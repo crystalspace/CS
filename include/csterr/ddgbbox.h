@@ -23,21 +23,21 @@
 #include "csterr/ddg.h"
 
 // Visibility data. 1 byte.
-typedef union ddgCFlags {
-	struct {
-		bool lin:1;				/// Is point inside left halfspace.
-		bool rin:1;				/// Right.
-		bool tin:1;				/// Top.
-		bool bin:1;				/// Bottom.
-		bool nin:1;				/// Near.
-		bool fin:1;				/// Far.
-		bool allin:1;			/// all in.
-		bool allout:1;			/// all out.
-		} flags; 
-	unsigned char visibility;
-} ddgClipFlags; 
+typedef unsigned char ddgClipFlags;
+enum {
+  DDGCF_LIN    = 1 << 0, /// Is point inside left halfspace.
+  DDGCF_RIN    = 1 << 1, /// Right.
+  DDGCF_TIN    = 1 << 2, /// Top.
+  DDGCF_BIN    = 1 << 3, /// Bottom.
+  DDGCF_NIN    = 1 << 4, /// Near.
+  DDGCF_FIN    = 1 << 5, /// Far.
+  DDGCF_ALLIN  = 1 << 6, /// all in.
+  DDGCF_ALLOUT = 1 << 7	 /// all out.
+};
 
-enum ddgClip { ddgINIT=0, ddgLEFT=1, ddgRIGHT=2, ddgTOP=4, ddgBOTTOM=8, ddgNEAR=16, ddgFAR=32, ddgALLIN=64, ddgALLOUT = 128};
+#define DDGCF_VISIBILITY \
+  (DDGCF_LIN | DDGCF_RIN | DDGCF_TIN | DDGCF_BIN | DDGCF_NIN | DDGCF_FIN)
+
 /**
  * Axis Aligned Bounding box object.
  * This object defines a 3d volume based on a centre point

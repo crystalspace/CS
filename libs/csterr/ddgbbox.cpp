@@ -19,6 +19,7 @@
 // 
 #include "sysdef.h"
 #include "csterr/ddgbbox.h"
+#include "csterr/ddgutil.h"
 
 // ----------------------------------------------------------------------
 // Initialization of global variables.
@@ -45,29 +46,28 @@ ddgBBox::ddgBBox(csVector3 min, csVector3 max)
 
 ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 {
-	ddgClipFlags vis;
-	vis.visibility = 0;
+	ddgClipFlags vis = 0;
 
 	if (tanHalfFOV != 1.0)		// Not 90 degree case
 		b.scale(csVector3(1.0/tanHalfFOV,1.0/tanHalfFOV,1));
 	// Test against near, and far plane and test viewing frustrum.
 	if (b.maxz() >= minz())
-		vis.flags.nin = true;
+		DDG_BSET(vis, DDGCF_NIN);
 	if (b.minz() <= maxz())
-		vis.flags.fin = true;
-	if (vis.flags.fin && vis.flags.nin)
+		DDG_BSET(vis, DDGCF_FIN);
+	if (DDG_BGET(vis, DDGCF_FIN) && DDG_BGET(vis, DDGCF_NIN))
 	{
 		if (b.maxx() > 0 || fabs(b.maxx()) <= b.maxz() )
-			vis.flags.lin = true;		// In left
+			DDG_BSET(vis, DDGCF_LIN);		// In left
 		if (b.minx() < 0 || b.minx() <= b.maxz() )
-			vis.flags.rin = true;		// In right
+			DDG_BSET(vis, DDGCF_RIN);		// In right
 		if (b.miny() < 0 || b.miny() <= b.maxz() )
-			vis.flags.tin = true;		// In top
+			DDG_BSET(vis, DDGCF_TIN);		// In top
 		if (b.maxy() > 0 || fabs(b.maxy()) <= b.maxz() )
-			vis.flags.bin = true;		// In bottom
+			DDG_BSET(vis, DDGCF_BIN);		// In bottom
 	}
 	// Check if bounding box is totally within the viewing volume.
-	if (vis.visibility == 63)
+	if (DDG_BGET(vis, DDGCF_VISIBILITY) == DDGCF_VISIBILITY)
 	{
 	    if ((b.minz() >= minz())
 			&& (b.maxz() <= maxz())
@@ -75,10 +75,10 @@ ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 			&& (b.maxx() < 0 || b.maxx() <= b.minz() )
 			&& (b.maxy() < 0 || b.maxy() <= b.minz() )
 			&& (b.miny() > 0 || fabs(b.miny()) <= b.minz() ))
-			vis.flags.allin = true;			// All Inside
+			DDG_BSET(vis, DDGCF_ALLIN);		// All Inside
 	}
 	else
-		vis.flags.allout = true;				// All Outside.
+		DDG_BSET(vis, DDGCF_ALLOUT);			// All Outside.
 
 	return vis;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999 by Jorrit Tyberghein
+    Copyright (C) 1999,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -180,7 +180,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 //			static ddgColor3  c1, c2, c3;
 			unsigned int i1 = 0, i2 = 0, i3 = 0;
 			// If triangle is visible.
-			if (!bt->tri (tvc)->vis ().flags.allout)
+			if (!DDG_BGET(bt->tri (tvc)->vis(), DDGCF_ALLOUT))
 			{
 				tva = ddgTBinTree::parent(tvc);
 				tv0 = bt->v0(tvc);

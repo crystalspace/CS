@@ -362,10 +362,10 @@ bool ddgTBinMesh::calculate( void )
 			if (!lastMerge || !merge())
 			{
 				// Top level triangles.
-				_bintree[i]->tri(0)->_state.all = 0;
-				_bintree[i]->tri(1)->_state.all = 0;
-				_bintree[i]->tri(triNo())->_state.all = 0;
-				_bintree[i]->tri(triNo()+1)->_state.all = 0;
+				_bintree[i]->tri(0)->_state = 0;
+				_bintree[i]->tri(1)->_state = 0;
+				_bintree[i]->tri(triNo())->_state = 0;
+				_bintree[i]->tri(triNo()+1)->_state = 0;
 				_bintree[i]->tri(0)->reset();
 				_bintree[i]->tri(1)->reset();
 				_bintree[i]->tri(triNo())->reset();
@@ -406,7 +406,7 @@ void ddgTBinMesh::clearSQ(void)
 	_qsi->reset();
 	while(!_qsi->end()) 
 	{
-		treeSQ(_qsi)->tri(indexSQ(_qsi))->_state.flags.sq = false;
+		DDG_BCLEAR(treeSQ(_qsi)->tri(indexSQ(_qsi))->_state, ddgMTri::SF_SQ);
 		_qsi->next();
 	}
 
@@ -420,7 +420,7 @@ void ddgTBinMesh::clearMQ(void)
 	_qmi->reset();
 	while(!_qmi->end()) 
 	{
-		treeMQ(_qmi)->tri(indexMQ(_qmi))->_state.flags.sq = false;
+		DDG_BCLEAR(treeMQ(_qmi)->tri(indexMQ(_qmi))->_state, ddgMTri::SF_SQ);
 		_qmi->next();
 	}
 	// Clear queue.
@@ -438,7 +438,7 @@ bool ddgTBinMesh::splitQueue(void)
 		ddgTBinTree *bt = treeSQ(_qsi);
 		ddgTriIndex i = indexSQ(_qsi);
 		if ( i < _triNo/2  // Not a leaf!
-			&& !bt->tri(i)->_vis.flags.allout)
+			&& !DDG_BGET(bt->tri(i)->_vis, DDGCF_ALLOUT))
 		{
 			bt->forceSplit(i);
 			split = true;

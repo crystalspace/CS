@@ -44,6 +44,10 @@
 #endif
 #endif
 
+#define DDG_BGET(VALUE,BITMASK) ((VALUE) & (BITMASK))
+#define DDG_BSET(VALUE,BITMASK) (VALUE) |= (BITMASK)
+#define DDG_BCLEAR(VALUE,BITMASK) (VALUE) &= ~(BITMASK)
+
 #define sq(a) ((a)*(a))
 // Some convenient angle functions.
 // Convert degrees to radians

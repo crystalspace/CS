@@ -52,20 +52,18 @@ class WEXP ddgMTri {
    /// The flags which incidate which frustrum sides we intersected. (1 byte)
 	ddgClipFlags _vis;
 	/// Flags indicating the triangle's state.
-	typedef union {
-		unsigned char all;
-		struct {
-			// if priority fields == 0, priority must be recalced.
-	        bool priority0:1;	/// 0 delay bit 0 LSB.
-	        bool priority1:1;	/// 1 .
-	        bool priority2:1;	/// 2 .
-	        bool priority3:1;	/// 3 delay bit 3 MSB.
-	        bool coord:1;		/// 4 Flag is true if coord cpqr is correct for frame.
-	        bool vbuffer:1;     /// 5 Flag is true if the coord is in the vertex buffer for frame.
-	        bool sq:1;			/// 6 Flag is true if triangle is in the split queue.
-            bool mq:1;			/// 7 Flag is true if triangle is in the merge queue.
-		} flags;
-	} ddgStateFlags;
+	enum {	// if all priority bits are clear, priority must be recalced.
+	  SF_PRIORITY0 = 1 << 0, /// 0 delay bit 0 LSB.
+	  SF_PRIORITY1 = 1 << 1, /// 1 .
+	  SF_PRIORITY2 = 1 << 2, /// 2 .
+	  SF_PRIORITY3 = 1 << 3, /// 3 delay bit 3 MSB.
+	  SF_COORD     = 1 << 4, /// 4 Flag is true if coord cpqr is correct for frame.
+	  SF_VBUFFER   = 1 << 5, /// 5 Flag is true if the coord is in the vertex buffer for frame.
+	  SF_SQ        = 1 << 6, /// 6 Flag is true if triangle is in the split queue.
+          SF_MQ        = 1 << 7  /// 7 Flag is true if triangle is in the merge queue.
+	};
+	#define SF_PRIORITY (SF_PRIORITY0 | SF_PRIORITY1 | SF_PRIORITY2 | SF_PRIORITY3)
+	typedef unsigned char ddgStateFlags;
     /// State of triangle.												(1 byte)
     ddgStateFlags  _state;
 public:
@@ -82,7 +80,7 @@ public:
     /// Return the buffer index of this triangle.
     inline unsigned int  vbufindex(void) { return _vbufindex; }
     /// Set the buffer flag for this triangle.
-    inline unsigned int  setvbufflag(void) { return _state.flags.vbuffer = true; }
+    inline unsigned int  setvbufflag(void) { DDG_BSET(_state, SF_VBUFFER); return true; }
 	///	get wedge thickness.
 	inline float	thick(void )	{return(_thick/4.0);}
 	///	set wedge thickness.
@@ -90,9 +88,10 @@ public:
     /// Reset all but queue status.
     inline void reset()
 	{
-		_state.flags.coord = _state.flags.vbuffer = false;
+		DDG_BCLEAR(_state, SF_COORD);
+		DDG_BCLEAR(_state, SF_VBUFFER);
 		decrPriorityDelay();
-		_vis.visibility = ddgINIT;
+		_vis = 0;
 		_cbufindex = 0;
 	}
 
@@ -100,19 +99,12 @@ public:
 	inline void setPriorityDelay(unsigned char v)
 	{
 		resetPriorityDelay();
-		_state.all += v;
+		_state += v;
 	}
 	/// Reset priority delay to zero.
 	inline void resetPriorityDelay()
 	{
-#ifdef WIN32
-		_state.all &= 0xF0;
-#else
-		_state.flags.priority0 =
-		_state.flags.priority1 =
-		_state.flags.priority2 =
-		_state.flags.priority3 = false;
-#endif
+		DDG_BCLEAR(_state, SF_PRIORITY);
 	}
 	/// Decrement the delay by one.
 	inline void decrPriorityDelay()
@@ -125,15 +117,7 @@ public:
 	/// Return priority delay.
 	inline unsigned char getPriorityDelay()
 	{
-#ifdef WIN32
-		return _state.all & 0x0F;
-#else
-		return
-			   ( _state.flags.priority3 ? 8 : 0)
-			+  ( _state.flags.priority2 ? 4 : 0)
-			+  ( _state.flags.priority1 ? 2 : 0)
-			+  ( _state.flags.priority0 ? 1 : 0);
-#endif
+		return DDG_BGET(_state, SF_PRIORITY);
 	}
 };
 
@@ -278,7 +262,7 @@ public:
             vout->Set(_dr-row(tindex),height(tindex),_dc-col(tindex));
         else
             vout->Set(_dr+row(tindex),height(tindex),_dc+col(tindex));
-        if (tri(tindex)->state().flags.vbuffer)
+        if (DDG_BGET(tri(tindex)->state(), ddgMTri::SF_VBUFFER))
             return tri(tindex)->vbufindex();
         return 0;
     }
@@ -385,7 +369,8 @@ public:
 	/// Is triangle visible?
 	bool visible(ddgTriIndex i)
 	{
-		return (tri(i)->vis().visibility > 0) ? true : false;
+		const ddgClipFlags v = tri(i)->vis();
+		return (v != 0 && !DDG_BGET(v, DDGCF_ALLOUT));
 	}
 
 	/// Calculate visibility of tree below a triangle.
