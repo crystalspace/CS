@@ -177,8 +177,10 @@ bool csWsTest::Initialize ()
   if (!csApp::Initialize ())
     return false;
 
-  LucidiaFont = LoadFont ("/fonts/LucidiaTypewriterRegular.ttf");
-
+  LucidiaFont = LoadFont ("*courier");
+  DefaultFontSize=14;
+  //  LucidiaFont = LoadFont ("/fonts/LucidiaTypewriterRegular.ttf");
+  
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
 
@@ -652,11 +654,11 @@ void csWsTest::LayoutDialog ()
 
   csGridBagLayout *gb = new csGridBagLayout (window);
 
-  csBorderConstraint *blc[5] = {csBorderLayout::CENTER,
-				csBorderLayout::EAST,
-				csBorderLayout::NORTH,
-				csBorderLayout::WEST,
-				csBorderLayout::SOUTH};
+  csBorderConstraint *blc[5] = {csBorderLayout::GetCenter (),
+				csBorderLayout::GetEast (),
+				csBorderLayout::GetNorth (),
+				csBorderLayout::GetWest (),
+				csBorderLayout::GetSouth ()};
 
   gb->c.fill = csGridBagConstraint::BOTH;
   gb->c.weightx = 1.0;
