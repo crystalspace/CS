@@ -97,8 +97,6 @@ csTerrBlock::~csTerrBlock ()
 
 void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func)
 {
-  int depth = 4;
-  if(!quaddiv) quaddiv = new csTerrainQuadDiv(depth);
   quaddiv->ComputeDmax(height_func, 
     bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
 }
@@ -245,7 +243,8 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
 
   m.mesh.num_triangles = m.triangles.Length();
   m.mesh.triangles = m.triangles.GetArray();
-  printf("terrfuncdiv: %d triangles\n", m.mesh.num_triangles);
+  printf("terrfuncdiv block %x: %d triangles\n", (int)this,
+    m.mesh.num_triangles);
 
   CS_ASSERT(m.mesh.buffers[0]);
   CS_ASSERT(!m.mesh.buffers[0]->IsLocked ());
@@ -1477,6 +1476,7 @@ void csTerrFuncObject::SetupObject ()
       printf ("Deleted %d triangles from %d.\n", del_tri, tot_tri);
       fflush (stdout);
     }
+    if(quaddiv_enabled) InitQuadDiv();
     ComputeNormals ();
     ComputeBBoxes ();
     SetupVisibilityTree ();
@@ -1606,6 +1606,83 @@ void csTerrFuncObject::TestVisibility (iRenderView* rview)
   quadtree->ComputeVisibility (origin, global_bbox, horizon, CS_HORIZON_SIZE);
 }
 
+void csTerrFuncObject::InitQuadDiv()
+{
+  if(!quad_height)
+  {
+    QuadDivHeightFunc *qdhf = new QuadDivHeightFunc();
+    qdhf->hf = height_func;
+    qdhf->scx = 1.0 / (scale.x * float (blockxy));
+    qdhf->scy = 1.0 / (scale.z * float (blockxy));
+    qdhf->offx = -topleft.x * qdhf->scx;
+    qdhf->offy = -topleft.z * qdhf->scy;
+    qdhf->offh = topleft.y;
+    qdhf->sch = scale.y;
+    quad_height = qdhf;
+  }
+  if(!quad_normal)
+  {
+    QuadDivNormalFunc *qdnf = new QuadDivNormalFunc();
+    if(normal_func) 
+    {
+      qdnf->nf = normal_func;
+      qdnf->scx = 1.0 / (scale.x * float (blockxy));
+      qdnf->scy = 1.0 / (scale.z * float (blockxy));
+      qdnf->offx = -topleft.x * qdnf->scx;
+      qdnf->offy = -topleft.z * qdnf->scy;
+      qdnf->inv_totx = 0.0;
+      qdnf->inv_toty = 0.0;
+    }
+    else 
+    {
+      qdnf->hf = quad_height;
+      qdnf->scx = 1.;
+      qdnf->scy = 1.;
+      qdnf->offx = 0.;
+      qdnf->offy = 0.;
+      qdnf->inv_totx = .5 / float (1+blockxy*gridx) * 
+        (scale.x * float (blockxy));
+      qdnf->inv_toty = .5 / float (1+blockxy*gridy) * 
+        (scale.z * float (blockxy));
+    }
+    quad_normal = qdnf;
+  }
+
+  int initdepth = 4;
+  int bx, by;
+  int blidx;
+
+  for (by = 0 ; by < blockxy ; by++)
+  {
+    for (bx = 0 ; bx < blockxy ; bx++)
+    {
+      blidx = by*blockxy + bx;
+      blocks[blidx].quaddiv = new csTerrainQuadDiv(initdepth);
+      blocks[blidx].PrepareQuadDiv(quad_height);
+      printf("block bx=%d by=%d block %x qd %x center %g,%g,%g\n", bx, by,
+        (int)&blocks[blidx], (int)blocks[blidx].quaddiv, blocks[blidx].center.x,
+	blocks[blidx].center.y, blocks[blidx].center.z);
+    }
+  }
+
+  for (by = 0 ; by < blockxy ; by++)
+  {
+    for (bx = 0 ; bx < blockxy ; bx++)
+    {
+      blidx = by*blockxy + bx;
+      if(bx>0) blocks[blidx].quaddiv->SetNeighbor(
+        CS_QUAD_LEFT, blocks[by*blockxy+bx-1].quaddiv);
+      if(by>0) blocks[blidx].quaddiv->SetNeighbor(
+        CS_QUAD_TOP, blocks[(by-1)*blockxy+bx].quaddiv);
+      if(bx<blockxy-1) blocks[blidx].quaddiv->SetNeighbor(
+        CS_QUAD_RIGHT, blocks[by*blockxy+bx+1].quaddiv);
+      if(by<blockxy-1) blocks[blidx].quaddiv->SetNeighbor(
+        CS_QUAD_BOT, blocks[(by+1)*blockxy+bx].quaddiv);
+    }
+  }
+}
+
+
 bool csTerrFuncObject::DrawTest (iRenderView*, iMovable*)
 {
   // @@@ Can we do something more sensible here?
@@ -1655,59 +1732,8 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       {
         if(quaddiv_enabled)
 	{
-	  if(block.quaddiv)
-	  { // set neighbors of block
-	    if(by>0) block.quaddiv->SetNeighbor(CS_QUAD_TOP, 
-	      blocks[blidx-blockxy].quaddiv);
-	    if(by<blockxy-1) block.quaddiv->SetNeighbor(CS_QUAD_BOT, 
-	      blocks[blidx+blockxy].quaddiv);
-	    if(bx>0) block.quaddiv->SetNeighbor(CS_QUAD_LEFT, 
-	      blocks[blidx-1].quaddiv);
-	    if(bx<blockxy-1) block.quaddiv->SetNeighbor(CS_QUAD_RIGHT, 
-	      blocks[blidx+1].quaddiv);
-	  }
-	  if(!quad_height)
-	  {
-	    QuadDivHeightFunc *qdhf = new QuadDivHeightFunc();
-	    qdhf->hf = height_func;
-	    qdhf->scx = 1.0 / (scale.x * float (blockxy));
-	    qdhf->scy = 1.0 / (scale.z * float (blockxy));
-	    qdhf->offx = -topleft.x * qdhf->scx;
-	    qdhf->offy = -topleft.z * qdhf->scy;
-	    qdhf->offh = topleft.y;
-	    qdhf->sch = scale.y;
-	    quad_height = qdhf;
-	  }
-	  if(!quad_normal)
-	  {
-	    QuadDivNormalFunc *qdnf = new QuadDivNormalFunc();
-	    if(normal_func) 
-	    {
-	      qdnf->nf = normal_func;
-	      qdnf->scx = 1.0 / (scale.x * float (blockxy));
-	      qdnf->scy = 1.0 / (scale.z * float (blockxy));
-	      qdnf->offx = -topleft.x * qdnf->scx;
-	      qdnf->offy = -topleft.z * qdnf->scy;
-	      qdnf->inv_totx = 0.0;
-	      qdnf->inv_toty = 0.0;
-	    }
-	    else 
-	    {
-	      qdnf->hf = quad_height;
-	      qdnf->scx = 1.;
-	      qdnf->scy = 1.;
-	      qdnf->offx = 0.;
-	      qdnf->offy = 0.;
-              qdnf->inv_totx = .5 / float (1+blockxy*gridx) * 
-	        (scale.x * float (blockxy));
-              qdnf->inv_toty = .5 / float (1+blockxy*gridy) * 
-	        (scale.z * float (blockxy));
-	    }
-	    quad_normal = qdnf;
-	  }
-	  block.PrepareQuadDiv(quad_height);
+	  if((bx!=0&&bx!=1) || by!=0) continue; // one block only
 	  block.PrepareFrame( origin );
-	  //if(by!=0) continue; //  debug
 	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
 	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane,
 	    correct_du, correct_su, correct_dv, correct_sv, this);

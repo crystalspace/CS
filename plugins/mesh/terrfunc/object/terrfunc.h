@@ -394,6 +394,11 @@ public:
    */
   void TestVisibility (iRenderView* rview);
 
+  /**
+   * Construct quad divisors for all blocks and interconnects them.
+   */
+  void InitQuadDiv();
+
   void SetDirLight (const csVector3& pos, const csColor& col)
   {
     csVector3 dp = dirlight - pos;

@@ -85,13 +85,11 @@ csTerrainQuadDiv::~csTerrainQuadDiv()
 }
 
 
-void csTerrainQuadDiv::SetNeighbor(int dir, csTerrainQuadDiv *neigh)
+void csTerrainQuadDiv::RemoveNeighbor(int dir)
 {
-  if((neigh!=NULL) && (neighbors[dir] == neigh)) return;
-  neighbors[dir] = neigh;
+  neighbors[dir] = NULL;
   if(!IsLeaf())
   {
-    neigh=NULL; /// make subchildren NULL so they will look up later.
     /// call 2 children only
     int c1=0, c2=0;
     switch(dir)
@@ -101,13 +99,34 @@ void csTerrainQuadDiv::SetNeighbor(int dir, csTerrainQuadDiv *neigh)
       case CS_QUAD_BOT: c1=CS_QUAD_BOTLEFT; c2=CS_QUAD_BOTRIGHT; break;
       case CS_QUAD_LEFT: c1=CS_QUAD_TOPLEFT; c2=CS_QUAD_BOTLEFT; break;
     }
-    children[c1]->SetNeighbor(dir, neigh);
-    children[c2]->SetNeighbor(dir, neigh);
+    children[c1]->RemoveNeighbor(dir);
+    children[c2]->RemoveNeighbor(dir);
+  }
+}
+
+void csTerrainQuadDiv::SetNeighbor(int dir, csTerrainQuadDiv *neigh)
+{
+  neighbors[dir] = neigh;
+  if(!IsLeaf())
+  {
+    /// call 2 children only
+    int c1=0, c2=0;
+    switch(dir)
+    {
+      case CS_QUAD_TOP: c1=CS_QUAD_TOPLEFT; c2=CS_QUAD_TOPRIGHT; break;
+      case CS_QUAD_RIGHT: c1=CS_QUAD_TOPRIGHT; c2=CS_QUAD_BOTRIGHT; break;
+      case CS_QUAD_BOT: c1=CS_QUAD_BOTLEFT; c2=CS_QUAD_BOTRIGHT; break;
+      case CS_QUAD_LEFT: c1=CS_QUAD_TOPLEFT; c2=CS_QUAD_BOTLEFT; break;
+    }
+    children[c1]->RemoveNeighbor(dir);
+    children[c2]->RemoveNeighbor(dir);
   }
 }
 
 csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
 {
+  if(!parent && neighbors[dir]) printf("qd %x dir %d %x\n", 
+    (int)this, dir, (int)neighbors[dir]);
   if(neighbors[dir]) return neighbors[dir];
   /// find & cache it;
   if(!parent) return NULL;
@@ -173,6 +192,7 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   float midy = (miny+maxy)*0.5f;
   float h;
   float cornerh[4];
+  float old_dmax = dmax;
   cornerh[0] = height_func->GetHeight(minx, miny);
   cornerh[1] = height_func->GetHeight(minx, maxy);
   cornerh[2] = height_func->GetHeight(maxx, maxy);
@@ -241,6 +261,7 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   h -= (cornerh[2] + cornerh[3])*0.5;
   h = ABS(h); if(h > dmax) dmax = h;
 
+  CS_ASSERT((old_dmax==0.0f)||(old_dmax==dmax));
   //printf("size %g dmax is %g.\n", maxx-minx, dmax);
 }
 

@@ -64,6 +64,8 @@ public:
 
   /// Add/Remove a neighbor from the tree - give direction and ptr(can be NULL)
   void SetNeighbor(int dir, csTerrainQuadDiv *neigh);
+  /// Set a neighbor to NULL (it will be looked up next frame)
+  void RemoveNeighbor(int dir);
   /** 
    * Get neighbor for a direction (will look it up if NULL is cached)
    * NULL means no neighbor (of same size) in that direction.
