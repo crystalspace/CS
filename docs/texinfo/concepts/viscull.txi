@@ -3,14 +3,8 @@
 @section Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility
-@cindex octrees
-@cindex BSP trees
 @cindex PVS
 @cindex Potentially Visible Set
-@cindex portals
-@cindex sectors
-@cindex c-buffer
-@cindex view frustrum
 
 @emph{NOTE:} This section describes in detail how visibility culling in
 Crystal Space works or will work in the not-to-distant future.
@@ -19,8 +13,10 @@ only represents of the ideal implementation which lives in my head right
 now and which I'm planning to implement in the near future. Parts of the
 system are implemented though.
 
-@node sectors and portals
+@node vis: sectors and portals
 @subsection Sectors and Portals
+@cindex portals
+@cindex sectors
 
 A sector is the basic building block in CS. A world will be made out
 of several sectors connected with portals. Normally adjacent sectors
@@ -43,14 +39,14 @@ is all visibility testing that ignores portal boundaries and we have
 portal/sector visibility which controls what you can see through a
 portal. Discussing both will be the main focus of this document later.
 
-@node entities
+@node vis: entities
 @subsection Entities
 
 But first lets discuss the type of entities that CS supports.
 We already saw sectors above. These are the main containers for all
 the entities below.
 
-@node sprites or models
+@node vis: sprites or models
 @subsubsection Sprites or Models
 
 CS supports both 3D and 2D sprites. A 3D sprite is basicly a
@@ -59,7 +55,7 @@ detail here because this document is related to visibility. A 2D sprite
 is a general polygon which always faces the camera. Both are considered
 detail objects (more on that later).
 
-@node things
+@node vis: things
 @subsubsection Things
 
 Things are general objects used to enhance geometry. They can move
@@ -69,21 +65,21 @@ a chair, ...). Large things can be merged with sector geometry (more
 on that later). Small and detailed things will be tagged as detail
 objects. Polygons on things can also be portals to other areas.
 
-@node curved surfaces
+@node vis: curved surfaces
 @subsubsection Curved Surfaces
 
 Curved surfaces are technically part of things but for visibility
 they are considered differently. They are always considered as detail
 objects as they represent a rather large triangle mesh.
 
-@node terrain
+@node vis: terrain
 @subsubsection Terrain Surfaces
 
 A terrain surface is a large entity that can be in a sector.
 It is not a detail object (obviously). Handling of terrain and visibility
 is not ready yet. We need to do more work on this part.
 
-@node sector structure
+@node vis: sector structure
 @subsection Sector Structure
 
 In this subsection we go deeper into the structure of a sector.
@@ -97,10 +93,12 @@ the rest of the world or else we first add a number of
 things and merge them into an octree/bsp-tree combination. After that
 we add further entities like above (and we can still use the outgoing
 portals). All things which are not marked as
-moveable and detail can be added to the octree.
+movable and detail can be added to the octree.
 
-@node about octrees and bsp trees
+@node vis: about octrees and bsp trees
 @subsubsection About Octrees and BSP Trees
+@cindex octrees
+@cindex BSP trees
 
 Note that this is only a very short explanation about BSP trees.
 There are much better documents explaining them.
@@ -136,9 +134,9 @@ An octree is a variant of a BSP tree. Instead of selecting a splitter
 from the given polygons you select three axis aligned splitter planes
 usually centered around the center of the set of input polygons. The planes
 are always axis aligned so you can't do much about that but there is
-some freedome with the choice of the center of those three planes.
+some freedom with the choice of the center of those three planes.
 CS currently tries a number of random center points and selects the one
-which causes least number of splits. A better criterium would be to
+which causes least number of splits. A better criterion would be to
 select a center which causes the planes to intersect as much solid space
 as possible. This is somewhat harder to implement. The reason why this
 is good has to do with visibility culling and PVS. If a splitter plane
@@ -156,7 +154,7 @@ So at the end you get a large octree with many mini-BSP trees at the
 leaves of the octree. This combined structure provides everything that
 CS needs for efficient visibility culling.
 
-@node visibility culling
+@node vis: visibility culling
 @subsection Visibility Culling
 
 Ok, here it comes. Given the above structure with sectors, entities,
@@ -192,20 +190,21 @@ but the culling object inside will take care of culling what is hidden
 by the detail object. Culling objects are only useful for detail objects
 that are sufficiently large and in sectors where there is a sufficient
 number of other entities (i.e. objects or portals) to be culled.
-A question here is wether or not it is possible (easy) to generate culling
+A question here is whether or not it is possible (easy) to generate culling
 objects automatically from detail objects.
 
 @end table
 
-@node view frustrum culling
+@node vis: view frustrum culling
 @subsection View Frustrum Culling
+@cindex view frustrum
 
 View frustrum culling is the most obvious type of culling. CS does not
 do it right now (see the following section about portal/sector visibility
 for the reason) but there are some areas where we should certainly do
 this. Detail objects are one example.
 
-@node portal/sector visibility
+@node vis: portal/sector visibility
 @subsection Portal/sector Visibility
 
 Portal/sector visibility is based on 2D clipping. The 2D projected
@@ -233,7 +232,7 @@ to the 2D clipper).
 
 For detail objects we have a number of options. We can simply
 consider them visible is they are in the view frustrum and ignore
-portals alltogether. Note that all detail objects are linked to a
+portals all-together. Note that all detail objects are linked to a
 sector. If a sector is not traversed too (because the current viewable
 portals don't connect to that sector) then the detail objects in
 that sector will not be considered as well. So for fast hardware this
@@ -258,7 +257,45 @@ because that enables good culling of other portals. Culling portals
 is valuable because culling a portal means that the entire sector behind
 that portal is also culled.
 
-@node in sector visibility
+@node vis: in sector visibility
 @subsection In-sector Visibility
+@cindex c-buffer
 
+For a normal sector which has no octree in-sector visibility is really
+very simple. Everything which is not culled by the view frustrum or
+the portal/sector visibility system is visible.
+
+If a sector has an octree then the situation is vastly different.
+Here is where the main work of the visibility algorithm happens.
+In-sector visibility is also 2D based (screen coordinates). This is why
+the discussion for detail objects in the previous section (Portal/sector
+Visibility) is relevant here too. In general we will try to avoid to
+do as little culling work as possible while still trying to cull as
+much as possible.
+
+The above comment is why it is important to have a good world design.
+World geometry (which is at the basis of visibility culling) should
+contain as little polygons as possible but they should be as big as
+possible and also potentially cull lots of geometry. Culling objects
+should be found for all large detail objects which can potentially
+cull large numbers of other objects or portals.
+
+The current culler works with the c-buffer. For every scanline we
+have a list of not rendered spans (i.e. the CS c-buffer keeps
+empty spans instead of full spans). Initially we will have a list
+of H spans with H being the number of scanlines on the screen.
+Every span will have a width of W with W being the number of horizontal
+screen pixels. When a polygon is added to the c-buffer it will be
+scan-converted and every scan of the polygon will be inserted at the
+appropriate line of the c-buffer.
+
+An important issue with the c-buffer is that it doesn't have Z information.
+So adjacent empty or full spans can be merged. This is in contrast
+with the s-buffer which keeps Z information for every span.
+This keeps complexity down enormously and also improves efficiently.
+The downside of this method is that it requires perfect front to back
+sorting in order to work properly (more on ways to solve that later).
+
+So given an octree and the c-buffer we can explain how the basic
+visibility algorithm works.
 
