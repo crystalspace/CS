@@ -22,7 +22,15 @@ The history order has been reversed so that new features are at the top.
 	  fixes iMeshWrapper::UpdateLighting().
 	- csEngine::GetNearbyLights() now returns references to iLight
 	  instead of csLight.
+	- Fixed a few bugs in the explosion loader which prevented that
+	  loader from working correctly.
 	- Fixed a reference to zlib-win32-bin in the documentation.
+	- Added full documentation for all the existing mesh object plugins
+	  in CS.
+	- Cleaned up mapfmt.txi documentation. i.e. removed all the
+	  documentation related to sprite and particle systems. This
+	  is now documented with the mesh object plugin documentation.
+	  Also added documentation about MESHOBJ keyword.
 	- Eric Sunshine made the following changes:
 	    - Modified static.mak so that cslibref.cpp now depends upon the
 	      system makefile (such as linux.mak) in addition to user.mak and

@@ -295,29 +295,29 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine)
         break;
       case CS_TOKEN_PARTRADIUS:
         {
-          int f;
-          ScanStr (params, "%d", &f);
+          float f;
+          ScanStr (params, "%f", &f);
           explostate->SetPartRadius (f);
         }
         break;
       case CS_TOKEN_SPREADPOS:
         {
-          int f;
-          ScanStr (params, "%d", &f);
+          float f;
+          ScanStr (params, "%f", &f);
           explostate->SetSpreadPos (f);
         }
         break;
       case CS_TOKEN_SPREADSPEED:
         {
-          int f;
-          ScanStr (params, "%d", &f);
+          float f;
+          ScanStr (params, "%f", &f);
           explostate->SetSpreadSpeed (f);
         }
         break;
       case CS_TOKEN_SPREADACCEL:
         {
-          int f;
-          ScanStr (params, "%d", &f);
+          float f;
+          ScanStr (params, "%f", &f);
           explostate->SetSpreadAcceleration (f);
         }
         break;

@@ -239,8 +239,8 @@ points forward.
 @production{texture-name, @nonterm{name}}@*
 @production{material-name, @nonterm{name}}@*
 @production{polygon-name, @nonterm{name}}@*
-@production{sprite-name, @nonterm{name}}@*
-@production{spritetpl-name, @nonterm{name}}@*
+@production{mesh-name, @nonterm{name}}@*
+@production{meshfact-name, @nonterm{name}}@*
 @production{library-name, @nonterm{name}}@*
 @production{file-name, @nonterm{name}}
 
@@ -564,7 +564,7 @@ from where you want the polygon to be visible.
 
 @subsubheading Collection Objects
 @production{col-thing, @token{THING} @LP{} @nonterm{thing-name} @RP{}}@*
-@production{col-sprite, @token{SPRITE} @LP{} @nonterm{sprite-name} @RP{}}@*
+@production{col-mesh, @token{MESH} @LP{} @nonterm{mesh-name} @RP{}}@*
 @production{col-collection,
     @token{COLLECTION} @LP{} @nonterm{col-name} @RP{}}@*
 @production{col-light, @token{LIGHT} @LP{} @nonterm{light-name} @RP{}}@*
@@ -573,7 +573,7 @@ from where you want the polygon to be visible.
     @prodnext{@nonterm{col-collection}}@*
     @prodnext{@nonterm{col-light}}@*
     @prodnext{@nonterm{col-sector}}@*
-    @prodnext{@nonterm{col-sprite}}@*
+    @prodnext{@nonterm{col-mesh}}@*
 @production{collection, @token{COLLECTION} @nonterm{col-name}
     @LP{} [ @nonterm{collection-comp} @dots{} ] @RP{}}
 
@@ -620,6 +620,27 @@ from where you want the polygon to be visible.
     @prodnext{@token{REFLECTION} @LP{} @nonterm{number} @RP{}}@*
 @production{material-desc, @token{MATERIAL} @nonterm{material-name}
     @LP{} [ @nonterm{material-desc-comp} @dots{} ] @RP{}}
+
+@subsubheading Mesh Objects
+@production{plugin, @token{PLUGIN} @LP{} @nonterm{string} @RP{}}@*
+@production{params, @token{PARAMS} @LP{} @nonterm{string} @RP{}}@*
+
+@production{mesh-comp, @nonterm{plugin}}@*
+    @prodnext{@nonterm{key}}@*
+    @prodnext{@nonterm{params}}@*
+    @prodnext{@nonterm{mesh}}@*
+    @prodnext{@nonterm{move2}}@*
+@production{mesh, @token{MESHOBJ} @nonterm{mesh-name}
+    @LP{} [ @nonterm{mesh-comp} @dots{} ] @RP{}}@*
+
+@subsubheading Mesh Object Factories
+@production{meshfact-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}@*
+@production{meshfact-comp, @nonterm{plugin}}@*
+    @prodnext{@nonterm{params}}@*
+    @prodnext{@nonterm{meshfact-file}}@*
+    @prodnext{@nonterm{material}}@*
+@production{meshfact, @token{MESHOBJ} @nonterm{meshfact-name}
+    @LP{} [ @nonterm{meshfact-comp} @dots{} ] @RP{}}@*
 
 @subsubheading Things and Objects
 @production{moveable, @token{MOVEABLE} @LP{} @RP{}}@*
@@ -709,163 +730,10 @@ from where you want the polygon to be visible.
 @production{sixface-template, @token{SIXFACE} @nonterm{thingtpl-name}
     @LP{} [ @nonterm{sixface-tpl-comp} @dots{} ] @RP{}}
 
-@subsubheading Sprites
-@production{v1, @nonterm{pos-number}}@*
-@production{v2, @nonterm{pos-number}}@*
-@production{v3, @nonterm{pos-number}}@*
-@production{frame-vector, @token{V} @LP{} @nonterm{x} @COMMA{} @nonterm{y}
-    @COMMA{} @nonterm{z} @token{:} @nonterm{u} @COMMA{} @nonterm{v} @RP{}}@*
-@production{frame-name, @nonterm{name}}@*
-@production{sprite-frame, @token{FRAME} @nonterm{frame-name}
-    @LP{} [ @nonterm{frame-vector} ] @RP{}}@*
-@production{action-name, @nonterm{name}}@*
-@production{action-delay, @nonterm{pos-number}}@*
-@production{action-frame, @token{F}
-    @LP{} @nonterm{frame-name} @COMMA{} @nonterm{action-delay} @RP{}}@*
-@production{sprite-action, @token{ACTION} @nonterm{action-name}
-    @LP{} [ @nonterm{action-frame} ] @RP{}}@*
-@production{sprite-triangle, @token{TRIANGLE}
-    @LP{} @nonterm{v1} @COMMA{} @nonterm{v2} @COMMA{} @nonterm{v3} @RP{}}@*
-@production{sprite-skeleton, @@@@@@@@@emph{Define this.}}@*
-@production{sprite-tween, @token{TWEEN} @LP{} @nonterm{yes-no} @RP{}}
-
-@production{sprite-tpl-comp, @nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{sprite-frame}}@*
-    @prodnext{@nonterm{sprite-action}}@*
-    @prodnext{@nonterm{sprite-triangle}}@*
-    @prodnext{@nonterm{template-file}}@*
-    @prodnext{@nonterm{sprite-skeleton}}@*
-    @prodnext{@nonterm{sprite-tween}}@*
-@production{sprite-template, @token{SPRITE} @nonterm{spritetpl-name}
-    @LP{} [ @nonterm{sprite-tpl-comp} @dots{} ] @RP{}}
-
-@production{mixmode1, @token{COPY} @LP{} @RP{}}@*
-    @prodnext{@token{MULTIPLY} @LP{} @RP{}}@*
-    @prodnext{@token{MULTIPLY2} @LP{} @RP{}}@*
-    @prodnext{@token{ADD} @LP{} @RP{}}@*
-    @prodnext{@token{ALPHA} @LP{} @nonterm{number} @RP{}}@*
-    @prodnext{@token{TRANSPARENT} @LP{} @RP{}}@*
-    @prodnext{@token{KEYCOLOR} @LP{} @RP{}}@*
-@production{mixmode, @token{MIXMODE} @LP{} @nonterm{mixmode1} @dots{} @RP{}}
-
-@production{sp-template, @token{TEMPLATE}
-    @LP{} @nonterm{spritetpl-name} @COMMA{} @nonterm{action-name} @RP{}}@*
-@production{sprite-comp, @nonterm{move2}}@*
-    @prodnext{@nonterm{sp-template}}@*
-    @prodnext{@nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{sprite-tween}}@*
-@production{sprite, @token{SPRITE} @nonterm{sprite-name}
-    @LP{} [ @nonterm{sprite-comp} @dots{} ] @RP{}}
-
-@production{move2d, @token{MOVE} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{spr2d-vertices,
-    @token{VERTICES} @LP{} @nonterm{vector-2d} @dots{} @RP{}}@*
-@production{sprite2d-comp, @nonterm{move2d}}@*
-    @prodnext{@nonterm{texnr}}@*
-    @prodnext{@nonterm{material}}@*
-    @prodnext{@nonterm{spr2d-vertices}}@*
-    @prodnext{@nonterm{uv}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{colors}}@*
-    @prodnext{@nonterm{lighting}}@*
-@production{sprite2d, @token{SPRITE2D} @nonterm{sprite-name}
-    @LP{} [ @nonterm{sprite2d-comp} @dots{} ] @RP{}}
-
-@subsubheading Sprite Files
-@noindent
-Sometimes you will want to share a sprite among many worlds.  To accomplish
-this, create a seperate file for your sprite that contains the @samp{SPRITE}
-definition and use the @samp{INCLUDESPRITE} macro to load it in.
-
-@production{sprite-file,
-    @token{INCLUDESPRITE} @LP{} @nonterm{file-name} @RP{}}
-
 @subsubheading Nodes
 @production{position, @token{POSITION} @LP{} @nonterm{coordinate} @RP{}}@*
 @production{node-comp, @nonterm{position} | @nonterm{key}}@*
 @production{node, @token{NODE} @LP{} [ @nonterm{node-comp} @dots{} ] @RP{}}
-
-@subsubheading Particle Systems
-@production{partsys-color, @token{COLOR} @LP{} @nonterm{color} @RP{}}@*
-@production{partsys-number, @token{NUMBER} @LP{} @nonterm{number} @RP{}}@*
-@production{partsys-dropsize,
-    @token{DROPSIZE} @LP{} @nonterm{number} @COMMA{} @nonterm{number} @RP{}}@*
-@production{partsys-box,
-    @token{BOX} @LP{} @nonterm{vector-3d} @COMMA{} @nonterm{vector-3d} @RP{}}
-
-@production{fountain-origin, @token{ORIGIN} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{fountain-accel, @token{ACCEL} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{fountain-speed, @token{SPEED} @LP{} @nonterm{number} @RP{}}@*
-@production{fountain-falltime, @token{FALLTIME} @LP{} @nonterm{number} @RP{}}@*
-@production{fountain-opening, @token{OPENING} @LP{} @nonterm{number} @RP{}}@*
-@production{fountain-azimuth, @token{AZIMUTH} @LP{} @nonterm{number} @RP{}}@*
-@production{fountain-elevation,
-    @token{ELEVATION} @LP{} @nonterm{number} @RP{}}@*
-@production{fountain-comp, @nonterm{texture}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{lighting}}@*
-    @prodnext{@nonterm{partsys-dropsize}}@*
-    @prodnext{@nonterm{partsys-color}}@*
-    @prodnext{@nonterm{partsys-number}}@*
-    @prodnext{@nonterm{fountain-origin}}@*
-    @prodnext{@nonterm{fountain-accel}}@*
-    @prodnext{@nonterm{fountain-speed}}@*
-    @prodnext{@nonterm{fountain-falltime}}@*
-    @prodnext{@nonterm{fountain-opening}}@*
-    @prodnext{@nonterm{fountain-azimuth}}@*
-    @prodnext{@nonterm{fountain-elevation}}@*
-@production{fountain, @token{FOUNTAIN} @nonterm{name}
-    @LP{} [ @nonterm{fountain-comp} @dots{} ] @RP{}}
-
-@production{fire-origin, @token{ORIGIN} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{fire-speed, @token{SPEED} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{fire-swirl, @token{SWIRL} @LP{} @nonterm{number} @RP{}}@*
-@production{fire-totaltime, @token{TOTALTIME} @LP{} @nonterm{number} @RP{}}@*
-@production{fire-colorscale, @token{COLORSCALE} @LP{} @nonterm{number} @RP{}}@*
-@production{fire-comp, @nonterm{texture}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{lighting}}@*
-    @prodnext{@nonterm{partsys-dropsize}}@*
-    @prodnext{@nonterm{partsys-number}}@*
-    @prodnext{@nonterm{fire-origin}}@*
-    @prodnext{@nonterm{fire-speed}}@*
-    @prodnext{@nonterm{fire-swirl}}@*
-    @prodnext{@nonterm{fire-totaltime}}@*
-    @prodnext{@nonterm{fire-colorscale}}@*
-@production{fire,
-    @token{FIRE} @nonterm{name} @LP{} [ @nonterm{fire-comp} @dots{} ] @RP{}}
-
-@production{snow-swirl, @token{SWIRL} @LP{} @nonterm{number} @RP{}}@*
-@production{snow-speed, @token{SPEED} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{snow-comp, @nonterm{texture}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{lighting}}@*
-    @prodnext{@nonterm{partsys-dropsize}}@*
-    @prodnext{@nonterm{partsys-color}}@*
-    @prodnext{@nonterm{partsys-number}}@*
-    @prodnext{@nonterm{partsys-box}}@*
-    @prodnext{@nonterm{snow-speed}}@*
-    @prodnext{@nonterm{snow-swirl}}@*
-@production{snow,
-    @token{SNOW} @nonterm{name} @LP{} [ @nonterm{snow-comp} @dots{} ] @RP{}}
-
-@production{rain-speed, @token{SPEED} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{rain-comp, @nonterm{texture}}@*
-    @prodnext{@nonterm{mixmode}}@*
-    @prodnext{@nonterm{lighting}}@*
-    @prodnext{@nonterm{partsys-dropsize}}@*
-    @prodnext{@nonterm{partsys-color}}@*
-    @prodnext{@nonterm{partsys-number}}@*
-    @prodnext{@nonterm{partsys-box}}@*
-    @prodnext{@nonterm{rain-speed}}@*
-@production{rain,
-    @token{RAIN} @nonterm{name} @LP{} [ @nonterm{rain-comp} @dots{} ] @RP{}}
-
-@production{partsys, @nonterm{fountain} | @nonterm{snow} | @nonterm{rain} |
-    @nonterm{fire}}
 
 @subsubheading Sectors and Rooms
 @production{tex-comp, @nonterm{texture} | @nonterm{plane} | @nonterm{texlen}}@*
@@ -894,7 +762,7 @@ definition and use the @samp{INCLUDESPRITE} macro to load it in.
     @prodnext{@nonterm{hardmove}}@*
     @prodnext{@nonterm{sixface}}@*
     @prodnext{@nonterm{light}}@*
-    @prodnext{@nonterm{sprite}}@*
+    @prodnext{@nonterm{mesh}}@*
     @prodnext{@nonterm{fog-desc}}@*
     @prodnext{@nonterm{circle}}@*
     @prodnext{@nonterm{skydome}}@*
@@ -927,7 +795,7 @@ definition and use the @samp{INCLUDESPRITE} macro to load it in.
     @prodnext{@nonterm{bsp}}@*
     @prodnext{@nonterm{statbsp}}@*
     @prodnext{@nonterm{move}}@*
-    @prodnext{@nonterm{sprite}}@*
+    @prodnext{@nonterm{mesh}}@*
     @prodnext{@nonterm{fog-desc}}@*
 @production{room, @token{ROOM} @nonterm{sector-name}
     @LP{} [ @nonterm{room-comp} @dots{} ] @RP{}}
@@ -992,8 +860,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @prodnext{@nonterm{room}}@*
     @prodnext{@nonterm{thing-template}}@*
     @prodnext{@nonterm{sixface-template}}@*
-    @prodnext{@nonterm{sprite-template}}@*
-    @prodnext{@nonterm{sprite-file}}@*
+    @prodnext{@nonterm{meshfact}}@*
     @prodnext{@nonterm{plane-desc}}@*
     @prodnext{@nonterm{collection}}@*
     @prodnext{@nonterm{start}}@*
@@ -1002,7 +869,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 
 @subsubheading Library File
 @production{library-comp, @nonterm{textures} | @nonterm{materials} |
-    @nonterm{thing-template} | @nonterm{sprite-template}}@*
+    @nonterm{thing-template} | @nonterm{meshfact}}@*
 @production{library,
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 

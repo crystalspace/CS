@@ -1,0 +1,113 @@
+@c -*-texinfo-*-
+@node MeshObject Spr2D, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@subsection Sprite2D Mesh Object
+@cindex MeshObject
+@cindex 2D Sprite
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iSprite2DState}
+@cindex @code{iSprite2DFactoryState}
+@cindex @code{iParticle}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+A 2D Sprite is basically a polygon that always faces the camera. There
+are some special effects that you can do with this but it is really
+very simple otherwise.
+
+@subsubheading Basic Structure
+
+The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
+@itemize
+@item
+  Type plugin: @samp{crystalspace.mesh.object.sprite.2d}
+@item
+  Loader plugin: @samp{crystalspace.mesh.loader.sprite.2d}
+@item
+  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.sprite.2d}
+@end itemize
+
+Objects in this plugin implement the following @sc{SCF} interfaces (get
+with @code{QUERY_INTERFACE}):
+@itemize @bullet
+@item
+  @code{MeshObject}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObject}
+  @item
+    Implements @code{iSprite2DState}
+  @item
+    Implements @code{iParticle}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectFactory}
+  @item
+    Implements @code{iSprite2DFactoryState}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectType}
+  @end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+@code{iSprite2DFactoryState} is the @sc{SCF} interface that you can
+use to set/get settings for a 2D Sprite factory. The definition of this
+interface can be found in @code{include/imspr2d.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the material, blending mode (mixmode),
+and lighting settings.
+
+@subsubheading Factory Loader
+
+@itemize @bullet
+@item
+  @samp{LIGHTING}: Enable/disable lighting.
+@item
+  @samp{MATERIAL}: Material to use for the polygon.
+@item
+  @samp{MIXMODE}: Blending mode, one of @samp{ADD}, @samp{ALPHA},
+  	@samp{COPY}, @samp{KEYCOLOR}, @samp{MULTIPLY2}, @samp{MULTIPLY},
+	or @samp{TRANSPARENT}.
+@end itemize
+
+@subsubheading Object State Interface
+
+@code{iSprite2DState} is the @sc{SCF} interface that you can
+use to set/get settings for a 2D Sprite object. The definition of this
+interface can be found in @code{include/imspr2d.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the material, blending mode (mixmode),
+lighting settings, and also the vertices of the 2D polygon controlled
+by this plugin.
+
+@subsubheading Object Loader
+
+@itemize @bullet
+@item
+  @samp{FACTORY}: Name of the factory to use for creation of this instance.
+@item
+  @samp{MIXMODE}: Blending mode, one of @samp{ADD}, @samp{ALPHA},
+  	@samp{COPY}, @samp{KEYCOLOR}, @samp{MULTIPLY2}, @samp{MULTIPLY},
+	or @samp{TRANSPARENT}.
+@item
+  @samp{MATERIAL}: Material to use for the polygon.
+@item
+  @samp{LIGHTING}: Enable/disable lighting.
+@item
+  @samp{VERTICES}: List of 2D vertices defining the polygon.
+@item
+  @samp{UV}: List of texture mapping UV coordinates for the polygon.
+@item
+  @samp{COLORS}: List of rgb colors for the polygon.
+@end itemize
+

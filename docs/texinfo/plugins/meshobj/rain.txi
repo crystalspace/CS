@@ -1,0 +1,93 @@
+@c -*-texinfo-*-
+@node MeshObject Rain, MeshObject Explo, MeshObject Snow, MeshObject
+@subsection Rain Mesh Object
+@cindex MeshObject
+@cindex Rain Particle System
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iRainState}
+@cindex @code{iParticleState}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+Rain is a particle system that emulates rain.
+@xref{MeshObject PartSys} for information
+which is valid for all particle systems.
+
+@subsubheading Basic Structure
+
+The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
+@itemize
+@item
+  Type plugin: @samp{crystalspace.mesh.object.rain}
+@item
+  Loader plugin: @samp{crystalspace.mesh.loader.rain}
+@item
+  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.rain}
+@end itemize
+
+Objects in this plugin implement the following @sc{SCF} interfaces (get
+with @code{QUERY_INTERFACE}):
+@itemize @bullet
+@item
+  @code{MeshObject}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObject}
+  @item
+    Implements @code{iParticleState}
+  @item
+    Implements @code{iRainState}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectFactory}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectType}
+  @end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+This plugin has no factory state interface.
+
+@subsubheading Factory Loader
+
+The fountain mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@code{iRainState} is the @sc{SCF} interface that you can
+use to set/get settings for a rain object. The definition of this
+interface can be found in @code{include/imrain.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the number of particles, the size
+of the particles, and various other rain parameters.
+
+In addition you can use @code{iParticleState}.
+
+@subsubheading Object Loader
+
+@xref{MeshObject PartSys} for other keywords.
+@itemize @bullet
+@item
+  @samp{DROPSIZE}: Size of the droplets for the rain (width and height).
+@item
+  @samp{BOX}: Box that will contain the rain particles. Give two 3D
+  coordinates here.
+@item
+  @samp{FALLSPEED}: Speed of the rain.
+@item
+  @samp{LIGHTING}: Disable or enable lighting for the rain particles.
+@item
+  @samp{NUMBER}: Number of particles to use.
+@end itemize
+

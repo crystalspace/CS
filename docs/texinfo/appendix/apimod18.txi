@@ -185,7 +185,7 @@ you will have to use instead. More detailed info will come later:
 @item
  @code{csEngine::UnlinkSprite} -> @code{csEngine::UnlinkMesh}
 @item
- @code{csEngine::sprite_templates} -> @code{csEngine::meshobj_factories}
+ @code{csEngine::sprite_templates} -> @code{csEngine::mesh_factories}
 @item
  @code{csSector::sprites} -> @code{csSector::meshes}
 @end itemize
@@ -368,5 +368,13 @@ accessible as a plugin.
 
 @subheading Various smaller changes
 
+@itemize @bullet
+@item
 @code{iGraphics2D::WriteChar()} is removed. Use @code{Write()} instead.
+@item
+All @code{UpdateLighting} calls now accept @code{iLight} pointers intead
+of @code{csLight} pointers. In addition @code{csEngine::GetNearbyLights()}
+returns an array of @code{iLight} pointers.
+@end itemize
+
 

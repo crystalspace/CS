@@ -1,0 +1,104 @@
+@c -*-texinfo-*-
+@node MeshObject Fountain, MeshObject Fire, MeshObject PartSys, MeshObject
+@subsection Fountain Mesh Object
+@cindex MeshObject
+@cindex Fountain Particle System
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iFountainState}
+@cindex @code{iParticleState}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+A fountain is a particle system that emulates a fountain of water
+drops. @xref{MeshObject PartSys} for information
+which is valid for all particle systems.
+
+@subsubheading Basic Structure
+
+The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
+@itemize
+@item
+  Type plugin: @samp{crystalspace.mesh.object.fountain}
+@item
+  Loader plugin: @samp{crystalspace.mesh.loader.fountain}
+@item
+  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.fountain}
+@end itemize
+
+Objects in this plugin implement the following @sc{SCF} interfaces (get
+with @code{QUERY_INTERFACE}):
+@itemize @bullet
+@item
+  @code{MeshObject}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObject}
+  @item
+    Implements @code{iParticleState}
+  @item
+    Implements @code{iFountainState}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectFactory}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectType}
+  @end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+This plugin has no factory state interface.
+
+@subsubheading Factory Loader
+
+The fountain mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@code{iFountainState} is the @sc{SCF} interface that you can
+use to set/get settings for a fountain object. The definition of this
+interface can be found in @code{include/imfount.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the number of particles, the size
+of the particles, and various other fountain parameters.
+
+In addition you can use @code{iParticleState}.
+
+@subsubheading Object Loader
+
+@xref{MeshObject PartSys} for other keywords.
+@itemize @bullet
+@item
+  @samp{DROPSIZE}: Size of the droplets for the fountain (width and height).
+@item
+  @samp{ORIGIN}: Origin of the fountain. Usually this is (0,0,0) and the
+  engine is responsible for setting the correct position of the fountain.
+  This works better for hierarchical transformations.
+@item
+  @samp{ACCEL}: Acceleration of the particles (x, y, and z acceleration).
+@item
+  @samp{SPEED}: Speed of the particles (one number).
+@item
+  @samp{OPENING}: Opening of the fountain sprinkler.
+@item
+  @samp{AZIMUTH}: Azimuth.
+@item
+  @samp{ELEVATION}: Elevation.
+@item
+  @samp{FALLTIME}: Falltime.
+@item
+  @samp{LIGHTING}: Disable or enable lighting for the fountain particles.
+@item
+  @samp{NUMBER}: Number of particles to use.
+@end itemize
+

@@ -1,0 +1,90 @@
+@c -*-texinfo-*-
+@node MeshObject Ball, MeshObject Cube, MeshObject Spr3D, MeshObject
+@subsection Ball Mesh Object
+@cindex MeshObject
+@cindex Ball
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iBallState}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+A ball is a ball shaped object made out of triangles. You can specify
+the detail (i.e. number of triangles used).
+
+@subsubheading Basic Structure
+
+The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
+@itemize
+@item
+  Type plugin: @samp{crystalspace.mesh.object.ball}
+@item
+  Loader plugin: @samp{crystalspace.mesh.loader.ball}
+@item
+  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.ball}
+@end itemize
+
+Objects in this plugin implement the following @sc{SCF} interfaces (get
+with @code{QUERY_INTERFACE}):
+@itemize @bullet
+@item
+  @code{MeshObject}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObject}
+  @item
+    Implements @code{iBallState}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectFactory}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectType}
+  @end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+The ball mesh object plugin has no factory state interface.
+
+@subsubheading Factory Loader
+
+The ball mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@code{iBallState} is the @sc{SCF} interface that you can
+use to set/get settings for a ball object. The definition of this
+interface can be found in @code{include/imball.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the material, blending mode (mixmode),
+and radius.
+
+@subsubheading Object Loader
+
+@itemize @bullet
+@item
+  @samp{FACTORY}: Name of the factory to use for creation of this instance.
+@item
+  @samp{MIXMODE}: Blending mode, one of @samp{ADD}, @samp{ALPHA},
+  	@samp{COPY}, @samp{KEYCOLOR}, @samp{MULTIPLY2}, @samp{MULTIPLY},
+	or @samp{TRANSPARENT}.
+@item
+  @samp{MATERIAL}: Material to use for the ball.
+@item
+  @samp{NUMRIM}: Number of vertices on the rim of the ball (i.e. the
+  number of vertices along the equator). A good default is 6.
+@item
+  @samp{RADIUS}: Three parameters for x, y, and z radius.
+@item
+  @samp{SHIFT}: Three parameters for x, y, and z shift.
+@end itemize
+

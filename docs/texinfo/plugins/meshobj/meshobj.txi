@@ -19,13 +19,38 @@ applications and how you can work with them.
 The third section covers everything needed to write your own mesh object
 plug-in modules.
 
+After that there is a section for every specific mesh object plugin that
+Crystal Space supports.
+
 @menu
 * MeshObject Concepts::
 * Using MeshObject:: Using Mesh Objects
 * Writing MeshObjects:: Writing Mesh Objects
+* MeshObject Spr2D:: Sprite2D Mesh Object
+* MeshObject Spr3D:: Sprite3D Mesh Object
+* MeshObject Ball:: Ball Mesh Object
+* MeshObject Cube:: Cube Mesh Object
+* MeshObject PartSys:: Particle Systems in General
+* MeshObject Fountain:: Fountain Mesh Object
+* MeshObject Fire:: Fire Mesh Object
+* MeshObject Snow:: Snow Mesh Object
+* MeshObject Rain:: Rain Mesh Object
+* MeshObject Explo:: Explosion Mesh Object
+* MeshObject Spiral:: Spiral Mesh Object
 @end menu
 
 @importss{plugins,meshobj,concepts.txi}
 @importss{plugins,meshobj,using.txi}
 @importss{plugins,meshobj,writing.txi}
+@importss{plugins,meshobj,spr2d.txi}
+@importss{plugins,meshobj,spr3d.txi}
+@importss{plugins,meshobj,ball.txi}
+@importss{plugins,meshobj,cube.txi}
+@importss{plugins,meshobj,partsys.txi}
+@importss{plugins,meshobj,fountain.txi}
+@importss{plugins,meshobj,fire.txi}
+@importss{plugins,meshobj,snow.txi}
+@importss{plugins,meshobj,rain.txi}
+@importss{plugins,meshobj,explo.txi}
+@importss{plugins,meshobj,spiral.txi}
 

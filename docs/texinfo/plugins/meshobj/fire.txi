@@ -1,0 +1,98 @@
+@c -*-texinfo-*-
+@node MeshObject Fire, MeshObject Snow, MeshObject Fountain, MeshObject
+@subsection Fire Mesh Object
+@cindex MeshObject
+@cindex Fire Particle System
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iFireState}
+@cindex @code{iParticleState}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+A fire is a particle system that emulates a torch or flame.
+@xref{MeshObject PartSys} for information
+which is valid for all particle systems.
+
+@subsubheading Basic Structure
+
+The following @sc{SCF} class names are used (for @code{LOAD_PLUGIN}):
+@itemize
+@item
+  Type plugin: @samp{crystalspace.mesh.object.fire}
+@item
+  Loader plugin: @samp{crystalspace.mesh.loader.fire}
+@item
+  Factory loader plugin: @samp{crystalspace.mesh.loader.factory.fire}
+@end itemize
+
+Objects in this plugin implement the following @sc{SCF} interfaces (get
+with @code{QUERY_INTERFACE}):
+@itemize @bullet
+@item
+  @code{MeshObject}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObject}
+  @item
+    Implements @code{iParticleState}
+  @item
+    Implements @code{iFireState}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectFactory}
+  @end itemize
+@item
+  @code{MeshObjectFactory}
+  @itemize @bullet
+  @item
+    Implements @code{iMeshObjectType}
+  @end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+This plugin has no factory state interface.
+
+@subsubheading Factory Loader
+
+The fountain mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@code{iFireState} is the @sc{SCF} interface that you can
+use to set/get settings for a fire object. The definition of this
+interface can be found in @code{include/imfire.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the number of particles, the size
+of the particles, and various other fire parameters.
+
+In addition you can use @code{iParticleState}.
+
+@subsubheading Object Loader
+
+@xref{MeshObject PartSys} for other keywords.
+@itemize @bullet
+@item
+  @samp{DROPSIZE}: Size of the flame particles (width and height).
+@item
+  @samp{ORIGIN}: Origin of the flame. Usually this is (0,0,0) and the
+  engine is responsible for setting the correct position of the flame.
+  This works better for hierarchical transformations.
+@item
+  @samp{SWIRL}: Swirl.
+@item
+  @samp{COLORSCALE}: Color scale.
+@item
+  @samp{TOTALTIME}: Total time.
+@item
+  @samp{LIGHTING}: Disable or enable lighting for the fire particles.
+@item
+  @samp{NUMBER}: Number of particles to use.
+@end itemize
+
