@@ -307,12 +307,23 @@ bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 static void __add_PutPixel (int x, int y, float area, void *arg)
 {
   csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+#ifdef CS_DEBUG
+  if(x >= cm->width || y>=cm->height || x < 0 || y < 0)
+    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__);
+#endif
   cm->coverage [cm->width * y + x] += area;
 }
 
 static void __add_DrawBox (int x, int y, int w, int h, void *arg)
 {
   csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+#ifdef CS_DEBUG
+  if(x >= cm->width || y>=cm->height || x < 0 || y < 0 ||
+      x+w > cm->width || y+h>cm->height || w < 0 || h < 0)
+    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__);
+#endif
   int ofs = cm->width * y + x;
   int delta = cm->width - w;
   for (int yy = h; yy > 0; yy--)
@@ -326,12 +337,26 @@ static void __add_DrawBox (int x, int y, int w, int h, void *arg)
 static void __sub_PutPixel (int x, int y, float area, void *arg)
 {
   csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+#ifdef CS_DEBUG
+  if(x >= cm->width || y>=cm->height || x < 0 || y < 0)
+  {
+    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__);
+    return;
+  }
+#endif
   cm->coverage [cm->width * y + x] -= area;
 }
 
 static void __sub_DrawBox (int x, int y, int w, int h, void *arg)
 {
   csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+#ifdef CS_DEBUG
+  if(x >= cm->width || y>=cm->height || x < 0 || y < 0 ||
+    x+w > cm->width || y+h>cm->height || w < 0 || h < 0)
+    CsPrintf(MSG_INTERNAL_ERROR, "Array bound error in file %s, line %d\n",
+      __FILE__, __LINE__);
+#endif
   int ofs = cm->width * y + x;
   int delta = cm->width - w;
   for (int yy = h; yy > 0; yy--)
@@ -420,6 +445,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 
       // Now add the common shadow to the coverage matrix
       csAntialiasedPolyFill (sfi, sfic, &cm, __add_PutPixel, __add_DrawBox);
+
     } /* endfor */
 
     delete shadow;
