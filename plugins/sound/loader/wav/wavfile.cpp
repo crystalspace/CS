@@ -160,6 +160,36 @@ struct _WAVchk
   unsigned long len; // length of chunk after this 8 bytes of header
 } wavchk;
 
+// helper functions
+/// Byte swap 32 bit data.
+static inline unsigned long csByteSwap32bit( const unsigned long value )
+{
+  return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
+        | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
+}
+
+/// Byte swap 16 bit data.
+static inline unsigned short csByteSwap16bit( const unsigned short value )
+{
+  return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
+}
+
+static inline void csByteSwap16BitBuffer (uint16* ptr, size_t count)
+{
+  for (; count > 0; --count, ++ptr)
+  {
+    *ptr = csByteSwap16bit (*ptr);
+  }
+}
+
+static inline void csByteSwap32bitBuffer (uint32* ptr, size_t count)
+{
+  for (; count > 0; --count, ++ptr)
+  {
+    *ptr = csByteSwap32bit (*ptr);
+  }
+}
+
 csPtr<iSoundData>
 csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
 {

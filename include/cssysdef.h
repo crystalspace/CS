@@ -67,6 +67,13 @@
     avoid including util/gnu/getopt.h at the bottom of this file.
 */
 
+// temporary hack for backward compatibility. Will stay default until CS is
+// fully changed.
+#ifndef CS_USE_NAMESPACES
+namespace crystal {}
+using namespace crystal;
+#endif
+
 /*
  * Pull in platform-specific overrides of the requested functionality.
  */

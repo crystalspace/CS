@@ -21,11 +21,11 @@
 
 #include <stdio.h>
 
+namespace crystal
+{
+
 /**\file
  */
-
-/// Return a random number.
-long csRndNum (long minRange, long maxRange);
 
 /**
  * Allocate a new char [] and copy the string into newly allocated storage.
@@ -34,15 +34,6 @@ long csRndNum (long minRange, long maxRange);
  * platforms). To free the pointer the caller should call delete[].
  */
 extern char *csStrNew (const char *s);
-
-/**
- * Compute all combinations of m by n. Calls the callback function with
- * a vector of numbers from 0 to m - 1; numbers never appears twice in vector.
- * Callback returns false for continuation and true to break the loop.
- */
-extern void csCombinations (int m, int n,
-  bool (*callback) (int *vector, int count,
-  void *arg), void *arg);
 
 /**
  * Expand a filename if it contains shortcuts.
@@ -72,47 +63,6 @@ extern void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
  */
 extern bool csGlobMatches (const char *fName, const char *fMask);
 
-/// Swap two integer variables
-static inline void csSwapInt (int &a, int &b)
-{
-  int tmp = a;
-  a = b; b = tmp;
-}
-
-/// Swap two floating-point variables
-static inline void csSwapFloat (float &a, float &b)
-{
-  float tmp = a;
-  a = b; b = tmp;
-}
-
-/// Return the argument squared
-static inline float csSquareFloat (float x)
-{
-  return x*x;
-}
-
-/// Byte swap 32 bit data.
-static inline unsigned long csByteSwap32bit( const unsigned long value )
-{
-  return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
-  	| ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
-}
-
-/// Byte swap 16 bit data.
-static inline unsigned short csByteSwap16bit( const unsigned short value )
-{
-  return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
-}
-
-/// Byte swap 32 bit data in a buffer
-void csByteSwap32bitBuffer( register unsigned long* const place,
-	register unsigned long count );
-
-/// Byte swap 16 bit data in a buffer
-void csByteSwap16bitBuffer( register unsigned short* const place,
-	register unsigned long count );
-
 /**
  * Finds the smallest number that is a power of two and is larger or
  * equal to n.
@@ -138,5 +88,18 @@ static inline int csLog2 (int n)
  */
 void csFindReplace (char *dest, const char *src, const char *search,
   const char *replace, int max);
+
+// names without cs prefix
+static inline char* StrNew (const char* s)
+{ return csStrNew (s); }
+static inline char* ExpandName (const char* name)
+{ return ExpandName (name); }
+static inline void SplitPath (const char* pathname, char* path,
+    size_t pathsize, char* name, size_t namesize)
+{ csSplitPath (pathname, path, pathsize, name, namesize); }
+static inline bool GlobMatches (const char* name, const char* mask)
+{ return csGlobMatches (name, mask); }
+
+} // end of namespace crystal
 
 #endif // __CS_UTIL_H__

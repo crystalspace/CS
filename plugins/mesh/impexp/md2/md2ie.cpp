@@ -350,7 +350,11 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
       csVector3 v (buf [0], buf [1], buf [2]);
       for (int k = 0; k < 3; k++)
         v[k] = v[k] * scale[k] + translate[k];
-      csSwapFloat (v.y, v.z);
+      // swap y and z
+      float t = v.y;
+      v.y = v.z;
+      v.z = v.y;
+      
       VertexFrame->AddVertex (v);
     }	
     VertexFrame->AddColor (csColor (1, 1, 1));

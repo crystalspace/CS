@@ -222,6 +222,36 @@ static bool doRectUnion (int *vector, int count, void *arg)
   return false;
 }
 
+static bool RecursivecsCombinations (int *vector, int top, int mask, int m, int
+n,
+  bool (*callback) (int *vector, int count, void *arg), void *arg)
+{
+  int i;
+  for (i = 0; i < m; i++)
+  {
+    if (mask & (1 << i))
+      continue;
+    vector [top] = i;
+    if (top + 1 >= n)
+      if (callback (vector, n, arg))
+        return true;
+      else
+        ;
+    else if (RecursivecsCombinations (vector, top + 1, mask | (1 << i),
+                                    m, n, callback, arg))
+      return true;
+  } /* endfor */
+  return false;
+}
+
+void csCombinations (int m, int n, bool (*callback) (int *vector, int count,
+  void *arg), void *arg)
+{
+  int *vector = new int [m];
+  RecursivecsCombinations (vector, 0, 0, m, n, callback, arg);
+  delete [] vector;
+}
+
 void RectUnion (cswsRectVector &rect, csRect &result)
 {
   // Sort rectangles by area so that we can compute much less variants
