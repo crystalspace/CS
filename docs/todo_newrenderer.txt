@@ -35,4 +35,5 @@ Things that need to be done in new renderer:
 	- Variable system (done, more or less).
 	- Materials (done, more or less).
 	- Pseudo VP with similar functionality as old texture layers.
-	- Fix smoothed things.
+	- Fix smoothed things. (Done)
+	- Better error handling. Everything is too crashy.

@@ -98,6 +98,7 @@ private:
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics3D> g3d;
   csRef<iShader> shadow;
+  csRef<iShaderWrapper> shadowWrapper;
 
   csRefArray<iLightRenderStep> steps;
 

@@ -1,8 +1,39 @@
-<!-- Created by map2cs 0.97 on 2003-06-04 20:12:23 -->
+<?xml version="1.0" encoding="utf-8" ?> 
 <world>
+    <addon>
+      <plugin>crystalspace.renderloop.loop.loader</plugin>
+      <params>
+	<name>myLoop</name>
+	<steps>
+	  <!-- ambient lighting -->
+	  <step plugin="crystalspace.renderloop.step.generic">
+	    <shadertype>ambient</shadertype>
+	    <zoffset>yes</zoffset>
+	    <zuse />
+	  </step>
+	  <step plugin="crystalspace.renderloop.step.lightiter">
+	    <steps>
+	      <!-- stencil shadows -->
+	      <step plugin="crystalspace.renderloop.step.shadow.stencil">
+		<steps>
+		  <!-- diffuse lighting -->
+		  <step plugin="crystalspace.renderloop.step.generic">
+		    <shadertype>diffuse</shadertype>
+		    <zoffset>no</zoffset>
+		    <ztest />
+		  </step>
+		</steps>
+	      </step>
+	    </steps>
+	  </step>
+	</steps>
+      </params>
+    </addon>
+    
     <settings>
         <clearzbuf>yes</clearzbuf>
         <lightmapcellsize>16</lightmapcellsize>
+	<renderloop>myLoop</renderloop>
     </settings>
     <key name="map2cs_scaling" value="0.025" />
     <start>

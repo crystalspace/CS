@@ -423,10 +423,18 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   }
 
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
-  csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
+  csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
+  //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
   shadow->Load (buf);
   shadow->Prepare ();
+
+  shadowWrapper = shmgr->GetShader (shadow->GetName ());
+  shadowWrapper->SelectMaterial (0);
+
+  // @@@ Dunno if this should be _here_ really.
+  csRef<iShaderManager> shadman = 
+    CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shadman->AddChild (shadowWrapper);
 
   return true;
 }
@@ -485,7 +493,9 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
 
   // probably shouldn't need to check this in general
   // but just in case, no need to draw if no edges are drawn
-  if (edge_start < index_range) {
+  if (edge_start < index_range) 
+  {
+    //shadowWrapper->SelectMaterial (0);
     pass->SetupState (&rmesh);
     if (shadowCacheEntry->ShadowCaps())
     {
@@ -495,18 +505,18 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
         WTF? The same mesh drawn twice, one immediately after another? -
 	That has to be optimized, kids! [res]
        */
-      //g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
-      //g3d->DrawMesh (&rmesh);
-      //g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
+      g3d->DrawMesh (&rmesh);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
       g3d->DrawMesh (&rmesh);
     }
     else 
     {
       rmesh.indexstart = edge_start;
       rmesh.indexend = index_range;
-      //g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
-      //g3d->DrawMesh (&rmesh);
-      //g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
+      g3d->DrawMesh (&rmesh);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
       g3d->DrawMesh (&rmesh);
     }
     pass->ResetState ();
@@ -574,10 +584,10 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
     csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
 	(csStencilShadowCacheEntry*)shadowcache.Get((csHashKey)obj);
 
-    if (shadowCacheEntry == 0) {
+    if (shadowCacheEntry == 0) 
+    {
       csRef<iObjectModel> model = 
-	SCF_QUERY_INTERFACE (obj->GetFactory()->GetMeshObjectFactory(), 
-		iObjectModel);
+	obj->GetMeshObject ()->GetObjectModel ();
       if (!model) { continue; } // Can't do shadows on this
       /* need the extra reference for the hashmap */
       shadowCacheEntry = new csStencilShadowCacheEntry ((iRenderStep*)this);
@@ -595,7 +605,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
 
   g3d->SetZMode (CS_ZBUF_TEST);
 
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
+  g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
 
 #if 1
   csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
@@ -649,14 +659,14 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
       shadowCacheEntry->DisableShadowCaps ();
   }  
 
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
+  g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
 
   for (int i = 0; i < steps.Length (); i++)
   {
     steps[i]->Perform (rview, sector, light);
   }
 
-  //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
+  g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 }
 
 int csStencilShadowStep::AddStep (iRenderStep* step)

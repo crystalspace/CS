@@ -250,6 +250,7 @@ csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* re
   SetName(name);
 
   symtabs.SetLength (1, csSymbolTable());
+  symtab = symtabs[0];
 }
 
 csShader::~csShader()
@@ -522,7 +523,6 @@ void csShaderPass::Deactivate()
   if(vp) vp->Deactivate(this);
   if(fp) fp->Deactivate(this);
 
-  int i;
   g3d->SetTextureState (units, clear_textures, TEXMAX);
   g3d->SetBufferState (attribs, clear_buffers, STREAMMAX*2);
 }

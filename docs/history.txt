@@ -27,6 +27,17 @@ chronological order.
 	- Jorrit migrated csMaterial::GetTexture() to old renderer.
 	- Jorrit reverted the change that shader variables don't support
 	  iTextureHandle. Apparently this is needed for fog.
+	- res made the following changes:
+	    - Fixed shadow volume generation. The problem was that the 
+	      "light position" shader var wasn't properly propagated to the
+	      shadow volume shader.
+	    - The shadow model is now queried from the mesh object, not the
+	      factory.
+	    - Fixed an unitialized member of csShader.
+	    - Small optimization in glshader_arb: shader var 'type casting' is
+	      done when a value on the SV is set, so no need for the client
+	      code to do that itself.
+	    - Updated NR todo.
 2-Sep-2003
 	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
           win32.cpp, which was overwritten by the old version by another

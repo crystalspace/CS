@@ -69,46 +69,11 @@ void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 
     if(lvar)
     {
-      switch(lvar->GetType())
+      csVector4 v4;
+      if (lvar->GetValue (v4))
       {
-      case csShaderVariable::INT:
-        {
-          int intval;
-          if(lvar->GetValue(intval))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            (float)intval, (float)intval, (float)intval, (float)intval);
-        }
-        break;
-      case csShaderVariable::FLOAT:
-        {
-          float fval;
-          if(lvar->GetValue(fval))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            fval, fval, fval, fval);
-        }
-        break;
-      case csShaderVariable::VECTOR3:
-        {
-          csVector3 v3;
-          if(lvar->GetValue(v3))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            v3.x, v3.y, v3.z, 1);
-        }
-        break;
-      case csShaderVariable::VECTOR4:
-        {
-          csVector4 v4;
-          if(lvar->GetValue(v4))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            v4.x, v4.y, v4.z, v4.w);
-        }
-        break;
-      default:
-	break;
+        ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
+	  variablemap[i].registernum, &v4.x);
       }
     }
   }
