@@ -38,7 +38,17 @@
 #include "csgeom/matrix3.h"
 #include "csutil/garray.h"
 #include "csutil/typedvec.h"
+#include "csgeom/subrec.h"
+#include "csgeom/vector3.h"
+#include "csgeom/plane3.h"
+#include "csutil/cscolor.h"
 
+
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
+#include <GL/gl.h>
+#endif
 
 /** 
 * the EXT implementation splits up the Polygon into traingles
@@ -55,18 +65,43 @@ public:
 
   struct csPolygonBufferEXTLightmap
   {
+    csPolygonBufferEXTLightmap() : m_lmrects(csRect(0, 0, 256, 256)) // @@@ hard coded lightmap size..
+    {
+      glGenTextures(1, &openglindex);
+      /*
+      TODO: Implement the correct lightmap style bla bla
+      */
+      glBindTexture(GL_TEXTURE_2D, openglindex);
+      
+      
+    };
+
+    ~csPolygonBufferEXTLightmap()
+    {
+      glDeleteTextures(1, &openglindex);
+    };
+
+    unsigned int openglindex;
+    csSubRectangles m_lmrects;
+  };
+
+  struct csPolygonBufferEXTIndices
+  {
     CS_DECLARE_GROWING_ARRAY(m_indices, int);
-    unsigned int m_texturehandle;
+    csPolygonBufferEXTLightmap m_lightmap;
   };
 
   struct csPolygonBufferEXTMaterial
   {
     /// it's better to have smaller vertex buffers
     /// otherwise we'd copy all the vertices to AGP memory every frame
-    csRef<iVertexBuffer> m_vbuf;
+    CS_DECLARE_GROWING_ARRAY (m_vertices, csVector3);
+    CS_DECLARE_GROWING_ARRAY (m_texcoords, csVector2);
+    CS_DECLARE_GROWING_ARRAY (m_lmcoords, csVector2);
+
 
     iMaterialHandle *m_mat_handle;
-    CS_DECLARE_GROWING_ARRAY (m_lightmaps, csPolygonBufferEXTLightmap);
+    CS_DECLARE_GROWING_ARRAY (m_lightmaps, csPolygonBufferEXTIndices);
   };
 
   /**
@@ -129,6 +164,12 @@ public:
 private:
   CS_DECLARE_GROWING_ARRAY(m_materials, csPolygonBufferEXTMaterial);
   iGraphics3D *m_g3d;
+  
+  /** this are all the vertices together... 
+  * internally the vertices will by stored per material
+  */  
+  csVector3   *m_vertices;
+  int          m_vertex_count;
   
 
 };
