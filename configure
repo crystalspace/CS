@@ -3871,7 +3871,6 @@ else
 	    cs_cv_python_base_cflags=`echo x$cs_cv_python_base_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	    cs_cv_python_base_lflags=`echo x$cs_cv_python_base_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	    cs_cv_python_base_libs=`echo x$cs_cv_python_base_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    cs_cv_python_distutils=yes
 	    cs_cv_python_sdk=yes
 fi
 

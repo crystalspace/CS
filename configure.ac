@@ -405,7 +405,6 @@ AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
 	    cs_cv_python_base_cflags=CS_TRIM([$cs_cv_python_base_cflags])
 	    cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
 	    cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
-	    cs_cv_python_distutils=yes
 	    cs_cv_python_sdk=yes])
 
 	# Not Python 2.x; try Python 1.x.
