@@ -40,6 +40,7 @@
   #pragma warning(disable:4512)   // Could not generate assignment operator
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
   #pragma warning(disable:4390)   // Empty control statement
+  #pragma warning(disable:4514)   // Removed unreferenced inlines. Only MSVC 6 relevant.
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
