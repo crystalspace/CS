@@ -21,43 +21,27 @@
 
 #include "csgfxldr/csimage.h"
 
-class csGIFImageLoader;
-
-/// An csImageFile subclass for reading GIF files.
-class ImageGifFile : public csImageFile
-{
-  ///
-  friend class csImageFile;	// For constructor
-  friend class csGIFImageLoader;
-
-private:
-  /// Read the GIF file from the buffer.
-  ImageGifFile (UByte* buf, long size);
-  void decode_gif(UByte*, long, int*, int*, int*);
-
-public:
-  ///
-  virtual ~ImageGifFile ();
-  /// Return GIF-specific error messages
-  virtual const char* get_status_mesg() const;
-};
-
 /**
  * The GIF Image Loader.
  */
 class csGIFImageLoader : public csImageLoader
 {
 protected:
-  ///
-  virtual csImageFile* LoadImage (UByte* buf, ULong size);
-  virtual AlphaMapFile* LoadAlphaMap(UByte *buf,ULong size);
-public:
-  ///
-  virtual const char* GetName() const
-  { return "GIF"; }
-  ///
-  virtual const char* GetDescription() const 
-  { return "CompuServe Graphics InterChange Format (GIF87a,GIF89a)"; }
+  /// Try to load the image
+  virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
+};
+
+/// An csImageFile subclass for reading GIF files.
+class ImageGifFile : public csImageFile
+{
+  friend class csGIFImageLoader;
+  int decode_gif (UByte* iBuffer, long iSize, int* Prefix, int* Suffix, int* OutCode);
+
+private:
+  /// Initialize the image object
+  ImageGifFile (int iFormat) : csImageFile (iFormat) { };
+  /// Try to read the GIF file from the buffer and return success status
+  bool Load (UByte* iBuffer, ULong iSize);
 };
 
 #endif

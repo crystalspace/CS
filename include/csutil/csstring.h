@@ -202,10 +202,6 @@ public:
   csString operator + (const csString &iStr) const
   { return Clone ().Append (iStr); }
 
-  /// Convert csString into ASCIIZ
-  operator char * ()
-  { return Data; }
-
   /// Return a const reference to this string in ASCIIZ format
   operator const char * () const
   { return Data; }

@@ -24,7 +24,7 @@
 #include "itexture.h"
 
 class csTextureManagerLine;
-struct iImageFile;
+struct iImage;
 
 /// The internal texture mapping modes.
 #define TXT_GLOBAL	0	// Textures are mapped with a single palette
@@ -194,14 +194,14 @@ protected:
   TxtCmapPrivate* priv_cmap;
  
   /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_global (csTextureManagerLine* tex, iImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_24bit (csTextureManagerLine* tex, iImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_private (csTextureManagerLine* tex, iImageFile* imfile, unsigned char* bm);
+  virtual void convert_to_internal (csTextureManager* tex, iImage* imfile, unsigned char* bm);
+  void convert_to_internal_global (csTextureManagerLine* tex, iImage* imfile, unsigned char* bm);
+  void convert_to_internal_24bit (csTextureManagerLine* tex, iImage* imfile, unsigned char* bm);
+  void convert_to_internal_private (csTextureManagerLine* tex, iImage* imfile, unsigned char* bm);
 
 public:
   ///
-  csTextureMMLine (iImageFile* image);
+  csTextureMMLine (iImage* image);
   ///
   virtual ~csTextureMMLine ();
 
@@ -344,7 +344,7 @@ public:
   ///
   virtual void Prepare ();
   ///
-  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
+  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d);
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
   ///
@@ -357,7 +357,7 @@ public:
   virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMLine* new_texture (iImageFile* image);
+  csTextureMMLine* new_texture (iImage* image);
 
   /**
    * Find an rgb value using the palette directly (not use

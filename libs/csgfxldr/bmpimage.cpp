@@ -34,22 +34,15 @@ bool RegisterBMP ()
   return csImageLoader::Register (&loader);
 }
 
-csImageFile* csBMPImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  CHK (ImageBMPFile* i = new ImageBMPFile(buf, size));
-  if (i && (i->get_status() & IFE_BadFormat))
-  { 
-    CHK(delete i);  
-    i = NULL; 
+  CHK (ImageBMPFile* i = new ImageBMPFile (iFormat));
+  if (i && !i->Load (iBuffer, iSize))
+  {
+    CHK (delete i);
+    return NULL;
   }
-  return i;    
-}
-
-AlphaMapFile *csBMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
-{
-  (void) buf;
-  (void) size;
-  return NULL;
+  return i;
 }
 
 //---------------------------------------------------------------------------
@@ -77,8 +70,7 @@ long l;
 #define IMAGESIZE(x) vpmh.ul_endian(((char *) (x))+34)
 #define BICLRUSED(x) vpmh.ul_endian(((char *) (x))+46)
 #define BICLRIMP(x)  vpmh.ul_endian(((char *) (x))+50)
-#define BIPALETTE(x) (char *)  (((char *) (x))+54)
-#define PALENT(x,i)  (char *)  (((ULong *)(x))+i)
+#define BIPALETTE(x) (char *) (((char *) (x))+54)
 
 //-----------------
 
@@ -129,147 +121,120 @@ long l;
 
 //---------------------------------------------------------------------------
 
-const char* ImageBMPFile::get_status_mesg() const
+bool ImageBMPFile::Load (UByte* iBuffer, ULong iSize)
 {
-  if (status & IFE_BadFormat) 
-    return "not a supported BMP format file";
-  else 
-    return "image successfully read";
+  if ((memcmp (iBuffer, BM, 2) == 0) && (*BISIZE(iBuffer)) == WinHSize)
+    return LoadWindowsBitmap (iBuffer, iSize);
+  return false;
 }
 
-ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
+bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
 {
-  status = IFE_BadFormat;
+  set_dimensions (*BIWIDTH(iBuffer), *BIHEIGHT(iBuffer));
+  const int bmp_size = Width * Height;
 
-  if( (memcmp( ptr, BM, 2 )==0) && 
-      (*BISIZE(ptr)) == WinHSize && 
-      ((*BICOMP(ptr)) == BI_RGB || (*BICOMP(ptr)) == BI_RLE8))
+  UByte *iPtr = iBuffer + *BFOFFBITS(iBuffer);
+
+  // The last scanline in BMP corresponds to the top line in the image
+  int buffer_y = Width * (Height - 1);
+  bool blip = false;
+
+  if ((*BITCOUNT(iBuffer)) == _256Color && (*BICLRUSED(iBuffer)))
   {
-     const int bmp_width  = (*BIWIDTH(ptr));
-     const int bmp_height = (*BIHEIGHT(ptr));
-     const int bmp_size   = bmp_width*bmp_height;
+    UByte *buffer = new UByte [bmp_size];
+    RGBPixel *palette = new RGBPixel [256];
 
-     set_dimensions(bmp_width, bmp_height);
+    // Get the palette first: suppose sizeof (RGBPixel) == sizeof (ULong)
+    memcpy (palette, BIPALETTE (iBuffer), 256 * sizeof (RGBPixel));
 
-     RGBPixel *bufPtr   = get_buffer();
-     UByte    *iPtr     = ptr + *BFOFFBITS(ptr);
-     int       pixelIdx = 0;
+    if ((*BICOMP(iBuffer)) == BI_RGB)
+    {
+      // Read the pixels from "top" to "bottom"
+      while (iPtr < iBuffer + iSize && buffer_y >= 0)
+      {
+        memcpy (buffer + buffer_y, iPtr, Width);
+        iPtr += Width;
+        buffer_y -= Width;
+      } /* endwhile */
+    }
+    else if ((*BICOMP(iBuffer)) == BI_RLE8)
+    {
+      // Decompress pixel data
+      UByte rl, rl1, i;			// runlength
+      UByte clridx, clridx1;		// colorindex
+      int buffer_x = 0;
+      while (iPtr < iBuffer + iSize && buffer_y >= 0)
+      {
+        rl = rl1 = *iPtr++;
+        clridx = clridx1 = *iPtr++;
+        if (rl == 0)
+           if (clridx == 0)
+        {
+    	  // new scanline
+          if (!blip)
+          {
+            // if we didnt already jumped to the new line, do it now
+            buffer_x  = 0;
+            buffer_y -= Width;
+          }
+          continue;
+        }
+        else if (clridx == 1)
+          // end of bitmap
+          break;
+        else if (clridx == 2)
+        {
+          // next 2 bytes mean column- and scanline- offset
+          buffer_x += *iPtr++;
+          buffer_y -= (Width * (*iPtr++));
+          continue;
+        }
+        else if (clridx > 2)
+          rl1 = clridx;
 
-      // The last scanline in BMP corresponds to the top line in the image
-     int buffer_y = bmp_width*(bmp_height - 1);
-     int buffer_x = 0;
-     bool blip = false;
-/*
-     if( (*BITCOUNT(ptr)) == _256Color && (*BICLRUSED(ptr)) && (*BICLRIMP(ptr)) )
-     @@@ I dont know why the number of "important colors" ( BICLRIMP )  matters.
-     In fact, many of my 256-color .bmp files have a ZERO there.
-*/
-     if( (*BITCOUNT(ptr)) == _256Color && (*BICLRUSED(ptr)) )
-     {
-       char *pal = BIPALETTE(ptr);
+        for ( i = 0; i < rl1; i++ )
+        {
+          if (!rl) clridx1 = *iPtr++;
+          buffer [buffer_y + buffer_x] = clridx1;
 
-       if ( (*BICOMP(ptr)) == BI_RGB ){
-         while( iPtr < ptr + filesize && pixelIdx < bmp_size )
-         {
-            char *palEnt = PALENT(pal,*iPtr++);
-  
-            RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
-            buf->blue    = *palEnt;
-            buf->green   = *(palEnt+1);
-            buf->red     = *(palEnt+2);
-          
-            if(++buffer_x >= bmp_width)
-            {
-              buffer_x  = 0;
-              buffer_y -= bmp_width;
-            }
-
-            pixelIdx++;
-         }
-       }else if ((*BICOMP(ptr)) == BI_RLE8) {
-         char *palEnt;
-         UByte rl, rl1, i; // runlength
-         UByte clridx, clridx1; // colorindex
-         while( iPtr < ptr + filesize && pixelIdx < bmp_size )
-         {
-	    rl = rl1 = *iPtr++;
-	    clridx = clridx1 = *iPtr++;
-	    if ( rl == 0 )
-	       if ( clridx == 0 ){
-		  // new scanline
-		  if ( !blip ){ // if we didnt already jumped to the new line, do it now
-	             pixelIdx += ( bmp_width - buffer_x );
-	             buffer_x  = 0;
-	             buffer_y -= bmp_width;
-		  }     
-	          continue;
-		}else if ( clridx == 1 ){
-		  // end of bitmap
-		  pixelIdx = bmp_size;
-		  continue;
-		}else if ( clridx == 2 ){
-		  // next 2 bytes mean column- and scanlineoffset
-		  buffer_x += *iPtr;
-		  pixelIdx += *iPtr++;
-		  buffer_y -= ( bmp_width * (*iPtr) );
-		  pixelIdx += ( bmp_width * (*iPtr++) );
-		  continue;
-		}else if ( clridx > 2 )
-		  rl1 = clridx;
-		  
-            for ( i = 0; i < rl1; i++ ){
-	      if ( !rl )
-	         clridx1 = *iPtr++;
-	      palEnt = PALENT(pal,clridx1);	    
-              RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
-              buf->blue    = *palEnt;
-              buf->green   = *(palEnt+1);
-              buf->red     = *(palEnt+2);
-          
-              if(++buffer_x >= bmp_width)
-              {
-                buffer_x  = 0;
-                buffer_y -= bmp_width;
-                blip = true;
-	      }else
-	        blip = false;
-
-              pixelIdx++;
-	    }
-	    // pad in case rl == 0 and clridx in [3..255]
-	    if ( rl == 0 && ( clridx & 0x01 )) iPtr++;
-         }
-       }
-       status = IFE_OK;
-     }
-     else if( !(*BICLRUSED(ptr)) && (*BITCOUNT(ptr)) == TRUECOLOR24 )
-     {
-       while( iPtr < ptr + filesize && pixelIdx < bmp_size )
-       {
-          RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
-
-          buf->blue    = *iPtr;
-          buf->green   = *(iPtr+1);
-          buf->red     = *(iPtr+2);
-
-          if(++buffer_x >= bmp_width)
+          if (++buffer_x >= Width)
           {
             buffer_x  = 0;
-            buffer_y -= bmp_width;
+            buffer_y -= Width;
+            blip = true;
           }
-
-          pixelIdx++;
-          iPtr += 3;
-       }
-
-       status = IFE_OK;
-     }
+          else
+            blip = false;
+        }
+        // pad in case rl == 0 and clridx in [3..255]
+        if (rl == 0 && (clridx & 0x01)) iPtr++;
+      }
+    }
+    // Now transform the image data to target format
+    convert_8bit (buffer, palette);
+    return true;
   }
+  else if (!(*BICLRUSED(iBuffer)) && (*BITCOUNT(iBuffer)) == TRUECOLOR24)
+  {
+    RGBPixel *buffer = new RGBPixel [bmp_size];
+
+    while (iPtr < iBuffer + iSize && buffer_y >= 0)
+    {
+      RGBPixel *d = buffer + buffer_y;
+      for (int x = Width; x; x--)
+      {
+        d->blue    = *iPtr++;
+        d->green   = *iPtr++;
+        d->red     = *iPtr++;
+        d++;
+      } /* endfor */
+
+      buffer_y -= Width;
+    }
+    // Now transform the image data to target format
+    convert_rgb (buffer);
+    return true;
+  }
+
+  return false;
 }
-
-
-ImageBMPFile::~ImageBMPFile ()
-{
-}
-
-//---------------------------------------------------------------------------

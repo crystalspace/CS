@@ -326,7 +326,7 @@ public:
    * Check consistency of the loaded world. Currently this function only
    * checks if polygons have three or more vertices and if the vertices
    * are coplanar (if more than three). This function prints out warnings
-   * for all found errors.  * Returns true if everything is in order.
+   * for all found errors. Returns true if everything is in order.
    */
   bool CheckConsistency ();
 
@@ -595,7 +595,10 @@ public:
 
   //--------------------- iWorld interface implementation ---------------------
 
-  csWorld *GetCsWorld () { return this; };
+  virtual csWorld *GetCsWorld () { return this; };
+
+  /// Query the format to load textures (usually this depends on texture manager)
+  virtual int GetTextureFormat ();
 
   //--------------------- iConfig interface implementation --------------------
 

@@ -388,6 +388,9 @@ public:
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight);
 
+  /// Do a screenshot: return a new iImage object
+  virtual iImage *ScreenShot ();
+
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig
   {

@@ -22,6 +22,7 @@
 #define __IGRAPH2D_H__
 
 #include "csutil/scf.h"
+#include "csgfxldr/rgbpixel.h"
 #include "iplugin.h"
 #include "itexture.h"
 
@@ -38,15 +39,6 @@ enum FontType
   csFontCourierFixed,
   csFontTiny,
   csFontTinyFixed
-};
-
-/// A RGB palette entry
-struct RGBpaletteEntry
-{
-  UByte red;
-  UByte green;
-  UByte blue;
-  UByte flags;
 };
 
 /**
@@ -257,7 +249,7 @@ struct iGraphics2D : public iPlugIn
   */
   virtual int GetNumPalEntries () = 0;
   /// Get the palette (if there is one)
-  virtual RGBpaletteEntry *GetPalette () = 0;
+  virtual RGBPixel *GetPalette () = 0;
 
   /// Get the width of a string if it would be drawn with given font
   virtual int GetTextWidth (int FontID, const char *text) = 0;

@@ -13,7 +13,7 @@ DESCRIPTION.os2gcc = OS/2 with GCC/EMX
 
 # Choose which drivers you want to build/use
 DRIVERS+=\
-  cs2d/csdive cs3d/software \
+  cs2d/csdive cs3d/software cs3d/line \
 #  csnetdrv/null csnetdrv/sockets csnetman/null csnetman/simple \
 #  cssnddrv/null cssndrdr/null cssndrdr/software \
 
@@ -61,7 +61,7 @@ LIBS.EXE=
 Z_LIBS=-lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpngdll
+PNG_LIBS=-lpng
 
 # Where can the JPG library be found on this system?
 JPG_LIBS=-ljpegdll

@@ -27,10 +27,10 @@ class csMatrix3;
 class csVector3;
 class csRect;
 
-struct iImageFile;
+struct iImage;
 struct iTextureHandle;
 
-SCF_VERSION (iTextureManager, 0, 0, 1);
+SCF_VERSION (iTextureManager, 0, 0, 2);
 
 /**
  * This is the standard texture manager interface.
@@ -72,8 +72,11 @@ struct iTextureManager : public iBase
    * If 'for3d' is true then the texture is prepared for the 3D rasterizer.
    * If 'for2d' is true then the texture is prepared for the 2D driver.
    * Both can be true at the same time.
+   *
+   * The texture manager will reject the texture if it is an inappropiate
+   * format (see GetTextureFormat () method).
    */
-  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d) = 0;
+  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d) = 0;
 
   /**
    * Unregister a texture. Note that this will have no effect on the
@@ -95,7 +98,7 @@ struct iTextureManager : public iBase
   virtual void MergeTexture (iTextureHandle *handle) = 0;
 
   /**
-   * Call this function if you want to release all csImageFile's as
+   * Call this function if you want to release all iImage's as
    * given to this texture manager. After FreeImages() has been called
    * it is no longer allowed to call Prepare() again. So the advantage
    * of calling FreeImages() is that you gain memory (may be a lot)
@@ -133,6 +136,15 @@ struct iTextureManager : public iBase
    * Set verbose mode on/off.
    */
   virtual void SetVerbose (bool vb) = 0;
+
+  /**
+   * Query the basic format of textures that can be registered with this
+   * texture manager. It is very likely that the texture manager will
+   * reject the texture if it is in an improper format. The alpha channel
+   * is optional; the texture can have it and can not have it. Only the
+   * bits that fit the CS_IMGFMT_MASK mask matters.
+   */
+  virtual int GetTextureFormat () = 0;
 };
 
 #endif // __ITXTMGR_H__

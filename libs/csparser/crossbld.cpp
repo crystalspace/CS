@@ -197,7 +197,7 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
       // read in the converted skin
       sprintf(buffer,"%s.gif",tempfilename);
       tempfile = fopen(buffer,"rb");
-      ImageFile *newskin = csImageLoader::load(tempfile);
+      iImage *newskin = csImageLoader::Load(tempfile);
       fclose(tempfile);
       unlink(buffer);
       unlink(tempfilename);
@@ -320,11 +320,9 @@ csCrossBuild_Quake2Importer::~csCrossBuild_Quake2Importer()
 {
 }
 
-csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File(
-			char *md2filebase,
-			char *skinpath,
-			char *modelname,
-			csWorld *importdestination) const
+csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
+  char *md2filebase, char *skinpath, char *modelname,
+  csWorld *importdestination) const
 {
 #if 0
   csFile *modelfile = localVFS.Open(md2filebase,VFS_FILE_READ);
@@ -356,9 +354,10 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File(
     lastslash = '\0';
   }
 
-  csTextureHandle *defaultskin = Import_Quake2Textures(skinpath,modelname,importdestination);
+  csTextureHandle *defaultskin = Import_Quake2Textures (skinpath,
+    modelname, importdestination);
   
-  newtemplate->SetTexture(importdestination->GetTextures (),
+  newtemplate->SetTexture (importdestination->GetTextures (),
     CONST_CAST(char*)(defaultskin->GetName ()));
 
   newtemplate->GenerateLOD ();
@@ -407,10 +406,8 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
   return NULL;
 }
 
-csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
-			char *skinpath,
-			char *modelname,
-			csWorld *importdestination) const
+csTextureHandle *csCrossBuild_Quake2Importer::Import_Quake2Textures (
+  char *skinpath, char *modelname, csWorld *importdestination) const
 {
   // go through and load all .pcx and .bmp files in the archive
   iStrVector *skinlist = localVFS.FindFiles(skinpath);
@@ -431,7 +428,8 @@ csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
       size_t imagefilesize;
       char *imagedata = localVFS.ReadFile(skinfilename,imagefilesize);
 
-      csImageFile *newskin = csImageLoader::load((unsigned char *)imagedata,imagefilesize);
+      iImage *newskin = csImageLoader::Load((unsigned char *)imagedata,
+        imagefilesize, importdestination->GetTextureFormat ());
 
       CHK (delete [] imagedata);
 

@@ -21,7 +21,6 @@
 
 #include "sysdef.h"
 #include "cs3d/common/txtmgr.h"
-#include "csgfxldr/boxfilt.h"
 #include "csutil/util.h"
 #include "iimage.h"
 #include "isystem.h"
@@ -31,7 +30,7 @@ IMPLEMENT_IBASE (csTextureMM)
   IMPLEMENTS_INTERFACE (iTextureHandle)
 IMPLEMENT_IBASE_END
 
-csTextureMM::csTextureMM (iImageFile* image)
+csTextureMM::csTextureMM (iImage* image)
 {
   CONSTRUCT_IBASE (NULL);
 
@@ -66,19 +65,11 @@ csTextureMM::~csTextureMM ()
 void csTextureMM::create_blended_mipmap (csTextureManager* tex, unsigned char* bm)
 {
   if (!ifile) return;
-  iImageFile* if2;
+  iImage* if2;
   bool tran = GetTransparent ();
-  if (tran)
-  {
-    // Just copy.
-    convert_to_internal (tex, ifile, bm);
-  }
-  else
-  {
-    if2 = ifile->Blend (&csTextureManager::blend_filter);
-    convert_to_internal (tex, if2, bm);
-    if2->DecRef ();
-  }
+  if2 = ifile->MipMap (0, tran ? &transp_color : NULL);
+  convert_to_internal (tex, if2, bm);
+  if2->DecRef ();
 }
 
 void csTextureMM::alloc_mipmaps (csTextureManager* tex)
@@ -100,7 +91,8 @@ void csTextureMM::alloc_mipmaps (csTextureManager* tex)
   t1 = tfact->new_texture (this, w, h);
 
   // Mipmap level 1.
-  if (tex->mipmap_nice != MIPMAP_VERYNICE) { w /= 2; h /= 2; }
+  if (tex->mipmap_mode != MIPMAP_VERYNICE)
+  { w /= 2; h /= 2; }
   t2 = tfact->new_texture (this, w, h);
 
   // Mipmap level 2.
@@ -130,14 +122,8 @@ void csTextureMM::blend_mipmap0 (csTextureManager* tex)
 void csTextureMM::create_mipmap_bitmap (csTextureManager* tex, int steps, unsigned char* bm)
 {
   if (!ifile) return;
-  iImageFile* if2;
-  bool tran = GetTransparent ();
-  if (tran || tex->mipmap_nice == MIPMAP_UGLY)
-    if2 = ifile->MipMap (steps); 
-  else if (tex->mipmap_nice == MIPMAP_DEFAULT)
-    if2 = ifile->MipMap (steps, NULL, NULL);
-  else
-    if2 = ifile->MipMap (steps, &csTextureManager::mipmap_filter_1, &csTextureManager::mipmap_filter_2);
+  iImage* if2;
+  if2 = ifile->MipMap (steps, istransp ? &transp_color : NULL);
   convert_to_internal (tex, if2, bm);
   if2->DecRef ();
 }
@@ -149,10 +135,10 @@ void csTextureMM::create_mipmaps (csTextureManager* tex)
   int w = ifile->GetWidth ();
   int h = ifile->GetHeight ();
 
-  if (tex->mipmap_nice == MIPMAP_VERYNICE)
+  if (tex->mipmap_mode == MIPMAP_VERYNICE)
   {
     // Mipmap level 1 (the same size of texture as level 0 but blended a little)
-    create_blended_mipmap (tex, t2->get_bitmap ());
+    create_mipmap_bitmap (tex, 0, t2->get_bitmap ());
 
     // Mipmap level 2 (mipmap starting from the blended version).
     create_mipmap_bitmap (tex, 1, t3->get_bitmap ());
@@ -182,7 +168,7 @@ void csTextureMM::create_mipmaps (csTextureManager* tex)
   // mapping is disabled.
   int x, y;
   ULong r, g, b;
-  RGBPixel* d = ifile->GetImageData ();
+  RGBPixel* d = (RGBPixel *)ifile->GetImageData ();
   w = ifile->GetWidth ();
   h = ifile->GetHeight ();
   r = g = b = 0;
@@ -255,7 +241,7 @@ void csTextureMM::compute_color_usage ()
   if (!ifile) return;
   if (usage) return;
   int s = ifile->GetSize ();
-  RGBPixel* bm = ifile->GetImageData ();
+  RGBPixel* bm = (RGBPixel *)ifile->GetImageData ();
   CHK (usage = new ImageColorInfo (bm, s));
 }
 
@@ -279,7 +265,7 @@ void csTextureMM::remap_palette_24bit (csTextureManager* new_palette)
   if (!usage) return;
 
   int s = ifile->GetSize ();
-  RGBPixel* src = ifile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
   ULong* dest = (ULong *)t1->get_bitmap ();
 
   // Map the texture to the RGB palette.
@@ -308,7 +294,7 @@ void csTextureMM::remap_palette_24bit (csTextureManager* new_palette)
 void csTextureMM::remap_texture_16 (csTextureManager* new_palette)
 {
   int s = ifile->GetSize ();
-  RGBPixel* src = ifile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
   UShort* dest = (UShort*)t2d->get_bitmap ();
 
   // Approximation for black, because we can't use real black. Value 0 is 
@@ -335,7 +321,7 @@ void csTextureMM::remap_texture_16 (csTextureManager* new_palette)
 void csTextureMM::remap_texture_32 (csTextureManager* new_palette)
 {
   int s = ifile->GetSize ();
-  RGBPixel* src = ifile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
   ULong* dest = (ULong *)t2d->get_bitmap ();
   
   // Approximation for black, because we can't use real black. Value 0 is 
@@ -421,29 +407,20 @@ void csTextureMM::AdjustSize()
   int newheight = ifile->GetHeight();
 
   if (!IsPowerOf2(newwidth))
-  {
-    newwidth  = FindNearestPowerOf2(ifile->GetWidth()) /2;
-  }
+    newwidth = FindNearestPowerOf2 (ifile->GetWidth ()) / 2;
 
-  if (!IsPowerOf2(newheight))
-  {
-    newheight = FindNearestPowerOf2(ifile->GetHeight())/2;
-  }
+  if (!IsPowerOf2 (newheight))
+    newheight = FindNearestPowerOf2 (ifile->GetHeight ()) / 2;
 
-  if (newwidth  != ifile->GetWidth() ||
-      newheight != ifile->GetHeight())
-  {
-    iImageFile* oldimage = ifile;
-    ifile                = oldimage->Resize(newwidth, newheight);
-    oldimage->DecRef();
-  }
+  if (newwidth != ifile->GetWidth () || newheight != ifile->GetHeight ())
+    ifile->Resize (newwidth, newheight);
 }
 
 void csHardwareAcceleratedTextureMM::convert_to_internal
-  (csTextureManager* tex, iImageFile* imfile, unsigned char* bm)
+  (csTextureManager* tex, iImage* imfile, unsigned char* bm)
 {
   int s = imfile->GetSize ();
-  RGBPixel* src = imfile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)imfile->GetImageData ();
   ULong* dest = (ULong*) bm;
 
   // Map the texture to the RGB palette.
@@ -548,32 +525,6 @@ IMPLEMENT_IBASE (csTextureManager)
   IMPLEMENTS_INTERFACE (iTextureManager)
 IMPLEMENT_IBASE_END
 
-Filter3x3 csTextureManager::mipmap_filter_1 =
-{
-  1, 2, 1,
-  2, 4, 2,
-  1, 2, 1,
-  16
-};
-
-Filter5x5 csTextureManager::mipmap_filter_2 =
-{
-  1, 1, 1, 1, 1,
-  1, 2, 4, 2, 1,
-  1, 4, 8, 4, 1,
-  1, 2, 4, 2, 1,
-  1, 1, 1, 1, 1,
-  48
-};
-
-Filter3x3 csTextureManager::blend_filter =
-{
-  1, 2, 1,
-  2, 4, 2,
-  1, 2, 1,
-  16
-};
-
 csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D* iG2D) :
   textures (64, 64)
 {
@@ -584,13 +535,10 @@ csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D* iG2D) :
   factory_2d = NULL;
 
   Gamma = 1.0;
-  mipmap_nice = 0;
+  mipmap_mode = 0;
   do_blend_mipmap0 = false;
   do_lightmapgrid = false;
   do_lightmaponly = false;
-  mixing = MIX_TRUE_RGB;
-  force_mix = -1;
-  use_rgb = true;
 }
 
 void csTextureManager::Initialize ()
@@ -655,4 +603,9 @@ int csTextureManager::get_almost_black ()
   }
   // huh ?!
   return 0;
+}
+
+int csTextureManager::GetTextureFormat ()
+{
+  return CS_IMGFMT_TRUECOLOR;
 }

@@ -139,101 +139,145 @@ char* read_str_endian (FILE* fp)
 }
 
 //-- Alternative routines for handling endianess ----------------------------
-typedef union
-{
- unsigned long l;
- struct { char b1,b2,b3,b4; } b;
-} long_swap;
 
-typedef union
+union long_swap
 {
- unsigned short s;
- struct { char b1,b2; } b;
-} short_swap;
+  unsigned long l;
+  struct { char b1,b2,b3,b4; } b;
+};
+
+union int_swap
+{
+  unsigned int i;
+  struct { char b1,b2,b3,b4; } b;
+};
+
+typedef union short_swap
+{
+  unsigned short s;
+  struct { char b1,b2; } b;
+};
 
 static unsigned long init_big_endian_long (unsigned long value);
 static unsigned long init_little_endian_long (unsigned long value);
+static unsigned int init_big_endian_int (unsigned int value);
+static unsigned int init_little_endian_int (unsigned int value);
 static unsigned short init_big_endian_short (unsigned short value);
 static unsigned short init_little_endian_short (unsigned short value);
 static unsigned long dummy_long (unsigned long value);
-static unsigned short dummy_short (unsigned short value);
 static unsigned long swap_long (unsigned long value);
+static unsigned int dummy_int (unsigned int value);
+static unsigned int swap_int (unsigned int value);
+static unsigned short dummy_short (unsigned short value);
 static unsigned short swap_short (unsigned short value);
 
 t_big_endian_long *big_endian_long = init_big_endian_long;
-t_big_endian_short *big_endian_short = init_big_endian_short;
 t_little_endian_long *little_endian_long = init_little_endian_long;
+t_big_endian_int *big_endian_int = init_big_endian_int;
+t_little_endian_int *little_endian_int = init_little_endian_int;
+t_big_endian_short *big_endian_short = init_big_endian_short;
 t_little_endian_short *little_endian_short = init_little_endian_short;
 
 static void endian_init()
 {
- if (test_endian ())
- {
-  big_endian_long = dummy_long;
-  big_endian_short = dummy_short;
-  little_endian_long = swap_long;
-  little_endian_short = swap_short;
- } else
- {
-  little_endian_long = dummy_long;
-  little_endian_short = dummy_short;
-  big_endian_long = swap_long;
-  big_endian_short = swap_short;
- } /* endif */
+  if (test_endian ())
+  {
+    big_endian_long = dummy_long;
+    little_endian_long = swap_long;
+    big_endian_int = dummy_int;
+    little_endian_int = swap_int;
+    big_endian_short = dummy_short;
+    little_endian_short = swap_short;
+  }
+  else
+  {
+    little_endian_long = dummy_long;
+    big_endian_long = swap_long;
+    little_endian_int = dummy_int;
+    big_endian_int = swap_int;
+    little_endian_short = dummy_short;
+    big_endian_short = swap_short;
+  } /* endif */
 }
 
 static unsigned long init_big_endian_long (unsigned long value)
 {
- endian_init ();
- return big_endian_long (value);
+  endian_init ();
+  return big_endian_long (value);
 }
 
 static unsigned long init_little_endian_long (unsigned long value)
 {
- endian_init ();
- return little_endian_long (value);
+  endian_init ();
+  return little_endian_long (value);
+}
+
+static unsigned int init_big_endian_int (unsigned int value)
+{
+  endian_init ();
+  return big_endian_int (value);
+}
+
+static unsigned int init_little_endian_int (unsigned int value)
+{
+  endian_init ();
+  return little_endian_int (value);
 }
 
 static unsigned short init_big_endian_short (unsigned short value)
 {
- endian_init ();
- return big_endian_short (value);
+  endian_init ();
+  return big_endian_short (value);
 }
 
 static unsigned short init_little_endian_short (unsigned short value)
 {
- endian_init ();
- return little_endian_short (value);
+  endian_init ();
+  return little_endian_short (value);
 }
 
 static unsigned long dummy_long (unsigned long value)
 {
- return value;
+  return value;
+}
+
+static unsigned int dummy_int (unsigned int value)
+{
+  return value;
 }
 
 static unsigned short dummy_short (unsigned short value)
 {
- return value;
+  return value;
 }
 
 static unsigned long swap_long (unsigned long value)
 {
- long_swap l1 = {value};
- long_swap l2;
- l2.b.b1 = l1.b.b4;
- l2.b.b2 = l1.b.b3;
- l2.b.b3 = l1.b.b2;
- l2.b.b4 = l1.b.b1;
- return l2.l;
+  long_swap l1 = {value};
+  long_swap l2;
+  l2.b.b1 = l1.b.b4;
+  l2.b.b2 = l1.b.b3;
+  l2.b.b3 = l1.b.b2;
+  l2.b.b4 = l1.b.b1;
+  return l2.l;
+}
+
+static unsigned int swap_int (unsigned int value)
+{
+  int_swap l1 = {value};
+  int_swap l2;
+  l2.b.b1 = l1.b.b4;
+  l2.b.b2 = l1.b.b3;
+  l2.b.b3 = l1.b.b2;
+  l2.b.b4 = l1.b.b1;
+  return l2.i;
 }
 
 static unsigned short swap_short (unsigned short value)
 {
- short_swap s1 = {value};
- short_swap s2;
- s2.b.b1 = s1.b.b2;
- s2.b.b2 = s1.b.b1;
- return s2.s;
+  short_swap s1 = {value};
+  short_swap s2;
+  s2.b.b1 = s1.b.b2;
+  s2.b.b2 = s1.b.b1;
+  return s2.s;
 }
-
-//---------------------------------------------------------------------------

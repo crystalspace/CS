@@ -2,6 +2,9 @@
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributions made by Ivan Avramovic <ivan@avramovic.com>
 
+	ALMOST DEAD
+	DO NOT MODIFY - THIS FILE WILL BE REMOVED SOON
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -23,6 +26,28 @@
 #include <stdio.h>
 #include "types.h"
 #include "csgfxldr/rgbpixel.h"
+
+/// An RGB palette entry with statistics information.
+struct RGBPalEntry
+{
+  unsigned char red, green, blue;
+  long count;
+  RGBPalEntry () : red(0), green(0), blue(0), count(0) {}
+  RGBPalEntry (const RGBcolor& c) :
+    red (c.red), green (c.green), blue (c.blue), count (0) {}
+  RGBPalEntry (const RGBPalEntry& e) :
+    red (e.red), green (e.green), blue (e.blue), count (e.count) {}
+  bool operator == (const RGBcolor& c) const
+  { return (c.red == red) && (c.green == green) && (c.blue == blue); }
+  bool operator == (const RGBPalEntry& e) const
+  { return (e.red == red) && (e.green == green) && (e.blue == blue) && (e.count == count); }
+  bool operator != (const RGBcolor& c) const
+  { return !operator == (c); }
+  bool operator != (const RGBPalEntry& e) const
+  { return !operator==(e); }
+  operator RGBcolor () const
+  { return RGBcolor (red, green, blue); }
+};
 
 ///
 class ImageColorInfo

@@ -23,7 +23,7 @@
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
-struct iImageFile;
+struct iImage;
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):
@@ -37,14 +37,12 @@ struct iImageFile;
 #define NUM_GREEN	(1 << BITS_GREEN)
 #define NUM_BLUE	(1 << BITS_BLUE)
 
-#define TABLE_WHITE	0
-#define TABLE_RED	1
-#define TABLE_GREEN	2
-#define TABLE_BLUE	3
-#define TABLE_WHITE_HI	4
-#define TABLE_RED_HI	5
-#define TABLE_GREEN_HI	6
-#define TABLE_BLUE_HI	7
+#define TABLE_RED	0
+#define TABLE_GREEN	1
+#define TABLE_BLUE	2
+#define TABLE_RED_HI	3
+#define TABLE_GREEN_HI	4
+#define TABLE_BLUE_HI	5
 
 typedef UShort RGB16map[256];
 typedef unsigned char RGB8map[256];
@@ -76,12 +74,12 @@ struct PalIdxLookup
 class csTextureMMOpenGL : public csHardwareAcceleratedTextureMM
 {
 public:
-  csTextureMMOpenGL(iImageFile* image) 
+  csTextureMMOpenGL(iImage* image) 
    : csHardwareAcceleratedTextureMM (image) {}
   ///
-  virtual void remap_texture(csTextureManager *new_palette) 
+  virtual void remap_texture(csTextureManager *texman) 
   { 
-    remap_palette_24bit(new_palette); 
+    remap_palette_24bit(texman); 
   }
 };
 
@@ -131,7 +129,7 @@ public:
   ///
   virtual void Prepare ();
   ///
-  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
+  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d);
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
   ///
@@ -144,10 +142,7 @@ public:
   virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMOpenGL* new_texture (iImageFile* image);
-
-  ///
-  bool force_mixing (char* mix);
+  csTextureMMOpenGL* new_texture (iImage* image);
 
   /**
    * Return the index for some color. This works in 8-bit

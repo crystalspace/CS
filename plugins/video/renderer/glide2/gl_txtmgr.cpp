@@ -23,15 +23,13 @@
 #include "isystem.h"
 
 #include "cs3d/glide2/gl_txtmgr.h"
-#include "cs3d/common/inv_cmap.h"
 #include "iimage.h"
-#include "csgfxldr/boxfilt.h"
 #include "csutil/scanstr.h"
 #include "lightdef.h"
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
-csTextureMMGlide::csTextureMMGlide (iImageFile* image) : 
+csTextureMMGlide::csTextureMMGlide (iImage* image) : 
   csHardwareAcceleratedTextureMM (image)
 {
 }
@@ -40,15 +38,15 @@ csTextureMMGlide::~csTextureMMGlide ()
 {
 }
 
-void csTextureMMGlide::convert_to_internal (csTextureManager* /*tex*/,
-                                            iImageFile* imfile, unsigned char* bm)
+void csTextureMMGlide::convert_to_internal (csTextureManager* /*texman*/,
+                                            iImage* imfile, unsigned char* bm)
 {
   int x,y;
 
   int w = imfile->GetWidth ();
   int h = imfile->GetHeight ();
 
-  RGBPixel* bmsrc = imfile->GetImageData ();
+  RGBPixel* bmsrc = (RGBPixel *)imfile->GetImageData ();
   int r, g, b;
   
   UShort* bml = (UShort*)bm;
@@ -75,7 +73,7 @@ void csTextureMMGlide::remap_palette_24bit (csTextureManager*)
 
   int w = ifile->GetWidth ();
   int h = ifile->GetHeight ();
-  RGBPixel* src = ifile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
   UShort* dest = (UShort *)t1->get_bitmap ();
 
   // Map the texture to the RGB palette.
@@ -110,19 +108,6 @@ void csTextureManagerGlide::Initialize ()
   read_config ();
 }
 
-
-bool csTextureManagerGlide::force_mixing (char* mix)
-{
-  if (!strcmp (mix, "true_rgb")) force_mix = MIX_TRUE_RGB;
-  else if (!strcmp (mix, "nocolor")) force_mix = MIX_NOCOLOR;
-  else
-  {
-    SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for 'mixing' (use 'true_rgb' or 'nocolor')!\n", mix);
-    return false;
-  }
-  return true;
-}
-
 void csTextureManagerGlide::read_config ()
 {
   char* p;
@@ -133,118 +118,40 @@ void csTextureManagerGlide::read_config ()
   // interface as well.
 
   do_blend_mipmap0 = System->ConfigGetYesNo ("TextureMapper", "BLEND_MIPMAP", false);
-
-  p = System->ConfigGetStr ("TextureMapper", "MIPMAP_FILTER_1", "-");
-  if (*p != '-')
-  {
-    ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
-      &mipmap_filter_1.f11, &mipmap_filter_1.f12, &mipmap_filter_1.f13,
-      &mipmap_filter_1.f21, &mipmap_filter_1.f22, &mipmap_filter_1.f23,
-      &mipmap_filter_1.f31, &mipmap_filter_1.f32, &mipmap_filter_1.f33);
-    mipmap_filter_1.tot =
-      mipmap_filter_1.f11+mipmap_filter_1.f12+mipmap_filter_1.f13+
-      mipmap_filter_1.f21+mipmap_filter_1.f22+mipmap_filter_1.f23+
-      mipmap_filter_1.f31+mipmap_filter_1.f32+mipmap_filter_1.f33;
-  }
-  p = System->ConfigGetStr ("TextureMapper", "MIPMAP_FILTER_2", "-");
-  if (*p != '-')
-  {
-    ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-      &mipmap_filter_2.f00, &mipmap_filter_2.f01, &mipmap_filter_2.f02, &mipmap_filter_2.f03, &mipmap_filter_2.f04,
-      &mipmap_filter_2.f10, &mipmap_filter_2.f11, &mipmap_filter_2.f12, &mipmap_filter_2.f13, &mipmap_filter_2.f14,
-      &mipmap_filter_2.f20, &mipmap_filter_2.f21, &mipmap_filter_2.f22, &mipmap_filter_2.f23, &mipmap_filter_2.f24,
-      &mipmap_filter_2.f30, &mipmap_filter_2.f31, &mipmap_filter_2.f32, &mipmap_filter_2.f33, &mipmap_filter_2.f34,
-      &mipmap_filter_2.f40, &mipmap_filter_2.f41, &mipmap_filter_2.f42, &mipmap_filter_2.f43, &mipmap_filter_2.f44);
-    mipmap_filter_2.tot =
-      mipmap_filter_2.f00+mipmap_filter_2.f01+mipmap_filter_2.f02+mipmap_filter_2.f03+mipmap_filter_2.f04+
-      mipmap_filter_2.f10+mipmap_filter_2.f11+mipmap_filter_2.f12+mipmap_filter_2.f13+mipmap_filter_2.f14+
-      mipmap_filter_2.f20+mipmap_filter_2.f21+mipmap_filter_2.f22+mipmap_filter_2.f23+mipmap_filter_2.f24+
-      mipmap_filter_2.f30+mipmap_filter_2.f31+mipmap_filter_2.f32+mipmap_filter_2.f33+mipmap_filter_2.f34+
-      mipmap_filter_2.f40+mipmap_filter_2.f41+mipmap_filter_2.f42+mipmap_filter_2.f43+mipmap_filter_2.f44;
-  }
-  p = System->ConfigGetStr ("TextureMapper", "BLEND_FILTER", "-");
-  if (*p != '-')
-  {
-    ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
-      &blend_filter.f11, &blend_filter.f12, &blend_filter.f13,
-      &blend_filter.f21, &blend_filter.f22, &blend_filter.f23,
-      &blend_filter.f31, &blend_filter.f32, &blend_filter.f33);
-    blend_filter.tot =
-      blend_filter.f11+blend_filter.f12+blend_filter.f13+
-      blend_filter.f21+blend_filter.f22+blend_filter.f23+
-      blend_filter.f31+blend_filter.f32+blend_filter.f33;
-  }
-
   prefered_dist = System->ConfigGetInt ("World", "RGB_DIST", PREFERED_DIST);
   prefered_col_dist = System->ConfigGetInt ("World", "RGB_COL_DIST", PREFERED_COL_DIST);
-  p = System->ConfigGetStr ("TextureMapper", "MIPMAP_NICE", "nice");
+  p = System->ConfigGetStr ("TextureMapper", "MIPMAP_MODE", "nice");
   if (!strcmp (p, "nice"))
   {
-    mipmap_nice = MIPMAP_NICE;
+    mipmap_mode = MIPMAP_NICE;
     if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'nice'.\n");
-  }
-  else if (!strcmp (p, "ugly"))
-  {
-    mipmap_nice = MIPMAP_UGLY;
-    if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'ugly'.\n");
-  }
-  else if (!strcmp (p, "default"))
-  {
-    mipmap_nice = MIPMAP_DEFAULT;
-    if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'default'.\n");
   }
   else if (!strcmp (p, "verynice"))
   {
     if (false/*caps.SupportsArbitraryMipMapping*/)
     {
-      mipmap_nice = MIPMAP_VERYNICE;
+      mipmap_mode = MIPMAP_VERYNICE;
       if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'verynice'\n  (Note: this is expensive for the texture cache)\n");
     }
     else
     {
-      mipmap_nice = MIPMAP_NICE;
+      mipmap_mode = MIPMAP_NICE;
       if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'nice' ('verynice' not available for hardware accelerators).\n");
     }
   }
   else
   {
-    SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIPMAP_NICE!\n(Use 'verynice', 'nice', 'ugly', or 'default')\n", p);
+    SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIPMAP_MODE!\n(Use 'verynice', 'nice', 'ugly', or 'default')\n", p);
     exit (0);	//@@@
-  }
-
-  if (force_mix != -1) mixing = force_mix;
-  else
-  {
-    char buf[100];
-    p=System->ConfigGetStr ("World", "MIXLIGHTS", "true_rgb");
-    strcpy (buf, p);
-
-    if (!strcmp (p, "true_rgb")) mixing = MIX_TRUE_RGB;
-    else if (!strcmp (p, "nocolor")) mixing = MIX_NOCOLOR;
-    else
-    {
-      SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIXLIGHTS (use 'true_rgb' or 'nocolor')!\n", p);
-      exit (0); //@@@
-    }
   }
 
   if (pfmt.PixelBytes == 4)
     { if (verbose) SysPrintf (MSG_INITIALIZATION, "Truecolor mode (32 bit).\n"); }
   else
     { if (verbose) SysPrintf (MSG_INITIALIZATION, "Truecolor mode (15/16 bit).\n"); }
-  mixing = MIX_TRUE_RGB;
-
-  if (force_mix != -1) mixing = force_mix;
-
-  use_rgb = mixing == MIX_TRUE_RGB;
-
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "Code all textures in 24-bit.\n");
 
   if (verbose)
-    if (mixing == MIX_TRUE_RGB)
-      SysPrintf (MSG_INITIALIZATION, "Use RGB light mixing.\n");
-    else
-      SysPrintf (MSG_INITIALIZATION, "Use colorless lights.\n");
+    SysPrintf (MSG_INITIALIZATION, "Code all textures in 24-bit.\n");
 }
 
 csTextureManagerGlide::~csTextureManagerGlide ()
@@ -257,7 +164,7 @@ void csTextureManagerGlide::clear ()
   csTextureManager::clear ();
 }
 
-csTextureMMGlide* csTextureManagerGlide::new_texture (iImageFile* image)
+csTextureMMGlide* csTextureManagerGlide::new_texture (iImage* image)
 {
   CHK (csTextureMMGlide* tm = new csTextureMMGlide (image));
   if (tm->loaded_correctly ())
@@ -313,16 +220,6 @@ int csTextureManagerGlide::find_rgb_map (int r, int g, int b, int map_type, int 
 
   switch (map_type)
   {
-    case TABLE_WHITE_HI:
-      nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
-      ng = (NORMAL_LIGHT_LEVEL+l)*g / NORMAL_LIGHT_LEVEL;
-      nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_WHITE:
-      nr = l*r / NORMAL_LIGHT_LEVEL;
-      ng = l*g / NORMAL_LIGHT_LEVEL;
-      nb = l*b / NORMAL_LIGHT_LEVEL;
-      break;
     case TABLE_RED_HI:
       nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
       break;
@@ -333,16 +230,13 @@ int csTextureManagerGlide::find_rgb_map (int r, int g, int b, int map_type, int 
       nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
       break;
     case TABLE_RED:
-      if (use_rgb) nr = l*r / NORMAL_LIGHT_LEVEL;
-      else nr = r+l*NORMAL_LIGHT_LEVEL/256;
+      nr = l*r / NORMAL_LIGHT_LEVEL;
       break;
     case TABLE_GREEN:
-      if (use_rgb) ng = l*g / NORMAL_LIGHT_LEVEL;
-      else ng = g+l*NORMAL_LIGHT_LEVEL/256;
+      ng = l*g / NORMAL_LIGHT_LEVEL;
       break;
     case TABLE_BLUE:
-      if (use_rgb) nb = l*b / NORMAL_LIGHT_LEVEL;
-      else nb = b+l*NORMAL_LIGHT_LEVEL/256;
+      nb = l*b / NORMAL_LIGHT_LEVEL;
       break;
   }
   return find_color (nr, ng, nb);
@@ -391,7 +285,7 @@ void csTextureManagerGlide::Prepare ()
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
-iTextureHandle *csTextureManagerGlide::RegisterTexture (iImageFile* image,
+iTextureHandle *csTextureManagerGlide::RegisterTexture (iImage* image,
   bool for3d, bool for2d)
 {
   csTextureMMGlide* txt = new_texture (image);

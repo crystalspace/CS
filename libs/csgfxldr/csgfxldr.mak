@@ -31,30 +31,38 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csgfxldr
 
-SRC.CSGFXLDR = libs/csgfxldr/csimage.cpp libs/csgfxldr/pcx.cpp
+SRC.CSGFXLDR = libs/csgfxldr/csimage.cpp libs/csgfxldr/imgload.cpp \
+  libs/csgfxldr/quantize.cpp
 
 ifeq ($(DO_GIF),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/gifimage.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_GIF
 endif
 ifeq ($(DO_BMP),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/bmpimage.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_BMP
 endif
 ifeq ($(DO_TGA),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/tgaimage.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_TGA
 endif
 ifeq ($(DO_PNG),yes)
-  SRC.CSGFXLDR+=libs/csgfxldr/pngimage.cpp
+  SRC.CSGFXLDR+=libs/csgfxldr/pngimage.cpp libs/csgfxldr/pngsave.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_PNG
   LIBS.EXE+=$(PNG_LIBS)
 endif
 ifeq ($(DO_JPG),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/jpgimage.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_JPG
   LIBS.EXE+=$(JPG_LIBS)
 endif
 ifeq ($(DO_WAL),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/walimage.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_WAL
 endif
 ifeq ($(DO_SGI),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/sgiimage.cpp
+  CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_SGI
 endif
 
 CSGFXLDR.LIB = $(OUT)$(LIB_PREFIX)csgfxldr$(LIB_SUFFIX)
@@ -71,6 +79,9 @@ all: $(CSGFXLDR.LIB)
 csgfxldr: $(OUTDIRS) $(CSGFXLDR.LIB)
 clean: csgfxldrclean
 
+$(OUT)imgload$O: imgload.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.IMG_FORMATS)
+
 $(CSGFXLDR.LIB): $(OBJ.CSGFXLDR)
 	$(DO.LIBRARY)
 
@@ -86,30 +97,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-#------------------------------------------------------------------- config ---#
-ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
-
-ifeq ($(DO_GIF),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_GIF$">>volatile.tmp
-endif
-ifeq ($(DO_BMP),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_BMP$">>volatile.tmp
-endif
-ifeq ($(DO_TGA),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_TGA$">>volatile.tmp
-endif
-ifeq ($(DO_PNG),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_PNG$">>volatile.tmp
-endif
-ifeq ($(DO_JPG),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_JPG$">>volatile.tmp
-endif
-ifeq ($(DO_WAL),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_WAL$">>volatile.tmp
-endif
-ifeq ($(DO_SGI),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SGI$">>volatile.tmp
-endif
-
-endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

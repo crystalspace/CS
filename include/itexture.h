@@ -6,7 +6,7 @@
 
 struct csHighColorCacheData;
 
-SCF_VERSION (iTextureHandle, 0, 0, 1);
+SCF_VERSION (iTextureHandle, 1, 0, 0);
 
 /** 
  * A texture handle as returned by iTextureManager.
@@ -54,9 +54,6 @@ struct iTextureHandle : public iBase
 
   /// Get the mean color index
   virtual int GetMeanColor () = 0;
-
-  /// Returns the number of colors in this texture.
-  virtual int GetNumberOfColors () = 0;
 
   /// Used internally by the 2D driver
   virtual csHighColorCacheData *GetHighColorCacheData () = 0;

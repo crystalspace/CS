@@ -21,43 +21,28 @@
 
 #include "csgfxldr/csimage.h"
 
-class csWALImageLoader;
-
-/**
- * An csImageFile subclass for reading WAL files.
- */
-class ImageWALFile : public csImageFile
-{
-  ///
-  friend class csImageFile;	// For constructor
-  friend class csWALImageLoader;
-
-private:
-  /// Read the WAL file from the buffer.
-  ImageWALFile (UByte* buf, long size);
-
-public:
-  ///
-  virtual ~ImageWALFile ();
-};
-
 /**
  * The TGA Image Loader.
  */
 class csWALImageLoader : public csImageLoader
 {
 protected:
-  ///
-  virtual csImageFile* LoadImage (UByte* buf, ULong size);
-  virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size);
+  /// Try to load the image
+  virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
+};
 
-public:
-  ///
-  virtual const char* GetName() const
-  { return "WAL"; }
-  ///
-  virtual const char* GetDescription() const 
-  { return "WAL (Quake2) image format"; }
+/**
+ * An csImageFile subclass for reading WAL files.
+ */
+class ImageWALFile : public csImageFile
+{
+  friend class csWALImageLoader;
+
+private:
+  /// Initialize the image object
+  ImageWALFile (int iFormat) : csImageFile (iFormat) { };
+  /// Try to read the WAL file from the buffer and return success status
+  bool Load (UByte* iBuffer, ULong iSize);
 };
 
 #endif

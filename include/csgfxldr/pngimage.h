@@ -21,7 +21,15 @@
 
 #include "csgfxldr/csimage.h"
 
-class csPNGImageLoader;
+/**
+ * The PNG Image Loader
+ */
+class csPNGImageLoader : public csImageLoader
+{
+protected:
+  /// Try to load the image
+  virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
+};
 
 /**
  * An csImageFile subclass for reading PNG files.<p>
@@ -29,42 +37,20 @@ class csPNGImageLoader;
  */
 class ImagePngFile : public csImageFile
 {
-  ///
-  friend class csImageFile;	// For constructor
   friend class csPNGImageLoader;
 
-private:
-  /// Read the PNG file from the buffer.
-  ImagePngFile (UByte* buf, size_t size);
-  ///
+  // The buffer to "read" from
+  UByte *r_data;
+  // The buffer size
+  size_t r_size;
+  // An "read from file" function to feed the image to libpng through
   static void PNG_read (png_structp png, png_bytep data, png_size_t size);
 
-  UByte *r_data;
-  size_t r_size;
-
-public:
-  ///
-  virtual ~ImagePngFile ();
+private:
+  /// Initialize the image object
+  ImagePngFile (int iFormat) : csImageFile (iFormat) { };
+  /// Try to read the PNG file from the buffer and return success status
+  bool Load (UByte* iBuffer, ULong iSize);
 };
 
-/**
- * The PNG Image Loader
- */
-class csPNGImageLoader : public csImageLoader
-{
-protected:
-  ///
-
-  virtual csImageFile* LoadImage (UByte* buf, ULong size);
-  virtual AlphaMapFile* LoadAlphaMap (UByte* buf, ULong size);
-
-public:
-  ///
-  virtual const char* GetName() const
-  { return "PNG"; }
-  ///
-  virtual const char* GetDescription() const 
-  { return "Portable Network Graphics"; }
-};
-
-#endif //PNGIMAGE_H
+#endif // PNGIMAGE_H

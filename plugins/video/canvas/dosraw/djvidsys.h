@@ -152,9 +152,9 @@ public:
   /// Flushes double buffer out to VRAM
   void Flush (int x, int y, int w, int h);
   /// Puts current pal in Palette
-  void GetPalette (RGBpaletteEntry *Palette, int iColors);
+  void GetPalette (RGBPixel *Palette, int iColors);
   /// Writes out Palette
-  void SetPalette (RGBpaletteEntry *Palette, int iColors);
+  void SetPalette (RGBPixel *Palette, int iColors);
   /// Clear current buffer
   void Clear (int Color);
   /// Open graphics screen; return error code

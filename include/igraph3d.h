@@ -32,6 +32,7 @@ struct iPolygonTexture;
 struct iTextureManager;
 struct iTextureHandle;
 struct iHalo;
+struct iImage;
 
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
@@ -334,7 +335,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 0, 0, 2);
+SCF_VERSION (iGraphics3D, 0, 0, 3);
 
 /**
  * This is the standard 3D graphics interface.
@@ -518,6 +519,9 @@ struct iGraphics3D : public iPlugIn
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
+
+  /// Do a screenshot: return a new iImage object
+  virtual iImage *ScreenShot () { return NULL; }
 };
 
 #endif // __IGRAPH3D_H__

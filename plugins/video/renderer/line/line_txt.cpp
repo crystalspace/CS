@@ -22,7 +22,6 @@
 #include "sysdef.h"
 #include "cs3d/line/line_txt.h"
 #include "cs3d/common/inv_cmap.h"
-#include "csgfxldr/boxfilt.h"
 #include "csutil/scanstr.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
@@ -37,11 +36,6 @@
   if (r < 0) r = 0; else if (r > 255) r = 255; \
   if (g < 0) g = 0; else if (g > 255) g = 255; \
   if (b < 0) b = 0; else if (b > 255) b = 255;
-
-// Eye sensivity to different colors
-#define R_COEF	299
-#define G_COEF	587
-#define B_COEF	114
 
 /**
  * A nice observation about the properties of human eye:
@@ -69,9 +63,9 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
 
   sR -= tR; sG -= tG; sB -= tB;
 
-  return R_COEF * sR * sR * (32 - ((max - tR) >> 3)) +
-         G_COEF * sG * sG * (32 - ((max - tG) >> 3)) +
-         B_COEF * sB * sB * (32 - ((max - tB) >> 3));
+  return R_COEF_SQ * sR * sR * (32 - ((max - tR) >> 3)) +
+         R_COEF_SQ * sG * sG * (32 - ((max - tG) >> 3)) +
+         R_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
 }
 
 TxtCmapPrivate::TxtCmapPrivate ()
@@ -123,7 +117,7 @@ int TxtCmapPrivate::alloc_rgb (int r, int g, int b, int dist)
 
 //---------------------------------------------------------------------------
 
-csTextureMMLine::csTextureMMLine (iImageFile* image) : csTextureMM (image)
+csTextureMMLine::csTextureMMLine (iImage* image) : csTextureMM (image)
 {
   priv_cmap = NULL;
 }
@@ -134,7 +128,7 @@ csTextureMMLine::~csTextureMMLine ()
 }
 
 void csTextureMMLine::convert_to_internal (csTextureManager* tex,
-  iImageFile* imfile, unsigned char* bm)
+  iImage* imfile, unsigned char* bm)
 {
   csTextureManagerLine* texs = (csTextureManagerLine*)tex;
   if (texs->txtMode == TXT_GLOBAL)
@@ -146,10 +140,10 @@ void csTextureMMLine::convert_to_internal (csTextureManager* tex,
 }
 
 void csTextureMMLine::convert_to_internal_global (csTextureManagerLine* tex,
-  iImageFile* imfile, unsigned char* bm)
+  iImage* imfile, unsigned char* bm)
 {
   int s = imfile->GetSize ();
-  RGBPixel *bmsrc = imfile->GetImageData ();
+  RGBPixel *bmsrc = (RGBPixel *)imfile->GetImageData ();
   if (GetTransparent ())
     for (; s > 0; s--, bmsrc++)
       if (transp_color == *bmsrc)
@@ -162,12 +156,12 @@ void csTextureMMLine::convert_to_internal_global (csTextureManagerLine* tex,
 }
 
 void csTextureMMLine::convert_to_internal_24bit (csTextureManagerLine *tex,
-  iImageFile* imfile, unsigned char* bm)
+  iImage* imfile, unsigned char* bm)
 {
   (void)tex;
 
   int s = imfile->GetSize ();
-  RGBPixel* bmsrc = imfile->GetImageData ();
+  RGBPixel* bmsrc = (RGBPixel *)imfile->GetImageData ();
   ULong *bml = (ULong*)bm;
   if (GetTransparent ())
     for (; s > 0; s--, bmsrc++)
@@ -181,10 +175,10 @@ void csTextureMMLine::convert_to_internal_24bit (csTextureManagerLine *tex,
 }
 
 void csTextureMMLine::convert_to_internal_private (csTextureManagerLine* /*tex*/,
-  iImageFile* imfile, unsigned char* bm)
+  iImage* imfile, unsigned char* bm)
 {
   int s = imfile->GetSize ();
-  RGBPixel* bmsrc = imfile->GetImageData ();
+  RGBPixel* bmsrc = (RGBPixel *)imfile->GetImageData ();
   if (GetTransparent ())
     for (; s > 0; s--, bmsrc++)
       if (transp_color == *bmsrc)
@@ -249,7 +243,7 @@ void csTextureMMLine::remap_palette_global (csTextureManagerLine* new_palette, b
         (get_usage (i).red, get_usage (i).green, get_usage (i).blue);
   }
 
-  RGBPixel* src = ifile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
 
   unsigned char *dest, *last;
   if (do_2d)
@@ -325,7 +319,7 @@ void csTextureMMLine::remap_palette_private (csTextureManagerLine* new_palette)
 
   int w = ifile->GetWidth ();
   int h = ifile->GetHeight ();
-  RGBPixel* src = ifile->GetImageData ();
+  RGBPixel* src = (RGBPixel *)ifile->GetImageData ();
   unsigned char* dest = t1->get_bitmap ();
 
   // Map the texture to the private palette.
@@ -458,73 +452,21 @@ void csTextureManagerLine::read_config ()
   char *p;
 
   do_blend_mipmap0 = config->GetYesNo ("Mipmapping", "BLEND_MIPMAP", false);
-
-  p = config->GetStr ("Mipmapping", "MIPMAP_FILTER_1", "-");
-  if (*p != '-')
-  {
-    ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
-      &mipmap_filter_1.f11, &mipmap_filter_1.f12, &mipmap_filter_1.f13,
-      &mipmap_filter_1.f21, &mipmap_filter_1.f22, &mipmap_filter_1.f23,
-      &mipmap_filter_1.f31, &mipmap_filter_1.f32, &mipmap_filter_1.f33);
-    mipmap_filter_1.tot =
-      mipmap_filter_1.f11+mipmap_filter_1.f12+mipmap_filter_1.f13+
-      mipmap_filter_1.f21+mipmap_filter_1.f22+mipmap_filter_1.f23+
-      mipmap_filter_1.f31+mipmap_filter_1.f32+mipmap_filter_1.f33;
-  }
-  p = config->GetStr ("Mipmapping", "MIPMAP_FILTER_2", "-");
-  if (*p != '-')
-  {
-    ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-      &mipmap_filter_2.f00, &mipmap_filter_2.f01, &mipmap_filter_2.f02, &mipmap_filter_2.f03, &mipmap_filter_2.f04,
-      &mipmap_filter_2.f10, &mipmap_filter_2.f11, &mipmap_filter_2.f12, &mipmap_filter_2.f13, &mipmap_filter_2.f14,
-      &mipmap_filter_2.f20, &mipmap_filter_2.f21, &mipmap_filter_2.f22, &mipmap_filter_2.f23, &mipmap_filter_2.f24,
-      &mipmap_filter_2.f30, &mipmap_filter_2.f31, &mipmap_filter_2.f32, &mipmap_filter_2.f33, &mipmap_filter_2.f34,
-      &mipmap_filter_2.f40, &mipmap_filter_2.f41, &mipmap_filter_2.f42, &mipmap_filter_2.f43, &mipmap_filter_2.f44);
-    mipmap_filter_2.tot =
-      mipmap_filter_2.f00+mipmap_filter_2.f01+mipmap_filter_2.f02+mipmap_filter_2.f03+mipmap_filter_2.f04+
-      mipmap_filter_2.f10+mipmap_filter_2.f11+mipmap_filter_2.f12+mipmap_filter_2.f13+mipmap_filter_2.f14+
-      mipmap_filter_2.f20+mipmap_filter_2.f21+mipmap_filter_2.f22+mipmap_filter_2.f23+mipmap_filter_2.f24+
-      mipmap_filter_2.f30+mipmap_filter_2.f31+mipmap_filter_2.f32+mipmap_filter_2.f33+mipmap_filter_2.f34+
-      mipmap_filter_2.f40+mipmap_filter_2.f41+mipmap_filter_2.f42+mipmap_filter_2.f43+mipmap_filter_2.f44;
-  }
-  p = config->GetStr ("Mipmapping", "BLEND_FILTER", "-");
-  if (*p != '-')
-  {
-    ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
-      &blend_filter.f11, &blend_filter.f12, &blend_filter.f13,
-      &blend_filter.f21, &blend_filter.f22, &blend_filter.f23,
-      &blend_filter.f31, &blend_filter.f32, &blend_filter.f33);
-    blend_filter.tot =
-      blend_filter.f11+blend_filter.f12+blend_filter.f13+
-      blend_filter.f21+blend_filter.f22+blend_filter.f23+
-      blend_filter.f31+blend_filter.f32+blend_filter.f33;
-  }
-
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
-  p = config->GetStr ("Mipmapping", "MIPMAP_NICE", "nice");
+  p = config->GetStr ("Mipmapping", "MIPMAP_MODE", "nice");
   if (!strcmp (p, "nice"))
   {
-    mipmap_nice = MIPMAP_NICE;
+    mipmap_mode = MIPMAP_NICE;
     if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'nice'.\n");
-  }
-  else if (!strcmp (p, "ugly"))
-  {
-    mipmap_nice = MIPMAP_UGLY;
-    if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'ugly'.\n");
-  }
-  else if (!strcmp (p, "default"))
-  {
-    mipmap_nice = MIPMAP_DEFAULT;
-    if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'default'.\n");
   }
   else if (!strcmp (p, "verynice"))
   {
-    mipmap_nice = MIPMAP_VERYNICE;
+    mipmap_mode = MIPMAP_VERYNICE;
     if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'verynice'\n  (Note: this is expensive for the texture cache)\n");
   }
   else
   {
-    SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIPMAP_NICE!\n(Use 'verynice', 'nice', 'ugly', or 'default')\n", p);
+    SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIPMAP_MODE!\n(Use 'verynice', 'nice', 'ugly', or 'default')\n", p);
     exit (0);	//@@@
   }
 
@@ -593,7 +535,7 @@ void csTextureManagerLine::clear ()
   CHK (delete lt_alpha); lt_alpha = NULL;
 }
 
-csTextureMMLine* csTextureManagerLine::new_texture (iImageFile* image)
+csTextureMMLine* csTextureManagerLine::new_texture (iImage* image)
 {
   CHK (csTextureMMLine* tm = new csTextureMMLine (image));
   if (tm->loaded_correctly ())
@@ -1006,7 +948,7 @@ void csTextureManagerLine::Prepare ()
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE\n");
 }
 
-iTextureHandle *csTextureManagerLine::RegisterTexture (iImageFile* image,
+iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
   bool for3d, bool for2d)
 {
   csTextureMMLine* txt = new_texture (image);

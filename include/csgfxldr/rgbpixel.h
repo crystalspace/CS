@@ -25,11 +25,11 @@
 // particular, some pieces of code make these assumptions:
 //
 //    sizeof(RGBcolor) == 3       (byte:rgb)
-//    sizeof(RGBPixel) == 4       (byte:rgb + byte:pad)
+//    sizeof(RGBPixel) == 4       (byte:rgb + byte:alpha)
 //    sizeof(RGBPalEntry) == 8    (byte:rgb + long:count)
 //
 // Originally, RGBPixel and RGBPalEntry were implemented as subclasses of
-// RGBcolor.  RGBPixel added a byte-sized "pad" variable, and RGBPalEntry added
+// RGBcolor.  RGBPixel added a byte-sized "alpha" variable, and RGBPalEntry added
 // a longword-sized "count" variable.  Thus, the original implementation made
 // the assumption that the compiler would not pad out the RGBcolor structure.
 //
@@ -55,7 +55,10 @@
 #include <stdio.h>
 #include "types.h"
 
-/// An RGB color.
+/**
+ * An RGB color. This class is used whenever we need just R, G and B
+ * information, such as when defining a color palette.
+ */
 struct RGBcolor
 {
   unsigned char red, green, blue;
@@ -72,15 +75,19 @@ struct RGBcolor
   { return RGBcolor (c.red + red, c.green + green, c.blue + blue); }
 };
 
-/// An RGB pixel.
+/**
+ * An RGB pixel. Besides R,G,B color components this structure also
+ * contains the Alpha channel component, which is used in images
+ * (that potentially have an alpha channel).
+ */
 struct RGBPixel
 {
-  unsigned char red, green, blue, pad;
-  RGBPixel () : red(0), green(0), blue(0), pad(0) {}
+  unsigned char red, green, blue, alpha;
+  RGBPixel () : red(0), green(0), blue(0), alpha(255) {}
   RGBPixel (const RGBcolor& c) :
-    red (c.red), green (c.green), blue (c.blue), pad (0) {}
+    red (c.red), green (c.green), blue (c.blue), alpha (255) {}
   RGBPixel (const RGBPixel& p) :
-    red (p.red), green (p.green), blue (p.blue), pad (p.pad) {}
+    red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {}
   bool operator == (const RGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
   bool operator == (const RGBPixel& p) const
@@ -93,26 +100,24 @@ struct RGBPixel
   { return RGBcolor (red, green, blue); }
 };
 
-/// An RGB palette entry with statistics information.
-struct RGBPalEntry
-{
-  unsigned char red, green, blue;
-  long count;
-  RGBPalEntry () : red(0), green(0), blue(0), count(0) {}
-  RGBPalEntry (const RGBcolor& c) :
-    red (c.red), green (c.green), blue (c.blue), count (0) {}
-  RGBPalEntry (const RGBPalEntry& e) :
-    red (e.red), green (e.green), blue (e.blue), count (e.count) {}
-  bool operator == (const RGBcolor& c) const
-  { return (c.red == red) && (c.green == green) && (c.blue == blue); }
-  bool operator == (const RGBPalEntry& e) const
-  { return (e.red == red) && (e.green == green) && (e.blue == blue) && (e.count == count); }
-  bool operator != (const RGBcolor& c) const
-  { return !operator == (c); }
-  bool operator != (const RGBPalEntry& e) const
-  { return !operator==(e); }
-  operator RGBcolor () const
-  { return RGBcolor (red, green, blue); }
-};
+/**
+ * Eye sensivity to different color components, from NTSC grayscale equation.
+ * The coefficients are multiplied by 100 and rounded towards nearest integer,
+ * to facilitate integer math. The squared coefficients are also multiplied
+ * by 100 and rounded to nearest integer (thus 173 == 1.73, 242 == 2.42 etc).
+ */
+/// Red component sensivity
+#define R_COEF		173
+/// Green component sensivity
+#define G_COEF		242
+/// Blue component sensivity
+#define B_COEF		107
+/// Eye sensivity to different color components, squared
+/// Red component sensivity, squared
+#define R_COEF_SQ	299
+/// Green component sensivity, squared
+#define G_COEF_SQ	587
+/// Blue component sensivity, squared
+#define B_COEF_SQ	114
 
 #endif // RGBPIXEL_H

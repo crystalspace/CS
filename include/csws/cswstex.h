@@ -36,7 +36,7 @@ class csWSTexture
   // Reference count
   int RefCount;
   // texture image
-  iImageFile *Image;
+  iImage *Image;
   // Will be this texture used for 3D and/or for 2D operations?
   bool for2D, for3D;
   // Red,Green and Blue components of transparent color
@@ -56,7 +56,7 @@ class csWSTexture
 
 public:
   /// Create the 2D texture
-  csWSTexture (const char *iName, iImageFile *iImage, bool i2D, bool i3D);
+  csWSTexture (const char *iName, iImage *Image, bool i2D, bool i3D);
   /// Destroy the texture object
   ~csWSTexture ();
   /// Set texture transparent color

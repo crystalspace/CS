@@ -49,12 +49,13 @@
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
-#include "csgfxldr/csimage.h"
 #include "cssfxldr/common/snddata.h"
+#include "csgfxldr/pngsave.h"
 #include "csparser/snddatao.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isndrdr.h"
+#include "iimage.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -1143,46 +1144,31 @@ void perf_test ()
   Sys->busy_perf_test = false;
 }
 
-void CaptureScreen (void)
+void CaptureScreen ()
 {
-#if !defined(OS_MACOS)  // SJI - NON mac stuff - the mac has its own way of doing screen captures
   int i = 0;
-  char name[255];
-  UByte pall[768];
-  UByte *pal = &pall[0];
-
+  char name [20];
   do
   {
-    sprintf (name, "cryst%02d.pcx", i++);
-  } while (i < 100 && (access (name, 0) == 0));
-
-  if (i >= 100) return;
-
-  RGBpaletteEntry* pPalette = System->G2D->GetPalette ();
-
-  if (pPalette)
+    sprintf (name, "cryst%03d.png", i++);
+  } while (i < 1000 && (access (name, 0) == 0));
+  if (i >= 1000)
   {
-    for (i=0; i<256; i++)
-    {
-      *pal++ = pPalette[i].red;
-      *pal++ = pPalette[i].green;
-      *pal++ = pPalette[i].blue;
-    }
+    System->Printf (MSG_CONSOLE, "Too many screenshot files in current directory\n");
+    return;
   }
 
-  extern void WritePCX (char *name, unsigned char *data, UByte *pal,
-			int width,int height);
-  Gfx3D->BeginDraw(CSDRAW_2DGRAPHICS);
-
-  unsigned char* pFirstPixel = Gfx2D->GetPixelAt(0,0);
-  if (!pFirstPixel)
+  iImage *img = System->G3D->ScreenShot ();
+  if (!img)
+  {
+    Sys->Printf (MSG_CONSOLE, "Current 3D driver does not support screen shots\n");
     return;
+  }
 
-  WritePCX (name, pFirstPixel, pall, FRAME_WIDTH, FRAME_HEIGHT);
-  Gfx3D->FinishDraw();
   Sys->Printf (MSG_CONSOLE, "Screenshot: %s", name);
-
-#endif // !OS_MACOS
+  if (!csSavePNG (name, img))
+    Sys->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
+  img->DecRef ();
 }
 
 /*---------------------------------------------

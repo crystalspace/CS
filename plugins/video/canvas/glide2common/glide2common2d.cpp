@@ -133,7 +133,7 @@ void csGraphics2DGlideCommon::SetRGB(int i, int r, int g, int b)
 void csGraphics2DGlideCommon::SetTMUPalette(int tmu)
 {
   GuTexPalette p;
-  RGBpaletteEntry pal;
+  RGBPixel pal;
   
   for(int i=0; i<256; i++)
   {

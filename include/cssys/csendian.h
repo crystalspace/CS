@@ -42,18 +42,25 @@ extern long read_long_endian (FILE* fp);
 extern char* read_str_endian (FILE* fp);
 
 //-- Alternative routines for handling endianess ----------------------------
+
 typedef unsigned long t_big_endian_long (unsigned long value);
+typedef unsigned int t_big_endian_int (unsigned int value);
 typedef unsigned short t_big_endian_short (unsigned short value);
 typedef unsigned long t_little_endian_long (unsigned long value);
+typedef unsigned int t_little_endian_int (unsigned int value);
 typedef unsigned short t_little_endian_short (unsigned short value);
 
-/// Convert a long from machine format to big-endian
+/// Convert a long from big-endian to machine format
 extern t_big_endian_long *big_endian_long;
-/// Convert a long from machine format to little-endian
+/// Convert a long from little-endian to machine format
 extern t_little_endian_long *little_endian_long;
-/// Convert a short from machine format to big-endian
+/// Convert a int from big-endian to machine format
+extern t_big_endian_int *big_endian_int;
+/// Convert a int from little-endian to machine format
+extern t_little_endian_int *little_endian_int;
+/// Convert a short from big-endian to machine format
 extern t_big_endian_short *big_endian_short;
-/// Convert a short from machine format to little-endian
+/// Convert a short from little-endian to machine format
 extern t_little_endian_short *little_endian_short;
 
 /// Read a little-endian short from address

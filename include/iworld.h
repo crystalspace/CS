@@ -35,6 +35,8 @@ struct iWorld : public iPlugIn
 {
   /// KLUDGE: this shouldn't be used when iWorld interface will be complete
   virtual csWorld *GetCsWorld () = 0;
+  /// Query the format to load textures (usually this depends on texture manager)
+  virtual int GetTextureFormat () = 0;
 };
 
 #endif // __IWORLD_H__

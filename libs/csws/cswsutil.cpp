@@ -982,7 +982,7 @@ void cspColorDialog::UpdateInfo (bool UpdateSlider)
 void cspColorDialog::SetColor (int iColor)
 {
   csPixelFormat *pfmt = System->G2D->GetPixelFormat ();
-  RGBpaletteEntry *palette = System->G2D->GetPalette ();
+  RGBPixel *palette = System->G2D->GetPalette ();
   if (pfmt->PalEntries)
   {
     r = float (palette [iColor].red) / 255;

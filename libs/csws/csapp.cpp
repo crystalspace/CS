@@ -220,7 +220,6 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
     }
 
   // Now load the texture
-  csImageFile *image;
   size_t size;
   char *fbuffer = System->VFS->ReadFile (filename, size);
   CHK (delete [] buffer);
@@ -230,15 +229,10 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
     return false;
   }
 
-  image = csImageLoader::load ((UByte *)fbuffer, size);
+  iTextureManager *txtmgr = System->G3D->GetTextureManager ();
+  iImage *image = csImageLoader::Load ((UByte *)fbuffer, size,
+    txtmgr->GetTextureFormat ());
   CHK (delete [] fbuffer);
-
-  if (image && (image->get_status () & IFE_Corrupt))
-  {
-    printf (MSG_WARNING, "'%s': %s!\n", filename, image->get_status_mesg ());
-    CHK (delete image);
-    return false;
-  }
 
   csWSTexture *tex = new csWSTexture (iTexName, image, i2D, i3D);
   image->DecRef ();

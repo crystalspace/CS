@@ -27,7 +27,7 @@
 
 IMPLEMENT_CSOBJTYPE (csTextureHandle,csObject);
 
-csTextureHandle::csTextureHandle (iImageFile* image) :
+csTextureHandle::csTextureHandle (iImage* image) :
   csObject (), txt_handle (NULL), for_2d (false), for_3d (true)
 {
   (ifile = image)->IncRef ();
@@ -101,7 +101,7 @@ void csTextureList::Clear ()
   CHK (textures = new csTextureHandle* [10]);
 }
 
-csTextureHandle* csTextureList::NewTexture (iImageFile* image)
+csTextureHandle* csTextureList::NewTexture (iImage* image)
 {
   CHK (csTextureHandle* tm = new csTextureHandle (image));
   //if (tm->loaded_correctly ())

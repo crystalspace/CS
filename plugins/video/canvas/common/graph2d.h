@@ -73,7 +73,7 @@ public:
   /// True if visual is full-screen
   bool FullScreen;
   /// 256-color palette
-  RGBpaletteEntry Palette[256];
+  RGBPixel Palette[256];
   /// true if some palette entry is already allocated
   bool PaletteAlloc[256];
   // The counter that is incremented inside BeginDraw and decremented in FinishDraw
@@ -238,7 +238,7 @@ public:
   { return FullScreen; }
 
   /// Get the palette (if there is one)
-  virtual RGBpaletteEntry *GetPalette ()
+  virtual RGBPixel *GetPalette ()
   { return pfmt.PalEntries ? Palette : NULL; }
 
   /// Query pixel R,G,B at given screen location

@@ -466,7 +466,7 @@ void csWorld::PrepareTextures ()
   for (int i = 0 ; i < textures->GetNumTextures () ; i++)
   {
     csTextureHandle* th = textures->GetTextureMM (i);
-    iImageFile *image = th->GetImageFile ();
+    iImage *image = th->GetImageFile ();
 
     // Now we check the size of the loaded image. Having an image, that
     // is not a power of two will result in strange errors while
@@ -1367,4 +1367,10 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
       lights[i] = light_array->GetLight (i);
     return max_num_lights;
   }
+}
+
+int csWorld::GetTextureFormat ()
+{
+  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  return txtmgr->GetTextureFormat ();
 }

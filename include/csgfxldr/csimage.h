@@ -21,157 +21,149 @@
 #define IMAGE_H
 
 #include <stdio.h>
-#include "csutil/scf.h"
 #include "csgfxldr/rgbpixel.h"
 #include "types.h"
 #include "iimage.h"
-#include "ialphmap.h"
-
-/// Status flag indicating that the image has loaded without problem.
-#define IFE_OK 0
-/// Status flag indicating that the image data is in the wrong format.
-#define IFE_BadFormat 1
-/// Status flag indicating that the image data is corrupt.
-#define IFE_Corrupt 2
-
-struct Filter3x3;
-struct Filter5x5;
-
-class AlphaMapFile
-{
-// @@@ FIXME: None of this is implemented anywhere.
-#if 0
-private:
-  int width;
-  int height;
-  UByte *alphamap;
-protected:
-  AlphaMapFile();
-  int status;
-  void set_dimensions(int w,int h);
-  UByte *get_buffer(){return alphamap;}
-public:
-  virtual ~AlphaMapFile();
-  int get_width() const{return width;}
-  int get_height() const{return height;}
-  ULong get_size() const{return width*height;}
-  const UByte* get_image() const {return alphamap;}
-  int get_status() const {return status;}
-  virtual const char* get_status_mesg() const;
-#endif
-};
 
 /**
- * An abstract class implementing an image loader. For every image
+ * An abstract class representing an abstract image. For every image
  * type supported, a subclass should be created for loading that image
- * type.
+ * type. The image file class contains a number of member functions
+ * for accessing and manipulating the image contents.
  */
-
-class csImageFile : public iImageFile
+class csImageFile : public iImage
 {
-private:
-  /// Width of image.
-  int width;
-  /// Height of image.
-  int height;
-  /// The image data.
-  RGBPixel* image;
-  /// Image file name
-  char *fname;
-
 protected:
+  /// Width of image.
+  int Width;
+  /// Height of image.
+  int Height;
+  /// The image data.
+  void *Image;
+  /// The image palette or NULL
+  RGBPixel *Palette;
+  /// The alpha map
+  UByte *Alpha;
+  /// Image file name
+  char *fName;
+  /// Image format (see CS_IMGFMT_XXX above)
+  int Format;
+
   /**
    * csImageFile constructor.
    * This object can only be created by an appropriate loader, which is why
    * the constructor is protected.
    */
-  csImageFile ();
-
-  /**
-   * Status of the loaded image.
-   * (status == IFE_OK) if the image loaded correctly.
-   * (status & IFE_BadFormat) indicates that the image is in the wrong format.
-   * (status & IFE_Corrupt) indicates that the image is in the correct format,
-   * but the data is corrupt and unreadable.
-   */
-  int status;
+  csImageFile (int iFormat);
 
   /**
    * Set the width and height.
-   * This will also allocate the 'image' buffer to hold the bitmap.
+   * This will also free the 'image' buffer to hold the bitmap,
+   * but it will NOT allocate a new buffer (thus `image' is NULL
+   * after calling this function). You should pass an appropiate
+   * pointer to one of convert_xxx functions below to define the
+   * image itself (or assign something to `image' manually).
    */
   void set_dimensions (int w, int h);
 
-  /// Get the buffer in which to write image data.
-  RGBPixel* get_buffer() { return image; }
+  /**
+   * Used to convert an truecolor RGB image into requested format.
+   * If the image loader cannot handle conversion itself, and the image
+   * file is in a format that is different from the requested one,
+   * load the image in RGBPixel format and pass the pointer to this
+   * function which will handle the RGB -> target format conversion.
+   * NOTE: the pointer should be allocated with new RGBPixel [] and you should
+   * not free it after calling this function: the function will free
+   * the buffer itself if it is appropiate (or wont if the buffer
+   * size/contents are appropiate for target format).
+   */
+  void convert_rgb (RGBPixel *iImage);
+
+  /**
+   * Used to convert an 8-bit indexed image into requested format.
+   * Pass a pointer to color indices and a pointer to palette, and you're done.
+   * NOTE: the pointer should be allocated with new UByte [] and you should
+   * not free it after calling this function: the function will free
+   * the buffer itself if it is appropiate (or wont if the buffer
+   * size/contents are appropiate for target format). Same about palette.
+   */
+  void convert_8bit (UByte *iImage, RGBPixel *iPalette);
+
+  /**
+   * Same as above but accepts an array of RGBcolor's as palette.
+   * The RGBcolor array is never freed, so its your responsability
+   * if you did it.
+   */
+  void convert_8bit (UByte *iImage, RGBcolor *iPalette);
+
+  /**
+   * Free all image data: pixels and palette. Takes care of image data format.
+   */
+  void free_image ();
+
+  /// Return the closest color index to given. Fails if image has no palette.
+  int closest_index (RGBPixel *iColor);
 
 public:
   DECLARE_IBASE;
 
-  ///
+  /// Destroy the image file object and free all associated storage
   virtual ~csImageFile ();
 
-  /// Returns the error status of the loaded image.
-  int get_status() const { return status; }
-  /// Returns a text message explaining the image status.
-  virtual const char* get_status_mesg() const;
-
-  /**
-   * Create a new csImageFile which is a mipmapped version of this one.
-   * 'steps' indicates how much the mipmap should be scaled down. Only
-   * steps 1, 2, and 3 are supported.
-   * If 'steps' is 1 then the 3x3 filter is used. Otherwise the 5x5 filter
-   * is used. If the filters are NULL then the pixels are just
-   * averaged.
-   */
-  csImageFile* mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2);
-
-  /**
-   * Create a new csImageFile which is a mipmapped version of this one.
-   * 'steps' indicates how much the mipmap should be scaled down. Only
-   * steps 1, 2, and 3 are supported.
-   * This version is required for transparent images. It preserves color
-   * 0 (transparent).
-   */
-  csImageFile* mipmap (int steps);
-
-  /**
-   * Create a new csImageFile which is a blended version of this one.
-   */
-  csImageFile* blend (Filter3x3* filt1);
-
   /***************************** iImage interface *****************************/
-  ///
-  virtual RGBPixel *GetImageData ();
-  ///
+  /**
+   * Get image data: returns either (RGBPixel *) or (unsigned char *)
+   * depending on format. Note that for RGBA images the RGBPixel structure
+   * contains the alpha channel as well, so GetAlpha (see below) method
+   * will return NULL (because alpha is not stored separately, as for
+   * paletted images).
+   */
+  virtual void *GetImageData ();
+  /// Query image width
   virtual int GetWidth ();
-  ///
+  /// Query image height
   virtual int GetHeight ();
-  ///
+  /// Query image size in bytes
   virtual int GetSize ();
 
   /// Resize the image to the given size
-  virtual iImageFile* Resize(int newwidth, int newheight);
+  virtual void Resize (int newwidth, int newheight);
 
-  ///
-  virtual iImageFile *MipMap (int steps, Filter3x3* filt1, Filter5x5* filt2);
-  ///
-  virtual iImageFile *MipMap (int steps);
-  ///
-  virtual iImageFile *Blend (Filter3x3* filter);
+  /**
+   * Create a new csImageFile which is a mipmapped version of this one.
+   * 'step' indicates how much the mipmap should be scaled down. Only
+   * steps 0, 1, 2, and 3 are supported. Step 0 returns the blended version
+   * of the image without image being scaled down.
+   * The new image will have same format as the original one. If you pass
+   * a pointer to a transparent color, the texels of that color are handled
+   * differently.
+   */
+  virtual iImage *MipMap (int step, RGBPixel *transp);
+
   /// Set image file name
   virtual void SetName (const char *iName);
   /// Get image file name
   virtual const char *GetName ();
+  /// Get image format
+  virtual int GetFormat ();
+  /// Get image palette (or NULL if no palette)
+  virtual RGBPixel *GetPalette ();
+  /// Get alpha map for image
+  virtual UByte *GetAlpha ();
 };
 
-class csVector;
-
 /**
+ * This class handles everything related to image loading.
+ * All image loaders are chained in a list and you can register new
+ * image handlers even at runtime. You can request the image to be loaded
+ * in a specific format (see CS_IMG_XXX constants).
  * Extend this class to support a particular type of image loading.
  */
 class csImageLoader
 {
+  /// A pointer to next image loader (loaders are chained in a list)
+  csImageLoader *Next;
+
 protected:
   /**
    * Load an image from the given buffer.
@@ -179,11 +171,10 @@ protected:
    * If successful, returns a pointer to the resulting csImageFile.  Otherwise
    * returns NULL.
    */
-  virtual csImageFile* LoadImage (UByte* buf, ULong size) = 0;
-  virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size) =0;
+  virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat) = 0;
 
-  ///
-  virtual ~csImageLoader() {}
+  /// Not really needed
+  virtual ~csImageLoader() { }
 
 public:
   /**
@@ -191,30 +182,16 @@ public:
    * Adds 'loader' to the list of image formats to be checked during an
    * csImageLoader::load(...) call.
    */
-  static bool Register (csImageLoader* loader);
-
-  /// Return the name of the image type supported by this loader.
-  virtual const char* GetName() const = 0;
-
-  /// Return a descriptive line about this image format.
-  virtual const char* GetDescription() const = 0;
+  static bool Register (csImageLoader *loader);
 
   /**
    * Load an image from a buffer.
    * This routine will read from the buffer buf of length size, try to
    * recognize the type of image contained within, and return an csImageFile
-   * of the appropriate type.  Returns a pointer to the csImageFile on
+   * of the appropriate type.  Returns a pointer to the iImage on
    * success, or NULL on failure.
    */
-  static csImageFile* load (UByte* buf, ULong size);
-
-  /**
-  * Load an alpha-map from an 8-bit image
-  */
-  static AlphaMapFile *load_alpha(UByte *buf,ULong size);
-
-  /// A pointer to next image loader (loaders are chained in a list)
-  csImageLoader *Next;
+  static iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
 };
 
 #endif

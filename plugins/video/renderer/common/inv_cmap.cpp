@@ -15,6 +15,7 @@
  * name of the person performing the modification, the date of modification,
  * and the reason for such modification.
  */
+
 /*
  * inv_cmap.c - Compute an inverse colormap.
  *
@@ -27,8 +28,6 @@
  * Modified:    12 Oct 1998 by G. C. Ewing
  *              Allow for different numbers of bits for r, g, and b.
  *              Convert to C++.
- *
- * $Id$
  */
 
 #include <math.h>
@@ -50,47 +49,6 @@ static void maxfill( unsigned long *, long, long, long );
 static int redloop( void );
 static int greenloop( int );
 static int blueloop( int );
-
-/*****************************************************************
- * TAG( inv_cmap )
- *
- * Compute an inverse colormap efficiently.
- * Inputs:
- * 	colors:		Number of colors in the forward colormap.
- * 	colormap:	The forward colormap.
- *      rbits, gbits, bbits:
- * 			Number of quantization bits.  The inverse
- * 			colormap will have N=(2^rbits)*(2^gbits)*(2^bbits)
- *                       entries.
- * 	dist_buf:	An array of N long integers to be
- * 			used as scratch space.
- * Outputs:
- * 	rgbmap:		The output inverse colormap.  The entry
- * 			rgbmap[(r<<(gbits+bbits)) + (g<<bbits) + b]
- * 			is the colormap entry that is closest to the
- * 			(quantized) color (r,g,b).
- * Assumptions:
- * 	Quantization is performed by right shift (low order bits are
- * 	truncated).  Thus, the distance to a quantized color is
- * 	actually measured to the color at the center of the cell
- * 	(i.e., to r+.5, g+.5, b+.5, if (r,g,b) is a quantized color).
- * Algorithm:
- * 	Uses a "distance buffer" algorithm:
- * 	The distance from each representative in the forward color map
- * 	to each point in the rgb space is computed.  If it is less
- * 	than the distance currently stored in dist_buf, then the
- * 	corresponding entry in rgbmap is replaced with the current
- * 	representative (and the dist_buf entry is replaced with the
- * 	new distance).
- *
- * 	The distance computation uses an efficient incremental formulation.
- *
- * 	Distances are computed "outward" from each color.  If the
- * 	colors are evenly distributed in color space, the expected
- * 	number of cells visited for color I is N^3/I.
- * 	Thus, the complexity of the algorithm is O(log(K) N^3),
- * 	where K = colors, and N = 2^bits.
- */
 
 /*
  * Here's the idea:  scan from the "center" of each cell "out"

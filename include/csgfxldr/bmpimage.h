@@ -22,48 +22,34 @@
 
 #include "csgfxldr/csimage.h"
 
-class csBMPImageLoader;
-
-/** An csImageFile subclass for reading BMP files.
- *
- *  Current Limitations:
- *  Only able to read 24 bits RGB encoded with no palette files and
- *                     8 bits RGB encoded files
- */
-class ImageBMPFile : public csImageFile
-{
-  ///
-  friend class csImageFile;	// For constructor
-  friend class csBMPImageLoader;
-
-private:
-  /// Read the BMP file from the buffer.
-  ImageBMPFile (UByte* buf, long size);
-
-public:
-  ///
-  virtual ~ImageBMPFile ();
-  /// Return BMP-specific error messages
-  virtual const char* get_status_mesg() const;
-};
-
 /**
- * The BMP Image Loader.
+ * The BMP image file format loader.
  */
 class csBMPImageLoader : public csImageLoader
 {
 protected:
-  ///
-  virtual csImageFile* LoadImage (UByte* buf, ULong size);
-  virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size);
+  /// Try to load the image
+  virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
+};
 
-public:
-  ///
-  virtual const char* GetName() const
-  { return "BMP"; }
-  ///
-  virtual const char* GetDescription() const 
-  { return "BitMap Image Format"; }
+/**
+ * An csImageFile subclass for reading BMP files.
+ *<p>
+ * Current Limitations:
+ * Only able to read 24 bits RGB encoded with no palette files and
+ * 8 bits RGB encoded files.
+ */
+class ImageBMPFile : public csImageFile
+{
+  friend class csBMPImageLoader;
+  // Load a Windows-format BMP file
+  bool LoadWindowsBitmap (UByte* iBuffer, ULong iSize);
+
+private:
+  /// Initialize the image object
+  ImageBMPFile (int iFormat) : csImageFile (iFormat) { };
+  /// Try to read the BMP file from the buffer and return success status
+  bool Load (UByte* iBuffer, ULong iSize);
 };
 
 #endif

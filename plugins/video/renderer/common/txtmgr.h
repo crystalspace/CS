@@ -19,7 +19,6 @@
 #ifndef TXTMGR_H
 #define TXTMGR_H
 
-#include "csgfxldr/boxfilt.h"
 #include "cs3d/common/imgtools.h"
 #include "csengine/cscolor.h"	// @@@BAD?
 #include "csutil/csvector.h"
@@ -31,15 +30,10 @@ class ImageColorInfo;
 class csTextureMM;
 class csTextureManager;
 class csTexture;
-struct iImageFile;
+struct iImage;
 
-#define MIPMAP_UGLY 0
-#define MIPMAP_DEFAULT 1
-#define MIPMAP_NICE 2
-#define MIPMAP_VERYNICE 3
-
-#define MIX_TRUE_RGB 0
-#define MIX_NOCOLOR 1
+#define MIPMAP_NICE	0
+#define MIPMAP_VERYNICE	1
 
 /**
  * csTextureMM represents a texture and all its mipmapped
@@ -49,7 +43,7 @@ class csTextureMM : public iTextureHandle
 {
 protected:
   /// The corresponding ImageFile.
-  iImageFile* ifile;
+  iImage* ifile;
   /// A sorted table with all used colors in the image.
   ImageColorInfo* usage;
   /// Transparent color
@@ -93,14 +87,14 @@ protected:
   void create_blended_mipmap (csTextureManager* tex, unsigned char* bm);
 
   /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm) = 0;
+  virtual void convert_to_internal (csTextureManager* tex, iImage* imfile, unsigned char* bm) = 0;
 
   /// Adjusts the textures size, to ensure some restrictions like power of two dimension are met.
   void AdjustSize();
 
 public:
   ///
-  csTextureMM (iImageFile* image);
+  csTextureMM (iImage* image);
   ///
   virtual ~csTextureMM ();
 
@@ -128,7 +122,7 @@ public:
   /// Free the color usage table linked to a texture.
   void free_usage_table ();
 
-  /// Release the original image (iImageFile) as given by the engine.
+  /// Release the original image (iImage) as given by the engine.
   void free_image ();
 
   /// Return true if the texture has been loaded correctly.
@@ -251,11 +245,11 @@ protected:
   bool in_memory;
 
   /// Convert ImageFile to internal format. Will just convert to 24 bit in most HW renderers
-  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm);
+  virtual void convert_to_internal (csTextureManager* tex, iImage* imfile, unsigned char* bm);
 
 public:
   ///
-  csHardwareAcceleratedTextureMM (iImageFile* image) : csTextureMM (image)
+  csHardwareAcceleratedTextureMM (iImage* image) : csTextureMM (image)
   { CONSTRUCT_IBASE (NULL); in_memory = false; hicolorcache = NULL;}
 
   ///
@@ -468,7 +462,7 @@ public:
   float Gamma;
 
   /// Configuration value: how is mipmapping done (one of MIPMAP_...)
-  int mipmap_nice;
+  int mipmap_mode;
 
   /// Configuration value: blend mipmap level 0.
   bool do_blend_mipmap0;
@@ -478,23 +472,6 @@ public:
 
   /// For debugging: don't show textures but only map lightmaps.
   bool do_lightmaponly;
-
-  /// Filter to use when mipmapping 1 level.
-  static Filter3x3 mipmap_filter_1;
-
-  /// Filter to use when mipmapping 2 levels.
-  static Filter5x5 mipmap_filter_2;
-
-  /// Filter to use when performing blending.
-  static Filter3x3 blend_filter;
-
-  /// How do we mix colors (one of MIX_...)
-  int mixing;
-  /// Force value (set by commandline) (-1 = no force)
-  int force_mix;
-
-  /// If true we have R,G,B lights.
-  bool use_rgb;
 
   ///
   csTextureManager (iSystem* iSys, iGraphics2D* iG2D);
@@ -513,7 +490,7 @@ public:
   virtual int FindRGB (int r, int g, int b);
   ///
   virtual bool GetVeryNice ()
-  { return (mipmap_nice == MIPMAP_VERYNICE); }
+  { return (mipmap_mode == MIPMAP_VERYNICE); }
   ///
   virtual void SetVerbose (bool vb)
   { verbose = vb; }
@@ -544,6 +521,15 @@ public:
 
   /// Query the "almost-black" color used for opaque black in transparent textures
   int get_almost_black ();
+
+  /**
+   * Query the basic format of textures that can be registered with this
+   * texture manager. It is very likely that the texture manager will
+   * reject the texture if it is in an improper format. The alpha channel
+   * is optional; the texture can have it and can not have it. Only the
+   * bits that fit the CS_IMGFMT_MASK mask matters.
+   */
+  virtual int GetTextureFormat ();
 };
 
 #endif // TXTMGR_H

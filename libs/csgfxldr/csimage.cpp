@@ -16,424 +16,412 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
 
 #include "sysdef.h"
 #include "isystem.h"
+#include "qint.h"
 #include "csgfxldr/csimage.h"
-#include "csgfxldr/boxfilt.h"
+#include "csgfxldr/quantize.h"
 #include "csutil/util.h"
 
-void box_filter3 (Filter3x3& f, RGBPixel* bm, int x, int y, int w, int h, int* pr, int* pg, int* pb)
-{
-  ULong m11, m12, m13;
-  ULong m21, m22, m23;
-  ULong m31, m32, m33;
-  int r, g, b;
-  m11 = ((x-1+w)%w) + ((y-1+h)%h) * w;
-  m12 = x           + ((y-1+h)%h) * w;
-  m13 = ((x+1)%w)   + ((y-1+h)%h) * w;
-  m21 = ((x-1+w)%w) + y * w;
-  m22 = x           + y * w;
-  m23 = ((x+1)%w)   + y * w;
-  m31 = ((x-1+w)%w) + ((y+1)%h) * w;
-  m32 = x           + ((y+1)%h) * w;
-  m33 = ((x+1)%w)   + ((y+1)%h) * w;
-  r = f.f11*bm[m11].red + f.f12*bm[m12].red + f.f13*bm[m13].red +
-      f.f21*bm[m21].red + f.f22*bm[m22].red + f.f23*bm[m23].red +
-      f.f31*bm[m31].red + f.f32*bm[m32].red + f.f33*bm[m33].red;
-  g = f.f11*bm[m11].green + f.f12*bm[m12].green + f.f13*bm[m13].green +
-      f.f21*bm[m21].green + f.f22*bm[m22].green + f.f23*bm[m23].green +
-      f.f31*bm[m31].green + f.f32*bm[m32].green + f.f33*bm[m33].green;
-  b = f.f11*bm[m11].blue + f.f12*bm[m12].blue + f.f13*bm[m13].blue +
-      f.f21*bm[m21].blue + f.f22*bm[m22].blue + f.f23*bm[m23].blue +
-      f.f31*bm[m31].blue + f.f32*bm[m32].blue + f.f33*bm[m33].blue;
-  *pr = r/f.tot;
-  *pg = g/f.tot;
-  *pb = b/f.tot;
-}
+//------------------------------------------------------- Helper functions -----
 
-void box_filter5 (Filter5x5& f, RGBPixel* bm, int x, int y, int w, int h, int* pr, int* pg, int* pb)
-{
-  ULong m00, m01, m02, m03, m04;
-  ULong m10, m11, m12, m13, m14;
-  ULong m20, m21, m22, m23, m24;
-  ULong m30, m31, m32, m33, m34;
-  ULong m40, m41, m42, m43, m44;
-  int r, g, b;
-  m00 = ((x-2+w)%w) + ((y-2+h)%h) * w;
-  m01 = ((x-1+w)%w) + ((y-2+h)%h) * w;
-  m02 = x           + ((y-2+h)%h) * w;
-  m03 = ((x+1)%w)   + ((y-2+h)%h) * w;
-  m04 = ((x+2)%w)   + ((y-2+h)%h) * w;
-  m10 = ((x-2+w)%w) + ((y-1+h)%h) * w;
-  m11 = ((x-1+w)%w) + ((y-1+h)%h) * w;
-  m12 = x           + ((y-1+h)%h) * w;
-  m13 = ((x+1)%w)   + ((y-1+h)%h) * w;
-  m14 = ((x+2)%w)   + ((y-1+h)%h) * w;
-  m20 = ((x-2+w)%w) + y * w;
-  m21 = ((x-1+w)%w) + y * w;
-  m22 = x           + y * w;
-  m23 = ((x+1)%w)   + y * w;
-  m24 = ((x+2)%w)   + y * w;
-  m30 = ((x-2+w)%w) + ((y+1)%h) * w;
-  m31 = ((x-1+w)%w) + ((y+1)%h) * w;
-  m32 = x           + ((y+1)%h) * w;
-  m33 = ((x+1)%w)   + ((y+1)%h) * w;
-  m34 = ((x+2)%w)   + ((y+1)%h) * w;
-  m40 = ((x-2+w)%w) + ((y+2)%h) * w;
-  m41 = ((x-1+w)%w) + ((y+2)%h) * w;
-  m42 = x           + ((y+2)%h) * w;
-  m43 = ((x+1)%w)   + ((y+2)%h) * w;
-  m44 = ((x+2)%w)   + ((y+2)%h) * w;
-  r = f.f00*bm[m00].red + f.f01*bm[m01].red + f.f02*bm[m02].red + f.f03*bm[m03].red + f.f04*bm[m04].red +
-      f.f10*bm[m10].red + f.f11*bm[m11].red + f.f12*bm[m12].red + f.f13*bm[m13].red + f.f14*bm[m14].red +
-      f.f20*bm[m20].red + f.f21*bm[m21].red + f.f22*bm[m22].red + f.f23*bm[m23].red + f.f24*bm[m24].red +
-      f.f30*bm[m30].red + f.f31*bm[m31].red + f.f32*bm[m32].red + f.f33*bm[m33].red + f.f34*bm[m34].red +
-      f.f40*bm[m40].red + f.f41*bm[m41].red + f.f42*bm[m42].red + f.f43*bm[m43].red + f.f44*bm[m44].red;
-  g = f.f00*bm[m00].green + f.f01*bm[m01].green + f.f02*bm[m02].green + f.f03*bm[m03].green + f.f04*bm[m04].green +
-      f.f10*bm[m10].green + f.f11*bm[m11].green + f.f12*bm[m12].green + f.f13*bm[m13].green + f.f14*bm[m14].green +
-      f.f20*bm[m20].green + f.f21*bm[m21].green + f.f22*bm[m22].green + f.f23*bm[m23].green + f.f24*bm[m24].green +
-      f.f30*bm[m30].green + f.f31*bm[m31].green + f.f32*bm[m32].green + f.f33*bm[m33].green + f.f34*bm[m34].green +
-      f.f40*bm[m40].green + f.f41*bm[m41].green + f.f42*bm[m42].green + f.f43*bm[m43].green + f.f44*bm[m44].green;
-  b = f.f00*bm[m00].blue + f.f01*bm[m01].blue + f.f02*bm[m02].blue + f.f03*bm[m03].blue + f.f04*bm[m04].blue +
-      f.f10*bm[m10].blue + f.f11*bm[m11].blue + f.f12*bm[m12].blue + f.f13*bm[m13].blue + f.f14*bm[m14].blue +
-      f.f20*bm[m20].blue + f.f21*bm[m21].blue + f.f22*bm[m22].blue + f.f23*bm[m23].blue + f.f24*bm[m24].blue +
-      f.f30*bm[m30].blue + f.f31*bm[m31].blue + f.f32*bm[m32].blue + f.f33*bm[m33].blue + f.f34*bm[m34].blue +
-      f.f40*bm[m40].blue + f.f41*bm[m41].blue + f.f42*bm[m42].blue + f.f43*bm[m43].blue + f.f44*bm[m44].blue;
-  *pr = r/f.tot;
-  *pg = g/f.tot;
-  *pb = b/f.tot;
-}
+#define MIPMAP_NAME	mipmap_0
+#define MIPMAP_LEVEL	0
+#include "mipmap.inc"
 
-//---------------------------------------------------------------------------
+#define MIPMAP_NAME	mipmap_0_t
+#define MIPMAP_LEVEL	0
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_0_p
+#define MIPMAP_LEVEL	0
+#define MIPMAP_PALETTED
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_0_pt
+#define MIPMAP_LEVEL	0
+#define MIPMAP_PALETTED
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_0_a
+#define MIPMAP_LEVEL	0
+#define MIPMAP_ALPHA
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_1
+#define MIPMAP_LEVEL	1
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_1_t
+#define MIPMAP_LEVEL	1
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_1_p
+#define MIPMAP_LEVEL	1
+#define MIPMAP_PALETTED
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_1_pt
+#define MIPMAP_LEVEL	1
+#define MIPMAP_PALETTED
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_1_a
+#define MIPMAP_LEVEL	1
+#define MIPMAP_ALPHA
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_2
+#define MIPMAP_LEVEL	2
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_2_t
+#define MIPMAP_LEVEL	2
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_2_p
+#define MIPMAP_LEVEL	2
+#define MIPMAP_PALETTED
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_2_pt
+#define MIPMAP_LEVEL	2
+#define MIPMAP_PALETTED
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_2_a
+#define MIPMAP_LEVEL	2
+#define MIPMAP_ALPHA
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_3
+#define MIPMAP_LEVEL	3
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_3_t
+#define MIPMAP_LEVEL	3
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_3_p
+#define MIPMAP_LEVEL	3
+#define MIPMAP_PALETTED
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_3_pt
+#define MIPMAP_LEVEL	3
+#define MIPMAP_PALETTED
+#define MIPMAP_TRANSPARENT
+#include "mipmap.inc"
+
+#define MIPMAP_NAME	mipmap_3_a
+#define MIPMAP_LEVEL	3
+#define MIPMAP_ALPHA
+#include "mipmap.inc"
+
+//------------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csImageFile)
-  IMPLEMENTS_INTERFACE (iImageFile)
+  IMPLEMENTS_INTERFACE (iImage)
 IMPLEMENT_IBASE_END
 
-csImageFile::csImageFile ()
+csImageFile::csImageFile (int iFormat)
 {
   CONSTRUCT_IBASE (NULL);
-  image = NULL;
-  fname = NULL;
-  status = IFE_OK;
+  Image = NULL;
+  Palette = NULL;
+  fName = NULL;
+  Alpha = NULL;
+  Format = iFormat;
 }
 
 csImageFile::~csImageFile ()
 {
-  CHK (delete [] image);
-  CHKB (delete [] fname);
+  free_image ();
+  CHK (delete [] fName);
 }
 
 int csImageFile::GetWidth ()
 {
-  return width;
+  return Width;
 }
 
 int csImageFile::GetHeight ()
 {
-  return height;
+  return Height;
 }
 
 int csImageFile::GetSize ()
 {
-  return width * height;
+  return Width * Height;
 }
 
-RGBPixel *csImageFile::GetImageData ()
+void *csImageFile::GetImageData ()
 {
-  return image;
-}
-
-iImageFile *csImageFile::MipMap (int steps, Filter3x3* filt1, Filter5x5* filt2)
-{
-  csImageFile* ifile = mipmap (steps, filt1, filt2);
-  return ifile;
-}
-
-iImageFile *csImageFile::MipMap (int steps)
-{
-  csImageFile* ifile = mipmap (steps);
-  return ifile;
-}
-
-iImageFile *csImageFile::Blend (Filter3x3* filter)
-{
-  csImageFile* ifile = blend (filter);
-  return ifile;
-}
-
-void csImageFile::set_dimensions (int w, int h)
-{
-  width = w;
-  height = h;
-  if (image) CHKB (delete [] image);
-  //We allocate a little more memory than is actually needed, because 
-  //the jpeg lib will write a little further than it is supposed to.
-  //(At least on Win32) In theory w*h would be enough!
-  CHK (image = new RGBPixel [(w+1)*(h+1)]); 
-}
-
-iImageFile *csImageFile::Resize(int newwidth, int newheight)
-{
-  CHK (csImageFile* ifile = new csImageFile ());
-  ifile->set_dimensions (newwidth, newheight);
-  RGBPixel* newimage = ifile->get_buffer ();
-
-  //Get the new value of the image from the old value.
-  //This is probably the most simple way to implement resizing.
-  //maybe somebody will find a way to implement this in a faster/
-  //or better way. 
-  //You could probably avoid much divisions by creating a table of
-  //rows and columns.
-  //It might also pay off, to combine several pixels, when scaling 
-  //down, and not just picking a random pixel.
-  for (int y=0; y<newheight; y++)
-  {
-    int oldline = y*height/newheight;
-    for (int x=0; x<newwidth; x++)
-    {
-      newimage[y*newwidth+x] = image[oldline*width+(x*width/newwidth)];
-    }
-  }
-  return ifile;
-}
-
-const char* csImageFile::get_status_mesg() const
-{
-  if (status & IFE_BadFormat) return "wrong data format";
-  else if (status & IFE_Corrupt) return "image file corrupt";
-  else return "image successfully read";
-}
-
-csImageFile* csImageFile::mipmap (int steps, Filter3x3* filt1, Filter5x5* filt2)
-{
-  CHK (csImageFile* nimg = new csImageFile ());
-  int w = width, h = height;
-  int w2, h2;
-  if (steps == 1) { w2 = width / 2; h2 = height / 2; }
-  else { w2 = width / 4; h2 = height / 4; }
-  nimg->set_dimensions (w2, h2);
-  RGBPixel* nimage = nimg->get_buffer ();
-  RGBPixel* bm = image, * bm2 = nimage;
-  int x, y, r, g, b;
-  if (steps == 1)
-    if (filt1)
-      for (y = 0 ; y < h ; y += 2)
-        for (x = 0 ; x < w ; x += 2)
-        {
-          box_filter3 (*filt1, bm, x, y, w, h, &r, &g, &b);
-	  bm2->red = r;
-	  bm2->green = g;
-	  bm2->blue = b;
-          bm2++;
-        }
-    else
-      for (y = 0 ; y < h2 ; y++)
-      {
-        for (x = 0 ; x < w2 ; x++)
-        {
-          // @@@ Consider a more accurate algorithm that shifts the source bitmap one
-          // half pixel. In the current implementation there is a small shift in the
-          // texture data.
-          r = (bm->red + (bm+1)->red + (bm+w)->red + (bm+w+1)->red)/4;
-          g = (bm->green + (bm+1)->green + (bm+w)->green + (bm+w+1)->green)/4;
-          b = (bm->blue + (bm+1)->blue + (bm+w)->blue + (bm+w+1)->blue)/4;
-	  bm2->red = r;
-	  bm2->green = g;
-	  bm2->blue = b;
-	  bm2++;
-          bm += 2;
-        }
-        bm += w;
-      }
-  else
-    if (filt2)
-      for (y = 0 ; y < h ; y += 4)
-        for (x = 0 ; x < w ; x += 4)
-        {
-          box_filter5 (*filt2, bm, x+1, y+1, w, h, &r, &g, &b);
-	  bm2->red = r;
-	  bm2->green = g;
-	  bm2->blue = b;
-          bm2++;
-        }
-    else
-      for (y = 0 ; y < h2 ; y++)
-      {
-        for (x = 0 ; x < w2 ; x++)
-        {
-          r = bm->red         + (bm+1)->red       + (bm+2)->red       + (bm+3)->red +
-              (bm+w)->red     + (bm+w+1)->red     + (bm+w+2)->red     + (bm+w+3)->red +
-              (bm+w+w)->red   + (bm+w+w+1)->red   + (bm+w+w+2)->red   + (bm+w+w+3)->red +
-              (bm+w*3)->red   + (bm+w*3+1)->red   + (bm+w*3+2)->red   + (bm+w*3+3)->red;
-          g = bm->green         + (bm+1)->green       + (bm+2)->green       + (bm+3)->green +
-              (bm+w)->green     + (bm+w+1)->green     + (bm+w+2)->green     + (bm+w+3)->green +
-              (bm+w+w)->green   + (bm+w+w+1)->green   + (bm+w+w+2)->green   + (bm+w+w+3)->green +
-              (bm+w*3)->green   + (bm+w*3+1)->green   + (bm+w*3+2)->green   + (bm+w*3+3)->green;
-          b = bm->blue         + (bm+1)->blue       + (bm+2)->blue       + (bm+3)->blue +
-              (bm+w)->blue     + (bm+w+1)->blue     + (bm+w+2)->blue     + (bm+w+3)->blue +
-              (bm+w+w)->blue   + (bm+w+w+1)->blue   + (bm+w+w+2)->blue   + (bm+w+w+3)->blue +
-              (bm+w*3)->blue   + (bm+w*3+1)->blue   + (bm+w*3+2)->blue   + (bm+w*3+3)->blue;
-	  bm2->red = r/16;
-	  bm2->green = g/16;
-	  bm2->blue = b/16;
-          bm2++;
-          bm += 4;
-        }
-        bm += w*3;
-      }
-
-  // Really ugly hack to support 3 levels without having to do to much work
-  // in the above routines. steps==3 is done with 2 steps above and here I call
-  // mipmap again for the final step.
-  if (steps == 3)
-  {
-    csImageFile* nimg2 = nimg->mipmap (1, filt1, filt2);
-    CHK (delete nimg);
-    nimg = nimg2;
-  }
-
-  return nimg;
-}
-
-csImageFile* csImageFile::mipmap (int steps)
-{
-  CHK (csImageFile* nimg = new csImageFile ());
-  int w = width;
-  int w2, h2;
-  if (steps == 1) { w2 = width / 2; h2 = height / 2; }
-  else if (steps == 2) { w2 = width / 4; h2 = height / 4; }
-  else { w2 = width / 8; h2 = height / 8; }
-  nimg->set_dimensions (w2, h2);
-  RGBPixel* nimage = nimg->get_buffer ();
-  RGBPixel* bm = image, * bm2 = nimage;
-  int x, y;
-  if (steps == 1)
-    for (y = 0 ; y < h2 ; y++)
-    {
-      for (x = 0 ; x < w2 ; x++)
-      {
-        *bm2++ = *bm;
-        bm += 2;
-      }
-      bm += w;
-    }
-  else if (steps == 2)
-    for (y = 0 ; y < h2 ; y++)
-    {
-      for (x = 0 ; x < w2 ; x++)
-      {
-        *bm2++ = *bm;
-        bm += 4;
-      }
-      bm += w*3;
-    }
-  else
-    for (y = 0 ; y < h2 ; y++)
-    {
-      for (x = 0 ; x < w2 ; x++)
-      {
-        *bm2++ = *bm;
-        bm += 8;
-      }
-      bm += w*7;
-    }
-
-  return nimg;
-}
-
-csImageFile* csImageFile::blend (Filter3x3* filt1)
-{
-  CHK (csImageFile* nimg = new csImageFile ());
-  nimg->set_dimensions (width, height);
-  RGBPixel* nimage = nimg->get_buffer ();
-  RGBPixel* bm = image, * bm2 = nimage;
-  int x, y, r, g, b;
-  for (y = 0 ; y < height ; y++)
-    for (x = 0 ; x < width ; x++)
-    {
-      box_filter3 (*filt1, bm, x, y, width, height, &r, &g, &b);
-      bm2->red = r;
-      bm2->green = g;
-      bm2->blue = b;
-      bm2++;
-    }
-  return nimg;
+  return Image;
 }
 
 void csImageFile::SetName (const char *iName)
 {
-  CHKB (delete [] fname);
-  fname = strnew (iName);
+  CHKB (delete [] fName);
+  fName = strnew (iName);
 }
 
 const char *csImageFile::GetName ()
 {
-  return fname;
+  return fName;
 }
 
-//---------------------------------------------------------------------------
-
-// Register all file formats we want
-#define REGISTER_FORMAT(format) \
-  extern bool Register##format (); \
-  bool __##format##_supported = Register##format ();
-
-#if defined (DO_GIF)
-  REGISTER_FORMAT (GIF)
-#endif
-#if defined (DO_PNG)
-  REGISTER_FORMAT (PNG)
-#endif
-#if defined (DO_JPG)
-  REGISTER_FORMAT (JPG)
-#endif
-#if defined (DO_BMP)
-  REGISTER_FORMAT (BMP)
-#endif
-#if defined (DO_WAL)
-  REGISTER_FORMAT(WAL)
-#endif
-#if defined (DO_SGI)
-  REGISTER_FORMAT(SGI)
-#endif
-#if defined (DO_TGA)
-  REGISTER_FORMAT (TGA)
-#endif
-
-static csImageLoader *loaderlist = NULL;
-
-bool csImageLoader::Register (csImageLoader* loader)
+int csImageFile::GetFormat ()
 {
-  loader->Next = loaderlist;
-  loaderlist = loader;
-  return true;
+  return Format;
 }
 
-csImageFile* csImageLoader::load (UByte* buf, ULong size)
+RGBPixel *csImageFile::GetPalette ()
 {
-  csImageLoader *l = loaderlist;
-  while (l)
+  return Palette;
+}
+
+UByte *csImageFile::GetAlpha ()
+{
+  return Alpha;
+}
+
+void csImageFile::set_dimensions (int w, int h)
+{
+  Width = w;
+  Height = h;
+  free_image ();
+}
+
+void csImageFile::free_image ()
+{
+  switch (Format & CS_IMGFMT_MASK)
   {
-    csImageFile *img = l->LoadImage (buf, size);
-    if (img) return img;
-    l = l->Next;
+    case CS_IMGFMT_TRUECOLOR:
+      CHK (delete [] (RGBPixel *)Image);
+      break;
+    case CS_IMGFMT_PALETTED8:
+      CHK (delete [] (UByte *)Image);
+      break;
   }
-  return NULL;
+  CHK (delete [] Palette);
+  CHK (delete [] Alpha);
+  Image = NULL; Palette = NULL; Alpha = NULL;
 }
 
-AlphaMapFile* csImageLoader::load_alpha (UByte *buf,ULong size)
+void csImageFile::Resize (int newwidth, int newheight)
 {
-  csImageLoader *l = loaderlist;
-  while (l)
-  {
-    AlphaMapFile *alpha = l->LoadAlphaMap (buf, size);
-    if (alpha) return alpha;
-    l = l->Next;
+  // This is a quick and dirty algorithm and it doesn't do funny things
+  // such as blending multiple pixels together or bilinear filtering,
+  // just a rough scale. It could be improved by someone in the future.
+
+  unsigned long x, y;
+  unsigned long dx = QInt16 (float (Width) / float (newwidth));
+  unsigned long dy = QInt16 (float (Height) / float (newheight));
+
+#define RESIZE(pt, field)				\
+  {							\
+    pt *dst = new pt [newwidth * newheight];		\
+    pt *newfield = dst;					\
+    y = 0;						\
+    for (int ny = newheight; ny; ny--)			\
+    {							\
+      pt *src = ((pt *)field) + (y >> 16) * Width;	\
+      y += dy; x = 0;					\
+      for (int nx = newwidth; nx; nx--)			\
+      {							\
+        *dst++ = src [x >> 16];				\
+        x += dx;					\
+      }							\
+    }							\
+    delete [] (pt *)field;				\
+    field = newfield;					\
   }
-  return NULL;
+
+  switch (Format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_TRUECOLOR:
+      RESIZE (RGBPixel, Image)
+      break;
+    case CS_IMGFMT_PALETTED8:
+      RESIZE (UByte, Image)
+      break;
+  }
+  if (Alpha)
+    RESIZE (UByte, Alpha)
+
+  Width = newwidth;
+  Height = newheight;
+}
+
+iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
+{
+  if ((steps < 0) || (steps > 3))
+    return NULL;
+
+  CHK (csImageFile* nimg = new csImageFile (Format));
+  nimg->set_dimensions (Width >> steps, Height >> steps);
+
+  RGBPixel *mipmap = new RGBPixel [nimg->Width * nimg->Height];
+  if (Alpha)
+    nimg->Alpha = new UByte [nimg->Width * nimg->Height];
+
+  int transpidx = -1;
+  if (transp && Palette)
+    transpidx = closest_index (transp);
+
+  switch (Format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+    case CS_IMGFMT_PALETTED8:
+      if (Image)
+        if (transpidx < 0)
+          (void)(steps == 0 ? mipmap_0_p :
+                 steps == 1 ? mipmap_1_p :
+                 steps == 2 ? mipmap_2_p :
+                 mipmap_3_p) (Width, Height, (UByte *)Image, mipmap, Palette);
+        else
+          (void)(steps == 0 ? mipmap_0_pt :
+                 steps == 1 ? mipmap_1_pt :
+                 steps == 2 ? mipmap_2_pt :
+                 mipmap_3_pt) (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+      if (Alpha)
+        (void)(steps == 0 ? mipmap_0_a :
+               steps == 1 ? mipmap_1_a :
+               steps == 2 ? mipmap_2_a :
+               mipmap_3_a) (Width, Height, (UByte *)Alpha, nimg->Alpha);
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      if (!transp)
+        (void)(steps == 0 ? mipmap_0 :
+               steps == 1 ? mipmap_1 :
+               steps == 2 ? mipmap_2 :
+               mipmap_3) (Width, Height, (RGBPixel *)Image, mipmap);
+      else
+        (void)(steps == 0 ? mipmap_0_t :
+               steps == 1 ? mipmap_1_t :
+               steps == 2 ? mipmap_2_t :
+               mipmap_3_t) (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+      break;
+  }
+
+  nimg->convert_rgb (mipmap);
+
+  return nimg;
+}
+
+static inline unsigned sqr (int x)
+{
+  return (x * x);
+}
+
+int csImageFile::closest_index (RGBPixel *iColor)
+{
+  if (!Palette)
+    return -1;
+
+  int closest_idx = -1;
+  unsigned closest_dst = (unsigned)-1;
+
+  for (int idx = 0; idx < 256; idx++)
+  {
+    unsigned dst = sqr (iColor->red   - Palette [idx].red)   * R_COEF_SQ +
+                   sqr (iColor->green - Palette [idx].green) * G_COEF_SQ +
+                   sqr (iColor->blue  - Palette [idx].blue)  * B_COEF_SQ;
+    if (dst == 0)
+      return idx;
+    if (dst < closest_dst)
+    {
+      closest_dst = dst;
+      closest_idx = idx;
+    } /* endif */
+  }
+  return closest_idx;
+}
+
+void csImageFile::convert_rgb (RGBPixel *iImage)
+{
+  int pixels = Width * Height;
+  switch (Format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+    case CS_IMGFMT_PALETTED8:
+      if (Format & CS_IMGFMT_ALPHA)
+      {
+        if (!Alpha)
+          Alpha = new UByte [pixels];
+        for (int i = 0; i < pixels; i++)
+          Alpha [i] = iImage [i].alpha;
+      }
+      if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+        // The most complex case: reduce an RGB image to a paletted image.
+        csQuantizeRGB (iImage, pixels, 256, (UByte *)Image, Palette);
+      delete [] iImage;
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      if (Image != iImage)
+        free_image ();
+      Image = iImage;
+      break;
+  }
+}
+
+void csImageFile::convert_8bit (UByte *iImage, RGBPixel *iPalette)
+{
+  int pixels = Width * Height;
+  switch (Format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+      delete [] iImage;
+      delete [] iPalette;
+      break;
+    case CS_IMGFMT_PALETTED8:
+      Image = iImage;
+      Palette = iPalette;
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+    {
+      UByte *in = iImage;
+      RGBPixel *out;
+      if (Image)
+        out = (RGBPixel *)Image;
+      else
+        Image = out = new RGBPixel [pixels];
+      while (pixels--)
+        *out++ = iPalette [*in++];
+      delete [] iImage;
+      delete [] iPalette;
+      break;
+    }
+  }
+  if ((Format & CS_IMGFMT_ALPHA)
+   && ((Format & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
+   && !Alpha)
+  {
+    // Allocate an dummy alpha channel
+    int pixels = Width * Height;
+    if (!Alpha)
+      Alpha = new UByte [pixels];
+    memset (Alpha, 255, pixels * sizeof (UByte));
+  } /* endif */
+}
+
+void csImageFile::convert_8bit (UByte *iImage, RGBcolor *iPalette)
+{
+  RGBPixel *newpal = new RGBPixel [256];
+  for (int i = 0; i < 256; i++)
+    newpal [i] = iPalette [i];
+  convert_8bit (iImage, newpal);
 }

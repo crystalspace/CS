@@ -21,7 +21,15 @@
 
 #include "csgfxldr/csimage.h"
 
-class csJPGImageLoader;
+/**
+ * the JPEG Image Loader.
+ */
+class csJPGImageLoader : public csImageLoader
+{
+protected:
+  /// Try to load the image
+  virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
+};
 
 /**
  * An csImageFile subclass for reading JPG files.<p>
@@ -29,35 +37,13 @@ class csJPGImageLoader;
  */
 class ImageJpgFile : public csImageFile
 {
-  ///
-  friend class csImageFile;	// For constructor
   friend class csJPGImageLoader;
 
 private:
-  /// Read the JPG file from the buffer.
-  ImageJpgFile (UByte* buf, long size);
-
-public:
-  ///
-  virtual ~ImageJpgFile ();
-};
-
-/**
- * the JPEG Image Loader.
- */
-class csJPGImageLoader : public csImageLoader
-{
-protected:
-  ///
-  virtual csImageFile* LoadImage (UByte* buf, ULong size);
-  virtual AlphaMapFile* LoadAlphaMap(UByte *buf,ULong size);
-public:
-  ///
-  virtual const char* GetName() const
-  { return "JPEG"; }
-  ///
-  virtual const char* GetDescription() const 
-  { return "JPEG image format"; }
+  /// Initialize the image object
+  ImageJpgFile (int iFormat) : csImageFile (iFormat) { };
+  /// Try to read the PNG file from the buffer and return success status
+  bool Load (UByte* iBuffer, ULong iSize);
 };
 
 #endif //JPGIMAGE_H

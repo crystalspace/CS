@@ -32,6 +32,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
+#include "cssys/csendian.h"
 #include "csgfxldr/walimage.h"
 #include "walpal.h"
 
@@ -56,52 +57,40 @@ bool RegisterWAL ()
   return csImageLoader::Register (&loader);
 }
 
-csImageFile* csWALImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  CHK (ImageWALFile* i = new ImageWALFile(buf, size));
-  if (i && (i->get_status() & IFE_BadFormat))
-  { CHK ( delete i );  i = NULL; }
+  CHK (ImageWALFile* i = new ImageWALFile (iFormat));
+  if (i && !i->Load (iBuffer, iSize))
+  {
+    CHK (delete i);
+    return NULL;
+  }
   return i;    
 }
 
-AlphaMapFile *csWALImageLoader::LoadAlphaMap(UByte* buf,ULong size)
-{
-	return NULL;
-}
-
 //---------------------------------------------------------------------------
-ImageWALFile::~ImageWALFile ()
-{
-}
 
-ImageWALFile::ImageWALFile (UByte* ptr, long filesize) : csImageFile ()
+bool ImageWALFile::Load (UByte* iBuffer, ULong iSize)
 {
-  status=IFE_BadFormat;
-  long chkfilesize;
-  unsigned char *datPtr;
-  unsigned int palindex;
-  unsigned int i;
-  RGBPixel *bufPtr;	//Where the result should go
-
-  WALHeader *head=(WALHeader*)ptr;
+  WALHeader *head = (WALHeader*)iBuffer;
+  head->width = little_endian_int (head->width);
+  head->height = little_endian_int (head->height);
+  head->offsets [0] = little_endian_int (head->offsets [0]);
+  head->offsets [3] = little_endian_int (head->offsets [3]);
   
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works
-  chkfilesize = head->offsets[3]+((head->height/8)*(head->width/8));
-  if (chkfilesize != filesize) return;
+  ULong chkfilesize = head->offsets [3] + ((head->height / 8) * (head->width / 8));
+  if (chkfilesize != iSize)
+    return false;
 
-  //There are 4 mipmaps in a wal-file, but we just use the first and
-  //Discard the rest
-  set_dimensions(head->width,head->height);
-  bufPtr=get_buffer();
-  datPtr=ptr+head->offsets[0];
-  for(i=0;i<(head->width*head->height);i++)
-  {
-	  palindex=*datPtr++;
-	  palindex*=3;
-	  bufPtr[i].red=palette[palindex++];
-	  bufPtr[i].green=palette[palindex++];
-	  bufPtr[i].blue=palette[palindex];
-  }
-  status=IFE_OK;
+  set_dimensions (head->width, head->height);
+
+  // There are 4 mipmaps in a wal-file, but we just use the first and discard the rest
+  UByte *buffer = new UByte [Width * Height];
+
+  memcpy (buffer, iBuffer + head->offsets[0], Width * Height);
+  convert_8bit (buffer, (RGBcolor *)&WALpalette);
+
+  return true;
 }

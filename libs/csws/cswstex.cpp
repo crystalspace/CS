@@ -25,15 +25,15 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//-- Windowing system texture --//--
 
-csWSTexture::csWSTexture (const char *iName, iImageFile *iImage,
+csWSTexture::csWSTexture (const char *iName, iImage *Image,
   bool i2D, bool i3D)
 {
-  (Image = iImage)->IncRef ();
+  (csWSTexture::Image = Image)->IncRef ();
   for2D = i2D;
   for3D = i3D;
   IsTransp = false;
   Name = strnew (iName);
-  FileName = strnew (iImage->GetName ());
+  FileName = strnew (Image->GetName ());
   Handle = NULL;
   TexMan = NULL;
   TranspChanged = false;
@@ -79,9 +79,19 @@ void csWSTexture::FixTransparency ()
 
   TranspChanged = false;
 
-  RGBPixel *src = Image->GetImageData ();
-  int size = Image->GetSize ();
   RGBPixel color;
+  RGBPixel *src;
+  int size;
+  if ((Image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+  {
+    src = (RGBPixel *)Image->GetImageData ();
+    size = Image->GetSize ();
+  }
+  else
+  {
+    src = Image->GetPalette ();
+    size = 256;
+  }
   int colordist = 0x7fffffff;
   while (size--)
   {

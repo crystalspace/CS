@@ -21,11 +21,10 @@
 
 #include "types.h"
 #include "csobject/csobject.h"
-#include "csgfxldr/boxfilt.h"
 #include "igraph2d.h"
 
 struct iTextureHandle;
-struct iImageFile;
+struct iImage;
 
 /**
  * csTextureHandle represents a texture and its link
@@ -34,8 +33,8 @@ struct iImageFile;
 class csTextureHandle : public csObject
 {
 private:
-  /// The corresponding iImageFile.
-  iImageFile* ifile;
+  /// The corresponding iImage.
+  iImage* ifile;
   /// The handle as returned by iTextureManager.
   iTextureHandle* txt_handle;
   // Transparent color
@@ -48,7 +47,7 @@ public:
   bool for_3d;
 
   /// Construct a texture handle given a image file
-  csTextureHandle (iImageFile* image);
+  csTextureHandle (iImage* image);
   /// Copy contstructor
   csTextureHandle (csTextureHandle &th);
   /// Release texture handle
@@ -60,8 +59,8 @@ public:
   /// Set the texture handle.
   void SetTextureHandle (iTextureHandle* h);
 
-  /// Get the iImageFile.
-  iImageFile* GetImageFile () { return ifile; }
+  /// Get the iImage.
+  iImage* GetImageFile () { return ifile; }
 
   /// Set the transparent color.
   void SetTransparent (int red, int green, int blue);
@@ -106,7 +105,7 @@ public:
   void Clear ();
 
   /// Create a new texture.
-  csTextureHandle* NewTexture (iImageFile* image);
+  csTextureHandle* NewTexture (iImage* image);
 
   /// Return number of textures
   int GetNumTextures () { return num_textures; }

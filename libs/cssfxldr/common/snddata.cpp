@@ -42,7 +42,7 @@ void csSoundData::Clean()
 {
   if(Data) 
   {
-    CHKB (delete Data);
+    CHKB (delete (UByte *)Data);
     Data = NULL;
   }
   Size = 0;
@@ -97,7 +97,7 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
     if(!Bit16)
     {
       unsigned char *convert;
-      unsigned char *from=(unsigned char *)Data;
+      unsigned char *from=(UByte *)Data;
       long newsize=(unsigned long)((double)(Size)/coeff);
       int nextchan=(Stereo)?2:1;
       double step;
@@ -113,8 +113,8 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
           ((int (from [intstep + nextchan]) - int (from [intstep]))) * interstep);
       }
 
-      CHK (delete Data);
-      Data = (unsigned char *)convert;
+      CHK (delete (UByte *) Data);
+      Data = (UByte *)convert;
       Size = newsize;
       Frequency = toFrequency;
     }
@@ -140,8 +140,8 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
           (int (from [intstep + nextchan]) - int (from [intstep])) * interstep);
       }
 
-      CHK (delete Data);
-      Data=(unsigned char *)convert;
+      CHK (delete [] (UByte *)Data);
+      Data=(UByte *)convert;
       Size=newsize;
       Frequency=toFrequency;
     }
@@ -159,7 +159,7 @@ bool csSoundData::convert16bitTo(bool toBit16)
     if(toBit16)
     {
       short *convert;
-      unsigned char *from=(unsigned char *)Data;
+      UByte *from=(UByte *)Data;
 
       CHK (convert=new short [Size]);
       if(convert==NULL) return 0;
@@ -167,7 +167,7 @@ bool csSoundData::convert16bitTo(bool toBit16)
       for(int j=0; j<Size; j++)
         convert [j] = (from [j] * 256) - 32768;
 
-      CHK (delete Data);
+      CHK (delete [] (UByte *)Data);
       Data=(unsigned char *)convert;
       Bit16=true;
     }
@@ -182,8 +182,8 @@ bool csSoundData::convert16bitTo(bool toBit16)
       for (i = 0; i < Size; i++)
         convert [i] = (from [i] - 32768) / 256;
 
-      CHK (delete Data);
-      Data = (unsigned char *)convert;
+      CHK (delete [] (UByte *)Data);
+      Data = (UByte *)convert;
       Bit16 = false;
     }
   }
@@ -202,7 +202,7 @@ bool csSoundData::convertStereoTo(bool toStereo)
       if(!Bit16)
       {
         unsigned char *convert;
-        unsigned char *from=(unsigned char *)Data;
+        unsigned char *from=(UByte *)Data;
         long newsize=Size/2;
 
         CHK (convert=new unsigned char [newsize]);
@@ -211,8 +211,8 @@ bool csSoundData::convertStereoTo(bool toStereo)
         for(i=0; i<newsize; i++)
           convert[i]=(from[i*2]+from[(i*2)+1])/2;
 
-        CHK (delete Data);
-        Data=(unsigned char *)convert;
+        CHK (delete [] (UByte *)Data);
+        Data=(UByte *)convert;
         Stereo=false;
         Size=newsize;
       } 
@@ -228,8 +228,8 @@ bool csSoundData::convertStereoTo(bool toStereo)
         for(i=0; i<newsize; i++)
           convert[i]=(from[i*2]+from[(i*2)+1])/2;
 
-        CHK (delete Data);
-        Data=(unsigned char *)convert;
+        CHK (delete [] (UByte *) Data);
+        Data=(UByte *)convert;
         Stereo=false;
         Size=newsize;
       } 
@@ -239,7 +239,7 @@ bool csSoundData::convertStereoTo(bool toStereo)
       if(!Bit16)
       {
         unsigned char *convert;
-        unsigned char *from=(unsigned char *)Data;
+        unsigned char *from=(UByte *)Data;
         long newsize=Size*2;
 
         CHK (convert=new unsigned char [newsize]);
@@ -248,8 +248,8 @@ bool csSoundData::convertStereoTo(bool toStereo)
         for(i=0; i<Size; i++)
           convert[i*2]=convert[(i*2)+1]=from[i];
 
-        CHK (delete Data);
-        Data=(unsigned char *)convert;
+        CHK (delete [] (UByte *)Data);
+        Data=(UByte *)convert;
         Size=newsize;
         Stereo=true;
       } 
@@ -265,8 +265,8 @@ bool csSoundData::convertStereoTo(bool toStereo)
         for(i=0; i<Size; i++)
           convert[i*2]=convert[(i*2)+1]=from[i];
 
-        CHK (delete Data);
-        Data=(unsigned char *)convert;
+        CHK (delete [] (UByte *)Data);
+        Data=(UByte *)convert;
         Size=newsize;
         Stereo=true;
       } 
@@ -286,7 +286,7 @@ void csSoundData::forceMute()
   }
   else
   {
-    unsigned char *ptr=(unsigned char *)Data;
+    unsigned char *ptr=(UByte *)Data;
     for(int i=0; i<Size; i++)
       *ptr++=128;
   }

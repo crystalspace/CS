@@ -24,7 +24,7 @@
 #include "itexture.h"
 
 class csTextureManagerSoftware;
-struct iImageFile;
+struct iImage;
 
 /// The internal texture mapping modes.
 #define TXT_GLOBAL	0	// Textures are mapped with a single palette
@@ -194,14 +194,14 @@ protected:
   TxtCmapPrivate* priv_cmap;
  
   /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, iImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_global (csTextureManagerSoftware* tex, iImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_24bit (csTextureManagerSoftware* tex, iImageFile* imfile, unsigned char* bm);
-  void convert_to_internal_private (csTextureManagerSoftware* tex, iImageFile* imfile, unsigned char* bm);
+  virtual void convert_to_internal (csTextureManager* texman, iImage* imfile, unsigned char* bm);
+  void convert_to_internal_global (csTextureManagerSoftware* texman, iImage* imfile, unsigned char* bm);
+  void convert_to_internal_24bit (csTextureManagerSoftware* texman, iImage* imfile, unsigned char* bm);
+  void convert_to_internal_private (csTextureManagerSoftware* texman, iImage* imfile, unsigned char* bm);
 
 public:
   ///
-  csTextureMMSoftware (iImageFile* image);
+  csTextureMMSoftware (iImage* image);
   ///
   virtual ~csTextureMMSoftware ();
 
@@ -209,21 +209,21 @@ public:
    * Remap the palette of this texture according to the internal
    * texture mode.
    */
-  virtual void remap_texture (csTextureManager* new_palette);
+  virtual void remap_texture (csTextureManager* texman);
 
   /**
    * Remap the palette of this texture using the given global
    * palette (inside csTextureManagerSoftware).
    * If do_2d is true then this remapping is done on the 2d driver texture.
    */
-  void remap_palette_global (csTextureManagerSoftware* new_palette, bool do_2d = false);
+  void remap_palette_global (csTextureManagerSoftware* texman, bool do_2d = false);
 
   /**
    * Remap the palette of this texture using a private
    * palette and make a mapping of this palette to RGB
    * and to the global palette (inside csTextureManagerSoftware).
    */
-  void remap_palette_private (csTextureManagerSoftware* new_palette);
+  void remap_palette_private (csTextureManagerSoftware* texman);
 
   /// Query private colormap (if there is one)
   unsigned char* GetPrivateColorMap () { return priv_cmap->rgb_values; }
@@ -328,8 +328,6 @@ public:
 
   /// How are texture represented internally.
   int txtMode;
-  /// Force value (set by commandline) (-1 = no force)
-  int force_txtMode;
 
   ///
   csTextureManagerSoftware (iSystem* iSys, iGraphics2D* iG2D);
@@ -344,7 +342,7 @@ public:
   ///
   virtual void Prepare ();
   ///
-  virtual iTextureHandle *RegisterTexture (iImageFile* image, bool for3d, bool for2d);
+  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d);
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
   ///
@@ -357,7 +355,7 @@ public:
   virtual void AllocPalette ();
 
   /// Create a new texture.
-  csTextureMMSoftware* new_texture (iImageFile* image);
+  csTextureMMSoftware* new_texture (iImage* image);
 
   /**
    * Find an rgb value using the palette directly (not use
@@ -369,9 +367,6 @@ public:
    * Allocate a new RGB color.
    */
   int alloc_rgb (int r, int g, int b, int dist);
-
-  ///
-  bool force_txtmode (char* txtmode);
 
   /**
    * Find an rgb value using the faster lookup tables.
