@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+21-Mar-2001:
+	- Reverted the fix from Philip to python plugin and did the
+	  fix the 'right' way. Please don't modify cs_pyth.cpp directly.
+	  It is an automatically generated file and it makes no sense
+	  to modify it. You have to modify the source file called
+	  plugins/cscript/common/cs.i and then run the target
+	  'make cspythonswig' (provided you have swig).
 20-Mar-2001:
 	- Philip Wyett altered his email address in the docs.
 	- Wouter Wijngaards added the following methods to explosion
@@ -12,6 +19,9 @@ The history order has been reversed so that new features are at the top.
 	- Split rview.cpp and rview.h into rview and lview. rview contains
 	  csRenderView and lview contains everything related to the
 	  shadow calculations.
+	- Robert Bate brought the Mac projects files up to date.
+	- Philip Wyett manually updated the VC project files.
+	- Philip also did a fix to the python plugin.
 18-Mar-2001
 	- Fixed skydomes so that they need to be in the same part. Without
 	  this fix the circle command could only correctly be specified in the

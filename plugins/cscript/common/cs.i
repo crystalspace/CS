@@ -31,6 +31,7 @@
   }
 
 #include "isys/system.h"
+#include "iengine/camera.h"
 #include "csparser/csloader.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()
