@@ -21,6 +21,8 @@
 
 #include "csgeom/csrect.h"
 
+const int FRAGMENT_BUFFER_SIZE=64;
+
 /**
  * A rect region is a class that implements splittable 2d rectangles.  The
  * region may be composed of one or more rectangles that do not need to occupy
@@ -43,7 +45,7 @@ protected:
   /// The size of the region buffer (in rects)
   int region_max;
   /// The fragment buffer, used for performing fragment operations
-  csRect  fragment[32];
+  csRect  fragment[FRAGMENT_BUFFER_SIZE];
   /// The gather marker
   int gather_mark;
 
