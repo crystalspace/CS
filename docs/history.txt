@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+13-Oct-2001
+	- Fixed compilation error in OpenGL Canvas for X.
 12-Oct-2001
 	- Fixed a bug in AWS where it would try to load something
 	  from VFS ONLY if VFS could NOT be loaded. I think it should

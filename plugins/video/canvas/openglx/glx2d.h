@@ -94,7 +94,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DGLX);
     virtual void *GetProcAddress (const char *funcname)
-    { return glXGetProcAddressARB ((const GLubyte *)funcname); }
+    { return (void*)glXGetProcAddressARB ((const GLubyte *)funcname); }
   } scfiOpenGLInterface;
 };
 
