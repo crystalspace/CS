@@ -17,6 +17,6 @@
   rm -f %1
 
   if /%WINDIR%/ == // goto nowindoze
-  sleep 1
+  sleep 2
 
 :nowindoze

@@ -62,7 +62,7 @@
   del conftest.*
 
   if /%WINDIR%/ == // goto nowindoze
-  sleep 1
+  sleep 2
 
 :nowindoze
 
