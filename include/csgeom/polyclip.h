@@ -84,6 +84,9 @@ protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
   static csPoly2DPool polypool;
 
+  /// Result of most recent clipping
+  UByte mrClipping;
+  
 public:
   /**
    * Clip a set of 2D points and return in 'OutPolygon' which is expected
@@ -140,6 +143,9 @@ public:
 
   /// Wrapper function: clip a polygon in-place.
   UByte Clip (csVector2 *InPolygon, int &InOutCount, csBox &BoundingBox);
+  
+  /// most recent Clipresult
+  UByte LastClipResult () { return mrClipping; }
 };
 
 /**
