@@ -4,6 +4,10 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 10-Jul-2003
+	- Jorrit added a test in csColliderWrapper::Collide() so that
+	  csColliderWrapper can be used in cases where there is no
+	  collider. This means one can use csColliderWrapper to remember
+	  the fact that there is no collider.
 	- Eric Sunshine augmented the -fvtable-thunks check in configure.ac so
 	  that it is also performed on Cygwin since this flag is needed with
 	  the 2.x compiler on Cygwin.  (Previously, it was performed only for

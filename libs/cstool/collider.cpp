@@ -90,6 +90,7 @@ bool csColliderWrapper::Collide (csColliderWrapper& otherCollider,
                           csReversibleTransform* pTransform1,
                           csReversibleTransform* pTransform2)
 {
+  if (!collider) return false;
   csColliderWrapper *pCollider2 = &otherCollider;
   if (pCollider2 == this) return false;
 
