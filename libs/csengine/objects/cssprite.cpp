@@ -1166,7 +1166,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
 
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor &light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    csColor light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetSquaredRadius ();
 
     // Compute light position in object coordinates
@@ -1213,7 +1213,7 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor &light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    csColor light_color = lights [i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
     float sq_light_radius = lights [i]->GetSquaredRadius ();
 
     // Compute light position in object coordinates
