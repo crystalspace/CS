@@ -189,11 +189,25 @@ void csStatLight::CalculateLighting (csThing* th)
   th->CalculateLighting (lview);
 }
 
-
-void csStatLight::DumpFrustrum (csTransform& t)
+void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 {
-  sector->DumpFrustrum (this, NULL, 0, t);
+  csLightView lview;
+  lview.l = this;
+  lview.mirror = false;
+  lview.gouraud_only = false;
+  lview.gouraud_color_reset = false;
+  lview.r = GetColor ().red;
+  lview.g = GetColor ().green;
+  lview.b = GetColor ().blue;
+  lview.dynamic = false;
+  lview.callback = callback;
+  lview.callback_data = callback_data;
+
+  CHK (lview.light_frustrum = new csFrustrum (center));
+  lview.light_frustrum->MakeInfinite ();
+  sector->CalculateLighting (lview);
 }
+
 
 void csStatLight::RegisterPolygon (csPolygon3D* poly)
 {

@@ -319,13 +319,13 @@ public:
   void CalculateLighting (csThing* th);
 
   /**
-   * This is a debugging function that will show the outlines
-   * on all polygons that are hit by this light.
-   * It will draw perspective correct outlines so it is meant to
-   * be called with a camera transformation.
-   * @@@ REMOVE FROM ENGINE?
+   * This function is similar to CalculateLighting. It will do all the stuff
+   * that CalculateLighting would do except for one important thing: it will
+   * not actually light the polygons. Instead it will call a callback function for
+   * every entity that it was planning to light. This allows you to show
+   * or draw debugging information.
    */
-  void DumpFrustrum (csTransform& t);
+  void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
 
   CSOBJTYPE;
 };
