@@ -21,6 +21,7 @@
 #include "cssys/sysfunc.h"
 #include "qint.h"
 #include "qsqrt.h"
+#include "ivideo/graph3d.h"
 #include "csutil/xmltiny.h"
 #include "csutil/cfgfile.h"
 #include "csutil/scanstr.h"
@@ -886,7 +887,7 @@ bool csLoader::LoadMap (iDocumentNode* node)
       csRef<iDocumentNode> child = it->Next ();
       if (child->GetType () != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
+        csStringID id = xmltokens.Request (value);
       switch (id)
       {
         case XMLTOKEN_SETTINGS:
@@ -2620,14 +2621,14 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   csVector3 pos;
 
 #ifdef CS_USE_NEW_RENDERER
-  csVector3 attenvec;
-  bool attnSet = false;
+  csVector3 attenvec (0, 1, 0);
+#else
+  int attenuation = CS_ATTN_LINEAR;
 #endif
+  float dist = 0;
 
   csColor color;
-  float dist = 0;
   bool dyn;
-  int attenuation = CS_ATTN_LINEAR;
   struct csHaloDef
   {
     int type;
@@ -2817,7 +2818,35 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
         break;
       case XMLTOKEN_ATTENUATION:
 	{
-	  const char* att = child->GetContentsValue ();
+	  const char* att = child->GetContentsValue();
+#ifdef CS_USE_NEW_RENDERER
+	  if (att)
+	  {
+	    if (dist == 0)
+	    {
+	      // implicit radius
+	      if (color.red > color.green && color.red > color.blue) dist = color.red;
+	      else if (color.green > color.blue) dist = color.green;
+	      else dist = color.blue;
+	    }
+	    if (!strcasecmp (att, "none")) attenvec = csVector3 (1, 0, 0);
+	    else if ((!strcasecmp (att, "linear")) || (!strcasecmp (att, "inverse"))) 
+	      attenvec = csVector3 (0, 1/dist, 0);
+	    else if (!strcasecmp (att, "realistic")) attenvec = 
+	      csVector3 (0, 0, 1/(dist*dist));
+	    else
+	    {
+	      SyntaxService->ReportBadToken (child);
+	      return NULL;
+	    }
+	  }
+	  else
+	  {
+	    attenvec.x = child->GetAttributeValueAsFloat ("c");
+	    attenvec.y = child->GetAttributeValueAsFloat ("l");
+	    attenvec.z = child->GetAttributeValueAsFloat ("q");
+	  }
+#else
           if (!strcasecmp (att, "none")     ) attenuation = CS_ATTN_NONE;
           else if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
           else if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
@@ -2827,14 +2856,15 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    SyntaxService->ReportBadToken (child);
 	    return NULL;
 	  }
+#endif
 	}
 	break;
       #ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_ATTENUATIONVECTOR:
         {
-          if (SyntaxService->ParseVector (child, attenvec))
-            attnSet = true;
-          else
+	  //@@@ should be scrapped in favor of specification via
+	  // "attenuation".
+          if (!SyntaxService->ParseVector (child, attenvec))
 	    return NULL;
         }
         break;
@@ -2845,6 +2875,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
     }
   }
 
+#ifndef CS_USE_NEW_RENDERER
   // implicit radius
   if (dist == 0)
   {
@@ -2859,6 +2890,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
       case CS_ATTN_REALISTIC : dist = 256.0f * dist; break;
     }
   }
+#endif
 
   csRef<iStatLight> l (Engine->CreateLight (lightname, pos,
   	dist, color, dyn));
@@ -2901,12 +2933,10 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
       }
       break;
   }
+#ifndef CS_USE_NEW_RENDERER
   l->QueryLight ()->SetAttenuation (attenuation);
-
-#ifdef CS_USE_NEW_RENDERER
-  if (attnSet)
-    l->QueryLight ()->SetAttenuationVector (attenvec);
-
+#else
+  l->QueryLight ()->SetAttenuationVector (attenvec);
 #endif
 
   // Move the key-value pairs from 'Keys' to the light object
@@ -3316,7 +3346,8 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
         if (fileChild)
         {
           csRef<iVFS> vfs (CS_QUERY_REGISTRY (csLoader::object_reg, iVFS));
-          shader->Load (vfs->ReadFile (fileChild->GetContentsValue ()));
+	  csRef<iDataBuffer> db = vfs->ReadFile (fileChild->GetContentsValue ());
+          shader->Load (db);
         }
         else
         {

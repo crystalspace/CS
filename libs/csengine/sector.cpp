@@ -767,20 +767,23 @@ void csSector::Draw (iRenderView *rview)
 
     csLightList alllights;
     csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
-	int i;
+
+    int i;
+    const csOrthoTransform camTransO = rview->GetCamera()->GetTransform();
     for (i = secs->GetCount () - 1; i >= 0; i --)
     {
       csRef<iLightList> seclights = secs->Get(i)->GetLights ();
-      for (int j = seclights->GetCount() - 1; j >= 0; j --)
+      int j;
+      for (j = seclights->GetCount() - 1; j >= 0; j --)
       {
         // Sphere check against rview before adding it.
-        csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
-        seclights->Get (i)->GetInfluenceRadius ());
-        if (rview->TestBSphere (rview->GetCamera()->GetTransform(), s))
-	      alllights.Add (seclights->Get(j));
-        else { 
-          i=i;
-        }
+	iLight* light = seclights->Get (j);
+        csSphere s = csSphere (light->GetCenter (), 
+          light->GetInfluenceRadius ());
+        if (rview->TestBSphere (camTransO, s))
+	{
+	  alllights.Add (light);
+	}
       }
     }
 
@@ -797,20 +800,24 @@ void csSector::Draw (iRenderView *rview)
     DrawZ (rview);
     r3d->DisableZOffset ();
 
+    csReversibleTransform camTransR = 
+      rview->GetCamera()->GetTransform();
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
+    //for (i = 0; i < alllights.GetCount (); i++) 
     {
-      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+      iLight* light = alllights.Get (i);
+      r3d->SetObjectToCamera (&camTransR);
       r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-  	    alllights.Get (i)->GetCenter ());
+  	    light->GetCenter());
       r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-  	    alllights.Get (i)->GetAttenuationVector() );
+  	    light->GetAttenuationVector());
 
       r3d->SetWriteMask (false, false, false, false);
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
-      DrawShadow (rview, alllights.Get (i));
+      DrawShadow (rview, light);
       r3d->SetWriteMask (true, true, true, true);
       r3d->SetShadowState (CS_SHADOW_VOLUME_USE);
-      DrawLight (rview, alllights.Get(i));
+      DrawLight (rview, light);
       r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
     }
 

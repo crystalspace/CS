@@ -21,6 +21,7 @@
 #define __CS_CSLOADER_H__
 
 #include <stdarg.h>
+#include "ivideo/graph3d.h"
 #include "imap/parser.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

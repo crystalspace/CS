@@ -539,9 +539,13 @@ void csGenmeshMeshObject::UpdateLightingOne (const csReversibleTransform& trans,
   csVector3 wor_light_pos = li->GetCenter ();
   csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
   float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
-  if (obj_sq_dist >= li->GetSquaredRadius ()) return;
-
+#ifdef CS_USE_NEW_RENDERER
   float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
+  if (in_obj_dist >= li->GetInfluenceRadius ()) return;
+#else
+  if (obj_sq_dist >= li->GetSquaredRadius ()) return;
+  float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
+#endif
 
   csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));

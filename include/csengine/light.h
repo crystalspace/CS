@@ -57,32 +57,37 @@ protected:
   csSector* sector;
   /// Position of the light.
   csVector3 center;
+#ifndef CS_USE_NEW_RENDERER
   /// Radius of light.
   float dist;
   /// Squared radius of light.
   float sqdist;
   /// Inverse radius of light.
   float inv_dist;
+#endif
   /// Color.
   csColor color;
   /// The associated halo (if not NULL)
   csHalo *halo;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Attenuation type
   int attenuation;
-  
-#ifdef CS_USE_NEW_RENDERER
+
+#else
   /// Attenuation vector in the format x=kc, y=kl, z=kq
   csVector3 attenuationvec;
 
   /// The radius where the light have any effect at all
   float influenceRadius; 
+  /// Squared influence radius
+  float influenceRadiusSq; 
 
   /**
    * Config value: The intensity at the influenceRadius in parts of the 
    * main light intensity.
    */
-  static float influenceIntensity;
+  static float influenceIntensityFraction;
 #endif
 
   /// Light number. Changes when the light changes in some way (color/pos).
@@ -157,6 +162,7 @@ public:
    */
   const csVector3& GetCenter () { return center; }
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Get the radius.
    */
@@ -176,6 +182,7 @@ public:
    * Set the radius.
    */
   void SetRadius (float radius);
+#endif
 
   /**
    * Get the light color.
@@ -201,6 +208,7 @@ public:
    */
   void SetHalo (csHalo *Halo);
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Get the light's attenuation type
    */
@@ -209,14 +217,14 @@ public:
   /**
    * Change the light's attenuation type
    */
-  void SetAttenuation (int a) {attenuation = a;}
+  void SetAttenuation (int a); 
 
-#ifdef CS_USE_NEW_RENDERER
+#else
   /**
   * Set attenuation vector 
   * csVector3(constant, linear, quadric)
   */
-  void SetAttenuationVector(csVector3 &pattenv);
+  void SetAttenuationVector (csVector3 &pattenv);
 
   /**
   * Get attenuation vector
@@ -228,6 +236,11 @@ public:
    * Get the influenceradius of the light
    */
   float GetInfluenceRadius ();
+
+  /** 
+   * Get the squared influenceradius of the light
+   */
+  float GetInfluenceRadiusSq ();
 
   /**
    * Set the influenceradius
@@ -291,15 +304,19 @@ public:
     }
     virtual iSector *GetSector ();
     virtual void SetSector (iSector* sector);
+#ifndef CS_USE_NEW_RENDERER
     virtual float GetRadius () { return scfParent->GetRadius (); }
     virtual float GetSquaredRadius () { return scfParent->GetSquaredRadius (); }
     virtual float GetInverseRadius () { return scfParent->GetInverseRadius (); }
     virtual void SetRadius (float r) { scfParent->SetRadius (r); }
+#endif
     virtual const csColor& GetColor () { return scfParent->GetColor (); }
     virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
     virtual bool IsDynamic () const { return scfParent->IsDynamic (); }
+#ifndef CS_USE_NEW_RENDERER
     virtual int GetAttenuation () { return scfParent->GetAttenuation (); }
     virtual void SetAttenuation (int a) { scfParent->SetAttenuation (a); }
+#endif
     virtual float GetBrightnessAtDistance (float d)
     {
       return scfParent->GetBrightnessAtDistance (d);
@@ -308,6 +325,7 @@ public:
     virtual void SetAttenuationVector(csVector3 &pattenv) { scfParent->SetAttenuationVector(pattenv); }
     virtual csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
     virtual float GetInfluenceRadius () { return scfParent->GetInfluenceRadius(); }
+    virtual float GetInfluenceRadiusSq () { return scfParent->GetInfluenceRadiusSq(); }
     virtual void SetInfluenceRadius (float radius) { scfParent->SetInfluenceRadius (radius); }
     virtual void CalculateInfluenceRadius () { scfParent->CalculateInfluenceRadius (); }
 #endif

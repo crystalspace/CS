@@ -32,7 +32,7 @@ int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 
 #ifdef CS_USE_NEW_RENDERER
-  float csLight::influenceIntensity = 1/256;
+  float csLight::influenceIntensityFraction = 256;
 #endif
 
 SCF_IMPLEMENT_IBASE_EXT(csLight)
@@ -62,19 +62,23 @@ csLight::csLight (
 
   SetName ("__light__");
 
-  dist = d;
-  sqdist = d * d;
-  inv_dist = 1 / d;
-  halo = NULL;
-
   color.red = red;
   color.green = green;
   color.blue = blue;
 
-  attenuation = CS_ATTN_LINEAR;
   lightnr = 0;
-#ifdef CS_USE_NEW_RENDERER
-  attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
+
+  halo = NULL;
+
+#ifndef CS_USE_NEW_RENDERER
+  dist = d;
+  sqdist = d * d;
+  inv_dist = 1 / d;
+
+  attenuation = CS_ATTN_LINEAR;
+#else
+  //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
+  attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
   CalculateInfluenceRadius ();
 #endif
 }
@@ -114,8 +118,17 @@ const char* csLight::GenerateUniqueID ()
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)QInt ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
+#ifndef CS_USE_NEW_RENDERER
   l = convert_endian ((int32)QInt ((dist * 1000)+.5));
   mf.Write ((char*)&l, 4);
+#else
+  l = convert_endian ((int32)QInt ((attenuationvec.x * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((attenuationvec.y * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((attenuationvec.z * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+#endif
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
 
@@ -133,6 +146,7 @@ void csLight::SetHalo (csHalo *Halo)
 
 float csLight::GetBrightnessAtDistance (float d)
 {
+#ifndef CS_USE_NEW_RENDERER
   switch (attenuation)
   {
     case CS_ATTN_NONE:      return 1;
@@ -142,6 +156,9 @@ float csLight::GetBrightnessAtDistance (float d)
   }
 
   return 0;
+#else
+  return (attenuationvec * csVector3 (1, d, d*d));
+#endif
 }
 
 void csLight::SetCenter (const csVector3 &pos)
@@ -182,6 +199,7 @@ void csLight::Light::SetSector (iSector *sector)
   scfParent->SetSector (sector ? sector->GetPrivateObject () : NULL);
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csLight::SetRadius (float radius)
 {
   int i = light_cb_vector.Length ()-1;
@@ -196,10 +214,8 @@ void csLight::SetRadius (float radius)
   inv_dist = 1 / dist;
   lightnr++;
 
-#ifdef CS_USE_NEW_RENDERER
-  CalculateInfluenceRadius ();
-#endif
 }
+#endif
 
 void csLight::SetColor (const csColor& col) 
 {
@@ -215,7 +231,13 @@ void csLight::SetColor (const csColor& col)
   lightnr++;
 }
 
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_NEW_RENDERER
+void csLight::SetAttenuation (int a)
+{
+  attenuation = a;
+}
+
+#else
 
 void csLight::SetAttenuationVector(csVector3 &pattenv)
 {
@@ -241,39 +263,72 @@ float csLight::GetInfluenceRadius ()
   return influenceRadius;
 }
 
+float csLight::GetInfluenceRadiusSq ()
+{
+  return influenceRadiusSq;
+}
+
 void csLight::SetInfluenceRadius (float radius)
 {
   if (radius > 0)
+  {
     influenceRadius = radius;
+    influenceRadiusSq = radius*radius;
+  }
 }
 
 void csLight::CalculateInfluenceRadius ()
 {
-  if (attenuationvec.y == 0 && attenuationvec.z == 0) {
-    SetInfluenceRadius (GetRadius()); //if we only have constant falloff, use current radius
-    return;
+  // simple cases
+  if (attenuationvec.z == 0)
+  {
+    if (attenuationvec.y == 0)
+    {
+      //no solution - brightness constant, infinite radius
+      SetInfluenceRadius (100000000); 
+      return;
+    }
+    else
+    {
+      float kc = attenuationvec.x;
+      float kl = attenuationvec.y;
+      float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
+      SetInfluenceRadius ((influenceIntensityFraction*y - kc) / kl);
+    }
   }
 
-  /*calculate radius where the light have the intensity of 1/256 using the
-  standard lightmodel    y*1/(kc + kl*d + kq*d^2)
-  solution formula:
-       / -kl +- sqrt( kl^2 - 4*kc*kq + 1024*kq *y )\
-  0.5* |------------------------------------------|
-       \                  kq                      /
+  /*
+   calculate radius where the light has the intensity of 
+   influenceIntensityFraction using the standard light model:    
+
+     brightness = y*1/(kc + kl*d + kq*d^2)
+
+   solving equation:
+           /-kl +- sqrt( kl^2 - 4*kc*kq + 4*kq*y*brightness)\
+   d = 0.5*|------------------------------------------------|
+           \                       kq                       /
   */
-  float radius1, radius2;
   float kc = attenuationvec.x;
   float kl = attenuationvec.y;
   float kq = attenuationvec.z;
-  float det;
+  float discr;
   float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   
-  det = -kl + sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq*y);
-  radius1 = 0.5*(det/kq);
-  det = -kl - sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq*y);
-  radius2 = 0.5*(det/kq);
-
-  SetInfluenceRadius(MAX(radius1,radius2));
+  discr = kl*kl - 4*kq*(kc + influenceIntensityFraction*y);
+  if (discr < 0)
+  {
+    //no solution - brightness constant, infinite radius
+    SetInfluenceRadius (100000000); 
+  }
+  else 
+  {
+    float radius1, radius2, det;
+    det = sqrtf (discr);
+    float denom = 0.5 / kq;
+    radius1 = denom * (-kl + det);
+    radius2 = denom * (-kl - det);
+    SetInfluenceRadius (MAX (radius1,radius2));
+  }
 }
 
 #endif
@@ -359,7 +414,11 @@ void csStatLight::CalculateLighting ()
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
+#ifdef CS_USE_NEW_RENDERER
+  lview.SetRadius (GetInfluenceRadius ());
+#else
   lview.SetRadius (GetRadius ());
+#endif
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
@@ -381,7 +440,11 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
+#ifdef CS_USE_NEW_RENDERER
+  lview.SetRadius (GetInfluenceRadius ());
+#else
   lview.SetRadius (GetRadius ());
+#endif
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
@@ -469,7 +532,11 @@ void csDynLight::Setup ()
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
+#ifdef CS_USE_NEW_RENDERER
+  lview.SetRadius (GetInfluenceRadius ());
+#else
   lview.SetRadius (GetRadius ());
+#endif
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);

@@ -1988,7 +1988,11 @@ int csEngine::GetNearbyLights (
       if (dl->GetSector () == sector->GetPrivateObject ())
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
+#ifdef CS_USE_NEW_RENDERER
+        if (sqrt (sqdist) < dl->GetInfluenceRadius ())
+#else
         if (sqdist < dl->GetSquaredRadius ())
+#endif
         {
           csRef<iLight> il (SCF_QUERY_INTERFACE (dl, iLight));
           light_array->AddLight (il, sqdist);
@@ -2007,7 +2011,11 @@ int csEngine::GetNearbyLights (
     {
       iLight *l = ll->Get (i);
       sqdist = csSquaredDist::PointPoint (pos, l->GetCenter ());
-      if (sqdist < l->GetSquaredRadius ())
+#ifdef CS_USE_NEW_RENDERER
+        if (sqrt (sqdist) < l->GetInfluenceRadius ())
+#else
+        if (sqdist < l->GetSquaredRadius ())
+#endif
       {
         light_array->AddLight (l, sqdist);
       }

@@ -20,6 +20,15 @@ The history order is reversed so that new features are at the top.
 	  crystal.m4.  This allows people to access the crystal.m4 utility
 	  macro from a CS installation, rather than being forced to grab it
 	  from a source distribution (which might now be handy or available).
+	- res made the following changes:
+	    - removed attenuation vector and radius from lights when
+	      new renderer is used. Those can be expressed with the
+	      attenuation vector.
+	    - Made some fixes to the influence radius calculation
+	    - updated csparser to calculate the attenuation vector from
+	      the att. type and radius given in the world file; added
+	      another syntax for explicit attenuation vectors:
+		<attenuation c="0" l="0.1" q="0" />
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in

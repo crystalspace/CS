@@ -169,6 +169,7 @@ struct iLight : public iBase
   /// Set the sector for this light.
   virtual void SetSector (iSector* sector) = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Get the radius
   virtual float GetRadius () = 0;
   /// Get the squared radius.
@@ -177,6 +178,7 @@ struct iLight : public iBase
   virtual float GetInverseRadius () = 0;
   /// Set the radius
   virtual void SetRadius (float r) = 0;
+#endif
 
   /// Get the color of this light.
   virtual const csColor& GetColor () = 0;
@@ -186,6 +188,7 @@ struct iLight : public iBase
   /// Return true if this light is pseudo-dynamic.
   virtual bool IsDynamic () const = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Return current attenuation mode.
   virtual int GetAttenuation () = 0;
   /**
@@ -200,10 +203,11 @@ struct iLight : public iBase
    */
   virtual void SetAttenuation (int a) = 0;
 
-#ifdef CS_USE_NEW_RENDERER
+#else
   /**
   * Set attenuation vector 
   * csVector3(constant, linear, quadric)
+  * FIXME: examples
   */
   virtual void SetAttenuationVector(csVector3 &pattenv) = 0;
 
@@ -218,6 +222,11 @@ struct iLight : public iBase
    */
   virtual float GetInfluenceRadius () = 0;
 
+  /** 
+   * Get the squared influenceradius of the light.
+   */
+  virtual float GetInfluenceRadiusSq () = 0;
+  
   /**
    * Set the influenceradius
    */
