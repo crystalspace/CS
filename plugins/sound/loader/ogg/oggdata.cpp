@@ -38,7 +38,7 @@ static size_t cs_ogg_read (void *ptr, size_t size, size_t nmemb, void *datasourc
   return br;
 }
 
-static int cs_ogg_seek (void *datasource, int64_t offset, int whence)
+static int cs_ogg_seek (void *datasource, ogg_int64_t offset, int whence)
 {
   size_t np;
   csOggSoundData::datastore *ds = (csOggSoundData::datastore*)datasource;

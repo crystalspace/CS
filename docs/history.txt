@@ -3,6 +3,8 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+5-Apr-2003
+	- Philip Wyett fixed compile error in ogg plugin.
 4-Apr-2003
         - JTarbox altered event define's to an enum
 	- Boyan added lightning loader plugin.
