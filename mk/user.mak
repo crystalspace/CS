@@ -16,7 +16,7 @@ endif
 # Should we build libraries as shared/dynamic libraries?
 # Currently only supported on Unix
 ifndef USE_SHARED_LIBS
-  USE_SHARED_LIBS=yes
+  USE_SHARED_LIBS=no
 endif
 
 # Default build mode
@@ -40,41 +40,41 @@ endif
 DO_ASM=yes
 
 # If 'yes' include support for PNG graphic files (required for MazeD).
-DO_PNG=no
+DO_PNG=yes
 
 # If 'yes' include support for GIF graphic files (required for all current
 # data files).
 DO_GIF=yes
 
 # If 'yes' include support for BMP graphic files (not required currently).
-DO_BMP=no
+DO_BMP=yes
 
 # If 'yes' include support for TGA graphic files (not required currently).
-DO_TGA=no
+DO_TGA=yes
 
 # If 'yes' include support for JPG graphic files (not required currently).
 DO_JPG=yes
 
 # If 'yes' include support for WAL graphic files (not required currently).
-DO_WAL=no
+DO_WAL=yes
 
 # If 'yes' include support for SGI graphic files (not required currently).
-DO_SGI=no
+DO_SGI=yes
 
 # If 'yes' include sound support.
-DO_SOUND=no
+DO_SOUND=yes
 
 # If "yes" include AIFF support
-DO_AIFF=no
+DO_AIFF=yes
 
 # If "yes" include IFF support
-DO_IFF=no
+DO_IFF=yes
 
 # If "yes" include AU support
-DO_AU=no
+DO_AU=yes
 
 # If "yes" include WAV support
-DO_WAV=no
+DO_WAV=yes
 
 # If "yes" include MMX support in software renderer
 DO_MMX=yes
@@ -93,19 +93,18 @@ DO_COREDUMP=no
 # allocated memory will be filled with garbage to detect memory areas that are
 # used uninitialized (since most OSes fills allocated memory with zeros).
 
-# MEM.memdebug=-DMEM_CHECK -DMEM_CHECK_FILL -DMEM_CHECK_EXTENSIVE
+MEM.memdebug=-DMEM_CHECK -DMEM_CHECK_FILL -DMEM_CHECK_EXTENSIVE
 
-# MEM=$(MEM.$(MODE))
+MEM=$(MEM.$(MODE))
 
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path
-USE_MESA=0
+USE_MESA=1
 
 # The tool used to build dependencies. The possible values are:
-# none  - Cannot build dependencies on this platform
-# cc    - Use the C compiler (gcc -MM) for this
-# mkdep - Use the makedep tool provided in the apps/makedep directory
+# none	- Cannot build dependencies on this platform
+# cc	- Use the C compiler (gcc -MM) for this
+# mkdep	- Use the makedep tool provided in the apps/makedep directory
 ifndef DEPEND_TOOL
   DEPEND_TOOL=cc
 endif
-
