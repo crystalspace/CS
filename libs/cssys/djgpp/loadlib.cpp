@@ -19,6 +19,8 @@
 
 #ifndef CS_STATIC_LINKED
 
+#define CS_SYSDEF_PROVIDE_DIR
+#define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 
@@ -27,6 +29,7 @@
 #include <go32.h>
 #include <sys/nearptr.h>
 #include <string.h>
+#include <zlib.h>
 
 /* dummy declation for external symbols, rather than using
    #include just to get (any) symbol definition... */
@@ -36,11 +39,19 @@ extern "C" void __builtin_new ();
 extern "C" void __builtin_vec_new ();
 extern "C" void __pure_virtual ();
 extern "C" void __dj_ctype_flags ();
+//extern "C" void __dj_gs ();
 extern "C" void _dos_getdrive ();
 extern "C" void _dos_setdrive ();
-extern "C" void getcwd ();
+//extern "C" void getcwd ();
 extern "C" void setjmp ();
 extern "C" void longjmp ();
+extern "C" void __djgpp_dos_sel ();
+extern "C" void __djgpp_ds_alias ();
+extern "C" void __moddi3 ();
+extern "C" void __divdi3 ();
+//extern "C" void cs_static_var_cleanup__FPFv_v ();
+extern "C" void clearerr ();
+
 
 /*
  * These symbols will be exported to loaded DXEs.
@@ -63,8 +74,14 @@ DXE_EXPORT_TABLE (syms)
   DXE_EXPORT (__builtin_new)
   DXE_EXPORT (__builtin_vec_delete)
   DXE_EXPORT (__builtin_vec_new)
+  DXE_EXPORT (__dj_assert)
   DXE_EXPORT (__dj_ctype_flags)
   DXE_EXPORT (__dj_stderr)
+  DXE_EXPORT (__dj_stdin)
+  DXE_EXPORT (__dj_stdout)
+  DXE_EXPORT (__djgpp_base_address)
+  DXE_EXPORT (__djgpp_dos_sel)
+  DXE_EXPORT (__djgpp_ds_alias)
   DXE_EXPORT (__djgpp_selector_limit)
   DXE_EXPORT (__dpmi_allocate_ldt_descriptors)
   DXE_EXPORT (__dpmi_get_segment_base_address)
@@ -73,15 +90,30 @@ DXE_EXPORT_TABLE (syms)
   DXE_EXPORT (__dpmi_physical_address_mapping)
   DXE_EXPORT (__dpmi_set_segment_base_address)
   DXE_EXPORT (__dpmi_set_segment_limit)
+  DXE_EXPORT (__moddi3)
+  DXE_EXPORT (__divdi3)
   DXE_EXPORT (__pure_virtual)
   DXE_EXPORT (_dos_getdrive)
   DXE_EXPORT (_dos_setdrive)
   DXE_EXPORT (_go32_info_block)
   DXE_EXPORT (abort)
   DXE_EXPORT (abs)
+  DXE_EXPORT (access)
+  DXE_EXPORT (acos)
+  DXE_EXPORT (asin)
+  DXE_EXPORT (atan2)
+  DXE_EXPORT (atof)
+  DXE_EXPORT (atoi)
   DXE_EXPORT (calloc)
   DXE_EXPORT (ceil)
+  DXE_EXPORT (clearerr)
+  DXE_EXPORT (closedir)
   DXE_EXPORT (cos)
+  DXE_EXPORT (crc32)
+  //  DXE_EXPORT (cs_static_var_cleanup__FPFv_v)
+  DXE_EXPORT (deflate)
+  DXE_EXPORT (deflateEnd)
+  DXE_EXPORT (deflateInit_)
   DXE_EXPORT (dosmemget)
   DXE_EXPORT (dosmemput)
   DXE_EXPORT (errno)
@@ -89,49 +121,73 @@ DXE_EXPORT_TABLE (syms)
   DXE_EXPORT (exp)
   DXE_EXPORT (fclose)
   DXE_EXPORT (fdopen)
+  DXE_EXPORT (feof)
   DXE_EXPORT (ferror)
   DXE_EXPORT (fflush)
   DXE_EXPORT (floor)
+  DXE_EXPORT (fmod)
   DXE_EXPORT (fopen)
   DXE_EXPORT (fprintf)
   DXE_EXPORT (fputc)
+  DXE_EXPORT (fputs)
   DXE_EXPORT (fread)
   DXE_EXPORT (free)
+  DXE_EXPORT (frexp)
   DXE_EXPORT (fseek)
   DXE_EXPORT (ftell)
   DXE_EXPORT (fwrite)
   DXE_EXPORT (getcwd)
   DXE_EXPORT (getenv)
   DXE_EXPORT (gmtime)
+  DXE_EXPORT (inflate)
+  DXE_EXPORT (inflateEnd)
+  DXE_EXPORT (inflateInit2_)
+  DXE_EXPORT (localtime)
   DXE_EXPORT (longjmp)
   DXE_EXPORT (malloc)
   DXE_EXPORT (memcpy)
   DXE_EXPORT (memmove)
   DXE_EXPORT (memset)
   DXE_EXPORT (memcmp)
+  DXE_EXPORT (modf)
+  DXE_EXPORT (mkdir)
+  DXE_EXPORT (opendir)
   DXE_EXPORT (pow)
   DXE_EXPORT (printf)
+  DXE_EXPORT (puts)
   DXE_EXPORT (qsort)
   DXE_EXPORT (rand)
+  DXE_EXPORT (readdir)
   DXE_EXPORT (realloc)
   DXE_EXPORT (rewind)
   DXE_EXPORT (setjmp)
   DXE_EXPORT (sin)
   DXE_EXPORT (sprintf)
   DXE_EXPORT (sqrt)
+  DXE_EXPORT (srand)
   DXE_EXPORT (sscanf)
+  DXE_EXPORT (stat)
   DXE_EXPORT (strcasecmp)
   DXE_EXPORT (strcat)
   DXE_EXPORT (strchr)
   DXE_EXPORT (strcmp)
   DXE_EXPORT (strcpy)
+  DXE_EXPORT (strcspn)
   DXE_EXPORT (strdup)
   DXE_EXPORT (strlen)
   DXE_EXPORT (strncasecmp)
+  DXE_EXPORT (strncmp)
   DXE_EXPORT (strncpy)
+  DXE_EXPORT (strpbrk)
+  DXE_EXPORT (strrchr)
   DXE_EXPORT (strspn)
   DXE_EXPORT (strstr)
+  DXE_EXPORT (tan)
+  DXE_EXPORT (time)
+  DXE_EXPORT (uclock)
+  DXE_EXPORT (unlink)
   DXE_EXPORT (vsprintf)
+  DXE_EXPORT (vprintf)
 DXE_EXPORT_END
 
 static const char *module;
