@@ -103,7 +103,6 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
   cmdline->DecRef ();
-  m_bHardwareCursor = false;
 
   return true;
 }
