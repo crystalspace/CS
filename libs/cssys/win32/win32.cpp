@@ -36,7 +36,7 @@
 
 // Use new DirectInput keyboard handling by Xavier Trochu (xtrochu@yahoo.com)?
 #ifdef DO_DINPUT_KEYBOARD
-#define DIRECTINPUT_VERSION  0x0700
+#define DIRECTINPUT_VERSION  0x0300
 #include <dinput.h>
 #endif
 
