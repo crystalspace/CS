@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	  priorities and Z-buffer mode.
 	- Fixed a bad bug in the parsing of the START keyword. It would
 	  simply crash.
+	- 'res' fixed aws so that it doesn't require source files from
+	  outside its directory. Also added transparency.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug
