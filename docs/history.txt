@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Aug-2004
+	- Steven Geens added an example of how to view a cal3d file with
+	  viewmesh to the docs.
 14-Aug-2004
 	- Jorrit added a new iEngine->PrecacheDraw() function which precaches
 	  the GetRenderMeshes() of all meshes in the engine. Walktest now
