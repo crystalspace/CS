@@ -42,7 +42,7 @@
 // multitexture support
 #define USE_MULTITEXTURE 0
 #ifdef GL_ARB_multitexture
-#define USE_MULTITEXTURE 1
+//#define USE_MULTITEXTURE 1
 #endif
 
 #if USE_MULTITEXTURE
