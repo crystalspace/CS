@@ -46,6 +46,8 @@ The history order is reversed so that new features are at the top.
 	  dependencies.
 	- Oktal swapped round a conditional expression in csHashComputeEvent
 	  that was causing some event types to be improperly encoded.
+	- Oktal re-fixed his yesterday's fix to pythpre.i so it now uses
+	  CS_ALLOC_STACK_ARRAY.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if

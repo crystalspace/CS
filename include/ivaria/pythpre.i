@@ -65,10 +65,9 @@
 %define TYPEMAP_OUT_csWrapPtr
 	%typemap(out) csWrapPtr
 	{
-		char *type_name = new char[strlen($1.Type)+3];
+		CS_ALLOC_STACK_ARRAY(char, type_name, strlen($1.Type) + 3);
 		strcat(strcpy(type_name, $1.Type), " *");
 		TYPEMAP_OUT_csRef_BODY($1.Ref, type_name, iBase)
-		delete[] type_name;
 	}
 %enddef
 
