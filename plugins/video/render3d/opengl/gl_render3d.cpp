@@ -2513,6 +2513,15 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
       case cscmdSystemClose:
         Close ();
         return true;
+      case cscmdContextResize:
+	{
+	  int w = G2D->GetWidth ();
+	  int h = G2D->GetHeight ();
+	  SetDimensions (w, h);
+	  asp_center_x = w/2;
+	  asp_center_y = h/2;
+	}
+	return true;
     }
   return false;
 }

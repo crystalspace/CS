@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-May-2004
+	- res fixed the NR GL renderer to handle resize events.
+	- res fixed texture downsampling in the NR GL renderer. It could 
+	  happen that a dimension of the image became 0.
 5-May-2004
 	- Eric Sunshine worked around problem caused by Jam2.4/BoostJam
 	  work-around of 2-May-2004 for problem where Jam complained about

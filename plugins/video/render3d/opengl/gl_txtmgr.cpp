@@ -491,14 +491,24 @@ void csGLTextureHandle::AdjustSizePo2 ()
     // downsample textures, if requested, but not 2D textures
     if (!(flags & (CS_TEXTURE_2D)))
     {
+      /*
+        @@@ FIXME: for some special 3d textures (eg normalization cube)
+	  downsampling may not be desired, either.
+       */
       newwidth >>= txtmgr->texture_downsample;
+      if (newwidth <= 0) newwidth = 1;
       newheight >>= txtmgr->texture_downsample;
+      if (newheight <= 0) newheight = 1;
     }
 
     // If necessary rescale if bigger than maximum texture size
     if (newwidth > txtmgr->max_tex_size) newwidth = txtmgr->max_tex_size;
     if (newheight > txtmgr->max_tex_size) newheight = txtmgr->max_tex_size;
 
+    /*
+      @@@ FIXME: It would be better if lower mipmaps provided by the 
+      image were used.
+     */
     if (newwidth != orig_width || newheight != orig_height)
     {
       images->GetImage (i)->Rescale (newwidth, newheight);
