@@ -92,7 +92,8 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   }
 
   // nothing helps, use default
-  // which is C:\Program Files\Crystal\
+  // which is "C:\Program Files\Crystal\"
+
   strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
 
 got_value:
