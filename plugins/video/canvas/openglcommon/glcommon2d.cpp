@@ -35,7 +35,7 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
-  csGraphics2D (iParent), FontCache (0), statecache (0)
+  csGraphics2D (iParent), statecache (0)
 {
   EventOutlet = 0;
   screen_shot = 0;
@@ -98,8 +98,7 @@ bool csGraphics2DGLCommon::Open ()
   statecache->InitCache();
 
   // initialize font cache object
-  if (!FontCache)
-    FontCache = new GLFontCache (FontServer, this);
+  fontCache = new csGLFontCache (this);
 
   if (!csGraphics2D::Open ())
     return false;
@@ -197,8 +196,8 @@ bool csGraphics2DGLCommon::Open ()
 void csGraphics2DGLCommon::Close ()
 {
   if (!is_open) return;
-  delete FontCache;
-  FontCache = 0;
+  delete fontCache;
+  fontCache = 0;
   ext.Close ();
   csGraphics2D::Close ();
 }
@@ -220,14 +219,19 @@ bool csGraphics2DGLCommon::BeginDraw ()
   glColor3f (1., 0., 0.);
   glClearColor (0., 0., 0., 0.);
 
+  statecache->SetShadeModel (GL_FLAT);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#ifdef CS_USE_NEW_RENDERER
+  glColorMask (true, true, true, true);
+#endif
+
   return true;
 }
 
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
   csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
-  if (FontCache)
-    FontCache->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
+  fontCache->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
@@ -485,25 +489,23 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
   const char *text)
 {
+  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
   if (bg >= 0)
   {
-    bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
 
     int fw, fh;
     font->GetDimensions (text, fw, fh);
     DrawBox (x, y, fw, fh, bg);
 
-    if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
+    statecache->Enable_GL_TEXTURE_2D ();
   }
 
+  if (!gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   setGLColorfromint (fg);
-  FontCache->Write (font, x, Height - y, text);
+  fontCache->Write (font, x, Height - y, (utf8_char*)text);
+  if (!gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
 }
-
-// This variable is usually 0 except when doing a screen shot:
-// in this case it is a temporarily allocated buffer for glReadPixels ()
-//static uint8 *screen_shot = 0;
 
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {

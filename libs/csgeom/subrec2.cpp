@@ -458,7 +458,6 @@ void csSubRect2::Reclaim ()
   {
     CS_ASSERT (children[0]);
     children[0]->Reclaim ();
-    TestCollapse ();
   }
 }
 
@@ -611,7 +610,7 @@ void csSubRectangles2::Dump ()
     new csImageMemory (w, h, (new uint8[w * h]),
     true, CS_IMGFMT_PALETTED8, newpal);
 
-  uint8* data3 = (uint8*)img2->GetImageData ();
+  uint8* data3 = (uint8*)img3->GetImageData ();
   memset (data3, 0, w * h);
 
   int c = 0;
@@ -621,12 +620,12 @@ void csSubRectangles2::Dump ()
   while (nodes.Length ())
   {
     csSubRect2* node = nodes[0];
-    nodes.Delete (0);
+    nodes.DeleteIndex (0);
 
     FillImgRect (data, c + 1, w, h, node->rect);
     FillImgRect (data2, c + 1, w, h, node->allocedRect);
     // Overlap information. The whole image should be just one color.
-    IncImgRect (data, w, h, node->rect);
+    IncImgRect (data3, w, h, node->rect);
 
     if (node->children[0] != 0) nodes.Push (node->children[0]);
     if (node->children[1] != 0) nodes.Push (node->children[1]);

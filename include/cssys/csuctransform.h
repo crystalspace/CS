@@ -28,6 +28,13 @@
 /**\addtogroup util
  * @{ */
 
+/// An Unicode character encoded as UTF8 is at max encoded to this length
+#define CS_UC_MAX_UTF8_ENCODED		6
+/// An Unicode character encoded as UTF16 is at max encoded to this length
+#define CS_UC_MAX_UTF16_ENCODED		2
+/// An Unicode character encoded as UTF32 is at max encoded to this length
+#define CS_UC_MAX_UTF32_ENCODED		1
+ 
 /**
  * Contains functions to convert between several UTF encodings.
  */
@@ -367,8 +374,8 @@ public:
 									\
       if ((size_t)dcnt >= bufRemaining) 				\
       {									\
-        bufRemaining = 0;						\
 	if (dest && (destSize > 0)) dest += bufRemaining;		\
+        bufRemaining = 0;						\
       }									\
       else								\
       {									\

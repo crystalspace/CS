@@ -41,6 +41,35 @@ chronological order.
 	  change.
 	- Jorrit fixed a bug in the csTypedObjectIterator class. It would
 	  often return 0 in the Next() method even if there were more objects.
+	- res made the following changes:
+	    - Leak fixes. After the recent array changes, csStringArray 
+	      allocates a copy of a Push()ed string. However, in some places
+	      was still code like "stringarray.Push (csStrNew (string));",
+	      causing leaks.
+	    - More leak fixed. After the recent changes to the event system
+	      (event queue IncRef()s events), in some places code like
+	      "eventqueue.Push (new csEvent ());" wasn't updated, causing
+	      leaks.
+	    - Fixed a bug in the UTF transformer that caused the last char to
+	      be cut off.
+	    - Typo fix in csunicode.h.
+	    - Win32 port won't try to change the console codepage to UTF-8 
+	      anymore. Problem with the UTF-8 codepage is that it requires
+	      a "TrueType" console font, but default is "Raster".
+	    - The yellow warning boxes used to display a trailing '\n' 
+	      character (appearing as a small note when using csfont font 
+	      server.)
+	    - Tweaked csSubRectangles2 a bit more.
+	    - Updated documentation in reporter.h.
+	    - csReport() prints "WARNING: " etc. in front of messages if 
+	      falling back to the console.
+	    - Added a new, almost-from-scratch font cache, currently only for
+	      OpenGL. Instead just putting all glyphs of a font onto a texture
+	      (not that practical when fonts with a wider range of supported
+	      Unicode glyphs are used), the new system is more "cache-like" 
+	      and dynamically adds glyph images to the texture and removes
+	      the least recently used glyphs when the max. allowed space
+	      doesn't suffice when a new glyph is to be added.
 10-Aug-2003
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)

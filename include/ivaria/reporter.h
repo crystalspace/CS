@@ -24,40 +24,49 @@
 #include "cssys/sysfunc.h"
 #include "iutil/objreg.h"
 
+/**\file
+ * Reporter interface.
+ */
+/**\addtogroup util
+ * @{ */
+ 
 struct iReporter;
 
+/**\name iReporter severity levels
+ * @{ */
 /**
- * Severity level for iReporter: BUG severity level.
+ * BUG severity level.
  * This is the worst thing that can happen. It means that some code
  * detected a bug in Crystal Space.
  */
 #define CS_REPORTER_SEVERITY_BUG 0
 
 /**
- * Severity level for iReporter: ERROR severity level.
+ * ERROR severity level.
  * There was an error of some kind. Usually this is an error while
  * reading data.
  */
 #define CS_REPORTER_SEVERITY_ERROR 1
 
 /**
- * Severity level for iReporter: WARNING severity level.
+ * WARNING severity level.
  * There was some condition which is non fatal but is suspicious.
  */
 #define CS_REPORTER_SEVERITY_WARNING 2
 
 /**
- * Severity level for iReporter: NOTIFY severity level.
+ * NOTIFY severity level.
  * Just a notification message.
  */
 #define CS_REPORTER_SEVERITY_NOTIFY 3
 
 /**
- * Severity level for iReporter: DEBUG severity level.
+ * DEBUG severity level.
  * This is for debugging and it will usually generate an entry
  * in some log.
  */
 #define CS_REPORTER_SEVERITY_DEBUG 4
+/** @} */
 
 SCF_VERSION (iReporterListener, 0, 0, 1);
 
@@ -115,7 +124,7 @@ SCF_VERSION (iReporter, 0, 1, 0);
 struct iReporter : public iBase
 {
   /**
-   * Report something. The given message string should be formed like:
+   * Report something. The given message ID should be formed like:
    * 'crystalspace.<source>.<type>.<detail>'. Example:
    * 'crystalspace.sprite2dloader.parse.material'.
    */
@@ -260,10 +269,20 @@ inline void iReporter::ReportDebug
 class csReporterHelper
 {
 public:
+  /**
+   * Helper function to use a reporter easily.  This function will also work if
+   * no reporter is present and use stdout in that case.
+   * \remark You can use the #csReportV macro for even more convenience.
+   */
   static inline void ReportV(iObjectRegistry* reg, int severity,
     char const* msgId, char const* description, va_list args)
     CS_GNUC_PRINTF (4, 0);
 
+  /**
+   * Helper function to use a reporter easily.  This function will also work if
+   * no reporter is present and use stdout in that case.
+   * \remark You can use the #csReport macro for even more convenience.
+   */
   static inline void Report(iObjectRegistry* reg, int severity,
     char const* msgId, char const* description, ...)
     CS_GNUC_PRINTF (4, 5);
@@ -277,6 +296,32 @@ inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
     reporter->ReportV(severity, msgId, description, args);
   else
   {
+    /*
+      @@@ The strncasecmp()s are there because sometimes reported messages
+      start with "Warning", and a "Warning: Warning" output looks rather
+      crappy. The correct fix is obviously to remove "Warning" prefixes
+      when the reporter is used.
+     */
+    switch (severity)
+    {
+      case CS_REPORTER_SEVERITY_BUG:
+	csPrintf("BUG: ");
+	break;
+      case CS_REPORTER_SEVERITY_ERROR:
+        if (strncasecmp (description, "error", 5) != 0)
+	  csPrintf("ERROR: ");
+	break;
+      case CS_REPORTER_SEVERITY_WARNING:
+        if (strncasecmp (description, "warning", 7) != 0)
+	  csPrintf("WARNING: ");
+	break;
+      case CS_REPORTER_SEVERITY_NOTIFY:
+        csPrintf("NOTIFY: ");
+	break;
+      case CS_REPORTER_SEVERITY_DEBUG:
+        csPrintf("DEBUG: ");
+	break;
+    }
     csPrintfV(description, args);
     csPrintf("\n");
   }
@@ -294,11 +339,15 @@ inline void csReporterHelper::Report(iObjectRegistry* reg, int severity,
 }
 
 /**
- * Helper function to use a reporter easily.  This function will also work if
- * no reporter is present and use stdout in that case.
+ * Helper macro to use a reporter easily.
  */
 #define csReport csReporterHelper::Report
+/**
+ * Helper macro to use a reporter easily.
+ */
 #define csReportV csReporterHelper::ReportV
+
+/* @} */
 
 #endif // __CS_IVARIA_REPORTER_H__
 

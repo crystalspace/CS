@@ -19,12 +19,18 @@
 #ifndef __CS_GLCOMMON2D_H__
 #define __CS_GLCOMMON2D_H__
 
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
+#include <GL/gl.h>
+#endif
+
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "gl2d_font.h"
+#include "glfontcache.h"
 #include "iutil/event.h"
-#include "video/canvas/openglcommon/glstates.h"
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "glstates.h"
+#include "glextmanager.h"
 #include "glss.h"
 
 class OpenGLTextureCache;
@@ -44,9 +50,10 @@ class GLFontCache;
 class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
   friend class csGLScreenShot;
+  friend class csGLFontCache;
 
   /// hold the CS fonts in an OpenGL-friendly format
-  GLFontCache *FontCache;
+  csGLFontCache* fontCache;
 
   /// Cache for GL states
   csGLStateCache* statecache;

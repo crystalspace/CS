@@ -262,8 +262,10 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     The DLL is contained in the "mingw-utils" package and works
     for both MinGW and VC compiled binaries.
    */
-  exceptHandlerDLL = LoadLibraryEx ("exchndl.dll", 0, 
-    LOAD_WITH_ALTERED_SEARCH_PATH);
+  // @@@ Potentially useful, but seems to interfere with "real" debugging
+  //exceptHandlerDLL = LoadLibraryEx ("exchndl.dll", 0, 
+  //  LOAD_WITH_ALTERED_SEARCH_PATH);
+  exceptHandlerDLL = 0;
 
   ModuleHandle = GetModuleHandle(0);
   STARTUPINFO startupInfo;
@@ -315,14 +317,15 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 
   // experimental UC stuff.
   // Retrieve old codepage.
-  oldCP = GetConsoleOutputCP ();
+  //oldCP = GetConsoleOutputCP ();
   // Try to set console codepage to UTF-8.
   // @@@ The drawback of UTF8 is that it requires a TrueType console
   // font to work properly. However, default is "raster font" :/
   // In this case, text output w/ non-ASCII chars will appear broken, tho
   // this is really a Windows issue. (see MS KB 99795)
   // @@@ Maybe a command line param to set a different con cp could be useful.
-  SetConsoleOutputCP (CP_UTF8);
+  // * Don't change the codepage, for now.
+  //SetConsoleOutputCP (CP_UTF8);
   //
 
   registry = r;
@@ -407,7 +410,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 Win32Assistant::~Win32Assistant ()
 {
   registry->DecRef();
-  SetConsoleOutputCP (oldCP);
+  //SetConsoleOutputCP (oldCP);
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
   FreeLibrary ((HMODULE)exceptHandlerDLL);

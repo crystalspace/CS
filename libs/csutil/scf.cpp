@@ -894,7 +894,7 @@ iStringArray* csSCF::QueryClassList (char const* pattern)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
       if (plen == 0 || strncasecmp(pattern, s, plen) == 0)
-        v->Push(csStrNew(s));
+        v->Push (s);
     }
   }
   csRef<iStringArray> iv (SCF_QUERY_INTERFACE(v, iStringArray));

@@ -168,7 +168,7 @@ static void AppendStrVecString (iStringArray*& strings, const char* str)
   {
     strings = new scfStringArray ();
   }
-  strings->Push (csStrNew (str));
+  strings->Push (str);
 }
 
 static void AppendWin32Error (const char* text,
@@ -459,11 +459,11 @@ void InternalScanPluginDir (iStringArray*& messages,
 	  char* dot = strrchr (cspluginPath, '.');
 	  strcpy (dot, ".csplugin");
 
-          plugins->Push (csStrNew (cspluginPath));
+          plugins->Push (cspluginPath);
 	}
 	else
 	{
-          plugins->Push (csStrNew (fullPath));
+          plugins->Push (fullPath);
 	}
       }
     }

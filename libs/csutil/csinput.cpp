@@ -153,8 +153,11 @@ void csKeyboardDriver::DoKey (int iKey, int iChar, bool iDown)
       iChar = (iKey >= 32 && iKey <= 255) ? iKey : 0;
   }
 
-  Post(new csEvent (csGetTicks (),
-    iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask));
+  iEvent* event = new csEvent (csGetTicks (),
+    iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask);
+  Post (event);
+  // Post() IncRef()s event
+  event->DecRef ();
 }
 
 void csKeyboardDriver::SetKeyState (int iKey, bool iDown)
@@ -271,7 +274,10 @@ void csMouseDriver::DoMotion (int x, int y)
               | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
     LastX = x;
     LastY = y;
-    Post(new csEvent (csGetTicks (), csevMouseMove, x, y, 0, smask));
+    iEvent* event = new csEvent (csGetTicks (), csevMouseMove, x, y, 0, smask);
+    Post (event);
+    // Post() IncRef()s event
+    event->DecRef ();
   }
 }
 

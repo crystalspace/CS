@@ -48,11 +48,11 @@ bool cswinIsWinNT ()
   return GetWinVer ()->IsWinNT;
 }
 
-char* cswinGetErrorMessage (HRESULT code)
+wchar_t* cswinGetErrorMessageW (HRESULT code)
 {
   LPVOID lpMsgBuf;
   DWORD dwResult;
-  char* ret;
+  wchar_t* ret;
 
   if (cswinIsWinNT ())
   {
@@ -60,7 +60,7 @@ char* cswinGetErrorMessage (HRESULT code)
       0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR) &lpMsgBuf, 0, 0);
     if (dwResult != 0)
     {
-      ret = csStrNew ((wchar_t*)lpMsgBuf);
+      ret = csStrNewW ((wchar_t*)lpMsgBuf);
       LocalFree (lpMsgBuf);
     }
   }
@@ -70,22 +70,26 @@ char* cswinGetErrorMessage (HRESULT code)
       0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &lpMsgBuf, 0, 0);
     if (dwResult != 0)
     {
-      wchar_t* wmsg = cswinAnsiToWide ((char*)lpMsgBuf);
+      ret = cswinAnsiToWide ((char*)lpMsgBuf);
       LocalFree (lpMsgBuf);
-      ret = csStrNew (wmsg);
-      delete[] wmsg;
     }
   }
 
   if (dwResult == 0)
   {
     HRESULT fmError = GetLastError ();
-    const char fmErrMsg[] = "{FormatMessage() error %.8x}";
-    char msg[sizeof (fmErrMsg) + 8];
-    sprintf (msg, fmErrMsg, (uint)fmError);
-    ret = csStrNew (msg);
+    const wchar_t fmErrMsg[] = L"{FormatMessage() error %.8x}";
+    wchar_t msg[sizeof (fmErrMsg) + 8];
+    swprintf (msg, fmErrMsg, (uint)fmError);
+    ret = csStrNewW (msg);
   }
 
   return ret;
+}
+
+char* cswinGetErrorMessage (HRESULT code)
+{
+
+  return csStrNew (cswinGetErrorMessageW (code));
 }
 

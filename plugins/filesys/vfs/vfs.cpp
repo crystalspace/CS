@@ -411,10 +411,11 @@ SCF_IMPLEMENT_IBASE_END
 
 // files above this size are attempted to be mapped into memory, 
 // instead of accessed via 'normal' file operations
-#define VFS_DISKFILE_MAPPING_THRESHOLD_MIN	    1 //0
+#define VFS_DISKFILE_MAPPING_THRESHOLD_MIN	    0
 // same as above, but upper size limit
-#define VFS_DISKFILE_MAPPING_THRESHOLD_MAX	    0 //256*1024*1024
+#define VFS_DISKFILE_MAPPING_THRESHOLD_MAX	    256*1024*1024
 // disabled for now.
+// #define VFS_DISKFILE_MAPPING
 
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
@@ -478,6 +479,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     printf ("VFS: Successfully opened, handle = %d\n", fileno (file));
 #endif
 
+#if defined(VFS_DISKFILE_MAPPING) && defined(CS_HAS_MEMORY_MAPPED_IO)
   if ((Error == VFS_STATUS_OK) && (!writemode) && 
     (Size >= VFS_DISKFILE_MAPPING_THRESHOLD_MIN) &&
     (Size <= VFS_DISKFILE_MAPPING_THRESHOLD_MAX))
@@ -491,6 +493,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
       buffernt = false;
     }
   }
+#endif
 }
 
 DiskFile::~DiskFile ()
@@ -962,12 +965,12 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
       src [cl] = 0;
 
       rc = true;
-      UPathV.Push (csStrNew (src));
+      UPathV.Push (src);
 
       // Now parse and expand this path
       char rpath [CS_MAXPATHLEN + 1];
       Expand (Parent, rpath, src, CS_MAXPATHLEN);
-      RPathV.Push (csStrNew (rpath));
+      RPathV.Push (rpath);
       src = cur + 1;
     } /* endif */
 

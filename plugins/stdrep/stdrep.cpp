@@ -214,6 +214,8 @@ bool csReporterListener::Report (iReporter*, int severity,
   }
   if (dest_popup[severity])
   {
+    // cut away trailing '\n'
+    msg.Truncate (msg.Length () - 1);
     csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
     	new csTimedMessage (msg.GetData ()));
     csScopedMutexLock lock (mutex);

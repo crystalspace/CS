@@ -1,0 +1,405 @@
+/*
+    Copyright (C) 2003 by Jorrit Tyberghein
+	      (C) 2003 by Frank Richter
+	      (C) 1999 by Gary Haussmann
+			  Samuel Humphreys
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
+#include <GL/gl.h>
+#endif
+
+#include "cssys/csuctransform.h"
+#include "ivideo/fontserv.h"
+
+#include "glcommon2d.h"
+#include "glfontcache.h"
+
+//---------------------------------------------------------------------------
+
+csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) : cacheDataAlloc(512)
+{
+  csGLFontCache::G2D = G2D;
+
+  texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
+  texSize = MAX (texSize, 64);
+  maxTxts = G2D->config->GetInt ("Video.OpenGL.FontCache.MaxTextureNum", 16);
+  maxTxts = MAX (maxTxts, 1);
+}
+
+csGLFontCache::~csGLFontCache ()
+{
+  CleanupCache ();
+
+  G2D->statecache->SetTexture (GL_TEXTURE_2D, 0);
+  int tex;
+  for (tex = 0; tex < textures.Length (); tex++)
+  {
+    glDeleteTextures (1, &textures[tex].handle);
+  }
+  textures.DeleteAll ();
+}
+
+csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
+  KnownFont* font, utf32_char glyph)
+{
+  int w, h, adv, left, top;
+  font->font->GetGlyphSize (glyph, w, h, adv, left, top);
+  csRect texRect;
+  csSubRect2* sr = 0;
+
+  int tex = 0;
+  while (tex < textures.Length ())
+  {
+    sr = textures[tex].glyphRects->Alloc (w, h, texRect);
+    if (sr != 0)
+    {
+      break;
+    }
+    tex++;
+  }
+  if ((sr == 0) && (textures.Length () < maxTxts))
+  {
+    tex = textures.Length ();
+    textures.SetLength (textures.Length () + 1);
+
+    textures[tex].InitRects (texSize);
+
+    glGenTextures (1, &textures[tex].handle);
+    G2D->statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    uint8* texImage = new uint8[texSize * texSize];
+#ifdef CS_DEBUG
+    uint8* p = texImage;
+    for (int y = 0; y < texSize; y++)
+    {
+      for (int x = 0; x < texSize; x++)
+      {
+	*p++ = 0x7f + (((x ^ y) & 1) << 7);
+      }
+    }
+#endif
+
+#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+    textures[tex].data = texImage;  
+#else
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
+      GL_ALPHA, GL_UNSIGNED_BYTE, texImage);
+    delete[] texImage;
+#endif
+
+    G2D->statecache->SetTexture (GL_TEXTURE_2D, 0);
+
+    sr = textures[tex].glyphRects->Alloc (w, h, texRect);
+  }
+  if (sr != 0)
+  {
+    GLGlyphCacheData* cacheData = cacheDataAlloc.Alloc ();
+    cacheData->w = w;
+    cacheData->h = h;
+    cacheData->adv = adv;
+    cacheData->left = left;
+    cacheData->top = top;
+    cacheData->subrect = sr;
+    cacheData->texNum = tex;
+    cacheData->font = font;
+    cacheData->glyph = glyph;
+    cacheData->tx1 = (float)texRect.xmin / (float)texSize;
+    cacheData->ty1 = (float)texRect.ymin / (float)texSize;
+    cacheData->tx2 = (float)texRect.xmax / (float)texSize;
+    cacheData->ty2 = (float)texRect.ymax / (float)texSize;
+
+    CopyGlyphData (font->font, glyph, tex, texRect);
+
+    return cacheData;
+  }
+  return 0;
+}
+
+void csGLFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
+{
+  GLGlyphCacheData* glCacheData = (GLGlyphCacheData*)cacheData;
+  textures[glCacheData->texNum].glyphRects->Reclaim (glCacheData->subrect);
+  cacheDataAlloc.Free (glCacheData);
+}
+
+void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex, 
+				   const csRect& rect)
+{
+  G2D->statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
+
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+
+  int gw, gh;
+  uint8* alphaData = font->GetGlyphAlphaBitmap (glyph, gw, gh);
+  if (alphaData)
+  {
+    CS_ASSERT (gw == rect.Width ());
+    CS_ASSERT (gh == rect.Height ());
+#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+    uint8* dest = textures[tex].data + (rect.ymin * texSize) + rect.xmin;
+    uint8* src = alphaData;
+    int ladd = texSize - gw;
+    int y;
+    for (y = 0; y < gh; y++)
+    {
+      memcpy (dest, src, gw);
+      dest += ladd;
+      src += gw;
+    }
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
+      GL_ALPHA, GL_UNSIGNED_BYTE, textures[tex].data);
+#else
+    glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, gw, gh, GL_ALPHA, 
+      GL_UNSIGNED_BYTE, alphaData);
+#endif
+  }
+  else
+  {
+    uint8* bitData = font->GetGlyphBitmap (glyph, gw, gh);
+
+    if (bitData)
+    {
+      CS_ASSERT (gw == rect.Width ());
+      CS_ASSERT (gh == rect.Height ());
+
+#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+      uint8* dest = textures[tex].data + (rect.ymin * texSize) + rect.xmin;
+      int ladd = texSize - gw;
+#else
+      alphaData = new uint8[gw * gh];
+      uint8* dest = alphaData;
+#endif
+      uint8* src = bitData;
+      uint8 byte = *src++;
+      int x, y;
+      for (y = 0; y < gh; y++)
+      {
+	for (x = 0; x < gw; x++)
+	{
+	  *dest++ = (byte & 0x80) ? 0xff : 0;
+	  if ((x & 7) == 7)
+	  {
+	    byte = *src++;
+	  }
+	  else
+	  {
+	    byte <<= 1;
+	  }
+	}
+#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+	dest += ladd;
+#endif
+	if ((gw & 7) != 0) byte = *src++;
+      }
+
+#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+      glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
+	GL_ALPHA, GL_UNSIGNED_BYTE, textures[tex].data);
+#else
+      glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, gw, gh, 
+	GL_ALPHA, GL_UNSIGNED_BYTE, alphaData);
+      delete[] alphaData;
+#endif
+    }
+  }
+}
+
+bool csGLFontCache::ClipRect (float x, float y,
+  float &x1, float &y1, float &x2, float &y2,
+  float &tx1, float &ty1, float &tx2, float &ty2)
+{
+  float nx1 = x1 + x, ny1 = y1 + y, nx2 = x2 + x, ny2 = y2 + y;
+  float ntx1 = tx1, nty1 = ty1, ntx2 = tx2, nty2 = ty2;
+
+  if ((nx1 > float (ClipX2)) || (nx2 < float (ClipX1))
+   || (ny1 > float (ClipY2)) || (ny2 < float (ClipY1)))
+      return false;
+
+  if (nx1 < ClipX1)
+    tx1 += (ntx2 - ntx1) * (ClipX1 - nx1) / (nx2 - nx1), x1 = ClipX1 - x;
+  if (nx2 > ClipX2)
+    tx2 -= (ntx2 - ntx1) * (nx2 - ClipX2) / (nx2 - nx1), x2 = ClipX2 - x;
+  if (tx2 <= tx1)
+    return false;
+
+  if (ny1 < ClipY1)
+    ty2 -= (nty2 - nty1) * (ClipY1 - ny1) / (ny2 - ny1), y1 = ClipY1 - y;
+  if (ny2 > ClipY2)
+    ty1 += (nty2 - nty1) * (ny2 - ClipY2) / (ny2 - ny1), y2 = ClipY2 - y;
+  if (ty2 <= ty1)
+    return false;
+
+  return true;
+}
+
+void csGLFontCache::Write (iFont *font, int x, int y, utf8_char* text)
+{
+  if (!text || !*text) return;
+
+  int maxwidth, maxheight;
+  font->GetMaxSize (maxwidth, maxheight);
+
+  KnownFont* knownFont = GetCachedFont (font);
+  if (knownFont == 0) knownFont = CacheFont (font);
+
+  y = y - maxheight;
+  if (y >= ClipY2) return;
+
+  glPushMatrix ();
+  glTranslatef (x, y, 0);
+
+  G2D->statecache->Enable_GL_BLEND ();
+  G2D->statecache->SetBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+/*
+  Those are better set up by BeginDraw() or so.
+
+  G2D->statecache->SetShadeModel (GL_FLAT);
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#ifdef CS_USE_NEW_RENDERER
+  glColorMask (true, true, true, true);
+#endif
+  */
+
+  GLuint lastTexture = (GLuint)-1;
+  int numverts = 0;
+
+  GLboolean vaenabled = glIsEnabled(GL_VERTEX_ARRAY);
+  GLboolean tcaenabled = glIsEnabled(GL_TEXTURE_COORD_ARRAY);
+  GLboolean caenabled = glIsEnabled(GL_COLOR_ARRAY);
+
+  if(vaenabled == GL_FALSE)
+    glEnableClientState(GL_VERTEX_ARRAY);
+  if(tcaenabled == GL_FALSE)
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  if(caenabled == GL_TRUE)
+    glDisableClientState(GL_COLOR_ARRAY);
+
+  int textLen = strlen ((char*)text);
+
+  if (wtTexcoords.Length () < (textLen * 4)) wtTexcoords.SetLength (textLen * 4);
+  if (wtVerts2d.Length () < (textLen * 4)) wtVerts2d.SetLength (textLen * 4);
+  glTexCoordPointer(2, GL_FLOAT, sizeof (csVector2), wtTexcoords.GetArray ());
+  glVertexPointer(2, GL_FLOAT, sizeof (csVector2), wtVerts2d.GetArray ());
+
+  float x1 = 0.0;
+
+  while (textLen > 0)
+  {
+    utf32_char glyph;
+    int skip = csUnicodeTransform::UTF8Decode (text, textLen, glyph, 0);
+    if (skip == 0) break;
+
+    text += skip;
+    textLen -= skip;
+
+    const GLGlyphCacheData* cacheData = 
+      (GLGlyphCacheData*)GetCacheData (knownFont, glyph);
+    if (cacheData == 0)
+    {
+      if (numverts != 0)
+      {
+	G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+	glDrawArrays(GL_QUADS, 0, numverts);
+	numverts = 0;
+      }
+      cacheData = (GLGlyphCacheData*)CacheGlyphUnsafe (knownFont, glyph);
+
+      GLuint newHandle = textures[cacheData->texNum].handle;
+      lastTexture = newHandle;
+    }
+    else
+    {
+      GLuint newHandle = textures[cacheData->texNum].handle;
+      if (lastTexture != newHandle) 
+      {
+	if (numverts != 0)
+	{
+	  G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+	  glDrawArrays(GL_QUADS, 0, numverts);
+	  numverts = 0;
+	}
+	lastTexture = newHandle;
+      }
+    }
+
+    float x_right, x2 = x_right = x1 + cacheData->w;
+    float tx1, tx2, ty1, ty2, y1, y2;
+
+    tx1 = cacheData->tx1;
+    tx2 = cacheData->tx2;
+    ty1 = cacheData->ty1;
+    ty2 = cacheData->ty2;
+    y1 = 0.0;
+    y2 = maxheight;
+
+    if (ClipRect (x, y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
+    {
+      wtTexcoords[numverts].x = tx1;
+      wtTexcoords[numverts].y = ty1;
+      wtVerts2d[numverts].x = x1;
+      wtVerts2d[numverts].y = y2;
+      numverts++;
+
+      wtTexcoords[numverts].x = tx2;
+      wtTexcoords[numverts].y = ty1;
+      wtVerts2d[numverts].x = x2;
+      wtVerts2d[numverts].y = y2;
+      numverts++;
+
+      wtTexcoords[numverts].x = tx2;
+      wtTexcoords[numverts].y = ty2;
+      wtVerts2d[numverts].x = x2;
+      wtVerts2d[numverts].y = y1;
+      numverts++;
+      
+      wtTexcoords[numverts].x = tx1;
+      wtTexcoords[numverts].y = ty2;
+      wtVerts2d[numverts].x = x1;
+      wtVerts2d[numverts].y = y1;
+      numverts++;
+    }
+
+    x1 = x_right;
+
+  }
+
+  if (numverts != 0)
+  {
+    G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+    glDrawArrays(GL_QUADS, 0, numverts);
+  }
+
+  if(vaenabled == GL_FALSE)
+    glDisableClientState(GL_VERTEX_ARRAY);
+  if(tcaenabled == GL_FALSE)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  if(caenabled == GL_TRUE)
+    glEnableClientState(GL_COLOR_ARRAY);
+
+  G2D->statecache->Disable_GL_BLEND ();
+  glPopMatrix ();
+}
