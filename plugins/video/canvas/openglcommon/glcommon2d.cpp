@@ -229,12 +229,6 @@ bool csGraphics2DGLCommon::BeginDraw ()
   return true;
 }
 
-void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
-{
-  csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
-  fontCache->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
-}
-
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
   GLubyte &oR, GLubyte &oG, GLubyte &oB)
 {

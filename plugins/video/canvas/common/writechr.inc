@@ -95,6 +95,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 
   int textLen = strlen ((char*)text);
   int charW, charH, advance = 0;
+  bool firstchar = true;
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -106,269 +107,323 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 
     SoftGlyphCacheData* cacheData = (SoftGlyphCacheData*)CacheGlyph 
       (knownFont, glyph);
-    charW = cacheData->w;
-    charH = cacheData->h;
-
-    int y = pen_y - cacheData->top;
-    
-    // If we are advancing more than the last char was wide, we have to
-    // fill the 'gap' with bg.
-    advance += cacheData->left;
-    if (bg >= 0)
+    if (!cacheData->hasGlyph) 
     {
-      while (advance > 0)
-      {
-	if (pen_x > ClipX2)
-	  return;
-  
-	int cury = y;
-	for (int i = 0; i < charH; i++, cury++)
-	{
-	  if ((cury < ClipY1) || (cury >= ClipY2)) continue;
-	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (pen_x, cury);
-	  *VRAM = bg;
-	}
-	pen_x++; advance--;
-      }
+      // fall back to the default glyph (CS_FONT_DEFAULT_GLYPH)
+      cacheData = (SoftGlyphCacheData*)CacheGlyph (knownFont, 
+        CS_FONT_DEFAULT_GLYPH);
+      if (!cacheData->hasGlyph) continue;
     }
 
-    int x = pen_x;
-    
-    if (x > ClipX2)
-      return;
-
-    // If character is completely outside the clipping rectangle, continue
-    if ((x + charW <= ClipX1) || (x >= ClipX2)
-     || (y + charH <= ClipY1) || (y >= ClipY2))
-      continue;
-      
 #ifdef WS_ALPHA_AVAILABLE
-    register uint8 *CharImageAlpha = cacheData->glyphDataAlpha;
+    register uint8 *CharImageAlpha = cacheData->glyphAlphaData;
 #else
     const int CharImageAlpha = 0;
 #endif
     register uint8 *CharImage = cacheData->glyphData;
     if ((!CharImage) && (!CharImageAlpha))
       continue;
-	
-    int cury = y;
 
-    // If character should not be clipped, go the fast path
-    if ((x < ClipX1) || (x + charW > ClipX2)
-    || (y < ClipY1) || (y + charH > ClipY2))
+    iFont::BitmapMetrics* bmetrics;
+    if (CharImageAlpha)
     {
-      // Perform full clipping
-      int lX = x < ClipX1 ? ClipX1 - x : 0;
-      int rX = x + charW >= ClipX2 ? ClipX2 - x : charW;
-#ifdef WS_ALPHA_AVAILABLE
-      int lBytes = CharImageAlpha ? lX : lX >> 3;
-      int shiftX = CharImageAlpha ? 0 : lX & 7;
-      int bbl = CharImageAlpha ? charW : (charW + 7) / 8; // bytes per line
-      int lAbsX = x + lX;
-      uint8 *p = CharImageAlpha ? CharImageAlpha - bbl : CharImage - bbl;
-#else
-      int lBytes = lX >> 3;
-      int shiftX = lX & 7;
-      int bbl = (charW + 7) / 8; // bytes per line
-      int lAbsX = x + lX;
-      uint8 *p = CharImage - bbl;
-#endif
-      
-#ifdef WS_ALPHA_AVAILABLE
-      if (CharImageAlpha)
+      bmetrics = &cacheData->alphaMetrics;
+    }
+    else
+    {
+      bmetrics = &cacheData->bitmapMetrics;
+    }
+    charW = bmetrics->width;
+    charH = bmetrics->height;
+    
+    int y = pen_y - bmetrics->top;
+    
+    // If we are advancing more than the last char was wide, we have to
+    // fill the 'gap' with bg.
+    
+    int x = pen_x - (advance > 0 ? advance : 0) + (bmetrics->left < 0 ? bmetrics->left : 0);
+    advance += bmetrics->left;
+    
+    // Hack: in case the first char has a negative left bitmap offset,
+    // some of the background isn't drawn. Fix that.
+    if (firstchar)
+    {
+      if (advance < 0)
       {
-	for (int i = 0; i < charH; i++, cury++)
-	{
-	  p += bbl;
-	  if ((cury < ClipY1) || (cury >= ClipY2)) continue;
-	  CharImageAlpha = p + lBytes;
-	  register uint8 CharLine = (*CharImageAlpha++) << shiftX;
-	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
-	  // If we are advancing less than the last char was wide, the current
-	  // and last chars overlap. So we can't draw opaque, but have to draw
-	  // transparent instead.
-	  if ((bg >= 0) && (advance >= 0))
-	  {
-	    for (int j = lX; j < rX; j++)
-	    {
-	      if (CharLine == 0xff)
-	      {
-	        *VRAM = fg;
-	      }
-	      else if (CharLine == 0x00)
-	      {
-	        *VRAM = bg;
-	      }
-	      else
-	      {
-		WS_ALPHABLEND_BG(fg, VRAM, CharLine)
-	      }
-	      VRAM++;
-	      CharLine = (*CharImageAlpha++);
-	    } /* endfor */
-	  }
-	  else
-	  {
-	    for (int j = lX; j < rX; j++)
-	    {
-	      if (CharLine == 0xff)
-	      {
-	        *VRAM = fg;
-	      }
-	      else if (CharLine != 0x00)
-	      {
-		WS_ALPHABLEND(fg, VRAM, CharLine)
-	      }
-	      VRAM++;
-	      CharLine = (*CharImageAlpha++);
-	    } /* endfor */
-	    if (advance < 0) advance++;
-	  }
-	}
+	advance = 0;
       }
-      else
-#endif
+      firstchar = false;
+    }
+   
+    if (bg >= 0)
+    {
+      while (advance > 0)
       {
+	if (x >= ClipX2)
+	  return;
+  
+	int cury = y;
 	for (int i = 0; i < charH; i++, cury++)
 	{
-	  p += bbl;
 	  if ((cury < ClipY1) || (cury >= ClipY2)) continue;
-	  CharImage = p + lBytes;
-	  register uint8 CharLine = (*CharImage++) << shiftX;
-	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
-	  if (bg >= 0)
-	  {
-	    for (int j = lX; j < rX; j++)
-	    {
-	      if (advance >= 0)
-	      {
-	        *VRAM++ = (CharLine & 0x80) ? fg : bg;
-	      }
-	      else
-	      {
-		if (CharLine & 0x80)
-		  *VRAM++ = fg;
-		else
-		  VRAM++;
-		advance++;
-	      }
-	      if ((j & 7) == 7)
-		CharLine = (*CharImage++);
-	      else
-		CharLine += CharLine;
-	    } /* endfor */
-	  }
-	  else
-	  {
-	    for (int j = lX; j < rX; j++)
-	    {
-	      if (CharLine & 0x80)
-		*VRAM++ = fg;
-	      else
-		VRAM++;
-	      if ((j & 7) == 7)
-		CharLine = (*CharImage++);
-	      else
-		CharLine += CharLine;
-	    } /* endfor */
-	  }
+	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (x, cury);
+	  if (x >= ClipX1) *VRAM = bg;
 	}
+	x++; advance--;
       }
     }
     else
     {
-#ifdef WS_ALPHA_AVAILABLE
-      if (CharImageAlpha)
+      if (advance > 0)
       {
-	for (int i = 0; i < charH; i++, cury++)
+	x += advance;
+	advance = 0;
+      }
+    }
+
+    if (x >= ClipX2)
+      return;
+
+    // If character is completely outside the clipping rectangle, continue
+    if (!((x + charW <= ClipX1) || (x >= ClipX2)
+     || (y + charH <= ClipY1) || (y >= ClipY2)))
+    {
+      int cury = y;
+  
+      int oldAdvance = advance;
+      // If character should not be clipped, go the fast path
+      if ((x < ClipX1) || (x + charW >= ClipX2)
+       || (y < ClipY1) || (y + charH >= ClipY2))
+      {
+	// Perform full clipping
+	int lX = x < ClipX1 ? ClipX1 - x : 0;
+	int rX = x + charW >= ClipX2 ? ClipX2 - x : charW;
+  #ifdef WS_ALPHA_AVAILABLE
+	int lBytes = CharImageAlpha ? lX : lX >> 3;
+	int shiftX = CharImageAlpha ? 0 : lX & 7;
+	int bbl = CharImageAlpha ? charW : (charW + 7) / 8; // bytes per line
+	int lAbsX = x + lX;
+	uint8 *p = CharImageAlpha ? CharImageAlpha - bbl : CharImage - bbl;
+  #else
+	int lBytes = lX >> 3;
+	int shiftX = lX & 7;
+	int bbl = (charW + 7) / 8; // bytes per line
+	int lAbsX = x + lX;
+	uint8 *p = CharImage - bbl;
+  #endif
+	
+  #ifdef WS_ALPHA_AVAILABLE
+	if (CharImageAlpha)
 	{
-	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (x, cury);
-	  register unsigned pixW = charW;
-	  if (bg < 0)
+	  for (int i = 0; i < charH; i++, cury++)
 	  {
-	    register int pix;
-	    for (pix = pixW; pix > 0; pix--)
+	    advance = oldAdvance;
+	    p += bbl;
+	    if ((cury < ClipY1) || (cury >= ClipY2)) 
 	    {
-	      register uint8 CharLine = (*CharImageAlpha++);
-	      if (CharLine == 0xff)
-	      {
-		*VRAM = fg;
-	      }
-	      else if (CharLine != 0x00)
-	      {
-		WS_ALPHABLEND(fg, VRAM, CharLine)
-	      }
-	      VRAM++;
+	      if (advance < 0) advance = MIN(0, advance + (rX - lX));
+	      continue;
 	    }
-	  }
-	  else
-	  {
-	    register int pix;
-	    for (pix = pixW; pix > 0; pix--)
+	    CharImageAlpha = p + lBytes;
+	    register uint8 CharLine = (*CharImageAlpha++) << shiftX;
+	    register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
+	    // If we are advancing less than the last char was wide, the current
+	    // and last chars overlap. So we can't draw opaque, but have to draw
+	    // transparent instead.
+	    if ((bg >= 0) && (advance >= 0))
 	    {
-	      register uint8 CharLine = (*CharImageAlpha++);
-	      if (CharLine == 0xff)
+	      for (int j = lX; j < rX; j++)
 	      {
-		*VRAM = fg;
-	      }
-	      else if (CharLine == 0x00)
+		if (CharLine == 0xff)
+		{
+		  *VRAM = fg;
+		}
+		else if (CharLine == 0x00)
+		{
+		  *VRAM = bg;
+		}
+		else
+		{
+		  WS_ALPHABLEND_BG(fg, VRAM, CharLine)
+		}
+		VRAM++;
+		CharLine = (*CharImageAlpha++);
+	      } /* endfor */
+	    }
+	    else
+	    {
+	      for (int j = lX; j < rX; j++)
 	      {
-		*VRAM = bg;
-	      }
-	      else
-	      {
-		WS_ALPHABLEND_BG(fg, VRAM, CharLine)
-	      }
-	      VRAM++;
+		if (CharLine == 0xff)
+		{
+		  *VRAM = fg;
+		}
+		else if (CharLine != 0x00)
+		{
+		  WS_ALPHABLEND(fg, VRAM, CharLine)
+		}
+		VRAM++;
+		CharLine = (*CharImageAlpha++);
+	      } /* endfor */
+	      if (advance < 0) advance++;
 	    }
 	  }
 	}
-      }
-      else
-#endif
-      {
-	for (int i = 0; i < charH; i++, cury++)
+	else
+  #endif
 	{
-	  register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (x, cury);
-	  register unsigned pixW = charW;
-	  if (bg < 0)
-	    while (pixW)
+	  for (int i = 0; i < charH; i++, cury++)
+	  {
+	    advance = oldAdvance;
+	    p += bbl;
+	    if ((cury < ClipY1) || (cury >= ClipY2))
 	    {
-	      register unsigned char CharLine = *CharImage++;
-	      register int pix;
-	      for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
+	      if (advance < 0) advance = MIN(0, advance + (rX - lX));
+	      continue;
+	    }
+	    CharImage = p + lBytes;
+	    register uint8 CharLine = (*CharImage++) << shiftX;
+	    register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
+	    if (bg >= 0)
+	    {
+	      for (int j = lX; j < rX; j++)
+	      {
+		if (advance >= 0)
+		{
+		  *VRAM++ = (CharLine & 0x80) ? fg : bg;
+		}
+		else
+		{
+		  if (CharLine & 0x80)
+		    *VRAM++ = fg;
+		  else
+		    VRAM++;
+		  advance++;
+		}
+		if ((j & 7) == 7)
+		  CharLine = (*CharImage++);
+		else
+		  CharLine += CharLine;
+	      } /* endfor */
+	    }
+	    else
+	    {
+	      for (int j = lX; j < rX; j++)
 	      {
 		if (CharLine & 0x80)
 		  *VRAM++ = fg;
 		else
 		  VRAM++;
-		// Addition is faster than shift, at least on i586+
-		CharLine += CharLine;
-	      }
-	      VRAM += pix;
+		if ((j & 7) == 7)
+		  CharLine = (*CharImage++);
+		else
+		  CharLine += CharLine;
+		if (advance < 0) advance++;
+	      } /* endfor */
 	    }
-	  else
+	  }
+	}
+      }
+      else
+      {
+	// no clipping
+  #ifdef WS_ALPHA_AVAILABLE
+	if (CharImageAlpha)
+	{
+	  for (int i = 0; i < charH; i++, cury++)
+	  {
+	    advance = oldAdvance;
+	    register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (x, cury);
+	    register unsigned pixW = charW;
+	    register int pix;
+	    for (pix = pixW; pix > 0; pix--)
+	    {
+	      register uint8 CharLine = (*CharImageAlpha++);
+	      if ((bg < 0) || (advance < 0))
+	      {
+		if (CharLine == 0xff)
+		{
+		  *VRAM = fg;
+		}
+		else if (CharLine != 0x00)
+		{
+		  WS_ALPHABLEND(fg, VRAM, CharLine)
+		}
+	      }
+	      else
+	      {
+		if (CharLine == 0xff)
+		{
+		  *VRAM = fg;
+		}
+		else if (CharLine == 0x00)
+		{
+		  *VRAM = bg;
+		}
+		else
+		{
+		  WS_ALPHABLEND_BG(fg, VRAM, CharLine)
+		}
+	      }
+	      if (advance < 0) advance++;
+	      VRAM++;
+	    }
+	  }
+	}
+	else
+  #endif
+	{
+	  for (int i = 0; i < charH; i++, cury++)
+	  {
+	    register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (x, cury);
+	    register unsigned pixW = charW;
 	    while (pixW)
 	    {
 	      register unsigned char CharLine = *CharImage++;
 	      register int pix;
 	      for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
 	      {
-		*VRAM++ = (CharLine & 0x80) ? fg : bg;
-		// Addition is faster than shift, at least on i586+
-		CharLine += CharLine;
+		if ((bg < 0) || (advance < 0))
+		{
+		  if (CharLine & 0x80)
+		    *VRAM++ = fg;
+		  else
+		    VRAM++;
+		  // Addition is faster than shift, at least on i586+
+		  CharLine += CharLine;
+		}
+		else
+		{
+		  *VRAM++ = (CharLine & 0x80) ? fg : bg;
+		  // Addition is faster than shift, at least on i586+
+		  CharLine += CharLine;
+		}
+		if (advance < 0) advance++;
+	      } /* endfor */
+	      if (advance < 0)
+	      {
+		VRAM -= advance;
+		pix += advance;
 	      }
-	      while (pix--)
-		*VRAM++ = bg;
-	    }
-	} /* endfor */
-      }
-    } /* endif */
+	      if (bg < 0)
+	      {
+		VRAM += pix;
+	      }
+	      else
+	      {
+		while (pix--)
+		  *VRAM++ = bg;
+	      }
+	    } 
+	  } 
+	}
+      } /* endif */
+    }
 
-    pen_x -= cacheData->left;
-    pen_x += MIN(cacheData->adv, charW);
-    advance += cacheData->adv - charW;
+    pen_x += cacheData->glyphMetrics.advance;
+    advance += cacheData->glyphMetrics.advance - (charW + bmetrics->left);
   }
+  PurgeEmptyPlanes (knownFont);
 }
 
 #undef WS_NAME

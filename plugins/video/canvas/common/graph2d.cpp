@@ -924,7 +924,6 @@ bool csGraphics2D::Resize (int w, int h)
     // Still in Initialization phase, configuring size of canvas
     Width = w;
     Height = h;
-    SetClipRect (0, 0, Width, Height);
     return true;
   }
 

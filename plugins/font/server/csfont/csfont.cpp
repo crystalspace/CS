@@ -20,8 +20,12 @@
 
 #include "cssysdef.h"
 #include "csfont.h"
+#include "cssys/csuctransform.h"
+#include "cssys/csendian.h"
 #include "iutil/vfs.h"
 #include "csutil/util.h"
+#include "csutil/databuf.h"
+#include "csutil/garray.h"
 #include "iutil/objreg.h"
 #include "iutil/comp.h"
 #include "ivaria/reporter.h"
@@ -33,26 +37,35 @@
 
 CS_IMPLEMENT_PLUGIN
 
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csParasiticDataBuffer)
+  SCF_IMPLEMENTS_INTERFACE (iDataBuffer)
+SCF_IMPLEMENT_IBASE_END
+
+//---------------------------------------------------------------------------
+
 struct csFontDef
 {
   char *Name;
-  int Width;
   int Height;
-  int First;
-  int Glyphs;
   int Baseline;
-  int Alpha;
   uint8 *FontBitmap;
+  size_t bitmapSize;
   uint8 *IndividualWidth;
-  uint8 *FontAlpha;
+  csDefaultFont::CharRange* ranges;
 };
 
 static csFontDef const FontList [] =
 {
-  { CSFONT_LARGE,	8, 8, 0, 256, 1, 0, font_Police,  width_Police,  0	},
-  { CSFONT_ITALIC,	8, 8, 0, 256, 1, 0, font_Italic,  width_Italic,  0	},
-  { CSFONT_COURIER,	7, 8, 0, 256, 1, 0, font_Courier, width_Courier, 0	},
-  { CSFONT_SMALL,	4, 6, 0, 256, 1, 0, font_Tiny,    width_Tiny,    0	}
+  { CSFONT_LARGE,	8, 1, font_Police,  sizeof (font_Police),  
+    width_Police,  ranges_Police  },
+  { CSFONT_ITALIC,	8, 1, font_Italic,  sizeof (font_Italic),  
+    width_Italic,  ranges_Italic  },
+  { CSFONT_COURIER,	8, 1, font_Courier, sizeof (font_Courier),  
+    width_Courier, ranges_Courier },
+  { CSFONT_SMALL,	6, 1, font_Tiny,    sizeof (font_Tiny),  
+    width_Tiny,    ranges_Tiny    }
 };
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
@@ -98,12 +111,41 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
   if (filename [0] == '*')
   {
     for (i = 0; i < FontListCount; i++)
+    {
       if (!strcmp (filename, FontList [i].Name))
-        return new csDefaultFont (this, FontList [i].Name,
-          FontList [i].First, FontList [i].Glyphs,
-          FontList [i].Width, FontList [i].Height, FontList [i].Baseline,
-          FontList [i].FontBitmap, FontList [i].IndividualWidth,
-          FontList [i].FontAlpha);
+      {
+	int numRanges = 0;
+	int numGlyphs = 0;
+
+	while (FontList [i].ranges[numRanges].charCount != 0)
+	{
+	  numGlyphs += FontList [i].ranges[numRanges].charCount;
+	  numRanges++;
+	}
+	csDirtyAccessArray<iFont::BitmapMetrics> bMetrics;
+	bMetrics.SetLength (numGlyphs);
+	csDirtyAccessArray<iFont::GlyphMetrics> gMetrics;
+	gMetrics.SetLength (numGlyphs);
+	int j;
+	for (j = 0; j < numGlyphs; j++)
+	{
+	  bMetrics[j].width = FontList [i].IndividualWidth[j];
+	  bMetrics[j].height = FontList [i].Height;
+	  bMetrics[j].left = 0;
+	  bMetrics[j].top = FontList [i].Height - FontList [i].Baseline;
+	  gMetrics[j].advance = FontList [i].IndividualWidth[j];
+	}
+
+	csRef<iDataBuffer> db;
+	db.AttachNew (new csDataBuffer ((char*)FontList[i].FontBitmap,
+	  FontList[i].bitmapSize, false));
+        return new csDefaultFont (this,	FontList [i].Name,
+          FontList [i].ranges,
+	  FontList [i].Height, FontList [i].Height-FontList [i].Baseline,
+	  FontList [i].Baseline,
+	  gMetrics.GetArray (), db, bMetrics.GetArray ());
+      }
+    }
   }
   else
   {
@@ -149,16 +191,16 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
-  csRef<iDataBuffer> fntfile (VFS->ReadFile (file));
+  csRef<iDataBuffer> fntfile (VFS->ReadFile (file, false));
   if (!fntfile)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.font.csfont",
       	"Could not read font file %s.", file);
     return 0;
   }
 
-  char *data = **fntfile;
+  char *data = fntfile->GetData ();
   if (data [0] != 'C' || data [1] != 'S' ||  data [2] != 'F')
   {
 error:
@@ -167,8 +209,16 @@ error:
 
   /// the new fontdef to store info into
   csFontDef fontdef;
+  csString fontdefName;
+  bool hasCharRanges = false;
+  bool hasBitmapMetrics = false;
+  bool hasGlyphAdvance = false;
+  int ascent = 0;
+  int descent = 0;
   memset (&fontdef, 0, sizeof (fontdef));
-  fontdef.Glyphs = 256;
+  int fontdefGlyphs = 256;
+  int fontdefFirst = 0;
+  bool fontdefAlpha = false;
 
   char *end = strchr (data, '\n');
   char *cur = strchr (data, '[');
@@ -202,7 +252,8 @@ error:
       char *start = cur;
       while ((cur < end) && (*cur != ' '))
         cur++;
-      fontdef.Name = new char [cur - start + 1];
+      fontdefName.SetCapacity (cur - start);
+      fontdef.Name = fontdefName.GetData ();
       memcpy (fontdef.Name, start, cur - start);
       fontdef.Name [cur - start] = 0;
     }
@@ -216,49 +267,238 @@ error:
       int n = atoi (val);
 
       if (!strcmp (kw, "Width"))
-        fontdef.Width = n;
+	/* ignore */;
       else if (!strcmp (kw, "Height"))
         fontdef.Height = n;
       else if (!strcmp (kw, "Baseline"))
         fontdef.Baseline = n;
       else if (!strcmp (kw, "First"))
-        fontdef.First = n;
+        fontdefFirst = n;
       else if (!strcmp (kw, "Glyphs"))
-        fontdef.Glyphs = n;
+        fontdefGlyphs = n;
       else if (!strcmp (kw, "Alpha"))
-        fontdef.Alpha = n;
+        fontdefAlpha = (n != 0);
+      else if (!strcmp (kw, "Ascent"))
+	ascent = n;
+      else if (!strcmp (kw, "Descent"))
+	descent = n;
+      else if (!strcmp (kw, "HasCharRanges"))
+	hasCharRanges = (n != 0);
+      else if (!strcmp (kw, "HasBitmapMetrics"))
+	hasBitmapMetrics = (n != 0);
+      else if (!strcmp (kw, "HasGlyphAdvance"))
+	hasGlyphAdvance = (n != 0);
+      else
+      {
+	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.font.csfont",
+      	  "Unrecognized property '%s' in font file %s.", kw, file);
+      }
+
     }
   }
 
-#if defined(CS_DEBUG)
-  printf("Reading Font %s, width %d, height %d, baseline %d, First %d, %d Glyphs.\n",
-    fontdef.Name, fontdef.Width, fontdef.Height, fontdef.Baseline, fontdef.First, fontdef.Glyphs);
-#endif
+  bool newStyleFont = (hasCharRanges | hasBitmapMetrics | hasGlyphAdvance);
 
-  fontdef.IndividualWidth = new uint8 [fontdef.Glyphs];
-  memcpy (fontdef.IndividualWidth, binary, fontdef.Glyphs);
-
-  // Compute the font size
-  int c, fontsize = 0, alphasize = 0;
-  for (c = 0; c < fontdef.Glyphs; c++)
+  if (newStyleFont)
   {
-    fontsize += ((fontdef.IndividualWidth [c] + 7) / 8) * fontdef.Height;
-    alphasize += fontdef.IndividualWidth[c] * fontdef.Height;
+  #if defined(CS_DEBUG)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.font.csfont",
+      "Reading new style Font %s.",
+      fontdef.Name);
+  #endif
+    csDirtyAccessArray<iFont::BitmapMetrics> bMetrics;
+    csDirtyAccessArray<iFont::BitmapMetrics> aMetrics;
+    csDirtyAccessArray<iFont::GlyphMetrics> gMetrics;
+    csDirtyAccessArray<csDefaultFont::CharRange> ranges;
+
+    int numGlyphs = 0;
+    if (hasCharRanges)
+    {
+      int numRanges = 0;
+      do
+      {
+	ranges.GetExtend (numRanges).startChar = get_le_long (binary);
+	binary += 4;
+	ranges[numRanges].charCount = get_le_long (binary);
+	binary += 4;
+	numGlyphs += ranges[numRanges].charCount;
+	numRanges++;
+      } 
+      while (ranges[numRanges - 1].charCount != 0);
+    }
+    else
+    {
+      if (fontdefGlyphs == 0)
+      {
+	csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.font.csfont",
+	  "Malformed font %s: neither 'Glyphs' nor 'HasCharRanges' property",
+	  fontdef.Name);
+	return 0;
+      }
+      ranges.SetLength (2);
+      ranges[0].startChar = fontdefFirst;
+      ranges[0].charCount = fontdefGlyphs;
+      ranges[1].startChar = 0;
+      ranges[1].charCount = 0;
+      numGlyphs = fontdefGlyphs;
+    }
+
+    size_t bitmapSize = 0;
+    size_t alphaSize = 0;
+    bMetrics.SetLength (numGlyphs);
+    aMetrics.SetLength (numGlyphs);
+    if (hasBitmapMetrics)
+    {
+      int j;
+      for (j = 0; j < numGlyphs; j++)
+      {
+	memset (&(bMetrics[j]), 0, sizeof (iFont::BitmapMetrics));
+	bMetrics[j].width = get_le_long (binary);
+	binary += 4;
+	bMetrics[j].height = get_le_long (binary);
+	binary += 4;
+	bMetrics[j].left = get_le_long (binary);
+	binary += 4;
+	bMetrics[j].top = get_le_long (binary);
+	binary += 4;
+	bitmapSize += ((bMetrics[j].width + 7) / 8) * bMetrics[j].height;
+      }
+      if (fontdefAlpha)
+      {
+	for (j = 0; j < numGlyphs; j++)
+	{
+	  memset (&(aMetrics[j]), 0, sizeof (iFont::BitmapMetrics));
+	  aMetrics[j].width = get_le_long (binary);
+	  binary += 4;
+	  aMetrics[j].height = get_le_long (binary);
+	  binary += 4;
+	  aMetrics[j].left = get_le_long (binary);
+	  binary += 4;
+	  aMetrics[j].top = get_le_long (binary);
+	  binary += 4;
+	  alphaSize += bMetrics[j].width * bMetrics[j].height;
+	}
+      }
+    }
+    else
+    {
+      uint8* individualWidths = (uint8*)binary;
+      int j;
+      for (j = 0; j < numGlyphs; j++)
+      {
+	memset (&(bMetrics[j]), 0, sizeof (iFont::BitmapMetrics));
+	bMetrics[j].width = individualWidths[j];
+	bMetrics[j].height = fontdef.Height;
+	bMetrics[j].left = 0;
+	bMetrics[j].top = ascent;
+
+	if (fontdefAlpha)
+	{
+	  memcpy (&(aMetrics[j]), &(bMetrics[j]), 
+	    sizeof (iFont::BitmapMetrics));
+	}
+	bitmapSize += ((individualWidths[j] + 7) / 8) * fontdef.Height;
+	alphaSize += individualWidths[j] * fontdef.Height;
+      }
+      binary += numGlyphs;
+    }
+
+    gMetrics.SetLength (numGlyphs);
+    if (hasGlyphAdvance)
+    {
+      int j;
+      for (j = 0; j < numGlyphs; j++)
+      {
+	memset (&(gMetrics[j]), 0, sizeof (iFont::GlyphMetrics));
+	gMetrics[j].advance = get_le_long (binary);
+	binary += 4;
+      }
+    }
+    else
+    {
+      int j;
+      for (j = 0; j < numGlyphs; j++)
+      {
+	memset (&(gMetrics[j]), 0, sizeof (iFont::GlyphMetrics));
+	gMetrics[j].advance = bMetrics[j].width;
+      }
+    }
+
+    size_t bitmapOffs = binary - data;
+    csRef<iDataBuffer> bitmapData = csPtr<iDataBuffer> 
+      (new csParasiticDataBuffer (fntfile, bitmapOffs,
+        bitmapSize));
+
+    csRef<iDataBuffer> alphaData;
+    if (fontdefAlpha)
+    {
+      alphaData.AttachNew (new csParasiticDataBuffer (fntfile, 
+	bitmapOffs + bitmapSize, alphaSize));
+    }
+    return new csDefaultFont (this, fontdef.Name, ranges.GetArray (), 
+      fontdef.Height, ascent, descent,
+      gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
+      alphaData, fontdefAlpha ? aMetrics.GetArray () : 0);
   }
-
-  // allocate memory and copy the font
-  fontdef.FontBitmap = new uint8 [fontsize];
-  memcpy (fontdef.FontBitmap, binary + fontdef.Glyphs, fontsize);
-
-  // allocate memory and copy the font alpha
-  if (fontdef.Alpha)
+  else
   {
-    fontdef.FontAlpha = new uint8 [alphasize];
-    memcpy (fontdef.FontAlpha, binary + fontdef.Glyphs + fontsize, alphasize);
-  }
+  #if defined(CS_DEBUG)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.font.csfont",
+      "Reading old style Font %s, height %d, baseline %d, First %d, %d Glyphs", 
+      fontdef.Name, fontdef.Height, fontdef.Baseline, fontdefFirst, 
+      fontdefGlyphs);
+  #endif
 
-  return new csDefaultFont (this, fontdef.Name, fontdef.First, fontdef.Glyphs,
-    fontdef.Width, fontdef.Height, fontdef.Baseline, fontdef.FontBitmap, fontdef.IndividualWidth, fontdef.FontAlpha);
+    uint8* individualWidths = (uint8*)binary;
+    csDirtyAccessArray<iFont::BitmapMetrics> bMetrics;
+    bMetrics.SetLength (fontdefGlyphs);
+    csDirtyAccessArray<iFont::GlyphMetrics> gMetrics;
+    gMetrics.SetLength (fontdefGlyphs);
+    int j;
+    for (j = 0; j < fontdefGlyphs; j++)
+    {
+      bMetrics[j].width = individualWidths[j];
+      bMetrics[j].height = fontdef.Height;
+      bMetrics[j].left = 0;
+      bMetrics[j].top = fontdef.Height - fontdef.Baseline;
+      gMetrics[j].advance = individualWidths[j];
+    }
+
+    // Compute the font size
+    int c, fontsize = 0, alphasize = 0;
+    for (c = 0; c < fontdefGlyphs; c++)
+    {
+      fontsize += ((individualWidths [c] + 7) / 8) * fontdef.Height;
+      alphasize += individualWidths [c] * fontdef.Height;
+    }
+
+    size_t binOffs = binary - data;
+
+    csRef<iDataBuffer> bitmapData = csPtr<iDataBuffer> 
+      (new csParasiticDataBuffer (fntfile, binOffs + fontdefGlyphs,
+        fontsize));
+
+    csDefaultFont::CharRange ranges[2];
+    ranges[0].startChar = fontdefFirst;
+    ranges[0].charCount = fontdefGlyphs;
+    ranges[1].startChar = 0;
+    ranges[1].charCount = 0;
+
+    csRef<iDataBuffer> alphaData;
+    if (fontdefAlpha)
+    {
+      alphaData.AttachNew (new csParasiticDataBuffer (fntfile, 
+	binOffs + fontdefGlyphs + fontsize, alphasize));
+    }
+    return new csDefaultFont (this, fontdef.Name, ranges, fontdef.Height,
+      fontdef.Height - fontdef.Baseline, fontdef.Baseline,
+      gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
+      alphaData, fontdefAlpha ? bMetrics.GetArray () : 0);
+  }
 }
 
 
@@ -268,55 +508,83 @@ SCF_IMPLEMENT_IBASE (csDefaultFont)
   SCF_IMPLEMENTS_INTERFACE (iFont)
 SCF_IMPLEMENT_IBASE_END
 
-csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
-  int first, int glyphs, int width, int height, int baseline, uint8 *bitmap,
-  uint8 *individualwidth, uint8 *alpha) : DeleteCallbacks (4, 4)
+csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
+			      CharRange* glyphs, int height, 
+			      int ascent, int descent,
+			      GlyphMetrics* gMetrics,
+			      iDataBuffer* bitmap, BitmapMetrics* bMetrics,
+			      iDataBuffer* alpha, BitmapMetrics* aMetrics) 
+			      : DeleteCallbacks (4, 4)
 {
   SCF_CONSTRUCT_IBASE (parent);
   Parent = parent;
   Parent->NotifyCreate (this);
-  if (name [0] != '*')
-    Name = csStrNew (name);
-  else
-    Name = CONST_CAST(char*, name);
-  First = first;
-  Glyphs = glyphs;
-  Width = width;
+  Name = csStrNew (name);
+
   Height = height;
-  Baseline = baseline;
-  FontBitmap = bitmap;
-  IndividualWidth = individualwidth;
-  int i;
+  Ascent = ascent;
+  Descent = descent;
+  bitData = bitmap;
+  alphaData = alpha;
 
-  if (IndividualWidth)
+  int i = 0;
+  int n = 0;
+  size_t bOffs = 0, aOffs = 0;
+  MaxWidth = 0;
+  while (glyphs[n].charCount > 0)
   {
-    MaxWidth = 0;
-    for (i = 0; i < Glyphs; i++)
-      if (MaxWidth < IndividualWidth [i])
-        MaxWidth = IndividualWidth [i];
-  }
-  else
-    MaxWidth = Width;
-
-  uint8 *cur = bitmap;
-  GlyphBitmap = new uint8 * [Glyphs];
-  for (i = 0; i < Glyphs; i++)
-  {
-    GlyphBitmap [i] = cur;
-    cur += ((IndividualWidth [i] + 7) / 8) * Height;
-  }
-
-  GlyphAlphaBitmap = 0;
-  if (alpha != 0)
-  {
-    uint8 * cur = alpha;
-    GlyphAlphaBitmap = new uint8 * [Glyphs];
-    for (i=0; i<Glyphs; i++)
+    int numGlyphs = glyphs[n].charCount;
+    utf32_char glyph = glyphs[n].startChar;
+    while (numGlyphs > 0)
     {
-      GlyphAlphaBitmap[i] = cur;
-      cur += IndividualWidth[i] * Height;
+      int w = bMetrics[i].width + abs (bMetrics[i].left);
+      if (MaxWidth < w)
+        MaxWidth = w;
+      int bSize = ((bMetrics[i].width + 7) / 8) * bMetrics[i].height;
+      int aSize = 0;
+      if (aMetrics)
+      {
+	w = aMetrics[i].width + abs (aMetrics[i].left);
+	if (MaxWidth < w)
+	  MaxWidth = w;
+	aSize = aMetrics[i].width * aMetrics[i].height;
+      }
+
+      int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+	gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
+
+      if (Glyphs.Length () <= gidx1)
+      {
+	Glyphs.SetLength (gidx1 + 1);
+      }
+      PlaneGlyphs*& pg = Glyphs[gidx1];
+      if (pg == 0)
+      {
+	pg = new PlaneGlyphs;
+      }
+      Glyph& glyphData = pg->entries[gidx2];
+
+      glyphData.bitmapOffs = bOffs;
+      glyphData.bitmapSize = bSize;
+      bOffs += bSize;
+      memcpy (&glyphData.bMetrics, &(bMetrics[i]), sizeof (BitmapMetrics));
+      if (alpha)
+      {
+	glyphData.alphaOffs = aOffs;
+	glyphData.alphaSize = aSize;
+	aOffs += aSize;
+	memcpy (&glyphData.aMetrics, &(aMetrics[i]), sizeof (BitmapMetrics));
+      }
+
+      memcpy (&glyphData.gMetrics, &(gMetrics[i]), sizeof (GlyphMetrics));
+
+      glyph++;
+      numGlyphs--;
+      i++;
     }
+    n++;
   }
+
 }
 
 csDefaultFont::~csDefaultFont ()
@@ -329,14 +597,13 @@ csDefaultFont::~csDefaultFont ()
   }
 
   Parent->NotifyDelete (this);
-  if (Name [0] != '*')
+  delete [] Name;
+
+  for (int j = 0; j < Glyphs.Length(); j++)
   {
-    delete [] Name;
-    delete [] FontBitmap;
-    delete [] IndividualWidth;
+    delete Glyphs[j];
   }
-  delete [] GlyphBitmap;
-  delete [] GlyphAlphaBitmap;
+
 }
 
 void csDefaultFont::SetSize (int iSize)
@@ -355,156 +622,203 @@ void csDefaultFont::GetMaxSize (int &oW, int &oH)
   oH = Height;
 }
 
-bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH)
+bool csDefaultFont::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
 {
-  int chr = int (c) - First;
-  if ((chr < 0) || (chr > Glyphs))
-	chr = 0;
+  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
 
-  oW = IndividualWidth ? IndividualWidth [chr] : Width;
-  oH = Height;
+  if (Glyphs.Length () <= gidx1)
+  {
+    return false;
+  }
+  PlaneGlyphs*& pg = Glyphs[gidx1];
+  if (pg == 0)
+  {
+    return false;
+  }
+  Glyph& glyphData = pg->entries[gidx2];
+
+  if ((glyphData.bitmapSize == (size_t)~0) && 
+      (glyphData.alphaSize == (size_t)~0))
+  {
+    return false;
+  }
+
+  metrics = glyphData.gMetrics;
+
   return true;
 }
 
-bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
+    BitmapMetrics& metrics)
 {
-  int chr = int (c) - First;
-  if ((chr < 0) || (chr > Glyphs))
-	chr = 0;
+  if (bitData == 0) return 0;
 
-  oW = IndividualWidth ? IndividualWidth [chr] : Width;
-  oH = Height;
-  adv = oW;
-  left = 0;
-  top = Height-Baseline;
-  return true;
-}
+  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
 
-uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
-{
-  int chr = int (c) - First;
-  if ((chr < 0) || (chr > Glyphs))
-	chr = 0;
-
-  oW = IndividualWidth ? IndividualWidth [chr] : Width;
-  oH = Height;
-  return GlyphBitmap [chr];
-}
-
-uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
-{
-  int chr = int (c) - First;
-  if ((chr < 0) || (chr > Glyphs))
-    chr = 0;
-
-  oW = IndividualWidth ? IndividualWidth [chr] : Width;
-  oH = Height;
-  adv = oW;
-  left = 0;
-  top = Height-Baseline;
-  return GlyphBitmap [chr];
-}
-
-uint8 *csDefaultFont::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH)
-{
-  int chr = int (c) - First;
-  if ((chr < 0) || (chr > Glyphs))
-    chr = 0;
-
-  if (GlyphAlphaBitmap == 0)
+  if (Glyphs.Length () <= gidx1)
+  {
     return 0;
+  }
+  PlaneGlyphs*& pg = Glyphs[gidx1];
+  if (pg == 0)
+  {
+    return 0;
+  }
+  Glyph& glyphData = pg->entries[gidx2];
 
-  oW = IndividualWidth ? IndividualWidth[chr] : Width;
-  oH = Height;
-  return GlyphAlphaBitmap[chr];
+  if (glyphData.bitmapSize == (size_t)~0) return 0;
+
+  metrics = glyphData.bMetrics;
+
+  csParasiticDataBuffer* db = 
+    new csParasiticDataBuffer (bitData, glyphData.bitmapOffs, 
+    glyphData.bitmapSize);
+
+  return csPtr<iDataBuffer> (db);
 }
 
-uint8 *csDefaultFont::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+csPtr<iDataBuffer> csDefaultFont::GetGlyphAlphaBitmap (utf32_char c,
+    BitmapMetrics& metrics)
 {
-  int chr = int (c) - First;
-  if ((chr < 0) || (chr > Glyphs))
-    chr = 0;
+  if (alphaData == 0) return 0;
 
-  if (GlyphAlphaBitmap == 0)
+  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
+
+  if (Glyphs.Length () <= gidx1)
+  {
     return 0;
+  }
+  PlaneGlyphs*& pg = Glyphs[gidx1];
+  if (pg == 0)
+  {
+    return 0;
+  }
+  Glyph& glyphData = pg->entries[gidx2];
 
-  oW = IndividualWidth ? IndividualWidth[chr] : Width;
-  oH = Height;
-  adv = oW;
-  left = 0;
-  top = Height-Baseline;
-  return GlyphAlphaBitmap[chr];
+  if (glyphData.alphaSize == (size_t)~0) return 0;
+
+  metrics = glyphData.aMetrics;
+
+  csParasiticDataBuffer* db = 
+    new csParasiticDataBuffer (alphaData, glyphData.alphaOffs, 
+    glyphData.alphaSize);
+
+  return csPtr<iDataBuffer> (db);
 }
 
 void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH)
 {
-  oH = Height;
-  oW = 0;
-
-  const int n = strlen (text);
-  if (!IndividualWidth)
-    oW = n * Width;
-  else
-  {
-	int i;
-    for (i = 0; i < n; i++)
-    {
-      int chr = (*(uint8 *)text++) - First;
-      if ((chr >= 0) && (chr < Glyphs))
-        oW += IndividualWidth [chr];
-	  else
-		oW += IndividualWidth [0];
-    }
-  }
+  int dummy;
+  GetDimensions (text, oW, oH, dummy);
 }
 
-void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &desc)
+void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, 
+				   int &desc)
 {
   oH = Height;
   oW = 0;
+  desc = GetDescent ();
 
-  const int n = strlen (text);
-  if (!IndividualWidth)
-    oW = n * Width;
-  else
+  int defW = 0;
+  if (Glyphs.Length () > (CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT))
   {
-	int i;
-    for (i = 0; i < n; i++)
+    PlaneGlyphs* pg = Glyphs[(CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT)];
+    if (pg != 0)
     {
-      int chr = (*(uint8 *)text++) - First;
-      if ((chr >= 0) && (chr < Glyphs))
-        oW += IndividualWidth [chr];
-	  else
-		oW += IndividualWidth [0];
+      Glyph& glyphData = 
+	pg->entries[(CS_FONT_DEFAULT_GLYPH & GLYPH_INDEX_LOWER_MASK)];
+      if ((glyphData.bitmapSize != (size_t)~0) || 
+	(glyphData.alphaSize != (size_t)~0))
+	defW = glyphData.gMetrics.advance;
     }
   }
-  desc = Baseline;
-}
 
-void csDefaultFont::GetDimensions (const char *, int &, int &, int &, int &, int &)
-{
-  // @@@ Added to fix compile error
+  int textLen = strlen ((char*)text);
+  while (textLen > 0)
+  {
+    utf32_char glyph;
+    int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, 
+      glyph, 0);
+    if (skip == 0) break;
+
+    text += skip;
+    textLen -= skip;
+
+    int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+      gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
+
+    if (Glyphs.Length () <= gidx1)
+    {
+      oW += defW;
+      continue;
+    }
+    PlaneGlyphs* pg = Glyphs[gidx1];
+    if (pg == 0)
+    {
+      oW += defW;
+      continue;
+    }
+    Glyph& glyphData = pg->entries[gidx2];
+
+    if ((glyphData.bitmapSize != (size_t)~0) || 
+      (glyphData.alphaSize != (size_t)~0))
+      oW += glyphData.gMetrics.advance;
+    else
+      oW += defW;
+  }
 }
 
 int csDefaultFont::GetLength (const char *text, int maxwidth)
 {
-  if (!IndividualWidth)
-    return (strlen (text) * Width) / maxwidth;
+  int defW = 0;
+  if (Glyphs.Length () > (CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT))
+  {
+    PlaneGlyphs* pg = Glyphs[(CS_FONT_DEFAULT_GLYPH >> GLYPH_INDEX_UPPER_SHIFT)];
+    if (pg != 0)
+    {
+      Glyph& glyphData = 
+	pg->entries[(CS_FONT_DEFAULT_GLYPH & GLYPH_INDEX_LOWER_MASK)];
+      if ((glyphData.bitmapSize != (size_t)~0) || 
+	(glyphData.alphaSize != (size_t)~0))
+	defW = glyphData.gMetrics.advance;
+    }
+  }
 
   int n = 0;
-  while (*text)
+  int textLen = strlen ((char*)text);
+  while (textLen > 0)
   {
-    int chr = (*(uint8 *)text) - First;
- //   if ((chr >= 0) && (chr < Glyphs))
-    if ((chr < 0) || (chr >= Glyphs))
-		chr = 0;
+    utf32_char glyph;
+    int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, 
+      glyph, 0);
+    if (skip == 0) break;
 
-    int w = IndividualWidth [chr];
-    if (maxwidth < w)
+    text += skip;
+    textLen -= skip;
+
+    int charW = defW;
+
+    int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+      gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
+
+    if (Glyphs.Length () > gidx1)
+    {
+      PlaneGlyphs*& pg = Glyphs[gidx1];
+      if (pg != 0)
+      {
+	Glyph& glyphData = pg->entries[gidx2];
+	charW = glyphData.gMetrics.advance;
+      }
+    }
+
+    if (maxwidth < charW)
       return n;
 
-    maxwidth -= w;
-    text++; n++;
+    maxwidth -= charW;
+    n++;
   }
   return n;
 }
@@ -533,11 +847,30 @@ bool csDefaultFontServer::eiComponent::Initialize (iObjectRegistry* p)
 
 int csDefaultFont::GetAscent ()
 {
-  return Height-Baseline;
+  return Ascent;
 }
 
 int csDefaultFont::GetDescent ()
 {
-  return Baseline;
+  return Descent;
 }
 
+bool csDefaultFont::HasGlyph (utf32_char c)
+{
+  int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
+    gidx2 = c & GLYPH_INDEX_LOWER_MASK;
+
+  if (Glyphs.Length () <= gidx1)
+  {
+    return false;
+  }
+  PlaneGlyphs*& pg = Glyphs[gidx1];
+  if (pg == 0)
+  {
+    return false;
+  }
+  Glyph& glyphData = pg->entries[gidx2];
+
+  return ((glyphData.bitmapSize != (size_t)~0) || 
+    (glyphData.alphaSize != (size_t)~0));
+}

@@ -28,6 +28,7 @@
 #endif
 
 #include "cssys/csuctransform.h"
+#include "iutil/databuff.h"
 #include "ivideo/fontserv.h"
 
 #include "glcommon2d.h"
@@ -61,15 +62,31 @@ csGLFontCache::~csGLFontCache ()
 csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
   KnownFont* font, utf32_char glyph)
 {
-  int w, h, adv, left, top;
-  font->font->GetGlyphSize (glyph, w, h, adv, left, top);
+  bool hasGlyph = font->font->HasGlyph (glyph);
+  if (!hasGlyph)
+  {
+    GLGlyphCacheData* cacheData = cacheDataAlloc.Alloc ();
+    memset (cacheData, 0, sizeof (GLGlyphCacheData));
+    cacheData->font = font;
+    cacheData->glyph = glyph;
+    cacheData->hasGlyph = false;
+    return cacheData;
+  }
   csRect texRect;
   csSubRect2* sr = 0;
+
+  iFont::BitmapMetrics bmetrics;
+  csRef<iDataBuffer> alphaData = 
+    font->font->GetGlyphAlphaBitmap (glyph, bmetrics);
+  csRef<iDataBuffer> bitmapData;
+  if (!alphaData)
+    bitmapData = font->font->GetGlyphBitmap (glyph, bmetrics);
 
   int tex = 0;
   while (tex < textures.Length ())
   {
-    sr = textures[tex].glyphRects->Alloc (w, h, texRect);
+    sr = textures[tex].glyphRects->Alloc (bmetrics.width, bmetrics.height, 
+      texRect);
     if (sr != 0)
     {
       break;
@@ -112,26 +129,25 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
 
     G2D->statecache->SetTexture (GL_TEXTURE_2D, 0);
 
-    sr = textures[tex].glyphRects->Alloc (w, h, texRect);
+    sr = textures[tex].glyphRects->Alloc (bmetrics.width, bmetrics.height, 
+      texRect);
   }
   if (sr != 0)
   {
     GLGlyphCacheData* cacheData = cacheDataAlloc.Alloc ();
-    cacheData->w = w;
-    cacheData->h = h;
-    cacheData->adv = adv;
-    cacheData->left = left;
-    cacheData->top = top;
     cacheData->subrect = sr;
     cacheData->texNum = tex;
     cacheData->font = font;
     cacheData->glyph = glyph;
+    cacheData->bmetrics = bmetrics;
+    font->font->GetGlyphMetrics (glyph, cacheData->glyphMetrics);
     cacheData->tx1 = (float)texRect.xmin / (float)texSize;
     cacheData->ty1 = (float)texRect.ymin / (float)texSize;
     cacheData->tx2 = (float)texRect.xmax / (float)texSize;
     cacheData->ty2 = (float)texRect.ymax / (float)texSize;
+    cacheData->hasGlyph = true;
 
-    CopyGlyphData (font->font, glyph, tex, texRect);
+    CopyGlyphData (font->font, glyph, tex, texRect, bitmapData, alphaData);
 
     return cacheData;
   }
@@ -146,57 +162,53 @@ void csGLFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
 }
 
 void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex, 
-				   const csRect& rect)
+				   const csRect& rect, iDataBuffer* bitmapDataBuf, 
+				   iDataBuffer* alphaDataBuf)
 {
   G2D->statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
-  int gw, gh;
-  uint8* alphaData = font->GetGlyphAlphaBitmap (glyph, gw, gh);
-  if (alphaData)
+  if (alphaDataBuf)
   {
-    CS_ASSERT (gw == rect.Width ());
-    CS_ASSERT (gh == rect.Height ());
+    uint8* alphaData = alphaDataBuf->GetUint8 ();
 #ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
     uint8* dest = textures[tex].data + (rect.ymin * texSize) + rect.xmin;
     uint8* src = alphaData;
     int y;
-    for (y = 0; y < gh; y++)
+    for (y = 0; y < rect.Height (); y++)
     {
-      memcpy (dest, src, gw);
+      memcpy (dest, src, rect.Width ());
       dest += texSize;
-      src += gw;
+      src += rect.Width ();
     }
     glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
       GL_ALPHA, GL_UNSIGNED_BYTE, textures[tex].data);
 #else
-    glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, gw, gh, GL_ALPHA, 
+    glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
+      rect.Width (), rect.Height (), GL_ALPHA, 
       GL_UNSIGNED_BYTE, alphaData);
 #endif
   }
   else
   {
-    uint8* bitData = font->GetGlyphBitmap (glyph, gw, gh);
-
-    if (bitData)
+    if (bitmapDataBuf)
     {
-      CS_ASSERT (gw == rect.Width ());
-      CS_ASSERT (gh == rect.Height ());
+      uint8* bitData = bitmapDataBuf->GetUint8 ();
 
 #ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
       uint8* dest = textures[tex].data + (rect.ymin * texSize) + rect.xmin;
-      int ladd = texSize - gw;
+      int ladd = texSize - rect.Width ();
 #else
-      alphaData = new uint8[gw * gh];
+      uint8* alphaData = new uint8[rect.Width () * rect.Height ()];
       uint8* dest = alphaData;
 #endif
       uint8* src = bitData;
       uint8 byte = *src++;
       int x, y;
-      for (y = 0; y < gh; y++)
+      for (y = 0; y < rect.Height (); y++)
       {
-	for (x = 0; x < gw; x++)
+	for (x = 0; x < rect.Width (); x++)
 	{
 	  *dest++ = (byte & 0x80) ? 0xff : 0;
 	  if ((x & 7) == 7)
@@ -211,19 +223,28 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex,
 #ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
 	dest += ladd;
 #endif
-	if ((gw & 7) != 0) byte = *src++;
+	if ((rect.Width () & 7) != 0) byte = *src++;
       }
 
 #ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
       glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
 	GL_ALPHA, GL_UNSIGNED_BYTE, textures[tex].data);
 #else
-      glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, gw, gh, 
+      glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
+	rect.Width (), rect.Height (), 
 	GL_ALPHA, GL_UNSIGNED_BYTE, alphaData);
       delete[] alphaData;
 #endif
     }
   }
+}
+
+void csGLFontCache::SetClipRect (int x1, int y1, int x2, int y2)
+{ 
+  ClipX1 = x1; 
+  ClipY1 = G2D->Height - y2; 
+  ClipX2 = x2; 
+  ClipY2 = G2D->Height - y1; 
 }
 
 bool csGLFontCache::ClipRect (float x, float y,
@@ -254,25 +275,35 @@ bool csGLFontCache::ClipRect (float x, float y,
   return true;
 }
 
+void csGLFontCache::FlushArrays (int& numverts, int bgVertOffset, 
+				 int& numBgVerts, const int fg, 
+				 const int bg)
+{
+  if (numverts != 0)
+  {
+    if (bg >= 0)
+    {
+      G2D->statecache->Disable_GL_TEXTURE_2D ();
+      G2D->setGLColorfromint (bg);
+      glDrawArrays(GL_QUADS, bgVertOffset, numBgVerts);
+      G2D->statecache->Enable_GL_TEXTURE_2D ();
+      G2D->setGLColorfromint (fg);
+    }
+
+    glDrawArrays(GL_QUADS, 0, numverts);
+    numverts = 0;
+    numBgVerts = 0;
+  }
+}
+
 void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y, 
 					 int fg, int bg, const utf8_char* text)
 {
   if (!text || !*text) return;
 
   bool gl_texture2d = G2D->statecache->IsEnabled_GL_TEXTURE_2D ();
-  if (bg >= 0)
-  {
-    if (gl_texture2d) G2D->statecache->Disable_GL_TEXTURE_2D ();
-
-    int fw, fh;
-    font->GetDimensions ((char*)text, fw, fh);
-    G2D->DrawBox (pen_x, pen_y - font->GetAscent (), fw, fh, bg);
-
-    G2D->statecache->Enable_GL_TEXTURE_2D ();
-  }
-
   if (!gl_texture2d) G2D->statecache->Enable_GL_TEXTURE_2D ();
-  G2D->setGLColorfromint (fg);
+  if (bg < 0) G2D->setGLColorfromint (fg);
 
   int maxwidth, maxheight;
   font->GetMaxSize (maxwidth, maxheight);
@@ -289,18 +320,8 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
   G2D->statecache->Enable_GL_BLEND ();
   G2D->statecache->SetBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-/*
-  Those are better set up by BeginDraw() or so.
-
-  G2D->statecache->SetShadeModel (GL_FLAT);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#ifdef CS_USE_NEW_RENDERER
-  glColorMask (true, true, true, true);
-#endif
-  */
-
-  GLuint lastTexture = (GLuint)-1;
-  int numverts = 0;
+  GLuint lastTexture = 0;
+  int numverts = 0, numBgVerts = 0;
 
   GLboolean vaenabled = glIsEnabled(GL_VERTEX_ARRAY);
   GLboolean tcaenabled = glIsEnabled(GL_TEXTURE_COORD_ARRAY);
@@ -316,11 +337,17 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
   int textLen = strlen ((char*)text);
 
   if (wtTexcoords.Length () < (textLen * 4)) wtTexcoords.SetLength (textLen * 4);
-  if (wtVerts2d.Length () < (textLen * 4)) wtVerts2d.SetLength (textLen * 4);
+  if (wtVerts2d.Length () < (textLen * 12)) wtVerts2d.SetLength (textLen * 12);
+  int bgVertOffset = textLen * 4;
   glTexCoordPointer(2, GL_FLOAT, sizeof (csVector2), wtTexcoords.GetArray ());
   glVertexPointer(2, GL_FLOAT, sizeof (csVector2), wtVerts2d.GetArray ());
 
   float x1 = 0.0;
+  float x2, y1, y2;
+  float fontDescent = -font->GetDescent ();
+  int advance = 0;
+  bool firstchar = true;
+  float oldH = 0.0f;
 
   while (textLen > 0)
   {
@@ -335,43 +362,52 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
       (GLGlyphCacheData*)GetCacheData (knownFont, glyph);
     if (cacheData == 0)
     {
-      if (numverts != 0)
-      {
-	G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-	glDrawArrays(GL_QUADS, 0, numverts);
-	numverts = 0;
-      }
+      G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+      FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
       cacheData = (GLGlyphCacheData*)CacheGlyphUnsafe (knownFont, glyph);
+    }
+    if (!cacheData->hasGlyph)
+    {
+      // fall back to the default glyph (CS_FONT_DEFAULT_GLYPH)
+      G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+      FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
+      cacheData = (GLGlyphCacheData*)CacheGlyph (knownFont, 
+	CS_FONT_DEFAULT_GLYPH);
+      if (!cacheData->hasGlyph) continue;
+    }
 
-      GLuint newHandle = textures[cacheData->texNum].handle;
+    GLuint newHandle = textures[cacheData->texNum].handle;
+    if (lastTexture != newHandle) 
+    {
+      G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+      FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
       lastTexture = newHandle;
     }
-    else
-    {
-      GLuint newHandle = textures[cacheData->texNum].handle;
-      if (lastTexture != newHandle) 
-      {
-	if (numverts != 0)
-	{
-	  G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-	  glDrawArrays(GL_QUADS, 0, numverts);
-	  numverts = 0;
-	}
-	lastTexture = newHandle;
-      }
-    }
 
+    advance += cacheData->bmetrics.left;
+    
+    // Hack: in case the first char has a negative left bitmap offset,
+    // some of the background isn't drawn. Fix that.
+    if (firstchar)
+    {
+      if (advance < 0)
+      {
+	advance = 0;
+      }
+      firstchar = false;
+    }
+   
     float x_left = x1;
-    x1 = x1 + cacheData->left;
-    float x_right, x2 = x_right = x1 + cacheData->w;
-    float tx1, tx2, ty1, ty2, y1, y2;
+    x1 = x1 + cacheData->bmetrics.left;
+    x2 = x1 + cacheData->bmetrics.width;
+    float tx1, tx2, ty1, ty2;
 
     tx1 = cacheData->tx1;
     tx2 = cacheData->tx2;
     ty1 = cacheData->ty1;
     ty2 = cacheData->ty2;
-    y1 = -font->GetDescent ();
-    y2 = cacheData->top;
+    y1 = fontDescent;
+    y2 = cacheData->bmetrics.top;
 
     if (ClipRect (pen_x, pen_y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
     {
@@ -400,15 +436,105 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
       numverts++;
     }
 
-    x1 = x_left + cacheData->adv;
+    if (bg >= 0)
+    {
+      float bx1 = x_left;
+      float bx2 = x2;
+      float by1 = y1;
+      float by2 = y2;
 
+      if (advance > 0)
+      {
+	bx1 -= advance;
+	advance = 0;
+      }
+      else if (advance < 0)
+      {
+	bx1 -= (float)advance;
+	// The texcoords are irrelevant for the BG, but ClipRect() rejects 
+	// null-width or height glyphs. But we still want a BG for them.
+	tx1 = ty1 = 0.0f;
+	tx2 = ty2 = 1.0f;
+	if (ClipRect (pen_x, pen_y, bx1, by1, bx2, by2, tx1, ty1, tx2, ty2))
+	{
+	  wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+	  wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+	  numBgVerts++;
+	  wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+	  wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+	  numBgVerts++;
+	  wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+	  wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+	  numBgVerts++;
+	  wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+	  wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+	  numBgVerts++;
+	}
+
+	if (oldH < (y2 - y1))
+	{
+	  bx2 = bx1;
+	  bx1 += (float)advance;
+	  by1 += oldH;
+	}
+	advance = 0;
+      }
+
+      tx1 = ty1 = 0.0f;
+      tx2 = ty2 = 1.0f;
+      if (ClipRect (pen_x, pen_y, bx1, by1, bx2, by2, tx1, ty1, tx2, ty2))
+      {
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+	numBgVerts++;
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+	numBgVerts++;
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+	numBgVerts++;
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+	numBgVerts++;
+      }
+    }
+
+    x1 = x_left + cacheData->glyphMetrics.advance;
+    advance += cacheData->glyphMetrics.advance - 
+      (cacheData->bmetrics.width + cacheData->bmetrics.left);
+    oldH = y2 - y1;
   }
 
-  if (numverts != 0)
+  // "Trailing" background
+  if ((bg >= 0) & (advance > 0))
   {
-    G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
-    glDrawArrays(GL_QUADS, 0, numverts);
+    float bx1 = x1 - advance;
+    float bx2 = x2;
+    float by1 = y1;
+    float by2 = y2;
+
+    float tx1, ty1, tx2, ty2;
+    tx1 = ty1 = 0.0f;
+    tx2 = ty2 = 1.0f;
+    if (ClipRect (pen_x, pen_y, bx1, by1, bx2, by2, tx1, ty1, tx2, ty2))
+    {
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+      numBgVerts++;
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+      numBgVerts++;
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+      numBgVerts++;
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+      numBgVerts++;
+    }
   }
+
+  G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
+  FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
 
   if(vaenabled == GL_FALSE)
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -421,4 +547,6 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
   glPopMatrix ();
 
   if (!gl_texture2d) G2D->statecache->Disable_GL_TEXTURE_2D ();
+  
+  PurgeEmptyPlanes (knownFont);
 }

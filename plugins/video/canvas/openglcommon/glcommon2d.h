@@ -119,8 +119,6 @@ public:
    */
   virtual bool BeginDraw ();
 
-  virtual void SetClipRect (int xmin, int ymin, int xmax, int ymax);
-
   /// Resize the canvas
   virtual bool Resize (int width, int height);
 

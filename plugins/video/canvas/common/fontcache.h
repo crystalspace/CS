@@ -54,7 +54,9 @@ public:
     /// Glyph
     utf32_char glyph;
     /// Glyph metrics
-    int w, h, adv, left, top;
+    iFont::GlyphMetrics glyphMetrics;
+    /// Does this font have this glyph?
+    bool hasGlyph;
   };
 
 protected:
@@ -68,10 +70,6 @@ protected:
     /// Previous entry
     LRUEntry* prev;
 
-    /// Font
-    //iFont* font;
-    /// Glyph in the font
-    //utf32_char glyph;
     /// Cache data associated with font.
     GlyphCacheData* cacheData;
   };
@@ -93,10 +91,12 @@ protected:
   {
     /// Pointer to glyph information
     LRUEntry* entries[GLYPH_INDEX_LOWER_COUNT];
+    int usedGlyphs;
 
     PlaneGlyphs ()
     {
       memset (entries, 0, sizeof (entries));
+      usedGlyphs = 0;
     }
   };
 
@@ -133,6 +133,7 @@ protected:
   {
     iFont* font;
     PlaneGlyphsArray planeGlyphs;
+    bool purgeNeeded;
   };
 
   /// Array of known fonts.
@@ -161,10 +162,12 @@ protected:
   void SetupCacheData (GlyphCacheData* cacheData,
     KnownFont* font, utf32_char glyph);
 
-  /// Remove a glyph from the cache.
+  /// Add a glyph to the cache.
+  void AddCacheData (KnownFont* font, utf32_char glyph, GlyphCacheData* cacheData);
+  /// Remove a glyph from the cache. @@@ Does not update PlaneGlyphs!
   void RemoveCacheData (GlyphCacheData* cacheData);
   /// Remove a glyph from the cache.
-  void RemoveCacheData (LRUEntry* entry);
+  void RemoveLRUEntry (LRUEntry* entry);
 
 
   /**
@@ -186,6 +189,9 @@ protected:
 
   /// the current clipping rect
   int ClipX1, ClipY1, ClipX2, ClipY2;
+
+  /// Delete empty PlaneGlyphs
+  void PurgeEmptyPlanes (KnownFont* knownFont);
 public:
   csFontCache ();
   virtual ~csFontCache ();
@@ -205,11 +211,9 @@ public:
   GlyphCacheData* GetCacheData (KnownFont* font, utf32_char glyph);
   /// Get cached data for the least used glyph.
   GlyphCacheData* GetLeastUsed ();
-  /// Add a glyph to the cache.
-  void AddCacheData (KnownFont* font, utf32_char glyph, GlyphCacheData* cacheData);
 
 
-  void SetClipRect (int x1, int y1, int x2, int y2)
+  virtual void SetClipRect (int x1, int y1, int x2, int y2)
   { 
     ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; 
   }

@@ -48,6 +48,7 @@ class csGLFontCache : public csFontCache
     csSubRect2* subrect;
     float tx1, ty1, tx2, ty2;
     int texNum;
+    iFont::BitmapMetrics bmetrics;
   };
 
   csGraphics2DGLCommon* G2D;
@@ -86,13 +87,16 @@ class csGLFontCache : public csFontCache
 
   csDirtyAccessArray<csVector2> wtVerts2d;
   csDirtyAccessArray<csVector2> wtTexcoords;
+
+  inline void FlushArrays (int& numverts, int bgVertsOffset, 
+    int& numBgVerts, const int fg, const int bg);
 protected:
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
     utf32_char glyph);
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 
   void CopyGlyphData (iFont* font, utf32_char glyph, int tex,
-    const csRect& rect);
+    const csRect& rect, iDataBuffer* bitmapDataBuf, iDataBuffer* alphaDataBuf);
 
   bool ClipRect (float x, float y,
     float &x1, float &y1, float &x2, float &y2,
@@ -100,6 +104,8 @@ protected:
 public:
   csGLFontCache (csGraphics2DGLCommon* G2D);
   virtual ~csGLFontCache ();
+
+  virtual void SetClipRect (int x1, int y1, int x2, int y2);
 
   /**
    * Draw a string using OpenGL, where the baseline starts at x,y. 

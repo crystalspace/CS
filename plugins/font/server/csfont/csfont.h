@@ -27,10 +27,54 @@
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "iutil/plugin.h"
+#include "iutil/databuff.h"
 
 struct iObjectRegistry;
 struct iPluginManager;
 class csDefaultFontServer;
+
+#define GLYPH_INDEX_UPPER_SHIFT	    8
+#define GLYPH_INDEX_LOWER_COUNT	    256
+#define GLYPH_INDEX_LOWER_MASK	    0xff
+
+class csParasiticDataBuffer : public iDataBuffer
+{
+  csRef<iDataBuffer> parentBuffer;
+  size_t size;
+  uint8* data;
+public:
+  SCF_DECLARE_IBASE;
+
+  csParasiticDataBuffer (iDataBuffer* parent, size_t offs,
+    size_t size = (size_t)~0)
+  {
+    SCF_CONSTRUCT_IBASE(0);
+    parentBuffer = parent;
+    data = parent->GetUint8 () + offs;
+    if (size == (size_t)~0)
+      csParasiticDataBuffer::size = parent->GetSize () - offs;
+    else
+      csParasiticDataBuffer::size = size;
+  }
+  virtual ~csParasiticDataBuffer () {};
+
+  /// Query the buffer size
+  virtual size_t GetSize () const
+  { return size; }
+  /// Get the buffer as an abstract pointer
+  virtual char* GetData () const
+  { return (char*)data; }
+  /// Get the buffer as an (char *) pointer
+  inline char *operator * () const
+  { return (char *)GetData (); }
+  /// Get as an int8 *
+  inline int8* GetInt8 ()
+  { return (int8 *)GetData (); }
+  /// Get as an uint8 *
+  inline uint8* GetUint8 ()
+  { return (uint8 *)GetData (); }
+};
+
 
 /**
  * Bitmap font
@@ -38,26 +82,80 @@ class csDefaultFontServer;
 class csDefaultFont : public iFont
 {
 public:
+  struct CharRange
+  {
+    utf32_char startChar;
+    int charCount;
+  };
+
+  struct Glyph
+  {
+    size_t bitmapOffs;
+    size_t bitmapSize;
+    size_t alphaOffs;
+    size_t alphaSize;
+    GlyphMetrics gMetrics;
+    BitmapMetrics bMetrics;
+    BitmapMetrics aMetrics;
+
+    Glyph () { bitmapSize = alphaSize = (size_t)~0; }  
+  };
+
+  /**
+   * Array of a number of glyphs.
+   * To quickly access a specific glyph, basically a two-dimensional
+   * array is used. This is the "second" dimension, a "plane". A plane
+   * always contains #GLYPH_INDEX_LOWER_COUNT number of glyphs.
+   */
+  struct PlaneGlyphs
+  {
+    /// Pointer to glyph information
+    Glyph entries[GLYPH_INDEX_LOWER_COUNT];
+  };
+
+  class PlaneGlyphElementHandler : public csArrayElementHandler<PlaneGlyphs*>
+  {
+  public:
+    static void Construct (PlaneGlyphs** address, PlaneGlyphs* const& src)
+    {
+      *address = 0;
+    }
+
+    static void Destroy (PlaneGlyphs** address)
+    {
+    }
+
+    static void InitRegion (PlaneGlyphs** address, int count)
+    {
+      memset (address, 0, count * sizeof (PlaneGlyphs*));
+    }
+  };
+
+  /**
+   * Array of a number of glyphs.
+   * This is the "first" dimension of the glyphs array, and consists of
+   * a variable number of "planes". If a plane doesn't contain a glyph,
+   * it doesn't take up memory.
+   */
+  csArray<PlaneGlyphs*, PlaneGlyphElementHandler> Glyphs;
+
   char *Name;
-  int First;
-  int Glyphs;
-  int Width;
-  int Baseline;
+  int Ascent, Descent;
   int MaxWidth;
   int Height;
-  uint8 *FontBitmap;
-  uint8 *IndividualWidth;
-  uint8 **GlyphBitmap;
-  uint8 **GlyphAlphaBitmap;
+  csRef<iDataBuffer> bitData;
+  csRef<iDataBuffer> alphaData;
   csDefaultFontServer *Parent;
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
 
   SCF_DECLARE_IBASE;
 
   /// Create the font object
-  csDefaultFont (csDefaultFontServer *parent, const char *name, int first,
-    int glyphs, int width, int height, int baseline, uint8 *bitmap,
-    uint8 *individualwidth, uint8 *alpha=0);
+  csDefaultFont (csDefaultFontServer *parent, const char *name, 
+    CharRange* glyphs, int height, int ascent, int descent,
+    GlyphMetrics* gMetrics,
+    iDataBuffer* bitmap, BitmapMetrics* bMetrics,
+    iDataBuffer* alpha = 0, BitmapMetrics* aMetrics = 0);
 
   /// Destroy the font object
   virtual ~csDefaultFont ();
@@ -83,34 +181,27 @@ public:
   virtual void GetMaxSize (int &oW, int &oH);
 
   /**
-   * Return character size in pixels.
-   * Returns false if values could not be determined.
+   * Return the metrics of a glyph.
    */
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
+  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics);
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
-   * Returns 0 if error occured. The oW and oH parameters are
-   * filled with bitmap width and height.
    */
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
+  virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c,
+    BitmapMetrics& metrics);
 
   /**
    * Return a pointer to the alpha bitmap for rendered character.
-   * Returns 0 if error occured. The oW and oH parameters are
-   * filled with bitmap width and height.
    */
-  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
-  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH);
+  virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
+    BitmapMetrics& metrics);
 
   /**
    * Return the width and height of text written with this font.
    */
   virtual void GetDimensions (const char *text, int &oW, int &oH);
   virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
-  virtual void GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &);
 
   /**
    * Determine how much characters from this string can be written
@@ -137,6 +228,8 @@ public:
    * Get the font's ascent in pixels.
    */
   virtual int GetAscent (); 
+
+  virtual bool HasGlyph (utf32_char c); 
 };
 
 /**

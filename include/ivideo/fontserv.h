@@ -19,6 +19,7 @@
 #ifndef __CS_IVIDEO_FONTSERV_H__
 #define __CS_IVIDEO_FONTSERV_H__
 
+#include "cssys/csunicode.h"
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
@@ -47,7 +48,15 @@
 #define CSFONT_SMALL		"*small"
 /** @} */
 
+/**
+ * The default char, drawn in case a glyph wasn't present in the font.
+ * The Unicode standard says that this will never be a valid code point -
+ * so we just take as the "replacer" char.
+ */
+#define CS_FONT_DEFAULT_GLYPH	0xffff
+
 struct iFont;
+struct iDataBuffer;
 
 SCF_VERSION (iFontDeleteNotify, 0, 0, 1);
 
@@ -67,7 +76,7 @@ struct iFontDeleteNotify : public iBase
   virtual void BeforeDelete (iFont* font) = 0;
 };
 
-SCF_VERSION (iFont, 3, 0, 0);
+SCF_VERSION (iFont, 4, 0, 0);
 
 /**
  * A font object.
@@ -75,6 +84,31 @@ SCF_VERSION (iFont, 3, 0, 0);
  */
 struct iFont : public iBase
 {
+  /**
+   * Metrics for a glyph that are dependent from whether a simple
+   * or antialiased image is used.
+   */
+  struct BitmapMetrics
+  {
+    /// Width of the glyph image
+    int width;
+    /// Height of the glyph image
+    int height;
+    /// X offset of the image to the pen position
+    int left;
+    /// Y offset of the image to the pen position
+    int top;
+  };
+  /**
+   * Metrics for a glyph that are independent from whether a simple
+   * or antialiased image is used.
+   */
+  struct GlyphMetrics
+  {
+    /// Amount of pixels the pen needs to advance after the glyph
+    int advance;
+  };
+
   /**
    * Add a font delete notification callback routine.
    * This routine will be called from font destructor,
@@ -109,49 +143,24 @@ struct iFont : public iBase
   virtual void GetMaxSize (int &oW, int &oH) = 0;
 
   /**
-   * Return character size in pixels.
-   * Returns false if values could not be determined.
+   * Return the metrics of a glyph.
    */
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH) = 0;
-
-  /**
-   * Return character width, height, advance, x- and y-bearing in pixels.
-   * Returns false if values could not be determined.
-   */
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv,
-  	int &left, int &top) = 0;
+  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics) = 0;
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
-   * Returns 0 if error occured. The oW and oH parameters are
-   * filled with bitmap width and height.
+   * Returns 0 if the glyph can't be retrieved.
    */
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH) = 0;
-
-  /**
-   * Return a pointer to a bitmap containing a rendered character.
-   * Returns 0 if error occured. The oW and oH parameters are
-   * filled with bitmap width and height. adv holds the advance
-   * in x-direction, left and top hold the x- and y-bearing.
-   */
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv,
-  	int &left, int &top) = 0;
+  virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c,
+    BitmapMetrics& metrics) = 0;
 
   /**
    * Return a pointer to a bitmap containing the alpha bitmap for the
-   * rendered character. Returns 0 if error occured. The oW and oH
-   * parameters are filled with bitmap width and height.
+   * rendered character. 
+   * Returns 0 if the glyph can't be retrieved.
    */
-  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH) = 0;
-
-  /**
-   * Return a pointer to a bitmap containing the alpha bitmap for the
-   * rendered character. Returns 0 if error occured. The oW and oH
-   * parameters are filled with bitmap width and height. adv holds the
-   * advance in x-direction, left and top hold the x- and y-bearing.
-   */
-  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv,
-  	int &left, int &top) = 0;
+  virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
+    BitmapMetrics& metrics) = 0;
 
   /**
    * Return the width and height of text written with this font.
@@ -186,6 +195,11 @@ struct iFont : public iBase
    * maximum height.
    */
   virtual int GetAscent () = 0; 
+  
+  /**
+   * Returns whether a specific glyph is present in this font.
+   */
+  virtual bool HasGlyph (utf32_char c) = 0; 
 };
 
 SCF_VERSION (iFontServer, 2, 0, 1);

@@ -52,7 +52,6 @@ csFontCache::csFontCache () : LRUAlloc (512)
 
 csFontCache::~csFontCache ()
 {
-  CleanupCache ();
 }
 
 void csFontCache::CleanupCache ()
@@ -76,6 +75,27 @@ void csFontCache::CleanupCache ()
   }
   knownFonts.DeleteAll ();
   delete deleteCallback; deleteCallback = 0;
+}
+
+void csFontCache::PurgeEmptyPlanes (KnownFont* knownFont)
+{
+  if (knownFont->purgeNeeded)
+  {
+    PlaneGlyphsArray& planeGlyphs = knownFont->planeGlyphs;
+    for (int j = 0; j < planeGlyphs.Length(); j++)
+    {
+      PlaneGlyphs*& pg = planeGlyphs[j];
+      if (pg != 0)
+      {
+	if (pg->usedGlyphs == 0)
+	{
+	  delete pg;
+	  pg = 0;
+	}
+      }
+    }
+    knownFont->purgeNeeded = false;
+  }
 }
 
 csFontCache::LRUEntry* csFontCache::FindLRUEntry (
@@ -130,6 +150,7 @@ csFontCache::KnownFont* csFontCache::CacheFont (iFont* font)
 {
   KnownFont* knownFont = new KnownFont;
   knownFont->font = font;
+  knownFont->purgeNeeded = false;
 
   knownFonts.InsertSorted (knownFont, KnownFontArrayCompareItems);
 
@@ -155,7 +176,7 @@ void csFontCache::UncacheFont (iFont* font)
 	  if (entry != 0) 
 	  {
 	    GlyphCacheData* cacheData = entry->cacheData;
-	    RemoveCacheData (entry);
+	    RemoveLRUEntry (entry);
 	    InternalUncacheGlyph (cacheData);
 	  }
 	}
@@ -237,8 +258,11 @@ csFontCache::GlyphCacheData* csFontCache::GetLeastUsed ()
     if (pg != 0)
     {
       pg->entries[gidx2] = 0;
+      pg->usedGlyphs--;
     }
   }
+
+  cacheData->font->purgeNeeded = true;
 
   return cacheData;
 }
@@ -259,8 +283,6 @@ void csFontCache::AddCacheData (KnownFont* font, utf32_char glyph,
   head = entry;
   
   entry->cacheData = cacheData;
-  //entry->font = font->font;
-  //entry->glyph = glyph;
 
   int gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
@@ -275,6 +297,7 @@ void csFontCache::AddCacheData (KnownFont* font, utf32_char glyph,
   {
     pg = new PlaneGlyphs;
   }
+  pg->usedGlyphs++;
   pg->entries[gidx2] = entry;
 }
 
@@ -283,11 +306,11 @@ void csFontCache::RemoveCacheData (GlyphCacheData* cacheData)
   LRUEntry* entry = FindLRUEntry (cacheData);
   if (entry != 0) 
   {
-    RemoveCacheData (entry);
+    RemoveLRUEntry (entry);
   }
 }
 
-void csFontCache::RemoveCacheData (LRUEntry* entry)
+void csFontCache::RemoveLRUEntry (LRUEntry* entry)
 {
   CS_ASSERT (entry != 0);
 
@@ -323,10 +346,17 @@ void csFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
 void csFontCache::SetupCacheData (GlyphCacheData* cacheData,
   KnownFont* font, utf32_char glyph)
 {
+  memset (cacheData, 0, sizeof (GlyphCacheData));
   cacheData->font = font;
   cacheData->glyph = glyph;
-  font->font->GetGlyphSize (glyph, cacheData->w, cacheData->h, 
-    cacheData->adv, cacheData->left, cacheData->top);
+  if (cacheData->hasGlyph = font->font->HasGlyph (glyph))
+  {
+    font->font->GetGlyphMetrics (glyph, cacheData->glyphMetrics);
+  }
+  else
+  {
+    memset (&cacheData->glyphMetrics, 0, sizeof (cacheData->glyphMetrics));
+  }
 }
 
 csFontCache::GlyphCacheData* csFontCache::CacheGlyphUnsafe (
@@ -361,6 +391,23 @@ csFontCache::GlyphCacheData* csFontCache::CacheGlyph (KnownFont* font,
 void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
 {
   CS_ASSERT (cacheData != 0);
+
+  int gidx1 = cacheData->glyph >> GLYPH_INDEX_UPPER_SHIFT, 
+    gidx2 = cacheData->glyph & GLYPH_INDEX_LOWER_MASK;
+
+  PlaneGlyphsArray& planeGlyphs = cacheData->font->planeGlyphs;
+  if (planeGlyphs.Length () > gidx1)
+  {
+    PlaneGlyphs*& pg = planeGlyphs[gidx1];
+    if (pg != 0)
+    {
+      pg->entries[gidx2] = 0;
+      pg->usedGlyphs--;
+    }
+  }
+
+  cacheData->font->purgeNeeded = true;
+
   RemoveCacheData (cacheData);
   InternalUncacheGlyph (cacheData);
 }

@@ -34,77 +34,34 @@ class csFreeType2Server;
  */
 class csFreeType2Font : public iFont
 {
-  // A single glyph bitmap
-  struct GlyphBitmap
-  {
-    unsigned char *bitmap;
-    unsigned char *alphabitmap;
-    int rows, width, stride;
-    int descender, ascender, advance, left, top;
-    bool isOk;
-
-    GlyphBitmap (){isOk=false; bitmap = 0; alphabitmap = 0; }
-    ~GlyphBitmap ()
-    { if (isOk) { delete [] bitmap; delete[] alphabitmap; } }
-  };
-
-  // A set of glyphs with same point size
-  struct GlyphSet
-  {
-    int size;
-    int maxW, maxH;
-    int ascend, descend;
-    GlyphBitmap glyphs [256];
-  };
-
-  // An array with (numerous) sets of glyphs of different sizes
-  class csFontDefVector : public csPDelArray<GlyphSet>
-  {
-  public:
-    static int Compare (GlyphSet* const& Item1, GlyphSet* const& Item2)
-    {
-      int id1 = Item1->size, id2 = Item2->size;
-      return id1 - id2;
-    }
-    static int CompareKey (GlyphSet* const& Item1, void* Key)
-    { int id1 = Item1->size; return id1 - (int)Key; }
-  } cache;
-
-  GlyphSet *FindGlyphSet (int size)
-  {
-    int idx = cache.FindKey ((void*)size, cache.CompareKey);
-    return (idx == -1 ? 0 : cache.Get (idx));
-  }
-
-  bool CreateGlyphBitmaps (int size);
-
- protected:
-  FT_Byte  *fontdata;
+protected:
+  FT_Glyph glyph;
+  csRef<iDataBuffer> fontdata;
 
 public:
+  csFreeType2Server* server;
   // font filename (for identification)
   char *name;
-  // current glyph set
-  GlyphSet *current;
+  // Size of this font
+  int fontSize;
   // The list of delete callbacks
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
   //
   FT_Face face;
   FT_Library instance;
-  //  TT_Face_Properties prop;
   FT_UShort pID, eID;
   FT_CharMap charMap;
-
+  
   SCF_DECLARE_IBASE;
 
   /// Constructor
-  csFreeType2Font (const char *filename);
+  csFreeType2Font (const char *filename, csFreeType2Server* server);
 
   /// Destructor
   virtual ~csFreeType2Font ();
 
   /// Load the font
-  bool Load (iVFS *pVFS, csFreeType2Server *server);
+  bool Load (iVFS *pVFS);
 
   /**
    * Set the size for this font.
@@ -130,25 +87,24 @@ public:
    * Return character size in pixels.
    * Returns false if values could not be determined.
    */
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH);
-  virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
+  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics);
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
    * Returns 0 if error occured. The oW and oH parameters are
    * filled with bitmap width and height.
    */
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
-  virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
+  virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c, 
+    BitmapMetrics& metrics);
 
-  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH);
-  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
+  virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
+    BitmapMetrics& metrics);
 
   /**
    * Return the width and height of text written with this font.
    */
-  virtual void GetDimensions (const char *text, int &oW, int &oH);
   virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
+  virtual void GetDimensions (const char *text, int &oW, int &oH);
 
   /**
    * Determine how much characters from this string can be written
@@ -175,6 +131,11 @@ public:
    * Get the font's ascent in pixels.
    */
   virtual int GetAscent (); 
+
+  /**
+   * Returns whether a specific glyph is present in this font.
+   */
+  virtual bool HasGlyph (utf32_char c); 
 };
 
 /**
@@ -196,7 +157,6 @@ class csFreeType2Server : public iFontServer
 
 public:
   FT_Library library;
-  FT_UShort platform_id, encoding_id;
   int defaultSize;
   iObjectRegistry *object_reg;
   csConfigAccess ftconfig;
@@ -211,8 +171,14 @@ public:
 
   virtual bool Initialize (iObjectRegistry *Sys);
   void Report (int severity, const char* msg, ...);
+  void ReportV (int severity, const char* msg, va_list arg);
 
   const char* GetErrorDescription(int code);
+
+  bool FreetypeError (int errorCode, int reportSeverity,
+    const char* message, ...);
+  bool FreetypeError (int errorCode, const char* message,
+    ...);
 
   /**
    * Load a font by name.

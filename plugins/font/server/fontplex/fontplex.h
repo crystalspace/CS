@@ -26,9 +26,77 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/refarr.h"
+#include "csutil/cfgacc.h"
+#include "csutil/hash.h"
+
+class csFontServerMultiplexor;
+class csFontPlexer;
+
+struct csFontLoadOrderEntry
+{
+  char* fontName;
+  csRef<iFontServer> server;
+
+  bool loaded;
+  csRef<iFont> font;
+  float scale;
+
+  csFontLoadOrderEntry (iFontServer* server, const char* fontName,
+    float scale);
+  csFontLoadOrderEntry (const csFontLoadOrderEntry& other);
+  ~csFontLoadOrderEntry ();
+
+  bool operator== (const csFontLoadOrderEntry& e2);
+
+  iFont* GetFont (csFontPlexer* parent);
+};
+
+class csFontLoaderOrder : public csArray<csFontLoadOrderEntry>
+{
+public:
+  void AppendSmart (const csFontLoaderOrder& other);
+};
+
+class csFontPlexer : public iFont
+{
+private:
+  friend struct csFontLoadOrderEntry;
+
+  int size;
+  iFont* primaryFont;
+
+  csFontLoaderOrder* order;
+  csRefArray<iFontDeleteNotify> DeleteCallbacks;
+public:
+  SCF_DECLARE_IBASE;
+
+  csFontPlexer (iFont* primary, csFontLoaderOrder* order);
+  virtual ~csFontPlexer ();
+
+  virtual void SetSize (int iSize);
+  virtual int GetSize ();
+  virtual void GetMaxSize (int &oW, int &oH);
+  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics);
+
+  virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c, 
+    BitmapMetrics& metrics);
+  virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
+    BitmapMetrics& metrics);
+
+  virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
+  virtual void GetDimensions (const char *text, int &oW, int &oH);
+  virtual int GetLength (const char *text, int maxwidth);
+
+  virtual void AddDeleteCallback (iFontDeleteNotify* func);
+  virtual bool RemoveDeleteCallback (iFontDeleteNotify* func);
+
+  virtual int GetDescent (); 
+  virtual int GetAscent (); 
+  virtual bool HasGlyph (utf32_char c); 
+};
 
 /**
- * Font server multiplexor plug-in.
+ * Font server multiplexer plug-in.
  * This plug-in takes all the other font servers and hides them behind
  * itself. Then when the application requests some font, all servers are
  * queried in turn; the first one that is able to load the specified font
@@ -36,19 +104,38 @@
  * identifier to this server, and "FontServer.1", "FontServer.2" and so on
  * to auxiliary font servers. Example extract from config file:
  * <code>
- * [Plugins]
  * ...
- * FontServer = crystalspace.font.server.multiplexor
- * FontServer.1 = crystalspace.font.server.default
- * FontServer.2 = crystalspace.font.server.freetype
+ * System.Plugins.iFontServer = crystalspace.font.server.multiplexor
+ * System.Plugins.iFontServer.1 = crystalspace.font.server.freetype2
+ * System.Plugins.iFontServer.2 = crystalspace.font.server.default
  * ...
  * </code>
  */
 class csFontServerMultiplexor : public iFontServer
 {
 private:
+  csRef<iObjectRegistry> object_reg;
   csRefArray<iFontServer> fontservers;
 
+  csConfigAccess config;
+  const char *fontset;
+
+  struct FontServerMapEntry
+  {
+    csRef<iFontServer> server;
+    char* name;
+
+    FontServerMapEntry (const char* name, iFontServer* server);
+    FontServerMapEntry (const FontServerMapEntry& source);
+    ~FontServerMapEntry ();
+  };
+  csHash<FontServerMapEntry> fontServerMap;
+
+  csFontLoaderOrder fallbackOrder;
+
+  void ParseFontLoaderOrder (csFontLoaderOrder& order, 
+    const char* str);
+  csPtr<iFontServer> ResolveFontServer (const char* name);
 public:
   SCF_DECLARE_IBASE;
 

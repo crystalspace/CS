@@ -29,10 +29,15 @@ class csSoftFontCache : public csFontCache
 protected:
   struct SoftGlyphCacheData : public csFontCache::GlyphCacheData
   {
+    csRef<iDataBuffer> glyphDataBuf;
+    csRef<iDataBuffer> glyphAlphaDataBuf;
     uint8* glyphData;
-    uint8* glyphDataAlpha;
+    uint8* glyphAlphaData;
+    iFont::BitmapMetrics bitmapMetrics;
+    iFont::BitmapMetrics alphaMetrics;
   };
 
+  size_t cacheRemaining;
   csGraphics2D* G2D;
 
   /// Cache canvas-dependent information for a specific font/glyph pair.
@@ -42,6 +47,7 @@ protected:
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 public:
   csSoftFontCache (csGraphics2D* G2D);
+  virtual ~csSoftFontCache ();
 };
 
 class csSoftFontCache8 : public csSoftFontCache

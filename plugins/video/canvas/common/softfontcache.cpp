@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "cssys/csuctransform.h"
+#include "iutil/databuff.h"
 
 #include "graph2d.h"
 #include "softfontcache.h"
@@ -29,6 +30,14 @@
 csSoftFontCache::csSoftFontCache (csGraphics2D* G2D)
 {
   csSoftFontCache::G2D = G2D;
+
+  cacheRemaining = G2D->config->GetInt ("Video.FontCache.MaxSize",
+    1024*1024);
+}
+
+csSoftFontCache::~csSoftFontCache ()
+{
+  CleanupCache ();
 }
 
 csSoftFontCache::GlyphCacheData* csSoftFontCache::InternalCacheGlyph (
@@ -36,9 +45,29 @@ csSoftFontCache::GlyphCacheData* csSoftFontCache::InternalCacheGlyph (
 {
   SoftGlyphCacheData* newData = new SoftGlyphCacheData;
   SetupCacheData (newData, font, glyph);
-  int w, h;
-  newData->glyphData = font->font->GetGlyphBitmap (glyph, w, h);
-  newData->glyphDataAlpha = font->font->GetGlyphAlphaBitmap (glyph, w, h);
+
+  newData->glyphDataBuf = font->font->GetGlyphBitmap (glyph, 
+    newData->bitmapMetrics);
+  newData->glyphData = 
+    newData->glyphDataBuf ? newData->glyphDataBuf->GetUint8 () : 0;
+
+  newData->glyphAlphaDataBuf = font->font->GetGlyphAlphaBitmap (glyph,
+    newData->alphaMetrics);
+  newData->glyphAlphaData = 
+    newData->glyphAlphaDataBuf ? newData->glyphAlphaDataBuf->GetUint8 () : 0;
+
+  size_t glyphSize = 0;
+  if (newData->glyphDataBuf) glyphSize += newData->glyphDataBuf->GetSize ();
+  if (newData->glyphAlphaDataBuf) glyphSize += newData->glyphAlphaDataBuf->GetSize ();
+
+  if (glyphSize > cacheRemaining)
+  {
+    delete newData;
+    return 0;
+  }
+
+  cacheRemaining -= glyphSize;
+
   return newData;
 
 }
@@ -46,6 +75,12 @@ csSoftFontCache::GlyphCacheData* csSoftFontCache::InternalCacheGlyph (
 void csSoftFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
 {
   SoftGlyphCacheData* softCacheData = (SoftGlyphCacheData*)cacheData;
+  size_t glyphSize = 0;
+  if (softCacheData->glyphDataBuf) glyphSize += 
+    softCacheData->glyphDataBuf->GetSize ();
+  if (softCacheData->glyphAlphaDataBuf) glyphSize += 
+    softCacheData->glyphAlphaDataBuf->GetSize ();
+  cacheRemaining += glyphSize;
   delete softCacheData;
 }
 

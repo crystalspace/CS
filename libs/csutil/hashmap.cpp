@@ -218,7 +218,7 @@ uint32 csHashMap::prime_table[] =
 
 csHashMap::csHashMap (uint32 size)
 {
-  size = FindLargerPrime(size);
+  size = FindNextPrime(size);
   NumBuckets = size;
   Buckets.SetLength (size, csHashBucket ());
   hash_elements = 0;
@@ -229,13 +229,13 @@ csHashMap::~csHashMap ()
   DeleteAll ();
 }
 
-uint32 csHashMap::FindLargerPrime (uint32 num)
+uint32 csHashMap::FindNextPrime (uint32 num)
 {
   int i = 0;
   uint32 p = prime_table[i];
   while (p)
   {
-    if (p > num) return p;
+    if (p >= num) return p;
     i++;
     p = prime_table[i];
   }
@@ -281,7 +281,7 @@ void csHashMap::Put (csHashKey key, csHashObject object)
   PutInternal (idx, key, object);
   hash_elements++;
   if (NumBuckets < 20000UL && hash_elements > (int)(NumBuckets*4))
-    ChangeBuckets (FindLargerPrime (NumBuckets*4));
+    ChangeBuckets (FindNextPrime (NumBuckets*4));
 }
 
 csHashObject csHashMap::Get (csHashKey key) const

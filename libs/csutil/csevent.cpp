@@ -104,7 +104,7 @@ csEvent::csEvent (csTicks iTime,int eType,int kCode,int kChar,int kModifiers)
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
-  int mButton, int mModifiers)
+		  int mButton, int mModifiers) : attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
@@ -117,7 +117,7 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
-  int jButton, int jModifiers)
+		  int jButton, int jModifiers) : attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
@@ -130,7 +130,8 @@ csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
   Joystick.Modifiers = jModifiers;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
+csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo) :
+  attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
@@ -142,7 +143,7 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
     Flags = CSEF_BROADCAST;
 }
 
-csEvent::csEvent (csEvent const& e) : iEvent()
+csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Type = e.Type;
