@@ -648,3 +648,7 @@ Type:    general command
 Action:  Set the color for the selected pseudo-dynamic light to
          r,g,b.
 
+Command: palette
+Type:    boolean command
+Action:  Toggle on/off displaying the palette on top of everything (just below
+         the Crystal Space logo). Works in 8-bit modes only.
