@@ -421,6 +421,8 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
       // Now add the common shadow to the coverage matrix
       csAntialiasedPolyFill (sfi, sfic, &cm, __add_PutPixel, __add_DrawBox);
     } /* endfor */
+
+    delete shadow;
   } /* endfor */
 
   // Free all shadow frustums
