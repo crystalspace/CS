@@ -23,7 +23,7 @@
 
 #include <csutil/csstring.h>
 
-csString csGetPlatformConfigPath (const char* key, bool directory)
+csString csGetPlatformConfigPath (const char* key)
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   NSArray* paths = NSSearchPathForDirectoriesInDomains(
@@ -32,7 +32,5 @@ csString csGetPlatformConfigPath (const char* key, bool directory)
     stringByAppendingPathComponent:@"Application Support"];
   csString dir([nsdir fileSystemRepresentation]);
   [pool release];
-  
-  dir << key << (directory ? CS_PATH_SEPARATOR : ".cfg");
   return dir;
 } 

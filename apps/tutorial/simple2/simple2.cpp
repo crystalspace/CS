@@ -24,7 +24,7 @@ CS_IMPLEMENT_APPLICATION
 
 Simple::Simple ()
 {
-  SetApplicationName ("Simple 2");
+  SetApplicationName ("CrystalSpace.Simple2");
 }
 
 Simple::~Simple ()

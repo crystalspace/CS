@@ -3677,12 +3677,35 @@ INPUT_LINE: while ($_ = &next_line) {
 		      $toplevel = $level;
 		    }
 		    push(@sections, $name);
-		    next_doc() if ($T2H_SPLIT eq 'section' ||
-				   $T2H_SPLIT && $level == $toplevel);
+		    # $docu_doc = next_doc() if ($T2H_SPLIT eq 'section' ||
+		    #		   $T2H_SPLIT && $level == $toplevel);
+		    if ($sec2number{$name} ne "")
+		    {
+		      my $secname = $sec2number{$name};
+		      $secname =~ s/\.*$//;
+		      $docu_doc = "${docu_name}_$secname.$docu_ext"
+		    }
+		    else
+		    {
+		      $docu_doc = next_doc();
+		    }
+		    $sec_num = 0;
 		  }
-		  $sec_num++;
-		  $docid = "SEC$sec_num";
-		  $tocid = (/^\@\w*heading/ ? undef : "TOC$sec_num");
+		  # $docid = "SEC$sec_num";
+		  # $tocid = (/^\@\w*heading/ ? undef : "TOC$sec_num");
+		  if ($sec2number{$name} ne "")
+		  {
+		    my $secname = $sec2number{$name};
+      		    $secname =~ s/\.*$//;
+  		    $docid = "SEC$secname";
+		    $tocid = (/^\@\w*heading/ ? undef : "TOC$secname" );
+		  } 
+		  else 
+		  {
+		    $sec_num++;
+  		    $docid = "SEC_$sec_num";
+		    $tocid = (/^\@\w*heading/ ? undef : "TOC_$sec_num" );
+		  } 
 		  # check biblio and glossary
 		  $in_bibliography = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*bibliography$/i);
 		  $in_glossary = ($name =~ /^([A-Z]|\d+)?(\.\d+)*\s*glossary$/i);
@@ -5423,7 +5446,7 @@ sub pretty_date {
 sub doc_href {
     local($num) = @_;
 
-    return("${docu_name}_$num.$docu_ext");
+    return("${docu_name}__$num.$docu_ext");
 }
 
 sub sec_href

@@ -59,6 +59,7 @@ static void MakeDir (char* name)
 csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
 {
   csString path = csGetPlatformConfigPath (Key);
+  path << ".cfg";
 
   char* bslash = strrchr (path.GetData(), '\\');
   if (bslash)
@@ -73,7 +74,7 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
   return new csConfigFile (path);
 }
 
-csString csGetPlatformConfigPath (const char* key, bool directory)
+csString csGetPlatformConfigPath (const char* key)
 {
   char appDataPath [MAX_PATH + 1];
   csString path;
@@ -85,8 +86,7 @@ csString csGetPlatformConfigPath (const char* key, bool directory)
     if (!GetShellFolderPath (CSIDL_PERSONAL, appDataPath))
     {
       // Guess...
-      path << ".\\" << key << (directory ? "\\" : ".cfg");
-      return path;
+      strcpy (appDataPath, ".");
     }
   }
 

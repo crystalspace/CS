@@ -68,7 +68,7 @@ CS_IMPLEMENT_APPLICATION
 
 Simple::Simple (iObjectRegistry* object_reg)
 @{
-  SetApplicationName ("Simple Map");
+  SetApplicationName ("CrystalSpace.SimpleMap");
 @}
 
 Simple::~Simple ()

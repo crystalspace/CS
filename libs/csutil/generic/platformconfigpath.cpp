@@ -26,7 +26,7 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 
-csString csGetPlatformConfigPath (const char* key, bool directory)
+csString csGetPlatformConfigPath (const char* key)
 {
   csString dir;
   
@@ -40,7 +40,7 @@ csString csGetPlatformConfigPath (const char* key, bool directory)
   // Construct directory and filename of the config file
   csString path;
   path << home << CS_PATH_SEPARATOR << "." CS_PACKAGE_NAME 
-    << CS_PATH_SEPARATOR << key << (directory ? "/" : ".cfg");
+    << CS_PATH_SEPARATOR << key;
   
   return path;
 }

@@ -153,18 +153,13 @@ CS_CSUTIL_EXPORT csPtr<iConfigFile> csGetPlatformConfig (const char* key);
  * Settings\\Application Data" on Windows, or $HOME on Unix.
  * \param key Used to distinguish different stored configurations. Should be
  *  the application ID, e.g. "MyGames.ClickFrenzy2".
- * \param directory Whether to construct a filename or path. When 'false', a
- *   filename with the suffix '.cfg' will be returned (e.g. 
- *   "...\MyGames\ClickFrenzy2.cfg"), otherwise a directory name is returned
- *   "...\MyGames\ClickFrenzy2\"). Useful when the configuration data consists
- *   of multiple files.
- * \return A native path to a filename or directory suitable to store per-user 
- *   configuration data.
+ * \return A native path  suitable to store per-user configuration data, in
+ *   the form of e.g. "...\MyGames\ClickFrenzy2". The path could then be used
+ *   as a directory name or a base for a file name.
  * \remarks The returned path may not exist. The caller has to ensure its
- *  existance before using it.
+ *   existance before using it.
  */
-CS_CSUTIL_EXPORT csString csGetPlatformConfigPath (const char* key, 
-  bool directory = false);
+CS_CSUTIL_EXPORT csString csGetPlatformConfigPath (const char* key);
 
 /** @} */
 
