@@ -196,7 +196,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 {
-  delete config;
+  if (config)
+    config->DecRef();
 
   Close ();
   if (G2D) G2D->DecRef ();

@@ -97,7 +97,8 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
     src->DecRef();
   }
 
-  delete Config;
+  if (Config)
+    Config->DecRef();
 
   VFS->DecRef();
 }

@@ -88,7 +88,8 @@ csGraphics3DLine::~csGraphics3DLine ()
   delete texman;
   if (G2D)
     G2D->DecRef ();
-  delete config;
+  if (config)
+    config->DecRef();
 }
 
 bool csGraphics3DLine::Initialize (iSystem *iSys)

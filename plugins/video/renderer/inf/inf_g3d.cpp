@@ -92,7 +92,8 @@ csGraphics3DInfinite::~csGraphics3DInfinite ()
   Close ();
   delete texman;
   if (G2D) G2D->DecRef ();
-  delete config;
+  if (config)
+    config->DecRef();
 }
 
 bool csGraphics3DInfinite::Initialize (iSystem *iSys)
