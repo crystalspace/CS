@@ -164,6 +164,8 @@ public:
   	int num_planes);
   virtual void VisTest (csPlane3* planes,
   	int num_planes, iVisibilityCullerListener* viscallback);
+  virtual csPtr<iVisibilityObjectIterator> IntersectSegmentSloppy (
+    const csVector3& start, const csVector3& end);
   virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
     const csVector3& start, const csVector3& end, bool accurate = false);
   virtual bool IntersectSegment (const csVector3& start,

@@ -78,7 +78,7 @@ struct iVisibilityCullerListener : public iBase
     iMeshWrapper *mesh, uint32 frustum_mask) = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 5, 0);
+SCF_VERSION (iVisibilityCuller, 0, 6, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -170,7 +170,16 @@ struct iVisibilityCuller : public iBase
    */
   virtual void VisTest (csPlane3* plane, int num_planes, 
     iVisibilityCullerListener* viscallback) = 0;
-	
+
+  /**
+   * Intersect a segment with all objects in the visibility culler and
+   * return them all in an iterator. This function is less accurate
+   * then IntersectSegment() because it might also return objects that
+   * are not even hit by the beam but just close to it.
+   */
+  virtual csPtr<iVisibilityObjectIterator> IntersectSegmentSloppy (
+    const csVector3& start, const csVector3& end) = 0;
+
   /**
    * Intersect a segment with all objects in the visibility culler and
    * return them all in an iterator.

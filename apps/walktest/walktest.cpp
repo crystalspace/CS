@@ -1240,13 +1240,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Get the collide system plugin.
   const char* p = cfg->GetStr ("Walktest.Settings.CollDetPlugin",
-  	"crystalspace.collisiondetection.rapid");
+  	"crystalspace.collisiondetection.opcode");
   collide_system = CS_LOAD_PLUGIN (plugin_mgr, p, iCollideSystem);
   if (!collide_system)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No Collision Detection plugin found!");
     return false;
   }
+  object_reg->Register (collide_system, "iCollideSystem");
 
   // Initialize the command processor with the engine and camera.
   csCommandProcessor::Initialize (Engine, view->GetCamera (),

@@ -28,6 +28,7 @@
 #include "csgeom/vector3.h"
 
 class csReversibleTransform;
+struct csIntersectingTriangle;
 struct iPolygonMesh;
 struct iCollideSystem;
 struct iCollider;
@@ -35,6 +36,7 @@ struct iObject;
 struct iEngine;
 struct iRegion;
 struct iMeshWrapper;
+struct iSector;
 
 SCF_VERSION (csColliderWrapper, 0, 0, 3);
 
@@ -223,6 +225,36 @@ public:
 	int num_colliders,
 	iCollider** colliders,
 	csReversibleTransform** transforms);
+
+
+  /**
+   * Trace a beam from 'start' to 'end' and return the first hit.
+   * This function will use CollideRay() from the collision detection system
+   * and is pretty fast. Note that only OPCODE plugin currently supports
+   * this! A special note about portals! Portal traversal will NOT be used
+   * on portals that have a collider! The idea there is that the portal itself
+   * is a surface that cannot be penetrated.
+   * \param cdsys is the collider system.
+   * \param sector is the starting sector for the beam.
+   * \param start is the start of the beam.
+   * \param end is the end of the beam.
+   * \param traverse_portals set to true in case you want the beam to
+   * traverse portals.
+   * \param closest_tri will be set to the closest triangle that is hit. The
+   * triangle will be specified in world space.
+   * \param closest_isect will be set to the closest intersection point (in
+   * world space).
+   * \param closest_mesh will be set to the closest mesh that is hit.
+   * \return the squared distance between 'start' and the closest hit
+   * or else a negative number if there was no hit.
+   */
+  static float TraceBeam (iCollideSystem* cdsys, iSector* sector,
+	const csVector3& start, const csVector3& end,
+	bool traverse_portals,
+	csIntersectingTriangle& closest_tri,
+	csVector3& closest_isect,
+	iMeshWrapper** closest_mesh = 0);
 };
 
 #endif // __CS_COLLIDER_H__
+

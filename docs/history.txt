@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Sep-2004
+	- Jorrit added a new iVisibilityCuller->IntersectSegmentSloppy().
+	  This function will find all objects that might possibly intersect
+	  with the given beam. Intersection is not guaranteed but at least
+	  the bounding box of the object will intersect. This function is
+	  not as accurate but a LOT faster then IntersectSegment().
+	- Jorrit added a new csColliderHelper::TraceBeam() function that
+	  is a very efficient way to find the closest object that is hit
+	  by a beam (uses colliders for the objects). This function is
+	  faster then the iSector->HitBeam() functions but in contrast
+	  to those TraceBeam() will only work on the colliders while
+	  HitBeam() will work on the actual current triangle data. This
+	  can matter in cases where animation is used and the collider
+	  is a simple box approximating the model. The new TraceBeam()
+	  function will correctly transform portals (and space warping
+	  portals too).
+	- Jorrit added functionality in bugplug to test this new routine
+	  in case the third mouse button is pressed.
+	- Jorrit changed walktest to also  register the iCollideSystem to
+	  the object registry.
 1-Sep-2004
 	- Jorrit added a new iCollideSystem->CollideRay() and
 	  GetIntersectingTriangles(). With this function it is possible

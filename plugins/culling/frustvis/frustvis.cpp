@@ -814,6 +814,54 @@ struct IntersectSegment_Front2BackData
   bool accurate;
 };
 
+static bool IntersectSegmentSloppy_Front2Back (csKDTree* treenode,
+	void* userdata, uint32 cur_timestamp, uint32&)
+{
+  IntersectSegment_Front2BackData* data
+  	= (IntersectSegment_Front2BackData*)userdata;
+
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+
+  // In the first part of this test we are going to test if the
+  // start-end vector intersects with the node. If not then we don't
+  // need to continue.
+  csVector3 box_isect;
+  if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // First test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+
+      if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
+      {
+        // This object is possibly intersected by this beam.
+	if (visobj_wrap->mesh)
+	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
+	    data->vector->Push (visobj_wrap->visobj);
+      }
+    }
+  }
+  return true;
+}
+
 static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
@@ -962,6 +1010,21 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.vector = new csArray<iVisibilityObject*> ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
+
+  csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, 0);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
+}
+
+csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegmentSloppy (
+    const csVector3& start, const csVector3& end)
+{
+  UpdateObjects ();
+  current_vistest_nr++;
+  IntersectSegment_Front2BackData data;
+  data.seg.Set (start, end);
+  data.vector = new csArray<iVisibilityObject*> ();
+  kdtree->Front2Back (start, IntersectSegmentSloppy_Front2Back,
+  	(void*)&data, 0);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, 0);
   return csPtr<iVisibilityObjectIterator> (vobjit);

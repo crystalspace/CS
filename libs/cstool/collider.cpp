@@ -23,9 +23,15 @@
 #include "iengine/engine.h"
 #include "iengine/region.h"
 #include "iengine/mesh.h"
+#include "iengine/sector.h"
+#include "iengine/viscull.h"
+#include "iengine/movable.h"
+#include "iengine/portalcontainer.h"
+#include "iengine/portal.h"
 #include "imesh/object.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
+#include "csqsqrt.h"
 
 //----------------------------------------------------------------------
 
@@ -292,5 +298,167 @@ int csColliderHelper::CollidePath (
     // There was no collision.
     return 1;
   }
+}
+
+float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
+	const csVector3& start, const csVector3& end,
+	bool traverse_portals,
+	csIntersectingTriangle& closest_tri,
+	csVector3& closest_isect,
+	iMeshWrapper** closest_mesh)
+{
+  if (!sector)
+  {
+    if (closest_mesh) *closest_mesh = 0;
+    return -1.0f;
+  }
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  csRef<iVisibilityObjectIterator> it = culler->IntersectSegmentSloppy (
+  	start, end);
+
+  // We loop over all objects that intersect with the beam. For every
+  // such object we will use CollideRay() to find colliding triangles. We
+  // will look for the colliding triangle closest to 'start'.
+  float best_squared_dist = 10000000000.0;
+  csSegment3 seg (start, end);
+  iMeshWrapper* best_mesh = 0;
+  bool have_hit = false;
+  // This will be set to the hit portal index if the best polygon we
+  // hit so far is actually a portal.
+  int last_portal_index = -1;
+ 
+  while (it->HasNext ())
+  {
+    iVisibilityObject* visobj = it->Next ();
+    iMeshWrapper* mesh = visobj->GetMeshWrapper ();
+    csColliderWrapper* colwrap = csColliderWrapper::GetColliderWrapper (
+    	mesh->QueryObject ());
+    if (colwrap)
+    {
+      iMovable* movable = mesh->GetMovable ();
+      csReversibleTransform trans = movable->GetFullTransform ();
+      if (cdsys->CollideRay (colwrap->GetCollider (), &trans, start, end))
+      {
+        // This ray hits the mesh.
+	const csArray<csIntersectingTriangle>& tris = cdsys->
+		GetIntersectingTriangles ();
+	size_t i;
+	for (i = 0 ; i < tris.Length () ; i++)
+	{
+	  csVector3 isect;
+	  csIntersectingTriangle tri;
+	  if (movable->IsFullTransformIdentity ())
+	  {
+	    tri = tris[i];
+	  }
+	  else
+	  {
+	    tri.a = trans.This2Other (tris[i].a);
+	    tri.b = trans.This2Other (tris[i].b);
+	    tri.c = trans.This2Other (tris[i].c);
+	  }
+	  // The function below should always return true but you never know
+	  // due to numerical inaccuracies.
+	  if (csIntersect3::IntersectTriangle (tri.a, tri.b, tri.c,
+	  	seg, isect))
+	  {
+	    float squared_dist = csSquaredDist::PointPoint (isect, start);
+	    if (squared_dist < best_squared_dist)
+	    {
+	      have_hit = true;
+	      best_squared_dist = squared_dist;
+	      closest_tri = tri;
+	      closest_isect = isect;
+	      // This is not a portal we want to traverse because it
+	      // has a collider which means it is solid.
+	      last_portal_index = -1;
+	      best_mesh = mesh;
+	    }
+	  }
+	}
+      }
+    }
+    if (mesh->GetPortalContainer () && traverse_portals)
+    {
+      // We have a portal container and we want to specifically traverse
+      // portals. In that case we also have to trace a beam to whatever
+      // portal we might hit.
+      iMovable* movable = mesh->GetMovable ();
+      csReversibleTransform trans = movable->GetFullTransform ();
+      csVector3 obj_start, obj_end;
+      if (movable->IsFullTransformIdentity ())
+      {
+        obj_start = start;
+        obj_end = end;
+      }
+      else
+      {
+        obj_start = trans.Other2This (start);
+        obj_end = trans.Other2This (end);
+      }
+      csVector3 obj_isect;
+      int polygon_idx;
+      if (mesh->GetMeshObject ()->HitBeamObject (obj_start, obj_end,
+      		obj_isect, 0, &polygon_idx))
+      {
+        if (!movable->IsFullTransformIdentity ())
+	  obj_isect = trans.This2Other (obj_isect);
+	float squared_dist = csSquaredDist::PointPoint (obj_isect, start);
+	if (squared_dist < best_squared_dist)
+	{
+	  have_hit = true;
+	  best_squared_dist = squared_dist;
+	  closest_isect = obj_isect;
+	  last_portal_index = polygon_idx;
+	  best_mesh = mesh;
+	}
+      }
+    }
+  }
+
+  // If our best hit is a portal then we must traverse it here.
+  if (last_portal_index != -1)
+  {
+    iPortal* portal = best_mesh->GetPortalContainer ()->GetPortal (
+    	last_portal_index);
+    // First we calculate a new beam starting in the new sector from
+    // the intersection point. We make sure the new start is slightly
+    // beyond the intersection point to avoid numerical inaccuracies.
+    // We take a point 0.1% on the way from 'closest_isect' to 'end'.
+    csVector3 new_start = closest_isect + 0.001 * (end-closest_isect);
+    csVector3 new_end = end;
+
+    // Now we have to consider space warping for the portal.
+    if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+    {
+      iMovable* movable = best_mesh->GetMovable ();
+      csReversibleTransform trans = movable->GetFullTransform ();
+
+      csReversibleTransform warp_wor;
+      portal->ObjectToWorld (trans, warp_wor);
+      new_start = portal->Warp (warp_wor, new_start);
+      new_end = portal->Warp (warp_wor, new_end);
+    }
+
+    // Recurse with the new beam to the new sector.
+    float new_squared_dist = TraceBeam (cdsys, portal->GetSector (),
+	new_start, new_end, traverse_portals,
+	closest_tri, closest_isect,
+	closest_mesh);
+    if (new_squared_dist >= 0)
+    {
+      // We have a hit. We have to add the distance so far to the
+      // new distance.
+      float new_dist = csQsqrt (best_squared_dist) + csQsqrt (new_squared_dist);
+      return new_dist * new_dist;
+    }
+    return -1.0f;
+  }
+
+  if (closest_mesh) *closest_mesh = best_mesh;
+  if (have_hit)
+    return best_squared_dist;
+  else
+    return -1.0f;
 }
 

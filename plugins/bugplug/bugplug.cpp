@@ -56,6 +56,7 @@
 #include "ivideo/material.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
+#include "ivaria/collider.h"
 #include "iutil/object.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
@@ -72,7 +73,9 @@
 #include "iengine/material.h"
 #include "iengine/rview.h"
 #include "cstool/csview.h"
+#include "cstool/collider.h"
 #include "csqint.h"
+#include "csqsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -581,8 +584,38 @@ void csBugPlug::MouseButton1 (iCamera*)
 {
 }
 
-void csBugPlug::MouseButton2 (iCamera*)
+void csBugPlug::MouseButton2 (iCamera* camera)
 {
+  csVector3 v;
+  // Setup perspective vertex, invert mouse Y axis.
+  csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
+
+  camera->InvPerspective (p, 100, v);
+  csVector3 end = camera->GetTransform ().This2Other (v);
+
+  iSector* sector = camera->GetSector ();
+  CS_ASSERT (sector != 0);
+  csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
+  csVector3 isect;
+
+  csRef<iCollideSystem> cdsys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
+  csIntersectingTriangle closest_tri;
+  iMeshWrapper* sel;
+  float sqdist = csColliderHelper::TraceBeam (cdsys, sector,
+	origin, end, true,
+	closest_tri, isect, &sel);
+
+  if (sqdist >= 0 && sel)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Hit a mesh '%s' at distance %g!",
+	sel->QueryObject ()->GetName (), csQsqrt (sqdist));
+  }
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"No mesh hit!");
+  }
 }
 
 void csBugPlug::MouseButton3 (iCamera* camera)
