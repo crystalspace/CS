@@ -140,7 +140,7 @@ void csGraphicsPipeline::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
 
   INCLUDE_MIN_POINT (x, y);
   INCLUDE_MAX_POINT (x + w, y + h);
-  s2d->Draw (G3D, x, y, w, h);
+  s2d->DrawScaled (G3D, x, y, w, h);
 }
 
 void csGraphicsPipeline::SaveArea (csImageArea **Area, int x, int y, int w, int h)

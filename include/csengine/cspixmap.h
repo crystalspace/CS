@@ -24,6 +24,13 @@
 #include "itexture.h"
 #include "csutil/csbase.h"
 
+/// alignment settings for drawing pixmaps
+#define PIXMAP_TOP      0
+#define PIXMAP_LEFT     0
+#define PIXMAP_CENTER   1
+#define PIXMAP_BOTTOM   2
+#define PIXMAP_RIGHT    2
+
 /**
  * This class is an simple set of inline routines good as an abstraction
  * for simple 2D sprites. Pixmaps can be drawn with a transparent key color
@@ -41,6 +48,15 @@ public:
   { tx = x; ty = y; tw = w; th = h; }
 
   /// Initialize the pixmap from a texture.
+  csPixmap (iTextureHandle *hTexture)
+  {
+    int w,h;
+    hTex = hTexture;
+    hTex->GetMipMapDimensions (0,w,h);
+    SetTextureRectangle (0, 0, w, h);
+  }
+
+  /// Initialize the pixmap from a texture with given rectangle
   csPixmap (iTextureHandle *hTexture, int x, int y, int w, int h)
   {
     hTex = hTexture;
@@ -57,15 +73,26 @@ public:
   { return hTex != NULL; }
 
   /// Draw the pixmap given the screen position and new size
-  virtual void Draw (iGraphics3D* g3d, int sx, int sy, int sw, int sh)
+  virtual void DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw, int sh)
   {
     if (hTex)
       g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th);
   }
 
+  /// Draw the pixmap given the screen position and new size (aligned)
+  void DrawScaledAlign (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
+        int alnx, int alny)
+  {
+     DrawScaled (g3d, sx-alnx*sw/2, sy-alny*sh/2, sw, sh);
+  }
+
   /// Draw the pixmap without rescale
   void Draw (iGraphics3D* g3d, int sx, int sy)
-  { Draw (g3d, sx, sy, tw, th); }
+  { DrawScaled (g3d, sx, sy, tw, th); }
+
+  /// Draw the pixmap without rescale (aligned)
+  void DrawAlign (iGraphics3D* g3d, int sx, int sy, int alnx, int alny)
+  { DrawScaledAlign (g3d, sx, sy, tw, th, alnx, alny); }
 
   /// Return pixmap width
   int Width ()
