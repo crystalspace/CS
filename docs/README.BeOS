@@ -99,12 +99,11 @@ This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunsh
 - window is not closed when alt-q is used to terminat application
 - it is possible to close the window while the application is starting, yet the application does not terminate.
 - application bombs when window is closed when using OpenGL driver.
-- blocks prints out some twirling text cursor as game progresses (every frame, presumably)
 - modified key strokes not translated properly (can not use shift modifier in walktest)
 - something in the make process is executing "rm -f" during 'clean'
-- maze does not respond to the mouse at all (which makes it entirely useless); presumably mouse related functionality has not yet been implemented.
+- mazed does not respond to the mouse at all (which makes it entirely useless); presumably mouse related functionality has not yet been implemented.
 - cswstest experiences some very bizarre display anomalies when the right mouse button is clicked; it appears to be a double-buffer problem.
-- metademo and squawk crash upon initialization when using OpenGL driver.
+- metademo and squawk crash upon initialization when using OpenGL driver (may be fixed for metademo; I fixed a bug in its command line argument parsing)
 - glide does not compile
 - usage of simulated depth appears to crash most applications, and is ignored by others
 
@@ -121,6 +120,5 @@ This is the list of bugs which have recently been fixed.
 - network socket library does not compile (BeOS does not support sockets)
 - ndriverdemo does not work (needs socket library)
 - opengl compiles with warnings
-- squawk is displaying detritus console text in the gaps between 3D views every other frame;
-this appears to be a double-buffer problem.
+- squawk is displaying detritus console text in the gaps between 3D views every other frame; this appears to be a double-buffer problem.
 - glrender.mak tries linking with libraries which do not exist on BeOS
