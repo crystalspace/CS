@@ -11,6 +11,8 @@ The history order is reversed so that new features are at the top.
 	  Perl-specific wrapper for that method to perlpost.i.
 	- Oktal changed /* in include/csutil/list.h to /** to fix the doxygen
 	  comment, so that csList will be added to PubAPI.
+	- Jorrit changed a comment for ThreadedLoadMapFile() to indicate that
+	  it doesn't work yet.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.
