@@ -160,7 +160,7 @@ public:
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
     csArray<T> ret (values.Length () / 2);
-    for (int i = values.Length () - 1; i >= 0; i++)
+    for (int i = values.Length () - 1; i >= 0; i--)
       if (KeyHandler::CompareKeys (values[i].key, key)) 
 	ret.Push (values[i].value);
     return ret;

@@ -36,6 +36,9 @@ chronological order.
 	  csShaderManager::SetupState().
 	- Jorrit fixed some occurances of Compare (changed with CompareKeys)
 	  in csHash.
+	- res fixed a bug in csHash<>::GetAll(). When you have a loop that 
+	  should iterate from n-1 to 0, it's better to decrement the loop
+	  counter than to increment.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
