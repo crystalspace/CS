@@ -7,7 +7,7 @@
 @noindent
 @emph{Origionally written by Thomas Hieber, @email{thieber@@gmx.net}}
 
-@emph{Updated by Philip Wyett, @email{philip.wyett@@lineone.net }. Last updated 12 Febuary, 2001.}
+@emph{Updated by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}. Last updated 12 Febuary, 2001.}
 
 At first look, map making can be pretty complicated, but if you follow this
 tutorial, you will soon walk around in your self-created world.
