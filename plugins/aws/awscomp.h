@@ -209,7 +209,7 @@ public:
     iAws *WindowManager() { return wmgr; }
 
     /// Returns a newly created component of the type this factory handles. 
-    virtual awsComponent *Create()=0;
+    virtual iAwsComponent *Create()=0;
 
     /// Registers this factory with the window manager
     void Register(char *type);

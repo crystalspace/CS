@@ -115,7 +115,7 @@ public:
     virtual ~awsCmdButtonFactory();
 
     /// Returns a newly created component of the type this factory handles. 
-    virtual awsComponent *Create();
+    virtual iAwsComponent *Create();
 };
 
 #endif

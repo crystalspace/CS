@@ -277,7 +277,7 @@ awsCmdButtonFactory::~awsCmdButtonFactory()
  // empty
 }
 
-awsComponent *
+iAwsComponent *
 awsCmdButtonFactory::Create()
 {
  return new awsCmdButton; 
