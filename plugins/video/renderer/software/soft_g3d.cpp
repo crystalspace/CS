@@ -1998,16 +1998,11 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
     flat_g = poly.flat_color_g;
     flat_b = poly.flat_color_b;
   }
-/*
   Scan.FlatColor =
     (QRound (flat_r * pfmt.RedMask) & pfmt.RedMask)
   | (QRound (flat_g * pfmt.GreenMask) & pfmt.GreenMask)
   | (QRound (flat_b * pfmt.BlueMask) & pfmt.BlueMask);
-*/
-  Scan.FlatColor =
-    ((QRound (flat_r) << pfmt.RedShift) & pfmt.RedMask)
-  | ((QRound (flat_g) << pfmt.GreenShift) & pfmt.GreenMask)
-  | ((QRound (flat_b) << pfmt.BlueShift) & pfmt.BlueMask);
+
   //-----
   // Get the values from the polygon for more conveniant local access.
   // Also look for the top-most and bottom-most vertices.
