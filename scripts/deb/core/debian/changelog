@@ -1,8 +1,9 @@
 crystalspace (0.98-20040623-1) unstable; urgency=low
 
   * New Upstream
+  * Changed dependancy taking in account "res" comments 
 
- -- Christian Bayle <bayle@debian.org>  Wed, 23 Jun 2004 01:25:35 +0200
+ -- Christian Bayle <bayle@debian.org>  Thu, 24 Jun 2004 00:54:33 +0200
 
 crystalspace (0.96-20030912-7) unstable; urgency=low
 
