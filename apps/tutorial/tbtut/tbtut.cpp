@@ -176,50 +176,50 @@ bool TerrBigTut::Initialize ()
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-100, 0, 100));
-  p->CreateVertex (csVector3 (100, 0, 100));
-  p->CreateVertex (csVector3 (100, 0, -100));
-  p->CreateVertex (csVector3 (-100, 0, -100));
+  p->CreateVertex (csVector3 (-128, 0, 128));
+  p->CreateVertex (csVector3 (128, 0, 128));
+  p->CreateVertex (csVector3 (128, 0, -128));
+  p->CreateVertex (csVector3 (-128, 0, -128));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-100, 100, -100));
-  p->CreateVertex (csVector3 (100, 100, -100));
-  p->CreateVertex (csVector3 (100, 100, 100));
-  p->CreateVertex (csVector3 (-100, 100, 100));
+  p->CreateVertex (csVector3 (-128, 100, -128));
+  p->CreateVertex (csVector3 (128, 100, -128));
+  p->CreateVertex (csVector3 (128, 100, 128));
+  p->CreateVertex (csVector3 (-128, 100, 128));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-100, 100, 100));
-  p->CreateVertex (csVector3 (100, 100, 100));
-  p->CreateVertex (csVector3 (100, 0, 100));
-  p->CreateVertex (csVector3 (-100, 0, 100));
+  p->CreateVertex (csVector3 (-128, 100, 128));
+  p->CreateVertex (csVector3 (128, 100, 128));
+  p->CreateVertex (csVector3 (128, 0, 128));
+  p->CreateVertex (csVector3 (-128, 0, 128));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (100, 100, 100));
-  p->CreateVertex (csVector3 (100, 100, -100));
-  p->CreateVertex (csVector3 (100, 0, -100));
-  p->CreateVertex (csVector3 (100, 0, 100));
+  p->CreateVertex (csVector3 (128, 100, 128));
+  p->CreateVertex (csVector3 (128, 100, -128));
+  p->CreateVertex (csVector3 (128, 0, -128));
+  p->CreateVertex (csVector3 (128, 0, 128));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-100, 100, -100));
-  p->CreateVertex (csVector3 (-100, 100, 100));
-  p->CreateVertex (csVector3 (-100, 0, 100));
-  p->CreateVertex (csVector3 (-100, 0, -100));
+  p->CreateVertex (csVector3 (-128, 100, -128));
+  p->CreateVertex (csVector3 (-128, 100, 128));
+  p->CreateVertex (csVector3 (-128, 0, 128));
+  p->CreateVertex (csVector3 (-128, 0, -128));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (100, 100, -100));
-  p->CreateVertex (csVector3 (-100, 100, -100));
-  p->CreateVertex (csVector3 (-100, 0, -100));
-  p->CreateVertex (csVector3 (100, 0, -100));
+  p->CreateVertex (csVector3 (128, 100, -128));
+  p->CreateVertex (csVector3 (-128, 100, -128));
+  p->CreateVertex (csVector3 (-128, 0, -128));
+  p->CreateVertex (csVector3 (128, 0, -128));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   csRef<iMeshFactoryWrapper> factory;
@@ -320,9 +320,9 @@ void TerrBigTut::SetupFrame ()
   if (kbd->GetKeyState (CSKEY_PGDN))
     c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * elapsed_time);
+    c->Move (CS_VEC_FORWARD * 10 * speed);
   if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_FORWARD * -4 * elapsed_time);
+    c->Move (CS_VEC_FORWARD * -10 * speed);
 
   if (g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) {
     view->Draw (); 
