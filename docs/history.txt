@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Dec-2004
+        - res made the following changes:
+            - Fixed the Win32 shared lib linking.
+            - Did some re-macroization of the static var cleanup stuff.
+            - Replaced some printf()s with csPrintf()s in the shader expression
+              code.
+            - Made csGradient::GetShades() return a ref to a const array.
+            - Added some missing CS_CSGEOM_EXPORT invokations to csBox2.
 4-Dec-2004
         - res fixed the GL renderer to not call glDeleteTextures() on super
           lightmap textures.

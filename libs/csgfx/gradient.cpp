@@ -48,23 +48,20 @@ csGradient::csGradient (csColor first, csColor last)
   AddShade (csGradientShade (last, 1.0f));
 }
 
+static int ShadeCompare (csGradientShade const& item,
+			 csGradientShade const& shade)
+{
+  if (item.position < shade.position)
+    return -1;
+  else if (item.position > shade.position)
+    return 1;
+  else
+    return 0;
+}
+
 void csGradient::AddShade (csGradientShade shade)
 {
-  size_t lo = 0, hi = shades.Length();
-  size_t mid = 0;
-  while (lo < hi)
-  {
-    mid = (lo + hi) / 2;
-    if (shades[mid].position < shade.position)
-    {
-      lo = mid + 1;
-    }
-    else
-    {
-      hi = mid;
-    }
-  }
-  shades.Insert (lo, shade);
+  shades.InsertSorted (shade, &ShadeCompare);
 }
 
 void csGradient::Clear ()

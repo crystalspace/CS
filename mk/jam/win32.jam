@@ -419,16 +419,39 @@ rule SystemLinkPlugin
   Clean $(<)clean : $(target) ;
 }
 
-rule SystemLinkLibrary
+rule SystemLinkSharedLibrary
 {
-  local libname = $(3) ;
-
   LFlags $(<) : $(LINKLIBS) ;
   Depends $(<) : $(>) ;
-  LinkSharedLibrary $(<) : $(>) : $(3) ;
+  LinkSharedLibrary $(<) : $(>) ;
+  MakeImportLib $(3) : $(<) ;
 
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
+}
+
+rule MakeImportLib
+{
+  local deffile = "$(<:B).def" ;
+  LOCATE on $(deffile) = $(LOCATE_TARGET) ;
+  SEARCH on $(deffile) = $(LOCATE_TARGET) ;
+  
+  Clean clean : $(deffile) ;
+  Clean $(<)clean : $(deffile) ;
+  Depends $(deffile) : $(>) ;
+  GenerateDef $(deffile) : $(>) ;
+  Depends $(<) : $(deffile) ;
+  GenerateImportLib $(<) : $(deffile) ;
+}
+
+actions GenerateDef 
+{
+  pexports $(>) > $(<)
+}
+
+actions GenerateImportLib
+{
+  $(CMD.DLLTOOL) -d $(>) -l $(<)
 }
 
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
@@ -454,5 +477,5 @@ else
   #$(CMD.LINK) -o $(<) $(>) -mdll $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --output-lib=$(3) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }

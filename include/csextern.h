@@ -20,14 +20,6 @@
 #ifndef __CS_CSEXTERN_H__
 #define __CS_CSEXTERN_H__
 
-// Defaults for platforms that do not define their own.
-#ifndef CS_EXPORT_SYM
-  #define CS_EXPORT_SYM
-#endif
-#ifndef CS_IMPORT_SYM
-  #define CS_IMPORT_SYM
-#endif
-
 #ifdef CS_CSUTIL_LIB
   #define CS_CSUTIL_EXPORT CS_EXPORT_SYM
 #else

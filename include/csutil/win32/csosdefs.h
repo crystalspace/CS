@@ -20,9 +20,12 @@
 #ifndef __CS_CSOSDEFS_H__
 #define __CS_CSOSDEFS_H__
 
+#define CS_EXPORT_SYM_DLL       __declspec(dllexport)
+#define CS_IMPORT_SYM_DLL       __declspec(dllimport)
+
 #ifdef CS_BUILD_SHARED_LIBS
-  #define CS_EXPORT_SYM __declspec(dllexport)
-  #define CS_IMPORT_SYM __declspec(dllimport)
+  #define CS_EXPORT_SYM CS_EXPORT_SYM_DLL
+  #define CS_IMPORT_SYM CS_IMPORT_SYM_DLL
 #else
   #define CS_EXPORT_SYM
   #define CS_IMPORT_SYM

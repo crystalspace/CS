@@ -37,6 +37,21 @@
  * Pull in platform-specific overrides of the requested functionality.
  */
 #include "csutil/csosdefs.h"
+
+// Defaults for platforms that do not define their own.
+#ifndef CS_EXPORT_SYM_DLL
+  #define CS_EXPORT_SYM_DLL
+#endif
+#ifndef CS_IMPORT_SYM_DLL
+  #define CS_IMPORT_SYM_DLL     extern
+#endif
+#ifndef CS_EXPORT_SYM
+  #define CS_EXPORT_SYM
+#endif
+#ifndef CS_IMPORT_SYM
+  #define CS_IMPORT_SYM
+#endif
+
 #include "csextern.h"
 
 /*
@@ -257,6 +272,22 @@ void Name (void (*p)())             			       \
 }
 #endif
 
+#ifndef CS_DEFINE_STATIC_VARIABLE_REGISTRATION
+#  define CS_DEFINE_STATIC_VARIABLE_REGISTRATION(func)			\
+    csStaticVarCleanupFN csStaticVarCleanup = &func
+#endif
+
+#ifndef CS_DECLARE_STATIC_VARIABLE_REGISTRATION
+#  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION(func)			\
+    void func (void (*p)())
+#endif
+
+#ifndef CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION
+#  define CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
+    CS_CSUTIL_EXPORT 							\
+    CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+#endif
+
 /**\def CS_IMPLEMENT_PLUGIN
  * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
  * exactly one compilation unit comprising a plugin module.  For maximum
@@ -268,19 +299,18 @@ void Name (void (*p)())             			       \
 #if defined(CS_STATIC_LINKED) || defined(CS_BUILD_SHARED_LIBS)
 
 #  ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN        					  \
-          CS_IMPLEMENT_PLATFORM_PLUGIN 					  \
-	  CS_CSUTIL_EXPORT void csStaticVarCleanup_csutil (void (*p)());  \
-	  csStaticVarCleanupFN csStaticVarCleanup = 			  \
-	    &csStaticVarCleanup_csutil;
+#  define CS_IMPLEMENT_PLUGIN        					\
+          CS_IMPLEMENT_PLATFORM_PLUGIN 					\
+	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION;		\
+	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #  endif
 
 #else
 
 #  ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN              \
-   CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)    \
-   csStaticVarCleanupFN csStaticVarCleanup = &csStaticVarCleanup_local;	  \
+#  define CS_IMPLEMENT_PLUGIN						\
+   CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
+   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
    CS_IMPLEMENT_PLATFORM_PLUGIN 
 #  endif
 
@@ -296,9 +326,8 @@ void Name (void (*p)())             			       \
  */
 #ifndef CS_IMPLEMENT_APPLICATION
 #  define CS_IMPLEMENT_APPLICATION       				\
-  CS_CSUTIL_EXPORT void csStaticVarCleanup_csutil (void (*p)());	\
-  csStaticVarCleanupFN csStaticVarCleanup = 				\
-    &csStaticVarCleanup_csutil;						\
+  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION;			\
+  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
   CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif
 

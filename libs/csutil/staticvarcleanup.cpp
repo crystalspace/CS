@@ -20,8 +20,8 @@
 #include "cssysdef.h"
 
 CS_CSUTIL_EXPORT 
-CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_csutil)
+CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil)
 
 #ifdef CS_BUILD_SHARED_LIBS
-csStaticVarCleanupFN csStaticVarCleanup = &csStaticVarCleanup_csutil;
+CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #endif

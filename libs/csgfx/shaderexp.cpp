@@ -1842,49 +1842,51 @@ void csShaderExpression::print_cons(const cons * head) const
 {
   const cons * cell = head;
 
-  printf("(");
+  csPrintf ("(");
 
   while (cell)
   {
     switch (cell->car.type)
     {
     case TYPE_CONS:
-      printf(" ");
+      csPrintf (" ");
       print_cons(cell->car.cell);
       break;
       
     case TYPE_OPER:
-      printf("%s", sexptokens.Request((csStringID)cell->car.oper));
+      csPrintf ("%s", sexptokens.Request((csStringID)cell->car.oper));
       break;
       
     case TYPE_NUMBER:
-      printf(" %f", cell->car.num);
+      csPrintf (" %f", cell->car.num);
       break;
       
     case TYPE_VECTOR2:
-      printf(" #(%f %f)", cell->car.vec4.x, cell->car.vec4.y);
+      csPrintf (" #(%f %f)", cell->car.vec4.x, cell->car.vec4.y);
       break;
       
     case TYPE_VECTOR3:
-      printf(" #(%f %f %f)", cell->car.vec4.x, cell->car.vec4.y, cell->car.vec4.z);
+      csPrintf (" #(%f %f %f)", cell->car.vec4.x, cell->car.vec4.y, 
+        cell->car.vec4.z);
       break;
       
     case TYPE_VECTOR4:
-      printf(" #(%f %f %f %f)", cell->car.vec4.x, cell->car.vec4.y, cell->car.vec4.z, cell->car.vec4.w);
+      csPrintf (" #(%f %f %f %f)", cell->car.vec4.x, cell->car.vec4.y, 
+        cell->car.vec4.z, cell->car.vec4.w);
       break;
       
     case TYPE_VARIABLE:
-      printf(" %s", strset->Request(cell->car.var));
+      csPrintf (" %s", strset->Request(cell->car.var));
       break;
       
     default:
-      printf(" #<unknown type>");
+      csPrintf (" #<unknown type>");
     }
 
     cell = cell->cdr;
   }
 	  
-  printf(")");
+  csPrintf (")");
 }
 
 void csShaderExpression::print_ops(const oper_array & ops) const
@@ -1895,38 +1897,38 @@ void csShaderExpression::print_ops(const oper_array & ops) const
   {
     const oper & op = iter.Next();
 
-    printf(" %s", mnemonics.Request(op.opcode));
+    csPrintf (" %s", mnemonics.Request(op.opcode));
 
     if (op.arg1.type != TYPE_INVALID)
     {
       switch (op.arg1.type)
       {
       case TYPE_NUMBER:
-	printf(" %f", op.arg1.num);
+	csPrintf (" %f", op.arg1.num);
 	break;
 	
       case TYPE_VECTOR2:
-	printf(" #(%f %f)", op.arg1.vec4.x, op.arg1.vec4.y);
+	csPrintf (" #(%f %f)", op.arg1.vec4.x, op.arg1.vec4.y);
 	break;
 	
       case TYPE_VECTOR3:
-	printf(" #(%f %f %f)", op.arg1.vec4.x, op.arg1.vec4.y, op.arg1.vec4.z);
+	csPrintf (" #(%f %f %f)", op.arg1.vec4.x, op.arg1.vec4.y, op.arg1.vec4.z);
 	break;
 	
       case TYPE_VECTOR4:
-	printf(" #(%f %f %f %f)", op.arg1.vec4.x, op.arg1.vec4.y, op.arg1.vec4.z, op.arg1.vec4.w);
+	csPrintf (" #(%f %f %f %f)", op.arg1.vec4.x, op.arg1.vec4.y, op.arg1.vec4.z, op.arg1.vec4.w);
 	break;
 	
       case TYPE_VARIABLE:
-	printf(" %s", strset->Request(op.arg1.var));
+	csPrintf (" %s", strset->Request(op.arg1.var));
 	break;
 
       case TYPE_ACCUM:
-	printf(" ACC%i", op.arg1.acc);
+	csPrintf (" ACC%i", op.arg1.acc);
 	break;
 	
       default:
-	printf(" #<unknown type %i>", op.arg1.type);
+	csPrintf (" #<unknown type %i>", op.arg1.type);
       }
       
     }
@@ -1936,34 +1938,34 @@ void csShaderExpression::print_ops(const oper_array & ops) const
       switch (op.arg2.type)
       {
       case TYPE_NUMBER:
-	printf(",%f", op.arg2.num);
+	csPrintf (",%f", op.arg2.num);
 	break;
 	
       case TYPE_VECTOR2:
-	printf(",#(%f %f)", op.arg2.vec4.x, op.arg2.vec4.y);
+	csPrintf (",#(%f %f)", op.arg2.vec4.x, op.arg2.vec4.y);
 	break;
 	
       case TYPE_VECTOR3:
-	printf(",#(%f %f %f)", op.arg2.vec4.x, op.arg2.vec4.y, op.arg2.vec4.z);
+	csPrintf (",#(%f %f %f)", op.arg2.vec4.x, op.arg2.vec4.y, op.arg2.vec4.z);
 	break;
 	
       case TYPE_VECTOR4:
-	printf(",#(%f %f %f %f)", op.arg2.vec4.x, op.arg2.vec4.y, op.arg2.vec4.z, op.arg2.vec4.w);
+	csPrintf (",#(%f %f %f %f)", op.arg2.vec4.x, op.arg2.vec4.y, op.arg2.vec4.z, op.arg2.vec4.w);
 	break;
 	
       case TYPE_VARIABLE:
-	printf(",%s", strset->Request(op.arg2.var));
+	csPrintf (",%s", strset->Request(op.arg2.var));
 	break;
 
       case TYPE_ACCUM:
-	printf(",ACC%i", op.arg2.acc);
+	csPrintf (",ACC%i", op.arg2.acc);
 	break;
 	
       default:
-	printf(",#<unknown type %i>", op.arg2.type);
+	csPrintf (",#<unknown type %i>", op.arg2.type);
       }
     }
 
-    printf(" -> ACC%i\n", op.acc);
+    csPrintf (" -> ACC%i\n", op.acc);
   }
 }

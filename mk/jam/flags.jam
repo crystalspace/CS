@@ -37,7 +37,7 @@ rule LinkWith
   local libs ;
   for i in $(rawlibs)
   {
-    libs += [ ConstructLibraryTarget $(i) : $($(i)_SHARED) ] ;
+    libs += [ ConstructLibraryLinkTarget $(i) : $($(i)_SHARED) ] ;
   }
       
   DEPENDS $($(<)_TARGET) : $(libs) ;

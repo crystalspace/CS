@@ -434,22 +434,30 @@ public:
   bool TestIntersect (const csBox2& box) const;
 
   /// Compute the union of two bounding boxes.
-  friend csBox2 operator+ (const csBox2& box1, const csBox2& box2);
+  friend CS_CSGEOM_EXPORT csBox2 operator+ (const csBox2& box1, 
+    const csBox2& box2);
   /// Compute the union of a bounding box and a point.
-  friend csBox2 operator+ (const csBox2& box, const csVector2& point);
+  friend CS_CSGEOM_EXPORT csBox2 operator+ (const csBox2& box, 
+    const csVector2& point);
   /// Compute the intersection of two bounding boxes.
-  friend csBox2 operator* (const csBox2& box1, const csBox2& box2);
+  friend CS_CSGEOM_EXPORT csBox2 operator* (const csBox2& box1, 
+    const csBox2& box2);
 
   /// Tests if two bounding boxes are equal.
-  friend bool operator== (const csBox2& box1, const csBox2& box2);
+  friend CS_CSGEOM_EXPORT bool operator== (const csBox2& box1, 
+    const csBox2& box2);
   /// Tests if two bounding boxes are unequal.
-  friend bool operator!= (const csBox2& box1, const csBox2& box2);
+  friend CS_CSGEOM_EXPORT bool operator!= (const csBox2& box1, 
+    const csBox2& box2);
   /// Tests if box1 is a subset of box2.
-  friend bool operator< (const csBox2& box1, const csBox2& box2);
+  friend CS_CSGEOM_EXPORT bool operator< (const csBox2& box1, 
+    const csBox2& box2);
   /// Tests if box1 is a superset of box2.
-  friend bool operator> (const csBox2& box1, const csBox2& box2);
+  friend CS_CSGEOM_EXPORT bool operator> (const csBox2& box1, 
+    const csBox2& box2);
   /// Tests if a point is contained in a box.
-  friend bool operator< (const csVector2& point, const csBox2& box);
+  friend CS_CSGEOM_EXPORT bool operator< (const csVector2& point, 
+    const csBox2& box);
 };
 
 /**

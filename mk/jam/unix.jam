@@ -27,13 +27,13 @@ LIBRARY.CFLAGS += $(COMPILER.CFLAGS.PIC) ;
 
 # The BFD tag name under which to embed meta-information into a plugin module.
 # This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
-SECTION_TAG_NAME ?= .crystalspace ;
+SECTION_TAG_NAME ?= .$(PACKAGE_NAME) ;
 
 #----------------------------------------------------------------------------
 # platform specific rules
 
 ##  ConstructApplicationTarget target : options
-##    Constructs the application atrget name (ie. foo.exe for foo)
+##    Constructs the application target name (ie. foo.exe for foo)
 rule ConstructApplicationTarget
 {
   return $(<) ;
@@ -44,11 +44,11 @@ rule ConstructStaticLibraryTarget
 }
 rule ConstructSharedLibraryTarget
 {
-  return $(<).so.0 ; # @@@ Hardcoded
+  return lib$(<).so.$(PACKAGE_VERSION) ; 
 }
 rule ConstructSharedLibraryLinkLib
 {
-  return $(<).so.0 ; # @@@ Hardcoded
+  return lib$(<).so.$(PACKAGE_VERSION) ; 
 }
 rule ConstructPluginTarget
 {

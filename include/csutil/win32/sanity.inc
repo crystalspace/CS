@@ -21,7 +21,7 @@
  * global preprocessor namespace after #including MS Windows headers. This file
  * #undefines various MS macros which interfere with method names in our own
  * classes.
-*/
+ */
 #undef DeleteFile
 #undef GetClassName
 #undef LoadImage
