@@ -76,7 +76,7 @@ private:
       {
 #	ifdef CS_MEMORY_TRACKER
 	int32* ptr = ((int32*)memory)-2;
-	mtiRegisterFree ((MemTrackerInfo*)*ptr, (size_t)ptr[1]);
+	mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
 	free (ptr);
 #	else
         free (memory);

@@ -10,6 +10,14 @@ chronological order.
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.
 	- res fixed some 64bit warnings on VC7.0.
+	- Eric Sunshine added Delete() and Slice() to csBitArray.
+	- Eric Sunshine renamed the following symbols in order to avoid global
+	  namespace pollution:
+	    MemEntry                      --> csMemTrackerEntry
+	    MemTrackerInfo                --> csMemTrackerInfo
+	    MemTrackerModule              --> csMemTrackerModule
+	    MemTrackerRegistry            --> csMemTrackerRegistry
+	    RegisterMemoryTrackerModule() --> mtiRegisterModule()
 4-Apr-2005
 	- res made the following changes:
 	    - Changed some internals of shader program variable mappings; now

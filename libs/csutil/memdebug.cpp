@@ -18,14 +18,13 @@
 
 #include <stdarg.h>
 
-
 // Include csplatform.h here. Otherwise we don't get the CS_EXTENSIVE_MEMDEBUG
 // or CS_MEMORY_TRACKER definitions.
 #include "csplatform.h"
 
 #ifdef CS_EXTENSIVE_MEMDEBUG
-  // in cssysdef.h is a "#define new" which affects the operator
-  // implementations as well
+// in cssysdef.h is a "#define new" which affects the operator
+// implementations as well
 #  define CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #  undef CS_EXTENSIVE_MEMDEBUG
 #endif
@@ -111,7 +110,7 @@ void operator delete[] (void* p)
 #define DETECT_NEW  0xda
 #define DETECT_FREE 0x9d
 
-struct MemEntry
+struct csMemTrackerEntry
 {
   char* start;		// 0 if not used or else pointer to memory.
   size_t size;
@@ -142,7 +141,7 @@ struct MemEntry
 #if DETECT_USE_TABLE
 static int first_free_idx = -1;
 static unsigned long global_age = 0;
-static MemEntry mem_table[DETECT_TABLE_SIZE];
+static csMemTrackerEntry mem_table[DETECT_TABLE_SIZE];
 
 //=======================================================
 // If the table is not initialized, initialize it here.
@@ -217,7 +216,7 @@ static void CompactMemEntries (unsigned long older_age)
 // Find a free memory entry.
 // If needed the table will be compacted.
 //=======================================================
-static MemEntry& FindFreeMemEntry ()
+static csMemTrackerEntry& FindFreeMemEntry ()
 {
   InitFreeMemEntries ();
   if (first_free_idx >= DETECT_TABLE_SIZE)
@@ -258,7 +257,7 @@ static MemEntry& FindFreeMemEntry ()
 //=======================================================
 // Find the memory entry for the given memory.
 //=======================================================
-static MemEntry* FindMemEntry (char* mem)
+static csMemTrackerEntry* FindMemEntry (char* mem)
 {
   int i;
   for (i = 0 ; i < first_free_idx ; i++)
@@ -271,7 +270,7 @@ static MemEntry* FindMemEntry (char* mem)
 //=======================================================
 // Show block info when a crash occurs.
 //=======================================================
-static void ShowBlockInfo (MemEntry& me)
+static void ShowBlockInfo (csMemTrackerEntry& me)
 {
   csPrintf ("BLOCK: start=%08p size=%zu freed=%d\n", me.start,
   	me.size, (int)me.freed);
@@ -291,7 +290,7 @@ static void MemoryCheck ()
   int i;
   for (i = 0 ; i < first_free_idx ; i++)
   {
-    MemEntry& me = mem_table[i];
+    csMemTrackerEntry& me = mem_table[i];
     if (me.start != 0)
     {
       char* rc = me.start - DETECT_WALL - 4;
@@ -300,7 +299,7 @@ static void MemoryCheck ()
       if (s != me.size)
       {
 	ShowBlockInfo (me);
-        csPrintf ("CHK: Size in table doesn't correspond with size in block!\n");
+        csPrintf("CHK: Size in table does not correspond to size in block!\n");
 	fflush (stdout);
 	DEBUG_BREAK;
       }
@@ -320,7 +319,7 @@ static void MemoryCheck ()
 	  fflush (stdout);
 	  DEBUG_BREAK;
 	}
-#       if DETECT_KEEP_FREE_MEMORY
+#if DETECT_KEEP_FREE_MEMORY
         unsigned int j;
 	for (j = 0 ; j < s ; j++)
 	{
@@ -332,7 +331,7 @@ static void MemoryCheck ()
 	    DEBUG_BREAK;
 	  }
 	}
-#       endif
+#endif
       }
       else
       {
@@ -365,7 +364,7 @@ static void DumpError (const char* msg, int info, char* rc)
 #if DETECT_USE_TABLE
   if (rc)
   {
-    MemEntry* me = FindMemEntry (rc);
+    csMemTrackerEntry* me = FindMemEntry (rc);
     if (me)
       ShowBlockInfo (*me);
     else
@@ -407,7 +406,7 @@ void* operator new (size_t s)
   memset ((void*)(rc+4+DETECT_WALL), DETECT_NEW, s);
 #endif
 #if DETECT_USE_TABLE
-  MemEntry& me = FindFreeMemEntry ();
+  csMemTrackerEntry& me = FindFreeMemEntry ();
   me.start = rc+4+DETECT_WALL;
   me.size = s;
   me.freed = false;
@@ -438,7 +437,7 @@ void* operator new[] (size_t s)
   memset ((void*)(rc+4+DETECT_WALL), DETECT_NEW, s);
 #endif
 #if DETECT_USE_TABLE
-  MemEntry& me = FindFreeMemEntry ();
+  csMemTrackerEntry& me = FindFreeMemEntry ();
   me.start = rc+4+DETECT_WALL;
   me.size = s;
   me.freed = false;
@@ -473,12 +472,12 @@ void operator delete (void* p)
 #endif
 
 #if DETECT_USE_TABLE
-  MemEntry* me = FindMemEntry (rc+4+DETECT_WALL);
+  csMemTrackerEntry* me = FindMemEntry (rc+4+DETECT_WALL);
   if (!me)
     DumpError ("ERROR! Can't find memory entry for this block!\n", 0,
       (char*)p);
   if (me->size != s)
-    DumpError ("ERROR! Size in table does not correspond with size in block!\n",
+    DumpError("ERROR! Size in table does not correspond with size in block!\n",
     	0, (char*)p);
   if (me->freed)
     DumpError ("ERROR! According to table memory is already freed!\n", 0,
@@ -517,12 +516,12 @@ void operator delete[] (void* p)
 #endif
 
 #if DETECT_USE_TABLE
-  MemEntry* me = FindMemEntry (rc+4+DETECT_WALL);
+  csMemTrackerEntry* me = FindMemEntry (rc+4+DETECT_WALL);
   if (!me)
     DumpError ("ERROR! Can't find memory entry for this block!\n", 0,
       (char*)p);
   if (me->size != s)
-    DumpError ("ERROR! Size in table does not correspond with size in block!\n",
+    DumpError("ERROR! Size in table does not correspond with size in block!\n",
     	0, (char*)p);
   if (me->freed)
     DumpError ("ERROR! According to table memory is already freed!\n", 0,
@@ -555,7 +554,8 @@ void* operator new (size_t s, void* filename, int line)
   uint32* rc = (uint32*)malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
-  csPrintf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  csPrintf ("+ %p %zu %zu %s\n",
+	    &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -566,7 +566,8 @@ void* operator new[] (size_t s, void* filename, int line)
   uint32* rc = (uint32*)malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
-  csPrintf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  csPrintf ("+ %p %zu %zu %s\n",
+	    &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -617,8 +618,9 @@ void* operator new[] (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  if (s > 1000) { csPrintf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
-  	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
+  if (s > 1000)
+    csPrintf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
+	      s, alloc_total, alloc_cnt, filename, line); fflush (stdout);
   return (void*)malloc (s);
 }
 void operator delete (void* p)
@@ -677,15 +679,15 @@ void operator delete[] (void* p)
 #undef new
 
 // This class is the memory tracker per module or application.
-// MemTrackerRegistry maintains a list of them.
-class MemTrackerModule
+// csMemTrackerRegistry maintains a list of them.
+class csMemTrackerModule
 {
 public:
   char* Class;		// Name of class or 0 for application level.
-  MemTrackerInfo* mti_table[10000];
+  csMemTrackerInfo* mti_table[10000];
   int mti_table_count;
 
-  MemTrackerModule ()
+  csMemTrackerModule ()
   {
     mti_table_count = 0;
   }
@@ -695,20 +697,20 @@ public:
     int tomove = mti_table_count - idx;
     if (tomove > 0)
       memmove (mti_table+idx+1, mti_table+idx,
-      	  sizeof (MemTrackerInfo*) * tomove);
+      	  sizeof (csMemTrackerInfo*) * tomove);
     mti_table_count++;
-    mti_table[idx] = (MemTrackerInfo*)malloc (sizeof (MemTrackerInfo));
+    mti_table[idx] = (csMemTrackerInfo*)malloc (sizeof (csMemTrackerInfo));
     mti_table[idx]->Init (filename);
   }
 
-  MemTrackerInfo* FindInsertMtiTableEntry (
+  csMemTrackerInfo* FindInsertMtiTableEntry (
 	char* filename, int start, int end)
   {
     // Binary search.
     if (mti_table_count <= 0)
     {
       mti_table_count++;
-      mti_table[0] = (MemTrackerInfo*)malloc (sizeof (MemTrackerInfo));
+      mti_table[0] = (csMemTrackerInfo*)malloc (sizeof (csMemTrackerInfo));
       mti_table[0]->Init (filename);
       return mti_table[0];
     }
@@ -758,7 +760,7 @@ public:
     }
   }
 
-  MemTrackerInfo* FindInsertMtiTableEntry (char* filename)
+  csMemTrackerInfo* FindInsertMtiTableEntry (char* filename)
   {
     return FindInsertMtiTableEntry (filename, 0, mti_table_count-1);
   }
@@ -773,7 +775,7 @@ public:
     int total_current_count = 0;
     for (i = 0 ; i < mti_table_count ; i++)
     {
-      MemTrackerInfo* mti = mti_table[i];
+      csMemTrackerInfo* mti = mti_table[i];
       if (!summary_only)
       {
         csPrintf ("    %8zu %8zu %8d %8d %s\n", mti->current_alloc,
@@ -792,26 +794,26 @@ public:
 
 // The following machinery is needed to try to keep track of memory
 // allocations in different plugins.
-class MemTrackerRegistry : public iMemoryTracker
+class csMemTrackerRegistry : public iMemoryTracker
 {
 public:
-  MemTrackerModule* modules[500];	// @@@ Hardcoded!
+  csMemTrackerModule* modules[500];	// @@@ Hardcoded!
   int num_modules;
 
   SCF_DECLARE_IBASE;
-  MemTrackerRegistry ()
+  csMemTrackerRegistry ()
   {
     SCF_CONSTRUCT_IBASE (0);
     num_modules = 0;
   }
-  virtual ~MemTrackerRegistry ()
+  virtual ~csMemTrackerRegistry ()
   {
     SCF_DESTRUCT_IBASE ();
   }
 
-  MemTrackerModule* NewMemTrackerModule (char* Class)
+  csMemTrackerModule* NewMemTrackerModule (char* Class)
   {
-    MemTrackerModule* mod = new MemTrackerModule ();
+    csMemTrackerModule* mod = new csMemTrackerModule ();
     mod->Class = Class;
     modules[num_modules++] = mod;
     return mod;
@@ -827,13 +829,13 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (MemTrackerRegistry)
+SCF_IMPLEMENT_IBASE (csMemTrackerRegistry)
   SCF_IMPLEMENTS_INTERFACE (iMemoryTracker)
 SCF_IMPLEMENT_IBASE_END
 
-MemTrackerModule* mti_this_module = 0;
+static csMemTrackerModule* mti_this_module = 0;
 
-void RegisterMemoryTrackerModule (char* Class)
+void mtiRegisterModule (char* Class)
 {
   if (!iSCF::SCF)
   {
@@ -848,11 +850,11 @@ void RegisterMemoryTrackerModule (char* Class)
 	iMemoryTracker);
     if (!mtiTR)
     {
-      mtiTR = csPtr<iMemoryTracker> ((iMemoryTracker*)new MemTrackerRegistry);
+      mtiTR = csPtr<iMemoryTracker>((iMemoryTracker*)new csMemTrackerRegistry);
       iSCF::SCF->object_reg->Register (mtiTR,
       	"crystalspace.utilities.memorytracker");
     }
-    mti_this_module = ((MemTrackerRegistry*)(iMemoryTracker*)mtiTR)
+    mti_this_module = ((csMemTrackerRegistry*)(iMemoryTracker*)mtiTR)
     	->NewMemTrackerModule (Class);
   }
   else
@@ -862,12 +864,12 @@ void RegisterMemoryTrackerModule (char* Class)
   }
 }
 
-MemTrackerInfo* mtiRegisterAlloc (size_t s, void* filename)
+csMemTrackerInfo* mtiRegisterAlloc (size_t s, void* filename)
 {
   if (mti_this_module == 0)
     return 0;	// Don't track this alloc yet.
 
-  MemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
+  csMemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
   	(char*)filename);
   mti->current_count++;
   mti->current_alloc += s;
@@ -878,7 +880,7 @@ MemTrackerInfo* mtiRegisterAlloc (size_t s, void* filename)
   return mti;
 }
 
-void mtiRegisterFree (MemTrackerInfo* mti, size_t s)
+void mtiRegisterFree (csMemTrackerInfo* mti, size_t s)
 {
   if (mti)
   {
@@ -887,7 +889,7 @@ void mtiRegisterFree (MemTrackerInfo* mti, size_t s)
   }
 }
 
-void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize)
+void mtiUpdateAmount (csMemTrackerInfo* mti, int dcount, int dsize)
 {
   if (mti)
   {
@@ -929,7 +931,7 @@ void operator delete (void* p)
     uint32* rc = ((uint32*)p)-4;
     if (rc[3] != 0xdeadbeef) { free (p); return; }
     size_t s = rc[0];
-    MemTrackerInfo* mti = (MemTrackerInfo*)rc[2];
+    csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
     free ((void*)rc);
     mtiRegisterFree (mti, s);
   }
@@ -941,7 +943,7 @@ void operator delete[] (void* p)
     uint32* rc = ((uint32*)p)-4;
     if (rc[3] != 0xdeadbeef) { free (p); return; }
     size_t s = rc[0];
-    MemTrackerInfo* mti = (MemTrackerInfo*)rc[2];
+    csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
     free ((void*)rc);
     mtiRegisterFree (mti, s);
   }

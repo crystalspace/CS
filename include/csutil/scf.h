@@ -571,8 +571,8 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 static inline void Class ## _scfUnitInitialize(iSCF* SCF)		\
 {									\
   iSCF::SCF = SCF;							\
-  extern void RegisterMemoryTrackerModule (char*);			\
-  RegisterMemoryTrackerModule (#Class);					\
+  extern void mtiRegisterModule (char*);				\
+  mtiRegisterModule (#Class);						\
 }									\
 CS_EXPORTED_FUNCTION							\
 void CS_EXPORTED_NAME(Class,_scfInitialize)(iSCF* SCF)			\

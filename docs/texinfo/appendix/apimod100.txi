@@ -283,9 +283,17 @@ global namespace.
 @item
 @code{longlong2double()} @result{} @code{csLongLongToDouble()}
 @item
+@code{MemEntry} @result @code{csMemTrackerEntry}
+@item
 @code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
 @item
 @code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
+@item
+@code{MemTrackerInfo} @result @code{csMemTrackerInfo}
+@item
+@code{MemTrackerModule} @result @code{csMemTrackerModule}
+@item
+@code{MemTrackerRegistry} @result @code{csMemTrackerRegistry}
 @item
 @code{MKDIR()} @result{} @code{CS_MKDIR()}
 @item
@@ -325,6 +333,8 @@ global namespace.
 @code{QRound()} @result{} @code{csQround()}
 @item
 @code{qsqrt()} @result{} @code{csQsqrt()}
+@item
+@code{RegisterMemoryTrackerModule()} @result{} @code{mtiRegisterModule()}
 @item
 @code{set_le_float16()} @result{} @code{csSetLittleEndianFloat16()}
 @item

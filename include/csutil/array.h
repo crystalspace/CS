@@ -327,7 +327,7 @@ private:
   size_t threshold;
   T* root;
 #ifdef CS_MEMORY_TRACKER
-  MemTrackerInfo* mti;
+  csMemTrackerInfo* mti;
   void UpdateMti (int dn, int curcapacity)
   {
     if (!mti)

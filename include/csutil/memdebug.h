@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,9 +25,9 @@
 
 /**
  * This structure is used per file to keep track of allocations.
- * ModuleMemTracker maintains an array of them per module.
+ * csMemTrackerModule maintains an array of them per module.
  */
-struct CS_CRYSTALSPACE_EXPORT MemTrackerInfo
+struct CS_CRYSTALSPACE_EXPORT csMemTrackerInfo
 {
   char* file;
   size_t max_alloc;
@@ -46,11 +46,11 @@ struct CS_CRYSTALSPACE_EXPORT MemTrackerInfo
 };
 
 /// 'info' can be filename or some other information to recognize allocation.
-extern CS_CRYSTALSPACE_EXPORT MemTrackerInfo* mtiRegisterAlloc (size_t s, void* info);
-extern CS_CRYSTALSPACE_EXPORT void mtiRegisterFree (MemTrackerInfo* mti, size_t s);
-extern CS_CRYSTALSPACE_EXPORT void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize);
+CS_CRYSTALSPACE_EXPORT csMemTrackerInfo* mtiRegisterAlloc(size_t, void* info);
+CS_CRYSTALSPACE_EXPORT void mtiRegisterFree(csMemTrackerInfo* mti, size_t s);
+CS_CRYSTALSPACE_EXPORT void mtiUpdateAmount(csMemTrackerInfo* mti, int dcount,
+					    int dsize);
 
 #endif // CS_MEMORY_TRACKER
 
 #endif // __CS_MEMDEBUG_H__
-
