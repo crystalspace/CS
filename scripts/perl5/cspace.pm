@@ -7753,6 +7753,8 @@ package cspace::iVFS;
 *SetFileTime = *cspacec::iVFS_SetFileTime;
 *GetFileSize = *cspacec::iVFS_GetFileSize;
 *GetRealPath = *cspacec::iVFS_GetRealPath;
+*GetMounts = *cspacec::iVFS_GetMounts;
+*GetRealMountPaths = *cspacec::iVFS_GetRealMountPaths;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
