@@ -87,9 +87,10 @@
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-@emph{Note!} this document is outdated in the sense that we moved
-to @sc{xml}. However some of the information here is still useful and
-not yet transformed to the new XML format. @xref{XML File Format}.
+@emph{NOTE}: This document is outdated.  Map files now use @sc{xml} format
+rather than the format described here.  However, some of the information here
+is still useful and has not yet been transformed to the new @sc{xml} format
+documentation.  @xref{XML File Format}.
 
 The next couple sections of this document describe the format of the standard
 Crystal Space map file.  The first section describes the syntax of the file.

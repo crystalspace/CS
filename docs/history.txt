@@ -30,6 +30,9 @@ chronological order.
 	    - Replaced 'effects' with 'shaders' in the XML format document.
 	- Eric Sunshine fixed bugs in xmlfmt.txi where it was using incorrect
 	  section nesting directives (@section vs. @subsection, etc.).
+	- Eric Sunshine fixed a lot of Texinfo markup problems in recently
+	  added material.  Also fixed numerous grammatical and spelling
+	  mistakes.
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.
@@ -190,7 +193,7 @@ chronological order.
 	- Reed Hedges made some changes to Doxygen comments, and named some
 	  anonymous enums, for event type codes.
 5-Feb-2004
-	- res added a small convenience wrapper arounf LoadLibrary() and 
+	- res added a small convenience wrapper arounf LoadLibrary() and
 	  FreeLibrary() for Win32.
 	- Eric Sunshine fixed a few global-search-replace problems in
 	  configure.ac from yesterday's unification of make/Jam variables which
@@ -214,7 +217,7 @@ chronological order.
 	- res made a micro optimization in csHash<>::Grow.
 	- res fixed a few leaks:
 	    - csPoolEvents now have a weak ref to the event queue.
-	    - csEvent::Remove() and RemoveAll() didn't free the attribute 
+	    - csEvent::Remove() and RemoveAll() didn't free the attribute
 	      array.
 	    - Another superflouous csStrNew() in VFS.
 	- res changed the Win32 port to remove the event listener of the old
@@ -276,15 +279,15 @@ chronological order.
 	- res changed ::CreateSolidBrush() to ::GetStockObject() in win32.cpp.
 	  Latter has the advantage that the brush doesn't need to be destroyed
 	  with DeleteObject() later.
-	- res fixed a leak in VFS MountRoot(). A string allocated with 
-	  csStrNew() was passed to an scfStringArray, which howeverallocates 
+	- res fixed a leak in VFS MountRoot(). A string allocated with
+	  csStrNew() was passed to an scfStringArray, which howeverallocates
 	  the strings itself.
 	- Neil Mosafi changed csvosa3dl plygin:
 	   - No longer store iObjectRegistry in a csRef<>.
 	   - Use size_t to iterate against STL classes as it's portable.
 	   - Use pointer instead of csRef<> as arguments to functions.
 	- Neil Mosafi added support for a3dl:clone class to csvosa3dl plugin.
-	  This new type of object will construct a mesh using the factory of 
+	  This new type of object will construct a mesh using the factory of
 	  the template mesh.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
@@ -325,7 +328,7 @@ chronological order.
 	  from $(OUTDERIVED).  It was supposed to include only the one from
 	  $(OUTDERIVED).  Also simplified msvcgen special case; thus allowing
 	  removal of CSPYTHON_MSVC_EXCLUDE hack.
-	- res fixed sprcal3d.mak to include cal3d.lib in the generated VC 
+	- res fixed sprcal3d.mak to include cal3d.lib in the generated VC
 	  project.
 2-Feb-2004
 	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in

@@ -20,7 +20,7 @@ Currently only some separate documents about the engine are available:
 * Dynamic Worlds::
 * Level of Detail::
 * Sequence Manager::
-* Level Building:: How to create optimal levels for Crystal Space
+* Map Creation:: How to Create Optimal Maps for Crystal Space
 @end menu
 
 @importss{plugins,engine,worldcmp.txi}

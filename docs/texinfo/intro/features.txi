@@ -59,13 +59,13 @@ calculation of color gradients, simple bumpmapping, etc.
 2D and 3D polygons
 
 @item
-Shared Class Facility @sc{scf}.  @xref{SCF}, @xref{Tutorial Introduction}.
+Shared Class Facility @sc{scf}.  @xref{SCF}. @xref{Tutorial Introduction}.
 
 @item
 Smart Pointers. @xref{HOWTO Smart Pointers}.
 
 @item
-Flexible plug-in system. @xref{SCF}, @xref{HOWTO Create Your Own Plugin}.
+Flexible plug-in system. @xref{SCF}. @xref{HOWTO Create Your Own Plugin}.
 
 @item
 Virtual file system and transparent support for @sc{zip} files. @xref{VFS}.
@@ -83,7 +83,7 @@ Event system.
 Full screen effects (fading, whiteout, etc).
 
 @item
-Procedural textures. @xref{ProcTextures}, @xref{Texture Mapping}.
+Procedural textures. @xref{ProcTextures}. @xref{Texture Mapping}.
 
 @item
 Level of Detail. @xref{Level of Detail}.
@@ -103,7 +103,7 @@ The @file{sprcal3d} plugin is able to load Cal3D models.
 @xref{MeshObject SprCal3D}.
 
 @item
-Crystal Space native windowing system(s). @xref{AWS}, @xref{CSWS}.
+Crystal Space native windowing system(s). @xref{AWS}. @xref{CSWS}.
 
 @item
 2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory)
@@ -153,12 +153,12 @@ Sound loaders (@sc{wav}, @sc{au}, @sc{iff}, @sc{aiff}, @sc{mod}, @sc{mp3},
 @sc{ogg}). @xref{Sound Drivers}.
 
 @item
-Thing and other mesh objects. @xref{MeshObject}, @xref{MeshObject Thing},
-@xref{HOWTO Create Thing}, @xref{MeshObject Genmesh},
+Thing and other mesh objects. @xref{MeshObject}. @xref{MeshObject Thing},
+@xref{HOWTO Create Thing}. @xref{MeshObject Genmesh}.
 @xref{HOWTO Create Genmesh}.
 
 @item
-2D and 3D sprites. @xref{MeshObject Spr3D}, @xref{MeshObject Spr2D}.
+2D and 3D sprites. @xref{MeshObject Spr3D}. @xref{MeshObject Spr2D}.
 
 @item
 Terrain engines. @xref{MeshObject TerrFunc}.
@@ -190,13 +190,13 @@ Bitmapped and vector fonts (FreeFont). @xref{HOWTO Use custom font}.
 
 @item
 Map file loader and converters. @xref{XML File Format},
-@xref{Tutorial Simple Map}, @xref{Old Map File Format}.
+@xref{Tutorial Simple Map}. @xref{Old Map File Format}.
 
 @item
 Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.
 
 @item
-Skeletal animation. @xref{MeshObject Spr3D}, @xref{MeshObject SprCal3D}.
+Skeletal animation. @xref{MeshObject Spr3D}. @xref{MeshObject SprCal3D}.
 
 @item
 Object movement. @xref{HOWTO Mesh Movement}.

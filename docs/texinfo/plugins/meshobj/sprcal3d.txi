@@ -9,11 +9,9 @@
 @cindex @code{iMeshObjectType}
 @cindex @code{iSkeletonConnectionState}
 
-@emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@file{sprcal3d} is a 3D mesh that can perform skeletal animation using the
+Cal3D library.
 
-This is a 3D mesh that can do skeletal animation using the @samp{Cal3D}
-library.
+@uref{http://cal3d.sourceforge.net/}
 
-@@@ WRITE ME!
-
+@@@@@@ WRITE ME!

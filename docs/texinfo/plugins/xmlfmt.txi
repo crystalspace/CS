@@ -1,9 +1,9 @@
 @c -*-texinfo-*-
 @node XML File Format, Old Map File Format, csParser, csParser
-@subsection Format of Map File (XML)
+@subsection Format of Map File (@sc{xml})
 @cindex Format of Map File
 @cindex Map File Format
-@cindex XML
+@cindex @sc{xml}
 
 This section describes the the Crystal Space map, which uses @sc{xml}, and is a
 companion to the @sc{xml} schema file residing at:

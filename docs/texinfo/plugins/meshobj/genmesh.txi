@@ -18,7 +18,8 @@ genmeshes are ideal for high detailed objects that don't require any animation.
 At this point in time genmeshes are limited to having only one material but
 that limitation may be removed in the future.
 
-There is also a howto on creating genmeshes (@pxref{HOWTO Create Genmesh}).
+There is also a @sc{howto} discussing the creation of genmeshes.
+@xref{HOWTO Create Genmesh}.
 
 @subsubheading Basic Structure
 
@@ -26,19 +27,19 @@ The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):
 
 @itemize @bullet
 @item
-Type plugin: @samp{crystalspace.mesh.object.genmesh}
+Type plugin: @code{crystalspace.mesh.object.genmesh}
 @item
-Loader plugin: @samp{crystalspace.mesh.loader.genmesh}
+Loader plugin: @code{crystalspace.mesh.loader.genmesh}
 @item
-Factory loader plugin: @samp{crystalspace.mesh.loader.factory.genmesh}
+Factory loader plugin: @code{crystalspace.mesh.loader.factory.genmesh}
 @end itemize
 
-Objects in this plugin implement the following @sc{scf} interfaces (get
-with @code{SCF_QUERY_INTERFACE()}):
+Objects in this plugin implement the following @sc{scf} interfaces, which you
+can retrieve with @code{SCF_QUERY_INTERFACE()}:
 
 @itemize @bullet
 @item
-@emph{MeshObject}
+@code{MeshObject}
 @itemize @bullet
 @item
 Implements @samp{iMeshObject}
@@ -46,7 +47,7 @@ Implements @samp{iMeshObject}
 Implements @samp{iGeneralMeshState}
 @end itemize
 @item
-@emph{MeshObjectFactory}
+@code{MeshObjectFactory}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectFactory}
@@ -54,7 +55,7 @@ Implements @samp{iMeshObjectFactory}
 Implements @samp{iGeneralFactoryState}
 @end itemize
 @item
-@emph{MeshObjectType}
+@code{MeshObjectType}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectType}
@@ -72,7 +73,7 @@ and various other configuration parameters for a genmesh factory.
 
 @subsubheading Factory Loader
 
-TODO
+@@@@@@TODO
 
 @subsubheading Object State Interface
 
@@ -83,5 +84,4 @@ object.  By using this interface you can access the material, blending mode
 
 @subsubheading Object Loader
 
-TODO
-
+@@@@@@TODO
