@@ -36,7 +36,7 @@ public:
   DECLARE_INTERFACE_TABLE (csGraphics2DGGIFactory)
 
   STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD (LockServer) (BOOL bLock);
+  STDMETHOD (LockServer) (COMBOOL bLock);
 };
 
 /// GGI version.

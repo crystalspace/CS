@@ -70,7 +70,7 @@ class csSoundRenderNullFactory : public ISoundRenderFactory
     STDMETHODIMP CreateInstance(REFIID riid, ISystem* piSystem, void** ppv);
 
     /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(BOOL bLock);
+    STDMETHODIMP LockServer(COMBOOL bLock);
 
     DECLARE_IUNKNOWN()
     DECLARE_INTERFACE_TABLE(csSoundRenderNullFactory)

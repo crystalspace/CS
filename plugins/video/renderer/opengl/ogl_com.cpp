@@ -135,7 +135,7 @@ STDMETHODIMP csGraphics3DOpenGLFactory::CreateInstance (REFIID riid,
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csGraphics3DOpenGLFactory::LockServer (BOOL bLock)
+STDMETHODIMP csGraphics3DOpenGLFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

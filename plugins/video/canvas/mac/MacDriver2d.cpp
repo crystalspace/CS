@@ -112,7 +112,7 @@ STDMETHODIMP csGraphics2DMacFactory::CreateInstance(REFIID riid, ISystem* piSyst
 	return pNew->QueryInterface(riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DMacFactory::LockServer(BOOL bLock)
+STDMETHODIMP csGraphics2DMacFactory::LockServer(COMBOOL bLock)
 {
 	if (bLock)
 		gRefCount++;

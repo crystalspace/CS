@@ -66,7 +66,7 @@ void STDAPICALLTYPE ModuleRelease()
 HINSTANCE DllHandle;
 
 // our main entry point...should be called when we're loaded.
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvReserved*/)
+COMBOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvReserved*/)
 {
   DllHandle = hinstDLL;
   
@@ -156,7 +156,7 @@ STDMETHODIMP csGraphics3DGlide2xFactory::CreateInstance(REFIID riid, ISystem* pi
   return pNew->QueryInterface(riid, ppv);
 }
 
-STDMETHODIMP csGraphics3DGlide2xFactory::LockServer(BOOL bLock)
+STDMETHODIMP csGraphics3DGlide2xFactory::LockServer(COMBOOL bLock)
 {
   if (bLock)
     gb_cRef++;

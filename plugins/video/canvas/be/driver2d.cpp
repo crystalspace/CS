@@ -124,7 +124,7 @@ STDMETHODIMP csGraphics2DBeLibFactory::CreateInstance(REFIID riid, ISystem* piSy
 	return pNew->QueryInterface(riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DBeLibFactory::LockServer(BOOL bLock)
+STDMETHODIMP csGraphics2DBeLibFactory::LockServer(COMBOOL bLock)
 {
 	if (bLock)
 		gRefCount++;

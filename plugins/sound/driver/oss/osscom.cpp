@@ -130,7 +130,7 @@ STDMETHODIMP csSoundDriverOSSFactory::CreateInstance (REFIID riid, ISystem* piSy
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csSoundDriverOSSFactory::LockServer (BOOL bLock)
+STDMETHODIMP csSoundDriverOSSFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

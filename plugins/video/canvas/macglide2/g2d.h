@@ -46,7 +46,7 @@ public:
     DECLARE_INTERFACE_TABLE(csGraphics2DGlide2xFactory)
 
     STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(BOOL bLock);
+    STDMETHOD(LockServer)(COMBOOL bLock);
 };
 
 class csGraphics2DGlide2x : public csGraphics2D

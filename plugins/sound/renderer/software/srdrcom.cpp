@@ -140,7 +140,7 @@ STDMETHODIMP csSoundRenderSoftwareFactory::CreateInstance (REFIID riid, ISystem*
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csSoundRenderSoftwareFactory::LockServer (BOOL bLock)
+STDMETHODIMP csSoundRenderSoftwareFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

@@ -251,7 +251,7 @@ class csGraphics3DGlide3xFactory : public IGraphicsContextFactory
     STDMETHODIMP CreateInstance( REFIID riid, ISystem* piSystem, void** ppv );
 
     /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(BOOL bLock);
+    STDMETHODIMP LockServer(COMBOOL bLock);
 
     DECLARE_IUNKNOWN()
     DECLARE_INTERFACE_TABLE(csGraphics3DGlide3xFactory)

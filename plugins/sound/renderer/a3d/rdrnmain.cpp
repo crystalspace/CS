@@ -138,7 +138,7 @@ STDMETHODIMP csSoundRenderA3DFactory::CreateInstance (REFIID riid, ISystem* piSy
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csSoundRenderA3DFactory::LockServer (BOOL bLock)
+STDMETHODIMP csSoundRenderA3DFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

@@ -35,7 +35,7 @@ public:
   DECLARE_INTERFACE_TABLE(csGraphics2DBeLibFactory)
 
   STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
-  STDMETHOD(LockServer)(BOOL bLock);
+  STDMETHOD(LockServer)(COMBOOL bLock);
 };
 
 ///

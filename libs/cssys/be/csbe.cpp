@@ -469,7 +469,7 @@ void SysMouseDriver::Handler (void *Self, int Button, int Down, int x, int y,
 
 
 //@@@ JORRIT: this is a bad place but I don't know where to define it otherwise
-BOOL ModuleIsStopping ()
+bool ModuleIsStopping ()
 {
   return false;
 }

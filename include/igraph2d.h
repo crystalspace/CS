@@ -295,7 +295,7 @@ interface IGraphics2DFactory : public IUnknown
   STDMETHOD (CreateInstance) (REFIID riid, ISystem* piSystem, void** ppv) PURE;
 
   /// Lock or unlock from memory.
-  STDMETHOD (LockServer) (BOOL bLock) PURE;
+  STDMETHOD (LockServer) (COMBOOL bLock) PURE;
 };
 
 #endif      // __IGRAPH2D_H__

@@ -96,7 +96,7 @@ STDMETHODIMP csGraphics2DFactoryDOSRAW::CreateInstance (REFIID riid,
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DFactoryDOSRAW::LockServer (BOOL bLock)
+STDMETHODIMP csGraphics2DFactoryDOSRAW::LockServer (COMBOOL bLock)
 {
   (void)bLock;
   return S_OK;

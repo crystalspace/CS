@@ -138,7 +138,7 @@ STDMETHODIMP csNetworkDriverSocketsFactory::CreateInstance(REFIID riid, ISystem*
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csNetworkDriverSocketsFactory::LockServer(BOOL bLock)
+STDMETHODIMP csNetworkDriverSocketsFactory::LockServer(COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

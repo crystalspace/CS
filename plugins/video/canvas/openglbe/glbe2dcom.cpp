@@ -128,7 +128,7 @@ STDMETHODIMP csGraphics2DGLBeFactory::CreateInstance (REFIID riid, ISystem * piS
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DGLBeFactory::LockServer (BOOL bLock)
+STDMETHODIMP csGraphics2DGLBeFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     atomic_add(&gRefCount, 1);

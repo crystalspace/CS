@@ -126,7 +126,7 @@ STDMETHODIMP csGraphics2DGGIFactory::CreateInstance (REFIID riid, ISystem* piSys
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DGGIFactory::LockServer(BOOL bLock)
+STDMETHODIMP csGraphics2DGGIFactory::LockServer(COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

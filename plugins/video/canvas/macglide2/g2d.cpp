@@ -61,9 +61,9 @@ HINSTANCE gb_hInstance;
 int gb_nCmdShow;
 static WORD wOldCW;
 
-static BOOL MungeFPCW( WORD *pwOldCW )
+static COMBOOL MungeFPCW( WORD *pwOldCW )
 {    
-	BOOL ret = FALSE;    
+	COMBOOL ret = FALSE;    
 	WORD wTemp, wSave; 
     __asm fstcw wSave    
 	if (wSave & 0x300 ||            // Not single mode

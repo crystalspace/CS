@@ -49,7 +49,7 @@ STDMETHODIMP csGraphics2DGlide2xFactory::CreateInstance(REFIID riid, ISystem* pi
 	return pNew->QueryInterface(riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DGlide2xFactory::LockServer(BOOL bLock)
+STDMETHODIMP csGraphics2DGlide2xFactory::LockServer(COMBOOL bLock)
 {
 	if (bLock)
 		gb_cRef++;

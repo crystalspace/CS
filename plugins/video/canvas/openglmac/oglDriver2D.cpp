@@ -109,7 +109,7 @@ STDMETHODIMP csGraphics2DOpenGLFactory::CreateInstance(REFIID riid, ISystem* piS
   return pNew->QueryInterface(riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DOpenGLFactory::LockServer(BOOL bLock)
+STDMETHODIMP csGraphics2DOpenGLFactory::LockServer(COMBOOL bLock)
 {
   if (bLock)
     gb_cRef++;

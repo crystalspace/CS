@@ -130,7 +130,7 @@ STDMETHODIMP csGraphics2DGlide2xBeFactory::CreateInstance (REFIID riid, ISystem 
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csGraphics2DGlide2xBeFactory::LockServer (BOOL bLock)
+STDMETHODIMP csGraphics2DGlide2xBeFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     atomic_add(&gRefCount, 1);

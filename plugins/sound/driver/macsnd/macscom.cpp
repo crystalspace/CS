@@ -130,7 +130,7 @@ STDMETHODIMP csSoundDriverMacFactory::CreateInstance (REFIID riid, ISystem* piSy
   return pNew->QueryInterface (riid, ppv);
 }
 
-STDMETHODIMP csSoundDriverMacFactory::LockServer (BOOL bLock)
+STDMETHODIMP csSoundDriverMacFactory::LockServer (COMBOOL bLock)
 {
   if (bLock)
     gRefCount++;

@@ -278,7 +278,7 @@ void csGraphics2DGlideX::Close(void)
 #ifdef DO_SHM
     shmdt(shmi.shmaddr);
 #else
-    CHK (free Memory);
+    CHK (delete [] Memory);
 #endif
 
     unsetenv("SST_NOSHUTDOWN");
