@@ -347,8 +347,27 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     }
     else 
     {
-      iShader* meshShader = 
-        mesh->material->GetMaterialHandle()->GetShader(shadertype);
+#ifdef CS_DEBUG
+      if (!mesh->material)
+      {
+        fprintf (stderr, "INTERNAL ERROR: mesh '%s' is missing a material!\n",
+		mesh->db_mesh_name);
+        fflush (stdout);
+	exit (-1);
+      }
+#endif
+      iMaterialHandle* hdl = mesh->material->GetMaterialHandle ();
+#ifdef CS_DEBUG
+      if (!hdl)
+      {
+        fprintf (stderr,
+		"INTERNAL ERROR: mesh '%s' is missing a material handle!\n",
+		mesh->db_mesh_name);
+        fflush (stdout);
+	exit (-1);
+      }
+#endif
+      iShader* meshShader = hdl->GetShader(shadertype);
       if (meshShader != shader)
       {
         // @@@ Need error reporter

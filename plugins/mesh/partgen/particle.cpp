@@ -552,6 +552,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   rm->indexstart = 0;
   rm->indexend = TriangleCount * 3;
   rm->material = Material;
+  CS_ASSERT (Material != 0);
   rm->object2camera = csReversibleTransform ();
   rm->camera_transform = &camera->GetTransform();
  

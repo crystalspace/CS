@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Aug-2004
+	- Jorrit added a test (debug mode only) in the generic render step
+	  to print when a material or material handle is missing.
+	- Jorrit added some asserts to a few mesh objects when the material
+	  is missing.
+	- Jorrit changed the engine so it reports upto 100 missing lightmaps
+	  objects if -verbose is used.
 6-Aug-2004
 	- Jorrit changed the engine so that the plane of the portal is always
 	  used for culling but only used for exact clipping in the renderer

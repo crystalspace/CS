@@ -1092,6 +1092,7 @@ void csThingStatic::FillRenderMeshes (
       }
     }
     rm->material = material;
+    CS_ASSERT (material != 0);
     rm->meshtype = CS_MESHTYPE_POLYGON;
     rm->variablecontext.AttachNew (new csShaderVariableContext ());
     csRef<csShaderVariable> sv (

@@ -1070,6 +1070,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   meshPtr->indexstart = 0;
   meshPtr->indexend = factory->GetTriangleCount () * 3;
   meshPtr->material = mater;
+  CS_ASSERT (mater != 0);
   meshPtr->object2camera = tr_o2c;
   meshPtr->camera_origin = camera_origin;
   meshPtr->camera_transform = &camera->GetTransform();

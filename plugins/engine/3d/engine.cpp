@@ -1578,9 +1578,10 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     }
   }
 
-  int failed = 0;
-  int tot_failed_meshes = 0;
-  iMeshWrapper* failed_meshes[4];
+  size_t failed = 0;
+  csArray<iMeshWrapper*> failed_meshes;
+  size_t max_failed_meshes = 4;
+  if (do_verbose) max_failed_meshes = 100;
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
@@ -1597,11 +1598,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
         else
           if (!linfo->ReadFromCache (cm))
 	  {
-	    if (tot_failed_meshes < 4)
-	    {
-	      failed_meshes[tot_failed_meshes] = s;
-	      tot_failed_meshes++;
-	    }
+	    if (failed_meshes.Length () < max_failed_meshes)
+	      failed_meshes.Push (s);
 	    failed++;
           }
       }
@@ -1612,11 +1610,12 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   if (failed > 0)
   {
     Warn ("Couldn't load cached lighting for %d object(s):", failed);
-    for (sn = 0 ; sn < tot_failed_meshes ; sn++)
+    size_t i;
+    for (i = 0 ; i < failed_meshes.Length () ; i++)
     {
-      Warn ("    %s", failed_meshes[sn]->QueryObject ()->GetName ());
+      Warn ("    %s", failed_meshes[i]->QueryObject ()->GetName ());
     }
-    if (tot_failed_meshes < failed)
+    if (failed_meshes.Length () < failed)
       Warn ("    ...");
     Warn ("Use -relight cmd option to refresh lighting.");
   }
