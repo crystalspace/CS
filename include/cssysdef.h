@@ -250,9 +250,6 @@
 #  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
-#  if defined (CS_USE_FAKE_SOCKLEN_TYPE)
-     typedef int socklen_t;
-#  endif
 #  if !defined (CS_IOCTLSOCKET)
 #    define CS_IOCTLSOCKET ioctl
 #  endif

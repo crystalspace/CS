@@ -90,7 +90,7 @@ ifeq ($(CS_BUILTIN_SIZED_TYPES),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_BUILTIN_SIZED_TYPES$">>volatile.tmp
 endif
 ifeq ($(CS_USE_FAKE_SOCKLEN_TYPE),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_USE_FAKE_SOCKLEN_TYPE$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define socklen_t	int$">>volatile.tmp
 endif
 ifeq ($(CS_NO_QSQRT),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_NO_QSQRT$">>volatile.tmp
