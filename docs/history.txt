@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+7-Jan-2002
+	- Keith Fulton added SetReverseAction to the Sprite3d so that
+	  they can walk backwards without defining a new action.  Call this
+	  just after setting the action.  Also he made it reset to forward
+	  each time SetAction is called, so the old behavior will still
+	  work normally, except when the the programmer explicitly tells
+	  it to go backwards.
 6-Jan-2002
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()
