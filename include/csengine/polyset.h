@@ -45,7 +45,7 @@ class Dumper;
 class csRenderView;
 class csFrustumList;
 class csCurve;
-class iPolygonMesh;
+struct iPolygonMesh;
 
 /**
  * This structure keeps the indices of the vertices which
