@@ -64,6 +64,7 @@ public:
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csFrustVisObjectWrapper::frustvis = frustvis;
+    updating = false;
   }
   virtual ~csFrustVisObjectWrapper ()
   {
