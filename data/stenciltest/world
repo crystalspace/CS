@@ -38,7 +38,7 @@
 	</plugins>
 	<addon>
 	  <plugin>renderloopLoader</plugin>
-	  <paramsfile>/shader/std_rloop_shadowed_dbg.xml</paramsfile>
+	  <paramsfile>/shader/std_rloop_shadowed.xml</paramsfile>
 	</addon>
 	
 	<settings>
