@@ -1457,14 +1457,16 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   }
 
   float sqdistance = distance;
-
-  //if (sqdistance < 0.01f) sqdistance = 0.01f;
-
-  // This function calculates radiosity with linear light attenuation
-  // because that is what CS uses internally as well.
-  float totalfactor = cossrcangle * cosdestangle * 
-    source_patch_area * visibility / (sqdistance);
-
+  
+  float totalfactor;
+  //// avoid divide by zero
+  if (sqdistance < 0.00001f) totalfactor = source_patch_area * visibility;
+  else
+    // This function calculates radiosity with linear light attenuation
+    // because that is what CS uses internally as well.
+    totalfactor = cossrcangle * cosdestangle * 
+      source_patch_area * visibility / (sqdistance);
+  
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
   if(totalfactor < 0.0)
@@ -1475,7 +1477,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #if 1
   //if(totalfactor > 10.0f)
   //if(totalfactor > 0.001f)
-  if(rand()%100000==0)
+  if( (rand()%100000==0)
+     ||(totalfactor > 10.0f) )
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
