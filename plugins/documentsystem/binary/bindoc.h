@@ -23,7 +23,7 @@
 #include "csutil/strset.h"
 #include "csutil/blockallocator.h"
 
-#ifdef __WORDSIZE == 64
+#if __WORDSIZE == 64
 // the value field is 33bit wide and might also contain pointers, unfortunatley
 // there is no easy fix. Making it 64bit will increase filesize dramatically,
 // making it intptr_t makes files incompatible between 32 and 64bit archs
