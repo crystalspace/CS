@@ -124,8 +124,8 @@ CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_lightmap_fog_texels, csVector2)
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog_texels, ogl_g3dcom_clipped_lightmap_fog_texels, ())
 
 
-CS_IMPLEMENT_STATIC_VAR (GetStaticClipInfo1, csClipInfo, [100])
-CS_IMPLEMENT_STATIC_VAR (GetStaticClipInfo2, csClipInfo, [100])
+CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo1, csClipInfo, [100])
+CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo2, csClipInfo, [100])
 
 
 static ogl_g3dcom_tr_verts *tr_verts = NULL;
