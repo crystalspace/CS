@@ -2700,13 +2700,28 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
 
   draw_busy++;
 
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
-    (lview->GetUserdata ());
-  bool dyn = lptq->IsDynamic ();
-  if (dyn)
+  iFrustumViewUserdata* fvud = lview->GetUserdata ();
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
+  bool dyn = lpi->IsDynamic ();
+
+  csRef<csLightingPolyTexQueue> lptq;
+  if (!dyn)
   {
-    // @@@ Needs to be iDynLight!!!
-    csDynLight *dl = (csDynLight *) (lptq->GetCsLight ());
+    csRef<iLightingProcessData> lpd = lpi->QueryUserdata (
+    	csLightingPolyTexQueue_scfGetID (),
+	csLightingPolyTexQueue_VERSION);
+    lptq = (csLightingPolyTexQueue*)(iLightingProcessData*)lpd;
+    if (!lptq)
+    {
+      lptq = csPtr<csLightingPolyTexQueue> (new csLightingPolyTexQueue (
+    	  lpi->GetLight ()));
+      lpi->AttachUserdata (lptq);
+    }
+  }
+  else
+  {
+    csRef<iDynLight> dl = SCF_QUERY_INTERFACE (lpi->GetLight (),
+    	iDynLight);
     dl->AddAffectedLightingInfo (&scfiLightingInfo);
   }
 
@@ -2716,7 +2731,7 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     if (dyn)
       poly->CalculateLightingDynamic ((csFrustumView*)lview);
     else
-      poly->CalculateLightingStatic ((csFrustumView*)lview, true);
+      poly->CalculateLightingStatic ((csFrustumView*)lview, lptq, true);
   }
 
   for (i = 0; i < GetCurveCount (); i++)

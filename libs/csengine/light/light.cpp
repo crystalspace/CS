@@ -274,19 +274,16 @@ void csStatLight::CalculateLighting ()
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingPolyTexQueue *lptq = new csLightingPolyTexQueue (
-      this,
-      false,
-      false);
-  lptq->SetColor (GetColor ());
-  lview.SetUserdata (lptq);
+  csLightingProcessInfo *lpi = new csLightingProcessInfo (
+      this, false);
+  lview.SetUserdata (lpi);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView *) &lview);
 
-  lptq->UpdateMaps (this, GetCenter (), GetColor ());
-  lptq->DecRef ();
+  lpi->FinalizeLighting ();
+  lpi->DecRef ();
 }
 
 void csStatLight::CalculateLighting (iMeshWrapper *th)
@@ -299,20 +296,17 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingPolyTexQueue *lptq = new csLightingPolyTexQueue (
-      this,
-      false,
-      false);
-  lptq->SetColor (GetColor ());
-  lview.SetUserdata (lptq);
+  csLightingProcessInfo *lpi = new csLightingProcessInfo (
+      this, false);
+  lview.SetUserdata (lpi);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   lview.CallObjectFunction (th, true);
 
-  lptq->UpdateMaps (this, GetCenter (), GetColor ());
-  lptq->DecRef ();
+  lpi->FinalizeLighting ();
+  lpi->DecRef ();
 }
 
 void csStatLight::RegisterLightMap (csLightMap *lmap)
@@ -434,18 +428,16 @@ void csDynLight::Setup ()
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingPolyTexQueue *lptq = new csLightingPolyTexQueue (
-      this,
-      true,
-      false);
-  lptq->SetColor (GetColor ());
-  lview.SetUserdata (lptq);
+  csLightingProcessInfo *lpi = new csLightingProcessInfo (
+      this, true);
+  lview.SetUserdata (lpi);
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView *) &lview);
 
-  lptq->DecRef ();
+  lpi->FinalizeLighting ();
+  lpi->DecRef ();
 }
 
 void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
@@ -541,3 +533,50 @@ iLight *csLightList::LightList::FindByID (unsigned long id) const
 {
   return scfParent->FindByID (id);
 }
+
+// --- csLightingProcessInfo --------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csLightingProcessInfo)
+  SCF_IMPLEMENTS_INTERFACE(iLightingProcessInfo)
+SCF_IMPLEMENT_IBASE_END
+
+csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  csLightingProcessInfo::light = light;
+  csLightingProcessInfo::dynamic = dynamic;
+  csLightingProcessInfo::color = light->GetColor ();
+}
+
+void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)
+{
+  userdatas.Push (userdata);
+}
+
+csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
+	scfInterfaceID id, int version)
+{
+  int i;
+  for (i = 0 ; i < userdatas.Length () ; i++)
+  {
+    iLightingProcessData* ptr = (iLightingProcessData*)(
+    	userdatas[i]->QueryInterface (id, version));
+    if (ptr)
+    {
+      return csPtr<iLightingProcessData> (ptr);
+    }
+  }
+  return NULL;
+}
+
+void csLightingProcessInfo::FinalizeLighting ()
+{
+  int i;
+  for (i = 0 ; i < userdatas.Length () ; i++)
+  {
+    userdatas[i]->FinalizeLighting ();
+  }
+}
+
+// ---------------------------------------------------------------------------
+

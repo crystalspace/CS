@@ -30,6 +30,7 @@ struct iMaterialHandle;
 struct iPolygon3D;
 struct iLight;
 struct csRGBpixel;
+class csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolyTexture;
 class csLightMap;
@@ -50,49 +51,16 @@ SCF_VERSION (csLightingPolyTexQueue, 0, 0, 1);
  * for all polygons that were hit by a light during the lighting
  * process.
  */
-struct csLightingPolyTexQueue : public iLightingProcessInfo
+struct csLightingPolyTexQueue : public iLightingProcessData
 {
 private:
   // Vector containing csPolygonTexture pointers.
   csVector polytxts;
-  // Light.
-  csLight* light;
-  // Gouraud shading alone.
-  bool gouraud_only;
-  // For dynamic lighting.
-  bool dynamic;
-  // Current lighting color.
-  csColor color;
+  iLight* light;
 
 public:
-  csLightingPolyTexQueue (csLight* light, bool dynamic, bool gouraud_only);
+  csLightingPolyTexQueue (iLight* light);
   virtual ~csLightingPolyTexQueue ();
-
-  /**
-   * Get the light.
-   */
-  csLight* GetCsLight () const { return light; }
-  virtual iLight* GetLight () const;
-
-  /**
-   * Get gouraud only state.
-   */
-  virtual bool GetGouraudOnly () const { return gouraud_only; }
-
-  /**
-   * Return true if dynamic.
-   */
-  virtual bool IsDynamic () const { return dynamic; }
-
-  /**
-   * Set the current color.
-   */
-  virtual void SetColor (const csColor& col) { color = col; }
-
-  /**
-   * Get the current color.
-   */
-  virtual const csColor& GetColor () const { return color; }
 
   /**
    * Add a csPolyTexture to the queue. Only call this when the
@@ -104,8 +72,14 @@ public:
   /**
    * Update all lightmaps or shadowmaps mentioned in the queue.
    */
-  void UpdateMaps (csLight* light, const csVector3& lightpos,
+  void UpdateMaps (iLight* light, const csVector3& lightpos,
   	const csColor& lightcolor);
+
+  /// Finalize lighting.
+  virtual void FinalizeLighting ()
+  {
+    UpdateMaps (light, light->GetCenter (), light->GetColor ());
+  }
 
   SCF_DECLARE_IBASE;
 };
@@ -196,7 +170,7 @@ public:
    *     it could in principle be modified by portals.
    * </ul>
    */
-void UpdateLightMap (csRGBpixel* lightmap,
+  void UpdateLightMap (csRGBpixel* lightmap,
 	int lightcell_shift,
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,
@@ -377,13 +351,14 @@ public:
    * case we should use 'subpoly' to see where the shadow must go and
    * not the base polygon which this csPolyTexture points too.
    */
-  void FillLightMap (csFrustumView* lview, bool vis, csPolygon3D* subpoly);
+  void FillLightMap (csFrustumView* lview, csLightingPolyTexQueue* lptq,
+  	bool vis, csPolygon3D* subpoly);
 
   /**
    * Update the lightmap of this polygon using the current shadow-bitmap
    * and the light information below.
    */
-  void UpdateFromShadowBitmap (csLight* light, const csVector3& lightpos,
+  void UpdateFromShadowBitmap (iLight* light, const csVector3& lightpos,
   	const csColor& lightcolor);
 
   /// set the dirty flag for our lightmap

@@ -422,8 +422,9 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
 {
   if (!vis) return ;
 
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)lview->GetUserdata ();
-  const csColor &col = lptq->GetColor ();
+  iFrustumViewUserdata* fvud = lview->GetUserdata (); 
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
+  const csColor &col = lpi->GetColor ();
 
   // If our UV buffers have not been intialized, create them.
   if (!uv2World)
@@ -436,7 +437,8 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
-  csStatLight *light = (csStatLight *) (lptq->GetCsLight ());
+  csLight* l = lpi->GetLight ()->GetPrivateObject ();
+  csStatLight *light = (csStatLight *)l;
 
   bool dyn = light->IsDynamic ();
 
@@ -550,7 +552,8 @@ void csCurve::CalculateLightingStatic (csFrustumView *lview, bool vis)
 
 void csCurve::CalculateLightingDynamic (csFrustumView *lview)
 {
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)lview->GetUserdata ();
+  iFrustumViewUserdata* fvud = lview->GetUserdata (); 
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
@@ -558,8 +561,8 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
 
   AddLightPatch (lp);
 
-  csDynLight *dl = (csDynLight *) (lptq->GetCsLight ());
-  //dl->AddLightpatch (lp);
+  csLight* l = lpi->GetLight ()->GetPrivateObject ();
+  csDynLight *dl = (csDynLight *)l;
   lp->SetLight (dl);
 
   // This light patch has exactly 4 vertices because it fits around our

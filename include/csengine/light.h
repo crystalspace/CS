@@ -26,6 +26,7 @@
 #include "csutil/csvector.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hashmap.h"
+#include "csutil/refarr.h"
 #include "csengine/lview.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
@@ -632,4 +633,58 @@ public:
   } scfiLightList;
 };
 
+/**
+ * This is user-data for iFrustumView for the lighting process.
+ */
+struct csLightingProcessInfo : public iLightingProcessInfo
+{
+private:
+  // Light.
+  csLight* light;
+  // For dynamic lighting.
+  bool dynamic;
+  // Current lighting color.
+  csColor color;
+  // Array of user data.
+  csRefArray<iLightingProcessData> userdatas;
+
+public:
+  csLightingProcessInfo (csLight* light, bool dynamic);
+  virtual ~csLightingProcessInfo () { }
+
+  /**
+   * Get the light.
+   */
+  csLight* GetCsLight () const { return light; }
+  virtual iLight* GetLight () const { return &(light->scfiLight); }
+
+  /**
+   * Return true if dynamic.
+   */
+  virtual bool IsDynamic () const { return dynamic; }
+
+  /**
+   * Set the current color.
+   */
+  virtual void SetColor (const csColor& col) { color = col; }
+
+  /**
+   * Get the current color.
+   */
+  virtual const csColor& GetColor () const { return color; }
+
+  /// Attach userdata.
+  virtual void AttachUserdata (iLightingProcessData* userdata);
+
+  /// Query for userdata based on SCF type.
+  virtual csPtr<iLightingProcessData> QueryUserdata (scfInterfaceID id,
+  	int version);
+
+  /// Finalize lighting.
+  virtual void FinalizeLighting ();
+
+  SCF_DECLARE_IBASE;
+};
+
 #endif // __CS_LIGHT_H__
+

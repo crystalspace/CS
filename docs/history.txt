@@ -13,6 +13,17 @@ The history order is reversed so that new features are at the top.
 	- The changes above disconnect the knowledge of individual
 	  polygons and curves from the dynamic lighting system. Another
 	  step closer towards csThing/csEngine seperation.
+	- Added iLightingProcessInfo->FinalizeLighting() function.
+	- Added iLightingProcessData interface. Mesh objects can implement
+	  this interface in order to be able to add userdata to the
+	  lighting procedure. Added iLightingProcessInfo->AttachUserdata()
+	  and QueryUserdata() to work with it.
+	- Added csLightingProcessInfo which implements iLightingProcessInfo
+	  and is directly used by the lighting system (as userdata
+	  for CheckFrustum()).
+	- Modified csLightingPolyTexQueue to implement iLightingProcessData
+	  so that the lightmap specific lighting stuff is now seperated
+	  from the lighting stuff.
 18-Dec-2002
 	- Fixed the sprite socket vector. FreeItem() casted the item
 	  to delete to the wrong type (csSpriteSocketVector instead

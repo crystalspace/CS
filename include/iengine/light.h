@@ -250,7 +250,23 @@ struct iLightList : public iBase
   virtual iLight *FindByID (unsigned long id) const = 0;
 };
 
-SCF_VERSION (iLightingProcessInfo, 0, 0, 1);
+SCF_VERSION (iLightingProcessData, 0, 0, 1);
+
+/**
+ * The iLightingProcessData interface can be implemented by a mesh
+ * object so that it can attach additional information for the lighting
+ * process.
+ */
+struct iLightingProcessData : public iBase
+{
+  /**
+   * Finalize lighting. This function is called by the lighting
+   * routines after performing CheckFrustum().
+   */
+  virtual void FinalizeLighting () = 0;
+};
+
+SCF_VERSION (iLightingProcessInfo, 0, 0, 2);
 
 /**
  * The iLightingProcessInfo interface holds information for the lighting
@@ -263,9 +279,6 @@ struct iLightingProcessInfo : public iFrustumViewUserdata
   /// Get the light.
   virtual iLight* GetLight () const = 0;
 
-  /// Get gouraud only state.
-  virtual bool GetGouraudOnly () const = 0;
-
   /// Return true if dynamic.
   virtual bool IsDynamic () const = 0;
 
@@ -274,6 +287,26 @@ struct iLightingProcessInfo : public iFrustumViewUserdata
 
   /// Get the current color.
   virtual const csColor& GetColor () const = 0;
+
+  /**
+   * Attach some userdata to the process info. You can later query
+   * for this by doing QueryUserdata() with the correct SCF version
+   * number.
+   */
+  virtual void AttachUserdata (iLightingProcessData* userdata) = 0;
+
+  /**
+   * Query for userdata based on SCF type.
+   */
+  virtual csPtr<iLightingProcessData> QueryUserdata (scfInterfaceID id,
+  	int version) = 0;
+
+  /**
+   * Finalize lighting. This function is called by the lighting
+   * routines after performing CheckFrustum(). It will call
+   * FinalizeLighting() on all user datas.
+   */
+  virtual void FinalizeLighting () = 0;
 };
 
 SCF_VERSION (iLightIterator, 0, 0, 1);

@@ -2100,10 +2100,10 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
   csLightPatch *lp = thing->thing_type->lightpatch_pool->Alloc ();
   AddLightpatch (lp);
 
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
-    (lview.GetUserdata ());
-  csDynLight *dl = (csDynLight *) (lptq->GetCsLight ());
-  //dl->AddLightpatch (lp);
+  iFrustumViewUserdata* fvud = lview.GetUserdata ();
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
+  csLight* l = lpi->GetLight ()->GetPrivateObject ();
+  csDynLight *dl = (csDynLight *)l;
   lp->SetLight (dl);
 
   csFrustum *light_frustum = ctxt->GetLightFrustum ();
@@ -2354,7 +2354,8 @@ stop:
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
+void csPolygon3D::CalculateLightingStatic (csFrustumView *lview,
+	csLightingPolyTexQueue* lptq, bool vis)
 {
   bool do_smooth = GetParent ()->GetSmoothingFlag ();
 
@@ -2410,7 +2411,7 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
 
   // Update the lightmap given light and shadow frustums in lview.
   if (calc_lmap)
-    FillLightMapStatic (lview, vis);
+    FillLightMapStatic (lview, lptq, vis);
 
   if (maybeItsVisible) 
     return;
@@ -2454,29 +2455,28 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
   }
 }
 
-void csPolygon3D::FillLightMapStatic (csFrustumView *lview, bool vis)
+void csPolygon3D::FillLightMapStatic (csFrustumView *lview,
+	csLightingPolyTexQueue* lptq, bool vis)
 {
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue*)lview->GetUserdata();
-
   csPolyTexGouraud *goi = GetGouraudInfo ();
   if (goi)
   {
     // We are working for a vertex lighted polygon.
     if (goi->gouraud_up_to_date) return ;
 
-    const csColor &col = lptq->GetColor ();
-    iLight *il = lptq->GetLight ();
+    iFrustumViewUserdata* fvud = lview->GetUserdata ();
+    iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
+    const csColor &col = lpi->GetColor ();
+    iLight *il = lpi->GetLight ();
     UpdateVertexLighting (il, col, false, false);
     return ;
   }
-
-  if (lptq->GetGouraudOnly ()) return ;
 
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (lmi)
   {
     if (lmi->lightmap_up_to_date) return ;
-    lmi->tex->FillLightMap (lview, vis, this);
+    lmi->tex->FillLightMap (lview, lptq, vis, this);
   }
 }
 

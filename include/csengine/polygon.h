@@ -1038,7 +1038,8 @@ public:
    * If 'vis' == false this means that the lighting system already discovered
    * that the polygon is totally shadowed.
    */
-  void FillLightMapStatic (csFrustumView* lview, bool vis);
+  void FillLightMapStatic (csFrustumView* lview, csLightingPolyTexQueue* lptq,
+  	bool vis);
 
   /**
    * Update vertex lighting for this polygon. Only works if the
@@ -1088,7 +1089,8 @@ public:
    * that the polygon is totally shadowed.
    * This version is for static lighting.
    */
-  void CalculateLightingStatic (csFrustumView* lview, bool vis);
+  void CalculateLightingStatic (csFrustumView* lview,
+  	csLightingPolyTexQueue* lptq, bool vis);
 
   /**
    * Transform the plane of this polygon from object space to world space.

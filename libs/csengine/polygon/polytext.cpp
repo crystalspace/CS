@@ -289,6 +289,7 @@ static bool CanCastShadow (
 
 void csPolyTexture::FillLightMap (
   csFrustumView *lview,
+  csLightingPolyTexQueue* lptq,
   bool vis,
   csPolygon3D *subpoly)
 {
@@ -317,8 +318,6 @@ void csPolyTexture::FillLightMap (
         csEngine::lightmap_quality,
         light_frustum->IsInfinite () ? 1 : 0);
 
-    iFrustumViewUserdata *ud = lview->GetUserdata ();
-    csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)ud;
     lptq->AddPolyTexture (this);
   }
 
@@ -802,7 +801,7 @@ finish:
 }
 
 void csPolyTexture::UpdateFromShadowBitmap (
-  csLight *light,
+  iLight *light,
   const csVector3 &lightpos,
   const csColor &lightcolor)
 {
@@ -817,7 +816,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
   float mul_u = 1.0f / ww;
   float mul_v = 1.0f / hh;
 
-  csStatLight *slight = (csStatLight *)light;
+  csLight* l = light->GetPrivateObject ();
+  csStatLight *slight = (csStatLight *)l;
   bool dyn = slight->IsDynamic ();
 
   // From: T = Mwt * (W - Vwt)
@@ -834,8 +834,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
 
   if (dyn)
   {
-    csShadowMap *smap = lm->FindShadowMap (light);
-    if (!smap) smap = lm->NewShadowMap (light, w, h);
+    csShadowMap *smap = lm->FindShadowMap (l);
+    if (!smap) smap = lm->NewShadowMap (l, w, h);
 
     unsigned char *shadowmap = smap->GetArray ();
     shadow_bitmap->UpdateShadowMap (
@@ -847,7 +847,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         mul_v,
         m_t2w,
         v_t2w,
-        light,
+        l,
         lightpos,
         polygon,
         cosfact);
@@ -866,7 +866,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         mul_v,
         m_t2w,
         v_t2w,
-        light,
+        l,
         lightpos,
         lightcolor,
         polygon,
@@ -1609,28 +1609,18 @@ void csShadowBitmap::UpdateShadowMap (
 
 //------------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csLightingPolyTexQueue)
-  SCF_IMPLEMENTS_INTERFACE(iFrustumViewUserdata)
-  SCF_IMPLEMENTS_INTERFACE(iLightingProcessInfo)
+  SCF_IMPLEMENTS_INTERFACE(iLightingProcessData)
 SCF_IMPLEMENT_IBASE_END
 
 csLightingPolyTexQueue::csLightingPolyTexQueue (
-  csLight *light,
-  bool dynamic,
-  bool gouraud_only)
+  iLight *light)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csLightingPolyTexQueue::light = light;
-  csLightingPolyTexQueue::dynamic = dynamic;
-  csLightingPolyTexQueue::gouraud_only = gouraud_only;
 }
 
 csLightingPolyTexQueue::~csLightingPolyTexQueue ()
 {
-}
-
-iLight *csLightingPolyTexQueue::GetLight () const
-{
-  return light ? &(light->scfiLight) : 0;
 }
 
 void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt)
@@ -1639,10 +1629,13 @@ void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt)
 }
 
 void csLightingPolyTexQueue::UpdateMaps (
-  csLight *light,
+  iLight *light,
   const csVector3 &lightpos,
   const csColor &lightcolor)
 {
+  csRef<iDynLight> dl = SCF_QUERY_INTERFACE (light, iDynLight);
+  if (dl) return;	// No update maps for dynamic lights.
+
   int i;
   for (i = 0; i < polytxts.Length (); i++)
   {
@@ -1654,3 +1647,4 @@ void csLightingPolyTexQueue::UpdateMaps (
 }
 
 //------------------------------------------------------------------------------
+
