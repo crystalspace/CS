@@ -31,6 +31,8 @@ chronological order.
 	  measurable FPS boost. If it breaks somewhere, disable it in 
 	  glrender3d.h by #undefining DELAYED_SWAP.
 	- res fixed screen clearing with delayed swap.
+	- res fixed msvcgen/config.jam to not contain dxguid.lib in the DirectX
+	  libs list. This lib is not used by CS.
 1-Apr-2005
 	- Eric Sunshine fixed some unportable uses of #warning directives in
 	  the public CS headers. (#warning is not part of the C++ standard)
