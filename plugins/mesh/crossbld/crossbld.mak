@@ -4,7 +4,7 @@ DESCRIPTION.crossbld = Mesh object cross-builder plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make crossbld        Make the $(DESCRIPTION.crossbld)$"
+  $(NEWLINE)echo $"  make crossbld     Make the $(DESCRIPTION.crossbld)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

@@ -65,6 +65,15 @@ The history order is reversed so that new features are at the top.
 	  csModelDataMaterial, and csModelData.
 	- Eric Sunshine eliminated several compilation warnings about implicit
 	  conversion from double to integer in csEngine::SetAmbientLight().
+	- Eric Sunshine fixed several problems in mdltest.mak and crossbld.mak
+	  which prevented the modules from building correctly on Unix.
+	- Eric Sunshine renamed csutil/crossbld.{h|cpp} to crossb.{h|cpp} in
+	  order to avoid conflicts with the crossbld.o file which is generated
+	  from plugins/mesh/crossbld/crossbld.cpp.  This is actually a
+	  limitation of the current makefile system where all object files are
+	  dumped into the same `out' directory, which means that no two source
+	  files in the entire project can have the same name.  I plan to
+	  address this problem sometime soon.
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python

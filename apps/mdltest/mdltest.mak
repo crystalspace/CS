@@ -1,24 +1,24 @@
 # Application description
-DESCRIPTION.mdltest = Model Importing Test Application
+DESCRIPTION.mdltst = Model Importing Test Application
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make mdltest     Make the $(DESCRIPTION.mdltest)$"
+  $(NEWLINE)echo $"  make mdltst       Make the $(DESCRIPTION.mdltst)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: mdltest mdltestclean
+.PHONY: mdltst mdltstclean
 
-all apps: mdltest
-mdltest:
+all apps: mdltst
+mdltst:
 	$(MAKE_TARGET)
-mdltestclean:
+mdltstclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: mdltest mdltestclean
+.PHONY: mdltst mdltstclean
 
 all: $(MDLTEST.EXE)
-mdltest: $(OUTDIRS) $(MDLTEST.EXE)
-clean: mdltestclean
+mdltst: $(OUTDIRS) $(MDLTEST.EXE)
+clean: mdltstclean
 
 $(MDLTEST.EXE): $(DEP.EXE) $(OBJ.MDLTEST) $(LIB.MDLTEST)
 	$(DO.LINK.EXE)
 
-mdltest1clean:
+mdltstclean:
 	-$(RM) $(MDLTEST.EXE) $(OBJ.MDLTEST)
 
 ifdef DO_DEPEND

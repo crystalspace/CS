@@ -107,9 +107,9 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
     
     ThingPoly->SetMaterial (DefaultMaterial);
     ThingPoly->SetTextureSpace (
-      Object->GetVertex (Polygon->GetVertex (0)), Polygon->GetTextureCoords (0),
-      Object->GetVertex (Polygon->GetVertex (1)), Polygon->GetTextureCoords (1),
-      Object->GetVertex (Polygon->GetVertex (2)), Polygon->GetTextureCoords (2));
+      Object->GetVertex(Polygon->GetVertex(0)), Polygon->GetTextureCoords(0),
+      Object->GetVertex(Polygon->GetVertex(1)), Polygon->GetTextureCoords(1),
+      Object->GetVertex(Polygon->GetVertex(2)), Polygon->GetTextureCoords(2));
 
     it->Next ();
   }
