@@ -402,11 +402,15 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
       {
 #if 1
 	// This version should be faster.
-	float f1 = (poly [pvp] % v1) * poly [pv];
-	float f2 = (v2 % poly [pvp]) * poly [pv]; 
-	if (!(f1 > 0 || f2 > 0)
-         || (f1 == 0) || (f2 == 0))
-          return CS_FRUST_PARTIAL;
+	if ((poly [pvp] % v1) * poly [pv] >= 0)
+	  if ((v2 % poly [pvp]) * poly [pv]; >= 0)
+	    return CS_FRUST_PARTIAL;
+
+	//float f1 = (poly [pvp] % v1) * poly [pv];
+	//float f2 = (v2 % poly [pvp]) * poly [pv]; 
+	//if (!(f1 > 0 || f2 > 0)
+         //|| (f1 == 0) || (f2 == 0))
+          //return CS_FRUST_PARTIAL;
 #else
         // If the segment intersects with the frustum plane somewhere
         // between two limiting lines, we have the CS_FRUST_PARTIAL case.

@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 25-Jul-2000
+	- Norman Kramer did another fix to csFrustum::Classify().
 	- Engine plugin is now working!
 	- Extended iWorld with a few functions from csWorld.
 	- Extended simplep app with more functionality. Still doesn't show
