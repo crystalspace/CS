@@ -203,7 +203,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
       else
         ii = i;
       const csPlane3& poly_plane = *polygons[ii]->GetPolyPlane ();
-DB((MSG_DEBUG_0, "SP: pl=%.3f,%.3f,%.3f,%.3f\n", poly_plane.A(),poly_plane.B(),poly_plane.C(),poly_plane.D()));
+DB((MSG_DEBUG_0, "SP: %d: pl=%.3f,%.3f,%.3f,%.3f\n", ii, poly_plane.A(),poly_plane.B(),poly_plane.C(),poly_plane.D()));
       int front = 0, back = 0;
       int splits = 0;
       for (j = 0 ; j < n ; j++)
@@ -213,7 +213,7 @@ DB((MSG_DEBUG_0, "SP: pl=%.3f,%.3f,%.3f,%.3f\n", poly_plane.A(),poly_plane.B(),p
 	else
 	  jj = j;
         int c = polygons[jj]->Classify (poly_plane);
-#if BSPDB
+#if 0
 {
 int kk;
 csPolygon3D* p = (csPolygon3D*)polygons[jj];
@@ -222,7 +222,7 @@ CsPrintf (MSG_DEBUG_0, "    %d: %.3f,%.3f,%.3f\n", kk, p->Vwor(kk).x,
 p->Vwor(kk).y, p->Vwor(kk).z);
 }
 #endif
-DB((MSG_DEBUG_0, "    RC %d\n", c));
+DB((MSG_DEBUG_0, "    %d: RC %d\n", jj, c));
 	if (c == POL_FRONT) front++;
 	else if (c == POL_BACK) back++;
 	else if (c == POL_SPLIT_NEEDED) splits++;
@@ -236,24 +236,27 @@ DB((MSG_DEBUG_0, "    RC %d\n", c));
       // Total penalty is a combination of both penalties. 0 is very good,
       float penalty = balance_factor * balance_penalty + split_factor * split_penalty;
 
+DB((MSG_DEBUG_0, "    pen=%f least=%f\n", penalty, least_penalty));
       if (penalty < least_penalty)
       {
+DB((MSG_DEBUG_0, "    SEL=%d\n", ii));
         least_penalty = penalty;
 	poly_idx = ii;
       }
     }
   }
+DB((MSG_DEBUG_0, "    BEST=%d\n", poly_idx));
   return poly_idx;
 }
 
 void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 	int num)
 {
-DB((MSG_DEBUG_0, "Build (num=%d)\n", num))
+DB((MSG_DEBUG_0, "num=%d\n", num))
   int i;
   if (!Covers (polygons, num))
   {
-DB((MSG_DEBUG_0, "  !Covers\n"))
+//DB((MSG_DEBUG_0, "  !Covers\n"))
     // We have a convex set.
     node->polygons_on_splitter = false;
     for (i = 0 ; i < num ; i++)
@@ -275,7 +278,7 @@ DB((MSG_DEBUG_0, "  sp plane=%.3f,%.3f,%.3f,%.3f\n", node->splitter.A (),
   {
     int c = polygons[i]->Classify (node->splitter);
 DB((MSG_DEBUG_0, "  cl pol %d -> %d\n", i, c))
-#if BSPDB
+#if 0
 {
 int j;
 csPolygon3D* p = (csPolygon3D*)polygons[i];
