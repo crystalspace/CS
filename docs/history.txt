@@ -10,12 +10,19 @@ The history order has been reversed so that new features are at the top.
 	  (in the past) used to control lighting. i.e. I removed all the
 	  settings related to 'Shadows....' in the Lighting section.
 	- Changed ambient setting from 40 to 20 as I personally think
-	  that 40 is to high.
+	  that 40 is too high.
 	- Updated the documentation to reflect the above changes to
 	  the settings.
 	- Updated various other things in the documentation.
 	- Alex Pfaffe did an update to the terrain engine to improve
 	  visible popping.
+	- Added CS_POLY_COLLDET flag to polygons with which you can
+	  enable and disable collision detection for a single polygon.
+	  By default collision detection is enabled for polygon, disabled
+	  for portals, and enabled again for mirrors (so other space warping
+	  portals have no CD by default).
+	- Also added this flag to the polygon templates used in thing
+	  templates.
 30-Jul-2000
 	- Samuel Humphreys did the following:
             - Little re-organisation of dtsimple, improved comments

@@ -1122,14 +1122,26 @@ csMeshedPolygon* csPolygonSet::PolyMesh::GetPolygons ()
 {
   if (!polygons)
   {
-    polygons = new csMeshedPolygon [scfParent->GetNumPolygons ()];
+    int i, cnt = 0;
     const csPolygonArray& pol = scfParent->polygons;
-    int i;
     for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
     {
       csPolygon3D* p = pol.Get (i);
-      polygons[i].num_vertices = p->GetNumVertices ();
-      polygons[i].vertices = p->GetVertexIndices ();
+      if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
+        cnt++;
+    }
+  
+    polygons = new csMeshedPolygon [cnt];
+    cnt = 0;
+    for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
+    {
+      csPolygon3D* p = pol.Get (i);
+      if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
+      {
+        polygons[cnt].num_vertices = p->GetNumVertices ();
+        polygons[cnt].vertices = p->GetVertexIndices ();
+	cnt++;
+      }
     }
   }
   return polygons;

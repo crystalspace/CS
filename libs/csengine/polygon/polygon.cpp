@@ -237,7 +237,7 @@ csPolygon3D::csPolygon3D (csMaterial* mat) : csPolygonInt (),
   orig_poly = NULL;
   txt_share_list = NULL;
 
-  flags.SetAll (CS_POLY_LIGHTING);
+  flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET);
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
@@ -275,7 +275,7 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csPolygonInt (),
   orig_poly = NULL;
   txt_share_list = NULL;
 
-  flags.SetAll (CS_POLY_LIGHTING);
+  flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET);
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
@@ -385,6 +385,7 @@ void csPolygon3D::SetCSPortal (csSector* sector)
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
   portal->SetSector (sector);
+  flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.
   //portal->SetTexture (texh->get_texture_handle ());
 }
 
@@ -394,6 +395,7 @@ void csPolygon3D::SetPortal (csPortal* prt)
   { delete portal; portal = NULL; }
   portal = prt;
   flags.Set (CS_POLY_DELETE_PORTAL);
+  flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.
 }
 
 void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,

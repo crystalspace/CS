@@ -78,6 +78,11 @@ struct iGraphics3D;
  */
 #define CS_POLY_SPLIT		0x20000000
 
+/**
+ * If this flag is set then this polygon is used for collision detection.
+ */
+#define CS_POLY_COLLDET		0x10000000
+
 /// Texture type is lightmapped
 #define POLYTXT_LIGHTMAP	1
 /// Gouraud Shaded texture

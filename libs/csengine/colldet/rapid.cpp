@@ -125,11 +125,9 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
   {
     csPolygon3D *p = ps->GetPolygon3D (i);
     // Don't count polygons that are split. Only do CD on the original polygons.
-    if (!p->GetUnsplitPolygon ())
+    if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
     {
-      // Handle solid walls and mirrors.
-      if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
-        tri_count += p->GetVertices ().GetNumVertices () - 2;
+      tri_count += p->GetVertices ().GetNumVertices () - 2;
     }
   }
 
@@ -142,19 +140,17 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
     for (i = 0; i < ps->GetNumPolygons () ; i++)
     {
       csPolygon3D *p = ps->GetPolygon3D (i);
-      if (!p->GetUnsplitPolygon ())
-        // Handle solid walls and mirrors.
-        if (!p->GetPortal () || p->GetPortal ()->flags.Check (CS_PORTAL_WARP))
+      if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
+      {
+        // Collision detection only works with triangles.
+        int *vt = p->GetVertices ().GetVertexIndices ();
+        for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
         {
-          // Collision detection only works with triangles.
-          int *vt = p->GetVertices ().GetVertexIndices ();
-          for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
-          {
-            m_pCollisionModel->AddTriangle (ps->Vwor (vt [v - 1]),
-                                            ps->Vwor (vt [v]), 
-                                            ps->Vwor (vt [0]));
-          }
+          m_pCollisionModel->AddTriangle (ps->Vwor (vt [v - 1]),
+                                          ps->Vwor (vt [v]), 
+                                          ps->Vwor (vt [0]));
         }
+      }
     }
     m_pCollisionModel->BuildHierarchy ();
   }

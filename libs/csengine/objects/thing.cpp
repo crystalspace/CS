@@ -570,6 +570,8 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     p->flags.Set (CS_POLY_LIGHTING|CS_POLY_FLATSHADING,
       (pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
       (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
+    if (pt->GetCollDet () == -1) p->flags.Reset (CS_POLY_COLLDET);
+    else if (pt->GetCollDet () == 1) p->flags.Set (CS_POLY_COLLDET);
     if (pt->GetUVCoords ())
     {
       p->SetTextureType (POLYTXT_GOURAUD);

@@ -152,6 +152,11 @@ private:
 
   /// Should this polygon be lighted?
   int no_lighting;
+  /**
+   * Should this polygon have collision detection?
+   * 0 = default from polygon, 1 = yes, -1 = no
+   */
+  int colldet;
   /// The texture used for this polygon.
   csTextureHandle* texture;
   /// The transformation from object space to texture space.
@@ -199,6 +204,16 @@ public:
   /// Get the pointer to the vertex uv coordinates.
   csVector2* GetUVCoords () { return uv_coords; }
 
+  /**
+   * Should this polygon have collision detection?
+   * 0 = default from polygon, 1 = yes, -1 = no
+   */
+  void SetCollDet (int cd) { colldet = cd; }
+
+  /**
+   * Get the colldet value.
+   */
+  int GetCollDet () { return colldet; }
 
   /// Return true if flat color is used (instead of texture).
   bool UseFlatColor () { return use_flat_color; }

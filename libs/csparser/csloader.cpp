@@ -116,6 +116,7 @@ TOKEN_DEF_START
   TOKEN_DEF (CENTER)
   TOKEN_DEF (CIRCLE)
   TOKEN_DEF (CLIP)
+  TOKEN_DEF (COLLDET)
   TOKEN_DEF (COLLECTION)
   TOKEN_DEF (COLOR)
   TOKEN_DEF (COLORS)
@@ -1718,6 +1719,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (UVA)
     TOKEN_TABLE (UV)
     TOKEN_TABLE (COLORS)
+    TOKEN_TABLE (COLLDET)
     TOKEN_TABLE (FLATCOL)
     TOKEN_TABLE (ALPHA)
     TOKEN_TABLE (FOG)
@@ -1777,6 +1779,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   bool do_mirror = false;
   csLightMapped* pol_lm = poly3d->GetLightMapInfo ();
   if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
+  int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
 
   char str[255];
 
@@ -1826,6 +1829,14 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
       case TOKEN_FOG:
         //@@@ OBSOLETE
         break;
+      case TOKEN_COLLDET:
+        {
+          int do_colldet;
+          ScanStr (params, "%b", &do_colldet);
+	  if (do_colldet) set_colldet = 1;
+	  else set_colldet = -1;
+        }
+        break;
       case TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
@@ -1865,6 +1876,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
                 break;
               case TOKEN_MIRROR:
                 do_mirror = true;
+		if (!set_colldet) set_colldet = 1;
                 break;
               case TOKEN_STATIC:
                 poly3d->GetPortal ()->flags.Set (CS_PORTAL_STATICDEST);
@@ -2049,6 +2061,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     CsPrintf (MSG_WARNING, "Polygon in line %d contains just %d vertices!\n", parser_line, poly3d->GetNumVertices());
     return NULL;
   }
+
+  if (set_colldet == 1) poly3d->flags.Set (CS_POLY_COLLDET);
+  else if (set_colldet == -1) poly3d->flags.Reset (CS_POLY_COLLDET);
 
   if (tx1_given)
     if (tx2_given)
@@ -2443,6 +2458,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     TOKEN_TABLE (VERTICES)
     TOKEN_TABLE (FLATCOL)
     TOKEN_TABLE (GOURAUD)
+    TOKEN_TABLE (COLLDET)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tex_commands)
@@ -2503,6 +2519,14 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         break;
       case TOKEN_GOURAUD:
         ptemplate->SetGouraud ();
+        break;
+      case TOKEN_COLLDET:
+        {
+          int do_colldet;
+          ScanStr (params, "%b", &do_colldet);
+	  if (do_colldet) ptemplate->SetCollDet (1);
+	  else ptemplate->SetCollDet (-1);
+        }
         break;
       case TOKEN_FLATCOL:
         {

@@ -307,11 +307,12 @@ position from where you want the polygon to be visible.
 <flatcol> ::= 'FLATCOL' '(' <color> ')'
   
 <cosfact> ::= 'COSFACT' '(' <number> ')'
+<colldet> ::= 'COLLDET' '(' <yes-no> ')'
 
 <polygon-comp> ::= <texnr> | <lighting> | <portal> | <warp> |
   <polygon-texture> | <vertices> | <alpha> |
   <fog> | <uv> | <uva> | <colors> | <cosfact> | <gouraud> |
-  <flatcol> | <mixmode>
+  <flatcol> | <mixmode> | <colldet>
 <polygon> ::= 'POLYGON' <polygon-name> '(' [ <polygon-comp> ] ')'
 @end example
 
@@ -319,7 +320,7 @@ position from where you want the polygon to be visible.
 Polygon templates:
 @example
 <polygon-tpl-comp> ::= <texnr> | <lighting> | <polygon-texture> | <vertices> |
-  <gouraud> | <flatcol>
+  <gouraud> | <flatcol> | <colldet>
 <polygon-template> ::= 'POLYGON' <polygon-name> '(' [ <polygon-tpl-comp> ] ')'
 @end example
 

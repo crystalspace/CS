@@ -113,6 +113,7 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
   use_flat_color = false;
   use_gouraud = false;
   uv_coords = NULL;
+  colldet = 0;
 }
 
 csPolygonTemplate::~csPolygonTemplate ()
