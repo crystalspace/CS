@@ -1354,8 +1354,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
  
   double val = ( reflectdir * viewdir );
   
-  if(val<SMALL_EPSILON) 
-    return;
+  if(val<0.0) val=-val;
+  if(val<SMALL_EPSILON) return;
   
   if (val>1.0) 
     val=1.0;
