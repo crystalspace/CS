@@ -364,7 +364,7 @@ struct iThingFactoryState : public iBase
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
    */
-  virtual void SetTextureMappingEnabled (const csPolygonRange& range,
+  virtual void SetPolygonTextureMappingEnabled (const csPolygonRange& range,
   	bool enabled) = 0;
 
   /**

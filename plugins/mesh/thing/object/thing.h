@@ -482,7 +482,7 @@ public:
   	float len1);
   virtual void GetPolygonTextureMapping (int polygon_idx,
   	csMatrix3& m, csVector3& v);
-  virtual void SetTextureMappingEnabled (const csPolygonRange& range,
+  virtual void SetPolygonTextureMappingEnabled (const csPolygonRange& range,
   	bool enabled);
   virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const;
   virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags);

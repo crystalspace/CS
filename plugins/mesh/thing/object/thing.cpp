@@ -1483,7 +1483,7 @@ void csThingStatic::GetPolygonTextureMapping (int polygon_idx,
   static_polygons[polygon_idx]->GetTextureSpace (m, v);
 }
 
-void csThingStatic::SetTextureMappingEnabled (const csPolygonRange& range,
+void csThingStatic::SetPolygonTextureMappingEnabled (const csPolygonRange& range,
   	bool enabled)
 {
   int i, start, end;
