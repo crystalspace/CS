@@ -24,6 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/sphere.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/randomgen.h"
+#include "csutil/cfgacc.h"
 #include "ivideo/graph3d.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
@@ -201,8 +202,9 @@ void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 }
 
 csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
-  iMeshObjectType* pParent, iObjectRegistry* object_reg)
-  : sprcal3d_type(pParent), calCoreModel("no name")
+  iMeshObjectType* pParent, csSpriteCal3DMeshObjectType* type,
+  iObjectRegistry* object_reg)
+  : sprcal3d_type(pParent), sprcal3d_type2 (type), calCoreModel("no name")
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DFactoryState);
@@ -592,6 +594,12 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   csSpriteCal3DMeshObject* spr = new csSpriteCal3DMeshObject (0, 
     object_reg, calCoreModel);
   spr->SetFactory (this);
+  spr->updateanim_sqdistance1 = sprcal3d_type2->updateanim_sqdistance1;
+  spr->updateanim_skip1 = sprcal3d_type2->updateanim_skip1;
+  spr->updateanim_sqdistance2 = sprcal3d_type2->updateanim_sqdistance2;
+  spr->updateanim_skip2 = sprcal3d_type2->updateanim_skip2;
+  spr->updateanim_sqdistance3 = sprcal3d_type2->updateanim_sqdistance3;
+  spr->updateanim_skip3 = sprcal3d_type2->updateanim_skip3;
 
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
   spr->DecRef ();
@@ -775,6 +783,14 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   bboxVersion = (uint)-1;
   default_idle_anim = -1;
   last_locked_anim = -1;
+
+  do_update = true;
+  updateanim_sqdistance1 = 10*10;
+  updateanim_skip1 = 5;		// Skip every 5 frames.
+  updateanim_sqdistance2 = 20*20;
+  updateanim_skip2 = 20;	// Skip every 20 frames.
+  updateanim_sqdistance3 = 50*50;
+  updateanim_skip3 = 1000;	// Animate very rarely.
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -1616,6 +1632,27 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   	clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
+  // Distance between camera and object. Use this for LOD.
+  float sqdist = camera_origin.x * camera_origin.x
+  	+ camera_origin.y * camera_origin.y
+  	+ camera_origin.z * camera_origin.z;
+  if (sqdist < updateanim_sqdistance1) do_update = 0;
+  else if (sqdist < updateanim_sqdistance2)
+  {
+    if (do_update == 0 || do_update > updateanim_skip1)
+      do_update = updateanim_skip1;
+  }
+  else if (sqdist < updateanim_sqdistance3)
+  {
+    if (do_update == 0 || do_update > updateanim_skip2)
+      do_update = updateanim_skip2;
+  }
+  else
+  {
+    if (do_update == 0 || do_update > updateanim_skip3)
+      do_update = updateanim_skip3;
+  }
+
   SetupRenderMeshes ();
   csDirtyAccessArray<csRenderMesh*>& meshes = 
     rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
@@ -1700,6 +1737,12 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
 
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
+  if (do_update > 0)
+  {
+    do_update--;
+    return true;
+  }
+
   // update anim frames, etc. here
   float delta = ((float)current_time - last_update_time)/1000.0F;
   if (!current_time)
@@ -2332,13 +2375,31 @@ bool csSpriteCal3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
   csSpriteCal3DMeshObjectType::object_reg = object_reg;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+
+  csConfigAccess cfg (object_reg, "/config/sprcal3d.cfg");
+
+  updateanim_sqdistance1 = cfg->GetFloat (
+  	"Mesh.SpriteCal3D.DistanceThresshold1", 10.0f);
+  updateanim_sqdistance1 *= updateanim_sqdistance1;
+  updateanim_skip1 = cfg->GetInt ("Mesh.SpriteCal3D.SkipFrames1", 4);
+
+  updateanim_sqdistance2 = cfg->GetFloat (
+  	"Mesh.SpriteCal3D.DistanceThresshold2", 20.0f);
+  updateanim_sqdistance2 *= updateanim_sqdistance2;
+  updateanim_skip2 = cfg->GetInt ("Mesh.SpriteCal3D.SkipFrames2", 20);
+
+  updateanim_sqdistance3 = cfg->GetFloat (
+  	"Mesh.SpriteCal3D.DistanceThresshold3", 50.0f);
+  updateanim_sqdistance3 *= updateanim_sqdistance3;
+  updateanim_skip3 = cfg->GetInt ("Mesh.SpriteCal3D.SkipFrames3", 1000);
+
   return true;
 }
 
 csPtr<iMeshObjectFactory> csSpriteCal3DMeshObjectType::NewFactory ()
 {
   csSpriteCal3DMeshObjectFactory* cm = new csSpriteCal3DMeshObjectFactory (
-    this, object_reg);
+    this, this, object_reg);
   cm->vc = vc;
   cm->engine = engine;
   cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);

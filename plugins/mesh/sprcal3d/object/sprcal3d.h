@@ -64,6 +64,7 @@
 struct iObjectRegistry;
 struct iEngine;
 struct iMaterialWrapper;
+class csSpriteCal3DMeshObjectType;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
@@ -193,6 +194,7 @@ private:
   iBase* logparent;
   
   iMeshObjectType* sprcal3d_type;
+  csSpriteCal3DMeshObjectType* sprcal3d_type2;
 
   /// If true then this factory has been initialized.
   bool initialized;
@@ -229,7 +231,8 @@ public:
     index_name;
 
   /// Create the sprite template.
-  csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
+  csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent,
+  	csSpriteCal3DMeshObjectType* type, iObjectRegistry* object_reg);
   /// Destroy the template.
   virtual ~csSpriteCal3DMeshObjectFactory ();
 
@@ -572,6 +575,9 @@ private:
   float idle_override_interval;
   int   idle_action;
 
+  // Optimization: only update animation when true.
+  int do_update;	// If 0 we update, else we decrease.
+
   csFlags flags;
 
   /**
@@ -661,6 +667,14 @@ private:
   void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
   void UpdateLighting (const csArray<iLight*>& lights,
       iMovable* movable);
+
+public:
+  float updateanim_sqdistance1;
+  int updateanim_skip1;		// 0 is normal, > 0 is skip
+  float updateanim_sqdistance2;
+  int updateanim_skip2;
+  float updateanim_sqdistance3;
+  int updateanim_skip3;
 
 public:
   SCF_DECLARE_IBASE;
@@ -1130,6 +1144,14 @@ private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
   csWeakRef<iEngine> engine;
+
+public:
+  float updateanim_sqdistance1;
+  int updateanim_skip1;		// 0 is normal, > 0 is skip
+  float updateanim_sqdistance2;
+  int updateanim_skip2;
+  float updateanim_sqdistance3;
+  int updateanim_skip3;
 
 public:
   /// Constructor.
