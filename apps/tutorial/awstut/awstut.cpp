@@ -150,13 +150,15 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  awsCanvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (myG2D, myG3D));
+  //awsCanvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (myG2D, myG3D));
 
   // In combination with the g2d->Clear() that happens in SetupFrame()
   // we also set the AWSF_AlwaysRedrawWindows flag so that resizing our
   // window doesn't leave trails.
-  aws->SetFlag (AWSF_AlwaysRedrawWindows);
-  aws->SetCanvas (awsCanvas);
+  //aws->SetFlag (AWSF_AlwaysRedrawWindows);
+  //aws->SetCanvas (awsCanvas);
+
+  aws->SetupCanvas(NULL, myG2D, myG3D);
 
   // Setup sink.
   iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
