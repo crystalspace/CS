@@ -749,6 +749,26 @@ csComponent *csComponent::PrevGroup (csComponent *start)
   return cur;
 }
 
+bool csComponent::FixFocused ()
+{
+  csComponent *start = focused;
+  csComponent *cur = start;
+
+  do
+  {
+    if (cur->GetState (CSS_SELECTABLE))
+      break;
+  } while ((cur = cur->next) != start);
+
+  if (cur == focused)
+    return true;
+  else
+  {
+    SetFocused (cur);
+    return false;
+  }
+}
+
 void csComponent::Redraw ()
 {
   if (!dirty.IsEmpty ())
@@ -1168,6 +1188,9 @@ void csComponent::Pixel (int x, int y, int colindx)
 
 void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
 {
+  if (!s)
+    return;
+
  /* Do clipping as follows: create a minimal rectangle which fits the string,
   * clip the rectangle against children & parents, then clip the string against
   * all resulting rectangles.
@@ -1481,6 +1504,8 @@ void csComponent::SetText (const char *iText)
   if (!text)
     CHKB (delete[] text);
 
+  if (!iText)
+    iText = "";
   int sl = strlen (iText);
   CHK (text = new char [sl + 1]);
   memcpy (text, iText, sl + 1);
@@ -1575,7 +1600,7 @@ void csComponent::FindMaxFreeRect (csRect &area)
   if (rect.Length () > 6)
   {
     SetMouse (csmcWait);
-    app->NextFrame (0, app->GetCurrentTime ());
+    app->FlushEvents ();
   } /* endif */
 
   // Search the one with maximal area

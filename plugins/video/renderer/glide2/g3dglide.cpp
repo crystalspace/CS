@@ -439,10 +439,7 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D_DRIVER, iGraphics2D);
   if (!m_piG2D)
-  {
-    SysPrintf (MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
     return false;
-  }
 
   CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D));
   txtmgr->Initialize ();

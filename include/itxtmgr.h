@@ -76,7 +76,9 @@ SCF_INTERFACE (iTextureManager, 0, 0, 1) : public iBase
   /**
    * Unregister a texture. Note that this will have no effect on the
    * possible palette and lookup tables until after Prepare() is called
-   * again.
+   * again. Note that the texture will be deleted only when you will
+   * remove all references to this texture (i.e. you will do DecRef()
+   * as much times as you did IncRef ())
    */
   virtual void UnregisterTexture (iTextureHandle* handle) = 0;
 

@@ -178,19 +178,25 @@ public:
   {
     struct
     {
-      int Code;                 // Key code
-      int ShiftKeys;            // Control key state
+      int Code;			// Key code
+      int ShiftKeys;		// Control key state
     } Key;
     struct
     {
-      int x,y;                  // Mouse coords
-      int Button;               // Button number: 1-left, 2-right, 3-middle
-      int ShiftKeys;            // Control key state
+      int x,y;			// Mouse coords
+      int Button;		// Button number: 1-left, 2-right, 3-middle
+      int ShiftKeys;		// Control key state
     } Mouse;
     struct
     {
-      unsigned int Code;        // Command code
-      void *Info;               // Command info
+      int dx, dy;		// Joystick deltax, deltay
+      int Button;		// Joystick button number
+      int ShiftKeys;		// Control key state
+    } Joystick;
+    struct
+    {
+      unsigned int Code;	// Command code
+      void *Info;		// Command info
     } Command;			// to allow virtual destructors
   };
 

@@ -37,13 +37,30 @@ csInputLine::csInputLine (csComponent *iParent, int iMaxLen,
   selstart = selend = 0;
   textx = 0;
   CHK (text = new char [iMaxLen + 1]);
-  SetText ("");
+  SetText (NULL);
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_INPUTLINE);
-  CHK ((void)new csTimer (this, CURSOR_FLASHING_INTERVAL));
+  CHK (timer = new csTimer (this, CURSOR_FLASHING_INTERVAL));
 }
 
 void csInputLine::SetText (const char *iText)
+{
+  if (!iText)
+    iText = "";
+
+  int sl = strlen (iText);
+  if (sl > maxlen)
+    sl = maxlen;
+  memcpy (text, iText, sl);
+  text [sl] = 0;
+  firstchar = 0;
+  SetCursorPos (sl, false);
+  SetSelection (0, GetState (CSS_DISABLED) ? 0 : sl);
+  cursorvis = true;
+  Invalidate ();
+}
+
+void csInputLine::SetTextExt (const char *iText)
 {
   int sl = strlen (iText);
   if (sl > maxlen)
@@ -62,6 +79,7 @@ void csInputLine::SetText (const char *iText)
 void csInputLine::Draw ()
 {
   int dx = 0, dy = 0;
+  bool Disabled = GetState (CSS_DISABLED);
 
   switch (FrameStyle)
   {
@@ -83,9 +101,14 @@ void csInputLine::Draw ()
       break;
   } /* endswitch */
   Box (dx, dy, bound.Width () - dx, bound.Height () - dy,
-    FrameStyle == csifsThickRect ? CSPAL_INPUTLINE_BACKGROUND2 :
-    CSPAL_INPUTLINE_BACKGROUND);
+    ((FrameStyle == csifsThickRect) && !Disabled) ?
+    CSPAL_INPUTLINE_BACKGROUND2 : CSPAL_INPUTLINE_BACKGROUND);
   SetClipRect (dx, dy, bound.Width () - dx, bound.Height () - dy);
+
+  csComponent::Draw ();
+
+  if (Disabled)
+    return;
 
   textx = dx;
   texty = dy + (clip.Height () - TextHeight ()) / 2;
@@ -167,8 +190,6 @@ void csInputLine::Draw ()
       Box (cursorrect.xmin, cursorrect.ymin, cursorrect.xmax,
         cursorrect.ymax, CSPAL_INPUTLINE_TEXT);
   } /* endif */
-
-  csComponent::Draw ();
 }
 
 bool csInputLine::HandleEvent (csEvent &Event)
@@ -179,7 +200,7 @@ bool csInputLine::HandleEvent (csEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdTimerPulse:
-          if (GetState (CSS_FOCUSED))
+          if ((Event.Command.Info == timer) && GetState (CSS_FOCUSED))
           {
             cursorvis = !cursorvis;
             Invalidate (cursorrect);
@@ -324,7 +345,7 @@ do_key:   if ((Event.Key.ShiftKeys & (CSMASK_CTRL | CSMASK_ALT))
           } /* endif */
           if (IsValidString (tmp))
           {
-            SetText (tmp);
+            SetTextExt (tmp);
             SetCursorPos (cursorpos + 1, false);
           } /* endif */
           return true;
@@ -455,7 +476,7 @@ void csInputLine::DeleteSelection ()
     strcpy (&tmp [ss], &tmp [se]);
     if (IsValidString (tmp))
     {
-      SetText (tmp);
+      SetTextExt (tmp);
       if (cursorpos >= se)
         SetCursorPos (cursorpos - (se - ss), false);
       else if (cursorpos > ss)

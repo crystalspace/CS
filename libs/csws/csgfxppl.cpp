@@ -447,7 +447,7 @@ sync:
 
 int csGraphicsPipeline::TextWidth (const char *text, int Font)
 {
-  return iG2D->GetTextWidth (Font, text);
+  return text ? iG2D->GetTextWidth (Font, text) : 0;
 }
 
 int csGraphicsPipeline::TextHeight (int Font)

@@ -255,15 +255,19 @@ pagescroll:
           timer->Pause (SCROLL_START_INTERVAL);
           // fallback to timer pulse
         case cscmdTimerPulse:
-          if (active_button == SCROLL_UL)
-            SetValue (status.value - status.step);
-          else if (active_button == SCROLL_DR)
-            SetValue (status.value + status.step);
-          else if (active_button == SCROLL_PAGE_UL)
-            SetValue (status.value - status.pagestep);
-          else if (active_button == SCROLL_PAGE_DR)
-            SetValue (status.value + status.pagestep);
-          return true;
+          if (Event.Command.Info == timer)
+          {
+            if (active_button == SCROLL_UL)
+              SetValue (status.value - status.step);
+            else if (active_button == SCROLL_DR)
+              SetValue (status.value + status.step);
+            else if (active_button == SCROLL_PAGE_UL)
+              SetValue (status.value - status.pagestep);
+            else if (active_button == SCROLL_PAGE_DR)
+              SetValue (status.value + status.pagestep);
+            return true;
+          }
+          break;
         case cscmdScrollBarSet:
         {
           status = *((csScrollBarStatus *)Event.Command.Info);

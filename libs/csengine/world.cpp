@@ -45,7 +45,7 @@
 #include "csgeom/polypool.h"
 #include "csinput/csevent.h"
 #include "csutil/util.h"
-#include "csgfxldr/csimage.h"
+#include "iimage.h"
 #include "ivfs.h"
 #include "ihalo.h"
 #include "itxtmgr.h"
@@ -463,7 +463,7 @@ void csWorld::PrepareTextures ()
   for (int i = 0 ; i < textures->GetNumTextures () ; i++)
   {
     csTextureHandle* th = textures->GetTextureMM (i);
-    csImageFile *image = th->GetImageFile ();
+    iImageFile *image = th->GetImageFile ();
 
     // Now we check the size of the loaded image. Having an image, that
     // is not a power of two will result in strange errors while

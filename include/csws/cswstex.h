@@ -33,28 +33,42 @@ scfInterface iTextureManager;
  */
 class csWSTexture
 {
+  // Reference count
+  int RefCount;
   // texture image
-  csImageFile *image;
+  iImageFile *Image;
   // Will be this texture used for 3D and/or for 2D operations?
   bool for2D, for3D;
   // Red,Green and Blue components of transparent color
   int tr, tg, tb;
   // has texture transparent areas?
-  bool istransp;
+  bool IsTransp;
   // texture handle for the 3D/2D driver
   iTextureHandle *Handle;
   // texture name
   char *Name;
+  // VFS file name
+  char *FileName;
+  // A pointer to the texture manager (WARNING: NO INCREF/DECREF)
+  iTextureManager *TexMan;
 
 public:
   /// Create the 2D texture
-  csWSTexture (const char *iName, csImageFile *iImage, bool i2D, bool i3D);
+  csWSTexture (const char *iName, iImageFile *iImage, bool i2D, bool i3D);
   /// Destroy the texture object
   ~csWSTexture ();
   /// Set texture transparent color
   void SetTransparent (int iR, int iG, int iB);
+  /// Get texture transparent color
+  void GetTransparent (int &oR, int &oG, int &oB)
+  { oR = tr; oG = tg; oB = tb; }
+  /// Query whenever texture has transparent areas
+  bool IsTransparent ()
+  { return IsTransp; }
   /// Register the texture with texture manager
   void Register (iTextureManager *iTexMan);
+  /// Unregister the texture
+  void Unregister ();
   /// Define texture name
   void SetName (const char *iName);
   /// Get texture name
@@ -62,6 +76,20 @@ public:
   { return Name; }
   iTextureHandle *GetHandle ()
   { return Handle; }
+  /// Increment reference count to this texture
+  void IncRef ()
+  { RefCount++; }
+  /// Delete a reference to this texture
+  void DecRef ()
+  { RefCount--; }
+  /// Return reference count
+  int GetRefCount () const
+  { return RefCount; }
+  /// Get texture file name
+  const char *GetFileName () const
+  { return FileName; }
+  /// Set texture file name
+  void SetFileName (const char *iFileName);
 };
 
 /// This class is a vector of csWSTexture's
@@ -76,8 +104,9 @@ public:
   virtual bool FreeItem (csSome Item);
   /// Compare texture with name; used in FindKey ()
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  /// Get texture by index
   csWSTexture *Get (int idx)
-  {  return (csWSTexture *)csVector::Get (idx); }
+  { return (csWSTexture *)csVector::Get (idx); }
   /// Find a texture by name
   csWSTexture *FindTexture (const char *iName)
   {

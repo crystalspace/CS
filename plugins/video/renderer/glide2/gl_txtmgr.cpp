@@ -255,19 +255,21 @@ csTextureManagerGlide::~csTextureManagerGlide ()
 void csTextureManagerGlide::clear ()
 {
   csTextureManager::clear ();
-  int i;
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    CHK (delete (csTextureMMGlide*)(textures[i]));
-    textures[i] = NULL;
-  }
-  textures.DeleteAll ();
 }
 
 csTextureMMGlide* csTextureManagerGlide::new_texture (iImageFile* image)
 {
   CHK (csTextureMMGlide* tm = new csTextureMMGlide (image));
-  if (tm->loaded_correctly ()) textures.Push (tm);
+  if (tm->loaded_correctly ())
+  {
+    tm->IncRef ();
+    textures.Push (tm);
+  }
+  else
+  {
+    delete tm;
+    tm = NULL;
+  }
   return tm;
 }
 

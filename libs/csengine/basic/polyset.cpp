@@ -823,9 +823,10 @@ int ch2d (csVector2 *P[], int n)
 }
 
 /*
- * Someone from Microsoft wrote this, but copyrights are absent. So I assume that it's also in public
- * domain ;). However, it's not a very critical function, I just was very lazy and didn't want to write
- * my own Convex-Hull finder ;). -DDK
+ * Someone from Microsoft wrote this, but copyrights are absent.
+ * So I assume that it's also in public domain ;). However, it's not
+ * a very critical function, I just was very lazy and didn't want to
+ * write my own Convex-Hull finder ;). -DDK
  */
 
 void Find2DConvexHull (int nverts, csVector2 *pntptr, int *cNumOutIdxs, int **OutHullIdxs)

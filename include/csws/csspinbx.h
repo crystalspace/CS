@@ -130,6 +130,9 @@ public:
   /// Insert a item into spinbox (same as csSpinBoxInsertItem message)
   int InsertItem (char *iValue, int iPosition);
 
+  /// Set spinbox text
+  virtual void SetText (const char *iText);
+
 private:
   // Spin to other value
   void Spin (int iDelta);

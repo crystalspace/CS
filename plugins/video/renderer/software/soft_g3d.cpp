@@ -219,10 +219,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
   G2D = LOAD_PLUGIN (System, driver, iGraphics2D);
   if (!G2D)
-  {
-    SysPrintf(MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
     return false;
-  }
 
   CHK (txtmgr = new csTextureManagerSoftware (System, G2D));
   txtmgr->SetConfig (config);

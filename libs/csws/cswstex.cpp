@@ -25,37 +25,57 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//-- Windowing system texture --//--
 
-csWSTexture::csWSTexture (const char *iName, csImageFile *iImage,
+csWSTexture::csWSTexture (const char *iName, iImageFile *iImage,
   bool i2D, bool i3D)
 {
-  image = iImage;
+  (Image = iImage)->IncRef ();
   for2D = i2D;
   for3D = i3D;
-  istransp = false;
+  IsTransp = false;
   Name = strnew (iName);
+  FileName = strnew (iImage->GetName ());
   Handle = NULL;
+  TexMan = NULL;
 }
 
 csWSTexture::~csWSTexture ()
 {
+  Unregister ();
   if (Name)
     delete [] Name;
-//@@todo: sigsegv here? who freed the texture handle
-//  if (Handle)
-//    Handle->DecRef ();
+  if (FileName)
+    delete [] FileName;
+  if (Image)
+    Image->DecRef ();
+  if (Handle)
+    Handle->DecRef ();
 }
 
 void csWSTexture::SetTransparent (int iR, int iG, int iB)
 {
-  istransp = true;
+  IsTransp = (iR >= 0) && (iG >= 0) && (iB >= 0);
   tr = iR; tg = iG; tb = iB;
 }
 
 void csWSTexture::Register (iTextureManager *iTexMan)
 {
-  Handle = iTexMan->RegisterTexture (image, for3D, for2D);
-  if (istransp)
+  Unregister ();
+  TexMan = iTexMan;
+  Handle = iTexMan->RegisterTexture (Image, for3D, for2D);
+  if (IsTransp)
     Handle->SetTransparent (tr, tg, tb);
+  Handle->IncRef ();
+}
+
+void csWSTexture::Unregister ()
+{
+  if (Handle)
+  {
+    TexMan->UnregisterTexture (Handle);
+    TexMan = NULL;
+    Handle->DecRef ();
+    Handle = NULL;
+  }
 }
 
 void csWSTexture::SetName (const char *iName)
@@ -63,6 +83,13 @@ void csWSTexture::SetName (const char *iName)
   if (Name)
     delete [] Name;
   Name = strnew (iName);
+}
+
+void csWSTexture::SetFileName (const char *iFileName)
+{
+  if (FileName)
+    delete [] FileName;
+  FileName = strnew (iFileName);
 }
 
 csWSTexVector::csWSTexVector () : csVector (16, 16)

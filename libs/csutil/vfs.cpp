@@ -1043,6 +1043,8 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 
 csVFS::~csVFS ()
 {
+  if (System)
+    System->DeregisterDriver ("iVFS", this);
 }
 
 bool csVFS::ReadConfig (csIniFile *Config)
@@ -1055,7 +1057,7 @@ bool csVFS::ReadConfig (csIniFile *Config)
 bool csVFS::Initialize (iSystem *iSys)
 {
   System = iSys;
-  if (!System->RegisterDriver ("iVFS", (iPlugIn *)this))
+  if (!System->RegisterDriver ("iVFS", this))
     return false;
 
   csIniFile *vfsconfig = new csIniFile (System->ConfigGetStr ("VFS.Options",

@@ -20,17 +20,17 @@
 
 #include "sysdef.h"
 #include "csengine/texture.h"
-#include "csgfxldr/csimage.h"
+#include "iimage.h"
 #include "itxtmgr.h"
 
 //---------------------------------------------------------------------------
 
 CSOBJTYPE_IMPL(csTextureHandle,csObject);
 
-csTextureHandle::csTextureHandle (csImageFile* image) :
+csTextureHandle::csTextureHandle (iImageFile* image) :
   csObject (), txt_handle (NULL), for_2d (false), for_3d (true)
 {
-  ifile = image;
+  (ifile = image)->IncRef ();
   transp_r = -1;
 }
 
@@ -39,7 +39,7 @@ csTextureHandle::csTextureHandle (csTextureHandle &th) :
 {
   for_2d = th.for_2d;
   for_3d = th.for_3d;
-  ifile = th.ifile;
+  (ifile = th.ifile)->IncRef ();
   transp_r = th.transp_r;
   transp_g = th.transp_g;
   transp_b = th.transp_b;
@@ -50,6 +50,8 @@ csTextureHandle::csTextureHandle (csTextureHandle &th) :
 csTextureHandle::~csTextureHandle ()
 {
   SetTextureHandle (NULL);
+  if (ifile)
+    ifile->DecRef ();
 }
 
 void csTextureHandle::SetTextureHandle (iTextureHandle* h)
@@ -99,7 +101,7 @@ void csTextureList::Clear ()
   CHK (textures = new csTextureHandle* [10]);
 }
 
-csTextureHandle* csTextureList::NewTexture (csImageFile* image)
+csTextureHandle* csTextureList::NewTexture (iImageFile* image)
 {
   CHK (csTextureHandle* tm = new csTextureHandle (image));
   //if (tm->loaded_correctly ())

@@ -210,10 +210,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx6", iGraphics2D);
   if (!m_piG2D)
-  {
-    SysPrintf(MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
     return false;
-  }
 
   config = new csIniFile("Direct3DDX6.cfg");
   use16BitTexture=config->GetYesNo("Direct3DDX6","USE_16BIT_TEXTURE",false);

@@ -611,13 +611,6 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
 void csTextureManagerSoftware::clear ()
 {
   csTextureManager::clear ();
-  int i;
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    CHK (delete (csTextureMMSoftware*)(textures[i]));
-    textures[i] = NULL;
-  }
-  textures.DeleteAll ();
   CHK (delete lt_truergb); lt_truergb = NULL;
   CHK (delete lt_truergb_private); lt_truergb_private = NULL;
   CHK (delete lt_white16); lt_white16 = NULL;
@@ -630,7 +623,15 @@ csTextureMMSoftware* csTextureManagerSoftware::new_texture (iImageFile* image)
 {
   CHK (csTextureMMSoftware* tm = new csTextureMMSoftware (image));
   if (tm->loaded_correctly ())
+  {
+    tm->IncRef ();
     textures.Push (tm);
+  }
+  else
+  {
+    delete tm;
+    tm = NULL;
+  }
   return tm;
 }
 
@@ -1187,8 +1188,10 @@ iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImageFile* image,
 
 void csTextureManagerSoftware::UnregisterTexture (iTextureHandle* handle)
 {
-  (void)handle;
-  //@@@ Not implemented yet.
+  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)handle->GetPrivateObject ();
+  int idx = textures.Find (tex_mm);
+  if (idx >= 0)
+    textures.Delete (idx);
 }
 
 void csTextureManagerSoftware::MergeTexture (iTextureHandle* handle)

@@ -95,6 +95,9 @@ csApp::~csApp ()
   if (GfxPpl)
     CHKB (delete GfxPpl);
 
+  // Delete all textures prior to deleting the texture manager
+  Textures.DeleteAll ();
+
   if (System)
     CHK (delete System);
 }
@@ -333,6 +336,8 @@ void csApp::PrepareTextures ()
   SetupPalette ();
   // Finally, set up mouse pointer images
   Mouse->Setup ();
+  // Invalidate entire screen
+  Invalidate (true);
 }
 
 void csApp::SetupPalette ()
@@ -593,4 +598,10 @@ void csApp::Dismiss (int iCode)
     DismissCode = iCode;
     System->ExitLoop = true;
   } /* endif */
+}
+
+void csApp::FlushEvents ()
+{
+  ProcessEvents ();
+  NextFrame (0, GetCurrentTime ());
 }

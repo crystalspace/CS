@@ -123,6 +123,7 @@ bool csSpinBox::HandleEvent (csEvent &Event)
       break;
     case csevMouseDoubleClick:
     case csevMouseDown:
+      Select ();
       if (!app->KeyboardOwner
        && (Event.Mouse.Button == 1)
        && (Event.Mouse.x >= bound.Width () - SpinBoxSize))
@@ -237,16 +238,16 @@ void csSpinBox::Spin (int iDelta)
   if (Values.Length ())
   {
     if (NewValue < 0)
-      NewValue = Values.Length () - 1;
+      NewValue += Values.Length ();
     if (NewValue >= Values.Length ())
-      NewValue = 0;
+      NewValue -= Values.Length ();
   }
   else
   {
     if (NewValue < NumLimits.MinValue)
-      NewValue = NumLimits.MaxValue + 1 - (NumLimits.MinValue - NewValue);
+      NewValue += (NumLimits.MaxValue - NumLimits.MinValue + 1);
     if (NewValue > NumLimits.MaxValue)
-      NewValue = NumLimits.MinValue - 1 + (NewValue - NumLimits.MaxValue);
+      NewValue -= (NumLimits.MaxValue - NumLimits.MinValue + 1);
   } /* endif */
   SetValue (NewValue);
 }
@@ -255,12 +256,15 @@ void csSpinBox::Spin ()
 {
   AutoRepeats++;
   int Delta;
-  if (AutoRepeats < 10)
-    Delta = 1;
-  else if (AutoRepeats < 20)
+  int NumValues = Values.Length ();
+  if (!NumValues)
+    NumValues = (NumLimits.MaxValue - NumLimits.MinValue) + 1;
+  if ((NumValues >= 40) && (AutoRepeats >= 40))
+    Delta = 10;
+  else if ((NumValues >= 20) && (AutoRepeats >= 20))
     Delta = 5;
   else
-    Delta = 10;
+    Delta = 1;
   switch (SpinState)
   {
     case 0:
@@ -316,4 +320,10 @@ int csSpinBox::InsertItem (char *iValue, int iPosition)
     iPosition = Values.Length ();
   Values.Insert (iPosition, strnew (iValue));
   return iPosition;
+}
+
+void csSpinBox::SetText (const char *iText)
+{
+  csInputLine::SetText (iText);
+  SetSelection (0, 0);
 }

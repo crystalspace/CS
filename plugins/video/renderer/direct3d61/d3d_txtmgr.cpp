@@ -194,19 +194,21 @@ csTextureManagerDirect3D::~csTextureManagerDirect3D ()
 void csTextureManagerDirect3D::clear ()
 {
   csTextureManager::clear ();
-  int i;
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    CHK (delete (csTextureMMDirect3D*)(textures[i]));
-    textures[i] = NULL;
-  }
-  textures.DeleteAll ();
 }
 
 csTextureMMDirect3D* csTextureManagerDirect3D::new_texture (iImageFile* image)
 {
   CHK (csTextureMMDirect3D* tm = new csTextureMMDirect3D (image));
-  if (tm->loaded_correctly ()) textures.Push (tm);
+  if (tm->loaded_correctly ())
+  {
+    tm->IncRef ();
+    textures.Push (tm);
+  }
+  else
+  {
+    delete tm;
+    tm = NULL;
+  }
   return tm;
 }
 

@@ -188,19 +188,21 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 void csTextureManagerOpenGL::clear ()
 {
   csTextureManager::clear ();
-  int i;
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    CHK (delete (csTextureMMOpenGL*)(textures[i]));
-    textures[i] = NULL;
-  }
-  textures.DeleteAll ();
 }
 
 csTextureMMOpenGL* csTextureManagerOpenGL::new_texture (iImageFile* image)
 {
   CHK (csTextureMMOpenGL* tm = new csTextureMMOpenGL (image));
-  if (tm->loaded_correctly ()) textures.Push (tm);
+  if (tm->loaded_correctly ())
+  {
+    tm->IncRef ();
+    textures.Push (tm);
+  }
+  else
+  {
+    delete tm;
+    tm = NULL;
+  }
   return tm;
 }
 

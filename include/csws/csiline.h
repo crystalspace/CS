@@ -37,6 +37,8 @@ enum csInputLineFrameStyle
 /// Default input line maximal field length
 #define CSIL_DEFAULTLENGTH		256
 
+class csTimer;
+
 /**
  * The Input Line class implements a rectangular are where user can
  * enter any text. The class has a method called IsValidChar() which can
@@ -67,6 +69,8 @@ class csInputLine : public csComponent
   bool insert;
   /// Top-Left corner of text
   int textx, texty;
+  /// The timer used for cursor flashing
+  csTimer *timer;
 
 public:
   /// Create input line object
@@ -106,6 +110,8 @@ public:
 protected:
   /// Query character X position within component
   int GetCharX (int iNum);
+  /// Set text, drop the selection and don't move the cursor
+  void SetTextExt (const char *iText);
 };
 
 #endif // __CSILINE_H__

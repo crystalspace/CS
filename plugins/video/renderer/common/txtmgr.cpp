@@ -211,7 +211,6 @@ void csTextureMM::alloc_2dtexture (csTextureManager* tex)
   t2d = tex->factory_2d->new_texture (this, w, h);
 }
 
-
 void csTextureMM::free_image ()
 {
   if (ifile) { ifile->DecRef (); ifile = NULL; }
@@ -544,7 +543,8 @@ Filter3x3 csTextureManager::blend_filter =
   16
 };
 
-csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D* iG2D)
+csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D* iG2D) :
+  textures (64, 64)
 {
   System = iSys;
   (G2D = iG2D)->IncRef ();
@@ -560,7 +560,6 @@ csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D* iG2D)
   mixing = MIX_TRUE_RGB;
   force_mix = -1;
   use_rgb = true;
-
 }
 
 void csTextureManager::Initialize ()
@@ -579,13 +578,7 @@ csTextureManager::~csTextureManager()
 
 void csTextureManager::clear ()
 {
-  //int i;
-  //for (i = 0 ; i < textures.Length () ; i++)
-  //{
-    //CHK (delete (csTextureMM*)(textures[i]));
-    //textures[i] = NULL;
-  //}
-  //textures.DeleteAll ();
+  textures.DeleteAll ();
 }
 
 void csTextureManager::SysPrintf (int mode, char* szMsg, ...)

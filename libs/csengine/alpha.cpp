@@ -4,7 +4,6 @@
 
 #include "sysdef.h"
 #include "csengine/alpha.h"
-#include "csgfxldr/csimage.h"
 #include "csobject/nameobj.h"
 #include "ialphamg.h"
 

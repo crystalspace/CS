@@ -125,10 +125,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem *iSys)
 
   G2D = LOAD_PLUGIN (System, OPENGL_2D_DRIVER, iGraphics2D);
   if (!G2D)
-  {
-    SysPrintf (MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
     return 0;
-  }
 
   CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
   txtmgr->SetConfig (config);

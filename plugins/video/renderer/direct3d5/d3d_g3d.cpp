@@ -227,10 +227,7 @@ bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx5", iGraphics2D);
   if (!m_piG2D)
-  {
-    SysPrintf(MSG_FATAL_ERROR, "FATAL ERROR: Couldn't load 2D graphics driver");
     return false;
-  }
 
   CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D));
   txtmgr->Initialize ();

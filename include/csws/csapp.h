@@ -123,6 +123,9 @@ public:
   /// Process all events in event queue
   virtual bool ProcessEvents ();
 
+  /// Process all events in the queue and refresh the screen
+  void FlushEvents ();
+
   /// Display a string on the console using almost usual printf() syntax
   void printf (int mode, char* str, ...);
 

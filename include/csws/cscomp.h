@@ -326,6 +326,9 @@ public:
   /// Return control in previous group before 'start'
   virtual csComponent *PrevGroup (csComponent *start = NULL);
 
+  /// Fix the focused child if it is not selectable (find another)
+  bool FixFocused ();
+
   /**
    * Change Z-order of a child component above 'below' (can be NULL
    * for lowest Z-order) neightbour.

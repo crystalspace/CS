@@ -413,9 +413,24 @@ public:
  */
 class csTextureManager : public iTextureManager
 {
+  // Private class used to keep a list of csTextureMM heirs
+  class csTexVector : public csVector
+  {
+  public:
+    // Initialize the array
+    csTexVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
+    // Free a single texture
+    virtual bool FreeItem (csSome Item)
+    {
+      if (Item)
+        ((iTextureHandle *)Item)->DecRef ();
+      return true;
+    }
+  };
+
 protected:
   /// List of textures.
-  csVector textures;
+  csTexVector textures;
 
   /// Pixel format.
   csPixelFormat pfmt;

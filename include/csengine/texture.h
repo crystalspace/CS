@@ -24,9 +24,8 @@
 #include "csgfxldr/boxfilt.h"
 #include "igraph2d.h"
 
-class csWorld;
-class csImageFile;
 scfInterface iTextureHandle;
+scfInterface iImageFile;
 
 /**
  * csTextureHandle represents a texture and its link
@@ -35,8 +34,8 @@ scfInterface iTextureHandle;
 class csTextureHandle : public csObject
 {
 private:
-  /// The corresponding csImageFile.
-  csImageFile* ifile;
+  /// The corresponding iImageFile.
+  iImageFile* ifile;
   /// The handle as returned by iTextureManager.
   iTextureHandle* txt_handle;
   // Transparent color
@@ -49,7 +48,7 @@ public:
   bool for_3d;
 
   /// Construct a texture handle given a image file
-  csTextureHandle (csImageFile* image);
+  csTextureHandle (iImageFile* image);
   /// Copy contstructor
   csTextureHandle (csTextureHandle &th);
   /// Release texture handle
@@ -61,11 +60,15 @@ public:
   /// Set the texture handle.
   void SetTextureHandle (iTextureHandle* h);
 
-  /// Get the csImageFile.
-  csImageFile* GetImageFile () { return ifile; }
+  /// Get the iImageFile.
+  iImageFile* GetImageFile () { return ifile; }
 
   /// Set the transparent color.
   void SetTransparent (int red, int green, int blue);
+
+  /// Query the transparent color.
+  void GetTransparent (int &red, int &green, int &blue)
+  { red = transp_r; green = transp_g; blue = transp_b; }
 
   CSOBJTYPE;
 };
@@ -103,7 +106,7 @@ public:
   void Clear ();
 
   /// Create a new texture.
-  csTextureHandle* NewTexture (csImageFile* image);
+  csTextureHandle* NewTexture (iImageFile* image);
 
   /// Return number of textures
   int GetNumTextures () { return num_textures; }

@@ -120,13 +120,9 @@ csSystemDriver::~csSystemDriver ()
 
   CHK (delete OptionList);
 
-  // Decrement reference count for all known drivers
-  if (Sound) Sound->DecRef ();
-  if (NetDrv) NetDrv->DecRef ();
-  if (NetMan) NetMan->DecRef ();
-  if (G2D) G2D->DecRef ();
-  if (G3D) G3D->DecRef ();
-  if (VFS) VFS->DecRef ();
+  // NOTE: We should not decrement reference count for known drivers
+  // since we suppose they will deregister themself during their
+  // shutdown sequence. If they won't do, they won't not be unloaded.
 
   // Free all plugins
   PlugIns.DeleteAll ();
