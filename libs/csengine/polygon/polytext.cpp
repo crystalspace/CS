@@ -1247,8 +1247,8 @@ bool csPolyTexture::CleanIfDirty (csBitSet *bs)
       dirty_cnt -= COUNT_BITS (s) - COUNT_BITS (s >> 4);
     s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
     d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
-    *((UByte *)src)++ = s;
-    *((UByte *)dst)++ = d;
+    *((UByte *)src++) = s;
+    *((UByte *)dst++) = d;
   }
 
   return (dc != dirty_cnt);

@@ -452,7 +452,8 @@ void csTextureManagerSoftware::PrepareTextures ()
   // Drop all "color allocated" flags to locked colors.
   // We won't clear the palette as we don't care about unused colors anyway.
   // The locked colors will stay the same.
-  cmap.alloc = locked;
+  //cmap.alloc = locked;
+  memcpy (cmap.alloc, locked, 256*sizeof(bool));
 
   if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
@@ -470,7 +471,7 @@ void csTextureManagerSoftware::PrepareTextures ()
   compute_palette ();
 
   // Remap all textures according to the new colormap.
-  for (int i = 0; i < textures.Length (); i++)
+  for (i = 0; i < textures.Length (); i++)
     ((csTextureMMSoftware*)textures.Get (i))->remap_texture (this);
 }
 
@@ -509,7 +510,7 @@ void csTextureManagerSoftware::ResetPalette ()
   locked [255] = true;
   cmap [0] = RGBcolor (0, 0, 0);
   cmap [255] = RGBcolor (255, 255, 255);
-  cmap.alloc = locked;
+  memcpy (cmap.alloc, locked, 256*sizeof(bool));
   palette_ok = false;
 }
 

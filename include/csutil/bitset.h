@@ -153,7 +153,7 @@ public:
       sz -= sizeof (ULong);
     }
     while (sz--)
-      *((UByte *)src)++ |= *((UByte *)dst)++;
+      *((UByte *)src++) |= *((UByte *)dst++);
     return *this;
   }
 
@@ -169,7 +169,7 @@ public:
       sz -= sizeof (ULong);
     }
     while (sz--)
-      *((UByte *)src)++ &= *((UByte *)dst)++;
+      *((UByte *)src++) &= *((UByte *)dst++);
     return *this;
   }
 };
