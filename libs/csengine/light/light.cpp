@@ -29,6 +29,7 @@
 #include "csengine/curve.h"
 #include "csengine/halo.h"
 #include "csengine/meshobj.h"
+#include "csutil/debug.h"
 
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
@@ -47,10 +48,13 @@ csLight::csLight (float x, float y, float z, float d,
   float red, float green, float blue) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
+  DG_DESCRIBE0 (this, "csLight()");
   light_id = last_light_id++;
   center.x = x;
   center.y = y;
   center.z = z;
+
+  SetName ("__light__");
 
   dist = d;
   sqdist = d * d;
@@ -166,6 +170,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
   : csLight (x, y, z, dist, red, green, blue)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
+  DG_DESCRIBE0 (this, "csStatLight()");
   csStatLight::dynamic = dynamic;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
@@ -371,6 +376,7 @@ csDynLight::csDynLight (float x, float y, float z, float dist,
   : csLight (x, y, z, dist, red, green, blue)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
+  DG_DESCRIBE0 (this, "csDynLight()");
   lightpatches = NULL;
 }
 

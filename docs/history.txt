@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+17-Nov-2001
+	- Added some additional DG_DESCRIBE0 statements to some
+	  constructors of engine objects in order to be able to do
+	  better debugging using the csDebuggingGraph.
+	- Made csDebuggingGraph a little bit more relaxed so that it
+	  no longer requires object_reg to be non-NULL. If object_reg
+	  is NULL it will simply do nothing.
 16-Nov-2001
 	- Removed csDebuggingGraph::AddInterface() and instead added
 	  a 'bool scf' parameter to AddObject().

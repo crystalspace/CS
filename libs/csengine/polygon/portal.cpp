@@ -26,6 +26,7 @@
 #include "csengine/cbuffer.h"
 #include "csengine/lview.h"
 #include "csengine/light.h"
+#include "csutil/debug.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
@@ -43,6 +44,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csPortal::csPortal ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
+  DG_DESCRIBE0 (this, "csPortal()");
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;

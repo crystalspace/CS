@@ -20,7 +20,7 @@
 #define __CS_UTIL_DEBUG__
 
 // Enable the following define to have the DG_... macros.
-//#define CS_USE_GRAPHDEBUG
+#define CS_USE_GRAPHDEBUG
 
 struct iBase;
 struct iObjectRegistry;

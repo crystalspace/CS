@@ -35,6 +35,7 @@
 #include "csengine/meshobj.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
+#include "csutil/debug.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
@@ -97,6 +98,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
+  DG_DESCRIBE0 (this, "csThing()");
 
   last_thing_id++;
   thing_id = last_thing_id;
