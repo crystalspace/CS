@@ -72,9 +72,9 @@ bool csGraphics2DGLBe::Open(const char* title)
   int const vh = Height - 1;
   BRect win_rect(INSET, INSET, vw + INSET, vh + INSET);
 
-  if (vw <= sw && vh <= sh) {	// Center the window.
-    float const x = floor((sw - vw) / 2);
-    float const y = floor((sh - vh) / 2);
+  if (vw <= sw && vh <= sh) {
+    float const x = floor((sw - vw) / 2); // Center window horizontally.
+    float const y = floor((sh - vh) / 4); // A pleasing vertical position.
     win_rect.Set(x, y, x + vw, y + vh);
   }
 
