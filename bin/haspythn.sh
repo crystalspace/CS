@@ -9,7 +9,7 @@
 # piped to stderr.
 #
 
-SOURCES="/usr /usr/local"
+SOURCES="/usr /usr/local /usr/local/python"
 
 # Find the Python header and library directories.  In the event that multiple
 # header and library directories are located, choose the the final
