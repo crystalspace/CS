@@ -232,6 +232,12 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match="property[name='whatsThis']">
+    <xsl:call-template name="awsinfo">
+      <xsl:with-param name="info" select="concat(string,'|')"/>
+    </xsl:call-template>
+  </xsl:template>
+
   <xsl:template match="attribute[name='title']">
     <xsl:if test="string-length(string) > 0">
       <xsl:call-template name="spacer"/>
@@ -332,6 +338,56 @@
       <xsl:call-template name="spacer">
         <xsl:with-param name="here" select="$here/.."/>
         <xsl:with-param name="prefix"></xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="awsinfo">
+    <xsl:param name="info"/>
+    <xsl:param name="sepa"><xsl:text>|</xsl:text></xsl:param>
+    <xsl:param name="idsepa"><xsl:text>:</xsl:text></xsl:param>
+    <xsl:variable name="token" select="substring-before($info,$sepa)"/>
+    <xsl:if test="string-length($token)>0">
+      <xsl:variable name="tokenid" select="substring-before($token,$idsepa)"/>
+      <xsl:choose>
+        <xsl:when test="$tokenid='c'">
+          <xsl:call-template name="do_connect">
+            <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="do_connect">
+    <xsl:param name="sepa"><xsl:text>,</xsl:text></xsl:param>
+    <xsl:param name="inp"/>
+    <xsl:call-template name="spacer"/><xsl:text>connect</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
+    <xsl:call-template name="connect">
+      <xsl:with-param name="inp" select="concat($inp,$sepa)"/>
+      <xsl:with-param name="sepa" select="$sepa"/>
+    </xsl:call-template>
+    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
+  </xsl:template>
+
+  <xsl:template name="connect">
+    <!-- tokenizes a string and for token of the form "from,to,from1,to1" 
+         it places connection entries ala "from -> to" and "from1 -> to1" in the output
+    -->
+    <xsl:param name="sepa"><xsl:text>,</xsl:text></xsl:param>
+    <xsl:param name="inp"/>
+    <xsl:variable name="from" select="substring-before($inp,$sepa)"/>
+    <xsl:variable name="inp" select="substring-after($inp,$sepa)"/>
+    <xsl:variable name="to" select="substring-before($inp,$sepa)"/>
+    <xsl:if test="string-length($from)>0 and string-length($to)>0">
+      <xsl:call-template name="spacer"/><xsl:value-of select="concat($tabwidth,$from,' -> ',$to)"/>
+    </xsl:if>
+    <xsl:variable name="inp" select="substring-after($inp,$sepa)"/>
+    <xsl:if test="string-length($inp)>0">
+      <xsl:call-template name="connect">
+        <xsl:with-param name="sepa" select="$sepa"/>   
+        <xsl:with-param name="inp" select="$inp"/>   
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
