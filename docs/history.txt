@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.
+	- Jorrit fixed a small bug in the thing plugin in case a polygon mesh
+	  was requested before the thing was prepared and in case the
+	  thing contained a portal.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday

@@ -612,7 +612,12 @@ bool csPolygon3DStatic::Finish ()
   }
 
   if (portal)
-    portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
+  {
+    if (material->GetMaterialHandle ())
+      portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
+    else
+      rc = false;
+  }
 
   if (flags.Check (CS_POLY_LIGHTING))
   {
