@@ -14,6 +14,10 @@ The history order has been reversed so that new features are at the top.
 	- The result of the SCF changes today and yesterday is that
 	  simplep (the version of simple that uses the engine plugin) is
 	  actually able to create geometry and show it.
+	- Added iTextureWrapper SCF class and let csTextureWrapper implement
+	  it.
+	- Made some fixes to cs.i so that the Python plugin is now up-to-date
+	  to the latest SCF changes.
 12-Dec-2000
 	- Thomas Hieber added two files to gamecore plugin which he
 	  forgot to add in the past.

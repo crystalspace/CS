@@ -73,6 +73,14 @@ struct iPlugIn:public iBase
   bool HandleEvent(iEvent&);
 };
 
+struct iTextureWrapper : public iBase
+{
+};
+
+struct iMaterialWrapper : public iBase
+{
+};
+
 struct iTextureHandle : public iBase
 {
   bool GetMipMapDimensions (int mipmap, int &mw, int &mh);
@@ -249,7 +257,7 @@ struct iEngine : public iPlugIn
   virtual void SelectLibrary (const char *iName) = 0;
   virtual bool DeleteLibrary (const char *iName) = 0;
   virtual void DeleteAll () = 0;
-  virtual bool CreateTexture (const char *iName, const char *iFileName, 
+  virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName, 
     csColor *iTransp, int iFlags) = 0;
   virtual bool CreateCamera (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward,
@@ -261,7 +269,7 @@ struct iEngine : public iPlugIn
   virtual iSector *FindSector (const char *iName) = 0;
   virtual iSector *GetSector (int idx) = 0;
   virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
-  virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
+  virtual iMaterialWrapper *FindMaterial (const char *iName, bool regionOnly = false) = 0;
 };
 
 //****** System Interface

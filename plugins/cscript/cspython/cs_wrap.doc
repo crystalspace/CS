@@ -195,7 +195,13 @@ Initialize(iSys)
 
 HandleEvent(iEvent *)
 
-1.6.  class iTextureHandle
+1.6.  class iTextureWrapper
+---------------------------
+
+1.7.  class iMaterialWrapper
+----------------------------
+
+1.8.  class iTextureHandle
 --------------------------
 
 GetMipMapDimensions(mipmap,mw,mh)
@@ -208,7 +214,7 @@ SetCacheData(d)
 
 GetPrivateObject()
 
-1.7.  class iGraphics3D
+1.9.  class iGraphics3D
 -----------------------
 
 Initialize(pSystem)
@@ -278,15 +284,15 @@ CreateHalo(iR,iG,iB,iAlpha,iWidth,iHeight)
 
 DrawPixmap(hTex,sx,sy,sw,sh,tx,ty,tw,th)
 
-1.8.  class iCamera
--------------------
+1.10.  class iCamera
+--------------------
 
 GetAspect()
 
 GetInvAspect()
 
-1.9.  class iPolygonSet
------------------------
+1.11.  class iPolygonSet
+------------------------
 
 GetName()
 
@@ -312,17 +318,17 @@ CreateVertex(iVertex)
 
 CreateKey(iName,iValue)
 
-1.10.  class iSector
+1.12.  class iSector
 --------------------
 
 CreateBSP()
 
 Query_iPolygonSet()
 
-1.11.  class iThing
+1.13.  class iThing
 -------------------
 
-1.12.  class iPolygon3D
+1.14.  class iPolygon3D
 -----------------------
 
 GetName()
@@ -361,7 +367,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.13.  class iImage
+1.15.  class iImage
 -------------------
 
 GetImageData()
@@ -392,7 +398,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.14.  class iTextureManager
+1.16.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -417,7 +423,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.15.  class iPolygonTexture
+1.17.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -457,7 +463,7 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.16.  class iEngine
+1.18.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -484,9 +490,9 @@ GetSector(idx)
 
 CreateThing(iName,iParent)
 
-FindMaterial(iName)
+FindMaterial(iName,regionOnly)
 
-1.17.  class iSystem
+1.19.  class iSystem
 --------------------
 
 Query_iEngine()

@@ -92,4 +92,16 @@ struct iTextureHandle : public iBase
   virtual bool GetAlphaMap () = 0;
 };
 
+SCF_VERSION (iTextureWrapper, 0, 0, 1);
+
+/**
+ * This class represents a texture wrapper which holds
+ * the mapping between a texture in the engine and a texture
+ * in the 3D rasterizer.
+ */
+struct iTextureWrapper : public iBase
+{
+};
+
+
 #endif //ITEXTURE_H
