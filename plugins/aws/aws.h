@@ -43,16 +43,20 @@ class awsManager : public iAws
 
    /// The current top window
    awsWindow   *top;
+
+   /// The 2d graphics context
+   iGraphics2D *ptG2D;
+
+   /// The 3d graphics context
+   iGraphics3D *ptG3D;
   
-   /// Handle to our procedural texture, which is what we draw on.
+   /// Handle to our procedural texture, which the user can have us draw on.
    class awsCanvas : public csProcTexture
    {
-    awsManager *wmgr;
-
-    public:
+     public:
   
         /// Create a new texture.
-        awsCanvas (awsManager *_wmgr);
+        awsCanvas ();
   
         /// Destroy this texture
         virtual ~awsCanvas () {}
@@ -67,8 +71,8 @@ class awsManager : public iAws
         /// Get the iGraphics3D interface so that components can use it.
         iGraphics3D *G3D() 
         { return ptG3D; }
-
    };
+
    awsCanvas canvas;
 
 public:
@@ -91,9 +95,24 @@ public:
     /// Set the top window
     virtual void       SetTopWindow(awsWindow *_top);
 
-
     /// Redraw whatever portions of the screen need it.
 
+public:
+    /// Set the contexts however you want
+    virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d);
+
+    /// Set the context to the procedural texture
+    virtual void SetDefaultContext();
+
+    /// Get the iGraphics2D interface so that components can use it.
+    iGraphics2D *G2D() 
+    { return ptG2D; }
+
+    /// Get the iGraphics3D interface so that components can use it.
+    iGraphics3D *G3D() 
+    { return ptG3D; }
+
+ 
   //////////////////////////////////////
 
   // Implement iPlugIn interface.

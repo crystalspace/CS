@@ -1,6 +1,7 @@
 #include "cssysdef.h"
 #include "awsprefs.h"
 #include "awscomp.h"
+#include "awsslot.h"
 
 /**
  *  This function is normally called automatically by the window manager.  You may call it manually if you wish, but
@@ -31,3 +32,16 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
   return true;
 
 }
+
+bool 
+awsComponent::RegisterSlot(iAwsSlot *slot, unsigned long signal)
+{
+  return true;
+}
+
+bool 
+awsComponent::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
+{
+  return true;
+}
+
