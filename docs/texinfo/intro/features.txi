@@ -3,9 +3,7 @@
 @section Feature List
 @cindex Features
 
-@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org}, on 2002-06-21.
-Please feel free to add comments or email me if any of the information here is
-incorrect or out-of-date.}
+@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org}, on 2002-06-21.} 
 
 The first feature to mention here are that Crystal Space is an Open Source
 project (or a Free Software project, depending on your religion) that is

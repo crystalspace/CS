@@ -3,41 +3,75 @@
 @section Requirements
 @cindex Requirements
 
+@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org}, on 2002-06-21.}
+
 To utilize Crystal Space you need at least the following resources:
 
 @itemize @bullet
 @item
-Hardware: A good computer with hardware accelerated graphics is best. What
-you really need depends on the situation and the map file. The minimum 
-recommended system is a Pentium (133 MHz) or equivalent.
+Hardware: To fully utilize the 3D engine a 3D-accelerated graphics card is
+highly recommended. You can get away without it by using the software renderer
+if you have a fast enough system. The minimum recommended processor on the x86
+architecture is one of the i586 family (Pentium).
 
 @item
-Operating System: One of the supported systems. Currently supported
-are: Windows (32 bit), Unix / GNU/Linux, MacOS/X, MacOS/X Server, OpenStep,
-NextStep, OS/2, BeOS, and MS-DOS.
+Operating System: You will need to be running a supported Operating System.
+Currently Crystal Space supports: Windows (32 bit), Linux, FreeBSD, NetBSD,
+MacOS/X, MacOS/X Server, @sc{openstep}, NeXTSTEP, @sc{os/2}, BeOS,
+@sc{gnu/hurd}, and @sc{ms-dos}.
 
 @item
-C++ Development Environment: Crystal Space must be built with a C++
-compiler such as the GNU C++, Microsoft Visual C/++, and Metrowerks 
-CodeWarrior compilers and other standard development tools. If someone
-makes a nice framework for you based on CS and Python you can get away
-without C++ compiler by developing in Python.
+Development Environment: If you plan to use Crystal Space it is recommended
+that you compile it yourself from source. To do so you will need a supported
+C++ compiler such as the @sc{gnu} Compiler Collection (@sc{gcc}), Microsoft
+Visual C++, or Metrowerks CodeWarrior. If you plan to use the scripting
+capabilities of Crystal Space you will also need an interpreter for each
+scripting language you use.
 
 @item
-The main Crystal Space package.  In fact you need the compiled library, an
-example application, and several drivers (@file{.DLL} or @file{.so} files).
-The Crystal Space package contains the sources for all of them, which means you
-must compile everything.  This is explained later.
+Crystal Space Package: The latest release of Crystal Space can be downloaded
+from @url{http://crystal.sourceforge.net/download.html}. The release includes
+all of the source code, some pre-generated documentation, and a few example
+data files. Or, if you're feeling brave you can download the latest @sc{cvs}
+snapshot from @url{http://crystal.sourceforge.net/cvs.html} or checkout the
+source directly from the @sc{cvs} repository (directions for doing this can be
+found at @url{http://sourceforge.net/cvs/?group_id=649}).
 
 @item
-One or more map files.  These can be downloaded from the Crystal Space
-homepage.  They are @sc{zip} archives.  Do not unzip them.  Crystal Space reads
-@sc{zip} archives directly.
+External Dependencies: Crystal Space can use a number of optional libraries and
+tools to provide a more robust set of features. A list can be found at
+@url{http://crystal.sourceforge.net/dlsrc.html}, but I will briefly list some
+of the current dependencies here. @xref{External Libraries}
 
-@noindent
-@uref{http://crystal.sourceforge.net/}
+@table @emph
+@item The Netwide Assembler
+@sc{nasm} is used by Crystal Space on certain platforms for assembly language
+routines (@url{http://www.web-sites.co.uk/nasm/}).
+
+@item @sc{ascii} Art Library
+aalib is used for 2D rendering in text mode.  Currently a modified version of
+aalib is required and can be downloaded from
+@url{ftp://sunsite.dk/pub/projects/crystal/support/aalib/}.
+
+@item Z Library
+zlib is used for compression and archiving (@url{http://www.gzip.org/zlib/}).
+
+@item @sc{png} Library
+libpng is used for loading Portable Network Graphics image files
+(@url{http://www.libpng.org/pub/png/libpng.html}).
+
+@item @sc{jpeg} Library
+libjpeg is used for loading Joint Photographics Experts Group image files
+(@url{http://www.ijg.org/files/}).
+@end table
 
 @item
-The external libraries @code{zlib}, @code{libjpeg} and @code{libpng}.
-@xref{External Libraries}.
+Maps and such are needed if you want to see examples of Crystal Space at work.
+A few data files are provided in the Crystal Space release itself, but more can
+be downloaded from @url{ftp://ftp.sunsite.dk/pub/projects/crystal/}. Most files
+can just be placed in the CS/data directory and left alone.
+
+@item
+A load of patience and powerful wetware are required to make good use of
+Crystal Space. Often these are the hardest to benchmark@dots{}
 @end itemize
