@@ -404,7 +404,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
 	// This version is much faster and seems to give the same
 	// results. I keep the old code here for a little while just
 	// to be sure :-)
-	if ((v1%poly[pvp])*poly[pv] >= 0 || (v2%poly[pvp])*poly[pv] >= 0)
+	if (!((poly[pvp]%v1)*poly[pv] >= 0 || (v2%poly[pvp])*poly[pv] >= 0))
           return CS_FRUST_PARTIAL;
 #else
         // If the segment intersects with the frustum plane somewhere
@@ -417,7 +417,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
         //@@@ This is the old code but I think this code
 	// should test against the frustum.
 	//--- if ((poly [pvp] % p) * (poly [pv] % p) < 0)
-        if ((v1 % p) * (v2 % p) <= 0)
+        if ((v1 % p) * (v2 % p) >= 0)
           return CS_FRUST_PARTIAL;
 #endif
       }
