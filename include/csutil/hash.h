@@ -241,10 +241,11 @@ public:
     Iterator (const csHash<T> *hash0, uint32 key0)
     : hash (hash0), key (key0), bucket (key % hash->Modulo),
       size (hash->Elements[bucket].Length ()) { Return (); }
+
+  public:
     Iterator (const Iterator &o)
     : hash (o.hash), bucket (o.bucket), size (o.size), element (o.element) {}
 
-  public:
     /// Returns a boolean indicating whether or not the hash has more elements.
     bool HasNext () const
     {
@@ -275,10 +276,11 @@ public:
 
   protected:
     GlobalIterator (const csHash<T> *hash0) : hash (hash0) { Zero (); Init (); }
+
+  public:
     GlobalIterator (const Iterator &o) : hash (o.hash), bucket (o.bucket),
       size (o.size), element (o.element) {}
 
-  public:
     /// Returns a boolean indicating whether or not the hash has more elements.
     bool HasNext () const
     {
@@ -310,12 +312,14 @@ public:
     void Return () { Zero (); Init (); }
   };
 
-  /// Return an iterator for the hash.
+  /// Return an iterator for the hash, to iterate only over the elements
+  /// with the given key.
   Iterator GetIterator (uint32 key) const
   {
     return Iterator (this, key);
   }
 
+  /// Return an iterator for the hash, to iterate over all elements.
   GlobalIterator GetIterator () const
   {
     return GlobalIterator (this);
