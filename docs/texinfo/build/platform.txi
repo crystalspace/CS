@@ -28,8 +28,8 @@ will find a reference to it from within the instructions in this section.
 @end menu
 
 @importss{build,platform,unix.txi}
-@importss{build,platform,win32.txi}
-@importss{build,platform,win32gcc.txi}
+@importss{build,platform,win32/win32.txi}
+@importss{build,platform,win32/win32gcc.txi}
 @importss{build,platform,next.txi}
 @importss{build,platform,mac.txi}
 @importss{build,platform,os2.txi}

@@ -155,6 +155,8 @@ version i.e. 2.0.
 
 @uref{http://www.python.org}
 
+@subsubheading BisonFlex
+
 You need not compile all parts of Crystal Space.  For example, if you don't
 want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
 then you don't have to compile it.  See the compilation instructions on how to
