@@ -929,10 +929,8 @@ public:
     { return 0; }
     virtual csPtr<iString> Dump ()
     { return 0; }
-  #ifndef CS_USE_NEW_RENDERER
     virtual void Dump (iGraphics3D* g3d)
     { }
-  #endif // CS_USE_NEW_RENDERER
     virtual bool DebugCommand (const char* cmd)
     { return scfParent->DebugCommand (cmd); }
   } scfiDebugHelper;

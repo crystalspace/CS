@@ -32,9 +32,7 @@ int csLight:: ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 
-#ifdef CS_USE_NEW_RENDERER
-  float csLight::influenceIntensityFraction = 256;
-#endif
+float csLight::influenceIntensityFraction = 256;
 
 SCF_IMPLEMENT_IBASE_EXT(csLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)

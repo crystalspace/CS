@@ -1494,36 +1494,55 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
   triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
 }
 
-#ifdef CS_USE_NEW_RENDERER
 bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name, 
   csRenderBufferComponentType component_type, int component_size)
 {
-  return anon_buffers.AddRenderBuffer(name, component_type, component_size, num_mesh_vertices);
+#ifdef CS_USE_NEW_RENDERER
+  return anon_buffers.AddRenderBuffer (name, component_type,
+    component_size, num_mesh_vertices);
+#else
+  return false;
+#endif
 }
 
 bool csGenmeshMeshObjectFactory::SetRenderBufferComponent (const char *name,
 	int index, int component, float value)
 {
+#ifdef CS_USE_NEW_RENDERER
   return anon_buffers.SetRenderBufferComponent(name, index, component, value);
+#else
+  return false;
+#endif
 }
 
 bool csGenmeshMeshObjectFactory::SetRenderBufferComponent (const char *name,
 	int index, int component, int value)
 {
+#ifdef CS_USE_NEW_RENDERER
   return anon_buffers.SetRenderBufferComponent(name, index, component, value);
+#else
+  return false;
+#endif
 }
 
-bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name, float *value)
+bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name,
+	float *value)
 {
+#ifdef CS_USE_NEW_RENDERER
   return anon_buffers.SetRenderBuffer (name, value, num_mesh_vertices);
+#else
+  return false;
+#endif
 }
 
 bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name, int *value)
 {
+#ifdef CS_USE_NEW_RENDERER
   return anon_buffers.SetRenderBuffer(name, value, num_mesh_vertices);
-}
-
+#else
+  return false;
 #endif
+}
 
 void csGenmeshMeshObjectFactory::Invalidate ()
 {

@@ -20,8 +20,6 @@
 #ifndef __CS_IVIDEO_VBUFMGR_H__
 #define __CS_IVIDEO_VBUFMGR_H__
 
-#ifndef CS_USE_NEW_RENDERER
-
 /**\file
  * Vertex buffer manager interface
  */
@@ -48,6 +46,7 @@ struct csPolyLightMapMapping;
 SCF_VERSION (iVertexBuffer, 0, 1, 1);
 
 /**
+ * @@@OR@@@
  * This interface represents a black-box vertex buffer.
  * Using the vertex buffer manager (see below) you can create objects
  * that implement this interface. These objects are managed by the
@@ -93,6 +92,7 @@ struct iVertexBuffer : public iBase
 SCF_VERSION (iPolygonBuffer, 0, 3, 0);
 
 /**
+ * @@@OR@@@
  * This interface represents a black-box polygon buffer.
  * It is used to draw a mesh of polygons. The vertex buffer manager
  * will create instances of iPolygonBuffer. Internally it will hold
@@ -194,6 +194,7 @@ struct iVertexBufferManagerClient : public iBase
 SCF_VERSION (iVertexBufferManager, 0, 0, 2);
 
 /**
+ * @@@OR@@@
  * This interface represents the vertex buffer manager. You can use this
  * to create vertex buffers which can be used by the 3D renderer.
  */
@@ -263,8 +264,6 @@ struct iVertexBufferManager : public iBase
   virtual void AddClient (iVertexBufferManagerClient *client) = 0;
   virtual void RemoveClient (iVertexBufferManagerClient *client) = 0;
 };
-
-#endif // CS_USE_NEW_RENDERER
 
 /** @} */
 

@@ -284,16 +284,19 @@ struct iRenderView : public iBase
    * Get the current camera.
    */
   virtual iCamera* GetCamera () = 0;
-#ifndef CS_USE_NEW_RENDERER
+
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DPolygonDP structure.
    */
   virtual void CalculateFogPolygon (G3DPolygonDP& poly) = 0;
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DPolygonDPFX structure.
    */
   virtual void CalculateFogPolygon (G3DPolygonDPFX& poly) = 0;
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DTriangleMesh
    * structure. This function assumes the fog array is already preallocated
    * and the rest of the structure should be filled in.
@@ -302,16 +305,15 @@ struct iRenderView : public iBase
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
   	G3DTriangleMesh& mesh) = 0;
 
-    /**
+  /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DPolygonMesh
    * structure. This function assumes the fog array is already preallocated
    * and the rest of the structure should be filled in.
    * This function will take care of correctly enabling/disabling fog.
    */
-
   virtual void CalculateFogMesh (const csTransform &tr_o2c, 
     G3DPolygonMesh &mesh) = 0;
-#endif // CS_USE_NEW_RENDERER
 
 
   /**

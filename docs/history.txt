@@ -8,6 +8,20 @@ chronological order.
 
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
+	- Jorrit did the following changes to bring new and old renderer
+	  branches closer together:
+	    - Added back the CalculateFog stuff in iRenderView. This is not
+	      relevant for new renderer but it doesn't hurt to have it
+	      back.
+	    - Some light changes.
+	    - Removed several unused NR specific variables from csSector.
+	    - csAnonRenderBufferManager is now part of OR build too.
+	    - Added NR specific genmesh API to OR build.
+	    - Re-added Dump(g3d) to iDebugHelper.
+	    - Iso engine change and fix.
+	    - iVertexBufferManager added to NR build.
+	    - Added csShaderBranch to OR build.
+	- Jorrit improved error reporting in the renderloop loader plugin.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

@@ -23,6 +23,7 @@
 #include "csutil/symtable.h"
 #include "ivideo/shader/shader.h"
 
+/// @@@ Document me!
 class csBaseShaderBranch : public iShaderBranch
 {
   csSymbolTable symtab;
@@ -37,6 +38,7 @@ public:
   virtual void SelectSymbolTable (int index);
 };
 
+/// @@@ Document me!
 class csShaderBranch : public csBaseShaderBranch
 {
 public:

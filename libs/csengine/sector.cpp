@@ -145,12 +145,6 @@ csSector::csSector (csEngine *engine) :
   meshes.SetSector (this);
   lights.SetSector (this);
 
-#ifdef CS_USE_NEW_RENDERER
-  g3d = CS_QUERY_REGISTRY (csEngine::object_reg, iGraphics3D);
-  shmgr = CS_QUERY_REGISTRY (csEngine::object_reg, iShaderManager);
-  virtual_clock = CS_QUERY_REGISTRY (csEngine::object_reg, iVirtualClock);
-#endif // CS_USE_NEW_RENDERER
-
   current_visnr = 1;
 }
 

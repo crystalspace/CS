@@ -19,8 +19,6 @@
 
 #include "cssysdef.h"
 
-#ifdef CS_USE_NEW_RENDERER
-
 #include "cstool/shaderbranch.h"
 
 csBaseShaderBranch::~csBaseShaderBranch ()
@@ -66,6 +64,4 @@ csShaderBranch::csShaderBranch()
 {
   SCF_CONSTRUCT_IBASE(0);
 }
-
-#endif
 

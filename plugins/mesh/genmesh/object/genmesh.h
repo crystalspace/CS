@@ -36,11 +36,9 @@
 #include "csgeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "iengine/shadcast.h"
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
-#endif
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -517,13 +515,16 @@ public:
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
-#ifdef CS_USE_NEW_RENDERER
-  bool AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size);
-  bool SetRenderBufferComponent (const char *name, int index, int component, float value);
-  bool SetRenderBufferComponent (const char *name, int index, int component, int value);
+
+  bool AddRenderBuffer (const char *name,
+  	csRenderBufferComponentType component_type, int component_size);
+  bool SetRenderBufferComponent (const char *name, int index,
+  	int component, float value);
+  bool SetRenderBufferComponent (const char *name, int index,
+  	int component, int value);
   bool SetRenderBuffer (const char *name, float *value);
   bool SetRenderBuffer (const char *name, int *value);
-#endif
+
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
 
@@ -628,19 +629,20 @@ public:
     {
       scfParent->GenerateBox (box);
     }
-#ifdef CS_USE_NEW_RENDERER
     virtual bool AddRenderBuffer (const char *name, 
       csRenderBufferComponentType component_type, int component_size)
     {
       return scfParent->AddRenderBuffer (name, component_type, component_size);
     }
-    virtual bool SetRenderBufferComponent (const char *name, int index, int component, float value)
+    virtual bool SetRenderBufferComponent (const char *name, int index,
+      int comp, float value)
     {
-      return scfParent->SetRenderBufferComponent (name, index, component, value);
+      return scfParent->SetRenderBufferComponent (name, index, comp, value);
     }
-    virtual bool SetRenderBufferComponent (const char *name, int index, int component, int value)
+    virtual bool SetRenderBufferComponent (const char *name, int index,
+      int comp, int value)
     {
-      return scfParent->SetRenderBufferComponent (name, index, component, value);
+      return scfParent->SetRenderBufferComponent (name, index, comp, value);
     }
     virtual bool SetRenderBuffer (const char *name, float *value) 
     {
@@ -650,7 +652,6 @@ public:
     {
       return scfParent->SetRenderBuffer (name, value);
     }
-#endif
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
 

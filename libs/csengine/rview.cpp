@@ -151,7 +151,6 @@ static void InitializeFogTable ()
 }
 #endif
 #define SMALL_D 0.01f
-#ifndef CS_USE_NEW_RENDERER
 void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
 {
   if (!ctxt->fog_info || poly.num < 3)
@@ -329,7 +328,6 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
 }
 
 // @@@ We should be able to avoid having the need for two functions
-
 // which are almost exactly the same.
 void csRenderView::CalculateFogPolygon (G3DPolygonDPFX &poly)
 {
@@ -785,7 +783,6 @@ void csRenderView::CalculateFogMesh (
     }
   }
 }
-#endif // CS_USE_NEW_RENDERER
 
 void csRenderView::UpdateFrustum (
   iClipper2D *clip,

@@ -115,22 +115,6 @@ private:
    */
   uint32 current_visnr;
 
-#ifdef CS_USE_NEW_RENDERER  
-  friend class csRenderMeshList;
-
-  csRef<iVirtualClock> virtual_clock;
-
-  /// num_objects in this sector
-  int num_objects;
-
-  /// sorted list of MeshObjects, saved for future render passes
-  iMeshWrapper **objects;
-  csDirtyAccessArray<csRenderMesh*> draw_objects;
-  csRef<iGraphics3D> g3d;
-  csRef<iShaderManager> shmgr;
-
-#endif
-
   /**
    * The same meshes above but each mesh in their own render priority
    * queue. This is a vector of vectors.

@@ -20,10 +20,7 @@
 #define __CS_IMESH_GENMESH_H__
 
 #include "csutil/scf.h"
-
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
-#endif // CS_USE_NEW_RENDERER
 
 class csVector3;
 class csVector2;
@@ -160,23 +157,28 @@ struct iGeneralFactoryState : public iBase
    */
   virtual void GenerateBox (const csBox3& box) = 0;
 
-#ifdef CS_USE_NEW_RENDERER
-
-  /// Adds an independantly named stream, sets to VertexCount
+  /**
+   * @@@NR@@@
+   * Adds an independantly named stream, sets to VertexCount
+   */
   virtual bool AddRenderBuffer (const char *name, 
     csRenderBufferComponentType component_type, int component_size) = 0;
 
-  /// Adds a component to stream with name
+  /**
+   * @@@NR@@@
+   * Adds a component to stream with name
+   */
   virtual bool SetRenderBufferComponent (const char *name, int index,
   	int component, float value) = 0; 
   virtual bool SetRenderBufferComponent (const char *name, int index,
   	int component, int value) = 0; 
 
-  /// Sets the stream based on the input array
+  /**
+   * @@@NR@@@
+   * Sets the stream based on the input array
+   */
   virtual bool SetRenderBuffer (const char *name, float *value) = 0;
   virtual bool SetRenderBuffer (const char *name, int *value) = 0;
-
-#endif
 };
 
 #endif // __CS_IMESH_GENMESH_H__

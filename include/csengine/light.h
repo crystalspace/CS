@@ -80,13 +80,11 @@ protected:
   /// Is the influence radius valid?
   bool influenceValid;
 
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Config value: The intensity at the influenceRadius in parts of the 
    * main light intensity.
    */
   static float influenceIntensityFraction;
-#endif
 
   /// Light number. Changes when the light changes in some way (color/pos).
   uint32 lightnr;

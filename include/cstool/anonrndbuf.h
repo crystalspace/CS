@@ -19,8 +19,6 @@
 #ifndef __CS_ANONRNDBUF_H__
 #define __CS_ANONRNDBUF_H__
 
-#ifdef CS_USE_NEW_RENDERER
-
 #include "csutil/ref.h"
 #include "csutil/garray.h"
 #include "csutil/refarr.h"
@@ -61,8 +59,5 @@ public:
   bool SetRenderBuffer (const char *name, float *value, int num_verts);
   bool SetRenderBuffer (const char *name, int *value, int num_verts);
 };
-
-
-#endif // CS_USE_NEW_RENDERER
 
 #endif // __CS_ANONRNDBUF_H_

@@ -122,6 +122,16 @@ public:
     ambient = oAmbient;
     reflection = oReflection;
   }
+
+  // @@@NR@@@
+  virtual void SetShader (csStringID, iShaderWrapper*) { }
+  virtual iShaderWrapper* GetShader (csStringID) { return 0; }
+  virtual void AddChild (iShaderBranch *) { }
+  virtual void AddVariable (csShaderVariable *) { }
+  virtual csShaderVariable* GetVariable (csStringID) { return 0; }
+  virtual csSymbolTable* GetSymbolTable () { return 0; }
+  virtual csSymbolTable* GetSymbolTable (int) { return 0; }
+  virtual void SelectSymbolTable (int) {}
 };
 
 /**

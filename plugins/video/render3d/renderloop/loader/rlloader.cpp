@@ -70,7 +70,14 @@ bool csRenderLoopLoader::ParseRenderSteps (iRenderLoop* loop,
 {
   csRef<iRenderStepContainer> cont =
     SCF_QUERY_INTERFACE (loop, iRenderStepContainer);
-  if (!cont) return false;
+  if (!cont)
+  {
+    if (synldr)
+      synldr->ReportError (
+	      "crystalspace.renderloop.load",
+              node, "Internal error: doesn't implement iRenderStepContainer!");
+    return false;
+  }
 
   return rsp.ParseRenderSteps (cont, node);
 }
@@ -80,11 +87,25 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
 {
   csRef<iEngine> engine =
     CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!engine) return 0;
+  if (!engine)
+  {
+    if (synldr)
+      synldr->ReportError (
+	      "crystalspace.renderloop.load",
+              node, "Can't find engine!");
+    return 0;
+  }
 
   csRef<iRenderLoopManager> loopmgr =
     engine->GetRenderLoopManager ();
-  if (!loopmgr) return 0;
+  if (!loopmgr)
+  {
+    if (synldr)
+      synldr->ReportError (
+	      "crystalspace.renderloop.load",
+              node, "Engine doesn't have a render loop manager!");
+    return 0;
+  }
 
   csRef<iRenderLoop> loop = loopmgr->Create ();
 

@@ -109,14 +109,14 @@ struct iTextureHandle : public iBase
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md) = 0;
 
   /**
-   *Sets Texture Target. 
-   *This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
-   *CS_TEXTURE_CUBEMAP etc.
-   *With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
-   *of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
-   *CS_TEXTURE_CUBE_POS_Y, etc.
+   * Sets Texture Target. 
+   * This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
+   * CS_TEXTURE_CUBEMAP etc.
+   * With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
+   * of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
+   * CS_TEXTURE_CUBE_POS_Y, etc.
    */
-  virtual void SetTextureTarget(int target) = 0;
+  virtual void SetTextureTarget (int target) = 0;
 #endif // CS_USE_NEW_RENDERER
 
   /// Get the mean color.

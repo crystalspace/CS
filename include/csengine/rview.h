@@ -237,16 +237,19 @@ public:
    * Get the current camera.
    */
   virtual iCamera* GetCamera () { return ctxt->icamera; }
+
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DPolygonDP structure.
    */
-#ifndef CS_USE_NEW_RENDERER
   virtual void CalculateFogPolygon (G3DPolygonDP& poly);
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DPolygonDPFX structure.
    */
   virtual void CalculateFogPolygon (G3DPolygonDPFX& poly);
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DTriangleMesh
    * structure. This function assumes the fog array is already preallocated
    * and the rest of the structure should be filled in.
@@ -256,6 +259,7 @@ public:
     G3DTriangleMesh& mesh);
 
   /**
+   * @@@OR@@@
    * Calculate the fog information in the given G3DPolygonMesh
    * structure. This function assumes the fog array is already preallocated
    * and the rest of the structure should be filled in.
@@ -264,7 +268,6 @@ public:
 
   virtual void CalculateFogMesh (const csTransform &tr_o2c, 
     G3DPolygonMesh &mesh);
-#endif // CS_USE_NEW_RENDERER
 
 
 
