@@ -1023,8 +1023,6 @@ public:
   /**
    * This function will try to read the lightmap from the
    * cache in the level archive.
-   * If do_cache == false this function will not try to read the lightmap
-   * from the cache.
    */
   bool ReadFromCache (iCacheManager* cache_mgr, int id);
 
@@ -1034,6 +1032,17 @@ public:
    * nothing if the cached lightmap was already up-to-date.
    */
   bool WriteToCache (iCacheManager* cache_mgr, int id);
+
+  /**
+   * This function will try to read the lightmap from the given file.
+   */
+  bool ReadFromCache (iFile* file);
+
+  /**
+   * Call after calling InitializeDefault() and CalculateLighting to cache
+   * the calculated lightmap to the file.
+   */
+  bool WriteToCache (iFile* file);
 
   /**
    * Prepare the lightmaps for use.

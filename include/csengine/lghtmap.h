@@ -34,6 +34,7 @@ class csDelayedLightingInfo;
 class csObject;
 struct iLight;
 struct iCacheManager;
+struct iFile;
 
 CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
 CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
@@ -221,6 +222,18 @@ public:
    * 'id' is a global id that is used to identify objects.
    */
   void Cache (iCacheManager* cache_mgr, int id, csPolygon3D* poly,
+  	csCurve* curve, csEngine*);
+
+  /**
+   * Read lightmap from a file. Return true if succesful.
+   */
+  bool ReadFromCache (iFile* file, int w, int h,
+    csObject* obj, bool isPolygon, csEngine*);
+
+  /**
+   * Write lightmap to a file.
+   */
+  void Cache (iFile* file, csPolygon3D* poly,
   	csCurve* curve, csEngine*);
 
   /**
