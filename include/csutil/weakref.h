@@ -23,6 +23,8 @@
 #include "csextern.h"
 #include "csutil/ref.h"
 
+struct iBase;
+
 /**
  * A weak reference. This is a reference to a reference counted object
  * but in itself it doesn't increment the ref counter. As soon as the

@@ -38,6 +38,7 @@ chronological order.
 	    - Now synthesizes a project-global header which performs the
 	      appropriate abstraction of importing config.h or config-msvc.h,
 	      depending upon the build circumstances.
+	- res added a declaration of iBase to weakref.h.
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
 	- Eric Sunshine augmented the Jam check in configure.ac so that it now
