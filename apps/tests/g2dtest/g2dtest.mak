@@ -27,7 +27,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tests/g2dtest
 
-LIB.G2DTEST = $(CSSYS.LIB) $(CSUTIL.LIB)
+LIB.G2DTEST = $(CSSYS.LIB) $(CSUTIL.LIB) $(CSGEOM.LIB)
 G2DTEST.EXE = g2dtest$(EXE)
 SRC.G2DTEST += apps/tests/g2dtest/g2dtest.cpp
 OBJ.G2DTEST = $(addprefix $(OUT),$(notdir $(SRC.G2DTEST:.cpp=$O)))

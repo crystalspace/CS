@@ -1,5 +1,125 @@
 The history order has been reversed so that new features are at the top.
 
+30-Oct-2000
+	- Andrew Zabolotny did the following changes:
+	    - Fixed a bug in default window theme that caused
+	      background texture to not be drawn if the window is not
+	      semi-transparent.
+	    - Fixed (I hope this is the last fix) clipping so that in
+	      very complex window configurations CheckDirtyTD and
+	      CheckDirtyBU are called as much times as required (until
+	      nothing changes).
+	    - Added gradient backgrounds! In general background for all
+	      skins is now one csBackground object which accepts one of
+	      the following modes: textured, gradient, flat-color, none
+	      (default flat color from CSWS). Gradients can be horizontal
+	      (two rgb values), vertical (two rgb values) and four-corner
+	      (four rgb values).
+	    - Fixed DrawPolygonFX in software renderer which works
+	      incorrectly for more than three-vertex polygons (it did not
+	      take into account neither z,u,v,r,g,b values for the fourth,
+	      fifth, ... vertices of the polygon). It is a bit more costly
+	      now (one division per scanline) but that's the price we have
+	      to pay for correct drawing...
+	    - Modified cswstest to be able to change skins at runtime. You
+	      can either set the [CSWS] Skin.Variant = ... option in main
+	      config file, or use the "-skin=..." command line option.
+	      The skin variants themself are defined in csws.zip file; for
+	      example use -skin=Colorful for a demonstration of gradient
+	      background textures; -skin=Marble for a
+	      marble-texture-background skin variant.
+	    - Fixed back the awful behaviour introduced by someone: when a
+	      drop-down submenu is visible, and the parent menu hides,
+	      the submenu stays visible.
+	    - Re-formatted and commented (doc++ style) the csGrid class.
+	    - Re-implemented font server interface from scratch. Added the
+	      iFont interface. Any font is an iFont object now. You pass
+	      the iFont object to iGraphics2D for drawing characters. The
+	      font server is not anymore a class private to the canvas
+	      driver; it is a public plugin like most others. You can
+	      avoid using a font server at all, if you aren't going to type
+	      text through iGraphics2D::Write().
+    	      This implies some need for rewriting code outside CVS that
+	      deals with fonts. The basic rules are:
+    		(*) Instead of using csFontCourier, csFontTiny etc you
+		    should `load' the font first. You can do it this way:
+        		iFontServer *fs = G2D->GetFontServer ();
+        		iFont *courier = fs->LoadFont (CSFONT_COURIER);
+        		iFont *police = fs->LoadFont (CSFONT_LARGE);
+        		iFont *italic = fs->LoadFont (CSFONT_ITALIC);
+        		iFont *tiny = fs->LoadFont (CSFONT_SMALL);
+    	      	    Note the new names for the fonts (you can find them in
+	      	    ifontsrv.h).
+    		(*) Then you use the iFont object to query text width,
+		    height etc:
+        		int fw, fh;
+        		font->GetDimensions ("Hello world", fw, fh);
+        		font->GetMaxSize (fw, fh);
+        		...
+    		(*) The only method in G2D that accepts an iFont object is
+		    Write():
+        		G2D->Write (font, x, y, fg, bg, "Hello world!");
+		    All other font-related methods (e.g. SetFontID,
+		    GetFontID, GetTextWidth and so on) are gone (mostly
+		    moved to iFont).
+	    - Changes in CSWS due to above font server change:
+		(*) TextWidth() and TextHeight() are gone. Instead there is
+		    a new method called int GetTextSize(char *, int *) which
+		    returns the width of given text and possibly height (if
+		    second argument is not NULL).
+    		(*) Added a new csComponent method - int GetTextChars(char *,
+		    int) which will return how much characters if written
+		    with current font will fit in given width.
+	    - Added "floating hints" capability to CSWS. These hints can be
+	      attached to absolutely any csComponent's; if the mouse stays
+	      unmoved over such an component for more than three seconds
+	      (adjustable) a new csHint object is created. As soon as you
+	      touch mouse or keyboard (or joystick :-) the hint will vanish.
+	      These hints helped to find a lot of errors in clipping
+	      algorithm related to clipping of foreign "clip childs"; this
+	      was not tested very good because of limited use of "clip
+	      childs". csHint objects are direct childs of the objects the
+	      hint is attached to, but they are "clip childs" of the csApp
+	      to avoid being clipped by parent object. Not complete yet
+	      (the size for hints is arbitrary right now :-)
+	    - Added some debug capabilities to SCF. You can add
+	      #define SCF_DEBUG at the top of certain SCF module and you will
+	      see (via printf()) all the IncRef's, DecRef's, class
+	      initializations and so on. On GCC > 2.8.0 it also types the
+	      address the methods were called from, use GDB's "l *address"
+	      command to find out what file/line/function corresponds to
+	      given address.
+	    - Added to VFS the ability to translate VFS paths into real
+	      filesystem paths. This works only for non-archive files. This
+	      is means as a last-resort for libraries that can't handle
+	      VFS directly (e.g. freetype can load fonts only from
+	      real-world files). If the VFS path refers to multiple paths,
+	      all of them will be searched for the existence of given path
+	      or filename. If the file is non-existent, the first one will
+	      be returned.
+	    - Ooops. Fixed a "bug", or rather an unimplemented yet feature.
+	      For some reason I was under impression that VFS understands
+	      expressions like: $(VAR:text), e.g. "get the value of VAR, if
+	      it is not defined, use the "text". It did not, now it does.
+	      It even should understand very complex things like:
+	      $(VAR1:VAR2:VAR3:sometext$(VAR4:plaintext)othertext)
+	    - Removed the last traces of the old memory debugger from
+	      makefiles and support/debug/memory,(h|cpp)
+	    - Added correct window resize support to GLX canvas.
+	      Re-implemented font support in GLX driver; now it will work
+	      even if you load fonts at runtime (old "glfontserver" code
+	      was able to display only fonts that are available at program
+	      startup, e.g. built-in fonts from font server). Now there is
+	      a "font cache" object which loads and frees fonts on demand.
+	    - Added runtime full-screen switching via Alt+Enter for the
+	      following X11 drivers: x2d, linex2d, glx.
+	    - Fixed "double-backbuffer" support in OpenGL canvases. All
+	      OpenGL canvases do NOT support double backbuffer mode. Note
+	      that "double backbuffer" is NOT the same as "double buffer",
+	      these are completely different things. All CS canvases should
+	      support double-buffering for smooth animation, while they may
+	      or may not support double-backbuffer mode, mainly for
+	      performance reasons.
 28-Oct-2000
 	- Changed iCollideSystem::Collide to accept 'const' transform
 	  pointers.
