@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -17,18 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MATH3D_H__
-#define __MATH3D_H__
+#ifndef __CS_MATH3D_H__
+#define __CS_MATH3D_H__
 
 #if defined(COMP_VC) && defined(DO_ASM)
-#  include "csgeom/vc_asm.inc"
+#include "csgeom/vc_asm.inc"
 #endif
 
 class csVector3;
 class csMatrix3;
 class csDVector3;
 
-// this is used in inline functions (we can use fSquare from csUtil?)
 inline float fSqr (float f)
 {
   return f * f;
@@ -40,11 +39,11 @@ inline float fSqr (float f)
 class csVector3
 {
 public:
-  ///
+  /// The X component of the vector
   float x;
-  ///
+  /// The Y component of the vector
   float y;
-  ///
+  /// The Z component of the vector
   float z;
 
   /**
@@ -52,7 +51,7 @@ public:
    * initialized. This makes the code slightly faster as
    * csVector3 objects are used a lot.
    */
-  csVector3 () { }
+  csVector3 () {}
 
   /**
    * Make a new initialized vector.
@@ -62,18 +61,13 @@ public:
   csVector3 (float m) : x(m), y(m), z(m) {}
 
   /// Make a new vector and initialize with the given values.
-  csVector3 (float x, float y, float z = 0)
-   { csVector3::x = x; csVector3::y = y; csVector3::z = z; }
+  csVector3 (float ix, float iy, float iz = 0) { x = ix; y = iy; z = iz; }
 
   /// Copy Constructor.
-  csVector3 ( const csVector3& other )
-   { csVector3::x = other.x; csVector3::y = other.y; csVector3::z = other.z; }
+  csVector3 (const csVector3& v) { x = v.x; y = v.y; z = v.z; }
 
   /// Conversion from double precision vector to single.
-  csVector3 (const csDVector3 &csv);
-
-  /// Conversion from double precision vector to single.
-  void operator= (const csDVector3 &csv);
+  csVector3 (const csDVector3&);
 
   /// Add two vectors.
   inline friend csVector3 operator+ (const csVector3& v1, const csVector3& v2)
@@ -91,8 +85,8 @@ public:
   inline friend csVector3 operator% (const csVector3& v1, const csVector3& v2)
   {
     return csVector3 (v1.y*v2.z-v1.z*v2.y,
-                    v1.z*v2.x-v1.x*v2.z,
-                    v1.x*v2.y-v1.y*v2.x);
+                      v1.z*v2.x-v1.x*v2.z,
+                      v1.x*v2.y-v1.y*v2.x);
   }
 
   /// Take cross product of two vectors and put result in this vector.
@@ -172,10 +166,12 @@ public:
   }
 
   /// Multiply this vector by a scalar.
-  inline csVector3& operator*= (float f) { x *= f; y *= f; z *= f; return *this; }
+  inline csVector3& operator*= (float f)
+  { x *= f; y *= f; z *= f; return *this; }
 
   /// Divide this vector by a scalar.
-  inline csVector3& operator/= (float f) { x /= f; y /= f; z /= f; return *this; }
+  inline csVector3& operator/= (float f)
+  { x /= f; y /= f; z /= f; return *this; }
 
   /// Unary + operator.
   inline csVector3 operator+ () const { return *this; }
@@ -739,6 +735,4 @@ public:
     float B, const csVector3& u, const csVector3& v, csVector3& isect);
 };
 
-
-#endif /*__MATH3D_H__*/
-
+#endif // __CS_MATH3D_H__

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
     Converted to double by Thomas Hieber
   
@@ -38,16 +38,11 @@ void csDVector3::Normalize()
     *this /= len;
 }
 
-// conversion from single precision vector to double
-csDVector3::csDVector3( const csVector3 &csv )
+csDVector3::csDVector3(const csVector3& v)
 {
-  x = csv.x; y = csv.y; z = csv.z; 
-}
-
-// conversion from single precision vector to double
-void csDVector3::operator=( const csVector3 &csv )
-{
- x = csv.x; y = csv.y; z = csv.z; 
+  x = v.x;
+  y = v.y;
+  z = v.z;
 }
 
 //---------------------------------------------------------------------------
@@ -61,8 +56,8 @@ csDMatrix3::csDMatrix3 ()
 }
 
 csDMatrix3::csDMatrix3 (double m11, double m12, double m13,
-  	    	  double m21, double m22, double m23,
-  	   	  double m31, double m32, double m33)
+  	    	        double m21, double m22, double m23,
+  	   	        double m31, double m32, double m33)
 {
   csDMatrix3::m11 = m11;
   csDMatrix3::m12 = m12;
@@ -152,15 +147,15 @@ double csDMatrix3::Determinant () const
 csDMatrix3 operator+ (const csDMatrix3& m1, const csDMatrix3& m2) 
 {
   return csDMatrix3 (m1.m11+m2.m11, m1.m12+m2.m12, m1.m13+m2.m13,
-                  m1.m21+m2.m21, m1.m22+m2.m22, m1.m23+m2.m23,
-                  m1.m31+m2.m31, m1.m32+m2.m32, m1.m33+m2.m33);
+                     m1.m21+m2.m21, m1.m22+m2.m22, m1.m23+m2.m23,
+                     m1.m31+m2.m31, m1.m32+m2.m32, m1.m33+m2.m33);
 }
                   
 csDMatrix3 operator- (const csDMatrix3& m1, const csDMatrix3& m2)
 {
   return csDMatrix3 (m1.m11-m2.m11, m1.m12-m2.m12, m1.m13-m2.m13,
-                  m1.m21-m2.m21, m1.m22-m2.m22, m1.m23-m2.m23,
-                  m1.m31-m2.m31, m1.m32-m2.m32, m1.m33-m2.m33);
+                     m1.m21-m2.m21, m1.m22-m2.m22, m1.m23-m2.m23,
+                     m1.m31-m2.m31, m1.m32-m2.m32, m1.m33-m2.m33);
 }
 csDMatrix3 operator* (const csDMatrix3& m1, const csDMatrix3& m2)
 {
@@ -179,22 +174,22 @@ csDMatrix3 operator* (const csDMatrix3& m1, const csDMatrix3& m2)
 csDMatrix3 operator* (const csDMatrix3& m, double f)
 {
   return csDMatrix3 (m.m11*f, m.m12*f, m.m13*f,
-                  m.m21*f, m.m22*f, m.m23*f,
-                  m.m31*f, m.m32*f, m.m33*f);
+                     m.m21*f, m.m22*f, m.m23*f,
+                     m.m31*f, m.m32*f, m.m33*f);
 }
 
 csDMatrix3 operator* (double f, const csDMatrix3& m)
 {
   return csDMatrix3 (m.m11*f, m.m12*f, m.m13*f,
-                  m.m21*f, m.m22*f, m.m23*f,
-                  m.m31*f, m.m32*f, m.m33*f);
+                     m.m21*f, m.m22*f, m.m23*f,
+                     m.m31*f, m.m32*f, m.m33*f);
 }
 
 csDMatrix3 operator/ (const csDMatrix3& m, double f)
 {
   return csDMatrix3 (m.m11/f, m.m12/f, m.m13/f,
-                  m.m21/f, m.m22/f, m.m23/f,
-                  m.m31/f, m.m32/f, m.m33/f);
+                     m.m21/f, m.m22/f, m.m23/f,
+                     m.m31/f, m.m32/f, m.m33/f);
 }
 
 bool operator== (const csDMatrix3& m1, const csDMatrix3& m2)
@@ -231,7 +226,7 @@ bool operator> (double f, const csDMatrix3& m)
 //---------------------------------------------------------------------------
 
 void csDMath3::Between (const csDVector3& v1, const csDVector3& v2,
-		       csDVector3& v, double pct, double wid)
+		        csDVector3& v, double pct, double wid)
 {
   if (pct != -1)
     pct /= 100.;
@@ -245,7 +240,7 @@ void csDMath3::Between (const csDVector3& v1, const csDVector3& v2,
 }
 
 bool csDMath3::Visible (const csDVector3& p, const csDVector3& t1,
-		       const csDVector3& t2, const csDVector3& t3)
+		        const csDVector3& t2, const csDVector3& t3)
 {
    double x1 = t1.x-p.x;
    double y1 = t1.y-p.y;
@@ -273,7 +268,7 @@ bool csDMath3::PlanesClose (const csDPlane& p1, const csDPlane& p2)
 //---------------------------------------------------------------------------
 
 double csDSquaredDist::PointLine (const csDVector3& p, 
-                           const csDVector3& l1, const csDVector3& l2)
+                                  const csDVector3& l1, const csDVector3& l2)
 {
   csDVector3 W = l1-p;
   csDVector3 L = l2-l1;
@@ -282,7 +277,7 @@ double csDSquaredDist::PointLine (const csDVector3& p,
 }
 
 double csDSquaredDist::PointPoly (const csDVector3& p, csDVector3 *V, int n, 
-                          const csDPlane& plane, double sqdist)
+                                  const csDPlane& plane, double sqdist)
 {
   csDVector3 W, L;
   bool lflag = true, lflag0 = true;
@@ -336,8 +331,8 @@ double csDSquaredDist::PointPoly (const csDVector3& p, csDVector3 *V, int n,
 //---------------------------------------------------------------------------
 
 void csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
-                       const csDVector3& normal, const csDVector3& a,
-                       csDVector3& isect)
+                          const csDVector3& normal, const csDVector3& a,
+                          csDVector3& isect)
 {
   double counter = normal * (u - a);
   double divider = normal * (v - u);
@@ -348,8 +343,8 @@ void csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
 }
 
 bool csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
-                       double A, double B, double C, double D,
-                       csDVector3& isect, double& dist)
+                          double A, double B, double C, double D,
+                          csDVector3& isect, double& dist)
 {
   double x,y,z, denom;
 
@@ -365,8 +360,8 @@ bool csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
 }
 
 bool csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
-                       const csDPlane& p,
-                       csDVector3& isect, double& dist)
+                          const csDPlane& p,
+                          csDVector3& isect, double& dist)
 {
   double x,y,z, denom;
 
@@ -382,7 +377,7 @@ bool csDIntersect3::Plane(const csDVector3& u, const csDVector3& v,
 }
 
 bool csDIntersect3::Planes(const csDPlane& p1, const csDPlane& p2, 
-                          const csDPlane& p3, csDVector3& isect)
+                           const csDPlane& p3, csDVector3& isect)
 {
   //To find the one point that is on all three planes, we need to solve
   //the following equation system (we need to find the x, y and z which
@@ -459,5 +454,3 @@ double csDIntersect3::YFrustrum(
   isect.z = r * (v.z-u.z) + u.z;
   return r;
 }
-
-//---------------------------------------------------------------------------

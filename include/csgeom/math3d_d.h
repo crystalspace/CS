@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
     Converted to double by Thomas Hieber
 
@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MATH3D_D_H__
-#define __MATH3D_D_H__
+#ifndef ___CS_MATH3D_D_H__
+#define ___CS_MATH3D_D_H__
 
 #include <float.h>
 #include "types.h"
@@ -35,10 +35,9 @@ class csDVector3;
 class csDMatrix3;
 class csVector3;
 
-// this is used in inline functions (we can use fSquare from csUtil?)
-inline double fSqr (double f)
+inline double dSqr (double d)
 {
-  return f * f;
+  return d * d;
 }
 
 /**
@@ -47,11 +46,11 @@ inline double fSqr (double f)
 class csDVector3
 {
 public:
-  ///
+  /// The X component of the vector
   double x;
-  ///
+  /// The Y component of the vector
   double y;
-  ///
+  /// The Z component of the vector
   double z;
 
   /**
@@ -59,7 +58,7 @@ public:
    * initialized. This makes the code slightly faster as
    * csDVector3 objects are used a lot.
    */
-  csDVector3 () { }
+  csDVector3 () {}
 
   /**
    * Make a new initialized vector.
@@ -69,21 +68,22 @@ public:
   csDVector3 (double m) : x(m), y(m), z(m) {}
 
   /// Make a new vector and initialize with the given values.
-  csDVector3 (double x, double y, double z = 0)
-   { csDVector3::x = x; csDVector3::y = y; csDVector3::z = z; }
+  csDVector3 (double ix, double iy, double iz = 0) { x = ix; y = iy; z = iz; }
 
-  /// conversion from single precision vector to double.
-  csDVector3 (const csVector3 &csv);
+  /// Copy Constructor.
+  csDVector3 (const csDVector3& v) { x = v.x; y = v.y; z = v.z; }
 
   /// Conversion from single precision vector to double.
-  void operator= (const csVector3 &csv);
+  csDVector3 (const csVector3&);
 
   /// Add two vectors.
-  inline friend csDVector3 operator+ (const csDVector3& v1, const csDVector3& v2)
+  inline friend
+  csDVector3 operator+ (const csDVector3& v1, const csDVector3& v2)
   { return csDVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
 
   /// Subtract two vectors.
-  inline friend csDVector3 operator- (const csDVector3& v1, const csDVector3& v2)
+  inline friend
+  csDVector3 operator- (const csDVector3& v1, const csDVector3& v2)
   { return csDVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
 
   /// Take the dot product of two vectors.
@@ -91,11 +91,12 @@ public:
   { return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z; }
 
   /// Take the cross product of two vectors.
-  inline friend csDVector3 operator% (const csDVector3& v1, const csDVector3& v2)
+  inline friend
+  csDVector3 operator% (const csDVector3& v1, const csDVector3& v2)
   {
     return csDVector3 (v1.y*v2.z-v1.z*v2.y,
-                    v1.z*v2.x-v1.x*v2.z,
-                    v1.x*v2.y-v1.y*v2.x);
+                       v1.z*v2.x-v1.x*v2.z,
+                       v1.x*v2.y-v1.y*v2.x);
   }
 
   /// Take cross product of two vectors and put result in this vector.
@@ -127,11 +128,13 @@ public:
   { return v1.x!=v2.x || v1.y!=v2.y || v1.z!=v2.z; }
 
   /// Project one vector onto another.
-  inline friend csDVector3 operator>> (const csDVector3& v1, const csDVector3& v2)
+  inline friend
+  csDVector3 operator>> (const csDVector3& v1, const csDVector3& v2)
   { return v2*(v1*v2)/(v2*v2); }
 
   /// Project one vector onto another.
-  inline friend csDVector3 operator<< (const csDVector3& v1, const csDVector3& v2)
+  inline friend
+  csDVector3 operator<< (const csDVector3& v1, const csDVector3& v2)
   { return v1*(v1*v2)/(v1*v1); }
 
   /// Test if each component of a vector is less than a small epsilon value.
@@ -175,10 +178,12 @@ public:
   }
 
   /// Multiply this vector by a scalar.
-  inline csDVector3& operator*= (double f) { x *= f; y *= f; z *= f; return *this; }
+  inline csDVector3& operator*= (double f)
+  { x *= f; y *= f; z *= f; return *this; }
 
   /// Divide this vector by a scalar.
-  inline csDVector3& operator/= (double f) { x /= f; y /= f; z /= f; return *this; }
+  inline csDVector3& operator/= (double f)
+  { x /= f; y /= f; z /= f; return *this; }
 
   /// Unary + operator.
   inline csDVector3 operator+ () const { return *this; }
@@ -364,7 +369,8 @@ public:
   csDPlane () : norm(0,0,1), DD(0) {}
 
   /// Initialize the plane.
-  csDPlane (const csDVector3& plane_norm, double d=0) : norm(plane_norm), DD(d) {}
+  csDPlane (const csDVector3& plane_norm, double d=0) :
+  norm(plane_norm), DD(d) {}
 
   /// Initialize the plane.
   csDPlane (double a, double b, double c, double d=0) : norm(a,b,c), DD(d) {}
@@ -475,8 +481,8 @@ public:
    * Otherwise, if pct equals -1, v will be the point along 'v1-v2' which is
    * distance wid from v1.
    */
-  static void Between (const csDVector3& v1, const csDVector3& v2, csDVector3& v,
-                       double pct, double wid);
+  static void Between (const csDVector3& v1, const csDVector3& v2,
+                       csDVector3& v, double pct, double wid);
 
   /**
    * Set the min and max vector if this vector exceeds their current limits.
@@ -572,7 +578,7 @@ class csDSquaredDist
 public:
   /// Returns the squared distance between two points.
   static double PointPoint (const csDVector3& p1, const csDVector3& p2)
-  { return fSqr (p1.x - p2.x) + fSqr (p1.y - p2.y) + fSqr (p1.z - p2.z); }
+  { return dSqr (p1.x - p2.x) + dSqr (p1.y - p2.y) + dSqr (p1.z - p2.z); }
 
   /// Returns the squared distance between a point and a line.
   static double PointLine (const csDVector3& p,
@@ -642,8 +648,8 @@ public:
    * planes. Returns true, if there is a single point that fits.
    * If some planes are parallel, then it will return false.
    */
-  static bool Planes(const csDPlane& p1, const csDPlane& p2, const csDPlane& p3,
-                     csDVector3& isect);
+  static bool Planes(const csDPlane& p1, const csDPlane& p2,
+                     const csDPlane& p3, csDVector3& isect);
 
   /**
    * Intersect a 3D segment with the z = 0 plane.  Assumes that there
@@ -680,6 +686,4 @@ public:
     double B, const csDVector3& u, const csDVector3& v, csDVector3& isect);
 };
 
-
-#endif /*__DMATH3D_H__*/
-
+#endif // ___CS_MATH3D_D_H__

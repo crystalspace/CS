@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -39,18 +39,12 @@ void csVector3::Normalize ()
     *this /= len;
 }
 
-// conversion from single precision vector to double
-csVector3::csVector3 (const csDVector3 &csv)
+csVector3::csVector3 (const csDVector3& v)
 {
- x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; 
+  x = (float)v.x;
+  y = (float)v.y;
+  z = (float)v.z;
 }
-
-// conversion from single precision vector to double
-void csVector3::operator= (const csDVector3 &csv)
-{
- x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; 
-}
-
 
 //---------------------------------------------------------------------------
 
@@ -63,8 +57,8 @@ csMatrix3::csMatrix3 ()
 }
 
 csMatrix3::csMatrix3 (float m11, float m12, float m13,
-  	    	  float m21, float m22, float m23,
-  	   	  float m31, float m32, float m33)
+  	    	      float m21, float m22, float m23,
+  	   	      float m31, float m32, float m33)
 {
   csMatrix3::m11 = m11;
   csMatrix3::m12 = m12;
@@ -154,15 +148,15 @@ float csMatrix3::Determinant () const
 csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2) 
 {
   return csMatrix3 (m1.m11+m2.m11, m1.m12+m2.m12, m1.m13+m2.m13,
-                  m1.m21+m2.m21, m1.m22+m2.m22, m1.m23+m2.m23,
-                  m1.m31+m2.m31, m1.m32+m2.m32, m1.m33+m2.m33);
+                    m1.m21+m2.m21, m1.m22+m2.m22, m1.m23+m2.m23,
+                    m1.m31+m2.m31, m1.m32+m2.m32, m1.m33+m2.m33);
 }
                   
 csMatrix3 operator- (const csMatrix3& m1, const csMatrix3& m2)
 {
   return csMatrix3 (m1.m11-m2.m11, m1.m12-m2.m12, m1.m13-m2.m13,
-                  m1.m21-m2.m21, m1.m22-m2.m22, m1.m23-m2.m23,
-                  m1.m31-m2.m31, m1.m32-m2.m32, m1.m33-m2.m33);
+                    m1.m21-m2.m21, m1.m22-m2.m22, m1.m23-m2.m23,
+                    m1.m31-m2.m31, m1.m32-m2.m32, m1.m33-m2.m33);
 }
 csMatrix3 operator* (const csMatrix3& m1, const csMatrix3& m2)
 {
@@ -181,22 +175,22 @@ csMatrix3 operator* (const csMatrix3& m1, const csMatrix3& m2)
 csMatrix3 operator* (const csMatrix3& m, float f)
 {
   return csMatrix3 (m.m11*f, m.m12*f, m.m13*f,
-                  m.m21*f, m.m22*f, m.m23*f,
-                  m.m31*f, m.m32*f, m.m33*f);
+                    m.m21*f, m.m22*f, m.m23*f,
+                    m.m31*f, m.m32*f, m.m33*f);
 }
 
 csMatrix3 operator* (float f, const csMatrix3& m)
 {
   return csMatrix3 (m.m11*f, m.m12*f, m.m13*f,
-                  m.m21*f, m.m22*f, m.m23*f,
-                  m.m31*f, m.m32*f, m.m33*f);
+                    m.m21*f, m.m22*f, m.m23*f,
+                    m.m31*f, m.m32*f, m.m33*f);
 }
 
 csMatrix3 operator/ (const csMatrix3& m, float f)
 {
   return csMatrix3 (m.m11/f, m.m12/f, m.m13/f,
-                  m.m21/f, m.m22/f, m.m23/f,
-                  m.m31/f, m.m32/f, m.m33/f);
+                    m.m21/f, m.m22/f, m.m23/f,
+                    m.m31/f, m.m32/f, m.m33/f);
 }
 
 bool operator== (const csMatrix3& m1, const csMatrix3& m2)
@@ -297,7 +291,7 @@ bool csMath3::PlanesClose (const csPlane& p1, const csPlane& p2)
 //---------------------------------------------------------------------------
 
 float csSquaredDist::PointLine (const csVector3& p, 
-                           const csVector3& l1, const csVector3& l2)
+                                const csVector3& l1, const csVector3& l2)
 {
   csVector3 W = l1-p;
   csVector3 L = l2-l1;
@@ -306,7 +300,7 @@ float csSquaredDist::PointLine (const csVector3& p,
 }
 
 float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n, 
-                          const csPlane& plane, float sqdist)
+                                const csPlane& plane, float sqdist)
 {
   csVector3 W, L;
   bool lflag = true, lflag0 = true;
@@ -360,8 +354,8 @@ float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n,
 //---------------------------------------------------------------------------
 
 void csIntersect3::Plane(const csVector3& u, const csVector3& v,
-                       const csVector3& normal, const csVector3& a,
-                       csVector3& isect)
+                         const csVector3& normal, const csVector3& a,
+                         csVector3& isect)
 {
   float counter = normal * (u - a);
   float divider = normal * (v - u);
@@ -372,8 +366,8 @@ void csIntersect3::Plane(const csVector3& u, const csVector3& v,
 }
 
 bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
-                       float A, float B, float C, float D,
-                       csVector3& isect, float& dist)
+                         float A, float B, float C, float D,
+                         csVector3& isect, float& dist)
 {
   float x,y,z, denom;
 
@@ -389,8 +383,7 @@ bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
 }
 
 bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
-                       const csPlane& p,
-                       csVector3& isect, float& dist)
+                         const csPlane& p, csVector3& isect, float& dist)
 {
   float x,y,z, denom;
 
@@ -483,5 +476,3 @@ float csIntersect3::YFrustrum(
   isect.z = r * (v.z-u.z) + u.z;
   return r;
 }
-
-//---------------------------------------------------------------------------
