@@ -112,6 +112,7 @@ class csShadow;
 #define DEBUGCMD_DS_DOWN	1035	// Move down in debug sector
 #define DEBUGCMD_DS_LEFT	1036	// Move left in debug sector
 #define DEBUGCMD_DS_RIGHT	1037	// Move right in debug sector
+#define DEBUGCMD_DEBUGVIEW	1038	// Toggle debug view
 
 /**
  * For key mappings.
@@ -201,9 +202,28 @@ private:
   iVisibilityCuller* visculler;
 
   /// The Debug Sector.
-  iSector* debug_sector;
-  csView* debug_sector_view;
-  bool debug_sector_show;
+  struct
+  {
+    iSector* sector;
+    csView* view;
+    bool show;
+  } debug_sector;
+
+  /// The Debug View.
+  struct dbLine { int i1, i2; };
+  struct
+  {
+    bool show;
+    bool clear;
+    int num_points;
+    int max_points;
+    csVector2* points;
+    int num_lines;
+    int max_lines;
+    dbLine* lines;
+    iBugPlugRenderObject* object;
+    int drag_point;	// Or -1 if not dragging a point.
+  } debug_view;
 
   /// Set viscull view.
   void VisculView (iCamera* camera);
@@ -290,14 +310,28 @@ public:
   	const char* name = NULL, iMeshObject* mesh = NULL);
   void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	const csVector3& s3, float r, float g, float b);
-  void DebugSectorWireBox (const csBox3& box,
-    	float r, float g, float b, const char* name = NULL);
-  void DebugSectorLine (const csVector3& start, const csVector3& end,
-  	float r, float g, float b);
-  void DebugSectorMarker (const csVector3& point,
-  	float r, float g, float b);
   void SwitchDebugSector (const csReversibleTransform& trans);
-  bool CheckDebugSector () const { return debug_sector_show; }
+  bool CheckDebugSector () const { return debug_sector.show; }
+
+  void CleanDebugView ();
+  void SetupDebugView ();
+  int DebugViewPoint (const csVector2& point);
+  void DebugViewLine (int i1, int i2);
+  int DebugViewPointCount () const { return debug_view.num_points; }
+  const csVector2& DebugViewGetPoint (int i) const
+  {
+    return debug_view.points[i];
+  }
+  int DebugViewLineCount () const { return debug_view.num_lines; }
+  void DebugViewGetLine (int i, int& i1, int& i2) const
+  {
+    i1 = debug_view.lines[i].i1;
+    i2 = debug_view.lines[i].i2;
+  }
+  void DebugViewRenderObject (iBugPlugRenderObject* obj);
+  void DebugViewClearScreen (bool cs) { debug_view.clear = cs; }
+  void SwitchDebugView ();
+  bool CheckDebugView () const { return debug_view.show; }
 
   struct BugPlug : public iBugPlug
   {
@@ -316,21 +350,6 @@ public:
     {
       scfParent->DebugSectorTriangle (s1, s2, s3, r, g, b);
     }
-    virtual void DebugSectorWireBox (const csBox3& box,
-    	float r, float g, float b, const char* name = NULL)
-    {
-      scfParent->DebugSectorWireBox (box, r, g, b, name);
-    }
-    virtual void DebugSectorLine (const csVector3& start, const csVector3& end,
-  	float r, float g, float b)
-    {
-      scfParent->DebugSectorLine (start, end, r, g, b);
-    }
-    virtual void DebugSectorMarker (const csVector3& point,
-  	float r, float g, float b)
-    {
-      scfParent->DebugSectorMarker (point, r, g, b);
-    }
     virtual void SwitchDebugSector (const csReversibleTransform& trans)
     {
       scfParent->SwitchDebugSector (trans);
@@ -338,6 +357,50 @@ public:
     virtual bool CheckDebugSector () const
     {
       return scfParent->CheckDebugSector ();
+    }
+    virtual void SetupDebugView ()
+    {
+      scfParent->SetupDebugView ();
+    }
+    virtual int DebugViewPoint (const csVector2& point)
+    {
+      return scfParent->DebugViewPoint (point);
+    }
+    virtual void DebugViewLine (int i1, int i2)
+    {
+      scfParent->DebugViewLine (i1, i2);
+    }
+    virtual int DebugViewPointCount () const
+    {
+      return scfParent->DebugViewPointCount ();
+    }
+    virtual const csVector2& DebugViewGetPoint (int i) const
+    {
+      return scfParent->DebugViewGetPoint (i);
+    }
+    virtual int DebugViewLineCount () const
+    {
+      return scfParent->DebugViewLineCount ();
+    }
+    virtual void DebugViewGetLine (int i, int& i1, int& i2) const
+    {
+      scfParent->DebugViewGetLine (i, i1, i2);
+    }
+    virtual void DebugViewRenderObject (iBugPlugRenderObject* obj)
+    {
+      scfParent->DebugViewRenderObject (obj);
+    }
+    virtual void DebugViewClearScreen (bool cs)
+    {
+      scfParent->DebugViewClearScreen (cs);
+    }
+    virtual void SwitchDebugView ()
+    {
+      scfParent->SwitchDebugView ();
+    }
+    virtual bool CheckDebugView () const
+    {
+      return scfParent->CheckDebugView ();
     }
   } scfiBugPlug;
 

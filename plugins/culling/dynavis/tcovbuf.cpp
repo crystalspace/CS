@@ -213,6 +213,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
 	CS_ASSERT (op.y2 >= 0);
 	CS_ASSERT (op.y2 <= 63);
 	int y1, y2;
+	// @@@ DO WE REALLY HAVE TO SWAP HERE??? I DON'T THINK SO!
 	if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
 	else { y1 = op.y2; y2 = op.y1; }
 	const csBits64& start = precalc_start_lines[y2];
@@ -243,7 +244,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       *cc = fvalue;
       cc->AndInverted (*c);
       *c |= fvalue;
-      if (tile_full && !fvalue.IsFull ())
+      if (tile_full && !c->IsFull ())
         tile_full = false;
       cc++;
       c++;
@@ -547,7 +548,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // All is contained in one tile.
       //------
       tile->PushVLine (0, y1 & 63, (y2-1) & 63);
-      if (!tile->IsFull ()) MarkTileDirty (0, tile_y1);
+      MarkTileDirty (0, tile_y1);
     }
     else
     {
@@ -557,17 +558,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // and finally the last tile.
       //------
       tile->PushVLine (0, y1 & 63, 63);
-      if (!tile->IsFull ()) MarkTileDirty (0, tile_y1);
+      MarkTileDirty (0, tile_y1);
       int t;
       for (t = tile_y1+1 ; t < tile_y2 ; t++)
       {
         tile += width_po2 >> 5;
         tile->PushFullVLine (0);
-	if (!tile->IsFull ()) MarkTileDirty (0, t);
+	MarkTileDirty (0, t);
       }
       tile += width_po2 >> 5;
       tile->PushVLine (0, 0, (y2-1) & 63);
-      if (!tile->IsFull ()) MarkTileDirty (0, tile_y2);
+      MarkTileDirty (0, tile_y2);
     }
     return;
   }
@@ -607,7 +608,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // All is contained in one tile.
       //------
       tile->PushVLine (x1, y1 & 63, (y2-1) & 63);
-      if (!tile->IsFull ()) MarkTileDirty (tile_x, tile_y1);
+      MarkTileDirty (tile_x, tile_y1);
     }
     else
     {
@@ -617,17 +618,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       // and finally the last tile.
       //------
       tile->PushVLine (x1, y1 & 63, 63);
-      if (!tile->IsFull ()) MarkTileDirty (tile_x, tile_y1);
+      MarkTileDirty (tile_x, tile_y1);
       int t;
       for (t = tile_y1+1 ; t < tile_y2 ; t++)
       {
         tile += width_po2 >> 5;
 	tile->PushFullVLine (x1);
-	if (!tile->IsFull ()) MarkTileDirty (tile_x, t);
+	MarkTileDirty (tile_x, t);
       }
       tile += width_po2 >> 5;
       tile->PushVLine (x1, 0, (y2-1) & 63);
-      if (!tile->IsFull ()) MarkTileDirty (tile_x, tile_y2);
+      MarkTileDirty (tile_x, tile_y2);
     }
     return;
   }
@@ -671,7 +672,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
     tile->PushLine ((x1 & 31) << 16, y1 & 63, ((x2 & 31) << 16)-dx,
     	(y2-1) & 63, dx);
-    if (!tile->IsFull ()) MarkTileDirty (tile_x1, tile_y1);
+    MarkTileDirty (tile_x1, tile_y1);
     return;
   }
   else if (tile_x1 == tile_x2)
@@ -688,7 +689,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     int x = x1 + dx * (63 - (y1 & 63));
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
     tile->PushLine (x1 & xmask, y1 & 63, x & xmask, 63, dx);
-    if (!tile->IsFull ()) MarkTileDirty (tile_x1, tile_y1);
+    MarkTileDirty (tile_x1, tile_y1);
     x += dx;
     int t;
     for (t = tile_y1+1 ; t < tile_y2 ; t++)
@@ -696,12 +697,12 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       tile += width_po2 >> 5;
       int xt = x + (dx << 6) - dx;
       tile->PushLine (x & xmask, 0, xt & xmask, 63, dx);
-      if (!tile->IsFull ()) MarkTileDirty (tile_x1, t);
+      MarkTileDirty (tile_x1, t);
       x = xt+dx;
     }
     tile += width_po2 >> 5;
     tile->PushLine (x & xmask, 0, (x2 & xmask) - dx, (y2-1) & 63, dx);
-    if (!tile->IsFull ()) MarkTileDirty (tile_x1, tile_y2);
+    MarkTileDirty (tile_x1, tile_y2);
     return;
   }
 
@@ -754,7 +755,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       {
         csCoverageTile* tile = GetTile (0, cur_tile_y);
         tile->PushVLine (0, last_y & 63, (y-1) & 63);
-        if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
+        MarkTileDirty (0, cur_tile_y);
         cur_tile_y = tile_y;
         last_y = y;
       }
@@ -769,7 +770,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       //int tile_y = (y-1) >> 6;
       csCoverageTile* tile = GetTile (0, cur_tile_y);
       tile->PushVLine (0, last_y & 63, (y-1) & 63);
-      if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
+      MarkTileDirty (0, cur_tile_y);
     }
   }
 
@@ -806,7 +807,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
       tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
       	(y-1) & 63, dx);
-      if (!tile->IsFull ()) MarkTileDirty (cur_tile_x, cur_tile_y);
+      MarkTileDirty (cur_tile_x, cur_tile_y);
       cur_tile_x = tile_x;
       cur_tile_y = tile_y;
       last_x = x;
@@ -826,7 +827,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
     tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
     	(y-1) & 63, dx);
-    if (!tile->IsFull ()) MarkTileDirty (cur_tile_x, cur_tile_y);
+    MarkTileDirty (cur_tile_x, cur_tile_y);
   }
 
   if (dy <= 0) return;
@@ -850,7 +851,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       {
         csCoverageTile* tile = GetTile (0, cur_tile_y);
         tile->PushVLine (0, last_y & 63, (y-1) & 63);
-        if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
+        MarkTileDirty (0, cur_tile_y);
         cur_tile_y = tile_y;
         last_y = y;
       }
@@ -866,7 +867,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       //int tile_y = (y-1) >> 6;
       csCoverageTile* tile = GetTile (0, cur_tile_y);
       tile->PushVLine (0, last_y & 63, (y-1) & 63);
-      if (!tile->IsFull ()) MarkTileDirty (0, cur_tile_y);
+      MarkTileDirty (0, cur_tile_y);
     }
   }
 }
@@ -1248,8 +1249,44 @@ iString* csTiledCoverageBuffer::Debug_Dump ()
   return rc;
 }
 
-void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int zoom)
+void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
 {
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  int colpoint = g3d->GetTextureManager ()->FindRGB (255, 0, 0);
+
+  int x, y, tx, ty, i, j;
+  for (ty = 0 ; ty < num_tile_rows ; ty++)
+  {
+    for (y = 0 ; y < 8 ; y++)
+    {
+      for (tx = 0 ; tx < (width_po2 >> 5) ; tx++)
+      {
+        g2d->DrawPixel (tx*32, ty*64, colpoint);
+
+        csCoverageTile* tile = GetTile (tx, ty);
+	for (x = 0 ; x < 4 ; x++)
+	{
+	  float depth = tile->depth[y*4+x];
+	  for (i = 0 ; i < 8 ; i++)
+	    for (j = 0 ; j < 8 ; j++)
+	    {
+	      bool val;
+	      if (tile->queue_tile_empty)
+	        val = false;
+	      else
+	        val = tile->coverage[x*8+i].TestBit (y*8+j);
+	      if (val)
+	      {
+	        int c = 255-int (depth);
+		if (c < 50) c = 50;
+		int col = g3d->GetTextureManager ()->FindRGB (c, c, c);
+	        g2d->DrawPixel (tx*32+x*8+i, ty*64+y*8+j, col);
+	      }
+	    }
+	}
+      }
+    }
+  }
 }
 
 static float rnd (int totrange, int leftpad, int rightpad)

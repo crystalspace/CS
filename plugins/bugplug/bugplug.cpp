@@ -130,14 +130,27 @@ csBugPlug::csBugPlug (iBase *iParent)
   selected_mesh = NULL;
   scfiEventHandler = NULL;
   shadow->SetShadowMesh (selected_mesh);
-  debug_sector = NULL;
-  debug_sector_view = NULL;
-  debug_sector_show = false;
+
+  debug_sector.sector = NULL;
+  debug_sector.view = NULL;
+  debug_sector.show = false;
+
+  debug_view.show = false;
+  debug_view.clear = true;
+  debug_view.num_points = 0;
+  debug_view.max_points = 0;
+  debug_view.points = NULL;
+  debug_view.num_lines = 0;
+  debug_view.max_lines = 0;
+  debug_view.lines = NULL;
+  debug_view.object = NULL;
+  debug_view.drag_point = -1;
 }
 
 csBugPlug::~csBugPlug ()
 {
   CleanDebugSector ();
+  CleanDebugView ();
 
   if (selected_mesh) selected_mesh->DecRef ();
   if (spider)
@@ -187,7 +200,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   {
     q->RegisterListener (scfiEventHandler,
     	CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
-  	CSMASK_MouseUp|CSMASK_MouseDown);
+  	CSMASK_MouseUp|CSMASK_MouseDown|CSMASK_MouseMove);
     q->DecRef ();
   }
   return true;
@@ -446,17 +459,49 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 bool csBugPlug::EatMouse (iEvent& event)
 {
   SetupPlugin ();
-  if (!process_next_mouse) return false;
+  if (!process_next_mouse && !debug_view.show) return false;
 
   bool down = (event.Type == csevMouseDown);
+  bool up = (event.Type == csevMouseUp);
   int button = event.Mouse.Button;
+
+  mouse_x = event.Mouse.x;
+  mouse_y = event.Mouse.y;
 
   if (down)
   {
-    mouse_x = event.Mouse.x;
-    mouse_y = event.Mouse.y;
-    UnleashSpider (DEBUGCMD_MOUSE1+button-1);
-    process_next_mouse = false;
+    if (debug_view.show)
+    {
+      int i;
+      debug_view.drag_point = -1;
+      for (i = 0 ; i < debug_view.num_points ; i++)
+      {
+        int x = int (debug_view.points[i].x);
+        int y = int (debug_view.points[i].y);
+	if (ABS (mouse_x-x) < 4 && ABS ((mouse_y)-y) < 4)
+	{
+	  debug_view.drag_point = i;
+	  break;
+	}
+      }
+    }
+    else
+    {
+      UnleashSpider (DEBUGCMD_MOUSE1+button-1);
+      process_next_mouse = false;
+    }
+  }
+  else if (up)
+  {
+    debug_view.drag_point = -1;
+  }
+  else
+  {
+    if (debug_view.show && debug_view.drag_point != -1)
+    {
+      debug_view.points[debug_view.drag_point].x = mouse_x;
+      debug_view.points[debug_view.drag_point].y = mouse_y;
+    }
   }
   return true;
 }
@@ -563,9 +608,10 @@ bool csBugPlug::EatKey (iEvent& event)
   }
 
   // Return false if we are not processing our own keys.
-  // If debug_sector_show is true we will process our own keys to...
-  if (!process_next_key && !debug_sector_show) return false;
-  if (debug_sector_show)
+  // If debug_sector.show is true we will process our own keys to...
+  if (!process_next_key && !debug_sector.show && !debug_view.show)
+    return false;
+  if (debug_sector.show || debug_view.show)
   {
     process_next_key = false;
   }
@@ -822,6 +868,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	    shadow->RemoveFromEngine (Engine);
 	}
         break;
+      case DEBUGCMD_DEBUGVIEW:
+	SwitchDebugView ();
+        break;
       case DEBUGCMD_VISCULVIEW:
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
@@ -831,9 +880,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	UnleashSpider (cmd);
         break;
       case DEBUGCMD_DS_LEFT:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->Move (csVector3 (-1, 0, 0), false);
+	  debug_sector.view->GetCamera ()->Move (csVector3 (-1, 0, 0), false);
 	}
 	else
 	{
@@ -842,9 +891,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_RIGHT:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->Move (csVector3 (1, 0, 0), false);
+	  debug_sector.view->GetCamera ()->Move (csVector3 (1, 0, 0), false);
 	}
 	else
 	{
@@ -853,9 +902,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_FORWARD:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->Move (csVector3 (0, 0, 1), false);
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, 1), false);
 	}
 	else
 	{
@@ -864,9 +913,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_BACKWARD:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->Move (csVector3 (0, 0, -1), false);
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, -1), false);
 	}
 	else
 	{
@@ -875,9 +924,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_UP:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->Move (csVector3 (0, 1, 0), false);
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 1, 0), false);
 	}
 	else
 	{
@@ -886,9 +935,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_DOWN:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->Move (csVector3 (0, -1, 0), false);
+	  debug_sector.view->GetCamera ()->Move (csVector3 (0, -1, 0), false);
 	}
 	else
 	{
@@ -897,9 +946,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_TURNLEFT:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->GetTransform ().
+	  debug_sector.view->GetCamera ()->GetTransform ().
 	  	RotateThis (CS_VEC_ROT_LEFT, .2);
 	}
 	else
@@ -909,9 +958,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_TURNRIGHT:
-        if (debug_sector_show)
+        if (debug_sector.show)
 	{
-	  debug_sector_view->GetCamera ()->GetTransform ().
+	  debug_sector.view->GetCamera ()->GetTransform ().
 	  	RotateThis (CS_VEC_ROT_RIGHT, .2);
 	}
 	else
@@ -968,11 +1017,37 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     }
   }
 
-  if (debug_sector_show)
+  if (debug_sector.show)
   {
     G3D->BeginDraw (CSDRAW_3DGRAPHICS |
     	CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
-    debug_sector_view->Draw ();
+    debug_sector.view->Draw ();
+  }
+
+  if (debug_view.show)
+  {
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS |
+    	(debug_view.clear ? CSDRAW_CLEARSCREEN : 0));
+    if (debug_view.object)
+      debug_view.object->Render (G3D, &scfiBugPlug);
+    int pointcol = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+    int linecol = G3D->GetTextureManager ()->FindRGB (255, 255, 255);
+    int i;
+    for (i = 0 ; i < debug_view.num_lines ; i++)
+    {
+      int i1 = debug_view.lines[i].i1;
+      int i2 = debug_view.lines[i].i2;
+      G2D->DrawLine (
+      	debug_view.points[i1].x, debug_view.points[i1].y,
+      	debug_view.points[i2].x, debug_view.points[i2].y, linecol);
+    }
+    for (i = 0 ; i < debug_view.num_points ; i++)
+    {
+      float x = debug_view.points[i].x;
+      float y = debug_view.points[i].y;
+      G2D->DrawLine (x-5, y-5, x+5, y+5, pointcol);
+      G2D->DrawLine (x-5, y+5, x+5, y-5, pointcol);
+    }
   }
 
   if (process_next_key || process_next_mouse)
@@ -988,7 +1063,6 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     CS_ASSERT (fnt != NULL);
     int fw, fh;
     fnt->GetMaxSize (fw, fh);
-    int sw = G2D->GetWidth ();
     int sh = G2D->GetHeight ();
     int x = 150;
     int y = sh/2 - (fh+5*2)/2;
@@ -1000,7 +1074,6 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     char* msg;
     if (process_next_key) msg = "Press a BugPlug key...";
     else msg = "Click on screen...";
-    int maxlen = fnt->GetLength (msg, w-10);
     G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg);
   }
 
@@ -1207,6 +1280,7 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "ds_turnright"))	return DEBUGCMD_DS_TURNRIGHT;
   if (!strcmp (cmd, "ds_left"))		return DEBUGCMD_DS_LEFT;
   if (!strcmp (cmd, "ds_right"))	return DEBUGCMD_DS_RIGHT;
+  if (!strcmp (cmd, "debugview"))	return DEBUGCMD_DEBUGVIEW;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -1541,6 +1615,10 @@ bool csBugPlug::HandleEvent (iEvent& event)
   {
     return EatMouse (event);
   }
+  else if (event.Type == csevMouseMove)
+  {
+    return EatMouse (event);
+  }
   else if (event.Type == csevBroadcast)
   {
     if (event.Command.Code == cscmdPreProcess)
@@ -1560,7 +1638,7 @@ bool csBugPlug::HandleEvent (iEvent& event)
 
 void csBugPlug::CleanDebugSector ()
 {
-  if (!debug_sector) return;
+  if (!debug_sector.sector) return;
   iRegion* cur_region = Engine->GetCurrentRegion ();
   Engine->SelectRegion ("__BugPlug_region__");
   iRegion* db_region = Engine->GetCurrentRegion ();
@@ -1570,10 +1648,10 @@ void csBugPlug::CleanDebugSector ()
   iRegionList* reglist = Engine->GetRegions ();
   reglist->Remove (db_region);
 
-  delete debug_sector_view;
+  delete debug_sector.view;
 
-  debug_sector = NULL;
-  debug_sector_view = NULL;
+  debug_sector.sector = NULL;
+  debug_sector.view = NULL;
 }
 
 void csBugPlug::SetupDebugSector ()
@@ -1589,15 +1667,15 @@ void csBugPlug::SetupDebugSector ()
   Engine->SelectRegion ("__BugPlug_region__");
   //iRegion* db_region = Engine->GetCurrentRegion ();
 
-  debug_sector = Engine->CreateSector ("__BugPlug_sector__");
+  debug_sector.sector = Engine->CreateSector ("__BugPlug_sector__");
 
   Engine->SelectRegion (cur_region);
 
-  debug_sector_view = new csView (Engine, G3D);
+  debug_sector.view = new csView (Engine, G3D);
   int w3d = G3D->GetWidth ();
   int h3d = G3D->GetHeight ();
-  debug_sector_view->SetRectangle (0, 0, w3d, h3d);
-  debug_sector_view->GetCamera ()->SetSector (debug_sector);
+  debug_sector.view->SetRectangle (0, 0, w3d, h3d);
+  debug_sector.view->GetCamera ()->SetSector (debug_sector.sector);
 }
 
 iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
@@ -1622,7 +1700,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
 void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   	const char* name, iMeshObject* mesh)
 {
-  if (!debug_sector) return;
+  if (!debug_sector.sector) return;
 
   iMaterialWrapper* mat = FindColor (r, g, b);
   // Create the box and add it to the engine.
@@ -1649,7 +1727,7 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   gfs->DecRef ();
 
   iMeshWrapper* mw = Engine->CreateMeshWrapper (
-  	mf, name ? name : "__BugPlug_mesh__", debug_sector, pos);
+  	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos);
   mf->DecRef ();
   iGeneralMeshState* gms = SCF_QUERY_INTERFACE (mw->GetMeshObject (),
   	iGeneralMeshState);
@@ -1672,7 +1750,7 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
 void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	const csVector3& s3, float r, float g, float b)
 {
-  if (!debug_sector) return;
+  if (!debug_sector.sector) return;
 
   iMaterialWrapper* mat = FindColor (r, g, b);
   // Create the box and add it to the engine.
@@ -1709,7 +1787,7 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   gfs->DecRef ();
 
   iMeshWrapper* mw = Engine->CreateMeshWrapper (
-  	mf, "__BugPlug_tri__", debug_sector, pos);
+  	mf, "__BugPlug_tri__", debug_sector.sector, pos);
   mf->DecRef ();
   iGeneralMeshState* gms = SCF_QUERY_INTERFACE (mw->GetMeshObject (),
   	iGeneralMeshState);
@@ -1727,35 +1805,96 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   mw->DecRef ();
 }
 
-void csBugPlug::DebugSectorWireBox (const csBox3& box,
-    	float r, float g, float b, const char* nameNULL)
-{
-  if (!debug_sector) return;
-}
-
-void csBugPlug::DebugSectorLine (const csVector3& start, const csVector3& end,
-  	float r, float g, float b)
-{
-  if (!debug_sector) return;
-}
-
-void csBugPlug::DebugSectorMarker (const csVector3& point,
-  	float r, float g, float b)
-{
-  if (!debug_sector) return;
-}
-
 void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)
 {
-  if (!debug_sector)
+  if (!debug_sector.sector)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "There is no debug sector!");
     return;
   }
-  debug_sector_show = !debug_sector_show;
-  if (debug_sector_show)
+  debug_sector.show = !debug_sector.show;
+  if (debug_sector.show)
   {
-    debug_sector_view->GetCamera ()->SetTransform (trans);
+    debug_sector.view->GetCamera ()->SetTransform (trans);
+    debug_view.show = false;
+  }
+}
+
+//---------------------------------------------------------------------------
+
+void csBugPlug::CleanDebugView ()
+{
+  delete[] debug_view.lines;
+  debug_view.lines = NULL;
+  debug_view.num_lines = 0;
+  debug_view.max_lines = 0;
+  delete[] debug_view.points;
+  debug_view.points = NULL;
+  debug_view.num_points = 0;
+  debug_view.max_points = 0;
+  if (debug_view.object)
+  {
+    debug_view.object->DecRef ();
+    debug_view.object = NULL;
+  }
+}
+
+void csBugPlug::SetupDebugView ()
+{
+  CleanDebugView ();
+}
+
+int csBugPlug::DebugViewPoint (const csVector2& point)
+{
+  if (debug_view.num_points >= debug_view.max_points)
+  {
+    debug_view.max_points += 50;
+    csVector2* new_points = new csVector2 [debug_view.max_points];
+    if (debug_view.num_points > 0)
+    {
+      memcpy (new_points, debug_view.points,
+      	sizeof (csVector2)*debug_view.num_points);
+      delete[] debug_view.points;
+    }
+    debug_view.points = new_points;
+  }
+  debug_view.points[debug_view.num_points++] = point;
+  return debug_view.num_points-1;
+}
+
+void csBugPlug::DebugViewLine (int i1, int i2)
+{
+  if (debug_view.num_lines >= debug_view.max_lines)
+  {
+    debug_view.max_lines += 30;
+    dbLine* new_lines = new dbLine [debug_view.max_lines];
+    if (debug_view.num_lines > 0)
+    {
+      memcpy (new_lines, debug_view.lines,
+      	sizeof (dbLine)*debug_view.num_lines);
+      delete[] debug_view.lines;
+    }
+    debug_view.lines = new_lines;
+  }
+  debug_view.lines[debug_view.num_lines].i1 = i1;
+  debug_view.lines[debug_view.num_lines].i2 = i2;
+  debug_view.num_lines++;
+}
+
+void csBugPlug::DebugViewRenderObject (iBugPlugRenderObject* obj)
+{
+  if (obj) obj->IncRef ();
+  if (debug_view.object) debug_view.object->DecRef ();
+  debug_view.object = obj;
+}
+
+void csBugPlug::SwitchDebugView ()
+{
+  debug_view.show = !debug_view.show;
+  if (debug_view.show)
+  {
+    debug_sector.show = false;
+    debug_view.drag_point = -1;
   }
 }
 

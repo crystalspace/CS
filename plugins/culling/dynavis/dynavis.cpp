@@ -1171,6 +1171,175 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
   }
 }
 
+class DynavisRenderObject : public iBugPlugRenderObject
+{
+private:
+  csDynaVis* dynavis;
+  csTiledCoverageBuffer* tcovbuf;
+  struct outline
+  {
+    int num_edges;
+    int* edges;
+    float depth;
+    int num_verts;
+    csVector2* verts;
+    int* verts_idx;
+    bool* used_verts;
+    ~outline ()
+    {
+      delete[] edges;
+      delete[] verts;
+      delete[] verts_idx;
+      delete[] used_verts;
+    }
+  };
+  outline o1, o2, o3;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  DynavisRenderObject (csDynaVis* dynavis, iBugPlug* bugplug, int w, int h)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    DynavisRenderObject::dynavis = dynavis;
+    tcovbuf = new csTiledCoverageBuffer (w, h);
+
+    int* e;
+
+    int p1 = bugplug->DebugViewPoint (csVector2 (100, 100));
+    int p2 = bugplug->DebugViewPoint (csVector2 (200, 110));
+    int p3 = bugplug->DebugViewPoint (csVector2 (150, 200));
+    int p4 = bugplug->DebugViewPoint (csVector2 (160, 150));
+    int p5 = bugplug->DebugViewPoint (csVector2 (50, 50));
+    bugplug->DebugViewLine (p1, p2);
+    bugplug->DebugViewLine (p2, p3);
+    bugplug->DebugViewLine (p3, p4);
+    bugplug->DebugViewLine (p4, p5);
+    bugplug->DebugViewLine (p5, p1);
+    o1.num_edges = 5;
+    o1.edges = new int[o1.num_edges*2];
+    o1.num_verts = 5;
+    o1.verts = new csVector2[o1.num_verts];
+    o1.verts_idx = new int[o1.num_verts];
+    o1.used_verts = new bool[o1.num_verts];
+    o1.used_verts[0] = true;
+    o1.used_verts[1] = true;
+    o1.used_verts[2] = true;
+    o1.used_verts[3] = true;
+    o1.used_verts[4] = true;
+    o1.verts_idx[0] = p1;
+    o1.verts_idx[1] = p2;
+    o1.verts_idx[2] = p3;
+    o1.verts_idx[3] = p4;
+    o1.verts_idx[4] = p5;
+    e = o1.edges;
+    *e++ = 0; *e++ = 1;
+    *e++ = 1; *e++ = 2;
+    *e++ = 2; *e++ = 3;
+    *e++ = 3; *e++ = 4;
+    *e++ = 4; *e++ = 0;
+    o1.depth = 20;
+
+    p1 = bugplug->DebugViewPoint (csVector2 (400, 100));
+    p2 = bugplug->DebugViewPoint (csVector2 (500, 110));
+    p3 = bugplug->DebugViewPoint (csVector2 (450, 200));
+    p4 = bugplug->DebugViewPoint (csVector2 (460, 150));
+    p5 = bugplug->DebugViewPoint (csVector2 (350, 50));
+    bugplug->DebugViewLine (p1, p2);
+    bugplug->DebugViewLine (p2, p3);
+    bugplug->DebugViewLine (p3, p4);
+    bugplug->DebugViewLine (p4, p5);
+    bugplug->DebugViewLine (p5, p1);
+
+    o2.num_edges = 5;
+    o2.edges = new int[o2.num_edges*2];
+    o2.num_verts = 5;
+    o2.verts = new csVector2[o2.num_verts];
+    o2.verts_idx = new int[o2.num_verts];
+    o2.used_verts = new bool[o2.num_verts];
+    o2.used_verts[0] = true;
+    o2.used_verts[1] = true;
+    o2.used_verts[2] = true;
+    o2.used_verts[3] = true;
+    o2.used_verts[4] = true;
+    o2.verts_idx[0] = p1;
+    o2.verts_idx[1] = p2;
+    o2.verts_idx[2] = p3;
+    o2.verts_idx[3] = p4;
+    o2.verts_idx[4] = p5;
+    e = o2.edges;
+    *e++ = 0; *e++ = 1;
+    *e++ = 1; *e++ = 2;
+    *e++ = 2; *e++ = 3;
+    *e++ = 3; *e++ = 4;
+    *e++ = 4; *e++ = 0;
+    o2.depth = 70;
+
+    p1 = bugplug->DebugViewPoint (csVector2 (400, 300));
+    p2 = bugplug->DebugViewPoint (csVector2 (500, 310));
+    p3 = bugplug->DebugViewPoint (csVector2 (450, 400));
+    p4 = bugplug->DebugViewPoint (csVector2 (460, 350));
+    p5 = bugplug->DebugViewPoint (csVector2 (350, 250));
+    bugplug->DebugViewLine (p1, p2);
+    bugplug->DebugViewLine (p2, p3);
+    bugplug->DebugViewLine (p3, p4);
+    bugplug->DebugViewLine (p4, p5);
+    bugplug->DebugViewLine (p5, p1);
+
+    o3.num_edges = 5;
+    o3.edges = new int[o3.num_edges*2];
+    o3.num_verts = 5;
+    o3.verts = new csVector2[o3.num_verts];
+    o3.verts_idx = new int[o3.num_verts];
+    o3.used_verts = new bool[o3.num_verts];
+    o3.used_verts[0] = true;
+    o3.used_verts[1] = true;
+    o3.used_verts[2] = true;
+    o3.used_verts[3] = true;
+    o3.used_verts[4] = true;
+    o3.verts_idx[0] = p1;
+    o3.verts_idx[1] = p2;
+    o3.verts_idx[2] = p3;
+    o3.verts_idx[3] = p4;
+    o3.verts_idx[4] = p5;
+    e = o3.edges;
+    *e++ = 0; *e++ = 1;
+    *e++ = 1; *e++ = 2;
+    *e++ = 2; *e++ = 3;
+    *e++ = 3; *e++ = 4;
+    *e++ = 4; *e++ = 0;
+    o3.depth = 150;
+  }
+  virtual ~DynavisRenderObject ()
+  {
+    delete tcovbuf;
+  }
+
+  void RenderOutline (const outline& ol, iBugPlug* bugplug)
+  {
+    int i;
+    for (i = 0 ; i < ol.num_verts ; i++)
+    {
+      ol.verts[i] = bugplug->DebugViewGetPoint (ol.verts_idx[i]);
+    }
+    tcovbuf->InsertOutline (ol.verts, ol.num_verts, ol.used_verts,
+    	ol.edges, ol.num_edges, ol.depth);
+  }
+
+  virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug)
+  {
+    tcovbuf->Initialize ();
+    RenderOutline (o1, bugplug);
+    RenderOutline (o2, bugplug);
+    RenderOutline (o3, bugplug);
+    tcovbuf->Debug_Dump (g3d);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (DynavisRenderObject)
+  SCF_IMPLEMENTS_INTERFACE (iBugPlugRenderObject)
+SCF_IMPLEMENT_IBASE_END
+
 bool csDynaVis::Debug_DebugCommand (const char* cmd)
 {
   if (!strcmp (cmd, "setup_debugsector"))
@@ -1223,6 +1392,26 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
         bugplug->DebugSectorTriangle (origin, v1, v2, .5, .5, 0);
       }
       bugplug->SwitchDebugSector (trans);
+    }
+    else
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"BugPlug not found!");
+    }
+    return true;
+  }
+  else if (!strcmp (cmd, "setup_debugview"))
+  {
+    if (!bugplug)
+      bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+    if (bugplug)
+    {
+      bugplug->SetupDebugView ();
+      DynavisRenderObject* dro = new DynavisRenderObject (this, bugplug,
+      	scr_width, scr_height);
+      bugplug->DebugViewRenderObject (dro);
+      dro->DecRef ();
+      bugplug->SwitchDebugView ();
     }
     else
     {

@@ -25,8 +25,23 @@ class csBox3;
 class csVector3;
 class csReversibleTransform;
 struct iMeshObject;
+struct iBugPlug;
+struct iGraphics3D;
 
-SCF_VERSION (iBugPlug, 0, 0, 1);
+SCF_VERSION (iBugPlugRenderObject, 0, 0, 1);
+
+/**
+ * An application/module can implement this interface to render something.
+ * BugPlug can call the render function when it decides it is time to
+ * render the object.
+ */
+struct iBugPlugRenderObject : public iBase
+{
+  /// Render.
+  virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug) = 0;
+};
+
+SCF_VERSION (iBugPlug, 0, 0, 2);
 
 /**
  * Using this interface you can communicate with the BugPlug plugin.
@@ -34,6 +49,8 @@ SCF_VERSION (iBugPlug, 0, 0, 1);
  */
 struct iBugPlug : public iBase
 {
+  //=========================================================================
+
   /**
    * Setup the 'debug sector'. The debug sector is a sector which you
    * can fill with boxes and other objects. BugPlug can then switch
@@ -60,26 +77,8 @@ struct iBugPlug : public iBase
   	const csVector3& s3, float r, float g, float b) = 0;
 
   /**
-   * Add a wireframe box to the debug sector. If name is not NULL it
-   * will be shown in BugPlug when the mouse is over the object.
-   */
-  virtual void DebugSectorWireBox (const csBox3& box, float r, float g, float b,
-  	const char* name = NULL) = 0;
-
-  /**
-   * Add a 3D line to the debug sector.
-   */
-  virtual void DebugSectorLine (const csVector3& start, const csVector3& end,
-  	float r, float g, float b) = 0;
-
-  /**
-   * Add a 3D marker to the debug sector. This will show up as a cross.
-   */
-  virtual void DebugSectorMarker (const csVector3& point,
-  	float r, float g, float b) = 0;
-
-  /**
-   * Switch BugPlug view to the debug sector.
+   * Switch BugPlug view to the debug sector. The given transform is
+   * given to the camera.
    */
   virtual void SwitchDebugSector (const csReversibleTransform& trans) = 0;
 
@@ -87,6 +86,69 @@ struct iBugPlug : public iBase
    * Returns true if the debug sector is currently visible.
    */
   virtual bool CheckDebugSector () const = 0;
+
+  //=========================================================================
+
+  /**
+   * Setup the 'debug 2dview'. To this view a plugin or application can
+   * add various 2D objects (lines and points for example).
+   * This function will clear any previously created debug view.
+   */
+  virtual void SetupDebugView () = 0;
+
+  /**
+   * Add a dragable point. Returns an index that can be used in a line.
+   */
+  virtual int DebugViewPoint (const csVector2& point) = 0;
+
+  /**
+   * Add a line. The two indices are as returned from DebugViewPoint().
+   */
+  virtual void DebugViewLine (int i1, int i2) = 0;
+
+  /**
+   * Return the current number of points.
+   */
+  virtual int DebugViewPointCount () const = 0;
+
+  /**
+   * Return a point.
+   */
+  virtual const csVector2& DebugViewGetPoint (int i) const = 0;
+
+  /**
+   * Return the current number of lines.
+   */
+  virtual int DebugViewLineCount () const = 0;
+
+  /**
+   * Return a line.
+   */
+  virtual void DebugViewGetLine (int i, int& i1, int& i2) const = 0;
+
+  /**
+   * Add some rendering code that will be rendered right before the
+   * points and lines are rendered. If NULL the current object will be removed.
+   */
+  virtual void DebugViewRenderObject (iBugPlugRenderObject* obj) = 0;
+
+  /**
+   * Indicate if BugPlug should clear the screen before rendering the
+   * debug view. True by default.
+   */
+  virtual void DebugViewClearScreen (bool cs) = 0;
+
+  /**
+   * Switch BugPlug view to the debug view.
+   */
+  virtual void SwitchDebugView () = 0;
+
+  /**
+   * Returns true if the debug view is currently visible.
+   */
+  virtual bool CheckDebugView () const = 0;
+
+  //=========================================================================
 };
 
 #endif

@@ -1,5 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+18-Jun-2002
+	- Extended iBugPlug interface with functions to setup a debug
+	  view. This is a 2D view on which you can render one general
+	  object (provided by application or plugin, this is done by
+	  implementing iBugPlugRenderObject) and then a set of points
+	  and lines.
+	- Added 'debugview' command to BugPlug to switch to this view.
+	  Assigned alt-s key to this command.
+	- Added new 'setup_debugview' Dynavis command which setups the
+	  debug view for testing of the tiled coverage buffer. Assigned
+	  this command to the 's' key. This command will setup the
+	  debug view with three outlines that are rendered on the tiled
+	  coverage buffer.
+	- Extended BugPlug so that you can now drag the points.
+	- Implemented the graphical dump of the tiled coverage buffer.
+	  This is now used in the setup_debugview command.
+	- Optimized the tiled coverage buffer by improving the check
+	  if a tile can is full.
+	- Fixed a bug where tiles which are full where not marked as
+	  dirty even though they have to be marked.
 17-Jun-2002
 	- Worked further on the tiled coverage buffer in Dynavis.
 	- Fixed bug in handling of 'analyze_vis' command in Dynavis.
