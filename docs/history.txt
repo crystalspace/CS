@@ -1,5 +1,31 @@
 The history order is reversed so that new features are at the top.
 
+7-Aug-2001
+	- Michael Voase did the following:
+	- Texture Manager: All drivers
+	  - Continued fortification of texture manager.. It
+	    should now behave like the rest of the engine,
+	    handing over the reference to the texture handle
+	    without needing an IncRef(). This ends the circular
+	    reference contract and resumes normal behaviour.
+	    To release a texture handle, simply DecRef() it,
+	    and the texture manager will do the rest.
+
+	- Texture Manager: soft3d
+	  - Tracked down and fixed the annoying tcache crash
+	    at exit. Under opengl, software texture managers
+	    and caches can be shared between different instances
+	    of the software driver. Soft3dcom now respects the
+	    shared resources and deletes correctly, I have only
+	    the csThing leaks to track down now. Also removed
+	    bug flag in Clear().
+	
+	- OpenGL software procedural textures and cswstex:
+	  - Removed now uneeded reference to parent procedural
+	    texture manager. Handles should now clean up with
+	    a DecRef() the same as most other engine objects.
+	    The handle will unregister itself.
+
 6-Aug-2001
 	- Removed almost all usage of iSystem in the entire CS system. Instead
 	  a pointer to the object registry (iObjectRegistry) is used. This
