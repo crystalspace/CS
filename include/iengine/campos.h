@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 
 class csVector3;
+class csPlane3;
 struct iObject;
 struct iEngine;
 struct iCamera;
