@@ -207,12 +207,9 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.mesh.sprite.3d", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -272,14 +269,13 @@ void csSprite3DMeshObjectFactory::GenerateCacheName ()
 
   if (logparent)
   {
-    iMeshFactoryWrapper* mw = SCF_QUERY_INTERFACE (logparent,
-    	iMeshFactoryWrapper);
+    csRef<iMeshFactoryWrapper> mw (SCF_QUERY_INTERFACE (logparent,
+    	iMeshFactoryWrapper));
     if (mw)
     {
       if (mw->QueryObject ()->GetName ())
         mf.Write (mw->QueryObject ()->GetName (),
 		strlen (mw->QueryObject ()->GetName ()));
-      mw->DecRef ();
     }
   }
   
@@ -345,9 +341,8 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
   spr->SetLightingQualityConfig (GetLightingQualityConfig());
   spr->SetAction ("default");
   spr->InitSprite ();
-  iMeshObject* im = SCF_QUERY_INTERFACE (spr, iMeshObject);
-  im->DecRef ();
-  return csPtr<iMeshObject> (im);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  return csPtr<iMeshObject> (im);	// DecRef is ok here.
 }
 
 void csSprite3DMeshObjectFactory::GenerateLOD ()
@@ -619,13 +614,12 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   GetFrame (frame)->SetNormalsCalculated (true);
 
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   char buf[100];
   iCacheManager* cache_mgr = NULL;
   if (engine)
   {
     cache_mgr = engine->GetCacheManager ();
-    engine->DecRef ();
     sprintf (buf, "spr3dnormals_%d_%d", base, frame);
     csRef<iDataBuffer> db (cache_mgr->ReadCache (buf, GetCacheName (), 0));
     if (db)
@@ -726,7 +720,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   if (cache_mgr)
   {
     csMemFile m;
-    iFile* mf = SCF_QUERY_INTERFACE ((&m), iFile);
+    csRef<iFile> mf (SCF_QUERY_INTERFACE ((&m), iFile));
 
     csVector3* fr_normals = GetNormals (frame);
     for (i = 0; i < GetVertexCount(); i++)
@@ -743,7 +737,6 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
     cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
   	  buf, GetCacheName (), 0);
-    mf->DecRef ();
   }
 
   delete[] tri_normals;
@@ -789,9 +782,9 @@ void csSprite3DMeshObjectFactory::Sprite3DFactoryState::
 iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
   const
 {
-  iSkeleton* iskel = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
-  if (iskel) iskel->DecRef ();
-  return iskel;
+  csRef<iSkeleton> iskel (
+  	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton));
+  return iskel;	// DecRef is ok here.
 }
 
 //=============================================================================
@@ -1261,8 +1254,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
     // Drill down into the parent and compute the center of
   // the socket where this mesh should be located along with the rotation angles
-  iMeshWrapper* mw = SCF_QUERY_INTERFACE (movable,	iMeshWrapper);
-	if (mw)
+  csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (movable,	iMeshWrapper));
+  if (mw)
   {
     // Get the parent of this wrapper
     iMeshWrapper* parent = mw->GetParentContainer();
@@ -1277,8 +1270,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
         if (mof)
         {
           // Find the socket in the parent
-          iSprite3DFactoryState* sof = SCF_QUERY_INTERFACE (
-              mof, iSprite3DFactoryState);
+          csRef<iSprite3DFactoryState> sof (SCF_QUERY_INTERFACE (
+              mof, iSprite3DFactoryState));
           if (sof)
           {  
             iSpriteSocket * socket = sof->FindSocket(mw);
@@ -1358,11 +1351,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
               
             }
           }
-          sof->DecRef();
         }
       }
     }
-    mw->DecRef();
   }
 
   // If we have a skeleton then we transform all vertices through
@@ -2060,9 +2051,10 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
 
 iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
 {
-  iSkeletonState* iskelstate = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
-  if (iskelstate) iskelstate->DecRef ();
-  return iskelstate;
+  csRef<iSkeletonState> iskelstate (
+  	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (),
+	iSkeletonState));
+  return iskelstate;	// DecRef is ok here.
 }
 
 void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
@@ -2123,9 +2115,9 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
   cm->object_reg = object_reg;
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 
 #define NUM_OPTIONS 2

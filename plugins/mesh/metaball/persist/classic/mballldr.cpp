@@ -130,50 +130,49 @@ csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csMetaBallFactoryLoader::~csMetaBallFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csMetaBallFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csMetaBallFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext* , iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.metaball", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.metaball", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.metaball",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.metaball\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csMetaBallFactoryLoader::Parse (iDocumentNode*,
 	iLoaderContext* , iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.metaball", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.metaball", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.metaball",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.metaball\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -183,18 +182,15 @@ csMetaBallFactorySaver::csMetaBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csMetaBallFactorySaver::~csMetaBallFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csMetaBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csMetaBallFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -211,21 +207,15 @@ csMetaBallLoader::csMetaBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  reporter = NULL;
 }
 
 csMetaBallLoader::~csMetaBallLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
 {
   csMetaBallLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -264,8 +254,8 @@ csPtr<iBase> csMetaBallLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iMetaBallState* ballstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iMetaBallState> ballstate;
   MetaParameters* mp = NULL;
 
   csParser* parser = ldr_context->GetParser ();
@@ -276,7 +266,6 @@ csPtr<iBase> csMetaBallLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (ballstate) ballstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -351,7 +340,6 @@ csPtr<iBase> csMetaBallLoader::Parse (const char* string,
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            mesh->DecRef ();
             return NULL;
 	  }
 	  ballstate->SetMaterial(mat);
@@ -372,7 +360,7 @@ csPtr<iBase> csMetaBallLoader::Parse (const char* string,
     }
   }
 
-  if (ballstate) ballstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -553,19 +541,15 @@ csMetaBallSaver::csMetaBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csMetaBallSaver::~csMetaBallSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csMetaBallSaver::Initialize (iObjectRegistry* object_reg)
 {
   csMetaBallSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -573,22 +557,19 @@ bool csMetaBallSaver::Initialize (iObjectRegistry* object_reg)
 void csMetaBallSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iMeshObject> mesh (SCF_QUERY_INTERFACE(obj, iMeshObject));
   if(!mesh)
   {
     printf("Error: non-mesh given to %s.\n",
       fact->QueryDescription () );
-    fact->DecRef();
     return;
   }
-  iMetaBallState *state = SCF_QUERY_INTERFACE(obj, iMetaBallState);
+  csRef<iMetaBallState> state (SCF_QUERY_INTERFACE(obj, iMetaBallState));
   if(!state)
   {
     printf("Error: invalid mesh given to %s.\n",
       fact->QueryDescription () );
-    fact->DecRef();
-    mesh->DecRef();
     return;
   }
 
@@ -624,8 +605,6 @@ void csMetaBallSaver::WriteDown (iBase* obj, iFile *file)
   sprintf(buf, "TEX_SCALE (%f)\n",state->GetEnvironmentMappingFactor());
   str.Append(buf);
 
-  fact->DecRef();
-  mesh->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }
+

@@ -116,8 +116,6 @@ csSprite3DBinFactoryLoader::csSprite3DBinFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 /**
@@ -125,9 +123,6 @@ csSprite3DBinFactoryLoader::csSprite3DBinFactoryLoader (iBase* pParent)
  */
 csSprite3DBinFactoryLoader::~csSprite3DBinFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  if (reporter) reporter->DecRef ();
-  SCF_DEC_REF (synldr);
 }
 
 /**
@@ -136,7 +131,6 @@ csSprite3DBinFactoryLoader::~csSprite3DBinFactoryLoader ()
 bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DBinFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
@@ -150,8 +144,10 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS(plugin_mgr,
-	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS(plugin_mgr,
+	"crystalspace.mesh.object.sprite.3d", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
@@ -168,7 +164,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   // @@@ Temporary fix to allow to set actions for objects loaded
   // with impexp. Once those loaders move to another plugin this code
   // below should be removed.
-  iMeshObjectFactory* fact = NULL;
+  csRef<iMeshObjectFactory> fact;
   if (context)
   {
     fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
@@ -179,9 +175,8 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   if (!fact)
     fact = type->NewFactory ();
 
-  type->DecRef ();
-  iSprite3DFactoryState* spr3dLook = SCF_QUERY_INTERFACE (fact,
-  	iSprite3DFactoryState);
+  csRef<iSprite3DFactoryState> spr3dLook (SCF_QUERY_INTERFACE (fact,
+  	iSprite3DFactoryState));
 
   char* p = (char*)data;
 
@@ -215,8 +210,6 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     ReportError (reporter,
 	"crystalspace.sprite3dbinfactoryloader.parse.unknownmaterial",
 	"Couldn't find material named '%s'", mat_name);
-    spr3dLook->DecRef ();
-    fact->DecRef ();
     return NULL;
   }
   spr3dLook->SetMaterialWrapper (mat);
@@ -265,8 +258,6 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	    "crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
 	    "Trying to add too many vertices to frame '%s'!",
 	    fr->GetName ());
-	spr3dLook->DecRef ();
-	fact->DecRef ();
 	return NULL;
       }
       spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
@@ -279,8 +270,6 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	"crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
 	"Too few vertices in frame '%s'!",
 	fr->GetName ());
-      spr3dLook->DecRef ();
-      fact->DecRef ();
       return NULL;
     }
   }
@@ -315,8 +304,6 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	  "crystalspace.sprite3dbinfactoryloader.parse.action.badframe",
 	  "Trying to add unknown frame '%s' to action '%s'!",
 	  fn, act->GetName ());
-	spr3dLook->DecRef ();
-	fact->DecRef ();
 	return NULL;
       }
 
@@ -364,7 +351,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   // Read the 1 byte tween value
   spr3dLook->EnableTweening (*p++);
 
-  spr3dLook->DecRef ();
+  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -378,7 +365,6 @@ csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 /**
@@ -386,8 +372,6 @@ csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
  */
 csSprite3DBinFactorySaver::~csSprite3DBinFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  if (reporter) reporter->DecRef ();
 }
 
 /**
@@ -396,7 +380,6 @@ csSprite3DBinFactorySaver::~csSprite3DBinFactorySaver ()
 bool csSprite3DBinFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DBinFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -409,8 +392,8 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
 {
   const char * name = 0;
 
-  iSprite3DFactoryState *state =
-    SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
+  csRef<iSprite3DFactoryState> state (
+    SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState));
 
   // Write a magic number so we can ID the file
   char magic[4] = {'5','1', '5','0'};
@@ -526,7 +509,6 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
     int idx;
     idx = convert_endian((int32)state->GetSocket(i)->GetTriangleIndex());
     file->Write ((char *)&idx, 4);
-    
   }
   /// @@@ Cannot retrieve smoothing information.
   /// SMOOTH()
@@ -537,7 +519,5 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
   char buf[1];
   buf[0] = state->IsTweeningEnabled() ? 0x00: 0x01;
   file->Write(buf, 1);
-
-  state->DecRef();
 }
 

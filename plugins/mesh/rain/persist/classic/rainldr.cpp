@@ -126,50 +126,49 @@ csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csRainFactoryLoader::~csRainFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csRainFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csRainFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.rain", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.rain", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.rain",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.rain\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.rain", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.rain", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.rain",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.rain\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -178,18 +177,15 @@ csRainFactorySaver::csRainFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csRainFactorySaver::~csRainFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csRainFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -205,22 +201,15 @@ csRainLoader::csRainLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csRainLoader::~csRainLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csRainLoader::Initialize (iObjectRegistry* object_reg)
 {
   csRainLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -256,9 +245,9 @@ csPtr<iBase> csRainLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iRainState* rainstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iRainState> rainstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -268,8 +257,6 @@ csPtr<iBase> csRainLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (rainstate) rainstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -311,8 +298,6 @@ csPtr<iBase> csRainLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (rainstate) rainstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -327,9 +312,6 @@ csPtr<iBase> csRainLoader::Parse (const char* string,
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (rainstate) rainstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -357,8 +339,7 @@ csPtr<iBase> csRainLoader::Parse (const char* string,
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (rainstate) rainstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -476,19 +457,15 @@ csRainSaver::csRainSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csRainSaver::~csRainSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csRainSaver::Initialize (iObjectRegistry* object_reg)
 {
   csRainSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -496,9 +473,9 @@ bool csRainSaver::Initialize (iObjectRegistry* object_reg)
 void csRainSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iRainState *state = SCF_QUERY_INTERFACE (obj, iRainState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iRainState> state (SCF_QUERY_INTERFACE (obj, iRainState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -533,8 +510,5 @@ void csRainSaver::WriteDown (iBase* obj, iFile *file)
   printf(buf, "BOX (%g,%g,%g, %g,%g,%g)\n", minbox.x, minbox.y, minbox.z,
     maxbox.x, maxbox.y, maxbox.z);
 
-  fact->DecRef();
-  partstate->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }

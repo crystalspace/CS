@@ -79,8 +79,6 @@ csReporterListener::csReporterListener (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
   object_reg = NULL;
-  console = NULL;
-  nativewm = NULL;
   reporter = NULL;
   debug_file = csStrNew ("debug.txt");
 #ifdef CS_DEBUG
@@ -134,14 +132,12 @@ csReporterListener::~csReporterListener ()
   // DontUseMeAnymoreSincerelyYourReporterOfChoice () which is called by
   // iReporter destructor for all listeners still in the listenerqueue
   //  .. norman
-  iReporter *rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
   {
     if (rep == reporter)
       reporter->RemoveReporterListener (&scfiReporterListener);
-    rep->DecRef ();
   }
-  if (console) console->DecRef ();
 }
 
 bool csReporterListener::Initialize (iObjectRegistry *object_reg)
@@ -214,29 +210,26 @@ void csReporterListener::SetDebugFile (const char* filename)
 
 void csReporterListener::SetDefaults ()
 {
-  if (console) console->DecRef ();
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   nativewm = NULL;
-  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (g3d)
   {
     iGraphics2D* g2d = g3d->GetDriver2D ();
     if (g2d)
     {
       nativewm = SCF_QUERY_INTERFACE (g2d, iNativeWindowManager);
-      if (nativewm) nativewm->DecRef ();
     }
-    g3d->DecRef ();
   }
   if (reporter)
   {
     reporter->RemoveReporterListener (&scfiReporterListener);
   }
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  reporter = rep;
   if (reporter)
   {
     reporter->AddReporterListener (&scfiReporterListener);
-    reporter->DecRef ();
   }
   delete[] debug_file;
   debug_file = csStrNew ("debug.txt");

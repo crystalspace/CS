@@ -151,21 +151,15 @@ csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
-  if (reporter) reporter->DecRef ();
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -311,8 +305,10 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
 
   csParser* parser = ldr_context->GetParser ();
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.2d",
@@ -325,10 +321,9 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
 		"Could not load the sprite.2d mesh object plugin!");
     return NULL;
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
-  iSprite2DFactoryState* spr2dLook = SCF_QUERY_INTERFACE (fact,
-  	iSprite2DFactoryState);
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  csRef<iSprite2DFactoryState> spr2dLook (SCF_QUERY_INTERFACE (fact,
+  	iSprite2DFactoryState));
 
   char* buf = (char*)string;
   while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
@@ -338,8 +333,6 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.sprite2dfactoryloader.parse.badformat",
 		"Bad format while parsing sprite2d factory!");
-      fact->DecRef ();
-      spr2dLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -353,8 +346,6 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
 		"Couldn't find material named '%s'", str);
-            fact->DecRef ();
-	    spr2dLook->DecRef ();
             return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
@@ -371,11 +362,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (parser, params, mm))
-	  {
-	    spr2dLook->DecRef ();
-	    fact->DecRef ();
 	    return NULL;
-	  }
           spr2dLook->SetMixMode (mm);
 	}
 	break;
@@ -387,15 +374,17 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
     }
   }
 
-  spr2dLook->DecRef ();
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.2d",
@@ -409,7 +398,6 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
     return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  type->DecRef ();
   csRef<iSprite2DFactoryState> spr2dLook (
   	SCF_QUERY_INTERFACE (fact, iSprite2DFactoryState));
 
@@ -473,21 +461,15 @@ csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
-  if (reporter) reporter->DecRef ();
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
@@ -498,8 +480,8 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 void csSprite2DFactorySaver::WriteDown (iBase* obj, iFile * file)
 {
   csString str;
-  iSprite2DFactoryState *state =
-    SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
+  csRef<iSprite2DFactoryState> state (
+    SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState));
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
@@ -512,7 +494,6 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iFile * file)
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
   str.Append(buf);
 
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }
 //---------------------------------------------------------------------------
@@ -521,21 +502,15 @@ csSprite2DLoader::csSprite2DLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  if (reporter) reporter->DecRef ();
-  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -569,8 +544,8 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iSprite2DState* spr2dLook = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iSprite2DState> spr2dLook;
   csColoredVertices* verts = NULL;
 
   csParser* parser = ldr_context->GetParser ();
@@ -583,7 +558,6 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.badformat",
 		"Bad format while parsing sprite2d!");
-      if (spr2dLook) spr2dLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -597,7 +571,6 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
-	    if (spr2dLook) spr2dLook->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -614,8 +587,6 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
-            mesh->DecRef ();
-	    if (spr2dLook) spr2dLook->DecRef ();
             return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
@@ -625,11 +596,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (parser, params, mm))
-	  {
-	    if (spr2dLook) spr2dLook->DecRef ();
-	    mesh->DecRef ();
 	    return NULL;
-	  }
           spr2dLook->SetMixMode (mm);
 	}
 	break;
@@ -701,8 +668,6 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
 	    ReportError (reporter,
 		"crystalspace.sprite2dloader.parse.uvanim",
 		"UVAnimation '%s' not found!", str);
-	    if (spr2dLook) spr2dLook->DecRef ();
-	    mesh->DecRef ();
 	    return NULL;
 	  }
         }
@@ -710,7 +675,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
     }
   }
 
-  if (spr2dLook) spr2dLook->DecRef ();
+  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -854,21 +819,15 @@ csSprite2DSaver::csSprite2DSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  if (reporter) reporter->DecRef ();
-  SCF_DEC_REF (synldr);
 }
 
 bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite2DSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
@@ -877,8 +836,8 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
 void csSprite2DSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iSprite2DState *state = SCF_QUERY_INTERFACE (obj, iSprite2DState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (obj, iSprite2DState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -924,7 +883,6 @@ void csSprite2DSaver::WriteDown (iBase* obj, iFile *file)
   }
   str.Append(")\n");
 
-  fact->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }
+

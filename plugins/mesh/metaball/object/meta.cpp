@@ -170,10 +170,9 @@ void csMetaBall::SetupVertexBuffer ()
 {
  if (!vbuf)
  {
-   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
    // @@@ priority should be a parameter.
    vbufmgr = g3d->GetVertexBufferManager ();
-   g3d->DecRef ();
    vbuf = vbufmgr->CreateBuffer (0);
    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
    mesh.buffers[0] = vbuf;
@@ -558,9 +557,8 @@ csPtr<iMeshObject> csMetaBallFactory::NewInstance()
 {
   csMetaBall* cm = new csMetaBall((iMeshObjectFactory *) this);
   cm->Initialize(object_reg);
-  iMeshObject* im = SCF_QUERY_INTERFACE( cm, iMeshObject );
-  im->DecRef();
-  return csPtr<iMeshObject> (im);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  return csPtr<iMeshObject> (im);	// DecRef is ok here.
 }
 
 SCF_IMPLEMENT_IBASE (csMetaBallType)
@@ -592,8 +590,8 @@ csMetaBallType::~csMetaBallType()
 csPtr<iMeshObjectFactory> csMetaBallType::NewFactory()
 {
   csMetaBallFactory* cm = new csMetaBallFactory(this, object_reg);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE(cm, iMeshObjectFactory);
-  ifact->DecRef();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE(cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

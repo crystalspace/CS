@@ -61,10 +61,9 @@ public:
 class csThingLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
   bool LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_context,
@@ -106,9 +105,8 @@ public:
 class csThingSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -138,10 +136,9 @@ public:
 class csPlaneLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:
@@ -177,9 +174,8 @@ public:
 class csPlaneSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -209,9 +205,8 @@ public:
 class csBezierLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:
@@ -247,9 +242,8 @@ public:
 class csBezierSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;

@@ -126,22 +126,15 @@ csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csHazeFactoryLoader::~csHazeFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csHazeFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -162,7 +155,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter* reporter,
 			     iDocumentNode* node,
 			     iHazeFactoryState *fstate, float &s)
 {
-  iHazeHull* result = NULL;
+  csRef<iHazeHull> result;
   int number;
   float p, q;
 
@@ -212,6 +205,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter* reporter,
 	return NULL;
     }
   }
+  result->IncRef ();	// Prevent smart pointer release.
   return result;
 }
 
@@ -228,13 +222,13 @@ static iHazeHull* ParseHull (csParser* parser, char* buf,
   long cmd;
   char* params;
 
-  iHazeHull* result = 0;
+  csRef<iHazeHull> result;
   csVector3 a,b;
   int number;
   float p,q;
 
-  iHazeHullCreation *hullcreate = SCF_QUERY_INTERFACE(fstate,
-    iHazeHullCreation);
+  csRef<iHazeHullCreation> hullcreate (SCF_QUERY_INTERFACE(fstate,
+    iHazeHullCreation));
 
   while ((cmd = parser->GetObject (&buf, emits, &name, &params)) > 0)
   {
@@ -272,7 +266,7 @@ static iHazeHull* ParseHull (csParser* parser, char* buf,
 	break;
     }
   }
-  if(hullcreate) hullcreate->DecRef();
+  result->IncRef ();	// Prevent smart pointer release.
   return result;
 }
 
@@ -298,17 +292,19 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
 
   csParser* parser = ldr_context->GetParser ();
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.haze", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.haze", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.haze",
     	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  iHazeFactoryState* hazefactorystate = SCF_QUERY_INTERFACE(
-    fact, iHazeFactoryState);
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  csRef<iHazeFactoryState> hazefactorystate (SCF_QUERY_INTERFACE(
+    fact, iHazeFactoryState));
   CS_ASSERT(hazefactorystate);
 
   char* buf = (char*)string;
@@ -317,7 +313,6 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (hazefactorystate) hazefactorystate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -330,7 +325,6 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
 	  {
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
-	    if (hazefactorystate) hazefactorystate->DecRef ();
             return NULL;
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
@@ -363,8 +357,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
     }
   }
 
-  if (hazefactorystate) hazefactorystate->DecRef ();
-  type->DecRef ();
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -374,8 +367,10 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 {
   csVector3 a;
 
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.haze", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.haze", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.haze",
@@ -387,7 +382,6 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
   csRef<iHazeFactoryState> hazefactorystate (
   	SCF_QUERY_INTERFACE (fact, iHazeFactoryState));
   CS_ASSERT (hazefactorystate);
-  type->DecRef ();
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -455,19 +449,15 @@ csHazeFactorySaver::csHazeFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csHazeFactorySaver::~csHazeFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csHazeFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -481,23 +471,21 @@ static void WriteHull(csString& str, iHazeHull *hull)
   csVector3 a,b;
   int nr;
   float p,q;
-  iHazeHullBox *ebox = SCF_QUERY_INTERFACE(hull, iHazeHullBox);
+  csRef<iHazeHullBox> ebox (SCF_QUERY_INTERFACE(hull, iHazeHullBox));
   if(ebox)
   {
     ebox->GetSettings(a, b);
     sprintf(buf, "  HAZEBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
     str.Append(buf);
-    ebox->DecRef();
     return;
   }
-  iHazeHullCone *econe = SCF_QUERY_INTERFACE(hull, iHazeHullCone);
+  csRef<iHazeHullCone> econe (SCF_QUERY_INTERFACE(hull, iHazeHullCone));
   if(econe)
   {
     econe->GetSettings(nr, a, b, p, q);
     sprintf(buf, "  HAZEBOX(%d, %g,%g,%g, %g,%g,%g, %g, %g)\n", nr,
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
     str.Append(buf);
-    econe->DecRef();
     return;
   }
   printf ("Unknown hazehull type, cannot writedown!\n");
@@ -506,7 +494,8 @@ static void WriteHull(csString& str, iHazeHull *hull)
 void csHazeFactorySaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iHazeFactoryState *hazestate = SCF_QUERY_INTERFACE (obj, iHazeFactoryState);
+  csRef<iHazeFactoryState> hazestate (
+  	SCF_QUERY_INTERFACE (obj, iHazeFactoryState));
   char buf[MAXLINE];
 
   if(hazestate->GetMixMode() != CS_FX_COPY)
@@ -532,8 +521,6 @@ void csHazeFactorySaver::WriteDown (iBase* obj, iFile *file)
     str.Append(" )\n");
   }
 
-  if(hazestate) hazestate->DecRef();
-
   file->Write ((const char*)str, str.Length ());
 }
 
@@ -543,22 +530,15 @@ csHazeLoader::csHazeLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csHazeLoader::~csHazeLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 {
   csHazeLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -591,9 +571,9 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iHazeFactoryState* hazefactorystate = NULL;
-  iHazeState* hazestate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iHazeFactoryState> hazefactorystate;
+  csRef<iHazeState> hazestate;
   csVector3 a;
 
   csParser* parser = ldr_context->GetParser ();
@@ -604,7 +584,6 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (hazestate) hazestate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -616,7 +595,6 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (hazestate) hazestate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -633,8 +611,6 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
 	  {
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (hazestate) hazestate->DecRef ();
             return NULL;
 	  }
 	  hazestate->SetMaterialWrapper (mat);
@@ -667,8 +643,7 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
     }
   }
 
-  if (hazestate) hazestate->DecRef ();
-  if (hazefactorystate) hazefactorystate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -764,26 +739,23 @@ csHazeSaver::csHazeSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csHazeSaver::~csHazeSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
 {
   csHazeSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 void csHazeSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iHazeState *state = SCF_QUERY_INTERFACE (obj, iHazeState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iHazeState> state (SCF_QUERY_INTERFACE (obj, iHazeState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -814,7 +786,5 @@ void csHazeSaver::WriteDown (iBase* obj, iFile *file)
     str.Append(" )\n");
   }
 
-  fact->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }

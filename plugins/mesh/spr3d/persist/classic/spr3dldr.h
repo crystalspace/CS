@@ -40,10 +40,9 @@ struct iObjectRegistry;
 class csSprite3DFactoryLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
   // Load a skeleton.
@@ -87,10 +86,9 @@ public:
 class csSprite3DFactorySaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
   // Save a skeleton.
   void SaveSkeleton (iSkeletonLimb* limb, csString& str);
@@ -124,10 +122,9 @@ public:
 class csSprite3DLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -164,10 +161,9 @@ public:
 class csSprite3DSaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

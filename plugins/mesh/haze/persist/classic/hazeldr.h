@@ -41,10 +41,9 @@ struct iHazeHull;
 class csHazeFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:
@@ -81,9 +80,8 @@ public:
 class csHazeFactorySaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -114,10 +112,9 @@ public:
 class csHazeLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:
@@ -154,9 +151,8 @@ public:
 class csHazeSaver : public iSaverPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

@@ -98,7 +98,8 @@ csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
   int i, j;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
   // @@@ collect converter plugins
   iStrVector* classlist =
@@ -109,13 +110,15 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
     char const* classname = classlist->Get(i);
     if (!strcasecmp (classname, MY_CLASSNAME)) continue;
 
-    iModelConverter *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname,
-    	iModelConverter);
+    csRef<iModelConverter> ldr (CS_LOAD_PLUGIN (plugin_mgr, classname,
+    	iModelConverter));
     if (ldr)
+    {
       Converters.Push(ldr);
+      ldr->IncRef ();	// Avoid smart pointer release.
+    }
   }
   classlist->DecRef ();
-  plugin_mgr->DecRef ();
 
   for (i=0; i<Converters.Length (); i++)
   {
@@ -142,8 +145,12 @@ csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
   int i;
   for (i=0; i<Converters.Length (); i++)
   {
-    iModelData *mdl = Converters.Get(i)->Load (Buffer, Size);
-    if (mdl) return csPtr<iModelData> (mdl);
+    csRef<iModelData> mdl (Converters.Get(i)->Load (Buffer, Size));
+    if (mdl)
+    {
+      mdl->IncRef ();	// Avoid smart pointer release.
+      return csPtr<iModelData> (mdl);
+    }
   }
   return NULL;
 }
@@ -153,8 +160,12 @@ csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl, const cha
   int i;
   for (i=0; i<Converters.Length (); i++)
   {
-    iDataBuffer *dbuf = Converters.Get(i)->Save (mdl, Format);
-    if (dbuf) return csPtr<iDataBuffer> (dbuf);
+    csRef<iDataBuffer> dbuf (Converters.Get(i)->Save (mdl, Format));
+    if (dbuf)
+    {
+      dbuf->IncRef ();	// Avoid smart pointer release.
+      return csPtr<iDataBuffer> (dbuf);
+    }
   }
   return NULL;
 }

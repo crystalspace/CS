@@ -37,9 +37,8 @@ struct iSyntaxService;
 class csStarFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iReporter* reporter;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -75,9 +74,8 @@ public:
 class csStarFactorySaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  csRef<iReporter> reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -108,10 +106,9 @@ public:
 class csStarLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -148,10 +145,9 @@ public:
 class csStarSaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService *synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

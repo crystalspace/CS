@@ -81,12 +81,9 @@ csPerfStats::~csPerfStats ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
   delete [] name;
@@ -100,12 +97,9 @@ bool csPerfStats::Initialize (iObjectRegistry *object_reg)
   csPerfStats::object_reg = object_reg;
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-    q->DecRef ();
-  }
   sub_section = super_section = NULL;
   // default resolution
   resolution = 500;
@@ -246,7 +240,7 @@ void csPerfStats::PrintSubsectionStats (int severity)
 
 void csPerfStats::PrintSectionStats (int severity)
 {
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
   {
     rep->Report (severity, "crystalspace.perfstats", "Total Time/s : %f", ((float)total_time)/1000.0f);
@@ -254,7 +248,6 @@ void csPerfStats::PrintSectionStats (int severity)
     rep->Report (severity, "crystalspace.perfstats", "Mean FPS     : %f", mean_fps);
     rep->Report (severity, "crystalspace.perfstats", "Lowest FPS   : %f", lowest_fps);
     rep->Report (severity, "crystalspace.perfstats", "Highest FPS  : %f", highest_fps);
-    rep->DecRef ();
   }
 }
 
@@ -369,7 +362,7 @@ void csPerfStats::WriteSummaryStats ()
 void csPerfStats::WriteMainHeader ()
 {
   StatEntry *entry = new StatEntry ();
-  iGraphics3D *g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (!g3d) abort ();
   iGraphics2D *g2d = g3d->GetDriver2D ();
   csGraphics3DCaps *caps = g3d->GetCaps ();
@@ -442,7 +435,6 @@ void csPerfStats::WriteMainHeader ()
     CS_ASSERT (entry->len <= len_guess);
 
     statvec->Push (entry);
-    g3d->DecRef ();
 }
 
 void csPerfStats::WriteSubSummary ()
@@ -608,16 +600,13 @@ bool csPerfStats::WriteFile ()
   statvec = NULL;
   head_section->framevec = NULL;
 
-  iVFS *vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
   if (!vfs)
     return false;
 
   // Is there a limit to the size of buffer which can be written at once?
-  iFile* cf;
-  cf = vfs->Open (file_name, VFS_FILE_WRITE);
-  vfs->DecRef ();
+  csRef<iFile> cf (vfs->Open (file_name, VFS_FILE_WRITE));
   cf->Write (buffer, total_len);
-  cf->DecRef ();
 
   delete [] buffer;
   delete [] f_buf;

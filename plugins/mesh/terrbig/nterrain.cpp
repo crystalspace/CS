@@ -447,12 +447,13 @@ csBigTerrainObject::SetupVertexBuffer (iVertexBuffer *&vbuf1)
  {
    if (!vbufmgr)
    {
-     iObjectRegistry* object_reg = ((csBigTerrainObjectFactory*)pFactory)->object_reg;
-     iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+     iObjectRegistry* object_reg = ((csBigTerrainObjectFactory*)pFactory)
+     	->object_reg;
+     csRef<iGraphics3D> g3d (
+     	CS_QUERY_REGISTRY (object_reg, iGraphics3D));
 
      // @@@ priority should be a parameter.
      vbufmgr = g3d->GetVertexBufferManager ();
-     g3d->DecRef ();
 
      //vbufmgr->AddClient (&scfiVertexBufferManagerClient);
    }
@@ -647,8 +648,8 @@ csPtr<iMeshObjectFactory> csBigTerrainObjectType::NewFactory ()
 {
   csBigTerrainObjectFactory* btf = new csBigTerrainObjectFactory (this, 
   	object_reg);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (btf, iMeshObjectFactory);
-  ifact->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (btf, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

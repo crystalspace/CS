@@ -322,17 +322,15 @@ public:
     {
       csSkelLimbState* ls=scfParent->GetNext();
       if (!ls) return NULL;
-      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
-      ibone->DecRef ();
-      return ibone;
+      csRef<iSkeletonBone> ibone (SCF_QUERY_INTERFACE(ls, iSkeletonBone));
+      return ibone;	// DecRef is ok here.
     }
     virtual iSkeletonBone* GetChildren ()
     {
       csSkelLimbState* ls=scfParent->GetFirstChild ();
       if (!ls) return NULL;
-      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
-      ibone->DecRef ();
-      return ibone;
+      csRef<iSkeletonBone> ibone (SCF_QUERY_INTERFACE(ls, iSkeletonBone));
+      return ibone;	// DecRef is ok here.
     }
     virtual const char* GetName ()
     {
@@ -407,17 +405,15 @@ public:
     {
       csSkelLimbState* ls=scfParent->GetNext();
       if(!ls) return NULL;
-      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
-      ibone->DecRef ();
-      return ibone;
+      csRef<iSkeletonBone> ibone (SCF_QUERY_INTERFACE(ls, iSkeletonBone));
+      return ibone;	// DecRef is ok here.
     }
     virtual iSkeletonBone* GetChildren ()
     {
       csSkelLimbState* ls=scfParent->GetFirstChild();
       if(!ls) return NULL;
-      iSkeletonBone* ibone = SCF_QUERY_INTERFACE(ls, iSkeletonBone);
-      ibone->DecRef ();
-      return ibone;
+      csRef<iSkeletonBone> ibone (SCF_QUERY_INTERFACE(ls, iSkeletonBone));
+      return ibone;	// DecRef is ok here.
     }
     virtual const char* GetName ()
     {

@@ -39,10 +39,9 @@ struct iSprite2DFactoryState;
 class csSprite2DFactoryLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
   bool ParseAnim (iDocumentNode* node, iReporter* reporter, 
@@ -81,10 +80,9 @@ public:
  */
 class csSprite2DFactorySaver : public iSaverPlugin
 {
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -115,10 +113,9 @@ public:
 class csSprite2DLoader : public iLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -155,10 +152,9 @@ public:
 class csSprite2DSaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

@@ -666,17 +666,16 @@ public:
     }
     virtual iSpriteFrame* AddFrame ()
     {
-      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->AddFrame (),
-      	iSpriteFrame);
-      if (ifr) ifr->DecRef ();
-      return ifr;
+      csRef<iSpriteFrame> ifr (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddFrame (),
+      	iSpriteFrame));
+      return ifr;	// DecRef is ok here.
     }
     virtual iSpriteFrame* FindFrame (const char* name) const
     {
-      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindFrame (name), iSpriteFrame);
-      if (ifr) ifr->DecRef ();
-      return ifr;
+      csRef<iSpriteFrame> ifr (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindFrame (name), iSpriteFrame));
+      return ifr;	// DecRef is ok here.
     }
     virtual int GetFrameCount () const
     {
@@ -684,31 +683,29 @@ public:
     }
     virtual iSpriteFrame* GetFrame (int f) const
     {
-      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->GetFrame (f),
-      	iSpriteFrame);
-      if (ifr) ifr->DecRef ();
-      return ifr;
+      csRef<iSpriteFrame> ifr (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetFrame (f),
+      	iSpriteFrame));
+      return ifr;	// DecRef is ok here.
     }
     virtual iSpriteAction* AddAction ()
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->AddAction (),
-      	iSpriteAction);
-      if (ia) ia->DecRef ();
-      return ia;
+      csRef<iSpriteAction> ia (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddAction (),
+      	iSpriteAction));
+      return ia;	// DecRef is ok here.
     }
     virtual iSpriteAction* FindAction (const char* name) const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindAction (name), iSpriteAction);
-      if (ia) ia->DecRef ();
-      return ia;
+      csRef<iSpriteAction> ia (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindAction (name), iSpriteAction));
+      return ia;	// DecRef is ok here.
     }
     virtual iSpriteAction* GetFirstAction () const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->GetFirstAction (), iSpriteAction);
-      if (ia) ia->DecRef ();
-      return ia;
+      csRef<iSpriteAction> ia (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->GetFirstAction (), iSpriteAction));
+      return ia;	// DecRef is ok here.
     }
     virtual int GetActionCount () const
     {
@@ -716,41 +713,40 @@ public:
     }
     virtual iSpriteAction* GetAction (int No) const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetAction (No),
-      	iSpriteAction);
-      if (ia) ia->DecRef ();
-      return ia;
+      csRef<iSpriteAction> ia (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetAction (No),
+      	iSpriteAction));
+      return ia;	// DecRef is ok here.
     }
     virtual iSpriteSocket* AddSocket ()
     {
-      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-      	iSpriteSocket);
-      if (ifr) ifr->DecRef ();
-      return ifr;
+      csRef<iSpriteSocket> ifr (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+      	iSpriteSocket));
+      return ifr;	// DecRef is ok here.
     }
     virtual iSpriteSocket* FindSocket (const char* name) const
     {
-      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindSocket (name), iSpriteSocket);
-      if (ifr) ifr->DecRef ();
-      return ifr;
+      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindSocket (name), iSpriteSocket));
+      return ifr;	// DecRef is ok here.
     }
     virtual iSpriteSocket* FindSocket (iMeshWrapper* mesh) const
     {
-      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindSocket (mesh), iSpriteSocket);
-      if (ifr) ifr->DecRef ();
-      return ifr;
-    }virtual int GetSocketCount () const
+      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindSocket (mesh), iSpriteSocket));
+      return ifr;	// DecRef is ok here.
+    }
+    virtual int GetSocketCount () const
     {
       return scfParent->GetSocketCount ();
     }
     virtual iSpriteSocket* GetSocket (int f) const
     {
-      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-      	iSpriteSocket);
-      if (ifr) ifr->DecRef ();
-      return ifr;
+      csRef<iSpriteSocket> ifr (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+      	iSpriteSocket));
+      return ifr;	// DecRef is ok here.
     }
     virtual void EnableSkeletalAnimation ();
     virtual iSkeleton* GetSkeleton () const;
@@ -1393,10 +1389,9 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const
   {
-    iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (factory,
-    	iMeshObjectFactory);
-    ifact->DecRef ();
-    return ifact;
+    csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (factory,
+    	iMeshObjectFactory));
+    return ifact;	// DecRef is ok here.
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
@@ -1540,10 +1535,10 @@ public:
     }
     virtual iSpriteAction* GetCurAction () const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetCurAction (),
-      	iSpriteAction);
-      if (ia) ia->DecRef ();
-      return ia;
+      csRef<iSpriteAction> ia (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetCurAction (),
+      	iSpriteAction));
+      return ia;	// DecRef is ok here.
     }
     virtual void EnableTweening (bool en)
     {

@@ -765,7 +765,9 @@ csPtr<iTextureHandle> csTextureManagerSoftware::RegisterTexture (iImage* image,
     G3D->Report(CS_REPORTER_SEVERITY_BUG,
       "BAAAD!!! csTextureManagerSoftware::RegisterTexture with NULL image!");
 
-    image = csCreateXORPatternImage(32, 32, 5);
+    csRef<iImage> im (csCreateXORPatternImage(32, 32, 5));
+    image = im;
+    im->IncRef ();	// Avoid smart pointer cleanup. @@@ UGLY
   }
 
   csTextureHandleSoftware *txt = new csTextureHandleSoftware (
@@ -815,12 +817,9 @@ void csTextureManagerSoftware::SetPalette ()
     G2D->SetRGB (i, r, g, b);
   }
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->GetEventOutlet()->ImmediateBroadcast (cscmdPaletteChanged, this);
-    q->DecRef ();
-  }
 }
 
 void csTextureManagerSoftware::Reprepare8BitProcs ()

@@ -232,22 +232,15 @@ csThingLoader::csThingLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  synldr = NULL;
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csThingLoader::~csThingLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csThingLoader::Initialize (iObjectRegistry* object_reg)
 {
   csThingLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -368,8 +361,8 @@ static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
               "Couldn't find thing factory '%s'!", str);
             return false;
           }
-	  iThingState* tmpl_thing_state = SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory (), iThingState);
+	  csRef<iThingState> tmpl_thing_state (SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory (), iThingState));
 	  if (!tmpl_thing_state)
 	  {
 	    ReportError (reporter,
@@ -378,7 +371,6 @@ static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
             return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
-	  tmpl_thing_state->DecRef ();
 	  if (info.use_mat_set)
           {
 	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
@@ -407,8 +399,8 @@ static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
             return false;
           }
 
-	  iThingState* tmpl_thing_state = SCF_QUERY_INTERFACE (
-	  	wrap->GetMeshObject (), iThingState);
+	  csRef<iThingState> tmpl_thing_state (SCF_QUERY_INTERFACE (
+	  	wrap->GetMeshObject (), iThingState));
 	  if (!tmpl_thing_state)
 	  {
 	    ReportError (reporter,
@@ -417,7 +409,6 @@ static bool load_thing_part (csParser* parser, iLoaderContext* ldr_context,
             return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
-	  tmpl_thing_state->DecRef ();
 	  if (info.use_mat_set)
           {
 	    thing_state->ReplaceMaterials (engine->GetMaterialList (),
@@ -545,10 +536,10 @@ Nag to Jorrit about this feature if you want it.");
         {
 	  char cname[100];
 	  csScanStr (params, "%s", cname);
-	  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-	    iThingEnvironment);
+	  csRef<iThingEnvironment> te (
+	  	SCF_QUERY_INTERFACE (engine->GetThingType (),
+		iThingEnvironment));
 	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
-	  te->DecRef ();
 	  iCurve* p = thing_state->CreateCurve (ct);
 	  p->QueryObject()->SetName (cname);
           if (!ct->GetMaterial ())
@@ -618,10 +609,10 @@ csPtr<iBase> csThingLoader::Parse (const char* string,
   csParser* parser = ldr_context->GetParser ();
 
   // Things only work with the real 3D engine and not with the iso engine.
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
-  iMeshObjectFactory* fact = NULL;
-  iThingState* thing_state = NULL;
+  csRef<iMeshObjectFactory> fact;
+  csRef<iThingState> thing_state;
 
   iMeshObjectType* type = engine->GetThingType (); // @@@ CS_LOAD_PLUGIN LATER!
   // We always do NewFactory() even for mesh objects.
@@ -634,11 +625,9 @@ csPtr<iBase> csThingLoader::Parse (const char* string,
   if (!load_thing_part (parser, ldr_context, object_reg, reporter, synldr, info,
   	engine, thing_state, buf, 0, true))
   {
-    fact->DecRef ();
     fact = NULL;
   }
-  thing_state->DecRef ();
-  engine->DecRef ();
+  if (fact) fact->IncRef ();	// Prevent smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -875,10 +864,10 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* ldr_context, iBase*)
 {
   // Things only work with the real 3D engine and not with the iso engine.
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
-  iMeshObjectFactory* fact = NULL;
-  iThingState* thing_state = NULL;
+  csRef<iMeshObjectFactory> fact;
+  csRef<iThingState> thing_state;
 
   iMeshObjectType* type = engine->GetThingType (); // @@@ CS_LOAD_PLUGIN LATER!
   // We always do NewFactory() even for mesh objects.
@@ -890,11 +879,9 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   if (!LoadThingPart (node, ldr_context, object_reg, reporter, synldr, info,
   	engine, thing_state, 0, true))
   {
-    fact->DecRef ();
     fact = NULL;
   }
-  thing_state->DecRef ();
-  engine->DecRef ();
+  if (fact) fact->IncRef ();	// Avoid smart pointer cleanup.
   return csPtr<iBase> (fact);
 }
 
@@ -904,20 +891,15 @@ csThingSaver::csThingSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csThingSaver::~csThingSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csThingSaver::Initialize (iObjectRegistry* object_reg)
 {
   csThingSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -925,13 +907,12 @@ bool csThingSaver::Initialize (iObjectRegistry* object_reg)
 void csThingSaver::WriteDown (iBase* /*obj*/, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
   char buf[MAXLINE];
   char name[MAXLINE];
   csFindReplace (name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf (buf, "FACTORY ('%s')\n", name);
   str.Append (buf);
-  fact->DecRef ();
   file->Write ((const char*)str, str.Length ());
 }
 
@@ -941,22 +922,15 @@ csPlaneLoader::csPlaneLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  synldr = NULL;
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csPlaneLoader::~csPlaneLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
 {
   csPlaneLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -1233,20 +1207,15 @@ csPlaneSaver::csPlaneSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csPlaneSaver::~csPlaneSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
 {
   csPlaneSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -1261,20 +1230,15 @@ csBezierLoader::csBezierLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csBezierLoader::~csBezierLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBezierLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   xmltokens.Register ("v", XMLTOKEN_V);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
@@ -1449,20 +1413,15 @@ csBezierSaver::csBezierSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csBezierSaver::~csBezierSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBezierSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }

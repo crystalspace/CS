@@ -232,8 +232,7 @@ SCF_IMPLEMENT_IBASE (csGraphics3DSoftwareCommon::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
-  G2D (NULL)
+csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -289,17 +288,13 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
 
   Close ();
-  if (G2D) G2D->DecRef ();
   if (partner) partner->DecRef ();
   if (clipper)
   {
@@ -314,12 +309,9 @@ bool csGraphics3DSoftwareCommon::Initialize (iObjectRegistry* p)
   object_reg = p;
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
   return true;
 }
 
@@ -345,8 +337,8 @@ bool csGraphics3DSoftwareCommon::HandleEvent (iEvent& Event)
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
   config.AddConfig(object_reg, "/config/soft3d.cfg");
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
@@ -360,7 +352,6 @@ void csGraphics3DSoftwareCommon::NewInitialize ()
 #ifdef DO_MMX
   do_mmx = config->GetBool ("Video.Software.MMX", true);
 #endif
-  cmdline->DecRef ();
 }
 
 void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
@@ -381,12 +372,9 @@ void csGraphics3DSoftwareCommon::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.video.software", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);

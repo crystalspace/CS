@@ -20,6 +20,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
+#include "iutil/databuff.h"
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
 #include "cstool/sprbuild.h"
@@ -129,11 +130,13 @@ csPtr<iDataBuffer> csModelConverterSPR::Save (iModelData *Data, const char *Form
     return NULL;
 
   // only the first object is saved
-  iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
+  csRef<iModelDataObject> obj (
+  	CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject));
   if (!obj) return NULL;
 
   csSpriteBuilderFile Builder;
-  iDataBuffer *buf = Builder.Build (obj);
-  obj->DecRef ();
+  csRef<iDataBuffer> buf (Builder.Build (obj));
+  buf->IncRef ();	// Avoid smart pointer release.
   return csPtr<iDataBuffer> (buf);
 }
+

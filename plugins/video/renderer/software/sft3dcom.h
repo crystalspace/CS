@@ -218,7 +218,7 @@ public:
    * Low-level 2D graphics layer.
    * csGraphics3DSoftwareCommon is in charge of creating and managing this.
    */
-  iGraphics2D* G2D;
+  csRef<iGraphics2D> G2D;
 
   /// The configuration file
   csConfigAccess config;

@@ -60,7 +60,7 @@ protected:
   uvAnimationControl uvani;
 
 private:
-  iMeshObjectFactory* ifactory;
+  csRef<iMeshObjectFactory> ifactory;
   iBase* logparent;
   csSprite2DMeshObjectFactory* factory;
 

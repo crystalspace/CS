@@ -516,7 +516,8 @@ csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Form
     return NULL;
 
   // only the first object is saved
-  iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
+  csRef<iModelDataObject> obj (
+  	CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject));
   if (!obj) return NULL;
   iModelDataVertices *ver = obj->GetDefaultVertices ();
   int i;

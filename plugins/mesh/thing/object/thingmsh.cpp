@@ -78,7 +78,10 @@ iThingEnvironment* csThingMeshObjectType::TE ()
     CS_ASSERT (engine != NULL);
     parent_type = engine->GetThingType ();
   }
-  te = SCF_QUERY_INTERFACE (parent_type, iThingEnvironment);
+  csRef<iThingEnvironment> tte (
+  	SCF_QUERY_INTERFACE (parent_type, iThingEnvironment));
+  te = tte;
+  tte->IncRef ();	// Avoid smart pointer release.
   return te;
 }
 

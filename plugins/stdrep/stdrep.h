@@ -37,9 +37,9 @@ class csReporterListener : public iStandardReporterListener
 {
 private:
   iObjectRegistry *object_reg;
-  iConsoleOutput* console;
-  iNativeWindowManager* nativewm;
-  iReporter* reporter;
+  csRef<iConsoleOutput> console;
+  csRef<iNativeWindowManager> nativewm;
+  iReporter* reporter;	// Not a csRef! We don't want to keep a reference.
   char* debug_file;
   bool dest_stdout[5];
   bool dest_stderr[5];

@@ -38,10 +38,9 @@ struct iObjectRegistry;
 class csSprite3DBinFactoryLoader : public iBinaryLoaderPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
 
   // Load a skeleton.
   bool LoadSkeleton (csParser* parser, iReporter* reporter, 
@@ -77,10 +76,9 @@ public:
 class csSprite3DBinFactorySaver : public iSaverPlugin
 {
 private:
-  iReporter* reporter;
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
 
   // Save a skeleton.
   void SaveSkeleton (iSkeletonLimb* limb, csString& str);

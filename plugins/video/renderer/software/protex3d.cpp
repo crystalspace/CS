@@ -243,9 +243,11 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   iImage *tex_image = new csImageMemory (width, height,
 					 (csRGBpixel*)buffer, false);
 
-  soft_tex_mm = (csTextureHandleSoftware *)(iTextureHandle*)
-        texman->RegisterTexture (tex_image, CS_TEXTURE_PROC | CS_TEXTURE_2D);
+  csRef<iTextureHandle> th (
+  	texman->RegisterTexture (tex_image, CS_TEXTURE_PROC | CS_TEXTURE_2D));
+  soft_tex_mm = (csTextureHandleSoftware *)(iTextureHandle*)th;
   soft_tex_mm->Prepare ();
+  th->IncRef ();	// Prevent smart pointer cleanup.
 
   // Return the software texture managers handle for this procedural texture.
   return soft_tex_mm;

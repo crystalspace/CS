@@ -128,50 +128,49 @@ csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csSnowFactoryLoader::~csSnowFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSnowFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSnowFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csSnowFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.snow", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.snow", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.snow",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.snow\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.snow", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.snow", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.snow",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.snow\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -181,18 +180,15 @@ csSnowFactorySaver::csSnowFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csSnowFactorySaver::~csSnowFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSnowFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSnowFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -208,22 +204,15 @@ csSnowLoader::csSnowLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csSnowLoader::~csSnowLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSnowLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -261,9 +250,9 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iSnowState* snowstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iSnowState> snowstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -273,8 +262,6 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (snowstate) snowstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -323,8 +310,6 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (snowstate) snowstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -339,9 +324,6 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (snowstate) snowstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -369,8 +351,7 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (snowstate) snowstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Prevent smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -491,27 +472,24 @@ csSnowSaver::csSnowSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csSnowSaver::~csSnowSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSnowSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSnowSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 void csSnowSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iSnowState *state = SCF_QUERY_INTERFACE (obj, iSnowState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iSnowState> state (SCF_QUERY_INTERFACE (obj, iSnowState));
   char buf[MAXLINE];
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
@@ -547,8 +525,5 @@ void csSnowSaver::WriteDown (iBase* obj, iFile *file)
   printf(buf, "SWIRL (%d)\n", state->GetSwirl());
   str.Append(buf);
 
-  fact->DecRef();
-  partstate->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }

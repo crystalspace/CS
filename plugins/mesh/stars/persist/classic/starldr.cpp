@@ -138,20 +138,15 @@ csStarFactoryLoader::csStarFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csStarFactoryLoader::~csStarFactoryLoader ()
 {
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csStarFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csStarFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -159,8 +154,10 @@ bool csStarFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csStarFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.stars", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.stars", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.stars",
@@ -173,16 +170,18 @@ csPtr<iBase> csStarFactoryLoader::Parse (const char* /*string*/,
 		"Could not load the stars mesh object plugin!");
     return NULL;
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->DecRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.stars", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.stars", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.stars",
@@ -195,8 +194,8 @@ csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
 		"Could not load the stars mesh object plugin!");
     return NULL;
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->DecRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -206,20 +205,15 @@ csStarFactorySaver::csStarFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  plugin_mgr = NULL;
 }
 
 csStarFactorySaver::~csStarFactorySaver ()
 {
-  if (reporter) reporter->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csStarFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
@@ -237,22 +231,15 @@ csStarLoader::csStarLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  synldr = NULL;
-  plugin_mgr = NULL;
 }
 
 csStarLoader::~csStarLoader ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csStarLoader::Initialize (iObjectRegistry* object_reg)
 {
   csStarLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -283,8 +270,8 @@ csPtr<iBase> csStarLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iStarsState* starstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iStarsState> starstate;
 
   csParser* parser = ldr_context->GetParser ();
   
@@ -296,7 +283,6 @@ csPtr<iBase> csStarLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.starloader.parse.badformat",
 		"Bad format while parsing star object!");
-      if (starstate) starstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -347,7 +333,6 @@ csPtr<iBase> csStarLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.starloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
-	    if (starstate) starstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -357,7 +342,7 @@ csPtr<iBase> csStarLoader::Parse (const char* string,
     }
   }
 
-  if (starstate) starstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -438,43 +423,17 @@ csStarSaver::csStarSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  reporter = NULL;
-  synldr = NULL;
-  plugin_mgr = NULL;
 }
 
 csStarSaver::~csStarSaver ()
 {
-  SCF_DEC_REF (reporter);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csStarSaver::Initialize (iObjectRegistry* object_reg)
 {
   csStarSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.starsaver.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.starsaver.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
   return true;
 }
 

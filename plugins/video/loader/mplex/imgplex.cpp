@@ -63,32 +63,34 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
 {
   if (object_reg)
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
     iStrVector* classlist =
       iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.");
     int const nmatches = classlist->Length();
     if (nmatches != 0)
     {
-	  int i;
+      int i;
       for (i = 0; i < nmatches; i++)
       {
 	char const* classname = classlist->Get(i);
         if (strcasecmp (classname, MY_CLASSNAME))
         {
-	  iImageIO *plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO);
+	  csRef<iImageIO> plugin (
+	  	CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO));
 	  if (plugin)
 	  {
 	    // remember the plugin
 	    list.Push (plugin);
 	    // and load its description, since we gonna return it on request
 	    StoreDesc (plugin->GetDescription ());
+	    plugin->IncRef ();	// Avoid smart pointer release.
 	  }
         }
       }
     }
     classlist->DecRef();
-    plugin_mgr->DecRef ();
     //return (list.Length() > 0);
     return true;
   }
@@ -114,8 +116,12 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iForma
   for (i=0; i<list.Length(); i++)
   {
     iImageIO *pIO = (iImageIO*)list.Get(i);
-    iImage *img = pIO->Load(iBuffer, iSize, iFormat);
-    if (img) return csPtr<iImage> (img);
+    csRef<iImage> img (pIO->Load(iBuffer, iSize, iFormat));
+    if (img)
+    {
+      img->IncRef ();	// Avoid smart pointer release.
+      return csPtr<iImage> (img);
+    }
   }
   return NULL;
 }
@@ -140,8 +146,12 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (
   for (i=0; i<list.Length(); i++)
   {
     iImageIO *pIO = (iImageIO*)list.Get(i);
-    iDataBuffer *buf = pIO->Save(image, format, extraoptions);
-    if (buf) return csPtr<iDataBuffer> (buf);
+    csRef<iDataBuffer> buf (pIO->Save(image, format, extraoptions));
+    if (buf)
+    {
+      buf->IncRef ();	// Avoid smart pointer release.
+      return csPtr<iDataBuffer> (buf);
+    }
   }
   return NULL;
 }
@@ -153,8 +163,12 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
   for (i=0; i<list.Length(); i++)
   {
     iImageIO *pIO = (iImageIO*)list.Get(i);
-    iDataBuffer *buf = pIO->Save(image, mime, extraoptions);
-    if (buf) return csPtr<iDataBuffer> (buf);
+    csRef<iDataBuffer> buf (pIO->Save(image, mime, extraoptions));
+    if (buf)
+    {
+      buf->IncRef ();	// Avoid smart pointer release.
+      return csPtr<iDataBuffer> (buf);
+    }
   }
   return NULL;
 }

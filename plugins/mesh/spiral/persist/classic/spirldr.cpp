@@ -121,50 +121,49 @@ csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csSpiralFactoryLoader::~csSpiralFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSpiralFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csSpiralFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.spiral", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.spiral", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.spiral",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.spiral\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csSpiralFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.spiral", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.spiral", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.spiral",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.spiral\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  if (fact) fact->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (fact);
 }
 
@@ -173,18 +172,15 @@ csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csSpiralFactorySaver::~csSpiralFactorySaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSpiralFactorySaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
@@ -199,22 +195,15 @@ csSpiralLoader::csSpiralLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csSpiralLoader::~csSpiralLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSpiralLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
@@ -244,9 +233,9 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
   char* params;
   char str[255];
 
-  iMeshObject* mesh = NULL;
-  iParticleState* partstate = NULL;
-  iSpiralState* spiralstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iSpiralState> spiralstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -256,8 +245,6 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (spiralstate) spiralstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -283,8 +270,6 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (spiralstate) spiralstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -299,9 +284,6 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
 	  if (!mat)
 	  {
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (spiralstate) spiralstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -322,8 +304,7 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (spiralstate) spiralstate->DecRef ();
+  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 
@@ -417,19 +398,15 @@ csSpiralSaver::csSpiralSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csSpiralSaver::~csSpiralSaver ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSpiralSaver::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
@@ -437,9 +414,9 @@ bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)
 void csSpiralSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
-  iFactory *fact = SCF_QUERY_INTERFACE (this, iFactory);
-  iParticleState *partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
-  iSpiralState *state = SCF_QUERY_INTERFACE (obj, iSpiralState);
+  csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
+  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
+  csRef<iSpiralState> state (SCF_QUERY_INTERFACE (obj, iSpiralState));
   char buf[MAXLINE];
   char name[MAXLINE];
 
@@ -464,8 +441,6 @@ void csSpiralSaver::WriteDown (iBase* obj, iFile *file)
     state->GetSource().y, state->GetSource().z);
   str.Append(buf);
 
-  fact->DecRef();
-  partstate->DecRef();
-  state->DecRef();
   file->Write ((const char*)str, str.Length ());
 }
+
