@@ -626,6 +626,184 @@ void LevTool::FindAllThings (iDocument* doc)
   }
 }
 
+void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th)
+{
+  csRef<iDocumentNodeIterator> it = th->GetPartNode ()->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    const char* value = child->GetValue ();
+    if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "part"))
+    {
+    }
+    else if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value,
+    	"vistree"))
+    {
+    }
+    else
+    {
+      csRef<iDocumentNode> newchild = params_node->CreateNodeBefore (
+        CS_NODE_ELEMENT);
+      CloneNode (child, newchild);
+    }
+  }
+}
+
+void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
+{
+  int i;
+  for (i = 0 ; i < things.Length () ; i++)
+  {
+    ltThing* th = (ltThing*)things.Get (i);
+    if (th->GetMeshNode ()->Equals (meshnode))
+    {
+      if (th->GetPolygonCount () == 0) continue;
+
+      csRef<iDocumentNode> newmesh = parentnode->CreateNodeBefore (
+        CS_NODE_ELEMENT);
+      newmesh->SetValue (meshnode->GetValue ());
+      csRef<iDocumentAttributeIterator> atit = meshnode->GetAttributes ();
+      while (atit->HasNext ())
+      {
+	csRef<iDocumentAttribute> attr = atit->Next ();
+	newmesh->SetAttribute (attr->GetName (), attr->GetValue ());
+      }
+      newmesh->SetAttribute ("name", th->GetName ());
+
+      csRef<iDocumentNodeIterator> it = meshnode->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+        const char* value = child->GetValue ();
+        if (child->GetType () == CS_NODE_ELEMENT &&
+    	    (!strcmp (value, "params")))
+        {
+	  csRef<iDocumentNode> params_clone = newmesh->CreateNodeBefore (
+	    child->GetType ());
+	  params_clone->SetValue ("params");
+	  WriteOutThing (params_clone, th);
+	}
+        else if (child->GetType () == CS_NODE_ELEMENT &&
+    	    (!strcmp (value, "zfill")))
+	{
+	  csRef<iDocumentNode> child_clone = newmesh->CreateNodeBefore (
+	    child->GetType ());
+	  CloneNode (child, child_clone);
+	  child_clone->SetValue ("zuse");
+	}
+	else
+	{
+	  csRef<iDocumentNode> child_clone = newmesh->CreateNodeBefore (
+	    child->GetType ());
+	  CloneNode (child, child_clone);
+	}
+      }
+    }
+  }
+}
+
+void LevTool::CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode)
+{
+  const char* parentvalue = node->GetValue ();
+
+  bool is_world = !strcmp (parentvalue, "world");
+  bool is_sector = !strcmp (parentvalue, "sector");
+  bool is_root = !strcmp (parentvalue, "");
+  if (!is_root && !is_sector && !is_world)
+  {
+    CloneNode (node, newnode);
+    return;
+  }
+
+  // First copy the world or sector name and attributes.
+  newnode->SetValue (node->GetValue ());
+  csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> attr = atit->Next ();
+    newnode->SetAttribute (attr->GetName (), attr->GetValue ());
+  }
+
+  csRef<iDocumentNode> settingsnode;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    const char* value = child->GetValue ();
+    if (is_sector && child->GetType () == CS_NODE_ELEMENT &&
+    	(!strcmp (value, "meshobj")) && IsMeshAThing (child))
+    {
+      SplitThing (child, newnode);
+    }
+    else if (is_sector && child->GetType () == CS_NODE_ELEMENT &&
+    	(!strcmp (value, "culler")))
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	child->GetType ());
+      newchild->SetValue ("cullerp");
+      csRef<iDocumentNode> text = newchild->CreateNodeBefore (
+      	CS_NODE_TEXT);
+      text->SetValue ("crystalspace.culling.dynavis");
+    }
+    else if (is_root && !strcmp (value, "world"))
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	child->GetType ());
+      CloneAndSplit (child, newchild);
+    }
+    else if (is_world && !strcmp (value, "sector"))
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	child->GetType ());
+      CloneAndSplit (child, newchild);
+    }
+    else
+    {
+      csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
+      	child->GetType ());
+      CloneNode (child, newchild);
+      if (is_world && !strcmp (value, "settings"))
+        settingsnode = newchild;
+    }
+  }
+  if (is_world && settingsnode == NULL)
+  {
+    settingsnode = newnode->CreateNodeBefore (CS_NODE_ELEMENT);
+    settingsnode->SetValue ("settings");
+  }
+  if (is_world)
+  {
+    bool found = false;
+    csRef<iDocumentNodeIterator> it = settingsnode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      const char* value = child->GetValue ();
+      if (child->GetType () == CS_NODE_ELEMENT && !strcmp (value, "clearzbuf"))
+      {
+        found = true;
+      }
+    }
+    if (!found)
+    {
+      csRef<iDocumentNode> newchild = settingsnode->CreateNodeBefore (
+      	CS_NODE_ELEMENT);
+      newchild->SetValue ("clearzbuf");
+      csRef<iDocumentNode> text = newchild->CreateNodeBefore (
+      	CS_NODE_TEXT);
+      text->SetValue ("yes");
+    }
+  }
+}
+
+void LevTool::CloneAndSplit (iDocument* doc, iDocument* newdoc)
+{
+  csRef<iDocumentNode> root = doc->GetRoot ();
+  csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
+  CloneAndSplit (root, newroot);
+}
+
 void LevTool::CloneNode (iDocumentNode* from, iDocumentNode* to)
 {
   to->SetValue (from->GetValue ());
@@ -642,43 +820,6 @@ void LevTool::CloneNode (iDocumentNode* from, iDocumentNode* to)
   {
     csRef<iDocumentAttribute> attr = atit->Next ();
     to->SetAttribute (attr->GetName (), attr->GetValue ());
-  }
-}
-
-void LevTool::RewriteThing (ltThing* thing, iDocumentNode* newthing)
-{
-  csRef<iDocumentNode> meshnode = thing->GetMeshNode ();
-  csRef<iDocumentNode> partnode = thing->GetPartNode ();
-
-  CloneNode (meshnode, newthing);
-  csRef<iDocumentNode> oldparams = newthing->GetNode ("params");
-  csRef<iDocumentNode> newparams = newthing->CreateNodeBefore (
-  	CS_NODE_ELEMENT, NULL);
-  CloneNode (partnode, newparams);
-  newthing->RemoveNode (oldparams);
-
-  newparams->SetValue ("params");
-  newthing->SetAttribute ("name", thing->GetName ());
-  csRef<iDocumentNode> vnode = newparams->GetNode ("v");
-  while (vnode != NULL)
-  {
-    newparams->RemoveNode (vnode);
-    vnode = newparams->GetNode ("v");
-  }
-  csRef<iDocumentNodeIterator> it = newparams->GetNodes ();
-  // We will add all vertices before 'firstchild'.
-  csRef<iDocumentNode> firstchild = it->Next ();
-
-  int i;
-  for (i = 0 ; i < thing->GetVertexCount () ; i++)
-  {
-    const ltVertex& vt = thing->GetVertex (i);
-    csRef<iDocumentNode> newv = newparams->CreateNodeBefore (
-    	CS_NODE_ELEMENT, firstchild);
-    newv->SetAttributeAsFloat ("x", vt.x);
-    newv->SetAttributeAsFloat ("y", vt.y);
-    newv->SetAttributeAsFloat ("z", vt.z);
-    newv->SetValue ("v");
   }
 }
 
@@ -901,7 +1042,7 @@ void LevTool::Main ()
 
   csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
   	new csTinyDocumentSystem ()));
-  csRef<iDocument> doc (xml->CreateDocument ());
+  csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (buf);
   if (error != NULL)
   {
@@ -936,44 +1077,20 @@ void LevTool::Main ()
       {
 	AnalyzePluginSection (doc);
 	FindAllThings (doc);
-        int i;
-        for (i = 0 ; i < things.Length () ; i++)
-        {
-          ltThing* th = (ltThing*)things.Get (i);
-          printf ("found thing %s\n", th->GetName ());
-          th->CompressVertices ();
-          th->RemoveUnusedVertices ();
-          th->RemoveDuplicateVertices ();
-          th->CreateVertexInfo ();
-
-          csRef<iDocumentNode> sectornode = th->GetMeshNode ()->GetParent ();
-          csRef<iDocumentNode> newnode = sectornode->CreateNodeBefore (
-    	      CS_NODE_ELEMENT, NULL);
-          RewriteThing (th, newnode);
-        }
-        for (i = 0 ; i < thing_nodes.Length () ; i++)
-        {
-          ltDocNodeWrap* w = (ltDocNodeWrap*)thing_nodes.Get (i);
-	  csRef<iDocumentNode> node = w->node;
-          csRef<iDocumentNode> parent = node->GetParent ();
-printf ("  parent '%s'\n", parent->GetValue ());
-printf ("  node   '%s'\n", node->GetValue ());
-printf ("REMOVE NODE %p->%p\n", (iDocumentNode*)parent, (iDocumentNode*)node);
-          parent->RemoveNode (node);
-	  delete w;
-        }
+	csRef<iDocument> newdoc = xml->CreateDocument ();
+	CloneAndSplit (doc, newdoc);
+        error = newdoc->Write (vfs, filename);
+	//error = newdoc->Write (vfs, "/this/world");
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
       }
       break;
   }
 
   //---------------------------------------------------------------
-
-  error = doc->Write (vfs, filename);
-  if (error != NULL)
-  {
-    ReportError ("Error writing '%s': %s!", (const char*)filename, error);
-    return;
-  }
 }
 
 /*---------------------------------------------------------------------*

@@ -213,15 +213,29 @@ public:
   void ParseThing (iDocumentNode* meshnode);
 
   /**
+   * Write out a params block.
+   */
+  void WriteOutThing (iDocumentNode* params_node, ltThing* th);
+
+  /**
+   * Clone a document but split all things in the process.
+   */
+  void CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode);
+
+  /**
+   * Split a thing and output on the given parent node (a sector node).
+   */
+  void SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode);
+
+  /**
+   * Clone a document but split all things in the process.
+   */
+  void CloneAndSplit (iDocument* doc, iDocument* newdoc);
+
+  /**
    * Clone a node and children.
    */
   void CloneNode (iDocumentNode* from, iDocumentNode* to);
-
-  /**
-   * Write the thing back into the XML structure. Perform the
-   * required modifications.
-   */
-  void RewriteThing (ltThing* thing, iDocumentNode* newthing);
 
   //-----------------------------------------------------------------------
 

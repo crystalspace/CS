@@ -217,6 +217,12 @@ csDocumentNodeType csTinyXmlNode::GetType ()
   }
 }
 
+bool csTinyXmlNode::Equals (iDocumentNode* other)
+{
+  csTinyXmlNode* other_node = (csTinyXmlNode*)other;
+  return GetTiNode () == other_node->GetTiNode ();
+}
+
 const char* csTinyXmlNode::GetValue ()
 {
   return node->Value ();

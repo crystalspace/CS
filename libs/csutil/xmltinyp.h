@@ -162,6 +162,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csDocumentNodeType GetType ();
+  virtual bool Equals (iDocumentNode* other);
   virtual const char* GetValue ();
   virtual void SetValue (const char* value);
   virtual void SetValueAsInt (int value);

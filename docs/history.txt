@@ -1,5 +1,29 @@
 The history order is reversed so that new features are at the top.
 
+4-Dec-2002
+	- Added iDocumentNode->Equals() to compare two nodes. Comparing
+	  the pointers doesn't work because these are only wrappers
+	  on top of the real nodes.
+	- Fixed crash bug in bumptest.
+	- 'levtool -dynavis' will now do a correct conversion from
+	  old octree based culler to Dynavis. Here is what it does:
+	      - Split all things into their 'parts'. So for this to work
+		nicely you should make sure that you have logical
+		objects in your original world and that these logical
+		objects are named as <part> entries in the world file.
+	      - Removes all <vistree /> statements.
+	      - Replaces <culler>static</culler> with
+	        <cullerp>crystalspace.culling.dynavis</cullerp>.
+	      - Replaces <zfill /> with <zuse /> for all thing objects.
+	      - Adds <settings><clearzbuf>yes</clearzbuf></settings> if
+	        not already present.
+	  This version of levtool does NOT yet split objects in smaller
+	  objects (which would be nice for Dynavis). So if your objects
+	  are not nicely defined then you will not get good performance.
+	  I tried this version of levtool on dmburg and performance dropped
+	  a great deal (four times slower for software renderer and about
+	  two times slower for OpenGL) so this is certainly not optimal
+	  yet. But don't worry :-)
 3-Dec-2002
 	- Fixed a bug in the engine where it would try to cache lightmaps
 	  even if CS_ENGINE_CACHE_WRITE was not set (but if

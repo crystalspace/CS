@@ -113,7 +113,7 @@ struct iDocumentNodeIterator : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentNode, 0, 4, 0);
+SCF_VERSION (iDocumentNode, 0, 4, 1);
 
 /**
  * Representation of a node in a document.
@@ -124,6 +124,15 @@ struct iDocumentNode : public iBase
    * Get the type of this node (one of CS_NODE_...).
    */
   virtual csDocumentNodeType GetType () = 0;
+
+  /**
+   * Compare this node with another node. You have to use this
+   * function to compare document nodes as equality on the
+   * iDocumentNode pointer itself doesn't work in all cases
+   * (iDocumentNode is just a wrapper of the real node in some
+   * implementations).
+   */
+  virtual bool Equals (iDocumentNode* other) = 0;
 
   /**
    * Get the value of this node.
@@ -180,7 +189,7 @@ struct iDocumentNode : public iBase
    * (CS_NODE_DOCUMENT is not allowed here for example).
    */
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before = 0) = 0;
+  	iDocumentNode* before = NULL) = 0;
 
   /**
    * Get the value of a node.  Scans all child nodes and looks for a node of
