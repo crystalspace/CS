@@ -171,11 +171,12 @@ public:
   }
 
   // return length of this vector
-  real length();
+  //real length();
+  real Norm();
 
   // return a vector of unit length in same direction as this vector
-  ctVector3 unit();
-  void normalize();
+  ctVector3 Unit();
+  void Normalize();
 
   // set all elements to zero
   void zero(){
@@ -313,7 +314,7 @@ public:
   void operator*=(const real p) { for (int idx=0; idx<3; ++idx) elements[idx] *= p;} 
   void operator/=(const real p) { for (int idx=0; idx<3; ++idx) elements[idx] /= p;}
  
-  void cross(const ctVector3 & px, const ctVector3 & py){
+  void Cross(const ctVector3 & px, const ctVector3 & py){
     elements[0] = px.elements[1]*py.elements[2] - px.elements[2]*py.elements[1];
     elements[1] = px.elements[2]*py.elements[0] - px.elements[0]*py.elements[2];
     elements[2] = px.elements[0]*py.elements[1] - px.elements[1]*py.elements[0];
@@ -339,12 +340,12 @@ protected:
 
 };
 
-inline real ctVector3::length() {
+inline real ctVector3::Norm() {
   return sqrt( elements[0]*elements[0] + elements[1]*elements[1] + elements[2]*elements[2]);
 }
 
-inline ctVector3 ctVector3::unit() {
-  return ((*this)/this->length() );
+inline ctVector3 ctVector3::Unit() {
+  return ((*this)/this->Norm() );
 }
 
 
@@ -356,9 +357,9 @@ real dotp = 0.0;
   return dotp;
 }
 
-inline void ctVector3::normalize() {
+inline void ctVector3::Normalize() {
 real len;
-  len = this->length();
+  len = this->Norm();
   if( len > MIN_REAL )
     *this /= len;
   
