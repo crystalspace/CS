@@ -154,7 +154,7 @@ public:
 /**
  * A conveniance polygon mesh implementation that represents a cube.
  */
-class csPolygonMeshCube : public iPolygonMesh
+class csPolygonMeshBox : public iPolygonMesh
 {
 private:
   csVector3 vertices[8];
@@ -166,7 +166,7 @@ public:
   /**
    * Construct a cube polygon mesh.
    */
-  csPolygonMeshCube (const csBox3& box)
+  csPolygonMeshBox (const csBox3& box)
   {
     SCF_CONSTRUCT_IBASE (0);
     change_nr = 0;
@@ -203,7 +203,7 @@ public:
     SetBox (box);
   }
 
-  virtual ~csPolygonMeshCube ()
+  virtual ~csPolygonMeshBox ()
   {
   }
 

@@ -76,7 +76,7 @@ void WalkTest::CreateColliders ()
 {
   csBox3 body_box (csVector3 (-DX_2, OY, -DZ_2),
 		   csVector3 (DX_2, OY+DY, DZ_2));
-  csPolygonMeshCube* mesh = new csPolygonMeshCube (body_box);
+  csPolygonMeshBox* mesh = new csPolygonMeshBox (body_box);
   body = collide_system->CreateCollider (mesh);
   float radius = qsqrt (csSquaredDist::PointPoint (body_box.GetCenter (),
 	body_box.Min ()));
@@ -86,7 +86,7 @@ void WalkTest::CreateColliders ()
 
   csBox3 legs_box (csVector3 (-DX_2L, OYL, -DZ_2L),
 		   csVector3 (DX_2L, OYL+DYL, DZ_2L));
-  mesh = new csPolygonMeshCube (legs_box);
+  mesh = new csPolygonMeshBox (legs_box);
   legs = collide_system->CreateCollider (mesh);
   radius = qsqrt (csSquaredDist::PointPoint (legs_box.GetCenter (),
 	legs_box.Min ()));

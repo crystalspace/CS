@@ -12,6 +12,8 @@ The history order is reversed so that new features are at the top.
 	      actor.
 	    - Also use csPolygonMeshCube in csparser instead of the custom
 	      cube mesh that was implemented there.
+	- Jorrit renamed csPolygonMeshCube to csPolygonMeshBox. It is a box,
+	  not a cube.
 10-Jul-2003
 	- Jorrit added a test in csColliderWrapper::Collide() so that
 	  csColliderWrapper can be used in cases where there is no

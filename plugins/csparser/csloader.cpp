@@ -1408,7 +1408,7 @@ bool csLoader::ParsePolyMeshChildBox (iDocumentNode* child,
   csBox3 b;
   if (!SyntaxService->ParseBox (child, b))
     return false;
-  polymesh = csPtr<iPolygonMesh> (new csPolygonMeshCube (b));
+  polymesh = csPtr<iPolygonMesh> (new csPolygonMeshBox (b));
   return true;
 }
 
