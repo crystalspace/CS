@@ -214,7 +214,11 @@ public:
       SCF_CONSTRUCT_IBASE (0);
       flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
-    virtual ~PolyMesh () { Cleanup (); }
+    virtual ~PolyMesh ()
+    {
+      Cleanup ();
+      SCF_DESTRUCT_IBASE (0);
+    }
     void Cleanup () { } //  delete[] polygons; polygons = 0; }
 
     csMeshedPolygon* polygons;

@@ -68,6 +68,10 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     csSpriteLODListener::variable = variable;
   }
+  virtual ~csSpriteLODListener ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
 
   virtual void VariableChanged (iSharedVariable* var)
   {
@@ -680,7 +684,11 @@ public:
       SCF_CONSTRUCT_IBASE (0);
       flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
-    virtual ~PolyMesh () { Cleanup (); }
+    virtual ~PolyMesh ()
+    {
+      Cleanup ();
+      SCF_DESTRUCT_IBASE ();
+    }
     void Cleanup () { delete[] polygons; polygons = 0; }
 
     csMeshedPolygon* polygons;

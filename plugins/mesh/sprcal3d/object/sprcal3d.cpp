@@ -123,6 +123,12 @@ csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
   //    }
 
   calCoreModel.destroy();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DFactoryState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DMeshObjectFactory::Create(const char *name)
@@ -504,6 +510,13 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
   delete [] meshes;
   delete [] is_initialized;
   delete [] meshes_colors;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DState);
+  SCF_DESTRUCT_IBASE ();
 }
 
 
@@ -1263,6 +1276,10 @@ csSpriteCal3DMeshObjectType::csSpriteCal3DMeshObjectType (iBase* pParent)
 
 csSpriteCal3DMeshObjectType::~csSpriteCal3DMeshObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DMeshObjectType::Initialize (iObjectRegistry* object_reg)

@@ -711,6 +711,8 @@ public:
     SCF_DECLARE_IBASE;
     PolyMesh () : BezierPolyMeshHelper () 
     { SCF_CONSTRUCT_IBASE (0); }
+    virtual ~PolyMesh ()
+    { SCF_DESTRUCT_IBASE (); }
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------

@@ -689,7 +689,10 @@ public:
       SCF_CONSTRUCT_IBASE (0);
       flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
-    virtual ~PolyMesh () { }
+    virtual ~PolyMesh ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
   } scfiPolygonMesh;
   friend struct PolyMesh;
 

@@ -88,7 +88,7 @@ private:
   csRef<iRenderBuffer> index_buffer;
 
   csRef<iGraphics3D> g3d;
-  
+
   bool ball_vertices_dirty_flag;
   bool ball_texels_dirty_flag;
   bool ball_normals_dirty_flag;
@@ -255,8 +255,8 @@ public:
   }
 
   iRenderBuffer *GetRenderBuffer (csStringID name);
-  //------------------------- iRenderBufferSource implementation ----------------
-  class BufferSource : public iRenderBufferSource 
+  //----------------------- iRenderBufferSource implementation ----------------
+  class BufferSource : public iRenderBufferSource
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
     iRenderBuffer *GetRenderBuffer (csStringID name)
@@ -285,7 +285,7 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
+  virtual void NextFrame(csTicks /*current_time*/, const csVector3& /*pos*/) {}
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
@@ -428,13 +428,14 @@ public:
     }
     virtual void Lock () { }
     virtual void Unlock () { }
-    
+
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () 
+    PolyMesh ()
     { SCF_CONSTRUCT_IBASE (0); }
-    virtual ~PolyMesh () { }
+    virtual ~PolyMesh ()
+    { SCF_DESTRUCT_IBASE (); }
   } scfiPolygonMesh;
   friend struct PolyMesh;
 };

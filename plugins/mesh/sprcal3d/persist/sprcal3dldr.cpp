@@ -111,6 +111,8 @@ csSpriteCal3DFactoryLoader::csSpriteCal3DFactoryLoader (iBase* pParent)
 
 csSpriteCal3DFactoryLoader::~csSpriteCal3DFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -417,6 +419,8 @@ csSpriteCal3DFactorySaver::csSpriteCal3DFactorySaver (iBase* pParent)
 
 csSpriteCal3DFactorySaver::~csSpriteCal3DFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -448,6 +452,8 @@ csSpriteCal3DLoader::csSpriteCal3DLoader (iBase* pParent)
 
 csSpriteCal3DLoader::~csSpriteCal3DLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
@@ -680,6 +686,8 @@ csSpriteCal3DSaver::csSpriteCal3DSaver (iBase* pParent)
 
 csSpriteCal3DSaver::~csSpriteCal3DSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)

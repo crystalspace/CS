@@ -109,6 +109,8 @@ csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 
 csSpiralFactoryLoader::~csSpiralFactoryLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -142,6 +144,8 @@ csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent)
 
 csSpiralFactorySaver::~csSpiralFactorySaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -165,6 +169,8 @@ csSpiralLoader::csSpiralLoader (iBase* pParent)
 
 csSpiralLoader::~csSpiralLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
@@ -300,6 +306,8 @@ csSpiralSaver::csSpiralSaver (iBase* pParent)
 
 csSpiralSaver::~csSpiralSaver ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)

@@ -8,19 +8,22 @@ chronological order.
 
 20-Dec-2003
 	- Andreas Busch added Yield() to csThread for posix and win32.
-	- res made some changes to GL proc texes and the GL canvas to work 
+	- res made some changes to GL proc texes and the GL canvas to work
 	  around flipping issues.
 	- res fixed compiling in Win32 after recent Yield() addition: Yield
-	  is #defined empty in winbase.h, causing trouble. #undefined in 
+	  is #defined empty in winbase.h, causing trouble. #undefined in
 	  win32/csosdefs.h now.
 	- res updated the "cal3d sufficiently recent" configure test.
 	- res fixed the remaining plugins in plugins/mesh to utilize the
 	  SCF_DESTRUCT_* macros.
 	- res fixed a compile error on odedynam on gcc 3.3, reported by andres
 	  from IRC.
-	- res commented out some #ifdefs in the light loading code 
+	- res commented out some #ifdefs in the light loading code
 	  distinguishing between NR and OR, causing incorrect lighting with NR
 	  in some cases.
+	- Eric Sunshine added a bunch of missing SCF_DESTRUCT_IBASE() and
+	  SCF_DESTRUCT_EMBEDDED_IBASE() invocations which Frank missed when he
+	  updated the CS/plugins/mesh directory to invoke these macros.
 19-Dec-2003
 	- Eric Sunshine added the new method
 	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to
@@ -109,9 +112,9 @@ chronological order.
 	  when verbose mode is enabled.
 	- Philip Wyett added missing newline at the end of the file to
 	  shadermgr.cpp and xmlshader.h.
-	- Anders Stenberg modified standard reporter to give a more easy to 
+	- Anders Stenberg modified standard reporter to give a more easy to
 	  read output to the console and to the yellow popup.
-	- Anders Stenberg fixed one more off-by-one problem in GL canvas with 
+	- Anders Stenberg fixed one more off-by-one problem in GL canvas with
 	  NR. Blit was off one pixel along Y.
 	- res added GL_ARB_shading_language_100 and GL_ARB_shader_objects
 	  extensions to the GL extension manager.

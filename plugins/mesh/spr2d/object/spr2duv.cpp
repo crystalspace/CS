@@ -34,6 +34,7 @@ csSprite2DUVAnimationFrame::csSprite2DUVAnimationFrame (iBase* pParent)
 csSprite2DUVAnimationFrame::~csSprite2DUVAnimationFrame ()
 {
   delete [] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite2DUVAnimationFrame::SetName (const char *name)
@@ -113,6 +114,7 @@ csSprite2DUVAnimation::csSprite2DUVAnimation (iBase* pParent)
 csSprite2DUVAnimation::~csSprite2DUVAnimation ()
 {
   delete [] name;
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite2DUVAnimation::SetName (const char *name)
