@@ -237,6 +237,7 @@ void SysSystemDriver::Loop(void)
 	EventRecord anEvent;
 	iMacGraphics* piG2D = NULL;
 	bool	driverNeedsEvent = false;
+	bool	eventHandled;
 
 	piG2D = QUERY_INTERFACE(System, iMacGraphics);
 
@@ -257,9 +258,14 @@ void SysSystemDriver::Loop(void)
 #endif
 
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
-			if (( driverNeedsEvent ) && ( piG2D ))
+			eventHandled = false;
+			if (( driverNeedsEvent ) && ( piG2D )) {
 				if ( piG2D->HandleEvent( &anEvent ))
-					DispatchEvent( current_time, &anEvent, piG2D );
+					eventHandled = true;
+			}
+			if ( ! eventHandled ) {
+				DispatchEvent( current_time, &anEvent, piG2D );
+			}
 		} else {
 			Point	theMouse;
 			bool	isIn = false;
