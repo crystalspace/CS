@@ -762,7 +762,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }
 
-int main (int argc, char **argv)
+int main (int argc, char *argv[])
 {
   G2DTestSystemDriver System;
 

@@ -411,7 +411,7 @@ static bool process_file (const char *fname)
   return success;
 }
 
-int main (int argc, char **argv)
+int main (int argc, char *argv[])
 {
 #if defined (__EMX__)	// Expand wildcards on OS/2+GCC+EMX
   _wildcard (&argc, &argv);
