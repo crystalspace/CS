@@ -144,6 +144,8 @@ class WEXP ddgTBinTree {
 
 	/// The number of visible triangles.
 	unsigned int		_visTriangle;
+	/// The number of unique vertices required to render.
+	unsigned int		_uniqueVertex;
 	/**
 	 * Split a triangle into 2 and recusively split the parent
 	 * neighbour triangles as needed.
@@ -161,6 +163,10 @@ public:
 	unsigned int visTriangle(void) { return _visTriangle; }
 	/// Set the number of visible triangles which this bin tree is managing.
 	void visTriangle(unsigned int v) { _visTriangle = v; }
+	/// Return the number of unique vertices required to render.
+	unsigned int uniqueVertex(void) { return _uniqueVertex; }
+	/// Set the number of unique vertices required to render.
+	void uniqueVertex(unsigned int v) { _uniqueVertex = v; }
 	/// Return the neighbouring bin tree.
 	ddgTBinTree* pNeighbourDiag(void) { return _pNeighbourDiag; }
 	/// Return the neighbouring bin tree.
