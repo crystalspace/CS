@@ -89,16 +89,8 @@ HRESULT CALLBACK csGraphics3DDirect3DDx5::EnumTextFormatsCallback(LPDDSURFACEDES
 {
   memset(lpUserArg, TRUE, sizeof(BOOL));
   
-  // Search a 8 bits palettized format
-  if (lpddsd->ddpfPixelFormat.dwRGBBitCount == 8
-    && lpddsd->ddpfPixelFormat.dwFlags & DDPF_PALETTEINDEXED8
-    && !bGotTexDesc && !use16BitTexture)
-  {
-    memcpy(&csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
-    bGotTexDesc = true;
-  }
   // Search a halo texture format with alpha channel
-  else if (lpddsd->ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+  if (lpddsd->ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
   {
     if (lpddsd->ddpfPixelFormat.dwRGBBitCount == 16
       && lpddsd->ddpfPixelFormat.dwRGBAlphaBitMask == 0xF000
@@ -119,18 +111,32 @@ HRESULT CALLBACK csGraphics3DDirect3DDx5::EnumTextFormatsCallback(LPDDSURFACEDES
   // Search a 16/32 bits format
   else if(lpddsd->ddpfPixelFormat.dwRGBBitCount >=16)
   {
-    if (lpddsd->ddpfPixelFormat.dwRGBBitCount == 16
-      && !bGotLitDesc)
+    if (lpddsd->ddpfPixelFormat.dwRGBBitCount == 16)
     {
-      memcpy(&csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
-      bGotLitDesc = true;
-    }
+      //Only use that format, if there has not been found annother format. (That might be the
+      //32 Bit texture formtat if use32BitTexture is true)
+      if(!bGotLitDesc)
+      {
+        memcpy(&csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
+        bGotLitDesc = true;
+      }
 
-    if (lpddsd->ddpfPixelFormat.dwRGBBitCount == 32
-      && use32BitTexture)
+      if(!bGotTexDesc)
+      {
+        memcpy(&csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
+        bGotTexDesc = true;
+      }
+    }
+    else if (lpddsd->ddpfPixelFormat.dwRGBBitCount == 32)
     {
-      memcpy(&csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
-      bGotLitDesc = true;
+      if (use32BitTexture)
+      {
+        //This will override a potentially found 16 Bit texture mode:
+        memcpy(&csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
+        bGotLitDesc = true;
+        memcpy(&csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc, lpddsd, sizeof(DDSURFACEDESC));
+        bGotTexDesc = true;
+      }
     }
   }
 
@@ -156,8 +162,7 @@ m_lpddPrimary(NULL),
 m_lpddZBuffer(NULL),
 m_pTextureCache(NULL),
 m_piSystem(piSystem),
-m_bVerbose(true),
-m_bUse24BitInternalTexture(false)
+m_bVerbose(true)
 {
   HRESULT hRes;
   CLSID clsid2dDriver;
@@ -172,7 +177,7 @@ m_bUse24BitInternalTexture(false)
   hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
   
   if (FAILED(hRes))
-  {	  
+  {       
     SysPrintf(MSG_FATAL_ERROR, "FATAL: Cannot open \"%s\" 2D Graphics driver", sz2DDriver);
     exit(0);
   }
@@ -213,6 +218,10 @@ m_bUse24BitInternalTexture(false)
 
   m_MaxAspectRatio = 1; 
 
+  zdist_mipmap1 = 12;
+  zdist_mipmap2 = 24;
+  zdist_mipmap3 = 40;
+
   rstate_dither = false;
   rstate_specular = false;
   rstate_bilinearmap = false;
@@ -238,8 +247,6 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Initialize(void)
   use16BitTexture=configd3d5->GetYesNo("Direct3DDX5","USE_16BIT_TEXTURE", false);
   if(use16BitTexture)
     use32BitTexture=configd3d5->GetYesNo("Direct3DDX5","EXTEND_32BIT_TEXTURE", false);
-
-  m_bUse24BitInternalTexture=configd3d5->GetYesNo("Direct3DDX5","USE_24BIT_INTERNAL_TEXTURE", true);
 
   return S_OK;
 }
@@ -367,17 +374,18 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
 
   m_Caps.minTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
   m_Caps.minTexWidth  = lpD3dDeviceDesc->dwMinTextureWidth;
-  m_Caps.maxTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
+  m_Caps.maxTexHeight = lpD3dDeviceDesc->dwMaxTextureHeight;
   m_Caps.maxTexWidth  = lpD3dDeviceDesc->dwMaxTextureWidth;
 
   if (lpD3dDeviceDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY)
   {
-    OutputDebugString("Direct3D Device supports only square textures\n");
+    SysPrintf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
+    SysPrintf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
     m_MaxAspectRatio = 1;
   }
   else
   {
-    OutputDebugString("Direct3D Device also supports non square textures\n");
+    SysPrintf (MSG_INITIALIZATION, "Your Direct3D Device also supports non square textures - that's good.\n");
     m_MaxAspectRatio = 32768;
   }
 
@@ -422,16 +430,14 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
 
   if (!bGotTexDesc && !bGotLitDesc)
   {
-    SysPrintf (MSG_INITIALIZATION, " ERROR : No 8, 16 or 32 bits texture format supported in hardware.\n");
+    SysPrintf (MSG_INITIALIZATION, " ERROR : No 16 or 32 bits texture format supported in hardware.\n");
     hRes = E_FAIL;
     goto OnError;
   }    
 
   if(m_bVerbose)
   {
-    if(m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount==8)
-      SysPrintf (MSG_INITIALIZATION, " Use 8 bits palettized texture format.\n");
-    else if(m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
+    if(m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
       SysPrintf (MSG_INITIALIZATION, " Use 16 bits texture format.\n");
     else
       SysPrintf (MSG_INITIALIZATION, " Use 32 bits texture format.\n");
@@ -507,10 +513,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
 
   if(m_bVerbose)
   {
-    if(m_bUse24BitInternalTexture)
-      SysPrintf (MSG_INITIALIZATION, " Use 24 bits internal format for texture\n");
-    else
-      SysPrintf (MSG_INITIALIZATION, " Use Private ColorMap internal format for texture\n");
+    SysPrintf (MSG_INITIALIZATION, " Use 24 bits internal format for texture\n");
   }
 
   // set mipmapping configuration
@@ -568,7 +571,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
   // set default render-states.
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
   m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE);
-	m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
+        m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
   
   hRes = m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_LINEAR);
   if (FAILED(hRes))
@@ -599,12 +602,12 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
   // half for lightmaps
   if (m_iTypeLightmap != 0)
   {
-    CHK (m_pTextureCache = new D3DTextureCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, m_bUse24BitInternalTexture, bMipmapping));
+    CHK (m_pTextureCache = new D3DTextureCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps, m_MaxAspectRatio));
     CHK (m_pLightmapCache = new D3DLightMapCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount));
   }
   else
   {
-    CHK (m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, m_bUse24BitInternalTexture, bMipmapping));
+    CHK (m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps, m_MaxAspectRatio));
     m_pLightmapCache = NULL;
   }
   
@@ -781,10 +784,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::SetZBufMode(ZBufMode mode)
 
 STDMETHODIMP csGraphics3DDirect3DDx5::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
 {
-  if(m_bUse24BitInternalTexture)
-    g3dFormat = G3DCOLORFORMAT_24BIT;
-  else
-    g3dFormat = G3DCOLORFORMAT_PRIVATE;        // Direct3D driver only uses private color maps.
+  g3dFormat = G3DCOLORFORMAT_24BIT;
   return S_OK;
 }
 
@@ -906,8 +906,6 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   HighColorCache_Data* pLightCache = NULL;
   D3DTLVERTEX vx;
   
-  IPolygonTexture* pTex;
-  
   float z;
   
   if (poly.num < 3) 
@@ -922,7 +920,45 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   bTransparent = poly_alpha>0 ? true : false;
 
   // retrieve the texture.
-  pTex = poly.poly_texture[0];
+
+  // Mipmapping.
+  int mipmap;
+  if (poly.uses_mipmaps == false ||  rstate_mipmap == false)
+  {
+    mipmap = 0;
+  }
+  else 
+  {
+    //*************************************************************************
+    // Do some mipmapping
+    //*************************************************************************
+
+    float min_z = M * (poly.vertices[0].sx - m_nHalfWidth)
+		+ N * (poly.vertices[0].sy - m_nHalfHeight) + O;
+
+    // count 'real' number of vertices
+    int num_vertices = 1;
+    for (i = 1 ; i < poly.num ; i++)
+    {
+      float inv_z = M * (poly.vertices[i].sx - m_nHalfWidth)
+		  + N * (poly.vertices[i].sy - m_nHalfHeight) + O;
+
+      if (inv_z > min_z) min_z = inv_z;
+    }
+
+    // Correct 1/z -> z.
+    min_z = 1/min_z;
+
+    if      (min_z < zdist_mipmap1) mipmap = 0;
+    else if (min_z < zdist_mipmap2) mipmap = 1;
+    else if (min_z < zdist_mipmap3) mipmap = 2;
+    else mipmap = 3;
+  }
+
+  mipmap = 0;
+  IPolygonTexture *pTex = poly.poly_texture[mipmap];
+
+  //pTex = poly.poly_texture[0];
   
   if (!pTex)
     return E_INVALIDARG;
@@ -988,9 +1024,9 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
   D3DTextureCache_Data *pD3D_texcache = (D3DTextureCache_Data *)pTexCache->pData;
 
-  m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, pD3D_texcache->htex);
+  VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, pD3D_texcache->htex), DD_OK);
   
-  m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS);
+  VERIFY_RESULT(m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
   
   // render texture-mapped poly
   
@@ -1263,8 +1299,6 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPF
     //alpha == 0, (opaque) because that will make the result invisible. :-(
     m_alpha = 0.01f; 
   }
-
-  //m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS, D3DANTIALIAS_NONE);
 
   VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex), DD_OK );
 
@@ -1868,7 +1902,7 @@ csGraphics3DDirect3DDx5::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r,
       d += 2 * (x - y) + 5;
       y--;
       if (y <= x)
-	break;
+        break;
 
       drawline_outerrim(-x, x, y);
       drawline_outerrim(-x, x, -y);
@@ -1902,7 +1936,7 @@ csGraphics3DDirect3DDx5::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r,
       d += 2 * (x - y) + 5;
       y--;
       if (y <= x)
-	break;
+        break;
 
       drawline_innerrim(-x, x, y);
       drawline_innerrim(-x, x, -y);

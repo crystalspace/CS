@@ -117,9 +117,9 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   /// The current drawing mode (2D/3D)
   int m_nDrawMode;
 
-  /// Use Private Colormap Texture or 24 bit Texture
-  bool m_bUse24BitInternalTexture;
-  
+  /// Option variables: mipmap distances
+  float zdist_mipmap1, zdist_mipmap2, zdist_mipmap3;
+
   /**
    * DAN: render-states
    * these override any other variable settings.
@@ -131,7 +131,7 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   bool rstate_gouraud;
   bool rstate_flat;
   bool rstate_alphablend;
-  int rstate_mipmap;
+  int  rstate_mipmap;
 
   bool        m_gouraud;
   DPFXMixMode m_mixmode;

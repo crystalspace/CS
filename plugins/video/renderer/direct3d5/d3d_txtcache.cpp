@@ -34,7 +34,7 @@
 #include "itexture.h"
 #include "ilghtmap.h"
 #include "IGraph3d.h"
-
+#include "csutil/util.h"
 
 const int    LightmapBrightness = 0;   //can be 0 (darkest) to 254 (everything becomes white)
 const double LightmapGamma      = 1.0; //can be from 0.01   to 1.0 (1.0= no effect)
@@ -45,15 +45,22 @@ const double TextureGamma      = 1.0; //can be from 0.01   to 1.0 (1.0= no effec
 ///////////////////////////////////
 // D3DTextureCache Implementation//
 ///////////////////////////////////
-D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, LPDIRECT3DDEVICE2 pDevice, int nBpp, bool b24bit, bool bMipmapping)
+D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, 
+                                 LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
+				 G3D_CAPS* pRendercaps, int MaxAspectRatio)
 : HighColorCache(nMaxSize, HIGHCOLOR_TEXCACHE, nBpp)
 {
-  m_bHardware=bHardware;
-  m_lpDD = pDDraw;
-  m_lpD3dDevice= pDevice;
-  m_bMipMapping = bMipmapping;
-  m_b24BitTexture = b24bit;
-  
+  ASSERT(MaxAspectRatio>0);
+  ASSERT(pRendercaps);
+  ASSERT(pDevice);
+  ASSERT(pDDraw);
+
+  m_bHardware      = bHardware;
+  m_lpDD           = pDDraw;
+  m_lpD3dDevice    = pDevice;
+  m_bMipMapping    = bMipmapping;
+  m_pRendercaps    = pRendercaps;
+  m_MaxAspectRatio = MaxAspectRatio;
   
   for (int i=0; i<256; i++)
   {
@@ -79,19 +86,10 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   IDirectDrawSurface* lpDDNextLevel;
   
   DDCOLORKEY key = { 0, 0 };
-  RGBpaletteEntry* Palette = NULL;
   CHK (cached_texture = new D3DTextureCache_Data);
   
   ITextureHandle* txt_handle = (ITextureHandle*)d->pSource;
   csTextureMM* txt_mm = GetcsTextureMMFromITextureHandle (txt_handle);
-  
-  //piMMC->GetPrivateColorMap((unsigned char**)&Palette);
-  //Palette = (RGBpaletteEntry *)txt_mm->get_usage_palette();
-  
-  unsigned char *lpC;
-  unsigned short *lpS;
-  unsigned long *lpL;
-  unsigned char *lpSrc, *lpySrc;
   
   int red_shift   = 0, red_scale   = 0;
   int green_shift = 0, green_scale = 0;
@@ -102,7 +100,6 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   d->pData = cached_texture;
   
   DDSURFACEDESC ddsd;
-  int nWidth, nHeight;
   
   // get the texture map
   csTexture* txt_unl = txt_mm->get_texture (0);
@@ -113,49 +110,61 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   ddsd.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
   ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_SYSTEMMEMORY;
   
-  nWidth = txt_unl->get_width ();
-  nHeight = txt_unl->get_height ();
-  
-  ddsd.dwHeight = (unsigned long)nHeight;
-  ddsd.dwWidth = (unsigned long)nWidth;
+  int OriginalWidth  = txt_unl->get_width ();
+  int OriginalHeight = txt_unl->get_height ();
+
+  ASSERT(IsPowerOf2(OriginalWidth));
+  ASSERT(IsPowerOf2(OriginalHeight));
+
+  //Some Direct3D cards do not accept all texture formats. For example, 
+  //the 3DFX Voodoo cards will not accept textures that are larger than
+  //256 pixels. Or the Riva128 card will only accept square textures.
+  //To help these cards we will now scale the texture to a format that
+  //is accepted by these cards. (Of course that is a slight performace
+  //hit, but this happens only when loading a level, so it is still
+  //ok.)
+  int NewWidth  = OriginalWidth;
+  int NewHeight = OriginalHeight;
+
+  while (NewWidth/NewHeight > m_MaxAspectRatio) NewHeight += NewHeight;
+  while (NewHeight/NewWidth > m_MaxAspectRatio) NewWidth  += NewWidth;
+
+  if (NewWidth< m_pRendercaps->minTexWidth)  NewWidth  = m_pRendercaps->minTexWidth;
+  if (NewHeight<m_pRendercaps->minTexHeight) NewHeight = m_pRendercaps->minTexHeight;
+  if (NewWidth> m_pRendercaps->maxTexWidth)  NewWidth  = m_pRendercaps->maxTexWidth;
+  if (NewHeight>m_pRendercaps->maxTexHeight) NewHeight = m_pRendercaps->maxTexHeight;
+
+  ddsd.dwHeight = (unsigned long)NewHeight;
+  ddsd.dwWidth  = (unsigned long)NewWidth;
   
   if(m_bMipMapping)
   {
-    ddsd.dwFlags |= DDSD_MIPMAPCOUNT;
     ddsd.dwMipMapCount = 4; 
+    ddsd.dwFlags        |= DDSD_MIPMAPCOUNT;
     ddsd.ddsCaps.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
   }
   
   VERIFY_SUCCESS( m_lpDD->CreateSurface(&ddsd, &cached_texture->lpsurf, NULL) );
   
-  if(bpp==8)
-  {
-    ASSERT(Palette);
-    // attach the palette to the texture.
-    VERIFY_SUCCESS( m_lpDD->CreatePalette(DDPCAPS_INITIALIZE | DDPCAPS_8BIT | DDPCAPS_ALLOW256, (PALETTEENTRY*)Palette, &cached_texture->lpddpal, NULL) );
-    VERIFY_SUCCESS( cached_texture->lpsurf->SetPalette(cached_texture->lpddpal) );
-  } 
-  else
-  {
-    cached_texture->lpddpal=NULL;
-    unsigned long m;
-    int s;
-    
-    // figure out the scale/shift of the rgb components for the surface
-    for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask; !(m & 1); s++, m >>= 1);
-    red_shift = s;
-    red_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask >> s);
-    
-    for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask; !(m & 1); s++, m >>= 1);
-    green_shift = s;
-    green_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask >> s);
-    
-    for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask; !(m & 1); s++, m >>= 1);
-    blue_shift = s;
-    blue_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask >> s);
-  }
+  cached_texture->lpddpal=NULL;
+  unsigned long m;
+  int s;
+  
+  // figure out the scale/shift of the rgb components for the surface
+  for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask; !(m & 1); s++, m >>= 1);
+  red_shift = s;
+  red_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask >> s);
+  
+  for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask; !(m & 1); s++, m >>= 1);
+  green_shift = s;
+  green_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask >> s);
+  
+  for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask; !(m & 1); s++, m >>= 1);
+  blue_shift = s;
+  blue_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask >> s);
   
   lpDDLevel = cached_texture->lpsurf; 
+
   ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_MIPMAP;
   
   // grab a reference to this level (we call Release later)
@@ -167,160 +176,158 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
   // go through each mip map level and fill it in.
   for (int z = 0; z < cLevels; z++)
   {
-    int width, height;
-    
-    txt_unl = txt_mm->get_texture (z);
-    width = txt_unl->get_width ();
-    height = txt_unl->get_height ();
-    lpSrc = txt_unl->get_bitmap8 ();
-    
-    
+    txt_unl              = txt_mm->get_texture (z);
+    int OriginalWidth    = txt_unl->get_width ();
+    int OriginalHeight   = txt_unl->get_height ();
+    unsigned long* lpSrc = txt_unl->get_bitmap32();
+
+    //When using Mipmaps, every Mipmap level has half the size of 
+    //the previous level. So we now derive all actual sizes from
+    //NewWidth/ NewHeight
+    int CurrentWidth  = NewWidth  / (1<<z);
+    int CurrentHeight = NewHeight / (1<<z);
+
     // lock the texture surface for writing
     memset(&ddsd, 0, sizeof(DDSURFACEDESC));
     ddsd.dwSize = sizeof(ddsd);
     lpDDLevel->Lock(NULL, &ddsd, 0, NULL);
     
-    int i, j;
-    
     // fill in the surface, depending on the bpp and texture format
     switch(bpp)
     {
-    case 32:
-      if(m_b24BitTexture)
+      case 32:
       {
-        unsigned long *llpSrc = (unsigned long *)lpSrc;
-        for (j = 0; j < height; j++)
-        {
-          lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-          unsigned long * llpySrc = llpSrc + (j * width);
-          
-          for(i=0; i< width; i++)
-          {
-            int r,g,b;
-            
-            r = m_GammaCorrect[R24(*llpySrc)];
-            g = m_GammaCorrect[G24(*llpySrc)];
-            b = m_GammaCorrect[B24(*llpySrc)];
-
-            *lpL =  ((r / red_scale) << red_shift) |
-              ((g / green_scale) << green_shift) |
-              ((b / blue_scale) << blue_shift);
-            
-            lpL++;
-            llpySrc++;
-          }
-        }
-      }
-      else
-      {
-        for (j = 0; j < height; j++)
-        {
-          lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-          lpySrc = lpSrc + (j * width);
-          
-          for(i=0; i< width; i++)
-          {
-            int r,g,b;
-            
-            r = Palette[*lpySrc].red;
-            g = Palette[*lpySrc].green;
-            b = Palette[*lpySrc].blue;
-            
-            *lpL =  ((r / red_scale) << red_shift) |
-              ((g / green_scale) << green_shift) |
-              ((b / blue_scale) << blue_shift);
-            
-            lpySrc++;
-            lpL++;
-          }
-        }
-      }
-      break;
-      
-    case 16:
-      if(m_b24BitTexture)
-      {
-        unsigned long *llpSrc = (unsigned long *)lpSrc;
-        for (j = 0; j < height; j++)
-        {
-          lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-          unsigned long * llpySrc = llpSrc + (j * width);
-          
-          for(i=0; i< width; i++)
-          {
-            int r,g,b;
-            
-            r = m_GammaCorrect[R24(*llpySrc)];
-            g = m_GammaCorrect[G24(*llpySrc)];
-            b = m_GammaCorrect[B24(*llpySrc)];
-            
-            *lpS =  ((r / red_scale) << red_shift) |
-              ((g / green_scale) << green_shift) |
-              ((b / blue_scale) << blue_shift);
-            
-            llpySrc++;
-            lpS++;
-          }
-        }
-      }
-      else
-      {
-        for (j = 0; j < height; j++)
-        {
-          lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-          lpySrc = lpSrc + (j * width);
-          
-          for(i=0; i< width; i++)
-          {
-            int r,g,b;
-            
-            r = Palette[*lpySrc].red;
-            g = Palette[*lpySrc].green;
-            b = Palette[*lpySrc].blue;
-            
-            *lpS =  ((r / red_scale) << red_shift) |
-              ((g / green_scale) << green_shift) |
-              ((b / blue_scale) << blue_shift);
-            
-            lpySrc++;
-            lpS++;
-          }
-        }
-      }
-      break;
-      
-    case 8:
-      for (j = 0; j < height; j++)
-      {
-        lpC = (unsigned char *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
-        lpySrc = lpSrc + (j * width);
+        if ((CurrentWidth == OriginalWidth) && (CurrentHeight == OriginalHeight))
+	{
+	  //No zooming needed, so we can use a rather fast method to add to the cache
+	  for (int j = 0; j < CurrentHeight; j++)
+	  {
+	    unsigned long* lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+	    unsigned long* llpySrc = lpSrc + (j * CurrentWidth);
         
-        for(i=0; i< width; i++)
-        {
-          *lpC = *lpySrc;
+	    for (int i=0; i < CurrentWidth; i++)
+	    {
+	      int r = m_GammaCorrect[R24(*llpySrc)];
+	      int g = m_GammaCorrect[G24(*llpySrc)];
+	      int b = m_GammaCorrect[B24(*llpySrc)];
+
+	      *lpL =  ((r / red_scale)   << red_shift)   |
+		      ((g / green_scale) << green_shift) |
+		      ((b / blue_scale)  << blue_shift);
           
-          lpySrc++;
-          lpC++;
-        }
+	      lpL++;
+	      llpySrc++;
+	    }
+	  }
+	}
+	else
+	{
+	  //Original size and Current size do differ, that makes things a bit
+	  //more difficult
+	  for (int j = 0; j < CurrentHeight; j++)
+	  {
+	    unsigned long* lpL = (unsigned long *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+	    
+	    //select the proper row.
+	    unsigned long* llpySrc = lpSrc + ((j*OriginalHeight/CurrentHeight) * OriginalWidth);
+        
+	    for (int i=0; i < CurrentWidth; i++)
+	    {
+	      //select the proper texel. (we could do this much nicer by using filtering, but
+	      //this would even cause a greater slowdown, and would be more work to code)
+	      unsigned long * llpxSrc = llpySrc + (i*OriginalWidth/CurrentWidth);
+
+	      int r = m_GammaCorrect[R24(*llpxSrc)];
+	      int g = m_GammaCorrect[G24(*llpxSrc)];
+	      int b = m_GammaCorrect[B24(*llpxSrc)];
+
+	      *lpL =  ((r / red_scale)   << red_shift)   |
+		      ((g / green_scale) << green_shift) |
+		      ((b / blue_scale)  << blue_shift);
+          
+	      lpL++;
+	    }
+	  }
+	}
+        break;
+      }  
+      case 16:
+      {
+        if ((CurrentWidth == OriginalWidth) && (CurrentHeight == OriginalHeight))
+	{
+	  //No zooming needed, so we can use a rather fast method to add to the cache
+	  for (int j = 0; j < CurrentHeight; j++)
+	  {
+	    unsigned short* lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+	    unsigned long*  llpySrc = lpSrc + (j * CurrentWidth);
+        
+	    for(int i=0; i< CurrentWidth; i++)
+	    {
+	      int r = m_GammaCorrect[R24(*llpySrc)];
+	      int g = m_GammaCorrect[G24(*llpySrc)];
+	      int b = m_GammaCorrect[B24(*llpySrc)];
+          
+	      *lpS =  ((r / red_scale)   << red_shift)   |
+		      ((g / green_scale) << green_shift) |
+		      ((b / blue_scale)  << blue_shift);
+          
+	      llpySrc++;
+	      lpS++;
+	    }
+	  }
+	}
+	else
+	{
+	  //Original size and Current size do differ, that makes things a bit
+	  //more difficult
+	  for (int j = 0; j < CurrentHeight; j++)
+	  {
+	    unsigned short* lpS = (unsigned short *)(((char *)ddsd.lpSurface) + ddsd.lPitch * j);
+	    
+	    //select the proper row.
+	    unsigned long * llpySrc = lpSrc + ((j*OriginalHeight/CurrentHeight) * OriginalWidth);
+        
+	    for (int i=0; i < CurrentWidth; i++)
+	    {
+	      //select the proper texel. (we could do this much nicer by using filtering, but
+	      //this would even cause a greater slowdown, and would be more work to code)
+	      unsigned long * llpxSrc = llpySrc + (i*OriginalWidth/CurrentWidth);
+
+	      int r = m_GammaCorrect[R24(*llpxSrc)];
+	      int g = m_GammaCorrect[G24(*llpxSrc)];
+	      int b = m_GammaCorrect[B24(*llpxSrc)];
+
+	      *lpS =  ((r / red_scale)   << red_shift)   |
+		      ((g / green_scale) << green_shift) |
+		      ((b / blue_scale)  << blue_shift);
+          
+	      lpS++;
+	    }
+	  }
+	}
+        break;
       }
-      break;
-      
-    default:
-      ASSERT( FALSE );
-      break;
+      default:
+      {
+        ASSERT( FALSE );
+        break;
       }
+    } //switch(bpp)
       
-      lpDDLevel->Unlock(NULL);
-      
-      lpDDLevel->SetColorKey(DDCKEY_SRCBLT, &key);
-      
-      lpDDLevel->GetAttachedSurface(&ddsCaps, &lpDDNextLevel);
-      
-      // Release our reference to this level.
-      lpDDLevel->Release();
-      
-      lpDDLevel = lpDDNextLevel; 
+    lpDDLevel->Unlock(NULL);
+    
+    lpDDLevel->SetColorKey(DDCKEY_SRCBLT, &key);
+    
+    lpDDLevel->GetAttachedSurface(&ddsCaps, &lpDDNextLevel);
+    
+    // Release our reference to this level.
+    lpDDLevel->Release();
+    
+    lpDDLevel = lpDDNextLevel; 
   }
+   
+  //assume, that all Mipmap levels have been set.
+  ASSERT(lpDDLevel==NULL); 
   
   // get the texture interfaces and handles
   cached_texture->lpsurf->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&cached_texture->lptex);
@@ -346,19 +353,16 @@ void D3DTextureCache::LoadIntoVRAM(D3DTextureCache_Data *tex)
   ddsd.dwSize = sizeof(ddsd);
   tex->lpsurf->GetSurfaceDesc(&ddsd);
   ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+
   ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_ALLOCONLOAD;
   if(m_bMipMapping)
-    ddsd.ddsCaps.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
-  
-  VERIFY_SUCCESS( m_lpDD->CreateSurface(&ddsd, &lpddts, NULL) );
-  
-  if(bpp==8) 
   {
-    lpddts->SetPalette(tex->lpddpal);
-    
-    tex->lpddpal->Release();
-    tex->lpddpal=NULL;
+    ddsd.dwMipMapCount = 4; 
+    ddsd.dwFlags        |= DDSD_MIPMAPCOUNT;
+    ddsd.ddsCaps.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
   }
+
+  VERIFY_SUCCESS( m_lpDD->CreateSurface(&ddsd, &lpddts, NULL) );
   
   VERIFY_SUCCESS( lpddts->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&ddtex) );     
   VERIFY_SUCCESS( ddtex->Load(tex->lptex) );
@@ -462,22 +466,19 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
   int green_shift = 0, green_scale = 0;
   int blue_shift  = 0, blue_scale  = 0;
   
-  if (bpp!=8)
-  {
-    // figure out the scale/shift of the rgb components for the surface
-    // (i took this from a d3d example by MS)
-    for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRBitMask; !(m & 1); s++, m >>= 1);
-    red_shift = s;
-    red_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRBitMask >> s);
-    
-    for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwGBitMask; !(m & 1); s++, m >>= 1);
-    green_shift = s;
-    green_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwGBitMask >> s);
-    
-    for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwBBitMask; !(m & 1); s++, m >>= 1);
-    blue_shift = s;
-    blue_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwBBitMask >> s);
-  }
+  // figure out the scale/shift of the rgb components for the surface
+  // (i took this from a d3d example by MS)
+  for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRBitMask; !(m & 1); s++, m >>= 1);
+  red_shift = s;
+  red_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRBitMask >> s);
+  
+  for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwGBitMask; !(m & 1); s++, m >>= 1);
+  green_shift = s;
+  green_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwGBitMask >> s);
+  
+  for(s=0, m = csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwBBitMask; !(m & 1); s++, m >>= 1);
+  blue_shift = s;
+  blue_scale = 255 / (csGraphics3DDirect3DDx5::m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwBBitMask >> s);
   
   // lock the lightmap surface
   memset(&ddsd, 0, sizeof(DDSURFACEDESC));
@@ -590,7 +591,7 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
   }
   
   FINAL_RELEASE( piLM );
-}	
+}       
 
 void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
 {
@@ -606,26 +607,6 @@ void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
   ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_ALLOCONLOAD;
   
   VERIFY_SUCCESS( m_lpDD->CreateSurface(&ddsd, &lpddts, NULL) );
-  
-  if(bpp==8) 
-  {
-    PALETTEENTRY pe[256];
-    LPDIRECTDRAWPALETTE lpddpal;
-    
-    for(int i=0; i<256; i++)
-    {
-      pe[i].peRed = i;
-      pe[i].peBlue = i;
-      pe[i].peGreen = i;
-      pe[i].peFlags = PC_NOCOLLAPSE;
-    }
-    
-    // attach the palette to the texture.
-    VERIFY_SUCCESS( m_lpDD->CreatePalette(DDPCAPS_INITIALIZE | DDPCAPS_8BIT | DDPCAPS_ALLOW256, pe, &lpddpal, NULL) );
-    
-    lpddts->SetPalette(lpddpal);
-    lpddpal->Release();
-  }
   
   lpddts->QueryInterface(IID_IDirect3DTexture2, (LPVOID *)&ddtex);     
   

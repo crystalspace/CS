@@ -24,6 +24,7 @@
 #include "d3d.h"
 #include "d3dcaps.h"
 
+#include "IGraph3d.h"
 
 #include "cs3d/direct3d5/d3d_g3d.h"
 #include "cs3d/direct3d5/d3d_hicache.h"
@@ -55,14 +56,19 @@ private:
   ///
   bool m_bHardware;
   bool m_bMipMapping;
-  bool m_b24BitTexture;
   ///
   LPDIRECTDRAW m_lpDD;
   ///
   LPDIRECT3DDEVICE2 m_lpD3dDevice;
+
+  G3D_CAPS* m_pRendercaps;
+  int       m_MaxAspectRatio;
+
 public:
   ///
-  D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, LPDIRECT3DDEVICE2 pDevice, int nBpp, bool b24bit, bool bMipmapping = true);
+  D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDraw, 
+                  LPDIRECT3DDEVICE2 pDevice, int nBpp, bool bMipmapping,
+		  G3D_CAPS* pRendercaps, int MaxAspectRatio);
   ///
   virtual void Dump();
   
