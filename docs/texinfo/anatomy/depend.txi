@@ -17,7 +17,7 @@ than actually linking with a library.
 @item Level 1@*
 Utility---independant of CS.
 
-@itemize @w
+@itemize @minus
 @item
 @file{libjpeg}
 @item
@@ -35,7 +35,7 @@ Utility---independant of CS.
 @item Level 2@*
 Basics---common base of various CS parts.
 
-@itemize @w
+@itemize @minus
 @item
 @file{csgfxldr}
 @item
@@ -47,7 +47,7 @@ Basics---common base of various CS parts.
 @item Level 3@*
 SCF---various interchangeable plug-in modules of CS.
 
-@itemize @w
+@itemize @minus
 @item
 @file{cs2d}
 @item
@@ -63,7 +63,7 @@ SCF---various interchangeable plug-in modules of CS.
 @item Level 4@*
 Engine---binds togehter all the engines components.
 
-@itemize @w
+@itemize @minus
 @item
 @file{csengine}
 @item
@@ -77,7 +77,7 @@ Engine---binds togehter all the engines components.
 @item Level 5@*
 Support---adds a common layer of engine abstraction.
 
-@itemize @w
+@itemize @minus
 @item
 @file{csws}
 @item
@@ -87,7 +87,7 @@ Support---adds a common layer of engine abstraction.
 @item Level 6@*
 Application.
 
-@itemize @w
+@itemize @minus
 @item
 @file{walktest}
 @item
