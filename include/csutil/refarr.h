@@ -20,6 +20,12 @@
 #ifndef __CS_REFARR_H__
 #define __CS_REFARR_H__
 
+//-----------------------------------------------------------------------------
+// Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
+// 3.4.x) which distinguish between dependent and non-dependent names in
+// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+//-----------------------------------------------------------------------------
+
 #include "ref.h"
 #include "array.h"
 
@@ -89,9 +95,9 @@ public:
   /// Pop an element from tail end of array.
   csPtr<T> Pop ()
   {
-    CS_ASSERT (Length () > 0);
-    csRef<T> ret = Get (Length () - 1);
-    SetLength (Length () - 1);
+    CS_ASSERT (this->Length () > 0);
+    csRef<T> ret = this->Get (this->Length () - 1); // see *1*
+    SetLength (this->Length () - 1);
     return csPtr<T> (ret);
   }
 
@@ -101,4 +107,3 @@ public:
 #undef CSREFARR_TRACK_DECREF
 
 #endif // __CS_REFARR_H__
-

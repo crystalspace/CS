@@ -20,6 +20,12 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
+//-----------------------------------------------------------------------------
+// Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
+// 3.4.x) which distinguish between dependent and non-dependent names in
+// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+//-----------------------------------------------------------------------------
+
 #include "array.h"
 
 /**\file 
@@ -59,15 +65,15 @@ public:
   // Reference counting. Delete array when reference reaches 0.
   void DecRef ()
   {
-    if (RefCount == 1) { DeleteAll (); }
+    if (RefCount == 1) { this->DeleteAll (); } // see *1*
     RefCount--;
   }
 
   /// Get the pointer to the start of the array.
   T* GetArray ()
   {
-    if (Length () > 0)
-      return &Get (0);
+    if (this->Length () > 0) // see *1*
+      return &this->Get (0)
     else
       return 0;
   }
@@ -75,8 +81,8 @@ public:
   /// Get the pointer to the start of the array.
   const T* GetArray () const
   {
-    if (Length () > 0)
-      return &Get (0);
+    if (this->Length () > 0) // see *1*
+      return &this->Get (0);
     else
       return 0;
   }
@@ -88,10 +94,10 @@ public:
    */
   T* GetArrayCopy ()
   {
-    if (Length () > 0)
+    if (this->Length () > 0) // see *1*
     {
-      T* copy = new T [Length ()];
-      memcpy (copy, &Get (0), sizeof (T) * Length ());
+      T* copy = new T [this->Length ()];
+      memcpy (copy, &this->Get (0), sizeof (T) * this->Length ());
       return copy;
     }
     else
@@ -100,4 +106,3 @@ public:
 };
 
 #endif // __CS_GARRAY_H__
-

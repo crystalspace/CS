@@ -20,6 +20,12 @@
 #ifndef __CS_NOBJVEC_H__
 #define __CS_NOBJVEC_H__
 
+//-----------------------------------------------------------------------------
+// Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
+// 3.4.x) which distinguish between dependent and non-dependent names in
+// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+//-----------------------------------------------------------------------------
+
 #include "csextern.h"
 #include "refarr.h"
 #include "iutil/object.h"
@@ -46,7 +52,7 @@ public:
   int GetIndexByName (const char* name) const
   {
     int i;
-    for (i = 0 ; i < Length () ; i++)
+    for (i = 0 ; i < this->Length () ; i++) // see *1*
     {
       T* o = (*this)[i];
       const char* n = o->QueryObject ()->GetName ();

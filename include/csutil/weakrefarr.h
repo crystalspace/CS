@@ -20,6 +20,12 @@
 #ifndef __CS_WEAKREFARR_H__
 #define __CS_WEAKREFARR_H__
 
+//-----------------------------------------------------------------------------
+// Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
+// 3.4.x) which distinguish between dependent and non-dependent names in
+// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+//-----------------------------------------------------------------------------
+
 #include "csextern.h"
 #include "weakref.h"
 #include "array.h"
@@ -46,15 +52,14 @@ public:
    */
   void Compact ()
   {
-    int i = Length ()-1;
+    int i = this->Length ()-1; // see *1*
     while (i >= 0)
     {
-      if (Get (i) == 0)
-        DeleteIndex (i);
+      if (this->Get (i) == 0)  // see *1*
+	this->DeleteIndex (i);
       i--;
     }
   }
 };
 
 #endif // __CS_WEAKREFARR_H__
-

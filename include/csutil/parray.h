@@ -20,6 +20,12 @@
 #ifndef __CS_PTRARR_H__
 #define __CS_PTRARR_H__
 
+//-----------------------------------------------------------------------------
+// Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
+// 3.4.x) which distinguish between dependent and non-dependent names in
+// templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+//-----------------------------------------------------------------------------
+
 #include "csextern.h"
 #include "array.h"
 
@@ -74,8 +80,8 @@ public:
    */
   T* GetAndClear (int n)
   {
-    T* ret = Get (n);
-    InitRegion (n, 1);
+    T* ret = this->Get (n); // see *1*
+    this->InitRegion (n, 1);
     return ret;
   }
 
@@ -87,16 +93,16 @@ public:
   T* Extract (int n)
   {
     T* ret = GetAndClear (n);
-    DeleteIndex (n);
+    this->DeleteIndex (n); // see *1*
     return ret;
   }
 
   /// Pop an element from tail end of array.
   T* Pop ()
   {
-    CS_ASSERT (Length () > 0);
-    T* ret = GetAndClear (Length () - 1);
-    Truncate (Length () - 1);
+    CS_ASSERT (this->Length () > 0);
+    T* ret = GetAndClear (this->Length () - 1); // see *1*
+    Truncate (this->Length () - 1);
     return ret;
   }
 
@@ -104,15 +110,15 @@ public:
   /// the actual pointer.
   void SetLength (int n, T const &what)
   {
-    if (n <= Length ())
+    if (n <= this->Length ()) // see *1*
     {
-      Truncate (n);
+      this->Truncate (n);
     }
     else
     {
-      int old_len = Length ();
+      int old_len = this->Length (); // see *1*
       superclass::SetLength (n);
-      for (int i = old_len ; i < n ; i++) Get(i) = new T (what);
+      for (int i = old_len ; i < n ; i++) this->Get(i) = new T (what);
     }
   }
 
@@ -130,3 +136,4 @@ public:
 };
 
 #endif // __CS_PTRARR_H__
+
