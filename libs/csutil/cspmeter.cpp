@@ -45,7 +45,8 @@ void csTextProgressMeter::Step()
       char buff [256]; // Batch the update here before emitting it.
       char const* safety_margin = buff + sizeof(buff) - 5;
       char* p = buff;
-      for (int i = anchor + 1; i <= extent && p < safety_margin; i++)
+	  int i;
+      for (i = anchor + 1; i <= extent && p < safety_margin; i++)
       {
         if (i % (10 / tick_scale) != 0)
 	  *p++ = '.';

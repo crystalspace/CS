@@ -254,7 +254,8 @@ iObject* csObject::GetChild (const char *Name) const
   if (!Children || !Name)
     return NULL;
   
-  for (int i = 0; i < Children->Length (); i++)
+  int i;
+  for (i = 0; i < Children->Length (); i++)
   {
     if (!strcmp (Children->Get (i)->GetName (), Name))
       return Children->Get (i);

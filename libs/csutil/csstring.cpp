@@ -179,7 +179,8 @@ csString &csString::Append (const char *iStr, size_t iCount)
 
 csString &csString::LTrim()
 {
-  for (size_t i = 0; i < Size; i++)
+  size_t i;
+  for (i = 0; i < Size; i++)
   {
     if (!isspace (Data[i]))
       return DeleteAt (0, i);
@@ -191,7 +192,8 @@ csString &csString::RTrim()
 {
   if (Size == 0) return *this;
 
-  for(int i = Size - 1; i >= 0; i--)
+  int i;
+  for(i = Size - 1; i >= 0; i--)
   {
     if (!isspace (Data[i]))
     {
@@ -213,14 +215,15 @@ csString &csString::Collapse()
 
   size_t start = (size_t) -1;
   Trim();
-  for (size_t i = 1; i < Size - 1; i++)
+  size_t i;
+  for (i = 1; i < Size - 1; i++)
   {
     if (isspace (Data[i]))
     {
       if (start==(size_t) -1)
       {
-	start = i + 1;
-	Data[i] = ' '; // Force 'space' as opposed to anything isspace()able.
+		start = i + 1;
+		Data[i] = ' '; // Force 'space' as opposed to anything isspace()able.
       }
     }
     else
@@ -228,8 +231,8 @@ csString &csString::Collapse()
       // Delete any extra whitespace
       if (start != (size_t)-1 && start != i)
       {
-	DeleteAt (start, i - start);
-	i -= i - start;
+		DeleteAt (start, i - start);
+		i -= i - start;
       }
       start = (size_t) -1;
     }
