@@ -89,30 +89,6 @@ void CalQuatInverse(CalQuaternion &qdest, const CalQuaternion &qin) {
   qdest[3]=inverselen*qin[3];
 }
 
-//TODO Azverkan this is for trying to export the model in its "standard pose"
-#if 0
-void SkeletonCalToCrystal(CalQuaternion &qdest, const CalQuaternion &qnew, const CalQuaternion &qold, CalVector &vdest, const CalVector &vnew, const CalVector &vold) {
-  CalQuaternion temp;
-  CalQuatInverse(qdest, qold);
-  qdest.product(qnew);
-
-  vdest[0]=vnew[0];
-  vdest[1]=vnew[1];
-  vdest[2]=vnew[2];
-  vdest.transform(qdest);
-
-  CalVector t;
-  t[0]=vold[0];
-  t[1]=vold[1];
-  t[2]=vold[2];
-  t.transform(qold);
-
-  vdest[0]=vold[0]-vdest[0];
-  vdest[1]=vold[1]-vdest[1];
-  vdest[2]=vold[2]-vdest[2];
-}
-#endif
-
 int ExportSprite(const char* filename, float scale, float timescale, CalCoreModel &calCoreModel, CalModel & calModel) {
   char name[255];
   StripExt(name, filename);
@@ -120,6 +96,10 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
   FILE *f=fopen(filename, "w");
   int ind=0;
   ifprintf(f, ind++, "LIBRARY 'soldier' (\n");
+
+  ifprintf(f, ind++, "PLUGINS (\n");
+  ifprintf(f, ind, "   PLUGIN 'sprite_3d_factory' ('crystalspace.mesh.loader.factory.sprite.3d')\n");
+  ifprintf(f, --ind, ")\n");
 
 //Write Texture Information
   ifprintf(f, ind++, "TEXTURES (\n");
@@ -148,11 +128,19 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
   ifprintf(f, --ind, ")\n");
 
   CalCoreMesh *mesh=calCoreModel.getCoreMesh(0);
+  if(!mesh) {
+    printf("Core Mesh not found!\n");
+    return 1;
+  }
   CalCoreSubmesh *submesh=mesh->getCoreSubmesh(0);
+  if(!submesh) {
+    printf("Core Submesh not found!\n");
+    return 1;
+  }
 
 //Write Mesh Information
   ifprintf(f, ind++, "MESHFACT '%s' (\n", name);
-  ifprintf(f, ind, "PLUGIN ('spr3dFact')\n");
+  ifprintf(f, ind, "PLUGIN ('sprite_3d_factory')\n");
   ifprintf(f, ind++, "PARAMS (\n");
 
   char texname[255];
@@ -194,7 +182,7 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
     CalCoreBone *coreBone=calCoreModel.getCoreSkeleton()->getVectorCoreBone()[useinf->boneId];
     int *ptr=(int*)coreBone->getUserData();
     if(!ptr) {
-      ptr=(int*)malloc(submesh->getVertexCount()*sizeof(int)); //SEMI-HARDCODED
+      ptr=(int*)malloc((submesh->getVertexCount()+1)*sizeof(int)); //SEMI-HARDCODED
       coreBone->setUserData(ptr);
       ptr[0]=0; //Store size in ptr[0]
     }
@@ -253,6 +241,8 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
         CalCoreKeyframe* keyframe=iteratorCoreKeyframe->second;
         CalQuaternion q;
 	CalVector v;
+	float time=keyframe->getTime()*timescale;
+
 #if 0 //TODO Azverkan this is for trying to export the model in its "standard pose"
 //	SkeletonCalToCrystal(q, keyframe->getRotation(), bone->getRotation(), v, keyframe->getTranslation(), bone->getTranslation());
 
@@ -266,11 +256,11 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
 	q=keyframe->getRotation();
 	v=keyframe->getTranslation();
 #endif
-	v[0]*=scale;
-	v[1]*=scale;
-	v[2]*=scale;
+	v.x*=scale;
+	v.y*=scale;
+	v.z*=scale;
 
-        ifprintf(f, ind, "FRAME '%f' (ROT(Q(%f,%f,%f,%f)) POS(%f,%f,%f))\n",keyframe->getTime()*timescale,q.x,q.y,q.z,q.w,v.x,v.y,v.z);
+        ifprintf(f, ind, "FRAME '%f' (ROT(Q(%f,%f,%f,%f)) POS(%f,%f,%f))\n",time,q.x,q.y,q.z,q.w,v.x,v.y,v.z);
       }
 
       ifprintf(f, --ind, ")\n");
@@ -333,24 +323,28 @@ int ConvertModel(const char *filename) {
     } else if(strcmp(cmd, "skeleton")==0) {
       if(!calCoreModel.loadCoreSkeleton(param)) {
         CalError::printLastError();
+	calCoreModel.destroy();
         return 1;
       }
       printf("Load skeleton %s\n", param);
     } else if(strcmp(cmd, "animation")==0) {
       if(calCoreModel.loadCoreAnimation(param)==-1) {
         CalError::printLastError();
+	calCoreModel.destroy();
         return 1;
       }
       printf("Load animation %s\n", param);
     } else if(strcmp(cmd, "mesh")==0) {
-      if(!calCoreModel.loadCoreMesh(param)==-1) {
+      if(calCoreModel.loadCoreMesh(param)==-1) {
         CalError::printLastError();
+	calCoreModel.destroy();
         return 1;
       }
       printf("Load mesh %s\n", param);
     } else if(strcmp(cmd, "material")==0) {
-      if(!calCoreModel.loadCoreMaterial(param)==-1) {
+      if(calCoreModel.loadCoreMaterial(param)==-1) {
         CalError::printLastError();
+	calCoreModel.destroy();
         return 1;
       }
       printf("Load material %s\n", param);
@@ -359,10 +353,18 @@ int ConvertModel(const char *filename) {
   fclose(f);
   f=NULL;
 
+  //Verify there is data to export
+  if(!calCoreModel.getCoreMeshCount()) {
+    printf("No meshes to export for %s\n", filename);
+    calCoreModel.destroy();
+    return 1;
+  }
+
   printf("Now converting\n");
   CalModel calModel;
   if(!calModel.create(&calCoreModel)) {
     CalError::printLastError();
+    calCoreModel.destroy();
     return 1;
   }
 
@@ -370,11 +372,10 @@ int ConvertModel(const char *filename) {
   ReplaceExt(outname, filename, ".csk");
 
   printf("Now exporting %s\n", outname);
-  ExportSprite(outname, scale, timescale, calCoreModel, calModel);
-
+  int ret=ExportSprite(outname, scale, timescale, calCoreModel, calModel);
   calModel.destroy();
   calCoreModel.destroy();
-  return 0;
+  return ret;
 }
 
 int main(int argc, char *argv[]) {
