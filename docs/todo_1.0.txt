@@ -68,7 +68,8 @@ Bugs to fix:
 	     window (or quit app).  4) Crash. (optimize and debug mode)
 	[S]  mottest crashes dereferencing a null pointer.  To reproduce: 1)
 	     Launch mottest.  2) Press ESC.  3) Crash.
-	     (optimize and debug mode)
+	     (optimize and debug mode)  Also reported in Bugs tracker as
+	     670281.
 	[**] OpenGL renderer crashes dereferencing null pointer if font manager
 	     is not present.  To reproduce: 1) Launch netmtst with OpenGL
 	     renderer: ./netmtst -video=opengl.  2) Crash.
