@@ -55,7 +55,7 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
   int       NumPixels = get_size ();
 
-  bool transp = Parent->GetTransparent () || For2d;
+  bool transp = Parent->GetTransparent ();
   UByte Transp_Red   = 0;
   UByte Transp_Green = 0;
   UByte Transp_Blue  = 0;
@@ -64,7 +64,9 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
     Parent->GetTransparent(Transp_Red, Transp_Green, Transp_Blue);
   }
 
-  switch (iG3D->m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount)
+  switch (For2d ? 
+          iG3D->m_ddsdPrimarySurfDesc.ddpfPixelFormat.dwRGBBitCount :
+          iG3D->m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount)
   {
     case 16:
     {
@@ -106,7 +108,7 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
     }
     case 32:
     {
-      image = new UByte [NumPixels * sizeof (ULong)];
+      image = new UByte [2*NumPixels * sizeof (ULong)];
       ULong *dst = (ULong *)image;
       ULong NearBlack = 1 << bsl;
 
@@ -125,6 +127,7 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
             ULong c = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
                       ((unsigned (pPixels->green) >> gsr) << gsl) |
                       ((unsigned (pPixels->blue ) >> bsr) << bsl);
+
             *dst++ = c ? c : NearBlack;
           }
           pPixels++;
@@ -143,8 +146,6 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
       break;
     }
   }
-
-  //Image->DecRef ();
 }
 
 csTextureDirect3D::~csTextureDirect3D ()
@@ -205,9 +206,6 @@ void csTextureMMDirect3D::ComputeMeanColor ()
 
 void csTextureMMDirect3D::CreateMipmaps ()
 {
-  (void) verynice;
-  (void) blend_mipmap0;
-
   if (!image) return;
 
   // Delete existing mipmaps, if any
