@@ -565,16 +565,16 @@ CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
 
 
 #------------------------------------------------------------------------------
-# Check if Mingw compiler recognizes -fvtable-thunks.  As of gcc 3.x, this
-# option is no longer supported.  Unfortunately, rather than returning an error
-# code (as it does with other unrecognized options), the compiler merely prints
-# a warning message when -fvtable-thunks is used, thus we use -Werror to turn
-# the warning into an error.
+# Check if Mingw and Cygwin compilers recognize -fvtable-thunks.  As of gcc
+# 3.x, this option is no longer supported.  Unfortunately, rather than
+# returning an error code (as it does with other unrecognized options), the
+# compiler merely prints a warning message when -fvtable-thunks is used, thus
+# we use -Werror to turn the warning into an error.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_MINGW_VTABLE_THUNKS],
+AC_DEFUN([CS_CHECK_VTABLE_THUNKS],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_os in
-	mingw*)
+	mingw*|cygwin*)
 	    CS_EMIT_BUILD_FLAGS([if -fvtable-thunks is needed],
 		[cs_cv_prog_cxx_vtable_thunks],
 		[CS_CREATE_TUPLE([-fvtable-thunks -Werror])],
@@ -582,7 +582,7 @@ AC_DEFUN([CS_CHECK_MINGW_VTABLE_THUNKS],
 	    ;;
     esac])
 
-CS_CHECK_MINGW_VTABLE_THUNKS
+CS_CHECK_VTABLE_THUNKS
 
 
 

@@ -5239,17 +5239,17 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check if Mingw compiler recognizes -fvtable-thunks.  As of gcc 3.x, this
-# option is no longer supported.  Unfortunately, rather than returning an error
-# code (as it does with other unrecognized options), the compiler merely prints
-# a warning message when -fvtable-thunks is used, thus we use -Werror to turn
-# the warning into an error.
+# Check if Mingw and Cygwin compilers recognize -fvtable-thunks.  As of gcc
+# 3.x, this option is no longer supported.  Unfortunately, rather than
+# returning an error code (as it does with other unrecognized options), the
+# compiler merely prints a warning message when -fvtable-thunks is used, thus
+# we use -Werror to turn the warning into an error.
 #------------------------------------------------------------------------------
 
 
 
     case $host_os in
-	mingw*)
+	mingw*|cygwin*)
 	    echo "$as_me:$LINENO: checking if -fvtable-thunks is needed" >&5
 echo $ECHO_N "checking if -fvtable-thunks is needed... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_vtable_thunks+set}" = set; then
