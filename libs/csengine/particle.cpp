@@ -230,10 +230,26 @@ void csSpiralParticleSystem::MoveToSector (csSector *sector)
 
 void csSpiralParticleSystem::Update (time_t elapsed_time)
 {
+  int i;
+  // Update the acceleration vectors first.
+  for (i=0 ; i<particles.Length () ; i++)
+  {
+    // Take a 2D vector between 'source' and 'part_speed' as seen from above
+    // and rotate it 90 degrees. This gives angle_vec which will be the
+    // acceleration.
+    csVector2 angle_vec (part_speed[i].z, -part_speed[i].x);
+    float n = angle_vec.Norm ();
+    if (ABS (n) > SMALL_EPSILON)
+      angle_vec /= n;
+    float delta_t = elapsed_time / 1000.0; // in seconds
+    angle_vec *= delta_t * 2.;
+    SetSpeed (i, part_speed[i]+csVector3 (angle_vec.x, 0, angle_vec.y));
+  }
+
   time_before_new_particle -= elapsed_time;
   while (time_before_new_particle < 0)
   {
-    time_before_new_particle += 30;	// @@@ PARAMETER
+    time_before_new_particle += 15;	// @@@ PARAMETER
     int num = GetNumParticles ();
     int part_idx;
     if (num >= max)
@@ -250,9 +266,10 @@ void csSpiralParticleSystem::Update (time_t elapsed_time)
     iParticle* part = GetParticle (part_idx);
     part->SetPosition (source);
     csVector3 dir;
-    dir = GetRandomDirection (csVector3 (.4, .1, .4), csVector3 (-.2, .5, -.2));
+    dir = GetRandomDirection (csVector3 (.01, .01, .01), csVector3 (.1, .3, .1));
+
     SetSpeed (part_idx, dir);
-    SetAccel (part_idx, csVector3 (0, 0, 0));
+    SetAccel (part_idx, csVector3 (0));
   }
   csNewtonianParticleSystem::Update (elapsed_time);
 }

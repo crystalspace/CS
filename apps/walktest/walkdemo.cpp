@@ -116,7 +116,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* txtn
     return;
   }
 
-  CHK (csSpiralParticleSystem* exp = new csSpiralParticleSystem (100,
+  CHK (csSpiralParticleSystem* exp = new csSpiralParticleSystem (500,
   	bottom, txt));
   exp->MoveToSector (sector);
   //exp->SetSelfDestruct (3000);
