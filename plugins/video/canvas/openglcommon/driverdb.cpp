@@ -100,6 +100,7 @@ bool csDriverDBReader::Apply (iDocumentNode* node)
 	  else
 	  {
 	    cfgmgr->AddDomain (cfg, usedCfgPrio);
+	    db->addedConfigs.Push (cfg);
 	  }
 	}
 	break;
@@ -401,6 +402,11 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
     {
       case csGLDriverDatabase::XMLTOKEN_RULE:
 	{
+	  const char* rulePhase = child->GetAttributeValue ("phase");
+	  if (rulePhase == 0) rulePhase = "";
+	  if (strcmp (db->rulePhase, rulePhase) != 0)
+	    continue;
+
 	  csRef<iDocumentNode> conditions = child->GetNode ("conditions");
 	  csRef<iDocumentNode> applicable = child->GetNode ("applicable");
 	  csRef<iDocumentNode> notapplicable = child->GetNode ("notapplicable");
@@ -467,9 +473,10 @@ csGLDriverDatabase::~csGLDriverDatabase ()
 {
 }
 
-void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d)
+void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d, const char* phase)
 {
   csGLDriverDatabase::ogl2d = ogl2d;
+  rulePhase = phase ? phase : "";
 
   csRef<iConfigManager> cfgmgr = CS_QUERY_REGISTRY (ogl2d->object_reg,
     iConfigManager);
@@ -541,4 +548,11 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d)
 
 void csGLDriverDatabase::Close ()
 {
+  csRef<iConfigManager> cfgmgr = CS_QUERY_REGISTRY (ogl2d->object_reg,
+    iConfigManager);
+  for (size_t i = 0; i < addedConfigs.Length(); i++)
+  {
+    cfgmgr->RemoveDomain (addedConfigs[i]);
+  }
+  addedConfigs.DeleteAll();
 }

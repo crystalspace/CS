@@ -20,12 +20,15 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 #define __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 
+struct iConfigDocument;
 class csGraphics2DGLCommon;
 
 class csGLDriverDatabase
 {
 public:
   csGraphics2DGLCommon* ogl2d;
+  csRefArray<iConfigFile> addedConfigs;
+  const char* rulePhase;
 
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/video/canvas/openglcommon/driverdb.tok"
@@ -36,7 +39,7 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  void Open (csGraphics2DGLCommon* ogl2d);
+  void Open (csGraphics2DGLCommon* ogl2d, const char* phase = 0);
   void Close ();
 };
 

@@ -110,6 +110,15 @@
 	</ShaderManager>
       </Video>
     </config>
+    <config name="pixelformatbroken">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <WGL_ARB_pixel_format>no</WGL_ARB_pixel_format>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -178,7 +187,7 @@
     <rule description="GeForce FX 5xxxXT: Slow VBO">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5...XT" />
-	<!-- @@@ Add some version check -->
+	<!-- @@@ Add some version check ? -->
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
@@ -187,10 +196,24 @@
     <rule description="GeForce FX 5xxxXT: Broken 'Inverted fog'">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5...XT" />
-	<!-- @@@ Add some version check -->
+	<!-- @@@ Add some version check ? -->
       </conditions>
       <applicable>
 	<usecfg>noinvertedfog</usecfg>
+      </applicable>
+    </rule>
+    <rule description="NVidia: borked WGL_ARB_pixel_format" phase="preinit">
+      <!-- 
+        'phase="preinit"' means this rule is only considered during 
+	"pre-initialization". On Win32 this is the time a pixel format is 
+	picked.
+      -->
+      <conditions fulfill="all">
+	<regexp	string="win32_driver" pattern="^nvogl" />
+	<comparever version="win32_driver" relation="le 6.13.10.2846" />
+      </conditions>
+      <applicable>
+	<usecfg>pixelformatbroken</usecfg>
       </applicable>
     </rule>
     <!--

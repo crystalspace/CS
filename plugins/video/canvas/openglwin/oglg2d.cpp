@@ -426,11 +426,15 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 
       csGLExtensionManager& ext = dwi->this_->ext;
       ext.Open();
+
+      dwi->this_->detector.DoDetection (hWnd, hDC);
+      dwi->this_->driverdb.Open (dwi->this_, "preinit");
+
       ext.InitWGL_ARB_pixel_format (hDC);
       if (ext.CS_WGL_ARB_pixel_format)
       {
 	unsigned int numFormats = 0;
-	int iAttributes[12];
+	int iAttributes[24];
 	float fAttributes[] = {0.0f, 0.0f};
 
 	GLPixelFormat format;
@@ -448,8 +452,20 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 	    (format[glpfvMultiSamples] != 0) ? GL_TRUE : GL_FALSE;
 	  iAttributes[8] = WGL_SAMPLES_ARB;
 	  iAttributes[9] = format[glpfvMultiSamples];
-	  iAttributes[10] = 0;
-	  iAttributes[11] = 0;
+	  iAttributes[10] = WGL_COLOR_BITS_ARB;
+	  iAttributes[11] = pfd.cColorBits;
+  	  iAttributes[12] = WGL_ALPHA_BITS_ARB;
+  	  iAttributes[13] = pfd.cAlphaBits;
+  	  iAttributes[14] = WGL_DEPTH_BITS_ARB;
+	  iAttributes[15] = pfd.cDepthBits;
+	  iAttributes[16] = WGL_STENCIL_BITS_ARB;
+	  iAttributes[17] = pfd.cStencilBits;	  
+	  iAttributes[18] = WGL_ACCUM_BITS_ARB;
+	  iAttributes[19] = pfd.cAccumBits;
+	  iAttributes[20] = WGL_ACCUM_ALPHA_BITS_ARB;
+	  iAttributes[21] = pfd.cAccumAlphaBits;
+	  iAttributes[22] = 0;
+	  iAttributes[23] = 0;
 
 	  if ((ext.wglChoosePixelFormatARB (hDC, iAttributes, fAttributes,
 	    1, &dwi->pixelFormat, &numFormats) == GL_TRUE) && (numFormats != 0))
@@ -468,6 +484,8 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 	}
 	while (picker.GetNextFormat (format));
       }
+
+      dwi->this_->driverdb.Close ();
 
       wglMakeCurrent (hDC, 0);
       wglDeleteContext (hGLRC);

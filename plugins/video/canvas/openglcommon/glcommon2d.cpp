@@ -878,7 +878,7 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValues ()
 {
   order = csStrNew (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.ReductionOrder", "mAasdc"));
+    "Video.OpenGL.FormatPicker.ReductionOrder", "ACmasdc"));
   orderNum = strlen (order);
   orderPos = 0;
 
