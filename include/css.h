@@ -324,7 +324,6 @@
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
 #include "csutil/csinput.h"
-#include "csutil/cskeys.h"
 #include "csutil/csmd5.h"
 #include "csutil/csobject.h"
 #include "csutil/csobjvec.h"

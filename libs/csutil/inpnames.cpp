@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 static struct csKeyCodeDef
 {
@@ -85,6 +86,29 @@ static struct csKeyMaskDef
   { "Shift+",	CSMASK_SHIFT	},
   { NULL,	0		}
 };
+
+#ifdef COMP_VC
+int strncmpi (const char* first, const char* last, unsigned int count)
+{
+  int f, l;
+  int result = 0;
+  
+  if (count)
+  {
+    do
+    {
+      f = tolower (*first);
+      l = tolower (*last);
+      first++;
+      last++;
+    } while (--count && f && l && f == l);
+		
+    int result = f - l;
+  }
+
+  return result;
+}
+#endif
 
 iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true)
 {
