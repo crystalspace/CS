@@ -587,20 +587,20 @@ bool csIniFile::Error (int LineNo, const char *Line, int Pos)
 
 csIniFile::SectionIterator *csIniFile::_EnumSections () const
 {
-  return Root.Length () ? new SectionIterator (this, &Root) : NULL;
+  return Root.Length () ? new SectionIterator (this, &Root) : 0;
 }
 
 csIniFile::DataIterator *csIniFile::_EnumData (const char* iSection) const
 {
   PrvINInode *Sec = FindNode (iSection, NULL);
-  return Sec ? new DataIterator (this, Sec) : NULL;
+  return Sec ? new DataIterator (this, Sec) : 0;
 }
 
 csIniFile::CommentIterator *csIniFile::_EnumComments(const char* iSection,
   const char* iKey) const
 {
   PrvINInode *Sec = FindNode (iSection, iKey);
-  return Sec ? new CommentIterator (this, Sec->Comments, iSection, iKey) : NULL;
+  return Sec ? new CommentIterator (this, Sec->Comments, iSection, iKey) : 0;
 }
 
 csIniFile::PrvINInode *csIniFile::FindNode (const char* iSection,
@@ -800,5 +800,6 @@ bool csIniFile::GetYesNo (const char *iSection, const char *iKey,
   const char *s = GetStr (iSection, iKey, NULL);
   if (!s)
     return def;
-  return !strcasecmp (s,"yes") || !strcasecmp (s,"true") || !strcasecmp (s,"on");
+  return !strcasecmp (s,"yes") || !strcasecmp (s,"true") ||
+    !strcasecmp (s,"on") || !strcasecmp (s,"1");
 }
