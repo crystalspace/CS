@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	  squared distance instead of the minimum one.
 	- Using the above functions added another optimization to the
 	  terrain visibility checker. Again this does not solve the bug though.
+	- Fixed the bug in the visibility checker. The minimum and maximum
+	  heights were correctly calculated but not scaled and translated
+	  according to the parameters given by the terrfunc user.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout
