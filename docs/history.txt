@@ -9,6 +9,11 @@ The history order is reversed so that new features are at the top.
 	  seems that the snapshot script runs out of disk space when using
 	  /tmp on shell1.sourceforge.net even though there appears to be
 	  nearly 0.5GB available.
+	- Eric Sunshine fixed problem with csConsoleOutput where it would crash
+	  if a font-server was not available.  Problem was reported by Neil
+	  Mosafi <nmosafi@totalise.co.uk>.  Now it instead reports a sensible
+	  warning message (and avoids crashing).  Also fixed bug where it was
+	  manually invoking IncRef()/DecRef() on its csRef'd `font' member.
 4-May-2003
 	- Eric Sunshine made the following changes:
 	    - Updated Swig test in configure.ac to utilize new optional version

@@ -24,6 +24,7 @@
 #include "csconout.h"
 #include "conbuff.h"
 #include "ivaria/conout.h"
+#include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "iutil/plugin.h"
@@ -106,9 +107,25 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);
   invalid.Set (size); // Invalidate the entire console
-  font = G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
   int fw, fh;
-  font->GetMaxSize (fw, fh);
+  csRef<iFontServer> fserv = G2D->GetFontServer();
+  if (fserv)
+  {
+    font = fserv->LoadFont (CSFONT_LARGE);
+    font->GetMaxSize (fw, fh);
+  }
+  else
+  {
+    fw = fh = 20;
+    csRef<iReporter> r = CS_QUERY_REGISTRY (object_reg, iReporter);
+    if (r)
+	r->Report(CS_REPORTER_SEVERITY_WARNING,
+	    crystalspace.console.output.standard,
+	    "csConsoleOutput: Unable to locate iFontServer");
+    else
+	csPrintf("Warning ID: crystalspace.console.output.standard\n"
+	    "Description: csConsoleOutput: Unable to locate iFontServer\n");
+  }
   // Create the backbuffer (4096 lines max)
   buffer = new csConsoleBuffer (4096, (size.Height() / (fh + 2)));
   // Initialize flash_time for flashing cursors
@@ -266,7 +283,7 @@ void csConsoleOutput::DeleteText (int start, int end)
 
 void csConsoleOutput::Draw2D (csRect *area)
 {
-  if (!visible) return;
+  if (!visible || !font) return;
 
   csScopedMutexLock lock (mutex);
   int i, height, fh;
@@ -401,6 +418,8 @@ csConsoleOutput::GetPosition(int &x, int &y, int &width, int &height) const
 
 void csConsoleOutput::SetPosition(int x, int y, int width, int height)
 {
+  if (!font) return;
+
   if (x >= 0)
     size.xmin = x;
   if (y >= 0)
@@ -458,16 +477,17 @@ void csConsoleOutput::Invalidate (csRect &area)
 void csConsoleOutput::SetFont (iFont *Font)
 {
   csScopedMutexLock lock (mutex);
-  if (font)
-    font->DecRef ();
-  font = Font;
-  if (font)
-    font->IncRef ();
-
-  // Calculate the number of lines on the console with the new font
-  int fw, fh;
-  font->GetMaxSize (fw, fh);
-  buffer->SetPageSize (size.Height () / (fh + 2));
+  if (font != Font)
+  {
+    font = Font;
+    if (font)
+    {
+      // Calculate the number of lines on the console with the new font
+      int fw, fh;
+      font->GetMaxSize (fw, fh);
+      buffer->SetPageSize (size.Height () / (fh + 2));
+    }
+  }
 }
 
 int csConsoleOutput::GetTopLine () const
