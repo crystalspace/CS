@@ -23,9 +23,10 @@
 #include "csutil/flags.h"
 #include "csutil/csobject.h"
 #include "csutil/csvector.h"
-#include "imesh/thing/portal.h"
+#include "iengine/portal.h"
 
 class csPolygon2D;
+class csPolygon3DStatic;
 class csStatLight;
 class csObject;
 struct iMeshWrapper;
@@ -42,6 +43,8 @@ class csPortal : public csObject
 private:
   /// The sector that this portal points to.
   iSector* sector;
+  /// The parent polygon.
+  csPolygon3DStatic* parent;
 
 public:
   /// Set of flags
@@ -70,13 +73,19 @@ protected:
 
 public:
   /// Create a portal.
-  csPortal ();
+  csPortal (csPolygon3DStatic* parent);
 
   /// Destructor.
   virtual ~csPortal ();
 
   /// Create a clone of this portal.
   csPortal* Clone ();
+
+  /// Set the parent polygon.
+  void SetParentPolygon (csPolygon3DStatic* parent)
+  {
+    csPortal::parent = parent;
+  }
 
   //---- misc. manipulation functions ---------------------------------------
 
@@ -97,6 +106,10 @@ public:
 
   /// Set portal flags (see CS_PORTAL_XXX values)
   csFlags& GetFlags ();
+
+  const csVector3* GetVertices () const;
+  int* GetVertexIndices () const;
+  int GetVertexIndicesCount () const;
 
   /// Set the maximum sector visit.
   void SetMaximumSectorVisit (int msv)
@@ -278,6 +291,20 @@ public:
     virtual iObject *QueryObject () { return scfParent; }
     virtual iSector* GetSector () const { return scfParent->GetSector (); }
     virtual void SetSector (iSector* s) { scfParent->SetSector (s); }
+
+    virtual const csVector3* GetVertices () const
+    {
+      return scfParent->GetVertices ();
+    }
+    virtual int* GetVertexIndices () const
+    {
+      return scfParent->GetVertexIndices ();
+    }
+    virtual int GetVertexIndicesCount () const
+    {
+      return scfParent->GetVertexIndicesCount ();
+    }
+
     virtual csFlags& GetFlags () { return scfParent->GetFlags (); }
     virtual void SetMaximumSectorVisit (int msv)
     {

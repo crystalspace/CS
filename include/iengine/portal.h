@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_THING_PORTAL_H__
-#define __CS_THING_PORTAL_H__
+#ifndef __CS_ENGINE_PORTAL_H__
+#define __CS_ENGINE_PORTAL_H__
 
 #include "csutil/scf.h"
 #include "iutil/objref.h"
@@ -105,7 +105,7 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 2, 1);
+SCF_VERSION (iPortal, 0, 3, 0);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -121,6 +121,23 @@ struct iPortal : public iReference
 
   /// Return the sector that this portal points too.
   virtual iSector* GetSector () const = 0;
+
+  /**
+   * Get an array of object space vertices. Use this in combination
+   * with GetVertexIndices() to find out where the portal is.
+   */
+  virtual const csVector3* GetVertices () const = 0;
+
+  /**
+   * Get an array of vertex indices (indices in the array returned
+   * by GetVertices()).
+   */
+  virtual int* GetVertexIndices () const = 0;
+
+  /**
+   * Get the number of vertex indices.
+   */
+  virtual int GetVertexIndicesCount () const = 0;
 
   /**
    * Set the sector that this portal points too. To avoid circular
@@ -273,4 +290,5 @@ struct iPortal : public iReference
 
 };
 
-#endif // __CS_THING_PORTAL_H__
+#endif // __CS_ENGINE_PORTAL_H__
+

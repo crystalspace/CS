@@ -210,6 +210,18 @@ public:
   virtual iMaterialWrapper* GetMaterialWrapper () const;
 
   /**
+   * See imesh/object.h for sepcification. The default implementation
+   * does not support portals.
+   */
+  virtual int GetPortalCount () const { return 0; }
+
+  /**
+   * See imesh/object.h for sepcification. The default implementation
+   * does not support portals.
+   */
+  virtual iPortal* GetPortal (int) const { return NULL; }
+
+  /**
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */

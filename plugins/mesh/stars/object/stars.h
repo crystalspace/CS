@@ -170,6 +170,8 @@ public:
   virtual bool GetColor (csColor& col) const { col = color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState

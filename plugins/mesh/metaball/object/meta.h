@@ -264,6 +264,8 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return th; }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 
   ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState

@@ -23,10 +23,10 @@
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
+#include "iengine/portal.h"
 #include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "imesh/thing/polygon.h"
-#include "imesh/thing/portal.h"
 #include "ivideo/graph3d.h"
 
 csImposterMesh::csImposterMesh(csMeshWrapper *parent,iObjectRegistry *objreg)

@@ -554,6 +554,8 @@ public:
   virtual bool GetColor (csColor& col) const { col = base_color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 
   /**  RDS NOTE: this is from iTerrainObject, what matches???  **/
   //------------------------- iTerrFuncState implementation ----------------

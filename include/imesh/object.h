@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2001 by Jorrit Tyberghein
+    Copyright (C) 2000-2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,6 +31,7 @@ struct iLight;
 struct iPolygonMesh;
 struct iObjectModel;
 struct iMaterialWrapper;
+struct iPortal;
 class csColor;
 class csReversibleTransform;
 
@@ -46,7 +47,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 1, 1);
+SCF_VERSION (iMeshObject, 0, 1, 2);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -208,6 +209,13 @@ struct iMeshObject : public iBase
    * return NULL.
    */
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+
+  /**
+   * Get the number of portals in this mesh object.
+   */
+  virtual int GetPortalCount () const = 0;
+  /// Get a portal.
+  virtual iPortal* GetPortal (int idx) const = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 6);

@@ -39,6 +39,7 @@
 #include "csengine/region.h"
 #include "csengine/radiosty.h"
 #include "csengine/objwatch.h"
+#include "iengine/portal.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
@@ -71,7 +72,6 @@
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
 #include "imesh/thing/polygon.h"
-#include "imesh/thing/portal.h"
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 
@@ -2252,8 +2252,8 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     iMeshWrapper* imw = vo->GetMeshWrapper ();
     if (imw)
     {
-      list.Push (imw->QueryObject ());
-      if ( crossPortals )
+      list.Push (imw->QueryObject ()); 
+      if (crossPortals && imw->GetMeshObject ()->GetPortalCount () > 0)
       {
         csRef<iThingState> st (
         	SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState));

@@ -149,6 +149,8 @@ public:
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 };
 
 #endif // __CS_SPIDER_H__

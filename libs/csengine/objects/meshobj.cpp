@@ -23,11 +23,11 @@
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
+#include "iengine/portal.h"
 #include "csutil/debug.h"
 #include "iengine/rview.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
-#include "imesh/thing/portal.h"
 #include "ivideo/graph3d.h"
 
 
@@ -471,6 +471,10 @@ void csMeshWrapper::PlaceMesh ()
   for (i = 0; i < ml->GetCount (); i++)
   {
     iMeshWrapper *mesh = ml->Get (i);
+
+    if (mesh->GetMeshObject ()->GetPortalCount () == 0)
+      continue;		// No portals to consider.
+
     csRef<iThingState> thing (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
         iThingState));

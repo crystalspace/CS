@@ -267,6 +267,8 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState

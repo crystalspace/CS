@@ -1669,6 +1669,8 @@ public:
   {
     return GetMaterial ();
   }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 
   //--------------------- iSprite3DState implementation -------------//
   struct Sprite3DState : public iSprite3DState

@@ -119,7 +119,10 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
   clone->SetName (name);
   clone->vertices = vertices;
   if (portal)
+  {
     clone->portal = portal->Clone ();
+    clone->portal->SetParentPolygon (this);
+  }
   else
     clone->portal = NULL;
   clone->plane_obj = plane_obj;
@@ -315,7 +318,7 @@ void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
   }
 
   if (!null && !sector) return ;
-  portal = new csPortal ();
+  portal = new csPortal (this);
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
   if (sector)

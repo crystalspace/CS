@@ -35,10 +35,10 @@
 #include "csengine/light.h"
 #include "csengine/material.h"
 #include "iengine/rview.h"
+#include "iengine/portal.h"
 #include "imesh/lighting.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
-#include "imesh/thing/portal.h"
 #include "csengine/material.h"
 
 #include "ivaria/bugplug.h"

@@ -37,7 +37,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPortal::Portal)
   SCF_IMPLEMENTS_INTERFACE(iReference)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPortal::csPortal ()
+csPortal::csPortal (csPolygon3DStatic* parent)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
   DG_TYPE (this, "csPortal");
@@ -47,6 +47,7 @@ csPortal::csPortal ()
   filter_b = 1;
   sector = NULL;
   max_sector_visit = 5;
+  csPortal::parent = parent;
 }
 
 csPortal::~csPortal ()
@@ -70,7 +71,7 @@ csPortal::~csPortal ()
 
 csPortal* csPortal::Clone ()
 {
-  csPortal* clone = new csPortal ();
+  csPortal* clone = new csPortal (NULL);
   clone->SetSector (sector);
   clone->flags.SetAll (flags.Get ());
   clone->warp_obj = warp_obj;
@@ -144,6 +145,21 @@ void csPortal::SetSector (iSector *s)
 csFlags &csPortal::GetFlags ()
 {
   return flags;
+}
+
+const csVector3* csPortal::GetVertices () const
+{
+  return parent->GetParent ()->GetVertices ();
+}
+
+int* csPortal::GetVertexIndices () const
+{
+  return parent->GetVertexIndices ();
+}
+
+int csPortal::GetVertexIndicesCount () const
+{
+  return parent->GetVertexCount ();
 }
 
 bool csPortal::CompleteSector (iBase *context)

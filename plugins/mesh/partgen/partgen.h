@@ -292,6 +292,8 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return mat; }
+  virtual int GetPortalCount () const { return 0; }
+  virtual iPortal* GetPortal (int) const { return NULL; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

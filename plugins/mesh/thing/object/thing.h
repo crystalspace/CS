@@ -981,6 +981,14 @@ public:
     virtual bool GetColor (csColor&) const { return false; }
     virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
     virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
+    virtual int GetPortalCount () const
+    {
+      return scfParent->static_data->GetPortalCount ();
+    }
+    virtual iPortal* GetPortal (int idx) const
+    {
+      return scfParent->static_data->GetPortal (idx);
+    }
   } scfiMeshObject;
   friend struct MeshObject;
 };

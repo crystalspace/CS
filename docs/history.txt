@@ -7,6 +7,22 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented
 	  that the substring is excluding the last char.
+	- Jorrit did various changes related to portal management:
+	    - Moved iPortal definition from imesh/thing/portal.h to
+	      iengine/portal.h. The reason is that portals are now an engine
+	      concept and not only for things. The only portal implementation
+	      is currently still in thing though.
+	    - Added the ability to get the portal vertices from iPortal.
+	    - Added iMeshObject->GetPortalCount() and iMeshObject->GetPortal().
+	    - Also added default implementations of those to csMeshObject
+	      (supporting no portals).
+	    - At two places in the engine (GetNearbyObjects() and PlaceMesh())
+	      this new function is used instead of first querying for
+	      iThingState. This makes those functions a bit faster and is (in
+	      theory) also more general (in the sense of being able to add
+	      portals to any mesh object). However later on most functions
+	      still query for iThingState so this promise of more generality
+	      is not fulfilled yet.
 20-May-2003
 	- Philip Wyett worked around problem of incorrect pathed cs_pyth.cpp
           being included in the cspython MSVC project file. Added variable
