@@ -590,9 +590,13 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     rm->indexstart = 0;
     rm->indexend = terr->numindices[idx];
     if (i==0)
+    {
       rm->material = material;
-    else
+      rm->variablecontext = terr->baseContext;
+    } else {
       rm->material = terr->palette[i-1];
+      rm->variablecontext = terr->paletteContexts[i-1];
+    }
     terr->returnMeshes->Push (rm);
   }
 }
@@ -1160,6 +1164,8 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   colorVersion = 0;
   last_colorVersion = ~0;
   dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
+
+  baseContext = new csShaderVariableContext();
 }
 
 csTerrainObject::~csTerrainObject ()
@@ -1738,9 +1744,11 @@ bool csTerrainObject::SetMaterialPalette (
   const csArray<iMaterialWrapper*>& pal)
 {
   palette.SetLength (pal.Length());
+  paletteContexts.SetLength (pal.Length());
   for (size_t i = 0; i < pal.Length(); i++)
   {
     palette[i] = pal[i];
+    paletteContexts[i] = new csShaderVariableContext();
   }
 
   return true;
@@ -1768,7 +1776,7 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
     new csShaderVariable (strings->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
-  matwrap->GetMaterial()->AddVariable (lod_var);
+  baseContext->AddVariable (lod_var);
 
   for (size_t i = 0; i < palette.Length(); i ++) 
   {
@@ -1791,14 +1799,13 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
       new csShaderVariable (strings->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
-    palette[i]->GetMaterial()->AddVariable (var);
+    paletteContexts[i]->AddVariable (var);
 
     csRef<csShaderVariable> lod_var = 
       new csShaderVariable (strings->Request ("texture lod distance"));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
-    matwrap->GetMaterial()->AddVariable (lod_var);
-    palette[i]->GetMaterial()->AddVariable (lod_var);
+    paletteContexts[i]->AddVariable (lod_var);
   }
   return true;
 }

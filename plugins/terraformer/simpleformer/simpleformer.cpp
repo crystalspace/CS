@@ -345,7 +345,10 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
         // Grab the intensity as height
         // We're reversing Y to later get negative Y in heightmap image 
         // to positive Z in terrain
-        heightData[x+(height-y-1)*width] = 
+        
+        // @@@ Edited to not flip Y. Why did I do it in the first place?
+        // /Anders Stenberg
+        heightData[x+y*width] = 
           data[x+y*width].Intensity ()/255.0;
       }
     }
@@ -370,7 +373,10 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
         // Grab the intensity as height
         // We're reversing Y to later get negative Y in heightmap image 
         // to positive Z in terrain
-        heightData[x+(height-y-1)*width] = 
+
+        // @@@ Edited to not flip Y. Why did I do it in the first place?
+        // /Anders Stenberg
+        heightData[x+y*width] = 
           palette[data[x+y*width]].Intensity () / 255.0;
       }
     }

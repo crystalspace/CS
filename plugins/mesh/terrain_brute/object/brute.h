@@ -258,6 +258,8 @@ private:
   csRef<iMaterialWrapper> matwrap;
   csArray<iMaterialWrapper*> palette;	// TODO@@@ Use csRefArray!!!
   csRefArray<iImage> alphas;
+  csRef<iShaderVariableContext> baseContext;
+  csRefArray<iShaderVariableContext> paletteContexts;
 
   float error_tolerance;
   float lod_distance;
