@@ -384,6 +384,9 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   }
 }
 
+//@@@
+bool no_occluder_shadow;
+
 void csOctree::CalculatePolygonShadow (
 	csPoly2D& proj_poly,
 	csPoly2D& result_poly, bool first_time)
@@ -411,16 +414,31 @@ bool csOctree::CalculatePolygonShadow (
 	const csPoly3D& cur_poly,
 	csPoly2D& result_poly, bool first_time,
 	int plane_nr, float plane_pos,
-	csFrustum4 frustum)
+	csFrustum5 frustum)
 {
   csPoly2D proj_poly;
 
   // First clip the polygon to the given frustum.
   csPoly3D new_poly (cur_poly);
+
+//if (no_occluder_shadow)
+//{
+//int i;
+//for (i = 0 ; i < new_poly.GetNumVertices () ; i++)
+//printf ("  new_poly: %d: %f,%f,%f\n", i, new_poly[i].x, new_poly[i].y, new_poly[i].z);
+//}
+
   int i;
-  for (i = 0 ; i < 4 ; i++)
+  for (i = 0 ; i < 5 ; i++)
   {
     new_poly.CutToPlane (frustum[i]);
+//if (no_occluder_shadow)
+//{
+//int i;
+//for (i = 0 ; i < new_poly.GetNumVertices () ; i++)
+//printf ("  CUT: %d: %f,%f,%f\n", i, new_poly[i].x, new_poly[i].y, new_poly[i].z);
+//}
+
     // We return
     if (new_poly.GetNumVertices () == 0) return false;
   }
@@ -508,19 +526,22 @@ void csOctree::CalculatePolygonShadowArea (
 	const csPoly3D& poly, const csPlane3& poly_plane,
 	csPoly2D& result_poly,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   int j;
   result_poly.MakeEmpty ();
   bool first_time = true;
+//if (no_occluder_shadow) printf ("CalculatePolygonShadowArea\n");
   for (j = 0 ; j < 8 ; j++)
   {
     const csVector3& corner = occludee_box.GetCorner (j);
+//if (no_occluder_shadow) printf ("  corner %d: %f,%f,%f\n", j, corner.x, corner.y, corner.z);
 
     // Backface culling: if plane is totally on edge with corner or
     // if corner can see polygon then we ignore it.
     if (poly_plane.Classify (corner) < SMALL_EPSILON)
     {
+//if (no_occluder_shadow) printf ("  BF cull\n");
       result_poly.SetNumVertices (0);
       break;
     }
@@ -528,12 +549,14 @@ void csOctree::CalculatePolygonShadowArea (
     if (!CalculatePolygonShadow (corner, poly, result_poly,
 	first_time, plane_nr, plane_pos, frustums[j]))
     {
+//if (no_occluder_shadow) printf ("  bad shadow\n");
       result_poly.SetNumVertices (0);
       break;
     }
     first_time = false;
     if (result_poly.GetNumVertices () == 0) break;
   }
+//if (no_occluder_shadow) printf ("  result_poly.num_verts=%d\n", result_poly.GetNumVertices ());
 }
 
 bool csOctree::CalculatePolygonsShadowArea (
@@ -542,7 +565,7 @@ bool csOctree::CalculatePolygonsShadowArea (
 	const csPoly3D& poly2, const csPlane3& plane2,
 	csPoly2D& result_poly,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   int j;
   result_poly.MakeEmpty ();
@@ -566,6 +589,7 @@ bool csOctree::CalculatePolygonsShadowArea (
     if (!poly2.ProjectAxisPlane (corner, plane_nr, plane_pos, &proj_poly2))
       return false;
     proj_poly1.ExtendConvex (proj_poly2, edge1);
+    // @@@ check for failure...
     CalculatePolygonShadow (proj_poly1, result_poly, first_time);
     first_time = false;
     if (result_poly.GetNumVertices () == 0)
@@ -580,7 +604,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 	csPolygonInt** polygons, int num_polygons,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   // This version will try to merge
   // adjacent polygons into one bigger convex polygon.
@@ -660,7 +684,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 	csPolygonInt** polygons, int num_polygons,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   int i, j;
   csPolygon3D* p;
@@ -685,13 +709,12 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 }
 #endif
 
-bool no_occluder_shadow;
 
 void csOctree::BoxOccludeeShadowSolidBoundaries (csOctreeNode* occluder,
 	const csBox3& occludee_box,
     	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   int side;
   for (side = 0 ; side < 6 ; side++)
@@ -703,6 +726,8 @@ void csOctree::BoxOccludeeShadowSolidBoundaries (csOctreeNode* occluder,
     while (occluder->NextSolidPolygon (spit, cur_poly))
     {
       poly_plane = cur_poly.ComputePlane ();
+//@@@ Potential bug! Are solid polygons oriented right? CalculatePolygonShadowArea
+// does backface culling which maybe should be avoided in this particular case.
       CalculatePolygonShadowArea (occludee_box, cur_poly, poly_plane, result_poly,
           plane_nr, plane_pos, frustums);
       if (result_poly.GetNumVertices () != 0)
@@ -748,7 +773,7 @@ exit (0);
 bool csOctree::BoxOccludeeShadowOutline (const csBox3& occluder_box,
 	const csBox3& occludee_box,
 	int plane_nr, float plane_pos, csPoly2D& result_poly,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   int j;
   csPoly3D cur_poly;
@@ -756,11 +781,11 @@ bool csOctree::BoxOccludeeShadowOutline (const csBox3& occluder_box,
   bool first_time = true;
 
 bool verbose = false;
-if ((occluder_box.Min ()-csVector3 (-27.2,0,-6.4)) < .2 &&
-    (occluder_box.Max ()-csVector3 (5,33.6,21.6)) < .2 &&
-    (occludee_box.Min ()-csVector3 (-20.8,-5.2,3.6)) < .2 &&
-    (occludee_box.Max ()-csVector3 (-12.8,0,13.2)) < .2)
-  verbose = true;
+//if ((occluder_box.Min ()-csVector3 (-27.2,0,-6.4)) < .2 &&
+    //(occluder_box.Max ()-csVector3 (5,33.6,21.6)) < .2 &&
+    //(occludee_box.Min ()-csVector3 (-20.8,-5.2,3.6)) < .2 &&
+    //(occludee_box.Max ()-csVector3 (-12.8,0,13.2)) < .2)
+  //verbose = true;
 if (verbose) printf ("BoxOccludeeShadowOutline\n");
 
   for (j = 0 ; j < 8 ; j++)
@@ -795,7 +820,7 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
 	const csBox3& box, const csBox3& occludee_box,
 	csVector3& box_center, csVector3& occludee_center,
 	bool do_polygons,
-	csFrustum4* frustums)
+	csFrustum5* frustums)
 {
   if (!occluder) return;
   if (cbuffer->IsFull ()) return;
@@ -819,13 +844,13 @@ no_occluder_shadow = false;
     	plane_nr, plane_pos, occluder_shadow, frustums))
     {
       if (occluder_shadow.GetNumVertices () == 0)
-no_occluder_shadow = true;
-//        return;
+//@@@ For debugging.no_occluder_shadow = true;
+        return;
       // Then we test the shadow on the c-buffer and see if that part of
       // the c-buffer has some unshadowed parts. If not then we don't
       // have to process this occluder either.
-//      if (!TestShadowIntoCBuffer (occluder_shadow, cbuffer, scale, shift))
-//        return;
+      if (!TestShadowIntoCBuffer (occluder_shadow, cbuffer, scale, shift))
+        return;
     }
 
     // Then we see if this occluder can see occludee. If not then
@@ -997,7 +1022,12 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
 
   // Initialize eight frustums as seen from all eight corners of
   // the occludee.
-  csFrustum4 frustums[8];
+  // @@@ Small note. We also add a fifth plane for the projection plane
+  // itself. This plane prevents occluders from doing something if they
+  // are behind the plane. This avoids problems but in some rare cases
+  // we will miss occluders that way. Maybe the issue is not important
+  // enough to waste brain cycles on though :-)
+  csFrustum5 frustums[8];
   csVector3 vxy, vXy, vxY, vXY;
   vxy = GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (BOX_CORNER_xy)),
   vXy = GetVector3 (plane_nr, plane_pos, plane_area.GetCorner (BOX_CORNER_Xy));
@@ -1013,22 +1043,34 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
     vxY = vXy;
     vXy = swap;
   }
+  // A shift to add to the projection plane itself. This shift of that plane
+  // will avoid misprojections due to polygons that are very close to that plane.
+  csVector3 plane_shift (0);
+  if (vxy[plane_nr] < occludee_box.GetCorner (0)[plane_nr])
+    plane_shift[plane_nr] = .1;
+  else
+    plane_shift[plane_nr] = -.1;
   for (i = 0 ; i < 8 ; i++)
   {
-printf ("  planes %d\n", i);
+//printf ("  planes %d\n", i);
     const csVector3& corner = occludee_box.GetCorner (i);
     frustums[i][0].Set (corner, vxy, vXy);
-printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
-vxy.x, vxy.y, vxy.z, vXy.x, vXy.y, vXy.z);
+//printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+//vxy.x, vxy.y, vxy.z, vXy.x, vXy.y, vXy.z);
     frustums[i][1].Set (corner, vXy, vXY);
-printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
-vXy.x, vXy.y, vXy.z, vXY.x, vXY.y, vXY.z);
+//printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+//vXy.x, vXy.y, vXy.z, vXY.x, vXY.y, vXY.z);
     frustums[i][2].Set (corner, vXY, vxY);
-printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
-vXY.x, vXY.y, vXY.z, vxY.x, vxY.y, vxY.z);
+//printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+//vXY.x, vXY.y, vXY.z, vxY.x, vxY.y, vxY.z);
     frustums[i][3].Set (corner, vxY, vxy);
-printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
-vxY.x, vxY.y, vxY.z, vxy.x, vxy.y, vxy.z);
+//printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n", corner.x, corner.y, corner.z,
+//vxY.x, vxY.y, vxY.z, vxy.x, vxy.y, vxy.z);
+    frustums[i][4].Set (vxy+plane_shift, vxY+plane_shift, vXY+plane_shift);
+//printf ("    %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f\n",
+//(vxy+plane_shift).x, (vxy+plane_shift).y, (vxy+plane_shift).z,
+//(vxY+plane_shift).x, (vxY+plane_shift).y, (vxY+plane_shift).z,
+//(vXY+plane_shift).x, (vXY+plane_shift).y, (vXY+plane_shift).z);
   }
 
   BoxOccludeeAddShadows ((csOctreeNode*)root, cbuffer, scale, shift,
@@ -1090,10 +1132,10 @@ void csOctree::DeleteNodeAndChildrenFromPVS (csPVS& pvs, csOctreeNode* occludee)
     DeleteNodeAndChildrenFromPVS (pvs, (csOctreeNode*)occludee->children[i]);
 }
 
-void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
+bool csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
 	csOctreeNode* leaf)
 {
-  if (!occludee) return;
+  if (!occludee) return true;
   int i;
   bool visible = false;
   int adjacent_side;
@@ -1102,7 +1144,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   if (!ovis)
   {
     // Node is not in PVS so it isn't visible.
-    return;
+    return false;
   }
   //else if (ovis->IsReallyVisible ())
   //{
@@ -1140,10 +1182,20 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   // the polygons in the node as well.
   // Also traverse to the children.
   if (visible)
+  {
+    visible = false;
     for (i = 0 ; i < 8 ; i++)
-      BuildPVSForLeaf ((csOctreeNode*)occludee->children[i],
-      	thing, leaf);
-  else
+    {
+      if (BuildPVSForLeaf ((csOctreeNode*)occludee->children[i],
+      	thing, leaf)) visible = true;
+    }
+    if (!visible)
+    {
+      printf ("&");
+    }
+  }
+
+  if (!visible)
   {
 #   if DO_PVS_QAD
     if (ovis->IsReallyVisible ())
@@ -1157,6 +1209,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     total_total_cull_node += 1+occludee->CountChildren ();
     DeleteNodeAndChildrenFromPVS (pvs, occludee);
   }
+  return visible;
 }
 
 void csOctree::AddDummyPVSNodes (csOctreeNode* leaf, csOctreeNode* node)

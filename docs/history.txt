@@ -16,6 +16,11 @@ The history order has been reversed so that new features are at the top.
 	  is flarge that should be fixed.
 	- Made csloader more robust. It now detects planes which are badly
 	  specified.
+	- Wouter Wijngaards reimplemented the quadtree. It is likely
+	  that this is going to be used for the PVS as well.
+	- Fixed another bug in PVS.
+	- Did a new optimization for PVS. If all children of a node are
+	  not visible then the node itself will not be visible as well.
 6-Jun-2000
 	- Fixed OpenGL GLX driver (2D driver for OpenGL/X Windows).
 	  It was trying to find a visual with AUX buffers.

@@ -235,7 +235,7 @@ public:
   void CleanupSolidPolygonIterator (void* vspit);
 };
 
-typedef csPlane3 csFrustum4[4];
+typedef csPlane3 csFrustum5[5];
 
 /**
  * The octree.
@@ -298,7 +298,7 @@ private:
 	const csPoly3D& poly, const csPlane3& poly_plane,
 	csPoly2D& result_poly,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums);
+	csFrustum5* frustums);
 
   /**
    * Help function for BoxCanSeeOccludee.
@@ -309,7 +309,7 @@ private:
 	const csPoly3D& poly2, const csPlane3& plane2,
 	csPoly2D& result_poly,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums);
+	csFrustum5* frustums);
   /**
    * Help function for BoxCanSeeOccludee.
    */
@@ -324,7 +324,7 @@ private:
 	const csPoly3D& cur_poly,
 	csPoly2D& result_poly, bool first_time,
 	int plane_nr, float plane_pos,
-	csFrustum4 frustum);
+	csFrustum5 frustum);
 
   /**
    * Help function for BoxCanSeeOccludee.
@@ -346,7 +346,7 @@ private:
   bool BoxOccludeeShadowOutline (const csBox3& occluder_box,
   	const csBox3& occludee_box,
 	int plane_nr, float plane_pos, csPoly2D& result_poly,
-	csFrustum4* frustums);
+	csFrustum5* frustums);
 
   /**
    * Help function for BoxCanSeeOccludee.
@@ -357,7 +357,7 @@ private:
 	csCBuffer* cbuffer,
   	const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums);
+	csFrustum5* frustums);
 
   /**
    * Help function for BoxCanSeeOccludee.
@@ -366,7 +366,7 @@ private:
 	const csBox3& occludee_box,
     	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos,
-	csFrustum4* frustums);
+	csFrustum5* frustums);
   /**
    * Help function for BoxCanSeeOccludee.
    * If 'do_polygons' is true then this function will also call
@@ -381,7 +381,7 @@ private:
   	const csBox3& box, const csBox3& occludee_box,
 	csVector3& box_center, csVector3& occludee_center,
 	bool do_polygons,
-	csFrustum4* frustums);
+	csFrustum5* frustums);
 
   /**
    * Test if 'box' can see 'occludee' through all the polygons
@@ -399,8 +399,9 @@ private:
 
   /**
    * Build PVS for this leaf.
+   * Returns true if the occludee was visible, false otherwise.
    */
-  void BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
+  bool BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   	csOctreeNode* leaf);
 
   /**
