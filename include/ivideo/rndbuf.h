@@ -125,6 +125,7 @@ private:
 
 public:
   /// Special attributes. Please don't change, it's used as flags
+  virtual ~csRenderMesh () {}
   typedef enum
   {
     SPECIAL_NONE = 0,
