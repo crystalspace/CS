@@ -204,7 +204,8 @@ public:
   int GetMorphAnimationCount() { return morph_animation_names.Length(); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
-  int  FindMeshName(const char *meshName);
+  int  FindMeshName(const char *meshName);  
+  const char* GetDefaultMaterial( const char* meshName );  
   const char *GetMorphAnimationName(int idx);
   int  FindMorphAnimationName(const char *meshName);
   bool IsMeshDefault(int idx);
@@ -386,6 +387,9 @@ public:
 
     virtual int  FindMeshName(const char *meshName)
     { return scfParent->FindMeshName(meshName); }
+    
+    virtual const char* GetDefaultMaterial( const char* meshName )
+    { return scfParent->GetDefaultMaterial( meshName ); }
     
     virtual const char *GetMorphAnimationName(int idx)
     { return scfParent->GetMorphAnimationName(idx); }

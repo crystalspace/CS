@@ -466,6 +466,20 @@ int  csSpriteCal3DMeshObjectFactory::FindMeshName(const char *meshName)
   return -1;
 }
 
+const char* csSpriteCal3DMeshObjectFactory::GetDefaultMaterial( const char* meshName )
+{
+    int meshIndex = FindMeshName( meshName );
+    if ( meshIndex != -1 )
+    {
+        if ( submeshes[meshIndex]->default_material )
+        {
+            return submeshes[meshIndex]->default_material->QueryObject()->GetName();
+        }
+    }
+    
+    return 0;                        
+}
+
 const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
 {
   if (idx >= morph_animation_names.Length())
