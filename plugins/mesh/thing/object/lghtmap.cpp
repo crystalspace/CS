@@ -507,9 +507,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
     ambient.Set ((unsigned char)dr, (unsigned char)dg, (unsigned char)db,
 		 0);	// Use alpha 0 so we can use this for UnsafeAdd.
 
-    if (max_static_color_values.red   + ambient.red   < 256  &&
-        max_static_color_values.green + ambient.green < 256  &&
-        max_static_color_values.blue  + ambient.blue  < 256)
+    if (max_static_color_values.red   + ambient.red   <= 255  &&
+        max_static_color_values.green + ambient.green <= 255  &&
+        max_static_color_values.blue  + ambient.blue  <= 255)
     {
       // No lightmap overflows so we can use fastest loop with no checking.
       if (static_lm)
@@ -585,7 +585,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       int tm_g = temp_max_color_values.green + QInt (smap->max_shadow * green);
       int tm_b = temp_max_color_values.blue  + QInt (smap->max_shadow * blue);
 
-      if (tm_r < 256  && tm_g < 256  && tm_b < 256)
+      if (tm_r <= 255  && tm_g <= 255  && tm_b <= 255)
       {
         // Again, if there is no risk of overflow, use fastest possible merge.
         do
@@ -633,7 +633,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 
 void csLightMap::CalcMaxStatic (int r, int g, int b)
 {
-  csRGBpixel min_static_color_values (256,256,256);
+  csRGBpixel min_static_color_values (255,255,255);
   max_static_color_values.Set (0,0,0);
 
   csRGBpixel *map = static_lm;

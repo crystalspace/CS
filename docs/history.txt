@@ -13,6 +13,11 @@ chronological order.
 	- Jorrit extended thing so that when it gives an oversized lightmap
 	  warning it will also show the name of the mesh instead of only
 	  the name of the polygon.
+	- Jorrit fixed a bug reported by Bedrich Zaba (frogbride@seznam.cz).
+	  In the thing mesh the min_static_color_values csRGBpixel value
+	  was initialized with 256,256,256. However csRGBpixel can only hold
+	  unsigned char and 256 wraps to 0 then. This could cause performance
+	  degradation.
 26-May-2004
 	- Keith fixed bug in HitBeam code which assumed that all meshes for
 	  a sprcal3d were attached to the model instance.  This is not required.
