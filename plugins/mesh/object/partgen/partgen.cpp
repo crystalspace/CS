@@ -100,8 +100,9 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   part->SetColor (csColor (1.0, 1.0, 1.0));
   state->SetMaterialWrapper (mat);
   AppendParticle (part);
-  part->DecRef (); 
-  
+  part->DecRef ();
+  state->DecRef ();
+  sprmesh->DecRef ();
 }
 
 
@@ -118,7 +119,9 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->SetColor (csColor (1.0, 1.0, 1.0));
 
   AppendParticle (part);
-  part->DecRef (); 
+  part->DecRef ();
+  sprmesh->DecRef (); 
+  state->DecRef ();
 }
 
 

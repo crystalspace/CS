@@ -161,6 +161,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
     {
       // @@@ Error handling!
       fact->DecRef ();
+      cubeLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -173,6 +174,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             fact->DecRef ();
+	    cubeLook->DecRef ();
             return NULL;
 	  }
 	  cubeLook->SetMaterialWrapper (mat);
@@ -198,6 +200,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  cubeLook->DecRef ();
   return fact;
 }
 

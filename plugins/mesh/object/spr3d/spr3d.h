@@ -515,11 +515,15 @@ public:
     }
     virtual iSpriteFrame* AddFrame ()
     {
-      return QUERY_INTERFACE_SAFE (scfParent->AddFrame (), iSpriteFrame);
+      iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->AddFrame (), iSpriteFrame);
+      if (ifr) ifr->DecRef ();
+      return ifr;
     }
     virtual iSpriteFrame* FindFrame (const char* name)
     {
-      return QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
+      iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
+      if (ifr) ifr->DecRef ();
+      return ifr;
     }
     virtual int GetNumFrames ()
     {
@@ -527,19 +531,27 @@ public:
     }
     virtual iSpriteFrame* GetFrame (int f)
     {
-      return QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
+      iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
+      if (ifr) ifr->DecRef ();
+      return ifr;
     }
     virtual iSpriteAction* AddAction ()
     {
-      return QUERY_INTERFACE_SAFE (scfParent->AddAction (), iSpriteAction);
+      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->AddAction (), iSpriteAction);
+      if (ia) ia->DecRef ();
+      return ia;
     }
     virtual iSpriteAction* FindAction (const char* name)
     {
-      return QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
+      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
+      if (ia) ia->DecRef ();
+      return ia;
     }
     virtual iSpriteAction* GetFirstAction ()
     {
-      return QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
+      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
+      if (ia) ia->DecRef ();
+      return ia;
     }
     virtual int GetNumActions ()
     {
@@ -547,7 +559,9 @@ public:
     }
     virtual iSpriteAction* GetAction (int No)
     {
-      return QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
+      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
+      if (ia) ia->DecRef ();
+      return ia;
     }
     virtual void EnableSkeletalAnimation ();
     virtual iSkeleton* GetSkeleton ();
@@ -1045,7 +1059,12 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () { return QUERY_INTERFACE (factory, iMeshObjectFactory); }
+  virtual iMeshObjectFactory* GetFactory ()
+  {
+    iMeshObjectFactory* ifact = QUERY_INTERFACE (factory, iMeshObjectFactory);
+    ifact->DecRef ();
+    return ifact;
+  }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -1151,7 +1170,9 @@ public:
     }
     virtual iSpriteAction* GetCurAction ()
     {
-      return QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
+      iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
+      if (ia) ia->DecRef ();
+      return ia;
     }
     virtual void EnableTweening (bool en)
     {

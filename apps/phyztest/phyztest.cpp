@@ -311,7 +311,7 @@ void Phyztest::NextFrame ()
     // use box template
 
     csMeshFactoryWrapper* bxtmpl = (csMeshFactoryWrapper*)
-      view->GetEngine ()->meshobj_factories.FindByName ("box");
+      view->GetEngine ()->mesh_factories.FindByName ("box");
     if (!bxtmpl)
     {  
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
@@ -370,7 +370,7 @@ void Phyztest::NextFrame ()
     {
       // add a mesh
       csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
-	view->GetEngine ()->meshobj_factories.FindByName ("box");
+	view->GetEngine ()->mesh_factories.FindByName ("box");
       if (!tmpl)
       {     
 	Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
@@ -442,16 +442,15 @@ void Phyztest::NextFrame ()
   if ( bot )
   {
     csVector3 new_p = rb_bot->get_pos();
-    csLight* lights[2];
+    iLight* lights[2];
     int num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     bot->UpdateLighting (lights, num_lights);  
-  
   }
  
   // if we have a swinging chain demo started
   if ( chain_added == true )
   {
-    csLight* lights[2];
+    iLight* lights[2];
     csVector3 new_p;
     int num_lights;
 
@@ -481,7 +480,7 @@ void Phyztest::NextFrame ()
 	chain[i]->sprt->GetMovable ().UpdateMove ();
 
         num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-              chain[i]->sprt->UpdateLighting (lights, num_lights); 
+        chain[i]->sprt->UpdateLighting (lights, num_lights); 
       }
     }
   }

@@ -110,8 +110,8 @@ void csRegion::Region::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csMeshFactoryWrapper::Type)
     {
       csMeshFactoryWrapper* o = (csMeshFactoryWrapper*)copy[i];
-      scfParent->engine->meshobj_factories.Delete (
-        scfParent->engine->meshobj_factories.Find (o));
+      scfParent->engine->mesh_factories.Delete (
+        scfParent->engine->mesh_factories.Find (o));
       copy[i] = NULL;
     }
 

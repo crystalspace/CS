@@ -59,6 +59,8 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   mesh->IncRef ();
   draw_cb = NULL;
   factory = NULL;
+
+  imovable = QUERY_INTERFACE (&movable, iMovable);
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -86,6 +88,8 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   csMeshWrapper::mesh = NULL;
   draw_cb = NULL;
   factory = NULL;
+
+  imovable = QUERY_INTERFACE (&movable, iMovable);
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
@@ -98,6 +102,7 @@ void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 csMeshWrapper::~csMeshWrapper ()
 {
   if (mesh) mesh->DecRef ();
+  if (imovable) imovable->DecRef ();
   if (parent->GetType () == csEngine::Type)
   {
     csEngine* engine = (csEngine*)parent;
@@ -187,7 +192,7 @@ void csMeshWrapper::RemoveFromSectors ()
 }
 
 /// The list of lights that hit the mesh
-static DECLARE_GROWING_ARRAY_REF (light_worktable, csLight*);
+static DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
 
 void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
 {
@@ -212,14 +217,13 @@ void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
 
 void csMeshWrapper::Draw (csRenderView& rview)
 {
-  iMeshWrapper* meshwrap = QUERY_INTERFACE (this, iMeshWrapper);
+  iMeshWrapper* meshwrap = &scfiMeshWrapper;
   iRenderView* irv = QUERY_INTERFACE (&rview, iRenderView);
   if (draw_cb) draw_cb (meshwrap, irv, draw_cbData);
-  iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
-  if (mesh->DrawTest (irv, imov))
+  if (mesh->DrawTest (irv, imovable))
   {
     UpdateDeferedLighting (movable.GetFullPosition ());
-    mesh->Draw (irv, imov);
+    mesh->Draw (irv, imovable);
   }
   int i;
   for (i = 0 ; i < children.Length () ; i++)
@@ -227,6 +231,7 @@ void csMeshWrapper::Draw (csRenderView& rview)
     csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->Draw (rview);
   }
+  irv->DecRef ();
 }
 
 void csMeshWrapper::NextFrame (cs_time current_time)
@@ -240,21 +245,13 @@ void csMeshWrapper::NextFrame (cs_time current_time)
   }
 }
 
-void csMeshWrapper::UpdateLighting (csLight** lights, int num_lights)
+void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 {
   defered_num_lights = 0;
   if (num_lights <= 0) return;
-  // @@@ Can't we avoid this allocation?
-  iLight** ilights = new iLight* [num_lights];
-  int i;
-  for (i = 0 ; i < num_lights ; i++)
-  {
-    ilights[i] = QUERY_INTERFACE (lights[i], iLight);
-  }
-  iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
-  mesh->UpdateLighting (ilights, num_lights, imov);
-  delete ilights;
+  mesh->UpdateLighting (lights, num_lights, imovable);
 
+  int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
     csMeshWrapper* spr = (csMeshWrapper*)children[i];
@@ -310,11 +307,6 @@ void csMeshWrapper::HardTransform (const csReversibleTransform& t)
     csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->HardTransform (t);
   }
-}
-
-iMovable* csMeshWrapper::MeshWrapper::GetMovable ()
-{
-  return QUERY_INTERFACE (&(scfParent->GetMovable ()), iMovable);
 }
 
 void csMeshWrapper::GetTransformedBoundingBox (
@@ -400,9 +392,9 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 
 void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
 {
-  if (meshFact) meshFact->DecRef ();
-  csMeshFactoryWrapper::meshFact = meshFact;
   if (meshFact) meshFact->IncRef ();
+  if (csMeshFactoryWrapper::meshFact) csMeshFactoryWrapper::meshFact->DecRef ();
+  csMeshFactoryWrapper::meshFact = meshFact;
 }
 
 csMeshWrapper* csMeshFactoryWrapper::NewMeshObject (csObject* parent)

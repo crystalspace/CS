@@ -63,6 +63,7 @@ struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
 struct iRegion;
+struct iLight;
 
 
 /**
@@ -430,7 +431,7 @@ public:
    * List of mesh object factories. This vector contains objects of
    * type csMeshFactoryWrapper*.
    */
-  csNamedObjVector meshobj_factories;
+  csNamedObjVector mesh_factories;
 
   /**
    * List of thing templates. This vector contains objects of
@@ -485,6 +486,8 @@ public:
   static iSystem* System;
   /// The shared engine instance.
   static csEngine* current_engine;
+  /// The shared engine instance.
+  static iEngine* current_iengine;
   /// Need to render using newradiosity?
   static bool use_new_radiosity;
   /// An object pool for 2D polygons used by the rendering process.
@@ -934,7 +937,7 @@ public:
    * array.
    */
   int GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
-  	csLight** lights, int max_num_lights);
+  	iLight** lights, int max_num_lights);
 
   /**
    * This routine returns an iterator to iterate over

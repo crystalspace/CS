@@ -877,6 +877,7 @@ void csOctree::Cache (iVFS* vfs, const char* name)
   WriteLong (mf, (long)mode);
   Cache ((csOctreeNode*)root, mf);
   vfs->WriteFile(name, m.GetData(), m.GetSize());
+  mf->DecRef ();
 }
 
 bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,

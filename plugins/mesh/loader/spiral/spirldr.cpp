@@ -188,6 +188,8 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (partstate) partstate->DecRef ();
+      if (spiralstate) spiralstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -213,6 +215,8 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    if (partstate) partstate->DecRef ();
+	    if (spiralstate) spiralstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -228,6 +232,8 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
+	    if (partstate) partstate->DecRef ();
+	    if (spiralstate) spiralstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -246,6 +252,8 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (partstate) partstate->DecRef ();
+  if (spiralstate) spiralstate->DecRef ();
   return mesh;
 }
 

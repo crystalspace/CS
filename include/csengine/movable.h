@@ -49,6 +49,8 @@ private:
    * the parent one.
    */
   csMovable* parent;
+  /// SCF interface to movable.
+  iMovable* iparent;
 
   /**
    * Object on which this movable operates (csThing or
@@ -69,10 +71,7 @@ public:
   void SetObject (csObject* obj) { object = obj; }
 
   /// Set the parent movable.
-  void SetParent (csMovable* parent)
-  {
-    csMovable::parent = parent;
-  }
+  void SetParent (csMovable* parent);
 
   /// Get the parent movable.
   csMovable* GetParent ()
@@ -206,7 +205,10 @@ public:
   struct eiMovable : public iMovable
   {
     DECLARE_EMBEDDED_IBASE (csMovable);
-    virtual iMovable* GetParent ();
+    virtual iMovable* GetParent ()
+    {
+      return scfParent->iparent;
+    }
     virtual void SetSector (iSector* sector);
     virtual void ClearSectors ()
     {
@@ -264,6 +266,7 @@ public:
       scfParent->UpdateMove ();
     }
   } scfiMovable;
+  friend class eiMovable;
 };
 
 #endif // __CS_MOVABLE_H__

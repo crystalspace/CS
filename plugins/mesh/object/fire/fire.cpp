@@ -107,8 +107,9 @@ csFireMeshObject::~csFireMeshObject()
   if (dynlight && delete_light)
   {
     light_engine->RemoveDynLight (dynlight);
-    dynlight->DecRef ();
   }
+  if (dynlight) dynlight->DecRef ();
+  if (light) light->DecRef ();
   delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
@@ -117,7 +118,8 @@ csFireMeshObject::~csFireMeshObject()
 void csFireMeshObject::SetControlledLight (iLight *l)
 {
   light = l;
-  dynlight = QUERY_INTERFACE (light, iDynLight);
+  if (dynlight) dynlight->DecRef ();
+  dynlight = QUERY_INTERFACE_SAFE (light, iDynLight);
 }
 
 void csFireMeshObject::RestartParticle (int index, float pre_move)
@@ -242,9 +244,10 @@ csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 
 iMeshObject* csFireMeshObjectFactory::NewInstance ()
 {
-  csFireMeshObject* cm = new csFireMeshObject (system,
-  	QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csFireMeshObject* cm = new csFireMeshObject (system, (iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -279,6 +282,8 @@ bool csFireMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csFireMeshObjectType::NewFactory ()
 {
   csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (system);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

@@ -129,7 +129,9 @@ iSkeletonConnection* csSkelLimb::CreateConnection ()
 {
   csSkelConnection* con = new csSkelConnection ();
   AddChild (con);
-  return QUERY_INTERFACE (con, iSkeletonConnection);
+  iSkeletonConnection* icon = QUERY_INTERFACE (con, iSkeletonConnection);
+  icon->DecRef ();
+  return icon;
 }
 
 csSkelLimbState* csSkelLimb::CreateState ()

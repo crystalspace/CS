@@ -277,7 +277,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
     {
       //@@@ Error handling!
       //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      //fatal_exit (0, false);
+      con->DecRef ();
       return false;
     }
     switch (cmd)
@@ -287,7 +287,12 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
           iSkeletonConnection* newcon = limb->CreateConnection ();
 	  iSkeletonLimb* newlimb = QUERY_INTERFACE (newcon, iSkeletonLimb);
 	  if (name) newlimb->SetName (name);
-	  if (!LoadSkeleton (newlimb, params)) return false;
+	  if (!LoadSkeleton (newlimb, params))
+	  {
+	    //@@@
+	    con->DecRef ();
+	    return false;
+	  }
 	}
         break;
       case CS_TOKEN_TRANSFORM:
@@ -303,6 +308,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 	      //@@@ Error handling!
       	      //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
       	      //fatal_exit (0, false);
+	      con->DecRef ();
 	      return false;
     	    }
             switch (cmd)
@@ -323,6 +329,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 	  //@@@ Error handling!
 	  //CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
 	  //fatal_exit (0, false);
+	  con->DecRef ();
 	  return false;
 	}
 	break;
@@ -341,9 +348,11 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
     //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
         //csGetLastOffender ());
     //fatal_exit (0, false);
+    con->DecRef ();
     return false;
   }
 
+  con->DecRef ();
   return true;
 }
 
@@ -391,6 +400,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
       // @@@ Error handling!
       printf ("No params!\n");
       fact->DecRef ();
+      spr3dLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -404,6 +414,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
             // @@@ Error handling!
 	    printf ("Can't find material!\n");
             fact->DecRef ();
+	    spr3dLook->DecRef ();
             return NULL;
 	  }
 	  spr3dLook->SetMaterialWrapper (mat);
@@ -420,6 +431,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	    // @@@ Error handling!
 	    printf ("Bad skeleton!\n");
 	    fact->DecRef ();
+	    spr3dLook->DecRef ();
 	    return NULL;
 	  }
 	}
@@ -439,6 +451,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
               //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
 	      printf ("Bad action!\n");
 	      fact->DecRef ();
+	      spr3dLook->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -453,6 +466,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
                         //fn, act->GetName ());
 		  printf ("Bad frame!\n");
 		  fact->DecRef ();
+		  spr3dLook->DecRef ();
                   return NULL;
                 }
                 act->AddFrame (ff, d);
@@ -478,6 +492,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
               //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
 	      printf ("Error\n");
 	      fact->DecRef ();
+	      spr3dLook->DecRef ();
 	      return NULL;
             }
             switch (cmd)
@@ -496,6 +511,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
                     //fr->GetName ());
 	      	  printf ("Too many vertices!\n");
 		  fact->DecRef ();
+		  spr3dLook->DecRef ();
 		  return NULL;
                 }
                 spr3dLook->GetVertex (anm_idx, i) = csVector3 (x, y, z);
@@ -511,6 +527,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
                 //fr->GetName (), csGetLastOffender ());
 	    printf ("Token not found!\n");
 	    fact->DecRef ();
+	    spr3dLook->DecRef ();
 	    return NULL;
           }
           if (i < spr3dLook->GetNumTexels ())
@@ -520,6 +537,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
                 //fr->GetName (), i, state->GetNumTexels ());
 	    printf ("Too few vertices!\n");
 	    fact->DecRef ();
+	    spr3dLook->DecRef ();
 	    return NULL;
           }
         }
@@ -557,6 +575,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	break;
     }
   }
+  spr3dLook->DecRef ();
   return fact;
 }
 
@@ -601,6 +620,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (spr3dLook) spr3dLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -613,6 +633,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
 	  {
 	    // @@@ Error handling!
 	    printf ("Can't find factory!\n");
+	    if (spr3dLook) spr3dLook->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -632,6 +653,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
             // @@@ Error handling!
 	    printf ("Can't find material!\n");
             mesh->DecRef ();
+	    if (spr3dLook) spr3dLook->DecRef ();
             return NULL;
 	  }
 	  spr3dLook->SetMaterialWrapper (mat);
@@ -651,6 +673,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (spr3dLook) spr3dLook->DecRef ();
   return mesh;
 }
 

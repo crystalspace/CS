@@ -198,6 +198,8 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (partstate) partstate->DecRef ();
+      if (firestate) firestate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -251,6 +253,8 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    if (partstate) partstate->DecRef ();
+	    if (firestate) firestate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -266,6 +270,8 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
+	    if (partstate) partstate->DecRef ();
+	    if (firestate) firestate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -291,6 +297,8 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (partstate) partstate->DecRef ();
+  if (firestate) firestate->DecRef ();
   return mesh;
 }
 

@@ -296,13 +296,17 @@ public:
     {
       csSkelLimbState* ls=scfParent->GetNext();
       if (!ls) return NULL;
-      return QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      ibone->DecRef ();
+      return ibone;
     }
     virtual iSkeletonBone* GetChildren ()
     {
       csSkelLimbState* ls=scfParent->GetFirstChild ();
       if (!ls) return NULL;
-      return QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      ibone->DecRef ();
+      return ibone;
     }
     virtual const char* GetName ()
     {
@@ -370,13 +374,17 @@ public:
     {
       csSkelLimbState* ls=scfParent->GetNext();
       if(!ls) return NULL;
-      return QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      ibone->DecRef ();
+      return ibone;
     }
     virtual iSkeletonBone* GetChildren ()
     {
       csSkelLimbState* ls=scfParent->GetFirstChild();
       if(!ls) return NULL;
-      return QUERY_INTERFACE(ls, iSkeletonBone);
+      iSkeletonBone* ibone = QUERY_INTERFACE(ls, iSkeletonBone);
+      ibone->DecRef ();
+      return ibone;
     }
     virtual const char* GetName ()
     {

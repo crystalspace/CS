@@ -63,6 +63,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
 {
+  if (ifactory) ifactory->DecRef ();
 }
 
 void csSprite2DMeshObject::SetupObject ()
@@ -439,7 +440,9 @@ csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
 iMeshObject* csSprite2DMeshObjectFactory::NewInstance ()
 {
   csSprite2DMeshObject* cm = new csSprite2DMeshObject (this);
-  return QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -473,6 +476,8 @@ bool csSprite2DMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csSprite2DMeshObjectType::NewFactory ()
 {
   csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory ();
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

@@ -267,12 +267,14 @@ csPolyTexture::csPolyTexture ()
   CONSTRUCT_IBASE (NULL);
   lm = NULL;
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
+  ipolygon = NULL;
 }
 
 csPolyTexture::~csPolyTexture ()
 {
   csEngine::current_engine->G3D->RemoveFromCache (this);
   if (lm) lm->DecRef ();
+  if (ipolygon) ipolygon->DecRef ();
 }
 
 void csPolyTexture::SetLightMap (csLightMap* lightmap)
@@ -1092,9 +1094,12 @@ void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, flo
   fMinV = Fmin_v; fMaxV = Fmax_v;
 }
 
-iPolygon3D *csPolyTexture::GetPolygon ()
+void csPolyTexture::SetPolygon (csPolygon3D* p)
 {
-  return QUERY_INTERFACE(polygon, iPolygon3D);
+  iPolygon3D* ipol = QUERY_INTERFACE (p, iPolygon3D);
+  if (ipolygon) ipolygon->DecRef ();
+  ipolygon = ipol;
+  polygon = p;
 }
 
 bool csPolyTexture::DynamicLightsDirty () 

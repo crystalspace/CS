@@ -308,7 +308,9 @@ csPolygon3D* csPolygonSet::GetPolygon3D (const char* name)
 
 iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
 {
-  return QUERY_INTERFACE(scfParent->GetPolygon3D (idx), iPolygon3D);
+  iPolygon3D* ip = QUERY_INTERFACE (scfParent->GetPolygon3D (idx), iPolygon3D);
+  ip->DecRef ();
+  return ip;
 }
 
 csPolygon3D* csPolygonSet::NewPolygon (csMaterialWrapper* material)

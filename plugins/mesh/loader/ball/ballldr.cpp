@@ -186,6 +186,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (ballstate) ballstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -243,6 +244,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (ballstate) ballstate->DecRef ();
   return mesh;
 }
 

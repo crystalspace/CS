@@ -194,9 +194,10 @@ csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 
 iMeshObject* csFountainMeshObjectFactory::NewInstance ()
 {
-  csFountainMeshObject* cm = new csFountainMeshObject (system,
-  	QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csFountainMeshObject* cm = new csFountainMeshObject (system, (iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -231,6 +232,8 @@ bool csFountainMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csFountainMeshObjectType::NewFactory ()
 {
   csFountainMeshObjectFactory* cm = new csFountainMeshObjectFactory (system);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

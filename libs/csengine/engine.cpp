@@ -567,6 +567,7 @@ int csEngine::frame_width;
 int csEngine::frame_height;
 iSystem* csEngine::System = NULL;
 csEngine* csEngine::current_engine = NULL;
+iEngine* csEngine::current_iengine = NULL;
 bool csEngine::use_new_radiosity = false;
 int csEngine::max_process_polygons = 2000000000;
 int csEngine::cur_process_polygons = 0;
@@ -612,6 +613,8 @@ csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
   covtree_lut = NULL;
   current_camera = NULL;
   current_engine = this;
+  current_iengine = QUERY_INTERFACE (this, iEngine);
+  current_iengine->DecRef ();
   use_pvs = false;
   use_pvs_only = false;
   freeze_pvs = false;
@@ -772,7 +775,7 @@ void csEngine::Clear ()
   meshes.DeleteAll ();
   things.DeleteAll ();
   skies.DeleteAll ();
-  meshobj_factories.DeleteAll ();
+  mesh_factories.DeleteAll ();
   curve_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
@@ -1622,7 +1625,7 @@ void csEngine::RemoveCollection (csCollection* collection)
 
 struct LightAndDist
 {
-  csLight* light;
+  iLight* light;
   float sqdist;
 };
 
@@ -1638,7 +1641,7 @@ public:
   csLightArray () : array (NULL), size (0), num_lights (0) { }
   virtual ~csLightArray () { delete [] array; }
   void Reset () { num_lights = 0; }
-  void AddLight (csLight* l, float sqdist)
+  void AddLight (iLight* l, float sqdist)
   {
     if (num_lights >= size)
     {
@@ -1655,7 +1658,7 @@ public:
     array[num_lights].light = l;
     array[num_lights++].sqdist = sqdist;
   };
-  csLight* GetLight (int i) { return array[i].light; }
+  iLight* GetLight (int i) { return array[i].light; }
 };
 
 int compare_light (const void* p1, const void* p2)
@@ -1670,7 +1673,7 @@ int compare_light (const void* p1, const void* p2)
 }
 
 int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
-  	csLight** lights, int max_num_lights)
+  	iLight** lights, int max_num_lights)
 {
   int i;
   float sqdist;
@@ -1701,7 +1704,12 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
       if (dl->GetSector () == sector)
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
-        if (sqdist < dl->GetSquaredRadius ()) light_array->AddLight (dl, sqdist);
+        if (sqdist < dl->GetSquaredRadius ())
+	{
+	  iLight* il = QUERY_INTERFACE (dl, iLight);
+	  light_array->AddLight (il, sqdist);
+	  il->DecRef ();
+	}
       }
       dl = dl->GetNext ();
     }
@@ -1714,7 +1722,12 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
     {
       csStatLight* sl = (csStatLight*)sector->lights[i];
       sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
-      if (sqdist < sl->GetSquaredRadius ()) light_array->AddLight (sl, sqdist);
+      if (sqdist < sl->GetSquaredRadius ())
+      {
+	iLight* il = QUERY_INTERFACE (sl, iLight);
+        light_array->AddLight (il, sqdist);
+	il->DecRef ();
+      }
     }
   }
 
@@ -1815,7 +1828,7 @@ bool csEngine::DeleteLibrary (const char *iName)
 
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (meshes, csMeshWrapper)
-  DELETE_ALL_OBJECTS (meshobj_factories, csMeshFactoryWrapper)
+  DELETE_ALL_OBJECTS (mesh_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
   DELETE_ALL_OBJECTS (thing_templates, csThing)
   DELETE_ALL_OBJECTS (sectors, csSector)
@@ -2042,9 +2055,9 @@ iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOn
 {
   csMeshFactoryWrapper* fact;
   if (regionOnly && region)
-    fact = (csMeshFactoryWrapper*)FindObjectInRegion (region, meshobj_factories, iName);
+    fact = (csMeshFactoryWrapper*)FindObjectInRegion (region, mesh_factories, iName);
   else
-    fact = (csMeshFactoryWrapper*)meshobj_factories.FindByName (iName);
+    fact = (csMeshFactoryWrapper*)mesh_factories.FindByName (iName);
   if (!fact) return NULL;
   iMeshFactoryWrapper* ifact = &fact->scfiMeshFactoryWrapper;
   return ifact;
@@ -2160,7 +2173,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   if (!fact) return NULL;
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
-  meshobj_factories.Push (mfactwrap);
+  mesh_factories.Push (mfactwrap);
   iMeshFactoryWrapper* imfw = QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
   imfw->DecRef ();
   return imfw;

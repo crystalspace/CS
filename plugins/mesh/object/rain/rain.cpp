@@ -151,9 +151,10 @@ csRainMeshObjectFactory::~csRainMeshObjectFactory ()
 
 iMeshObject* csRainMeshObjectFactory::NewInstance ()
 {
-  csRainMeshObject* cm = new csRainMeshObject (system,
-  	QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csRainMeshObject* cm = new csRainMeshObject (system, (iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -188,6 +189,8 @@ bool csRainMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
 {
   csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (system);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

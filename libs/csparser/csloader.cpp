@@ -3602,12 +3602,12 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
 	  break;
         case CS_TOKEN_MESHOBJ:
           {
-            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->meshobj_factories.FindByName (name);
+            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->mesh_factories.FindByName (name);
             if (!t)
             {
               t = new csMeshFactoryWrapper ();
               t->SetName (name);
-              Engine->meshobj_factories.Push (t);
+              Engine->mesh_factories.Push (t);
             }
             LoadMeshObjectFactory (t, params);
           }
@@ -3922,12 +3922,12 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_MESHOBJ:
           {
-            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->meshobj_factories.FindByName (name);
+            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->mesh_factories.FindByName (name);
             if (!t)
             {
               t = new csMeshFactoryWrapper ();
               t->SetName (name);
-              Engine->meshobj_factories.Push (t);
+              Engine->mesh_factories.Push (t);
             }
             LoadMeshObjectFactory (t, params);
           }
@@ -4106,7 +4106,7 @@ csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (csEngine* engine,
     tmpl->SetName (name);
     if (LoadMeshObjectFactory (tmpl, data))
     {
-      Engine->meshobj_factories.Push (tmpl);
+      Engine->mesh_factories.Push (tmpl);
       databuff->DecRef ();
       return tmpl;
     }
@@ -4154,8 +4154,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	}
 	else
 	{
-	  iBase* mof = plug->Parse (params,
-	      (iEngine*)QUERY_INTERFACE (csEngine::current_engine, iEngine));
+	  iBase* mof = plug->Parse (params, csEngine::current_iengine);
 	  if (!mof)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
@@ -4180,7 +4179,10 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	    iSprite3DFactoryState* state = QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
 		iSprite3DFactoryState);
-            state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+            iMaterialWrapper* imat = QUERY_INTERFACE (mat, iMaterialWrapper);
+            state->SetMaterialWrapper (imat);
+	    imat->DecRef ();
+	    state->DecRef ();
 	  }
           else
           {
@@ -4212,6 +4214,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	  iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
 	  csCrossBuild_SpriteTemplateFactory builder;
 	  builder.CrossBuild (state, *filedata);
+	  state->DecRef ();
 	  delete filedata;
         }
         break;
@@ -4328,8 +4331,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params,
-	      (iEngine*)QUERY_INTERFACE (csEngine::current_engine, iEngine));
+	  iBase* mo = plug->Parse (params, csEngine::current_iengine);
 	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
 	  mesh->SetMeshObject (mo2);
 	  mo2->DecRef ();
@@ -4338,9 +4340,9 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	  // reference to the factory that created this object.
 	  iMeshObjectFactory* fact = mo2->GetFactory ();
 	  int i;
-	  for (i = 0 ; i < Engine->meshobj_factories.Length () ; i++)
+	  for (i = 0 ; i < Engine->mesh_factories.Length () ; i++)
 	  {
-	    csMeshFactoryWrapper* factwrap = (csMeshFactoryWrapper*)(Engine->meshobj_factories[i]);
+	    csMeshFactoryWrapper* factwrap = (csMeshFactoryWrapper*)(Engine->mesh_factories[i]);
 	    if (factwrap->GetMeshObjectFactory () == fact)
 	    {
 	      mesh->SetFactory (factwrap);

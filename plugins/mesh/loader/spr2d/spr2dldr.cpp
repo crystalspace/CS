@@ -162,6 +162,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
     {
       // @@@ Error handling!
       fact->DecRef ();
+      spr2dLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -174,6 +175,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             fact->DecRef ();
+	    spr2dLook->DecRef ();
             return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
@@ -192,6 +194,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  spr2dLook->DecRef ();
   return fact;
 }
 
@@ -239,6 +242,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (spr2dLook) spr2dLook->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -250,6 +254,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    if (spr2dLook) spr2dLook->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -265,6 +270,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
+	    if (spr2dLook) spr2dLook->DecRef ();
             return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
@@ -328,6 +334,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (spr2dLook) spr2dLook->DecRef ();
   return mesh;
 }
 

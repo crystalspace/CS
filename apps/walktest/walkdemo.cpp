@@ -959,7 +959,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
     dyn->Setup ();
   }
   csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
-  	Sys->view->GetEngine ()->meshobj_factories.FindByName ("bot");
+  	Sys->view->GetEngine ()->mesh_factories.FindByName ("bot");
   if (!tmpl) return;
   iMeshObject* botmesh = tmpl->GetMeshObjectFactory ()->NewInstance ();
   Bot* bot;
@@ -1178,7 +1178,7 @@ void fire_missile ()
   sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
 
   csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
-  	Sys->view->GetEngine ()->meshobj_factories.FindByName (misname);
+  	Sys->view->GetEngine ()->mesh_factories.FindByName (misname);
   if (!tmpl)
     Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite factory!\n", misname);
   else

@@ -42,10 +42,20 @@ csMovable::csMovable ()
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = NULL;
+  iparent = NULL;
 }
 
 csMovable::~csMovable ()
 {
+  if (iparent) iparent->DecRef ();
+}
+
+void csMovable::SetParent (csMovable* parent)
+{
+  iMovable* ipar = QUERY_INTERFACE_SAFE (parent, iMovable);
+  if (iparent) iparent->DecRef ();
+  iparent = ipar;
+  csMovable::parent = parent;
 }
 
 void csMovable::SetPosition (csSector* home, const csVector3& pos)
@@ -145,13 +155,6 @@ csReversibleTransform csMovable::GetFullTransform () const
 
 //--------------------------------------------------------------------------
 
-iMovable* csMovable::eiMovable::GetParent ()
-{
-  csMovable* par = scfParent->GetParent ();
-  if (!par) return NULL;
-  return QUERY_INTERFACE (par, iMovable);
-}
-
 void csMovable::eiMovable::SetSector (iSector* sector)
 {
   scfParent->SetSector (sector->GetPrivateObject ());
@@ -170,6 +173,7 @@ void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
 iSector* csMovable::eiMovable::GetSector (int idx)
 {
   csSector* sect = (csSector*)scfParent->GetSectors ()[idx];
-  return QUERY_INTERFACE (sect, iSector);
+  if (!sect) return NULL;
+  return &sect->scfiSector;
 }
 

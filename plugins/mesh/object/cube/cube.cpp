@@ -59,6 +59,7 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
 
 csCubeMeshObject::~csCubeMeshObject ()
 {
+  if (ifactory) ifactory->DecRef ();
 }
 
 void csCubeMeshObject::GetTransformedBoundingBox (iTransformationManager* tranman,
@@ -373,7 +374,9 @@ csCubeMeshObjectFactory::~csCubeMeshObjectFactory ()
 iMeshObject* csCubeMeshObjectFactory::NewInstance ()
 {
   csCubeMeshObject* cm = new csCubeMeshObject (this);
-  return QUERY_INTERFACE (cm, iMeshObject);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -421,7 +424,10 @@ iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
   iCubeFactoryState* cubeLook = QUERY_INTERFACE (cm, iCubeFactoryState);
   cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
   cubeLook->SetShift (default_shift.x, default_shift.y, default_shift.z);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  cubeLook->DecRef ();
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 
 #define NUM_OPTIONS 6

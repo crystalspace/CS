@@ -1813,4 +1813,5 @@ void csOctree::CachePVS (iVFS* vfs, const char* name)
   WriteLong (mf, 100001);
   CachePVS ((csOctreeNode*)root, mf);
   vfs->WriteFile(name, m.GetData(), m.GetSize());
+  mf->DecRef ();
 }

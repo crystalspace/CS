@@ -91,7 +91,7 @@ void Bot::move (cs_time elapsed_time)
   if (s)
   {
     GetMovable ().SetSector (s);
-    csLight* lights[2];
+    iLight* lights[2];
     int num_lights = engine->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
     if (light)

@@ -196,6 +196,8 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (partstate) partstate->DecRef ();
+      if (snowstate) snowstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -244,6 +246,8 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    if (partstate) partstate->DecRef ();
+	    if (snowstate) snowstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -259,6 +263,8 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
+	    if (partstate) partstate->DecRef ();
+	    if (snowstate) snowstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -284,6 +290,8 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (partstate) partstate->DecRef ();
+  if (snowstate) snowstate->DecRef ();
   return mesh;
 }
 

@@ -163,9 +163,10 @@ csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
 
 iMeshObject* csSnowMeshObjectFactory::NewInstance ()
 {
-  csSnowMeshObject* cm = new csSnowMeshObject (system,
-  	QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csSnowMeshObject* cm = new csSnowMeshObject (system, (iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -200,6 +201,8 @@ bool csSnowMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csSnowMeshObjectType::NewFactory ()
 {
   csSnowMeshObjectFactory* cm = new csSnowMeshObjectFactory (system);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

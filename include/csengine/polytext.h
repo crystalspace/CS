@@ -31,6 +31,7 @@ class csLightPatch;
 class csBitSet;
 class Dumper;
 struct iMaterialHandle;
+struct iPolygon3D;
 struct LightInfo;
 
 
@@ -65,6 +66,8 @@ class csPolyTexture : public iPolygonTexture
 private:
   /// The corresponding polygon.
   csPolygon3D* polygon;
+  /// SCF pointer.
+  iPolygon3D* ipolygon;
 
   /// The corresponding unlighted material.
   iMaterialHandle* mat_handle;
@@ -132,7 +135,7 @@ public:
   /**
    * Set the corresponding polygon for this polytexture.
    */
-  void SetPolygon (csPolygon3D* p) { polygon = p; }
+  void SetPolygon (csPolygon3D* p);
 
   /**
    * Return the polygon corresponding to this texture
@@ -213,7 +216,10 @@ public:
   virtual int GetOriginalWidth ();
 
   ///
-  virtual iPolygon3D *GetPolygon ();
+  virtual iPolygon3D *GetPolygon ()
+  {
+    return ipolygon;
+  }
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty ();
   /**

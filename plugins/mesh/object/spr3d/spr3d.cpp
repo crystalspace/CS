@@ -218,7 +218,9 @@ iMeshObject* csSprite3DMeshObjectFactory::NewInstance ()
   spr->SetLightingQualityConfig (GetLightingQualityConfig());
   spr->SetAction ("default");
   spr->InitSprite ();
-  return QUERY_INTERFACE (spr, iMeshObject);
+  iMeshObject* im = QUERY_INTERFACE (spr, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 void csSprite3DMeshObjectFactory::GenerateLOD ()
@@ -544,7 +546,9 @@ void csSprite3DMeshObjectFactory::Sprite3DFactoryState::EnableSkeletalAnimation 
 
 iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
 {
-  return QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
+  iSkeleton* iskel = QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
+  if (iskel) iskel->DecRef ();
+  return iskel;
 }
 
 //=============================================================================
@@ -1564,7 +1568,9 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
 
 iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState ()
 {
-  return QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
+  iSkeletonState* iskelstate = QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
+  if (iskelstate) iskelstate->DecRef ();
+  return iskelstate;
 }
 
 //----------------------------------------------------------------------
@@ -1606,7 +1612,9 @@ iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory ();
   cm->System = System;
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 
 #define NUM_OPTIONS 2

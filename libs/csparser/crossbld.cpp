@@ -106,6 +106,7 @@ void csCrossBuild_SpriteTemplateFactory::CrossBuild (void* object,
     defaultaction->AddFrame( fstate->GetFrame(0), 1000 );
   }
 
+  fstate->DecRef ();
 }
 
 /// frame build method

@@ -28,6 +28,7 @@
 
 struct iMeshWrapper;
 struct iRenderView;
+struct iMovable;
 class Dumper;
 class csMeshWrapper;
 class csRenderView;
@@ -82,6 +83,8 @@ protected:
    * Position in the world.
    */
   csMovable movable;
+  /// SCF pointer to movable.
+  iMovable* imovable;
 
   /**
    * Pointer to the object to place in the polygon tree.
@@ -212,7 +215,7 @@ public:
    * Light object according to the given array of lights (i.e.
    * fill the vertex color array).
    */
-  void UpdateLighting (csLight** lights, int num_lights);
+  void UpdateLighting (iLight** lights, int num_lights);
 
   /**
    * Update lighting as soon as the object becomes visible.
@@ -316,12 +319,12 @@ public:
     }
     virtual void UpdateLighting (iLight** lights, int num_lights)
     {
-      (void)lights; (void)num_lights;
-      printf ("UpdateLighting in iMeshWrapper DOES NOT WORK YET!\n");
-      // @@@ TODO!!!
-      //scfParent->UpdateLighting (lights, num_lights);
+      scfParent->UpdateLighting (lights, num_lights);
     }
-    virtual iMovable* GetMovable ();
+    virtual iMovable* GetMovable ()
+    {
+      return scfParent->imovable;
+    }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)
     {

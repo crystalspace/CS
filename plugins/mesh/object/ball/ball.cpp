@@ -523,8 +523,10 @@ csBallMeshObjectFactory::~csBallMeshObjectFactory ()
 
 iMeshObject* csBallMeshObjectFactory::NewInstance ()
 {
-  csBallMeshObject* cm = new csBallMeshObject (QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csBallMeshObject* cm = new csBallMeshObject ((iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -558,6 +560,8 @@ bool csBallMeshObjectType::Initialize (iSystem*)
 iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
 {
   csBallMeshObjectFactory* cm = new csBallMeshObjectFactory ();
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

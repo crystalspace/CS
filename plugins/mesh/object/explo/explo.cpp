@@ -133,6 +133,7 @@ void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, cs_time fade)
   explight = engine->CreateDynLight (center, 5, csColor (1, 1, 0));
   ilight = QUERY_INTERFACE (explight, iLight);
   ilight->SetSector (light_sector);
+  ilight->DecRef ();
   explight->Setup ();
 }
 
@@ -173,9 +174,10 @@ csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 
 iMeshObject* csExploMeshObjectFactory::NewInstance ()
 {
-  csExploMeshObject* cm = new csExploMeshObject (system,
-  	QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csExploMeshObject* cm = new csExploMeshObject (system, (iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -210,6 +212,8 @@ bool csExploMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
 {
   csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (system);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 

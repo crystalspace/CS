@@ -323,7 +323,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 
   csMeshFactoryWrapper* meshwrap = new csMeshFactoryWrapper (result);
   meshwrap->SetName (templatename);
-  Sys->engine->meshobj_factories.Push (meshwrap);
+  Sys->engine->mesh_factories.Push (meshwrap);
 }
 
 iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,

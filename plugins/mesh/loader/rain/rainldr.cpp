@@ -194,6 +194,8 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (partstate) partstate->DecRef ();
+      if (rainstate) rainstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -235,6 +237,8 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    if (partstate) partstate->DecRef ();
+	    if (rainstate) rainstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -250,6 +254,8 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
+	    if (partstate) partstate->DecRef ();
+	    if (rainstate) rainstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -275,6 +281,8 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (partstate) partstate->DecRef ();
+  if (rainstate) rainstate->DecRef ();
   return mesh;
 }
 

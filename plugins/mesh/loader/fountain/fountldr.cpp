@@ -204,6 +204,8 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      if (partstate) partstate->DecRef ();
+      if (fountstate) fountstate->DecRef ();
       return NULL;
     }
     switch (cmd)
@@ -278,6 +280,8 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    if (partstate) partstate->DecRef ();
+	    if (fountstate) fountstate->DecRef ();
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -293,6 +297,8 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
+	    if (partstate) partstate->DecRef ();
+	    if (fountstate) fountstate->DecRef ();
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -318,6 +324,8 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
     }
   }
 
+  if (partstate) partstate->DecRef ();
+  if (fountstate) fountstate->DecRef ();
   return mesh;
 }
 

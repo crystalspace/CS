@@ -149,9 +149,10 @@ csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
 
 iMeshObject* csSpiralMeshObjectFactory::NewInstance ()
 {
-  csSpiralMeshObject* cm = new csSpiralMeshObject (system,
-  	QUERY_INTERFACE (this, iMeshObjectFactory));
-  return QUERY_INTERFACE (cm, iMeshObject);
+  csSpiralMeshObject* cm = new csSpiralMeshObject (system, (iMeshObjectFactory*)this);
+  iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
+  im->DecRef ();
+  return im;
 }
 
 //----------------------------------------------------------------------
@@ -186,6 +187,8 @@ bool csSpiralMeshObjectType::Initialize (iSystem* system)
 iMeshObjectFactory* csSpiralMeshObjectType::NewFactory ()
 {
   csSpiralMeshObjectFactory* cm = new csSpiralMeshObjectFactory (system);
-  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
+  ifact->DecRef ();
+  return ifact;
 }
 
