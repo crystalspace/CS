@@ -234,11 +234,11 @@ include mk/msvcgen/win32.mak
 MSVC7.PROJECT = $(MSVC7.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
 
 # Macro to compose full project pathname.
-# (ex: "CSGEOM" becomes "out/mk/visualc/libcsgeom.dsp")
+# (ex: "CSGEOM" becomes "out/mk/visualc/libcsgeom.vcproj")
 MSVC7.OUTPUT = $(MSVC7.OUT.DIR)/$(MSVC7.PROJECT)$(MSVC7.EXT.DSP)
 
 # Macro to compose full fragment pathname.
-# (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.dwi")
+# (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
 MSVC7.FRAGMENT = $(MSVC7.OUT.FRAGMENT)/$(MSVC7.PROJECT)$(MSVC7.EXT.FRAGMENT)
 
 # Macro to compose entire list of resources which comprise a project.
@@ -276,7 +276,7 @@ MSVC7.LIBRARY.DIRECTIVES = $(foreach l,$(DSP.$*.LIBS),--library=$l)
 MSVC7.LFLAGS.DIRECTIVE = $(subst --lflags='',,--lflags='$(DSP.$*.LFLAGS)')
 MSVC7.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
-# Macros to compose lists of existing and newly created DSW and DSP files.
+# Macros to compose lists of existing and newly created .SLN and .VCPROJ files.
 MSVC7.CVS.FILES = $(sort $(subst $(MSVC7.CVS.DIR)/,,$(wildcard \
   $(addprefix $(MSVC7.CVS.DIR)/*,$(MSVC7.EXT.DSP) $(MSVC7.EXT.DSW)))))
 MSVC7.OUT.FILES = $(sort $(subst $(MSVC7.OUT.DIR)/,,$(wildcard \
@@ -320,7 +320,7 @@ ifeq ($(MAKESECTION),targets)
 #$(MSVC7.OUT.DIR) $(MSVC7.OUT.FRAGMENT): $(MSVC7.OUT.BASE)
 #	$(MSVC7.SILENT)$(MKDIR)
 
-# Build a DSP project file and an associated DSW fragment file.
+# Build a .VCPROJ project file and associated .SLN fragment files.
 %.MAKEVCPROJ:
 	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --vcproj \
 	--name=$(DSP.$*.NAME) \
@@ -335,15 +335,15 @@ ifeq ($(MAKESECTION),targets)
 	$(MSVC7.CFLAGS.DIRECTIVE) \
 	$(MSVC7.CONTENTS)
 
-# Build the project-wide DSW file (csall.sln).
+# Build the project-wide .SLN file (csall.sln).
 slngen:
 	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --sln \
 	--output=$(MSVC7.OUT.DIR)/$(MSVC7.DSW) \
 	--template-dir=$(MSVC7.TEMPLATE.DIR) \
 	$(wildcard $(MSVC7.OUT.FRAGMENT)/*$(MSVC7.EXT.FRAGMENT))
 
-# Build all Visual-C++ DSW and DSP project files.  The DSW file is built last
-# since it is composed of the fragment files generated as part of the DSP file
+# Build all Visual-C++ .SLN and .VCPROJ project files.  The .SLN file is built last
+# since it is composed of the fragment files generated as part of the .VCPROJ file
 # synthesis process.
 msvc7gen: \
   msvc7genclean \
