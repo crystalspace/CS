@@ -63,7 +63,7 @@
   del conftest.* >nul
 
   echo ### Checking if you use cmd.exe or some fancy shell...
-  echo testing>conftest.1
+  echo testing>conftest.2
   make -f bin\win32conf.mak testecho
   cmp conftest.1 conftest.2
   if not errorlevel 1 goto noremovequote
