@@ -157,7 +157,7 @@ private:
   /// current file name and file system
   char *Filename;
   /// the VFS filesystem used for this file (or NULL if not used)
-  iVFS *VFS;
+  csRef<iVFS> VFS;
   /**
    * are the current contents of this object different from the contents
    * stored in the config file?

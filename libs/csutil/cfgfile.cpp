@@ -361,7 +361,6 @@ void csConfigFile::InitializeObject ()
 
   Iterators = new csVector();
   Filename = NULL;
-  VFS = NULL;
   Dirty = false;
   EOFComment = NULL;
 }
@@ -390,7 +389,6 @@ csConfigFile::~csConfigFile()
   CS_ASSERT(Iterators->Length() == 0);
   delete Iterators;
   if (Filename) delete[] Filename;
-  if (VFS) VFS->DecRef();
 }
 
 const char* csConfigFile::GetFileName() const
@@ -406,11 +404,9 @@ iVFS* csConfigFile::GetVFS() const
 void csConfigFile::SetFileName(const char *fName, iVFS *vfs)
 {
   if (Filename) delete[] Filename;
-  if (VFS) VFS->DecRef();
 
   Filename = csStrNew(fName);
   VFS = vfs;
-  if (VFS) VFS->IncRef();
   Dirty = true;
 }
 

@@ -3226,6 +3226,8 @@ int main (int argc, char* argv[])
 #endif
   csDefaultRunLoop(object_reg);
 
+  config = NULL;	// Clean this up before DestroyApplicatoin happens.
+
   Cleanup ();
   return 0;
 }
