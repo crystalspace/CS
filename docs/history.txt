@@ -23,6 +23,9 @@ The history order is reversed so that new features are at the top.
 	  it states that it might not be supported by implementations. It is 
 	  indeed not supported by the ATI Catalyst drivers, causing the 
 	  GL_version_1_2 pseudo-extension to fail initialization.
+	- Matze disabled csperl5 Jamfile, until it is fixed, but I don't want to
+	  mess around here without having a working example (a working
+	  makefile).
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
