@@ -41,15 +41,10 @@ protected:
   struct ColorInfo { csColor c; float age; float dage; };
   static ColorInfo* Colors;
   static void SetupColors();
-  static ColorInfo const* GetColorInfo(int n)
-  {
-    CS_ASSERT(n < MAX_COLORS);
-    if (Colors == 0) SetupColors();
-    return Colors + n;
-  }
-  static csColor const GetColor(int n) { return GetColorInfo(n)->c;    }
-  static float GetColorAge(int n)      { return GetColorInfo(n)->age;  }
-  static float GetColorDAge(int n)     { return GetColorInfo(n)->dage; }
+  static ColorInfo const* GetColorInfo(int n) { return Colors + n; }
+  static csColor const GetColor(int n) { return Colors[n].c;    }
+  static float GetColorAge(int n)      { return Colors[n].age;  }
+  static float GetColorDAge(int n)     { return Colors[n].dage; }
 
   // The following two colors are precalculated from the base colors, ages,
   // and dages (see above).  If precalc_valid == false this table has to be

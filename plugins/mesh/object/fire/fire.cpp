@@ -60,10 +60,10 @@ void csFireMeshObject::SetupColors()
   {
     static ColorInfo c[MAX_COLORS];
     c[0].c.Set(1.0,1.0,1.0); c[0].age = COL_AGE0; c[0].dage = COL_DAGE0;
-    c[0].c.Set(1.0,1.0,0.0); c[0].age = COL_AGE1; c[0].dage = COL_DAGE1;
-    c[0].c.Set(1.0,0.0,0.0); c[0].age = COL_AGE2; c[0].dage = COL_DAGE2;
-    c[0].c.Set(0.6,0.6,0.6); c[0].age = COL_AGE3; c[0].dage = COL_DAGE3;
-    c[0].c.Set(0.1,0.1,0.1); c[0].age = COL_AGE4; c[0].dage = COL_DAGE4;
+    c[1].c.Set(1.0,1.0,0.0); c[1].age = COL_AGE1; c[1].dage = COL_DAGE1;
+    c[2].c.Set(1.0,0.0,0.0); c[2].age = COL_AGE2; c[2].dage = COL_DAGE2;
+    c[3].c.Set(0.6,0.6,0.6); c[3].age = COL_AGE3; c[3].dage = COL_DAGE3;
+    c[4].c.Set(0.1,0.1,0.1); c[4].age = COL_AGE4; c[4].dage = COL_DAGE4;
     Colors = c;
   }
 }
@@ -131,6 +131,7 @@ csFireMeshObject::csFireMeshObject (iSystem* system,
   delete_light = false;
   light_engine = NULL;
   precalc_valid = false;
+  SetupColors ();
 }
 
 csFireMeshObject::~csFireMeshObject()

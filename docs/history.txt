@@ -15,6 +15,9 @@ The history order is reversed so that new features are at the top.
 	  for all apps but at this moment they are saved with the app prefix.
 	  This means that as long as you use the same app it will reuse the
 	  saved config.
+	- Fixed a bug in the fire plugin which was accidently broken by
+	  Eric a few days ago. I also optimized Eric's solution a little by
+	  avoiding the test for Colors==0 every time.
 9-May-2001
 	- Martin Geisse added a version of typed vectors that don't delete
 	  their elements.
