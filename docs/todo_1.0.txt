@@ -1,0 +1,139 @@
+The Big 1.0 TODO List:
+
+Bugs to fix:
+	- Investigate if there are any more memory leaks after
+	  unloading a level and if so fix them.
+	- Shoot a missile in hole in flarge. The walls of the hole
+	  become lit ok then but revert to full bright after missile
+	  particles have disappeared. Only with OpenGL.
+	- It seems that pseudo-dynamic lighting is not working
+	  correctly. In flarge you can see that near the stairs
+	  some polygons are not updated when the dynamic light
+	  changes intensity/color.
+	- Investigate various visible artifacts in the mazedex
+	  level.
+	- Static lighting no longer goes through space-warping
+	  portals.
+	- Investigate if PlaceMesh() works correctly. I suspect it
+	  doesn't. May be related to bug [Bug 471638].
+	- Fix radiosity so that it works again. Radiosity is currently
+	  disabled because several things had been rewritten and the
+	  radiosity code was left behind.
+	  [Bug 429283]
+	- In isometric engine (isotest) + OpenGL some of the mesh
+	  objects (like the particle systems) are clipped wrong to the
+	  floor.
+	- Gouraud shaded polygons are not supported well. There are
+	  two problems: first you can only define triangles that
+	  are gouraud shaded and not polygons in general. And secondly
+	  lighting is not cached for gouraud shaded polygons.
+	  [Bug 202768]
+	  [Bug 202780]
+	- Investigate if skeletal sprites work nicely with the
+	  visibility culling system.
+	  [Bug 204194]
+	- Mesh objects outside the global bounding box of an
+	  infinite sector will not be visible.
+	  [Bug 216698]
+	- Light with explosion particle system is not correctly
+	  positioned.
+	  [Bug 231392]
+	- With OpenGL the lightmaps are not mapped correctly.
+	  This is very visible if you have two adjacent polygons which
+	  have a different size and a shadow going over those two
+	  polygons (in dmburg this situation occurs a few times).
+	  In that case the shadows on both polygons will not match
+	  exactly.
+	  [Bug 405964]
+	- Problem with keycolor + zbuffer:
+	  When a texture with keycolor transparency is rendered the
+	  software and hardware renderers currently behave differently.
+	  With software the z-buffer is only updated at those positions
+	  where the texture is actually drawn. This is very nice of
+	  course since that means you can essentially draw the keycolor
+	  texture using Z-buffer and objects drawn behind it will be correct.
+	  However this doesn't work with hardware. With hardware the
+	  Z-buffer is updated for the entire polygon regardsless of the
+	  key-color value.
+	  I'm not sure if it is actually possible to do otherwise with
+	  hardware. If not then the engine will have to solve this by
+	  sorting such polygons from back to front in relation to other
+	  objects in the same sector.
+	  [Bug 409067]
+	- The software renderer implementation of DrawTriangleMesh
+	  is still missing a few clipping features. In general it would
+	  be nice to investigate the use of the OpenGL clipping routines
+	  for software too.
+	  [Bug 430207]
+	- Investigate clipping bug in OpenGL.
+	  [Bug 430214]
+	- In OpenGL adjacent polygons do not match nicely. Especially if
+	  you clear the background every frame you can easily notice
+	  gaps between polygons.
+	  [Bug 430601]
+	- Investigate bugs related to the walktest 'portal' command and
+	  to portals in general.
+	  [Bug 430285]
+	  [Bug 471637]
+	  [Bug 471638]
+	  [Bug 473597]
+	- Visibility culling does not work correctly on objects that
+	  are scaled using the movable (it works correctly with objects
+	  scaled using HardTransform).
+	  [Bug 478072]
+	- AWS + OpenGL is still not behaving very nicely. At least for
+	  me.
+	  [Bug 488777]
+
+API and Small Feature Additions:
+	- Translate point on polygon to texture space/object space
+	  coordinates (for selection). This is useful for Quark++.
+	- Ability to close portals in map loader.
+	- Automatic generation of lightmap cache names using MD5
+	  checksum of geometry. This is important for dynamic
+	  loading/reloading of worlds.
+	- Support iPolygonMesh (for collision detection) in more
+	  mesh objects (like ball, cube, ...).
+
+Global Additions and Stuff:
+	- Direct3D8 Renderer.
+	- Split of CS module in CS and CSextra. Applications like
+	  Blocks will then move to CSextra.
+	- [OPTIONAL?] Configuration setup tool so that it is
+	  possible to edit config files with a GUI?
+	- There are still a few places where we need to use the
+	  reporter for reporting error conditions.
+	- Remove Squawk after implementing a multi-view demo
+	  in WalkTest.
+
+Things to Check:
+	- Does CS Still work on ports like OS/2, BeOS, MacOS/X,
+	  NextStep, OpenStep, DOS, ...
+
+Documentation Updates:
+	- Update the 'Configuration Files Section'.
+	- Write docs and/or HOWTO on the Python and LUA plugins.
+	- Write doc on the heightmap texture generation utility.
+	- Write HOWTO on creation of a mesh object.
+	- Write doc on how to create your own mesh object
+	  plugins.
+	- Write HOWTO on plugin creation in general.
+	- Complete docs on metaballs mesh object.
+	- Complete docs on haze mesh object.
+	- Write a HOWTO or other doc that explains the best
+	  way to create a level (i.e. detail objects, occluders,
+	  ...). Also explains when to use portals/sectors and
+	  when not.
+	- Tutorial on isometric engine.
+	- HOWTO on how to work with regions and load/unload
+	  parts of a map (dynamic loading/unloading).
+	- HOWTO on sound.
+	- Complete update of map format documentation.
+	- HOWTO on KEY and NODE system for game specific
+	  purposes (i.e. triggers, scripts, and things like that).
+	- Go over the API documentation (doxygen comments) and
+	  see if they can be improved.
+	- Complete the features lists.
+	- See if the credits/authors list is still up-to-date.
+
+
