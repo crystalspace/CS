@@ -61,17 +61,22 @@ int csMovableSectorList::Add (iSector *obj)
 
 bool csMovableSectorList::Remove (iSector *obj)
 {
+  csMeshWrapper* object = movable->GetMeshWrapper ();
+  if (object) object->RemoveFromSectors (obj);
   return Delete (obj);
 }
 
 bool csMovableSectorList::Remove (int n)
 {
+  iSector* obj = Get (n);
+  csMeshWrapper* object = movable->GetMeshWrapper ();
+  if (object) object->RemoveFromSectors (obj);
   return DeleteIndex (n);
 }
 
 void csMovableSectorList::RemoveAll ()
 {
-  DeleteAll ();
+  movable->ClearSectors ();
 }
 
 int csMovableSectorList::Find (iSector *obj) const

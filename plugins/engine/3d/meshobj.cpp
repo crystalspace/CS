@@ -257,7 +257,7 @@ void csMeshWrapper::AddToSectorPortalLists ()
   }
 }
 
-void csMeshWrapper::ClearFromSectorPortalLists ()
+void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
 {
   if (portal_container)
   {
@@ -265,11 +265,19 @@ void csMeshWrapper::ClearFromSectorPortalLists ()
     csMeshWrapper* prev = this;
     csMeshWrapper* m = csParent;
     while (m) { prev = m; m = m->GetCsParent (); }
-    const iSectorList *sectors = prev->GetCsMovable ().GetSectors ();
-    for (i = 0; i < sectors->GetCount (); i++)
+
+    if (sector)
     {
-      iSector *ss = sectors->Get (i);
-      if (ss) ss->UnregisterPortalMesh (&scfiMeshWrapper);
+      sector->UnregisterPortalMesh (&scfiMeshWrapper);
+    }
+    else
+    {
+      const iSectorList *sectors = prev->GetCsMovable ().GetSectors ();
+      for (i = 0; i < sectors->GetCount (); i++)
+      {
+        iSector *ss = sectors->Get (i);
+        if (ss) ss->UnregisterPortalMesh (&scfiMeshWrapper);
+      }
     }
   }
 }
@@ -344,9 +352,9 @@ void csMeshWrapper::MoveToSector (iSector *s)
   }
 }
 
-void csMeshWrapper::RemoveFromSectors ()
+void csMeshWrapper::RemoveFromSectors (iSector* sector)
 {
-  ClearFromSectorPortalLists ();
+  ClearFromSectorPortalLists (sector);
   int i;
   for (i = 0; i < children.GetCount (); i++)
   {
@@ -355,17 +363,24 @@ void csMeshWrapper::RemoveFromSectors ()
     // If we have children then we call RemoveFromSectors() on them so that
     // any potential portal_containers among them will also unregister
     // themselves from the sector.
-    cspr->RemoveFromSectors ();
+    cspr->RemoveFromSectors (sector);
   }
 
   if (Parent) return ;
 
-  const iSectorList *sectors = movable.GetSectors ();
-  for (i = 0; i < sectors->GetCount (); i++)
+  if (sector)
   {
-    iSector *ss = sectors->Get (i);
-    if (ss)
-      ss->GetMeshes ()->Remove (&scfiMeshWrapper);
+    sector->GetMeshes ()->Remove (&scfiMeshWrapper);
+  }
+  else
+  {
+    const iSectorList *sectors = movable.GetSectors ();
+    for (i = 0; i < sectors->GetCount (); i++)
+    {
+      iSector *ss = sectors->Get (i);
+      if (ss)
+        ss->GetMeshes ()->Remove (&scfiMeshWrapper);
+    }
   }
 }
 

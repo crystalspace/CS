@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed the engine so that before removing a sector, all
 	  objects in that sector are unlinked from it. Added an
 	  iSector->UnlinkObjects().
+	- Jorrit fixed the iSectorList implementation in
+	  iMovable->GetSectors() so that it is now safe to remove sectors
+	  from the returned list.
 8-Jul-2004
 	- Jorrit fixed a compile error in partgen.
         - Matze changed some jam/configure things:

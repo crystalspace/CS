@@ -276,8 +276,11 @@ public:
   /// Culler flags.
   csFlags culler_flags;
 
-  /// Clear this object from all sector portal lists.
-  void ClearFromSectorPortalLists ();
+  /**
+   * Clear this object from all sector portal lists.
+   * If a sector is given then it will only clear for that sector.
+   */
+  void ClearFromSectorPortalLists (iSector* sector = 0);
   /// Add this object to all sector portal lists.
   void AddToSectorPortalLists ();
 
@@ -288,8 +291,11 @@ protected:
   /// Move this object to the specified sector. Can be called multiple times.
   void MoveToSector (iSector* s);
 
-  /// Remove this object from all sectors it is in (but not from the engine).
-  void RemoveFromSectors ();
+  /**
+   * Remove this object from all sectors it is in (but not from the engine).
+   * If a sector is given then it will only be removed from that sector.
+   */
+  void RemoveFromSectors (iSector* sector = 0);
 
   /**
    * Update transformations after the object has moved
