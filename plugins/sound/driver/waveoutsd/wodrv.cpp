@@ -101,7 +101,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 
   iVFS* v = m_piSystem->GetVFS();
   configwodrv = new csIniFile (v, "/config/wodrv.cfg");
-  v-DecRef(); v = NULL;
+  v->DecRef(); v = NULL;
 
   MMRESULT res;
   WAVEFORMATEX format;
