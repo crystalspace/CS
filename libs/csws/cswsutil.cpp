@@ -646,12 +646,13 @@ void cspFileDialog::Reread ()
     char name [MAXPATHLEN + 1];
 #if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
     strncpy (name, curp, sep - curp);
-    if (name [sep - curp - 1] == ':') sep++;	// Root directory "C:\"
+//    if (name [sep - curp - 1] == ':') { sep++;	name [sep - curp - 1] = ' '; }// Root directory "C:\"
 #else
     if (sep == curp) sep++;			// Root directory "/"
     strncpy (name, curp, sep - curp);
 #endif
     name [sep - curp] = 0;
+	System->Printf (MSG_INITIALIZATION, "Name of file query result %s\n", name);
     CHK (csListBoxItem *lbi = new csListBoxItem (dp, name, CSFDI_PATHCOMPONENT));
     lbi->SetBitmap (fdspr [1], false);
     lbi->SetOffset (level * 6, 0);
@@ -666,11 +667,23 @@ void cspFileDialog::Reread ()
   DIR *dh;
   struct dirent *de;
 
+  System->Printf (MSG_INITIALIZATION, "Path is  %s**\n", path);
+// prevent the extra '\' when evaluating root directory
+#if defined (OS_DOS) || defined (OS_WIN32)
+  if (strlen(path) == 3) // root path
+	  path[2] = '\0';
+#endif
   if (!(dh = opendir (path)))
   {
     MessageBox (app, "Error", "Invalid directory");
+	System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
     goto done;
   }
+// Return to original path
+#if defined (OS_DOS) || defined (OS_WIN32)
+  if (strlen(path) == 4) // root path
+	  path[2] = '\\';
+#endif
   while ((de = readdir (dh)))
   {
     if ((strcmp (de->d_name, ".") == 0)
