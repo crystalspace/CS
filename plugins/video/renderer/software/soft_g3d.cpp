@@ -237,6 +237,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
 
   fogMode = G3DFOGMETHOD_ZBUFFER;
+  //fogMode = G3DFOGMETHOD_VERTEX;
   //fogMode = G3DFOGMETHOD_PLANES;
 
   z_buffer = NULL;
@@ -1482,8 +1483,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
           dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
           // horizontal pixel correction
           sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
-        } /* endif */
-      } /* endif */
+        }
+      }
       if (sy <= fyL)
       {
         scanL1 = scanL2;
@@ -1502,9 +1503,9 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
           dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
           // horizontal pixel correction
           sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
-        } /* endif */
-      } /* endif */
-    } while (!leave); /* enddo */
+        }
+      }
+    } while (!leave);
 
     // Steps for interpolating vertically over scanlines.
     float vd_inv_z = - dxL * M + N;
@@ -1557,6 +1558,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
+        //if (dscanFog)
+	  //dscanFog (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
       }
 
       sxL += dxL;
@@ -1665,6 +1668,8 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
   if (fogMode == G3DFOGMETHOD_PLANES && (fog_type == CS_FOG_FRONT || fog_type == CS_FOG_BACK))
     return S_FALSE;
   if (fogMode == G3DFOGMETHOD_ZBUFFER && fog_type == CS_FOG_PLANE)
+    return S_FALSE;
+  if (fogMode == G3DFOGMETHOD_VERTEX)
     return S_FALSE;
 
   float M = 0, N = 0, O = 0;
