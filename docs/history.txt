@@ -12,6 +12,12 @@ The history order is reversed so that new features are at the top.
 	  copy/paste errors which caused it to fail in static-link mode.
 	- Eric Sunshine fixed a couple $(SRCDIR)-related problems in
 	  CS/mk/template.mak.
+	- Eric Sunshine updated physldr.mak so that it conforms with the CS
+	  makefile standard.  Also upgraded it to place its transient resource
+	  in a module-specific output directory rather than dumping everything
+	  directly in $(OUT).  Finally, fixed it to respect $(SRCDIR), so that
+	  it can be built when the build directory differs from the source
+	  directory.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no

@@ -1,13 +1,8 @@
-# This is a subinclude file used to define the rules needed
-# to build the physldr plug-in.
-
-# Driver description
-DESCRIPTION.physldr = Crystal Space Physics Loader plug-in
+DESCRIPTION.physldr = Crystal Space Physics loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# Driver-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make physldr      Make the $(DESCRIPTION.physldr)$"
 
@@ -29,51 +24,60 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/plugins/physics/loader
-
 ifeq ($(USE_PLUGINS),yes)
-  physldr = $(OUTDLL)/physldr$(DLL)
-  LIB.physldr = $(foreach d,$(DEP.physldr),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(physldr)
+  PHYSLDR = $(OUTDLL)/physldr$(DLL)
+  LIB.PHYSLDR = $(foreach d,$(DEP.PHYSLDR),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(PHYSLDR)
 else
-  physldr = $(OUT)/$(LIB_PREFIX)physldr$(LIB)
-  DEP.EXE += $(physldr)
+  PHYSLDR = $(OUT)/$(LIB_PREFIX)physldr$(LIB)
+  DEP.EXE += $(PHYSLDR)
   SCF.STATIC += physldr
-  TO_INSTALL.STATIC_LIBS += $(physldr)
+  TO_INSTALL.STATIC_LIBS += $(PHYSLDR)
 endif
 
-INC.physldr = $(wildcard plugins/physics/loader/*.h)
-SRC.physldr = $(wildcard plugins/physics/loader/*.cpp)
-OBJ.physldr = $(addprefix $(OUT)/,$(notdir $(SRC.physldr:.cpp=$O)))
-DEP.physldr = CSGEOM CSUTIL CSSYS
+DIR.PHYSLDR = plugins/physics/loader
+OUT.PHYSLDR = $(OUT)/$(DIR.PHYSLDR)
+INC.PHYSLDR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSLDR)/*.h))
+SRC.PHYSLDR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSLDR)/*.cpp))
+OBJ.PHYSLDR = $(addprefix $(OUT.PHYSLDR)/,$(notdir $(SRC.PHYSLDR:.cpp=$O)))
+DEP.PHYSLDR = CSGEOM CSUTIL CSSYS
 
-MSVC.DSP += physldr
-DSP.physldr.NAME = physldr
-DSP.physldr.TYPE = plugin
-DSP.physldr.LIBS = ode
+OUTDIRS += $(OUT.PHYSLDR)
+
+MSVC.DSP += PHYSLDR
+DSP.PHYSLDR.NAME = physldr
+DSP.PHYSLDR.TYPE = plugin
+DSP.PHYSLDR.LIBS = ode
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: physldr physldrclean
+.PHONY: physldr physldrclean physldrcleandep
 
-physldr: $(OUTDIRS) $(physldr)
+physldr: $(OUTDIRS) $(PHYSLDR)
 
-$(physldr): $(OBJ.physldr) $(LIB.physldr)
+$(OUT.PHYSLDR)/%$O: $(SRCDIR)/$(DIR.PHYSLDR)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(PHYSLDR): $(OBJ.PHYSLDR) $(LIB.PHYSLDR)
 	$(DO.PLUGIN)
 
 clean: physldrclean
 physldrclean:
-	$(RM) $(physldr) $(OBJ.physldr)
+	-$(RM) $(PHYSLDR) $(OBJ.PHYSLDR)
+
+cleandep: physldrcleandep
+physldrcleandep:
+	-$(RM) $(OUT.PHYSLDR)/physldr.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/physldr.dep
-$(OUTOS)/physldr.dep: $(SRC.physldr)
-	$(DO.DEP)
+dep: $(OUT.PHYSLDR) $(OUT.PHYSLDR)/physldr.dep
+$(OUT.PHYSLDR)/physldr.dep: $(SRC.PHYSLDR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/physldr.dep
+-include $(OUT.PHYSLDR)/physldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
