@@ -572,14 +572,14 @@ public:
     { return array.Get(currentelem++); }
 
   protected:
-    Iterator(const csArray<T>& newarray)
+    Iterator(const csArray<T, ElementHandler>& newarray)
 	: currentelem(0), array(newarray)
     { }
-    friend class csArray<T>;
+    friend class csArray<T, ElementHandler>;
     
   private:
     int currentelem;
-    const csArray<T>& array;
+    const csArray<T, ElementHandler>& array;
   };
 
   /** Returns an Iterator which traverses the Array */

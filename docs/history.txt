@@ -24,6 +24,8 @@ chronological order.
 	  meaning of 'd0' is the distance at which lod will be 0 (lowest
 	  detail possible) and 'd1' is the distance at which lod will be 1
 	  (highest detail possible).
+	- Matze fixed csArray::Iterator. The code was always assuming default
+	  ElementHandler.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.
