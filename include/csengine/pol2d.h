@@ -26,6 +26,7 @@
 class csPolygon3D;
 class csPolyPlane;
 class csClipper;
+class csRenderView;
 interface IGraphics2D;
 interface IGraphics3D;
 
@@ -179,8 +180,8 @@ public:
    * space).
    * 'poly' is only used for debugging. The plane and vertices are not used.
    */
-  void DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
-  	bool mirror, bool use_z_buf = false);
+  void DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
+  	bool use_z_buf = false);
 
   /**
    * Add this polygon as a back or front polygon of a fog object.

@@ -30,6 +30,7 @@ class csLight;
 class csPolygon3D;
 class csRenderView;
 class csLightView;
+struct csFog;
 interface IGraphics3D;
 interface IGraphics2D;
 
@@ -51,6 +52,30 @@ typedef void (csLightingFunc) (csLightView* lview, int type, void* entity);
 #define CALLBACK_SECTOREXIT 5
 #define CALLBACK_THING 6
 #define CALLBACK_THINGEXIT 7
+
+/**
+ * Information for vertex based fog. There is an instance of this
+ * structure in the csRenderView struct for every fogged sector that
+ * we encounter. It contains information which allows us to calculate
+ * the thickness of the fog for any given ray through the incoming
+ * and outgoing portals of the sector.
+ */
+class csFogInfo
+{
+public:
+  /// Next in list (back in recursion time).
+  csFogInfo* next;
+
+  /// The incoming plane (plane of the portal).
+  csPlane incoming_plane;
+  /// The outgoing plane (also of a portal).
+  csPlane outgoing_plane;
+  /// If this is false then there is no incoming plane (the current sector has fog).
+  bool has_incoming_plane;
+
+  /// The structure describing the fog.
+  csFog* fog;
+};
 
 /**
  * This structure represents all information needed for drawing
@@ -100,16 +125,31 @@ public:
   /// Userdata belonging to the callback.
   void* callback_data;
 
+  /**
+   * Every fogged sector we encountered results in an extra structure in the
+   * following list. This is only used if we are doing vertex based fog.
+   */
+  csFogInfo* fog_info;
+
+  /**
+   * If the following variable is true then a fog_info was added in this
+   * recursion level.
+   */
+  bool added_fog_info;
+
   ///
   csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
+  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL),
+	fog_info (NULL), added_fog_info (false) {}
   ///
   csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
+  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL),
+	fog_info (NULL), added_fog_info (false) {}
   ///
   csRenderView (const csCamera& c, csClipper* v, IGraphics3D* ig3d, IGraphics2D* ig2d) :
    csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
-   portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
+   portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL),
+   fog_info (NULL), added_fog_info (false) {}
 
   ///
   void SetView (csClipper* v) { view = v; }
