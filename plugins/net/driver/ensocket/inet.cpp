@@ -439,7 +439,7 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
       {
         FD_ZERO(&fd_mask);
         FD_SET(fd_list[0],&fd_mask);
-        if (select(FD_SETSIZE,&fd_mask,0,0,0) != 1) return 0;
+        if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1) return 0;
         if (FD_ISSET(fd_list[0],&fd_mask)) 
         {
           result = recvfrom(socketfd,buff,size,0,(struct sockaddr *)&local_addr,&addr_len);
