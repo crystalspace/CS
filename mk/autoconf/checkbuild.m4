@@ -58,7 +58,7 @@ AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
 #------------------------------------------------------------------------------
 # CS_BUILD_IFELSE([PROGRAM], [FLAGS], [LANGUAGE], [ACTION-IF-BUILT],
 #                 [ACTION-IF-NOT-BUILT], [OTHER-CFLAGS], [OTHER-LFLAGS],
-#                 [OTHER-LIBS], [INHIBIT-OTHER-FLAGS])
+#                 [OTHER-LIBS], [INHIBIT-OTHER-FLAGS], [ERROR-REGEX])
 #	Try building a program using the supplied compiler flags, linker flags,
 #	and library references.  PROGRAM is typically a program composed via
 #	AC_LANG_PROGRAM().  PROGRAM may be omitted if you are interested only
@@ -82,7 +82,27 @@ AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
 #	flags, linker flags, and libraries which should be used with each tuple
 #	build attempt.  Upon successful build, these additional flags are also
 #	reflected in the variables cs_build_cflags, cs_build_lflags, and
-#	cs_build_libs unless INHIBIT-OTHER-FLAGS is a non-empty string.
+#	cs_build_libs unless INHIBIT-OTHER-FLAGS is a non-empty string.  The
+#	optional ERROR-REGEX places an additional constraint upon the build
+#	check.  If specified, ERROR-REGEX, which is a standard `grep' regular
+#	expression, is applied to output captured from the compiler and linker.
+#	If ERROR-REGEX matches, then the build is deemed a failure, and
+#	cs_build_ok is set to "no".  This facility is useful for broken build
+#	tools which emit an error message yet still return success as a result.
+#	In such cases, it should be possible to detect the failure by scanning
+#	the tools' output.
+#
+# IMPLEMENTATION NOTES
+#
+#	In Autoconf 2.57 and earlier, AC_LINK_IFELSE() invokes AC_TRY_EVAL(),
+#	which does not provide access to the captured output.  To work around
+#	this limitation, we temporarily re-define AC_TRY_EVAL() as
+#	_AC_EVAL_STDERR(), which leaves the captured output in conftest.err
+#	(which we must also delete).  In Autoconf 2.58, however,
+#	AC_LINK_IFELSE() instead already invokes _AC_EVAL_STDERR() on our
+#	behalf, however we must be careful to apply ERROR-REGEX within the
+#	invocation AC_LINK_IFELSE(), since AC_LINK_IFELSE() deletes
+#	conftest.err before it returns.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_BUILD_IFELSE],
     [AC_LANG_PUSH(m4_default([$3],[C]))
@@ -90,6 +110,7 @@ AC_DEFUN([CS_BUILD_IFELSE],
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
+    m4_ifval([$10], [m4_pushdef([AC_TRY_EVAL], [_AC_EVAL_STDERR]($$[1]))])
 
     for cs_build_item in m4_default([$2],[CS_CREATE_TUPLE()])
     do
@@ -99,10 +120,15 @@ AC_DEFUN([CS_BUILD_IFELSE],
 	LDFLAGS="$cs_lflags_test $7 $cs_lflags_save"
 	LIBS="$cs_libs_test $8 $cs_libs_save"
 	AC_LINK_IFELSE(m4_default([$1], [AC_LANG_PROGRAM([],[])]),
-	    [cs_build_ok=yes
-	    break])
+	    [m4_ifval([$10],
+		[AS_IF([AC_TRY_COMMAND(
+		    [grep "AS_ESCAPE([$10])" conftest.err >/dev/null 2>&1])],
+		    [cs_build_ok=no], [cs_build_ok=yes])],
+		[cs_build_ok=yes])])
+	AS_IF([test $cs_build_ok = yes], [break])
     done
 
+    m4_ifval([$10], [m4_popdef([AC_TRY_EVAL]) rm -f conftest.err])
     CS_LANG_CFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
@@ -121,7 +147,7 @@ AC_DEFUN([CS_BUILD_IFELSE],
 # CS_CHECK_BUILD(MESSAGE, CACHE-VAR, [PROGRAM], [FLAGS], [LANGUAGE],
 #                [ACTION-IF-BUILT], [ACTION-IF-NOT-BUILT], [IGNORE-CACHE],
 #                [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS],
-#                [INHIBIT-OTHER-FLAGS])
+#                [INHIBIT-OTHER-FLAGS], [ERROR-REGEX])
 #	Like CS_BUILD_IFELSE() but also prints "checking" and result messages,
 #	and optionally respects the cache.  Sets CACHE-VAR to "yes" upon
 #	success, else "no" upon failure.  Additionally, sets CACHE-VAR_cflags,
@@ -138,14 +164,14 @@ AC_DEFUN([CS_CHECK_BUILD],
 		$2_cflags=$cs_build_cflags
 		$2_lflags=$cs_build_lflags
 		$2_libs=$cs_build_libs],
-		[$2=no], [$9], [$10], [$11], [$12])])],
+		[$2=no], [$9], [$10], [$11], [$12], [$13])])],
 	[AC_MSG_CHECKING([$1])
 	    CS_BUILD_IFELSE([$3], [$4], [$5],
 		[$2=yes
 		$2_cflags=$cs_build_cflags
 		$2_lflags=$cs_build_lflags
 		$2_libs=$cs_build_libs],
-		[$2=no], [$9], [$10], [$11], [$12])
+		[$2=no], [$9], [$10], [$11], [$12], [$13])
 	    AC_MSG_RESULT([$$2])])
     AS_IF([test $$2 = yes], [$6],
 	[$2_cflags=''
@@ -158,7 +184,8 @@ AC_DEFUN([CS_CHECK_BUILD],
 #------------------------------------------------------------------------------
 # CS_CHECK_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
 #                     [ACTION-IF-RECOGNIZED], [ACTION-IF-NOT-RECOGNIZED],
-#                     [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS])
+#                     [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS],
+#                     [ERROR-REGEX])
 #	Like CS_CHECK_BUILD(), but checks only if the compiler or linker
 #	recognizes a command-line option or options.  MESSAGE is the "checking"
 #	message.  CACHE-VAR is the shell cache variable which receives the flag
@@ -179,5 +206,5 @@ AC_DEFUN([CS_CHECK_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2],
 	[CS_BUILD_IFELSE([], [$3], [$4],
 	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])],
-	    [$2=no], [$7], [$8], [$9], [Y])])
+	    [$2=no], [$7], [$8], [$9], [Y], [$10])])
     AS_IF([test "$$2" != no], [$5], [$6])])

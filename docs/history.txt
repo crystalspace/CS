@@ -7,12 +7,26 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 23-Jan-2004
-	- Jorrit fixed a crash bug in the engine. At destruction it was
-	  forcing a get of the thing plugin. However this also happens
-	  at cleanup if nothing else has been initialized yet (i.e. if
-	  there is an error doing application initialization). This
-	  caused crashes because thing plugin was trying to do stuff to
-	  the renderers which were not initialized yet.
+	- Jorrit fixed a crash bug in the engine.  At destruction it was
+	  forcing a get of the thing plugin.  However this also happens at
+	  cleanup if nothing else has been initialized yet (i.e. if there is
+	  an error doing application initialization).  This caused crashes
+	  because thing plugin was trying to do stuff to the renderers which
+	  were not initialized yet.
+	- Eric Sunshine fixed configure's "-shared" flag check so that it works
+	  with Autoconf >= 2.58, as well as with earlier releases.  This check
+	  needs to examine conftest.err, which normally is not created by
+	  AC_LINK_IFELSE() in <= 2.57, so the check had to perform some m4
+	  magic to fool AC_LINK_IFELSE() into creating conftest.err.  As of
+	  Autoconf 2.58, however, AC_LINK_IFELSE() has been changed so that it
+	  always creates conftest.err, but it also deletes conftest.err, with
+	  the result that, by the time the "-shared" check tried to examine
+	  conftest.err, it had already been deleted by AC_LINK_IFELSE().  In
+	  addition to fixing this problem, the functionality of examining
+	  conftest.err has also been generalized and is now available as a
+	  standard option to all callers of CS_BUILD_IFELSE(),
+	  CS_CHECK_BUILD(), and CS_CHECK_BUILD_FLAGS(), rather than being
+	  implemented as a special case for the "-shared" check.
 22-Jan-2004
 	- Jorrit added the engine target to both jam and make 'walkall' since
 	  the engine plugin is now required.
@@ -21,17 +35,17 @@ chronological order.
 	  important of which was to replace "make all" with "make -k all" in
 	  the CS build instructions.
 	- Jorrit did the following array related changes:
-	    - Added csSafeCopyArrayMemoryAllocator which is a memory
-	      allocator that takes care to properly re-construct all
-	      objects upon reallocation of the array. This memory
-	      allocator can be used when you have an array of objects
-	      that cannot be safely moved around in memory otherwise.
-	    - Added csSafeCopyArray conveniance class which is a version
-	      of csArray that uses the csSafeCopyArrayMemoryAllocator.
+	    - Added csSafeCopyArrayMemoryAllocator which is a memory allocator
+	      that takes care to properly re-construct all objects upon
+	      reallocation of the array.  This memory allocator can be used
+	      when you have an array of objects that cannot be safely moved
+	      around in memory otherwise.
+	    - Added csSafeCopyArray conveniance class which is a version of
+	      csArray that uses the csSafeCopyArrayMemoryAllocator.
 	    - Changed csWeakRefArray to inherit from csSafeCopyArray.
 	    - As a consequence of the above changes the dangerous
-	      csWeakRef::Link() and Unlink() functions could be made
-	      private so they cannot be misused.
+	      csWeakRef::Link() and Unlink() functions could be made private so
+	      they cannot be misused.
 	- res made the following changes:
 	    - Fixed "Independent target ../../../mk/visualcX/foobar.rc" Jam
 	      warnings, for real now.
@@ -42,10 +56,10 @@ chronological order.
 	      more.
 	    - Removed some unused stuff from csengine.
 	    - Cosmetic change in msvcgen.jam.
-	- Luca added a friend declaration to access a private member from 
-	  an enclosed class in the class csSpriteCal3DMeshObject. 
-	  He also added the needed dependencies for sprcal3d and sprcal3dldr
-	  (CSGFX CSGEOM CSUTIL).
+	- Luca added a friend declaration to access a private member from an
+	  enclosed class in the class csSpriteCal3DMeshObject.  He also added
+	  the needed dependencies for sprcal3d and sprcal3dldr (CSGFX CSGEOM
+	  CSUTIL).
 20-Jan-2004
 	- Jorrit added a new MemoryAllocator template parameter to csArray.
 	  With this parameter it is possible to use another memory allocator

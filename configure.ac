@@ -800,21 +800,13 @@ CS_EMIT_BUILD_FLAGS([if -pipe is accepted], [cs_cv_prog_cxx_pipe],
 # the -shared option, it nevertheless returns a "success" result after
 # complaining that the option is unrecognized.  Worse, even -Werror fails to
 # coerce the compiler into returning a "failure" result, so we must perform the
-# additional task of capturing the compiler's output and checking it for an
-# appropriate error message.
+# additional task of checking the compiler's output for an appropriate error
+# emission, such as "unrecognized option `-shared'".
 #------------------------------------------------------------------------------
-AC_CACHE_CHECK([if -shared is accepted], [cs_cv_prog_link_shared],
-    [dnl Cheat: Make CS_BUILD_IFELSE/AC_LINK_IFELSE send errors to conftest.err
-    m4_pushdef([AC_TRY_EVAL], [_AC_EVAL_STDERR([$$1])])
-    CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-shared])], [C++],
-	[AS_IF([grep nrecognize conftest.err >/dev/null 2>&1],
-	    [cs_cv_prog_link_shared=no], [cs_cv_prog_link_shared=yes])],
-	[cs_cv_prog_link_shared=no])
-    rm -f conftest.err
-    m4_popdef([AC_TRY_EVAL])])
-
-AS_IF([test $cs_cv_prog_link_shared = yes],
-    [CS_BUILD_PROPERTY([LFLAGS.DLL], [-shared], [+])])
+CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
+    [CS_CREATE_TUPLE([-shared])], [C++],
+    [CS_BUILD_PROPERTY([LFLAGS.DLL], [-shared], [+])], [],
+    [$cs_prog_cxx_enable_errors], [], [], [nrecognize])
 
 
 
