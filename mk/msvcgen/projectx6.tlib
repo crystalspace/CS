@@ -88,15 +88,12 @@ GET glue(my.doc.librarydelay,' ','/DELAYLOAD:','.dll') %]
 [% MACRO addlink32_subsystem(subsys) BLOCK -%]
 /subsystem:[% subsys %]
 [%- END %]
-[% MACRO addlink32_outfile BLOCK -%]
-/out:"[% path([my.doc.buildroot.0, my.doc.target.0]) %]"
+[% MACRO addlink32_common(subsys) BLOCK -%]
+/out:"[% path([my.doc.buildroot.0, my.doc.target.0]) %]" [%
+addlink32_subsystem(subsys) %]
 [%- END %]
-[% MACRO addlink32_appcon
-GET addlink32_subsystem('console'); GET addlink32_outfile %]
-[% MACRO addlink32_appgui_release
-GET addlink32_subsystem('windows'); GET addlink32_outfile %]
-[% MACRO addlink32_appgui_debug
-GET addlink32_subsystem('console'); GET addlink32_outfile %]
+[% MACRO addlink32_appcon GET addlink32_common('console') %]
+[% MACRO addlink32_appgui_release GET addlink32_common('windows') %]
+[% MACRO addlink32_appgui_debug GET addlink32_common('console') %]
 [% MACRO addlink32_library GET addlink32_subsystem('windows') %]
-[% MACRO addlink32_plugin
-GET addlink32_subsystem('windows'); GET addlink32_outfile %]
+[% MACRO addlink32_plugin GET addlink32_common('windows') %]
