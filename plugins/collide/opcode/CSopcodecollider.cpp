@@ -82,7 +82,7 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
     tri_count += p.num_vertices - 2;
   }
 
-  if (tri_count>1)
+  if (tri_count>=1)
   {
     m_pCollisionModel = new Opcode::Model;
     if (!m_pCollisionModel)
@@ -98,20 +98,17 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
     
     int* vidx;
     int index = 0;
-    int tri;
     for (i = 0; i < polycnt; i++)
     {
       csMeshedPolygon& p = polygons[i];
       vidx = p.vertices;
-      tri = 0;
      
-      for (v = 2; v < p.num_vertices; v++ , tri += 3) //triangulation
+      for (v = 2; v < p.num_vertices; v++) //triangulation
       {
-        indexholder[index + tri] = vidx[0];
-        indexholder[index + tri + 1] = vidx[v - 1];
-        indexholder[index + tri + 2] = vidx[v];
+        indexholder[index++] = vidx[0];
+        indexholder[index++] = vidx[v - 1];
+        indexholder[index++] = vidx[v];
       }
-      index += 3 * (p.num_vertices - 2);
     }
    
     opcMeshInt.SetNbTriangles (tri_count);

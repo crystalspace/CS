@@ -65,7 +65,7 @@ bool Opcode_Err (const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
-  // Although it's called "..._Err", Opcode also reports less-than-fatal 
+  // Although it's called "..._Err", Opcode also reports less-than-fatal
   // messages through it
   csReportV (0, CS_REPORTER_SEVERITY_WARNING, // @@@ use a real object_reg
     "crystalspace.collisiondetection.opcode", msg, args);
@@ -93,7 +93,7 @@ csOPCODECollideSystem::~csOPCODECollideSystem ()
 bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)
 {
   object_reg = iobject_reg;
-  return true; 
+  return true;
 }
 
 csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
@@ -110,64 +110,55 @@ bool csOPCODECollideSystem::Collide (
   // printf( " we are in Collide \n");
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;
- 
+  if (col1 == col2) return false;
+
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = col2->m_pCollisionModel;
-  
-  csReversibleTransform NetTransform;
-  if (trans1 && trans2)
-  {
-    NetTransform = *trans1 / *trans2;
-  }
-  else if (trans1)
-  {
-    NetTransform = *trans1;
-  }
-  else if (trans2)
-  {
-    NetTransform = trans2->GetInverse ();
-  }
-  
-  csMatrix3 m1 = NetTransform.GetO2T ();
-  // csMatrix3 m2 = trans2->GetO2T ();
+
+  csMatrix3 m1;
+  if (trans1) m1 = trans1->GetT2O ();
+  csMatrix3 m2;
+  if (trans2) m2 = trans2->GetT2O ();
   csVector3 u;
- 
+
   u = m1.Row1 ();
   col1->transform.m[0][0] = u.x;
   col1->transform.m[1][0] = u.y;
   col1->transform.m[2][0] = u.z;
-  // u = m2.Row1 ();
-  // col2->transform.m[0][0] = u.x;
-  // col2->transform.m[1][0] = u.y;
-  // col2->transform.m[2][0] = u.z;
+  u = m2.Row1 ();
+  col2->transform.m[0][0] = u.x;
+  col2->transform.m[1][0] = u.y;
+  col2->transform.m[2][0] = u.z;
   u = m1.Row2 ();
   col1->transform.m[0][1] = u.x;
   col1->transform.m[1][1] = u.y;
   col1->transform.m[2][1] = u.z;
-  // u = m2.Row2 ();
-  // col2->transform.m[0][1] = u.x;
-  // col2->transform.m[1][1] = u.y;
-  // col2->transform.m[2][1] = u.z;
+  u = m2.Row2 ();
+  col2->transform.m[0][1] = u.x;
+  col2->transform.m[1][1] = u.y;
+  col2->transform.m[2][1] = u.z;
   u = m1.Row3 ();
   col1->transform.m[0][2] = u.x;
   col1->transform.m[1][2] = u.y;
   col1->transform.m[2][2] = u.z;
-  // u = m2.Row3();
-  // col2->transform.m[0][2] = u.x;
-  // col2->transform.m[1][2] = u.y;
-  // col2->transform.m[2][2] = u.z;
-  
-  u = NetTransform.GetO2TTranslation ();
+  u = m2.Row3();
+  col2->transform.m[0][2] = u.x;
+  col2->transform.m[1][2] = u.y;
+  col2->transform.m[2][2] = u.z;
+
+  if (trans1) u = trans1->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
   col1->transform.m[3][0] = u.x;
   col1->transform.m[3][1] = u.y;
   col1->transform.m[3][2] = u.z;
 
-  // u = trans2->GetO2TTranslation();
-  // col2->transform.m[3][0] = u.x;
-  // col2->transform.m[3][1] = u.y;
-  // col2->transform.m[3][2] = u.z;
+  if (trans2) u = trans2->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  col2->transform.m[3][0] = u.x;
+  col2->transform.m[3][1] = u.y;
+  col2->transform.m[3][2] = u.z;
 
-  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,  0);
+  bool isOk = TreeCollider.Collide (ColCache, &col1->transform, &col2->transform);
   if (isOk)
   {
     bool status = TreeCollider.GetContactStatus ();
@@ -179,7 +170,7 @@ bool csOPCODECollideSystem::Collide (
   }
   else
   {
-    return false; 
+    return false;
   }
 }
 
@@ -203,7 +194,7 @@ int csOPCODECollideSystem::CollidePath (
 
 void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
 	csOPCODECollider* col2)
-{     
+{
   int size = (int) (udword(TreeCollider.GetNbPairs ()));
   if (size == 0) return;
   int N_pairs = size;
@@ -221,14 +212,14 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
 
   int oldlen = pairs.Length ();
   pairs.SetLength (oldlen + N_pairs);
- 
+
   // it really sucks having to copy all this each Collide query, but
-  // since opcode library uses his own vector types, 
+  // since opcode library uses his own vector types,
   // but there are some things to consider:
   // first, since opcode doesnt store the mesh, it relies on a callback
   // to query for precise positions of vertices when doing close-contact
   // checks, hence are two options:
-  // 1. Do the triangulation only at the creation of the collider, but 
+  // 1. Do the triangulation only at the creation of the collider, but
   //    keeping copies of the meshes inside the colliders, which are then used
   //    for constructing the csCollisionPair and the opcode callbacks, but
   //    duplicates mesh data in memory (which is how is it currently)
@@ -242,19 +233,19 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   for (i = 0 ; i < N_pairs ; i++)
   {
     j = 3 * colPairs[i].id0;
-    current = &vertholder0[indexholder0[j]];		 
+    current = &vertholder0[indexholder0[j]];		
     pairs[oldlen].a1 = csVector3 (current->x, current->y, current->z);
-    current = &vertholder0[indexholder0[j + 1]];		 
+    current = &vertholder0[indexholder0[j + 1]];		
     pairs[oldlen].b1 = csVector3 (current->x, current->y, current->z);
-    current = &vertholder0[indexholder0[j + 2]];		 
+    current = &vertholder0[indexholder0[j + 2]];		
     pairs[oldlen].c1 = csVector3 (current->x, current->y, current->z);
 
-    j = 3 * colPairs[i].id1; 
-    current = &vertholder1[indexholder1[j]];		 
+    j = 3 * colPairs[i].id1;
+    current = &vertholder1[indexholder1[j]];		
     pairs[oldlen].a2 = csVector3 (current->x, current->y, current->z);
-    current = &vertholder1[indexholder1[j + 1 ]];		 
+    current = &vertholder1[indexholder1[j + 1 ]];		
     pairs[oldlen].b2 = csVector3 (current->x, current->y, current->z);
-    current = &vertholder1[indexholder1[j + 2 ]];		 
+    current = &vertholder1[indexholder1[j + 2 ]];		
     pairs[oldlen].c2 = csVector3 (current->x, current->y, current->z);
 
     oldlen++;
@@ -276,7 +267,7 @@ void csOPCODECollideSystem::ResetCollisionPairs ()
   pairs.Empty ();
 }
 
-void csOPCODECollideSystem::SetOneHitOnly (bool on) 
+void csOPCODECollideSystem::SetOneHitOnly (bool on)
 {
   TreeCollider.SetFirstContact (on);
 }
@@ -287,7 +278,7 @@ void csOPCODECollideSystem::SetOneHitOnly (bool on)
 * will return the value set by the SetOneHitOnly() function.
 * For CD systems that support one hit only this will always return true.
 */
-bool csOPCODECollideSystem::GetOneHitOnly () 
+bool csOPCODECollideSystem::GetOneHitOnly ()
 {
   return TreeCollider.FirstContactEnabled ();
 }

@@ -223,7 +223,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_PLUGIN("crystalspace.collisiondetection.rapid",
+	CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode",
 		iCollideSystem),
 	CS_REQUEST_END))
   {

@@ -10,6 +10,11 @@ chronological order.
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where
 	  <params> doesn't have to be given so this test is invalid.
+	- Jorrit fixed a bug in OPCODE where it would ignore meshes that
+	  have only one triangle.
+	- Jorrit fixed a bug in OPCODE that would cause it to calculate
+	  wrong collision in case two transforms different from identity
+	  were given.
 1-Jun-2004
 	- Jorrit fixed a bug in the particles loader. The test to see if a
 	  factory is ok was wrong.
