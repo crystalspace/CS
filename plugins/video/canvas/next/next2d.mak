@@ -22,7 +22,7 @@ ifeq ($(MAKESECTION),roottargets)
 all softcanvas plugins drivers drivers2d: next2d
 
 next2d:
-	$(MAKE_TARGET) MAKE_DLL=yes
+	$(MAKE_TARGET) MAKE_DLL=yes DO_NEXT2D=yes
 next2dclean:
 	$(MAKE_CLEAN)
 
@@ -33,12 +33,27 @@ ifeq ($(MAKESECTION),defines)
 
 NEXT.SOURCE_2D_PATHS = \
   $(addprefix plugins/video/canvas/next/,$(NEXT.SEARCH_PATH))
-CFLAGS.NEXT2D = $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
+NEXT.HEADER_2D_PATHS = $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
+
+# Only add header search paths if actually building this plug-in or if
+# USE_PLUGINS=no, in which case this module might be built as the dependency
+# of some other module (rather than being built explicitly by the `next2d'
+# target).
+ifeq ($(USE_PLUGINS),no)
+  CFLAGS.INCLUDE += $(NEXT.HEADER_2D_PATHS)
+else
+ifeq ($(DO_NEXT2D),yes)
+  CFLAGS.INCLUDE += $(NEXT.HEADER_2D_PATHS)
+endif
+endif
 
 endif # ifeq ($(MAKESECTION),defines)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
+
+vpath %.cpp $(NEXT.SOURCE_2D_PATHS)
+vpath %.m   $(NEXT.SOURCE_2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   NEXT2D = $(OUTDLL)next2d$(DLL)
@@ -69,36 +84,6 @@ ifeq ($(MAKESECTION),targets)
 
 next2d: $(OUTDIRS) $(NEXT2D)
 
-$(OUT)%$O: plugins/video/canvas/next/shared/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/shared/%.m
-	$(DO.COMPILE.M) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/nextstep/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/nextstep/%.m
-	$(DO.COMPILE.M) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/openstep/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/openstep/%.m
-	$(DO.COMPILE.M) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/macosxs/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/macosxs/%.m
-	$(DO.COMPILE.M) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/macosx/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.NEXT2D)
- 
-$(OUT)%$O: plugins/video/canvas/next/macosx/%.m
-	$(DO.COMPILE.M) $(CFLAGS.NEXT2D)
- 
 $(NEXT2D): $(OBJ.NEXT2D) $(LIB.NEXT2D)
 	$(DO.PLUGIN)
 
@@ -109,7 +94,7 @@ next2dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)next2d.dep
 $(OUTOS)next2d.dep: $(SRC.NEXT2D)
-	$(DO.DEP1) $(CFLAGS.NEXT2D) $(DO.DEP2)
+	$(DO.DEP1) $(NEXT.HEADER_2D_PATHS) $(DO.DEP2)
 else
 -include $(OUTOS)next2d.dep
 endif

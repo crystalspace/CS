@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+29-Aug-2001
+	- Eric Sunshine reverted his changes to next2d.mak since they caused
+	  the build process to attempt to compile files from the NextStep port
+	  on MacOS/X, MacOS/X Server 1.0, and OpenStep.  At any rate, the
+	  changes to this file weren't really needed.  They had only been
+	  applied as an interim solution to a problem during design of the
+	  makefile caching system, since errors in the caching facility (now
+	  fixed) were causing next2d.mak to misbehave.
 28-Aug-2001
 	- Norman Kramer reported a fix for the freefont plugin.
 	- Added aws and ie3ds to mk/user.mak.
