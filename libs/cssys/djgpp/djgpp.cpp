@@ -77,6 +77,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
 	: csSystemDriver (object_reg)
 {
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
   {
