@@ -21,7 +21,8 @@
 #ifndef __CSUTIL_CSINPUTS_H__
 #define __CSUTIL_CSINPUTS_H__
 
-/**\file
+/**\file 
+ * Crystal Space input library
  */
 
 /**

@@ -22,6 +22,10 @@
 
 #include "csutil/scf.h"
 
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 class csDynLight;
 struct iObject;
 struct iLight;
@@ -47,6 +51,8 @@ struct iDynLight : public iBase
   /// Get the next dynamic light in the list.
   virtual iDynLight* GetNext () = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_DYNLIGHT_H__
 

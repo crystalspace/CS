@@ -20,6 +20,12 @@
 #ifndef __IENGINE_REGION_H__
 #define __IENGINE_REGION_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 struct iSector;
@@ -128,5 +134,7 @@ struct iRegionList : public iBase
   /// Find a region by name.
   virtual iRegion *FindByName (const char *Name) const = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_REGION_H__

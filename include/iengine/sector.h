@@ -20,6 +20,12 @@
 #ifndef __IENGINE_SECTOR_H__
 #define __IENGINE_SECTOR_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "cstypes.h"
 #include "csutil/scf.h"
 
@@ -205,6 +211,8 @@ struct iSectorIterator : public iBase
    */
   virtual const csVector3& GetLastPosition () = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_SECTOR_H__
 

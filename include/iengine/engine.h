@@ -20,9 +20,14 @@
 #ifndef __IENGINE_ENGINE_H__
 #define __IENGINE_ENGINE_H__
 
-/**\file
+/**\file 
+ * Crystal Space 3D Engine Interface
  */
 
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 
@@ -70,92 +75,98 @@ struct iRegionList;
 struct iLoaderContext;
 struct iCacheManager;
 
+/** \name GetNearbyLights() flags
+ * @{ */
 /**
- * Flag for GetNearbyLights().
  * Detect shadows and don't return lights for which the object
  * is shadowed (not implemented yet).
  */
 #define CS_NLIGHT_SHADOWS 1
 
 /**
- * Flag for GetNearbyLights().
  * Return static lights.
  */
 #define CS_NLIGHT_STATIC 2
 
 /**
- * Flag for GetNearbyLights().
  * Return dynamic lights.
  */
 #define CS_NLIGHT_DYNAMIC 4
 
 /**
- * Flag for GetNearbyLights().
  * Also check lights in nearby sectors (not implemented yet).
  */
 #define CS_NLIGHT_NEARBYSECTORS 8
+/** @} */
 
-
+/** \name SetEngineMode() settings
+ * @{ */
 /**
- * Setting for SetEngineMode().
  * Autodetect the best mode according to the level.
  */
 #define CS_ENGINE_AUTODETECT 0
 
 /**
- * Setting for SetEngineMode().
  * Use back-to-front rendering (using optional BSP/octree) and Z-fill.
  * Don't init Z-buffer at start of render frame.
  */
 #define CS_ENGINE_BACK2FRONT 1
 
 /**
- * Setting for SetEngineMode().
  * Use a 2D/3D culler (c-buffer) and front-to-back sorting.
  */
 #define CS_ENGINE_FRONT2BACK 2
 
 /**
- * Setting for SetEngineMode().
  * Use the Z-buffer for culling.
  */
 #define CS_ENGINE_ZBUFFER 3
+/** @} */
 
+/** \name SetLightingCacheMode() settings
+ * @{ */
 /**
- * Setting for SetLightingCacheMode().
  * Read the cache.
  */
 #define CS_ENGINE_CACHE_READ 1
 
 /**
- * Setting for SetLightingCacheMode().
  * Write the cache.
  */
 #define CS_ENGINE_CACHE_WRITE 2
+/** @} */
 
+/** \name RegisterRenderPriority() flags
+ * @{ */
 /**
- * Flag for RegisterRenderPriority. Do not sort this priority.
+ * Do not sort this priority.
  */
 #define CS_RENDPRI_NONE 0
 
 /**
- * Flag for RegisterRenderPriority. Sort this priority back to front.
+ * Sort this priority back to front.
  */
 #define CS_RENDPRI_BACK2FRONT 1
 
 /**
- * Flag for RegisterRenderPriority. Sort this priority front to back.
+ * Sort this priority front to back.
  */
 #define CS_RENDPRI_FRONT2BACK 2
+/** @} */
 
-/**
+/** \name Engine Callback flags
  * Flags for the callbacks called via iEngine::DrawFunc().
  * (type iDrawFuncCallback).
- */
+ * @{ */
+/// a sector is being drawn
 #define CS_CALLBACK_SECTOR 1
+/// a sector has been drawn completely
 #define CS_CALLBACK_SECTOREXIT 2
+/// a mesh will be drawn if visible
 #define CS_CALLBACK_MESH 3
+/// the mesh is visible and will be drawn
 #define CS_CALLBACK_VISMESH 4
+/** @} */
 
 SCF_VERSION (iDrawFuncCallback, 0, 0, 1);
 
@@ -168,10 +179,10 @@ struct iDrawFuncCallback : public iBase
    * Before drawing.
    * The 'type' will be one of the following:
    * <ul>
-   * <li>CS_CALLBACK_SECTOR: a sector is being drawn.
-   * <li>CS_CALLBACK_SECTOREXIT: a sector has been drawn completely.
-   * <li>CS_CALLBACK_MESH: a mesh will be drawn if visible.
-   * <li>CS_CALLBACK_VISMESH: the mesh is visible and will be drawn.
+   * <li>#CS_CALLBACK_SECTOR: a sector is being drawn.
+   * <li>#CS_CALLBACK_SECTOREXIT: a sector has been drawn completely.
+   * <li>#CS_CALLBACK_MESH: a mesh will be drawn if visible.
+   * <li>#CS_CALLBACK_VISMESH: the mesh is visible and will be drawn.
    * </ul>
    */
   virtual void DrawFunc (iRenderView* rview, int type, void* entity) = 0;
@@ -258,12 +269,12 @@ struct iEngine : public iBase
   /**
    * Register a new render priority.
    * The parameter rendsort is one of the CS_RENDPRI_... flags.
-   * By default this is CS_RENDPRI_NONE. The following values are possible:
+   * By default this is #CS_RENDPRI_NONE. The following values are possible:
    * <ul>
-   * <li>CS_RENDPRI_NONE: objects in this render priority are not sorted.
-   * <li>CS_RENDPRI_FRONT2BACK: sort objects front to back (as seen from
+   * <li>#CS_RENDPRI_NONE: objects in this render priority are not sorted.
+   * <li>#CS_RENDPRI_FRONT2BACK: sort objects front to back (as seen from
    *     camera viewpoint).
-   * <li>CS_RENDPRI_BACK2FRONT: sort objects back to front.
+   * <li>#CS_RENDPRI_BACK2FRONT: sort objects back to front.
    * </ul>
    */
   virtual void RegisterRenderPriority (const char* name, long priority,
@@ -312,7 +323,7 @@ struct iEngine : public iBase
   /**
    * Conveniance function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
-   * it will have CS_ZBUF_FILL set (so that the Z-buffer will be filled
+   * it will have #CS_ZBUF_FILL set (so that the Z-buffer will be filled
    * by the polygons of this object) and have 'wall' as render
    * priority. This version creates a mesh wrapper.
    */
@@ -320,7 +331,7 @@ struct iEngine : public iBase
       const char* name) = 0;
   /**
    * Conveniance function to create a thing mesh in a sector.
-   * This mesh will have CS_ZBUF_USE set (use Z-buffer fully)
+   * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
    * and have 'object' as render priority. This means this function
    * is useful for general objects.
    */
@@ -430,10 +441,10 @@ struct iEngine : public iBase
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
-   * Default is CS_ENGINE_CACHE_READ.
+   * Default is #CS_ENGINE_CACHE_READ.
    * <ul>
-   * <li>CS_ENGINE_CACHE_READ: Read the cache.
-   * <li>CS_ENGINE_CACHE_WRITE: Write the cache.
+   * <li>#CS_ENGINE_CACHE_READ: Read the cache.
+   * <li>#CS_ENGINE_CACHE_WRITE: Write the cache.
    * </ul>
    */
   virtual void SetLightingCacheMode (int mode) = 0;
@@ -536,14 +547,14 @@ struct iEngine : public iBase
    * Set the desired engine mode.
    * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
    * <ul>
-   * <li>CS_ENGINE_AUTODETECT: try to auto-detect the best mode to use
+   * <li>#CS_ENGINE_AUTODETECT: try to auto-detect the best mode to use
    *     for rendering this level (also depends on hardware capabilities).
    *     This is calculated the first time iEngine->Draw() is called.
-   * <li>CS_ENGINE_BACK2FRONT: Render polygons back to front (optionally
+   * <li>#CS_ENGINE_BACK2FRONT: Render polygons back to front (optionally
    *     using octree/bsp for this).
-   * <li>CS_ENGINE_FRONT2BACK: Use the c-buffer for culling polygons and
+   * <li>#CS_ENGINE_FRONT2BACK: Use the c-buffer for culling polygons and
    *     render front to back (only if octree/bsp tree is available).
-   * <li>CS_ENGINE_ZBUFFER: Use the Z-buffer for rendering.
+   * <li>#CS_ENGINE_ZBUFFER: Use the Z-buffer for rendering.
    * </ul>
    */
   virtual void SetEngineMode (int mode) = 0;
@@ -679,11 +690,11 @@ struct iEngine : public iBase
    * This routine returns all lights which might affect an object
    * at some position according to the following flags:<br>
    * <ul>
-   * <li>CS_NLIGHT_SHADOWS: detect shadows and don't return lights for
+   * <li>#CS_NLIGHT_SHADOWS: detect shadows and don't return lights for
    *     which the object is shadowed (not implemented yet).
-   * <li>CS_NLIGHT_STATIC: return static lights.
-   * <li>CS_NLIGHT_DYNAMIC: return dynamic lights.
-   * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors
+   * <li>#CS_NLIGHT_STATIC: return static lights.
+   * <li>#CS_NLIGHT_DYNAMIC: return dynamic lights.
+   * <li>#CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors
    *     (not implemented yet).
    * </ul>
    * <br>
@@ -708,7 +719,7 @@ struct iEngine : public iBase
   /**
    * This routine returns an iterator to iterate over
    * all objects that are within a radius
-   * of a given position. You can use SCF_QUERY_INTERFACE to get
+   * of a given position. You can use #SCF_QUERY_INTERFACE to get
    * any interface from the returned objects.<p>
    * Delete the iterator with 'DecRef()' when ready.
    */
@@ -719,7 +730,7 @@ struct iEngine : public iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine assumes full 360 degree visibility.
-   * You can use SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #SCF_QUERY_INTERFACE to get any interface from the
    * returned objects.<p>
    * Delete the iterator with 'DecRef()' when ready.
    */
@@ -730,7 +741,7 @@ struct iEngine : public iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine has a frustum restricting the view.
-   * You can use SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #SCF_QUERY_INTERFACE to get any interface from the
    * returned objects.<p>
    * Delete the iterator with 'DecRef()' when ready.
    */
@@ -773,5 +784,7 @@ struct iEngine : public iBase
   /// Return the default amount of ambient light
   virtual void GetDefaultAmbientLight (csColor &c) const = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_ENGINE_H__

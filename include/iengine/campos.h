@@ -19,6 +19,10 @@
 #ifndef __IENGINE_CAMPOS_H__
 #define __IENGINE_CAMPOS_H__
 
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 class csVector3;
@@ -132,6 +136,8 @@ struct iCameraPositionList : public iBase
   /// Find a camera position by name
   virtual iCameraPosition *FindByName (const char *Name) const = 0;
 };
+
+/** @} */
 
 #endif
 

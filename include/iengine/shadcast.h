@@ -20,6 +20,12 @@
 #ifndef __I_SHADCAST_H__
 #define __I_SHADCAST_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 struct iShadowCaster;
@@ -56,6 +62,8 @@ struct iShadowReceiver : public iBase
   /// Cast shadows on this receiver.
   virtual void CastShadows (iMovable* movable, iFrustumView* fview) = 0;
 };
+
+/** @} */
 
 #endif // __I_SHADCAST_H__
 

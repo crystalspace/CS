@@ -20,6 +20,12 @@
 #ifndef __I_SHADOWS_H__
 #define __I_SHADOWS_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 struct iShadowBlock;
@@ -35,7 +41,6 @@ SCF_VERSION (iShadowIterator, 0, 0, 1);
  * A shadow iterator allows someone to iterate over all shadows
  * in a iShadowBlock or iShadowBlockList.
  */
-
 struct iShadowIterator : public iBase
 {
   /// Reset the iterator to start again.
@@ -171,6 +176,8 @@ struct iShadowBlockList : public iBase
    */
   virtual bool FromCurrentRegion (iShadowBlock* block) = 0;
 };
+
+/** @} */
 
 #endif // __I_SHADOWS_H__
 

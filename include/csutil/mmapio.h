@@ -5,22 +5,34 @@
  #include "csutil/bitarray.h"
 #endif
 
-/**\file
+/**\file 
+ * Support for Memory-Mapped IO
  */
 
-/*******************************************************************
+/// \internal Default cache block size
+const unsigned csmmioDefaultCacheBlockSize = 256;
 
+/// \internal Default cache size (in cache blocks)
+const unsigned csmmioDefaultCacheSize = 256;//2048;
+
+/// \internal Default size for hash table (best to use primes here)
+const unsigned csmmioDefaultHashSize = 211;//1559;
+
+
+/**
+  Defines a simple memory-mapped IO class that is portable.  Requires that data be organized in fixed block sizes.
+  <p>
   Design notes:
-
+  <p>
    1. Although the offset and page in the cache block can both be 
-   calculated from either value, i chose to precalculate and store
+   calculated from either value, I chose to precalculate and store
    BOTH items.  The reason for this is that it avoids one 
    multiplication on each access, and one division when paging data
    in to cache.  For the default values data storage per cache is
    8192 bytes with 20 bytes additional overhead.  This means that
    0.2% of the data is overhead.  That's worth it to avoid a heavy
    op like multiplication
-
+  <p>
    2. Usage of the singly-linked list for storage was chosen over a
    static array of cache blocks because there's no simple way to
    provide a direct index into the cache list from the index or page.
@@ -36,21 +48,7 @@
    four operations per (counting the modulus.)  While the hash table 
    does consume about 4k more memory, I think the slight memory usage 
    is worth it, considering the massive speedup.
-    
- *******************************************************************/
- 
-
-/// \internal Default cache block size
-const unsigned csmmioDefaultCacheBlockSize = 256;
-
-/// \internal Default cache size (in cache blocks)
-const unsigned csmmioDefaultCacheSize = 256;//2048;
-
-/// \internal Default size for hash table (best to use primes here)
-const unsigned csmmioDefaultHashSize = 211;//1559;
-
-
-/// Defines a simple memory-mapped IO class that is portable.  Requires that data be organized in fixed block sizes.
+*/  
 class csMemoryMappedIO
 {
   /// Minimum size of a single block 

@@ -19,6 +19,12 @@
 #ifndef __IENGINE_MOVABLE_H__
 #define __IENGINE_MOVABLE_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csgeom/transfrm.h"
@@ -164,5 +170,7 @@ struct iMovable : public iBase
    */
   virtual long GetUpdateNumber () const = 0;
 };
+
+/** @} */
 
 #endif

@@ -19,6 +19,12 @@
 #ifndef __IENGINE_HALO_H__
 #define __IENGINE_HALO_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "csutil/flags.h"
 
@@ -29,8 +35,11 @@ struct iMaterialWrapper;
  */
 enum csHaloType
 {
+  /// Cross halo
   cshtCross,
+  /// Nova halo
   cshtNova,
+  /// Flare halo
   cshtFlare
 };
 
@@ -100,5 +109,7 @@ struct iFlareHalo : public iBase
   virtual void AddComponent (float pos, float w, float h, uint mode,
     iMaterialWrapper *image) = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_HALO_H__

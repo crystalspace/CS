@@ -20,6 +20,12 @@
 #ifndef __IENGINE_VISCULL_H__
 #define __IENGINE_VISCULL_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 struct iRenderView;
@@ -128,6 +134,8 @@ struct iVisibilityObject : public iBase
    */
   virtual iObjectModel* GetObjectModel () = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_VISCULL_H__
 

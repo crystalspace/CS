@@ -24,7 +24,8 @@
 #include "csutil/typedvec.h"
 #include "iutil/object.h"
 
-/**\file
+/**\file 
+ * Named Object Vector class
  */
 
 class csObject;

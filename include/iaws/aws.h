@@ -18,7 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 
-/**\file
+/**\file 
+ * Advanced Windowing Systen
  */
 
 #include "csutil/scf.h"

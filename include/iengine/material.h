@@ -21,6 +21,12 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 class csMaterialWrapper;
 struct iMaterial;
 struct iMaterialHandle;
@@ -137,5 +143,7 @@ struct iMaterialList : public iBase
   /// Find a material by name
   virtual iMaterialWrapper *FindByName (const char *Name) const = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_MATERIAL_H__

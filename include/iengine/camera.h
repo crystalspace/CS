@@ -19,6 +19,13 @@
 #ifndef __IENGINE_CAMERA_H__
 #define __IENGINE_CAMERA_H__
 
+/** \file
+ */
+
+/**
+ * \addtogroup engine3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 
@@ -221,6 +228,8 @@ struct iCamera : public iBase
   /// Get the hit-only-portals flag.
   virtual bool GetOnlyPortals () = 0;
 };
+
+/** @} */
 
 #endif
 

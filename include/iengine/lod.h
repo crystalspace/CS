@@ -19,17 +19,36 @@
 #ifndef __IENGINE_LOD_H__
 #define __IENGINE_LOD_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
+/** \name Mesh feature flags
+ * Features can be disabled by the engine for LOD purposes.
+ * @{ */
+/// 
 #define CS_LOD_TRIANGLE_REDUCTION	1
+/// 
 #define CS_LOD_LIGHT_QUALITY		2
+/// 
 #define CS_LOD_LIGHT_QUANTITY		4
+/// 
 #define CS_LOD_FRAME_ANIMATION		8
+/// 
 #define CS_LOD_SKELETAL_ANIMATION	16
+/// 
 #define CS_LOD_TEXTURE_DETAIL		32
+/// 
 #define CS_LOD_TEXTURE_SIZE		64
+/// 
 #define CS_LOD_DISTANCE_REDUCTION	128
+/// 
 #define CS_LOD_ALL			(~0)
+/** @} */
 
 SCF_VERSION (iLODControl, 0, 0, 1);
 
@@ -54,14 +73,14 @@ struct iLODControl : public iBase
    * The following values are possible in the mask (CS_LOD_ALL represents
    * all):
    * <ul>
-   * <li>CS_LOD_TRIANGLE_REDUCTION
-   * <li>CS_LOD_LIGHT_QUALITY
-   * <li>CS_LOD_LIGHT_QUANTITY
-   * <li>CS_LOD_FRAME_ANIMATION
-   * <li>CS_LOD_SKELETAL_ANIMATION
-   * <li>CS_LOD_TEXTURE_DETAIL
-   * <li>CS_LOD_TEXTURE_SIZE
-   * <li>CS_LOD_DISTANCE_REDUCTION
+   * <li>#CS_LOD_TRIANGLE_REDUCTION
+   * <li>#CS_LOD_LIGHT_QUALITY
+   * <li>#CS_LOD_LIGHT_QUANTITY
+   * <li>#CS_LOD_FRAME_ANIMATION
+   * <li>#CS_LOD_SKELETAL_ANIMATION
+   * <li>#CS_LOD_TEXTURE_DETAIL
+   * <li>#CS_LOD_TEXTURE_SIZE
+   * <li>#CS_LOD_DISTANCE_REDUCTION
    * </ul>
    */
   virtual void SetLODFeatures (uint32 mask, uint32 value) = 0;
@@ -125,8 +144,11 @@ struct iLODControl : public iBase
    */
   virtual uint16 GetLODPriority () const = 0;
 
+  /// 
   virtual void SetMinLODThreshold (float level, bool turnOff) = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_LOD_H__
 

@@ -19,6 +19,12 @@
 #ifndef __IENGINE_MOTION_H__
 #define __IENGINE_MOTION_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "iengine/skelbone.h"
 
@@ -133,6 +139,8 @@ struct iMotionManager : public iBase
    */
   virtual void UpdateAll () = 0;
 };
+
+/** @} */
 
 #endif
 

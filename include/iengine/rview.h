@@ -19,6 +19,12 @@
 #ifndef __IENGINE_RVIEW_H__
 #define __IENGINE_RVIEW_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
@@ -407,6 +413,8 @@ struct iRenderView : public iBase
    */
   virtual iCamera* GetOriginalCamera () const = 0;
 };
+
+/** @} */
 
 #endif
 

@@ -19,6 +19,12 @@
 #ifndef __IENGINE_TEXTURE_H__
 #define __IENGINE_TEXTURE_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "cstypes.h"
 
@@ -147,5 +153,7 @@ struct iTextureList : public iBase
   /// Find a texture by name.
   virtual iTextureWrapper *FindByName (const char *Name) const = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_TEXTURE_H__

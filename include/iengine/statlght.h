@@ -19,6 +19,12 @@
 #ifndef __IENGINE_STATLGHT_H__
 #define __IENGINE_STATLGHT_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 class csStatLight;
@@ -41,6 +47,8 @@ struct iStatLight : public iBase
   /// Return the iLight for this light
   virtual iLight *QueryLight () = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_STATLGHT_H__
 

@@ -22,6 +22,9 @@
 
 /**\file
  */
+/**
+ * \addtogroup engine3d
+ * @{ */
  
 #include "csutil/scf.h"
 #include "iengine/fview.h"
@@ -35,6 +38,8 @@ struct iCrossHalo;
 struct iNovaHalo;
 struct iFlareHalo;
 
+/** \name Light flags
+ * @{ */
 /**
  * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
  * cast shadows. This flag is set by default for static lights and unset
@@ -42,19 +47,20 @@ struct iFlareHalo;
  */
 #define CS_LIGHT_THINGSHADOWS	0x00000001
 
-/**
+/** \internal
  * If this flag is set, the halo for this light is active and is in the
  * engine's queue of active halos. When halo become inactive, this flag
  * is reset.
  */
 #define CS_LIGHT_ACTIVEHALO	0x80000000
+/** @} */
 
 /// Light level that is used when there is no light on the texture.
 #define CS_DEFAULT_LIGHT_LEVEL 20
 /// Light level that corresponds to a normally lit texture.
 #define CS_NORMAL_LIGHT_LEVEL 128
 
-/**
+/** \name Attenuation modes
  * Attenuation controls how the brightness of a light fades with distance.
  * There are four attenuation formulas:
  * <ul>
@@ -63,11 +69,16 @@ struct iFlareHalo;
  *   <li> inverse attenuation = light * (radius / distance)
  *   <li> realistic attenuation = light * (radius^2 / distance^2)
  * </ul>
- */
+ * @{ */
+/// no attenuation: light * 1
 #define CS_ATTN_NONE      0
+/// linear attenuation: light * (radius - distance) / radius
 #define CS_ATTN_LINEAR    1
+/// inverse attenuation: light * (radius / distance)
 #define CS_ATTN_INVERSE   2
+/// realistic attenuation = light * (radius^2 / distance^2)
 #define CS_ATTN_REALISTIC 3
+/** @} */
 
 SCF_VERSION (iLight, 0, 0, 7);
 
@@ -133,13 +144,13 @@ struct iLight : public iBase
   /// Return current attenuation mode.
   virtual int GetAttenuation () = 0;
   /**
-   * Set attenuation mode. The following values are possible (CS_ATTN_LINEAR
-   * is default CS_ATTN_LINEAR):
+   * Set attenuation mode. The following values are possible 
+   * (default is #CS_ATTN_LINEAR):
    * <ul>
-   * <li> CS_ATTN_NONE: light * 1
-   * <li> CS_ATTN_LINEAR: light * (radius - distance) / radius
-   * <li> CS_ATTN_INVERSE: light * (radius / distance)
-   * <li> CS_ATTN_REALISTIC: light * (radius^2 / distance^2)
+   * <li>#CS_ATTN_NONE: light * 1
+   * <li>#CS_ATTN_LINEAR: light * (radius - distance) / radius
+   * <li>#CS_ATTN_INVERSE: light * (radius / distance)
+   * <li>#CS_ATTN_REALISTIC: light * (radius^2 / distance^2)
    * </ul>
    */
   virtual void SetAttenuation (int a) = 0;
@@ -159,8 +170,8 @@ struct iLight : public iBase
    * Get flags for this light.
    * Supported flags:
    * <ul>
-   * <li>CS_LIGHT_ACTIVEHALO
-   * <li>CS_LIGHT_THINGSHADOWS
+   * <li>#CS_LIGHT_ACTIVEHALO
+   * <li>#CS_LIGHT_THINGSHADOWS
    * </ul>
    */
   virtual csFlags& GetFlags () = 0;
@@ -246,6 +257,8 @@ struct iLightIterator : public iBase
   /// Get the sector for the last fetched light.
   virtual iSector* GetLastSector () = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_LIGHT_H__
 

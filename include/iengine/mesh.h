@@ -21,6 +21,9 @@
 
 /**\file
  */
+/**
+ * \addtogroup engine3d
+ * @{ */
 
 #include "csutil/scf.h"
 #include "csgeom/box.h"
@@ -43,6 +46,8 @@ struct iLight;
 struct iObject;
 class csFlags;
 
+/** \name Meshwrapper flags.
+ * @{ */
 /**
  * If CS_ENTITY_CONVEX is set then this entity is convex (what did
  * you expect :-)
@@ -88,6 +93,7 @@ class csFlags;
  * to disable that.
  */
 #define CS_ENTITY_NOLIGHTING 32
+/** @} */
 
 SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
 
@@ -248,14 +254,14 @@ struct iMeshWrapper : public iBase
   /**
    * Get flags for this meshwrapper. The following flags are supported:
    * <ul>
-   * <li>CS_ENTITY_CONVEX: entity is convex. This can help the engine with
+   * <li>#CS_ENTITY_CONVEX: entity is convex. This can help the engine with
    *     optimizing rendering.
-   * <li>CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
+   * <li>#CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
    *     for the engine to render this object differently.
-   * <li>CS_ENTITY_CAMERA: entity will always be centered around the camera.
-   * <li>CS_ENTITY_INVISIBLE: entity is invisible.
-   * <li>CS_ENTITY_NOSHADOWS: cast no shadows.
-   * <li>CS_ENTITY_NOLIGHTING: do not light this object.
+   * <li>#CS_ENTITY_CAMERA: entity will always be centered around the camera.
+   * <li>#CS_ENTITY_INVISIBLE: entity is invisible.
+   * <li>#CS_ENTITY_NOSHADOWS: cast no shadows.
+   * <li>#CS_ENTITY_NOLIGHTING: do not light this object.
    * </ul>
    */
   virtual csFlags& GetFlags () = 0;
@@ -264,10 +270,10 @@ struct iMeshWrapper : public iBase
    * Set the Z-buf drawing mode to use for this object.
    * Possible values are:
    * <ul>
-   * <li>CS_ZBUF_NONE: do not read nor write the Z-buffer.
-   * <li>CS_ZBUF_FILL: only write the Z-buffer but do not read.
-   * <li>CS_ZBUF_USE: write and read the Z-buffer.
-   * <li>CS_ZBUF_TEST: only read the Z-buffer but do not write.
+   * <li>#CS_ZBUF_NONE: do not read nor write the Z-buffer.
+   * <li>#CS_ZBUF_FILL: only write the Z-buffer but do not read.
+   * <li>#CS_ZBUF_USE: write and read the Z-buffer.
+   * <li>#CS_ZBUF_TEST: only read the Z-buffer but do not write.
    * </ul>
    */
   virtual void SetZBufMode (csZBufMode mode) = 0;
@@ -469,6 +475,8 @@ struct iMeshFactoryList : public iBase
   /// Find a mesh factory wrapper by name.
   virtual iMeshFactoryWrapper *FindByName (const char *Name) const = 0;
 };
+
+/** @} */
 
 #endif // __IENGINE_MESH_H__
 

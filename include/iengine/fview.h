@@ -19,6 +19,10 @@
 #ifndef __IENGINE_FVIEW_H__
 #define __IENGINE_FVIEW_H__
 
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
@@ -183,6 +187,8 @@ struct iFrustumView : public iBase
   /// Get userdata.
   virtual iFrustumViewUserdata* GetUserdata () = 0;
 };
+
+/** @} */
 
 #endif
 

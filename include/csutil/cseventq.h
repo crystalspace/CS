@@ -21,7 +21,8 @@
 #ifndef __CSEVENTQ_H__
 #define __CSEVENTQ_H__
 
-/**\file
+/**\file 
+ * Event Queue interface
  */
 
 #include "csutil/csevent.h"

@@ -19,6 +19,12 @@
 #ifndef __IENGINE_SKELBONE_H__
 #define __IENGINE_SKELBONE_H__
 
+/**\file
+ */
+/**
+ * \addtogroup engine3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 class csTransform;
@@ -44,6 +50,8 @@ struct iSkeletonBone : public iBase
   /// Get the transformation.
   virtual csTransform& GetTransformation () = 0;
 };
+
+/** @} */
 
 #endif
 

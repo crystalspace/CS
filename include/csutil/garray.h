@@ -20,7 +20,8 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
-/**\file
+/**\file 
+ * vector class interface
  */
 
 /**\internal
