@@ -97,11 +97,3 @@ drawers depending on mipmap level. This causes things to disappear
 when they are close.
 SOLUTION: just have a look.
 DIFFICULTY: probably easy
-
-PROBLEM: Unlighted texture mapping in 32-bit mode does not look right
-if your display hardware does not use the ARGB format (red becomes blue,
-etc).
-SOLUTION: Just write special versions for every format (similar to what
-is done for fog).
-DIFFICULTY: very easy
-
