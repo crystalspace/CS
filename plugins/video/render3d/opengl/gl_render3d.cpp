@@ -1043,7 +1043,7 @@ void csGLGraphics3D::Close ()
   shadermgr = 0;
   for (size_t h = 0; h < halos.Length(); h++)
   {
-    halos[h]->DeleteTexture();
+    if (halos[h]) halos[h]->DeleteTexture();
   }
 
   if (G2D)
