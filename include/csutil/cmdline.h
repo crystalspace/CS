@@ -31,10 +31,11 @@ class csCommandLineParser : public iCommandLineParser
 {
 private:
   // A vector of command line options
-  CS_BEGIN_TYPED_VECTOR (csCommandLineOptionVector, csCommandLineOption)
-    bool FreeTypedItem (csCommandLineOption*);
+  CS_BEGIN_TYPED_VECTOR (CS_DECLARE_TYPED_VECTOR_USERDELETE,
+    csCommandLineOptionVector, csCommandLineOption)
+  public:
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-  CS_FINISH_TYPED_VECTOR (csCommandLineOption);
+  CS_FINISH_TYPED_VECTOR;
 
   // The array of all command-line options.
   csCommandLineOptionVector Options;

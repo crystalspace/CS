@@ -58,93 +58,168 @@ public:
 
 /**
  * Object Vectors: A subset of typed vectors. They assume that it is possible
- * to cast the contained objects from and to (iBase*). This pointer is then
- * used to query the iObject interface form the contained objects.
+ * to cast the contained objects from and to (iBase*), and that they implement
+ * the iObject interface. <p>
+ *
+ * Object vectors also have the following special methods: <ul>
+ * <li> GetObjectVector () : Return the vector as a csNamedObjectVector.
+ *      The returned object is used to deal with the vector as a vector
+ *      of iObject's. However, as they are not really iObject's, it is not
+ *      possible to add objects to the vector, due to type-unsafety.
+ * <li> GetIndexByName () : Return the index of an object by searching
+ *      for its name.
+ * <li> FindByName () : Return the pointer to an object by searching
+ *      for its name.
+ * <li> FindObjectByName () : Like FindByName(), but returns an (iObject*)
+ *      pointer.
+ * </ul>
  */
 
 /**
- * This class is intended as a superclass for typed object vectors. Instances
- * of this class itself should not be created; However it is valid to cast
- * a typed object vector to this class. It is not possible to add objects to
- * the vector though this interface, because this interface does not know
- * which type of objects is actually contained.
+ * This class is intended as a wrapper around an existing csVector. It assumes
+ * that the vector contains iBase objects which implement the iObject
+ * interface. This class allows access to the vector as if it was a vector
+ * of iObject's. However, it is not possible to add objects to the vector
+ * though this interface, because this interface does not know which type of
+ * objects is actually contained.
+ *
+ * @@@ the current implementation uses SCF_QUERY_INTERFACE everywhere. This
+ * is slow and also the refcount is not handled correctly.
  */
-class csNamedObjectVector : protected csIBaseVector
+class csNamedObjectVector
 {
-protected:
-  /// Find an object by name
-  csSome FindByName (const char* iName) const;
-  /// Compare two objects by their names
-  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
-  /// Compare object's name with a string
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+private:
+  // the wrapped vector
+  csVector *Vector;
 
 public:
   /// constructor
-  csNamedObjectVector (int iLimit = 8, int iThreshold = 16) :
-    csIBaseVector (iLimit, iThreshold) {}
+  inline csNamedObjectVector ();
 
-  /// Set the length of this vector
-  inline void SetLength (int n)
-  { csIBaseVector::SetLength(n); }
-  /// Return the length of this vector
-  inline int Length () const
-  { return count; }
-  /// Return the limit of this vector
-  inline int Limit () const
-  { return limit; }
-  /// Exchange two elements of the vector
-  inline void Exchange (int n1, int n2)
-  { csIBaseVector::Exchange (n1, n2); }
-  /// Quick-sort the elements, using the given mode
-  inline void QuickSort (int Left, int Right, int Mode = 0)
-  { csIBaseVector::QuickSort (Left, Right, Mode); }
-  /// Quick-sort the elements, using the given mode
-  inline void QuickSort (int Mode = 0)
-  { csIBaseVector::QuickSort (Mode); }
-  /// Find an element using the given key
-  inline int FindKey (csConstSome Key, int Mode = 0) const
-  { return csIBaseVector::FindKey (Key, Mode); }
-  /// Find an element using the given key. Expects the elements to be sorted.
-  inline int FindSortedKey (csConstSome Key, int Mode = 0) const
-  { return csIBaseVector::FindSortedKey (Key, Mode); }
-  /// Pop an element from the vector.
-  inline iObject *PopObject ()
-  { return SCF_QUERY_INTERFACE_FAST (((iBase*)csIBaseVector::Pop()), iObject); }
-  /// Delete an element from the vector
-  inline bool Delete (int n)
-  { return csIBaseVector::Delete (n); }
-  /// Delete all elements
-  inline void DeleteAll ()
-  { csIBaseVector::DeleteAll (); }
-  /// Return the pointer to an element
-  inline iObject *GetObject (int n) const
-  { return SCF_QUERY_INTERFACE_FAST (((iBase*)(csIBaseVector::Get(n))), iObject); }
   /// Return the index of the element with the given name, or -1.
   int GetIndexByName (const char *name) const;
+  /// Find an object by name
+  iObject *FindByName (const char *name) const;
+
+  /// Set the length of this vector
+  inline void SetLength (int n);
+  /// Return the length of this vector
+  inline int Length () const;
+  /// Return the limit of this vector
+  inline int Limit () const;
+  /// Exchange two elements of the vector
+  inline void Exchange (int n1, int n2);
+  /// Quick-sort the elements, using the given mode
+  inline void QuickSort (int Left, int Right, int Mode = 0);
+  /// Quick-sort the elements, using the given mode
+  inline void QuickSort (int Mode = 0);
+  /// Find an element and return its index
+  int Find (iObject *obj) const;
+  /// Find an element using the given key
+  inline int FindKey (csConstSome Key, int Mode = 0) const;
+  /// Find an element using the given key. Expects the elements to be sorted.
+  inline int FindSortedKey (csConstSome Key, int Mode = 0) const;
+  /// Pop an element from the vector.
+  inline iObject *Pop ();
+  /// Delete an element from the vector
+  inline bool Delete (int n);
+  /// Delete all elements
+  inline void DeleteAll ();
+  /// Return the pointer to an element
+  inline iObject *Get (int n) const;
+  /// Return the pointer to an element
+  inline iObject *operator[] (int n) const;
+
+  // private method: Compare two objects by their names
+  static int Compare (csSome Item1, csSome Item2, int Mode);
+  // private method: Compare object's name with a string
+  static int CompareKey (csSome Item, csConstSome Key, int Mode);
+  // private method: set the wrapped vector
+  inline void SetVector (void *vec);
 };
 
 /**
- * Begin the class definition of an object vector. Be careful with
- * user-defined methods in this class: Due to the 'protected' inheritance
- * they can access members and methods of csVector (not type-safe!). <p>
- *
- * Note that exploiting the inheritance from csNamedObjectVector is legal. 
+ * Declare an object vector class which correctly handles the reference
+ * count of the contained objects.
  */
-#define CS_BEGIN_OBJECT_VECTOR(NAME,TYPE)				\
-  CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS (NAME, TYPE, public, csNamedObjectVector) \
-    TYPE *FindByName (const char* iName) const				\
-    { return (TYPE*)csNamedObjectVector::FindByName (iName); }		\
-    int GetIndexByName (const char* iName) const			\
-    { return csNamedObjectVector::GetIndexByName (iName); }
-
-/// Finish the class definition of an object vector
-#define CS_FINISH_OBJECT_VECTOR						\
-  CS_FINISH_TYPED_IBASE_VECTOR
-
-/// Declare an object vector class
 #define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
-  CS_BEGIN_OBJECT_VECTOR (NAME, TYPE)					\
-  CS_FINISH_OBJECT_VECTOR
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
+
+/**
+ * Declare an object vector class which leaves the reference count of the
+ * contained objects untouched.
+ */
+#define CS_DECLARE_OBJECT_VECTOR_NOREF(NAME,TYPE)			\
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR_NOREF (NAME, TYPE)
+
+//----------------------------------------------------------------------------
+//--- implementation of the above macros follows -----------------------------
+//----------------------------------------------------------------------------
+
+#define CS_PRIVATE_DECLARE_OBJECT_VECTOR(NAME,TYPE)			\
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON (				\
+    CS_DECLARE_TYPED_IBASE_VECTOR, NAME, TYPE)
+
+#define CS_PRIVATE_DECLARE_OBJECT_VECTOR_NOREF(NAME,TYPE)		\
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON (				\
+    CS_DECLARE_TYPED_VECTOR_NODELETE, NAME, TYPE)
+
+#define CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON(MACRO,NAME,TYPE)	\
+  CS_BEGIN_TYPED_VECTOR (MACRO, NAME, TYPE)				\
+  private:								\
+    csNamedObjectVector ObjVec;						\
+  public:								\
+    NAME (int ilimit = 16, int ithreshold = 16) :			\
+      NAME##_Helper (ilimit, ithreshold)				\
+      {ObjVec.SetVector (this);}					\
+    inline csNamedObjectVector *GetObjectVector ()			\
+      { return &ObjVec; }						\
+    inline const csNamedObjectVector *GetObjectVector () const		\
+      { return &ObjVec; }						\
+    int GetIndexByName (const char* iName) const			\
+      { return ObjVec.GetIndexByName (iName); }				\
+    TYPE *FindByName (const char* iName) const				\
+      { int n = GetIndexByName (iName);					\
+        return (n==-1) ? NULL : Get(n); }				\
+    iObject *FindObjectByName (const char* iName) const			\
+      { return ObjVec.FindByName (iName); }				\
+    virtual int Compare (csSome Item1, csSome Item2, int Mode) const	\
+      { return csNamedObjectVector::Compare (Item1, Item2, Mode); }	\
+    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const \
+      { return csNamedObjectVector::CompareKey (Item, Key, Mode); }	\
+  CS_FINISH_TYPED_VECTOR
+
+// implementation of inline functions follows
+inline csNamedObjectVector::csNamedObjectVector ()
+  { Vector = NULL; }
+inline void csNamedObjectVector::SetVector (void *v)
+  { Vector = (csVector*)v; }
+inline void csNamedObjectVector::SetLength (int n)
+  { Vector->SetLength(n); }
+inline int csNamedObjectVector::Length () const
+  { return Vector->Length (); }
+inline int csNamedObjectVector::Limit () const
+  { return Vector->Limit (); }
+inline void csNamedObjectVector::Exchange (int n1, int n2)
+  { Vector->Exchange (n1, n2); }
+inline void csNamedObjectVector::QuickSort (int Left, int Right, int Mode)
+  { Vector->QuickSort (Left, Right, Mode); }
+inline void csNamedObjectVector::QuickSort (int Mode)
+  { Vector->QuickSort (Mode); }
+inline int csNamedObjectVector::FindKey (csConstSome Key, int Mode) const
+  { return Vector->FindKey (Key, Mode); }
+inline int csNamedObjectVector::FindSortedKey (csConstSome Key, int Mode) const
+  { return Vector->FindSortedKey (Key, Mode); }
+inline iObject *csNamedObjectVector::Pop ()
+  { iObject *obj = SCF_QUERY_INTERFACE_FAST (((iBase*)Vector->Pop()), iObject);
+    CS_ASSERT (obj); return obj; }
+inline bool csNamedObjectVector::Delete (int n)
+  { return Vector->Delete (n); }
+inline void csNamedObjectVector::DeleteAll ()
+  { Vector->DeleteAll (); }
+inline iObject *csNamedObjectVector::Get (int n) const
+  { return SCF_QUERY_INTERFACE_FAST (((iBase*)(Vector->Get(n))), iObject); }
+inline iObject *csNamedObjectVector::operator[] (int n) const
+  { return SCF_QUERY_INTERFACE_FAST (((iBase*)(Vector->Get(n))), iObject); }
 
 #endif // __NOBJVEC_H__

@@ -24,6 +24,107 @@
 #include "csutil/csvector.h"
 
 /**
+ * This header file contains a set of macros to construct 'typed vectors'.
+ * They are the type-safe variant of csVector. You can perform almost any
+ * operation as with csVector, but the contained objects are always
+ * given as a (TYPE*) instead of a (csSome) which is actually a (void*). <p>
+ *
+ * There are basically two types of such vectors. The first type are used
+ * to store normal C++ objects. These vectors work exactly like csVector.
+ * The contained objects are given to FreeItem() when deleted and upon
+ * vector destruction. Whether the items are really deleted in that function
+ * depends on which macro you use. You can also define your own FreeItem
+ * if you want. Also, every method that possibly calls FreeItem accepts
+ * a parameter that determines whether that is actually done. <p>
+ *
+ * The second type are 'iBase vectors'. They are used to store SCF objects.
+ * The contained objects are IncRef'ed when added and DecRef'ed when
+ * removed (with the exception of the Pop() function, where it makes more
+ * sense not to DecRef the contained object but instead let the user do that).
+ * This has some implications on the interface: <ul>
+ * <li> No parameter is accepted that determines whether removed items are
+ *      actually deleted. They are always DecRef'ed.
+ * <li> No reference access is allowed. csVector::Get() and operator[]
+ *      return references to the contained objects which let you assign
+ *      them directly. This is not possible for iBase vectors, as it
+ *      circumvents proper reference-counting.
+ * </ul>
+ */
+
+/**
+ * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
+ * The vector deletes the items in FreeItem ().
+ */
+#define CS_DECLARE_TYPED_VECTOR(NAME,TYPE)				\
+  CS_PRIVATE_DECLARE_TYPED_VECTOR (NAME, TYPE)
+
+/**
+ * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
+ * The vector does not do anything in FreeItem ().
+ */
+#define CS_DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
+  CS_PRIVATE_DECLARE_TYPED_VECTOR_NODELETE (NAME, TYPE)
+
+/**
+ * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
+ * This macro lets you define how items are deleted. You have to define
+ * the following function for this: <p>
+ *
+ * bool NAME::FreeTypedItem (TYPE *item);
+ */
+#define CS_DECLARE_TYPED_VECTOR_USERDELETE(NAME,TYPE)			\
+  CS_PRIVATE_DECLARE_TYPED_VECTOR_USERDELETE (NAME, TYPE)
+
+/**
+ * Implement Name::FreeTypedItem() for CS_DECLARE_TYPED_VECTOR_USERDELETE to
+ * delete the item. This combination can be used instead of
+ * CS_DECLARE_TYPED_VECTOR if the contained type is undefined at the time
+ * you declare the vector class.
+ */
+#define CS_IMPLEMENT_TYPED_VECTOR_DELETE(NAME,TYPE)			\
+  CS_PRIVATE_IMPLEMENT_TYPED_VECTOR_DELETE(NAME,TYPE)
+
+/**
+ * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
+ * The contained objects must be subclasses of iBase (this is not
+ * checked by the compiler!!!)
+ */
+#define CS_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)			\
+  CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR (NAME, TYPE)
+
+/**
+ * Begin the class definition of a typed vector. The 'macro' parameter
+ * determines which of the above macros is used, and by this the type
+ * of vector to use. After this macro, add any number of user-defined
+ * members and functions, then close the class definition with
+ * CS_FINISH_TYPED_VECTOR. This actually creates an empty subclass of
+ * a typed vector class called "NAME_Helper". This also means that by
+ * default there is no constructor that takes any parameters. Note that
+ * when using CS_DECLARE_TYPED_VECTOR_USERDELETE for MACRO, the function
+ * to implement is called "NAME_Helper::FreeTypedItem", Not "NAME::..."
+ */
+#define CS_BEGIN_TYPED_VECTOR(MACRO,NAME,TYPE)				\
+  CS_PRIVATE_BEGIN_USER_VECTOR(MACRO,NAME,TYPE)
+
+/**
+ * Finish the class definition of a typed vector.
+ */
+#define CS_FINISH_TYPED_VECTOR						\
+  CS_PRIVATE_FINISH_USER_VECTOR
+
+/**
+ * Define the default constructor in a typed vector (must be placed into
+ * the class definition).
+ */
+#define CS_TYPED_VECTOR_CONSTRUCTOR(NAME)				\
+  CS_PRIVATE_TYPED_VECTOR_CONSTRUCTOR (NAME)
+
+
+//----------------------------------------------------------------------------
+//--- implementation of the above macros follows -----------------------------
+//----------------------------------------------------------------------------
+
+/*
  * Helper class for vectors that contain 'iBase' objects. It assumes that
  * the contained objects may be cast to 'iBase'. Note that it does not
  * take parameters of type 'iBase'. This way it overrides the methods of
@@ -39,8 +140,6 @@
  */
 class csIBaseVector : public csVector
 {
-protected:
-  void TestInheritance () {}
 public:
   inline csIBaseVector (int lim, int thr) : csVector (lim, thr) {}
   inline bool Delete (int n)
@@ -78,7 +177,7 @@ public:
   }
 };
 
-/**
+/*
  * This is a helper macro for typed vectors. It defines all methods that are
  * valid for usual typed vectors and typed SCF vectors. This basically
  * excludes all methods that have a 'DeleteIt' parameter for
@@ -87,7 +186,7 @@ public:
  * This macro assumes that the type 'superclass' is defined to the superclass
  * of the typed vector.
  */
-#define CS_DECLARE_TYPED_VECTOR_HELPER(NAME,TYPE)			\
+#define CS_PRIVATE_DECLARE_TYPED_VECTOR_HELPER(NAME,TYPE)		\
     inline NAME (int ilimit = 16, int ithreshold = 16) :		\
       superclass (ilimit, ithreshold) {}				\
     virtual ~NAME ()							\
@@ -119,8 +218,8 @@ public:
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
     { return superclass::InsertSorted ((csSome)Item, oEqual, Mode); }
 
-/**
- * Declares a new vector type NAME as a subclass of a given superclass.
+/*
+ * Declares a new vector type NAME as a subclass of csVector.
  * Elements of this vector are of type TYPE. The elements are
  * automatically given to FreeTypedItem() on either Delete() or
  * DeleteAll() or upon vector destruction. However, you must define
@@ -131,41 +230,35 @@ public:
  * csVector members (type-unsafe!) from the inside, i.e. from your own methods.
  *
  * Usage (all features):
- *   CS_BEGIN_TYPED_VECTOR_WITH_SUPERCLASS (NAME, TYPE, INHERIT, SUPERCLASS)
+ *   CS_PRIVATE_BEGIN_TYPED_VECTOR (NAME, TYPE)
  *     user-defined FreeTypedItem() here
  *     any other user-defined methods
- *   CS_FINISH_TYPED_VECTOR (TYPE)
- *
- * or (no user-defined superclass):
- *   CS_BEGIN_TYPED_VECTOR (NAME, TYPE)
- *     user-defined FreeTypedItem() here
- *     any other user-defined methods
- *   CS_FINISH_TYPED_VECTOR (TYPE)
+ *   CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
  *
  * or (no user-defined members, contained objects are correctly deleted):
- *   CS_DECLARE_TYPED_VECTOR (NAME, TYPE)
+ *   CS_PRIVATE_DECLARE_TYPED_VECTOR (NAME, TYPE)
  *
  * or (no user-defined members, contained objects are not deleted):
- *   CS_DECLARE_TYPED_VECTOR_NODELETE (NAME, TYPE)
+ *   CS_PRIVATE_DECLARE_TYPED_VECTOR_NODELETE (NAME, TYPE)
+ *
+ * or (no user-defined members, user has to define FreeTypedItem):
+ *   CS_PRIVATE_DECLARE_TYPED_VECTOR_NODELETE (NAME, TYPE)
  *
  * Parameters:
  *   NAME - Name of the new vector class.
  *   TYPE - Data type to which this vector refer.
  *          The TYPE should be possible to cast to (void *) and back.
- *   INHERIT - type of inheritance, usually 'private'.
- *   SUPERCLASS - The superclass of the vector. Usually csVector (in
- *          which case you can use CS_BEGIN_TYPED_VECTOR for convenience).
  */
-#define CS_BEGIN_TYPED_VECTOR_WITH_SUPERCLASS(NAME,TYPE,INHERIT,SCLASS)	\
-  class NAME : INHERIT SCLASS						\
+#define CS_PRIVATE_BEGIN_TYPED_VECTOR(NAME,TYPE)			\
+  class NAME : private csVector						\
   {									\
-    typedef SCLASS superclass;						\
+    typedef csVector superclass;					\
   public:								\
     inline bool Delete (int n, bool FreeIt = true)			\
     { return superclass::Delete (n, FreeIt); }				\
     inline void DeleteAll (bool FreeThem = true)			\
     { superclass::DeleteAll (FreeThem); }				\
-    CS_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
+    CS_PRIVATE_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)			\
     inline TYPE *& operator [] (int n)					\
     { return (TYPE *&)superclass::operator [] (n); }			\
     inline TYPE *& operator [] (int n) const				\
@@ -177,38 +270,43 @@ public:
     inline bool Replace (int n, TYPE *what, bool FreePrevious = true)	\
     { return superclass::Replace(n, (csSome)what, FreePrevious); }
 
-/// Begin the class definition of a typed vector
-#define CS_BEGIN_TYPED_VECTOR(NAME,TYPE)				\
-  CS_BEGIN_TYPED_VECTOR_WITH_SUPERCLASS (NAME, TYPE, private, csVector)
-
-/// Finish the class definition of a typed vector
-#define CS_FINISH_TYPED_VECTOR(TYPE)					\
+// Finish the class definition of a typed vector
+#define CS_PRIVATE_FINISH_TYPED_VECTOR(TYPE)				\
     virtual bool FreeItem (csSome Item)					\
     { return FreeTypedItem ((TYPE *)Item); }				\
   }
 
-/**
+/*
  * Declares a new vector type NAME as a subclass of csVector. Elements
  * of this vector are of type TYPE. The elements are automatically deleted
  * on either Delete() or DeleteAll() or upon vector destruction.
  */
-#define CS_DECLARE_TYPED_VECTOR(NAME,TYPE)				\
-  CS_BEGIN_TYPED_VECTOR (NAME,TYPE)					\
+#define CS_PRIVATE_DECLARE_TYPED_VECTOR(NAME,TYPE)			\
+  CS_PRIVATE_BEGIN_TYPED_VECTOR (NAME,TYPE)				\
     inline bool FreeTypedItem (TYPE* obj)				\
     { delete obj; return true; }					\
-  CS_FINISH_TYPED_VECTOR (TYPE)
+  CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
 
 /**
  * Declares a new vector type NAME as a subclass of csVector. Elements of
  * this vector are of type TYPE. The elements are not deleted by this vector.
  */
-#define CS_DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
-  CS_BEGIN_TYPED_VECTOR (NAME,TYPE)					\
+#define CS_PRIVATE_DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)		\
+  CS_PRIVATE_BEGIN_TYPED_VECTOR (NAME,TYPE)				\
     inline bool FreeTypedItem (TYPE*)					\
     { return true; }							\
-  CS_FINISH_TYPED_VECTOR (TYPE)
+  CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
 
 /**
+ * Declares a new vector type NAME as a subclass of csVector. Elements of
+ * this vector are of type TYPE. The user has to define FreeTypedItem ().
+ */
+#define CS_PRIVATE_DECLARE_TYPED_VECTOR_USERDELETE(NAME,TYPE)		\
+  CS_PRIVATE_BEGIN_TYPED_VECTOR (NAME,TYPE)				\
+    bool FreeTypedItem (TYPE*);						\
+  CS_PRIVATE_FINISH_TYPED_VECTOR (TYPE)
+
+/*
  * This is a special version of typed vectors that contain SCF objects. The
  * vector will correctly IncRef all added objects and DecRef all removed
  * objects. There is only one exeption: The Pop() function does not DecRef
@@ -216,69 +314,54 @@ public:
  * you call Pop(), you do usually not have a pointer to the object, so you can
  * not IncRef() it before. <p>
  *
- * Note that through some way the typed vector must be derived from
- * csIBaseVector, i.e. the given superclass must be csIBaseVector itself
- * or a descendant of it. This is required for correct reference counting. <p>
- *
  * Be careful with user-defined methods in typed vectors. Though the
  * vectors are type-safe to the outside, it is still possible to access
  * csVector members (type-unsafe!) from the inside, i.e. from your own methods.
  *
- * Usage (all features):
- *   CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS(NAME,TYPE,INHERIT,SUPERCLASS)
- *     any user-defined methods
- *   CS_FINISH_TYPED_IBASE_VECTOR
- *
- * or (no user-defined superclass):
- *   CS_BEGIN_TYPED_IBASE_VECTOR (NAME, TYPE)
- *     any other user-defined methods
- *   CS_FINISH_TYPED_IBASE_VECTOR
- *
- * or (no user-defined members):
- *   CS_DECLARE_TYPED_IBASE_VECTOR (NAME, TYPE)
+ * Usage:
+ *   CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR (NAME, TYPE)
  *
  * Parameters:
  *   NAME - Name of the new vector class.
  *   TYPE - Data type to which this vector refer.
  *          The TYPE should be possible to cast to (void *) and back.
- *   INHERIT - type of inheritance, usually 'private'.
- *   SUPERCLASS - The superclass of the vector. Usually csIBaseVector (in
- *          which case you can use CS_BEGIN_TYPED_IBASE_VECTOR for
- *          convenience). Note that if you use another superclass, then
- *          it must be a descendant of csIBaseVector.
  */
-#define CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS(NAME,TYPE,INHERIT,SCLASS) \
-  class NAME : INHERIT SCLASS						\
+#define CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)		\
+  class NAME : csIBaseVector						\
   {									\
-    typedef SCLASS superclass;						\
-    /* This function has no other purpose than to assure inheritance */	\
-    /* from csIBaseVector.                                           */	\
-    inline void TestIBaseVectorInhertiance ()				\
-    { TestInheritance (); }						\
+    typedef csIBaseVector superclass;					\
+  protected:								\
+    inline bool FreeItem (csSome item)					\
+    { return superclass::FreeItem (item); }				\
   public:								\
     inline bool Delete (int n)						\
     { return superclass::Delete (n); }					\
     inline void DeleteAll ()						\
     { superclass::DeleteAll (); }					\
-    CS_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
+    CS_PRIVATE_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)			\
     inline TYPE *operator [] (int n) const				\
     { return (TYPE *)superclass::operator [] (n); }			\
     inline TYPE *Get (int n) const					\
     { return (TYPE *)superclass::Get(n); }				\
     inline bool Replace (int n, TYPE *what)				\
-    { return superclass::Replace(n, (csSome)what); }
-
-/// Begin the class definition of a typed vector for SCF objects
-#define CS_BEGIN_TYPED_IBASE_VECTOR(NAME,TYPE)				\
-  CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS(NAME,TYPE,private,csIBaseVector)
-
-/// Finish the class definition of a typed vector for SCF objects
-#define CS_FINISH_TYPED_IBASE_VECTOR					\
+    { return superclass::Replace(n, (csSome)what); }			\
   }
 
-/// Define a vector for SCF objects
-#define CS_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)			\
-  CS_BEGIN_TYPED_IBASE_VECTOR (NAME, TYPE)				\
-  CS_FINISH_TYPED_IBASE_VECTOR
+#define CS_PRIVATE_IMPLEMENT_TYPED_VECTOR_DELETE(NAME,TYPE)		\
+  bool NAME::FreeTypedItem (TYPE *Item)					\
+  { delete Item; return true; }
+
+#define CS_PRIVATE_BEGIN_USER_VECTOR(MACRO,NAME,TYPE)			\
+  MACRO (NAME##_Helper, TYPE);						\
+  class NAME : public NAME##_Helper					\
+  {									\
+  public:
+
+#define CS_PRIVATE_FINISH_USER_VECTOR					\
+  }
+
+#define CS_PRIVATE_TYPED_VECTOR_CONSTRUCTOR(NAME)			\
+  NAME (int ilimit = 8, int ithreshold = 16) :				\
+    NAME##_Helper (ilimit, ithreshold) {}
 
 #endif // __TYPEDVEC_H__

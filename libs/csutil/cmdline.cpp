@@ -36,12 +36,8 @@ struct csCommandLineOption
   { delete [] Name; delete [] Value; }
 };
 
-bool csCommandLineParser::csCommandLineOptionVector::FreeTypedItem (
-  csCommandLineOption *Option)
-{
-  delete Option;
-  return true;
-}
+CS_IMPLEMENT_TYPED_VECTOR_DELETE (
+  csCommandLineParser::csCommandLineOptionVector_Helper, csCommandLineOption);
 
 int csCommandLineParser::csCommandLineOptionVector::CompareKey
   (csSome Item, csConstSome Key, int /*Mode*/) const
@@ -53,14 +49,13 @@ SCF_IMPLEMENT_IBASE (csCommandLineParser)
   SCF_IMPLEMENTS_INTERFACE (iCommandLineParser)
 SCF_IMPLEMENT_IBASE_END
 
-csCommandLineParser::csCommandLineParser (iBase *Parent) :
-  Options (16, 16), Names (16, 16)
+csCommandLineParser::csCommandLineParser (iBase *Parent) : Names (16, 16)
 {
   SCF_CONSTRUCT_IBASE (Parent);
 }
 
 csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
-  Options (16, 16), Names (16, 16)
+  Names (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Initialize (argc, argv);

@@ -1760,7 +1760,7 @@ iObject* csEngine::FindObjectInRegion (csRegion* region,
 {
   for (int i = vector.Length () - 1; i >= 0; i--)
   {
-    iObject* o = vector.GetObject (i);
+    iObject* o = vector.Get (i);
     if (!region->IsInRegion (o)) continue;
     const char* oname = o->GetName ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
@@ -1773,7 +1773,7 @@ iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
 {
   if (regionOnly && region)
   {
-    iObject* obj = FindObjectInRegion (region, sectors, iName);
+    iObject* obj = FindObjectInRegion (region, *sectors.GetObjectVector (), iName);
     if (!obj) return NULL;
     return SCF_QUERY_INTERFACE_FAST (obj, iSector);
   }
@@ -1786,7 +1786,7 @@ iMeshWrapper* csEngine::FindMeshWrapper (const char *iName, bool regionOnly)
 {
   if (regionOnly && region)
   {
-    iObject* obj = FindObjectInRegion (region, meshes, iName);
+    iObject* obj = FindObjectInRegion (region, *meshes.GetObjectVector (), iName);
     if (!obj) return NULL;
     return SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
   }
@@ -1799,7 +1799,7 @@ iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName,
 {
   if (regionOnly && region)
   {
-    iObject* obj = FindObjectInRegion (region, mesh_factories, iName);
+    iObject* obj = FindObjectInRegion (region, *mesh_factories.GetObjectVector (), iName);
     if (!obj) return NULL;
     return SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
   }
@@ -1848,7 +1848,7 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName,
   iMaterialWrapper* wr;
   if (regionOnly && region)
   {
-    iObject* obj = FindObjectInRegion (region, *materials, iName);
+    iObject* obj = FindObjectInRegion (region, *materials->GetObjectVector (), iName);
     if (!obj) return NULL;
     wr = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
   }
@@ -1863,7 +1863,7 @@ iTextureWrapper* csEngine::FindTexture (const char* iName,
   iTextureWrapper* wr;
   if (regionOnly && region)
   {
-    iObject* obj = FindObjectInRegion (region, *textures, iName);
+    iObject* obj = FindObjectInRegion (region, *textures->GetObjectVector (), iName);
     if (!obj) return NULL;
     wr = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
   }

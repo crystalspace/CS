@@ -58,7 +58,7 @@ int csNamedObjectVector::GetIndexByName (const char *name) const
   int i;
   for (i = 0; i < Length (); i++)
   {
-    iObject *o = GetObject (i);
+    iObject *o = Get (i);
     const char* oname = o->GetName ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
       return i;
@@ -66,13 +66,25 @@ int csNamedObjectVector::GetIndexByName (const char *name) const
   return -1;
 }
 
-csSome csNamedObjectVector::FindByName (const char* name) const
+iObject *csNamedObjectVector::FindByName (const char* name) const
 {
   int n = GetIndexByName (name);
   return (n == -1) ? NULL : Get (n);
 }
 
-int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+int csNamedObjectVector::Find (iObject *obj) const
+{
+  int i;
+  for (i = 0; i < Length (); i++)
+  {
+    iObject *o = Get (i);
+    if (obj == o)
+      return i;
+  }
+  return -1;
+}
+
+int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int)
 {
   iObject *obj1 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item1), iObject);
   iObject *obj2 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item2), iObject);
@@ -81,7 +93,7 @@ int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) cons
        : strcmp (obj1->GetName (), obj2->GetName ());
 }
 
-int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int)
 {
   iObject *obj = SCF_QUERY_INTERFACE_FAST (((iBase*)Item), iObject);
   const char *name = (const char *)Key;
