@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.tutsimp1 = Crystal Space tutorial part one
+DESCRIPTION.simple1 = Crystal Space tutorial part one
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make tutsimp1     Make the $(DESCRIPTION.tutsimp1)$"
+  $(NEWLINE)echo $"  make simple1      Make the $(DESCRIPTION.simple1)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tutsimp1 tutsimp1clean
+.PHONY: simple1 tutsimp1clean
 
-all apps: tutsimp1
-tutsimp1:
-	$(MAKE_TARGET)
+all apps: simple1
+simple1:
+	$(MAKE_APP)
 tutsimp1clean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tutsimp1 tutsimp1clean
+.PHONY: build.simple1 tutsimp1clean
 
 all: $(SIMPLE1.EXE)
-tutsimp1: $(OUTDIRS) $(SIMPLE1.EXE)
+build.simple1: $(OUTDIRS) $(SIMPLE1.EXE)
 clean: tutsimp1clean
 
 $(SIMPLE1.EXE): $(DEP.EXE) $(OBJ.SIMPLE1) $(LIB.SIMPLE1)

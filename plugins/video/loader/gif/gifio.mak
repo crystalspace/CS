@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.gifimg = Crystal Space gif image loader
+DESCRIPTION.csgifimg = Crystal Space gif image loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make gifimg       Make the $(DESCRIPTION.gifimg)$"
+  $(NEWLINE)echo $"  make csgifimg     Make the $(DESCRIPTION.csgifimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: gifimg gifimgclean
-all plugins: gifimg
+.PHONY: csgifimg gifimgclean
+all plugins: csgifimg
 
-gifimg:
+csgifimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 gifimgclean:
 	$(MAKE_CLEAN)
@@ -29,45 +29,45 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/gif
 
 ifeq ($(USE_PLUGINS),yes)
-  GIFIMG = $(OUTDLL)csgifimg$(DLL)
-  LIB.GIFIMG = $(foreach d,$(DEP.GIFIMG),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(GIFIMG)
+  CSGIFIMG = $(OUTDLL)csgifimg$(DLL)
+  LIB.CSGIFIMG = $(foreach d,$(DEP.CSGIFIMG),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSGIFIMG)
 else
-  GIFIMG = $(OUT)$(LIB_PREFIX)csgifimg$(LIB)
-  DEP.EXE += $(GIFIMG)
+  CSGIFIMG = $(OUT)$(LIB_PREFIX)csgifimg$(LIB)
+  DEP.EXE += $(CSGIFIMG)
   SCF.STATIC += csgifimg
-  TO_INSTALL.STATIC_LIBS += $(GIFIMG)
+  TO_INSTALL.STATIC_LIBS += $(CSGIFIMG)
 endif
 
-INC.GIFIMG = $(wildcard plugins/video/loader/gif/*.h)
-SRC.GIFIMG = $(wildcard plugins/video/loader/gif/*.cpp)
+INC.CSGIFIMG = $(wildcard plugins/video/loader/gif/*.h)
+SRC.CSGIFIMG = $(wildcard plugins/video/loader/gif/*.cpp)
 
-OBJ.GIFIMG = $(addprefix $(OUT),$(notdir $(SRC.GIFIMG:.cpp=$O)))
-DEP.GIFIMG = CSUTIL CSSYS CSGFX CSUTIL
+OBJ.CSGIFIMG = $(addprefix $(OUT),$(notdir $(SRC.CSGIFIMG:.cpp=$O)))
+DEP.CSGIFIMG = CSUTIL CSSYS CSGFX CSUTIL
 
-MSVC.DSP += GIFIMG
-DSP.GIFIMG.NAME = csgifimg
-DSP.GIFIMG.TYPE = plugin
+MSVC.DSP += CSGIFIMG
+DSP.CSGIFIMG.NAME = csgifimg
+DSP.CSGIFIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: gifimg gifimgclean
+.PHONY: csgifimg gifimgclean
 
-gifimg: $(OUTDIRS) $(GIFIMG)
+csgifimg: $(OUTDIRS) $(CSGIFIMG)
 
-$(GIFIMG): $(OBJ.GIFIMG) $(LIB.GIFIMG)
+$(CSGIFIMG): $(OBJ.CSGIFIMG) $(LIB.CSGIFIMG)
 	$(DO.PLUGIN)
 
 clean: gifimgclean
 gifimgclean:
-	$(RM) $(GIFIMG) $(OBJ.GIFIMG)
+	$(RM) $(CSGIFIMG) $(OBJ.CSGIFIMG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)gifimg.dep
-$(OUTOS)gifimg.dep: $(SRC.GIFIMG)
+$(OUTOS)gifimg.dep: $(SRC.CSGIFIMG)
 	$(DO.DEP)
 else
 -include $(OUTOS)gifimg.dep

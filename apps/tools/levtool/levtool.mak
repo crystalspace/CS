@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.ltool = Crystal Space Level Tool
+DESCRIPTION.levtool = Crystal Space Level Tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make ltool        Make the $(DESCRIPTION.ltool)$"
+APPHELP += $(NEWLINE)echo $"  make levtool      Make the $(DESCRIPTION.levtool)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: ltool ltoolclean
+.PHONY: levtool ltoolclean
 
-all apps: ltool
-ltool:
-	$(MAKE_TARGET)
+all apps: levtool
+levtool:
+	$(MAKE_APP)
 ltoolclean:
 	$(MAKE_CLEAN)
 
@@ -47,10 +47,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: ltool ltoolclean
+.PHONY: build.levtool ltoolclean
 
 all: $(LEVTOOL.EXE)
-ltool: $(OUTDIRS) $(LEVTOOL.EXE)
+build.levtool: $(OUTDIRS) $(LEVTOOL.EXE)
 clean: ltoolclean
 
 $(LEVTOOL.EXE): $(DEP.EXE) $(OBJ.LEVTOOL) $(LIB.LEVTOOL)

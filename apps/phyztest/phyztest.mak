@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.phyz = Phyziks example
+DESCRIPTION.phyztest = Phyziks example
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make phyz         Make the $(DESCRIPTION.phyz)$"
+APPHELP += $(NEWLINE)echo $"  make phyztest     Make the $(DESCRIPTION.phyztest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: phyz phyzclean
+.PHONY: phyztest phyzclean
 
-all apps: phyz
-phyz:
-	$(MAKE_TARGET)
+all apps: phyztest
+phyztest:
+	$(MAKE_APP)
 phyzclean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: phyz phyzclean
+.PHONY: build.phyztest phyzclean
 
 all: $(PHYZTEST.EXE)
-phyz: $(OUTDIRS) $(PHYZTEST.EXE)
+build.phyztest: $(OUTDIRS) $(PHYZTEST.EXE)
 clean: phyzclean
 
 $(PHYZTEST.EXE): $(DEP.EXE) $(OBJ.PHYZTEST) $(LIB.PHYZTEST)

@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.wav = Crystal Space wav sound loader
+DESCRIPTION.sndwav = Crystal Space wav sound loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make wav          Make the $(DESCRIPTION.wav)$"
+  $(NEWLINE)echo $"  make sndwav       Make the $(DESCRIPTION.sndwav)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: wav wavclean
-all plugins drivers snddrivers: wav
+.PHONY: sndwav wavclean
+all plugins drivers snddrivers: sndwav
 
-wav:
+sndwav:
 	$(MAKE_TARGET) MAKE_DLL=yes
 wavclean:
 	$(MAKE_CLEAN)
@@ -29,46 +29,46 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/wav plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  WAV = $(OUTDLL)sndwav$(DLL)
-  LIB.WAV = $(foreach d,$(DEP.WAV),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(WAV)
+  SNDWAV = $(OUTDLL)sndwav$(DLL)
+  LIB.SNDWAV = $(foreach d,$(DEP.SNDWAV),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDWAV)
 else
-  WAV = $(OUT)$(LIB_PREFIX)sndwav$(LIB)
-  DEP.EXE += $(WAV)
+  SNDWAV = $(OUT)$(LIB_PREFIX)sndwav$(LIB)
+  DEP.EXE += $(SNDWAV)
   SCF.STATIC += sndwav
-  TO_INSTALL.STATIC_LIBS += $(WAV)
+  TO_INSTALL.STATIC_LIBS += $(SNDWAV)
 endif
 
-INC.WAV = $(wildcard plugins/sound/loader/wav/*.h) \
+INC.SNDWAV = $(wildcard plugins/sound/loader/wav/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
-SRC.WAV = $(wildcard plugins/sound/loader/wav/*.cpp) \
+SRC.SNDWAV = $(wildcard plugins/sound/loader/wav/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.WAV = $(addprefix $(OUT),$(notdir $(SRC.WAV:.cpp=$O)))
-DEP.WAV = CSUTIL CSSYS CSUTIL
+OBJ.SNDWAV = $(addprefix $(OUT),$(notdir $(SRC.SNDWAV:.cpp=$O)))
+DEP.SNDWAV = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += WAV
-DSP.WAV.NAME = sndwav
-DSP.WAV.TYPE = plugin
+MSVC.DSP += SNDWAV
+DSP.SNDWAV.NAME = sndwav
+DSP.SNDWAV.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: wav wavclean
+.PHONY: sndwav wavclean
 
-wav: $(OUTDIRS) $(WAV)
+sndwav: $(OUTDIRS) $(SNDWAV)
 
-$(WAV): $(OBJ.WAV) $(LIB.WAV)
+$(SNDWAV): $(OBJ.SNDWAV) $(LIB.SNDWAV)
 	$(DO.PLUGIN)
 
 clean: wavclean
 wavclean:
-	$(RM) $(WAV) $(OBJ.WAV)
+	$(RM) $(SNDWAV) $(OBJ.SNDWAV)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndwav.dep
-$(OUTOS)sndwav.dep: $(SRC.WAV)
+$(OUTOS)sndwav.dep: $(SRC.SNDWAV)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndwav.dep

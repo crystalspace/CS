@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.jngimg = Crystal Space jng image loader
+DESCRIPTION.csjngimg = Crystal Space jng image loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make jngimg       Make the $(DESCRIPTION.jngimg)$"
+  $(NEWLINE)echo $"  make csjngimg     Make the $(DESCRIPTION.csjngimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: jngimg jngimgclean
-all plugins: jngimg
+.PHONY: csjngimg jngimgclean
+all plugins: csjngimg
 
-jngimg:
+csjngimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 jngimgclean:
 	$(MAKE_CLEAN)
@@ -28,53 +28,53 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/loader/jng
 
-LIB.JNGIMG.LOCAL += $(MNG_LIBS) $(Z_LIBS) $(JPG_LIBS)
+LIB.CSJNGIMG.LOCAL += $(MNG_LIBS) $(Z_LIBS) $(JPG_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
-  JNGIMG = $(OUTDLL)csjngimg$(DLL)
-  LIB.JNGIMG = $(foreach d,$(DEP.JNGIMG),$($d.LIB))
-  LIB.JNGIMG.SPECIAL += $(LIB.JNGIMG.LOCAL)
-  TO_INSTALL.DYNAMIC_LIBS += $(JNGIMG)
+  CSJNGIMG = $(OUTDLL)csjngimg$(DLL)
+  LIB.CSJNGIMG = $(foreach d,$(DEP.CSJNGIMG),$($d.LIB))
+  LIB.CSJNGIMG.SPECIAL += $(LIB.CSJNGIMG.LOCAL)
+  TO_INSTALL.DYNAMIC_LIBS += $(CSJNGIMG)
 else
-  JNGIMG = $(OUT)$(LIB_PREFIX)csjngimg$(LIB)
-  DEP.EXE += $(JNGIMG)
-  LIBS.EXE += $(LIB.JNGIMG.LOCAL)
+  CSJNGIMG = $(OUT)$(LIB_PREFIX)csjngimg$(LIB)
+  DEP.EXE += $(CSJNGIMG)
+  LIBS.EXE += $(LIB.CSJNGIMG.LOCAL)
   SCF.STATIC += csjngimg
-  TO_INSTALL.STATIC_LIBS += $(JNGIMG)
+  TO_INSTALL.STATIC_LIBS += $(CSJNGIMG)
 endif
 
-INC.JNGIMG = $(wildcard plugins/video/loader/jng/*.h)
-SRC.JNGIMG = $(wildcard plugins/video/loader/jng/*.cpp)
+INC.CSJNGIMG = $(wildcard plugins/video/loader/jng/*.h)
+SRC.CSJNGIMG = $(wildcard plugins/video/loader/jng/*.cpp)
 
-OBJ.JNGIMG = $(addprefix $(OUT),$(notdir $(SRC.JNGIMG:.cpp=$O)))
-DEP.JNGIMG = CSUTIL CSSYS CSGFX CSUTIL
+OBJ.CSJNGIMG = $(addprefix $(OUT),$(notdir $(SRC.CSJNGIMG:.cpp=$O)))
+DEP.CSJNGIMG = CSUTIL CSSYS CSGFX CSUTIL
 
-MSVC.DSP += JNGIMG
-DSP.JNGIMG.NAME = csjngimg
-DSP.JNGIMG.TYPE = plugin
-DSP.JNGIMG.LIBS = libmng zlib libjpeg
+MSVC.DSP += CSJNGIMG
+DSP.CSJNGIMG.NAME = csjngimg
+DSP.CSJNGIMG.TYPE = plugin
+DSP.CSJNGIMG.LIBS = libmng libz libjpeg
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: jngimg jngimgclean
+.PHONY: csjngimg jngimgclean
 
-jngimg: $(OUTDIRS) $(JNGIMG)
+csjngimg: $(OUTDIRS) $(CSJNGIMG)
 
-$(JNGIMG): $(OBJ.JNGIMG) $(LIB.JNGIMG)
+$(CSJNGIMG): $(OBJ.CSJNGIMG) $(LIB.CSJNGIMG)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(LIB.JNGIMG.SPECIAL) \
+	$(DO.PLUGIN.CORE) $(LIB.CSJNGIMG.SPECIAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 clean: jngimgclean
 jngimgclean:
-	$(RM) $(JNGIMG) $(OBJ.JNGIMG)
+	$(RM) $(CSJNGIMG) $(OBJ.CSJNGIMG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)jngimg.dep
-$(OUTOS)jngimg.dep: $(SRC.JNGIMG)
+$(OUTOS)jngimg.dep: $(SRC.CSJNGIMG)
 	$(DO.DEP)
 else
 -include $(OUTOS)jngimg.dep

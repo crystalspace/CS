@@ -23,7 +23,8 @@ imgplex:
 	$(MAKE_TARGET) MAKE_DLL=yes
 imgplexclean:
 	$(MAKE_CLEAN)
-imgplexall: imgplex bmpimg gifimg jpgimg pngimg sgiimg tgaimg walimg
+imgplexall: imgplex csbmpimg csgifimg csjpgimg cspngimg cssgiimg cstgaimg \
+  cswalimg
 
 endif # ifeq ($(MAKESECTION),roottargets)
 

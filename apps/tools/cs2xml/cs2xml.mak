@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.csxmlconv = Crystal Space World To XML Convertor
+DESCRIPTION.cs2xml = Crystal Space World To XML Convertor
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make csxmlconv    Make the $(DESCRIPTION.csxmlconv)$"
+APPHELP += $(NEWLINE)echo $"  make cs2xml       Make the $(DESCRIPTION.cs2xml)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csxmlconv csxmlconvclean
+.PHONY: cs2xml csxmlconvclean
 
-all apps: csxmlconv
-csxmlconv:
-	$(MAKE_TARGET)
+all apps: cs2xml
+cs2xml:
+	$(MAKE_APP)
 csxmlconvclean:
 	$(MAKE_CLEAN)
 
@@ -27,41 +27,41 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/cs2xml
 
-CSXMLCONV.EXE = cs2xml$(EXE)
-INC.CSXMLCONV = $(wildcard apps/tools/cs2xml/*.h)
-SRC.CSXMLCONV = $(wildcard apps/tools/cs2xml/*.cpp)
-OBJ.CSXMLCONV = $(addprefix $(OUT),$(notdir $(SRC.CSXMLCONV:.cpp=$O)))
-DEP.CSXMLCONV = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
-LIB.CSXMLCONV = $(foreach d,$(DEP.CSXMLCONV),$($d.LIB))
+CS2XML.EXE = cs2xml$(EXE)
+INC.CS2XML = $(wildcard apps/tools/cs2xml/*.h)
+SRC.CS2XML = $(wildcard apps/tools/cs2xml/*.cpp)
+OBJ.CS2XML = $(addprefix $(OUT),$(notdir $(SRC.CS2XML:.cpp=$O)))
+DEP.CS2XML = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
+LIB.CS2XML = $(foreach d,$(DEP.CS2XML),$($d.LIB))
 
-TO_INSTALL.EXE    += $(CSXMLCONV.EXE)
+TO_INSTALL.EXE    += $(CS2XML.EXE)
 
-MSVC.DSP += CSXMLCONV
-DSP.CSXMLCONV.NAME = cs2xml
-DSP.CSXMLCONV.TYPE = appcon
+MSVC.DSP += CS2XML
+DSP.CS2XML.NAME = cs2xml
+DSP.CS2XML.TYPE = appcon
 
-#$(CSXMLCONV.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+#$(CS2XML.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csxmlconv csxmlconvclean
+.PHONY: build.cs2xml csxmlconvclean
 
-all: $(CSXMLCONV.EXE)
-csxmlconv: $(OUTDIRS) $(CSXMLCONV.EXE)
+all: $(CS2XML.EXE)
+build.cs2xml: $(OUTDIRS) $(CS2XML.EXE)
 clean: csxmlconvclean
 
-$(CSXMLCONV.EXE): $(DEP.EXE) $(OBJ.CSXMLCONV) $(LIB.CSXMLCONV)
+$(CS2XML.EXE): $(DEP.EXE) $(OBJ.CS2XML) $(LIB.CS2XML)
 	$(DO.LINK.EXE)
 
 csxmlconvclean:
-	-$(RM) $(CSXMLCONV.EXE) $(OBJ.CSXMLCONV)
+	-$(RM) $(CS2XML.EXE) $(OBJ.CS2XML)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cs2xml.dep
-$(OUTOS)cs2xml.dep: $(SRC.CSXMLCONV)
+$(OUTOS)cs2xml.dep: $(SRC.CS2XML)
 	$(DO.DEP)
 else
 -include $(OUTOS)cs2xml.dep

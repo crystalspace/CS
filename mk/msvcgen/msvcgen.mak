@@ -281,9 +281,9 @@ MSVC.DEPEND.library =
 MSVC.DEPEND.group   =
 
 # Project types for which version information should be generated.
-MSVC.MAKEVERRC.appgui  = $(MSVC.MAKEVERRC.COMMAND.APP)
-MSVC.MAKEVERRC.appcon  = $(MSVC.MAKEVERRC.COMMAND.APP)
-MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND.PLG)
+MSVC.MAKEVERRC.appgui  = $(MSVC.MAKEVERRC.COMMAND)
+MSVC.MAKEVERRC.appcon  = $(MSVC.MAKEVERRC.COMMAND)
+MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND)
 MSVC.MAKEVERRC.library =
 MSVC.MAKEVERRC.group   =
 
@@ -314,24 +314,23 @@ MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
 # Macros to compose project.rc filename for standard and build locations.
-MSVC.VERSIONRC.CVS.NAME = $(MSVC.CVS.DIR)/$(MSVC.PROJECT).rc
-MSVC.VERSIONRC.OUT.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).rc
+MSVC.VERSIONRC.CVS.NAME = $(MSVC.CVS.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.RESOURCES)
+MSVC.VERSIONRC.OUT.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.RESOURCES)
 
 # Macros to compose project.rc filename for a given project.
 MSVC.VERSIONRC.CVS = $(MSVC.VERSIONRC.CVS.$(DSP.$*.TYPE))
 MSVC.VERSIONRC.OUT = $(MSVC.VERSIONRC.OUT.$(DSP.$*.TYPE))
 
 # Module name/description for project.rc.
-MSVC.VERSIONDESC.PLG = \
-  $(DESCRIPTION.$(shell echo $* | \
-  sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
-MSVC.VERSIONDESC.APP = $(DSP.$*.NAME)
+#MSVC.VERSIONDESC = \
+#  $(DESCRIPTION.$(shell echo $* | \
+#  sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
+MSVC.VERSIONDESC = \
+  $(DESCRIPTION.$(DSP.$*.NAME))
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND.APP = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.VERSIONDESC.APP)'
-MSVC.MAKEVERRC.COMMAND.PLG = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.VERSIONDESC.PLG)'
+MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
+  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.VERSIONDESC)'
 
 # Command to generate the project.rc file for a given project.
 MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))

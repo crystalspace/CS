@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.bumptst = Crystal Space bumpmap test
+DESCRIPTION.bumptest = Crystal Space bumpmap test
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make bumptst      Make the $(DESCRIPTION.bumptst)$"
+APPHELP += $(NEWLINE)echo $"  make bumptest     Make the $(DESCRIPTION.bumptest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: bumptst bumptstclean
+.PHONY: bumptest bumptestclean
 
-all apps: bumptst
-bumptst:
-	$(MAKE_TARGET)
-bumptstclean:
+all apps: bumptest
+bumptest:
+	$(MAKE_APP)
+bumptestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: bumptst bumptstclean
+.PHONY: build.bumptest bumptestclean
 
 all: $(BUMPTEST.EXE)
-bumptst: $(OUTDIRS) $(BUMPTEST.EXE)
-clean: bumptstclean
+build.bumptest: $(OUTDIRS) $(BUMPTEST.EXE)
+clean: bumptestclean
 
 $(BUMPTEST.EXE): $(DEP.EXE) $(OBJ.BUMPTEST) $(LIB.BUMPTEST)
 	$(DO.LINK.EXE)
 
-bumptstclean:
+bumptestclean:
 	-$(RM) $(BUMPTEST.EXE) $(OBJ.BUMPTEST)
 
 ifdef DO_DEPEND

@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.pngimg = Crystal Space png image loader
+DESCRIPTION.cspngimg = Crystal Space png image loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make pngimg       Make the $(DESCRIPTION.pngimg)$"
+  $(NEWLINE)echo $"  make cspngimg     Make the $(DESCRIPTION.cspngimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pngimg pngimgclean
-all plugins: pngimg
+.PHONY: cspngimg pngimgclean
+all plugins: cspngimg
 
-pngimg:
+cspngimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 pngimgclean:
 	$(MAKE_CLEAN)
@@ -28,53 +28,53 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/video/loader/png
 
-LIB.PNGIMG.LOCAL += $(PNG_LIBS) $(Z_LIBS)
+LIB.CSPNGIMG.LOCAL += $(PNG_LIBS) $(Z_LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
-  PNGIMG = $(OUTDLL)cspngimg$(DLL)
-  LIB.PNGIMG = $(foreach d,$(DEP.PNGIMG),$($d.LIB))
-  LIB.PNGIMG.SPECIAL += $(LIB.PNGIMG.LOCAL)
-  TO_INSTALL.DYNAMIC_LIBS += $(PNGIMG)
+  CSPNGIMG = $(OUTDLL)cspngimg$(DLL)
+  LIB.CSPNGIMG = $(foreach d,$(DEP.CSPNGIMG),$($d.LIB))
+  LIB.CSPNGIMG.SPECIAL += $(LIB.CSPNGIMG.LOCAL)
+  TO_INSTALL.DYNAMIC_LIBS += $(CSPNGIMG)
 else
-  PNGIMG = $(OUT)$(LIB_PREFIX)cspngimg$(LIB)
-  DEP.EXE += $(PNGIMG)
-  LIBS.EXE += $(LIB.PNGIMG.LOCAL)
+  CSPNGIMG = $(OUT)$(LIB_PREFIX)cspngimg$(LIB)
+  DEP.EXE += $(CSPNGIMG)
+  LIBS.EXE += $(LIB.CSPNGIMG.LOCAL)
   SCF.STATIC += cspngimg
-  TO_INSTALL.STATIC_LIBS += $(PNGIMG)
+  TO_INSTALL.STATIC_LIBS += $(CSPNGIMG)
 endif
 
-INC.PNGIMG = $(wildcard plugins/video/loader/png/*.h)
-SRC.PNGIMG = $(wildcard plugins/video/loader/png/*.cpp)
+INC.CSPNGIMG = $(wildcard plugins/video/loader/png/*.h)
+SRC.CSPNGIMG = $(wildcard plugins/video/loader/png/*.cpp)
 
-OBJ.PNGIMG = $(addprefix $(OUT),$(notdir $(SRC.PNGIMG:.cpp=$O)))
-DEP.PNGIMG = CSUTIL CSSYS CSGFX CSUTIL
+OBJ.CSPNGIMG = $(addprefix $(OUT),$(notdir $(SRC.CSPNGIMG:.cpp=$O)))
+DEP.CSPNGIMG = CSUTIL CSSYS CSGFX CSUTIL
 
-MSVC.DSP += PNGIMG
-DSP.PNGIMG.NAME = cspngimg
-DSP.PNGIMG.TYPE = plugin
-DSP.PNGIMG.LIBS = png
+MSVC.DSP += CSPNGIMG
+DSP.CSPNGIMG.NAME = cspngimg
+DSP.CSPNGIMG.TYPE = plugin
+DSP.CSPNGIMG.LIBS = libpng
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: pngimg pngimgclean
+.PHONY: cspngimg pngimgclean
 
-pngimg: $(OUTDIRS) $(PNGIMG)
+cspngimg: $(OUTDIRS) $(CSPNGIMG)
 
-$(PNGIMG): $(OBJ.PNGIMG) $(LIB.PNGIMG)
+$(CSPNGIMG): $(OBJ.CSPNGIMG) $(LIB.CSPNGIMG)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(LIB.PNGIMG.SPECIAL) \
+	$(DO.PLUGIN.CORE) $(LIB.CSPNGIMG.SPECIAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 clean: pngimgclean
 pngimgclean:
-	$(RM) $(PNGIMG) $(OBJ.PNGIMG)
+	$(RM) $(CSPNGIMG) $(OBJ.CSPNGIMG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)pngimg.dep
-$(OUTOS)pngimg.dep: $(SRC.PNGIMG)
+$(OUTOS)pngimg.dep: $(SRC.CSPNGIMG)
 	$(DO.DEP)
 else
 -include $(OUTOS)pngimg.dep

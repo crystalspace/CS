@@ -13,9 +13,10 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: scftut scftutclean
+.PHONY: zoo scftut scftutclean
 
 all apps: scftut
+zoo: scftut
 scftut: scftutdlls
 	$(MAKE_TARGET)
 scftutdlls:
@@ -66,11 +67,12 @@ endif
 MSVC.DSP += ZOO
 DSP.ZOO.NAME = zoo
 DSP.ZOO.TYPE = appcon
+# Those descriptions are really only for the Windows version info...
+DESCRIPTION.zoo = The CrystalSpace Zoo
 
 MSVC.DSP += DOG
 DSP.DOG.NAME = dog
 DSP.DOG.TYPE = plugin
-# Those descriptions are really only for the Windows version info...
 DESCRIPTION.dog = The incredible Dog plug-in
 
 MSVC.DSP += WORM

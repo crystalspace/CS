@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.cswse = Crystal Space Example: CSWS And Engine
+DESCRIPTION.cswseng = Crystal Space Example: CSWS And Engine
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make cswse        Make the $(DESCRIPTION.cswse)$"
+APPHELP += $(NEWLINE)echo $"  make cswseng      Make the $(DESCRIPTION.cswseng)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cswse cswseclean
+.PHONY: cswseng cswsengclean
 
-all apps: cswse
-cswse:
-	$(MAKE_TARGET)
-cswseclean:
+all apps: cswseng
+cswseng:
+	$(MAKE_APP)
+cswsengclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -27,44 +27,44 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/examples/cswseng
 
-CSWSE.EXE = cswseng$(EXE)
-INC.CSWSE = $(wildcard apps/examples/cswseng/*.h)
-SRC.CSWSE = $(wildcard apps/examples/cswseng/*.cpp)
-OBJ.CSWSE = $(addprefix $(OUT),$(notdir $(SRC.CSWSE:.cpp=$O)))
-DEP.CSWSE = \
+CSWSENG.EXE = cswseng$(EXE)
+INC.CSWSENG = $(wildcard apps/examples/cswseng/*.h)
+SRC.CSWSENG = $(wildcard apps/examples/cswseng/*.cpp)
+OBJ.CSWSENG = $(addprefix $(OUT),$(notdir $(SRC.CSWSENG:.cpp=$O)))
+DEP.CSWSENG = \
   CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
-LIB.CSWSE = $(foreach d,$(DEP.CSWSE),$($d.LIB))
+LIB.CSWSENG = $(foreach d,$(DEP.CSWSENG),$($d.LIB))
 
-#TO_INSTALL.EXE    += $(CSWSE.EXE)
-#TO_INSTALL.CONFIG += $(CFG.CSWSE)
+#TO_INSTALL.EXE    += $(CSWSENG.EXE)
+#TO_INSTALL.CONFIG += $(CFG.CSWSENG)
 
-MSVC.DSP += CSWSE
-DSP.CSWSE.NAME = cswseng
-DSP.CSWSE.TYPE = appcon
+MSVC.DSP += CSWSENG
+DSP.CSWSENG.NAME = cswseng
+DSP.CSWSENG.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cswse cswseclean
+.PHONY: build.cswseng cswsengclean
 
-all: $(CSWSE.EXE)
-cswse: $(OUTDIRS) $(CSWSE.EXE)
-clean: cswseclean
+all: $(CSWSENG.EXE)
+build.cswseng: $(OUTDIRS) $(CSWSENG.EXE)
+clean: cswsengclean
 
-$(CSWSE.EXE): $(DEP.EXE) $(OBJ.CSWSE) $(LIB.CSWSE)
+$(CSWSENG.EXE): $(DEP.EXE) $(OBJ.CSWSENG) $(LIB.CSWSENG)
 	$(DO.LINK.EXE)
 
-cswseclean:
-	-$(RM) $(CSWSE.EXE) $(OBJ.CSWSE)
+cswsengclean:
+	-$(RM) $(CSWSENG.EXE) $(OBJ.CSWSENG)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cswse.dep
-$(OUTOS)cswse.dep: $(SRC.CSWSE)
+dep: $(OUTOS)cswseng.dep
+$(OUTOS)cswseng.dep: $(SRC.CSWSENG)
 	$(DO.DEP)
 else
--include $(OUTOS)cswse.dep
+-include $(OUTOS)cswseng.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

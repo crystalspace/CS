@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.demo = Crystal Space Demo
+DESCRIPTION.csdemo = Crystal Space Demo
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make demo         Make the $(DESCRIPTION.demo)$"
+APPHELP += $(NEWLINE)echo $"  make csdemo       Make the $(DESCRIPTION.csdemo)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: demo democlean
+.PHONY: csdemo csdemoclean
 
-all apps: demo
-demo:
-	$(MAKE_TARGET)
-democlean:
+all apps: csdemo
+csdemo:
+	$(MAKE_APP)
+csdemoclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -27,42 +27,42 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/demo
 
-DEMO.EXE=csdemo$(EXE)
-INC.DEMO = $(wildcard apps/demo/*.h)
-SRC.DEMO = $(wildcard apps/demo/*.cpp)
-OBJ.DEMO = $(addprefix $(OUT),$(notdir $(SRC.DEMO:.cpp=$O)))
-DEP.DEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
-LIB.DEMO = $(foreach d,$(DEP.DEMO),$($d.LIB))
-CFG.DEMO = data/config/csdemo.cfg
+CSDEMO.EXE=csdemo$(EXE)
+INC.CSDEMO = $(wildcard apps/demo/*.h)
+SRC.CSDEMO = $(wildcard apps/demo/*.cpp)
+OBJ.CSDEMO = $(addprefix $(OUT),$(notdir $(SRC.CSDEMO:.cpp=$O)))
+DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
+LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
+CFG.CSDEMO = data/config/csdemo.cfg
 
 #TO_INSTALL.EXE += $(DEMO.EXE)
 
-MSVC.DSP += DEMO
-DSP.DEMO.NAME = csdemo
-DSP.DEMO.TYPE = appcon
+MSVC.DSP += CSDEMO
+DSP.CSDEMO.NAME = csdemo
+DSP.CSDEMO.TYPE = appcon
 
-$(DEMO.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+$(CSDEMO.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: demo democlean
+.PHONY: build.csdemo csdemoclean
 
-all: $(DEMO.EXE)
-demo: $(OUTDIRS) $(DEMO.EXE)
-clean: democlean
+all: $(CSDEMO.EXE)
+build.csdemo: $(OUTDIRS) $(CSDEMO.EXE)
+clean: csdemoclean
 
-$(DEMO.EXE): $(DEP.EXE) $(OBJ.DEMO) $(LIB.DEMO)
+$(CSDEMO.EXE): $(DEP.EXE) $(OBJ.CSDEMO) $(LIB.CSDEMO)
 	$(DO.LINK.EXE)
 
-democlean:
-	-$(RM) $(DEMO.EXE) $(OBJ.DEMO)
+csdemoclean:
+	-$(RM) $(CSDEMO.EXE) $(OBJ.CSDEMO)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csdemo.dep
-$(OUTOS)csdemo.dep: $(SRC.DEMO)
+$(OUTOS)csdemo.dep: $(SRC.CSDEMO)
 	$(DO.DEP)
 else
 -include $(OUTOS)csdemo.dep

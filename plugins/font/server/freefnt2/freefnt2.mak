@@ -1,18 +1,18 @@
-DESCRIPTION.freefont2 = Crystal Space FreeType font server
+DESCRIPTION.freefnt2 = Crystal Space FreeType font server
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make freefont2    Make the $(DESCRIPTION.freefont2)$"
+  $(NEWLINE)echo $"  make freefnt2     Make the $(DESCRIPTION.freefnt2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: freefont2 freefont2clean
-all plugins: freefont2
-freefont2:
+.PHONY: freefnt2 freefont2clean
+all plugins: freefnt2
+freefnt2:
 	$(MAKE_TARGET) MAKE_DLL=yes
 freefont2clean:
 	$(MAKE_CLEAN)
@@ -47,14 +47,14 @@ DSP.FREEFONT2.NAME = freefnt2
 DSP.FREEFONT2.TYPE = plugin
 #DSP.FREEFONT2.LFLAGS = /nodefaultlib:"MSVCRT"
 DSP.FREEFONT2.CFLAGS = /I "..\..\include\cssys\win32\freetype2"
-DSP.FREEFONT2.LIBS = freetype2
+DSP.FREEFONT2.LIBS = libfreetype
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: freefont2 freefont2clean
-freefont2: $(OUTDIRS) $(FREEFONT2)
+.PHONY: freefnt2 freefont2clean
+freefnt2: $(OUTDIRS) $(FREEFONT2)
 
 $(OUT)%$O: plugins/font/server/freefnt2/%.cpp
 	$(DO.COMPILE.CPP) -I/usr/include/freetype2

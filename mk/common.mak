@@ -67,3 +67,13 @@ define MAKE_CLEAN
   @echo $(SEPARATOR)
   +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef
+
+# Macro used to build an application
+define MAKE_APP
+  @echo $(SEPARATOR)
+  @echo $"  Building $(DESCRIPTION.$@)$"
+  @echo $"  Building for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
+  @echo $(SEPARATOR)
+  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak build.$@
+endef
+

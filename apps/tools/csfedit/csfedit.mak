@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.csfedt = Crystal Space font editor
+DESCRIPTION.csfedit = Crystal Space font editor
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make csfedt       Make the $(DESCRIPTION.csfedt)$"
+APPHELP += $(NEWLINE)echo $"  make csfedit      Make the $(DESCRIPTION.csfedit)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csfedt csfedtclean
+.PHONY: csfedit csfedtclean
 
-all apps: csfedt
-csfedt:
-	$(MAKE_TARGET)
+all apps: csfedit
+csfedit:
+	$(MAKE_APP)
 csfedtclean:
 	$(MAKE_CLEAN)
 
@@ -45,10 +45,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csfedt csfedtclean
+.PHONY: build.csfedit csfedtclean
 
 all: $(CSFEDIT.EXE)
-csfedt: $(OUTDIRS) $(CSFEDIT.EXE)
+build.csfedit: $(OUTDIRS) $(CSFEDIT.EXE)
 clean: csfedtclean
 
 $(CSFEDIT.EXE): $(DEP.EXE) $(OBJ.CSFEDIT) $(LIB.CSFEDIT)

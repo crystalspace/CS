@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.au = Crystal Space au sound loader
+DESCRIPTION.sndau = Crystal Space au sound loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make au           Make the $(DESCRIPTION.au)$"
+  $(NEWLINE)echo $"  make sndau        Make the $(DESCRIPTION.sndau)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: au auclean
-all plugins drivers snddrivers: au
+.PHONY: sndau auclean
+all plugins drivers snddrivers: sndau
 
-au:
+sndau:
 	$(MAKE_TARGET) MAKE_DLL=yes
 auclean:
 	$(MAKE_CLEAN)
@@ -29,46 +29,46 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/au plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  AU = $(OUTDLL)sndau$(DLL)
-  LIB.AU = $(foreach d,$(DEP.AU),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(AU)
+  SNDAU = $(OUTDLL)sndau$(DLL)
+  LIB.SNDAU = $(foreach d,$(DEP.SNDAU),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDAU)
 else
-  AU = $(OUT)$(LIB_PREFIX)sndau$(LIB)
-  DEP.EXE += $(AU)
+  SNDAU = $(OUT)$(LIB_PREFIX)sndau$(LIB)
+  DEP.EXE += $(SNDAU)
   SCF.STATIC += sndau
-  TO_INSTALL.STATIC_LIBS += $(AU)
+  TO_INSTALL.STATIC_LIBS += $(SNDAU)
 endif
 
-INC.AU = $(wildcard plugins/sound/loader/au/*.h) \
+INC.SNDAU = $(wildcard plugins/sound/loader/au/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
-SRC.AU = $(wildcard plugins/sound/loader/au/*.cpp) \
+SRC.SNDAU = $(wildcard plugins/sound/loader/au/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.AU = $(addprefix $(OUT),$(notdir $(SRC.AU:.cpp=$O)))
-DEP.AU = CSUTIL CSSYS CSUTIL
+OBJ.SNDAU = $(addprefix $(OUT),$(notdir $(SRC.SNDAU:.cpp=$O)))
+DEP.SNDAU = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += AU
-DSP.AU.NAME = sndau
-DSP.AU.TYPE = plugin
+MSVC.DSP += SNDAU
+DSP.SNDAU.NAME = sndau
+DSP.SNDAU.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: au auclean
+.PHONY: sndau auclean
 
-au: $(OUTDIRS) $(AU)
+sndau: $(OUTDIRS) $(SNDAU)
 
-$(AU): $(OBJ.AU) $(LIB.AU)
+$(SNDAU): $(OBJ.SNDAU) $(LIB.SNDAU)
 	$(DO.PLUGIN)
 
 clean: auclean
 auclean:
-	$(RM) $(AU) $(OBJ.AU)
+	$(RM) $(SNDAU) $(OBJ.SNDAU)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndau.dep
-$(OUTOS)sndau.dep: $(SRC.AU)
+$(OUTOS)sndau.dep: $(SRC.SNDAU)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndau.dep

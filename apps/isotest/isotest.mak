@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.isotst = Crystal Space isotest demo executable
+DESCRIPTION.isotest = Crystal Space isotest demo executable
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make isotst       Make the $(DESCRIPTION.isotst)$"
+APPHELP += $(NEWLINE)echo $"  make isotest      Make the $(DESCRIPTION.isotest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: isotst isotstclean
+.PHONY: isotest isotestclean
 
-all apps: isotst
-isotst:
-	$(MAKE_TARGET)
-isotstclean:
+all apps: isotest
+isotest:
+	$(MAKE_APP)
+isotestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: isotst isotstclean
+.PHONY: build.isotest isotestclean
 
 all: $(ISOTEST.EXE)
-isotst: $(OUTDIRS) $(ISOTEST.EXE)
-clean: isotstclean
+build.isotest: $(OUTDIRS) $(ISOTEST.EXE)
+clean: isotestclean
 
 $(ISOTEST.EXE): $(DEP.EXE) $(OBJ.ISOTEST) $(LIB.ISOTEST)
 	$(DO.LINK.EXE)
 
-isotstclean:
+isotestclean:
 	-$(RM) $(ISOTEST.EXE) $(OBJ.ISOTEST)
 
 ifdef DO_DEPEND

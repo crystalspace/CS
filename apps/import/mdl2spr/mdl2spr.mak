@@ -1,24 +1,24 @@
 # Application description
-DESCRIPTION.mdlconv = Quake model MDL/MD2 conversion tool
+DESCRIPTION.mdl2spr = Quake model MDL/MD2 conversion tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make mdlconv      Make the $(DESCRIPTION.mdlconv)$"
+  $(NEWLINE)echo $"  make mdl2spr      Make the $(DESCRIPTION.mdl2spr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: mdlconv mdlconvclean
+.PHONY: mdl2spr mdl2sprclean
 
-all apps: mdlconv
-mdlconv:
-	$(MAKE_TARGET)
-mdlconvclean:
+all apps: mdl2spr
+mdl2spr:
+	$(MAKE_APP)
+mdl2sprclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: mdlconv mdlconvclean
+.PHONY: build.mdl2spr mdl2sprclean
 
 all: $(MDL2SPR.EXE)
-mdlconv: $(OUTDIRS) $(MDL2SPR.EXE)
-clean: mdlconvclean
+build.mdl2spr: $(OUTDIRS) $(MDL2SPR.EXE)
+clean: mdl2sprclean
 
 $(MDL2SPR.EXE): $(OBJ.MDL2SPR) $(LIB.MDL2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
-mdlconvclean:
+mdl2sprclean:
 	-$(RM) $(MDL2SPR.EXE) $(OBJ.MDL2SPR)
 
 ifdef DO_DEPEND

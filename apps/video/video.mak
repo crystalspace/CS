@@ -2,24 +2,24 @@
 ifneq (,$(findstring video/format,$(PLUGINS)))
 
 # Application description
-DESCRIPTION.vid = Crystal Space video example
+DESCRIPTION.csvid = Crystal Space video example
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make vid          Make the $(DESCRIPTION.vid)$"
+APPHELP += $(NEWLINE)echo $"  make csvid        Make the $(DESCRIPTION.csvid)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: vid vidclean
+.PHONY: csvid vidclean
 
-all apps: vid
-vid:
-	$(MAKE_TARGET)
+all apps: csvid
+csvid:
+	$(MAKE_APP)
 vidclean:
 	$(MAKE_CLEAN)
 
@@ -48,10 +48,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: vid vidclean
+.PHONY: build.csvid vidclean
 
 all: $(CSVID.EXE)
-vid: $(OUTDIRS) $(CSVID.EXE)
+build.csvid: $(OUTDIRS) $(CSVID.EXE)
 clean: vidclean
 
 $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)

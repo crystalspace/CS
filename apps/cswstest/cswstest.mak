@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.wstest = Crystal Space Windowing System test
+DESCRIPTION.cswstest = Crystal Space Windowing System test
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP+=$(NEWLINE)echo $"  make wstest       Make the $(DESCRIPTION.wstest)$"
+APPHELP+=$(NEWLINE)echo $"  make cswstest     Make the $(DESCRIPTION.cswstest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: wstest wstestclean
+.PHONY: cswstest cswstestclean
 
-all apps: wstest
-wstest:
-	$(MAKE_TARGET)
-wstestclean:
+all apps: cswstest
+cswstest:
+	$(MAKE_APP)
+cswstestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: wstest wstestclean
+.PHONY: build.cswstest cswstestclean
 
 all: $(CSWSTEST.EXE)
-wstest: $(OUTDIRS) $(CSWSTEST.EXE)
-clean: wstestclean
+build.cswstest: $(OUTDIRS) $(CSWSTEST.EXE)
+clean: cswstestclean
 
 $(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(LIB.CSWSTEST)
 	$(DO.LINK.EXE)
 
-wstestclean:
+cswstestclean:
 	-$(RM) $(CSWSTEST.EXE) $(OBJ.CSWSTEST)
 
 ifdef DO_DEPEND

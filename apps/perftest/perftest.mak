@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.perf = Crystal Space graphics performance tester
+DESCRIPTION.perftest = Crystal Space graphics performance tester
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make perf         Make the $(DESCRIPTION.perf)$"
+APPHELP += $(NEWLINE)echo $"  make perftest     Make the $(DESCRIPTION.perftest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------ roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: perf perfclean
+.PHONY: perftest perftestclean
 
-all apps: perf
-perf:
-	$(MAKE_TARGET)
-perfclean:
+all apps: perftest
+perftest:
+	$(MAKE_APP)
+perftestclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -27,42 +27,42 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/perftest apps/support
 
-PERF.EXE = perftest$(EXE)
-INC.PERF = $(wildcard apps/perftest/*.h)
-SRC.PERF = $(wildcard apps/perftest/*.cpp)
-OBJ.PERF = $(addprefix $(OUT),$(notdir $(SRC.PERF:.cpp=$O)))
-DEP.PERF = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX
-LIB.PERF = $(foreach d,$(DEP.PERF),$($d.LIB))
+PERFTEST.EXE = perftest$(EXE)
+INC.PERFTEST = $(wildcard apps/perftest/*.h)
+SRC.PERFTEST = $(wildcard apps/perftest/*.cpp)
+OBJ.PERFTEST = $(addprefix $(OUT),$(notdir $(SRC.PERFTEST:.cpp=$O)))
+DEP.PERFTEST = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX
+LIB.PERFTEST = $(foreach d,$(DEP.PERFTEST),$($d.LIB))
 
-TO_INSTALL.EXE += $(PERF.EXE)
+TO_INSTALL.EXE += $(PERFTEST.EXE)
 
-MSVC.DSP += PERF
-DSP.PERF.NAME = perftest
-DSP.PERF.TYPE = appcon
+MSVC.DSP += PERFTEST
+DSP.PERFTEST.NAME = perftest
+DSP.PERFTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #---------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: perf perfclean
+.PHONY: build.perftest perftestclean
 
-all: $(PERF.EXE)
-perf: $(OUTDIRS) $(PERF.EXE)
-clean: perfclean
+all: $(PERFTEST.EXE)
+build.perftest: $(OUTDIRS) $(PERFTEST.EXE)
+clean: perftestclean
 
-$(PERF.EXE): $(DEP.EXE) $(OBJ.PERF) $(LIB.PERF)
+$(PERFTEST.EXE): $(DEP.EXE) $(OBJ.PERFTEST) $(LIB.PERFTEST)
 	$(DO.LINK.EXE)
 
-perfclean:
-	-$(RM) $(PERF.EXE) $(OBJ.PERF)
+perftestclean:
+	-$(RM) $(PERFTEST.EXE) $(OBJ.PERFTEST)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)perf.dep
-$(OUTOS)perf.dep: $(SRC.PERF)
+dep: $(OUTOS)perftest.dep
+$(OUTOS)perftest.dep: $(SRC.PERFTEST)
 	$(DO.DEP)
 else
--include $(OUTOS)perf.dep
+-include $(OUTOS)perftest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

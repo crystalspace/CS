@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.tutmap = Crystal Space tutorial part three, map loading
+DESCRIPTION.simpmap = Crystal Space tutorial part three, map loading
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make tutmap       Make the $(DESCRIPTION.tutmap)$"
+APPHELP += $(NEWLINE)echo $"  make simpmap      Make the $(DESCRIPTION.simpmap)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tutmap tutmapclean
+.PHONY: simpmap tutmapclean
 
-all apps: tutmap
-tutmap:
-	$(MAKE_TARGET)
+all apps: simpmap
+simpmap:
+	$(MAKE_APP)
 tutmapclean:
 	$(MAKE_CLEAN)
 
@@ -45,10 +45,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tutmap tutmapclean
+.PHONY: build.simpmap tutmapclean
 
 all: $(SIMPMAP.EXE)
-tutmap: $(OUTDIRS) $(SIMPMAP.EXE)
+build.simpmap: $(OUTDIRS) $(SIMPMAP.EXE)
 clean: tutmapclean
 
 $(SIMPMAP.EXE): $(DEP.EXE) $(OBJ.SIMPMAP) $(LIB.SIMPMAP)

@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.vshell = Crystal Space Virtual Shell tool
+DESCRIPTION.vsh = Crystal Space Virtual Shell tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make vshell       Make the $(DESCRIPTION.vshell)$"
+  $(NEWLINE)echo $"  make vsh          Make the $(DESCRIPTION.vsh)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: vshell vshellclean
+.PHONY: vsh vshellclean
 
-all apps: vshell
-vshell:
-	$(MAKE_TARGET)
+all apps: vsh
+vsh:
+	$(MAKE_APP)
 vshellclean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: vshell vshellclean
+.PHONY: build.vsh vshellclean
 
 all: $(VSH.EXE)
-vshell: $(OUTDIRS) $(VSH.EXE)
+build.vsh: $(OUTDIRS) $(VSH.EXE)
 clean: vshellclean
 
 $(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)
@@ -59,11 +59,11 @@ vshellclean:
 	-$(RM) $(VSH.EXE) $(OBJ.VSH)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)vshell.dep
-$(OUTOS)vshell.dep: $(SRC.VSH)
+dep: $(OUTOS)vsh.dep
+$(OUTOS)vsh.dep: $(SRC.VSH)
 	$(DO.DEP)
 else
--include $(OUTOS)vshell.dep
+-include $(OUTOS)vsh.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

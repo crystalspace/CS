@@ -19,7 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 all apps: awstut
 awstut:
-	$(MAKE_TARGET)
+	$(MAKE_APP)
 awstutclean:
 	$(MAKE_CLEAN)
 
@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tutorial/awstut apps/support
 
-AWSTUT.EXE = awstutor$(EXE)
+AWSTUT.EXE = awstut$(EXE)
 INC.AWSTUT = $(wildcard apps/tutorial/awstut/*.h)
 SRC.AWSTUT = $(wildcard apps/tutorial/awstut/*.cpp)
 OBJ.AWSTUT = $(addprefix $(OUT),$(notdir $(SRC.AWSTUT:.cpp=$O)))
@@ -50,10 +50,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: awstut awstutclean
+.PHONY: build.awstut awstutclean
 
 all: $(AWSTUT.EXE)
-awstut: $(OUTDIRS) $(AWSTUT.EXE)
+build.awstut: $(OUTDIRS) $(AWSTUT.EXE)
 clean: awstutclean
 
 $(AWSTUT.EXE): $(DEP.EXE) $(OBJ.AWSTUT) $(LIB.AWSTUT)

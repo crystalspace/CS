@@ -1,24 +1,24 @@
 # Application description
-DESCRIPTION.mapconv = Quake map conversion tool
+DESCRIPTION.map2cs = Quake map conversion tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make mapconv      Make the $(DESCRIPTION.mapconv)$"
+  $(NEWLINE)echo $"  make map2cs       Make the $(DESCRIPTION.map2cs)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: mapconv mapconvclean
+.PHONY: map2cs map2csclean
 
-all apps: mapconv
-mapconv:
-	$(MAKE_TARGET)
-mapconvclean:
+all apps: map2cs
+map2cs:
+	$(MAKE_APP)
+map2csclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -42,24 +42,24 @@ TO_INSTALL.CONFIG += $(CFG.MAP2CS)
 MSVC.DSP += MAP2CS
 DSP.MAP2CS.NAME = map2cs
 DSP.MAP2CS.TYPE = appcon
-#DSP.MAP2CS.LIBS = libz
-DSP.MAP2CS.LIBS = zlib
+DSP.MAP2CS.LIBS = libz
+#DSP.MAP2CS.LIBS = zlib
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: mapconv mapconvclean
+.PHONY: build.map2cs map2csclean
 
 all: $(MAP2CS.EXE)
-mapconv: $(OUTDIRS) $(MAP2CS.EXE)
-clean: mapconvclean
+build.map2cs: $(OUTDIRS) $(MAP2CS.EXE)
+clean: map2csclean
 
 $(MAP2CS.EXE): $(OBJ.MAP2CS) $(LIB.MAP2CS)
 	$(DO.LINK.CONSOLE.EXE)
 
-mapconvclean:
+map2csclean:
 	-$(RM) $(MAP2CS.EXE) $(OBJ.MAP2CS)
 
 ifdef DO_DEPEND

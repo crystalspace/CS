@@ -2,24 +2,24 @@
 ifneq ($(USE_PLUGINS),no)
 
 # Application description
-DESCRIPTION.scfr = Crystal Space SCF registration server
+DESCRIPTION.scfreg = Crystal Space SCF registration server
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make scfr         Make the $(DESCRIPTION.scfr)$"
+APPHELP += $(NEWLINE)echo $"  make scfreg       Make the $(DESCRIPTION.scfreg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: scfr scfrclean
+.PHONY: scfreg scfrclean
 
-all apps: scfr
-scfr:
-	$(MAKE_TARGET)
+all apps: scfreg
+scfreg:
+	$(MAKE_APP)
 scfrclean:
 	$(MAKE_CLEAN)
 
@@ -30,39 +30,39 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/scfreg
 
-REGSVR.EXE = scfreg$(EXE)
-INC.REGSVR =
-SRC.REGSVR = apps/tools/scfreg/scfreg.cpp
-OBJ.REGSVR = $(addprefix $(OUT),$(notdir $(SRC.REGSVR:.cpp=$O)))
-DEP.REGSVR = CSSYS CSUTIL CSGEOM
-LIB.REGSVR = $(foreach d,$(DEP.REGSVR),$($d.LIB))
+SCFREG.EXE = scfreg$(EXE)
+INC.SCFREG =
+SRC.SCFREG = apps/tools/scfreg/scfreg.cpp
+OBJ.SCFREG = $(addprefix $(OUT),$(notdir $(SRC.SCFREG:.cpp=$O)))
+DEP.SCFREG = CSSYS CSUTIL CSGEOM
+LIB.SCFREG = $(foreach d,$(DEP.SCFREG),$($d.LIB))
 
-TO_INSTALL.EXE += $(REGSVR.EXE)
+TO_INSTALL.EXE += $(SCFREG.EXE)
 
-MSVC.DSP += REGSVR
-DSP.REGSVR.NAME = scfreg
-DSP.REGSVR.TYPE = appcon
+MSVC.DSP += SCFREG
+DSP.SCFREG.NAME = scfreg
+DSP.SCFREG.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: scfr scfrclean
+.PHONY: build.scfreg scfrclean
 
-all: $(REGSVR.EXE)
-scfr: $(OUTDIRS) $(REGSVR.EXE)
+all: $(SCFREG.EXE)
+build.scfreg: $(OUTDIRS) $(SCFREG.EXE)
 clean: scfrclean
 
-$(REGSVR.EXE): $(OBJ.REGSVR) $(LIB.REGSVR)
+$(SCFREG.EXE): $(OBJ.SCFREG) $(LIB.SCFREG)
 	$(DO.LINK.CONSOLE.EXE)
 
 scfrclean:
-	-$(RM) $(REGSVR.EXE) $(OBJ.REGSVR)
+	-$(RM) $(SCFREG.EXE) $(OBJ.SCFREG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)scfreg.dep
-$(OUTOS)scfreg.dep: $(SRC.REGSVR)
+$(OUTOS)scfreg.dep: $(SRC.SCFREG)
 	$(DO.DEP)
 else
 -include $(OUTOS)scfreg.dep

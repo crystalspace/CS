@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.bmpimg = Crystal Space bmp image loader
+DESCRIPTION.csbmpimg = Crystal Space bmp image loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make bmpimg       Make the $(DESCRIPTION.bmpimg)$"
+  $(NEWLINE)echo $"  make csbmpimg     Make the $(DESCRIPTION.csbmpimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: bmpimg bmpimgclean
-all plugins: bmpimg
+.PHONY: csbmpimg bmpimgclean
+all plugins: csbmpimg
 
-bmpimg:
+csbmpimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 bmpimgclean:
 	$(MAKE_CLEAN)
@@ -29,45 +29,45 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/bmp
 
 ifeq ($(USE_PLUGINS),yes)
-  BMPIMG = $(OUTDLL)csbmpimg$(DLL)
-  LIB.BMPIMG = $(foreach d,$(DEP.BMPIMG),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(BMPIMG)
+  CSBMPIMG = $(OUTDLL)csbmpimg$(DLL)
+  LIB.CSBMPIMG = $(foreach d,$(DEP.CSBMPIMG),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSBMPIMG)
 else
-  BMPIMG = $(OUT)$(LIB_PREFIX)csbmpimg$(LIB)
-  DEP.EXE += $(BMPIMG)
+  CSBMPIMG = $(OUT)$(LIB_PREFIX)csbmpimg$(LIB)
+  DEP.EXE += $(CSBMPIMG)
   SCF.STATIC += csbmpimg
-  TO_INSTALL.STATIC_LIBS += $(BMPIMG)
+  TO_INSTALL.STATIC_LIBS += $(CSBMPIMG)
 endif
 
-INC.BMPIMG = $(wildcard plugins/video/loader/bmp/*.h)
-SRC.BMPIMG = $(wildcard plugins/video/loader/bmp/*.cpp)
+INC.CSBMPIMG = $(wildcard plugins/video/loader/bmp/*.h)
+SRC.CSBMPIMG = $(wildcard plugins/video/loader/bmp/*.cpp)
 
-OBJ.BMPIMG = $(addprefix $(OUT),$(notdir $(SRC.BMPIMG:.cpp=$O)))
-DEP.BMPIMG = CSUTIL CSSYS CSGFX CSUTIL
+OBJ.CSBMPIMG = $(addprefix $(OUT),$(notdir $(SRC.CSBMPIMG:.cpp=$O)))
+DEP.CSBMPIMG = CSUTIL CSSYS CSGFX CSUTIL
 
-MSVC.DSP += BMPIMG
-DSP.BMPIMG.NAME = csbmpimg
-DSP.BMPIMG.TYPE = plugin
+MSVC.DSP += CSBMPIMG
+DSP.CSBMPIMG.NAME = csbmpimg
+DSP.CSBMPIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: bmpimg bmpimgclean
+.PHONY: csbmpimg bmpimgclean
 
-bmpimg: $(OUTDIRS) $(BMPIMG)
+csbmpimg: $(OUTDIRS) $(CSBMPIMG)
 
-$(BMPIMG): $(OBJ.BMPIMG) $(LIB.BMPIMG)
+$(CSBMPIMG): $(OBJ.CSBMPIMG) $(LIB.CSBMPIMG)
 	$(DO.PLUGIN)
 
 clean: bmpimgclean
 bmpimgclean:
-	$(RM) $(BMPIMG) $(OBJ.BMPIMG)
+	$(RM) $(CSBMPIMG) $(OBJ.CSBMPIMG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)bmpimg.dep
-$(OUTOS)bmpimg.dep: $(SRC.BMPIMG)
+$(OUTOS)bmpimg.dep: $(SRC.CSBMPIMG)
 	$(DO.DEP)
 else
 -include $(OUTOS)bmpimg.dep

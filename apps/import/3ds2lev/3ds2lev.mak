@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.3dslev = 3DS to Crystal Space map converter
+DESCRIPTION.3ds2lev = 3DS to Crystal Space map converter
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make 3dslev       Make the $(DESCRIPTION.3dslev)$"
+  $(NEWLINE)echo $"  make 3ds2lev      Make the $(DESCRIPTION.3ds2lev)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: 3dslev 3dslevclean
+.PHONY: 3ds2lev 3ds2levclean
 
-3dslev:
-	$(MAKE_TARGET)
-3dslevclean:
+3ds2lev:
+	$(MAKE_APP)
+3ds2levclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,15 +46,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: 3dslev 3dslevclean
+.PHONY: build.3ds2lev 3ds2levclean
 
-3dslev: $(OUTDIRS) $(3DS2LEV.EXE)
-clean: 3dslevclean
+build.3ds2lev: $(OUTDIRS) $(3DS2LEV.EXE)
+clean: 3ds2levclean
 
 $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	$(DO.LINK.CONSOLE.EXE) -l3ds
 
-3dslevclean:
+3ds2levclean:
 	-$(RM) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)
 
 ifdef DO_DEPEND

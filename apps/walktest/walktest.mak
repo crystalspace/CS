@@ -1,11 +1,11 @@
 # Application description
-DESCRIPTION.walk = Crystal Space WalkTest demo executable
+DESCRIPTION.walktest = Crystal Space WalkTest demo executable
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make walk         Make the $(DESCRIPTION.walk)$"
+APPHELP += $(NEWLINE)echo $"  make walktest     Make the $(DESCRIPTION.walktest)$"
 
 PSEUDOHELP += $(NEWLINE) \
   echo $"  make walkall      Make WalkTest and all plug-ins it requires$"
@@ -15,14 +15,14 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: walk walkclean
+.PHONY: walktest walkclean
 
-walkall: walk vfs soft3d softcanvas csfont csconin simpcon perfstat \
-  rapid meshes cssynldr imgplex gifimg jpgimg pngimg bmpimg reporter \
-  stdrep csparser frustvis
-all apps: walk
-walk:
-	$(MAKE_TARGET)
+walkall: walktest vfs soft3d softcanvas csfont csconin simpcon perfstat \
+  rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg reporter \
+  stdrep csparser frustvis csjngimg
+all apps: walktest
+walktest:
+	$(MAKE_APP)
 walkclean:
 	$(MAKE_CLEAN)
 
@@ -56,10 +56,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: walk walkclean
+.PHONY: build.walktest walkclean
 
 all: $(WALKTEST.EXE)
-walk: $(OUTDIRS) $(WALKTEST.EXE)
+build.walktest: $(OUTDIRS) $(WALKTEST.EXE)
 clean: walkclean
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)

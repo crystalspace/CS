@@ -2,24 +2,24 @@
 ifneq (,$(findstring freefont,$(PLUGINS)))
 
 # Application description
-DESCRIPTION.csfg = TrueType to Crystal Space font converter
+DESCRIPTION.csfgen = TrueType to Crystal Space font converter
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP+=$(NEWLINE)echo $"  make csfg         Make the $(DESCRIPTION.csfg)$"
+APPHELP+=$(NEWLINE)echo $"  make csfgen         Make the $(DESCRIPTION.csfgen)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csfg csfgclean
+.PHONY: csfgen csfgclean
 
-all apps: csfg
-csfg:
-	$(MAKE_TARGET)
+all apps: csfgen
+csfgen:
+	$(MAKE_APP)
 csfgclean:
 	$(MAKE_CLEAN)
 
@@ -48,10 +48,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csfg csfgclean
+.PHONY: build.csfgen csfgclean
 
 all: $(CSFGEN.EXE)
-csfg: $(OUTDIRS) $(CSFGEN.EXE)
+build.csfgen: $(OUTDIRS) $(CSFGEN.EXE)
 clean: csfgclean
 
 $(CSFGEN.EXE): $(OBJ.CSFGEN) $(LIB.CSFGEN)
@@ -61,11 +61,11 @@ csfgclean:
 	-$(RM) $(CSFGEN.EXE) $(OBJ.CSFGEN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)csfg.dep
-$(OUTOS)csfg.dep: $(SRC.CSFGEN)
+dep: $(OUTOS)csfgen.dep
+$(OUTOS)csfgen.dep: $(SRC.CSFGEN)
 	$(DO.DEP)
 else
--include $(OUTOS)csfg.dep
+-include $(OUTOS)csfgen.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

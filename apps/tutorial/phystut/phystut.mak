@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.tutphys = Crystal Space physics tutorial
+DESCRIPTION.phystut = Crystal Space physics tutorial
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make tutphys      Make the $(DESCRIPTION.tutphys)$"
+  $(NEWLINE)echo $"  make phystut      Make the $(DESCRIPTION.phystut)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tutphys tutphysclean
+.PHONY: phystut tutphysclean
 
-all apps: tutphys
-tutphys:
-	$(MAKE_TARGET)
+all apps: phystut
+phystut:
+	$(MAKE_APP)
 tutphysclean:
 	$(MAKE_CLEAN)
 
@@ -28,39 +28,39 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tutorial/phystut
 
-PHYS.EXE = phys$(EXE)
-INC.PHYS = $(wildcard apps/tutorial/phystut/*.h)
-SRC.PHYS = $(wildcard apps/tutorial/phystut/*.cpp)
-OBJ.PHYS = $(addprefix $(OUT),$(notdir $(SRC.PHYS:.cpp=$O)))
-DEP.PHYS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
-LIB.PHYS = $(foreach d,$(DEP.PHYS),$($d.LIB))
+PHYSTUT.EXE = phystut$(EXE)
+INC.PHYSTUT = $(wildcard apps/tutorial/phystut/*.h)
+SRC.PHYSTUT = $(wildcard apps/tutorial/phystut/*.cpp)
+OBJ.PHYSTUT = $(addprefix $(OUT),$(notdir $(SRC.PHYSTUT:.cpp=$O)))
+DEP.PHYSTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+LIB.PHYSTUT = $(foreach d,$(DEP.PHYSTUT),$($d.LIB))
 
-#TO_INSTALL.EXE += $(PHYS.EXE)
+#TO_INSTALL.EXE += $(PHYSTUT.EXE)
 
-MSVC.DSP += PHYS
-DSP.PHYS.NAME = phys
-DSP.PHYS.TYPE = appcon
+MSVC.DSP += PHYSTUT
+DSP.PHYSTUT.NAME = phystut
+DSP.PHYSTUT.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tutphys tutphysclean
+.PHONY: build.phystut tutphysclean
 
-all: $(PHYS.EXE)
-tutphys: $(OUTDIRS) $(PHYS.EXE)
+all: $(PHYSTUT.EXE)
+build.phystut: $(OUTDIRS) $(PHYSTUT.EXE)
 clean: tutphysclean
 
-$(PHYS.EXE): $(DEP.EXE) $(OBJ.PHYS) $(LIB.PHYS)
+$(PHYSTUT.EXE): $(DEP.EXE) $(OBJ.PHYSTUT) $(LIB.PHYSTUT)
 	$(DO.LINK.EXE)
 
 tutphysclean:
-	-$(RM) $(PHYS.EXE) $(OBJ.PHYS)
+	-$(RM) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)phys.dep
-$(OUTOS)phys.dep: $(SRC.PHYS)
+$(OUTOS)phys.dep: $(SRC.PHYSTUT)
 	$(DO.DEP)
 else
 -include $(OUTOS)phys.dep

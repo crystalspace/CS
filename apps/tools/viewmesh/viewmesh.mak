@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.vmesh = Crystal Space mesh viewing utility
+DESCRIPTION.viewmesh = Crystal Space mesh viewing utility
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make vmesh        Make the $(DESCRIPTION.vmesh)$"
+  $(NEWLINE)echo $"  make viewmesh     Make the $(DESCRIPTION.viewmesh)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: vmesh vmeshclean
+.PHONY: viewmesh vmeshclean
 
-all apps: vmesh
-vmesh:
-	$(MAKE_TARGET)
+all apps: viewmesh
+viewmesh:
+	$(MAKE_APP)
 vmeshclean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: vmesh vmeshclean
+.PHONY: build.viewmesh vmeshclean
 
 all: $(VIEWMESH.EXE)
-vmesh: $(OUTDIRS) $(VIEWMESH.EXE)
+build.viewmesh: $(OUTDIRS) $(VIEWMESH.EXE)
 clean: vmeshclean
 
 $(VIEWMESH.EXE): $(DEP.EXE) $(OBJ.VIEWMESH) $(LIB.VIEWMESH)

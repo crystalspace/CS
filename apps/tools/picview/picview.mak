@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.pview = Crystal Space Picture Viewer
+DESCRIPTION.picview = Crystal Space Picture Viewer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make pview        Make the $(DESCRIPTION.pview)$"
+APPHELP += $(NEWLINE)echo $"  make picview      Make the $(DESCRIPTION.picview)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pview pviewclean
+.PHONY: picview pviewclean
 
-all apps: pview
-pview:
-	$(MAKE_TARGET)
+all apps: picview
+picview:
+	$(MAKE_APP)
 pviewclean:
 	$(MAKE_CLEAN)
 
@@ -27,44 +27,44 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/picview
 
-PVIEW.EXE = picview$(EXE)
-INC.PVIEW = $(wildcard apps/tools/picview/*.h)
-SRC.PVIEW = $(wildcard apps/tools/picview/*.cpp)
-OBJ.PVIEW = $(addprefix $(OUT),$(notdir $(SRC.PVIEW:.cpp=$O)))
-DEP.PVIEW = \
+PICVIEW.EXE = picview$(EXE)
+INC.PICVIEW = $(wildcard apps/tools/picview/*.h)
+SRC.PICVIEW = $(wildcard apps/tools/picview/*.cpp)
+OBJ.PICVIEW = $(addprefix $(OUT),$(notdir $(SRC.PICVIEW:.cpp=$O)))
+DEP.PICVIEW = \
   CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
-LIB.PVIEW = $(foreach d,$(DEP.PVIEW),$($d.LIB))
+LIB.PICVIEW = $(foreach d,$(DEP.PICVIEW),$($d.LIB))
 
-#TO_INSTALL.EXE    += $(PVIEW.EXE)
-#TO_INSTALL.CONFIG += $(CFG.PVIEW)
+#TO_INSTALL.EXE    += $(picview.EXE)
+#TO_INSTALL.CONFIG += $(CFG.PICVIEW)
 
-MSVC.DSP += PVIEW
-DSP.PVIEW.NAME = picview
-DSP.PVIEW.TYPE = appcon
+MSVC.DSP += PICVIEW
+DSP.PICVIEW.NAME = picview
+DSP.PICVIEW.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: pview pviewclean
+.PHONY: build.picview pviewclean
 
-all: $(PVIEW.EXE)
-pview: $(OUTDIRS) $(PVIEW.EXE)
+all: $(PICVIEW.EXE)
+build.picview: $(OUTDIRS) $(PICVIEW.EXE)
 clean: pviewclean
 
-$(PVIEW.EXE): $(DEP.EXE) $(OBJ.PVIEW) $(LIB.PVIEW)
+$(PICVIEW.EXE): $(DEP.EXE) $(OBJ.PICVIEW) $(LIB.PICVIEW)
 	$(DO.LINK.EXE)
 
 pviewclean:
-	-$(RM) $(PVIEW.EXE) $(OBJ.PVIEW)
+	-$(RM) $(PICVIEW.EXE) $(OBJ.PICVIEW)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)pview.dep
-$(OUTOS)pview.dep: $(SRC.PVIEW)
+dep: $(OUTOS)picview.dep
+$(OUTOS)picview.dep: $(SRC.PICVIEW)
 	$(DO.DEP)
 else
--include $(OUTOS)pview.dep
+-include $(OUTOS)picview.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

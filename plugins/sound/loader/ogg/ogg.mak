@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.csogg = Crystal Space ogg vorbis sound loader
+DESCRIPTION.sndogg = Crystal Space ogg vorbis sound loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make csogg        Make the $(DESCRIPTION.csogg)$"
+  $(NEWLINE)echo $"  make sndogg       Make the $(DESCRIPTION.sndogg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csogg csoggclean
-all plugins drivers snddrivers: csogg
+.PHONY: sndogg csoggclean
+all plugins drivers snddrivers: sndogg
 
-csogg:
+sndogg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csoggclean:
 	$(MAKE_CLEAN)
@@ -29,45 +29,45 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/ogg
 
 ifeq ($(USE_PLUGINS),yes)
-  CSOGG = $(OUTDLL)sndogg$(DLL)
-  LIB.CSOGG = $(foreach d,$(DEP.CSOGG),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(CSOGG)
+  SNDOGG = $(OUTDLL)sndogg$(DLL)
+  LIB.SNDOGG = $(foreach d,$(DEP.SNDOGG),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDOGG)
 else
-  CSOGG = $(OUT)$(LIB_PREFIX)sndogg$(LIB)
-  DEP.EXE += $(CSOGG)
+  SNDOGG = $(OUT)$(LIB_PREFIX)sndogg$(LIB)
+  DEP.EXE += $(SNDOGG)
   SCF.STATIC += sndogg
-  TO_INSTALL.STATIC_LIBS += $(CSOGG)
+  TO_INSTALL.STATIC_LIBS += $(SNDOGG)
 endif
 
-INC.CSOGG = $(wildcard plugins/sound/loader/ogg/*.h)
-SRC.CSOGG = $(wildcard plugins/sound/loader/ogg/*.cpp)
-OBJ.CSOGG = $(addprefix $(OUT),$(notdir $(SRC.CSOGG:.cpp=$O)))
-DEP.CSOGG = CSUTIL CSSYS CSUTIL
+INC.SNDOGG = $(wildcard plugins/sound/loader/ogg/*.h)
+SRC.SNDOGG = $(wildcard plugins/sound/loader/ogg/*.cpp)
+OBJ.SNDOGG = $(addprefix $(OUT),$(notdir $(SRC.SNDOGG:.cpp=$O)))
+DEP.SNDOGG = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += CSOGG
-DSP.CSOGG.NAME = sndogg
-DSP.CSOGG.TYPE = plugin
-DSP.CSOGG.LIBS = vorbisfile vorbis ogg
+MSVC.DSP += SNDOGG
+DSP.SNDOGG.NAME = sndogg
+DSP.SNDOGG.TYPE = plugin
+DSP.SNDOGG.LIBS = vorbisfile vorbis ogg
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csogg csoggclean
+.PHONY: sndogg csoggclean
 
-csogg: $(OUTDIRS) $(CSOGG)
+sndogg: $(OUTDIRS) $(SNDOGG)
 
-$(CSOGG): $(OBJ.CSOGG) $(LIB.CSOGG)
+$(SNDOGG): $(OBJ.SNDOGG) $(LIB.SNDOGG)
 	$(DO.PLUGIN) -lvorbisfile -lvorbis -logg
 
 clean: csoggclean
 csoggclean:
-	$(RM) $(CSOGG) $(OBJ.CSOGG)
+	$(RM) $(SNDOGG) $(OBJ.SNDOGG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndogg.dep
-$(OUTOS)sndogg.dep: $(SRC.CSOGG)
+$(OUTOS)sndogg.dep: $(SRC.SNDOGG)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndogg.dep

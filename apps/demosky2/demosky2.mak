@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.demsky2 = Crystal Space sky demo 2
+DESCRIPTION.demosky2 = Crystal Space sky demo 2
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make demsky2      Make the $(DESCRIPTION.demsky2)$"
+APPHELP += $(NEWLINE)echo $"  make demosky2     Make the $(DESCRIPTION.demosky2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: demsky2 demsky2clean
+.PHONY: demosky2 demosky2clean
 
-all apps: demsky2
-demsky2:
-	$(MAKE_TARGET)
-demsky2clean:
+all apps: demosky2
+demosky2:
+	$(MAKE_APP)
+demosky2clean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,16 +45,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: demsky2 demsky2clean
+.PHONY: build.demosky2 demosky2clean
 
 all: $(DEMOSKY2.EXE)
-demsky2: $(OUTDIRS) $(DEMOSKY2.EXE)
-clean: demsky2clean
+build.demosky2: $(OUTDIRS) $(DEMOSKY2.EXE)
+clean: demosky2clean
 
 $(DEMOSKY2.EXE): $(DEP.EXE) $(OBJ.DEMOSKY2) $(LIB.DEMOSKY2)
 	$(DO.LINK.EXE)
 
-demsky2clean:
+demosky2clean:
 	-$(RM) $(DEMOSKY2.EXE) $(OBJ.DEMOSKY2)
 
 ifdef DO_DEPEND

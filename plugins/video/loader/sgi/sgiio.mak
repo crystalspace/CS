@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.sgiimg = Crystal Space sgi image loader
+DESCRIPTION.cssgiimg = Crystal Space sgi image loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make sgiimg       Make the $(DESCRIPTION.sgiimg)$"
+  $(NEWLINE)echo $"  make cssgiimg     Make the $(DESCRIPTION.cssgiimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sgiimg sgiimgclean
-all plugins: sgiimg
+.PHONY: cssgiimg sgiimgclean
+all plugins: cssgiimg
 
-sgiimg:
+cssgiimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 sgiimgclean:
 	$(MAKE_CLEAN)
@@ -29,45 +29,45 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/sgi
 
 ifeq ($(USE_PLUGINS),yes)
-  SGIIMG = $(OUTDLL)cssgiimg$(DLL)
-  LIB.SGIIMG = $(foreach d,$(DEP.SGIIMG),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(SGIIMG)
+  CSSGIIMG = $(OUTDLL)cssgiimg$(DLL)
+  LIB.CSSGIIMG = $(foreach d,$(DEP.CSSGIIMG),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSSGIIMG)
 else
-  SGIIMG = $(OUT)$(LIB_PREFIX)cssgiimg$(LIB)
-  DEP.EXE += $(SGIIMG)
+  CSSGIIMG = $(OUT)$(LIB_PREFIX)cssgiimg$(LIB)
+  DEP.EXE += $(CSSGIIMG)
   SCF.STATIC += cssgiimg
-  TO_INSTALL.STATIC_LIBS += $(SGIIMG)
+  TO_INSTALL.STATIC_LIBS += $(CSSGIIMG)
 endif
 
-INC.SGIIMG = $(wildcard plugins/video/loader/sgi/*.h)
-SRC.SGIIMG = $(wildcard plugins/video/loader/sgi/*.cpp)
+INC.CSSGIIMG = $(wildcard plugins/video/loader/sgi/*.h)
+SRC.CSSGIIMG = $(wildcard plugins/video/loader/sgi/*.cpp)
 
-OBJ.SGIIMG = $(addprefix $(OUT),$(notdir $(SRC.SGIIMG:.cpp=$O)))
-DEP.SGIIMG = CSUTIL CSSYS CSGFX CSUTIL
+OBJ.CSSGIIMG = $(addprefix $(OUT),$(notdir $(SRC.CSSGIIMG:.cpp=$O)))
+DEP.CSSGIIMG = CSUTIL CSSYS CSGFX CSUTIL
 
-MSVC.DSP += SGIIMG
-DSP.SGIIMG.NAME = cssgiimg
-DSP.SGIIMG.TYPE = plugin
+MSVC.DSP += CSSGIIMG
+DSP.CSSGIIMG.NAME = cssgiimg
+DSP.CSSGIIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sgiimg sgiimgclean
+.PHONY: cssgiimg sgiimgclean
 
-sgiimg: $(OUTDIRS) $(SGIIMG)
+cssgiimg: $(OUTDIRS) $(CSSGIIMG)
 
-$(SGIIMG): $(OBJ.SGIIMG) $(LIB.SGIIMG)
+$(CSSGIIMG): $(OBJ.CSSGIIMG) $(LIB.CSSGIIMG)
 	$(DO.PLUGIN)
 
 clean: sgiimgclean
 sgiimgclean:
-	$(RM) $(SGIIMG) $(OBJ.SGIIMG)
+	$(RM) $(CSSGIIMG) $(OBJ.CSSGIIMG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sgiimg.dep
-$(OUTOS)sgiimg.dep: $(SRC.SGIIMG)
+$(OUTOS)sgiimg.dep: $(SRC.CSSGIIMG)
 	$(DO.DEP)
 else
 -include $(OUTOS)sgiimg.dep

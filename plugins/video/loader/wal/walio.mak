@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.walimg = Crystal Space wal image loader
+DESCRIPTION.cswalimg = Crystal Space wal image loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make walimg       Make the $(DESCRIPTION.walimg)$"
+  $(NEWLINE)echo $"  make cswalimg     Make the $(DESCRIPTION.cswalimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: walimg walimgclean
-all plugins: walimg
+.PHONY: cswalimg walimgclean
+all plugins: cswalimg
 
-walimg:
+cswalimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
 walimgclean:
 	$(MAKE_CLEAN)
@@ -29,45 +29,45 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/video/loader/wal
 
 ifeq ($(USE_PLUGINS),yes)
-  WALIMG = $(OUTDLL)cswalimg$(DLL)
-  LIB.WALIMG = $(foreach d,$(DEP.WALIMG),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(WALIMG)
+  CSWALIMG = $(OUTDLL)cswalimg$(DLL)
+  LIB.CSWALIMG = $(foreach d,$(DEP.CSWALIMG),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSWALIMG)
 else
   WALIMG = $(OUT)$(LIB_PREFIX)cswalimg$(LIB)
-  DEP.EXE += $(WALIMG)
+  DEP.EXE += $(CSWALIMG)
   SCF.STATIC += cswalimg
-  TO_INSTALL.STATIC_LIBS += $(WALIMG)
+  TO_INSTALL.STATIC_LIBS += $(CSWALIMG)
 endif
 
-INC.WALIMG = $(wildcard plugins/video/loader/wal/*.h)
-SRC.WALIMG = $(wildcard plugins/video/loader/wal/*.cpp)
+INC.CSWALIMG = $(wildcard plugins/video/loader/wal/*.h)
+SRC.CSWALIMG = $(wildcard plugins/video/loader/wal/*.cpp)
 
-OBJ.WALIMG = $(addprefix $(OUT),$(notdir $(SRC.WALIMG:.cpp=$O)))
-DEP.WALIMG = CSUTIL CSSYS CSGFX CSUTIL
+OBJ.CSWALIMG = $(addprefix $(OUT),$(notdir $(SRC.CSWALIMG:.cpp=$O)))
+DEP.CSWALIMG = CSUTIL CSSYS CSGFX CSUTIL
 
-MSVC.DSP += WALIMG
-DSP.WALIMG.NAME = cswalimg
-DSP.WALIMG.TYPE = plugin
+MSVC.DSP += CSWALIMG
+DSP.CSWALIMG.NAME = cswalimg
+DSP.CSWALIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: walimg walimgclean
+.PHONY: cswalimg walimgclean
 
-walimg: $(OUTDIRS) $(WALIMG)
+cswalimg: $(OUTDIRS) $(CSWALIMG)
 
-$(WALIMG): $(OBJ.WALIMG) $(LIB.WALIMG)
+$(CSWALIMG): $(OBJ.CSWALIMG) $(LIB.CSWALIMG)
 	$(DO.PLUGIN)
 
 clean: walimgclean
 walimgclean:
-	$(RM) $(WALIMG) $(OBJ.WALIMG)
+	$(RM) $(CSWALIMG) $(OBJ.CSWALIMG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)walimg.dep
-$(OUTOS)walimg.dep: $(SRC.WALIMG)
+$(OUTOS)walimg.dep: $(SRC.CSWALIMG)
 	$(DO.DEP)
 else
 -include $(OUTOS)walimg.dep

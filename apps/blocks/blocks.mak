@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.blks = Crystal Space Blocks game
+DESCRIPTION.blocks = Crystal Space Blocks game
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make blks         Make the $(DESCRIPTION.blks)$"
+APPHELP += $(NEWLINE)echo $"  make blocks       Make the $(DESCRIPTION.blocks)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: blks blksclean
+.PHONY: blocks blocksclean
 
-all apps: blks
-blks:
-	$(MAKE_TARGET)
-blksclean:
+all apps: blocks
+blocks:
+	$(MAKE_APP)
+blocksclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -48,16 +48,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #---------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: blks blksclean
+.PHONY: build.blocks blocksclean
 
 all: $(BLOCKS.EXE)
-blks: $(OUTDIRS) $(BLOCKS.EXE)
-clean: blksclean
+build.blocks: $(OUTDIRS) $(BLOCKS.EXE)
+clean: blocksclean
 
 $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)
 	$(DO.LINK.EXE)
 
-blksclean:
+blocksclean:
 	-$(RM) $(BLOCKS.EXE) $(OBJ.BLOCKS)
 
 ifdef DO_DEPEND

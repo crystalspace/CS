@@ -47,7 +47,7 @@ OBJ.SNDEAX = $(addprefix $(OUT),$(notdir $(SRC.SNDEAX:.cpp=$O)))
 DEP.SNDEAX = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDEAX
-DSP.SNDEAX.NAME = sndrdreax
+DSP.SNDEAX.NAME = sndeax
 DSP.SNDEAX.TYPE = plugin
 DSP.SNDEAX.LIBS = dsound eax eaxguid
 

@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.demsky = Crystal Space sky demo
+DESCRIPTION.demosky = Crystal Space sky demo
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make demsky       Make the $(DESCRIPTION.demsky)$"
+APPHELP += $(NEWLINE)echo $"  make demosky      Make the $(DESCRIPTION.demosky)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: demsky demskyclean
+.PHONY: demosky demoskyclean
 
-all apps: demsky
-demsky:
-	$(MAKE_TARGET)
-demskyclean:
+all apps: demosky
+demosky:
+	$(MAKE_APP)
+demoskyclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,16 +45,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: demsky demskyclean
+.PHONY: build.demosky demoskyclean
 
 all: $(DEMOSKY.EXE)
-demsky: $(OUTDIRS) $(DEMOSKY.EXE)
-clean: demskyclean
+build.demosky: $(OUTDIRS) $(DEMOSKY.EXE)
+clean: demoskyclean
 
 $(DEMOSKY.EXE): $(DEP.EXE) $(OBJ.DEMOSKY) $(LIB.DEMOSKY)
 	$(DO.LINK.EXE)
 
-demskyclean:
+demoskyclean:
 	-$(RM) $(DEMOSKY.EXE) $(OBJ.DEMOSKY)
 
 ifdef DO_DEPEND

@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.csmod = Crystal Space mod MikMod sound loader
+DESCRIPTION.sndmod = Crystal Space mod MikMod sound loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make csmod        Make the $(DESCRIPTION.csmod)$"
+  $(NEWLINE)echo $"  make sndmod       Make the $(DESCRIPTION.sndmod)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csmod csmodclean
-all plugins drivers snddrivers: csmod
+.PHONY: sndmod csmodclean
+all plugins drivers snddrivers: sndmod
 
-csmod:
+sndmod:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csmodclean:
 	$(MAKE_CLEAN)
@@ -29,45 +29,45 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/mod
 
 ifeq ($(USE_PLUGINS),yes)
-  CSMOD = $(OUTDLL)sndmod$(DLL)
-  LIB.CSMOD = $(foreach d,$(DEP.CSMOD),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(CSMOD)
+  SNDMOD = $(OUTDLL)sndmod$(DLL)
+  LIB.SNDMOD = $(foreach d,$(DEP.SNDMOD),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDMOD)
 else
-  CSMOD = $(OUT)$(LIB_PREFIX)sndmod$(LIB)
-  DEP.EXE += $(CSMOD)
+  SNDMOD = $(OUT)$(LIB_PREFIX)sndmod$(LIB)
+  DEP.EXE += $(SNDMOD)
   SCF.STATIC += sndmod
-  TO_INSTALL.STATIC_LIBS += $(CSMOD)
+  TO_INSTALL.STATIC_LIBS += $(SNDMOD)
 endif
 
-INC.CSMOD = $(wildcard plugins/sound/loader/mod/*.h)
-SRC.CSMOD = $(wildcard plugins/sound/loader/mod/*.cpp)
-OBJ.CSMOD = $(addprefix $(OUT),$(notdir $(SRC.CSMOD:.cpp=$O)))
-DEP.CSMOD = CSUTIL CSSYS CSUTIL
+INC.SNDMOD = $(wildcard plugins/sound/loader/mod/*.h)
+SRC.SNDMOD = $(wildcard plugins/sound/loader/mod/*.cpp)
+OBJ.SNDMOD = $(addprefix $(OUT),$(notdir $(SRC.SNDMOD:.cpp=$O)))
+DEP.SNDMOD = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += CSMOD
-DSP.CSMOD.NAME = sndmod
-DSP.CSMOD.TYPE = plugin
-DSP.CSMOD.LIBS = mikmod
+MSVC.DSP += SNDMOD
+DSP.SNDMOD.NAME = sndmod
+DSP.SNDMOD.TYPE = plugin
+DSP.SNDMOD.LIBS = mikmod
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csmod csmodclean
+.PHONY: sndmod csmodclean
 
-csmod: $(OUTDIRS) $(CSMOD)
+sndmod: $(OUTDIRS) $(SNDMOD)
 
-$(CSMOD): $(OBJ.CSMOD) $(LIB.CSMOD)
+$(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)
 	$(DO.PLUGIN) -lmikmod
 
 clean: csmodclean
 csmodclean:
-	$(RM) $(CSMOD) $(OBJ.CSMOD)
+	$(RM) $(SNDMOD) $(OBJ.SNDMOD)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndmod.dep
-$(OUTOS)sndmod.dep: $(SRC.CSMOD)
+$(OUTOS)sndmod.dep: $(SRC.SNDMOD)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndmod.dep

@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.tutsimplept = Crystal Space procedural textures tutorial
+DESCRIPTION.simplept = Crystal Space procedural textures tutorial
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make tutsimplept  Make the $(DESCRIPTION.tutsimplept)$"
+  $(NEWLINE)echo $"  make simplept     Make the $(DESCRIPTION.simplept)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tutsimplept tutsimpleptclean
+.PHONY: simplept tutsimpleptclean
 
-all apps: tutsimplept
-tutsimplept:
-	$(MAKE_TARGET)
+all apps: simplept
+simplept:
+	$(MAKE_APP)
 tutsimpleptclean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tutsimplept tutsimpleptclean
+.PHONY: build.simplept tutsimpleptclean
 
 all: $(SIMPLEPT.EXE)
-tutsimplept: $(OUTDIRS) $(SIMPLEPT.EXE)
+build.simplept: $(OUTDIRS) $(SIMPLEPT.EXE)
 clean: tutsimpleptclean
 
 $(SIMPLEPT.EXE): $(DEP.EXE) $(OBJ.SIMPLEPT) $(LIB.SIMPLEPT)

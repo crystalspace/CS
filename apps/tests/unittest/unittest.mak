@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.unit = Crystal Space Unit Tester
+DESCRIPTION.unittest = Crystal Space unittest Tester
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make unit         Make the $(DESCRIPTION.unit)$"
+APPHELP += $(NEWLINE)echo $"  make unittest     Make the $(DESCRIPTION.unittest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: unit unitclean
+.PHONY: unittest unitclean
 
-all apps: unit
-unit:
-	$(MAKE_TARGET)
+all apps: unittest
+unittest:
+	$(MAKE_APP)
 unitclean:
 	$(MAKE_CLEAN)
 
@@ -48,10 +48,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: unit unitclean
+.PHONY: build.unittest unitclean
 
 all: $(UNITTEST.EXE)
-unit: $(OUTDIRS) $(UNITTEST.EXE)
+build.unittest: $(OUTDIRS) $(UNITTEST.EXE)
 clean: unitclean
 
 $(UNITTEST.EXE): $(DEP.EXE) $(OBJ.UNITTEST) $(LIB.UNITTEST)

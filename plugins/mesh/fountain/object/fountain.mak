@@ -1,21 +1,21 @@
-DESCRIPTION.fount = Fountain mesh object plug-in
+DESCRIPTION.fountain = Fountain mesh object plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make fount        Make the $(DESCRIPTION.fount)$"
+  $(NEWLINE)echo $"  make fountain     Make the $(DESCRIPTION.fountain)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: fount fountclean
-plugins meshes all: fount
+.PHONY: fountain fountclean
+plugins meshes all: fountain
 
 fountclean:
 	$(MAKE_CLEAN)
-fount:
+fountain:
 	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -25,42 +25,42 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/mesh/fountain/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
-  FOUNT = $(OUTDLL)fountain$(DLL)
-  LIB.FOUNT = $(foreach d,$(DEP.FOUNT),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(FOUNT)
+  FOUNTAIN = $(OUTDLL)fountain$(DLL)
+  LIB.FOUNTAIN = $(foreach d,$(DEP.FOUNTAIN),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(FOUNTAIN)
 else
-  FOUNT = $(OUT)$(LIB_PREFIX)fountain$(LIB)
-  DEP.EXE += $(FOUNT)
+  FOUNTAIN = $(OUT)$(LIB_PREFIX)fountain$(LIB)
+  DEP.EXE += $(FOUNTAIN)
   SCF.STATIC += fountain
-  TO_INSTALL.STATIC_LIBS += $(FOUNT)
+  TO_INSTALL.STATIC_LIBS += $(FOUNTAIN)
 endif
 
-INC.FOUNT = $(wildcard plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h)
-SRC.FOUNT = $(wildcard plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp)
-OBJ.FOUNT = $(addprefix $(OUT),$(notdir $(SRC.FOUNT:.cpp=$O)))
-DEP.FOUNT = CSGEOM CSUTIL CSSYS CSUTIL
+INC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h)
+SRC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp)
+OBJ.FOUNTAIN = $(addprefix $(OUT),$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
+DEP.FOUNTAIN = CSGEOM CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += FOUNT
-DSP.FOUNT.NAME = fountain
-DSP.FOUNT.TYPE = plugin
+MSVC.DSP += FOUNTAIN
+DSP.FOUNTAIN.NAME = fountain
+DSP.FOUNTAIN.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: fount fountclean
-fount: $(OUTDIRS) $(FOUNT)
+.PHONY: fountain fountclean
+fountain: $(OUTDIRS) $(FOUNTAIN)
 
-$(FOUNT): $(OBJ.FOUNT) $(LIB.FOUNT)
+$(FOUNTAIN): $(OBJ.FOUNTAIN) $(LIB.FOUNTAIN)
 	$(DO.PLUGIN)
 
 clean: fountclean
 fountclean:
-	-$(RM) $(FOUNT) $(OBJ.FOUNT)
+	-$(RM) $(FOUNTAIN) $(OBJ.FOUNTAIN)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)fount.dep
-$(OUTOS)fount.dep: $(SRC.FOUNT)
+$(OUTOS)fount.dep: $(SRC.FOUNTAIN)
 	$(DO.DEP)
 else
 -include $(OUTOS)fount.dep

@@ -2,24 +2,24 @@
 ifneq (,$(findstring aws,$(PLUGINS) $(PLUGINS.DYNAMIC)))
 
 # Application description
-DESCRIPTION.awstst = Alternate Windowing System test
+DESCRIPTION.awstest = Alternate Windowing System test
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP+=$(NEWLINE)echo $"  make awstst       Make the $(DESCRIPTION.awstst)$"
+APPHELP+=$(NEWLINE)echo $"  make awstest      Make the $(DESCRIPTION.awstest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: awstst awststclean
+.PHONY: awstest awststclean
 
-all apps: awstst
-awstst:
-	$(MAKE_TARGET)
+all apps: awstest
+awstest:
+	$(MAKE_APP)
 awststclean:
 	$(MAKE_CLEAN)
 
@@ -50,10 +50,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: awstst awststclean
+.PHONY: build.awstest awststclean
 
 all: $(AWSTEST.EXE)
-awstst: $(OUTDIRS) $(AWSTEST.EXE)
+build.awstest: $(OUTDIRS) $(AWSTEST.EXE)
 clean: awststclean
 
 $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)

@@ -41,13 +41,14 @@ INC.ENGINE = $(wildcard plugins/engine/3d/*.h)
 SRC.ENGINE = $(wildcard plugins/engine/3d/*.cpp)
 OBJ.ENGINE = $(addprefix $(OUT),$(notdir $(SRC.ENGINE:.cpp=$O)))
 # @@@ Should also include "CSENGINE" but see *Mingw* note below.
-DEP.ENGINE = CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+#DEP.ENGINE = CSGFX CSUTIL CSSYS CSGEOM 
+DEP.ENGINE = CSENGINE CSGFX CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += ENGINE
 DSP.ENGINE.NAME = engine
 DSP.ENGINE.TYPE = plugin
 # @@@ Should be no need to set this variable at all but see *Mingw* note below.
-DSP.ENGINE.RESOURCES = $(INC.CSENGINE) $(SRC.CSENGINE)
+#DSP.ENGINE.RESOURCES = $(INC.CSENGINE) $(SRC.CSENGINE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -65,7 +66,8 @@ engine: $(OUTDIRS) $(ENGINE)
 # around this problem, instead of linking with CSENGINE.LIB as expected, we
 # link individually with the object files from OBJ.CSENGINE.  The real solution
 # to this problem, however, is to figure out why dllwrap is misbehaving.
-$(ENGINE): $(OBJ.ENGINE) $(OBJ.CSENGINE) $(LIB.ENGINE)
+#$(ENGINE): $(OBJ.ENGINE) $(OBJ.CSENGINE) $(LIB.ENGINE)
+$(ENGINE): $(OBJ.ENGINE) $(LIB.ENGINE)
 	$(DO.PLUGIN)
 
 clean: engineclean

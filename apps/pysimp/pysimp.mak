@@ -2,25 +2,25 @@
 ifneq (,$(findstring cspython,$(PLUGINS) $(PLUGINS.DYNAMIC)))
 
 # Application description
-DESCRIPTION.pysimple = Crystal Space Python example
+DESCRIPTION.pysimp = Crystal Space Python example
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make pysimple     Make the $(DESCRIPTION.pysimple)$"
+  $(NEWLINE)echo $"  make pysimp       Make the $(DESCRIPTION.pysimp)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pysimple pysimpleclean
+.PHONY: pysimp pysimpleclean
 
-all apps: pysimple
-pysimple:
-	$(MAKE_TARGET)
+all apps: pysimp
+pysimp:
+	$(MAKE_APP)
 pysimpleclean:
 	$(MAKE_CLEAN)
 
@@ -49,10 +49,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: pysimple pysimpleclean
+.PHONY: build.pysimp pysimpleclean
 
 all: $(PYSIMP.EXE)
-pysimple: $(OUTDIRS) $(PYSIMP.EXE)
+build.pysimp: $(OUTDIRS) $(PYSIMP.EXE)
 clean: pysimpleclean
 
 $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)

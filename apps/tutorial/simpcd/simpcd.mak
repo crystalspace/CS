@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.tutsimpcd = Crystal Space CD tutorial
+DESCRIPTION.simpcd = Crystal Space CD tutorial
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make tutsimpcd    Make the $(DESCRIPTION.tutsimpcd)$"
+  $(NEWLINE)echo $"  make simpcd       Make the $(DESCRIPTION.simpcd)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tutsimpcd tutsimpcdclean
+.PHONY: simpcd tutsimpcdclean
 
-all apps: tutsimpcd
-tutsimpcd:
-	$(MAKE_TARGET)
+all apps: simpcd
+simpcd:
+	$(MAKE_APP)
 tutsimpcdclean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tutsimpcd tutsimpcdclean
+.PHONY: build.simpcd tutsimpcdclean
 
 all: $(SIMPCD.EXE)
-tutsimpcd: $(OUTDIRS) $(SIMPCD.EXE)
+build.simpcd: $(OUTDIRS) $(SIMPCD.EXE)
 clean: tutsimpcdclean
 
 $(SIMPCD.EXE): $(DEP.EXE) $(OBJ.SIMPCD) $(LIB.SIMPCD)

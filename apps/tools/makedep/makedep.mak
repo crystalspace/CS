@@ -1,22 +1,22 @@
 # Application description
-DESCRIPTION.mkdep = Dependency generation tool
+DESCRIPTION.makedep = Dependency generation tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make mkdep        Make the $(DESCRIPTION.mkdep)$"
+APPHELP += $(NEWLINE)echo $"  make makedep      Make the $(DESCRIPTION.makedep)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: mkdep mkdepclean
+.PHONY: makedep mkdepclean
 
-#all apps: mkdep
-mkdep:
-	$(MAKE_TARGET)
+#all apps: makedep
+makedep:
+	$(MAKE_APP)
 mkdepclean:
 	$(MAKE_CLEAN)
 
@@ -45,10 +45,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: mkdep mkdepclean
+.PHONY: build.makedep mkdepclean
 
 all: $(MAKEDEP.EXE)
-mkdep: $(OUTDIRS) $(MAKEDEP.EXE)
+build.makedep: $(OUTDIRS) $(MAKEDEP.EXE)
 clean: mkdepclean
 
 $(OUT)main$O: apps/tools/makedep/main.cpp
@@ -61,11 +61,11 @@ mkdepclean:
 	-$(RM) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)mkdep.dep
-$(OUTOS)mkdep.dep: $(SRC.MAKEDEP)
+dep: $(OUTOS)makedep.dep
+$(OUTOS)makedep.dep: $(SRC.MAKEDEP)
 	$(DO.DEP)
 else
--include $(OUTOS)mkdep.dep
+-include $(OUTOS)makedep.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -1,24 +1,24 @@
 # Application description
-DESCRIPTION.milkconv = Milkshape ACII Model conversion tool
+DESCRIPTION.milk2spr = Milkshape ASCII Model conversion tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make milkconv     Make the $(DESCRIPTION.milkconv)$"
+  $(NEWLINE)echo $"  make milk2spr     Make the $(DESCRIPTION.milk2spr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: milkconv milkconvclean
+.PHONY: milk2spr milk2sprclean
 
-all apps: milkconv
-milkconv:
-	$(MAKE_TARGET)
-milkconvclean:
+all apps: milk2spr
+milk2spr:
+	$(MAKE_APP)
+milk2sprclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -46,16 +46,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: milkconv milkconvclean
+.PHONY: build.milk2spr milk2sprclean
 
 all: $(MILK2SPR.EXE)
-milkconv: $(OUTDIRS) $(MILK2SPR.EXE)
-clean: milkconvclean
+build.milk2spr: $(OUTDIRS) $(MILK2SPR.EXE)
+clean: milk2sprclean
 
 $(MILK2SPR.EXE): $(OBJ.MILK2SPR) $(LIB.MILK2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
-milkconvclean:
+milk2sprclean:
 	-$(RM) $(MILK2SPR.EXE) $(OBJ.MILK2SPR)
 
 ifdef DO_DEPEND

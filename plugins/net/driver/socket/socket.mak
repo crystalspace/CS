@@ -1,22 +1,22 @@
 # Driver description
-DESCRIPTION.socket = Crystal Space socket network driver
+DESCRIPTION.cssocket = Crystal Space socket network driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make socket       Make the $(DESCRIPTION.socket)$"
+  $(NEWLINE)echo $"  make cssocket     Make the $(DESCRIPTION.cssocket)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: socket socketclean
-all plugins drivers netdrivers: socket
+.PHONY: cssocket socketclean
+all plugins drivers netdrivers: cssocket
 
-socket:
+cssocket:
 	$(MAKE_TARGET) MAKE_DLL=yes
 socketclean:
 	$(MAKE_CLEAN)
@@ -29,47 +29,47 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/net/driver/socket
 
 ifeq ($(USE_PLUGINS),yes)
-  SOCKET = $(OUTDLL)cssocket$(DLL)
-  LIB.SOCKET = $(foreach d,$(DEP.SOCKET),$($d.LIB))
-  LIB.SOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
-  TO_INSTALL.DYNAMIC_LIBS += $(SOCKET)
+  CSSOCKET = $(OUTDLL)cssocket$(DLL)
+  LIB.CSSOCKET = $(foreach d,$(DEP.CSSOCKET),$($d.LIB))
+  LIB.CSSOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(CSSOCKET)
 else
-  SOCKET = $(OUT)$(LIB_PREFIX)cssocket$(LIB)
-  DEP.EXE += $(SOCKET)
+  CSSOCKET = $(OUT)$(LIB_PREFIX)cssocket$(LIB)
+  DEP.EXE += $(CSSOCKET)
   LIBS.EXE += $(LIBS.SOCKET.SYSTEM)
   SCF.STATIC += cssocket
-  TO_INSTALL.STATIC_LIBS += $(SOCKET)
+  TO_INSTALL.STATIC_LIBS += $(CSSOCKET)
 endif
 
-INC.SOCKET = $(wildcard plugins/net/driver/socket/*.h)
-SRC.SOCKET = $(wildcard plugins/net/driver/socket/*.cpp)
-OBJ.SOCKET = $(addprefix $(OUT),$(notdir $(SRC.SOCKET:.cpp=$O)))
-DEP.SOCKET = CSUTIL CSSYS CSUTIL
+INC.CSSOCKET = $(wildcard plugins/net/driver/socket/*.h)
+SRC.CSSOCKET = $(wildcard plugins/net/driver/socket/*.cpp)
+OBJ.CSSOCKET = $(addprefix $(OUT),$(notdir $(SRC.CSSOCKET:.cpp=$O)))
+DEP.CSSOCKET = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += SOCKET
-DSP.SOCKET.NAME = cssocket
-DSP.SOCKET.TYPE = plugin
-DSP.SOCKET.LIBS = wsock32
+MSVC.DSP += CSSOCKET
+DSP.CSSOCKET.NAME = cssocket
+DSP.CSSOCKET.TYPE = plugin
+DSP.CSSOCKET.LIBS = wsock32
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: socket socketclean
+.PHONY: cssocket socketclean
 
-socket: $(OUTDIRS) $(SOCKET)
+cssocket: $(OUTDIRS) $(CSSOCKET)
 
-$(SOCKET): $(OBJ.SOCKET) $(LIB.SOCKET)
-	$(DO.PLUGIN) $(LIB.SOCKET.SPECIAL)
+$(CSSOCKET): $(OBJ.CSSOCKET) $(LIB.CSSOCKET)
+	$(DO.PLUGIN) $(LIB.CSSOCKET.SPECIAL)
 
 clean: socketclean
 socketclean:
-	$(RM) $(SOCKET) $(OBJ.SOCKET)
+	$(RM) $(CSSOCKET) $(OBJ.CSSOCKET)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)socket.dep
-$(OUTOS)socket.dep: $(SRC.SOCKET)
+$(OUTOS)socket.dep: $(SRC.CSSOCKET)
 	$(DO.DEP)
 else
 -include $(OUTOS)socket.dep

@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.iff = Crystal Space iff sound loader
+DESCRIPTION.sndiff = Crystal Space iff sound loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make iff          Make the $(DESCRIPTION.iff)$"
+  $(NEWLINE)echo $"  make sndiff       Make the $(DESCRIPTION.sndiff)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: iff iffclean
-all plugins drivers snddrivers: iff
+.PHONY: sndiff iffclean
+all plugins drivers snddrivers: sndiff
 
-iff:
+sndiff:
 	$(MAKE_TARGET) MAKE_DLL=yes
 iffclean:
 	$(MAKE_CLEAN)
@@ -29,46 +29,46 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/iff plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  IFF = $(OUTDLL)sndiff$(DLL)
-  LIB.IFF = $(foreach d,$(DEP.IFF),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(IFF)
+  SNDIFF = $(OUTDLL)sndiff$(DLL)
+  LIB.SNDIFF = $(foreach d,$(DEP.SNDIFF),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDIFF)
 else
-  IFF = $(OUT)$(LIB_PREFIX)sndiff$(LIB)
-  DEP.EXE += $(IFF)
+  SNDIFF = $(OUT)$(LIB_PREFIX)sndiff$(LIB)
+  DEP.EXE += $(SNDIFF)
   SCF.STATIC += sndiff
-  TO_INSTALL.STATIC_LIBS += $(IFF)
+  TO_INSTALL.STATIC_LIBS += $(SNDIFF)
 endif
 
-INC.IFF = $(wildcard plugins/sound/loader/iff/*.h) \
+INC.SNDIFF = $(wildcard plugins/sound/loader/iff/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
-SRC.IFF = $(wildcard plugins/sound/loader/iff/*.cpp) \
+SRC.SNDIFF = $(wildcard plugins/sound/loader/iff/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.IFF = $(addprefix $(OUT),$(notdir $(SRC.IFF:.cpp=$O)))
-DEP.IFF = CSUTIL CSSYS CSUTIL
+OBJ.SNDIFF = $(addprefix $(OUT),$(notdir $(SRC.SNDIFF:.cpp=$O)))
+DEP.SNDIFF = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += IFF
-DSP.IFF.NAME = sndiff
-DSP.IFF.TYPE = plugin
+MSVC.DSP += SNDIFF
+DSP.SNDIFF.NAME = sndiff
+DSP.SNDIFF.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: iff iffclean
+.PHONY: sndiff iffclean
 
-iff: $(OUTDIRS) $(IFF)
+sndiff: $(OUTDIRS) $(SNDIFF)
 
-$(IFF): $(OBJ.IFF) $(LIB.IFF)
+$(SNDIFF): $(OBJ.SNDIFF) $(LIB.SNDIFF)
 	$(DO.PLUGIN)
 
 clean: iffclean
 iffclean:
-	$(RM) $(IFF) $(OBJ.IFF)
+	$(RM) $(SNDIFF) $(OBJ.SNDIFF)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndiff.dep
-$(OUTOS)sndiff.dep: $(SRC.IFF)
+$(OUTOS)sndiff.dep: $(SRC.SNDIFF)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndiff.dep

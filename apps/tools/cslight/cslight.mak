@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.cslght = Crystal Space Lighting Calculator
+DESCRIPTION.cslight = Crystal Space Lighting Calculator
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make cslght       Make the $(DESCRIPTION.cslght)$"
+  $(NEWLINE)echo $"  make cslight      Make the $(DESCRIPTION.cslight)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cslght cslghtclean
+.PHONY: cslight cslghtclean
 
-all apps: cslght
-cslght:
-	$(MAKE_TARGET)
+all apps: cslight
+cslight:
+	$(MAKE_APP)
 cslghtclean:
 	$(MAKE_CLEAN)
 
@@ -48,10 +48,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cslght cslghtclean
+.PHONY: build.cslight cslghtclean
 
 all: $(CSLIGHT.EXE)
-cslght: $(OUTDIRS) $(CSLIGHT.EXE)
+build.cslight: $(OUTDIRS) $(CSLIGHT.EXE)
 clean: cslghtclean
 
 $(CSLIGHT.EXE): $(DEP.EXE) $(OBJ.CSLIGHT) $(LIB.CSLIGHT)

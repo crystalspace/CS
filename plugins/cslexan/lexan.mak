@@ -1,22 +1,22 @@
 #------------------------------------------------------------------------------
 # Lexical Analyzer plugin submakefile
 #------------------------------------------------------------------------------
-DESCRIPTION.lexan = Crystal Space lexical analyzer plug-in
+DESCRIPTION.cslexan = Crystal Space lexical analyzer plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make lexan        Make the $(DESCRIPTION.lexan)$"
+  $(NEWLINE)echo $"  make cslexan      Make the $(DESCRIPTION.cslexan)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: lexan lexanclean
-all plugins: lexan
+.PHONY: cslexan lexanclean
+all plugins: cslexan
 
-lexan:
+cslexan:
 	$(MAKE_TARGET) MAKE_DLL=yes
 lexanclean:
 	$(MAKE_CLEAN)
@@ -28,42 +28,42 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/cslexan
 
 ifeq ($(USE_PLUGINS),yes)
-  LEXAN = $(OUTDLL)cslexan$(DLL)
-  LIB.LEXAN = $(foreach d,$(DEP.LEXAN),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(LEXAN)
+  CSLEXAN = $(OUTDLL)cslexan$(DLL)
+  LIB.CSLEXAN = $(foreach d,$(DEP.CSLEXAN),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSLEXAN)
 else
-  LEXAN = $(OUT)$(LIB_PREFIX)cslexan$(LIB)
-  DEP.EXE += $(LEXAN)
+  CSLEXAN = $(OUT)$(LIB_PREFIX)cslexan$(LIB)
+  DEP.EXE += $(CSLEXAN)
   SCF.STATIC += cslexan
-  TO_INSTALL.STATIC_LIBS += $(LEXAN)
+  TO_INSTALL.STATIC_LIBS += $(CSLEXAN)
 endif
 
-INC.LEXAN = $(wildcard plugins/cslexan/*.h)
-SRC.LEXAN = $(wildcard plugins/cslexan/*.cpp)
-OBJ.LEXAN = $(addprefix $(OUT),$(notdir $(SRC.LEXAN:.cpp=$O)))
-DEP.LEXAN = CSUTIL CSSYS CSUTIL
+INC.CSLEXAN = $(wildcard plugins/cslexan/*.h)
+SRC.CSLEXAN = $(wildcard plugins/cslexan/*.cpp)
+OBJ.CSLEXAN = $(addprefix $(OUT),$(notdir $(SRC.CSLEXAN:.cpp=$O)))
+DEP.CSLEXAN = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += LEXAN
-DSP.LEXAN.NAME = cslexan
-DSP.LEXAN.TYPE = plugin
+MSVC.DSP += CSLEXAN
+DSP.CSLEXAN.NAME = cslexan
+DSP.CSLEXAN.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: lexan lexanclean
-lexan: $(OUTDIRS) $(LEXAN)
+.PHONY: cslexan lexanclean
+cslexan: $(OUTDIRS) $(LEXAN)
 
-$(LEXAN): $(OBJ.LEXAN) $(LIB.LEXAN)
+$(CSLEXAN): $(OBJ.CSLEXAN) $(LIB.CSLEXAN)
 	$(DO.PLUGIN)
 
 clean: lexanclean
 lexanclean:
-	-$(RM) $(LEXAN) $(OBJ.LEXAN)
+	-$(RM) $(CSLEXAN) $(OBJ.CSLEXAN)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)lexan.dep
-$(OUTOS)lexan.dep: $(SRC.LEXAN)
+$(OUTOS)lexan.dep: $(SRC.CSLEXAN)
 	$(DO.DEP)
 else
 -include $(OUTOS)lexan.dep

@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.tutsimpvs = Crystal Space tutorial, video selector
+DESCRIPTION.simpvs = Crystal Space tutorial, video selector
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make tutsimpvs    Make the $(DESCRIPTION.tutsimpvs)$"
+  $(NEWLINE)echo $"  make simpvs       Make the $(DESCRIPTION.simpvs)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: tutsimpvs tutsimpvsclean
+.PHONY: simpvs tutsimpvsclean
 
-all apps: tutsimpvs
-tutsimpvs:
-	$(MAKE_TARGET)
+all apps: simpvs
+simpvs:
+	$(MAKE_APP)
 tutsimpvsclean:
 	$(MAKE_CLEAN)
 
@@ -46,10 +46,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: tutsimpvs tutsimpvsclean
+.PHONY: build.simpvs tutsimpvsclean
 
 all: $(SIMPVS.EXE)
-tutsimpvs: $(OUTDIRS) $(SIMPVS.EXE)
+build.simpvs: $(OUTDIRS) $(SIMPVS.EXE)
 clean: tutsimpvsclean
 
 $(SIMPVS.EXE): $(DEP.EXE) $(OBJ.SIMPVS) $(LIB.SIMPVS)

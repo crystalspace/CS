@@ -1,25 +1,25 @@
 ifeq ($(HAS_CAL3D),yes)
 # Application description
-DESCRIPTION.cal3dtocs = Cal3D to Sprite3D converter
+DESCRIPTION.caltocs = Cal3D to Sprite3D converter
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make cal3dtocs    Make the $(DESCRIPTION.cal3dtocs)$"
+  $(NEWLINE)echo $"  make caltocs      Make the $(DESCRIPTION.caltocs)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cal3dtocs cal3dtocsclean
+.PHONY: caltocs caltocsclean
 
-all apps: cal3dtocs
-cal3dtocs:
-	$(MAKE_TARGET)
-cal3dtocsclean:
+all apps: caltocs
+caltocs:
+	$(MAKE_APP)
+caltocsclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -45,16 +45,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cal3dtocs cal3dtocsclean
+.PHONY: build.caltocs caltocsclean
 
 all: $(CALTOCS.EXE)
-cal3dtocs: $(OUTDIRS) $(CALTOCS.EXE)
-clean: cal3dtocsclean
+build.caltocs: $(OUTDIRS) $(CALTOCS.EXE)
+clean: caltocsclean
 
 $(CALTOCS.EXE): $(OBJ.CALTOCS)
 	$(DO.LINK.CONSOLE.EXE) -lcal3d -lstdc++
 
-cal3dtocsclean:
+caltocsclean:
 	-$(RM) $(CALTOCS.EXE) $(OBJ.CALTOCS)
 
 ifdef DO_DEPEND

@@ -1,19 +1,19 @@
-DESCRIPTION.rle = Crystal Space RLE codec
+DESCRIPTION.rlecodec = Crystal Space RLE codec
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make rle          Make the $(DESCRIPTION.rle)$"
+  $(NEWLINE)echo $"  make rlecodec     Make the $(DESCRIPTION.rlecodec)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: rle rleclean
-plugins all: rle
+.PHONY: rlecodec rleclean
+plugins all: rlecodec
 
-rle:
+rlecodec:
 	$(MAKE_TARGET) MAKE_DLL=yes
 rleclean:
 	$(MAKE_CLEAN)
@@ -52,8 +52,8 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: rle rleclean
-rle: $(OUTDIRS) $(RLE)
+.PHONY: rlecodec rleclean
+rlecodec: $(OUTDIRS) $(RLE)
 
 $(RLE): $(OBJ.RLE) $(LIB.RLE)
 	$(DO.PLUGIN) $(LIB.EXTERNAL.RLE)

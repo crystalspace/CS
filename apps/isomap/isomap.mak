@@ -1,23 +1,23 @@
 # Application description
-DESCRIPTION.isomaptst = Crystal Space isomap demo executable
+DESCRIPTION.isomap = Crystal Space isomap demo executable
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make isomaptst    Make the $(DESCRIPTION.isomaptst)$"
+APPHELP += $(NEWLINE)echo $"  make isomap       Make the $(DESCRIPTION.isomap)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: isomaptst isomaptstclean
+.PHONY: isomap isomapclean
 
-all apps: isomaptst
-isomaptst:
-	$(MAKE_TARGET)
-isomaptstclean:
+all apps: isomap
+isomap:
+	$(MAKE_APP)
+isomapclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: isomaptst isomaptstclean
+.PHONY: build.isomap isomapclean
 
 all: $(ISOMAP.EXE)
-isomaptst: $(OUTDIRS) $(ISOMAP.EXE)
-clean: isomaptstclean
+build.isomap: $(OUTDIRS) $(ISOMAP.EXE)
+clean: isomapclean
 
 $(ISOMAP.EXE): $(DEP.EXE) $(OBJ.ISOMAP) $(LIB.ISOMAP)
 	$(DO.LINK.EXE)
 
-isomaptstclean:
+isomapclean:
 	-$(RM) $(ISOMAP.EXE) $(OBJ.ISOMAP)
 
 ifdef DO_DEPEND

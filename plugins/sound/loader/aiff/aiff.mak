@@ -1,22 +1,22 @@
 # Plug-in description
-DESCRIPTION.aiff = Crystal Space aiff sound loader
+DESCRIPTION.sndaiff = Crystal Space aiff sound loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make aiff         Make the $(DESCRIPTION.aiff)$"
+  $(NEWLINE)echo $"  make sndaiff      Make the $(DESCRIPTION.sndaiff)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: aiff aiffclean
-all plugins drivers snddrivers: aiff
+.PHONY: sndaiff aiffclean
+all plugins drivers snddrivers: sndaiff
 
-aiff:
+sndaiff:
 	$(MAKE_TARGET) MAKE_DLL=yes
 aiffclean:
 	$(MAKE_CLEAN)
@@ -29,46 +29,46 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/sound/loader/aiff plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
-  AIFF = $(OUTDLL)sndaiff$(DLL)
-  LIB.AIFF = $(foreach d,$(DEP.AIFF),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(AIFF)
+  SNDAIFF = $(OUTDLL)sndaiff$(DLL)
+  LIB.SNDAIFF = $(foreach d,$(DEP.SNDAIFF),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDAIFF)
 else
-  AIFF = $(OUT)$(LIB_PREFIX)sndaiff$(LIB)
-  DEP.EXE += $(AIFF)
+  SNDAIFF = $(OUT)$(LIB_PREFIX)sndaiff$(LIB)
+  DEP.EXE += $(SNDAIFF)
   SCF.STATIC += sndaiff
-  TO_INSTALL.STATIC_LIBS += $(AIFF)
+  TO_INSTALL.STATIC_LIBS += $(SNDAIFF)
 endif
 
-INC.AIFF = $(wildcard plugins/sound/loader/aiff/*.h) \
+INC.SNDAIFF = $(wildcard plugins/sound/loader/aiff/*.h) \
   $(wildcard plugins/sound/loader/common/*.h)
-SRC.AIFF = $(wildcard plugins/sound/loader/aiff/*.cpp) \
+SRC.SNDAIFF = $(wildcard plugins/sound/loader/aiff/*.cpp) \
   $(wildcard plugins/sound/loader/common/*.cpp)
-OBJ.AIFF = $(addprefix $(OUT),$(notdir $(SRC.AIFF:.cpp=$O)))
-DEP.AIFF = CSUTIL CSSYS CSUTIL
+OBJ.SNDAIFF = $(addprefix $(OUT),$(notdir $(SRC.SNDAIFF:.cpp=$O)))
+DEP.SNDAIFF = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += AIFF
-DSP.AIFF.NAME = sndaiff
-DSP.AIFF.TYPE = plugin
+MSVC.DSP += SNDAIFF
+DSP.SNDAIFF.NAME = sndaiff
+DSP.SNDAIFF.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: aiff aiffclean
+.PHONY: sndaiff aiffclean
 
-aiff: $(OUTDIRS) $(AIFF)
+sndaiff: $(OUTDIRS) $(SNDAIFF)
 
-$(AIFF): $(OBJ.AIFF) $(LIB.AIFF)
+$(SNDAIFF): $(OBJ.SNDAIFF) $(LIB.SNDAIFF)
 	$(DO.PLUGIN)
 
 clean: aiffclean
 aiffclean:
-	$(RM) $(AIFF) $(OBJ.AIFF)
+	$(RM) $(SNDAIFF) $(OBJ.SNDAIFF)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndaiff.dep
-$(OUTOS)sndaiff.dep: $(SRC.AIFF)
+$(OUTOS)sndaiff.dep: $(SRC.SNDAIFF)
 	$(DO.DEP)
 else
 -include $(OUTOS)sndaiff.dep
