@@ -812,11 +812,11 @@ better integrated with the project. It is now also a mesh object.
 @subheading @sc{csws} Modal Session Paradigm Shift
 @cindex @sc{csws}
 @cindex @code{csMessageBox()}
-@cindex @code{csApp::Execute()}
-@cindex @code{csApp::StartModal()}
-@cindex @code{csApp::StopModal()}
-@cindex @code{csApp::GetTopModalUserdata()}
-@cindex @code{csApp::GetTopModalComponent()}
+@cindex @code{csApp.Execute()}
+@cindex @code{csApp.StartModal()}
+@cindex @code{csApp.StopModal()}
+@cindex @code{csApp.GetTopModalUserdata()}
+@cindex @code{csApp.GetTopModalComponent()}
 @cindex @code{iMessageBoxData}
 
 @code{csApp::Execute()} has been removed.  This method ran a modal session for
@@ -930,8 +930,8 @@ passing the parameter at all makes no sense.
 @subheading Miscellaneous Changes
 @cindex @code{iPortal}
 @cindex @code{csMeshWrapper}
-@cindex @code{csEngine::NextFrame()}
-@cindex @code{iEngine::NextFrame()}
+@cindex @code{csEngine.NextFrame()}
+@cindex @code{iEngine.NextFrame()}
 @cindex @code{csFilenameMatches()}
 @cindex @code{csGlobMatches()}
 

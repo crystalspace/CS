@@ -63,8 +63,8 @@ The following defines have changed:
 
 @subheading Engine Changes
 @cindex far planes
-@cindex @code{iEngine::LoadMeshFactory()}
-@cindex @code{iEngine::LoadMeshWrapper()}
+@cindex @code{iEngine.LoadMeshFactory()}
+@cindex @code{iEngine.LoadMeshWrapper()}
 
 Far plane handling in the engine has changed. Polygons are no longer
 clipped exactly to the far plane but instead the polygons are rejected
@@ -74,7 +74,7 @@ which are fully behind the far plane.
 used to have a @samp{classId} parameter. That parameter has now been removed.
 
 @subheading Various Changes
-@cindex @code{csPlane3::ClipPolygon()}
+@cindex @code{csPlane3.ClipPolygon()}
 
 @code{csPlane3::ClipPolygon()} will now by default consider the
 polygon to be visible on the negative side of the plane

@@ -867,16 +867,12 @@ public:
    */
   virtual iSectorIterator* GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
-
-  /**
-   * This routine returns an iterator to iterate over
-   * all objects of a given type that are within a radius
-   * of a given position. You can use SCF_QUERY_INTERFACE to get
-   * any interface from the returned objects. <p>
-   * Delete the iterator with 'DecRef()' when ready.
-   */
   virtual iObjectIterator* GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius);
+  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+    const csVector3& pos);
+  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+    const csFrustum& frustum);
 
   virtual bool RemoveObject (iBase* object);
 

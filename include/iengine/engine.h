@@ -28,6 +28,7 @@
 
 class csEngine;
 class csVector3;
+class csFrustum;
 class csMatrix3;
 class csColor;
 struct csTextureLayer;
@@ -177,7 +178,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 10);
+SCF_VERSION (iEngine, 0, 7, 11);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -682,13 +683,35 @@ struct iEngine : public iBase
 
   /**
    * This routine returns an iterator to iterate over
-   * all objects of a given type that are within a radius
+   * all objects that are within a radius
    * of a given position. You can use SCF_QUERY_INTERFACE to get
    * any interface from the returned objects.<p>
    * Delete the iterator with 'DecRef()' when ready.
    */
   virtual iObjectIterator* GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all objects that are potentially visible as seen from a given position.
+   * This routine assumes full 360 degree visibility.
+   * You can use SCF_QUERY_INTERFACE to get any interface from the
+   * returned objects.<p>
+   * Delete the iterator with 'DecRef()' when ready.
+   */
+  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+    const csVector3& pos) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all objects that are potentially visible as seen from a given position.
+   * This routine has a frustum restricting the view.
+   * You can use SCF_QUERY_INTERFACE to get any interface from the
+   * returned objects.<p>
+   * Delete the iterator with 'DecRef()' when ready.
+   */
+  virtual iObjectIterator* GetVisibleObjects (iSector* sector,
+    const csFrustum& frustum) = 0;
 
   /**
    * Conveniance function to 'remove' a CS object from the engine.

@@ -20,8 +20,8 @@ The @code{iCollideSystem::Collide()} function now accepts
 @code{csReversibleTransform} transforms instead of just @code{csTransform}.
 
 @subheading Texture Manager Changes
-@cindex @code{iTextureManager::UnregisterTexture()}
-@cindex @code{iTextureManager::UnregisterMaterial()}
+@cindex @code{iTextureManager.UnregisterTexture()}
+@cindex @code{iTextureManager.UnregisterMaterial()}
 
 The following deregistration functions have been removed.  Instead, use the
 normal @code{DecRef()} mechanism.
@@ -40,7 +40,7 @@ The functions @code{iRegion::Find@dots{}()} will no longer increase
 the reference count of the returned objects.
 
 @subheading GetThingState
-@cindex @code{iEngine::GetThingState()}
+@cindex @code{iEngine.GetThingState()}
 
 @code{iEngine::GetThingState()} has not been removed but this function
 is now deprecated. It is recommended that you get the @code{iMeshObjectType}

@@ -343,8 +343,6 @@ On the pointer returned by the following macros:
 @item
 @code{SCF_QUERY_INTERFACE()}
 @item
-@code{SCF_QUERY_INTERFACE_FAST()}
-@item
 @code{SCF_QUERY_INTERFACE_SAFE()}
 @item
 @code{CS_QUERY_REGISTRY()}

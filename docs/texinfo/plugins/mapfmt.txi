@@ -206,8 +206,11 @@ backslash.
 @production{red, 0..1}@*
 @production{green, 0..1}@*
 @production{blue, 0..1}@*
-@production{color,
-    @nonterm{red} @COMMA{} @nonterm{green} @COMMA{} @nonterm{blue}}
+@production{gray, 0..1}@*
+@production{color-grayscale, @nonterm{gray}}@*
+@production{color-general,
+    @nonterm{red} @COMMA{} @nonterm{green} @COMMA{} @nonterm{blue}}@*
+@production{color, @nonterm{color-grayscale} | @nonterm{color-general}}
 
 @subsubheading Vectors and Coordinates
 @noindent
@@ -241,29 +244,30 @@ points forward.
 @production{file-name, @nonterm{name}}@*
 @production{region-name, @nonterm{name}}@*
 @production{plugin-name, @nonterm{name}}@*
-@production{plugin-shortname, @nonterm{name}}
+@production{plugin-shortname, @nonterm{name}}@*
+@production{cache-name, @nonterm{name}}@*
+@production{priority-name, @nonterm{name}}
 
 @subsubheading Attributes and Numbers
 @production{radius, @nonterm{pos-number}}@*
-@production{texture-length, @nonterm{pos-number}}@*
-@production{height-nr, @nonterm{number}}@*
 @production{angle, @nonterm{number}}@*
-@production{light-index, @token{0} | @nonterm{pos-integer}}@*
-@production{vertex-index, @token{0} | @nonterm{pos-integer}}@*
 @production{keyname, @nonterm{string}}@*
 @production{keyvalue, @nonterm{string}}
 
 @subsubheading Visibility Culling
-@production{culler, @token{CULLER} @LP{} @RP{}}
+Sidenote: the @samp{CULLER} statement is going to be obsolete in the future.
+
+@production{culler, @token{CULLER} @LP{} @nonterm{mesh-name} @RP{}}
+@production{cullerp, @token{CULLERP} @LP{} @nonterm{plugin-name} @RP{}}
 
 @subsubheading Key
+Use the @samp{KEY} feature to attach arbitrary game data to any Crystal
+Space object. Crystal Space will only store these key/value pairs with
+objects but doesn't otherwise use them. You can iterate over these
+keys in the code.
+
 @production{key,
     @token{KEY} @LP{} @nonterm{keyname} @COMMA{} @nonterm{keyvalue} @RP{}}
-
-@subsubheading Lighting Primitives
-@production{tex-lighting,
-    @token{TEXTURE_LIGHTING} @LP{} @nonterm{yes-no} @RP{}}@*
-@production{lighting, @token{LIGHTING} @LP{} @nonterm{yes-no} @RP{}}
 
 @subsubheading Fog
 @production{density, @nonterm{number}}@*
@@ -272,12 +276,8 @@ points forward.
 @production{alpha-nr, @token{0} | @token{25} | @token{50} | @token{75}}@*
 @production{alpha, @token{ALPHA} @LP{} @nonterm{alpha-nr} @RP{}}
 
-@subsubheading Vertex and Vector
-@production{vertex, @token{VERTEX} @LP{} @nonterm{coordinate} @RP{}}@*
-@production{vector, @token{V} @LP{} @nonterm{vector-3d} @RP{}}@*
-@production{quaternion, @token{Q} @LP{} @nonterm{vector-4d} @RP{}}
-
 @subsubheading Matrices, Vectors, Scalers, and Angles
+@production{vector, @token{V} @LP{} @nonterm{vector-3d} @RP{}}@*
 @production{matrix-scaler, @nonterm{number}}@*
 @production{matrix-x-scaler, @nonterm{matrix-scaler}}@*
 @production{matrix-y-scaler, @nonterm{matrix-scaler}}@*
@@ -331,15 +331,16 @@ points forward.
     @token{MATRIX} @LP{} [ @nonterm{matrix-type} @dots{} ] @RP{}}
 
 @production{move-comp, @nonterm{matrix} | @nonterm{vector}}@*
-@production{move2, @token{MOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}@*
-@production{move, @token{MOVE} @LP{} @nonterm{matrix} @nonterm{vector} @RP{}}@*
+@production{move, @token{MOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}@*
 @production{hardmove,
     @token{HARDMOVE} @LP{} [ @nonterm{move-comp} @dots{} ] @RP{}}
 
 @subsubheading Lights
+It is recommended to use the new syntax for lights.
+
 @production{dynamic-flag, @token{0} | @token{1}}@*
 @production{light-oldsyntax, @nonterm{coordinate} @token{:} @nonterm{radius}
-    @COMMA{} @nonterm{color} @COMMA{} @nonterm{dynamic-flag}}
+    @COMMA{} @nonterm{color-general} @COMMA{} @nonterm{dynamic-flag}}
 
 @production{light-center, @token{CENTER} @LP{} @nonterm{coordinate} @RP{}}@*
 @production{light-radius, @token{RADIUS} @LP{} @nonterm{radius} @RP{}}@*
@@ -357,6 +358,9 @@ points forward.
     @LP{} @nonterm{light-oldsyntax} | @nonterm{light-newsyntax} @RP{}}
 
 @subsubheading Collection Objects
+Note that collection objects are NOT hierarchical objects. A collection
+object is just one object that represents a group of other objects.
+
 @production{col-mesh, @token{MESH} @LP{} @nonterm{mesh-name} @RP{}}@*
 @production{col-collection,
     @token{COLLECTION} @LP{} @nonterm{col-name} @RP{}}@*
@@ -372,15 +376,6 @@ points forward.
 @subsubheading Materials and Textures
 @production{material, @token{MATERIAL} @LP{} @nonterm{material-name} @RP{}}@*
 @production{texture, @token{TEXTURE} @LP{} @nonterm{texture-name} @RP{}}@*
-@production{ceil-texture,
-    @token{CEIL_TEXTURE} @LP{} @nonterm{texture-name} @RP{}}@*
-@production{floor-texture,
-    @token{FLOOR_TEXTURE} @LP{} @nonterm{texture-name} @RP{}}@*
-@production{texnr,
-    @token{TEXNR} @LP{} @nonterm{texture-name} @RP{}} (Obsolete)@*
-@production{texlen, @token{LEN} @LP{} @nonterm{texture-length} @RP{}}@*
-@production{texture-scale,
-    @token{TEXTURE_SCALE} @LP{} @nonterm{texture-length} @RP{}}
 
 @subsubheading Material and Texture Description
 @production{transparent, @token{TRANSPARENT} @LP{} @nonterm{color} @RP{}}@*
@@ -413,25 +408,96 @@ points forward.
 @production{material-desc, @token{MATERIAL} @nonterm{material-name}
     @LP{} [ @nonterm{material-desc-comp} @dots{} ] @RP{}}
 
+@subsubheading LOD
+@production{lod-level, @token{LEVEL} @LP{} @nonterm{number} @RP{}}@*
+@production{lod-comp, @nonterm{lod-level}}@*
+@production{lod, @token{LOD} @LP{} [ @nonterm{lod-comp} @dots{} ] @RP{}}
+
 @subsubheading Mesh Objects
+Important note! This documentation explains ONLY the basic mesh object
+and factory parsing. It does NOT describe the parsing that is done by
+the loader plugin itself. So this means that everything inside the
+@samp{PARAMS} blocks is not documented in this document. Documentation
+for this will follow later in the mesh object plugin documentation.
+
 @production{plugin, @token{PLUGIN} @LP{} @nonterm{string} @RP{}}@*
 @production{params, @token{PARAMS} @LP{} @nonterm{string} @RP{}}
+@production{paramsfile, @token{PARAMSFILE} @LP{} @nonterm{file-name} @RP{}}
+@production{mesh-nolighting, @token{NOLIGHTING} @LP{} @RP{}}@*
+@production{mesh-noshadows, @token{NOSHADOWS} @LP{} @RP{}}@*
+@production{mesh-invisible, @token{INVISIBLE} @LP{} @RP{}}@*
+@production{mesh-detail, @token{DETAIL} @LP{} @RP{}}@*
+@production{mesh-zfill, @token{ZFILL} @LP{} @RP{}}@*
+@production{mesh-znone, @token{ZNONE} @LP{} @RP{}}@*
+@production{mesh-zuse, @token{ZUSE} @LP{} @RP{}}@*
+@production{mesh-ztest, @token{ZTEST} @LP{} @RP{}}@*
+@production{mesh-camera, @token{CAMERA} @LP{} @RP{}}@*
+@production{mesh-convex, @token{CONVEX} @LP{} @RP{}}@*
+@production{mesh-priority, @token{PRIORITY} @LP{} @nonterm{priority-name} @RP{}}@*
+@production{mesh-lmcache, @token{LMCACHE} @LP{} @nonterm{cache-name} @RP{}}@*
 
 @production{mesh-comp, @nonterm{plugin}}@*
+    @prodnext{@nonterm{addon}}@*
     @prodnext{@nonterm{key}}@*
     @prodnext{@nonterm{params}}@*
+    @prodnext{@nonterm{paramsfile}}@*
     @prodnext{@nonterm{mesh}}@*
-    @prodnext{@nonterm{move2}}@*
+    @prodnext{@nonterm{move}}@*
+    @prodnext{@nonterm{hardmove}}@*
+    @prodnext{@nonterm{lod}}@*
+    @prodnext{@nonterm{mesh}}@*
+    @prodnext{@nonterm{meshref}}@*
+    @prodnext{@nonterm{mesh-nolighting}}@*
+    @prodnext{@nonterm{mesh-noshadows}}@*
+    @prodnext{@nonterm{mesh-invisible}}@*
+    @prodnext{@nonterm{mesh-detail}}@*
+    @prodnext{@nonterm{mesh-zfill}}@*
+    @prodnext{@nonterm{mesh-znone}}@*
+    @prodnext{@nonterm{mesh-zuse}}@*
+    @prodnext{@nonterm{mesh-ztest}}@*
+    @prodnext{@nonterm{mesh-camera}}@*
+    @prodnext{@nonterm{mesh-convex}}@*
+    @prodnext{@nonterm{mesh-priority}}@*
+    @prodnext{@nonterm{mesh-lmcache}}@*
 @production{mesh, @token{MESHOBJ} @nonterm{mesh-name}
-    @LP{} [ @nonterm{mesh-comp} @dots{} ] @RP{}}
+    @LP{} [ @nonterm{mesh-comp} @dots{} ] @RP{}}@*
+@production{meshlib, @token{MESHLIB} @nonterm{mesh-name}
+    @LP{} [ @nonterm{mesh-comp} @dots{} @RP{}}
+
+@production{meshref-factory, @token{FACTORY} @LP{} @nonterm{meshfact-name} @RP{}}@*
+@production{meshref-comp, @nonterm{meshref-factory}}@*
+    @prodnext{@nonterm{addon}}@*
+    @prodnext{@nonterm{key}}@*
+    @prodnext{@nonterm{move}}@*
+    @prodnext{@nonterm{hardmove}}@*
+    @prodnext{@nonterm{lod}}@*
+    @prodnext{@nonterm{mesh-nolighting}}@*
+    @prodnext{@nonterm{mesh-noshadows}}@*
+    @prodnext{@nonterm{mesh-invisible}}@*
+    @prodnext{@nonterm{mesh-detail}}@*
+    @prodnext{@nonterm{mesh-zfill}}@*
+    @prodnext{@nonterm{mesh-znone}}@*
+    @prodnext{@nonterm{mesh-zuse}}@*
+    @prodnext{@nonterm{mesh-ztest}}@*
+    @prodnext{@nonterm{mesh-camera}}@*
+    @prodnext{@nonterm{mesh-convex}}@*
+    @prodnext{@nonterm{mesh-priority}}@*
+@production{meshref, @token{MESHREF} @nonterm{mesh-name}
+    @LP{} [ @nonterm{meshref-comp} @dots{} ] @RP{}}
 
 @subsubheading Mesh Object Factories
 @production{meshfact-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}@*
 @production{meshfact-comp, @nonterm{plugin}}@*
+    @prodnext{@nonterm{addon}}@*
     @prodnext{@nonterm{params}}@*
+    @prodnext{@nonterm{paramsfile}}@*
     @prodnext{@nonterm{meshfact-file}}@*
+    @prodnext{@nonterm{meshfact}}@*
+    @prodnext{@nonterm{move}}@*
+    @prodnext{@nonterm{hardmove}}@*
+    @prodnext{@nonterm{lod}}@*
     @prodnext{@nonterm{material}}@*
-@production{meshfact, @token{MESHOBJ} @nonterm{meshfact-name}
+@production{meshfact, @token{MESHFACT} @nonterm{meshfact-name}
     @LP{} [ @nonterm{meshfact-comp} @dots{} ] @RP{}}
 
 @subsubheading Nodes
@@ -441,12 +507,14 @@ points forward.
 
 @subsubheading Sectors
 
-@production{sector-comp, @nonterm{vertex}}@*
+@production{sector-comp, @nonterm{addon}}@*
     @prodnext{@nonterm{culler}}@*
+    @prodnext{@nonterm{cullerp}}@*
     @prodnext{@nonterm{light}}@*
     @prodnext{@nonterm{mesh}}@*
+    @prodnext{@nonterm{meshref}}@*
+    @prodnext{@nonterm{meshlib}}@*
     @prodnext{@nonterm{fog-desc}}@*
-    @prodnext{@nonterm{circle}}@*
     @prodnext{@nonterm{key}}@*
     @prodnext{@nonterm{node}}@*
 @production{sector, @token{SECTOR} @nonterm{sector-name}
@@ -468,8 +536,7 @@ This is where material groupings come in handy.  The final name of a texture
 in a @samp{MAT_SET} expression will be `@var{mat-set-name_texture-name}'.  The
 materials will be merged into the global texture list.  You should define a
 @samp{MAT_SET} after @samp{TEXTURES} since the latter command clears the
-internal list first.  For usage of @samp{MAT_SET} see the description of
-@samp{THING}.
+internal list first.
 
 @production{mat-set-name, @nonterm{name}}@*
 @production{material-set,
@@ -504,6 +571,9 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @LP{} [ @nonterm{plugin-comp} @dots{} ] @RP{}}
 
 @subsubheading Add-ons
+Same remark as for mesh objects: the stuff that is inside the
+@samp{PARAMS} block is not documented here.
+
 @production{addon-comp,
     @nonterm{plugin-spec} | @nonterm{plugin-params}}@*
 @production{addon, @token{ADDON} @LP{} [ @nonterm{addon-comp} @dots{} ] @RP{}}
@@ -521,10 +591,24 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @production{rendpri-value, @nonterm{integer}}@*
 @production{rendpri-setting,
     @token{BACK2FRONT} | @token{FRONT2BACK} | @token{NONE}}@*
-@production{rendpri-comp, @token{PRIORITY}
+@production{rendpri-comp, @token{PRIORITY} @nonterm{priority-name}
     @LP{} @nonterm{rendpri-value} @COMMA{} @nonterm{rendpri-setting} @RP{}}@*
 @production{renderpriorities, @token{RENDERPRIORITIES}
     @LP{} [ @nonterm{rendpri-comp} @dots{} ] @RP{}}
+
+@subsubheading Settings
+@production{setting-ambient, @token{AMBIENT} @LP{} @nonterm{color} @RP{}}@*
+@production{setting-clearzbuf, @token{CLEARZBUF} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{setting-clearscreen, @token{CLEARSCREEN} @LP{} @nonterm{yes-no} @RP{}}@*
+@production{setting-lightmapcellsize, @token{LIGHTMAPCELLSIZE} @LP{} @nonterm{pos-integer} @RP{}}@*
+@production{setting-maxlightmapsize, @token{MAXLIGHTMAPSIZE} @LP{} @nonterm{pos-integer} @COMMA{} @nonterm{pos-integer} @RP{}}@*
+@production{settings-comp, @nonterm{setting-ambient}}@*
+    @prodnext{@nonterm{setting-clearzbuf}}@*
+    @prodnext{@nonterm{setting-clearscreen}}@*
+    @prodnext{@nonterm{setting-lightmapcellsize}}@*
+    @prodnext{@nonterm{setting-maxlightmapsize}}@*
+@production{settings,
+    @token{SETTINGS} @LP{} [ @nonterm{settings-comp} @dots{} ] @RP{}}
 
 @subsubheading World
 @production{world-comp, @nonterm{textures}}@*
@@ -541,11 +625,18 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @prodnext{@nonterm{collection}}@*
     @prodnext{@nonterm{start}}@*
     @prodnext{@nonterm{key}}@*
+    @prodnext{@nonterm{settings}}@*
 @production{world, @token{WORLD} @LP{} [ @nonterm{world-comp} @dots{} ] @RP{}}
 
 @subsubheading Library File
-@production{library-comp,
-    @nonterm{textures} | @nonterm{materials} | @nonterm{meshfact}}@*
+@production{library-comp, @nonterm{textures}}@*
+    @prodnext{@nonterm{materials}}@*
+    @prodnext{@nonterm{meshfact}}@*
+    @prodnext{@nonterm{addon}}@*
+    @prodnext{@nonterm{meshobj}}@*
+    @prodnext{@nonterm{meshref}}@*
+    @prodnext{@nonterm{sounds}}@*
+    @prodnext{@nonterm{plugins}}@*
 @production{library,
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 
@@ -558,7 +649,9 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
 This section contains extra discussions and hints regarding the map file and
-the objects contained within it.
+the objects contained within it (this documentation is a little bit outdated
+but still useful for the general idea. However it should be moved to the
+thing mesh object description).
 
 First, a little explanation about @samp{LEN} and @samp{TEXLEN}.  With these
 you can specify the size of the texture on the polygon.  For example, let's

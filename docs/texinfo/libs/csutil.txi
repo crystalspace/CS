@@ -63,10 +63,8 @@ Same as the above but stops at the first object with the given name, even if
 it does not implement the requested interface (in that case, @code{NULL} is
 returned). This is slightly faster.
 @end table
-There is also a @samp{@dots{}_FAST} version of each macro that uses the fast
-interface feature of @sc{scf}, i.e. you must declare a fast interface by using
-@code{SCF_DECLARE_FAST_INTERFACE} before using them. Note that all these
-macros increase the reference count of the returned object by 1.
+Note that all these macros increase the reference count of the returned
+object by 1.
 
 @node Typed Vectors, , csObject, csUtil
 @subsection @code{Typed Vectors}

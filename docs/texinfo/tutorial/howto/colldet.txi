@@ -189,11 +189,11 @@ again. Example:
 
 @example
 void Player::Move (csVector3 move)
-{
+@{
   csVector3 old (move);
   while (collsys->CollidePath (player_collider, player_transform, move,
          world_colliders, world_transforms) != 1)
-  {
+  @{
     player_transform->Translate (move);
     csCollisionPair *pair = collsys->GetCollisionPairs ();
     csPlane3 wall (pair->a2, pair->b2, pair->c2);
@@ -201,9 +201,9 @@ void Player::Move (csVector3 move)
     old = move; move = newmove;
     move %= wall.Normal();
     move %= wall.Normal();
-  }
+  @}
   player_transform->Translate (move);
-}
+@}
 @end example
 
 This example is limited in that it will run into an infinite loop if the

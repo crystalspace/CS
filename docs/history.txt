@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+3-Jul-2002
+	- Added non-functional iEngine->GetVisibleObjects(). The purpose
+	  of this routine will be to return all potentially visible objects
+	  from a given position. At this moment this function returns NULL.
+	  It still has to be implemented. There are two versions: one accepts
+	  a single point and computes visibility in a full 360 degree around
+	  that point. The other has a frustum to restrict visibility.
+	- Updated the documentation with regards to the SCF _FAST macros
+	  that are now removed.
+	- Significantly updated the map format documentation. Now it should
+	  be about 95% up-to-date. However! Keep in mind that this is ONLY
+	  the documentation for the basic map format. It does NOT contain
+	  documentation for the loader plugins. This means that everything
+	  that is INSIDE a PARAMS block is not documented by this documentation.
 2-Jul-2002
 	- Removed an obsolete feature to show the c-buffer in walktest.
 	- Removed db_cbuffer console command in walktest.

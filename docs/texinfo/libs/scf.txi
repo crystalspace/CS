@@ -697,19 +697,6 @@ iSCF::SCF->RegisterClass("csDog", "dog");
 The @sc{scf} library implements some things that you will need to know about
 to use some advanced techniques.  They are described in detail, below.
 
-@subsubheading @code{QueryInterface()} performance
-
-Usually you use @code{SCF_QUERY_INTERFACE (object, interface)} to query an
-interface from an object. However, this involves string comparison and should
-therefore be considered slow. To speed things up, place the following line
-somewhere in your source file (header files are also allowed, as this only
-defines an inline function):
-@example
-SCF_DECLARE_FAST_INTERFACE (iInterfaceName)
-@end example
-After that, you can use @code{SCF_QUERY_INTERFACE_FAST (object, interface)}
-to query an interface from an object.
-
 @subsubheading Dynamic Class Registration
 
 You can register and deregister @sc{scf} classes at run time.  You can even

@@ -2249,6 +2249,22 @@ iObjectIterator *csEngine::GetNearbyObjects (
   return it;
 }
 
+iObjectIterator *csEngine::GetVisibleObjects (
+  iSector* /*sector*/,
+  const csVector3& /*pos*/)
+{
+  // @@@ Not implemented yet.
+  return NULL;
+}
+
+iObjectIterator *csEngine::GetVisibleObjects (
+  iSector* /*sector*/,
+  const csFrustum& /*frustum*/)
+{
+  // @@@ Not implemented yet.
+  return NULL;
+}
+
 int csEngine::GetTextureFormat () const
 {
   iTextureManager *txtmgr = G3D->GetTextureManager ();
