@@ -16,22 +16,7 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-	# Activate all plugins
-	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
-	cd CS; make linux
-	# Make it not cpu specific (Intel)
-	# CPU=i386 make linux (this was too intel specific)
-	perl -pi -e "s/CFLAGS.SYSTEM.*mcpu.*\n//" $(CURDIR)/CS/config.mak
-	# Force -fPIC as compiling/linking option
-	perl -pi -e "s/(CC.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
-	perl -pi -e "s/(CXX.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
-	perl -pi -e "s/(LINK.*)/\1 -fPIC/" $(CURDIR)/CS/config.mak
-	# Install as much as possible
-	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
-	# Activating scripts
 	chmod +x $(CURDIR)/debian/createmenus
-	chmod +x $(CURDIR)/debian/addmissing
-	chmod +x $(CURDIR)/debian/automan
 	# Creating menus
 	$(CURDIR)/debian/createmenus $(CURDIR)
 
@@ -42,7 +27,7 @@ build-stamp:
 	dh_testdir
 
 	# Add here commands to compile the package.
-	cd CS; $(MAKE) all
+	#$(MAKE) all
 
 	touch build-stamp
 
@@ -52,88 +37,37 @@ clean:
 	rm -f build-stamp configure-stamp
 
 	# Add here commands to clean up after the build process.
-	-cd $(CURDIR)/CS; $(MAKE) clean
-	-cd $(CURDIR)/CS; $(MAKE) distclean
-	rm -f $(CURDIR)/CS/cache.mak
-	rm -f $(CURDIR)/CS/config.mak
+	#-$(MAKE) clean
+	#-$(MAKE) distclean
+	rm -f $(CURDIR)/data/*.xpm
+	rm -f $(CURDIR)/debian/crystalspace-data.menu
 
 	dh_clean
 
-#DEVBIN=3ds2lev map2cs mdl2spr \
-#	csfedit csfgen cslight picview scfreg viewmesh vsh \
-#	cs-config
-	
-DEVBIN=map2cs mdl2spr scfreg vsh cs-config
-
 install: DH_OPTIONS=
-install: build 
+install: build xpms
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
 
 	# Add here commands to install the package into debian/crystalspace.
-	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
-	cd CS; $(MAKE) install INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace
-	# Let's fix some things
-	$(CURDIR)/debian/addmissing $(CURDIR)
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace/data
+	mkdir -p $(CURDIR)/debian/tmp/usr/share/pixmaps
 
-	find $(CURDIR)/debian/tmp/usr/lib/crystalspace/include -type f \
-		-exec chmod 644 {} \;
-	chmod +x \
-	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/cssh.py
-	chmod +x \
-	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/pysimp.py
-	
-	# Move to respect Debian Policy
-
-	# dev binaries in /usr/bin
-	mkdir -p $(CURDIR)/debian/tmp/usr/bin
-	mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
-		 $(DEVBIN))\
-		$(CURDIR)/debian/tmp/usr/bin
-	# renaming picview because of name conflict with picview package
-	#mv $(CURDIR)/debian/tmp/usr/bin/picview \
-	#	$(CURDIR)/debian/tmp/usr/bin/cspicview
-	# From Loic Dachary (fix for cs-config)
-	perl -pi -e 's:^prefix=.*:prefix=/usr:' $(CURDIR)/debian/tmp/usr/bin/cs-config
-	perl -pi -e 's:^includedir=.*:includedir=/usr/include/crystalspace:' $(CURDIR)/debian/tmp/usr/bin/cs-config
-	perl -pi -e 's:libdir=.*:libdir=/usr/lib/crystalspace/lib:' $(CURDIR)/debian/tmp/usr/bin/cs-config
-
-	# demos binaries in /usr/games
-	mkdir -p $(CURDIR)/debian/tmp/usr/games
-	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/* \
-		$(CURDIR)/debian/tmp/usr/games
-
-	# includes in /usr/include/crystalspace
-	mkdir -p $(CURDIR)/debian/tmp/usr/include
-	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/include \
-		$(CURDIR)/debian/tmp/usr/include/crystalspace
+	# These are levels for walktest + data for csdemo
+	cp $(CURDIR)/data/*.zip \
+		$(CURDIR)/debian/tmp/usr/lib/crystalspace/data
+	cp $(CURDIR)/data/*.xpm \
+		$(CURDIR)/debian/tmp/usr/share/pixmaps
 
 	dh_movefiles
-
-	# Adding home made xpm
-	cp $(CURDIR)/debian/xpm/*.xpm \
-		$(CURDIR)/debian/crystalspace-demos/usr/share/pixmaps
-
-	# Autogenerate man
-	$(CURDIR)/debian/automan $(CURDIR)
-	$(CURDIR)/debian/rules man
-	rm -f $(CURDIR)/debian/man/*.sgml.?
-	dh_installman -p crystalspace-demos $(CURDIR)/debian/man/*.6
-	dh_installman -p crystalspace-dev $(CURDIR)/debian/man/*.1
 
 %.xpm: %.jpg
 	convert -size 32x32 $< $@
 	mogrify -format xpm -geometry 32x32 -map /usr/X11R6/include/X11/pixmaps/cmap.xpm $@
 
-man: $(subst .sgml,, $(wildcard $(CURDIR)/debian/man/*.sgml*))
-%.1: %.sgml.1
-	@echo "Creating $(notdir $@)"
-	@docbook-to-man $< > $@
-%.6: %.sgml.6
-	@echo "Creating $(notdir $@)"
-	@docbook-to-man $< > $@
+xpms: $(patsubst %.jpg,%.xpm,$(wildcard $(CURDIR)/data/*.jpg))
 
 # Build architecture-independent files here.
 # Pass -i to all debhelper commands in this target to reduce clutter.
@@ -163,35 +97,5 @@ binary-indep: build install
 	dh_md5sums -i
 	dh_builddeb -i
 
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir 
-	dh_testroot 
-#	dh_installdebconf 
-	dh_installdocs 
-	dh_installexamples 
-	dh_installmenu 
-#	dh_installlogrotate 
-#	dh_installemacsen
-#	dh_installpam 
-#	dh_installmime 
-#	dh_installinit
-#	dh_installcron
-	dh_installman
-	dh_installinfo
-#	dh_undocumented
-	dh_installchangelogs 
-	dh_strip 
-	dh_link
-	dh_compress
-	dh_fixperms 
-	dh_makeshlibs 
-	dh_installdeb 
-#	dh_perl
-	dh_shlibdeps -l$(CURDIR)/debian/usr/lib/crystalspace/lib
-	dh_gencontrol
-	dh_md5sums 
-	dh_builddeb 
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+binary: binary-indep 
+.PHONY: build clean binary-indep binary install configure
