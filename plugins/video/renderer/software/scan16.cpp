@@ -535,6 +535,8 @@ void Scan16::draw_scanline_fog_555 (int xx, unsigned char* d,
     int g = ((*_dest) >> 5) & 0x1f;
     int b = (*_dest) & 0x1f;
 
+    if (dens_dist<0) dens_dist=0; //Thomas Hieber range check is still necessary (May, 24th, 1999)
+
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
     b += tables.mul_table[dens_dist+fog_b - b];
@@ -576,6 +578,8 @@ void Scan16::draw_scanline_fog_565 (int xx, unsigned char* d,
     int g = ((*_dest) >> 5) & 0x3f;
     int b = (*_dest) & 0x1f;
 
+    if (dens_dist<0) dens_dist=0; //Thomas Hieber range check is still necessary (May, 24th, 1999)
+
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
     b += tables.mul_table[dens_dist+fog_b - b];
@@ -614,6 +618,8 @@ void Scan16::draw_scanline_fog_view_555 (int xx, unsigned char* d,
     int g = ((*_dest) >> 5) & 0x1f;
     int b = (*_dest) & 0x1f;
 
+    if (dens_dist<0) dens_dist=0; //Thomas Hieber range check is still necessary (May, 24th, 1999)
+
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
     b += tables.mul_table[dens_dist+fog_b - b];
@@ -650,6 +656,8 @@ void Scan16::draw_scanline_fog_view_565 (int xx, unsigned char* d,
     int r = (*_dest) >> 11;
     int g = ((*_dest) >> 5) & 0x3f;
     int b = (*_dest) & 0x1f;
+
+    if (dens_dist<0) dens_dist=0; //Thomas Hieber range check is still necessary (May, 24th, 1999)
 
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
@@ -692,6 +700,8 @@ void Scan16::draw_scanline_fog_plane_555 (int xx, unsigned char* d,
     int r = (*_dest) >> 10;
     int g = ((*_dest) >> 5) & 0x1f;
     int b = (*_dest) & 0x1f;
+
+    if (dens_dist<0) dens_dist=0; //Thomas Hieber range check is still necessary (May, 24th, 1999)
 
     r += tables.mul_table[dens_dist+fog_r - r];
     g += tables.mul_table[dens_dist+fog_g - g];
