@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+24-May-2002
+	- Fixed a bug in the handling of the polygon mesh instances in a thing.
+	  If they were queried too early they could hold invalid date and
+	  the vis system would not know about it.
+	- This fix means that Dynavis outline culling finally works :-)
 23-May-2002
 	- Put back the fflush() in engine.cpp. An fflush() can NEVER
 	  cause crashes unless your environment is screwed up a lot.

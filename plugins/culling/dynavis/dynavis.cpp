@@ -458,6 +458,8 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     if (camv.z <= 0.0)
     {
       // @@@ Later we should clamp instead of ignoring this outline.
+      delete[] tr_z;
+      delete[] tr_verts;
       return;
     }
     if (camv.z > max_depth) max_depth = camv.z;
@@ -476,6 +478,8 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 	max_depth);
       iobj->DecRef ();
     }
+    printf ("  campos_obj=%g,%g,%g\n",
+    	campos_object.x, campos_object.y, campos_object.z);
   }
 
   // Then insert the outline.
@@ -483,19 +487,24 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   	outline_info.outline_edges, outline_info.num_outline_edges, max_depth);
   if (do_state_dump)
   {
-    printf ("  max_depth=%g rc=%d ", max_depth, rc);
+    printf ("  max_depth=%g rc=%d\n", max_depth, rc);
     int j;
+    for (j = 0 ; j < outline_info.num_outline_verts ; j++)
+    {
+      int vt = outline_info.outline_verts[j];
+      csVector3 cam = trans.Other2This (verts[vt]);
+      printf ("  V%d: %d(%g,%g / %g,%g,%g / %g,%g,%g)\n",
+	j, vt,
+	tr_verts[vt].x, tr_verts[vt].y,
+	verts[vt].x, verts[vt].y, verts[vt].z,
+	cam.x, cam.y, cam.z);
+    }
     for (j = 0 ; j < outline_info.num_outline_edges ; j++)
     {
-      int vt1 = outline_info.outline_verts[outline_info.outline_edges[j*2+0]];
-      int vt2 = outline_info.outline_verts[outline_info.outline_edges[j*2+1]];
-      printf ("(%g,%g[%d],%g,%g[%d]) ",
-        tr_verts[vt1].x, tr_verts[vt1].y,
-        outline_info.outline_edges[j*2+0],
-        tr_verts[vt2].x, tr_verts[vt2].y,
-        outline_info.outline_edges[j*2+1]);
+      int vt1 = outline_info.outline_edges[j*2+0];
+      int vt2 = outline_info.outline_edges[j*2+1];
+      printf ("  E%d: %d-%d\n", j, vt1, vt2);
     }
-    printf ("\n");
 
     iString* str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());

@@ -1,0 +1,22 @@
+- Seperate the outline info from csObjectModel. An outline is not attached
+  to a model but to an instance of a model (perhaps make
+  csObjectModelInstance?).
+
+	OR
+
+  Implement an outline cache which IS attached to csObjectModel and let
+  model instances use an entry from that cache.
+
+- Improve filling of outline in coverage buffer. Clamp outline to Z=0
+  plane instead of rejecting write objects that are clipped by that plane.
+
+- Make a new line draw function in the coverage buffer that isn't
+  concerned about left/right lines.
+
+- Split coverage buffer into tiles and implement delayed writing.
+
+- Predict quality of occluders.
+
+- VPT (Visible Point Tracking) and keeping an object visible for a
+  random number of frames.
+

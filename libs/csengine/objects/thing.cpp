@@ -376,6 +376,9 @@ void csThing::Prepare ()
 {
   if (prepared) return ;
   prepared = true;
+  shapenr++;
+  scfiPolygonMeshLOD.Cleanup ();
+  scfiPolygonMesh.Cleanup ();
   if (!flags.Check (CS_THING_NOCOMPRESS))
   {
     CompressVertices ();
@@ -919,6 +922,8 @@ void csThing::InvalidateThing ()
   CleanupThingEdgeTable ();
 
   shapenr++;
+  scfiPolygonMeshLOD.Cleanup ();
+  scfiPolygonMesh.Cleanup ();
 }
 
 void csThing::RemovePolygon (int idx)
@@ -2327,7 +2332,6 @@ void PolyMeshHelper::Setup ()
   if (polygons || alloc_vertices)
   {
     // Already set up. First we check if the object vertex array
-
     // is still valid (if it is not a copy).
     if (alloc_vertices) return ;
     if (vertices == thing->obj_verts) return ;
