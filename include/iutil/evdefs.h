@@ -117,6 +117,8 @@ enum
 #define CS_IS_MOUSE_EVENT(e)	((1 << (e).Type) & CSMASK_Mouse)
 /// Check if a event is a joystick event
 #define CS_IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & CSMASK_Joystick)
+/// Check if a event is any input event
+#define CS_IS_INPUT_EVENT(e)	((1 << (e).Type) & CSMASK_Input)
 /// Check if the event is a network event
 #define CS_IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
 
