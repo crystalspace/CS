@@ -53,7 +53,6 @@ csReporter::csReporter (iBase *iParent)
 csReporter::~csReporter ()
 {
   Clear (-1);
-  int i;
   while (listeners.Length () > 0)
   {
     iReporterListener* listener = (iReporterListener*)listeners[0];
