@@ -28,10 +28,14 @@
 
 #include "sysdef.h"
 // DDG includes
+#include "csterr/ddgutil.h"
 #include "csterr/ddghemap.h"
-#include "csterr/ddgvec.h"
 #include "csterr/ddgnoise.h"
 #include "csterr/ddgerror.h"
+#include "csterr/worditer.h"
+
+#define PGM_MAGIC "P2"
+
 // ----------------------------------------------------------------------
 
 ddgHeightMap::~ddgHeightMap(void)
@@ -185,7 +189,7 @@ bool ddgHeightMap::readTGN(char *file)
 	name[8] = '\0';
 	fread(type,8,1,fptr);
 	type[8] = '\0';
-	if (!ddgStr::equal(name,"TERRAGEN") || !ddgStr::equal(type,"TERRAIN "))
+	if (strcmp(name,"TERRAGEN") || strcmp(type,"TERRAIN "))
 	{
 		ddgErrorSet(FileRead,(char *) "File is not a TERRAGEN TERRAIN file");
 		ddgError::report();
@@ -197,7 +201,7 @@ bool ddgHeightMap::readTGN(char *file)
 
 	fread(segment,4,1,fptr);
 
-	if (ddgStr::equal(segment,"SIZE"))
+	if (strcmp(segment,"SIZE")==0)
 	{
 		// SIZE 2 bytes.
 		ch1 = fgetc(fptr);
@@ -208,7 +212,7 @@ bool ddgHeightMap::readTGN(char *file)
 		fread(segment,4,1,fptr);
 	}
 
-	if (ddgStr::equal(segment,"XPTS"))
+	if (strcmp(segment,"XPTS")==0)
 	{
 		// XPTS.
 		ch1 = fgetc(fptr);
@@ -219,7 +223,7 @@ bool ddgHeightMap::readTGN(char *file)
 
 		fread(segment,4,1,fptr);
 		// YPTS.
-		if (ddgStr::equal(segment,"YPTS"))
+		if (strcmp(segment,"YPTS")==0)
 		{
 			ch1 = fgetc(fptr);
 			ch2 = fgetc(fptr);
@@ -239,7 +243,7 @@ bool ddgHeightMap::readTGN(char *file)
 	// ALTW.
 	// Absolute elevation for a given point is
 	// BaseHeight + elevation* Scale / 65536.
-	if (ddgStr::equal(segment,"ALTW"))
+	if (strcmp(segment,"ALTW")==0)
 	{
 		ch1 = fgetc(fptr);
 		ch2 = fgetc(fptr);
@@ -442,3 +446,93 @@ void ddgHeightMap::sin(void)
 				         +ddgAngle::sin(180.0*(float)c/(float)_cols))));
 		}
 }
+
+/*
+	Dumb little utility function to make sure that 
+	atoi doesn't get a null argument...
+*/
+int stringToInt(char *str)
+{
+	if (str)
+	{
+		return atoi(str);
+	};
+	
+	return 0;
+};
+
+/*
+	Some notes about this function:
+	1. It sets scale to height/width and base to 0
+	2. The magic for an ascii PGM is that the first two characters should be "P2"
+	3. The values in the map are between 0 and max_grey and are then scaled
+	   to fit between 0 and desired_max
+	4. The reason you have to work from a char* is that the VFS 
+	   provides only a read function, which while this is enough to implement
+	   a nice interface on top of it, that's not the focus of this code
+	   ScanStr could have been used but in general is very limited and would
+	   have required a lot of extra work...
+	5. The PGM spec doesn't set limits on the values in the file, this function
+	   can only accept up to something small depending on the value
+	   of desired_max
+	6. Error reporting is only via the return value but is commented :)
+	7. PGMs aren't really meant to be fast, and this function isn't either
+*/
+bool ddgHeightMap::readPGM(char* data, int desired_max)
+{
+	int	max_grey;
+	int width;
+	int height;
+	
+	char* token;
+	
+	WordIterator st(data, " \n\t");
+	
+	token = st.nextWord();
+	if (!strncmp(token, PGM_MAGIC, strlen(PGM_MAGIC)))
+	{
+		token = st.nextWord();
+		width = stringToInt(token);
+		
+		token = st.nextWord();
+		height = stringToInt(token);
+		
+		token = st.nextWord();
+		max_grey = stringToInt(token);
+
+		if ((max_grey < 1) || (width < 1) || (height < 1))
+		{
+			//ERROR: Obviously not well formed...
+			return false;
+		};
+		
+		allocate(height, width);
+		setScaleAndBase((float)((float)height / (float)width), 0);
+	
+		for (int x = 0; x < width; x++)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				int temp;
+				short val;
+				
+				token = st.nextWord();
+				temp = stringToInt(token);
+
+				/* @@@ This could overflow... how do we want to solve this?*/
+				val = (short)((temp * desired_max) / max_grey);
+
+				set(x, y, val);
+			};
+		};
+		
+	}
+	else
+	{
+		//ERROR: Invalid magic, not an ASCII PGM
+		return false;
+	};
+
+	return true;	
+};
+
