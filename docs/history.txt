@@ -9,6 +9,33 @@ The history order is reversed so that new features are at the top.
 	  port. This is not the right way to do this. The best way is to
 	  do this through the commandline parser. If needed this will have
 	  to be delayed until the commandline parser IS ready.
+	- Eric Sunshine made the following changes to the standard input
+	  drivers:
+	    - Eliminated the clever but confusing synthetic-embedded
+	      iEventHandler object from csInputDriver.  Replaced with true SCF
+	      embedded iEventHandler objects in csKeyboardDriver,
+	      csMouseDriver, and csJoystickDriver.  Though this approach is
+	      more verbose and involves a bit more copy/paste code, it is
+	      simpler, more robust, easier to understand, and its correctness
+	      is readily verifiable.
+	    - Fixed a problem where, upon creation, each of the input drivers
+	      had a reference count of 2, rather than 1.  This problem was a
+	      direct result of the manner in which the pseudo-embedded
+	      iEventHandler object was synthesized.  Thanks go to Jorge Acereda
+	      Macia <drslump@ono.com> for notifying me that the drivers
+	      instances were being leaked.
+	    - csInputDriver no longer caches a pointer to the shared event
+	      queue.  Previously, it was trying to cache this pointer without
+	      calling IncRef() on it (to avoid a circular reference), but this
+	      was a very dangerous thing to do, so now it doesn't even bother
+	      with caching the pointer.  Unfortunately, this means that access
+	      to the event queue from the csInputDriver subclasses will be very
+	      slightly slower, but it will also now be completely safe.
+	    - Fixed several potentially nasty, nasty, nasty bugs which were
+	      introduced into the input drivers at the time that the behavior
+	      of CS_QUERY_REGISTRY() was changed.  Several places in the code
+	      were accessing SCF objects _after_ DecRef() had been called.
+	      This is a big No-No.
 6-Nov-2001
 	- Eric Sunshine fixed the derivation of Win32Assistant.  It was
 	  incorrectly inheriting iEventPlug and iEventHandler privately, rather

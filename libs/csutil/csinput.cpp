@@ -40,67 +40,68 @@ char ShiftedKey [128-32] =
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
 
-SCF_IMPLEMENT_IBASE (csInputDriver::FocusListener)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-csInputDriver::csInputDriver(iObjectRegistry* r) : Registry(r), Queue(0)
+csInputDriver::csInputDriver(iObjectRegistry* r) :
+  Registered(false), Registry(r), Listener(0)
 {
-  Listener.Parent = this;
 }
 
 csInputDriver::~csInputDriver()
 {
-  // Force a refetch of Queue in order to double check its validity since, at
-  // shutdown time, the event queue might already have been destroyed.
-  Queue = NULL;
-  GetEventQueue();
   StopListening();
-}
-
-void csInputDriver::SetSCFParent(iBase* p)
-{
-  Listener.SetSCFParent(p);
-  StartListening();
 }
 
 iEventQueue* csInputDriver::GetEventQueue()
 {
-  if (Queue == 0)
-  {
-    Queue = CS_QUERY_REGISTRY(Registry, iEventQueue);
-    if (Queue) Queue->DecRef ();
-  }
-  return Queue;
+  return CS_QUERY_REGISTRY(Registry, iEventQueue);
 }
 
 void csInputDriver::StartListening()
 {
-  if (Queue == 0 && GetEventQueue() != 0) // Not already registered.
-    Queue->RegisterListener(&Listener, CSMASK_Command);
+  if (Listener != 0 && !Registered)
+  {
+    iEventQueue* q = GetEventQueue();
+    if (q != 0)
+    {
+      q->RegisterListener(Listener, CSMASK_Command);
+      q->DecRef();
+      Registered = true;
+    }
+  }
 }
 
 void csInputDriver::StopListening()
 {
-  if (Queue != 0) // Already registered.
-    Queue->RemoveListener(&Listener);
+  if (Listener != 0 && Registered)
+  {
+    iEventQueue* q = GetEventQueue();
+    if (q != 0)
+    {
+      q->RemoveListener(Listener);
+      q->DecRef();
+    }
+  }
+  Registered = false;
 }
 
 void csInputDriver::Post(iEvent* e)
 {
   StartListening(); // If this failed at construction, try again.
-  if (Queue != 0)
-    Queue->Post(e);
+  iEventQueue* q = GetEventQueue();
+  if (q != 0)
+  {
+    q->Post(e);
+    q->DecRef();
+  }
   else
     e->DecRef();
 }
 
-bool csInputDriver::FocusListener::HandleEvent(iEvent& e)
+bool csInputDriver::HandleEvent(iEvent& e)
 {
   bool const mine = (e.Type == csevBroadcast && 
     e.Command.Code == cscmdFocusChanged && !e.Command.Info);
   if (mine) // Application lost focus.
-    Parent->LostFocus();
+    LostFocus();
   return mine;
 }
 
@@ -108,14 +109,25 @@ bool csInputDriver::FocusListener::HandleEvent(iEvent& e)
 
 SCF_IMPLEMENT_IBASE(csKeyboardDriver)
   SCF_IMPLEMENTS_INTERFACE(iKeyboardDriver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE(csKeyboardDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
   csInputDriver(r), KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
 {
   SCF_CONSTRUCT_IBASE(0);
-  SetSCFParent(this);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  Listener = &scfiEventHandler;
+  StartListening();
   KeyState.Reset();
+}
+
+csKeyboardDriver::~csKeyboardDriver ()
+{
 }
 
 void csKeyboardDriver::Reset ()
@@ -170,13 +182,20 @@ bool csKeyboardDriver::GetKeyState (int iKey)
 
 SCF_IMPLEMENT_IBASE(csMouseDriver)
   SCF_IMPLEMENTS_INTERFACE(iMouseDriver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE(csMouseDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMouseDriver::csMouseDriver (iObjectRegistry* r) :
   csInputDriver(r), Keyboard(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  SetSCFParent(this);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  Listener = &scfiEventHandler;
+  StartListening();
 
   LastX = LastY = 0;
   memset (&Button, 0, sizeof (Button));
@@ -191,6 +210,8 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 
 csMouseDriver::~csMouseDriver ()
 {
+  if (Keyboard != 0)
+    Keyboard->DecRef();
 }
 
 void csMouseDriver::Reset ()
@@ -204,10 +225,7 @@ void csMouseDriver::Reset ()
 iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
 {
   if (Keyboard == 0)
-  {
     Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
-    if (Keyboard) Keyboard->DecRef ();
-  }
   return Keyboard;
 }
 
@@ -275,16 +293,29 @@ void csMouseDriver::SetDoubleClickTime (int iTime, size_t iDist)
 
 SCF_IMPLEMENT_IBASE(csJoystickDriver)
   SCF_IMPLEMENTS_INTERFACE(iJoystickDriver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csJoystickDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
   csInputDriver(r), Keyboard(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  SetSCFParent(this);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  Listener = &scfiEventHandler;
+  StartListening();
   memset (&Button, 0, sizeof (Button));
   memset (&LastX, sizeof (LastX), 0);
   memset (&LastY, sizeof (LastY), 0);
+}
+
+csJoystickDriver::~csJoystickDriver ()
+{
+  if (Keyboard != 0)
+    Keyboard->DecRef();
 }
 
 void csJoystickDriver::Reset ()
@@ -298,10 +329,7 @@ void csJoystickDriver::Reset ()
 iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 {
   if (Keyboard == 0)
-  {
     Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
-    if (Keyboard) Keyboard->DecRef ();
-  }
   return Keyboard;
 }
 

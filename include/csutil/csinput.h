@@ -40,26 +40,18 @@ struct iObjectRegistry;
  */
 class csInputDriver
 {
+private:
+  bool Registered;
 protected:
   iObjectRegistry* Registry;
+  iEventHandler* Listener;
   csInputDriver(iObjectRegistry*);
   virtual ~csInputDriver();
   iEventQueue* GetEventQueue();
   virtual void LostFocus() = 0;
   virtual void Post(iEvent*);
-protected:
-  struct FocusListener : public iEventHandler
-  {
-    csInputDriver* Parent;
-    SCF_DECLARE_IBASE;
-    FocusListener() {}
-    void SetSCFParent(iBase* p) { SCF_CONSTRUCT_IBASE(p); }
-    virtual bool HandleEvent(iEvent&);
-  };
+  virtual bool HandleEvent(iEvent&);
   friend struct FocusListener;
-  FocusListener Listener;
-  iEventQueue* Queue;
-  void SetSCFParent(iBase*);
   void StartListening();
   void StopListening();
 };
@@ -86,6 +78,8 @@ public:
 
   /// Initialize keyboard interface.
   csKeyboardDriver (iObjectRegistry*);
+  /// Destructor.
+  virtual ~csKeyboardDriver ();
 
   /// Call to release all key down flags.
   virtual void Reset ();
@@ -100,9 +94,15 @@ public:
    */
   virtual bool GetKeyState (int iKey);
 
-private:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
+    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 /**
@@ -139,7 +139,7 @@ public:
 
   /// Initialize mouse interface.
   csMouseDriver (iObjectRegistry*);
-
+  /// Destructor.
   virtual ~csMouseDriver ();
 
   /// Set double-click mouse parameters
@@ -164,9 +164,15 @@ public:
   /// Call this to add a 'mouse moved' event to queue
   virtual void DoMotion (int x, int y);
 
-private:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csMouseDriver);
+    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 /**
@@ -192,6 +198,8 @@ public:
 
   /// Initialize joystick interface.
   csJoystickDriver (iObjectRegistry*);
+  /// Destructor.
+  virtual ~csJoystickDriver ();
 
   /// Call to release all joystick buttons.
   virtual void Reset ();
@@ -213,9 +221,15 @@ public:
   /// Call this to add a 'joystick moved' event to queue
   virtual void DoMotion (int number, int x, int y);
 
-private:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);
+    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 #endif // __CS_CSINPUT_H__
