@@ -4466,39 +4466,46 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   /* @@@ get the needed plugin interfaces:
    * when moving the loader to a plug-in, this should be done
    * at initialization, and pointers shouldn't be DecRef'ed here.
+   * The 'no sound loader' warning should also be printed at
+   * initialization.
+   * I marked all cases with '###'.
    */
 
   /* get format descriptor */
-  iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
-  if (!SoundRender) return NULL;
+  /* ### */iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
+  /* ### */if (!SoundRender) return NULL;
   const csSoundFormat *Format = SoundRender->GetLoadFormat();
-  /*@@@*/SoundRender->DecRef();
+  /* ### */SoundRender->DecRef();
 
   /* read the file data */
   size_t size;
   char* buf = System->VFS->ReadFile (filename, size);
   if (!buf || !size) {
-    CsPrintf (MSG_FATAL_ERROR,
+    CsPrintf (MSG_WARNING,
       "Cannot read sound file \"%s\" from VFS\n", filename);
     return NULL;
   }
 
-  /* get sound loader plugin */
+  /* ### get sound loader plugin */
+  static bool TriedToLoadSound = false;
   iSoundLoader *SoundLoader = QUERY_PLUGIN(System, iSoundLoader);
   if (!SoundLoader) {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
-      "without sound loader plug-in\n", filename);
+    if (!TriedToLoadSound) {
+      TriedToLoadSound = true;
+      CsPrintf(MSG_WARNING,
+        "Trying to load sound without sound loader.\n");
+    }
     return NULL;
   }
 
   /* load the sound */
   iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, Format);
   delete [] buf;
-  /*@@@*/SoundLoader->DecRef();
+  /* ### */SoundLoader->DecRef();
 
   /* check for valid sound data */
   if (!Sound) {
-    CsPrintf (MSG_FATAL_ERROR, "The sound file \"%s\" is corrupt!\n", filename);
+    CsPrintf (MSG_WARNING, "The sound file \"%s\" is corrupt!\n", filename);
     return NULL;
   }
 
