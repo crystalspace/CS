@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BOX_H
-#define BOX_H
+#ifndef __CS_BOX_H
+#define __CS_BOX_H
 
 #include "types.h"	// for bool
 #include "math2d.h"
@@ -66,12 +66,6 @@ public:
    */
   csVector2 GetCorner (int corner) const;
 
-  /// Test if the given coordinate is in this box.
-  bool In (const csVector2& v) const
-  {
-    return In (v.x, v.y);
-  }
-
   /**
    * Test if a polygon if visible in the box. This
    * function does not test the case where the box is
@@ -110,6 +104,12 @@ public:
     if (x < minbox.x || x > maxbox.x) return false;
     if (y < minbox.y || y > maxbox.y) return false;
     return true;
+  }
+
+  /// Test if the given coordinate is in this box.
+  bool In (const csVector2& v) const
+  {
+    return In (v.x, v.y);
   }
 
   /// Test if this box overlaps with the given box.
@@ -283,18 +283,18 @@ public:
   csVector3 GetCorner (int corner) const;
 
   /// Test if the given coordinate is in this box.
-  bool In (const csVector3& v) const
-  {
-    return In (v.x, v.y, v.z);
-  }
-
-  /// Test if the given coordinate is in this box.
   bool In (float x, float y, float z) const
   {
     if (x < minbox.x || x > maxbox.x) return false;
     if (y < minbox.y || y > maxbox.y) return false;
     if (z < minbox.z || z > maxbox.z) return false;
     return true;
+  }
+
+  /// Test if the given coordinate is in this box.
+  bool In (const csVector3& v) const
+  {
+    return In (v.x, v.y, v.z);
   }
 
   /// Test if this box overlaps with the given box.
@@ -383,8 +383,13 @@ public:
   //-----
 
   /// Initialize this box to empty.
-  csBox3 () : minbox (CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE),
-	      maxbox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE) {}
+  csBox3 () :
+    minbox ( CS_BOUNDINGBOX_MAXVALUE,
+             CS_BOUNDINGBOX_MAXVALUE,
+	     CS_BOUNDINGBOX_MAXVALUE),
+    maxbox (-CS_BOUNDINGBOX_MAXVALUE,
+            -CS_BOUNDINGBOX_MAXVALUE,
+	    -CS_BOUNDINGBOX_MAXVALUE) {}
 
   /// Initialize this box with one point.
   csBox3 (const csVector3& v) : minbox (v), maxbox (v) { }
@@ -438,5 +443,4 @@ public:
   friend bool operator< (const csVector3& point, const csBox3& box);
 };
 
-
-#endif /*BOX_H*/
+#endif // __CS_BOX_H
