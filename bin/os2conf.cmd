@@ -6,6 +6,13 @@
 
   '@echo off';
 
+  parse arg args;
+  /* Interpret all args as they would be assignments */
+  do i = 1 to words(args)
+    interpret word(args, i)' = "'word(args, i + 1)'"';
+    i = i + 1;
+  end;
+
   call RxFuncAdd "SysLoadFuncs", "RexxUtil", "SysLoadFuncs";
   call SysLoadFuncs;
   call InitializeANSI;

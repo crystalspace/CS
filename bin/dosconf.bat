@@ -25,7 +25,7 @@
 
   del conftest.o
   echo $$$ O.K., using the -fno-exceptions switch to get smaller executables
-  echo CFLAGS.SYSTEM += -fno-exceptions>>config.mak
+  echo CFLAGS.SYSTEM += -fno-exceptions>>config.tmp
 
 :noexceptions
 
@@ -35,7 +35,7 @@
 
   del conftest.o
   echo $$$ O.K., using the -fno-rtti switch to get smaller executables
-  echo CFLAGS.SYSTEM += -fno-rtti>>config.mak
+  echo CFLAGS.SYSTEM += -fno-rtti>>config.tmp
 
 :nortti
 
@@ -45,7 +45,7 @@
 
   del conftest.o
   echo $$$ O.K., using -mpentium -march=pentium switches
-  echo CFLAGS.SYSTEM += -mpentium -march=pentium>>config.mak
+  echo CFLAGS.SYSTEM += -mpentium -march=pentium>>config.tmp
 
 :nop5
 
@@ -55,7 +55,7 @@
 
   del conftest.o
   echo $$$ O.K., setting USE_NASM to "yes"
-  echo USE_NASM = yes>>config.mak
+  echo USE_NASM = yes>>config.tmp
 
 :nonasm
 
