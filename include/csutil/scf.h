@@ -712,6 +712,7 @@ inline static scfInterfaceID Name##_scfGetID()				\
   return ID;								\
 }									\
 struct Name;								\
+CS_SPECIALIZE_TEMPLATE							\
 class scfInterface<Name>						\
 {									\
 public:									\

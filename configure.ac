@@ -1869,6 +1869,25 @@ AS_IF([test $cs_cv_cxx_new_casts = no],
 
 
 #------------------------------------------------------------------------------
+# Check if C++ compiler understands new explicit template specialization
+# syntax `template<> class Foo<Bar>'.  Older compiler allows specializations
+# without the `template<>' prefix.
+#------------------------------------------------------------------------------
+AC_CACHE_CHECK([for C++ explicit template<> specialization],
+    [cs_cv_cxx_explicit_template_specialization],
+    [CS_BUILD_IFELSE(
+	[AC_LANG_PROGRAM(
+	    [template <class T> class A {}; template<> class A<int> {};], [])],
+	[], [C++],
+	[cs_cv_cxx_explicit_template_specialization=yes],
+	[cs_cv_cxx_explicit_template_specialization=no])])
+
+AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
+    [CS_HEADER_PROPERTY([CS_USE_OLD_TEMPLATE_SPECIALIZATION])])
+
+
+
+#------------------------------------------------------------------------------
 # CS_CHECK_QSQRT
 #	Check if gcc is able to understand CS/include/qsqrt.h.  This test will
 #	catch not only versions of gcc which do not understand the assembly
