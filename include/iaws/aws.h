@@ -39,6 +39,7 @@ class  awsWindow;
 class  awsComponent;
 class  awsComponentNode;
 class  awsComponentFactory;
+class  awsLayoutManager;
 
 struct  iGraphics2D;
 struct  iGraphics3D;
@@ -386,15 +387,21 @@ struct iAwsComponent : public iAwsSource
   /// Gets the window that this component resides in.
   virtual iAwsWindow *Window()=0;
 
-  /// Gets the parent component of this component;
+  /// Gets the parent component of this component.
   virtual iAwsComponent *Parent()=0;
+
+  /// Gets the layout manager for this component.
+  virtual awsLayoutManager *Layout()=0;
 
   /// Sets the window that this component resides in.
   virtual void SetWindow(iAwsWindow *win)=0;
 
-  /// Sets the parent component of this component;
+  /// Sets the parent component of this component.
   virtual void SetParent(iAwsComponent *parent)=0;
 
+  /// Sets the layout manager for this component.
+  virtual void SetLayout(awsLayoutManager *layout)=0;
+  
   /// Gets the preferred size of the component
   virtual csRect getPreferredSize()=0;
 
@@ -423,7 +430,7 @@ struct iAwsComponent : public iAwsSource
   virtual void MoveChildren(int delta_x, int delta_y)=0;
 
   /// Adds a child into this component.
-  virtual void AddChild(iAwsComponent* child, bool owner=true)=0;
+  virtual void AddChild(iAwsComponent* child, bool has_layout=false)=0;
 
   /// Removes a child from this component.
   virtual void RemoveChild(iAwsComponent *child)=0;
