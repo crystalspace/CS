@@ -242,6 +242,7 @@ bool TerrBigTut::Initialize ()
   iMaterialWrapper *mat = engine->GetMaterialList()->FindByName ("heightmap");
   terrbigstate->SetMaterialsList (&mat, 1);
   terrbigstate->LoadHeightMapFile ("./data/terrain/test.map");
+  terrbigstate->SetScaleFactor (csVector3 (1.0, 10, 1.0));
 
   mesh->SetRenderPriority (engine->GetRenderPriority ("object"));
   mesh->SetZBufMode (CS_ZBUF_USE);
@@ -250,15 +251,15 @@ bool TerrBigTut::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
+  light = engine->CreateLight (NULL, csVector3 (-50, 20, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
+  light = engine->CreateLight (NULL, csVector3 (50, 20,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
+  light = engine->CreateLight (NULL, csVector3 (0, 20, -50), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
@@ -266,7 +267,6 @@ bool TerrBigTut::Initialize ()
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
   view->GetCamera()->Move (csVector3 (0, 20, 0));
