@@ -12,8 +12,11 @@ The history order is reversed so that new features are at the top.
 	  was changed.
 	- Matze moved CFLAGS from mk/jam/variant.jam to Jamrules to not enforce
 	  external projects to the same flags as CS is using
-	- Anders Stenberg fixed a bug in stdrep where it assumed that the 
-	  renderer was in 2d mode.
+	- Anders Stenberg 
+	  - fixed a bug in stdrep where it assumed that the renderer was 
+	    in 2d mode.
+	  - added console output to r3dtest. Can be toggled with TAB.
+	
 29-Jun-2003
 	- Luca fixed the inconcistency of properties read and written by
 	  Set/GetProperty in the awsScrollBar class. He updated the texinfo

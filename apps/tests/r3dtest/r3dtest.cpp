@@ -48,6 +48,7 @@
 #include "ivideo/fontserv.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
+#include "ivaria/conout.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
@@ -162,7 +163,11 @@ void R3DTest::SetupFrame ()
 
   view->Draw ();
 
-  r3d->FinishDraw ();
+  console->Draw3D ();
+  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+  console->Draw2D ();
+
   if(stop)
     stop=false;
 }
@@ -199,13 +204,20 @@ bool R3DTest::HandleEvent (iEvent& ev)
     r3dtest->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
+  else if (ev.Type == csevKeyDown)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
-    return true;
+    switch (ev.Key.Code)
+    {
+    case CSKEY_ESC:
+      {
+        csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+        if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+        return true;
+      }
+    case CSKEY_TAB:
+      console->SetVisible (!console->GetVisible ());
+    }
   }
-
   return false;
 }
 
@@ -229,6 +241,7 @@ bool R3DTest::Initialize ()
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
+        CS_REQUEST_CONSOLEOUT,
  	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -320,6 +333,7 @@ bool R3DTest::Initialize ()
     return false;
   }
 
+  console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -463,6 +477,7 @@ bool R3DTest::Initialize ()
 
   engine->Prepare ();
 
+  console->SetVisible (false);
   hasfocus = true;
   int w = r3d->GetDriver2D ()->GetWidth()/2;
   int h = r3d->GetDriver2D ()->GetHeight()/2;

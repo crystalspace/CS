@@ -47,6 +47,7 @@ private:
   csRef<iView> view;
   csRef<iKeyboardDriver> kbd;
   csRef<iMouseDriver> mouse;
+  csRef<iConsoleOutput> console;
 
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
