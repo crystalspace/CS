@@ -46,6 +46,7 @@ if test -z "$PROC"; then
     *mips*)       PROC="MIPS"    ;;
     *alpha*)      PROC="ALPHA"   ;;
     *arm*)        PROC="ARM"     ;;
+    *s390*)       PROC="S390"    ;;
     *)            echo "UNKNOWN MACHINE TYPE $MACHINE: Please fix $0!" >&2
                   exit 1         ;;
   esac

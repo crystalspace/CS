@@ -59,6 +59,12 @@
 #    undef  CS_PROCESSOR_NAME
 #    define CS_PROCESSOR_NAME "PowerPC"
 #  endif
+#elif defined(__s390__)
+#  if !defined(PROC_S390)
+#    define PROC_S390
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "s390"
+#  endif
 #else
 #  if !defined(PROC_UNKNOWN)
 #    define PROC_UNKNOWN
