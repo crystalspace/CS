@@ -759,19 +759,20 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   // radiosity works with the base, unsplit polygon.
   csPolygon3D *destpoly3d = ((csPolygon3D*)obj)->GetBasePolygon();
   csRadPoly *dest = csRadPoly::GetRadPoly(*destpoly3d); // obtain radpoly
-  if(!dest) return; // polygon not lightmapped / radiosity rendered.
-  // check poly -- on right side of us?
-  csVector3 destcenter;
-  dest->QuickLumel2World(destcenter, dest->GetWidth()/2., dest->GetHeight()/2.);
-  if( csMath3::WhichSide3D(destcenter - plane_origin, plane_v1, plane_v2) >= 0)
-    return; // when on the plane or behind, skip.
-  // use poly
-  csRadiosity *rad = (csRadiosity*)lview->userdata;
+  // if polygon not lightmapped / radiosity rendered, it can still be a portal.
+  if(dest) 
+  {
+    // check poly -- on right side of us?
+    csVector3 destcenter;
+    dest->QuickLumel2World(destcenter,dest->GetWidth()/2.,dest->GetHeight()/2.);
+    if( csMath3::WhichSide3D(destcenter-plane_origin, plane_v1, plane_v2) >= 0)
+      dest=0; // when on the plane or behind, skip.
+  }
 
   csFrustumView new_lview = *lview;
   csVector3 poly[40];
   int num_vert = 4;
-  if( !dest->GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
+  if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
     GetLightmapBounds(lview, poly) )
     /// empty intersection or lightmap has already been seen by frustum.
     return;
@@ -779,32 +780,35 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   // empty intersection, none covered (will be skipped)
   if(!new_lview.light_frustum) return;
 
-  /// radiosity to this polygon.
-  rad->ProcessDest(dest, &new_lview);
+  if(dest) {
+    /// radiosity to this polygon.
+    csRadiosity *rad = (csRadiosity*)lview->userdata;
+    rad->ProcessDest(dest, &new_lview);
+  }
 
   /// portal?
 
   // uses polygon3d of *base* polygon...
-  csPortal *po = dest->GetPolygon3D()->GetPortal();
+  csPortal *po = destpoly3d->GetPortal();
   if(!po) return;
 
   csVector3& center = lview->light_frustum->GetOrigin ();
-  csPlane3 poly_plane = *dest->GetPolygon3D()->GetPolyPlane ();
+  csPlane3 poly_plane = *destpoly3d->GetPolyPlane ();
   // First translate plane to center of frustum.
   poly_plane.DD += poly_plane.norm * center;
   poly_plane.Invert ();
-  if (!dest->GetPolygon3D()->MarkRelevantShadowFrustums (new_lview, poly_plane))
+  if (!destpoly3d->MarkRelevantShadowFrustums (new_lview, poly_plane))
     return;
   
-  int num_vertices = dest->GetPolygon3D()-> GetVertices ().GetNumVertices ();
+  int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
   /// @@@ hope that poly array is big enough
   int j;
   if (lview->mirror)
     for (j = 0 ; j < num_vertices ; j++)
-      poly[j] = dest->GetPolygon3D()-> Vwor (num_vertices - j - 1) - center;
+      poly[j] = destpoly3d->Vwor (num_vertices - j - 1) - center;
   else
     for (j = 0 ; j < num_vertices ; j++)
-      poly[j] = dest->GetPolygon3D()-> Vwor (j) - center;
+      poly[j] = destpoly3d->Vwor (j) - center;
  
   delete new_lview.light_frustum;
   new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vertices);
