@@ -104,10 +104,14 @@ char** csGetPluginPaths ()
     return paths;
   }
 
-  char** paths = new char* [3];
+  char** paths = new char* [4];
   paths[0] = csStrNew(crystal);
-  paths[1] = csStrNew(".");
-  paths[2] = 0;
+  char* temp = new char[1024];
+  strncpy (temp, crystal, 1000);
+  strcat (temp, "/lib");
+  paths[1] = temp;
+  paths[2] = csStrNew(".");
+  paths[3] = 0;
   
   return paths;
 }
