@@ -14,6 +14,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csconfig csconfigclean
 
+all apps: csconfig
 csconfig:
 	$(MAKE_TARGET)
 csconfigclean:
