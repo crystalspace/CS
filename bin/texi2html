@@ -29,8 +29,9 @@ $THISPROG = "texi2html $THISVERSION";	# program name and version
 # Please read the copyright at the end of the man page.
 
 $T2H_TODAY = &pretty_date;		# like "20 September 1993"
-($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*// # Who am i 
-  if (defined (\&getpwuid));
+# Who am I; some platforms may not implement getpwuid() so catch exception.
+unless (eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//; return 1; })
+    { $T2H_USER = "unknown"; }
 
 #+++############################################################################
 #                                                                              #

@@ -39,6 +39,8 @@ Short-term cleanups that need to be done:
 	      see a white screen :-)
 	- Norman Kramer did some fixes after Andrews changes (to glide
 	  and funcon).
+	- Eric Sunshine patched texi2html so that it no longer crashes on DOS
+	  when invoking getpwuid().
 21-Mar-2000
 	- Norman Kramer added lines to draw 3D part of console if available.
 	  (and made the console window smaller to enjoy the funky console
