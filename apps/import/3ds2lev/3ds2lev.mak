@@ -40,6 +40,7 @@ LIB.3DS2LEV = $(foreach d,$(DEP.3DS2LEV),$($d.LIB))
 MSVC.DSP += 3DS2LEV
 DSP.3DS2LEV.NAME = 3ds2lev
 DSP.3DS2LEV.TYPE = appcon
+DSP.3DS2LEV.LIBS = lib3ds-101d
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
