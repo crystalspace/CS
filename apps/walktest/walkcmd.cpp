@@ -386,7 +386,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
-    CONPRI("  dumpvis cbuffer covtree pvs freezepvs pvsonly\n");
+    CONPRI("  dumpvis cbuffer covtree quad3d pvs freezepvs pvsonly\n");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
     CONPRI("  db_curleaf\n");
     CONPRI("Lights:\n");
@@ -590,6 +590,12 @@ bool CommandHandler (const char *cmd, const char *arg)
     bool en = Sys->world->GetCBuffer () != NULL;
     Command::change_boolean (arg, &en, "cbuffer");
     Sys->world->EnableCBuffer (en);
+  }
+  else if (!strcasecmp (cmd, "quad3d"))
+  {
+    bool en = Sys->world->GetQuad3D () != NULL;
+    Command::change_boolean (arg, &en, "quad3d");
+    Sys->world->EnableQuad3D (en);
   }
   else if (!strcasecmp (cmd, "covtree"))
   {

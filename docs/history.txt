@@ -4,6 +4,10 @@ The history order has been reversed so that new features are at the top.
 	- Brandon Ehle restarted work on Crystal Script (python).
 	  New layout is interface based, which allos for more dynamicism
 	  and lower runtime memory requirements.
+	- Tried to use csQuadTree3D for doing 3D visibility culling
+	  (in contrast with c-buffer which does 2D culling). It doesn't
+	  work yet though.
+	- Added 'quad3d' console command to enable the new culling system.
 13-Jul-2000
 	- Removed 'solidbsp' command from documentation.
 	- Added SetMainFrustum to csQuadTree3D to change the frustum for an

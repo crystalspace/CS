@@ -550,10 +550,10 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csPortal* po;
   csVector3* verts;
   int num_verts;
-  int i;
+  int i, j;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
-  //csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
+  csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
   bool visible;
   csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
@@ -561,6 +561,11 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   for (i = 0 ; i < num ; i++)
   {
     if (!csWorld::ProcessPolygon ()) return (void*)1;
+    // For every polygon we perform some type of culling (2D or 3D culling).
+    // If 2D culling (c-buffer) then transform it to screen space
+    // and perform clipping to Z plane. Then test against the c-buffer
+    // to see if it is visible.
+    // If 3D culling (quadtree3D) then we just test it.
     if (polygon[i]->GetType () == 3)
     {
       // We're dealing with a csBspPolygon.
@@ -594,26 +599,41 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  tbb->World2Camera (*d);
 	}
 
-        // Transform it to screen space and perform clipping to Z plane.
-        // Then test against the c-buffer to see if it is visible.
+	// Culling.
 	bool mark_vis = false;
-        clip = (csPolygon2D*)(render_pool->Alloc ());
-        if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
-		(csPlane3*)NULL, d->GetOrigin (), verts, num_verts) &&
-             bsppol->DoPerspective (*d, verts, num_verts, clip,
-	 	d->IsMirrored ()) &&
-             clip->ClipAgainst (d->view) )
-        {
-	  if (covtree)
-	  {
-	    if (covtree->TestPolygon (clip->GetVertices (),
-	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
+	if (quad3d)
+	{
+	  clip = NULL;
+	  csVector3 test_poly[128];	// @@@ Bad hardcoded limit.
+	  csPolyTreeBBox* par = bsppol->GetParent ();
+	  csVector3Array& verts = par->GetVertices ();
+	  csPolyIndexed& pi = bsppol->GetPolygon ();
+	  for (j = 0 ; j < pi.GetNumVertices () ; j++)
+	    test_poly[j] = verts[pi[j]]-quad3d->GetCenter ();
+	  csBox3 bbox;
+	  int rc = quad3d->TestPolygon (test_poly, pi.GetNumVertices (), bbox);
+	  mark_vis = (rc != CS_QUAD3D_NOCHANGE);
+	}
+	else
+	{
+          clip = (csPolygon2D*)(render_pool->Alloc ());
+          if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
+		  (csPlane3*)NULL, d->GetOrigin (), verts, num_verts) &&
+               bsppol->DoPerspective (*d, verts, num_verts, clip,
+	 	  d->IsMirrored ()) &&
+               clip->ClipAgainst (d->view) )
+          {
+	    if (covtree)
+	    {
+	      if (covtree->TestPolygon (clip->GetVertices (),
+	    	  clip->GetNumVertices (), clip->GetBoundingBox ()))
+	        mark_vis = true;
+	    }
+	    else if (c_buffer->TestPolygon (clip->GetVertices (),
+	  	  clip->GetNumVertices ()))
 	      mark_vis = true;
-	  }
-	  else if (c_buffer->TestPolygon (clip->GetVertices (),
-	  	clip->GetNumVertices ()))
-	    mark_vis = true;
-        }
+          }
+	}
 	if (mark_vis)
 	{
           if (obj->GetType () >= csSprite::Type)
@@ -627,7 +647,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
             th->MarkVisible ();
 	  }
 	}
-        render_pool->Free (clip);
+        if (clip) render_pool->Free (clip);
       }
     }
     else
@@ -646,47 +666,89 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         }
       }
 
-      clip = (csPolygon2D*)(render_pool->Alloc ());
       visible = false;
-      if (!p->flags.Check (CS_POLY_NO_DRAW)
-       && p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
-                          d->GetOrigin (), verts, num_verts)
-       && p->DoPerspective (*d, verts, num_verts, clip, NULL,
-                            d->IsMirrored ())
-       && clip->ClipAgainst (d->view))
+      clip = NULL;
+      // Culling.
+      if (p->flags.Check (CS_POLY_NO_DRAW))
       {
+        // Don't draw this polygon.
+      }
+      else if (quad3d && !csWorld::current_world->IsPVSOnly ())
+      {
+	csVector3 test_poly[128];	// @@@ Bad hardcoded limit.
+	for (j = 0 ; j < p->GetNumVertices () ; j++)
+	  test_poly[j] = p->Vwor (j)-quad3d->GetCenter ();
+	csBox3 bbox;
         po = p->GetPortal ();
-	if (csWorld::current_world->IsPVSOnly ())
-          visible = true;
-        else if (csSector::do_portals && po)
+	int rc;
+	if (po)
+	  rc = quad3d->TestPolygon (test_poly, p->GetNumVertices (), bbox);
+	else
+	  rc = quad3d->InsertPolygon (test_poly, p->GetNumVertices (), bbox);
+	visible = (rc != CS_QUAD3D_NOCHANGE);
+      }
+      else
+      {
+        clip = (csPolygon2D*)(render_pool->Alloc ());
+        if (
+         p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
+                            d->GetOrigin (), verts, num_verts)
+         && p->DoPerspective (*d, verts, num_verts, clip, NULL,
+                              d->IsMirrored ())
+         && clip->ClipAgainst (d->view))
         {
-	  if (covtree)
-            visible = covtree->TestPolygon (clip->GetVertices (),
-		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  else
-            visible = c_buffer->TestPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
-        }
-        else
-        {
-	  if (covtree)
-            visible = covtree->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  else
-            visible = c_buffer->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
+          po = p->GetPortal ();
+	  if (csWorld::current_world->IsPVSOnly ())
+            visible = true;
+          else if (csSector::do_portals && po)
+          {
+	    if (covtree)
+              visible = covtree->TestPolygon (clip->GetVertices (),
+		    clip->GetNumVertices (), clip->GetBoundingBox ());
+	    else
+              visible = c_buffer->TestPolygon (clip->GetVertices (),
+		    clip->GetNumVertices ());
+          }
+          else
+          {
+	    if (covtree)
+              visible = covtree->InsertPolygon (clip->GetVertices (),
+		    clip->GetNumVertices (), clip->GetBoundingBox ());
+	    else
+              visible = c_buffer->InsertPolygon (clip->GetVertices (),
+		    clip->GetNumVertices ());
+          }
         }
       }
+
+      if (visible && !clip)
+      {
+	// If visible and we don't already have a clip (i.e. we did 3D culling)
+	// then we need to make it here. It is still possible that the
+	// polygon will be culled at this stage.
+        clip = (csPolygon2D*)(render_pool->Alloc ());
+        if (!(
+           p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
+                              d->GetOrigin (), verts, num_verts)
+           && p->DoPerspective (*d, verts, num_verts, clip, NULL,
+                                d->IsMirrored ())
+           && clip->ClipAgainst (d->view)))
+	{
+	  visible = false;
+	}
+      }
+
       if (visible)
       {
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
+	if (quad3d && quad3d->IsFull ()) return (void*)1;	// End BSP processing
 	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// End BSP processing
 	if (covtree && covtree->IsFull ()) return (void*)1;	// End BSP processing
       }
       else
       {
-        render_pool->Free (clip);
+        if (clip) render_pool->Free (clip);
         Stats::polygons_rejected++;
       }
     }

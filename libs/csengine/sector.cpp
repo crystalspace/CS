@@ -615,11 +615,24 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
   c_buffer = csWorld::current_world->GetCBuffer ();
   covtree = csWorld::current_world->GetCovtree ();
-  //quad3d = csWorld::current_world->GetQuad3D ();
+  quad3d = csWorld::current_world->GetQuad3D ();
   int num_array;
   otree->GetConvexOutline (onode, pos, array, num_array);
+
   if (num_array)
   {
+    if (quad3d)
+    {
+      csVector3 test_poly[6];
+      for (i = 0 ; i < num_array ; i++)
+        test_poly[i] = array[i]-quad3d->GetCenter ();
+      csBox3 bbox;
+      int rc = quad3d->TestPolygon (test_poly, num_array, bbox);
+      bool visible = (rc != CS_QUAD3D_NOCHANGE);
+      if (!visible) return false;
+      goto is_vis;
+    }
+  
     csVector3 cam[6];
     // If all vertices are behind z plane then the node is
     // not visible. If some vertices are behind z plane then we
