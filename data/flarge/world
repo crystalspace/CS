@@ -5802,6 +5802,17 @@
                 <v x="-1.5" y="-.7" z="14" />
             </move>
         </meshobj>
+        <meshobj name="genMesh2">
+            <plugin>mesh</plugin>
+            <params>
+                <factory>genMeshFact</factory>
+                <material>mosaic</material>
+		<localshadows />
+            </params>
+            <move>
+                <v x="-17" y="-.7" z="18" />
+            </move>
+        </meshobj>
         <meshobj name="sprSkel">
             <plugin>spr3d</plugin>
             <params>

@@ -45,6 +45,18 @@ The history order is reversed so that new features are at the top.
 	  function needs to be done differently (i.e. DeferUpdateLighting()
 	  should be automatic). On large levels (i.e. PlaneShift levels) this
 	  function was second in the top (profiling).
+	- When you specify the <localshadows/> tag with a genmesh object
+	  it will no longer use the DeferUpdateLighting() system but instead
+	  it will be lit using the same system that is used for things.
+	  This means that lighting will be calculated during -relight
+	  and cached just like with things. At this moment there is no
+	  shadow information yet. So if a light touches a genmesh it will
+	  be fully lit by that light. So the cache on disk basically involves
+	  a list of all lights that affect the mesh and nothing more. In
+	  future we will cast real shadows on genmeshes.
+	  Using this system also ensures that the genmesh lighting will be
+	  automatically updated when a light changes (pseudo-dynamic or
+	  dynamic) even without having to call DeferUpdateLighting().
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.

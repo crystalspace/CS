@@ -379,8 +379,7 @@ bool csLightMap::ReadFromCache (
       light = il->QueryLight ();
       csShadowMap *smap = NewShadowMap (light, w, h);
 
-      csRef<iStatLight> slight (SCF_QUERY_INTERFACE (il, iStatLight));
-      slight->AddAffectedLightingInfo (li);
+      il->AddAffectedLightingInfo (li);
 
       if ((long) file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
         return false;
