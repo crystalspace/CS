@@ -155,7 +155,7 @@ public:
   { return cwd; }
 
   /// Push current directory
-  virtual void PushDir ();
+  virtual void PushDir (char const* Path = 0);
   /// Pop current directory
   virtual bool PopDir ();
 

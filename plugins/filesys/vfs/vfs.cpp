@@ -1691,10 +1691,14 @@ bool csVFS::ChDir (const char *Path)
   return true;
 }
 
-void csVFS::PushDir ()
+void csVFS::PushDir (char const* Path)
 {
-  csScopedMutexLock lock (mutex);
-  dirstack.Push (cwd);
+  { // Scope.
+    csScopedMutexLock lock (mutex);
+    dirstack.Push (cwd);
+  }
+  if (Path != 0)
+    ChDir(Path);
 }
 
 bool csVFS::PopDir ()

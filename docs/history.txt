@@ -12,6 +12,11 @@ chronological order.
 	  TinyXML.  This corrects, for instance, a problem on MacOS/X where
 	  modules requiring both csutil and cal3d failed to link on account of
 	  symbolic collisions (since cal3d also embeds TinyXML).
+	- Eric Sunshine greatly expanded the Doxygen documentation fo iVFS and
+	  iFile.
+	- Eric Sunshine augmented iVFS::PushDir() so that, as a convenience, it
+	  optionally accepts a path as an argument and invokes ChDir() for that
+	  path after pushing the current working directory.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

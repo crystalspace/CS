@@ -104,43 +104,63 @@ struct iFile : public iBase
 {
   /// Query file name (in VFS)
   virtual const char *GetName () = 0;
+
   /// Query file size
   virtual size_t GetSize () = 0;
+
   /**
    * Check (and clear) file last error status
    * \sa #VFS_STATUS_ACCESSDENIED
    */
   virtual int GetStatus () = 0;
 
-  /// Replacement for standard fread()
+  /**
+   * Read DataSize bytes and place them into the buffer at which Data points.
+   * \param Data Pointer to the buffer into which the data should be read.  The
+   *   buffer should be at least DataSize bytes in size.
+   * \param DataSize Number of bytes to read.
+   * \return The number of bytes actually read.  If an error occurs, zero is
+   *   returned.  Invoke GetStatus() to retrieve the error code.
+   */
   virtual size_t Read (char *Data, size_t DataSize) = 0;
-  /// Replacement for standard fwrite()
+
+  /**
+   * Write DataSize bytes from the buffer at which Data points.
+   * \param Data Pointer to the data to be written.
+   * \param DataSize Number of bytes to write.
+   * \return The number of bytes actually written.  If an error occurs, zero is
+   *   returned.  Invoke GetStatus() to retrieve the error code.
+   */
   virtual size_t Write (const char *Data, size_t DataSize) = 0;
+
   /// Flush stream.
   virtual void Flush () = 0;
-  /// Replacement for standard feof()
+
+  /// Returns true if the stream is at end-of-file, else false.
   virtual bool AtEOF () = 0;
-  /// Query current file pointer
+
+  /// Query current file pointer.
   virtual size_t GetPos () = 0;
+
+  /**
+   * Set new file pointer.
+   * \param newpos New position in file.
+   * \return True if the operation succeeded, else false.
+   */
+  virtual bool SetPos (size_t newpos) = 0;
 
   /**
    * Request whole content of the file as a single data buffer.
    * \param nullterm Set this to true if you want a null char to be appended
    *  to the buffer (e.g. for use with string functions.)
-   * \remarks Null-termination might have a performance penalty (dependent on
+   * \remarks Null-termination might have a performance penalty (depending upon
    *  where the file is stored.) Use only when needed.
-   * \return The complete data contained in the file, or 0 if this doesn't 
-   *  support this function (e.g. write-opened VFS files.) Don't modify the 
-   *  contained data!
+   * \return The complete data contained in the file; or an invalidated pointer
+   *  if this object does not support this function (e.g. write-only VFS
+   *  files).  Check for an invalidated result via csRef<>::IsValid().  Do not
+   *  modify the contained data!
    */
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
-
-  /**
-   * Set new file pointer.
-   * \param newpos New position in file.
-   * \return Whether the position was successfully changed.
-   */
-  virtual bool SetPos (size_t newpos) = 0;
 };
 
 
@@ -174,18 +194,34 @@ struct iVFS : public iBase
 {
   /// Set current working directory
   virtual bool ChDir (const char *Path) = 0;
+
   /// Get current working directory
   virtual const char *GetCwd () const = 0;
 
-  /// Push current directory
-  virtual void PushDir () = 0;
-  /// Pop current directory
+  /**
+   * Push current directory and optionally change to a different directory.
+   * \param Path Path which should become the new working directory after the
+   *   current directory is remembered.  May be null.
+   * \remarks If Path is not the null pointer, then current working directory
+   *   is remembered and Path is set as the new working directory.  If Path is
+   *   the null pointer, then the current working directory is remembered, but
+   *   not changed.
+   */
+  virtual void PushDir (char const* Path = 0) = 0;
+  /**
+   * Pop current directory.  Set the current working directory to the one most
+   * recently pushed.
+   * \return True if there was a remembered directory and the invocation of
+   *   ChDir() for the remembered directory succeeded; else false if there was
+   *   no remembered directory, or ChDir() failed.
+   */
   virtual bool PopDir () = 0;
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
-   * 'currend virtual directory'. Return a new iString object.
-   * If IsDir is true, expanded path ends in an '/', otherwise no.
+   * 'currend virtual directory'.
+   * \param IsDir If true, the expanded path will be terminated with '/'.
+   * \return A new iDataBuffer object.
    */
   virtual csPtr<iDataBuffer> ExpandPath (
     const char *Path, bool IsDir = false) const = 0;
@@ -194,14 +230,17 @@ struct iVFS : public iBase
   virtual bool Exists (const char *Path) const = 0;
 
   /**
-   * Find all files in a virtual directory and return an array with their
-   * names.
+   * Find absolute paths of all files in a virtual directory and return an
+   * array with their names.
    */
   virtual csPtr<iStringArray> FindFiles (const char *Path) const = 0;
 
   /**
-   * Replacement for standard fopen().
-   * Mode: combination of VFS_FILE_XXX.
+   * Open a file on the VFS filesystem.
+   * \param FileName The VFS path of the file in the VFS filesystem.
+   * \param Mode Combination of VFS_FILE_XXX constants.
+   * \return A valid iFile if the file was opened successfully, otherwise an
+   *  invalidated iFile.  Use csRef<>::IsValid() to check validity.
    * \sa #VFS_FILE_MODE
    */
   virtual csPtr<iFile> Open (const char *FileName, int Mode) = 0;
@@ -214,47 +253,106 @@ struct iVFS : public iBase
    * returned size.
    * \param FileName VFS path of the file to be read.
    * \param nullterm Null-terminate the returned buffer.
-   * \return Interface to the contained data.
+   * \return An iDataBuffer containing the file contents if the file was opened
+   *  and read successfully, otherwise an invalidated iFile.  Use
+   *  csRef<>::IsValid() to check validity.
    * \remarks Null-termination might have a performance penalty (dependent on
    *  where the file is stored.) Use only when needed.
    */
   virtual csPtr<iDataBuffer> ReadFile (const char *FileName,
     bool nullterm = true) = 0;
-  /// Write an entire file in one pass.
+
+  /**
+   * Write an entire file in one pass.
+   * \param Data Pointer to the data to be written.
+   * \param Size Number of bytes to write.
+   * \return True if the write succeeded, else false.
+   */
   virtual bool WriteFile (const char *Name, const char *Data, size_t Size) = 0;
 
-  /// Delete a file on VFS
+  /**
+   * Delete a file on VFS
+   * \return True if the deletion succeeded, else false.
+   */
   virtual bool DeleteFile (const char *FileName) = 0;
 
-  /// Close all opened archives, free temporary storage etc.
+  /**
+   * Close all opened archives, free temporary storage etc.
+   * \return True if the synchronization succeeded, else false.
+   */
   virtual bool Sync () = 0;
 
-  /// Mount an VFS path on a "real-world-filesystem" path
+  /**
+   * Mount an VFS path on a "real-world-filesystem" path.
+   * \param VirtualPath The location in the virtual filesystem in which to
+   *   mount RealPath.
+   * \param RealPath The physical filesystem path to mount at VirtualPath.
+   * \return True if the mount succeeded, else false.
+   */
   virtual bool Mount (const char *VirtualPath, const char *RealPath) = 0;
-  /// Unmount an VFS path; if RealPath is 0, entire VirtualPath is unmounted
+
+  /**
+   * Unmount a VFS path.
+   * \param VirtualPath The location in the virtual filesystem which is to be
+   *   unmounted.
+   * \param RealPath The physical filesystem path corresponding to the virtual
+   *   path.
+   * \remarks A single virtual path may represent multiple physical locations;
+   *   in which case, the physical locations appear as a conglomerate in the
+   *   virtual filesystem.  The RealPath argument allows unmounting of just a
+   *   single location represented by the given VirtualPath.  If RealPath is
+   *   the null pointer, then all pysical locations represented by VirtualPath
+   *   are umounted.
+   * \return True if the unmount succeeded, else false.
+   */
   virtual bool Unmount (const char *VirtualPath, const char *RealPath) = 0;
+
   /**
    * Mount the root directory or directories beneath the given virtual path.
-   * Returns a list of absolute virtual pathnames mounted by this operation.
+   * \return A list of absolute virtual pathnames mounted by this operation.
+   * \remarks On Unix, there is only a single root directory, but on other
+   *   platforms there may be many.  For example, on Unix, if VirtualPath is
+   *   "/native", then the single Unix root directory "/" will be mounted
+   *   directly to "/native".  On Windows, which has multiple root directories,
+   *   one for each drive letter, they will be mounted as "/native/a/",
+   *   "/native/c/", "/native/d/", and so on.
    */
   virtual csRef<iStringArray> MountRoot (const char *VirtualPath) = 0;
 
-  /// Save current configuration back into configuration file
+  /**
+   * Save current configuration back into configuration file
+   * \return True if the operation succeeded, else false.
+   */
   virtual bool SaveMounts (const char *FileName) = 0;
 
-  /// Query file date/time
+  /**
+   * Query file date/time.
+   * \return True if the query succeeded, else false.
+   */
   virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const = 0;
-  /// Set file date/time
+  /**
+   * Set file date/time.
+   * \return True if the operation succeeded, else false.
+   */
   virtual bool SetFileTime (const char *FileName, const csFileTime &iTime) = 0;
 
-  /// Query file size (without opening it)
+  /**
+   * Query file size (without opening it).
+   * \return True if the query succeeded, else false.
+   */
   virtual bool GetFileSize (const char *FileName, size_t &oSize) = 0;
 
   /**
    * Query real-world path from given VFS path.
-   * This will work only for files that are stored on real filesystem,
-   * not in archive files. You should expect this function to return
-   * 0 in this case.
+   * \param FileName The virtual path for which the physical path is desired.
+   * \remarks This will work only for files that are stored on real filesystem,
+   *   not in archive files.  You should expect this function to return an
+   *   invalidated iDataBuffer for filesystems which do not support this
+   *   operation.
+   * \return An iDataBuffer containing the actual physical path corresponding
+   *   to the virtual path named by FileName, or an invalidated iDataBuffer if
+   *   the operation fails or is not supported.  Use csRef<>::IsValid() to
+   *   check validity.
    */
   virtual csPtr<iDataBuffer> GetRealPath (const char *FileName) = 0;
 };
@@ -262,4 +360,3 @@ struct iVFS : public iBase
 /** @} */
 
 #endif // __CS_IUTIL_VFS_H__
-
