@@ -54,13 +54,14 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_ver
   // to avoid that they are overwritten when interpolating.
   G3DTexturedVertex tritexcoords[3];
   G3DFogInfo trifoginfo[3];
-  for (int i = 0; i < 3; i++)
+	int i;
+  for (i = 0; i < 3; i++)
   {
     tritexcoords[i] = g3dpoly->vertices[i];
     trifoginfo[i] = g3dpoly->fog_info[i];
   }
 
-  int i, vt, vt2;
+  int vt, vt2;
   float t;
   for (i = 0 ; i < num_vertices ; i++)
   {
