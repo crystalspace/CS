@@ -82,6 +82,7 @@ endif
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.DLL += -fPIC"  >> $(CURDIR)/CS/config.mak 
+	echo "LIBS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	# Make dynamic version of libs
 	# not yet usable
 #	cd $(CURDIR)/CS; $(MAKE) libs USE_SHARED_LIBS=yes
