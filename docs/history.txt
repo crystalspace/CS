@@ -51,6 +51,8 @@ chronological order.
 	  iFoo is only a forward declaration.  This was supposed to have been
 	  fixed on 25-Nov-2003, but a typographical error resulted in inclusion
 	  of iutil/event.h rather than the needed iutil/eventh.h.
+	- Eric Sunshine fixed bug in cpsace.i.  It failed to export iReporter,
+	  iReporterIterator, and iReporterListener.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even
