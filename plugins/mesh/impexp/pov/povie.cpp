@@ -42,9 +42,9 @@ public:
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount();
-  virtual const csModelConverterFormat *GetFormat( int idx );
-  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
-  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
+  virtual const csModelConverterFormat *GetFormat(int idx);
+  virtual csPtr<iModelData> Load(uint8* Buffer, uint32 size);
+  virtual csPtr<iDataBuffer> Save(iModelData*, const char *format);
 
   struct Component : public iComponent
   {
@@ -69,9 +69,6 @@ SCF_IMPLEMENT_FACTORY (csModelConverterPOV)
 
 
 CS_IMPLEMENT_PLUGIN
-
-CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
 csModelConverterPOV::csModelConverterPOV (iBase *pBase)
 {
@@ -116,7 +113,8 @@ static void WriteVertex (csString &out, iModelDataVertices *Vertices,
   out << s;
 }
 
-csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
+csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/,
+					     uint32 /*Size*/)
 {
   return 0;
 }
@@ -186,13 +184,14 @@ csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/
 
 */
 
-csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data,
+					      const char *Format)
 {
   if (strcasecmp (Format, "pov"))
     return 0;
 
   csString out;
-  out << "// This file was created by csModelConverterPOV from Crystal Space.\n";
+  out << "// This file was created by Crystal Space's csModelConverterPOV.\n";
 
 /*
   Initial declarations.
@@ -236,13 +235,13 @@ csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Form
   out << "}\n\n";
 
   int TextureNum = 0;
-  csModelDataObjectIterator it (Data->QueryObject ());
+  csTypedObjectIterator<iModelDataObject> it (Data->QueryObject ());
   while (it.HasNext ())
   {
     iModelDataObject *Object = it.Next ();
     out << "mesh {\n";
 
-    csModelDataPolygonIterator it2 (Object->QueryObject ());
+    csTypedObjectIterator<iModelDataPolygon> it2 (Object->QueryObject ());
     while (it2.HasNext ())
     {
       iModelDataPolygon *Polygon = it2.Next ();

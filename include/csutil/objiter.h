@@ -24,64 +24,73 @@
 #define __CS_OBJITER_H__
 
 #include "csextern.h"
+#include "csutil/ref.h"
 #include "iutil/object.h"
 
 /**
- * Defines a typed objectiterator class, descending from 
- * csTypedObjectIterator. This macro assumes that the requested interface 
- * is already declared as a fast interface.
+ * Typed object iterator class.
  */
-#define CS_DECLARE_OBJECT_ITERATOR(NAME,INTERFACE)			\
-  class NAME : public csTypedObjectIterator				\
-  {									\
-  protected:								\
-    virtual void GetRequestedInterface (scfInterfaceID &id,		\
-      int &ver) const							\
-    { id = scfInterface<INTERFACE>::GetID();				\
-      ver = scfInterface<INTERFACE>::GetVersion(); }			\
-  public:								\
-    inline NAME (iObject *Parent) : csTypedObjectIterator (Parent)	\
-      { }								\
-    inline INTERFACE *Next ()						\
-      { return (INTERFACE*)(iBase*)csTypedObjectIterator::Next (); }	\
-  };
-
-/**
- * Helper class for #CS_DECLARE_OBJECT_ITERATOR macro.
- */
-class CS_CSUTIL_EXPORT csTypedObjectIterator
+template<typename T> class csTypedObjectIterator
 {
 protected:
+  scfInterfaceID scf_id;
+  int scf_ver;
   csRef<iObjectIterator> iter;
   csRef<iBase> CurrentTypedObject;
-  bool fetched;
 
-  void FetchObject ();
-  iBase* GetCurrentObject();
-  virtual void GetRequestedInterface (scfInterfaceID &id, int &ver) const = 0;
+  void FetchObject()
+  {
+    CurrentTypedObject.Invalidate();
+    while (iter->HasNext())
+    {
+      CurrentTypedObject =
+	csPtr<iBase>((iBase*)(iter->Next()->QueryInterface(scf_id, scf_ver)));
+      if (CurrentTypedObject.IsValid())
+	return;
+    }
+  }
 
 public:
-  /// constructor
-  csTypedObjectIterator (iObject *Parent);
-  /// destructor
-  virtual ~csTypedObjectIterator ();
+  /// Constructor.
+  csTypedObjectIterator(iObject* parent)
+  {
+    scf_id = scfInterface<T>::GetID();
+    scf_ver = scfInterface<T>::GetVersion();
+    iter = parent->GetIterator();
+    FetchObject();
+  }
+
+  /// Destructor.
+  ~csTypedObjectIterator() {}
 
   /// Move forward
-  iBase* Next()
+  T* Next()
   {
-    iBase* cur = GetCurrentObject();
-    FetchObject ();
-    return cur;
+    iBase* cur = CurrentTypedObject;
+    FetchObject();
+    return (T*)cur;
   }
-  /// Reset the iterator to the beginning
-  void Reset () { iter->Reset (); fetched = false; }
-  /// Get the parent object
-  iObject *GetParentObj() const { return iter->GetParentObj (); }
-  /// Check if we have any children of requested type
-  bool HasNext () const
-  { return const_cast<csTypedObjectIterator*>(this)->GetCurrentObject() != 0; }
-  /// Find the object with the given name
-  iBase* FindName (const char* name);
+
+  /// Reset the iterator to the beginning.
+  void Reset() { iter->Reset(); FetchObject(); }
+
+  /// Get the parent object.
+  iObject* GetParentObj() const { return iter->GetParentObj(); }
+
+  /// Check if we have any children of requested type.
+  bool HasNext() const { return CurrentTypedObject.IsValid(); }
+
+  /// Find the object with the given name.
+  T* FindName (const char* name)
+  {
+    iObject* obj = iter->FindName(name);
+    if (obj != 0)
+      CurrentTypedObject.AttachNew(
+  	(iBase*)(obj->QueryInterface(scf_id, scf_ver)));
+    else
+      CurrentTypedObject.Invalidate();
+    return (T*)(iBase*)CurrentTypedObject;
+  }
 };
 
 #endif // __CS_OBJITER_H__

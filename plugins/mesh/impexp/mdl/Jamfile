@@ -1,8 +1,6 @@
 SubDir TOP plugins mesh impexp mdl ;
 
 Description mdlie : "MDL Import/Export plugin" ;
-
-Plugin mdlie
-	: [ Wildcard *.cpp *.h ]
-;
+Plugin mdlie : [ Wildcard *.cpp *.h ] ;
 LinkWith mdlie : csgeom cstool csutil ;
+CompileGroups mdlie : meshimpexp ;

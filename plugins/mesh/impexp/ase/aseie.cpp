@@ -34,8 +34,8 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 
-typedef bool (csASEInterpreter) (class csModelConverterASE *conv, csDataStream &in,
-  const char *Token);
+typedef bool (csASEInterpreter) (class csModelConverterASE *conv,
+				 csDataStream &in, const char *Token);
 
 class csModelConverterASE : public iModelConverter
 {
@@ -339,8 +339,8 @@ bool csASEInterpreter_NODE_TM (csModelConverterASE *conv, csDataStream &in,
   return false;
 }
 
-bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv, csDataStream &in,
-  const char *Token)
+bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv,
+					csDataStream &in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_VERTEX"))
   {
@@ -357,8 +357,8 @@ bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv, csDataStream 
   return false;
 }
 
-bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv, csDataStream &in,
-  const char *Token)
+bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv,
+				      csDataStream &in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_FACE"))
   {
@@ -399,8 +399,8 @@ bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv, csDataStream &i
   return false;
 }
 
-bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv, csDataStream &in,
-  const char *Token)
+bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv,
+				    csDataStream &in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_FACENORMAL"))
   {
@@ -432,8 +432,7 @@ bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv, csDataStream &in,
 }
 
 bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv,
-  csDataStream &/*in*/,
-  const char *Token)
+  csDataStream &/*in*/, const char *Token)
 {
   CS_ASE_READ_IGNORE ("*MESH_CFACE");
 
@@ -441,8 +440,8 @@ bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv,
   return false;
 }
 
-bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv, csDataStream &in,
-  const char *Token)
+bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv,
+				      csDataStream &in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_VERTCOL"))
   {
@@ -459,8 +458,8 @@ bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv, csDataStream &i
   return false;
 }
 
-bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv, csDataStream &/*in*/,
-  const char *Token)
+bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv,
+				      csDataStream &/*in*/, const char *Token)
 {
   CS_ASE_READ_IGNORE ("*MESH_TFACE");
 
@@ -468,8 +467,8 @@ bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv, csDataStream &/
   return false;
 }
 
-bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv, csDataStream &in,
-  const char *Token)
+bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv,
+				      csDataStream &in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_TVERT"))
   {
@@ -561,9 +560,9 @@ struct csExtTriangle
 
 typedef csPDelArray<csTriangle> csTriangleVector;
 typedef csPDelArray<csExtTriangle> csExtTriangleVector;
-CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
-csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data,
+					      const char *Format)
 {
   if (strcasecmp (Format, "ase"))
     return 0;
@@ -571,7 +570,8 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
 /*
   Purpose:
 
-    csModelConverterASE::Save () writes graphics information to an AutoCAD ASE file.
+  csModelConverterASE::Save() writes graphics information to an AutoCAD ASE
+  file.
 
   Modified:
 
@@ -598,23 +598,25 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
   // must be of the same size. This is not true for vertex normals.
   csSingleIndexVertexSet VertexTexelSet (true, false, false, true);
 
-  // build the triangle list and store the indices in VertexTexelSet. 'origtri'
-  // stores a list of triangles whose indices point into the original vertex list,
-  // those from 'tri' point into the vertex/texel set.
+  // Build the triangle list and store the indices in VertexTexelSet. 'origtri'
+  // stores a list of triangles whose indices point into the original vertex
+  // list, those from 'tri' point into the vertex/texel set.
   csExtTriangleVector origtri;
   csTriangleVector tri;
 
-  csModelDataPolygonIterator it (obj->QueryObject ());
+  csTypedObjectIterator<iModelDataPolygon> it (obj->QueryObject ());
   while (it.HasNext ())
   {
     iModelDataPolygon *poly = it.Next ();
-    int v1 = VertexTexelSet.Add (poly->GetVertex (0), -1, -1, poly->GetTexel (0));
-    int vprev = VertexTexelSet.Add (poly->GetVertex (1), -1, -1, poly->GetTexel (1));
+    int v1 = VertexTexelSet.Add(poly->GetVertex(0), -1, -1, poly->GetTexel(0));
+    int vprev =
+      VertexTexelSet.Add(poly->GetVertex(1), -1, -1, poly->GetTexel(1));
 
     size_t i;
     for (i=2; i<poly->GetVertexCount (); i++)
     {
-      int vn = VertexTexelSet.Add (poly->GetVertex (i), -1, -1, poly->GetTexel (i));
+      int vn =
+	VertexTexelSet.Add(poly->GetVertex(i), -1, -1, poly->GetTexel(i));
       tri.Push (new csTriangle (v1, vprev, vn));
       origtri.Push (new csExtTriangle (poly, 0, i-1, i));
       vprev = vn;

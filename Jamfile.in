@@ -47,6 +47,7 @@ Description fontservers  : "font servers" ;
 Description canvases	 : "2D canvases" ;
 Description renderers	 : "3D renderers" ;
 Description meshes	 : "mesh plugins and loaders" ;
+Description meshimpexp   : "mesh import/export plugins" ;
 Description walkall  	 : "Walktest application and all required plugins" ;
 Description openglcanvas : "canvas for the OpenGL renderer" ;
 Description softcanvas   : "canvas for the software renderer" ;
@@ -54,8 +55,8 @@ Description proctexes    : "procedural texture plugins" ;
 Description renderall    : "modules related to rendering" ;
 Description shaders      : "shaders and related modules" ;
 RegisterCompileGroups sounddrivers soundloaders imageloaders fontservers
-		      canvases renderers meshes walkall openglcanvas 
-		      softcanvas proctexes renderall shaders ;
+		      canvases renderers meshes meshimpexp walkall
+                      openglcanvas softcanvas proctexes renderall shaders ;
 
 # Historic group aliases.
 NotFile drivers2d ;

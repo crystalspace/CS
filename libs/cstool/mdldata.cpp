@@ -54,9 +54,6 @@
   iObject* clname::QueryObject ()					\
   { return &scfiObject; }
 
-CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
-
 //----------------------------------------------------------------------------
 
 /*** csModelDataTexture ***/
@@ -555,7 +552,7 @@ csModelData::~csModelData()
 
 void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
 {
-  csModelDataTextureIterator it (&scfiObject);
+  csTypedObjectIterator<iModelDataTexture> it (&scfiObject);
   while (!it.HasNext ())
   {
     it.Next ()->LoadImage (vfs, io, Format);
@@ -564,7 +561,7 @@ void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
 
 void csModelData::RegisterTextures (iTextureList *tm)
 {
-  csModelDataTextureIterator it (&scfiObject);
+  csTypedObjectIterator<iModelDataTexture> it (&scfiObject);
   while (it.HasNext ())
   {
     it.Next ()->Register (tm);
@@ -573,7 +570,7 @@ void csModelData::RegisterTextures (iTextureList *tm)
 
 void csModelData::RegisterMaterials (iMaterialList *ml)
 {
-  csModelDataMaterialIterator it (&scfiObject);
+  csTypedObjectIterator<iModelDataMaterial> it (&scfiObject);
   while (!it.HasNext ())
   {
     it.Next ()->Register (ml);

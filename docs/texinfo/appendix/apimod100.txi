@@ -1079,3 +1079,39 @@ goes out is same as the cut-off distance, but this can be changed by altering
 the first attenuation constant. See comments in
 @file{CS/include/iengine/light.h} for exact details of the different
 attenuation modes.
+
+@subheading @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
+
+The @samp{iObject} iterator creation macro @code{CS_DECLARE_OBJECT_ITERATOR()}
+has been replaced by the templated class @code{csTypedObjectIterator<>}. Given
+existing code, such as:
+
+@example
+iObject* parent = @dots{};
+CS_DECLARE_OBJECT_ITERATOR(MyFooIter, iFoo);
+MyFooIter iter(parent);
+while (iter.HasNext())
+@{
+  iFoo* foo = iter.Next();
+  @dots{}
+@}
+@end example
+
+@noindent
+Revise the code by instantiating the new template class:
+
+@example
+typedef csTypedObjectIterator<iFoo> MyFooIter;
+MyFooIter iter(parent);
+while (iter.HasNext())
+@{
+@end example
+
+@noindent
+Or, even simpler without the @samp{typedef}:
+
+@example
+csTypedObjectIterator<iFoo> iter(parent);
+while (iter.HasNext())
+@{
+@end example

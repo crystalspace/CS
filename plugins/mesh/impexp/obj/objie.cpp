@@ -44,9 +44,9 @@ public:
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount();
-  virtual const csModelConverterFormat *GetFormat( int idx );
-  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
-  virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
+  virtual const csModelConverterFormat *GetFormat(int idx);
+  virtual csPtr<iModelData> Load(uint8* Buffer, uint32 size);
+  virtual csPtr<iDataBuffer> Save(iModelData*, const char *format);
 
   struct Component : public iComponent
   {
@@ -69,10 +69,7 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csModelConverterOBJ)
 
-
 CS_IMPLEMENT_PLUGIN
-
-CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
 csModelConverterOBJ::csModelConverterOBJ (iBase *pBase)
 {
@@ -507,7 +504,8 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
   return csPtr<iModelData> (Scene);
 }
 
-csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Format)
+csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data,
+					      const char *Format)
 {
   if (strcasecmp (Format, "obj"))
     return 0;
@@ -545,7 +543,7 @@ csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data, const char *Form
   }
 
   // store polygons
-  csModelDataPolygonIterator it (obj->QueryObject ());
+  csTypedObjectIterator<iModelDataPolygon> it (obj->QueryObject ());
   while (it.HasNext ())
   {
     iModelDataPolygon *poly = it.Next ();

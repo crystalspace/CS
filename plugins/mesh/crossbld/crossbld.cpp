@@ -31,10 +31,6 @@
 #include "csgeom/transfrm.h"
 #include "csutil/objiter.h"
 
-CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
-
-//----------------------------------------------------------------------------
-
 class csCrossBuilder : public iCrossBuilder
 {
 public:
@@ -155,7 +151,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
 {
   csRef<iMeshFactoryWrapper> MainWrapper;
 
-  csModelDataObjectIterator it (Scene->QueryObject ());
+  csTypedObjectIterator<iModelDataObject> it (Scene->QueryObject ());
   while (it.HasNext ())
   {
     csRef<iMeshFactoryWrapper> SubWrapper (Engine->CreateMeshFactory (

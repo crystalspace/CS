@@ -22,6 +22,12 @@ chronological order.
 	  formats (mostly correct formatting of pointers).
 	- Eric Sunshine added csRef<>::Invalidate() to complement the existing
 	  IsValid() method.
+	- Eric Sunshine replaced the ugly CS_DECLARE_OBJECT_ITERATOR() macro
+	  with a new templated class csTypedObjectIterator<>. As a happy
+	  side-effect, the templated class provides a cleaner solution than the
+	  20-Aug-2003 fix to the problem where the macro-based class was
+	  incorrectly invoking the pure-virtual GetRequestedInterface().
+	- Eric Sunshine added a `meshimpexp' Jam compile-group.
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 

@@ -6,4 +6,5 @@ Description ie3ds : "Model Import/Export 3ds plugin" ;
 Plugin ie3ds : [ Wildcard *.cpp *.h ] ;
 LinkWith ie3ds : csgeom cstool csutil ;
 ExternalLibs ie3ds : 3DS ;
+CompileGroups ie3ds : meshimpexp ;
 }

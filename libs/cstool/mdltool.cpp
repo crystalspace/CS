@@ -31,9 +31,8 @@
 #include "iengine/material.h"
 #include "ivideo/material.h"
 
-// ---------------------------------------------------------------------------
-
-static void PushIdentityMapping (csDirtyAccessArray<int>& array, int n, int offset)
+static void PushIdentityMapping (csDirtyAccessArray<int>& array, int n,
+				 int offset)
 {
   int i;
   for (i=0; i<n; i++)
@@ -93,7 +92,8 @@ csSingleIndexVertexSet::~csSingleIndexVertexSet ()
   }
 }
 
-size_t csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color, int Texel)
+size_t csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color,
+				    int Texel)
 {
 
 /* @@@: Removed the code below because it is extremely expensive
@@ -117,7 +117,8 @@ size_t csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color, int Texel
   return Count - 1;
 }
 
-void csSingleIndexVertexSet::Add (int Count, int *ver, int *nrm, int *col, int *tex)
+void csSingleIndexVertexSet::Add (int Count, int *ver, int *nrm, int *col,
+				  int *tex)
 {
   int i;
 
@@ -156,12 +157,6 @@ int csSingleIndexVertexSet::GetTexel (size_t n) const
 // ---------------------------------------------------------------------------
 // Some helper declarations
 // ---------------------------------------------------------------------------
-
-CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
-CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 
 typedef csDirtyAccessArray<csVector3> csVector3ArrayType;
 typedef csDirtyAccessArray<csVector2> csVector2Array;
@@ -257,7 +252,8 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
     if (ver)
     {
       iModelDataVertices *NewVertices = Swap ?
-        new csModelDataVertices (In2, ver) : new csModelDataVertices (ver, In2);
+        new csModelDataVertices (In2, ver) :
+	new csModelDataVertices (ver, In2);
       Out->AddFrame (In1->GetTime (i), NewVertices->QueryObject ());
       NewVertices->DecRef ();
     }
@@ -372,9 +368,8 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
       }
     }
 
-    csRef<iModelDataVertices> MergedVertices (
-        csPtr<iModelDataVertices> (
-		new csModelDataVertices (Frame1, Frame2)));
+    csRef<iModelDataVertices> MergedVertices(csPtr<iModelDataVertices>(
+      new csModelDataVertices (Frame1, Frame2)));
 
     Out->AddFrame (CurrentTime, MergedVertices->QueryObject ());
 
@@ -399,12 +394,13 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
  * BuildMappedVertexFrame (): Create a vertex frame by copying vertices from
  * the given frame, as described by the given map.
  */
-static iModelDataVertices *BuildMappedVertexFrame (iModelDataVertices *Orig,
-  const csModelDataVertexMap *Map)
+static csRef<iModelDataVertices> BuildMappedVertexFrame(
+  iModelDataVertices *Orig, const csModelDataVertexMap *Map)
 {
-  iModelDataVertices *ver = new csModelDataVertices ();
-  size_t i;
+  csRef<iModelDataVertices> ver;
+  ver.AttachNew(new csModelDataVertices());
 
+  size_t i;
   for (i=0; i<Map->VertexCount; i++)
     ver->AddVertex (Orig->GetVertex (Map->Vertices [i]));
 
@@ -428,7 +424,7 @@ static bool CheckMaterialConflict (iModelDataObject *obj1)
 {
   iModelDataMaterial *mat = 0;
 
-  csModelDataPolygonIterator it = (obj1->QueryObject ());
+  csTypedObjectIterator<iModelDataPolygon> it = (obj1->QueryObject ());
   while (it.HasNext ())
   {
     iModelDataMaterial *mat2 = it.Next ()->GetMaterial ();
@@ -458,15 +454,15 @@ static float MergeTimesHelper (float in1, float in2)
     return in1;
 
   float a = in2 / in1;
-  if (ABS (a-1) < EPSILON) {
+  if (ABS (a-1) < EPSILON)
     return in2;
-  } else if (ABS (a-2) < EPSILON) {
+  else if (ABS (a-2) < EPSILON)
     return in2;
-  } else if (ABS (a-3) < EPSILON) {
+  else if (ABS (a-3) < EPSILON)
     return in2;
-  } else if (ABS (a-1.5) < EPSILON) {
+  else if (ABS (a-1.5) < EPSILON)
     return in2 * 2;
-  }
+
   return -1;
 }
 
@@ -479,42 +475,45 @@ static float MergeTimesHelper (float in1, float in2)
  */
 inline float MergeTimes (float in1, float in2)
 {
-  if (in1 < in2) {
+  if (in1 < in2)
     return MergeTimesHelper (in1, in2);
-  } else {
+  else
     return MergeTimesHelper (in2, in1);
-  }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 		    
-void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject *src)
+void csModelDataTools::MergeCopyObject (iModelDataObject *dest,
+  iModelDataObject *src)
 {
-  // store vertex, normal, texel and color offset
-  csRef<iModelDataVertices> DefaultVertices = dest->GetDefaultVertices ();
-  int VertexOffset = DefaultVertices ? (int)DefaultVertices->GetVertexCount () : 0;
-  int NormalOffset = DefaultVertices ? (int)DefaultVertices->GetNormalCount () : 0;
-  int TexelOffset = DefaultVertices ? (int)DefaultVertices->GetTexelCount () : 0;
-  int ColorOffset = DefaultVertices ? (int)DefaultVertices->GetColorCount () : 0;
   size_t i;
 
+  // store vertex, normal, texel and color offset
+  csRef<iModelDataVertices> DefaultVertices = dest->GetDefaultVertices ();
+  int VertexOffset =
+    DefaultVertices ? (int)DefaultVertices->GetVertexCount () : 0;
+  int NormalOffset =
+    DefaultVertices ? (int)DefaultVertices->GetNormalCount () : 0;
+  int TexelOffset =
+    DefaultVertices ? (int)DefaultVertices->GetTexelCount () : 0;
+  int ColorOffset =
+    DefaultVertices ? (int)DefaultVertices->GetColorCount () : 0;
+
   // copy the default vertices
-  iModelDataVertices *ver = new csModelDataVertices (DefaultVertices,
-  	src->GetDefaultVertices ());
+  iModelDataVertices *ver =
+    new csModelDataVertices (DefaultVertices, src->GetDefaultVertices ());
   dest->SetDefaultVertices (ver);
   ver->DecRef ();
 
   // copy all polygons
-  csModelDataPolygonIterator *polyit = new csModelDataPolygonIterator (
-  	src->QueryObject ());
-  while (polyit->HasNext ())
+  csTypedObjectIterator<iModelDataPolygon> polyit(src->QueryObject());
+  while (polyit.HasNext ())
   {
-    iModelDataPolygon *poly = polyit->Next ();
+    iModelDataPolygon *poly = polyit.Next ();
     iModelDataPolygon *NewPoly = new csModelDataPolygon ();
     dest->QueryObject ()->ObjAdd (NewPoly->QueryObject ());
 
-    for (i=0; i<poly->GetVertexCount (); i++)
+    for (i = 0; i<poly->GetVertexCount (); i++)
     {
       NewPoly->AddVertex (
       poly->GetVertex (i) + VertexOffset,
@@ -525,7 +524,6 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     NewPoly->SetMaterial (poly->GetMaterial ());
     NewPoly->DecRef ();
   }
-  delete polyit;
 
   // build the action mapping
   csModelDataActionVector ActionMap1, ActionMap2;
@@ -576,7 +574,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 	if (total<0)
 	{
           // this should not happen
-	  CS_ASSERT ("Action conflict detection missed a conflict!!!" && false);
+	  CS_ASSERT("Action conflict detection missed a conflict!!!" && false);
 	  NewAction = 0;
 	}
 
@@ -605,12 +603,11 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
   iModelDataObject *src, const csModelDataVertexMap *Map)
 {
-  iModelDataVertices *ver =
+  csRef<iModelDataVertices> ver =
     BuildMappedVertexFrame (src->GetDefaultVertices (), Map);
   dest->SetDefaultVertices (ver);
-  ver->DecRef ();
 
-  csModelDataActionIterator it (src->QueryObject ());
+  csTypedObjectIterator<iModelDataAction> it (src->QueryObject ());
   while (it.HasNext ())
   {
     iModelDataAction *OldAction = it.Next ();
@@ -620,8 +617,8 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
     if (!NewAction)
     {
       NewAction = csPtr<iModelDataAction> (new csModelDataAction ());
-      dest->QueryObject ()->ObjAdd (NewAction->QueryObject ());
-      NewAction->QueryObject ()->SetName (OldAction->QueryObject ()->GetName ());
+      dest->QueryObject()->ObjAdd(NewAction->QueryObject());
+      NewAction->QueryObject()->SetName(OldAction->QueryObject()->GetName());
     }
     else
     {
@@ -639,15 +636,15 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
       {
         ver = BuildMappedVertexFrame (oldver, Map);
 	NewAction->AddFrame (OldAction->GetTime (i), ver->QueryObject ());
-	ver->DecRef ();
       }
     }
   }
 }
 
-static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
+static bool CheckActionConflict (
+  iModelDataObject *obj1, iModelDataObject *obj2)
 {
-  csModelDataActionIterator it (obj1->QueryObject ());
+  csTypedObjectIterator<iModelDataAction> it (obj1->QueryObject ());
   while (it.HasNext ())
   {
     iModelDataAction *Action = it.Next ();
@@ -663,7 +660,6 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
         return true;
     }
   }
-
   return false;
 }
 
@@ -673,7 +669,7 @@ static bool CheckMaterialConflict (iModelDataObject *obj1,
   csModelDataMaterialVector mat1, mat2;
 
   {
-    csModelDataPolygonIterator it (obj1->QueryObject ());
+    csTypedObjectIterator<iModelDataPolygon> it (obj1->QueryObject ());
     while (it.HasNext ())
     {
       iModelDataPolygon *poly = it.Next ();
@@ -682,7 +678,7 @@ static bool CheckMaterialConflict (iModelDataObject *obj1,
   }
 
   {
-    csModelDataPolygonIterator it (obj2->QueryObject ());
+    csTypedObjectIterator<iModelDataPolygon> it (obj2->QueryObject ());
     while (it.HasNext ())
     {
       iModelDataPolygon *poly = it.Next ();
@@ -757,7 +753,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
       csModelDataObjectVector NewObjects;
 
       // build the Polygons, Materials and PolygonToNewObject lists
-      csModelDataPolygonIterator it (obj->QueryObject ());
+      csTypedObjectIterator<iModelDataPolygon> it (obj->QueryObject ());
       while (it.HasNext ())
       {
         iModelDataPolygon *poly = it.Next ();
@@ -807,7 +803,6 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 	size_t j;
 	for (j=0; j<Polygon->GetVertexCount (); j++)
 	{
-
 #define CS_MDLTOOL_HELPER(obj)						\
   n = obj##IndexTable->Find (Polygon->Get##obj (j));			\
   if (n != (size_t)-1) {						\
@@ -954,7 +949,7 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
 
 void csModelDataTools::CompressVertices (iModelData *Scene)
 {
-  csModelDataObjectIterator it (Scene->QueryObject ());
+  csTypedObjectIterator<iModelDataObject> it (Scene->QueryObject ());
   while (it.HasNext ())
   {
     CompressVertices (it.Next ());
@@ -985,7 +980,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
       for (i=0; i<Action->GetFrameCount (); i++)
       {
         csRef<iModelDataVertices> ver (
-		SCF_QUERY_INTERFACE (Action->GetState (i), iModelDataVertices));
+	  SCF_QUERY_INTERFACE (Action->GetState (i), iModelDataVertices));
 	if (ver)
 	  VertexFrames.PushSmart (ver);
       }
@@ -1022,7 +1017,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 #define CS_MDLTOOL_HELPER(type,obj,comp)				\
   while (obj##List.Length () > 0)					\
   {									\
-    csDirtyAccessArray<int> *Set = new csDirtyAccessArray<int> ();		\
+    csDirtyAccessArray<int> *Set = new csDirtyAccessArray<int> ();	\
     type o1 = obj##List [0];						\
     int Index1 = obj##ListIndices->Get (0);				\
     Set->Push (Index1);							\
@@ -1060,8 +1055,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 #define CS_MDLTOOL_HELPER(type,obj,comp)				\
   for (i=0; i<obj##Sets.Length (); i++)					\
   {									\
-    csDirtyAccessArray<int> *Set = obj##Sets [i];				\
-    csDirtyAccessArray<int> *Removed = 0;					\
+    csDirtyAccessArray<int> *Set = obj##Sets [i];			\
+    csDirtyAccessArray<int> *Removed = 0;				\
     type o1 = ver->Get##obj (Set->Get (0));				\
     for (j=1; j<Set->Length (); j++)					\
     {									\
@@ -1113,7 +1108,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     obj##MapN2O.Push (obj##Sets [i]->Get (0));				\
     for (j=0; j<obj##Sets [i]->Length (); j++)				\
     {									\
-      obj##MapO2N [obj##Sets [i]->Get (j)] = (int)(Unique##obj##List.Length () + i); \
+      obj##MapO2N [obj##Sets [i]->Get (j)] =				\
+	(int)(Unique##obj##List.Length () + i);				\
     }									\
   }
 
