@@ -78,10 +78,12 @@
 ; Do (almost) bogus checking on texture overflows
 %define STUPID_TEST
 
-; Flag: scanproc does texture mapping
-%define SCANPROC_TEXMAP		0x00000001
+; Flag: scanproc uses light mapping
+%define SCANPROC_MAP		0x00000001
+; Flag: scanproc uses unlighted texture
+%define SCANPROC_TEX		0x00000002
 ; Flag: scanproc uses MMX instructions (so FPU is clobbered)
-%define SCANPROC_MMX		0x00000002
+%define SCANPROC_MMX		0x00000004
 
 ; Predefine several macros to make it maximally possible C-like;
 ; this makes easier porting the structure from scan.h
@@ -229,7 +231,7 @@ extvar	Scan
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %macro		stupid_test 3
 	%ifdef STUPID_TEST
-	%if %1 & SCANPROC_TEXMAP
+	%if %1 & SCANPROC_MAP
 ; if (uu < 0) uu = 0; else if (uu > tw2fp) uu = tw2fp;
 		mov	ebp,%2
 		test	ebp,ebp
@@ -267,11 +269,13 @@ extvar	Scan
 ;   - bits per pixel (8/16/32)
 ;   - The name of scanline routine (without csScan_#_ prefix)
 ;   - texture flags ORed together
-;	SCANPROC_TEXMAP - if scanloop does texture mapping
+;	SCANPROC_MAP - if scanloop uses light map (vs unlighted textures)
+;	SCANPROC_MMX - if zloop uses MMX instructions (and we don't need
+;	to clear z and inv_z from fpu stack since we anyway need "emms")
 ;   - The basename of scanline routine
 ;	(appended suffixes: _args,_init,_body,_fini)
 ; Example:
-;   scanproc 8,draw_scanline_map_zfill,SCANPROC_TEXMAP,scanloop_map
+;   scanproc 8,draw_scanline_map_zfill,SCANPROC_MAP,scanloop_map
 ; Comments:
 ;   The following variables are placed in registers (and
 ;   should not be changed by scanline loop macro):
@@ -460,10 +464,10 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 			mov	edx,%$vv1				; 0
 			sub	eax,%$uu				; 1
 			sub	edx,%$vv				; 1
-			sar	eax,cl					; 2
-			sar	edx,cl					; 2
-			mov	%$duu,eax				; 3
-			mov	%$dvv,edx				; 3
+			sar	eax,cl					; 2(4)
+			sar	edx,cl					; 6(4)
+			mov	%$duu,eax				; 10
+			mov	%$dvv,edx				; 10
 ;   }
 ;   else
 ;   {
@@ -668,9 +672,8 @@ endproc
 		add	edi,8
 		sub	ecx,2
 %$zless2:	add	ecx,2
-		emms
-		test	ecx,ecx
 		mov	eax,[edi-4]
+		test	ecx,ecx
 		jz	%$zexit
 
 %$zloop1:	add	eax,ebx
@@ -678,7 +681,7 @@ endproc
 		add	edi,4
 		dec	ecx
 		jnz	%$zloop1
-%$zexit:
+%$zexit:	emms
 %endmacro
 
 %endif ; __SCAN_ASH__

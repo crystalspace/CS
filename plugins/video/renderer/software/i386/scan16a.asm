@@ -30,7 +30,7 @@
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 16,draw_scanline_map_zfil,SCANPROC_TEXMAP,scanloop_map
+;   scanproc 16,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_args 24
 %macro		scanloop_map_init 0
@@ -204,7 +204,7 @@
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 16,mmx_draw_scanline_map_zfil,SCANPROC_TEXMAP|SCANPROC_MMX,mmx_scanloop_map
+;   scanproc 16,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		mmx_scanloop_map_args scanloop_map_args
 %define		mmx_scanloop_map_init scanloop_map_init
@@ -218,7 +218,7 @@
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 16,draw_scanline_map_zuse,SCANPROC_TEXMAP,scanloop_map_z
+;   scanproc 16,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_z_args 24
 %macro		scanloop_map_z_init 0
@@ -294,14 +294,14 @@
   		mov	[edi],dx		; Put texel		; 3
 %$zbelow:	add	ebx,%$dvFP 		; vv += dvv		; 3?
 		sbb	edx,edx			; carry (vv + dvv)	; 4
-		add	edi,2			; dest++		; 4
-		adc	edx,edx			; *2+carry (uu + duu)	; 5
-		add	eax,%$duFP		; uu += duu		; 5/2
-		adc	esi,[%$dudvFP_+8+edx*4]	; Source texture ptr	; 8/2
-		add	ecx,%$dzz		; z = z + dz		; 8/2
-		add	ebp,4			; zbuff++		; 10
-		cmp	edi,%$destend		; dest < destend?	; 10
-		jb	%$zloop						; 11
+		add	eax,%$duFP		; uu += duu		; 4/2
+		adc	edx,edx			; *2+carry (uu + duu)	; 6
+		add	edi,2			; dest++		; 6
+		adc	esi,[%$dudvFP_+8+edx*4]	; Source texture ptr	; 7/2
+		add	ecx,%$dzz		; z = z + dz		; 7/2
+		add	ebp,4			; zbuff++		; 9
+		cmp	edi,%$destend		; dest < destend?	; 9
+		jb	%$zloop						; 10
 
 		mov	%$zbuff,ebp
 		mov	%$izz,ecx
@@ -319,7 +319,7 @@
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 16,draw_scanline_map_alpha50,SCANPROC_TEXMAP,scanloop_map_a50
+;   scanproc 16,draw_scanline_map_alpha50,SCANPROC_MAP,scanloop_map_a50
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %define		scanloop_map_a50_args 36
 %macro		scanloop_map_a50_init 0
@@ -498,10 +498,10 @@
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 16,draw_scanline_tex_zfil,SCANPROC_TEXMAP,scanloop
+;   scanproc 16,draw_scanline_tex_zfil,0,scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-%define		scanloop_args 12
-%macro		scanloop_init 0
+%define		scanloop_tex_args 12
+%macro		scanloop_tex_init 0
 		tloc	%$and_w		; texture width mask
 		tloc	%$and_h		; texture height mask
 		tloc	%$paltable	; 8->16 conversion table
@@ -513,7 +513,7 @@
 		mov	%$and_w,ecx
 		mov	%$paltable,ebp
 %endmacro
-%macro		scanloop_body 0
+%macro		scanloop_tex_body 0
 	%ifdef PIC
 		push	ebx
 	%endif
@@ -558,7 +558,7 @@
 		pop	ebx
 	%endif
 %endmacro
-%define		scanloop_fini zfill
+%define		scanloop_tex_fini zfill
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
@@ -567,12 +567,12 @@
 ; Arguments:
 ;   none
 ; Example:
-;   scanproc 16,mmx_draw_scanline_tex_zfil,SCANPROC_TEXMAP,mmx_scanloop
+;   scanproc 16,mmx_draw_scanline_tex_zfil,SCANPROC_MAP,mmx_scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-%define		mmx_scanloop_args scanloop_args
-%define		mmx_scanloop_init scanloop_init
-%define		mmx_scanloop_body scanloop_body
-%define		mmx_scanloop_fini mmx_zfill
+%define		mmx_scanloop_tex_args scanloop_tex_args
+%define		mmx_scanloop_tex_init scanloop_tex_init
+%define		mmx_scanloop_tex_body scanloop_tex_body
+%define		mmx_scanloop_tex_fini mmx_zfill
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 ; Summary:
@@ -594,12 +594,12 @@ proc		csScan_16_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 		targ	%$dz		; long dz
 		targ	%$bitmap	; unsigned char *bitmap
 		targ	%$bitmap_log2w	; int bitmap_log2w
-
 		loc	%$dudvFP,8	; fixed-point value of (dv * tex_w + du)
 		tloc	%$duFP		; fixed-point duu
 		tloc	%$dvFP		; fixed-point dvv
 		tloc	%$destend
 		tloc	%$paltable	; 8->16 conversion table
+
 ; if (len <= 0)
 ;   return;
 		mov	eax,%$width
@@ -707,6 +707,7 @@ proc		csScan_16_mmx_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 		tloc	%$dvFP		; fixed-point dvv
 		tloc	%$destend
 		tloc	%$paltable	; 8->16 conversion table
+
 ; if (len <= 0)
 ;   return;
 		mov	eax,%$width
@@ -922,9 +923,9 @@ proc		csScan_16_mmx_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 %$sexit:	emms
 endproc
 
-scanproc 16,draw_scanline_map_zfil,SCANPROC_TEXMAP,scanloop_map
-scanproc 16,mmx_draw_scanline_map_zfil,SCANPROC_TEXMAP|SCANPROC_MMX,mmx_scanloop_map
-scanproc 16,draw_scanline_map_zuse,SCANPROC_TEXMAP,scanloop_map_z
-scanproc 16,draw_scanline_map_alpha50,SCANPROC_TEXMAP,scanloop_map_a50
-scanproc 16,draw_scanline_tex_zfil,SCANPROC_TEXMAP,scanloop
-scanproc 16,mmx_draw_scanline_tex_zfil,SCANPROC_TEXMAP|SCANPROC_MMX,mmx_scanloop
+scanproc 16,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
+scanproc 16,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
+scanproc 16,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
+scanproc 16,draw_scanline_map_alpha50,SCANPROC_MAP,scanloop_map_a50
+scanproc 16,draw_scanline_tex_zfil,SCANPROC_TEX,scanloop_tex
+scanproc 16,mmx_draw_scanline_tex_zfil,SCANPROC_TEX|SCANPROC_MMX,mmx_scanloop_tex
