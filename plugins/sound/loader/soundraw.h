@@ -23,7 +23,6 @@
 #include "isound/data.h"
 
 class csSoundDataRaw : public iSoundData {
-friend class csSoundStreamRaw;
 public:
   DECLARE_IBASE;
 
@@ -31,11 +30,13 @@ public:
     csSoundFormat Format);
   virtual ~csSoundDataRaw();
 
-  void Convert(const csSoundFormat *NewFormat);
-
-  virtual long GetNumSamples();
+  virtual bool Initialize(const csSoundFormat *fmt);
   virtual const csSoundFormat *GetFormat();
-  virtual iSoundStream *CreateStream();
+  virtual bool IsStatic();
+  virtual long GetStaticNumSamples();
+  virtual void *GetStaticData();
+  virtual void ResetStreamed();
+  virtual void *ReadStreamed(long &NumSamples);
 
 private:
   // the sample buffer
@@ -44,33 +45,8 @@ private:
   long NumSamples;
   // format of this sound
   csSoundFormat Format;
-};
 
-class csSoundStreamRaw : public iSoundStream {
-public:
-  DECLARE_IBASE;
-  
-  // constructor
-  csSoundStreamRaw(csSoundDataRaw *sndData);
-  // destructor
-  virtual ~csSoundStreamRaw();
-
-  // return the format descriptor
-  virtual const csSoundFormat *GetFormat();
-  // return true if the samples may be precached
-  virtual bool MayPrecache();
-  // reset the stream to the beginning
-  virtual void Restart();
-  // read the sound buffer
-  virtual void *Read(long &NumSamples);
-  // discard a buffer returned by Read()
-  virtual void DiscardBuffer(void *buf);
-
-private:
-  // the sound data
-  csSoundDataRaw *Data;
-  // current position
-  long Position;
+  long pos;
 };
 
 #endif

@@ -2466,7 +2466,7 @@ void csLoader::skydome_process (csThing& thing, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-iSoundData* csLoader::LoadSoundData(const char* filename) {
+iSoundHandle* csLoader::LoadSoundHandle(const char* filename) {
   /* @@@ get the needed plugin interfaces:
    * when moving the loader to a plug-in, this should be done
    * at initialization, and pointers shouldn't be DecRef'ed here.
@@ -2478,8 +2478,6 @@ iSoundData* csLoader::LoadSoundData(const char* filename) {
   /* get format descriptor */
   /* ### */iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
   /* ### */if (!SoundRender) return NULL;
-  const csSoundFormat *Format = SoundRender->GetLoadFormat();
-  /* ### */SoundRender->DecRef();
 
   /* read the file data */
   iDataBuffer *buf = System->VFS->ReadFile (filename);
@@ -2504,7 +2502,7 @@ iSoundData* csLoader::LoadSoundData(const char* filename) {
   }
 
   /* load the sound */
-  iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize (), Format);
+  iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
   buf->DecRef ();
   /* ### */SoundLoader->DecRef();
 
@@ -2514,7 +2512,11 @@ iSoundData* csLoader::LoadSoundData(const char* filename) {
     return NULL;
   }
 
-  return Sound;
+  /* register the sound */
+  iSoundHandle *hdl = SoundRender->RegisterSound(Sound);
+  /* ### */SoundRender->DecRef();
+
+  return hdl;
 }
 
 
@@ -2522,8 +2524,8 @@ csSoundDataObject *csLoader::LoadSoundObject (csEngine* engine,
   char* name, const char* fname) {
 
   Engine=engine;
-  /* load the sound data */
-  iSoundData *Sound = LoadSoundData(fname);
+  /* load the sound handle */
+  iSoundHandle *Sound = LoadSoundHandle(fname);
 
   /* build wrapper object */
   csSoundDataObject* sndobj = new csSoundDataObject (Sound);
@@ -3033,7 +3035,7 @@ bool csLoader::LoadSounds (char* buf)
           CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
         }
-        iSoundData *snd = csSoundDataObject::GetSound (*Engine, name);
+        iSoundHandle *snd = csSoundDataObject::GetSound (*Engine, name);
         if (!snd)
         {
           csSoundDataObject *s = LoadSoundObject(Engine, name, filename);

@@ -24,13 +24,14 @@
 #include "isound/data.h"
 #include "srdrsrc.h"
 #include "srdrcom.h"
+#include "sndhdl.h"
 
 IMPLEMENT_IBASE(csSoundSourceSoftware)
   IMPLEMENTS_INTERFACE(iSoundSource)
 IMPLEMENT_IBASE_END;
 
 csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
-    iSoundStream *Stream, int m3d) {
+    csSoundHandleSoftware *hdl, int m3d) {
   CONSTRUCT_IBASE(srdr);
 
   SoundRender = srdr;
@@ -40,14 +41,15 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
   Position = csVector3(0,0,0);
   Velocity = csVector3(0,0,0);
   Active = false;
-  SoundStream = Stream;
-  SoundStream->IncRef();
+  SoundPos = 0;
+  SoundHandle = hdl;
+  SoundHandle->IncRef();
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
   Stop();
-  SoundStream->DecRef();
+  SoundHandle->DecRef();
 }
 
 void csSoundSourceSoftware::Play(unsigned long pMethod)
@@ -55,7 +57,7 @@ void csSoundSourceSoftware::Play(unsigned long pMethod)
   PlayMethod=pMethod;
   if (!Active) SoundRender->AddSource(this);
   Active=true;
-  if (PlayMethod & SOUND_RESTART) SoundStream->Restart();
+  if (PlayMethod & SOUND_RESTART) Restart();
 }
 
 void csSoundSourceSoftware::Stop() {
@@ -63,6 +65,14 @@ void csSoundSourceSoftware::Stop() {
     Active=false;
     SoundRender->RemoveSource(this);
   }
+}
+
+void csSoundSourceSoftware::Restart() {
+  if (!SoundHandle->Data) return;
+  if (SoundHandle->Data->IsStatic())
+    SoundPos = 0;
+  else
+    SoundHandle->Data->ResetStreamed();
 }
 
 bool csSoundSourceSoftware::IsActive() {
@@ -175,13 +185,13 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
 }
 
 /* helper macros */
-#define READMONOSAMP        ((int)(RawData[i])-NullSample)
-#define READLEFTSAMP        ((int)(RawData[2*i])-NullSample)
-#define READRIGHTSAMP       ((int)(RawData[2*i+1])-NullSample)
+#define READMONOSAMP        ((int)(Input[i])-NullSample)
+#define READLEFTSAMP        ((int)(Input[2*i])-NullSample)
+#define READRIGHTSAMP       ((int)(Input[2*i+1])-NullSample)
 
-#define WRITEMONOSAMP(x)    Buffer[i]+=(x)*(CalcVolL+CalcVolR)/2;
-#define WRITELEFTSAMP(x)    Buffer[2*i]+=(x)*CalcVolL;
-#define WRITERIGHTSAMP(x)   Buffer[2*i+1]+=(x)*CalcVolR;
+#define WRITEMONOSAMP(x)    Output[i]+=(x)*(CalcVolL+CalcVolR)/2;
+#define WRITELEFTSAMP(x)    Output[2*i]+=(x)*CalcVolL;
+#define WRITERIGHTSAMP(x)   Output[2*i+1]+=(x)*CalcVolR;
 
 #define READMONO3D          int samp=READMONOSAMP;
 #define READSTEREO3D        int samp=(READLEFTSAMP+READRIGHTSAMP)/2;
@@ -191,78 +201,72 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
 
 #define LOOP                for (unsigned long i=0;i<NumSamples;i++)
 
-#define ADDTOBUFFER_BITS {                                                  \
-  stype *Buffer=(stype*)Memory;                                             \
-  long SamplesToWrite=MemSize/(sizeof(stype));                              \
-  if (SoundRender->isStereo()) SamplesToWrite/=2;                           \
-                                                                            \
-  while (1) {                                                               \
-    long NumSamples = SamplesToWrite;                                       \
-    stype *RawData = (stype*)SoundStream->Read(NumSamples);                 \
-    if (Mode3d != SOUND3D_DISABLE) {                                        \
-      /* is 3d effect is enabled, stereo input channels are mixed */        \
-      if (Format->Channels==2) {                                            \
-        if (SoundRender->isStereo()) {                                      \
-          LOOP {READSTEREO3D; WRITESTEREO3D;}                               \
-        } else {                                                            \
-          LOOP {READSTEREO3D; WRITEMONO3D;}                                 \
-        }                                                                   \
-      } else {                                                              \
-        if (SoundRender->isStereo()) {                                      \
-          LOOP {READMONO3D; WRITESTEREO3D;}                                 \
-        } else {                                                            \
-          LOOP {READMONO3D; WRITEMONO3D;}                                   \
-        }                                                                   \
-      }                                                                     \
-    } else {                                                                \
-      /* handle non-3d sound (use CalcVolL for volume, NOT 'Volume', */     \
-      /* to use any precalculation done in Prepare()                 */     \
-      if (Format->Channels==2) {                                            \
-        if (SoundRender->isStereo()) {                                      \
-          /* stereo -> stereo */                                            \
-          LOOP {                                                            \
-            WRITELEFTSAMP(READLEFTSAMP);                                    \
-            WRITERIGHTSAMP(READRIGHTSAMP);                                  \
-          }                                                                 \
-        } else {                                                            \
-          /* stereo -> mono */                                              \
-          LOOP {                                                            \
-            WRITEMONOSAMP((READLEFTSAMP + READRIGHTSAMP)/2);                \
-          }                                                                 \
-        }                                                                   \
-      } else {                                                              \
-        if (SoundRender->isStereo()) {                                      \
-          /* mono -> stereo */                                              \
-          LOOP {                                                            \
-            WRITELEFTSAMP(READMONOSAMP);                                    \
-            WRITERIGHTSAMP(READMONOSAMP);                                   \
-          }                                                                 \
-        } else {                                                            \
-          LOOP {                                                            \
-          /* mono -> mono */                                                \
-            WRITEMONOSAMP(READMONOSAMP);                                    \
-          }                                                                 \
-        }                                                                   \
-      }                                                                     \
-    }                                                                       \
-    SoundStream->DiscardBuffer(RawData);                                    \
-    SamplesToWrite-=NumSamples;                                             \
-    if (SamplesToWrite==0) break;                                           \
-    else {                                                                  \
-      if (PlayMethod & SOUND_LOOP) SoundStream->Restart();                  \
-      else {Active=false;return;}                                           \
-    }                                                                       \
-  }                                                                         \
+#define ADDTOBUFFER_BITS {                                              \
+  stype *Input = (stype*)Source;                                        \
+  stype *Output = (stype*)Dest;                                         \
+                                                                        \
+  if (Mode3d != SOUND3D_DISABLE) {                                      \
+    /* is 3d effect is enabled, stereo input channels are mixed */      \
+    if (InputFormat->Channels==2) {                                     \
+      if (OutputFormat->Channels==2) {                                  \
+        LOOP {READSTEREO3D; WRITESTEREO3D;}                             \
+      } else {                                                          \
+        LOOP {READSTEREO3D; WRITEMONO3D;}                               \
+      }                                                                 \
+    } else {                                                            \
+      if (OutputFormat->Channels==2) {                                  \
+        LOOP {READMONO3D; WRITESTEREO3D;}                               \
+      } else {                                                          \
+        LOOP {READMONO3D; WRITEMONO3D;}                                 \
+      }                                                                 \
+    }                                                                   \
+  } else {                                                              \
+    /* handle non-3d sound (use CalcVolL for volume, NOT 'Volume', */   \
+    /* to use any precalculation done in Prepare()                 */   \
+    if (InputFormat->Channels==2) {                                     \
+      if (OutputFormat->Channels==2) {                                  \
+        /* stereo -> stereo */                                          \
+        LOOP {                                                          \
+          WRITELEFTSAMP(READLEFTSAMP);                                  \
+          WRITERIGHTSAMP(READRIGHTSAMP);                                \
+        }                                                               \
+      } else {                                                          \
+        /* stereo -> mono */                                            \
+        LOOP {                                                          \
+          WRITEMONOSAMP((READLEFTSAMP + READRIGHTSAMP)/2);              \
+        }                                                               \
+      }                                                                 \
+    } else {                                                            \
+      if (OutputFormat->Channels==2) {                                  \
+        /* mono -> stereo */                                            \
+        LOOP {                                                          \
+          WRITELEFTSAMP(READMONOSAMP);                                  \
+          WRITERIGHTSAMP(READMONOSAMP);                                 \
+        }                                                               \
+      } else {                                                          \
+        LOOP {                                                          \
+        /* mono -> mono */                                              \
+          WRITEMONOSAMP(READMONOSAMP);                                  \
+        }                                                               \
+      }                                                                 \
+    }                                                                   \
+  }                                                                     \
 }
 
-void csSoundSourceSoftware::AddToBuffer(void *Memory, long MemSize) {
-  if (!Active) return;
+void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
+        long NumSamples) {
 
-  const csSoundFormat *Format = SoundStream->GetFormat();
+  csSoundFormat outfmt;
+  outfmt.Freq = SoundRender->getFrequency();
+  outfmt.Bits = SoundRender->is16Bits() ? 16 : 8;
+  outfmt.Channels = SoundRender->isStereo() ? 2 : 1;
 
-  if (SoundRender->is16Bits()) {
+  const csSoundFormat *InputFormat = SoundHandle->Data->GetFormat();
+  const csSoundFormat *OutputFormat = &outfmt;
+  
+  if (OutputFormat->Bits == 16) {
     #define stype short
-    #define NullSample  0
+    #define NullSample 0
     ADDTOBUFFER_BITS
     #undef stype
     #undef NullSample
@@ -272,5 +276,34 @@ void csSoundSourceSoftware::AddToBuffer(void *Memory, long MemSize) {
     ADDTOBUFFER_BITS
     #undef stype
     #undef NullSample
+  }
+}
+
+void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
+{
+  iSoundData *snd = SoundHandle->Data;
+  if (!snd) return;
+
+  long InBPS = (snd->GetFormat()->Bits/8) * (snd->GetFormat()->Channels);
+  long OutBPS = (SoundRender->is16Bits() ? 2 : 1) *
+                (SoundRender->isStereo() ? 2 : 1);
+  long NumSamples = size / OutBPS;
+
+  while (1) {
+    long Num = NumSamples;
+
+    if (SoundPos + Num > snd->GetStaticNumSamples())
+      Num = snd->GetStaticNumSamples() - SoundPos;
+    unsigned char *Input = (unsigned char*)snd->GetStaticData();
+
+    WriteBuffer(Input + SoundPos * InBPS, mem, Num);
+    SoundPos += Num;
+
+    NumSamples -= Num;
+    mem = ((unsigned char *)mem) + Num * OutBPS;
+
+    if (NumSamples == 0) break;
+    if (!(PlayMethod & SOUND_LOOP)) break;
+    Restart();
   }
 }

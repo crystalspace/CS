@@ -34,8 +34,7 @@
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_IFF::Load(UByte* buf, ULong size,
-        const csSoundFormat *RequestFormat) const {
+iSoundData *csSoundLoader_IFF::Load(UByte* buf, ULong size) const {
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
   char *data=NULL;
@@ -138,7 +137,6 @@ iSoundData *csSoundLoader_IFF::Load(UByte* buf, ULong size,
   Format.Bits=8;
   Format.Channels=1;
   sb = new csSoundDataRaw(NULL, data, samples_size, Format);
-  sb->Convert(RequestFormat);
 
   goto exit_ok;
 exit_read:

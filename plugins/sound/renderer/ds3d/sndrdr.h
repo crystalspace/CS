@@ -28,6 +28,7 @@
 #include "isound/renderer.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
+#include "dsound.h"
 
 class csSoundListenerDS3D;
 class csSoundSourceDS3D;
@@ -43,13 +44,10 @@ public:
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
 
-  virtual void PlaySound (iSoundData *snd, bool Loop);
-  virtual void PlaySound (iSoundStream *snd, bool Loop);
-  virtual iSoundSource *CreateSource (iSoundData *snd, int Mode3d);
-  virtual iSoundSource *CreateSource (iSoundStream *snd, int Mode3d);
+  virtual iSoundHandle *RegisterSound(iSoundData *);
+  virtual void UnregisterSound(iSoundHandle *);
 
   virtual iSoundListener *GetListener ();
-  virtual const csSoundFormat *GetLoadFormat();
   virtual void MixingFunction ();
   virtual bool HandleEvent (iEvent &e);
 
@@ -63,13 +61,14 @@ public:
 
   const char *GetError(HRESULT result);
 
-public:
   LPDIRECTSOUND AudioRenderer;
   iSystem *System;
   csSoundListenerDS3D *Listener;
   csSoundFormat LoadFormat;
   csVector ActiveSources;
+  csVector SoundHandles;
   csConfigAccess Config;
+  cs_time LastTime;
 };
 
 #endif	//__SOUND_RENDER_DS3D_H__

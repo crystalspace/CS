@@ -29,6 +29,8 @@ csSoundDataRaw::csSoundDataRaw(iBase *iParent, void *d, long n,
   Data = d;
   NumSamples = n;
   Format = f;
+
+  pos = 0;
 }
 
 csSoundDataRaw::~csSoundDataRaw() {
@@ -36,17 +38,32 @@ csSoundDataRaw::~csSoundDataRaw() {
   delete[] p;
 }
 
-long csSoundDataRaw::GetNumSamples() {
-  return NumSamples;
-}
 
 const csSoundFormat *csSoundDataRaw::GetFormat() {
   return &Format;
 }
 
-iSoundStream *csSoundDataRaw::CreateStream() {
-  return new csSoundStreamRaw(this);
+
+bool csSoundDataRaw::IsStatic() {
+  return true;
 }
+
+long csSoundDataRaw::GetStaticNumSamples() {
+  return NumSamples;
+}
+
+void *csSoundDataRaw::GetStaticData() {
+  return Data;
+}
+
+void csSoundDataRaw::ResetStreamed() {
+}
+
+void *csSoundDataRaw::ReadStreamed(long &) {
+  return NULL;
+}
+
+/*** format conversion functions follow ***/
 
 #define REPLACE_DATA(x) {                        \
   unsigned char* const p = (unsigned char*)Data; \
@@ -127,8 +144,7 @@ void *ConvertFreq(void *d, const csSoundFormat *oldfmt,
   }
 }
 
-
-void csSoundDataRaw::Convert(const csSoundFormat *RequestFormat) {
+bool csSoundDataRaw::Initialize(const csSoundFormat *RequestFormat) {
   if (Format.Bits==16 && RequestFormat->Bits==8) {
     REPLACE_DATA(ConvertBuffer16To8Bit(Data, NumSamples * Format.Channels));
     Format.Bits = 8;
@@ -146,56 +162,6 @@ void csSoundDataRaw::Convert(const csSoundFormat *RequestFormat) {
     REPLACE_DATA(ConvertFreq(Data, &Format, RequestFormat, NumSamples));
     Format.Freq = RequestFormat->Freq;
   }
-}
 
-/***************************************************************************/
-
-IMPLEMENT_IBASE(csSoundStreamRaw)
-  IMPLEMENTS_INTERFACE(iSoundStream)
-IMPLEMENT_IBASE_END
-
-csSoundStreamRaw::csSoundStreamRaw(csSoundDataRaw *sd) {
-  CONSTRUCT_IBASE(NULL);
-  Data=sd;
-  Data->IncRef();
-  Position=0;
-}
-
-csSoundStreamRaw::~csSoundStreamRaw() {
-  Data->DecRef();
-}
-
-const csSoundFormat *csSoundStreamRaw::GetFormat() {
-  return &Data->Format;
-}
-
-bool csSoundStreamRaw::MayPrecache() {
   return true;
-}
-
-void csSoundStreamRaw::Restart() {
-  Position=0;
-}
-
-void *csSoundStreamRaw::Read(long &Num) {
-  // test if we should return as much data as possible
-  if (Num == -1) Num = Data->NumSamples - Position;
-  // decrease size of data if we reached the end of the sound
-  if (Position + Num > Data->NumSamples) Num = Data->NumSamples-Position;
-  // set up return data
-  void *d;
-  if (Data->Format.Bits==16) {
-    d=(short*)Data->Data+Position*Data->Format.Channels;
-  } else {
-    d=(unsigned char *)Data->Data+Position*Data->Format.Channels;
-  }
-  Position+=Num;
-  // the data buffer is like another reference to this stream
-  IncRef();
-  return d;
-}
-
-void csSoundStreamRaw::DiscardBuffer(void *buf) {
-  (void)buf;
-  DecRef();
 }

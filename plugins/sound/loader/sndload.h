@@ -20,18 +20,17 @@
 #define __SNDLOAD_H__
 
 struct iSoundData;
-struct csSoundFormat;
 
 // format-specific sound data loader
 class csSoundDataLoader {
-  public: virtual iSoundData *Load (UByte *buf, ULong size,
-    const csSoundFormat*) const = 0;
+public:
+  virtual iSoundData *Load (UByte *buf, ULong size) const = 0;
 };
 
 #define DECLARE_SOUNDDATA_LOADER(name)                                          \
   class name : public csSoundDataLoader {                                       \
-    public: virtual iSoundData *Load(UByte*, ULong,                             \
-      const csSoundFormat*) const;                                              \
+  public:                                                                       \
+    virtual iSoundData *Load(UByte*, ULong) const;                              \
   }
 
 // all sound data loaders

@@ -29,9 +29,9 @@
 #include "isys/event.h"
 
 #include "srdrcom.h"
-#include "srdrlst.h"
+#include "../common/slstn.h"
 #include "srdrsrc.h"
-#include "../common/convmeth.h"
+#include "sndhdl.h"
 
 IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
@@ -103,7 +103,7 @@ bool csSoundRenderSoftware::Open()
   if (Volume>1) Volume = 1;
   if (Volume<0) Volume = 0;
 
-  Listener = new csSoundListenerSoftware (NULL);
+  Listener = new csSoundListener ();
   ActivateMixing = true;
   LoadFormat.Freq = getFrequency();
   LoadFormat.Bits = is16Bits() ? 16 : 8;
@@ -112,6 +112,11 @@ bool csSoundRenderSoftware::Open()
   System->Printf (MSG_INITIALIZATION, "  Playing %d Hz, %d bits, %s\n",
     getFrequency(), (is16Bits())?16:8, (isStereo())?"Stereo":"Mono");
   System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", Volume);
+
+  cs_time et, ct;
+  System->GetElapsedTime(et, ct);
+  LastTime = ct;
+
   return true;
 }
 
@@ -132,24 +137,32 @@ void csSoundRenderSoftware::Close()
 
   while (Sources.Length()>0)
     ((iSoundSource*)Sources.Get(0))->Stop();
+
+  while (SoundHandles.Length()>0) {
+    csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)SoundHandles.Pop();
+    hdl->Unregister();
+    hdl->DecRef();
+  }
 }
 
-IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderSoftware);
+iSoundHandle *csSoundRenderSoftware::RegisterSound(iSoundData *snd) {
+  // convert the sound
+  if (!snd->Initialize(&LoadFormat)) return NULL;
 
-iSoundSource *csSoundRenderSoftware::CreateSource(iSoundStream *Str, int mode3d) {
-  if (!Str) return NULL;
-  // check for correct input format
-  const csSoundFormat *fmt = Str->GetFormat();
-  if (fmt->Bits != (is16Bits()?16:8)) {
-    System->Printf(MSG_WARNING, "incorrect input format for sound renderer (bits)\n");
-    return NULL;
-  }
-  if (fmt->Freq != getFrequency()) {
-    System->Printf(MSG_WARNING, "incorrect input format for sound renderer (frequency)\n");
-    return NULL;
-  }
+  // create the sound handle
+  csSoundHandleSoftware *hdl = new csSoundHandleSoftware(this, snd);
+  SoundHandles.Push(hdl);
+  return hdl;
+}
 
-  return new csSoundSourceSoftware(this, Str, mode3d);
+void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd) {
+  int n = SoundHandles.Find(snd);
+  if (n != -1) {
+    csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)snd;
+    SoundHandles.Delete(n);
+    hdl->Unregister();
+    hdl->DecRef();
+  }
 }
 
 iSoundListener *csSoundRenderSoftware::GetListener()
@@ -195,18 +208,16 @@ void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src) {
   }
 }
 
-const csSoundFormat *csSoundRenderSoftware::GetLoadFormat() {
-  return &LoadFormat;
-}
-
 void csSoundRenderSoftware::MixingFunction()
 {
+  long i;
+
   // look if this function is activated
   if (!ActivateMixing) return;
 
   // test if we have a sound driver
   if(!SoundDriver) return;
-	
+
   // if no sources exist, there may be an optimized way to handle this
   if (Sources.Length()==0 && SoundDriver->IsHandleVoidSound()) return;
 
@@ -219,16 +230,22 @@ void csSoundRenderSoftware::MixingFunction()
   else memset(memory,128,memorysize);
 
   // prepare and play all sources
-  long i;
   for (i=0;i<Sources.Length();i++) {
     csSoundSourceSoftware *src=(csSoundSourceSoftware*)(Sources.Get(i));
     src->Prepare(Volume);
-    src->AddToBuffer(memory, memorysize);
+    src->AddToBufferStatic(memory, memorysize);
     if (!src->IsActive()) {
       RemoveSource(src);
       i--;
     }
   }  
+
+  // update sound handles
+  long NumSamples = memorysize / (is16Bits()?2:1) / (isStereo()?2:1);
+  for (i=0;i<SoundHandles.Length();i++) {
+    csSoundHandleSoftware *hdl = (csSoundHandleSoftware*)SoundHandles.Get(i);
+    hdl->Update_Num(NumSamples);
+  }
 
   SoundDriver->UnlockMemory();
 }

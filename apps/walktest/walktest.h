@@ -42,7 +42,7 @@ class csWireFrameCam;
 class PhysicsLibrary;
 class InfiniteMaze;
 class HugeRoom;
-struct iSoundData;
+struct iSoundHandle;
 struct iCollideSystem;
 struct iPerfStats;
 struct iConfigFile;
@@ -240,8 +240,8 @@ public:
   HugeRoom* huge_room;
 
   /// Some sounds.
-  iSoundData* wMissile_boom;
-  iSoundData* wMissile_whoosh;
+  iSoundHandle* wMissile_boom;
+  iSoundHandle* wMissile_whoosh;
 
   PhysicsLibrary *pl;
 

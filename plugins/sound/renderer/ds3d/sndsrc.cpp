@@ -25,9 +25,8 @@
 
 #include "sndrdr.h"
 #include "sndsrc.h"
+#include "sndhdl.h"
 #include "isys/system.h"
-
-#define REFRESH_RATE    10
 
 IMPLEMENT_FACTORY(csSoundSourceDS3D)
 
@@ -41,7 +40,7 @@ csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase) {
   Buffer3D = NULL;
   Buffer2D = NULL;
   Renderer = NULL;
-  SoundStream = NULL;
+  SoundHandle = NULL;
 }
 
 csSoundSourceDS3D::~csSoundSourceDS3D() {
@@ -51,22 +50,22 @@ csSoundSourceDS3D::~csSoundSourceDS3D() {
     Buffer2D->Release();
   }
   if (Renderer) Renderer->DecRef();
-  if (SoundStream) SoundStream->DecRef();
+  if (SoundHandle) SoundHandle->DecRef();
 }
 
 bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
-        iSoundStream *Data, int mode3d) {
+        csSoundHandleDS3D *shdl, int mode3d, long NumSamples) {
   HRESULT r;
 
   srdr->IncRef();
   Renderer = srdr;
+  shdl->IncRef();
+  SoundHandle = shdl;
 
-  Precached = Data->MayPrecache();
+  Static = SoundHandle->Data->IsStatic();
 
-  long NumSamples = Precached?-1:(Data->GetFormat()->Freq/REFRESH_RATE);
-  void *databuf = Data->Read(NumSamples);
-
-  SampleBytes = Data->GetFormat()->Channels * Data->GetFormat()->Bits/8;
+  SampleBytes = SoundHandle->Data->GetFormat()->Channels *
+                SoundHandle->Data->GetFormat()->Bits/8;
   BufferBytes = NumSamples * SampleBytes;
 
   DSBUFFERDESC dsbd;
@@ -74,15 +73,15 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
 
   dsbd.dwSize = sizeof(DSBUFFERDESC);
   dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN
-    | DSBCAPS_CTRL3D | (Precached ? DSBCAPS_STATIC : 0);
+    | DSBCAPS_CTRL3D | (Static ? DSBCAPS_STATIC : 0);
   dsbd.dwBufferBytes = BufferBytes;
   dsbd.dwReserved = 0;
   dsbd.lpwfxFormat = &wfxFormat;
 
   wfxFormat.wFormatTag = WAVE_FORMAT_PCM;
-  wfxFormat.nChannels = Data->GetFormat()->Channels;
-  wfxFormat.nSamplesPerSec = Data->GetFormat()->Freq;
-  wfxFormat.wBitsPerSample = Data->GetFormat()->Bits;
+  wfxFormat.nChannels = SoundHandle->Data->GetFormat()->Channels;
+  wfxFormat.nSamplesPerSec = SoundHandle->Data->GetFormat()->Freq;
+  wfxFormat.wBitsPerSample = SoundHandle->Data->GetFormat()->Bits;
   wfxFormat.nBlockAlign = (wfxFormat.wBitsPerSample*wfxFormat.nChannels)/8;
   wfxFormat.nAvgBytesPerSec = wfxFormat.nBlockAlign*wfxFormat.nSamplesPerSec;
   wfxFormat.cbSize = 0;
@@ -94,14 +93,6 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
     return false;
   }
 
-  Write(databuf, BufferBytes);
-  Data->DiscardBuffer(databuf);
-
-  if (!Precached) {
-    SoundStream = Data;
-    SoundStream->IncRef();
-  }
-
   r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
   if (r != DS_OK) {
     srdr->System->Printf(MSG_WARNING, "cannot query 3D buffer interface "
@@ -110,11 +101,17 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   }
 
   SetMode3D(mode3d);
-  BaseFrequency = Data->GetFormat()->Freq;
+  BaseFrequency = SoundHandle->Data->GetFormat()->Freq;
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));
   Looped = false;
-  StopNextUpdate = false;
+
+  if (Static) {
+    void *buf = SoundHandle->Data->GetStaticData();
+    Write(buf, BufferBytes);
+  } else {
+    ClearBuffer();
+  }
 
   return true;
 }
@@ -180,19 +177,20 @@ int csSoundSourceDS3D::GetMode3D() {
 
 void csSoundSourceDS3D::Play(unsigned long PlayMethod)
 {
-  Looped = PlayMethod & SOUND_LOOP;
-
+  Looped = Static ? (PlayMethod & SOUND_LOOP) : true;
   Buffer2D->Stop();
-  if (PlayMethod & SOUND_RESTART) Buffer2D->SetCurrentPosition(0);
-  Buffer2D->Play(0, 0, (Looped || !Precached) ? DSBPLAY_LOOPING : 0);
   Renderer->AddSource(this);
-  StopNextUpdate = false;
+
+  if (Static && (PlayMethod & SOUND_RESTART))
+    Buffer2D->SetCurrentPosition(0);
+  Buffer2D->Play(0, 0, Looped ? DSBPLAY_LOOPING : 0);
 }
 
 void csSoundSourceDS3D::Stop()
 {
   Buffer2D->Stop();
   Renderer->RemoveSource(this);
+  if (!Static) ClearBuffer();
 }
 
 void csSoundSourceDS3D::SetFrequencyFactor(float factor) {
@@ -205,25 +203,17 @@ float csSoundSourceDS3D::GetFrequencyFactor() {
   return (frq/BaseFrequency);
 }
 
-
-
 bool csSoundSourceDS3D::IsPlaying() {
   DWORD r;
   Buffer2D->GetStatus(&r);
   return (r & DSBSTATUS_PLAYING);
 }
 
+/*
 void csSoundSourceDS3D::Update() {
-  // check if source must be stopped. Don't call stop directly. Instead wait
-  // for automatic removing by the renderer. Otherwise the list of sources
-  // will be corrupt. (no source may be added/removed in this function).
-  if (StopNextUpdate) {
-    StopNextUpdate = false;
-    Buffer2D->Stop();
-  }
-
   // check if new data must be read from the stream
-  if (!Precached) {
+  // @@@ this is not in a working state!
+  if (!Static) {
     DWORD PlayPos, WritePos;
     Buffer2D->GetCurrentPosition(&PlayPos, &WritePos);
 
@@ -262,8 +252,10 @@ void csSoundSourceDS3D::Update() {
         StopNextUpdate = true;
       }
     }
+
+    WriteStream(NumSamples);
   }
-}
+}*/
 
 void csSoundSourceDS3D::Write(void *Data, unsigned long NumBytes) {
   void *Pointer1 = NULL, *Pointer2 = NULL;
@@ -285,10 +277,23 @@ void csSoundSourceDS3D::WriteMute(unsigned long NumBytes) {
   if (Buffer2D->Lock(0, NumBytes, &Pointer1, &Length1, &Pointer2, &Length2,
         DSBLOCK_FROMWRITECURSOR) != DS_OK) return;
 
-  unsigned char Byte = (SoundStream->GetFormat()->Bits==8)?128:0;
+  unsigned char Byte = (SoundHandle->Data->GetFormat()->Bits==8)?128:0;
 
   if (Pointer1) FillMemory(Pointer1, Byte, Length1);
   if (Pointer2) FillMemory(Pointer2, Byte, Length2);
 
   Buffer2D->Unlock(Pointer1, Length1, Pointer2, Length2);
+}
+
+void csSoundSourceDS3D::ClearBuffer()
+{
+  DWORD pp, wp;
+ 
+  Buffer2D->GetCurrentPosition(&pp,  &wp);
+  Buffer2D->SetCurrentPosition(wp);
+}
+
+csSoundHandleDS3D *csSoundSourceDS3D::GetSoundHandle()
+{
+  return SoundHandle;
 }

@@ -29,9 +29,9 @@ struct iSoundRender;
 SCF_VERSION (iSoundDriver, 0, 0, 1);
 
 /**
- * This is the sound render interface for CS.
- * All sound renders must implement this interface.
- * The standard implementation is ISoundDriver.
+ * This is the interface for the low-level, system-dependent sound driver
+ * that is used by the software sound renderer. The sound driver is
+ * responsible for playing a single stream of samples.
  */
 struct iSoundDriver : public iPlugIn
 {
@@ -43,16 +43,19 @@ struct iSoundDriver : public iPlugIn
   virtual void LockMemory (void **mem, int *memsize) = 0;
   /// Unlock Sound Memory Buffer
   virtual void UnlockMemory () = 0;
-  /// Is driver need to be updated 'manually' ?
+  /// Must the driver be updated manually or does it run in background?
   virtual bool IsBackground () = 0;
-  /// Do driver is in 16 bits mode ?
+  /// Is the driver in 16 bits mode ?
   virtual bool Is16Bits () = 0;
-  /// Do driver is in stereo mode ?
+  /// Is the driver in stereo mode ?
   virtual bool IsStereo () = 0;
-  /// get current frequency of driver
+  /// Get current frequency of driver
   virtual int GetFrequency () = 0;
-  /// Is driver have it's own handler for no sound data else soundrender fill memory
+  /**
+   * Is the sound driver able to create silence without locking and
+   * writing to the sound memory?
+   */
   virtual bool IsHandleVoidSound () = 0;
 };
 
-#endif
+#endif // __ISOUND_DRIVER_H__

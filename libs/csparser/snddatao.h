@@ -23,23 +23,23 @@
 
 #include "csobject/csobject.h"
 
-struct iSoundData;
+struct iSoundHandle;
 
 class csSoundDataObject : public csObject
 {
 protected:
   ///
-  iSoundData* sndbuf;
+  iSoundHandle* sndbuf;
 
 public:
   ///
-  csSoundDataObject(iSoundData* buf) : csObject(), sndbuf(buf) {}
+  csSoundDataObject(iSoundHandle* buf);
   ///
   ~csSoundDataObject();
   ///
-  iSoundData* GetSound() const { return sndbuf; }
+  iSoundHandle* GetSound() const { return sndbuf; }
   ///
-  static iSoundData* GetSound(csObject& csobj, const char* name);
+  static iSoundHandle* GetSound(csObject& csobj, const char* name);
 
   CSOBJTYPE;
 };

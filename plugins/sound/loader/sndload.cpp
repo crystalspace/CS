@@ -43,8 +43,7 @@ public:
   virtual bool Initialize (iSystem *sys);
 
   // Load a sound file from the VFS.
-  virtual iSoundData *LoadSound(void *Data, unsigned long Size,
-    const csSoundFormat *fmt);
+  virtual iSoundData *LoadSound(void *Data, unsigned long Size);
 
   // register a sound data loader
   inline void RegisterSoundDataLoader(csSoundDataLoader *Loader)
@@ -103,11 +102,10 @@ bool csSoundLoader::Initialize(iSystem *sys) {
   return true;
 }
 
-iSoundData *csSoundLoader::LoadSound(void *Data, unsigned long Size,
-        const csSoundFormat *fmt) {
+iSoundData *csSoundLoader::LoadSound(void *Data, unsigned long Size) {
   for (long i=0;i<SoundDataLoaders.Length();i++) {
     csSoundDataLoader *Ldr=(csSoundDataLoader*)(SoundDataLoaders.Get(i));
-    iSoundData *snd=Ldr->Load((unsigned char *)Data, Size, fmt);
+    iSoundData *snd=Ldr->Load((unsigned char *)Data, Size);
     if (snd) return snd;
   }
   return NULL;

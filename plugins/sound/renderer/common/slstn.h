@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
-    Copyright (C) 1998, 1999 by Jorrit Tyberghein
-    Written by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,21 +16,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSOUNDLISTENERDS3D_H__
-#define __CSSOUNDLISTENERDS3D_H__
+#ifndef __SLSTN_H__
+#define __SLSTN_H__
 
-#include "../common/slstn.h"
+#include "isound/listener.h"
 
-class csSoundRenderDS3D;
-
-class csSoundListenerDS3D  : public csSoundListener
+class csSoundListener : public iSoundListener
 {
-friend class csSoundRenderDS3D;
 public:
   DECLARE_IBASE;
-  csSoundListenerDS3D(iBase *piBase);
-  virtual ~csSoundListenerDS3D();
-	
+  csSoundListener();
+
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top);
   virtual void SetPosition (const csVector3 &pos);
   virtual void SetVelocity (const csVector3 &v);
@@ -41,15 +35,21 @@ public:
   virtual void SetDopplerFactor (float factor);
   virtual void SetHeadSize (float size);
   virtual void SetEnvironment (csSoundEnvironment env);
+  virtual void GetDirection (csVector3 &Front, csVector3 &Top);
+  virtual const csVector3 &GetPosition ();
+  virtual const csVector3 &GetVelocity ();
+  virtual float GetDistanceFactor ();
+  virtual float GetRollOffFactor ();
+  virtual float GetDopplerFactor ();
+  virtual float GetHeadSize ();
+  virtual csSoundEnvironment GetEnvironment ();
 
-  bool Initialize(csSoundRenderDS3D *srdr);
-  void Prepare();
-
-private:
-  csSoundRenderDS3D *Renderer;
-  LPDIRECTSOUNDBUFFER PrimaryBuffer;
-  LPDIRECTSOUND3DLISTENER Listener;
-  bool Dirty;
+protected:
+  csVector3 Position, Velocity;
+  csVector3 Front, Top;
+  float DistanceFactor, RollOffFactor, DopplerFactor;
+  float HeadSize;
+  csSoundEnvironment Environment;
 };
 
-#endif
+#endif // __SLSTN_H__

@@ -31,7 +31,8 @@ class csSoundSourceSoftware : public iSoundSource
 public:
   DECLARE_IBASE;
 	
-  csSoundSourceSoftware(csSoundRenderSoftware *srdr, iSoundStream *str, int snd3d);
+  csSoundSourceSoftware(csSoundRenderSoftware *srdr,
+    csSoundHandleSoftware *hdl, int snd3d);
   virtual ~csSoundSourceSoftware();
 	
   virtual void Stop();
@@ -55,14 +56,17 @@ public:
   // calculate internal values
   void Prepare(float BaseVolume);
 
-  // add the data from this source to the global buffer
-  void AddToBuffer(void *mem, long size);
+  // add the data from this source to the global buffer (static sound)
+  void AddToBufferStatic(void *mem, long size);
 
-protected:
+  // add the source buffer to the dest buffer, using the settings from this
+  // source (volume, format etc.)
+  void WriteBuffer(const void *Source, void *Dest, long NumSamples);
+
   // pointer to the sound renderer
   csSoundRenderSoftware *SoundRender;
   // the sound stream for this source
-  iSoundStream *SoundStream;
+  csSoundHandleSoftware *SoundHandle;
   // frequency factor - a factor of 1 plays the sound in its original frequency
   float FrequencyFactor;
   // volume
@@ -75,6 +79,8 @@ protected:
   csVector3 Velocity;
   // is this buffer currently being played
   bool Active;
+  // current position in the sound (only for static sounds)
+  long SoundPos;
 
   // playing method
   unsigned int PlayMethod;
@@ -82,6 +88,10 @@ protected:
   float CalcVolL, CalcVolR;
   // calculated frequency factor
   float CalcFreqFactor;
+
+protected:
+  // restart the sound to the beginning
+  void Restart();
 };
 
 #endif

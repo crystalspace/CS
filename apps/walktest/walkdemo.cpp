@@ -47,7 +47,7 @@
 #include "cssys/system.h"
 #include "csfx/cspixmap.h"
 #include "qint.h"
-#include "isound/data.h"
+#include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"
 #include "isound/source.h"
@@ -1016,7 +1016,7 @@ void HandleDynLight (csDynLight* dyn)
         if (Sys->Sound)
         {
           iSoundSource *sndsrc;
-          if ((sndsrc = Sys->Sound->CreateSource (Sys->wMissile_boom, SOUND3D_ABSOLUTE)))
+          if ((sndsrc = Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE)))
           {
             sndsrc->SetPosition (v);
             sndsrc->Play();
@@ -1097,7 +1097,7 @@ void fire_missile ()
   MissileStruct* ms = new MissileStruct;
   ms->snd = NULL;
   if (Sys->Sound)
-    if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh, SOUND3D_ABSOLUTE)))
+    if ((ms->snd = Sys->wMissile_whoosh->CreateSource (SOUND3D_ABSOLUTE)))
     {
       ms->snd->SetPosition (pos);
       ms->snd->Play();

@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include <stdio.h>
 #include <initguid.h>
-#include "dsound.h"
 
 #include "csutil/scf.h"
 #include "isys/system.h"
@@ -31,7 +30,7 @@
 #include "sndrdr.h"
 #include "sndlstn.h"
 #include "sndsrc.h"
-#include "../common/convmeth.h"
+#include "sndhdl.h"
 
 IMPLEMENT_FACTORY(csSoundRenderDS3D);
 
@@ -98,12 +97,25 @@ bool csSoundRenderDS3D::Open()
   float vol = Config->GetFloat("Sound.Volume",-1);
   if (vol>=0) SetVolume(vol);
   System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
+
+  cs_time et, ct;
+  System->GetElapsedTime(et, ct);
+  LastTime = ct;
   
   return true;
 }
 
 void csSoundRenderDS3D::Close()
 {
+  while (ActiveSources.Length()>0)
+    ((iSoundSource*)ActiveSources.Get(0))->Stop();
+
+  while (SoundHandles.Length()>0) {
+    csSoundHandleDS3D *hdl = (csSoundHandleDS3D *)SoundHandles.Pop();
+    hdl->Unregister();
+    hdl->DecRef();
+  }
+
   if (Listener) Listener->DecRef();
   Listener = NULL;
 
@@ -127,15 +139,25 @@ float csSoundRenderDS3D::GetVolume()
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
-IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderDS3D);
-
-iSoundSource *csSoundRenderDS3D::CreateSource(iSoundStream *snd, int mode3d) {
+iSoundHandle *csSoundRenderDS3D::RegisterSound(iSoundData *snd)
+{
   if (!snd) return NULL;
-  csSoundSourceDS3D *src = new csSoundSourceDS3D(this);
-  if (!src->Initialize(this, snd, mode3d)) {
-    src->DecRef();
-    return NULL;
-  } else return src;
+  if (!snd->Initialize(&LoadFormat)) return NULL;
+
+  csSoundHandleDS3D *hdl = new csSoundHandleDS3D(this, snd);
+  SoundHandles.Push(hdl);
+  return hdl;
+}
+
+void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)
+{
+  int n = SoundHandles.Find(snd);
+  if (n != -1) {
+    csSoundHandleDS3D *hdl = (csSoundHandleDS3D *)snd;
+    SoundHandles.Delete(n);
+    hdl->Unregister();
+    hdl->DecRef();
+  }
 }
 
 iSoundListener *csSoundRenderDS3D::GetListener() {
@@ -143,19 +165,26 @@ iSoundListener *csSoundRenderDS3D::GetListener() {
 }
 
 void csSoundRenderDS3D::Update() {
+  int i;
+  cs_time et, ct;
+  System->GetElapsedTime(et, ct);
+  cs_time ETime = ct - LastTime;
+  LastTime = ct;
+
   Listener->Prepare();
 
-  for (int i=0;i<ActiveSources.Length();i++) {
+  for (i=0;i<SoundHandles.Length();i++) {
+    csSoundHandleDS3D *hdl = (csSoundHandleDS3D*)SoundHandles.Get(i);
+    hdl->Update_Time(ETime);
+  }
+
+  for (i=0;i<ActiveSources.Length();i++) {
     csSoundSourceDS3D *src = (csSoundSourceDS3D*)ActiveSources.Get(i);
     if (!src->IsPlaying()) {
       ActiveSources.Delete(i);
       i--;
-    } else src->Update();
+    }
   }
-}
-
-const csSoundFormat *csSoundRenderDS3D::GetLoadFormat() {
-  return &LoadFormat;
 }
 
 void csSoundRenderDS3D::MixingFunction() {

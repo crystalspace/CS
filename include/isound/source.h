@@ -42,7 +42,7 @@ enum
 SCF_VERSION (iSoundSource, 0, 0, 1);
 
 /**
- * The sound source is used to play a sound stream. It can be a non-3d source,
+ * The sound source is an instance of a sound. It can be a non-3d source,
  * in which case it plays the sound as it was recorded, or a 3d source, in
  * which case it represents an object in 3d space and adjusts L/R volume for
  * 3d sound.
@@ -76,4 +76,4 @@ struct iSoundSource : public iBase
   virtual csVector3 GetVelocity() = 0;
 };
 
-#endif
+#endif // __ISOUND_SOURCE_H__

@@ -20,17 +20,22 @@
 
 #include <string.h>
 #include "cssysdef.h"
-#include "isound/data.h"
+#include "isound/handle.h"
 #include "csparser/snddatao.h"
 
 IMPLEMENT_CSOBJTYPE (csSoundDataObject,csObject);
+
+csSoundDataObject::csSoundDataObject (iSoundHandle *buf) : csObject(), sndbuf(buf)
+{
+  if (sndbuf) sndbuf->IncRef();
+}
 
 csSoundDataObject::~csSoundDataObject ()
 {
   if (sndbuf) sndbuf->DecRef ();
 }
 
-iSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)
+iSoundHandle* csSoundDataObject::GetSound (csObject& csobj, const char* name)
 {
   if (!name) return NULL;
   csObjIterator i = csobj.GetIterator (csSoundDataObject::Type);

@@ -26,8 +26,7 @@
 
 struct iSoundListener;
 struct iSoundData;
-struct iSoundStream;
-struct csSoundFormat;
+struct iSoundHandle;
 
 SCF_VERSION (iSoundRender, 1, 0, 0);
 
@@ -41,11 +40,8 @@ SCF_VERSION (iSoundRender, 1, 0, 0);
  * where non-3d sources simply ignore the position and velocity control
  * methods of iSoundSource. <p>
  *
- * The renderer can play sound data and sound stream objects. You should
- * read the docs for them to understand the template-instance relation
- * between them. This basically means that you can create any number of
- * sound sources from a sound data object, but only one source from a sound
- * stream.
+ * Before you can play a sound, you must first register it and get a sound
+ * handle. <p>
  */
 struct iSoundRender : public iPlugIn
 {
@@ -55,39 +51,16 @@ public:
   /// Get Volume [0, 1]
   virtual float GetVolume () = 0;
 
-  /**
-   * Play a sound without further control. This is a convenience function
-   * to create and play a new sound stream.
-   */
-  virtual void PlaySound(iSoundData *Data, bool Loop = false) = 0;
-  /**
-   * Play a sound without further control. Note: No other part of your
-   * program should read data from the sound stream while it is playing.
-   */
-  virtual void PlaySound(iSoundStream *Sound, bool Loop = false) = 0;
-
-  /**
-   * Create a sound source. This is a convenience function
-   * to create a new sound stream and attach it to a new sound source. Mode3D
-   * can be one of SOUND_HEAD, SOUND_RELATIVE or SOUND_3D.
-   */
-  virtual iSoundSource *CreateSource(iSoundData *Sound, int Mode3D) = 0;
-  /**
-   * Create a sound source and attach the given sound stream. Note: No other
-   * part of your program should read data from the sound stream as long as
-   * the sound source exists. Mode3D can be one of SOUND_HEAD, SOUND_RELATIVE
-   * or SOUND_3D.
-   */
-  virtual iSoundSource *CreateSource(iSoundStream *Sound, int Mode3D) = 0;
+  /// Register a sound
+  virtual iSoundHandle *RegisterSound(iSoundData *) = 0;
+  /// Unregister a sound
+  virtual void UnregisterSound(iSoundHandle *) = 0;
 
   /// Get the global Listener object
   virtual iSoundListener *GetListener () = 0;
-
-  /// return the sound format to load a sound
-  virtual const csSoundFormat *GetLoadFormat() = 0;
 
   /// Internal use : mixing function (needed if your renderer uses a driver)
   virtual void MixingFunction () = 0;
 };
 
-#endif
+#endif // __ISOUND_RENDERER_H__

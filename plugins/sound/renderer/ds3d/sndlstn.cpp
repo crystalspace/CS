@@ -73,99 +73,57 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
     return false;
   }
 
-  SetPosition(csVector3(0,0,0));
-  SetVelocity(csVector3(0,0,0));
-  SetDirection(csVector3(0,0,1), csVector3(0,1,0));
-  SetDistanceFactor(1.0);
-  SetDopplerFactor(1.0);
-  SetDistanceFactor(1.0);
-  SetRollOffFactor(1.0);
-  SetEnvironment(ENVIRONMENT_GENERIC);
+  Dirty = true;
   Prepare();
-
   return true;
 }
 
-void csSoundListenerDS3D::SetPosition(csVector3 v) {
+void csSoundListenerDS3D::SetPosition(const csVector3 &v) {
   Dirty = true;
-  Position = v;
+  csSoundListener::SetPosition(v);
   Listener->SetPosition( v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDirection(csVector3 f, csVector3 t) {
+void csSoundListenerDS3D::SetDirection(const csVector3 &f, const csVector3 &t) {
   Dirty = true;
-  Front = f;
-  Top = t;
+  csSoundListener::SetDirection(f, t);
   Listener->SetOrientation(f.x, f.y, f.z,t.x, t.y, t.z,DS3D_DEFERRED);
 }
 
 void csSoundListenerDS3D::SetHeadSize(float size) {
 //  Dirty = true;
-  HeadSize = size;
+  csSoundListener::SetHeadSize(size);
 // @@@
 }
 
-void csSoundListenerDS3D::SetVelocity(csVector3 v) {
+void csSoundListenerDS3D::SetVelocity(const csVector3 &v) {
   Dirty = true;
-  Velocity = v;
+  csSoundListener::SetVelocity(v);
   Listener->SetVelocity(v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
 void csSoundListenerDS3D::SetDopplerFactor(float factor) {
   Dirty = true;
-  Doppler = factor;
-  Listener->SetDopplerFactor(Doppler, DS3D_DEFERRED);
+  csSoundListener::SetDopplerFactor(factor);
+  Listener->SetDopplerFactor(factor, DS3D_DEFERRED);
 }
 
 void csSoundListenerDS3D::SetDistanceFactor(float factor) {
   Dirty = true;
-  DistanceFactor = factor;
+  csSoundListener::SetDistanceFactor(factor);
   Listener->SetDistanceFactor(factor, DS3D_DEFERRED);
 }
 
 void csSoundListenerDS3D::SetRollOffFactor(float factor) {
   Dirty = true;
-  RollOff = factor;
+  csSoundListener::SetRollOffFactor(factor);
   Listener->SetRolloffFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetEnvironment(SoundEnvironment env) {
+void csSoundListenerDS3D::SetEnvironment(csSoundEnvironment env) {
 //  Dirty = true;
-  Environment = env;
+  csSoundListener::SetEnvironment(env);
 // @@@
-}
-
-csVector3 csSoundListenerDS3D::GetPosition() {
-  return Position;
-}
-
-void csSoundListenerDS3D::GetDirection(csVector3 &f, csVector3 &t) {
-  f = Front;
-  t = Top;
-}
-
-float csSoundListenerDS3D::GetHeadSize() {
-  return HeadSize;
-}
-
-csVector3 csSoundListenerDS3D::GetVelocity() {
-  return Velocity;
-}
-
-float csSoundListenerDS3D::GetDopplerFactor() {
-  return Doppler;
-}
-
-float csSoundListenerDS3D::GetDistanceFactor() {
-  return DistanceFactor;
-}
-
-float csSoundListenerDS3D::GetRollOffFactor() {
-  return RollOff;
-}
-
-SoundEnvironment csSoundListenerDS3D::GetEnvironment() {
-  return Environment;
 }
 
 void csSoundListenerDS3D::Prepare() {

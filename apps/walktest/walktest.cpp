@@ -61,7 +61,7 @@
 #include "iutil/cfgmgr.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "isound/data.h"
+#include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"
 #include "isound/source.h"
@@ -1381,7 +1381,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   {
     //sounds (other than standard) are from a zip specified in map file
     //SOUNDS section and specified in vfs.cfg in lib/sounds
-    iSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
+    iSoundHandle* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
     if (wSoundData && Sound)
     {
       //don't play now if loaded for missile
@@ -1393,7 +1393,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       }
       else
       {
-        Sound->PlaySound (wSoundData, true);
+        wSoundData->Play (true);
         ///++sobj;
       }
     }

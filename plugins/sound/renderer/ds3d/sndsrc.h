@@ -22,7 +22,10 @@
 #define __CSSOUNDSOURCEDS3D_H__
 
 #include "isound/source.h"
+
 struct iSoundData;
+class csSoundRenderDS3D;
+class csSoundHandleDS3D;
 
 class csSoundSourceDS3D : public iSoundSource
 {
@@ -31,7 +34,8 @@ public:
 
   csSoundSourceDS3D(iBase *scfParent);
   virtual ~csSoundSourceDS3D();
-  bool Initialize(csSoundRenderDS3D *srdr, iSoundStream *data, int Mode3d);
+  bool Initialize(csSoundRenderDS3D *srdr, csSoundHandleDS3D *hdl, int Mode3d,
+    long NumSamples);
 
   virtual void Play (unsigned long playMethod = 0);
   virtual void Stop ();
@@ -47,9 +51,10 @@ public:
   virtual csVector3 GetVelocity();
 
   bool IsPlaying();
-  void Update();
   void Write(void *d, unsigned long NumBytes);
   void WriteMute(unsigned long NumBytes);
+  void ClearBuffer();
+  csSoundHandleDS3D *GetSoundHandle();
 
 private:
   // Position and velocity of sound object. These are copies of the internal
@@ -68,19 +73,16 @@ private:
   unsigned long BaseFrequency;
 
   // if this is false new samples must be written all the time
-  bool Precached;
+  bool Static;
 
-  // the stream for the sample data. This is NULL if sound is precached.
-  iSoundStream *SoundStream;
+  // the sound handle
+  csSoundHandleDS3D *SoundHandle;
 
   // size of the sound buffer in bytes, size of one sample in bytes
   unsigned long BufferBytes, SampleBytes;
 
   // true if the sound is looped
   bool Looped;
-
-  // if this is set the source must be stopped in the next call to Update().
-  bool StopNextUpdate;
 };
 
 #endif

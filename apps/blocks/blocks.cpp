@@ -51,7 +51,7 @@
 #include "ivideo/txtmgr.h"
 #include "isound/renderer.h"
 #include "csparser/snddatao.h"
-#include "isound/data.h"
+#include "isound/handle.h"
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
 
@@ -2118,8 +2118,8 @@ void Blocks::InitEngine ()
 #ifdef DO_SOUND
   // Load the blocks.zip library where sound refs are stored
   csLoader::LoadLibraryFile (engine, "/data/blocks/Library");
-  iSoundData* w = csSoundDataObject::GetSound(*engine, "background.wav");
-  if (w && Sound) Sound->PlaySound (w, true);
+  iSoundHandle* w = csSoundDataObject::GetSound(*engine, "background.wav");
+  if (w) w->Play (true);
 #endif
 }
 

@@ -55,8 +55,7 @@ struct _WAVhdr
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size,
-        const csSoundFormat *RequestFormat) const {
+iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size) const {
   int index=0;
 
   csSoundDataRaw *sb= NULL;
@@ -128,7 +127,6 @@ iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size,
   Format.Channels=wavhdr.channel;
   sb=new csSoundDataRaw(NULL, data,
     (wavhdr.bits_per_sample==16)?(wavchk.len/2)-1:wavchk.len-1, Format);
-  sb->Convert(RequestFormat);
 
   goto exit_ok;
 exit_read:

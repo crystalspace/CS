@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein    
+    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,27 +16,27 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUND_LOADER_H__
-#define __ISOUND_LOADER_H__
+#ifndef __SNDHDL_H__
+#define __SNDHDL_H__
 
-#include "isys/plugin.h"
+#include "../common/shdl.h"
 
-struct iSoundData;
-struct csSoundFormat;
+class csSoundRenderDS3D;
 
-SCF_VERSION (iSoundLoader, 1, 0, 0);
-
-/**
- * The sound loader plugin is used to load sound files from the VFS and
- * create sound data objects from it.
- */
-struct iSoundLoader : public iPlugIn
+class csSoundHandleDS3D : public csSoundHandle
 {
-  /// Initialize the Sound Loader.
-  virtual bool Initialize (iSystem *sys) = 0;
+public:
+  csSoundRenderDS3D *SoundRender;
+  long NumSamples;
 
-  /// Load a sound file from the VFS.
-  virtual iSoundData *LoadSound(void *Data, unsigned long Size) = 0;
+  // constructor
+  csSoundHandleDS3D(csSoundRenderDS3D *srdr, iSoundData *snd);
+  // destructor
+  ~csSoundHandleDS3D();
+
+  void Unregister();
+  virtual void vUpdate(void *buf, long NumSamples);
+  virtual iSoundSource *CreateSource(int Mode3d);
 };
 
-#endif // __ISOUND_LOADER_H__
+#endif // __SNDHDL_H__

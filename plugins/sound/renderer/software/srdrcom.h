@@ -28,11 +28,12 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
+#include "isound/data.h"
 #include "isound/renderer.h"
 
 struct iSoundDriver;
 struct iConfigFile;
-class csSoundListenerSoftware;
+class csSoundListener;
 class csSoundSourceSoftware;
 
 class csSoundRenderSoftware : public iSoundRender
@@ -40,6 +41,9 @@ class csSoundRenderSoftware : public iSoundRender
 friend class csSoundSourceSoftware;
 public:
   DECLARE_IBASE;
+  // the system driver
+  iSystem *System;
+
   csSoundRenderSoftware(iBase *piBase);
   virtual ~csSoundRenderSoftware();
 	
@@ -49,12 +53,9 @@ public:
   // implementation of iSoundRender
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
-  virtual void PlaySound(iSoundData *Data, bool Loop);
-  virtual void PlaySound(iSoundStream *Sound, bool Loop);
-  virtual iSoundSource *CreateSource(iSoundData *Sound, int mode3d);
-  virtual iSoundSource *CreateSource(iSoundStream *Sound, int mode3d);
+  virtual iSoundHandle *RegisterSound(iSoundData *);
+  virtual void UnregisterSound(iSoundHandle *);
   virtual iSoundListener *GetListener ();
-  virtual const csSoundFormat *GetLoadFormat();
   virtual void MixingFunction ();
   virtual bool HandleEvent (iEvent &e);
 
@@ -73,16 +74,15 @@ public:
   bool isStereo();
   // return frequency
   int getFrequency();
-	
-private:
+
   // the config file
   csConfigAccess Config;
 
   // all active sound sources
   csVector Sources;
 
-  // the system driver
-  iSystem *System;
+  // all registered sound handles
+  csVector SoundHandles;
 
   // the low-level sound driver
   iSoundDriver *SoundDriver;
@@ -92,7 +92,7 @@ private:
   int memorysize;
 	
   // the global listener object
-  csSoundListenerSoftware *Listener;
+  csSoundListener *Listener;
 
   // is the mixing function acitvated?
   bool ActivateMixing;
@@ -102,6 +102,9 @@ private:
 
   // global volume setting
   float Volume;
+
+  // previous time the sound handles were updated
+  cs_time LastTime;
 };
 
 #endif

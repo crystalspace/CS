@@ -50,7 +50,7 @@
 #include "cssys/csendian.h"
 #include "csfx/cspixmap.h"
 #include "qint.h"
-#include "isound/data.h"
+#include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"
 #include "isound/source.h"
@@ -1770,10 +1770,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->Sound)
     {
-      iSoundData *sb =
+      iSoundHandle *sb =
         csSoundDataObject::GetSound(*(Sys->view->GetEngine()), arg);
       if (sb)
-        Sys->Sound->PlaySound(sb);
+        sb->Play();
       else
         Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);
     }

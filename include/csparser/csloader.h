@@ -29,7 +29,7 @@ struct iImage;
 struct csRGBcolor;
 struct iMotion;
 struct iMotionAnim;
-struct iSoundData;
+struct iSoundHandle;
 struct iSkeletonLimb;
 struct iPlugIn;
 class csTextureWrapper;
@@ -255,7 +255,7 @@ public:
   { return load_image (name); }
 
   /// Load a sound and return an iSoundData object
-  static iSoundData *LoadSoundData (const char *filename);
+  static iSoundHandle* LoadSoundHandle(const char* filename);
 
   /// Load a sound and add it to the engine
   static csSoundDataObject *LoadSoundObject (csEngine*, char* name,
