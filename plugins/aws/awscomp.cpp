@@ -5,7 +5,7 @@
 #include "awsfparm.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
-#include "aws/iawsdefs.h"
+#include "iaws/iawsdefs.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -169,7 +169,7 @@ awsComponent::SetProperty(char *name, void *parm)
 }
 
 bool 
-awsComponent::Execute(char *action, awsParmList &parmlist)
+awsComponent::Execute(char *action, iAwsParmList &parmlist)
 {
   if (strcmp("MoveTo", action)==0)
   {

@@ -211,7 +211,7 @@ public:
     bool SetProperty(char *name, void *parm);
 
     /// Executes some actions
-    bool Execute(char *action, awsParmList &parmlist);
+    bool Execute(char *action, iAwsParmList &parmlist);
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type();

@@ -164,7 +164,7 @@ awsWindow::SetProperty(char *name, void *parm)
 }
 
 bool 
-awsWindow::Execute(char *action, awsParmList &parmlist)
+awsWindow::Execute(char *action, iAwsParmList &parmlist)
 {
   if (comp.Execute(action, parmlist)) return true;
 

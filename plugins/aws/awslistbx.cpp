@@ -129,7 +129,7 @@ awsListBox::SetProperty(char *name, void *parm)
 }
 
 bool 
-awsListBox::Execute(char *action, awsParmList &parmlist)
+awsListBox::Execute(char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute(action, parmlist)) return true;
 
