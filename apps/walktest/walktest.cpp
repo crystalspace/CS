@@ -1252,7 +1252,7 @@ void WalkTest::Create2DSprites(void)
   int w, h;
   csTextureWrapper *texh;
   iTextureHandle* phTex;
-  csEngine* engine = (csEngine*)engine;
+  csEngine* engine = (csEngine*)Engine;
   csTextureList *texlist = engine->GetTextures ();
 
   // Create a 2D sprite for the Logo.
