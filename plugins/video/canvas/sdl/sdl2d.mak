@@ -49,7 +49,7 @@ endif
 INC.SDL2D = $(wildcard plugins/video/canvas/sdl/*.h   $(INC.COMMON.DRV2D))
 SRC.SDL2D = $(wildcard plugins/video/canvas/sdl/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.SDL2D = $(addprefix $(OUT),$(notdir $(SRC.SDL2D:.cpp=$O)))
-DEP.SDL2D = CSUTIL
+DEP.SDL2D = CSUTIL CSSYS CSUTIL CSGEOM
 
 #MSVC.DSP += SDL2D
 #DSP.SDL2D.NAME = sdl2d

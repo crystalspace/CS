@@ -219,7 +219,6 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
     if (!csGraphics2D::Initialize (pSystem))
       return false;
 
-    Font = 0;
     Memory = NULL;
     opened = false;
 

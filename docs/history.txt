@@ -29,6 +29,10 @@ The history order is reversed so that new features are at the top.
 	  the libs, plugins and apps.
 	- Eric Sunshine eliminated a couple compilation warnings in surf.cpp
 	  regarding possible use of unitialized variables.
+	- Eric Sunshine fixed a few minor problems with the SDL canvas which
+	  prevented it from compiling.  Whether or not the canvas actually
+	  works at run-time is unknown, but it does compile cleanly with the
+	  the SDL 1.2.1 headers.
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python
