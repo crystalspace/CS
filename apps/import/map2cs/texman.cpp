@@ -159,9 +159,13 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     CTextureFile* pTexture = pTexArchive->CreateTexture(defaultname);
     if (pTexture)
     {
-      printf("Warning: texture '%s'('%s') is missing.\n         Using '%s' instead!\n",
-             TextureName, InternalName, defaultname);
       pTexture->SetTexturename(InternalName);
+      if (pTexture->IsVisible() && pTexture->IsStored())
+      {
+	printf("Warning: texture '%s'('%s') is missing.\n"
+	  "         Using '%s' instead!\n",  TextureName, InternalName, 
+	  defaultname);
+      }
       m_StoredTextures.Push(pTexture);
       return pTexture;
     }

@@ -159,6 +159,7 @@ protected:
   /// Write Templates for all curves
   bool WriteCurvetemplates(csRef<iDocumentNode> node);
 
+  bool WriteLibs (csRef<iDocumentNode> node);
 public:
   /// Write a simple 'texmap' section for a polygon based on plane.
   bool WriteTexMap (CMapTexturedPlane* plane, DocNode& poly);

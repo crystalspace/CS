@@ -43,7 +43,7 @@ CTextureFile* CPk3File::CreateTexture(const char* texturename)
   pTexture = ExtractTexture(texturename, texfilename);
   if (pTexture) return pTexture;
 
-  return 0;
+  return CZipArchive::CreateTexture (texturename);
 }
 
 

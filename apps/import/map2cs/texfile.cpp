@@ -30,29 +30,29 @@
 
 static const char* InvisibleTextures[] =
 {
- //"common/areaportal",
- "common/caulk",
- "common/clip",
- //"common/clusterportal",
- "common/cushion",
- "common/donotenter",
- "common/fullclip",
- "common/hint",
- "common/invisible",
- "common/missileclip",
- "common/nodraw",
- "common/nodrawnonsolid",
- "common/nodrop",
- "common/noimpact",
- "common/nolightmap",
- "common/origin",
- "common/portal",
- "common/qer_portal",
- "common/skip",
- "common/slick",
- //"common/teleporter",
- "common/trigger",
- "common/weapclip",
+ //"common_areaportal",
+ "common_caulk",
+ "common_clip",
+ //"common_clusterportal",
+ "common_cushion",
+ "common_donotenter",
+ "common_fullclip",
+ "common_hint",
+ "common_invisible",
+ "common_missileclip",
+ "common_nodraw",
+ "common_nodrawnonsolid",
+ "common_nodrop",
+ "common_noimpact",
+ "common_nolightmap",
+ "common_origin",
+ "common_portal",
+ "common_qer_portal",
+ "common_skip",
+ "common_slick",
+ //"common_teleporter",
+ "common_trigger",
+ "common_weapclip",
  "clip",
  "aaatrigger",
  "origin"
@@ -142,6 +142,7 @@ void CTextureFile::SetTexturename(const char* name)
     if (strcasecmp (m_Texturename, InvisibleTextures[i])==0)
     {
       m_Visible = false;
+      break;
     }
   }
 
@@ -154,9 +155,12 @@ void CTextureFile::SetTexturename(const char* name)
       if (strcasecmp(m_Texturename, UnstoredTextures[i])==0)
       {
 	m_Stored = false;
+	break;
       }
     }
   }
+  else
+    m_Stored = false;
 }
 
 bool CTextureFile::IsVisible()

@@ -326,7 +326,7 @@ void csMaterial::AddTextureLayer (
 void csMaterial::SetShader (csStringID type, iShader* shd)
 {
 #ifdef CS_USE_NEW_RENDERER
-  shaders.Put (type, shd);
+  shaders.PutFirst (type, shd);
 #else
   (void)type;
   (void)shd;

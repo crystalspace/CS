@@ -22,6 +22,9 @@
 #include "cssysdef.h"
 #include "csver.h"
 
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
+
 #include "mapstd.h"
 #include "map.h"
 #include "entity.h"
@@ -180,6 +183,7 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
 
   WritePlayerStart (world);
   WriteTextures (world);
+  WriteLibs (world);
 
   {
     DocNode renderpriorities = CreateNode (world, "renderpriorities");
@@ -520,7 +524,25 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
 
   FindAdditionalTextures();
 
+  csSet<csStrKey, csConstCharHashKeyHandler> userMaterials;
+
+  const char* mats = pEntity->GetValueOfKey("usermaterials");
+  csString mat;
+  while (mats && *mats)
+  {
+    mat.Clear();
+    const char* comma = strchr (mats, ',');
+    if (comma)
+      mat.Append (mats, comma - mats);
+    else
+      mat.Append (mats);
+    
+    userMaterials.Add ((const char*)mat);
+    mats = comma ? comma + 1 : 0;
+  }
+
   DocNode textures = CreateNode (node, "textures");
+  DocNode materials = CreateNode (node, "materials");
 
   int i=0;
   for (i=0; i<m_pMap->GetTextureManager()->GetTextureCount(); i++)
@@ -556,29 +578,23 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
 	CreateNode (texture, "mipmap", "no");
       }
     }
-  }
 
-  //-------------------------------------------------------------------
-
-  DocNode materials = CreateNode (node, "materials");
-
-  for (i=0; i<m_pMap->GetTextureManager()->GetTextureCount(); i++)
-  {
-    CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(i);
-    assert(pTexture);
-
-    DocNode material = CreateNode (materials, "material");
-    material->SetAttribute ("name", pTexture->GetTexturename());
-    if (pTexture->IsStored())
+    if (pTexture->IsVisible() && 
+      !userMaterials.In (pTexture->GetTexturename()))
     {
-      CreateNode (material, "texture", pTexture->GetTexturename());
-    }
-    else
-    {
-      DocNode color = CreateNode (material, "color");
-      color->SetAttributeAsFloat ("red", 0.5f);
-      color->SetAttributeAsFloat ("green", 0.5f);
-      color->SetAttributeAsFloat ("blue", 0.5f);
+      DocNode material = CreateNode (materials, "material");
+      material->SetAttribute ("name", pTexture->GetTexturename());
+      if (pTexture->IsStored())
+      {
+	CreateNode (material, "texture", pTexture->GetTexturename());
+      }
+      else
+      {
+	DocNode color = CreateNode (material, "color");
+	color->SetAttributeAsFloat ("red", 0.5f);
+	color->SetAttributeAsFloat ("green", 0.5f);
+	color->SetAttributeAsFloat ("blue", 0.5f);
+      }
     }
   }
 
@@ -726,6 +742,25 @@ bool CCSWorld::WriteCurvetemplates(csRef<iDocumentNode> node)
     }
   }
 
+  return true;
+}
+
+bool CCSWorld::WriteLibs (csRef<iDocumentNode> node)
+{
+  const char* libs = GetWorldspawn()->GetValueOfKey("libraries");
+  csString lib;
+  while (libs && *libs)
+  {
+    lib.Clear();
+    const char* comma = strchr (libs, ',');
+    if (comma)
+      lib.Append (libs, comma - libs);
+    else
+      lib.Append (libs);
+    
+    CreateNode (node, "library", lib);
+    libs = comma ? comma + 1 : 0;
+  }
   return true;
 }
 

@@ -36,6 +36,16 @@ chronological order.
 	- Jorrit fixed the ball plugin so that it compiles again after res2k
 	  'fixed' it.
 	- Duhprey added a IBASE constructor/destructor for csSimpleSampler
+	- res changed csMaterial::SetShader() to override any already set
+	  shader for a type. 
+	- res fixed bugplug's spider camera catching in NR after Marten's 
+	  recent changes to GetRenderMeshes() and DrawTest().
+	- res augmented map2cs with the ability to specify libraries included
+	  in a map and exclude certain materials from being generated (so they
+	  are supplied by the user).
+	- res fixed map2cs so that q3 invisible textures are handled properly.
+	- res fixed the PS shader plugin so constants are honored for ATI
+	  programs.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader

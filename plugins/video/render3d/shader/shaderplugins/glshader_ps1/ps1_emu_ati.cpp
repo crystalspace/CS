@@ -240,6 +240,32 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
     return false;
   }
 
+  const csArray<csPSConstant> &constants = parser.GetConstants ();
+
+  int i;
+
+  for(i=0;i<constants.Length();i++)
+  {
+    const csPSConstant constant = constants.Get (i);
+
+    csString con_name;
+    con_name.Format("ps constant %d", i);
+    csStringID con_id = strings->Request(con_name);
+
+    //create a new variable
+    csRef<csShaderVariable> var = csPtr<csShaderVariable>(
+    new csShaderVariable (con_id));
+
+    var->SetValue(constant.value);
+
+    variablemapentry& vmentry = 
+      variablemap[variablemap.Push (variablemapentry ())];
+
+    vmentry.name = con_id;
+    vmentry.registernum = constant.reg;
+    vmentry.statlink = var;
+  }
+
   const csArray<csPSProgramInstruction> &instrs =
     parser.GetParsedInstructionList ();
 

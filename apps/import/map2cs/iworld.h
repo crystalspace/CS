@@ -50,9 +50,6 @@ public:
     */
   virtual bool Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * sourcename) = 0;
 
-  /// Get the filedescriptor of the file currently open for exporting
-  //FILE*     GetFile() {return m_fd;}
-
   /// Get a pointer to the map to convert.
   CMapFile* GetMap()  {return m_pMap;}
 
@@ -76,15 +73,6 @@ public:
 
   /// Return the n-th sector
   CISector* GetSector(int n) {return m_Sectors[n];}
-
-  /// Add another column of spaces before every line
-  //void Indent();
-
-  /// Remove another column of spaces before every line
-  //void Unindent();
-
-  /// Writes the currently selected number of spaces for indenting
-  bool WriteIndent();
 
   /**
     * derived export classes override this and return an instance of the
@@ -140,17 +128,11 @@ protected:
   /// Array containing all used texture filenames
   CCharVector      m_TextureFileNames;
 
-  /// Store the descrptior of the worldfile here while writing
-  //FILE*            m_fd;
-
   /// A Pointer to the map containing the data to be written
   CMapFile*        m_pMap;
 
   /// The factor to be used while converting Quake coordinates
   double           m_ScaleFactor;
-
-  /// The current indent Level. (1=="  ", 2=="    "...)
-  //int              m_Indent;
 }; //CCSWorld
 
 #endif // __IWORLD_H__

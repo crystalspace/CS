@@ -600,26 +600,21 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL (const char* programstring)
     const csPSConstant constant = constants.Get (i);
 
     csString con_name;
-    con_name.Format("nv_con%d", i);
+    con_name.Format("ps constant %d", i);
     csStringID con_id = strings->Request(con_name);
 
     //create a new variable
     csRef<csShaderVariable> var = csPtr<csShaderVariable>(
     new csShaderVariable (con_id));
 
-    // @@@ Will leak! Should do proper refcounting.
-    var->IncRef ();
-
-    var->SetType(csShaderVariable::VECTOR4);
-
     var->SetValue(constant.value);
 
-    variablemap.Push (variablemapentry ());
-    int v = variablemap.Length ()-1;
+    variablemapentry& vmentry = 
+      variablemap[variablemap.Push (variablemapentry ())];
 
-    variablemap[v].name = con_id;
-    variablemap[v].registernum = constant.reg;
-    variablemap[v].statlink = var;
+    vmentry.name = con_id;
+    vmentry.registernum = constant.reg;
+    vmentry.statlink = var;
   }
 
   const csArray<csPSProgramInstruction> &instrs =

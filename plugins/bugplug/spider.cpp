@@ -58,6 +58,17 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
   return false;
 }
 
+csRenderMesh** csSpider::GetRenderMeshes (int& n, iRenderView* rview, 
+    iMovable* movable) 
+{ 
+  if (!camera)
+  {
+    camera = rview->GetCamera ();
+  }
+  n = 0; 
+  return 0; 
+}
+
 bool csSpider::WeaveWeb (iEngine* engine)
 {
   if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = 0; }
