@@ -359,10 +359,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 
   float x1 = 0.0;
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-  int curvert = 0;
+  glBegin (GL_QUADS);
   for (; *text; ++text)
   {
     GLGlyph &glyph = glyphs [*text];
@@ -373,17 +370,10 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
     GLuint hTexture = glyph.hTexture;
     if (hTexture != hLastTexture)
     {
+      glEnd ();
       hLastTexture = hTexture;
       statecache->SetTexture (GL_TEXTURE_2D, hTexture);
-
-      if(verts2d.Length() > 0)
-      {
-        glTexCoordPointer(2, GL_FLOAT, sizeof(csVector2),texcoords.GetArray());
-        glVertexPointer(2, GL_FLOAT, sizeof(csVector2), verts2d.GetArray());
-        glDrawArrays(GL_QUADS, 0, curvert);
-        curvert = 0;
-      }
-      
+      glBegin (GL_QUADS);
     }
     // the texture coordinates must point to the correct character
     // the texture is a strip a wide as a single character and
@@ -398,54 +388,16 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 
     if (ClipRect (x, y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
     {
-      texcoords[curvert].x = tx1;
-      texcoords[curvert].y = ty1;
-
-      verts2d[curvert].x = x1;
-      verts2d[curvert].y = y2;
-
-      curvert++;
-
-      texcoords[curvert].x = tx2;
-      texcoords[curvert].y = ty1;
-
-      verts2d[curvert].x = x2;
-      verts2d[curvert].y = y2;
-
-      curvert++;
-
-      texcoords[curvert].x = tx2;
-      texcoords[curvert].y = ty2;
-
-      verts2d[curvert].x = x2;
-      verts2d[curvert].y = y1;
-
-      curvert++;
-      
-      texcoords[curvert].x = tx1;
-      texcoords[curvert].y = ty2;
-
-      verts2d[curvert].x = x1;
-      verts2d[curvert].y = y1;
-
-      curvert++;
-
-      /*
       glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
       glTexCoord2f (tx2,ty1); glVertex2f (x2,y2);
       glTexCoord2f (tx2,ty2); glVertex2f (x2,y1);
-      glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);*/
+      glTexCoord2f (tx1,ty2); glVertex2f (x1,y1);
     }
 
     x1 = x_right;
   }
 
-  glTexCoordPointer(2, GL_FLOAT, sizeof(csVector2),texcoords.GetArray());
-  glVertexPointer(2, GL_FLOAT, sizeof(csVector2), verts2d.GetArray());
-  glDrawArrays(GL_QUADS, 0, curvert);
-
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glEnd ();
 
   statecache->Disable_GL_BLEND ();
 //  statecache->DisableState (GL_ALPHA_TEST);

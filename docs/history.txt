@@ -14,6 +14,11 @@ The history order is reversed so that new features are at the top.
 	- Philipp Aumayr optimized font drawing code to use vertex arrays.
 	- Philipp Aumayr extended gmeshldr to support general streams
 	  for new Renderer.
+	- Reverted latest font drawing optimization because it messed
+	  up with the OpenGL renderer. It is currently illegal to
+	  set client states outside the OpenGL renderer because the
+	  renderer has a state cache for this. We need to find a better
+	  way to solve this.
 15-Feb-2003
 	- res checked if the image IO plugins work properly and fixed them
 	  if necessary:

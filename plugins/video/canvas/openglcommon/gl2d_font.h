@@ -28,8 +28,6 @@
 
 #include "csutil/csvector.h"
 #include "ivideo/fontserv.h"
-#include "csgeom/vector2.h"
-#include "csutil/garray.h"
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/glstates.h"
 
@@ -116,10 +114,6 @@ protected:
   int ClipX1, ClipY1, ClipX2, ClipY2;
   /// Pointer to our callback routine.
   iFontDeleteNotify* delete_callback;
-
-  // quad buffer
-  csGrowingArray<csVector2> verts2d;
-  csGrowingArray<csVector2> texcoords;
 
   // Graphics2D
   csRef<iGraphics2D> g2d;
