@@ -18,6 +18,9 @@ The history order is reversed so that new features are at the top.
 	    - Modified Light Iterator step to always do stencil write
 	      (should be optimized out later when stencil writes aren't 
 	      needed)
+	- Jorrit fixed various compile errors in csStringArray which were
+	  introduced after the changes to char const*. These changes were
+	  incomplete.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.

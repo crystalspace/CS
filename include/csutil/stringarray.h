@@ -47,7 +47,7 @@ public:
     limit = (ilimit > 0 ? ilimit : 0);
     threshold = (ithreshold > 0 ? ithreshold : 16);
     if (limit != 0)
-      root = (char**)calloc (limit, sizeof(char*));
+      root = (char const**)calloc (limit, sizeof(char const*));
     else
       root = 0;
   }
@@ -112,12 +112,12 @@ public:
       }
       else if (root == 0)
       {
-        root = (char**)calloc (n, sizeof(char*));
+        root = (char const**)calloc (n, sizeof(char const*));
       }
       else
       {
-        char** newroot = (char**)calloc (n, sizeof(char*));
-	memcpy (newroot, root, old_count * sizeof (char*));
+        char const** newroot = (char const**)calloc (n, sizeof(char const*));
+	memcpy (newroot, root, old_count * sizeof (char const*));
 	free (root);
 	root = newroot;
       }
@@ -215,9 +215,9 @@ public:
    * Pop an element from vector 'top'. Caller is responsible for
    * deleting the object later (using delete[]).
    */
-  char* Pop ()
+  char const* Pop ()
   {
-    char* ret = root [count - 1];
+    char const* ret = root [count - 1];
     root [count-1] = 0;
     SetLength (count - 1);
     return ret;
@@ -234,10 +234,10 @@ public:
    * will be set to 0. Caller is responsible for deleting the returned
    * pointer later (using delete[]).
    */
-  char* GetAndClear (int n)
+  char const* GetAndClear (int n)
   {
     CS_ASSERT (n >= 0 && n < count);
-    char* ret = root[n];
+    char const* ret = root[n];
     root[n] = 0;
     return ret;
   }
@@ -247,9 +247,9 @@ public:
    * from the array and returned. Caller is responsible for deleting the
    * pointer later (using delete[]).
    */
-  char* Extract (int n)
+  char const* Extract (int n)
   {
-    char* rc = 0;
+    char const* rc = 0;
     if (n >= 0 && n < count)
     {
       rc = root[n]; root[n] = 0;
@@ -257,7 +257,7 @@ public:
       const int nmove = ncount - n;
       if (nmove > 0)
       {
-        memmove (&root [n], &root [n + 1], nmove * sizeof (char*));
+        memmove (&root [n], &root [n + 1], nmove * sizeof (char const*));
 	root[count-1] = 0;	// Clear last element to prevent deletion.
       }
       SetLength (ncount);
@@ -268,7 +268,7 @@ public:
   /// Delete element number 'n' from vector.
   bool Delete (int n)
   {
-    char* p = Extract (n);
+    char const* p = Extract (n);
     if (p)
     {
       delete[] p;
