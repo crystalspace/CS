@@ -95,22 +95,10 @@ void SysSystemDriver::SetSystemDefaults ()
 bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)
 {
   if (strcasecmp ("-shm", argv[i]) == 0)
-  {
-#   ifdef DO_SHM
-      UseSHM = true;
-#   else
-      Printf (MSG_FATAL_ERROR, "SHM support not compiled into this version of Crystal Space!\n");
-      return false;
-#   endif
-  }
+    UseSHM = true;
   else if (strcasecmp ("-noshm", argv[i]) == 0)
   {
-#   ifdef DO_SHM
-      UseSHM = false;
-#   else
-      Printf (MSG_FATAL_ERROR, "SHM support not compiled into this version of Crystal Space!\n");
-      return false;
-#   endif
+    UseSHM = false;
   }
   else if (strcasecmp ("-sdepth", argv[i]) == 0)
   {
@@ -131,10 +119,8 @@ void SysSystemDriver::Help ()
 {
   csSystemDriver::Help ();
   Printf (MSG_STDOUT, "  -sdepth <depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
-#ifdef DO_SHM
   Printf (MSG_STDOUT, "  -shm/noshm         SHM extension (default '%sshm')\n",
     UseSHM ? "" : "no");
-#endif
 }
 
 void SysSystemDriver::FocusHandler (int Enable)
