@@ -18,6 +18,7 @@ chronological order.
 	  splatting_scattering_base shader. It didn't flip the (source) Y 
 	  coordinate.
 	- Eric Sunshine added several missing #includes to
+	  csplugincommon/canvas/draw_line.h and
 	  csplugincommon/renderstep/parserenderstep.h.
 	- Eric Sunshine fixed problem in csutil/win32/callstack.cpp where it
 	  failed to compile with MSVC6 on account of missing ULONG_PTR type.

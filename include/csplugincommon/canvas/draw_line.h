@@ -21,6 +21,7 @@
 #define __CS_CANVAS_COMMON_DRAW_LINE_H__
 
 #include "draw_common.h"
+#include "csqint.h"
 
 template<class Tpixel, class Tpixmixer>
 class csG2DDrawLine
