@@ -2531,6 +2531,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 
 #ifdef CS_USE_NEW_RENDERER
   csVector3 attenvec;
+  bool attnSet = false;
 #endif
 
   csColor color;
@@ -2741,7 +2742,9 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
       #ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_ATTENUATIONVECTOR:
         {
-          if (!SyntaxService->ParseVector (child, attenvec))
+          if (SyntaxService->ParseVector (child, attenvec))
+            attnSet = true;
+          else
 	    return NULL;
         }
         break;
@@ -2811,7 +2814,9 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   l->QueryLight ()->SetAttenuation (attenuation);
 
 #ifdef CS_USE_NEW_RENDERER
-  l->QueryLight ()->SetAttenuationVector (attenvec);
+  if (attnSet)
+    l->QueryLight ()->SetAttenuationVector (attenvec);
+
 #endif
 
   // Move the key-value pairs from 'Keys' to the light object
