@@ -508,7 +508,7 @@ void csWindow::ThemeChanged ()
 {
   int bw,bh;
   csThemeWindow * thwin = (csThemeWindow *)GetTheme();
-  CS_ASSERT(thwin != NULL)
+  CS_ASSERT(thwin != NULL);
 
 
   if (ThemeActive.BorderLightColor == 1)
