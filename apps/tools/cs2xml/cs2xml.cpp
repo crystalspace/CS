@@ -384,7 +384,7 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
     csScanStr (orig_buf, "%F", list, &num);
-    delete[] orig_buf;
+    orig_buf = NULL;
     if (num == 1)
     {
       WriteToken (indent, "scale", NULL, false, false);
