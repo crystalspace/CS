@@ -10,6 +10,8 @@ chronological order.
 	- Keith committed a new version of the Max level export scripts.
 	  This version supports ThingFactories and instances now.  Also
 	  the doc is slightly updated.
+	- Eric Sunshine re-added /nodefaultlib:"MSVCRT" to the freefnt2 MSVC
+	  project file since MSVC complained that this flag was needed.
 17-Nov-2003
 	- Jorrit removed obsolete bits64.h from Dynavis.
 	- Jorrit performed additional micro-optimizations in the coverage

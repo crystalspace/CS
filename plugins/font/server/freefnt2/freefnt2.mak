@@ -46,9 +46,8 @@ TO_INSTALL.CONFIG += $(CFG.FREEFNT2)
 MSVC.DSP += FREEFNT2
 DSP.FREEFNT2.NAME = freefnt2
 DSP.FREEFNT2.TYPE = plugin
-#DSP.FREEFNT2.LFLAGS = /nodefaultlib:"MSVCRT"
+DSP.FREEFNT2.LFLAGS = /nodefaultlib:"MSVCRT"
 DSP.FREEFNT2.CFLAGS = /I "..\..\include\cssys\win32\freetype2"
-#DSP.FREEFNT2.LIBS = libfreetype
 DSP.FREEFNT2.LIBS = freetype2
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -68,7 +67,8 @@ $(FREEFNT2): $(OBJ.FREEFNT2) $(LIB.FREEFNT2)
 
 clean: freefnt2clean
 freefnt2clean:
-	-$(RMDIR) $(FREEFNT2) $(OBJ.FREEFNT2) $(OUTDLL)/$(notdir $(INF.FREEFNT2))
+	-$(RMDIR) $(FREEFNT2) $(OBJ.FREEFNT2) \
+	$(OUTDLL)/$(notdir $(INF.FREEFNT2))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/freefnt2.dep
