@@ -35,6 +35,8 @@ class csProcSkyTexture : public csProcTexture {
 
   /// texture orig,udir,vdir (in world coordinates as used in the sky)
   csVector3 txtorig, txtu, txtv;
+  /// the cached intersection points
+  csVector3 *isect;
 
 public:
   /// create, given a sky it belongs to.
@@ -60,6 +62,10 @@ public:
   /// get texturespace values
   void GetTextureSpace(csVector3& orig, csVector3& u, csVector3& v) const
   { orig = txtorig; u = txtu; v = txtv; }
+  /// set cached isects cache array
+  void SetIntersect(csVector3 *icache) {isect = icache;}
+  /// get cached isects cache array
+  csVector3 *GetIntersect() const {return isect;}
 
   /** 
    * Set the texturemapping of the sky onto this texture
@@ -123,7 +129,11 @@ public:
   csProcSky();
   ~csProcSky();
 
+  /// do a nextframe like drawing update
   void DrawToTexture(csProcSkyTexture *skytex);
+
+  /// Make intersection point cache in a texture
+  void MakeIntersectCache(csProcSkyTexture *skytex);
 };
 
 #endif // __PROCSKYTEX_H__

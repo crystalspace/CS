@@ -33,6 +33,7 @@ csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
   sky = par;
   mat_w = 256;
   mat_h = 256;
+  isect = NULL;
 
   if(0)
   {
@@ -55,6 +56,7 @@ csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
 
 csProcSkyTexture::~csProcSkyTexture() 
 {
+  if(isect) {delete[] isect; isect=NULL;}
 }
 
 bool csProcSkyTexture::PrepareAnim ()
@@ -296,6 +298,9 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
   iGraphics2D *g2d = skytex->GetG2D();
   iTextureManager *txtmgr = skytex->GetTextureManager();
 
+  // if the texture has no cache, make one
+  if(!skytex->GetIntersect()) MakeIntersectCache(skytex);
+
   if (!skytex->GetG3D()->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
@@ -305,6 +310,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
   for(int y=0; y<height; y++)
     for(int x=0; x<width; x++)
     {
+      /*    // 20 msec
       /// get texel pt in 3d space
       spot = txtorig + texelu*float(x) + texelv*float(y);
       if(!SphereIntersect(spot, isect))
@@ -312,11 +318,13 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
         //printf("no intersection!\n");
 	isect = center; isect.z += radius;
       }
+      */
+      isect = skytex->GetIntersect()[ y*width+x ];
 
-      float sundist = GetSundist(isect);
+      float sundist = GetSundist(isect); /* 5 msec */
       bool below = false;
       float haze=0.0;
-      csRGBcolor blue = GetSkyBlue(isect, haze, sundist, below);
+      csRGBcolor blue = GetSkyBlue(isect, haze, sundist, below); /* 35 msec */
       /// 
       int cloud;
       if(!below)
@@ -325,7 +333,8 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
         float cloudy = 1024.+(isect.z - center.z)/radius*255.*20.;
         if(cloudx<0.0)cloudx = -cloudx;
         if(cloudy<0.0)cloudy = -cloudy;
-        cloud = GetCloudVal((int)cloudx, (int)cloudy );
+        cloud = GetCloudVal((int)cloudx, (int)cloudy ); /* 80 msec */
+	//cloud = 0;
         //cloud = int(cloudx)%256 + int(cloudy)%256; /// nice patterns :)
         //cloud = GetCloudVal(x,y); // debug
       }
@@ -351,5 +360,38 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
 
   skytex->GetG3D()->FinishDraw();
   skytex->GetG3D()->Print(NULL);
+}
+
+
+void csProcSky::MakeIntersectCache(csProcSkyTexture *skytex)
+{
+  if(skytex->GetIntersect() != 0)
+  {
+    delete[] skytex->GetIntersect();
+    skytex->SetIntersect(0);
+  }
+  int width = skytex->GetWidth();
+  int height = skytex->GetHeight();
+  csVector3 *cache = new csVector3 [ width*height ] ;
+  skytex->SetIntersect(cache);
+
+  /// fill the cache
+  csVector3 txtorig, txtu, txtv;
+  skytex->GetTextureSpace(txtorig, txtu, txtv);
+  csVector3 texelu = txtu / float(width);
+  csVector3 texelv = txtv / float(height);
+  csVector3 spot, isect;
+  for(int y=0; y<height; y++)
+    for(int x=0; x<height; x++)
+    {
+      /// get texel pt in 3d space
+      spot = txtorig + texelu*float(x) + texelv*float(y);
+      if(!SphereIntersect(spot, isect))
+      {
+        //printf("no intersection!\n");
+	isect = center; isect.z += radius;
+      }
+      cache [ y*width+x ] = isect;
+    }
 }
 
