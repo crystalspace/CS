@@ -158,6 +158,10 @@ public:
   /// Get shader associated with a shader type
   virtual iShader* GetShader (csStringID type);
 
+  /// Get all Shaders
+  const csHash<csRef<iShader>, csStringID>& GetShaders() const
+  { return shaders; }
+
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
   /**
@@ -227,6 +231,10 @@ public:
   /// Get a named variable from this context
   csShaderVariable* GetVariable (csStringID name) const
   { return svcontext.GetVariable (name); }
+
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return svcontext.GetShaderVariables (); }
 
   /**
   * Push the variables of this context onto the variable stacks

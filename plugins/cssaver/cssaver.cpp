@@ -30,6 +30,7 @@
 #include "iengine/material.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
+#include "iengine/movable.h"
 #include "iengine/campos.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
@@ -39,11 +40,15 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
+#include "imap/services.h"
 #include "imap/writer.h"
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
+#include "imesh/thing.h"
+#include "iengine/renderloop.h"
+#include "iengine/sharevar.h"
 
 #define ONE_OVER_256 (1.0/255.0)
 
@@ -77,6 +82,7 @@ bool csSaver::Initialize(iObjectRegistry* p)
 {
   object_reg = p;
   engine = CS_QUERY_REGISTRY(object_reg, iEngine);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
@@ -124,7 +130,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
   for (int i = 0; i < texList->GetCount(); i++)
   {
     iTextureWrapper *texWrap=texList->Get(i);
-    csRef<iDocumentNode> child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode>child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     const char *name=texWrap->QueryObject()->GetName();
     child->SetValue("texture");
     if (name && *name)
@@ -135,21 +141,14 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       const char* filename=img->GetName();
       if (filename && *filename)
         CreateValueNode(child, "file", filename);
-      else
-      {
-      }
 
-
-#if 0
-      //TODO behle not currently read from map, so no point to write back out
-      if (img->HasKeycolor() == 1)
+      if (img->HasKeycolor())
       {
         int r,g,b;
         img->GetKeycolor(r, g, b);
         CreateValueNodeAsColor(child, "transparent",
 	  csColor(r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256));
       }
-#endif
     }
     else
     {
@@ -160,6 +159,20 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 
 bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iStringSet> stringset =
+    CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg, 
+    "crystalspace.shared.stringset", iStringSet);
+
+  csStringID texdiffID = stringset->Request("tex diffuse");
+  csStringID matdiffID = stringset->Request("mat diffuse");
+  csStringID matambiID = stringset->Request("mat ambient");
+  csStringID matreflID = stringset->Request("mat reflection");
+  csStringID matflatcolID = stringset->Request("mat flatcolor");
+  csStringID orlightID = stringset->Request("or_lighting");
+  csStringID orcompatID = stringset->Request("OR compatibility");
+#endif
+
   csRef<iDocumentNode> current = CreateNode(parent, "materials");
   iMaterialList *matList=engine->GetMaterialList();
   for (int i = 0; i < matList->GetCount(); i++)
@@ -168,7 +181,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     CS_ASSERT(matWrap);
     iMaterial* mat = matWrap->GetMaterial();
     CS_ASSERT(mat);
-    csRef<iMaterialEngine> matEngine(SCF_QUERY_INTERFACE(mat,iMaterialEngine));
+    csRef<iMaterialEngine>matEngine(SCF_QUERY_INTERFACE(mat,iMaterialEngine));
     CS_ASSERT(matEngine);
 
     iTextureWrapper* texWrap = matEngine->GetTextureWrapper();
@@ -257,10 +270,167 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
         }
       }
     }
+#else
+
+    csHash<csRef<iShader>, csStringID> shaders = mat->GetShaders();
+    csHash<csRef<iShader>, csStringID>::GlobalIterator shaderIter = 
+      shaders.GetIterator();
+
+    while (shaderIter.HasNext())
+    {
+      csStringID typeID;
+      iShader* shader = shaderIter.Next(typeID);
+      const char* shadername = shader->QueryObject()->GetName();
+      if (orcompatID == typeID && orlightID == stringset->Request(shadername))
+        continue;
+      const char* shadertype = stringset->Request(typeID);
+
+      csRef<iDocumentNode> shaderNode = CreateNode(child, "shader");
+      shaderNode->SetAttribute("type", shadertype);
+      shaderNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(shadername);
+    }
+
+    csRefArray<csShaderVariable> shaderVars = mat->GetShaderVariables();
+    csRefArray<csShaderVariable>::Iterator shaderVarIter =
+      shaderVars.GetIterator();
+
+    while (shaderVarIter.HasNext())
+    {
+      csShaderVariable* shaderVar = shaderVarIter.Next();
+      csStringID varnameid = shaderVar->GetName();
+      csString varname(stringset->Request(varnameid));
+      csRef<iDocumentNode> shadervarNode = CreateNode(child, "shadervar");
+      shadervarNode->SetAttribute("name", (const char*)varname);
+
+      switch(shaderVar->GetType())
+      {
+        case csShaderVariable::INT:
+          {
+            int intval;
+            if(shaderVar->GetValue(intval))
+            {
+              shadervarNode->SetAttribute("type", "int");
+              shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->
+                SetValueAsInt(intval);
+            }
+          }
+          break;
+        case csShaderVariable::FLOAT:
+          {
+            float fval;
+            if(shaderVar->GetValue(fval))
+            {
+              if ((varnameid == matdiffID && fval == 0) ||
+                  (varnameid == matambiID && fval == 0) ||
+                  (varnameid == matreflID && fval == 0) )
+              {
+                child->RemoveNode(shadervarNode);
+                break;
+              }
+              shadervarNode->SetAttribute("type", "float");
+              shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->
+                SetValueAsFloat(fval);
+            }
+          }
+          break;
+        case csShaderVariable::VECTOR2:
+          {
+            csVector2 v2;
+            if(shaderVar->GetValue(v2))
+            {
+              shadervarNode->SetAttribute("type", "vector2");
+              csString value;
+              value.Format("%f,%f",v2.x,v2.y);
+              shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(
+                (const char*)value);
+            }
+          }
+          break;
+        case csShaderVariable::VECTOR3:
+          {
+            csVector3 v3;
+            if(shaderVar->GetValue(v3))
+            {
+              if (varnameid == matflatcolID && (v3 == 1 || v3.x*255 == color.red
+                  && v3.y *255 == color.green && v3.z *255 == color.blue))
+              {
+                child->RemoveNode(shadervarNode);
+                break;
+              }
+
+              shadervarNode->SetAttribute("type", "vector3");
+              csString value;
+              value.Format("%f,%f,%f",v3.x,v3.y,v3.z);
+              shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(
+              (const char*)value);
+            }
+          }
+          break;
+        case csShaderVariable::VECTOR4:
+          {
+            csVector4 v4;
+            if(shaderVar->GetValue(v4))
+            {
+              shadervarNode->SetAttribute("type", "vector4");
+              csString value;
+              value.Format("%f,%f,%f,%f",v4.x,v4.y,v4.z,v4.w);
+              shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(
+                (const char*)value);
+            }
+          }
+          break;
+        case csShaderVariable::TEXTURE:
+          {
+            iTextureWrapper* tex;
+            if(shaderVar->GetValue(tex) && tex && 
+              !(varnameid == texdiffID && tex == texWrap))
+            {
+              shadervarNode->SetAttribute("type", "texture");
+              shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->
+                SetValue(tex->QueryObject()->GetName());
+            }
+            else
+              child->RemoveNode(shadervarNode);
+          }
+          break;
+        default:
+          int i=0;
+	  break;
+      }
+
+    }
+
 #endif
   }
   return true;
 }
+
+bool csSaver::SaveShaders (iDocumentNode *parent)
+{
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iDocumentNode> shadersNode = CreateNode(parent, "shaders");
+  csRef<iShaderManager> shaderMgr = 
+    CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  if (!shaderMgr) return false;
+
+  csRefArray<iShader> shaders = shaderMgr->GetShaders ();
+  size_t i;
+  for (i = 0 ; i < shaders.Length () ; i++)
+  {
+    iShader* shader = shaders[i];
+    //const char* shadername = shader->QueryObject()->GetName();
+    const char* shaderfile = shader->GetFileName();
+    if (shaderfile && *shaderfile)
+    {
+      csRef<iDocumentNode> shaderNode = CreateNode(shadersNode, "shader");
+      CreateNode(shaderNode, "file")
+        ->CreateNodeBefore(CS_NODE_TEXT)->SetValue(shaderfile);
+    }
+  }
+#endif
+  return true;
+}
+
 
 bool csSaver::SaveRenderPriorities(iDocumentNode *parent)
 {
@@ -273,29 +443,30 @@ bool csSaver::SaveRenderPriorities(iDocumentNode *parent)
     {
       csRef<iDocumentNode> prioritynode = CreateNode(rpnode, "priority");
 
-      rpnode->SetAttribute("name", rpname);
+      prioritynode->SetAttribute("name", rpname);
       csRef<iDocumentNode> levelnode = CreateNode(prioritynode, "level");
-      levelnode->SetValueAsInt(i);
+      levelnode->CreateNodeBefore(CS_NODE_TEXT)->SetValueAsInt(i);
 
       csRef<iDocumentNode> sortnode = CreateNode(prioritynode, "sort");
       int sorttype = engine->GetRenderPrioritySorting(i);
       switch(sorttype)
       {
         case CS_RENDPRI_NONE:
-          sortnode->SetValue("NONE");
+          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("NONE");
           break;
         case CS_RENDPRI_BACK2FRONT:
-          sortnode->SetValue("BACK2FRONT");
+          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("BACK2FRONT");
           break;
         case CS_RENDPRI_FRONT2BACK:
-          sortnode->SetValue("FRONT2BACK");
+          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("FRONT2BACK");
           break;
 /*      case CS_RENDPRI_MATERIAL:
-          sortnode->SetValue("MATERIAL");
+          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("MATERIAL");
           break;*/
       }
     }
   }
+
   return true;
 }
 
@@ -352,7 +523,8 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
   return true;
 }
 
-bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent)
+bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, 
+                                iDocumentNode *parent)
 {
   for (int i=0; i<factList->GetCount(); i++)
   {
@@ -378,18 +550,22 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *paren
 
     //Add the plugin tag
     char loadername[128] = "";
-    csFindReplace(loadername, pluginname, ".object.", ".loader.factory.", 128);
+    csFindReplace(loadername, pluginname, ".object.", ".loader.factory.",128);
 
     pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr = 
+      CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
     char savername[128] = "";
     csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
 
     //Invoke the iSaverPlugin::WriteDown
-    csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-    if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
-    if (saver) saver->WriteDown(meshfactwrap->GetMeshObjectFactory(), factNode);
+    csRef<iSaverPlugin> saver = 
+      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+    if (!saver) 
+      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+    if (saver) 
+      saver->WriteDown(meshfactwrap->GetMeshObjectFactory(), factNode);
   }
   return true;
 }
@@ -415,8 +591,8 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
   {
     iMeshWrapper* meshwrapper = meshList->Get(i);
     //Check if it's a portal
-    csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(),
-                                                         iPortalContainer);
+    csRef<iPortalContainer> portal = 
+      SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
     if (portal) 
     {
       for (int i=0; i<portal->GetPortalCount(); i++)
@@ -437,13 +613,16 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
     //It has to create the params node itself, maybe it might like to write
     //more things outside the params at a later stage. you never know ;)
     csRef<iFactory> factory;
-    iMeshObjectFactory* meshobjectfactory = meshwrapper->GetMeshObject()->GetFactory();
+    iMeshObjectFactory* meshobjectfactory = 
+      meshwrapper->GetMeshObject()->GetFactory();
     if (meshobjectfactory)
-      factory = SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
+      factory = 
+        SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
     else
     {
       char error[128];
-      sprintf(error, "Factory less Mesh found! %s => Please fix or report to Jorrit ;)", name);
+      sprintf(error, "Factory less Mesh found! %s => \
+                        Please fix or report to Jorrit ;)", name);
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.plugin.cssaver", error);
     }
@@ -459,15 +638,21 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
         csFindReplace(loadername, pluginname, ".object.", ".loader.", 128);
 
         pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
-        csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+        csRef<iPluginManager> plugin_mgr = 
+          CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
         char savername[128] = "";
         csFindReplace(savername, pluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
-        csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-        if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
-        if (saver) saver->WriteDown(meshwrapper->GetMeshObject(), meshNode);
+        csRef<iSaverPlugin> saver = 
+          CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+          
+        if (!saver) 
+          saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+          
+        if (saver)
+          saver->WriteDown(meshwrapper->GetMeshObject(), meshNode);
       }
 
     }
@@ -476,6 +661,31 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
 
     //TBD: write <priority>
     //TBD: write other tags
+
+    //Add the transformation tags
+    csVector3 moveVect =
+      -meshwrapper->GetMovable()->GetTransform().GetT2OTranslation();
+    csMatrix3 moveMatrix =
+      meshwrapper->GetMovable()->GetTransform().GetT2O();
+    if (moveVect != 0 || !moveMatrix.IsIdentity())
+    {
+      //Add the move tag
+      csRef<iDocumentNode> moveNode = CreateNode(meshNode, "move");
+
+      //Add the matrix tag
+      if (!moveMatrix.IsIdentity())
+      {
+        csRef<iDocumentNode> matrixNode = CreateNode(moveNode, "matrix");
+        synldr->WriteMatrix(matrixNode, &moveMatrix);
+      }
+
+      //Add the v tag
+      if (moveVect != 0)
+      {
+        csRef<iDocumentNode> vNode = CreateNode(moveNode, "v");
+        synldr->WriteVector(vNode, &moveVect);
+      }
+    }
 
     //Save all childmeshes
     iMeshList* childlist = meshwrapper->GetChildren();
@@ -512,7 +722,8 @@ bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
   {
     csRef<iDocumentNode> sectorNode = CreateNode(portalNode, "sector");
     const char* name = sector->QueryObject()->GetName();
-    if (name && *name) sectorNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(name);
+    if (name && *name)
+      sectorNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(name);
   }
 
   return true;
@@ -553,9 +764,97 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
   return true;
 }
 
+bool csSaver::SaveVariables (iDocumentNode* node)
+{
+  csRef<iDocumentNode> variablesNode = CreateNode(node, "variables");
+  iSharedVariableList* vars = engine->GetVariableList();
+  for (int x=0; x<vars->GetCount(); x++)
+  {
+    csRef<iDocumentNode> variableNode = CreateNode(variablesNode, "variable");
+    iSharedVariable* var = vars->Get(x);
+    variableNode->SetAttribute("name", var->GetName());
+    switch (var->GetType())
+    {
+      case iSharedVariable::SV_FLOAT:
+      {
+        variableNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+          ->SetValueAsFloat(var->Get());
+        break;
+      }
+      case iSharedVariable::SV_COLOR:
+      {
+        csString value;
+        csColor c = var->GetColor();
+        value.Format("%f,%f,%f",c.red,c.green,c.blue);
+        variableNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+          ->SetValue((const char*) value);
+        break;
+      }
+      case iSharedVariable::SV_VECTOR:
+      {
+        csString value;
+        csVector3 v = var->GetVector();
+        value.Format("%f,%f,%f",v.x,v.y,v.z);
+        variableNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+          ->SetValue((const char*) value);
+        break;
+      }
+    }
+  }
+  return true;
+}
+
+bool csSaver::SaveSettings (iDocumentNode* node)
+{
+  csRef<iDocumentNode> settingsNode = CreateNode(node, "settings");
+//case XMLTOKEN_CLEARZBUF:
+  //csRef<iDocumentNode> clrzbufNode = CreateNode(settingsNode, "clearzbuf");
+  synldr->WriteBool(settingsNode,"clearzbuf",engine->GetClearScreen(), true);
+//case XMLTOKEN_CLEARSCREEN:
+  //csRef<iDocumentNode> clrscrNode = CreateNode(settingsNode, "clearscreen");
+  synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen(), true);
+//case XMLTOKEN_LIGHTMAPCELLSIZE:
+  csRef<iDocumentNode> lghtmapcellNode = CreateNode(settingsNode, "lightmapcellsize");
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+    iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+    "crystalspace.mesh.object.thing", iMeshObjectType));
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.mesh.object.thing", iMeshObjectType);
+  }
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
+    iThingEnvironment);
+  int cellsize = te->GetLightmapCellSize ();
+  lghtmapcellNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(cellsize);
+//case XMLTOKEN_MAXLIGHTMAPSIZE:
+  csRef<iDocumentNode> maxlghtmapNode = CreateNode(settingsNode, "maxlightmapsize");
+  int max[2];
+  engine->GetMaxLightmapSize(max[0], max[1]);
+  maxlghtmapNode->SetAttributeAsInt ("horizontal", max[0]);
+  maxlghtmapNode->SetAttributeAsInt ("vertical"  , max[1]);
+//case XMLTOKEN_AMBIENT:
+  csRef<iDocumentNode> ambientNode = CreateNode(settingsNode, "ambient");
+  csColor c;
+  engine->GetAmbientLight(c);
+  synldr->WriteColor(ambientNode, &c);
+
+#ifdef CS_USE_NEW_RENDERER
+//case XMLTOKEN_RENDERLOOP:
+  iRenderLoop* renderloop = engine->GetCurrentDefaultRenderloop();
+  const char* loopName = engine->GetRenderLoopManager()->GetName(renderloop);
+  CreateNode(settingsNode, "renderloop")
+    ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
+
+#endif
+  return true;
+}
+
 csRef<iString> csSaver::SaveMapFile()
 {
-  csRef<iDocumentSystem> xml = csPtr<iDocumentSystem>(new csTinyDocumentSystem());
+  csRef<iDocumentSystem> xml = 
+    csPtr<iDocumentSystem>(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -563,8 +862,11 @@ csRef<iString> csSaver::SaveMapFile()
 
   //TBD: this crashes for me, dunno why, have to look at it more closley.
   if (!SaveTextures(parent)) return 0;
+  if (!SaveSettings(parent)) return 0;
+  if (!SaveShaders(parent)) return 0;
   if (!SaveMaterials(parent)) return 0;
-  
+  if (!SaveVariables(parent)) return 0;
+  if (!SaveRenderPriorities(parent)) return 0;
   if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return 0;
   
   if (!SaveSectors(parent)) return 0;
@@ -597,7 +899,9 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
   parent->SetValue("world");
 
   if (!SaveTextures(parent)) return false;
+  if (!SaveShaders(parent)) return false;
   if (!SaveMaterials(parent)) return false;
+  if (!SaveRenderPriorities(parent)) return false;
 
   /// TODO: write mesh objects, factories
   return true;

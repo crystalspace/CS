@@ -1384,7 +1384,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent
     binormal_name = strings->Request ("binormals");
   }
 
-  autonormals = false;
   mesh_vertices_dirty_flag = false;
   mesh_texels_dirty_flag = false;
   mesh_normals_dirty_flag = false;
@@ -1394,6 +1393,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent
 
   buffers_version = 0;
 #endif
+
+  autonormals = false;
 
   default_mixmode = 0;
   default_lighting = true;
@@ -2040,9 +2041,7 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
 
   delete[] mesh_tri_normals;
   mesh_tri_normals = new csVector3[num_triangles];
-#ifdef CS_USE_NEW_RENDERER
   autonormals = true;
-#endif
 
   // Calculate triangle normals.
   // Get the cross-product of 2 edges of the triangle and normalize it.

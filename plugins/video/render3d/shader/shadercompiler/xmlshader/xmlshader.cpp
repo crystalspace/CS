@@ -1047,6 +1047,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler)
   activeTech = 0;
   csXMLShader::compiler = compiler;
   g3d = compiler->g3d;
+  filename = 0;
 }
 
 csXMLShader::~csXMLShader ()

@@ -158,6 +158,14 @@ public:
   virtual iObject* QueryObject () 
   { return (iObject*)(csObject*)this; }
 
+  /// Get name of the File where it was loaded from.
+  const char* GetFileName ()
+  { return filename; }
+
+  /// Set name of the File where it was loaded from.
+  void SetFileName (const char* filename)
+  { this->filename = filename; }
+
   /// Get number of passes this shader have
   virtual int GetNumberOfPasses ()
   {
@@ -197,6 +205,10 @@ public:
   csShaderVariable* GetVariable (csStringID name) const
   { return activeTech->svcontext.GetVariable (name); }
 
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return activeTech->svcontext.GetShaderVariables(); }
+
   /**
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
@@ -216,6 +228,7 @@ public:
   csXMLShaderCompiler* compiler;
   csXMLShaderTech* activeTech;
   csRef<iGraphics3D> g3d;
+  const char* filename;
 };
 
 class csXMLShaderCompiler : public iShaderCompiler, public iComponent

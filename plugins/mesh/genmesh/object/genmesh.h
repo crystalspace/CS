@@ -459,9 +459,7 @@ private:
   int num_mesh_vertices;
   csVector3* mesh_tri_normals;
 
-#ifdef CS_USE_NEW_RENDERER
-  csTriangle* mesh_triangles;
-  int num_mesh_triangles;
+  bool autonormals;
 
   bool mesh_vertices_dirty_flag;
   bool mesh_texels_dirty_flag;
@@ -470,7 +468,9 @@ private:
   bool mesh_triangle_dirty_flag;
   bool mesh_tangents_dirty_flag;
 
-  bool autonormals;
+#ifdef CS_USE_NEW_RENDERER
+  csTriangle* mesh_triangles;
+  int num_mesh_triangles;
 
   csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
@@ -709,6 +709,10 @@ public:
   {
     return default_shadowreceiving;
   }
+  bool IsAutoNormals () const
+  {
+    return autonormals;
+  }
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -839,6 +843,10 @@ public:
     virtual void SetBack2Front (bool b2f)
     {
       scfParent->SetBack2Front (b2f);
+    }
+    virtual bool IsAutoNormals () const
+    {
+      return scfParent->IsAutoNormals ();
     }
     virtual bool IsBack2Front () const
     {

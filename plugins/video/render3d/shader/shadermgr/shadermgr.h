@@ -137,6 +137,10 @@ public:
   csShaderVariable* GetVariable (csStringID name) const
     { return svcontext.GetVariable (name); }
 
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return svcontext.GetShaderVariables(); }
+
   /**
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument

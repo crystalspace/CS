@@ -83,6 +83,9 @@ struct iShaderVariableContext : public iBase
     return sv;
   }
 
+  /// Get Array of all ShaderVariables
+  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const =0;
+
   /**
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
@@ -188,6 +191,12 @@ struct iShader : public iShaderVariableContext
 {
   /// Query the object.
   virtual iObject* QueryObject () = 0;
+
+  /// Get name of the File where it was loaded from.
+  virtual const char* GetFileName () = 0;
+
+  /// Set name of the File where it was loaded from.
+  virtual void SetFileName (const char* filename) = 0;
 
   /// Get number of passes this shader have
   virtual int GetNumberOfPasses() = 0;

@@ -116,6 +116,11 @@ struct iMaterial : public iShaderVariableContext
   virtual iShader* GetShader (csStringID type) = 0;
 
   /**
+   * Get all Shaders.
+   */
+  virtual const csHash<csRef<iShader>, csStringID>& GetShaders() const =0;
+
+  /**
    * Get the base texture from the material.
    */
   virtual iTextureHandle *GetTexture () = 0;

@@ -43,6 +43,10 @@ public:
 
   virtual ~csShaderVariableContext ();
 
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return variables; }
+
   /// Add a variable to this context
   virtual void AddVariable (csShaderVariable *variable);
 

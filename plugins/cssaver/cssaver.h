@@ -26,10 +26,13 @@
 #include "iutil/document.h"
 #include "csutil/cscolor.h"
 
+struct iSyntaxService;
+
 class csSaver : public iSaver
 {
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -50,8 +53,11 @@ public:
 
   bool SaveTextures(iDocumentNode *parent);
   bool SaveMaterials(iDocumentNode *parent);
+  bool SaveShaders(iDocumentNode *parent);
+  bool SaveSettings(iDocumentNode* node);
+  bool SaveRenderPriorities(iDocumentNode* node);
+  bool SaveVariables (iDocumentNode* node);
   bool SaveCameraPositions(iDocumentNode *parent);
-  bool SaveRenderPriorities(iDocumentNode *parent);
   bool SaveMeshFactories(iMeshFactoryList* factList, iDocumentNode *parent);
   bool SaveSectors(iDocumentNode *parent);
   bool SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent);

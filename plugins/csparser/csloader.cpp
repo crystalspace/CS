@@ -5086,6 +5086,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	csRef<iShader> shader = shcom->CompileShader (shaderNode);
 	if (shader)
 	{
+          shader->SetFileName(fileChild->GetContentsValue ());
 	  AddToRegion (ldr_context, shader->QueryObject ());
 	  shaderMgr->RegisterShader (shader);
         }

@@ -9,6 +9,22 @@ chronological order.
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.
+	- PK did the following:
+	    - fixed genmesh so that it really compiles with OR.
+	    - extended the iShaderVarContext with GetShaderVariables()
+	      to get a all shadervariables.
+	    - extended the genmesh API with ->IsAutoNormals()
+	      to check if the normals were automatically calculated.
+	    - extended iMaterial with GetShaders() 
+	      to get a list of all shaders that material uses.
+	    - extended the iShader API to allow the manual setting of a file.
+	    - changed the csloader so it sets the filename in the shader.
+	    - did a lot in the cssaver.cpp, mainly implementing the following:
+	        - bool SaveShaders(iDocumentNode *parent);
+	        - bool SaveSettings(iDocumentNode* node);
+	        - bool SaveRenderPriorities(iDocumentNode* node);
+	        - bool SaveVariables (iDocumentNode* node);
+	    - fixed some lines that were longer than 79.
 11-Sep-2004
 	- Andrew Robberts updated sprcal3d to allow for transformations of
 	  a mesh attached to a socket.
