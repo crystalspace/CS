@@ -47,6 +47,7 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/driver/waveoutsd        \
   sound/renderer/ds3d           \
   sound/renderer/software       \
+  strserv                       \
   video/canvas/ddraw            \
   video/canvas/openglwin        \
   video/format/avi              \
