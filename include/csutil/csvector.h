@@ -305,6 +305,8 @@ inline void csVector::QuickSort (int Mode)
     DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
     inline TYPE *operator [] (int n) const				\
     { return (TYPE *)csVector::operator [] (n); }			\
+    inline TYPE*& operator [] (int n)   				\
+    { return (TYPE *)csVector::operator [] (n); }			\
     inline TYPE *Get (int n) const					\
     { return (TYPE *)csVector::Get(n); }				\
     inline int Push (TYPE *what)					\
