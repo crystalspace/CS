@@ -180,7 +180,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // add a light to the scene.
   iIsoLight *scenelight = engine->CreateLight();
-  scenelight->SetPosition(csVector3(3,3,3));
+  scenelight->SetPosition(csVector3(3,3,6));
   scenelight->SetGrid(grid);
   scenelight->SetRadius(4.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
@@ -197,17 +197,55 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     for(mx=0; mx<multx; mx++)
       grid->SetGroundValue(5, 15, mx, my, 4.0);
   sprite = engine->CreateFloorSprite(csVector3(15,4,5), 1.0, 1.0);
-  sprite->SetMaterialHandle(math2);
+  sprite->SetMaterialHandle(math1);
   world->AddSprite(sprite);
   for(my=0; my<4; my++)
   {
     sprite = engine->CreateXWallSprite(csVector3(15,my,5), 1.0, 1.0);
-    sprite->SetMaterialHandle(math2);
+    sprite->SetMaterialHandle(math1);
     world->AddSprite(sprite);
     sprite = engine->CreateZWallSprite(csVector3(16,my,5), 1.0, 1.0);
-    sprite->SetMaterialHandle(math2);
+    sprite->SetMaterialHandle(math1);
     world->AddSprite(sprite);
   }
+
+  for(mx=0; mx<8; mx++)
+  {
+    sprite = engine->CreateFloorSprite(csVector3(5,4,2+mx), 1.0, 1.0);
+    sprite->SetMaterialHandle(math1);
+    world->AddSprite(sprite);
+  }
+  for(my=0; my<4; my++)
+  {
+    sprite = engine->CreateXWallSprite(csVector3(5,my,2), 1.0, 1.0);
+    sprite->SetMaterialHandle(math1);
+    world->AddSprite(sprite);
+    sprite = engine->CreateXWallSprite(csVector3(5,my,7), 1.0, 1.0);
+    sprite->SetMaterialHandle(math2);
+    world->AddSprite(sprite);
+    for(mx=0; mx<3; mx++)
+    {
+      sprite = engine->CreateZWallSprite(csVector3(6,my,2+mx), 1.0, 1.0);
+      sprite->SetMaterialHandle(math1);
+      world->AddSprite(sprite);
+      sprite = engine->CreateZWallSprite(csVector3(6,my,7+mx), 1.0, 1.0);
+      sprite->SetMaterialHandle(math1);
+      world->AddSprite(sprite);
+    }
+  }
+  sprite = engine->CreateZWallSprite(csVector3(6,3,5), 1.0, 1.0);
+  sprite->SetMaterialHandle(math1);
+  world->AddSprite(sprite);
+  sprite = engine->CreateZWallSprite(csVector3(6,3,6), 1.0, 1.0);
+  sprite->SetMaterialHandle(math1);
+  world->AddSprite(sprite);
+  for(x=0; x<3; x++)
+    for(my=0; my<multy; my++)
+      for(mx=0; mx<multx; mx++)
+      {
+        grid->SetGroundValue(2+x, 5, mx, my, 4.0);
+        grid->SetGroundValue(7+x, 5, mx, my, 4.0);
+      }
 
   //bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,-2,8));
   //printf("Hitbeam gave %d\n", (int)res);
