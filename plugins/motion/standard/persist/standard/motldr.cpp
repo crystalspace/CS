@@ -323,6 +323,7 @@ csPtr<iBase> csMotionLoader::Parse (iDocumentNode* node,
 	return NULL;
     }
   }
+  this->IncRef (); // the returned pointer wil be DecRef()ed.
   return csPtr<iBase> (this);
 }
 
