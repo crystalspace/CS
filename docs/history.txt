@@ -9,6 +9,7 @@ The history order is reversed so that new features are at the top.
 	  of a MATERIAL. In LAYER you can specify the texture, scale, shift,
 	  and mixmode to use for that texture layer.
 	- Fixed iso plugin for latest material changes.
+	- Fixed MazeD for latest material changes.
 	- Wouter Wijngaards added CS_FX_TILING to the bumptest bump layer.
 	  It works perfectly nice in software now!
 	- Wouter Wijngaards added small fix to demo.
