@@ -949,9 +949,6 @@ public:
 
   csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx);
   const csPlane3& GetPolygonWorldPlane (int polygon_idx);
-  iMaterialWrapper* GetPolygonMaterial (int polygon_idx);
-  void SetPolygonMaterial (const csPolygonRange& range,
-  	iMaterialWrapper* material);
 
   SCF_DECLARE_IBASE;
 
@@ -1014,15 +1011,6 @@ public:
     virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx)
     {
       return scfParent->GetPolygonWorldPlane (polygon_idx);
-    }
-    virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx)
-    {
-      return scfParent->GetPolygonMaterial (polygon_idx);
-    }
-    virtual void SetPolygonMaterial (const csPolygonRange& range,
-  	iMaterialWrapper* material)
-    {
-      scfParent->SetPolygonMaterial (range, material);
     }
   } scfiThingState;
   friend struct ThingState;

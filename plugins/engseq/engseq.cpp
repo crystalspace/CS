@@ -364,18 +364,10 @@ public:
         polygon = SCF_QUERY_INTERFACE (polygonpar->GetValue (params),
 		iPolygonHandle);
       int poly_idx = polygon->GetIndex ();
-      iThingState* ts = 0;//polygon->GetThingState ();
-      if (ts)
+      iThingFactoryState* tfs = polygon->GetThingFactoryState ();
+      if (tfs)
       {
-        ts->SetPolygonMaterial (CS_POLYRANGE_SINGLE (poly_idx), material);
-      }
-      else
-      {
-        iThingFactoryState* tfs = polygon->GetThingFactoryState ();
-	if (tfs)
-	{
-	  tfs->SetPolygonMaterial (CS_POLYRANGE_SINGLE (poly_idx), material);
-	}
+	tfs->SetPolygonMaterial (CS_POLYRANGE_SINGLE (poly_idx), material);
       }
       if (polygonpar)
         polygon = 0;

@@ -687,24 +687,6 @@ struct iThingState : public iBase
    * supported here!
    */
   virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx) = 0;
-
-  /**
-   * Get the material for the specified polygon.
-   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT
-   * supported here!
-   */
-  virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
-
-  /**
-   * Set the material of all polygons in the given range.
-   * Set the material of all polygons in the given range.
-   * This material must have the same size as the material given in the factory!
-   * If 0 then the factory material will be used.
-   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
-   * range. Note that it is not allowed to use #CS_POLYRANGE_LAST here!
-   */
-  virtual void SetPolygonMaterial (const csPolygonRange& range,
-  	iMaterialWrapper* material) = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 3, 0);

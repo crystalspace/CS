@@ -1035,6 +1035,7 @@ void csThingStatic::FillRenderMeshes (
 	const csArray<RepMaterial>& repMaterials,
 	uint mixmode)
 {
+//@@@@ ADD support for repMaterials!!!
   //polyRenderers.DeleteAll ();
 
   for (int i = 0; i < (litPolys.Length () + unlitPolys.Length ()); i++)
@@ -1786,7 +1787,7 @@ void csThing::PreparePolygons ()
     p->SetStaticPolyIdx (i);
     p->SetParent (this);
     polygons.Push (p);
-    p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
+    //p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
     p->Finish (ps);
   }
 }
@@ -1926,29 +1927,6 @@ const csPlane3& csThing::GetPolygonWorldPlaneNoCheck (int polygon_idx) const
     return polygon_world_planes[polygon_idx];
   else
     return static_data->static_polygons[polygon_idx]->GetObjectPlane ();
-}
-
-iMaterialWrapper* csThing::GetPolygonMaterial (int polygon_idx)
-{
-  CS_ASSERT (polygon_idx >= 0);
-  return polygons[polygon_idx]->GetMaterial ();
-}
-
-void csThing::SetPolygonMaterial (const csPolygonRange& range,
-  	iMaterialWrapper* material)
-{
-  int start, end;
-  start = range.start;
-  end = range.end;
-  CS_ASSERT (start != -1);
-  CS_ASSERT (end != -1);
-  if (start < 0) start = 0;
-  if (end >= polygons.Length ()) end = polygons.Length ()-1;
-  int i;
-  for (i = start ; i <= end ; i++)
-  {
-    polygons[i]->SetMaterial (material);
-  }
 }
 
 void csThing::InvalidateThing ()

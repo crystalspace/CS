@@ -517,8 +517,6 @@ private:
    */
   csThing* thing;
 
-  iMaterialWrapper* material;
-
   /**
    * List of light patches for this polygon.
    */
@@ -583,9 +581,6 @@ public:
    * Refresh texture mapping and other info from static polygon.
    */
   void RefreshFromStaticData ();
-
-  void SetMaterial (iMaterialWrapper* mat) { material = mat; }
-  iMaterialWrapper* GetMaterial () { return material; }
 
   /**
    * @@@@@ NEEDED?

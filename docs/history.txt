@@ -44,6 +44,9 @@ chronological order.
 	  in csThing. The array in csThing is only created if the object has
 	  moved so for most static geometry this optimization will be useful.
 	- Jorrit did some small optimizations on thing lighting.
+	- Jorrit removed four bytes in every polygon by removing the unnused
+	  material there. Also removed the API to set materials on polygons
+	  in a thing. This should be done by using the ReplaceMaterials api.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

@@ -26,6 +26,7 @@ Comparing walktest between NR and OR:
 
 Things that need to be done in new renderer:
 
+	- iThingState->ReplaceMaterial() will not work in NR.
 	- Support static LOD. This is a special case of a hierarchical mesh
 	  where only one of the children is drawn based on distance
 	  related conditions.
