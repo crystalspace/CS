@@ -638,25 +638,26 @@ void csSimpleKDTree::Flatten ()
 
 bool csSimpleKDTree::Front2Back (const csVector3& pos,
 	csSimpleKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp)
+  	void* userdata, uint32 cur_timestamp,
+	uint32 frustum_mask)
 {
   CS_ASSERT (this != NULL);
-  if (!func (this, userdata, cur_timestamp))
+  if (!func (this, userdata, cur_timestamp, frustum_mask))
     return false;
   if (child1)
   {
     // There are children.
     if (pos[split_axis] <= split_location)
     {
-      child1->Front2Back (pos, func, userdata, cur_timestamp);
+      child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
       CS_ASSERT (child2 != NULL);
-      child2->Front2Back (pos, func, userdata, cur_timestamp);
+      child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
     else
     {
-      child2->Front2Back (pos, func, userdata, cur_timestamp);
+      child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
       CS_ASSERT (child1 != NULL);
-      child1->Front2Back (pos, func, userdata, cur_timestamp);
+      child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
   }
   return true;
@@ -676,7 +677,7 @@ void csSimpleKDTree::ResetTimestamps ()
 
 void csSimpleKDTree::Front2Back (const csVector3& pos,
 	csSimpleKDTreeVisitFunc* func,
-  	void* userdata)
+  	void* userdata, uint32 frustum_mask)
 {
   if (global_timestamp > 4000000000u)
   {
@@ -691,6 +692,6 @@ void csSimpleKDTree::Front2Back (const csVector3& pos,
   {
     global_timestamp++;
   }
-  Front2Back (pos, func, userdata, global_timestamp);
+  Front2Back (pos, func, userdata, global_timestamp, frustum_mask);
 }
 

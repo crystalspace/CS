@@ -404,7 +404,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
   p.y = v.y * iz + sy;
 }
 
-static bool PrintObjects (csKDTree* treenode, void*, uint32)
+static bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
 {
   int num_objects;
   csKDTreeChild** objects;
@@ -438,11 +438,10 @@ struct VisTest_Front2BackData
   // is maintained recursively during VisTest() and indicates the
   // planes that are still active for the current kd-tree node.
   csPlane3 frustum[32];
-  uint32 frustum_mask;
 };
 
 bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
-	VisTest_Front2BackData* data)
+	VisTest_Front2BackData* data, uint32& frustum_mask)
 {
   const csBox3& node_bbox = treenode->GetNodeBBox ();
   const csVector3& pos = data->pos;
@@ -479,7 +478,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   if (do_cull_frustum)
   {
     uint32 new_mask;
-    if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, data->frustum_mask,
+    if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, frustum_mask,
     	new_mask))
     {
       hist->reason = INVISIBLE_FRUSTUM;
@@ -488,7 +487,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     }
     // In VisTest_Front2Back() this is later restored when recursing back to
     // higher level.
-    data->frustum_mask = new_mask;
+    frustum_mask = new_mask;
   }
 
   if (do_cull_coverage != COVERAGE_NONE)
@@ -551,7 +550,7 @@ end:
     if (hist->reason != VISIBLE && hist->reason != VISIBLE_INSIDE)
     {
       printf ("  ");
-      treenode->Front2Back (data->pos, PrintObjects, NULL);
+      treenode->Front2Back (data->pos, PrintObjects, NULL, 0);
       printf ("\n");
     }
   }
@@ -932,7 +931,7 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
 }
 
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
-  	VisTest_Front2BackData* data)
+  	VisTest_Front2BackData* data, uint32 frustum_mask)
 {
   bool vis = true;
   bool do_write_object = false;
@@ -963,9 +962,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       goto end;
     }
   
-    uint32 new_mask;
+    uint32 new_mask2;
     if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		data->frustum_mask, new_mask))
+		frustum_mask, new_mask2))
     {
       hist->reason = INVISIBLE_FRUSTUM;
       vis = false;
@@ -1156,24 +1155,15 @@ end:
 //======== VisTest =========================================================
 
 static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32& frustum_mask)
 {
   VisTest_Front2BackData* data = (VisTest_Front2BackData*)userdata;
   csDynaVis* dynavis = data->dynavis;
 
-  // Visible or not...
-  bool vis = false;
-
-  // Remember current frustum mask.
-  uint32 old_frustum_mask = data->frustum_mask;
-
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
-  if (!dynavis->TestNodeVisibility (treenode, data))
-  {
-    vis = false;
-    goto end;
-  }
+  if (!dynavis->TestNodeVisibility (treenode, data, frustum_mask))
+    return false;
 
   treenode->Distribute ();
 
@@ -1189,17 +1179,11 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
       objects[i]->timestamp = cur_timestamp;
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
       	objects[i]->GetObject ();
-      dynavis->TestObjectVisibility (visobj_wrap, data);
+      dynavis->TestObjectVisibility (visobj_wrap, data, frustum_mask);
     }
   }
 
-  vis = true;
-
-end:
-  // Restore the frustum mask.
-  data->frustum_mask = old_frustum_mask;
-
-  return vis;
+  return true;
 }
 
 bool csDynaVis::VisTest (iRenderView* rview)
@@ -1272,7 +1256,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
   data.frustum[2].Set (origin, p1, p2);
   data.frustum[3].Set (origin, p3, p0);
   //data.frustum[4].Set (origin, p0, p1);	// @@@ DO z=0 plane too!
-  data.frustum_mask = 0xf;
+  uint32 frustum_mask = 0xf;
   //@@@ NOTE! I don't understand why Dynavis doesn't require this mirroring
   // and FrustVis does require it!
   //if (rview->GetCamera ()->IsMirrored ())
@@ -1290,7 +1274,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
     printf ("origin %g,%g,%g lx=%g rx=%g ty=%g by=%g\n",
     	trans.GetOrigin ().x, trans.GetOrigin ().y, trans.GetOrigin ().z,
 	lx, rx, ty, by);
-    uint32 mk = data.frustum_mask;
+    uint32 mk = frustum_mask;
     int i;
     i = 0;
     while (mk)
@@ -1310,7 +1294,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
   data.dynavis = this;
-  kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data);
+  kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
 
   // Conclude statistics.
   if (t2 != 0)
@@ -1335,11 +1319,10 @@ struct VisTestPlanes_Front2BackData
   // is maintained recursively during VisTest() and indicates the
   // planes that are still active for the current kd-tree node.
   csPlane3* frustum;
-  uint32 frustum_mask;
 };
 
 static bool VisTestPlanes_Front2Back (csKDTree* treenode,
-	void* userdata, uint32 cur_timestamp)
+	void* userdata, uint32 cur_timestamp, uint32& frustum_mask)
 {
   VisTestPlanes_Front2BackData* data
   	= (VisTestPlanes_Front2BackData*)userdata;
@@ -1348,15 +1331,12 @@ static bool VisTestPlanes_Front2Back (csKDTree* treenode,
   // itself is visible. If it is not then we don't need to continue.
   const csBox3& node_bbox = treenode->GetNodeBBox ();
   uint32 new_mask;
-  if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, data->frustum_mask,
+  if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, frustum_mask,
   	new_mask))
   {
     return false;
   }
-
-  // Remember current frustum mask.
-  uint32 old_frustum_mask = data->frustum_mask;
-  data->frustum_mask = new_mask;
+  frustum_mask = new_mask;
 
   treenode->Distribute ();
 
@@ -1377,7 +1357,7 @@ static bool VisTestPlanes_Front2Back (csKDTree* treenode,
 	const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
 	uint32 new_mask2;
 	if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
-		data->frustum_mask, new_mask2))
+		frustum_mask, new_mask2))
 	{
 	  visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
 	  data->vistest_objects->Push (visobj_wrap->visobj);
@@ -1386,8 +1366,6 @@ static bool VisTestPlanes_Front2Back (csKDTree* treenode,
     }
   }
 
-  // Restore the frustum mask.
-  data->frustum_mask = old_frustum_mask;
   return true;
 }
 
@@ -1414,10 +1392,10 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   data.current_visnr = current_visnr;
   data.vistest_objects = v;
   data.frustum = planes;
-  data.frustum_mask = (1 << num_planes)-1;
+  uint32 frustum_mask = (1 << num_planes)-1;
 
   kdtree->Front2Back (csVector3 (0, 0, 0), VisTestPlanes_Front2Back,
-  	(void*)&data);
+  	(void*)&data, frustum_mask);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
   	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
@@ -1434,7 +1412,7 @@ struct VisTestBox_Front2BackData
 };
 
 static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32&)
 {
   VisTestBox_Front2BackData* data = (VisTestBox_Front2BackData*)userdata;
 
@@ -1498,7 +1476,8 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   data.box = box;
   data.current_visnr = current_visnr;
   data.vistest_objects = v;
-  kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data);
+  kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data,
+  	0);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
   	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
@@ -1516,7 +1495,7 @@ struct VisTestSphere_Front2BackData
 };
 
 static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32&)
 {
   VisTestSphere_Front2BackData* data = (VisTestSphere_Front2BackData*)userdata;
 
@@ -1582,7 +1561,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   data.vistest_objects = v;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
-  kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data);
+  kdtree->Front2Back (data.pos, VisTestSphere_Front2Back, (void*)&data, 0);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
   	vistest_objects_inuse ? NULL : &vistest_objects_inuse);
@@ -1603,7 +1582,7 @@ struct IntersectSegment_Front2BackData
 };
 
 static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32&)
 {
   IntersectSegment_Front2BackData* data
   	= (IntersectSegment_Front2BackData*)userdata;
@@ -1744,7 +1723,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   data.mesh = NULL;
   data.polygon = NULL;
   data.vector = NULL;
-  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   if (p_mesh) *p_mesh = data.mesh;
   if (pr) *pr = data.r;
@@ -1765,7 +1744,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
   data.mesh = NULL;
   data.polygon = NULL;
   data.vector = new csVector ();
-  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (data.vector, NULL);
   return csPtr<iVisibilityObjectIterator> (vobjit);
@@ -1786,7 +1765,6 @@ struct CastShadows_Front2BackData
   uint32 current_visnr;
   iFrustumView* fview;
   csPlane3 planes[32];
-  uint32 planes_mask;
   ShadObj* shadobjs;
   int num_shadobjs;
 };
@@ -1801,7 +1779,7 @@ static int compare_shadobj (const void* el1, const void* el2)
 }
 
 static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32& planes_mask)
 {
   CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
 
@@ -1819,13 +1797,14 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 
   // First we do frustum checking if relevant. See if the current node
   // intersects with the frustum.
-  if (data->planes_mask)
+  if (planes_mask)
   {
     const csBox3& node_bbox = treenode->GetNodeBBox ();
     uint32 out_mask;
-    if (!csIntersect3::BoxFrustum (node_bbox, data->planes, data->planes_mask,
+    if (!csIntersect3::BoxFrustum (node_bbox, data->planes, planes_mask,
     	out_mask))
       return false;
+    planes_mask = out_mask;
   }
 
   treenode->Distribute ();
@@ -1901,7 +1880,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
   // First check if we need to do frustum clipping.
   csFrustum* lf = fview->GetFrustumContext ()->GetLightFrustum ();
-  data.planes_mask = 0;
+  uint32 planes_mask = 0;
   int i;
   // Traverse the kd-tree to find all relevant objects.
   // @@@ What if the frustum is bigger???
@@ -1915,7 +1894,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
   int i1 = lf->GetVertexCount () - 1;
   for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
   {
-    data.planes_mask = (data.planes_mask<<1)|1;
+    planes_mask = (planes_mask<<1)|1;
     const csVector3 &v1 = lf->GetVertex (i);
     const csVector3 &v2 = lf->GetVertex (i1);
     data.planes[i].Set (center, v1+center, v2+center);
@@ -1924,11 +1903,12 @@ void csDynaVis::CastShadows (iFrustumView* fview)
   {
     // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
     // It is possible this plane has to be inverted.
-    data.planes_mask = (data.planes_mask<<1)|1;
+    planes_mask = (planes_mask<<1)|1;
     data.planes[i] = *(lf->GetBackPlane ());
   }
 
-  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
+  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data,
+  	planes_mask);
 
   // Now sort the list of shadow objects on radius.
   qsort (data.shadobjs, data.num_shadobjs, sizeof (ShadObj), compare_shadobj);

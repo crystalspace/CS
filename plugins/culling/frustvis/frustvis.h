@@ -122,11 +122,11 @@ public:
   // This function will also modify the frustum_mask in 'data'. So
   // take care to restore this later if you recurse down.
   bool TestNodeVisibility (csSimpleKDTree* treenode,
-  	FrustTest_Front2BackData* data);
+  	FrustTest_Front2BackData* data, uint32& frustum_mask);
 
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csFrustVisObjectWrapper* obj,
-  	FrustTest_Front2BackData* data);
+  	FrustTest_Front2BackData* data, uint32 frustum_mask);
 
   // Add an object to the update queue. That way it will be updated
   // in the kdtree later when needed.

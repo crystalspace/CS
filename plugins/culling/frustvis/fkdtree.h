@@ -44,9 +44,13 @@ class csSimpleKDTree;
  * should then update the timestamp of the child. If this is not done
  * then some objects will be encountered multiple times. In some
  * cases this may not be a problem or even desired.
+ * <p>
+ * 'frustum_mask' can be modified by this function to reduce the number
+ * of plane tests (for frustum culling) that have to occur for children
+ * of this node.
  */
 typedef bool (csSimpleKDTreeVisitFunc)(csSimpleKDTree* treenode,
-	void* userdata, uint32 timestamp);
+	void* userdata, uint32 timestamp, uint32& frustum_mask);
 
 /**
  * A child in the KD-tree (usually some object).
@@ -195,9 +199,11 @@ private:
   /**
    * Traverse the tree from front to back. Every node of the
    * tree will be encountered. Returns false if traversal should stop.
+   * The mask parameter is optionally used for frustum checking.
+   * Front2Back will pass it to the tree nodes.
    */
   bool Front2Back (const csVector3& pos, csSimpleKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp);
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
    * Reset timestamps of all objects in this treenode.
@@ -267,9 +273,11 @@ public:
   /**
    * Traverse the tree from front to back. Every node of the
    * tree will be encountered.
+   * The mask parameter is optionally used for frustum checking.
+   * Front2Back will pass it to the tree nodes.
    */
   void Front2Back (const csVector3& pos, csSimpleKDTreeVisitFunc* func,
-  	void* userdata);
+  	void* userdata, uint32 frustum_mask);
 
   /**
    * Return the number of objects in this node.

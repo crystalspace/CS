@@ -12,6 +12,11 @@ The history order is reversed so that new features are at the top.
   	  DDS image plugin.
 	- Eric Sunshine fixed compilation error in ddsloader.cpp.  Was
   	  returning false as a csPtr<iImage>.
+	- There was supposed to be an optimization in frustvis and dynavis
+	  with regards to frustum clipping in order to avoid doing too many
+	  plane tests. Unfortunatelly it appears that this optimization has
+	  never worked properly. Fixed now so frustvis and dynavis should
+	  now be a little faster.
 26-Feb-2003
 	- Christian Bayle added some missing dependancy to enable to compile
   	  libs as shared

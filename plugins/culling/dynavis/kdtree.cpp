@@ -654,25 +654,25 @@ void csKDTree::Flatten ()
 }
 
 bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp)
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
 {
   CS_ASSERT (this != NULL);
-  if (!func (this, userdata, cur_timestamp))
+  if (!func (this, userdata, cur_timestamp, frustum_mask))
     return false;
   if (child1)
   {
     // There are children.
     if (pos[split_axis] <= split_location)
     {
-      child1->Front2Back (pos, func, userdata, cur_timestamp);
+      child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
       CS_ASSERT (child2 != NULL);
-      child2->Front2Back (pos, func, userdata, cur_timestamp);
+      child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
     else
     {
-      child2->Front2Back (pos, func, userdata, cur_timestamp);
+      child2->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
       CS_ASSERT (child1 != NULL);
-      child1->Front2Back (pos, func, userdata, cur_timestamp);
+      child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
   }
   return true;
@@ -691,7 +691,7 @@ void csKDTree::ResetTimestamps ()
 }
 
 void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata)
+  	void* userdata, uint32 frustum_mask)
 {
   if (global_timestamp > 4000000000u)
   {
@@ -706,7 +706,7 @@ void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   {
     global_timestamp++;
   }
-  Front2Back (pos, func, userdata, global_timestamp);
+  Front2Back (pos, func, userdata, global_timestamp, frustum_mask);
 }
 
 #define KDT_ASSERT_BOOL(test,msg) \
@@ -830,7 +830,7 @@ struct Debug_TraverseData
 };
 
 static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32&)
 {
   Debug_TraverseData* data = (Debug_TraverseData*)userdata;
 
@@ -1016,7 +1016,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
     data.obj_counter = 0;
     data.num_bbox_pointers = 0;
     csVector3 start (rnd (100.0)-50.0, rnd (100.0)-50.0, rnd (100.0)-50.0);
-    Front2Back (start, Debug_TraverseFunc, (void*)&data);
+    Front2Back (start, Debug_TraverseFunc, (void*)&data, 0);
     KDT_ASSERT (data.obj_counter == CS_UNITTEST_OBJECTS,
   	"number of objects traversed doesn't match tree!");
 
@@ -1082,7 +1082,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   Flatten ();
   data.obj_counter = 0;
   data.num_bbox_pointers = 0;
-  Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data);
+  Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data, 0);
   KDT_ASSERT (data.obj_counter == CS_UNITTEST_OBJECTS,
   	"number of objects traversed doesn't match tree!");
   if (!Debug_CheckTree (str)) return rc;
@@ -1094,7 +1094,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
 }
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,
-	uint32 cur_timestamp)
+	uint32 cur_timestamp, uint32&)
 {
   treenode->Distribute ();
 
@@ -1137,7 +1137,7 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   for (i = 0 ; i < num_iterations ; i++)
   {
-    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL);
+    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL, 0);
   }
 
   csTicks pass2 = csGetTicks ();
@@ -1152,7 +1152,7 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   for (i = 0 ; i < num_iterations ; i++)
   {
-    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL);
+    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL, 0);
   }
 
   csTicks pass4 = csGetTicks ();
