@@ -456,13 +456,14 @@ request plugins (so you can override a plugin on command-line/config file).
 @item
 @strong{Q}: How can I show FPS (frame rate) in my Crystal Space application?
 
-@strong{A}: Add the following line to @file{data/config/user.cfg}:
+@strong{A}: Add the following entry to the user-specific application-neutral
+or application-specific domain (@pxref{Configuration File}):
 @example
 Global.System.Plugins.iBugPlug = crystalspace.utilities.bugplug
 @end example
-This will make sure that the BugPlug plugin runs in any Crystal Space
-application. BugPlug shows FPS (among other things) and is otherwise
-not harmful. You can also use BugPlug to make screenshots (press ctrl-d
-followed by f12).
+This will make sure that the BugPlug plugin runs in either you or any 
+Crystal Space application (dependent on the config domain you chose). 
+BugPlug shows FPS (among other things) and is otherwise not harmful. You can 
+also use BugPlug to make screenshots (press ctrl-d followed by f12).
 
 @end itemize
