@@ -1418,6 +1418,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (mesh.clip_portal != CS_CLIP_NOT &&
       (mesh.clip_portal == CS_CLIP_NEEDED && cliptype != CS_CLIPPER_OPTIONAL))
     want_clipping = true;
+  // @@@ Temporary: for this case I would like to use the z-buffer border
+  // around the toplevel portal.
+  //if (mesh.clip_portal == CS_CLIP_TOPLEVEL)
+    //want_clipping = true;
   // @@@ Temporary.
   if (mesh.clip_plane == CS_CLIP_NEEDED)
     want_clipping = true;
