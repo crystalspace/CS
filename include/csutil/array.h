@@ -25,6 +25,15 @@
 #endif
 #include <new>
 
+
+#if defined(COMP_VC) && _MSC_VER == 1200
+// Disable warning C4786 (identifier was truncated to '255' characters
+// in the browser information) for VC6
+#pragma warning (disable : 4786)
+
+#endif //VC6
+
+
 /// This function prototype is used for Sort()
 typedef int ArraySortCompareFunction (void const* item1,
 	void const* item2);
