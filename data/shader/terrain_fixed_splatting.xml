@@ -4,6 +4,8 @@
   </shadervars>
 
   <technique priority="300"> 
+    <tag>linear_fog</tag>
+    <tag>terrain_splatting</tag>
     <pass>
       <mixmode><add /></mixmode>
       <alphamode><smooth /></alphamode>
@@ -42,4 +44,8 @@
       </fp>
     </pass>
   </technique>
+  
+  <!-- Some HW doesn't even handle the linear fog correctly at all. 
+       Effectively disable splatting there. (controlled through linear_fog
+       tag.) -->
 </shader>

@@ -8,3 +8,4 @@ Plugin simpleformerldr
 
 LinkWith simpleformerldr : csgeom csutil ;
 
+CompileGroups simpleformerldr :  meshes ;

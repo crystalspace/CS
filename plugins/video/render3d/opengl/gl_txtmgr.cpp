@@ -1553,9 +1553,6 @@ csGLSuperLightmap::~csGLSuperLightmap ()
 
 void csGLSuperLightmap::CreateTexture ()
 {
-  /*
-    @@@ Or hm... go through the texture cache?...
-   */
   if (texHandle == (GLuint)~0)
   {
     glGenTextures (1, &texHandle);

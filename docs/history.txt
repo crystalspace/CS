@@ -12,6 +12,12 @@ chronological order.
 	  which fixes a crash when the Caps Lock, Num Lock, Scroll Lock, Print
 	  Screen, Pause/Break, Windows, or Context Menu keys were pressed.  (It
 	  was accessing out-of-bounds elements of the ScanCodeToChar[] array.)
+	- res fixed a problem in the GL polyrender where a wrong component number
+	  was specified for the LM coords when interleaving was enabled.
+	- res fixed a bogus pixel write in 16bpp software canvas Blit().
+	- res added some more tweaks for Intel graphics.
+	- res added the simple terrain former and loader plugin to the "meshes"
+	  compile group.
 26-Dec-2004
 	- res removed some unneeded code from win32.cpp.
 	- res moved some code in heightmapgen into their own methods.

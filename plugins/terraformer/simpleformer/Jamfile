@@ -8,4 +8,6 @@ Plugin simpleformer
 
 LinkWith simpleformer : csgeom csutil ;
 
+CompileGroups simpleformer :  meshes ;
+
 SubInclude TOP plugins terraformer simpleformer loader ;

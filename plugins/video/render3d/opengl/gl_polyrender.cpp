@@ -129,7 +129,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     lmcoords_buffer = buffers[2];
     lmcoords_buffer->SetOffset (sizeof(csVector3) + sizeof(csVector2));
     lmcoords_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
-    lmcoords_buffer->SetComponentCount (3);
+    lmcoords_buffer->SetComponentCount (2);
     lmcoords_buffer->SetStride (compsize);
     float* interleaved_data = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 #else

@@ -148,6 +148,17 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="nolinearfog">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <linear_fog>
+	      <Presence>forbidden</Presence>
+	    </linear_fog>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -261,6 +272,7 @@
       </conditions>
       <applicable>
 	<usecfg>disableMTtext</usecfg>
+	<usecfg>nolinearfog</usecfg>
       </applicable>
     </rule>
     <!--
