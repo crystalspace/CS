@@ -16,19 +16,19 @@ depends()
 
 #is it a source distribution?
 if test -r "$prefix/Makefile"; then
-#	look for the lib files...
-#	a more or less dirty hack...
-	if test -r "$prefix/lib/libcssys.a"; then
-	    libdir="$prefix/lib"
-	else
-	    #Thanks go to Jorge for this script magic...
-	    libdir=`ls -1d "$CRYSTAL"/out/*/*/*/libcssys.a | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
-	    if test -z "$libdir"; then
-	        echo "Couldn't detect dir with lib files, aborting!"
-		echo "  Did you already compile CS?"
-		exit 1
-	    fi  
-	fi
+#  look for the lib files...
+#  a more or less dirty hack...
+  if test -r "$prefix/lib/libcssys.a"; then
+    libdir="$prefix/lib"
+  else
+    #Thanks go to Jorge for this script magic...
+    libdir=`ls -1d "$CRYSTAL"/out/*/*/*/libcssys.a | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
+  fi
+fi
+if test -z "$libdir"; then
+  echo "Couldn't detect dir with lib files, aborting!"
+  echo "  Did you already compile CS?"
+  exit 1
 fi
 
 usage()

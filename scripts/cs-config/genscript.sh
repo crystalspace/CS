@@ -23,7 +23,9 @@ echo "prefix=\${CRYSTAL-$1}"	>> cs-config
 echo "exec_prefix=\${prefix}"	>> cs-config
 echo "version='${vmajor}.${vminor} (${rdate})'"		>> cs-config
 echo "includedir=\${prefix}/include"	>> cs-config
-echo "libdir=\${prefix}/lib"	>> cs-config
+echo "if test -r \${prefix}/lib; then"	>> cs-config
+echo "  libdir=\${prefix}/lib"	>> cs-config
+echo "fi"			>> cs-config
 echo "syslibs=\"$4\""		>> cs-config
 echo "common_cflags=\"$2\""	>> cs-config
 echo "common_cxxflags=\"$3\""	>> cs-config
