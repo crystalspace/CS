@@ -197,6 +197,9 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
+  /// Number of bits that are supported by stencil buffer.
+  GLint stencil_bits;
+
 public:
   /// The maximum texture size
   GLint max_texture_size;

@@ -17,6 +17,8 @@ The history order has been reversed so that new features are at the top.
 	  to the buffer write masks and doesn't update the buffer when the
 	  mask is disabled. This affected iso mostly as CS normally doesn't
 	  require a clear of the Z-buffer.
+	- Started preparation work for stencil buffer support in OpenGL
+	  renderer.
 	- Wouter Wijngaards did the following update:
 	  The isometric sprites now use zbuffer TEST mode when the sprite is
 	  transparent. This removes some glitches in drawing overlapping

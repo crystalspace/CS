@@ -417,6 +417,10 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   // now that we know what pixelformat we use, clue the texture manager in
   txtmgr->SetPixelFormat (*G2D->GetPixelFormat ());
 
+  // Get the number of stencil bits that are supported.
+  glGetIntegerv (GL_STENCIL_BITS, &stencil_bits);
+  SysPrintf (MSG_INITIALIZATION, "Number of stencil bits: %d\n", stencil_bits);
+
   return true;
 }
 
@@ -1328,9 +1332,21 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // handle.  This includes software clipping.
   if (mesh.do_clip && clipper)
   {
-  ///  SysPrintf(MSG_DEBUG_0, "Falling back to software clipping in DrawTriangleMesh\n");
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
-    return;
+    //if (!stencil_bits)
+    //{
+      // If we have no stencil buffer then we just use the default version.
+      DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect,
+      	width2, height2);
+      return;
+    //}
+    //else
+    //{
+      //glClear (GL_STENCIL_BUFFER_BIT);
+      //glStencilOp (GL_KEEP, GL_INVERT, GL_INVERT);
+//
+      //glStencilFunc ();
+      //glEnable (GL_STENCIL_TEST);
+    //}
   }
 
   int i,k;
