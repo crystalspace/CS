@@ -269,11 +269,14 @@ enum
  * items at a time (if that style flag is set).
  */
 
+
 class csTreeCtrl : public csComponent
 {
-  class TreeCtrlNode : public csTreeNode{
+  class TreeCtrlNode : public csTreeNode
+  {
   public:
-    TreeCtrlNode (csComponent *theItem, TreeCtrlNode *theParent, bool isOpen) : csTreeNode (theParent)
+    TreeCtrlNode (csComponent *theItem, TreeCtrlNode *theParent, bool isOpen) 
+    : csTreeNode (theParent)
       { item = theItem; open = isOpen; }
     ~TreeCtrlNode () { csComponent *c=item; item=NULL; if (c) delete c;}
     
@@ -284,6 +287,13 @@ class csTreeCtrl : public csComponent
     csComponent *item;
     bool open;
   };
+
+friend bool CompareTreeCtrlNode (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool BranchOpen (csTreeNode *node);
 
   TreeCtrlNode *treeroot;
   /// Tree style
@@ -316,7 +326,8 @@ public:
   csTreeCtrl (csComponent *iParent, int iStyle = CSTS_DEFAULTVALUE,
     csTreeFrameStyle iFrameStyle = cstfsThickRect);
 
-  virtual ~csTreeCtrl () { delete treeroot; }
+  virtual ~csTreeCtrl () 
+  { delete treeroot; }
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (csEvent &Event);
 
