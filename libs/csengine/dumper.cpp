@@ -102,6 +102,11 @@ void Dumper::dump (csPolygon3D* p)
   csPolygonSet* ps = (csPolygonSet*)p->GetParent ();
   CsPrintf (MSG_DEBUG_0, "Dump polygon '%s/%s' id=%ld:\n", csNameObject::GetName(*ps),
   	csNameObject::GetName(*p), p->GetID ());
+  if (p->GetUnsplitPolygon ())
+  {
+    CsPrintf (MSG_DEBUG_0, "    Split from polygon with id=%ld\n",
+    	((csPolygon3D*)(p->GetUnsplitPolygon ()))->GetID ());
+  }
   CsPrintf (MSG_DEBUG_0, "    num_vertices=%d  max_vertices=%d\n",
   	p->GetVertices ().GetNumVertices (), p->GetVertices ().max_vertices);
   if (p->portal)

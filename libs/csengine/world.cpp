@@ -76,7 +76,7 @@ csPolygon3D* csPolyIt::Fetch ()
   {
     sector_idx = 0;
     thing = NULL;
-    polygon_idx = 0;
+    polygon_idx = -1;
   }
 
   if (sector_idx >= world->sectors.Length ()) return NULL;
@@ -126,6 +126,51 @@ csPolygon3D* csPolyIt::Fetch ()
   if (thing) poly = (csPolygon3D*)(thing->GetPolygon (polygon_idx));
   else poly = (csPolygon3D*)(sector->GetPolygon (polygon_idx));
   return poly;
+}
+
+//---------------------------------------------------------------------------
+
+csLightIt::csLightIt (csWorld* w)
+{
+  world = w;
+  sector_idx = -1;
+  light_idx = 0;
+}
+
+void csLightIt::Restart ()
+{
+  sector_idx = -1;
+  light_idx = 0;
+}
+
+csLight* csLightIt::Fetch ()
+{
+  csSector* sector;
+  if (sector_idx == -1)
+  {
+    sector_idx = 0;
+    light_idx = -1;
+  }
+
+  if (sector_idx >= world->sectors.Length ()) return NULL;
+  sector = (csSector*)(world->sectors[sector_idx]);
+
+  // Try next light.
+  light_idx++;
+
+  if (light_idx >= sector->lights.Length ())
+  {
+    // Go to next sector.
+    light_idx = -1;
+    sector_idx++;
+    if (sector_idx >= world->sectors.Length ()) return NULL;
+    // Initialize iterator to start of sector and recurse.
+    return Fetch ();
+  }
+
+  csLight* light;
+  light = (csLight*)(sector->lights[light_idx]);
+  return light;
 }
 
 //---------------------------------------------------------------------------
@@ -471,6 +516,7 @@ void csWorld::ShineLights ()
   }
 
   csPolyIt* pit = NewPolyIterator ();
+  csLightIt* lit = NewLightIterator ();
 
   // Set lumel size for 'High Quality Mode'
   // and reinit all lightmaps.
@@ -486,6 +532,12 @@ void csWorld::ShineLights ()
       p->UpdateLightMapSize ();
     polygon_count++;
   }
+
+  // Count number of lights to process.
+  csLight* l;
+  int light_count = 0;
+  lit->Restart ();
+  while (lit->Fetch ()) light_count++;
   
   int sn = 0;
   int num_sectors = sectors.Length ();
@@ -501,13 +553,12 @@ void csWorld::ShineLights ()
     meter.Step();
   }
 
-  meter.SetTotal (num_sectors);
-  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d sectors total):\n  ", num_sectors);
-  for (sn = 0; sn < num_sectors ; sn++)
+  meter.SetTotal (light_count);
+  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d lights total):\n  ", light_count);
+  lit->Restart ();
+  while ((l = lit->Fetch ()) != NULL)
   {
-    csSector* s = (csSector*)sectors[sn];
-    s->ShineLights (&pulse);
-    pulse.Erase();
+    ((csStatLight*)l)->CalculateLighting ();
     meter.Step();
   }
 
@@ -542,6 +593,7 @@ void csWorld::ShineLights ()
     CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
 
   CHK (delete pit);
+  CHK (delete lit);
 }
 
 void csWorld::CreateLightMaps (IGraphics3D* g3d)

@@ -851,6 +851,88 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
   return NULL;
 }
 
+//@@@ Needs to be part of sector?
+void* CalculateLightingPolygonsFB (csPolygonParentInt*,
+	csPolygonInt** polygon, int num, void* data)
+{
+  csPolygon3D* p;
+  csLightView* lview = (csLightView*)data;
+  csVector3& center = lview->light_frustrum->GetOrigin ();
+  bool cw = true;	// @@@ Mirror flag?
+  int i, j;
+  for (i = 0 ; i < num ; i++)
+  {
+    p = (csPolygon3D*)polygon[i];
+    p->CamUpdate ();
+    p->CalculateLighting (lview);
+
+    if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
+    csShadowFrustrum* frust;
+    CHK (frust = new csShadowFrustrum (center));
+    csPlane pl = p->GetPlane ()->GetWorldPlane ();
+    pl.DD += center * pl.norm;
+    pl.Invert ();
+    frust->SetBackPlane (pl);
+    frust->polygon = p;
+    for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
+      frust->AddVertex (p->Vwor (j)-center);
+    lview->shadows.AddLast (frust);
+  }
+  return NULL;
+}
+
+// @@@ This routine need to be cleaned up!!! It needs to
+// be part of the class.
+bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& pos, void* data)
+{
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
+  int i;
+  csOctreeNode* onode = (csOctreeNode*)node;
+  csLightView* lview = (csLightView*)data;
+
+  const csVector3& center = lview->light_frustrum->GetOrigin ();
+  csVector3 bmin = onode->GetMinCorner ()-center;
+  csVector3 bmax = onode->GetMaxCorner ()-center;
+
+  // Calculate the distance between (0,0,0) and the box.
+  csVector3 result (0,0,0);
+  if (bmin.x > 0) result.x = bmin.x;
+  else if (bmax.x < 0) result.x = -bmax.x;
+  if (bmin.y > 0) result.y = bmin.y;
+  else if (bmax.y < 0) result.y = -bmax.y;
+  if (bmin.z > 0) result.z = bmin.z;
+  else if (bmax.z < 0) result.z = -bmax.z;
+  float dist = result.Norm ();
+  float radius = lview->l->GetRadius ();
+  if (radius < dist) return false;
+
+  csShadowFrustrum* sf = lview->shadows.GetFirst ();
+  for ( ; sf ; sf = sf->next)
+  {
+    if (!sf->Contains (bmin)) continue;
+    if (!sf->Contains (bmax)) continue;
+    csVector3 v;
+    v.x = bmin.x; v.y = bmin.y; v.z = bmax.z;
+    if (!sf->Contains (v)) continue;
+    v.x = bmin.x; v.y = bmax.y; v.z = bmin.z;
+    if (!sf->Contains (v)) continue;
+    v.x = bmin.x; v.y = bmax.y; v.z = bmax.z;
+    if (!sf->Contains (v)) continue;
+    v.x = bmax.x; v.y = bmin.y; v.z = bmin.z;
+    if (!sf->Contains (v)) continue;
+    v.x = bmax.x; v.y = bmin.y; v.z = bmax.z;
+    if (!sf->Contains (v)) continue;
+    v.x = bmax.x; v.y = bmax.y; v.z = bmin.z;
+    if (!sf->Contains (v)) continue;
+    // Node is completely shadowed by frustrum.
+//printf ("CULL (%f,%f,%f)\n", bmax.x-bmin.x, bmax.y-bmin.y, bmax.z-bmin.z);
+    return false;
+  }
+  return true;
+}
+
 csThing** csSector::GetVisibleThings (csLightView& lview, int& num_things)
 {
   csFrustrum* lf = lview.light_frustrum;
@@ -987,32 +1069,44 @@ void csSector::CalculateLighting (csLightView& lview)
     for (i = 0 ; i < num_visible_things ; i++)
     {
       sp = visible_things[i];
-      shadows = sp->GetShadows (center);
-      lview.shadows.AppendList (shadows);
-      CHK (delete shadows);
+      if (sp != static_thing)
+      {
+        shadows = sp->GetShadows (center);
+        lview.shadows.AppendList (shadows);
+        CHK (delete shadows);
+      }
     }
 
-  // @@@ Here we would like to do an optimization pass on all
-  // the generated shadow frustrums. In essence this pass would try to
-  // find all shadow frustrums which are:
-  //    - outside the current light frustrum and thus are not relevant
-  //    - completely inside another shadow frustrum and thus do not
-  //      contribute to the shadow
-  // Note that we already do something similar when finally mapping
-  // the light on a polygon but doing it here would eliminate the
-  // frustrums earlier in the process.
-
-  // Calculate lighting for all polygons in this sector.
-  if (bsp)
-    bsp->Back2Front (center, &CalculateLightingPolygons, (void*)&lview);
+  // If there is a static tree (BSP and/or octree) then we
+  // can use another way to do the lighting. In that case we
+  // go front to back and add shadows to the list while we are doing
+  // that. In future I would like to add some extra culling stage
+  // here using a quad-tree or something similar (for example six
+  // quad-trees arranged in a cube around the light).
+  if (static_tree)
+  {
+    static_thing->UpdateTransformation (center);
+    static_tree->Front2Back (center, &CalculateLightingPolygonsFB, (void*)&lview,
+      	CullOctreeNodeLighting, (void*)&lview);
+    CalculateLightingPolygonsFB ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+  }
   else
-    CalculateLightingPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+  {
+    // Calculate lighting for all polygons in this sector.
+    if (bsp)
+      bsp->Back2Front (center, &CalculateLightingPolygons, (void*)&lview);
+    else
+      CalculateLightingPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+  }
 
   // Calculate lighting for all things in the current sector.
+  // @@@ If there is an octree/bsp tree then this should be done
+  // differently by adding those things dynamically to the BSP tree.
   for (i = 0 ; i < num_visible_things ; i++)
   {
     sp = visible_things[i];
-    sp->CalculateLighting (lview);
+    if (sp != static_thing)
+      sp->CalculateLighting (lview);
   }
   CHK (delete [] visible_things);
 

@@ -110,6 +110,33 @@ public:
 };
 
 /**
+ * Iterator to iterate over all static lights in the world.
+ * This iterator assumes there are no fundamental changes
+ * in the world while it is being used.
+ * If changes to the world happen the results are unpredictable.
+ */
+class csLightIt
+{
+private:
+  // The world for this iterator.
+  csWorld* world;
+  // Current sector index.
+  int sector_idx;
+  // Current light index.
+  int light_idx;
+
+public:
+  /// Construct an iterator and initialize to start.
+  csLightIt (csWorld* w);
+
+  /// Restart iterator.
+  void Restart ();
+
+  /// Get light from iterator. Return NULL at end.
+  csLight* Fetch ();
+};
+
+/**
  * The world! This class basicly represents the 3D engine.
  * It is the main anchor class for working with Crystal Space.
  */
@@ -478,6 +505,16 @@ public:
   {
     csPolyIt* it;
     CHK (it = new csPolyIt (this));
+    return it;
+  }
+
+  /**
+   * Create an iterator to iterate over all static lights of the world.
+   */
+  csLightIt* NewLightIterator ()
+  {
+    csLightIt* it;
+    CHK (it = new csLightIt (this));
     return it;
   }
 

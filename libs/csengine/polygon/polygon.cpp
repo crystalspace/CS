@@ -377,13 +377,13 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   float sideA, sideB;
   csVector3 ptA = Vwor (GetVertices ().GetNumVertices () - 1);
   sideA = plane.Classify (ptA);
-  if (ABS (sideA) < EPSILON) sideA = 0;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   for (int i = -1 ; ++i < GetVertices ().GetNumVertices () ; )
   {
     ptB = Vwor (i);
     sideB = plane.Classify (ptB);
-    if (ABS (sideB) < EPSILON) sideB = 0;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
     if (sideB > 0)
     {
       if (sideA < 0)
@@ -1372,7 +1372,7 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
 
 void csPolygon3D::FillLightMap (csLightView& lview)
 {
-  if (orig_poly) return;
+  //@@@if (orig_poly) return; BE CAREFUL
   if (lview.callback)
   {
     lview.callback (&lview, CALLBACK_POLYGON, (void*)this);
@@ -1489,6 +1489,7 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
 	  // it is still possible to have an overlap. We need to
 	  // continue the testing here!!!
 	  sf->relevant = false;
+	  //sf->relevant = true;	//@@@ Temporarily disabled.
         }
         else if (count == lview.light_frustrum->GetNumVertices ())
         {
@@ -1518,7 +1519,7 @@ public:
 
 void csPolygon3D::CalculateLighting (csLightView* lview)
 {
-  if (orig_poly) return;
+  //@@@if (orig_poly) return; Be careful!!!
 
   csPortal* po;
   csFrustrum* light_frustrum = lview->light_frustrum;
