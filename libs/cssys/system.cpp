@@ -88,7 +88,8 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
   FullScreen = false;
   Mouse = NULL;
   Keyboard = NULL;
-  
+
+  VFS = NULL;
   G3D = NULL;
   G2D = NULL;
   NetDrv = NULL;
@@ -645,14 +646,14 @@ bool csSystemDriver::RegisterDriver (const char *iInterface, iPlugIn *iObject)
 
 bool csSystemDriver::DeregisterDriver (const char *iInterface, iPlugIn *iObject)
 {
-#define CHECK(Else, Object, Interface)				\
-  Else if (strcmp (iInterface, #Interface) == 0)		\
-  {								\
-    Interface *p = QUERY_INTERFACE (iObject, Interface);	\
-    if (!p) return false;					\
-    if (p != Object) { p->DecRef (); return false; }		\
-    p->DecRef (); Object->DecRef (); Object = NULL;		\
-    return true;						\
+#define CHECK(Else, Object, Interface)					\
+  Else if (strcmp (iInterface, #Interface) == 0)			\
+  {									\
+    Interface *p = QUERY_INTERFACE (iObject, Interface);		\
+    if (!p) return false;						\
+    if (p != Object) { p->DecRef (); return false; }			\
+    p->DecRef (); iBase* t = Object; Object = NULL; t->DecRef ();	\
+    return true;							\
   }
 
   CHECK (;   , VFS,    iVFS)
