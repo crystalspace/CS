@@ -21,6 +21,7 @@
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 #include "iutil/objreg.h"
+#include "iutil/string.h"
 #include "ivaria/script.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
@@ -29,11 +30,9 @@
 
 CS_IMPLEMENT_APPLICATION
 
-iObjectRegistry *objreg;
-
 int main (int argc, char *argv[])
 {
-  objreg = csInitializer::CreateEnvironment (argc, argv);
+  iObjectRegistry* objreg = csInitializer::CreateEnvironment (argc, argv);
   if (! objreg)
   {
     fprintf (stderr, "Failed to create environment!\n");
@@ -74,27 +73,43 @@ int main (int argc, char *argv[])
 
     csInitializer::OpenApplication (objreg);
 
-    char *text = "Hello, world!";
+    char const *text = "Hello, world!";
     printf ("Testing Store:\n");
     script->Store ("text", text);
     printf ("text = %s\n", text);
 
+    csRef<iString> rettext;
     printf ("Testing Retrieve:\n");
-    script->Retrieve ("text", & text);
-    printf ("text = %s\n", text);
+    script->Retrieve ("text", rettext);
+    printf ("text = %s\n", rettext->GetData());
+
+    puts("");
 
     printf ("Testing NewObject:\n");
-    csRef<iScriptObject> obj
-      = script->NewObject ("cspace::csVector3", "%f%f%f", 1.0f, 2.0f, 3.0f);
+    csRef<iScriptObject> obj =
+      script->NewObject ("cspace::csVector3", "%g%g%g", 1.0f, 2.0f, 3.0f);
     printf ("new csVector3 (1.0f, 2.0f, 3.0f)\n");
+
+    puts("");
 
     printf ("Testing Get:\n");
     float x = 0.0f, y = 0.0f, z = 0.0f;
-    printf ("csVector3 = (%f, %f, %f)\n", x, y, z);
     obj->Get ("x", x);
     obj->Get ("y", y);
     obj->Get ("z", z);
-    printf ("csVector3 = (%f, %f, %f)\n", x, y, z);
+    printf ("x=%g, y=%g, z=%g\n", x, y, z);
+
+    puts("");
+
+    printf("Testing Set:\n");
+    obj->Set ("x", 3.0f);
+    obj->Set ("y", 2.0f);
+    obj->Set ("z", 1.0f);
+
+    obj->Get ("x", x);
+    obj->Get ("y", y);
+    obj->Get ("z", z);
+    printf ("x=%g, y=%g, z=%g\n", x, y, z);
   }
 
   csInitializer::DestroyApplication (objreg);

@@ -28,8 +28,6 @@
 
 extern "C" void xs_init (pTHX); // defined in csperlxs.c
 
-iObjectRegistry *scripts_iObjectRegistry = 0;
-
 SCF_IMPLEMENT_IBASE (csPerl5)
   SCF_IMPLEMENTS_INTERFACE (iScript)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -55,8 +53,6 @@ bool csPerl5::Init (iObjectRegistry *objreg)
   reporter = CS_QUERY_REGISTRY (objreg, iReporter);
   if (! reporter) return false;
 
-  scripts_iObjectRegistry = objreg;
-
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
   if (! vfs)
   {
@@ -75,7 +71,7 @@ bool csPerl5::Init (iObjectRegistry *objreg)
   }
 
   my_perl = perl_alloc ();
-  if (! my_perl)
+  if (my_perl == 0)
   {
     reporter->ReportError ("crystalspace.script.perl5.init.alloc",
       "perl5: Can't allocate memory for perl interpreter");
@@ -93,8 +89,11 @@ bool csPerl5::Init (iObjectRegistry *objreg)
 
 csPerl5::~csPerl5 ()
 {
-  perl_destruct (my_perl);
-  perl_free (my_perl);
+  if (my_perl != 0)
+  {
+    perl_destruct (my_perl);
+    perl_free (my_perl);
+  }
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
@@ -144,6 +143,7 @@ bool csPerl5::LoadModule (const char *name)
   return ok;
 }
 
+// Caller is responsible for decref'ing returned SV.
 SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
 {
   dSP;
@@ -151,7 +151,10 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
   SAVETMPS;
 
   PUSHMARK(SP);
-  if (self) XPUSHs (self);
+
+  if (self)
+    XPUSHs (self);
+
   while (*fmt++ == '%') switch (*fmt++)
   {
     case 'c': case 'd': case 'i':
@@ -253,8 +256,10 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
   else
     call_pv (name, G_SCALAR | G_EVAL);
   SPAGAIN;
+
   bool ok = CheckError ("call");
   SV *ret = POPs;
+  SvREFCNT_inc (ret);
 
   PUTBACK;
   FREETMPS;
@@ -268,43 +273,43 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
 
 SCF_IMPLEMENT_IBASE (csPerl5::Object)
   SCF_IMPLEMENTS_INTERFACE (iScriptObject)
-  SCF_IMPLEMENTS_INTERFACE (Object)
+  SCF_IMPLEMENTS_INTERFACE (csPerl5Object)
 SCF_IMPLEMENT_IBASE_END
 
-csPerl5::Object::Object (const csPerl5 *p, SV *s)
-: parent ((csPerl5 *) p), my_perl (parent->my_perl), self (s)
+csPerl5::Object::Object (csPerl5 *p, SV *s) :
+  parent (p), my_perl(parent->my_perl), self(s)
 {
   SCF_CONSTRUCT_IBASE (parent);
-
   SvREFCNT_inc (self);
 }
 
 csPerl5::Object::~Object ()
 {
   SvREFCNT_dec (self);
-
   SCF_DESTRUCT_IBASE ();
 }
 
 csPerl5::Object* csPerl5::Query (iScriptObject *obj) const
 {
-  csRef<Object> priv = SCF_QUERY_INTERFACE (obj, Object);
-  if (! priv) reporter->Report (CS_REPORTER_SEVERITY_WARNING,
-    "crystalspace.script.perl5.call", "This iScriptObject isn't from Perl!");
-  return priv;
+  csRef<csPerl5Object> priv = SCF_QUERY_INTERFACE (obj, csPerl5Object);
+  if (priv == 0)
+    reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+      "crystalspace.script.perl5.call", "This iScriptObject isn't from Perl!");
+  return CS_STATIC_CAST(csPerl5::Object*,(csPerl5Object*)priv);
 }
 
-csPtr<iScriptObject> csPerl5::NewObject
-  (const char *type, const char *fmt, ...) const
+csRef<iScriptObject> csPerl5::NewObject(const char *type, const char *fmt, ...)
 {
   va_list va;
   va_start (va, fmt);
-  SV *sv = ((csPerl5 *) this)->
-    CallV ("new", fmt, va, sv_2mortal (newSVpv (type, 0)));
+  SV *sv = CallV("new", fmt, va, sv_2mortal (newSVpv (type, 0)));
   va_end (va);
 
+  csRef<iScriptObject> obj;
   if (sv)
-    return csPtr<iScriptObject> (new Object (this, sv));
-  else
-    return 0;
+  {
+    obj.AttachNew(new Object (this, sv));
+    SvREFCNT_dec(sv);
+  }
+  return obj;
 }
