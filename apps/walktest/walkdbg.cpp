@@ -24,6 +24,7 @@
 #include "iengine/view.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 

@@ -1,5 +1,32 @@
 The history order is reversed so that new features are at the top.
 
+28-Jun-2001
+	- Fixed error handling in spr2dldr (for mixmode) a little.
+	- Added error reporting to ballldr (using reporter plugin).
+	- Added back some include files from WalkTest that Martin removed
+	  but which are needed hard.
+	- Richard D. Shank added header files for 3ds importer.
+	- Martin Geisse removed lots of unneeded include statements from
+	  walktest and squawk. Also made some changes to squawk, so it now
+	  uses the engine only through interfaces.
+	- Martin also did:
+	    - Renamed BEGIN_TYPED_VECTOR_EXT to BEGIN_TYPED_VECTOR and
+	      END_TYPED_VECTOR_EXT to FINISH_TYPED_VECTOR.
+	    - Added GetArray() to typed vectors which returns the array
+	      of pointers as a (TYPE**) pointer.
+	    - Cleaned up the arrays from csengine/arrays.cpp using typed
+	      vectors.
+	    - Changed DECLARE_TYPED_VECTOR slightly. The user-defined
+	      FreeTypedItem method must now be given as a complete function
+	      (i.e.  with function name and brackets). This makes it
+	      possible to move the implementation outside the macro call
+	      and also to add other user-defined methods.
+	    - Removed the non-const operator [] from SCF vectors again. It
+	      is unsafe because it allows to replace items but ignore their
+	      reference count.
+	    - Did a little cleanup in mdldata.h.
+	    - Added 'position' member to csModelDataLight.
+	    - Added 'GetRefCount' Implementation to all model data components.
 27-Jun-2001
 	- Renamed csFilenameMatches() to csGlobMatches() because it is
 	  useful for more than just filenames (in csutil).

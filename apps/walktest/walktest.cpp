@@ -41,6 +41,7 @@
 #include "csver.h"
 #include "qint.h"
 #include "iutil/cfgmgr.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "isound/handle.h"
