@@ -18,12 +18,19 @@ Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
-Microsoft Visual C++ and @sc{dos} users can download a single package which
+Microsoft Visual C++ 5 and 6 and @sc{dos} users can download a single package which
 contains all headers, pre-built library files, and dynamic link libraries in
 pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.92d.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.92e.zip}
+
+Microsoft Visual C++ 7 and @sc{dos} users can download a single package which
+contains all headers, pre-built library files, and dynamic link libraries in
+pre-compiled form from the following location on the Crystal Space server:
+
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.92b.zip}
 
 @subheading zlib
 @cindex zlib

@@ -43,7 +43,7 @@ DEP.IE3DS = CSUTIL CSSYS CSTOOL CSUTIL CSGEOM
 MSVC.DSP += IE3DS
 DSP.IE3DS.NAME = ie3ds
 DSP.IE3DS.TYPE = plugin
-DSP.IE3DS.LIBS = lib3ds-101
+DSP.IE3DS.LIBS = lib3ds-120
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
