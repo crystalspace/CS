@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+24-Jun-2003
+	- Oktal added an iGraphicsMemory interface with which to access
+	  the csGraphicsMemory plugin.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild
