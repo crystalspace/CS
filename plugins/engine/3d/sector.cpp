@@ -139,6 +139,18 @@ csSector::~csSector ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSector);
 }
 
+void csSector::UnlinkObjects ()
+{
+  int i;
+  for (i = 0; i < meshes.GetCount (); i++)
+  {
+    iMeshWrapper* m = meshes.Get (i);
+    iSectorList* sl = m->GetMovable ()->GetSectors ();
+    sl->Remove (&scfiSector);
+    m->GetMovable ()->UpdateMove ();
+  }
+}
+
 //----------------------------------------------------------------------
 
 void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
@@ -1082,6 +1094,9 @@ csSectorList::~csSectorList ()
 
 void csSectorList::FreeSector (iSector* item)
 {
+  // We scan all objects in this sector and unlink those
+  // objects.
+  item->UnlinkObjects ();
 }
 
 int csSectorList::Add (iSector *obj)

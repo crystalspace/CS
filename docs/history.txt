@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jul-2004
+	- Jorrit fixed the engine so that before removing a sector, all
+	  objects in that sector are unlinked from it. Added an
+	  iSector->UnlinkObjects().
 8-Jul-2004
 	- Jorrit fixed a compile error in partgen.
         - Matze changed some jam/configure things:
@@ -39,8 +43,8 @@ chronological order.
 	- res changed configure to emit a TARGET.PROCESSORSIZE build property,
 	  containing the processor's bit size.
 	- res changed the software renderer to not use asm on 64bit machines.
-	- res fixed the csddsimg Jamfile to add the plugin to the 'imageloaders' 
-	  compile group.
+	- res fixed the csddsimg Jamfile to add the plugin to the
+	  'imageloaders' compile group.
 	- res added a paragraph about data type sizes to the portability 
 	  guidelines.
 	- Jorrit changed the particles mesh to use a csRef instead of

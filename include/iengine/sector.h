@@ -70,7 +70,7 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
-SCF_VERSION (iSector, 0, 5, 3);
+SCF_VERSION (iSector, 0, 5, 4);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -276,6 +276,14 @@ struct iSector : public iBase
    * Unregister a mesh with a portal. @@@ TO BE REMOVED...
    */
   virtual void UnregisterPortalMesh (iMeshWrapper* mesh) = 0;
+
+  /**
+   * Unlink all mesh objects from this sector. This will not remove
+   * the mesh objects but simply unlink them so that they are no longer
+   * part of this sector. This happens automatically when the sector
+   * is removed but you can force it by calling this function here.
+   */
+  virtual void UnlinkObjects () = 0;
 };
 
 

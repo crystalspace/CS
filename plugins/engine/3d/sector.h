@@ -232,6 +232,14 @@ public:
   /// Get the renderloop for this sector (or 0 in case of default).
   iRenderLoop* GetRenderLoop () { return renderloop; }
 
+  /**
+   * Unlink all meshes from this sector. WARNING! This function may
+   * cause virtual function calls to happen on this sector so don't
+   * call it from the csSector destructor! It should only be called
+   * from csSectorList::FreeSector()!.
+   */
+  void UnlinkObjects ();
+
   //----------------------------------------------------------------------
   // Mesh manipulation functions
   //----------------------------------------------------------------------
@@ -580,6 +588,10 @@ public:
     virtual void UnregisterPortalMesh (iMeshWrapper* mesh)
     {
       scfParent->UnregisterPortalMesh (mesh);
+    }
+    virtual void UnlinkObjects ()
+    {
+      scfParent->UnlinkObjects ();
     }
     csSector* GetCsSector ()
     {
