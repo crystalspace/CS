@@ -17,12 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define USE_PLUGIN 0
 
 #include "cssysdef.h"
-#if !USE_PLUGIN
-#include "csengine/csspr2d.h"
-#endif
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
@@ -31,9 +27,7 @@
 #include "csengine/sector.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/fastsqrt.h"
-#if USE_PLUGIN
 #include "imspr2d.h"
-#endif
 #include <math.h>
 #include <stdlib.h>
 
@@ -59,6 +53,7 @@ csParticleSystem::csParticleSystem (csObject* theParent)
   change_alpha = false;
   change_rotation = false;
   // bbox is empty.
+  prev_time = 0;
   
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (csEngine::System, "crystalspace.meshobj.spr2d",
       "MeshObj", iMeshObjectType);
@@ -119,15 +114,10 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   csMaterialWrapper *mat, bool lighted)
 {
   iParticle *pTicle;
-#if !USE_PLUGIN
-  csSprite2D *part = new csSprite2D(this);
-  csColoredVertices& vs = part->GetVertices();
-#else
   iMeshObject* sprmesh = spr_factory->NewInstance ();
-  csMeshWrapper* part = new csMeshWrapper (this, sprmesh);
+  iParticle* part = QUERY_INTERFACE (sprmesh, iParticle);
   iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
   csColoredVertices& vs = state->GetVertices();
-#endif
 
   vs.SetLimit(4);
   vs.SetLength(4);
@@ -135,16 +125,10 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   vs[1].pos.Set(-width,+height); vs[1].u=0.; vs[1].v=0.;
   vs[2].pos.Set(+width,+height); vs[2].u=1.; vs[2].v=0.;
   vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=1.;
-#if !USE_PLUGIN
-  part->SetLighting( lighted );
-  part->SetColor( csColor(1.0, 1.0, 1.0) );
-  part->SetMaterial (mat);
-#else
   state->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
   state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
-#endif
-  AppendParticle(pTicle = QUERY_INTERFACE(part, iParticle));
+  AppendParticle(pTicle = part);
   pTicle->DecRef ();
   part->DecRef(); 
   
@@ -155,25 +139,16 @@ void csParticleSystem :: AppendRegularSprite(int n, float radius,
   csMaterialWrapper* mat, bool lighted)
 {
   iParticle *pTicle;
-#if !USE_PLUGIN
-  csSprite2D *part = new csSprite2D(this);
-  part->CreateRegularVertices(n, true);
-  part->ScaleBy(radius);
-  part->SetMaterial (mat);
-  part->SetLighting( lighted );
-  part->SetColor( csColor(1.0, 1.0, 1.0) );
-#else
   iMeshObject* sprmesh = spr_factory->NewInstance ();
-  csMeshWrapper* part = new csMeshWrapper (this, sprmesh);
+  iParticle* part = QUERY_INTERFACE (sprmesh, iParticle);
   iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
   state->CreateRegularVertices(n, true);
   part->ScaleBy(radius);
   state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
   state->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
-#endif
 
-  AppendParticle(pTicle = QUERY_INTERFACE(part, iParticle));
+  AppendParticle(pTicle = part);
   pTicle->DecRef ();
   part->DecRef(); 
 }

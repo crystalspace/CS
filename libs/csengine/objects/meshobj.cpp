@@ -55,6 +55,7 @@ csMeshWrapper::~csMeshWrapper ()
 
 void csMeshWrapper::ScaleBy (float factor)
 {
+  // @@@ OBSOLETE
   csMatrix3 trans = movable.GetTransform ().GetT2O ();
   trans.m11 *= factor;
   trans.m22 *= factor;
@@ -66,6 +67,7 @@ void csMeshWrapper::ScaleBy (float factor)
 
 void csMeshWrapper::Rotate (float angle)
 {
+  // @@@ OBSOLETE
   csZRotMatrix3 rotz (angle);
   movable.Transform (rotz);
   csXRotMatrix3 rotx (angle);
@@ -76,6 +78,7 @@ void csMeshWrapper::Rotate (float angle)
 
 void csMeshWrapper::SetColor (const csColor& /*col*/)
 {
+  // @@@ OBSOLETE
   //for (int i=0; i<tpl->GetNumTexels (); i++)
     //SetVertexColor (i, col);
 }
@@ -83,6 +86,7 @@ void csMeshWrapper::SetColor (const csColor& /*col*/)
 
 void csMeshWrapper::AddColor (const csColor& /*col*/)
 {
+  // @@@ OBSOLETE
   //for (int i=0; i<tpl->GetNumTexels (); i++)
     //AddVertexColor (i, col);
 }
@@ -148,7 +152,7 @@ void csMeshWrapper::Draw (csRenderView& rview)
   iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
   if (mesh->DrawTest (irv, imov))
   {
-    UpdateDeferedLighting (movable.GetPosition ());
+    UpdateDeferedLighting (movable.GetFullPosition ());
     mesh->Draw (irv, imov);
   }
   int i;
@@ -159,6 +163,10 @@ void csMeshWrapper::Draw (csRenderView& rview)
   }
 }
 
+void csMeshWrapper::NextFrame (cs_time current_time)
+{
+  mesh->NextFrame (current_time);
+}
 
 void csMeshWrapper::UpdateLighting (csLight** lights, int num_lights)
 {

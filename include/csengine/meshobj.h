@@ -100,6 +100,12 @@ public:
    */
   virtual void Draw (csRenderView& rview);
 
+  /// Go the next animation frame.
+  virtual void NextFrame (cs_time current_time);
+
+  /// Returns true if this object wants to die.
+  virtual bool WantToDie () { return mesh->WantToDie (); }
+
   /**
    * Check if this sprite is hit by this object space vector.
    * Return the collision point in object space coordinates.

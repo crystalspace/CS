@@ -39,9 +39,8 @@
 #include "csengine/cspixmap.h"
 #include "csengine/collider.h"
 #include "csengine/particle.h"
+#include "csengine/meshobj.h"
 #include "csengine/region.h"
-#include "csfx/partexp.h"
-#include "csfx/partfoun.h"
 #include "csfx/partfire.h"
 #include "csfx/partspir.h"
 #include "csfx/partsnow.h"
@@ -62,6 +61,9 @@
 #include "isndrdr.h"
 #include "igraph3d.h"
 #include "icollide.h"
+#include "impartic.h"
+#include "imfount.h"
+#include "imexplo.h"
 
 extern WalkTest* Sys;
 
@@ -243,17 +245,34 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
     return;
   }
 
-  csFountainParticleSystem* exp = new csFountainParticleSystem(
-      Sys->view->GetEngine (), num, mat,
-      CS_FX_ADD, false, 0.1, 0.1,
-      origin, csVector3(0, -1.0, 0), 5.0,
-      3.0, 0.2,
-      0.0, 3.1415926/2.);
+  // @@@ Memory leak on factories!
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.fountain",
+      	"MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.fountain",
+      	"MeshObj", iMeshObjectType);
+  iMeshObjectFactory* factory = type->NewFactory ();
+  iMeshObject* mesh = factory->NewInstance ();
+  csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
-  exp->SetChangeRotation(7.5);
-  //exp->SetColor (csColor (.25,.25,.25));
-  exp->SetColor (csColor (.25,.35,.55));
   exp->GetMovable ().UpdateMove ();
+
+  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  partstate->SetMixMode (CS_FX_ADD);
+  partstate->SetColor (csColor (.25, .35, .55));
+  partstate->SetChangeRotation (7.5);
+
+  iFountainState* fountstate = QUERY_INTERFACE (mesh, iFountainState);
+  fountstate->SetNumberParticles (num);
+  fountstate->SetDropSize (.1, .1);
+  fountstate->SetOrigin (origin);
+  fountstate->SetAcceleration (csVector3 (0, -1., 0));
+  fountstate->SetFallTime (5.0);
+  fountstate->SetSpeed (3.0);
+  fountstate->SetElevation (3.1415926/2.);
+  fountstate->SetAzimuth (0);
+  fountstate->SetOpening (.2);
 }
 
 //===========================================================================
@@ -270,19 +289,39 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
     return;
   }
 
-  csParSysExplosion* exp = new csParSysExplosion (
-  	Sys->view->GetEngine (), 100,
-  	center, csVector3 (0, 0, 0), mat, 6, 0.15, true, .6, 2., 2.);
+  // @@@ Memory leak on factories!
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.explo",
+      	"MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.explo",
+      	"MeshObj", iMeshObjectType);
+  iMeshObjectFactory* factory = type->NewFactory ();
+  iMeshObject* mesh = factory->NewInstance ();
+  csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
-  exp->SetSelfDestruct (3000);
-  exp->SetMixmode (CS_FX_SETALPHA (0.50));
-  exp->SetChangeRotation(5.0);
-  exp->SetChangeSize (1.25);
-  exp->SetFadeSprites (500);
-  exp->SetColor( csColor(1,1,0) );
-  exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
-  exp->AddLight (Sys->engine, sector, 1000);
   exp->GetMovable ().UpdateMove ();
+
+  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  partstate->SetMixMode (CS_FX_SETALPHA (0.50));
+  partstate->SetColor (csColor (1, 1, 0));
+  partstate->SetChangeRotation (5.0);
+  partstate->SetChangeSize (1.25);
+  partstate->SetSelfDestruct (3000);
+
+  iExplosionState* expstate = QUERY_INTERFACE (mesh, iExplosionState);
+  expstate->SetNumberParticles (100);
+  expstate->SetCenter (center);
+  expstate->SetPush (csVector3 (0, 0, 0));
+  expstate->SetNrSides (6);
+  expstate->SetPartRadius (0.15);
+  expstate->SetLighting (true);
+  expstate->SetSpreadPos (.6);
+  expstate->SetSpreadSpeed (2.);
+  expstate->SetSpreadAcceleration (2.);
+  expstate->SetFadeSprites (500);
+  expstate->AddLight (QUERY_INTERFACE (Sys->engine, iEngine),
+      	QUERY_INTERFACE (sector, iSector), 1000);
 }
 
 //===========================================================================

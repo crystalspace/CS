@@ -27,7 +27,6 @@
 #include "csengine/particle.h"
 #include "iparticl.h"
 
-class csSprite2D;
 class csMaterialWrapper;
 class csEngine;
 class csSector;

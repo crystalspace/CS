@@ -169,6 +169,11 @@ void csLight::CorrectForNocolor (float* rp, float* gp, float* bp)
 #endif
 }
 
+void csLight::Light::SetSector (iSector* sector)
+{
+  scfParent->SetSector (sector->GetPrivateObject ());
+}
+
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csStatLight,csLight);
@@ -373,10 +378,19 @@ void csLightPatch::Initialize (int n)
 
 IMPLEMENT_CSOBJTYPE (csDynLight,csLight);
 
+IMPLEMENT_IBASE_EXT (csDynLight)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iDynLight)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csDynLight::eiDynLight)
+  IMPLEMENTS_INTERFACE (iDynLight)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csDynLight::csDynLight (float x, float y, float z, float dist,
   float red, float green, float blue)
   : csLight (x, y, z, dist, red, green, blue)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
   lightpatches = NULL;
 }
 

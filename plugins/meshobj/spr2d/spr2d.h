@@ -64,6 +64,9 @@ private:
    */
   void SetupObject ();
 
+  /// Update lighting given a position.
+  void UpdateLighting (iLight** lights, int num_lights, const csVector3& pos);
+
 public:
   /// Constructor.
   csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory);
@@ -88,6 +91,8 @@ public:
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable);
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
+  virtual void NextFrame (cs_time /*current_time*/) { }
+  virtual bool WantToDie () { return false; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
@@ -112,6 +117,29 @@ public:
     }
   } scfiSprite2DState;
   friend class Sprite2DState;
+
+  //------------------------- iParticle implementation ----------------
+  class Particle : public iParticle
+  {
+  private:
+    csVector3 part_pos;
+
+  public:
+    DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
+    virtual void SetPosition (const csVector3& pos) { part_pos = pos; }
+    virtual void MovePosition (const csVector3& move) { part_pos += move; }
+    virtual void SetColor (const csColor& col);
+    virtual void AddColor (const csColor& col);
+    virtual void ScaleBy (float factor);
+    virtual void SetMixmode (UInt mode)
+    {
+      scfParent->MixMode = mode;
+    }
+    virtual void Rotate (float angle);
+    virtual void Draw (iRenderView* rview);
+    virtual void UpdateLighting (iLight** lights, int num_lights);
+  } scfiParticle;
+  friend class Particle;
 };
 
 /**

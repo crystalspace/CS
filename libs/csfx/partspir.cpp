@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/csspr2d.h"
 #include "csengine/light.h"
 #include "csengine/engine.h"
 #include "csengine/particle.h"

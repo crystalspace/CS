@@ -500,7 +500,7 @@ IMPLEMENT_CSOBJTYPE (csSprite, csPObject)
 IMPLEMENT_IBASE_EXT (csSprite)
   IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSprite)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSprite::Particle)
   IMPLEMENTS_INTERFACE (iParticle)
@@ -1271,7 +1271,7 @@ void csSprite3D::InitSprite ()
   MixMode = CS_FX_COPY;
 }
 
-bool csSprite3D::NextFrame (cs_time current_time, bool onestep, bool stoptoend)
+bool csSprite3D::OldNextFrame (cs_time current_time, bool onestep, bool stoptoend)
 {
   bool ret = false;
 

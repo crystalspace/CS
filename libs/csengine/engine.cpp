@@ -35,7 +35,6 @@
 #include "csengine/csview.h"
 #include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
-#include "csengine/csspr2d.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
 #include "csengine/covcube.h"
@@ -1484,17 +1483,13 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
   dyn->SetPrev (NULL);
 }
 
-void csEngine::UpdateParticleSystems (cs_time elapsed_time)
+void csEngine::NextFrame (cs_time current_time)
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
   {
     csSprite* sp = (csSprite*)sprites[i];
-    if (sp->GetType () >= csParticleSystem::Type)
-    {
-      csParticleSystem* partsys = (csParticleSystem*)sp;
-      partsys->Update (elapsed_time);
-    }
+    sp->NextFrame (current_time);
   }
 
   // Delete particle systems that self-destructed now.
@@ -1502,28 +1497,9 @@ void csEngine::UpdateParticleSystems (cs_time elapsed_time)
   while (i >= 0)
   {
     csSprite* sp = (csSprite*)sprites[i];
-    if (sp->GetType () >= csParticleSystem::Type)
-    {
-      csParticleSystem* partsys = (csParticleSystem*)sp;
-      if (partsys->GetDelete ())
-        delete partsys;
-    }
+    if (sp->WantToDie ())
+      delete sp;
     i--;
-  }
-
-}
-
-void csEngine::AdvanceSpriteFrames (cs_time current_time)
-{
-  int i;
-  for (i = 0 ; i < sprites.Length () ; i++)
-  {
-    csSprite* sp = (csSprite*)sprites[i];
-    if (sp->GetType () == csSprite3D::Type)
-    {
-      csSprite3D* s = (csSprite3D*)sp;
-      s->NextFrame (current_time);
-    }
   }
 }
 
@@ -2146,6 +2122,20 @@ iStatLight* csEngine::CreateLight (const csVector3& pos, float radius,
   csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue, pseudoDyn);
   return QUERY_INTERFACE (light, iStatLight);
+}
+
+iDynLight* csEngine::CreateDynLight (const csVector3& pos, float radius,
+  	const csColor& color)
+{
+  csDynLight* light = new csDynLight (pos.x, pos.y, pos.z, radius,
+  	color.red, color.green, color.blue);
+  AddDynLight (light);
+  return QUERY_INTERFACE (light, iDynLight);
+}
+
+void csEngine::RemoveDynLight (iDynLight* light)
+{
+  RemoveDynLight (light->GetPrivateObject ());
 }
 
 iTransformationManager* csEngine::GetTransformationManager ()

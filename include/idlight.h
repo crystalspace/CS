@@ -17,37 +17,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ILIGHT_H__
-#define __ILIGHT_H__
+#ifndef __IDYNLIGHT_H__
+#define __IDYNLIGHT_H__
 
 #include "csutil/scf.h"
 
-class csLight;
-class csColor;
-struct iSector;
+class csDynLight;
 
-SCF_VERSION (iLight, 0, 0, 4);
+SCF_VERSION (iDynLight, 0, 0, 1);
 
 /**
- * The iLight interface is the SCF interface for the csLight class. 
+ * The iDynLight interface is the SCF interface for the csDynLight class. 
  */
-struct iLight : public iBase
+struct iDynLight : public iBase
 {
-  /// Get private pointer to light object. UGLY
-  virtual csLight* GetPrivateObject () = 0;
-  /// Get the position of this light.
-  virtual csVector3& GetCenter () = 0;
-  /// Get the squared radius.
-  virtual float GetSquaredRadius () const = 0;
-  /// Get the color of this light.
-  virtual csColor& GetColor () = 0;
-  /// Set the color of this light.
-  virtual void SetColor (const csColor& col) = 0;
-  /// Set the sector for this light.
-  virtual void SetSector (iSector* sector) = 0;
-  /// Get the brightness of a light at a given distance.
-  virtual float GetBrightnessAtDistance (float d) = 0;
+  /// Get the private pointer to csDynLight (ugly).
+  virtual csDynLight* GetPrivateObject () = 0;
+  /// Setup the light (i.e. do the lighting calculations).
+  virtual void Setup () = 0;
 };
 
-#endif // __ILIGHT_H__
+#endif // __IDYNLIGHT_H__
 

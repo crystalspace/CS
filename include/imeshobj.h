@@ -27,7 +27,7 @@ struct iRenderView;
 struct iMovable;
 struct iLight;
 
-SCF_VERSION (iMeshObject, 0, 0, 4);
+SCF_VERSION (iMeshObject, 0, 0, 5);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -65,6 +65,19 @@ struct iMeshObject : public iBase
    * to be a bounding box.
    */
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false) = 0;
+
+  /**
+   * Control animation of this object.
+   */
+  virtual void NextFrame (cs_time current_time) = 0;
+
+  /**
+   * If this method returns true this object wants to die. The
+   * user of this object should take care to make it die at the
+   * soonest possible time. This is usally used for things like
+   * particle systems that only have a limited time to live.
+   */
+  virtual bool WantToDie () = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 3);

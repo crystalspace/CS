@@ -1,5 +1,73 @@
 The history order has been reversed so that new features are at the top.
 
+4-Jan-2001
+	- Andrew Zabolotny fixed the disaster caused to VFS by one of
+	  Eric's changes. CS_PLATFORM_NAME was not the strict name of
+	  platform like it should be, but rather a free-form description
+	  of the platform, which is wrong.
+	- The sprited2D plugin now also implements iParticle which means
+	  it can be directly used as a particle for the particle systems.
+	- The particle systems now use the sprite2d plugin directly instead
+	  of using csSprite2D.
+	- As a consequence of this I'm now able to remove csSprite2D
+	  from the engine. In addition I also removed support for loading
+	  2D sprites directly. Instead the new MESHOBJ token should be used.
+	- Forgot to implement support for the MATERIAL keyword in the
+	  sprite2d loader (the factory loader did support it).
+	- Started work on moving particle systems to plugins. There is
+	  now a directory plugins/meshobj/partgen which contains the
+	  general classes for particle systems (csParticleSystem
+	  and csNewtonianParticleSystem).
+	- Added iParticleState interface which represents the general
+	  settings common to all particle systems. csParticleSystem
+	  implements this.
+	- Started moving fountain particle system to plugins. Source can
+	  be found in plugins/meshobj/fountain.
+	- Added iFountainState interface which represents the general
+	  settings specific for the fountain. csFountainParticleSystem
+	  implements this.
+	- Fixed SCF macros for csPolygonSet, csSprite, csSkeletonLimbState
+	  and csPolygon3D. They were all using IMPLEMENT_IBASE_EXT
+	  but forgot to close this with IMPLEMENT_IBASE_EXT_END (instead
+	  they used the default IMPLEMENT_IBASE_END).
+	- Added NextFrame to csSprite and implement this in all the
+	  current remaining subclasses (csParticleSystem, csMeshWrapper,
+	  and csSprite3D).
+	- Added similar NextFrame() to iMeshObject.
+	- Added empty implementation of NextFrame() to cube and 2D sprite
+	  plugins. They don't have animation so they don't need a NextFrame().
+	- Added a functional implementation of NextFrame() to the general
+	  particle system plugin code.
+	- Renamed csEngine::AdvanceSpriteFrames() to NextFrame(). In
+	  addition it will now also control animation and deletion of
+	  particle systems.
+	- Removed UpdateParticleSystems() because csEngine::NextFrame()
+	  does this.
+	- Finished the fountain plugin. The fountain plugin itself uses
+	  the 2D sprite plugin to create the fountain particles.
+	- Added WantToDie() to iMeshObject. With this function a mesh
+	  can indicate that it wants to die. This is most useful for particle
+	  systems that have only a limited time to live (like an explosion).
+	- Also added default WantToDie() to csSprite and implemented it
+	  in csMeshWrapper by asking the mesh. By doing this the auto-delete
+	  system of particle systems is generalized to all mesh objects.
+	- Started moving explosion particle system to plugins. Source can
+	  be found in plugins/meshobj/explo.
+	- Added iExplosionState interface which represents the general
+	  settings specific for the explosion. csExploParticleSystem
+	  implements this.
+	- Added iDynLight SCF interface for dynamic lights. This is needed
+	  for the explosion plugin.
+	- Extended iLight SCF interface with SetColor() and SetSector().
+	- Extended iEngine with CreateDynLight() and RemoveDynLight().
+	- Finished the explosion plugin. Note that there still seems to be
+	  a bug with lighting and the particles of the particle systems.
+	  Sometimes the lighting routine on the particle system is not
+	  called (UpdateLighting).
+	- Changed walktest to use the fountain and explosion plugins instead
+	  of the still existing fountain particle systems in csfx.
+	- Fixed a CSFX dependency error in the blocks makefile.
+	- Implemented the fountain loader plugin (in plugins/meshldr/fountain).
 3-Jan-2001
 	- Andrew Zabolotny did the following changes to CS:
 	    - Enhanced a little software DrawPixmap for

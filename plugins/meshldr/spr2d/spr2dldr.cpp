@@ -196,6 +196,19 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
 	  verts = &(spr2dLook->GetVertices ());
 	}
 	break;
+      case CS_TOKEN_MATERIAL:
+	{
+          ScanStr (params, "%s", str);
+          iMaterialWrapper* mat = engine->FindMaterial (str);
+	  if (!mat)
+	  {
+            // @@@ Error handling!
+            mesh->DecRef ();
+            return NULL;
+	  }
+	  spr2dLook->SetMaterialWrapper (mat);
+	}
+	break;
       case CS_TOKEN_MIXMODE:
 	printf ("Not implemented yet!\n");
 	break;

@@ -683,6 +683,11 @@ public:
   virtual void Draw (csRenderView& rview) = 0;
 
   /**
+   * Control animation given the current time.
+   */
+  virtual void NextFrame (cs_time current_time) = 0;
+
+  /**
    * Get the movable instance for this sprite.
    * It is very important to call GetMovable().UpdateMove()
    * after doing any kind of modification to this movable
@@ -715,6 +720,9 @@ public:
 
   /// Rotate sprite in some manner (as defined by subclass), in radians.
   virtual void Rotate (float angle) = 0;
+
+  /// Returns true if this object wants to die.
+  virtual bool WantToDie () { return false; }
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
@@ -1162,10 +1170,16 @@ public:
    */
   virtual void Draw (csRenderView& rview);
 
+  /// Go the next animation frame.
+  virtual void NextFrame (cs_time current_time)
+  {
+    OldNextFrame (current_time);
+  }
+
   /**
    * Go to the next frame depending on the current time in milliseconds.
    */
-  bool NextFrame (cs_time current_time, bool onestep = false,
+  bool OldNextFrame (cs_time current_time, bool onestep = false,
     bool stoptoend = false);
 
   /**

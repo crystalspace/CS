@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by W.C.A. Wijngaards
+    Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +17,29 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PARTICLE_H__
-#define __CS_PARTICLE_H__
+#ifndef __CS_PARTGEN_H__
+#define __CS_PARTGEN_H__
 
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
-#include "csobject/csobject.h"
 #include "csutil/cscolor.h"
-#include "csengine/cssprite.h"
+#include "csutil/csvector.h"
+#include "igraph3d.h"
+#include "imeshobj.h"
+#include "impartic.h"
 #include "iparticl.h"
 
-class csMaterialWrapper;
-class csEngine;
-class csSector;
-class csDynLight;
-class csLight;
-class csRenderView;
 struct iMeshObjectFactory;
+struct iMaterialWrapper;
+struct iMovable;
+struct iRenderView;
 
 /**
  * This class represents a particle system. It is a set of iParticles.
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class csParticleSystem : public csSprite
+class csParticleSystem : public iMeshObject
 {
 protected:
   /// iParticle ptrs to the particles.
@@ -49,6 +49,12 @@ protected:
   cs_time time_to_live; // msec
   /// If this system should be deleted.
   bool to_delete;
+  /// Color of all particles.
+  csColor color;
+  /// Material for all particles.
+  iMaterialWrapper* mat;
+  /// MixMode for all particles.
+  UInt MixMode;
   /// Color change
   bool change_color; csColor colorpersecond;
   /// Size change
@@ -57,25 +63,22 @@ protected:
   bool change_alpha; float alphapersecond; float alpha_now;
   /// Rotate particles, angle in radians.
   bool change_rotation; float anglepersecond;
-  /** bounding box in 3d of all particles in this system.
+  /**
+   * bounding box in 3d of all particles in this system.
    * the particle system subclass has to give this a reasonable value.
    * no particle may exceed the bbox. 
    */
   csBox3 bbox;
-
-  /// Bounding box for polygon trees.
-  csPolyTreeBBox ptree_bbox;
 
   /// Pointer to a mesh object factory for 2D sprites.
   iMeshObjectFactory* spr_factory;
   /// Previous time.
   cs_time prev_time;
 
+  /// Set up this object.
+  virtual void SetupObject () = 0;
+
 protected:
-  /// Update this sprite in the polygon trees.
-  virtual void UpdateInPolygonTrees ();
-  /// Move all particles to a sector, virtual so subclass can move more.
-  virtual void MoveToSector (csSector *sector);
   /// Helping func. Returns vector of with -1..+1 members. Varying length!
   static csVector3& GetRandomDirection ();
   /// Helping func. Returns vector of with -1..+1 members. Varying length!
@@ -87,7 +90,7 @@ public:
    * Make a new system. 
    * Also adds the particle system to the list of the current engine.
    */
-  csParticleSystem (csObject* theParent);
+  csParticleSystem (iSystem* system);
 
   /**
    * Destroy particle system, and all particles.
@@ -102,23 +105,25 @@ public:
   /// Get a particle.
   inline iParticle* GetParticle (int idx) 
   { return (iParticle*)particles[idx]; }
+  /// Remove all particles.
+  void RemoveParticles ();
 
   /// Add a new particle, increases num_particles. Do a DecRef yourself.
   inline void AppendParticle (iParticle *part) 
-  {particles.Push(part); part->IncRef();}
+  { particles.Push(part); part->IncRef(); }
   
   /** 
    * Add an rectangle shaped sprite2d particle. Pass along half w and h.
    * adds sprite to engine list.
    */
-  void AppendRectSprite (float width, float height, csMaterialWrapper* mat,
+  void AppendRectSprite (float width, float height, iMaterialWrapper* mat,
     bool lighted);
 
   /** 
    * Add a sprite2d n-gon with material, and given radius.
    * adds sprite to engine list.
    */
-  void AppendRegularSprite (int n, float radius, csMaterialWrapper* mat,
+  void AppendRegularSprite (int n, float radius, iMaterialWrapper* mat,
     bool lighted);
 
   /// Set selfdestruct mode on, and msec to live.
@@ -150,7 +155,7 @@ public:
 
   /// Set the alpha of particles.
   inline void SetAlpha(float alpha) 
-  {alpha_now = alpha; SetMixmode( CS_FX_SETALPHA(alpha) ); }
+  {alpha_now = alpha; MixMode = CS_FX_SETALPHA (alpha); SetupMixMode (); }
   /// Get the probable alpha of the particles
   inline float GetAlpha() {return alpha_now;}
   /// Change alpha of all particles, by factor per second.
@@ -168,37 +173,20 @@ public:
   /// Get the bounding box for this particle system.
   inline const csBox3& GetBoundingBox() const {return bbox;}
 
-  /**
-   * Get an iParticle for this particle system, thus you can add
-   * the particle system as particle to another particle system,
-   * making particle systems of particle systems.
-   * Do not add particle systems to themselves, you'll get infinite loops.
-   */
-  iParticle* GetAsParticle() { return &scfiParticle; }
-
   /// Move all particles to this position
-  virtual void SetPosition(const csVector3& pos);
+  //virtual void SetPosition(const csVector3& pos);
   /// Move all particles by given delta.
-  virtual void MovePosition(const csVector3& move);
+  //virtual void MovePosition(const csVector3& move);
   /// Set particle colors, convenience function.
-  virtual void SetColor (const csColor& col);
+  virtual void SetupColor ();
   /// Add particle colors, convenience function.
   virtual void AddColor (const csColor& col);
   /// Scale all particles.
   virtual void ScaleBy(float factor);
   /// Set particle mixmodes, convenience function.
-  virtual void SetMixmode (UInt mode);
+  virtual void SetupMixMode ();
   /// Rotate all particles
   virtual void Rotate(float angle);
-
-  /// Go the next animation frame.
-  virtual void NextFrame (cs_time current_time)
-  {
-    cs_time elaps = 0;
-    if (prev_time != 0) elaps = current_time-prev_time;
-    prev_time = current_time;
-    Update (elaps);
-  }
 
   /**
    * Update the state of the particles as time has passed.
@@ -208,18 +196,6 @@ public:
    */
   virtual void Update (cs_time elapsed_time);
 
-  /// Draw the particle system.
-  virtual void Draw (csRenderView& rview);
-
-  /// Light part sys according to the given array of lights.
-  virtual void UpdateLighting (csLight** lights, int num_lights);
-
-  /// Get the location of the part sys.
-  virtual const csVector3& GetPosition () const;
-
-  /// Update lighting as soon as the part sys becomes visible.
-  virtual void DeferUpdateLighting (int flags, int num_lights);
-
   /**
    * Check if this sprite is hit by this object space vector.
    * Return the collision point in object space coordinates.
@@ -228,8 +204,93 @@ public:
   virtual bool HitBeamObject (const csVector3& /*start*/,
     const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
     { return false; }
+ 
+  //------------------------ iMeshObject implementation ------------------------
+  DECLARE_IBASE;
 
-  CSOBJTYPE;
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual void UpdateLighting (iLight** lights, int num_lights,
+      	iMovable* movable);
+  virtual bool Draw (iRenderView* rview, iMovable* movable);
+  virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false)
+  {
+    (void)accurate;
+    bbox = csParticleSystem::bbox;
+  }
+  virtual void NextFrame (cs_time current_time)
+  {
+    cs_time elaps = 0;
+    if (prev_time != 0) elaps = current_time-prev_time;
+    prev_time = current_time;
+    Update (elaps);
+  }
+  virtual bool WantToDie () { return to_delete; }
+
+  //------------------------- iParticleState implementation ----------------
+  class ParticleState : public iParticleState
+  {
+    DECLARE_EMBEDDED_IBASE (csParticleSystem);
+    virtual void SetMaterialWrapper (iMaterialWrapper* material)
+    {
+      scfParent->mat = material;
+    }
+    virtual iMaterialWrapper* GetMaterialWrapper ()
+    {
+      return scfParent->mat;
+    }
+    virtual void SetMixMode (UInt mode)
+    {
+      scfParent->MixMode = mode;
+      scfParent->SetupMixMode ();
+    }
+    virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual void SetColor (const csColor& color)
+    {
+      scfParent->color = color;
+      scfParent->SetupColor ();
+    }
+    virtual void SetChangeColor (const csColor& color)
+    {
+      scfParent->SetChangeColor (color);
+    }
+    virtual void UnsetChangeColor ()
+    {
+      scfParent->UnsetChangeColor ();
+    }
+    virtual void SetChangeSize (float factor)
+    {
+      scfParent->SetChangeSize (factor);
+    }
+    virtual void UnsetChangeSize ()
+    {
+      scfParent->UnsetChangeSize ();
+    }
+    virtual void SetChangeRotation (float angle)
+    {
+      scfParent->SetChangeRotation (angle);
+    }
+    virtual void UnsetChangeRotation ()
+    {
+      scfParent->UnsetChangeRotation ();
+    }
+    virtual void SetChangeAlpha (float factor)
+    {
+      scfParent->SetChangeAlpha (factor);
+    }
+    virtual void UnsetChangeAlpha ()
+    {
+      scfParent->UnsetChangeAlpha ();
+    }
+    virtual void SetSelfDestruct (cs_time t)
+    {
+      scfParent->SetSelfDestruct (t);
+    }
+    virtual void UnSetSelfDestruct ()
+    {
+      scfParent->UnSetSelfDestruct ();
+    }
+  } scfiParticleState;
+  friend class ParticleState;
 };
 
 /**
@@ -246,8 +307,10 @@ protected:
 
 public:
   /// Specify max number of particles.
-  csNewtonianParticleSystem (csObject* theParent, int max);
+  csNewtonianParticleSystem (iSystem* system);
   virtual ~csNewtonianParticleSystem ();
+
+  void SetNumber (int max);
 
   /// Moves the particles depending on their acceleration and speed.
   virtual void Update (cs_time elapsed_time);
@@ -263,8 +326,6 @@ public:
   /// Set a particles acceleration. accelerations are in metres/second.
   void SetAccel (int idx, const csVector3& acl) 
   { part_accel[idx] = acl; }
-
-  CSOBJTYPE;
 };
 
-#endif // __CS_PARTICLE_H__
+#endif // __CS_PARTGEN_H__

@@ -36,16 +36,22 @@
 IMPLEMENT_IBASE (csSprite2DMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Sprite2DState)
   IMPLEMENTS_INTERFACE (iSprite2DState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
+  IMPLEMENTS_INTERFACE (iParticle)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
+  CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   csSprite2DMeshObject::factory = factory;
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
@@ -70,7 +76,7 @@ bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 }
 
 void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
-    iMovable* movable)
+    const csVector3& pos)
 {
   SetupObject ();
   if (!lighting) return;
@@ -85,7 +91,6 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
     //color.Set (r / 128.0, g / 128.0, b / 128.0);
   //}
 
-  csVector3 pos = movable->GetFullPosition ();
   int i;
   for (i = 0; i < num_lights; i++)
   {
@@ -107,6 +112,14 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
     vertices[i].color = vertices[i].color_init + color;
     vertices[i].color.Clamp (2, 2, 2);
   }
+}
+
+void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
+    iMovable* movable)
+{
+  if (!lighting) return;
+  csVector3 pos = movable->GetFullPosition ();
+  UpdateLighting (lights, num_lights, pos);
 }
 
 #define INTERPOLATE1(component) \
@@ -300,8 +313,8 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 {
   double angle_inc = 2.0 * PI / n;
   double angle = 0.0;
-  vertices.SetLimit(n);
-  vertices.SetLength(n);
+  vertices.SetLimit (n);
+  vertices.SetLength (n);
   for (int i = 0; i < vertices.Length (); i++, angle += angle_inc)
   {
     vertices [i].pos.y = cos (angle);
@@ -312,7 +325,60 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
       vertices [i].u = vertices [i].pos.x / 2.0f + 0.5f;
       vertices [i].v = vertices [i].pos.y / 2.0f + 0.5f;
     }
+    vertices [i].color.Set (0, 0, 0);
+    vertices [i].color_init.Set (0, 0, 0);
   }
+}
+
+void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights, int num_lights)
+{
+  scfParent->UpdateLighting (lights, num_lights, part_pos);
+}
+
+void csSprite2DMeshObject::Particle::Draw (iRenderView* rview)
+{
+  scfParent->SetupObject ();
+
+  // Camera transformation for the single 'position' vector.
+  scfParent->cam = rview->GetCamera ()->GetTransform ().Other2This (part_pos);
+  if (scfParent->cam.z < SMALL_Z) return;
+  scfParent->Draw (rview, NULL);
+}
+
+void csSprite2DMeshObject::Particle::SetColor (const csColor& col)
+{
+  csColoredVertices& vertices = scfParent->GetVertices ();
+  int i;
+  for (i = 0 ; i < vertices.Length () ; i++)
+    vertices[i].color_init = col;
+  if (!scfParent->lighting)
+    for (i = 0 ; i < vertices.Length () ; i++)
+      vertices[i].color = col;
+}
+
+void csSprite2DMeshObject::Particle::AddColor (const csColor& col)
+{
+  csColoredVertices& vertices = scfParent->GetVertices ();
+  int i;
+  for (i = 0 ; i < vertices.Length () ; i++)
+    vertices[i].color_init += col;
+  if (!scfParent->lighting)
+    for (i = 0 ; i < vertices.Length () ; i++)
+      vertices[i].color = vertices[i].color_init;
+}
+
+void csSprite2DMeshObject::Particle::ScaleBy (float factor)
+{
+  csColoredVertices& vertices = scfParent->GetVertices ();
+  for (int i = 0; i < vertices.Length (); i++)
+    vertices[i].pos *= factor;
+}
+
+void csSprite2DMeshObject::Particle::Rotate (float angle)
+{
+  csColoredVertices& vertices = scfParent->GetVertices ();
+  for (int i = 0; i < vertices.Length (); i++)
+    vertices[i].pos.Rotate (angle);
 }
 
 //----------------------------------------------------------------------

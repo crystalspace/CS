@@ -147,7 +147,7 @@ IMPLEMENT_CSOBJTYPE (csSkeletonConnectionState,csSkeletonLimbState);
 IMPLEMENT_CSOBJTYPE (csSkeletonState,csSkeletonLimbState);
 
 IMPLEMENT_IBASE_EXT (csSkeletonLimbState)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 csSkeletonLimbState::csSkeletonLimbState (): 
   next (NULL), vertices (NULL), num_vertices (0), children (NULL)

@@ -27,6 +27,7 @@
 #include "lightdef.h"
 #include "ilight.h"
 #include "istlight.h"
+#include "idlight.h"
 
 class csSector;
 class csSprite;
@@ -240,6 +241,8 @@ public:
     virtual csVector3& GetCenter () { return scfParent->GetCenter (); }
     virtual float GetSquaredRadius () const { return scfParent->GetSquaredRadius (); }
     virtual csColor& GetColor () { return scfParent->GetColor (); }
+    virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
+    virtual void SetSector (iSector* sector);
     virtual float GetBrightnessAtDistance (float d)
     {
       return scfParent->GetBrightnessAtDistance (d);
@@ -610,6 +613,20 @@ public:
   csDynLight* GetPrev () { return prev; }
 
   CSOBJTYPE;
+
+  //------------------------ iDynLight interface -----------------------------
+  DECLARE_IBASE_EXT (csLight);
+
+  struct eiDynLight : public iDynLight
+  {
+    DECLARE_EMBEDDED_IBASE (csDynLight);
+
+    /// Used by the engine to retrieve internal dyn light object (ugly)
+    virtual csDynLight* GetPrivateObject ()
+    { return scfParent; }
+    virtual void Setup () { scfParent->Setup (); }
+  } scfiDynLight;
+  friend struct eiDynLight;
 };
 
 #endif // __CS_LIGHT_H__

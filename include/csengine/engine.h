@@ -1013,14 +1013,9 @@ public:
   csStatLight* FindLight (const char* name, bool regionOnly = false);
 
   /**
-   * Advance the frames of all sprites given the current time.
+   * Advance the frames of all objects given the current time.
    */
-  void AdvanceSpriteFrames (cs_time current_time);
-
-  /**
-   * Update the particle systemns given an elapsed time.
-   */
-  void UpdateParticleSystems (cs_time elapsed_time);
+  void NextFrame (cs_time current_time);
 
   /**
    * Unlink a sprite from the engine (but do not delete it).
@@ -1208,6 +1203,11 @@ public:
   /// Create a static/pseudo-dynamic light.
   virtual iStatLight* CreateLight (const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
+  /// Create a dynamic light.
+  virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
+  	const csColor& color);
+  /// Remove a dynamic light.
+  virtual void RemoveDynLight (iDynLight*);
 
   //--------------------- iConfig interface implementation --------------------
 

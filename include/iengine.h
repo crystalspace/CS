@@ -30,6 +30,7 @@ class csColor;
 
 struct iSector;
 struct iStatLight;
+struct iDynLight;
 struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
@@ -42,7 +43,7 @@ struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 8);
+SCF_VERSION (iEngine, 0, 1, 9);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -210,6 +211,11 @@ struct iEngine : public iPlugIn
   /// Create a static/pseudo-dynamic light.
   virtual iStatLight* CreateLight (const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn) = 0;
+  /// Create a dynamic light.
+  virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
+  	const csColor& color) = 0;
+  /// Remove a dynamic light.
+  virtual void RemoveDynLight (iDynLight*) = 0;
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called

@@ -368,8 +368,8 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     wentity->NextFrame (elapsed_time);
   }
 
-  // Move all particle systems.
-  Sys->engine->UpdateParticleSystems (elapsed_time);
+  // Move all particle systems and sprites.
+  Sys->engine->NextFrame (current_time);
 
   // Record the first time this routine is called.
   extern bool do_bots;
@@ -605,9 +605,6 @@ void WalkTest::DrawFrame3D (int drawflags, cs_time current_time)
   if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | drawflags
   	| CSDRAW_3DGRAPHICS))
     return;
-
-  // Advance sprite frames
-  Sys->engine->AdvanceSpriteFrames (current_time);
 
   // Apply lighting BEFORE the very first frame
   csDynLight* dyn = Sys->engine->GetFirstDynLight ();

@@ -28,7 +28,6 @@
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
-#include "csengine/csspr2d.h"
 #include "csengine/skeleton.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
@@ -247,7 +246,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SPEED)
   CS_TOKEN_DEF (SPLIT)
   CS_TOKEN_DEF (SPRITE)
-  CS_TOKEN_DEF (SPRITE2D)
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (STATBSP)
   CS_TOKEN_DEF (STATELESS)
@@ -2956,7 +2954,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
     CS_TOKEN_TABLE (ACTIVATE)
     CS_TOKEN_TABLE (BSP)
     CS_TOKEN_TABLE (STATBSP)
-    CS_TOKEN_TABLE (SPRITE2D)
     CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (FOG)
@@ -3200,16 +3197,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
       case CS_TOKEN_SPRITE:
         {
           csSprite3D* sp = new csSprite3D (Engine);
-          sp->SetName (name);
-          LoadSprite (sp, params);
-          Engine->sprites.Push (sp);
-          sp->GetMovable ().SetSector (sector);
-	  sp->GetMovable ().UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_SPRITE2D:
-        {
-          csSprite2D* sp = new csSprite2D (Engine);
           sp->SetName (name);
           LoadSprite (sp, params);
           Engine->sprites.Push (sp);
@@ -3530,7 +3517,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SIXFACE)
     CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (SPRITE2D)
     CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (SKYDOME)
@@ -3623,16 +3609,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
       case CS_TOKEN_SPRITE:
         {
           csSprite3D* sp = new csSprite3D (Engine);
-          sp->SetName (name);
-          LoadSprite (sp, params);
-          Engine->sprites.Push (sp);
-          sp->GetMovable ().SetSector (sector);
-	  sp->GetMovable ().UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_SPRITE2D:
-        {
-          csSprite2D* sp = new csSprite2D (Engine);
           sp->SetName (name);
           LoadSprite (sp, params);
           Engine->sprites.Push (sp);
@@ -5116,126 +5092,6 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 }
 
 //---------------------------------------------------------------------------
-
-bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (VERTICES)
-    CS_TOKEN_TABLE (UV)
-    CS_TOKEN_TABLE (TEXNR)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (MOVE)
-    CS_TOKEN_TABLE (COLORS)
-    CS_TOKEN_TABLE (LIGHTING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  int i;
-
-  csLoaderStat::sprites_loaded++;
-
-  csColoredVertices& verts = spr->GetVertices ();
-  char str[255];
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_MIXMODE:
-        spr->SetMixmode (ParseMixmode (params));
-        break;
-      case CS_TOKEN_VERTICES:
-        {
-          float list[100];
-	  int num;
-          ScanStr (params, "%F", list, &num);
-	  num /= 2;
-	  verts.SetLength (num);
-          for (i = 0 ; i < num ; i++)
-	  {
-	    verts[i].pos.x = list[i*2+0];
-	    verts[i].pos.y = list[i*2+1];
-	    verts[i].color_init.Set (0, 0, 0);
-	    verts[i].color.Set (0, 0, 0);
-	  }
-        }
-        break;
-      case CS_TOKEN_UV:
-        {
-          float list[100];
-	  int num;
-          ScanStr (params, "%F", list, &num);
-	  num /= 2;
-	  verts.SetLength (num);
-          for (i = 0 ; i < num ; i++)
-	  {
-	    verts[i].u = list[i*2+0];
-	    verts[i].v = list[i*2+1];
-	  }
-        }
-        break;
-      case CS_TOKEN_LIGHTING:
-        {
-          int do_lighting;
-          ScanStr (params, "%b", &do_lighting);
-          spr->SetLighting (do_lighting);
-        }
-        break;
-      case CS_TOKEN_COLORS:
-        {
-          float list[100];
-	  int num;
-          ScanStr (params, "%F", list, &num);
-	  num /= 3;
-	  verts.SetLength (num);
-          for (i = 0 ; i < num ; i++)
-	  {
-	    verts[i].color_init.red = list[i*3+0];
-	    verts[i].color_init.green = list[i*3+1];
-	    verts[i].color_init.blue = list[i*3+2];
-	  }
-        }
-        break;
-      case CS_TOKEN_MOVE:
-        {
-	  float x, y, z;
-	  ScanStr (params, "%f,%f,%f", &x, &y, &z);
-          spr->SetPosition (csVector3 (x, y, z));
-	}
-        break;
-
-      case CS_TOKEN_TEXNR:
-        //@@OBSOLETE, retained for backward compatibility
-      case CS_TOKEN_MATERIAL:
-        {
-          ScanStr (params, "%s", str);
-          csMaterialWrapper* mat = FindMaterial (str, onlyRegion);
-          if (mat == NULL)
-          {
-            CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", params);
-            fatal_exit (0, true);
-          }
-          spr->SetMaterial (mat);
-	}
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the sprite!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  return true;
-}
 
 bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 {

@@ -92,6 +92,8 @@ public:
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable);
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
+  virtual void NextFrame (cs_time /*current_time*/) { }
+  virtual bool WantToDie () { return false; }
 };
 
 /**

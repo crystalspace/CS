@@ -46,7 +46,6 @@ class csSoundDataObject;
 class csSpriteTemplate;
 class csMeshFactoryWrapper;
 class csMeshWrapper;
-class csSprite2D;
 class csSprite3D;
 class csParticleSystem;
 class csKeyValuePair;
@@ -156,11 +155,6 @@ class csLoader
    * Load the mesh object from the map file.
    */
   static bool LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector);
-
-  /**
-   * Load the 2D sprite from the map file.
-   */
-  static bool LoadSprite (csSprite2D* spr, char* buf);
 
   /**
    * Load sounds from a SOUNDS(...) argument.
