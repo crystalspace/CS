@@ -65,7 +65,7 @@ chronological order.
 	- Jorrit moved const Get() and [] operator implementations to
 	  csArrayBase.
 	- Eric Sunshine reverted Paul Garceau's CS_WCHAR_T_SIZE-related hack
-	  to csunicode.h which was addressing the symptom, rather than the
+	  to csunicode.h which was addressing the symptom rather than the
 	  cause.  We need to determine the actual problem (if there is one),
 	  and instead address that.
 3-Aug-2003
@@ -120,8 +120,6 @@ chronological order.
 	- Jorrit replaced a lot of 'if (bla) delete bla' with 'delete bla'.
 	  C++ guarantees that 'delete' will check on null pointer so there is
 	  no need to add another test.
-	- Luca replaced some call to Delete (int) (which does not exist no more) 
-	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D class.
 	- Luca replaced some call to Delete (int) (which no longer exists) 
 	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D
 	  class.
@@ -132,8 +130,8 @@ chronological order.
 	  should now be possible to achieve though.
 	- Anders Stenberg added better pixel format handling in csGraphics3D,
 	  since it was needed for the abuse pgserver puts it through.
-	- Paul G. modified Win32 platform macro definitions to be more readable without
-          changing macro functionality.
+	- Paul G. modified Win32 platform macro definitions to be more
+	  readable without changing macro functionality.
 	    - CS_IMPLEMENT_PLATFORM_APPLICATION
 	    - CS_IMPLEMENT_PLATFORM_PLUGIN
 2-Aug-2003
@@ -143,8 +141,8 @@ chronological order.
 	  more to the API used by csArray.
 	- Jorrit renamed csStringArray::Delete(int) to DeleteIndex() to conform
 	  more to the API used by csArray.
-	- Jorrit renamed csGrowingArray::Delete(int) to DeleteIndex() to conform
-	  more to the API used by csArray.
+	- Jorrit renamed csGrowingArray::Delete(int) to DeleteIndex() to
+	  conform more to the API used by csArray.
 	- Jorrit modified the api documentation to reflect the pending removal
 	  of csVector and csBasicVector. Also explained how to do most common
 	  transitions.
@@ -173,7 +171,8 @@ chronological order.
 	      csPDelArray<GLGlyphSet>.
 	    - Replaced 'vStream' in csavi plugin with csRefArray<iStream>.
 	    - Replaced 'StreamIdx' in csavi plugin with csArray<indexentry*>.
-	    - Replaced 'StreamList' in csavi plugin with csPDelArray<StreamIdx>.
+	    - Replaced 'StreamList' in csavi plugin with
+	      csPDelArray<StreamIdx>.
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'scfLibraryVector' in scf with
 	      csPDelArray<scfSharedLibrary>.
@@ -191,7 +190,8 @@ chronological order.
 	    - Replaced 'generic' in md32spr with csArray<md3Model*>.
 	    - Replaced 'csTokenVector' in cs2xml with csPDelArray<csTokenDesc>.
 	    - Replaced 'things' in levtool with csPDelArray<ltThing>.
-	    - Replaced 'thing_nodes' in levtool with csPDelArray<ltDocNodeWrap>.
+	    - Replaced 'thing_nodes' in levtool with
+	      csPDelArray<ltDocNodeWrap>.
 	    - Replaced 'planes' in levtool with csPDelArray<ltPlane>.
 	    - Replaced 'thing_plugins' in levtool with csPDelArray<csString>.
 	    - Replaced 'plane_plugins' in levtool with csPDelArray<csString>.
@@ -201,7 +201,8 @@ chronological order.
 	    - Replaced 'busy_vector' in walktest with csArray<csWalkEntity*>.
 	- Jorrit replaced various occurances of csBasicVector:
 	    - Replaced 'texlayers' in csShaderGLMTEX with csArray<mtexlayer*>.
-	    - Replaced 'techniques' in csShader with csArray<iShaderTechnique*>.
+	    - Replaced 'techniques' in csShader with
+	      csArray<iShaderTechnique*>.
 	    - Removed unused 'pluginlist' in
 	      csGLRender3D::eiShaderRenderInterface.
 	    - Replaced 'vertex_constants' in csOpenGlEffectPassData with
