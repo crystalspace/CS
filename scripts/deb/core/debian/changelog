@@ -1,3 +1,9 @@
+crystalspace (0.98-20040612-1) unstable; urgency=low
+
+  * New Upstream 
+
+ -- Christian Bayle <bayle@debian.org>  Sat, 12 Jun 2004 23:40:55 +0200
+
 crystalspace (0.96-20030912-7) unstable; urgency=low
 
   * Removed support of libode an lib3ds for s390 

@@ -58,25 +58,27 @@ endif
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), powerpc))
 	perl -pi -e "s/^PLUGINS(.*cspython.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 endif
+	find $(CURDIR)/CS -name .cvsignore | xargs rm -f
 	# --disable-qsqrt was added for a gcc3.2 bug
 	#  then removed and I had to replace with cs_cv_cxx_qsqrt_ok=no ./configure
 	#  then a correct test was added in configure
 	#  this is adding #define CS_NO_QSQRT in CS/include/volatile.h
 	# Don't support until this is dynamic lib
 	# --enable-meta-info-embedding was by default before (enbed .csplugin info)
-	cd CS; ./configure --prefix=/usr --disable-cpu-specific-instructions $(CONFFLAG)
+	perl -pi -e "s:\[crystal\]:\[crystalspace\]:" $(CURDIR)/CS/configure.ac
+	cd CS; ./bin/autogen.sh ; cs_cv_prog_cxx_local_include=no ./configure --prefix=/usr --sysconfdir=/etc --enable-cpu-specific-optimizations=no $(CONFFLAG)
 
 	# Install as much as possible
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts
-	chmod +x $(CURDIR)/debian/createmenus
-	chmod +x $(CURDIR)/debian/addmissing
+#	chmod +x $(CURDIR)/debian/createmenus
+#	chmod +x $(CURDIR)/debian/addmissing
 	chmod +x $(CURDIR)/debian/automan
 	# Creating menus
-	$(CURDIR)/debian/createmenus $(CURDIR)
+#	$(CURDIR)/debian/createmenus $(CURDIR)
 	# Some path adjustment
-	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/generic/instpath.cpp
-	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/unix/instpath.cpp
+#	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/generic/instpath.cpp
+#	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/unix/instpath.cpp
 
 	touch configure-stamp
 
@@ -86,9 +88,6 @@ build: build-arch build-indep
 build-arch: build-arch-stamp
 build-arch-stamp: configure-stamp
 
-	# In case this would solve some problem 
-#	cd $(CURDIR)/CS; $(MAKE) swigpythgen
-	#
 	# Add here commands to compile the package.
 	# For arm, powerpc, s390
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), arm))
@@ -119,7 +118,7 @@ endif
 	echo "LIBS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	# Make dynamic version of libs
 	# not yet usable
-#	cd $(CURDIR)/CS; $(MAKE) libs USE_SHARED_LIBS=yes
+	#cd $(CURDIR)/CS; $(MAKE) libs USE_SHARED_LIBS=yes
 	# Build the rest
 	# Blocks is not anymore in CS CVS
 	# Ok this is rather dirty but i didn't find where to put this for blocks (only for dyn lib in fact)
@@ -156,13 +155,7 @@ install-indep:
 	# Add here commands to install the indep part of the package into
 	# debian/<package>-doc.
 	#INSTALLDOC#
-#	mkdir $(CURDIR)/debian/tmp
-	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
-#	cd CS; $(MAKE) SUBMAKEFILES=mk/install.mak INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace install 
-	cd CS; cp -r docs $(CURDIR)/debian/tmp/usr/lib/crystalspace
-	find $(CURDIR)/debian/tmp/usr/lib/crystalspace -name CVS -type d | xargs rm -rf
-
-#	dh_movefiles -i
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-doc $(MAKE) install_doc
 
 install-arch:
 	dh_testdir
@@ -171,72 +164,28 @@ install-arch:
 	dh_installdirs -a
 
 	# Add here commands to install the package into debian/crystalspace.
-	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
-	cd CS; $(MAKE) install INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_bin 
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_lib 
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_data 
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_config 
+
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-dev $(MAKE) install_include
+
 	# Let's fix some things
-#	$(CURDIR)/debian/addmissing $(CURDIR)
-
-	find $(CURDIR)/debian/tmp/usr/lib/crystalspace/include -type f \
-		-exec chmod 644 {} \;
-	chmod +x \
-	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/cssh.py
-	chmod +x \
-	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/pysimp.py
-
-	# Move to respect Debian Policy
-
-	# dev binaries in /usr/bin
-	mkdir -p $(CURDIR)/debian/tmp/usr/bin
-	-mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
-		 $(DEVBIN))\
-		$(CURDIR)/debian/tmp/usr/bin
-
-	# renaming picview because of name conflict with picview package
-	#mv $(CURDIR)/debian/tmp/usr/bin/picview \
-	#	$(CURDIR)/debian/tmp/usr/bin/cspicview
-	# From Loic Dachary (fix for cs-config)
-	perl -pi -e 's:^prefix=.*:prefix=/usr:' $(CURDIR)/debian/tmp/usr/bin/cs-config
-	perl -pi -e 's:^includedir=.*:includedir=/usr/include/crystalspace:' $(CURDIR)/debian/tmp/usr/bin/cs-config
-	perl -pi -e 's:libdir=.*:libdir=/usr/lib/crystalspace/lib:' $(CURDIR)/debian/tmp/usr/bin/cs-config
-
-	# demos binaries in /usr/games
-	mkdir -p $(CURDIR)/debian/tmp/usr/games
-	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/* \
-		$(CURDIR)/debian/tmp/usr/games
-
-	# renaming zoo because of name conflict with /usr/bin/zoo
-#	mv $(CURDIR)/debian/tmp/usr/games/zoo \
-#		$(CURDIR)/debian/tmp/usr/games/cszoo
-
-	# includes in /usr/include/crystalspace
-	mkdir -p $(CURDIR)/debian/tmp/usr/include
-	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/include \
-		$(CURDIR)/debian/tmp/usr/include/crystalspace
-
-	# config files in /etc/crystalspace
-	mkdir -p $(CURDIR)/debian/tmp/etc/crystalspace
-	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/data/config \
-		$(CURDIR)/debian/tmp/etc/crystalspace
-	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/*.cfg \
-		$(CURDIR)/debian/tmp/etc/crystalspace
-	# Fed up of missing files, should not have to do this
-	cp $(CURDIR)/CS/data/config/*.cfg \
-		$(CURDIR)/debian/tmp/etc/crystalspace/config
-
-	dh_movefiles -a
-
-	-rmdir $(CURDIR)/debian/crystalspace/usr/lib/crystalspace/data/config
+	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/python/*.py
 
 	# Adding home made xpm
+	mkdir -p $(CURDIR)/debian/crystalspace/usr/share/pixmaps
 	cp $(CURDIR)/xpm/*.xpm \
-		$(CURDIR)/debian/crystalspace-demos/usr/share/pixmaps
+		$(CURDIR)/debian/crystalspace/usr/share/pixmaps
 
 	# Autogenerate man
 	$(CURDIR)/debian/automan $(CURDIR)
 	$(CURDIR)/debian/rules man
 	rm -f $(CURDIR)/debian/man/*.sgml.?
-	dh_installman -p crystalspace-demos $(CURDIR)/debian/man/*.6
-	dh_installman -p crystalspace-dev $(CURDIR)/debian/man/*.1
+#	dh_installman -p crystalspace-demos $(CURDIR)/debian/man/*.6
+#	dh_installman -p crystalspace-dev $(CURDIR)/debian/man/*.1
+	dh_installman -p crystalspace $(CURDIR)/debian/man/*.1
 
 %.xpm: %.jpg
 	convert -size 32x32 $< $@
@@ -277,7 +226,8 @@ binary-common:
 	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-	dh_shlibdeps -l$(CURDIR)/debian/usr/lib/crystalspace/lib
+	#dh_shlibdeps -l$(CURDIR)/debian/usr/lib/crystalspace/lib
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

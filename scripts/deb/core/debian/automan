@@ -1,7 +1,7 @@
 # ! /bin/sh
 CURDIR=$1
-PACKAGES="crystalspace-demos crystalspace-dev"
-BINTYPE="bin games"
+PACKAGES="crystalspace"
+BINTYPE="bin"
 
 #=============================================================================
 gensgml(){
@@ -233,7 +233,7 @@ do
 					2>/dev/null \
 					> $CURDIR/debian/man/$bin.sgml.$SECTION
 					;;
-				cs-config|mdl2spr|3ds2lev|makedep|csfgen|map2cs|cspicview|nettut|unittest|phystut|levtool|maya2spr|milk2spr|python.cex)
+				cs-config|mdl2spr|partedit|md22spr|3ds2lev|makedep|csfgen|map2cs|cspicview|nettut|unittest|phystut|levtool|maya2spr|milk2spr|python.cex)
 					export TYPE="Not standart"
 					echo "Not yet documented" > $CURDIR/debian/man/$bin.txt
 					gensgml $CURDIR/debian/man/$bin.txt \
