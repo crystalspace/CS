@@ -634,7 +634,7 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
   return true;
 }
 
-void reset_vertex_colors (csThing* th)
+void reset_vertex_colors (csThing* /*th*/)
 {
   //@@@PROBABLY NOT NEEDED ANYMORE. TEST THIS!
   //int i, j;
