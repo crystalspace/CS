@@ -162,6 +162,8 @@ TOKEN_DEF_START
   TOKEN_DEF (LIGHTING)
   TOKEN_DEF (LIGHTX)
   TOKEN_DEF (LIMB)
+  TOKEN_DEF (MATERIAL)
+  TOKEN_DEF (MATERIALS)
   TOKEN_DEF (MATRIX)
   TOKEN_DEF (MAX_TEXTURES)
   TOKEN_DEF (MERGE_NORMALS)
@@ -2444,6 +2446,45 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
       QInt (transp.green * 255.2), QInt (transp.blue * 255.2));
 }
 
+void csLoader::mat_process (char *name, char* buf)
+{
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (TEXTURE)
+  TOKEN_TABLE_END
+
+  long cmd;
+  char *params;
+
+  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case TOKEN_TEXTURE:
+        // ...
+        break;
+    }
+  }
+
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a material specification!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  csMaterial* material = new csMaterial ();
+  if (!material)
+    return;
+
+  // The size of image should be checked before registering it with
+  // the 3D or 2D driver... if the texture is used for 2D only, it can
+  // not have power-of-two dimensions...
+
+  csMaterialHandle* mat = World->GetMaterials ()->NewMaterial (material);
+  mat->SetName (name);
+  // dereference image pointer since tex already incremented it
+  material->DecRef ();
+}
+
 //---------------------------------------------------------------------------
 
 csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
@@ -4408,6 +4449,7 @@ bool csLoader::LoadWorld (char* buf)
     TOKEN_TABLE (COLLECTION)
     TOKEN_TABLE (SCRIPT)
     TOKEN_TABLE (TEXTURES)
+    TOKEN_TABLE (MATERIALS)
     TOKEN_TABLE (TEX_SET)
     TOKEN_TABLE (LIGHTX)
     TOKEN_TABLE (THING)
@@ -4485,6 +4527,13 @@ bool csLoader::LoadWorld (char* buf)
           {
             World->GetTextures ()->DeleteAll ();
             if (!LoadTextures (params))
+              return false;
+          }
+          break;
+        case TOKEN_MATERIALS:
+          {
+            World->GetMaterials ()->DeleteAll ();
+            if (!LoadMaterials (params))
               return false;
           }
           break;
@@ -4629,6 +4678,39 @@ bool csLoader::LoadTextures (char* buf, const char* prefix)
         break;
       case TOKEN_TEXTURE:
         txt_process (name, params, prefix);
+        break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a matrix!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+bool csLoader::LoadMaterials (char* buf)
+{
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MATERIAL)
+  TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case TOKEN_MATERIAL:
+        mat_process (name, params);
         break;
     }
   }

@@ -32,6 +32,8 @@ The history order has been reversed so that new features are at the top.
 	  and iMaterialHandle. Added csMaterialList which is a list of
 	  loaded materials.
 	- Added list of loaded materials to csWorld.
+	- Added support for materials to csparser. Stubs only.
+	  New MATERIALS keyword similar to TEXTURES.
 2-Aug-2000
 	- Martin Geisse added 2d animations and aligned pixmaps.
 	- Norman Kramer fixed funcon plugin so that use_fog=false for DPFX.
