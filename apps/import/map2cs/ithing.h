@@ -59,6 +59,9 @@ public:
   /// Return true, if this thing is moveable
   bool IsMoveable();
 
+  /// Return true, if this is a sky box/dome
+  bool IsSky();
+
   /// Return true, if there is something to write
   bool ContainsVisiblePolygons();
 

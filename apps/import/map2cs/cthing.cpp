@@ -62,7 +62,10 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
   pWorld->WriteIndent();
   fprintf(fd, "ZUSE()\n");
   pWorld->WriteIndent();
-  fprintf(fd, "PRIORITY('object')\n");
+  if (IsSky())
+    fprintf(fd, "PRIORITY('sky')\n");
+  else
+    fprintf(fd, "PRIORITY('object')\n");
 
   //Activate a script
   char scriptname[99] = "none";

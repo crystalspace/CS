@@ -58,6 +58,14 @@ bool CIThing::IsMoveable()
   return m_pOriginalEntity->GetBoolValueOfKey("moveable", false);
 }
 
+bool CIThing::IsSky()
+{
+  if (m_pOriginalEntity)
+    return m_pOriginalEntity->GetBoolValueOfKey("sky", false);
+  
+  return false;
+}
+
 const char* CIThing::GetClassname()
 {
   assert(m_pOriginalEntity);
