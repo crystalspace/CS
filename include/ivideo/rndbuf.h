@@ -20,7 +20,7 @@
 #ifndef __IVIDEO_RNDBUF_H__
 #define __IVIDEO_RNDBUF_H__
 
-#include "csutil/strhash.h"
+#include "csutil/strset.h"
 
 class csVector3;
 class csVector2;
@@ -61,7 +61,7 @@ struct iRenderBuffer : public iBase
   /// Get number of indices in the data (as different datatypes)
   virtual int GetFloatLength() = 0;
   virtual int GetUCharLength() = 0;
-  virtual int GetUintLength() = 0;
+  virtual int GetUIntLength() = 0;
   virtual int GetVec3Length() = 0;
   virtual int GetVec2Length() = 0;
   virtual int GetColorLength() = 0;
@@ -109,7 +109,7 @@ private:
   csRef<iStreamSource> streamsource;
 
 public:
-  ///Special attributes. Please don't change, it's used as flags
+  /// Special attributes. Please don't change, it's used as flags
   typedef enum
   {
     SPECIAL_NONE = 0,

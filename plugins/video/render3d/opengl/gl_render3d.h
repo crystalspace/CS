@@ -27,7 +27,7 @@
 
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
-#include "csutil/strhash.h"
+#include "csutil/strset.h"
 
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -67,7 +67,7 @@ private:
 
   csRender3dCaps rendercaps;
 
-  csStringHash* strings;
+  csStringSet* strings;
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -112,8 +112,9 @@ public:
     { return lightmgr; }
 
   /// Dimensions of window
-  void SetDimension(int width, int height);
-  void GetDimension(int &width, int &height) 
+  void SetDimensions (int width, int height)
+    { viewwidth = width; viewheight = height; }
+  void GetDimensions (int &width, int &height) 
     { width = viewwidth; height = viewheight; }
 
   /// Capabilities of the driver
@@ -142,7 +143,7 @@ public:
   void DrawMesh(csRenderMesh* mymesh);
 
   /// Get a stringhash to be used by our streamsources etc.
-  csStringHash *GetStringContainer() 
+  csStringSet *GetStringContainer() 
     { return strings; }
 
   ////////////////////////////////////////////////////////////////////

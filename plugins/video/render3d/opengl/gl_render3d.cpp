@@ -23,7 +23,7 @@
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/strhash.h"
+#include "csutil/strset.h"
 
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
@@ -32,8 +32,8 @@
 
 #include "ivideo/lighting.h"
 #include "ivideo/txtmgr.h"
-#include "ivideo/rndbuf.h"
 #include "ivideo/render3d.h"
+#include "ivideo/rndbuf.h"
 
 #include "gl_render3d.h"
 #include "gl_softrbufmgr.h"
@@ -82,7 +82,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
   scfiEventHandler = NULL;
 
-  strings = new csStringHash ();
+  strings = new csStringSet ();
 }
 
 csGLRender3D::~csGLRender3D()
@@ -147,7 +147,7 @@ void csGLRender3D::Close ()
 
 bool csGLRender3D::BeginDraw (int drawflags)
 {
-  return false;
+  return true;
 }
 
 void csGLRender3D::FinishDraw ()
@@ -168,16 +168,39 @@ void csGLRender3D::SetWVMatrix(csReversibleTransform* wvmatrix)
 {
 }
 
-void csGLRender3D::SetDimension(int width, int height)
-{
-}
-
 void csGLRender3D::SetFOV(float fov)
 {
 }
 
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+
+  GLfloat matrixholder[16];
+
+  glOrtho (0., (GLdouble) (viewwidth+1), 0., (GLdouble) (viewheight+1), -1.0, 10.0);
+  glViewport (1, -1, viewwidth+1, viewheight+1);
+  glDisable (GL_CULL_FACE);
+
+  glTranslatef (400, 300, 0);
+  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+  matrixholder[0] = matrixholder[5] = 1.0;
+  matrixholder[11] = (float)viewheight/(float)viewwidth;
+  matrixholder[14] = -matrixholder[11];
+  glMultMatrixf (matrixholder);
+
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+
+  csRef<iStreamSource> source = mymesh->GetStreamSource ();
+  csRef<iRenderBuffer> vertexbuf = source->GetBuffer (strings->Request ("vertices"));
+  csRef<iRenderBuffer> indexbuf = source->GetBuffer (strings->Request ("indices"));
+
+  glVertexPointer (vertexbuf->GetVec3Length (), GL_FLOAT, 0, vertexbuf->GetFloatBuffer ());
+  /*glIndexPointer (GL_INT, 0, vertexbuf->GetUIntBuffer ());
+  glDrawArrays (GL_TRIANGLES, 0, indexbuf->GetUIntLength ());*/
+  glDrawElements (GL_TRIANGLES, indexbuf->GetUIntLength (), GL_INT, indexbuf->GetUIntBuffer ());
 }
 
 

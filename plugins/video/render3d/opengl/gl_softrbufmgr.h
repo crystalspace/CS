@@ -47,6 +47,8 @@ public:
   
   csSoftRenderBuffer (void *buffer, int size, CS_RENDERBUFFER_TYPE type)
   {
+    SCF_CONSTRUCT_IBASE (NULL)
+
     csSoftRenderBuffer::buffer = buffer;
     csSoftRenderBuffer::size = size;
     csSoftRenderBuffer::type = type;
@@ -71,7 +73,7 @@ public:
   /// Get number of indices in the data (as different datatypes)
   int GetFloatLength() { return size/sizeof(float); }
   int GetUCharLength() { return size/sizeof(unsigned char); }
-  int GetUintLength() { return size/sizeof(unsigned char); }
+  int GetUIntLength() { return size/sizeof(unsigned int); }
   int GetVec3Length() { return size/sizeof(csVector3); }
   int GetVec2Length() { return size/sizeof(csVector2); }
   int GetColorLength() { return size/sizeof(csColor); }

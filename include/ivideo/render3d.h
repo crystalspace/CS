@@ -25,7 +25,7 @@
 
 class csRect;
 class csReversibleTransform;
-class csStringHash;
+class csStringSet;
 
 
 class csRenderMesh;
@@ -49,58 +49,58 @@ SCF_VERSION (iRender3D, 0, 0, 1);
 struct iRender3D : public iBase
 {
   /// Open 3d renderer.
-  virtual bool Open() = 0;
+  virtual bool Open () = 0;
 
   /// Close renderer and release all resources used
-  virtual void Close() = 0;
+  virtual void Close () = 0;
 
   /**
    * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
    * and therefore it shouldn't be decref-ed by caller.
    */
-  virtual iGraphics2D* Get2DDriver() = 0;
+  virtual iGraphics2D* Get2DDriver () = 0;
 
   /// Get a pointer to our texture manager
-  virtual iTextureManager* GetTextureManager() = 0;
+  virtual iTextureManager* GetTextureManager () = 0;
 
   /**
    * Get a pointer to the VB-manager
    * Always use the manager referenced here to get VBs
    */
-  virtual iRenderBufferManager* GetBufferManager() = 0;
+  virtual iRenderBufferManager* GetBufferManager () = 0;
 
   /// Get a pointer to lighting manager
-  virtual iLightingManager* GetLightingManager() = 0;
+  virtual iLightingManager* GetLightingManager () = 0;
 
   /// Dimensions of window
-  virtual void SetDimension(int width, int height) = 0;
-  virtual void GetDimension(int &width, int &height) = 0;
+  virtual void SetDimensions (int width, int height) = 0;
+  virtual void GetDimensions (int &width, int &height) = 0;
 
   /// Capabilities of the driver
-  virtual csRender3dCaps* GetCaps() = 0;
+  virtual csRender3dCaps* GetCaps () = 0;
 
   /// Field of view
-  virtual void SetFOV(float fov) = 0;
-  virtual float GetFOV() = 0;
+  virtual void SetFOV (float fov) = 0;
+  virtual float GetFOV () = 0;
 
   /// Set world to view transform
-  virtual void SetWVMatrix(csReversibleTransform* wvmatrix) = 0;
-  virtual csReversibleTransform* GetWVMatrix() = 0;
+  virtual void SetWVMatrix (csReversibleTransform* wvmatrix) = 0;
+  virtual csReversibleTransform* GetWVMatrix () = 0;
 
   /// Begin drawing in the renderer
-  virtual bool BeginDraw(int drawflags) = 0;
+  virtual bool BeginDraw (int drawflags) = 0;
 
   /// Indicate that drawing is finished
-  virtual void FinishDraw() = 0;
+  virtual void FinishDraw () = 0;
 
   /// Do backbuffer printing
-  virtual void Print(csRect* area) = 0;
+  virtual void Print (csRect* area) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh(csRenderMesh* mymesh) = 0;
+  virtual void DrawMesh (csRenderMesh* mymesh) = 0;
 
   /// Get a stringhash to be used by our streamsources etc.
-  virtual csStringHash* GetStringContainer() = 0;
+  virtual csStringSet* GetStringContainer () = 0;
 };
 
 #endif // __IVIDEO_RENDER3D_H__
