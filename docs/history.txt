@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+18-Nov-1999
+	- Eric Sunshine reverted changes which Brandon Ehle had made to SCF.
+	  Brandon totally botched it and completely broke the reference
+	  counting mechanism.  Furthermore, his changes were entirely
+	  unwarranted.
 17-Nov-1999
 	- Eric Sunshine performed the SCF conversion on the BeOS port.  He
 	  also reformatted, removed unused / unneeded code, and generally
