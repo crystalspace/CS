@@ -304,7 +304,7 @@ int csLightMapQueue::AddVertices (int num)
     if (gltxt) memcpy (new_ar, gltxtFog, sizeof (GLfloat)*2*old_num);
     delete[] gltxtFog; gltxtFog = new_ar;
 
-    new_ar = new GLfloat [max_vertices*4];
+    new_ar = new GLfloat [max_vertices*3];
     if (gltxt) memcpy (new_ar, glcolorsFog, sizeof (GLfloat)*3*old_num);
     delete[] glcolorsFog; glcolorsFog = new_ar;
 
