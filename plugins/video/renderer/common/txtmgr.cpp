@@ -67,7 +67,7 @@ void csTextureMM::create_blended_mipmap (csTextureManager* tex, unsigned char* b
   if (!ifile) return;
   iImage* if2;
   bool tran = GetTransparent ();
-  if2 = ifile->MipMap (0, tran ? &transp_color : NULL);
+  if2 = ifile->MipMap (0, tran ? &transp_color : (RGBPixel*)NULL);
   convert_to_internal (tex, if2, bm);
   if2->DecRef ();
 }
@@ -123,7 +123,7 @@ void csTextureMM::create_mipmap_bitmap (csTextureManager* tex, int steps, unsign
 {
   if (!ifile) return;
   iImage* if2;
-  if2 = ifile->MipMap (steps, istransp ? &transp_color : NULL);
+  if2 = ifile->MipMap (steps, istransp ? &transp_color : (RGBPixel*)NULL);
   convert_to_internal (tex, if2, bm);
   if2->DecRef ();
 }
