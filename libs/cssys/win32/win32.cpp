@@ -48,6 +48,15 @@
 #include <dos.h> // For _argc & _argv
 #endif
 
+#if defined(__CYGWIN__)
+// Cygwin doesn't understand _argc or _argv, so we define them here.
+// These are borrowed from Mingw32 includes (see stdlib.h)
+// Cygwin Purists, forgive the corruption, Cygwin means Cygnus for Win32.
+extern int	_argc;
+extern char**	_argv;
+#endif
+
+
 HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
@@ -607,7 +616,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
   (void)hPrevInstance;
 
   return
-#ifdef COMP_BC
+#if defined(COMP_BC) || defined (__CYGWIN__)
     csMain ( _argc,  _argv);
 #else
     csMain (__argc, __argv);
