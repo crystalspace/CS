@@ -54,7 +54,7 @@ class csColor;
 #define CS_POLY_COLLDET	0x00000002
 
 
-SCF_VERSION (iPolygon3D, 0, 1, 12);
+SCF_VERSION (iPolygon3D, 0, 1, 13);
 
 /**
  * This is the interface to 3D polygons.
@@ -240,6 +240,11 @@ struct iPolygon3D : public iBase
    */
   virtual void UpdateVertexLighting (iLight* light, const csColor& lcol,
   	bool dynamic, bool reset) = 0;
+  /**
+   * Get a unique ID for this polygon. This is only unique relative
+   * to the polygon parent.
+   */
+  virtual unsigned long GetPolygonID () = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

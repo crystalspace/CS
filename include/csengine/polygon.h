@@ -1407,6 +1407,10 @@ public:
     {
       scfParent->UpdateVertexLighting (light, lcol, dynamic, reset);
     }
+    virtual unsigned long GetPolygonID ()
+    {
+      return scfParent->GetPolygonID ();
+    }
   } scfiPolygon3D;
   friend struct eiPolygon3D;
 };

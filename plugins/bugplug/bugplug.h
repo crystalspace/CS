@@ -37,6 +37,7 @@ struct iSector;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iCamera;
+struct iPolygon3D;
 
 class csMatrix3;
 class csVector3;
@@ -130,6 +131,7 @@ private:
   void Dump (iMeshWrapper* mesh);
   void Dump (iMeshFactoryWrapper* meshfact);
   void Dump (iCamera* c);
+  void Dump (iPolygon3D* p);
   void Dump (int indent, const csMatrix3& m, char const* name);
   void Dump (int indent, const csVector3& v, char const* name);
   void Dump (int indent, const csVector2& v, char const* name);

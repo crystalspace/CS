@@ -131,6 +131,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
 
   current_lod = 1;
   current_features = ALL_FEATURES;
+  thing_edges_valid = false;
 }
 
 csThing::~csThing ()
@@ -150,6 +151,29 @@ csThing::~csThing ()
     vinf->visobj->DecRef ();
     delete vinf;
   }
+  CleanupThingEdgeTable ();
+}
+
+void csThing::CleanupThingEdgeTable ()
+{
+  int i;
+  for (i = 0 ; i < thing_edges.Length () ; i++)
+  {
+    csThingEdge& te = thing_edges[i];
+    delete[] te.polygon_indices;
+  }
+  thing_edges.SetLength (0);
+  thing_edges_valid = false;
+}
+
+void csThing::ComputeThingEdgeTable ()
+{
+  if (thing_edges_valid) return;
+  CleanupThingEdgeTable ();
+
+
+
+  thing_edges_valid = true;
 }
 
 void csThing::SetMovingOption (int opt)
@@ -518,6 +542,7 @@ void csThing::AddPolygon (csPolygonInt* poly)
 {
   ((csPolygon3D *)poly)->SetParent (this);
   polygons.Push ((csPolygon3D *)poly);
+  thing_edges_valid = false;
 }
 
 csCurve* csThing::GetCurve (char* name)
@@ -2248,7 +2273,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
       	center, (void*)p, p->GetVertices ().GetVertexCount (), pl);
       // Polygons that are merged with the octree have world==obj space.
       for (j = 0 ; j < p->GetVertices ().GetVertexCount () ; j++)
-        frust->GetVertex (j).Set (p->Vobj (j)-center);
+        frust->GetVertex (j).Set (poly[j]);
       frust_cnt--;
       if (frust_cnt < 0)
       {

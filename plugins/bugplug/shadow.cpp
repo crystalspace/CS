@@ -118,14 +118,14 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   }
   if (do_beam)
   {
-	int beam_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
-	int isec_color = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
-	int isec2_color = G3D->GetTextureManager ()->FindRGB (255, 0, 0);
-	csVector3 st = tr_w2c * beam[0], fin = tr_w2c * beam[1], 
+    int beam_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
+    int isec_color = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+    int isec2_color = G3D->GetTextureManager ()->FindRGB (255, 0, 0);
+    csVector3 st = tr_w2c * beam[0], fin = tr_w2c * beam[1], 
 	  isc = tr_w2c * isec;
-	G3D->DrawLine( st, isc, fov, isec_color);
-	G3D->DrawLine( st, fin, fov, beam_color);
-	G3D->DrawLine( isc, fin, fov, isec2_color);
+    G3D->DrawLine (st, isc, fov, isec_color);
+    G3D->DrawLine (st, fin, fov, beam_color);
+    G3D->DrawLine (isc, fin, fov, isec2_color);
   }
   G3D->BeginDraw (CSDRAW_3DGRAPHICS);
   return true;

@@ -40,6 +40,7 @@
 #include "iutil/object.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
+#include "imesh/thing/polygon.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
@@ -270,18 +271,30 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 isect, end = origin + (vw - origin) * 60;
 
   sector->HitBeam (origin, end, isect);
-  iObject* sel = sector->HitBeam (origin, end, isect, NULL);
+  iPolygon3D* poly;
+  iObject* sel = sector->HitBeam (origin, end, isect, &poly);
+  const char* poly_name;
+  unsigned long poly_id;
+  if (poly)
+  {
+    poly_name = poly->QueryObject ()->GetName ();
+    poly_id = poly->GetPolygonID ();
+    Dump (poly);
+  }
+  else
+  {
+    poly_name = NULL;
+    poly_id = 0;
+  }
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
-#ifdef CS_DEBUG
   System->Printf (CS_MSG_CONSOLE,
-    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
-    v.x, v.y, v.z, vw.x, vw.y, vw.z);
+    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d\n",
+    v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
   System->Printf (CS_MSG_DEBUG_0,
-    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
-    v.x, v.y, v.z, vw.x, vw.y, vw.z);
-#endif
+    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d\n",
+    v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
 
   if (sel)
   {
@@ -306,7 +319,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
       shadow->GetShowOptions (bbox, rad, bm);
       shadow->SetShadowMesh (selected_mesh);
 
-	  shadow->SetBeam(origin, end, isect);
+      shadow->SetBeam (origin, end, isect);
       if (bbox || rad || bm)
 	shadow->AddToEngine (Engine);
       else
@@ -1112,7 +1125,8 @@ void csBugPlug::Dump (iCamera* c)
   if (!sn) sn = "?";
   csPlane3 far_plane;
   bool has_far_plane = c->GetFarPlane (far_plane);
-  System->Printf (CS_MSG_DEBUG_0, "Camera: %s (mirror=%d, fov=%d, fovangle=%g,\n",
+  System->Printf (CS_MSG_DEBUG_0,
+  	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,\n",
   	sn, c->IsMirrored (), c->GetFOV (), c->GetFOVAngle ());
   System->Printf (CS_MSG_DEBUG_0, "    shiftx=%g shifty=%g camnr=%d)\n",
   	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
@@ -1124,6 +1138,21 @@ void csBugPlug::Dump (iCamera* c)
   Dump (4, trans.GetO2T (), "Camera matrix");
 }
 
+void csBugPlug::Dump (iPolygon3D* poly)
+{
+  const char* poly_name = poly->QueryObject ()->GetName ();
+  if (!poly_name) poly_name = "<noname>";
+  unsigned long poly_id = poly->GetPolygonID ();
+  System->Printf (CS_MSG_DEBUG_0, "Polygon '%s' (id=%ld)\n",
+  	poly_name, poly_id);
+  int nv = poly->GetVertexCount ();
+  int i;
+  int* idx = poly->GetVertexIndices ();
+  System->Printf (CS_MSG_DEBUG_0, "  Vertices: ");
+  for (i = 0 ; i < nv ; i++)
+    System->Printf (CS_MSG_DEBUG_0, "%d ", idx[i]);
+  System->Printf (CS_MSG_DEBUG_0, "\n");
+}
 
 bool csBugPlug::HandleEvent (iEvent& event)
 {

@@ -79,6 +79,17 @@ struct csThingBBox
 };
 
 /**
+ * This struct represents a line along which polygons are attached.
+ * These polygons don't have to be adjacent but they usually are.
+ * A thing has a list of these edges.
+ */
+struct csThingEdge
+{
+  int num_polygons;
+  int* polygon_indices;
+};
+
+/**
  * A Thing is a set of polygons. A thing can be used for the
  * outside of a sector or else to augment the sector with
  * features that are difficult to describe with convex sectors alone.<p>
@@ -153,6 +164,11 @@ private:
    * RemovePortalPolygon() when appropriate.
    */
   csVector portal_polygons;
+
+  /// A vector with all edges in this thing.
+  DECLARE_GROWING_ARRAY (thing_edges, csThingEdge);
+  /// If false then thing_edges is not valid and needs to be recalculated.
+  bool thing_edges_valid;
 
   /// The array of curves forming the outside of the set
   csCurvesArray curves;
@@ -316,6 +332,12 @@ private:
 
   /// Internal draw function.
   bool DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode);
+
+  /// Cleanup the thing edge table.
+  void CleanupThingEdgeTable ();
+
+  /// Compute table of thing edges if needed.
+  void ComputeThingEdgeTable ();
 
 public:
   /**

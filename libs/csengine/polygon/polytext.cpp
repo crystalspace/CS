@@ -887,27 +887,62 @@ void csPolyTexture::FillLightMapNew (csFrustumView* lview)
     lptq->AddPolyTexture (this);
   }
 
+  // Our polygon in light space (i.e. frustum).
+  // Here we will actually go back to the original polygon so that
+  // our shadows will cover the entire polygon and not the sub-part (split
+  // polygon).
+  csVector3 poly[MAX_OUTPUT_VERTICES];
+  csPolygon3D* base_poly = polygon->GetBasePolygon ();
+  int num_vertices = base_poly->GetVertexCount ();
+  int j;
+  if (lview->GetFrustumContext ()->IsMirrored ())
+    for (j = 0 ; j < num_vertices ; j++)
+      poly[j] = base_poly->Vwor (num_vertices - j - 1) - lightpos;
+  else
+    for (j = 0 ; j < num_vertices ; j++)
+      poly[j] = base_poly->Vwor (j) - lightpos;
+
+  // Room for our shadow in lightmap space.
+  csVector2 s2d[MAX_OUTPUT_VERTICES];
+
   // Render all shadow polygons on the shadow-bitmap.
   csFrustumContext* ctxt = lview->GetFrustumContext ();
-  csVector2 s2d[MAX_OUTPUT_VERTICES];
   iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
   while (shadow_it->HasNext ())
   {
     csFrustum* shadow_frust = shadow_it->Next ();
+
+    //@@@ QUESTION!
+    //Why do we have to copy the polygon data to the shadow frustum?
+    //We have a pointer to the polygon in the shadow frustum. That should
+    //be enough. On the other hand, we have to be careful with space
+    //warping portals. In that case the list of shadow frustums is
+    //currently transformed and we cannot do that to the original polygon.
+
     // @@@ Optimization: Check for shadow_it->IsRelevant() here.
-    if (((csPolygon3D*)(shadow_it->GetUserData ())) != polygon)
+    if (((csPolygon3D*)(shadow_it->GetUserData ()))->GetBasePolygon ()
+    	!= base_poly)
     {
-      int nv = shadow_frust->GetVertexCount ();
-      if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
-      csVector3* s3d = shadow_frust->GetVertices ();
-      for (int j = 0; j < nv; j++)
+      // @@@ TODO: Optimize. Custom version of Intersect that is more
+      // optimial (doesn't require to copy 'poly') and detects cases
+      // that should not shadow.
+      csFrustum* new_shadow = shadow_frust->Intersect (poly, num_vertices);
+      if (new_shadow)
       {
-        csVector3 v = txt_pl->m_world2tex *
-          (s3d[j] + lightpos - txt_pl->v_world2tex);
-        s2d[j].x = (v.x * ww - Imin_u) * inv_lightcell_size + 0.5;
-        s2d[j].y = (v.y * hh - Imin_v) * inv_lightcell_size + 0.5;
+        int nv = new_shadow->GetVertexCount ();
+        if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
+        csVector3* s3d = new_shadow->GetVertices ();
+        for (int j = 0; j < nv; j++)
+        {
+	// @@@ TODO: Optimize. Combine the calculations below.
+          csVector3 v = txt_pl->m_world2tex *
+	  	(s3d[j] + lightpos - txt_pl->v_world2tex);
+          s2d[j].x = (v.x * ww - Imin_u) * inv_lightcell_size;
+          s2d[j].y = (v.y * hh - Imin_v) * inv_lightcell_size;
+        }
+	new_shadow->DecRef ();
+        shadow_bitmap->RenderShadow (s2d, nv);
       }
-      //@@@ Temporarily disabled: shadow_bitmap->RenderShadow (s2d, nv);
     }
   }
   shadow_it->DecRef ();
@@ -1312,6 +1347,25 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
   }
 
   //-------------------
+  // First calculate the minimum and maximum indices (for 'y').
+  //-------------------
+  csVector2* sp = shadow_poly;		// For conveniance.
+  int MaxIndex = -1, MinIndex = -1;
+  float miny = 100000000, maxy = -100000000;
+  float minx = 100000000, maxx = -100000000;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (sp[i].y < miny) miny = sp[MinIndex = i].y;
+    if (sp[i].y > maxy) maxy = sp[MaxIndex = i].y;
+    if (sp[i].x < minx) minx = sp[i].x;
+    if (sp[i].x > maxx) maxx = sp[i].x;
+  }
+
+  // The shadow does touch the shadow-bitmap.
+  if (maxy < 0 || miny > sb_h-1) return;
+  if (maxx < 0 || minx > sb_w-1) return;
+
+  //-------------------
   // If we don't already have a bitmap then we allocate it here.
   // @@@ NOTE: We currently allocate one byte for every shadow-point.
   // That's not optimal. We should use 1/8 byte for every shadow-point.
@@ -1320,18 +1374,6 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
   {
     bitmap = new char [sb_w * sb_h];
     memset (bitmap, 0, sb_w * sb_h);
-  }
-
-  //-------------------
-  // First calculate the minimum and maximum indices (for 'y').
-  //-------------------
-  csVector2* sp = shadow_poly;		// For conveniance.
-  int MaxIndex = -1, MinIndex = -1;
-  float miny = 100000000, maxy = -100000000;
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    if (sp[i].y < miny) miny = sp[MinIndex = i].y;
-    if (sp[i].y > maxy) maxy = sp[MaxIndex = i].y;
   }
 
   //-------------------
@@ -1344,7 +1386,7 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
 
   sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = MaxIndex;
-  sy = fyL = fyR = (QRound (ceil (sp[scanL2].y)) > sb_h-1)
+  sy = fyL = fyR = (QRound (ceil (sp[scanL2].y)) > (sb_h-1))
   	? sb_h-1 : QRound (ceil (sp[scanL2].y));
 
   for ( ; ; )
@@ -1428,9 +1470,12 @@ b:      if (scanL2 == MinIndex) return;
       if (xR < 0) xR = 0;
       if (xL > sb_w) xL = sb_w;
 
-      char* uv = &bitmap[sy * sb_w + xR];
-      char* uv_end = uv + (xL-xR);
-      while (uv < uv_end) *uv++ = 1;
+      if (xL > xR)
+      {
+        char* uv = &bitmap[sy * sb_w + xR];
+        char* uv_end = uv + (xL-xR);
+        while (uv < uv_end) *uv++ = 1;
+      }
 
       if (!sy) return;
       sxL += dxL;
@@ -1484,6 +1529,10 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
     int uv = i * lm_w;
     for (int j = 0 ; j < lm_w ; j++, uv++)
     {
+//@@@
+//if (i == j) lightmap[uv].red = 255;
+//if (i == lm_w-1-j) lightmap[uv].blue = 255;
+//@@@
       float lightness = GetLighting (j, i);
       if (lightness < EPSILON)
         continue;

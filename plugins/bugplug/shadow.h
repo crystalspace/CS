@@ -78,7 +78,7 @@ public:
   {
     do_bbox = bbox;
     do_rad = rad;
-	do_beam = beam;
+    do_beam = beam;
   }
 
   /**
@@ -88,14 +88,14 @@ public:
   {
     bbox = do_bbox;
     rad = do_rad;
-	beam = do_beam;
+    beam = do_beam;
   }
 
-  void SetBeam( csVector3& start, csVector3& finish, csVector3& intersect )
+  void SetBeam (csVector3& start, csVector3& finish, csVector3& intersect)
   {
-	beam[0] = start;
-	beam[1] = finish;
-	isec = intersect;
+    beam[0] = start;
+    beam[1] = finish;
+    isec = intersect;
   }
 
   SCF_DECLARE_IBASE;

@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+12-Jul-2001
+	- Added iPolygon3D::GetPolygonID ().
+	- Extended BugPlug to show the name and ID of the selected polygon.
+	  BugPlug will also dump some additional information to debug.txt.
+	- Worked further on the new lighting system. It starts to work
+	  mostly now but there is still a lot to do. Quality is less that
+	  optimal now and so is speed.
+	- Prepared some classes in csThing in order to be able to generate
+	  an edge table so that adjacent polygons can be easily detected.
+	  Unimplemented at the moment.
 11-Jul-2001
 	- Removed csLight::CorrectForNoColor() since it is obsolete.
 	- Added a virtual destructor to mdldata.h.
@@ -28,6 +38,34 @@ The history order is reversed so that new features are at the top.
 	  lighting process. It implements iFrustumViewUserdata.
 	- Continued work on the new lighter. Almost starts to work now but
 	  it still isn't enabled by default.
+	- Martin Geisse changed the following for 3d sprites:
+	    - Removed GetTexelCount() and GetNormalCount() for 3d sprite
+	      factories. As there is always the same number of vertices,
+	      normals and texels, GetVertexCount() should be used instead.
+	    - Made GetVertex(), GetNormal() and GetTexel() return 'const'
+	      references. To change these objects, corresponding Set*()
+	      functions have been added.
+	    - Removed the 'count' parameter from SetVertices(), SetNormal()
+	      and SetTexels(). These functions assumed that 'count' is always
+	      equal to the current number of vertices, therefore it was not
+	      needed as a parameter.
+	- Christopher Nelson did lots of little changes so that AWS works
+	  better in the "real world".
+	  AWS now assumes that it will be loaded as a plugin, and during
+	  initialization it finds and loads the default bundled preference
+	  manager.  The user no longer has to do this separately.  You can,
+	  however, replace that preference manager with a totally different
+	  one if you so desire.  
+	  A couple of tweaks, also added color definitions for standard UI
+	  items like highlights and shadows.
+	  The preference manager will automatically look those up for you and
+	  keep track of them so that components don't need to query the
+	  texture manager.  This also lets you make global UI color changes
+	  at any time.
+	  Colors are specified in skin definitions, and MUST BE PRESENT.
+	  Alternatively, the system may provide default values for missing
+	  color keys.
+	- Philip Wyett fixed some struct vs. class mismatches in AWS header.
 10-Jul-2001
 	- Michael Voasse did the following:
 	    - Next installment on terrfunc, this patch adds some bound
