@@ -143,7 +143,6 @@ csKDTree::csKDTree ()
   	-KDTREE_MAX, KDTREE_MAX,
 	KDTREE_MAX, KDTREE_MAX);
 
-  userobject = 0;
   estimate_total_objects = 0;
 }
 
@@ -156,8 +155,6 @@ csKDTree::~csKDTree ()
 
 void csKDTree::SetUserObject (iBase* userobj)
 {
-  if (userobj) userobj->IncRef ();
-  if (userobject) userobject->DecRef ();
   userobject = userobj;
 }
 

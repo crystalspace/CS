@@ -58,8 +58,26 @@ csImageMemory::csImageMemory (int width, int height, void *buffer, bool destroy,
   destroy_image = destroy;
 }
 
+void csImageMemory::FreeImage ()
+{
+  if (!destroy_image)
+  {
+    // Before the csImageFile destructor fires we first
+    // clear the 'Image' pointer so that it will not try to
+    // deallocate.
+    Image = 0;
+  }
+}
+
 csImageMemory::~csImageMemory ()
 {
+  if (!destroy_image)
+  {
+    // Before the csImageFile destructor fires we first
+    // clear the 'Image' pointer so that it will not try to
+    // deallocate.
+    Image = 0;
+  }
 }
 
 void csImageMemory::Clear (const csRGBpixel &colour)

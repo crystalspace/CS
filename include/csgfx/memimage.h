@@ -28,10 +28,15 @@
  */
 class csImageMemory : public csImageFile
 {
+private:
   /// If we are a blank image, we can take a short cut with rescaling
   bool short_cut;
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
+ 
+protected:
+  virtual void FreeImage ();
+
 public:
   /**
    * Create a blank image of these dimensions and the specified
