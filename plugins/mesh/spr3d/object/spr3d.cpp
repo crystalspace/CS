@@ -1525,10 +1525,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   int cf_idx = cframe->GetAnmIndex();
 
-  csVector3* real_obj_verts;
   csVector3* real_tween_verts = 0;
-
-  real_obj_verts = factory->GetVertices (cf_idx);
+  csVector3* real_obj_verts = factory->GetVertices (cf_idx);
   if (do_tween)
   {
     int nf_idx = next_frame->GetAnmIndex();
@@ -1642,7 +1640,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
 
 #ifndef CS_USE_NEW_RENDERER
-  vbuf_verts = verts;
+  vbuf_verts = real_obj_verts;
   vbuf_texels = real_uv_verts;
   vbuf_colors = vertex_colors;
   vbuf_num_vertices = num_verts_for_lod;
