@@ -51,6 +51,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine modified CS/docs/support/texi2html.init so that it can
 	  support multiple languages.  Added French translation of contained
 	  strings from Vincent Knecht <vince@iefr.ath.cx>.
+	- Eric Sunshine fixed the socket plugin so that it does not error-out
+	  when csSocketDriver::NewListener() is invoked for a non-reliable
+	  connection.  Problem was that it was invoking listen() which is
+	  illegal for datagram sockets.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...

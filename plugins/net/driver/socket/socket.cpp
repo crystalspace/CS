@@ -173,7 +173,8 @@ csNetworkSocket csSocketConnection::csSocket::GetSocket() const
 // csSocketListener -----------------------------------------------------------
 
 csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
-  unsigned short port, bool blockingListener, bool blockingConnection) :
+  unsigned short port, bool reliable, bool blockingListener,
+  bool blockingConnection) :
   csSocketEndPoint(s, blockingListener), BlockingConnection(blockingConnection)
 {
   SCF_CONSTRUCT_IBASE(p);
@@ -187,7 +188,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
   bool ok = false;
   if (bind(Socket, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     LastError = CS_NET_ERR_CANNOT_BIND;
-  else if (listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
+  else if (reliable && listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
     LastError = CS_NET_ERR_CANNOT_LISTEN;
   else
     ok = true;
@@ -349,8 +350,8 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   {
     csNetworkSocket s = CreateSocket(reliable);
     if (s != CS_NET_SOCKET_INVALID)
-      listener = new csSocketListener(this, s, port, blockingListener,
-        blockingConnection);
+      listener = new csSocketListener(this, s, port, reliable,
+        blockingListener, blockingConnection);
   }
   return csPtr<iNetworkListener> (listener);
 }
