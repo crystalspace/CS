@@ -60,8 +60,8 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   if (!path)
   {
     // no setting, use the default.
-    // is the current dir a possible install? try opening vfs.cfg,
-    if (!access ("vfs.cfg", F_OK))
+    // is the current dir a possible install? try opening scf.cfg,
+    if (!access ("scf.cfg", F_OK))
     {
       strncpy (oInstallPath, "", iBufferSize);
       return true;

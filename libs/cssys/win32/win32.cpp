@@ -773,7 +773,7 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   // override the default to get install path from
   // 1. CRYSTAL environment variable
   // 2. this machine's system registry
-  // 3. if current working directory contains 'vfs.cfg' use this dir.
+  // 3. if current working directory contains 'scf.cfg' use this dir.
   // 4. hard-wired default path
 
   //@@@ this function is called several times; maybe cache the found dir
@@ -826,7 +826,7 @@ bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   // perhaps current drive/dir? 
   if (1)
   {
-    FILE *test = fopen("vfs.cfg", "r");
+    FILE *test = fopen("scf.cfg", "r");
     if(test != NULL)
     {
       // usr current dir
