@@ -27,6 +27,11 @@
 
 #include "gl2d_font.h"
 
+/* MACOS driver do not currently support GL_ALPHA textures needed for
+ * shaped text, so for that platform we have a hack that gives blocky
+ * text.  This is superior to the other option which is NO text. -GJH 05-20-2000
+ */
+
 csGraphics2DOpenGLFontServer::GLFontInfo::~GLFontInfo ()
 {
   GLuint hTex= glyphs[0].hTexture + 1;
@@ -105,9 +110,15 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
 	// if this is not the first handle we create, we hand over the data to opengl
 	if (c)
 	{
+#ifdef OS_MACOS
+          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_LUMINANCE /* bytes-per-pixel */,
+                        basetexturewidth, basetextureheight, 0 /*border*/,
+                        GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
+#else
           glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
                         basetexturewidth, basetextureheight, 0 /*border*/,
                         GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
+#endif
 	  nCurrentTex++;
         }
         // set up the texture info
@@ -160,9 +171,15 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
     else c++;
   }
 
+#ifdef OS_MACOS
+  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_LUMINANCE /* bytes-per-pixel */,
+                basetexturewidth, basetextureheight, 0 /*border*/,
+                GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
+#else
   glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
                 basetexturewidth, basetextureheight, 0 /*border*/,
                 GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
+#endif
 
   delete [] nTexNames;
   delete [] fontbitmapdata;
@@ -177,7 +194,6 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
   // other required settings
   glEnable(GL_TEXTURE_2D);
   glShadeModel(GL_FLAT);
-  glEnable(GL_ALPHA_TEST);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   // the texture coordinates must point to the correct character
@@ -191,7 +207,10 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
   float x1 = 0.0, x2 = glyphs[characterindex].width;
   float y1 = 0.0, y2 = height;
 
+#ifndef OS_MACOS
+  glEnable(GL_ALPHA_TEST);
   glAlphaFunc (GL_EQUAL,1.0);
+#endif
 
   glBegin (GL_QUADS);
   glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
@@ -201,7 +220,9 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
   glEnd ();
 
   glTranslatef (x2,0.0,0.0);
+#ifndef OS_MACOS  
   glDisable(GL_ALPHA_TEST);
+#endif
 }
 
 /* The constructor initializes it member variables and constructs the
