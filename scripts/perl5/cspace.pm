@@ -5800,26 +5800,58 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iGeneralMeshState ##############
+############# Class : cspace::iGeneralMeshCommonState ##############
 
-package cspace::iGeneralMeshState;
+package cspace::iGeneralMeshCommonState;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*SetMaterialWrapper = *cspacec::iGeneralMeshState_SetMaterialWrapper;
-*GetMaterialWrapper = *cspacec::iGeneralMeshState_GetMaterialWrapper;
-*SetMixMode = *cspacec::iGeneralMeshState_SetMixMode;
-*GetMixMode = *cspacec::iGeneralMeshState_GetMixMode;
-*SetLighting = *cspacec::iGeneralMeshState_SetLighting;
-*IsLighting = *cspacec::iGeneralMeshState_IsLighting;
-*SetColor = *cspacec::iGeneralMeshState_SetColor;
-*GetColor = *cspacec::iGeneralMeshState_GetColor;
-*SetManualColors = *cspacec::iGeneralMeshState_SetManualColors;
-*IsManualColors = *cspacec::iGeneralMeshState_IsManualColors;
-*SetShadowCasting = *cspacec::iGeneralMeshState_SetShadowCasting;
-*IsShadowCasting = *cspacec::iGeneralMeshState_IsShadowCasting;
-*SetShadowReceiving = *cspacec::iGeneralMeshState_SetShadowReceiving;
-*IsShadowReceiving = *cspacec::iGeneralMeshState_IsShadowReceiving;
+*SetMaterialWrapper = *cspacec::iGeneralMeshCommonState_SetMaterialWrapper;
+*GetMaterialWrapper = *cspacec::iGeneralMeshCommonState_GetMaterialWrapper;
+*SetMixMode = *cspacec::iGeneralMeshCommonState_SetMixMode;
+*GetMixMode = *cspacec::iGeneralMeshCommonState_GetMixMode;
+*SetLighting = *cspacec::iGeneralMeshCommonState_SetLighting;
+*IsLighting = *cspacec::iGeneralMeshCommonState_IsLighting;
+*SetColor = *cspacec::iGeneralMeshCommonState_SetColor;
+*GetColor = *cspacec::iGeneralMeshCommonState_GetColor;
+*SetManualColors = *cspacec::iGeneralMeshCommonState_SetManualColors;
+*IsManualColors = *cspacec::iGeneralMeshCommonState_IsManualColors;
+*SetShadowCasting = *cspacec::iGeneralMeshCommonState_SetShadowCasting;
+*IsShadowCasting = *cspacec::iGeneralMeshCommonState_IsShadowCasting;
+*SetShadowReceiving = *cspacec::iGeneralMeshCommonState_SetShadowReceiving;
+*IsShadowReceiving = *cspacec::iGeneralMeshCommonState_IsShadowReceiving;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGeneralMeshCommonState($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGeneralMeshState ##############
+
+package cspace::iGeneralMeshState;
+@ISA = qw( cspace cspace::iGeneralMeshCommonState );
+%OWNER = ();
+%ITERATORS = ();
+*SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
+*GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5848,7 +5880,7 @@ sub ACQUIRE {
 ############# Class : cspace::iGeneralFactoryState ##############
 
 package cspace::iGeneralFactoryState;
-@ISA = qw( cspace cspace::iGeneralMeshState );
+@ISA = qw( cspace cspace::iGeneralMeshCommonState );
 %OWNER = ();
 %ITERATORS = ();
 *SetVertexCount = *cspacec::iGeneralFactoryState_SetVertexCount;
@@ -5859,9 +5891,10 @@ package cspace::iGeneralFactoryState;
 *CalculateNormals = *cspacec::iGeneralFactoryState_CalculateNormals;
 *GenerateBox = *cspacec::iGeneralFactoryState_GenerateBox;
 *SetBack2Front = *cspacec::iGeneralFactoryState_SetBack2Front;
+*IsAutoNormals = *cspacec::iGeneralFactoryState_IsAutoNormals;
 *IsBack2Front = *cspacec::iGeneralFactoryState_IsBack2Front;
-*SetAnimationControl = *cspacec::iGeneralFactoryState_SetAnimationControl;
-*GetAnimationControl = *cspacec::iGeneralFactoryState_GetAnimationControl;
+*SetAnimationControlFactory = *cspacec::iGeneralFactoryState_SetAnimationControlFactory;
+*GetAnimationControlFactory = *cspacec::iGeneralFactoryState_GetAnimationControlFactory;
 *AddRenderBuffer = *cspacec::iGeneralFactoryState_AddRenderBuffer;
 *SetRenderBufferComponent = *cspacec::iGeneralFactoryState_SetRenderBufferComponent;
 *SetRenderBuffer = *cspacec::iGeneralFactoryState_SetRenderBuffer;
@@ -5901,12 +5934,14 @@ package cspace::iGenMeshAnimationControl;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
+*AnimatesVertices = *cspacec::iGenMeshAnimationControl_AnimatesVertices;
+*AnimatesTexels = *cspacec::iGenMeshAnimationControl_AnimatesTexels;
+*AnimatesNormals = *cspacec::iGenMeshAnimationControl_AnimatesNormals;
+*AnimatesColors = *cspacec::iGenMeshAnimationControl_AnimatesColors;
 *UpdateVertices = *cspacec::iGenMeshAnimationControl_UpdateVertices;
 *UpdateTexels = *cspacec::iGenMeshAnimationControl_UpdateTexels;
 *UpdateNormals = *cspacec::iGenMeshAnimationControl_UpdateNormals;
 *UpdateColors = *cspacec::iGenMeshAnimationControl_UpdateColors;
-*Load = *cspacec::iGenMeshAnimationControl_Load;
-*Save = *cspacec::iGenMeshAnimationControl_Save;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5938,6 +5973,8 @@ package cspace::iGenMeshAnimationControlFactory;
 %OWNER = ();
 %ITERATORS = ();
 *CreateAnimationControl = *cspacec::iGenMeshAnimationControlFactory_CreateAnimationControl;
+*Load = *cspacec::iGenMeshAnimationControlFactory_Load;
+*Save = *cspacec::iGenMeshAnimationControlFactory_Save;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5945,6 +5982,37 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iGenMeshAnimationControlFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGenMeshAnimationControlType ##############
+
+package cspace::iGenMeshAnimationControlType;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*CreateAnimationControlFactory = *cspacec::iGenMeshAnimationControlType_CreateAnimationControlFactory;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGenMeshAnimationControlType($self);
         delete $OWNER{$self};
     }
 }
@@ -6421,6 +6489,13 @@ package cspace::iSpriteCal3DSocket;
 *GetSubmeshIndex = *cspacec::iSpriteCal3DSocket_GetSubmeshIndex;
 *SetMeshIndex = *cspacec::iSpriteCal3DSocket_SetMeshIndex;
 *GetMeshIndex = *cspacec::iSpriteCal3DSocket_GetMeshIndex;
+*SetTransform = *cspacec::iSpriteCal3DSocket_SetTransform;
+*GetTransform = *cspacec::iSpriteCal3DSocket_GetTransform;
+*GetSecondaryCount = *cspacec::iSpriteCal3DSocket_GetSecondaryCount;
+*GetSecondaryMesh = *cspacec::iSpriteCal3DSocket_GetSecondaryMesh;
+*GetSecondaryTransform = *cspacec::iSpriteCal3DSocket_GetSecondaryTransform;
+*AttachSecondary = *cspacec::iSpriteCal3DSocket_AttachSecondary;
+*DetachSecondary = *cspacec::iSpriteCal3DSocket_DetachSecondary;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10359,6 +10434,7 @@ package cspace::iShaderVariableContext;
 *AddVariable = *cspacec::iShaderVariableContext_AddVariable;
 *GetVariable = *cspacec::iShaderVariableContext_GetVariable;
 *GetVariableAdd = *cspacec::iShaderVariableContext_GetVariableAdd;
+*GetShaderVariables = *cspacec::iShaderVariableContext_GetShaderVariables;
 *PushVariables = *cspacec::iShaderVariableContext_PushVariables;
 *PopVariables = *cspacec::iShaderVariableContext_PopVariables;
 sub DESTROY {
@@ -10463,6 +10539,8 @@ package cspace::iShader;
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iShader_QueryObject;
+*GetFileName = *cspacec::iShader_GetFileName;
+*SetFileName = *cspacec::iShader_SetFileName;
 *GetNumberOfPasses = *cspacec::iShader_GetNumberOfPasses;
 *ActivatePass = *cspacec::iShader_ActivatePass;
 *SetupPass = *cspacec::iShader_SetupPass;
@@ -10924,6 +11002,7 @@ package cspace::iMaterial;
 %ITERATORS = ();
 *SetShader = *cspacec::iMaterial_SetShader;
 *GetShader = *cspacec::iMaterial_GetShader;
+*GetShaders = *cspacec::iMaterial_GetShaders;
 *GetTexture = *cspacec::iMaterial_GetTexture;
 *GetTextureLayerCount = *cspacec::iMaterial_GetTextureLayerCount;
 *GetTextureLayer = *cspacec::iMaterial_GetTextureLayer;
