@@ -123,7 +123,6 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
   compressed_vertex_name = strings->Request ("compressed vertices");
   texcors_name = strings->Request ("texture coordinates");
   compressed_texcors_name = strings->Request("compressed texture coordinates");
-  //texcoords_norm_name = strings->Request ("texture coordinates normalized");
   normal_name = strings->Request ("normals");
   compressed_normal_name = strings->Request ("compressed normals");
   tangent_name = strings->Request ("tangents");
@@ -220,8 +219,6 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
   const csVector3* normals = fullsample->SampleVector3 (normal_name);
   const csVector2* texcoords = fullsample->SampleVector2 (texcors_name);
 
-  //const csVector2 tcScale (hm_x, hm_y);
-
   int i, j;
   for (j = 0; j < hm_y; j ++)
   {
@@ -231,10 +228,7 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
 
       datamap[pos].pos = positions[pos];
       datamap[pos].norm = normals[pos];
-      const csVector2& tc = texcoords[pos];
-      //datamap[pos].tex.x = tc.x * tcScale.x;
-      //datamap[pos].tex.y = tc.y * tcScale.y;
-      datamap[pos].tex = tc;
+      datamap[pos].tex = texcoords[pos];
       datamap[pos].col = pos;
     }
   }
@@ -637,29 +631,6 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     return 0;
   }
-  /*else if (name == pFactory->texcoords_norm_name)
-  {
-    if (!texcoords_norm_buffer)
-    {
-      uint len = texcors.Length();
-      texcoords_norm_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csVector2) * len, CS_BUF_STATIC, 
-	CS_BUFCOMP_FLOAT, 2, false);
-
-      float inv_x = 1.0f / (float)pFactory->hm_x;
-      float inv_y = 1.0f / (float)pFactory->hm_y;
-
-      csRenderBufferLock<csVector2> normalizedTexCoords (
-	texcoords_norm_buffer);
-
-      for (uint i = 0; i < len; i++)
-      {
-	normalizedTexCoords.Get (i).Set (texcors[i].x * inv_x, 
-	  texcors[i].y * inv_y); 
-      }
-    }
-    return texcoords_norm_buffer;
-  }*/
   else if (name == pFactory->compressed_color_name)
   {
     return 0;

@@ -92,15 +92,10 @@
       #calculate vector from vertex to light in object-space
       MOV oLightDir, tangLight;
 
-      #RCP scale.x, texscale.x;
-      #RCP scale.y, texscale.y;
-      #SGE scale.z, scale.z, scale.z;
-      #SGE scale.w, scale.x, scale.x;
       # Pass normal map and diffuse map scaled by parameter
       MUL oNormal, texscale, iTex0;
       MUL oTex, texscale, iTex0;
 
-      # Pass in splatting scaled to not tile
       MOV oSplat, iTex0;
       
       ###
