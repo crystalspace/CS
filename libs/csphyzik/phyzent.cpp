@@ -23,7 +23,7 @@
 #include "csphyzik/mathutil.h"
 #include "csphyzik/solver.h"
 
-ctPhysicalEntity::ctPhysicalEntity() : RF( ctReferenceFrame::universe )
+ctPhysicalEntity::ctPhysicalEntity() : RF( ctReferenceFrame::universe() )
 {
 	RF.add_ref( RF );
 	solver = NULL;

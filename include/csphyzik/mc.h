@@ -1,2 +1,2 @@
 
-#define McUni ReferenceFrame::universe
+#define McUni ReferenceFrame::universe()

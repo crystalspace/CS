@@ -20,22 +20,22 @@
 
 #include "csphyzik/refframe.h"
 
-// inertial reference frame
-ctReferenceFrame ctReferenceFrame::universe( true );
-
 ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, angle ppitch, angle proll, angle pyaw, ctReferenceFrame *ref )
 {
 	reference_count = 0;
 	is_universe_frame = false;
-//	parent_frame = ref ? ref : &universe;
+//	parent_frame = ref ? ref : &universe();
 }
 
-// hacky hacky.  Used to instantiate the unverse( inertial ) frame of reference
-ctReferenceFrame::ctReferenceFrame( bool yup )
+ctReferenceFrame& ctReferenceFrame::universe()
 { 
-	reference_count = 0;
-	is_universe_frame = true; 
-
+	static ctReferenceFrame basis;
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		basis.is_universe_frame = true; 
+	}
+	return basis;
 } 
 
 

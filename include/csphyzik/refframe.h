@@ -34,11 +34,11 @@
 class ctReferenceFrame
 {
 public:
-	static ctReferenceFrame universe;
-
 	ctReferenceFrame( coord px = 0, coord py = 0, coord pz = 0, angle ppitch = 0, angle proll = 0, angle pyaw = 0, ctReferenceFrame *ref = NULL );
 
 	~ctReferenceFrame(){}
+
+	static ctReferenceFrame& universe();
 
 	static void add_ref( ctReferenceFrame &rf )
 	{ 
@@ -102,11 +102,6 @@ protected:
 	bool is_universe_frame; // true if this is the top-most reference frame
 //	bool is_T_world_calced; // true if T_world is currently valid
 //	ctReferenceFrame *parent_frame;
-
-private:
-	//!me a little hacky. constructs the singleton object world_reference_frame
-	ctReferenceFrame( bool );
-
 };
 
 #endif

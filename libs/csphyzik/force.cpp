@@ -22,7 +22,7 @@
 #include "csphyzik/refframe.h"
 #include "csphyzik/phyzent.h"
 
-ctForce::ctForce() : RF( ctReferenceFrame::universe )
+ctForce::ctForce() : RF( ctReferenceFrame::universe() )
 {
 	RF.add_ref( RF );
 	magnitude = 1.0;
