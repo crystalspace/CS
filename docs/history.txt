@@ -5,11 +5,193 @@ The history order is reversed so that new features are at the top.
 	  in number of vertices.
 	- Print out error message if a plane cannot be found
 	  (TEXTURE (PLANE (...)) statement.
+	- Martin Geisse reverted his latest change to scfreg.
+	- Norman Kramer did the following:
+	    - awscomp.cpp: mgr and hidden variable were not explicitly
+	      initialized, also the first condition in Setup was wrong
+	      (that was the reason that prevented showing the Splash window
+	      on systems where the variable are initialized to zero by
+	      default).
+	    - csloader.cpp: Meshreferences never made it into the engines
+	      meshlist, thus they were never freed.
+	    - Childs of an hierachic meshobject needed an incref after they
+	      were added to the containing childs list of children.
+	    - In ControlMeshes added same precaution for removing mesh from
+	      list as in DeleteAll.
+	    - Added RemoveMesh to csEngineMeshList which encloses the removal
+	      with and IncRef/DecRef, removed the enclosing of RemoveMesh
+	      with IncRef/DecRef from the remaining of engine.cpp.
+	    - walktest: Did some more work on refcounting.
+	    - walktest: Simplified some code.
+	    - walktest: In few cases changed from csBlah to iBlah.
+	    - Changed GetData() in dataobj.h so it does no longer IncRef's the
+	      found child.
+	- Philip Wyett did the following:
+	  Change and renaming of timing.cpp to timing32.cpp to avoid conflict
+	  with general/timing.cpp. First seen and reported by:
+	  turboj@gmx.de
+15-Sep-2001
+	- Martin Geisse fixed a problem with scfreg where it only entered the
+	  library file name to scf.cfg but not its path.
+	- Norman Kramer did the following:
+	    - Added GetDimensions() to csProcTexture.
+	    - Removed fire, water and plasma and replaced their use with the
+	      respective classes from cstool .
+	    - The remaining procedural textures are now derived from
+	      csProcTexture.
+	    - Cleaned up refcounting, the remaining unreleased references are
+	      due to an issue with mesh hierachies.
+	    - csdllist.cpp: SetCurrentItem did set the current item to NULL
+	      if the searched object was not found, this was bad, since
+	      subsequent call to AddCurrentItem and similars fail if
+	      currentItem is NULL. Now the methods sets it only if the item
+	      actually exists and returns its container, otherwise returns
+	      NULL.
+	    - csloader.cpp did not release the reporter.
+	    - The refcounting police is at it again (aws), there were also few
+	      other resources not released that are now hopefully cleanly
+	      destroyed.
+	    - Safer version of SetImageFile in texture.cpp.
+	- Philip Wyett fixed a bad delete from const char* to void* in pttex.h.
 14-Sep-2001
 	- Eric Sunshine eliminated a compilation warning in meshobj.cpp
 	  regarding unused variable.
 	- Eric Sunshine eliminated several copmilation warnings from 3dsco.cpp
 	  regarding implicit conversion of float to int.
+	- Philip Wyett did the following:
+	    - Added missing DM_BITSPERPEL.
+	    - Added use of 'SetForegroundWindow(m_hWnd);' Use of this
+	      function adds a higher priority to the thread which created this
+	      window, than is normally given to Window creation and brings
+	      it to the foreground.
+	- Norman Kramer did the following:
+	    - Found a case where texturehandle inside materialhandle was not
+	      decref'ed.
+13-Sep-2001
+	- Norman Kramer did the following:
+	    - Solved the double T problem in demosky (hitting 't' two times
+	      caused crashing). Problem was that althought not all animated
+	      textures were prepared yet, they were updated when syncing with
+	      current time.
+	    - Another batch of refcounting changes.
+	    - The revisited refcounting finally led to really destructing the
+	      low level classes like shadowmaps etc.. this revealed another
+	      problem with the staticarray, where in the destructor a pure
+	      virtual function was called.
+	    - Curve now implements the iVertexBufferManagerClient interface.
+	    - Changes to the destructor of csThing: the polygons need to be
+	      deleted prior to deleting the portal_polygons.
+	- Philip Wyett removed MSVC quick square root asm code as there's
+	  nothing quick about it, once the pragmas are removed and it works
+	  without error again.
+12-Sep-2001
+	- Norman Kramer did the following:
+	    - Fix to cswseng problem (before it worked for me 2 out of 3
+	      times, now it does 3 of 3 :)
+	    - Refcounting for imagehandles in software renderer was screwed.
+	    - Other refcounting errors.
+	    - Fixed bumptest and demosky.
+	- Martin Geisse made the following changes:
+	    - Added SetParentContainer() and WantToDie() to iMeshWrapper.
+	    - Changed the 'object' pointer in csMovable from iMeshWrapper to
+	      csMeshWrapper.
+	    - Cleaned up the movable code a bit.
+11-Sep-2001
+	- Norman Kramer did the following:
+	    - Added enclosing IncRef/DecRef pair when moving a sprite, so its
+	      not destructed by accident.
+	    - metasys.cpp: CS-ified and refcounting.
+	    - Ok, i can't watch those horrible pictures from NYC any longer,
+	      back to work .. refcounting.
+	    - Meshobjectfactory in engine.cpp was not decrefed upon loading.
+	    - A missing incref to spr3dldr.cpp in case the factorywrapper
+	      had an objectfactory attached already.
+	    - csdemo now releases all (?) references - well at least the
+	      visible ones.
+	    - isocell.cpp: a DecRef on removed sprites was missing.
+	- Jan Dvorak fixed some compilation warnings in lots of source files.
+	- Jan also fixed initialization of G3DTriangleMesh in perftest and
+	  thus segfault when using OpenGL renderer.
+10-Sep-2001
+	- Andrew Zabolotny fixed OS/2 port so that it can use more than 32Mb
+	  of memory. As it turned by default the EMX C library allows heap
+	  to grow just till 32Mb of RAM.  This fixes various random crashes
+	  even in levels of moderate sizes.
+	- Andrew added *.exe, *.zip, *.txt and some other patterns to ignore
+	  list.
+	- Norman Kramer did the following:
+	    - Applied Jan Dvorak's patch (for gcc3).
+	    - Jan Dvoraks macro patch for slightly moderater use of ##, this
+	      will make the gcc3 compiler (and 2.96-x afaik) more happy.
+	    - Removed *.cfg from ignore list.
+	    - Get and [] of csNamedObjectVector no longer increfing the
+	      objects (Pop still does).
+	    - csLoader::LoadTexture now has an additional DecRef on the
+	      texturehandle (since the csTextureWrapper keeps track of it).
+	    - All csEngine::CreateMeshFactory now return an IncRef'ed pointer
+	      to the factory wrapper (prior to this it only was incref'ed for
+	      newly created factorywrappers and not for factories that were
+	      found in the factorylist).
+	    - Bumptest now also terminates without leaving plugins unloaded.
+	    - Demosky joins the growing list of "good" programs not leaving
+	      unreleased instances (still something fishy with the seagull
+	      texture - I don't know why I have to IncRef() it).
+	    - CswsEng now nicely exits.
+	    - Refcounting revisited for the isometric engine.
+	    - Isotest joins the list of "good" programs.
+9-Sep-2001
+	- Norman Kramer did the following:
+	    - Added a fix submitted by Luca Pancallo:
+	      Fixed 3ds2lev. when we use -xzy or other conversion of coords, we
+	      must convert also triangle generation or the texture will be
+	      inside out. This is now fixed.
+	    - Added decRef after a child factory was added, the previous
+	      way to keep it increfed was wrong, since upon adding it to the
+	      child list it gets incref'ed automatically.
+	    - Modified simple2: added decref'ing of the created
+	      meshwrapper, now simple2 also cleanly unloads the 3d meshobject
+	      factory plugin.
+	    - The incref police is at it again. there is still one
+	      issue - it doesnt free the thingobjecttype.
+	    - Updated the docs to the recent incref related changes.
+	    - Added a new force to the physics library by Anders Stenberg
+	      (Dentoid).
+	    - The mother of all increfs has now been decref'ed (nobjvec.cpp).
+	    - Implemented iVertexBufferManagerClient for the other meshes that
+	      use the vertex buffer manager.
+	- Philip Wyett made the following changes to the CS project.
+	    - Added missing ';' at the end of on eof the lines. :-)
+	    - Changed class to match Terarin class rather than the
+	      Surf one where it was copy and pasted from.
+	- Justin Miller made some copied-and-pasted comments in several
+	  sources more relevant (snow.* fountain.h fire.h).
+8-Sep-2001
+	- Philip Wyett made the following change to the Crystal Space
+	  project:
+	    - Fixed an inconsistency between MingW port and others using GNU
+	      compilers. All other ports use GCC for CC and G++ for CXX. The
+	      MingW port was using GCC for both. Changed to use G++  for CXX
+	      rather than using GCC.
+	- Martin Geisse changed the type of the 'parent' pointer of mesh
+	  wrappers to (iMeshWrapper*). Meshes without a parent can store NULL
+	  instead.
+	- Norman Kramer added iVertexBufferManagerClient interface which
+	  should be implemneted by objects using the vertexbuffermanager.
+	  They will be called if the manger is closing, so the objects can
+	  request a new buffer next time.
+	- Implemented iVertexBufferManagerClient in spr3d as a testcase.
+	- Norman added implementation of RemoveClient() and AddClient()
+	  to the vertex buffer manager.
+7-Sep-2001
+	- Norman Kramer added DecRef() for lights that were added to sectors
+	  (the lightlist does an IncRef() to the lights).
+	- Norman added solution for meshes that are only held by the meshlist
+	  which causes trouble when destructing the meshlist (see in-code
+	  comment).
+	- Norman added DecRef for the iMeshWrapper returned from
+	  CreateSectorWallsMesh.
+	- Norman changed the classname for simple2 from
+	  crystalspace.application.simple1 to ...simple2.
 6-Sep-2001
 	- Fixed a bug in iLoader::LoadTexture(). This function would still
 	  return a texture wrapper even if no texture handle could be loaded.
@@ -20,6 +202,36 @@ The history order is reversed so that new features are at the top.
 	  a simple 3-line patch instead.  (In fact, when Eric designed the
 	  csInputDriver class, he had intended that these three lines be
 	  present, but simply forgot to type them.)
+	- Eric also reports:
+	  The reference count on csInputDriver::FocusListener's scfParent is
+	  now correct.  I had forgotten that the default behavior in scf.h
+	  had changed so that the parent's reference count is now only
+	  incremented when a child object is created; rather than each time
+	  the child's reference count increments (the old behavior).  Also now
+	  ensures that the parent's and child's reference counts are properly
+	  initialized before being registered as an event listener.
+	- Philip Wyett updated links to CS MingW package to correspond with
+	  new 0.60 version.
+	- Philip Wyett did the following:
+	    - Disabled profiling on by default in debug builds of CS plugins.
+	      Profiling should only be enabled when is actually needed.
+	    - Manually updated MSVC project files where applicable.
+	- Norman Kramer reports while modifying csinput.h:
+	  Moved the IBASE from the base class to the subclasses and made it an
+	  embedded ibase. The previous let one register an inputdriver as an
+	  eventhandler but the refcount was never incremented (because it was
+	  an ibase and not embedded ibase). Thus it led to a deleted
+	  inputdriver while the eventqueue still had the listeners
+	  registered (which caused the crash at exit since the eventqueue
+	  decrefs the listeners at destruction time). erm, did that explain
+	  anything?
+	- Norman added IncRef() of objects queried from the registry (returned
+	  objects from registry have to be incref'ed if you want to store the
+	  pointers).
+	- Norman added test to prevent the "Warning: extra call to ..."
+	  problem in stdrep.cpp.
+	- Martin Geisse fixed a minor problem that occurs when using an
+	  interface as the outer class for an embedded class.
 5-Sep-2001
 	- Eric Sunshine eliminated several compilation warnings from aseie.cpp.
 	- Eric Sunshine removed the obsolete igame/csgame.h.
