@@ -17,8 +17,8 @@ interface ITextureHandle : public IUnknown
   /// Set the transparent color.
   STDMETHOD (SetTransparent) (int red, int green, int blue);
 
-  /// Get the transparent index (-1 if no transparency, 0 if transparency).
-  STDMETHOD (GetTransparent) (int& retval);
+  /// Get the transparent index (false if no transparency, true if transparency).
+  STDMETHOD (GetTransparent) (bool& retval);
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
