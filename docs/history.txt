@@ -9,6 +9,10 @@ chronological order.
 6-Jul-2004
 	- Eric Sunshine fixed bug in jamtemplate/app.cpp.template where it
 	  asked SCF to scan CEL plugin path multiple times.
+	- Eric Sunshine made parsing of MAKEFLAGS in make emulation layer more
+	  robust. It should no longer be fooled by equates, such as
+	  "make FOOBAR=socks all", which previously would have caused it to
+	  think that the user specified -k and -s make options.
 5-Jul-2004
 	- Jorrit fixed the cs096 in csdemo.
 4-Jul-2004
