@@ -135,12 +135,6 @@ chronological order.
 	- Jorrit removed the cache_data from csPolyTexture and csLightMap
 	  (also for bezier). Also removed delayed_light_info structure
 	  since this has been unused for a long time.
-	- Eric Sunshine clarified documentation for csGetResourceDir(),
-	  iCommandLineParser::GetResourceDir(), and
-	  csCommandLineParser::GetResourceDir() so that the Cocoa application
-	  wrapper's "Resources" directory is mentioned explicitly.  Also
-	  clarified documentation for csGetAppDir() so that Cocoa application
-	  wrapper is mentioned explicitly.
 11-Oct-2003
 	- Jorrit added csPolygonRenderData structure. This structure is now
 	  used for communication between the thing mesh plugin and the
