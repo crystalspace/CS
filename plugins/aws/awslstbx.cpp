@@ -115,6 +115,7 @@ awsListBox::awsListBox () :
   actions.Register ("InsertItem", &InsertItem);
   actions.Register ("DeleteItem", &DeleteItem);
   actions.Register ("GetSelectedItem", &GetSelectedItem);
+  actions.Register ("GetItem", &GetItem);
   actions.Register ("ClearList", &ClearList);
 }
 
@@ -492,42 +493,55 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
 void awsListBox::GetSelectedItem (void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
+  parmlist.AddBool ("success", lb->GetItems (lb->sel, parmlist));
+}
 
-  if (lb->sel)
+void awsListBox::GetItem (void *owner, iAwsParmList &parmlist)
+{
+  awsListBox *lb = (awsListBox *)owner;
+  int row=-1;
+  if (parmlist.GetInt ("row", &row) && row >= -1 && row < lb->rows.Length ())
+    parmlist.AddBool ("success", lb->GetItems ((awsListRow*)lb->rows[row], parmlist));
+  else
+    parmlist.AddBool ("success", false);
+}
+
+bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
+{
+  bool succ = false;
+
+  if (row)
   {
     int i;
     char buf[50];
 
-    //bool state[lb->ncolumns];
-    bool *state = new bool[lb->ncolumns];
+    bool *state = new bool[ncolumns];
 
-    //iString *str[lb->ncolumns];
-    iString **str = new iString *[lb->ncolumns];
+    iString **str = new iString *[ncolumns];
 
-    //bool usedt[lb->ncolumns], useds[lb->ncolumns];
-    bool *usedt = new bool[lb->ncolumns];
-    bool *useds = new bool[lb->ncolumns];
+    bool *usedt = new bool[ncolumns];
+    bool *useds = new bool[ncolumns];
 
-    for (i = 0; i < lb->ncolumns; ++i)
+    for (i = 0; i < ncolumns; ++i)
     {
       usedt[i] = false;
       useds[i] = false;
     }
 
     // check if they want the text or state or what. then return those in the parmlist
-    for (i = 0; i < lb->ncolumns; ++i)
+    for (i = 0; i < ncolumns; ++i)
     {
       cs_snprintf (buf, 50, "text%d", i);
       if (parmlist.GetString (buf, &str[i]))
       {
-        str[i] = lb->sel->cols[i].text;
+        str[i] = row->cols[i].text;
         usedt[i] = true;
       }
 
       cs_snprintf (buf, 50, "state%d", i);
       if (parmlist.GetBool (buf, &state[i]))
       {
-        state[i] = lb->sel->cols[i].state;
+        state[i] = row->cols[i].state;
         useds[i] = true;
       }
     }
@@ -535,7 +549,7 @@ void awsListBox::GetSelectedItem (void *owner, iAwsParmList &parmlist)
     parmlist.Clear ();
 
     // return parmlist
-    for (i = 0; i < lb->ncolumns; ++i)
+    for (i = 0; i < ncolumns; ++i)
     {
       if (usedt[i])
       {
@@ -554,7 +568,9 @@ void awsListBox::GetSelectedItem (void *owner, iAwsParmList &parmlist)
     delete str;
     delete useds;
     delete usedt;
+    succ = true;
   }
+  return succ;
 }
 
 void awsListBox::ClearList (void *owner, iAwsParmList &)

@@ -232,8 +232,11 @@ private:
   /// Deletes an item
   static void DeleteItem (void *owner, iAwsParmList &parmlist);
 
-  /// Inserts an item
+  /// Get the selected item
   static void GetSelectedItem (void *owner, iAwsParmList &parmlist);
+
+  /// Get an item by row number
+  static void GetItem (void *owner, iAwsParmList &parmlist);
 
   /// Clears the entire list
   static void ClearList (void *owner, iAwsParmList &parmlist);
@@ -266,6 +269,9 @@ protected:
 
   /// Find out how depp this row is
   int GetRowDepth (awsListRow *row);
+
+  /// get requested items for this row
+  bool GetItems (awsListRow *row, iAwsParmList &parmlist);
 
   /// Find out if this row is the last child in it's parent's list
   bool IsLastChild (awsListRow *row);
