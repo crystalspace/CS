@@ -20,6 +20,7 @@ chronological order.
 	  'typename' keyword, but it is meant to be used only to pacify modern
 	  compilers which complain about ambiguous type names within templates;
 	  not for declaration of template arguments.
+        - Philip Wyett updated OR to eliminate garray.h deprecation warnings.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.

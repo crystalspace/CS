@@ -53,7 +53,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/graph2d.h"
 #include "igraphic/imageio.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
@@ -6587,4 +6587,3 @@ bool csGraphics3DOGLCommon::DebugCommand (const char* cmdstr)
   }
   return false;
 }
-

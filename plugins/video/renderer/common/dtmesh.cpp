@@ -24,7 +24,7 @@
 #include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "csqint.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/cscolor.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"

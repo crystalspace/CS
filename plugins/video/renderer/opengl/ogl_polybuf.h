@@ -22,7 +22,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/matrix3.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
 #include "ivideo/graph3d.h"
@@ -202,4 +202,3 @@ public:
 };
 
 #endif // __CS_OGL_POLYBUF_H__
-

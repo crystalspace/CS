@@ -20,7 +20,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
@@ -286,4 +286,3 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     piG3D->DrawPolygon (poly);
   }
 }
-
