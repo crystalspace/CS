@@ -168,7 +168,7 @@ private:
     
     void UpdateBufferSV ();
   } *root;
-  friend MeshTreeNode;//??
+  friend class MeshTreeNode;
 
   void ComputeError (int i, int j, int di, int dj, int n, int w);
 
