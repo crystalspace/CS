@@ -35,6 +35,7 @@ csPortal::csPortal ()
   filter_g = 1;
   filter_b = 1;
   static_dest = false;
+  sector = NULL;
 }
 
 void csPortal::ObjectToWorld (const csReversibleTransform& t)
@@ -83,7 +84,8 @@ void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror)
   if (do_mirror) mirror = !mirror;
 }
 
-bool csPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loose_end, csRenderView& rview)
+bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
+	csRenderView& rview)
 {
   if (sector->draw_busy >= 5)
     return false;
@@ -97,9 +99,14 @@ bool csPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loo
 
   csRenderView new_rview = rview;
   new_rview.view = &new_view;
-
-  new_rview.clip_plane = *portal_plane;
+  new_rview.portal_polygon = portal_polygon;
+  new_rview.clip_plane = portal_polygon->GetPlane ()->GetCameraPlane();
   new_rview.clip_plane.Invert ();
+  // @@@ We could use a better check for loose_end here.
+  // Maybe this needs to be a parameter which can be given in the
+  // world file?
+  bool loose_end = ((csPolygonParentInt*)portal_polygon->GetSector ()) !=
+  	portal_polygon->GetParent ();
   if (loose_end || sector->IsBSP ()) new_rview.do_clip_plane = true;
 
   if (do_warp_space)
@@ -114,17 +121,17 @@ bool csPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loo
   return true;
 }
 
-csPolygon3D* csPortalCS::HitBeam (csVector3& start, csVector3& end)
+csPolygon3D* csPortal::HitBeam (csVector3& start, csVector3& end)
 {
   return sector->HitBeam (start, end);
 }
 
-csPolygon3D* csPortalCS::IntersectSphere (csVector3& center, float radius, float* pr)
+csPolygon3D* csPortal::IntersectSphere (csVector3& center, float radius, float* pr)
 {
   return sector->IntersectSphere (center, radius, pr);
 }
 
-csSector* csPortalCS::FollowSegment (csReversibleTransform& t,
+csSector* csPortal::FollowSegment (csReversibleTransform& t,
 				  csVector3& new_position, bool& mirror)
 {
   if (do_warp_space)
@@ -135,7 +142,7 @@ csSector* csPortalCS::FollowSegment (csReversibleTransform& t,
   return sector ? sector->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
 }
 
-void csPortalCS::CalculateLighting (csLightView& lview)
+void csPortal::CalculateLighting (csLightView& lview)
 {
   if (sector->draw_busy > csSector::cfg_reflections) return;
 

@@ -27,6 +27,7 @@ class Sparse3D;
 class WideSparse3D;
 class csSector;
 class csTextureHandle;
+class csPolygon3D;
 
 /**
  * Data for every room in the infinite maze.
@@ -81,7 +82,7 @@ public:
  * Special subclass of PortalCS which knows how to handle
  * portal for which the destination has not been defined yet.
  */
-class InfPortalCS : public csPortalCS
+class InfPortalCS : public csPortal
 {
 public:
   class LV
@@ -93,8 +94,8 @@ public:
   LV* lviews;
   int x1, y1, z1;
   int x2, y2, z2;
-  InfPortalCS () : csPortalCS () { lviews = NULL; }
-  virtual bool Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loose_end, csRenderView& rview);
+  InfPortalCS () : csPortal () { lviews = NULL; }
+  virtual bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview);
   virtual void CalculateLighting (csLightView& lview);
 };
 

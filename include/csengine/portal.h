@@ -28,19 +28,16 @@ class csPolygon3D;
 class csStatLight;
 interface ITextureHandle;
 
-/// All supported types of portals.
-#define PORTAL_CS 1
-
 /**
  * This class represents a portal. It belongs to some polygon
  * which is then considered a portal to another sector.
- * This is a generic ADT. Specific implementations should
- * override this class so that they can provide implementation
- * for 'draw'. The default PortalCS implements a portal to
- * a Crystal Space sector.
  */
 class csPortal
 {
+private:
+  /// The sector that this portal points to.
+  csSector* sector;
+
 protected:
   /**
    * 0 is no alpha, 25 is 25% see through and
@@ -94,6 +91,16 @@ public:
 
   /// Destructor.
   virtual ~csPortal () { }
+
+  /**
+   * Return the sector that this portal points too.
+   */
+  csSector* GetSector () { return sector; }
+
+  /**
+   * Set the sector that this portal points too.
+   */
+  void SetSector (csSector* s) { sector = s; }
 
   /**
    * Transform the warp matrix from object space to world space.
@@ -152,11 +159,6 @@ public:
   void SetAlpha (int a) { cfg_alpha = a; }
 
   /**
-   * Return the type of this portal (one of PORTAL_...)
-   */
-  virtual int PortalType () = 0;
-
-  /**
    * Warp space using the given world->camera transformation.
    * This function modifies the given camera transformation to reflect
    * the warping change.<p>
@@ -176,13 +178,9 @@ public:
    *
    * 'new_clipper' is the new 2D polygon to which all things drawn
    * should be clipped.<br>
-   * 'portal_plane' is the camera space plane of the portal polygon.<br>
-   * 'loose_end' is true if the portal arrives in the middle of a sector. This
-   * can only happen if the portal arrives in a BSP sector or if the portal is
-   * part of a Thing. In case the destination sector is a BSP this will be
-   * detected automatically by this function and you don't need to set 'loose_end'
-   * for that.<br>
-   * 'rview' is the current csRenderView (it will be modified with 'new_clipper'.<p>
+   * 'portal_polygon' is the polygon containing this portal. This routine
+   * will use the camera space plane of the portal polygon.<br>
+   * 'rview' is the current csRenderView.<p>
    *
    * Return true if succesful, false otherwise.
    * Failure to draw through a portal does not need to
@@ -190,25 +188,22 @@ public:
    * reached (like the maximum number of times a certain sector
    * can be drawn through a mirror).
    */
-  virtual bool Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loose_end, csRenderView& rview) = 0;
+  virtual bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
+  	csRenderView& rview);
 
   /**
    * Follow a beam through this portal and return the polygon
-   * that it hits with. NOTE@@@! This function assumes that all
-   * engines use csPolygon3D which is probably not a safe assumption.
-   * We need to take care of this somehow.
+   * that it hits with.
    * NOTE@@@! This function does not take proper care of space warping!
    */
-  virtual csPolygon3D* HitBeam (csVector3& start, csVector3& end) = 0;
+  virtual csPolygon3D* HitBeam (csVector3& start, csVector3& end);
 
   /**
    * Intersects world-space sphere through this sector. Return closest
    * polygon that is hit (or NULL) and the intersection point. If 'pr' !=
    * NULL it will also return the distance where the intersection happened.
-   * NOTE@@@! This function assumes that all engines use csPolygon3D which
-   * is not good.
    */
-  virtual csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL) = 0;
+  virtual csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL);
 
   /**
    * Follow a segment through this portal and modify the given
@@ -217,68 +212,16 @@ public:
    * should be used as the new camera transformation when you
    * decide to use it.<p>
    *
-   * This function returns the destination. NOTE@@@! Currently it
-   * assumes that this destination is always a csSector. This is not true.
+   * This function returns the destination.
    */
   virtual csSector* FollowSegment (csReversibleTransform& t,
-                                  csVector3& new_position, bool& mirror) = 0;
-
-  /**
-   * Update lighting of all polygons reachable through this portal.
-   */
-  virtual void CalculateLighting (csLightView& lview) = 0;
-};
-
-/**
- * This class implements a portal to a Crystal Space csSector.
- */
-class csPortalCS : public csPortal
-{
-private:
-  /// The sector that this portal points to.
-  csSector* sector;
-
-public:
-  /**
-   * Return the sector that this portal points too.
-   */
-  csSector* GetSector () { return sector; }
-
-  /**
-   * Set the sector that this portal points too.
-   */
-  void SetSector (csSector* s) { sector = s; }
-
-  /**
-   * Type of this portal.
-   */
-  int PortalType () { return PORTAL_CS; }
-
-  /**
-   * Draw the sector through this portal.
-   */
-  virtual bool Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loose_end, csRenderView& rview);
-
-  /**
-   * Follow a beam through this portal.
-   */
-  virtual csPolygon3D* HitBeam (csVector3& start, csVector3& end);
-
-  /**
-   * Intersect a sphere through this portal.
-   */
-  virtual csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL);
-
-  /**
-   * Follow a segment through this portal.
-   */
-  virtual csSector* FollowSegment (csReversibleTransform& t, 
                                   csVector3& new_position, bool& mirror);
 
   /**
-   * Update lighting of all polygons visible through this portal.
+   * Update lighting of all polygons reachable through this portal.
    */
   virtual void CalculateLighting (csLightView& lview);
 };
 
 #endif /*PORTAL_H*/
+

@@ -229,7 +229,7 @@ void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
   }
 }
 
-bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loose_end, csRenderView& rview)
+bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview)
 {
   if (!GetSector ())
   {
@@ -257,7 +257,7 @@ bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool lo
 
     }
   }
-  return csPortalCS::Draw (new_clipper, portal_plane, loose_end, rview);
+  return csPortal::Draw (new_clipper, portal_polygon, rview);
 }
 
 void InfPortalCS::CalculateLighting (csLightView& lview)
@@ -278,7 +278,7 @@ void InfPortalCS::CalculateLighting (csLightView& lview)
   }
   else
   {
-    csPortalCS::CalculateLighting (lview);
+    csPortal::CalculateLighting (lview);
   }
 }
 
