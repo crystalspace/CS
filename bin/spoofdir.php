@@ -46,17 +46,17 @@
 //
 // This script should be accompanied by an .htaccess file in the same
 // directory.  Here is an example .htaccess file which defines two virtual
-// directories; 'docs' and 'download':
+// directories; 'docs' and 'faq':
 //
 //    Options FollowSymLinks
 //    RewriteEngine on
-//    RewriteRule "^(docs|download)(/)?$"  "/spoofdir.php?/$1$2"  [L]
-//    RewriteRule "^(docs|download)/(.+)$" "/spoofdir.php?/$1/$2" [L]
+//    RewriteRule "^(docs|faq)(/)?$"  "/spoofdir.php?spoofpath=/$1$2"  [L,QSA]
+//    RewriteRule "^(docs|faq)/(.+)$" "/spoofdir.php?spoofpath=/$1/$2" [L,QSA]
 //
 // In this example, the first rule catches requests for the directory itself
-// (either 'docs' or 'download'), with or without the trailing '/'.  The
-// second rule catches requests for any file within either of the virtual
-// directories and passes the requests on to this script.
+// (either 'docs' or 'faq'), with or without the trailing '/'.  The second rule
+// catches requests for any file within either of the virtual directories and
+// passes the requests on to this script.
 //
 // When the script is invoked, it takes the input virtual path argument and
 // tries to locate a matching physical path by searching through a list of
@@ -104,7 +104,7 @@
 //-----------------------------------------------------------------------------
 
 $prog_name = 'spoofdir.php';
-$prog_version = '4';
+$prog_version = '5';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 
@@ -243,6 +243,7 @@ $indexfile['^index.php[1-9]?$'] = 1; // index.php, index.php3, index.php4
 //-----------------------------------------------------------------------------
 // Private Configuration
 //-----------------------------------------------------------------------------
+$send_php_file = '';
 if (file_exists($globalconfig))
     include($globalconfig);
 if (count($dirlist) == 0)
@@ -399,9 +400,10 @@ function redirect($uri)
 //
 // NOTE: Unfortunately, PHP files must be handled specially.  A simple
 // re-direct will not execute the file.  Instead, the PHP file is loaded into
-// the currently running script via include().  This is a poor solution since
-// the script might cause name clashes, among other problems.  A better
-// solution is needed.
+// the currently running script via include() at the end of the script.  This
+// allows the script to access all global variables, as though it had been run
+// directly.  (We can not include the PHP file from within this function, since
+// global variables are not accessible here.)
 //-----------------------------------------------------------------------------
 function send_file($path)
 {
@@ -422,10 +424,9 @@ function send_file($path)
     }
     else
     {
-	chdir(dirname($path));
-	include(basename($path));
+	global $send_php_file;
+	$send_php_file = $path;
     }
-    exit();
 }
 
 //-----------------------------------------------------------------------------
@@ -533,7 +534,8 @@ function list_directory($display_name, $path)
 	if (is_indexfile($entry))
 	{
 	    closedir($handle);
-	    send_file("$path/$entry"); // Never returns
+	    send_file("$path/$entry");
+	    return;
 	}
 	elseif ($entry != '..' && $entry != '.' && !is_ignored($entry))
 	{
@@ -593,8 +595,23 @@ function dispatch_uri($uri)
 //-----------------------------------------------------------------------------
 // Main: Dispatch the input URI.
 //-----------------------------------------------------------------------------
-$uri = $argv[0];
+$uri = $spoofpath;
 if (strlen($uri) == 0)
     $uri = $REQUEST_URI;
 dispatch_uri($uri);
+
+//-----------------------------------------------------------------------------
+// Unfortunately, PHP files must be handled specially.  A simple re-direct will
+// not execute the file.  Instead, if send_file() was asked to send a PHP file,
+// it sets the $send_php_file variable, and the file is loaded via include() at
+// this point.  This allows the script to access all global variables, as
+// though it had been run directly.  (We can not include the PHP file from
+// within send_file(), since global variables are not accessible there.)
+//-----------------------------------------------------------------------------
+if (strlen($send_php_file) != 0)
+{
+    $PHP_SELF = basename($send_php_file);
+    chdir(dirname($send_php_file));
+    include(basename($send_php_file));
+}
 ?>
