@@ -23,13 +23,6 @@
 
 #include "cstypes.h"
 
-#ifndef ABS
-#define ABS(x) ((x)<0?-(x):(x))
-#endif
-
-#undef SMALL_EPSILON
-#define SMALL_EPSILON 0.000000001			/* Very small value */
-
 class CdVector3;
 class CdMatrix3;
 
