@@ -29,7 +29,7 @@
 #
 
 use strict;
-use HTML::Entities;
+use HTMLEntities;
 
 #
 # the index needs some special treatment
