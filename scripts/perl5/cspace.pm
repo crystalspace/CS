@@ -7613,6 +7613,7 @@ package cspace::iCacheManager;
 *CacheData = *cspacec::iCacheManager_CacheData;
 *ReadCache = *cspacec::iCacheManager_ReadCache;
 *ClearCache = *cspacec::iCacheManager_ClearCache;
+*Flush = *cspacec::iCacheManager_Flush;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9431,6 +9432,7 @@ package cspace::iGraphics2D;
 *GetPalette = *cspacec::iGraphics2D_GetPalette;
 *SetRGB = *cspacec::iGraphics2D_SetRGB;
 *FindRGB = *cspacec::iGraphics2D_FindRGB;
+*GetRGB = *cspacec::iGraphics2D_GetRGB;
 *SetClipRect = *cspacec::iGraphics2D_SetClipRect;
 *GetClipRect = *cspacec::iGraphics2D_GetClipRect;
 *BeginDraw = *cspacec::iGraphics2D_BeginDraw;
