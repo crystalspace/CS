@@ -2378,6 +2378,8 @@ class csInitializer(_object):
     if _newclass:CreateVirtualClock = staticmethod(_cspace.csInitializer_CreateVirtualClock)
     __swig_getmethods__["CreateCommandLineParser"] = lambda x: _cspace.csInitializer_CreateCommandLineParser
     if _newclass:CreateCommandLineParser = staticmethod(_cspace.csInitializer_CreateCommandLineParser)
+    __swig_getmethods__["CreateVerbosityManager"] = lambda x: _cspace.csInitializer_CreateVerbosityManager
+    if _newclass:CreateVerbosityManager = staticmethod(_cspace.csInitializer_CreateVerbosityManager)
     __swig_getmethods__["CreateConfigManager"] = lambda x: _cspace.csInitializer_CreateConfigManager
     if _newclass:CreateConfigManager = staticmethod(_cspace.csInitializer_CreateConfigManager)
     __swig_getmethods__["CreateInputDrivers"] = lambda x: _cspace.csInitializer_CreateInputDrivers
@@ -2426,6 +2428,8 @@ csInitializer_CreateEventQueue = _cspace.csInitializer_CreateEventQueue
 csInitializer_CreateVirtualClock = _cspace.csInitializer_CreateVirtualClock
 
 csInitializer_CreateCommandLineParser = _cspace.csInitializer_CreateCommandLineParser
+
+csInitializer_CreateVerbosityManager = _cspace.csInitializer_CreateVerbosityManager
 
 csInitializer_CreateConfigManager = _cspace.csInitializer_CreateConfigManager
 
