@@ -49,13 +49,29 @@ protected:
 public:
   /// Create the iterator
   csObjIterator (const csIdType &iType, const csObject &iObject);
-  /// Check if we have any children of requested type
-  bool IsNull () const
-  { return Container == NULL; }
+
+  /// Reuse the iterator for an other search
+  void Reset(const csIdType &iType, const csObject &iObject);
   /// Get the object we are pointing at
-  csObject& operator* () const;
+  csObject* GetObj() const;
   /// Move forward
-  csObjIterator& operator++ ();
+  void Next();
+  /// Check if we have any children of requested type
+  bool IsFinished () const { return Container == NULL; }
+  /**
+    * traverses all csObjects and looks for an object with the given name
+    * returns true, if found, false if not found. You can then get the
+    * object by calling GetObj, and can continue search by calling Next and
+    * then do an other FindName, if you like.
+    */
+  bool FindName(const char* name);
+
+  /// Check if we have any children of requested type
+  bool IsNull () const {return IsFinished();}
+  /// Get the object we are pointing at
+  csObject& operator* () const {return *GetObj();}
+  /// Move forward
+  csObjIterator& operator++ () {Next(); return *this;}
 };
 
 #endif // __OBJITER_H__

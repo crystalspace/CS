@@ -146,20 +146,26 @@ void csObject::ObjRemove (csObject *obj)
 
 csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObject)
 {
+  Reset(iType, iObject);
+}
+
+void csObjIterator::Reset(const csIdType &iType, const csObject &iObject)
+{
   Type = &iType;
   Container = iObject.children;
   Index = -1;
-  ++(*this);
+  Next();
 }
 
-csObject& csObjIterator::operator* () const
+csObject* csObjIterator::GetObj() const
 {
-  return *(Container ? Container->obj [Index] : (csObject *)NULL);
+  return Container ? Container->obj [Index] : NULL;
 }
 
-csObjIterator& csObjIterator::operator++ ()
+void csObjIterator::Next()
 {
   if (Container)
+  {
     do
     {
       Index++;
@@ -169,7 +175,17 @@ csObjIterator& csObjIterator::operator++ ()
         break;
       }
     } while (&Container->obj [Index]->GetType () != Type);
-  return (*this);
+  }
+}
+
+bool csObjIterator::FindName(const char* name)
+{
+  while (!IsFinished())
+  {
+    if (strcmp(GetObj()->GetName(), name)==0) return true;
+    Next();
+  }
+  return false;
 }
 
 //-------------------- miscelaneous simple classes derived from csObject -----//
