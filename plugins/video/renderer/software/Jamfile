@@ -1,6 +1,6 @@
 SubDir TOP plugins video renderer software ;
 
-Help soft3d : "Crystal Space software 3D renderer" ;
+Description soft3d : "software 3D renderer" ;
 
 if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" && ! [ Property build : projgen ]
 {

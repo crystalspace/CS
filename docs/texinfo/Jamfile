@@ -4,7 +4,7 @@ if $(CMD.MAKEINFO)
 {
   Texi2Info manualinfo : cs-unix.txi : info : info manual ;
   FLAGS.MAKEINFO on manualinfo += --output=crystal.info ;
-  Help manualinfo : "user manual in Info format" ;
+  Help manualinfo : "Convert user manual to Info format" ;
 }
   
 if $(CMD.TEXI2HTML)
@@ -12,25 +12,25 @@ if $(CMD.TEXI2HTML)
   TEXI2HTML.INIT = [ ConcatDirs $(TOP) docs support texi2html.init ] ;
   FLAGS.TEXI2HTML on manualhtml += -init_file=$(TEXI2HTML.INIT) -prefix=cs ;
   Texi2HTML manualhtml : cs-unix.txi : html manual ;
-  Help manualhtml : "user manual in HTML format" ;
+  Help manualhtml : "Convert user manual to HTML format" ;
 }
 
 if $(CMD.TEXI2DVI)
 {
   Texi2DVI manualdvi : cs-unix.txi : dvi manual ;
-  Help manualdvi : "user manual in DVI format" ;
+  Help manualdvi : "Convert user manual to DVI format" ;
 }
 
 if $(CMD.TEXI2DVI) && $(CMD.DVIPS)
 {
   Texi2PS manualps : cs-unix.txi : ps manual ;
-  Help manualps : "user manual in PS format" ;
+  Help manualps : "Convert user manual to PostScript format" ;
 }
 
 if $(CMD.TEXI2DVI) && $(CMD.DVIPDF)
 {
   Texi2PDF manualpdf : cs-unix.txi : pdf manual ;
-  Help manualpdf : "user manual in PDF format" ;
+  Help manualpdf : "Convert user manual to PDF format" ;
 }
 
 if $(PERL)
@@ -51,5 +51,5 @@ if $(PERL)
   }
 
   RepairNodes repairdoc : cs-unix.txi : $(SUBDIR) ;
-  Help repairdoc : "Repair Texinfo @node and @menu directives" : verbatim ;
+  Help repairdoc : "Repair Texinfo @node and @menu directives" ;
 }

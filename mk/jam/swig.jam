@@ -114,7 +114,7 @@ if $(CMD.SWIG)
     Depends $(tag)swig : $(target) ;
     NotFile $(tag)swig ;
     Always $(tag)swig ;
-    Help $(tag)swig : "Generate Swig files for $(tag)" : verbatim ;
+    Help $(tag)swig : "Generate Swig files for $(tag)" ;
 
     Clean $(tag)swigclean : $(target) $(othertargets) ;
     Depends clean : $(tag)swigclean ;
@@ -137,8 +137,7 @@ if $(CMD.SWIG)
       }
 
       NotFile $(tag)freeze ;
-      Help $(tag)freeze : "Copy generated Swig files to source directory" :
-        verbatim ;
+      Help $(tag)freeze : "Copy generated Swig files to source directory" ;
     }
   }
   

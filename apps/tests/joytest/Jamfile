@@ -1,5 +1,5 @@
 SubDir TOP apps tests joytest ;
 
-Help joytest : "Joystick Test" ;
+Description joytest : "Joystick Test" ;
 Application joytest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith joytest : csgeom csgfx cstool csutil ;

@@ -33,3 +33,5 @@ actions piecemeal together existing CleanDir
 {
   $(DELTREE) $(>)
 }
+
+Help clean : "Remove all built targets from project" ;

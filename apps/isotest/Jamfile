@@ -1,5 +1,5 @@
 SubDir TOP apps isotest ;
 
-Help isotest : "Crystal Space isotest demo executable" ;
+Description isotest : "isotest demo executable" ;
 Application isotest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith isotest : csgeom csgfx cstool csutil ;

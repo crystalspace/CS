@@ -1,6 +1,6 @@
 SubDir TOP libs csws ;
 
-Help csws : "Crystal Space Windowing System library" ;
+Description csws : "Windowing System library" ;
 Library csws :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs skins default ] : *.cpp *.h ]

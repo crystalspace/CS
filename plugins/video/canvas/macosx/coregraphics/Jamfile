@@ -2,7 +2,7 @@ SubDir TOP plugins video canvas macosx coregraphics ;
 
 if $(TARGET.OS) = "MACOS_X"
 {
-Help cgdriver2d : "Crystal Space MacOS/X CoreGraphics 2D driver" ;
+Description cgdriver2d : "MacOS/X CoreGraphics 2D driver" ;
 Plugin cgdriver2d : [ Wildcard *.cpp *.m *.h ] ;
 LinkWith cgdriver2d : canvascommon osxcanvascommon csutil ;
 CompileGroups cgdriver2d : drivers2d softcanvas ;

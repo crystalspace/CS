@@ -33,10 +33,11 @@ GRISTMETA ?= pluginmeta ;
 ##	noinstall: Don't setup a default installation target.
 ##	independent: The target will not be made a dependency of the plugins
 ##		     and all target.
+##	nohelp: Do not invoke Help for this target.
 rule Plugin
 {
   # check options
-  CheckOptions noinstall independent : $(3) : $(<) ;
+  CheckOptions noinstall independent nohelp : $(3) : $(<) ;
 
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
@@ -61,7 +62,7 @@ rule Plugin
   if ! $(NO_STATIC_LINKING)
   {
     SubVariant static ;
-    Library $(<)_static : $(>) : $(3) independent noinstall ;
+    Library $(<)_static : $(>) : $(3) independent noinstall nohelp ;
     CFlags $(<)_static : [ FDefines CS_STATIC_LINKED ] ;
     LFlags $(<)_static : $(LINKLIBS) ;
     SubVariant ;
@@ -92,6 +93,13 @@ rule Plugin
 
   CFlags $(<) : $(PLUGIN.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+
+  if ! [ IsElem nohelp : $(3) ]
+  {
+    local desc = [ Description $(<) ] ;
+    if ! $(desc) { desc = "$(<) plugin" ; }
+    Help $(<) : "Build the $(desc)" ;
+  }
 }
 
 #----------------------------------------------------------------------------
@@ -119,4 +127,4 @@ rule PluginMetaData
 # Construct pseudo target plugins
 Depends exe : plugins ;
 NotFile plugins ;
-Help plugins : "plugin modules" ;
+Help plugins : "Build all plugin modules" ;

@@ -1,5 +1,5 @@
 SubDir TOP apps tutorial simpmap ;
 
-Help simpmap : "Crystal Space tutorial part three, map loading" ;
+Description simpmap : "tutorial part three, map loading" ;
 Application simpmap : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith simpmap : csgeom csgfx cstool csutil ;

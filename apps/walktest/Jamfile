@@ -1,6 +1,6 @@
 SubDir TOP apps walktest ;
 
-Help walktest : "Crystal Space WalkTest demo" ;
+Description walktest : "WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : csgeom csgfx cstool csutil ;
 Win32Resource walktest : [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;
@@ -53,7 +53,7 @@ CompileGroups walktest : nrall ;
 
 if ! [ Property build : projgen ]
 {
-Help walktest_static : "Crystal Space WalkTest demo (static build)" ;
+Description walktest_static : "WalkTest demo (static build)" ;
 
 SubVariant static ;
 Application walktest_static : [ Wildcard *.cpp *.h ] : independent noinstall ;

@@ -1,6 +1,6 @@
 SubDir TOP apps import milk2spr ;
 
-Help milk2spr : "Milkshape ASCII Model conversion tool" ;
+Description milk2spr : "Milkshape ASCII Model conversion tool" ;
 
 Application milk2spr
 	: [ Wildcard *.cpp *.h ]

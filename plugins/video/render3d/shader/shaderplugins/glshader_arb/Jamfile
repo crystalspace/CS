@@ -2,7 +2,7 @@ SubDir TOP plugins video render3d shader shaderplugins glshader_arb ;
 
 if $(GL.AVAILABLE) = "yes"
 {
-Help glshader_arb : "Crystal Space Render3d Shaderplugin for ARB vp/fp" ;
+Description glshader_arb : "Render3d Shaderplugin for ARB vp/fp" ;
 Plugin glshader_arb : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_arb : shaderplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_arb : GL ;

@@ -189,9 +189,8 @@ rule MakeVersionRc
   if ! $(v4) { v4 = 0 ; }
   PACKAGE_VERSION_LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
       
-  local desc ;
-  if $($(>)_help) { desc = $($(>)_help) ; }
-  else { desc = "$(>)" ; }
+  local desc = [ Description $(>) ] ;
+  if ! $(desc) { desc = "$(>)" ; }
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
 
   local name ;

@@ -276,7 +276,7 @@ actions CopyImages
 
 CleanDir cleandoc : $(LOCATE.DOCS) ;
 Depends clean : cleandoc ;
-Help cleandoc : "Remove built documentation files" : verbatim ;
+Help cleandoc : "Remove built documentation files" ;
 
 Always docclean ;
 NotFile docclean ;

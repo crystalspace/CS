@@ -1,6 +1,6 @@
 SubDir TOP apps tools viewmesh ;
 
-Help viewmesh : "Crystal Space mesh viewing utility" ;
+Description viewmesh : "mesh viewing utility" ;
 
 Application viewmesh
 	: [ Wildcard *.cpp *.h ]

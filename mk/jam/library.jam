@@ -29,10 +29,16 @@
 ##    you don't want an install target generated.
 ##    Don't specify any extensions for the library name, also leave out the
 ##    leading "lib".
+##    Options:
+##	noinstall: Do not set up a default installation target.
+##	independent: The target will not be made a dependency of the libs and
+##		     all targets.
+##	shared: Create as a shared library on supported platforms.
+##	nohelp: Do not invoke Help for this target.
 rule Library
 {
   # check options
-  CheckOptions noinstall independent shared : $(3) : $(<) ;
+  CheckOptions noinstall independent shared nohelp : $(3) : $(<) ;
 
   local target = [ ConstructLibraryTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
@@ -133,6 +139,13 @@ rule Library
   
   CFlags $(<) : $(LIBRARY.CFLAGS) ;
   LFlags $(<) : $(LIBRARY.LFLAGS) ;
+
+  if ! [ IsElem nohelp : $(3) ]
+  {
+    local desc = [ Description $(<) ] ;
+    if ! $(desc) { desc = "$(<) library" ; }
+    Help $(<) : "Build the $(desc)" ;
+  }
 }
 
 ##  LibDepends libname : dependant libraries
@@ -158,4 +171,4 @@ actions together Ranlib
 # in Jambase
 Depends lib : libs ;
 NotFile libs ;
-Help libs : "link libraries" ;
+Help libs : "Build all link libraries" ;

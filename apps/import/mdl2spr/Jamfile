@@ -1,6 +1,6 @@
 SubDir TOP apps import mdl2spr ;
 
-Help mdl2spr : "Quake model MDL/MD2 conversion tool" ;
+Description mdl2spr : "Quake model MDL/MD2 conversion tool" ;
 
 Application mdl2spr
 	: [ Wildcard *.cpp *.h ]

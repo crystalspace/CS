@@ -1,6 +1,6 @@
 SubDir TOP libs cstool ;
 
-Help cstool : "Crystal Space tool Library" ;
+Description cstool : "tool library" ;
 Library cstool :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include cstool ] : *.h ] ;

@@ -1,5 +1,5 @@
 SubDir TOP apps cswstest ;
 
-Help cswstest : "Crystal Space Windowing System test" ;
+Description cswstest : "Windowing System test" ;
 Application cswstest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith cswstest : csgeom csgfx cstool csutil csws ;

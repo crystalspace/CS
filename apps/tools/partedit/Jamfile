@@ -1,6 +1,6 @@
 SubDir TOP apps tools partedit ;
 
-Help partedit : "Crystal Space particle system editor" ;
+Description partedit : "particle system editor" ;
 
 Application partedit
 	: [ Wildcard *.cpp *.h ]

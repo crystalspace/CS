@@ -1,6 +1,6 @@
 SubDir TOP apps tools levtool ;
 
-Help levtool : "Crystal Space Level Tool" ;
+Description levtool : "Level Tool" ;
 
 Application levtool
 	: [ Wildcard *.cpp *.h ]

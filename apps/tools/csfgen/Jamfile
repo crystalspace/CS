@@ -1,6 +1,6 @@
 SubDir TOP apps tools csfgen ;
 
-Help csfgen : "TrueType to Crystal Space font converter" ;
+Description csfgen : "TrueType to Crystal Space font converter" ;
 
 Application csfgen
 	: [ Wildcard *.cpp *.h ]

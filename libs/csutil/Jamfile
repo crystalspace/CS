@@ -1,6 +1,6 @@
 SubDir TOP libs csutil ;
 
-Help csutil : "Crystal Space utility library" ;
+Description csutil : "utility library" ;
 
 CSSYS_SRC = ;
 

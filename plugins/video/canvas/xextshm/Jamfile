@@ -2,7 +2,7 @@ SubDir TOP plugins video canvas xextshm ;
 
 if $(X11.AVAILABLE) = "yes"
 {
-Help xextshm : "Crystal Space X-Extension Shared Memory Plugin" ;
+Description xextshm : "X-Extension Shared Memory Plugin" ;
 Plugin xextshm : [ Wildcard *.cpp *.h ] ;
 LinkWith xextshm : csgeom csutil ;
 ExternalLibs xextshm : X11 ;

@@ -1,5 +1,5 @@
 SubDir TOP apps tutorial simpcd ;
 
-Help simpcd : "Crystal Space CD tutorial" ;
+Description simpcd : "collision detection tutorial" ;
 Application simpcd : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith simpcd : csgeom csgfx cstool csutil ;

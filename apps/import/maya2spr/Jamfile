@@ -1,6 +1,6 @@
 SubDir TOP apps import maya2spr ;
 
-Help maya2spr : "Maya to CS Sprite convertor" ;
+Description maya2spr : "Maya to CS Sprite convertor" ;
 
 Application maya2spr
 	: [ Wildcard *.cpp *.h ]

@@ -1,5 +1,5 @@
 SubDir TOP apps tutorial tbtut ;
 
-Help tbtut : "Crystal Space Terrbig Tutorial" ;
+Description tbtut : "Terrbig Tutorial" ;
 Application tbtut : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith tbtut : csgeom csgfx cstool csutil ;

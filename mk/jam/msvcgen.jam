@@ -133,12 +133,12 @@ rule MsvcGenTarget
   MSVC_VERSION on msvc$(<)gen = $(<) ;
   MsvcGen msvc$(<)gen ;
   Depends msvcgen : msvc$(<)gen ;
-  Help msvc$(<)gen : "Create MSVC$(<) project files" : verbatim ;
+  Help msvc$(<)gen : "Create MSVC$(<) project files" ;
   MSVCGEN_TARGETS += msvc$(<)gen ;
   CleanDir msvc$(<)clean :
     [ msvcgen_target_dir $(<) ] [ msvcgen_fragment_dir $(<) ] ;
   Depends msvcclean : msvc$(<)clean ;
-  Help msvc$(<)clean : "Remove built MSVC$(<) project files" : verbatim ;
+  Help msvc$(<)clean : "Remove built MSVC$(<) project files" ;
 }
 
 actions MsvcGen
@@ -153,10 +153,10 @@ MsvcGenTarget 7 ;
 
 Always msvcgen ;
 NotFile msvcgen ;
-Help msvcgen : "Create MSVC project files (all versions)" : verbatim ;
+Help msvcgen : "Create MSVC project files (all versions)" ;
 
 CleanDir msvcclean : [ msvcgen_build_dir ] ;
-Help msvcclean : "Remove built MSVC project files (all versions)" : verbatim ;
+Help msvcclean : "Remove built MSVC project files (all versions)" ;
 Depends clean : msvcclean ;
 
 }

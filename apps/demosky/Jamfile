@@ -1,5 +1,5 @@
 SubDir TOP apps demosky ;
 
-Help demosky : "Crystal Space sky demo" ;
+Description demosky : "sky demo" ;
 Application demosky : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith demosky : csgeom csgfx cstool csutil ;

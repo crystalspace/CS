@@ -2,7 +2,7 @@ SubDir TOP plugins video render3d opengl ;
 
 if $(GL.AVAILABLE) = "yes"
 {
-Help glrender3d : "Crystal Space Render3d OpenGL driver" ;
+Description glrender3d : "Render3d OpenGL driver" ;
 Plugin glrender3d : [ Wildcard *.cpp *.h ] ;
 LinkWith glrender3d : render3dcommon csgeom csgfx csutil cstool ;
 ExternalLibs glrender3d : GL ;

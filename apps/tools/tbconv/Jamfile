@@ -1,6 +1,6 @@
 SubDir TOP apps tools tbconv ;
 
-Help tbconvert : "Crystal Space Big Terrain Conversion Tool" ;
+Description tbconvert : "Big Terrain Conversion Tool" ;
 
 Application tbconvert
 	: [ Wildcard *.cpp *.h ]

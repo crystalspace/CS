@@ -1,6 +1,6 @@
 SubDir TOP plugins video render3d null ;
 
-Help nullrender3d : "Render3D null driver" ;
+Description nullrender3d : "Render3D null driver" ;
 
 Plugin nullrender3d
 	: [ Wildcard *.cpp *.h ]

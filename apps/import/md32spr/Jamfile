@@ -1,6 +1,6 @@
 SubDir TOP apps import md32spr ;
 
-Help md32spr : "Quake MD3 conversion tool" ;
+Description md32spr : "Quake MD3 conversion tool" ;
 
 Application md32spr
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP apps isomap ;
 
-Help isomap : "Crystal Space isomap demo executable" ;
+Description isomap : "isomap demo executable" ;
 
 Application isomap
 	: [ Wildcard *.cpp *.h ]

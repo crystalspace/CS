@@ -2,7 +2,7 @@ SubDir TOP plugins video canvas softx ;
 
 if $(X11.AVAILABLE) = "yes"
 {
-Help x2d : "Crystal Space XLib 2D driver" ;
+Description x2d : "XLib 2D driver" ;
 Plugin x2d : [ Wildcard *.cpp *.h ] ;
 LinkWith x2d : canvascommon csgeom csutil ;
 ExternalLibs x2d : X11 ;

@@ -171,7 +171,7 @@ Depends install : $(INSTALLTARGETS) ;
 if ! $(PACKAGE_INSTALL_NAME) { PACKAGE_INSTALL_NAME = $(PACKAGE_LONGNAME) ; }
 if ! $(PACKAGE_INSTALL_NAME) { PACKAGE_INSTALL_NAME = $(PACKAGE_NAME) ; }
 if ! $(PACKAGE_INSTALL_NAME) { PACKAGE_INSTALL_NAME = "the project" ; }
-Help install : "Install $(PACKAGE_INSTALL_NAME)" : verbatim ;
+Help install : "Install $(PACKAGE_INSTALL_NAME)" ;
 
 actions Install1
 {

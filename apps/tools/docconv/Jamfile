@@ -1,6 +1,6 @@
 SubDir TOP apps tools docconv ;
 
-Help docconv : "Crystal Space Document Converter" ;
+Description docconv : "Document Converter" ;
 
 Application docconv
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP apps perftest ;
 
-Help perftest : "Crystal Space graphics performance tester" ;
+Description perftest : "graphics performance tester" ;
 
 Application perftest
 	: [ Wildcard *.cpp *.h ]

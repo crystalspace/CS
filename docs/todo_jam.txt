@@ -13,17 +13,6 @@ W - Wishlist (the build also works without this feature)
 [M] Add a Jamfile for cscript/csjava.
 [M] Figure out how to create MSVC project files for the pure Python and pure
     Perl extension modules.
-[M] Introduce a new rule named Description and change all invocations of the
-    Help rule (except the ones using the "verbatim" option) to invocations of
-    the Description rule throughout the project.  Next, remove the "verbatim"
-    option from the Help rule and make the Help rule _always_ treat its
-    argument as verbatim. Also eliminate the anomaly where Help is hard-coded
-    to prepend "Build the" to the incoming text.  Then, augment the
-    Application, Library, Plugin, and ShellScript rules to invoke Help
-    automatically with the text "Build the $(description)".  Finally, augment
-    msvcgen.jam and win32.jam to utilize the target's decription string (as
-    collected by the Description rule) rather than the help string (which is
-    not necessarily appropriate as a module's description).
 [M] Write complete documentation about the Jam build system for the CS user
     manual.
 [M] msvcgen.jam: Eliminate dependency upon external scripts for creation of the
@@ -83,6 +72,17 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] Introduce a new rule named Description and change all invocations of the
+    Help rule (except the ones using the "verbatim" option) to invocations of
+    the Description rule throughout the project.  Next, remove the "verbatim"
+    option from the Help rule and make the Help rule to _always_ treat its
+    argument as verbatim. Also eliminate the anomaly where Help is hard-coded
+    to prepend "Build the" to the incoming text.  Then, augment the
+    Application, Library, Plugin, and ShellScript rules to invoke Help
+    automatically with the text "Build the $(description)".  Finally, augment
+    msvcgen.jam and win32.jam to utilize the target's decription string (as
+    collected by the Description rule) rather than the help string (which is
+    not necessarily appropriate as a module's description).
 [*] There are no rules for building the pure Python module yet (only the Python
     plugin works).
 [*] Doxygen rule causes warning of the sort on modern Unix platforms:

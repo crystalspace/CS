@@ -1,6 +1,6 @@
 SubDir TOP apps tools vsh ;
 
-Help vsh : "Crystal Space Virtual Shell tool" ;
+Description vsh : "Virtual Shell tool" ;
 
 Application vsh
 	: [ Wildcard *.cpp *.h ]

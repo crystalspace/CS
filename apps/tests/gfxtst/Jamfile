@@ -1,5 +1,5 @@
 SubDir TOP apps tests gfxtst ;
 
-Help gfxtest : "Crystal Space image manipulator" ;
+Description gfxtest : "image manipulator" ;
 Application gfxtest : [ Wildcard *.cpp *.h ] : console noinstall ;
 LinkWith gfxtest : csgeom csgfx cstool csutil ;

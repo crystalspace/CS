@@ -1,6 +1,6 @@
 SubDir TOP libs csappframe ;
 
-Help csappframe : "Crystal Space application framework" ;
+Description csappframe : "application framework" ;
 Library csappframe :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csappframe ] : *.h ] ;

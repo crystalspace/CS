@@ -2,7 +2,7 @@ SubDir TOP plugins video canvas openglx ;
 
 if $(GLX.AVAILABLE) = "yes"
 {
-Help glx2d : "Crystal Space GL/X 2D driver" ;
+Description glx2d : "GL/X 2D driver" ;
 Plugin glx2d : [ Wildcard *.cpp *.h ] ;
 LinkWith glx2d : openglcommon canvascommon csgeom csutil ;
 ExternalLibs glx2d : GLX ;

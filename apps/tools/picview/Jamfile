@@ -1,5 +1,5 @@
 SubDir TOP apps tools picview ;
 
-Help picview : "Crystal Space Picture Viewer" ;
+Description picview : "Picture Viewer" ;
 Application picview : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith picview : csgeom csgfx cstool csutil csws ;

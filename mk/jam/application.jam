@@ -35,13 +35,14 @@ if "$(EXEMODE)" = "711" { EXEMODE = "+x" ; }
 ##    will do that on win32.
 ##    Options:
 ##	console: Create a console application
-##	noinstall: Don't setup a default installation target.
+##	noinstall: Do not set up a default installation targets.
 ##	independent: The target will not be made a dependency of the apps and
 ##		     all target.
+##	nohelp: Do not invoke Help for this target.
 rule Application
 {
   # check options
-  CheckOptions noinstall console independent : $(3) : $(<) ;
+  CheckOptions noinstall console independent nohelp : $(3) : $(<) ;
 
   local target = [ ConstructApplicationTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
@@ -87,16 +88,24 @@ rule Application
 
   CFlags $(<) : $(APPLICATION.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;      
+
+  if ! [ IsElem nohelp : $(3) ]
+  {
+    local desc = [ Description $(<) ] ;
+    if ! $(desc) { desc = "$(<) application" ; }
+    Help $(<) : "Build the $(desc)" ;
+  }
 }
 
 ##  ShellScript scriptname : rule [ : options ]
 ##    Build a shell script by invoking `rule', the script creation rule, which
 ##    is passed `scriptname' and `options'.
 ##    Options:
-##	noinstall: Don't setup a default installation target.
+##	noinstall: Do not set up a default installation target.
+##	nohelp: Do not invoke Help for this target.
 rule ShellScript
 {
-  CheckOptions noinstall : $(3) : $(<) ;
+  CheckOptions noinstall nohelp : $(3) : $(<) ;
 
   Always $(<)clean ;
   NotFile $(<)clean ;
@@ -115,6 +124,13 @@ rule ShellScript
   MODE on $(<) = $(EXEMODE) ;
   SUBDIR on $(<) = $(SUBDIR) ;
   Chmod $(<) ;
+
+  if ! [ IsElem nohelp : $(3) ]
+  {
+    local desc = [ Description $(<) ] ;
+    if ! $(desc) { desc = "$(<) script" ; }
+    Help $(<) : "Build the $(desc)" ;
+  }
 }
 
 #----------------------------------------------------------------------------
@@ -124,4 +140,4 @@ rule ShellScript
 # in Jambase
 Depends exe : apps ;
 NotFile apps ;
-Help apps : "applications" ;
+Help apps : "Build all applications" ;

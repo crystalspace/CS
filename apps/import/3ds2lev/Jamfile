@@ -2,7 +2,7 @@ SubDir TOP apps import 3ds2lev ;
 
 if $(3DS.AVAILABLE) = "yes" 
 {
-Help 3ds2lev : "3DS to Crystal Space map converter" ;
+Description 3ds2lev : "3DS to Crystal Space map converter" ;
 
 Application 3ds2lev
 	: [ Wildcard *.cpp *.h ]

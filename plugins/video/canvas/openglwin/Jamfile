@@ -2,7 +2,7 @@ SubDir TOP plugins video canvas openglwin ;
 
 if $(GL.AVAILABLE) = "yes" && $(TARGET.OS) = "WIN32"
 {
-Help glwin32 : "Crystal Space GL/Win32 2D driver" ;
+Description glwin32 : "GL/Win32 2D driver" ;
 Plugin glwin32 : [ Wildcard *.cpp *.h ] ;
 LinkWith glwin32 : openglcommon canvascommon csgeom csutil ;
 ExternalLibs glwin32 : GL ;

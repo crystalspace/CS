@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas null2d ;
 
-Help null2d : "Crystal Space null 2D driver" ;
+Description null2d : "null 2D driver" ;
 
 Plugin null2d
 	: [ Wildcard *.cpp *.h ]

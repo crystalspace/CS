@@ -2,7 +2,7 @@ SubDir TOP plugins video render3d shader shaderplugins glshader_fixed ;
 
 if $(GL.AVAILABLE) = "yes"
 {
-Help glshader_fixed : "Render3d Shaderplugin for fixed function pipeline" ;
+Description glshader_fixed : "Render3d Shaderplugin for fixed function pipeline" ;
 Plugin glshader_fixed : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_fixed : shaderplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_fixed : GL ;

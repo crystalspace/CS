@@ -48,4 +48,14 @@ rule RegisterCompileGroups
 {
   NotFile $(<) ;
   COMPILE_GROUPS += $(<) ;
+
+  local i ;
+  for i in $(<)
+  {
+    local desc = [ Description $(i) ] ;
+    if $(desc)
+    {
+      Help $(i) : "Build the $(desc)" ;
+    }
+  }
 }

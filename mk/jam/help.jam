@@ -1,6 +1,7 @@
 #============================================================================
-# Rules for displaying help messages about targets
+# Rules for collecting and emitting descriptions about targets
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
+# Copyright (C)2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -18,34 +19,53 @@
 #
 #============================================================================
 
-##  Help target : description [ : options ]
-##    Adds a description to a target which will be shown to the user when
-##    "jam help" is invoked.  If the `verbatim' option is specified, then
-##    `description' will be emitted verbatim; otherwise, the string "Build the"
-##    will be prepended to `description'.
-##    Options:
-##      verbatim: Do not pre-prend "Build the" to `description'.
+##  Description target [ : description ]
+##    Provides access to the description of 'target'. The description may be
+##    used by other rules, such as those which generate project files, or which
+##    present informative messages to the user regarding 'target'. If invoked
+##    with two arguments, then it sets the description of 'target'. If invoked
+##    with one argument, then it returns the description of 'target'. You
+##    should invoke this rule to set the description before invoking other
+##    rules which might need access to target's description, such as the
+##    Application, Library, and Plugin rules. As a convenience, several generic
+##    rules, such as Application, Library, and Plugin will automatically invoke
+##    the Help rule for 'target' using the provided 'description'.
+rule Description
+{
+  local desc = $(>) ;
+  if $(desc)
+  {
+    $(<)_description = $(desc) ;
+  }
+  else
+  {
+    desc = $($(<)_description) ;
+  }
+  return $(desc) ;
+}
+
+
+##  Help target : description
+##    Specify the 'description' to emit for 'target' when the user invokes "jam
+##    help".
 rule Help
 {
-  CheckOptions verbatim : $(3) : $(<) ;
-  $(<)_help = $(>) ; # Squirrel-away for use by msvcgen.jam.
   local target = $(<:G=help) ;
-  Depends help : $(target) ;
   local desc = $(>) ;
-  if ! [ IsElem verbatim : $(3) ] { desc = "Build the $(desc)" ; }
+  Depends help : $(target) ;
   NotFile $(desc) ;
   PrintHelp $(target) : $(desc) ;
   Always $(target) ;
+  NotFile $(target) ;
 }
 
 actions quietly PrintHelp
 {
   # target width:15, description width:59
-  echo "jam ->$(<)               <- =>$(>)                                                           <=" | \
+  echo "jam ->$(<:G=)               <- =>$(>)                                                           <=" | \
     $(SED) 's/->\(...............\).*<-/\1/;s/=>\(...........................................................\).*<=/\1/'
 }
 
 NotFile help ;
 Always help ;
-Help all : "entire project" ;
-Help clean : "Remove all built targets from entire project" : verbatim ;
+Help all : "Build the entire project" ;

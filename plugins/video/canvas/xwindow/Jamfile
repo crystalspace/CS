@@ -2,7 +2,7 @@ SubDir TOP plugins video canvas xwindow ;
 
 if $(X11.AVAILABLE) = "yes"
 {
-Help xwin : "Crystal Space X Window Plugin" ;
+Description xwin : "X Window Plugin" ;
 Plugin xwin : [ Wildcard *.cpp *.h ] ;
 LinkWith xwin : canvascommon csgeom csutil ;
 CompileGroups xwin : drivers2d softcanvas ;
