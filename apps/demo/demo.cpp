@@ -830,6 +830,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
     for (g = 0; g < 8; g++)
       for (b = 0; b < 4; b++)
 	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
+
   txtmgr->SetPalette ();
 
   font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
