@@ -16,6 +16,8 @@ chronological order.
 	  now utilized when building Swig-generated code for Python and Perl.
 	  (To be fair to gcc, however, Swig _is_ generating crash-worthy code,
 	  so the warning message is warranted.)
+	- Luca fixed a compilation error that the VisualC++ 6.0 was complaining 
+	  about.
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.

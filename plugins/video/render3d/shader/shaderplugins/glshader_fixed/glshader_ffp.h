@@ -52,6 +52,9 @@ private:
     FogExp,
     FogExp2
   };
+
+  struct FogInfo;
+  friend FogInfo;
   struct FogInfo
   {
     FogMode mode;
