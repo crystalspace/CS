@@ -592,6 +592,7 @@ sub new {
 }
 
 *Set = *cspacec::csVector2_Set;
+*Get = *cspacec::csVector2_Get;
 *Norm = *cspacec::csVector2_Norm;
 *SquaredNorm = *cspacec::csVector2_SquaredNorm;
 *Rotate = *cspacec::csVector2_Rotate;
@@ -639,6 +640,12 @@ package cspace::csVector3;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*swig_x_get = *cspacec::csVector3_x_get;
+*swig_x_set = *cspacec::csVector3_x_set;
+*swig_y_get = *cspacec::csVector3_y_get;
+*swig_y_set = *cspacec::csVector3_y_set;
+*swig_z_get = *cspacec::csVector3_z_get;
+*swig_z_set = *cspacec::csVector3_z_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csVector3(@_);
@@ -649,6 +656,7 @@ sub new {
 *__add_ass__ = *cspacec::csVector3___add_ass__;
 *__subtr_ass__ = *cspacec::csVector3___subtr_ass__;
 *Set = *cspacec::csVector3_Set;
+*Get = *cspacec::csVector3_Get;
 *Norm = *cspacec::csVector3_Norm;
 *SquaredNorm = *cspacec::csVector3_SquaredNorm;
 *Unit = *cspacec::csVector3_Unit;
@@ -6386,6 +6394,7 @@ package cspace::iSpriteCal3DState;
 *GetAnimationTime = *cspacec::iSpriteCal3DState_GetAnimationTime;
 *GetAnimationDuration = *cspacec::iSpriteCal3DState_GetAnimationDuration;
 *SetAnimationTime = *cspacec::iSpriteCal3DState_SetAnimationTime;
+*GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
