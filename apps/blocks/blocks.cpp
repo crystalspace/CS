@@ -636,14 +636,13 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
 
 void reset_vertex_colors (csThing* /*th*/)
 {
-  //@@@PROBABLY NOT NEEDED ANYMORE. TEST THIS!
-  //int i, j;
-  //for (i = 0 ; i < th->GetNumPolygons () ; i++)
-  //{
-    //csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
-    //for (j = 0 ; j < 3 ; j++)
-      //p->GetGouraudInfo ()->SetColor (j, 0, 0, 0);
-  //}
+  int i;
+  for (i = 0 ; i < th->GetNumPolygons () ; i++)
+  {
+    csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
+    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
+    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
+  }
 }
 
 void Blocks::move_cubes (long elapsed_time)
@@ -751,7 +750,6 @@ void Blocks::move_cubes (long elapsed_time)
     t->Transform ();
     reset_vertex_colors (t);
     room->ShineLights (t);
-    t = (csThing*)(t->GetNext ());
   }
   csPolygonSet::current_light_frame_number++;
 }
