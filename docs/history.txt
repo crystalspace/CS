@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+6-Oct-2000
+	- Eric Sunshine made the following changes to csVector:
+	    - No longer tries to malloc() zero bytes, as that will crash on
+	      some platforms.
+	    - No longer tries to realloc() a null pointer, as that will crash
+	      on some platforms (rather than performing malloc as documented).
+	    - Now checks for null pointer before calling free().
+	    - Now enforces valid values for 'ilimit' and 'ithreshold'.
 5-Oct-2000
 	- Samuel Humphreys fixed particle systems in STATBSP worlds. Their
 	  bsp bounding boxes would otherwise remain uninitialized and so

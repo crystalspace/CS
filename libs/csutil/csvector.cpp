@@ -1,6 +1,6 @@
 /*
     Crystal Space Vector class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,33 +22,36 @@
 #include "cssysdef.h"
 #include "csutil/csvector.h"
 
-csBasicVector::csBasicVector (int ilimit, int ithreshold)
+csBasicVector::csBasicVector (int ilimit, int ithreshold) : count(0), root(0)
 {
-  root = (csSome *)malloc ((limit = ilimit) * sizeof (csSome));
-  count = 0; threshold = ithreshold;
+  limit = (ilimit > 0 ? ilimit : 0);
+  threshold = (ithreshold > 0 ? ithreshold : 16);
+  if (limit != 0)
+    root = (csSome*)malloc (limit * sizeof(csSome));
 }
 
 csBasicVector::~csBasicVector ()
 {
-//not much sense to call DeleteAll () since even for inherited classes
-//anyway will be called csVector::FreeItem which is empty.
-//DeleteAll ();
-  if (root) free (root);
+  if (root)
+    free (root);
 }
 
 void csBasicVector::SetLength (int n)
 {
   count = n;
-  if ((n > limit) || ((limit > threshold) && (n < limit - threshold)))
+  if (n > limit || (limit > threshold && n < limit - threshold))
   {
     n = ((n + threshold - 1) / threshold) * threshold;
     if (!n)
     {
-      free (root);
+      if (root)
+        free (root);
       root = NULL;
     }
+    else if (root == 0)
+      root = (csSome*)malloc(n * sizeof(csSome));
     else
-      root = (csSome *)realloc (root, n * sizeof (csSome));
+      root = (csSome*)realloc(root, n * sizeof(csSome));
     limit = n;
   }
 }
