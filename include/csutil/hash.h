@@ -116,7 +116,7 @@ private:
     Modulo = *p;
     CS_ASSERT (Modulo);
 
-    Elements.SetLength (Modulo);
+    Elements.SetLength (Modulo, csArray<Element> (0, MIN (Modulo / GrowRate, 8)));
 
     for (size_t i = 0; i < elen; i++)
     {
@@ -150,11 +150,11 @@ public:
    * 50119, 70951, 90313, 104707.
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
-  csHash (int size = 257, int grow_rate = 64, int max_size = 20000)
+  csHash (int size = 23, int grow_rate = 5, int max_size = 20000)
     : Elements (size), Modulo (size), InitModulo (size),
-      GrowRate (grow_rate), MaxSize (max_size), Size (0)
+      GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
   {
-    Elements.SetLength (size, csArray<Element> (0, 8));
+    Elements.SetLength (size, csArray<Element> (0, MIN (size / GrowRate, 8)));
   }
 
   /// Copy constructor.

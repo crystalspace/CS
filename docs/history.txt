@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Nov-2004
+	- res reduced the default hash table size and grow rate from 257/64 to
+	  23/5 to have hashes use less memory by default.
 1-Nov-2004
 	- Erotoman added new stencil2 plugin for dynamic shadows. It is working
 	  only for perfectly closed meshes
