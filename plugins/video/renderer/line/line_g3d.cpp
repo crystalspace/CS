@@ -22,6 +22,7 @@
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/polyclip.h"
 #include "cs3d/line/line_g3d.h"
 #include "cs3d/line/line_txt.h"
 #include "csutil/inifile.h"
@@ -75,6 +76,7 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 
   config = new csIniFile ("line3d.cfg");
 
+  clipper = NULL;
   texman = NULL;
 }
 
@@ -172,6 +174,17 @@ void csGraphics3DLine::SetPerspectiveCenter (int x, int y)
 {
   width2 = x;
   height2 = y;
+}
+
+void csGraphics3DLine::SetClipper (csVector2* vertices, int num_vertices)
+{
+  CHK (delete clipper);
+  clipper = NULL;
+  if (!vertices) return;
+  // @@@ This could be better! We are using a general polygon clipper
+  // even in cases where a box clipper would be better. We should
+  // have a special SetBoxClipper call in iGraphics3D.
+  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
 }
 
 bool csGraphics3DLine::BeginDraw (int DrawFlags)

@@ -41,7 +41,7 @@ else
 endif
 DESCRIPTION.$(LINE3D) = $(DESCRIPTION.line)
 SRC.LINE3D = $(wildcard libs/cs3d/line/*.cpp) \
-  libs/cs3d/common/txtmgr.cpp
+  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/dtmesh.cpp
 OBJ.LINE3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.LINE3D:.cpp=$O))))
 
 endif # ifeq ($(MAKESECTION),postdefines)

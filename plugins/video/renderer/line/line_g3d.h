@@ -22,6 +22,8 @@
 // csGraphics3DLine line rasterizer class.
 
 #include "csutil/scf.h"
+#include "csgeom/transfrm.h"
+#include "cs3d/common/dtmesh.h"
 #include "line_txt.h"
 #include "iconfig.h"
 #include "igraph2d.h"
@@ -29,6 +31,7 @@
 #include "ihalo.h"
 #include "iplugin.h"
 
+class csClipper;
 struct iGraphics2D;
 class csIniFile;
 
@@ -46,6 +49,15 @@ class csGraphics3DLine : public iGraphics3D
   int width2;
   /// Opt: height divided by 2.
   int height2;
+
+  /// Current transformation from world to camera.
+  csTransform o2c;
+  /// Current 2D clipper.
+  csClipper* clipper;
+  /// Current aspect ratio for perspective correction.
+  float aspect;
+  /// Current inverse aspect ratio for perspective correction.
+  float inv_aspect;
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
@@ -167,14 +179,24 @@ public:
   virtual int GetHeight () { return height; }
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y);
-  /// Set perspective aspect. @@@ NOT YET IMPLEMENTED
-  virtual void SetPerspectiveAspect (float aspect) { }
-  /// Set world to camera transformation. @@@ NOT YET IMPLEMENTED
-  virtual void SetObjectToCamera (csTransform* o2c) { }
-  /// Set optional clipper. @@@ NOT YET IMPLEMENTED
-  virtual void SetClipper (csVector2* vertices, int num_vertices) { }
-  /// Draw a triangle mesh. @@@ NOT YET IMPLEMENTED
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) { }
+  /// Set perspective aspect.
+  virtual void SetPerspectiveAspect (float aspect)
+  {
+    this->aspect = aspect;
+    inv_aspect = 1./aspect;
+  }
+  /// Set world to camera transformation.
+  virtual void SetObjectToCamera (csTransform* o2c)
+  {
+    this->o2c = *o2c;
+  }
+  /// Set optional clipper.
+  virtual void SetClipper (csVector2* vertices, int num_vertices);
+  /// Draw a triangle mesh.
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
+  {
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+  }
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

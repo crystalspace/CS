@@ -16,6 +16,8 @@ Short-term cleanups that need to be done:
 	- Fixed bug in terrain interface to terrain engine. Now passes
 	  1/z instead of z. This fixes the OpenGL clipping bug and also
 	  makes the terrain appear better now.
+	- Fixed the line renderer so that it correctly draws sprites too
+	  (i.e. implemented the missing DrawTriangleMesh).
 14-Mar-2000
 	- Michael Dale Long did a major rewrite of the iEntityManager
 	  interface.  Replaced Entity and Render lists with "associative
