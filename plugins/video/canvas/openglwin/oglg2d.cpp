@@ -78,8 +78,6 @@ CS_IMPLEMENT_PLUGIN
 #define DISP_CHANGE_BADPARAM        -5
 #endif
 
-#define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
-
 #ifndef ENUM_CURRENT_SETTINGS
 #define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
 #endif
@@ -94,7 +92,7 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
   {
     DWORD dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
     	| FORMAT_MESSAGE_FROM_SYSTEM, NULL, hRes,  MAKELANGID(LANG_NEUTRAL,
-	SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
+      SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
 
     if (dwResult != 0)
     {
@@ -113,9 +111,9 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
     }
   }
 
-  MessageBox(NULL, str, "Fatal Error in glwin32.dll", MB_OK);
+  MessageBox (NULL, str, "Fatal Error in glwin32.dll", MB_OK);
 
-  exit(1);
+  exit (1);
 }
 
 /////The 2D Graphics Driver//////////////
@@ -137,7 +135,8 @@ SCF_EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 
-static struct {
+static struct
+{
   WORD Version;
   WORD NumberOfEntries;
   PALETTEENTRY aEntries[256];
@@ -147,9 +146,9 @@ static struct {
     256
 };
 
-static HPALETTE hWndPalette=NULL;
+static HPALETTE hWndPalette = NULL;
 
-static void ClearSystemPalette()
+static void ClearSystemPalette ()
 {
   struct
   {
@@ -162,12 +161,8 @@ static void ClearSystemPalette()
       256
   };
 
-  HPALETTE BlackPal, OldPal;
-  HDC hdc;
-
   int c;
-
-  for(c=0; c<256; c++)
+  for (c = 0; c < 256; c++)
   {
     Palette.aEntries[c].peRed = 0;
     Palette.aEntries[c].peGreen = 0;
@@ -175,22 +170,22 @@ static void ClearSystemPalette()
     Palette.aEntries[c].peFlags = PC_NOCOLLAPSE;
   }
 
-  hdc = GetDC(NULL);
+  HDC hdc = GetDC (NULL);
 
-  BlackPal = CreatePalette((LOGPALETTE *)&Palette);
+  HPALETTE BlackPal, OldPal;
+  BlackPal = CreatePalette ((LOGPALETTE *)&Palette);
+  OldPal = SelectPalette (hdc,BlackPal,FALSE);
+  RealizePalette (hdc);
+  SelectPalette (hdc, OldPal, FALSE);
+  DeleteObject (BlackPal);
 
-  OldPal = SelectPalette(hdc,BlackPal,FALSE);
-  RealizePalette(hdc);
-  SelectPalette(hdc, OldPal, FALSE);
-  DeleteObject(BlackPal);
-
-  ReleaseDC(NULL, hdc);
+  ReleaseDC (NULL, hdc);
 }
 
-static void CreateIdentityPalette(csRGBpixel *p)
+static void CreateIdentityPalette (csRGBpixel *p)
 {
-  int i;
-  struct {
+  struct
+  {
     WORD Version;
     WORD nEntries;
     PALETTEENTRY aEntries[256];
@@ -200,13 +195,14 @@ static void CreateIdentityPalette(csRGBpixel *p)
       256
   };
 
-  if(hWndPalette)
-    DeleteObject(hWndPalette);
+  if (hWndPalette)
+    DeleteObject (hWndPalette);
 
   Palette.aEntries[0].peFlags = 0;
   Palette.aEntries[0].peFlags = 0;
 
-  for(i=1; i<255; i++)
+  int i;
+  for (i = 1; i < 255; i++)
   {
     Palette.aEntries[i].peRed = p[i].red;
     Palette.aEntries[i].peGreen = p[i].green;
@@ -214,28 +210,28 @@ static void CreateIdentityPalette(csRGBpixel *p)
     Palette.aEntries[i].peFlags = PC_RESERVED;
   }
 
-  hWndPalette = CreatePalette((LOGPALETTE *)&Palette);
+  hWndPalette = CreatePalette ((LOGPALETTE *)&Palette);
 
-  if(!hWndPalette)
+  if (!hWndPalette)
     SystemFatalError ("Error creating identity palette.");
 }
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) :
+csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
                    csGraphics2DGLCommon (iParent),
-                   m_nGraphicsReady(true),
-                   m_hWnd(NULL),
-                   m_piWin32Assistant(NULL),
-                   m_bPalettized(false),
-                   m_bPaletteChanged(false)
+                   m_nGraphicsReady (true),
+                   m_hWnd (NULL),
+                   m_piWin32Assistant (NULL),
+                   m_bPalettized (false),
+                   m_bPaletteChanged (false)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
-csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
+csGraphics2DOpenGL::~csGraphics2DOpenGL (void)
 {
   if (m_piWin32Assistant)
     m_piWin32Assistant->DecRef ();
-  m_nGraphicsReady=0;
+  m_nGraphicsReady = 0;
 }
 
 void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
@@ -265,9 +261,9 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (!m_piWin32Assistant)
     SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.");
 
-  // Get the creation parameters //
-  m_hInstance = m_piWin32Assistant->GetInstance();
-  m_nCmdShow  = m_piWin32Assistant->GetCmdShow();
+  // Get the creation parameters
+  m_hInstance = m_piWin32Assistant->GetInstance ();
+  m_nCmdShow  = m_piWin32Assistant->GetCmdShow ();
 
   if (Depth == 8)
   {
@@ -275,8 +271,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
     pfmt.PixelBytes = 1;
   }
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
@@ -308,48 +303,46 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       0, 0, 0                         /* no layer, visible, damage masks */
   };
 
-  int pixelFormat;
-  pixelFormat = ChoosePixelFormat(hDC, &pfd);
+  int pixelFormat = ChoosePixelFormat (hDC, &pfd);
 
   if (pixelFormat == 0)
     SystemFatalError ("ChoosePixelFormat failed.");
-  if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE)
+  if (SetPixelFormat (hDC, pixelFormat, &pfd) != TRUE)
     SystemFatalError ("SetPixelFormat failed.");
 
-  if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR),
-  	&pfd) == 0)
+  if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
     SystemFatalError ("DescribePixelFormat failed.");
 }
 
-bool csGraphics2DOpenGL::Open()
+bool csGraphics2DOpenGL::Open ()
 {
   if (is_open) return true;
   DEVMODE dmode;
   LONG ti;
+  DWORD exStyle;
+  DWORD style;
 
   // create the window.
-  DWORD exStyle = 0;
-  DWORD style = WINDOW_STYLE;
   if (FullScreen)
   {
-    ChangeDisplaySettings(NULL,0);
+    ChangeDisplaySettings (NULL, 0);
 
-    EnumDisplaySettings(NULL, 0, &dmode);
+    EnumDisplaySettings (NULL, 0, &dmode);
 
     dmode.dmBitsPerPel = Depth;
     dmode.dmPelsWidth = Width;
     dmode.dmPelsHeight = Height;
     dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-    if((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
+    if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
     {
       //The cases below need error handling, as they are errors.
-      switch(ti)
+      switch (ti)
       {
         case DISP_CHANGE_RESTART:
           //computer must restart for mode to work.
           Report (CS_REPORTER_SEVERITY_WARNING,
-		"gl2d error: must restart for display change.");
+            "gl2d error: must restart for display change.");
           break;
         case DISP_CHANGE_BADFLAGS:
           //Bad Flag settings
@@ -359,44 +352,43 @@ bool csGraphics2DOpenGL::Open()
         case DISP_CHANGE_FAILED:
           //Failure to display
           Report (CS_REPORTER_SEVERITY_WARNING,
-	  	"gl2d error: display change failed.");
+            "gl2d error: display change failed.");
           break;
         case DISP_CHANGE_NOTUPDATED:
           //No Reg Write Error
           Report (CS_REPORTER_SEVERITY_WARNING,
-	  	"gl2d error: display change could not write registry.");
+            "gl2d error: display change could not write registry.");
           break;
         default:
           //Unknown Error
           Report (CS_REPORTER_SEVERITY_WARNING,
-	  	"gl2d error: display change gave unknown error.");
+            "gl2d error: display change gave unknown error.");
           break;
       }
     }
   }
 
-  EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dmode);
+  EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &dmode);
   Depth = dmode.dmBitsPerPel;
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "Using %d bits per pixel (%d color mode).", Depth, 1 << (Depth==32?24:Depth) );
+    "Using %d bits per pixel (%d color mode).", Depth, 1 << (Depth == 32 ? 24 : Depth));
 
   if (FullScreen)
   {
-    m_hWnd = CreateWindowEx(exStyle | WS_EX_TOPMOST, CS_WIN32_WINDOW_CLASS_NAME, 
-      win_title, WS_POPUP, 0, 0, Width, Height,
-      NULL, NULL, m_hInstance, NULL);
+    exStyle = WS_EX_TOPMOST;
+    style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
+    m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style, 0, 0, 
+      Width, Height, NULL, NULL, m_hInstance, NULL);
   }
   else
   {
-    int wwidth,wheight;
-    wwidth=Width+2*GetSystemMetrics(SM_CXFIXEDFRAME);
-    wheight=Height+2*GetSystemMetrics(SM_CYFIXEDFRAME)
-    	+GetSystemMetrics(SM_CYCAPTION);
-    m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title,
-    	style,
-	(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
-	(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
-	wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+    exStyle = 0;
+    style = WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
+    int wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
+    int wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
+    m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
+      (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
+      wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   }
 
   if (!m_hWnd)
@@ -459,7 +451,7 @@ void csGraphics2DOpenGL::Print (csRect* /*area*/)
   glFlush();
 }
 
-HRESULT csGraphics2DOpenGL::SetColorPalette()
+HRESULT csGraphics2DOpenGL::SetColorPalette ()
 {
   HRESULT ret = S_OK;
 
@@ -467,22 +459,22 @@ HRESULT csGraphics2DOpenGL::SetColorPalette()
   {
     m_bPaletteChanged = false;
 
-    if(!FullScreen)
+    if (!FullScreen)
     {
       HPALETTE oldPal;
       HDC dc = GetDC(NULL);
 
-      SetSystemPaletteUse(dc, SYSPAL_NOSTATIC);
-      PostMessage(HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
+      SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
+      PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
 
-      CreateIdentityPalette(Palette);
-      ClearSystemPalette();
+      CreateIdentityPalette (Palette);
+      ClearSystemPalette ();
 
-      oldPal = SelectPalette(dc, hWndPalette, FALSE);
+      oldPal = SelectPalette (dc, hWndPalette, FALSE);
 
-      RealizePalette(dc);
-      SelectPalette(dc, oldPal, FALSE);
-      ReleaseDC(NULL, dc);
+      RealizePalette (dc);
+      SelectPalette (dc, oldPal, FALSE);
+      ReleaseDC (NULL, dc);
     }
 
     return ret;
@@ -491,7 +483,7 @@ HRESULT csGraphics2DOpenGL::SetColorPalette()
   return S_OK;
 }
 
-void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
+void csGraphics2DOpenGL::SetRGB (int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
   m_bPaletteChanged = true;
@@ -519,9 +511,9 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
   p.x = x;
   p.y = y;
 
-  ClientToScreen(m_hWnd, &p);
+  ClientToScreen (m_hWnd, &p);
 
-  ::SetCursorPos(p.x, p.y);
+  ::SetCursorPos (p.x, p.y);
 
   return true;
 }
@@ -535,7 +527,7 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
     if (GetFullScreen() && config->GetBool (
     	"Video.OpenGL.Win32.DisableConsoleWindow", false) )
     {
-      m_piWin32Assistant->DisableConsole();
+      m_piWin32Assistant->DisableConsole ();
       Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"*** Disabled Win32 console window to avoid OpenGL interference.");
     }
@@ -544,5 +536,4 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
   }
   return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
-
 
