@@ -81,7 +81,8 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
 
   tex_mm->GetMipMapDimensions(0, width, height);
 
-  G2D = new csOpenGLProcBackBuffer2D (g2d, width, height, ipfmt);
+  G2D = csPtr<iGraphics2D>
+    (new csOpenGLProcBackBuffer2D (g2d, width, height, ipfmt));
   pixel_bytes = g2d->GetPixelBytes ();
   frame_height = g2d->GetHeight ();
   frame_width = g2d->GetWidth ();

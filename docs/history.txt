@@ -53,6 +53,8 @@ The history order is reversed so that new features are at the top.
 	      reported to cure this problem.
 	- Removed a very old hack in the engine (camera_hack).
 	- Eric Sunshine fixed compilation errors in engseq and csparser.
+	- Eric Sunshine fixed a resource leak in the OpenGL procedural texture
+	  renderer.  It was leaking a csOpenGLProcBackBuffer2D object.
 2-Oct-2002
 	- Cleaned up new thing smoothing code (code style, please people
 	  a tab == 8 spaces but indentation MUST be with 2 spaces!!!).
