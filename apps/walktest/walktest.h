@@ -220,9 +220,6 @@ public:
   /// Color for the TXT map background.
   int bgcolor_txtmap;
 
-  /// Clear color with 'fclear'.
-  int bgcolor_fclear;
-
   /// Clear color for other map modes.
   int bgcolor_map;
 
@@ -315,7 +312,6 @@ public:
   /// Some flags.
   bool do_fps;
   bool do_stats;
-  bool do_clear;
   bool do_show_coord;
   bool do_show_cbuffer;
   bool busy_perf_test;

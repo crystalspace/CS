@@ -34,6 +34,7 @@ PLUGINS += console/output/simple
 PLUGINS += console/input/standard
 PLUGINS += colldet/rapid
 PLUGINS += perfstat
+PLUGINS += bugplug
 PLUGINS += mesh/object/cube        mesh/loader/cube
 PLUGINS += mesh/object/spr2d       mesh/loader/spr2d
 PLUGINS += mesh/object/spr3d       mesh/loader/spr3d

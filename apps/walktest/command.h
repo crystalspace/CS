@@ -85,8 +85,6 @@ public:
 
   /// Change boolean variable value
   static void change_boolean (const char* arg, bool* value, const char* what);
-  /// Change boolean variable value specifically for G3D.
-  static bool change_boolean_gfx3d (const char* arg, G3D_RENDERSTATEOPTION op, const char* what);
   /// Change value to one of listed in choices[]
   static void change_choice (const char* arg, int* value, const char* what, const char* const* choices, int num);
   /// Change float variable value

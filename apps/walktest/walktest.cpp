@@ -130,7 +130,6 @@ WalkTest::WalkTest () :
   map_projection = WF_ORTHO_PERSP;
   do_fps = true;
   do_stats = false;
-  do_clear = false;
   do_edges = false;
   do_show_coord = false;
   do_show_cbuffer = false;
@@ -176,7 +175,6 @@ WalkTest::WalkTest () :
 
   bgcolor_txtmap = 255;
   bgcolor_map = 0;
-  bgcolor_fclear = 255;
 
   ConsoleInput = NULL;
   SmallConsole = false;
@@ -235,17 +233,6 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   else
     sprintf (map_dir, "/lev/%s", val);
   
-  if (GetOptionCL ("clear"))
-  {
-    do_clear = true;
-    Sys->Printf (MSG_INITIALIZATION, "Screen will be cleared every frame.\n");
-  }
-  else if (GetOptionCL ("noclear"))
-  {
-    do_clear = false;
-    Sys->Printf (MSG_INITIALIZATION, "Screen will not be cleared every frame.\n");
-  }
-
   if (GetOptionCL ("stats"))
   {
     do_stats = true;
@@ -300,7 +287,6 @@ void WalkTest::Help ()
 {
   SysSystemDriver::Help ();
   Sys->Printf (MSG_STDOUT, "  -exec=<script>     execute given script at startup\n");
-  Sys->Printf (MSG_STDOUT, "  -[no]clear         clear display every frame (default '%sclear')\n", do_clear ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
@@ -895,15 +881,14 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
   (void)elapsed_time; (void)current_time;
 
   //not used since we need WHITE background not black
-  int drawflags = (do_clear || map_mode == MAP_TXT) ? CSDRAW_CLEARZBUFFER : 0;
-  if (do_clear || map_mode == MAP_ON || map_mode == MAP_TXT)
+  int drawflags = (map_mode == MAP_TXT) ? CSDRAW_CLEARZBUFFER : 0;
+  if (map_mode == MAP_ON || map_mode == MAP_TXT)
   {
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS))
       return;
-    int col;
+    int col = 0;
     if (map_mode == MAP_ON) col = bgcolor_map;
     else if (map_mode == MAP_TXT) col = bgcolor_txtmap;
-    else col = bgcolor_fclear;
     Gfx2D->Clear (col);
   }
 
@@ -1565,7 +1550,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   txtmgr->SetPalette ();
   bgcolor_txtmap = txtmgr->FindRGB (128, 128, 128);
   bgcolor_map = 0;
-  bgcolor_fclear = txtmgr->FindRGB (0, 255, 255);
   fgcolor_stats = txtmgr->FindRGB (255, 255, 255);
 
   // Reinit console object for 3D engine use.

@@ -683,7 +683,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol\n");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert\n");
     CONPRI("Debugging:\n");
-    CONPRI("  fclear hi zbuf debug0 debug1 debug2 edges palette\n");
+    CONPRI("  hi zbuf debug0 debug1 debug2 palette bugplug\n");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
     CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
     CONPRI("Meshes:\n");
@@ -930,15 +930,13 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void bind_key (const char* arg);
     bind_key (arg);
   }
-  else if (!strcasecmp (cmd, "fclear"))
-    csCommandProcessor::change_boolean (arg, &Sys->do_clear, "fclear");
+  else if (!strcasecmp (cmd, "bugplug"))
+  {
+    LOAD_PLUGIN (System, "crystalspace.utilities.bugplug",
+    	"BugPlug", iPlugIn);
+  }
   else if (!strcasecmp (cmd, "fps"))
     csCommandProcessor::change_boolean (arg, &Sys->do_fps, "fps");
-  else if (!strcasecmp (cmd, "edges"))
-  {
-    csCommandProcessor::change_boolean (arg, &Sys->do_edges, "do_edges");
-    Sys->myG3D->SetRenderState (G3DRENDERSTATE_EDGES, Sys->do_edges);
-  }
   else if (!strcasecmp (cmd, "do_gravity"))
     csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
   else if (!strcasecmp (cmd, "inverse_mouse"))

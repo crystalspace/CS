@@ -138,15 +138,6 @@ void csCommandProcessor::change_boolean (const char* arg, bool* value, const cha
   }
 }
 
-bool csCommandProcessor::change_boolean_gfx3d (const char* arg, G3D_RENDERSTATEOPTION op, const char* what)
-{
-  bool bValue;
-  long val = g3d->GetRenderState (op);
-  bValue = (bool)val;
-  change_boolean (arg, &bValue, what);
-  return (g3d->SetRenderState (op, bValue));
-}
-
 /*
  * Standard processing to change/display a multi-value setting.
  */
@@ -304,14 +295,13 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   {
     CsPrintf (MSG_CONSOLE, "-*- General commands -*-\n");
     CsPrintf (MSG_CONSOLE, " about, version, quit, help\n");
-    CsPrintf (MSG_CONSOLE, " dblbuff, debug, db_maxpol, cachedump, cacheclr\n");
+    CsPrintf (MSG_CONSOLE, " dblbuff, debug, db_maxpol\n");
 //  CsPrintf (MSG_CONSOLE, " coorddump, coordsave, coordload, coordset\n");
     CsPrintf (MSG_CONSOLE, " console, facenorth, facesouth, faceeast\n");
     CsPrintf (MSG_CONSOLE, " facewest, faceup, facedown, turn, activate\n");
     CsPrintf (MSG_CONSOLE, " cls, exec, dnl, dump, cmessage, dmessage\n");
-    CsPrintf (MSG_CONSOLE, " lighting, texture, portals, transp, mipmap\n");
-    CsPrintf (MSG_CONSOLE, " gamma, fov, fovangle, gouraud, ilace, mmx, inter\n");
-    CsPrintf (MSG_CONSOLE, " bilinear, trilinear, lm_grid, lm_only, cosfact\n");
+    CsPrintf (MSG_CONSOLE, " portals, gamma, fov, fovangle\n");
+    CsPrintf (MSG_CONSOLE, " lm_grid, lm_only, cosfact\n");
     CsPrintf (MSG_CONSOLE, " extension, lod, sprlight, coorddump, coordset\n");
     CsPrintf (MSG_CONSOLE, " db_procpol\n");
   }
@@ -384,10 +374,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!strcasecmp (cmd, "dump"))
   {
     Dumper::dump (camera);
-    Dumper::dump (engine);
   }
-  else if (!strcasecmp (cmd, "transp"))
-    change_boolean_gfx3d (arg, G3DRENDERSTATE_TRANSPARENCYENABLE, "transp");
   else if (!strcasecmp (cmd, "portals"))
     change_boolean (arg, &csSector::do_portals, "portals");
   //@@@
@@ -395,29 +382,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     //change_boolean (arg, &Textures::do_lightmapgrid, "lightmap grid");
   //else if (!strcasecmp (cmd, "lm_only"))
     //change_boolean (arg, &Textures::do_lightmaponly, "lightmap only");
-  else if (!strcasecmp (cmd, "texture"))
-    change_boolean_gfx3d (arg, G3DRENDERSTATE_TEXTUREMAPPINGENABLE, "texture mapping");
-  else if (!strcasecmp (cmd, "bilinear"))
-    change_boolean_gfx3d (arg, G3DRENDERSTATE_BILINEARMAPPINGENABLE, "bi-linear filtering");
-  else if (!strcasecmp (cmd, "trilinear"))
-    change_boolean_gfx3d (arg, G3DRENDERSTATE_TRILINEARMAPPINGENABLE, "tri-linear filtering");
-  else if (!strcasecmp (cmd, "lighting"))
-    change_boolean_gfx3d (arg, G3DRENDERSTATE_LIGHTINGENABLE, "lighting");
-  else if (!strcasecmp (cmd, "gouraud"))
-  {
-    if (!change_boolean_gfx3d (arg, G3DRENDERSTATE_GOURAUDENABLE, "Gouraud shading"))
-      CsPrintf (MSG_CONSOLE, "Gouraud shading toggling is not supported by 3D driver\n");
-  }
-  else if (!strcasecmp (cmd, "ilace"))
-  {
-    if (!change_boolean_gfx3d (arg, G3DRENDERSTATE_INTERLACINGENABLE, "interlaced mode"))
-      CsPrintf (MSG_CONSOLE, "Interlaced mode not supported by 3D driver\n");
-  }
-  else if (!strcasecmp (cmd, "mmx"))
-  {
-    if (!change_boolean_gfx3d (arg, G3DRENDERSTATE_MMXENABLE, "mmx usage"))
-      CsPrintf (MSG_CONSOLE, "MMX support is not present in this version\n");
-  }
   else if (!strcasecmp (cmd, "cls"))
   {
     if (console)
@@ -432,31 +396,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
       if (active != console->GetVisible ())
         console->SetVisible (active);
     }
-  }
-  else if (!strcasecmp (cmd, "mipmap"))
-  {
-    int nValue;
-    char* choices[6] = { "on", "off", "1", "2", "3", NULL };
-    long old = g3d->GetRenderState( G3DRENDERSTATE_MIPMAPENABLE);
-    nValue = old;
-    change_choice (arg, &nValue, "mipmapping", choices, 5);
-    g3d->SetRenderState( G3DRENDERSTATE_MIPMAPENABLE, (long)nValue );
-  }
-  else if (!strcasecmp (cmd, "inter"))
-  {
-    int nValue;
-    char* choices[5] = { "smart", "step32", "step16", "step8", NULL };
-    long old = g3d->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
-    nValue = old;
-    change_choice (arg, &nValue, "interpolation steps", choices, 4);
-    g3d->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, (long)nValue);
-  }
-  else if (!strcasecmp (cmd, "cachedump"))
-    g3d->DumpCache ();
-  else if (!strcasecmp (cmd, "cacheclr"))
-  {
-    CsPrintf (MSG_CONSOLE, "Refresh (clear) the texture cache.\n");
-    g3d->ClearCache ();
   }
   else if (!strcasecmp (cmd, "turn"))
     camera->RotateThis (VEC_ROT_RIGHT, M_PI);

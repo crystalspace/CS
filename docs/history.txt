@@ -1,5 +1,31 @@
 The history order is reversed so that new features are at the top.
 
+11-Jun-2001
+	- Created a new 'bugplug' plugin. This plugin will give debugging
+	  functionality to any CS app. To use it just add the following
+	  line to your config:
+		System.PlugIns.BugPlug = crystalspace.utilities.bugplug
+	  or load the plugin from the code with:
+		LOAD_PLUGIN (System, "crystalspace.utilities.bugplug",
+			"BugPlug", iPlugIn);
+	  That's all you have to do. The plugin will nest itself in the
+	  application event loop and listens to keys. In
+	  data/config/bugplug.cfg you can control to what keys it listens.
+	  The most important key is assigned to the 'debugenter' key.
+	  When this key is pressed (by default it is ctrl-d) the next key
+	  will be given to BugPlug which will perform the associated
+	  command. The other keys and commands are also defined in
+	  bugplug.cfg.
+	- Added 'bugplug' to the WalkTest config file (commented) and also
+	  added new 'bugplug' console command. The best way to get
+	  BugPlug working in all your apps automatically is to add the
+	  following line to data/config/user.cfg:
+		Global.System.PlugIns.BugPlug = crystalspace.utilities.bugplug
+	- Removed 'edges', 'cacheclear', 'cachedump', 'texture', 'lighting',
+	  'bilinear', 'trilinear', 'ilace', 'mmx', 'gouraud', 'transp',
+	  'mipmap', 'inter', and 'fclear' debug commands from walktest
+	  since BugPlug can do those now.
+	- Fixed a crash at exit bug in OpenGL renderer.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the
