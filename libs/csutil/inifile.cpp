@@ -180,7 +180,7 @@ bool csIniFile::Load (const char* path)
   if (f)
   {
     size_t size;
-    if (fseek (f, 0, SEEK_END) == 0 && (size = ftell(f)) != -1 &&
+    if (fseek (f, 0, SEEK_END) == 0 && (size = ftell(f)) != size_t(-1) &&
         fseek (f, 0, SEEK_SET) == 0)
     {
       if (size == 0)
