@@ -30,7 +30,7 @@ ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_BOOL_TYPE = yes"
 #------------------------------------------------------------------------------
 cat << TEST > comptest.cpp
 int func1() { long n = 1; return static_cast<int>(n); }
-char* func2() { char const* s = "const"; return const_cast<char*>(s); }
+char* func2() { static char const* s = "const"; return const_cast<char*>(s); }
 struct A {}; A* func3(A* a) { return dynamic_cast<A*>(a); }
 A* func4(void* p) { return reinterpret_cast<A*>(p); }
 TEST
