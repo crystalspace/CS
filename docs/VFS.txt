@@ -139,7 +139,7 @@ BSD		= VFS.Unix
 Irix		= VFS.Unix
 NextStep	= VFS.Unix
 OpenStep	= VFS.Unix
-Rhapsody-DR2	= VFS.Unix
+MacOS/X Server	= VFS.Unix
 BeOS		= VFS.Unix
 
 ; All OSes with CP/M-like filesystems
