@@ -84,10 +84,10 @@ bool csXORBuffer::IsFull ()
   return true;
 }
 
-void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
+void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2, int yfurther)
 {
-x1--; // @@@ temporary, but could be an option for contribution culling.
-x2--;
+  y2 += yfurther;
+
   if (y2 < 0 || y1 >= height)
   {
     //------
@@ -157,12 +157,12 @@ x2--;
   //------
   if (y1 < 0)
   {
-    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-y1);
+    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-yfurther-y1);
     y1 = 0;
   }
   if (y2 >= height)
   {
-    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-y1);
+    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-yfurther-y1);
     y2 = height-1;
   }
 
@@ -174,7 +174,7 @@ x2--;
     int dy = (y2-y1)+1;
     int x = x1<<16;
     int y = y1;
-    int dx = ((x2-x1)<<16) / dy;
+    int dx = ((x2-x1)<<16) / (dy-yfurther);
     dy--;
     while (dy > 0)
     {
@@ -193,7 +193,7 @@ x2--;
     int dy = (y2-y1)+1;
     int x = x1<<16;
     int y = y1;
-    int dx = ((x2-x1)<<16) / dy;
+    int dx = ((x2-x1)<<16) / (dy-yfurther);
     dy--;
     while (dy > 0)
     {
@@ -219,10 +219,9 @@ x2--;
   }
 }
 
-void csXORBuffer::DrawRightLine (int x1, int y1, int x2, int y2)
+void csXORBuffer::DrawRightLine (int x1, int y1, int x2, int y2, int yfurther)
 {
-x1++; // @@@ temporary, but could be an option for contribution culling.
-x2++;
+  y2 += yfurther;
   if (y2 < 0 || y1 >= height)
   {
     //------
@@ -292,12 +291,12 @@ x2++;
   //------
   if (y1 < 0)
   {
-    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-y1);
+    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-yfurther-y1);
     y1 = 0;
   }
   if (y2 >= height)
   {
-    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-y1);
+    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-yfurther-y1);
     y2 = height-1;
   }
 
@@ -309,7 +308,7 @@ x2++;
     int dy = (y2-y1)+1;
     int x = x1<<16;
     int y = y1;
-    int dx = ((x2-x1)<<16) / dy;
+    int dx = ((x2-x1)<<16) / (dy-yfurther);
     int dx2 = dx>>1;
     x += dx2;
     dy--;
@@ -330,7 +329,7 @@ x2++;
     int dy = (y2-y1)+1;
     int x = x1<<16;
     int y = y1;
-    int dx = ((x2-x1)<<16) / dy;
+    int dx = ((x2-x1)<<16) / (dy-yfurther);
     int dx2 = dx>>1;
     x += dx2;
     dy--;
@@ -358,7 +357,8 @@ x2++;
   }
 }
 
-void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
+void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
+	csBox2Int& bbox, int shift)
 {
   int i, j;
 
@@ -373,20 +373,24 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
   int bot_vt = 0;
   xa[0] = QInt (verts[0].x);
   ya[0] = QInt (verts[0].y);
-  int top_y = ya[0];
-  int bot_y = ya[0];
+  bbox.minx = bbox.maxx = xa[0];
+  bbox.miny = bbox.maxy = ya[0];
   for (i = 1 ; i < num_verts ; i++)
   {
     xa[i] = QInt (verts[i].x);
     ya[i] = QInt (verts[i].y);
-    if (ya[i] < top_y)
+
+    if (xa[i] < bbox.minx) bbox.minx = xa[i];
+    else if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
+
+    if (ya[i] < bbox.miny)
     {
-      top_y = ya[i];
+      bbox.miny = ya[i];
       top_vt = i;
     }
-    else if (ya[i] > bot_y)
+    else if (ya[i] > bbox.maxy)
     {
-      bot_y = ya[i];
+      bbox.maxy = ya[i];
       bot_vt = i;
     }
   }
@@ -419,7 +423,8 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
         printf ("R{%d,%d} (%d,%d) - (%d,%d)\n",
 	  i, j, xa[i], ya[i], xa[j], ya[j]);
       }
-      DrawRightLine (xa[i], ya[i], xa[j], ya[j]);
+      DrawRightLine (xa[i]+shift, ya[i], xa[j]+shift, ya[j],
+      	j == bot_vt ? 1 : 0);
     }
     i = j;
     j = (j+num_verts+dir)%num_verts;
@@ -441,7 +446,8 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
         printf ("L{%d,%d} (%d,%d) - (%d,%d)\n",
 	  i, j, xa[i], ya[i], xa[j], ya[j]);
       }
-      DrawLeftLine (xa[i], ya[i], xa[j], ya[j]);
+      DrawLeftLine (xa[i]-shift, ya[i], xa[j]-shift, ya[j],
+      	j == bot_vt ? 1 : 0);
     }
     i = j;
     j = (j+num_verts+dir)%num_verts;
@@ -468,10 +474,9 @@ void csXORBuffer::XORSweep ()
 bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 {
   InitializePolygonBuffer ();
-  // @@@ This code is totally unoptimized and ignores the
-  // bounding box of the polygon. Using the 2D bounding box of the
-  // polygon a much more optimal rendering can be done.
-  DrawPolygon (verts, num_verts);
+
+  csBox2Int bbox;
+  DrawPolygon (verts, num_verts, bbox, 1);
 
   // In this routine we render the polygon to the polygon buffer
   // and then we simulate (but don't actually perform for optimization
@@ -482,38 +487,54 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
   uint32* scr_buf;
   bool mod = false;
   uint32 init;
-  if (negative) init = ~0;
-  else init = 0;
-  for (i = 0 ; i < numrows ; i++)
+
+  int startrow, endrow;
+  int startcol, endcol;
+  if (negative)
+  {
+    init = ~0;
+    // If we are working in negative mode we need
+    // to do entire box and not only what the bounding box says.
+    startrow = 0;
+    endrow = numrows-1;
+    startcol = 0;
+    endcol = width-1;
+  }
+  else
+  {
+    init = 0;
+    startrow = bbox.miny >> 5;
+    endrow = bbox.maxy >> 5;
+    startcol = bbox.minx-1;
+    if (startcol < 0) startcol = 0;
+    endcol = bbox.maxx;
+  }
+
+  for (i = startrow ; i <= endrow ; i++)
   {
     int pc = partcols[i];
     if (!pc) continue;
 
-    buf = &buffer[i<<w_shift];
-    scr_buf = &scr_buffer[i<<w_shift];
+    int buf_idx = (i<<w_shift) + startcol;
+    buf = &buffer[buf_idx];
+    scr_buf = &scr_buffer[buf_idx];
+
     uint32 first = init;
-    //bool rowmod = false;
-    for (x = 0 ; x < width ; x++)
+    for (x = startcol ; x <= endcol ; x++)
     {
       first ^= *buf++;
-      //if (first) rowmod = true;
-      //if (rowmod && !first) break;
       uint32 sb = *scr_buf;
       if ((~sb) & first)
       {
         mod = true;
 	sb |= first;
 	*scr_buf++ = sb;
-	if (!~sb)
-	{
-	  pc--;
-	}
+	if (!~sb) pc--;
       }
       else
       {
         scr_buf++;
       }
-      // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
     }
     partcols[i] = pc;
   }
@@ -523,27 +544,35 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 bool csXORBuffer::TestPolygon (csVector2* verts, int num_verts)
 {
   InitializePolygonBuffer ();
-  // @@@ This code is totally unoptimized and ignores the
-  // bounding box of the polygon. Using the 2D bounding box of the
-  // polygon a much more optimal rendering can be done.
-  DrawPolygon (verts, num_verts);
+
+  csBox2Int bbox;
+  DrawPolygon (verts, num_verts, bbox, 0);
 
   int i, x;
   uint32* buf;
   uint32* scr_buf;
-  for (i = 0 ; i < numrows ; i++)
+
+  int startrow = bbox.miny >> 5;
+  int endrow = bbox.maxy >> 5;
+  int startcol = bbox.minx-1;
+  if (startcol < 0) startcol = 0;
+  int endcol = bbox.maxx;
+  
+  for (i = startrow ; i <= endrow ; i++)
   {
     if (!partcols[i])
       continue;
-    buf = &buffer[i<<w_shift];
-    scr_buf = &scr_buffer[i<<w_shift];
+
+    int buf_idx = (i<<w_shift) + startcol;
+    buf = &buffer[buf_idx];
+    scr_buf = &scr_buffer[buf_idx];
+
     uint32 first = 0;
-    for (x = 0 ; x < width ; x++)
+    for (x = startcol ; x <= endcol ; x++)
     {
       first ^= *buf++;
       if ((~*scr_buf) & first) return true;
       scr_buf++;
-      // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
     }
   }
   return false;
@@ -677,7 +706,8 @@ bool csXORBuffer::Debug_ExtensiveTest (int num_iterations, csVector2* verts,
         // @@@ TODO!
 	break;
     }
-    DrawPolygon (verts, num_verts);
+    csBox2Int bbox;
+    DrawPolygon (verts, num_verts, bbox);
     XORSweep ();
 
     int r;

@@ -26,6 +26,16 @@ struct iGraphics2D;
 struct iGraphics3D;
 
 /**
+ * A 2D bounding box with integer coordinates.
+ */
+class csBox2Int
+{
+public:
+  int minx, miny;
+  int maxx, maxy;
+};
+
+/**
  * The XOR Buffer.
  * This is a black-and-white bitmap represented by 32-bit ints
  * arranged in rows. For example, a 128x128 bitmap is represented
@@ -73,22 +83,31 @@ public:
   /**
    * Draw a left-side line on the XOR buffer.
    * This function is normally not called by user code.
+   * Normally a line is rendered upto but NOT including x2,y2 (i.e. the
+   * scanline at y2 is ignored). With yfurther==1 you can go to y2. This
+   * is useful for the lowest lines.
    */
-  void DrawLeftLine (int x1, int y1, int x2, int y2);
+  void DrawLeftLine (int x1, int y1, int x2, int y2, int yfurther = 0);
 
   /**
    * Draw a right-side line on the XOR buffer.
    * This function is normally not called by user code.
+   * Normally a line is rendered upto but NOT including x2,y2 (i.e. the
+   * scanline at y2 is ignored). With yfurther==1 you can go to y2. This
+   * is useful for the lowest lines.
    */
-  void DrawRightLine (int x1, int y1, int x2, int y2);
+  void DrawRightLine (int x1, int y1, int x2, int y2, int yfurther = 0);
 
   /**
    * Draw a polygon on the XOR buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
    * This function is normally not called by user code.
+   * The optional 'shift' parameter indicates how many pixels the
+   * polygon will be extended horizontally.
    */
-  void DrawPolygon (csVector2* verts, int num_verts);
+  void DrawPolygon (csVector2* verts, int num_verts, csBox2Int& bbox,
+  	int shift = 0);
 
   /**
    * Insert a polygon in the XOR buffer.

@@ -9,6 +9,15 @@ The history order is reversed so that new features are at the top.
 	  and ctrl-c as 'enginecmd toggle_cullstat'.
 	- 'toggle_cullstat' will now show the percentage of the complete
 	  octree bounding box that is visible.
+	- Extended XOR buffer so it will now make inserted polygons a little
+	  bit wider while tested polygons are original size. This increases
+	  chance of good culling.
+	- XOR buffer will now also correctly render the last row of the
+	  polygon. It was not doing that before which caused visibility
+	  culling to ignore many good opportunities.
+	- Optimized the XOR buffer to use the 2D bounding box of the polygon
+	  for doing the XOR sweep. This gives a big boost in speed. Still
+	  slower compared to c-buffer.
 23-Apr-2002
 	- Fixed parsing of FILE keyword in texture parsing so it also
 	  works with quotes.
