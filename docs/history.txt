@@ -23,6 +23,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed the makefiles so that g2dtest, perftest, and
 	  csdemo can link successfully when USE_PLUGINS=no.  These programs
 	  required the CSGFX library.
+	- Eric Sunshine fixed a dormant bug in csCurveTemplate where it
+	  incorrectly invoked DECLARE_IBASE_EXT() with an argument of csObject
+	  rather than csPObject.
+	- Eric Sunshine worked around a bizarre NextStep compiler bug where
+	  calls to csBezierTemplate::QueryInterface() incorrectly invoked
+	  csObject::QueryInterface() rather than correctly invoking
+	  csCurveTemplate::QueryInterface().
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to

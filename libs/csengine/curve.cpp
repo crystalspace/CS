@@ -56,6 +56,12 @@ IMPLEMENT_EMBEDDED_IBASE (csCurveTemplate::CurveTemplate)
   IMPLEMENTS_INTERFACE (iCurveTemplate)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+// Should not be necessary, but without this buggy NextStep compiler
+// incorrectly calls csObject::QueryInterface() rather than correctly calling
+// csCurveTemplate::QueryInterface().
+IMPLEMENT_IBASE_EXT(csBezierTemplate)
+IMPLEMENT_IBASE_EXT_END
+
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
 {
   num_vertices = num_v;

@@ -30,6 +30,7 @@
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 #include "ivideo/graph3d.h"
 #include "iengine/curve.h"
 
@@ -323,7 +324,7 @@ public:
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   CSOBJTYPE;
-  DECLARE_IBASE_EXT (csObject);
+  DECLARE_IBASE_EXT (csPObject);
 
   //------------------ iCurveTemplate interface implementation --------------
   struct CurveTemplate : public iCurveTemplate
@@ -369,6 +370,10 @@ public:
   virtual int NumVertices ();
 
   CSOBJTYPE;
+  // Should not be necessary, but without this buggy NextStep compiler
+  // incorrectly calls csObject::QueryInterface() rather than correctly
+  // calling csCurveTemplate::QueryInterface().
+  DECLARE_IBASE_EXT(csCurveTemplate);
 };
 
 /**
