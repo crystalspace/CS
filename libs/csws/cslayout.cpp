@@ -33,6 +33,7 @@ csLayout::csLayout (csComponent *pParent) : csComponent (pParent)
   bRecalcLayout = true;
   SetPalette (CSPAL_DIALOG);
   lc = &c;
+  state |= CSS_SELECTABLE;
 }
 
 int csLayout::GetLayoutingPhase ()
