@@ -187,7 +187,7 @@ void Class::DecRef ()							\
 #define IMPLEMENT_IBASE_QUERY(Class)					\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%u, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));
 
 /**
@@ -251,7 +251,7 @@ void Class::DecRef ()							\
 #define IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)				\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%u, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));
 
 /**
