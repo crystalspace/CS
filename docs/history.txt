@@ -23,6 +23,14 @@ The history order has been reversed so that new features are at the top.
 	- csEngine::GetNearbyLights() now returns references to iLight
 	  instead of csLight.
 	- Fixed a reference to zlib-win32-bin in the documentation.
+	- Eric Sunshine made the following changes:
+	    - Modified static.mak so that cslibref.cpp now depends upon the
+	      system makefile (such as linux.mak) in addition to user.mak and
+	      config.mak (upon which it historically depended).  This new
+	      dependency catches the cases where the user modifies the PLUGINS
+	      variable in the system makefile.
+	    - Fixed a couple minor problems with ddraw.mak and fountain.mak so
+	      that they work correctly with static linking.
 13-Feb-2001
 	- Philip Wyett did some proof reading of the docs:
 	    - Added two missing web links for required mingw

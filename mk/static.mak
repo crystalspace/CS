@@ -87,7 +87,7 @@ OBJ.LIBREF = $(addprefix $(OUT),$(notdir $(SRC.LIBREF:.cpp=$O)))
 
 # List of resources to monitor for changes.  If any of these resources change,
 # then the file referenced by SRC.LIBREF will be regenerated.
-DEP.LIBREF.EXTRA = config.mak mk/user.mak
+DEP.LIBREF.EXTRA = config.mak mk/user.mak $(TARGET_MAKEFILE)
 
 # If plug-in modules will be linked into applications statically, then also
 # link against the synthesized reference file.
