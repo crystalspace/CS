@@ -200,6 +200,7 @@
 	INTERFACE_APPLY(iStream)
 	INTERFACE_APPLY(iStreamIterator)
 	INTERFACE_APPLY(iStreamFormat)
+	INTERFACE_APPLY(iString)
 	INTERFACE_APPLY(iStrVector)
 	INTERFACE_APPLY(iTextureHandle)
 	INTERFACE_APPLY(iTextureList)
@@ -434,6 +435,9 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csutil/cmdhelp.h"
 %include "csutil/strset.h"
+
+%include "iutil/string.h"
+//%include "csutil/csstring.h"
 
 %ignore csVector2::operator[];
 %ignore csVector2::Norm (const csVector2 &);
