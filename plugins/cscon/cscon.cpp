@@ -22,8 +22,8 @@
 #include "sysdef.h"
 #include "iconsole.h"
 #include "igraph2d.h"
-#include "igraph3d.h"
 #include "isystem.h"
+#include "itxtmgr.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "cscon.h"
@@ -31,6 +31,9 @@
 csConsole::csConsole(iBase *base)
 {
   CONSTRUCT_IBASE(base);
+  fg_rgb.red = fg_rgb.green = fg_rgb.blue = 255;    // Foreground defaults to white
+  bg_rgb.red = bg_rgb.green = bg_rgb.blue = 0;    // Background defaults to black
+  bg_alpha = 0; // Background defaults to no transparency
 }
 
 csConsole::~csConsole()
@@ -39,22 +42,19 @@ csConsole::~csConsole()
   //piSystem->DecRef();
   if(piG2D)
     piG2D->DecRef();
-  if(piG3D)
-    piG3D->DecRef();
 }
 
 bool csConsole::Initialize(iSystem *system)
 {
   piSystem = system;
   piG2D = QUERY_PLUGIN(piSystem, iGraphics2D);
-  piG3D = QUERY_PLUGIN(piSystem, iGraphics3D);
   active = false;
   buffer = NULL;
   // Set the maximum backbuffer (4096 lines)
   SetBufferSize(4096);
   Clear();
   // Initialize ourselves with the system and return true if all is well
-  return ((piG2D != NULL) && (piG3D != NULL) && (piSystem->RegisterDriver("iConsole", this)));
+  return ((piG2D != NULL) && (piSystem->RegisterDriver("iConsole", this)));
 }
 
 void csConsole::Show()
@@ -65,13 +65,10 @@ void csConsole::Show()
 void csConsole::Hide()
 {
   active = false;
-  piG3D->BeginDraw(CSDRAW_2DGRAPHICS);
   piG2D->ClearAll(0);
-  piG3D->FinishDraw();
-  piG3D->Print(NULL);
 }
 
-bool csConsole::IsActive()
+bool csConsole::IsActive() const
 {
   return active;
 }
@@ -148,14 +145,14 @@ void csConsole::Draw(csRect * = NULL)
 
   // Display the console, if active
   if(active) {
-    piG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-    piG2D->Clear(0xFF);
+    piG2D->BeginDraw();
+    piG2D->Clear(bg);
     i=topline;
     pos = 0;
     while (i!=line) {
       // Prevent blank lines from killing us
       if(buffer[i]&&(!buffer[i]->IsEmpty()))
-	piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), 0xFFFFFF, -1, buffer[i]->GetData());
+	piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), fg, -1, buffer[i]->GetData());
       i++;
       pos++;
       if(i>=maxlines)
@@ -163,10 +160,38 @@ void csConsole::Draw(csRect * = NULL)
     }
     // Prevent blank lines from killing us
     if(buffer[line]&&(!buffer[line]->IsEmpty()))
-      piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), 0xFFFFFF, -1, buffer[line]->GetData());
-    piG3D->FinishDraw();
-    piG3D->Print(NULL);
+      piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), fg, -1, buffer[line]->GetData());
+    piG2D->FinishDraw();
+    piG2D->Print(NULL);
   }
+}
+
+void csConsole::CacheColors(iTextureManager* txtmgr)
+{
+  fg = txtmgr->FindRGB(fg_rgb.red, fg_rgb.green, fg_rgb.blue);
+  bg = txtmgr->FindRGB(bg_rgb.red, bg_rgb.green, bg_rgb.blue);
+}
+
+void csConsole::GetForeground(int &red, int &green, int &blue) const
+{
+  red = fg_rgb.red; green = fg_rgb.green; blue = fg_rgb.blue;
+}
+
+void csConsole::SetForeground(int red, int green, int blue)
+{
+  fg_rgb.red = red; fg_rgb.green = green; fg_rgb.blue = blue;
+}
+
+void csConsole::GetBackground(int &red, int &green, int &blue, int &alpha) const
+{
+  red = bg_rgb.red; green = bg_rgb.green; blue = bg_rgb.blue;
+  alpha = bg_alpha;
+}
+
+void csConsole::SetBackground(int red, int green, int blue, int alpha = 0)
+{
+  bg_rgb.red = red; bg_rgb.green = green; bg_rgb.blue = blue;
+  bg_alpha = alpha;
 }
 
 IMPLEMENT_IBASE(csConsole)

@@ -22,9 +22,10 @@
 #include "iconsole.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csgeom/math3d.h"
 
 struct iGraphics2D;
-struct iGraphics3D;
+struct iTextureManager;
 class csRect;
 
 class csConsole : public iConsole
@@ -36,11 +37,16 @@ public:
   virtual bool Initialize(iSystem *);
   virtual void Show();
   virtual void Hide();
-  virtual bool IsActive();
+  virtual bool IsActive() const;
   virtual void Clear();
   virtual void PutText(const char *text);
   virtual void Draw(csRect *rect);
   virtual void SetBufferSize(int lines);
+  virtual void CacheColors(iTextureManager *txtmgr);
+  virtual void GetForeground(int &red, int &green, int &blue) const;
+  virtual void SetForeground(int red, int green, int blue);
+  virtual void GetBackground(int &red, int &green, int &blue, int &alpha) const;
+  virtual void SetBackground(int red, int green, int blue, int alpha = 0);
 
 protected:
   bool active;
@@ -48,8 +54,19 @@ protected:
   int line; // Current line in the buffer;
   int topline, maxlines; // Top and Maximum lines in buffer
   iGraphics2D *piG2D;
-  iGraphics3D *piG3D;
   iSystem *piSystem;
+
+  typedef struct Color {
+    int red;
+    int green;
+    int blue;
+  };
+
+  //  Foreground and background colors
+  Color fg_rgb;
+  Color bg_rgb;
+  // The texture manager codes for the colors, and the background alpha field
+  int fg, bg, bg_alpha;
 
   // Increments to the next column/line, and accounts for various limits
   void IncLine();

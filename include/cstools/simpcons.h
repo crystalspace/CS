@@ -82,7 +82,7 @@ public:
   virtual ~csSimpleConsole ();
 
   /// Return true if console is active
-  virtual bool IsActive () { return (ConsoleMode == CONSOLE_MODE); }
+  virtual bool IsActive () const { return (ConsoleMode == CONSOLE_MODE); }
   /// Show the console
   virtual void Show ();
   /// Hide the console
@@ -128,6 +128,11 @@ public:
   virtual void PutText(const char *text);
   virtual void Draw(csRect *rect = NULL) { Print(rect); }
   virtual void SetBufferSize(int lines) { SetMaxLines(lines); }
+  virtual void CacheColors(iTextureManager *txtmgr) { SetupColors(txtmgr); }
+  virtual void GetForeground(int &red, int &green, int &blue) const { red = console_fg_r; green = console_fg_g; blue = console_fg_b; }
+  virtual void SetForeground(int red, int green, int blue) { console_fg_r = red; console_fg_g = green; console_fg_b = blue; }
+  virtual void GetBackground(int &red, int &green, int &blue, int &alpha) const  { red = console_bg_r; green = console_bg_g; blue = console_bg_b; alpha = console_transparent_bg; }
+  virtual void SetBackground(int red, int green, int blue, int alpha = 0)  { console_bg_r = red; console_bg_g = green; console_bg_b = blue;  console_transparent_bg = alpha; }
 private:
   /// Time left until messages will scroll up
   time_t LineTime;

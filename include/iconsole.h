@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 
 class csRect;
+struct iTextureManager;
 
 SCF_VERSION(iConsole, 0, 0, 1);
 struct iConsole : public iPlugIn
@@ -40,7 +41,7 @@ struct iConsole : public iPlugIn
   virtual void Draw(csRect *rect = NULL) = 0;
 
   /// Return true if console is active
-  virtual bool IsActive() = 0;
+  virtual bool IsActive() const = 0;
 
   /// Clear console
   virtual void Clear() = 0;
@@ -48,10 +49,21 @@ struct iConsole : public iPlugIn
   /// Set the buffer size in lines
   virtual void SetBufferSize(int maxlines) = 0;
 
+  /// Retrieve the console colors from the current palette
+  virtual void CacheColors(iTextureManager *txtmgr) = 0;
+
+  /// Get the foreground color
+  virtual void GetForeground(int &red, int &green, int &blue) const = 0;
+  /// Set the foreground color.  CacheColor() must be called before it goes into effect!
+  virtual void SetForeground(int red, int green, int blue) = 0;
+
+  /// Get the background color.  Includes transparency.
+  virtual void GetBackground(int &red, int &green, int &blue, int &alpha) const = 0;
+  /// Set the background color.  CacheColor() must be called before it goes into effect!
+  virtual void SetBackground(int red, int green, int blue, int alpha = 0) = 0;
+
   /* Needs some more features, like:
-   * Foreground/background color control
    * Font control
-   * Transparency control
    * Background texture(s)
    * Scroll control
    * ...
