@@ -118,10 +118,7 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
       right = idx[i];
   }
   /// the resulting span should be less than half the horizon
-  /// (putting % in an assert gives warnings)
-  int spansize = (right - left);
-  spansize %= horsize;
-  CS_ASSERT (spansize <= horsize/2);
+  CS_ASSERT( (right - left)%horsize <= horsize/2);
 }
 
 void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
@@ -285,10 +282,10 @@ void csTerrainQuad::ComputeVisibility(const csVector3& campos,
     {3,1,2,0}
   };
   csBox3 cbox[4];
-  cbox[CS_QUAD_TOPLEFT].Set (bbox.MinX(), 0, midz, midx, 0, bbox.MaxZ());
-  cbox[CS_QUAD_TOPRIGHT].Set(midx, 0, midz, bbox.MaxX(), 0, bbox.MaxZ());
-  cbox[CS_QUAD_BOTLEFT].Set (bbox.MinX(), 0, bbox.MinZ(), midx, 0, midz);
-  cbox[CS_QUAD_BOTRIGHT].Set(midx, 0, bbox.MinZ(), bbox.MaxX(), 0, midz);
+  cbox[CS_QUAD_TOPLEFT].Set (bbox.MinX(), 0, bbox.MinZ(), midx, 0, midz);
+  cbox[CS_QUAD_TOPRIGHT].Set(midx, 0, bbox.MinZ(), bbox.MaxX(), 0, midz);
+  cbox[CS_QUAD_BOTLEFT].Set (bbox.MinX(), 0, midz, midx, 0, bbox.MaxZ());
+  cbox[CS_QUAD_BOTRIGHT].Set(midx, 0, midz, bbox.MaxX(), 0, bbox.MaxZ());
   for(int i=0; i<4; i++)
   {
     int child = fronttoback[camchild][i];
