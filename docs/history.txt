@@ -12,6 +12,16 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+23-Mar-2000
+	- Gary Haussmann added basic support for DrawTriangleMesh(). All
+	  triangles are sent via a glDrawElements() call.  May crash some
+	  OpenGL drivers, although I have not been able to isolate the
+	  problem to CS or the GL driver. Transforms are still in software,
+	  and hardware transform should wait until the basic drawing code is
+	  ironed out.
+	- Norman Kramer did some fixes on the csConsole plygin to cursor
+	  positioning on pageup/down and fixed some code that caused crashes
+	  when the right cursorkey was hit on an empty line.
 22-Mar-2000
 	- Continued debugging work on solid BSP. Still not perfect
 	  although I'm getting closer all the time.
@@ -41,6 +51,8 @@ Short-term cleanups that need to be done:
 	  and funcon).
 	- Eric Sunshine patched texi2html so that it no longer crashes on DOS
 	  when invoking getpwuid().
+	- Thomas Hieber did various fixes to make sure everything compiles
+	  again after Andrew's changes.
 21-Mar-2000
 	- Norman Kramer added lines to draw 3D part of console if available.
 	  (and made the console window smaller to enjoy the funky console
