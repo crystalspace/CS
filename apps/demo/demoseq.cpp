@@ -291,20 +291,48 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
       do_path = false;
     }
     pfm->path->Calculate (r);
+    csVector3 oldpos;
+    iSector* oldsector;
     csVector3 pos, up, forward;
+    if (pfm->mesh)
+    {
+      iMovable* movable = pfm->mesh->GetMovable ();
+      oldpos = movable->GetPosition ();
+      oldsector = movable->GetSectors ()->Get (0);
+    }
+    else
+    {
+      oldpos = camera->GetTransform ().GetOrigin ();
+      oldsector = camera->GetSector ();
+    }
+
     pfm->path->GetInterpolatedPosition (pos);
     pfm->path->GetInterpolatedUp (up);
     pfm->path->GetInterpolatedForward (forward);
+
+    // See if we have to go to another sector when going through a
+    // portal.
+    csVector3 remember_pos = pos;
+    csReversibleTransform trans;
+    trans.SetOrigin (oldpos);
+    bool mirror = false;
+    iSector* newsector = oldsector->FollowSegment (trans,
+    	pos, mirror, true);
+
     if (pfm->mesh)
     {
       iMovable* movable = pfm->mesh->GetMovable ();
       movable->SetPosition (pos);
+      if (oldsector != newsector)
+        movable->SetSector (newsector);
       movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
       movable->UpdateMove ();
       pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
     }
     else
     {
+      if (oldsector != newsector)
+        camera->SetSector (newsector);
       camera->GetTransform ().SetOrigin (pos);
       camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
     }

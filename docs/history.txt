@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	  for example.
 	- csdemo will no longer fail if there is no library in the demo
 	  archive.
+	- csdemo will now correctly move objects and camera so that they end
+	  up in the correct sector if they go through a portal.
 11-Mar-2002
 	- Fixed a bug in csScanStr when presented with an empty string
 	  as input. This prevented the proper scanning of the format

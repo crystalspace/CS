@@ -43,6 +43,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SHOWMESH)
   CS_TOKEN_DEF (HIDEMESH)
   CS_TOKEN_DEF (PATH)
+  CS_TOKEN_DEF (SECTOR)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (TEST)
   CS_TOKEN_DEF (DELAY)
@@ -402,6 +403,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
     CS_TOKEN_TABLE (TIMES)
     CS_TOKEN_TABLE (UNIFORMSPEED)
     CS_TOKEN_TABLE (SPEED)
+    CS_TOKEN_TABLE (SECTOR)
   CS_TOKEN_TABLE_END
 
   csNamedPath* np = NULL;
@@ -437,6 +439,13 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	np = LoadPath (**buf, pName);
 	buf->DecRef ();
 	return np;
+      }
+      case CS_TOKEN_SECTOR:
+      {
+	char sname[255];
+	csScanStr (params, "%s", sname);
+	np->SetStartSector (sname);
+        break;
       }
       case CS_TOKEN_NUM:
       {

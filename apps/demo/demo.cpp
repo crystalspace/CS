@@ -290,12 +290,9 @@ bool Demo::Initialize (int argc, const char* const argv[],
      return false;
     }
 
-    if (!loader->LoadLibraryFile ("library"))
-    {
-      //Report (CS_REPORTER_SEVERITY_ERROR,
-        //"There was an error loading library!");
-      //exit (0);
-    }
+    // This can fail, but we don't care :-)
+    loader->LoadLibraryFile ("library");
+
     if (!loader->LoadMapFile ("world", false, true))
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
@@ -439,7 +436,7 @@ void Demo::SetupFrame ()
   // since no time has passed, the animated screen image stays the same.
   // avoid drawing this, it will only fill up queues and cause jerky
   // movement on some hardware/drivers.
-  if(elapsed_time == 0) return;
+  if (elapsed_time == 0) return;
 
   // Now rotate the camera according to keyboard state
   csReversibleTransform& camtrans = view->GetCamera ()->GetTransform ();
