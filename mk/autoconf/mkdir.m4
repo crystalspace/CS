@@ -6,10 +6,10 @@ AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
 # Replacement for AS_MKDIR_P() from m4sugar/m4sh.m4 which fixes two problems
-# which are present in Autoconf 2.57 and probably all 2.5x versions.  This bug,
-# along with a patch, was submitted to the Autoconf GNATS database by Eric
-# Sunshine as #227 on 17-Dec-2002.  The bogus "-p" directory bug was fixed for
-# Autoconf 2.58 on 26-Sep-2003.  The "mkdirs" optimization was not accepted
+# which are present in Autoconf 2.57 and probably all earlier 2.5x versions.
+# This bug, along with a patch, was submitted to the Autoconf GNATS database by
+# Eric Sunshine as #227 on 17-Dec-2002.  The bogus "-p" directory bug was fixed
+# for Autoconf 2.58 on 26-Sep-2003.  The "mkdirs" optimization was not accepted
 # (since it is unnecessary; it's only an optimization).
 #
 # 1) Removes bogus "-p" directory which the stock AS_MKDIR_P() leaves laying

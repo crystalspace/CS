@@ -30,9 +30,9 @@ AC_PREREQ([2.56])
 #	when the file is listed as a dependency in a makefile.
 #
 # *NOTE*
-#	There is a bug in Autoconf 2.57 and probably all 2.5x versions which
-#	results in errors if AC_CONFIG_COMMANDS is invoked for a `tag' which
-#	represents a file in a directory which does not yet exist.
+#	There is a bug in Autoconf 2.57 and probably all earlier 2.5x versions
+#	which results in errors if AC_CONFIG_COMMANDS is invoked for a `tag'
+#	which represents a file in a directory which does not yet exist.
 #	Unfortunately, even invoking AS_MKDIR_P in the `cmd' portion of
 #	AC_CONFIG_COMMANDS does not solve the problem because the generated
 #	configure script attempts to access information about the directory
