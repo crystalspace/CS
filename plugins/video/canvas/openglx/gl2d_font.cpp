@@ -30,7 +30,7 @@ csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer(FontDef *startfont)
     : Font_Count(0), Font_Offsets(NULL)
 {
 
-    // intialize a first font, if we have one
+    // initialize a first font, if we have one
     if (startfont != NULL)
 	BuildFont(*startfont);
 
@@ -46,7 +46,9 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 {
     // we assume the FontDef is legal...
 
-    // OK, update our member variables with new font information
+    // We need to make room for another offset, which tells the
+    // offset to the bank of openGL display lists used for the
+    // new font.
 
     // need another spot in the array of offsets
     if (Font_Offsets != NULL)
@@ -63,7 +65,6 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 
     // get a bank of list indices from GL, and stored in our array
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glGenLists(5);
     GLuint newfontoffset = glGenLists(128);
 
     // since openGL's raster data is reversed from CS, we must
@@ -78,6 +79,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 
     // new shove all the raster data at openGL...
     int charwidth = newfont.Width;
+    int offsetfrombottom = WordsPerChar-newfont.Height;
     for (int characterindex=0; characterindex<128; characterindex++)
     {
     	glNewList(newfontoffset+characterindex,GL_COMPILE);
@@ -94,18 +96,18 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 	// the reason behind this code!
 
 	basebuffer = newfont.FontBitmap + characterindex*newfont.BytesPerChar;
-	for (int wordindex=0; wordindex < WordsPerChar; wordindex++)
+	for (int wordindex=0; wordindex < newfont.Height; wordindex++)
 	{
 	    for (int charindex=0; charindex < wordsize; charindex++)
 	    	flipbuffer[wordindex*wordsize+charindex] =
-			basebuffer[(WordsPerChar-wordindex-1)*wordsize+charindex];
+			basebuffer[(newfont.Height-wordindex-1)*wordsize+charindex];
 	}
 
 	// we assume that stepping to the next character involves moving
 	// 0 pixels in the y direction and moving 'charwidth' pixels to the
 	// right
 	glBitmap(charwidth, newfont.Height,  /* bitmap size */
-		 0.0 , 0.0 , 			     /* offset from bitmap origin */
+		 0.0 , offsetfrombottom,      /* offset from bitmap origin */
 		 charwidth, 0, 		     /* shift raster position by this */
 		 flipbuffer
 		 );
