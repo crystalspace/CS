@@ -64,11 +64,11 @@ public:
 };
 
 class csCdModel;
-class csCdTriangle;
-class collision_pair;
 class csCdBBox;
 class csPolygonSet;
 class csSprite3D;
+struct csCdTriangle;
+struct collision_pair;
 
 /// Low level collision detection using the RAPID algorithm
 class csRAPIDCollider : public csCollider {

@@ -990,17 +990,20 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
   return false;
 }
 
-const csVector3 &csRAPIDCollider::GetRadius() const {
+const csVector3 &csRAPIDCollider::GetRadius() const 
+{
   return GetBbox()->GetRadius();
 }
 
-const csCdBBox* csRAPIDCollider::GetBbox(void) const {
+const csCdBBox* csRAPIDCollider::GetBbox(void) const 
+{
   return m_pCollisionModel->GetTopLevelBox();
 }
 
 bool csRAPIDCollider::Collide (csObject &otherObject,
-                               csTransform *pThisTransform = 0,
-                               csTransform *pOtherTransform = 0) {
+                               csTransform *pThisTransform,
+                               csTransform *pOtherTransform) 
+{
   csRAPIDCollider *pOtherCollider = GetRAPIDCollider(otherObject);
   if (pOtherCollider)
     return Collide(*pOtherCollider, pThisTransform, pOtherTransform);
@@ -1008,7 +1011,8 @@ bool csRAPIDCollider::Collide (csObject &otherObject,
     return false;
 }
 
-csRAPIDCollider *csRAPIDCollider::GetRAPIDCollider(csObject &object) {
+csRAPIDCollider *csRAPIDCollider::GetRAPIDCollider(csObject &object) 
+{
   csObject *o = object.GetChild (csRAPIDCollider::Type);
   if (o) return (csRAPIDCollider*) o;
   return NULL;
