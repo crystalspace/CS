@@ -100,7 +100,6 @@
         <plugin name="haze">crystalspace.mesh.loader.haze</plugin>
         <plugin name="spiralFact">crystalspace.mesh.loader.factory.spiral</plugin>
         <plugin name="spiral">crystalspace.mesh.loader.spiral</plugin>
-        <plugin name="plane">crystalspace.mesh.loader.thing.plane</plugin>
     </plugins>
     <renderpriorities>
         <priority name="sky">
@@ -148,28 +147,6 @@
         <plugin>hazeFact</plugin>
         <params />
     </meshfact>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>floor</name>
-            <orig x="0" y="-1" z="0" />
-            <first x="1" y="-1" z="0" />
-            <firstlen>5</firstlen>
-            <second x="0" y="-1" z="1" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
-    <addon>
-        <plugin>plane</plugin>
-        <params>
-            <name>ceiling</name>
-            <orig x="0" y="5" z="0" />
-            <first x="1" y="5" z="0" />
-            <firstlen>5</firstlen>
-            <second x="0" y="5" z="1" />
-            <secondlen>5</secondlen>
-        </params>
-    </addon>
     <sector name="room">
         <meshobj name="walls">
             <zfill />
@@ -209,7 +186,11 @@
                     <v>15</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down2">
@@ -219,7 +200,11 @@
                     <v>14</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down3">
@@ -229,7 +214,11 @@
                     <v>3</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up1">
@@ -239,7 +228,11 @@
                     <v>18</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up2">
@@ -249,7 +242,11 @@
                     <v>19</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up3">
@@ -259,7 +256,11 @@
                     <v>6</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="front1">
@@ -482,7 +483,11 @@
                     <v>15</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down2">
@@ -492,7 +497,11 @@
                     <v>14</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down3">
@@ -502,7 +511,11 @@
                     <v>3</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up1">
@@ -512,7 +525,11 @@
                     <v>18</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up2">
@@ -522,7 +539,11 @@
                     <v>19</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up3">
@@ -532,7 +553,11 @@
                     <v>6</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="front1">
@@ -780,12 +805,12 @@
                 <startaccel>
                     <emitfixed x="0" y="0" z="0" />
                 </startaccel>
-		<fieldspeed>
-		  <emitcylindertangent p="0.3" q="0.4">
-			<min x="0" y="-1" z="0" />
-			<max x="0" y="3" z="0" />
-		  </emitcylindertangent>
-		</fieldspeed>
+                <fieldspeed>
+                    <emitcylindertangent p="0.3" q="0.4">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="3" z="0" />
+                    </emitcylindertangent>
+                </fieldspeed>
                 <aging>
                     <color red="0" green="0.4" blue="0.8" />
                     <time>0</time>
@@ -927,7 +952,11 @@
                     <v>15</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down2">
@@ -937,7 +966,11 @@
                     <v>14</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down3">
@@ -947,7 +980,11 @@
                     <v>3</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up1">
@@ -957,7 +994,11 @@
                     <v>18</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up2">
@@ -967,7 +1008,11 @@
                     <v>19</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up3">
@@ -977,7 +1022,11 @@
                     <v>6</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="front1">
@@ -1289,7 +1338,11 @@
                     <v>15</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down2">
@@ -1299,7 +1352,11 @@
                     <v>14</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down3">
@@ -1309,7 +1366,11 @@
                     <v>3</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up1">
@@ -1319,7 +1380,11 @@
                     <v>18</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up2">
@@ -1329,7 +1394,11 @@
                     <v>19</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up3">
@@ -1339,7 +1408,11 @@
                     <v>6</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="front1">
@@ -1789,7 +1862,11 @@
                     <v>15</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down2">
@@ -1799,7 +1876,11 @@
                     <v>14</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down3">
@@ -1809,7 +1890,11 @@
                     <v>3</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up1">
@@ -1819,7 +1904,11 @@
                     <v>18</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up2">
@@ -1829,7 +1918,11 @@
                     <v>19</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up3">
@@ -1839,7 +1932,11 @@
                     <v>6</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="front1">
@@ -2066,7 +2163,11 @@
                     <v>15</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down2">
@@ -2076,7 +2177,11 @@
                     <v>14</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="down3">
@@ -2086,7 +2191,11 @@
                     <v>3</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>floor</plane>
+                        <orig x="0" y="-1" z="0" />
+                        <first x="1" y="-1" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="-1" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up1">
@@ -2096,7 +2205,11 @@
                     <v>18</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up2">
@@ -2106,7 +2219,11 @@
                     <v>19</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="up3">
@@ -2116,7 +2233,11 @@
                     <v>6</v>
                     <material>wood</material>
                     <texmap>
-                        <plane>ceiling</plane>
+                        <orig x="0" y="5" z="0" />
+                        <first x="1" y="5" z="0" />
+                        <firstlen>5</firstlen>
+                        <second x="0" y="5" z="1" />
+                        <secondlen>5</secondlen>
                     </texmap>
                 </p>
                 <p name="front1">
