@@ -42,7 +42,7 @@ endif
 #------
 # Location of sources and object files
 #------
-SRC=$(wildcard src/*.cpp)
+SRC=$(wildcard *.cpp)
 OBJS=$(addsuffix .o, $(basename $(SRC)))
 OUT=.
 
