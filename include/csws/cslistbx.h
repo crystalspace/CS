@@ -300,6 +300,8 @@ class csListBox : public csComponent
   csPixmap *FrameBitmap;
   /// Flag: delete frame bitmap on destruction?
   bool fDelFrameBitmap;
+  /// Alpha for the listbox frame
+  uint8 FrameAlpha;
   
 public:
   /// Create input line object
@@ -342,6 +344,9 @@ public:
  
  /// Set the background texture (only useful when FrameStyle is cslfsTextured)
  void SetTexture(csPixmap *iTexture, bool iDelFrameBitmap=false);
+ 
+ /// Set the frame's alpha
+ void SetAlpha(uint8 iAlpha);
     
  /**
   * Accessors for private member variables
@@ -386,6 +391,10 @@ public:
  /// Get frame bitmap or texture bitmap (same item, meaning just depends on FrameStyle)
  csPixmap *GetFrameBitmap()
  { return FrameBitmap; }
+ 
+ /// Get the alpha for the listbox
+ uint8 GetAlpha() 
+ { return FrameAlpha; }
 
 protected:
   /// Make a listbox item visible (same as cscmdListBoxMakeVisible)
