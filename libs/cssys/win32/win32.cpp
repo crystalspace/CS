@@ -69,10 +69,10 @@ void SysSystemDriver::Alert (const char* s)
 {
   bool FullScreen = false;
 
-  if (piG2D)
+  if (G2D)
   {
     //Check if we are in Fullscreenmode.
-    piG2D->GetIsFullScreen(FullScreen);
+    FullScreen = G2D->GetFullScreen();
   }
 
   if (FullScreen)
@@ -380,7 +380,7 @@ SysMouseDriver::~SysMouseDriver(void)
 
 bool SysMouseDriver::Open(csEventQueue *EvQueue)
 {
-  csMouseDriver::Open (GetiSystemFromSystem(System), EvQueue);
+  csMouseDriver::Open (System, EvQueue);
   // Open mouse system
   return true;
 }
@@ -392,12 +392,14 @@ void SysMouseDriver::Close()
 
 // The System driver ////////////////
 
+/*
 BEGIN_INTERFACE_TABLE(SysSystemDriver)
   IMPLEMENTS_COMPOSITE_INTERFACE (Win32SystemDriver)
   IMPLEMENTS_COMPOSITE_INTERFACE (System)
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE (SysSystemDriver)
+*/
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
@@ -426,15 +428,15 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 void SysSystemDriver::Loop ()
 {
   MSG msg;
-  IDDraw3GraphicsInfo* piG2Ddd3 = NULL;
+  iGraphics2DDDraw3* piG2Ddd3 = NULL;
 
-  HRESULT hRes = System->piG2D->QueryInterface( IID_IDDraw3GraphicsInfo, (void**)&piG2Ddd3);
+  piG2Ddd3 = QUERY_INTERFACE(System->G2D, iGraphics2DDDraw3);
 
-  if (SUCCEEDED(hRes))
+  if (piG2Ddd3)
   {
     piG2Ddd3->SetColorPalette();
 
-    piG2Ddd3->Release();
+    piG2Ddd3->DecRef();
     piG2Ddd3 = NULL;
   }
 
@@ -461,7 +463,7 @@ void SysSystemDriver::Loop ()
 
 //----------------------------------------------// COM Implementation //------//
 
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED( SysSystemDriver, Win32SystemDriver )
+//IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED( SysSystemDriver, Win32SystemDriver )
 
 STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetInstance(HINSTANCE* retval)
 {

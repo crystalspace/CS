@@ -107,13 +107,14 @@ public:
     /// Gets the nCmdShow of the WinMain().
     STDMETHODIMP GetCmdShow (int* retval);
 
-    DECLARE_IUNKNOWN ()
+    //DECLARE_IUNKNOWN ()
   };
 
+/*
   // COM stuff
   DECLARE_IUNKNOWN ()
   DECLARE_INTERFACE_TABLE (SysSystemDriver)  
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (Win32SystemDriver);
+  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (Win32SystemDriver);*/
 };
 
 /// Windows version.

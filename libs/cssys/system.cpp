@@ -689,7 +689,7 @@ bool csSystemDriver::RegisterDriver (const char *iInterface, iPlugIn *iObject)
     rc = !!(Object = QUERY_INTERFACE (iObject, Interface));
 
   bool rc = false;
-  CHECK (    , VFS,    iVFS)
+  CHECK (;   , VFS,    iVFS)
   CHECK (else, G3D,    iGraphics3D)
   CHECK (else, G2D,    iGraphics2D)
   CHECK (else, Sound,  iSoundRender)
@@ -712,7 +712,7 @@ bool csSystemDriver::DeregisterDriver (const char *iInterface, iPlugIn *iObject)
     return true;						\
   }
 
-  CHECK (    , VFS,    iVFS)
+  CHECK (;   , VFS,    iVFS)
   CHECK (else, G3D,    iGraphics3D)
   CHECK (else, G2D,    iGraphics2D)
   CHECK (else, Sound,  iSoundRender)

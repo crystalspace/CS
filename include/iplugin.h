@@ -44,7 +44,7 @@ SCF_INTERFACE (iPlugIn, 0, 0, 1) : public iBase
    * and want the event to not be passed further for processing by
    * other plugins.
    */
-  virtual bool HandleEvent (csEvent &Event)
+  virtual bool HandleEvent (csEvent& /*Event*/)
   { return false; }
 };
 

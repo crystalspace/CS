@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/timeb.h>
+#include <windows.h>
 #include "sysdef.h"
 #include "cssys/system.h"
 
