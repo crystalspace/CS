@@ -32,6 +32,7 @@
 #include "csgeom/polyaa.h"
 #include "csgeom/vector2.h"
 
+#include "iutil/cfgmgr.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
@@ -39,6 +40,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/custcursor.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/util.h"
 #include "iutil/cmdline.h"
@@ -66,6 +68,7 @@ class G2DTestSystemDriver
     stContextInfo,
     stWindowFixed,
     stWindowResize,
+    stCustomCursor,
     stBackBufferON,
     stBackBufferOFF,
     stTestUnicode1,
@@ -79,6 +82,7 @@ class G2DTestSystemDriver
     stLineClipTest,
     stBoxClipTest,
     stFontClipTest,
+    stBlitTest,
     stPause,
     stWaitKey
   };
@@ -96,7 +100,8 @@ class G2DTestSystemDriver
   // some handy colors
   int white, yellow, green, red, blue, black, gray, dsteel;
   // Last pressed key
-  int lastkey, lastkey2, lastkey3, lastkey4, lastkey5, lastkey6, lastkey7, lastkey8;
+  int lastkey, lastkey2, lastkey3, lastkey4, lastkey5, lastkey6, lastkey7, 
+    lastkey8, lastkey9;
   // Switch backbuffer while waiting for a key
   bool SwitchBB;
   // Current font
@@ -105,12 +110,15 @@ class G2DTestSystemDriver
   csRef<iFont> fontItalic;
   csRef<iFont> fontCourier;
   csRef<iFont> fontSmall;
+  csRef<iImage> blitTestImage;
   // Event Outlet
   iEventOutlet* EventOutlet;
 
 public:
   csRef<iGraphics2D> myG2D;
+  csRef<iGraphics3D> myG3D;
   iObjectRegistry* object_reg;
+  csRef<iCursor> cursorPlugin;
 
 public:
   G2DTestSystemDriver (int argc, char* argv[]);
@@ -133,10 +141,14 @@ private:
 
   void ResizeContext ();
 
+  void SetCustomCursor ();
+  void SetNormalCursor ();
+
   void DrawStartupScreen ();
   void DrawContextInfoScreen ();
   void DrawWindowScreen ();
   void DrawWindowResizeScreen ();
+  void DrawCustomCursorScreen ();
   void DrawBackBufferText ();
   void DrawBackBufferON ();
   void DrawBackBufferOFF ();
@@ -152,6 +164,8 @@ private:
   void LineClipTest  ();
   void BoxClipTest ();
   void FontClipTest ();
+
+  void BlitTest ();
 
   void DrawClipRect(int x, int y, int w, int h);
 };
@@ -190,6 +204,7 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
     EventOutlet = q->GetEventOutlet();
     EventOutlet->IncRef();
   }
+
 }
 
 G2DTestSystemDriver::~G2DTestSystemDriver ()
@@ -201,6 +216,8 @@ G2DTestSystemDriver::~G2DTestSystemDriver ()
   fontCourier = 0;
   fontLarge = 0;
   fontSmall = 0;
+  blitTestImage = 0;
+  cursorPlugin = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -232,6 +249,9 @@ void G2DTestSystemDriver::EnterState (appState newstate, int arg)
       break;
     case stFontClipTest:
       lastkey8 = 0;
+      break;
+    case stCustomCursor:
+      lastkey9 = 0;
       break;
     case stWaitKey:
       lastkey = 0;
@@ -276,6 +296,7 @@ void G2DTestSystemDriver::SetupFrame ()
     case stContextInfo:
     case stWindowFixed:
     case stWindowResize:
+    case stCustomCursor:
     case stBackBufferON:
     case stBackBufferOFF:
     case stTestUnicode1:
@@ -289,8 +310,9 @@ void G2DTestSystemDriver::SetupFrame ()
     case stLineClipTest:
     case stBoxClipTest:
     case stFontClipTest:
+    case stBlitTest:
     {
-      if (!myG2D->BeginDraw ())
+      if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS))
         break;
 
       myG2D->Clear (black);
@@ -302,11 +324,29 @@ void G2DTestSystemDriver::SetupFrame ()
 	  fontItalic = GetFont (CSFONT_ITALIC);
 	  fontCourier = GetFont (CSFONT_COURIER);
 	  fontSmall = GetFont (CSFONT_SMALL);
+	  {
+	    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+	    csRef<iImageIO> iio = CS_QUERY_REGISTRY (object_reg,
+	      iImageIO);
+	    if (vfs.IsValid () && iio.IsValid ())
+	    {
+	      csRef<iFile> testFile = vfs->Open ("/lib/g2dtest/up.png", 
+		VFS_FILE_READ);
+	      if (testFile.IsValid ())
+	      {
+		csRef<iDataBuffer> fileData = testFile->GetAllData ();
+		blitTestImage = iio->Load (fileData->GetUint8 (), 
+		  fileData->GetSize (), CS_IMGFMT_ANY);
+		blitTestImage->SetFormat (CS_IMGFMT_TRUECOLOR 
+		  | CS_IMGFMT_ALPHA);
+	      }
+	    }
+	  }
 	  EnterState (stStartup);
 	  break;
         case stStartup:
           DrawStartupScreen ();
-          EnterState (stContextInfo);
+	  EnterState (stContextInfo);
           EnterState (stPause, 5000);
           break;
         case stContextInfo:
@@ -321,10 +361,19 @@ void G2DTestSystemDriver::SetupFrame ()
           break;
         case stWindowResize:
           DrawWindowResizeScreen ();
-          EnterState (stBackBufferON);
+          EnterState (stCustomCursor);
           EnterState (stWaitKey);
           break;
+	case stCustomCursor:
+          DrawCustomCursorScreen ();
+	  SetCustomCursor ();
+	  if (lastkey9)
+            EnterState (stBackBufferON);
+	  else
+            EnterState (stCustomCursor);
+          break;
         case stBackBufferON:
+	  SetNormalCursor ();
           myG2D->AllowResize (false);
           EnterState (stBackBufferOFF);
           if (myG2D->DoubleBuffer (true))
@@ -418,9 +467,13 @@ void G2DTestSystemDriver::SetupFrame ()
         case stFontClipTest:
           FontClipTest ();
           if (lastkey8)
-            ;//EnterState ();
+	    EnterState (stBlitTest);
           else
             EnterState (stFontClipTest);
+          break;
+	case stBlitTest:
+	  BlitTest ();
+          EnterState (stWaitKey);
           break;
         default:
           break;
@@ -455,8 +508,8 @@ void G2DTestSystemDriver::SetupFrame ()
 
 void G2DTestSystemDriver::FinishFrame ()
 {
-  myG2D->FinishDraw ();
-  myG2D->Print (0);
+  myG3D->FinishDraw ();
+  myG3D->Print (0);
 }
 
 bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
@@ -505,12 +558,19 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
 	      break;
 	    case stPixelClipTest:
 	      lastkey5 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
 	    case stLineClipTest:
 	      lastkey6 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
 	    case stBoxClipTest:
 	      lastkey7 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
 	    case stFontClipTest:
 	      lastkey8 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
+	    case stCustomCursor:
+	      lastkey9 = csKeyEventHelper::GetCookedCode (&Event);
+	      break;
 	    default:
 	      break;
 	  }
@@ -749,6 +809,19 @@ void G2DTestSystemDriver::ResizeContext ()
   myG2D->Print (0);
 }
 
+void G2DTestSystemDriver::SetCustomCursor ()
+{
+  if (cursorPlugin)
+  {
+    cursorPlugin->SwitchCursor ("Hand");
+  }
+}
+
+void G2DTestSystemDriver::SetNormalCursor ()
+{
+  myG2D->SetMouseCursor (csmcArrow);
+}
+
 void G2DTestSystemDriver::DrawBackBufferText ()
 {
   SetFont (fontItalic);
@@ -796,6 +869,22 @@ void G2DTestSystemDriver::DrawBackBufferOFF ()
   WriteCentered (0, 16*0, gray,  -1, "You should not see any flickering now; if this text");
   WriteCentered (0, 16*1, gray,  -1, "flickers, this means that current canvas plugin has");
   WriteCentered (0, 16*2, gray,  -1, "wrong support for single-backbuffer mode.");
+}
+
+void G2DTestSystemDriver::DrawCustomCursorScreen ()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+
+  SetFont (fontItalic);
+  int tpos = -h / 2;
+  WriteCentered (0, tpos, white, -1, "CUSTOM MOUSE CURSOR");
+
+  SetFont (fontLarge);
+  WriteCentered (0, tpos + 16*2, black,  -1, "If your current canvas supports custom mouse cursors");
+  WriteCentered (0, tpos + 16*3, black,  -1, "you shouldn't see your systems default cursor now.");
 }
 
 void G2DTestSystemDriver::DrawUnicodeTest1 ()
@@ -1452,6 +1541,37 @@ void G2DTestSystemDriver::FontClipTest()
   } while (delta_time < 100);
 }
 
+void G2DTestSystemDriver::BlitTest ()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+  
+  SetFont (fontItalic);
+  WriteCentered (0,-16*8, white, -1, "BLIT() TEST");
+
+  SetFont (fontLarge);
+  WriteCentered (0,-16*7, black, dsteel, "This will test whether iGraphics2D->Blit() works correctly");
+  WriteCentered (0,-16*6, black, dsteel, "on this canvas.");
+
+  WriteCentered (0,-16*4, black, dsteel, "You should an image of an arrow and the word \"up\".");
+  WriteCentered (0,-16*3, black, dsteel, "It is surrounded by a green rectangle, and the image");
+  WriteCentered (0,-16*2, black, dsteel, "itself has a black border. No red should be visible");
+  WriteCentered (0,-16*1, black, dsteel, "and the border has to be complete, too.");
+
+  if (blitTestImage.IsValid ())
+  {
+    const int imW = blitTestImage->GetWidth ();
+    const int imH = blitTestImage->GetHeight ();
+    const int bx = (w - imW) / 2;
+    const int by = h / 2;
+    DrawClipRect (bx, by, imW + 1, imH + 1);
+    myG2D->Blit (bx + 1, by + 1, imW, imH, 
+      (unsigned char*)blitTestImage->GetImageData ());
+  }
+}
+
 static bool G2DEventHandler (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
@@ -1496,34 +1616,35 @@ int main (int argc, char *argv[])
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser));
 
-  System.myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
-  // Now load the canvas plugin
-  if (!System.myG2D)
+  System.myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  // Now load the renderer plugin
+  if (!System.myG3D)
   {
-    csString canvas = cmdline->GetOption ("canvas");
+    csString canvas = cmdline->GetOption ("video");
     if (!canvas || !*canvas)
-      canvas = CS_SOFTWARE_2D_DRIVER;
+      canvas = "crystalspace.graphics3d.software"; //CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))
     {
-      canvas = "crystalspace.graphics2d." + canvas;
+      canvas = "crystalspace.graphics3d." + canvas;
     }
-    System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, iGraphics2D);
-    if (!object_reg->Register (System.myG2D, "iGraphics2D"))
+    System.myG3D = CS_LOAD_PLUGIN (plugin_mgr, canvas, iGraphics3D);
+    if (!object_reg->Register (System.myG3D, "iGraphics3D"))
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	  "crystalspace.application.g2dtest",
-	  "Unable to register canvas!");
+	  "Unable to register renderer!");
       return -1;
     }
   }
 
-  if (!System.myG2D)
+  if (!System.myG3D)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
 	"Unable to load canvas driver!");
     return -1;
   }
+  System.myG2D = System.myG3D->GetDriver2D ();
     
   if (!csInitializer::OpenApplication (object_reg))
   {
@@ -1533,7 +1654,7 @@ int main (int argc, char *argv[])
     return -1;
   }
   
-  if (!System.myG2D->Open ())
+  if (!System.myG3D->Open ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
@@ -1541,15 +1662,28 @@ int main (int argc, char *argv[])
     return -1;
   }
 
+  System.cursorPlugin = CS_QUERY_REGISTRY(object_reg, iCursor);
+  if (System.cursorPlugin)
+  {
+    csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+    if (System.cursorPlugin->Setup (System.myG3D))
+    {
+      System.cursorPlugin->ParseConfigFile ((iConfigManager*)cfg);
+    }
+    else
+      System.cursorPlugin = 0;
+  }
+
   iNativeWindow* nw = System.myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle (APP_TITLE);
 
   csDefaultRunLoop(object_reg);
 
-  System.myG2D->Close();
-  System.myG2D = NULL;
-  plugin_mgr = NULL;
-  cmdline = NULL;
+  System.myG2D = 0;
+  System.myG3D->Close();
+  System.myG3D = 0;
+  plugin_mgr = 0;
+  cmdline = 0;
 
   return 0;
 }
