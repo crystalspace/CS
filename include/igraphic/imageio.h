@@ -90,14 +90,14 @@ struct iImageIO : public iBase
    * <code>compress=50</code><br>
    * <code>progressive,compress=30</code>
    */
-  virtual iDataBuffer* Save (iImage *image, iImageIO::FileFormatDescription *format,
+  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format,
     const char* extraoptions = NULL) = 0;
 
   /**
    * Save an image using format <mime>.
    * If omitted format selection is left to the plugin.
    */
-  virtual iDataBuffer* Save (iImage *image, const char *mime = NULL,
+  virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = NULL,
     const char* extraoptions = NULL) = 0;
 };
 

@@ -208,14 +208,13 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
   printf ("Saving output file %s\n", outname);
 
 #if 1
-  iDataBuffer *db = ImageLoader->Save (ifile, output_mime, output_opts);
+  csRef<iDataBuffer> db (ImageLoader->Save (ifile, output_mime, output_opts));
   if (db)
   {
     FILE *f = fopen (outname, "wb");
     if (f)
       fwrite (db->GetData (), 1, db->GetSize (), f);
     fclose (f);
-    db->DecRef();
   }
   else
   {

@@ -411,7 +411,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 
 	  SkinImage img (
 	    spr.skins[i].texs[j], palette, spr.skinwidth, spr.skinheight);
-	  iDataBuffer *db = mdl2spr_imageio->Save (&img, "image/png");
+	  csRef<iDataBuffer> db (mdl2spr_imageio->Save (&img, "image/png"));
 	  if (db)
 	  {
 	    FILE *f = fopen (skinfilename, "w+");
@@ -421,7 +421,6 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	    if (!f || n != db->GetSize ())
 	      fprintf(stderr, "Error when writing `%s'.\n", skinfilename);
 	    if (f) fclose (f);
-	    db->DecRef ();
 	  }
 	}
       }

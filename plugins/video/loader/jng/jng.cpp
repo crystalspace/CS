@@ -307,7 +307,7 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
   dest->ds = ds;
 }
 
-iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
+csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {
   // we need to get a RGB/RGBA version of the image.
@@ -323,7 +323,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
       break;
     default:
       // unknown format
-      return NULL;
+      return csPtr<iDataBuffer> (NULL);
   } 
 
   // compression options
@@ -414,7 +414,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   {
     Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "failed to initialize libmng");
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   if ((mng_setcb_openstream (handle, cb_openstream) != MNG_NOERROR) ||
@@ -423,7 +423,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   {
     ReportLibmngError (object_reg, handle, "failed to set libmng callbacks");
     mng_cleanup (&handle);
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   outfile = new csMemFile ();
@@ -434,7 +434,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     mng_cleanup (&handle);
     delete outfile;
     imgRGBA->DecRef();
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   bool has_alpha = imgRGBA->GetFormat() & CS_IMGFMT_ALPHA;
@@ -452,7 +452,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     mng_cleanup (&handle);
     delete outfile;
     imgRGBA->DecRef();
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   // @@@ chunk data generation.
@@ -535,7 +535,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
 	delete outfile;
 	delete[] alpha;
 	imgRGBA->DecRef();
-	return NULL;
+	return csPtr<iDataBuffer> (NULL);
       }
     }
     else
@@ -580,7 +580,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
 	delete[] chunkdata;
 	delete[] alpha;
 	imgRGBA->DecRef();
-	return NULL;
+	return csPtr<iDataBuffer> (NULL);
       }
 
       char buff[0x8000];
@@ -633,7 +633,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     delete [] row;
     jpeg_destroy_compress (&cinfo);
     imgRGBA->DecRef();
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   jpeg_create_compress (&cinfo);
@@ -672,7 +672,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     mng_cleanup (&handle);
     delete outfile;
     imgRGBA->DecRef();
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
   
   imgRGBA->DecRef();
@@ -682,7 +682,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     ReportLibmngError (object_reg, handle, "failed to put IEND chunk");
     mng_cleanup (&handle);
     delete outfile;
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   if (mng_write (handle) != MNG_NOERROR)
@@ -690,7 +690,7 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     ReportLibmngError (object_reg, handle, "failed to write out JNG data");
     mng_cleanup (&handle);
     delete outfile;
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   mng_cleanup (&handle);
@@ -699,16 +699,16 @@ iDataBuffer *csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
 
   delete outfile;
 
-  return db;
+  return csPtr<iDataBuffer> (db);
 }
 
-iDataBuffer *csJNGImageIO::Save (iImage *Image, const char *mime,
+csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, JNG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
 //---------------------------------------------------------------------------

@@ -220,7 +220,7 @@ void csJPGImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
+csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
   const char* extraoptions)
 {
   int format = Image->GetFormat ();
@@ -230,7 +230,7 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
       break;
     default:
       // unknown format
-      return NULL;
+      return csPtr<iDataBuffer> (NULL);
   } /* endswitch */
 
   // compression options
@@ -298,7 +298,7 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
     Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "%s\n", errmsg);
     jpeg_destroy_compress (&cinfo);
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   jpeg_create_compress (&cinfo);
@@ -335,16 +335,16 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
   csDataBuffer *db = new csDataBuffer (ds.len);
   memcpy (db->GetData (), ds.data, ds.len);
 
-  return db;
+  return csPtr<iDataBuffer> (db);
 }
 
-iDataBuffer *csJPGImageIO::Save (iImage *Image, const char *mime,
+csPtr<iDataBuffer> csJPGImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, JPG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
 //---------------------------------------------------------------------------

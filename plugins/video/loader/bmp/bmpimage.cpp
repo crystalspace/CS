@@ -181,13 +181,13 @@ void csBMPImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
+csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {
   extraoptions = NULL;
 
   if (!Image || !Image->GetImageData ())
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   // check if we have a format we support saving
   int format = Image->GetFormat ();
@@ -201,11 +201,11 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     break;
   default:
       // unknown format
-      return NULL;
+      return csPtr<iDataBuffer> (NULL);
   } /* endswitch */
 
   if (palette && !Image->GetPalette ())
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   // calc size
   int w = Image->GetWidth ();
@@ -267,16 +267,16 @@ iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
       }
   }
 
-  return db;
+  return csPtr<iDataBuffer> (db);
 }
 
-iDataBuffer *csBMPImageIO::Save (iImage *Image, const char *mime,
+csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, BMP_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
 bool ImageBMPFile::Load (uint8* iBuffer, uint32 iSize)

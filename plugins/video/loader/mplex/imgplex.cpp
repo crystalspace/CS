@@ -132,7 +132,7 @@ void csMultiplexImageIO::SetDithering (bool iEnable)
   csImage_dither = iEnable;
 }
 
-iDataBuffer *csMultiplexImageIO::Save (
+csPtr<iDataBuffer> csMultiplexImageIO::Save (
   iImage *image, iImageIO::FileFormatDescription *format,
   const char* extraoptions)
 {
@@ -141,12 +141,12 @@ iDataBuffer *csMultiplexImageIO::Save (
   {
     iImageIO *pIO = (iImageIO*)list.Get(i);
     iDataBuffer *buf = pIO->Save(image, format, extraoptions);
-    if (buf) return buf;
+    if (buf) return csPtr<iDataBuffer> (buf);
   }
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
-iDataBuffer *csMultiplexImageIO::Save (iImage *image, const char *mime,
+csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
   const char* extraoptions)
 {
   int i;
@@ -154,7 +154,7 @@ iDataBuffer *csMultiplexImageIO::Save (iImage *image, const char *mime,
   {
     iImageIO *pIO = (iImageIO*)list.Get(i);
     iDataBuffer *buf = pIO->Save(image, mime, extraoptions);
-    if (buf) return buf;
+    if (buf) return csPtr<iDataBuffer> (buf);
   }
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }

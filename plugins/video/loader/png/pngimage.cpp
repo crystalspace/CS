@@ -153,11 +153,11 @@ int closest_index (iImage *Image, csRGBpixel *iColor)
   return closest_idx;
 }
 
-iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
+csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {
   if (!Image)
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
 
   int compress = 6;
   bool interlace = false;
@@ -214,7 +214,7 @@ iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
   if (!png)
   {
 error1:
-    return NULL;
+    return csPtr<iDataBuffer> (NULL);
   }
 
   png_set_compression_level (png, compress);
@@ -376,16 +376,16 @@ error2:
   memcpy (db->GetData (), ds.data, ds.pos);
 
   /* that's it */
-  return db;
+  return csPtr<iDataBuffer> (db);
 }
 
-iDataBuffer *csPNGImageIO::Save (iImage *Image, const char *mime,
+csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
   if (!strcasecmp (mime, PNG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
 //---------------------------------------------------------------------------
