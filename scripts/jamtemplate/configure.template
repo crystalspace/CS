@@ -1,6 +1,6 @@
 #----------------------------------------------------------------------------
-# Autoconf input script. Start the ./autgen.sh script for producing a
-# the configure script.
+# Autoconf input script. Invoke the ./autgen.sh script to generate a
+# configure script from this file.
 #----------------------------------------------------------------------------
 AC_PREREQ([2.54])
 
@@ -18,7 +18,7 @@ AC_CANONICAL_HOST
 #----------------------------------------------------------------------------
 AC_CONFIG_HEADERS(config.h)
   AH_TOP([
-/* we'll use CS everywhere... so config.h can include cssysdef.h */
+/* We expect to use CS everywhere, thus config.h can include cssysdef.h. */
 #include <cssysdef.h>
   ])
 
@@ -44,18 +44,17 @@ CS_CHECK_HOST
 #----------------------------------------------------------------------------
 # Check for syntax problems / header files
 #----------------------------------------------------------------------------
-                                                                                
 #nothing yet
                                                                                 
 #----------------------------------------------------------------------------
 # Check for external libraries
 #----------------------------------------------------------------------------
-
 CS_PATH_CRYSTAL_JAM([0.96], [],
   [AC_MSG_ERROR([
-*** Crystal Space couldn't be found. The latest version is always avaiable
+*** Crystal Space could not be found. The latest version is always available
 *** from http://crystal.sourceforge.net
-*** Be also sure that you've either installed CS or set the CRYSTAL var right.
+*** Be sure that you have either installed CS or set the CRYSTAL environment
+*** variable properly.
 ])], [cstool csgfx csgeom csutil])
                                                                                 
 #----------------------------------------------------------------------------
@@ -87,7 +86,6 @@ AC_OUTPUT
                                                                                 
 AC_MSG_NOTICE([
                                                                                 
-Please note that this project uses jam as build tool.
-So you have to type 'jam' now.
+Please note that this project uses Jam as build tool,
+therefore you must type 'jam' to build the project.
 ])
-

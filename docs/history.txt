@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Sep-2003
+	- Eric Sunshine corrected erroneous comments in
+	  CS/mk/autoconf/compiler.m4.
+	- Eric Sunshine performed clean-up of
+	  CS/scripts/jamtemplate/configure.template.
+	- Eric Sunshine fixed a number of problems in
+	  CS/scripts/jamtemplate/cs_check_host.m4:
+	    - Comments were all wrong; they had been copy/pasted from
+	      configure.ac but not edited to suit the new context.
+	    - Was using an old, unreliable scheme for differentiating between
+	      MacOS/X and Darwin.
+	    - Was incorrectly emitting OS_MACOSX when building for Darwin.
+	    - Neglected to emit OS_UNIX when building for MacOX/X (in addition
+	      to OS_MACOSX which it was correctly emitting).
 27-Sep-2003
 	- Eric Sunshine made minor clarifications to the "SCF Changes" section
 	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.

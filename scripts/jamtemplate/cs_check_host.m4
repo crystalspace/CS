@@ -8,13 +8,12 @@
 #
 # CS_CHECK_HOST_CPU
 #       Set the shell variable cs_host_cpu to a normalized form of the CPU name
-#       returned by config.guess/config.sub. Additionally sets the
-#	TARGET.PROCESSOR Jamconfig property. Also takes the normalized name,
-#       uppercases and appends it to the string "PROC_" to form a name suitable
-#       for the C preprocessor.  Assigns this value to the shell variable
-#       cs_host_cpu_cpp_define.  Typically, Crystal Space's conception of CPU
-#       name is the same as that returned by config.guess/config.sub, but there
-#       may be exceptions as seen in the `case' statement.
+#       returned by config.guess/config.sub.  Typically, Crystal Space's
+#       conception of CPU name is the same as that returned by
+#       config.guess/config.sub, but there may be exceptions as seen in the
+#       `case' statement.  Also takes the normalized name, uppercases it to
+#       form a name suitable for the C preprocessor.  Additionally sets the
+#       TARGET.PROCESSOR Jamconfig property.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -26,65 +25,84 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     CS_JAMCONFIG_PROPERTY([TARGET.PROCESSOR], [$cs_host_cpu_normalized])
     ])
 
+
 #------------------------------------------------------------------------------
 # CS_CHECK_HOST
-#       Sets the shell variables cs_host_target, cs_host_makefile, and
-#       cs_host_family.  Client code can use these variables to emit
-#       appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
-#       header define.
+#       Sets the shell variables cs_host_target cs_host_family,
+#       cs_host_os_normalized, and cs_host_os_normalized_uc.  Emits appropriate
+#       OS_UNIX, OS_WIN32, OS_MACOSX via AC_DEFINE(), and TARGET.OS and
+#       TARGET.OS.NORMALIZED to Jamconfig.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST],
-    [
+    [AC_REQUIRE([AC_CANONICAL_HOST])
     CS_CHECK_HOST_CPU
     cs_host_os_normalized=''
-    AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_os in
         mingw*|cygwin*)
             cs_host_target=win32gcc
             cs_host_family=windows
-            AC_DEFINE([OS_WIN32],,[define when compiling for win32 operating system])
-	    AS_IF([test -z "$cs_host_os_normalized"],
-		    [cs_host_os_normalized='Win32'])
             ;;
         darwin*)
             _CS_CHECK_HOST_DARWIN
-            AC_DEFINE([OS_MACOSX],,[define when compiling for macosx operating system])
-            AS_IF([test -z "$cs_host_os_normalized"],
-		[cs_host_os_normalized='MacOS/X'])
             ;;
         *)
             # Everything else is assumed to be Unix or Unix-like.
             cs_host_target=unix
             cs_host_family=unix
-            AC_DEFINE([OS_UNIX],,[define when compiling for unix operating system])
-            AS_IF([test -z "$cs_host_os_normalized"], [cs_host_os_normalized='Unix'])
+	    ;;
+    esac
+
+    case $cs_host_family in
+	windows)
+            AC_DEFINE([OS_WIN32], [], [define when compiling for Win32])
+	    AS_IF([test -z "$cs_host_os_normalized"],
+		[cs_host_os_normalized='Win32'])
+	    ;;
+	unix)
+            AC_DEFINE([OS_UNIX], [],
+		[define when compiling for Unix and Unix-like (i.e. MacOS/X)])
+	    AS_IF([test -z "$cs_host_os_normalized"],
+		[cs_host_os_normalized='Unix'])
 	    ;;
     esac
 
     cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
     CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
+    CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
 ])
 
 AC_DEFUN([_CS_CHECK_HOST_DARWIN],
-    [AC_REQUIRE([AC_PATH_X])
-    AC_REQUIRE([AC_PROG_CC])
+    [AC_REQUIRE([AC_PROG_CC])
     AC_REQUIRE([AC_PROG_CXX])
-    # If user explicitly requested --with-x, then assume Darwin+XFree86; else
-    # assume MacOS/X.
-    AC_MSG_CHECKING([for --with-x])
-    if test "$with_x" = "yes"; then
-        AC_MSG_RESULT([yes (assume Darwin)])
-        cs_host_target=unix
-        cs_host_family=unix
-    else
-        AC_MSG_RESULT([no (assume MacOS/X)])
-        cs_host_target=macosx
-        cs_host_family=unix
-        AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
-            [cs_cv_prog_objc="$CC -c"])
-        CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
-        AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
-            [cs_cv_prog_objcxx="$CXX -c"])
-        CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])
-    fi])
 
+    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
+    # a way to distinguish between the two.  If Carbon.h is present, then
+    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Carbon.h is present, then assume that user wants to cross-build for
+    # Darwin even though build host is MacOS/X.
+
+    AC_CHECK_HEADER([Carbon/Carbon.h],
+	[cs_host_macosx=yes], [cs_host_macosx=no])
+
+    AS_IF([test $cs_host_macosx = yes],
+	[AC_MSG_CHECKING([for --with-x])
+	AS_IF([test "${with_x+set}" = set && test "$with_x" = "yes"],
+	    [AC_MSG_RESULT([yes (assume Darwin)])
+	    cs_host_macosx=no],
+	    [AC_MSG_RESULT([no])])])
+
+    AS_IF([test $cs_host_macosx = yes],
+	[cs_host_target=macosx
+	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
+        AC_DEFINE([OS_MACOSX], [], [define when compiling for MacOS/X])
+
+	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
+	    [cs_cv_prog_objc="$CC"])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
+	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
+	    [cs_cv_prog_objcxx="$CXX"])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
+
+	[cs_host_target=unix
+	cs_host_family=unix])])
