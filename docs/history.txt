@@ -31,6 +31,7 @@ chronological order.
 	  plugins.
 	- res changed the particle_basic shader to not use fixed function 
 	  lighting any more.
+        - Philip Wyett moved decleration of 'iPortal *po' into better scope.
 9-Jan-2004
 	- Jorrit fixed a warning in memimage.cpp.  It was trying to delete a
 	  void* which is undefined.

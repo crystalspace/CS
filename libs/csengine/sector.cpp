@@ -16,6 +16,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "cssysdef.h"
 #include "qint.h"
 #include "csutil/csstring.h"
@@ -516,20 +517,19 @@ iSector *csSector::FollowSegment (
   csVector3 isect;
   iMeshWrapper* mesh;
   int p = IntersectSegment (
-      t.GetOrigin (),
-      new_position,
-      isect,
-      0,
-      only_portals,
-      &mesh);
-  iPortal *po;
+    t.GetOrigin (),
+    new_position,
+    isect,
+    0,
+    only_portals,
+    &mesh);
 
   if (p != -1)
   {
     iPortalContainer* portals = mesh->GetPortalContainer ();
     if (portals)
     {
-      po = portals->GetPortal (p);
+      iPortal *po = portals->GetPortal (p);
       if (po)
       {
         po->CompleteSector (0);
@@ -560,7 +560,6 @@ iSector *csSector::FollowSegment (
       new_position = isect;
     }
   }
-
   return &scfiSector;
 }
 
@@ -1095,4 +1094,3 @@ iSector *csSectorList::FindByName (const char *Name) const
 {
   return list.FindByName (Name);
 }
-
