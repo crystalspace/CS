@@ -79,6 +79,7 @@ awsWindow::awsWindow () :
 
 awsWindow::~awsWindow ()
 {
+  printf("*** destr %s\n", title ? title->GetData () : "??");
 }
 
 void awsWindow::SetWindowAbove (iAwsWindow *win)

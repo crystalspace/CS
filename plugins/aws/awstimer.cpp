@@ -37,19 +37,21 @@ awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   this->object_reg = object_reg;
-  ehSetup = false;
   bSetup = false;
   stopped = true;
   vc = NULL;
-  eq = NULL;
 }
 
 awsTimer::~awsTimer ()
 {
-  if (ehSetup)
+  if (!stopped)
   {
-    if (!stopped) eq->RemoveListener (&scfiEventHandler);
-    eq->DecRef ();
+    iEventQueue *eq= CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (eq)
+    {
+      eq->RemoveListener (&scfiEventHandler);
+      eq->DecRef ();
+    }
   }
 
   SCF_DEC_REF (vc);
@@ -59,15 +61,9 @@ bool awsTimer::Setup ()
 {
   if (!bSetup)
   {
-    if (!ehSetup)
-    {
-      eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-      ehSetup = (eq != NULL);
-    }
-
     if (!vc) vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-    bSetup = ehSetup && (vc != NULL);
+    bSetup = (vc != NULL);
   }
 
   return bSetup;
@@ -104,20 +100,32 @@ bool awsTimer::HandleEvent (iEvent &Event)
 
 void awsTimer::Stop ()
 {
-  stopped = true;
-  if (ehSetup) eq->RemoveListener (&scfiEventHandler);
+  if (!stopped)
+  {
+    stopped = true;
+    iEventQueue *eq= CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (eq)
+    {
+      eq->RemoveListener (&scfiEventHandler);
+      eq->DecRef ();
+    }
+  }
 }
 
 bool awsTimer::Start ()
 {
-  if (Setup ())
+  if (Setup () && stopped)
   {
-    eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
-    stopped = false;
-    start = vc->GetCurrentTicks ();
+    iEventQueue *eq= CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (eq)
+    {
+      eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+      eq->DecRef ();
+      stopped = false;
+      start = vc->GetCurrentTicks ();
+    }
   }
-
-  return bSetup;
+  return !stopped;
 }
 
 bool awsTimer::IsRunning ()

@@ -29,8 +29,6 @@ class awsTimer :
   public awsSource
 {
 protected:
-  // eventhandler has been set up ?
-  bool ehSetup;
 
   // everything ready to go ?
   bool bSetup;
@@ -41,7 +39,6 @@ protected:
   csTicks start, nTicks;
 
   iVirtualClock *vc;
-  iEventQueue *eq;
   iObjectRegistry *object_reg;
 
   // try to set up everything needed
