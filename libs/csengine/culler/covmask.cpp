@@ -337,12 +337,6 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
 	int hor_offs, int ver_offs,
 	int box_dim, int box_shift) const
 {
-#if CS_COV_STATS
-  extern int cnt_GetIndex;
-  extern int cnt_GetIndex_hor;
-  extern int cnt_GetIndex_ver;
-  cnt_GetIndex++;
-#endif
   float fhor_offs = (float)hor_offs;	// Optimal?@@@
   float fver_offs = (float)ver_offs;	// Optimal?@@@
   float fbox_dim = (float)box_dim;	// Optimal?@@@
@@ -360,9 +354,6 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
 
   if (edge.horizontal)
   {
-#   if CS_COV_STATS
-    cnt_GetIndex_hor++;
-#   endif
     // Special case for a horizontal edge.
     f = - sta.y;
     if (f < 0)
@@ -393,9 +384,6 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
   }
   else if (edge.vertical)
   {
-#   if CS_COV_STATS
-    cnt_GetIndex_ver++;
-#   endif
     // Special case for a vertical edge.
     f = sta.x;
     if (f < 0)

@@ -1,5 +1,91 @@
 The history order has been reversed so that new features are at the top.
 
+24-Jul-2000
+	- Added csWorld parameter to csPolygonSet (and thus to csThing
+	  and csSector as well) to help the removal of the current_world
+	  static variable.
+	- Removed the iostream dependency in t3d2cs app because I don't
+	  have the C++ libraries here.
+	- In WalkTest console: bound 'd' to 'emode front2back' which will
+	  mainly make sure that it behaves like it used to in the past
+	  except that it doesn't toggle. Bound 'shift-d' to 'emode
+	  back2front' which is the prefered engine mode for portal worlds.
+	  Bound 'alt-d' to the new 'emode zbuffer' mode. Bound 'ctrl-d'
+	  to 'culler next' to switch between the various cullers (cbuffer,
+	  quad3d, and covtree).
+	- Added new CS_POLY_SPLIT flag to csPolygon3D which is set for
+	  a polygon that is split by a BSP split. Previously the flag
+	  CS_POLY_NO_DRAW was used for that but this is now used for what
+	  it is actually ment: i.e. to indicate a polygon that should not
+	  be drawn. This fixes the new CS_ENGINE_ZBUFFER engine mode.
+23-Jul-2000
+	- Cleaned up some coverage mask tree statictics.
+	- Added csWorld::SetEngineMode() with which you can control how
+	  the engine will render the world. The setting is there but
+	  actual engine functionality is still lacking. There is also
+	  an auto-detect mode (which is default) which will try to detect
+	  the best engine mode for the loaded world.
+	- Implemented the three engine modes now.
+	- Cleaned up csWorld::Draw() and csWorld::DrawFunc() (added new
+	  StartDraw()).
+	- IMPORTANT change! csWorld now has a function GetBeginDrawFlags()
+	  which returns flags that the engine requires for G3D->BeginDraw().
+	  Since BeginDraw() is called by the application it is now the
+	  responsibility of the application to actually call this function
+	  and or the returned flags with the flags the application wants to
+	  use. This is used because some engine modes require the Z buffer
+	  to be initialized when BeginDraw() is called.
+	- Added csWorld::SetCuller() to set the 2D/3D culler to use. This
+	  replaces the functions EnableQuad3D, EnableCovTree, and
+	  EnableCBuffer. c-buffer is now default but will only be used
+	  when the engine mode is equal to CS_ENGINE_FRONT2BACK. And this
+	  depends on the loaded level.
+	- Removed console commands 'cbuffer', 'quad3d', and 'covtree'
+	  and replaced with 'culler' command.
+	- Added console command 'emode' to switch between the different
+	  engine modes. Options are 'auto', 'back2front', 'front2back',
+	  and 'zbuffer'.
+	- In an effor to minimize the use of the global current_world
+	  variable from csWorld I added a world pointer to csRenderView.
+	- Gary Haussmann added code (for OpenGL renderer) to try and
+	  determine the proper lightmap blend mode automatically.
+	  With the blend mode set to 'auto' the code will draw polys in both
+	  the SRC*DST and 2*SRC*DST blend mode, comparing the two and
+	  picking the more appropriate one for use in drawing lightmaps.
+	  Also added extension detection #ifdef's to assume Mesa-style
+	  extension detection on Linux with GCC, even if the MESA_*
+	  macros are not defined.
+	- Gary Haussmann added some info the the lightmap blend mode comment
+	  in opengl.cfg. Now the comment includes the newly supported
+	  'auto' lightmap blend code.
+	- Gary removed superfluous diagnostic messages from glx2d.
+	  With the addition of autodetect for lightmap blends, the OpenGL
+	  code is starting to spew out a lot of initialization diagnostic
+	  messages :)
+	- Norman Kramer removed the empty destructor in cssfxldr.
+	  The same problem like the one in the graphics loader lib.
+	  If the lib is bound to a plugin then it crashes on program exit
+	  (class destructor is called in atexit).
+22-Jul-2000
+	- New 'txt' map mode nearly works. Texture mapping is not ok
+	  though.
+	- Changed clear color for 'fclear' command. Now it is the same
+	  color on all systems.
+	- Scott Bowden added the first version of t3d2cs which is an
+	  app that will read Unreal t3d files and produce CS files.
+	- Scott Bowden put back the entry.t3d file so that people can
+	  work on it for the t3d2cs convertor.
+21-Jul-2000
+	- Added an extra 'txt' map mode to do an orthographic texture
+	  mapping map. Not functioning yet.
+	- Alex Pfaffe removed the ddgHistogram dependency for CS. This
+	  fixes the problem with the file that could not be found.
+	- Wouter Wijngaards enabled terrain again after Alex fixed
+	  the missing file problem.
+	- Wyatt Miler updated the Mac project files.
+	- Wyatt also added a couple of comma's to the dungeon plugin so
+	  the mac compiler doesn't die. Check lines 116 and 119. I'm not
+	  sure how this was supposed to work anyway.
 20-Jul-2000
 	- Alex Pfaffe did an update to the terrain engine. Should now
 	  be faster since less vertices are sent to the 3D rasterizer.
@@ -18,6 +104,10 @@ The history order has been reversed so that new features are at the top.
 	- Added csSector/csWorld::FindLight() with CS_ID as a parameter.
 	  This can be used to locate a light with a given id.
 	  This is mainly useful for the lightmap cache.
+	- Added back face culling to the test for csQuadTree3D. Still
+	  doesn't solve the culling bugs though.
+	- Solved a very old bug (in data/config/autoexec.cfg) where movement
+	  keys didn't autorepeat in 3d-move and map mode.
 19-Jul-2000
 	- Updated 'simple' tutorial and 'simple' application a little bit.
 	- Extended 'simple' application to load a 'sprite1' template from
@@ -35,6 +125,12 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards disabled some debug prints in csQuadTree3D.
 	- Wouter also set radiosity.stoppriority from 25.0 to 0.1 now,
 	  since radiosity is fixed by the Classify changes.
+	- Added support for orthographic projection in the csWireFrame
+	  class. This is going to be used for three types of orthographic
+	  maps (X, Y, and Z). These maps are going to be used for debugging
+	  mainly (i.e. PVS).
+	- Added 'mapproj' console command to change the projection mode
+	  for the 'map' command to either persp (default), x, y, or z.
 18-Jul-2000
 	- Did an optimization in csFrustum::Classify() as suggested
 	  by Norman Kramer.

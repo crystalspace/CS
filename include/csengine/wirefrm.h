@@ -29,6 +29,11 @@ class csCamera;
 
 #define PLANE_VERTEX_RADIUS .1
 
+#define WF_ORTHO_PERSP -1
+#define WF_ORTHO_X 0
+#define WF_ORTHO_Y 1
+#define WF_ORTHO_Z 2
+
 /**
  * A color for an object in a WireFrame.
  * This color object is special in that it provides support
@@ -80,10 +85,13 @@ public:
   void SetPrev (csWfObject* ob) { prev = ob; }
 
   /// Draw this object given a camera.
-  virtual void Draw (iGraphics3D* g, csCamera* c) = 0;
+  virtual void Draw (iGraphics3D* g, csCamera* c, int ortho = WF_ORTHO_PERSP) = 0;
 
   /// Do the perspective transform.
   bool Perspective (csCamera* c, csVector3& v, csVector2& persp, float radius, float& pradius);
+  //
+  /// Do an orthographic transform.
+  bool Orthographic (csCamera* c, int ortho, csVector3& v, csVector2& persp);
 };
 
 /**
@@ -104,7 +112,7 @@ public:
   void SetLocation (float x, float y, float z) { loc.x = x; loc.y = y; loc.z = z; }
 
   ///
-  virtual void Draw (iGraphics3D* g, csCamera* c);
+  virtual void Draw (iGraphics3D* g, csCamera* c, int ortho = WF_ORTHO_PERSP);
 };
 
 /**
@@ -124,7 +132,7 @@ public:
   void SetLine (csVector3& vv1, csVector3& vv2) { v1 = vv1; v2 = vv2; }
 
   ///
-  virtual void Draw (iGraphics3D* g, csCamera* c);
+  virtual void Draw (iGraphics3D* g, csCamera* c, int ortho = WF_ORTHO_PERSP);
 };
 
 /**
@@ -162,7 +170,7 @@ public:
   bool IsVisible (csCamera* camera);
 
   ///
-  virtual void Draw (iGraphics3D* g, csCamera* c);
+  virtual void Draw (iGraphics3D* g, csCamera* c, int ortho = WF_ORTHO_PERSP);
 };
 
 /**
@@ -233,7 +241,7 @@ public:
   csWfPolygon* AddPolygon ();
 
   ///
-  void Draw (iGraphics3D* g, csCamera* c);
+  void Draw (iGraphics3D* g, csCamera* c, int ortho = WF_ORTHO_PERSP);
 
   /// Apply a function to all objects contained in the WireFrame
   void Apply (void (*func)( csWfObject*, void*), void*);
@@ -267,6 +275,10 @@ public:
   void KeyLeft (float speed, bool slow, bool fast);
   ///
   void KeyRight (float speed, bool slow, bool fast);
+  ///
+  void KeyLeftStrafe (float speed, bool slow, bool fast);
+  ///
+  void KeyRightStrafe (float speed, bool slow, bool fast);
   ///
   void KeyPgDn (float speed, bool slow, bool fast);
   ///

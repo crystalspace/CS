@@ -308,7 +308,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
 
   material = poly.material;
 
-  poly.flags.Set (CS_POLY_NO_DRAW);
+  poly.flags.Set (CS_POLY_SPLIT);
   orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
 
   // Share txt_info with original polygon.
@@ -318,7 +318,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
   orig_poly->txt_share_list = this;
 
   flags = poly.flags;
-  flags.Reset (CS_POLY_NO_DRAW | CS_POLY_DELETE_PORTAL);
+  flags.Reset (CS_POLY_SPLIT | CS_POLY_DELETE_PORTAL);
 
   light_info.cosinus_factor = poly.light_info.cosinus_factor;
   light_info.lightpatches = NULL;

@@ -103,6 +103,9 @@ private:
   void ComputeAngle ();
 
 public:
+  /// A pointer to the world.
+  csWorld* world;
+
   /// The 2D polygon describing how everything drawn inside should be clipped.
   csClipper* view;
 

@@ -514,7 +514,7 @@ void Simple::NextFrame(time_t elapsed_time, time_t current_time)
   superclass::NextFrame(elapsed_time, current_time);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw(CSDRAW_3DGRAPHICS)) return;
+  if (!G3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
 
   // Tell the camera to render into the frame buffer.
   view->Draw();
@@ -528,9 +528,12 @@ void Simple::NextFrame(time_t elapsed_time, time_t current_time)
 
 First we indicate to the 3D rasterizer that we want to start drawing 3D
 graphics.  This call makes sure that the needed buffers are set up and
-performs all necessary initialization.  Then we draw through our view by
-calling @code{csView::Draw()} which updates the view area with the 3D world
-data as seen through the camera.  After this we finish 3D drawing with
+performs all necessary initialization. The engine often needs extra settings
+for this as well so you MUST call @code{world->GetBeginDrawFlags()} to
+get these flags and or them with the ones that you want.
+Then we draw through our view by calling @code{csView::Draw()} which
+updates the view area with the 3D world data as seen through the camera.
+After this we finish 3D drawing with
 @code{FinishDraw()} and then update the display by calling @code{Print()}.
 The @samp{NULL} pointer given to @code{Print()} is the area that you want to
 update (it is a rectangle).  If @samp{NULL} is used then the entire window is

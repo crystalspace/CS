@@ -69,37 +69,91 @@ bool csWfObject::Perspective (csCamera* c, csVector3& v, csVector2& persp, float
   else return false;
 }
 
-void csWfVertex::Draw (iGraphics3D* g, csCamera* c)
+bool csWfObject::Orthographic (csCamera* c, int ortho,
+	csVector3& v, csVector2& persp)
 {
-  csVector2 persp;
-  float rad;
-  int r, px, py;
-  iGraphics2D* g2d;
-
-  if (Perspective (c, loc, persp, PLANE_VERTEX_RADIUS, rad))
+  const csVector3& o = c->GetOrigin ();
+  csVector3 v2 = (v-o)*20;
+  switch (ortho)
   {
-    csVector3 cam = c->Other2This (loc);
-    int col = color->GetColor (cam.z);
+    case WF_ORTHO_X: persp.x = v2.y; persp.y = v2.z; break;
+    case WF_ORTHO_Y: persp.x = v2.x; persp.y = v2.z; break;
+    case WF_ORTHO_Z: persp.x = v2.x; persp.y = v2.y; break;
+  }
+  persp.x += csWorld::frame_width/2;
+  persp.y += csWorld::frame_height/2;
+  return true;
+}
 
-    r = QInt (rad);
-    px = QInt (persp.x);
-    py = QInt (persp.y);
-    g2d = g->GetDriver2D ();
-    g2d->DrawLine (px-r, py-r, px+r, py+r, col);
-    g2d->DrawLine (px+r, py-r, px-r, py+r, col);
-    //if (cross)
-    //{
-      //g2d->DrawLine (px-r, py, px+r, py, col);
-      //g2d->DrawLine (px, py-r, px, py+r, col);
-    //}
+void csWfVertex::Draw (iGraphics3D* g, csCamera* c, int ortho)
+{
+  if (ortho == WF_ORTHO_PERSP)
+  {
+    csVector2 persp;
+    float rad;
+    int r, px, py;
+    iGraphics2D* g2d;
+
+    if (Perspective (c, loc, persp, PLANE_VERTEX_RADIUS, rad))
+    {
+      csVector3 cam = c->Other2This (loc);
+      int col = color->GetColor (cam.z);
+
+      r = QInt (rad);
+      px = QInt (persp.x);
+      py = QInt (persp.y);
+      g2d = g->GetDriver2D ();
+      g2d->DrawLine (px-r, py-r, px+r, py+r, col);
+      g2d->DrawLine (px+r, py-r, px-r, py+r, col);
+      //if (cross)
+      //{
+        //g2d->DrawLine (px-r, py, px+r, py, col);
+        //g2d->DrawLine (px, py-r, px, py+r, col);
+      //}
+    }
+  }
+  else
+  {
+    csVector2 persp;
+    int r, px, py;
+    iGraphics2D* g2d;
+
+    if (Orthographic (c, ortho, loc, persp))
+    {
+      int col = color->GetColor (loc[ortho]);
+
+      r = 3;
+      px = QInt (persp.x);
+      py = QInt (persp.y);
+      g2d = g->GetDriver2D ();
+      g2d->DrawLine (px-r, py-r, px+r, py+r, col);
+      g2d->DrawLine (px+r, py-r, px-r, py+r, col);
+      //if (cross)
+      //{
+        //g2d->DrawLine (px-r, py, px+r, py, col);
+        //g2d->DrawLine (px, py-r, px, py+r, col);
+      //}
+    }
   }
 }
 
-void csWfLine::Draw (iGraphics3D* g, csCamera* c)
+void csWfLine::Draw (iGraphics3D* g, csCamera* c, int ortho)
 {
-  csVector3 cam1 = c->Other2This (v1);
-  csVector3 cam2 = c->Other2This (v2);
-  g->DrawLine (cam1, cam2, c->GetFOV (), color->GetColor ((cam1.z+cam2.z)/2));
+  if (ortho == WF_ORTHO_PERSP)
+  {
+    csVector3 cam1 = c->Other2This (v1);
+    csVector3 cam2 = c->Other2This (v2);
+    g->DrawLine (cam1, cam2, c->GetFOV (), color->GetColor ((cam1.z+cam2.z)/2));
+  }
+  else
+  {
+    csVector2 p1, p2;
+    iGraphics2D* g2d = g->GetDriver2D ();
+    Orthographic (c, ortho, v1, p1);
+    Orthographic (c, ortho, v2, p2);
+    int col = color->GetColor (v1[ortho]+v2[ortho]);
+    g2d->DrawLine (p1.x, p1.y, p2.x, p2.y, col);
+  }
 }
 
 csWfPolygon::csWfPolygon ()
@@ -183,20 +237,36 @@ bool csWfPolygon::IsVisible (csCamera* camera)
   return csPlane3::Classify (A, B, C, D, camera->GetOrigin ()) < 0;
 }
 
-void csWfPolygon::Draw (iGraphics3D* g, csCamera* c)
+void csWfPolygon::Draw (iGraphics3D* g, csCamera* c, int ortho)
 {
-  int i;
-  csVector3 cam1, cam2;
-  bool vis = IsVisible (c);
-  csVector3 cen = c->Other2This (center);
-  int col = color->GetColor (cen.z);
-  int vcol = vcolor->GetColor (cen.z);
-  for (i = 0 ; i < num_vertices ; i++)
+  if (ortho == WF_ORTHO_PERSP)
   {
-    cam1 = c->Other2This (vertices[i]);
-    cam2 = c->Other2This (vertices[(i+1)%num_vertices]);
-    g->DrawLine (cam1, cam2, c->GetFOV (), col);
-    if (vis) g->DrawLine (cam1, cen, c->GetFOV (), vcol);
+    int i;
+    csVector3 cam1, cam2;
+    bool vis = IsVisible (c);
+    csVector3 cen = c->Other2This (center);
+    int col = color->GetColor (cen.z);
+    int vcol = vcolor->GetColor (cen.z);
+    for (i = 0 ; i < num_vertices ; i++)
+    {
+      cam1 = c->Other2This (vertices[i]);
+      cam2 = c->Other2This (vertices[(i+1)%num_vertices]);
+      g->DrawLine (cam1, cam2, c->GetFOV (), col);
+      if (vis) g->DrawLine (cam1, cen, c->GetFOV (), vcol);
+    }
+  }
+  else
+  {
+    int i;
+    csVector2 p1, p2;
+    int col = color->GetColor (center[ortho]);
+    iGraphics2D* g2d = g->GetDriver2D ();
+    for (i = 0 ; i < num_vertices ; i++)
+    {
+      Orthographic (c, ortho, vertices[i], p1);
+      Orthographic (c, ortho, vertices[(i+1)%num_vertices], p2);
+      g2d->DrawLine (p1.x, p1.y, p2.x, p2.y, col);
+    }
   }
 }
 
@@ -299,12 +369,12 @@ csWfPolygon* csWireFrame::AddPolygon ()
   return po;
 }
 
-void csWireFrame::Draw (iGraphics3D* g, csCamera* c)
+void csWireFrame::Draw (iGraphics3D* g, csCamera* c, int ortho)
 {
   csWfObject* o = objects;
   while (o)
   {
-    o->Draw (g, c);
+    o->Draw (g, c, ortho);
     o = o->GetNext ();
   }
 }
@@ -343,6 +413,20 @@ void csWireFrameCam::KeyDown (float speed, bool slow, bool fast)
   if (slow) c->MoveUnrestricted (speed*0.01f*VEC_BACKWARD);
   else if (fast) c->MoveUnrestricted (speed*1.2f*VEC_BACKWARD);
   else c->MoveUnrestricted (speed*0.6f*VEC_BACKWARD);
+}
+
+void csWireFrameCam::KeyLeftStrafe (float speed, bool slow, bool fast)
+{
+  if (slow) c->MoveUnrestricted (speed*0.01f*VEC_LEFT);
+  else if (fast) c->MoveUnrestricted (speed*1.2f*VEC_LEFT);
+  else c->MoveUnrestricted (speed*0.6f*VEC_LEFT);
+}
+
+void csWireFrameCam::KeyRightStrafe (float speed, bool slow, bool fast)
+{
+  if (slow) c->MoveUnrestricted (speed*0.01f*VEC_RIGHT);
+  else if (fast) c->MoveUnrestricted (speed*1.2f*VEC_RIGHT);
+  else c->MoveUnrestricted (speed*0.6f*VEC_RIGHT);
 }
 
 void csWireFrameCam::KeyLeft (float speed, bool slow, bool fast)

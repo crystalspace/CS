@@ -730,7 +730,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
 	    csVector3 v4 = GetVector3 (plane_nr, plane_pos, v);
 	    csTextureHandle* white = world->GetTextures ()->FindByName ("white.gif");
-	    csThing* thing = new csThing ();
+	    csThing* thing = new csThing (world);
 	    thing->AddVertex (v1);
 	    thing->AddVertex (v2);
 	    thing->AddVertex (v3);

@@ -28,6 +28,7 @@
 
 struct LightInfo;
 class csThing;
+class csWorld;
 class csStatLight;
 class csPolygon3D;
 class Polygon2D;
@@ -178,7 +179,7 @@ public:
   /**
    * Construct a sector. This sector will be completely empty.
    */
-  csSector ();
+  csSector (csWorld* world);
 
   /**
    * Destroy this sector. All things in this sector are also destroyed.

@@ -147,7 +147,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
 
 csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 {
-  csThing* thing = new csThing ();
+  csThing* thing = new csThing (sector->GetWorld ());
   thing->SetName ("t"); 
 
 #ifdef ROOM_SMALL
@@ -221,7 +221,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
-  csThing* thing = new csThing ();
+  csThing* thing = new csThing (sector->GetWorld ());
   thing->SetName ("t"); 
 
   float y_low = -wall_dim+1;
@@ -404,7 +404,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   }
 
 #if defined(ROOM_CITY)
-  csThing* floorthing = new csThing ();
+  csThing* floorthing = new csThing (world);
   floorthing->SetName ("floor"); 
   create_wall (room, floorthing,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
@@ -415,7 +415,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   room->AddThing (floorthing);
   floorthing->Transform ();
 #elif !defined(ROOM_SMALL)
-  csThing* floorthing = new csThing ();
+  csThing* floorthing = new csThing (world);
   floorthing->SetName ("floor"); 
   create_wall (room, floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);

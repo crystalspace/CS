@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    cOPYRIGHT (c) 1998,2000 BY jORRIT tYBERGHEIN
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -45,6 +45,7 @@ class csSpriteTemplate;
 class csClipper;
 class csCovcube;
 class csCBufferCube;
+class csRenderView;
 class csWorld;
 class Dumper;
 class csLight;
@@ -56,6 +57,7 @@ class csPoly2DPool;
 class csLightPatchPool;
 struct iSystem;
 struct iVFS;
+
 
 /**
  * Flag for GetNearbyLights().
@@ -81,6 +83,52 @@ struct iVFS;
  * Also check lights in nearby sectors (not implemented yet).
  */
 #define CS_NLIGHT_NEARBYSECTORS 8
+
+
+/**
+ * Setting for SetEngineMode().
+ * Autodetect the best mode according to the level.
+ */
+#define CS_ENGINE_AUTODETECT 0
+
+/**
+ * Setting for SetEngineMode().
+ * Use back-to-front rendering (using optional BSP/octree) and Z-fill.
+ * Don't init Z-buffer at start of render frame.
+ */
+#define CS_ENGINE_BACK2FRONT 1
+
+/**
+ * Setting for SetEngineMode().
+ * Use a 2D/3D culler (c-buffer) and front-to-back sorting.
+ */
+#define CS_ENGINE_FRONT2BACK 2
+
+/**
+ * Setting for SetEngineMode().
+ * Use the Z-buffer for culling.
+ */
+#define CS_ENGINE_ZBUFFER 3
+
+
+/**
+ * Setting for SetCuller().
+ * Use the c-buffer (default).
+ */
+#define CS_CULLER_CBUFFER 0
+
+/**
+ * Setting for SetCuller().
+ * Use the 3D quadtree.
+ */
+#define CS_CULLER_QUAD3D 1
+
+/**
+ * Setting for SetCuller().
+ * Use the coverage mask tree.
+ */
+#define CS_CULLER_COVTREE 2
+
 
 /**
  * Iterator to iterate over all polygons in the world.
@@ -326,6 +374,9 @@ private:
   /// Current number of processed polygons.
   static int cur_process_polygons;
 
+  /// Current engine mode (one of CS_ENGINE_... flags).
+  int engine_mode;
+
   /// Optional 3D quadtree used for culling.
   csQuadTree3D* quad3d;
 
@@ -362,6 +413,17 @@ private:
   bool freeze_pvs;
   /// Frozen PVS position.
   csVector3 freeze_pvs_pos;
+
+private:
+  /**
+   * Resolve the engine mode if it is CS_ENGINE_AUTODETECT.
+   */
+  void ResolveEngineMode ();
+
+  /**
+   * Setup for starting a Draw or DrawFunc.
+   */
+  void StartDraw (csCamera* c, csClipper* view, csRenderView& rview);
 
 public:
   /**
@@ -457,9 +519,52 @@ public:
   }
 
   /**
-   * Enable/disable 3D quadtree.
+   * Set the desired engine mode.
+   * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
+   * If you select CS_ENGINE_AUTODETECT then the mode will be
+   * auto-detected (depending on level and/or hardware capabilities)
+   * the first time csWorld::Draw() is called.
    */
-  void EnableQuad3D (bool en);
+  void SetEngineMode (int mode)
+  {
+    engine_mode = mode;
+  }
+
+  /**
+   * Get the current engine mode.
+   * If called between SetEngineMode() and the first Draw() it is
+   * possible that this mode will still be CS_ENGINE_AUTODETECT.
+   */
+  int GetEngineMode () { return engine_mode; }
+
+  /**
+   * Get the required flags for 3D->BeginDraw() which should be called
+   * from the application. These flags must be or-ed with optional other
+   * flags that the application might be interested in.
+   */
+  int GetBeginDrawFlags ()
+  {
+    if (engine_mode == CS_ENGINE_ZBUFFER)
+      return CSDRAW_CLEARZBUFFER;
+    else
+      return 0;
+  }
+
+  /**
+   * Set the culler to use in CS_ENGINE_FRONT2BACK mode.
+   * Possible values are CS_CULLER_....
+   */
+  void SetCuller (int culler);
+
+  /**
+   * Get the current culler.
+   */
+  int GetCuller ()
+  {
+    if (c_buffer) return CS_CULLER_CBUFFER;
+    else if (covtree) return CS_CULLER_COVTREE;
+    else return CS_CULLER_QUAD3D;
+  }
 
   /**
    * Return 3D quadtree (or NULL if not used).
@@ -467,19 +572,9 @@ public:
   csQuadTree3D* GetQuad3D () { return quad3d; }
 
   /**
-   * Enable/disable c-buffer.
-   */
-  void EnableCBuffer (bool en);
-
-  /**
    * Return c-buffer (or NULL if not used).
    */
   csCBuffer* GetCBuffer () { return c_buffer; }
-
-  /**
-   * Enable/disable coverage mask tree.
-   */
-  void EnableCovtree (bool en);
 
   /**
    * Return coverage mask tree (or NULL if not used).

@@ -455,6 +455,7 @@ void WalkTest::imm_down (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
 {
+  if (map_mode == MAP_TXT) { wf->KeyLeftStrafe (speed, slow, fast); return; }
   if (map_mode) { wf->KeyLeft (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .005);
@@ -477,6 +478,7 @@ void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 
 void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
 {
+  if (map_mode == MAP_TXT) { wf->KeyRightStrafe (speed, slow, fast); return; }
   if (map_mode) { wf->KeyRight (speed, slow, fast); return; }
   if (slow)
     view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .005);

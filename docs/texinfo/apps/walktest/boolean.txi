@@ -152,26 +152,6 @@ useful for debugging a PVS as you can then walk around and see where
 the PVS is culling nodes. Use this command with 'pvsonly' for better
 debugging.
 
-@item cbuffer
-Toggle c-buffer rendering on/off. In some levels (especially levels with
-many non-moving things) enabling the c-buffer for the engine can improve
-performance considerably. By default it is off (currently). Note that the
-level needs to be prepared for this (octree needs to be added using STATBSP
-command). Enabling the c-buffer disables the coverage mask
-tree automatically.
-
-@item covtree
-Toggle coverage mask tree rendering on/off.  In some levels (especially levels
-with many non-moving things) enabling the coverage mask tree for the engine
-can improve performance considerably.  By default it is off (currently).  Note
-that the level needs to be prepared for this (octree needs to be added using
-@samp{STATBSP} command).  Enabling the coverage mask tree disables the
-c-buffer automatically.
-
-@item quad3d
-Toggle experimental 3D culling system on/off. Default is off now as
-it is not yet working properly.
-
 @item sprlight
 Change quality setting of sprite lighting.  If yes every vertex will be lit
 according to the correct distance with the light.  If no then the distances

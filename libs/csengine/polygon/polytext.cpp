@@ -68,7 +68,7 @@ class csDelayedLightingInfo : public csFrustrumViewCleanup
       unlit_poly = NULL;
       while (poly)
       {
-        if (!poly->flags.Check (CS_POLY_NO_DRAW))
+        if (!poly->flags.Check (CS_POLY_SPLIT))
 	{
           // orig_poly should be always invisible
           if (prev_poly)

@@ -108,6 +108,8 @@ protected:
   csPolygonSet* next;
   /// Parent object (sector or world) in which this object is linked.
   csObject* parent;
+  /// The pointer to the world.
+  csWorld* world;
 
   /// Number of vertices
   int num_vertices;
@@ -220,7 +222,7 @@ public:
   int max_curve_vertices;
 
   /// Construct a csPolygonSet.
-  csPolygonSet ();
+  csPolygonSet (csWorld* world);
 
   /**
    * Delete all contents of this polygonset (vertices,
@@ -387,6 +389,8 @@ public:
   csPolygonSet* GetNext () { return next; }
   /// Get the parent for this polygonset.
   csObject* GetParent () { return parent; }
+  /// Get the world for this polygonset.
+  csWorld* GetWorld () { return world; }
 
   /// Set the next polygonset and parent in its linked list.
   void SetNext (csObject* parent, csPolygonSet* next)

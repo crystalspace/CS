@@ -85,7 +85,7 @@ int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
 void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
-  plbody = new csPolygonSet ();
+  plbody = new csPolygonSet (world);
   plbody->SetName ("Player's Body");
 
   plbody->AddVertex(-DX_2, OY,    -DZ_2);
@@ -130,7 +130,7 @@ void WalkTest::CreateColliders ()
 
   body = new csRAPIDCollider (plbody);
 
-  pllegs = new csPolygonSet ();
+  pllegs = new csPolygonSet (world);
 
   pllegs->AddVertex(-DX_2L, OYL,     -DZ_2L);
   pllegs->AddVertex(-DX_2L, OYL,     DZ_2L);

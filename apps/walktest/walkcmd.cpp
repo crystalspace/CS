@@ -437,7 +437,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
-    CONPRI("  dumpvis cbuffer covtree quad3d pvs freezepvs pvsonly\n");
+    CONPRI("  dumpvis culler emode pvs freezepvs pvsonly\n");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
     CONPRI("  db_curleaf\n");
     CONPRI("Lights:\n");
@@ -457,7 +457,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("Various:\n");
-    CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
+    CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
     CONPRI("  record play clrrec saverec loadrec action\n");
 #   undef CONPRI
@@ -636,23 +636,20 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
       Sys->world->UnfreezePVS ();
   }
-  else if (!strcasecmp (cmd, "cbuffer"))
+  else if (!strcasecmp (cmd, "culler"))
   {
-    bool en = Sys->world->GetCBuffer () != NULL;
-    Command::change_boolean (arg, &en, "cbuffer");
-    Sys->world->EnableCBuffer (en);
+    const char* const choices[4] = { "cbuffer", "quad3d", "covtree", NULL };
+    int culler = Sys->world->GetCuller ();
+    Command::change_choice (arg, &culler, "culler", choices, 3);
+    Sys->world->SetCuller (culler);
   }
-  else if (!strcasecmp (cmd, "quad3d"))
+  else if (!strcasecmp (cmd, "emode"))
   {
-    bool en = Sys->world->GetQuad3D () != NULL;
-    Command::change_boolean (arg, &en, "quad3d");
-    Sys->world->EnableQuad3D (en);
-  }
-  else if (!strcasecmp (cmd, "covtree"))
-  {
-    bool en = Sys->world->GetCovtree () != NULL;
-    Command::change_boolean (arg, &en, "covtree");
-    Sys->world->EnableCovtree (en);
+    const char* const choices[5] = { "auto", "back2front", "front2back",
+    	"zbuffer", NULL };
+    int emode = Sys->world->GetEngineMode ();
+    Command::change_choice (arg, &emode, "engine mode", choices, 4);
+    Sys->world->SetEngineMode (emode);
   }
   else if (!strcasecmp (cmd, "freelook"))
   {
@@ -1135,8 +1132,15 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "map"))
   {
-    const char* const choices[4] = { "off", "overlay", "on", NULL };
-    Command::change_choice (arg, &Sys->map_mode, "map", choices, 3);
+    const char* const choices[5] = { "off", "overlay", "on", "txt", NULL };
+    Command::change_choice (arg, &Sys->map_mode, "map", choices, 4);
+  }
+  else if (!strcasecmp (cmd, "mapproj"))
+  {
+    const char* const choices[5] = { "persp", "x", "y", "z", NULL };
+    Sys->map_projection++;
+    Command::change_choice (arg, &Sys->map_projection, "map projection", choices, 4);
+    Sys->map_projection--;
   }
   else if (!strcasecmp (cmd, "snd_play"))
   {

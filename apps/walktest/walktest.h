@@ -46,6 +46,7 @@ struct iCollideSystem;
 #define MAP_OFF 0
 #define MAP_OVERLAY 1
 #define MAP_ON 2
+#define MAP_TXT 3
 
 ///
 struct csKeyMap
@@ -178,6 +179,15 @@ public:
    */
   static bool move_3d;
 
+  /// Color for the TXT map background.
+  int bgcolor_txtmap;
+
+  /// Clear color with 'fclear'.
+  int bgcolor_fclear;
+
+  /// Clear color for other map modes.
+  int bgcolor_map;
+
   /**
    * If true we show edges around all polygons (debugging).
    */
@@ -243,6 +253,8 @@ public:
   csWireFrameCam* wf;
   /// Map mode.
   int map_mode;
+  /// The map projection mode (WF_PROJ_xxx)
+  int map_projection;
 
   /// Timing.
   float timeFPS;
@@ -290,6 +302,11 @@ public:
 
   /// Move bots, particle systems, players, etc. for each frame.
   virtual void MoveSystems (time_t elapsed_time, time_t current_time);
+
+  /**
+   * Draw a frame in map mode.
+   */
+  void DrawFrameMap ();
 
   /**
    * Draw all things related to debugging (mostly edge drawing).

@@ -28,6 +28,7 @@
 #include "ithing.h"
 
 class csSector;
+class csWorld;
 class csStatLight;
 class csTextureHandle;
 class csPolygon3D;
@@ -118,7 +119,7 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing ();
+  csThing (csWorld* world);
 
   /// Destructor.
   virtual ~csThing ();

@@ -67,7 +67,7 @@ csBeing* csBeing::PlayerSpawn (char *name)
   #define OZ    0.0
   
   csPolygon3D *p;
-  csPolygonSet* playerps = new csPolygonSet();
+  csPolygonSet* playerps = new csPolygonSet(_world);
   playerps->SetName (name);
 
   playerps->AddVertex(OX,    OY,    OZ); 

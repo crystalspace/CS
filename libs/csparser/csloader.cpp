@@ -1302,7 +1302,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-  csThing* thing = new csThing ();
+  csThing* thing = new csThing (World);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1586,7 +1586,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-   csThing* thing = new csThing() ;
+   csThing* thing = new csThing(World) ;
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1827,7 +1827,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
       case TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
-          csSector *s = new csSector();
+          csSector *s = new csSector (World);
           s->SetName (str);
           poly3d->SetCSPortal (s);
           csLoaderStat::portals_loaded++;
@@ -2811,7 +2811,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
   char str[255];
   int i;
 
-   csThingTemplate *tmpl = new csThingTemplate() ;
+  csThingTemplate *tmpl = new csThingTemplate() ;
   tmpl->SetName (tname);
   long cmd;
   char* params;
@@ -3409,7 +3409,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
   int i1, i2, i3, i4;
   bool do_stat_bsp = false;
 
-  csSector* sector = new csSector();
+  csSector* sector = new csSector (World);
   sector->SetName (secname);
 
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
@@ -3885,7 +3885,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     }
 
     // This will later be defined correctly
-    portal = new csSector () ;
+    portal = new csSector (World) ;
     portal->SetName (portals[i].sector);
     p->SetCSPortal (portal);
     csLoaderStat::portals_loaded++;
@@ -3943,7 +3943,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   char* params;
   bool do_stat_bsp = false;
 
-  csSector* sector = new csSector() ;
+  csSector* sector = new csSector (World) ;
   sector->SetName (secname);
 
   csLoaderStat::sectors_loaded++;

@@ -288,6 +288,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   System = NULL;
   VFS = NULL;
@@ -314,6 +315,8 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   }
   //covcube = new csCovcube (covtree_lut);
   cbufcube = new csCBufferCube (1024);
+
+  SetCuller (CS_CULLER_CBUFFER);
 
   textures = new csTextureList ();
 
@@ -462,9 +465,7 @@ void csWorld::Clear ()
   }
   delete textures; textures = NULL;
   textures = new csTextureList ();
-  delete c_buffer; c_buffer = NULL;
-  delete quad3d; quad3d = NULL;
-  delete covtree; covtree = NULL;
+  SetCuller (CS_CULLER_CBUFFER);
   delete render_pol2d_pool;
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
   delete lightpatch_pool;
@@ -483,69 +484,82 @@ void csWorld::Clear ()
   }
 }
 
+void csWorld::ResolveEngineMode ()
+{
+  if (engine_mode == CS_ENGINE_AUTODETECT)
+  {
+    // Here we do some heuristic. We scan all sectors and see if there
+    // are some that have big octrees. If so we select CS_ENGINE_FRONT2BACK.
+    // If not we select CS_ENGINE_BACK2FRONT.
+    // @@@ It might be an interesting option to try to find a good engine
+    // mode for every sector and switch dynamically based on the current
+    // sector (only switch based on the position of the camera, not switch
+    // based on the sector we are currently rendering).
+    int switch_f2b = 0;
+    for (int i = 0 ; i < sectors.Length () ; i++)
+    {
+      csSector* s = (csSector*)sectors[i];
+      csPolygonTree* ptree = s->GetStaticTree ();
+      if (ptree)
+      {
+        csOctree* otree = (csOctree*)ptree;
+	int num_nodes = otree->GetRoot ()->CountChildren ();
+	if (num_nodes > 30) switch_f2b += 10;
+	else if (num_nodes > 15) switch_f2b += 5;
+      }
+      if (switch_f2b >= 10) break;
+    }
+    if (switch_f2b >= 10)
+    {
+      engine_mode = CS_ENGINE_FRONT2BACK;
+      CsPrintf (MSG_CONSOLE, "Engine is using front2back mode\n");
+    }
+    else
+    {
+      engine_mode = CS_ENGINE_BACK2FRONT;
+      CsPrintf (MSG_CONSOLE, "Engine is using back2front mode\n");
+    }
+  }
+}
+
 void csWorld::EnableLightingCache (bool en)
 {
   do_lighting_cache = en;
   if (!do_lighting_cache) do_force_relight = true;
 }
 
-void csWorld::EnableQuad3D (bool en)
+void csWorld::SetCuller (int culler)
 {
-  if (en)
+  delete c_buffer; c_buffer = NULL;
+  delete covtree; covtree = NULL;
+  delete quad3d; quad3d = NULL;
+  switch (culler)
   {
-    delete covtree; covtree = NULL;
-    delete c_buffer; c_buffer = NULL;
-    if (quad3d) return;
-    csVector3 corners[4];
-    corners[0].Set (-1, -1, 1);
-    corners[1].Set (1, -1, 1);
-    corners[2].Set (1, 1, 1);
-    corners[3].Set (-1, 1, 1);
-    csBox3 bbox;
-    quad3d = new csQuadTree3D (csVector3 (0, 0, 0),
-    	corners, bbox, 5);
-  }
-  else
-  {
-    delete quad3d;
-    quad3d = NULL;
-  }
-}
-
-void csWorld::EnableCBuffer (bool en)
-{
-  if (en)
-  {
-    delete covtree; covtree = NULL;
-    delete quad3d; quad3d = NULL;
-    if (c_buffer) return;
-    c_buffer = new csCBuffer (0, frame_width-1, frame_height);
-  }
-  else
-  {
-    delete c_buffer;
-    c_buffer = NULL;
-  }
-}
-
-void csWorld::EnableCovtree (bool en)
-{
-  if (en)
-  {
-    delete c_buffer; c_buffer = NULL;
-    delete quad3d; quad3d = NULL;
-    if (covtree) return;
-    csBox2 box (0, 0, frame_width, frame_height);
-    if (!covtree_lut)
+    case CS_CULLER_CBUFFER:
+      c_buffer = new csCBuffer (0, frame_width-1, frame_height);
+      break;
+    case CS_CULLER_QUAD3D:
     {
-      covtree_lut = new csCovMaskLUT (16);
+      csVector3 corners[4];
+      corners[0].Set (-1, -1, 1);
+      corners[1].Set (1, -1, 1);
+      corners[2].Set (1, 1, 1);
+      corners[3].Set (-1, 1, 1);
+      csBox3 bbox;
+      quad3d = new csQuadTree3D (csVector3 (0, 0, 0),
+    	  corners, bbox, 5);
+      break;
     }
-    covtree = new csCoverageMaskTree (covtree_lut, box);
-  }
-  else
-  {
-    delete covtree;
-    covtree = NULL;
+    case CS_CULLER_COVTREE:
+    {
+      csBox2 box (0, 0, frame_width, frame_height);
+      if (!covtree_lut)
+      {
+        covtree_lut = new csCovMaskLUT (16);
+      }
+      covtree = new csCoverageMaskTree (covtree_lut, box);
+      break;
+    }
   }
 }
 
@@ -561,7 +575,7 @@ csThingTemplate* csWorld::GetThingTemplate (const char* name)
 
 csSector* csWorld::NewSector ()
 {
-  csSector* s = new csSector();
+  csSector* s = new csSector (this);
   s->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sectors.Push (s);
   return s;
@@ -642,55 +656,6 @@ bool csWorld::Prepare ()
 
 void csWorld::ShineLights ()
 {
-#if CS_COV_STATS
-  extern int cnt_TestPolygonNotEmpty;
-  extern int cnt_TestPolygonNotEmpty_loop;
-  extern int cnt_TestPolygonNotEmpty_child;
-  extern int cnt_TestPolygonNotEmpty0;
-  extern int cnt_InsertPolygon;
-  extern int cnt_InsertPolygon_loop;
-  extern int cnt_InsertPolygon_child;
-  extern int cnt_InsertPolygon0;
-  extern int cnt_UpdatePolygon;
-  extern int cnt_UpdatePolygon_loop;
-  extern int cnt_UpdatePolygon_child;
-  extern int cnt_UpdatePolygon0;
-  extern int cnt_UpdatePolygonInverted;
-  extern int cnt_UpdatePolygonInverted_loop;
-  extern int cnt_UpdatePolygonInverted_child;
-  extern int cnt_UpdatePolygonInverted0;
-  extern int cnt_TestPolygon;
-  extern int cnt_TestPolygon_loop;
-  extern int cnt_TestPolygon_child;
-  extern int cnt_TestPolygon0;
-  extern int cnt_GetIndex;
-  extern int cnt_GetIndex_hor;
-  extern int cnt_GetIndex_ver;
-  cnt_TestPolygonNotEmpty = 0;
-  cnt_TestPolygonNotEmpty_loop = 0;
-  cnt_TestPolygonNotEmpty_child = 0;
-  cnt_TestPolygonNotEmpty0 = 0;
-  cnt_InsertPolygon = 0;
-  cnt_InsertPolygon_loop = 0;
-  cnt_InsertPolygon_child = 0;
-  cnt_InsertPolygon0 = 0;
-  cnt_UpdatePolygon = 0;
-  cnt_UpdatePolygon_loop = 0;
-  cnt_UpdatePolygon_child = 0;
-  cnt_UpdatePolygon0 = 0;
-  cnt_UpdatePolygonInverted = 0;
-  cnt_UpdatePolygonInverted_loop = 0;
-  cnt_UpdatePolygonInverted_child = 0;
-  cnt_UpdatePolygonInverted0 = 0;
-  cnt_TestPolygon = 0;
-  cnt_TestPolygon_loop = 0;
-  cnt_TestPolygon_child = 0;
-  cnt_TestPolygon0 = 0;
-  cnt_GetIndex = 0;
-  cnt_GetIndex_hor = 0;
-  cnt_GetIndex_ver = 0;
-#endif
-
   tr_manager.NewFrame ();
 
   if (!do_not_force_relight)
@@ -894,38 +859,6 @@ void csWorld::ShineLights ()
 
   delete pit;
   delete lit;
-
-#if CS_COV_STATS
-  printf ("TestPolygonNotEmpty: %d loop=%d child=%d 0=%d\n",
-  cnt_TestPolygonNotEmpty,
-  cnt_TestPolygonNotEmpty_loop,
-  cnt_TestPolygonNotEmpty_child,
-  cnt_TestPolygonNotEmpty0);
-  printf ("InsertPolygon: %d loop=%d child=%d 0=%d\n",
-  cnt_InsertPolygon,
-  cnt_InsertPolygon_loop,
-  cnt_InsertPolygon_child,
-  cnt_InsertPolygon0);
-  printf ("UpdatePolygon: %d loop=%d child=%d 0=%d\n",
-  cnt_UpdatePolygon,
-  cnt_UpdatePolygon_loop,
-  cnt_UpdatePolygon_child,
-  cnt_UpdatePolygon0);
-  printf ("UpdatePolygonInverted: %d loop=%d child=%d 0=%d\n",
-  cnt_UpdatePolygonInverted,
-  cnt_UpdatePolygonInverted_loop,
-  cnt_UpdatePolygonInverted_child,
-  cnt_UpdatePolygonInverted0);
-  printf ("TestPolygon: %d loop=%d child=%d 0=%d\n",
-  cnt_TestPolygon,
-  cnt_TestPolygon_loop,
-  cnt_TestPolygon_child,
-  cnt_TestPolygon0);
-  printf ("GetIndex: %d hor=%d ver=%d\n",
-  cnt_GetIndex,
-  cnt_GetIndex_hor,
-  cnt_GetIndex_ver);
-#endif
 }
 
 bool csWorld::CheckConsistency ()
@@ -990,64 +923,19 @@ void csWorld::StartWorld ()
   Clear ();
 }
 
-void csWorld::Draw (csCamera* c, csClipper* view)
+void csWorld::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
 {
-#if CS_COV_STATS
-  extern int cnt_TestPolygonNotEmpty;
-  extern int cnt_TestPolygonNotEmpty_loop;
-  extern int cnt_TestPolygonNotEmpty_child;
-  extern int cnt_TestPolygonNotEmpty0;
-  extern int cnt_InsertPolygon;
-  extern int cnt_InsertPolygon_loop;
-  extern int cnt_InsertPolygon_child;
-  extern int cnt_InsertPolygon0;
-  extern int cnt_UpdatePolygon;
-  extern int cnt_UpdatePolygon_loop;
-  extern int cnt_UpdatePolygon_child;
-  extern int cnt_UpdatePolygon0;
-  extern int cnt_UpdatePolygonInverted;
-  extern int cnt_UpdatePolygonInverted_loop;
-  extern int cnt_UpdatePolygonInverted_child;
-  extern int cnt_UpdatePolygonInverted0;
-  extern int cnt_TestPolygon;
-  extern int cnt_TestPolygon_loop;
-  extern int cnt_TestPolygon_child;
-  extern int cnt_TestPolygon0;
-  extern int cnt_GetIndex;
-  extern int cnt_GetIndex_hor;
-  extern int cnt_GetIndex_ver;
-  cnt_TestPolygonNotEmpty = 0;
-  cnt_TestPolygonNotEmpty_loop = 0;
-  cnt_TestPolygonNotEmpty_child = 0;
-  cnt_TestPolygonNotEmpty0 = 0;
-  cnt_InsertPolygon = 0;
-  cnt_InsertPolygon_loop = 0;
-  cnt_InsertPolygon_child = 0;
-  cnt_InsertPolygon0 = 0;
-  cnt_UpdatePolygon = 0;
-  cnt_UpdatePolygon_loop = 0;
-  cnt_UpdatePolygon_child = 0;
-  cnt_UpdatePolygon0 = 0;
-  cnt_UpdatePolygonInverted = 0;
-  cnt_UpdatePolygonInverted_loop = 0;
-  cnt_UpdatePolygonInverted_child = 0;
-  cnt_UpdatePolygonInverted0 = 0;
-  cnt_TestPolygon = 0;
-  cnt_TestPolygon_loop = 0;
-  cnt_TestPolygon_child = 0;
-  cnt_TestPolygon0 = 0;
-  cnt_GetIndex = 0;
-  cnt_GetIndex_hor = 0;
-  cnt_GetIndex_ver = 0;
-#endif
-
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
   Stats::portals_drawn = 0;
   Stats::polygons_rejected = 0;
   Stats::polygons_accepted = 0;
 
+  // Make sure we select an engine mode.
+  ResolveEngineMode ();
+
   current_camera = c;
+  rview.world = this;
 
   // This flag is set in HandleEvent on a cscmdContextResize event
   if (resize) 
@@ -1055,6 +943,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     resize = false;
     Resize ();
   }
+
   // when many cameras per context, need to make sure each camera has updated
   // shift_* fields, after resizing.
   //  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
@@ -1062,9 +951,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   // resize events and update the cameras accordingly. (dtsimple implements this)
   top_clipper = view;
 
-  csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
-  rview.callback = NULL;
 
   // Calculate frustum for screen dimensions (at z=1).
   float leftx = - c->GetShiftX () * c->GetInvFOV ();
@@ -1073,123 +960,67 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
   rview.SetFrustum (leftx, rightx, topy, boty);
 
+  // Initialize our transformation manager so that we will get
+  // new transformed coordinates.
   tr_manager.NewFrame ();
 
-  if (c_buffer)
+  // Initialize the 2D/3D culler.
+  if (engine_mode == CS_ENGINE_FRONT2BACK)
   {
-    c_buffer->Initialize ();
-    c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (), true);
-  }
-  else if (quad3d)
-  {
-    csVector3 corners[4];
-    c->InvPerspective (csVector2 (0, 0), 1, corners[0]);
-    corners[0] = c->Camera2World (corners[0]);
-    c->InvPerspective (csVector2 (frame_width-1, 0), 1, corners[1]);
-    corners[1] = c->Camera2World (corners[1]);
-    c->InvPerspective (csVector2 (frame_width-1, frame_height-1), 1, corners[2]);
-    corners[2] = c->Camera2World (corners[2]);
-    c->InvPerspective (csVector2 (0, frame_height-1), 1, corners[3]);
-    corners[3] = c->Camera2World (corners[3]);
-    quad3d->SetMainFrustum (c->GetOrigin (), corners);
-    quad3d->MakeEmpty ();
-  }
-  else if (covtree)
-  {
-    covtree->MakeEmpty ();
-    covtree->UpdatePolygonInverted (view->GetClipPoly (), view->GetNumVertices ());
+    if (c_buffer)
+    {
+      c_buffer->Initialize ();
+      c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (), true);
+    }
+    else if (quad3d)
+    {
+      csVector3 corners[4];
+      c->InvPerspective (csVector2 (0, 0), 1, corners[0]);
+      corners[0] = c->Camera2World (corners[0]);
+      c->InvPerspective (csVector2 (frame_width-1, 0), 1, corners[1]);
+      corners[1] = c->Camera2World (corners[1]);
+      c->InvPerspective (csVector2 (frame_width-1, frame_height-1), 1, corners[2]);
+      corners[2] = c->Camera2World (corners[2]);
+      c->InvPerspective (csVector2 (0, frame_height-1), 1, corners[3]);
+      corners[3] = c->Camera2World (corners[3]);
+      quad3d->SetMainFrustum (c->GetOrigin (), corners);
+      quad3d->MakeEmpty ();
+    }
+    else if (covtree)
+    {
+      covtree->MakeEmpty ();
+      covtree->UpdatePolygonInverted (view->GetClipPoly (), view->GetNumVertices ());
+    }
   }
 
-  csSector* s = c->GetSector ();
   cur_process_polygons = 0;
+}
+
+void csWorld::Draw (csCamera* c, csClipper* view)
+{
+  csRenderView rview (*c, view, G3D, G2D);
+  StartDraw (c, view, rview);
+  rview.callback = NULL;
+
+  csSector* s = c->GetSector ();
   s->Draw (rview);
+
   // draw all halos on the screen
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!ProcessHalo (halos.Get (halo)))
       halos.Delete (halo);
-
-#if CS_COV_STATS
-  printf ("TestPolygonNotEmpty: %d loop=%d child=%d 0=%d\n",
-  cnt_TestPolygonNotEmpty,
-  cnt_TestPolygonNotEmpty_loop,
-  cnt_TestPolygonNotEmpty_child,
-  cnt_TestPolygonNotEmpty0);
-  printf ("InsertPolygon: %d loop=%d child=%d 0=%d\n",
-  cnt_InsertPolygon,
-  cnt_InsertPolygon_loop,
-  cnt_InsertPolygon_child,
-  cnt_InsertPolygon0);
-  printf ("UpdatePolygon: %d loop=%d child=%d 0=%d\n",
-  cnt_UpdatePolygon,
-  cnt_UpdatePolygon_loop,
-  cnt_UpdatePolygon_child,
-  cnt_UpdatePolygon0);
-  printf ("UpdatePolygonInverted: %d loop=%d child=%d 0=%d\n",
-  cnt_UpdatePolygonInverted,
-  cnt_UpdatePolygonInverted_loop,
-  cnt_UpdatePolygonInverted_child,
-  cnt_UpdatePolygonInverted0);
-  printf ("TestPolygon: %d loop=%d child=%d 0=%d\n",
-  cnt_TestPolygon,
-  cnt_TestPolygon_loop,
-  cnt_TestPolygon_child,
-  cnt_TestPolygon0);
-  printf ("GetIndex: %d hor=%d ver=%d\n",
-  cnt_GetIndex,
-  cnt_GetIndex_hor,
-  cnt_GetIndex_ver);
-#endif
 }
 
 void csWorld::DrawFunc (csCamera* c, csClipper* view,
 	csDrawFunc* callback, void* callback_data)
 {
-  // This flag is set in HandleEvent on a NativeWindowResize event
-  if (resize) 
-  {
-    resize = false;
-    Resize ();
-  }
-  // when many cameras per context, need to make sure each camera has updated
-  // shift_* fields, after resizing.
-
-  //  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
-  // smgh: depreciated.. it is now the apps responsibility to monitor context
-  // resize events and update the cameras accordingly. (dtsimple implements this)
-
   csRenderView rview (*c, view, G3D, G2D);
-  rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
+  StartDraw (c, view, rview);
+
   rview.callback = callback;
   rview.callback_data = callback_data;
 
-  // Calculate frustum for screen dimensions (at z=1).
-  float leftx = - c->GetShiftX () * c->GetInvFOV ();
-  float rightx = (frame_width - c->GetShiftX ()) * c->GetInvFOV ();
-  float topy = - c->GetShiftY () * c->GetInvFOV ();
-  float boty = (frame_height - c->GetShiftY ()) * c->GetInvFOV ();
-  rview.SetFrustum (leftx, rightx, topy, boty);
-
-  tr_manager.NewFrame ();
-
-  if (c_buffer) c_buffer->Initialize ();
-  else if (quad3d)
-  {
-    csVector3 corners[4];
-    c->InvPerspective (csVector2 (0, 0), 1, corners[0]);
-    corners[0] = c->Camera2World (corners[0]);
-    c->InvPerspective (csVector2 (frame_width-1, 0), 1, corners[1]);
-    corners[1] = c->Camera2World (corners[1]);
-    c->InvPerspective (csVector2 (frame_width-1, frame_height-1), 1, corners[2]);
-    corners[2] = c->Camera2World (corners[2]);
-    c->InvPerspective (csVector2 (0, frame_height-1), 1, corners[3]);
-    corners[3] = c->Camera2World (corners[3]);
-    quad3d->SetMainFrustum (c->GetOrigin (), corners);
-    quad3d->MakeEmpty ();
-  }
-  else if (covtree) covtree->MakeEmpty ();
-
   csSector* s = c->GetSector ();
-  cur_process_polygons = 0;
   s->Draw (rview);
 }
 
@@ -1746,9 +1577,9 @@ bool csWorld::CreatePlane (const char *iName, const csVector3 &iOrigin,
   return true;
 }
 
-iSector *csWorld::CreateSector (const char *iName)
+iSector* csWorld::CreateSector (const char *iName)
 {
-  csSector *sector = new csSector ();
+  csSector* sector = new csSector (this);
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sector->SetName (iName);
   sectors.Push (sector);
@@ -1757,7 +1588,7 @@ iSector *csWorld::CreateSector (const char *iName)
 
 iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
 {
-  csThing *thing = new csThing ();
+  csThing *thing = new csThing (this);
   thing->SetName (iName);
   thing->SetSector (iParent->GetPrivateObject ());
   iThing* p = QUERY_INTERFACE (thing, iThing);
@@ -1772,22 +1603,8 @@ void csWorld::Resize ()
 {
   frame_width = G3D->GetWidth ();
   frame_height = G3D->GetHeight ();
-
-  if (c_buffer) 
-  { 
-    EnableCBuffer (false); 
-    EnableCBuffer (true);  
-  }
-  if (covtree) 
-  { 
-    EnableCovtree (false); 
-    EnableCovtree (true); 
-  }
-  if (quad3d) 
-  { 
-    EnableQuad3D (false); 
-    EnableQuad3D (true); 
-  }
+  // Reset the culler.
+  SetCuller (GetCuller ());
 }
 
 csWorld::csWorldState::csWorldState (csWorld *w)
@@ -1803,9 +1620,9 @@ csWorld::csWorldState::csWorldState (csWorld *w)
 
 csWorld::csWorldState::~csWorldState ()
 {
-  if (c_buffer) delete c_buffer;
-  if (quad3d)   delete quad3d;
-  if (covtree)  delete covtree;
+  delete c_buffer;
+  delete quad3d;
+  delete covtree;
 }
 
 void csWorld::csWorldState::Activate ()

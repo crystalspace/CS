@@ -571,7 +571,7 @@ void Blocks::add_hrast_template ()
 void Blocks::add_pillar (int x, int y)
 {
   csThing* pillar;
-  pillar = new csThing ();
+  pillar = new csThing (world);
   pillar->SetName ("pillar");
   pillar->SetSector (room);
   pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
@@ -586,7 +586,7 @@ void Blocks::add_pillar (int x, int y)
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 {
   csThing* vrast;
-  vrast = new csThing ();
+  vrast = new csThing (world);
   vrast->SetName ("vrast");
   vrast->SetSector (room);
   vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
@@ -603,7 +603,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 {
   csThing* hrast;
-  hrast = new csThing ();
+  hrast = new csThing (world);
   hrast->SetName ("hrast");
   hrast->SetSector (room);
   hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
@@ -694,7 +694,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
 	csThingTemplate* tmpl)
 {
   csThing* cube;
-  cube = new csThing ();
+  cube = new csThing (world);
   cube->SetName ("cubexxx");
   cube->SetSector (room);
   cube->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
@@ -1831,7 +1831,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
 void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 {
   csTextureHandle* tm_front = world->GetTextures ()->FindByName (txt);
-  csThing* thing = new csThing ();
+  csThing* thing = new csThing (world);
 
   thing->AddVertex (-1, .25, 0);
   thing->AddVertex (1, .25, 0);
@@ -1862,7 +1862,7 @@ void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 csThing* Blocks::CreateMenuArrow (bool left)
 {
   csTextureHandle* tm_front = world->GetTextures ()->FindByName ("menu_back");
-  csThing* thing = new csThing ();
+  csThing* thing = new csThing (world);
 
   float pointx;
   float rearx;
@@ -2392,7 +2392,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   {
     if (initscreen) StartDemo ();
     HandleMovement (elapsed_time);
-    if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
+    if (!Gfx3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
@@ -2455,7 +2455,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     if (player1->cur_speed > MAX_SPEED) player1->cur_speed = MAX_SPEED;
 
     // Tell Gfx3D we're going to display 3D things
-    if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
+    if (!Gfx3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
   }
 

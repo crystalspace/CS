@@ -57,7 +57,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
-csPolygonSet::csPolygonSet () : csObject(),
+csPolygonSet::csPolygonSet (csWorld* world) : csObject(),
   polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
@@ -80,11 +80,12 @@ csPolygonSet::csPolygonSet () : csObject(),
 
   light_frame_number = -1;
 
-  cam_verts_set.SetTransformationManager (&csWorld::current_world->tr_manager);
+  cam_verts_set.SetTransformationManager (&world->tr_manager);
 
   next = NULL;
   parent = NULL;
   sector = NULL;
+  csPolygonSet::world = world;
 }
 
 csPolygonSet::~csPolygonSet ()
@@ -433,7 +434,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i;
-  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = d->world->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
@@ -551,11 +552,11 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i, j;
-  csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
-  csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
-  csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
+  csCBuffer* c_buffer = d->world->GetCBuffer ();
+  csCoverageMaskTree* covtree = d->world->GetCovtree ();
+  csQuadTree3D* quad3d = d->world->GetQuad3D ();
   bool visible;
-  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = d->world->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
@@ -611,6 +612,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  for (j = 0 ; j < pi.GetNumVertices () ; j++)
 	    test_poly[j] = verts[pi[j]]-quad3d->GetCenter ();
 	  csBox3 bbox;
+//@@@ BF CULLING
 	  int rc = quad3d->TestPolygon (test_poly, pi.GetNumVertices (), bbox);
 	  mark_vis = (rc != CS_QUAD3D_NOCHANGE);
 	}
@@ -673,19 +675,26 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         // Don't draw this polygon.
       }
-      else if (quad3d && !csWorld::current_world->IsPVSOnly ())
+      else if (quad3d && !d->world->IsPVSOnly ())
       {
-	csVector3 test_poly[128];	// @@@ Bad hardcoded limit.
-	for (j = 0 ; j < p->GetNumVertices () ; j++)
-	  test_poly[j] = p->Vwor (j)-quad3d->GetCenter ();
-	csBox3 bbox;
-        po = p->GetPortal ();
-	int rc;
-	if (po)
-	  rc = quad3d->TestPolygon (test_poly, p->GetNumVertices (), bbox);
+	csPlane3* wplane = p->GetPolyPlane ();
+	float cl = wplane->Classify (quad3d->GetCenter ());
+    	if (cl > 0)
+	  visible = false;
 	else
-	  rc = quad3d->InsertPolygon (test_poly, p->GetNumVertices (), bbox);
-	visible = (rc != CS_QUAD3D_NOCHANGE);
+	{
+	  csVector3 test_poly[128];	// @@@ Bad hardcoded limit.
+	  for (j = 0 ; j < p->GetNumVertices () ; j++)
+	    test_poly[j] = p->Vwor (j)-quad3d->GetCenter ();
+	  csBox3 bbox;
+          po = p->GetPortal ();
+	  int rc;
+	  if (po)
+	    rc = quad3d->TestPolygon (test_poly, p->GetNumVertices (), bbox);
+	  else
+	    rc = quad3d->InsertPolygon (test_poly, p->GetNumVertices (), bbox);
+	  visible = (rc != CS_QUAD3D_NOCHANGE);
+	}
       }
       else
       {
@@ -698,7 +707,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
          && clip->ClipAgainst (d->view))
         {
           po = p->GetPortal ();
-	  if (csWorld::current_world->IsPVSOnly ())
+	  if (d->world->IsPVSOnly ())
             visible = true;
           else if (csSector::do_portals && po)
           {

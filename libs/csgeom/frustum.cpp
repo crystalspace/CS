@@ -401,11 +401,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
        || (prev_d > 0 && d < 0))
       {
 #if 1
-	// This version should be faster but is not ok yet.
-	// Here is a counter example:
-	// rect (0,1,1), (1,1,1), (1,0,1), (0,0,1)
-	// with frust (0,0,2), (8,8,2), (8,0,2)
-	// is classified as 0 (outside) but should be partial.
+	// This version should be faster.
 	float f1;
 	float f2; 
 	if (!((f1=(poly[pvp]%v1)*poly[pv]) > 0 || (f2=(v2%poly[pvp]) * poly[pv]) > 0) || f1 == 0 || f2 == 0)

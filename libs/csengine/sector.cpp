@@ -70,7 +70,7 @@ IMPLEMENT_EMBEDDED_IBASE (csSector::SectorInterface)
   IMPLEMENTS_INTERFACE (iSector)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSector::csSector () : csPolygonSet ()
+csSector::csSector (csWorld* world) : csPolygonSet (world)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   first_thing = NULL;
@@ -213,7 +213,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   delete static_tree; static_tree = NULL;
 
   if (static_thing) return;
-  static_thing = new csThing ();
+  static_thing = new csThing (world);
   static_thing->SetName ("__static__");
 
   static_thing->SetSector (this);
@@ -245,7 +245,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
 
   csString str ("vis/octree_");
   str += GetName ();
-  csWorld* w = csWorld::current_world;
+  csWorld* w = world;
   bool recalc_octree = true;
   if (!csWorld::do_force_revis && w->VFS->Exists ((const char*)str))
   {
@@ -552,7 +552,7 @@ void* csSector::TestQueuePolygons (csSector* sector,
 {
   csRenderView* d = (csRenderView*)data;
   return sector->TestQueuePolygonArray (polygon, num, d, poly_queue,
-    csWorld::current_world->IsPVS ());
+    d->world->IsPVS ());
 }
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
@@ -560,7 +560,7 @@ void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
-  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = rview->world->render_pol2d_pool;
   while (queue->Pop (&poly3d, &poly2d))
   {
     poly3d->CamUpdate ();
@@ -605,17 +605,18 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
   csVector3 array[6];
+  csWorld* w = rview->world;
 
-  if (csWorld::current_world->IsPVS ())
+  if (w->IsPVS ())
   {
     // Test for PVS.
     if (!onode->IsVisible ()) return false;
-    else if (csWorld::current_world->IsPVSOnly ()) goto is_vis;
+    else if (w->IsPVSOnly ()) goto is_vis;
   }
 
-  c_buffer = csWorld::current_world->GetCBuffer ();
-  covtree = csWorld::current_world->GetCovtree ();
-  quad3d = csWorld::current_world->GetQuad3D ();
+  c_buffer = w->GetCBuffer ();
+  covtree = w->GetCovtree ();
+  quad3d = w->GetQuad3D ();
   int num_array;
   otree->GetConvexOutline (onode, pos, array, num_array);
 
@@ -867,7 +868,7 @@ void csSector::Draw (csRenderView& rview)
   }
   else if (HasFog ())
   {
-    if ((fogmethod = csWorld::current_world->fogmethod) == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = rview.world->fogmethod) == G3DFOGMETHOD_VERTEX)
     {
       csFogInfo* fog_info = new csFogInfo ();
       fog_info->next = rview.fog_info;
@@ -908,14 +909,12 @@ void csSector::Draw (csRenderView& rview)
   // If the following flag is true the queues are actually used.
   bool use_object_queues = false;
 
-  csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
-  csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
-  csQuadTree3D* quad3d = csWorld::current_world->GetQuad3D ();
-  if (c_buffer || covtree || quad3d)
+  int engine_mode = rview.world->GetEngineMode ();
+  if (engine_mode == CS_ENGINE_FRONT2BACK)
   {
     //-----
-    // In this part of the rendering we use the c-buffer and or another
-    // 2D visibility culler.
+    // In this part of the rendering we use the c-buffer or another
+    // 2D/3D visibility culler.
     //-----
 
     // @@@ We should make a pool for queues. The number of queues allocated
@@ -956,11 +955,11 @@ void csSector::Draw (csRenderView& rview)
 
       // Using the PVS, mark all sectors and polygons that are visible
       // from the current node.
-      if (csWorld::current_world->IsPVS ())
+      if (rview.world->IsPVS ())
       {
         csOctree* otree = (csOctree*)static_tree;
-	if (csWorld::current_world->IsPVSFrozen ())
-	  otree->MarkVisibleFromPVS (csWorld::current_world->GetFrozenPosition ());
+	if (rview.world->IsPVSFrozen ())
+	  otree->MarkVisibleFromPVS (rview.world->GetFrozenPosition ());
 	else
 	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
       }
@@ -1029,7 +1028,7 @@ void csSector::Draw (csRenderView& rview)
     DrawPolygonsFromQueue (queue, &rview);
     delete queue;
   }
-  else
+  else if (engine_mode == CS_ENGINE_BACK2FRONT)
   {
     //-----
     // Here we don't use the c-buffer or 2D culler but just render back
@@ -1040,6 +1039,21 @@ void csSector::Draw (csRenderView& rview)
     {
       static_thing->UpdateTransformation (rview);
       static_tree->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
+    }
+  }
+  else
+  {
+    //-----
+    // Here we render using the Z-buffer.
+    //-----
+    DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, true);
+    if (static_thing)
+    {
+      static_thing->UpdateTransformation (rview);
+      csOctree* otree = (csOctree*)static_tree;
+      csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
+      DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetNumPolygons (),
+    	  &rview, true);
     }
   }
 
@@ -1161,7 +1175,7 @@ void csSector::Draw (csRenderView& rview)
   if (!rview.callback)
     for (i = lights.Length () - 1; i >= 0; i--)
       // Tell the world to try to add this light into the halo queue
-      csWorld::current_world->AddHalo ((csLight *)lights.Get (i));
+      rview.world->AddHalo ((csLight *)lights.Get (i));
 
   // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
@@ -1551,8 +1565,8 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
 
 void csSector::CheckFrustum (csFrustumView& lview)
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  csCBufferCube* cb = world->GetCBufCube ();
+  csCovcube* cc = world->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   RealCheckFrustum (lview);

@@ -49,7 +49,7 @@ IMPLEMENT_EMBEDDED_IBASE (csThing::ThingInterface)
   IMPLEMENTS_INTERFACE (iThing)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing () : csPolygonSet (), obj(), tree_bbox (NULL)
+csThing::csThing (csWorld* world) : csPolygonSet (world), obj(), tree_bbox (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   center_idx = -1;
@@ -252,7 +252,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     // why not do it to the smallest possible clip area.
     if (!do_clip)
     {
-      box_class = csWorld::current_world->top_clipper->ClassifyBox (bbox);
+      box_class = world->top_clipper->ClassifyBox (bbox);
       if (box_class == 0) do_clip = true;
     }
 
@@ -359,7 +359,7 @@ void csThing::DrawFoggy (csRenderView& d)
   csVector3* verts;
   int num_verts;
   int i;
-  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = world->render_pol2d_pool;
   csPolygon2D* clip;
 
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
@@ -438,8 +438,8 @@ void csThing::DrawFoggy (csRenderView& d)
 
 void csThing::CheckFrustum (csFrustumView& lview)
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  csCBufferCube* cb = world->GetCBufCube ();
+  csCovcube* cc = world->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   RealCheckFrustum (lview);

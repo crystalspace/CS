@@ -70,6 +70,13 @@ struct iGraphics3D;
  */
 #define CS_POLY_NO_DRAW		0x40000000
 
+/**
+ * If this flag is set then this polygon has been split (BSP tree
+ * or other reason). Depending on the engine mode this polygon will
+ * not be used anymore for rendering.
+ */
+#define CS_POLY_SPLIT		0x20000000
+
 /// Texture type is lightmapped
 #define POLYTXT_LIGHTMAP	1
 /// Gouraud Shaded texture
