@@ -58,7 +58,8 @@ enum
   XMLTOKEN_MATERIAL,
   XMLTOKEN_MORPHTARGET,
   XMLTOKEN_MORPHANIMATION,
-  XMLTOKEN_OPTIONS
+  XMLTOKEN_OPTIONS,
+  XMLTOKEN_SOCKET
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
@@ -131,6 +132,7 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("morphtarget",    XMLTOKEN_MORPHTARGET);
   xmltokens.Register ("morphanimation", XMLTOKEN_MORPHANIMATION);
   xmltokens.Register ("options",        XMLTOKEN_OPTIONS);
+  xmltokens.Register ("socket",        XMLTOKEN_SOCKET);
   return true;
 }
 
@@ -368,6 +370,21 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  return 0;
 	break;
       }
+
+    case XMLTOKEN_SOCKET:
+      {
+	int a = child->GetAttributeValueAsInt ("tri");
+	int submesh = child->GetAttributeValueAsInt ("submesh");
+	int mesh = child->GetAttributeValueAsInt ("mesh");
+	iSpriteCal3DSocket* sprite_socket = newspr->AddSocket ();
+	sprite_socket->SetName (child->GetAttributeValue ("name"));
+	sprite_socket->SetTriangleIndex (a);
+	sprite_socket->SetSubmeshIndex (submesh);
+	sprite_socket->SetMeshIndex (mesh);
+	break;
+      }
+
+      break;
 
     default:
       synldr->ReportBadToken (child);

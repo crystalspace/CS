@@ -12,6 +12,7 @@ chronological order.
 	  clipping is required at all.
 	- Jorrit added PointOnPolygon() to iThingStatic to test if a point
 	  is on a polygon.
+	- Steven Geens added sockets to the cal3d XML loader.
 1-Jan-2004
 	- Marten Svanfeldt made the first commit of 2004. Changes are:
 	  - Added basic portal support to new renderer. It still lacks support
