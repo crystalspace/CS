@@ -152,27 +152,27 @@ public:
   }
   inline int Push (csSome what)
   {
-    ((iBase*)what)->IncRef ();
+    if (what) ((iBase*)what)->IncRef ();
     return csVector::Push((csSome)what); 
   }
   inline bool Insert (int n, csSome Item)
   {
-    ((iBase*)Item)->IncRef ();
+    if (Item) ((iBase*)Item)->IncRef ();
     return csVector::Insert (n, (csSome)Item);
   }
   inline int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0)
   {
-    ((iBase*)Item)->IncRef ();
+    if (Item) ((iBase*)Item)->IncRef ();
     return csVector::InsertSorted ((csSome)Item, oEqual, Mode); 
   }
   inline bool Replace (int n, csSome what)
   {
-    ((iBase*)what)->IncRef ();
+    if (what) ((iBase*)what)->IncRef ();
     return csVector::Replace(n, (csSome)what, true);
   }
   virtual bool FreeItem (csSome Item)
   {
-    ((iBase *)Item)->DecRef ();
+    if (Item) ((iBase *)Item)->DecRef ();
     return true;
   }
 };

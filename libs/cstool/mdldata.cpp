@@ -350,13 +350,12 @@ csModelDataObject::~csModelDataObject ()
   SCF_DEC_REF (DefaultVertices);
 }
 
-/*
 void MergeAction (iModelDataAction *Out, iModelDataAction *In1,
   iModelDataVertices *In2, bool Swap)
 {
   for (int i=0; i<In1->GetFrameCount (); i++)
   {
-    iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (In1->QueryObject (),
+    iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (In1->GetState (i),
       iModelDataVertices);
     if (ver)
     {
@@ -368,7 +367,6 @@ void MergeAction (iModelDataAction *Out, iModelDataAction *In1,
     }
   }
 }
-*/
 
 void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
 {
@@ -381,6 +379,9 @@ void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
   int ColorOffset = DefaultVertices ? DefaultVertices->GetColorCount () : 0;
 
   // copy the default vertices
+  iModelDataVertices *OrigDefaultVertices = GetDefaultVertices ();
+  SCF_INC_REF (OrigDefaultVertices);
+
   iModelDataVertices *ver = MergeVertices (DefaultVertices, obj->GetDefaultVertices ());
   SetDefaultVertices (ver);
   ver->DecRef ();
@@ -413,7 +414,6 @@ void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
   it->DecRef ();
 
   // build the action mapping
-/*
   csActionVector ActionMap1, ActionMap2;
 
   it = scfiObject.GetIterator ();
@@ -458,7 +458,9 @@ void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
     iModelDataAction *Action1 = ActionMap1.Get (i),
                      *Action2 = ActionMap2.Get (i),
 		     *NewAction = new csModelDataAction ();
-    NewAction->QueryObject ()->SetName (Action1->QueryObject ()->GetName ());
+    NewAction->QueryObject ()->SetName (Action1 ?
+      Action1->QueryObject ()->GetName () :
+      Action2->QueryObject ()->GetName ());
     scfiObject.ObjAdd (NewAction->QueryObject ());
     NewAction->DecRef ();
 
@@ -472,10 +474,10 @@ void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
       }
     } else {
       // merge action 2 and the default frame of object 1
-      MergeAction (NewAction, Action2, GetDefaultVertices (), true);
+      MergeAction (NewAction, Action2, OrigDefaultVertices, true);
     }
   }
-*/
+  SCF_DEC_REF (OrigDefaultVertices);
 }
 
 /*** csModelDataCamera ***/

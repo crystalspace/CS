@@ -59,6 +59,7 @@ int csNamedObjectVector::GetIndexByName (const char *name) const
   for (i = 0; i < Length (); i++)
   {
     iObject *o = Get (i);
+    if (!o) continue;
     const char* oname = o->GetName ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
       return i;

@@ -211,15 +211,26 @@ inline int csNamedObjectVector::FindKey (csConstSome Key, int Mode) const
 inline int csNamedObjectVector::FindSortedKey (csConstSome Key, int Mode) const
   { return Vector->FindSortedKey (Key, Mode); }
 inline iObject *csNamedObjectVector::Pop ()
-  { iObject *obj = SCF_QUERY_INTERFACE_FAST (((iBase*)Vector->Pop()), iObject);
-    CS_ASSERT (obj); return obj; }
+  {
+    iBase *objbase = (iBase*)Vector->Pop ();
+    if (!objbase) return NULL;
+    iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
+    CS_ASSERT (obj);
+    return obj;
+  }
 inline bool csNamedObjectVector::Delete (int n)
   { return Vector->Delete (n); }
 inline void csNamedObjectVector::DeleteAll ()
   { Vector->DeleteAll (); }
 inline iObject *csNamedObjectVector::Get (int n) const
-  { return SCF_QUERY_INTERFACE_FAST (((iBase*)(Vector->Get(n))), iObject); }
+  { 
+    iBase *objbase = (iBase*)Vector->Get (n);
+    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : NULL;
+  }
 inline iObject *csNamedObjectVector::operator[] (int n) const
-  { return SCF_QUERY_INTERFACE_FAST (((iBase*)(Vector->Get(n))), iObject); }
+  { 
+    iBase *objbase = (iBase*)Vector->Get (n);
+    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : NULL;
+  }
 
 #endif // __NOBJVEC_H__

@@ -45,6 +45,7 @@
 #include "imap/parser.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "csutil/csstring.h"
 #include "isys/plugin.h"
 
 CS_IMPLEMENT_APPLICATION
