@@ -70,7 +70,7 @@ public:
 	virtual void set_m( real pm );
   
   // collision response
-  virtual void resolve_collision( ctCollidingContact &cont );
+  virtual void resolve_collision( ctCollidingContact *cont );
   virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
 
 
