@@ -183,18 +183,14 @@ while ! includedeps $LIBS_OUT; do
 	ALREADY_TESTED=""
 done
 
-# reverse order
-the_libs=""
-for i in $LIBS_OUT; do
-	the_libs="$i $the_libs"
-done
+the_libs="$LIBS_OUT"
 
 the_libs="-L$libdir $syslibs $the_libs"
 if test -n "$show_cflags"; then
-	echo "$common_cflags"
+	echo "-I$includedir $common_cflags"
 fi
 if test -n "$show_cxxflags"; then
-	echo "$common_cxxflags"
+	echo "-I$includedir $common_cxxflags"
 fi
 if $libs_L || $libs_l; then
 	echo "$the_libs"
