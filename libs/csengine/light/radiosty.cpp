@@ -1342,6 +1342,10 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   float inv_distance = 1./distance;
   path *= inv_distance;
   cosdestangle *= inv_distance;
+  
+  /// take both angles as positive
+  if(cosdestangle<0.0)cosdestangle=-cosdestangle;
+  if(cossrcangle<0.0)cossrcangle=-cossrcangle;
 
   csVector3 viewdir = dest_normal;
 
