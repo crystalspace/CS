@@ -24,6 +24,7 @@ Scripting
 * Makefile How-To::
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
+* World Components:: Components of a World
 * World File Format:: Format of the World File
 * Memory Debugger:: Crystal Space Memory Debugger
 * ProcTextures:: Procedural Texture System
@@ -36,6 +37,7 @@ Scripting
 @imports{anatomy,makefile.txi}
 @imports{anatomy,scf.txi}
 @imports{anatomy,vfs.txi}
+@imports{anatomy,worldcmp.txi}
 @imports{anatomy,worldfmt.txi}
 @imports{anatomy,memdebug.txi}
 @imports{anatomy,proctex.txi}
