@@ -101,6 +101,12 @@ parm(p), sink_err(0)
 
 awsSink::~awsSink ()
 {
+  for (int i=0; i<triggers.Length(); i++)
+  {
+    TriggerMap *tm = (TriggerMap *)triggers[i];
+    delete tm;
+  }
+  triggers.SetLength(0);
 }
 
 unsigned long awsSink::GetTriggerID (const char *_name)

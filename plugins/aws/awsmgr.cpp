@@ -1293,7 +1293,9 @@ void awsManager::RegisterCommonComponents ()
   factory->DecRef ();
   
   // Standard sink
-  GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink (this));
+  awsStandardSink* temp_sink = new awsStandardSink (this);
+  GetSinkMgr ()->RegisterSink ("awsStandardSink", temp_sink);
+  temp_sink->DecRef ();
 
   // Global constants
   GetPrefMgr ()->RegisterConstant ("True", 1);

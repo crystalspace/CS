@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+14-Jun-2003
+	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
+	  leaks in AWS.
 13-Jun-2003
 	- Oktal renamed the function AutoLoad slightly, to avoid conflict with
 	  the Windows API identifier of the same name, in perlpost.i.
