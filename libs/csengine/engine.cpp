@@ -793,10 +793,12 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
 {
   csEngine::object_reg = object_reg;
 
-  if (!(virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock)))
+  virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!virtual_clock)
     return false;
 
-  if (!(G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D)))
+  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!G3D)
   {
     // If there is no G3D then we still allow initialization of the
     // engine because it might be useful to use the engine stand-alone
@@ -804,7 +806,8 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
     Warn ("No 3D driver!");
   }
 
-  if (!(VFS = CS_QUERY_REGISTRY (object_reg, iVFS)))
+  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS)
     return false;
 
   if (G3D)
