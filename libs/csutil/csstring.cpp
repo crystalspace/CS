@@ -78,6 +78,7 @@ void csString::SetGrowsBy(size_t n)
     n = DEFAULT_GROW_BY;
   // Round `n' up to multiple of DEFAULT_GROW_BY.
   GrowBy = (n + DEFAULT_GROW_BY - 1) & ~(DEFAULT_GROW_BY - 1);
+  GrowExponentially = false;
 }
 
 csString &csString::Reclaim()
