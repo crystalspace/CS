@@ -94,10 +94,15 @@ csCollider::csCollider (csSprite3D *sp)
   _sp = sp;
 
   csTriangleMesh *mesh = _sp->tpl->GetBaseMesh ();
-  // pick a frame for now.  This should of course be done for the
+
+  // Pick a frame for now.  This should of course be done for the
   // correct frame (some global CD outline or else we need to do it
   // for every frame which is too expensive.
   csFrame *cf = _sp->cur_action->GetFrame (_sp->cur_frame);
+
+  // GetObjectVerts returns an array of vertices in object space.
+  // It correctly takes care of optional skeletons.
+  csVector3* object_vertices = _sp->GetObjectVerts (cf);
 
   CHK (_rm = new CD_model (mesh->GetNumTriangles ()));
   if (!_rm)
@@ -105,19 +110,14 @@ csCollider::csCollider (csSprite3D *sp)
   _rm->b = 0;
   _rm->num_boxes_alloced = 0;
 
-  //@@@ Why was this added? It is wrong!
-  //_rm->tris = 0;
-  //_rm->num_tris = 0;
-  //_rm->num_tris_alloced = 0;
-
   for (int i = 0; i < mesh->GetNumTriangles (); i++)
   {
     int v[3];
     v[0] = mesh->GetTriangles () [i].a;
     v[1] = mesh->GetTriangles () [i].b;
     v[2] = mesh->GetTriangles () [i].c;
-    _rm->AddTriangle (i, cf->GetVertex (v [0]), cf->GetVertex (v [1]),
-      cf->GetVertex (v [2]));
+    _rm->AddTriangle (i, object_vertices[v [0]], object_vertices[v [1]],
+      object_vertices[v [2]]);
   }
 
   _rm->build_hierarchy();
