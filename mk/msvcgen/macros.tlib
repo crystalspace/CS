@@ -38,7 +38,7 @@ MACRO path(p) BLOCK;
     UNLESS my.doc.striprootpat;
       t = [];
       FOREACH c IN my.doc.striproot;
-	t.push(c.replace('[/\\\\]?$', '/?'));
+	t.push(c.replace('[.]', '\\.').replace('[/\\\\]?$', '/?'));
       END;
       my.doc.striprootpat = '^(?i:' _ t.join('|') _ ')';
     END;
