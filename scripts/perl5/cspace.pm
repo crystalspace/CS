@@ -5282,6 +5282,7 @@ package cspace::iMeshWrapper;
 *CastHardwareShadow = *cspacec::iMeshWrapper_CastHardwareShadow;
 *SetDrawAfterShadow = *cspacec::iMeshWrapper_SetDrawAfterShadow;
 *GetDrawAfterShadow = *cspacec::iMeshWrapper_GetDrawAfterShadow;
+*GetSVContext = *cspacec::iMeshWrapper_GetSVContext;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5335,6 +5336,7 @@ package cspace::iMeshFactoryWrapper;
 *SetRenderPriority = *cspacec::iMeshFactoryWrapper_SetRenderPriority;
 *GetRenderPriority = *cspacec::iMeshFactoryWrapper_GetRenderPriority;
 *SetRenderPriorityRecursive = *cspacec::iMeshFactoryWrapper_SetRenderPriorityRecursive;
+*GetSVContext = *cspacec::iMeshFactoryWrapper_GetSVContext;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
