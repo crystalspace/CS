@@ -22,8 +22,25 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
+#include "csutil/csvector.h"
 #include "csutil/scf.h"
 #include "iengine/viscull.h"
+
+class csKDTree;
+class csKDTreeChild;
+class csCoverageBuffer;
+
+/**
+ * This object is a wrapper for an iVisibilityObject from the engine.
+ */
+class csVisibilityObjectWrapper
+{
+public:
+  iVisibilityObject* visobj;
+  csKDTreeChild* child;
+  long update_number;	// Last used update_number from movable.
+  long shape_number;	// Last used shape_number from visobj.
+};
 
 /**
  * A dynamic visisibility culling system.
@@ -32,6 +49,17 @@ class csDynaVis : public iVisibilityCuller
 {
 private:
   iObjectRegistry *object_reg;
+  csKDTree* kdtree;
+  csCoverageBuffer* covbuf;
+  csVector visobj_vector;
+
+  // Scan all objects, mark them as invisible and check if they
+  // have moved since last frame (and update them in the kdtree then).
+  void UpdateObjects ();
+  // Fill the bounding box with the current object status.
+  void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
+  // Calculate a screen bounding box for the given world space bbox.
+  void ProjectBBox (iCamera* camera, const csBox3& bbox, csBox2& sbox);
 
 public:
   SCF_DECLARE_IBASE;
@@ -40,10 +68,14 @@ public:
   virtual ~csDynaVis ();
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  virtual void Setup (const char* /*name*/) { }
-  virtual void RegisterVisObject (iVisibilityObject* /*visobj*/) { }
-  virtual void UnregisterVisObject (iVisibilityObject* /*visobj*/) { }
-  virtual bool VisTest (iRenderView* /*irview*/) { return false; }
+  // Test visibility for the given node. Returns true if visible.
+  bool TestNodeVisibility (csKDTree* treenode, iRenderView* rview,
+  	const csVector3& pos);
+
+  virtual void Setup (const char* name);
+  virtual void RegisterVisObject (iVisibilityObject* visobj);
+  virtual void UnregisterVisObject (iVisibilityObject* visobj);
+  virtual bool VisTest (iRenderView* irview);
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL) { return NULL; }

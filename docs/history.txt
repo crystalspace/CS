@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	  extensive tests for that routine to the unit tester.
 	- Implemented csCoverageBuffer::TestPoint() and added
 	  extensive tests for that routine to the unit tester.
+	- The Dynavis now implements VERY basic visibility culling.
+	  It used the kdtree for traversal and will cull octree nodes
+	  against the view frustum. But that's all for now. This is also
+	  untested.
 7-May-2002
 	- Implemented csKDTree::RemoveObject().
 	- Added lazy obj_bbox calculation in csKDTree. This is useful

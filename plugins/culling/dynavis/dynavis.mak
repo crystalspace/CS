@@ -45,7 +45,7 @@ endif
 INC.DYNAVIS = $(wildcard plugins/culling/dynavis/*.h)
 SRC.DYNAVIS = $(wildcard plugins/culling/dynavis/*.cpp)
 OBJ.DYNAVIS = $(addprefix $(OUT),$(notdir $(SRC.DYNAVIS:.cpp=$O)))
-DEP.DYNAVIS = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.DYNAVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
 
 MSVC.DSP += DYNAVIS
 DSP.DYNAVIS.NAME = dynavis
