@@ -364,60 +364,31 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
     mesh->DecRef();
     return;
   }
-  const char* objname = "Untitled";
-  iObject *objinterface = QUERY_INTERFACE(obj, iObject); 
-  if(objinterface)
-  {
-    objname = objinterface->GetName ();
-  }
 
   char buf[MAXLINE];
   char name[MAXLINE];
-  sprintf(buf, "MESHOBJ '%s' (\n", objname);
-  str->Push(strnew(buf));
-  csFindReplace(name, fact->QueryClassID (), "saver", "loader", MAXLINE);
-  sprintf(buf, "  PLUGIN ('%s')\n", name);
-  str->Push(strnew(buf));
-  str->Push(strnew("  PARAMS (\n"));
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
-  sprintf(buf, "    FACTORY ('%s')\n", name);
+  sprintf(buf, "FACTORY ('%s')\n", name);
   str->Push(strnew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
   {
-    str->Push(strnew("    "));
     WriteMixmode(str, state->GetMixMode());
   }
 
   // Mesh information
   float x=0, y=0, z=0;
   state->GetRadius(x, y, z);
-  sprintf(buf, "    RADIUS (%g, %g, %g)\n", x, y, z);
+  sprintf(buf, "RADIUS (%g, %g, %g)\n", x, y, z);
   str->Push(strnew(buf));
-  sprintf(buf, "    SHIFT (%g, %g, %g)\n", state->GetShift ().x, 
+  sprintf(buf, "SHIFT (%g, %g, %g)\n", state->GetShift ().x, 
     state->GetShift ().y, state->GetShift ().z);
   str->Push(strnew(buf));
-  sprintf(buf, "    NUMRIM (%d)\n", state->GetRimVertices());
+  sprintf(buf, "NUMRIM (%d)\n", state->GetRimVertices());
   str->Push(strnew(buf));
-  sprintf(buf, "    MATERIAL (%s)\n", state->GetMaterialWrapper()->
+  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     GetPrivateObject()->GetName());
   str->Push(strnew(buf));
 
-  
-
-  str->Push(strnew("  )\n"));
-  iMovable *movable = QUERY_INTERFACE(obj, iMovable);
-  if(movable)
-  {
-    sprintf(buf, "  MOVE (%g, %g, %g)\n", movable->GetPosition().x,
-      movable->GetPosition().y, movable->GetPosition().z);
-    str->Push(strnew(buf));
-  }
-  str->Push(strnew(")\n"));
-  
-  if(movable)
-    movable->DecRef();
-  if(objinterface)
-    objinterface->DecRef();
   fact->DecRef();
   mesh->DecRef();
   state->DecRef();
