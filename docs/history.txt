@@ -12,6 +12,27 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Mar-2000
+	- Fixed a bug with deletion of sprites.
+	- New patch from Andrew Zabolotny:
+	    - Fixed a bug with ALPHA=50 textures in 32bpp modes. It was
+	      there from the very beginning. It's strange Seth did not
+	      complain about it...
+	    - Fixed the bug with unlighted textures being sometimes
+	      shifted relatively to lighted versions of same textures.
+	      The problem was that IMinU/IMinV was not taken into account
+	      with unlighted textures.
+	    - Improved the "CACHE=" statement of soft3d.cfg. Now you can
+	      use suffixes to specify the units in which you measure
+	      cache size. Possible suffixes are "KB", "MB" (for kilo/mega
+	      bytes) and "KP", "MP" (for kilo/mega pixels).
+	      There is no way to specify cache size in bytes/pixels
+	      (what for?)
+	    - Phew! Found and fixed a very strange bug that caused at
+	      least on OS/2 the GUI window to suddenly jump while dragging
+	      if using CSWS. This was caused by the fact that csws calls
+	      SetMouseCursor() on each frame, even if cursor
+	      shape has not changed (!).
 9-Mar-2000
 	- Norman Kramer fixed bug in SetRenderState (glide) and added
 	  CS_FX_KEYCOLOR mixmode in Glide.
@@ -52,6 +73,7 @@ Short-term cleanups that need to be done:
 	  polygons not using the Z buffer and one for unlighted sprites
 	  using the Z buffer). These bugs only appeared on 8-bit display
 	  modes when NASM assembly is used.
+	- Thomas Hieber started support for skydome in Map2CS.
 8-Mar-2000
 	- Decreased glOrtho setting in OpenGL renderer from 150 to 10 to
 	  make Z buffering precision better. This breaks the terrain engine
