@@ -114,13 +114,16 @@ public:
   	iEngine* engine, iPolygon3DStatic* poly3d,
 	float default_texlen,
 	iThingFactoryState* thing_fact_state,
-	int vt_offset, bool& poly_delete);
+	int vt_offset, bool& poly_delete,
+	iMeshWrapper* mesh);
 
   bool LoadThingPart (iThingEnvironment* te,
   	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
-	iEngine* engine, int vt_offset, bool isParent);
+	iEngine* engine, int vt_offset, bool isParent,
+	iMeshWrapper* mesh);
+
   void OptimizePolygon (iPolygon3DStatic *p);
 
 public:

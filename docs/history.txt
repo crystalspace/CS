@@ -56,6 +56,12 @@ chronological order.
 	  renderer plugins.
 	- Eric Sunshine eliminated compilation warning from
 	  portalcontainer.cpp.
+	- Jorrit changed the standard loader so that it now gives the mesh
+	  wrapper as the context data for a mesh plugin (i.e. inside params).
+	- Added code in thing loader to create portals using the new
+	  portal container stuff instead of using portals in the thing plugin.
+	  This seems to work mostly but not completely. That's why this new
+	  code is still disabled for now.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.

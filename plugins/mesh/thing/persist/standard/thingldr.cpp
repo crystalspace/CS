@@ -37,6 +37,7 @@
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
 #include "imesh/object.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
@@ -391,10 +392,10 @@ SCF_IMPLEMENT_IBASE_END
 bool csThingLoader::ParsePoly3d (
         iDocumentNode* node,
 	iLoaderContext* ldr_context,
-	iEngine* , iPolygon3DStatic* poly3d,
+	iEngine* engine, iPolygon3DStatic* poly3d,
 	float default_texlen,
 	iThingFactoryState* thing_fact_state, int vt_offset,
-	bool& poly_delete)
+	bool& poly_delete, iMeshWrapper* mesh)
 {
   poly_delete = false;
   iMaterialWrapper* mat = 0;
@@ -490,6 +491,14 @@ bool csThingLoader::ParsePoly3d (
         }
         break;
       case XMLTOKEN_PORTAL:
+        if (!mesh)
+	{
+	  // If we don't have a mesh then we can't correctly define
+	  // portals.
+	  synldr->ReportError ("crystalspace.syntax.polygon", child,
+	    "Internal error! Mesh wrapper is missing for loading a portal!");
+	  return false;
+	}
         portal_node = child;
         break;
       case XMLTOKEN_TEXMAP:
@@ -716,45 +725,69 @@ bool csThingLoader::ParsePoly3d (
     bool do_mirror = false;
     int msv = -1;
     scfString destSectorName;
-    iSector* destSector = 0;
 
     if (synldr->ParsePortal (portal_node, ldr_context,
 	      flags, do_mirror, do_warp, msv,
 	      m_w, v_w_before, v_w_after, &destSectorName))
     {
-      destSector = ldr_context->FindSector (destSectorName.GetData ());
-      if (destSector)
+      iSector* destSector = ldr_context->FindSector (destSectorName.GetData ());
+#if 0
+// @@@ Works more or less but not fully!
+      csVector3* portal_verts = new csVector3[poly3d->GetVertexCount ()];
+      int i;
+      for (i = 0 ; i < poly3d->GetVertexCount () ; i++)
+        portal_verts[i] = poly3d->GetVertex (i);
+      csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (mesh, destSector,
+      	portal_verts, poly3d->GetVertexCount ());
+      delete[] portal_verts;
+
+      csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (
+      	portal_mesh->GetMeshObject (), iPortalContainer);
+      CS_ASSERT (pc != 0);
+      iPortal* portal = pc->GetPortal (0);
+      if (!destSector)
       {
-	poly3d->CreatePortal (destSector);
-      }
-      else
-      {
-	poly3d->CreateNullPortal ();
-	iPortal* portal = poly3d->GetPortal ();
 	MissingSectorCallback* mscb = new MissingSectorCallback (
 	    	ldr_context, destSectorName.GetData ());
 	portal->SetMissingSectorCallback (mscb);
 	mscb->DecRef ();
       }
 
-      poly3d->GetPortal ()->GetFlags ().Set (flags);
+      poly_delete = if_portal_delete_polygon;
+#else
+      iPortal* portal;
+      if (destSector)
+      {
+	portal = poly3d->CreatePortal (destSector);
+      }
+      else
+      {
+	poly3d->CreateNullPortal ();
+	portal = poly3d->GetPortal ();
+	MissingSectorCallback* mscb = new MissingSectorCallback (
+	    	ldr_context, destSectorName.GetData ());
+	portal->SetMissingSectorCallback (mscb);
+	mscb->DecRef ();
+      }
+#endif
+
+      portal->GetFlags ().Set (flags);
 
       if (do_mirror)
       {
         if (!set_colldet) set_colldet = 1;
-        poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
-    	  poly3d->GetObjectPlane () ));
+        portal->SetWarp (csTransform::GetReflect (poly3d->GetObjectPlane ()));
       }
       else if (do_warp)
-        poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
+      {
+        portal->SetWarp (m_w, v_w_before, v_w_after);
+      }
 
       if (msv != -1)
       {
-        poly3d->GetPortal ()->SetMaximumSectorVisit (msv);
+        portal->SetMaximumSectorVisit (msv);
       }
     }
-
-    //poly_delete = if_portal_delete_polygon;
   }
 
   OptimizePolygon (poly3d);
@@ -766,7 +799,8 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
-	iEngine* engine, int vt_offset, bool isParent)
+	iEngine* engine, int vt_offset, bool isParent,
+	iMeshWrapper* mesh)
 {
 #define CHECK_TOPLEVEL(m) \
 if (!isParent) { \
@@ -931,7 +965,7 @@ if (!info.thing_fact_state) \
 	if (!LoadThingPart (te, child, ldr_context, object_reg, reporter,
 		synldr, info, engine, info.thing_fact_state
 			? info.thing_fact_state->GetVertexCount () : 0,
-		false))
+		false, mesh))
 	  return false;
         break;
       case XMLTOKEN_V:
@@ -963,7 +997,7 @@ Nag to Jorrit about this feature if you want it.");
 	  bool success = ParsePoly3d (child, ldr_context,
 	  			    engine, poly3d,
 				    info.default_texlen, info.thing_fact_state,
-				    vt_offset, poly_delete);
+				    vt_offset, poly_delete, mesh);
 	  if (poly_delete || !success)
 	  {
 	    info.thing_fact_state->RemovePolygon (
@@ -1024,14 +1058,14 @@ Nag to Jorrit about this feature if you want it.");
 }
 
 csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
-			     iLoaderContext* ldr_context, iBase*)
+			     iLoaderContext* ldr_context, iBase* context)
 {
   ThingLoadInfo info;
   info.load_factory = false;
   info.global_factory = false;
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager);
   info.type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.thing", iMeshObjectType);
   if (!info.type)
@@ -1050,8 +1084,11 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   	iThingEnvironment);
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
+  // It is possible that the mesh wrapper is null.
+  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (context, iMeshWrapper);
+
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
-  	engine, 0, true))
+  	engine, 0, true, mesh))
   {
     info.obj = 0;
   }
@@ -1116,7 +1153,7 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
   info.thing_fact_state = SCF_QUERY_INTERFACE (fact, iThingFactoryState);
 
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
-  	engine, 0, true))
+  	engine, 0, true, 0))
   {
     fact = 0;
   }

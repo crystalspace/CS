@@ -2815,7 +2815,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  csRef<iBase> mo (plug->Parse (child, ldr_context, 0));
+	  csRef<iBase> mo = plug->Parse (child, ldr_context, mesh);
           if (mo)
           {
 	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
@@ -2873,12 +2873,12 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  }
 	  csRef<iBase> mo;
 	  if (plug)
-	    mo = TestXmlPlugParse (ldr_context, plug, buf, 0, fname);
+	    mo = TestXmlPlugParse (ldr_context, plug, buf, mesh, fname);
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	ldr_context, 0);
+	  	ldr_context, mesh);
 	  }
           if (mo)
           {
@@ -3038,7 +3038,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  csRef<iBase> rc (plug->Parse (child, ldr_context, context));
+	  csRef<iBase> rc = plug->Parse (child, ldr_context, context);
 	  if (!rc) return false;
 	}
         break;
@@ -3079,8 +3079,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
-	    csRef<iBase> ret (binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	ldr_context, 0));
+	    csRef<iBase> ret = binplug->Parse ((void*)(dbuf->GetUint8 ()),
+	  	ldr_context, 0);
 	    rc = (ret != 0);
 	  }
 	  if (!rc)
@@ -3946,6 +3946,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
 	iDocumentNode* node, iSector* sourceSector)
 {
 // @@@ NAME IGNORED
+// @@@ Need to use syntax services::ParsePortal()!
   iSector* destSector = 0;
   csDirtyAccessArray<csVector3> poly;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
