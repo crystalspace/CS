@@ -42,6 +42,7 @@
 #include "dynavis.h"
 #include "kdtree.h"
 #include "covbuf.h"
+#include "tcovbuf.h"
 #include "wqueue.h"
 #include "exvis.h"
 
@@ -76,6 +77,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   object_reg = NULL;
   kdtree = NULL;
   covbuf = NULL;
+  tcovbuf = NULL;
   debug_camera = NULL;
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
@@ -88,6 +90,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_coverage = COVERAGE_OUTLINE;
   do_cull_history = true;
   do_cull_writequeue = true;
+  do_cull_tiled = false;
 
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
@@ -106,6 +109,7 @@ csDynaVis::~csDynaVis ()
   }
   delete kdtree;
   delete covbuf;
+  delete tcovbuf;
   delete model_mgr;
   delete write_queue;
 }
@@ -115,7 +119,8 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   csDynaVis::object_reg = object_reg;
 
   delete kdtree;
-  delete covbuf;
+  delete covbuf; covbuf = NULL;
+  delete tcovbuf; tcovbuf = NULL;
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (g3d)
@@ -132,7 +137,11 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   }
 
   kdtree = new csKDTree (NULL);
-  covbuf = new csCoverageBuffer (scr_width, scr_height);
+
+  if (do_cull_tiled)
+    tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
+  else
+    covbuf = new csCoverageBuffer (scr_width, scr_height);
 
   return true;
 }
@@ -305,12 +314,20 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     float max_depth;
     if (node_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
     	camera->GetShiftX (), camera->GetShiftY (), sbox, min_depth, max_depth))
-      if (!covbuf->TestRectangle (sbox, min_depth))
+    {
+      bool rc;
+      if (do_cull_tiled)
+        rc = tcovbuf->TestRectangle (sbox, min_depth);
+      else
+        rc = covbuf->TestRectangle (sbox, min_depth);
+
+      if (!rc)
       {
         reason = INVISIBLE_TESTRECT;
         vis = false;
         goto end;
       }
+    }
   }
 
 end:
@@ -414,10 +431,13 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     }
     if (max_depth > 0.0)
     {
-      bool rc = covbuf->InsertPolygon (verts2d, num_verts, max_depth);
+      if (do_cull_tiled)
+        tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
+      else
+        covbuf->InsertPolygon (verts2d, num_verts, max_depth);
       if (do_state_dump)
       {
-        printf ("  max_depth=%g rc=%d ", max_depth, rc);
+        printf ("  max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
 	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
         printf ("\n");
@@ -427,7 +447,11 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 
   if (do_state_dump)
   {
-    iString* str = covbuf->Debug_Dump ();
+    iString* str;
+    if (do_cull_tiled)
+      str = tcovbuf->Debug_Dump ();
+    else
+      str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
     str->DecRef ();
   }
@@ -491,12 +515,17 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   }
 
   // Then insert the outline.
-  bool rc = covbuf->InsertOutline (tr_verts, vertex_count,
+  if (do_cull_tiled)
+    tcovbuf->InsertOutline (tr_verts, vertex_count,
+  	outline_info.outline_verts,
+  	outline_info.outline_edges, outline_info.num_outline_edges, max_depth);
+  else
+    covbuf->InsertOutline (tr_verts, vertex_count,
   	outline_info.outline_verts,
   	outline_info.outline_edges, outline_info.num_outline_edges, max_depth);
   if (do_state_dump)
   {
-    printf ("  max_depth=%g rc=%d\n", max_depth, rc);
+    printf ("  max_depth=%g\n", max_depth);
     int j;
     for (j = 0 ; j < vertex_count ; j++)
     {
@@ -517,7 +546,11 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
       printf ("  E%d: %d-%d\n", j, vt1, vt2);
     }
 
-    iString* str = covbuf->Debug_Dump ();
+    iString* str;
+    if (do_cull_tiled)
+      str = tcovbuf->Debug_Dump ();
+    else
+      str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
     str->DecRef ();
   }
@@ -627,7 +660,14 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       if (obj_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
     	  camera->GetShiftX (), camera->GetShiftY (), sbox,
 	  min_depth, max_depth))
-        if (covbuf->TestRectangle (sbox, min_depth))
+      {
+	bool rc;
+        if (do_cull_tiled)
+	  rc = tcovbuf->TestRectangle (sbox, min_depth);
+	else
+	  rc = covbuf->TestRectangle (sbox, min_depth);
+
+        if (rc)
         {
 	  // Object is visible. If we have a write queue we will first
 	  // test if there are objects in the queue that may mark the
@@ -658,7 +698,11 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	      }
 	      while (qobj);
 	      // Now try again.
-              if (!covbuf->TestRectangle (sbox, min_depth))
+	      if (do_cull_tiled)
+                rc = tcovbuf->TestRectangle (sbox, min_depth);
+	      else
+                rc = covbuf->TestRectangle (sbox, min_depth);
+              if (!rc)
 	      {
 	        // It really is invisible.
                 obj->reason = INVISIBLE_TESTRECT;
@@ -674,6 +718,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	  vis = false;
           goto end;
         }
+      }
     }
 
     //---------------------------------------------------------------
@@ -791,7 +836,10 @@ bool csDynaVis::VisTest (iRenderView* rview)
   debug_camera = rview->GetOriginalCamera ();
 
   // Initialize the coverage buffer to all empty.
-  covbuf->Initialize ();
+  if (do_cull_tiled)
+    tcovbuf->Initialize ();
+  else
+    covbuf->Initialize ();
 
   // Initialize the write queue to empty.
   write_queue->Initialize ();
@@ -1119,6 +1167,19 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     do_cull_history = !do_cull_history;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s history culling!", do_cull_history ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_tiled"))
+  {
+    do_cull_tiled = !do_cull_tiled;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s tiled culling!", do_cull_tiled ? "Enabled" : "Disabled");
+    delete covbuf; covbuf = NULL;
+    delete tcovbuf; tcovbuf = NULL;
+    if (do_cull_tiled)
+      tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
+    else
+      covbuf = new csCoverageBuffer (scr_width, scr_height);
     return true;
   }
   else if (!strcmp (cmd, "toggle_coverage"))

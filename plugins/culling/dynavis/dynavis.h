@@ -31,6 +31,7 @@
 class csKDTree;
 class csKDTreeChild;
 class csCoverageBuffer;
+class csTiledCoverageBuffer;
 class csWriteQueue;
 struct iPolygonMesh;
 struct iMovable;
@@ -100,6 +101,7 @@ private:
   iObjectRegistry *object_reg;
   csKDTree* kdtree;
   csCoverageBuffer* covbuf;
+  csTiledCoverageBuffer* tcovbuf;
   csVector visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
@@ -120,6 +122,7 @@ private:
   int do_cull_coverage;
   bool do_cull_history;
   bool do_cull_writequeue;
+  bool do_cull_tiled;
 
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;
