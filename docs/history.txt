@@ -46,6 +46,22 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine made the following changes:
 	    - Moved the contents of plugins/engine to plugins/engine/3d.
 	    - Moved plugins/iso to plugins/engine/iso.
+	- Eric Sunshine re-organized the plugins/mesh directory.  Whereas, in
+	  the past, components for a single type of mesh were spread across
+	  multiple locations in the mesh directory hierarchy, now each mesh
+	  type is self-contained.  For example, in the past, we had:
+	    plugins/mesh/object/ball
+	    plugins/mesh/load/ball
+	  We now have:
+	    plugins/mesh/ball/object
+	    plugins/mesh/ball/persist/classic
+	  The `persist' directory contains plugins which manage object
+	  persistence (such as loading and saving to files).  The `classic'
+	  subdirectory contains code to manage persistence for the so-called
+	  classic CS file format.  Other theoretical future subdirectories
+	  might include (among others):
+	    plugins/mesh/ball/persist/xml
+	    plugins/mesh/ball/persist/binary
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the
