@@ -48,6 +48,7 @@ MSVC.MAKE.FLAGS = \
 
 MSVC.PLUGINS.REQUIRED =         \
   cscript/cspython              \
+  device/joystick/windows	\
   documentsystem/xml            \
   filesys/vfs			\
   font/server/freefnt2          \

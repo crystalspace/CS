@@ -17,6 +17,7 @@ chronological order.
 	  Dawidowski <truman@go2.pl> which allows it to build with Mingw.  The
 	  patch also sets the DX cooperative level to DISCL_BACKGROUND when
 	  CS_DEBUG is defined, rather than to DISCL_FOREGROUND.
+	- Eric Sunshine added device/joystick/windows to msvc/required.mak.
 28-Nov-2003
 	- Daniel Fryer found a bug in the thing mesh plugin when adding
 	  polygon vertices one at a time. The vertex count was not correctly
