@@ -17,7 +17,7 @@ INSTALL_DIR=$2
 SCRIPT_NAME=`basename $0`
 SCRIPT_DIR=`expr $0 : "\(.*\)/${SCRIPT_NAME}"`
 [ -z "${SCRIPT_DIR}" ] && SCRIPT_DIR="./"
-SCRIPT_DIR=`(cd ${SCRIPT_DIR} > /dev/null; pwd)`	# Convert to absolute path.
+SCRIPT_DIR=`(cd ${SCRIPT_DIR} > /dev/null; pwd)` # Convert to absolute path.
 
 # First get a string describing current machine and processor types
 # Initially set to reasonable defaults
@@ -96,7 +96,7 @@ echo "#include <netinet/in.h>" >> socktest.cpp
 echo "#include <netdb.h>" >> socktest.cpp
 echo "int main() { socklen_t x = 0; return (int)x; }" >> socktest.cpp
 
-${CXX} -c socktest.cpp 2>/dev/null || echo "DO_FAKE_SOCKLEN_T = yes"
+${CXX} -c socktest.cpp 2>/dev/null || echo "CS_USE_FAKE_SOCKLEN_TYPE = yes"
 
 rm -f socktest.cpp socktest.o
 
@@ -151,8 +151,8 @@ echo "USE_XFREE86VM = yes"
 ([ -w /usr/local ] && echo "INSTALL_DIR = /usr/local/crystal") ||
 echo "INSTALL_DIR = "${HOME}"/crystal"
 
-sh ${SCRIPT_DIR}/haspythn.sh ${CXX}
-sh ${SCRIPT_DIR}/booltest.sh ${CXX}
+sh ${SCRIPT_DIR}/comptest.sh ${CXX}
 sh ${SCRIPT_DIR}/endtest.sh ${CXX}
+sh ${SCRIPT_DIR}/haspythn.sh ${CXX}
 
 exit 0

@@ -33,8 +33,8 @@ NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), initialized(false),
     controller(0), simulated_depth(0), next_config(0)
     {
     CONSTRUCT_EMBEDDED_IBASE(scfiNeXTSystemDriver);
-    printf("Crystal Space for " OS_NEXT_DESCRIPTION " " VERSION "\nPorted to "
-	OS_NEXT_DESCRIPTION " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
+    printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
+	CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
     }
 
 

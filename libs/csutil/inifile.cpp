@@ -103,7 +103,7 @@ void csIniFile::Iterator::RemoveItem ()
 {
   if (Current >= 0 && Current < Limit)
   {
-    (CONST_CAST(PrvINIbranch*)(Branch))->Delete (Current);
+    CONST_CAST(PrvINIbranch*, Branch)->Delete (Current);
     Node = NULL;
     Limit--;
   }
@@ -600,13 +600,13 @@ csIniFile::PrvINInode *csIniFile::FindNode (const char* iSection,
     if (!strcmp (iSection, sections.GetSection ()))
     {
       if (iKey == 0)
-        return CONST_CAST(PrvINInode *)(sections.Node);
+        return CONST_CAST(PrvINInode*, sections.Node);
       else
       {
         DataIterator data (this, sections.Node);
 	while (data.Next ())
 	  if (!strcmp (iKey, data.GetKey ()))
-	    return CONST_CAST(PrvINInode *)(data.Node);
+	    return CONST_CAST(PrvINInode*, data.Node);
       }
     }
   }
@@ -668,7 +668,7 @@ bool csIniFile::SetData (const char *iSection, const char *iKey,
       else
       {
         delete [] (char *)iterator.Node->Data.Pointer;
-	SetData (CONST_CAST(PrvINInode*)(iterator.Node), Data, DataSize);
+	SetData (CONST_CAST(PrvINInode*, iterator.Node), Data, DataSize);
       }
       Dirty = true;
       return true;

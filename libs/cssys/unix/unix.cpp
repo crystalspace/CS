@@ -49,10 +49,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 #endif
 }
 
-#ifdef OS_SOLARIS
-extern "C" int usleep (unsigned);
-#endif
-
 void SysSystemDriver::Sleep (int SleepTime)
 {
   usleep (SleepTime * 1000);

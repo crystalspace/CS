@@ -28,15 +28,4 @@
 #  include "volatile.h"
 #endif
 
-// Adjust some definitions contained in volatile.h
-#if defined (PROC_INTEL) && !defined (DO_NASM)
-#  undef NO_ASSEMBLER
-#  define NO_ASSEMBLER
-#endif
-
-#if !defined (PROC_INTEL) || defined (NO_ASSEMBLER)
-#  undef DO_MMX
-#  undef DO_NASM
-#endif
-
 #endif // __CS_PLATFORM_H__

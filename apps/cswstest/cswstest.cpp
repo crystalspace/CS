@@ -173,7 +173,7 @@ bool csWsTest::Initialize (const char *iConfigName)
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
 
-  printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
+  printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
   printf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
 
 #if 0

@@ -71,7 +71,7 @@
 #endif
 
 //COM Helpers. (DirectX still requires COM...03/31/2000 -- PEG)
-#define FINAL_RELEASE( d ) if (d!=NULL) { d->Release(); d = NULL; }
+#define FINAL_RELEASE(d) if (d != NULL) { d->Release(); d = NULL; }
 
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
@@ -79,14 +79,18 @@
 #define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidewin"
 #define SOUND_DRIVER "crystalspace.sound.driver.waveout"
 
+// SCF symbol export facility.
+#undef SCF_EXPORT_FUNCTION
+#define SCF_EXPORT_FUNCTION extern "C" __declspec(dllexport)
+
 #if defined (SYSDEF_DIR) || defined (SYSDEF_GETCWD) || defined (SYSDEF_MKDIR)
 #  include <direct.h>
 #  if defined(COMP_BC) || defined(COMP_GCC)
-#	ifdef __CYGWIN32__
-#		include <sys/dirent.h>
-#	else
+#    ifdef __CYGWIN32__
+#	include <sys/dirent.h>
+#    else
 #    	include <dirent.h>
-#	endif
+#    endif
 #  endif
 #endif
 
@@ -95,7 +99,7 @@
 #  define strncasecmp strnicmp
 #endif
 
-#if defined(COMP_VC)
+#if defined (COMP_VC)
 #  define strcasecmp _stricmp
 #  define strncasecmp _strnicmp
 #endif
@@ -106,7 +110,7 @@
 #    ifdef _MAX_FNAME
 #      define MAXPATHLEN _MAX_FNAME
 #    else
-#      define MAXPATHLEN 260		// and not 256!
+#      define MAXPATHLEN 260 /* not 256 */
 #    endif
 #  endif
 #endif
@@ -114,21 +118,20 @@
 // COMP_GCC has generic opendir(), readdir(), closedir()
 
 #if defined(SYSDEF_DIR) || defined(SYSDEF_PATH)
-  /// Directory read functions
-#if !defined(COMP_GCC)	  
-  
-  #if !defined(COMP_BC)
+// Directory read functions
+# if !defined(COMP_GCC)	  
+#  if !defined(COMP_BC)
     #define __NEED_OPENDIR_PROTOTYPE
     #include <io.h>
 
-    /// Directory entry
+    // Directory entry
     struct dirent
     {
-      char d_name [MAXPATHLEN + 1];	/* File name, 0 terminated */
-      long d_size;			/* File size (bytes) */
-      unsigned d_attr;			/* File attributes (Windows-specific) */
+      char d_name [MAXPATHLEN + 1]; // File name, 0 terminated
+      long d_size; // File size (bytes)
+      unsigned d_attr; // File attributes (Windows-specific)
     };
-    /// Directory handle
+    // Directory handle
     struct DIR
     {
       bool valid;
@@ -145,8 +148,7 @@
     extern "C" DIR *opendir (const char *name);
     extern "C" dirent *readdir (DIR *dirp);
     extern "C" int closedir (DIR *dirp);
-
-#   endif // end if !defined(COMP_BC)
+#  endif // end if !defined(COMP_BC)
 # endif
 #endif
 
@@ -155,13 +157,12 @@
 #    define __NEED_GENERIC_ISDIR
 #  else
 #    define __NO_GENERIC_ISDIR
-  static inline bool isdir (char *path, dirent *de)
-  {
-    (void)path;
-    return !!(de->d_attr & _A_SUBDIR);
-  }
+     static inline bool isdir (char *path, dirent *de)
+     {
+       (void)path;
+       return !!(de->d_attr & _A_SUBDIR);
+     }
 #  endif
-
 #endif
 
 #ifdef SYSDEF_SOCKETS
@@ -227,12 +228,10 @@ static inline void *better_memcpy (void *dst, const void *src, size_t len)
 #endif
 
 #ifdef COMP_BC
-// Azverkan
 // Major hack due to pow failures in CS for Borland, removing this
-// causes millions of strings to print out
+// causes millions of strings to print out -- Brandon Ehle
 #define pow(arga, argb) ( (!arga && !argb)?0:pow(arga, argb) )
-
-// Azverkan: Dunno why this is in CS
+// Dunno why this is in CS -- Brandon Ehle
 #define DEBUG_BREAK
 #endif
 

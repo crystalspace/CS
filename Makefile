@@ -57,18 +57,13 @@ define PSEUDOHELP
   echo $"  make platforms    List the available target platforms$"
 endef
 define SYSMODIFIERSHELP
-  echo $"+++ Modifiers +++$"
+  echo $(SEPARATOR)
+  echo $"The following optional configuration modifiers may be specified:$"
+  echo $"$"
   echo $"  USE_PLUGINS=yes$|no$"
   echo $"      Build drivers/plugins as dynamic/static modules$"
   echo $"  MODE=optimize$|debug$|profile$"
   echo $"      Select one of three available compilation modes$"
-endef
-# This macro is used to rebuild "volatile.h"
-# You're free to add any commands you want to it in submakefiles
-define MAKE_VOLATILE_H
-  echo $"#define OS_$(OS)$">>volatile.tmp
-  echo $"#define PROC_$(PROC)$">>volatile.tmp
-  echo $"#define COMP_$(COMP)$">>volatile.tmp
 endef
 
 # If there is no target defined (makefile system was not configured),
@@ -141,14 +136,14 @@ endif
 banner:
 	@echo $(SEPARATOR)
 	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
-	@echo $"  are suited for your system. Note that you need at least one renderer and$"
-	@echo $"  at least one 2D driver in order to be able to run the engine.$"
+	@echo $"  are suited to your system.$"
 	@echo $(SEPARATOR)
 
 showplatforms:
 	@$(SYSHELP)
 	@$(SYSMODIFIERSHELP)
-	@echo $"  Example: make linux USE_PLUGINS=yes MODE=debug$"
+	@echo $"$"
+	@echo $"Example: make linux USE_PLUGINS=yes MODE=debug$"
 	@echo $(SEPARATOR)
 
 # Prepare for specific platform.

@@ -27,12 +27,12 @@
 #include <float.h>
 
 //-----------------------------------------------------------------------------
-// If your compiler complains about 'true', 'false', and 'bool' it
-// may be an older C++ compiler which doesn't understand these constructs.
-// In that case, set DO_FAKE_BOOL to 'yes' in the makefile, or define the
-// C-macro DO_FAKE_BOOL in your project file.
+// If your compiler complains about 'true', 'false', and 'bool' it may be an
+// older C++ compiler which doesn't understand these constructs.  In that case,
+// set CS_USE_FAKE_BOOL_TYPE to 'yes' in the makefile, or define the C-macro
+// CS_USE_FAKE_BOOL_TYPE in your project file.
 //-----------------------------------------------------------------------------
-#ifdef DO_FAKE_BOOL
+#ifdef CS_USE_FAKE_BOOL_TYPE
 typedef int bool;
 #undef  true
 #define true 1
@@ -65,8 +65,8 @@ typedef unsigned char uint8;
 typedef char int8;
 typedef unsigned short uint16;
 typedef short int16;
-typedef unsigned int uint32;
-typedef int int32;
+typedef unsigned long uint32;
+typedef long int32;
 #endif
 
 //------------------------------
@@ -74,7 +74,7 @@ typedef int int32;
 //------------------------------
 typedef unsigned char uchar;
 typedef unsigned short ushort;
-typedef unsigned int uint;	// AKA simply 'unsigned'
+typedef unsigned int uint;
 typedef unsigned long ulong;
 
 // Time in milli (1/1000) seconds

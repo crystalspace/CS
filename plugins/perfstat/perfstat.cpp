@@ -395,7 +395,7 @@ void csPerfStats::WriteMainHeader ()
     entry->buf = new char [len_guess];
 
     sprintf (entry->buf, buf, 
-	     VERSION, RELEASE_DATE, 
+	     CS_VERSION, CS_RELEASE_DATE, 
 	     g3d->GetWidth (), g3d->GetHeight (),
 	     caps->CanClip ? "yes" : "no",
 	     caps->minTexWidth, caps->minTexHeight,

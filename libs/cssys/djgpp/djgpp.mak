@@ -3,7 +3,7 @@
 ################################################################################
 
 # Friendly names for building environment
-DESCRIPTION.djgpp = DOS with DJGPP
+DESCRIPTION.djgpp = DOS/DJGPP
 
 PLUGINS+=video/renderer/software
 

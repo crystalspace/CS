@@ -9,9 +9,9 @@ PLUGINS+=video/renderer/software video/canvas/softx
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 
-# uncomment some of the following if you have a special MESA version that uses some 
-# of the following hardware/software renderers
-# Also set the entry Driver in section Display of opengl.cfg
+# Uncomment some of the following if you have a special MESA version that uses
+# some of the following hardware/software renderers. Also set the entry Driver
+# in section Display of opengl.cfg
 #PLUGINS+=video/canvas/openglx/glide
 #PLUGINS+=video/canvas/openglx/svga
 PLUGINS+=video/canvas/openglx/empty
@@ -22,21 +22,25 @@ PLUGINS+=video/canvas/openglx/empty
 # Uncomment the following to build sound renderer
 #PLUGINS+=sound/renderer/software
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 # Processor is autodetected and written to config.mak
 #PROC=SPARC
 
-# Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE
+# Operating system. Can be one of:
+# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
 OS=SOLARIS
+
+# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
+OS_FAMILY=UNIX
 
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
@@ -109,7 +113,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
@@ -117,7 +121,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG=bin/unixconf.sh solaris >>config.tmp

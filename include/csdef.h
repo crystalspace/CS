@@ -26,78 +26,6 @@
 #include "platform.h"
 #include "cstypes.h"
 
-//---------------------------------------------------------------
-// Define the appropriate PROC_ flag for the current architecture
-// for MacOS/X Server, OpenStep, and NextStep multi-architecture
-// binary (MAB) compilations.
-//---------------------------------------------------------------
-
-#if defined(OS_NEXT)
-#  if defined(__m68k__)
-#    if !defined(PROC_M68K)
-#      define PROC_M68K
-#    endif
-#  elif defined(__i386__)
-#    if !defined(PROC_INTEL)
-#      define PROC_INTEL
-#    endif
-#  elif defined(__sparc__)
-#    if !defined(PROC_SPARC)
-#      define PROC_SPARC
-#    endif
-#  elif defined(__hppa__)
-#    if !defined(PROC_HPPA)
-#      define PROC_HPPA
-#    endif
-#  elif defined(__ppc__)
-#    if !defined(PROC_POWERPC)
-#      define PROC_POWERPC
-#    endif
-#  else
-#    if !defined(PROC_UNKNOWN)
-#      define PROC_UNKNOWN
-#    endif
-#  endif
-#endif
-
-//---------------------------------------------------------------
-// Test if the makefile correctly defines all the operating
-// system (one of the OS_ flags), the compiler (one of the
-// COMP_ flags) and the processor (one of the PROC_ flags).
-//---------------------------------------------------------------
-
-#ifndef HAVE_CONFIG_H
-
-#if (defined(OS_SOLARIS) || defined(OS_LINUX) || defined(OS_IRIX) || \
-    defined(OS_PS2) || defined(OS_BSD) || defined(OS_BE) || \
-    defined(OS_NEXT)) && !defined(OS_UNIX)
-#  define OS_UNIX
-#endif
-
-#if !defined(OS_SOLARIS) && !defined(OS_LINUX) && !defined(OS_DOS) && \
-    !defined(OS_UNIX) && !defined(OS_MACOS) && !defined(OS_WIN32) && \
-    !defined(OS_OS2) && !defined(OS_IRIX) && !defined(OS_BSD) && \
-    !defined(OS_BE) && !defined(OS_NEXT) && !defined(OS_WINNT) && \
-    !defined(OS_PS2)
-#  error Please specify the operating system in the makefile! (OS=...)
-#endif
-
-#if !defined(COMP_GCC) && !defined(COMP_UNKNOWN) && !defined(COMP_MWERKS) && \
-    !defined(COMP_VC) && !defined(COMP_BC)
-#  error Please specify the compiler in the makefile! (COMP=...)
-#endif
-
-#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && \
-    !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && \
-    !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA) && \
-    !defined(PROC_EE)
-#  error Please specify the processor in the makefile! (PROC=...)
-#endif
-
-#endif
-
-//---------------------------------------------------------------
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -148,29 +76,33 @@
 #  define M_PI_2 1.57079632679489661923	/* PI/2 */
 #endif
 
-// NextStep 3.3 compiler frequently crashes when initializing static const
-// tables of unknown size.  Ex: static const Foo[] = { ... };  Work around
-// the problem by removing 'const'.
-#if defined(OS_NEXT)
-#  define CS_STATIC_TABLE static
+// A macro for defining a constant static table.  The default expansion is
+// merely `static const'.  Typical usage is `CS_STATIC_TABLE Foo[] = {...};',
+// which expands to `static const Foo[] = {...};'.  Some variants of GCC have
+// been known to throw an internal compiler error exception when confronted
+// with such an expression.  In this case, the platform-specific header file
+// may override the definition of CS_STATIC_TABLE with one which works around
+// the compiler bug.
+#define CS_STATIC_TABLE static const
+
+// Platforms with compilers which only understand old-style C++ casting syntax
+// should define CS_USE_OLD_STYLE_CASTS.
+#if defined(CS_USE_OLD_STYLE_CASTS)
+#  define CS_CAST(C,T,V) ((T)(V))
 #else
-#  define CS_STATIC_TABLE static const
+#  define CS_CAST(C,T,V) (C<T>(V))
 #endif
 
-#if defined(OS_NEXT)
-#  define CS_USE_OLD_CASTS
-#endif
+#define STATIC_CAST(T,V)      CS_CAST(static_cast,T,V)
+#define DYNAMIC_CAST(T,V)     CS_CAST(dynamic_cast,T,V)
+#define REINTERPRET_CAST(T,V) CS_CAST(reinterpret_cast,T,V)
+#define CONST_CAST(T,V)       CS_CAST(const_cast,T,V)
 
-#if defined(CS_USE_OLD_CASTS)
-#  define CS_CAST(C,T) (T)
-#else
-#  define CS_CAST(C,T) C<T>
+// Platforms with compilers which do not understand the new C++ keyword
+// `explicit' should define CS_USE_FAKE_EXPLICIT_KEYWORD.
+#if defined(CS_USE_FAKE_EXPLICIT_KEYWORD)
+#  define explicit /* nothing */
 #endif
-
-#define STATIC_CAST(T)      CS_CAST(static_cast,T)
-#define DYNAMIC_CAST(T)     CS_CAST(dynamic_cast,T)
-#define REINTERPRET_CAST(T) CS_CAST(reinterpret_cast,T)
-#define CONST_CAST(T)       CS_CAST(const_cast,T)
 
 // The smallest Z at which 3D clipping occurs
 #define SMALL_Z .01

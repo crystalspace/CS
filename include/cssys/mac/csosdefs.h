@@ -3,11 +3,11 @@
     Most of them should be defined only if corresponding SYSDEF_XXX macro is
     defined (see system/cssysdef.h)
  */
-#ifndef OSDEFS_H
-#define OSDEFS_H
+#ifndef __CSOSDEFS_H__
+#define __CSOSDEFS_H__
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 int strcasecmp (const char *str1, const char *str2);
@@ -15,12 +15,16 @@ int strncasecmp (char const *dst, char const *src, int maxLen);
 char *strdup (const char *str);
 #define stricmp strcasecmp
 
+// SCF symbol export facility.
+#undef SCF_EXPORT_FUNCTION
+#define SCF_EXPORT_FUNCTION extern "C" __declspec(export)
+
 #ifdef SYSDEF_ACCESS
 int access (const char *path, int mode);
 #endif
 
 #ifdef __cplusplus
-	}
+}
 #endif
 
 // The 2D graphics driver used by software renderer on this platform
@@ -47,4 +51,4 @@ typedef unsigned long fd_set;
 #  error "Please define a suitable CS_XXX_ENDIAN macro in mac/csosdefs.h!"
 #endif
 
-#endif // OSDEFS_H
+#endif // __CSOSDEFS_H__

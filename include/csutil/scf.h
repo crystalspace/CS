@@ -21,9 +21,7 @@
 #define __CSSCF_H__
 
 /*
-
-    PLEASE USE 8-SPACE TAB WIDTH AT LEAST WHILE EDITING THIS FILE!
-
+    PLEASE USE 8-SPACE TAB WIDTH WHEN EDITING THIS FILE!
 */
 
 /**
@@ -87,10 +85,10 @@ struct iBase
   virtual void *QueryInterface (const char *iInterfaceID, int iVersion) = 0;
 };
 
-/// This macro should make use of IncRef() safer
+/// This macro should make use of IncRef() safer.
 #define INC_REF(ptr) {if (ptr) {ptr->IncRef();}}
 
-/// This macro should make use of DecRef() safer
+/// This macro should make use of DecRef() safer.
 #define DEC_REF(ptr) {if (ptr) {ptr->DecRef();}}
 
 
@@ -227,7 +225,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
    && !strcmp (iInterfaceID, #Interface))				\
   {									\
     (Object)->IncRef ();						\
-    return STATIC_CAST (Interface *) (Object);				\
+    return STATIC_CAST(Interface*, Object);				\
   }
 
 /**
@@ -325,7 +323,8 @@ struct scfClassInfo
  * the table is called LibraryName_GetClassTable.
  */
 #define EXPORT_CLASS_TABLE(LibraryName)					\
-EXPORTED_FUNCTION (scfClassInfo *EXPORTED_NAME(LibraryName,_GetClassTable)) ()\
+SCF_EXPORT_FUNCTION scfClassInfo*					\
+SCF_EXPORTED_NAME(LibraryName,_GetClassTable)()				\
 {									\
   static scfClassInfo ExportClassTable [] =				\
   {
@@ -414,7 +413,7 @@ struct iFactory : public iBase
 
 //----------------------------------------------- Client-side functions -----//
 
-// We'll use iConfigFile to read SCF.CFG
+// We'll use iConfigFile to read `scf.cfg'.
 struct iConfigFile;
 
 /**
@@ -574,33 +573,28 @@ struct iSCF : public iBase
 
 //-------------------------------------------- System-dependent defines -----//
 
-// A macro to declare a symbol that should be exported from shared libraries
-#if defined (OS_WIN32) || defined (OS_BE)
-#  define EXPORTED_FUNCTION(f) extern "C" __declspec(dllexport) f
-#elif defined (OS_MACOS)
-#  define EXPORTED_FUNCTION(f) extern "C" __declspec(export) f
-#else
-#  define EXPORTED_FUNCTION(f) extern "C" f
+/*
+ * A macro to export a function from a shared library.
+ * Some platforms may need to override this.  For instance, Windows requires
+ * extra `__declspec' goop when exporting a function from a plug-in module.
+ */
+#if !defined(SCF_EXPORT_FUNCTION)
+#  define SCF_EXPORT_FUNCTION extern "C"
 #endif
 
 /*
  * A macro used to build exported function names.
  * Usually "Prefix" is derived from shared library name, thus for each library
- * we'll have different exported names. While this is good for static linking
- * and for shared libraries on NeXTStep, this is bad for some platforms that
- * will need to build on-the-fly at compile-time some additional files
- * (such as exported functions table). Because of this, on these platforms
- * we drop the module-dependent prefix in the case we use dynamic linking.
+ * we'll have different exported names.  This prevents naming collisions when
+ * static linking is used, and on platforms where plug-in symbols are exported
+ * by default.  However, this may be bad for platforms which need to build
+ * special export-tables on-the-fly at compile-time since distinct names make
+ * the job more difficult.  Such platforms may need to override the default
+ * expansion of this macro to use only the `Suffix' and ignore the `Prefix'
+ * when composing the name.
  */
-#if !defined (CS_STATIC_LINKING) && defined (OS_AMIGA)
-#  define EXPORTED_NAME(Prefix, Suffix) Suffix
-#else
-#  define EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix
-#endif
-
-//------------------------ Pacify Doc++ which complains about extra '{' -----//
-#if 0
-}
+#if !defined(SCF_EXPORTED_NAME)
+#  define SCF_EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix
 #endif
 
 #endif // __CSSCF_H__

@@ -59,4 +59,8 @@
 extern "C" unsigned long inet_addr(const char*);
 #endif
 
+#if defined (OS_SOLARIS)
+extern "C" int usleep (unsigned);
+#endif
+
 #endif // __CSOSDEFS_H__

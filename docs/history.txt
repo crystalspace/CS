@@ -2,6 +2,89 @@ The history order has been reversed so that new features are at the top.
 
 5-Dec-2000
 	- Started work on csRegion class. Not functional at the moment.
+	- Eric Sunshine made the following changes:
+	    - Removed all platform-specific specializations from of csdef.h.
+	      These specializations have been moved to platform-specific
+	      makefiles and include files, where appropriate.  The idea here is
+	      to eliminate the mentality of monolithicism by moving as much
+	      platform-specific goop into platform-specific configuration files
+	      rather than polluting generalized project resources with
+	      platform-specific crud.
+	    - Moved all OS_NEXT-specific specializations out of csdef.h and
+	      into next/csosdefs.h.
+	    - csdef.h is no longer responsible for setting the OS_UNIX flag for
+	      Solaris, Linux, Irix, BSD, BeOS, NeXT, and PS2.  It is now the
+	      responsibility of each platform's makefile to set the OS_UNIX
+	      flag, instead, if that designation is appropriate for the given
+	      platform.
+	    - Upgraded volatile.mak so that it has an understanding of
+	      operating system `families', such as Unix, Win32, etc.  If it
+	      sees that a platform-specific makefile has designated itself as
+	      belonging to a particular family, then volatile.mak includes an
+	      appropriate definition (such as OS_UNIX) in volatile.h.  All
+	      platform-specific makefiles which require OS_UNIX now obtain it
+	      via the new `family' mechanism.
+	    - Added comptest.sh which tests for different compiler capabilities
+	      at project configuration time.  Both unixconf.sh and next.mak now
+	      invoke comptest.sh.
+	    - Merged booltest.sh into comptest.sh.  Removed booltest.sh.
+	    - Added a compiler capability test for new-style C++ casting syntax
+	      to comptest.sh.  If the compiler does not understand this syntax,
+	      then the makefile variable CS_USE_OLD_STYLE_CASTS is defined.
+	      volatile.mak then defines the preprocessor variable
+	      CS_USE_OLD_STYLE_CASTS which is recognized by csdef.h.
+	    - Added a compiler capability test for the new C++ `explicit'
+	      keyword.  If the compiler does not understand this keyword, then
+	      the makefile variable CS_USE_FAKE_EXPLICIT_KEYWORD is defined.
+	      volatile.mak then defines the preprocessor variable
+	      CS_USE_FAKE_EXPLICIT_KEYWORD which is recognized by csdef.h.
+	    - Renamed makefile and preprocessor variables DO_FAKE_BOOL to
+	      CS_USE_FAKE_BOOL_TYPE.
+	    - Renamed makefile and preprocessor variables DO_FAKE_SOCKLEN_T to
+	      CS_USE_FAKE_SOCKLEN_TYPE.
+	    - Moved initial definition of MAKE_VOLATILE_H out of Makefile and
+	      into volatile.mak.
+	    - Reworked the STATIC_CAST, DYNAMIC_CAST, REINTERPRET_CAST, and
+	      CONST_CAST macros so that the user is no longer responsible for
+	      remembering to add extra parentheses around the expression which
+	      is being casted.
+	    - Eliminated Linux-specific specializations from makedep/parse.cpp.
+	    - Eliminated NextStep-specific specializations from bspbox.cpp.
+	    - Eliminated platform-specific specializations from scf.h and moved
+	      them into the appropriate platform-specific csosdefs.h files.  In
+	      particular, the Windows, BeOS, and OS/2 configuration files now
+	      override the default function export mechanism rather than
+	      hard-coding such platform-specific knowledge into SCF.
+	    - Created include/cssys/csosdefs.h which takes over the
+	      responsibility of including the platform-specific csosdefs.h from
+	      cssysdef.h.  This helps to remove some platform-specific
+	      specialization from cssysdef.h.
+	    - Eliminated all platform-specific specializations from version.h.
+	      It is now the responsibility of the platform-specific makefile
+	      and project files to provide this information on behalf of
+	      version.h.  The idea here is to eliminate the mentality of
+	      monolithicism and promote the concept of modularity, rather than
+	      polluting generalized project resources, such as version.h, with
+	      platform-, processor-, and compiler-specific crud.  For all
+	      platforms which use the GNU makefile system, this information is
+	      now provided automatically by volatile.mak by gleaning the
+	      necessary information from the existing GNU makefiles.  In
+	      particular, volatile.mak examines the makefile variables
+	      $(DESCRIPTION.$(TARGET)), $(PROC), and $(COMP) in order to
+	      provide useful human-readable information to version.h.
+	    - Renamed the following preprocessor identifiers from version.h
+	      (some of which are now defined by platform-specific project files
+	      rather than being defined directly in version.h):
+		CS_VERSION    --> CS_VERSION_MAJOR
+		CS_SUBVERSION --> CS_VERSION_MINOR
+		VERSION       --> CS_VERSION
+		RELEASE_DATE  --> CS_RELEASE_DATE
+		OS_VERSION    --> CS_PLATFORM_NAME
+		PR_VERSION    --> CS_PROCESSOR_NAME
+		CC_VERSION    --> CS_COMPILER_NAME
+	    - Renamed the plug-in file extension for MacOS/X Server, OpenStep,
+	      and NextStep from .dylib to .csplugin.
+	    - Added general/findlib.cpp to SRC.SYS_CSSYS in next.mak.
 4-Dec-2000
 	- Norman Kramer implemented farplane culling for sprites.
 3-Dec-2000

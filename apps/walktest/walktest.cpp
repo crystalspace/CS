@@ -1127,7 +1127,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Some commercials...
-  Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", VERSION, RELEASE_DATE);
+  Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
   Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
 
   // Get all collision detection and movement config file parameters.

@@ -9,7 +9,7 @@
 #---------------------------------------------------
 
 # Friendly names for building environment
-DESCRIPTION.os2gcc = OS/2 with GCC/EMX
+DESCRIPTION.os2gcc = OS/2-GCC/EMX
 
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/csdive video/renderer/software sound/renderer/software

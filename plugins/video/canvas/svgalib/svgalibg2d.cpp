@@ -195,11 +195,11 @@ bool csGraphics2DSVGALib::Open(const char *Title)
   gl_enablepageflipping (&physicalscreen);
 
   keyboard_init ();
-#if !defined (OS_DOS)
+//#if !defined (OS_DOS)
 //mouse_setxrange (0, Width-1);
 //mouse_setyrange (0, Height-1);
 //mouse_setwrap (MOUSE_NOWRAP);
-#endif // OS_DOS
+//#endif // OS_DOS
 
   Clear (0);
   return true;

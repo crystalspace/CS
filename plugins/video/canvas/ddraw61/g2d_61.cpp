@@ -826,7 +826,7 @@ void csGraphics2DDDraw6::GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE4* lplpDire
 extern DirectDetectionDevice* DirectDevice;
 void csGraphics2DDDraw6::GetDirectDetection (IDirectDetectionInternal** lplpDDetection)
 {
-  *lplpDDetection = static_cast<IDirectDetectionInternal*>(DirectDevice);
+  *lplpDDetection = STATIC_CAST(IDirectDetectionInternal*, DirectDevice);
 }
 
 void csGraphics2DDDraw6::SetFor3D(bool For3D)

@@ -35,8 +35,6 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#include "version.h"
-
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csutil/inifile.h"

@@ -27,7 +27,6 @@
 #define SYSDEF_MKDIR
 #define SYSDEF_UNLINK
 #include "cssysdef.h"
-#include "version.h"
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"
@@ -761,12 +760,12 @@ const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
   iConfigFile *Config = Parent->config;
 
   // Now look in "VFS.Solaris" section, for example
-  value = Config->GetStr ("VFS." OS_VERSION, VarName, NULL);
+  value = Config->GetStr ("VFS." CS_PLATFORM_NAME, VarName, NULL);
   if (value)
     return value;
 
   // Now look in "VFS.Alias" section for alias section name
-  const char *alias = Config->GetStr ("VFS.Alias", OS_VERSION, NULL);
+  const char *alias = Config->GetStr ("VFS.Alias", CS_PLATFORM_NAME, NULL);
   // If there is one, look into that section too
   if (alias)
     value = Config->GetStr (alias, VarName, NULL);

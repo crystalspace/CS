@@ -42,6 +42,10 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #endif
 
+// SCF symbol export facility.
+#undef SCF_EXPORT_FUNCTION
+#define SCF_EXPORT_FUNCTION extern "C" __declspec(dllexport)
+
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
@@ -49,7 +53,7 @@
 #if defined(SYSDEF_SOCKETS)
 #  include <socket.h>
 #  define CS_CLOSESOCKET closesocket
-#  define DO_FAKE_SOCKLEN_T
+#  define CS_USE_FAKE_SOCKLEN_TYPE
 #endif
 
 #if defined(SYSDEF_SELECT)

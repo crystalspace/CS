@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "walktest/walktest.h"
-#include "version.h"
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"

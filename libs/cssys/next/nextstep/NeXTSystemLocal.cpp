@@ -66,7 +66,7 @@ void NeXTSystemDriver::init_system()
 void NeXTSystemDriver::init_menu()
     {
     char const* style =
-	next_config->GetStr( "Platform." OS_NEXT_DESCRIPTION, "menu", 0);
+	next_config->GetStr( "Platform." CS_PLATFORM_NAME, "menu", 0);
     if (style != 0)
 	{
 	Menu* const menu = NeXTMenuGenerate( style, *next_config );

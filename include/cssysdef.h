@@ -93,36 +93,15 @@
 #  define SYSDEF_PATH
 #endif
 
-// For VC/C++ based builds or platforms which use DX5 (Win9x/Win2k) or later.
-#if defined(OS_WIN32)
-#  include "cssys/win32/csosdefs.h"
-#endif
+/*
+ * Pull in platform-specific overrides of the requested functionality.
+ */
+#include "cssys/csosdefs.h"
 
-#if defined (COMP_GCC) && defined (OS_DOS)
-#  include "cssys/djgpp/csosdefs.h"
-#endif
-
-#if defined (OS_MACOS)
-#  include "cssys/mac/csosdefs.h"
-#endif
-
-#if defined (OS_UNIX) && !defined(OS_BE)
-#  include "cssys/unix/csosdefs.h"
-#endif
-
-#if defined (OS_OS2)
-#  include "cssys/os2/csosdefs.h"
-#endif
-
-#if defined (OS_BE)
-#  include "cssys/be/csosdefs.h"
-#endif
-
-#if defined (OS_NEXT)
-#  include "cssys/next/csosdefs.h"
-#endif
-
-// Allow system-dependent header files to override these ----------------------
+/*
+ * Default definitions for requested functionality.  Platform-specific
+ * configuration files may override these.
+ */
 
 #ifdef SYSDEF_CASE
 // Convert a character to upper case
@@ -331,7 +310,7 @@
 #  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
-#  if defined (DO_FAKE_SOCKLEN_T)
+#  if defined (CS_USE_FAKE_SOCKLEN_TYPE)
      typedef int socklen_t;
 #  endif
 #  if !defined (CS_IOCTLSOCKET)
@@ -389,6 +368,17 @@
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
 #if !defined (CS_LITTLE_ENDIAN) && !defined (CS_BIG_ENDIAN)
 #  error No CS_XXX_ENDIAN macro defined in your OS-specific csosdefs.h!
+#endif
+
+// Adjust some definitions contained in volatile.h
+#if defined (PROC_INTEL) && !defined (DO_NASM)
+#  undef NO_ASSEMBLER
+#  define NO_ASSEMBLER
+#endif
+
+#if !defined (PROC_INTEL) || defined (NO_ASSEMBLER)
+#  undef DO_MMX
+#  undef DO_NASM
 #endif
 
 // Fatal exit routine (which can be replaced if neccessary)

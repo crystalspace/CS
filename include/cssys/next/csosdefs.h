@@ -12,13 +12,62 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// osdefs.h
+// csosdefs.h
 //
 //	Platform-specific interface to common functionality.  Compatible
 //	with MacOS/X Server, OpenStep, and NextStep.
 //
 // *NOTE* This file is included by include/cssysdef.h and must not be renamed.
 //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Define the appropriate PROC_ flag for the current architecture for MacOS/X
+// Server, OpenStep, and NextStep multi-architecture binary (MAB) compilations.
+// It is necessary to perform this step here since this information is not
+// known at makefile configuration time or even at the time when the compiler
+// is invoked on account of the ability to build multi-architecture binaries
+// with a single invocation of the compiler.  Therefore, this is the first
+// chance we have of actually determining the proper PROC_ flag.  Also set
+// CS_PROCESSOR_NAME to an appropriate value.
+//-----------------------------------------------------------------------------
+#if defined(__m68k__)
+#  if !defined(PROC_M68K)
+#    define PROC_M68K
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "M68K"
+#  endif
+#elif defined(__i386__)
+#  if !defined(PROC_INTEL)
+#    define PROC_INTEL
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "Intel"
+#  endif
+#elif defined(__sparc__)
+#  if !defined(PROC_SPARC)
+#    define PROC_SPARC
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "Sparc"
+#  endif
+#elif defined(__hppa__)
+#  if !defined(PROC_HPPA)
+#    define PROC_HPPA
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "PA-RISC"
+#  endif
+#elif defined(__ppc__)
+#  if !defined(PROC_POWERPC)
+#    define PROC_POWERPC
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "PowerPC"
+#  endif
+#else
+#  if !defined(PROC_UNKNOWN)
+#    define PROC_UNKNOWN
+#    undef  CS_PROCESSOR_NAME
+#    define CS_PROCESSOR_NAME "Unknown"
+#  endif
+#endif
+
 
 //-----------------------------------------------------------------------------
 // The 2D graphics driver used by the software renderer on this platform.
@@ -53,7 +102,7 @@ static inline char* strdup( char const* s )
 #endif
 
 #if defined(SYSDEF_SOCKETS)
-#define DO_FAKE_SOCKLEN_T
+#define CS_USE_FAKE_SOCKLEN_TYPE
 #endif
 
 #if defined(SYSDEF_SELECT)
@@ -125,5 +174,15 @@ static inline char* getcwd( char* p, size_t size )
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in next/csosdefs.h!"
 #endif
+
+
+//-----------------------------------------------------------------------------
+// NextStep's gcc infrequently throws an exception when confronted with an
+// expression such as `static const Foo[] = {...};'.  There are two ways to
+// work around this problem.  (1) Remove the `const' or (2) specify the exact
+// table size, as in `Foo[3]'.  This patch employs work-around #1.
+//-----------------------------------------------------------------------------
+#undef CS_STATIC_TABLE
+#define CS_STATIC_TABLE static
 
 #endif // __NeXT_csosdefs_h

@@ -23,9 +23,9 @@
 #	packages should use 50.  The default, if not specified, is 50.
 #
 # To-Do
-#	Update to support plug-in modules.  Need to include .dylib files
+#	Update to support plug-in modules.  Need to include .csplugin files
 #	and strip applications and plug-ins with appropriate flags for both
-#	NextStep and OpenStep.
+#	NextStep, OpenStep, and MacOS/X Server.
 #------------------------------------------------------------------------------
 
 SRC=./CS

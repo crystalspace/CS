@@ -8,21 +8,25 @@ DESCRIPTION.freebsd = FreeBSD
 PLUGINS+=video/canvas/softx video/renderer/software \
   sound/renderer/software sound/driver/oss
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 # Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, UNKNOWN
 PROC=INTEL
 
-# Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE
+# Operating system. Can be one of:
+# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
 OS=BSD
+
+# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
+OS_FAMILY=UNIX
 
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
@@ -52,7 +56,8 @@ CFLAGS.INCLUDE=-I/usr/local/include
 CFLAGS.GENERAL=-Wall
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-O6 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 -malign-functions=2 -ffast-math
+CFLAGS.optimize=-O6 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 \
+  -malign-functions=2 -ffast-math
 
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g3 -gstabs
@@ -98,7 +103,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
@@ -106,7 +111,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure --
+#---------------------------------------------------------------- configure --#
 ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG=bin/unixconf.sh freebsd >>config.tmp

@@ -363,7 +363,7 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
     modelname, importdestination);
   
   newtemplate->SetTexture (importdestination->GetTextures (),
-    CONST_CAST(char*)(defaultskin->GetName ()));
+    CONST_CAST(char*, defaultskin->GetName()));
 
   newtemplate->GenerateLOD ();
   newtemplate->ComputeBoundingBox ();

@@ -32,9 +32,12 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 # Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, UNKNOWN
 PROC=INTEL
 
-# Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS,
-# MACOS, AMIGAOS, WIN32, OS2, BE
+# Operating system. Can be one of:
+# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
 OS=BE
+
+# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
+OS_FAMILY=UNIX
 
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++),
 # UNKNOWN

@@ -143,7 +143,7 @@ public:
   STR_APPEND(double, %g, 64)
 #undef STR_APPEND
 
-#if !defined(DO_FAKE_BOOL)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
   /// Append a boolean (as a number -- 1 or 0) to this string
   csString &Append (bool b) { return Append (b ? "1" : "0"); }
 #endif
@@ -235,7 +235,7 @@ public:
   STR_APPEND(unsigned long)
   STR_APPEND(float)
   STR_APPEND(double)
-#if !defined(DO_FAKE_BOOL)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
   STR_APPEND(bool)
 #endif
 #undef STR_APPEND
@@ -280,7 +280,7 @@ STR_SHIFT(long);
 STR_SHIFT(unsigned long)
 STR_SHIFT(float)
 STR_SHIFT(double)
-#if !defined(DO_FAKE_BOOL)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
 STR_SHIFT(bool)
 #endif
 #undef STR_SHIFT

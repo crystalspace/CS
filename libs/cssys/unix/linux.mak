@@ -17,9 +17,9 @@ PLUGINS+=video/canvas/svgalib
 # uncomment the following to build sound drivers
 #PLUGINS+=sound/driver/oss sound/renderer/software
 
-# uncomment some of the following if you have a special MESA version that uses some 
-# of the following hardware/software renderers
-# Also set the entry Driver in section Display of opengl.cfg
+# Uncomment some of the following if you have a special MESA version that uses
+# some of the following hardware/software renderers.  Also set the entry Driver
+# in section Display of opengl.cfg
 #PLUGINS+=video/canvas/openglx/glide
 #PLUGINS+=video/canvas/openglx/svga
 PLUGINS+=video/canvas/openglx/empty
@@ -32,21 +32,25 @@ PLUGINS+=video/renderer/glide
 endif
 GLIDE2_PATH=-I/usr/include/glide2
 GLIDE3_PATH=-I/usr/include/glide3
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 # Processor is autodetected and written to config.mak
 #PROC=
 
-# Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE
+# Operating system. Can be one of:
+# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
 OS=LINUX
+
+# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
+OS_FAMILY=UNIX
 
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
@@ -130,7 +134,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
@@ -138,7 +142,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG=sh bin/unixconf.sh linux $(INSTALL_DIR) >>config.tmp

@@ -1,16 +1,16 @@
 #==============================================================================
 # This is the system makefile for MacOS/X Server, OpenStep, and NextStep.
-# Copyright (C)1998, 1999, 2000 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)1998,1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 #==============================================================================
 
 # Only one of the cover makefiles should be including this file. Ignore others.
 ifeq ($(NEXT.FRIEND),yes)
 
 # Choose which drivers you want to build/use
-PLUGINS+=video/canvas/next video/renderer/software
+PLUGINS += video/canvas/next video/renderer/software
 
 ifneq ($(NEXT.TARGET),)
-  DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)
+  DESCRIPTION.$(NEXT.TARGET) := $(NEXT.DESCRIPTION)
 endif
 
 #----------------------------------------- rootdefines, defines, config ------#
@@ -43,20 +43,23 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 # Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, HPPA, UNKNOWN
 # May use TARGET_ARCHS to specify multiple architectures at once.
 # Ex. TARGET_ARCHS="m68k i386 sparc hppa"
+PROC = $(subst $(SPACE),_,$(foreach arch,$(NEXT.TARGET_ARCHS),$(PROC.$(arch))))
 
-PROC=$(subst $(SPACE),_,$(foreach arch,$(NEXT.TARGET_ARCHS),$(PROC.$(arch))))
+# Operating system.
+OS = NEXT
 
-# Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE, NEXT
-OS=NEXT
+# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
+OS_FAMILY = UNIX
 
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
-COMP=GCC
+COMP = GCC
 
-NEXT.PLUGIN_DIR=components/
-NEXT.PLUGIN_EXT=.dylib
+# Plug-in component support.
+NEXT.PLUGIN_DIR = components/
+NEXT.PLUGIN_EXT = .csplugin
 
 # None of the NeXT platforms can grok the assembly used by CS
-override DO_ASM=no
+override DO_ASM = no
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -66,109 +69,113 @@ ifeq ($(MAKESECTION),defines)
 include mk/unix.mak
 
 # Multi-architecture binary (MAB) support.
-NEXT.ARCH_FLAGS=$(foreach arch,$(NEXT.TARGET_ARCHS),-arch $(arch))
+NEXT.ARCH_FLAGS = $(foreach arch,$(NEXT.TARGET_ARCHS),-arch $(arch))
 
 # Select appropriate source directories (macosxs, openstep, nextstep, shared).
 # NOTE: List "shared" directory last so search proceeds: specific -> general.
-NEXT.SHARED=shared
-NEXT.SEARCH_PATH=$(NEXT.SOURCE_DIRS) $(NEXT.SHARED)
-NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
+NEXT.SHARED = shared
+NEXT.SEARCH_PATH = $(NEXT.SOURCE_DIRS) $(NEXT.SHARED)
+NEXT.SOURCE_PATHS = $(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 
-# select next config file for inclusion with install
-TO_INSTALL.CONFIG+=data/config/next.cfg
+# Select next config file for inclusion with install.
+TO_INSTALL.CONFIG += data/config/next.cfg
 
 # Typical extension for dynamic libraries on this system.
-DLL=.dylib
+DLL = .dylib
 
 # Does this system require libsocket.a?
-NEED_SOCKET_LIB=no
+NEED_SOCKET_LIB = no
 
 # Extra libraries needed on this system.
-LIBS.EXE=
+LIBS.EXE =
 
 # Extra libraries needed only for executables (not plug-ins)
-LIBS.EXE.PLATFORM=$(NEXT.LIBS)
+LIBS.EXE.PLATFORM = $(NEXT.LIBS)
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.l)z
+Z_LIBS = $(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.l)png
+PNG_LIBS = $(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.l)jpeg
+JPG_LIBS = $(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
-SOUND_LIBS=
+SOUND_LIBS =
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=$(NEXT.INCLUDE_DIRS) \
-  $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS))
+CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
+  $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS)) \
+  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=$(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) -fno-common -pipe
+CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) -fno-common -pipe
 
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=$(NEXT.CFLAGS.OPTIMIZE)
+CFLAGS.optimize = $(NEXT.CFLAGS.OPTIMIZE)
 
 # Flags for the compiler which are used when debugging.
-CFLAGS.debug=-g $(NEXT.CFLAGS.DEBUG)
+CFLAGS.debug = -g $(NEXT.CFLAGS.DEBUG)
 
 # Flags for the compiler which are used when profiling.
-CFLAGS.profile=-pg -O -g
+CFLAGS.profile = -pg -O -g
 
 # Flags for the compiler which are used when building a shared library.
-CFLAGS.DLL=$(NEXT.CFLAGS.DLL)
+CFLAGS.DLL = $(NEXT.CFLAGS.DLL)
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=$(NEXT.ARCH_FLAGS) $(NEXT.LFLAGS.GENERAL)
+LFLAGS.GENERAL = $(NEXT.ARCH_FLAGS) $(NEXT.LFLAGS.GENERAL) \
+  $(LFLAGS.L)libs/zlib $(LFLAGS.L)libs/libpng $(LFLAGS.L)libs/libjpeg
 
 # Flags for the linker which are used when debugging.
-LFLAGS.debug=-g
+LFLAGS.debug = -g
 
 # Flags for the linker which are used when profiling.
-LFLAGS.profile=-pg
+LFLAGS.profile = -pg
 
 # Flags for the linker which are used when building a graphical executable.
-LFLAGS.EXE=$(NEXT.LFLAGS.EXE)
+LFLAGS.EXE = $(NEXT.LFLAGS.EXE)
 
 # Flags for the linker which are used when building a console executable.
-LFLAGS.CONSOLE.EXE=$(NEXT.LFLAGS.EXE)
+LFLAGS.CONSOLE.EXE = $(NEXT.LFLAGS.EXE)
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL= $(NEXT.LFLAGS.DLL)
+LFLAGS.DLL = $(NEXT.LFLAGS.DLL)
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=
+NASMFLAGS.SYSTEM =
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp \
-  $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)))
+SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
+  libs/cssys/general/findlib.cpp \
+  libs/cssys/general/getopt.cpp \
+  libs/cssys/general/printf.cpp
 
 # Where to put dynamic libraries on this system?
-OUTDLL=$(NEXT.PLUGIN_DIR)
+OUTDLL = $(NEXT.PLUGIN_DIR)
 
 # The C compiler.
-CC=cc -c
+CC = cc -c
 
 # The C++ compiler.
-CXX=cc -ObjC++ -c
+CXX = cc -ObjC++ -c
 
 # The linker.
-LINK=cc
+LINK = cc
 
 # The library (archive) manager
-AR=libtool
-ARFLAGS=-static -o
+AR = libtool
+ARFLAGS = -static -o
 
 # The stripper :-)
-STRIP=strip
+STRIP = strip
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=-e "s/\.cpp\.o \:/\.o\:/g"
+SYS_SED_DEPEND = -e "s/\.cpp\.o \:/\.o\:/g"
 
 # We don't need separate directories for dynamic libraries
-OUTSUFX.yes=
+OUTSUFX.yes =
 
 endif # ifeq ($(MAKESECTION),defines)
 
@@ -216,8 +223,8 @@ ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 SYSCONFIG += \
-  $(NEWLINE)bin/booltest.sh "cc -ObjC++" >> config.tmp \
-  $(NEWLINE)bin/haspythn.sh >> config.tmp \
+  $(NEWLINE)bin/comptest.sh "cc -ObjC++">>config.tmp \
+  $(NEWLINE)bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
@@ -226,7 +233,6 @@ ifeq ($(ROOTCONFIG),volatile)
 
 MAKE_VOLATILE_H += \
   $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp \
-  $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp \
   $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)"$">>volatile.tmp \
   $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_EXT "$(NEXT.PLUGIN_EXT)"$">>volatile.tmp
 

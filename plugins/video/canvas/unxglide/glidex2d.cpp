@@ -338,7 +338,7 @@ bool csGraphics2DGlideX::HandleEvent (iEvent &/*Event*/)
         XRefreshKeyboardMapping (&event.xmapping);
 	break;
       case ClientMessage:
-	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
+	if (STATIC_CAST(Atom, event.xclient.data.l[0]) == wm_delete_window)
 	{
 	  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
 	  EventOutlet->Broadcast (cscmdQuit);

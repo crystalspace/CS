@@ -40,17 +40,10 @@ void csBspPolygonFactory::Init (csPolygonInt* pi)
 
 //---------------------------------------------------------------------------
 
-#if !defined(OS_NEXT)
-static csBspPolygonFactory poly_fact;
-static csPolygonIntPool poly_pool (&poly_fact);
-#endif
-
 csPolygonIntPool& csBspPolygon::GetPolygonPool()
 {
-#if defined(OS_NEXT)
   static csBspPolygonFactory poly_fact;
   static csPolygonIntPool poly_pool (&poly_fact);
-#endif
   return poly_pool;
 }
 

@@ -2,31 +2,35 @@
 # settings. Also have a look at mk/user.mak.
 
 # Friendly names for building environment
-DESCRIPTION.irix = IRIX
+DESCRIPTION.irix = Irix
 
 # Choose which drivers you want to build/use
 PLUGINS+=video/canvas/softx video/renderer/software sound/renderer/software
 
-# uncomment the following to build GGI 2D driver
+# Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi
-# uncomment the following to build OpenGL stuff
+# Uncomment the following to build OpenGL stuff
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 # Processor is autodetected and written to config.mak
 #PROC=MIPS
 
-# Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE
+# Operating system. Can be one of:
+# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
 OS=IRIX
+
+# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
+OS_FAMILY=UNIX
 
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
@@ -99,7 +103,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 SYSHELP += \
@@ -107,7 +111,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 define SYSCONFIG

@@ -1,24 +1,37 @@
 /*
-    This header is used by COMP_BC, COMP_VC and COMP_GCC for all OS_WIN32 builds
-    You can change these macros to suit your own needs
-    For a description of what each macro does, see mk/user.mak
+  This header is used by COMP_BC, COMP_VC and COMP_GCC for all OS_WIN32 builds.
+  You can change these macros to suit your own needs.
+  For a description of what each macro does, see mk/user.mak.
 */
-#ifndef __VOLATILE_H__
-#define __VOLATILE_H__
+#ifndef __CS_VOLATILE_H__
+#define __CS_VOLATILE_H__
 
 #define OS_WIN32
+#if !defined(CS_PLATFORM_NAME)
+#  define CS_PLATFORM_NAME "Win32"
+#endif
+
 #define PROC_INTEL
+#if !defined(CS_PROCESSOR_NAME)
+#  define CS_PROCESSOR_NAME "Intel"
+#endif
 
 #if defined(__BORLANDC__)
-  #define COMP_BC
-  #define __NEED_GENERIC_ISDIR
+#  define COMP_BC
+#  if !defined(CS_COMPILER_NAME)
+#    define CS_COMPILER_NAME "Borland"
+#  endif
+#  define __NEED_GENERIC_ISDIR
+#elif defined(__MINGW32__) || defined(__CYGWIN32__)
+#  define COMP_GCC
+#  if !defined(CS_COMPILER_NAME)
+#    define CS_COMPILER_NAME "GCC"
+#  endif
 #else
-# if defined(__MINGW32__) || defined(__CYGWIN32__)
-// COMP_GCC has no need for Generic ISDIR
-#	define COMP_GCC
-# else
-#	define COMP_VC
-# endif
+#  define COMP_VC
+#  if !defined(CS_COMPILER_NAME)
+#    define CS_COMPILER_NAME "VisualC"
+#  endif
 #endif
 
 #if !defined (COMP_GCC)
@@ -44,4 +57,4 @@
 #	undef DO_DINPUT_KEYBOARD
 #endif
 
-#endif // __VOLATILE_H__
+#endif // __CS_VOLATILE_H__

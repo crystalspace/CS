@@ -123,7 +123,7 @@ void sys_fatalerror( char* thestr, int hRes=0 )
   }
 
   MessageBox(NULL, str, "Fatal Error in GlideRender.dll", MB_OK);
-#elif defined( OS_MACOS )
+#elif defined(OS_MACOS)
   (void)hRes;
 	Str255	theString;
 	Str255	theString2;

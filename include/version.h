@@ -1,77 +1,42 @@
+/*
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_VERSION_H__
 #define __CS_VERSION_H__
 
-#define CS_VERSION	"0.17"	/* NOTE: Update docs/texinfo/version.txi  */
-#define CS_SUBVERSION	"001"	/* whenever updating these two values.    */
-#define RELEASE_DATE	"Wed, 1-Sep-2000"
+#define CS_VERSION_MAJOR "0.17"	/* NOTE: Update docs/texinfo/version.txi  */
+#define CS_VERSION_MINOR "001"	/* whenever updating these two values.    */
+#define CS_RELEASE_DATE "Wed, 1-Sep-2000"
 
-#if defined(OS_SOLARIS)
-#  define OS_VERSION "Solaris"
-#elif defined(OS_LINUX)
-#  define OS_VERSION "Linux"
-#elif defined(OS_BSD)
-#  define OS_VERSION "BSD"
-#elif defined(OS_IRIX)
-#  define OS_VERSION "Irix"
-#elif defined(OS_NEXT)
-#  define OS_VERSION OS_NEXT_DESCRIPTION    /* Must appear before OS_UNIX */
-#elif defined(OS_BE)
-#  define OS_VERSION "BeOS"                 /* Must appear before OS_UNIX */
-#elif defined(OS_UNIX)
-#  define OS_VERSION "Unix"
-#elif defined(OS_DOS)
-#  define OS_VERSION "DOS"
-#elif defined(OS_MACOS)
-#  define OS_VERSION "Macintosh"
-#elif defined(OS_WIN32)
-#  define OS_VERSION "Win32"
-#elif defined(OS_OS2)
-#  define OS_VERSION "OS/2"
-#elif defined(OS_PS2)
-#  define OS_VERSION "Playstation/2"
-#elif defined(OS_UNKNOWN)
-#  define OS_VERSION "Unknown"
-#else
-#  error "Unspecified operating system!"
+#if !defined(CS_PLATFORM_NAME)
+#  define CS_PLATFORM_NAME "MysteryPlatform"
+#  warning Unable to identify platform name using CS_PLATFORM_NAME.
+#endif
+#if !defined(CS_PROCESSOR_NAME)
+#  define CS_PROCESSOR_NAME "MysteryProcessor"
+#  warning Unable to identify processor name using CS_PROCESSOR_NAME.
+#endif
+#if !defined(CS_COMPILER_NAME)
+#  define CS_COMPILER_NAME "MysteryCompiler"
+#  warning Unable to identify compiler name using CS_COMPILER_NAME.
 #endif
 
-#if defined(PROC_INTEL)
-#  define PR_VERSION "Intel"
-#elif defined(PROC_SPARC)
-#  define PR_VERSION "SPARC"
-#elif defined(PROC_MIPS)
-#  define PR_VERSION "MIPS"
-#elif defined(PROC_POWERPC)
-#  define PR_VERSION "PowerPC"
-#elif defined(PROC_M68K)
-#  define PR_VERSION "M68K"
-#elif defined(PROC_HPPA)
-#  define PR_VERSION "PA-RISC"
-#elif defined(PROC_ALPHA)
-#  define PR_VERSION "Alpha"
-#elif defined(PROC_EE)
-#  define PR_VERSION "EmotionEngine"
-# elif defined(PROC_UNKNOWN)
-#  define PR_VERSION "Unknown"
-#else
-#  error "Unspecified processor!"
-#endif
-
-#if defined(COMP_GCC)
-#  define CC_VERSION "GCC"
-#elif defined(COMP_MWERKS)
-#  define CC_VERSION "MWERKS"
-#elif defined(COMP_VC)
-#  define CC_VERSION "VisualC"
-#elif defined(COMP_BC)
-#  define CC_VERSION "Borland"
-#elif defined(COMP_UNKNOWN)
-#  define CC_VERSION "Unknown"
-#else
-#  error "Unspecified compiler!"
-#endif
-
-#define VERSION CS_VERSION \
-  " r" CS_SUBVERSION " [" OS_VERSION "-" PR_VERSION "-" CC_VERSION "]"
+#define CS_VERSION CS_VERSION_MAJOR " r" CS_VERSION_MINOR \
+  " [" CS_PLATFORM_NAME "-" CS_PROCESSOR_NAME "-" CS_COMPILER_NAME "]"
 
 #endif // __CS_VERSION_H__

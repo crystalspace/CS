@@ -129,7 +129,7 @@
 #  include <sys/ioctl.h>
 #  include <sys/so_ioctl.h>
 #  include <sys/time.h>
-#  define DO_FAKE_SOCKLEN_T
+#  define CS_USE_FAKE_SOCKLEN_TYPE
 #endif
 
 #ifdef SYSDEF_ACCESS
