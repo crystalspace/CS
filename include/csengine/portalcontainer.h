@@ -19,18 +19,13 @@
 #ifndef __CS_PORTALCONTAINER_H__
 #define __CS_PORTALCONTAINER_H__
 
-#include "csengine/sectorobj.h"
 #include "iengine/portalcontainer.h"
 
 /**
  * This is a container class for portals.
  */
-class csPortalContainer : public csSectorObject, public iPortalContainer
+class csPortalContainer : public iPortalContainer
 {
-  virtual void MoveToSector (iSector*) { }
-  virtual void RemoveFromSectors () { }
-  virtual void UpdateMove () { }
-
 protected:
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
@@ -40,22 +35,10 @@ protected:
 
 public:
   /// Constructor.
-  csPortalContainer (iMeshWrapper* theParent);
-
-  /**
-   * Pure abstract function to return the object model associated with
-   * this object (for iVisibilityObject).
-   */
-  virtual iObjectModel* GetObjectModel () { return 0; }
-
-  // For iVisibilityObject:
-  virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
-
-  // For iPortalContainer:
-  virtual iObject *QueryObject () { return (csObject*)this; }
+  csPortalContainer ();
 
   //--------------------- SCF stuff follows ------------------------------//
-  SCF_DECLARE_IBASE_EXT (csSectorObject);
+  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_PORTALCONTAINER_H__

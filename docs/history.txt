@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Sep-2003
+	- Jorrit reverted nearly all his changes of yesterday. The only two
+	  changes that remain are the iPortalContainer object (but now
+	  totally empty and unimplemented) and the multiple inheritance
+	  used in csMeshWrapper. But csSectorObject is now gone. The reason
+	  is that this system turned out much too complex. Instead portals
+	  will be implemented by a special mesh object that is managed
+	  by the engine itself.
 19-Sep-2003
 	- Eric Sunshine added the new CS_MSG_ERROR() Autoconf macro.  This is A
 	  convenience wrapper for AC_MSG_ERROR() which invokes AC_CACHE_SAVE()

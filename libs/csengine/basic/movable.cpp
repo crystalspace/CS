@@ -52,7 +52,7 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
   CS_ASSERT (movable != 0);
   if (movable->GetParent ()) return false;
 
-  csSectorObject *mw = movable->GetSectorObject ();
+  csMeshWrapper *mw = movable->GetMeshWrapper ();
   if (mw) mw->MoveToSector (sector);
   return true;
 }

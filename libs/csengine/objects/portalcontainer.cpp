@@ -25,12 +25,13 @@
 // ---------------------------------------------------------------------------
 // csMeshWrapper
 // ---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csPortalContainer)
-SCF_IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE(csPortalContainer)
+  SCF_IMPLEMENTS_INTERFACE (iPortalContainer)
+SCF_IMPLEMENT_IBASE_END
 
-csPortalContainer::csPortalContainer (iMeshWrapper *theParent) :
-    csSectorObject (theParent)
+csPortalContainer::csPortalContainer ()
 {
+  SCF_CONSTRUCT_IBASE (0);
 }
 
 csPortalContainer::~csPortalContainer ()

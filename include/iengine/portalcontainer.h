@@ -34,48 +34,7 @@ SCF_VERSION (iPortalContainer, 0, 0, 1);
  */
 struct iPortalContainer : public iBase
 {
-  /**
-   * Get the iObject for this mesh object. This can be used to get the
-   * name of the mesh wrapper and also to attach other user objects
-   * to this mesh (like for collision detection or game data).
-   */
-  virtual iObject *QueryObject () = 0;
 };
-
-SCF_VERSION (iPortalContainerList, 0, 0, 1);
-
-/**
- * A list of portal containers.
- */
-struct iPortalContainerList : public iBase
-{
-  /// Return the number of portal containers in this list.
-  virtual int GetCount () const = 0;
-
-  /// Return a portal container by index.
-  virtual iPortalContainer *Get (int n) const = 0;
-
-  /// Add a portal container.
-  virtual int Add (iPortalContainer *obj) = 0;
-
-  /// Remove a portal container.
-  virtual bool Remove (iPortalContainer *obj) = 0;
-
-  /// Remove the nth portal container.
-  virtual bool Remove (int n) = 0;
-
-  /// Remove all portal containers.
-  virtual void RemoveAll () = 0;
-
-  /// Find a portal container and return its index.
-  virtual int Find (iPortalContainer *obj) const = 0;
-
-  /**
-   * Find a portal container by name.
-   */
-  virtual iPortalContainer *FindByName (const char *Name) const = 0;
-};
-
 
 /** @} */
 

@@ -27,11 +27,11 @@
 #include "csutil/garray.h"
 #include "csengine/movable.h"
 #include "csengine/impmesh.h"
-#include "csengine/sectorobj.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iengine/mesh.h"
 #include "iengine/imposter.h"
+#include "iengine/viscull.h"
 #include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
 
@@ -142,9 +142,42 @@ SCF_VERSION (csMeshWrapper, 0, 0, 1);
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public csSectorObject
+class csMeshWrapper : public csObject, public iVisibilityObject
 {
+  friend class csMovable;
+  friend class csMovableSectorList;
+
 protected:
+  /// The parent sector object, or 0
+  iMeshWrapper *Parent;
+
+  /**
+   * Bounding box in world space.
+   * This is a cache for GetWorldBoundingBox() which will recalculate this
+   * if the movable changes (by using movablenr).
+   */
+  csBox3 wor_bbox;
+  /// Last used movable number for wor_bbox.
+  long wor_bbox_movablenr;
+
+  /**
+   * Current visibility number used by the visibility culler.
+   */
+  uint32 visnr;
+
+  /**
+   * Position in the world.
+   */
+  csMovable movable;
+
+  /**
+   * The renderer will render all objects in a sector based on this
+   * number. Low numbers get rendered first. High numbers get rendered
+   * later. There are a few predefined slots which the application is
+   * free to use or not.
+   */
+  long render_priority;
+
   /// Defered lighting. If > 0 then we have defered lighting.
   int defered_num_lights;
 
@@ -173,18 +206,6 @@ protected:
    * mesh that supports static LOD.
    */
   csRef<csStaticLODMesh> static_lod;
-
-  /// Update defered lighting.
-  void UpdateDeferedLighting (const csBox3& box);
-
-  /// Clear this object from all sector portal lists.
-  void ClearFromSectorPortalLists ();
-
-  /// Move this object to the specified sector. Can be called multiple times.
-  virtual void MoveToSector (iSector* s);
-
-  /// Remove this object from all sectors it is in (but not from the engine).
-  virtual void RemoveFromSectors ();
 
 private:
   /// Mesh object corresponding with this csMeshWrapper.
@@ -220,7 +241,28 @@ private:
 
   csImposterMesh *imposter_mesh;
 
+public:
+  /// Set of flags
+  csFlags flags;
+  /// Culler flags.
+  csFlags culler_flags;
+
 protected:
+  /// Update defered lighting.
+  void UpdateDeferedLighting (const csBox3& box);
+
+  /// Clear this object from all sector portal lists.
+  void ClearFromSectorPortalLists ();
+
+  /// Get the bounding box in world space and correct in hierarchy.
+  void GetFullBBox (csBox3& box);
+
+  /// Move this object to the specified sector. Can be called multiple times.
+  void MoveToSector (iSector* s);
+
+  /// Remove this object from all sectors it is in (but not from the engine).
+  void RemoveFromSectors ();
+
   /**
    * Update transformations after the object has moved
    * (through updating the movable instance).
@@ -228,7 +270,7 @@ protected:
    * some of the internal data structures will not be updated
    * correctly. This function is called by movable.UpdateMove();
    */
-  virtual void UpdateMove ();
+  void UpdateMove ();
 
   /**
    * This function determines whether to draw the imposter
@@ -264,7 +306,7 @@ public:
   /// Get the mesh object.
   iMeshObject* GetMeshObject () const { return meshobj; }
 
-  /// Get the object model.
+  /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
   {
     return meshobj->GetObjectModel ();
@@ -276,8 +318,50 @@ public:
     return (iMeshWrapper*)&scfiMeshWrapper;
   }
 
+  // For iVisibilityObject:
+  virtual csFlags& GetCullerFlags () { return culler_flags; }
+
+  /**
+   * Get the movable instance for this object.
+   * It is very important to call GetMovable().UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
+   */
+  csMovable& GetCsMovable () { return movable; }
+
+  // For iVisibilityObject.
+  virtual iMovable* GetMovable () const
+  {
+    return (iMovable*)&(movable.scfiMovable);
+  }
+
+  /// Set parent container for this object.
+  void SetParentContainer (iMeshWrapper* newParent) { Parent = newParent; }
+  /// Get parent container for this object.
+  iMeshWrapper* GetParentContainer () const { return Parent; }
+
+  /// Mark this object as visible (for iVisibilityObject).
+  virtual void SetVisibilityNumber (uint32 vis)
+  {
+    visnr = vis;
+    if (Parent)
+    {
+      ((csMeshWrapper::MeshWrapper*)Parent)->scfParent
+      	->SetVisibilityNumber (vis);
+    }
+  }
+
+  /// Return if this object is visible (for iVisibilityObject). 
+  virtual uint32 GetVisibilityNumber () const { return visnr; }
+
   /// Set the render priority for this object.
-  virtual void SetRenderPriority (long rp);
+  void SetRenderPriority (long rp);
+  /// Get the render priority for this object.
+  long GetRenderPriority () const
+  {
+    return render_priority;
+  }
 
   /// Set the Z-buf drawing mode to use for this object.
   void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
@@ -310,17 +394,6 @@ public:
   iMeshDrawCallback* GetDrawCallback (int idx) const
   {
     return draw_cb_vector.Get (idx);
-  }
-
-  /// Mark this object as visible.
-  virtual void SetVisibilityNumber (uint32 vis)
-  {
-    csSectorObject::SetVisibilityNumber (vis);
-    if (Parent)
-    {
-      ((csMeshWrapper::MeshWrapper*)Parent)->scfParent
-      	->SetVisibilityNumber (vis);
-    }
   }
 
   /**
@@ -438,8 +511,17 @@ public:
    */
   void DrawIntFull (iRenderView* rview);
 
+  //---------- Bounding volume and beam functions -----------------//
+
   /// Get the radius of this mesh and all its children.
   void GetRadius (csVector3& rad, csVector3& cent) const;
+
+  /**
+   * Check if this object is hit by this object space vector.
+   * BBox version.
+   */
+  int HitBeamBBox (const csVector3& start, const csVector3& end,
+         csVector3& isect, float* pr);
 
   /**
    * Check if this object is hit by this object space vector.
@@ -460,8 +542,50 @@ public:
   bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 
+  /**
+   * Calculate the squared distance between the camera and the object.
+   */
+  float GetSquaredDistance (iRenderView *rview);
+
+  /**
+   * This routine will find out in which sectors a mesh object
+   * is positioned. To use it the mesh has to be placed in one starting
+   * sector. This routine will then start from that sector, find all
+   * portals that touch the sprite and add all additional sectors from
+   * those portals. Note that this routine using a bounding sphere for
+   * this test so it is possible that the mesh will be added to sectors
+   * where it really isn't located (but the sphere is).
+   * <p>
+   * If the mesh is already in several sectors those additional sectors
+   * will be ignored and only the first one will be used for this routine.
+   */
+  void PlaceMesh ();
+
+  /**
+   * Get the bounding box of this object in world space.
+   * This routine will cache the bounding box and only recalculate it
+   * if the movable changes.
+   */
+  void GetWorldBoundingBox (csBox3& cbox);
+
+  /**
+   * Get the bounding box of this object after applying a transformation to it.
+   * This is really a very inaccurate function as it will take the bounding
+   * box of the object in object space and then transform this bounding box.
+   */
+  void GetTransformedBoundingBox (const csReversibleTransform& trans,
+  	csBox3& cbox);
+
+  /**
+   * Get a very inaccurate bounding box of the object in screen space.
+   * Returns -1 if object behind the camera or else the distance between
+   * the camera and the furthest point of the 3D box.
+   */
+  float GetScreenBoundingBox (const iCamera *camera, csBox2& sbox,
+  	csBox3& cbox);
+
   //--------------------- SCF stuff follows ------------------------------//
-  SCF_DECLARE_IBASE_EXT (csSectorObject);
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper
