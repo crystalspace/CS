@@ -1635,6 +1635,7 @@ int main (int argc, char* argv[])
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    Cleanup();
     exit (-1);
   }
 

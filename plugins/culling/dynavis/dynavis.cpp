@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
+#include "csutil/garray.h"
 #include "csgeom/frustum.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
@@ -541,6 +542,12 @@ end:
   return vis;
 }
 
+typedef csGrowingArray<csVector2> dynavis_tr_verts;
+CS_IMPLEMENT_STATIC_VAR (GetTrVerts, dynavis_tr_verts, ())
+
+typedef csGrowingArray<csVector3> dynavis_tr_cam;
+CS_IMPLEMENT_STATIC_VAR (GetTrCam, dynavis_tr_cam, ())
+
 void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 	iVisibilityObject* visobj, csObjectModel* model)
 {
@@ -572,24 +579,20 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   int i;
 
   // First transform all vertices.
-  //@@@ Memory leak!
-  static csVector2* tr_verts = NULL;
-  static csVector3* tr_cam = NULL;
-  static int max_tr_verts = 0;
-  if (vertex_count > max_tr_verts)
+  dynavis_tr_verts *tr_verts = GetTrVerts();
+  dynavis_tr_cam *tr_cam = GetTrCam();
+  
+  if (vertex_count > tr_verts->Length())
   {
-    delete[] tr_verts;
-    delete[] tr_cam;
-    max_tr_verts = vertex_count+50;
-    tr_verts = new csVector2[max_tr_verts];
-    tr_cam = new csVector3[max_tr_verts];
+    tr_verts->SetLength (vertex_count);
+    tr_cam->SetLength (vertex_count);
   }
 
   for (i = 0 ; i < vertex_count ; i++)
   {
-    tr_cam[i] = trans.Other2This (verts[i]);
-    if (tr_cam[i].z > 0.1)
-      Perspective (tr_cam[i], tr_verts[i], fov, sx, sy);
+    (*tr_cam)[i] = trans.Other2This (verts[i]);
+    if ((*tr_cam)[i].z > 0.1)
+      Perspective ((*tr_cam)[i], (*tr_verts)[i], fov, sx, sy);
   }
 
   if (do_state_dump)
@@ -619,7 +622,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     for (j = 0 ; j < num_verts ; j++)
     {
       int vertex_idx = vi[j];
-      float tz = tr_cam[vertex_idx].z;
+      float tz = (*tr_cam)[vertex_idx].z;
       if (tz <= 0.1)
       {
 	max_depth = -1.0;
@@ -638,7 +641,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 	    for (++j ; j < num_verts ; j++)	// The start '++j' is not a bug!
 	    {
 	      vertex_idx = vi[j];
-	      tz = tr_cam[vertex_idx].z;
+	      tz = (*tr_cam)[vertex_idx].z;
 	      if (tz > 0.1)
 	      {
 	        do_clamp = true;
@@ -650,7 +653,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 	break;
       }
       if (tz > max_depth) max_depth = tz;
-      verts2d[j] = tr_verts[vertex_idx];
+      verts2d[j] = (*tr_verts)[vertex_idx];
     }
     if (max_depth > 0.0)
     {
@@ -671,7 +674,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       csPoly3D poly;
       for (j = 0 ; j < num_verts ; j++)
       {
-	poly.AddVertex (tr_cam[vi[j]]);
+	poly.AddVertex ((*tr_cam)[vi[j]]);
       }
       csPoly3D front, back;
       // @@@ Make specific version that doesn't fill 'front' version.
