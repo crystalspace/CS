@@ -1,0 +1,186 @@
+<html>
+
+<head>
+<title>Crystal Space - Installation Guide</title>
+</head>
+
+<body>
+
+<table width="100%" border="1">
+<tr>
+<td bgcolor="#000000">
+  <img src="img/smalllogo.jpg">
+</td>
+<td align="center" bgcolor="#BBDDFF" width="100%">
+  <h1>Crystal Space</h1>
+  <h2>Installation Guide</h2>
+</td>
+</tr>
+</table>
+
+<p>
+
+<ul>
+<li><a href="#compile">Compilation Instructions</a>
+<li><a href="#run">Running Crystal Space</a>
+<li><a href="#xwin">Special Comments for X Windows Version</a>
+<li><a href="#args">Command-Line Arguments And The Config File</a>
+<li><a href="#console">The Console</a>
+</ul>
+
+<hr>
+
+<h1><a name="compile"></a>Compilation Instructions</h1>
+
+To compile Crystal Space for your platform, read the appropriate installation 
+document(s) as indicated below.  You may also need to read
+<a href="general.htm">Installation with the GNU make system</a> and
+<a href="PROBLEMS">Platform specific bugs and problems.</a>
+After reading the appropriate platform-specific installation instructions,
+return to this document and continue reading with the next section.
+
+<ul>
+<li>Amiga - <a href="INSTALL.Amiga">INSTALL.Amiga</a>
+<li>BeOS
+  - <a href="README.BeOS">README</a>
+  - <a href="INSTALL.BeOS">INSTALL</a>
+<li>DOS - <a href="djgpp.htm">DJGPP</a>
+<li>Mac - <a href="INSTALL.Mac">Metrowerks CodeWarrior instructions</a>
+<li>NeXT
+  - <a href="README.NeXT">README</a>
+  - <a href="INSTALL.NeXT">install source distribution</a>
+  - <a href="INSTALL.NeXT-Binary">install binary distribution</a>
+<li>OS/2
+  - <a href="README.OS2.html">README</a>
+  - <a href="INSTALL.OS2">INSTALL</a>
+<li>Unix/Linux
+  - <a href="INSTALL.Unix">general instructions</a>
+  - <a href="INSTALL.IRIX">special instructions for SGI/IRIX</a>
+<li>Windows
+  - <a href="INSTALL.Win">MS Visual C++</a>
+  - <a href="win32gcc.htm">Mingw32, Cygwin</a>
+</ul>
+
+<hr>
+
+<h1><a name="run"></a>Running Crystal Space</h1>
+
+To run Crystal Space you need at least the following:
+
+<ul>
+<li>An executable (walktest.exe, walktest, ...)
+<li>standard.zip (not really required but recommended)
+<li>unless you are using a statically linked version of CS
+  you should also have a 3D rasterizer library (for example
+  the software rasterizer), a 2D driver library (for example
+  for XLib or SVGALIB) and at least the Network NULL Driver.
+  Those libraries are either in .so format (for Unix) or
+  in .DLL format (for OS/2 and Windows).
+<li>The configuration file: cryst.cfg
+<li>One or more level files (*.zip)
+</ul>
+
+And of course you also need a computer :-)
+
+<p>
+
+The executable and all other files must be located in the same
+directory. The level files may be put anywhere. Please
+note that the level files should NOT be extracted. Crystal Space
+can read zip files directly.
+
+<p>
+
+To run Crystal Space with a specific level you have two
+possibilities (lets assume that you have put the level in a
+directory called 'data' and this directory is located in the
+same directory as the executable):
+
+<pre>
+    walktest data/level.zip
+</pre>
+
+(Replace level.zip with any level you want).
+
+<p>
+
+Otherwise you can edit cryst.cfg and set WORLDFILE=data/level.zip
+as a configuration option.
+
+<p>
+
+Note that Crystal Space currently only supports 256-color displays
+(with a colormap) or 15/16/32-bit truecolor displays.
+
+<p>
+
+<hr>
+
+<h1><a name="xwin"></a>Special Comments for X Windows Version</h1>
+
+Note that the X version of Crystal Space optionally supports the Shared
+Memory Extension (SHM). This makes Crystal Space run much faster if your
+server supports it (Crystal Space should also support DGA but this is not
+yet the case).
+
+<p>
+
+By default Crystal Space assumes that your server supports SHM. It will
+automatically auto-detect if your server doesn't support it. So you can
+safely leave it enabled.
+
+<p>
+
+<hr>
+
+<h1><a name="args"></a>Command-Line Arguments And The Config File</h1>
+
+Crystal Space supports a number of command-line options. With
+'-help' you get a list and a description (including the default
+that is used for that option). The default for every command-line
+option is set internally in the program unless there is a
+corresponding line for it in the config file. For example,
+normally the default for -cache is 4000000 (the default size
+of the texture cache). But when CACHE=2000000 is set in 'cryst.cfg'
+the default will be 2000000. Using an option on the command-line will
+always override the default.
+
+<p>
+
+Some interesting options to play with are:
+
+<pre>
+  -mode 640x480
+        (or another value). Use this option to set the size of the display.
+  -driver opengl
+        (or direct3d, glide, software, ...). Use this option to select
+        another kind of display driver.
+</pre>
+
+The configuration file ('cryst.cfg') is useful for keeping options that
+you use often. Not all options can be set with the configuration file
+though, and not all configuration file options have a corresponding
+command-line option. See <a href="config.txt">docs/config.txt</a>
+for a complete list of all configuration file options.
+
+<p>
+
+<hr>
+
+<h1><a name="console"></a>The Console</h1>
+
+There is also an input/output console that you can use (similar to
+the one in Quake). Press 'tab' to toggle between the console and
+normal output. There are several commands that you can use. Type
+'help' to get the list of commands. There is a document
+<a href="console.txt">docs/console.txt</a>
+describing all these commands.
+
+<p>
+
+<hr>
+
+<A href="index.htm">Return to Index</a>
+
+</body>
+</html>

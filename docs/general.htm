@@ -1,0 +1,137 @@
+<html>
+
+<head>
+<title>Crystal Space - Installation with the GNU make system</title>
+</head>
+
+<body>
+
+<table width="100%" border="1">
+<tr>
+<td bgcolor="#000000">
+  <img src="img/smalllogo.jpg">
+</td>
+<td align="center" bgcolor="#BBDDFF" width="100%">
+  <h1>Crystal Space</h1>
+  <h2>Installation with the GNU make system</h2>
+</td>
+</tr>
+</table>
+
+<p>
+
+This file contains general installation instructions for Crystal Space
+when using the GNU make system.  These instructions may be applicable to
+the Unix, Solaris, Irix, Linux, BeOS, OS/2, MacOS/X Server, OpenStep,
+NextStep, and DOS/DJGPP ports of Crystal Space.
+
+<p>
+
+Be sure to also read the platform-specific installation instructions for
+your platform if such instructions exist.  These instructions can be found
+in the <a href="install.htm">Installation Guide</a>.
+
+<p>
+
+<hr>
+
+<h1>System Types</h1>
+
+Before compiling Crystal Space you should edit 'include/types.h' and see if
+it conforms to your system. This file defines some types for boolean (the
+'bool' type) and several types of signed/unsigned integers. If you have
+a system with uncommon sizes for integers (for example 32-bit 'short'
+values) then you should edit and change this file. Normally you should have
+no problems here.
+
+<p>
+
+<hr>
+
+<h1>External Libraries: zlib</h1>
+
+Crystal Space requires an external library called 'zlib' (for reading ZIP
+files). Some Unix/Linux distributions come preinstalled with that library.
+In that case there is no problem. Otherwise you need to download the package
+from:
+
+<pre>
+    <a href="ftp://ftp.uu.net/graphics/png/src/"
+    >ftp://ftp.uu.net/graphics/png/src/</a>zlib-?????.tar.gz
+    (as of this writing the current latest version is <a
+    href="ftp://ftp.uu.net/graphics/png/src/zlib-1.1.3.tar.gz"
+    >zlib-1.1.3.tar.gz</a>)
+</pre>
+
+After downloading you must put the contents of that package in 'CS/libs/zlib'
+(thus at the same level as the 'data' and 'src' directory). It is possible
+to put the library somewhere else as well (for example in the standard
+/usr directories) but you must make sure that the makefile will be able
+to find it (more on this later).
+
+<p>
+
+Read the compilation instructions included with zlib and compile it.
+
+<p>
+
+<hr>
+
+<h1>External Libraries: libpng</h1>
+
+If you want the ability to read PNG graphic files from within Crystal
+Space then you should also download the PNG libraries. If they are not
+already installed on your system you can download them from:
+
+<pre>
+    <a href="ftp://ftp.uu.net/graphics/png/src/"
+    >ftp://ftp.uu.net/graphics/png/src/</a>libpng-?????.tar.gz
+    (as of this writing the current latest version is <a
+    href="ftp://ftp.uu.net/graphics/png/src/libpng-1.0.2.tar.gz"
+    >libpng-1.0.2.tar.gz</a>)
+</pre>
+
+None of the current Crystal Space levels contain PNG files so Crystal
+Space does not really need it. However, it is enabled by default in
+the makefile because MazeD (the beta level editor) requires PNG support.
+
+<p>
+
+Edit 'mk/user.mak' and set DO_PNG=no if you want to disable PNG support.
+Otherwise you must install the PNG libraries just like you did with
+zlib (in 'CS/libs/libpng').
+
+<p>
+
+<hr>
+
+<h1>External Libraries: libjpeg</h1>
+
+If you want the ability to read JPEG graphic files from within Crystal
+Space then you should also download the JPEG libraries. If they are not
+already installed on your system you can download them from:
+
+<pre>
+    <a href="ftp://ftp.uu.net/graphics/jpeg/"
+    >ftp://ftp.uu.net/graphics/jpeg/</a>jpegsrc.???.tar.gz
+    (as of this writing the current latest version is <a
+    href="ftp://ftp.uu.net/graphics/jpeg/jpegsrc.v6b.tar.gz"
+    >jpegsrc.v6b.tar.gz</a>)
+</pre>
+
+JPEG support is currently enabled by default. If you want to disabled it,
+edit 'mk/user.mak' and set DO_JPG=no.  Otherwise you must install the JPEG
+libraries just like you did with zlib (in 'CS/libs/libjpeg').
+
+<p>
+
+Again follow compilation instructions as specified by the JPEG library.
+
+<p>
+
+<hr>
+
+<A href="index.htm">Return to Index</a>
+
+</body>
+</html>
