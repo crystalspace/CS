@@ -49,7 +49,7 @@ inline void csSymbolTable::SetParent (csSymbolTable *p)
   }
 }
 
-inline void csSymbolTable::PropagateSymbol (csStringID name, void *value)
+inline void csSymbolTable::PropagateSymbol (csStringID name, iBase *value)
 {
   for (int i = 0; i < Children.Length (); i++)
     Children[i]->SetSymbolSafe (name, value);
@@ -61,28 +61,33 @@ inline void csSymbolTable::PropagateDelete (csStringID name)
     Children[i]->DeleteSymbolSafe (name);
 }
 
-inline void csSymbolTable::SetSymbolSafe (csStringID name, void *value)
+inline void csSymbolTable::SetSymbolSafe (csStringID name, iBase *value)
 {
-  Symbol *sym = (Symbol *) Hash.Get (name);
-  if (sym)
+  Symbol *s = (Symbol *) Hash.Get (name);
+  if (s)
   {
-    if (! sym->Auth)
-      SetSymbol (name, value);//@@@ Wasteful: SetSymbol will do Hash.Get again
+    if (! s->Auth)
+    {
+      s->Val = value;
+      s->Auth = true;
+      PropagateSymbol (name, value);
+    }
   }
   else
-    SetSymbol (name, value);//@@@ Wasteful: SetSymbol will do Hash.Get again
+  {
+    Hash.Put (name, new Symbol (name, value, true));
+    PropagateSymbol (name, value);
+  }
 }
 
 inline void csSymbolTable::DeleteSymbolSafe (csStringID name)
 {
-  Symbol *sym = (Symbol *) Hash.Get (name);
-  if (sym)
+  Symbol *s = (Symbol *) Hash.Get (name);
+  if (s && ! s->Auth)
   {
-    if (! sym->Auth)
-      DeleteSymbol (name);//@@@ Wasteful: DeleteSymbol will do Hash.Get again
+    Hash.DeleteAll (s->Name);
+    PropagateDelete (s->Name);
   }
-  else
-    DeleteSymbol (name);//@@@ Wasteful: DeleteSymbol will do Hash.Get again
 }
 
 void csSymbolTable::AddChild (csSymbolTable *child)
@@ -101,7 +106,7 @@ void csSymbolTable::AddChildren (csArray<csSymbolTable*> &children)
   }
 }
 
-void csSymbolTable::SetSymbol (csStringID name, void *value)
+void csSymbolTable::SetSymbol (csStringID name, iBase *value)
 {
   Symbol *s = (Symbol *) Hash.Get (name);
   if (s)
@@ -110,29 +115,17 @@ void csSymbolTable::SetSymbol (csStringID name, void *value)
     s->Auth = true;
   }
   else
-    Hash.Put (name, (csHashObject) new Symbol (name, value, true));
+    Hash.Put (s->Name, new Symbol (name, value, true));
 
   PropagateSymbol (name, value);
 }
 
-void csSymbolTable::SetSymbols (const csArray<csStringID> &names, csArray<void*> &values)
+void csSymbolTable::SetSymbols (const csArray<csStringID> &names,
+  csArray<iBase *> &values)
 {
+  CS_ASSERT (names.Length () == values.Length ());
   for (int i = 0; i < names.Length (); i++)
-  {
-    csStringID name = names[i];
-    void *value = values[i];
-
-    Symbol *s = (Symbol *) Hash.Get (name);
-    if (s)
-    {
-      s->Val = value;
-      s->Auth = true;
-    }
-    else
-      Hash.Put (name, (csHashObject) new Symbol (name, value, true));
-
-    PropagateSymbol (name, value);
-  }
+    SetSymbol (names[i], values[i]);
 }
 
 bool csSymbolTable::DeleteSymbol (csStringID name)
@@ -140,8 +133,8 @@ bool csSymbolTable::DeleteSymbol (csStringID name)
   Symbol *s = (Symbol *) Hash.Get (name);
   if (s && s->Auth)
   {
-    Hash.DeleteAll (name);
-    PropagateDelete (name);
+    Hash.DeleteAll (s->Name);
+    PropagateDelete (s->Name);
     return true;
   }
   return false;
@@ -151,37 +144,22 @@ bool csSymbolTable::DeleteSymbols (const csArray<csStringID> &names)
 {
   bool ok = true;
   for (int i = 0; i < names.Length (); i++)
-  {
-    csStringID name = names[i];
-    Symbol *s = (Symbol *) Hash.Get (name);
-    if (s && s->Auth)
-    {
-      Hash.DeleteAll (name);
-      PropagateDelete (name);
-    }
-    else
-      ok = false;
-  }
+    if (! DeleteSymbol (names[i])) ok = false;
   return ok;
 }
 
-void* csSymbolTable::GetSymbol (csStringID name)
+iBase* csSymbolTable::GetSymbol (csStringID name)
 {
   Symbol *s = (Symbol *) Hash.Get (name);
   if (s) return s->Val;
   else return 0;
 }
 
-csArray<void*> csSymbolTable::GetSymbols (const csArray<csStringID> &names)
+csArray<iBase *> csSymbolTable::GetSymbols (const csArray<csStringID> &names)
 {
-  csArray<void*> values;
+  csArray<iBase *> values;
   for (int i = 0; i < names.Length (); i++)
-  {
-    csStringID name = names[i];
-    Symbol *s = (Symbol *) Hash.Get (name);
-    if (s) values.Push (s->Val);
-    else values.Push (0);
-  }
+    values.Push (GetSymbol (names[i]));
   return values;
 }
 
@@ -193,6 +171,6 @@ bool csSymbolTable::SymbolExists (csStringID name)
 bool csSymbolTable::SymbolsExist (const csArray<csStringID> &names)
 {
   for (int i = 0; i < names.Length (); i++)
-    if (! Hash.Get (names[i])) return false;
+    if (! SymbolExists (names[i])) return false;
   return true;
 }
