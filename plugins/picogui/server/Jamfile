@@ -3,7 +3,7 @@ SubDir TOP plugins picogui server ;
 if $(PGSERVER.AVAILABLE) = "yes"
 {
   Plugin pgserver : [ Wildcard *.cpp *.h ] ;
-  LinkWith pgserver : csutil csgeom csgfx ;
+  LinkWith pgserver : csutil csgeom cstool csgfx ;
   ExternalLibs pgserver : PGSERVER ;
   Help pgserver : "Crystal Space PicoGUI Server Plugin" ;
 }
