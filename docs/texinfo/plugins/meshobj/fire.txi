@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Fire, MeshObject Snow, MeshObject Fountain, MeshObject
+@node MeshObject Fire, MeshObject Snow, MeshObject Emit, MeshObject
 @subsection Fire Mesh Object
 @cindex MeshObject
 @cindex Fire Particle System
