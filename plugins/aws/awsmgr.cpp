@@ -233,16 +233,12 @@ awsManager::WindowIsDirty(awsWindow *win)
   return false;
 }
 
-void
-awsManager::Print(iGraphics3D *g3d)
+void 
+awsManager::UpdateStore()
 {
-  if (updatestore_dirty)
+ if (updatestore_dirty)
   {
-  
-    /*g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
-  		  0,0,512,480,//g3d->GetWidth(), g3d->GetHeight(),
-		  0,0,512,480,0);*/
-
+ 
    awsWindow *curwin=top;
    
    updatestore.makeEmpty();
@@ -257,36 +253,39 @@ awsManager::Print(iGraphics3D *g3d)
    updatestore_dirty=false;
 
   }
+}
+
+void
+awsManager::Print(iGraphics3D *g3d)
+{
+  UpdateStore();
   
-    int i;
-    iGraphics2D *g2d = g3d->GetDriver2D();
+  int i;
+  iGraphics2D *g2d = g3d->GetDriver2D();
 
-    for(i=0; i<updatestore.Count(); ++i)
-    {
+  for(i=0; i<updatestore.Count(); ++i)
+  {
 
-      csRect r(updatestore.RectAt(i));
+    csRect r(updatestore.RectAt(i));
 
-      g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
-      		  r.xmin,r.ymin,r.xmax,r.ymax,
-		  r.xmin,r.ymin,r.xmax,r.ymax,
+    g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
+      		  r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
+		  r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
                   0);
 
-    }
+  }
 
-    // Debug code
-    for(i=0; i<updatestore.Count(); ++i)
-    {
-
-      csRect r(updatestore.RectAt(i));
+  // Debug code
+  for(i=0; i<updatestore.Count(); ++i)
+  {
+    csRect r(updatestore.RectAt(i));
      
-      g2d->DrawLine(r.xmin, r.ymin, r.xmax, r.ymin, GetPrefMgr()->GetColor(AC_WHITE));
-      g2d->DrawLine(r.xmin, r.ymin, r.xmin, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-      g2d->DrawLine(r.xmin, r.ymax, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-      g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+    g2d->DrawLine(r.xmin, r.ymin, r.xmax, r.ymin, GetPrefMgr()->GetColor(AC_WHITE));
+    g2d->DrawLine(r.xmin, r.ymin, r.xmin, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+    g2d->DrawLine(r.xmin, r.ymax, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+    g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
 
-    }
-  
-
+  }
 }
 
 void       
@@ -375,8 +374,15 @@ awsManager::Redraw()
    // This only needs to happen when drawing to the default context.
    if (UsingDefaultContext)
    {
+     int i;
+
      ptG3D->FinishDraw ();
-     ptG3D->Print (&bounds);
+     ptG3D->Print(&bounds);
+
+     //UpdateStore();
+
+     //for(i=0; i<updatestore.Count(); ++i)
+       //ptG3D->Print(&(updatestore.RectAt(i)));
    }
 
    // Reset the dirty region

@@ -192,6 +192,9 @@ protected:
     
     /// Recursively creates child components and adds them into a parent.  Used internally.
     void CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings);
+
+    /// Checks the updatestore_dirty flag and refreshes the store accordingly.
+    void UpdateStore();
     
 public:
     /// Instantiates a window based on a window definition.
