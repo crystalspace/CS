@@ -1373,6 +1373,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->l->GetRadius ()) return;
 
   // Calculate the new frustrum for this polygon.
+
   int j;
   if (lview->mirror)
     for (j = 0 ; j < num_vertices ; j++)
@@ -1550,7 +1551,15 @@ void csPolygon2D::Draw (IGraphics2D* g2d, int col)
 
 void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool gouraud)
 {
-  // First we have to find the u,v coordinates for every
+  //first we copy the first three texture coordinates to a local buffer to avoid that they
+  //are overwritten when interpolating.
+  G3DTexturedVertex tritexcoords[3];
+  for (int i=0; i<3; i++)
+  {
+    tritexcoords[i] = g3dpoly->vertices[i];
+  }
+
+  // Now we have to find the u,v coordinates for every
   // point in the clipped polygon. We know we started
   // from orig_triangle and that texture mapping is not perspective correct.
 
@@ -1620,34 +1629,34 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool
         }
 
     // Calculate Z
-    INTERPOLATE (g3dpoly->vertices [j].z,
-          g3dpoly->vertices [vtl].z, g3dpoly->vertices [vbl].z,
-          g3dpoly->vertices [vtr].z, g3dpoly->vertices [vbr].z);
+    INTERPOLATE(g3dpoly->vertices [j].z,
+                tritexcoords [vtl].z, tritexcoords [vbl].z,
+                tritexcoords [vtr].z, tritexcoords [vbr].z);
     if (g3dpoly->txt_handle)
     {
       // Calculate U
-      INTERPOLATE (g3dpoly->vertices [j].u,
-            g3dpoly->vertices [vtl].u, g3dpoly->vertices [vbl].u,
-            g3dpoly->vertices [vtr].u, g3dpoly->vertices [vbr].u);
+      INTERPOLATE(g3dpoly->vertices [j].u,
+                  tritexcoords [vtl].u, tritexcoords [vbl].u,
+                  tritexcoords [vtr].u, tritexcoords [vbr].u);
       // Calculate V
-      INTERPOLATE (g3dpoly->vertices [j].v,
-            g3dpoly->vertices [vtl].v, g3dpoly->vertices [vbl].v,
-            g3dpoly->vertices [vtr].v, g3dpoly->vertices [vbr].v);
+      INTERPOLATE(g3dpoly->vertices [j].v,
+                  tritexcoords [vtl].v, tritexcoords [vbl].v,
+                  tritexcoords [vtr].v, tritexcoords [vbr].v);
     }
     if (gouraud)
     {
       // Calculate R
-      INTERPOLATE (g3dpoly->vertices [j].r,
-            g3dpoly->vertices [vtl].r, g3dpoly->vertices [vbl].r,
-            g3dpoly->vertices [vtr].r, g3dpoly->vertices [vbr].r);
+      INTERPOLATE(g3dpoly->vertices [j].r,
+                  tritexcoords [vtl].r, tritexcoords [vbl].r,
+                  tritexcoords [vtr].r, tritexcoords [vbr].r);
       // Calculate G
       INTERPOLATE (g3dpoly->vertices [j].g,
-            g3dpoly->vertices [vtl].g, g3dpoly->vertices [vbl].g,
-            g3dpoly->vertices [vtr].g, g3dpoly->vertices [vbr].g);
+                  tritexcoords [vtl].g, tritexcoords [vbl].g,
+                  tritexcoords [vtr].g, tritexcoords [vbr].g);
       // Calculate B
       INTERPOLATE (g3dpoly->vertices [j].b,
-            g3dpoly->vertices [vtl].b, g3dpoly->vertices [vbl].b,
-            g3dpoly->vertices [vtr].b, g3dpoly->vertices [vbr].b);
+                  tritexcoords [vtl].b, tritexcoords [vbl].b,
+                  tritexcoords [vtr].b, tritexcoords [vbr].b);
     }
     else
     {
