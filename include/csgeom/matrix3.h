@@ -40,12 +40,20 @@ public:
 
 public:
   /// Construct a matrix, initialized to be the identity.
-  csMatrix3 ();
+  csMatrix3 ()
+      : m11(1), m12(0), m13(0),
+	m21(0), m22(1), m23(0),
+	m31(0), m32(0), m33(1)
+  {}
 
   /// Construct a matrix and initialize it.
-  csMatrix3 (float m11, float m12, float m13,
-             float m21, float m22, float m23,
-             float m31, float m32, float m33);
+  csMatrix3 (float am11, float am12, float am13,
+             float am21, float am22, float am23,
+             float am31, float am32, float am33)
+      : m11(am11), m12(am12), m13(am13),
+	m21(am21), m22(am22), m23(am23),
+	m31(am31), m32(am32), m33(am33)
+  {}
 
   /// Construct a matrix with a quaternion.
   explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }

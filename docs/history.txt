@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  to include/ivaria. The reason is that this is also a public include
 	  file. If you want to make a python plugin in your own project you
 	  will need to include this file.
+	- Matze inlined constructor of csMatrix3 in the hope to speed it up a
+	  bit (no tests made)
 14-Dec-2001
 	- Reverted a patch from 'res' on the OpenGL windows canvas
 	  related to the calculation of 'wwidth' and 'wheight'. This

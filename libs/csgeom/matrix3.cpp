@@ -26,29 +26,6 @@
 
 //---------------------------------------------------------------------------
 
-csMatrix3::csMatrix3 () 
-{
-  m12 = m13 = 0;
-  m21 = m23 = 0;
-  m31 = m32 = 0;
-  m11 = m22 = m33 = 1;
-}
-
-csMatrix3::csMatrix3 (float m11, float m12, float m13,
-  	    	      float m21, float m22, float m23,
-  	   	      float m31, float m32, float m33)
-{
-  csMatrix3::m11 = m11;
-  csMatrix3::m12 = m12;
-  csMatrix3::m13 = m13;
-  csMatrix3::m21 = m21;
-  csMatrix3::m22 = m22;
-  csMatrix3::m23 = m23;
-  csMatrix3::m31 = m31;
-  csMatrix3::m32 = m32;
-  csMatrix3::m33 = m33;
-}
-
 csMatrix3& csMatrix3::operator+= (const csMatrix3& m)
 {
   m11 += m.m11; m12 += m.m12; m13 += m.m13;
