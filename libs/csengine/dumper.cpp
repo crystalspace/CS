@@ -80,7 +80,8 @@ void Dumper::dump (csCamera* c)
 
 void Dumper::dump (csPolyPlane* p)
 {
-  CsPrintf (MSG_DEBUG_0, "PolyPlane '%s' id=%ld:\n", csNameObject::GetName(*p),
+  const char* pl_name = csNameObject::GetName (*p);
+  CsPrintf (MSG_DEBUG_0, "PolyPlane '%s' id=%ld:\n", pl_name ? pl_name : "(no name)",
             p->GetID ());
   dump (&p->m_obj2tex, "Mot");
   dump (&p->v_obj2tex, "Vot");
