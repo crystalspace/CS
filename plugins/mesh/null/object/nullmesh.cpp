@@ -145,7 +145,7 @@ bool csNullmeshMeshObject::HitBeamObject (const csVector3& /*start*/,
 void csNullmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 {
   rad.Set (radius);
-  cent.Set (0);
+  cent.Set (box.GetCenter ());
 }
 
 csPtr<iMeshObject> csNullmeshMeshObject::MeshObjectFactory::NewInstance ()

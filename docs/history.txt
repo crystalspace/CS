@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	  collision detection without having to define a mesh object.
 	  Internally this shortcut will make a regular mesh object that uses
 	  a 'nullmesh' internally.
+	- Jorrit fixed a bug in nullmesh, GetRadius(). The center was not
+	  correctly set in case SetBoundingBox() was called.
 15-May-2003
 	- res made the following changes to the fire proctex:
 	    - changed the algorithm a bit so it doesn't look tilted any more.
