@@ -128,6 +128,8 @@ The history order is reversed so that new features are at the top.
 	  source tree, and the recursive scan of the source tree are needlessly
 	  excessive.  In general, recursive scan during plugin discovery is
 	  useful, but we need to think it out more before re-enabling it.
+        - Philip Wyett removed '#include "csutil/string.h"' which does not
+          exist from appdir.cpp.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
