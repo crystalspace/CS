@@ -80,7 +80,8 @@ public:
   bool MustRender() const {return forcerender;}
   /// unset the forced rendering.
   void UnsetForceRender() {forcerender = false;}
-
+  /// has been prepared ?
+  bool AnimPrepared () {return anim_prepared;}
   /** 
    * Set the texturemapping of the sky onto this texture
    * txtorig is a corner point of the polygon (say the topleft point)

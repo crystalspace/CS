@@ -25,7 +25,6 @@
 #include "csgeom/matrix3.h"
 
 //---------- csProcSkyTexture ------------------------------------
-
 csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
 {
   sky = par;
@@ -152,8 +151,11 @@ void csProcSky::SetAnimated(bool anim, csTicks current_time)
     csProcSkyTexture *p = firstsky;
     while(p)
     {
-      p->ForceRerender(); 
-      DrawToTexture(p, current_time);
+      if (p->AnimPrepared())
+      {
+        p->ForceRerender(); 
+        DrawToTexture(p, current_time);
+      }
       p = p->GetNextSky();
     }
   }
