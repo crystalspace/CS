@@ -187,7 +187,7 @@ void csPolyTexture::InitLightMaps ()
 //
 // TODO@@@: Add tests for more planes!
 //====================================================
-static bool FindSeperatingPlane (
+static bool FindSeparatingPlane (
   csPolygon3D* poly1, int num_vertices1,
   csPolygon3D* p, int num_vertices2,
   const csVector3 &lightpos)
@@ -256,7 +256,7 @@ static bool CanCastShadow (
    * the light position and two points in space that cleanly seperates
    * the two polygons. These are the criteria we now use in this test.
    */
-  if (FindSeperatingPlane (
+  if (FindSeparatingPlane (
   	shadow_poly, shadow_poly->GetVertexCount (), 
 	poly, poly->GetVertexCount (),
 	lightpos))
@@ -265,7 +265,7 @@ static bool CanCastShadow (
   // If we couldn't find a seperating plane between poly1 and p then
   // we also try the reverse because that way we might give a good
   // result.
-  if (FindSeperatingPlane (
+  if (FindSeparatingPlane (
 	poly, poly->GetVertexCount (),
 	shadow_poly, shadow_poly->GetVertexCount (),
 	lightpos))
