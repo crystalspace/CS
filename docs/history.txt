@@ -16,6 +16,25 @@ Short-term cleanups that need to be done:
 	- Fixed a bug in yesterdays bugfix on CompressShadowFrustrums.
 	- Fixed a bug which caused sectors using STATBSP to work wrong when
 	  the sector has less than 150 polygons.
+	- More work on visibility doc. The first draft is now finished.
+	- Andrew Zabolotny did the following changes:
+	    - Fixed a few things in MazeD. All polygons are now
+	      unnamed by default, unless you give them a name.
+	    - Made Home/End go to top/bottom of lists (Ctrl+PgUp/Dn workso
+	      too - like before). To go horizontally to begin/end use
+	      Ctrl+Home/Ctrl+End.
+	    - Fixed some minor bugs in MazeD.
+	    - Fixed the polygon clipper to not give divide overflows
+	      anymore.
+	    - Changed QInt back (seems working).
+	    - Added X11/gpm/slang libs for Unix when compiling aalib 2D driver.
+	- Michael Dale Long did the following changes:
+	    - Fixed some bugs that popped up when DECLARE_TYPED_VECTOR was
+	      changed to delete it's items. It resulted in some better
+	      data management but broke some assumptions made when writing
+	      the code originally.
+	    - Added the first three chapters of a tutorial for adding
+	      CrystalClear functionality to Simple.
 	- Eric Sunshine reverted Norman Kramer's change to the image loaders
 	  since it crashed the OpenStep port of CS.  Neither Jorrit, Andrew,
 	  nor Eric could understand the reasoning behind the change as stated
