@@ -58,6 +58,9 @@ chronological order.
 	  having to run the stand-alone mk/msvcgen/msvcgen.sh shell script.
 	  (The 'msvcgen' target is just a shortcut which invokes the other two
 	  targets.)  Removed the msvcgen.sh script.
+	- Jorrit added some initialization code to Data in the chunklod
+	  terrain engine in an attempt to fix the strange texture swaps.
+	  Didn't help though.
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

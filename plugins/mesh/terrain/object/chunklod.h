@@ -94,6 +94,16 @@ private:
     csVector2 tex;
     csColor col;
     float error;
+    Data ()
+    {
+      pos.Set (0);
+      norm.Set (0);
+      tan.Set (0);
+      bin.Set (0);
+      tex.Set (0, 0);
+      col.Set (0, 0, 0);
+      error = 0.0;
+    }
   };
   csArray<Data> datamap;
   int hm_x, hm_y;
