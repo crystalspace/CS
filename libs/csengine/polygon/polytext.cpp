@@ -624,6 +624,8 @@ void csPolyTexture::FillLightMap (csLightView& lview)
       ru = u << lightcell_shift;
       rv = sy << lightcell_shift;
 
+      // rc tests wether or not the lumel will be shadowed.
+      // If true then shadow.
       bool rc = false;
       int tst;
       static int shift_u [5] = { 0, 2, 0, -2, 0 };
@@ -691,7 +693,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
         if (dyn)
         {
           dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-          l1 = l1 + QInt (lightness * QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
+          l1 = l1 + QInt (lightness*(cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
           if (l1 > 255) l1 = 255;
           mapR[uv] = l1;
         }
@@ -701,19 +703,19 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
           if (lview.r > 0)
           {
-            l1 = l1 + QInt (lightness * QRound (color.red * brightness));
+            l1 = l1 + QInt (lightness*(color.red * brightness));
             if (l1 > 255) l1 = 255;
             mapR[uv] = l1;
           }
           if (lview.g > 0 && mapG)
           {
-            l2 = mapG[uv] + QInt (lightness * QRound (color.green * brightness));
+            l2 = mapG[uv] + QInt (lightness*(color.green * brightness));
             if (l2 > 255) l2 = 255;
             mapG[uv] = l2;
           }
           if (lview.b > 0 && mapB)
           {
-            l3 = mapB[uv] + QInt (lightness * QRound (color.blue * brightness));
+            l3 = mapB[uv] + QInt (lightness*(color.blue * brightness));
             if (l3 > 255) l3 = 255;
             mapB[uv] = l3;
           }
