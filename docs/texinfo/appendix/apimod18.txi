@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node API Modifications 18, API Modifications 17, API Modifications, API Modifications
+@node API Modifications 18, API Modifications 17, API Modifications 19, API Modifications
 @appendixsec @sc{api} Changes from 0.17 to 0.18
 @cindex @sc{api} Changes
 @cindex @code{AdvanceSpriteFrames()}

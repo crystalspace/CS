@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Pixmaps, , , HOWTO
+@node HOWTO Pixmaps, HOWTO Render Priorities, HOWTO Level Loading, HOWTO
 @subsection Loading Images for Pixmaps
 @cindex @code{csSimplePixmap}
 @cindex loading images
