@@ -1024,6 +1024,7 @@ void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
   for (i = 0 ; i < 4 ; i++)
   {
     int xx1, yy1, xx2, yy2;
+	xx1 = yy1 = xx2 = yy2 = 0;
     switch (i)
     {
       case CS_QUAD_TOPLEFT:
