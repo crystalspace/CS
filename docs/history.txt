@@ -13,6 +13,31 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+29-Sep-1999
+	- Andrew Zabolotny made the following modifications:
+	  - Removed SystemDriver::fopen() method; outdated by the new virtual
+	    file system.  Respective port maintainers will have to remove
+	    cssys/*/fopen.cpp from their project files.  I did it already for
+	    ports that use the Makefile system.
+	  - Removed FOpen and FClose (huh?) methods from ISystem interface
+	    for same reason.
+	  - Removed SaveFile() and LoadFile() methods from csCamera class.
+	    Debug methods; moved to debug program (i.e. walktest).
+	  - MazeD now is compilable.  However, some important functions are
+	    disabled (ie. saving and loading).  Many small fixes.
+	  - Added "const" here and there through the entire CS source tree.
+	- A new version of Squawk (v16) by Seth Galbrain :-) was imported by
+	  Eric Sunshine.
+	- Eric Sunshine fixed the model import/export library so that it is
+	  now possible to actually use it for converting models in memory.
+	  Writing the converted model to disk and generation of a log file
+	  are now optional.  Modified Squawk to take advantage of these new
+	  options so that it no longer outputs "junk" files.  Note that this
+	  entire library really needs to be converted to VFS.
+	- Eric Sunshine modified the import/export library so that it now
+	  appends output to the log file rather than overwriting it.
+	- Eric Sunshine added "const" here and there through the source tree.
+	- Eric Sunshine updated some documentation.
 28-Sep-1999
 	- Csparser detects duplicate vertex indices in polygons and ignores
 	  them (while given a warning at the same time).
