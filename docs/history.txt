@@ -50,6 +50,10 @@ The history order is reversed so that new features are at the top.
 	  when you have big objects. In the past with the old GetNearbyLights()
 	  this would often give bad results because lights with a radius
 	  smaller then the object would not be registered.
+	- The Delete() function in csRefCount class is now protected
+	  instead of private. That way subclasses of csRefCount can override
+	  Delete() to provide for other functionality (like returning the
+	  object to a pool).
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could

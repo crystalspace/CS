@@ -29,7 +29,7 @@
  */
 class csRefCount
 {
-private:
+protected:
   int ref_count;
 
   // To avoid a problem with MSVC and multiple DLLs (with seperate memory
@@ -41,7 +41,6 @@ private:
     delete this;
   }
 
-protected:
   virtual ~csRefCount () {}
 
 public:
