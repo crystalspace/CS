@@ -83,7 +83,7 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
   CS_ASSERT (y2 < 64);
   CS_ASSERT (x1+ABS (y2-y1)*dx >= 0);
   CS_ASSERT (x1+ABS (y2-y1)*dx < (32<<16));
-  CS_ASSERT (x2-ABS (y1-y2)*dx >= 0);
+  CS_ASSERT (x2-ABS (y1-y2)*dx >= 0); //@@@ VERY SUSPICIOUS! These asserts are triggerred in some cases!
   CS_ASSERT (x2-ABS (y1-y2)*dx < (32<<16));
   csLineOperation& op = AddOperation ();
   op.op = OP_LINE;
@@ -940,7 +940,9 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     int dy = y2-y1;
     int dx = ((x2-x1)<<16) / (dy-yfurther);
     csCoverageTile* tile = GetTile (tile_x1, tile_y1);
-    tile->PushLine ((x1 & 31) << 16, y1 & 63, ((x2 & 31) << 16)-dx,
+// @@@@@@@ DOUBLE CHECK THE THING BELOW TO SEE IF IT IS REALLY OK!!!
+    tile->PushLine ((x1 & 31) << 16, y1 & 63, ((x2 & 31) << 16)
+    	-(yfurther ? 0 : dx),
     	(y2-1) & 63, dx);
     MarkTileDirty (tile_x1, tile_y1);
     return;

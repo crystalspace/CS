@@ -4,6 +4,14 @@ The history order is reversed so that new features are at the top.
 	- Enabled tiled culling by default in Dynavis. This gives a big
 	  improvement in fps and it seems to work properly.
 	- Disabled tiled culling again as it seems to crash in some cases.
+	- Fixed a small bug in tiled coverage buffer. I'm not convinced
+	  the tiled coverage buffer is 100% ok yet since I'm still
+	  experiencing crashes when I disable it. So there is some
+	  memory corruption going on. That's why it is still disabled
+	  by default. It does give a huge speed benefit though so if
+	  you have BugPlug in memory you can enable it by pressing the
+	  following keys one after the other:
+	  	ctrl-d v ctrl-d 5 ctrl-d v
 5-Nov-2002
 	- Fixed an old bug in frustvis and dynavis with relation to frustum
 	  culling. The cause of the bug was that the kdtree node bounding
