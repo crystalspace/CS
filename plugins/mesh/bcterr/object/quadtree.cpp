@@ -91,7 +91,11 @@ bool csColQuad::HitBeamOutline (csSegment3 seg,
     if (children[0])
     {
       for (i = 0; i < 4; i++)
-        return children[i]->HitBeamOutline (seg, isect, pr);
+      {
+        hit = children[i]->HitBeamOutline (seg, isect, pr);
+        if (hit)
+          return true;
+      }
     }
     return false;
   } else
@@ -135,17 +139,15 @@ bool csColQuad::HitBeamObject (csSegment3 seg,
         }
         work = blocks[i]->controlpoint + (length * j);
       }
-      //hit = BBoxLineIntersect (blocks[i]->bbox, seg, isect, pr);
-      hit = csIntersect3::BoxSegment (blocks[i]->bbox, seg, isect, pr);
-      if (hit)
-      {
-        return true;
-      }
     }
     if (children[0])
     {
       for (i = 0; i < 4; i++)
-        return children[i]->HitBeamObject (seg, isect, pr);
+      {
+        hit = children[i]->HitBeamObject (seg, isect, pr);
+        if (hit)
+          return true;
+      }
     }
     return false;
   } else
