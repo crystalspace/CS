@@ -32,10 +32,10 @@
 #include "csengine/camera.h"
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "ivideo/itxtmgr.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "ivideo/txtmgr.h"
 
 // An ugly hack to avoid "local relocation entries in non-writable section"
 // linkage error on OpenStep/HPPA/Sparc when csEngine library is linked into

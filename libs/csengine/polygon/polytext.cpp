@@ -33,9 +33,9 @@
 #include "csengine/quadcube.h"
 #include "csengine/lghtmap.h"
 #include "csutil/bitset.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
 
 // This is a private class used to track all postponed lighting references
 // for a lightmap that is shared by several polygons. See the large comment

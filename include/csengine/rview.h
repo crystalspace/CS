@@ -23,7 +23,7 @@
 #include "csgeom/frustum.h"
 #include "csengine/camera.h"
 #include "csutil/csvector.h"
-#include "iengine/irview.h"
+#include "iengine/rview.h"
 #include "iengine/shadows.h"
 
 class csMatrix3;

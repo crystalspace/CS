@@ -20,7 +20,7 @@
 #define __CS_PROTEX3D_H__
 
 #include "sft3dcom.h"
-#include "ivideo/isprotex.h"
+#include "ivideo/sproctxt.h"
 
 class csTextureHandleSoftware;
 class csTextureCacheSoftware;

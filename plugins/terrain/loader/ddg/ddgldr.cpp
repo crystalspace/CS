@@ -22,11 +22,11 @@
 #include "csengine/terrobj.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
-#include "iengine/iengine.h"
-#include "isys/isystem.h"
-#include "iterrain/itddg.h"
-#include "iterrain/iterrobj.h"
-#include "iengine/iterrobj.h"
+#include "iengine/engine.h"
+#include "isys/system.h"
+#include "iterrain/ddg.h"
+#include "iterrain/object.h"
+#include "iengine/terrain.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FACTORY)

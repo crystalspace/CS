@@ -30,7 +30,7 @@
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
-#include "ivideo/igraph3d.h"
+#include "ivideo/graph3d.h"
 
 struct iMaterialHandle;
 class csBspContainer;

@@ -27,13 +27,13 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/garray.h"
-#include "iengine/ithing.h"
-#include "iengine/imovable.h"
-#include "iengine/ipolmesh.h"
-#include "iengine/iviscull.h"
-#include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
-#include "iengine/irview.h"
+#include "iengine/thing.h"
+#include "iengine/movable.h"
+#include "iengine/polymesh.h"
+#include "iengine/viscull.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
+#include "iengine/rview.h"
 
 class csSector;
 class csEngine;

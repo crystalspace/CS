@@ -26,7 +26,7 @@
 #include "csengine/engine.h"
 #include "csengine/curve.h"
 #include "csutil/util.h"
-#include "isys/ivfs.h"
+#include "isys/vfs.h"
 
 csShadowMap::csShadowMap ()
 {

@@ -23,7 +23,7 @@
 #include "video/canvas/ps2d/ps2d.h"
 #include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 #include "SDL/SDL.h"
 #include <fakegl.h>

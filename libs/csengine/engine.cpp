@@ -55,13 +55,13 @@
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
-#include "igraphic/iimage.h"
-#include "isys/ivfs.h"
-#include "ivideo/ihalo.h"
-#include "ivideo/itxtmgr.h"
-#include "ivideo/igraph3d.h"
-#include "isys/ievent.h"
-#include "iutil/icfgmgr.h"
+#include "igraphic/image.h"
+#include "isys/vfs.h"
+#include "ivideo/halo.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/graph3d.h"
+#include "isys/event.h"
+#include "iutil/cfgmgr.h"
 
 //---------------------------------------------------------------------------
 

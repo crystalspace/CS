@@ -24,9 +24,9 @@
 #include "dsound.h"
 
 #include "csutil/scf.h"
-#include "isys/isystem.h"
-#include "iutil/icfgfile.h"
-#include "isys/ievent.h"
+#include "isys/system.h"
+#include "iutil/cfgfile.h"
+#include "isys/event.h"
 
 #include "sndrdr.h"
 #include "sndlstn.h"

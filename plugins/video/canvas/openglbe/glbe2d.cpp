@@ -20,7 +20,7 @@
 #include "csutil/scf.h"
 #include "glbe2d.h"
 #include "CrystGLWindow.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include <Screen.h>
 
 IMPLEMENT_FACTORY (csGraphics2DGLBe)

@@ -24,11 +24,11 @@
 #include "csengine/engine.h"
 #include "csgeom/polyclip.h"
 #include "csutil/halogen.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
 
 // The speed at which halo brightens/vanishes in milliseconds per frame
 #define HALO_FRAME_TIME        20

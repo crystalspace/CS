@@ -19,7 +19,7 @@
 #ifndef _CSRLECODEC_H_
 #define _CSRLECODEC_H_
 
-#include "ivideo/ividecod.h"
+#include "ivideo/codec.h"
 #include "plugins/video/format/avi/iavicdec.h"
 #include "csgfxldr/rgbpixel.h"
 

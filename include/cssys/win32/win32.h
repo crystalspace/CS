@@ -37,7 +37,7 @@
 
 #if defined(COMP_VC)
 #include "cssys/csinput.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/graph2d.h"
 #endif
 
 #include "cssys/system.h"

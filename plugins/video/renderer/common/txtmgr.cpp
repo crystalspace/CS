@@ -23,11 +23,11 @@
 #include "txtmgr.h"
 #include "csutil/util.h"
 #include "qint.h"
-#include "igraphic/iimage.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
-#include "isys/isystem.h"
-#include "ivideo/igraph2d.h"
+#include "igraphic/image.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "isys/system.h"
+#include "ivideo/graph2d.h"
 
 //---------------------------------------------------------- csTextureHandle -----//
 

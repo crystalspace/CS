@@ -19,7 +19,7 @@
 #ifndef _DDGLDR_H_
 #define _DDGLDR_H_
 
-#include "imap/ildrplug.h"
+#include "imap/reader.h"
 
 struct iEngine;
 struct iSystem;

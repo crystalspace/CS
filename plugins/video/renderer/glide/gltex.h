@@ -21,9 +21,9 @@
 
 #include "csutil/scf.h"
 #include "video/renderer/common/txtmgr.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "igraphic/iimage.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "igraphic/image.h"
 
 class csGraphics3DGlide;
 class csGlideProcedural;

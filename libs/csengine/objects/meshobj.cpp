@@ -22,8 +22,8 @@
 #include "csengine/light.h"
 #include "csengine/engine.h"
 #include "csengine/thing.h"
-#include "ivideo/igraph3d.h"
-#include "iengine/irview.h"
+#include "ivideo/graph3d.h"
+#include "iengine/rview.h"
 
 IMPLEMENT_CSOBJTYPE (csMeshWrapper, csPObject)
 

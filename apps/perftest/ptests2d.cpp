@@ -18,10 +18,10 @@
 */
 
 #include "cssysdef.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/itxtmgr.h"
-#include "ivideo/ifontsrv.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/fontserv.h"
 #include "apps/perftest/ptests2d.h"
 
 void Tester2D::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)

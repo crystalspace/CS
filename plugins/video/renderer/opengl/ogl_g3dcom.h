@@ -34,8 +34,8 @@
 #include "video/renderer/common/dpmesh.h"
 #include "csgeom/transfrm.h"
 #include "ogl_txtmgr.h"
-#include "ivideo/igraph3d.h"
-#include "isys/iplugin.h"
+#include "ivideo/graph3d.h"
+#include "isys/plugin.h"
 
 struct iGraphics2D;
 class OpenGLTextureCache;

@@ -21,7 +21,7 @@
 #define __CS_CSPMETER_H__
 
 #include "csutil/csbase.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 /**
  * The csProgressMeter class displays a simple percentage-style textual

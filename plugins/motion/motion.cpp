@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "motion.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "csgeom/transfrm.h"
 #include "csutil/hashmap.h"
 

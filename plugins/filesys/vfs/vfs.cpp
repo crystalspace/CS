@@ -33,7 +33,7 @@
 #include "csutil/scfstrv.h"
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"

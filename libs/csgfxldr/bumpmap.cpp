@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csgfxldr/bumpmap.h"
 #include "csgfxldr/rgbpixel.h"
-#include "igraphic/iimage.h"
+#include "igraphic/image.h"
 
 csBumpMap::csBumpMap (iImage* src, int fmt)
 {

@@ -21,11 +21,11 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "explo.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
-#include "iengine/iengine.h"
-#include "iengine/idlight.h"
-#include "iengine/ilight.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "iengine/engine.h"
+#include "iengine/dynlight.h"
+#include "iengine/light.h"
 #include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>

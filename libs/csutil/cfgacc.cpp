@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/cfgacc.h"
-#include "iutil/icfgmgr.h"
+#include "iutil/cfgmgr.h"
 
 csConfigAccess::csConfigAccess()
 {

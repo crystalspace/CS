@@ -20,8 +20,8 @@
 #define __FUNCON_H__
 
 #include "cscon.h"
-#include "ivideo/igraph3d.h"
-#include "isys/ivfs.h"
+#include "ivideo/graph3d.h"
+#include "isys/vfs.h"
 
 struct ConDecoBorder
 {

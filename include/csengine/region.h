@@ -20,7 +20,7 @@
 #define __CS_REGION_H__
 
 #include "csobject/csobject.h"
-#include "iengine/iregion.h"
+#include "iengine/region.h"
 
 class csEngine;
 

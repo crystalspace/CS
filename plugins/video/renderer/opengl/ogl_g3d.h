@@ -32,7 +32,7 @@
 #include "ogl_g3dcom.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
-#include "isys/iplugin.h"
+#include "isys/plugin.h"
 
 struct iGraphics3D;
 

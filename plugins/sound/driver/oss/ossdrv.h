@@ -26,7 +26,7 @@
 // csSoundDriverOSS class.
 
 #include "csutil/scf.h"
-#include "isound/isnddrv.h"
+#include "isound/driver.h"
 
 #include <sys/types.h>
 #include <sys/ipc.h>

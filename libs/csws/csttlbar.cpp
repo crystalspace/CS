@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/csttlbar.h"
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 csTitleBar::csTitleBar (csComponent *iParent, const char *iText)
   : csComponent (iParent)

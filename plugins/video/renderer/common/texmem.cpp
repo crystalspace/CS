@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include "cssysdef.h"
 #include "texmem.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 /**
   * This function provides a state of the current fragmentation 

@@ -20,8 +20,8 @@
 #ifndef _BALLLDR_H_
 #define _BALLLDR_H_
 
-#include "imap/ildrplug.h"
-#include "imap/isvrplg.h"
+#include "imap/reader.h"
+#include "imap/writer.h"
 
 struct iEngine;
 struct iSystem;

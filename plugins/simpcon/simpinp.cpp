@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "simpinp.h"
-#include "ivaria/iconsole.h"
-#include "isys/isystem.h"
-#include "isys/ievent.h"
+#include "ivaria/conout.h"
+#include "isys/system.h"
+#include "isys/event.h"
 
 IMPLEMENT_IBASE (csSimpleInput)
   IMPLEMENTS_INTERFACE (iPlugIn)

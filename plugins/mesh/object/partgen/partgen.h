@@ -24,10 +24,10 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
-#include "ivideo/igraph3d.h"
-#include "imesh/imeshobj.h"
-#include "imesh/impartic.h"
-#include "imesh/iparticl.h"
+#include "ivideo/graph3d.h"
+#include "imesh/object.h"
+#include "imesh/partsys.h"
+#include "imesh/particle.h"
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;

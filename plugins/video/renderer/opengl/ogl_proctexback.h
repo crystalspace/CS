@@ -31,9 +31,9 @@
 #ifndef _OGL_PROCTEXBACK_H_
 #define _OGL_PROCTEXBACK_H_
 
-#include "ivideo/igraph3d.h"
-#include "ivideo/igraph2d.h"
-#include "isys/isystem.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "isys/system.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "ogl_g3dcom.h"

@@ -25,7 +25,7 @@
 #include "csobject/objiter.h"
 #include "csutil/csbase.h"
 #include "csutil/util.h"
-#include "iobject/iobject.h"
+#include "iobject/object.h"
 
 /**
  * A generic csObject class.

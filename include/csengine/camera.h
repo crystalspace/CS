@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
-#include "iengine/icamera.h"
+#include "iengine/camera.h"
 #include "csengine/planeclp.h"
 
 class csSector;

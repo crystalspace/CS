@@ -24,7 +24,7 @@
 
 #include "csgeom/math2d.h"
 #include "csgeom/polypool.h"
-#include "igeom/iclip2.h"
+#include "igeom/clip2d.h"
 
 class Dumper;
 

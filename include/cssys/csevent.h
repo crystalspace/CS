@@ -20,7 +20,7 @@
 #ifndef __CSEVENT_H__
 #define __CSEVENT_H__
 
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 /**
  * This class represents a system event.<p>

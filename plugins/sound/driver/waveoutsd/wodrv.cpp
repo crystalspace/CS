@@ -23,9 +23,9 @@
 #include <mmsystem.h>
 
 #include "csutil/scf.h"
-#include "isys/isystem.h"
-#include "isound/isndrdr.h"
-#include "iutil/icfgfile.h"
+#include "isys/system.h"
+#include "isound/renderer.h"
+#include "iutil/cfgfile.h"
 #include "wodrv.h"
 
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)

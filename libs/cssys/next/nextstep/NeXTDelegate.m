@@ -20,7 +20,7 @@
 #include "NeXTDelegate.h"
 #include "NeXTKeymap.h"
 #include "NeXTMenu.h"
-#include "isys/ievdefs.h"
+#include "isys/evdefs.h"
 #include "cssys/next/NeXTSystemDriver.h"
 #include <errno.h>
 #include <libc.h>

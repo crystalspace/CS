@@ -20,7 +20,7 @@
 //	MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
-#include "ivideo/icursor.h"
+#include "ivideo/cursor.h"
 
 #if !defined(__cplusplus)
 

@@ -24,8 +24,8 @@
 #include "csengine/bsp.h"
 #include "csgeom/math3d.h"
 #include "csutil/cscolor.h"
-#include "iengine/isector.h"
-#include "ivideo/igraph3d.h"
+#include "iengine/sector.h"
+#include "ivideo/graph3d.h"
 
 class csThing;
 class csEngine;

@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "plugins/mesh/object/partgen/partgen.h"
-#include "imesh/imfire.h"
+#include "imesh/fire.h"
 
 struct iMaterialWrapper;
 struct iLight;

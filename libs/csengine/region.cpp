@@ -32,7 +32,7 @@
 #include "csobject/objiter.h"
 #include "csengine/terrobj.h"
 #include "csutil/csvector.h"
-#include "ivideo/itxtmgr.h"
+#include "ivideo/txtmgr.h"
 
 //---------------------------------------------------------------------------
 

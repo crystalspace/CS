@@ -24,10 +24,10 @@
 #include "video/canvas/common/protex2d.h"
 #include "qint.h"
 #include "scrshot.h"
-#include "isys/isystem.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
+#include "isys/system.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
 
 csGraphics2D::csGraphics2D ()
 {

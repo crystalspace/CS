@@ -38,12 +38,12 @@
 #include "csutil/scanstr.h"
 #include "walktest.h"
 #include "qint.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/igraph2d.h"
-#include "ivaria/iconsole.h"
-#include "isys/ievent.h"
-#include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivaria/conout.h"
+#include "isys/event.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
 
 extern WalkTest* Sys;
 

@@ -36,11 +36,11 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "ossdrv.h"
-#include "isys/iplugin.h"
-#include "isys/isystem.h"
-#include "isound/isndlstn.h"
-#include "isound/isndsrc.h"
-#include "isound/isndrdr.h"
+#include "isys/plugin.h"
+#include "isys/system.h"
+#include "isound/listener.h"
+#include "isound/source.h"
+#include "isound/renderer.h"
 
 IMPLEMENT_FACTORY(csSoundDriverOSS)
 

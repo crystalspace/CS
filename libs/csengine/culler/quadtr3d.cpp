@@ -22,7 +22,7 @@
 #include "csengine/engine.h" /* for CsPrintf() -- bleh */
 #include "csgeom/frustum.h"
 #include "csgeom/poly2d.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 /// computes 2**x
 static int Pow2(int x)

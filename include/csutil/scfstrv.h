@@ -20,7 +20,7 @@
 #ifndef __CS_SCFSTRV_H__
 #define __CS_SCFSTRV_H__
 
-#include "iutil/istrvec.h"
+#include "iutil/strvec.h"
 #include "csutil/csstrvec.h"
 
 /// This class is a thin wrapper around csStrVector with SCF capability

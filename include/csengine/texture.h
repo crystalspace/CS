@@ -23,9 +23,9 @@
 #include "csobject/csobject.h"
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
 
 class csTextureWrapper;
 struct iTextureManager;

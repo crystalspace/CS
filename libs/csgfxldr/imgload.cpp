@@ -21,7 +21,7 @@
 #include <assert.h>
 
 #include "cssysdef.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
 

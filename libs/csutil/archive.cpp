@@ -29,7 +29,7 @@
 #include "cssys/csendian.h"
 #include "csutil/util.h"
 #include "csutil/archive.h"
-#include "isys/ivfs.h"	// For csFileTime
+#include "isys/vfs.h"	// For csFileTime
 
 // Default compression method to use when adding entries (there is no choice for now)
 #ifndef DEFAULT_COMPRESSION_METHOD

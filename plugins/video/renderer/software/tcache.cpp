@@ -22,8 +22,8 @@
 #include "tcache.h"
 #include "soft_g3d.h"
 #include "soft_txt.h"
-#include "iengine/ilghtmap.h"
-#include "isys/isystem.h"
+#include "iengine/lightmap.h"
+#include "isys/system.h"
 
 static int hash_table [384];
 

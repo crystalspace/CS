@@ -19,7 +19,7 @@
 #ifndef __MOTION_H__
 #define __MOTION_H__
 
-#include "iengine/imotion.h"
+#include "iengine/motion.h"
 #include "csutil/csvector.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/matrix3.h"

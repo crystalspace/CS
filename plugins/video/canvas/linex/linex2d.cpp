@@ -25,8 +25,8 @@
 #include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
-#include "isys/isystem.h"
-#include "iutil/icfgmgr.h"
+#include "isys/system.h"
+#include "iutil/cfgmgr.h"
 
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
 IMPLEMENT_FACTORY (csLineX2DFontServer)

@@ -20,7 +20,7 @@
 #ifndef __SOUNDRAW_H__
 #define __SOUNDRAW_H__
 
-#include "isound/isnddata.h"
+#include "isound/data.h"
 
 class csSoundDataRaw : public iSoundData {
 friend class csSoundStreamRaw;

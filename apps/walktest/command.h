@@ -19,8 +19,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "ivideo/igraph3d.h"
-#include "isys/ivfs.h"
+#include "ivideo/graph3d.h"
+#include "isys/vfs.h"
 
 class csSystemDriver;
 class csEngine;

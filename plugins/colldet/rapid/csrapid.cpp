@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "plugins/colldet/rapid/csrapid.h"
 #include "plugins/colldet/rapid/rapcol.h"
-#include "iengine/ipolmesh.h"
+#include "iengine/polymesh.h"
 
 IMPLEMENT_IBASE (csRapidCollider)
   IMPLEMENTS_INTERFACE (iCollider)

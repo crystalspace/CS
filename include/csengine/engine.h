@@ -25,10 +25,10 @@
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
-#include "ivideo/igraph3d.h"
-#include "isys/isystem.h"
-#include "iengine/iengine.h"
-#include "iutil/iconfig.h"
+#include "ivideo/graph3d.h"
+#include "isys/system.h"
+#include "iengine/engine.h"
+#include "iutil/config.h"
 
 class csRegion;
 class csRadiosity;

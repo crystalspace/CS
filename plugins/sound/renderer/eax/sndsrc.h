@@ -21,7 +21,7 @@
 #ifndef __CSSOUNDSOURCEEAX_H__
 #define __CSSOUNDSOURCEEAX_H__
 
-#include "isound/isndsrc.h"
+#include "isound/source.h"
 struct iSoundData;
 
 class csSoundSourceEAX : public iSoundSource

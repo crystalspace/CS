@@ -20,7 +20,7 @@
 #include "cssys/win32/directdetection.h"
 #include "csutil/csrect.h"
 #include "g2d_61.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 #ifndef DD_FALSE 
   // This is normally being done in the ddraw.h file

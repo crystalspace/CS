@@ -5,8 +5,8 @@
 // just wanted to see some stuff bouncing around for now. 
 #include "csphyzik/ctcat.h"
 #include "csengine/collider.h"
-#include "iengine/icollide.h"
-#include "isys/isystem.h"
+#include "iengine/collider.h"
+#include "isys/system.h"
 
 class csEngine;
 class csMeshWrapper;

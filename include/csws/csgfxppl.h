@@ -23,7 +23,7 @@
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
 #include "csfx/cspixmap.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/graph2d.h"
 
 class csMouse;
 struct iGraphics2D;

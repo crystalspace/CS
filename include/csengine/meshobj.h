@@ -22,9 +22,9 @@
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "csengine/movable.h"
-#include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
-#include "iengine/iviscull.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
+#include "iengine/viscull.h"
 
 struct iMeshWrapper;
 struct iRenderView;

@@ -24,9 +24,9 @@
 #include "csgeom/vector3.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
-#include "iterrain/iterrobj.h"
-#include "iengine/iterrobj.h"
-#include "iterrain/itddg.h"
+#include "iterrain/object.h"
+#include "iengine/terrain.h"
+#include "iterrain/ddg.h"
 
 class ddgContext;
 class csDDGTerrainObjectFactory;

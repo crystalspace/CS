@@ -20,7 +20,7 @@
 #ifndef __SCFSTR_H__
 #define __SCFSTR_H__
 
-#include "iutil/istring.h"
+#include "iutil/string.h"
 #include "csutil/csstring.h"
 
 /// This is a thin SCF wrapper around csString

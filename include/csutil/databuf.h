@@ -20,7 +20,7 @@
 #ifndef __DATABUF_H__
 #define __DATABUF_H__
 
-#include "iutil/idatabuf.h"
+#include "iutil/databuff.h"
 
 /**
  * This is a implementation of iDataBuffer interface.

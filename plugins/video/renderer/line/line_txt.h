@@ -21,7 +21,7 @@
 #define __LINE_TXT_H__
 
 #include "video/renderer/common/txtmgr.h"
-#include "igraphic/iimage.h"
+#include "igraphic/image.h"
 
 class csTextureManagerLine;
 

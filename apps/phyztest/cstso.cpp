@@ -4,7 +4,7 @@
 #include "csengine/meshobj.h"
 #include "csengine/sector.h"
 #include "phyztest.h"
-#include "iengine/ipolmesh.h"
+#include "iengine/polymesh.h"
 
 extern ctWorld phyz_world;
 extern Phyztest *Sys;

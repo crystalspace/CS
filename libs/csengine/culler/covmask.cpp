@@ -21,7 +21,7 @@
 #include "csgeom/math2d.h"
 #include "csengine/engine.h"
 #include "csengine/covmask.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/graph2d.h"
 
 void csCovMask::Dump () const
 {

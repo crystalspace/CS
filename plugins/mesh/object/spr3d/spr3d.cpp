@@ -21,12 +21,12 @@
 #include "csgeom/polyclip.h"
 #include "csutil/garray.h"
 #include "csutil/rng.h"
-#include "ivideo/igraph3d.h"
-#include "isys/isystem.h"
-#include "iengine/icamera.h"
-#include "iengine/irview.h"
-#include "iengine/imovable.h"
-#include "iengine/ilight.h"
+#include "ivideo/graph3d.h"
+#include "isys/system.h"
+#include "iengine/camera.h"
+#include "iengine/rview.h"
+#include "iengine/movable.h"
+#include "iengine/light.h"
 #include "qsqrt.h"
 
 // Set the default lighting quality.

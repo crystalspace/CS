@@ -32,8 +32,8 @@
 #include "csengine/polytext.h"
 #include "csengine/octree.h"
 #include "csengine/material.h"
-#include "iengine/ipolygon.h"
-#include "iengine/isector.h"
+#include "iengine/polygon.h"
+#include "iengine/sector.h"
 
 class csSector;
 class StatLight;

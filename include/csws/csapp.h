@@ -30,8 +30,8 @@
 #include "cssys/cseventq.h"
 #include "csutil/csstrvec.h"
 #include "csutil/cfgacc.h"
-#include "isys/iplugin.h"
-#include "isys/ievent.h"
+#include "isys/plugin.h"
+#include "isys/event.h"
 
 class csSkin;
 

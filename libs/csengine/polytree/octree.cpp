@@ -32,8 +32,8 @@
 #include "csengine/thing.h"
 #include "csengine/dumper.h"
 #include "csutil/memfile.h"
-#include "isys/isystem.h"
-#include "isys/ivfs.h"
+#include "isys/system.h"
+#include "isys/vfs.h"
 
 //---------------------------------------------------------------------------
 

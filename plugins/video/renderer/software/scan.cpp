@@ -23,8 +23,8 @@
 #include "tcache.h"
 #include "soft_txt.h"
 #include "sft3dcom.h"
-#include "isys/isystem.h"
-#include "iengine/ipolygon.h"
+#include "isys/system.h"
+#include "iengine/polygon.h"
 #include "sttest.h"
 
 /// The only instance of this structure lives here

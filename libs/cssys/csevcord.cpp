@@ -21,8 +21,8 @@
 #include "csutil/scf.h"
 #include "cssys/system.h"
 #include "cssys/csevcord.h"
-#include "isys/iplugin.h"
-#include "isys/ievent.h"
+#include "isys/plugin.h"
+#include "isys/event.h"
 
 IMPLEMENT_IBASE (csEventCord)
   IMPLEMENTS_INTERFACE (iEventCord)

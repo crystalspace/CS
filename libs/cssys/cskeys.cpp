@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 #include <ctype.h>
 

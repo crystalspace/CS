@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 /// XLIB version.
 class csGraphics2Dps2 : public csGraphics2D, public iEventPlug

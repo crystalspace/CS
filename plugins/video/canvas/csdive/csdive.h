@@ -21,7 +21,7 @@
 #define __CSDIVE_H__
 
 #include "video/canvas/common/graph2d.h"
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 // avoid including os2.h
 class diveWindow;

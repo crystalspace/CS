@@ -21,7 +21,7 @@
 #ifndef __CSSOUNDSOURCEDS3D_H__
 #define __CSSOUNDSOURCEDS3D_H__
 
-#include "isound/isndsrc.h"
+#include "isound/source.h"
 struct iSoundData;
 
 class csSoundSourceDS3D : public iSoundSource

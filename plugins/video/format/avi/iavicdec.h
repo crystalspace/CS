@@ -20,7 +20,7 @@
 #define _IAVICDEC_H_
 
 #include "csutil/scf.h"
-#include "ivideo/ividecod.h"
+#include "ivideo/codec.h"
 
 SCF_VERSION (iAVICodec, 0, 0, 1);
 

@@ -19,7 +19,7 @@
 #ifndef _ODIVX_H_
 #define _ODIVX_H_
 
-#include "ivideo/ividecod.h"
+#include "ivideo/codec.h"
 #include "plugins/video/format/avi/iavicdec.h"
 
 class csOpenDivX : public iAVICodec

@@ -23,7 +23,7 @@
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
-#include "iengine/isector.h"
+#include "iengine/sector.h"
 
 //---------------------------------------------------------------------------
 

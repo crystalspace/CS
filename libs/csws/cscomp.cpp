@@ -26,16 +26,16 @@
 #include "csfx/cspixmap.h"
 #include "cssys/csinput.h"
 #include "qint.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/graph2d.h"
 #include "csws/cscomp.h"
 #include "csws/csapp.h"
 #include "csws/csmouse.h"
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
 #include "csws/cswsaux.h"
-#include "isys/isystem.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
+#include "isys/system.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 

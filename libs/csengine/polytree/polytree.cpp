@@ -23,8 +23,8 @@
 #include "csengine/bspbbox.h"
 #include "csengine/engine.h"
 #include "cssys/csendian.h"
-#include "isys/ivfs.h"
-#include "isys/isystem.h"
+#include "isys/vfs.h"
+#include "isys/system.h"
 
 csPolygonTreeNode::~csPolygonTreeNode ()
 {

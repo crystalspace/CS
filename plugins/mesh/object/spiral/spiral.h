@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "plugins/mesh/object/partgen/partgen.h"
-#include "imesh/imspiral.h"
+#include "imesh/spiral.h"
 
 /**
  * This class has a set of particles that act like a spiraling

@@ -1,52 +1,65 @@
 The history order has been reversed so that new features are at the top.
 
+16-Mar-2001
+	- Eric Sunshine renamed all of the pure SCF interface header files.
+	  Considering that that these files were recently organized into
+	  well-named subdirectories, it is possible to use more descriptive
+	  names for the files themselves.  Also dropped the `i' prefix.  Here
+	  are just a few examples of the new more meaningful and descriptive
+	  names:
+	    iengine/idlight.h  --> iengine/dynlight.h
+	    iengine/imeshobj.h --> iengine/mesh.h
+	    imesh/imeshobj.h   --> imesh/object.h
+	    imesh/mfire.h      --> imesh/fire.h
+	    imap/ildrplug.h    --> imap/reader.h
+	    imap/isvrplg.h     --> imap/writer.h
+	    isound/isnddrv.h   --> isound/driver.h
+	    isound/isndlstn.h  --> isound/listener.h
+	    ivideo/imater.h    --> ivideo/material.h
 15-Mar-2001
 	- Let csShadowIterator implement iShadowIterator.
 	- Let csShadowBlock implement iShadowBlock.
 	- Let csShadowBlockList implement iShadowBlockList.
 	- Philip Wyett fixed on exit errors under VC6 builds/Windows for
-	  demosky. Removed cleanup function from app and moved
-	  delete System; to apps destructor.
+	  demosky.  Removed cleanup function from app and moved delete System;
+	  to apps destructor.
 	- Wouter Wijngaards fixed a bug in the procedural sky - when you
-	  stopped animation, different polygons could be out of synch.
-	  Now all skytextures of a procedural sky are set to a forced
-	  rerender for the next time they become visible.
-	- Wouter also got animated sky to work correctly.
-	  SetAnimated(false, ...) now takes a *lot* of time. (like a second
-	  or so). But during this time all sky textures are brought
-	  up to date. This makes the sky look seamless, and you are
-	  guaranteed no more slowdowns.
+	  stopped animation, different polygons could be out of synch.  Now all
+	  skytextures of a procedural sky are set to a forced rerender for the
+	  next time they become visible.
+	- Wouter also got animated sky to work correctly.  SetAnimated(false,
+	  ...) now takes a *lot* of time.  (like a second or so).  But during
+	  this time all sky textures are brought up to date.  This makes the
+	  sky look seamless, and you are guaranteed no more slowdowns.
 14-Mar-2001
-	- Fixed a bug in csRenderView. IncRef() should be DecRef(). Thanks
-	  to Norman Kramer for spotting this.
+	- Fixed a bug in csRenderView.  IncRef() should be DecRef().  Thanks to
+	  Norman Kramer for spotting this.
 	- Philip Wyett changed Visual C++ service pack recommendation to 5.
-	- Norman Kramer fixed the crashes that occured when farplanes were
-	  used (overlooked the problem a few times before realizing whats
-	  going on!).
+	- Norman Kramer fixed the crashes that occured when farplanes were used
+	  (overlooked the problem a few times before realizing whats going
+	  on!).
 13-Mar-2001
-	- Philip Wyett fixed VC6 compile error in 'plgengine', created
-	  by move of 'int ApplicationShow;'. Modification was made to SCF
-	  interface to allow correct usage of it and leaving Martins
-	  intention of being able to create apps without 'cssys'
-	  intact.
-	- Reverted part of the patch from Philip because otherwise OpenGL
-	  would not open a window when running apps (if using MingW).
+	- Philip Wyett fixed VC6 compile error in 'plgengine', created by move
+	  of 'int ApplicationShow;'.  Modification was made to SCF interface to
+	  allow correct usage of it and leaving Martins intention of being able
+	  to create apps without 'cssys' intact.
+	- Reverted part of the patch from Philip because otherwise OpenGL would
+	  not open a window when running apps (if using MingW).
 12-Mar-2001
-	- Robert Bate updated the Mac project files and added project files
-	  for terrain plugin.
+	- Robert Bate updated the Mac project files and added project files for
+	  terrain plugin.
 	- Martin Geisse did a small update to the windows docs.
 	- Martin also fixed a bug in the system driver.
-	- Martin moved the 'ApplicationShow' variable from cssys to
-	  cswin32exe, so you can create applications that don't use cssys.
-	- Added a new constructor csFrustum with which you can create
-	  a frustum that already has place for the right number of vertices
-	  but the vertices are not initialized yet.
-	- Added new csVector3 and csVector2 Set() routine that accepts
-	  another csVector3 or csVector2 respectively.
-	- Did more work on cleaning up the shadow frustum code in order
-	  to make it easier to make it SCF interfaces. For example,
-	  csShadowFrustum is now completely private to the shadow block
-	  classes.
+	- Martin moved the 'ApplicationShow' variable from cssys to cswin32exe,
+	  so you can create applications that don't use cssys.
+	- Added a new constructor csFrustum with which you can create a frustum
+	  that already has place for the right number of vertices but the
+	  vertices are not initialized yet.
+	- Added new csVector3 and csVector2 Set() routine that accepts another
+	  csVector3 or csVector2 respectively.
+	- Did more work on cleaning up the shadow frustum code in order to make
+	  it easier to make it SCF interfaces.  For example, csShadowFrustum is
+	  now completely private to the shadow block classes.
 	- Eric Sunshine performed some rewriting of material recently added to
 	  simple.txi.
 	- Eric Sunshine eliminated an `overfull hbox' warning reported by TeX

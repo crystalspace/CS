@@ -26,9 +26,9 @@
 #include "csengine/cbuffer.h"
 #include "csengine/quadtr3d.h"
 #include "csengine/covtree.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "iengine/irview.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "iengine/rview.h"
 
 IMPLEMENT_IBASE (csPortal)
   IMPLEMENTS_INTERFACE (iPortal)

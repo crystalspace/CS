@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "video/canvas/common/x11comm.h"
 #include "video/canvas/common/scancode.h"
 #include "video/renderer/glide/gllib.h"

@@ -39,8 +39,8 @@
 #include "csengine/octree.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 
 #define Gfx3D System->G3D
 #define Gfx2D System->G2D

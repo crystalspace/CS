@@ -22,8 +22,8 @@
 
 #include "csobject/csobject.h"
 #include "csutil/csvector.h"
-#include "iterrain/iterrobj.h"
-#include "iengine/iterrobj.h"
+#include "iterrain/object.h"
+#include "iengine/terrain.h"
 
 struct iEngine;
 struct iTerrainWrapper;

@@ -22,7 +22,7 @@
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/common/scrshot.h"
 #include "csutil/csrect.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "qint.h"
 
 IMPLEMENT_IBASE (csGraphics2DGLCommon)

@@ -20,7 +20,7 @@
 #include "csgeom/math2d.h"
 #include "csengine/covmask.h"
 #include "csengine/covtree.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/graph2d.h"
 
 //---------------------------------------------------------------------------
 

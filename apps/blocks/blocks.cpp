@@ -46,17 +46,17 @@
 #include "csengine/thing.h"
 #include "csengine/textrans.h"
 #include "csengine/csview.h"
-#include "isys/ivfs.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
-#include "isound/isndrdr.h"
+#include "isys/vfs.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+#include "isound/renderer.h"
 #include "csparser/snddatao.h"
-#include "isound/isnddata.h"
-#include "ivideo/ifontsrv.h"
-#include "iutil/icfgmgr.h"
+#include "isound/data.h"
+#include "ivideo/fontserv.h"
+#include "iutil/cfgmgr.h"
 
 #if defined(BLOCKS_NETWORKING)
-#include "inetwork/inetdrv.h"
+#include "inetwork/driver.h"
 #endif
 
 //-----------------------------------------------------------------------------

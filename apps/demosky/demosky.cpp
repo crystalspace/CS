@@ -32,13 +32,13 @@
 #include "csfx/proctex.h"
 #include "csfx/prsky.h"
 #include "csparser/csloader.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
-#include "ivaria/iconsole.h"
-#include "ivideo/ifontsrv.h"
-#include "imesh/imspr2d.h"
-#include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+#include "ivaria/conout.h"
+#include "ivideo/fontserv.h"
+#include "imesh/sprite2d.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

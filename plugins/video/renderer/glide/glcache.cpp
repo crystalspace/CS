@@ -25,10 +25,10 @@
 #include "gltex.h"
 #include "glcache.h"
 #include "gllib.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "iengine/ipolygon.h"
-#include "iengine/ilghtmap.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "iengine/polygon.h"
+#include "iengine/lightmap.h"
 
 IMPLEMENT_IBASE (csGlideTextureCache)
 IMPLEMENT_IBASE_END

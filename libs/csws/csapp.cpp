@@ -33,10 +33,10 @@
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
 #include "csws/cswsaux.h"
-#include "isys/isystem.h"
-#include "isys/ivfs.h"
-#include "ivideo/itxtmgr.h"
-#include "isys/ievent.h"
+#include "isys/system.h"
+#include "isys/vfs.h"
+#include "ivideo/txtmgr.h"
+#include "isys/event.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 

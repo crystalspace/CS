@@ -23,7 +23,7 @@
 #include "csutil/csbase.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
-#include "iengine/iview.h"
+#include "iengine/view.h"
 
 class csPolygon2D;
 class csCamera;

@@ -30,7 +30,7 @@
 #ifndef _GLPROCTEX_H_
 #define _GLPROCTEX_H_
 
-#include "ivideo/igraph3d.h"
+#include "ivideo/graph3d.h"
 
 class csGraphics3DGlide;
 class csTextureHandleGlide;

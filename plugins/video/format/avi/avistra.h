@@ -19,7 +19,7 @@
 #ifndef _AVI_AUDIOSTREAM_H_
 #define _AVI_AUDIOSTREAM_H_
 
-#include "ivideo/ividecod.h"
+#include "ivideo/codec.h"
 #include "csavi.h"
 #include "iavicdec.h"
 

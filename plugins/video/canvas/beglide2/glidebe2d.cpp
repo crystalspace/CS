@@ -21,7 +21,7 @@
 #include "glidebe2d.h"
 #include "crystglidewindow.h"
 #include "csutil/csrect.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include <Screen.h>
 
 IMPLEMENT_FACTORY (csGraphics2DBeGlide)

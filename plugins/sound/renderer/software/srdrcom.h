@@ -28,7 +28,7 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
-#include "isound/isndrdr.h"
+#include "isound/renderer.h"
 
 struct iSoundDriver;
 struct iConfigFile;

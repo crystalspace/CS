@@ -17,11 +17,11 @@
 */
 
 #include "cssysdef.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
 #include "qint.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"

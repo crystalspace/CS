@@ -24,10 +24,10 @@
 #include "csgfxldr/inv_cmap.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "iutil/icfgfile.h"
-#include "isys/ievent.h"
-#include "isys/isystem.h"
-#include "igraphic/iimage.h"
+#include "iutil/cfgfile.h"
+#include "isys/event.h"
+#include "isys/system.h"
+#include "igraphic/image.h"
 
 #define SysPrintf System->Printf
 

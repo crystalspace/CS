@@ -20,9 +20,9 @@
 #include "qint.h"
 #include "csengine/cbuffer.h"
 #include "csengine/engine.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 
 //---------------------------------------------------------------------------
 

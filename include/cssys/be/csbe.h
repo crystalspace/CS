@@ -22,8 +22,8 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "cssys/system.h"
-#include "isys/ievent.h"
-#include "ivideo/igraph2d.h" // csMouseCursorID
+#include "isys/event.h"
+#include "ivideo/graph2d.h" // csMouseCursorID
 #include <Handler.h>
 #include <MessageQueue.h>
 

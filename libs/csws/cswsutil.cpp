@@ -25,7 +25,7 @@
 #include "csws/cswsaux.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Window list --//--
 

@@ -20,11 +20,11 @@
 #ifndef __SIMPCONS_H__
 #define __SIMPCONS_H__
 
-#include "isys/isystem.h"
-#include "ivaria/iconsole.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/ifontsrv.h"
+#include "isys/system.h"
+#include "ivaria/conout.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/fontserv.h"
 #include "csutil/csbase.h"
 #include "csutil/scf.h"
 

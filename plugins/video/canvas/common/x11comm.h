@@ -20,7 +20,7 @@
 #ifndef __X11COMM_H__
 #define __X11COMM_H__
 
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 /**
  * Query user preferences through iSystem interface:

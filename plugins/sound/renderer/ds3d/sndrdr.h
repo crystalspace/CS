@@ -24,8 +24,8 @@
 // SoundRender.H
 // csSoundRenderDS3D class.
 
-#include "isound/isnddata.h"
-#include "isound/isndrdr.h"
+#include "isound/data.h"
+#include "isound/renderer.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 

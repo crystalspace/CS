@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "plugins/mesh/object/partgen/partgen.h"
-#include "imesh/imexplo.h"
+#include "imesh/explode.h"
 
 struct iMaterialWrapper;
 struct iSector;

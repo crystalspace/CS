@@ -19,13 +19,13 @@
 #ifndef _AVI_VIDEOSTREAM_H_
 #define _AVI_VIDEOSTREAM_H_
 
-#include "ivideo/ividecod.h"
+#include "ivideo/codec.h"
 #include "csavi.h"
 #include "csutil/csrect.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
 #include "csgfxldr/memimage.h"
 #include "iavicdec.h"
 

@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csws/cslayout.h"
 #include "csws/cswindow.h"
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 csLayoutConstraint *csLayoutConstraint::Clone ()
 {

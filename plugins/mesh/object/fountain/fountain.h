@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "plugins/mesh/object/partgen/partgen.h"
-#include "imesh/imfount.h"
+#include "imesh/fountain.h"
 
 struct iMaterialWrapper;
 

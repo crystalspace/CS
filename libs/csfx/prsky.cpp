@@ -18,9 +18,9 @@
 
 #include "cssysdef.h"
 #include "csfx/prsky.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 #include "qsqrt.h"
 #include "csgeom/matrix3.h"
 

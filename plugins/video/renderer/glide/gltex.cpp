@@ -20,12 +20,12 @@
 #include <math.h>
 
 #include "cssysdef.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 #include "gltex.h"
 #include "g3dgl.h"
 #include "glproc.h"
-#include "igraphic/iimage.h"
+#include "igraphic/image.h"
 #include "csutil/scanstr.h"
 
 #define SysPrintf System->Printf

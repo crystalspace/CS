@@ -20,8 +20,8 @@
 #define SYSDEF_SOCKETS
 #include "cssysdef.h"
 #include "socket.h"
-#include "isys/isystem.h"
-#include "isys/ievent.h"
+#include "isys/system.h"
+#include "isys/event.h"
 #include "csutil/util.h"
 
 #define CS_NET_LISTEN_QUEUE_SIZE 5

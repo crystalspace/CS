@@ -23,9 +23,9 @@
 #include "csengine/polygon.h"
 #include "csengine/sector.h"
 #include "csgeom/polyclip.h"
-#include "ivideo/igraph3d.h"
-#include "igeom/iclip2.h"
-#include "iengine/icamera.h"
+#include "ivideo/graph3d.h"
+#include "igeom/clip2d.h"
+#include "iengine/camera.h"
 
 csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
   callback_data (NULL)

@@ -21,8 +21,8 @@
 #include "cssys/sysdriv.h"
 #include "csws/csws.h"
 #include "version.h"
-#include "ivideo/ifontsrv.h"
-#include "iutil/icfgmgr.h"
+#include "ivideo/fontserv.h"
+#include "iutil/cfgmgr.h"
 
 class csWsTest : public csApp
 {

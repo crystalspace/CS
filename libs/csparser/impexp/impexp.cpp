@@ -39,8 +39,8 @@
 #include "csengine/meshobj.h"
 #include "csutil/csstring.h"
 #include "cssys/csendian.h"
-#include "isys/ivfs.h"
-#include "iutil/icfgfile.h"
+#include "isys/vfs.h"
+#include "iutil/cfgfile.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

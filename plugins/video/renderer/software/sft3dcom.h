@@ -26,10 +26,10 @@
 #include "video/renderer/common/dpmesh.h"
 #include "csutil/cfgacc.h"
 #include "scan.h"
-#include "ivideo/ihalo.h"
-#include "isys/iplugin.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/igraph3d.h"
+#include "ivideo/halo.h"
+#include "isys/plugin.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 
 class csClipper;
 class csTextureCacheSoftware;

@@ -23,8 +23,8 @@
 #include "cssys/win32/directdetection.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
-#include "isys/isystem.h"
-#include "isys/ievent.h"
+#include "isys/system.h"
+#include "isys/event.h"
 
 #ifndef DD_FALSE 
   // This is normally being done in the ddraw.h file

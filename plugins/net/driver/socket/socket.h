@@ -20,7 +20,7 @@
 #ifndef __CS_SOCKET_H__
 #define __CS_SOCKET_H__
 
-#include "inetwork/isocket.h"
+#include "inetwork/socket.h"
 
 class csSocketEndPoint
 {

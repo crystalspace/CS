@@ -19,8 +19,8 @@
 #ifndef __CS_FREEFONT_H__
 #define __CS_FREEFONT_H__
 
-#include "isys/isystem.h"
-#include "ivideo/ifontsrv.h"
+#include "isys/system.h"
+#include "ivideo/fontserv.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"

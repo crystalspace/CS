@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "cssys/os2/csos2.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 #undef SEVERITY_ERROR
 #define INCL_DOS

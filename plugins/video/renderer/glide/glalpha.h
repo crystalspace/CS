@@ -20,8 +20,8 @@
 #define ALPHAMAP_H
 
 #include "csutil/scf.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
 #include "cstypes.h"
 #include "csutil/util.h"
 

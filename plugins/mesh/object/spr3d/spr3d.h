@@ -29,13 +29,13 @@
 #include "csgeom/box.h"
 #include "plugins/mesh/object/spr3d/sprtri.h"
 #include "plugins/mesh/object/spr3d/skel3d.h"
-#include "ivideo/igraph3d.h"
-#include "iengine/ipolmesh.h"
-#include "imesh/imspr3d.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
-#include "imesh/imeshobj.h"
-#include "iutil/iconfig.h"
+#include "ivideo/graph3d.h"
+#include "iengine/polymesh.h"
+#include "imesh/sprite3d.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "imesh/object.h"
+#include "iutil/config.h"
 
 struct iSystem;
 

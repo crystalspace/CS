@@ -27,9 +27,9 @@
 #include "ogl_proctexback.h"
 #include "ogl_proctexsoft.h"
 #include "csutil/scanstr.h"
-#include "iutil/icfgfile.h"
-#include "isys/isystem.h"
-#include "igraphic/iimage.h"
+#include "iutil/cfgfile.h"
+#include "isys/system.h"
+#include "igraphic/image.h"
 
 #define SysPrintf System->Printf
 

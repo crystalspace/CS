@@ -21,8 +21,8 @@
 #include "cssysdef.h"
 #include "csengine/texture.h"
 #include "csengine/engine.h"
-#include "igraphic/iimage.h"
-#include "ivideo/itxtmgr.h"
+#include "igraphic/image.h"
+#include "ivideo/txtmgr.h"
 
 //---------------------------------------------------------------------------
 

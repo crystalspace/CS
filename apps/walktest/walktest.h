@@ -27,11 +27,11 @@
 #include "csengine/collider.h"
 #include "csengine/light.h"
 #include "walktest/wentity.h"
-#include "iengine/iengine.h"
-#include "ivaria/iconsole.h"
-#include "ivaria/iconinp.h"
-#include "isys/ivfs.h"
-#include "ivideo/ifontsrv.h"
+#include "iengine/engine.h"
+#include "ivaria/conout.h"
+#include "ivaria/conin.h"
+#include "isys/vfs.h"
+#include "ivideo/fontserv.h"
 
 class csRegion;
 class WalkTest;

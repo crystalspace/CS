@@ -22,10 +22,10 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
-#include "imesh/imeshobj.h"
-#include "imesh/imcube.h"
-#include "ivideo/igraph3d.h"
-#include "iutil/iconfig.h"
+#include "imesh/object.h"
+#include "imesh/cube.h"
+#include "ivideo/graph3d.h"
+#include "iutil/config.h"
 
 struct iMaterialWrapper;
 class csCubeMeshObjectFactory;

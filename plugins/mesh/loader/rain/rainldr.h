@@ -19,7 +19,7 @@
 #ifndef _RAINLDR_H_
 #define _RAINLDR_H_
 
-#include "imap/ildrplug.h"
+#include "imap/reader.h"
 
 struct iEngine;
 struct iSystem;

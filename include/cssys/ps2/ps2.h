@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "cssys/system.h"
-#include "ivideo/igraph2d.h"
+#include "ivideo/graph2d.h"
 
 /// PS2 version.
 class SysSystemDriver : public csSystemDriver

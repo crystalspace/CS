@@ -19,7 +19,7 @@
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
 
-#include "ivideo/igraph3d.h"
+#include "ivideo/graph3d.h"
 #include "csgeom/math3d.h"
 
 /**

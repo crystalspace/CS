@@ -24,9 +24,9 @@
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
-#include "isys/isystem.h"
-#include "isys/ievent.h"
-#include "iutil/icfgfile.h"
+#include "isys/system.h"
+#include "isys/event.h"
+#include "iutil/cfgfile.h"
 #include "qint.h"
 
 #include "csaa.h"

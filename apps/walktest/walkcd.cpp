@@ -43,7 +43,7 @@
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
 #include "csfx/cspixmap.h"
-#include "iengine/icollide.h"
+#include "iengine/collider.h"
 
 extern WalkTest *Sys;
 

@@ -27,9 +27,9 @@
 #include "csengine/light.h"
 #include "csengine/polygon.h"
 #include "csparser/csloader.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
-#include "ivaria/iscript.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+#include "ivaria/script.h"
 #include "csengine/dumper.h"
 
 //------------------------------------------------- We need the 3D engine -----

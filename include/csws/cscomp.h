@@ -25,8 +25,8 @@
 #include "csutil/csobjvec.h"
 #include "csfx/cspixmap.h"
 #include "cswspal.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/ifontsrv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/fontserv.h"
 
 class csApp;
 class csSkin;

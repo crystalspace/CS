@@ -113,9 +113,8 @@ In the source file @file{simple.cpp} we place the following:
 #include "csengine/polygon.h"
 #include "csengine/texture.h"
 #include "csparser/csloader.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
-#include "ivaria/iconsole.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 
 // We need the 3D engine
 REGISTER_STATIC_LIBRARY (engine)

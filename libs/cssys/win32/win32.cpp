@@ -22,9 +22,9 @@
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
-#include "iutil/icfgmgr.h"
-#include "ivideo/igraph2d.h"
-#include "ivideo/igraph3d.h"
+#include "iutil/cfgmgr.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 
 #include "cssys/win32/directdetection.h"
 

@@ -37,12 +37,12 @@
 #include "csengine/meshobj.h"
 #include "csengine/quadtr3d.h"
 #include "csutil/csstring.h"
-#include "ivideo/igraph3d.h"
-#include "ivideo/itxtmgr.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "isys/ivfs.h"
-#include "iengine/irview.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "isys/vfs.h"
+#include "iengine/rview.h"
 #include "qint.h"
 
 long csThing::current_light_frame_number = 0;

@@ -23,7 +23,7 @@
 #include "csws/cswstex.h"
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "qint.h"
 
 #define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"

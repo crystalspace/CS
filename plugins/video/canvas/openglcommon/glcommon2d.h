@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "gl2d_font.h"
-#include "isys/ievent.h"
+#include "isys/event.h"
 
 #define CsPrintf System->Printf
 class OpenGLTextureCache;

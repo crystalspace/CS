@@ -22,7 +22,7 @@
 #include <assert.h>
 
 #include "cssysdef.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 #include "qint.h"
 #include "csgfxldr/csimage.h"
 #include "csgfxldr/quantize.h"

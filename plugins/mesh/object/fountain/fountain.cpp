@@ -21,8 +21,8 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/matrix3.h"
 #include "fountain.h"
-#include "ivideo/imater.h"
-#include "iengine/imater.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
 #include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>

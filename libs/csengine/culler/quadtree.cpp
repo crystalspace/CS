@@ -22,7 +22,7 @@
 #include "csgeom/poly2d.h"
 #include "csengine/quadtree.h"
 #include "csengine/engine.h"
-#include "isys/isystem.h"
+#include "isys/system.h"
 
 
 bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox2& bbox)

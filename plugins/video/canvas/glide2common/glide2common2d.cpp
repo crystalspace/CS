@@ -23,9 +23,9 @@
 #include "cssys/csinput.h"
 #include "video/renderer/glide/gllib.h"
 #include "csutil/csrect.h"
-#include "isys/isystem.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
+#include "isys/system.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
 #include "glidcurs.h"
 
 IMPLEMENT_IBASE (csGraphics2DGlideCommon)

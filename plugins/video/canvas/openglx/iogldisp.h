@@ -20,8 +20,8 @@
 #define __IOGLDISP_H__
 
 #include "csutil/scf.h"
-#include "isys/iplugin.h"
-//#include "isys/isystem.h"
+#include "isys/plugin.h"
+//#include "isys/system.h"
 
 SCF_VERSION (iOpenGLDisp, 0, 0, 1);
 

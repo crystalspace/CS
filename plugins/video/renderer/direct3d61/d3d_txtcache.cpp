@@ -24,10 +24,10 @@
 #include "d3dcaps.h"
 
 #include "d3d_g3d.h"
-#include "ivideo/itexture.h"
-#include "iengine/itexture.h"
-#include "iengine/ilghtmap.h"
-#include "ivideo/igraph3d.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
+#include "iengine/lightmap.h"
+#include "ivideo/graph3d.h"
 #include "csutil/util.h"
 
 //----------------------------------------------------------------------------//
