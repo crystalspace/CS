@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jan-2004
+	- Eric Sunshine renamed the 'memory' plugin to 'memory2d' for the
+	  following reasons:
+	    - Sensibility: Jam would become confused if C++ code #included the
+	      standard C++ <memory> (the "modern" version of the old
+	      <memory.h>). Jam would think that the foreign C++ code had a
+	      dependency upon the entire 'memory' canvas.
+	    - Consistency: The '2d' suffix is used by the majority of canvas
+	      plugins.
+	    - Clarity: 'memory' was a poor choice for a plugin name; it
+	      conveyed very little about the plugin's purpose. 'memory2d', on
+	      the other hand, at least indicates strongly that the plugin
+	      likely is a canvas.
 12-Jan-2005
 	- Jorrit worked further on the PVS visibility culler.
 	- Chris fixed a bug in the AWS manager that meant that modal dialogs
@@ -24,13 +37,14 @@ chronological order.
 	  size_t loop instead of one based on int. This should be the same
 	  but it is safer/cleaner.
 9-Jan-2005
-	- acraig extended StandardReporterListener to allow appending to file.
-	  Default behaviour is create new file but can now also configure to 
-	  append by:
-	    1) Reporter.FileAppend = true in a cfg file
-	    2) command line option append
-	    3) through  a param in SetDebugFile()
-	- Marten fixed a bug in csGLRender3D::DrawSimpleMesh he introduced in
+	- Andrew Craig extended StandardReporterListener to allow appending to
+	  the log file rather than unconditionally overwriting it.  Default
+	  behaviour is still overwrite, however content can also now be appened
+	  by one or more of the following methods:
+	    1) Reporter.FileAppend = true in a configuration domain.
+	    2) Via command-line option `--append'.
+	    3) Via a parameter to iStandardReporterListener::SetDebugFile().
+	- Marten fixed a bug in csGLRender3D::DrawSimpleMesh() he introduced in
 	  his last commit.
 	- res made the following changes:
 	    - Removed iTextureHandle::GetCanvas(). The render target mechanism
