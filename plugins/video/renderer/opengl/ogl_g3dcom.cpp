@@ -241,6 +241,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   planes_add_z_clip = false;
   frustum_valid = false;
   clipportal_dirty = false;
+  clipportal_floating = 0;
 
   if (!tr_verts)
   {
@@ -1240,6 +1241,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
     FlushDrawPolygon ();
     clipportal_stack.DeleteAll ();
     clipportal_dirty = true;
+    clipportal_floating = 0;
     statecache->Disable_GL_STENCIL_TEST ();
   }
 
@@ -1748,7 +1750,7 @@ void csGraphics3DOGLCommon::SetupStencil ()
 {
   if (stencil_init) return;
   stencil_init = true;
-  if (clipper && GLCaps.use_stencil && clipportal_stack.Length () <= 0)
+  if (clipper && GLCaps.use_stencil && !clipportal_floating)
   {
     // First set up the stencil area.
     statecache->Enable_GL_STENCIL_TEST ();
@@ -4238,7 +4240,7 @@ void csGraphics3DOGLCommon::RestoreDTMTransforms ()
 void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
 {
   int i;
-  bool use_clip_portals = clipportal_stack.Length () > 0;
+  bool use_clip_portals = clipportal_floating;
 
   //===========
   // First we are going to find out what kind of clipping (if any)
@@ -5451,7 +5453,8 @@ void csGraphics3DOGLCommon::CloseFogObject (CS_ID)
 
 void csGraphics3DOGLCommon::OpenPortal (size_t numVertices, 
 					const csVector2* vertices,
-					const csPlane3& normal)
+					const csPlane3& normal,
+					bool floating)
 {
   csClipPortal* cp = new csClipPortal ();
   cp->poly = new csVector2[numVertices];
@@ -5460,6 +5463,13 @@ void csGraphics3DOGLCommon::OpenPortal (size_t numVertices,
   cp->normal = normal;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;
+
+  // If we already have a floating portal then we increase the
+  // number. Otherwise we start at one.
+  if (clipportal_floating)
+    clipportal_floating++;
+  else if (floating)
+    clipportal_floating = 1;
 }
 
 void csGraphics3DOGLCommon::ClosePortal ()
@@ -5468,6 +5478,8 @@ void csGraphics3DOGLCommon::ClosePortal ()
   csClipPortal* cp = clipportal_stack.Pop ();
   delete cp;
   clipportal_dirty = true;
+  if (clipportal_floating > 0)
+    clipportal_floating--;
 }
 
 void csGraphics3DOGLCommon::SetupClipPortals ()
@@ -5477,7 +5489,7 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
     clipportal_dirty = false;
     if (GLCaps.use_stencil)
     {
-      if (clipportal_stack.Length () <= 0)
+      if (clipportal_floating)
       {
         statecache->Disable_GL_STENCIL_TEST ();
       }

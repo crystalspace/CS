@@ -138,8 +138,7 @@ public:
   void OpenFogObject (CS_ID id, csFog* fog) { }
   void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype) { }
   void CloseFogObject (CS_ID id) { }
-  void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal) { }
+  void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) { }
   void ClosePortal () { }
   iHalo* CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha,
     int iWidth, int iHeight) { return 0; }

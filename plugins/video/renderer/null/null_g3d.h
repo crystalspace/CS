@@ -132,8 +132,7 @@ public:
   virtual void CloseFogObject (CS_ID) { }
 
   /// Open a clipped portal.
-  virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal) { }
+  virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) { }
 
   /// Close a portal previously opened with OpenPortal().
   virtual void ClosePortal () { }

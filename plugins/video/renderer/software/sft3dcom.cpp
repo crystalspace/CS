@@ -2642,7 +2642,8 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
 
 void csGraphics3DSoftwareCommon::OpenPortal (size_t /*numVertices*/, 
 					     const csVector2* /*vertices*/,
-					     const csPlane3& /*normal*/)
+					     const csPlane3& /*normal*/,
+					     bool /*floating*/)
 {
 }
 

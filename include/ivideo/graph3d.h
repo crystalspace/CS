@@ -1104,7 +1104,7 @@ struct iGraphics3D : public iBase
   virtual void CloseFogObject (CS_ID id) = 0;
 
   /**
-   * Enter a new clipped portal. Basically this routine will restrict
+   * Enter a new portal. If 'floating' is true then this routine will restrict
    * all further drawing to the given 2D area and it will also respect
    * the current contents of the Z-buffer so that geometry will only
    * render where the Z-buffer allows it (even if zfill or znone is used).
@@ -1113,7 +1113,7 @@ struct iGraphics3D : public iBase
    * portal must be fully contained in the previous ones.
    */
   virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal) = 0;
+    const csPlane3& normal, bool floating) = 0;
 
   /**
    * Close a portal previously opened with OpenPortal().

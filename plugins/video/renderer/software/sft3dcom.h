@@ -336,7 +336,7 @@ public:
 
   /// Open a new clipped portal.
   virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal);
+    const csPlane3& normal, bool floating);
   /// Close a portal previously opened with OpenPortal().
   virtual void ClosePortal ();
 

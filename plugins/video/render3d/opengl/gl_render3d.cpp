@@ -140,6 +140,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   shadow_stencil_enabled = false;
   clipping_stencil_enabled = false;
   clipportal_dirty = true;
+  clipportal_floating = 0;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -170,7 +171,7 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
 void csGLGraphics3D::SetCorrectStencilState ()
 {
   if (shadow_stencil_enabled || clipping_stencil_enabled ||
-  	clipportal_stack.Length () > 0)
+  	clipportal_floating)
   {
     statecache->Enable_GL_STENCIL_TEST ();
   }
@@ -528,7 +529,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   //    clipper, clipping needs, and object (number of triangles).
   // 2. We have encountered a floating portal. In that case we always
   //    consider every subsequent portal as being floating.
-  if (clipportal_stack.Length () > 0)
+  if (clipportal_floating)
   {
     if (clipportal_dirty)
     {
@@ -541,7 +542,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // is already set up) to do the clipping. In case we have a floating
   // portal we also can use the following part.
   if (clipper->GetClipperType() == iClipper2D::clipperBox ||
-  	clipportal_stack.Length () > 0)
+  	clipportal_floating)
   {
     SetCorrectStencilState ();
     // If we still need plane clipping then we must set that up too.
@@ -1120,6 +1121,9 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   SetWriteMask (true, true, true, true);
 
   clipportal_dirty = true;
+  clipportal_floating = 0;
+  CS_ASSERT (clipportal_stack.Length () == 0);
+
   debug_inhibit_draw = false;
 
   int i = 0;
@@ -1778,7 +1782,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   // Based on the kind of clipping we need we set or clip mask.
   int clip_mask, clip_value;
-  if (clipportal_stack.Length () > 0)
+  if (clipportal_floating)
   {
     clip_mask = 128;
     clip_value = 128;
@@ -2054,7 +2058,8 @@ void csGLGraphics3D::DebugVisualizeStencil (uint32 mask)
 
 void csGLGraphics3D::OpenPortal (size_t numVertices, 
 				 const csVector2* vertices,
-				 const csPlane3& normal)
+				 const csPlane3& normal,
+				 bool floating)
 {
   csClipPortal* cp = new csClipPortal ();
   cp->poly = new csVector2[numVertices];
@@ -2063,6 +2068,13 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
   cp->normal = normal;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;
+
+  // If we already have a floating portal then we increase the
+  // number. Otherwise we start at one.
+  if (clipportal_floating)
+    clipportal_floating++;
+  else if (floating)
+    clipportal_floating = 1;
 }
 
 void csGLGraphics3D::ClosePortal ()
@@ -2071,6 +2083,8 @@ void csGLGraphics3D::ClosePortal ()
   csClipPortal* cp = clipportal_stack.Pop ();
   delete cp;
   clipportal_dirty = true;
+  if (clipportal_floating > 0)
+    clipportal_floating--;
 }
 
 void csGLGraphics3D::SetupClipPortals ()

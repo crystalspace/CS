@@ -698,8 +698,7 @@ public:
 
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
 
-  virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal) {  }
+  virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) {  }
   virtual void ClosePortal () {  }
 
   //=========================================================================

@@ -24,6 +24,9 @@ chronological order.
             - fixed some more pointless consts in tinyxml code
             - fixed warnings in csProcCaps
             - some more small warning fixes for icc
+	- Jorrit changed g3d->OpenPortal() so that it is now called for
+	  every portal instead of only for floating portals. There is a new
+	  'floating' parameter which indicates if the portal floats or not.
 15-Jun-2004
 	- Jorrit fixed two serious problems with the NR floating portals
 	  implementations (csGLGraphics3D::SetupClipPortals()):
