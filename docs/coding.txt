@@ -1,0 +1,151 @@
+For consistency and ease of future maintenance, when working on Crystal Space
+source code, please follow these guidelines.
+
+===============================================================================
+RULE 1: Indentation
+===============================================================================
+
+Indent with two (2) spaces.  If you use tabs then they must be interpreted as
+eight (8) spaces.  This means that you should not use the tab character for
+indentation since that would indent by eight characters rather than two.  Also
+consider avoiding tabs altogether in order to eliminate tab-related problems.
+Here is an example of proper indentation:
+
+void func ()
+{
+  int a;
+  for (a = 0 ; a < 10 ; a++)
+  {
+    int b = 5;
+    if (a < b)
+      printf ("Hello\n");
+  }
+}
+
+This example also illustrates how to place curly braces and where to add
+spaces, for example 'for_(' rather than 'for(_'.
+
+Also add sufficient whitespace between tokens.
+
+
+===============================================================================
+RULE 2: Class and Method Naming
+===============================================================================
+
+Classes should be named in this fashion: csThisIsAClass.  The name starts with
+lower-case 'cs' and has every word capitalized.
+
+Methods and functions should be named in this fashion: ThisIsAMethod.  Each
+word in the name is capitalized.
+
+
+===============================================================================
+RULE 3: Doc++ and Comments
+===============================================================================
+
+Use Doc++ comments in header files to document classes, methods, and
+functions.  These comments are extracted with the Doc++ tool and HTML
+documentation is generated from them.
+
+IMPORTANT NOTE: Always use Doc++ comments for a class.  If you fail to do so
+then Doc++ will ignore comments for methods within the class itself.
+
+A one line Doc++ comment uses three slases (///) rather than two slashes as is
+typical for normal C++ comments.  Multi-line Doc++ comments are specified with
+/** ... */ rather than /* ... */.
+
+Here is an example:
+
+/**
+ * This class represents a blue ball.
+ * Blue balls bounce higher than red balls.
+ */
+class csBlueBall
+{
+private:
+  // A private function, no Doc++ comment here...
+  // But still we add a comment :-)
+  void PrivateFunction ();
+
+public:
+  /// This is the constructor. Initializes the blue ball.
+  csBlueBall ();
+
+  /**
+   * This is a multiline comment.
+   * And this is the second line of the multiline comment.
+   */
+  void Deflate ();
+};
+
+
+===============================================================================
+RULE 4: Maximum Line Length (78 Characters)
+===============================================================================
+
+Lines in source code should be no longer than 78 characters.  This facilitates
+generation of hard-copy and works better with certain (unamed :-) tools which
+process code or text files.
+
+
+===============================================================================
+RULE 5: Multiple-Inclusion Protection for Headers
+===============================================================================
+
+Be certain to insert multiple-inclusion protection in all header files.  These
+controls should take this form:
+
+#ifndef __CS_FILENAME_H__
+#define __CS_FILENAME_H__
+...
+#endif // __CS_FILENAME_H__
+
+
+===============================================================================
+RULE 6: SCF Interfaces
+===============================================================================
+
+SCF interfaces always start with a lower 'i', as in "iThisIsAnInterface".
+
+
+===============================================================================
+RULE 7: Module/library dependencies
+===============================================================================
+
+Do not introduce unnecessary dependencies between libaries and modules.
+Absolutely avoid introducing circular dependencies.
+
+For instance, code in the csGeom library should never refer to code from the
+csEngine library.  The other way around is okay.
+
+
+===============================================================================
+RULE 8: DOS Filename Restrictions
+===============================================================================
+
+Use DOS-style 8.3 filenames for files which are shared by all platforms which
+run CS.  This allows the project to support DOS in addition to platforms with
+less restrictive filenames.  Platform-specific files (not intended for DOS)
+need not follow this restriction.
+
+
+===============================================================================
+RULE 9: Include "sysdef.h"
+===============================================================================
+
+Always include "sysdef.h" in each source file as the very first file included.
+Never include "sysdef.h" in header files.
+
+
+===============================================================================
+RULE 10: Platform Dependencies
+===============================================================================
+
+Beware of code that is endian specific.  Key off of the CS_BIG_ENDIAN or
+CS_LITTLE_ENDIAN macros if needed.  Avoid unions of bit-sets since they can
+result in endian-related problems.
+
+Beware of code which tries to access values of primitive types at non-even
+memory locations or locations which are not multiples of the type's size,
+since some platforms require "natural alignment" and will generate faults if
+data is accessed at incorrect locations.
