@@ -120,6 +120,12 @@ public:
   csPlane3 Other2This (const csPlane3& p) const;
 
   /**
+   * Convert a plane in 'other' space to 'this' space.
+   * This version ignores translation.
+   */
+  csPlane3 Other2ThisRelative (const csPlane3& p) const;
+
+  /**
    * Convert a plane in 'other' space to 'this' space. This is an optimized
    * version for which a point on the new plane is known (point). The result
    * is stored in 'result'.
@@ -252,11 +258,18 @@ public:
   csPlane3 This2Other (const csPlane3& p) const;
 
   /**
-   * Convert a plane in 'this' space to 'other' space. This is an optimized version
-   * for which a point on the new plane is known (point). The result
+   * Convert a plane in 'this' space to 'other' space.
+   * This version ignores translation.
+   */
+  csPlane3 This2OtherRelative (const csPlane3& p) const;
+
+  /**
+   * Convert a plane in 'this' space to 'other' space. This is an optimized
+   * version for which a point on the new plane is known (point). The result
    * is stored in 'result'.
    */
-  void This2Other (const csPlane3& p, const csVector3& point, csPlane3& result) const;
+  void This2Other (const csPlane3& p, const csVector3& point,
+  	csPlane3& result) const;
 
   /**
    * Rotate the transform by the angle (radians) around the given vector,

@@ -244,6 +244,12 @@ public:
    */
   static void SetClientStates (UInt client_states);
 
+  /**
+   * Set mirror mode for the rasterizer. Then polygons have
+   * to be rendered as seen from the other side.
+   */
+  static void SetMirrorMode (bool mirror);
+
 private:
   /**
    * Return true if two z-buf modes are compatible.
@@ -282,7 +288,29 @@ private:
     int& num_clipped_triangles,
     int& num_clipped_vertices,
     bool transform,
-    bool exact_clipping);
+    bool mirror,
+    bool exact_clipping,
+    bool plane_clipping,	// Clip to the near plane
+    bool frustum_clipping);	// Clip to the frustum planes
+
+  /**
+   * Given information from a mesh, clip the mesh to the frustum.
+   * The clipped mesh will be put in the clipped_??? arrays.
+   */
+  void ClipTriangleMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool exact_clipping,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes,
+    csPlane3* diag_planes, int num_diag_planes);
 
 protected:
   friend class csOpenGLHalo;

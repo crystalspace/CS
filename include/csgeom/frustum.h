@@ -308,6 +308,17 @@ public:
 	csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
 
   /**
+   * Clip a frustum (defined from 0,0,0 origin) to the given plane.
+   * This routine will also fill an array of clipinfo so that you can
+   * use this information to correctly interpolate information related to
+   * the vertex (like texture mapping coordinates). Note that clipinfo
+   * needs to be preinitialized correctly with CS_CLIPINFO_ORIGINAL
+   * instances and correct indices.
+   */
+  static void ClipToPlane (csVector3* vertices, int& num_vertices,
+	csClipInfo* clipinfo, const csPlane3& plane);
+
+  /**
    * Clip the polygon of this frustum to the postive side of an arbitrary plane
    * (which should be specified relative to the origin of the frustum).
    * Note that this clips the polygon which forms the frustum. It does

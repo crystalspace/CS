@@ -621,7 +621,6 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 
     if (d->GetGraphics3D ()->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
-              
     if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
     {
       keep_plane = new csPolyPlane (*(p->GetPlane ()));
@@ -1265,7 +1264,7 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius,
     if (d < min_d && csMath3::Visible (center, wpl))
     {
       hit = -center;
-      hit -= wpl.GetNormal ();
+      hit -= wpl.Normal ();
       hit *= d;
       hit += center;
       if (p->IntersectRay (center, hit))

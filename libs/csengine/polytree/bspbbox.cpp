@@ -173,7 +173,7 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+	float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v ) ;
 	v *= sect; v += ptA;
 	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
 	polygon1.AddVertex (idx);
@@ -189,7 +189,7 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v );
+	float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v );
 	v *= sect; v += ptA;
 	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
 	polygon1.AddVertex (idx);
@@ -497,11 +497,6 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   // We really need to clip.
   num_verts = 0;
 
-  float A = portal_plane->A ();
-  float B = portal_plane->B ();
-  float C = portal_plane->C ();
-  float D = portal_plane->D ();
-
   i1 = num_vertices-1;
   for (i = 0 ; i < num_vertices ; i++)
   {
@@ -510,15 +505,15 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
 
     if (z1s && !zs)
     {
-      csIntersect3::Plane (vertices[polygon[i1]], vertices[polygon[i]], A, B, C, D,
-      	verts[num_verts], r);
+      csIntersect3::Plane (vertices[polygon[i1]], vertices[polygon[i]],
+      	*portal_plane, verts[num_verts], r);
       num_verts++;
       verts[num_verts++] = vertices[polygon[i]];
     }
     else if (!z1s && zs)
     {
-      csIntersect3::Plane (vertices[polygon[i1]], vertices[polygon[i]], A, B, C, D,
-      	verts[num_verts], r);
+      csIntersect3::Plane (vertices[polygon[i1]], vertices[polygon[i]],
+      	*portal_plane, verts[num_verts], r);
       num_verts++;
     }
     else if (!z1s && !zs)

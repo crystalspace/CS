@@ -58,9 +58,8 @@ public:
 
   /// Return the normal vector of this plane.
   inline csVector3& Normal () { return norm; }
-
-  /// Return the normal vector of this plane (const version).
-  inline csVector3 GetNormal () const { return norm; }
+  /// Return the normal vector of this plane.
+  inline const csVector3& Normal () const { return norm; }
 
   /// Return the A component of this plane.
   inline float A () const { return norm.x; }

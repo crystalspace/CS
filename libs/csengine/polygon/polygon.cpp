@@ -474,7 +474,7 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - plane.Classify (ptA) / ( plane.GetNormal () * v ) ;
+	float sect = - plane.Classify (ptA) / ( plane.Normal () * v ) ;
 	v *= sect; v += ptA;
 	np1->AddVertex (v);
 	np2->AddVertex (v);
@@ -489,7 +489,7 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - plane.Classify (ptA) / ( plane.GetNormal () * v );
+	float sect = - plane.Classify (ptA) / ( plane.Normal () * v );
 	v *= sect; v += ptA;
 	np1->AddVertex (v);
 	np2->AddVertex (v);
@@ -590,6 +590,9 @@ bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 bool csPolygon3D::IsTransparent ()
 {
   if (GetAlpha ())
+    return true;
+
+  if (txt_info->GetMixMode () != CS_FX_COPY)
     return true;
 
   iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
@@ -1056,7 +1059,7 @@ void csPolygon3D::ClipPolyPlane (csVector3* verts, int* num, bool mirror,
   int cw_offset = -1;
   int ccw_offset;
   bool first_vertex_side;
-  csVector3 isect_cw,isect_ccw;
+  csVector3 isect_cw, isect_ccw;
   csVector3 Plane_Normal;
   int i;
 
@@ -1092,8 +1095,11 @@ void csPolygon3D::ClipPolyPlane (csVector3* verts, int* num, bool mirror,
   // calculate the intersection points.
   i = cw_offset - 1;
   if (i < 0) {i = (*num) -1;}
-  csIntersect3::Plane (verts[cw_offset], verts[i], Plane_Normal, v1,isect_cw);
-  csIntersect3::Plane (verts[ccw_offset], verts[ccw_offset + 1],Plane_Normal, v1, isect_ccw);
+  float dummy;
+  csIntersect3::Plane (verts[cw_offset], verts[i], Plane_Normal, v1, isect_cw,
+  	dummy);
+  csIntersect3::Plane (verts[ccw_offset], verts[ccw_offset + 1],Plane_Normal,
+  	v1, isect_ccw, dummy);
 
   // remove the obsolete point and insert the intersection points.
   if (first_vertex_side)
@@ -1191,11 +1197,6 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   // We really need to clip.
   num_verts = 0;
 
-  float A = portal_plane->A ();
-  float B = portal_plane->B ();
-  float C = portal_plane->C ();
-  float D = portal_plane->D ();
-
   i1 = num_vertices-1;
   z1s = vis[i1];
   for (i = 0 ; i < num_vertices ; i++)
@@ -1204,7 +1205,8 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
 
     if (!z1s && zs)
     {
-      csIntersect3::Plane (Vcam (i1), Vcam (i), A, B, C, D, verts[num_verts], r);
+      csIntersect3::Plane (Vcam (i1), Vcam (i), *portal_plane,
+      	verts[num_verts], r);
       num_verts++;
       verts[num_verts++] = Vcam (i);
 #ifdef DO_HW_UVZ
@@ -1213,7 +1215,8 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
     }
     else if (z1s && !zs)
     {
-      csIntersect3::Plane (Vcam (i1), Vcam (i), A, B, C, D, verts[num_verts], r);
+      csIntersect3::Plane (Vcam (i1), Vcam (i), *portal_plane,
+      	verts[num_verts], r);
       num_verts++;
 #ifdef DO_HW_UVZ
       isClipped = true;

@@ -314,7 +314,8 @@ static bool load_vector (char* buf, csVector3 &v)
 
 static void OptimizePolygon (iPolygon3D *p)
 {
-  if (!p->GetPortal () || p->GetAlpha ())
+  if (!p->GetPortal () || p->GetAlpha ()
+  	|| p->GetPolyTexType ()->GetMixMode () != 0)
     return;
 
   iMaterialWrapper *mat = p->GetMaterial ();

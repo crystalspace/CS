@@ -240,7 +240,7 @@ void csPoly3D::SplitWithPlane (csPoly3D& poly1, csPoly3D& poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+	float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v ) ;
 	v *= sect; v += ptA;
 	poly1.AddVertex (v);
 	poly2.AddVertex (v);
@@ -255,7 +255,7 @@ void csPoly3D::SplitWithPlane (csPoly3D& poly1, csPoly3D& poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v );
+	float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v );
 	v *= sect; v += ptA;
 	poly1.AddVertex (v);
 	poly2.AddVertex (v);
@@ -296,7 +296,7 @@ void csPoly3D::CutToPlane (const csPlane3& split_plane)
         // from point A to point B with the partition
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB; v -= ptA;
-        float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+        float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v ) ;
         v *= sect; v += ptA;
         AddVertex (v);
       }
@@ -309,7 +309,7 @@ void csPoly3D::CutToPlane (const csPlane3& split_plane)
         // from point A to point B with the partition
         // plane. This is a simple ray-plane intersection.
         csVector3 v = ptB; v -= ptA;
-        float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+        float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v ) ;
         v *= sect; v += ptA;
         AddVertex (v);
       }

@@ -285,63 +285,11 @@ public:
   static void Plane (
     const csVector3& u, const csVector3& v,
     const csVector3& normal, const csVector3& a, // plane
-    csVector3& isect);                    // intersection point
-
-  /**
-   * Intersect a 3D segment with a plane.  Returns true if there is an
-   * intersection, with the intersection point returned in isect.
-   */
-  static void Plane (
-    const csVector3& u, const csVector3& v,
-    const csVector3& normal, const csVector3& a, // plane
     csVector3& isect, float& dist);              // intersection point
 
   /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
-   */
-  static void Plane (
-    const csSegment3& uv,
-    const csVector3& normal, const csVector3& a, // plane
-    csVector3& isect)                     // intersection point
-  {
-    Plane (uv.Start (), uv.End (), normal, a, isect);
-  }
-
-  /**
-   * Intersect a 3D segment with a plane.  Returns true if there is an
-   * intersection, with the intersection point returned in isect.
-   * The distance from u to the intersection point is returned in dist.
-   * The distance that is returned is a normalized distance with respect
-   * to the given input vector. i.e. a distance of 0.5 means that the
-   * intersection point is halfway u and v.
-   */
-  static bool Plane (
-    const csVector3& u, const csVector3& v,
-    float A, float B, float C, float D, // plane Ax+By+Cz+D=0
-    csVector3& isect,                     // intersection point
-    float& dist);                       // distance from u to isect
-
-  /**
-   * Intersect a 3D segment with a plane.  Returns true if there is an
-   * intersection, with the intersection point returned in isect.
-   * The distance from u to the intersection point is returned in dist.
-   * The distance that is returned is a normalized distance with respect
-   * to the given input vector. i.e. a distance of 0.5 means that the
-   * intersection point is halfway u and v.
-   */
-  static bool Plane (
-    const csSegment3& uv,
-    float A, float B, float C, float D, // plane Ax+By+Cz+D=0
-    csVector3& isect,                     // intersection point
-    float& dist)                        // distance from u to isect
-  {
-    return Plane (uv.Start (), uv.End (), A, B, C, D, isect, dist);
-  }
-
-  /**
-   * Intersect a 3D segment with a plane.  Returns true if there is an
-   * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.
    * The distance that is returned is a normalized distance with respect
    * to the given input vector. i.e. a distance of 0.5 means that the
@@ -352,31 +300,14 @@ public:
     const csPlane3& p,                     // plane Ax+By+Cz+D=0
     csVector3& isect,                     // intersection point
     float& dist);                       // distance from u to isect
-
-  /**
-   * Intersect a 3D segment with a plane.  Returns true if there is an
-   * intersection, with the intersection point returned in isect.
-   * The distance from u to the intersection point is returned in dist.
-   * The distance that is returned is a normalized distance with respect
-   * to the given input vector. i.e. a distance of 0.5 means that the
-   * intersection point is halfway u and v.
-   */
-  static bool Plane (
-    const csSegment3& uv,
-    const csPlane3& p,                     // plane Ax+By+Cz+D=0
-    csVector3& isect,                     // intersection point
-    float& dist)	                  // distance from u to isect
-  {
-    return Plane (uv.Start (), uv.End (), p, isect, dist);
-  }
 
   /**
    * Intersect 3 planes to get the point that is part of all three
    * planes. Returns true, if there is a single point that fits.
    * If some planes are parallel, then it will return false.
    */
-  static bool Planes (const csPlane3& p1, const csPlane3& p2, const csPlane3& p3,
-                      csVector3& isect);
+  static bool Planes (const csPlane3& p1, const csPlane3& p2,
+  	const csPlane3& p3, csVector3& isect);
 
   /**
    * Intersect a regular plane and an axis aligned plane and

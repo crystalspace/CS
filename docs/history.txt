@@ -1,6 +1,62 @@
 The history order is reversed so that new features are at the top.
 
+5-Jun-2001
+	- Reduced the optimization level in linux.mak from -O6 to -O2.
+	  This will probably not do much anyway and -O6 seems to give problems
+	  with gcc 2.96. I hope -O2 works well enough.
+	- Removed 'sndload' from 'make walkall'.
+	- Norman Kramer says:
+	  The Sound, VFS, G3D, G2D, MotionMan, Config and NetDrv variables of
+	  the csSystemDriver class are now private. If you want to access the
+	  plugins represented by those variables first do a QUERY_PLUGIN to
+	  get a pointer to them.
+	  Norman did a lot of changes everywhere to accomodate the changes
+	  above.
 4-Jun-2001
+	- Added csTransform This2OtherRelative() and Other2ThisRelative()
+	  which operate on csPlane3.
+	- Removed a couple of csIntersect3::Plane() routines to make things
+	  simpler.
+	- Did a little work on plane clipping in OpenGL renderer. It is
+	  almost working perfectly now but there are still a few problems/bugs
+	  here and there.
+	- Fixed two bugs with csPolygon3D::IsTransparent() and polygons using
+	  MIXMODE. When such a polygon was used on a portal the portal would
+	  not detect that the polygon was transparent and the texture would
+	  not be drawn.
+	- Philip Wyett fixed output of OpenGL clipper detection by using
+	  SysPrintf.
+	- Wouter Wijngaards did the following to the iso engine:
+	    - Fixed the transform for iso mesh objects. The current transform
+	      causes MUCH less disforming than the previous. The secret to
+	      this is by not translating 0,0,minz, but by  -minz*3/4,
+	      -minz/4, +minz/4. Which is soooo obvious...
+	    - Fixed potential mesh lighting problems.
+	    - Adjusted the fountain to look nicer (a bit wider).
+	- Christopher Nelson updated table code so that it works, with the
+	  caveat that named tables are still not up. Changed all "char"
+	  references to "unsigned char" in case someone needs the upper 128
+	  characters of the UTF-8 or ASCII table in matching.  This is
+	  primarily for international codepage support. 
+	- Christopher Nelson also added final code for named table
+	  recognition in the BuildTableLeaf function. Named tables (character
+	  classes like alpha, alnum, space, upper, lower, print, graph,
+	  cntrl, xdigit, digit) are now fully supported syntactic elements.
+	- Martin Geisse did further work on the RTTI system:
+	    - Added iDataObject as an interface for csDataObject.
+	    - The above change makes it possible for walktest to use SCF
+	      instead of RTTI.
+	    - Rewrote csNodeIterator to use SCF instead of RTTI.
+	- Martin Geisse removed the now unused 'old' RTTI system.
+	- Norman Kramer did a lot of cleanup on CS with regards to querying
+	  plugins (like iVFS, iGraphics3D, ...).
+	- Norman split sound loaders into multiple plugins.
+	- Norman added QueryClassList to scf.
+	- Norman removed entries for soundloaders other than multiplex.
+	  Removed imgplex.cfg. No longer needed. The image multiplexer now
+	  uses QueryClassList.
+	- Norman: the sound loader multiplexer now uses QueryClassList to
+	  determine the list of sound loaders to use.
 	- Eric Sunshine updated out-of-date Mingw comment in enginep.mak.
 	- Eric Sunshine fixed the makefiles for map2cs, mdl2spr, scfreg,
 	  scftutor, and gfxtest so that these applications successfully link on
@@ -39,6 +95,30 @@ The history order is reversed so that new features are at the top.
 	  of finding their plugin modules based upon the setting of the CRYSTAL
 	  environment variable.
 3-Jun-2001
+	- Added new version of csFrustum::ClipToPlane() which accepts a
+	  general plane instead of two vertices.
+	- Renamed csPlane3::GetNormal() to Normal(). Also for csDPlane.
+	- Martin Geisse added iDynLight::GetNext() and moved csObjectIt from
+	  the old RTTI system to SCF.
+	- Martin extended iCameraPosition and iEngine with functions from
+	  csCameraPosition and csEngine. Levtool now uses the engine only
+	  through interfaces.
+	- Martin also added GetWarp() to iPortal and continued to change
+	  levtool to use the engine through interfaces (seems like I
+	  overlooked some cases last time :-)
+	- Wouter Wijngaards extended iso engine so that you can now use mesh
+	  objects in the iso engine. They are wrapped in a iIsoMeshSprite
+	  class, and can be handled like any other iso Sprite. In the isotest
+	  app you can see a fountain mesh, and a cube.
+	- Wouter Wijngaards enabled lighting for mesh objects used in the
+	  iso engine. Iso engine now exports a fake iLight interface.
+	- Wouter fixed the perspectiveaspect, turned out to be a simple
+	  mistake. The cube mesh now shows up at the correct spot - but looks
+	  a bit weird due to uninited lighting.
+	- Wouter added csgeom to the linex2d canvas, to fix csRect reference.
+	- Philip Wyett started adding the new Direct Draw 8 plugin (not
+	  Direct3D yet!).
+	- Michael Voasse did some more work on motion manager.
 	- Eric Sunshine eliminated a couple compilation warnings in isoview.cpp
 	  regarding assignment of float to integer.
 	- Eric Sunshine eliminated several compilation errors from metasys.cpp.
@@ -68,7 +148,60 @@ The history order is reversed so that new features are at the top.
 	  calls to csBezierTemplate::QueryInterface() incorrectly invoked
 	  csObject::QueryInterface() rather than correctly invoking
 	  csCurveTemplate::QueryInterface().
+2-Jun-2001
+	- Fixed a very old bug in the OpenGL renderer. Triangle meshes as
+	  seen through a mirror did make backface culling operate differently.
+	  This resulted in the inside of the object being visible through
+	  a mirror.
+	- Fixed another bug in OpenGL clipper with regards to mirroring.
+	- Martin Geisse changed the 'bumptest', 'demosky', 'metademo' and
+	  'video' applications to use the engine only through SCF interfaces.
+	- Philip Wyett removed the DirectX 6.1 plugin.
+	- Wouter Wijngaards created a start for an iso mesh sprite.
+	  Wraps around a mesh object, and that becomes a nice sprite in the
+	  isometric engine. I've fudged the transformations now, so that the
+	  perspective transformation will be almost like the isometric one,
+	  for small objects (say for animated 3d sprites ;) ). It does not
+	  work yet. The code is commented out in apps/isotest, with a #if. 
+	- Christopher Nelson made some changes to the cslexan parser, added
+	  most of the table support.  Still need to add character classes
+	  (named tables) and finish the table build sequence.
+	- Philip Wyett removed cslexan from build process until repaired.
+	- Christopher Nelson writes:
+	  Dumb me: I forgot that the make files automatically compile ALL
+	  .cpp files in the source directory, not just specific ones.  I
+	  hadn't intended csrdparse.cpp to be included in the build process
+	  yet, but I also wanted to update the repository so that I could
+	  work on it at home too.  I fixed the build problem, so cslexan
+	  should compile normally again.  Sorry for the trouble Philip, and
+	  thanks for letting me know. 
+	- Philip Wyett added cslexan to build process.
 1-Jun-2001
+	- Martin Geisse changed the way in which csEngine represents a
+	  csObject. It is no longer a subclass of csObject but instead has
+	  a csObject as a member. More accurately, this member is not a
+	  csObject but a subclass which overrides the SCF methods to serve
+	  as an embedded interface. Also added an accessor method for it,
+	  QueryCsObject().
+	- Martin also optimized SCF in two cases:
+	    - Normal (non-embedded) SCF objects increase and decrease the
+	      reference count of their scfParent only once at construction
+	      and destruction.
+	    - Embedded interface have no longer a reference count because
+	      it was not used anyway.
+	- Christopher Nelson writes:
+	  These are the new general RE parsing routines. They support
+	  alternates, all wildcards, and have rudimentary support for
+	  tables. Nesting alternates and wildcards is allowed.  Silly
+	  syntax is ignored, and some syntactical errors are recovered from.
+	  Forgetting ')', ']', or specifying an unknown named table are fatal.  
+	- Philip Wyett fixed compiler warning in "Create2DSprites(void)"
+	  caused by:
+	    csEngine* engine = (csEngine*)engine;
+	  when it should be:
+	    csEngine* engine = (csEngine*)Engine;
+	- Philip also modified video app to use iThingState and brought
+	  into line with Jorrits changes.
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to
 	  TYPED_VECTOR_NODELETE. Note, motion manager now throws a compiler

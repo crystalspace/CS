@@ -410,7 +410,7 @@ bool csIntersect3::IntersectTriangle (const csVector3& tr1,
 {
   csPlane3 plane (tr1, tr2, tr3);
   float dist;
-  if (!Plane (seg, plane, isect, dist)) return false;
+  if (!Plane (seg.Start (), seg.End (), plane, isect, dist)) return false;
   // 'isect' is the intersection of the segment and the
   // plane. Now we have to see if this intersection is
   // in the triangle.
@@ -418,18 +418,6 @@ bool csIntersect3::IntersectTriangle (const csVector3& tr1,
   if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
   if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
   return true;
-}
-
-void csIntersect3::Plane(const csVector3& u, const csVector3& v,
-                         const csVector3& normal, const csVector3& a,
-                         csVector3& isect)
-{
-  float counter = normal * (u - a);
-  float divider = normal * (v - u);
-  float dist;
-  if (divider == 0) { isect = v; return; }
-  dist = counter / divider;
-  isect = u + dist*(u - v);
 }
 
 void csIntersect3::Plane(const csVector3& u, const csVector3& v,
@@ -444,35 +432,18 @@ void csIntersect3::Plane(const csVector3& u, const csVector3& v,
 }
 
 bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
-                         float A, float B, float C, float D,
-                         csVector3& isect, float& dist)
-{
-  float x,y,z, denom;
-
-  x = v.x-u.x;  y = v.y-u.y;  z = v.z-u.z;
-  denom = A*x + B*y + C*z;
-  if (ABS (denom) < SMALL_EPSILON) return false; // they are parallel
-
-  dist = -(A*u.x + B*u.y + C*u.z + D) / denom;
-  if (dist < -SMALL_EPSILON || dist > 1+SMALL_EPSILON) return false;
-
-  isect.x = u.x + dist*x;  isect.y = u.y + dist*y;  isect.z = u.z + dist*z;
-  return true;
-}
-
-bool csIntersect3::Plane(const csVector3& u, const csVector3& v,
                          const csPlane3& p, csVector3& isect, float& dist)
 {
-  float x,y,z, denom;
+  float denom;
+  csVector3 vu = v-u;
 
-  x = v.x-u.x;  y = v.y-u.y;  z = v.z-u.z;
-  denom = p.norm.x*x + p.norm.y*y + p.norm.z*z;
-  if (ABS (denom) < SMALL_EPSILON) return false; // they are parallel
+  denom = p.norm * vu;
+  if (denom == 0) { isect = v; return false; } // they are parallel
 
   dist = -(p.norm*u + p.DD) / denom;
   if (dist < -SMALL_EPSILON || dist > 1+SMALL_EPSILON) return false;
 
-  isect.x = u.x + dist*x;  isect.y = u.y + dist*y;  isect.z = u.z + dist*z;
+  isect = u + dist * vu;
   return true;
 }
 

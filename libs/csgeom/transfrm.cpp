@@ -77,6 +77,12 @@ csPlane3 csTransform::Other2This (const csPlane3& p) const
   return csPlane3 (newnorm, p.DD + newnorm * (m_o2t*v_o2t) );
 }
 
+csPlane3 csTransform::Other2ThisRelative (const csPlane3& p) const
+{
+  csVector3 newnorm = m_o2t*p.norm;
+  return csPlane3 (newnorm, p.DD);
+}
+
 void csTransform::Other2This (const csPlane3& p, const csVector3& point,
                            csPlane3& result) const
 {
@@ -123,11 +129,17 @@ csPlane3 csReversibleTransform::This2Other (const csPlane3& p) const
   return csPlane3 (newnorm, p.DD - p.norm * (m_o2t*v_o2t) );
 }
 
-void csReversibleTransform::This2Other (const csPlane3& p, const csVector3& point,
-                           csPlane3& result) const
+void csReversibleTransform::This2Other (const csPlane3& p,
+	const csVector3& point, csPlane3& result) const
 {
   result.norm = m_t2o*p.norm;
   result.DD = - (result.norm * point);
+}
+
+csPlane3 csReversibleTransform::This2OtherRelative (const csPlane3& p) const
+{
+  csVector3 newnorm = m_t2o * p.norm;
+  return csPlane3 (newnorm, p.DD);
 }
 
 csVector3 operator/ (const csVector3& v, const csReversibleTransform& t) 

@@ -846,10 +846,20 @@ void csGraphics3DOGLCommon::SetupClipPlanes ()
       glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
       i1 = i;
     }
-    plane_eq[0] = 0;
-    plane_eq[1] = 0;
-    plane_eq[2] = 1;
-    plane_eq[3] = -.001;
+    if (do_near_plane)
+    {
+      plane_eq[0] = -near_plane.A ();
+      plane_eq[1] = -near_plane.B ();
+      plane_eq[2] = -near_plane.C ();
+      plane_eq[3] = -near_plane.D ();
+    }
+    else
+    {
+      plane_eq[0] = 0;
+      plane_eq[1] = 0;
+      plane_eq[2] = 1;
+      plane_eq[3] = -.001;
+    }
     glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
   }
 }
@@ -1129,6 +1139,19 @@ void csGraphics3DOGLCommon::SetClientStates (UInt ct)
     glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
   prev_ct = ct;
+}
+
+static bool mirror_mode = false;
+
+void csGraphics3DOGLCommon::SetMirrorMode (bool mirror)
+{
+  if (mirror == mirror_mode)
+    return;
+  mirror_mode = mirror;
+  if (mirror)
+    glCullFace (GL_BACK);
+  else
+    glCullFace (GL_FRONT);
 }
 
 void csGraphics3DOGLCommon::SetupStencil ()
@@ -1975,58 +1998,109 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     int& num_clipped_triangles,
     int& num_clipped_vertices,
     bool transform,
-    bool exact_clipping)
+    bool mirror,
+    bool exact_clipping,
+    bool plane_clipping,
+    bool frustum_clipping)
 {
   // Make sure the frustum is ok.
-  CalculateFrustum ();
+  if (frustum_clipping)
+    CalculateFrustum ();
 
-  // Now calculate the frustum as seen in object space for the given
-  // mesh.
-  csPlane3 frustum_planes[100];	// @@@ Arbitrary number.
-  csPoly3D obj_frustum;
+  csPlane3 frustum_planes[100];	// @@@ Arbitrary limit
+  csPlane3 diagonal_planes[50];	// @@@ Arbitrary number.
+  int num_frust = 0;
+  int num_diagonal_planes = 0;
+
   int i, j, j1;
-  for (i = 0 ; i < frustum.GetNumVertices () ; i++)
+  if (frustum_clipping)
   {
+    // Now calculate the frustum as seen in object space for the given
+    // mesh.
+    csPoly3D obj_frustum;
+    int mir_i;
+    num_frust = frustum.GetNumVertices ();
+    for (i = 0 ; i < num_frust ; i++)
+    {
+      if (mirror) mir_i = num_frust-i-1;
+      else mir_i = i;
+      if (transform)
+        obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[mir_i]));
+      else
+        obj_frustum.AddVertex (frustum[mir_i]);
+    }
+    j1 = num_frust-1;
+    for (j = 0 ; j < num_frust ; j++)
+    {
+      frustum_planes[j].Set (csVector3 (0), obj_frustum[j1], obj_frustum[j]);
+      j1 = j;
+    }
+
+    // In addition to the frustum planes itself we also calculate all
+    // diagonal planes which go from one side of the frustum to the other.
+    // These are going to be used to detect the special case of a triangle
+    // that has none of its vertices in the frustum. But this triangle can
+    // still be visible. To detect this we test if there is one of these
+    // extra planes that cuts the triangle in two. Since the number of diagonal
+    // planes is half the number of frustum planes we can save some
+    // calculation here.
+    if (num_frust > 3)
+      // Use (num_frust+1)/2 to make sure that odd frustums get one extra plane.
+      for (j = 0 ; j < (num_frust+1) / 2 ; j++)
+      {
+        j1 = j + (num_frust+1) / 2;
+        j1 = j1 % num_frust;
+        diagonal_planes[num_diagonal_planes++].Set
+      	  (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
+      }
+  }
+
+  // num_planes is the number of planes to test with. If there is no
+  // near clipping plane then this will be equal to num_frust.
+  int num_planes;
+  if (plane_clipping)
+  {
+  //@@@ If mirror???
     if (transform)
-      obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[i]));
+      frustum_planes[num_frust] = o2c.This2OtherRelative (near_plane);
     else
-      obj_frustum.AddVertex (frustum[i]);
+      frustum_planes[num_frust] = near_plane;
+    num_planes = num_frust+1;
   }
-  int num_frust = frustum.GetNumVertices ();
-  j1 = num_frust-1;
-  for (j = 0 ; j < num_frust ; j++)
+  else
   {
-    frustum_planes[j].Set (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
-    j1 = j;
+    num_planes = num_frust;
   }
+
   csVector3 frust_origin;
   if (transform)
     frust_origin = o2c.This2Other (csVector3 (0));
   else
     frust_origin.Set (0, 0, 0);
 
-  // In addition to the frustum planes itself we also calculate all
-  // diagonal planes which go from one side of the frustum to the other.
-  // These are going to be used to detect the special case of a triangle
-  // that has none of its vertices in the frustum. But this triangle can
-  // still be visible. To detect this we test if there is one of these
-  // extra planes that cuts the triangle in two. Since the number of diagonal
-  // planes is half the number of frustum planes we can save some
-  // calculation here.
-  csPlane3 diagonal_planes[50];	// @@@ Arbitrary number.
-  int num_diagonal_planes = 0;
-  if (num_frust > 3)
-    // Use (num_frust+1)/2 to make sure that odd frustums get one extra plane.
-    for (j = 0 ; j < (num_frust+1) / 2 ; j++)
-    {
-      j1 = j + (num_frust+1) / 2;
-      j1 = j1 % num_frust;
-      diagonal_planes[num_diagonal_planes++].Set
-      	(csVector3 (0), obj_frustum[j], obj_frustum[j1]);
-    }
+  ClipTriangleMesh (num_triangles, num_vertices, triangles, vertices,
+    texels, vertex_colors, vertex_fog,
+    num_clipped_triangles, num_clipped_vertices, exact_clipping,
+    frust_origin, frustum_planes, num_planes,
+    diagonal_planes, num_diagonal_planes);
+}
 
-  // Setup the viewing plane.
-  //@@@frustum_planes[num_frust].Set (0, 0, -1, .01);
+void csGraphics3DOGLCommon::ClipTriangleMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    bool exact_clipping,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes,
+    csPlane3* diag_planes, int num_diag_planes)
+{
+  int i, j;
 
   // Make sure our worktables are big enough for the clipped mesh.
   int num_tri = num_triangles*2+50;
@@ -2056,16 +2130,13 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   {
     const csVector3& v = vertices[i];
     bool inside = true;
-    j1 = num_frust-1;
-    for (j = 0 ; j < num_frust ; j++)
+    for (j = 0 ; j < num_planes ; j++)
     {
-      if (csMath3::WhichSide3D (v-frust_origin, obj_frustum[j],
-	    obj_frustum[j1]) >= 0)
+      if (planes[j].Classify (v-frust_origin) >= 0)
       {
 	inside = false;
 	break;	// Not inside.
       }
-      j1 = j;
     }
     if (inside)
     {
@@ -2105,9 +2176,13 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       // triangle is cut by the diagonal planes. If yes then we have
       // to clip anyway.
       //=====
-      for (j = 0 ; j < num_diagonal_planes ; j++)
+      // @@@ WARNING: This test is not 100% correct and it is possible
+      // to reproduce this problem fairly easily. Especially if the
+      // clipper is a triangle in which case this test will not even
+      // function.
+      for (j = 0 ; j < num_diag_planes ; j++)
       {
-        csPlane3& pl = diagonal_planes[j];
+        csPlane3& pl = diag_planes[j];
         csVector3 v0 = vertices[tri.a] - frust_origin;
         csVector3 v1 = vertices[tri.b] - frust_origin;
         csVector3 v2 = vertices[tri.c] - frust_origin;
@@ -2166,18 +2241,14 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       int num_poly = 3;
 
       //-----
-      // First we clip the triangle to the planes of the frustum.
+      // First we clip the triangle to the given planes.
       // This will result in a polygon. The clipper keeps information
       // (in clipinfo) about what happens to all the vertices.
       //-----
-      j1 = num_frust-1;
-      for (j = 0 ; j < num_frust ; j++)
+      for (j = 0 ; j < num_planes ; j++)
       {
-        csVector3& v1 = obj_frustum[j1];
-        csVector3& v2 = obj_frustum[j];
-        csFrustum::ClipToPlane (poly, num_poly, clipinfo, v1, v2);
+	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
 	if (num_poly <= 0) break;
-	j1 = j;
       }
 
       //-----
@@ -2238,8 +2309,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   char how_clip = OPENGL_CLIP_NONE;
   bool use_lazy_clipping = false;
+  bool do_plane_clipping = false;
 
-  // @@@ Todo: what to do with clip_plane?
   if (mesh.clip_portal != CS_CLIP_NOT)
   {
     // Some clipping may be required.
@@ -2287,7 +2358,33 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
   }
 
-  int i,k;
+  // Check for the near plane.
+  if (mesh.clip_plane != CS_CLIP_NOT)
+  {
+    // @@@@@@@@@@@@@@@@@@
+    // What about the case where geometry straddles both the Z=0 and
+    // near plane independently? We need two extra planes in that case.
+    // @@@@@@@@@@@@@@@@@@
+    if (do_near_plane)
+    {
+      do_plane_clipping = true;
+      // If we must do clipping to the near plane then we cannot use
+      // lazy clipping.
+      use_lazy_clipping = false;
+      // If we are doing plane clipping already then we don't have
+      // to do additional software plane clipping as the OpenGL plane
+      // clipper can do this too.
+      if (how_clip == 'p')
+      {
+        do_plane_clipping = false;
+      }
+    }
+    else
+    {
+    }
+  }
+
+  int i, k;
 
   //===========
   // Update work tables.
@@ -2356,7 +2453,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
-  if (how_clip == '0' || use_lazy_clipping)
+  if (how_clip == '0' || use_lazy_clipping || do_plane_clipping)
   {
     ClipTriangleMesh (
 	num_triangles,
@@ -2369,7 +2466,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	num_triangles,
 	num_vertices,
 	mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
-	!use_lazy_clipping);
+	mesh.do_mirror,
+	!use_lazy_clipping,
+	do_plane_clipping,
+	how_clip == '0' || use_lazy_clipping);
     if (!use_lazy_clipping)
     {
       work_verts = clipped_vertices.GetArray ();
@@ -2505,6 +2605,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       m_multimat = (csMaterialHandle*)mesh.mat_handle;
   }
   m_alpha = SetupBlend (m_mixmode, m_alpha, txt_alpha);
+  SetMirrorMode (mesh.do_mirror);
 
   bool m_textured = (texturehandle != 0);
   if (m_textured)
@@ -2714,6 +2815,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (clip_planes_enabled)
     for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+
+  SetMirrorMode (false);
 }
 
 

@@ -373,9 +373,8 @@ public:
 
   /// Return the normal vector of this plane.
   inline csDVector3& Normal () { return norm; }
-
-  /// Return the normal vector of this plane (const version).
-  inline csDVector3 GetNormal () const { return norm; }
+  /// Return the normal vector of this plane.
+  inline const csDVector3& Normal () const { return norm; }
 
   /// Return the A component of this plane.
   inline double A () const { return norm.x; }
