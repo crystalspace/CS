@@ -66,7 +66,11 @@ struct iPosition : public iBase
                        const csVector3& Pos, 
                        const csVector3& Orientation) = 0;
   
-  /// Set the position, using an existing position object.
+  /**
+   * Set the position, using an existing position object, The position data
+   * will only be copied by this call. This call will not create a link
+   * between these objects
+   */
   virtual SetPosition (iPosition* pPos) = 0;
 
   /// Gets the current sector.
@@ -150,9 +154,18 @@ struct iAttribute : public iBase
 
   /**
    * returns true, if this attribute is to be stored to disk, when
-   * the according entity will be saved
+   * the according entity will be saved. 
    */
   virtual bool IsPersistant() = 0;
+
+  /**
+   * returns true, if the referenced data is considered to belong to
+   * the attribute, instead of just pointing to the data.
+   * by default all simple types like float or string are aggreagted.
+   * This is also true for Arrays and Position. For Entities you can 
+   * choose, if you want reference or aggregation.
+   */
+  virtual bool IsAggegated() = 0;
 
   /// Get the value as various types.
   virtual double           GetFloat()        = 0;
@@ -164,13 +177,13 @@ struct iAttribute : public iBase
   virtual iAttributeArray* GetArray()        = 0;
 
   /// Set the value as various types.
-  virtual void SetFloat   (double Val)           = 0;
-  virtual void SetInteger (int Val)              = 0;
-  virtual void SetString  (const char* Val)      = 0;
-  virtual void SetEntity  (iEntity* Val)         = 0;
-  virtual void SetPosition(iPosition* Val)       = 0;
-  virtual void SetVector  (csVector3 Val)        = 0;
-  virtual void SetArray   (iAttributeArray* Val) = 0;
+  virtual void SetFloat   (double Val)                   = 0;
+  virtual void SetInteger (int Val)                      = 0;
+  virtual void SetString  (const char* Val)              = 0;
+  virtual void SetEntity  (iEntity* Val, bool Aggregate) = 0;
+  virtual void SetPosition(iPosition* Val)               = 0;
+  virtual void SetVector  (csVector3 Val)                = 0;
+  virtual void SetArray   (iAttributeArray* Val)         = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -378,6 +391,74 @@ struct iEntityIterator : public iBase
 
 //---------------------------------------------------------------------------
 
+SCF_VERSION (iGameSprite3D, 0, 1, 0);
+
+/**
+ * The interface for an iterator across Game entites
+ */
+struct iGameSprite3D : public iBase
+{
+  /**
+   * Get the name of the model, that defines that sprite
+   */
+  virtual const char* GetModelName() = 0;
+  
+  /**
+   * Set the position to be used by the Sprite. You can either use an 
+   * existing position object (for example the entity position), or
+   * create a new position object for the Sprite to use.
+   * Using the entites position object has the advantage, that the 
+   * Sprite will be able to update the position of the engine while
+   * it plays the animation. This is very useful for example, when
+   * you have a model of a walking object to keep movement in sync
+   * with position.
+   */
+  virtual void SetPosition (iPosition* pPos) = 0;
+
+  /// Get the current position of the sprite
+  virtual iPosition* GetPosition() = 0;
+
+  /**
+   * Get a pointer to the current collider. While animation advances,
+   * the collider frame will also advance
+   */
+  virtual iCollider* GetCollider() = 0;
+
+  /**
+   * Set a pointer to the entity, that will receive the events that
+   * occur while the animation is running. (For example there could
+   * be an event "fire_gun" that was triggered, whenever the animation
+   * frame was passed that has the model react to the firing)
+   */
+  virtual void SetEntity(iEntity* pEntity) = 0;
+
+  /**
+   * switches to one of the predefined animation modes available for
+   * this sprite.
+   */
+  virtual void SetAnmiation(const char* Animation) = 0;
+
+  /**
+   * Sets the current Animation Frame. Automatic animation will contine
+   * at that point 
+   */
+  virtual void SetAnimationFrame(const char* Animation, int Frame) = 0;
+
+  /// Get the current frame of animation
+  virtual int GetAnimationFrame() = 0;
+
+  /// Get the name of the current animation sequence.
+  virtual const char* GetAnimation() = 0;
+
+  /**
+   * Used by the game engine, to keep the sprite animated. Do not call this
+   * method from your game code.
+   */
+  virtual void AdvanceAnimation() = 0;
+};
+
+//---------------------------------------------------------------------------
+
 SCF_VERSION (iDataLoader, 0, 1, 0);
 
 /**
@@ -479,6 +560,16 @@ struct iGameCore : public iBase
 
   /// Remove an entity from the game core.
   virtual void RemoveEntity (iEntity* pEntity) = 0;
+
+  /// Creates a 3D sprite from an existing definition
+  virtual iGameSprite3D* CreateSprite(const char* Modelname);
+
+  /**
+   * Register a 3D sprite model from its textual representation
+   * It is assumed that the caller has already set the proper 
+   * context for loading, by using pLoader->OpenContext()
+   */
+  virtual void RegisterSprite3DModel(iDataLoader* pLoader);
 
   /**
    * Starts moving an entity to a new position and automatically stops the Entity
