@@ -79,6 +79,7 @@ private:
 //  csRenderLoop* rl;
   csStringID shadertype;
   bool zOffset;
+  bool portalTraversal;
   csZBufMode zmode;
   csRef<iStringSet> strings;
   csRef<iShaderManager> shaderManager;
@@ -106,10 +107,12 @@ public:
   virtual const char* GetShaderType ();
 
   virtual void SetZOffset (bool zOffset);
-  virtual bool GetZOffset ();
+  virtual bool GetZOffset () const;
+  virtual void SetPortalTraversal (bool p) { portalTraversal = p; }
+  virtual bool GetPortalTraversal () const { return portalTraversal; }
 
   virtual void SetZBufMode (csZBufMode zmode);
-  virtual csZBufMode GetZBufMode ();
+  virtual csZBufMode GetZBufMode () const;
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 
     csRenderMesh** meshes, int num, csShaderVarStack &stacks);

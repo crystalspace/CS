@@ -30,6 +30,17 @@ chronological order.
 	  render time yet... So a CS_ASSERT will have to do for now.
 	- Steven Geens fixed sockets in sprcal3d. The alignement of the
 	  object in the socket was incorrect.
+	- Jorrit added 'const' to several methods in iGenericRenderStep.
+	- Jorrit added methods iGenericRenderStep->SetPortalTraversal()
+	  and GetPortalTraversal(). These methods indicate to the render
+	  step if it should traverse (draw) portal containers or not. By
+	  doing this we will solve the problem that using portals in a
+	  level with a complicated renderloop will cause huge overhead
+	  because the portal is traversed for every step in the render loop.
+	- Jorrit added a <portaltraversal> keyword for the renderstep loader.
+	  If this is specified then portals will be rendered in that
+	  renderstep. In most cases this should probably be specified
+	  for the first step (i.e. ambient).
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

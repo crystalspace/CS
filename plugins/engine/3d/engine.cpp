@@ -1811,6 +1811,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
     genStep->SetShaderType ("OR compatibility");
     genStep->SetZBufMode (CS_ZBUF_MESH);
     genStep->SetZOffset (false);
+    genStep->SetPortalTraversal (true);
   }
   else
     Error("Failed to load plugin %s; pandemonium will ensue.", stdstep);

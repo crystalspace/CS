@@ -4,6 +4,7 @@
   <steps>
     <step plugin="crystalspace.renderloop.step.generic">
       <shadertype>ambient</shadertype>
+      <portaltraversal />
       <zuse />
     </step>
   </steps>

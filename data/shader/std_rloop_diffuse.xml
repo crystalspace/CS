@@ -6,6 +6,7 @@
     <step plugin="crystalspace.renderloop.step.generic">
       <shadertype>ambient</shadertype>
       <zoffset>yes</zoffset>
+      <portaltraversal />
       <zuse />
     </step>
     <step plugin="crystalspace.renderloop.step.lightiter">

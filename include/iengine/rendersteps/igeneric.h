@@ -38,12 +38,17 @@ struct iGenericRenderStep : public iBase
   /// Set Z offset flag.
   virtual void SetZOffset (bool zOffset) = 0;
   /// Get Z offset flag.
-  virtual bool GetZOffset () = 0;
+  virtual bool GetZOffset () const = 0;
+
+  /// Enable/disable portal traversal for this renderstep.
+  virtual void SetPortalTraversal (bool p) = 0;
+  /// Get portal traversal flag.
+  virtual bool GetPortalTraversal () const = 0;
 
   /// Set Z buffer mode.
   virtual void SetZBufMode (csZBufMode zmode) = 0;
   /// Get Z buffer mode.
-  virtual csZBufMode GetZBufMode () = 0;
+  virtual csZBufMode GetZBufMode () const = 0;
 };
 
 #endif

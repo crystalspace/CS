@@ -74,13 +74,19 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
     csStringID id = tokens.Request (child->GetValue ());
     switch (id)
     {
+      case XMLTOKEN_PORTALTRAVERSAL:
+        {
+	  bool result;
+	  if (!synldr->ParseBool (child, result, false))
+	    return 0;
+	  step->SetPortalTraversal (result);
+	}
+	break;
       case XMLTOKEN_ZOFFSET:
 	{
 	  bool result;
 	  if (!synldr->ParseBool (child, result, false))
-	  {
 	    return 0;
-	  }
 	  step->SetZOffset (result);
 	}
 	break;
@@ -161,6 +167,7 @@ csGenericRenderStep::csGenericRenderStep (
 
   shadertype = 0;
   zOffset = false;
+  portalTraversal = false;
   zmode = CS_ZBUF_USE;
   currentSettings = false;
   o2c_matrix_name = strings->Request ("object2camera matrix");
@@ -199,6 +206,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
+      if ((!portalTraversal) && mesh->portal != 0) continue;
       csShaderVariable *sv;
       
       sv = shadervars.GetVariableAdd (o2c_matrix_name);
@@ -392,7 +400,7 @@ void csGenericRenderStep::SetZOffset (bool zOffset)
   csGenericRenderStep::zOffset = zOffset;
 }
 
-bool csGenericRenderStep::GetZOffset ()
+bool csGenericRenderStep::GetZOffset () const
 {
   return zOffset;
 }
@@ -402,7 +410,7 @@ void csGenericRenderStep::SetZBufMode (csZBufMode zmode)
   csGenericRenderStep::zmode = zmode;
 }
 
-csZBufMode csGenericRenderStep::GetZBufMode ()
+csZBufMode csGenericRenderStep::GetZBufMode () const
 {
   return zmode;
 }
