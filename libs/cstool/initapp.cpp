@@ -54,8 +54,6 @@
 
 static SysSystemDriver* global_sys = NULL;
 static bool config_done = false;
-static int global_argc = 0;
-static const char* const * global_argv = 0;
 static iEventHandler* installed_event_handler = NULL;
 
 iObjectRegistry* csInitializer::CreateEnvironment ()
@@ -162,6 +160,16 @@ iConfigManager* csInitializer::CreateConfigManager (
   return Config;
 }
 
+bool csInitializer::SetupCommandLineParser (iObjectRegistry* object_reg,
+  	int argc, const char* const argv[])
+{
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  CS_ASSERT (CommandLine != NULL);
+  CommandLine->Initialize (argc, argv);
+  return true;
+}
+
 bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
 	const char* configName)
 {
@@ -229,15 +237,12 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
 }
 
 bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
-	int argc, const char* const argv[],
 	...)
 {
   if (!config_done) SetupConfigManager (object_reg, NULL);
-  global_argc = argc;
-  global_argv = argv;
 
   va_list arg;
-  va_start (arg, argv);
+  va_start (arg, object_reg);
   char* plugName = va_arg (arg, char*);
   while (plugName != NULL)
   {
@@ -256,7 +261,7 @@ bool csInitializer::Initialize (iObjectRegistry* object_reg)
 {
   if (!config_done) SetupConfigManager (object_reg, NULL);
 
-  bool rc = global_sys->Initialize (global_argc, global_argv);
+  bool rc = global_sys->Initialize ();
   if (!rc) return false;
 
   // Setup the object registry.
@@ -392,12 +397,21 @@ bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
 
 bool csInitializer::OpenApplication (iObjectRegistry* object_reg)
 {
-  return global_sys->Open ();
+  // Pass the open event to all interested listeners.
+  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
+  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (EventQueue != NULL);
+  EventQueue->Dispatch (Event);
+  return true;
 }
 
-void csInitializer::CloseApplication (iObjectRegistry* /*object_reg*/)
+void csInitializer::CloseApplication (iObjectRegistry* object_reg)
 {
-  global_sys->Close ();
+  // Warn all interested listeners the system is going down
+  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
+  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (EventQueue != NULL);
+  EventQueue->Dispatch (Event);
 }
 
 void csInitializer::DestroyApplication (iObjectRegistry* object_reg)

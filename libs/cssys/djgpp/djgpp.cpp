@@ -102,11 +102,16 @@ SysSystemDriver::~SysSystemDriver ()
 {
   if (EventOutlet)
     EventOutlet->DecRef ();
+  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (event_queue)
+    event_queue->RemoveListener (&scfiEventHandler);
 }
 
 bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
+  if (e.Type != csevBroadcast) return false;
+
+  if (e.Command.Code == cscmdPreProcess)
   {
     if (!EventOutlet)
     {
@@ -154,111 +159,111 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
     } /* endwhile */
     return true;
   }
+  else if (e.Command.Code == cscmdSystemOpen)
+  {
+    // Initialize keyboard handler
+    if (KH.install ())
+      return false;
+    // Give us exclusive access of the keyboard.
+    KH.chain (0);
+    KeyboardOpened = true;
+
+    csConfigAccess cfg;
+    cfg.AddConfig(GetObjectRegistry(), "/config/mouse.cfg");
+    SensivityFactor = cfg->GetFloat ("MouseDriver.MouseSensivity", 1.0);
+
+    if (MH.install ())
+      return false;
+
+    // Query screen size
+    int FrameWidth, FrameHeight, Depth;
+    bool FullScreen;
+    //@@@ THIS IS BROKEN: Should get information from canvas!
+    //@@@GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
+    FrameWidth = 640;
+    FrameHeight = 480;
+    //@@@
+
+    // Query mouse sensivity
+    __dpmi_regs regs;
+    regs.x.ax = 0x1B;
+    __dpmi_int (0x33, &regs);
+    mouse_sensivity_x = regs.x.bx;
+    mouse_sensivity_y = regs.x.cx;
+    mouse_sensivity_threshold = regs.x.dx;
+
+    // Compute mouse sensivity
+    regs.x.cx = 8;
+    regs.x.dx = 8;
+    regs.x.ax = 0x0F;
+    __dpmi_int (0x33, &regs);
+    regs.x.bx = (int) ((50 + FrameWidth / 32) * SensivityFactor);
+    regs.x.cx = (int) ((50 + FrameHeight / 24) * SensivityFactor);
+    regs.x.dx = MAX (regs.x.bx, regs.x.cx); // ? not sure about this
+    regs.x.ax = 0x1A;
+    __dpmi_int (0x33, &regs);
+
+    // Set mouse range to full-screen
+    regs.x.ax = 0x07;
+    regs.x.cx = 0;
+    regs.x.dx = FrameWidth - 1;
+    __dpmi_int (0x33, &regs);
+    regs.x.ax = 0x08;
+    regs.x.cx = 0;
+    regs.x.dx = FrameHeight - 1;
+    __dpmi_int (0x33, &regs);
+
+    // Set mouse to (0, 0)
+    regs.x.ax = 0x04;
+    regs.x.cx = 0;
+    regs.x.dx = 0;
+    __dpmi_int (0x33, &regs);
+
+    MouseOpened = true;
+
+    return true;
+  }
+  else if (e.Command.Code == cscmdSystemClose)
+  {
+    if (KeyboardOpened)
+    {
+      KH.uninstall ();
+      KeyboardOpened = false;
+    }
+
+    if (MouseOpened)
+    {
+      MH.uninstall ();
+
+      // Restore mouse sensivity
+      __dpmi_regs regs;
+      regs.x.cx = 8;
+      regs.x.dx = 16;
+      regs.x.ax = 0x0F;
+      __dpmi_int (0x33, &regs);
+      regs.x.ax = 0x1A;
+      regs.x.bx = mouse_sensivity_x;
+      regs.x.cx = mouse_sensivity_y;
+      regs.x.dx = mouse_sensivity_threshold;
+      __dpmi_int (0x33, &regs);
+
+      MouseOpened = false;
+    }
+    return true;
+  }
   return false;
 }
 
-bool SysSystemDriver::Open ()
+bool SysSystemDriver::Initialize ()
 {
-  if (!csSystemDriver::Open ())
-    return false;
+  if (!csSystemDriver::Initialize ()) return false;
 
   iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (event_queue != NULL);
-  event_queue->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
-
-  // Initialize keyboard handler
-  if (KH.install ())
-    return false;
-  // Give us exclusive access of the keyboard.
-  KH.chain (0);
-  KeyboardOpened = true;
-
-  csConfigAccess cfg;
-  cfg.AddConfig(GetObjectRegistry(), "/config/mouse.cfg");
-  SensivityFactor = cfg->GetFloat ("MouseDriver.MouseSensivity", 1.0);
-
-  if (MH.install ())
-    return false;
-
-  // Query screen size
-  int FrameWidth, FrameHeight, Depth;
-  bool FullScreen;
-  //@@@ THIS IS BROKEN: Should get information from canvas!
-  //@@@GetSettings (FrameWidth, FrameHeight, Depth, FullScreen);
-  FrameWidth = 640;
-  FrameHeight = 480;
-  //@@@
-
-  // Query mouse sensivity
-  __dpmi_regs regs;
-  regs.x.ax = 0x1B;
-  __dpmi_int (0x33, &regs);
-  mouse_sensivity_x = regs.x.bx;
-  mouse_sensivity_y = regs.x.cx;
-  mouse_sensivity_threshold = regs.x.dx;
-
-  // Compute mouse sensivity
-  regs.x.cx = 8;
-  regs.x.dx = 8;
-  regs.x.ax = 0x0F;
-  __dpmi_int (0x33, &regs);
-  regs.x.bx = (int) ((50 + FrameWidth / 32) * SensivityFactor);
-  regs.x.cx = (int) ((50 + FrameHeight / 24) * SensivityFactor);
-  regs.x.dx = MAX (regs.x.bx, regs.x.cx); // ? not sure about this
-  regs.x.ax = 0x1A;
-  __dpmi_int (0x33, &regs);
-
-  // Set mouse range to full-screen
-  regs.x.ax = 0x07;
-  regs.x.cx = 0;
-  regs.x.dx = FrameWidth - 1;
-  __dpmi_int (0x33, &regs);
-  regs.x.ax = 0x08;
-  regs.x.cx = 0;
-  regs.x.dx = FrameHeight - 1;
-  __dpmi_int (0x33, &regs);
-
-  // Set mouse to (0, 0)
-  regs.x.ax = 0x04;
-  regs.x.cx = 0;
-  regs.x.dx = 0;
-  __dpmi_int (0x33, &regs);
-
-  MouseOpened = true;
+  event_queue->RegisterListener (&scfiEventHandler,
+  	CSMASK_Nothing | CSMASK_Broadcast);
 
   return true;
-}
-
-void SysSystemDriver::Close ()
-{
-  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (event_queue != NULL);
-  event_queue->RemoveListener (&scfiEventHandler);
-
-  if (KeyboardOpened)
-  {
-    KH.uninstall ();
-    KeyboardOpened = false;
-  }
-
-  if (MouseOpened)
-  {
-    MH.uninstall ();
-
-    // Restore mouse sensivity
-    __dpmi_regs regs;
-    regs.x.cx = 8;
-    regs.x.dx = 16;
-    regs.x.ax = 0x0F;
-    __dpmi_int (0x33, &regs);
-    regs.x.ax = 0x1A;
-    regs.x.bx = mouse_sensivity_x;
-    regs.x.cx = mouse_sensivity_y;
-    regs.x.dx = mouse_sensivity_threshold;
-    __dpmi_int (0x33, &regs);
-
-    MouseOpened = false;
-  }
 }
 
 void SysSystemDriver::SetMousePosition (int x, int y)

@@ -314,8 +314,6 @@ csSystemDriver::csSystemDriver (iObjectRegistry* object_reg) :
 
 csSystemDriver::~csSystemDriver ()
 {
-  Close ();
-
   ReportSys (CS_REPORTER_SEVERITY_DEBUG,
   	"*** System driver is going to shut down now!\n");
 
@@ -333,14 +331,14 @@ csSystemDriver::~csSystemDriver ()
   object_reg->Unregister (&scfiPluginManager);
 }
 
-bool csSystemDriver::Initialize (int argc, const char* const argv[])
+bool csSystemDriver::Initialize ()
 {
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
 
   // Collect all options from command line
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
-  CommandLine->Initialize (argc, argv);
+  CS_ASSERT (CommandLine != NULL);
 
   // The list of plugins
   csPluginList PluginList;
@@ -423,30 +421,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[])
   // flush all removed config files
   Config->FlushRemoved();
   return true;
-}
-
-bool csSystemDriver::Open ()
-{
-  ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Opening the drivers now!\n");
-
-  // Now pass the open event to all plugins
-  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
-  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (EventQueue != NULL);
-  EventQueue->Dispatch (Event);
-
-  return true;
-}
-
-void csSystemDriver::Close ()
-{
-  ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Closing the drivers now!\n");
-
-  // Warn all plugins the system is going down
-  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
-  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (EventQueue != NULL);
-  EventQueue->Dispatch (Event);
 }
 
 void csSystemDriver::QueryOptions (iComponent *iObject)

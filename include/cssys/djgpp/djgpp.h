@@ -56,11 +56,7 @@ public:
   virtual ~SysSystemDriver ();
 
   bool HandleEvent (iEvent& ev);
-
-  /// Open the system
-  virtual bool Open ();
-  /// Close the system
-  virtual void Close ();
+  virtual bool Initialize ();
 
   /// Set the mouse position (function for DosHelper).
   void SetMousePosition (int x, int y);

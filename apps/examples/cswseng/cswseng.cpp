@@ -567,7 +567,8 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
 	CS_REQUEST_ENGINE,

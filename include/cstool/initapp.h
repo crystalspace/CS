@@ -62,17 +62,6 @@ struct iConfigManager;
 typedef bool (csEventHandlerFunc) (iEvent&);
 
 /**
- * This is a very general function that does a lot of the application
- * setup for you. It has to be called after system->Initialize() and will
- * setup various objects in the object registry.
- * returns true if everything went fine
- @@@ SOON OBSOLETE, USE THE NEW csInitializer CLASS.
- */
-extern bool csInitializeApplication (iObjectRegistry* object_reg,
-	bool use_reporter = true,
-	bool use_reporter_listener = true);
-
-/**
  * This class contains several static member functions that can help
  * setup an application. It is possible to do all the setup on your own
  * but using the functions below will help considerably.
@@ -159,6 +148,13 @@ public:
   static bool CreateInputDrivers (iObjectRegistry* object_reg);
 
   /**
+   * Setup the commandline parser. This must be called after
+   * CreateCommandLineParser().
+   */
+  static bool SetupCommandLineParser (iObjectRegistry* object_reg,
+  	int argc, const char* const argv[]);
+
+  /**
    * Setup the config manager. If you have no config file then you can still
    * call this routine using a NULL parameter. If you don't call this then
    * either RequestPlugins() or Initialize() will call this routine with
@@ -177,9 +173,7 @@ public:
    * easier it is recommended you use one of the CS_REQUEST_xxx macros
    * above. <b>WARNING</b> Make sure to end the list with CS_REQUEST_END!
    */
-  static bool RequestPlugins (iObjectRegistry* object_reg,
-	int argc, const char* const argv[],
-	...);
+  static bool RequestPlugins (iObjectRegistry* object_reg, ...);
 
   /**
    * Really initialize the application. This will initialize all loaded

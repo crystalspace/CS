@@ -105,7 +105,7 @@ public:
   ~SysSystemDriver();
 
   // Implementation of the system.
-  virtual bool Initialize(int argc, char const* const argv[]);
+  virtual bool Initialize();
   bool HandleEvent(iEvent& ev);
 
   // Implementation of iEventPlug.

@@ -41,8 +41,7 @@ public:
 
 	virtual void Close();
 
-	virtual bool Initialize ( int argc, const char* const argv[]);
-	virtual void Loop ();
+	virtual bool Initialize ();
 
 	virtual void Alert( const char* s );
 	virtual void Warn( const char* s );

@@ -13,6 +13,17 @@ The history order is reversed so that new features are at the top.
 	  HitBeam() would sometimes return the right polygon that was hit
 	  but not the right mesh (i.e. it would always return the static
 	  mesh in those cases).
+	- Commandline parser is no longer initialized in csSystemDriver.
+	  Instead there is now csInitializer::SetupCommandLineParser().
+	  csInitializer::RequestPlugins() no longer has argc,argv parameters.
+	  Take care to fix your code! The compiler will not catch this!
+	- Removed the now obsolete csInitializeApplication().
+	- Removed csSystemDriver::Open() and Close(). The few ports that
+	  actually did something in those routines (Win32 and DOS) now listen
+	  to cscmdSystemOpen and cscmdSystemClose instead.
+	- csInitializer::OpenApplication() and CloseApplication() now send
+	  the cscmdSystemOpen/cscmdSystemClose messages instead of letting
+	  the system driver do it.
 9-Oct-2001
 	- Removed iSystem::GetObjectRegistry().
 	- The object registry is now a parameter to the system driver and

@@ -340,7 +340,7 @@ void SysSystemDriver::Warn(const char* s)
 }
 
 
-bool SysSystemDriver::Initialize (int argc, const char* const argv[])
+bool SysSystemDriver::Initialize ()
 {
     Handle          theMenuBar;
     MenuHandle      theMenu;
@@ -349,8 +349,8 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[])
 	OSErr			theError;
 
 // WHM CW6 fix, remove the (char ***) for CW4
-    argc = GetCommandLine( (char***) &argv );
-    if ( ! csSystemDriver::Initialize ( argc, argv ))
+    //@@@argc = GetCommandLine( (char***) &argv );
+    if ( ! csSystemDriver::Initialize ( ))
         return false;
 
     /*

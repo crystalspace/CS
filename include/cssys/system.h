@@ -157,14 +157,7 @@ public:
   virtual ~csSystemDriver ();
 
   /// This is usually called right after object creation.
-  virtual bool Initialize (int argc, const char* const argv[]);
-
-  /**
-   * Send cscmdSystemOpen message to all loaded plugins.
-   */
-  virtual bool Open ();
-  /// Close the system
-  virtual void Close ();
+  virtual bool Initialize ();
 
 // @@@ The following (and some of the above) should all move to the
 // specific implementation of the plugin manager when we have that.

@@ -3184,7 +3184,8 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  if (!csInitializer::RequestPlugins (object_reg, argc, argv, CS_REQUEST_END))
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     return -1;

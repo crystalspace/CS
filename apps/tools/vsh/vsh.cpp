@@ -518,7 +518,8 @@ int main (int argc, char *argv [])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return -1;
 
-  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_END))
     return -1;

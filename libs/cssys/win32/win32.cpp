@@ -474,57 +474,29 @@ SysSystemDriver::~SysSystemDriver ()
     FreeConsole();
 
   System = NULL;
+
+  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (event_queue)
+    event_queue->RemoveListener (&scfiEventHandler);
 }
 
-bool SysSystemDriver::Open ()
+bool SysSystemDriver::Initialize ()
 {
-  if (!csSystemDriver::Open ())
-    return false;
+  if (!csSystemDriver::Initialize ()) return false;
 
   iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (event_queue != NULL);
-  event_queue->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+  event_queue->RegisterListener (&scfiEventHandler,
+  	CSMASK_Nothing | CSMASK_Broadcast);
 
-  CreateEventOutlet (object_reg, this);
-
-#ifdef DO_DINPUT_KEYBOARD
-  DWORD dwThreadId;
-  m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
-  m_hThread = CreateThread (NULL, 0, s_threadroutine, EventOutlet, 0, &dwThreadId);
-  if (!m_hEvent || !m_hThread)
-  {
-    MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
-    ExitProcess (1);
-  }
-#endif
   return true;
-}
-
-void SysSystemDriver::Close ()
-{
-  csSystemDriver::Close ();
-  ChangeDisplaySettings (NULL, 0);
-
-  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (event_queue != NULL);
-  event_queue->RemoveListener (&scfiEventHandler);
-
-#ifdef DO_DINPUT_KEYBOARD
-  if (m_hEvent)
-  {
-    SetEvent (m_hEvent);
-    CloseHandle (m_hEvent);
-    m_hEvent = NULL;
-    WaitForSingleObject (m_hThread, 1000);
-    CloseHandle (m_hThread);
-    m_hThread = NULL;
-  }
-#endif
 }
 
 bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
+  if (e.Type != csevBroadcast) return false;
+
+  if (e.Command.Code == cscmdPreProcess)
   {
     MSG msg;
     while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
@@ -541,6 +513,39 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
     }
 
     return true;
+  }
+  else if (e.Command.Code == cscmdSystemOpen)
+  {
+    CreateEventOutlet (object_reg, this);
+
+#   ifdef DO_DINPUT_KEYBOARD
+    DWORD dwThreadId;
+    m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
+    m_hThread = CreateThread (NULL, 0, s_threadroutine, EventOutlet,
+    	0, &dwThreadId);
+    if (!m_hEvent || !m_hThread)
+    {
+      MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
+      ExitProcess (1);
+    }
+#   endif
+    return true;
+  }
+  else if (e.Command.Code == cscmdSystemClose)
+  {
+    ChangeDisplaySettings (NULL, 0);
+
+#   ifdef DO_DINPUT_KEYBOARD
+    if (m_hEvent)
+    {
+      SetEvent (m_hEvent);
+      CloseHandle (m_hEvent);
+      m_hEvent = NULL;
+      WaitForSingleObject (m_hThread, 1000);
+      CloseHandle (m_hThread);
+      m_hThread = NULL;
+    }
+#   endif
   }
   return false;
 }

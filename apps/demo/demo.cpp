@@ -871,8 +871,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
-	CS_REQUEST_END))
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize app!");
     return false;

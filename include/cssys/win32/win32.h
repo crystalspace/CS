@@ -70,14 +70,13 @@ public:
   /// Gets the nCmdShow of the WinMain().
   int GetCmdShow() const;
 
-  virtual bool Open ();
-  virtual void Close ();
-
   /// @@@ CURRENTLY BROKEN!!!
   virtual void SetSystemDefaults (iConfigManager *Config);
 
   /// @@@ CURRENTLY BROKEN!!!
   virtual void Help ();
+
+  virtual bool Initialize ();
 
   /// Function for Win32Helper to set the cursor.
   void SetWinCursor (HCURSOR cur)

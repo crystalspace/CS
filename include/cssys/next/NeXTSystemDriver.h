@@ -31,8 +31,7 @@ private:
 public:
   NeXTSystemDriver();
   virtual ~NeXTSystemDriver();
-  virtual bool Initialize(int argc, char const* const argv[]);
-  virtual void Loop();
+  virtual bool Initialize();
 };
 
 class SysSystemDriver : public NeXTSystemDriver {};

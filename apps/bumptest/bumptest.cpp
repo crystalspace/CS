@@ -294,7 +294,8 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_REPORTER,
   	CS_REQUEST_REPORTERLISTENER,
   	CS_REQUEST_END))

@@ -142,7 +142,8 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
     exit (0);
   }
 
-  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
   	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_END))
