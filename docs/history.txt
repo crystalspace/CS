@@ -45,7 +45,7 @@ chronological order.
 	    PROC_FOO       --> CS_PROCESSOR_FOO
 	    CS_PROCSIZE    --> CS_PROCESSOR_SIZE
 	    DO_NASM        --> CS_USE_NASM
-	    DO_MMX	   --> CS_USE_MXX
+	    DO_MMX	   --> CS_USE_MMX
 	- Eric Sunshine removed the obsolete USE_PLUGINS configuration
 	  property. The Jam build system now instead provides "variants", such
 	  as `static'.
