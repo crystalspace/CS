@@ -82,11 +82,11 @@ bool csSoundBuffer::convertTo(int toFrequency, bool toBit16, bool toStereo)
   return true;
 }
 
-bool csSoundBuffer::convertFrequencyTo(int toFrequency)
+bool csSoundBuffer::convertFrequencyTo (int toFrequency)
 {
   int i;
 
-  if(toFrequency!=Frequency)
+  if (toFrequency!=Frequency)
   {
     double coeff=(double)(Frequency)/(double)(toFrequency);
 
@@ -99,24 +99,22 @@ bool csSoundBuffer::convertFrequencyTo(int toFrequency)
       double step;
 
       CHK (convert=new unsigned char [newsize]);
-      if(convert==NULL) return 0;
+      if (convert == NULL) return 0;
 
-      for(i=0, step=0.0; i<newsize; i++, step+=coeff)
+      for(i = 0, step = 0.0; i < newsize; i++, step += coeff)
       {
-        unsigned long intstep=(unsigned long)step;
-        double interstep=step-intstep;
-
-        convert[i]=QInt (from[intstep]
-                  +(((double)from[intstep+nextchan]
-                  -(double)from[intstep])*interstep));
+        int intstep = QInt (step);
+        double interstep = step - intstep;
+        convert [i] = QInt (from [intstep] +
+          ((int (from [intstep + nextchan]) - int (from [intstep]))) * interstep);
       }
 
       CHK (delete Data);
-      Data=(unsigned char *)convert;
-      Size=newsize;
-      Frequency=toFrequency;
+      Data = (unsigned char *)convert;
+      Size = newsize;
+      Frequency = toFrequency;
     }
-    else // if(bit16)
+    else // if (bit16)
     {
       short *convert;
       short *from=(short *)Data;
@@ -127,16 +125,15 @@ bool csSoundBuffer::convertFrequencyTo(int toFrequency)
       newsize=(unsigned long)((double)(Size)/coeff);
 
       CHK (convert=new short [newsize]);
-      if(convert==NULL) return 0;
+      if (convert == NULL) return 0;
 
-      for(i=0, step=0.0; i<newsize; i++, step+=coeff)
+      for (i = 0, step = 0.0; i < newsize; i++, step += coeff)
       {
-        unsigned long intstep=(unsigned long)step;
-        double interstep=step-intstep;
+        int intstep = QInt (step);
+        double interstep = step - intstep;
 
-        convert[i]=QInt (from[intstep]
-                  +(((double)from[intstep+nextchan]
-                  -(double)from[intstep])*interstep));
+        convert [i] = QInt (from [intstep] +
+          (int (from [intstep + nextchan]) - int (from [intstep])) * interstep);
       }
 
       CHK (delete Data);
@@ -164,7 +161,7 @@ bool csSoundBuffer::convert16bitTo(bool toBit16)
       if(convert==NULL) return 0;
 
       for(int j=0; j<Size; j++)
-        convert[j]=(from[j]*256)-32768;
+        convert [j] = (from [j] * 256) - 32768;
 
       CHK (delete Data);
       Data=(unsigned char *)convert;
@@ -175,15 +172,15 @@ bool csSoundBuffer::convert16bitTo(bool toBit16)
       unsigned char *convert;
       short *from=(short *)Data;
 
-      CHK (convert=new unsigned char [Size]);
-      if(convert==NULL) return 0;
+      CHK (convert = new unsigned char [Size]);
+      if(convert == NULL) return 0;
 
-      for(i=0; i<Size; i++)
-        convert[i]=(from[i] - 32768) / 256;
+      for (i = 0; i < Size; i++)
+        convert [i] = (from [i] - 32768) / 256;
 
       CHK (delete Data);
-      Data=(unsigned char *)convert;
-      Bit16=false;
+      Data = (unsigned char *)convert;
+      Bit16 = false;
     }
   }
 
