@@ -12,6 +12,9 @@ chronological order.
 	- Eric Sunshine rewrote gobs of unportable shell programming in the
 	  jamtemplate/createproject.sh script. Also generally cleaned up and
 	  unified the rest of the jamtemplate resources.
+	- Eric Sunshine removed obsolete crystalspace.motion.manager.*
+	  reference from csparser.csplugin.  Reported by Matthew Hawn
+	  <steamraven@yahoo.com>.
 28-Apr-2004
 	- Eric Sunshine applied a few scripting-related patches from Michael
 	  Franz Aigner <crystal-space@amfranz.com>:
