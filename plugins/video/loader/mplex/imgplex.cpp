@@ -38,22 +38,26 @@ csMultiplexImageIO::~csMultiplexImageIO ()
 
 bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 {
-  config.AddConfig (pSystem, IMGPLEX_CONFIG);
-  // load all the image io plugins given
-  iConfigIterator *iPlugList = pSystem->GetConfig ()->Enumerate (IMGPLEX_KEY_SUB);
-  while (iPlugList->Next ())
+  if (pSystem)
   {
-    iImageIO *plugin = LOAD_PLUGIN (pSystem, iPlugList->GetStr (), NULL, iImageIO);
-    if (plugin)
+    config.AddConfig (pSystem, IMGPLEX_CONFIG);
+    // load all the image io plugins given
+    iConfigIterator *iPlugList = pSystem->GetConfig ()->Enumerate (IMGPLEX_KEY_SUB);
+    while (iPlugList->Next ())
     {
-      // remember the plugin
-      list.Push (plugin);
-      // and load its description, since we gonna return it on request
-      StoreDesc (plugin->GetDescription ());
+      iImageIO *plugin = LOAD_PLUGIN (pSystem, iPlugList->GetStr (), NULL, iImageIO);
+      if (plugin)
+      {
+	// remember the plugin
+	list.Push (plugin);
+	// and load its description, since we gonna return it on request
+	StoreDesc (plugin->GetDescription ());
+      }
     }
+    iPlugList->DecRef ();
+    return list.Length () > 0;
   }
-  iPlugList->DecRef ();
-  return list.Length () > 0;
+  return false;
 }
 
 void csMultiplexImageIO::StoreDesc (const csVector& format)
