@@ -9,7 +9,6 @@ if $(JAMVERSION) < 2.4
 
 mkdir = $(TOP)/mk/jam ;
 
-include $(mkdir)/variables.jam ;
 include $(mkdir)/subdir.jam ;
 
 include $(mkdir)/modus.jam ;
