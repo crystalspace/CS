@@ -156,7 +156,7 @@ m_lpddPrimary(NULL),
 m_lpddZBuffer(NULL),
 m_pTextureCache(NULL),
 m_piSystem(piSystem),
-m_bVerbose(false),
+m_bVerbose(true),
 m_bUse24BitInternalTexture(false)
 {
   HRESULT hRes;

@@ -128,7 +128,7 @@ class converter
 public:
 	converter();
 	virtual ~converter();
-	int                comline ( char *command );
+	int      comline ( char *command );
 	int ivcon( char* filename );  // reads in filename
 
 	void ProcessConfig ( csIniFile* config );
@@ -141,7 +141,7 @@ bool convert(char* infile);
 	
 public:
 
-	FILE* logfile;
+FILE* logfile;
 
 int    debug;
 char   filein_name[81];

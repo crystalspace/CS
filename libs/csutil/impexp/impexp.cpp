@@ -107,11 +107,7 @@ int converter::ivcon ( char *command ) {
 
    init_program_data ( );
    
-
-
    result = comline ( command );
-	
-
   
    fclose(logfile);
 
