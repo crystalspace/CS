@@ -38,7 +38,7 @@ rule Plugin
 
   # Create a target for eventual static linking
   SubVariant static ;
-  Library $(<)_static : $(>) : $(3) independent ;
+  Library $(<)_static : $(>) : $(3) independent noinstall ;
   CFlags $(<)_static : -DCS_STATIC_LINKED ;
   LFlags $(<)_static : $(LINKLIBS) ;
   SubVariant ;

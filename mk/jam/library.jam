@@ -85,7 +85,7 @@ rule Library
   }
 
   # Generate install rules
-  if ! $(DONTINSTALL_$(<))
+  if ! [ IsElem noinstall : $(3) ]
   {
     InstallLibrary $(target) ;
   }
