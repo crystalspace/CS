@@ -126,17 +126,17 @@ float BiCubicData (float* data, int width, int height, float x, float z)
 //////////////////////////////////////////////////////////////////////////
 
 SCF_IMPLEMENT_IBASE (csSimpleFormer)
-SCF_IMPLEMENTS_INTERFACE (iTerraFormer)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSimpleFormerState)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iTerraFormer)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSimpleFormerState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleFormer::SimpleFormerState)
-SCF_IMPLEMENTS_INTERFACE (iSimpleFormerState)
+  SCF_IMPLEMENTS_INTERFACE (iSimpleFormerState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleFormer::Component)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSimpleFormer)
@@ -306,7 +306,7 @@ bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
 //////////////////////////////////////////////////////////////////////////
 
 SCF_IMPLEMENT_IBASE (csSimpleSampler)
-SCF_IMPLEMENTS_INTERFACE (iTerraSampler)
+  SCF_IMPLEMENTS_INTERFACE (iTerraSampler)
 SCF_IMPLEMENT_IBASE_END
 
 csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer,

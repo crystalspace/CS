@@ -604,7 +604,7 @@ public:
     virtual const csBox2& GetSamplerRegion ()
     { 
       return scfParent->GetSamplerRegion (); 
-}
+    }
 
     virtual bool SaveState (const char *filename)
     {
