@@ -16,7 +16,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-// This file is _NOT_ automaticall generated.
+// This file is _NOT_ automatically generated.
 /*
   Use this file to add your own extension initialization code. Just add a 
   #define INITMORE_<nameofyourext>. This code is then inserted into the generic
