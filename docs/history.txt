@@ -13,6 +13,23 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+8-Aug-1999
+	- Eric Sunshine fixed the 'clean' target in the Makefile so that it
+	  also deletes the generated $(OUTDLL) directory.
+	- Eric Sunshine fixed problem in Squawk.  It was not properly clearing
+	  the console text in double-buffered environments.
+	- Eric Sunshine started cleaning up the BeOS port of Crystal Space.
+	    - It now builds straight out of the box.  It is no longer
+	      necessary to relocate or edit makefiles.
+	    - It now builds cleanly.  All compilation warnings and errors
+	      have been eradicated.
+	    - Disabled the excessive debugging output.
+	    - Updated the documentation.
+	    - Mazed, Shooter, Squawk, CSWSTest, NDrvDemo now compile and run.
+	    - The socket library and simple network manager now compile.
+	    - The version string now says "BeOS-Intel-GCC" rather than
+	      "Unix-Intel-GCC".
+	    - The user no longer needs to manually configure for buggy EGCS.
 6-Aug-1999
 	- Wrote an object pool design pattern class for 2D polygons. They
 	  are used instead of the global 'clipped' variable which caused
