@@ -433,6 +433,9 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   end_draw_poly ();
 
+  glCullFace(GL_FRONT);
+  glEnable(GL_CULL_FACE);
+
   return true;
 }
 
