@@ -21,6 +21,7 @@ endif
 
 ifeq ($(PLUGINS_SUBMAKEFILES),)
   PLUGINS_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))))
+  PLUGINS_SUBMAKEFILES += plugins/video/canvas/cs2d.mak plugins/video/renderer/cs3d.mak
 endif
 ifneq ($(PLUGINS_SUBMAKEFILES),)
   include $(PLUGINS_SUBMAKEFILES)
@@ -46,3 +47,4 @@ endif
 ifneq ($(COMPOSITE_SUBMAKEFILES),)
   include $(COMPOSITE_SUBMAKEFILES)
 endif
+
