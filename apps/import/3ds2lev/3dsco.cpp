@@ -126,7 +126,7 @@ void ConvertXYZ (float& x, float& y, float& z)
 void ConvertXYZ (H3dsScene * scene)
 {
   ConvertXYZ (scene->centre.x, scene->centre.y, scene->centre.z);
-  int n, v;
+  int n, v, f;
   for (n=0; n<scene->meshobjs; n++)
   {
     H3dsMeshObj * mo = &scene->meshobjlist[n];
@@ -135,6 +135,20 @@ void ConvertXYZ (H3dsScene * scene)
     {
       H3dsVert * vrt=&mo->vertlist[v];
       ConvertXYZ (vrt->x, vrt->y, vrt->z);
+    }
+	// we must convert also triangles or the texture will be flippe
+	for (f=0; f<mo->faces; f++)
+    {
+      H3dsFace * fa = &mo->facelist[f];
+	  float v1 = fa->p0;
+	  float v2 = fa->p1;
+	  float v3 = fa->p2;
+
+      ConvertXYZ (v1, v2, v3);
+
+	  fa->p0 = v1;
+	  fa->p1 = v2;
+	  fa->p2 = v3;
     }
   }
 }
