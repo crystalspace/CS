@@ -27,6 +27,8 @@ chronological order.
 	    - Changed the OR to use the GL extension manager, too (instead of
 	      the "custom" ext management).
 	- Rhad fixed the NV specific vertex program paths for the Cg shader plugin.
+	- Neil Mosafi added some more dynamics code to csvosa3dl plugin, and
+	  the iVosObject3D interface now exposes it's collider to the user
 4-Jun-2004
         - Andrew Craig removed misplaced return in sprcal3d as reported by
           Ingie from the mailing list.
