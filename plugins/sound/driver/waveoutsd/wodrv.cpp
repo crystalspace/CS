@@ -66,7 +66,7 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   Memory = NULL;
   WaveOut = NULL;
   Playback = 0;
-  LastError = -1;
+  LastError = ~0;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
@@ -256,7 +256,7 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
     // @@@ special behaviour in case this was called by waveOutReset?
 
     LPWAVEHDR OldHeader = (LPWAVEHDR)dwParam1;
-    if (OldHeader->dwUser==NULL) return;
+    if (OldHeader->dwUser == 0) return;
     SoundBlock *Block = (SoundBlock *)OldHeader->dwUser;
     Block->Driver->SoundProc(OldHeader);
   }
