@@ -31,6 +31,8 @@
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 
+#include "fontcache.h"
+
 struct iObjectRegistry;
 struct iPluginManager;
 
@@ -75,6 +77,8 @@ public:
 
   /// The font server
   csRef<iFontServer> FontServer;
+  /// The font cache
+  csFontCache* fontCache;
 
   /// Pointer to a title.
   char* win_title;
@@ -201,14 +205,14 @@ public:
   }
   /// Write a text string into the back buffer
   virtual void Write (iFont *font , int x, int y, int fg, int bg,
-    const char *text) { _WriteString (this, font, x, y, fg, bg, text); }
+    const char *text);
   virtual void WriteBaseline (iFont *font , int x, int y, int fg, int bg,
-    const char *text) { _WriteStringBaseline (this, font, x, y, fg, bg, text); }
+    const char *text);
   /// Write a single character
-  void (*_WriteString) (csGraphics2D *This, iFont *font, int x, int y,
-    int fg, int bg, const char *text);
-  void (*_WriteStringBaseline) (csGraphics2D *This, iFont *font, int x, int y,
-    int fg, int bg, const char *text);
+//  void (*_WriteString) (csGraphics2D *This, iFont *font, int x, int y,
+//    int fg, int bg, const char *text);
+//  void (*_WriteStringBaseline) (csGraphics2D *This, iFont *font, int x, int y,
+//    int fg, int bg, const char *text);
   /// (*) Get address of video RAM at given x,y coordinates
   unsigned char* (*_GetPixelAt) (csGraphics2D *This, int x, int y);
   /// Same but exposed through iGraphics2D interface
@@ -364,30 +368,30 @@ protected:
   /// Draw a pixel in 8-bit modes
   static void DrawPixel8 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 8-bit modes
-  static void WriteString8 (csGraphics2D *This, iFont *font, int x, int y,
+/*  static void WriteString8 (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
   static void WriteStringBaseline8 (csGraphics2D *This, iFont *font,
-    int x, int y, int fg, int bg, const char *text);
+    int x, int y, int fg, int bg, const char *text);*/
   /// Return address of a 8-bit pixel
   static unsigned char *GetPixelAt8 (csGraphics2D *This, int x, int y);
 
   /// Draw a pixel in 16-bit modes
   static void DrawPixel16 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 16-bit modes
-  static void WriteString16 (csGraphics2D *This, iFont *font, int x, int y,
+/*  static void WriteString16 (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
   static void WriteStringBaseline16 (csGraphics2D *This, iFont *font,
-    int x, int y, int fg, int bg, const char *text);
+    int x, int y, int fg, int bg, const char *text);*/
   /// Return address of a 16-bit pixel
   static unsigned char *GetPixelAt16 (csGraphics2D *This, int x, int y);
 
   /// Draw a pixel in 32-bit modes
   static void DrawPixel32 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 32-bit modes
-  static void WriteString32 (csGraphics2D *This, iFont *font, int x, int y,
+/*  static void WriteString32 (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
   static void WriteStringBaseline32 (csGraphics2D *This, iFont *font,
-    int x, int y, int fg, int bg, const char *text);
+    int x, int y, int fg, int bg, const char *text);*/
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
 

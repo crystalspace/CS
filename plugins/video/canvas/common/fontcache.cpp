@@ -344,18 +344,15 @@ csFontCache::GlyphCacheData* csFontCache::CacheGlyphUnsafe (
   return cacheData;
 }
 
-csFontCache::GlyphCacheData* csFontCache::CacheGlyph (iFont* font, 
+csFontCache::GlyphCacheData* csFontCache::CacheGlyph (KnownFont* font, 
 						      utf32_char glyph)
 {
   CS_ASSERT (font != 0);
 
-  KnownFont* knownFont = 
-    GetCachedFont (font);
-  if (knownFont == 0) knownFont = CacheFont (font);
-  GlyphCacheData* cacheData = GetCacheData (knownFont, glyph);
+  GlyphCacheData* cacheData = GetCacheData (font, glyph);
   if (cacheData == 0) 
   {
-    return CacheGlyphUnsafe (knownFont, glyph);
+    return CacheGlyphUnsafe (font, glyph);
   }
 
   return cacheData;
@@ -367,3 +364,14 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
   RemoveCacheData (cacheData);
   InternalUncacheGlyph (cacheData);
 }
+
+void csFontCache::WriteString (iFont *font, int x, int y, int fg, int bg, 
+  const utf8_char* text)
+{
+}
+
+void csFontCache::WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
+  const utf8_char* text)
+{
+}
+

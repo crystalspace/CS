@@ -52,9 +52,6 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   friend class csGLScreenShot;
   friend class csGLFontCache;
 
-  /// hold the CS fonts in an OpenGL-friendly format
-  csGLFontCache* fontCache;
-
   /// Cache for GL states
   csGLStateCache* statecache;
 
@@ -149,8 +146,6 @@ public:
   virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color);
   /// Blit.
   virtual void Blit (int x, int y, int w, int h, unsigned char* data);
-  /// Write a text string
-  virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
 
   /**
    * Get address of video RAM at given x,y coordinates.

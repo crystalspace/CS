@@ -84,9 +84,6 @@ class csGLFontCache : public csFontCache
   csArray<CacheTexture> textures;
   csBlockAllocator<GLGlyphCacheData> cacheDataAlloc;
 
-  /// the current clipping rect
-  int ClipX1, ClipY1, ClipX2, ClipY2;
-
   csDirtyAccessArray<csVector2> wtVerts2d;
   csDirtyAccessArray<csVector2> wtTexcoords;
 protected:
@@ -104,15 +101,14 @@ public:
   csGLFontCache (csGraphics2DGLCommon* G2D);
   virtual ~csGLFontCache ();
 
-  void SetClipRect (int x1, int y1, int x2, int y2)
-  { 
-    ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; 
-  }
   /**
    * Draw a string using OpenGL at x,y. It is assumed you have
    * set up the render state using glColor.
    */
-  void Write (iFont *font, int x, int y, utf8_char* text);
+  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
+    const utf8_char* text);
+  //virtual void WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
+  //  utf8_char* text);
 };
 
 #endif // __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__

@@ -169,7 +169,6 @@ int CocoaDriver2D::determine_bits_per_sample(int desired_depth) const
 void CocoaDriver2D::setup_rgb_15()
 {
   _DrawPixel = DrawPixel16;
-  _WriteString = WriteString16;
   _GetPixelAt = GetPixelAt16;
 }
 
@@ -180,7 +179,6 @@ void CocoaDriver2D::setup_rgb_15()
 void CocoaDriver2D::setup_rgb_32()
 {
   _DrawPixel = DrawPixel32;
-  _WriteString = WriteString32;
   _GetPixelAt = GetPixelAt32;
 }
 

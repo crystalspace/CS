@@ -181,12 +181,15 @@ protected:
   FontDeleteNotify* deleteCallback;
 
   void CleanupCache ();
+
+  /// the current clipping rect
+  int ClipX1, ClipY1, ClipX2, ClipY2;
 public:
   csFontCache ();
   virtual ~csFontCache ();
   
   /// Store glyph-specific information.
-  GlyphCacheData* CacheGlyph (iFont* font, utf32_char glyph);
+  GlyphCacheData* CacheGlyph (KnownFont* font, utf32_char glyph);
   /// Uncache cached glyph data.
   void UncacheGlyph (GlyphCacheData* cacheData);
 
@@ -202,6 +205,20 @@ public:
   GlyphCacheData* GetLeastUsed ();
   /// Add a glyph to the cache.
   void AddCacheData (KnownFont* font, utf32_char glyph, GlyphCacheData* cacheData);
+
+
+  void SetClipRect (int x1, int y1, int x2, int y2)
+  { 
+    ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; 
+  }
+
+  /**
+   * Draw a string.
+   */
+  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
+    const utf8_char* text);
+  virtual void WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
+    const utf8_char* text);
 };
 
 #endif // __CS_CANVAS_COMMON_FONTCACHE_H__

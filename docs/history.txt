@@ -34,6 +34,13 @@ chronological order.
 	  ParseSystemColliderMesh.  Will add softness to remaining colliders
 	  when i get tests built for them.
 	- Jorrit added documentation about static lod.
+	- res made the following changes wrt graphical text output:
+	    - Started to work on a font cache for "software" canvases.
+	    - Added anti-aliased text output to them.
+	    - In general, the text writing logic has moved to the font caches.
+	    - Fixed corruption of AA'ed glyphs with OpenGL canvases.
+	- res replaced in wintools.cpp the usage of 'swprintf()', which
+	  cygwin doesn't have, with 'wsprintfW()' from the Win32 API.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.

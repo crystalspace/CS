@@ -203,13 +203,11 @@ void GLOSXDriver2D::SetupDrawingFunctions()
     if (Depth == 32)
     {
         _DrawPixel = DrawPixel32;
-        _WriteString = WriteString32;
         _GetPixelAt = GetPixelAt32;
     }
     else	// Depth is 16
     {
         _DrawPixel = DrawPixel16;
-        _WriteString = WriteString16;
         _GetPixelAt = GetPixelAt16;
     }
 }

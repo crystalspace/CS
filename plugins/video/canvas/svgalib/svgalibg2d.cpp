@@ -153,7 +153,6 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
       pfmt.PixelBytes = 2;
 
       _DrawPixel = DrawPixel16;
-      _WriteString = WriteString16;
       _GetPixelAt = GetPixelAt16;
       break;
 
@@ -165,7 +164,6 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
       pfmt.PixelBytes = 2;
 
       _DrawPixel = DrawPixel16;
-      _WriteString = WriteString16;
       _GetPixelAt = GetPixelAt16;
       break;
 
@@ -177,7 +175,6 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
       pfmt.PixelBytes = 4;
 
       _DrawPixel = DrawPixel32;
-      _WriteString = WriteString32;
       _GetPixelAt = GetPixelAt32;
       break;
   }

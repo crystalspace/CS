@@ -32,6 +32,7 @@
 #include "video/canvas/directxcommon/directdetection.h"
 
 #include "cssys/win32/wintools.h"
+#include "video/canvas/common/softfontcache.h"
 
 #include "g2d.h"
 
@@ -685,32 +686,45 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   pfmt.BlueMask = ddpf.dwBBitMask;
   Depth = ddpf.dwRGBBitCount;
 
+  if (fontCache) delete fontCache;
   if (Depth == 8)
   {
     pfmt.PalEntries = 256;
     pfmt.PixelBytes = 1;
+
+    fontCache = new csSoftFontCache8 (this);
   }
   else if (Depth == 16)
   {
     _DrawPixel = DrawPixel16;
-    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
 
     // Set pixel format
     pfmt.PixelBytes = 2;
     pfmt.PalEntries = 0;
+
+    if (ddpf.dwGBitMask == 0x03e0)
+    {
+      fontCache = new csSoftFontCache16_555 (this);
+    }
+    else
+    {
+      fontCache = new csSoftFontCache16_565 (this);
+    }
   }
   else if (Depth == 32)
   {
     _DrawPixel = DrawPixel32;
-    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
 
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
+    
+    fontCache = new csSoftFontCache32 (this);
   }
   pfmt.complete ();
+  fontCache->SetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 
   m_lpddsBack->GetSurfaceDesc (&ddsd);
   int i;

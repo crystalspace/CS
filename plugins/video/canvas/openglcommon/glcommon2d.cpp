@@ -487,27 +487,6 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
 
-void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
-  const char *text)
-{
-  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-  if (bg >= 0)
-  {
-    if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
-
-    int fw, fh;
-    font->GetDimensions (text, fw, fh);
-    DrawBox (x, y, fw, fh, bg);
-
-    statecache->Enable_GL_TEXTURE_2D ();
-  }
-
-  if (!gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
-  setGLColorfromint (fg);
-  fontCache->Write (font, x, Height - y, (utf8_char*)text);
-  if (!gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
-}
-
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
   /// left as Height-y-1 to keep within offscreen bitmap.

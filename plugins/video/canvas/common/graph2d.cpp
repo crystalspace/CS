@@ -34,6 +34,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
+#include "softfontcache.h"
+
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
@@ -84,6 +86,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   AllowResizing = false;
   refreshRate = 0;
   vsync = false;
+  fontCache = 0;
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
@@ -122,8 +125,8 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
   _DrawPixel = DrawPixel8;
-  _WriteString = WriteString8;
-  _WriteStringBaseline = WriteStringBaseline8;
+//  _WriteString = WriteString8;
+//  _WriteStringBaseline = WriteStringBaseline8;
   _GetPixelAt = GetPixelAt8;
   // Mark all slots in palette as free
   int i;
@@ -165,8 +168,6 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
 
   // Initialize pointers to default drawing methods
   _DrawPixel = DrawPixel8;
-  _WriteString = WriteString8;
-  _WriteStringBaseline = WriteStringBaseline8;
   _GetPixelAt = GetPixelAt8;
 
   Palette = new csRGBpixel [256];
@@ -178,8 +179,6 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   else if (Depth == 16)
   {
     _DrawPixel = DrawPixel16;
-    _WriteString = WriteString16;
-    _WriteStringBaseline = WriteStringBaseline16;
     _GetPixelAt = GetPixelAt16;
 
     // Set pixel format
@@ -192,8 +191,6 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   else if (Depth == 32)
   {
     _DrawPixel = DrawPixel32;
-    _WriteString = WriteString32;
-    _WriteStringBaseline = WriteStringBaseline32;
     _GetPixelAt = GetPixelAt32;
 
     // calculate CS's pixel format structure.
@@ -276,6 +273,22 @@ bool csGraphics2D::Open ()
   for (i = 0, addr = 0; i < Height; i++, addr += bpl)
     LineAddress[i] = addr;
 
+  if (!fontCache)
+  {
+    if (Depth == 8)
+    {
+      fontCache = new csSoftFontCache8 (this);
+    }
+    else if (Depth == 16)
+    {
+      fontCache = new csSoftFontCache16_565 (this);
+    }
+    else if (Depth == 32)
+    {
+      fontCache = new csSoftFontCache32 (this);
+    }
+  }
+
   SetClipRect (0, 0, Width, Height);
 
   return true;
@@ -287,6 +300,8 @@ void csGraphics2D::Close ()
   is_open = false;
   delete [] LineAddress;
   LineAddress = 0;
+  delete fontCache;
+  fontCache = 0;
 }
 
 bool csGraphics2D::BeginDraw ()
@@ -627,21 +642,6 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
   } /* endswitch */
 }
 
-#define WR_NAME WriteString8
-#define WR_NAME2 WriteStringBaseline8
-#define WR_PIXTYPE uint8
-#include "writechr.inc"
-
-#define WR_NAME WriteString16
-#define WR_NAME2 WriteStringBaseline16
-#define WR_PIXTYPE uint16
-#include "writechr.inc"
-
-#define WR_NAME WriteString32
-#define WR_NAME2 WriteStringBaseline32
-#define WR_PIXTYPE uint32
-#include "writechr.inc"
-
 void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
   if (xmin < 0) xmin = 0;
@@ -654,6 +654,8 @@ void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
   else if (ymax > Height) ymax = Height;
   ClipX1 = xmin; ClipX2 = xmax;
   ClipY1 = ymin; ClipY2 = ymax;
+  
+  fontCache->SetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 }
 
 void csGraphics2D::GetClipRect (int &xmin, int &ymin, int &xmax, int &ymax)
@@ -790,6 +792,18 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
   Palette[i].blue = b;
   PaletteAlloc[i] = true;
   if (ofscb) ofscb->SetRGB (this, i, r, g, b);
+}
+
+void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg, 
+			  const char *text) 
+{ 
+  fontCache->WriteString (font, x, y, fg, bg, (utf8_char*)text);
+}
+
+void csGraphics2D::WriteBaseline (iFont *font , int x, int y, int fg, int bg, 
+				  const char *text) 
+{ 
+  fontCache->WriteStringBaseline (font, x, y, fg, bg, (utf8_char*)text);
 }
 
 unsigned char *csGraphics2D::GetPixelAt8 (csGraphics2D *This, int x, int y)

@@ -333,13 +333,11 @@ bool csGraphics2DXLib::CreateVisuals ()
   if (pfmt.PixelBytes == 2)
   {
     _DrawPixel = DrawPixel16;
-    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
   }
   else if (pfmt.PixelBytes == 4)
   {
     _DrawPixel = DrawPixel32;
-    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
   } /* endif */
 

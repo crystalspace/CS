@@ -161,12 +161,11 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex,
 #ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
     uint8* dest = textures[tex].data + (rect.ymin * texSize) + rect.xmin;
     uint8* src = alphaData;
-    int ladd = texSize - gw;
     int y;
     for (y = 0; y < gh; y++)
     {
       memcpy (dest, src, gw);
-      dest += ladd;
+      dest += texSize;
       src += gw;
     }
     glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
@@ -255,9 +254,25 @@ bool csGLFontCache::ClipRect (float x, float y,
   return true;
 }
 
-void csGLFontCache::Write (iFont *font, int x, int y, utf8_char* text)
+void csGLFontCache::WriteString (iFont *font, int x, int y, int fg, int bg, 
+				 const utf8_char* text)
 {
   if (!text || !*text) return;
+
+  bool gl_texture2d = G2D->statecache->IsEnabled_GL_TEXTURE_2D ();
+  if (bg >= 0)
+  {
+    if (gl_texture2d) G2D->statecache->Disable_GL_TEXTURE_2D ();
+
+    int fw, fh;
+    font->GetDimensions ((char*)text, fw, fh);
+    G2D->DrawBox (x, y, fw, fh, bg);
+
+    G2D->statecache->Enable_GL_TEXTURE_2D ();
+  }
+
+  if (!gl_texture2d) G2D->statecache->Enable_GL_TEXTURE_2D ();
+  G2D->setGLColorfromint (fg);
 
   int maxwidth, maxheight;
   font->GetMaxSize (maxwidth, maxheight);
@@ -265,7 +280,7 @@ void csGLFontCache::Write (iFont *font, int x, int y, utf8_char* text)
   KnownFont* knownFont = GetCachedFont (font);
   if (knownFont == 0) knownFont = CacheFont (font);
 
-  y = y - maxheight;
+  y = G2D->Height - y - maxheight;
   if (y >= ClipY2) return;
 
   glPushMatrix ();
@@ -402,4 +417,6 @@ void csGLFontCache::Write (iFont *font, int x, int y, utf8_char* text)
 
   G2D->statecache->Disable_GL_BLEND ();
   glPopMatrix ();
+
+  if (!gl_texture2d) G2D->statecache->Disable_GL_TEXTURE_2D ();
 }

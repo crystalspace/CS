@@ -79,8 +79,8 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
   {
     HRESULT fmError = GetLastError ();
     const wchar_t fmErrMsg[] = L"{FormatMessage() error %.8x}";
-    wchar_t msg[sizeof (fmErrMsg) + 8];
-    swprintf (msg, fmErrMsg, (uint)fmError);
+    wchar_t msg[wcslen (fmErrMsg) + 9];
+    wsprintfW (msg, fmErrMsg, (uint)fmError);
     ret = csStrNewW (msg);
   }
 

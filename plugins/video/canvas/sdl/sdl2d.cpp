@@ -353,7 +353,6 @@ bool csGraphics2DSDL::Open()
       pfmt.PixelBytes = screen->format->BytesPerPixel;
 
       _DrawPixel = DrawPixel16;
-      _WriteString = WriteString16;
       _GetPixelAt = GetPixelAt16;
       break;
 
@@ -366,7 +365,6 @@ bool csGraphics2DSDL::Open()
       pfmt.PixelBytes = screen->format->BytesPerPixel;
 
       _DrawPixel = DrawPixel32;
-      _WriteString = WriteString32;
       _GetPixelAt = GetPixelAt32;
       break;
     default:
