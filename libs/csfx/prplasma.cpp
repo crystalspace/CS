@@ -150,6 +150,8 @@ void csProcPlasma::Animate (cs_time current_time)
       thex %= mat_w;
       they %= mat_h;
 
+      //@@@ Is the following test ok?
+      if (col >= 256) col = 255;
       ptG2D->DrawPixel (thex, they, palette[col*palsize/256] );
 
       curanim[0] += lineincr[0];

@@ -810,7 +810,7 @@ csArchive::ArchiveEntry::~ArchiveEntry ()
 
 void csArchive::ArchiveEntry::FreeBuffer ()
 {
-  free (buffer);
+  if (buffer) free (buffer);
   buffer = NULL;
   buffer_pos = 0;
   buffer_size = 0;

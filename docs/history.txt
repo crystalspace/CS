@@ -26,6 +26,18 @@ The history order has been reversed so that new features are at the top.
 	  GetInterpolatedDimension().
 	- Fixed csReversibleTransform::LookAt(). The was interpreting the
 	  up vector in a negative way. I fixed Blocks too.
+	- Fixed several bugs reported by a memory checker:
+	    - In archive.cpp: free (buffer) with buffer == NULL.
+	    - Fixed a bug in plasma procedural texture. It was sometimes
+	      trying to access palette index 256 which is one out of bounds.
+	      I fixed this by adding an overflow test for this which is
+	      probably not the best way.
+	    - Found a bad memory access in the software texture
+	      cache. This is a bit more complicated so I did
+	      not fix it yet but put a '@@@' comment there.
+	      This bug could very well be the cause for the
+	      bad texture cache contents that happens with very
+	      thin polygons.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.

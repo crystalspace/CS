@@ -134,7 +134,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   int src = min_lu + min_lv * lm_w;
   int src_dlu = lm_w - (max_lu - min_lu);
-  for (int lv = min_lv; lv < max_lv; lv++)
+  for (int lv = min_lv; lv < max_lv-1/*@@@@@@@@*/; lv++)
   {
     for (int lu = min_lu; lu < max_lu; lu++)
     {
@@ -147,6 +147,10 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
       GET (lm_R, r);
       GET (lm_G, g);
+      // @@@ The following statement causes an access slightly
+      // beyond the bounds of the lm_B array in some cases.
+      // I discovered this with a memory debugger. However I
+      // have not yet found out why and how to fix it.
       GET (lm_B, b);
 
 #undef GET
