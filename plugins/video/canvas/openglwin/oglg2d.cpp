@@ -355,10 +355,20 @@ bool csGraphics2DOpenGL::Open()
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
 
-  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, win_title, style,
+  if (FullScreen)
+  {
+	  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, win_title, 
+		style, CW_USEDEFAULT, CW_USEDEFAULT, wwidth, wheight,
+		NULL, NULL, m_hInstance, NULL);
+  }
+  else
+  {
+	  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, win_title, style,
 		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
 		wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+  }
+
   if( !m_hWnd )
     SystemFatalError ("Cannot create Crystal Space window", GetLastError());
 
