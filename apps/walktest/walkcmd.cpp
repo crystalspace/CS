@@ -244,7 +244,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Could not open camera file '%s'!", fName);
   iDataBuffer *data = 0;
-  IFFAIL (data = vfs->ReadFile(fName))
+  IFFAIL ((data = vfs->ReadFile(fName)) != 0)
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Could not read camera file '%s'!", fName);
   csMatrix3 m;
@@ -272,7 +272,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Wrong format for camera file '%s'", fName);
   iSector* s = 0;
-  IFFAIL (s = Sys->Engine->GetSectors ()->FindByName (sector_name))
+  IFFAIL ((s = Sys->Engine->GetSectors ()->FindByName (sector_name)) != 0)
     Sys->Report (CS_REPORTER_SEVERITY_ERROR,
 		 "Sector `%s' in coordinate file does not "
 		 "exist in this map!", sector_name);
