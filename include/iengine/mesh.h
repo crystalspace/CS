@@ -55,7 +55,8 @@ class csFlags;
  * you expect :-)
  * This means the 3D engine can do various optimizations.
  * If you set 'convex' to true the center vertex will also be calculated.
- * It is unset by default (@@@ should be calculated).
+ * It is unset by default.
+ * This flag is currently not used.
  */
 #define CS_ENTITY_CONVEX 1
 
@@ -64,14 +65,18 @@ class csFlags;
  * object. A detail object is treated as a single object by
  * the engine. The engine can do several optimizations on this.
  * In general you should use this flag for small and detailed
- * objects. Detail objects are not included in BSP or octrees.
+ * objects.
+ * This flag is currently not used.
  */
 #define CS_ENTITY_DETAIL 2
 
 /**
  * If CS_ENTITY_CAMERA is set then this entity will be always
  * be centerer around the same spot relative to the camera. This
- * is useful for skyboxes or skydomes.
+ * is useful for skyboxes or skydomes. Important note! When you
+ * use an object with this flag you should also add this object to
+ * a render priority that also has the camera flag set (see
+ * iEngine->SetRenderPriorityCamera()).
  */
 #define CS_ENTITY_CAMERA 4
 
@@ -123,19 +128,23 @@ SCF_VERSION (iMeshWrapper, 0, 4, 0);
  * A mesh wrapper is an engine-level object that wraps around an actual
  * mesh object (iMeshObject). Every mesh object in the engine is represented
  * by a mesh wrapper, which keeps the pointer to the mesh object, its position,
- * its name, etc. <p>
- *
+ * its name, etc.
+ * <p>
  * Think of the mesh wrapper as the hook that holds the mesh object in the
  * engine. An effect of this is that the i???State interfaces (e.g.
- * iSprite3DState) must be queried from the mesh *objects*, not the wrappers! <p>
- *
+ * iSprite3DState) must be queried from the mesh *objects*, not the wrappers!
+ * <p>
  * Note that a mesh object should never be contained in more than one wrapper.
  */
 struct iMeshWrapper : public iBase
 {
   /// UGLY!!!@@@
   virtual csMeshWrapper* GetPrivateObject () = 0;
-  /// Get the iObject for this mesh object.
+  /**
+   * Get the iObject for this mesh object. This can be used to get the
+   * name of the mesh wrapper and also to attach other user objects
+   * to this mesh (like for collision detection or game data).
+   */
   virtual iObject *QueryObject () = 0;
 
   /// Get the iMeshObject.
@@ -146,13 +155,15 @@ struct iMeshWrapper : public iBase
   /**
    * Get the optional lighting information that is implemented
    * by this mesh object. If the mesh object doesn't implement it
-   * then this will return NULL.
+   * then this will return NULL. This is similar (but more efficient)
+   * to calling SCF_QUERY_INTERFACE on the mesh object for iLightingInfo.
    */
   virtual iLightingInfo* GetLightingInfo () const = 0;
   /**
    * Get the optional shadow receiver that is implemented
    * by this mesh object. If the mesh object doesn't implement it
-   * then this will return NULL.
+   * then this will return NULL. This is similar (but more efficient)
+   * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowReceiver.
    */
   virtual iShadowReceiver* GetShadowReceiver () const = 0;
 
@@ -164,7 +175,10 @@ struct iMeshWrapper : public iBase
   /**
    * Update lighting as soon as the object becomes visible.
    * This will call engine->GetNearestLights with the supplied
-   * parameters.
+   * parameters. Note that this function doesn't work on thing
+   * mesh objects as they use another lighting system. Also some genmesh
+   * objects can optionally also use the other lighting system in which
+   * case DeferUpdateLighting() will do nothing.
    */
   virtual void DeferUpdateLighting (int flags, int num_lights) = 0;
 
@@ -176,6 +190,9 @@ struct iMeshWrapper : public iBase
    * based on the lights which hit one point of the sprite (usually
    * the center). More elaborate lighting systems are possible
    * but this will do for now.
+   * <p>
+   * This function is usually not called by applications. It is better
+   * to call DeferUpdateLighting() instead.
    */
   virtual void UpdateLighting (iLight** lights, int num_lights) = 0;
 
@@ -199,6 +216,11 @@ struct iMeshWrapper : public iBase
    * <p>
    * If the mesh is already in several sectors those additional sectors
    * will be ignored and only the first one will be used for this routine.
+   * <p>
+   * Placing a mesh in different sectors is important when the mesh crosses
+   * a portal boundary. If you don't do this then it is possible that the
+   * mesh will be clipped wrong. For small mesh objects you can get away
+   * by not doing this in most cases.
    */
   virtual void PlaceMesh () = 0;
 
@@ -208,7 +230,7 @@ struct iMeshWrapper : public iBase
    * So this means that it might return a hit even though the object
    * isn't really hit at all. Depends on how much the bounding box
    * overestimates the object. This also returns the face number
-   * as defined in csBox3 on which face the hit occured. Usefull for
+   * as defined in csBox3 on which face the hit occured. Useful for
    * grid structures.
    */
   virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
@@ -223,7 +245,8 @@ struct iMeshWrapper : public iBase
 
   /**
    * Check if this object is hit by this object space vector.
-   * Return the collision point in object space coordinates.
+   * Return the collision point in object space coordinates. This version
+   * is more accurate than HitBeamOutline.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr) = 0;
@@ -281,9 +304,9 @@ struct iMeshWrapper : public iBase
    * Get flags for this meshwrapper. The following flags are supported:
    * <ul>
    * <li>#CS_ENTITY_CONVEX: entity is convex. This can help the engine with
-   *     optimizing rendering.
+   *     optimizing rendering. Currently not used.
    * <li>#CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
-   *     for the engine to render this object differently.
+   *     for the engine to render this object differently. Currently not used.
    * <li>#CS_ENTITY_CAMERA: entity will always be centered around the camera.
    * <li>#CS_ENTITY_INVISIBLE: entity is invisible.
    * <li>#CS_ENTITY_NOSHADOWS: cast no shadows.
@@ -316,6 +339,11 @@ struct iMeshWrapper : public iBase
    * coordinates by this routine). Note that some implementations
    * of mesh objects will not change the orientation of the object but
    * only the position.
+   * <p>
+   * Note also that some mesh objects don't support HardTransform. You
+   * can find out by calling iMeshObject->SupportsHardTransform().
+   * In that case you can sometimes still call HardTransform() on the
+   * factory.
    */
   virtual void HardTransform (const csReversibleTransform& t) = 0;
 
@@ -343,12 +371,15 @@ struct iMeshWrapper : public iBase
   	csBox3& cbox) = 0;
 
   /**
-   * Get all the children of this mesh object.
+   * Get all the children of this mesh object. This is used for hierarchical
+   * meshes. If you want to make a hierarchical mesh you can call
+   * GetChildren ()->Add (mesh).
    */
   virtual iMeshList* GetChildren () = 0;
   /**
    * Get the parent of this mesh. Returns NULL if the mesh has no parent (i.e.
-   * it is contained in the engine directly).
+   * it is contained in the engine directly). If not NULL then this mesh
+   * is part of a hierarchical mesh.
    */
   virtual iMeshWrapper* GetParentContainer () = 0;
   /**

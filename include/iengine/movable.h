@@ -43,7 +43,10 @@ SCF_VERSION (iMovableListener, 0, 0, 1);
  */
 struct iMovableListener : public iBase
 {
-  /// The movable has changed.
+  /**
+   * The movable has changed. This is called whenever something does
+   * UpdateMove() on the movable.
+   */
   virtual void MovableChanged (iMovable* movable) = 0;
   /// The movable is about to be destroyed.
   virtual void MovableDestroyed (iMovable* movable) = 0;
@@ -52,22 +55,40 @@ struct iMovableListener : public iBase
 SCF_VERSION (iMovable, 0, 1, 2);
 
 /**
- * This interface describes a movable entity. It is usually
- * attached to some other geometrical object like a thing or
- * mesh object.
+ * This interface describes the transformation between local object space
+ * of some model and world space (i.e. where it is in the world). Movables
+ * are attached to mesh objects (use iMeshWrapper->GetMovable()) to get
+ * the movable belonging to some mesh.
+ * <p>
+ * Usually models are defined with the local origin (0,0,0) somewhere in
+ * the model. Sometimes in the center or the center-bottom depending on what
+ * is easiest. It is important to realize that all position setting routines
+ * below operate relative to the local origin of the object.
+ * <p>
+ * Common problem: some mesh objects (in particular thing) don't allow
+ * movement by default for optimization purposes. Changing the movable
+ * will not do a lot in that case. To enable moving you have to
+ * set the CS_THING_MOVE_OCCASIONAL flags using iThingState->SetMovingOption().
  */
 struct iMovable : public iBase
 {
-  /// Get the parent movable.
+  /**
+   * Get the parent movable. This is relevant in case the mesh belonging
+   * to this movable is part of a hierarchical transformation.
+   */
   virtual iMovable* GetParent () const = 0;
-  /// Set the parent movable.
+  /**
+   * Set the parent movable. Usually you don't need to call this function
+   * yourselves as it is called automatically whenever you add some mesh
+   * to another mesh parent (using iMeshWrapper->GetChildren ()->Add()).
+   */
   virtual void SetParent (iMovable* parent) = 0;
 
   /**
    * Initialize the list of sectors to one sector where
-   * this thing is. This is a convenience funcion.
-   * This function does not update the corresponding list in
-   * the sector. It only does a local update here.
+   * this thing is. This is a convenience funcion. Calling this function
+   * makes the object visible in this sector. Use GetSectors() if you want
+   * to have more control over where the object really is.
    * This function does not do anything if the parent is not NULL.
    * You have to call UpdateMove() after changing the sector
    * information.
@@ -75,7 +96,9 @@ struct iMovable : public iBase
   virtual void SetSector (iSector* sector) = 0;
 
   /**
-   * Clear the list of sectors.
+   * Clear the list of sectors. This basically makes the object invisible
+   * as it will not be present in any sector. The mesh will still be present
+   * in the engine list of meshes though.
    * This function does not do anything if the parent is not NULL.
    * You have to call UpdateMove() after changing the sector
    * information.
@@ -83,41 +106,62 @@ struct iMovable : public iBase
   virtual void ClearSectors () = 0;
 
   /**
-   * Get list of sectors for this entity.
-   * This will return the sectors of the parent if there
-   * is a parent.
+   * Get the list of sectors for this entity. Using this list you can get
+   * and set all sectors that this object is in. Note that if an object
+   * crosses a portal then you should in theory add every touched sector
+   * to this list of sectors. If objects are small then you can get away
+   * by not doing this. But it is possible that you will get render/clipping
+   * errors. There is a conveniance function (iMeshWrapper->PlaceMesh())
+   * which will attempt to find all sectors a mesh is in and update the
+   * movable.
+   * <p>
+   * This will return the sectors of the parent if there is a parent.
    */
   virtual iSectorList* GetSectors () = 0;
 
   /**
-   * Return true if we are placed in a sector.
+   * Return true if we are placed in a sector (i.e. visible).
    */
   virtual bool InSector () const = 0;
 
   /**
    * Set the transformation vector and sector to move to
-   * some position.
+   * some position. This call doesn't change the orientation of the model.
    * You have to call UpdateMove() after changing the position
    * of an object.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will set the position relative to the parent.
    */
   virtual void SetPosition (iSector* home, const csVector3& v) = 0;
 
   /**
    * Set the transformation vector for this object. Note
-   * that the sectors are unchanged.
+   * that the sectors and orientation are unchanged.
    * You have to call UpdateMove() after changing the position
    * of an object.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will set the position relative to the parent.
    */
   virtual void SetPosition (const csVector3& v) = 0;
 
   /**
-   * Get the current position.
+   * Get the current position. Remember that positions are relative
+   * to some sector.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * returns the position relative to the parent.
    */
   virtual const csVector3& GetPosition () const = 0;
 
   /**
    * Get the current position but keep track of hierarchical
-   * transformations.
+   * transformations. So the returned vector will be the world space coordinate
+   * where this object really is.
    */
   virtual const csVector3 GetFullPosition () const = 0;
 
@@ -125,17 +169,30 @@ struct iMovable : public iBase
    * Set the transformation matrix for this entity.
    * You have to call UpdateMove() after changing the transform
    * of an object.
+   * <p>
+   * <b>WARNING:</b> Do not scale objects using the transform in the movable!
+   * Several subsystems in Crystal Space (like collision detection and
+   * visibility culling) don't work properly if you do that. Instead use
+   * iMeshWrapper or iMeshFactoryWrapper->HardTransform() to scale.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will set the transformation relative to the parent.
    */
   virtual void SetTransform (const csMatrix3& matrix) = 0;
 
   /**
-   * Set the world to object tranformation. Note that it is
-   * recommended not to scale objects using SetTransform()
-   * as some parts of CS don't work properly in that case.
-   * It is better to scale your object using
-   * iMeshWrapper or iMeshFactoryWrapper->HardTransform().
-   * You have to call UpdateMove() after changing the transform
-   * of an object.
+   * Set the world to object tranformation. This==object and Other==world
+   * for the transform.
+   * <p>
+   * <b>WARNING:</b> Do not scale objects using the transform in the movable!
+   * Several subsystems in Crystal Space (like collision detection and
+   * visibility culling) don't work properly if you do that. Instead use
+   * iMeshWrapper or iMeshFactoryWrapper->HardTransform() to scale.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will set the transformation relative to the parent.
    */
   virtual void SetTransform (const csReversibleTransform& t) = 0;
 
@@ -144,6 +201,10 @@ struct iMovable : public iBase
    * and Other==world so This2Other()
    * transforms from object to world space. If you modify this
    * transform you have to call UpdateMove() later.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will get the transformation relative to the parent.
    */
   virtual csReversibleTransform& GetTransform () = 0;
 
@@ -155,17 +216,29 @@ struct iMovable : public iBase
 
   /**
    * Relative move.
+   * <p>
+   * Note that this function will not check for collision detection or
+   * portals.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will move relative to the parent.
    */
   virtual void MovePosition (const csVector3& v) = 0;
 
   /**
    * Relative transform.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will move relative to the parent.
    */
   virtual void Transform (const csMatrix3& matrix) = 0;
 
   /**
    * Add a listener to this movable. This listener will be called whenever
-   * the movable changes or right before the movable is destroyed.
+   * the movable changes (when UpdateMove() is called) or right before the
+   * movable is destroyed.
    */
   virtual void AddListener (iMovableListener* listener) = 0;
 
@@ -205,6 +278,10 @@ struct iMovable : public iBase
    * <p>
    * The engine and visibility cullers can use this information to
    * optimize stuff a bit.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will only test the local transform for identity.
    */
   virtual bool IsTransformIdentity () const = 0;
 
@@ -222,6 +299,10 @@ struct iMovable : public iBase
    * Set the transform of this movable to the identity transform (i.e.
    * not moving at all). You have to call UpdateMove() after calling
    * this.
+   * <p>
+   * This function ignores the hierarchical transformation this movable
+   * may be part off. If part of a hierarchical transformation this function
+   * will only set the local transform to identity.
    */
   virtual void TransformIdentity () = 0;
 };

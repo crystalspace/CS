@@ -308,6 +308,14 @@ on the object when it is first created, when lights in the vicinity move,
 or when the object itself moves.  @xref{HOWTO Mesh LightAnim}.
 
 @item
+@strong{Q}: I'm trying to move some things around but this doesn't appear
+to work right.
+
+@strong{A}: For optization purposes things can't move by default. To
+enable the option to move them you must set the @code{CS_THING_MOVE_OCCASIONAL}
+flag using @code{iThingState->SetMovingOption()}.
+
+@item
 @strong{Q}: Why isn't my polygon lit correctly? It is simply full bright.
 
 @strong{A}: Both the software and OpenGL renderer have a limitation on

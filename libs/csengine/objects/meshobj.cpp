@@ -431,6 +431,9 @@ void csMeshWrapper::PlaceMesh ()
   // @@@ This function only goes one level deep in portals. Should be fixed!
   // @@@ It would be nice if we could find a more optimal portal representation
   // for large sectors.
+
+  // @@@ THIS FUNCTION SHOULD USE GetNearbyObjects()!!!
+
   int i, j;
   iMeshList *ml = sector->GetMeshes ();
   for (i = 0; i < ml->GetCount (); i++)
