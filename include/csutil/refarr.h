@@ -51,6 +51,18 @@ public:
       root = 0;
   }
 
+  csRefArray (const csRefArray<T>& source)
+  {
+    count = 0;
+    limit = source.limit;
+    threshold = source.threshold;
+    root = (csRef<T>*)calloc (limit, sizeof(csRef<T>));
+    while (count < source.Length ())
+    {
+      Push (source[count]);
+    }
+  }
+  
   /**
    * Transfer the entire contents of one array to the other. The end
    * result will be that this array will be completely empty and the

@@ -42,7 +42,7 @@ struct csGradientShade
   /// Position in the gradient
   float position;
   
-  /// Construct with all 0
+  /// Construct with all values set to 0
   csGradientShade ();
   /// Construct supplying all values
   csGradientShade (csColor left_color, csColor right_color, float pos);
@@ -58,15 +58,38 @@ struct csGradientShade
  * If you ever have worked with an image creation/manipulation program with
  * a slightly higher niveau than Windows Paint then you probably know what 
  * this is. <p>
- * Colors(here calles 'shades') can be placed at arbitrary positions; although 
+ * Colors(here called 'shades') can be placed at arbitrary positions; although 
  * commonly a range of [0;1] is used, negative positions and positions larger 
  * than 1 are supported.<p>
  * Shades contain actually two colors, a 'left' and 'right' one. You can think
  * of this as, when approaching from one side, you'll get closer and closer to
- * the respective color. If you step over a shade, you got the other from, 
- * getting farther and farther. This feature can be used for sharp 
- * transitions; for smooth ones they are simply set to the same value. 
- * \todo More shade management (e.g., getting, deleting of single shades.)
+ * the respective color. If you step over a shade, you have the other color, 
+ * but you're getting farther and farther from it (and towards the next color) 
+ * when moving on. This feature can be used for sharp transitions; for smooth 
+ * ones they are simply set to the same value.<p>
+ * Examples:
+ * \code
+ * csGradient grad;
+ * // Rainbow-ish
+ * grad.AddShade (csGradientShade (csColor (1.0f, 0.0f, 0.0f), 0.0f)));
+ * grad.AddShade (csGradientShade (csColor (1.0f, 1.0f, 0.0f), 0.2f)));
+ * grad.AddShade (csGradientShade (csColor (0.0f, 1.0f, 0.0f), 0.4f)));
+ * grad.AddShade (csGradientShade (csColor (0.0f, 1.0f, 1.0f), 0.6f)));
+ * grad.AddShade (csGradientShade (csColor (0.0f, 0.0f, 1.0f), 0.8f)));
+ * grad.AddShade (csGradientShade (csColor (1.0f, 0.0f, 1.0f), 1.0f)));
+ *
+ * // German flag
+ * grad.Clear ();
+ * grad.AddShade (csGradientShade (csColor (0.0f, 0.0f, 0.0f), 0.0f)));
+ * grad.AddShade (csGradientShade (csColor (0.0f, 0.0f, 0.0f), 
+ *  csGradientShade (csColor (1.0f, 0.0f, 0.0f)
+ *  0.33f)));
+ * grad.AddShade (csGradientShade (csColor (1.0f, 0.0f, 0.0f), 
+ *  csGradientShade (csColor (1.0f, 1.0f, 0.0f)
+ *  0.66f)));
+ * grad.AddShade (csGradientShade (csColor (1.0f, 1.0f, 0.0f), 1.0f)));
+ * \endcode
+ * \todo More shade management (e.g. getting, deleting of single shades.)
  */
 class csGradient
 {

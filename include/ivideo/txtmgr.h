@@ -35,11 +35,14 @@ class csMatrix3;
 class csVector3;
 class csRect;
 
+struct csRGBpixel;
+struct csLightMapMapping;
 struct iImage;
 struct iTextureHandle;
 struct iMaterial;
 struct iMaterialHandle;
 struct iImageVector;
+struct iLightMap;
 
 /**\name Texture registration flags.
  * During texture registration you should tell
@@ -52,7 +55,7 @@ struct iImageVector;
 /// You're going to use the texture for 3D drawing
 #define CS_TEXTURE_3D			0x00000002
 /**
- * Dither texture or not.<p>
+ * Dither texture or not.
  * Some renderers may use dithering while converting textures to internal
  * format (say from truecolor to 8-bit paletted). For most textures dithering
  * won't give any visual effect, but very seldom there are textures that looks
@@ -61,7 +64,7 @@ struct iImageVector;
  */
 #define CS_TEXTURE_DITHER		0x00000004
 /**
- * Create mipmaps for this texture?<p>
+ * Create mipmaps for this texture?
  * Sometimes we know in advance that some texture will need just one
  * mipmap (or we just don't care about the mipmapping artifacts because of,
  * say, how texture is looking (smoothed etc)). This flag is a <b>hint</b>
@@ -83,7 +86,50 @@ struct iImageVector;
 #endif // CS_USE_NEW_RENDERER
 /** @} */
 
-SCF_VERSION (iTextureManager, 2, 1, 0);
+SCF_VERSION (iRendererLightmap, 1, 0, 0);
+
+/**
+ * A lightmap registered with a renderer.
+ */
+struct iRendererLightmap : public iBase
+{
+  /**
+   * Retrieve the coordinates of this lightmap in the superlightmap, in a 
+   * system the renderer uses internally. Calculate lightmap U/Vs within this
+   * bounds when they are intended to be passed to the renderer.
+   */
+  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
+    float &lm_u2, float& lm_v2) = 0;
+    
+  /**
+   * Retrieve the coordinates of this lightmap in the superlightmap, in the
+   * 'absolute' system used by iSuperLightmap::RegisterLightmap().
+   */
+  virtual void GetSLMCoords (int& left, int& top, 
+    int& width, int& height) = 0;
+    
+  /// Set the image data of this lightmap.
+  virtual void SetData (csRGBpixel* data) = 0;
+  
+  virtual void SetLightCellSize (int size) = 0;
+};
+
+SCF_VERSION (iSuperLightmap, 1, 0, 0);
+
+/**
+ * A super light map.
+ */
+struct iSuperLightmap : public iBase
+{
+  /// Add a lightmap to this SLM.
+  virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 
+    int width, int height) = 0;
+    
+  /// Retrieve an image of the whole SLM (for debugging purposes)
+  virtual csPtr<iImage> Dump () = 0;
+};
+
+SCF_VERSION (iTextureManager, 2, 3, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -195,6 +241,17 @@ struct iTextureManager : public iBase
    * bits that fit the CS_IMGFMT_MASK mask matters.
    */
   virtual int GetTextureFormat () = 0;
+  
+  /**
+   * Create a new super lightmap with the specified dimensions.
+   */
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
+    int height) = 0;
+
+  /**
+   * Request maximum texture dimensions.
+   */
+  virtual void GetMaxTextureSize (int& w, int& h, int& aspect) = 0;
 };
 
 /** @} */

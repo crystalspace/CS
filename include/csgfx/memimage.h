@@ -23,12 +23,9 @@
 #include "csimage.h"
 
 /**
- * This class represents a block of memory in the true colour format only.
- * It is used with dynamic textures so that the usual method of registering
- * and preparing textures if fulfilled. 8bit images and cropping/cloning make
- * no  sense in this context.
+ * Memory image.
+ * \remark Does not support cropping or cloning.
  */
-
 class csImageMemory : public csImageFile
 {
   /// If we are a blank image, we can take a short cut with rescaling
@@ -54,7 +51,7 @@ public:
    * \param destroy Destroy the buffer when the Image is destroyed
    * \param format Image format. Data in \arg buffer must be in this format.
    * Default: #CS_IMGFMT_TRUECOLOR
-   * \param palette Palett for indexed images.
+   * \param palette Palette for indexed images.
    */
   csImageMemory (int width, int height, void *buffer, bool destroy,
     int format = CS_IMGFMT_TRUECOLOR, csRGBpixel *palette = 0);

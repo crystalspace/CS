@@ -57,6 +57,23 @@ public:
       root = 0;
   }
 
+  csPArray (const csPArray& source)
+  {
+    count = source.count;
+    limit = source.limit;
+    threshold = source.threshold;
+    if (source.root != 0)
+    {
+      const size_t rootSize = limit * sizeof(T*);
+      root = (T**)malloc (rootSize);
+      memcpy (root, source.root, rootSize);
+    }
+    else
+    {
+      root = 0;
+    }
+  }
+
   /**
    * Clear entire vector.
    */
