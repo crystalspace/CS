@@ -500,8 +500,8 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
 }
 
 // Work around lack of ULONG_PTR on older platform SDKs
-#ifndef __int3264
-#define ULONG_PTR   ULONG
+#if !defined(__int3264) || (_MSC_VER < 1300)
+#define ULONG_PTR ULONG
 #endif
 
 /* A slightly odd method to get a thread context, deliberately raising an exception
