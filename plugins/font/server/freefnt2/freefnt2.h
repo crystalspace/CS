@@ -37,13 +37,14 @@ class csFreeType2Font : public iFont
   struct GlyphBitmap
   {
     unsigned char *bitmap;
+    unsigned char *alphabitmap;
     int rows, width, stride;
     int descender, ascender, advance, left, top;
     bool isOk;
 
-    GlyphBitmap (){isOk=false; bitmap = NULL;}
+    GlyphBitmap (){isOk=false; bitmap = NULL; alphabitmap = NULL; }
     ~GlyphBitmap ()
-    { if (isOk) delete [] bitmap; }
+    { if (isOk) { delete [] bitmap; if (alphabitmap) delete[] alphabitmap; } }
   };
 
   // A set of glyphs with same point size
@@ -51,6 +52,7 @@ class csFreeType2Font : public iFont
   {
     int size;
     int maxW, maxH;
+    int ascend, descend;
     GlyphBitmap glyphs [256];
   };
 
@@ -144,14 +146,8 @@ public:
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
   virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
-  virtual uint8 *GetGlyphAlphaBitmap (uint8, int&, int&)
-  {
-    return NULL;
-  }
-  virtual uint8 *GetGlyphAlphaBitmap (uint8, int&, int&, int&, int&, int&)
-  {
-    return NULL;
-  }
+  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH);
+  virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
 
   /**
    * Return the width and height of text written with this font.
@@ -174,6 +170,16 @@ public:
    * Remove a font delete notification callback.
    */
   virtual bool RemoveDeleteCallback (iFontDeleteNotify* func);
+
+  /**
+   * Get the font's descent in pixels.
+   */
+  virtual int GetDescent (); 
+
+  /**
+   * Get the font's ascent in pixels.
+   */
+  virtual int GetAscent (); 
 };
 
 /**
@@ -219,6 +225,8 @@ public:
 
   virtual bool Initialize (iObjectRegistry *Sys);
   void Report (int severity, const char* msg, ...);
+
+  const char* GetErrorDescription(int code);
 
   /**
    * Load a font by name.

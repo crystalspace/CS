@@ -88,6 +88,15 @@ void csFreeType2Server::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
+const char* csFreeType2Server::GetErrorDescription(int code)
+{
+  #undef __FTERRORS_H__
+  #define FT_ERRORDEF( e, v, s )  case v: return s;
+  #define FT_ERROR_START_LIST     switch (code) {
+  #define FT_ERROR_END_LIST       default: return "unknown error"; }
+  #include FT_ERRORS_H
+}
+
 bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
 {
   csFreeType2Server::object_reg = object_reg;
@@ -263,6 +272,29 @@ uint8 *csFreeType2Font::GetGlyphBitmap (uint8 c, int &oW, int &oH)
   return glyph.bitmap;
 }
 
+uint8 *csFreeType2Font::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
+{
+  if (!current || !current->glyphs[c].isOk) return NULL;
+
+  const GlyphBitmap &glyph = current->glyphs[c];
+  oW = MAX( glyph.advance, glyph.width);
+  oH = glyph.rows;
+  adv = glyph.advance;
+  left = glyph.left;
+  top = glyph.top;
+  return glyph.alphabitmap;
+}
+
+uint8 *csFreeType2Font::GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH)
+{
+  if (!current || !current->glyphs[c].isOk) return NULL;
+
+  const GlyphBitmap &glyph = current->glyphs[c];
+  oW = MAX( glyph.advance, glyph.width);
+  oH = current->maxH;
+  return glyph.alphabitmap;
+}
+
 void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &desc)
 {
   if (!text || !current)
@@ -339,11 +371,15 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
         return false;
         
       }
+      // @@@ kludge: don't report error on CSF files(or?)
+      if ((size >= 3) && (!strncmp ((const char*)fontdata, "CSF", 3)))
+	return false;
       if ((error=FT_New_Memory_Face (server->library, fontdata, size, 0, &face)))
       {
         file->DecRef ();
         server->Report (CS_REPORTER_SEVERITY_WARNING,
-                        "Font file %s could not be loaded - FreeType2 errorcode for FT_New_Face = %d!\n", name, error);
+	  "Font file %s could not be loaded: %s (%d)\n", 
+	  name, server->GetErrorDescription (error), error);
         return false;
       }
     }
@@ -365,7 +401,6 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
   file->DecRef ();
 
   // we do not change the default values of the new instance
-  // ( 96 dpi, 10 pt. size, no trafo flags )
 
   // next we scan the charmap table if there is an encoding
   // that matches the requested platform and encoding ids
@@ -397,7 +432,8 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
   if ((error=FT_Set_Charmap (face, charmap)))
   {
     server->Report (CS_REPORTER_SEVERITY_WARNING,
-      "Could not set CharMap - FreeType2 errorcode for FT_Set_CharMap = %d!", error);
+      "Could not set CharMap: %s(%d)", 
+      server->GetErrorDescription (error), error);
     return false;
   }
   // now we create the bitmap of all glyphs in the face
@@ -409,21 +445,21 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
   if (FindGlyphSet (size))
     return true;
 
-  if (FT_Set_Char_Size (face, size * 64, size * 64, 0, 0))
+  if (FT_Set_Char_Size (face, 0, 
+    size * 64, 96, 96))
     return false;
   //    DEBUG_BREAK;
   // Create the glyphset
   GlyphSet *glyphset;
   glyphset = new GlyphSet;
   glyphset->size = size;
-  int baseline;
 //  int maxrows = (-face->size->metrics.descender + face->size->metrics.ascender + 63)>>6;
   int maxrows = (face->size->metrics.height + 63)>>6;
   glyphset->maxW = (face->size->metrics.max_advance + 63) >> 6;
   glyphset->maxH = maxrows;
+  glyphset->ascend = (face->size->metrics.ascender + 63)>>6;
+  glyphset->descend = (-face->size->metrics.descender + 63)>>6;
   int bitmapsize, stride;
-
-  baseline = (-face->size->metrics.descender)>>6;
 
   memset (glyphset->glyphs, 0, sizeof (glyphset->glyphs));
   cache.Push (glyphset);
@@ -441,7 +477,7 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
     stride = MAX((g.advance+7)/8, (((FT_BitmapGlyph)glyph)->bitmap.width+7)/8);
     g.bitmap = new unsigned char [bitmapsize=maxrows*stride];
     memset (g.bitmap, 0, bitmapsize);
-    int startrow = maxrows-(baseline + ((FT_BitmapGlyph)glyph)->top);
+    int startrow = maxrows-(glyphset->descend + ((FT_BitmapGlyph)glyph)->top);
     int endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
     if (startrow < 0) startrow = 0;
     if (endrow > maxrows) endrow = maxrows;
@@ -455,9 +491,24 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
     g.rows = maxrows;
     g.left = ((FT_BitmapGlyph)glyph)->left;
     //    g.top = ((FT_BitmapGlyph)glyph)->top;
-    g.top = maxrows-baseline;
+    g.top = maxrows-glyphset->descend;
 
     //    FT_Done_Glyph (glyph);
+
+    if (FT_Load_Char (face, iso_char, FT_LOAD_RENDER) || FT_Get_Glyph (face->glyph, &glyph))
+      continue;
+
+    stride = MAX(g.advance, ((FT_BitmapGlyph)glyph)->bitmap.width);
+    g.alphabitmap = new unsigned char [bitmapsize=maxrows*stride];
+    memset (g.alphabitmap, 0, bitmapsize);
+    startrow = maxrows-(glyphset->descend + ((FT_BitmapGlyph)glyph)->top);
+    endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
+    if (startrow < 0) startrow = 0;
+    if (endrow > maxrows) endrow = maxrows;
+    for (int n=0,i=startrow; i < endrow; i++,n++)
+      memcpy (g.alphabitmap + stride*i, 
+              ((FT_BitmapGlyph)glyph)->bitmap.buffer + n*((FT_BitmapGlyph)glyph)->bitmap.pitch,
+              MIN(stride, ((FT_BitmapGlyph)glyph)->bitmap.pitch));
   }
 
   current = glyphset;
@@ -484,4 +535,14 @@ bool csFreeType2Font::RemoveDeleteCallback (iFontDeleteNotify* func)
     }
   }
   return false;
+}
+
+int csFreeType2Font::GetAscent ()
+{
+  return current ? current->ascend : -1;
+}
+
+int csFreeType2Font::GetDescent ()
+{
+  return current ? current->descend : -1;
 }

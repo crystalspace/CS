@@ -545,3 +545,13 @@ bool csDefaultFontServer::eiComponent::Initialize (iObjectRegistry* p)
   return true;
 }
 
+int csDefaultFont::GetAscent ()
+{
+  return Height-Baseline;
+}
+
+int csDefaultFont::GetDescent ()
+{
+  return Baseline;
+}
+

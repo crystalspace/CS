@@ -125,6 +125,16 @@ public:
    * Remove a font delete notification callback.
    */
   virtual bool RemoveDeleteCallback (iFontDeleteNotify* func);
+
+  /**
+   * Get the font's descent in pixels.
+   */
+  virtual int GetDescent (); 
+
+  /**
+   * Get the font's ascent in pixels.
+   */
+  virtual int GetAscent (); 
 };
 
 /**

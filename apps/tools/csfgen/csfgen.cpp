@@ -267,7 +267,7 @@ int main (int argc, char* argv[])
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
-	CS_REQUEST_PLUGIN ("crystalspace.font.server.freetype", iFontServer),
+	CS_REQUEST_PLUGIN ("crystalspace.font.server.freetype2", iFontServer),
 	CS_REQUEST_END))
   {
     fprintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");

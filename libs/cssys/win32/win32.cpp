@@ -59,8 +59,8 @@ extern int ApplicationShow;
 void SystemFatalError (char *s)
 {
   ChangeDisplaySettings (NULL, 0);  // doesn't hurt
+  fprintf(stderr, "FATAL: %s\n", s);
   MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  exit (1);
 }
 
 #define MAX_SCANCODE 0x100
@@ -497,7 +497,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   else
   {
     a->DecRef();
-    fprintf (stderr, "FATAL: Failed to register iWin32Assistant!\n");
+    SystemFatalError ("Failed to register iWin32Assistant!");
   }
   return ok;
 }

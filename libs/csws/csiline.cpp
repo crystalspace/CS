@@ -323,7 +323,13 @@ bool csInputLine::HandleEvent (iEvent &Event)
           break;
         default:
         {
-do_key:   if ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))
+	  /*
+	    on german keyboards some chars are only available when
+	    pressing AltGr = Ctrl+Alt, so allow that combination.
+	   */
+do_key:   if ((((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT)) 
+	    != (CSMASK_CTRL | CSMASK_ALT))
+	   && ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT)) != 0))
            || (Event.Key.Char < 32))
             return false;
           if ((Event.Key.Char > 255) || !IsValidChar (Event.Key.Char))

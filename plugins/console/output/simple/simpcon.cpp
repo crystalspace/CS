@@ -127,6 +127,7 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   buf = Config->GetStr ("SimpleConsole.ConBG", "0,0,0");
   sscanf (buf, "%d,%d,%d", &console_bg_r, &console_bg_g, &console_bg_b);
   buf = Config->GetStr ("SimpleConsole.ConFont", "auto");
+  mingap = Config->GetInt ("SimpleConsole.MinimumLineGap", 2);
 
   const char *fontname;
   if (!strcasecmp (buf, "auto"))
@@ -159,7 +160,9 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
 
   int fw, fh;
   console_font->GetMaxSize (fw, fh);
-  int i = fh + 2;
+  int i = fh;
+  if (console_font->GetDescent() < mingap)
+    i += mingap - console_font->GetDescent();
   LineSize = (FrameWidth / 4) + 1;
   SetBufferSize ((FrameHeight / i) - 2);
   SetLineMessages (Config->GetInt ("SimpleConsole.LineMax", 4));
@@ -401,7 +404,8 @@ void csSimpleConsole::Draw2D (csRect* area)
 
   int tw, th;
   console_font->GetMaxSize (tw, th);
-  th += 2;
+  if (console_font->GetDescent () < mingap)
+    th += mingap - console_font->GetDescent ();
 
   bool dblbuff = G2D->GetDoubleBufferState ();
 

@@ -56,6 +56,8 @@ private:
   int ConsoleMode;
   /// Select font
   iFont *console_font;
+  /// Minimum gap between two lines
+  int mingap;
   /// The width and height of graphics canvas
   int FrameWidth, FrameHeight;
   /// The system driver

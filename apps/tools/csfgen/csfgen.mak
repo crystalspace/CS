@@ -1,5 +1,5 @@
 # Application target only valid if module is listed in PLUGINS.
-ifneq (,$(findstring freefont,$(PLUGINS)))
+ifneq (,$(findstring freefnt2,$(PLUGINS)))
 
 # Application description
 DESCRIPTION.csfgen = TrueType to Crystal Space font converter

@@ -231,7 +231,8 @@ struct iGraphics2D : public iBase
 
   /**
    * Write a text string into the back buffer. A negative value for bg
-   * color will not draw the background. x and y are the pen position on a baseline
+   * color will not draw the background. x and y are the pen position on a baseline.
+   * The actual font baseline is shifted up by the font's descent.
    */
   virtual void WriteBaseline (iFont *font, int x, int y, int fg, int bg,
     const char *str) = 0;

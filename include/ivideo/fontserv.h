@@ -62,7 +62,7 @@ struct iFontDeleteNotify : public iBase
   virtual void BeforeDelete (iFont* font) = 0;
 };
 
-SCF_VERSION (iFont, 2, 0, 2);
+SCF_VERSION (iFont, 3, 0, 0);
 
 /**
  * A font object.
@@ -71,7 +71,20 @@ SCF_VERSION (iFont, 2, 0, 2);
 struct iFont : public iBase
 {
   /**
-   * Set the size for this font.
+   * Add a font delete notification callback routine.
+   * This routine will be called from font destructor,
+   * with the font instance being passed as argument.
+   * Another parameter is provided to supply additional data.
+   */
+  virtual void AddDeleteCallback (iFontDeleteNotify* func) = 0;
+
+  /**
+   * Remove a font delete notification callback.
+   */
+  virtual bool RemoveDeleteCallback (iFontDeleteNotify* func) = 0;
+  
+  /**
+   * Set the size for this font in Point.
    * All other methods will change their behaviour as soon as you call
    * this method; but not all font managers supports rescalable fonts
    * in which case this method will be unimplemented.
@@ -79,13 +92,13 @@ struct iFont : public iBase
   virtual void SetSize (int iSize) = 0;
 
   /**
-   * Query current font size. If server does not support rescalable
+   * Query current font size in Point. If server does not support rescalable
    * fonts, this method returns 0.
    */
   virtual int GetSize () = 0;
 
   /**
-   * Return the maximum width and height of a single glyph.
+   * Return the maximum width and height of a single glyph, in pixels.
    * Return -1 if it could not be determined.
    */
   virtual void GetMaxSize (int &oW, int &oH) = 0;
@@ -152,19 +165,22 @@ struct iFont : public iBase
    * without exceeding given width (in pixels)
    */
   virtual int GetLength (const char *text, int maxwidth) = 0;
+  
+  /**
+   * Get the font's descent in pixels.
+   * Returns a value <0 if an error occured.
+   * The sum of descent and ascent must not necessarily equal the 
+   * maximum height.
+   */
+  virtual int GetDescent () = 0; 
 
   /**
-   * Add a font delete notification callback routine.
-   * This routine will be called from font destructor,
-   * with the font instance being passed as argument.
-   * Another parameter is provided to supply additional data.
+   * Get the font's ascent in pixels.
+   * Returns a value <0 if an error occured.
+   * The sum of descent and ascent must not necessarily equal the 
+   * maximum height.
    */
-  virtual void AddDeleteCallback (iFontDeleteNotify* func) = 0;
-
-  /**
-   * Remove a font delete notification callback.
-   */
-  virtual bool RemoveDeleteCallback (iFontDeleteNotify* func) = 0;
+  virtual int GetAscent () = 0; 
 };
 
 SCF_VERSION (iFontServer, 2, 0, 1);
