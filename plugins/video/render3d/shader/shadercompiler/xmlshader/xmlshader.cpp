@@ -1052,5 +1052,6 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler)
 
 csXMLShader::~csXMLShader ()
 {
+  if (filename) delete [] filename;
   delete activeTech;
 }

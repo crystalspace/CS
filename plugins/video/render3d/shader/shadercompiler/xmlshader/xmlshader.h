@@ -164,7 +164,7 @@ public:
 
   /// Set name of the File where it was loaded from.
   void SetFileName (const char* filename)
-  { this->filename = filename; }
+  { this->filename = csStrNew(filename); }
 
   /// Get number of passes this shader have
   virtual int GetNumberOfPasses ()
