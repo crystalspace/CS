@@ -24,6 +24,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "qsqrt.h"
+#include "qint.h"
 #include "csgeom/math3d.h"
 #include <math.h>
 #include <stdlib.h>
@@ -511,14 +512,17 @@ void csEmitMeshObject::SetupObject ()
     RemoveParticles ();
     initialized = true;
     delete[] ages;
+    delete[] part_pos;
     delete[] part_speed;
     delete[] part_accel;
+    delete[] part_attract;
 
     ages = new int[number];
+    part_pos = new csVector3[number];
     part_speed = new csVector3[number];
-    part_speed = new csVector3[number];
-    /// not a very good estimate
-    bbox.Set(-10000, -10000, -10000, 100000, 10000, 10000);
+    part_accel = new csVector3[number];
+    part_attract = new csVector3[number];
+    bbox.StartBoundingBox();
 
     /// create new particles and add to particle system
     float drop_width = 0.3;
@@ -527,6 +531,9 @@ void csEmitMeshObject::SetupObject ()
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
       StartParticle(i);
+      /// age each particle randomly, to spread out particles over ages.
+      int elapsed = QInt(GetRandomFloat(0,time_to_live));
+      MoveAgeParticle(i, elapsed, elapsed/1000.);
     }
     SetupColor ();
     SetupMixMode ();
@@ -541,24 +548,35 @@ csEmitMeshObject::csEmitMeshObject (iSystem* system,
   lighted_particles = false;
   number = 50;
   ages = NULL;
+  part_pos = NULL;
   part_speed = NULL;
   part_accel = NULL;
+  part_attract = NULL;
+  attractor = NULL;
   startpos = NULL;
   startspeed = NULL;
   startaccel = NULL;
   timetolive = 1000;
   aging = NULL;
   nr_aging_els = 0;
+  using_rect_sprites = true;
+  drop_width = 0.2;
+  drop_height = 0.2;
+  drop_sides = 6;
+  drop_radius = 0.1;
 }
 
 csEmitMeshObject::~csEmitMeshObject()
 {
   delete[] ages;
+  delete[] part_pos;
   delete[] part_speed;
   delete[] part_accel;
+  delete[] part_attract;
   if(startpos) startpos->DecRef();
   if(startspeed) startspeed->DecRef();
   if(startaccel) startaccel->DecRef();
+  if(attractor) attractor->DecRef();
   csEmitAge *p = aging, *np = 0;
   while(p)
   {
@@ -575,8 +593,11 @@ void csEmitMeshObject::StartParticle (int i)
   startpos->GetValue(pos, startgiven);
   startspeed->GetValue(part_speed[i], pos);
   startaccel->GetValue(part_accel[i], pos);
+  if(attractor) attractor->GetValue(part_attract[i], pos);
   GetParticle (i)->SetMixMode (MixMode);
   GetParticle (i)->SetPosition (pos);
+  part_pos[i] = pos;
+  bbox.AddBoundingVertex(part_pos[i]);
   ages[i] = 0;
   /// use first element to start particles with
   if(!aging) return;
@@ -674,11 +695,19 @@ void csEmitMeshObject::MoveAgeParticle (int i, int elapsed, float delta_t)
   }
 
   /// move the particle
+  if(attractor)
+  {
+    // do attractor influence
+    csVector3 d = part_attract[i] - part_pos[i];
+    part_accel[i] += d * delta_t;
+  }
   csVector3 swirl = GetRandomDirection() * swirlamount;
   part_speed[i] += swirl * delta_t;
   part_speed[i] += part_accel[i]*delta_t;
   csVector3 move = part_speed[i]*delta_t;
   GetParticle(i)->MovePosition(move);
+  part_pos[i] += move;
+  bbox.AddBoundingVertexSmart(part_pos[i]);
 }
 
 void csEmitMeshObject::Update (cs_time elapsed_time)
@@ -694,6 +723,25 @@ void csEmitMeshObject::Update (cs_time elapsed_time)
   {
     if(ages[i] + elapsed > timetolive)
     {
+      // find old scalefactor
+      csEmitAge *belowage = 0, *aboveage = aging;
+      float oldscale = 1.;
+      while(aboveage && (aboveage->time < ages[i]))
+      {
+        belowage = aboveage;
+        aboveage = aboveage->next;
+      }
+      if(!belowage && aboveage)
+        oldscale = aboveage->scale;
+      else if(belowage && !aboveage)
+        oldscale = belowage->scale;
+      else if(belowage && aboveage)
+      {
+        float between = float(aboveage->time - ages[i]) /
+          float(aboveage->time - belowage->time);
+        oldscale = between*belowage->scale + (1.-between)*aboveage->scale;
+      }
+      GetParticle(i)->ScaleBy(1./oldscale); // reset the scale
       /// restart the particle
       int afterstart = ages[i] + elapsed_time - timetolive;
       StartParticle(i);
@@ -740,7 +788,7 @@ void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color,
   float &alpha, float& swirl, float& rotspeed, float& scale)
 {
   int n = 0;
-  if(i > nr_aging_els) return;
+  if(i >= nr_aging_els) return;
   csEmitAge *p;
   while(n < i)
   {

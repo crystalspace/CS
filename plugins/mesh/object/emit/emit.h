@@ -200,19 +200,32 @@ protected:
   iEmitGen3D *startspeed;
   /// the start accel generator
   iEmitGen3D *startaccel;
+  /// attractor position generator (can be NULL)
+  iEmitGen3D *attractor;
   /// the time to live for particles in msec
   int timetolive;
   /// the aging table
   csEmitAge *aging;
   /// size of aging table
   int nr_aging_els;
+  /// is using Rect Sprites as particles
+  bool using_rect_sprites;
+  /// size for rect sprites
+  float drop_width, drop_height;
+  /// shape for regular sprites
+  int drop_sides; float drop_radius;
+
 
   /// the ages (time they lived) of the particles, in msec.
   int* ages;
+  /// particle position
+  csVector3 *part_pos;
   /// particle speed m/s
   csVector3 *part_speed;
   /// particle acceleration m/s*s
   csVector3 *part_accel;
+  /// attractor position per particle
+  csVector3 *part_attract;
 
   /// give particle i new start values
   void StartParticle(int i);
@@ -260,6 +273,11 @@ public:
   {startaccel = emit; if(startaccel) startaccel->IncRef();}
   /// get startemit
   iEmitGen3D* GetStartAccelEmit() const {return startaccel;}
+  /// set startaccelemit
+  void SetAttractorEmit(iEmitGen3D *emit) 
+  {attractor = emit; if(attractor) attractor->IncRef();}
+  /// get startemit
+  iEmitGen3D* GetAttractorEmit() const {return attractor;}
 
   /// get the number of ageing moments
   int GetNumberAging() const {return nr_aging_els;}
@@ -269,6 +287,21 @@ public:
   /// get aging data
   void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale);
+
+  /// set rectangular particles
+  void SetRectParticles(float w, float h)
+  { using_rect_sprites = true; drop_width=w; drop_height=h;}
+  /// set regular polygon particles
+  void SetRegularParticles(int n, float radius)
+  { using_rect_sprites = false; drop_sides=n; drop_radius=radius;}
+  /// is using rects?
+  bool UsingRectParticles() const { return using_rect_sprites; }
+  /// get rect size
+  void GetRectParticles(float &w, float &h) const 
+  { w = drop_width; h = drop_height; }
+  /// get regular shape
+  void GetRegularParticles(int& n, float& radius) const
+  { n = drop_sides; radius = drop_radius;}
 
   /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
@@ -307,6 +340,10 @@ public:
     { scfParent->SetStartAccelEmit(emit); }
     virtual iEmitGen3D* GetStartAccelEmit() const
     { return scfParent->GetStartAccelEmit(); }
+    virtual void SetAttractorEmit(iEmitGen3D *emit) 
+    { scfParent->SetAttractorEmit(emit); }
+    virtual iEmitGen3D* GetAttractorEmit() const
+    { return scfParent->GetAttractorEmit(); }
     virtual int GetNumberAging() const { return scfParent->GetNumberAging();}
     virtual void AddAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
@@ -314,12 +351,22 @@ public:
     virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale) 
     {scfParent->GetAgingMoment(i, time, color, alpha, swirl, rotspeed, scale);}
+    virtual void SetRectParticles(float w, float h)
+    { scfParent->SetRectParticles(w,h); }
+    virtual void SetRegularParticles(int s, float r)
+    { scfParent->SetRegularParticles(s,r); }
+    virtual bool UsingRectParticles() const 
+    { return scfParent->UsingRectParticles(); }
+    virtual void GetRectParticles(float &w, float &h) const
+    { scfParent->GetRectParticles(w,h); }
+    virtual void GetRegularParticles(int &s, float &r) const
+    { scfParent->GetRegularParticles(s,r); }
   } scfiEmitState;
   friend class EmitState;
 };
 
 /**
- * Factory for rain.
+ * Factory for emitter.
  */
 class csEmitMeshObjectFactory : public iMeshObjectFactory
 {

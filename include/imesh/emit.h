@@ -140,7 +140,7 @@ struct iEmitCylinderTangent : public iEmitGen3D
 SCF_VERSION (iEmitFactoryState, 0, 0, 1);
 
 /**
- * This interface describes the API for the rain mesh factory object.
+ * This interface describes the API for the emitter mesh factory object.
  */
 struct iEmitFactoryState : public iBase
 {
@@ -166,7 +166,7 @@ struct iEmitFactoryState : public iBase
 SCF_VERSION (iEmitState, 0, 0, 1);
 
 /**
- * This interface describes the API for the rain mesh object.
+ * This interface describes the API for the emitter mesh object.
  */
 struct iEmitState : public iBase
 {
@@ -194,6 +194,10 @@ struct iEmitState : public iBase
   virtual void SetStartAccelEmit(iEmitGen3D *emit) = 0;
   /// get the particle start acceleration emitter
   virtual iEmitGen3D* GetStartAccelEmit() const = 0;
+  /// set the particle attrator emitter, increfs. Position is given.
+  virtual void SetAttractorEmit(iEmitGen3D *emit) = 0;
+  /// get the particle attrator emitter. Null means no attractor.
+  virtual iEmitGen3D* GetAttractorEmit() const = 0;
 
   /** Add an aging moment, they are interpolated.
    * time is the time since creation of the particle in msec.
@@ -211,6 +215,18 @@ struct iEmitState : public iBase
   /// get the settings of aging moment i (0..number-1)
   virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
     float& swirl, float& rotspeed, float& scale) = 0;
+
+  /// Set the particle system to use rectangular particles, given w, h
+  virtual void SetRectParticles(float w, float h) = 0;
+  /// Set the particle system to use regular shaped particles
+  virtual void SetRegularParticles(int n, float radius) = 0;
+  /// true if using rect particles. false if using regular particles.
+  virtual bool UsingRectParticles() const = 0;
+  /// get the size of rect particles;
+  virtual void GetRectParticles(float &w, float &h) const = 0;
+  /// Get the regular shaped particles sides and radius
+  virtual void GetRegularParticles(int& n, float& radius) const = 0;
+
 };
 
 #endif
