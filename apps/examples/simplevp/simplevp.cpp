@@ -62,7 +62,7 @@
 #include "ivideo/effects/eftech.h"
 #include "ivideo/effects/efpass.h"
 #include "igraphic/imageio.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
@@ -181,10 +181,16 @@ bool Simple::Initialize ()
     return false;
   }
 
-	//Mount effectsdir'
-	csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-	
-	vfs->Mount("/effect/", "$@data$/effectsys$/");
+  //Mount effectsdir'
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  if(!vfs.IsValid())
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.simplevp",
+      "Couldn't get a iVFS to mount effectdata!");
+  }
+    
+  vfs->Mount("/effect/", "$@data$/effectsys$/");
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
@@ -335,10 +341,8 @@ bool Simple::Initialize ()
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetPalette ();
 
-
-
 	
-	iTextureWrapper* txt = loader->LoadTexture ("ms",
+  iTextureWrapper* txt = loader->LoadTexture ("ms",
   	"/lib/std/stone4.gif", CS_TEXTURE_3D, txtmgr, true);
   if (txt == NULL)
   {
@@ -349,12 +353,12 @@ bool Simple::Initialize ()
   }
 
 
-	//effectserver test
-	
-
+  //effectserver test
+  loader->LoadEffectFile("/effect/ef1.xml");
+  
   iMaterialWrapper *MatWrapper=engine->GetMaterialList()->FindByName("ms");
   iMaterial *Mat=MatWrapper->GetMaterial();
-	
+  /*
   effect=efserver->CreateEffect();
   technique=effect->CreateTechnique();
   pass1=technique->CreatePass();
@@ -384,19 +388,17 @@ bool Simple::Initialize ()
   pass1->SetStateString( efserver->RequestString("vertex program constant 4"), efserver->RequestString("color") );
   pass1->SetStateString( efserver->RequestString("vertex program constant 5"), efserver->RequestString("multiple") );
 
-
   layer1=pass1->CreateLayer();
-
 
   layer1->SetStateFloat( efserver->RequestString("texture source"), 1);
   layer1->SetStateFloat( efserver->RequestString("texture coordinate source"), efserver->RequestString("mesh"));
   //layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("texture color"));
   layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("vertex color"));
   layer1->SetStateString( efserver->RequestString("color operation") , efserver->RequestString("use source 1"));
-
-
+*/
+  effect = efserver->GetEffect("rainbow");
   Mat->SetEffect (effect);
-  efserver->Validate(effect);
+//  efserver->Validate(effect);
 
 	
   MatWrapper->Register (txtmgr);
