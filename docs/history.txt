@@ -29,6 +29,7 @@ The history order is reversed so that new features are at the top.
 	      because STATIC.PLUGINLIST itself is an ugly hack.)
 	    - Fixed problem in macosx/cocoa/Jamfile which prevented cocoa2d
 	      driver from ever being considered a build target by Jam.
+	    - Eliminated unportable ussage of "echo -e" from static.jam.
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
