@@ -52,6 +52,10 @@ chronological order.
 	  Swig-generated code attempts to assign a va_list to a va_list.  Note
 	  that the corresponding var-arg (...) function, csPrintfErr() is still
 	  exported. (bug #1039809)
+	- res augmented xmlshader to also support conditionals in external
+	  fp/vp program files specified via a "file" attribute.
+	- res augmented the shader conditionals with an <?include?> statement.
+	  This will "mount" external documents into a tree.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

@@ -450,27 +450,7 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iDocumentNode *node,
     return 0;
   csRef<iDocumentNode> programNode;
   if (node->GetAttributeValue ("file") != 0)
-  {
-    csRef<iVFS> VFS = CS_QUERY_REGISTRY(parent->compiler->objectreg, 
-      iVFS);
-    csRef<iFile> programFile = VFS->Open (node->GetAttributeValue ("file"),
-      VFS_FILE_READ);
-    if (!programFile)
-    {
-      parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-        "Unable to load shader program file '%s'",
-        node->GetAttributeValue ("file"));
-      return 0;
-    }
-    csRef<iDocumentSystem> docsys (
-      CS_QUERY_REGISTRY(parent->compiler->objectreg, iDocumentSystem));
-    if (docsys == 0)
-      docsys.AttachNew (new csTinyDocumentSystem ());
-
-    csRef<iDocument> programDoc = docsys->CreateDocument ();
-    programDoc->Parse (programFile);
-    programNode = programDoc->GetRoot ();
-  }
+    programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"));
   else
     programNode = node;
   if (!program->Load (programNode))
@@ -1449,4 +1429,34 @@ void csXMLShader::DumpStats (csString& str)
     str.Replace ("unvarying");
   else
     str.Format ("%lu variations", (unsigned long)resolver->GetVariantCount ());
+}
+
+csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
+{
+  csRef<iVFS> VFS = CS_QUERY_REGISTRY (compiler->objectreg, 
+    iVFS);
+  csRef<iFile> programFile = VFS->Open (filename, VFS_FILE_READ);
+  if (!programFile)
+  {
+    compiler->Report (CS_REPORTER_SEVERITY_ERROR,
+      "Unable to open shader program file '%s'", filename);
+    return 0;
+  }
+  csRef<iDocumentSystem> docsys (
+    CS_QUERY_REGISTRY (compiler->objectreg, iDocumentSystem));
+  if (docsys == 0)
+    docsys.AttachNew (new csTinyDocumentSystem ());
+
+  csRef<iDocument> programDoc = docsys->CreateDocument ();
+  const char* err = programDoc->Parse (programFile);
+  if (err != 0)
+  {
+    compiler->Report (CS_REPORTER_SEVERITY_ERROR,
+      "Unable to parse shader program file '%s': %s", filename, err);
+    return 0;
+  }
+  csRef<iDocumentNode> programNode;
+  programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
+    programDoc->GetRoot (), resolver));
+  return programNode;
 }

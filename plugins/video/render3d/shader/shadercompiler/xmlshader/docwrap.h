@@ -130,6 +130,8 @@ class csWrappedDocumentNode : public iDocumentNode
     iDocumentNode* Peek ();
     iDocumentNode* Next ();
   };
+  struct NodeProcessingState;
+  void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode ();
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
 

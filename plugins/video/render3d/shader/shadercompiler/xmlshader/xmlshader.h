@@ -370,6 +370,7 @@ public:
 
   /// Return some info on this shader
   void DumpStats (csString& str);
+  csRef<iDocumentNode> LoadProgramFile (const char* filename);
 public:
   //Holders
   csXMLShaderCompiler* compiler;

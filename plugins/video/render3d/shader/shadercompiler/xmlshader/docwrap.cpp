@@ -21,8 +21,10 @@
 
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
+#include "csutil/xmltiny.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
+#include "iutil/vfs.h"
 
 #include "docwrap.h"
 #include "tokenhelper.h"
@@ -119,18 +121,24 @@ struct WrapperStackEntry
   }
 };
 
+struct csWrappedDocumentNode::NodeProcessingState
+{
+  csArray<WrapperStackEntry> wrapperStack;
+  WrapperStackEntry currentWrapper;
+};
+
 //#define DUMP_CONDITION_IDS
 
-void csWrappedDocumentNode::ProcessWrappedNode ()
+void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state, 
+						iDocumentNode* wrappedNode)
 {
   const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_ERROR;
 
-  if (wrappedNode->GetType() == CS_NODE_ELEMENT)
+  if ((wrappedNode->GetType() == CS_NODE_ELEMENT)
+    || (wrappedNode->GetType () == CS_NODE_DOCUMENT))
   {
-    WrapperStackEntry currentWrapper;
-    currentWrapper.child = new WrappedChild;
-    wrappedChildren.Push (currentWrapper.child);
-    csArray<WrapperStackEntry> wrapperStack;
+    csArray<WrapperStackEntry>& wrapperStack = state->wrapperStack;
+    WrapperStackEntry& currentWrapper = state->currentWrapper;
     
     csRef<iDocumentNodeIterator> iter = wrappedNode->GetNodes ();
     while (iter->HasNext ())
@@ -307,6 +315,61 @@ void csWrappedDocumentNode::ProcessWrappedNode ()
 		currentWrapper = newWrapper;
 	      }
 	    }
+	    else if (TokenEquals (valStart, cmdLen, "include"))
+	    {
+	      bool okay = true;
+	      csString filename;
+	      const char* space = strchr (valStart, ' ');
+	      /* The rightmost spaces were skipped and don't interest us
+		any more. */
+              if (space != 0)
+	      {
+		filename.Replace (space + 1, valLen - cmdLen - 1);
+		filename.Trim ();
+	      }
+	      if ((space == 0) || (filename.IsEmpty ()))
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "'include' without filename");
+		okay = false;
+	      }
+	      if (okay)
+	      {
+		csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+		CS_ASSERT (vfs.IsValid ());
+		csRef<iFile> include = vfs->Open (filename, VFS_FILE_READ);
+		if (!include.IsValid ())
+		{
+		  Report (syntaxErrorSeverity, node,
+		    "could not open '%s'", filename.GetData ());
+		}
+		else
+		{
+		  csRef<iDocumentSystem> docsys (
+		    CS_QUERY_REGISTRY(objreg, iDocumentSystem));
+		  if (docsys == 0)
+		    docsys.AttachNew (new csTinyDocumentSystem ());
+
+		  csRef<iDocument> includeDoc = docsys->CreateDocument ();
+		  const char* err = includeDoc->Parse (include);
+		  if (err != 0)
+		  {
+		    Report (syntaxErrorSeverity, node,
+		      "error parsing '%s': %s", filename.GetData (), err);
+		  }
+		  else
+		  {
+		    csRef<iDocumentNode> includeNode = includeDoc->GetRoot ();
+		    csRef<iDocumentNodeIterator> it = includeNode->GetNodes ();
+		    while (it->HasNext ())
+		    {
+		      csRef<iDocumentNode> child = it->Next ();
+		      ProcessWrappedNode (state, child);
+		    }
+		  }
+		}
+	      }
+	    }
 	    else
 	    {
 	      csString cmdStr;
@@ -328,6 +391,14 @@ void csWrappedDocumentNode::ProcessWrappedNode ()
       }
     }
   }
+}
+
+void csWrappedDocumentNode::ProcessWrappedNode ()
+{
+  NodeProcessingState state;
+  state.currentWrapper.child = new WrappedChild;
+  wrappedChildren.Push (state.currentWrapper.child);
+  ProcessWrappedNode (&state, wrappedNode);
 }
 
 void csWrappedDocumentNode::Report (int severity, iDocumentNode* node, 
