@@ -1242,7 +1242,7 @@ chronological order.
 	  acceptable (presently) for csString to contain arbitrary binary data,
 	  thus embedded null characters may be present.
 	- Eric Sunshine fixed bogus logic in scfString::SubString().
-	- Eric Sunshined replaced a bunch of long, ugly copy/paste sprintf()
+	- Eric Sunshine replaced a bunch of long, ugly copy/paste sprintf()
 	  invocations throughout the project with csMD5::Digest:HexString().
 	- Eric Sunshine removed the unused iShaderProgram::GetProgramID().
 	- Jorrit fixed a missing strlwr() in win32/loadlib.cpp.
