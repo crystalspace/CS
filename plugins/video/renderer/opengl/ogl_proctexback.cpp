@@ -89,6 +89,7 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
 
   tex_0 = (csTextureProcOpenGL*) tex_mm->vTex[0];
 
+  config.AddConfig(object_reg, "/config/opengl.cfg");
   SharedInitialize (g3d);
   SharedOpen (g3d);
 
@@ -244,7 +245,7 @@ void csOpenGLProcBackBuffer::FinishDraw ()
 {
   if ((!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
     return;
-  FinishDraw ();
+  csGraphics3DOGLCommon::FinishDraw ();
   statecache->SetCullFace (GL_FRONT);
   glMatrixMode (GL_PROJECTION);
   glPopMatrix();

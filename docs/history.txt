@@ -1,7 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+13-Oct-2002
+	- Fixed OpenGL/backbuffer implementation of the procedural
+	  textures so that it at least doesn't crash anymore. It also
+	  seems to work mostly except that the rendering of a procedural
+	  texture also causes the proc texture to be rendered on the
+	  main screen.
 12-Oct-2002
-    - Some MSVC warnings cleanup to the opcode plugin (jtarbox)
+	- Some MSVC warnings cleanup to the opcode plugin (jtarbox).
 11-Oct-2002
 	- Some more cleanups in the OpenGL renderer.
 10-Oct-2002

@@ -436,6 +436,7 @@ bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
 
 bool csGraphics3DOGLCommon::NewInitialize ()
 {
+  CS_ASSERT (object_reg != NULL);
   config.AddConfig(object_reg, "/config/opengl.cfg");
 
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
