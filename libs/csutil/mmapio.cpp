@@ -12,45 +12,6 @@ csMemoryMappedIO::~csMemoryMappedIO()
   UnMemoryMapFile(&platform);
 }
 
-void *
-csMemoryMappedIO::GetPointer(unsigned int index)
-{
-
-#ifdef CS_HAS_MEMORY_MAPPED_IO
-
-  return platform.data + (index*block_size);
-
-#else
-
-  unsigned int page = index/cache_block_size;
-  
-  if (!(*page_map)[page])
-    CachePage(page);
-
-  // This MUST come AFTER CachPage b/c CachePage might re-orient things.
-  CacheBlock *cp = cache[page % csmmioDefaultHashSize];
-
-  while(cp)
-  { 
-    if (cp->page==page)
-    {
-      // Decrease age     
-      ++cp->age;
-	      
-      return cp->data + ((index-cp->offset)*block_size);
-    }
-
-    cp=cp->next;
-  }
-
-  //Serious error! The page is marked as here, but we could not find it!
-  return NULL;
-  
-#endif
-
-}
-
-
 /////////////////////////////////////////// Software Support for Memory Mapping ///////////////////////////////////
 
 #ifndef CS_HAS_MEMORY_MAPPED_IO
@@ -58,7 +19,18 @@ csMemoryMappedIO::GetPointer(unsigned int index)
 bool
 csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char *filename)
 {
-  if ((_platform->hMappedFile=fopen(filename, "rb")) != NULL)
+  // Clear the page map
+  page_map = NULL;
+
+  // Clear the cache
+  memset(&cache, 0, sizeof(cache));
+
+  // Initialize cache management variables
+  cache_block_size = csmmioDefaultCacheBlockSize;
+  cache_max_size = csmmioDefaultCacheSize;
+  cache_block_count=0;
+  
+  if ((_platform->hMappedFile=fopen(filename, "rb")) == NULL)
   {
     return false;
   }
@@ -67,9 +39,9 @@ csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char *filename)
     // Create a page map with one bit per cache block.
     page_map = new csBitArray(_platform->file_size/cache_block_size);
 
-    // Clear the cache
-    memset(&cache, 0, sizeof(cache));
-
+    // Clear all of it's bits
+    page_map->Clear();
+    
     // Set that we're good to go.
     return true;
   }
@@ -150,8 +122,8 @@ csMemoryMappedIO::CachePage(unsigned int page)
   page_map->SetBit(page);
     
   // Read the page from the file
-  fseek(mapped_file, page*cache_block_size*block_size, SEEK_SET);
-  fread(cp->data, block_size, cache_block_size, mapped_file);
+  fseek(platform.hMappedFile, page*cache_block_size*block_size, SEEK_SET);
+  fread(cp->data, block_size, cache_block_size, platform.hMappedFile);
 }
 
 
