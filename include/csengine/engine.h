@@ -435,14 +435,8 @@ private:
    * Get a list of all objects in the given sphere.
    */
   void GetNearbyObjectList (iSector* sector,
-    const csVector3& pos, float radius, iObject**& list, int& num_objects,
-    int& max_objects);
-
-  /**
-   * Get a list of all objects in the given sphere.
-   */
-  iObject** GetNearbyObjectList (iSector* sector,
-    const csVector3& pos, float radius, int& num_objects);
+    const csVector3& pos, float radius, csPArray<iObject>& list,
+    csPArray<iSector>& visited_sectors);
 
   /**
    * Get/create the engine sequence manager.

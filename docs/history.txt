@@ -4,6 +4,10 @@ The history order is reversed so that new features are at the top.
 	- Wyatt Miler suggested a work around for what seems to be a
 	  gcc 3.1 compiler bug which triggers on MacOS/X (PowerPC) in
 	  the tiny XML parser.
+	- Fixed a bug in iEngine->GetNearbyObjects(). This bug could cause
+	  infinite loops in cases where there is a portal from A->B and
+	  then another portal back from B->A which is also visible from
+	  the viewpoint of the center.
         - Philip Wyett fixed map2cs dependacy problem which lead to link
           errors under MSVC 6. He also removed ddraw8 canvas from win32gcc
           build process.

@@ -359,7 +359,7 @@ class csObjectListIt : public iObjectIterator
 {
   friend class csEngine;
 private:
-  iObject** list;
+  csPArray<iObject>* list;
   int num_objects;
 
   // Current index.
@@ -367,7 +367,7 @@ private:
 
 private:
   /// Construct an iterator and initialize to start.
-  csObjectListIt (iObject** list, int num_objects);
+  csObjectListIt (csPArray<iObject>* list);
 
 public:
   /// Destructor.
@@ -518,17 +518,17 @@ SCF_IMPLEMENT_IBASE(csObjectListIt)
   SCF_IMPLEMENTS_INTERFACE(iObjectIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csObjectListIt::csObjectListIt (iObject** list, int num_objects)
+csObjectListIt::csObjectListIt (csPArray<iObject>* list)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csObjectListIt::list = list;
-  csObjectListIt::num_objects = num_objects;
+  num_objects = list->Length ();
   Reset ();
 }
 
 csObjectListIt::~csObjectListIt ()
 {
-  delete[] list;
+  delete list;
 }
 
 void csObjectListIt::Reset ()
@@ -545,7 +545,7 @@ bool csObjectListIt::Next ()
 iObject *csObjectListIt::GetObject () const
 {
   if (cur_idx < num_objects)
-    return list[cur_idx];
+    return (*list)[cur_idx];
   else
     return NULL;
 }
@@ -2052,32 +2052,9 @@ csPtr<iSectorIterator> csEngine::GetNearbySectors (
   return csPtr<iSectorIterator> (it);
 }
 
-static void AddObject (iObject**& list, int& num_objects,
-	int& max_objects, iObject* obj)
-{
-  CS_ASSERT (num_objects <= max_objects);
-  if (num_objects >= max_objects)
-  {
-    if (max_objects == 0)
-      max_objects = 50;
-    else if (max_objects < 1000)
-      max_objects += max_objects;
-    else
-      max_objects += 1000;
-    iObject** new_list = new iObject*[max_objects];
-    if (num_objects > 0)
-    {
-      memcpy (new_list, list, sizeof (iObject*)*num_objects);
-    }
-    delete[] list;
-    list = new_list;
-  }
-  list[num_objects++] = obj;
-}
-
 void csEngine::GetNearbyObjectList (iSector* sector,
-    const csVector3& pos, float radius, iObject**& list, int& num_objects,
-    int& max_objects)
+    const csVector3& pos, float radius, csPArray<iObject>& list,
+    csPArray<iSector>& visited_sectors)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (
@@ -2091,7 +2068,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     iMeshWrapper* imw = vo->GetMeshWrapper ();
     if (imw)
     {
-      AddObject (list, num_objects, max_objects, imw->QueryObject ());
+      list.Push (imw->QueryObject ());
       csRef<iThingState> st (
       	SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState));
       if (st)
@@ -2125,8 +2102,22 @@ void csEngine::GetNearbyObjectList (iSector* sector,
 	      if (sector != portal->GetSector () && portal->GetSector ()
 			      && !portal->GetFlags ().Check (CS_PORTAL_WARP))
 	      {
-		GetNearbyObjectList (portal->GetSector (), pos, radius,
-				list, num_objects, max_objects);
+	        int l;
+		bool already_visited = false;
+		for (l = 0 ; l < visited_sectors.Length () ; l++)
+		{
+		  if (visited_sectors[l] == portal->GetSector ())
+		  {
+		    already_visited = true;
+		    break;
+		  }
+		}
+		if (!already_visited)
+		{
+		  visited_sectors.Push (portal->GetSector ());
+		  GetNearbyObjectList (portal->GetSector (), pos, radius, list,
+		  	visited_sectors);
+		}
 	      }
 	    }
 	  }
@@ -2136,24 +2127,15 @@ void csEngine::GetNearbyObjectList (iSector* sector,
   }
 }
 
-iObject** csEngine::GetNearbyObjectList (iSector* sector,
-    const csVector3& pos, float radius, int& num_objects)
-{
-  iObject** list = NULL;
-  num_objects = 0;
-  int max_objects = 0;
-  GetNearbyObjectList (sector, pos, radius, list, num_objects, max_objects);
-  return list;
-}
-
 csPtr<iObjectIterator> csEngine::GetNearbyObjects (
   iSector *sector,
   const csVector3 &pos,
   float radius)
 {
-  int num_objects;
-  iObject** list = GetNearbyObjectList (sector, pos, radius, num_objects);
-  csObjectListIt *it = new csObjectListIt (list, num_objects);
+  csPArray<iObject>* list = new csPArray<iObject>;
+  csPArray<iSector> visited_sectors;
+  GetNearbyObjectList (sector, pos, radius, *list, visited_sectors);
+  csObjectListIt *it = new csObjectListIt (list);
   return csPtr<iObjectIterator> (it);
 }
 
