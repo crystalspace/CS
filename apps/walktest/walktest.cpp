@@ -385,7 +385,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
   }
   else if (type == CALLBACK_POLYGONQ)
   {
-    G3DPolygonDPQ* dpq = (G3DPolygonDPQ*)entity;
+    // G3DPolygonDPQ* dpq = (G3DPolygonDPQ*)entity;
   }
   else if (type == CALLBACK_SECTOR)
   {
