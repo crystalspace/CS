@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 28-Apr-2003
+	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
 	  mechanism:
 	    - Fixed problem: Latest changes assumed that everyone had Swig
