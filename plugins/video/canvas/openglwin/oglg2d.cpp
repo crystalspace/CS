@@ -86,6 +86,19 @@ CS_IMPLEMENT_PLUGIN
 #define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
 #endif
 
+/*
+    in fs mode, the window is topmost, means above every other
+    window, all the time. but when debugging a break it is really annoying to 
+    have a black window in front of your face instead of the IDE... 
+    note: this hack causes taskbar flickering when "always on top"  is enabled
+    and auto-hide is disabled.
+ */
+#ifdef CS_DEBUG
+# define CS_WINDOW_Z_ORDER HWND_TOP
+#else
+# define CS_WINDOW_Z_ORDER HWND_TOPMOST
+#endif
+
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
@@ -390,7 +403,7 @@ bool csGraphics2DOpenGL::Open ()
      * of the window rectangle equal to the size of the screen with 
      * SetWindowPos."
      */
-    SetWindowPos (m_hWnd, HWND_TOPMOST, 0, 0, Width, Height, 0);
+    SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, 0);
   }
 
   if (!csGraphics2DGLCommon::Open ())
@@ -548,37 +561,6 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
       This->Activate (!(wParam == WA_INACTIVE));
     break;
   }
-/*  switch (message)
-  {
-    case WM_PAINT:
-      if (!This->FullScreen || !This->m_bDoubleBuffer)
-      {
-        RECT rect;
-        if (GetUpdateRect (hWnd, &rect, FALSE))
-        {
-          PAINTSTRUCT ps;
-          BeginPaint (hWnd, &ps);
-          This->Refresh (rect);
-          EndPaint (hWnd, &ps);
-          return TRUE;
-        }
-      }
-      break;
-    case WM_SYSKEYDOWN:
-      // Catch Alt+Enter
-      if ((TCHAR)wParam == VK_RETURN)
-      {
-        This->PerformExtension ("fullscreen", !This->FullScreen);
-        return TRUE;
-      }
-      break;
-    case WM_SYSCOMMAND:
-      // For some strange reason if we don't intercept this message
-      // the system produces an ugly beep when switching from fullscreen
-      if (wParam == SC_KEYMENU)
-        return TRUE;
-      break;
-  }*/
   return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
 }
 
@@ -591,7 +573,7 @@ void csGraphics2DOpenGL::Activate (bool activated)
     {
       SwitchDisplayMode ();
       ShowWindow (m_hWnd, SW_SHOWNORMAL);
-      SetWindowPos (m_hWnd, HWND_TOPMOST, 0, 0, Width, Height, 0);
+      SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, 0);
     }
     else
     {
