@@ -1106,7 +1106,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
             ReportError (
 	      "crystalspace.maploader.parse.meshobject",
               "Mesh object is missing!");
-	    return false;
+	    return NULL;
 	  }
 	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
 	    	mesh->GetMeshObject (),
@@ -1116,12 +1116,12 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
             ReportError (
 	      "crystalspace.maploader.parse.meshobject",
               "This mesh doesn't implement LOD control!");
-	    return false;
+	    return NULL;
 	  }
 	  if (!LoadLodControl (lodctrl, params))
 	  {
 	    lodctrl->DecRef ();
-	    return false;
+	    return NULL;
 	  }
 	  lodctrl->DecRef ();
 	}
