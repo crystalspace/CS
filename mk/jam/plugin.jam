@@ -105,12 +105,14 @@ rule Plugin
 #----------------------------------------------------------------------------
 # private rules
 
-#  PluginMetaData pluginname : metafile
+#  PluginMetaData pluginname : metafile [ : options ]
 #    Copy a plugin's meta file so that it resides alongside the generated
 #    plugin module.  This utility rule may be used by SystemLinkPlugin rules
 #    which employ the default behavior of having a plugin's meta-data file
 #    reside alongside the plugin executable (as opposed to bundling the
 #    metadata directly into the plugin).
+#    Options:
+#	noinstall: Don't setup a default installation target.
 rule PluginMetaData
 {
   local target = $(>:G=$(GRISTMETA)) ;
@@ -121,7 +123,10 @@ rule PluginMetaData
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 
-  Depends install_plugin : [ DoInstall $(target) : $(plugindir) ] ;
+  if ! [ IsElem noinstall : $(3) ]
+  {
+    Depends install_plugin : [ DoInstall $(target) : $(plugindir) ] ;
+  }
 }
 
 # Construct pseudo target plugins

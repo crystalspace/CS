@@ -116,7 +116,7 @@ rule SystemLinkPlugin
     local target = $($(<)_TARGET) ;
     Depends $(target) : $(>) ;
     LinkPlugin $(target) : $(>) ;
-    PluginMetaData $(<) : $($(<)_METAFILE) ;
+    PluginMetaData $(<) : $($(<)_METAFILE) : $(3) ;
     Clean clean : $(target) ;
     Clean $(<)clean : $(target) ;
 }

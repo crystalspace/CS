@@ -396,7 +396,7 @@ rule SystemLinkPlugin
 
   if $(EMBED_META) != "yes"
   {
-    PluginMetaData $(<) : $($(<)_METAFILE) ;
+    PluginMetaData $(<) : $($(<)_METAFILE) : $(3) ;
   }
 
   Clean clean : $(target) ;

@@ -46,7 +46,12 @@ chronological order.
 	- Jorrit removed DeleteNext() from the iterators in csHash. These
 	  functions could not compile (the 'hash' that is given to the iterators
 	  is const so it cannot be modified) and since nobody seems to be
-	  needing them (they are broken anyway)...
+	  needing them (they are broken anyway).
+	- Eric Sunshine fixed bug in Jam build system where .csplugin file (if
+	  not embedded) was being installed by 'install_plugin' and 'install'
+	  even if Plugin rule had been invoked with "noinstall" option.
+	- Eric Sunshine added "nohelp" option to Plugin invocation for
+	  'dynavis_debug' target in dynavis/Jamfile.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 

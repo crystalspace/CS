@@ -96,7 +96,7 @@ rule SystemLinkPlugin
   }
   else
   {
-    PluginMetaData $(<) : $($(<)_METAFILE) ;
+    PluginMetaData $(<) : $($(<)_METAFILE) : $(3) ;
   }
   # setup clean rules
   Clean clean : $(target) ;

@@ -7,7 +7,8 @@ LinkWith dynavis : csgeom csutil ;
 if ! [ Property build : projgen ]
 {
   SubVariant debug ;
-  Plugin dynavis_debug : [ Wildcard *.cpp *.h ] : independent noinstall ;
+  Plugin dynavis_debug : [ Wildcard *.cpp *.h ] :
+    independent noinstall nohelp ;
   LinkWith dynavis_debug : csgeom csutil ;
   CFlags dynavis_debug : [ FDefines DYNAVIS_DEBUG ] ;
   SubVariant ;
