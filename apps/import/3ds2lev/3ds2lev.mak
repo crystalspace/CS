@@ -1,3 +1,4 @@
+ifeq ($(3DS.AVAILABLE),yes)
 # Application description
 DESCRIPTION.3ds2lev = 3DS to Crystal Space map converter
 
@@ -15,6 +16,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: 3ds2lev 3ds2levclean
 
+all apps: 3ds2lev
 3ds2lev:
 	$(MAKE_APP)
 3ds2levclean:
@@ -67,3 +69,5 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+endif # ifeq ($(3DS.AVAILABLE),yes)

@@ -42,6 +42,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed scftutor for lack of obvious usefulness.
 	- Eric Sunshine hacked the cslight run in install.mak to work with
 	  MacOS/X.
+	- Eric Sunshine protected 3ds2lex.mak inside 3DS.AVAILABLE conditional
+	  to prevent "make install" from trying to install it on platforms
+	  which do not have lib3ds intalled.  Also added it to "all" and "apps"
+	  pseudo-targets.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
