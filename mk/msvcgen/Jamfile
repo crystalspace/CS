@@ -40,8 +40,8 @@ MsvcGenVariable customize : custom.cslib ;
 include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;
 
 # Crystal Space-specific interpolation values.
-MsvcGenVariable libdir : "../../libs/crystalspace/win32/libs" ;
-MsvcGenVariable libdirdebug : "../../libs/crystalspace/win32/libs" ;
+MsvcGenVariable libdir : "../../libs/csutil/win32/libs" ;
+MsvcGenVariable libdirdebug : "../../libs/csutil/win32/libs" ;
 
 #------------------------------------------------------------------------------
 # The msvcgen process needs to be presented with configuration information
