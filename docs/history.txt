@@ -4,6 +4,12 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in alpha map support for DrawPixmap and software
 	  renderer when used on a 32-bit display. It was actually completely
 	  wrong.
+	- Wouter Wijngaards did the following:
+	    Now transparent gifs should make the texture pixmap keycolour
+	    preset to the value stored in the gif file.
+	- Norman Kramer added csCrystalBall which is an attempt for a new
+	  kind of culler for CS.
+	- Andrew Zabolotny removed 'dep' from rm -f line in make softclean.
 	- Eric Sunshine applied a couple simple patches from Jan Dvorak
 	  <johnydog@go.cz>:
 	    - Trivial documentation typo in Makefile.
