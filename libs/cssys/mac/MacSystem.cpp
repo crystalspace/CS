@@ -32,6 +32,7 @@
 #include <ToolUtils.h>
 #include <Windows.h>
 #include <InputSprocket.h>
+#include <SIOUX.h>
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
@@ -109,6 +110,15 @@ SysSystemDriver::SysSystemDriver()
 	 */
 	for ( i = 0; i < 4; ++i )
 		mKeyboardState[i] = 0L;
+
+	/*
+	 *	Initialize sioux (console).
+	 */
+	SIOUXSettings.standalone = FALSE;
+	SIOUXSettings.setupmenus = FALSE;
+	SIOUXSettings.initializeTB = FALSE;
+	SIOUXSettings.asktosaveonclose = FALSE;
+	SIOUXSettings.autocloseonquit = FALSE;
 
 	/*
 	 *	Get the application name and location on disk.
@@ -328,7 +338,6 @@ void SysSystemDriver::Loop(void)
 	EventRecord anEvent;
 	iMacGraphics* piG2D = NULL;
 	bool	driverNeedsEvent = false;
-	bool	eventHandled;
 
 	piG2D = QUERY_INTERFACE(G2D, iMacGraphics);
 
@@ -348,6 +357,7 @@ void SysSystemDriver::Loop(void)
 
     prev_time = current_time = Time();
 	while (( ! Shutdown ) && ( ! ExitLoop )) {
+		current_time = Time();
     	NextFrame( current_time - prev_time, current_time );
     	prev_time = current_time;
 
@@ -359,16 +369,33 @@ void SysSystemDriver::Loop(void)
 			ISpTickle();
 		}
 
+		/*
+		 *	Get the next event in the queue.
+		 */
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
-			eventHandled = false;
+			/*
+			 *	If we got an event, check to see if sioux wants it
+			 */
+			if ( SIOUXHandleOneEvent( &anEvent )) {
+				continue;
+			}
+
+			/*
+			 *	If sioux doesn't want it, check to see if the driver needs it.
+			 */
 			if (( driverNeedsEvent ) && ( piG2D )) {
 				if ( piG2D->HandleEvent( &anEvent ))
-					eventHandled = true;
+					continue;
 			}
-			if ( ! eventHandled ) {
-				DispatchEvent( current_time, &anEvent, piG2D );
-			}
+
+			/*
+			 *	Otherwise handle it.
+			 */
+			DispatchEvent( current_time, &anEvent, piG2D );
 		} else {
+			/*
+			 *	No event in the queue, get the mouse location so we can track it.
+			 */
 			Point	theMouse;
 			bool	isIn = false;
 
@@ -377,9 +404,11 @@ void SysSystemDriver::Loop(void)
 				QueueMouseEvent( 0, 0, theMouse.h, theMouse.v );
 			}
 		}
-		current_time = Time();
 	}
 
+	/*
+	 *	If we have a reference to the 2d driver, give it up.
+	 */
 	if ( piG2D ) {
 		piG2D->DecRef();
 		piG2D = NULL;

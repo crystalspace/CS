@@ -1,5 +1,5 @@
 Crystal Space Macintosh Development Readme
-This is up to date as of December 8th, 1999
+This is up to date as of May 10th, 2000
 Written by K. Robert Bate
 If you have any questions or problems, contact me at rbate@ma.ultranet.com.
 
@@ -15,6 +15,9 @@ Contents:
 2) Include Files: Universal Includes 3.2 from Apple
 
 [2] GETTING READY TO DEVELOP
+
+Copy "MSL C++.PPC.DLL" and "MSL RuntimePPC++.DLL" from the CodeWarrior folder and put them into
+the CS folder.
 
 If you are going to build the Open GL Renderer you need to download the OpenGL SDK from Apple.
 ftp://ftp.apple.com/developer/opengl/opengl_sdk.hqx  This will download a self mounting disk image.

@@ -7,6 +7,12 @@ Add Network support.
 Optimize everything.
 
 History:
+10-May-2000
+	- Updated all of the projects so that they use MSL C++.PPC.DLL and MSL RuntimePPC++.DLL.
+	  This change is needed so that CSpace can be made into a shared library and used
+	  by the plugins.
+	- Added projects for csfont, freefont and cspython
+	- Fixed up the access paths.
 8-Dec-99
 	- Moved the sys include files to the include directory and removed includes.sit.
 	- Fixed up the Pro5 compiling problems.
