@@ -265,18 +265,13 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
     for (unsigned int vn = 0; vn < mesh->points; vn++)
     {
       float *xyz = mesh->pointL[vn].pos;
-      float u, v;
+      Lib3dsTexel* texel = &mesh->texelL[vn];
+      float u = 0, v = 0;
 
-      // Don't assume every vertex has a texel!
-      if (vn < mesh->texels)
+      if (texel)
       {
-        const Lib3dsTexel& texel = mesh->texelL[vn];
-	u = texel[0];
-	v = texel[1];
-      }
-      else
-      {
-        u = v = 0;
+	u = texel[0][0];
+	v = texel[0][1];
       }
 
       Write ("V(%g,%g,%g:", 
@@ -350,12 +345,13 @@ bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
   // this holds the numbers of the 2 shared vertices
   facenum sharedfaces[2];
   // this is the number of the vertice that is left on the triangle
-  facenum nonshared;
+  facenum nonshared = 0;
   
   bool found=false;
-  for (int i=0;i<3;i++)
+  int i, i2;
+  for (i=0;i<3;i++)
   {
-    for (int i2=0; i2<plen; i2++)
+    for (i2=0; i2<plen; i2++)
     {
       // a point found that is the same on both polys
       // then the next point must correspond to the next (or last) point
