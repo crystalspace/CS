@@ -35,8 +35,8 @@ usage()
 	cat <<EOF
 Usage: cs-config [OPTIONS] [LIBRARIES]
 Options:
-	[--prefix[=DIR]]
-	[--exec-prefix[=DIR]]
+	[--prefix]
+	[--exec-prefix]
 	[--version]
 	[--libs]
 	[--cflags]
@@ -63,87 +63,6 @@ cflags=false
 libs_L=false
 libs_l=false
 
-the_flags="-I${includedir} -I${exec_prefix}/include"
-
-while test $# -gt 0; do
-  case "$1" in
-  -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
-  *) optarg= ;;
-  esac
-
-  case $1 in
-    --prefix=*)
-      prefix=$optarg
-      if test $exec_prefix_set = no ; then
-        exec_prefix=$optarg
-      fi
-      ;;
-    --prefix)
-	echo $prefix
-	exit 0
-	;;
-    --exec-prefix=*)
-	exec_prefix=$optarg
-	exec_prefix_set=yes
-	;;
-    --exec-prefix)
-	echo $exec_prefix
-	exit 0
-	;;
-    --version)
-      echo $version
-      exit 0
-      ;;
-    --cflags)
-      show_cflags=true
-      ;;
-    --cxxflags)
-	show_cxxflags=true
-	;;
-    --libs)
-	libs_l=true
-	libs_L=true
-	;;
-    --libs-only-L)
-	libs_L=true
-	;;
-    --libs-only-l)
-	libs_l=true
-	;;
-    cssys)
-	the_libs="$the_libs -lcssys"
-	;;
-    csengine)
-	the_libs="$the_libs -lcsengine"
-	;;
-    csgeom)
-	the_libs="$the_libs -lcsgeom"
-	;;
-    csgfx)
-	the_libs="$the_libs -lcsgfx"
-	;;
-    cstool)
-	the_libs="$the_libs -lcstool"
-	;;
-    csutil)
-	the_libs="$the_libs -lcsutil"
-	;; 
-    csws)
-	the_libs="$the_libs -lcsws"
-	;;
-    *)
-      usage 1 1>&2
-      ;;
-  esac
-  shift
-done
-
-#if users specified none, output all
-if test -z "$the_libs"; then
-	the_libs="-lcsengine -lcsws -lcsgeom -lcsgfx -lcstool -lcsutil -lcssys"
-fi
-
-#look for dependencies
 includedeps()
 {
 # already had all dependencies of this lib? then exit
@@ -159,7 +78,7 @@ includedeps()
 	case " $@ " in
 	    *\ $a\ *) ;;
     	    *)  
-		LIBS_OUT="$LIBS_OUT $a"
+		the_libs="$the_libs $a"
 	    	return 1
 	    ;;
 	esac
@@ -176,24 +95,98 @@ includedeps()
     fi
 }
 
-LIBS_OUT="$the_libs"
-ALREADY_TESTED=""
-# loop as long new dependencies had to be added
-while ! includedeps $LIBS_OUT; do
-	ALREADY_TESTED=""
+addlib()
+{
+    # Lib already in list?
+    case " $the_libs " in
+	*\ $1\ *) return;;
+	*) ;;
+    esac
+
+    the_libs="$1 $the_libs"
+
+    # loop till all dependencies are resolved
+    while ! includedeps $the_libs; do
+    	ALREADY_TESTED=""
+    done
+}
+
+the_libs=""
+show_libs=""
+show_cflags=""
+show_cxxflags=""
+
+while test $# -gt 0; do
+  case $1 in
+    --prefix)
+	echo $prefix
+	exit 0
+	;;
+    --exec-prefix)
+	echo $exec_prefix
+	exit 0
+	;;
+    --version)
+      echo $version
+      exit 0
+      ;;
+    --cflags)
+      show_cflags=true
+      ;;
+    --cxxflags)
+	show_cxxflags=true
+	;;
+    --libs)
+	show_libs=true
+	;;
+    cssys)
+	addlib "-lcssys"
+	;;
+    csengine)
+	addlib "-lcsengine"
+	;;
+    csgeom)
+	addlib "-lcsgeom"
+	;;
+    csgfx)
+	addlib "-lcsgfx"
+	;;
+    cstool)
+	addlib "-lcstool"
+	;;
+    csutil)
+	addlib "-lcsutil"
+	;; 
+    csws)
+	addlib "-lcsws"
+	;;
+    *)
+      usage 1 1>&2
+      ;;
+  esac
+  shift
 done
 
-the_libs="$LIBS_OUT"
-
-the_libs="-L$libdir $syslibs $the_libs"
 if test -n "$show_cflags"; then
 	echo "-I$includedir $common_cflags"
 fi
 if test -n "$show_cxxflags"; then
 	echo "-I$includedir $common_cxxflags"
 fi
-if $libs_L || $libs_l; then
-	echo "$the_libs"
+if test -n "$show_libs"; then
+    #if users specified no lib, output all
+    if test -z "$the_libs"; then
+	addlib "-lcsengine"
+        addlib "-lcsws"
+        addlib "-lcsgfx"
+        addlib "-lcsgeom"
+        addlib "-lcstool"
+        addlib "-lcsutil"
+        addlib "-lcssys"
+    fi
+    the_libs="-L${libdir} $the_libs ${syslibs}"
+
+    echo "$the_libs"
 fi
 
 exit 0
