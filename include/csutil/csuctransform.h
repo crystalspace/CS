@@ -712,7 +712,8 @@ public:
   /**
    * Determine how many characters in an UTF-8 buffer need to skipped back to
    * get to the start of the previous encoded character.
-   * \param str Pointer to buffer with encoded character.
+   * \param str Pointer to the encoded character after the character that is
+   *  actually to be skipped back.
    * \param maxRew The number of characters to go back at max. Typically, this 
    *  is the number of chars from \a str to the start of the buffer.
    * \return Number of chars to skip back in the buffer. Returns 0 if 

@@ -154,7 +154,7 @@ struct iShaderManager : public iShaderVariableContext
     int priority = 0) = 0;
   /**
    * Get a technique tag's options.
-   * \copydoc SetTagOptions
+   * \copydoc SetTagOptions()
    */
   virtual void GetTagOptions (csStringID tag, csShaderTagPresence& presence, 
     int& priority) = 0;

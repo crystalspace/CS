@@ -11,6 +11,8 @@ chronological order.
 	  of casting shadows, the lowest detail object that has a shadow
 	  caster will be used. In case of receiving shadows all children
 	  will get the shadows.
+	- res made some small comment changes in ivideo/shader/shader.h and
+	  csutil/csuctransform.h.
 13-Jun-2004
 	- res changed the Win32 thread error reporting to be less 
 	  macro-centric.
