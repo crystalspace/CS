@@ -36,9 +36,10 @@ SCF_IMPLEMENT_IBASE (csXmlReadDocumentSystem)
   SCF_IMPLEMENTS_INTERFACE (iDocumentSystem)
 SCF_IMPLEMENT_IBASE_END
 
-csXmlReadDocumentSystem::csXmlReadDocumentSystem ()
+csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (0);
+  csXmlReadDocumentSystem::parent = parent;
 }
 
 csXmlReadDocumentSystem::~csXmlReadDocumentSystem ()

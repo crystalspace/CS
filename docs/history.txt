@@ -24,6 +24,11 @@ chronological order.
 	  the Clone() in csThings can use that. This also fixes a bug
 	  because res2k added fields to csPolyTextureMapping and forgot
 	  to update Clone().
+	- res fixed a crash-at-exit in xmlread. An object was deleted, 
+	  although apparently instances of it were referenced in other places.
+	  Now the object isn't forcibly deleted any more, and further, the
+	  xmlread plugin won't get unloaded as long as documents (or document
+	  systems) of it are still floating around.
 22-Feb-2004
 	- Duhprey made null renderer for the NR.  (Shaders currently try to
 	  load with error, but it appears to be harmless.)

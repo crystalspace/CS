@@ -22,6 +22,7 @@
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
 #include "csutil/scf.h"
+#include "csutil/weakref.h"
 #include "xriface.h"
 #include "xrpriv.h"
 
@@ -153,7 +154,7 @@ int csXmlReadDocWrapper::Changeable ()
 class csXmlReadXMLPlugin : public iDocumentSystem, public iComponent
 {
 private:
-  csXmlReadDocumentSystem *xmlread;
+  csWeakRef<csXmlReadDocumentSystem> xmlread;
 public:
   SCF_DECLARE_IBASE;
 
@@ -173,12 +174,10 @@ SCF_IMPLEMENT_IBASE_END
 csXmlReadXMLPlugin::csXmlReadXMLPlugin(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-  xmlread = new csXmlReadDocumentSystem ();
 }
 
 csXmlReadXMLPlugin::~csXmlReadXMLPlugin()
 {
-  delete xmlread;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -189,6 +188,13 @@ bool csXmlReadXMLPlugin::Initialize (iObjectRegistry* objreg)
 
 csRef<iDocument> csXmlReadXMLPlugin::CreateDocument ()
 {
+  csRef<csXmlReadDocumentSystem> xmlread;
+  xmlread = csXmlReadXMLPlugin::xmlread;
+  if (!xmlread.IsValid())
+  {
+    xmlread.AttachNew (new csXmlReadDocumentSystem ((iComponent*)this));
+    csXmlReadXMLPlugin::xmlread = xmlread;
+  }
   return csPtr<iDocument> (new csXmlReadDocWrapper (
     xmlread->CreateDocument ()));
 }

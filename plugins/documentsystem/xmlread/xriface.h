@@ -29,8 +29,9 @@ class TrDocumentNode;
  */
 class csXmlReadDocumentSystem : public iDocumentSystem
 {
+  csRef<iBase> parent;
 public:
-  csXmlReadDocumentSystem ();
+  csXmlReadDocumentSystem (iBase* parent);
   virtual ~csXmlReadDocumentSystem ();
 
   SCF_DECLARE_IBASE;
