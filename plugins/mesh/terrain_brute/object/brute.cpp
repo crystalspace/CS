@@ -88,8 +88,6 @@ SCF_IMPLEMENT_IBASE_END*/
 
 csTerrBlock::csTerrBlock (csTerrainObject *terr)
 {
-  int i;
-
   parent = 0;
   child = 0;
   children[0] = 0;
@@ -204,8 +202,8 @@ void csTerrBlock::SetupMesh ()
   terrasampler->Cleanup ();
 
   const csBox2& terrRegion = terr->region;
-  float terrW = terrRegion.MaxX() - terrRegion.MinX();
-  float terrH = terrRegion.MaxY() - terrRegion.MinY();
+  //float terrW = terrRegion.MaxX() - terrRegion.MinX();
+  //float terrH = terrRegion.MaxY() - terrRegion.MinY();
   const csVector2 tcOffset (-terrRegion.MinX() + (center.x - size / 2.0),
     -terrRegion.MinY() + (center.z - size / 2.0));
   const csVector2 tcScale (size, size);
@@ -852,8 +850,8 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   } else if (strcmp (parameter, "block resolution") == 0)
   {
     // Make the resolution conform to n^2
-    block_res = csLog2(value);
-    block_res = pow(2, block_res);
+    block_res = csLog2 ((int) value);
+    block_res = (int) pow (2, block_res);
     return true;
   }
   return false;
@@ -878,13 +876,13 @@ float csTerrainObject::GetLODValue (const char* parameter)
 }
 
 
-static void Perspective (const csVector3& v, csVector2& p, float fov,
+/*static void Perspective (const csVector3& v, csVector2& p, float fov,
                          float sx, float sy)
 {
   float iz = fov / v.z;
   p.x = v.x * iz + sx;
   p.y = v.y * iz + sy;
-}
+}*/
 
 /*bool csTerrainObject::BBoxVisible (const csBox3& bbox,
                                     iRenderView* rview, iCamera* camera,
@@ -943,10 +941,10 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 void csTerrainObject::TestVisibility (iRenderView* rview)
 {
 
-  /*iCamera* camera = rview->GetCamera ();
+  //iCamera* camera = rview->GetCamera ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
-  const csVector3& origin = camtrans.GetOrigin ();*/
-  /*quadtree->ComputeVisibility (origin, global_bbox, horizon, CS_HORIZON_SIZE);
+  const csVector3& origin = camtrans.GetOrigin ();
+  //quadtree->ComputeVisibility (origin, global_bbox, horizon, CS_HORIZON_SIZE);
 }*/
 
 
@@ -1135,4 +1133,3 @@ csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()
   csTerrainFactory *pFactory = new csTerrainFactory (object_reg);
   return csPtr<iMeshObjectFactory> (pFactory);
 }
-
