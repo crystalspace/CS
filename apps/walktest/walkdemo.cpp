@@ -944,7 +944,7 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   bot = new Bot (Sys->view->GetEngine()->GetCsEngine (), botmesh);
   botmesh->DecRef ();
   bot->SetName ("bot");
-  Sys->view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
+  Sys->view->GetEngine ()->GetMeshes ()->AddMesh (&(bot->scfiMeshWrapper));
   bot->GetMovable ().SetSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
   bot->GetMovable ().SetTransform (m);
@@ -965,7 +965,7 @@ void del_bot ()
   {
     Bot* bot = first_bot;
     first_bot = bot->next;
-    Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh (bot);
+    Sys->view->GetEngine ()->GetMeshes ()->RemoveMesh (&(bot->scfiMeshWrapper));
   }
 }
 
@@ -1050,7 +1050,8 @@ void HandleDynLight (iDynLight* dyn)
             add_bot (1, l->GetSector (), l->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ().ClearSectors ();
-	  Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh (ms->sprite);
+	  Sys->view->GetEngine ()->GetMeshes ()->RemoveMesh (
+	  	&(ms->sprite->scfiMeshWrapper));
 	}
         dyn->QueryObject ()->ObjRemove (CS_GET_CHILD_OBJECT_FAST (
 	  dyn->QueryObject (), iDataObject)->QueryObject ());
@@ -1198,10 +1199,12 @@ void AttachRandomLight (csDynLight* light)
 void light_statics ()
 {
   iEngine* e = Sys->view->GetEngine ();
-  for (int i = 0 ; i < e->GetMeshWrapperCount () ; i++)
+  iMeshList* meshes = e->GetMeshes ();
+  for (int i = 0 ; i < meshes->GetMeshCount () ; i++)
   {
-    iMeshWrapper* sp = e->GetMeshWrapper (i);
-    iSprite3DState* state = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iSprite3DState);
+    iMeshWrapper* sp = meshes->GetMesh (i);
+    iSprite3DState* state = SCF_QUERY_INTERFACE (sp->GetMeshObject (),
+    	iSprite3DState);
     if (state != NULL)
     {
       if (state->GetSkeletonState ())

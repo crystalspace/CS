@@ -196,8 +196,8 @@ WalkTest::~WalkTest ()
   delete cslogo;
   if (Engine)
   {
-    if (plbody) Engine->RemoveMesh (plbody);
-    if (pllegs) Engine->RemoveMesh (pllegs);
+    if (plbody) Engine->GetMeshes ()->RemoveMesh (plbody);
+    if (pllegs) Engine->GetMeshes ()->RemoveMesh (pllegs);
   }
   delete [] recorded_perf_stats_name;
   if (perf_stats) perf_stats->DecRef ();
@@ -1181,9 +1181,10 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   }
   // Initialize all mesh objects for collision detection.
   int i;
-  for (i = 0 ; i < engine->GetMeshWrapperCount () ; i++)
+  iMeshList* meshes = engine->GetMeshes ();
+  for (i = 0 ; i < meshes->GetMeshCount () ; i++)
   {
-    iMeshWrapper* sp = engine->GetMeshWrapper (i);
+    iMeshWrapper* sp = meshes->GetMesh (i);
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
     if (mesh)

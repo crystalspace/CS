@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+19-Jul-2001
+	- Added iMeshList and iMeshFactoryList. Added iEngine::GetMeshes()
+	  and GetMeshFactories() and removed several mesh/mesh factory
+	  related routines (like RemoveMeshWrapper(), GetMeshWrapperCount(),
+	  ...). This is similar to iSectorList.
 18-Jul-2001
 	- Reworked the cstool texture generation tool to also use a
 	  SCF structure for the slope and height function instead of a

@@ -958,25 +958,28 @@ void csBugPlug::ReadKeyBindings (const char* filename)
 void csBugPlug::Dump (iEngine* engine)
 {
   System->Printf (CS_MSG_DEBUG_0, "===========================================\n");
+  iSectorList* sectors = engine->GetSectors ();
+  iMeshList* meshes = engine->GetMeshes ();
+  iMeshFactoryList* factories = engine->GetMeshFactories ();
   System->Printf (CS_MSG_DEBUG_0,
     "%d sectors, %d mesh factories, %d mesh objects\n",
-    engine->GetSectors ()->GetSectorCount (),
-    engine->GetMeshFactoryCount (),
-    engine->GetMeshWrapperCount ());
+    sectors->GetSectorCount (),
+    factories->GetMeshFactoryCount (),
+    meshes->GetMeshCount ());
   int i;
-  for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
+  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
   {
-    iSector* sector = engine->GetSectors ()->GetSector (i);
+    iSector* sector = sectors->GetSector (i);
     Dump (sector);
   }
-  for (i = 0 ; i < engine->GetMeshFactoryCount () ; i++)
+  for (i = 0 ; i < factories->GetMeshFactoryCount () ; i++)
   {
-    iMeshFactoryWrapper* meshfact = engine->GetMeshFactory (i);
+    iMeshFactoryWrapper* meshfact = factories->GetMeshFactory (i);
     Dump (meshfact);
   }
-  for (i = 0 ; i < engine->GetMeshWrapperCount () ; i++)
+  for (i = 0 ; i < meshes->GetMeshCount () ; i++)
   {
-    iMeshWrapper* mesh = engine->GetMeshWrapper (i);
+    iMeshWrapper* mesh = meshes->GetMesh (i);
     Dump (mesh);
   }
   System->Printf (CS_MSG_DEBUG_0, "===========================================\n");

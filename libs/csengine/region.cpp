@@ -101,7 +101,7 @@ void csRegion::Region::DeleteAll ()
       iMeshWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
       o->DecRef ();
-      scfParent->engine->RemoveMesh (o);
+      scfParent->engine->GetMeshes ()->RemoveMesh (o);
 
       scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
@@ -114,8 +114,7 @@ void csRegion::Region::DeleteAll ()
       iMeshFactoryWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
       o->DecRef ();
-      scfParent->engine->mesh_factories.Delete (
-        scfParent->engine->mesh_factories.Find (o->GetPrivateObject ()));
+      scfParent->engine->GetMeshFactories ()->RemoveMeshFactory (o);
       scfParent->ObjRemove (obj);	// Remove from this region.
       copy[i] = NULL;
     }

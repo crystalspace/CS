@@ -554,4 +554,54 @@ public:
   friend struct MeshFactoryWrapper;
 };
 
+CS_DECLARE_OBJECT_VECTOR (csMeshListHelper, iMeshWrapper);
+
+class csMeshList : public csMeshListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csMeshList ();
+
+  /// override FreeItem
+  virtual bool FreeItem (csSome Item);
+
+  class MeshList : public iMeshList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshList);
+    virtual int GetMeshCount () const;
+    virtual iMeshWrapper *GetMesh (int idx) const;
+    virtual void AddMesh (iMeshWrapper *mesh);
+    virtual void RemoveMesh (iMeshWrapper *mesh);
+    virtual iMeshWrapper *FindByName (const char *name) const;
+    virtual int Find (iMeshWrapper *mesh) const;
+  } scfiMeshList;
+};
+
+CS_DECLARE_OBJECT_VECTOR (csMeshFactoryListHelper, iMeshFactoryWrapper);
+
+class csMeshFactoryList : public csMeshFactoryListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csMeshFactoryList ();
+
+  /// override FreeItem
+  virtual bool FreeItem (csSome Item);
+
+  class MeshFactoryList : public iMeshFactoryList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryList);
+    virtual int GetMeshFactoryCount () const;
+    virtual iMeshFactoryWrapper *GetMeshFactory (int idx) const;
+    virtual void AddMeshFactory (iMeshFactoryWrapper *mesh);
+    virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh);
+    virtual iMeshFactoryWrapper *FindByName (const char *name) const;
+    virtual int Find (iMeshFactoryWrapper *mesh) const;
+  } scfiMeshFactoryList;
+};
+
 #endif // __CS_MESHOBJ_H__

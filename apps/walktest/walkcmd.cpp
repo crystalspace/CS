@@ -347,11 +347,12 @@ void list_meshes (void)
   const char* mesh_name;
   iMeshWrapper* mesh;
 
-  num_meshes = Sys->Engine->GetMeshWrapperCount ();
+  iMeshList* meshes = Sys->Engine->GetMeshes ();
+  num_meshes = meshes->GetMeshCount ();
 
   for(int i = 0; i < num_meshes; i++)
   {
-    mesh = Sys->Engine->GetMeshWrapper (i);
+    mesh = meshes->GetMesh (i);
     mesh_name = mesh->QueryObject ()->GetName();
 
     if (mesh_name)
@@ -360,7 +361,7 @@ void list_meshes (void)
       Sys->Printf (CS_MSG_CONSOLE, "A mesh with no name.\n");
   }
   Sys->Printf (CS_MSG_CONSOLE, "There are:%d meshes\n",
-	       Sys->Engine->GetMeshWrapperCount ());
+	       Sys->Engine->GetMeshes ()->GetMeshCount ());
 }
 
 //===========================================================================
@@ -1644,9 +1645,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       csScanStr (arg, "%s", name);
-      csObject* obj = Sys->view->GetEngine ()->GetCsEngine ()->meshes.FindByName (name);
-      if (obj)
-        Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh ((csMeshWrapper*)obj);
+      iMeshList* meshes = Sys->Engine->GetMeshes ();
+      iMeshWrapper* mesh = meshes->FindByName (name);
+      if (mesh)
+        meshes->RemoveMesh (mesh);
       else
         Sys->Printf (CS_MSG_CONSOLE, "Can't find mesh with that name!\n");
     }

@@ -679,7 +679,9 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 	      	"crystalspace.maploader.load.meshfactory",
 		"Could not load mesh object factory '%s' from file '%s'!",
 		name, fname);
-      Engine->DeleteMeshFactory(name);
+      iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
+      	->FindByName (name);
+      Engine->GetMeshFactories ()->RemoveMeshFactory (factwrap);
       databuff->DecRef ();
       return NULL;
     }

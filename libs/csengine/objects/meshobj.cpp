@@ -58,7 +58,7 @@ void csMeshWrapper::DecRef()
 #ifdef CS_DEBUG
   if (scfRefCount == 1)
   {
-    int idx = csEngine::current_engine->meshes.Find (this);
+    int idx = csEngine::current_engine->GetMeshes ()->Find (&scfiMeshWrapper);
     CS_ASSERT (idx == -1);
   }
 #endif
@@ -447,7 +447,7 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
     iEngine *engine = SCF_QUERY_INTERFACE_FAST (par, iEngine);
     if (engine)
     {
-      engine->GetCsEngine ()->RemoveMesh (c);
+      engine->GetMeshes ()->RemoveMesh (child);
       engine->DecRef ();
     }
     else
@@ -639,4 +639,89 @@ csReversibleTransform& csMeshFactoryWrapper::MeshFactoryWrapper::
   CS_ASSERT (idx >= 0 && idx < scfParent->transformations.Length ());
   return scfParent->transformations[idx];
 }
+
+//--------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csMeshList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshList::MeshList)
+  SCF_IMPLEMENTS_INTERFACE (iMeshList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csMeshList::csMeshList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
+}
+
+bool csMeshList::FreeItem (csSome Item)
+{
+  iMeshWrapper* mesh = (iMeshWrapper*)Item;
+  mesh->GetMovable ()->ClearSectors ();
+  mesh->DecRef ();
+  return true;
+}
+
+int csMeshList::MeshList::GetMeshCount () const
+  { return scfParent->Length (); }
+iMeshWrapper *csMeshList::MeshList::GetMesh (int idx) const
+  { return scfParent->Get (idx); }
+void csMeshList::MeshList::AddMesh (iMeshWrapper *mesh)
+  { scfParent->Push (mesh); }
+void csMeshList::MeshList::RemoveMesh (iMeshWrapper *mesh)
+  {
+    int n = scfParent->Find (mesh);
+    if (n >= 0) scfParent->Delete (n); 
+  }
+iMeshWrapper *csMeshList::MeshList::FindByName (const char *name) const
+  { return scfParent->FindByName (name); }
+int csMeshList::MeshList::Find (iMeshWrapper *mesh) const
+  { return scfParent->Find (mesh); }
+
+//--------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csMeshFactoryList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryList::MeshFactoryList)
+  SCF_IMPLEMENTS_INTERFACE (iMeshFactoryList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csMeshFactoryList::csMeshFactoryList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
+}
+
+bool csMeshFactoryList::FreeItem (csSome Item)
+{
+  iMeshFactoryWrapper* mesh = (iMeshFactoryWrapper*)Item;
+  mesh->DecRef ();
+  return true;
+}
+
+int csMeshFactoryList::MeshFactoryList::GetMeshFactoryCount () const
+  { return scfParent->Length (); }
+iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::GetMeshFactory (
+	int idx) const
+  { return scfParent->Get (idx); }
+void csMeshFactoryList::MeshFactoryList::AddMeshFactory (
+	iMeshFactoryWrapper *mesh)
+  { scfParent->Push (mesh); }
+void csMeshFactoryList::MeshFactoryList::RemoveMeshFactory (
+	iMeshFactoryWrapper *mesh)
+  {
+    int n = scfParent->Find (mesh);
+    if (n >= 0) scfParent->Delete (n); 
+  }
+iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (
+	const char *name) const
+  { return scfParent->FindByName (name); }
+int csMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *mesh) const
+  { return scfParent->Find (mesh); }
+
+//--------------------------------------------------------------------------
 

@@ -637,12 +637,11 @@ void csEngine::DeleteAll ()
   for (i = collections.Length () -1; i >= 0 ; i--)
     RemoveCollection ((csCollection*)collections.Get (i));
 
-  for (i = meshes.Length () -1; i >= 0 ; i--)
-    RemoveMesh ((csMeshWrapper*)meshes.Get (i));
-
+  meshes.DeleteAll ();
   mesh_factories.DeleteAll ();
   curve_templates.DeleteAll ();
 
+// @@@ I suppose the loop below is no longer needed?
   for (i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* sect = sectors[i]->GetPrivateObject ();
@@ -844,8 +843,8 @@ void csEngine::PrepareMeshes ()
   int i;
   for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
-    sp->GetMovable ().UpdateMove ();
+    iMeshWrapper* sp = (iMeshWrapper*)meshes[i];
+    sp->GetMovable ()->UpdateMove ();
   }
 }
 
@@ -1002,8 +1001,8 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
   }
   for (sn = 0; sn < num_meshes ; sn++)
   {
-    csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
-    if (!region || region->IsInRegion (s))
+    iMeshWrapper* s = (iMeshWrapper*)meshes[sn];
+    if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = SCF_QUERY_INTERFACE_FAST (s->GetMeshObject (),
       	iLightingInfo);
@@ -1074,8 +1073,8 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
   }
   for (sn = 0; sn < num_meshes ; sn++)
   {
-    csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
-    if (!region || region->IsInRegion (s))
+    iMeshWrapper* s = (iMeshWrapper*)meshes[sn];
+    if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = SCF_QUERY_INTERFACE_FAST (s->GetMeshObject (),
       	iLightingInfo);
@@ -1358,9 +1357,9 @@ void csEngine::ControlMeshes ()
   int i = meshes.Length ()-1;
   while (i >= 0)
   {
-    csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
-    if (sp->WantToDie ())
-      RemoveMesh (sp);
+    iMeshWrapper* sp = (iMeshWrapper*)meshes[i];
+    if (sp->GetPrivateObject ()->WantToDie ())
+      GetMeshes ()->RemoveMesh (sp);
     i--;
   }
 }
@@ -1412,21 +1411,6 @@ void csEngine::ReadConfig (iConfigFile* Config)
         ("Engine.Lighting.Radiosity.StopIterations", csRadiosity::stop_iterations);
   csRadiosity::source_patch_size = Config->GetInt
         ("Engine.Lighting.Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
-}
-
-void csEngine::RemoveMesh (csMeshWrapper* mesh)
-{
-  mesh->GetMovable ().ClearSectors ();
-  int idx = meshes.Find (mesh);
-  if (idx == -1) return;
-  meshes[idx] = NULL;
-  meshes.Delete (idx);
-  mesh->DecRef ();
-}
-
-void csEngine::RemoveMesh (iMeshWrapper* mesh)
-{
-  RemoveMesh (mesh->GetPrivateObject ());
 }
 
 void csEngine::RemoveCollection (csCollection* collection)
@@ -1726,16 +1710,14 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
 
   thing_obj->DecRef ();
   thing_wrap->SetName (iName);
-  meshes.Push (thing_wrap);
+  GetMeshes ()->AddMesh (&(thing_wrap->scfiMeshWrapper));
   thing_wrap->GetMovable ().SetSector (&sector->scfiSector);
   thing_wrap->GetMovable ().UpdateMove ();
   thing_wrap->flags.Set (CS_ENTITY_CONVEX);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
 
-  iMeshWrapper* mesh_wrap = SCF_QUERY_INTERFACE_FAST (thing_wrap, iMeshWrapper);
-  mesh_wrap->DecRef ();
-  return mesh_wrap;
+  return &(thing_wrap->scfiMeshWrapper);
 }
 
 iMeshWrapper* csEngine::CreateSectorWallsMesh (iSector* sector,
@@ -1786,43 +1768,40 @@ iObject* csEngine::FindObjectInRegion (csRegion* region,
 
 iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
 {
-  iSector* sec;
   if (regionOnly && region)
   {
     iObject* obj = FindObjectInRegion (region, sectors, iName);
     if (!obj) return NULL;
-    sec = SCF_QUERY_INTERFACE_FAST (obj, iSector);
+    return SCF_QUERY_INTERFACE_FAST (obj, iSector);
   }
   else
-    sec = sectors.FindByName (iName);
-  return sec;
+    return sectors.FindByName (iName);
 }
 
 iMeshWrapper* csEngine::FindMeshWrapper (const char *iName, bool regionOnly)
   const
 {
-  csMeshWrapper* mesh;
   if (regionOnly && region)
-    mesh = (csMeshWrapper*)FindObjectInRegion (region, meshes, iName);
+  {
+    iObject* obj = FindObjectInRegion (region, meshes, iName);
+    if (!obj) return NULL;
+    return SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
+  }
   else
-    mesh = (csMeshWrapper*)meshes.FindByName (iName);
-  if (!mesh) return NULL;
-  iMeshWrapper* imesh = SCF_QUERY_INTERFACE_FAST (mesh, iMeshWrapper);
-  imesh->DecRef ();
-  return imesh;
+    return meshes.FindByName (iName);
 }
 
 iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName,
   bool regionOnly) const
 {
-  csMeshFactoryWrapper* fact;
   if (regionOnly && region)
-    fact = (csMeshFactoryWrapper*)FindObjectInRegion (region, mesh_factories, iName);
+  {
+    iObject* obj = FindObjectInRegion (region, mesh_factories, iName);
+    if (!obj) return NULL;
+    return SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
+  }
   else
-    fact = (csMeshFactoryWrapper*)mesh_factories.FindByName (iName);
-  if (!fact) return NULL;
-  iMeshFactoryWrapper* ifact = &fact->scfiMeshFactoryWrapper;
-  return ifact;
+    return mesh_factories.FindByName (iName);
 }
 
 iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
@@ -1994,7 +1973,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   mfactwrap->IncRef ();
-  mesh_factories.Push (mfactwrap);
+  GetMeshFactories ()->AddMeshFactory (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
 
@@ -2009,32 +1988,8 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
   mfactwrap->IncRef ();
-  mesh_factories.Push (mfactwrap);
+  GetMeshFactories ()->AddMeshFactory (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
-}
-
-void csEngine::DeleteMeshFactory (const char* iName, bool regionOnly)
-{
-  csMeshFactoryWrapper* fact;
-  if (regionOnly && region)
-  {
-    fact = (csMeshFactoryWrapper*)FindObjectInRegion (region,
-    	mesh_factories, iName);
-    if (fact) region->ReleaseFromRegion (fact);
-  }
-  else
-  {
-    int i;
-    for (i = 0 ; i < mesh_factories.Length () ; i++)
-    {
-      csMeshFactoryWrapper* fact = (csMeshFactoryWrapper*)mesh_factories[i];
-      if (fact->GetName () && !strcmp (fact->GetName (), iName))
-      {
-        mesh_factories.Delete (i);
-	return;
-      }
-    }
-  }
 }
 
 iMeshFactoryWrapper* csEngine::LoadMeshFactory (
@@ -2055,7 +2010,7 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, fact);
   plug->DecRef ();
-  if (!mof) { DeleteMeshFactory (name); return NULL; }
+  if (!mof) { GetMeshFactories ()->RemoveMeshFactory (fact); return NULL; }
   fact->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
   return fact;
 }
@@ -2076,15 +2031,14 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
   csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
   if (name) meshwrap->SetName (name);
   meshwrap->IncRef ();
-  meshes.Push (meshwrap);
+  GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
-  iMeshWrapper* imw = SCF_QUERY_INTERFACE_FAST (meshwrap, iMeshWrapper);
-  imw->DecRef ();
+  iMeshWrapper* imw = &(meshwrap->scfiMeshWrapper);
 
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, imw);
@@ -2101,7 +2055,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (iMeshFactoryWrapper* factory,
   iMeshWrapper* meshwrap = factory->CreateMeshWrapper ();
   csMeshWrapper* mesh = meshwrap->GetPrivateObject ();
   if (name) mesh->SetName (name);
-  meshes.Push (mesh);
+  GetMeshes ()->AddMesh (meshwrap);
   if (sector)
   {
     mesh->GetMovable ().SetSector (sector);
@@ -2116,7 +2070,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (iMeshObject* mesh,
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject, mesh);
   if (name) meshwrap->SetName (name);
-  meshes.Push (meshwrap);
+  GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
@@ -2130,31 +2084,9 @@ iMeshWrapper* csEngine::CreateMeshWrapper (const char* name)
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
   if (name) meshwrap->SetName (name);
-  meshes.Push (meshwrap);
+  GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
   return &meshwrap->scfiMeshWrapper;
 }
-
-int csEngine::GetMeshWrapperCount () const
-{
-  return meshes.Length ();
-}
-
-iMeshWrapper *csEngine::GetMeshWrapper (int n) const
-{
-  return &((csMeshWrapper*)meshes.Get(n))->scfiMeshWrapper;
-}
-
-int csEngine::GetMeshFactoryCount () const
-{
-  return mesh_factories.Length ();
-}
-
-iMeshFactoryWrapper *csEngine::GetMeshFactory (int n) const
-{
-  return &((csMeshFactoryWrapper*)mesh_factories.Get(n))->
-  	scfiMeshFactoryWrapper;
-}
-
 
 iPolyTxtPlane* csEngine::CreatePolyTxtPlane (const char* name)
 {

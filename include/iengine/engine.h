@@ -55,6 +55,8 @@ struct iDataBuffer;
 struct iCamera;
 struct iRenderView;
 struct iSectorList;
+struct iMeshList;
+struct iMeshFactoryList;
 struct iProgressMeter;
 
 /**
@@ -142,7 +144,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 2, 5);
+SCF_VERSION (iEngine, 0, 3, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -269,6 +271,10 @@ struct iEngine : public iBase
 
   /// Get the list of sectors
   virtual iSectorList *GetSectors () = 0;
+  /// Get the list of mesh factories
+  virtual iMeshFactoryList *GetMeshFactories () = 0;
+  /// Get the list of meshes
+  virtual iMeshList *GetMeshes () = 0;
 
   /**
    * Find a sector by name. If regionOnly is true then the returned
@@ -291,21 +297,6 @@ struct iEngine : public iBase
   	bool regionOnly = false) const = 0;
 
   /**
-   * Remove a mesh from the engine and all sectors that the mesh is in.
-   * The mesh will also be DecRef()'ed which means that it might get
-   * deleted if the engine was the only one still holding a reference
-   * to the mesh.
-   */
-  virtual void RemoveMesh (iMeshWrapper* mesh) = 0;
-
-  /**
-   * Delete a mesh factory by name. ONLY call this when you're sure
-   * no objects are actually using this factory!
-   */
-  virtual void DeleteMeshFactory (const char* iName,
-  	bool regionOnly = false) = 0;
-
-  /**
    * Find a mesh factory by name. If regionOnly is true then the returned
    * factory will belong to the current region. Note that this is different
    * from calling iRegion::FindMeshFactory() because the latter will also
@@ -314,6 +305,7 @@ struct iEngine : public iBase
    */
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
   	bool regionOnly = false) const = 0;
+
   /**
    * Find a texture by name. If regionOnly is true then the returned
    * texture will belong to the current region. Note that this is different
@@ -452,16 +444,6 @@ struct iEngine : public iBase
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
-
-  /// return the number of mesh objects
-  virtual int GetMeshWrapperCount () const = 0;
-  /// return a mesh object by index
-  virtual iMeshWrapper *GetMeshWrapper (int n) const = 0;
-
-  /// return the number of mesh factories
-  virtual int GetMeshFactoryCount () const = 0;
-  /// return a mesh object by index
-  virtual iMeshFactoryWrapper *GetMeshFactory (int n) const = 0;
 
   /**
    * @@@ Temporary function to create a polygon plane. This is temporary

@@ -354,5 +354,41 @@ struct iMeshFactoryWrapper : public iBase
   virtual void RemoveChild (iMeshFactoryWrapper* child) = 0;
 };
 
+SCF_VERSION (iMeshList, 0, 0, 1);
+
+struct iMeshList : public iBase
+{
+  /// Return the number of meshes in this list.
+  virtual int GetMeshCount () const = 0;
+  /// Return a single mesh.
+  virtual iMeshWrapper *GetMesh (int idx) const = 0;
+  /// Add a mesh
+  virtual void AddMesh (iMeshWrapper *mesh) = 0;
+  /// Remove a mesh
+  virtual void RemoveMesh (iMeshWrapper *mesh) = 0;
+  /// Find a mesh by name
+  virtual iMeshWrapper *FindByName (const char *name) const = 0;
+  /// Find a mesh and return its index
+  virtual int Find (iMeshWrapper *mesh) const = 0;
+};
+
+SCF_VERSION (iMeshFactoryList, 0, 0, 1);
+
+struct iMeshFactoryList : public iBase
+{
+  /// Return the number of mesh factories in this list.
+  virtual int GetMeshFactoryCount () const = 0;
+  /// Return a single mesh factory.
+  virtual iMeshFactoryWrapper *GetMeshFactory (int idx) const = 0;
+  /// Add a mesh factory
+  virtual void AddMeshFactory (iMeshFactoryWrapper *mesh) = 0;
+  /// Remove a mesh factory
+  virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh) = 0;
+  /// Find a mesh factory by name
+  virtual iMeshFactoryWrapper *FindByName (const char *name) const = 0;
+  /// Find a mesh factory and return its index
+  virtual int Find (iMeshFactoryWrapper *mesh) const = 0;
+};
+
 #endif // __IENGINE_MESH_H__
 

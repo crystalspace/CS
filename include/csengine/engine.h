@@ -25,6 +25,7 @@
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csengine/thing.h"
+#include "csengine/meshobj.h"
 #include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
 #include "isys/plugin.h"
@@ -313,7 +314,7 @@ public:
    * List of mesh object factories. This vector contains objects of
    * type csMeshFactoryWrapper*.
    */
-  csNamedObjVector mesh_factories;
+  csMeshFactoryList mesh_factories;
 
   /**
    * List of curve templates (bezier templates). This vector contains objects of
@@ -328,7 +329,7 @@ public:
    * from all sectors as well. Note that after you add a mesh to the list
    * you still need to add it to all sectors that you want it to be visible in.
    */
-  csNamedObjVector meshes;
+  csMeshList meshes;
 
   /**
    * The list of all camera position objects.
@@ -877,18 +878,6 @@ public:
   csStatLight* FindCsLight (const char* name, bool regionOnly = false) const;
 
   /**
-   * Unlink and delete (using DecRef()) a mesh from the engine.
-   * It is also removed from all sectors.
-   */
-  void RemoveMesh (csMeshWrapper* mesh);
-
-  /**
-   * Unlink and delete (using DecRef()) a mesh from the engine.
-   * It is also removed from all sectors.
-   */
-  virtual void RemoveMesh (iMeshWrapper* mesh);
-
-  /**
    * Unlink and delete a collection from the engine.
    * It is also removed from all sectors.
    */
@@ -1006,15 +995,22 @@ public:
   /// Create a texture plane
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
+
   /// Create a empty sector with given name.
   virtual iSector *CreateSector (const char *iName, bool link = true);
-
   /// Find a sector by name
   virtual iSector *FindSector (const char *iName, bool regionOnly = false)
     const;
+
   /// Return the list of sectors
   virtual iSectorList *GetSectors ()
     { return &sectors.scfiSectorList; }
+  /// Return the list of mesh factories
+  virtual iMeshFactoryList *GetMeshFactories ()
+    { return &mesh_factories.scfiMeshFactoryList; }
+  /// Return the list of meshes
+  virtual iMeshList *GetMeshes ()
+    { return &meshes.scfiMeshList; }
 
   /// Find a mesh by name
   virtual iMeshWrapper *FindMeshWrapper (const char *iName,
@@ -1022,8 +1018,6 @@ public:
   /// Find a mesh factory by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
   	bool regionOnly = false) const;
-  /// Delete a mesh factory by name
-  virtual void DeleteMeshFactory (const char* iName, bool regionOnly = false);
 
   /// Find a loaded texture by name.
   virtual iTextureWrapper* FindTexture (const char* iName,
@@ -1085,16 +1079,6 @@ public:
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
-
-  /// Return the number of mesh wrappers.
-  virtual int GetMeshWrapperCount () const;
-  /// Return a mesh wrapper by index.
-  virtual iMeshWrapper *GetMeshWrapper (int n) const;
-
-  /// Return the number of mesh factories.
-  virtual int GetMeshFactoryCount () const;
-  /// Return a mesh factory by index.
-  virtual iMeshFactoryWrapper *GetMeshFactory (int n) const;
 
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,
