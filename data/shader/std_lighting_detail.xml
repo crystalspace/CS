@@ -10,7 +10,7 @@
       <texture name="tex detail" destination="unit 2" />
       <vp plugin="glfixed">
         <fixedvp>
-          <texmatrix destination="unit 2">
+          <texmatrix layer="2">
             <scale type="shadervar">detail texture scale</scale>
           </texmatrix>
         </fixedvp>
