@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Added a new csStringSet::Request() which can return the string
 	  based on the ID (i.e. exactly the opposite of the old Request()
 	  method in csStringSet).
+	- Fixed a bug in the engine which would cause it to crash if
+	  the gouraud info was missing in the lightmap cache.
 25-Dec-2001
 	- Matze had nothing to do and fixed hundreds of compiler warnings
 	  in aws.

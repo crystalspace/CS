@@ -1697,6 +1697,7 @@ bool csPolygon3D::ReadFromCache (int id)
     char buf[200];
     CacheName (buf, "G", id, GetPolygonID (), "");
     iDataBuffer* data = csEngine::current_engine->VFS->ReadFile (buf);
+    if (!data) return false;
 
     char *d = **data;
     uint16 num_vts;
