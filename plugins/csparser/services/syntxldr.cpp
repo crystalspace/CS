@@ -890,19 +890,27 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (!set_viscull)
   {
-    mat = poly3d->GetMaterial ();
-    csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat, iMaterialEngine);
-    if (mateng)
+    if (poly3d->GetPortal ())
     {
-      iTextureWrapper* tw = mateng->GetTextureWrapper ();
-      if (tw)
+      set_viscull = -1;
+    }
+    else
+    {
+      mat = poly3d->GetMaterial ();
+      csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat,
+      	iMaterialEngine);
+      if (mateng)
       {
-        iImage* im = tw->GetImageFile ();
-        if (im)
+        iTextureWrapper* tw = mateng->GetTextureWrapper ();
+        if (tw)
         {
-          if (im->HasKeycolor ()) set_viscull = -1;
-	  else if (im->GetFormat () & CS_IMGFMT_ALPHA)
-	    set_viscull = -1;
+          iImage* im = tw->GetImageFile ();
+          if (im)
+          {
+            if (im->HasKeycolor ()) set_viscull = -1;
+	    else if (im->GetFormat () & CS_IMGFMT_ALPHA)
+	      set_viscull = -1;
+          }
         }
       }
     }

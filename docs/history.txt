@@ -3,6 +3,11 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+14-May-2003
+	- Jorrit fixed a bug in the syntax services. When a polygon is a
+	  portal it is now marked as excluded from the visculling mesh.
+	  Without this fix portals would actually cull geometry even if that
+	  wasn't the idea.
 13-May-2003
 	- res added an iAnimatedImage interface to support animnated images.
 	- res added a plugin for a proctex for animated images.
