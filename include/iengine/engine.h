@@ -50,6 +50,77 @@ struct iPolyTxtPlane;
 struct iCurveTemplate;
 struct iObject;
 
+/**
+ * Flag for GetNearbyLights().
+ * Detect shadows and don't return lights for which the object
+ * is shadowed (not implemented yet).
+ */
+#define CS_NLIGHT_SHADOWS 1
+
+/**
+ * Flag for GetNearbyLights().
+ * Return static lights.
+ */
+#define CS_NLIGHT_STATIC 2
+
+/**
+ * Flag for GetNearbyLights().
+ * Return dynamic lights.
+ */
+#define CS_NLIGHT_DYNAMIC 4
+
+/**
+ * Flag for GetNearbyLights().
+ * Also check lights in nearby sectors (not implemented yet).
+ */
+#define CS_NLIGHT_NEARBYSECTORS 8
+
+
+/**
+ * Setting for SetEngineMode().
+ * Autodetect the best mode according to the level.
+ */
+#define CS_ENGINE_AUTODETECT 0
+
+/**
+ * Setting for SetEngineMode().
+ * Use back-to-front rendering (using optional BSP/octree) and Z-fill.
+ * Don't init Z-buffer at start of render frame.
+ */
+#define CS_ENGINE_BACK2FRONT 1
+
+/**
+ * Setting for SetEngineMode().
+ * Use a 2D/3D culler (c-buffer) and front-to-back sorting.
+ */
+#define CS_ENGINE_FRONT2BACK 2
+
+/**
+ * Setting for SetEngineMode().
+ * Use the Z-buffer for culling.
+ */
+#define CS_ENGINE_ZBUFFER 3
+
+
+/**
+ * Setting for SetCuller().
+ * Use the c-buffer (default).
+ */
+#define CS_CULLER_CBUFFER 0
+
+/**
+ * Setting for SetCuller().
+ * Use the 3D quadtree.
+ */
+#define CS_CULLER_QUAD3D 1
+
+/**
+ * Setting for SetCuller().
+ * Use the coverage mask tree.
+ */
+#define CS_CULLER_COVTREE 2
+
+
 SCF_VERSION (iEngine, 0, 1, 21);
 
 /**

@@ -32,12 +32,69 @@ struct iRenderView;
 struct iMovable;
 struct iLight;
 struct iObject;
+class csFlags;
+
+/**
+ * If CS_ENTITY_CONVEX is set then this entity is convex (what did
+ * you expect :-)
+ * This means the 3D engine can do various optimizations.
+ * If you set 'convex' to true the center vertex will also be calculated.
+ * It is unset by default (@@@ should be calculated).
+ */
+#define CS_ENTITY_CONVEX 1
+
+/**
+ * If CS_ENTITY_DETAIL is set then this entity is a detail
+ * object. A detail object is treated as a single object by
+ * the engine. The engine can do several optimizations on this.
+ * In general you should use this flag for small and detailed
+ * objects. Detail objects are not included in BSP or octrees.
+ */
+#define CS_ENTITY_DETAIL 2
+
+/**
+ * If CS_ENTITY_CAMERA is set then this entity will be always
+ * be centerer around the same spot relative to the camera. This
+ * is useful for skyboxes or skydomes.
+ */
+#define CS_ENTITY_CAMERA 4
+
+/**
+ * If CS_ENTITY_INVISIBLE is set then this thing will not be rendered.
+ * It will still cast shadows and be present otherwise. Use the
+ * CS_ENTITY_NOSHADOWS flag to disable shadows.
+ */
+#define CS_ENTITY_INVISIBLE 8
+
+/**
+ * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
+ * shadows. Lighting will still be calculated for it though. Use the
+ * CS_ENTITY_NOLIGHTING flag to disable that.
+ */
+#define CS_ENTITY_NOSHADOWS 16
+
+/**
+ * If CS_ENTITY_NOLIGHTING is set then this thing will not be lit.
+ * It may still cast shadows though. Use the CS_ENTITY_NOSHADOWS flag
+ * to disable that.
+ */
+#define CS_ENTITY_NOLIGHTING 32
+
+/**
+ * If CS_ENTITY_BACK2FRONT is set then all objects with the same
+ * render order as this one and which also have this flag set will
+ * be rendered in roughly back to front order. All objects with
+ * the same render order but which do not have this flag set will
+ * be rendered later. This flag is important if you want to have
+ * alpha transparency rendered correctly.
+ */
+#define CS_ENTITY_BACK2FRONT 64
 
 /// A callback function for MeshWrapper::Draw().
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 4);
+SCF_VERSION (iMeshWrapper, 0, 0, 5);
 
 /**
  * This interface corresponds to the object in the engine
@@ -127,6 +184,11 @@ struct iMeshWrapper : public iBase
    * Get the render priority.
    */
   virtual long GetRenderPriority () = 0;
+
+  /**
+   * Get flags for this meshwrapper.
+   */
+  virtual csFlags& GetFlags () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 2);
