@@ -51,8 +51,7 @@ is faster.  You can switch shells by changing the @samp{SHELL=} line in
 
 You also will need @sc{ibm} @sc{os}/2 Toolkit for @sc{dive} headers.
 Theoretically it can be made with @sc{dive} headers for @sc{emx} which can be
-found on several sites, for example on @uref{ftp.leo.org}, but I've never
-tried it.
+found on several sites.
 
 You will also require @samp{zlib} (de/compression library), @samp{pnglib} (if
 you're going to work with @sc{png} files), and @samp{libjpeg} (if you're going
