@@ -149,6 +149,8 @@ public:
   csGenerateTerrainImageLayer *layers;
   /// the value function object
   csGenerateTerrainImageValue *valuefunc;
+  ///
+  csGenerateTerrainImageTextureBlend();
   /// deletes the list too
   virtual ~csGenerateTerrainImageTextureBlend();
   /// get the color

@@ -27,6 +27,11 @@
 
 
 //-- csGenerateTerrainImageTextureBlend ----------------------------------
+csGenerateTerrainImageTextureBlend::csGenerateTerrainImageTextureBlend()
+{
+  layers = 0;
+  valuefunc = 0;
+}
 
 csGenerateTerrainImageTextureBlend::~csGenerateTerrainImageTextureBlend()
 {
