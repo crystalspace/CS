@@ -27,6 +27,8 @@ The history order has been reversed so that new features are at the top.
 	  headers already define these types.
 	- Eric Sunshine eliminated a compilation warning in the Dungeon
 	  plug-in which was reported by BeOS compiler.
+	- Eric Sunshine eliminated a couple compilation warnings in the
+	  OpenGL renderer.
 21-Jun-2000
 	- Norman Kramer added new SetViewArea for gridviews to retsrict the
 	  area they can show.
