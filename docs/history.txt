@@ -19,6 +19,8 @@ chronological order.
 	  intersection routines.
 	- Jorrit also optimized ODE mesh-cylinder and performed further
 	  optimizations on the others.
+        - Philip Wyett added test for PGSERVER.AVAILABLE to pgtest application
+          Jamfile.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with
