@@ -26,6 +26,8 @@ The history order is reversed so that new features are at the top.
 	  since it employs csRect.
 	- Oktal added iSprite2DState to the list of interfaces wrapped by
 	  cspace.i, and added a GetVertexByIndex function to it with %extend.
+	- res fixed the NULL pointer access bug in TinyXML writing intrduced
+	  after my recent leak fix.
 12-May-2003
 	- Philip Wyett brought warning level in MSVC 7 project files down
           to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for

@@ -562,9 +562,7 @@ const char* csTinyXmlDocument::Write (iFile* file)
 
 const char* csTinyXmlDocument::Write (iString* str)
 {
-  TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
-  	->GetTiNode ());
-  doc->Print (str, 0);
+  root->Print (str, 0);
   return NULL;
 }
 
