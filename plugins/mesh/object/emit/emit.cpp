@@ -148,6 +148,7 @@ void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
   float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   value = xaround * value;
+  value += center;
 
   // slow but gives a good even spreading
   //while(1)
@@ -529,8 +530,6 @@ void csEmitMeshObject::SetupObject ()
     bbox.StartBoundingBox();
 
     /// create new particles and add to particle system
-    float drop_width = 0.3;
-    float drop_height = 0.3;
     for (int i=0 ; i < number ; i++)
     {
       if(using_rect_sprites)
@@ -539,7 +538,7 @@ void csEmitMeshObject::SetupObject ()
         lighted_particles);
       StartParticle(i);
       /// age each particle randomly, to spread out particles over ages.
-      int elapsed = QInt(GetRandomFloat(0,time_to_live));
+      int elapsed = QInt(GetRandomFloat(0,timetolive));
       MoveAgeParticle(i, elapsed, elapsed/1000.);
     }
     SetupColor ();

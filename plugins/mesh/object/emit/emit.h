@@ -257,9 +257,9 @@ public:
   bool GetLighting () const
   { return lighted_particles; }
   /// set ttl
-  void SetParticleTime (int ttl) { time_to_live = ttl; }
+  void SetParticleTime (int ttl) { timetolive = ttl; }
   /// get ttl
-  int GetParticleTime () const { return time_to_live; }
+  int GetParticleTime () const { return timetolive; }
   /// set startposemit
   void SetStartPosEmit(iEmitGen3D *emit) 
   {startpos = emit; if(startpos) startpos->IncRef();}
