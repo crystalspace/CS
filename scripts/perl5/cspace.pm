@@ -5601,6 +5601,7 @@ package cspace::iVisibilityCuller;
 *UnregisterVisObject = *cspacec::iVisibilityCuller_UnregisterVisObject;
 *PrecacheCulling = *cspacec::iVisibilityCuller_PrecacheCulling;
 *VisTest = *cspacec::iVisibilityCuller_VisTest;
+*IntersectSegmentSloppy = *cspacec::iVisibilityCuller_IntersectSegmentSloppy;
 *IntersectSegment = *cspacec::iVisibilityCuller_IntersectSegment;
 *CastShadows = *cspacec::iVisibilityCuller_CastShadows;
 sub DESTROY {
@@ -12710,6 +12711,7 @@ package cspace::csColliderHelper;
 *InitializeCollisionWrappers = *cspacec::csColliderHelper_InitializeCollisionWrappers;
 *CollideArray = *cspacec::csColliderHelper_CollideArray;
 *CollidePath = *cspacec::csColliderHelper_CollidePath;
+*TraceBeam = *cspacec::csColliderHelper_TraceBeam;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csColliderHelper(@_);
