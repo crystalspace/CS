@@ -33,8 +33,7 @@ usage consider using the @sc{opcode} plugin instead.
 In addition, some plugins may need to link to external libraries covered 
 under a license other than the @sc{lgpl}.
 
-@itemize bullet
+@itemize @bullet
 @item
 @emph{None yet.}
-
 @end itemize
