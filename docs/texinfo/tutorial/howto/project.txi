@@ -56,7 +56,8 @@ recommended that you change at least the following variables:
 
 @itemize
 @item
-@samp{EXECUTABLE} should be the name of your executable.
+@samp{EXECUTABLE} should be the name of your executable. The .exe suffix
+is automatically appended if needed on the platform.
 @item
 @samp{OBJSRC} should point to the source code of your project.
 @item
@@ -64,7 +65,79 @@ recommended that you change at least the following variables:
 that you want to use.
 @end itemize
 
-Other than that you usually do not need to make any other modifications.
+This will enable the makefile to compile an executable for you.
+If, in addition, you want to compile a plugin for Crystal Space, you
+have to change these variables:
+
+@itemize
+@item
+@samp{PLUGIN} should be the name of your plugin. The .dll suffix
+is automatically appended if needed on the platform.
+@item
+@samp{PLUGIN.OBJSRC} should point to the source code of your plugin.
+@item
+@samp{PLUGIN.LINKFLAGS} should be modified to list all the Crystal Space 
+libraries that you want to use for your plugin.
+@end itemize
+
+@subsubheading Larger Changes to the Makefile
+
+If you do not wish to make an executable at all, delete, or comment 
+out with a @samp{#} sign the following lines:
+
+@itemize
+@item
+@samp{EXECUTABLE=} ..., comment or delete this line.
+@item
+@samp{OBJSRC=} ..., comment or delete this line.
+@item
+@samp{OBJS=} ..., comment or delete this line.
+@item
+@samp{LINKFLAGS =} ..., comment or delete this line.
+@item
+@samp{all: $(CSCONFIG.MAK) $(EXECUTABLE) $(PLUGIN)} change this line to read:
+@samp{all: $(CSCONFIG.MAK) $(PLUGIN)}.
+@item
+@samp{$(EXECUTABLE): } ... and its following line 
+@samp{$(DO.EXEC)} need to be commented out or deleted.
+@item
+@samp{$(RM) $(OBJS) $(PLUGIN.OBJS)} change this to read:
+@samp{$(RM) $(PLUGIN.OBJS)}.
+@item
+@samp{gcc -MM $(CXXFLAGS $(OBJSRC) > makefile.dep} remove this line, and 
+in the next line change @samp{>>} to @samp{>}.
+@end itemize
+
+If, on the other hand you wish to compile only an application executable,
+and not a plugin, do the following:
+
+@itemize
+@item
+@samp{PLUGIN=} ..., comment or delete this line.
+@item
+@samp{PLUGIN.OBJSRC=} ..., comment or delete this line.
+@item
+@samp{PLUGIN.OBJS=} ..., comment or delete this line.
+@item
+@samp{PLUGIN.LINKFLAGS =} ..., comment or delete this line.
+@item
+@samp{all: $(CSCONFIG.MAK) $(EXECUTABLE) $(PLUGIN)} change this line to read:
+@samp{all: $(CSCONFIG.MAK) $(EXECUTABLE)}.
+@item
+@samp{$(PLUGIN): } ... and its following line 
+@samp{$(DO.PLUGIN)} need to be commented out or deleted.
+@item
+@samp{$(RM) $(OBJS) $(PLUGIN.OBJS)} change this to read:
+@samp{$(RM) $(OBJS)}.
+@item
+@samp{gcc -MM $(CXXFLAGS $(PLUGIN.OBJSRC) >> makefile.dep} remove this line.
+@end itemize
+
+Note that the difference between compiling an executable and a plugin
+is the change of @samp{$(DO.EXEC)} to @samp{$(DO.PLUGIN)}, and vice
+versa. Of course, an application must have a main routine and initialize
+Crystal Space, and a plugin needs to declare its SCF class table and
+interfaces.
 
 @subsubheading Using the Makefile
 

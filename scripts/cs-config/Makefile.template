@@ -90,7 +90,7 @@ clean:
 #------
 depend: $(CSCONFIG.MAK)
 	gcc -MM $(CXXFLAGS) $(OBJSRC) > makefile.dep
-	gcc -MM $(CXXFLAGS) $(PLUGIN.OBJSRC) > makefile.dep
+	gcc -MM $(CXXFLAGS) $(PLUGIN.OBJSRC) >> makefile.dep
 
 #------
 # Re-create the config flags include file
