@@ -28,7 +28,7 @@
 				AssemblerListingLocation=".\csrelease\temp\%project%/"
 				ObjectFile=".\csrelease\temp\%project%/"
 				ProgramDataBaseFileName=".\csrelease\temp\%project%/"
-				WarningLevel="4"
+				WarningLevel="3"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -68,7 +68,7 @@
 				ObjectFile=".\csdebug\temp\%project%/"
 				ProgramDataBaseFileName=".\csdebug\temp\%project%/"
 				BrowseInformation="1"
-				WarningLevel="4"
+				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
@@ -109,7 +109,7 @@
 				ObjectFile=".\csmemdbg\temp\%project%/"
 				ProgramDataBaseFileName=".\csmemdbg\temp\%project%/"
 				BrowseInformation="1"
-				WarningLevel="4"
+				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool

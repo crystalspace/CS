@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+12-May-2003
+	- Philip Wyett brought warning level in MSVC 7 project files down
+          to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for
+          both MSVC 6 and 7.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.

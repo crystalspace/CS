@@ -36,7 +36,7 @@
 				AssemblerListingLocation=".\csrelease\temp\%project%/"
 				ObjectFile=".\csrelease\temp\%project%/"
 				ProgramDataBaseFileName=".\csrelease\temp\%project%/%project%.pdb"
-				WarningLevel="4"
+				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				CompileAs="0"/>
 			<Tool
@@ -107,7 +107,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				ObjectFile=".\csdebug\temp\%project%/"
 				ProgramDataBaseFileName=".\csdebug\temp\%project%/%project%.pdb"
 				BrowseInformation="1"
-				WarningLevel="4"
+				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
@@ -179,7 +179,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				ObjectFile=".\csmemdbg\temp\%project%/"
 				ProgramDataBaseFileName=".\csmemdbg\temp\%project%/%project%.pdb"
 				BrowseInformation="1"
-				WarningLevel="4"
+				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
 				CompileAs="0"/>
