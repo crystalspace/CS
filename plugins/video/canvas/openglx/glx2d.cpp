@@ -706,7 +706,7 @@ bool csGraphics2DGLX::HandleEvent (iEvent &/*Event*/)
 
   if (resize)
   {
-    SetClipRect (0, 0, Width, Height);
+    SetClipRect (0, 0, Width - 1, Height - 1);
     EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
   }
   return false;

@@ -433,7 +433,7 @@ bool csGraphics2DMac::Open(const char* Title)
 	for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
 		LineAddress[i] = theOffset;
 
-	SetClipRect (0, 0, Width, Height);
+	SetClipRect (0, 0, Width - 1, Height - 1);
 
 	BeginDraw();
 	Clear( 0 );

@@ -166,22 +166,22 @@ void csGraphics2D::ClearAll (int color)
 
 void csGraphics2D::DrawPixel8 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= This->ClipX1) && (x < This->ClipX2)
-   && (y >= This->ClipY1) && (y < This->ClipY2))
+  if ((x >= This->ClipX1) && (x <= This->ClipX2)
+   && (y >= This->ClipY1) && (y <= This->ClipY2))
     *(This->GetPixelAt (x, y)) = color;
 }
 
 void csGraphics2D::DrawPixel16 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= This->ClipX1) && (x < This->ClipX2)
-   && (y >= This->ClipY1) && (y < This->ClipY2))
+  if ((x >= This->ClipX1) && (x <= This->ClipX2)
+   && (y >= This->ClipY1) && (y <= This->ClipY2))
     *(short *)(This->GetPixelAt (x, y)) = color;
 }
 
 void csGraphics2D::DrawPixel32 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= This->ClipX1) && (x < This->ClipX2)
-   && (y >= This->ClipY1) && (y < This->ClipY2))
+  if ((x >= This->ClipX1) && (x <= This->ClipX2)
+   && (y >= This->ClipY1) && (y <= This->ClipY2))
     *(long *)(This->GetPixelAt (x, y)) = color;
 }
 

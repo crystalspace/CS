@@ -416,6 +416,6 @@ void csGraphics2DOS2GL::ResizeHandlerStub (void *Self)
     This->Width = This->glW->BufferWidth ();
     This->Height = This->glW->BufferHeight ();
     This->EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)This);
-    This->SetClipRect (0, 0, This->Width, This->Height);
+    This->SetClipRect (0, 0, This->Width - 1, This->Height - 1);
   }
 }

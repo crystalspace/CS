@@ -240,7 +240,7 @@ awsManager::Redraw()
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   ptG2D->SetClipRect(0,0,640,480);
+   ptG2D->SetClipRect(0,0,639,479);
    ptG2D->DrawBox( 0,  200,512, 20, GetPrefMgr()->GetColor(AC_FILL));
    ptG2D->DrawLine(0,  200,512,200, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
    ptG2D->DrawLine(0,  200,0,  220, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
