@@ -104,6 +104,7 @@ copy $(TargetPath)  csrelease\bin
 				AssemblerListingLocation=".\csdebug\temp\%project%/"
 				ObjectFile=".\csdebug\temp\%project%/"
 				ProgramDataBaseFileName=".\csdebug\temp\%project%/%project%.pdb"
+				BrowseInformation="1"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
