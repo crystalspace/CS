@@ -329,6 +329,7 @@ private:
   void Draw2DPolygon (csVector2* poly, int num_poly, const csPlane3& normal);
 
   bool wantToSwap;
+  int delayClearFlags;
   void SwapIfNeeded();
 public:
   static csGLStateCache* statecache;

@@ -97,7 +97,7 @@ SCF_IMPLEMENT_IBASE_END
 
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false), 
-  wantToSwap (false)
+  wantToSwap (false), delayClearFlags (0)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -1077,6 +1077,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   if (render_target)
     r2tbackend->BeginDrawCommon (); 
 
+  int clearMask;
   const bool doStencilClear = 
     (drawflags & CSDRAW_3DGRAPHICS) && stencil_clipping_available;
   const bool doZbufferClear = (drawflags & CSDRAW_CLEARZBUFFER)
@@ -1087,15 +1088,20 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       stencil_clipping_available ? GL_STENCIL_BUFFER_BIT : 0;
     statecache->SetDepthMask (GL_TRUE);
     if (drawflags & CSDRAW_CLEARSCREEN)
-      glClear (GL_DEPTH_BUFFER_BIT | stencilFlag
-      	| GL_COLOR_BUFFER_BIT);
+      clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag
+      	| GL_COLOR_BUFFER_BIT;
     else
-      glClear (GL_DEPTH_BUFFER_BIT | stencilFlag);
+      clearMask = GL_DEPTH_BUFFER_BIT | stencilFlag;
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
-    glClear (GL_COLOR_BUFFER_BIT);
+    clearMask = GL_COLOR_BUFFER_BIT;
   else if (doStencilClear)
-    glClear (GL_STENCIL_BUFFER_BIT);
+    clearMask = GL_STENCIL_BUFFER_BIT;
+#ifndef DELAYED_SWAP
+  glClear (clearMask);
+#else
+  delayClearFlags = clearMask;
+#endif
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
@@ -2227,6 +2233,11 @@ void csGLGraphics3D::SwapIfNeeded()
   {
     G2D->Print (0);
     wantToSwap = false;
+    if (delayClearFlags != 0)
+    {
+      glClear (delayClearFlags);
+      delayClearFlags = 0;
+    }
   }
 #endif
 }

@@ -30,6 +30,7 @@ chronological order.
 	  have no other choice. Works fine in flarge at gives a small but 
 	  measurable FPS boost. If it breaks somewhere, disable it in 
 	  glrender3d.h by #undefining DELAYED_SWAP.
+	- res fixed screen clearing with delayed swap.
 1-Apr-2005
 	- Eric Sunshine fixed some unportable uses of #warning directives in
 	  the public CS headers. (#warning is not part of the C++ standard)
