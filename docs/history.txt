@@ -8,7 +8,7 @@ chronological order.
 
 28-Jul-2004
 	- Eric Sunshine fixed csjava/Jamfile so that it constructs the
-	  shared-library name correctly on all supported platforms
+	  shared-library name correctly on all supported platforms:
 	    MacOS/X : libcsjava.jnilib
 	    Unix    : libcsjava.so
 	    Windows : csjava.dll
