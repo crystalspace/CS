@@ -48,7 +48,11 @@
 
     for (uu = u + Imin_u ; uu < end_u ; uu++)
     {
-      UInt pixel = ot [uu & and_w];
+#if defined (PI_R8G8B8) && defined (TOP8BITS_R8G8B8_USED)
+      ULong pixel = ot [uu & and_w] >> PostShift;
+#else
+      ULong pixel = ot [uu & and_w];
+#endif
       UInt r = (pixel >> 16) * __red >> (31 - PI_RS - PI_RB);
       if (r > PI_RM) r = PI_RM;
 #if PI_RS > 0

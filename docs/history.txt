@@ -21,6 +21,14 @@ Short-term cleanups that need to be done:
 	  a suggestion by Brandon Ehle <azverkan@yahoo.com>.  It is now
 	  possible to specify the class name of the new vector type, the
 	  superclass type, as well as the element type.
+	- Eric Sunshine applied the final tweaks to Andrew's changes from
+	  24-Sep-1999 which actually allows the renderer to work correctly in
+	  24-bit RGBA mode on big-endian hardware.
+24-Sep-1999
+	- Andrew Zabolotny fixed some problems with the 3D software renderer
+	  which affected 24-bit mode on big-endian machines which use RGBA
+	  (as opposed to ARGB or ABGR).  The renderer was using hard-coded
+	  shift amounts which were incompatible with RGBA.
 23-Sep-1999
 	- Big optimization in sprite drawing. I eliminated 3*num_triangles
 	  divides for every sprite!
