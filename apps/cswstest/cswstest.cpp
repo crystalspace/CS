@@ -21,12 +21,11 @@
 #include "csengine/sysitf.h"
 #include "csws/csws.h"
 
-class MazeEditor : public csApp
+class csWsTest : public csApp
 {
 public:
   /// Initialize maze editor
-  MazeEditor (char *AppTitle, int argc, char *argv[]) :
-    csApp (AppTitle, argc, argv) {};
+  csWsTest (char *AppTitle, int argc, char *argv[]);
 
   ///
   virtual bool HandleEvent (csEvent &Event);
@@ -34,11 +33,26 @@ public:
   virtual bool InitialSetup ();
 };
 
-MazeEditor *app;                        // The main Windowing System object
+csWsTest *app;                        // The main Windowing System object
 
 //-----------------------------------------------------------------------------
 
-bool MazeEditor::InitialSetup ()
+// Scroll bar class default palette
+static int palette_csWsTest[] =
+{
+  cs_Color_Gray_D,			// Application workspace
+  cs_Color_Green_L,			// End points
+  cs_Color_Red_L,			// lines
+  cs_Color_White			// Start points
+};
+
+csWsTest::csWsTest (char *AppTitle, int argc, char *argv[]) :
+  csApp (AppTitle, argc, argv)
+{
+  SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
+}
+
+bool csWsTest::InitialSetup ()
 {
   if (!csApp::InitialSetup ())
     return false;
@@ -184,8 +198,21 @@ bool MazeEditor::InitialSetup ()
   return true;
 }
 
-bool MazeEditor::HandleEvent (csEvent &Event)
+bool csWsTest::HandleEvent (csEvent &Event)
 {
+  static csMouseCursorID mousecursors [] =
+  {
+    csmcNone, csmcArrow, csmcLens, csmcCross, csmcPen, csmcMove,
+    csmcSizeNWSE, csmcSizeNESW, csmcSizeNS, csmcSizeEW, csmcStop, csmcWait
+  };
+
+  static int mousecursor = 1;
+  static int px, py;
+  static bool draw = false;
+
+  if (csApp::HandleEvent (Event))
+    return true;
+
   switch (Event.Type)
   {
     case csevCommand:
@@ -202,48 +229,63 @@ bool MazeEditor::HandleEvent (csEvent &Event)
               delete d;
               MessageBox (app, "Result", filename);
             }
+            return true;
           }
-          break;
       }
       break;
-  }
-#if 0
-  static int px, py;
-  static bool draw = false;
 
-  switch (Event.Type)
-  {
     case csevMouseMove:
+      SetMouse (mousecursors [mousecursor]);
       if (draw)
       {
-        Line (px, py, Event.Mouse.x, Event.Mouse.y, csws_Color_Gray_D);
+        // kludge: set dirty rectangle so that line won't get clipped
+        csRect old (dirty);
+        dirty.Set (px, py, Event.Mouse.x, Event.Mouse.y);
+        dirty.Normalize ();
+        dirty.xmax++; dirty.ymax++;
+        Line (px, py, Event.Mouse.x, Event.Mouse.y, 2);
+        dirty.Set (old);
+
         px = Event.Mouse.x;
         py = Event.Mouse.y;
-        return Mouse->HandleEvent (Event);
       } /* endif */
-      break;
+      return true;
+
     case csevMouseDown:
-      if (Event.Mouse.button == 1)
+    case csevMouseDoubleClick:
+      if (Event.Mouse.Button == 1)
       {
         draw = true;
         px = Event.Mouse.x;
         py = Event.Mouse.y;
-        Line (px, py, px, py, csws_Color_White);
-        return Mouse->HandleEvent (Event);
-      } else if (Event.Mouse.button == 2)
+
+        // kludge: set dirty rectangle so that line won't get clipped
+        csRect old (dirty);
+        dirty.Set (px - 1, py - 1, px + 2, py + 2);
+        Box (px - 1, py - 1, px + 2, py + 2, 3);
+        dirty.Set (old);
+      }
+      else if (Event.Mouse.Button == 2)
       {
-        static int lastcursor = 0;
-        lastcursor = (lastcursor + 1) % 4;
-        Mouse->SetCursor (lastcursor);
-        return Mouse->HandleEvent (Event);
+        mousecursor = (mousecursor + 1) % (sizeof (mousecursors) / sizeof (int));
+        SetMouse (mousecursors [mousecursor]);
       } /* endif */
-      break;
+      return true;
+
     case csevMouseUp:
+    {
+      // kludge: set dirty rectangle so that line won't get clipped
+      csRect old (dirty);
+      dirty.Set (px - 1, py - 1, px + 2, py + 2);
+      Box (px - 1, py - 1, px + 2, py + 2, 1);
+      dirty.Set (old);
+
       draw = false;
       return true;
+    }
   } /* endswitch */
-#endif
-  return csApp::HandleEvent (Event);
+
+  return false;
 }
 
 //---------------------------------------------------------------------------
@@ -255,9 +297,9 @@ int main (int argc, char* argv[])
 {
   config = new csIniFile ("MazeD.cfg");
 
-  app = new MazeEditor ("Crystal Space 3D maze editor", argc, argv);
+  app = new csWsTest ("Crystal Space 3D maze editor", argc, argv);
 
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space Maze Editor version %s (%s).\n", VERSION, RELEASE_DATE);
+  CsPrintf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
   CsPrintf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
 
   // For GUI apps double buffering is a performance hit
