@@ -48,6 +48,8 @@ The history order is reversed so that new features are at the top.
 	    - Cleaned the bison and flex rules a bit.
 	- Matze added some scripts which create a basic external CS
 	  application with a jam build system.
+	- Oktal fixed the extern function declaration of xs_init in csperl5.cpp
+	  that had the wrong function prototype.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if

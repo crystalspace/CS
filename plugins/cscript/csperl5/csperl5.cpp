@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-extern "C" void xs_init (); // defined in csperlxs.c
+extern "C" void xs_init (PerlInterpreter *); // defined in csperlxs.c
 
 iObjectRegistry *scripts_iObjectRegistry = NULL;
 
