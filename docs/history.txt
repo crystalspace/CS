@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Dec-2004
+	- Eric Sunshine worked around problem in csjava caused by new operator
+	  overrides in csColor and csColor4. Although modern C++ can deal with
+	  overrides in subclasses having return values which differ from those
+	  in the parent class, Java can not.
 11-Dec-2004
 	- PK added static void ReportWarning (const char* description, ...)
 	  to csApplicationFramework.

@@ -83,6 +83,11 @@
 %rename(bitOrAssign) operator|=;
 %rename(bitXorAssign) operator^=;
 
+// csutil/cscolor.h
+%rename(assign4) csColor4::operator=(const csColor&);
+%rename(multiplyAssign4) csColor4::operator*=(float);
+%rename(addAssign4) csColor4::operator+=(const csColor&);
+
 // cstool/initapp.h
 %extend csPluginRequest
 {
@@ -162,77 +167,84 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 
 #undef TYPEMAP_OUT_csRef
 %define TYPEMAP_OUT_csRef(T)
-	%typemap(out) csRef<T>
-	{
-		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "com/crystalspace/" #T)
-	}
-    %typemap(jni) csRef<T> "jobject";
-    %typemap(jtype) csRef<T> #T;
-    %typemap(jstype) csRef<T> #T;
-    %typemap(javain) csRef<T> "$javainput";
-    %typemap(javaout) csRef<T> { return $jnicall; }
+  %typemap(out) csRef<T>
+  {
+    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csRef, "com/crystalspace/" #T)
+  }
+  %typemap(jni) csRef<T> "jobject";
+  %typemap(jtype) csRef<T> #T;
+  %typemap(jstype) csRef<T> #T;
+  %typemap(javain) csRef<T> "$javainput";
+  %typemap(javaout) csRef<T> { return $jnicall; }
 %enddef
 
 #undef TYPEMAP_OUT_csPtr
 %define TYPEMAP_OUT_csPtr(T)
-	%typemap(out) csPtr<T>
-	{
-		TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "com/crystalspace/" #T)
-	}
-    //%typemap(out) csPtr<T> %{ $result = $1; %}
-    %typemap(jni) csPtr<T> "jobject";
-    %typemap(jtype) csPtr<T> #T;
-    %typemap(jstype) csPtr<T> #T;
-    %typemap(javain) csPtr<T> "$javainput";
-    %typemap(javaout) csPtr<T> { return $jnicall; }
+  %typemap(out) csPtr<T>
+  {
+    TYPEMAP_OUT_csRef_BODY($1, #T " *", T, csPtr, "com/crystalspace/" #T)
+  }
+  //%typemap(out) csPtr<T> %{ $result = $1; %}
+  %typemap(jni) csPtr<T> "jobject";
+  %typemap(jtype) csPtr<T> #T;
+  %typemap(jstype) csPtr<T> #T;
+  %typemap(javain) csPtr<T> "$javainput";
+  %typemap(javaout) csPtr<T> { return $jnicall; }
 %enddef
 
 
 #undef TYPEMAP_OUT_csWrapPtr
 %define TYPEMAP_OUT_csWrapPtr
-	%typemap(out) csWrapPtr
-	{
-        void * ptr = 0;
-        if ($1.VoidPtr)
-        {
-            ptr = $1.VoidPtr;
-        }
-        else
-        {
-            ptr = iBase__DynamicCast((iBase *)$1.Ref, $1.Type).VoidPtr;
-        }
-    	//ref->IncRef();
-	if (ptr == 0)
-            $result = 0;
-        else
-	{
-            jlong cptr = 0;
-            *(void **)&cptr = ptr;
-            char cls_name[1024];
-            strcat(strcpy(cls_name, "com/crystalspace/"), $1.Type);
-            jclass cls = jenv->FindClass(cls_name);
-            jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
-            $result = jenv->NewObject(cls, mid, cptr, false);
-	}
-	}
-	//%typemap(out) csWrapPtr %{ $result = $1; %}
-	%typemap(jni) csWrapPtr "jobject";
-	%typemap(jtype) csWrapPtr "Object";
-	%typemap(jstype) csWrapPtr "Object";
-	%typemap(javain) csWrapPtr "$javainput";
-	//%typemap(javaout) csWrapPtr { return $jnicall; }
-	%typemap(javaout) csWrapPtr { Object _obj = $jnicall; iBase ibase = (iBase) _obj; if (ibase != null) ibase.IncRef(); return _obj; }
+  %typemap(out) csWrapPtr
+  {
+    void * ptr = 0;
+    if ($1.VoidPtr)
+    {
+      ptr = $1.VoidPtr;
+    }
+    else
+    {
+      ptr = iBase__DynamicCast((iBase *)$1.Ref, $1.Type).VoidPtr;
+    }
+    //ref->IncRef();
+    if (ptr == 0)
+      $result = 0;
+    else
+    {
+      jlong cptr = 0;
+      *(void **)&cptr = ptr;
+      char cls_name[1024];
+      strcat(strcpy(cls_name, "com/crystalspace/"), $1.Type);
+      jclass cls = jenv->FindClass(cls_name);
+      jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
+      $result = jenv->NewObject(cls, mid, cptr, false);
+    }
+  }
+  //%typemap(out) csWrapPtr %{ $result = $1; %}
+  %typemap(jni) csWrapPtr "jobject";
+  %typemap(jtype) csWrapPtr "Object";
+  %typemap(jstype) csWrapPtr "Object";
+  %typemap(javain) csWrapPtr "$javainput";
+  //%typemap(javaout) csWrapPtr { return $jnicall; }
+  %typemap(javaout) csWrapPtr
+  {
+    Object _obj = $jnicall;
+    iBase ibase = (iBase) _obj;
+    if (ibase != null)
+      ibase.IncRef();
+    return _obj;
+  }
 %enddef
 
 #undef INTERFACE_EQUALS
 %define INTERFACE_EQUALS
-	public boolean equals (Object obj)
-	{
-	    boolean equal = false;
-	    if (obj instanceof $javaclassname)
-	        equal = ((($javaclassname)obj).swigCPtr == this.swigCPtr);
-	    return equal;
-	}
+  public boolean equals (Object obj)
+  {
+    boolean equal = false;
+    if (obj instanceof $javaclassname)
+      equal = ((($javaclassname)obj).swigCPtr == this.swigCPtr);
+    return equal;
+  }
 %enddef
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(T) %typemap(javacode) T %{ INTERFACE_EQUALS %}
@@ -252,8 +264,8 @@ public void Broadcast (int iCode) { Broadcast(iCode, null); }
 %define IEVENTOUTLET_JAVACODE
 %typemap(javacode) iEventOutlet
 %{
-    INTERFACE_EQUALS
-    IEVENTOUTLET_BROADCAST
+  INTERFACE_EQUALS
+  IEVENTOUTLET_BROADCAST
 %}
 %enddef
 IEVENTOUTLET_JAVACODE
