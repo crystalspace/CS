@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  using `false' rather than `true' for the SourceForge shell machine.
 	  Using `false' allows the makefile configuration phase to complete
 	  successfully, whereas `true' caused some tests to fail.
+	- Eric Sunshine fixed CS/docs/support/devapi.dox so that it no longer
+	  refers to the obsolete CS/support directory.
 30-Sep-2002
 	- Reverted a downscaling fix in OpenGL renderer for 2D images.
 	- Fixed simplept so it works again. Basically there was a problem
