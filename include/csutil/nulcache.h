@@ -19,6 +19,9 @@
 #ifndef __CSUTIL_NULCACHE_H__
 #define __CSUTIL_NULCACHE_H__
 
+/**\file
+ * 'Null' Cache Manager
+ */
 #include "iutil/cache.h"
 
 /**

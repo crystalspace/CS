@@ -19,6 +19,9 @@
 #ifndef __CSUTIL_VFSCACHE_H__
 #define __CSUTIL_VFSCACHE_H__
 
+/**\file
+ * VFS Cache Manager
+ */
 #include "iutil/cache.h"
 
 struct iObjectRegistry;
