@@ -1609,12 +1609,14 @@ simulate an isometric look with the normal 3D engine.
 @subheading Some Plugins Removed
 
 The following plugins and programs also have been removed (along with any 
-parts of the API they provided exclusively), because they are unmaintained and
-not currently usable. For more discussion see mailing list posts at
-<http://sourceforge.net/mailarchive/message.php?msg_id=8645194>
-<http://sourceforge.net/mailarchive/message.php?msg_id=8296024>
-<http://sourceforge.net/mailarchive/message.php?msg_id=8296017>
-<http://sourceforge.net/mailarchive/message.php?msg_id=8295883>
+parts of the @sc{api} they provided exclusively), because they are unmaintained
+and not currently usable. For more discussion see mailing list posts at:
+
+@noindent
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8645194}@*
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8296024}@*
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8296017}@*
+@uref{http://sourceforge.net/mailarchive/message.php?msg_id=8295883}@*
 
 @itemize @bullet
 @item @code{terrbig} (use new terrain features in the new renderer)
