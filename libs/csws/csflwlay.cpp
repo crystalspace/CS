@@ -66,7 +66,7 @@ void csFlowLayout::SuggestSize (int &sugw, int& sugh)
   int width = 0;
   int maxHeight = 0;
 
-  for (int i; i < vConstraints.Length (); i++)
+  for (int i = 0; i < vConstraints.Length (); i++)
   {
     if (i != 0 ) 
       width += mHgap;
