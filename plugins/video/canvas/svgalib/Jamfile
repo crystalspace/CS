@@ -6,7 +6,7 @@ Plugin svga2d
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith svga2d : canvascommon cssys csutil ;
-ExternalLibs svga2d :  VGA ;
+ExternalLibs svga2d :  SVGA ;
 
 Help svga2d : "Crystal Space SVGAlib 2D driver" ;
 CompileGroups svga2d :  drivers2d ;
