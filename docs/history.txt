@@ -1,7 +1,23 @@
 The history order has been reversed so that new features are at the top.
 
 3-Dec-2000
-	-Eric Sunshine made the following changes to the documentation:
+	- Norman Kramer did some work on CrystalBall (his polygon culler).
+	- Norman also did the following with relation to the c-buffer
+	  culler:
+	    - GetConvexOutline (in csBox) has a new parameter: bVisisble.
+              If true it returns all visible corners, if not then just
+	      the outline.
+	    - The farplane is now recognized in the octree culling and
+	      polygon culling process.
+	- Noah L. Gibbs added support for change to libs/csphyzik/qtrbconn.cpp.
+	  Also some prototypes for new functions. Here is the comment:
+	      Checking in code that's almost enough to make the rigid-body
+	      connectors useful. They now successfully take derivatives of
+	      an arbitrary point and its velocity on the rigid body with
+	      respect to all state variables of that body -- except for the
+	      derivative of the velocity with respect to the rigid body's
+	      angular momentum.  Ouch.  Working on it.
+	- Eric Sunshine made the following changes to the documentation:
 	    - Fixed several Texinfo mark-up problems in msdos.txi, win32.txi,
 	      win32gcc.txi, 
 	    - Performed some re-writing and clean-up of features.txi.
@@ -85,7 +101,53 @@ The history order has been reversed so that new features are at the top.
 		data/entry.t3d
 		include/cssys/wcc
 		scripts/python/unrmap.py
+	- Martin Geisse added some sections and items to the libs and
+	  plugins chapters of the docs.
+2-Dec-2000
+	- Seth Galbraith did the following changes to sprites:
+	    - Automatic level-of-detail adjustment based on distance and
+	      field-of-view.
+	    - cfg_lod_detail (the "lod" setting in Walktest) is now
+	      basically the distance at which full detail is visible
+	      instead of a fractional value.
+	- Seth also added -mconsole to the linking flags for win32gcc.mak.
+          He also added comments explaining what to expect if you
+	  comment-out the -mconsole option.
+	- Wouter Wijngaards improved WalkTest as follows:
+	    - Finetuned the parameters for the 'flame' demo particle system.
+	      It looks better now, less blocky.
+	    - Removed those irritating 1 pixel wide margins where pixels
+	      from the console text could still be seen. At the end of
+	      initialize, ClearAll() is called.
+1-Dec-2000
+	- Andrew Zabolotny tried to fix OpenGL library problems.
+	  LIBS.OPENGL.SYSTEM is now the correct variable to define the
+	  system libraries for OpenGL support. For example (in system
+	  makefile or in config.mak):
+	    LIBS.OPENGL.SYSTEM=-L/usr/local/include/MesaGL -lMesaGL
+30-Nov-2000
+	- Martin Geisse changed the following in the documentation:
+	    - Moved vfs docs to the plugins section.
+	    - Added basic docs for cssys, csutil and csgeom.
+	    - Added some missing applications to the apps section.
+29-Nov-2000
+	- Seth Galbraith added the following changes to sprites which he
+	  got from Rene Dudfield:
+	    - UpdateLightingFast () method.
+	    - lighting_quality instead of do_quality_lighting.
+	    - [Lighting]->LightingQual config option.
+	    - Plus some cleanup work and optimization by Seth.
+28-Nov-2000
+	- Seth Galbraith did an update to sprites:
+	    - Fixed lighting normals interpolation.
+	    - Don't need obj_verts for UpdateLightingLQ.
+	    - MergeNormals functions now take a "base" parameter.
+	    - MERGE_ tokens removed, replaced with SMOOTH.
+	- Martin Geisse did a minor change to the input syntax for dungeon.
 27-Nov-2000
+	- Martin Geisse fixed some compiler warnings in 3ds2lev.
+	- Martin also fixed a bug in ptlab.
+	- Wouter Wijngaards added csgeom library to csfgen app.
 	- Fixed a bug in sprites recently introduced by Seth. The problem
 	  was a divide by zero when normalizing the null vector.
 	- Andrew Zabolotny did the following changes:
