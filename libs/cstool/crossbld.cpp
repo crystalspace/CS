@@ -24,7 +24,6 @@
 #include "cssysdef.h"
 #include "cstool/crossbld.h"
 #include "csgfx/csimage.h"
-#include "cssys/system.h"
 #include "csutil/scfstrv.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
@@ -38,10 +37,11 @@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
+#include "isys/system.h"
 
 // helper function for image loading
 
-iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
+static iImage *LoadImage (iSystem *System, UByte* iBuffer, ULong iSize, int iFormat)
 {
   iImageIO *ImageLoader =
     CS_QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
@@ -57,8 +57,9 @@ iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 //
 
 /// constructor
-csCrossBuild_Factory::csCrossBuild_Factory()
+csCrossBuild_Factory::csCrossBuild_Factory(iSystem *sys)
 {
+  System = sys;
 }
 
 /// destructor
@@ -71,8 +72,8 @@ csCrossBuild_Factory::~csCrossBuild_Factory()
 //
 
 /// constructor
-csCrossBuild_SpriteTemplateFactory::csCrossBuild_SpriteTemplateFactory()
-  : csCrossBuild_Factory()
+csCrossBuild_SpriteTemplateFactory::csCrossBuild_SpriteTemplateFactory(iSystem *sys)
+  : csCrossBuild_Factory(sys)
 {
 }
 
@@ -268,8 +269,8 @@ iTextureWrapper *ivconload_Quake2Textures(iEngine *engine,
 //
 
 /// constructor
-csCrossBuild_ThingTemplateFactory::csCrossBuild_ThingTemplateFactory()
-  : csCrossBuild_Factory()
+csCrossBuild_ThingTemplateFactory::csCrossBuild_ThingTemplateFactory(iSystem *sys)
+  : csCrossBuild_Factory(sys)
 {
 }
 
@@ -351,14 +352,16 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
   }
 }
 
-csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer()
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iSystem *sys)
 {
+  System = sys;
   localVFS = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
 }
 
 
-csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iVFS *specialVFS)
+csCrossBuild_Quake2Importer::csCrossBuild_Quake2Importer(iSystem *sys, iVFS *specialVFS)
 {
+  System = sys;
   (localVFS = specialVFS)->IncRef ();
 }
 
@@ -474,7 +477,7 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
     {
       iDataBuffer *imagedata = localVFS->ReadFile(skinfilename);
 
-      iImage *newskin = LoadImage(imagedata->GetUint8 (),
+      iImage *newskin = LoadImage(System, imagedata->GetUint8 (),
         imagedata->GetSize (), importdestination->GetTextureFormat ());
 
       imagedata->DecRef ();

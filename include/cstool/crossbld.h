@@ -33,6 +33,7 @@ struct iSpriteFrame;
 struct iThingState;
 struct iTextureWrapper;
 struct iEngine;
+struct iImage;
 
 /**
  * The general cross builder interface.  All cross builders inherit from
@@ -41,9 +42,14 @@ struct iEngine;
  */
 class csCrossBuild_Factory
 {
-  public:
+protected:
+  iSystem *System;
+
+  iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
+
+public:
     /// Constructor.  By default you will probably not do much here.
-    csCrossBuild_Factory();
+    csCrossBuild_Factory(iSystem *sys);
 
     /**
      * Destructor.  Don't go off killing the converter, as you don't
@@ -100,7 +106,7 @@ class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
 {
   public:
     /// Constructor.  There are currently no options
-    csCrossBuild_SpriteTemplateFactory();
+    csCrossBuild_SpriteTemplateFactory(iSystem *sys);
 
     /**
      * Destructor.  Does not delete the sprite templates it has
@@ -146,7 +152,7 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
 {
   public:
     /// Constructor.  There are currently no options
-    csCrossBuild_ThingTemplateFactory();
+    csCrossBuild_ThingTemplateFactory(iSystem *sys);
 
     /**
      * Destructor.  Does not delete the Thing templates it has
@@ -206,6 +212,9 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
 class csCrossBuild_Quake2Importer
 {
   private:
+    // the system driver
+    iSystem *System;
+
     // VFS to use.  May be the default, or it may have
     // .zip files mounted containing the sprites
     iVFS *localVFS;
@@ -237,8 +246,8 @@ class csCrossBuild_Quake2Importer
      * Constructor needs a VFS to map from the WAD, sprite respository, or
      * whatever, to files.  If no VFS is supplied it will use the system VFS
      */
-    csCrossBuild_Quake2Importer();
-    csCrossBuild_Quake2Importer(iVFS *specialVFS);
+    csCrossBuild_Quake2Importer(iSystem *sys);
+    csCrossBuild_Quake2Importer(iSystem *sys, iVFS *specialVFS);
     ~csCrossBuild_Quake2Importer();
 
     /**

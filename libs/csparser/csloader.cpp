@@ -1430,7 +1430,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 	  iMeshObjectFactory* fact = type->NewFactory ();
 	  stemp->SetMeshObjectFactory (fact);
 	  fact->DecRef ();
-	  csCrossBuild_SpriteTemplateFactory builder;
+	  csCrossBuild_SpriteTemplateFactory builder (System);
 	  builder.CrossBuild (fact, *filedata);
 	  delete filedata;
         }

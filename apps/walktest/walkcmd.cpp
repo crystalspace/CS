@@ -306,7 +306,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   // convert data from the 'filedata' structure into a CS sprite template
-  csCrossBuild_SpriteTemplateFactory builder;
+  csCrossBuild_SpriteTemplateFactory builder (System);
   iMeshObjectFactory *result = (iMeshObjectFactory *)builder.CrossBuild (*filedata);
   delete filedata;
 
