@@ -37,6 +37,7 @@ The history order is reversed so that new features are at the top.
 	  construction a new csGlobalHashIterator was created, but not deleted 
 	  on destruction (more exactly, csStringHashIterator lacked a 
 	  destructor.)
+    - Reed Hedges fixed cxXWindow::SetTitle()
 9-Jul-2003
 	- Jorrit fixed PlaceMesh() so that it now uses
 	  engine->GetNearbyObjects(). That makes it a lot more efficient
