@@ -180,6 +180,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
   CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
   csStatLight::dynamic = dynamic;
   lightmaps = NULL;
+  num_lightmap = 0;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
 
