@@ -294,12 +294,19 @@ struct iEntity : public iBase
   virtual csVector3 GetRadius() = 0;
 
   /**
+   * Returns true, if this entity wants the other entity to return
+   * its detailed collider fot the following collision test.
+   */
+  virtual bool WantDetailedCollider(iEntity* pOtherEntity) = 0;
+
+  /**
    * Get the collider for a collision test against the given Entity
    * The pointer to the collider is being returned. Also the relevant
    * Transformation for the collision test, and the information, whether
    * the collider is solid or not.
    */
   virtual void GetCollider(iEntity*     pOtherEntity, 
+                           bool         WantDetailed,
                            iCollider*&  pCollider,
                            csTransform& pTransform,
                            bool&        Solid);
@@ -456,6 +463,46 @@ struct iGameSprite3D : public iBase
    */
   virtual void AdvanceAnimation() = 0;
 };
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iColliderSelector, 0, 1, 0);
+
+/**
+ * A Collider Selector allows to pick a collider without creating an event.
+ * This is a big advantage, because Scripting is not very fast, and the
+ * engine needs to do lots of collision tests, so using a native class seems
+ * to be adviseable. If you really want to handle this in scripts, feel free
+ * to do so. The iColliderSelector is an internal class for an entity, and
+ * can easily be omitted.
+ */
+struct iColliderSelector : public iBase
+{
+  /**
+   * Returns true, if this entity wants the other entity to return
+   * its detailed collider fot the following collision test.
+   */
+  virtual bool WantDetailedCollider(iEntity* pOtherEntity) = 0;
+
+  /**
+   * Get the number of the collider for a collision test against the given 
+   * Entity. Also returns, the information, whether the collider is solid 
+   * or not. It is the task of the containing entity, to pick the remaining
+   * information itself.
+   */
+  virtual void GetCollider(iEntity*     pOtherEntity, 
+                           bool         WantDetailed,
+                           int&         NumCollider,
+                           bool&        Solid);
+  /**
+   * Loads the definition from stored data. This seams to be easier to use,
+   * than putting all the rules togehter at runtime. The format of the rules
+   * will be described later. (And will of course be specific for any class
+   * that implements this selector.)
+   */
+  virtual void LoadDefinition(iDataLoader* pLoader) = 0;
+};
+
 
 //---------------------------------------------------------------------------
 
