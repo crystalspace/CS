@@ -105,9 +105,9 @@ In addition, you must set a version number for the class using
 this:
 
 @example
-IMPLEMENT_IBASE_EXT (csMyClass)
-  IMPLEMENTS_INTERFACE (csMyClass)
-IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_EXT (csMyClass)
+  SCF_IMPLEMENTS_INTERFACE (csMyClass)
+SCF_IMPLEMENT_IBASE_EXT_END
 @end example
 
 Using this you can use @code{SCF_QUERY_INTERFACE(object, csMyClass)}, i.e.
