@@ -65,23 +65,25 @@ bool csFreeTypeServer::Initialize (iSystem *pSystem)
   else
   {
     iVFS *v= QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
-    csIniFile *ftini = new csIniFile ( v, "config/freetype.cfg");
+    csIniFile *ftini = new csIniFile ( "config/freetype.cfg", v);
     defaultSize = ftini->GetInt ("Default", "size", 10);
     platformID = ftini->GetInt ("Default", "platformid", 3);
     encodingID = ftini->GetInt ("Default", "encodingid", 1);
 
-    csStrVector vFonts;
+    iConfigDataIterator *pFonts;
     const char *p = ftini->GetStr ("Default", "preload");
-    ftini->EnumData (p, &vFonts);
+	int i=0;
+    pFonts = ftini->EnumData (p);
 
-    int i;
-    for (i = 0; i < vFonts.Length (); i++)
+    while (pFonts->Next ())
     {
-      pSystem->Printf (MSG_INITIALIZATION, "Load font %s\n",(const char*)vFonts [i]);
-      LoadFont ((const char *)vFonts [i], ftini->GetStr (p, (const char*)vFonts [i]));
+      pSystem->Printf (MSG_INITIALIZATION, "Load font %s\n",pFonts->GetKey ());
+      LoadFont (pFonts->GetKey (), (const char*)pFonts->GetData ());
+	  i++;
     }
-    succ = (vFonts.Length () == 0 || fonts.Length () > 0 );
+    succ = (i == 0 || fonts.Length () > 0 );
     v->DecRef ();
+	pFonts->DecRef ();
     delete ftini;
   }
 

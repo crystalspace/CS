@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 4-Oct-2000
+	- Norman Kramer updated config access in freefont plugin according
+	  to Andrew's latest changes.
 	- Philip Wyett did some small changes to the VC project files.
 	- Added a change from Luca Pancallo to 3ds2lev so that floating
 	  point values near zero are better printed.
