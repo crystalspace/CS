@@ -31,7 +31,6 @@
 void csGraphics2D::DRAWSPRITE_NAME (csGraphics2D *This, iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  return; //THFIXME
   bool transp = hTex->GetTransparent ();
 
   int bw, bh;
