@@ -20,7 +20,6 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "qint.h"
-#include "csparser/csloader.h"
 #include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
