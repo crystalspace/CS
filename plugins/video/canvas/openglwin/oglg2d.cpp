@@ -317,7 +317,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
   if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
     SystemFatalError ("DescribePixelFormat failed.");
 
-  Depth = pfd.cColorBits;
+  //Depth = pfd.cColorBits; // @@@ ColorBits are ignored. Will cause corruption
   DepthBits = pfd.cDepthBits;
 }
 
