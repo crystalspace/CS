@@ -41,7 +41,10 @@ rule LinkStaticPlugins
   for i in $(deplibs) {
     libs += $(i) $($(i)_depends) ;
   }
-  libs = [ RemoveDups $(libs) ] ;
+  # We must eliminate the duplicates in reverse order in order to ensure that
+  # we do not destroy the overall library ordering since Unix linkers are
+  # order-sensitive.
+  libs = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
   libs = lib$(libs)$(SUFLIB) ;     
   Depends $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;

@@ -34,6 +34,11 @@ chronological order.
 	- Eric Sunshine eliminated compilation complaint from unix/instpath.cpp
 	  about CS_CONFIGDIR and CS_PLUGINDIR being undefined when building
 	  with GNU make.
+	- res fixed a problem with the link library order when doing static
+	  builds: the LinkStaticPlugins Jam rule didn't respect that the last 
+	  occurance of a lib has to remain when filtering out duplicates from
+	  the list of libs later passed to the linker; instead, it preserved 
+	  the first.
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that
