@@ -70,7 +70,7 @@ public:
 #define COMPARE_TYPE(startval,stopval)			\
   const csIdType *c;					\
   for (c = startval; c && c != stopval; c = c->Base) {}	\
-  return (c != NULL);
+  return (c != NULL)
 
   /// Compares whether one object's type is derived from the other.
   bool operator < (const csIdType& id) const

@@ -18,6 +18,11 @@ Short-term cleanups that need to be done:
 	  makes the terrain appear better now.
 	- Fixed the line renderer so that it correctly draws sprites too
 	  (i.e. implemented the missing DrawTriangleMesh).
+	- Fixed a bug in fakertti.h which could cause compile errors on
+	  some compilers (very rare). The problem was that a ';' was used
+	  in a define (at the end) but the define was used with another
+	  ';' at the end again. Giving two ';'. Apparently some compilers
+	  don't correctly parse the null statement.
 14-Mar-2000
 	- Michael Dale Long did a major rewrite of the iEntityManager
 	  interface.  Replaced Entity and Render lists with "associative
