@@ -56,8 +56,7 @@ struct FogBuffer
 };
 
 ///
-class csGraphics3DSoftware : public iGraphics3D, public iHaloRasterizer,
-  public iConfig
+class csGraphics3DSoftware : public iGraphics3D
 {
 private:
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
@@ -379,19 +378,6 @@ public:
   virtual G3D_COLORMAPFORMAT GetColormapFormat()
   { return G3DCOLORFORMAT_ANY; }
 
-  ////// iHaloRasterizer Methods ////
-
-  /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
-  virtual csHaloHandle CreateHalo (float r, float g, float b);
-  /// Destroy the halo.
-  virtual void DestroyHalo (csHaloHandle haloInfo);
-
-  /// Draw the halo given a center point and an intensity.
-  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
-
-  /// Test to see if a halo would be visible (but don't attempt to draw it)
-  virtual bool TestHalo (csVector3* pCenter);
-
   /// Use to printf through system driver
   void SysPrintf (int mode, char* str, ...);
 
@@ -446,11 +432,38 @@ public:
     void drawline_innerrim(int x1, int x2, int y);
   };
 
+  ///------------ iHaloRasterizer interface implementation ------------------
+  scfInterface csSoftHalo : public iHaloRasterizer
+  {
+    DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
+    virtual csHaloHandle CreateHalo (float r, float g, float b);
+    virtual void DestroyHalo (csHaloHandle haloInfo);
+    virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
+    virtual bool TestHalo (csVector3* pCenter);
+  } scfiHaloRasterizer;
+  friend scfInterface csSoftHalo;
+
+  /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
+  virtual csHaloHandle CreateHalo (float r, float g, float b);
+  /// Destroy the halo.
+  virtual void DestroyHalo (csHaloHandle haloInfo);
+
+  /// Draw the halo given a center point and an intensity.
+  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
+
+  /// Test to see if a halo would be visible (but don't attempt to draw it)
+  virtual bool TestHalo (csVector3* pCenter);
+
   ///------------------- iConfig interface implementation -------------------
-  virtual int GetOptionCount ();
-  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-  virtual bool SetOption (int id, csVariant* value);
-  virtual bool GetOption (int id, csVariant* value);
+  scfInterface csSoftConfig : public iConfig
+  {
+    DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
+    virtual int GetOptionCount ();
+    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+    virtual bool SetOption (int id, csVariant* value);
+    virtual bool GetOption (int id, csVariant* value);
+  } scfiConfig;
+  friend scfInterface csSoftConfig;
 };
 
 #endif // __SOFT_G3D_H__

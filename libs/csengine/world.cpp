@@ -182,7 +182,7 @@ CSOBJTYPE_IMPL(csWorld,csObject);
 IMPLEMENT_IBASE (csWorld)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iWorld)
-  IMPLEMENTS_INTERFACE (iConfig)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY (csWorld)
@@ -190,6 +190,7 @@ IMPLEMENT_FACTORY (csWorld)
 csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
 {
   CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   do_lighting_cache = true;
   first_dyn_lights = NULL;
   start_sector = NULL;

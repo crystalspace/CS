@@ -139,7 +139,7 @@ public:
  * The world! This class basicly represents the 3D engine.
  * It is the main anchor class for working with Crystal Space.
  */
-class csWorld : public iWorld, public iConfig, public csObject
+class csWorld : public iWorld, public csObject
 {
   friend class Dumper;
 
@@ -566,14 +566,14 @@ public:
 
   //--------------------- iConfig interface implementation --------------------
 
-  ///
-  virtual int GetOptionCount ();
-  ///
-  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-  ///
-  virtual bool SetOption (int id, csVariant* value);
-  ///
-  virtual bool GetOption (int id, csVariant* value);
+  scfInterface csWorldConfig : public iConfig
+  {
+    DECLARE_EMBEDDED_IBASE (csWorld);
+    virtual int GetOptionCount ();
+    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+    virtual bool SetOption (int id, csVariant* value);
+    virtual bool GetOption (int id, csVariant* value);
+  } scfiConfig;
 };
 
 #endif // __CS_WORLD_H__

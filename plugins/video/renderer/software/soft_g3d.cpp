@@ -119,8 +119,8 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics3DSoftware)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
-  IMPLEMENTS_INTERFACE (iHaloRasterizer)
-  IMPLEMENTS_INTERFACE (iConfig)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iHaloRasterizer)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
 #if defined (OS_LINUX)
@@ -147,6 +147,8 @@ char* get_software_2d_driver ()
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE (scfiHaloRasterizer);
+  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 
   config = new csIniFile ("soft3d.cfg");
 
@@ -2631,6 +2633,19 @@ void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
 
 // iHaloRasterizer Implementation //
 
+IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftHalo)
+  IMPLEMENTS_INTERFACE (iHaloRasterizer)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csHaloHandle csGraphics3DSoftware::csSoftHalo::CreateHalo (float r, float g, float b)
+  { return scfParent->CreateHalo (r, g, b); }
+void csGraphics3DSoftware::csSoftHalo::DestroyHalo (csHaloHandle haloInfo)
+  { scfParent->DestroyHalo (haloInfo); }
+void csGraphics3DSoftware::csSoftHalo::DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
+  { scfParent->DrawHalo (pCenter, fIntensity, haloInfo); }
+bool csGraphics3DSoftware::csSoftHalo::TestHalo (csVector3* pCenter)
+  { return scfParent->TestHalo (pCenter); }
+
 // NOTE!!! This only works in 16-bit mode!!!
 void csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
 {
@@ -3141,6 +3156,10 @@ void csGraphics3DSoftware::csHaloDrawer::drawline_innerrim(int x1, int x2, int y
 
 //---------------------------------------------------------------------------
 
+IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
+  IMPLEMENTS_INTERFACE (iConfig)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 #define NUM_OPTIONS 15
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
@@ -3162,68 +3181,69 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 14, "lmonly", "Lightmap only", CSVAR_BOOL },
 };
 
-int csGraphics3DSoftware::GetOptionCount ()
+int csGraphics3DSoftware::csSoftConfig::GetOptionCount ()
 {
   return NUM_OPTIONS;
 }
 
-bool csGraphics3DSoftware::SetOption (int id, csVariant* value)
+bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
 {
   if (value->type != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: do_interlaced = value->v.b ? 0 : -1; break;
-    case 1: do_lighting = value->v.b; break;
-    case 2: do_transp = value->v.b; break;
-    case 3: do_textured = value->v.b; break;
-    case 4: do_texel_filt = value->v.b; break;
-    case 5: do_bilin_filt = value->v.b; break;
+    case 0: scfParent->do_interlaced = value->v.b ? 0 : -1; break;
+    case 1: scfParent->do_lighting = value->v.b; break;
+    case 2: scfParent->do_transp = value->v.b; break;
+    case 3: scfParent->do_textured = value->v.b; break;
+    case 4: scfParent->do_texel_filt = value->v.b; break;
+    case 5: scfParent->do_bilin_filt = value->v.b; break;
 #ifdef DO_MMX
-    case 6: do_mmx = value->v.b; break;
+    case 6: scfParent->do_mmx = value->v.b; break;
 #endif
-    case 7: txtmgr->Gamma = value->v.f; break;
-    case 8: zdist_mipmap1 = value->v.f; break;
-    case 9: zdist_mipmap2 = value->v.f; break;
-    case 10: zdist_mipmap3 = value->v.f; break;
-    case 11: rstate_gouraud = value->v.b; break;
-    case 12: do_smaller_rendering = value->v.b; break;
-    case 13: txtmgr->do_lightmapgrid = value->v.b; break;
-    case 14: txtmgr->do_lightmaponly = value->v.b; break;
+    case 7: scfParent->txtmgr->Gamma = value->v.f; break;
+    case 8: scfParent->zdist_mipmap1 = value->v.f; break;
+    case 9: scfParent->zdist_mipmap2 = value->v.f; break;
+    case 10: scfParent->zdist_mipmap3 = value->v.f; break;
+    case 11: scfParent->rstate_gouraud = value->v.b; break;
+    case 12: scfParent->do_smaller_rendering = value->v.b; break;
+    case 13: scfParent->txtmgr->do_lightmapgrid = value->v.b; break;
+    case 14: scfParent->txtmgr->do_lightmaponly = value->v.b; break;
     default: return false;
   }
-  ScanSetup ();
+  scfParent->ScanSetup ();
   return true;
 }
 
-bool csGraphics3DSoftware::GetOption (int id, csVariant* value)
+bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.b = do_interlaced != -1; break;
-    case 1: value->v.b = do_lighting; break;
-    case 2: value->v.b = do_transp; break;
-    case 3: value->v.b = do_textured; break;
-    case 4: value->v.b = do_texel_filt; break;
-    case 5: value->v.b = do_bilin_filt; break;
+    case 0: value->v.b = scfParent->do_interlaced != -1; break;
+    case 1: value->v.b = scfParent->do_lighting; break;
+    case 2: value->v.b = scfParent->do_transp; break;
+    case 3: value->v.b = scfParent->do_textured; break;
+    case 4: value->v.b = scfParent->do_texel_filt; break;
+    case 5: value->v.b = scfParent->do_bilin_filt; break;
 #ifdef DO_MMX
-    case 6: value->v.b = do_mmx; break;
+    case 6: value->v.b = scfParent->do_mmx; break;
 #endif
-    case 7: value->v.f = txtmgr->Gamma; break;
-    case 8: value->v.f = zdist_mipmap1; break;
-    case 9: value->v.f = zdist_mipmap2; break;
-    case 10: value->v.f = zdist_mipmap3; break;
-    case 11: value->v.b = rstate_gouraud; break;
-    case 12: value->v.b = do_smaller_rendering; break;
-    case 13: value->v.b = txtmgr->do_lightmapgrid; break;
-    case 14: value->v.b = txtmgr->do_lightmaponly; break;
+    case 7: value->v.f = scfParent->txtmgr->Gamma; break;
+    case 8: value->v.f = scfParent->zdist_mipmap1; break;
+    case 9: value->v.f = scfParent->zdist_mipmap2; break;
+    case 10: value->v.f = scfParent->zdist_mipmap3; break;
+    case 11: value->v.b = scfParent->rstate_gouraud; break;
+    case 12: value->v.b = scfParent->do_smaller_rendering; break;
+    case 13: value->v.b = scfParent->txtmgr->do_lightmapgrid; break;
+    case 14: value->v.b = scfParent->txtmgr->do_lightmaponly; break;
     default: return false;
   }
   return true;
 }
 
-bool csGraphics3DSoftware::GetOptionDescription (int idx, csOptionDescription* option)
+bool csGraphics3DSoftware::csSoftConfig::GetOptionDescription (
+  int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)
     return false;

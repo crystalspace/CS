@@ -22,6 +22,10 @@
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 
+IMPLEMENT_EMBEDDED_IBASE (csWorld::csWorldConfig)
+  IMPLEMENTS_INTERFACE (iConfig)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 #define NUM_OPTIONS 8
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
@@ -36,12 +40,12 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 7, "cache", "Enabling caching of generated lightmaps", CSVAR_BOOL },
 };
 
-int csWorld::GetOptionCount ()
+int csWorld::csWorldConfig::GetOptionCount ()
 {
   return NUM_OPTIONS;
 }
   
-bool csWorld::SetOption (int id, csVariant* value)
+bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
@@ -58,7 +62,7 @@ bool csWorld::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csWorld::GetOption (int id, csVariant* value)
+bool csWorld::csWorldConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -76,7 +80,8 @@ bool csWorld::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csWorld::GetOptionDescription (int idx, csOptionDescription* option)
+bool csWorld::csWorldConfig::GetOptionDescription (
+  int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS) return false;
   *option = config_options[idx];
