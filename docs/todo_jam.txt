@@ -23,7 +23,7 @@ W - Wishlist (the build also works without this feature)
     necessary for modules such as cssocket and ensocket which require
     wsock32.lib, for instance.  There are a number of other such modules.  The
     current monlithic solution of placing this information in
-    CS/mk/msvcgen/Jamconfig is ugly, error-prone, and a maintenance headache.
+    CS/mk/msvcgen/msvcgen.jam is ugly, error-prone, and a maintenance headache.
 [H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.jam. The
     information in this file should be provided by rule invocations in the
     various module Jamfiles. (This is directly related to the above item.)
