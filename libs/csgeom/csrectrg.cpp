@@ -88,68 +88,68 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
     // The include function pre-checks for this case and exits, so it is 
     // properly handled.
 
-    pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin-1, r1.ymax));   //left
-    pushRect(csRect(r2.xmax+1, r1.ymin,   r1.xmax,   r1.ymax));   //right
-    pushRect(csRect(r2.xmin,   r1.ymin,   r2.xmax,   r2.ymin-1)); //top
-    pushRect(csRect(r2.xmin,   r2.ymax+1, r2.xmax,   r1.ymax));   //bottom
+    pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin, r1.ymax));   //left
+    pushRect(csRect(r2.xmax, r1.ymin,   r1.xmax,   r1.ymax));   //right
+    pushRect(csRect(r2.xmin,   r1.ymin,   r2.xmax,   r2.ymin)); //top
+    pushRect(csRect(r2.xmin,   r2.ymax, r2.xmax,   r1.ymax));   //bottom
            
     return;
 
   case 1:
     // Three rects (top, right, bottom) [rect on left side, middle]
     
-    pushRect(csRect(r1.xmin,   r1.ymin,   r1.xmax,   r2.ymin-1)); //top
-    pushRect(csRect(r2.xmax+1, r2.ymin,   r1.xmax,   r2.ymax));   //right
-    pushRect(csRect(r1.xmin,   r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin,   r1.ymin,   r1.xmax,   r2.ymin)); //top
+    pushRect(csRect(r2.xmax, r2.ymin,   r1.xmax,   r2.ymax));   //right
+    pushRect(csRect(r1.xmin,   r2.ymax, r1.xmax,   r1.ymax));   //bot
   
     return;
 
   case 2:
     // Three rects (bot, left, right)   [rect on top side, middle]
     
-    pushRect(csRect(r1.xmin,   r2.ymax+1, r1.xmax,   r1.ymax));   //bot
-    pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin-1, r2.ymax));   //left
-    pushRect(csRect(r2.xmax+1, r1.ymin,   r1.xmax,   r2.ymax));   //right
+    pushRect(csRect(r1.xmin,   r2.ymax, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin, r2.ymax));   //left
+    pushRect(csRect(r2.xmax, r1.ymin,   r1.xmax,   r2.ymax));   //right
         
     return;
   
   case 3:
     // Two rects (right, bottom)        [rect on top left corner]
     
-    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax,   r2.ymax)); //right
-    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax)); //bot
+    pushRect(csRect(r2.xmax, r1.ymin, r1.xmax,   r2.ymax)); //right
+    pushRect(csRect(r1.xmin, r2.ymax, r1.xmax,   r1.ymax)); //bot
   
     return;
   
   case 4:
     // Three rects (top, left, bottom)  [rect on right side, middle]
     
-    pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin-1)); //top
-    pushRect(csRect(r1.xmin, r2.ymin,   r2.xmin-1, r2.ymax));   //left
-    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin)); //top
+    pushRect(csRect(r1.xmin, r2.ymin,   r2.xmin, r2.ymax));   //left
+    pushRect(csRect(r1.xmin, r2.ymax, r1.xmax,   r1.ymax));   //bot
   
     return;
 
   case 5:
     // Two rects (top, bottom)          [rect in middle, horizontally touches left and right sides]
     
-    pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin-1)); //top
-    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin)); //top
+    pushRect(csRect(r1.xmin, r2.ymax, r1.xmax,   r1.ymax));   //bot
   
     return;
 
   case 6:
     // Two rects (left, bottom)         [rect on top, right corner]
     
-    pushRect(csRect(r1.xmin, r1.ymin,   r2.xmin-1, r1.ymax));   //left
-    pushRect(csRect(r2.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin, r1.ymin,   r2.xmin, r1.ymax));   //left
+    pushRect(csRect(r2.xmin, r2.ymax, r1.xmax,   r1.ymax));   //bot
        
     return;
 
   case 7:
     // One rect (bottom)                [rect covers entire top]
     
-    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin, r2.ymax, r1.xmax,   r1.ymax));   //bot
        
     return;
 
@@ -157,54 +157,54 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
   case 8:
     // Three rects (top, left, right)   [rect on bottom side, middle]
     
-    pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax,   r2.ymin-1)); //top
-    pushRect(csRect(r1.xmin,   r2.ymin, r2.xmin-1, r1.ymax));   //left
-    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax,   r1.ymax));   //right
+    pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax,   r2.ymin)); //top
+    pushRect(csRect(r1.xmin,   r2.ymin, r2.xmin, r1.ymax));   //left
+    pushRect(csRect(r2.xmax, r2.ymin, r1.xmax,   r1.ymax));   //right
         
     return;
 
   case 9:
     // Two rects (right, top)           [rect on bottom, left corner]
     
-    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax, r1.ymax));   //right
-    pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax, r2.ymin-1)); //top
+    pushRect(csRect(r2.xmax, r2.ymin, r1.xmax, r1.ymax));   //right
+    pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax, r2.ymin)); //top
        
     return;
 
   case 10:
     // Two rects (left, right)          [rect in middle, vertically touches top and bottom sides]
     
-    pushRect(csRect(r1.xmin,   r1.ymin, r2.xmin-1, r1.ymax)); //left
-    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax,   r1.ymax)); //right
+    pushRect(csRect(r1.xmin,   r1.ymin, r2.xmin, r1.ymax)); //left
+    pushRect(csRect(r2.xmax, r1.ymin, r1.xmax,   r1.ymax)); //right
   
     return;
 
   case 11:
     // One rect (right)                 [rect on left, vertically touches top and bottom sides]
     
-    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax,   r1.ymax)); //right
+    pushRect(csRect(r2.xmax, r1.ymin, r1.xmax,   r1.ymax)); //right
   
     return;
 
   case 12:
     // Two rects (left, top)            [rect on bottom, right corner]
     
-    pushRect(csRect(r1.xmin, r1.ymin, r2.xmin-1, r1.ymax));   //left
-    pushRect(csRect(r2.xmin, r1.ymin, r1.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r1.xmin, r1.ymin, r2.xmin, r1.ymax));   //left
+    pushRect(csRect(r2.xmin, r1.ymin, r1.xmax,   r2.ymin)); //top
   
     return;
 
   case 13:
     // One rect (top)                   [rect on bottom, horizontally touches left and right sides]
     
-    pushRect(csRect(r1.xmin, r1.ymin, r1.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r1.xmin, r1.ymin, r1.xmax,   r2.ymin)); //top
   
     return;
 
   case 14:
     // One rect (left)                   [rect on right, vertically touches top and bottom ]
     
-    pushRect(csRect(r1.xmin, r1.ymin, r2.xmin-1, r1.ymax)); //bottom
+    pushRect(csRect(r1.xmin, r1.ymin, r2.xmin, r1.ymax)); //bottom
   
     return;
 
