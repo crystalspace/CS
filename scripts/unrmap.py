@@ -45,12 +45,12 @@ class Brush(Actor):
     	def MakeGeom(self, vecs, room, tm):
 		if not self.attrib.has_key('CsgOper'):
 			poly=room.NewPolygon(tm)
-		elif self.attrib['CsgOper']=='CSG_Add':
+#		elif self.attrib['CsgOper']=='CSG_Add':
 #			thing=csThing()
 #			poly=thing.NewPolygon(tm)
 #			vecs.Load(poly)
 #			room.AddThing(thing)
-			return
+#			return
 		else:
 			print "WARNING: Unknown "+self.attrib['CsgOper']
 			return
@@ -90,7 +90,7 @@ class Map(Actor):
 	def Load(self):
 		system=GetSystem()
 		room=csSector(roomptr)
-		view=csView(viewptr)
+#		view=csView(viewptr)
 		tm=csTextureHandle(tmptr)
 		for x in self.stack:
 			if isinstance(x, Brush):
