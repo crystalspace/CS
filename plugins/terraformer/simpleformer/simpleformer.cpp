@@ -63,7 +63,7 @@ float BiLinearData (float* data, int width, int height, float x, float z)
 }
 
 // Bicubic weight function
-float WeightFunction (float x)
+static float WeightFunction (float x)
 {
   float a = (x+2)<0?0:(x+2);
   float b = (x+1)<0?0:(x+1);
@@ -95,21 +95,31 @@ float BiCubicData (float* data, int width, int height, float x, float z)
   }
 #endif
 
+  int ix = (int) floor (x) - 1;
+  int iy = (int) floor (z) - 1;
+
   // Grab 16 surrounding heights and blend them
-  for (int i=0; i<4; ++i)
+  for (int j=0; j<4; ++j)
   {
-    for (int j=0; j<4; ++j)
+    // Calculate integer position
+    int intZ = iy + j;
+    // Clamp coordinates to heightmap size
+    if (intZ < 0) intZ = 0;
+    else if (intZ > height-1) intZ = height-1;
+
+    // Multiply with width.
+    intZ *= width;
+
+    for (int i=0; i<4; ++i)
     {
       // Calculate integer position
-      int intX = (int) floor (x) - 1 + i;
-      int intZ = (int) floor (z) - 1 + j;
-
+      int intX = ix + i;
       // Clamp coordinates to heightmap size
-      intX = MAX (MIN (intX, width-1), 0);
-      intZ = MAX (MIN (intZ, height-1), 0);
+      if (intX < 0) intX = 0;
+      else if (intX > width-1) intX = width-1;
 
       // Grab the height
-      float height = data[intX+intZ*width];
+      float height = data[intX+intZ];
 
       // Weight the height using a cubic weight function
       height *= WeightFunction (i-1.0f-deltaX) * 
