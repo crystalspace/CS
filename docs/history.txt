@@ -17,6 +17,9 @@ chronological order.
 	  match all meshes in the current sector.
 	- Jorrit fixed a bug in HitBeamObject/HitBeamOutline of bruteblock
 	  plugin. Now it appears to work correctly.
+	- Luca fixed a problem VisualC++6 users have with inner classes,
+	  which by default cannot access to any non-public member 
+	  of the containing class.
 26-Jun-2004
 	- Jorrit added a new bugplug command to switch visibility culler of
 	  the current sector. ctrl-shift-1 is assigned to switch to frustvis
