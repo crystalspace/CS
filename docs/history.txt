@@ -1,5 +1,31 @@
 The history order has been reversed so that new features are at the top.
 
+20-Jun-2000
+	- Eric Sunshine made the following changes to the Blocks game:
+	    - Fixed a nasty memory corruption bug.  HandleLoweringPlanes() was
+	      writing one past the end of the States::filled_planes[] array
+	      and clobbering the States::encodedData variable which followed
+	      it.  This bug occurred at all times, but only manifested itself
+	      when the network plug-in was available since encodedData is only
+	      used by the networking code.
+	    - Fixed a really bone-headed error where States::Init_game_cube()
+	      was accessing 'zone_dim' before it had been initialized, thus it
+	      failed to initialize the playing field in a meaninful manner.
+	      This resulted in all sorts of bizarre problems on platforms where
+	      'game_cube' isn't filled with NULL by default (and by accident).
+	    - Fixed some memory leaks.
+	    - Cleaned up the source and header files and removed a bunch of
+	      dead code.
+	    - Updated comments for Doc++ compatibility.
+	    - Fixed the makefile's 'clean' target.
+	- Eric Sunshine made the following changes to csBitSet:
+	    - Constructor no longer attempts to allocate zero bytes from heap.
+	    - Bits are now 'false' by default in new bitsets as a convenience.
+	      Same applies to bits added when a bitset is grown with Resize().
+	    - Resize() no longer tries to allocate zero bytes.
+	    - Resize() no longer calls realloc() with a null pointer since
+	      doing so crashes on some systems though it works on others.
+	    - Resize() now frees byte array if resized down to zero.
 19-Jun-2000
 	- Martin Geisse fixed a number of compiler warnings all over
 	  the place.

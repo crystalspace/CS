@@ -16,16 +16,16 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BLOCKS_H
-#define BLOCKS_H
+#ifndef __BLOCKS_H__
+#define __BLOCKS_H__
 
 #include <stdarg.h>
+#include "blocdefs.h"
+#include "states.h"
 #include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "apps/blocks/blocdefs.h"
-#include "apps/blocks/states.h"
-
+#include "csgeom/matrix3.h"
 
 class csThingTemplate;
 class csTextureHandle;
@@ -33,6 +33,7 @@ class csSector;
 class csWorld;
 class csThing;
 class csDynLight;
+struct iTextureManager;
 
 class KeyMapping
 {
@@ -124,7 +125,8 @@ public:
   char* GetSelectedEntry ();
   int GetNumEntries () { return num_entries; }
   void SetSelected (int sel) { selected = sel; }
-  void SelDown () { selected++; if (selected >= num_entries) selected = num_entries-1; }
+  void SelDown ()
+  { selected++; if (selected >= num_entries) selected = num_entries - 1; }
   void SelUp () { selected--; if (selected < 0) selected = 0; }
 };
 
@@ -145,12 +147,6 @@ public:
   bool RegisterScore (const char* name, int score);
   bool CheckScore (int score);
 };
-
-//class Screen
-//{
-//public:
-//
-//};
 
 class Blocks : public SysSystemDriver
 {
@@ -331,7 +327,8 @@ public:
   const char* KeyName (const KeyMapping& map);
 
   void DrawMenu (int menu);
-  void DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int new_menu);
+  void DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
+    int new_menu);
   void InitMenu ();
   void AddMenuItem (int menu_nr, bool leftright);
   void ReplaceMenuItem (int idx, int menu_nr);
@@ -417,25 +414,19 @@ public:
   // Debugging.
   void dump_shape ();
 
-  // removesPlanesVisual(player1) will remove all of the planes in
-  //   player1->filled_planes.
-  // So use player1->checkForPlanes first.
+  // Remove all of the planes in the States::filled_planes[] array.
+  // Must call States::checkForPlanes first.
   void removePlanesVisual (States* player);
 
-  //------------- Networking stuff.
-
+  // Networking stuff.
   void CheckConnection();
   bool InitNet();
   void Connect ();
-
   void TerminateConnection();
-  
   int since_last_check;
   
-  //----------------
   // State Changes.
-  
   States* player1;
-  
 };
-#endif // BLOCKS_H
+
+#endif // __BLOCKS_H__
