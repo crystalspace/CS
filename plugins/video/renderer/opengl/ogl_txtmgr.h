@@ -75,14 +75,6 @@ protected:
   void ShowFormat ();
   void PrepareKeycolor ();
 
-  class texVector : public csVector
-  {
-  public:
-    csTextureOpenGL* operator [] (int idx) const
-    { return (csTextureOpenGL*)csVector::Get (idx);}
-    int Push (csTexture *t){ return csVector::Push ((void*)t);}
-  };
-
 public:
   /// Retains original size of image before any readjustment
   int orig_width, orig_height;
@@ -90,7 +82,7 @@ public:
   csGraphics3DOGLCommon *G3D;
   /// True if the texture has alphamap
   bool has_alpha;
-  texVector vTex;
+  csArray<csTextureOpenGL*> vTex;
   long size;
   /// true if texture has already been used as a render target
   bool was_render_target;

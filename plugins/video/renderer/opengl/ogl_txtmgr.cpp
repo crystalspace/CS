@@ -448,7 +448,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
   size = 0;
   //  printf ("push 0\n");
   csTexture* ntex = NewTexture (image, false);
-  vTex.Push (ntex);
+  vTex.Push ((csTextureOpenGL*)ntex);
   DG_LINK (this, ntex);
 
   //  printf ("transform 0\n");
@@ -488,7 +488,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       }
       //  printf ("push %d\n", nTex);
       csTexture* ntex = NewTexture (mipmapImage, true);
-      vTex.Push (ntex);
+      vTex.Push ((csTextureOpenGL*)ntex);
       DG_LINK (this, ntex);
       //  printf ("transform %d\n", nTex);
       transform (mipmapImage, vTex[nTex]);

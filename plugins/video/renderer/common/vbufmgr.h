@@ -19,7 +19,6 @@
 #ifndef __CS_VBUFMGR_H__
 #define __CS_VBUFMGR_H__
 
-#include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "ivideo/vbufmgr.h"
 #include "csgeom/box.h"
@@ -150,7 +149,7 @@ protected:
   iObjectRegistry *object_reg;
 
   /// list of registered clients
-  csVector vClients;
+  csArray<iVertexBufferManagerClient*> vClients;
 
 public:
   /// Initialize the vertex buffer manager

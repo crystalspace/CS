@@ -81,7 +81,7 @@ csVertexBufferManager::~csVertexBufferManager()
   /// go through list of registered client and tell 'em we are no longer
   /// available
   for (int i=0; i < vClients.Length (); i++)
-    ((iVertexBufferManagerClient*)vClients.Get (i))->ManagerClosing ();
+    vClients[i]->ManagerClosing ();
 }
 
 void csVertexBufferManager::RemoveVBuf (iVertexBuffer* buf)
@@ -139,12 +139,10 @@ void csVertexBufferManager::UnlockBuffer (iVertexBuffer* buf)
 
 void csVertexBufferManager::AddClient (iVertexBufferManagerClient *client)
 {
-  vClients.Push ((void*)client);
+  vClients.Push (client);
 }
 
 void csVertexBufferManager::RemoveClient (iVertexBufferManagerClient *client)
 {
-  int idx = vClients.Find ((void*)client);
-  if (idx != -1)
-    vClients.Delete (idx);
+  vClients.Delete (client);
 }

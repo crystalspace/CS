@@ -5,6 +5,12 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's apears before the previous day's entry.  The individual changes
 for each given day, however, are in normal (ascending) chronological order.
 
+31-Jul-2003
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'vTex' in OpenGL texture manager with
+	      csArray<csTextureOpenGL*>.
+	    - Replaced 'vClients' in csVertexBufferManager with
+	      csArray<iVertexBufferManagerClient*>.
 30-Jul-2003
 	- Anders Stenberg brought the variable system for the new renderer
 	  back up and running, now using Oktal's symbol table which should
