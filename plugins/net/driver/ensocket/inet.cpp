@@ -110,7 +110,7 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
   if (socket_type == SOCK_DGRAM)
   {
     socketfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-    if (socketfd != socket_error) 
+    if (socketfd != (SOCKET)socket_error) 
     {
 	proto_type = SOCK_DGRAM;
     }
@@ -122,7 +122,7 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
   if (socket_type == SOCK_STREAM) 
   {
     socketfd = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if (socketfd != socket_error) 
+    if (socketfd != (SOCKET)socket_error) 
     {
         proto_type = SOCK_STREAM;
     } 
