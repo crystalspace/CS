@@ -74,11 +74,11 @@ PLUGINS += csparser
 PLUGINS += csparser/services
 PLUGINS += cssaver
 PLUGINS += video/effects
+PLUGINS += sequence
+PLUGINS += engseq
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
-PLUGINS.DYNAMIC += sequence
-PLUGINS.DYNAMIC += engseq
 #PLUGINS.DYNAMIC += cscript/cspython
 #PLUGINS.DYNAMIC += cscript/cslua
 PLUGINS.DYNAMIC += video/renderer/line
