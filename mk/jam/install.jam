@@ -2,6 +2,10 @@
 # Rules for installation
 #============================================================================
 
+# override crappy jam defaults
+EXEMODE = 0755
+FILEMODE = 0644
+
 ##  InstallApplication applicationname [ : subdir ]
 ##    Install an application into the bindir directory. A subdirectory
 ##    relative to the bindir can be specified.
