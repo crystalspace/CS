@@ -73,7 +73,8 @@ void csSymbolTable::AddChild (csSymbolTable *child)
         dst->Vals.Push (Stack::Symbol (src->Vals[i]));
     else
       child->Hash.Put (src->Name,
-        (csHashObject) new Stack (src->Name, src->Vals));
+        (csHashObject) (dst = new Stack (src->Name, src->Vals)));
+    child->Propagate (dst);
   }
 }
 

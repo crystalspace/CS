@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSGFX_SYMTABLE_H__
-#define __CS_CSGFX_SYMTABLE_H__
+#ifndef __CS_CSUTIL_SYMTABLE_H__
+#define __CS_CSUTIL_SYMTABLE_H__
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
