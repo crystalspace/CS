@@ -42,71 +42,28 @@
 #include "csparser/sndbufo.h"
 #include "csparser/csloader.h"
 #include "csscript/csscript.h"
+#include "csgeom/math3d.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
 #include "isndrdr.h"
-
-#include "csgeom/math3d.h"
-
 #include "igraph3d.h"
 
 csKeyMap* mapping = NULL;
 
-Bot* first_bot = NULL;
-bool do_bots = false;
-
-#define DYN_TYPE_MISSILE 1
-#define DYN_TYPE_RANDOM 2
-#define DYN_TYPE_EXPLOSION 3
-
-struct LightStruct
-{
-  int type;
-};
-
-struct MissileStruct
-{
-  int type;		// type == DYN_TYPE_MISSILE
-  csOrthoTransform dir;
-  csSprite3D* sprite;
-  ISoundSource *snd;
-};
-
-struct ExplosionStruct
-{
-  int type;		// type == DYN_TYPE_EXPLOSION
-  float radius;
-  int dir;
-  ISoundSource *snd;
-};
-
-struct RandomLight
-{
-  int type;		// type == DYN_TYPE_RANDOM
-  float dyn_move_dir;
-  float dyn_move;
-  float dyn_r1, dyn_g1, dyn_b1;
-};
+//===========================================================================
+// Some utility functions used throughout this source.
+//===========================================================================
 
 void RandomColor (float& r, float& g, float& b)
 {
+  float sig = (float)(900+(rand () % 100))/1000.;
+  float sm1= (float)(rand () % 1000)/1000.;
+  float sm2 = (float)(rand () % 1000)/1000.;
   switch ((rand ()>>3) % 3)
   {
-    case 0:
-      r = (float)(900+(rand () % 100))/1000.;
-      g = (float)(rand () % 1000)/1000.;
-      b = (float)(rand () % 1000)/1000.;
-      break;
-    case 1:
-      r = (float)(rand () % 1000)/1000.;
-      g = (float)(900+(rand () % 100))/1000.;
-      b = (float)(rand () % 1000)/1000.;
-      break;
-    case 2:
-      r = (float)(rand () % 1000)/1000.;
-      g = (float)(rand () % 1000)/1000.;
-      b = (float)(900+(rand () % 100))/1000.;
-      break;
+    case 0: r = sig; g = sm1; b = sm2; break;
+    case 1: r = sm1; g = sig; b = sm2; break;
+    case 2: r = sm1; g = sm2; b = sig; break;
   }
 }
 
@@ -123,16 +80,16 @@ void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
   sprite->MoveToSector (where);
 }
 
-void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
+csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 const& pos, float size)
 {
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (name, true);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (tname, true);
   if (!tmpl)
   {
-    Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", name);
-    return;
+    Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", tname);
+    return NULL;
   }
   csSprite3D* spr = tmpl->NewSprite ();
-  csNameObject::AddName (*spr, name);
+  csNameObject::AddName (*spr, sname);
   Sys->view->GetWorld ()->sprites.Push (spr);
   spr->MoveToSector (where);
   spr->SetMove (pos);
@@ -143,48 +100,15 @@ void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
   spr->ObjAdd (sprdata);
 
   light_sprite (spr, where, pos);
+  return spr;
 }
 
-void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radius)
-{
-  csDynLight* dyn = NULL;
-  if (dyn_radius)
-  {
-    float r, g, b;
-    RandomColor (r, g, b);
-    //@@@ MEMORY LEAK?
-    CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, dyn_radius, r, g, b));
-    Sys->view->GetWorld ()->AddDynLight (dyn);
-    dyn->SetSector (where);
-    dyn->Setup ();
-  }
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot", true);
-  if (!tmpl) return;
-  Bot* bot;
-  CHK (bot = new Bot (tmpl));
-  csNameObject::AddName (*bot, "bot");
-  Sys->view->GetWorld ()->sprites.Push (bot);
-  bot->MoveToSector (where);
-  csMatrix3 m; m.Identity (); m = m * size;
-  bot->SetTransform (m);
-  bot->set_bot_move (pos);
-  bot->set_bot_sector (where);
-  bot->SetAction ("default");
-  bot->InitSprite ();
-  bot->next = first_bot;
-  bot->light = dyn;
-  first_bot = bot;
-}
+//===========================================================================
+// Everything for skeletal tree demo.
+//===========================================================================
 
-void HandleSprite (csSprite3D* spr)
-{
-  int data = (int)csDataObject::GetData (*spr);
-  if (data)
-  {
-    move_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
-  }
-}
-
+// Recursive function to add limbs to a skeletal tree. This also builds
+// the sprite template.
 void add_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, int& vertex_idx,
 	int prev_par_idx, int maxdepth, int width, int recursion)
 {
@@ -205,8 +129,8 @@ void add_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, 
   frame->SetVertex (par_vertex_idx+1, .05, 0, -.05); frame->SetTexel (par_vertex_idx+1, .99, 0);
   frame->SetVertex (par_vertex_idx+2, 0, 0, .05); frame->SetTexel (par_vertex_idx+2, 0, .99);
   frame->SetVertex (par_vertex_idx+3, -.05, .45, -.05); frame->SetTexel (par_vertex_idx+3, .99, .99);
-  frame->SetVertex (par_vertex_idx+4, .05, .45, -.05); frame->SetTexel (par_vertex_idx+4, 0, 0);
-  frame->SetVertex (par_vertex_idx+5, 0, .45, .05); frame->SetTexel (par_vertex_idx+5, .99, 0);
+  frame->SetVertex (par_vertex_idx+4, .05, .45, -.05); frame->SetTexel (par_vertex_idx+4, .5, .5);
+  frame->SetVertex (par_vertex_idx+5, 0, .45, .05); frame->SetTexel (par_vertex_idx+5, .5, 0);
   if (recursion > 0)
   {
     // Create connection triangles with previous set
@@ -228,14 +152,25 @@ void add_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, 
   if (recursion >= maxdepth) return;
   csSkeletonConnection* con;
   int i;
-  for (i = 0 ; i < width ; i++)
+  int rwidth;
+  if (width < 0)
+    rwidth = 1 + ((rand () >> 3) % (-width));
+  else rwidth = width;
+
+  for (i = 0 ; i < rwidth ; i++)
   {
     CHK (con = new csSkeletonConnection ());
     parent->AddChild (con);
+    csMatrix3 tr = csMatrix3::GetYRotation (0) *
+    	csMatrix3::GetZRotation (.15) *
+	csMatrix3::GetXRotation (.15);
+    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    con->SetTransformation (trans);
     add_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
   }
 }
 
+// Create a skeletal tree.
 csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame, int& vertex_idx,
 	int maxdepth, int width)
 {
@@ -244,6 +179,8 @@ csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame, int& vertex
   return skel;
 }
 
+// Add a skeletal tree sprite. If needed it will also create
+// the template for this.
 void add_skeleton_sprite (csSector* where, csVector3 const& pos, int depth, int width)
 {
   char skelname[50];
@@ -264,16 +201,11 @@ void add_skeleton_sprite (csSector* where, csVector3 const& pos, int depth, int 
     tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
     tmpl->GenerateLOD ();
   }
-  csSprite3D* spr = tmpl->NewSprite ();
-  csNameObject::AddName (*spr, "__testSkel__");
-  Sys->view->GetWorld ()->sprites.Push (spr);
-  spr->MoveToSector (where);
-  spr->SetMove (pos - csVector3 (0, Sys->cfg_body_height, 0));
-  csMatrix3 m; m.Identity ();
-  spr->SetTransform (m);
-  light_sprite (spr, where, pos);
+  add_sprite (skelname, "__testSkel__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
 }
 
+// Object added to every skeletal tree node to keep the animation
+// information.
 class SkelSpriteInfo : public csObject
 {
 public:
@@ -290,6 +222,7 @@ public:
 
 CSOBJTYPE_IMPL (SkelSpriteInfo, csObject);
 
+// Animate a skeleton.
 void animate_skeleton (csSkeletonLimbState* limb)
 {
   csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
@@ -340,21 +273,81 @@ void animate_skeleton (csSkeletonLimbState* limb)
   }
 }
 
-void light_statics ()
+//===========================================================================
+// Everything for bots.
+//===========================================================================
+
+Bot* first_bot = NULL;
+bool do_bots = false;
+
+// Add a bot with some size at the specified positin.
+void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radius)
 {
-  csWorld *w = Sys->view->GetWorld ();
-  for (int i = 0 ; i < w->sprites.Length () ; i++)
+  csDynLight* dyn = NULL;
+  if (dyn_radius)
   {
-    csSprite3D *spr = (csSprite3D *)w->sprites [i];
-    csSkeletonState* sk_state = spr->GetSkeletonState ();
-    if (sk_state)
-    {
-      const char* name = csNameObject::GetName (*spr);
-      if (!strcmp (name, "__testSkel__")) animate_skeleton (sk_state);
-    }
-    light_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
+    float r, g, b;
+    RandomColor (r, g, b);
+    //@@@ MEMORY LEAK?
+    CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, dyn_radius, r, g, b));
+    Sys->view->GetWorld ()->AddDynLight (dyn);
+    dyn->SetSector (where);
+    dyn->Setup ();
   }
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot", true);
+  if (!tmpl) return;
+  Bot* bot;
+  CHK (bot = new Bot (tmpl));
+  csNameObject::AddName (*bot, "bot");
+  Sys->view->GetWorld ()->sprites.Push (bot);
+  bot->MoveToSector (where);
+  csMatrix3 m; m.Identity (); m = m * size;
+  bot->SetTransform (m);
+  bot->set_bot_move (pos);
+  bot->set_bot_sector (where);
+  bot->SetAction ("default");
+  bot->InitSprite ();
+  bot->next = first_bot;
+  bot->light = dyn;
+  first_bot = bot;
 }
+
+//===========================================================================
+// Everything for the missile.
+//===========================================================================
+
+#define DYN_TYPE_MISSILE 1
+#define DYN_TYPE_RANDOM 2
+#define DYN_TYPE_EXPLOSION 3
+
+struct LightStruct
+{
+  int type;
+};
+
+struct MissileStruct
+{
+  int type;		// type == DYN_TYPE_MISSILE
+  csOrthoTransform dir;
+  csSprite3D* sprite;
+  ISoundSource *snd;
+};
+
+struct ExplosionStruct
+{
+  int type;		// type == DYN_TYPE_EXPLOSION
+  float radius;
+  int dir;
+  ISoundSource *snd;
+};
+
+struct RandomLight
+{
+  int type;		// type == DYN_TYPE_RANDOM
+  float dyn_move_dir;
+  float dyn_move;
+  float dyn_r1, dyn_g1, dyn_b1;
+};
 
 void HandleDynLight (csDynLight* dyn)
 {
@@ -451,6 +444,10 @@ void HandleDynLight (csDynLight* dyn)
     }
   }
 }
+
+//===========================================================================
+// Everything for key mapping and binding.
+//===========================================================================
 
 void map_key (char* keyname, csKeyMap* map)
 {
@@ -630,6 +627,27 @@ void free_keymap ()
     CHK (delete prev);
   }
   mapping = NULL;
+}
+
+//===========================================================================
+
+// Light all sprites and animate the skeletal trees.
+// This function does no effort at all to optimize stuff. It does
+// not test if the sprite is visible or not.
+void light_statics ()
+{
+  csWorld *w = Sys->view->GetWorld ();
+  for (int i = 0 ; i < w->sprites.Length () ; i++)
+  {
+    csSprite3D *spr = (csSprite3D *)w->sprites [i];
+    csSkeletonState* sk_state = spr->GetSkeletonState ();
+    if (sk_state)
+    {
+      const char* name = csNameObject::GetName (*spr);
+      if (!strcmp (name, "__testSkel__")) animate_skeleton (sk_state);
+    }
+    light_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
+  }
 }
 
 float safe_atof (char* arg)
@@ -973,7 +991,7 @@ static bool CommandHandler (char *cmd, char *arg)
     float size;
     if (arg) ScanStr (arg, "%s,%f", name, &size);
     else { *name = 0; size = 1; }
-    add_sprite (name, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), size);
+    add_sprite (name, name, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), size);
   }
   else if (!strcasecmp (cmd, "addskel"))
   {

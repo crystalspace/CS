@@ -471,14 +471,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       if (dyn->GetObj(csDataObject::Type())) HandleDynLight (dyn);
       dyn = dn;
     }
-    int i;
-    for (i = 0 ; i < Sys->world->sprites.Length () ; i++)
-    {
-      extern void HandleSprite (csSprite3D*);
-      csSprite3D* spr = (csSprite3D*)Sys->world->sprites[i];
-      HandleSprite (spr);
-    }
-    // Apply lighting to all static sprites
+    // Apply lighting to all sprites
     light_statics ();
   }
 
