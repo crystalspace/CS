@@ -152,7 +152,6 @@ csStaticPVSTree::csStaticPVSTree ()
 {
   SCF_CONSTRUCT_IBASE (0);
   root = 0;
-  node_minbox_set = false;
 }
 
 csStaticPVSTree::~csStaticPVSTree ()
@@ -438,13 +437,6 @@ void csStaticPVSTree::UpdateBoundingBoxes ()
 void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
 {
   root_box = bbox;
-  // If the node_minbox is not set we calculated it here from
-  // the root box.
-  if (!node_minbox_set)
-  {
-    node_minbox = (root_box.Max () - root_box.Min ()) / 3.0;
-  }
-
   if (root)
     root->PropagateBBox (root_box);
 }

@@ -55,6 +55,13 @@ chronological order.
 	  as occluders during PVS calculation. By default this is equal to 2.
 	  Decreasing that value might improve quality of PVS but the
 	  calculation time will be longer.
+	- Jorrit renamed 'minarea' to 'minpolygonarea' in the PVS meta
+	  data parsing.
+	- Jorrit removed the minimal node size from pvsvis. That information
+	  is now parsed via metadata:
+    		<meta plugin="crystalspace.pvscalc">
+		  <minnodesize x="..." y="..." z="..." />
+		</meta>
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.

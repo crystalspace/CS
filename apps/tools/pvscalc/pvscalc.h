@@ -205,6 +205,10 @@ private:
   // Minimum polygon area before it is being considered for PVS calculation.
   float min_polygon_area;
 
+  // Minimal size for nodes in the kdtree.
+  csVector3 minsize;
+  bool minsize_specified;
+
   // Help variables used during calculation. They are here so that the internal
   // memory that they allocate on construction is reused.
   csPoly2D poly_intersect;
@@ -236,8 +240,7 @@ private:
   /// Build the kdtree.
   void BuildKDTree ();
   void BuildKDTree (void* node, const csArray<csBox3>& boxlist,
-	const csBox3& bbox, const csVector3& minsize,
-	bool minsize_only, int depth);
+	const csBox3& bbox, bool minsize_only, int depth);
 
   /**
    * Build the shadow KDTree from the KDTree in the culler.

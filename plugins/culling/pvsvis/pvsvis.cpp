@@ -241,13 +241,6 @@ const char* csPVSVis::ParseCullerParameters (iDocumentNode* node)
       pvstree.SetBoundingBox (b);
       box_was_given = true;
     }
-    else if (!strcmp ("minnode", value))
-    {
-      csVector3 b;
-      if (!syn->ParseVector (child, b))
-        return "Error parsing <minnode> for the PVS visibility culler!";
-      pvstree.SetMinimalNodeBox (b);
-    }
     else
     {
       return "Unrecognized parameter for the PVS visibility culler!";

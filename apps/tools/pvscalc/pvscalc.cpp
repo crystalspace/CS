@@ -136,6 +136,9 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
   // Minimum required polygon area.
   min_polygon_area = 2;
 
+  // Minimum size for kdtree nodes.
+  minsize_specified = false;
+
   init_token_table (xmltokens);
 }
 
@@ -342,8 +345,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
 }
 
 void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
-	const csBox3& bbox, const csVector3& minsize,
-	bool minsize_only, int depth)
+	const csBox3& bbox, bool minsize_only, int depth)
 {
   if (depth > maxdepth) maxdepth = depth;
 
@@ -399,7 +401,7 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
     {
       // All options are bad. Here we mark the traversal so that
       // we only continue to split for minsize.
-      BuildKDTree (node, boxlist, bbox, minsize, true, depth);
+      BuildKDTree (node, boxlist, bbox, true, depth);
       return;	// No good split location.
     }
   }
@@ -413,8 +415,8 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   DistributeBoxes (axis, where, boxlist, boxlist_left, boxlist_right);
   pvstree->SplitNode (node, axis, where, child1, child2);
   countnodes += 2;
-  BuildKDTree (child1, boxlist_left, box1, minsize, minsize_only, depth+1);
-  BuildKDTree (child2, boxlist_right, box2, minsize, minsize_only, depth+1);
+  BuildKDTree (child1, boxlist_left, box1, minsize_only, depth+1);
+  BuildKDTree (child2, boxlist_right, box2, minsize_only, depth+1);
 }
 
 void PVSCalcSector::BuildKDTree ()
@@ -423,10 +425,13 @@ void PVSCalcSector::BuildKDTree ()
   pvstree->Clear ();
   void* root = pvstree->CreateRootNode ();
   const csBox3& bbox = pvstree->GetBoundingBox ();
-  const csVector3& minsize = pvstree->GetMinimalNodeBox ();
+  if (!minsize_specified)
+  {
+    minsize = (bbox.Max () - bbox.Min ()) / 3.0f;
+  }
   countnodes = 1;
   maxdepth = 0;
-  BuildKDTree (root, boxes, bbox, minsize, false, 0);
+  BuildKDTree (root, boxes, bbox, false, 0);
   totalnodes = countnodes;
 }
 
@@ -1124,10 +1129,6 @@ void PVSCalcSector::Calculate ()
   parent->ReportInfo ("Calculating PVS for '%s'!",
   	sector->QueryObject ()->GetName ());
 
-  const csVector3& minsize = pvstree->GetMinimalNodeBox ();
-  parent->ReportInfo ("Minimal node size %g,%g,%g",
-  	minsize.x, minsize.y, minsize.z);
-
   const csBox3& bbox = pvstree->GetBoundingBox ();
   parent->ReportInfo ("Total box (from culler) %g,%g,%g  %g,%g,%g",
   	bbox.MinX (), bbox.MinY (), bbox.MinZ (),
@@ -1186,6 +1187,8 @@ void PVSCalcSector::Calculate ()
   for (i = 0 ; i < polygons.Length () ; i++)
     polygon_ptrs.Push (&polygons[i]);
   BuildShadowTreePolygons (shadow_tree, polygon_ptrs);
+  parent->ReportInfo ("KDTree: Minimal node size %g,%g,%g",
+  	minsize.x, minsize.y, minsize.z);
   parent->ReportInfo ("KDTree: max depth=%d, number of nodes=%d",
   	maxdepth, countnodes);
 
@@ -1225,8 +1228,13 @@ bool PVSCalcSector::FeedMetaInformation (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_MINAREA:
+      case XMLTOKEN_MINPOLYGONAREA:
         min_polygon_area = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_MINNODESIZE:
+	if (!synserv->ParseVector (child, minsize))
+	  return false;
+	minsize_specified = true;
         break;
       case XMLTOKEN_POLYGON:
         {

@@ -67,22 +67,6 @@ struct iStaticPVSTree : public iBase
   virtual void UpdateBoundingBoxes () = 0;
 
   /**
-   * Set the minimal size to use for a node in the PVS tree. This minimal
-   * size will be used to subdivide the node even if there are no more
-   * static objects there. This can be useful in case dynamic objects
-   * will still move there later.
-   * This is mostly used in situations where you want to setup a PVS culler at
-   * runtime. Normally this information is present in the XML parameters
-   * for the PVS culler.
-   */
-  virtual void SetMinimalNodeBox (const csVector3& size) = 0;
-
-  /**
-   * Get the minimal size to use for a node in the PVS tree.
-   */
-  virtual const csVector3& GetMinimalNodeBox () const = 0;
-
-  /**
    * Clear the PVS information. This must be called if you want
    * to recreate the PVS.
    */
