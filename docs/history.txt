@@ -38,6 +38,9 @@ chronological order.
 	- res fixed NR halos.
 	- res fixed msvcgen to properly handle template variable assignments
 	  with '='s (e.g. --set=%cflags%='/D foo=bar').
+	- Neil Mosafi changed the csvosa3dl plugin
+	    - Fixed some confusing log messages
+		- Plugin-wide relight system which should _almost_ work perfectly
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.
