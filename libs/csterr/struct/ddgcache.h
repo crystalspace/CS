@@ -349,7 +349,7 @@ public:
 	{
 		ddgAssert(ci);
 		ddgSNode	*n = get(ci);
-		short		b = n->bucket();
+		unsigned short	b = n->bucket();
 		if (n->next())
 			return n->next();
 		// Find next bucket with something in it.
