@@ -214,7 +214,7 @@ ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make msys       Prepare for building on $(DESCRIPTION.msys)$"
+  $(NEWLINE)echo $"  make msys         Prepare for building on $(DESCRIPTION.msys)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
