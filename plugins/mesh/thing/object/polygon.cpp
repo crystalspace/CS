@@ -1077,21 +1077,6 @@ void csPolygon3D::RefreshFromStaticData ()
   plane_wor = static_poly->GetObjectPlane ();
 }
 
-void csPolygon3D::WorldToCameraPlane (
-  const csReversibleTransform &t,
-  const csVector3 &vertex1,
-  csPlane3& plane_cam)
-{
-  t.Other2This (plane_wor, vertex1, plane_cam);
-}
-
-void csPolygon3D::ComputeCameraPlane (const csReversibleTransform& t,
-    csPlane3& pl)
-{
-  csVector3 cam_vert = t.Other2This (Vwor (0));
-  WorldToCameraPlane (t, cam_vert, pl);
-}
-
 void csPolygon3D::ObjectToWorld (
   const csReversibleTransform &t,
   const csVector3 &vwor)
@@ -1435,7 +1420,8 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
     for (j = 0; j < num_vertices; j++)
       poly[j] = Vwor (num_vertices - j - 1) - center;
   else
-    for (j = 0; j < num_vertices; j++) poly[j] = Vwor (j) - center;
+    for (j = 0; j < num_vertices; j++)
+      poly[j] = Vwor (j) - center;
 
   new_light_frustum = light_frustum->Intersect (poly, num_vertices);
 

@@ -611,23 +611,6 @@ public:
   csPlane3& GetWorldPlane () { return plane_wor; }
 
   /**
-   * Transform the plane of this polygon from world space to camera space using
-   * the given matrices. One vertex on the plane is also given so
-   * that we can more easily recompute the 'D' component of the plane.
-   * The given vertex should be in camera space.
-   */
-  void WorldToCameraPlane (
-  	const csReversibleTransform& t,
-	const csVector3& vertex1,
-	csPlane3& camera_plane);
-
-  /**
-   * Other version which computes the camera space vertex itself.
-   */
-  void ComputeCameraPlane (const csReversibleTransform& t,
-  	csPlane3& pl);
-
-  /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
    * a reference to the vertex in world-space is returned.

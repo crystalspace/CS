@@ -55,6 +55,7 @@ chronological order.
 	- Jorrit renamed 'static_data' to 'static_poly' in the thing mesh
 	  object. This way it is less confusing because csThing also uses
 	  'static_data' to refer to the static thing.
+	- Jorrit removed two unnused functions from thing mesh plugin.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.
