@@ -686,7 +686,7 @@ importer to recognize actions, fixed some bugs in mdl2spr, fixed some bugs in
 changes.
 
 @item
-Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})
+Jorrit Tyberghein (@email{jorrit.tyberghein@@gmail.com})
 
 Jorrit is the main author of Crystal Space.  He wrote the initial engine with
 the main current functionality.  He is still the main driving force of the

@@ -15,7 +15,7 @@ chapters or sections to their name.
 
 @itemize @bullet
 @item
-Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})
+Jorrit Tyberghein (@email{jorrit.tyberghein@@gmail.com})
 
 As the creator of Crystal Space, Jorrit wrote the original documentation
 included with the package.  Although some of that original work has since been

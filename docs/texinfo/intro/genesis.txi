@@ -34,7 +34,4 @@ of you.
 @end quotation
 
 @noindent
-Jorrit can be reached at the following email addresses:
-
-@email{Jorrit.Tyberghein@@uz.kuleuven.ac.be} or
-@email{Jorrit.Tyberghein@@pandora.be}
+Jorrit can be reached via email at @email{jorrit.tyberghein@@gmail.com}.
