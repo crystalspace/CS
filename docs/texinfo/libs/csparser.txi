@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node csParser, CSWS, VFS, Libraries
+@node csParser, CSWS, csGeom, Libraries
 @section World File Parser (@code{csParser})
 @cindex World File Parser
 @cindex csParser

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node VFS
+@node VFS, Graphics Drivers, Plug-In Overview, Plug-In Drivers
 @section Virtual File System (@sc{vfs})
 @cindex Virtual File System (@sc{vfs})
 @cindex @sc{vfs}, Virtual File System

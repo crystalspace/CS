@@ -1,4 +1,4 @@
-@node csUtil
+@node csUtil, SCF, csSys, Libraries
 @section Utility Library (@code{csUtil})
 @cindex csUtil
 @cindex Libraries,csUtil

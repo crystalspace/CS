@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Lib Overview, SCF, Libraries, Libraries
+@node Lib Overview, csSys, Libraries, Libraries
 @section Quick Overview
 @cindex Library List
 @cindex Library Overview

@@ -1,4 +1,4 @@
-@node csSys
+@node csSys, csUtil, Lib Overview, Libraries
 @section System Library (@code{csSys})
 @cindex csSys
 @cindex Libraries,csSys
@@ -38,7 +38,7 @@ It processes the command-line parameters and also allows plug-ins to react
 to the parameters.
 @end itemize
 
-@node csSys howto
+@node csSys howto, , csSys, csSys
 @subsection How to use the System Driver
 
 The system driver is explicitly designed to be a superclass for your own

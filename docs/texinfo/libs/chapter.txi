@@ -11,8 +11,8 @@ graph.  @xref{Dependencies}.
 
 @menu
 * Lib Overview:: Quick Overview
-* csSys:: System Library (@sc{cssys})
-* csUtil:: Utility Library (@sc{csutil})
+* csSys:: System Library (@code{csSys})
+* csUtil:: Utility Library (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
 * csGeom:: Geometry Library (@code{csGeom})
 * csParser:: World File Parser (@code{csParser})
