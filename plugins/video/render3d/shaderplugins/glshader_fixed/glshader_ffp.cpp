@@ -162,8 +162,8 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
         if(num < 0 || num > 3 )
           continue;
 
-        const char* str;
-        if (str = child->GetAttributeValue("source"))
+        const char* str = child->GetAttributeValue("source");
+        if (str)
         {
           int i = xmltokens.Request(str);
           if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
@@ -178,7 +178,8 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           }
         }
 
-        if (str = child->GetAttributeValue("modifier"))
+        str = child->GetAttributeValue("modifier");
+        if (str)
         {
           int m = xmltokens.Request(str);
           if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Aug-2003
+        - Philip Wyett eliminated warning suggesting adding parentheses
+          around truth value in csGLShaderFFP::LoadLayer (...);.
 25-Aug-2003
 	- Jorrit moved GlyphMetrics and BitmapMetrics out of iFont and
 	  added 'cs' in front of them. The reason is that SWIG seems to have
