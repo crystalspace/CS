@@ -335,11 +335,7 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       }
 
       d = csSquaredDist::PointPoint (center, pos);
-#ifdef CS_USE_NEW_RENDERER
       if (d >= light->QueryLight ()->GetInfluenceRadiusSq ()) continue;
-#else
-      if (d >= light->QueryLight ()->GetSquaredRadius ()) continue;
-#endif
       d = qsqrt (d);
       normal = uv2Normal[uv];
 
@@ -503,11 +499,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
       pos = uv2World[uv];
 
       d = csSquaredDist::PointPoint (center, pos);
-#ifdef CS_USE_NEW_RENDERER
       if (d >= l->GetInfluenceRadiusSq ()) continue;
-#else
-      if (d >= l->GetSquaredRadius ()) continue;
-#endif
       d = qsqrt (d);
 
       normal = uv2Normal[uv];

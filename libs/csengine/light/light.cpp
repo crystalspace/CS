@@ -80,8 +80,8 @@ csLight::csLight (
   attenuation = CS_ATTN_CLQ;
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
   //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
-  CalculateInfluenceRadius ();
 #endif
+  CalculateInfluenceRadius ();
 }
 
 csLight::~csLight ()
@@ -189,24 +189,6 @@ void csLight::SetSector (iSector* sector)
   lightnr++;
 }
 
-#ifndef CS_USE_NEW_RENDERER
-void csLight::SetRadius (float radius)
-{
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
-  {
-    iLightCallback* cb = light_cb_vector[i];
-    cb->OnRadiusChange (&scfiLight, radius);
-    i--;
-  }
-  influenceRadius = radius;
-  influenceRadiusSq = radius*radius;
-  inv_dist = 1 / radius;
-  lightnr++;
-
-}
-#endif
-
 void csLight::SetColor (const csColor& col) 
 {
   int i = light_cb_vector.Length ()-1;
@@ -233,10 +215,7 @@ void csLight::SetAttenuationVector(const csVector3& attenv)
 {
   attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
-
-#ifdef CS_USE_NEW_RENDERER
   influenceValid = false;
-#endif
 }
 
 const csVector3 &csLight::GetAttenuationVector()
@@ -244,7 +223,6 @@ const csVector3 &csLight::GetAttenuationVector()
   return attenuationvec;
 }
 
-#ifdef CS_USE_NEW_RENDERER
 float csLight::GetInfluenceRadius ()
 {
   if (!influenceValid)
@@ -261,20 +239,29 @@ float csLight::GetInfluenceRadiusSq ()
 
 void csLight::SetInfluenceRadius (float radius)
 {
-  if (radius > 0)
+  if (radius <= 0) return;
+  int i = light_cb_vector.Length ()-1;
+  while (i >= 0)
   {
-    influenceRadius = radius;
-    influenceRadiusSq = radius*radius;
-    inv_dist = 1.0 / influenceRadius;
-    influenceValid = true;
-    int oldatt = attenuation;
-    CalculateAttenuationVector (attenuation, radius, 1.0);
-    attenuation = oldatt;
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnRadiusChange (&scfiLight, radius);
+    i--;
   }
+  lightnr++;
+  influenceRadius = radius;
+  influenceRadiusSq = radius*radius;
+  inv_dist = 1.0 / influenceRadius;
+  influenceValid = true;
+#ifdef CS_USE_NEW_RENDERER
+  int oldatt = attenuation;
+  CalculateAttenuationVector (attenuation, radius, 1.0);
+  attenuation = oldatt;
+#endif
 }
 
 void csLight::CalculateInfluenceRadius ()
 {
+#ifdef CS_USE_NEW_RENDERER
   float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   float radius;
   if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
@@ -283,10 +270,9 @@ void csLight::CalculateInfluenceRadius ()
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
+#endif
   influenceValid = true;
 }
-
-#endif
 
 void csLight::CalculateAttenuationVector (int atttype, float radius,
   float brightness)
@@ -445,11 +431,7 @@ void csStatLight::CalculateLighting ()
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
-#ifdef CS_USE_NEW_RENDERER
   lview.SetRadius (GetInfluenceRadius ());
-#else
-  lview.SetRadius (GetRadius ());
-#endif
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
@@ -471,11 +453,7 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
-#ifdef CS_USE_NEW_RENDERER
   lview.SetRadius (GetInfluenceRadius ());
-#else
-  lview.SetRadius (GetRadius ());
-#endif
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
@@ -566,11 +544,7 @@ void csDynLight::Setup ()
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
-#ifdef CS_USE_NEW_RENDERER
   lview.SetRadius (GetInfluenceRadius ());
-#else
-  lview.SetRadius (GetRadius ());
-#endif
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);

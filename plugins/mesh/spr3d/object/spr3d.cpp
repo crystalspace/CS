@@ -2307,11 +2307,7 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
     light_color = lights [light_num]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
-#ifndef CS_USE_NEW_RENDERER
-    sq_light_radius = lights [light_num]->GetSquaredRadius ();
-#else
     sq_light_radius = lights [light_num]->GetInfluenceRadiusSq ();
-#endif
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [light_num]->GetCenter ();
@@ -2413,11 +2409,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
-#ifndef CS_USE_NEW_RENDERER
-    if (wor_sq_dist >= lights[i]->GetSquaredRadius ()) continue;
-#else
     if (wor_sq_dist >= lights[i]->GetInfluenceRadiusSq ()) continue;
-#endif
 
     csVector3 obj_light_pos;
     if (identity)
@@ -2497,11 +2489,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   for (i = 0 ; i < num_lights ; i++)
   {
     csColor light_color = lights [i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
-#ifndef CS_USE_NEW_RENDERER
-    float sq_light_radius = lights [i]->GetSquaredRadius ();
-#else
     float sq_light_radius = lights [i]->GetInfluenceRadiusSq ();
-#endif
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();

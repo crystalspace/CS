@@ -112,13 +112,12 @@ public:
   virtual void SetCenter (const csVector3& pos) {isolight->SetPosition(pos);}
   virtual iSector *GetSector () {return 0;}
   virtual void SetSector (iSector* ) {}
-  virtual float GetRadius () {return isolight->GetRadius();}
-  virtual float GetSquaredRadius ()
+  virtual float GetInfluenceRadius () {return isolight->GetRadius();}
+  virtual float GetInfluenceRadiusSq ()
   //{ return isolight->GetRadius()*isolight->GetRadius(); }
   // for use with checking if lighting needs to be done
   { return isolight->MaxRadius()*isolight->MaxRadius(); }
-  virtual float GetInverseRadius () {return 1./isolight->GetRadius();}
-  virtual void SetRadius (float r) {isolight->SetRadius(r);}
+  virtual void SetInfluenceRadius (float r) {isolight->SetRadius(r);}
   virtual const csColor& GetColor () {return isolight->GetColor();}
   virtual void SetColor (const csColor& col) {isolight->SetColor(col);}
   virtual int GetAttenuation () {return isolight->GetAttenuation();}

@@ -13,6 +13,9 @@ chronological order.
 	  1.8 of that file the new renderer crashes because GetBestTechnique()
 	  returns 0 for some shader.
 	- Jorrit fixed iso engine for latest light and material changes.
+	- Jorrit merged api of new renderer iLight with old renderer iLight.
+	  This means that Set/GetRadius() is now Set/GetInfluenceRadius() and
+	  GetSquaredRadius() is now GetInfluenceRadiusSq().
 	- Jorrit and res2k fixed data/shader/vertexlight.avp so that it now
 	  compiles on at least one additional OpenGL implementation.
 	- Jorrit added some extra debug code (number of rendered meshes)

@@ -306,7 +306,7 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
   csVector3 li_center = movable->GetTransform().Other2This (li->GetCenter());
   csVector3 light_dir = v - li_center;
   float sq_dist = light_dir.SquaredNorm();
-  if (sq_dist < li->GetSquaredRadius ())
+  if (sq_dist < li->GetInfluenceRadiusSq ())
   {
     
     csColor light_color = li->GetColor () * (256.0 / CS_NORMAL_LIGHT_LEVEL);

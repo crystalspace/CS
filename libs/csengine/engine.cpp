@@ -2264,11 +2264,7 @@ static bool FindLightPos_Front2Back (csKDTree* treenode,
       {
         iLight* light = (iLight*)objects[i]->GetObject ();
 	float sqdist = csSquaredDist::PointPoint (pos, light->GetCenter ());
-#ifdef CS_USE_NEW_RENDERER
 	if (sqdist < light->GetInfluenceRadiusSq ())
-#else
-	if (sqdist < light->GetSquaredRadius ())
-#endif
 	{
 	  light_array->AddLight (light, sqdist);
 	}
@@ -2314,11 +2310,7 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
         csBox3 b (box->Min () - light->GetCenter (),
 		  box->Max () - light->GetCenter ());
         float sqdist = b.SquaredOriginDist ();
-#ifdef CS_USE_NEW_RENDERER
         if (sqdist < light->GetInfluenceRadiusSq ())
-#else
-        if (sqdist < light->GetSquaredRadius ())
-#endif
 	{
 	  light_array->AddLight (light, sqdist);
 	}
@@ -2357,11 +2349,7 @@ int csEngine::GetNearbyLights (
       if (dl->GetSector () == sector)
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
-#ifdef CS_USE_NEW_RENDERER
         if (sqdist < dl->GetInfluenceRadiusSq ())
-#else
-        if (sqdist < dl->GetSquaredRadius ())
-#endif
         {
           csRef<iLight> il (SCF_QUERY_INTERFACE (dl, iLight));
           light_array->AddLight (il, sqdist);
@@ -2433,11 +2421,7 @@ int csEngine::GetNearbyLights (
       {
         csBox3 b (box.Min () - dl->GetCenter (), box.Max () - dl->GetCenter ());
         sqdist = b.SquaredOriginDist ();
-#ifdef CS_USE_NEW_RENDERER
         if (sqdist < dl->GetInfluenceRadiusSq ())
-#else
-        if (sqdist < dl->GetSquaredRadius ())
-#endif
         {
           csRef<iLight> il (SCF_QUERY_INTERFACE (dl, iLight));
           light_array->AddLight (il, sqdist);

@@ -180,16 +180,20 @@ struct iLight : public iBase
   /// Return true if this light is pseudo-dynamic.
   virtual bool IsDynamic () const = 0;
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Get the radius
-  virtual float GetRadius () = 0;
-  /// Get the squared radius.
-  virtual float GetSquaredRadius () = 0;
-  /// Get the inverse radius.
-  virtual float GetInverseRadius () = 0;
-  /// Set the radius
-  virtual void SetRadius (float r) = 0;
-#endif
+  /** 
+   * Get the influence radius of the light
+   */
+  virtual float GetInfluenceRadius () = 0;
+
+  /** 
+   * Get the squared influence radius of the light.
+   */
+  virtual float GetInfluenceRadiusSq () = 0;
+  
+  /**
+   * Override the influence radius.
+   */
+  virtual void SetInfluenceRadius (float radius) = 0;
 
   /// Return current attenuation mode.
   virtual int GetAttenuation () = 0;
@@ -238,23 +242,6 @@ struct iLight : public iBase
    * \li Might fail when \p brightness <= 0.
    */
   virtual bool GetDistanceForBrightness (float brightness, float& distance) = 0;
-
-#ifdef CS_USE_NEW_RENDERER
-  /** 
-   * Get the influence radius of the light
-   */
-  virtual float GetInfluenceRadius () = 0;
-
-  /** 
-   * Get the squared influence radius of the light.
-   */
-  virtual float GetInfluenceRadiusSq () = 0;
-  
-  /**
-   * Override the influence radius.
-   */
-  virtual void SetInfluenceRadius (float radius) = 0;
-#endif
 
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;

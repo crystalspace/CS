@@ -48,6 +48,7 @@ struct iObjectRegistry;
 struct iMeshWrapper;
 struct iSkeletonBone;
 class csPolygonTree;
+struct iODEFrameUpdateCallback;
 
 ////////////////////////////////////////////
 // NOTE

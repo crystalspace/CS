@@ -139,11 +139,7 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   for (i = 0; i < num_lights; i++)
   {
     csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
-#ifdef CS_USE_NEW_RENDERER
     float sq_light_radius = lights [i]->GetInfluenceRadiusSq ();
-#else
-    float sq_light_radius = lights [i]->GetSquaredRadius ();
-#endif
     // Compute light position.
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     float wor_sq_dist =

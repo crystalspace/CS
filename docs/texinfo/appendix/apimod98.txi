@@ -461,4 +461,8 @@ documentation on that to see how to modify your own mesh object for the new
 @sc{api}. In this section we describe @sc{api} modifications that are relevant
 for user applications:
 
+For @code{iLight}: @code{SetRadius}, @code{GetRadius}, and @code{GetSquaredRadius} have been replaced with @code{SetInfluenceRadius}, @code{GetInfluenceRadius}, and @code{GetInfluenceRadiusSq}.
+
+For @code{iMaterialEngine} and related: @code{GetTextureWrapper} for
+layers now expects a @code{csStringID} instead of an integer.
 
