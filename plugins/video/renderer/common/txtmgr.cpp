@@ -73,8 +73,7 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 
 csTextureHandle::~csTextureHandle ()
 {
-  int i;
-  for (i = 0; i < 4; i++)
+  for (int i = 0; i < 4; i++)
   {
     if (tex[i])
     {
@@ -276,6 +275,7 @@ csMaterialHandle::~csMaterialHandle ()
   FreeMaterial ();
   texman->UnregisterMaterial (this);
   DG_REM (this);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csMaterialHandle::FreeMaterial ()
@@ -335,7 +335,6 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 csTextureManager::~csTextureManager()
 {
   Clear ();
-  //printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
   SCF_DESTRUCT_IBASE();
 }
 

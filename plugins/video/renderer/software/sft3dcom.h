@@ -510,12 +510,16 @@ public:
   private:
     csGraphics3DSoftwareCommon* parent;
   public:
+    SCF_DECLARE_IBASE;
     EventHandler (csGraphics3DSoftwareCommon* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    SCF_DECLARE_IBASE;
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
     virtual bool HandleEvent (iEvent& ev)
     {
       return parent->HandleEvent (ev);

@@ -62,6 +62,7 @@ csDivX4::~csDivX4 ()
   free(decParam.buffers.mp4_tables);
 
   delete [] result;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csDivX4::Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, uint32)

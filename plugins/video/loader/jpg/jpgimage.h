@@ -38,7 +38,7 @@ class csJPGImageIO : public iImageIO
   SCF_DECLARE_IBASE;
 
   csJPGImageIO (iBase *pParent);
-  virtual ~csJPGImageIO (){}
+  virtual ~csJPGImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);

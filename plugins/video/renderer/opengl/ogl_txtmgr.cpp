@@ -568,6 +568,7 @@ public:
   }
   virtual ~csOFSCbOpenGL ()
   {
+    SCF_DESTRUCT_IBASE();
   }
   SCF_DECLARE_IBASE;
   virtual void FinishDraw (iGraphics2D*)
@@ -969,7 +970,6 @@ void csGLRendererLightmap::DecRef ()
 csGLRendererLightmap::csGLRendererLightmap ()
 {
   SCF_CONSTRUCT_IBASE (0);
-
   mean_calculated = false;
   mean_r = mean_g = mean_b = 0.0f;
 }
@@ -1085,7 +1085,6 @@ csGLSuperLightmap::csGLSuperLightmap (csTextureManagerOpenGL* txtmgr,
 				      int width, int height) : RLMs(32)
 {
   SCF_CONSTRUCT_IBASE (0);
-
   w = width; h = height;
   texHandle = (GLuint)~0;
   numRLMs = 0;
@@ -1095,7 +1094,6 @@ csGLSuperLightmap::csGLSuperLightmap (csTextureManagerOpenGL* txtmgr,
 csGLSuperLightmap::~csGLSuperLightmap ()
 {
   DeleteTexture ();
-  
   SCF_DESTRUCT_IBASE();
 }
 

@@ -308,6 +308,9 @@ csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
     clipper = 0;
     cliptype = CS_CLIPPER_NONE;
   }
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)

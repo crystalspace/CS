@@ -80,6 +80,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
 csAVIStreamAudio::~csAVIStreamAudio ()
 {
   delete pChunk;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csAVIStreamAudio::GetStreamDescription (csStreamDescription &desc)
@@ -137,7 +138,8 @@ bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
   if (pCodec)
   {
     // codec exists, now try to initialize it
-    if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx, nFormatEx))
+    if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen, pFormatEx,
+        nFormatEx))
       return true;
     else
     {

@@ -54,6 +54,8 @@ csXExtSHM::csXExtSHM (iBase* parent)
 csXExtSHM::~csXExtSHM ()
 {
   DestroyMemory ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csXExtSHM::Initialize (iObjectRegistry *object_reg)

@@ -43,12 +43,26 @@ public:
   csEffectVector4 vector_value;
   int point_to;
 
-  efvariable( csStringID argid )
-    { type = CS_EFVARIABLETYPE_UNDEFINED; id = argid; point_to = -1;}
-  efvariable( csStringID argid, float value)
-    { type = CS_EFVARIABLETYPE_FLOAT; id = argid; float_value = value; point_to = -1;}
-  efvariable( csStringID argid, csEffectVector4 value)
-    { type = CS_EFVARIABLETYPE_VECTOR4; id = argid; vector_value = value;  point_to = -1;}
+  efvariable(csStringID argid)
+  {
+    type = CS_EFVARIABLETYPE_UNDEFINED;
+    id = argid;
+    point_to = -1;
+  }
+  efvariable(csStringID argid, float value)
+  {
+    type = CS_EFVARIABLETYPE_FLOAT;
+    id = argid;
+    float_value = value;
+    point_to = -1;
+  }
+  efvariable(csStringID argid, csEffectVector4 value)
+  {
+    type = CS_EFVARIABLETYPE_VECTOR4;
+    id = argid;
+    vector_value = value;
+    point_to = -1;
+  }
 };
 
 class csEffectDefinition : public iEffectDefinition
@@ -66,26 +80,27 @@ public:
 
   csEffectDefinition(): techniquename(0)
   {
-    SCF_CONSTRUCT_IBASE( 0 );
+    SCF_CONSTRUCT_IBASE(0);
   }
   virtual ~csEffectDefinition ()
   { 
     delete[] techniquename;
+    SCF_DESTRUCT_IBASE();
   }
 
   csPtr<iEffectTechnique> CreateTechnique();
   int GetTechniqueCount();
   iEffectTechnique* GetTechnique (int technique);
 
-  void SetName( const char* name );
+  void SetName(const char* name);
   const char* GetName();
 
-  float GetVariableFloat( int variableID );
-  csEffectVector4 GetVariableVector4( int variableID );
-  char GetVariableType( int variableID );
+  float GetVariableFloat(int variableID);
+  csEffectVector4 GetVariableVector4(int variableID);
+  char GetVariableType(int variableID);
 
-  void SetVariableFloat( int variableID, float value );
-  void SetVariableVector4( int variableID, csEffectVector4 value );
+  void SetVariableFloat(int variableID, float value);
+  void SetVariableVector4(int variableID, csEffectVector4 value);
 
   int GetVariableID(csStringID string, bool create = true);
   //@@@

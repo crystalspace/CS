@@ -38,6 +38,7 @@ csPolygonBuffer::csPolygonBuffer (iVertexBufferManager* mgr)
 
 csPolygonBuffer::~csPolygonBuffer ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 //---------------------------------------------- csVertexBuffer -----//

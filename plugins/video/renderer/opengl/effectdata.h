@@ -74,9 +74,7 @@ public:
     SCF_CONSTRUCT_IBASE(0);
 
     ccsource = ED_SOURCE_NONE;
-
     vcord_source = ED_SOURCE_NONE;
-
     inputtex = 0;
 
     colorsource[0] = GL_PREVIOUS_ARB; colorsource[1] = GL_TEXTURE; colorsource[2] = -1; colorsource[3] = -1;
@@ -89,6 +87,11 @@ public:
 
     scale_rgb[0] = scale_rgb[1] = scale_rgb[2] = 1.0f;
     scale_alpha = 1.0f;
+  }
+
+  virtual csOpenGlEffectLayerData()
+  {
+    SCF_DESTRUCT_IBASE();
   }
 };
 
@@ -157,6 +160,7 @@ public:
 
   virtual ~csOpenGlEffectPassData()
   {
+    SCF_DESTRUCT_IBASE();
   }
 };
 

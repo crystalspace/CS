@@ -135,6 +135,12 @@ csTGAImageIO::csTGAImageIO (iBase *pParent)
   formats.Push (&formatlist[5]);
 }
 
+csTGAImageIO::~csTGAImageIO()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
+}
+
 const csImageIOFileFormatDescriptions& csTGAImageIO::GetDescription ()
 {
   return formats;

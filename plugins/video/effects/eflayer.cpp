@@ -27,6 +27,7 @@ csEffectLayer::csEffectLayer ()
 
 csEffectLayer::~csEffectLayer ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 iBase* csEffectLayer::GetRendererData ()
@@ -39,7 +40,6 @@ void csEffectLayer::SetRendererData (iBase* data)
   rendererData = data;
 }
 
-SCF_IMPLEMENT_IBASE( csEffectLayer )
-  SCF_IMPLEMENTS_INTERFACE( iEffectLayer )
+SCF_IMPLEMENT_IBASE(csEffectLayer)
+  SCF_IMPLEMENTS_INTERFACE(iEffectLayer)
 SCF_IMPLEMENT_IBASE_END
-

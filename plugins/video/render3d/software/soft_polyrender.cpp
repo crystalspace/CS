@@ -42,7 +42,6 @@ csSoftPolygonRenderer::csSoftPolygonRenderer (
   csSoftwareGraphics3DCommon* parent)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csSoftPolygonRenderer::parent = parent;
   renderBufferNum = ~0;
   polysNum = 0;
@@ -50,6 +49,7 @@ csSoftPolygonRenderer::csSoftPolygonRenderer (
 
 csSoftPolygonRenderer::~csSoftPolygonRenderer ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 iRenderBufferSource* csSoftPolygonRenderer::GetBufferSource (uint& indexStart, 

@@ -56,6 +56,11 @@ csGLRenderBuffer::csGLRenderBuffer (int size, csRenderBufferType type,
   compGLType = compGLtypes [comptype];
 }
 
+csGLRenderBuffer::~csGLRenderBuffer()
+{
+  SCF_DESTRUCT_IBASE()
+}
+
 //-----------------------------------------------------------------
 
 void* csSysRenderBuffer::RenderLock (csGLRenderBufferLockType type)

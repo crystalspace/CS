@@ -28,6 +28,7 @@ class csOpenGLGlideDisp : public iOpenGLDisp
       SCF_DECLARE_IBASE;
 
       csOpenGLGlideDisp( iBase *iParent );
+      virtual ~csOpenGLGlideDisp();
 
       virtual bool open();
       virtual bool close();

@@ -66,6 +66,14 @@ csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug)
   SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 }
 
+csGLShaderFFP::~csGLShaderFFP ()
+{
+  Deactivate();
+  if (programstring)
+    delete programstring;
+  SCF_DESTRUCT_IBASE();
+}
+
 void csGLShaderFFP::Report (int severity, const char* msg, ...)
 {
   va_list args;

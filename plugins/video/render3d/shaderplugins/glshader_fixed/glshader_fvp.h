@@ -87,8 +87,8 @@ public:
 
   csGLShaderFVP(iObjectRegistry* object_reg, csGLExtensionManager* ext)
   {
-    validProgram = true;
     SCF_CONSTRUCT_IBASE (0);
+    validProgram = true;
     this->object_reg = object_reg;
     this->ext = ext;
   
@@ -97,6 +97,7 @@ public:
   }
   virtual ~csGLShaderFVP ()
   {
+    SCF_DESTRUCT_IBASE();
   }
 
   void SetValid(bool val) { validProgram = val; }

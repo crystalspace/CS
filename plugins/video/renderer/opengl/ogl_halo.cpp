@@ -133,6 +133,7 @@ csOpenGLHalo::~csOpenGLHalo ()
   // Delete generated OpenGL handle
   glDeleteTextures (1, &halohandle);
   G3D->DecRef ();
+  SCF_DESTRUCT_IBASE();
 }
 
 // Draw the halo. Wasn't that a suprise

@@ -334,6 +334,11 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   int i;
   for (i=0 ; i<CS_VBUF_TOTAL_USERA ; i++)
     clipped_user[i]->DecRef ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEffectClient);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)

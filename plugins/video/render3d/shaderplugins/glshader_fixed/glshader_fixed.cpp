@@ -59,14 +59,14 @@ csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   enable = false;
   texUnits = 0;
 }
 
 csGLShader_FIXED::~csGLShader_FIXED()
 {
-
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGLShader_FIXED::Report (int severity, const char* msg, ...)

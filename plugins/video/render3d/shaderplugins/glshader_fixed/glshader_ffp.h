@@ -147,12 +147,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csGLShaderFFP(csGLShader_FIXED* shaderPlug);
-
-  virtual ~csGLShaderFFP ()
-  {
-    Deactivate();
-    if(programstring) delete programstring;
-  }
+  virtual ~csGLShaderFFP ();
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram

@@ -85,6 +85,7 @@ csTextureHandle::~csTextureHandle ()
   }
   DG_REM (this);
   FreeImage ();
+  SCF_DESTRUCT_IBASE()
 }
 
 void csTextureHandle::FreeImage ()
@@ -259,6 +260,7 @@ csMaterialHandle::~csMaterialHandle ()
   FreeMaterial ();
   texman->UnregisterMaterial (this);
   DG_REM (this);
+  SCF_DESTRUCT_IBASE()
 }
 
 void csMaterialHandle::FreeMaterial ()
@@ -336,7 +338,7 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 csTextureManager::~csTextureManager()
 {
   Clear ();
-  //printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
+  SCF_DESTRUCT_IBASE()
 }
 
 void csTextureManager::read_config (iConfigFile* /*config*/)

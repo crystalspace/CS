@@ -148,6 +148,11 @@ csGLGraphics3D::~csGLGraphics3D()
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q)
     q->RemoveListener (scfiEventHandler);
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 ////////////////////////////////////////////////////////////////////

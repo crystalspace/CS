@@ -39,8 +39,12 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
   csSoftRenderBuffer (void *buffer, int size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount);
+
+  /// Destructor.
+  virtual ~csSoftRenderBuffer ();
 
   /// Get type of buffer (where it's located)
   virtual csRenderBufferType GetBufferType() const { return type; }
@@ -55,11 +59,6 @@ public:
   virtual csRenderBufferComponentType GetComponentType () const
   { return comptype; }
 
-  virtual ~csSoftRenderBuffer ()
-  {
-    if (buffer != 0)
-      delete[] (char *)buffer;
-  }
 
   /**
   * Lock the buffer to allow writing and give us a pointer to the data

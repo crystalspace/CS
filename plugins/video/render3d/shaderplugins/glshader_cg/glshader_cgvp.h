@@ -77,8 +77,8 @@ public:
 
   csShaderGLCGVP(iObjectRegistry* objreg, CGcontext context)
   {
-    validProgram = true;
     SCF_CONSTRUCT_IBASE (0);
+    validProgram = true;
     this->object_reg = objreg;
     this->context = context;
     programstring = 0;
@@ -89,6 +89,7 @@ public:
     delete programstring;
     if (program)
       cgDestroyProgram (program);
+    SCF_DESTRUCT_IBASE();
   }
 
   bool LoadProgramStringToGL( const char* programstring );

@@ -45,12 +45,13 @@ public:
 
   csSoftShader_VP(iObjectRegistry* objreg)
   {
-    validProgram = true;
     SCF_CONSTRUCT_IBASE (0);
+    validProgram = true;
     this->object_reg = objreg;
   }
   virtual ~csSoftShader_VP ()
   {
+    SCF_DESTRUCT_IBASE();
   }
 
   void SetValid(bool val) { validProgram = val; }

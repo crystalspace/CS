@@ -78,6 +78,7 @@ csGraphicsMemory::~csGraphicsMemory()
 #endif
   delete (res);
   Memory = 0;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiGraphicsMemory);
 }
 
 bool csGraphicsMemory::BeginDraw()

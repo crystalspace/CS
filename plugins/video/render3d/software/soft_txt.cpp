@@ -279,6 +279,7 @@ private:
   csSoftwareTextureHandle* txt;
 
 public:
+  SCF_DECLARE_IBASE;
   csOFSCbSoftware (csSoftwareTextureHandle* txt)
   {
     SCF_CONSTRUCT_IBASE (0);
@@ -286,8 +287,8 @@ public:
   }
   virtual ~csOFSCbSoftware ()
   {
+    SCF_DESTRUCT_IBASE();
   }
-  SCF_DECLARE_IBASE;
   virtual void FinishDraw (iGraphics2D*)
   {
     txt->UpdateTexture ();
@@ -392,6 +393,7 @@ csSoftRendererLightmap::csSoftRendererLightmap ()
 
 csSoftRendererLightmap::~csSoftRendererLightmap ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoftRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
@@ -436,12 +438,13 @@ SCF_IMPLEMENT_IBASE_END
 csSoftSuperLightmap::csSoftSuperLightmap (int width, int height) : RLMs(32)
 {
   SCF_CONSTRUCT_IBASE (0);
-
-  w = width; h = height;
+  w = width;
+  h = height;
 }
 
 csSoftSuperLightmap::~csSoftSuperLightmap ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoftSuperLightmap::FreeRLM (csSoftRendererLightmap* rlm)

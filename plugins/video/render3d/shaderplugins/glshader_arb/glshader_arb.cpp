@@ -59,13 +59,13 @@ csGLShader_ARB::csGLShader_ARB(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   enable = false;
 }
 
 csGLShader_ARB::~csGLShader_ARB()
 {
-
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 ////////////////////////////////////////////////////////////////////

@@ -71,6 +71,9 @@ csGLShader_CG::csGLShader_CG(iBase* parent)
 csGLShader_CG::~csGLShader_CG()
 {
   cgDestroyContext (context);
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGLShader_CG::ErrorCallback ()

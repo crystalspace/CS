@@ -52,7 +52,8 @@ csXExtF86VM::csXExtF86VM (iBase* parent)
 
 csXExtF86VM::~csXExtF86VM ()
 {
-
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csXExtF86VM::Initialize (iObjectRegistry *object_reg)

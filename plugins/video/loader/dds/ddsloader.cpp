@@ -31,16 +31,15 @@ static iImageIO::FileFormatDescription formatlist[1] =
 csDDSImageIO::csDDSImageIO (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-
-  int formatcount =
+  int const formatcount =
     sizeof(formatlist)/sizeof(iImageIO::FileFormatDescription);
-  int i;
-  for (i=0; i < formatcount; i++)
+  for (int i=0; i < formatcount; i++)
     formats.Push (&formatlist[i]);
 }
 
 csDDSImageIO::~csDDSImageIO ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csDDSImageIO::Initialize (iObjectRegistry* )
@@ -116,8 +115,7 @@ bool csDDSImageFile::Load (dds::Loader* loader)
   convert_rgba ((csRGBpixel*) img);
 
   mipmapcount = loader->GetMipmapCount ();
-  int i;
-  for (i=0;i<mipmapcount;i++)
+  for (int i=0;i<mipmapcount;i++)
   {
     uint8* img = loader->LoadMipmap(i);
     if (!img)
@@ -145,9 +143,6 @@ int csDDSImageFile::HasMipmaps ()
   return mipmapcount;
 }
 
-//---------------------------------------------------------------------------
-// The usual plugin stuff
-
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csDDSImageIO)
@@ -156,4 +151,3 @@ SCF_IMPLEMENT_IBASE (csDDSImageIO)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csDDSImageIO);
-

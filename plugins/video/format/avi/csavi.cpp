@@ -69,6 +69,8 @@ csAVIFormat::~csAVIFormat ()
     delete [] pData;
     delete pChunkList;
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csAVIFormat::Report (int severity, const char* msg, ...)
@@ -585,13 +587,13 @@ SCF_IMPLEMENT_IBASE_END
 csAVIFormat::streamiterator::streamiterator (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
-   pAVI = (csAVIFormat*)pBase;
-   pos = 0;
+  pAVI = (csAVIFormat*)pBase;
+  pos = 0;
 }
 
 csAVIFormat::streamiterator::~streamiterator ()
 {
-
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csAVIFormat::streamiterator::HasNext ()

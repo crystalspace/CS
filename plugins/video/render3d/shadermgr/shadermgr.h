@@ -142,13 +142,16 @@ public:
   private:
     csShaderManager* parent;
   public:
+    SCF_DECLARE_IBASE;
     EventHandler (csShaderManager* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    
-    SCF_DECLARE_IBASE;
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
     virtual bool HandleEvent (iEvent& ev) 
     { return parent->HandleEvent (ev); }
   } * scfiEventHandler;
@@ -392,7 +395,7 @@ public:
 
   csShaderPass(csShaderTechnique* owner, iObjectRegistry* reg)
   {
-    SCF_CONSTRUCT_IBASE( 0 );
+    SCF_CONSTRUCT_IBASE(0);
     g3d = CS_QUERY_REGISTRY (reg, iGraphics3D);
     vp = 0; fp = 0;
     parent = owner;
@@ -420,7 +423,10 @@ public:
     writemaskAlpha = true;
 
   }
-  virtual ~csShaderPass () {}
+  virtual ~csShaderPass ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   /// Add a stream mapping
   virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute);

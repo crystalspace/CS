@@ -97,7 +97,10 @@ csShaderManager::~csShaderManager()
 {
   //clear all shaders
   shaders.DeleteAll ();
-  if (scfiEventHandler) scfiEventHandler->DecRef();
+  if (scfiEventHandler)
+    scfiEventHandler->DecRef();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csShaderManager::Report (int severity, const char* msg, ...)
@@ -239,7 +242,7 @@ void csShaderManager::PrepareShaders ()
 //===================== csShader ====================//
 csShader::csShader (csShaderManager* owner, iObjectRegistry* reg)
 {
-  SCF_CONSTRUCT_IBASE( 0 );
+  SCF_CONSTRUCT_IBASE(0);
   this->name = 0;
   parent = owner;
   objectreg = reg;
@@ -248,7 +251,7 @@ csShader::csShader (csShaderManager* owner, iObjectRegistry* reg)
 csShader::csShader (const char* name, csShaderManager* owner,
 	iObjectRegistry* reg)
 {
-  SCF_CONSTRUCT_IBASE( 0 );
+  SCF_CONSTRUCT_IBASE(0);
   csShader::name = 0;
   parent = owner;
   objectreg = reg;
@@ -258,6 +261,7 @@ csShader::csShader (const char* name, csShaderManager* owner,
 csShader::~csShader()
 {
   delete name;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csShader::IsValid() const
@@ -865,7 +869,7 @@ bool csShaderPass::Prepare()
 //================= csShaderTechnique ============//
 csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
-  SCF_CONSTRUCT_IBASE( 0 );
+  SCF_CONSTRUCT_IBASE(0);
   parent = owner;
   objectreg = reg;
 
@@ -873,6 +877,7 @@ csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 
 csShaderTechnique::~csShaderTechnique()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iShaderPass> csShaderTechnique::CreatePass()

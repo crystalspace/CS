@@ -37,7 +37,7 @@ class csTGAImageIO : public iImageIO
   SCF_DECLARE_IBASE;
 
   csTGAImageIO (iBase *pParent);
-  virtual ~csTGAImageIO () {}
+  virtual ~csTGAImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);

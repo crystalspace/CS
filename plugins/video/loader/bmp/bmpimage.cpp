@@ -159,6 +159,12 @@ csBMPImageIO::csBMPImageIO (iBase *pParent)
   formats.Push (&formatlist[2]);
 }
 
+csBMPImageIO::~csBMPImageIO()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
+}
+
 const csImageIOFileFormatDescriptions& csBMPImageIO::GetDescription ()
 {
   return formats;

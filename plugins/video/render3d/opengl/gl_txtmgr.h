@@ -474,7 +474,7 @@ public:
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *G3D, csGLTextureCache* txtcache);
 
-  virtual ~csGLTextureManager () { }
+  virtual ~csGLTextureManager ();
 
   /// Read configuration values from config file.
   void read_config (iConfigFile *config);

@@ -87,6 +87,12 @@ csJPGImageIO::csJPGImageIO (iBase *pParent)
   formats.Push (&formatlist[1]);
 }
 
+csJPGImageIO::~csJPGImageIO()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
+}
+
 const csImageIOFileFormatDescriptions& csJPGImageIO::GetDescription ()
 {
   return formats;

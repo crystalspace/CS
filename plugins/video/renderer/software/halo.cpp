@@ -142,6 +142,7 @@ csSoftHalo::~csSoftHalo ()
 {
   delete [] Alpha;
   G3D->DecRef ();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,

@@ -67,8 +67,8 @@ public:
 
   csShaderGLAVP(iObjectRegistry* objreg, csGLExtensionManager* ext)
   {
-    validProgram = true;
     SCF_CONSTRUCT_IBASE (0);
+    validProgram = true;
     this->object_reg = objreg;
     this->ext = ext;
     programstring = 0;
@@ -78,6 +78,7 @@ public:
   {
     delete[] programstring;
     delete[] description;
+    SCF_DESTRUCT_IBASE();
   }
 
   bool LoadProgramStringToGL( const char* programstring );

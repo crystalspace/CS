@@ -31,7 +31,7 @@
 
 csEffectTechnique::csEffectTechnique()
 {
-  SCF_CONSTRUCT_IBASE( 0 );
+  SCF_CONSTRUCT_IBASE(0);
   valid = CS_TECHNIQUE_NOTVALIDATED;
   quality = 0;
   clientflags = 0;
@@ -39,12 +39,13 @@ csEffectTechnique::csEffectTechnique()
 
 csEffectTechnique::~csEffectTechnique ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iEffectPass> csEffectTechnique::CreatePass()
 {
   csRef <iEffectPass> pass = csPtr<iEffectPass> (new csEffectPass());
-  passes.Push( pass );
+  passes.Push(pass);
   return csPtr<iEffectPass> (pass);
 }
 
@@ -68,7 +69,7 @@ int csEffectTechnique::GetValidation()
   return valid;
 }
 
-void csEffectTechnique::SetQuality( float q )
+void csEffectTechnique::SetQuality(float q)
 {
   quality = q;
 }
@@ -78,7 +79,7 @@ float csEffectTechnique::GetQuality()
   return quality;
 }
 
-void csEffectTechnique::SetClientFlags( uint32 flags )
+void csEffectTechnique::SetClientFlags(uint32 flags)
 {
   clientflags = flags;
 }
@@ -88,6 +89,6 @@ uint32 csEffectTechnique::GetClientFlags()
   return clientflags;
 }
 
-SCF_IMPLEMENT_IBASE( csEffectTechnique )
-  SCF_IMPLEMENTS_INTERFACE( iEffectTechnique )
+SCF_IMPLEMENT_IBASE(csEffectTechnique)
+  SCF_IMPLEMENTS_INTERFACE(iEffectTechnique)
 SCF_IMPLEMENT_IBASE_END

@@ -57,6 +57,7 @@ csRLECodec::csRLECodec (iBase *pParent)
 csRLECodec::~csRLECodec ()
 {
   delete [] pixel;
+  SCF_DESTRUCT_IBASE();
 }
 
 static void decode_idx (uint8 *dst, uint8 *src, uint32, csRGBcolor *pMap,

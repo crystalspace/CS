@@ -44,7 +44,6 @@ csStringID csGLPolygonRenderer::lmcoords_name = csInvalidStringID;
 csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csGLPolygonRenderer::parent = parent;
   renderBufferNum = ~0;
   polysNum = 0;
@@ -52,6 +51,7 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
 
 csGLPolygonRenderer::~csGLPolygonRenderer ()
 {
+  SCF_DESTRUCT_IBASE()
 }
 
 void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)

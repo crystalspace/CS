@@ -84,6 +84,8 @@ csGraphics3DNull::~csGraphics3DNull ()
   }
 
   Close ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csGraphics3DNull::Initialize (iObjectRegistry *r)

@@ -56,8 +56,14 @@ csSoftRenderBuffer::csSoftRenderBuffer
   locked = false;
 }
 
-//-----------------------------------------------------------------
+csSoftRenderBuffer::~csSoftRenderBuffer ()
+{
+  if (buffer != 0)
+    delete[] (char *)buffer;
+  SCF_DESTRUCT_IBASE()
+}
 
+//-----------------------------------------------------------------
 
 csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,

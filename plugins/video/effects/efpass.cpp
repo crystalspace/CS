@@ -31,11 +31,12 @@
 
 csEffectPass::csEffectPass()
 {
-  SCF_CONSTRUCT_IBASE( 0 );
+  SCF_CONSTRUCT_IBASE(0);
 }
 
 csEffectPass::~csEffectPass ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iEffectLayer> csEffectPass::CreateLayer()
@@ -51,7 +52,7 @@ int csEffectPass::GetLayerCount()
   return layers.Length();
 }
 
-iEffectLayer* csEffectPass::GetLayer( int layer )
+iEffectLayer* csEffectPass::GetLayer(int layer)
 {
   return layers.Get (layer);
 }
@@ -66,6 +67,6 @@ void csEffectPass::SetRendererData (iBase* data)
   rendererData = data;
 }
 
-SCF_IMPLEMENT_IBASE( csEffectPass )
+SCF_IMPLEMENT_IBASE(csEffectPass)
   SCF_IMPLEMENTS_INTERFACE (iEffectPass)
 SCF_IMPLEMENT_IBASE_END

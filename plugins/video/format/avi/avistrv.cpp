@@ -39,7 +39,6 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   pChunk = 0;
   pAVI = (csAVIFormat*)pBase;
   object_reg = 0;
-
   pIA = new csImageArea (1,1,1,1);
 }
 
@@ -118,6 +117,7 @@ csAVIStreamVideo::~csAVIStreamVideo ()
   delete pChunk;
   delete pIA->data;
   delete pIA;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csAVIStreamVideo::GetStreamDescription (csStreamDescription &desc)

@@ -129,6 +129,7 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   XFree ((void*)xvis);
   Close ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 bool csGraphics2DGLX::Open()

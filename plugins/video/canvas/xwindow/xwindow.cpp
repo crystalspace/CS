@@ -111,6 +111,8 @@ csXWindow::~csXWindow ()
     scfiEventHandler->DecRef ();
   }
   delete [] win_title;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csXWindow::Initialize (iObjectRegistry *object_reg)

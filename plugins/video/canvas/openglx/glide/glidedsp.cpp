@@ -38,6 +38,11 @@ csOpenGLGlideDisp::csOpenGLGlideDisp (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
 }
 
+csOpenGLGlideDisp::~csOpenGLGlideDisp()
+{
+  SCF_DESTRUCT_IBASE();
+}
+
 bool csOpenGLGlideDisp::Initialize(iObjectRegistry *)
 {
    // This environment setting prevents fxmesa from setting atexit handlers
@@ -50,7 +55,8 @@ bool csOpenGLGlideDisp::Initialize(iObjectRegistry *)
 
 bool csOpenGLGlideDisp::open()
 {
-  // no special fx required ( e.g. in mesa this is done by setting MESA_GLX_FX=fullscreen in the enviroment )
+  // no special fx required ( e.g.  in mesa this is done by setting
+  // MESA_GLX_FX=fullscreen in the enviroment )
   return true;
 }
 
@@ -59,4 +65,3 @@ bool csOpenGLGlideDisp::close()
   grGlideShutdown();
   return true;
 }
-

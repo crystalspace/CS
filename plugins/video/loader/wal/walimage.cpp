@@ -79,6 +79,12 @@ csWALImageIO::csWALImageIO (iBase *pParent)
   formats.Push (&formatlist[0]);
 }
 
+csWALImageIO::~csWALImageIO()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
+}
+
 const csImageIOFileFormatDescriptions& csWALImageIO::GetDescription ()
 {
   return formats;

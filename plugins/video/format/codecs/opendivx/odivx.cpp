@@ -37,13 +37,12 @@ csOpenDivX::csOpenDivX (iBase *pParent)
 
 csOpenDivX::~csOpenDivX ()
 {
-  if (bOK)
-    // stop current processing
+  if (bOK) // stop current processing
     decore ( (unsigned long)this, DEC_OPT_RELEASE, 0, 0);
-
   delete [] ydata;
   delete [] udata;
   delete [] vdata;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csOpenDivX::Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, uint32)

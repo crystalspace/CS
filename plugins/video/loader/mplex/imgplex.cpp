@@ -50,9 +50,10 @@ csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 
 csMultiplexImageIO::~csMultiplexImageIO ()
 {
-  int i;
-  for (i=0; i < list.Length (); i++)
+  for (int i=0; i < list.Length (); i++)
     ((iImageIO*)list.Get (i))->DecRef ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)

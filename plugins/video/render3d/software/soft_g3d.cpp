@@ -54,6 +54,7 @@ csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
 csSoftwareGraphics3D::~csSoftwareGraphics3D ()
 {
   csScan_Finalize ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
 }
 
 bool csSoftwareGraphics3D::Initialize (iObjectRegistry *object_reg)

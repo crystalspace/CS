@@ -37,7 +37,7 @@ class csWALImageIO : public iImageIO
   SCF_DECLARE_IBASE;
 
   csWALImageIO (iBase *pParent);
-  virtual ~csWALImageIO (){}
+  virtual ~csWALImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);

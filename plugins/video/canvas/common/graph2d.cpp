@@ -237,10 +237,10 @@ csGraphics2D::~csGraphics2D ()
   delete [] Palette;
   delete [] win_title;
 
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
 

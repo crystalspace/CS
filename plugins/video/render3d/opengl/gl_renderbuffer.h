@@ -43,7 +43,7 @@ public:
   csGLRenderBuffer (int size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount);
   
-  virtual ~csGLRenderBuffer () { }
+  virtual ~csGLRenderBuffer ();
 
   /// Get type of buffer (where it's located)
   virtual csRenderBufferType GetBufferType() const { return type; }

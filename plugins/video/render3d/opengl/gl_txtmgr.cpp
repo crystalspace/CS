@@ -43,6 +43,7 @@ private:
   csGLTextureHandle* txt;
 
 public:
+  SCF_DECLARE_IBASE;
   csOFSCbOpenGL (csGLTextureHandle* txt)
   {
     SCF_CONSTRUCT_IBASE (0);
@@ -50,8 +51,8 @@ public:
   }
   virtual ~csOFSCbOpenGL ()
   {
+    SCF_DESTRUCT_IBASE()
   }
-  SCF_DECLARE_IBASE;
   virtual void FinishDraw (iGraphics2D*)
   {
     txt->UpdateTexture ();
@@ -180,6 +181,7 @@ csGLTextureHandle::~csGLTextureHandle()
 {
   for (int i=0; i<vTex.Length(); i++)
     delete vTex[i];
+  SCF_DESTRUCT_IBASE()
 }
 
 void csGLTextureManager::DetermineStorageSizes ()
@@ -850,6 +852,7 @@ csGLMaterialHandle::~csGLMaterialHandle ()
 {
   FreeMaterial ();
   texman->UnregisterMaterial (this);
+  SCF_DESTRUCT_IBASE()
 }
 
 void csGLMaterialHandle::FreeMaterial ()
@@ -991,6 +994,11 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   Clear ();
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+}
+
+csGLTextureManager::~csGLTextureManager()
+{
+  SCF_DESTRUCT_IBASE()
 }
 
 void csGLTextureManager::read_config (iConfigFile *config)
@@ -1286,7 +1294,6 @@ void csGLRendererLightmap::DecRef ()
 csGLRendererLightmap::csGLRendererLightmap ()
 {
   SCF_CONSTRUCT_IBASE (0);
-
   mean_calculated = false;
   mean_r = mean_g = mean_b = 0.0f;
 }
@@ -1318,6 +1325,7 @@ csGLRendererLightmap::~csGLRendererLightmap ()
     delete[] pat;
   }
 #endif
+  SCF_DESTRUCT_IBASE()
 }
 
 void csGLRendererLightmap::GetSLMCoords (int& left, int& top, 
@@ -1401,7 +1409,6 @@ csGLSuperLightmap::csGLSuperLightmap (csGLTextureManager* txtmgr,
 				      int width, int height) : RLMs(32)
 {
   SCF_CONSTRUCT_IBASE (0);
-
   w = width; h = height;
   texHandle = (GLuint)~0;
   numRLMs = 0;
@@ -1411,6 +1418,7 @@ csGLSuperLightmap::csGLSuperLightmap (csGLTextureManager* txtmgr,
 csGLSuperLightmap::~csGLSuperLightmap ()
 {
   DeleteTexture ();
+  SCF_DESTRUCT_IBASE()
 }
 
 void csGLSuperLightmap::CreateTexture ()

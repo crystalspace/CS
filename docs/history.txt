@@ -14,13 +14,17 @@ chronological order.
 	    - iEmitState::RemoveAge reverses iEmitState::AddAge
 	    - iEmitMix::RemoveEmitter reverses iEmitMix::AddEmitter
 	    - iEmitMix::AdjustEmitterWeight allows for adjusting the weight
-	      of an existing emitter beneath a mix without recreating the 
+	      of an existing emitter beneath a mix without recreating the
 	      entire mix, or removing and re-adding the sub emitter.
 	- Wouter added csgfx library to linking of thing.so, now needed
 	  under NR. Both to .mak and Jamfile.
+	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
+	  corresponding SCF_CONSTRUCT_IBASE() invocations in methods in
+	  CS/plugins/video.  The only remaining directories which need to be
+	  converted are the CS/plugins/mesh tree.
 8-Nov-2003
 	- Andreas Busch added missing awstut.cfg
-	- Wouter fixed a typo in csfxscr fullscreen header file, and 
+	- Wouter fixed a typo in csfxscr fullscreen header file, and
 	  added a new function that can do a dpfx for part of the screen.
 	- res made the following (mostly NR-related) changes:
 	    - Rendermeshes now contain a shader var context.
@@ -124,9 +128,9 @@ chronological order.
 	  is off, the same behaviour as before. Extensions are:
 	  EnableShadow, DisableShadow, SetShadowColor, GetShadowColor.
 	- Wouter fixed some more SCF_DESTRUCT_IBASE typos in the sndmod
-	  loader, linux joystick and iff loader. Also unbalanced ()'s 
+	  loader, linux joystick and iff loader. Also unbalanced ()'s
 	  in cssaver.
-	- Luca fixed some compilation errors for VC6 in the method 
+	- Luca fixed some compilation errors for VC6 in the method
 	  void csSequenceManager::Clear ().
         - John Harger fixed the Cg plugin so it works with the newer
           iShaderProgram interface

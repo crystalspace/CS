@@ -37,7 +37,7 @@ class csPNGImageIO : public iImageIO
   SCF_DECLARE_IBASE;
 
   csPNGImageIO (iBase *pParent);
-  virtual ~csPNGImageIO (){}
+  virtual ~csPNGImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);

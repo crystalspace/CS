@@ -32,9 +32,9 @@
 #include "ivideo/effects/eftech.h"
 #include "eftech.h"
 
-csEffectServer::csEffectServer( iBase* parent)
+csEffectServer::csEffectServer(iBase* parent)
 {
-  SCF_CONSTRUCT_IBASE( parent );
+  SCF_CONSTRUCT_IBASE(parent);
   seqnr = 0;
   
   efstrings = new csEffectStrings();
@@ -44,9 +44,10 @@ csEffectServer::csEffectServer( iBase* parent)
 csEffectServer::~csEffectServer () 
 {
   delete efstrings;
+  SCF_DESTRUCT_IBASE();
 }
 
-bool csEffectServer::Initialize( iObjectRegistry* reg )
+bool csEffectServer::Initialize(iObjectRegistry* reg)
 {
   objectreg = reg;
   return true;
@@ -68,21 +69,21 @@ csPtr<iEffectDefinition> csEffectServer::CreateEffect()
   return csPtr<iEffectDefinition> ((iEffectDefinition*)effect);
 }
 
-bool csEffectServer::Validate( iEffectDefinition* effect )
+bool csEffectServer::Validate(iEffectDefinition* effect)
 {
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY( objectreg, iGraphics3D ));
-  if( g3d )
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY(objectreg, iGraphics3D));
+  if (g3d)
   {
-    csRef<iEffectClient> client (SCF_QUERY_INTERFACE( g3d, iEffectClient ));
-    if( client )
+    csRef<iEffectClient> client (SCF_QUERY_INTERFACE(g3d, iEffectClient));
+    if (client)
     {
       bool valideffect = false;
-      for( int i=0; i<effect->GetTechniqueCount(); i++ )
-        if( client->Validate( effect, effect->GetTechnique(i) ) )
+      for (int i=0; i<effect->GetTechniqueCount(); i++)
+        if (client->Validate(effect, effect->GetTechnique(i)))
         {
-          effect->GetTechnique(i)->SetValidation( CS_TECHNIQUE_PASSED );
+          effect->GetTechnique(i)->SetValidation(CS_TECHNIQUE_PASSED);
           valideffect = true;
-        } else effect->GetTechnique(i)->SetValidation( CS_TECHNIQUE_FAILED );
+        } else effect->GetTechnique(i)->SetValidation(CS_TECHNIQUE_FAILED);
       return valideffect;
     }
   }
@@ -90,16 +91,16 @@ bool csEffectServer::Validate( iEffectDefinition* effect )
 }
 
 iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
-	iEffectDefinition* effect )
+	iEffectDefinition* effect)
 {
-  if( !effect )
+  if (!effect)
     return 0;
 
   float maxquality = -1;
   csRef<iEffectTechnique> tech = 0;
-  for( int i=0; i<effect->GetTechniqueCount(); i++ )
-    if( (effect->GetTechnique(i)->GetValidation() == CS_TECHNIQUE_PASSED) && 
-        (effect->GetTechnique(i)->GetQuality()>maxquality) )
+  for (int i=0; i<effect->GetTechniqueCount(); i++)
+    if ((effect->GetTechnique(i)->GetValidation() == CS_TECHNIQUE_PASSED) && 
+        (effect->GetTechnique(i)->GetQuality()>maxquality))
     {
       maxquality = effect->GetTechnique(i)->GetQuality();
       tech = effect->GetTechnique(i);
@@ -109,34 +110,34 @@ iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
 
 iEffectDefinition* csEffectServer::GetEffect(const char* name)
 {
-  for(int i = 0; i < effects.Length(); i++)
+  for (int i = 0; i < effects.Length(); i++)
   {
-    if(strcasecmp(name, effects.Get(i)->GetName()) == 0)
+    if (strcasecmp(name, effects.Get(i)->GetName()) == 0)
       //is this, return it
       return effects.Get (i);
   }
   return 0;
 }
 
-csStringID csEffectServer::RequestString( const char *s )
+csStringID csEffectServer::RequestString(const char *s)
 {
-  return strset.Request( s );
+  return strset.Request(s);
 }
 
-const char* csEffectServer::RequestString( csStringID id )
+const char* csEffectServer::RequestString(csStringID id)
 {
-  return strset.Request( id );
+  return strset.Request(id);
 }
 
 // Plugin part
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE( csEffectServer )
-  SCF_IMPLEMENTS_INTERFACE( iEffectServer )
-  SCF_IMPLEMENTS_INTERFACE( iComponent )
+SCF_IMPLEMENT_IBASE(csEffectServer)
+  SCF_IMPLEMENTS_INTERFACE(iEffectServer)
+  SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_FACTORY( csEffectServer )
+SCF_IMPLEMENT_FACTORY(csEffectServer)
 
 

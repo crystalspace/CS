@@ -51,7 +51,7 @@ class csJNGImageIO : public iImageIO
   SCF_DECLARE_IBASE;
 
   csJNGImageIO (iBase *pParent);
-  virtual ~csJNGImageIO (){}
+  virtual ~csJNGImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);

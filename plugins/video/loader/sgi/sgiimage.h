@@ -19,7 +19,7 @@ class csSGIImageIO : public iImageIO
   SCF_DECLARE_IBASE;
 
   csSGIImageIO (iBase *pParent);
-  virtual ~csSGIImageIO () {}
+  virtual ~csSGIImageIO ();
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
