@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "cssys/syspath.h"
-#include "csutil/cstring.h"
 #include "csutil/util.h"
 #include <string.h>
 
