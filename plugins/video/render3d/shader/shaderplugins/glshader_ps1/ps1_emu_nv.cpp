@@ -60,37 +60,23 @@ void csShaderGLPS1_NV::SetupState (const csRenderMesh *mesh,
   // set variables
   for (int i = 0; i < MAX_CONST_REGS; i++)
   {
-    csShaderVariable* lvar = constantRegs[i].statlink;
-
-    if (!lvar)
+    if (RetrieveParamValue (constantRegs[i], stacks))
     {
-      if (constantRegs[i].varID == csInvalidStringID) continue;
-
-      if ((csStringID)variablemap[i].name < (csStringID)stacks.Length ()
-	  && stacks[variablemap[i].name].Length () > 0)
-	lvar = stacks[variablemap[i].name].Top ();
-    }
-    
-    if(lvar)
-    {
-      csVector4 v4;
-      if (lvar->GetValue (v4))
+      const float* vptr = &constantRegs[i].vectorValue.x;
+      for(size_t j = 0; j < constant_pairs.Length (); j++)
       {
-        for(size_t j = 0; j < constant_pairs.Length (); j++)
+        nv_constant_pair &pair = constant_pairs.Get (j);
+        if (pair.first == i)
         {
-          nv_constant_pair &pair = constant_pairs.Get (j);
-          if(pair.first == i)
-          {
-            ext->glCombinerStageParameterfvNV (
-              GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR0_NV,
-              &v4.x);
-          }
-          else if(pair.second == i)
-          {
-            ext->glCombinerStageParameterfvNV (
-              GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR1_NV,
-              &v4.x);
-          }
+          ext->glCombinerStageParameterfvNV (
+            GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR0_NV,
+            vptr);
+        }
+        else if (pair.second == i)
+        {
+          ext->glCombinerStageParameterfvNV (
+            GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR1_NV,
+            vptr);
         }
       }
     }
@@ -294,11 +280,16 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
 
 csVector4 csShaderGLPS1_NV::GetConstantRegisterValue (int reg)
 {
-  if (constantRegs[reg].statlink)
+  if (constantRegs[reg].valid && (constantRegs[reg].var 
+    || (constantRegs[reg].name != csInvalidStringID)))
   {
-    csVector4 value;
-    constantRegs[reg].statlink->GetValue(value);
-    return value;
+    if (constantRegs[reg].var)
+    {
+      csVector4 v;
+      constantRegs[reg].var->GetValue (v);
+      return v;
+    }
+    return constantRegs[reg].vectorValue;
   }
   return csVector4 (0.0f,0.0f,0.0f,0.0f);
 }
@@ -595,12 +586,8 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   {
     const csPSConstant& constant = constants.Get (i);
 
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable (csInvalidStringID));
-    var->SetValue(constant.value);
-
-    constantRegs[constant.reg].statlink = var;
-    constantRegs[constant.reg].varID = csInvalidStringID;
+    constantRegs[constant.reg].vectorValue = constant.value;
+    constantRegs[constant.reg].valid = true;
   }
 
   const csArray<csPSProgramInstruction> &instrs =

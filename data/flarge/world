@@ -169,7 +169,7 @@
       <shader><file>/shader/reflect.xml</file></shader>
       <shader><file>/shader/std_lighting_detail.xml</file></shader>
       <shader><file>/shader/std_lighting_detail_add.xml</file></shader>
-      <shader><file>/shader/std_lighting_detail_alpha.xml</file></shader>
+      <shader><file>/shader/std_lighting_detail_alpha_scroll.xml</file></shader>
     </shaders>
     <materials>
         <material name="tree">
@@ -204,7 +204,7 @@
         </material>
         <material name="bricks">
             <texture>bricks.gif</texture>
-	    <shader type="standard">std_lighting_detail_alpha</shader>
+	    <shader type="standard">std_lighting_detail_alpha_scroll</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
 	    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
@@ -229,6 +229,7 @@
         </material>
         <material name="oldbrick">
             <texture>oldbrick.gif</texture>
+            <!--color red="1" green="1" blue="1" /-->
         </material>
         <material name="window">
             <texture>window.gif</texture>

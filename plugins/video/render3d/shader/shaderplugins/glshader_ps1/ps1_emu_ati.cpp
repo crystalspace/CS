@@ -54,24 +54,10 @@ void csShaderGLPS1_ATI::SetupState (const csRenderMesh *mesh,
   // set variables
   for (int i = 0; i < MAX_CONST_REGS; i++)
   {
-    csShaderVariable* lvar = constantRegs[i].statlink;
-
-    if (!lvar)
+    if (RetrieveParamValue (constantRegs[i], stacks))
     {
-      if (constantRegs[i].varID == csInvalidStringID) continue;
-
-      if ((csStringID)variablemap[i].name < (csStringID)stacks.Length ()
-	  && stacks[variablemap[i].name].Length () > 0)
-	lvar = stacks[variablemap[i].name].Top ();
-    }
-    
-    if(lvar)
-    {
-      csVector4 v4;
-      if (lvar->GetValue (v4))
-      {
-        ext->glSetFragmentShaderConstantATI (GL_CON_0_ATI + i, &v4.x);
-      }
+      ext->glSetFragmentShaderConstantATI (GL_CON_0_ATI + i, 
+	&constantRegs[i].vectorValue.x);
     }
   }
 }
@@ -255,12 +241,8 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
   {
     const csPSConstant& constant = constants.Get (i);
 
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable (csInvalidStringID));
-    var->SetValue(constant.value);
-
-    constantRegs[constant.reg].statlink = var;
-    constantRegs[constant.reg].varID = csInvalidStringID;
+    constantRegs[constant.reg].vectorValue = constant.value;
+    constantRegs[constant.reg].valid = true;
   }
 
   const csArray<csPSProgramInstruction>* instrs =

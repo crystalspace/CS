@@ -114,7 +114,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
   if (q)
     q->RegisterListener (scfiEventHandler,
-	CSMASK_Broadcast);
+	CSMASK_Broadcast | CSMASK_Nothing);
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
 	iPluginManager);
@@ -195,6 +195,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     SetTagOptions (tagID, presence, tagPriority);
   }
 
+  sv_time.AttachNew (new csShaderVariable (strings->Request ("standard time")));
+  sv_time->SetValue (0.0f);
+  svcontext.AddVariable (sv_time);
+
   return true;
 }
 
@@ -213,7 +217,7 @@ bool csShaderManager::HandleEvent(iEvent& event)
     switch(event.Command.Code)
     {
       case cscmdPreProcess:
-  //      UpdateStandardVariables();
+        UpdateStandardVariables();
 	return false;
       case cscmdSystemOpen:
 	{
@@ -230,6 +234,10 @@ bool csShaderManager::HandleEvent(iEvent& event)
   return false;
 }
 
+void csShaderManager::UpdateStandardVariables()
+{
+  sv_time->SetValue ((float)vc->GetCurrentTicks() / 1000.0f);
+}
 
 void csShaderManager::RegisterShader (iShader* shader)
 {

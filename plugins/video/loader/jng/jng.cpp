@@ -54,6 +54,9 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
+namespace JngLoader
+{
+
 SCF_IMPLEMENT_IBASE (csJNGImageIO)
   SCF_IMPLEMENTS_INTERFACE (iImageIO)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -979,3 +982,4 @@ bool ImageJngFile::IsAnimated ()
    */
 }
 
+}; // namespace JngLoader

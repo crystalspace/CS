@@ -38,14 +38,7 @@ protected:
   {
     MAX_CONST_REGS = 8
   };
-  struct ConstantReg
-  {
-    csRef<csShaderVariable> statlink;
-    csStringID varID;
-
-    ConstantReg() { varID = csInvalidStringID; }
-  };
-  ConstantReg constantRegs[MAX_CONST_REGS];
+  ProgramParam constantRegs[MAX_CONST_REGS];
 
   void Report (int severity, const char* msg, ...);
 

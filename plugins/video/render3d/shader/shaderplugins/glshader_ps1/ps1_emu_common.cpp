@@ -75,7 +75,7 @@ bool csShaderGLPS1_Common::Load (iShaderTUResolver*, const char* program,
 }
 
 
-bool csShaderGLPS1_Common::Compile(
+bool csShaderGLPS1_Common::Compile (
 	csArray<iShaderVariableContext*> &staticContexts)
 {
   ResolveStaticVars (staticContexts);
@@ -100,8 +100,7 @@ bool csShaderGLPS1_Common::Compile(
       continue;
     }
 
-    constantRegs[dest].statlink = variablemap[i].statlink;
-    constantRegs[dest].varID = variablemap[i].name;
+    constantRegs[dest] = variablemap[i].mappingParam;
   }
 
   variablemap.DeleteAll();

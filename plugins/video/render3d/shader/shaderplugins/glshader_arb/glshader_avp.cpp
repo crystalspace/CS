@@ -68,22 +68,11 @@ void csShaderGLAVP::SetupState (const csRenderMesh *mesh,
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-    const VariableMapEntry& mapping = variablemap[i];
-    // Check if it's statically linked
-    csRef<csShaderVariable> lvar = mapping.statlink;
-    // If not, we check the stack
-    if (!lvar && mapping.name < (csStringID)stacks.Length ()
-        && stacks[mapping.name].Length () > 0)
-      lvar = stacks[mapping.name].Top ();
-
-    if(lvar)
+    VariableMapEntry& mapping = variablemap[i];
+    if (RetrieveParamValue (mapping.mappingParam, stacks))
     {
-      csVector4 v4;
-      if (lvar->GetValue (v4))
-      {
-        ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
-	  mapping.userInt, &v4.x);
-      }
+      ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
+	mapping.userVal, &mapping.mappingParam.vectorValue.x);
     }
   }
 }
@@ -226,7 +215,7 @@ bool csShaderGLAVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       continue;
     }
 
-    variablemap[i].userInt = dest;
+    variablemap[i].userVal = dest;
     i++;
   }
 

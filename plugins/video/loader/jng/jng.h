@@ -28,6 +28,9 @@
 #include "iutil/virtclk.h"
 #include "csutil/memfile.h"
 
+namespace JngLoader
+{
+
 /**
  * The JNG image file format loader.
  */
@@ -124,5 +127,7 @@ public:
   virtual bool Animate (csTicks time, csRect* dirtyrect = 0);
   virtual bool IsAnimated ();
 };
+
+}; // namespace JngLoader
 
 #endif // __CS_JNG_H__

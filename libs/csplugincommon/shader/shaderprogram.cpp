@@ -22,6 +22,8 @@
 #include "csutil/databuf.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
+#include "csgfx/shaderexp.h"
+#include "csgfx/shaderexpaccessor.h"
 
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
@@ -124,6 +126,44 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   {
     paramType = ParamMatrix;
   }
+  else if (strcmp (type, "expression") == 0)
+  {
+    csRef<iDocumentNode> exprNode;
+    csRef<iDocumentNodeIterator> nodeIt = node->GetNodes();
+    while (nodeIt->HasNext())
+    {
+      csRef<iDocumentNode> child = nodeIt->Next();
+      if (child->GetType() != CS_NODE_ELEMENT) continue;
+      exprNode = child;
+      break;
+    }
+
+    if (!exprNode)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.common",
+	CS_REPORTER_SEVERITY_WARNING,
+	node, "Can't find expression node");
+      return false;
+    }
+
+    csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(objectReg, iShaderManager);
+    csShaderExpression* expression = new csShaderExpression (objectReg);
+    // @@@ Find a way to allow use of SVs available at shader render time
+    if (!expression->Parse (exprNode, shmgr))
+    {
+      delete expression;
+      return false;
+    }
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable (csInvalidStringID));
+    csRef<csShaderExpressionAccessor> acc;
+    acc.AttachNew (new csShaderExpressionAccessor (expression));
+    var->SetType (csShaderVariable::VECTOR4);
+    var->SetAccessor (acc);
+    param.var = var;
+    param.valid = true;
+    return true;
+  }
   else 
   {
     synsrv->Report ("crystalspace.graphics3d.shader.common",
@@ -141,6 +181,8 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
       "Type '%s' not supported by this parameter", type);
     return false;
   }
+
+  param.type = paramType;
 
   switch (paramType)
   {
@@ -237,6 +279,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 bool csShaderProgram::RetrieveParamValue (ProgramParam& param, 
   const csShaderVarStack& stacks)
 {
+  if (!param.valid) return false;
   csRef<csShaderVariable> var = param.var;
   if (!var && (param.name != csInvalidStringID) &&
       param.name < (csStringID)stacks.Length () && 
@@ -261,15 +304,6 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
   {
     case XMLTOKEN_VARIABLEMAP:
       {
-	const char* varname = child->GetAttributeValue ("variable");
-	if (!varname)
-	{
-	  synsrv->Report ("crystalspace.graphics3d.shader.common",
-	    CS_REPORTER_SEVERITY_WARNING, child,
-	    "<variablemap> has no 'variable' attribute");
-	  return false;
-	}
-
 	const char* destname = child->GetAttributeValue ("destination");
 	if (!destname)
 	{
@@ -279,8 +313,22 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	  return false;
 	}
 
-	variablemap.Push (VariableMapEntry (strings->Request (varname),
-	  destname));
+	const char* varname = child->GetAttributeValue ("variable");
+	if (!varname)
+	{
+	  // "New style" variable mapping
+	  VariableMapEntry vme (csInvalidStringID, destname);
+	  if (!ParseProgramParam (child, vme.mappingParam,
+	    ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
+	    return false;
+	  variablemap.Push (vme);
+	}
+	else
+	{
+	  // "Classic" variable mapping
+	  variablemap.Push (VariableMapEntry (strings->Request (varname),
+	    destname));
+	}
       }
       break;
     case XMLTOKEN_PROGRAM:
@@ -408,7 +456,8 @@ void csShaderProgram::ResolveStaticVars (
     if (var)
     {
       // We found it, so we add it as a static mapping
-      variablemap[i].statlink = var;
+      //variablemap[i].statlink = var;
+      variablemap[i].mappingParam.var = var;
     }
   }
 }
@@ -429,8 +478,8 @@ void csShaderProgram::DumpVariableMappings (csString& output)
     output << strings->Request (vme.name);
     output << '(' << vme.name << ") -> ";
     output << vme.destination << ' ';
-    output << vme.userInt << ' ';
-    output.AppendFmt ("%p", (void*)vme.userPtr);
+    output.AppendFmt ("%jx", (intmax_t)vme.userVal);
+    output << ' ';
     output << '\n'; 
   }
 }

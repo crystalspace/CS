@@ -394,7 +394,7 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
     for (size_t i = 0; i < variablemap.Length (); i++)
     {
       // Get the Cg parameter
-      CGparameter parameter = (CGparameter)variablemap[i].userPtr;
+      CGparameter parameter = (CGparameter)variablemap[i].userVal;
       // Check if it's found, and just skip it if not.
       // Make sure it's a C-register
       CGresource resource = cgGetParameterResource (parameter);

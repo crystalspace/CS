@@ -240,7 +240,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       }
       default:
         synldr->ReportError ("crystalspace.terraformer.simple.loader",
-          child, "Unkown token!");
+          child, "Unknown token!");
     }
   }
   return csPtr<iBase> (former);

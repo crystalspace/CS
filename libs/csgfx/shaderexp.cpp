@@ -696,13 +696,13 @@ bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
       out.type = TYPE_VECTOR2;
       var->GetValue(out.vec4); // @@@ relies on the fact that csShaderVariables don't check type.
       out.vec4.z = 0;
-      out.vec4.w = 0;
+      out.vec4.w = 1.0f; // standard value for w
       break;
 
     case csShaderVariable::VECTOR3:
       out.type = TYPE_VECTOR3;
       var->GetValue(out.vec4);
-      out.vec4.w = 0;
+      out.vec4.w = 1.0f; // standard value for w
       break;
       
     case csShaderVariable::VECTOR4:
@@ -1776,7 +1776,15 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
   cptr = cptr->cdr;
   if (!cptr)
   {
+    tmp.opcode = OP_INT_SELT34;
+    tmp.acc = this_acc;
+    tmp.arg1.type = TYPE_NUMBER;
+    tmp.arg1.num = 0.0f;
+    tmp.arg2.type = TYPE_NUMBER;
+    tmp.arg2.num = 1.0f;
+
     acc_top++;
+    opcodes.Push(tmp);
     return true;
   }
   

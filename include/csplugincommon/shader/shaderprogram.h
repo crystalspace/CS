@@ -57,42 +57,6 @@ protected:
   csRef<iSyntaxService> synsrv;
   csRef<iStringSet> strings;
 
-  struct VariableMapEntry : public csShaderVarMapping
-  {
-    // Variables that can be resolved statically at shader load
-    // or compilation is put in "statlink"
-    csRef<csShaderVariable> statlink;
-    int userInt;
-    void* userPtr;
-
-    VariableMapEntry (csStringID s, const char* d) : 
-      csShaderVarMapping (s, d)
-    { 
-      userInt = 0;
-      userPtr = 0;
-    }
-    VariableMapEntry (const csShaderVarMapping& other) :
-      csShaderVarMapping (other.name, other.destination)
-    {
-      userInt = 0;
-      userPtr = 0;
-    }
-  };
-  csArray<VariableMapEntry> variablemap;
-
-  struct ProgramParam
-  {
-    bool valid;
-    csVector4 vectorValue;
-    csMatrix3 matrixValue;
-    csStringID name;
-    csRef<csShaderVariable> var;
-
-    ProgramParam() : valid (false), vectorValue (0.0f), 
-      name(csInvalidStringID) { }
-    ProgramParam(const csVector4& def) : valid (false), 
-      vectorValue (def), name(csInvalidStringID) { }
-  };
   enum ProgramParamType
   {
     ParamInvalid    = 0,
@@ -102,12 +66,46 @@ protected:
     ParamVector4    = 0x08,
     ParamMatrix	    = 0x10
   };
+  struct ProgramParam
+  {
+    bool valid;
+    csVector4 vectorValue;
+    csMatrix3 matrixValue;
+    csStringID name;
+    csRef<csShaderVariable> var;
+    ProgramParamType type;
+
+    ProgramParam() : valid (false), vectorValue (0.0f), 
+      name(csInvalidStringID) { }
+    ProgramParam(const csVector4& def) : valid (false), 
+      vectorValue (def), name(csInvalidStringID) { }
+  };
   void ResolveParamStatic (ProgramParam& param,
     csArray<iShaderVariableContext*> &staticContexts);
   bool ParseProgramParam (iDocumentNode* node,
     ProgramParam& param, uint types = ~0);
   bool RetrieveParamValue (ProgramParam& param, 
     const csShaderVarStack& stacks);
+
+  struct VariableMapEntry : public csShaderVarMapping
+  {
+    ProgramParam mappingParam;
+    intptr_t userVal;
+
+    VariableMapEntry (csStringID s, const char* d) : 
+      csShaderVarMapping (s, d)
+    { 
+      userVal = 0;
+      mappingParam.name = s;
+    }
+    VariableMapEntry (const csShaderVarMapping& other) :
+      csShaderVarMapping (other.name, other.destination)
+    {
+      userVal = 0;
+      mappingParam.name = other.name;
+    }
+  };
+  csArray<VariableMapEntry> variablemap;
 
   char* description;
   csRef<iDocumentNode> programNode;
