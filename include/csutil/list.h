@@ -20,7 +20,7 @@
 #ifndef __CS_UTIL_LIST_H__
 #define __CS_UTIL_LIST_H__
 
-/*
+/**
  * A lightweight template double-linked list.
  * This is VERY lightweight and not very tested, as it was writen for
  * one single purpose, and have not been extended to be more general
