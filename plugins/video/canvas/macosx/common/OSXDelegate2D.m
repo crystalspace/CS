@@ -253,16 +253,22 @@
 // Window focus changed
 - (void) focusChanged:(BOOL) focused shouldPause:(BOOL) pause
 {
-    if (isPaused != pause)
+    // Pause = 1 -> "pause if not focused", not "pause now"
+    if (pause == YES)
     {
-        isPaused = pause;
+        isPaused = !focused;
         [self adjustTitle];
     };
     
     if (focused == NO)
+    {
         [self stopTrackingMouse];
+    }
     else
+    {
+        
         [self startTrackingMouse];
+    }
 };
 
 
