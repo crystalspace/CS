@@ -4,6 +4,11 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 12-Apr-2003
+	- Rhad fixed a couple potential deadlock and mutex issues in
+	  the ds3d sound renderer plugin. Also fixed similar issues in
+	  the openal sound renderer plugin.  Added some workaround code
+	  for buggy OpenAL implementations (a windows openal32.dll dated
+	  9/2/2002 specifically).
 	- Rhad added frequency adjustment capabilities to the software
 	  sound renderer.  These changes only take effect if 
 	  SetFrequencyFactor() is called with a value >0.0 and !=1.0.  
