@@ -71,11 +71,10 @@ void cleanup ()
   delete System;
 }
 
-void Demo::LoadFactory (const char* factname, const char* filename,
-	const char* classId, iLoaderPlugIn* plug)
+iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
+	const char* classId, const char* loaderClassId,
+	iSector* sector, const csVector3& pos)
 {
-  iMeshFactoryWrapper* factwrap = engine->CreateMeshFactory (classId,
-  	factname);
   iDataBuffer* databuf = System->VFS->ReadFile (filename);
   if (!databuf || !databuf->GetSize ())
   {
@@ -83,17 +82,39 @@ void Demo::LoadFactory (const char* factname, const char* filename,
     Printf (MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
     exit (0);
   }
-  char* buf = **databuf;
-  iBase* mof = plug->Parse (buf, engine, factwrap);
+  iMeshWrapper* obj = engine->LoadMeshObject (classId, objname,
+  	loaderClassId, databuf, sector, pos);
   databuf->DecRef ();
-  if (!mof)
+  if (!obj)
   {
     Printf (MSG_FATAL_ERROR,
-    	"There was an error loading sprite factory from file '%s'!\n",
+    	"There was an error loading object from file '%s'!\n",
 	filename);
     exit (0);
   }
-  factwrap->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
+  return obj;
+}
+
+void Demo::LoadFactory (const char* factname, const char* filename,
+	const char* classId, const char* loaderClassId)
+{
+  iDataBuffer* databuf = System->VFS->ReadFile (filename);
+  if (!databuf || !databuf->GetSize ())
+  {
+    if (databuf) databuf->DecRef ();
+    Printf (MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
+    exit (0);
+  }
+  iMeshFactoryWrapper* fact = engine->LoadMeshFactory (classId, factname,
+  	loaderClassId, databuf);
+  databuf->DecRef ();
+  if (!fact)
+  {
+    Printf (MSG_FATAL_ERROR,
+    	"There was an error loading factory from file '%s'!\n",
+	filename);
+    exit (0);
+  }
 }
 
 void Demo::SetupFactories ()
@@ -115,30 +136,26 @@ void Demo::SetupFactories ()
     exit (0);
   }
 
-  iLoaderPlugIn* plug;
-  plug = LOAD_PLUGIN (this, "crystalspace.mesh.loader.factory.sprite.3d",
-  	"MeshLdr", iLoaderPlugIn);
-  if (!plug)
+  fact = engine->CreateMeshFactory ("crystalspace.mesh.object.fire",
+  	"fire_factory");
+  if (!fact)
   {
-    Printf (MSG_FATAL_ERROR, "Could not open sprite 3d factory loader!\n");
+    Printf (MSG_FATAL_ERROR, "Could not open fire plugin!\n");
     exit (0);
   }
-  LoadFactory ("fighter", "/data/demo/spr_fighter",
-  	"crystalspace.mesh.object.sprite.3d", plug);
-  LoadFactory ("laser", "/data/demo/spr_laser",
-  	"crystalspace.mesh.object.sprite.3d", plug);
-  plug->DecRef ();
 
-  plug = LOAD_PLUGIN (this, "crystalspace.mesh.loader.factory.sprite.2d",
-  	"MeshLdr", iLoaderPlugIn);
-  if (!plug)
-  {
-    Printf (MSG_FATAL_ERROR, "Could not open sprite 2d factory loader!\n");
-    exit (0);
-  }
-  LoadFactory ("photonTorpedo", "/data/demo/spr_photon",
-  	"crystalspace.mesh.object.sprite.2d", plug);
-  plug->DecRef ();
+  //=====
+  // Load all factories.
+  //=====
+  LoadFactory ("fighter", "/data/demo/objects/fighter",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("laser", "/data/demo/objects/laser",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("photonTorpedo", "/data/demo/objects/photon",
+  	"crystalspace.mesh.object.sprite.2d",
+	"crystalspace.mesh.loader.factory.sprite.2d");
 }
 
 void Demo::LoadMaterial (const char* matname, const char* filename)
@@ -160,18 +177,19 @@ void Demo::SetupMaterials ()
   LoadMaterial ("flare_spark5", "/lib/stdtex/flare_pink.jpg");
   LoadMaterial ("stone", "/lib/std/stone4.gif");
   LoadMaterial ("white", "/lib/std/white.gif");
-  LoadMaterial ("jupiter", "/data/demo/jup0vtt2.jpg");
-  LoadMaterial ("saturn", "/data/demo/Saturn.jpg");
-  LoadMaterial ("earth", "/data/demo/Earth.jpg");
-  LoadMaterial ("earthclouds", "/data/demo/earthclouds.jpg");
-  LoadMaterial ("nebula_b", "/data/demo/nebula_b.png");
-  LoadMaterial ("nebula_d", "/data/demo/nebula_d.png");
-  LoadMaterial ("nebula_f", "/data/demo/nebula_f.png");
-  LoadMaterial ("nebula_l", "/data/demo/nebula_l.png");
-  LoadMaterial ("nebula_r", "/data/demo/nebula_r.png");
-  LoadMaterial ("nebula_u", "/data/demo/nebula_u.png");
-  LoadMaterial ("stars", "/data/demo/stars.png");
-  LoadMaterial ("starcross", "/data/demo/starcross2.jpg");
+  LoadMaterial ("exhaust", "/data/demo/textures/explode.jpg");
+  LoadMaterial ("jupiter", "/data/demo/textures/jup0vtt2.jpg");
+  LoadMaterial ("saturn", "/data/demo/textures/Saturn.jpg");
+  LoadMaterial ("earth", "/data/demo/textures/Earth.jpg");
+  LoadMaterial ("earthclouds", "/data/demo/textures/earthclouds.jpg");
+  LoadMaterial ("nebula_b", "/data/demo/textures/nebula_b.png");
+  LoadMaterial ("nebula_d", "/data/demo/textures/nebula_d.png");
+  LoadMaterial ("nebula_f", "/data/demo/textures/nebula_f.png");
+  LoadMaterial ("nebula_l", "/data/demo/textures/nebula_l.png");
+  LoadMaterial ("nebula_r", "/data/demo/textures/nebula_r.png");
+  LoadMaterial ("nebula_u", "/data/demo/textures/nebula_u.png");
+  LoadMaterial ("stars", "/data/demo/textures/stars.png");
+  LoadMaterial ("starcross", "/data/demo/textures/starcross2.jpg");
 }
 
 static void SetTexSpace (iPolygon3D* poly, 
@@ -459,6 +477,13 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  iMeshWrapper* tail = LoadObject ("FighterTail1",
+  	"/data/demo/objects/fightertail",
+  	"crystalspace.mesh.object.fire",
+	"crystalspace.mesh.loader.fire",
+	NULL, csVector3 (0));
+  tail->SetZBufMode (CS_ZBUF_TEST);
+  spr3d->AddChild (tail);
 
   spr3d = engine->CreateMeshObject (
   	engine->FindMeshFactory ("fighter"), "Fighter2",
@@ -466,6 +491,13 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  tail = LoadObject ("FighterTail2",
+  	"/data/demo/objects/fightertail",
+  	"crystalspace.mesh.object.fire",
+	"crystalspace.mesh.loader.fire",
+	NULL, csVector3 (0));
+  tail->SetZBufMode (CS_ZBUF_TEST);
+  spr3d->AddChild (tail);
 
   // Create laser.
   spr3d = engine->CreateMeshObject (
@@ -692,6 +724,8 @@ void Demo::NextFrame ()
     seqmgr->ControlPaths (view->GetCamera (), current_time, elapsed_time);
   else if (map_enabled == MAP_EDIT_FORWARD)
     seqmgr->DebugPositionObjects (view->GetCamera ());
+
+  engine->NextFrame (current_time);
 
   if (map_enabled == MAP_EDIT_FORWARD)
   {
@@ -1127,7 +1161,8 @@ bool Demo::HandleEvent (iEvent &Event)
 	  if (np)
 	  {
 	    char buf[200], backup[200];
-	    strcpy (buf, "/data/demo/path_"); strcat (buf, np->GetName ());
+	    strcpy (buf, "/data/demo/paths/");
+	    strcat (buf, np->GetName ());
 	    // Make a backup of the original file.
 	    strcpy (backup, buf);
 	    strcat (backup, ".bak");
@@ -1200,7 +1235,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	    }
 	    else
 	    {
-	      csVector3 v1, v2, v;
+	      csVector3 v1, v2;
 	      np->GetPositionVector (map_selpoint-1, v1);
 	      np->GetPositionVector (map_selpoint+1, v2);
 	      np->SetPositionVector (map_selpoint, (v1+v2)/2.);
@@ -1403,7 +1438,7 @@ bool Demo::HandleEvent (iEvent &Event)
           seqmgr->TimeWarp (1500);
 	  break;
         case '<':
-          seqmgr->TimeWarp (-1500);
+          seqmgr->TimeWarp (-1500, true);
 	  break;
         case 'm':
 	  map_enabled++;

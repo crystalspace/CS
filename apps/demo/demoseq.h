@@ -92,6 +92,7 @@ private:
   iSequence* main_sequence;
   bool suspended;
   bool suspend_one_frame;
+  cs_time main_start_time;
   cs_time suspend_time;
 
   //=====
@@ -127,6 +128,7 @@ private:
 	const csVector3& pos, const csVector3& forward,
 	const csVector2& tl, const csVector2& br,
 	int dim, int col, float fwlen);
+  void Clear ();
 
 public:
   DemoSequenceManager (Demo* demo);
@@ -144,8 +146,11 @@ public:
   /// Restart the sequence manager from zero.
   void Restart (const char* sequenceFileName);
 
-  /// Time warp.
-  void TimeWarp (cs_time dt);
+  /**
+   * Time warp. If restart==true we restart the sequence manager
+   * when we go backwards in time.
+   */
+  void TimeWarp (cs_time dt, bool restart = false);
 
   /**
    * Initialize the sequence manager and setup all sequences

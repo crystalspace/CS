@@ -61,38 +61,53 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   do_fade = false;
   fade_value = 0;
   suspended = true;
+  suspend_time = demo->GetTime ();
   suspend_one_frame = false;
+  main_sequence = NULL;
 }
 
 DemoSequenceManager::~DemoSequenceManager ()
 {
+  Clear ();
   if (seqmgr) seqmgr->DecRef ();
+  if (main_sequence) main_sequence->DecRef ();
+}
+
+void DemoSequenceManager::Clear ()
+{
+  seqmgr->Clear ();
   int i;
   for (i = 0 ; i < paths.Length () ; i++)
   {
     csNamedPath* np = (csNamedPath*)paths[i];
     delete np;
   }
+  paths.DeleteAll ();
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     delete pfm;
   }
+  pathForMesh.DeleteAll ();
   for (i = 0 ; i < meshRotation.Length () ; i++)
   {
     MeshRotation* mrot = (MeshRotation*)meshRotation[i];
     if (mrot->particle) mrot->particle->DecRef ();
     delete mrot;
   }
+  meshRotation.DeleteAll ();
 }
 
 void DemoSequenceManager::Setup (const char* sequenceFileName)
 {
+  if (main_sequence) main_sequence->DecRef ();
   DemoSequenceLoader* loader = new DemoSequenceLoader (
   	DemoSequenceManager::demo, this, seqmgr, sequenceFileName);
   main_sequence = loader->GetSequence ("main");
+  main_sequence->IncRef ();
   seqmgr->RunSequence (0, main_sequence);
-  // Don't decref main_sequence because we might need it later.
+  if (suspended) main_start_time = suspend_time;
+  else main_start_time = demo->GetTime ();
   seqmgr->Resume ();
   suspended = false;
   delete loader;
@@ -135,27 +150,8 @@ void DemoSequenceManager::Resume ()
 
 void DemoSequenceManager::Restart (const char* sequenceFileName)
 {
-  seqmgr->Clear ();
-  int i;
-  for (i = 0 ; i < paths.Length () ; i++)
-  {
-    csNamedPath* np = (csNamedPath*)paths[i];
-    delete np;
-  }
-  paths.DeleteAll ();
-  for (i = 0 ; i < pathForMesh.Length () ; i++)
-  {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-    delete pfm;
-  }
-  pathForMesh.DeleteAll ();
-  for (i = 0 ; i < meshRotation.Length () ; i++)
-  {
-    MeshRotation* mrot = (MeshRotation*)meshRotation[i];
-    if (mrot->particle) mrot->particle->DecRef ();
-    delete mrot;
-  }
-  meshRotation.DeleteAll ();
+  Clear ();
+  if (main_sequence) { main_sequence->DecRef (); main_sequence = NULL; }
   do_camera_path = false;
   do_fade = false;
   fade_value = 0;
@@ -164,8 +160,30 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
   Setup (sequenceFileName);
 }
 
-void DemoSequenceManager::TimeWarp (cs_time dt)
+void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
 {
+#if 0
+  if (int (dt) < 0 && restart)
+  {
+    Clear ();
+    do_camera_path = false;
+    do_fade = false;
+    fade_value = 0;
+    seqmgr->RunSequence (0, main_sequence);
+    cs_time cur;
+    if (suspended) cur = suspend_time;
+    else cur = demo->GetTime ();
+    printf ("suspended=%d suspend_time=%d demo->GetTime()=%d cur=%d dt=%d\n",
+    	suspended, suspend_time, demo->GetTime (), cur, dt);
+    printf ("main_start_time=%d\n", main_start_time);
+    dt = cur+dt-main_start_time;
+    if (suspended) main_start_time = suspend_time;
+    else main_start_time = demo->GetTime ();
+    printf ("new dt=%d main_start_time=%d\n", dt, main_start_time);
+    fflush (stdout);
+  }
+#endif
+
   // Now we correct all time information in the sequencer
   // so that it appears as if we just go on from here.
   start_fade_time -= dt;
@@ -194,6 +212,8 @@ void DemoSequenceManager::TimeWarp (cs_time dt)
     // If the sequence manager is empty we insert the main sequence
     // again.
     seqmgr->RunSequence (0, main_sequence);
+    if (suspended) main_start_time = suspend_time;
+    else main_start_time = demo->GetTime ();
   }
 }
 

@@ -31,6 +31,7 @@ struct iFont;
 struct iFile;
 struct iImageLoader;
 struct iLoaderPlugIn;
+struct iMeshWrapper;
 class DemoSequenceManager;
 class csTransform;
 
@@ -53,7 +54,10 @@ public:
 private:
   void LoadMaterial (const char* matname, const char* filename);
   void LoadFactory (const char* factname, const char* filename,
-  	const char* classId, iLoaderPlugIn* plug);
+  	const char* classId, const char* loaderClassId);
+  iMeshWrapper* LoadObject (const char* objname, const char* filename,
+	const char* classId, const char* loaderClassId,
+	iSector* sector, const csVector3& pos);
   void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
   void FileWrite (iFile* file, char *str, ...);
 

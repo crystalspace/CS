@@ -34,6 +34,7 @@ The history order is reversed so that new features are at the top.
 	  soon as DrawTest() returns true. This should increase global
 	  speed of the engine if there are many particle systems and sprites
 	  in the world but they are all currently invisible.
+	- Worked more on csdemo.
 	- Martin Geisse did a small bug fix in engine.cpp.
 25-Apr-2001
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
