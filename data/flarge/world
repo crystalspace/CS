@@ -22921,13 +22921,13 @@
 	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02"
 	    	duration="1000" />
 	    <delay>1000</delay>
-	    <runsequence>fogloop</runsequence>
+	    <run sequence="fogloop" />
 	</sequence>
 
         <sequence name="fog">
 	    <setfog sector="kamer2l" red="0" green="0" blue="0" density="0" />
 	    <delay>1000</delay>
-	    <runsequence>fogloop</runsequence>
+	    <run sequence="fogloop" />
 	</sequence>
 
 	<sequence name="animlight">
@@ -22941,7 +22941,7 @@
 	    <delay>1000</delay>
 	    <fadelight light="l1" red="0" green="0" blue="1" duration="1000" />
 	    <delay>1000</delay>
-	    <enabletrigger>animlight</enabletrigger>
+	    <enable trigger="animlight" />
 	</sequence>
 
 	<sequence name="animhugelight">
@@ -22960,7 +22960,7 @@
 	    <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5" duration="3000" />
 	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6" duration="3000" />
 	    <delay>3000</delay>
-	    <enabletrigger>animhugelight</enabletrigger>
+	    <enable trigger="animhugelight" />
 	</sequence>
 
 	<sequence name="rotball">
@@ -22968,12 +22968,12 @@
 	        <roty>3</roty>
 	    </rotate>
 	    <delay>1000</delay>
-	    <enabletrigger>rotball</enabletrigger>
+	    <enable trigger="rotball" />
 	</sequence>
 
 	<sequence name="dobox">
-	    <runsequence>movebox</runsequence>
-	    <runsequence>openbox</runsequence>
+	    <run sequence="movebox" />
+	    <run sequence="openbox" />
 	</sequence>
 
 	<sequence name="movebox">
@@ -22982,7 +22982,7 @@
 	    <delay>10000</delay>
 	    <move mesh="floorplate" duration="10000" x="0" y="10" z="0" />
 	    <delay>10000</delay>
-	    <runsequence>movebox</runsequence>
+	    <run sequence="movebox" />
 	-->
 	</sequence>
 
@@ -23057,69 +23057,91 @@
 		<v x="0" y="4" z="0" />
 	    </rotate>
 	    <delay>6000</delay>
-	    <runsequence>openbox</runsequence>
+	    <run sequence="openbox" />
 	</sequence>
 
+	<!--
+	 *** This sequence is fired when the camera is near the door.
+	 *** It will start the operation of moving the door. First
+	 *** both opendoor triggers are disabled to prevent the other
+	 *** trigger from firing too (causing the door to open twice which
+	 *** isn't really nice). After opening the door the two triggers
+	 *** are constantly checked in the 'testdoor' sequence.
+	 -->
 	<sequence name="opendoor">
 	    <!-- Disable both triggers because the door is now open -->
-	    <disabletrigger>opendoor1</disabletrigger>
-	    <disabletrigger>opendoor2</disabletrigger>
-	    <!-- <checktrigger trigger="opendoor1" delay="1000" />
-	    <checktrigger trigger="opendoor2" delay="1000" /> -->
+	    <disable trigger="opendoor1" />
+	    <disable trigger="opendoor2" />
 	    <rotate mesh="rot_door1" duration="2000">
 	        <roty>-1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
 	    </rotate>
-	    <!-- <runsequence>testdoor</runsequence> -->
+	    <delay>2000</delay>
+	    <check trigger="opendoor1" delay="500" />
+	    <check trigger="opendoor2" delay="500" />
+	    <run sequence="testdoor" />
         </sequence>
+	
+	<!--
+	 *** This sequence will first wait one second. Then it will
+	 *** see if both triggers are false. When that's the case the
+	 *** camera has moved away from the door and we can close it.
+	 -->
 	<sequence name="testdoor">
 	    <delay>1000</delay>
-	    <testtrigger trigger="opendoor1" truesequence="testdoor" />
-	    <testtrigger trigger="opendoor2" truesequence="testdoor" />
+	    <test trigger="opendoor1"
+	    	truesequence="testdoor"
+		falsesequence="testdoor2" />
+        </sequence>
+	<sequence name="testdoor2">
+	    <test trigger="opendoor2"
+	    	truesequence="testdoor"
+		falsesequence="reallyclosedoor" />
+        </sequence>
+
+	<!--
+	 *** Now we can really close the door.
+	 *** First we disable the checks on the triggers.
+	 *** After the door is closed we enable both triggers again
+	 *** so the door can open later.
+	 -->
+	<sequence name="reallyclosedoor">
 	    <!-- Close door again -->
-	    <checktrigger trigger="opendoor1" delay="0" />
-	    <checktrigger trigger="opendoor2" delay="0" />
+	    <check trigger="opendoor1" delay="0" />
+	    <check trigger="opendoor2" delay="0" />
 	    <rotate mesh="rot_door1" duration="2000">
 	        <roty>1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
 	    </rotate>
 	    <delay>2000</delay>
-	    <enabletrigger>opendoor1</enabletrigger>
-	    <enabletrigger>opendoor2</enabletrigger>
+	    <enable trigger="opendoor1" />
+	    <enable trigger="opendoor2" />
         </sequence>
     </sequences>
 
     <triggers>
         <trigger name="setfog">
-	    <sectorvis>
-	        <sector>kamer2l</sector>
-	    </sectorvis>
-	    <fire delay=100>fog</fire>
+	    <sectorvis sector="kamer2l" />
+	    <fire delay="100" sequence="fog" />
 	</trigger>
 
         <trigger name="animlight">
-	    <sectorvis>
-	        <sector>large</sector>
-	    </sectorvis>
-	    <fire delay=0>animlight</fire>
+	    <sectorvis sector="large" />
+	    <fire delay="0" sequence="animlight" />
 	</trigger>
 	
 	<trigger name="rotball">
-	    <fire delay=0>rotball</fire>
+	    <fire delay="0" sequence="rotball" />
 	</trigger>
 
 	<trigger name="animhugelight">
-	    <sectorvis>
-	        <sector>kamer2lhuge</sector>
-	    </sectorvis>
-	    <fire delay=0>animhugelight</fire>
+	    <sectorvis sector="kamer2lhuge" />
+	    <fire delay="0" sequence="animhugelight" />
 	</trigger>
 
 	<trigger name="openbox">
-	    <sectorvis>
-	        <sector>kamer2lhuge</sector>
-	    </sectorvis>
-	    <fire delay=1000>dobox</fire>
+	    <sectorvis sector="kamer2lhuge" />
+	    <fire delay="1000" sequence="dobox" />
 	</trigger>
 
 	<!--
@@ -23131,18 +23153,16 @@
 	 *** accidently turn 180 degrees by activating both triggers.
 	 -->
 	<trigger name="opendoor1">
-	    <sectorvis>
-	        <sector>large</sector>
+	    <sectorvis sector="large">
 		<sphere x="-3.75" y="0.5" z="20" radius="5" />
 	    </sectorvis>
-	    <fire delay=0>opendoor</fire>
+	    <fire delay="0" sequence="opendoor" />
 	</trigger>
 	<trigger name="opendoor2">
-	    <sectorvis>
-	        <sector>room3</sector>
+	    <sectorvis sector="room3">
 		<sphere x="-3.75" y="0.5" z="20" radius="5" />
 	    </sectorvis>
-	    <fire delay=0>opendoor</fire>
+	    <fire delay="0" sequence="opendoor" />
 	</trigger>
     </triggers>
 

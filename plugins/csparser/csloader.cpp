@@ -771,13 +771,13 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("vertexprogram", XMLTOKEN_VERTEXPROGRAM);
   xmltokens.Register ("vertexprogramconstant", XMLTOKEN_VERTEXPROGRAMCONST);
 
-  xmltokens.Register ("runsequence", XMLTOKEN_RUNSEQUENCE);
+  xmltokens.Register ("run", XMLTOKEN_RUN);
   xmltokens.Register ("sequence", XMLTOKEN_SEQUENCE);
   xmltokens.Register ("sequences", XMLTOKEN_SEQUENCES);
   xmltokens.Register ("trigger", XMLTOKEN_TRIGGER);
   xmltokens.Register ("triggers", XMLTOKEN_TRIGGERS);
-  xmltokens.Register ("testtrigger", XMLTOKEN_TESTTRIGGER);
-  xmltokens.Register ("checktrigger", XMLTOKEN_CHECKTRIGGER);
+  xmltokens.Register ("test", XMLTOKEN_TEST);
+  xmltokens.Register ("check", XMLTOKEN_CHECK);
   xmltokens.Register ("setfog", XMLTOKEN_SETFOG);
   xmltokens.Register ("fadefog", XMLTOKEN_FADEFOG);
   xmltokens.Register ("setlight", XMLTOKEN_SETLIGHT);
@@ -786,8 +786,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("rotx", XMLTOKEN_ROTX);
   xmltokens.Register ("roty", XMLTOKEN_ROTY);
   xmltokens.Register ("rotz", XMLTOKEN_ROTZ);
-  xmltokens.Register ("enabletrigger", XMLTOKEN_ENABLETRIGGER);
-  xmltokens.Register ("disabletrigger", XMLTOKEN_DISABLETRIGGER);
+  xmltokens.Register ("enable", XMLTOKEN_ENABLE);
+  xmltokens.Register ("disable", XMLTOKEN_DISABLE);
   xmltokens.Register ("delay", XMLTOKEN_DELAY);
   xmltokens.Register ("fire", XMLTOKEN_FIRE);
   xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);

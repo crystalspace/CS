@@ -20,6 +20,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated compilation warning in ddraw and ddraw8
 	  canvases regarding promotion of bool to int when passed through
 	  vararg (...).
+	- Finally got the door in flarge correctly opening AND closing.
+	  Go to the door to let it open. Then go away again and it will
+	  close. This required a lot of tweaking in the engine
+	  sequencer to get right.
+	- Cleaned up the syntax of the sequences and triggers considerably
+	  by using shorter keywords and more attributes.
 24-Sep-2002
 	- Relaxed the sequence and trigger loader so that you can now refer to
 	  triggers and sequences that haven't been defined yet.

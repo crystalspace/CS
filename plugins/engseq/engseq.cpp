@@ -765,6 +765,7 @@ csSequenceTrigger::csSequenceTrigger (csEngineSequenceManager* eseqmgr)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTrigger);
   enabled = true;
   enable_onetest = false;
+  onetest_framenr = 0;
   fire_delay = 0;
   csSequenceTrigger::eseqmgr = eseqmgr;
   framenr = 0;
@@ -829,26 +830,77 @@ void csSequenceTrigger::FireSequence (csTicks delay, iSequenceWrapper* seq)
   fire_delay = delay;
 }
 
+void csSequenceTrigger::EnableOneTest ()
+{
+  if (enable_onetest && onetest_framenr == 0)
+  {
+    // Since we last enabled the test nothing has happened.
+    // That means that we can consider the test to have
+    // failed since nothing fired (i.e. Fire() wasn't called).
+    last_trigger_state = false;
+    return;
+  }
+  enable_onetest = true;
+  onetest_framenr = 0;	// We don't know the frame yet.
+}
+
+bool csSequenceTrigger::CheckState ()
+{
+  return last_trigger_state;
+}
+
 void csSequenceTrigger::Fire ()
 {
-  if (!enabled && !enable_onetest) return;
-  enable_onetest = false;
+  if (enabled)
+  {
+    enable_onetest = false;
+    uint32 global_framenr = eseqmgr->GetGlobalFrameNr ();
+    if (framenr != global_framenr)
+    {
+      framenr = global_framenr;
+      fired_conditions = 0;
+    }
 
-  last_trigger_state = false;
-  uint32 global_framenr = eseqmgr->GetGlobalFrameNr ();
-  if (framenr != global_framenr)
-  {
-    framenr = global_framenr;
-    fired_conditions = 0;
+    last_trigger_state = false;
+    fired_conditions++;
+    if (fired_conditions >= total_conditions)
+    {
+      last_trigger_state = true;
+      // Only fire if trigger is enabled. Otherwise we are only
+      // doing the test.
+      eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
+    	  fire_sequence->GetSequence ());
+      enabled = false;
+      fired_conditions = 0;
+    }
   }
-  fired_conditions++;
-  if (fired_conditions >= total_conditions)
+  else if (enable_onetest)
   {
-    last_trigger_state = true;
-    eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
-    	fire_sequence->GetSequence ());
-    fired_conditions = 0;
-    enabled = false;
+    uint32 global_framenr = eseqmgr->GetGlobalFrameNr ();
+    if (framenr != global_framenr)
+    {
+      // We start a new frame.
+      if (onetest_framenr != 0)
+      {
+        // In this case we already did our test last frame.
+	// Since we come here we know the trigger failed.
+	enable_onetest = false;
+	last_trigger_state = false;
+	return;
+      }
+      framenr = global_framenr;
+      onetest_framenr = global_framenr;
+      fired_conditions = 0;
+    }
+    if (onetest_framenr == 0) return;	// Not busy testing yet.
+
+    fired_conditions++;
+    if (fired_conditions >= total_conditions)
+    {
+      last_trigger_state = true;
+      fired_conditions = 0;
+      enable_onetest = false;
+    }
   }
 }
 
@@ -894,7 +946,7 @@ void csSequenceTrigger::TestConditions (csTicks delay)
     csRef<iSequence> seq (csPtr<iSequence> (
 	eseqmgr->GetSequenceManager ()->NewSequence ()));
     CondTestConditions* cond = new CondTestConditions (this, delay);
-    seq->AddLoop (delay, cond, seq);
+    seq->AddCondition (delay, cond, seq, NULL);
     cond->DecRef ();
     eseqmgr->GetSequenceManager ()->RunSequence (0, seq);
   }

@@ -206,6 +206,7 @@ class csSequenceTrigger : public csObject
 private:
   bool enabled;
   bool enable_onetest;
+  uint32 onetest_framenr;	// We test for this frame.
   csRef<iSequenceWrapper> fire_sequence;
   csEngineSequenceManager* eseqmgr;
   csTicks fire_delay;
@@ -235,10 +236,10 @@ public:
   void FireSequence (csTicks delay, iSequenceWrapper* seq);
   iSequenceWrapper* GetFiredSequence () { return fire_sequence; }
   void TestConditions (csTicks delay);
-  bool CheckState () { return last_trigger_state; }
+  bool CheckState ();
 
   csTicks GetConditionTestDelay () const { return condtest_delay; }
-  void EnableOneTest () { enable_onetest = true; }
+  void EnableOneTest ();
 
   csEngineSequenceManager* GetEngineSequenceManager () const
   {
