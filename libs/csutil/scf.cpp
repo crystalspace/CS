@@ -588,5 +588,7 @@ iStrVector* csSCF::QueryClassList (char const* pattern)
         v->Push(csStrNew(s));
     }
   }
-  return SCF_QUERY_INTERFACE(v, iStrVector);
+  iStrVector* iv = SCF_QUERY_INTERFACE(v, iStrVector);
+  if (iv) v->DecRef(); // Should _always_ be true, but just in case...
+  return iv;
 }

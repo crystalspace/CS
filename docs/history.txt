@@ -30,6 +30,9 @@ The history order is reversed so that new features are at the top.
 	  scfSharedLibrary objects were never actually getting destroyed.  The
 	  result was that the dynamically loaded plugin code never got unloaded
 	  even though SCF though that it had.
+	- Eric Sunshine fixed csSCF::QueryClassList() so that it no longer
+	  leaks an scfStrVector object.  The reference count on the returned
+	  object was incorrect; it should have been 1 but was actually 2.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
