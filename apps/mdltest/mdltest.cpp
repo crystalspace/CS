@@ -57,6 +57,19 @@ CS_IMPLEMENT_APPLICATION
 
 void Cleanup ();
 
+void InitializeSprite (iMeshWrapper *SpriteWrapper)
+{
+  iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
+    iSprite3DState);
+  sprState->SetBaseColor (csColor (1, 1, 1));
+  sprState->SetLighting (false);
+  sprState->SetAction ("action");
+  sprState->DecRef ();
+
+  for (int i=0; i<SpriteWrapper->GetChildCount (); i++)
+    InitializeSprite (SpriteWrapper->GetChild (i));
+}
+
 iModelDataVertices *Simple::CreateDefaultModelVertexFrame ()
 {
   iModelDataVertices *Vertices = new csModelDataVertices ();
@@ -93,12 +106,20 @@ void Simple::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
+iModelData *Simple::CreateDefaultModel ()
 {
+  iMaterialWrapper *m1 = engine->FindMaterial ("material1");
+  iMaterialWrapper *m2 = engine->FindMaterial ("material2");
+  iMaterialWrapper *m3 = engine->FindMaterial ("material3");
+
   iModelData *Model = new csModelData ();
 
   iModelDataMaterial *mat = new csModelDataMaterial ();
-  mat->SetMaterialWrapper (OtherMaterial);
+  mat->SetMaterialWrapper (m1);
+  iModelDataMaterial *mat2 = new csModelDataMaterial ();
+  mat2->SetMaterialWrapper (m2);
+  iModelDataMaterial *mat3 = new csModelDataMaterial ();
+  mat3->SetMaterialWrapper (m3);
 
   iModelDataObject *Object = new csModelDataObject ();
   Model->QueryObject ()->ObjAdd (Object->QueryObject ());
@@ -154,6 +175,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Polygon->AddVertex (0, 1, 0, 1);
   Polygon->AddVertex (4, 1, 0, 2);
   Polygon->AddVertex (5, 1, 0, 3);
+  Polygon->SetMaterial (mat2);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -161,6 +183,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Polygon->AddVertex (1, 4, 0, 1);
   Polygon->AddVertex (5, 4, 0, 2);
   Polygon->AddVertex (6, 4, 0, 3);
+  Polygon->SetMaterial (mat3);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -168,6 +191,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Polygon->AddVertex (2, 0, 0, 1);
   Polygon->AddVertex (6, 0, 0, 2);
   Polygon->AddVertex (7, 0, 0, 3);
+  Polygon->SetMaterial (mat);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -175,6 +199,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Polygon->AddVertex (3, 5, 0, 1);
   Polygon->AddVertex (7, 5, 0, 2);
   Polygon->AddVertex (4, 5, 0, 3);
+  Polygon->SetMaterial (mat2);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -182,6 +207,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Polygon->AddVertex (6, 2, 0, 1);
   Polygon->AddVertex (5, 2, 0, 2);
   Polygon->AddVertex (4, 2, 0, 3);
+  Polygon->SetMaterial (mat3);
 
   return Model;
 }
@@ -336,15 +362,17 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
-  iMaterialWrapper* tm = LoadTexture ("stone", "/lib/std/stone4.gif");
-  iMaterialWrapper* tm2 = LoadTexture ("wood", "/lib/std/andrew_wood.gif");
+  iMaterialWrapper* tm = LoadTexture ("material1", "/lib/std/stone4.gif");
+  iMaterialWrapper* tm2 = LoadTexture ("material2", "/lib/std/andrew_wood.gif");
+  iMaterialWrapper* tm3 = LoadTexture ("material3", "/lib/std/andrew_marble4.gif");
 
   room = engine->CreateSector ("room");
 
   // -------------------------------------------------------------------------
 
   const char *Filename = cmdline->GetName (0);
-  iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
+  iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel ();
+
   csModelDataTools::MergeObjects (Model, true);
 
 //  Model->LoadImages (vfs, imageio, g3d->GetTextureManager ()->GetTextureFormat ());
@@ -354,25 +382,20 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   iMeshObjectType *ThingType = engine->GetThingType ();
   iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
-  iMeshFactoryWrapper *SpriteFactory = engine->CreateMeshFactory (
-    "crystalspace.mesh.object.sprite.3d", "SpriteFactory");
 
   iThingState *fState =
 	SCF_QUERY_INTERFACE (ThingFactory, iThingState);
-  iSprite3DFactoryState *sState = SCF_QUERY_INTERFACE (
-	SpriteFactory->GetMeshObjectFactory (), iSprite3DFactoryState);
-  sState->SetMaterialWrapper (tm);
   iModelDataObject *mdo = CS_GET_CHILD_OBJECT (Model->QueryObject (), iModelDataObject);
   crossbuilder->BuildThing (mdo, fState, tm);
-  crossbuilder->BuildSpriteFactory (mdo, sState);
+  csModelDataTools::SplitObjectsByMaterial (Model);
+  iMeshFactoryWrapper *sfWrapper = crossbuilder->BuildSpriteFactoryHierarchy (Model, engine, tm);
   fState->DecRef ();
-  sState->DecRef ();
   mdo->DecRef ();
   Model->DecRef ();
 
   iMeshObject *ThingObject = ThingFactory->NewInstance ();
   iMeshWrapper *ThingWrapper = engine->CreateMeshWrapper (ThingObject, "thing");
-  iMeshWrapper *SpriteWrapper = engine->CreateMeshWrapper (SpriteFactory, "sprite");
+  iMeshWrapper *SpriteWrapper = engine->CreateMeshWrapper (sfWrapper, "sprite");
 
   // @@@ hardcoded == BAD!
   float rad = 6;
@@ -393,12 +416,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
   SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
 
-  iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
-    iSprite3DState);
-  sprState->SetBaseColor (csColor (1, 1, 1));
-  sprState->SetLighting (false);
-  sprState->SetAction ("action");
-  sprState->DecRef ();
+  InitializeSprite (SpriteWrapper);
 
   // -------------------------------------------------------------------------
 

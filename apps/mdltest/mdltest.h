@@ -57,7 +57,7 @@ public:
   virtual void NextFrame ();
   iModelDataVertices *CreateDefaultModelVertexFrame ();
   iModelData *ImportModel (const char *Filename);
-  iModelData *CreateDefaultModel (iMaterialWrapper *OtherMaterial);
+  iModelData *CreateDefaultModel ();
   iMaterialWrapper *LoadTexture (const char *Name, const char *Filename);
 };
 

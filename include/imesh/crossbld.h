@@ -21,11 +21,13 @@
 
 #include "csutil/scf.h"
 
+struct iModelData;
 struct iModelDataObject;
 struct iThingState;
 struct iSprite3DFactoryState;
 struct iMaterialWrapper;
-
+struct iEngine;
+struct iMeshFactoryWrapper;
 
 SCF_VERSION (iCrossBuilder, 0, 1, 0);
 
@@ -45,6 +47,10 @@ struct iCrossBuilder : public iBase
   /// Build a sprite factory from a model file
   virtual bool BuildSpriteFactory (iModelDataObject *Data,
 	iSprite3DFactoryState *tgt) const = 0;
+
+  /// Build a hierarchical sprite factory from all objects in a scene
+  virtual iMeshFactoryWrapper *BuildSpriteFactoryHierarchy (iModelData *Scene,
+	iEngine *Engine, iMaterialWrapper *DefaultMaterial) const = 0;
 };
 
 #endif // __IMESH_CROSSBLD_H__

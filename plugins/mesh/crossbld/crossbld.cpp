@@ -2,17 +2,25 @@
 #include "cssysdef.h"
 #include "csutil/csobject.h"
 #include "csutil/typedvec.h"
+#include "csutil/objiter.h"
+#include "csgeom/transfrm.h"
 #include "isys/plugin.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdldata.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/sprite3d.h"
+#include "imesh/object.h"
+#include "iengine/engine.h"
+#include "iengine/mesh.h"
 
 SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
 SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
 SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
 SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
+SCF_DECLARE_FAST_INTERFACE (iSprite3DFactoryState);
+
+CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
 
 //----------------------------------------------------------------------------
 
@@ -24,13 +32,17 @@ public:
   /// constructor
   csCrossBuilder (iBase *parent);
 
-  /// Build a thing from a model file
+  /// Build a thing from a model data object
   virtual bool BuildThing (iModelDataObject *Data, iThingState *tgt,
 	iMaterialWrapper *defMat) const;
 
-  /// Build a sprite factory from a model file
+  /// Build a sprite factory from a model data object
   virtual bool BuildSpriteFactory (iModelDataObject *Data,
 	iSprite3DFactoryState *tgt) const;
+
+  /// Build a hierarchical sprite factory from all objects in a scene
+  virtual iMeshFactoryWrapper *BuildSpriteFactoryHierarchy (iModelData *Scene,
+	iEngine *Engine, iMaterialWrapper *DefaultMaterial) const;
 
   class Plugin : public iPlugin
   {
@@ -337,4 +349,44 @@ bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
   }
 
   return true;
+}
+
+iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
+	iModelData *Scene, iEngine *Engine, iMaterialWrapper *DefaultMaterial) const
+{
+  iMeshFactoryWrapper *MainWrapper = NULL;
+
+  csModelDataObjectIterator it (Scene->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    iMeshFactoryWrapper *SubWrapper = Engine->CreateMeshFactory (
+      "crystalspace.mesh.object.sprite.3d", NULL);
+    if (!SubWrapper) {
+      // seems like building 3d sprites is impossible
+      Engine->GetMeshFactories ()->RemoveMeshFactory (MainWrapper);
+      return NULL;
+    }
+
+    iSprite3DFactoryState *sfState = SCF_QUERY_INTERFACE_FAST (
+      SubWrapper->GetMeshObjectFactory (), iSprite3DFactoryState);
+    if (!sfState) {
+      // impossible to query the correct interface, maybe because
+      // of a version conflict
+      Engine->GetMeshFactories ()->RemoveMeshFactory (MainWrapper);
+      return NULL;
+    }
+    
+    sfState->SetMaterialWrapper (DefaultMaterial);
+    BuildSpriteFactory (it.Get (), sfState);
+    sfState->DecRef ();
+
+    if (MainWrapper) {
+      MainWrapper->AddChild (SubWrapper, csReversibleTransform ());
+      /* @@@ remove the sub-wrapper from the iEngine again? */
+    } else MainWrapper = SubWrapper;
+
+    it.Next ();
+  }
+  
+  return MainWrapper;
 }
