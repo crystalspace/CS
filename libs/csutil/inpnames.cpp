@@ -573,6 +573,27 @@ bool csInputDefinition::FromEvent (iEvent* event, bool useCookedKey)
   else if (CS_IS_MOUSE_EVENT(*event))
   {
     m = event->Mouse;
+    if (m.Button)
+    {
+      containedType = csevMouseDown;
+      m.x = m.y = 0;
+    }
+    else if (m.y)
+    {
+      containedType = csevMouseMove;
+      m.x = 0;
+      m.y = 1;
+      m.Button = 0;
+    }
+    else if (m.x)
+    {
+      containedType = csevMouseMove;
+      m.x = 1;
+      m.y = 0;
+      m.Button = 0;
+    }
+    else
+      return false;
     // Left/Right/any is lost in translation, we default to any
     for (int mod=0; mod < csKeyModifierTypeLast; mod++)
       if (m.Modifiers & (1<<mod))
@@ -582,6 +603,27 @@ bool csInputDefinition::FromEvent (iEvent* event, bool useCookedKey)
   else if (CS_IS_JOYSTICK_EVENT(*event))
   {
     j = event->Joystick;
+    if (j.Button)
+    {
+      containedType = csevJoystickDown;
+      j.x = j.y = 0;
+    }
+    else if (j.y)
+    {
+      containedType = csevJoystickMove;
+      j.x = 0;
+      j.y = 1;
+      j.Button = 0;
+    }
+    else if (j.x)
+    {
+      containedType = csevJoystickMove;
+      j.x = 1;
+      j.y = 0;
+      j.Button = 0;
+    }
+    else
+      return false;
     // Left/Right/any is lost in translation, we default to any
     for (int mod=0; mod < csKeyModifierTypeLast; mod++)
       if (m.Modifiers & (1<<mod))
