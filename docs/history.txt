@@ -56,6 +56,8 @@ chronological order.
 	- Eric Sunshine augmented the Python SDK check in configure.ac so that
 	  it now works correctly with the Python package for Windows which is
 	  distributed by www.python.org.
+	- Steven Geens added some documentation about sockets and
+	  morphanimations in sprcal3d.
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.
