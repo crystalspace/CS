@@ -458,7 +458,7 @@
       croak("No self parameter passed to GetCollisionPairs");
 
     iCollideSystem* sys;
-    if (SWIG_ConvertPtr(sys_ref,(void**)&reg,SWIGTYPE_p_iCollideSystem,0) < 0)
+    if (SWIG_ConvertPtr(sys_ref,(void**)&sys,SWIGTYPE_p_iCollideSystem,0) < 0)
       croak("Self parameter of GetCollisionPairs must be an iCollideSystem\n");
 
     csCollisionPair *pairs = sys->GetCollisionPairs ();

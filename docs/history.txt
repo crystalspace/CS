@@ -60,6 +60,8 @@ chronological order.
 	  unused variables.  Previously, these Jamfiles and makefiles made the
 	  potentially bogus assumption that all compilers understand
 	  -Wno-unused.
+	- Eric Sunshine fixed copy/paste error in _GetCollisionPairs() in
+	  perlpost.i which resulted in syntax error.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
