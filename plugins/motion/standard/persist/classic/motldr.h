@@ -29,13 +29,11 @@ struct iObjectRegistry;
 struct iVFS;
 struct iMotionManager;
 struct iMotionTemplate;
+struct iLoaderContext;
 
-/*
- *
- *	Motion Loader.
- *
+/**
+ * Motion Loader.
  */
-
 class csMotionLoader : public iLoaderPlugin
 {
 private:
@@ -55,8 +53,8 @@ public:
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
   virtual bool Initialize( iObjectRegistry *object_reg);
-  virtual iBase* Parse( const char* string, iMaterialList* matlist,
-  	iMeshFactoryList* factlist, iBase *context );
+  virtual iBase* Parse( const char* string, iLoaderContext* ldr_context,
+  	iBase *context );
 
   void Report (int severity, const char* msg, ...);
 

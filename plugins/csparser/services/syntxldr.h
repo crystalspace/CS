@@ -52,9 +52,6 @@ protected:
 
   void OptimizePolygon (iPolygon3D *p);
 
-  iMaterialWrapper* FindMaterial (iEngine* engine, const char* name);
-  iSector* FindSector (iEngine* engine, const char* name);
-
 public:
 
   SCF_DECLARE_IBASE;
@@ -81,7 +78,8 @@ public:
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before, csVector3 &after);
 
-  virtual bool ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
+  virtual bool ParsePoly3d (iLoaderContext* ldr_context,
+  			    iEngine* engine, iPolygon3D* poly3d, char* buf,
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset);
 

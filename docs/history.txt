@@ -1,5 +1,38 @@
 The history order is reversed so that new features are at the top.
 
+22-Feb-2002
+	- Added iLoaderContext interface (include/imap/ldrctxt.h). This
+	  new interface gives loader plugins a way to find out about
+	  sectors, materials, mesh objects, and mesh factory wrappers.
+	  The interface supports the notion of region-qualified names (i.e.
+	  'regionname/objectname') or just normal object names.
+	  Implementations of loader contexts should not be modifiable since
+	  sometimes a context is stored for delayed loading.
+	- Removed iLoader::FindMaterial(), FindSector(), and
+	  ResolveCurrentRegionOnly() since now the loader context has
+	  to be used.
+	- Changed iLoaderPlugin to use the iLoaderContext instead of
+	  material and factory list.
+	- The standard loader now supports an iLoaderContext and gives
+	  it to the loader plugins.
+	- Modified all the loader plugins to use the new context object.
+	- Extended iSyntaxService::ParsePoly3d() with a new
+	  iLoaderContext* parameter.
+	- Added iEngine::CreateLoaderContext(). With this function you can
+	  create a loader context that will operate on the engine lists.
+	  It also has an optional region parameter with which
+	  you can get a loader context that will only search in that
+	  region. You can use this function for giving it to loader plugins
+	  directly.
+	- Changed the new iEngine::FindBla() functions I added yesterday
+	  so that they accept an optional region parameter instead of
+	  a bool ResolveCurrentRegion.
+	- Fixed a bug in iEngine::CreateMeshFactory(). If a factory with
+	  the same name already existed it would not create a new factory.
+	  This is wrong since different factories with the same name
+	  are perfectly legal. It is possible for the factory to be in
+	  another region for example.
+	- Fixed the python plugin for the changes yesterday.
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:

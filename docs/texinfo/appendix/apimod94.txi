@@ -6,6 +6,14 @@
 This section documents the major changes between versions 0.92 and 0.94 of of
 Crystal Space.
 
+@subheading Loader Changes
+@cindex @code{iLoaderPlugin}
+@cindex @code{iLoaderContext}
+
+All plugins implementing @code{iLoaderPlugin} will have to be changed
+since the material and mesh factory lists are now replaced with a
+@code{iLoaderContext} parameter.
+
 @subheading iCamera changes
 @cindex @code{iCamera}
 

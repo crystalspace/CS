@@ -29,6 +29,7 @@ struct iPolygon3D;
 struct iEngine;
 struct iMaterialWrapper;
 struct iThingState;
+struct iLoaderContext;
 
 #define CSTEX_UV 1  // UV is given in texture description
 #define CSTEX_V1 2  // vector1 is given in texture description
@@ -107,7 +108,8 @@ struct iSyntaxService : public iBase
   /**
    * Parses a POLYGON.
    */
-  virtual bool ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
+  virtual bool ParsePoly3d (iLoaderContext* ldr_context,
+  			    iEngine* engine, iPolygon3D* poly3d, char* buf,
 			    float default_texlen,
 			    iThingState* thing_state, int vt_offset) = 0;
 

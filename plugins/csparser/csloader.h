@@ -59,6 +59,7 @@ struct iKeyValuePair;
 struct iMapNode;
 struct iReporter;
 struct iLODControl;
+struct iLoaderContext;
 
 /**
  * The loader for Crystal Space maps.
@@ -66,6 +67,9 @@ struct iLODControl;
 class csLoader : public iLoader
 {
 private:
+  iLoaderContext* ldr_context;
+  iLoaderContext* GetLoaderContext ();
+
   class csLoaderStats
   {
   public:
@@ -118,11 +122,6 @@ private:
   class csLoaderStats *Stats;
 
   /// -----------------------------------------------------------------------
-
-  /// Find a sector (in engine or region).
-  virtual iSector* FindSector (const char* name);
-  /// Get ResolveOnlyRegion flag.
-  virtual bool ResolveCurrentRegionOnly () const { return ResolveOnlyRegion; }
 
   /// Parse a matrix definition
   bool ParseMatrix (char* buf, csMatrix3 &m);
@@ -234,9 +233,6 @@ private:
 
   /// Load map from a memory buffer
   bool LoadMap (char* buf);
-
-  /// Find a material (and create one from texture if possible)
-  virtual iMaterialWrapper* FindMaterial (const char *iName);
 
   /**
    * Print an error about an unknown token. 'object' is the type of object

@@ -461,8 +461,8 @@ bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
 }
 
 
-iBase* csMotionLoader::Parse ( const char *string, iMaterialList*,
-	iMeshFactoryList*, iBase* /* context */ )
+iBase* csMotionLoader::Parse ( const char *string, iLoaderContext*,
+	iBase* /* context */ )
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE(FILE)

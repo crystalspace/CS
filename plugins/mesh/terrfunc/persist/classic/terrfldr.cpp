@@ -34,6 +34,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -105,7 +106,7 @@ bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
-	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
+	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.terrfunc", iMeshObjectType);
@@ -143,8 +144,8 @@ bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csTerrFuncLoader::Parse (const char* pString, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* /* context */)
+iBase* csTerrFuncLoader::Parse (const char* pString,
+	iLoaderContext* ldr_context, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -186,7 +187,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iMaterialList* matlist,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (pParams, "%s", pStr);
-	  iMeshFactoryWrapper* iFactory = factlist->FindByName (pStr);
+	  iMeshFactoryWrapper* iFactory = ldr_context->FindMeshFactory (pStr);
 	  if (!iFactory)
 	  {
 	    // @@@ Error handling!
@@ -200,7 +201,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iMaterialList* matlist,
 	{
 	  int i;
           csScanStr (pParams, "%d,%s", &i, pStr);
-          iMaterialWrapper* mat = matlist->FindByName (pStr);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (pStr);
 	  if (!mat)
 	  {
             // @@@ Error handling!
@@ -215,7 +216,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iMaterialList* matlist,
 		int i, j = iTerrainState->GetXResolution();
 		j = j * j;
 		csScanStr( pParams, "%s", pStr);
-		iMaterialWrapper *mat = matlist->FindByName (pStr);
+		iMaterialWrapper *mat = ldr_context->FindMaterial (pStr);
 		if (!mat)
 		{
 		  printf("Terrain func loader: Cant find requested material '%s'\n",pStr);

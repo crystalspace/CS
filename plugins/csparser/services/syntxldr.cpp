@@ -42,6 +42,7 @@
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "imap/parser.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN;
 
@@ -157,34 +158,6 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   csTextSyntaxService::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
-}
-
-iSector* csTextSyntaxService::FindSector (iEngine* engine,
-	const char* name)
-{
-  iLoader *loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (loader)
-  {
-    iSector* sector = loader->FindSector (name);
-    loader->DecRef ();
-    return sector;
-  }
-  else
-    return engine->FindSector (name);
-}
-
-iMaterialWrapper* csTextSyntaxService::FindMaterial (iEngine* engine,
-	const char* name)
-{
-  iLoader *loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (loader)
-  {
-    iMaterialWrapper* mat = loader->FindMaterial (name);
-    loader->DecRef ();
-    return mat;
-  }
-  else
-    return engine->FindMaterial (name);
 }
 
 bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
@@ -644,27 +617,26 @@ void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
 class MissingSectorCallback : public iPortalCallback
 {
 public:
-  iEngine* engine;
+  iLoaderContext* ldr_context;
   char* sectorname;
-  bool ResolveOnlyRegion;
 
   SCF_DECLARE_IBASE;
-  MissingSectorCallback (iEngine* engine, const char* sector,
-  	bool ResolveOnlyRegion)
+  MissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
   {
     SCF_CONSTRUCT_IBASE (NULL);
-    MissingSectorCallback::engine = engine;
-    MissingSectorCallback::ResolveOnlyRegion = ResolveOnlyRegion;
+    MissingSectorCallback::ldr_context = ldr_context;
     sectorname = csStrNew (sector);
+    if (ldr_context) ldr_context->IncRef ();
   }
   virtual ~MissingSectorCallback ()
   {
     delete[] sectorname;
+    if (ldr_context) ldr_context->DecRef ();
   }
   
   virtual bool Traverse (iPortal* portal, iBase* /*context*/)
   {
-    iSector* sector = engine->FindSector (sectorname, ResolveOnlyRegion);
+    iSector* sector = ldr_context->FindSector (sectorname);
     if (!sector) return false;
     portal->SetSector (sector);
     // For efficiency reasons we deallocate the name here.
@@ -679,6 +651,7 @@ SCF_IMPLEMENT_IBASE (MissingSectorCallback)
 SCF_IMPLEMENT_IBASE_END
 
 bool csTextSyntaxService::ParsePoly3d (
+	iLoaderContext* ldr_context,
 	iEngine* engine, iPolygon3D* poly3d, char* buf,
 	float default_texlen,
 	iThingState* thing_state, int vt_offset)
@@ -760,7 +733,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-        mat = FindMaterial (engine, str);
+        mat = ldr_context->FindMaterial (str);
         if (mat == NULL)
         {
           ReportError (reporter, "crystalspace.syntax.polygon",
@@ -803,25 +776,17 @@ bool csTextSyntaxService::ParsePoly3d (
       case CS_TOKEN_PORTAL:
         {
           csScanStr (params, "%s", str);
-	  iSector* sector = FindSector (engine, str);
+	  iSector* sector = ldr_context->FindSector (str);
 	  if (sector)
 	  {
             poly3d->CreatePortal (sector);
 	  }
 	  else
 	  {
-	    bool ResolveCurrentRegion;
-	    iLoader *loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-	    if (loader)
-	    {
-	      ResolveCurrentRegion = loader->ResolveCurrentRegionOnly ();
-	      loader->DecRef ();
-	    }
-	    else ResolveCurrentRegion = false;
 	    poly3d->CreateNullPortal ();
 	    iPortal* portal = poly3d->GetPortal ();
-	    MissingSectorCallback* mscb = new MissingSectorCallback (engine,
-	    	str, ResolveCurrentRegion);
+	    MissingSectorCallback* mscb = new MissingSectorCallback (
+	    	ldr_context, str);
 	    portal->SetMissingSectorCallback (mscb);
 	    mscb->DecRef ();
 	  }

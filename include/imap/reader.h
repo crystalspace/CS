@@ -21,8 +21,7 @@
 
 #include "csutil/scf.h"
 
-struct iMaterialList;
-struct iMeshFactoryList;
+struct iLoaderContext;
 
 SCF_VERSION (iLoaderPlugin, 0, 1, 0);
 
@@ -32,8 +31,8 @@ SCF_VERSION (iLoaderPlugin, 0, 1, 0);
 struct iLoaderPlugin : public iBase
 {
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iMaterialList* matlist,
-  	iMeshFactoryList* factlist, iBase* context) = 0;
+  virtual iBase* Parse (const char* string, iLoaderContext* ldr_context,
+  	iBase* context) = 0;
 };
 
 #endif

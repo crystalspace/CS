@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -141,7 +142,7 @@ bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csExplosionFactoryLoader::Parse (const char* /*string*/,
-	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
+	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.explosion", iMeshObjectType);
@@ -277,8 +278,8 @@ static uint ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csExplosionLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase*)
+iBase* csExplosionLoader::Parse (const char* string,
+	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (CENTER)
@@ -342,7 +343,7 @@ iBase* csExplosionLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
@@ -358,7 +359,7 @@ iBase* csExplosionLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
             // @@@ Error handling!

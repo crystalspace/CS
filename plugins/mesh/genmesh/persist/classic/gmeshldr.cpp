@@ -39,6 +39,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/services.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -157,7 +158,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csGeneralFactoryLoader::Parse (const char* string,
-	iMaterialList* matlist, iMeshFactoryList*, iBase* /* context */)
+	iLoaderContext* ldr_context, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -225,7 +226,7 @@ iBase* csGeneralFactoryLoader::Parse (const char* string,
 	{
 	  char str[255];
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
       	    ReportError (reporter,
@@ -538,9 +539,8 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csGeneralMeshLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist,
-	iBase*)
+iBase* csGeneralMeshLoader::Parse (const char* string,
+	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -596,7 +596,7 @@ iBase* csGeneralMeshLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
 	  if (!fact)
 	  {
       	    ReportError (reporter,
@@ -612,7 +612,7 @@ iBase* csGeneralMeshLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
       	    ReportError (reporter,

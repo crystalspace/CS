@@ -988,6 +988,7 @@ public:
   	const char* name);
   /// Create an uninitialized mesh factory wrapper
   virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name);
+  virtual iLoaderContext* CreateLoaderContext (iRegion* region = NULL);
   /// Load mesh factory.
   virtual iMeshFactoryWrapper* LoadMeshFactory (
   	const char* name, const char* loaderClassId,
@@ -1016,19 +1017,19 @@ public:
   virtual void GetAmbientLight (csColor &c) const;
 
   virtual iMaterialWrapper* FindMaterial (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
   virtual iTextureWrapper* FindTexture (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
   virtual iSector* FindSector (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
   virtual iMeshWrapper* FindMeshObject (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
   virtual iCameraPosition* FindCameraPosition (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
   virtual iCollection* FindCollection (const char* name,
-	bool ResolveOnlyRegion = false);
+  	iRegion* region = NULL);
 
   //--------------------- iConfig interface implementation --------------------
 

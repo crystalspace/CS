@@ -1,6 +1,6 @@
 /*
     Crystal Space 3D Engine
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2002 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -62,6 +62,7 @@ struct iMeshList;
 struct iMeshFactoryList;
 struct iProgressMeter;
 struct iRegionList;
+struct iLoaderContext;
 
 /**
  * Flag for GetNearbyLights().
@@ -171,7 +172,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 3);
+SCF_VERSION (iEngine, 0, 7, 4);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -338,94 +339,87 @@ struct iEngine : public iBase
   /**
    * Find the given material. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iMaterialWrapper* FindMaterial (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
   /**
    * Find the given texture. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iTextureWrapper* FindTexture (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
   /**
    * Find the given sector. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iSector* FindSector (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
   /**
    * Find the given mesh object. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iMeshWrapper* FindMeshObject (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
   /**
    * Find the given mesh factory. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
   /**
    * Find the given camera position. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iCameraPosition* FindCameraPosition (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
   /**
    * Find the given collection. The name can be a normal
    * name. In that case this function will look in all regions
-   * except if ResolveOnlyRegion is true in which case it will only
-   * look in the current region (if there is a current region defined).
+   * except if region is not NULL in which case it will only
+   * look in that region.
    * If the name is specified as 'regionname/objectname' then
    * this function will only look in the specified region and return
    * NULL if that region doesn't contain the object or the region
-   * doesn't exist. In this case the ResolveOnlyRegion parameter is
-   * ignored.
+   * doesn't exist. In this case the region parameter is ignored.
    */
   virtual iCollection* FindCollection (const char* name,
-	bool ResolveOnlyRegion = false) = 0;
+  	iRegion* region = NULL) = 0;
 
   /**
    * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
@@ -530,6 +524,15 @@ struct iEngine : public iBase
 
   /// Create an uninitialized mesh factory wrapper
   virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name) = 0;
+
+  /**
+   * Create a loader context that you can give to loader plugins.
+   * It will basically allow loader plugins to find materials, ...
+   * If region != NULL then only that region will
+   * be searched. Destroy this object with DecRef(). The engine itself
+   * does not keep track of it.
+   */
+  virtual iLoaderContext* CreateLoaderContext (iRegion* region = NULL) = 0;
 
   /**
    * Conveniance function to load a mesh factory from a given loader plugin.

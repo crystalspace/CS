@@ -34,6 +34,7 @@
 
 #include "iutil/databuff.h"
 #include "imap/reader.h"
+#include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
@@ -72,7 +73,88 @@
 
 //---------------------------------------------------------------------------
 
-void csLoader::csLoaderStats::Init()
+/*
+ * Context class for the standard loader.
+ */
+class StdLoaderContext : public iLoaderContext
+{
+private:
+  iEngine* Engine;
+  iRegion* region;
+
+public:
+  StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion);
+  virtual ~StdLoaderContext ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual iSector* FindSector (const char* name);
+  virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
+  virtual iMeshWrapper* FindMeshObject (const char* name);
+};
+
+SCF_IMPLEMENT_IBASE(StdLoaderContext);
+  SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
+SCF_IMPLEMENT_IBASE_END;
+
+StdLoaderContext::StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  StdLoaderContext::Engine = Engine;
+  if (ResolveOnlyRegion)
+    region = Engine->GetCurrentRegion ();
+  else
+    region = NULL;
+}
+
+StdLoaderContext::~StdLoaderContext ()
+{
+}
+
+iSector* StdLoaderContext::FindSector (const char* name)
+{
+  return Engine->FindSector (name, region);
+}
+
+iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
+{
+  iMaterialWrapper* mat = Engine->FindMaterial (name, region);
+  if (mat)
+    return mat;
+
+  iTextureWrapper* tex = Engine->FindTexture (name, region);
+  if (tex)
+  {
+    // Add a default material with the same name as the texture
+    iMaterial* material = Engine->CreateBaseMaterial (tex);
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material);
+    // First we have to extract the optional region name from the name:
+    char* n = strchr (name, '/');
+    if (!n) n = (char*)name;
+    else n++;
+    mat->QueryObject()->SetName (n);
+    material->DecRef ();
+    return mat;
+  }
+
+  return NULL;
+}
+
+iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
+{
+  return Engine->FindMeshFactory (name, region);
+}
+
+iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
+{
+  return Engine->FindMeshObject (name, region);
+}
+
+//---------------------------------------------------------------------------
+
+void csLoader::csLoaderStats::Init ()
 {
   polygons_loaded = 0;
   portals_loaded  = 0;
@@ -86,7 +168,7 @@ void csLoader::csLoaderStats::Init()
 
 csLoader::csLoaderStats::csLoaderStats()
 {
-  Init();
+  Init ();
 }
 
 // Define all tokens used through this file
@@ -191,39 +273,7 @@ void csLoader::ReportNotify (const char* description, ...)
   va_end (arg);
 }
 
-iMaterialWrapper *csLoader::FindMaterial (const char* name)
-{
-  iMaterialWrapper* mat = Engine->FindMaterial (name, ResolveOnlyRegion);
-  if (mat)
-    return mat;
-
-  iTextureWrapper* tex = Engine->FindTexture (name, ResolveOnlyRegion);
-  if (tex)
-  {
-    // Add a default material with the same name as the texture
-    iMaterial* material = Engine->CreateBaseMaterial (tex);
-    iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
-    // First we have to extract the optional region name from the name:
-    char* n = strchr (name, '/');
-    if (!n) n = (char*)name;
-    else n++;
-    mat->QueryObject()->SetName (n);
-    material->DecRef ();
-    return mat;
-  }
-
-  ReportError (
-    "crystalspace.maploader.find.material",
-    "Could not find material named '%s'!", name);
-  return NULL;
-}
-
 //---------------------------------------------------------------------------
-
-iSector* csLoader::FindSector (const char* name)
-{
-  return Engine->FindSector (name, ResolveOnlyRegion);
-}
 
 bool csLoader::LoadMap (char* buf)
 {
@@ -292,7 +342,7 @@ bool csLoader::LoadMap (char* buf)
       	  break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->CreateMeshFactory(name);
+            iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
 	    if (!t || !LoadMeshObjectFactory (t, params))
 	    {
 	      ReportError (
@@ -316,7 +366,7 @@ bool csLoader::LoadMap (char* buf)
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
-          if (!FindSector (name))
+          if (!GetLoaderContext ()->FindSector (name))
 	  {
             if (!ParseSector (name, params))
 	      return false;
@@ -385,6 +435,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   Stats->Init ();
   if (iClearEngine) Engine->DeleteAll ();
   ResolveOnlyRegion = iOnlyRegion;
+  SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
   iDataBuffer *buf = VFS->ReadFile (file);
 
@@ -605,6 +656,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
   }
 
   ResolveOnlyRegion = false;
+  SCF_DEC_REF (ldr_context); ldr_context = NULL;
   bool retcode = LoadLibrary (**buf);
 
   buf->DecRef ();
@@ -857,8 +909,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  iBase* mof = plug->Parse (params, Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), stemp->GetMeshObjectFactory ());
+	  iBase* mof = plug->Parse (params, GetLoaderContext (),
+	  	stemp->GetMeshObjectFactory ());
 	  if (!mof)
 	  {
             ReportError (
@@ -908,8 +960,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
 	  iBase* mof = plug->Parse ((char*)(buf->GetUint8 ()),
-	  	Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), stemp->GetMeshObjectFactory ());
+	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
 	  buf->DecRef ();
 	  if (!mof)
 	  {
@@ -947,7 +998,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    return false;
 	  }
           csScanStr (params, "%s", str);
-          mat = FindMaterial (str);
+          mat = GetLoaderContext ()->FindMaterial (str);
           if (mat)
 	  {
 	    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (
@@ -1760,8 +1811,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params, Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), NULL);
+	  iBase* mo = plug->Parse (params, GetLoaderContext (), NULL);
           if (mo)
           {
 	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
@@ -1817,8 +1867,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	    return false;
 	  }
 	  iBase* mo = plug->Parse ((char*)(buf->GetUint8 ()),
-	  	Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), NULL);
+	  	GetLoaderContext (), NULL);
           if (mo)
           {
 	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
@@ -1936,8 +1985,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 	}
 	else
 	{
-	  plug->Parse (params, Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), context);
+	  plug->Parse (params, GetLoaderContext (), context);
 	}
         break;
 
@@ -2142,7 +2190,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
-csLoader::csLoader(iBase *p)
+csLoader::csLoader (iBase *p)
 {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -2160,12 +2208,14 @@ csLoader::csLoader(iBase *p)
 
   flags = 0;
   ResolveOnlyRegion = false;
-  Stats = new csLoaderStats();
+  Stats = new csLoaderStats ();
+  ldr_context = NULL;
 }
 
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
+  SCF_DEC_REF(ldr_context);
   SCF_DEC_REF(plugin_mgr);
   SCF_DEC_REF(Reporter);
   SCF_DEC_REF(VFS);
@@ -2177,6 +2227,15 @@ csLoader::~csLoader()
   SCF_DEC_REF(ModelConverter);
   SCF_DEC_REF(CrossBuilder);
   delete Stats;
+}
+
+iLoaderContext* csLoader::GetLoaderContext ()
+{
+  if (!ldr_context)
+  {
+    ldr_context = new StdLoaderContext (Engine, ResolveOnlyRegion);
+  }
+  return ldr_context;
 }
 
 #define GET_PLUGIN(var, intf, msgname)	\
@@ -2308,7 +2367,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
       case CS_TOKEN_SECTOR:
         {
           csScanStr (params, "%s", str);
-	  iSector* s = FindSector (str);
+	  iSector* s = GetLoaderContext ()->FindSector (str);
           if (!s)
 	  {
 	    ReportError (
@@ -2547,12 +2606,55 @@ defaulthalo:
 	      cur_idx++;
 	      params = end+1;
 	    }
-	    halo.flare.mat_center = FindMaterial (mat_names[0]);
-	    halo.flare.mat_spark1 = FindMaterial (mat_names[1]);
-	    halo.flare.mat_spark2 = FindMaterial (mat_names[2]);
-	    halo.flare.mat_spark3 = FindMaterial (mat_names[3]);
-	    halo.flare.mat_spark4 = FindMaterial (mat_names[4]);
-	    halo.flare.mat_spark5 = FindMaterial (mat_names[5]);
+	    iLoaderContext* lc = GetLoaderContext ();
+	    halo.flare.mat_center = lc->FindMaterial (mat_names[0]);
+	    if (!halo.flare.mat_center)
+	    {
+	      ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	      return NULL;
+	    }
+	    halo.flare.mat_spark1 = lc->FindMaterial (mat_names[1]);
+	    if (!halo.flare.mat_spark1)
+	    {
+	      ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	      return NULL;
+	    }
+	    halo.flare.mat_spark2 = lc->FindMaterial (mat_names[2]);
+	    if (!halo.flare.mat_spark2)
+	    {
+	      ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	      return NULL;
+	    }
+	    halo.flare.mat_spark3 = lc->FindMaterial (mat_names[3]);
+	    if (!halo.flare.mat_spark3)
+	    {
+	      ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	      return NULL;
+	    }
+	    halo.flare.mat_spark4 = lc->FindMaterial (mat_names[4]);
+	    if (!halo.flare.mat_spark4)
+	    {
+	      ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	      return NULL;
+	    }
+	    halo.flare.mat_spark5 = lc->FindMaterial (mat_names[5]);
+	    if (!halo.flare.mat_spark5)
+	    {
+	      ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	      return NULL;
+	    }
           }
           else
             goto defaulthalo;
@@ -2891,3 +2993,4 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     if (do_culler) sector->SetVisibilityCuller (bspname);
   return sector;
 }
+

@@ -60,6 +60,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "imap/reader.h"
+#include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
 #include "imesh/thing/polytmap.h"
 #include "imesh/thing/curve.h"
@@ -1339,24 +1340,18 @@ bool csEngine::Prepare (iProgressMeter *meter)
 void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 {
   // If we have to read from the cache then we check if the 'precalc_info'
-
   // file exists on the VFS. If not then we cannot use the cache.
-
   // If the file exists but is not valid (some flags are different) then
-
   // we cannot use the cache either.
-
   // If we recalculate then we also update this 'precalc_info' file with
-
   // the new settings.
   struct PrecalcInfo
   {
-    int lm_version;                             // This number identifies a version of the lightmap format.
+    int lm_version; // This number identifies a version of the lightmap format.
 
     // If different then the format is different and we need
-
     // to recalculate.
-    int normal_light_level;                     // Normal light level (unlighted level).
+    int normal_light_level; // Normal light level (unlighted level).
     int ambient_red;
     int ambient_green;
     int ambient_blue;
@@ -1401,205 +1396,204 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       int xi = QRound (xf);
 
 #define CHECK(keyw, cond, reas) \
-  else if (!strcmp (keyword, keyw)) \
-  { \
-    if (cond) \
-    { \
-      reason = reas " changed"; \
-      break; \
-    } \
-  }
+	else if (!strcmp (keyword, keyw)) \
+	{ \
+	  if (cond) \
+	  { \
+	    reason = reas " changed"; \
+	    break; \
+	  } \
+	}
 
-    if (false)
-    {
-    }
+      if (false)
+      {
+      }
 
-    CHECK ("LMVERSION", xi != current.lm_version, "lightmap format") CHECK (
+      CHECK ("LMVERSION", xi != current.lm_version, "lightmap format") CHECK (
         "LIGHTMAP_SIZE",
         xi != current.lightmap_size,
         "lightmap size")
 #undef CHECK
-  }
-}
-
-if (data) data->DecRef ();
-
-if (reason)
-{
-  char data[500];
-  sprintf (
-    data,
-    "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\nAMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nCOSINUS_FACTOR=%g\nLIGHTMAP_SIZE=%d\n",
-    current.lm_version,
-    current.normal_light_level,
-    current.ambient_red,
-    current.ambient_green,
-    current.ambient_blue,
-    current.reflect,
-    current.radiosity,
-    current.cosinus_factor,
-    current.lightmap_size);
-  if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
-    VFS->WriteFile ("precalc_info", data, strlen (data));
-  Report ("Lightmap data is not up to date (reason: %s).", reason);
-  lightcache_mode &= ~CS_ENGINE_CACHE_READ;
-}
-
-if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
-{
-  Report ("Recalculation of lightmaps forced.");
-  Report (
-    "  Pseudo-radiosity system %s.",
-    csSector::do_radiosity ? "enabled" : "disabled");
-  Report (
-    "  Maximum number of visits per sector = %d.",
-    csSector::cfg_reflections);
-}
-else
-{
-  // If no recalculation is forced we set these variables to default to
-
-  // make sure that we don't do too many unneeded calculations.
-  csSector::do_radiosity = false;
-  csSector::cfg_reflections = 1;
-}
-
-csLightIt *lit = NewLightIterator(iregion);
-
-// Count number of lights to process.
-csLight *l;
-int light_count = 0;
-lit->Restart();
-while (lit->Fetch()) light_count++;
-
-bool do_relight = false;
-if (!(lightcache_mode & CS_ENGINE_CACHE_READ)) do_relight = true;
-
-int sn = 0;
-int num_meshes = meshes.Length();
-
-if (do_relight)
-{
-  Report ("Initializing lighting (%d meshes).", num_meshes);
-  if (meter)
-  {
-    meter->SetProgressDescription (
-        "crystalspace.engine.lighting.init",
-        "Initializing lighting (%d meshes).",
-        num_meshes);
-    meter->SetTotal (num_meshes);
-    meter->Restart ();
-  }
-}
-
-for (sn = 0; sn < num_meshes; sn++)
-{
-  iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
-  if (!region || region->IsInRegion (s->QueryObject ()))
-  {
-    iLightingInfo *linfo = SCF_QUERY_INTERFACE_FAST (
-        s->GetMeshObject (),
-        iLightingInfo);
-    if (linfo)
-    {
-      if (do_relight)
-        linfo->InitializeDefault ();
-      else
-        linfo->ReadFromCache (0);               // ID?
-      linfo->DecRef ();
     }
   }
 
-  if (do_relight && meter) meter->Step ();
-}
+  if (data) data->DecRef ();
 
-csTicks start, stop;
-start = csGetTicks();
-if (do_relight)
-{
-  Report ("Shining lights (%d lights).", light_count);
-  if (meter)
+  if (reason)
   {
-    meter->SetProgressDescription (
-        "crystalspace.engine.lighting.calc",
-        "Shining lights (%d lights)",
-        light_count);
-    meter->SetTotal (light_count);
-    meter->Restart ();
+    char data[500];
+    sprintf (
+      data,
+      "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\nAMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nCOSINUS_FACTOR=%g\nLIGHTMAP_SIZE=%d\n",
+      current.lm_version,
+      current.normal_light_level,
+      current.ambient_red,
+      current.ambient_green,
+      current.ambient_blue,
+      current.reflect,
+      current.radiosity,
+      current.cosinus_factor,
+      current.lightmap_size);
+    if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
+      VFS->WriteFile ("precalc_info", data, strlen (data));
+    Report ("Lightmap data is not up to date (reason: %s).", reason);
+    lightcache_mode &= ~CS_ENGINE_CACHE_READ;
   }
 
-  lit->Restart ();
-  while ((l = lit->Fetch ()) != NULL)
+  if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
   {
-    ((csStatLight *)l)->CalculateLighting ();
-    if (meter) meter->Step ();
-  }
-
-  stop = csGetTicks ();
-  Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
-}
-
-// Render radiosity
-if (use_new_radiosity && do_relight)
-{
-  start = csGetTicks ();
-
-  csRadiosity *rad = new csRadiosity (this, meter);
-  if (do_rad_debug)
-  {
-    rad_debug = rad;
+    Report ("Recalculation of lightmaps forced.");
+    Report (
+      "  Pseudo-radiosity system %s.",
+      csSector::do_radiosity ? "enabled" : "disabled");
+    Report (
+      "  Maximum number of visits per sector = %d.",
+      csSector::cfg_reflections);
   }
   else
   {
-    rad->DoRadiosity ();
-    delete rad;
+    // If no recalculation is forced we set these variables to default to
+    // make sure that we don't do too many unneeded calculations.
+    csSector::do_radiosity = false;
+    csSector::cfg_reflections = 1;
   }
 
-  stop = csGetTicks ();
+  csLightIt *lit = NewLightIterator(iregion);
+
+  // Count number of lights to process.
+  csLight *l;
+  int light_count = 0;
+  lit->Restart();
+  while (lit->Fetch()) light_count++;
+
+  bool do_relight = false;
+  if (!(lightcache_mode & CS_ENGINE_CACHE_READ)) do_relight = true;
+
+  int sn = 0;
+  int num_meshes = meshes.Length();
+
   if (do_relight)
-    Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
-}
-
-if (do_relight)
-{
-  Report ("Caching lighting (%d meshes).", num_meshes);
-  if (meter)
   {
-    meter->SetProgressDescription (
-        "crystalspace.engine.lighting.cache",
-        "Caching lighting (%d meshes)",
-        num_meshes);
-    meter->SetTotal (num_meshes);
-    meter->Restart ();
-  }
-}
-
-for (sn = 0; sn < num_meshes; sn++)
-{
-  iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
-  if (!region || region->IsInRegion (s->QueryObject ()))
-  {
-    iLightingInfo *linfo = SCF_QUERY_INTERFACE_FAST (
-        s->GetMeshObject (),
-        iLightingInfo);
-    if (linfo)
+    Report ("Initializing lighting (%d meshes).", num_meshes);
+    if (meter)
     {
-      if (do_relight) linfo->WriteToCache (0);  // @@@ id
-      linfo->PrepareLighting ();
-      linfo->DecRef ();
+      meter->SetProgressDescription (
+        "crystalspace.engine.lighting.init",
+        "Initializing lighting (%d meshes).",
+        num_meshes);
+      meter->SetTotal (num_meshes);
+      meter->Restart ();
     }
   }
 
-  if (do_relight && meter) meter->Step ();
-}
+  for (sn = 0; sn < num_meshes; sn++)
+  {
+    iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
+    if (!region || region->IsInRegion (s->QueryObject ()))
+    {
+      iLightingInfo *linfo = SCF_QUERY_INTERFACE_FAST (
+        s->GetMeshObject (),
+        iLightingInfo);
+      if (linfo)
+      {
+        if (do_relight)
+          linfo->InitializeDefault ();
+        else
+          linfo->ReadFromCache (0);               // ID?
+        linfo->DecRef ();
+      }
+    }
 
-csThing::current_light_frame_number++;
+    if (do_relight && meter) meter->Step ();
+  }
 
-if (do_relight) Report ("Updating VFS....");
-if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
-if (do_relight) Report ("DONE!");
+  csTicks start, stop;
+  start = csGetTicks();
+  if (do_relight)
+  {
+    Report ("Shining lights (%d lights).", light_count);
+    if (meter)
+    {
+      meter->SetProgressDescription (
+          "crystalspace.engine.lighting.calc",
+        "Shining lights (%d lights)",
+        light_count);
+      meter->SetTotal (light_count);
+      meter->Restart ();
+    }
 
-delete lit;
+    lit->Restart ();
+    while ((l = lit->Fetch ()) != NULL)
+    {
+      ((csStatLight *)l)->CalculateLighting ();
+      if (meter) meter->Step ();
+    }
+
+    stop = csGetTicks ();
+    Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
+  }
+
+  // Render radiosity
+  if (use_new_radiosity && do_relight)
+  {
+    start = csGetTicks ();
+
+    csRadiosity *rad = new csRadiosity (this, meter);
+    if (do_rad_debug)
+    {
+      rad_debug = rad;
+    }
+    else
+    {
+      rad->DoRadiosity ();
+      delete rad;
+    }
+
+    stop = csGetTicks ();
+    if (do_relight)
+      Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
+  }
+
+  if (do_relight)
+  {
+    Report ("Caching lighting (%d meshes).", num_meshes);
+    if (meter)
+    {
+      meter->SetProgressDescription (
+          "crystalspace.engine.lighting.cache",
+          "Caching lighting (%d meshes)",
+          num_meshes);
+      meter->SetTotal (num_meshes);
+      meter->Restart ();
+    }
+  }
+
+  for (sn = 0; sn < num_meshes; sn++)
+  {
+    iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
+    if (!region || region->IsInRegion (s->QueryObject ()))
+    {
+      iLightingInfo *linfo = SCF_QUERY_INTERFACE_FAST (
+          s->GetMeshObject (),
+          iLightingInfo);
+      if (linfo)
+      {
+        if (do_relight) linfo->WriteToCache (0);  // @@@ id
+        linfo->PrepareLighting ();
+        linfo->DecRef ();
+      }
+    }
+
+    if (do_relight && meter) meter->Step ();
+  }
+
+  csThing::current_light_frame_number++;
+
+  if (do_relight) Report ("Updating VFS....");
+  if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
+  if (do_relight) Report ("DONE!");
+
+  delete lit;
 }
 void csEngine::InvalidateLightmaps ()
 {
@@ -1880,7 +1874,7 @@ char* csEngine::SplitRegionName (const char* name, iRegion** region)
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1889,15 +1883,15 @@ iMaterialWrapper* csEngine::FindMaterial (const char* name,
   iMaterialWrapper* mat;
   if (region)
     mat = region->FindMaterial (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    mat = GetCurrentRegion ()->FindMaterial (n);
+  else if (reg)
+    mat = reg->FindMaterial (n);
   else
     mat = GetMaterialList ()->FindByName (n);
   return mat;
 }
 
 iTextureWrapper* csEngine::FindTexture (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1906,15 +1900,15 @@ iTextureWrapper* csEngine::FindTexture (const char* name,
   iTextureWrapper* txt;
   if (region)
     txt = region->FindTexture (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    txt = GetCurrentRegion ()->FindTexture (n);
+  else if (reg)
+    txt = reg->FindTexture (n);
   else
     txt = GetTextureList ()->FindByName (n);
   return txt;
 }
 
 iSector* csEngine::FindSector (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1923,15 +1917,15 @@ iSector* csEngine::FindSector (const char* name,
   iSector* sect;
   if (region)
     sect = region->FindSector (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    sect = GetCurrentRegion ()->FindSector (n);
+  else if (reg)
+    sect = reg->FindSector (n);
   else
     sect = GetSectors ()->FindByName (n);
   return sect;
 }
 
 iMeshWrapper* csEngine::FindMeshObject (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1940,15 +1934,15 @@ iMeshWrapper* csEngine::FindMeshObject (const char* name,
   iMeshWrapper* mesh;
   if (region)
     mesh = region->FindMeshObject (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    mesh = GetCurrentRegion ()->FindMeshObject (n);
+  else if (reg)
+    mesh = reg->FindMeshObject (n);
   else
     mesh = GetMeshes ()->FindByName (n);
   return mesh;
 }
 
 iMeshFactoryWrapper* csEngine::FindMeshFactory (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1957,15 +1951,15 @@ iMeshFactoryWrapper* csEngine::FindMeshFactory (const char* name,
   iMeshFactoryWrapper* fact;
   if (region)
     fact = region->FindMeshFactory (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    fact = GetCurrentRegion ()->FindMeshFactory (n);
+  else if (reg)
+    fact = reg->FindMeshFactory (n);
   else
     fact = GetMeshFactories ()->FindByName (n);
   return fact;
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1974,15 +1968,15 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
   iCameraPosition* campos;
   if (region)
     campos = region->FindCameraPosition (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    campos = GetCurrentRegion ()->FindCameraPosition (n);
+  else if (reg)
+    campos = reg->FindCameraPosition (n);
   else
     campos = GetCameraPositions ()->FindByName (n);
   return campos;
 }
 
 iCollection* csEngine::FindCollection (const char* name,
-	bool ResolveOnlyRegion)
+	iRegion* reg)
 {
   iRegion* region;
   char* n = SplitRegionName (name, &region);
@@ -1991,8 +1985,8 @@ iCollection* csEngine::FindCollection (const char* name,
   iCollection* col;
   if (region)
     col = region->FindCollection (n);
-  else if (ResolveOnlyRegion && GetCurrentRegion ())
-    col = GetCurrentRegion ()->FindCollection (n);
+  else if (reg)
+    col = reg->FindCollection (n);
   else
     col = GetCollections ()->FindByName (n);
   return col;
@@ -2517,19 +2511,12 @@ iMeshFactoryWrapper *csEngine::CreateMeshFactory (
   const char *classId,
   const char *name)
 {
-  if (name != NULL)
-  {
-    iMeshFactoryWrapper *factwrap = GetMeshFactories ()->FindByName (name);
-    if (factwrap != NULL)
-    {
-      // in the "creation" case below we also return an already incref'ed
-
-      // instance to the caller so we incref'ing this one too
-      factwrap->IncRef ();
-      return factwrap;
-    }
-  }
-
+  // WARNING! In the past this routine checked if the factory
+  // was already created. This is wrong! This routine should not do
+  // this and instead allow duplicate factories (with the same name).
+  // That's because that duplicate factory can still be in another
+  // region. And even if this is not the case then factories with same
+  // name are still allowed.
   iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMeshObjectType *type = CS_QUERY_PLUGIN_CLASS (
       plugin_mgr,
@@ -2554,19 +2541,12 @@ iMeshFactoryWrapper *csEngine::CreateMeshFactory (
   iMeshObjectFactory *fact,
   const char *name)
 {
-  if (name != NULL)
-  {
-    iMeshFactoryWrapper *factwrap = GetMeshFactories ()->FindByName (name);
-    if (factwrap != NULL)
-    {
-      // in the "creation" case below we also return an already incref'ed
-
-      // instance to the caller so we incref'ing this one too
-      factwrap->DecRef ();
-      return factwrap;
-    }
-  }
-
+  // WARNING! In the past this routine checked if the factory
+  // was already created. This is wrong! This routine should not do
+  // this and instead allow duplicate factories (with the same name).
+  // That's because that duplicate factory can still be in another
+  // region. And even if this is not the case then factories with same
+  // name are still allowed.
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
@@ -2575,24 +2555,85 @@ iMeshFactoryWrapper *csEngine::CreateMeshFactory (
 
 iMeshFactoryWrapper *csEngine::CreateMeshFactory (const char *name)
 {
-  if (name != NULL)
-  {
-    iMeshFactoryWrapper *factwrap = GetMeshFactories ()->FindByName (name);
-    if (factwrap != NULL)
-    {
-      // in the "creation" case below we also return an already incref'ed
-
-      // instance to the caller so we incref'ing this one too
-      factwrap->IncRef ();
-      return factwrap;
-    }
-  }
-
+  // WARNING! In the past this routine checked if the factory
+  // was already created. This is wrong! This routine should not do
+  // this and instead allow duplicate factories (with the same name).
+  // That's because that duplicate factory can still be in another
+  // region. And even if this is not the case then factories with same
+  // name are still allowed.
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
+
+//------------------------------------------------------------------------
+
+/*
+ * Loader context class for the engine.
+ */
+class EngineLoaderContext : public iLoaderContext
+{
+private:
+  iEngine* Engine;
+  iRegion* region;
+
+public:
+  EngineLoaderContext (iEngine* Engine, iRegion* region);
+  virtual ~EngineLoaderContext ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual iSector* FindSector (const char* name);
+  virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
+  virtual iMeshWrapper* FindMeshObject (const char* name);
+};
+
+SCF_IMPLEMENT_IBASE(EngineLoaderContext);
+  SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
+SCF_IMPLEMENT_IBASE_END;
+
+EngineLoaderContext::EngineLoaderContext (iEngine* Engine,
+	iRegion* region)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  EngineLoaderContext::Engine = Engine;
+  EngineLoaderContext::region = region;
+}
+
+EngineLoaderContext::~EngineLoaderContext ()
+{
+}
+
+iSector* EngineLoaderContext::FindSector (const char* name)
+{
+  return Engine->FindSector (name, region);
+}
+
+iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name)
+{
+  return Engine->FindMaterial (name, region);
+}
+
+iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name)
+{
+  return Engine->FindMeshFactory (name, region);
+}
+
+iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
+{
+  return Engine->FindMeshObject (name, region);
+}
+
+//------------------------------------------------------------------------
+
+iLoaderContext* csEngine::CreateLoaderContext (iRegion* region)
+{
+  return new EngineLoaderContext (this, region);
+}
+
+//------------------------------------------------------------------------
 
 iMeshFactoryWrapper *csEngine::LoadMeshFactory (
   const char *name,
@@ -2613,11 +2654,10 @@ iMeshFactoryWrapper *csEngine::LoadMeshFactory (
   if (!fact) return NULL;
 
   char *buf = **input;
+  iLoaderContext* elctxt = CreateLoaderContext ();
   iBase *mof = plug->Parse (
-      buf,
-      GetMaterialList (),
-      GetMeshFactories (),
-      fact->GetMeshObjectFactory ());
+      buf, elctxt, fact->GetMeshObjectFactory ());
+  elctxt->DecRef ();
   plug->DecRef ();
   if (!mof)
   {
@@ -2670,11 +2710,10 @@ iMeshWrapper *csEngine::LoadMeshWrapper (
   }
 
   char *buf = **input;
+  iLoaderContext* elctxt = CreateLoaderContext ();
   iBase *mof = plug->Parse (
-      buf,
-      GetMaterialList (),
-      GetMeshFactories (),
-      imw);
+      buf, elctxt, imw);
+  elctxt->DecRef ();
   plug->DecRef ();
   if (!mof)
   {

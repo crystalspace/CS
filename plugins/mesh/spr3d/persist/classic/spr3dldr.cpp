@@ -43,6 +43,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -493,8 +494,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
 }
 
 iBase* csSprite3DFactoryLoader::Parse (const char* string,
-	iMaterialList* matlist, iMeshFactoryList* /*factlist*/,
-	iBase* context)
+	iLoaderContext* ldr_context, iBase* context)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -570,7 +570,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
 	    ReportError (reporter,
@@ -936,8 +936,8 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase*)
+iBase* csSprite3DLoader::Parse (const char* string,
+	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
@@ -974,7 +974,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
 	  if (!fact)
 	  {
       	    ReportError (reporter,
@@ -1008,7 +1008,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
       	    ReportError (reporter,

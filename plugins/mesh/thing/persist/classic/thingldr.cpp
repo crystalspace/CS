@@ -46,6 +46,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/services.h"
+#include "imap/ldrctxt.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 
@@ -258,7 +259,8 @@ public:
   }
 };
 
-static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
+static bool load_thing_part (iLoaderContext* ldr_context,
+	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,
 	char* buf, int vt_offset, bool isParent)
@@ -347,8 +349,7 @@ static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
 	else
         {
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
-	  	->FindByName (str);
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
           if (!fact)
           {
 	    ReportError (reporter,
@@ -386,7 +387,7 @@ static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
 	else
         {
           csScanStr (params, "%s", str);
-	  iMeshWrapper* wrap = engine->GetMeshes ()->FindByName (str);
+	  iMeshWrapper* wrap = ldr_context->FindMeshObject (str);
           if (!wrap)
           {
 	    ReportError (reporter,
@@ -415,7 +416,7 @@ static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (object_reg, reporter, synldr, info,
+	if (!load_thing_part (ldr_context, object_reg, reporter, synldr, info,
 		engine, thing_state, params,
 		thing_state->GetVertexCount (), false))
 	  return false;
@@ -518,8 +519,10 @@ Nag to Jorrit about this feature if you want it.");
 	  iPolygon3D* poly3d = thing_state->CreatePolygon (xname);
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);
-	  if (!synldr->ParsePoly3d (engine, poly3d, params,
-				   info.default_texlen, thing_state, vt_offset))
+	  if (!synldr->ParsePoly3d (ldr_context,
+	  			    engine, poly3d, params,
+				    info.default_texlen, thing_state,
+				    vt_offset))
 	  {
 	    poly3d->DecRef ();
 	    return false;
@@ -568,18 +571,7 @@ Nag to Jorrit about this feature if you want it.");
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
 
-	{
-	  iLoader* ldr = CS_QUERY_REGISTRY (object_reg, iLoader);
-	  if (ldr)
-	  {
-            info.default_material = ldr->FindMaterial (str);
-	    ldr->DecRef ();
-	  }
-	  else
-            info.default_material = engine->GetMaterialList ()->
-	    	FindByName (str);
-	}
-
+        info.default_material = ldr_context->FindMaterial (str);
         if (info.default_material == NULL)
         {
 	  ReportError (reporter,
@@ -609,8 +601,8 @@ Nag to Jorrit about this feature if you want it.");
   return true;
 }
 
-iBase* csThingLoader::Parse (const char* string, iMaterialList*,
-	iMeshFactoryList*, iBase*)
+iBase* csThingLoader::Parse (const char* string, iLoaderContext* ldr_context,
+	iBase*)
 {
   // Things only work with the real 3D engine and not with the iso engine.
   iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -626,7 +618,7 @@ iBase* csThingLoader::Parse (const char* string, iMaterialList*,
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  if (!load_thing_part (object_reg, reporter, synldr, info,
+  if (!load_thing_part (ldr_context, object_reg, reporter, synldr, info,
   	engine, thing_state, buf, 0, true))
   {
     fact->DecRef ();
@@ -718,8 +710,8 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csPlaneLoader::Parse (const char* string, iMaterialList*,
-	iMeshFactoryList*, iBase* /*context*/)
+iBase* csPlaneLoader::Parse (const char* string, iLoaderContext*,
+	iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ORIG)
@@ -908,8 +900,7 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBezierLoader::Parse (const char* string, iMaterialList*,
-	iMeshFactoryList*,
+iBase* csBezierLoader::Parse (const char* string, iLoaderContext* ldr_context,
 	iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -956,17 +947,7 @@ iBase* csBezierLoader::Parse (const char* string, iMaterialList*,
         break;
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-
-	{
-	  iLoader* ldr = CS_QUERY_REGISTRY (object_reg, iLoader);
-	  if (ldr)
-	  {
-            mat = ldr->FindMaterial (str);
-	    ldr->DecRef ();
-	  }
-	  else
-            mat = engine->GetMaterialList ()->FindByName (str);
-	}
+        mat = ldr_context->FindMaterial (str);
 
         if (mat == NULL)
         {

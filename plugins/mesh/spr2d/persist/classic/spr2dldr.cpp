@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -263,8 +264,7 @@ static void ParseAnim (iReporter* reporter, iSprite2DFactoryState* spr2dLook,
 }
 
 iBase* csSprite2DFactoryLoader::Parse (const char* string,
-	iMaterialList* matlist, iMeshFactoryList* /*factlist*/,
-	iBase* /* context */)
+	iLoaderContext* ldr_context, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (LIGHTING)
@@ -314,7 +314,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
 	    ReportError (reporter,
@@ -444,8 +444,8 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase*)
+iBase* csSprite2DLoader::Parse (const char* string,
+	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -483,7 +483,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = factlist->FindByName (str);
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
 	  if (!fact)
 	  {
       	    ReportError (reporter,
@@ -500,7 +500,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
       case CS_TOKEN_MATERIAL:
 	{
           csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = matlist->FindByName (str);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
 	  if (!mat)
 	  {
       	    ReportError (reporter,

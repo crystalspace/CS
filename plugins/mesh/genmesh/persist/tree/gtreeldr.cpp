@@ -651,7 +651,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
-	iMaterialList*, iMeshFactoryList*, iBase* /* context */)
+	iLoaderContext* ldr_context, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (HEIGHT)
