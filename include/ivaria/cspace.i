@@ -203,6 +203,7 @@
 	INTERFACE_APPLY(iSoundSource)
 	INTERFACE_APPLY(iSprite2DState)
 	INTERFACE_APPLY(iSprite3DState)
+	INTERFACE_APPLY(iSpriteCal3DState)
 	INTERFACE_APPLY(iStatLight)
 	INTERFACE_APPLY(iStream)
 	INTERFACE_APPLY(iStreamIterator)
@@ -737,6 +738,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/object.h"
 %include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
+%include "imesh/spritecal3d.h"
 %include "imesh/ball.h"
 %include "imesh/genmesh.h"
 %include "imesh/thing/thing.h"

@@ -26,6 +26,7 @@ chronological order.
 	- Eric Sunshine added assignment operators for csHash::Iterator and
 	  GlobalIterator to pacify MSVC which complained that it could not
 	  generate default assignment operators.
+	- jamest added spritecal3d support to swig wrapper
 16-Nov-2003
 	- Eric Sunshine fixed bug in make and Jam `install' targets where they
 	  neglected to install the generated volatile.h if the build directory

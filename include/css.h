@@ -128,6 +128,7 @@
 #include "imesh/spiral.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
+#include "imesh/spritecal3d.h"
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
 #include "imesh/bezier.h"
