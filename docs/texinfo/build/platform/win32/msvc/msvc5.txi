@@ -386,7 +386,12 @@ them.  The @sc{cvs} repository contains these files as well.
 
 @item
 Q. @emph{How can I reduce build times?}
-A. Build only the projects you will need ("unload" the rest).
+
+A. Build only the projects you will need. You must build all the Crystal Space
+libraries, however those you may not need can be unloaded (Right click on the
+project you wish unload from the build process and click on Unload). @emph{Be
+very careful when unloading projects as some of Crystal Spaces projects e.g. some
+plugins are dependant on others}.
 
 @item
 Q. @emph{How can I reduce build sizes?}
