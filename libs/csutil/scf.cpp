@@ -108,7 +108,10 @@ public:
 
   /// Decrement reference count for the library
   void DecRef ()
-  { RefCount--; }
+  { 
+    RefCount--;
+    TryUnload ();
+  }
 
   /// Get the reference count.
   int GetRefCount ()
@@ -307,22 +310,18 @@ void scfFactory::IncRef ()
   {
     int libidx = LibraryRegistry->FindKey (LibraryName);
     if (libidx >= 0)
+    {
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
+      Library->IncRef ();
+    }
     else
       Library = new scfSharedLibrary (LibraryName);
     if (Library->ok ())
       ClassInfo = Library->Find (ClassID);
+
     if (!Library->ok () || !ClassInfo)
     {
-      // If the library was not in the library-registry (libidx < 0), then we
-      // just created it with `new'.  As a side-effect of creation, the library
-      // added itself to the library-registry, so we call
-      // scfSharedLibrary::TryUnload() to will remove the library from the
-      // registry, so as not to leak the instance.  In other circumstances,
-      // scfFactory::TryUnload() would free the instance (if needed), but it
-      // only does so if the `Library' variable is non-null.
       Library->DecRef();
-      Library->TryUnload();
       Library = NULL;
       return; // Signify that IncRef() failed by _not_ incrementing count.
     }
@@ -373,9 +372,8 @@ void *scfFactory::CreateInstance ()
 void scfFactory::TryUnload ()
 {
 #ifndef CS_STATIC_LINKED
-  if (Library)
-    if (Library->TryUnload ())
-      Library = NULL;
+ if (Library &&  Library->TryUnload ())
+    Library = NULL;
 #endif
 }
 
