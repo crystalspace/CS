@@ -87,6 +87,8 @@ private:
 
   // Some common shortcut functions that may or may not apply, depending
   // on the underlying hardware
+  // guess the proper blend mode to use
+  void Guess_BlendMode(GLenum *src, GLenum *dst);
 
 protected:
 

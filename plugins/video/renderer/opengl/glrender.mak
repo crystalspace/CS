@@ -85,6 +85,7 @@ gl3d: $(OUTDIRS) $(GL3D)
 
 $(OUT)%$O: plugins/video/renderer/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
+
  
 $(GL3D): $(OBJ.GL3D) $(DEP.GL3D)
 	$(DO.PLUGIN) $(LIBS.GL3D)

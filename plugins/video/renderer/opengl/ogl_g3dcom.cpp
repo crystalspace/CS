@@ -101,7 +101,6 @@ void csGraphics3DOGLCommon::end_draw_poly ()
   in_draw_poly = false;
 }
 
-
 /*===========================================================================
  Fog Variables Section
  ===========================================================================*/
@@ -410,6 +409,20 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
+
+  // if blend style is 'auto' try to determine which mode to use by drawing on the
+  // frame buffer.  We check the results to see if the OpenGL driver provides good
+  // support for multipledouble (2*SRC*DST) blend mode; if not, fallback to the
+  // normal multiply blend mode
+  if (strcmp(lightmapstyle, "auto") == 0)
+  {
+    GLenum srcblend, dstblend;
+
+    Guess_BlendMode(&srcblend, &dstblend);
+
+    m_config_options.m_lightmap_src_blend = srcblend;
+    m_config_options.m_lightmap_dst_blend = dstblend;
+  }
 
   end_draw_poly ();
 
@@ -2037,4 +2050,96 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   glTexCoord2f (ntx1, nty2);
   glVertex2i (sx, height - (sy+1 + sh));
   glEnd ();
+}
+
+
+
+/* this function is called when the user configures the OpenGL renderer to use
+ * 'auto' blend mode.  It tries to figure out how well the driver supports
+ * the 2*SRC*DST blend mode--some beta/debug drivers support it badly, some hardware
+ * does not support it at all.
+ *
+ * We check the driver by drawing a polygon with both blend modes:
+ *   - we draw using SRC*DST blending and read back the color result, called A
+ *   - we draw using 2*SRC*DST blending and read back the color result, called B
+ *
+ * Ideally B=2*A.  Here we guess that if B > 1.5*A then the 2*SRC*DST mode is
+ * reasonably well supported and suggest using 2*SRC*DST mode.  Otherwise we
+ * suggest using SRC*DST mode which is pretty well supported.
+ */
+void csGraphics3DOGLCommon::Guess_BlendMode(GLenum *src, GLenum*dst)
+{
+  // colors of the 2 polys to blend
+  float testcolor1[3] = {0.5,0.5,0.5};
+  float testcolor2[3] = {0.5,0.5,0.5};
+
+  // these will hold the resultant color intensities
+  float blendresult1[3], blendresult2[3];
+
+  SysPrintf(MSG_INITIALIZATION, "Attempting to determine best blending mode to use.\n");
+
+  // draw the polys
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glShadeModel(GL_FLAT);
+
+  // blend mode one
+
+  glDisable(GL_BLEND);
+  glColor3fv(testcolor1);
+  glBegin(GL_QUADS);
+  glVertex2i(0,0); glVertex2i(5,0); glVertex2i(5,5); glVertex2i(0,5);
+  glEnd();
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_DST_COLOR, GL_ZERO);
+  glColor3fv(testcolor2);
+  glBegin(GL_QUADS);
+  glVertex2i(0,0); glVertex2i(5,0); glVertex2i(5,5); glVertex2i(0,5);
+  glEnd();
+
+  glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT, &blendresult1);
+
+  // blend mode two
+
+  glDisable(GL_BLEND);
+  glColor3fv(testcolor1);
+  glBegin(GL_QUADS);
+  glVertex2i(0,0); glVertex2i(5,0); glVertex2i(5,5); glVertex2i(0,5);
+  glEnd();
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+  glColor3fv(testcolor2);
+  glBegin(GL_QUADS);
+  glVertex2i(0,0); glVertex2i(5,0); glVertex2i(5,5); glVertex2i(0,5);
+  glEnd();
+
+  glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT, &blendresult2);
+
+  SysPrintf(MSG_INITIALIZATION, "Blend mode values are %f and %f...", blendresult1[1], blendresult2[1]);
+
+  // compare the green component between the two results, A and B.  In the
+  // ideal case B = 2*A.  If SRC*DST blend mode is supported but 2*SRC*DST is
+  // not, then B = A.  So we guess that if B > 1.5*A that the 2*SRC*DST is
+  // 'pretty well' supported and go with that.  Otherwise, fall back on the
+  // normal SRC*DST mode.
+
+  float resultA = blendresult1[1];
+  float resultB = blendresult2[1];
+
+  if (resultB > 1.5 * resultA)
+  {
+    SysPrintf(MSG_INITIALIZATION, "using 'multiplydouble' blend mode.\n");
+
+    *src = GL_DST_COLOR;
+    *dst = GL_SRC_COLOR;
+  }
+  else
+  {
+    SysPrintf(MSG_INITIALIZATION, "using 'multiply' blend mode.\n");
+
+    *src = GL_DST_COLOR;
+    *dst = GL_ZERO;
+  }
 }

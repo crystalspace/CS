@@ -41,6 +41,9 @@
 #elif (MESA_MAJOR_VERSION >= 3) && (MESA_MINOR_VERSION >= 1)
 #include "ext_mesa.cpp"
 
+#elif defined(OS_LINUX) && defined(COMP_GCC)
+#include "ext_mesa.cpp"
+
 // Default no extensions...
 #else
 #undef USE_EXTENSIONS
