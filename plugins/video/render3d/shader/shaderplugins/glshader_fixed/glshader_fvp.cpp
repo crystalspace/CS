@@ -104,7 +104,7 @@ void csGLShaderFVP::SetupState (
       csRef<csShaderVariable> var = 0;
 
       var = lights[i].positionVarRef;
-      if (!var && lights[i].positionvar < stacks.Length ()
+      if (!var && lights[i].positionvar < (csStringID)stacks.Length ()
           && stacks[lights[i].positionvar].Length () > 0)
         var = stacks[lights[i].positionvar].Top ();
       if (var)
@@ -120,7 +120,7 @@ void csGLShaderFVP::SetupState (
       }
 
       var = lights[i].diffuseVarRef;
-      if (!var && lights[i].diffusevar < stacks.Length ()
+      if (!var && lights[i].diffusevar < (csStringID)stacks.Length ()
           && stacks[lights[i].diffusevar].Length () > 0)
         var = stacks[lights[i].diffusevar].Top ();
       if (var)
@@ -136,7 +136,7 @@ void csGLShaderFVP::SetupState (
       }
 
       var = lights[i].specularVarRef;
-      if (!var && lights[i].specularvar < stacks.Length ()
+      if (!var && lights[i].specularvar < (csStringID)stacks.Length ()
           && stacks[lights[i].diffusevar].Length () > 0)
         var = stacks[lights[i].diffusevar].Top ();
       if (var)
@@ -152,7 +152,7 @@ void csGLShaderFVP::SetupState (
       }
 
       var = lights[i].attenuationVarRef;
-      if (!var && lights[i].attenuationvar < stacks.Length ()
+      if (!var && lights[i].attenuationvar < (csStringID)stacks.Length ()
           && stacks[lights[i].attenuationvar].Length () > 0)
         var = stacks[lights[i].attenuationvar].Top ();
       if (var)
@@ -179,7 +179,7 @@ void csGLShaderFVP::SetupState (
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
 
     csRef<csShaderVariable> var = ambientVarRef;
-    if (!var && ambientvar < stacks.Length ()
+    if (!var && ambientvar < (csStringID)stacks.Length ()
         && stacks[ambientvar].Length () > 0)
       var = stacks[ambientvar].Top ();
     if (var)

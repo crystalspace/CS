@@ -759,7 +759,7 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   {
     if (thispass->bufferRef[i] != 0)
       thispass->bufferRef[i]->GetValue(last_buffers[i]);
-    else if (thispass->bufferID[i] < stacks.Length ())
+    else if (thispass->bufferID[i] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
       if (stacks[thispass->bufferID[i]].Length () > 0)
@@ -788,7 +788,7 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
       else
         last_textures[i] = 0;
     }
-    else if (thispass->textureID[i] < stacks.Length ())
+    else if (thispass->textureID[i] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
       if (stacks[thispass->textureID[i]].Length () > 0)
@@ -819,7 +819,7 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
       thispass->autoAlphaTexRef->GetValue (tex);
     else if (thispass->alphaMode.autoModeTexture != csInvalidStringID)
     {
-      if (thispass->alphaMode.autoModeTexture < stacks.Length ())
+      if (thispass->alphaMode.autoModeTexture < (csStringID)stacks.Length ())
       {
         csShaderVariable* var = 0;
         if (stacks[thispass->alphaMode.autoModeTexture].Length ()>0)
