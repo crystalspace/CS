@@ -50,34 +50,49 @@ bool csTerrain::Initialize (char* heightmap)
   CHK (height = new ddgHeightMap ());
   if (height->readTGN (heightmap)) return false;
   CHK (mesh = new ddgTBinMesh (height));
-  CHK (clipbox = new ddgBBox (0, 640, 0, 480, 1, 15000));
+  CHK (clipbox = new ddgBBox (ddgVector3(0,0,1),ddgVector3(640, 480, 15000)));
+  wtoc[0] = 1;
+  wtoc[1] = 0;
+  wtoc[2] = 0;
+  wtoc[3] = 0;
+  wtoc[4] = 0;
+  wtoc[5] = 1;
+  wtoc[6] = 0;
+  wtoc[7] = 0;
+  wtoc[8] = 0;
+  wtoc[9] = 0;
+  wtoc[10] = 1;
+  wtoc[11] = 0;
+  wtoc[12] = 0;
+  wtoc[13] = 0;
+  wtoc[14] = 0;
+  wtoc[15] = 1;  float fov = 90.0;
+  mesh->init (wtoc, clipbox, fov);
   return true;
 }
 
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   // Initialize.
-  double wtoc[16];		// World to camera space transformation matrix.
   const csMatrix3& m_o2t = rview.GetO2T ();
   const csVector3& v_o2t = rview.GetO2TTranslation ();
   wtoc[0] = m_o2t.m11;
-  wtoc[1] = m_o2t.m12;
-  wtoc[2] = m_o2t.m13;
-  wtoc[3] = v_o2t.x;
-  wtoc[4] = m_o2t.m21;
+  wtoc[4] = m_o2t.m12;
+  wtoc[8] = m_o2t.m13;
+  wtoc[12] = v_o2t.x;
+  wtoc[1] = m_o2t.m21;
   wtoc[5] = m_o2t.m22;
-  wtoc[6] = m_o2t.m23;
-  wtoc[7] = v_o2t.y;
-  wtoc[8] = m_o2t.m31;
-  wtoc[9] = m_o2t.m32;
+  wtoc[9] = m_o2t.m23;
+  wtoc[13] = v_o2t.y;
+  wtoc[2] = m_o2t.m31;
+  wtoc[6] = m_o2t.m32;
   wtoc[10] = m_o2t.m33;
-  wtoc[11] = v_o2t.z;
-  wtoc[12] = 0;
-  wtoc[13] = 0;
-  wtoc[14] = 0;
+  wtoc[14] = v_o2t.z;
+  wtoc[3] = 0;
+  wtoc[7] = 0;
+  wtoc[11] = 0;
   wtoc[15] = 1;
   float fov = 90.0;
-  mesh->init (wtoc, clipbox, fov);
 
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
