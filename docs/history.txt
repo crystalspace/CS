@@ -29,6 +29,7 @@ The history order is reversed so that new features are at the top.
 	- Marten cleaned up code in gl_render3d and genmesh. Removed old
 	  deprecated code and some general cleanup.
 	- Oktal fixed a pointer arithmetic error in res's changes to cssys.
+        - Philip Wyett fixed formatting in the MSVC 6 project plugin template.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image
 	  View".
