@@ -134,12 +134,12 @@
 		0 : "No"
 	]
 	halo(string) : "Halo (value intensity cross)" : "0 0 0"
-	attenuation(choices): "Attenuation type" : linear =
+	attenuation(choices): "Attenuation type" : "linear" =
 	[
-		"none" : "none"
-		"linear" : "linear"
-		"inverse" : "inverse"
-		"realistic" : "realistic"
+		"none" : "None"
+		"linear" : "Linear"
+		"inverse" : "Inverse"
+		"realistic" : "Realistic"
 	]
 //	cs_collection(string) : "Under development"
 ]

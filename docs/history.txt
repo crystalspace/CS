@@ -9,6 +9,12 @@ The history order is reversed so that new features are at the top.
 	- res fixed a wrong #include in anonrndbuf.cpp.
 	- res fixed a typo in syspath.h, slightly changed a few comments 
 	  there, and also fixed a comment in gradient.h.
+	- res added a missing pair of quotes to the crystal.fgd "light" entry.
+	- res fixed the map2cs mechanism for removal of polys with certain
+	  textures. This didn't work with Hammer maps due to a 
+	  lowercase/uppercase mismatch.
+	- res fixed a bug in map2cs where 'invisible' (and thus unused)
+	  textures nevertheless appeared in texture & material list.
 3-Jul-2003
 	- Jorrit removed obsolete bindings for radiosity commands for Walktest
 	  and added 'r' key to record movements on/off and 'shift-r' to play

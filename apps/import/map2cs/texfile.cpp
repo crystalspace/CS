@@ -74,7 +74,7 @@ CTextureFile::CTextureFile()
   m_R              = 0.0f;
   m_G              = 0.0f;
   m_B              = 0.0f;
-  m_Stored	   = true;
+  m_Stored	   = false;
 }
 
 CTextureFile::~CTextureFile()
@@ -139,7 +139,7 @@ void CTextureFile::SetTexturename(const char* name)
   int i;
   for (i=0; i<int(sizeof(InvisibleTextures)/sizeof(InvisibleTextures[0])); i++)
   {
-    if (strcmp(m_Texturename, InvisibleTextures[i])==0)
+    if (strcasecmp (m_Texturename, InvisibleTextures[i])==0)
     {
       m_Visible = false;
     }
