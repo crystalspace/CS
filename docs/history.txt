@@ -30,6 +30,7 @@ The history order is reversed so that new features are at the top.
 	      - csModelDataTextureIterator
 	      - csModelDataMaterialIterator
 	      - csModelDataObjectIterator
+	- Jorrit additionally updated the iStreamIterator.
 	- Eric Sunshine corrected ddraw/g2d.cpp so that it uses a fixed SCF
 	  class identifier in SCF_EXPORT_CLASS_DEP() rather than using the
 	  CS_SOFTWARE_2D_DRIVER macro which might change value, inadvertently

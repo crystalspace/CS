@@ -237,6 +237,7 @@ the visible mesh.)
 @cindex @code{iSectorIterator}
 @cindex @code{iObjectIterator}
 @cindex @code{iObjectRegistryIterator}
+@cindex @code{iStreamIterator}
 @cindex @code{csTypedObjectIterator}
 @cindex @code{csModelDataActionIterator}
 @cindex @code{csModelDataPolygonIterator}
@@ -260,6 +261,8 @@ Changed the following iterators to conform to the following iterator standard:
 @code{iSectorIterator}
 @item
 @code{iObjectIterator}
+@item
+@code{iStreamIterator}
 @item
 @code{iObjectRegistryIterator}
 @item

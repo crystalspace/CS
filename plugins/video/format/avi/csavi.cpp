@@ -301,7 +301,7 @@ bool csAVIFormat::ValidateStreams ()
   int nAudio = 0, nVideo = 0;
   while (it->HasNext())
   {
-    it->GetNext ()->GetStreamDescription (desc);
+    it->Next ()->GetStreamDescription (desc);
     if (desc.type == CS_STREAMTYPE_AUDIO)
       nAudio++;
     else
@@ -606,7 +606,7 @@ bool csAVIFormat::streamiterator::HasNext ()
   return pos < pAVI->vStream.Length ();
 }
 
-iStream* csAVIFormat::streamiterator::GetNext ()
+iStream* csAVIFormat::streamiterator::Next ()
 {
   if (HasNext ())
     return (iStream*)pAVI->vStream.Get (pos++);

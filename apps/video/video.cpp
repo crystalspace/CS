@@ -330,7 +330,7 @@ bool Video::Initialize (int argc, const char* const argv[],
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "Looking for video stream.");
 	while (it->HasNext ())
 	{
-	   pS= it->GetNext ();
+	   pS= it->Next ();
 	   pS->GetStreamDescription (desc);
 	   if (desc.type == CS_STREAMTYPE_VIDEO)
 	   {

@@ -127,7 +127,7 @@ SCF_VERSION (iStreamIterator, 0, 0, 1);
 struct iStreamIterator : public iBase
 {
   virtual bool HasNext () = 0;
-  virtual iStream *GetNext () = 0;
+  virtual iStream *Next () = 0;
 };
 
 SCF_VERSION (iStreamFormat, 0, 0, 1);

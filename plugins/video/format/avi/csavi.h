@@ -44,7 +44,7 @@ class csAVIFormat : public iStreamFormat
     SCF_DECLARE_IBASE;
     virtual ~streamiterator ();
     bool HasNext ();
-    iStream *GetNext ();
+    iStream *Next ();
   };
 
   // @@@TODO: handle optional chunklists in AVI files
