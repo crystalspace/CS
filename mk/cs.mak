@@ -177,7 +177,7 @@ endif
 
 cleanlib:
 
-cleandep:
+cleandep: $(OUTBASE) $(OUTOS)
 	-$(RM) $(OUTOS)*.dep
 
 $(OUT)static$O: static.cpp

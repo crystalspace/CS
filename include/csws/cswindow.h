@@ -159,9 +159,9 @@ public:
   /// Change titlebar text
   virtual void SetText (const char *iText);
   /// Query window title text
-  virtual void GetText (char *oText, int iTextSize);
+  virtual void GetText (char *oText, int iTextSize) const;
   /// Same, but returns a readonly value
-  virtual const char *GetText ();
+  virtual const char *GetText () const;
 
   /// Get window border width and height
   void GetBorderSize (int &bw, int &bh)

@@ -47,6 +47,7 @@
  *        |--[ csInputLine ]		// input line control
  *        |    +--[ csSpinBox ]		// spin box control
  *        +--[ csListBox ]		// list box control
+ *        +--[ csNotebook ]		// notebook control
  * </pre>
  */
 
@@ -104,6 +105,7 @@ class csApp;
 #include "csspinbx.h"			// Spin boxes
 #include "csmenu.h"			// Menu class
 #include "cslistbx.h"			// List box class
+#include "csnotebk.h"			// Notebook class
 #include "csdialog.h"			// User dialogs
 #include "cswindow.h"			// Window class
 #include "cswstex.h"			// Windowing System textures

@@ -80,7 +80,7 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
 
     CHK (csMenu *mn = new csSysMenu (this, csmfs3D, CSMS_DEFAULTVALUE, bt));
     ADD_SYSMENU_ENTRIES (mn);
-//    mn->PlaceItems ();
+//  mn->PlaceItems ();
     mn->Hide ();
     mn->id = CSWID_SYSMENU;
   } /* endif */
@@ -450,7 +450,7 @@ void csWindow::SetText (const char *iText)
     csComponent::SetText (iText);
 }
 
-void csWindow::GetText (char *oText, int iTextSize)
+void csWindow::GetText (char *oText, int iTextSize) const
 {
   csComponent *c = GetChild (CSWID_TITLEBAR);
   if (c)
@@ -459,7 +459,7 @@ void csWindow::GetText (char *oText, int iTextSize)
     *oText = 0;
 }
 
-const char *csWindow::GetText ()
+const char *csWindow::GetText () const
 {
   csComponent *c = GetChild (CSWID_TITLEBAR);
   if (c)

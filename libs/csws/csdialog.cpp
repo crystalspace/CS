@@ -28,28 +28,13 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
 {
   SetPalette (CSPAL_DIALOG);
   state |= CSS_SELECTABLE;
-  FrameStyle = iFrameStyle;
   DragStyle = 0;
   first = NULL;
   GridX = GridY = -1;
   SnapSizeToGrid = false;
   if (parent)
     parent->SendCommand (cscmdWindowSetClient, (void *)this);
-  switch (FrameStyle)
-  {
-    case csdfsNone:
-      BorderWidth = 0; BorderHeight = 0;
-      break;
-    case csdfsHorizontal:
-      BorderWidth = 0; BorderHeight = 2;
-      break;
-    case csdfsVertical:
-      BorderWidth = 2; BorderHeight = 0;
-      break;
-    case csdfsAround:
-      BorderWidth = 2; BorderHeight = 2;
-      break;
-  } /* endswitch */
+  SetFrameStyle (iFrameStyle);
 }
 
 void csDialog::Draw ()
@@ -275,4 +260,24 @@ void csDialog::FixSize (int &newW, int &newH)
   // Don't allow too small windows
   if (newW < minw) newW = minw;
   if (newH < minh) newH = minh;
+}
+
+void csDialog::SetFrameStyle (csDialogFrameStyle iFrameStyle)
+{
+  switch (FrameStyle = iFrameStyle)
+  {
+    case csdfsNone:
+      BorderWidth = 0; BorderHeight = 0;
+      break;
+    case csdfsHorizontal:
+      BorderWidth = 0; BorderHeight = 2;
+      break;
+    case csdfsVertical:
+      BorderWidth = 2; BorderHeight = 0;
+      break;
+    case csdfsAround:
+      BorderWidth = 2; BorderHeight = 2;
+      break;
+  } /* endswitch */
+  Invalidate ();
 }

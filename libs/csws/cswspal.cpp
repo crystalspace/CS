@@ -22,13 +22,13 @@
 #include "csws/cscomp.h"
 
 // Application class default palette
-static int palette_csApp[] =
+static int palette_csApp [] =
 {
   cs_Color_Gray_D			// Application workspace
 };
 
 // Button class default palette
-static int palette_csButton[] =
+static int palette_csButton [] =
 {
   cs_Color_Gray_L,			// button background
   cs_Color_Black,			// default button frame
@@ -39,7 +39,7 @@ static int palette_csButton[] =
 };
 
 // Dialog class default palette
-static int palette_csDialog[] =
+static int palette_csDialog [] =
 {
   cs_Color_Gray_L,			// dialog background
   cs_Color_Gray_D,			// 3D border dark
@@ -49,7 +49,7 @@ static int palette_csDialog[] =
 };
 
 // Input line class default palette
-static int palette_csInputLine[] =
+static int palette_csInputLine [] =
 {
   cs_Color_Gray_L,			// input line background
   cs_Color_White,			// background for csifsThickRect
@@ -63,7 +63,7 @@ static int palette_csInputLine[] =
 };
 
 // Menu item class default palette
-static int palette_csMenuItem[] =
+static int palette_csMenuItem [] =
 {
   cs_Color_Gray_L,			// Menu item unselected background
   cs_Color_Cyan_D,			// Selection bar background
@@ -75,7 +75,7 @@ static int palette_csMenuItem[] =
 };
 
 // Menu class default palette
-static int palette_csMenu[] =
+static int palette_csMenu [] =
 {
   cs_Color_Gray_L,			// Menu background
   cs_Color_Gray_D,			// 3D border dark
@@ -85,7 +85,7 @@ static int palette_csMenu[] =
 };
 
 // Static class default palette
-static int palette_csStatic[] =
+static int palette_csStatic [] =
 {
   cs_Color_Gray_D,			// static component background
   cs_Color_Cyan_D,			// static component text / inactive
@@ -96,7 +96,7 @@ static int palette_csStatic[] =
 };
 
 // Title bar class default palette
-static int palette_csTitleBar[] =
+static int palette_csTitleBar [] =
 {
   cs_Color_Gray_D,			// 3D border dark
   cs_Color_White,			// 3D border light
@@ -111,7 +111,7 @@ static int palette_csTitleBar[] =
 };
 
 // Window class default palette
-static int palette_csWindow[] =
+static int palette_csWindow [] =
 {
   cs_Color_Gray_D,			// 3D border dark
   cs_Color_White,			// 3D border light
@@ -121,7 +121,7 @@ static int palette_csWindow[] =
 };
 
 // List box item class default palette
-static int palette_csListBoxItem[] =
+static int palette_csListBoxItem [] =
 {
   cs_Color_Gray_L,			// Unselected listbox item background
   cs_Color_Cyan_D,			// Selected listbox item background
@@ -134,7 +134,7 @@ static int palette_csListBoxItem[] =
 };
 
 // Scroll bar class default palette
-static int palette_csScrollBar[] =
+static int palette_csScrollBar [] =
 {
   cs_Color_Gray_L,			// Scroll bar background
   cs_Color_Gray_M,			// Scroll bar selected background
@@ -142,8 +142,29 @@ static int palette_csScrollBar[] =
   cs_Color_White			// 3D border light
 };
 
+// Notebook class default palette
+static int palette_csNotebook [] =
+{
+  cs_Color_Gray_L,			// Notebook background
+  cs_Color_Gray_M,			// Unselected tab background
+  cs_Color_Black,			// The text on unselected tabs
+  cs_Color_Black,			// The most dark color of unselected tab border
+  cs_Color_Gray_D,			// The second color of unselected tab border
+  cs_Color_Gray_L,			// The third color of unselected tab border
+  cs_Color_Gray_L,			// Selected tab background
+  cs_Color_Cyan_D,			// The text on selected tab
+  cs_Color_Black,			// The most dark color of selected tab border
+  cs_Color_Gray_D,			// The second color of selected tab border
+  cs_Color_White,			// The third color of selected tab border
+  cs_Color_Cyan_D,			// The information text
+  cs_Color_Gray_D,			// 3D border dark
+  cs_Color_White,			// 3D border light
+  cs_Color_Black,			// 3D border very dark
+  cs_Color_Gray_M			// 3D border middle light
+};
+
 // Pointers to all standard palettes
-csPaletteExport cswsPalette[] =
+csPaletteExport cswsPalette [] =
 {
   { palette_csApp,         sizeof (palette_csApp)         / sizeof (int) },
   { palette_csButton,      sizeof (palette_csButton)      / sizeof (int) },
@@ -155,5 +176,6 @@ csPaletteExport cswsPalette[] =
   { palette_csTitleBar,    sizeof (palette_csTitleBar)    / sizeof (int) },
   { palette_csWindow,      sizeof (palette_csWindow)      / sizeof (int) },
   { palette_csListBoxItem, sizeof (palette_csListBoxItem) / sizeof (int) },
-  { palette_csScrollBar,   sizeof (palette_csScrollBar)   / sizeof (int) }
+  { palette_csScrollBar,   sizeof (palette_csScrollBar)   / sizeof (int) },
+  { palette_csNotebook,    sizeof (palette_csNotebook)    / sizeof (int) }
 };

@@ -72,7 +72,7 @@ bool csVector::FreeItem (csSome Item)
 
 bool csVector::Delete (int n)
 {
-  if (n < count)
+  if (n >= 0 && n < count)
   {
     if (!FreeItem (root [n]))
       return false;

@@ -1419,19 +1419,16 @@ void csSector::CheckFrustum (csFrustumView& lview)
       }
     }
 
-  // If there is a static tree (BSP and/or octree) then we
-  // can use another way to do the lighting. In that case we
-  // go front to back and add shadows to the list while we are doing
-  // that. In future I would like to add some extra culling stage
-  // here using a quad-tree or something similar (for example six
-  // quad-trees arranged in a cube around the light).
+  // If there is a static tree (BSP and/or octree) then we can use
+  // another way to do the lighting. In that case we go front to back
+  // and add shadows to the list while we are doing that.
   if (static_tree)
   {
     count_cull_dist = 0;
     count_cull_quad = 0;
     count_cull_not = 0;
     static_thing->UpdateTransformation (center);
-    static_tree->Front2Back (center, &CheckFrustumPolygonsFB, (void*)&lview,
+    static_tree->Front2Back (center, CheckFrustumPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
     CheckFrustumPolygonsFB (this, polygons.GetArray (),
       polygons.Length (), (void*)&lview);

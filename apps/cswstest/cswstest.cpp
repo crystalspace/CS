@@ -23,6 +23,8 @@
 
 class csWsTest : public csApp
 {
+  void NotebookDialog ();
+
 public:
   /// Initialize maze editor
   csWsTest (char *AppTitle);
@@ -144,7 +146,7 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
     csNewToolbarButton (toolbar, cscmdNothing, "another test");
     csNewToolbarButton (toolbar, cscmdNothing, "yet another test");
   }
-  window->SetRect (80, 20, 520, 340);
+  window->SetRect (80, 60, 520, 380);
 
   csComponent *client = new csDialog (window);
 
@@ -155,7 +157,7 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
     csStatic *stat = new csStatic (client, but, "Test ~Label", csscsFrameLabel);
     stat->SetRect (10, 10, 420, 110);
     but = new csButton (client, cscmdNothing, CSBS_DEFAULTVALUE | CSBS_DEFAULT);
-    but->SetText ("~Another one"); but->SetRect (50, 80, 180, 100);
+    but->SetText ("~Another button"); but->SetRect (50, 80, 180, 100);
 
     but = new csButton (client, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThinRect);
     but->SetText ("hmm~..."); but->SetRect (20, 130, 100, 144);
@@ -193,13 +195,163 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
 
   {
     csButton *but = new csButton (this, 9999);
-    but->SetText ("Hello"); but->SetRect (10, 10, 100, 30);
+    but->SetText ("File dialog"); but->SetRect (10, 10, 100, 30);
     but->SetFont (csFontTiny);
+
     but = new csButton (this, 9998);
-    but->SetText ("Othello"); but->SetRect (210, 10, 300, 30);
+    but->SetText ("Color dialog"); but->SetRect (210, 10, 360, 30);
+
+    but = new csButton (this, 9997);
+    but->SetText ("Notebook"); but->SetRect (400, 15, 500, 35);
   }
 
   return true;
+}
+
+void csWsTest::NotebookDialog ()
+{
+  class cspExtDialog : public csDialog
+  {
+  public:
+    cspExtDialog (csComponent *iParent) : csDialog (iParent)
+    { SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Brown_L); }
+    virtual bool HandleEvent (csEvent &Event)
+    {
+      csNotebook *nb = (csNotebook *)parent;
+      if (Event.Type == csevCommand)
+        switch (Event.Command.Code)
+        {
+          case cscmdRadioButtonSelected:
+            switch (((csRadioButton *)Event.Command.Info)->id)
+            {
+              case 9990:
+                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_TOP);
+                break;
+              case 9991:
+                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_BOTTOM);
+                break;
+              case 9992:
+                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_LEFT);
+                break;
+              case 9993:
+                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_RIGHT);
+                break;
+            }
+            break;
+          case cscmdCheckBoxSwitched:
+          {
+            csCheckBox *cb = (csCheckBox *)Event.Command.Info;
+            int mask = (cb->id == 9980) ? CSNBS_PAGEFRAME :
+                       (cb->id == 9981) ? CSNBS_PAGEINFO :
+                       (cb->id == 9982) ? CSNBS_THINTABS : 0;
+            if (mask)
+            {
+              int style = nb->GetStyle ();
+              if (cb->SendCommand (cscmdCheckBoxQuery))
+                style |= mask;
+              else
+                style &= ~mask;
+              nb->SetStyle (style);
+            }
+            return true;
+          }
+        }
+      return csDialog::HandleEvent (Event);
+    }
+  };
+
+  // create a window
+  csComponent *window = new csWindow (this, "Notebook test",
+    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
+    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+  window->SetSize (400, 300);
+  window->Center ();
+
+  csDialog *toolbar = (csDialog *)window->GetChild (CSWID_TOOLBAR);
+  if (toolbar)
+  {
+    toolbar->SetFrameStyle (csdfsNone);
+    csNewToolbarButton (toolbar, cscmdOK, "~Ok");
+    csNewToolbarButton (toolbar, cscmdCancel, "Cancel");
+  }
+
+  // Now create the notebook window
+  csNotebook *nb = new csNotebook (window, CSNBS_TABPOS_TOP);
+  window->SendCommand (cscmdWindowSetClient, (void *)nb);
+
+  csComponent *page = new cspExtDialog (nb);
+  nb->AddPrimaryTab (page, "~Style", "Change notebook style");
+
+//------------------------------
+  int y = 10;
+  csRadioButton *rb = new csRadioButton (page, 9990);
+  rb->SetPos (5, y); rb->SetState (CSS_GROUP, true);
+  rb->SendCommand (cscmdRadioButtonSet, (void *)true);
+  csStatic *st = new csStatic (page, rb, "CSNBS_TABPOS_TOP");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  rb = new csRadioButton (page, 9991);
+  rb->SetPos (5, y);
+  st = new csStatic (page, rb, "CSNBS_TABPOS_BOTTOM");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  rb = new csRadioButton (page, 9992);
+  rb->SetPos (5, y);
+  st = new csStatic (page, rb, "CSNBS_TABPOS_LEFT");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  rb = new csRadioButton (page, 9993);
+  rb->SetPos (5, y);
+  st = new csStatic (page, rb, "CSNBS_TABPOS_RIGHT");
+  st->SetPos (21, y + 2);
+
+  //---
+
+  y += 20;
+  csCheckBox *cb = new csCheckBox (page, 9980);
+  cb->SetPos (5, y); cb->SetState (CSS_GROUP, true);
+  st = new csStatic (page, cb, "CSNBS_PAGEFRAME");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  cb = new csCheckBox (page, 9981);
+  cb->SetPos (5, y);
+  st = new csStatic (page, cb, "CSNBS_PAGEINFO");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  cb = new csCheckBox (page, 9982);
+  cb->SetPos (5, y);
+  st = new csStatic (page, cb, "CSNBS_THINTABS");
+  st->SetPos (21, y + 2);
+//------------------------------
+
+  page = new csDialog (nb);
+  nb->AddPrimaryTab (page, "- ~2 -", "Page two");
+  page->SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Blue_D);
+
+  page = new csDialog (nb);
+  nb->AddSecondaryTab (page, "Page two subpage two");
+  page->SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Blue_M);
+
+  page = new csDialog (nb);
+  nb->AddSecondaryTab (page, "Page two subpage three");
+  page->SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Blue_L);
+
+  page = new csDialog (nb);
+  nb->AddPrimaryTab (page, "[-= ~3 =-]", "Page three");
+  page->SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Cyan_M);
+
+  page = new csDialog (nb);
+  iTextureHandle *tex = GetTexture ("csws::FileDialog");
+  nb->AddPrimaryTab (page, new csPixmap (tex, 16, 0, 16, 13),
+    true, "Page four");
+
+  Execute (window);
+  delete window;
 }
 
 bool csWsTest::HandleEvent (csEvent &Event)
@@ -223,41 +375,46 @@ bool csWsTest::HandleEvent (csEvent &Event)
       switch (Event.Command.Code)
       {
         case 9999:
+        {
+          csWindow *d = csFileDialog (this, "test file dialog");
+          if (d)
           {
-            csWindow *d = csFileDialog (this, "test file dialog");
-            if (d)
+            if (Execute (d) == cscmdCancel)
             {
-              if (Execute (d) == cscmdCancel)
-              {
-                delete d;
-                return true;
-              }
-              char filename [MAXPATHLEN + 1];
-              csQueryFileDialog (d, filename, sizeof (filename));
               delete d;
-              csMessageBox (app, "Result", filename);
+              return true;
             }
-            return true;
+            char filename [MAXPATHLEN + 1];
+            csQueryFileDialog (d, filename, sizeof (filename));
+            delete d;
+            csMessageBox (app, "Result", filename);
           }
+          return true;
+        }
         case 9998:
+        {
+          csWindow *d = csColorDialog (this, "test color dialog");
+          if (d)
           {
-            csWindow *d = csColorDialog (this, "test color dialog");
-            if (d)
+            if (Execute (d) == cscmdCancel)
             {
-              if (Execute (d) == cscmdCancel)
-              {
-                delete d;
-                return true;
-              }
-              int color;
-              csQueryColorDialog (d, color);
               delete d;
-              char buff [100];
-              sprintf (buff, "color value: %08X\n", color);
-              csMessageBox (app, "Result", buff);
+              return true;
             }
-            return true;
+            int color;
+            csQueryColorDialog (d, color);
+            delete d;
+            char buff [100];
+            sprintf (buff, "color value: %08X\n", color);
+            csMessageBox (app, "Result", buff);
           }
+          return true;
+        }
+        case 9997:
+        {
+          NotebookDialog ();
+          return true;
+        }
       }
       break;
 

@@ -101,6 +101,9 @@ public:
   /// Fix dialog size when resizing
   virtual void FixSize (int &newW, int &newH);
 
+  /// Change dialog border style
+  void SetFrameStyle (csDialogFrameStyle iFrameStyle);
+
 protected:
   /// Adjust focused control by switching back or forth if it is disabled
   void AdjustFocused (bool forward);

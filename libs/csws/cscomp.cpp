@@ -43,8 +43,7 @@ csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
 
 csComponent::~csComponent ()
 {
-  if (text)
-    CHKB (delete[] text);
+  delete [] text;
   if (app && (app->MouseOwner == this))
     app->CaptureMouse (NULL);
   if (app && (app->KeyboardOwner == this))
@@ -210,9 +209,9 @@ static bool find_child_by_id (csComponent *child, void *find_id)
   return (child->id == (unsigned int)find_id);
 }
 
-csComponent *csComponent::GetChild (int find_id)
+csComponent *csComponent::GetChild (int find_id) const
 {
-  return ForEach (find_child_by_id, (void *)find_id);
+  return ((csComponent *)this)->ForEach (find_child_by_id, (void *)find_id);
 }
 
 bool csComponent::SetFocused (csComponent *comp)
@@ -1527,7 +1526,7 @@ void csComponent::SetText (const char *iText)
   Invalidate ();
 }
 
-void csComponent::GetText (char *oText, int iTextSize)
+void csComponent::GetText (char *oText, int iTextSize) const
 {
   if (text)
   {
@@ -1536,7 +1535,8 @@ void csComponent::GetText (char *oText, int iTextSize)
       sl = iTextSize - 1;
     memcpy (oText, text, sl);
     oText [sl] = 0;
-  } else if (iTextSize)
+  }
+  else if (iTextSize)
    *oText = 0;
 }
 

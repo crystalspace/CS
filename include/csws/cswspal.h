@@ -33,7 +33,7 @@ struct csPaletteExport
 extern csPaletteExport cswsPalette[];
 
 /**
- * These are indexes into cswsPalette for each component type
+ * These are indices into cswsPalette for each component type
  */
 /// Application palette index
 #define CSPAL_APP			0
@@ -59,15 +59,17 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_LISTBOXITEM		9
 /// Scroll bar palette index
 #define CSPAL_SCROLLBAR			10
+/// Notebook palette index
+#define CSPAL_NOTEBOOK			11
 
 /**
- * csApp class color palette indexes.<p>
+ * csApp class color palette indices.<p>
  */
 /// Workspace color index
 #define CSPAL_APP_WORKSPACE	0
 
 /**
- * csButton class color palette indexes.<p>
+ * csButton class color palette indices.<p>
  */
 /// button background
 #define CSPAL_BUTTON_BACKGROUND		0
@@ -83,7 +85,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_BUTTON_DTEXT		5
 
 /**
- * csDialog class color palette indexes.<p>
+ * csDialog class color palette indices.<p>
  */
 /// Background color index
 #define CSPAL_DIALOG_BACKGROUND		0
@@ -97,7 +99,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_DIALOG_2LIGHT3D		4
 
 /**
- * csButton class color palette indexes.<p>
+ * csButton class color palette indices.<p>
  */
 /// input line background
 #define CSPAL_INPUTLINE_BACKGROUND	0
@@ -119,7 +121,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_INPUTLINE_SELTEXT		8
 
 /**
- * csListBox class color palette indexes.<p>
+ * csListBox class color palette indices.<p>
  */
 /// list box background
 #define CSPAL_LISTBOX_BACKGROUND	CSPAL_INPUTLINE_BACKGROUND
@@ -141,7 +143,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_LISTBOX_SELTEXT		CSPAL_INPUTLINE_SELTEXT
 
 /**
- * csMenuItem class color palette indexes.<p>
+ * csMenuItem class color palette indices.<p>
  */
 /// Unselected menu item background
 #define CSPAL_MENUITEM_BACKGROUND	0
@@ -159,7 +161,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_MENUITEM_LIGHT3D		6
 
 /**
- * csMenu class color palette indexes.<p>
+ * csMenu class color palette indices.<p>
  */
 /// Menu background
 #define CSPAL_MENU_BACKGROUND		0
@@ -173,7 +175,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_MENU_2LIGHT3D		4
 
 /**
- * csStatic class color palette indexes.<p>
+ * csStatic class color palette indices.<p>
  */
 /// static component background
 #define CSPAL_STATIC_BACKGROUND		0
@@ -189,7 +191,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_STATIC_LIGHT3D		5
 
 /**
- * csTitleBar class color palette indexes.<p>
+ * csTitleBar class color palette indices.<p>
  */
 /// 3D border dark
 #define CSPAL_TITLEBAR_DARK3D		0
@@ -213,7 +215,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_TITLEBAR_ALIGHT3D		9
 
 /**
- * csWindow class color palette indexes.<p>
+ * csWindow class color palette indices.<p>
  */
 /// 3D border dark
 #define CSPAL_WINDOW_DARK3D		0
@@ -227,7 +229,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_WINDOW_BORDER		4
 
 /**
- * csListBoxItem class color palette indexes.<p>
+ * csListBoxItem class color palette indices.<p>
  */
 /// Unselected listbox item background
 #define CSPAL_LISTBOXITEM_BACKGROUND	0
@@ -247,7 +249,7 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_LISTBOXITEM_SETEXT	7
 
 /**
- * csScrollBar class color palette indexes.<p>
+ * csScrollBar class color palette indices.<p>
  */
 /// Scroll bar background
 #define CSPAL_SCROLLBAR_BACKGROUND	0
@@ -257,5 +259,41 @@ extern csPaletteExport cswsPalette[];
 #define CSPAL_SCROLLBAR_DARK3D		2
 /// 3D border light
 #define CSPAL_SCROLLBAR_LIGHT3D		3
+
+/**
+ * csNotebook class color palete indices.<p>
+ */
+/// Notebook background
+#define CSPAL_NOTEBOOK_BACKGROUND	0
+/// Unselected tab background
+#define CSPAL_NOTEBOOK_TAB_UNSEL	1
+/// The text on unselected tabs
+#define CSPAL_NOTEBOOK_UNSEL_TEXT	2
+/// The most dark color of unselected tab border
+#define CSPAL_NOTEBOOK_TAB_UNSELB1	3
+/// The second color of unselected tab border
+#define CSPAL_NOTEBOOK_TAB_UNSELB2	4
+/// The third color of unselected tab border
+#define CSPAL_NOTEBOOK_TAB_UNSELB3	5
+/// Selected tab background
+#define CSPAL_NOTEBOOK_TAB_SEL		6
+/// The text on selected tab
+#define CSPAL_NOTEBOOK_SEL_TEXT		7
+/// The most dark color of selected tab border
+#define CSPAL_NOTEBOOK_TAB_SELB1	8
+/// The second color of selected tab border
+#define CSPAL_NOTEBOOK_TAB_SELB2	9
+/// The third color of selected tab border
+#define CSPAL_NOTEBOOK_TAB_SELB3	10
+/// The information text
+#define CSPAL_NOTEBOOK_INFO_TEXT	11
+/// 3D border dark
+#define CSPAL_NOTEBOOK_DARK3D		12
+/// 3D border light
+#define CSPAL_NOTEBOOK_LIGHT3D		13
+/// 3D border very dark
+#define CSPAL_NOTEBOOK_2DARK3D		14
+/// 3D border middle light
+#define CSPAL_NOTEBOOK_2LIGHT3D		15
 
 #endif // __CSWSPAL_H__

@@ -189,11 +189,11 @@ csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand, char *iText,
 
 csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
   csPixmap *bmpup, csPixmap *bmpdn, csButtonFrameStyle iFrameStyle,
-  int iButtonStyle)
+  int iButtonStyle, bool iDeletePixmaps)
 {
   CHK (csButton *but = new csButton (iToolbar, iCommand, iButtonStyle,
     iFrameStyle));
-  but->SetBitmap(bmpup, bmpdn);
+  but->SetBitmap (bmpup, bmpdn, iDeletePixmaps);
   int w, h;
   but->SuggestSize (w, h);
   but->SetSize (w, h);

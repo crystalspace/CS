@@ -37,7 +37,7 @@ csButton::csButton (csComponent *iParent, int iCommandCode,
   if (ButtonStyle & CSBS_SELECTABLE)
     SetState (CSS_SELECTABLE, true);
   if (FrameStyle == csbfsOblique)
-    SetState (CSS_TRANSPARENT, TRUE);
+    SetState (CSS_TRANSPARENT, true);
   id = iCommandCode;
 }
 

@@ -112,9 +112,9 @@ private:
   friend class csApp;
 
   /// Draw mouse pointer
-  void Draw ();
+  virtual void Draw ();
   /// Undraw mouse pointer
-  void Undraw ();
+  virtual void Undraw ();
 
   /// This function sets up mouse cursor images
   void NewPointer (char *id, char *posdef);

@@ -55,17 +55,14 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
     = status.step = status.pagestep = 0;
 
   scrbarref++;
-  if (app)
+  if (app && !sprscroller[0])
   {
     // Load arrow and scroller images
-    if (!sprscroller[0])
-    {
-      iTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
-      for (int i = 0; i < 12; i++)
-        CHKB (sprarrows [i] = new csPixmap (scrolltex, i * 9, 0, 9, 9));
-      CHK (sprscroller [0] = new csPixmap (scrolltex, 12 * 9 + 0, 0, 7, 8));
-      CHK (sprscroller [1] = new csPixmap (scrolltex, 12 * 9 + 7, 0, 8, 7));
-    } /* endif */
+    iTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
+    for (int i = 0; i < 12; i++)
+      CHKB (sprarrows [i] = new csPixmap (scrolltex, i * 9, 0, 9, 9));
+    CHK (sprscroller [0] = new csPixmap (scrolltex, 12 * 9 + 0, 0, 7, 8));
+    CHK (sprscroller [1] = new csPixmap (scrolltex, 12 * 9 + 7, 0, 8, 7));
   } /* endif */
 
   TrackScroller = false;

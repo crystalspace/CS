@@ -45,7 +45,7 @@ class csStrVector;
 #define CSS_GROUP		0x00020000
 /// Move component to top Z-order when selected
 #define CSS_TOPSELECT		0x00040000
-/// Excldude component from clipping process
+/// Exclude component from clipping process
 #define CSS_TRANSPARENT		0x00080000
 /// Component is modally executing
 #define CSS_MODAL		0x00100000
@@ -91,20 +91,21 @@ enum
  * ranges are reserved:<p>
  * <ul>
  *   <li>0x00000000 ... 0x7FFFFFFF: Reserved for CrystalSpace Windowing System
- *       <ul>
- *         <li>0x00000000 ... 0x000000FF: Non-class specific commands
- *         <li>0x00000100 ... 0x000001FF: csWindow class messages
- *         <li>0x00000200 ... 0x000002FF: csMenu class messages
- *         <li>0x00000300 ... 0x000003FF: csTimer class messages
- *         <li>0x00000400 ... 0x000004FF: csListBox class messages
- *         <li>0x00000500 ... 0x000005FF: csButton class messages
- *         <li>0x00000600 ... 0x000006FF: csScrollBar class messages
- *         <li>0x00000700 ... 0x000007FF: csStatic class messages
- *         <li>0x00000800 ... 0x000008FF: csCheckBox class messages
- *         <li>0x00000900 ... 0x000009FF: csRadioButton class messages
- *         <li>0x00000A00 ... 0x00000AFF: csSpinBox class messages
- *         <li>0x00000B00 ... 0x00000BFF: csColorWheel class messages
- *       </ul>
+ *     <ul>
+ *       <li>0x00000000 ... 0x000000FF: Non-class specific commands
+ *       <li>0x00000100 ... 0x000001FF: csWindow class messages
+ *       <li>0x00000200 ... 0x000002FF: csMenu class messages
+ *       <li>0x00000300 ... 0x000003FF: csTimer class messages
+ *       <li>0x00000400 ... 0x000004FF: csListBox class messages
+ *       <li>0x00000500 ... 0x000005FF: csButton class messages
+ *       <li>0x00000600 ... 0x000006FF: csScrollBar class messages
+ *       <li>0x00000700 ... 0x000007FF: csStatic class messages
+ *       <li>0x00000800 ... 0x000008FF: csCheckBox class messages
+ *       <li>0x00000900 ... 0x000009FF: csRadioButton class messages
+ *       <li>0x00000A00 ... 0x00000AFF: csSpinBox class messages
+ *       <li>0x00000B00 ... 0x00000BFF: csColorWheel class messages
+ *       <li>0x00000C00 ... 0x00000CFF: csNotebook class messages
+ *     </ul>
  *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
  * </ul>
  * All commands receives a input parameter in the Command.Info field of csEvent
@@ -393,9 +394,9 @@ public:
    */
   virtual void SetText (const char *iText);
   /// Query component text
-  virtual void GetText (char *oText, int iTextSize);
+  virtual void GetText (char *oText, int iTextSize) const;
   /// Same, but you cannot change returned value
-  virtual const char *GetText () { return text; }
+  virtual const char *GetText () const { return text; }
 
   /**
    * For each child component call a function with a optional arg
@@ -407,7 +408,7 @@ public:
     void *param = NULL, bool Zorder = false);
 
   /// Find a child component by its ID
-  csComponent *GetChild (int find_id);
+  csComponent *GetChild (int find_id) const;
 
   /// Set the application for this object and all its children
   void SetApp (csApp *newapp);
@@ -565,11 +566,17 @@ public:
   /// Find the maximal rectangle uncovered by child windows
   void FindMaxFreeRect (csRect &area);
 
-/**
- * The following methods should be used for drawing.
- * All drawing should perform all expected clipping.
- * Some routines works somewhat kludgy for now, but its enough.
- */
+  /**
+   * The following methods should be used for drawing.
+   * All drawing routines below performs all required clipping.
+   *<p>
+   * You should avoid using other drawing routines
+   * (such as accessing iGraphics2D/3D directly) because
+   * first of all they aren't clipped to the bounds of current
+   * component and possibly to all overlapped windows, and second
+   * the graphics pipeline should take care to copy static portions
+   * of screen in double-buffered environments.
+   */
 
   /**
    * Set clipping rectangle. All following drawing will be clipped
