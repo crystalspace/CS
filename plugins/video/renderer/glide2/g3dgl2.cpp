@@ -1098,7 +1098,6 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
     m_dpverts[i].tmuvtx[0].tow= v; 
     m_dpverts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
   }
-
   if (lm_exists)
   {
     float fMinU, fMinV, fMaxU, fMaxV;
@@ -1310,7 +1309,7 @@ void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
         m_verts[i].g = 255;
         m_verts[i].b = 255;
       }
-      m_verts[i].oow = poly.vertices[i].z;
+      m_verts[i].oow = 1./poly.vertices[i].z;
       if ( m_renderstate.textured ){
         m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
         m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
