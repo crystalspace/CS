@@ -1241,6 +1241,8 @@ void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
 {
   src_uv = suv;
+  src_x = sx;
+  src_y = sy;
   shoot_src->Lumel2World(src_lumel, QInt (sx + srcp_width / 2.0),
     QInt (sy + srcp_height / 2.0));
   /// use the size of a lumel in the source poly *
@@ -1279,7 +1281,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   //if(visibility <= SMALL_EPSILON) return;
 
   // prepare dest lumel info
-  shoot_dest->Lumel2World(dest_lumel, rx, ry);
+  shoot_dest->Lumel2World(dest_lumel, float(rx)+0.5, float(ry)+0.5);
 
   // compute formfactors.
   csVector3 path = dest_lumel - src_lumel;
@@ -1288,14 +1290,50 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // Since 'path' is not normalized the cosinus calculated below
   // is not really a cosinus. But it doesn't matter for our calculations.
   // If specular is enabled it matters and in that case we correct it.
-  float cossrcangle = src_normal * path;
-  float cosdestangle = - (dest_normal * path);
-
+  float cossrcangle;
+  float cosdestangle;
   //// linear version
   //float distance = path.Norm ();
   //float sqdistance = distance * distance;
   //// squared version
-  float distance = path.SquaredNorm ();
+  float distance;
+
+  if(source_patch_size == 1)
+  {
+    cossrcangle = src_normal * path;
+    cosdestangle = - (dest_normal * path);
+    distance = path.SquaredNorm ();
+  } else
+  {
+    /// average over the source area
+    /// take the 4 corners.
+    csVector3 pos;
+    cossrcangle = 0.0;
+    cosdestangle = 0.0;
+    distance = 0.0;
+
+    shoot_src->Lumel2World(pos, src_x, src_y);
+    cossrcangle += src_normal * (dest_lumel - pos);
+    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    distance += (dest_lumel - pos).SquaredNorm();
+    shoot_src->Lumel2World(pos, src_x + srcp_width, src_y);
+    cossrcangle += src_normal * (dest_lumel - pos);
+    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    distance += (dest_lumel - pos).SquaredNorm();
+    shoot_src->Lumel2World(pos, src_x + srcp_width, src_y + srcp_height);
+    cossrcangle += src_normal * (dest_lumel - pos);
+    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    distance += (dest_lumel - pos).SquaredNorm();
+    shoot_src->Lumel2World(pos, src_x, src_y + srcp_height);
+    cossrcangle += src_normal * (dest_lumel - pos);
+    cosdestangle += - (dest_normal * (dest_lumel - pos));
+    distance += (dest_lumel - pos).SquaredNorm();
+
+    cossrcangle /= 4.0; 
+    cosdestangle /= 4.0; 
+    distance /= 4.0; 
+  }
+
   float sqdistance = distance;
 
   if (sqdistance < 0.01f) sqdistance = 0.01f;
@@ -1339,7 +1377,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
  
   // Now we need to correct the cosinus factor so that it
   // really represents a cosinus.
-  if(distance < 0.01f) return; // also prevents divide by zero
+  if(distance < 0.1f) return; // also prevents divide by zero
   float inv_distance = 1./sqrt(distance);
   path *= inv_distance;
   cosdestangle *= inv_distance;

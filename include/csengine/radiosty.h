@@ -529,6 +529,8 @@ private:
   float source_patch_area;
   /// index into source maps
   int src_uv; 
+  /// x, y of source lumel
+  int src_x, src_y;
   /// texture map of source polygon - reasonably quick to compute, saves
   /// a lot of space.
   csRGBLightMap *texturemap;
