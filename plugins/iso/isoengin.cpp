@@ -32,7 +32,7 @@
 #include "iutil/cfgmgr.h"
 #include "csutil/util.h"
 #include "iobject/object.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 
 
 IMPLEMENT_IBASE (csIsoEngine)
@@ -228,7 +228,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 	          const char *materialname)
 {
-  iImageLoader *imgloader = QUERY_PLUGIN(system, iImageLoader);
+  iImageIO *imgloader = QUERY_PLUGIN(system, iImageIO);
   if(imgloader==NULL)
   {
     system->Printf(MSG_INTERNAL_ERROR, "Could not get image loader plugin.\n");

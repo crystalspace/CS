@@ -27,7 +27,7 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iMaterialHandle;
 struct iVFS;
-struct iImageLoader;
+struct iImageIO;
 
 struct ConDecoBorder
 {
@@ -56,7 +56,7 @@ private:
   iConsoleOutput* base;
   iGraphics2D *G2D;
   iGraphics3D *G3D;
-  iImageLoader *ImageLoader;
+  iImageIO *ImageLoader;
   ConsoleDecoration deco;
   csRect outersize, bordersize, p2size;
   bool border_computed;

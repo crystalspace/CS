@@ -31,7 +31,7 @@
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
 #include "igraphic/image.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 
 IMPLEMENT_IBASE(csFancyConsole)
   IMPLEMENTS_INTERFACE(iConsoleOutput)
@@ -118,7 +118,7 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
           system_ready = true;
 	  if (!pix_loaded)
 	  {
-            ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+            ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
 	    LoadPix ();
 	    pix_loaded = true;
 	  }
