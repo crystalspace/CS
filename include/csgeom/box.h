@@ -35,6 +35,8 @@
 #include "vector3.h"
 #include "segment.h"
 
+#include "csutil/array.h"
+
 class csPlane3;
 class csTransform;
 class csPoly2D;
@@ -1055,6 +1057,16 @@ public:
    */
   bool ProjectOutline (const csTransform& trans, float fov, float sx, float sy,
   	csPoly2D& poly, float& min_z, float& max_z) const;
+
+  /**
+   * Project this box to the 2D outline given the origin and an axis aligned
+   * plane. If this fails (because some of the points cannot be projected)
+   * then it will return false. Note that this function will NOT clear
+   * the input array. So it will add the projected vertices after the
+   * vertices that may already be there.
+   */
+  bool ProjectOutline (const csVector3& origin,
+	int axis, float where, csArray<csVector2>& poly) const;
 
   /**
    * Project this box to the 2D outline given the origin and an axis aligned

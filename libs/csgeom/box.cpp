@@ -781,6 +781,33 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
 
 bool csBox3::ProjectOutline (const csVector3& origin,
 	int axis, float where,
+  	csArray<csVector2>& poly) const
+{
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+
+  int i;
+  for (i = 0 ; i < num_array ; i++)
+  {
+    csVector3 isect;
+    if (!csIntersect3::AxisPlane (origin, ol.vertices[i], axis, where,
+    	isect))
+      return false;
+    csVector2 v;
+    switch (axis)
+    {
+      case 0: v.x = isect.y; v.y = isect.z; break;
+      case 1: v.x = isect.x; v.y = isect.z; break;
+      case 2: v.x = isect.x; v.y = isect.y; break;
+    }
+    poly.Push (v);
+  }
+  return true;
+}
+
+bool csBox3::ProjectOutline (const csVector3& origin,
+	int axis, float where,
   	csPoly2D& poly) const
 {
   int idx = CalculatePointSegment (origin);
