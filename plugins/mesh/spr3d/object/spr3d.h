@@ -1337,7 +1337,6 @@ private:
   csShaderVariableContext dynDomain;
 
 #endif // CS_USE_NEW_RENDERER
-  csReversibleTransform tr_o2c;
 
   /// Setup this object.
   void SetupObject ();
