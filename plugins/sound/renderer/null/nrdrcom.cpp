@@ -80,6 +80,8 @@ STDMETHODIMP csSoundRenderNull::CreateSource(ISoundSource ** ppv, csSoundData* s
     *ppv = 0;
     return E_OUTOFMEMORY;
   }
+  
+  pNew->SetVolume (1.0);
 
   return pNew->CreateSource(ppv);
 }
@@ -92,7 +94,8 @@ STDMETHODIMP csSoundRenderNull::CreateSoundBuffer(ISoundBuffer** ppv, csSoundDat
     *ppv = 0;
     return E_OUTOFMEMORY;
   }
-  
+  pNew->SetVolume (1.0);
+
   return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
 

@@ -61,3 +61,28 @@ STDMETHODIMP csSoundBufferNull::Stop()
 {
   return S_OK;
 }
+
+STDMETHODIMP csSoundBufferNull::SetVolume(float vol)
+{
+  fVolume = vol;
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferNull::GetVolume(float &vol)
+{
+  vol = fVolume;
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferNull::SetFrequencyFactor(float factor)
+{
+  fFrequencyFactor = factor;
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferNull::GetFrequencyFactor(float &factor)
+{
+  factor = fFrequencyFactor;
+  return S_OK;
+}
+

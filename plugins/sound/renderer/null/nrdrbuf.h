@@ -32,10 +32,20 @@ public:
 
 	STDMETHODIMP Stop();
 	STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
+
+  STDMETHODIMP SetVolume(float vol);
+  STDMETHODIMP GetVolume(float &vol);
+  
+  STDMETHODIMP SetFrequencyFactor(float vol);
+  STDMETHODIMP GetFrequencyFactor(float &vol);
+
   STDMETHODIMP CreateSource(ISoundSource **source);
 
  	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundBufferNull)
+public:
+  float fFrequencyFactor;
+  float fVolume;
 };
 
 #endif // __CSSOUNDBUFFERNULL_H__
