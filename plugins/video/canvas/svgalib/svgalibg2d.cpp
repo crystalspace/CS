@@ -354,7 +354,7 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
     if (down != keydown [scancode])
     {
       keydown [scancode] = down;
-      EventOutlet->Key (key, -1, down);
+      EventOutlet->Key (key, 0, down);
     }
   }
 
