@@ -130,8 +130,8 @@ This shows a tree with selectable packages in the branches.  If you have
 sufficient disk space and a high-speed Internet connection, you may wish to
 install the majority of the tools.  On the other hand, if you want to install
 only a minimum set of tools, choose the packages in the @emph{Devel} branch
-and, at a minimum, @emph{libjpeg}, @emph{libpng}, @emph{opengl}, @emph{python},
-@emph{win32api}, and @emph{zlib} from the @emph{Libs} branch.
+and, at a minimum, @emph{jpeg}, @emph{libpng}, @emph{opengl}, @emph{python},
+@emph{w32api}, and @emph{zlib} from the @emph{Libs} branch.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot8}

@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	  convert models which had been created/saved on Windows or older
 	  MacOS.  Problem was that it was explicitly looking for LF terminator
 	  without taking into account CRLF (Windows) or CR (Macintosh).
+	- Eric Sunshine corrected a couple package names in cygwin.txi as
+	  reported by Ian Walker.
 13-Mar-2003
 	- Eric Sunshine applied a couple corrections to aws/quick.txi reported
 	  by <shri@vitalstate.co.uk>.
