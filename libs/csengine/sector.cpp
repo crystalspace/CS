@@ -919,8 +919,8 @@ int cnt=0,del=0;
   while (sf)
   {
     bool vis;
-    if (qc) qc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
-    else if (cc) cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    if (qc) vis = qc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    else if (cc) vis = cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
     if (!vis)
     {
       csShadowFrustrum* sfdel = sf;
