@@ -69,6 +69,7 @@ struct iObjectRegistry;
 struct iVirtualClock;
 struct iCacheManager;
 struct iString;
+struct iEngineSequenceManager;
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -221,6 +222,11 @@ public:
   csRef<iVFS> VFS;
 
   /**
+   * Pointer to the engine sequence manager.
+   */
+  csRef<iEngineSequenceManager> eseqmgr;
+
+  /**
    * Pointer to an optional reporter that will be used for notification
    * and warning messages.
    */
@@ -292,6 +298,12 @@ public:
   csRef<iGraphics2D> G2D;
   /// The graphics loader
   csRef<iImageIO> ImageLoader;
+  /**
+   * The following variable is only set if the engine had to create its
+   * own cache manager. In that case the engine is also responsible
+   * for cleaning this up.
+   */
+  csRef<iCacheManager> cache_mgr;
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
   /// Does the 3D driver require power-of-two lightmaps?
@@ -446,13 +458,6 @@ private:
   char* SplitRegionName (const char* name, iRegion*& region, bool& global);
 
   /**
-   * The following variable is only set if the engine had to create its
-   * own cache manager. In that case the engine is also responsible
-   * for cleaning this up.
-   */
-  csRef<iCacheManager> cache_mgr;
-
-  /**
    * Get a list of all objects in the given sphere.
    */
   void GetNearbyObjectList (iSector* sector,
@@ -464,6 +469,11 @@ private:
    */
   iObject** GetNearbyObjectList (iSector* sector,
     const csVector3& pos, float radius, int& num_objects);
+
+  /**
+   * Get/create the engine sequence manager.
+   */
+  iEngineSequenceManager* GetEngineSequenceManager ();
 
 public:
   /**

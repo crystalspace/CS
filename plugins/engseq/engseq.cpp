@@ -808,6 +808,13 @@ void csSequenceTrigger::AddConditionMeshVisible (iMeshWrapper* mesh)
 {
 }
 
+void csSequenceTrigger::AddConditionMeshClick (iMeshWrapper* mesh)
+{
+  eseqmgr->RegisterMeshTrigger (this);
+  click_mesh = mesh;
+  total_conditions++;
+}
+
 void csSequenceTrigger::AddConditionManual ()
 {
 }
@@ -818,6 +825,7 @@ void csSequenceTrigger::ClearConditions ()
   fired_conditions = 0;
   framenr = 0;
   condition_cleanups.DeleteAll ();
+  click_mesh = NULL;
 }
 
 void csSequenceTrigger::Trigger ()
@@ -1001,7 +1009,7 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing | CSMASK_MouseDown);
 
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -1046,7 +1054,51 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 
     return true;
   }
+  else if (event.Type == csevMouseDown)
+  {
+    int mouse_x = event.Mouse.x;
+    int mouse_y = event.Mouse.y;
+    if (camera != NULL && mesh_triggers.Length () > 0)
+    {
+      csVector3 v;
+      // Setup perspective vertex, invert mouse Y axis.
+      csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
+
+      camera->InvPerspective (p, 1, v);
+      csVector3 vw = camera->GetTransform ().This2Other (v);
+
+      iSector* sector = camera->GetSector ();
+      csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
+      csVector3 isect, end = origin + (vw - origin) * 120;
+
+      iPolygon3D* poly = NULL;
+      iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
+
+      int i;
+      for (i = 0 ; i < mesh_triggers.Length () ; i++)
+      {
+	if (mesh_triggers[i]->GetClickMesh () == sel)
+	  mesh_triggers[i]->Fire ();
+      }
+
+      //vw = isect;
+      //v = camera->GetTransform ().Other2This (vw);
+    }
+  }
   return false;
+}
+
+void csEngineSequenceManager::RegisterMeshTrigger (
+	csSequenceTrigger* trigger)
+{
+  if (mesh_triggers.Find (trigger) == -1)
+    mesh_triggers.Push (trigger);
+}
+
+void csEngineSequenceManager::UnregisterMeshTrigger (
+	csSequenceTrigger* trigger)
+{
+  mesh_triggers.Delete (trigger);
 }
 
 csPtr<iSequenceTrigger> csEngineSequenceManager::CreateTrigger (

@@ -28,6 +28,7 @@ struct iSector;
 struct iMeshWrapper;
 struct iObject;
 struct iLight;
+struct iCamera;
 class csColor;
 class csReversibleTransform;
 class csVector3;
@@ -201,6 +202,11 @@ struct iSequenceTrigger : public iBase
   virtual void AddConditionMeshVisible (iMeshWrapper* mesh) = 0;
 
   /**
+   * Condition: true if clicked on a mesh.
+   */
+  virtual void AddConditionMeshClick (iMeshWrapper* mesh) = 0;
+
+  /**
    * Condition: manual trigger. Call this to set add a trigger
    * that requires manual confirmation. The 'Trigger()' function
    * can then be used later to actually do the trigger.
@@ -289,6 +295,18 @@ struct iEngineSequenceManager : public iBase
    */
   virtual iSequenceManager* GetSequenceManager () = 0;
 
+  /**
+   * Set the camera to use for some of the features (like clicking
+   * on mesh objects). If this is not set then those features will
+   * not be available.
+   */
+  virtual void SetCamera (iCamera* camera) = 0;
+
+  /**
+   * Get the camera that is used for some features.
+   */
+  virtual iCamera* GetCamera () = 0;
+  
   //-----------------------------------------------------------------------
 
   /**

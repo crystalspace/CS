@@ -616,9 +616,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   loaded_plugins.plugin_mgr = plugin_mgr;
 
-  // get the virtual file system plugin
+  // Get the virtual file system plugin.
   GET_CRITICAL_PLUGIN (VFS, iVFS, "VFS");
-  // get syntax services
+  // Get syntax services.
   SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!SyntaxService)
   {
@@ -791,6 +791,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("delay", XMLTOKEN_DELAY);
   xmltokens.Register ("fire", XMLTOKEN_FIRE);
   xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
+  xmltokens.Register ("onclick", XMLTOKEN_ONCLICK);
   return true;
 }
 
@@ -3000,15 +3001,25 @@ iEngineSequenceManager* csLoader::GetEngineSequenceManager ()
 {
   if (!eseqmgr)
   {
-    csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-    eseqmgr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.utilities.sequence.engine", iEngineSequenceManager);
+    eseqmgr = CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
     if (!eseqmgr)
     {
-      ReportError ("crystalspace.maploader",
-	"Could not load the engine sequence manager!");
-      return NULL;
+      csRef<iPluginManager> plugin_mgr (
+  	  CS_QUERY_REGISTRY (object_reg, iPluginManager));
+      eseqmgr = CS_LOAD_PLUGIN (plugin_mgr,
+    	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
+      if (!eseqmgr)
+      {
+        ReportError ("crystalspace.maploader",
+	  "Could not load the engine sequence manager!");
+        return NULL;
+      }
+      if (!object_reg->Register (eseqmgr, "iEngineSequenceManager"))
+      {
+        ReportError ("crystalspace.maploader",
+	  "Could not register the engine sequence manager!");
+        return NULL;
+      }
     }
   }
   return eseqmgr;

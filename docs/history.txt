@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+26-Sep-2002
+	- Engine sequence manager is now registered to the object
+	  registry when it is loaded by the main loader (it will also
+	  first check if it is already in the registry and then use that).
+	- The engine will now also try to find and load the engine
+	  sequence manager. It will also feed the current camera to it
+	  every frame.
+	- Implemented 'onclick' trigger condition in the engine
+	  sequence manager so you can now listen to clicks on meshes.
+	  Untested...
 25-Sep-2002
 	- Sequence manager (the old one) can now cope with null trueSequence
 	  and falseSequence in the condition.

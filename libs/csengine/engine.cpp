@@ -68,6 +68,7 @@
 #include "imesh/thing/polytmap.h"
 #include "imesh/thing/curve.h"
 #include "ivaria/reporter.h"
+#include "ivaria/engseq.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
 
@@ -1466,6 +1467,32 @@ void csEngine::StartEngine ()
   DeleteAll ();
 }
 
+iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
+{
+  if (!eseqmgr)
+  {
+    eseqmgr = CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
+    if (!eseqmgr)
+    {
+      csRef<iPluginManager> plugin_mgr (
+  	  CS_QUERY_REGISTRY (object_reg, iPluginManager));
+      eseqmgr = CS_LOAD_PLUGIN (plugin_mgr,
+    	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
+      if (!eseqmgr)
+      {
+        Report ("Could not load the engine sequence manager!");
+        return NULL;
+      }
+      if (!object_reg->Register (eseqmgr, "iEngineSequenceManager"))
+      {
+        Report ("Could not register the engine sequence manager!");
+        return NULL;
+      }
+    }
+  }
+  return eseqmgr;
+}
+
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
   Stats::polygons_considered = 0;
@@ -1480,6 +1507,12 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
   current_camera = c;
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
+
+  iEngineSequenceManager* eseqmgr = GetEngineSequenceManager ();
+  if (eseqmgr)
+  {
+    eseqmgr->SetCamera (c);
+  }
 
   // This flag is set in HandleEvent on a cscmdContextResize event
   if (resize)

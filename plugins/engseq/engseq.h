@@ -211,7 +211,11 @@ private:
   csEngineSequenceManager* eseqmgr;
   csTicks fire_delay;
   uint32 framenr;
+
   csRefArray<csConditionCleanup> condition_cleanups;
+
+  // We are waiting for a click on this mesh.
+  csRef<iMeshWrapper> click_mesh;
 
   bool last_trigger_state;
   csTicks condtest_delay;
@@ -228,18 +232,22 @@ public:
   void AddConditionInMeshSphere (iMeshWrapper* mesh);
   void AddConditionInMeshBox (iMeshWrapper* mesh);
   void AddConditionMeshVisible (iMeshWrapper* mesh);
+  void AddConditionMeshClick (iMeshWrapper* mesh);
   void AddConditionManual ();
+
   void SetEnabled (bool en) { enabled = en; }
   bool IsEnabled () const { return enabled; }
   void ClearConditions ();
   void Trigger ();
   void FireSequence (csTicks delay, iSequenceWrapper* seq);
   iSequenceWrapper* GetFiredSequence () { return fire_sequence; }
+
   void TestConditions (csTicks delay);
   bool CheckState ();
-
   csTicks GetConditionTestDelay () const { return condtest_delay; }
   void EnableOneTest ();
+
+  iMeshWrapper* GetClickMesh () const { return click_mesh; }
 
   csEngineSequenceManager* GetEngineSequenceManager () const
   {
@@ -287,6 +295,10 @@ public:
     virtual void AddConditionMeshVisible (iMeshWrapper* mesh)
     {
       scfParent->AddConditionMeshVisible (mesh);
+    }
+    virtual void AddConditionMeshClick (iMeshWrapper* mesh)
+    {
+      scfParent->AddConditionMeshClick (mesh);
     }
     virtual void AddConditionManual ()
     {
@@ -370,10 +382,22 @@ class csEngineSequenceManager : public iEngineSequenceManager
 private:
   iObjectRegistry *object_reg;
   csRef<iSequenceManager> seqmgr;
+
+  /// All loaded triggers.
   csRefArray<iSequenceTrigger> triggers;
+
+  /// All loaded sequences.
   csRefArray<iSequenceWrapper> sequences;
+
+  /// All triggers interested in knowing when a mesh is clicked.
+  csRefArray<csSequenceTrigger> mesh_triggers;
+
+  /// All timed operations.
   csRefArray<csTimedOperation> timed_operations;
   uint32 global_framenr;
+
+  /// Set the camera to use for some features.
+  csRef<iCamera> camera;
 
 public:
   SCF_DECLARE_IBASE;
@@ -385,6 +409,11 @@ public:
   /// This is set to receive the once per frame nothing event.
   virtual bool HandleEvent (iEvent &event);
 
+  virtual void SetCamera (iCamera* camera)
+  {
+    csEngineSequenceManager::camera = camera;
+  }
+  virtual iCamera* GetCamera () { return camera; }
   virtual iSequenceManager* GetSequenceManager () { return seqmgr; }
   virtual csPtr<iSequenceTrigger> CreateTrigger (const char* name);
   virtual void RemoveTrigger (iSequenceTrigger* trigger);
@@ -400,6 +429,15 @@ public:
   virtual iSequenceWrapper* FindSequenceByName (const char* name) const;
   virtual void FireTimedOperation (csTicks delta,
   	csTicks duration, iSequenceTimedOperation* op);
+
+  /**
+   * Register a trigger that will be called whenever a mesh is clicked.
+   */
+  void RegisterMeshTrigger (csSequenceTrigger* trigger);
+  /**
+   * Unregister a mesh trigger.
+   */
+  void UnregisterMeshTrigger (csSequenceTrigger* trigger);
 
   /// Get the global frame number.
   uint32 GetGlobalFrameNr () const { return global_framenr; }

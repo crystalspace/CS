@@ -74,6 +74,30 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_ONCLICK:
+	{
+	  const char* meshname = child->GetAttributeValue ("mesh");
+	  if (!meshname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.trigger",
+		child, "Couldn't find 'mesh' attribute in trigger '%s'!",
+		trigname);
+	    return NULL;
+	  }
+
+	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.trigger",
+		child, "Couldn't find mesh '%s' in trigger '%s'!", meshname,
+		trigname);
+	    return NULL;
+	  }
+	  trigger->AddConditionMeshClick (mesh);
+	}
+	break;
       case XMLTOKEN_SECTORVIS:
 	{
 	  const char* sectname = child->GetAttributeValue ("sector");
