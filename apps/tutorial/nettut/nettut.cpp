@@ -40,11 +40,11 @@ int main(int argc, char *argv[])
 	  return 0;
   }
 
-  if (stricmp(argv[1],"server") == 0)
+  if (strcasecmp(argv[1],"server") == 0)
   {
 	  role = 0;
   }
-  if (stricmp(argv[1],"client") == 0)
+  if (strcasecmp(argv[1],"client") == 0)
   {
 	  role = 1;
   }
