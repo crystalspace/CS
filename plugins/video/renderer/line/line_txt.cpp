@@ -471,9 +471,8 @@ iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
 
 void csTextureManagerLine::UnregisterTexture (csTextureHandleLine* handle)
 {
-  if (!handle->GetRefCount()) return; // Loop breaker
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx);
+  if (idx >= 0) textures.Delete (idx, (bool)handle->GetRefCount());
 }
 
 void csTextureManagerLine::ResetPalette ()

@@ -235,7 +235,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
 
   tcache = NULL;
   texman = NULL;
-
+  partner = NULL;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
   do_near_plane = false;
@@ -1232,12 +1232,19 @@ void csGraphics3DSoftwareCommon::Close ()
     delete fog_buffers;
     fog_buffers = n;
   }
-//@@@ Bug: The software texture cache when used with opengl crashes at exit. MHV.
-  delete tcache; tcache = NULL;
-  if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
-
-  texman->Clear();
-  texman->DecRef(); texman = NULL;
+  if (!partner)
+  { 
+    delete tcache; 
+    tcache = NULL; 
+    texman->Clear();
+    texman->DecRef(); texman = NULL;
+  }
+  if (clipper) 
+  { 
+    clipper->DecRef ();
+    clipper = NULL;
+    cliptype = CS_CLIPPER_NONE;
+  }
 
   delete [] z_buffer; z_buffer = NULL;
   delete [] smaller_buffer; smaller_buffer = NULL;

@@ -34,7 +34,6 @@ csWSTexture::csWSTexture (const char *iName, iImage *inImage, int iFlags)
   Name = csStrNew (iName);
   FileName = csStrNew (Image->GetName ());
   Handle = NULL;
-  TexMan = NULL;
   KeyChanged = false;
   tr = tg = tb = 255;
 }
@@ -112,9 +111,7 @@ void csWSTexture::FixKeyColor ()
 void csWSTexture::Register (iTextureManager *iTexMan)
 {
   if (!iTexMan) return;
-  iTexMan->IncRef();
   Unregister ();
-  TexMan = iTexMan;
   Handle = iTexMan->RegisterTexture (Image, Flags);
   Handle->IncRef();
   SetKeyColor (HasKey);
@@ -124,11 +121,8 @@ void csWSTexture::Unregister ()
 {
   if (Handle)
   {
-    TexMan->UnregisterTexture(Handle);
     Handle->DecRef ();
     Handle = NULL;
-    TexMan->DecRef();
-    TexMan = NULL;
   }
 }
 

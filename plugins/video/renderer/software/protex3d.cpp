@@ -175,9 +175,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
           (csRGBpixel *) buffer, false);
 	  csTextureHandleSoftware *dummy = 
           (csTextureHandleSoftware *)texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
-	dummy->IncRef();
         dummy->Prepare();
-	texman->UnregisterTexture(dummy);
 	dummy->DecRef();
       }
 

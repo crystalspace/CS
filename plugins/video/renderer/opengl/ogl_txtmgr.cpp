@@ -88,6 +88,7 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   if (!image) return;
   if (((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) && tex[0])
     return;
+
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
@@ -201,7 +202,7 @@ csTextureManagerOpenGL::csTextureManagerOpenGL (iObjectRegistry* object_reg,
 
 csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 {
-  Clear ();
+  csTextureManager::Clear ();
 }
 
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
@@ -244,7 +245,6 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
 
 void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 {
-  if (!handle->GetRefCount()) return; // Loop breaker
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx);
+  if (idx >= 0) textures.Delete (idx, (bool)handle->GetRefCount());
 }
