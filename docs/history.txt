@@ -43,6 +43,11 @@ chronological order.
 	  properly with the OPCODE plugin.
 	- Jorrit clearly documented how csCollisionPair should be
 	  interpreted in the API documentation.
+	- Jorrit applied a patch from Andrew (Khaki from PS) so that walktest
+	  collision detection correctly transforms the collision pairs. Jorrit
+	  improved his patch by using the full transform instead of the
+	  normal transform and also testing if the transform is identity or
+	  not to avoid the work.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to

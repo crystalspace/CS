@@ -139,8 +139,10 @@ int CollisionDetect (iEngine* Engine, iCollider *c, iSector* sp,
     Sys->collide_system->ResetCollisionPairs ();
     csColliderWrapper* other_wrap = csColliderWrapper::GetColliderWrapper (
 	mw->QueryObject ());
+    csReversibleTransform mwtrans = mw->GetMovable ()->GetFullTransform ();
+    bool mwtrans_identity = mw->GetMovable ()->IsFullTransformIdentity ();
     if (other_wrap && Sys->collide_system->Collide (c, cdt,
-	other_wrap->GetCollider (), &mw->GetMovable ()->GetTransform ()))
+	other_wrap->GetCollider (), &mwtrans))
       hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
@@ -148,7 +150,22 @@ int CollisionDetect (iEngine* Engine, iCollider *c, iSector* sp,
     {
       if (num_our_cd >= MAX_CONTACT)
 	break;
-      our_cd_contact[num_our_cd++] = CD_contact[j];
+      our_cd_contact[num_our_cd].a1 = cdt->This2Other(CD_contact[j].a1);
+      our_cd_contact[num_our_cd].b1 = cdt->This2Other(CD_contact[j].b1);
+      our_cd_contact[num_our_cd].c1 = cdt->This2Other(CD_contact[j].c1);
+      if (mwtrans_identity)
+      {
+        our_cd_contact[num_our_cd].a2 = CD_contact[j].a2;
+        our_cd_contact[num_our_cd].b2 = CD_contact[j].b2;
+        our_cd_contact[num_our_cd].c2 = CD_contact[j].c2;
+      }
+      else
+      {
+        our_cd_contact[num_our_cd].a2 = mwtrans.This2Other(CD_contact[j].a2);
+        our_cd_contact[num_our_cd].b2 = mwtrans.This2Other(CD_contact[j].b2);
+        our_cd_contact[num_our_cd].c2 = mwtrans.This2Other(CD_contact[j].c2);
+      }
+      num_our_cd++;
     }
 
     if (Sys->collide_system->GetOneHitOnly () && hit)
@@ -321,10 +338,6 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 	if (n*csVector3(0,-1,0)<0.7) continue;
 
 	csVector3 line[2];
-
-	cd.a1 += new_pos;
-	cd.b1 += new_pos;
-	cd.c1 += new_pos;
 
 	if (FindIntersection (cd,line))
 	{
