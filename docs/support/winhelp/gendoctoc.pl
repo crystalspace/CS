@@ -75,7 +75,7 @@ EOTOCENTRY
   			close($INDEXFILE);
   	}
   	
-  	open(my $HHKFILE, ">docindex.hhk");
+  	open(my $HHKFILE, ">manualindex.hhk");
 	  print $HHKFILE <<EOHHKHEAD;
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
@@ -155,7 +155,7 @@ EOTOCENTRY
 sub doctoc {
 		my $docroot = shift @_;
 	
-	  open(my $TOCFILE, ">doctoc.hhc");
+	  open(my $TOCFILE, ">manualtoc.hhc");
 	  
 	  print $TOCFILE <<EOTOCHEAD;
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
