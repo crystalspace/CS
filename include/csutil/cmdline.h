@@ -59,7 +59,7 @@ private:
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;
 
   /// Directory of application executable
-  const char* appPath;
+  char* appPath;
 public:
   SCF_DECLARE_IBASE;
 

@@ -43,6 +43,7 @@ The history order is reversed so that new features are at the top.
 	- res added the ability to load a single plugin and further improved
 	  SCF factory 'contexts'.
 	- res fixed Win32 csLoadLibrary() which has been messed up by himself.
+        - Philip Wyett fixed a compile error in cmdline.cpp.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
