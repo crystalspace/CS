@@ -27,6 +27,7 @@
 #include "iengine/engine.h"
 #include "imesh/object.h"
 #include "csgeom/obb.h"
+#include "qsqrt.h"
 
 #include "odedynam.h"
 
@@ -353,8 +354,24 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
         vertex_table[ind2] / mesht - plane.Normal());
       edgeplane.Normalize();	
       if (edgeplane.Classify (center) < 0) {
-        depth = -1;
-        break;
+        csVector3 line = vertex_table[ind2] - vertex_table[ind1];
+        line.Normalize();
+        float proj = center * line;
+        /* if the point projects on this edge, but outside the poly test 
+         * for depth to this edge (especially important on sharp corners)
+         */
+        if ((proj > (vertex_table[ind1] * line)) &&
+            (proj < (vertex_table[ind2] * line))) {
+          csVector3 projpt = vertex_table[ind1] + line * proj;
+          csVector3 newnorm = center - projpt;
+          float dist = newnorm.Norm();
+          depth = rad - dist;
+          newnorm /= dist;
+          plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
+        } else {
+          /* this is an invalid the ball is outside the poly at this edge */
+          depth = -1;
+        }
       }
     }
     /* get the one last edge from END to 0 */
@@ -365,7 +382,24 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
       vertex_table[ind2] / mesht - plane.Normal());
     edgeplane.Normalize ();
     if (edgeplane.Classify (center) < 0) {
-      depth = -1;
+      csVector3 line = vertex_table[ind2] - vertex_table[ind1];
+      line.Normalize();
+      float proj = center * line;
+      /* if the point projects on this edge, but outside the poly test 
+       * for depth to this edge (especially important on sharp corners)
+       */
+      if ((proj > (vertex_table[ind1] * line)) &&
+          (proj < (vertex_table[ind2] * line))) {
+        csVector3 projpt = vertex_table[ind1] + line * proj;
+        csVector3 newnorm = center - projpt;
+        float dist = newnorm.Norm();
+        depth = rad - dist;
+        newnorm /= dist;
+        plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
+      } else {
+        /* this is an invalid the ball is outside the poly at this edge */
+        depth = -1;
+      }
     }
     if (depth < 0) {
       continue;
