@@ -44,21 +44,23 @@ enum
  * creator's statistics by calling GetStatistics();
  * NEVER alter the values you get from there!
  */
-class dnStats : public csBase
+struct csDungeonStats
 {
-public:
   long NumAreas,NumAreaTemplates,NumCrossCons;
   char **AreaTemplateNames;
   long *AreaTemplates;
   long NumDirectCons,NumAngleCons,NumDAngleCons;
 };
 
+
+SCF_VERSION (iDungeon, 2, 0, 0);
+
 /**
  * This is the randomizer plug-in itself. This is how to use it:
  * <ul>
  * <li>1. Set all options via SetOption. These options SHOULD NOT be changed
  *    after this (unexpected results).
- * <li>2. Call PrepareInput with the path to the main dungeon.gen file as a
+ * <li>2. Call PrepareInput with the path to the main dungeon.ini file as a
  *    parameter.  This will read the necessary data for the randomizer.  It
  *    will fill the NumAreaTemplates and AreaTemplateNames fields of the
  *    statistics.  Calling this function more than once will overwrite the old
@@ -72,11 +74,8 @@ public:
  *    textures (optionally).
  * </ul>
  */
-SCF_VERSION (iDungeon, 2, 0, 0);
-
-class iDungeon : public iPlugIn
+struct iDungeon : public iPlugIn
 {
-public:
   /// Plugin initialization.
   virtual bool Initialize (iSystem *sys) = 0;
 
@@ -87,7 +86,7 @@ public:
   virtual int GetOption (int opt) = 0;
 
   /**
-   * Read the main dungeon.gen file from the given virtual directory and
+   * Read the main dungeon.ini file from the given virtual directory and
    * prepare its contents for the dungeon randomizer.
    */
   virtual void PrepareInput (const char *InputDirectory) = 0;
@@ -107,7 +106,7 @@ public:
   virtual void WriteWorld (const char *OutputDirectory) = 0;
 
   /// get a pointer to the statistics info
-  virtual dnStats *GetStatistics () = 0;
+  virtual csDungeonStats *GetStatistics () = 0;
 };
 
 #endif // __IDUNGEON_H__
