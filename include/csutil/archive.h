@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "csutil/zip.h"
+#include "csutil/csstrvec.h"
 
 /**
  * csArchive class that can be used to work with standard .ZIP format files.
@@ -59,7 +60,6 @@ private:
   public:
     char *filename;
     ZIP_central_directory_file_header info;
-    ArchiveEntry *next;
     char *buffer;
     size_t buffer_pos;
     void *extrafield, *comment;
@@ -76,14 +76,31 @@ private:
   };
   friend class ArchiveEntry;
 
-  ArchiveEntry *first;           // Archive directory: chain head
-  ArchiveEntry *lazyops;         // Chain head of lazy operations
+  /// A vector of ArchiveEntries
+  class ArchiveEntryVector : public csVector
+  {
+  public:
+    ArchiveEntryVector () : csVector (256, 256) {}
+    virtual ~ArchiveEntryVector () { DeleteAll (); }
+    virtual bool FreeItem (csSome Item)
+    { delete (ArchiveEntry *)Item; return true; }
+    virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    { return strcmp (((ArchiveEntry *)Item1)->filename, ((ArchiveEntry *)Item2)->filename); }
+    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    { return strcmp (((ArchiveEntry *)Item)->filename, (char *)Key); }
+    ArchiveEntry *Get (int n) const
+    { return (ArchiveEntry *)csVector::Get (n); }
+  };
 
-  char *filename;                // Archive file name
-  FILE *file;		         // Archive file pointer.
+  ArchiveEntryVector dir;	// Archive directory: chain head (sorted)
+  csStrVector del;		// The array of files that should be deleted (sorted)
+  ArchiveEntryVector lazy;	// The array of lazy operations (unsorted)
 
-  size_t comment_length;         // Archive comment length
-  char *comment;                 // Archive comment
+  char *filename;		// Archive file name
+  FILE *file;			// Archive file pointer.
+
+  size_t comment_length;	// Archive comment length
+  char *comment;		// Archive comment
 
   void ReadDirectory ();
   bool IsDeleted (const char *name) const;
@@ -167,11 +184,9 @@ public:
    */
   bool Flush ();
 
-  /// Iterator.
-  void *FirstFile () const
-  { return (void*)first; }
-  void *NextFile (void *entry) const
-  { return (void*)(((ArchiveEntry*)entry)->next); }
+  /// Get Nth file in archive or NULL
+  void *GetFile (int no)
+  { return dir.Get (no); }
 
   /// Find a file in archive; returns a handle or NULL
   void *FindName (const char *name) const;

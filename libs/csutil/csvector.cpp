@@ -139,6 +139,34 @@ int csVector::FindSortedKey (csConstSome Key, int Mode) const
   return -1;
 }
 
+int csVector::InsertSorted (csSome Item, int *oEqual, int Mode)
+{
+  int m = 0, l = 0, r = Length () - 1;
+  while (l <= r)
+  {
+    m = (l + r) / 2;
+    int cmp = Compare (root [m], Item, Mode);
+
+    if (cmp == 0)
+    {
+      if (oEqual)
+        *oEqual = m;
+      Insert (++m, Item);
+      return m;
+    }
+    else if (cmp < 0)
+      l = m + 1;
+    else
+      r = m - 1;
+  }
+  if (r == m)
+    m++;
+  Insert (m, Item);
+  if (oEqual)
+    *oEqual = -1;
+  return m;
+}
+
 void csVector::QuickSort (int Left, int Right, int Mode)
 {
 recurse:

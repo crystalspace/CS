@@ -40,9 +40,6 @@
 #  define DEFAULT_COMPRESSION_LEVEL Z_DEFAULT_COMPRESSION
 #endif
 
-// This value is used as compression_method to indicate deleted file
-#define FILE_DELETED 0xffff
-
 //---------------------------------------------------------------------------
 
 char csArchive::hdr_central[4] = {'P', 'K', CENTRAL_HDR_SIG};
@@ -61,8 +58,6 @@ char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 csArchive::csArchive (const char *filename)
 {
-  first = NULL;
-  lazyops = NULL;
   comment = NULL;
   comment_length = 0;
   csArchive::filename = strnew (filename);
@@ -76,15 +71,6 @@ csArchive::csArchive (const char *filename)
 
 csArchive::~csArchive ()
 {
-  ArchiveEntry *cur = first;
-
-  while (cur)
-  {
-    ArchiveEntry *prev = cur;
-
-    cur = cur->next;
-    CHK (delete prev);
-  } /* endwhile */
   if (filename)
     CHKB (delete [] filename);
   if (comment)
@@ -95,7 +81,7 @@ csArchive::~csArchive ()
 
 void csArchive::ReadDirectory ()
 {
-  if (first)
+  if (dir.Length ())
     return;                     /* Directory already read */
 
   ReadZipDirectory (file);
@@ -155,25 +141,25 @@ void csArchive::ReadZipDirectory (FILE *infile)
           for (;;)
           {
             if ((fread (buff, 1, sizeof (hdr_central), infile) < sizeof (hdr_central))
-                || (memcmp (buff, hdr_central, sizeof (hdr_central)) != 0))
+             || (memcmp (buff, hdr_central, sizeof (hdr_central)) != 0))
             {
-              if (first)
+              if (dir.Length ())
                 return;         /* Finished reading central directory */
               else
                 goto rebuild_cdr;       /* Broken central directory */
             }
             if ((!ReadCDFH (cdfh, infile))
-                || (cdfh.filename_length > sizeof (buff))
-                || (fread (buff, 1, cdfh.filename_length, infile) < cdfh.filename_length))
+             || (cdfh.filename_length > sizeof (buff))
+             || (fread (buff, 1, cdfh.filename_length, infile) < cdfh.filename_length))
               return;           /* Broken zipfile? */
             buff[cdfh.filename_length] = 0;
 
             if ((buff[cdfh.filename_length - 1] != '/')
-                && (buff[cdfh.filename_length - 1] != PATH_SEPARATOR))
+             && (buff[cdfh.filename_length - 1] != PATH_SEPARATOR))
             {
               ArchiveEntry *curentry = InsertEntry (buff, cdfh);
               if (!curentry->ReadExtraField (infile, cdfh.extra_field_length)
-                  || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
+               || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
                 return;         /* Broken zipfile? */
             } else
             {
@@ -241,44 +227,12 @@ void csArchive::ReadZipEntries (FILE *infile)
 csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
   ZIP_central_directory_file_header &cdfh)
 {
-  ArchiveEntry *cur, *prev;
-
-  cur = first;
-  prev = NULL;
-  while (cur)
-  {
-    if (strcmp (cur->filename, name) == 0)
-    {
-      if (prev)
-      {
-        CHK (prev->next = new ArchiveEntry (name, cdfh));
-        prev->next->next = cur->next;
-        prev = prev->next;
-      } else
-      {
-        CHK (first = new ArchiveEntry (name, cdfh));
-        first->next = cur->next;
-        prev = first;
-      }
-      CHK (delete cur);
-      return prev;
-    }
-    prev = cur;
-    cur = cur->next;
-  } /* endwhile */
-
-  if (first)
-  {
-    cur = first;
-    while (cur->next)
-      cur = cur->next;
-    CHK (cur->next = new ArchiveEntry (name, cdfh));
-    return (cur->next);
-  } else
-  {
-    CHK (first = new ArchiveEntry (name, cdfh));
-    return first;
-  } /* endif */
+  int dupentry;
+  ArchiveEntry *e = new ArchiveEntry (name, cdfh);
+  dir.InsertSorted (e, &dupentry);
+  if (dupentry >= 0)
+    dir.Delete (dupentry);
+  return e;
 }
 
 bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
@@ -298,30 +252,23 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
 
 void csArchive::Dir () const
 {
-  ArchiveEntry *f = first;
-
   printf (" Comp |Uncomp| File |CheckSum| File\n");
   printf (" size | size |offset| (CRC32)| name\n");
   printf ("------+------+------+--------+------\n");
-  while (f)
+  for (int fn = 0; fn < dir.Length (); fn++)
   {
-    printf ("%6ld|%6ld|%6ld|%08x|%s\n", f->info.csize, f->info.ucsize,
-            f->info.relative_offset_local_header, (UInt) f->info.crc32, f->filename);
-    f = f->next;
+    ArchiveEntry *e = dir.Get (fn);
+    printf ("%6ld|%6ld|%6ld|%08x|%s\n", e->info.csize, e->info.ucsize,
+      e->info.relative_offset_local_header, (UInt)e->info.crc32, e->filename);
   }
 }
 
 void *csArchive::FindName (const char *name) const
 {
-  ArchiveEntry *f = first;
-
-  while (f)
-  {
-    if (!strcmp (f->filename, name))
-      return (void *) f;
-    f = f->next;
-  }
-  return NULL;
+  int idx = dir.FindSortedKey (name);
+  if (idx < 0)
+    return NULL;
+  return dir.Get (idx);
 }
 
 char *csArchive::Read (const char *name, size_t * size)
@@ -449,20 +396,11 @@ void *csArchive::NewFile (const char *name, size_t size, bool pack)
 
   time_t curtime = time (NULL);
   struct tm *curtm = localtime (&curtime);
+  SetFileTime ((void *)f, *curtm);
 
-  SetFileTime ((void *) f, *curtm);
+  lazy.Push (f);
 
-  if (lazyops)
-  {
-    ArchiveEntry *last = lazyops;
-
-    while (last->next)
-      last = last->next;
-    last->next = f;
-  } else
-    lazyops = f;
-
-  return (void *) f;
+  return (void *)f;
 }
 
 bool csArchive::DeleteFile (const char *name)
@@ -470,22 +408,7 @@ bool csArchive::DeleteFile (const char *name)
   if (!FileExists (name))
     return false;
 
-  ZIP_central_directory_file_header cdfh;
-
-  memset (&cdfh, 0, sizeof (cdfh));
-  cdfh.compression_method = FILE_DELETED;
-  CHK (ArchiveEntry * f = new ArchiveEntry (name, cdfh));
-
-  if (lazyops)
-  {
-    ArchiveEntry *last = lazyops;
-
-    while (last->next)
-      last = last->next;
-    last->next = f;
-  } else
-    lazyops = f;
-
+  del.InsertSorted (strnew (name));
   return true;
 }
 
@@ -511,7 +434,7 @@ bool csArchive::Write (void *entry, const char *data, size_t len)
 // Flush all pending operations (if any)
 bool csArchive::Flush ()
 {
-  if (!lazyops)
+  if (!lazy.Length () && !del.Length ())
     return true;                /* Nothing to do */
   return WriteZipArchive ();
 }
@@ -521,7 +444,7 @@ bool csArchive::WriteZipArchive ()
 {
   char temp_file[MAXPATHLEN];
   FILE *temp;
-  char buff[1024];
+  char buff [16 * 1024];
   bool success = false;
 
   // Step one: Copy archive file into a temporary file,
@@ -541,7 +464,8 @@ bool csArchive::WriteZipArchive ()
     ArchiveEntry *this_file = NULL;
 
     if (memcmp (buff, hdr_local, sizeof (hdr_local)) == 0)
-    {                           //----------------------------------local header
+    {
+      // local header
       ZIP_local_file_header lfh;
 
       if (!ReadLFH (lfh, file))
@@ -561,7 +485,8 @@ bool csArchive::WriteZipArchive ()
         bytes_to_skip = lfh.extra_field_length + lfh.csize;
         bytes_to_copy = 0;
         CHK (delete[] this_name);
-      } else
+      }
+      else
       {
         this_file = (ArchiveEntry *) FindName (this_name);
         if (this_file)
@@ -574,11 +499,14 @@ bool csArchive::WriteZipArchive ()
           bytes_to_copy = lfh.csize;
           if (!this_file->WriteLFH (temp))
             goto temp_failed;   /* Write error */
-        } else
+        }
+        else
           goto skip_file;       /* hmm... strange. */
       }
-    } else if (memcmp (buff, hdr_central, sizeof (hdr_central)) == 0)
-    {                           //----------------------------------central directory header
+    }
+    else if (memcmp (buff, hdr_central, sizeof (hdr_central)) == 0)
+    {
+      // central directory header
       ZIP_central_directory_file_header cdfh;
 
       if (!ReadCDFH (cdfh, file))
@@ -586,10 +514,12 @@ bool csArchive::WriteZipArchive ()
 
       bytes_to_copy = 0;
       bytes_to_skip = cdfh.filename_length + cdfh.extra_field_length + cdfh.file_comment_length;
-    } else if (memcmp (buff, hdr_endcentral, sizeof (hdr_endcentral)) == 0)
-    {                           //----------------------------------end-of-central-directory header
+    }
+    else if (memcmp (buff, hdr_endcentral, sizeof (hdr_endcentral)) == 0)
+    {
+      // end-of-central-directory header
       ZIP_end_central_dir_record ecdr;
-      char buff[ZIP_END_CENTRAL_DIR_RECORD_SIZE];
+      char buff [ZIP_END_CENTRAL_DIR_RECORD_SIZE];
 
       if (fread (buff, 1, ZIP_END_CENTRAL_DIR_RECORD_SIZE, file) < ZIP_END_CENTRAL_DIR_RECORD_SIZE)
         goto temp_failed;
@@ -597,9 +527,10 @@ bool csArchive::WriteZipArchive ()
 
       bytes_to_copy = 0;
       bytes_to_skip = ecdr.zipfile_comment_length;
-    } else
+    }
+    else
     {
-      /* Unknown chunk type */
+      // Unknown chunk type
       goto temp_failed;
     } /* endif */
 
@@ -622,17 +553,12 @@ bool csArchive::WriteZipArchive ()
   } /* endwhile */
 
   /* Now we have to append all files that were added to archive */
+  for (int n = 0; n < lazy.Length (); n++)
   {
-    ArchiveEntry *cur = lazyops;
-
-    while (cur)
-    {
-      if ((cur->info.compression_method != FILE_DELETED)
-          && !cur->WriteFile (temp))
-        goto temp_failed;       /* Write error */
-      cur = cur->next;
-    } /* endwhile */
-  }
+    ArchiveEntry *f = lazy.Get (n);
+    if (!f->WriteFile (temp))
+      goto temp_failed;			/* Write error */
+  } /* endfor */
 
   /* And finaly write central directory structure */
   if (!WriteCentralDirectory (temp))
@@ -655,11 +581,11 @@ bool csArchive::WriteZipArchive ()
     }
     while (fsize)
     {
-      char buff[16384];
       size_t bytes_read = fread (buff, 1, sizeof (buff), temp);
 
       if (fwrite (buff, 1, bytes_read, file) < bytes_read)
-      {                         /* Yuck! Keep at least temporary file */
+      {
+        /* Yuck! Keep at least temporary file */
         fclose (temp);
         fclose (file);
         file = fopen (filename, "rb");
@@ -685,30 +611,25 @@ temp_failed:
 
 bool csArchive::WriteCentralDirectory (FILE *temp)
 {
-  ArchiveEntry *cur = first;
-  int count = 0;
+  int n, count = 0;
   size_t cdroffs = ftell (temp);
 
-  while (cur)
+  for (n = 0; n < dir.Length (); n++)
   {
-    if (!IsDeleted (cur->filename))
-    {
-      if (!cur->WriteCDFH (temp))
-        return false;
-      count++;
-    } /* endif */
-    cur = cur->next;
+    ArchiveEntry *f = dir.Get (n);
+    if (IsDeleted (f->filename))
+      continue;
+    if (!f->WriteCDFH (temp))
+      return false;
+    count++;
   } /* endwhile */
 
-  cur = lazyops;
-  while (cur)
+  for (n = 0; n < lazy.Length (); n++)
   {
-    if (cur->info.compression_method != FILE_DELETED)
-      if (cur->WriteCDFH (temp))
-        count++;
-      else
-        return false;
-    cur = cur->next;
+    ArchiveEntry *f = lazy.Get (n);
+    if (!f->WriteCDFH (temp))
+      return false;
+    count++;
   } /* endwhile */
 
   /* Write end-of-central-directory record */
@@ -728,60 +649,28 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
 void csArchive::UpdateDirectory ()
 {
   /* Update archive directory: remove deleted entries first */
+  int n;
+  for (n = dir.Length () - 1; n >= 0; n--)
   {
-    ArchiveEntry *cur = first, *last = first;
-    ArchiveEntry **prev = &first;
-
-    while (cur)
-    {
-      if (IsDeleted (cur->filename))
-      {
-        *prev = cur->next;
-        CHK (delete cur);
-        cur = *prev;
-      } else
-      {
-        prev = &cur->next;
-        cur = cur->next;
-      } /* endif */
-    } /* endwhile */
-
-    /* Now add 'new_file'd entries to archive directory */
-    if (last)
-      while (last->next)
-        last = last->next;
-    while (lazyops)
-    {
-      cur = lazyops->next;
-      if (lazyops->info.compression_method != FILE_DELETED)
-      {
-        lazyops->FreeBuffer ();
-        lazyops->next = NULL;
-
-        if (last)
-          last->next = lazyops;
-        last = lazyops;
-        if (!first)
-          first = lazyops;
-      } else
-        CHKB (delete lazyops);
-      lazyops = cur;
-    } /* endwhile */
+    ArchiveEntry *e = dir.Get (n);
+    if (IsDeleted (e->filename))
+      dir.Delete (n);
   }
+  del.DeleteAll ();
+
+  for (n = 0; n < lazy.Length (); n++)
+  {
+    ArchiveEntry *e = lazy.Get (n);
+    e->FreeBuffer ();
+    dir.Push (e);
+    lazy [n] = NULL;
+  }
+  lazy.DeleteAll ();
 }
 
 bool csArchive::IsDeleted (const char *name) const
 {
-  ArchiveEntry *current = lazyops;
-
-  while (current)
-  {
-    if ((current->info.compression_method == FILE_DELETED)
-        && (strcmp (name, current->filename) == 0))
-      return true;
-    current = current->next;
-  } /* endwhile */
-  return false;
+  return (del.FindSortedKey (name) >= 0);
 }
 
 void csArchive::UnpackTime (ush zdate, ush ztime, tm & rtime) const
@@ -894,7 +783,6 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
   CHK (filename = new char[strlen (name) + 1]);
   strcpy (filename, name);
   info = cdfh;
-  next = NULL;
   buffer = NULL;
   extrafield = NULL;
   comment = NULL;
@@ -922,9 +810,6 @@ void csArchive::ArchiveEntry::FreeBuffer ()
 
 bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
 {
-  if (info.compression_method == FILE_DELETED)	/* Non-writeable file */
-    return false;
-
   if (!buffer || (buffer_pos + size > info.ucsize))
   {
     size_t new_size = buffer_pos + size;

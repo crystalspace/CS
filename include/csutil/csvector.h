@@ -86,6 +86,8 @@ public:
   void DeleteAll ();
   /// Insert element 'Item' before element 'n'
   bool Insert (int n, csSome Item);
+  /// Insert element 'Item' so that array remains sorted (assumes its already)
+  int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0);
   /// Virtual function which frees a vector element; returns success status
   virtual bool FreeItem (csSome Item);
   /// Compare two array elements in given Mode

@@ -107,9 +107,6 @@ SCF_INTERFACE (iVFS, 0, 0, 1) : public iPlugIn
   /// Initialize the Virtual File System plugin
   virtual bool Initialize (iSystem *iSys) = 0;
 
-  /// Add a virtual link: real path can contain $(...) macros
-  virtual bool AddLink (const char *VirtualPath, const char *RealPath) = 0;
-
   /// Set current working directory
   virtual bool ChDir (const char *Path) = 0;
   /// Get current working directory

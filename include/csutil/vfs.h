@@ -138,9 +138,6 @@ public:
   /// Virtual File System destructor
   virtual ~csVFS ();
 
-  /// Add a virtual link: real path can contain $(...) macros
-  virtual bool AddLink (const char *VirtualPath, const char *RealPath);
-
   /// Set current working directory
   virtual bool ChDir (const char *Path);
   /// Get current working directory
@@ -196,6 +193,9 @@ public:
   bool ReadConfig (csIniFile *Config);
 
 private:
+  /// Add a virtual link: real path can contain $(...) macros
+  virtual bool AddLink (const char *VirtualPath, const char *RealPath);
+
   // Callback function used to read ini file
   static bool EnumConfig (csSome Parm, char *Name, size_t DataSize, csSome Data);
   // Find the VFS node corresponding to given virtual path
