@@ -46,6 +46,7 @@ csTinyDocumentSystem::~csTinyDocumentSystem ()
   while (pool)
   {
     csTinyXmlNode* n = pool->next_pool;
+    // The 'sys' member in pool should be NULL here.
     delete pool;
     pool = n;
   }
@@ -64,6 +65,7 @@ csTinyXmlNode* csTinyDocumentSystem::Alloc ()
     csTinyXmlNode* n = pool;
     pool = n->next_pool;
     n->scfRefCount = 1;
+    n->sys = this;	// Incref.
     return n;
   }
   else
@@ -84,6 +86,7 @@ void csTinyDocumentSystem::Free (csTinyXmlNode* n)
 {
   n->next_pool = pool;
   pool = n;
+  n->sys = NULL;	// Free ref.
 }
 
 //------------------------------------------------------------------------
@@ -186,7 +189,7 @@ csTinyXmlNode::csTinyXmlNode (csTinyDocumentSystem* sys)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   node = NULL;
-  csTinyXmlNode::sys = sys;
+  csTinyXmlNode::sys = sys;	// Increase reference.
 }
 
 csTinyXmlNode::~csTinyXmlNode ()

@@ -144,7 +144,9 @@ struct csTinyXmlNode : public iDocumentNode
 private:
   friend class csTinyDocumentSystem;
   TiDocumentNode* node;
-  csTinyDocumentSystem* sys;
+  // We keep a reference to 'sys' to avoid it being cleaned up too early.
+  // We need 'sys' for the pool.
+  csRef<csTinyDocumentSystem> sys;
   csTinyXmlNode* next_pool;	// Next element in pool.
 
   csTinyXmlNode (csTinyDocumentSystem* sys);

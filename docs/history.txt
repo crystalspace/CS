@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+5-Sep-2002
+	- Fixed a very subtle bug in the csRef assignement operators.
+	  It is very important FIRST to assign the new value to the
+	  internal 'obj' pointer of csRef before doing the DecRef().
+	  Otherwise it is easy to get in an infinite loop with
+	  constructs like 'ref = NULL' if 'ref = NULL' causes a
+	  destructor to be fired which checks on the value of 'ref'
+	  again.
+	- Fixed a bug in the TinyXml loader by making sure that
+	  nodes also have a real reference to the system (for the pool).
 4-Sep-2002
 	- Converted exploldr to XML.
 	- Converted bcterrldr to XML.

@@ -106,9 +106,11 @@ public:
    */
   csRef& operator = (const csPtr<T>& newobj)
   {
-    if (obj)
-      obj->DecRef ();
+    T* oldobj = obj;
+    // First assign and then DecRef() of old object!
     obj = newobj;
+    if (oldobj)
+      oldobj->DecRef ();
     return *this;
   }
 
@@ -120,11 +122,16 @@ public:
   {
     if (obj != newobj)
     {
-      if (obj)
-	obj->DecRef ();
+      T* oldobj = obj;
+      // It is very important to first assign the new value to
+      // 'obj' BEFORE calling DecRef() on the old object. Otherwise
+      // it is easy to get in infinite loops with objects being
+      // destructed forever (when ref=NULL is used for example).
       obj = newobj;
-      if (obj)
-	obj->IncRef ();
+      if (oldobj)
+	oldobj->DecRef ();
+      if (newobj)
+	newobj->IncRef ();
     }
     return *this;
   }
