@@ -58,10 +58,4 @@
   #define CS_CSWS_EXPORT CS_IMPORT_SYM
 #endif
 
-#ifdef CS_CSAPPFRAME_LIB
-  #define CS_CSAPPFRAME_EXPORT CS_EXPORT_SYM
-#else
-  #define CS_CSAPPFRAME_EXPORT CS_IMPORT_SYM
-#endif
-
 #endif // __CS_EXTERN_H__
