@@ -70,5 +70,6 @@ MSVC.PLUGINS.REQUIRED =         \
   video/canvas/openglwin        \
   video/format/avi              \
   video/format/codecs/rle       \
+  video/renderer/null		\
   video/renderer/opengl		\
   video/renderer/software

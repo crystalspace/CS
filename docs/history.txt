@@ -39,6 +39,8 @@ chronological order.
 	  uncertain how to fix this.
 	- Eric Sunshine added a few more csGeom classes and interfaces to
 	  cspace.i at user request.
+	- Eric Sunshine augmented msvcgen/required.mak to ensure that null3d
+	  renderer is included in wkstypical and wksall.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
