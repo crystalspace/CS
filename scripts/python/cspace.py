@@ -2282,6 +2282,10 @@ csPrintf = _cspace.csPrintf
 
 csFPutErr = _cspace.csFPutErr
 
+csPrintfErr = _cspace.csPrintfErr
+
+csPrintfErrV = _cspace.csPrintfErrV
+
 csGetTicks = _cspace.csGetTicks
 
 csSleep = _cspace.csSleep
@@ -9332,6 +9336,7 @@ class iShader(iShaderVariableContext):
     def QueryObject(*args): return _cspace.iShader_QueryObject(*args)
     def GetFileName(*args): return _cspace.iShader_GetFileName(*args)
     def SetFileName(*args): return _cspace.iShader_SetFileName(*args)
+    def GetTicket(*args): return _cspace.iShader_GetTicket(*args)
     def GetNumberOfPasses(*args): return _cspace.iShader_GetNumberOfPasses(*args)
     def ActivatePass(*args): return _cspace.iShader_ActivatePass(*args)
     def SetupPass(*args): return _cspace.iShader_SetupPass(*args)
