@@ -337,8 +337,7 @@ void csBox3::GetConvexOutline (const csVector3& pos,
   }
 }
 
-bool csBox3::Between (const csBox3& box1, const csBox3& box2,
-  	csPlane3* /*planes*/, int /*num_planes*/) const
+bool csBox3::Between (const csBox3& box1, const csBox3& box2) const
 {
   // First the trival test to see if the coordinates are
   // at least within the right intervals.

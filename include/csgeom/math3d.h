@@ -30,6 +30,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
+#include "csgeom/plane2.h"
 #include "csgeom/segment.h"
 #include "csgeom/box.h"
 
@@ -339,13 +340,55 @@ public:
     return Plane (uv.Start (), uv.End (), p, isect, dist);
   }
 
-  /** 
-   * Intersect 3 planes, to get the point that is part of all three 
+  /**
+   * Intersect 3 planes to get the point that is part of all three
    * planes. Returns true, if there is a single point that fits.
    * If some planes are parallel, then it will return false.
    */
-  static bool Planes(const csPlane3& p1, const csPlane3& p2, const csPlane3& p3,
-                     csVector3& isect);
+  static bool Planes (const csPlane3& p1, const csPlane3& p2, const csPlane3& p3,
+                      csVector3& isect);
+
+  /**
+   * Intersect a regular plane and an axis aligned plane and
+   * return the intersection (line) as a 2D plane. This intersection
+   * is defined on the axis aligned plane.
+   * Returns false if there is no intersection.
+   */
+  static bool PlaneXPlane (const csPlane3& p1, float x2, csPlane2& isect);
+
+  /**
+   * Intersect a regular plane and an axis aligned plane and
+   * return the intersection (line) as a 2D plane. This intersection
+   * is defined on the axis aligned plane.
+   * Returns false if there is no intersection.
+   */
+  static bool PlaneYPlane (const csPlane3& p1, float y2, csPlane2& isect);
+
+  /**
+   * Intersect a regular plane and an axis aligned plane and
+   * return the intersection (line) as a 2D plane. This intersection
+   * is defined on the axis aligned plane.
+   * Returns false if there is no intersection.
+   */
+  static bool PlaneZPlane (const csPlane3& p1, float z2, csPlane2& isect);
+
+  /**
+   * Intersect a regular plane and an axis aligned plane and
+   * return the intersection (line) as a 2D plane. This intersection
+   * is defined on the axis aligned plane.
+   * Returns false if there is no intersection.
+   */
+  static bool PlaneAxisPlane (const csPlane3& p1, int nr, float pos,
+  	csPlane2& isect)
+  {
+    switch (nr)
+    {
+      case 0: return PlaneXPlane (p1, pos, isect); break;
+      case 1: return PlaneYPlane (p1, pos, isect); break;
+      case 2: return PlaneZPlane (p1, pos, isect); break;
+    }
+    return false;
+  }
 
   /**
    * Intersect a 3D segment with the z = 0 plane.  Assumes that there

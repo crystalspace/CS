@@ -461,6 +461,36 @@ bool csIntersect3::Planes(const csPlane3& p1, const csPlane3& p2,
   return true;
 }
 
+bool csIntersect3::PlaneXPlane (const csPlane3& p1, float x2,
+                          csPlane2& isect)
+{
+  // p1: A*x+B*y+C*z+D=0
+  if (ABS (p1.B ()) < SMALL_EPSILON && ABS (p1.C ()) < SMALL_EPSILON)
+    return false;
+  isect.Set (p1.B (), p1.C (), p1.D ()+x2*p1.A ());
+  return true;
+}
+
+bool csIntersect3::PlaneYPlane (const csPlane3& p1, float y2,
+                          csPlane2& isect)
+{
+  // p1: A*x+B*y+C*z+D=0
+  if (ABS (p1.A ()) < SMALL_EPSILON && ABS (p1.C ()) < SMALL_EPSILON)
+    return false;
+  isect.Set (p1.A (), p1.C (), p1.D ()+y2*p1.B ());
+  return true;
+}
+
+bool csIntersect3::PlaneZPlane (const csPlane3& p1, float z2,
+                          csPlane2& isect)
+{
+  // p1: A*x+B*y+C*z+D=0
+  if (ABS (p1.A ()) < SMALL_EPSILON && ABS (p1.B ()) < SMALL_EPSILON)
+    return false;
+  isect.Set (p1.A (), p1.B (), p1.D ()+z2*p1.C ());
+  return true;
+}
+
 
 float csIntersect3::Z0Plane(
   const csVector3& u, const csVector3& v, csVector3& isect)

@@ -63,6 +63,10 @@ public:
   float MaxX () const { return maxbox.x; }
   ///
   float MaxY () const { return maxbox.y; }
+  /// Get Min component for 0 (x) or 1 (y).
+  float Min (int idx) const { return idx ? minbox.y : minbox.x; }
+  /// Get Max component for 0 (x) or 1 (y).
+  float Max (int idx) const { return idx ? maxbox.y : maxbox.x; }
   ///
   const csVector2& Min () const { return minbox; }
   ///
@@ -302,6 +306,10 @@ public:
   float MaxY () const { return maxbox.y; }
   ///
   float MaxZ () const { return maxbox.z; }
+  /// Get Min component for 0 (x), 1 (y), or 2 (z).
+  float Min (int idx) const { return idx == 1 ? minbox.y : idx == 0 ? minbox.x : minbox.z; }
+  /// Get Max component for 0 (x), 1 (y), or 2 (z).
+  float Max (int idx) const { return idx == 1 ? maxbox.y : idx == 0 ? maxbox.x : maxbox.z; }
   ///
   const csVector3& Min () const { return minbox; }
   ///
@@ -501,11 +509,9 @@ public:
   	csVector3* array, int& num_array) const;
 
   /**
-   * Test if this box is between two others. The set of planes
-   * that is given to this routine can be made with csMath3::OuterPlanes().
+   * Test if this box is between two others.
    */
-  bool Between (const csBox3& box1, const csBox3& box2,
-  	csPlane3* planes, int num_planes) const;
+  bool Between (const csBox3& box1, const csBox3& box2) const;
 
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);

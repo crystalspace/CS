@@ -949,12 +949,16 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
     AddToPVS (pvs, (csOctreeNode*)node->children[i]);
 }
 
+#define PLANE_X 0
+#define PLANE_Y 1
+#define PLANE_Z 2
+
 void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
 	const csBox3& occludee,
 	csPolygonInt** polygons, int num_polygons,
-	csCovcube* cube, int* relevant_sides, int num_relevant_sides)
+	csCBuffer* cbuffer)
 {
-  int i, j, k;
+  int i, j;
   csPolygon3D* p;
   csPoly3D cur_poly;
   csPoly2D proj_poly;
@@ -965,41 +969,21 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
       cur_poly.SetNumVertices (0);
       for (j = 0 ; j < p->GetNumVertices () ; j++)
         cur_poly.AddVertex (p->Vwor (j));
-      for (j = 0 ; j < num_relevant_sides ; j++)
-        for (k = 0 ; k < 8 ; k++)
-	{
-	  const csVector3& corner = box.GetCorner (k);
-	  switch (relevant_sides[j])
-	  {
-	    case 0:
-	      cur_poly.ProjectXPlane (corner, box.MinX (), &proj_poly);
-	      break;
-	    case 1:
-	      cur_poly.ProjectXPlane (corner, box.MaxX (), &proj_poly);
-	      break;
-	    case 2:
-	      cur_poly.ProjectYPlane (corner, box.MinY (), &proj_poly);
-	      break;
-	    case 3:
-	      cur_poly.ProjectYPlane (corner, box.MaxY (), &proj_poly);
-	      break;
-	    case 4:
-	      cur_poly.ProjectZPlane (corner, box.MinZ (), &proj_poly);
-	      break;
-	    case 5:
-	      cur_poly.ProjectZPlane (corner, box.MaxZ (), &proj_poly);
-	      break;
-	  }
-	  //@@@@@@@@@@@@@
-	}
+      for (j = 0 ; j < 8 ; j++)
+      {
+#if 0
+	const csVector3& corner = box.GetCorner (j);
+	cur_poly.ProjectAxisPlane (corner, plane_nr, box.MinX (), &proj_poly);
+	//@@@@@@@@@@@@@
+#endif
+      }
     }
 }
 
-void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder, csCovcube* cube,
+void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
+	csCBuffer* cbuffer,
 	const csBox3& box, const csBox3& occludee,
-	csVector3& box_center, csVector3& occludee_center,
-	int* relevant_sides, int num_relevant_sides,
-	csPlane3* planes, int num_planes)
+	csVector3& box_center, csVector3& occludee_center)
 {
   if (!occluder) return;
   int i;
@@ -1008,31 +992,117 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder, csCovcube* cube,
   {
     for (i = 0 ; i < 8 ; i++)
       BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
-      	cube, box, occludee, box_center, occludee_center,
-	relevant_sides, num_relevant_sides, planes, num_planes);
+      	cbuffer, box, occludee, box_center, occludee_center);
   }
-  else if (occluder_box.Between (box, occludee, planes, num_planes))
+  else if (occluder_box.Between (box, occludee))
   {
     if (occluder->IsLeaf ())
       BoxOccludeeShadowPolygons (box, occludee,
 	occluder->unsplit_polygons.GetPolygons (),
 	occluder->unsplit_polygons.GetNumPolygons (),
-	cube, relevant_sides, num_relevant_sides);
+	cbuffer);
     else
       for (i = 0 ; i < 8 ; i++)
         BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
-      	  cube, box, occludee, box_center, occludee_center,
-	  relevant_sides, num_relevant_sides, planes, num_planes);
+      	  cbuffer, box, occludee, box_center, occludee_center);
   }
 }
 
-bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee,
-	csCovcube* cube)
+// This routine will take a set of 2D planes (i.e. lines) and calculate
+// all the intersections. Then it will only keep those intersections that
+// are in or on the smallest convex polygons formed by the intersection
+// of those planes. From those vertices it will calculate a bounding box
+// in 2D.
+void CalcBBoxFromLines (csPlane2* planes2d, int num_planes2d, csBox2& bbox)
 {
+  int i, j, k;
+  csVector2 isect;
+  csVector2 points[64];
+  k = 0;
+  // Find all intersection points between the planes.
+  for (i = 0 ; i < num_planes2d ; i++)
+    for (j = 0 ; j < num_planes2d ; j++)
+      if (i != j)
+        if (csIntersect2::Planes (planes2d[i], planes2d[j], isect))
+	  points[k++] = isect;
+  // Calculate the bounding box for all intersection points that
+  // are in or on the smallest polygon.
+  bbox.StartBoundingBox ();
+  for (i = 0 ; i < k ; i++)
+  {
+    bool in = true;
+    for (j = 0 ; j < num_planes2d ; j++)
+      if (planes2d[j].Classify (points[i]) < SMALL_EPSILON)
+      {
+        in = false;
+	break;
+      }
+    if (in) bbox.AddBoundingVertex (points[i]);
+  }
+}
+
+
+bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
+{
+  // This routine works as follows: first we find a suitable plane
+  // between 'box' and 'occludee' on which we're going to project all
+  // the potentially occluding polygons (which are between box and occludee).
+  // The shape of the occludee itself projected on that plane 'lights up'
+  // some polygon shape on the plane. For this light polygon we create a
+  // c-buffer on which we'll insert the projected occluder polygons one
+  // by one (more on this projection later). As soon as the c-buffer is
+  // completely full we know that all the polygons shadow the occludee
+  // for the box so we can stop and return 'false'.
+  //
+  // To project a polygon on the plane we consider the occludee is an
+  // area light source. We take every vertex of the occludee (8 total)
+  // and project that to a 2D polygon on the plane. Then we intersect
+  // all those polygons. The resulting intersection is then added to the
+  // c-buffer.
+
   int i;
+
+  // First find a suitable plane between box and occludee. We take a plane
+  // as close to box as possible (i.e. it will be a plane containing one
+  // of the sides of 'box').
+  csVector3 box_center = box.GetCenter ();
+  csVector3 occludee_center = occludee.GetCenter ();
+  float dx = ABS (box_center.x - occludee_center.x);
+  float dy = ABS (box_center.y - occludee_center.y);
+  float dz = ABS (box_center.z - occludee_center.z);
+  int plane_nr;
+  float plane_pos;
+  if (dx > dy && dx > dz) plane_nr = PLANE_X;
+  else if (dy > dz) plane_nr = PLANE_Y;
+  else plane_nr = PLANE_Z;
+  if (box_center[plane_nr] > occludee_center[plane_nr])
+    plane_pos = box.Min (plane_nr);
+  else
+    plane_pos = box.Max (plane_nr);
+
+  // On this plane we now find the largest possible area that will
+  // be used. This corresponds with the projection on the plane of
+  // the outer set of planes between the occludee and the box.
   csPlane3 planes[8];
   int num_planes;
   num_planes = csMath3::OuterPlanes (occludee, box, planes);
+  csPlane2 planes2d[8]; // The lines making up the 2D outline.
+  for (i = 0 ; i < num_planes ; i++)
+    csIntersect3::PlaneAxisPlane (planes[i], plane_nr, plane_pos, planes2d[i]);
+  // @@@ This routine is not ideal. We would like to be able to have
+  // a convex 2D polygon for the projection of the outer planes on the
+  // axis aligned plane but I'm not sure how to do this efficiently. For
+  // now we just calculate a bounding box in 2D which may in some cases
+  // slightly overestimate the lit area (but not much).
+  csBox2 plane_area;
+  CalcBBoxFromLines (planes2d, num_planes, plane_area);
+
+  // From the calculated plane area we can now calculate a scale to get
+  // to a c-buffer size of 1024x1024. We also allocate this c-buffer here.
+
+
+#if 0
+  int i;
   int relevant_sides[6];
   int num_relevant_sides;
   num_relevant_sides = csMath3::FindObserverSides (box, occludee,
@@ -1048,11 +1118,13 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee,
     if (!cube->GetFace (relevant_sides[i])->IsFull ())
       return true;
   return false;
+#endif
+  return true;
 }
 
 #if 1
 void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
-	csOctreeNode* leaf, csCovcube* cube)
+	csOctreeNode* leaf)
 {
   if (!occludee) return;
   int i;
@@ -1064,7 +1136,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     // nodes in the PVS by testing if the shared plane between
     // the two nodes is completely solid.
     visible = true;
-  else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox (), cube))
+  else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ()))
     visible = true;
 
   // If visible then we add to the PVS and build the PVS for
@@ -1080,12 +1152,12 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       //BuildPVSForLeafPolygons (occludee, ovis, ...);
     for (i = 0 ; i < 8 ; i++)
       BuildPVSForLeaf ((csOctreeNode*)occludee->children[i],
-      	thing, leaf, cube);
+      	thing, leaf);
   }
 }
 #elif 0
 void csOctree::BuildPVSForLeaf (csThing* thing,
-	csOctreeNode* leaf, csCovcube* /*cube*/)
+	csOctreeNode* leaf)
 {
 printf ("*"); fflush (stdout);
   // Here we traverse the octree starting from the leaf node.
@@ -1114,7 +1186,7 @@ printf ("*"); fflush (stdout);
 }
 #else
 void csOctree::BuildPVSForLeaf (csThing* thing,
-	csOctreeNode* leaf, csCovcube* cube)
+	csOctreeNode* leaf)
 {
 printf ("*"); fflush (stdout);
   // Here we simulate a limited rendering on a 2D culler
@@ -1167,7 +1239,7 @@ printf ("*"); fflush (stdout);
 #endif
 
 void csOctree::BuildPVS (csThing* thing,
-	csOctreeNode* node, csCovcube* cube)
+	csOctreeNode* node)
 {
   if (!node) return;
 
@@ -1184,23 +1256,20 @@ void csOctree::BuildPVS (csThing* thing,
     // by the normal polygon/node traversal process.
     csPVS& pvs = node->GetPVS ();
     pvs.Clear ();
-    BuildPVSForLeaf ((csOctreeNode*)root, thing, node, cube);
+    BuildPVSForLeaf ((csOctreeNode*)root, thing, node);
   }
   else
   {
     // Traverse to the children.
     int i;
     for (i = 0 ; i < 8 ; i++)
-      BuildPVS (thing, (csOctreeNode*)node->children[i], cube);
+      BuildPVS (thing, (csOctreeNode*)node->children[i]);
   }
 }
 
 void csOctree::BuildPVS (csThing* thing)
 {
-  csCovcube* cube;
-  CHK (cube = new csCovcube (csWorld::current_world->GetCovMaskLUT ()));
-  BuildPVS (thing, (csOctreeNode*)root, cube);
-  CHK (delete cube);
+  BuildPVS (thing, (csOctreeNode*)root);
 }
 
 void csOctree::Statistics ()

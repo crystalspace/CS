@@ -29,7 +29,7 @@ class csPolygonInt;
 class csOctree;
 class csOctreeNode;
 class csBspTree;
-class csCovcube;
+class csCBuffer;
 class csThing;
 class csPVS;
 class Dumper;
@@ -296,35 +296,31 @@ private:
   void BoxOccludeeShadowPolygons (const csBox3& box,
   	const csBox3& occludee,
 	csPolygonInt** polygons, int num_polygons,
-	csCovcube* cube, int* relevant_sides, int num_relevant_sides);
+	csCBuffer* cbuffer);
 
   /**
    * Help function for BoxCanSeeOccludee.
    */
-  void BoxOccludeeAddShadows (csOctreeNode* occluder, csCovcube* cube,
+  void BoxOccludeeAddShadows (csOctreeNode* occluder, csCBuffer* cbuffer,
   	const csBox3& box, const csBox3& occludee,
-	csVector3& box_center, csVector3& occludee_center,
-	int* relevant_sides, int num_relevant_sides,
-	csPlane3* planes, int num_planes);
+	csVector3& box_center, csVector3& occludee_center);
 
   /**
    * Test if 'box' can see 'occludee' through all the polygons
-   * in this octree. May use the given coverage mask tree cube.
+   * in this octree.
    */
-  bool BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee,
-  	csCovcube* cube);
+  bool BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee);
 
   /**
    * Build PVS for this leaf.
    */
   void BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
-  	csOctreeNode* leaf, csCovcube* cube);
+  	csOctreeNode* leaf);
 
   /**
    * Build PVS for this node.
    */
-  void BuildPVS (csThing* thing,
-  	csOctreeNode* node, csCovcube* cube);
+  void BuildPVS (csThing* thing, csOctreeNode* node);
 
   /**
    * Add all visible nodes and polygons in this tree to

@@ -243,6 +243,14 @@ public:
     PlaneNoTest (uv.Start (), uv.End (), p, isect, dist);
   }
 
+  /**
+   * Intersect 2 planes to get the point that is part of all two
+   * planes. Returns true, if there is a single point that fits.
+   * If the planes are parallel, then it will return false.
+   */
+  static bool Planes (const csPlane2& p1, const csPlane2& p2,
+                      csVector2& isect);
+
 };
 
 #endif /*MATH_H*/

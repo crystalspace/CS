@@ -1,6 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
 1-May-2000
+	- Added csBox2 and csBox3 Min() and Max() functions that accept
+	  a component index (x=0, y=1, z=2).
+	- Added csIntersect3::PlaneXPlane(), PlaneYPlane(), PlaneZPlane()
+	  and PlaneAxisPlane() to intersect a general plane with an
+	  axis aligned plane. The result is a 2D plane.
+	- Added csIntersect2::Planes() (but unimplemented right now)
+	  to calculate the intersection between to 2D planes (i.e. lines).
+	- Further work on PVS. Made the realization that it is better
+	  to work with a single 2D culler plane instead of a cube.
+	  This simplifies the code a bit.
 	- Eric Sunshine fixed several build problems with the Dungeon plug-in
 	  which showed up with the introduction of Bison and Lex.
 	- Eric Sunshine eliminated several compilation warnings and problems
@@ -49,6 +59,24 @@ The history order has been reversed so that new features are at the top.
 	- Added csBox3::Between() to test if a box is between two others.
 	- Martin Geisse added framework for object conditions and cleaned up
 	  thing handling for the DUNGEON plugin.
+	- Chris Bruner changed inline asm code to be Borland Compatible.
+	- Martin Geisse added framework for object conditions and cleaned
+	  up thing handling for DUNGEON plugin.
+	- Norman Kramer corrected halo drawing for Glide.
+29-Apr-2000
+	- Desmond Fletcher extended Map2CS with the option to add
+	  TRIGGER to activate scripts in a THING.
+	- Brandon Ehle refixed the ddraw.mak to avoid ddraw2d.dll
+	  and ddraw.dll name collisions within windows. The name
+	  ddraw5.dll does not exist within windows, and therefore won't
+	  cause names collisions as they other possible names do.
+	- Norman Kramer enhanced glide to show cursors, though it
+	  produces a nice trail in csApp derived apps ( where Print()
+	  is not called in every case ). I used andyz cursors from mazed,
+	  but its easily changeable ( extended XPM format, see glidcurs.h).
+	- Norman Kramer fixed glide so that ti no longer leaves a trail
+	  of mouse backimages (but still not optimal).
+	- Frank O'Connor did some changes for redo of network stuff.
 28-Apr-2000
 	- Paul Garceau modified for COMP_GCC/COMP_VC Win32 implementation:
 	    - Re-enabled "make ddraw".
@@ -122,6 +150,12 @@ The history order has been reversed so that new features are at the top.
 	  old, unused, and perpetually unfinished files from the CS source
 	  tree, including the Amiga and WCC ports, and the aborted autoconf
 	  conversion, among others.
+	- Wouter Wijngaards: weird crash bug in optimize mode is fixed now.
+	  Warning to any sane programmer: the fix was holistic in nature.
+	  The code now feels much more in balance, and because of the good
+	  vibes the bug went away, I hope. At least the bug disappeared
+	  for me :-).
+	- Frank O'Connor added a new multiprotocol communication manager.
 27-Apr-2000
 	- Frank O'Connor updated VC project files for NetComm and
 	  the scfTutor apps (zoo, dog, worm).

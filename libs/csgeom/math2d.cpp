@@ -167,8 +167,8 @@ bool csIntersect2::Lines (
   return true;
 }
 
-bool csIntersect2::Plane(const csVector2& u, const csVector2& v,
-                         const csPlane2& p, csVector2& isect, float& dist)
+bool csIntersect2::Plane (const csVector2& u, const csVector2& v,
+                          const csPlane2& p, csVector2& isect, float& dist)
 {
   float x,y, denom;
 
@@ -181,6 +181,16 @@ bool csIntersect2::Plane(const csVector2& u, const csVector2& v,
 
   isect.x = u.x + dist*x;  isect.y = u.y + dist*y;
   return true;
+}
+
+static bool csIntersect2::Planes (const csPlane2& p1, const csPlane2& p2,
+                    csVector2& isect)
+{
+  // p1: A1x+B1y+C1 = 0
+  // p2: A2x+B2y+C2 = 0
+//@@@@@@@@@@@@@@@@@@@@@ TO BE IMPLEMENTED!
+  CRASH;
+  return false;
 }
 
 //---------------------------------------------------------------------------
