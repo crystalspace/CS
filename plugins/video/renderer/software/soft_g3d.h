@@ -119,7 +119,6 @@ private:
   bool rstate_bilinearmap;
   bool rstate_trilinearmap;
   bool rstate_gouraud;
-  bool rstate_flat;
   bool rstate_alphablend;
   int rstate_mipmap;
   bool rstate_edges;
@@ -131,6 +130,12 @@ private:
 
   /// Look for a given fog buffer
   FogBuffer* find_fog_buffer (CS_ID id);
+
+  /**
+   * Draw the projected polygon with light and texture.
+   * Dirty version.
+   */
+  HRESULT DrawPolygonDirty (G3DPolygon& poly);
 
 public:
 #if defined (DO_MMX)
@@ -263,13 +268,13 @@ public:
   /// Draw a line in camera space.
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
 
-  /**
-   * Draw a projected polygon.
-   * This routine will draw the polygon using and filling
-   * the z buffer if needed. The texture mapping need not
-   * be perspective correct since this function is generally going
-   * to be used for 3D sprites which are made up of small triangles.
-   */
+  /// Start drawing.
+  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouroud);
+
+  /// Finish drawing.
+  STDMETHODIMP FinishPolygonQuick ();
+
+  /// Draw a projected polygon.
   STDMETHODIMP DrawPolygonQuick (G3DPolygon& poly, bool gouroud);
 
   /// Give a texture to csGraphics3DSoftware to cache it.
