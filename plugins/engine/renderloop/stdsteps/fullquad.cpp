@@ -321,7 +321,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector,
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN );
   shader->GetBestTechnique ()->GetPass (0)->Activate (&mesh);
   shader->GetBestTechnique ()->GetPass (0)->SetupState (&mesh);
-  g3d->DrawMesh (&mesh);
+  g3d->DrawMesh (&mesh, stacks);
   shader->GetBestTechnique ()->GetPass (0)->ResetState ();
   shader->GetBestTechnique ()->GetPass (0)->Deactivate ();
   g3d->FinishDraw ();

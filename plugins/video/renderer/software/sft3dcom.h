@@ -489,7 +489,8 @@ public:
   	iRenderBuffer**, int count) { }
   virtual void SetTextureState (int*, iTextureHandle**,
   	int) { }
-  virtual void DrawMesh (csRenderMesh*) { }
+  virtual void DrawMesh (csRenderMesh*,
+        const csArray< csArray<csShaderVariable*> >&) {}
   virtual void SetWriteMask (bool, bool, bool, bool) { }
   virtual void GetWriteMask (bool &, bool &, bool &,
 	bool &) const { }
