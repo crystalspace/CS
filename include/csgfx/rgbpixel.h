@@ -160,8 +160,11 @@ struct csRGBpixel
       green += c.green;
       blue  += c.blue;
   }
-  /// Add a csRGBcolor, may cause overflows!
-  void UnsafeAdd(const csRGBcolor&c)
+  /**
+   * Use this only if you know there is no overflow. Also take
+   * care to set alpha to 0 in 'c'!
+   */
+  void UnsafeAdd(const csRGBpixel&c)
   { *(uint32*)this += *(uint32*)&c; }
 } CS_STRUCT_ALIGN_4BYTE_END;
 

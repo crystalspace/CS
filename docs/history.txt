@@ -10,6 +10,14 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett updated links to the msvc_libs packages in the docs.
 	  Added xml2 plugin to MSVC build process and updated MSVC project
 	  files.
+	- Removed csRGBpixel::UnsafeAdd(csRGBcolor) because it is unsafe
+	  to use. csRGBcolor is only three bytes and the value of the fourth
+	  byte is undefined. So it is not legal to try to add that to
+	  a csRGBpixel which is four bytes (alpha). Instead of using this
+	  one should convert the csRGBColor to csRGBpixel with alpha set
+	  to 0 and then use UnsafeAdd(csRGBpixel) instead.
+	- The fix above may fix some issues with wrong lightmaps after
+	  a pseudo-dynamic light changed intensity.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 
