@@ -169,38 +169,18 @@ public:
 
 class csStencilShadowType : public csBaseRenderStepType
 {
-  void Report (int severity, const char* msg, ...);
-
-  void Open ();
-  void Close ();
-public:
   csRef<iShader> shadow;
   csRef<iShaderWrapper> shadowWrapper;
+  bool shadowLoaded;
 
+  void Report (int severity, const char* msg, ...);
+public:
   csStencilShadowType (iBase* p);
   virtual ~csStencilShadowType ();
 
-  virtual bool Initialize (iObjectRegistry* object_reg);
-
   virtual csPtr<iRenderStepFactory> NewFactory ();
 
-  bool HandleEvent (iEvent& Event);
-
-  struct EventHandler : public iEventHandler
-  {
-  private:
-    csStencilShadowType* parent;
-  public:
-    EventHandler (csStencilShadowType* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    
-    SCF_DECLARE_IBASE;
-    virtual bool HandleEvent (iEvent& ev) 
-      { return parent->HandleEvent (ev); }
-  } *scfiEventHandler;
+  iShader* GetShadow ();
 };
 
 class csStencilShadowLoader : public csBaseRenderStepLoader

@@ -221,9 +221,7 @@ struct csEngineConfig : public iConfig
  */
 class csEngine : public iEngine
 {
-#if defined(CS_NR_ALTERNATE_RENDERLOOP)
   friend class csRenderLoop;
-#endif
 
 public:
   /**
@@ -349,14 +347,13 @@ public:
   long render_priority_object;
   long render_priority_alpha;
 
-#if defined(CS_NR_ALTERNATE_RENDERLOOP)
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
   /// Render loop manager
   csRenderLoopManager* renderLoopManager;
 
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
-#endif
+  void LoadDefaultRenderLoop (const char* fileName);
 
   /// Option variable: force lightmap recalculation?
   static int lightcache_mode;

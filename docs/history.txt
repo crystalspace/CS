@@ -70,6 +70,19 @@ chronological order.
 	    - csStencilShadowStep::Perform() now uses a viscallback to 
 	      iterate over shadowing meshes.
 	    - The CLOSED/NOTCLOSED flags of the shadow poly meshes are honored.
+	- res made the following changes:
+	    - Ditched loading of the shadow shader at system open time again.
+	      It may happen that the renderstep is loaded after the open event,
+	      and in this case the shader wasn't loaded. Instead, the shader
+	      is now loaded when needed the first time.
+	    - Added the ability to 'override' the engine's default render loop.
+	      This can be done either with a config setting 
+	      "Engine.RenderLoop.Default" or a "-renderloop=X" command line
+	      parameter. In both cases, the full VFS name must be specified.
+	    - Added two renderloops in data/shader.
+	    - Changed csHash<> so all 'key' parameters are now const refs.
+	    - Added a 'csHashReversible<>' which is analogue to 
+	      csHashMapReversible. Still very primitive, tho.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<renderloop>
+  <name>std_rloop_diffuse</name>
+  <steps>
+    <!-- ambient lighting -->
+    <step plugin="crystalspace.renderloop.step.generic">
+      <shadertype>ambient</shadertype>
+      <zoffset>yes</zoffset>
+      <zuse />
+    </step>
+    <step plugin="crystalspace.renderloop.step.lightiter">
+      <steps>
+	<!-- diffuse lighting -->
+	<step plugin="crystalspace.renderloop.step.generic">
+	  <shadertype>diffuse</shadertype>
+	  <zoffset>no</zoffset>
+	  <ztest />
+	</step>
+      </steps>
+    </step>
+  </steps>
+</renderloop>

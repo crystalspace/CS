@@ -57,6 +57,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
 #include "iutil/databuff.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -747,6 +748,8 @@ csEngine::csEngine (iBase *iParent) :
   BuildSqrtTable ();
   resize = false;
 
+  renderLoopManager = 0;
+
   ClearRenderPriorities ();
 }
 
@@ -769,9 +772,7 @@ csEngine::~csEngine ()
   delete materials;
   delete textures;
   delete shared_variables;
-#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
   delete renderLoopManager;
-#endif
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)
@@ -815,11 +816,25 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
 
-#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+#if defined(CS_USE_NEW_RENDERER)
+  // Set up the RL manager.
   renderLoopManager = new csRenderLoopManager (this);
+  // Create the default, hardwired RL.
   defaultRenderLoop = CreateDefaultRenderLoop ();
+  // Register it.
   renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
     defaultRenderLoop);
+
+  // Now, try to load the user-specified default render loop.
+  const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default",
+    0);
+
+  if (configLoop)
+  {
+    csRef<iRenderLoop> newDefault = renderLoopManager->Load (configLoop);
+    if (newDefault != 0)
+      defaultRenderLoop = newDefault;
+  }
 #endif
 
   return true;
@@ -1639,7 +1654,7 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
   return eseqmgr;
 }
 
-#if !defined(CS_USE_NEW_RENDERER) || !defined(CS_NR_ALTERNATE_RENDERLOOP)
+#if !defined(CS_USE_NEW_RENDERER)
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
   Stats::polygons_considered = 0;
@@ -1707,7 +1722,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 }
 #endif
 
-#if defined(CS_NR_ALTERNATE_RENDERLOOP) && defined(CS_USE_NEW_RENDERER)
+#if defined(CS_USE_NEW_RENDERER)
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
 }
@@ -1753,21 +1768,11 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   step = liFact->Create ();
   loop->AddStep (step);
 
-  csRef<iRenderStepContainer> liContainer =
+  csRef<iRenderStepContainer> container =
     SCF_QUERY_INTERFACE (step, iRenderStepContainer);
 
-  csRef<iRenderStepType> stencilType =
-    CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.renderloop.step.shadow.stencil.type",
-      iRenderStepType);
-
-//  csRef<iRenderStepFactory> stencilFact = stencilType->NewFactory ();
-
-//  step = stencilFact->Create ();
-//  liContainer->AddStep (step);
-
   step = genFact->Create ();
-  liContainer->AddStep (step);
+  container->AddStep (step);
 
   genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
 
@@ -1777,7 +1782,17 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 
   return csPtr<iRenderLoop> (loop);
 }
+
 #endif
+
+void csEngine::LoadDefaultRenderLoop (const char* fileName)
+{
+#if defined(CS_USE_NEW_RENDERER)
+  csRef<iRenderLoop> newDefault = renderLoopManager->Load (fileName);
+  if (newDefault != 0)
+    defaultRenderLoop = newDefault;
+#endif
+}
 
 void csEngine::AddHalo (csLight *Light)
 {

@@ -63,10 +63,10 @@ class csHash
 protected:
   struct Element
   {
-    K key;
+    const K key;
     T value;
 
-    Element (K key0, const T &value0) : key (key0), value (value0) {}
+    Element (const K& key0, const T &value0) : key (key0), value (value0) {}
     Element (const Element &other) : key (other.key), value (other.value) {}
   };
   csArray< csArray<Element> > Elements;
@@ -144,7 +144,7 @@ public:
     GrowRate (o.GrowRate), MaxSize (o.MaxSize), Size (o.Size) {}
 
   /// Add an element to the hash table.
-  void Put (K key, const T &value)
+  void Put (const K& key, const T &value)
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -167,7 +167,7 @@ public:
   }
 
   /// Add an element to the hash table, overwriting if the key already exists.
-  void PutFirst (K key, const T &value)
+  void PutFirst (const K& key, const T &value)
   {
     csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -185,7 +185,7 @@ public:
   }
 
   /// Get the first element matching the given key, or 0 if there is none.
-  const T& Get (K key) const
+  const T& Get (const K& key) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -213,7 +213,7 @@ public:
   }
 
   /// Delete all the elements matching the given key.
-  bool DeleteAll (K key)
+  bool DeleteAll (const K& key)
   {
     bool ret = false;
     csArray<Element> &values = 
@@ -229,7 +229,7 @@ public:
   }
   
   /// Delete all the elements matching the given key and value.
-  bool Delete (K key, const T &value)
+  bool Delete (const K& key, const T &value)
   {
     bool ret = false;
     csArray<Element> &values = 
@@ -256,7 +256,7 @@ public:
   {
   private:
     const csHash<T, K, KeyHandler>* hash;
-    K key;
+    const K key;
     int bucket, size, element;
 
     void Seek ()
@@ -267,7 +267,7 @@ public:
     }
 
   protected:
-    Iterator (const csHash<T, K, KeyHandler>* hash0, K key0)
+    Iterator (const csHash<T, K, KeyHandler>* hash0, const K& key0)
     : hash (hash0), key (key0), 
       bucket (KeyHandler::ComputeHash (key) % hash->Modulo),
       size (hash->Elements[bucket].Length ()) { Return (); }
@@ -382,7 +382,7 @@ public:
    * Modifying the hash (except with DeleteNext) while you have open iterators
    * will cause undefined behaviour.
    */
-  Iterator GetIterator (K key) const
+  Iterator GetIterator (const K& key) const
   {
     return Iterator (this, key);
   }

@@ -26,7 +26,6 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "imap/reader.h"
-#include "itexture/itexfact.h"
 
 #include "../common/parserenderstep.h"
 

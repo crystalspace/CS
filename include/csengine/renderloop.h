@@ -21,11 +21,8 @@
 #ifndef __CS_CSENGINE_RENDERLOOP_H__
 #define __CS_CSENGINE_RENDERLOOP_H__
 
-#define CS_NR_ALTERNATE_RENDERLOOP
-
-#ifdef CS_NR_ALTERNATE_RENDERLOOP
-
-#include "csutil/hashmapr.h"
+//#include "csutil/hashmapr.h"
+#include "csutil/hashr.h"
 #include "csutil/refarr.h"
 #include "iengine/renderloop.h"
 #include "iutil/strset.h"
@@ -59,9 +56,40 @@ public:
   virtual int GetStepCount ();
 };
 
+class StringHashKeyHandler
+{
+public:
+  static uint32 ComputeHash (const char* const& key)
+  {
+    return (csHashCompute (key));
+  }
+
+  static bool CompareKeys (const char* const& key1, const char* const& key2)
+  {
+    return (strcmp (key1, key2) == 0);
+  }
+};
+
+template <class T>
+class csRefHashKeyHandler
+{
+public:
+  static uint32 ComputeHash (const csRef<T>& key)
+  {
+    return (uint32)((T*)key);
+  }
+
+  static bool CompareKeys (const csRef<T>& key1, const csRef<T>& key2)
+  {
+    return ((T*)key1 == (T*)key2);
+  }
+};
+
 class csRenderLoopManager : public iRenderLoopManager
 {
-  csHashMapReversible loops;
+  //csHashMapReversible loops;
+  csHashReversible<csRef<iRenderLoop>, const char*, 
+    StringHashKeyHandler, csRefHashKeyHandler<iRenderLoop> > loops;
   csStringSet strings;
 
   csEngine* engine;
@@ -77,8 +105,11 @@ public:
   virtual iRenderLoop* Retrieve (const char* name);
   virtual const char* GetName (iRenderLoop* loop);
   virtual bool Unregister (iRenderLoop* loop);
-};
 
-#endif
+  /**
+   * Load a renderloop from VFS file named \p file.
+   */
+  csPtr<iRenderLoop> Load (const char* fileName);
+};
 
 #endif

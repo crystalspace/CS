@@ -552,7 +552,8 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector)
 void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	iLight* light)
 {
-  if (!type->shadow)
+  iShader* shadow;
+  if ((shadow = type->GetShadow ()) == 0)
   {
     for (int i = 0; i < steps.Length (); i++)
     {
@@ -641,7 +642,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   {
     csVector3 rad, center;
     float maxRadius;
-    iShaderTechnique* tech = type->shadow->GetBestTechnique ();
+    iShaderTechnique* tech = shadow->GetBestTechnique ();
     for (int p = 0; p < tech->GetPassCount (); p ++) 
     {
       iShaderPass* pass = tech->GetPass (p);
@@ -762,18 +763,13 @@ csPtr<iRenderStep> csStencilShadowFactory::Create ()
 
 SCF_IMPLEMENT_FACTORY(csStencilShadowType);
 
-SCF_IMPLEMENT_IBASE (csStencilShadowType::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 csStencilShadowType::csStencilShadowType (iBase *p) : csBaseRenderStepType (p)
 {
-  scfiEventHandler = 0;
+  shadowLoaded = false;
 }
 
 csStencilShadowType::~csStencilShadowType ()
 {
-  delete scfiEventHandler;
 }
 
 void csStencilShadowType::Report (int severity, const char* msg, ...)
@@ -786,95 +782,57 @@ void csStencilShadowType::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
-bool csStencilShadowType::Initialize (iObjectRegistry* object_reg)
-{
-  if (!csBaseRenderStepType::Initialize (object_reg))
-  {
-    return false;
-  }
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
-
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q)
-  {
-    q->RegisterListener (scfiEventHandler,     
-      CSMASK_Broadcast);
-  }
-
-  return true;
-}
-
 csPtr<iRenderStepFactory> csStencilShadowType::NewFactory ()
 {
   return csPtr<iRenderStepFactory> (new csStencilShadowFactory (
     object_reg, this));
 }
 
-bool csStencilShadowType::HandleEvent (iEvent& event)
+iShader* csStencilShadowType::GetShadow ()
 {
-  if (event.Type == csevBroadcast)
+  if (!shadowLoaded)
   {
-    switch(event.Command.Code)
+    shadowLoaded = true;
+
+    csRef<iPluginManager> plugin_mgr (
+      CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+    // Load the shadow vertex program 
+    csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    if (!shmgr) 
     {
-      case cscmdSystemOpen:
-	{
-	  Open ();
-	  return true;
-	}
-      case cscmdSystemClose:
-	{
-	  Close ();
-	  return true;
-	}
+      shmgr = CS_LOAD_PLUGIN (plugin_mgr,
+        "crystalspace.graphics3d.shadermanager",
+        iShaderManager);
     }
-  }
-  return false;
-}
+    if (!shmgr) 
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve shader manager!");
+      return 0;
+    }
+    shadow = shmgr->CreateShader ();
+    if (!shadow) 
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to create new shader");
+      return 0;
+    }
+    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
+    //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
+    if (!shadow->Load (buf))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to load shadow shader");
+      return 0;
+    }
+    shadow->Prepare ();
 
-void csStencilShadowType::Open ()
-{
-  csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    shadowWrapper = shmgr->GetShader (shadow->GetName ());
+    shadowWrapper->SelectMaterial (0);
 
-  // Load the shadow vertex program 
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  if (!shmgr) 
-  {
-    shmgr = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.graphics3d.shadermanager",
-      iShaderManager);
+    // @@@ Dunno if this should be _here_ really.
+    shmgr->AddChild (shadowWrapper);
   }
-  if (!shmgr) 
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve shader manager!");
-    return;
-  }
-  shadow = shmgr->CreateShader ();
-  if (!shadow) 
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to create new shader");
-    return;
-  }
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
-  //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
-  if (!shadow->Load (buf))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to load shadow shader");
-    return;
-  }
-  shadow->Prepare ();
-
-  shadowWrapper = shmgr->GetShader (shadow->GetName ());
-  shadowWrapper->SelectMaterial (0);
-
-  // @@@ Dunno if this should be _here_ really.
-  shmgr->AddChild (shadowWrapper);
-}
-
-void csStencilShadowType::Close ()
-{
+  return shadow;
 }
 
 //---------------------------------------------------------------------------
@@ -909,7 +867,7 @@ csPtr<iBase> csStencilShadowLoader::Parse (iDocumentNode* node,
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
-  csRef<iRenderStepType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  csRef<iRenderStepType> type (CS_LOAD_PLUGIN (plugin_mgr,
   	"crystalspace.renderloop.step.shadow.stencil.type", 
 	iRenderStepType));
 

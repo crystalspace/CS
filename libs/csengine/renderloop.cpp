@@ -21,18 +21,20 @@
 #include "cssysdef.h"
 #include "csengine/renderloop.h"
 
-#ifdef CS_NR_ALTERNATE_RENDERLOOP
-
 #include "cssys/sysfunc.h"
 
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
+#include "iutil/vfs.h"
 #include "iengine/material.h"
 #include "ivideo/rendersteps/irsfact.h"
 #include "ivideo/rendersteps/igeneric.h"
+#include "imap/reader.h"
 
 #include "csgfx/rgbpixel.h"
 #include "csengine/engine.h"
+#include "csutil/xmltiny.h"
 
 //---------------------------------------------------------------------------
 
@@ -153,12 +155,12 @@ csRenderLoopManager::csRenderLoopManager(csEngine* engine)
 
 csRenderLoopManager::~csRenderLoopManager()
 {
-  csGlobalHashIteratorReversible it (&loops);
+/*  csGlobalHashIteratorReversible it (&loops);
   while (it.HasNext())
   {
     iRenderLoop* loop = (iRenderLoop*)it.Next();
     loop->DecRef ();
-  }
+  }*/
 }
 
 csPtr<iRenderLoop> csRenderLoopManager::Create ()
@@ -171,28 +173,81 @@ bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
 {
   const char* myName = strings.Request (strings.Request (name));
   if (loops.Get (myName) != 0) return false;
-  loop->IncRef();
-  loops.Put (myName, (csHashObject)loop);
+  //loop->IncRef();
+  loops.Put (myName, loop);
   return true;
 }
  
 iRenderLoop* csRenderLoopManager::Retrieve (const char* name)
 {
-  return (iRenderLoop*)(loops.Get (name));
+  return (loops.Get (name));
 }
 
 const char* csRenderLoopManager::GetName (iRenderLoop* loop)
 {
-  return loops.GetKey ((csHashObject)loop);
+  return loops.GetKey (loop);
 }
 
 bool csRenderLoopManager::Unregister (iRenderLoop* loop)
 {
   const char* key;
-  if ((key = loops.GetKey ((csHashObject)loop)) == 0) return false;
-  loop->DecRef();
-  loops.Delete (key, (csHashObject)loop);
+  if ((key = loops.GetKey (loop)) == 0) return false;
+  //loop->DecRef();
+  loops.Delete (key, loop);
   return false;
 }
 
-#endif
+csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
+{
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (engine->object_reg, iPluginManager));
+
+  csRef<iLoaderPlugin> rlLoader =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.loop.loader",
+      iLoaderPlugin);
+
+  if (rlLoader == 0)
+  {
+    engine->Warn ("Error loading '%s': could not retrieve render loop loader",
+      fileName);
+    return 0;
+  }
+
+  csRef<iFile> file = engine->VFS->Open (fileName, VFS_FILE_READ);
+  if (file == 0)
+  {
+    engine->Warn ("Error loading '%s': could open file on VFS", fileName);
+    return 0;
+  }
+
+  csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (engine->object_reg, 
+    iDocumentSystem));
+  if (!xml) xml.AttachNew (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+
+  const char* error = doc->Parse (file);
+  if (error != 0)
+  { 
+    engine->Warn ("Error parsing '%s': %s", fileName, error);
+    return 0;
+  }
+
+  csRef<iDocumentNode> rlNode = doc->GetRoot ()->GetNode ("renderloop");
+  if (rlNode == 0)
+  {
+    engine->Warn ("Error loading '%s': no <renderloop> node", fileName);
+    return 0;
+  }
+
+  csRef<iBase> b = rlLoader->Parse (rlNode, 0, 0);
+  csRef<iRenderLoop> rl = SCF_QUERY_INTERFACE (b, iRenderLoop);
+  if (rl == 0)
+  {
+    engine->ReportBug (
+      "Error loading '%s': returned object doesn't implement iRenderLoop", 
+      fileName);
+  }
+  return (csPtr<iRenderLoop> (rl));
+}
+
