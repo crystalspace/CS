@@ -44,13 +44,13 @@ public:
   csRef<iDynamicSystem> dynsys;
   int rim_vertices;
 
-  ConstructSphereTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat, 
+  ConstructSphereTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
                       csMetaSphere* s, std::string n, iSector *s, int rv);
   virtual ~ConstructSphereTask();
   virtual void doTask();
 };
 
-ConstructSphereTask::ConstructSphereTask(iObjectRegistry *objreg, 
+ConstructSphereTask::ConstructSphereTask(iObjectRegistry *objreg,
                                      vRef<csMetaMaterial> mat, csMetaSphere* s,
                                      std::string n, iSector *sec, int rv)
   : object_reg(objreg), metamat(mat), sphere(s, true), name(n), sector(sec),
@@ -68,15 +68,15 @@ void ConstructSphereTask::doTask()
 
   // should store a single sphere factory for everything?  or do we always get
   // the same one back?
-  //if(! sphere_factor) 
+  //if(! sphere_factor)
   //{
   csRef<iMeshFactoryWrapper> ball_factory = engine->CreateMeshFactory (
                          "crystalspace.mesh.object.ball", "ball_factory");
   //}
-  
+
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper
       (ball_factory, name.c_str(), sector, csVector3(0, 0, 0));
-  
+
   csRef<iBallState> ballLook = SCF_QUERY_INTERFACE (
                           meshwrapper->GetMeshObject(), iBallState);
 
@@ -111,7 +111,8 @@ void ConstructSphereTask::doTask()
 csMetaSphere::csMetaSphere(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Sphere(superobject)
+    A3DL::Sphere(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -123,6 +124,9 @@ MetaObject* csMetaSphere::new_csMetaSphere(VobjectBase* superobject,
 
 void csMetaSphere::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
   LOG("csMetaSphere", 3, "getting material " << mat.isValid());
@@ -131,7 +135,7 @@ void csMetaSphere::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   int rim_vertices = getRimVertices();
 
   LOG("csMetaSphere", 3, "setting up sphere");
-  ConstructSphereTask *t = new ConstructSphereTask(vosa3dl->GetObjectRegistry(), 
+  ConstructSphereTask *t = new ConstructSphereTask(vosa3dl->GetObjectRegistry(),
                                     mat, this, getURLstr(), sect->GetSector(),
                                     rim_vertices);
 

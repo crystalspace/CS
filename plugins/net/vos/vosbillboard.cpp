@@ -127,7 +127,8 @@ void ConstructBillboardTask::doTask()
 csMetaBillboard::csMetaBillboard(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Billboard(superobject)
+    A3DL::Billboard(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -138,6 +139,9 @@ MetaObject* csMetaBillboard::new_csMetaBillboard(VobjectBase* superobject, const
 
 void csMetaBillboard::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
   LOG("csMetaBillboard", 2, "getting material " << mat.isValid());

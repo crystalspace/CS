@@ -31,11 +31,13 @@
 
 class csMetaSphere : public virtual csMetaObject3D, public virtual A3DL::Sphere
 {
+private:
+  bool alreadyLoaded;
 public:
   csMetaSphere(VOS::VobjectBase* superobject);
 
   static VOS::MetaObject* new_csMetaSphere(VOS::VobjectBase* superobject,
-  	const std::string& type);
+    const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };

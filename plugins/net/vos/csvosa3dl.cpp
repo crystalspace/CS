@@ -76,6 +76,7 @@ void RelightTask::doTask()
 
   LOG ("RelightTask", 2, "Performing relight");
   engine->ForceRelight();
+  LOG ("RelightTask", 2, "Done");
 }
 
 
@@ -217,7 +218,7 @@ void csVosA3DL::decrementRelightCounter()
   boost::mutex::scoped_lock lk (relightCounterMutex);
   if (--relightCounter == 0)
   {
-	mainThreadTasks.push(new RelightTask (this));
+  mainThreadTasks.push(new RelightTask (this));
   }
   LOG ("csVosA3DL", 2, "relight counter decremented to " << relightCounter);
 }

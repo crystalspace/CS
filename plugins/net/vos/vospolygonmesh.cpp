@@ -403,8 +403,8 @@ void ConstructPolygonMeshTask::doTask()
       csOrthoTransform t (tm, tv);
       collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
 
-      if (polygonmesh->isLocal()) 
-		collider->SetMoveCallback (polygonmesh->GetCSinterface());
+      if (polygonmesh->isLocal())
+    collider->SetMoveCallback (polygonmesh->GetCSinterface());
 
       polygonmesh->GetCSinterface()->SetCollider (collider);
     }
@@ -412,7 +412,7 @@ void ConstructPolygonMeshTask::doTask()
     LOG("ConstructPolygonMeshTask", 3, "done with " << name);
 
     polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
-  
+
     vosa3dl->decrementRelightCounter();
   }
   else
@@ -513,7 +513,8 @@ void ConstructPolygonMeshTask::doTask()
 csMetaPolygonMesh::csMetaPolygonMesh(VobjectBase* superobject)
     : A3DL::Object3D(superobject),
       csMetaObject3D(superobject),
-      A3DL::PolygonMesh(superobject)
+      A3DL::PolygonMesh(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -525,6 +526,9 @@ MetaObject* csMetaPolygonMesh::new_csMetaPolygonMesh(VobjectBase* superobject,
 
 void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   this->vosa3dl = vosa3dl;
 
   ConstructPolygonMeshTask* cpmt = new ConstructPolygonMeshTask(

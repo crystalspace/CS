@@ -82,57 +82,80 @@ void ConstructCylinderTask::doTask()
   if (cylinderLook)
   {
     cylinderLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
-    cylinderLook->SetVertexCount (2 + hub_vertices * 2);
+    cylinderLook->SetVertexCount (2 + (hub_vertices+1) * 4);
     cylinderLook->SetTriangleCount (hub_vertices * 4);
 
     csVector3* vertices=cylinderLook->GetVertices();
-    //csVector2* texels=cylinderLook->GetTexels();
+    csVector3* normals=cylinderLook->GetNormals();
+    csVector2* texels=cylinderLook->GetTexels();
     csTriangle* triangles=cylinderLook->GetTriangles();
     vertices[0].Set(0, .5,  0);
     vertices[1].Set(0, -.5, 0);
 
+    normals[0].Set(0, 1,  0);
+    normals[1].Set(0, -1, 0);
+
+    texels[0].Set(1, 1);
+    texels[1].Set(0, 0);
+
     int i = 0;
-    vertices[2 + i*2 + 0].Set (
-      cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
-      .5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
-    vertices[2 + i*2 + 1].Set (
-      cos( ((double)i/(double)hub_vertices) * M_PI *2) * .5,
-      -.5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
+    double angle = (double) i / (double) hub_vertices * M_PI * 2;
+    vertices[2 + i*4 + 0].Set (cos(angle) * .5,  .5, sin(angle) * .5);
+    vertices[2 + i*4 + 1].Set (cos(angle) * .5, -.5, sin(angle) * .5);
+    vertices[2 + i*4 + 2].Set (cos(angle) * .5 , .5, sin(angle) * .5);
+    vertices[2 + i*4 + 3].Set (cos(angle) * .5, -.5, sin(angle) * .5);
+
+    normals[2 + i*4 + 0].Set (cos(angle) * .5, 0, sin(angle) * .5);
+    normals[2 + i*4 + 0].Normalize();
+    normals[2 + i*4 + 1].Set (cos(angle) * .5, 0, sin(angle) * .5);
+    normals[2 + i*4 + 1].Normalize();
+    normals[2 + i*4 + 2].Set (0, 1, 0);
+    normals[2 + i*4 + 3].Set (0, -1, 0);
+
+    texels[2 + i*4 + 0].Set((float)i / (float)hub_vertices, 0);
+    texels[2 + i*4 + 1].Set((float)i / (float)hub_vertices, 1);
+    texels[2 + i*4 + 2].Set((float)i / (float)hub_vertices, 0);
+    texels[2 + i*4 + 3].Set((float)i / (float)hub_vertices, 1);
 
     for (i = 1; i <= hub_vertices; i++)
     {
-      if(i < hub_vertices) {
-        vertices[2 + i*2 + 0].Set (
-          cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
-          .5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
-        vertices[2 + i*2 + 1].Set (
-          cos( ((double)i/(double)hub_vertices) * M_PI *2) * .5,
-          -.5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
-      }
+      double angle = (double) i / (double) hub_vertices * M_PI * 2;
+      vertices[2 + i*4 + 0].Set (cos(angle) * .5,  .5, sin(angle) * .5);
+      vertices[2 + i*4 + 1].Set (cos(angle) * .5, -.5, sin(angle) * .5);
+      vertices[2 + i*4 + 2].Set (cos(angle) * .5,  .5, sin(angle) * .5);
+      vertices[2 + i*4 + 3].Set (cos(angle) * .5, -.5, sin(angle) * .5);
 
-      int n;
-      if(i < hub_vertices) n = i;
-      else n = 0;
+      normals[2 + i*4 + 0].Set (cos(angle) * .5, 0, sin(angle) * .5);
+      normals[2 + i*4 + 0].Normalize();
+      normals[2 + i*4 + 1].Set (cos(angle) * .5, 0, sin(angle) * .5);
+      normals[2 + i*4 + 1].Normalize();
+      normals[2 + i*4 + 2].Set (0, 1, 0);
+      normals[2 + i*4 + 3].Set (0, -1, 0);
+
+      texels[2 + i*4 + 0].Set((float)i / (float)hub_vertices, 0);
+      texels[2 + i*4 + 1].Set((float)i / (float)hub_vertices, 1);
+      texels[2 + i*4 + 2].Set((float)i / (float)hub_vertices, 0);
+      texels[2 + i*4 + 3].Set((float)i / (float)hub_vertices, 1);
 
       // top triangle
       triangles[(i-1)*4].a = 0;
-      triangles[(i-1)*4].b = 2 + n*2 + 0;
-      triangles[(i-1)*4].c = 2 + (i-1)*2 + 0;
+      triangles[(i-1)*4].b = 2 + i*4 + 2;
+      triangles[(i-1)*4].c = 2 + (i-1)*4 + 2;
 
       // bottom triangle
       triangles[(i-1)*4 + 1].c = 1;
-      triangles[(i-1)*4 + 1].b = 2 + n*2 + 1;
-      triangles[(i-1)*4 + 1].a = 2 + (i-1)*2 + 1;
+      triangles[(i-1)*4 + 1].b = 2 + i*4 + 3;
+      triangles[(i-1)*4 + 1].a = 2 + (i-1)*4 + 3;
 
       // first side triangle
-      triangles[(i-1)*4 + 2].a = 2 + n*2 + 0;
-      triangles[(i-1)*4 + 2].b = 2 + n*2 + 1;
-      triangles[(i-1)*4 + 2].c = 2 + (i-1)*2 + 0;
+      triangles[(i-1)*4 + 2].a = 2 + i*4 + 0;
+      triangles[(i-1)*4 + 2].b = 2 + i*4 + 1;
+      triangles[(i-1)*4 + 2].c = 2 + (i-1)*4 + 0;
 
       // second side triangle
-      triangles[(i-1)*4 + 3].c = 2 + n*2 + 1;
-      triangles[(i-1)*4 + 3].b = 2 + (i-1)*2 + 0;
-      triangles[(i-1)*4 + 3].a = 2 + (i-1)*2 + 1;
+      triangles[(i-1)*4 + 3].c = 2 + i*4 + 1;
+      triangles[(i-1)*4 + 3].b = 2 + (i-1)*4 + 0;
+      triangles[(i-1)*4 + 3].a = 2 + (i-1)*4 + 1;
     }
 
     cylinderLook->Invalidate();
@@ -178,7 +201,8 @@ void ConstructCylinderTask::doTask()
 csMetaCylinder::csMetaCylinder(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Cylinder(superobject)
+    A3DL::Cylinder(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -190,6 +214,9 @@ MetaObject* csMetaCylinder::new_csMetaCylinder(VobjectBase* superobject,
 
 void csMetaCylinder::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
   LOG("csMetaCylinder", 3, "getting material " << mat.isValid());

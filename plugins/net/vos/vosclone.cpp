@@ -75,7 +75,8 @@ void ConstructCloneTask::doTask()
 csMetaClone::csMetaClone(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Clone(superobject)
+    A3DL::Clone(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -87,6 +88,10 @@ MetaObject* csMetaClone::new_csMetaClone(VobjectBase* superobject,
 
 void csMetaClone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
+#if 0 // the ConstructCloneTask crashes at the moment...
   /* Can we replace the material without changing the factory? if so
    * we might want to pass this to the ConstructCloneTask and use it
    */
@@ -109,5 +114,6 @@ void csMetaClone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   LOG("csMetaClone", 2, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
+#endif
 }
 

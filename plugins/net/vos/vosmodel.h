@@ -31,11 +31,13 @@
 
 class csMetaModel : public virtual csMetaObject3D, public virtual A3DL::Model
 {
+private:
+  bool alreadyLoaded;
 public:
   csMetaModel(VOS::VobjectBase* superobject);
 
   static VOS::MetaObject* new_csMetaModel(VOS::VobjectBase* superobject,
-  	const std::string& type);
+    const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };

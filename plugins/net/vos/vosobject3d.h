@@ -35,7 +35,7 @@
 #include "vossector.h"
 
 class csVosObject3D : public iVosObject3D, public iVosApi,
-	                  public iDynamicsMoveCallback
+                    public iDynamicsMoveCallback
 {
 private:
   csRef<iMeshWrapper> meshwrapper;
@@ -67,6 +67,7 @@ class csMetaObject3D : public virtual A3DL::Object3D,
                        public VOS::ChildChangeListener
 {
 protected:
+  bool alreadyLoaded;
   csRef<csVosObject3D> csvobj3d;
   csVosA3DL *vosa3dl;
 
@@ -102,8 +103,8 @@ public:
   // This is commented out because CS does not support dynamically changing
   // scaling of objects
   //virtual void changeScaling (const csMatrix3 &scaling)
-  
-  
+
+
 };
 
 #endif

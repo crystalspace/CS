@@ -82,45 +82,49 @@ void ConstructConeTask::doTask()
 
     int hubVertices = 24;
 
-    coneLook->SetVertexCount (2 + hubVertices);
+    coneLook->SetVertexCount (1 + (hubVertices+1) * 2);
     coneLook->SetTriangleCount (hubVertices * 2);
 
     csVector3 *vertices = coneLook->GetVertices();
+    csVector3 *normals = coneLook->GetNormals();
     csTriangle *triangles = coneLook->GetTriangles();
     csVector2 *texels = coneLook->GetTexels();
 
-    vertices[0].Set (0,  0.5, 0);
-    vertices[1].Set (0, -0.5, 0);
-
+    vertices[0].Set (0, -0.5, 0);
     texels[0].Set(.5, 0);
-    texels[1].Set(.5, 1);
+    normals[0].Set(0, -1, 0);
 
     int i = 0;
     double angle = (double) i / (double) hubVertices * M_PI * 2;
-    vertices[i+2].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
-    texels[i+2].Set(0, (float)i / (float)hubVertices);
+    vertices[1 + (i*2) + 0].Set(cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
+    vertices[1 + (i*2) + 1].Set(0,  0.5, 0);
+    normals[1 + (i*2) + 0].Set(cos(angle) * 0.5, 0.5, sin(angle) * 0.5);
+    normals[1 + (i*2) + 1].Set(cos(angle) * 0.5, 0.5, sin(angle) * 0.5);
+    texels[1 + (i*2) + 0].Set(0, (float)i / (float)hubVertices);
+    texels[1 + (i*2) + 1].Set(1, (float)i / (float)hubVertices);
+
 
     for (i = 1; i <= hubVertices; i++)
     {
-      if(i < hubVertices) {
-        double angle = (double) i / (double) hubVertices * M_PI * 2;
-        vertices[i+2].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
-        texels[i+2].Set(0, (float)i / (float)hubVertices);
-      }
-
-      int n;
-      if(i < hubVertices) n = i;
-      else n = 0;
+      double angle = (double) i / (double) hubVertices * M_PI * 2;
+      vertices[1 + (i*2) + 0].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
+      vertices[1 + (i*2) + 1].Set (0,  0.5, 0);
+      normals[1 + (i*2) + 0].Set(cos(angle) * 0.5, .25, sin(angle) * 0.5);
+      normals[1 + (i*2) + 1].Set(cos(angle) * 0.5, .25, sin(angle) * 0.5);
+      normals[1 + (i*2) + 0].Normalize();
+      normals[1 + (i*2) + 1].Normalize();
+      texels[1 + (i*2) + 0].Set(0, (float)i / (float)hubVertices);
+      texels[1 + (i*2) + 1].Set(1, (float)i / (float)hubVertices);
 
       // top (slope) triangle
-      triangles[(i-1) * 2].a = 0;
-      triangles[(i-1) * 2].b = 2 + n;
-      triangles[(i-1) * 2].c = 2 + i-1;
+      triangles[(i-1) * 2].a = 1 + (i*2) + 1;
+      triangles[(i-1) * 2].b = 1 + (i*2);
+      triangles[(i-1) * 2].c = 1 + (i-1)*2;
 
       // bottom (base) triangle
-      triangles[(i-1) * 2 + 1].a = 1;
-      triangles[(i-1) * 2 + 1].b = 2 + i-1;
-      triangles[(i-1) * 2 + 1].c = 2 + n;
+      triangles[(i-1) * 2 + 1].a = 0;
+      triangles[(i-1) * 2 + 1].b = 1 + (i-1)*2;
+      triangles[(i-1) * 2 + 1].c = 1 + (i*2);
     }
 
     coneLook->Invalidate ();
@@ -137,7 +141,8 @@ void ConstructConeTask::doTask()
 csMetaCone::csMetaCone(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Cone(superobject)
+    A3DL::Cone(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -149,6 +154,9 @@ MetaObject* csMetaCone::new_csMetaCone(VobjectBase* superobject,
 
 void csMetaCone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
   LOG("csMetaCone", 2, "getting material " << mat.isValid());

@@ -192,7 +192,8 @@ public:
 /// csMetaObject3D ///
 
 csMetaObject3D::csMetaObject3D(VobjectBase* superobject)
-    : A3DL::Object3D(superobject)
+    : A3DL::Object3D(superobject),
+    alreadyLoaded(false)
 {
   csvobj3d = new csVosObject3D(this);
   csvobj3d->IncRef();
@@ -290,6 +291,9 @@ Task* csMetaObject3D::GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect)
 
 void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   LOG("csMetaObject3D", 3, "now in csMetaObject3D::setup");
 
   this->vosa3dl = vosa3dl;
@@ -402,7 +406,7 @@ void csMetaObject3D::changePosition (const csVector3 &pos)
 
   if (csvobj3d->GetCollider().IsValid())
   {
-	csvobj3d->GetCollider()->SetPosition(pos);
+  csvobj3d->GetCollider()->SetPosition(pos);
   }
 }
 
@@ -411,15 +415,15 @@ void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
   if (mw.IsValid())
   {
-	// NOTE:Movable doesn't support scaling, if it did we'd need to incorporate
-	// it into the matrix
+  // NOTE:Movable doesn't support scaling, if it did we'd need to incorporate
+  // it into the matrix
     mw->GetMovable()->SetTransform(ori);
     mw->GetMovable()->UpdateMove();
   }
 
   if (csvobj3d->GetCollider().IsValid())
   {
-	csvobj3d->GetCollider()->SetOrientation(ori);
+  csvobj3d->GetCollider()->SetOrientation(ori);
   }
 }
 

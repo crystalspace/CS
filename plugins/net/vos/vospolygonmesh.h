@@ -30,13 +30,15 @@
 #include "vosobject3d.h"
 
 class csMetaPolygonMesh : public virtual csMetaObject3D,
-	public virtual A3DL::PolygonMesh
+  public virtual A3DL::PolygonMesh
 {
+private:
+  bool alreadyLoaded;
 public:
   csMetaPolygonMesh(VOS::VobjectBase* superobject);
 
   static VOS::MetaObject* new_csMetaPolygonMesh(VOS::VobjectBase* superobject,
-  	const std::string& type);
+    const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };

@@ -82,13 +82,13 @@ void ConstructTextureTask::doTask()
   }
 
   csRef<iImage> image (io->Load ((uint8*) texturedata.c_str(),
-			  					 texturedata.size(), 
-								 engine->GetTextureFormat()));
+                   texturedata.size(),
+                 engine->GetTextureFormat()));
 
   csRef<iTextureHandle> handle (txtmgr->RegisterTexture (image, CS_TEXTURE_3D));
 
   csRef<iTextureWrapper> texture = engine->GetTextureList()->NewTexture ( handle);
-  
+
   if(!texture)
   {
     LOG("ConstructTextureTask", 1,
@@ -115,6 +115,7 @@ csMetaTexture::~csMetaTexture()
 void csMetaTexture::Setup(csVosA3DL* vosa3dl)
 {
   if(alreadyLoaded) return;
+  else alreadyLoaded = true;
 
   vRef<Property> imagedata = getImage();
   char cachefilename[256];
@@ -138,7 +139,6 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
                    cachefilename, this);
   imagedata->read(ctt->texturedata);
   vosa3dl->mainThreadTasks.push(ctt);
-  alreadyLoaded = true;
 
   //addChildListener(this);
 

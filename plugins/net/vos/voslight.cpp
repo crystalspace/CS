@@ -40,7 +40,7 @@ public:
   float radius;
   bool isStatic;
   csVosA3DL *vosa3dl;
-  
+
 
   ConstructLightTask(iObjectRegistry *objreg, iSector *sector,
                      const std::string &n, csMetaLight *ml);
@@ -144,6 +144,7 @@ void csMetaLight::notifyPropertyChange(const PropertyEvent& event)
 void csMetaLight::Setup(csVosA3DL* vosa3dl, csVosSector* sector)
 {
   if(alreadyLoaded) return;
+  else alreadyLoaded = true;
 
   ConstructLightTask* clt = new ConstructLightTask(
     vosa3dl->GetObjectRegistry(), sector->GetSector(), getURLstr(), this);

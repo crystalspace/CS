@@ -201,7 +201,8 @@ void ConstructModelTask::doTask()
 csMetaModel::csMetaModel(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Model(superobject)
+    A3DL::Model(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -213,6 +214,9 @@ MetaObject* csMetaModel::new_csMetaModel(VobjectBase* superobject,
 
 void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   // Get material
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());

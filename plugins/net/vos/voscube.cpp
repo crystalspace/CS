@@ -113,7 +113,8 @@ void ConstructCubeTask::doTask()
 csMetaCube::csMetaCube(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
-    A3DL::Cube(superobject)
+    A3DL::Cube(superobject),
+    alreadyLoaded(false)
 {
 }
 
@@ -125,6 +126,9 @@ MetaObject* csMetaCube::new_csMetaCube(VobjectBase* superobject,
 
 void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   vRef<A3DL::Material> m = getMaterial();
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
   LOG("csMetaCube", 3, "getting material " << mat.isValid());

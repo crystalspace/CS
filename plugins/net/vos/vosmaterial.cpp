@@ -197,6 +197,9 @@ csRef<iMaterialWrapper> csMetaMaterial::GetCheckerboard()
 
 void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 {
+  if(alreadyLoaded) return;
+  else alreadyLoaded = true;
+
   LOG("csMetaMaterial", 3, "setting up material");
   ConstructMaterialTask* cmt = new ConstructMaterialTask(
     vosa3dl->GetObjectRegistry(), this);

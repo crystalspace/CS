@@ -31,11 +31,13 @@
 
 class csMetaClone : public virtual csMetaObject3D, public virtual A3DL::Clone
 {
+private:
+  bool alreadyLoaded;
 public:
   csMetaClone(VOS::VobjectBase* superobject);
 
   static VOS::MetaObject* new_csMetaClone(VOS::VobjectBase* superobject,
-  	const std::string& type);
+    const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };

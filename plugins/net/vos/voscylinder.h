@@ -29,14 +29,16 @@
 #include "csvosa3dl.h"
 #include "vosobject3d.h"
 
-class csMetaCylinder : public virtual csMetaObject3D, 
+class csMetaCylinder : public virtual csMetaObject3D,
                      public virtual A3DL::Cylinder
 {
+private:
+  bool alreadyLoaded;
 public:
   csMetaCylinder(VOS::VobjectBase* superobject);
 
   static VOS::MetaObject* new_csMetaCylinder(VOS::VobjectBase* superobject,
-  	const std::string& type);
+    const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };
