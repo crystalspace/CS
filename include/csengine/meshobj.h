@@ -637,7 +637,7 @@ public:
     {
       return scfParent->shadow_receiver;
     }
-    virtual uint32 GetVisibilityNumber () const
+    virtual uint GetVisibilityNumber () const
     {
       return scfParent->GetVisibilityNumber ();
     }
