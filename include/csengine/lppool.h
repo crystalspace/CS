@@ -108,6 +108,7 @@ public:
     else
     {
       // Cannot happen!
+      CS_ASSERT (false);
     }
   }
 

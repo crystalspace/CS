@@ -3,6 +3,16 @@ The history order is reversed so that new features are at the top.
 13-May-2001
 	- Added CS_ASSERT to some of the functions in growing arrays to
 	  make sure we catch those kinds of errors early.
+	- Martin Geisse fixed simplep for his changes yesterday.
+	- Michael Voase added APPLY_MOTION to spr3dldr.cpp. Modified
+	  walktest.cfg to correctly load motion manager.
+	- Removed all 'friend' declarations (except Dumper) from
+	  csLightPatch. Instead added SetPolyCurve(), AddPolyList(),
+	  AddLightList(), RemoveLightList(), SetLightFrustum(), and
+	  GetLightFrustum(). Added a few CS_ASSERT's again.
+	- Added some CS_ASSERT's to various classes in csgeom.
+	- Added CS_ASSERT to dynamic light calculation code.
+	- Martin Geisse changed bumptest to use the engine as a plugin.
 12-May-2001
 	- Thanks to Philip Wyett I fixed a bad bug in the OpenGL
 	  software clipper. Some arrays were not correctly sized to the

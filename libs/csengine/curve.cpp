@@ -338,17 +338,10 @@ void csCurve::MakeDirtyDynamicLights ()
 };
 
 
-void csCurve::AddLightPatch(csLightPatch* lp)
+void csCurve::AddLightPatch (csLightPatch* lp)
 {
-  lp->next_poly = lightpatches;
-  lp->prev_poly = NULL;
-
-  if (lightpatches) 
-    lightpatches->prev_poly = lp;
-  
-  lightpatches = lp;
-  lp->polygon = NULL;
-  lp->curve = this;
+  lp->AddPolyList (lightpatches);
+  lp->SetPolyCurve (this);
 
   /// set the dynamic lights to dirty
   lightmap->MakeDirtyDynamicLights ();
@@ -356,11 +349,7 @@ void csCurve::AddLightPatch(csLightPatch* lp)
 
 void csCurve::UnlinkLightPatch (csLightPatch* lp)
 {
-  if (lp->next_poly) lp->next_poly->prev_poly = lp->prev_poly;
-  if (lp->prev_poly) lp->prev_poly->next_poly = lp->next_poly;
-  else lightpatches = lp->next_poly;
-  lp->prev_poly = lp->next_poly = NULL;
-  lp->curve = NULL;
+  lp->RemovePolyList (lightpatches);
   lightmap->MakeDirtyDynamicLights ();
 }
 
@@ -392,9 +381,9 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   int lm_width = lightmap->GetWidth ();
   int lm_height = lightmap->GetHeight ();
 
-  csDynLight *light = lp->light;
+  csDynLight *light = lp->GetLight ();
 
-  iShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
+  iShadowIterator* shadow_it = lp->GetShadowBlock ().GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
 
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
@@ -421,7 +410,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
       pos = _uv2World[uv];
 
       // is the point contained within the light frustrum? 
-      if (!lp->light_frustum->Contains(pos - lp->light_frustum->GetOrigin()))
+      if (!lp->GetLightFrustum ()->Contains(pos - lp->GetLightFrustum ()->GetOrigin()))
         // No, skip it
         continue;
 
@@ -556,14 +545,14 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     lp->Initialize (4);
 
     // Copy shadow frustums.
-    lp->shadows.DeleteShadows ();
+    lp->GetShadowBlock ().DeleteShadows ();
     // @@@: It would be nice if we could optimize earlier 
     // to determine relevant shadow frustums in curves and use
     // AddRelevantShadows instead.
-    lp->shadows.AddAllShadows (lview.GetFrustumContext ()->GetShadows ());
+    lp->GetShadowBlock ().AddAllShadows (lview.GetFrustumContext ()->GetShadows ());
 
-    lp->light_frustum = new csFrustum(*lview.GetFrustumContext ()->
-    	GetLightFrustum ());
+    lp->SetLightFrustum (new csFrustum(*lview.GetFrustumContext ()->
+    	GetLightFrustum ()));
 
     MakeDirtyDynamicLights ();
   }

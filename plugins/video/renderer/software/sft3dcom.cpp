@@ -3083,6 +3083,12 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 }
 
+void csGraphics3DSoftwareCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
+{
+  DefaultDrawTriangleMesh (mesh, this, o2c, clipper,
+	cliptype, aspect, width2, height2);
+}
+
 unsigned char *csGraphics3DSoftwareCommon::BuildIndexedFogTable ()
 {
   static int usage = 0;

@@ -77,6 +77,7 @@ public:
    */
   csSegment2& operator[] (int i)
   {
+    CS_ASSERT (i >= 0 && i < num_edges);
     return edges[i];
   }
 
@@ -220,6 +221,7 @@ public:
     else
     {
       // Cannot happen!
+      CS_ASSERT (false);
     }
   }
 };

@@ -475,19 +475,12 @@ void csDynLight::SetColor (const csColor& col)
 
 void csDynLight::UnlinkLightpatch (csLightPatch* lp)
 {
-  if (lp->next_light) lp->next_light->prev_light = lp->prev_light;
-  if (lp->prev_light) lp->prev_light->next_light = lp->next_light;
-  else lightpatches = lp->next_light;
-  lp->prev_light = lp->next_light = NULL;
-  lp->light = NULL;
+  lp->RemoveLightList (lightpatches);
 }
 
 void csDynLight::AddLightpatch (csLightPatch* lp)
 {
-  lp->next_light = lightpatches;
-  lp->prev_light = NULL;
-  if (lightpatches) lightpatches->prev_light = lp;
-  lightpatches = lp;
-  lp->light = this;
+  lp->AddLightList (lightpatches);
+  lp->SetLight (this);
 }
 

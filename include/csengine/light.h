@@ -394,10 +394,6 @@ public:
  */
 class csLightPatch
 {
-  friend class csPolygon3D;
-  friend class csCurve;
-  friend class csPolyTexture;
-  friend class csDynLight;
   friend class Dumper;
   friend class csLightPatchPool;
 
@@ -467,6 +463,22 @@ public:
    */
   csDynLight* GetLight () { return light; }
 
+  /// Get a reference to the shadow list.
+  csShadowBlock& GetShadowBlock () { return shadows; }
+
+  /// Get the number of vertices in this light patch.
+  int GetNumVertices () { return num_vertices; }
+  /// Get all the vertices.
+  csVector3* GetVertices () { return vertices; }
+
+  /// Get a vertex.
+  csVector3& GetVertex (int i)
+  {
+    CS_ASSERT (vertices != NULL);
+    CS_ASSERT (i >= 0 && i < num_vertices);
+    return vertices[i];
+  }
+
   /**
    * Get next light patch as seen from the standpoint
    * of the polygon.
@@ -478,6 +490,55 @@ public:
    * of the light.
    */
   csLightPatch* GetNextLight () { return next_light; }
+
+  /// Set polygon.
+  void SetPolyCurve (csPolygon3D* pol) { polygon = pol; curve = NULL; }
+  /// Set curve.
+  void SetPolyCurve (csCurve* c) { curve = c; polygon = NULL; }
+  /// Set light.
+  void SetLight (csDynLight* l) { light = l; }
+  /// Add to poly list.
+  void AddPolyList (csLightPatch*& first)
+  {
+    next_poly = first;
+    prev_poly = NULL;
+    if (first) 
+      first->prev_poly = this;
+    first = this;
+  }
+  /// Remove from poly list.
+  void RemovePolyList (csLightPatch*& first)
+  {
+    if (next_poly) next_poly->prev_poly = prev_poly;
+    if (prev_poly) prev_poly->next_poly = next_poly;
+    else first = next_poly;
+    prev_poly = next_poly = NULL;
+    polygon = NULL;
+    curve = NULL;
+  }
+  /// Add to light list.
+  void AddLightList (csLightPatch*& first)
+  {
+    next_light = first;
+    prev_light = NULL;
+    if (first) 
+      first->prev_light = this;
+    first = this;
+  }
+  /// Remove from light list.
+  void RemoveLightList (csLightPatch*& first)
+  {
+    if (next_light) next_light->prev_light = prev_light;
+    if (prev_light) prev_light->next_light = next_light;
+    else first = next_light;
+    prev_light = next_light = NULL;
+    light = NULL;
+  }
+
+  /// Set the light frustum.
+  void SetLightFrustum (csFrustum* lf) { light_frustum = lf; }
+  /// Get the light frustum.
+  csFrustum* GetLightFrustum () { return light_frustum; }
 };
 
 /**

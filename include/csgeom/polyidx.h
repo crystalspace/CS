@@ -79,12 +79,20 @@ public:
   /**
    * Get the specified vertex index.
    */
-  int& operator[] (int i) { return vertices_idx[i]; }
+  int& operator[] (int i)
+  {
+    CS_ASSERT (i >= 0 && i < num_vertices);
+    return vertices_idx[i];
+  }
 
   /**
    * Get the specified vertex index.
    */
-  int& operator[] (int i) const { return vertices_idx[i]; }
+  int& operator[] (int i) const
+  {
+    CS_ASSERT (i >= 0 && i < num_vertices);
+    return vertices_idx[i];
+  }
 
   /**
    * Make room for at least the specified number of vertices.

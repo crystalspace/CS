@@ -94,6 +94,7 @@ public:
    */
   csVector2& operator[] (int i)
   {
+    CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
   }
 
@@ -102,6 +103,7 @@ public:
    */
   const csVector2& operator[] (int i) const
   {
+    CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
   }
 

@@ -873,7 +873,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   invhh = 1. / (float)hh;
 
   csRGBLightMap& remap = lm->GetRealMap ();
-  csDynLight* light = (csDynLight*)(lp->light);
+  csDynLight* light = (csDynLight*)(lp->GetLight ());
   unsigned char* mapR = remap.GetRed ();
   unsigned char* mapG = remap.GetGreen ();
   unsigned char* mapB = remap.GetBlue ();
@@ -884,19 +884,19 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   float inv_lightcell_size = 1.0 / lightcell_size;
 
   csVector3 lightpos;
-  if (lp->light_frustum)
-    lightpos = lp->light_frustum->GetOrigin ();
+  if (lp->GetLightFrustum ())
+    lightpos = lp->GetLightFrustum ()->GetOrigin ();
   else
     lightpos = light->GetCenter ();
 
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
   csVector2* f_uv = NULL;
-  if (lp->vertices)
+  if (lp->GetVertices ())
   {
     int mi;
-    f_uv = new csVector2 [lp->num_vertices];
-    for (i = 0 ; i < lp->num_vertices ; i++)
+    f_uv = new csVector2 [lp->GetNumVertices ()];
+    for (i = 0 ; i < lp->GetNumVertices () ; i++)
     {
       //if (lview.IsMirrored ()) mi = lview.num_frustum-i-1;
       //else mi = i;
@@ -904,7 +904,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
-      v1 = txt_pl->m_world2tex * (lp->vertices[mi] + lightpos - txt_pl->v_world2tex);
+      v1 = txt_pl->m_world2tex * (lp->GetVertex (mi) + lightpos - txt_pl->v_world2tex);
       f_uv[i].x = (v1.x * ww - Imin_u) * inv_lightcell_size;
       f_uv[i].y = (v1.y * hh - Imin_v) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
@@ -940,7 +940,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
         // Check first if polygon has been finished
 a:      if (scanR2 == MinIndex) goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % lp->num_vertices;
+        scanR2 = (scanR2 + 1) % lp->GetNumVertices ();
 
         if (ABS (f_uv [scanR2].y - f_uv [MaxIndex].y) < EPSILON)
         {
@@ -967,7 +967,7 @@ a:      if (scanR2 == MinIndex) goto finish;
       {
 b:      if (scanL2 == MinIndex) goto finish;
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
+        scanL2 = (scanL2 - 1 + lp->GetNumVertices ()) % lp->GetNumVertices ();
 
         if (ABS (f_uv [scanL2].y - f_uv [MaxIndex].y) < EPSILON)
         {
@@ -1031,7 +1031,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	// Check if the point on the polygon is shadowed. To do this
 	// we traverse all shadow frustums and see if it is contained in any of them.
-	iShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
+	iShadowIterator* shadow_it = lp->GetShadowBlock ().GetShadowIterator ();
 	bool shadow = false;
 	while (shadow_it->HasNext ())
 	{
@@ -1063,6 +1063,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    l1 = QRound (color.red * brightness);
 	    if (l1)
 	    {
+	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
 	      l1 += mapR[uv];
 	      if (l1 > 255) l1 = 255;
 	      mapR[uv] = l1;
@@ -1073,6 +1074,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    l2 = QRound (color.green * brightness);
 	    if (l2)
 	    {
+	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
 	      l2 += mapG[uv];
 	      if (l2 > 255) l2 = 255;
 	      mapG[uv] = l2;
@@ -1083,6 +1085,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    l3 = QRound (color.blue * brightness);
 	    if (l3)
 	    {
+	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
 	      l3 += mapB[uv];
 	      if (l3 > 255) l3 = 255;
 	      mapB[uv] = l3;

@@ -423,11 +423,7 @@ public:
 
 
   /// Draw a triangle mesh.
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
-  {
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper,
-	cliptype, aspect, width2, height2);
-  }
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
 
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)

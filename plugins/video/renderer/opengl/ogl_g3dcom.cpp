@@ -2299,7 +2299,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     tr_verts.SetLimit (num_vertices);
     uv_verts.SetLimit (num_vertices);
-	uv_mul_verts.SetLimit (num_vertices);
+    uv_mul_verts.SetLimit (num_vertices);//@@@ Should not be needed?
     color_verts.SetLimit (num_vertices);
   }
 
@@ -2597,12 +2597,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if (mat->TextureLayerTranslated (j))
       {
         mul_uv = uv_mul_verts.GetArray ();
-		
-		for (i = 0 ; i < num_vertices ; i++)
-		{
-			mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
-			mul_uv[i].y = work_uv_verts[i].y * vscale + vshift;
-		}
+	for (i = 0 ; i < num_vertices ; i++)
+	{
+	  mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
+	  mul_uv[i].y = work_uv_verts[i].y * vscale + vshift;
+	}
       }
 
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);

@@ -964,22 +964,14 @@ void csPolygon3D::MakeDirtyDynamicLights ()
 
 void csPolygon3D::UnlinkLightpatch (csLightPatch* lp)
 {
-  if (lp->next_poly) lp->next_poly->prev_poly = lp->prev_poly;
-  if (lp->prev_poly) lp->prev_poly->next_poly = lp->next_poly;
-  else light_info.lightpatches = lp->next_poly;
-  lp->prev_poly = lp->next_poly = NULL;
-  lp->polygon = NULL;
+  lp->RemovePolyList (light_info.lightpatches);
   MakeDirtyDynamicLights ();
 }
 
 void csPolygon3D::AddLightpatch (csLightPatch* lp)
 {
-  lp->next_poly = light_info.lightpatches;
-  lp->prev_poly = NULL;
-  if (light_info.lightpatches) light_info.lightpatches->prev_poly = lp;
-  light_info.lightpatches = lp;
-  lp->polygon = this;
-  lp->curve = NULL;
+  lp->AddPolyList (light_info.lightpatches);
+  lp->SetPolyCurve (this);
   MakeDirtyDynamicLights ();
 }
 
@@ -1672,13 +1664,13 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     lp->Initialize (light_frustum->GetNumVertices ());
 
     // Copy shadow frustums.
-    lp->shadows.AddRelevantShadows (ctxt->GetShadows ());
+    lp->GetShadowBlock ().AddRelevantShadows (ctxt->GetShadows ());
 
     int i, mi;
-    for (i = 0 ; i < lp->num_vertices ; i++)
+    for (i = 0 ; i < lp->GetNumVertices () ; i++)
     {
-      mi = ctxt->IsMirrored () ? lp->num_vertices-i-1 : i;
-      lp->vertices[i] = light_frustum->GetVertex (mi);
+      mi = ctxt->IsMirrored () ? lp->GetNumVertices ()-i-1 : i;
+      lp->GetVertex (i) = light_frustum->GetVertex (mi);
     }
   }
   else

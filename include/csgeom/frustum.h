@@ -273,7 +273,11 @@ public:
   /**
    * Get a vertex.
    */
-  csVector3& GetVertex (int idx) { return vertices[idx]; }
+  csVector3& GetVertex (int idx)
+  {
+    CS_ASSERT (idx >= 0 && idx < num_vertices);
+    return vertices[idx];
+  }
 
   /**
    * Get the array of vertices.
