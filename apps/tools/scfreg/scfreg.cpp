@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
+#include "csutil/csstring.h"
 #include "csutil/cfgfile.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -44,11 +45,11 @@ static int display_help ()
   printf ("Crystal Space SCF object registration utility v%s\n", programversion);
   printf ("Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>\n\n");
   printf ("Usage: %s {option/s} [plug-in module] [...]\n\n", programname);
-  printf ("By default the program will register the SCF components contained\n");
-  printf ("in the plug-in module passed on command line. Registration occurs\n" );
-  printf ("in the SCF registration file scf.cfg.\n\n");
+  printf ("By default the program will generate a .scf file for the\n");
+  printf ("plug-in module passed on command line.\n" );
   printf ("  -r   --register    Register SCF components contained in file #\n");
   printf ("  -u   --unregister  Unregister SCF components contained in file #\n");
+  printf ("  -s			Register in scf.cfg instead of own .scf file\n");
   printf ("  -h   --help        Display this help text\n");
   printf ("  -v   --verbose     Comment on what's happening\n");
   printf ("  -V   --version     Display program version\n");
@@ -57,8 +58,8 @@ static int display_help ()
 
 static bool verbose = false;
 
-static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
-  bool Register)
+static bool RegisterServer (char *SharedLibraryFilename, bool Register,
+			    bool usescfcfg)
 {
   static bool DisplayedHeader = false;
   if (!DisplayedHeader && !verbose)
@@ -129,13 +130,33 @@ static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
       printf ("ERROR: Failed to find entry \"%s\" in library \"%s\"\n", name, SharedLibraryFilename);
     fflush (stdout);
     return false;
-  } /* endif */
+  }
 
   if (verbose)
   {
     printf ("OK, address = %08lX\n", (unsigned long)func);
     fflush (stdout);
-  } /* endif */
+  }
+
+  // Open config file
+  csString configfile;
+  if (usescfcfg)
+    configfile = "scf.cfg";
+  else
+  {
+    // search extension
+    configfile = SharedLibraryFilename;
+    int i;
+    for (i=configfile.Length()-1;i>=0;i--)
+      if (configfile.GetAt(i) == '.')
+	break;
+    if (i>0)
+      configfile.DeleteAt(i, configfile.Length()-i);
+    configfile += ".scf";
+    printf ("Condiffile. %s\n", (const char*) configfile);
+  }
+  
+  csConfigFile cfg (configfile);
 
   scfClassInfo *ClassTable = func (NULL);
   while (ClassTable->ClassID)
@@ -176,6 +197,8 @@ static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
     ClassTable++;
   }
 
+  cfg.Save (configfile);
+
   if (verbose)
   {
     printf ("Unloading library \"%s\"...", SharedLibraryFilename);
@@ -202,16 +225,20 @@ static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
 int main (int argc, char *argv[])
 {
   int operation = 1;
+  bool use_scf_cfg = false;
   programname = argv [0];
 
 #ifndef COMP_BC
   int c;
-  while ((c = getopt_long (argc, argv, "ruhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "rsuhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
         // unknown option
         return -1;
+      case 's':
+	use_scf_cfg=true;
+	break;
       case 'r':
         operation = 1;
         break;
@@ -235,8 +262,6 @@ int main (int argc, char *argv[])
   int optind=1;
 #endif
 
-  csConfigFile cfg ("scf.cfg");
-
   // Interpret the non-option arguments as file names
   bool did_something = false;
   for (; optind < argc; ++optind)
@@ -244,18 +269,16 @@ int main (int argc, char *argv[])
     {
       case 1:
         did_something = true;
-        RegisterServer (argv [optind], cfg, true);
+        RegisterServer (argv [optind], true, use_scf_cfg);
         break;
       case 2:
         did_something = true;
-        RegisterServer (argv [optind], cfg, false);
+        RegisterServer (argv [optind], false, use_scf_cfg);
         break;
     } /* endswitch */
 
   if (!did_something)
     return display_help ();
-
-  cfg.Save ("scf.cfg");
 
   return 0;
 }
