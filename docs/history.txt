@@ -10,6 +10,9 @@ chronological order.
 	- Eric Sunshine once again disabled /nodefaultlib:"MSVCRT" in the
 	  freefnt2 MSVC project files since a user reports that it results in
 	  many unresolved references at link time.
+	- Eric Sunshine re-configured msvcgen/required.mak so that the sprcal3d
+	  and sprcal3dldr project files actually get generated (as was
+	  intention).
 19-Nov-2003
 	- Eric Sunshine added new static method scfInterface<>::GetName() which
 	  returns an interface's name as a string.  This allows templates to

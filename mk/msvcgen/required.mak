@@ -42,7 +42,6 @@
 #
 #------------------------------------------------------------------------------
 MSVC.MAKE.FLAGS = \
-  HAS_CAL3D=yes \
   3DS.AVAILABLE=yes \
   ODE.AVAILABLE=yes \
   CSPYTHON_MSVC_EXCLUDE=yes
@@ -53,6 +52,8 @@ MSVC.PLUGINS.REQUIRED =         \
   filesys/vfs			\
   font/server/freefnt2          \
   mesh/impexp/3ds               \
+  mesh/sprcal3d/object		\
+  mesh/sprcal3d/persist		\
   net/driver/socket		\
   net/driver/ensocket		\
   physics/odedynam              \
