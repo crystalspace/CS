@@ -1334,17 +1334,14 @@ void csSprite3D::Draw (csRenderView& rview)
   // Do vertex morphing if needed.
   for (i = 0 ; i < num_verts ; i++)
   {
-    csVector3 v;
     csVector2 uv;
     if (cfg_lod_detail < 0 || cfg_lod_detail == 1 || i < num_verts-1)
     {
-      v = verts[i];
       uv = tpl->GetTexel (cf_idx, i);
     }
     else
     {
       // Morph between the last vertex and the one we morphed from.
-      v = (1-fnum)*verts[emerge_from[i]] + fnum*verts[i];
       uv = (1-fnum) * tpl->GetTexel (cf_idx, emerge_from[i])
         + fnum * tpl->GetTexel (cf_idx, i);
     }

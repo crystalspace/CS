@@ -615,7 +615,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
       float lightness = lightintensity / usual_value;
 
-      //@@todo
+      //@@@todo
       //The infamous Black Borders {tm} problem:
       // we should set lightness == 1.0 for non-shared edges
       // and leave it as-is for shared

@@ -1,6 +1,60 @@
 The history order has been reversed so that new features are at the top.
 
 17-Apr-2000
+	- Big changes from Andrew Zabolotny again:
+	    - Moved (yet again :-) get_driver_2d() to unix/csosdefs.h.
+	      Now it is a static inline function thus it should work for
+	      software driver. There is no more system-dependent stuff in
+	      soft_g3d.cpp anymore. OS/2 implements its own get_driver_2d()
+	      which selects the MGL 2D driver (see below) if the executable
+	      is run in a full screen session.
+	    - Changed a bit one of 2D/3D driver paradigms: previously it
+	      was supposed that the pixel format is available before
+	      calling Open() (it was supposed to be clarified inside
+	      Initialize() call), from now you cannot know which pixel format
+	      will be used unless you Open'ed the drivers. This is because
+	      there are a lot of hardware environments with this limit,
+	      and up to now they just tried to guess the pixel format which
+	      will be used after Open().  Besides, this is a preparation to
+	      the changes that will allow us to dynamically switch the
+	      resolution/screen depth. Changed the csConsole plugin to
+	      load textures when system opens the main window rather than
+	      in Initialize() (texture manager is not available during
+	      Initialize()).  Other than that, no other changes were
+	      required (to my surprise :-).
+	    - Finished the new SciTech MGL 2D driver. It is completely
+	      system-independent and should work more or less on all
+	      platforms supported by MGL (there is a catch though: I
+	      don't know how it will work on systems that implement
+	      keyboard/mouse input inside the system driver: the MGL event
+	      system and the one inside the system driver may interfere on
+	      some systems). It works perfectly on OS/2 although it is quite
+	      slow for now: I presume it is because I use the backbuffer
+	      in video RAM and video RAM is quite slow on my machine. The
+	      driver should be enhanced to be able to use back buffer
+	      in system memory. The driver supports a lot (I mean A LOT :-)
+	      of different resolutions and screen depths. We need some
+	      functionality (todo) in the 2D driver to query about
+	      available resolutions/screen depths.
+	    - Redesigned quite significantly the input system. Added
+	      preliminary joystick support. It almost works with the new
+	      MGL 2D driver (the joystick poll is commented out for now
+	      because it is a relatively slow operation). We need some way
+	      to enable joystick on demand, also we need a way to implement
+	      joystick calibration. The entire csinput library has been
+	      merged into cssys library. There is a new driver:
+	      csJoystickDriver. The keyboard and mouse drivers were
+	      removed from all system drivers, thus there may be minor
+	      compilation errors if I forgot something (I hope I didn't but
+	      who knows).
+	    - Redesigned a bit the plugin system: there is no RegisterDriver/
+	      UnregisterDriver paradigm anymore. Instead of that, a new
+	      plugin attribute called "functionality identifier" is
+	      introduced. Read include/isystem.h for more information about
+	      it.
+	    - And of course lots of changes to the new loader.
+	- Made a few fixes to the large batch of changes from Andrew.
+	- Norman Kramer removed several warnings.
 	- Eric Sunshine removed all references to the obsolete csInput library
 	  from the documentation and from the makefiles ("$(CSINPUT.LIB)").
 16-Apr-2000
@@ -28,6 +82,36 @@ The history order has been reversed so that new features are at the top.
 	   - Converted all of the GIF files from the map2cs documentation to
 	      PNG format.  Added EPS conversions for printed (TeX) output.
 	   - Made minor corrections to some of the other Texinfo documents.
+	- Wouter Wijngaards added GetArea() function to csPolygon3D to
+	  compute the area of a polygon.
+	- Wouter added GetCSLightMap() to csPolyTexture as he needed the
+	  csRGBLightMaps for radiosity. Also added SetupPolyFill and
+	  DoPolyFill as static functions, they are useful.
+	- Wouter added new radiosity system:
+	  Set the NEWRADIOSITY=yes in cryst.cfg to enable it.
+	  Caveat: it is not stored in precalc.info, so always use -recalc.
+	  Note: flarge takes an hour with 64x64 lightgrid for me.
+	  Reduce your ambient white before using radiosity - it will light up
+	  as well. Remove 20 to 40 from it.
+	  The handbooks say that a small patch size is necessary, thus
+	  16 is 'okay'. But time increases ^2 or ^3 in the number of
+	  patches... So beware.
+	  A feature is needed to really use radiosity: ambient_color for
+	  a polygon, so that a polygon is 'self lit', radiosity will then
+	  spread the light to surroundings.
+	  The global ambient color is removed before radiosity
+	  calculation, and put back afterwards.
+	  Also the old pseudo-radiosity algorithm is not useless, it is
+	  a global-reflection algorithm, and having a 'reflection' fraction
+	  per polygon would be nice, as well as the global_reflection.
+	  When you're adding params to polygons add 'diffuse' for the diffuse
+	  reflection used by the radiosity algorithm. 0.7 now, not often
+	  changed.
+	- Norman Kramer fixed Z-buffer calculation in glide renderer.
+15-Apr-2000
+	- Martin Geisse added a world randomize plug-in.
+	- Martin Geisse added example application for the dungeon plug-in.
+	- Norman Kramer made python plugin compilable.
 14-Apr-2000
 	- As by a suggestion of Wouter Wijngaards, Andrew Zabolotny
 	  converted the poly_fill routine in polytext.cpp (static lighting)
@@ -42,6 +126,8 @@ The history order has been reversed so that new features are at the top.
 	  wasted and only slows down.
 	- Eric Sunshine updated the VC project files (received them
 	  from Nicholas Blumire <empathy@empathy.hostingcheck.com>).
+	- Wouter Wijngaards created iParticle to use with csParticleSystem.
+	  csParticleSystem itself implements iParticle.
 	- Eric Sunshine completed Phase Six of Eric's Big Documentation
 	  Overhaul(tm).
 	    - Completely eliminated all remaining warnings which were reported
@@ -87,6 +173,9 @@ The history order has been reversed so that new features are at the top.
 	    - Way too many additional documentation changes to even begin to
 	      summarize them here.  You'll just have to take my word for it
 	      that a _lot_ has changed. :-)
+	- Paul Garceau reverted a small change from yesterday.
+	- Andrew Zabolotny Fixed a bug in FastSqrt() that caused sqrt(32)
+	  to return 4e18. In fact, any sqrt(power-of-two) was incorrect.
 13-Apr-2000
 	- Changes from Paul Garceau:
 	  Patch for Mingw to work around unknown escape sequence
