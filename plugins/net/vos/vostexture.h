@@ -35,7 +35,10 @@
 
 class ConstructTextureTask;
 
-class csMetaTexture : public A3DL::Texture, VOS::ChildChangeListener, VOS::PropertyListener
+class csMetaTexture :
+  public A3DL::Texture,
+  public VOS::ChildChangeListener,
+  public VOS::PropertyListener
 {
 private:
   csRef<iTextureWrapper> texturewrapper;
@@ -57,7 +60,8 @@ public:
   virtual void notifyChildReplaced(VOS::VobjectEvent& event);
   virtual void notifyChildRemoved(VOS::VobjectEvent& event);
 
-  static VOS::MetaObject* new_csMetaTexture(VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaTexture(
+    VOS::VobjectBase* superobject, const std::string& type);
 
   friend class ConstructTextureTask;
 };

@@ -30,6 +30,12 @@ chronological order.
 	- Eric Sunshine greatly enhanced the Doxygen documentation for
 	  iNetworkSocket so that it explains precisely what the interface
 	  represents, and how & when clients might want to use it.
+	- Eric Sunshine fixed classes csMetaMaterial and csMetaTexture in
+	  csvosa3dl plugin.  They were accidentally and incorrectly using
+	  private inheritance.  Note that "class Foo : public Bar, Cow, Smoo"
+	  is not the same as "class Foo : public Bar, public Cow, public Smoo".
+	- Eric Sunshine updated csvosa3dl.mak so that it links the plugin
+	  against csgeom.
 14-Jan-2004
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.

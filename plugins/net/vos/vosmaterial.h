@@ -33,10 +33,12 @@
 
 #include "iengine/material.h"
 
-class iMaterialWrapper;
 class ConstructMaterialTask;
 
-class csMetaMaterial : public A3DL::Material, VOS::ChildChangeListener, VOS::PropertyListener
+class csMetaMaterial :
+  public A3DL::Material,
+  public VOS::ChildChangeListener,
+  public VOS::PropertyListener
 {
 protected:
   csRef<iMaterialWrapper> materialwrapper;
@@ -48,7 +50,7 @@ public:
 
   virtual void setup(csVosA3DL* vosa3dl);
 
-  /** Return CS icsMetaMaterialWrapper interface for this object */
+  /** Return CS iMaterialWrapper interface for this object */
   csRef<iMaterialWrapper> getMaterialWrapper();
 
   virtual void notifyPropertyChange(const VOS::PropertyEvent& event);
@@ -56,7 +58,8 @@ public:
   virtual void notifyChildReplaced(VOS::VobjectEvent& event);
   virtual void notifyChildRemoved(VOS::VobjectEvent& event);
 
-  static VOS::MetaObject* new_csMetaMaterial(VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaMaterial(
+    VOS::VobjectBase* superobject, const std::string& type);
 
   friend class ConstructMaterialTask;
 };
