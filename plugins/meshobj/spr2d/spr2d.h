@@ -136,8 +136,9 @@ public:
       scfParent->MixMode = mode;
     }
     virtual void Rotate (float angle);
-    virtual void Draw (iRenderView* rview);
-    virtual void UpdateLighting (iLight** lights, int num_lights);
+    virtual void Draw (iRenderView* rview, const csReversibleTransform& transform);
+    virtual void UpdateLighting (iLight** lights, int num_lights,
+	const csReversibleTransform& transform);
   } scfiParticle;
   friend class Particle;
 };

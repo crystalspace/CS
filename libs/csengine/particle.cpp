@@ -242,14 +242,16 @@ void csParticleSystem :: Update(cs_time elapsed_time)
 
 void csParticleSystem::Draw (csRenderView& rview)
 {
-  UpdateDeferedLighting (movable.GetPosition ());
+  csReversibleTransform trans = movable.GetFullTransform ();
+  UpdateDeferedLighting (trans.GetOrigin ());
   iRenderView* irview = QUERY_INTERFACE (&rview, iRenderView);
   for (int i = 0; i<particles.Length(); i++)
-    GetParticle(i)->Draw (irview);
+    GetParticle(i)->Draw (irview, trans);
 }
 
 void csParticleSystem::UpdateLighting (csLight** lights, int num_lights)
 {
+  csReversibleTransform trans = movable.GetFullTransform ();
   defered_num_lights = 0;
   // @@@ NOT EFFICIENT!!!
   iLight** ilights = new iLight*[num_lights];
@@ -257,7 +259,7 @@ void csParticleSystem::UpdateLighting (csLight** lights, int num_lights)
   for (i = 0 ; i < num_lights ; i++)
     ilights[i] = QUERY_INTERFACE (lights[i], iLight);
   for (i = 0; i<particles.Length(); i++)
-    GetParticle(i)->UpdateLighting (ilights, num_lights);
+    GetParticle(i)->UpdateLighting (ilights, num_lights, trans);
   delete[] ilights;
 }
 

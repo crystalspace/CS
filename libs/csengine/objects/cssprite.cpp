@@ -28,13 +28,11 @@
 #include "csengine/sector.h"
 #include "csengine/bspbbox.h"
 #include "csengine/dumper.h"
-#include "csengine/particle.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/fastsqrt.h"
 #include "csutil/garray.h"
 #include "csutil/rng.h"
 #include "igraph3d.h"
-#include "iparticl.h"
 
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.
@@ -498,13 +496,8 @@ void csSpriteTemplate::HardTransform (const csReversibleTransform& t)
 IMPLEMENT_CSOBJTYPE (csSprite, csPObject)
 
 IMPLEMENT_IBASE_EXT (csSprite)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSprite)
 IMPLEMENT_IBASE_EXT_END
-
-IMPLEMENT_EMBEDDED_IBASE (csSprite::Particle)
-  IMPLEMENTS_INTERFACE (iParticle)
-IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSprite::Sprite)
   IMPLEMENTS_INTERFACE (iSprite)
@@ -512,7 +505,6 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 csSprite::csSprite (csObject* theParent) : csPObject ()
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite);
   movable.scfParent = this;
   dynamiclights = NULL;
@@ -631,31 +623,24 @@ bool csSprite::HitBeam (const csVector3& start, const csVector3& end,
   return rc;
 }
 
-void csSprite::Particle::SetPosition(const csVector3& v)
-  { scfParent->GetMovable().SetPosition(v); scfParent->GetMovable ().UpdateMove (); }
-void csSprite::Particle::MovePosition(const csVector3& v)
-  { scfParent->GetMovable().MovePosition(v); scfParent->GetMovable ().UpdateMove (); }
-void csSprite::Particle::SetColor(const csColor& c)
-  { scfParent->SetColor(c); }
-void csSprite::Particle::AddColor(const csColor& c)
-  { scfParent->AddColor(c); }
-void csSprite::Particle::ScaleBy(float factor)
-  { scfParent->ScaleBy(factor); }
-void csSprite::Particle::SetMixmode(UInt mode)
-  { scfParent->SetMixmode(mode); }
-void csSprite::Particle::Rotate(float angle)
-  { scfParent->Rotate(angle); }
-void csSprite::Particle::Draw (iRenderView* v)
-  { scfParent->Draw (*(v->GetPrivateObject ())); }
-void csSprite::Particle::UpdateLighting(iLight** lights, int num_lights)
+void csSprite::ScaleBy (float factor)
 {
-  // @@@ NOT EFFICIENT: TEMPORARY
-  csLight** cslights = new csLight*[num_lights];
-  int i;
-  for (i = 0 ; i < num_lights ; i++)
-    cslights[i] = lights[i]->GetPrivateObject ();
-  scfParent->UpdateLighting (cslights, num_lights);
-  delete[] cslights;
+  csMatrix3 trans = movable.GetTransform ().GetT2O ();
+  trans.m11 *= factor;
+  trans.m22 *= factor;
+  trans.m33 *= factor;
+  movable.SetTransform (trans);
+  UpdateMove ();
+}
+
+
+void csSprite::Rotate (float angle)
+{
+  csZRotMatrix3 rotz(angle);
+  movable.Transform (rotz);
+  csXRotMatrix3 rotx(angle);
+  movable.Transform (rotx);
+  UpdateMove ();
 }
 
 //=============================================================================
@@ -737,39 +722,17 @@ void csSprite3D::SetMaterial (csMaterialWrapper *material)
   cstxt = material;
 }
 
-
-void csSprite3D::ScaleBy (float factor)
-{
-  csMatrix3 trans = movable.GetTransform ().GetT2O ();
-  trans.m11 *= factor;
-  trans.m22 *= factor;
-  trans.m33 *= factor;
-  movable.SetTransform (trans);
-  UpdateMove ();
-}
-
-
-void csSprite3D::Rotate (float angle)
-{
-  csZRotMatrix3 rotz(angle);
-  movable.Transform (rotz);
-  csXRotMatrix3 rotx(angle);
-  movable.Transform (rotx);
-  UpdateMove ();
-}
-
-
 void csSprite3D::SetColor (const csColor& col)
 {
-  for(int i=0; i<tpl->GetNumTexels(); i++)
-    SetVertexColor(i, col);
+  for (int i=0 ; i < tpl->GetNumTexels () ; i++)
+    SetVertexColor (i, col);
 }
 
 
 void csSprite3D::AddColor (const csColor& col)
 {
-  for(int i=0; i<tpl->GetNumTexels(); i++)
-    AddVertexColor(i, col);
+  for (int i=0 ; i < tpl->GetNumTexels () ; i++)
+    AddVertexColor (i, col);
 }
 
 

@@ -55,6 +55,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   csSprite2DMeshObject::factory = factory;
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
+  MixMode = factory->GetMixMode ();
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -330,17 +331,21 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   }
 }
 
-void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights, int num_lights)
+void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights,
+    int num_lights, const csReversibleTransform& transform)
 {
-  scfParent->UpdateLighting (lights, num_lights, part_pos);
+  csVector3 new_pos = transform.This2Other (part_pos);
+  scfParent->UpdateLighting (lights, num_lights, new_pos);
 }
 
-void csSprite2DMeshObject::Particle::Draw (iRenderView* rview)
+void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
+    const csReversibleTransform& transform)
 {
   scfParent->SetupObject ();
 
   // Camera transformation for the single 'position' vector.
-  scfParent->cam = rview->GetCamera ()->GetTransform ().Other2This (part_pos);
+  csVector3 new_pos = transform.This2Other (part_pos);
+  scfParent->cam = rview->GetCamera ()->GetTransform ().Other2This (new_pos);
   if (scfParent->cam.z < SMALL_Z) return;
   scfParent->Draw (rview, NULL);
 }
@@ -398,6 +403,7 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory ()
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DFactoryState);
   material = NULL;
   MixMode = 0;
+  lighting = true;
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

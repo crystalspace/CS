@@ -21,12 +21,12 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
-#include "plugins/meshldr/fountain/fountldr.h"
+#include "plugins/meshldr/fire/fireldr.h"
 #include "imeshobj.h"
 #include "iengine.h"
 #include "isystem.h"
 #include "impartic.h"
-#include "imfount.h"
+#include "imfire.h"
 #include "igraph3d.h"
 #include "qint.h"
 
@@ -39,64 +39,61 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (TRANSPARENT)
 
-  CS_TOKEN_DEF (ACCEL)
-  CS_TOKEN_DEF (AZIMUTH)
+  CS_TOKEN_DEF (COLORSCALE)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (DROPSIZE)
-  CS_TOKEN_DEF (ELEVATION)
   CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (FALLTIME)
   CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (OPENING)
   CS_TOKEN_DEF (ORIGIN)
-  CS_TOKEN_DEF (SPEED)
+  CS_TOKEN_DEF (SWIRL)
+  CS_TOKEN_DEF (TOTALTIME)
 CS_TOKEN_DEF_END
 
-IMPLEMENT_IBASE (csFountainFactoryLoader)
+IMPLEMENT_IBASE (csFireFactoryLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE (csFountainLoader)
+IMPLEMENT_IBASE (csFireLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFountainFactoryLoader)
-IMPLEMENT_FACTORY (csFountainLoader)
+IMPLEMENT_FACTORY (csFireFactoryLoader)
+IMPLEMENT_FACTORY (csFireLoader)
 
-EXPORT_CLASS_TABLE (fountldr)
-  EXPORT_CLASS (csFountainFactoryLoader, "crystalspace.meshldr.fountfact",
-    "Crystal Space Fountain Factory Loader")
-  EXPORT_CLASS (csFountainLoader, "crystalspace.meshldr.fount",
-    "Crystal Space Fountain Mesh Loader")
+EXPORT_CLASS_TABLE (fireldr)
+  EXPORT_CLASS (csFireFactoryLoader, "crystalspace.meshldr.firefact",
+    "Crystal Space Fire Factory Loader")
+  EXPORT_CLASS (csFireLoader, "crystalspace.meshldr.fire",
+    "Crystal Space Fire Mesh Loader")
 EXPORT_CLASS_TABLE_END
 
-csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
+csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
   CONSTRUCT_IBASE (pParent);
 }
 
-csFountainFactoryLoader::~csFountainFactoryLoader ()
+csFireFactoryLoader::~csFireFactoryLoader ()
 {
 }
 
-bool csFountainFactoryLoader::Initialize (iSystem* system)
+bool csFireFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
   return true;
 }
 
-iBase* csFountainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
+iBase* csFireFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
 {
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.meshobj.fountain", "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.meshobj.fire", "MeshObj", iMeshObjectType);
   if (!type)
   {
-    type = LOAD_PLUGIN (sys, "crystalspace.meshobj.fountain", "MeshObj", iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.meshobj.fountain\n");
+    type = LOAD_PLUGIN (sys, "crystalspace.meshobj.fire", "MeshObj", iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.meshobj.fire\n");
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   return fact;
@@ -104,16 +101,16 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine
 
 //---------------------------------------------------------------------------
 
-csFountainLoader::csFountainLoader (iBase* pParent)
+csFireLoader::csFireLoader (iBase* pParent)
 {
   CONSTRUCT_IBASE (pParent);
 }
 
-csFountainLoader::~csFountainLoader ()
+csFireLoader::~csFireLoader ()
 {
 }
 
-bool csFountainLoader::Initialize (iSystem* system)
+bool csFireLoader::Initialize (iSystem* system)
 {
   sys = system;
   return true;
@@ -170,19 +167,16 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
+iBase* csFireLoader::Parse (const char* string, iEngine* engine)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (FACTORY)
     CS_TOKEN_TABLE (ORIGIN)
-    CS_TOKEN_TABLE (ACCEL)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (FALLTIME)
+    CS_TOKEN_TABLE (SWIRL)
+    CS_TOKEN_TABLE (TOTALTIME)
+    CS_TOKEN_TABLE (COLORSCALE)
     CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (OPENING)
-    CS_TOKEN_TABLE (AZIMUTH)
-    CS_TOKEN_TABLE (ELEVATION)
     CS_TOKEN_TABLE (DROPSIZE)
     CS_TOKEN_TABLE (LIGHTING)
     CS_TOKEN_TABLE (NUMBER)
@@ -196,7 +190,7 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
 
   iMeshObject* mesh = NULL;
   iParticleState* partstate = NULL;
-  iFountainState* fountstate = NULL;
+  iFireState* firestate = NULL;
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -219,56 +213,35 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
 	{
 	  float dw, dh;
 	  ScanStr (params, "%f,%f", &dw, &dh);
-	  fountstate->SetDropSize (dw, dh);
+	  firestate->SetDropSize (dw, dh);
 	}
 	break;
       case CS_TOKEN_ORIGIN:
 	{
 	  csVector3 origin;
 	  ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
-	  fountstate->SetOrigin (origin);
+	  firestate->SetOrigin (origin);
 	}
 	break;
-      case CS_TOKEN_ACCEL:
-	{
-	  csVector3 accel;
-	  ScanStr (params, "%f,%f,%f", &accel.x, &accel.y, &accel.z);
-	  fountstate->SetAcceleration (accel);
-	}
-	break;
-      case CS_TOKEN_SPEED:
+      case CS_TOKEN_SWIRL:
 	{
 	  float f;
 	  ScanStr (params, "%f", &f);
-	  fountstate->SetSpeed (f);
+	  firestate->SetSwirl (f);
 	}
 	break;
-      case CS_TOKEN_OPENING:
+      case CS_TOKEN_COLORSCALE:
 	{
 	  float f;
 	  ScanStr (params, "%f", &f);
-	  fountstate->SetOpening (f);
+	  firestate->SetColorScale (f);
 	}
 	break;
-      case CS_TOKEN_AZIMUTH:
+      case CS_TOKEN_TOTALTIME:
 	{
 	  float f;
 	  ScanStr (params, "%f", &f);
-	  fountstate->SetAzimuth (f);
-	}
-	break;
-      case CS_TOKEN_ELEVATION:
-	{
-	  float f;
-	  ScanStr (params, "%f", &f);
-	  fountstate->SetElevation (f);
-	}
-	break;
-      case CS_TOKEN_FALLTIME:
-	{
-	  float f;
-	  ScanStr (params, "%f", &f);
-	  fountstate->SetFallTime (f);
+	  firestate->SetTotalTime (f);
 	}
 	break;
       case CS_TOKEN_FACTORY:
@@ -282,7 +255,7 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = QUERY_INTERFACE (mesh, iParticleState);
-          fountstate = QUERY_INTERFACE (mesh, iFountainState);
+          firestate = QUERY_INTERFACE (mesh, iFireState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -305,14 +278,14 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine)
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
-          fountstate->SetLighting (do_lighting);
+          firestate->SetLighting (do_lighting);
         }
         break;
       case CS_TOKEN_NUMBER:
         {
           int nr;
           ScanStr (params, "%d", &nr);
-          fountstate->SetNumberParticles (nr);
+          firestate->SetNumberParticles (nr);
         }
         break;
     }

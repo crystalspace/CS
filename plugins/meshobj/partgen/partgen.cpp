@@ -21,10 +21,12 @@
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/fastsqrt.h"
+#include "csgeom/transfrm.h"
 #include "plugins/meshobj/partgen/partgen.h"
 #include "imeshobj.h"
 #include "isystem.h"
 #include "imspr2d.h"
+#include "imovable.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -41,7 +43,7 @@ csParticleSystem::csParticleSystem (iSystem* system)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
-  particles.SetLength(0);
+  particles.SetLength (0);
   self_destruct = false;
   time_to_live = 0;
   to_delete = false;
@@ -53,6 +55,7 @@ csParticleSystem::csParticleSystem (iSystem* system)
   // bbox is empty.
   spr_factory = NULL;
   prev_time = 0;
+  MixMode = 0;
 
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (system, "crystalspace.meshobj.spr2d",
       "MeshObj", iMeshObjectType);
@@ -77,24 +80,26 @@ void csParticleSystem::RemoveParticles ()
 void csParticleSystem::AppendRectSprite (float width, float height, 
   iMaterialWrapper *mat, bool lighted)
 {
-  iParticle *pTicle;
   iMeshObject* sprmesh = spr_factory->NewInstance ();
   iParticle* part = QUERY_INTERFACE (sprmesh, iParticle);
   iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
   csColoredVertices& vs = state->GetVertices();
 
-  vs.SetLimit(4);
-  vs.SetLength(4);
-  vs[0].pos.Set(-width,-height); vs[0].u=0.; vs[0].v=1.;
-  vs[1].pos.Set(-width,+height); vs[1].u=0.; vs[1].v=0.;
-  vs[2].pos.Set(+width,+height); vs[2].u=1.; vs[2].v=0.;
-  vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=1.;
-  state->SetLighting( lighted );
-  part->SetColor( csColor(1.0, 1.0, 1.0) );
+  vs.SetLimit (4);
+  vs.SetLength (4);
+  vs[0].pos.Set (-width,-height); vs[0].u=0.; vs[0].v=1.;
+  vs[0].color.Set (0, 0, 0);
+  vs[1].pos.Set (-width,+height); vs[1].u=0.; vs[1].v=0.;
+  vs[1].color.Set (0, 0, 0);
+  vs[2].pos.Set (+width,+height); vs[2].u=1.; vs[2].v=0.;
+  vs[2].color.Set (0, 0, 0);
+  vs[3].pos.Set (+width,-height); vs[3].u=1.; vs[3].v=1.;
+  vs[3].color.Set (0, 0, 0);
+  state->SetLighting (lighted);
+  part->SetColor (csColor (1.0, 1.0, 1.0));
   state->SetMaterialWrapper (mat);
-  AppendParticle(pTicle = part);
-  pTicle->DecRef ();
-  part->DecRef(); 
+  AppendParticle (part);
+  part->DecRef (); 
   
 }
 
@@ -102,19 +107,17 @@ void csParticleSystem::AppendRectSprite (float width, float height,
 void csParticleSystem::AppendRegularSprite (int n, float radius, 
   iMaterialWrapper* mat, bool lighted)
 {
-  iParticle *pTicle;
   iMeshObject* sprmesh = spr_factory->NewInstance ();
   iParticle* part = QUERY_INTERFACE (sprmesh, iParticle);
   iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
   state->CreateRegularVertices (n, true);
-  part->ScaleBy(radius);
+  part->ScaleBy (radius);
   state->SetMaterialWrapper (mat);
-  state->SetLighting( lighted );
-  part->SetColor( csColor(1.0, 1.0, 1.0) );
+  state->SetLighting (lighted);
+  part->SetColor (csColor (1.0, 1.0, 1.0));
 
-  AppendParticle(pTicle = part);
-  pTicle->DecRef ();
-  part->DecRef(); 
+  AppendParticle (part);
+  part->DecRef (); 
 }
 
 
@@ -203,10 +206,11 @@ bool csParticleSystem::DrawTest (iRenderView*, iMovable*)
   return true;
 }
 
-bool csParticleSystem::Draw (iRenderView* rview, iMovable* /*movable*/)
+bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable)
 {
+  csReversibleTransform trans = movable->GetFullTransform ();
   for (int i = 0 ; i < particles.Length() ; i++)
-    GetParticle (i)->Draw (rview);
+    GetParticle (i)->Draw (rview, trans);
   return true;
 }
 
@@ -214,8 +218,9 @@ void csParticleSystem::UpdateLighting (iLight** lights, int num_lights,
     iMovable* movable)
 {
   SetupObject ();
-  for (int i = 0 ; i < particles.Length() ; i++)
-    GetParticle (i)->UpdateLighting (lights, num_lights);
+  csReversibleTransform trans = movable->GetFullTransform ();
+  for (int i = 0 ; i < particles.Length () ; i++)
+    GetParticle (i)->UpdateLighting (lights, num_lights, trans);
 }
 
 //---------------------------------------------------------------------
@@ -268,16 +273,16 @@ csNewtonianParticleSystem::~csNewtonianParticleSystem ()
 void csNewtonianParticleSystem::Update (cs_time elapsed_time)
 {
   csVector3 move;
-  csParticleSystem::Update(elapsed_time);
+  csParticleSystem::Update (elapsed_time);
   // time passed; together with CS 1 unit = 1 meter makes units right.
   float delta_t = elapsed_time / 1000.0f; // in seconds
-  for (int i=0; i<particles.Length(); i++)
+  for (int i=0 ; i < particles.Length () ; i++)
   {
     // notice that the ordering of the lines (1) and (2) makes the
     // resulting newpos = a*dt^2 + v*dt + oldposition (i.e. paraboloid).
     part_speed[i] += part_accel[i] * delta_t; // (1)
     move = part_speed[i] * delta_t; // (2)
-    GetParticle(i)->MovePosition (move); 
+    GetParticle (i)->MovePosition (move); 
   }
 }
 

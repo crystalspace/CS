@@ -25,8 +25,18 @@
 #include "iengine.h"
 #include "isystem.h"
 #include "imspr2d.h"
+#include "igraph3d.h"
+#include "qint.h"
 
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (ADD)
+  CS_TOKEN_DEF (ALPHA)
+  CS_TOKEN_DEF (COPY)
+  CS_TOKEN_DEF (KEYCOLOR)
+  CS_TOKEN_DEF (MULTIPLY2)
+  CS_TOKEN_DEF (MULTIPLY)
+  CS_TOKEN_DEF (TRANSPARENT)
+
   CS_TOKEN_DEF (COLORS)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (LIGHTING)
@@ -69,6 +79,57 @@ bool csSprite2DFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
   return true;
+}
+
+static UInt ParseMixmode (char* buf)
+{
+  CS_TOKEN_TABLE_START (modes)
+    CS_TOKEN_TABLE (COPY)
+    CS_TOKEN_TABLE (MULTIPLY2)
+    CS_TOKEN_TABLE (MULTIPLY)
+    CS_TOKEN_TABLE (ADD)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (KEYCOLOR)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  UInt Mixmode = 0;
+
+  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      return 0;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
+      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
+      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
+      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
+      case CS_TOKEN_ALPHA:
+	Mixmode &= ~CS_FX_MASK_ALPHA;
+	float alpha;
+	int ialpha;
+        ScanStr (params, "%f", &alpha);
+	ialpha = QInt (alpha * 255.99);
+	Mixmode |= CS_FX_SETALPHA(ialpha);
+	break;
+      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
+      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
+    return 0;
+  }
+  return Mixmode;
 }
 
 iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
@@ -126,7 +187,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
         }
 	break;
       case CS_TOKEN_MIXMODE:
-	printf ("Not implemented yet!\n");
+        spr2dLook->SetMixMode (ParseMixmode (params));
 	break;
     }
   }
@@ -210,7 +271,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-	printf ("Not implemented yet!\n");
+        spr2dLook->SetMixMode (ParseMixmode (params));
 	break;
       case CS_TOKEN_VERTICES:
         {

@@ -53,45 +53,6 @@ csMeshWrapper::~csMeshWrapper ()
   if (mesh) mesh->DecRef ();
 }
 
-void csMeshWrapper::ScaleBy (float factor)
-{
-  // @@@ OBSOLETE
-  csMatrix3 trans = movable.GetTransform ().GetT2O ();
-  trans.m11 *= factor;
-  trans.m22 *= factor;
-  trans.m33 *= factor;
-  movable.SetTransform (trans);
-  UpdateMove ();
-}
-
-
-void csMeshWrapper::Rotate (float angle)
-{
-  // @@@ OBSOLETE
-  csZRotMatrix3 rotz (angle);
-  movable.Transform (rotz);
-  csXRotMatrix3 rotx (angle);
-  movable.Transform (rotx);
-  UpdateMove ();
-}
-
-
-void csMeshWrapper::SetColor (const csColor& /*col*/)
-{
-  // @@@ OBSOLETE
-  //for (int i=0; i<tpl->GetNumTexels (); i++)
-    //SetVertexColor (i, col);
-}
-
-
-void csMeshWrapper::AddColor (const csColor& /*col*/)
-{
-  // @@@ OBSOLETE
-  //for (int i=0; i<tpl->GetNumTexels (); i++)
-    //AddVertexColor (i, col);
-}
-
-
 void csMeshWrapper::UpdateInPolygonTrees ()
 {
   bbox.RemoveFromTree ();
@@ -166,6 +127,12 @@ void csMeshWrapper::Draw (csRenderView& rview)
 void csMeshWrapper::NextFrame (cs_time current_time)
 {
   mesh->NextFrame (current_time);
+  int i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csSprite* spr = (csSprite*)children[i];
+    spr->NextFrame (current_time);
+  }
 }
 
 void csMeshWrapper::UpdateLighting (csLight** lights, int num_lights)

@@ -22,10 +22,11 @@
 #include "csutil/scf.h"
 class csColor;
 class csVector3;
+class csReversibleTransform;
 struct iRenderView;
 struct iLight;
 
-SCF_VERSION (iParticle, 0, 0, 2);
+SCF_VERSION (iParticle, 0, 0, 3);
 
 /**
  * A iParticle can be used in particle Systems.
@@ -36,9 +37,14 @@ SCF_VERSION (iParticle, 0, 0, 2);
  */
 struct iParticle : public iBase
 {
-  /// Set the position of this particle in world coordinates.
+  /**
+   * Set the position of this particle in coordinates relative
+   * to the parent particle system.
+   */
   virtual void SetPosition (const csVector3& pos) = 0;
-  /// Move the particle relative to position.
+  /**
+   * Move the particle relative to position.
+   */
   virtual void MovePosition (const csVector3& move) = 0;
 
   /// Set the color of this particle.
@@ -51,10 +57,19 @@ struct iParticle : public iBase
   virtual void SetMixmode (UInt mode) = 0;
   /// Rotate the particle is some particle dependent manner, in radians.
   virtual void Rotate (float angle) = 0;
-  /// Draw this particle.
-  virtual void Draw (iRenderView* rview) = 0;
-  /// Light this particle.
-  virtual void UpdateLighting (iLight** lights, int num_lights) = 0;
+  /**
+   * Draw this particle. The given transform is the transform of the
+   * parent particle system. The position of this particle should be
+   * relative to that transform.
+   */
+  virtual void Draw (iRenderView* rview, const csReversibleTransform& transform) = 0;
+  /**
+   * Light this particle.
+   * The given transform is the transform of the parent particle system.
+   * The position of this particle should be relative to that transform.
+   */
+  virtual void UpdateLighting (iLight** lights, int num_lights,
+      const csReversibleTransform& transform) = 0;
 };
 
 #endif // __IPARTCL_H__

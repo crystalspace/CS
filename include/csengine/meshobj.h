@@ -63,21 +63,6 @@ public:
   /// Set the mesh object.
   void SetMeshObject (iMeshObject* mesh);
 
-  /// Scale the mesh object by scaling the diagonal of the transform.
-  virtual void ScaleBy (float factor);
-
-  /**
-   * Rotate the mesh object in some way, angle in radians.
-   * currently first z-rotates angle then x-rotates angle.
-   */
-  virtual void Rotate (float angle);
-
-  /// Set color for all vertices.
-  virtual void SetColor (const csColor& col);
-
-  /// Add color to all vertices.
-  virtual void AddColor (const csColor& col);
-
   /**
    * Light object according to the given array of lights (i.e.
    * fill the vertex color array).

@@ -41,7 +41,6 @@
 #include "csengine/particle.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
-#include "csfx/partfire.h"
 #include "csfx/partspir.h"
 #include "csfx/partsnow.h"
 #include "csfx/partrain.h"
@@ -64,6 +63,7 @@
 #include "impartic.h"
 #include "imfount.h"
 #include "imexplo.h"
+#include "imfire.h"
 
 extern WalkTest* Sys;
 
@@ -221,13 +221,30 @@ void add_particles_fire (csSector* sector, char* matname, int num,
     return;
   }
 
-   csFireParticleSystem* exp = new csFireParticleSystem(
-     Sys->view->GetEngine (), num, mat,
-     CS_FX_ADD, false, 0.02, 0.04,
-     3.0, csVector3(0,1.0,0), origin,
-     0.6, 0.20);
+  // @@@ Memory leak on factories!
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.fire",
+      	"MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.fire",
+      	"MeshObj", iMeshObjectType);
+  iMeshObjectFactory* factory = type->NewFactory ();
+  iMeshObject* mesh = factory->NewInstance ();
+  csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
+
+  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  partstate->SetMixMode (CS_FX_ADD);
+
+  iFireState* firestate = QUERY_INTERFACE (mesh, iFireState);
+  firestate->SetNumberParticles (num);
+  firestate->SetDropSize (.02, .04);
+  firestate->SetLighting (false);
+  firestate->SetOrigin (origin);
+  firestate->SetDirection (csVector3 (0, 1., 0));
+  firestate->SetSwirl (0.6);
+  firestate->SetColorScale (0.2);
 }
 
 //===========================================================================

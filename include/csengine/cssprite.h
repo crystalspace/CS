@@ -34,7 +34,6 @@
 #include "csengine/triangle.h"
 #include "csengine/movable.h"
 #include "igraph3d.h"
-#include "iparticl.h"
 #include "ipolmesh.h"
 #include "isprite.h"
 
@@ -696,15 +695,6 @@ public:
    */
   csMovable& GetMovable () { return movable; }
 
-  /// Set the color of this sprite.
-  virtual void SetColor (const csColor&) = 0;
-
-  /// Add color to the color of the sprite.
-  virtual void AddColor (const csColor& col) = 0;
-
-  /// Scale sprite by this factor. 
-  virtual void ScaleBy (float factor) = 0;
-
   /**
    * Check if this sprite is hit by this object space vector.
    * Return the collision point in object space coordinates.
@@ -718,29 +708,23 @@ public:
   bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 
-  /// Rotate sprite in some manner (as defined by subclass), in radians.
-  virtual void Rotate (float angle) = 0;
+  /**
+   * Rotate sprite in some manner in radians.
+   * This function operates by rotating the movable transform.
+   */
+  void Rotate (float angle);
+
+  /**
+   * Scale sprite by this factor. 
+   * This function operates by scaling the movable transform.
+   */
+  void ScaleBy (float factor);
 
   /// Returns true if this object wants to die.
   virtual bool WantToDie () { return false; }
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
-
-  //------------------------ iParticle implementation -----------------------//
-  struct Particle : public iParticle
-  {
-    DECLARE_EMBEDDED_IBASE (csSprite);
-    virtual void SetPosition (const csVector3&);
-    virtual void MovePosition (const csVector3&);
-    virtual void SetColor (const csColor&);
-    virtual void AddColor (const csColor&);
-    virtual void ScaleBy (float factor);
-    virtual void SetMixmode (UInt mode);
-    virtual void Rotate (float angle);
-    virtual void Draw (iRenderView*);
-    virtual void UpdateLighting (iLight**, int num_lights);
-  } scfiParticle;
 
   //-------------------------- iSprite implementation -----------------------//
   struct Sprite : public iSprite
@@ -1057,20 +1041,11 @@ public:
   /// Is tweening enabled?
   bool IsTweeningEnabled () { return do_tweening; }
 
-  /// Scale the sprite by scaling the diagonal of the transform
-  virtual void ScaleBy (float factor);
-
-  /**
-   * Rotate the sprite in some way, angle in radians.
-   * currently first z-rotates angle then x-rotates angle.
-   */
-  virtual void Rotate (float angle);
-
   /// Set color for all vertices
-  virtual void SetColor (const csColor& col);
+  void SetColor (const csColor& col);
 
   /// Add color to all vertices
-  virtual void AddColor (const csColor& col);
+  void AddColor (const csColor& col);
 
   /**
    * Set a color for a vertex.

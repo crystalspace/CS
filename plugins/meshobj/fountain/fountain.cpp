@@ -76,12 +76,14 @@ csFountainMeshObject::csFountainMeshObject (iSystem* system)
   part_pos = NULL;
   part_speed = NULL;
   part_age = NULL;
-  accel = csVector3 (0, 1, 0);
+  accel.Set (0, -1, 0);
+  origin.Set (0, 0, 0);
   fall_time = 1;
   speed = 1;
   opening = 1;
   azimuth = 1;
   elevation = 1;
+  number = 50;
 }
 
 csFountainMeshObject::~csFountainMeshObject()
@@ -96,24 +98,24 @@ void csFountainMeshObject::RestartParticle (int index, float pre_move)
 {
   csVector3 dest; // destination spot of particle (for speed at start)
   dest.Set(speed, 0.0f, 0.0f);
-  /// now make it shoot to a circle in the x direction
+  // now make it shoot to a circle in the x direction
   float rotz_open = 2.0 * opening * (rand() / (1.0+RAND_MAX)) - opening;
   csZRotMatrix3 openrot(rotz_open);
   dest = openrot * dest;
   float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
-  /// now dest point to somewhere in a circular cur of a sphere around the 
-  /// x axis.
+  // now dest point to somewhere in a circular cur of a sphere around the 
+  // x axis.
 
-  /// direct the fountain to the users dirction
+  // direct the fountain to the users dirction
   csZRotMatrix3 elev(elevation);
   dest = elev * dest;
   csYRotMatrix3 compassdir(azimuth);
   dest = compassdir * dest;
 
-  /// now dest points to the exit speed of the spout if that spout was
-  /// at 0,0,0.
+  // now dest points to the exit speed of the spout if that spout was
+  // at 0,0,0.
   part_pos[index] = origin;
   part_speed[index] = dest;
 
@@ -126,7 +128,7 @@ void csFountainMeshObject::RestartParticle (int index, float pre_move)
 }
 
 
-int csFountainMeshObject::FindOldest()
+int csFountainMeshObject::FindOldest ()
 {
   int ret = next_oldest;
   next_oldest = (next_oldest + 1 ) % amt;
@@ -136,11 +138,11 @@ int csFountainMeshObject::FindOldest()
 void csFountainMeshObject::Update (cs_time elapsed_time)
 {
   SetupObject ();
-  csParticleSystem::Update(elapsed_time);
+  csParticleSystem::Update (elapsed_time);
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
   int i;
-  for(i=0; i<particles.Length(); i++)
+  for (i=0 ; i < particles.Length() ; i++)
   {
     part_speed[i] += accel * delta_t;
     part_pos[i] += part_speed[i] * delta_t;
@@ -148,12 +150,12 @@ void csFountainMeshObject::Update (cs_time elapsed_time)
     part_age[i] += delta_t;
   }
 
-  /// restart a number of particles
+  // restart a number of particles
   float intersperse = fall_time / (float)amt;
   float todo_time = delta_t + time_left;
-  while(todo_time > intersperse)
+  while (todo_time > intersperse)
   {
-    RestartParticle(FindOldest(), todo_time);
+    RestartParticle (FindOldest (), todo_time);
     todo_time -= intersperse;
   }
   time_left = todo_time;

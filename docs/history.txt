@@ -1,6 +1,53 @@
 The history order has been reversed so that new features are at the top.
 
+5-Jan-2001
+	- Wouter Wijngaards says: From Harald Fielker
+	  (fielker@informatik.fh-augsburg.de) I got an addition to csloader,
+	  a LoadThing and LoadThingTemplate methods. You can load a thing
+	  from a vfs file with them.
+	- Norman Kramer replaced AdvanceSpriteFrames with engines NextFrame
+	  for cctest.
+	- Fixed a big initialization bug in the spr2d plugin. This would
+	  cause strange and hard to debug crashes sometimes.
+	- Fixed a very similar initialization bug in the fountain and
+	  explosion plugins.
+	- Fixed another bug in the general particle code for the particle
+	  plugins. Particles were DecRef()'ed once too many.
+	- Fixed csMeshWrapper::NextFrame() so that it also calls NextFrame
+	  on the children.
+	- csSprite no longer implements iParticle. In the future it will
+	  be the mesh objects themselves that implement iParticle. At this
+	  moment however, it means that only the 2D sprite mesh objects
+	  work as particles (which is fine since these are actually the
+	  only objects that are really useful as particles).
+	- Also removed csSprite::AddColor() and SetColor() since they
+	  were actually only ment for the particle systems. Moved AddColor()
+	  and SetColor() as specific functions for csSprite3D.
+	- Moved implementation of csSprite::Rotate() and ScaleBy() to
+	  csSprite and made non virtual. The implementation was the same
+	  for all subclasses anyway.
+	- Changed iParticle interface to make it possible to use relative
+	  transforms for particle systems. The transform of the parent
+	  particle system is given with Draw() and UpdateLighting().
+	  SetPosition() should now be specified in the particle system
+	  coordinate system.
+	- The particle system plugins now render correctly in a hierarchical
+	  transformation context. This gives really very nice effects.
+	  For example, I put a fountain particle system on the hand of the
+	  robot (which is rotating). This looks as if the robot is shooting
+	  around with fountain particles.
+	- Finished the explosion particle system loader plugins.
+	- Started working on the fire particle system (in
+	  plugins/meshobj/fire).
+	- Added iFireState interface for the fire plugin system.
+	- Finished the fire plugin and changed WalkTest to use it instead
+	  of the old version in csfx.
+	- Finished the fire loader plugins.
+	- Implemented MIXMODE command in all mesh object loader plugins.
 4-Jan-2001
+	- Martin Geisse moved volume control from the sound drivers to
+	  the software sound renderer. Also cleaned up the wave-out driver
+	  a bit.
 	- Andrew Zabolotny fixed the disaster caused to VFS by one of
 	  Eric's changes. CS_PLATFORM_NAME was not the strict name of
 	  platform like it should be, but rather a free-form description

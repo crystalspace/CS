@@ -168,14 +168,6 @@ public:
   /// Get the bounding box for this particle system.
   inline const csBox3& GetBoundingBox() const {return bbox;}
 
-  /**
-   * Get an iParticle for this particle system, thus you can add
-   * the particle system as particle to another particle system,
-   * making particle systems of particle systems.
-   * Do not add particle systems to themselves, you'll get infinite loops.
-   */
-  iParticle* GetAsParticle() { return &scfiParticle; }
-
   /// Move all particles to this position
   virtual void SetPosition(const csVector3& pos);
   /// Move all particles by given delta.

@@ -54,7 +54,7 @@ void csExploMeshObject::SetupObject ()
     // The bounding box for the explosion particle system is not accurate.
     // For efficiency reasons we overestimate this bounding box and never
     // calculate it again.
-    for (i=0; i<number; i++)
+    for (i=0 ; i < number ; i++)
     {
       AppendRegularSprite (nr_sides, part_radius, mat, lighted_particles);
       pos = center + GetRandomDirection() * spread_pos;
@@ -88,6 +88,9 @@ csExploMeshObject::csExploMeshObject (iSystem* system)
   explight = NULL;
   ilight = NULL;
   scale_particles = false;
+  push.Set (0, 0, 0);
+  center.Set (0, 0, 0);
+  number = 50;
 }
 
 csExploMeshObject::~csExploMeshObject()
@@ -106,14 +109,14 @@ void csExploMeshObject::Update (cs_time elapsed_time)
   radiusnow += addedradius;
 
   // size of particles is exponentially reduced in fade time.
-  if(scale_particles && self_destruct && time_to_live < fade_particles)
+  if (scale_particles && self_destruct && time_to_live < fade_particles)
     ScaleBy (1.0 - (fade_particles - time_to_live)/((float)fade_particles));
-  if(!has_light) return;
+  if (!has_light) return;
   csColor newcol;
   newcol.red =   1.0 - 0.3*sin(time_to_live/10. + center.x);
   newcol.green = 1.0 - 0.3*sin(time_to_live/15. + center.y);
   newcol.blue =  0.3 + 0.3*sin(time_to_live/10. + center.z);
-  if(self_destruct && time_to_live < light_fade)
+  if (self_destruct && time_to_live < light_fade)
     newcol *= 1.0 - (light_fade - time_to_live)/((float)light_fade);
   ilight->SetColor (newcol);
 }
@@ -132,9 +135,9 @@ void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, cs_time fade)
 }
 
 
-void csExploMeshObject::RemoveLight()
+void csExploMeshObject::RemoveLight ()
 {
-  if(!has_light) return;
+  if (!has_light) return;
   has_light = false;
   light_engine->RemoveDynLight (explight);
   explight->DecRef ();
