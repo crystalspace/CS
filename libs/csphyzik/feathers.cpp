@@ -390,7 +390,9 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
       // calc impulse transfered to parent
       ctSpatialMatrix6 Ident;
       Ident.identity();
-      in_feather->Ja = fXg*( Ident - Ia*s*(!s)*(1.0L/sIs) )*Ja;
+      ctSpatialMatrix6 Ident1;
+      Ident1 = Ia*s*(!s)*(1.0L/sIs);
+      in_feather->Ja = fXg*( Ident - Ident1 )*Ja;
       // recurse
       in_feather->propagate_impulse();
     }
