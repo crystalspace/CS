@@ -139,7 +139,7 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
         "Unable to init app!");
-    return false;
+    exit (0);
   }
 
   if (!csInitializer::RequestPlugins (object_reg, argc, argv,
