@@ -568,7 +568,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 	printf ("P3:%d\n", covtree->InsertPolygon (poly3.GetVertices (),
 		poly3.GetNumVertices (), poly3.GetBoundingBox ()));
 	covtree->GfxDump (Gfx2D, covtree_level);
-	poly1.Draw (Gfx2D, 0xf800);
+	poly1.Draw (Gfx2D, 0x0303);
 	poly2.Draw (Gfx2D, 0x07e0);
 	poly3.Draw (Gfx2D, 0x008f);
 	//covtree->TestConsistency ();
