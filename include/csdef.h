@@ -120,7 +120,10 @@
 #endif
 
 // Platforms with compilers which do not understand the new C++ keyword
-// `typename' should define CS_USE_FAKE_TYPENAME_KEYWORD.
+// `typename' should define CS_USE_FAKE_TYPENAME_KEYWORD. Note, however, that
+// this faked-up `typename' should be used only to pacify a modern compiler
+// about a type name within a template. Do not use this fake keyword when
+// specifying template arguments; instead, use `class'.
 #if defined(CS_USE_FAKE_TYPENAME_KEYWORD)
   #define typename /* nothing */
 #endif

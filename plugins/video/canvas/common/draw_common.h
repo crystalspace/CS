@@ -22,14 +22,14 @@
 
 #include "graph2d.h"
 
-template<typename Tpixel>
+template<class Tpixel>
 static void SplitAlpha (const int color, Tpixel& colorPart, uint8& alphaPart)
 {
   colorPart = color & 0x00ffffff;
   alphaPart = 255 - (color >> 24);
 }
 
-template<typename Tpixel>
+template<class Tpixel>
 class csPixMixerCopy
 {
   Tpixel color;
@@ -44,7 +44,7 @@ public:
   }
 };
 
-template<typename Tpixel>
+template<class Tpixel>
 class csPixMixerRGBA
 {
   uint32 rbMask, gaMask;
@@ -79,7 +79,7 @@ public:
   }
 };
 
-template<typename Tpixel>
+template<class Tpixel>
 class csPixMixerNoop
 {
 public:

@@ -23,7 +23,7 @@
 #include "graph2d.h"
 #include "draw_text.h"
 
-template <typename Tpixel, class Tpixmixer>
+template <class Tpixel, class Tpixmixer>
 class csSoftFontCacheImpl : public csSoftFontCache
 {
 public:

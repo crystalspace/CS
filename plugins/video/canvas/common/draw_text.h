@@ -24,7 +24,7 @@
 #include "draw_common.h"
 #include "softfontcache.h"
 
-template<typename Tpixel, class Tpixmixer1, class Tpixmixer2, class Tpixmixer3>
+template<class Tpixel, class Tpixmixer1, class Tpixmixer2, class Tpixmixer3>
 class csG2DDrawText
 {
 public:

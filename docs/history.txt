@@ -15,6 +15,11 @@ chronological order.
 	  only deleting the entry in case there are no open files. If there
 	  are open files the entry is only flushed so the effect of
 	  Sync() is not lost.
+	- Eric Sunshine replaced usage of 'typename' in template arguments with
+	  'class' in order to support slightly older compilers. CS fakes up a
+	  'typename' keyword, but it is meant to be used only to pacify modern
+	  compilers which complain about ambiguous type names within templates;
+	  not for declaration of template arguments.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.

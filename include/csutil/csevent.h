@@ -76,7 +76,7 @@ private:
 
   bool CheckForLoops(iEvent *current, iEvent *e);
 
-  template <typename T>
+  template <class T>
   bool InternalAddInt (const char* name, T value)
   {
     if (attributes.In (GetKeyID (name))) return false;
@@ -87,7 +87,7 @@ private:
     return true;						
   }
 
-  template <typename T>
+  template <class T>
   bool InternalAddUInt (const char* name, T value)
   {
     if (attributes.In (GetKeyID (name))) return false;
@@ -120,7 +120,7 @@ private:
     return csEventErrUhOhUnknown;
   }
 
-  template <typename T>
+  template <class T>
   csEventError InternalRetrieveInt (const char* name, T& value) const
   {								
     attribute* object = attributes.Get (GetKeyID (name), 0);
@@ -141,7 +141,7 @@ private:
     }
   }
 
-  template <typename T>
+  template <class T>
   csEventError InternalRetrieveUint (const char* name, T& value) const
   {								
     attribute* object = attributes.Get (GetKeyID (name), 0);

@@ -22,7 +22,7 @@
 
 #include "draw_common.h"
 
-template<typename Tpixel, class Tpixmixer>
+template<class Tpixel, class Tpixmixer>
 class csG2DDrawLine
 {
 public:
