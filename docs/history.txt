@@ -31,6 +31,13 @@ chronological order.
 	- Jorrit fixed a bug in the NR OpenGL renderer DrawMesh implementation
 	  which would not correctly set alpha and keycolor mode in some
 	  situations.
+	- Eric Sunshine made the following changes:
+	    - Augmented configure.ac so that it propagates CS_USE_NEW_RENDERER
+	      to $(SWIG.FLAGS).
+	    - Fixed csperl5.mak, cspython.mak, and csjava/Makefile so that they
+	      respect $(SWIG.FLAGS).
+	    - Fixed several bugs in, and performed minor cleanup of
+	      csjava/Makefile.
 9-Feb-2004
 	- Eric Sunshine fixed bug in csKeyValuePair where it was incorrectly
 	  invoking SCF_CONSTRUCT_IBASE() even though it should not have been

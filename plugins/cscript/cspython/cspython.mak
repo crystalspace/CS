@@ -160,7 +160,7 @@ $(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.cpp
 $(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.c
 	$(DO.COMPILE.C) $(PYTHON.CFLAGS)
 
-SWIGFLAGS=-python -c++ -shadow -I$(SRCDIR)/include
+SWIG.FLAGS.CSPYTHON=-python -c++ -shadow -I$(SRCDIR)/include
 SWIG.CSPYTHON.DEPS=\
 	$(SRCDIR)/include/ivaria/pythpre.i \
 	$(SRCDIR)/include/ivaria/pythpost.i
@@ -175,7 +175,8 @@ $(SWIG.CSPYTHON.PY): $(SWIG.CSPYTHON.PY.CVS)
 else
 $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY): \
   $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS)
-	$(CMD.SWIG) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.INTERFACE)
+	$(CMD.SWIG) $(SWIG.FLAGS) $(SWIG.FLAGS.CSPYTHON) -o $(SWIG.CSPYTHON) \
+	$(SWIG.CSPYTHON.INTERFACE)
 	$(SED) '/$(BUCK)Header:/d' < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
 	$(RM) $(SWIG.CSPYTHON)
 	$(MV) $(SWIG.CSPYTHON).sed $(SWIG.CSPYTHON)

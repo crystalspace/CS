@@ -2277,7 +2277,8 @@ AC_ARG_ENABLE([new-renderer], [AC_HELP_STRING([--enable-new-renderer],
 AC_MSG_RESULT([$enable_new_renderer])
 CS_BUILD_PROPERTY([USE_NEW_RENDERER], [$enable_new_renderer])
 AS_IF([test $enable_new_renderer = yes], 
-  [CS_HEADER_PROPERTY([CS_USE_NEW_RENDERER])])
+  [CS_HEADER_PROPERTY([CS_USE_NEW_RENDERER])
+  CS_BUILD_PROPERTY([SWIG.FLAGS], [-DCS_USE_NEW_RENDERER], [+])])
 
 
 

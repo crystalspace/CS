@@ -32205,6 +32205,14 @@ fi
 if test $enable_new_renderer = yes; then
   cs_header_text="${cs_header_text}#define CS_USE_NEW_RENDERER
 "
+  cs_build_prop_val=`echo x-DCS_USE_NEW_RENDERER | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}SWIG.FLAGS += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}SWIG.FLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
 fi
 
 

@@ -162,9 +162,9 @@ $(SWIG.PERL5.C.IN): $(SWIG.PERL5.C)
 	$(CP) $(SWIG.PERL5.C) $(SWIG.PERL5.C.IN)
 else
 $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(SWIG.I)
-	-$(CMD.SWIG) -perl5 -c++ -shadow -const -Iinclude -I$(SRCDIR)/include \
-	-module $(SWIG.MOD) -o $(SWIG.PERL5.C.IN) $(SWIG.I)
-	$(SED) '/$(BUCK)Header:/d' < $(SWIG.PERL5.C.IN) > $(SWIG.PERL5.C.IN).sed
+	-$(CMD.SWIG) $(SWIG.FLAGS) -perl5 -c++ -shadow -const -Iinclude \
+	-I$(SRCDIR)/include -module $(SWIG.MOD) -o $(SWIG.PERL5.C.IN) $(SWIG.I)
+	$(SED) '/$(BUCK)Header:/d' < $(SWIG.PERL5.C.IN) >$(SWIG.PERL5.C.IN).sed
 	$(RM) $(SWIG.PERL5.C.IN)
 	$(MV) $(SWIG.PERL5.C.IN).sed $(SWIG.PERL5.C.IN)
 
