@@ -3889,8 +3889,17 @@ fi
 # directory.  When checking for Jam, in addition to PATH, we also look in root
 # of the build directory since we might already have built Jam on a previous
 # configure run.
+#
+# IMPLEMENTATION NOTES
+#
+# We also check for 'make', since it is used to build Jam locally, when needed.
+#
+# The Jam which ships with MacOS/X is extremely old (version 2.2.1) and is
+# modified by Apple, so we must reject it.
 #------------------------------------------------------------------------------
 
+
+cs_prog_jam_okay=yes
 for ac_prog in jam
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -3936,6 +3945,20 @@ fi
 done
 
 if test -z "$JAM"; then
+  cs_prog_jam_okay=no
+else
+  echo "$as_me:$LINENO: checking if $JAM is usable" >&5
+echo $ECHO_N "checking if $JAM is usable... $ECHO_C" >&6
+    if $JAM -v | grep ProjectBuilder > /dev/null 2>&1; then
+  cs_prog_jam_okay=no
+fi
+
+    echo "$as_me:$LINENO: result: $cs_prog_jam_okay" >&5
+echo "${ECHO_T}$cs_prog_jam_okay" >&6
+fi
+
+
+if test cs_prog_jam_ok != yes; then
   JAM=./jam$EXEEXT CS_NEED_LOCAL_JAM=yes
 fi
 
@@ -3947,7 +3970,6 @@ cs_build_prop_val="$JAM"
 fi
 
 
-# Needed for building Jam.
 for ac_prog in gnumake gmake make
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.

@@ -127,13 +127,29 @@ AS_IF([test -n "$SWIG"],
 # directory.  When checking for Jam, in addition to PATH, we also look in root
 # of the build directory since we might already have built Jam on a previous
 # configure run.
+#
+# IMPLEMENTATION NOTES
+#
+# We also check for 'make', since it is used to build Jam locally, when needed.
+#
+# The Jam which ships with MacOS/X is extremely old (version 2.2.1) and is
+# modified by Apple, so we must reject it.
 #------------------------------------------------------------------------------
 m4_define([cs_jam_local_exe], [jam$EXEEXT])
+
+cs_prog_jam_okay=yes
 AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
-AS_IF([test -z "$JAM"], [JAM=./cs_jam_local_exe CS_NEED_LOCAL_JAM=yes])
+AS_IF([test -z "$JAM"],
+    [cs_prog_jam_okay=no],
+    [AC_MSG_CHECKING([if $JAM is usable])
+    AS_IF([$JAM -v | grep ProjectBuilder > /dev/null 2>&1],
+	[cs_prog_jam_okay=no])
+    AC_MSG_RESULT([$cs_prog_jam_okay])])
+
+AS_IF([test cs_prog_jam_ok != yes],
+    [JAM=./cs_jam_local_exe CS_NEED_LOCAL_JAM=yes])
 CS_EMIT_BUILD_PROPERTY([JAM], [$JAM])
 
-# Needed for building Jam.
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 
 
