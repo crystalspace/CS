@@ -135,6 +135,7 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("uvanimation", XMLTOKEN_UVANIMATION);
   xmltokens.Register ("frame", XMLTOKEN_FRAME);
   xmltokens.Register ("duration", XMLTOKEN_DURATION);
+  xmltokens.Register ("v", XMLTOKEN_V);
   return true;
 }
 
