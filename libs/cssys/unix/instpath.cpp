@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -90,31 +91,5 @@ char* csGetConfigPath ()
   return 0;
 }
 
-csPluginPath* csGetPluginPaths ()
-{
-  const char* crystal = getenv ("CRYSTAL");
 
-  if (!crystal)
-  {
-    csPluginPath* paths = new csPluginPath [3];
-    paths[0].path = csStrNew(CS_PLUGINDIR);
-    paths[0].scanRecursive = true;
-    paths[1].path = csStrNew(".");
-    paths[2].path = 0;
-
-    return paths;
-  }
-
-  csPluginPath* paths = new csPluginPath [4];
-  paths[0].path = csStrNew(crystal);
-  char* temp = new char[1024];
-  strncpy (temp, crystal, 1000);
-  strcat (temp, "/lib");
-  paths[1].path = temp;
-  paths[1].scanRecursive = true;
-  paths[2].path = csStrNew(".");
-  paths[3].path = 0;
-
-  return paths;
-}
 

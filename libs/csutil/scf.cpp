@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
 #include "csutil/memfile.h"
@@ -410,7 +411,7 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (csPluginPath* pluginPaths)
+void scfInitialize (csPluginPaths* pluginPaths)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
@@ -447,7 +448,7 @@ void scfInitialize (csPluginPath* pluginPaths)
 
   if (freePaths)
   {
-    delete[] pluginPaths;
+    delete pluginPaths;
   }
 #endif
 }

@@ -20,6 +20,7 @@
 #ifndef __CS_CSSHLIB_H__
 #define __CS_CSSHLIB_H__
 
+#include "syspath.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "iutil/string.h"
@@ -94,7 +95,7 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
  * Accepts the same parameters as csScanPluginDir(), with the exception of
  * \p dirs.
  */				
-csRef<iStrVector> csScanPluginDirs (csPluginPath* dirs, 
+csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
 				    csRef<iStrVector>& plugins,
 				    csRefArray<iDocument>& metadata);
 

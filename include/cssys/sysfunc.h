@@ -19,6 +19,16 @@
 #ifndef __CS_SYSFUNC_H__
 #define __CS_SYSFUNC_H__
 
+/**\file
+ * Common system functions.
+ */
+/**\addtogroup util
+ * @{
+ */
+/**\name System functions
+ * @{
+ */
+
 #include <stdarg.h>
 #include <stdio.h>
 #include "csutil/ref.h"
@@ -87,51 +97,12 @@ int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 csTicks csGetTicks ();
 
 /**
- * Get the installation path.<p>
- * This returns the path where the system has been installed to.
- * It has a limited use because mostly everything should be done
- * through VFS which is installation directory - independent; but
- * some initialization tasks still need this.
- * You're responsible to delete[] the string after using it.
- */
-char* csGetConfigPath ();
-
-/**
- * This structure contains information about a plugin path.
- */
-struct csPluginPath
-{
-  /**
-   * The actual path.
-   * Has to be allocated with csStrNew() or new[].
-   */
-  char* path;
-  /// Whether this path should be recursively scanned for plugins.
-  bool scanRecursive;
-  
-  csPluginPath () : path(0), scanRecursive(false) {}
-  ~csPluginPath () { delete[] path; }
-};
-
-/** Get a list of directories where plugins are installed
- * You're responsible to free the array with delete[] after using it.
- */
-csPluginPath* csGetPluginPaths ();
-
-/**
  * This function will freeze your application for given number of 1/1000
  * seconds. The function is very inaccurate, so don't use it for accurate
  * timing. It may be useful when the application is idle, to explicitly
  * release CPU for other tasks in multi-tasking operating systems.
  */
 void csSleep (int /*SleepTime*/);
-
-/**
- * Get the list of root directories.<p>
- * For instance in Unix it simply returns '/' but for Windows it may return a
- * list of available drive letters.
- */
-csRef<iStrVector> csFindSystemRoots();
 
 /**
  * Get the username of the account running the program.<p>
@@ -149,5 +120,9 @@ csString csGetUsername();
  *   error occured.
  */
 csPtr<iConfigFile> csGetPlatformConfig (const char* key);
+
+/** @} */
+
+/** @} */
 
 #endif // __CS_SYSFUNC_H__

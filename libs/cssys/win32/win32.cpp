@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
@@ -542,13 +543,13 @@ bool csPlatformStartup(iObjectRegistry* r)
   char* pathEnv = csStrNew (getenv("PATH"));
   bool pathChanged = false;
 
-  csPluginPath* pluginpaths = csGetPluginPaths ();
-  for (int i = 0; pluginpaths[i].path != 0; i++)
+  csPluginPaths* pluginpaths = csGetPluginPaths ();
+  for (int i = 0; i < pluginpaths->GetCount(); i++)
   {
     // @@@ deal with path recursion here?
-    if (AddToPathEnv (pluginpaths[i].path, &pathEnv)) pathChanged = true;
+    if (AddToPathEnv ((*pluginpaths)[i].path, &pathEnv)) pathChanged = true;
   }
-  delete[] pluginpaths;
+  delete pluginpaths;
 
   if (pathChanged) SetEnvironmentVariable ("PATH", pathEnv);
   delete[] pathEnv;

@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 #include "cssys/win32/shellstuff.h"
 #include <windows.h>
 #include <shlobj.h>
@@ -178,39 +179,4 @@ char* csGetConfigPath ()
   return csStrNew (cachedCfgPath->path);
 }
 
-csPluginPath* csGetPluginPaths ()
-{
-  csPluginPath* paths = new csPluginPath [5];
-
-  char appPath [MAX_PATH + 1];
-  GetModuleFileName (0, appPath, sizeof (appPath) - 1);
-  char* slash = strrchr (appPath, '\\');
-  if (slash) *slash = 0;
-  
-  char* configpath = csGetConfigPath ();
-
-  int i = 0;
-
-  paths[i++].path = csStrNew (appPath);
-
-  char* temp = new char[MAX_PATH];
-  strncpy (temp, configpath, MAX_PATH);
-  strcat (temp, "\\lib");
-
-  paths[i].scanRecursive = true;
-  paths[i++].path = temp;
-
-  if (strcasecmp (configpath, appPath) != 0)
-  {
-    paths[i++].path = configpath;
-  }
-  else
-  {
-    delete[] configpath;
-  }
-
-  paths[i++].path = 0;
-
-  return paths;
-}
 

@@ -14,11 +14,12 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+*/	
 
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
@@ -338,7 +339,7 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
   return csPtr<iStrVector> (messages);
 }
 
-csRef<iStrVector> csScanPluginDirs (csPluginPath* dirs, 
+csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs, 
 				    csRef<iStrVector>& plugins,
 				    csRefArray<iDocument>& metadata)
 {
@@ -356,17 +357,17 @@ csRef<iStrVector> csScanPluginDirs (csPluginPath* dirs,
   csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
     (new csTinyDocumentSystem ());
 
-  for (int i = 0; dirs[i].path != 0; i++)
+  for (int i = 0; i < dirs->GetCount (); i++)
   {
     iStrVector* dirMessages = 0;
-    InternalScanPluginDir (dirMessages, docsys, dirs[i].path, 
-      plugins, metadata, dirs[i].scanRecursive);
+    InternalScanPluginDir (dirMessages, docsys, (*dirs)[i].path, 
+      plugins, metadata, (*dirs)[i].scanRecursive);
     
     if (dirMessages != 0)
     {
       csString tmp;
       tmp.Format ("The following error(s) occured while scanning '%s':",
-	dirs[i].path);
+	(*dirs)[i].path);
 
       AppendStrVecString (messages, tmp);
 

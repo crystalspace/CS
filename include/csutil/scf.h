@@ -28,7 +28,7 @@
  * \addtogroup scf
  * @{ */
 
-struct csPluginPath;
+class csPluginPaths;
 
 #include "csutil/ref.h"
 
@@ -650,7 +650,7 @@ inline static scfInterfaceID Name##_scfGetID ()				\
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
  * \remark The path list is ignored for static builds. 
  */
-extern void scfInitialize (csPluginPath* pluginPaths = 0);
+extern void scfInitialize (csPluginPaths* pluginPaths = 0);
 
 /**
  * This function checks whenever an interface is compatible with given version.
