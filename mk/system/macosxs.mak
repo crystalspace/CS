@@ -9,16 +9,16 @@
 # copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 #
 #==============================================================================
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # macosxs.mak
 #
 #	Build-time configuration options for the MacOS/X Server platform.
 #
 # *NOTE*
-#	The OpenStep 4.2 Objective-C++ compiler has a register allocation bug
-#	which causes it to corrupt the virtual-table pointer of classes whose
-#	parent class (and sometimes parent's parent class) have very small
-#	constructors or very small inline constructors.  This bug only
+#	The MacOS/X Server Objective-C++ compiler has a register allocation
+#	bug which causes it to corrupt the virtual-table pointer of classes
+#	whose parent class (and sometimes parent's parent class) have very
+#	small constructors or very small inline constructors.  This bug only
 #	manifests itself when the constructors are not inlined and when no
 #	optimization is in effect, such as when compiling for debug.  When the
 #	constructors are inlined or when even minimal optimization is in
@@ -36,7 +36,7 @@
 #	$(subst) calls with $(patsubst) since patsubst is incapable of
 #	transforming the sort of strings which MAKE_VOLATILE_H contains.
 #
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 NEXT.TARGET=macosxs
 NEXT.TARGET.DESCRIPTION=$(NEXT.TARGET)$(SPACE)
