@@ -344,6 +344,7 @@ public:
       return scfParent->GetDrawCallback ();
     }
   } scfiMeshWrapper;
+  friend struct MeshWrapper;
 };
 
 /**
