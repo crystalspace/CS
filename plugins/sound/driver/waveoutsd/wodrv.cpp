@@ -143,7 +143,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   Format.cbSize = 0;
 
   // read settings from the config file
-  float BufferLength=Config->GetFloat("Sound.WaveOut.BufferLength", (float)0.05);
+  float BufferLength=Config->GetFloat("Sound.WaveOut.BufferLength", (float)0.10);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "  pre-buffering %f seconds of sound",
     BufferLength);
   waveout_device_index=(unsigned int)Config->GetInt("Sound.WaveOut.DeviceIndexOverride",(int)WAVE_MAPPER);
@@ -169,6 +169,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   for (buffer_idx=0;buffer_idx<WAVEOUT_BUFFER_COUNT;buffer_idx++)
   {
     AllocatedBlocks[buffer_idx].Driver = this;
+    AllocatedBlocks[buffer_idx].Prepared = false;
     AllocatedBlocks[buffer_idx].DataHandle = GlobalAlloc(GMEM_FIXED | GMEM_SHARE, sizeof(WAVEHDR) + MemorySize);
     AllocatedBlocks[buffer_idx].Data = (unsigned char *)GlobalLock(AllocatedBlocks[buffer_idx].DataHandle);
     AllocatedBlocks[buffer_idx].WaveHeader = (LPWAVEHDR)(AllocatedBlocks[buffer_idx].Data);
@@ -201,6 +202,7 @@ void csSoundDriverWaveOut::Close()
   // Signal background thread to halt
   bgThread->RequestStop();
 
+  // Wait a bit for it to shut down nicely.  If it doesn't 
   while (bgThread->IsRunning() && wait_timer++<120000)
     csSleep(0);
 
@@ -380,12 +382,23 @@ bool csSoundDriverWaveOut::BackgroundThread::FillBlock(SoundBlock *Block)
   LPWAVEHDR lpWaveHdr;
   MMRESULT result;
 
-  // Unprepare the block, in case it was used previously.  Per MSDN an unprepare on a block that has
-  //  not been previously prepared is safe - it does nothing and returns zero.
+  /* Unprepare the block, in case it was used previously.  Per MSDN an unprepare on a block that has
+   *  not been previously prepared is safe - it does nothing and returns zero.
+   *
+   * However, testing on systems using C-Media sound cards proves that this does not hold for
+   *  all cards/drivers.  On these cards, passing an unprepared buffer will return an error
+   *  and apparently invalidate the opened device - causing sound to fail to be produced.
+   */
   lpWaveHdr = (LPWAVEHDR)Block->Data;
-  result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-  if (result != 0 && !CheckError("waveOutUnprepareHeader", result))
-    return false;
+  if (Block->Prepared)
+  {
+    result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+    if (result != 0 && !CheckError("waveOutUnprepareHeader", result))
+      return false;
+
+    // Block is no longer prepared
+    Block->Prepared=false;
+  }
 
   // Ensure the block pointers are correct
   Block->WaveHeader = (LPWAVEHDR)Block->Data;
@@ -408,24 +421,28 @@ bool csSoundDriverWaveOut::BackgroundThread::FillBlock(SoundBlock *Block)
   if (!CheckError("waveOutPrepareHeader", result)) {
       return false;
   }
-  else
-  {
-      // Now the data block can be sent to the output device. The
-      // waveOutWrite function returns immediately and waveform
-      // data is sent to the output device in the background.
-      result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-      if (!CheckError("waveOutWrite", result)) {
-        result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-        CheckError("waveOutUnprepareHeader", result);
-        return false;
-      }
+
+
+  /* Now the data block can be sent to the output device. The
+   * waveOutWrite function returns immediately and waveform
+   * data is sent to the output device in the background.
+   */
+  result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+  if (!CheckError("waveOutWrite", result)) {
+    result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+    if (!CheckError("waveOutUnprepareHeader", result))
+      Block->Prepared=true; // Mark the block as prepared if we couldn't unprepare it
+    return false;
   }
+
+  Block->Prepared=true;
   return true;
 }
 
 void csSoundDriverWaveOut::BackgroundThread::Run()
 {
   MMRESULT result;
+  size_t block_idx;
   int shutdown_wait_counter=0;
   running=true;
 
@@ -480,6 +497,7 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
     // Grab a lock on the available blocks list
     EnterCriticalSection(&(parent_driver->critsec_EmptyBlocks));
 
+    // If all blocks are free, don't wait anymore
     if (parent_driver->EmptyBlocks.Length() >= WAVEOUT_BUFFER_COUNT)
     {
       // Release the lock
@@ -492,6 +510,24 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
     // Give up timeslice
     csSleep(0);
   }
+
+  // Unprepare any Blocks before closing the device
+  EnterCriticalSection(&(parent_driver->critsec_EmptyBlocks));
+  for (block_idx=0;block_idx<parent_driver->EmptyBlocks.Length();block_idx++)
+  {
+    SoundBlock *Block=parent_driver->EmptyBlocks[block_idx];
+    if (Block->Prepared)
+    {
+      LPWAVEHDR lpWaveHdr;
+      MMRESULT result;
+
+      lpWaveHdr = (LPWAVEHDR)Block->Data;
+      result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
+      if (CheckError("waveOutUnprepareHeader", result))
+        Block->Prepared=false;
+    }
+  }
+  LeaveCriticalSection(&(parent_driver->critsec_EmptyBlocks));
 
   // Close the wave output device
   waveOutClose(WaveOut);

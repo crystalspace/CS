@@ -110,6 +110,7 @@ protected:
   struct SoundBlock 
   {
     csSoundDriverWaveOut *Driver;
+    bool Prepared; 
     HGLOBAL DataHandle;
     unsigned char *Data;
     LPWAVEHDR WaveHeader;

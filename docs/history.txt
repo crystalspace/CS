@@ -49,6 +49,11 @@ chronological order.
 	  should be allocated by the caller. This is also more efficient as
 	  there will be less growing array operations needed.
 	- Vincent Knecht worked around an #error single quote error in bindoc.h
+	- Rhad made further adjustments to the windows waveout driver:
+	    - waveOutUnprepareHeader is no longer called on blocks that have
+	      not been prepared.  Fixes "no sound on some C-Media audio devices"
+	    - empty blocks are now unprepared on shutdown.
+	    - Default buffer length increased from 0.05s to 0.1s
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections
