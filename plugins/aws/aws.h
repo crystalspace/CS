@@ -26,13 +26,14 @@
 #include "awscomp.h"
 #include "awswin.h"
 
-/****
-  
-  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
-windowing system.  It supports simple skinning via the .skn defintions, and creation of windows from .win definitions.
+const int awsNumRectBuckets = 16;
 
- ****/
-
+/**
+ *
+ *  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
+ * windowing system.  It supports simple skinning via the .skn defintions, and creation of windows from .win definitions.
+ *
+ */
 class awsManager : public iAws
 {
    /// Handle to the preference manager.
@@ -44,10 +45,20 @@ class awsManager : public iAws
     * perform a scatter/gather sort of update.  This is especially useful when
     * updating several small areas.
     */
-   csRect     dirty[16];
+   csRect     dirty[awsNumRectBuckets];
 
    /// This contains the index of the highest dirty rect containing valid info.
    int dirty_lid;
+
+   /** This is true if all the rect buckets got full.  It would be nice to
+    *  have an algorithm that checks to see if the rect is close enough to
+    *  another dirty zone so that including them wouldn't cause too much
+    *  hassle, but I have a feeling that that's overkill.  Currently, if we
+    *  overrun the rect buckets, all buckets are merged and this flag becomes
+    *  set, so that future invalidations are automatically merged into
+    *  bucket 0.
+    */
+   bool all_buckets_full;
 
    /// The current top window
    awsWindow   *top;
