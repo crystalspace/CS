@@ -31,6 +31,10 @@ The history order is reversed so that new features are at the top.
 	  rather than only testing if it compiles.  This is needed because some
 	  versions of gcc 3.2.x return incorrect results in optimize mode, such
 	  as qsqrt(1)=0.
+	- Eric Sunshine augmented the lib3ds test in configure.ac so that it
+	  checks for a sufficiently recent lib3ds containing lib3ds/io.h which
+	  is required by the 3ds plugin but which is not present in older
+	  versions of lib3ds.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the

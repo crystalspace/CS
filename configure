@@ -15045,10 +15045,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <lib3ds/file.h>
+	    #include <lib3ds/io.h>
 int
 main ()
 {
-lib3ds_file_new();
+lib3ds_file_new(); lib3ds_io_free(0);
   ;
   return 0;
 }
@@ -15180,10 +15181,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <lib3ds/file.h>
+	    #include <lib3ds/io.h>
 int
 main ()
 {
-lib3ds_file_new();
+lib3ds_file_new(); lib3ds_io_free(0);
   ;
   return 0;
 }
