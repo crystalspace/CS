@@ -2914,8 +2914,8 @@ bool csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
   if (!var2)
   {
     SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.meshobject",
-	    node, "Specified imposter rotation tolerance variable doesn't exist!");
+	    "crystalspace.maploader.parse.meshobject", node,
+	    "Specified imposter rotation tolerance variable doesn't exist!");
     return false;
   }
   imposter->SetRotationTolerance (var2);
@@ -2933,88 +2933,116 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
 
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
+  const char* plugin_name = node->GetAttributeValue ("plugin");
+  if (plugin_name != 0)
   {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
+    // Short-hand notation: <addon plugin="bla"> ... </addon>
+    if (!loaded_plugins.FindPlugin (plugin_name, plug, binplug))
     {
-      case XMLTOKEN_PARAMS:
-	if (!plug)
-	{
-          SyntaxService->ReportError (
-	      "crystalspace.maploader.load.plugin",
-              child, "Could not load plugin!");
-	  return false;
-	}
-	else
-	{
-	  csRef<iBase> rc = plug->Parse (child, ldr_context, context);
-	  if (!rc) return false;
-	}
-        break;
-
-      case XMLTOKEN_PARAMSFILE:
-	if (!plug && !binplug)
-	{
-          SyntaxService->ReportError (
-	      "crystalspace.maploader.load.plugin",
-              child, "Could not load plugin!");
-	  return false;
-	}
-	else
-	{
-	  const char* fname = child->GetContentsValue ();
-	  if (!fname)
+      SyntaxService->ReportError (
+ 	        "crystalspace.maploader.parse.addon",
+	        node, "Error loading plugin '%s'!",
+		plugin_name);
+      return false;
+    }
+    if (!plug)
+    {
+      SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                node, "Could not load plugin!");
+      return false;
+    }
+    csRef<iBase> rc = plug->Parse (node, ldr_context, context);
+    if (!rc) return false;
+    return true;
+  }
+  else
+  {
+    // Long notation: <addon> <plugin>bla</plugin> <params>...</params> </addon>
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_PARAMS:
+	  if (!plug)
 	  {
             SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.loadingfile",
-	      child, "Specify a VFS filename with 'paramsfile'!");
+	        "crystalspace.maploader.load.plugin",
+                child, "Could not load plugin!");
 	    return false;
-	  }
-          csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
-	  if (!buf)
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.loadingfile",
-	      child, "Error opening file '%s'!", fname);
-	    return false;
-	  }
-	  bool rc;
-	  if (plug)
-	  {
-	    csRef<iBase> ret (TestXmlPlugParse (ldr_context,
-	    	plug, buf, 0, fname));
-	    rc = (ret != 0);
 	  }
 	  else
 	  {
-	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
-	    csRef<iBase> ret = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	ldr_context, 0);
-	    rc = (ret != 0);
+	    csRef<iBase> rc = plug->Parse (child, ldr_context, context);
+	    if (!rc) return false;
 	  }
-	  if (!rc)
-	    return false;
-	}
-        break;
+          break;
 
-      case XMLTOKEN_PLUGIN:
-	if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
-		plug, binplug))
-	{
-	  SyntaxService->ReportError (
- 	      "crystalspace.maploader.parse.addon",
-	      child, "Error loading plugin '%s'!", child->GetContentsValue ());
+        case XMLTOKEN_PARAMSFILE:
+	  if (!plug && !binplug)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                child, "Could not load plugin!");
+	    return false;
+	  }
+	  else
+	  {
+	    const char* fname = child->GetContentsValue ();
+	    if (!fname)
+	    {
+              SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.loadingfile",
+	        child, "Specify a VFS filename with 'paramsfile'!");
+	      return false;
+	    }
+            csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
+	    if (!buf)
+	    {
+              SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.loadingfile",
+	        child, "Error opening file '%s'!", fname);
+	      return false;
+	    }
+	    bool rc;
+	    if (plug)
+	    {
+	      csRef<iBase> ret (TestXmlPlugParse (ldr_context,
+	    	  plug, buf, 0, fname));
+	      rc = (ret != 0);
+	    }
+	    else
+	    {
+	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
+	      csRef<iBase> ret = binplug->Parse ((void*)(dbuf->GetUint8 ()),
+	  	  ldr_context, 0);
+	      rc = (ret != 0);
+	    }
+	    if (!rc)
+	      return false;
+	  }
+          break;
+
+        case XMLTOKEN_PLUGIN:
+	  if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
+		  plug, binplug))
+	  {
+	    SyntaxService->ReportError (
+ 	        "crystalspace.maploader.parse.addon",
+	        child, "Error loading plugin '%s'!",
+		child->GetContentsValue ());
+	    return false;
+	  }
+          break;
+        default:
+	  SyntaxService->ReportBadToken (child);
 	  return false;
-	}
-        break;
-      default:
-	SyntaxService->ReportBadToken (child);
-	return false;
+      }
     }
   }
 
