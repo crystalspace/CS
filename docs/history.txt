@@ -4,6 +4,11 @@ The history order is reversed so that new features are at the top.
 	- Added new tutorial app in apps/tutorial/awstut. This is a small
 	  AWS using application that demonstrates how to open and use
 	  one simple window. So it is easier to follow than awstest.
+	- Added /tmp mount path to vfs (vfs.cfg) which should point to the
+	  system dependent location of a temporary directory. This works
+	  for unix and windows now. On windows it will first try
+	  $(TEMP), if that doesn't exist it will try $(TMP). Otherwise it
+	  will use the temp dir in the Windows directory.
 12-Feb-2002
 	- Matt Reda moved the event-handling code in the OSX canvases 
 	  from the delegate to a new NSView-derived class.  The old code 
