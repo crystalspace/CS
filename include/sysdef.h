@@ -247,7 +247,7 @@
 #  if defined (OS_MACOS)
 #    include <unix.h>
 #  else
-#    if !defined(COMP_VC)
+#    if !defined(COMP_VC) && !defined(COMP_BC)
 #      include <unistd.h>
 #    endif
 #  endif
@@ -266,7 +266,7 @@
 #endif
 
 #ifdef SYSDEF_ACCESS
-#  if !defined (OS_MACOS) && !defined(COMP_VC)
+#  if !defined (OS_MACOS) && !defined(COMP_VC) && !defined(COMP_BC)
 #    include <unistd.h>
 #  endif
 #  ifndef F_OK
