@@ -13,6 +13,9 @@ chronological order.
 	  the templates to build correctly with modern compilers, such as gcc
 	  3.4.x.  For details of "dependent" template contexts, see:
 	  http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
+	- Eric Sunshine fixed bug in csModelConverterSPR where it reported that
+	  it could neither load nor save sprites, thus rendering itself quite
+	  useless as a sprite importer/exporter.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause

@@ -76,7 +76,7 @@ csModelConverterSPR::csModelConverterSPR (iBase *pBase)
 
   FormatInfo.Name = "spr";
   FormatInfo.CanLoad = false;
-  FormatInfo.CanSave = false;
+  FormatInfo.CanSave = true;
 }
 
 csModelConverterSPR::~csModelConverterSPR ()
