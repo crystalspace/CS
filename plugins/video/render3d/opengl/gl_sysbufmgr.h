@@ -53,7 +53,7 @@ public:
     locked = false;
   }
 
-  ~csSysRenderBuffer ()
+  virtual ~csSysRenderBuffer ()
   {
     if (buffer != NULL)
     {
