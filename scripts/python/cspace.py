@@ -1777,6 +1777,8 @@ class csSpline(_object):
     def SetDimensionValue(*args): return _cspace.csSpline_SetDimensionValue(*args)
     def GetDimensionValues(*args): return _cspace.csSpline_GetDimensionValues(*args)
     def GetDimensionValue(*args): return _cspace.csSpline_GetDimensionValue(*args)
+    def SetIndexValues(*args): return _cspace.csSpline_SetIndexValues(*args)
+    def GetIndexValues(*args): return _cspace.csSpline_GetIndexValues(*args)
     def Calculate(*args): return _cspace.csSpline_Calculate(*args)
     def GetCurrentIndex(*args): return _cspace.csSpline_GetCurrentIndex(*args)
     def GetInterpolatedDimension(*args): return _cspace.csSpline_GetInterpolatedDimension(*args)
