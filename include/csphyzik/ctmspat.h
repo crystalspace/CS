@@ -35,7 +35,7 @@ public:
 
 	// spatial inertia tensor constructed from a rigid bodies inertia tensor
 	// and it's mass
-	void form_spatial_I( ctMatrix3 &pI, real pmass );
+	void form_spatial_I( const ctMatrix3 &pI, real pmass );
 
 	void operator=( const ctMatrix6 &pm ){
 		for( int idx = 0; idx < 6; idx++ )
@@ -68,7 +68,7 @@ inline void ctSpatialMatrix::form_spatial_transformation( const ctMatrix3 &pR, c
 
 }
 
-inline void ctSpatialMatrix::form_spatial_I( ctMatrix3 &pI, real pmass ){
+inline void ctSpatialMatrix::form_spatial_I( const ctMatrix3 &pI, real pmass ){
 /*	M11 *= 0;
 	M12.Identity();
 	M12 *= pmass;
