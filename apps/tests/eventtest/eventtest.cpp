@@ -195,6 +195,16 @@ bool run_event_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "Adding a new event as my_event... %s\n", e->Add("my_event", f) ? "Sucess!" : "Failure!");
   fprintf (stdout, "Adding the parent event to the child event... %s\n", f->Add("my_event", e) ? "Sucess!" : "Failure!");
   fprintf (stdout, "  That should have failed.\n");
+  uint32 size = e->FlattenSize();
+  char *serialized_buffer = new char[size];
+  fprintf (stdout, "Serializing the event to a buffer...%s\n", e->Flatten(serialized_buffer) ? "Sucess!" : "Failure");
+  FILE *log = fopen("test.bin", "wb");
+  fwrite(serialized_buffer,size, 1, log);
+  fclose(log);
+  csRef<iEvent> a = q->CreateEvent(1);
+  fprintf (stdout, "Recreating event from the buffer...%s\n", a->Unflatten(serialized_buffer, size) ? "Sucess!" : "Failure");
+  fprintf (stdout, "Printing the contents of the new event out:\n");
+  a->Print();
   
   return true;
 }

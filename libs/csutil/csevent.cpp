@@ -761,7 +761,6 @@ bool csEvent::Print(int32 level)
     {
       attribute *object = NULL;
       int32 index = 0;
-      IndentLevel(level); printf ("Event Type: %d\n", Type);
       while(index < v->Length())
       {
         if ((object = (attribute *) v->Get(index)) != NULL)
@@ -839,8 +838,9 @@ uint32 csEvent::FlattenSize(int format)
 uint32 csEvent::FlattenSizeCrystal()
 {
   csHashIteratorReversible iter(&attributes);
-  // Start count with the initial header (protocol version)
-  uint32 size = 4;
+  // Start count with the initial header
+  // Version(4) + Type(1) + Cat(1) + SubCat(1) + Flags(1) + Time(4) + Joystick(5*4)
+  uint32 size = 32;
 
   while (iter.HasNext())
   {
@@ -861,7 +861,7 @@ uint32 csEvent::FlattenSizeCrystal()
               // X for name string
               // 1 for type id
               // 4 for data length
-              // 1 for data
+              // X for data
               size += 7 + strlen(iter.GetKey())
 	      	+ object->Event->FlattenSize(CS_CRYSTAL_PROTOCOL);
             }
@@ -894,7 +894,9 @@ uint32 csEvent::FlattenSizeCrystal()
             // 4 for data
             size += 7 + strlen(iter.GetKey());
           }
-          if (object->type == attribute::tag_double)
+          if ((object->type == attribute::tag_double)
+            || (object->type == attribute::tag_int64)
+            || (object->type == attribute::tag_uint64))
           {
             // 2 for name length
             // X for name string
@@ -990,19 +992,40 @@ bool csEvent::FlattenXML(char * buffer)
 bool csEvent::FlattenCrystal(char * buffer)
 {
   csHashIteratorReversible iter(&attributes);
-  csMemFile b(buffer,FlattenSizeCrystal());
+  csMemFile b(buffer,FlattenSizeCrystal(),csMemFile::DISPOSITION_IGNORE);
   uint8 ui8;
   int8 i8;
   uint16 ui16;
   int16 i16;
   uint32 ui32;
   int32 i32;
+  int64 i64;
+  uint64 ui64;
   float f;
   //double d;
   
   ui32 = CS_CRYSTAL_PROTOCOL;
-  b.Write((char *)&ui32, sizeof(ui32));
-  
+  convert_endian(ui32);
+  b.Write((char *)&ui32, sizeof(uint32));         // protocol version
+  b.Write((char *)&Type, sizeof(uint8));          // iEvent.Type
+  b.Write((char *)&Category, sizeof(uint8));      // iEvent.Category
+  b.Write((char *)&SubCategory, sizeof(uint8));   // iEvent.SubCategory
+  b.Write((char *)&Flags, sizeof(uint8));         // iEvent.Flags
+  ui32 = convert_endian(Time);
+  b.Write((char *)&ui32, sizeof(uint32));       // iEvent.Time
+
+  // The largest struct in the union is Joystick, so we take that..
+  i32 = convert_endian(Joystick.number);
+  b.Write((char *)&i32, sizeof(int32));
+  i32 = convert_endian(Joystick.x);
+  b.Write((char *)&i32, sizeof(int32));
+  i32 = convert_endian(Joystick.y);
+  b.Write((char *)&i32, sizeof(int32));
+  i32 = convert_endian(Joystick.Button);
+  b.Write((char *)&i32, sizeof(int32));
+  i32 = convert_endian(Joystick.Modifiers);
+  b.Write((char *)&i32, sizeof(int32));
+   
   while (iter.HasNext())
   {
     csVector *v = (csVector *) iter.Next();
@@ -1035,6 +1058,8 @@ bool csEvent::FlattenCrystal(char * buffer)
                 // XX byte data
                 if (!object->Event->Flatten(b.GetPos() + buffer))
                   return false;
+                else
+                  b.SetPos(b.GetPos() + object->Event->FlattenSize());
               }
               break;
             case attribute::tag_databuffer:
@@ -1173,6 +1198,36 @@ bool csEvent::FlattenCrystal(char * buffer)
               convert_endian(ui32);
               b.Write((char *)&ui32, sizeof(uint32));
               break;
+            case attribute::tag_int64:
+              // 2 byte name length (little endian)
+              ui16 = strlen(iter.GetKey());
+              convert_endian(ui16);
+              b.Write((char *)&ui16, sizeof(int16));
+              // XX byte name
+              b.Write(iter.GetKey(), ui16);
+              // 1 byte datatype id
+              ui8 = CS_DATATYPE_INT64;
+              b.Write((char *)&ui8, sizeof(uint8));
+              // 4 byte data
+              i64 = (int64)object->Integer;
+              convert_endian(i64);
+              b.Write((char *)&i64, sizeof(int64));
+              break;
+            case attribute::tag_uint64:
+              // 2 byte name length (little endian)
+              ui16 = strlen(iter.GetKey());
+              convert_endian(ui16);
+              b.Write((char *)&ui16, sizeof(int16));
+              // XX byte name
+              b.Write(iter.GetKey(), ui16);
+              // 1 byte datatype id
+              ui8 = CS_DATATYPE_UINT64;
+              b.Write((char *)&ui8, sizeof(uint8));
+              // 4 byte data (little endian)
+              ui64 = (uint64)object->Unsigned;
+              convert_endian(ui64);
+              b.Write((char *)&ui64, sizeof(uint64));
+              break;
             case attribute::tag_float:
               // 2 byte name length (little endian)
               ui16 = strlen(iter.GetKey());
@@ -1188,21 +1243,20 @@ bool csEvent::FlattenCrystal(char * buffer)
               i32 = float2long(f);
               b.Write((char *)&i32, sizeof(i32));
               break;
-//            case attribute::tag_double:
-//              // 2 byte name length (little endian)
-//              ui16 = strlen(iter.GetKey());
-//              convert_endian(ui16);
-//              b.Write((char *)&ui16, sizeof(int16));
-//              // XX byte name
-//              b.Write(iter.GetKey(), ui16);
-//              // 1 byte datatype id
-//              ui8 = CS_DATATYPE_FLOAT;
-//              b.Write((char *)&ui8, sizeof(uint8));
-//              // 4 byte data (little endian)
-//              d = object->Double;
-//              convert_endian(d);
-//              b.Write((char *)&d, sizeof(d));
-//              break;
+            case attribute::tag_double:
+              // 2 byte name length (little endian)
+              ui16 = strlen(iter.GetKey());
+              convert_endian(ui16);
+              b.Write((char *)&ui16, sizeof(int16));
+              // XX byte name
+              b.Write(iter.GetKey(), ui16);
+              // 1 byte datatype id
+              ui8 = CS_DATATYPE_DOUBLE;
+              b.Write((char *)&ui8, sizeof(uint8));
+              // 8 byte data (longlong fixed format)
+              i64 = double2longlong(object->Double);
+              b.Write((char *)&i64, sizeof(int64));
+              break;
             default: 
               break;
           }
@@ -1216,7 +1270,7 @@ bool csEvent::FlattenCrystal(char * buffer)
 
 bool csEvent::Unflatten(const char *buffer, uint32 length)
 {
-  csMemFile b(buffer,length);
+  csMemFile b((char *)buffer,length, csMemFile::DISPOSITION_IGNORE);
   uint32 v;
   
   b.Read((char *)&v, sizeof(uint32));
@@ -1236,22 +1290,46 @@ bool csEvent::Unflatten(const char *buffer, uint32 length)
 
 bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
 {
-  csMemFile b(buffer,length);
+  csMemFile b((char *)buffer,length, csMemFile::DISPOSITION_IGNORE);
   uint8 ui8;
   int8 i8;
   uint16 ui16;
   int16 i16;
   uint32 ui32;
   int32 i32;
+  uint64 ui64;
+  int64 i64;
   float f;
-  //double d;
+  double d;
   char *name;
 
+  uint8 *i_buffer = (uint8*)buffer;
   b.Read((char *)&ui32, sizeof(ui32));
   convert_endian(ui32);
   if (ui32 != CS_CRYSTAL_PROTOCOL)
+  {
+    //printf("protocol version invalid: %X\n", ui32);
     return false;
-  
+  }
+  b.Read((char *)&Type, sizeof(uint8));          // iEvent.Type
+  b.Read((char *)&Category, sizeof(uint8));      // iEvent.Category
+  b.Read((char *)&SubCategory, sizeof(uint8));   // iEvent.SubCategory
+  b.Read((char *)&Flags, sizeof(uint8));         // iEvent.Flags
+  b.Read((char *)&ui32, sizeof(uint32));       // iEvent.Time
+  Time = convert_endian(ui32);
+
+  // The largest struct in the union is Joystick, so we take that..
+  b.Read((char *)&i32, sizeof(int32));
+  Joystick.number = convert_endian(i32);
+  b.Read((char *)&i32, sizeof(int32));
+  Joystick.x = convert_endian(i32);
+  b.Read((char *)&i32, sizeof(int32));
+  Joystick.y = convert_endian(i32);
+  b.Read((char *)&i32, sizeof(int32));
+  Joystick.Button = convert_endian(i32);
+  b.Read((char *)&i32, sizeof(int32));
+  Joystick.Modifiers = convert_endian(i32);
+
   while (!b.AtEOF())
   {
     b.Read((char *)&ui16, sizeof(uint16));
@@ -1259,6 +1337,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
     name = new char[ui16+1];
     b.Read(name, ui16);
     name[ui16] = 0;
+
     b.Read((char *)&ui8, sizeof(uint8));
     switch(ui8)
     {
@@ -1290,12 +1369,25 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
         convert_endian(ui32);
         Add(name, ui32);
         break;
+      case CS_DATATYPE_INT64:
+        b.Read((char *)&i64, sizeof(int64));
+        convert_endian(i64);
+        Add(name, i64);
+        break;
+      case CS_DATATYPE_UINT64:
+        b.Read((char *)&ui64, sizeof(uint64));
+        convert_endian(ui64);
+        Add(name, ui64);
+        break;
       case CS_DATATYPE_FLOAT:
         b.Read((char *)&i32, sizeof(int32));
         f = long2float(i32);
         Add(name, f);
         break;
       case CS_DATATYPE_DOUBLE:
+        b.Read((char *)&i64, sizeof(int64));
+        d = longlong2double(i64);
+        Add(name, d);
         break;
       case CS_DATATYPE_BOOL:
         b.Read((char *)&i8, sizeof(int8));
@@ -1337,6 +1429,8 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
             Add(name, STATIC_CAST(iEvent *,e));
             e->Unflatten(buffer+b.GetPos(), ui32);
           }
+          printf("returning from sub event\n");
+          b.SetPos(b.GetPos() + ui32);
         }
         break;
       default:
