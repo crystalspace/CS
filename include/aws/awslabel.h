@@ -27,6 +27,9 @@ class awsLabel : public awsComponent
 
    /// True if the component has the mouse over it
    bool mouse_is_over;
+
+   /// Alignment of text (defaults to left)
+   int alignment;
    
    /// Caption text for this component
    iString *caption;
@@ -39,7 +42,17 @@ public:
 
    /// An up and down motion for the button
    static const int signalClicked;
-        
+
+   /******* Alignment Options ************/
+  
+   /// Align text to left.
+   static const int alignLeft;
+  
+   /// Align text to right
+   static const int alignRight;
+    
+   /// Align text centered
+   static const int alignCenter;
     
 public:
     /// Get's the texture handle and the title, plus style if there is one.
