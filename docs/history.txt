@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	  curved surfaces to be completely unlit if there were polygons
 	  in the level. One polygon was enough to shadow the curve even
 	  if the polygon was nowhere near the curve.
+	- According to some suggestions by Luca Pancallo I fixed viewmesh
+	  so the light placement there is better. This makes the viewed
+	  models look nicer.
 10-Oct-2001
 	- Slight optimization in csSector::IntersectSegment() where it
 	  would transform back the intersection point even if there
