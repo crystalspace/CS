@@ -3316,9 +3316,11 @@ csOptionDescription IXConfig3DSoft::config_options[] =
   { 10, "dmipmap3", "Mipmap distance 3", CSVAR_FLOAT },
   { 11, "gouraud", "Gouraud shading", CSVAR_BOOL },
   { 12, "smaller", "Smaller rendering", CSVAR_BOOL },
+  { 13, "lmgrid", "Lightmap grid", CSVAR_BOOL },
+  { 14, "lmonly", "Lightmap only", CSVAR_BOOL },
 };
 
-#define NUM_OPTIONS 13
+#define NUM_OPTIONS 15
 
 STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
 {
@@ -3341,6 +3343,8 @@ STDMETHODIMP IXConfig3DSoft::SetOption (int id, csVariant* value)
     case 10: pThis->zdist_mipmap3 = value->v.fVal; break;
     case 11: pThis->rstate_gouraud = value->v.bVal; break;
     case 12: pThis->do_smaller_rendering = value->v.bVal; break;
+    case 13: pThis->txtmgr->do_lightmapgrid = value->v.bVal; break;
+    case 14: pThis->txtmgr->do_lightmaponly = value->v.bVal; break;
     default: return E_FAIL;
   }
   pThis->ScanSetup ();
@@ -3368,6 +3372,8 @@ STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
     case 10: value->v.fVal = pThis->zdist_mipmap3; break;
     case 11: value->v.bVal = pThis->rstate_gouraud; break;
     case 12: value->v.bVal = pThis->do_smaller_rendering; break;
+    case 13: value->v.bVal = pThis->txtmgr->do_lightmapgrid; break;
+    case 14: value->v.bVal = pThis->txtmgr->do_lightmaponly; break;
     default: return E_FAIL;
   }
   return S_OK;
