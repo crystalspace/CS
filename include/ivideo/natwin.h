@@ -52,6 +52,7 @@ struct iNativeWindowManager : public iBase
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
+   * \remarks All strings are expected to be UTF-8 encoded.
    * \sa #CS_ALERT_ERROR
    */
   virtual void Alert (int type, const char* title, const char* okMsg,
@@ -59,6 +60,7 @@ struct iNativeWindowManager : public iBase
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
+   * \remarks All strings are expected to be UTF-8 encoded.
    * \sa #CS_ALERT_ERROR
    */
   virtual void AlertV (int type, const char* title, const char* okMsg,
@@ -74,6 +76,7 @@ struct iNativeWindow : public iBase
 {
   /**
    * Set the title for this window.
+   * \remarks \p title is expected to be UTF-8 encoded.
    */
   virtual void SetTitle (const char* title) = 0;
 };

@@ -300,7 +300,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
         an->index = anims.Push(an);
 
         std::string str(name);
-        calCoreModel.addAnimHelper(str,id);
+        calCoreModel.addAnimationName (str,id);
       }
       return id;
     }

@@ -97,7 +97,7 @@ void Simple::SetupFrame ()
 
 
   // Take small steps.
-  const float maxStep = 0.01f;
+  const float maxStep = 0.001f;
   float ta = 0;
   float tb = speed;
   while (ta < speed)
@@ -430,7 +430,7 @@ iRigidBody* Simple::CreateBox (void)
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetProperties (1, csVector3 (0), csMatrix3 ());
-  rb->SetPosition (tc.GetOrigin ());
+  rb->SetPosition (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->AttachMesh (mesh);
 
   // Create and attach a box collider.

@@ -306,6 +306,7 @@ struct iGraphics2D : public iBase
   /**
    * Write a text string into the back buffer. A negative value for bg
    * color will not draw the background.
+   * \remarks \p str is expected to be UTF-8 encoded.
    */
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const char *str, uint flags = 0) = 0;
