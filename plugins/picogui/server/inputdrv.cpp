@@ -86,6 +86,7 @@ void csPGInputDriver::Close ()
 
 bool csPGInputHandler::HandleEvent (iEvent &ev)
 {
+  static int mbstate;
   switch (ev.Type)
   {
     case csevKeyDown:
@@ -99,18 +100,20 @@ bool csPGInputHandler::HandleEvent (iEvent &ev)
     return true;
 
     case csevMouseDown:
+    mbstate |= 1<<(ev.Mouse.Button-1);
     infilter_send_pointing (PG_TRIGGER_DOWN, ev.Mouse.x, ev.Mouse.y,
-      ev.Mouse.Button, csPGInputDriver::GetCursor ());
+      mbstate, csPGInputDriver::GetCursor ());
     return true;
 
     case csevMouseUp:
+    mbstate &= ~(1<<(ev.Mouse.Button-1));
     infilter_send_pointing (PG_TRIGGER_UP, ev.Mouse.x, ev.Mouse.y,
-      ev.Mouse.Button, csPGInputDriver::GetCursor ());
+      mbstate, csPGInputDriver::GetCursor ());
     return true;
 
     case csevMouseMove:
     infilter_send_pointing (PG_TRIGGER_MOVE, ev.Mouse.x, ev.Mouse.y,
-      ev.Mouse.Button, csPGInputDriver::GetCursor ());
+      mbstate, csPGInputDriver::GetCursor ());
     return true;
 
     default:
