@@ -32,14 +32,22 @@
 
 IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
-EXPORT_CLASS_TABLE (glmac)
-  EXPORT_CLASS (csGraphics2DOpenGL, "crystalspace.graphics2d.glmac",
-    "Mac OpenGL 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE (Driver2DGL)
+  EXPORT_CLASS (csGraphics2DOpenGL, OPENGL_2D_DRIVER,
+    "Crystal Space OpenGL 2D driver for Macintosh")
 EXPORT_CLASS_TABLE_END
+
+IMPLEMENT_IBASE (csGraphics2DOpenGL)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iMacGraphics)
+IMPLEMENT_IBASE_END
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) : 
                    csGraphics2DGLCommon (iParent)
 {
+	CONSTRUCT_IBASE(iParent);
+
 	mMainWindow = NULL;
 	mColorTable = NULL;
 	mGLContext = NULL;
@@ -435,14 +443,15 @@ void csGraphics2DOpenGL::ActivateWindow( WindowPtr inWindow, bool active )
 /*----------------------------------------------------------------
 	Update the window.
 ----------------------------------------------------------------*/
-void csGraphics2DOpenGL::UpdateWindow( WindowPtr inWindow, bool *updated )
+bool csGraphics2DOpenGL::UpdateWindow( WindowPtr inWindow )
 {
-	*updated = false;
+	return false;
 }
 
-void csGraphics2DOpenGL::PointInWindow( Point *thePoint, bool *inWindow )
+bool csGraphics2DOpenGL::PointInWindow( Point *thePoint )
 {
 	GrafPtr	thePort;
+	bool	inWindow = false;
 
 	if ( PtInRgn( *thePoint, ((WindowPeek)mMainWindow)->strucRgn )) {
 		::GetPort( &thePort );
@@ -450,34 +459,29 @@ void csGraphics2DOpenGL::PointInWindow( Point *thePoint, bool *inWindow )
 		::GlobalToLocal( thePoint );
 		::SetPort( thePort );
 
-		*inWindow = true;
-	} else
-		*inWindow = false;
+		inWindow = true;
+	}
 
-	return;
+	return inWindow;
 }
 
 
-void csGraphics2DOpenGL::DoesDriverNeedEvent( bool *isEnabled )
+bool csGraphics2DOpenGL::DoesDriverNeedEvent( void )
 {
-	*isEnabled = false;
-
-	return;
+	return false;
 }
 
 
-void csGraphics2DOpenGL::WindowChanged()
+void csGraphics2DOpenGL::WindowChanged( void )
 {
 	aglUpdateContext( mGLContext );
 	return;
 }
 
 
-void csGraphics2DOpenGL::HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed )
+bool csGraphics2DOpenGL::HandleEvent( EventRecord *inEvent )
 {
-	*outEventWasProcessed = false;
-
-	return;
+	return false;
 }
 
 

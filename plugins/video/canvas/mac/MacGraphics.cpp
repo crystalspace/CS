@@ -788,16 +788,15 @@ void csGraphics2DMac::ActivateWindow( WindowPtr inWindow, bool active )
 /*----------------------------------------------------------------
 	Update the window.
 ----------------------------------------------------------------*/
-void csGraphics2DMac::UpdateWindow( WindowPtr inWindow, bool *updated )
+bool csGraphics2DMac::UpdateWindow( WindowPtr inWindow )
 {
 	CGrafPtr	thePort;
 	GDHandle	theGDHandle;
-
-	*updated = false;
+	bool		updated = false;
 
 	if ( ! mDrawSprocketsEnabled && mMainWindow ) {
 		if ( inWindow != (WindowPtr)mMainWindow )
-			return;
+			return false;
 
 		GetGWorld( &thePort, &theGDHandle );
 
@@ -815,13 +814,16 @@ void csGraphics2DMac::UpdateWindow( WindowPtr inWindow, bool *updated )
 
 		SetGWorld( thePort, theGDHandle );
 
-		*updated = true;
+		updated = true;
 	}
-	return;
+
+	return updated;
 }
 
-void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
+bool csGraphics2DMac::PointInWindow( Point *thePoint )
 {
+	bool inWindow = false;
+
 	if ( mDrawSprocketsEnabled ) {
 		DSpContextReference outContext;
 		OSStatus			err;
@@ -829,11 +831,9 @@ void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
 		if ( DSpFindContextFromPoint( *thePoint, &outContext ) == noErr ) {
 			if ( outContext == mDisplayContext ) {
 				DSpContext_GlobalToLocal ( outContext, thePoint );
-				*inWindow = true;
-				return;
+				inWindow = true;
 			}
 		}
-		*inWindow = false;
 	} else {
 		CGrafPtr	thePort;
 		GDHandle	theGDHandle;
@@ -843,26 +843,21 @@ void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
 			SetGWorld( (CGrafPtr)mMainWindow, mMainGDevice );
 			GlobalToLocal( thePoint );
 			SetGWorld( thePort, theGDHandle );
-
-			*inWindow = true;
-			return;
+			inWindow = true;
 		}
-
-		*inWindow = false;
 	}
-	return;
+
+	return inWindow;
 }
 
 
-void csGraphics2DMac::DoesDriverNeedEvent( bool *isEnabled )
+bool csGraphics2DMac::DoesDriverNeedEvent( void )
 {
-	*isEnabled = mDrawSprocketsEnabled;
-
-	return;
+	return mDrawSprocketsEnabled;
 }
 
 
-void csGraphics2DMac::WindowChanged()
+void csGraphics2DMac::WindowChanged( void )
 {
 	int				i;
 	int				theOffset;
@@ -892,20 +887,19 @@ void csGraphics2DMac::WindowChanged()
 }
 
 
-void csGraphics2DMac::HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed )
+bool csGraphics2DMac::HandleEvent( EventRecord *inEvent )
 {
+	bool outEventWasProcessed = false;
 	Boolean	processed = FALSE;
 
 	if ( mDrawSprocketsEnabled ) {
 		DSpProcessEvent( inEvent, &processed );
+
+		if ( processed )
+			outEventWasProcessed = true;
 	}
 
-	if ( processed )
-		*outEventWasProcessed = true;
-	else
-		*outEventWasProcessed = false;
-
-	return;
+	return outEventWasProcessed;
 }
 
 

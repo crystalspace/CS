@@ -12,17 +12,17 @@ struct iMacGraphics : public iBase
 {
     virtual void ActivateWindow( WindowPtr theWindow, bool active ) = 0;
     ///
-    virtual void UpdateWindow( WindowPtr theWindow, bool *updated ) = 0;
+    virtual bool UpdateWindow( WindowPtr theWindow ) = 0;
     ///
-    virtual void PointInWindow( Point *thePoint, bool *inWindow ) = 0;
+    virtual bool PointInWindow( Point *thePoint ) = 0;
     ///
-    virtual void DoesDriverNeedEvent( bool *enabled ) = 0;
+    virtual bool DoesDriverNeedEvent( void ) = 0;
     ///
     virtual void SetColorPalette( void ) = 0;
     ///
     virtual void WindowChanged( void ) = 0;
     ///
-    virtual void HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed ) = 0;
+    virtual bool HandleEvent( EventRecord *inEvent ) = 0;
 };
 
 #endif /* __IMACGRAPHICS_H__ */

@@ -24,11 +24,11 @@
 #include <gl/gl.h>
 #include <agl.h>
 #include "csutil/scf.h"
-#include "cs2d/mac/isysg2d.h"
+#include "cs2d/mac/iMacGraphics.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 
-/// Windows version.
-class csGraphics2DOpenGL : public csGraphics2DGLCommon
+/// Macintosh version.
+class csGraphics2DOpenGL : public csGraphics2DGLCommon, public iMacGraphics
 {
 	friend class csGraphics3DOpenGL;
 
@@ -48,13 +48,13 @@ public:
 	virtual bool	BeginDraw();
 	virtual void	FinishDraw();
 
-	void		 	ActivateWindow( WindowPtr theWindow, bool active );
-	void		 	UpdateWindow( WindowPtr theWindow, bool *updated );
-	void			PointInWindow( Point *thePoint, bool *inWindow );
- 	void			DoesDriverNeedEvent( bool *isEnabled );
- 	void			SetColorPalette( void );
- 	void			WindowChanged( void );
-	void			HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed );
+	virtual void	ActivateWindow( WindowPtr theWindow, bool active );
+	virtual bool	UpdateWindow( WindowPtr theWindow );
+	virtual bool	PointInWindow( Point *thePoint );
+ 	virtual bool	DoesDriverNeedEvent( void );
+ 	virtual void	SetColorPalette( void );
+ 	virtual void	WindowChanged( void );
+	virtual bool	HandleEvent( EventRecord *inEvent );
 
 	virtual bool	SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap);
 	virtual int		GetPage ();
@@ -62,6 +62,8 @@ public:
 	virtual bool	DoubleBuffer ();
 
 	int mGraphicsReady;
+
+	DECLARE_IBASE;
 
 protected:
 	CWindowPtr			mMainWindow;

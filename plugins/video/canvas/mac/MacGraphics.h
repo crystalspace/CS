@@ -54,12 +54,12 @@ public:
 	virtual void		Clear( int color );
 
 	virtual void		ActivateWindow( WindowPtr theWindow, bool active );
-	virtual void		UpdateWindow( WindowPtr theWindow, bool *updated );
-	virtual void		PointInWindow( Point *thePoint, bool *inWindow );
- 	virtual void		DoesDriverNeedEvent( bool *isEnabled );
+	virtual bool		UpdateWindow( WindowPtr theWindow );
+	virtual bool		PointInWindow( Point *thePoint );
+ 	virtual bool		DoesDriverNeedEvent( void );
  	virtual void		SetColorPalette( void );
  	virtual void		WindowChanged( void );
-	virtual void		HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed );
+	virtual bool		HandleEvent( EventRecord *inEvent );
 
 	DECLARE_IBASE;
 

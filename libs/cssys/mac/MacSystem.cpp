@@ -236,13 +236,12 @@ void SysSystemDriver::Loop(void)
     time_t current_time;
 	EventRecord anEvent;
 	iMacGraphics* piG2D = NULL;
-	bool outEventWasProcessed;
 	bool	driverNeedsEvent = false;
 
 	piG2D = QUERY_INTERFACE(System, iMacGraphics);
 
 	if (piG2D) {
-		piG2D->DoesDriverNeedEvent( &driverNeedsEvent );
+		driverNeedsEvent = piG2D->DoesDriverNeedEvent();
       	piG2D->SetColorPalette();
 	}
 
@@ -258,21 +257,16 @@ void SysSystemDriver::Loop(void)
 #endif
 
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
-			outEventWasProcessed = false;
 			if (( driverNeedsEvent ) && ( piG2D ))
-				piG2D->HandleEvent( &anEvent, &outEventWasProcessed);
-			if ( ! outEventWasProcessed )
-				DispatchEvent( current_time, &anEvent, piG2D );
+				if ( piG2D->HandleEvent( &anEvent ))
+					DispatchEvent( current_time, &anEvent, piG2D );
 		} else {
 			Point	theMouse;
 			bool	isIn = false;
 
 			theMouse = anEvent.where;
-			if ( piG2D ) {
-				piG2D->PointInWindow( &theMouse, &isIn );
-
-				if ( isIn )
-					Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
+			if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
+				Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
 			}
 		}
 		current_time = Time();
@@ -324,7 +318,7 @@ void SysSystemDriver::DispatchEvent( time_t current_time, EventRecord *theEvent,
 			{
 				bool	updateDone = false;
 				if ( piG2D )
-					piG2D->UpdateWindow( (WindowPtr) theEvent->message, &updateDone );
+					updateDone = piG2D->UpdateWindow( (WindowPtr) theEvent->message );
 			}
 			break;
 
@@ -884,13 +878,10 @@ void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent,
 	osEvtFlag = (unsigned char) (((unsigned long) theEvent->message) >> 24);
 	if (osEvtFlag == mouseMovedMessage) {
 		Point	theMouse;
-		bool	isIn = false;
 
 		theMouse = theEvent->where;
-		if ( piG2D ) {
-			piG2D->PointInWindow( &theMouse, &isIn );
-			if ( isIn )
-				Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
+		if (( piG2D ) && ( piG2D->PointInWindow( &theMouse ) )) {
+			Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
 		}
 	} else if (osEvtFlag == suspendResumeMessage) {
 		if (theEvent->message & resumeFlag) {
