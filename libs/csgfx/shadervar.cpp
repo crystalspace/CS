@@ -76,6 +76,12 @@ csShaderVariable& csShaderVariable::operator= (csShaderVariable& copyFrom)
 	copyFrom.GetValue(v); SetValue(v);
       }
       break;
+    case TRANSFORM:
+      {
+	csReversibleTransform v;
+	copyFrom.GetValue(v); SetValue(v);
+      }
+      break;
   }
   return *this;
 }

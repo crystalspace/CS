@@ -18,6 +18,8 @@ chronological order.
 	- Eric Sunshine relocated the bruteblock implementation from
 	  CS/plugins/mesh/terrain_brute to mesh/terrain/brute so that it
 	  resides alongside the terrain loader.
+	- Eric Sunshine added a missing csShaderVariable::TRANSFORM case to
+	  csShaderVariable::operator=().
 27-Mar-2005
 	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.
