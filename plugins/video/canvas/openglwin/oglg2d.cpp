@@ -304,18 +304,23 @@ bool csGraphics2DOpenGL::Open(const char *Title)
       {
         case DISP_CHANGE_RESTART:
         //computer must restart for mode to work.
+        CsPrintf (MSG_INITIALIZATION, "gl2d error: must restart for display change.\n");
         break;
         case DISP_CHANGE_BADFLAGS:
         //Bad Flag settings
+        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change bad flags.\n");
         break;
         case DISP_CHANGE_FAILED:
         //Failure to display
+        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change failed.\n");
         break;
         case DISP_CHANGE_NOTUPDATED:
         //No Reg Write Error
+        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change could not write registry.\n");
         break;
         default:
         //Unknown Error
+        CsPrintf (MSG_INITIALIZATION, "gl2d error: display change gave unknown error.\n");
         break;
       }
     }
