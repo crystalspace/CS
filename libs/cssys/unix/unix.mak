@@ -62,9 +62,7 @@ ifndef CFLAGS.profile
 endif
 
 # Flags for the compiler which are used when building a shared library.
-ifndef CFLAGS.DLL
-  CFLAGS.DLL =
-endif
+CFLAGS.DLL +=
 
 # General flags for the linker which are used in any case.
 # <cs-config>
@@ -78,7 +76,9 @@ endif
 
 # Flags for the linker which are used when building a shared library.
 # <cs-config>
-LFLAGS.DLL = -shared -Wl,-soname -Wl,$@
+ifeq ($(LFLAGS.DLL.USE_SONAME),yes)
+  LFLAGS.DLL += -Wl,-soname,$@
+endif
 # </cs-config>
 
 # System-dependent flags to pass to NASM

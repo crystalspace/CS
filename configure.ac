@@ -92,6 +92,8 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[CFLAGS.debug], [COMPILER.CFLAGS.debug],
 	[LFLAGS.debug], [COMPILER.LFLAGS.debug],
 	[LFLAGS.SYSTEM], [COMPILER.LFLAGS],
+	[LFLAGS.DLL], [PLUGIN.LFLAGS],
+	[LFLAGS.DLL.USE_SONAME], [PLUGIN.LFLAGS.USE_SONAME],
 	[LIBS.EXE], [COMPILER.LFLAGS],
 	[LIBS.SYSTEM], [COMPILER.LFLAGS],
 	[USE_XFREE86VM], [XFREE86VM.AVAILABLE],
@@ -651,18 +653,16 @@ CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$LDFLAGS], [+])
 CS_EMIT_BUILD_FLAGS([how to enable compilation warnings],
     [cs_cv_prog_cxx_enable_warnings],
     [CS_CREATE_TUPLE([-Wmost]) CS_CREATE_TUPLE([-Wall])], [C++],
-    [CFLAGS.SYSTEM], [+])
+    [CFLAGS.SYSTEM], [+], [], [cs_cv_prog_cxx_enable_warnings=''])
 
 
 
 #------------------------------------------------------------------------------
 # Check how to make compiler treat warnings as errors.
 #------------------------------------------------------------------------------
-AC_CACHE_CHECK([how to treat warnings as errors],
-    [cs_cv_prog_cxx_enable_errors],
-    [CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-Werror])], [C++],
-	[cs_cv_prog_cxx_enable_errors=$cs_build_cflags],
-	[cs_cv_prog_cxx_enable_errors=no])])
+CS_CHECK_BUILD_FLAGS([how to treat warnings as errors],
+    [cs_cv_prog_cxx_enable_errors], [CS_CREATE_TUPLE([-Werror])], [C++],
+    [], [cs_cv_prog_cxx_enable_errors=''])
 
 
 
@@ -766,6 +766,41 @@ CS_CHECK_VTABLE_THUNKS
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([if -pipe is accepted], [cs_cv_prog_cxx_pipe],
    [CS_CREATE_TUPLE([-pipe])], [C++], [CFLAGS.SYSTEM], [+])
+
+
+
+#------------------------------------------------------------------------------
+# Check if compiler/linker recognizes -shared directive which is needed for
+# linking plugin modules.  Unfortunately, the Apple compiler (and possibly
+# others) require extra effort.  Even though the compiler does not recognize
+# the -shared option, it nevertheless returns a "success" result after
+# complaining that the option is unrecognized.  Worse, even -Werror fails to
+# coerce the compiler into returning a "failure" result, so we must perform the
+# additional task of capturing the compiler's output and checking it for an
+# appropriate error message.
+#------------------------------------------------------------------------------
+AC_CACHE_CHECK([if -shared is accepted], [cs_cv_prog_link_shared],
+    [dnl Cheat: Make CS_BUILD_IFELSE/AC_LINK_IFELSE send errors to conftest.err
+    m4_pushdef([AC_TRY_EVAL], [_AC_EVAL_STDERR([$$1])])
+    CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-shared])], [C++],
+	[AS_IF([grep nrecognize conftest.err >/dev/null 2>&1],
+	    [cs_cv_prog_link_shared=no], [cs_cv_prog_link_shared=yes])],
+	[cs_cv_prog_link_shared=no])
+    rm -f conftest.err
+    m4_popdef([AC_TRY_EVAL])])
+
+AS_IF([test $cs_cv_prog_link_shared = yes],
+    [CS_BUILD_PROPERTY([LFLAGS.DLL], [-shared], [+])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if linker recognizes -soname which is used to assign a name internally
+# to plugin modules.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
+    [CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
+    [CS_BUILD_PROPERTY([LFLAGS.DLL.USE_SONAME], [yes])])
 
 
 
@@ -894,17 +929,12 @@ AS_IF([test $cs_cv_prog_cxx_debug != no],
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LOCAL_INCLUDE],
     [AS_IF([test -d /usr/local/include],
-	[AS_IF([test $cs_cv_prog_cxx_enable_warnings != no && \
-	    test $cs_cv_prog_cxx_enable_errors != no],
-	    [AC_CACHE_CHECK([if -I/usr/local/include is usable],
-		[cs_cv_prog_cxx_local_include],
-		[CS_BUILD_IFELSE([],
-		    [CS_CREATE_TUPLE([-I/usr/local/include \
-			$cs_cv_prog_cxx_enable_warnings \
-			$cs_cv_prog_cxx_enable_errors],[],[])], [C++],
-			[cs_cv_prog_cxx_local_include=yes],
-			[cs_cv_prog_cxx_local_include=no])])],
-	    [cs_cv_prog_cxx_local_include=yes])],
+	[CS_CHECK_BUILD_FLAGS([if -I/usr/local/include is usable],
+	    [cs_cv_prog_cxx_local_include],
+	    [CS_CREATE_TUPLE([-I/usr/local/include])], [C++],
+	    [cs_cv_prog_cxx_local_include=yes],
+	    [cs_cv_prog_cxx_local_include=no],
+	    [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors])],
 	[cs_cv_prog_cxx_local_include=no])
     
     AS_IF([test $cs_cv_prog_cxx_local_include = yes],

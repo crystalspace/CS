@@ -255,7 +255,7 @@ if $(USE_DLLWRAP) != "yes"
 {
   actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
   {
-    $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
   }
 }
 else

@@ -7,8 +7,45 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 11-Dec-2003
-	- Philipp Aumayr fixed a bug in AWS where a masked textbox raised an assert
-	  if the input was reactivated by clicking on the far right of the string.
+	- Philipp Aumayr fixed a bug in AWS where a masked textbox raised an
+	  assert if the input was reactivated by clicking on the far right of
+	  the string.
+	- Eric Sunshine augmented configure.ac to check if the compiler/linker
+	  recognize the -shared flag.  Consequently, this flag is no longer
+	  hard-coded in unix.mak, unix.jam, and win32.jam.
+	- Eric Sunshine augmented configure.ac to check if the linker
+	  recognizes the -soname flag.  Consequently, this flag is no longer
+	  hard-coded in unix.mak and unix.jam.  This change also fixes bug
+	  #748023 ("-soname not recognized on Solaris").
+	- Eric Sunshine augmented compiler.m4, which is used by external
+	  projects, to also check for -shared and -soname.
+	- Eric Sunshine fixed the CS_PROG_CC, CS_PROG_CXX, CS_PROG_LINK checks
+	  in compiler.m4, which is used by external projects, so that they
+	  append results to the existing values of COMPILER.CFLAGS,
+	  COMPILER.C++FLAGS, and COMPILER.LFLAGS, respectively, rather than
+	  setting the values exclusively.
+	- Eric Sunshine agumented CS_BUILD_IFELSE() and CS_CHECK_BUILD() in
+	  checkbuild.m4 to accept an optional INHIBIT-OTHER-FLAGS argument.
+	  This argument, if provided, inhibits the normal behavior of appending
+	  OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS to the values of the
+	  output variables (though the "other" flags are still used for the
+	  check itself).
+	- Eric Sunshine augmented CS_CHECK_BUILD_FLAGS() in checkbuild.m4 to
+	  accept optional OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS arguments.
+	  These may be useful in special cases where the check for one build
+	  flag might depend upon the presence of other build flags, yet the
+	  output variable should reflect only the build flag under actual
+	  scrutiny, and not the additional supporting flags.  As a practical
+	  example, some build flags cause the compiler to emit a warning
+	  message because it does not like the flag, yet the compiler still
+	  exits with a "success" result, which makes it difficult to determine
+	  that the compiler complained about the test flag.  To work around
+	  this problem, -Werror can be sent in via OTHER-CFLAGS to cause the
+	  compiler to treat the warning as an error and exit with a proper and
+	  detectable "failure" result.
+	- Eric Sunshine simplified the -Werror and CS_CHECK_LOCAL_INCLUDE tests
+	  in configure.ac by using the (relatively) new CS_CHECK_BUILD_FLAGS()
+	  macro, rather than the lower-level CS_BUILD_IFELSE() macro.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even

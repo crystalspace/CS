@@ -5,6 +5,7 @@ SHELL ?= "/bin/sh" ;
 
 # only use nasm on x86 for now...
 NASM.FLAGS += -f elf ;
+
 # disabled (Matze: I really think we should eanble this, regardless of the 1%
 # speed loss...)
 #PLUGIN.CFLAGS += -fPIC ;
@@ -78,7 +79,19 @@ actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
-actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+
+if $(PLUGIN.LFLAGS.USE_SONAME) = "yes"
 {
-  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+  {
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
+      -Wl,-soname,$(<)
+  }
+}
+else
+{
+  actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+  {
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  }
 }

@@ -58,7 +58,7 @@ AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
 #------------------------------------------------------------------------------
 # CS_BUILD_IFELSE([PROGRAM], [FLAGS], [LANGUAGE], [ACTION-IF-BUILT],
 #                 [ACTION-IF-NOT-BUILT], [OTHER-CFLAGS], [OTHER-LFLAGS],
-#                 [OTHER-LIBS])
+#                 [OTHER-LIBS], [INHIBIT-OTHER-FLAGS])
 #	Try building a program using the supplied compiler flags, linker flags,
 #	and library references.  PROGRAM is typically a program composed via
 #	AC_LANG_PROGRAM().  PROGRAM may be omitted if you are interested only
@@ -80,9 +80,9 @@ AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
 #	cs_build_ok is set to "no" and ACTION-IF-NOT-BUILT is invoked.
 #	OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS specify additional compiler
 #	flags, linker flags, and libraries which should be used with each tuple
-#	build attempt.  Upon successful build, these additional flags are
+#	build attempt.  Upon successful build, these additional flags are also
 #	reflected in the variables cs_build_cflags, cs_build_lflags, and
-#	cs_build_libs.
+#	cs_build_libs unless INHIBIT-OTHER-FLAGS is a non-empty string.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_BUILD_IFELSE],
     [AC_LANG_PUSH(m4_default([$3],[C]))
@@ -109,9 +109,9 @@ AC_DEFUN([CS_BUILD_IFELSE],
     AC_LANG_POP(m4_default([$3],[C]))
 
     AS_IF([test $cs_build_ok = yes],
-	[cs_build_cflags=CS_TRIM([$cs_cflags_test $6])
-	cs_build_lflags=CS_TRIM([$cs_lflags_test $7])
-	cs_build_libs=CS_TRIM([$cs_libs_test $8])
+	[cs_build_cflags=CS_TRIM([$cs_cflags_test[]m4_ifval([$9],[],[ $6])])
+	cs_build_lflags=CS_TRIM([$cs_lflags_test[]m4_ifval([$9],[],[ $7])])
+	cs_build_libs=CS_TRIM([$cs_libs_test[]m4_ifval([$9],[],[ $8])])
 	m4_default([$4],[:])],
 	[m4_default([$5],[:])])])
 
@@ -120,7 +120,8 @@ AC_DEFUN([CS_BUILD_IFELSE],
 #------------------------------------------------------------------------------
 # CS_CHECK_BUILD(MESSAGE, CACHE-VAR, [PROGRAM], [FLAGS], [LANGUAGE],
 #                [ACTION-IF-BUILT], [ACTION-IF-NOT-BUILT], [IGNORE-CACHE],
-#                [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS])
+#                [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS],
+#                [INHIBIT-OTHER-FLAGS])
 #	Like CS_BUILD_IFELSE() but also prints "checking" and result messages,
 #	and optionally respects the cache.  Sets CACHE-VAR to "yes" upon
 #	success, else "no" upon failure.  Additionally, sets CACHE-VAR_cflags,
@@ -137,14 +138,14 @@ AC_DEFUN([CS_CHECK_BUILD],
 		$2_cflags=$cs_build_cflags
 		$2_lflags=$cs_build_lflags
 		$2_libs=$cs_build_libs],
-		[$2=no], [$9], [$10], [$11])])],
+		[$2=no], [$9], [$10], [$11], [$12])])],
 	[AC_MSG_CHECKING([$1])
 	    CS_BUILD_IFELSE([$3], [$4], [$5],
 		[$2=yes
 		$2_cflags=$cs_build_cflags
 		$2_lflags=$cs_build_lflags
 		$2_libs=$cs_build_libs],
-		[$2=no], [$9], [$10], [$11])
+		[$2=no], [$9], [$10], [$11], [$12])
 	    AC_MSG_RESULT([$$2])])
     AS_IF([test $$2 = yes], [m4_default([$6],[:])],
 	[$2_cflags=''
@@ -156,7 +157,8 @@ AC_DEFUN([CS_CHECK_BUILD],
 
 #------------------------------------------------------------------------------
 # CS_CHECK_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
-#                     [ACTION-IF-RECOGNIZED], [ACTION-IF-NOT-RECOGNIZED])
+#                     [ACTION-IF-RECOGNIZED], [ACTION-IF-NOT-RECOGNIZED],
+#                     [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS])
 #	Like CS_CHECK_BUILD(), but checks only if the compiler or linker
 #	recognizes a command-line option or options.  MESSAGE is the "checking"
 #	message.  CACHE-VAR is the shell cache variable which receives the flag
@@ -168,13 +170,14 @@ AC_DEFUN([CS_CHECK_BUILD],
 #	specifies which compiler to use for the test.  If LANGUAGE is omitted,
 #	C is used.  If a command-line option is recognized, then CACHE-VAR is
 #	set to the composite value of $cs_build_cflags, $cs_build_lflags, and
-#	$cs_build_libs of the FLAGS element which succeeded, and
-#	ACTION-IF-RECOGNIZED is invoked.  If no options are recognized, then
-#	CACHE-VAR is set to "no", and ACTION-IF-NOT-RECOGNIZED is invoked.
+#	$cs_build_libs of the FLAGS element which succeeded (not including the
+#	"other" flags) and ACTION-IF-RECOGNIZED is invoked.  If no options are
+#	recognized, then CACHE-VAR is set to "no", and ACTION-IF-NOT-RECOGNIZED
+#	is invoked.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2],
 	[CS_BUILD_IFELSE([], [$3], [$4],
 	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])],
-	    [$2=no])])
+	    [$2=no], [$7], [$8], [$9], [Y])])
     AS_IF([test "$$2" != no], m4_default([$5],[:]), m4_default([$6],[:]))])

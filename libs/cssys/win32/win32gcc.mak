@@ -63,7 +63,7 @@ CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx
 CFLAGS.profile = -pg -O -g
 
 # Flags for the compiler which are used when building a shared library.
-CFLAGS.DLL =
+CFLAGS.DLL +=
 
 # General flags for the linker which are used in any case.
 # <cs-config>
@@ -86,7 +86,7 @@ DFLAGS.debug =
 # <cs-config>
 TARGET.RAW = $(basename $(notdir $@))
 TARGET.RAW.UPCASE = $(basename $(notdir $(UPCASE)))
-LFLAGS.DLL = -shared $(DFLAGS.$(MODE))
+LFLAGS.DLL += $(DFLAGS.$(MODE))
 # </cs-config>
 
 # Typical extension for objects and static libraries
