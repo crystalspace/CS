@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Aug-2003
+	- Eric Sunshine moved an MSVC6 specialization (added by Boyan) out of
+	  csutil/array.h and into cssys/win32/csosdefs.h where it belongs.
 16-Aug-2003
 	- Jorrit added more features with references to parts of the
 	  documentation.
