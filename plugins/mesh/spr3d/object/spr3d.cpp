@@ -40,6 +40,9 @@
 #include "cssys/csendian.h"
 #include "qsqrt.h"
 
+// [res: moved here 'cause I get an "internal compiler error" on msvc7... whyever]
+CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh2, ())
+
 CS_IMPLEMENT_PLUGIN
 
 // Set the default lighting quality.
@@ -50,7 +53,6 @@ CS_IMPLEMENT_PLUGIN
 
 // Set the default lod used.
 #define DEFAULT_LOD 1
-
 
 //--------------------------------------------------------------------------
 
@@ -833,8 +835,6 @@ CS_IMPLEMENT_STATIC_VAR (Get_obj_verts, spr3d_obj_verts, ())
 /// The list of tween vertices.
 CS_TYPEDEF_GROWING_ARRAY_REF (spr3d_tween_verts, csVector3);
 CS_IMPLEMENT_STATIC_VAR (Get_tween_verts, spr3d_tween_verts, ())
-
-CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh2, ())
 
 spr3d_tr_verts *tr_verts = NULL;
 spr3d_uv_verts *uv_verts = NULL;
