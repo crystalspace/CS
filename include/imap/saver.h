@@ -4,8 +4,9 @@
 #include "csutil/scf.h"
 
 struct iString;
+struct iMetaManager;
 
-SCF_VERSION (iSaver, 0, 0, 1);
+SCF_VERSION (iSaver, 0, 0, 2);
 
   /**
    * This interface is used to serialize the engine
@@ -20,6 +21,10 @@ struct iSaver : public iBase {
    * Return the current engine contents as a string.
    */ 
   virtual iString* SaveMapFile()=0;
+  /**
+   * Register a meta-data manager for use with this saver.
+   */
+  virtual void UseMetaManager (iMetaManager *mm) = 0;
 };
 
 #endif

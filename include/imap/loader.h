@@ -38,6 +38,7 @@ struct iSoundHandle;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
+struct iMetaManager;
 
 /**\name Loader bit flags
  * Used in iLoader::SetMode().
@@ -51,7 +52,7 @@ struct iSoundWrapper;
 #define CS_LOADER_NOTRANSFORM	0x00000004
 /** @} */
 
-SCF_VERSION (iLoader, 0, 0, 6);
+SCF_VERSION (iLoader, 0, 0, 7);
 
 /**
  * This interface represents the map loader.
@@ -128,6 +129,9 @@ struct iLoader : public iBase
   
   /// Load and parse a effect from file
   virtual bool LoadEffectFile (const char* filename) = 0;
+
+  /// Register a meta-data manager for use with this loader.
+  virtual void UseMetaManager (iMetaManager *mm) = 0;
 };
 
 /** } */

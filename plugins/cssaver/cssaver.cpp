@@ -17,6 +17,7 @@
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 #include "csgfx/rgbpixel.h"
+#include "imap/meta.h"
 
 #define ONE_OVER_256 (1.0/255.0)
 
@@ -115,6 +116,14 @@ bool csSaver::SaveTextures(csRef<iDocumentNode>& parent) {
     } else {
       CS_ASSERT(0);
     }
+
+    if (metamanager)
+    {
+      csRef<iDocumentNode> meta = current->CreateNodeBefore (CS_NODE_ELEMENT);
+      meta->SetValue ("meta");
+      csRef<iDocumentNode> metatext = meta->CreateNodeBefore (CS_NODE_TEXT);
+      metatext->SetValue (metamanager->Save (texWrap->QueryObject ()));
+    }
   }
   return 1;
 }
@@ -199,6 +208,14 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent) {
         }
       }
     }
+
+    if (metamanager)
+    {
+      csRef<iDocumentNode> meta = current->CreateNodeBefore (CS_NODE_ELEMENT);
+      meta->SetValue ("meta");
+      csRef<iDocumentNode> metatext = meta->CreateNodeBefore (CS_NODE_TEXT);
+      metatext->SetValue (metamanager->Save (matWrap->QueryObject ()));
+    }
   }
   return 1;
 }
@@ -230,5 +247,9 @@ bool csSaver::SaveMapFile(const char *filename) {
   if(!str) return 0;
 
   return vfs->WriteFile(filename, str->GetData(), str->Length());
+}
+
+void csSaver::UseMetaManager(iMetaManager *mm) {
+  metamanager = mm;
 }
 
