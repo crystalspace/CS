@@ -441,7 +441,6 @@ void csTriangleArrayPolygonBuffer::Prepare ()
     qn--;
     size = size + size;
   }
-  printf ("size=%d\n", size); fflush (stdout);
 
   //------------------
   // We now have an optimal size for the super lightmap. Start allocating

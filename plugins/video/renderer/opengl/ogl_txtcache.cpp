@@ -376,7 +376,7 @@ int OpenGLLightmapCache::FindFreeSuperLightmap (int q)
 {
   int i;
 
-  for(i = 0 ; i < super_lm_num[q] ; i++)
+  for (i = 0 ; i < super_lm_num[q] ; i++)
     if (suplm[q][i].cacheData == NULL) return i;
   return -1;
 }
