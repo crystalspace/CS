@@ -24,6 +24,10 @@ The history order is reversed so that new features are at the top.
         - Philip Wyett commented out all MSVC project file related lines
           in csperl5 plugin makefile, until time permits to investigate why it
 	  hangs the nsvcgen process when run locally.
+	- res fixed:
+	    - Wrong parameters for *nix csGetPluginPaths().
+	    - Stupid bug where the name of the .csplugin instead of. dll file 
+	      was returned as the plugin path on Win32.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
