@@ -28,8 +28,16 @@
 #pragma warning (disable:4305)  // VC++ 5.0 version of above warning. 
 #include "strstrea.h"
 #include "stdlib.h"			// For exit()
-#define WEXP	__declspec(dllexport)
-#define WFEXP	__cdecl
+
+//I undefined the following defines, because they cause every application, 
+//that gets linked against the cspace lib to export all the ddg symbols.
+//you probably only need these, if you intend to make the ddg stuff
+//into its own dll.
+
+//#define WEXP	__declspec(dllexport) //Only needed for a standalone version...
+//#define WFEXP	__cdecl               //Only needed for a standalone version...  
+#define WEXP	
+#define WFEXP	
 
 #else
 // Linux defines
