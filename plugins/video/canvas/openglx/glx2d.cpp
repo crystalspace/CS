@@ -74,7 +74,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     config->DecRef ();
   }
   else
-    CsPrintf (MSG_FATAL_ERROR, "could not opengl.cfg, will use NULL as displaydriver\n");
+    CsPrintf (MSG_FATAL_ERROR, "Could not open opengl.cfg to check if a special MESA displaydriver should be used.\n");
   
   Screen* screen_ptr;
 
