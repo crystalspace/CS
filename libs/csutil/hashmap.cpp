@@ -104,7 +104,7 @@ void csHashIterator::GotoNextSameKey ()
   if (!bucket) return;
   element_index++;
   while (element_index < bucket->Length () &&
-  	bucket->Get(element_index)->key != key)
+  	bucket->Get(element_index).key != key)
   {
     element_index++;
   }
@@ -114,7 +114,7 @@ void csHashIterator::GotoNextSameKey ()
 csHashObject csHashIterator::Next ()
 {
   if (bucket == NULL) return NULL;
-  csHashObject obj = ((csHashElement*)((*bucket)[element_index]))->object;
+  csHashObject obj = ((*bucket)[element_index]).object;
   current_index = element_index;
   current_bucket = bucket;
   if (do_iterate_key) GotoNextSameKey ();
@@ -145,10 +145,10 @@ void csHashMap::Put (csHashKey key, csHashObject object)
   uint32 idx = key % NumBuckets;
   if (!Buckets[idx]) Buckets.Put (idx, new csHashBucket ());
   csHashBucket* bucket = Buckets[idx];
-  csHashElement* element = new csHashElement ();
-  element->key = key;
-  element->object = object;
-  bucket->Push (element);
+
+  int i = bucket->Push (csHashElement ());
+  (*bucket)[i].key = key;
+  (*bucket)[i].object = object;
 }
 
 csHashObject csHashMap::Get (csHashKey key) const
@@ -159,8 +159,8 @@ csHashObject csHashMap::Get (csHashKey key) const
   int i;
   for (i = 0 ; i < bucket->Length () ; i++)
   {
-    csHashElement* element = bucket->Get(i);
-    if (element->key == key) return element->object;
+    csHashElement& element = bucket->Get(i);
+    if (element.key == key) return element.object;
   }
   return NULL;
 }
@@ -173,10 +173,10 @@ void csHashMap::Delete (csHashKey key, csHashObject object)
   int i;
   for (i = bucket->Length ()-1 ; i >= 0 ; i--)
   {
-    csHashElement* element = bucket->Get(i);
-    if (element->key == key && element->object == object)
+    csHashElement& element = bucket->Get(i);
+    if (element.key == key && element.object == object)
     {
-      bucket->Delete (i);
+      bucket->DeleteIndex (i);
       break;
     }
   }
@@ -190,9 +190,9 @@ void csHashMap::DeleteAll (csHashKey key)
   uint32 i;
   for (i = bucket->Length () ; i-- > 0 ; )
   {
-    csHashElement* element = bucket->Get(i);
-    if (element->key == key)
-      bucket->Delete (i);
+    csHashElement& element = bucket->Get(i);
+    if (element.key == key)
+      bucket->DeleteIndex (i);
   }
 }
 

@@ -86,8 +86,10 @@ csHashObject csHashIteratorReversible::Next ()
 
 const char* csHashIteratorReversible::GetKey () const
 {
-  if ((current_bucket != NULL) && (current_index > -1) && (current_index <= current_bucket->Length())) 
-    return hashr->GetKey ( ((csHashElement *)((*current_bucket)[current_index])) ->key);
+  if ((current_bucket != NULL) && (current_index > -1)
+  	&& (current_index <= current_bucket->Length())) 
+    return hashr->GetKey ( ((*current_bucket)
+    	[current_index]) .key);
   else
     return NULL;
 }

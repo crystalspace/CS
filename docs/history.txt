@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 24-Apr-2003
 	- Fixed a compile error in lview.h.
 	- Fixed another compile error in bezier mesh.
+	- Greatly optimized the CS hashmap. Now it is several factors faster
+	  than before and also uses less memory. Filling 1000000 elements
+	  in a hashmap with 211 buckets (default) now takes 1 second instead
+	  of 2.5. Traversing all elements takes 37 ms instead of 144.
+	  Getting 100000 random elements takes 49 ms instead of 218.
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The

@@ -20,6 +20,7 @@
 #define __CS_HASHMAP_H__
 
 #include "csutil/parray.h"
+#include "csutil/array.h"
 
 class csHashMapReversible;
 class csHashIteratorReversible;
@@ -46,7 +47,7 @@ struct csHashElement
 };
 
 /// a vector of csHashElements
-typedef csPDelArray<csHashElement> csHashBucket;
+typedef csArray<csHashElement> csHashBucket;
 /// a vector of csHashBuckets
 typedef csPDelArray<csHashBucket> csHashBucketVector;
 
