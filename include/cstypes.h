@@ -61,9 +61,9 @@ typedef unsigned short uint16;
 /// signed 16-bit integer (-32 768..32 767)
 typedef short int16;
 /// unsigned 32-bit integer (0..4 294 967 295)
-typedef unsigned long uint32;
+typedef unsigned int uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
-typedef long int32;
+typedef int int32;
 #ifdef COMP_GCC
 /// unsigned 64 bit integer
 typedef unsigned long long uint64;
