@@ -64,12 +64,20 @@ The history order is reversed so that new features are at the top.
 	  what he had completed so far.
 	- Michael also added SetVertices() methods to Sprite3d, modified
 	  metagen to hand over the pointer to its vertex buffer (and all
-	  the other arrays it uses ). *WARNING* you will need to
-	  recompile csparser, spr3d and spr3dldr to return a
-	  successful build. This is as per the patch sent earlier
-	  to the dev list.
+	  the other arrays it uses ).
 	- Michael added some further documentation to tesselat.h to explain
 	  what it does and how it does it.
+	- Eric Sunshine eliminated references to non-existent motion.txi and
+	  skelbone.txi from anim.txi.
+	- Eric Sunshine fixed numerous Texinfo mark-up problems and other
+	  related errors in the new texinfo/plugins/anim documentation.
+	- Eric Sunshine repaired the documentation in tesselat.h so that
+	  Doxygen will be able to make use of it.
+	- Eric Sunshine fixed the new SetTexels(), SetVertices(), SetNormals(),
+	  and SetTriangles() methods which were added to the 3D sprite class so
+	  that the array argument is now `const'.  This helps to indicate that
+	  the incoming array is not intended for modification.  Also clarified
+	  the documentation to make this point painfully clear.
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow

@@ -144,9 +144,9 @@ public:
   int AddVertex (float x, float y, float z);
 
   /**
-   * Set all polygon vertices at once.
+   * Set all polygon vertices at once.  Copies the array.
    */
-  void SetVertices (csVector3 *v, int num)
+  void SetVertices (csVector3 const* v, int num)
   { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector3)); }
 
   /**

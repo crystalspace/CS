@@ -362,8 +362,8 @@ public:
   /// Get array of texels.
   csVector2* GetTexels (int frame) const
     { return (*texels.Get(frame)).GetVertices (); }
-  /// Set texel array
-  void SetTexels(csVector2* tex, int count, int frame)
+  /// Set texel array.  The array is copied.
+  void SetTexels(csVector2 const* tex, int count, int frame)
     { (*texels.Get(frame)).SetVertices(tex, count); }
 
 
@@ -375,8 +375,8 @@ public:
   /// Get vertex array.
   csVector3* GetVertices (int frame) const
     { return (*vertices.Get(frame)).GetVertices (); }
-  /// Set vertex array
-  void SetVertices(csVector3* verts, int count, int frame)
+  /// Set vertex array.  The array is copied.
+  void SetVertices(csVector3 const* verts, int count, int frame)
     { (*vertices.Get(frame)).SetVertices(verts, count); }
 	
   /// Query the number of normals.
@@ -387,8 +387,8 @@ public:
   /// Get normal array.
   csVector3* GetNormals (int frame) const
     { return (*normals.Get(frame)).GetVertices (); }
-  /// Set normal array
-  void SetNormals(csVector3* norms, int count, int frame)
+  /// Set normal array.  The array is copied.
+  void SetNormals(csVector3 const* norms, int count, int frame)
     { (*normals.Get(frame)).SetVertices(norms, count); }
 
   /**
@@ -404,8 +404,8 @@ public:
   int GetTriangleCount () const { return texel_mesh->GetTriangleCount(); }
   /// Size triangle buffer size
   void SetTriangleCount( int count ) { texel_mesh->SetSize(count); }
-  /// Set a bank of triangles
-  void SetTriangles( csTriangle *trig, int count ) { texel_mesh->SetTriangles(trig, count); }
+  /// Set a bank of triangles.  The bank is copied.
+  void SetTriangles( csTriangle const* trig, int count ) { texel_mesh->SetTriangles(trig, count); }
 
   /// Create and add a new frame to the sprite.
   csSpriteFrame* AddFrame ();
@@ -501,7 +501,7 @@ public:
     {
       return scfParent->GetTexels (frame);
     }
-    virtual void SetTexels(csVector2* tex, int count, int frame)
+    virtual void SetTexels(csVector2 const* tex, int count, int frame)
     {
       scfParent->SetTexels(tex, count, frame);
     }
@@ -517,7 +517,7 @@ public:
     {
       return scfParent->GetVertices (frame);
     }
-    virtual void SetVertices(csVector3* verts, int count, int frame)
+    virtual void SetVertices(csVector3 const* verts, int count, int frame)
     {
       scfParent->SetVertices(verts, count, frame);
     }
@@ -533,7 +533,7 @@ public:
     {
       return scfParent->GetNormals (frame);
     }
-    virtual void SetNormals(csVector3* norms, int count, int frame)
+    virtual void SetNormals(csVector3 const* norms, int count, int frame)
     {
       scfParent->SetNormals(norms, count, frame);
     }
@@ -557,7 +557,7 @@ public:
     {
       scfParent->SetTriangleCount(count);
     }
-    virtual void SetTriangles( csTriangle *trig, int count)
+    virtual void SetTriangles( csTriangle const* trig, int count)
     {
       scfParent->SetTriangles(trig, count);
     }

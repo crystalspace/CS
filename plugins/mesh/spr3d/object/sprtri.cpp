@@ -42,20 +42,20 @@ void csTriangleMesh2::Clear ()
 
 void csTriangleMesh2::SetSize(int count)
 {
-  if ( triangles) delete [] triangles;
+  if (triangles) delete [] triangles;
   triangles = new csTriangle[count];
   max_triangles = num_triangles = count;
 }
 
-void csTriangleMesh2::SetTriangles( csTriangle *trigs, int count)
+void csTriangleMesh2::SetTriangles( csTriangle const* trigs, int count)
 {
-  if ( count > max_triangles ) 
+  if (count > max_triangles)
   {
-	delete [] triangles;
-	triangles = new csTriangle[count];
-	max_triangles = count;
+    delete [] triangles;
+    triangles = new csTriangle[count];
+    max_triangles = count;
   }
-  memcpy( triangles, trigs, sizeof(csTriangle) * count);
+  memcpy(triangles, trigs, sizeof(csTriangle) * count);
   num_triangles = count;
 }
 

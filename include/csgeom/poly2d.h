@@ -155,10 +155,10 @@ public:
   int AddVertex (float x, float y);
 
   /**
-   * Set all polygon vertices at once.
+   * Set all polygon vertices at once.  Copies the array.
    * Note! This doesn't update the bounding box!
    */
-  void SetVertices (csVector2 *v, int num)
+  void SetVertices (csVector2 const* v, int num)
   { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
 
   /// Update the bounding box (useful after SetVertices).

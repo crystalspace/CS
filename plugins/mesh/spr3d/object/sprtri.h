@@ -56,10 +56,10 @@ public:
   void Clear ();
   /// Reset the mesh of triangles (don't deallocate the internal structures yet).
   void Reset ();
-  
+  /// Set the size of the triangle list.
   void SetSize(int count);
-  
-  void SetTriangles( csTriangle *trigs, int count );
+  /// Set the triangle array.  The array is copied.
+  void SetTriangles( csTriangle const* trigs, int count );
 };
 
 class csTriangleVertices2;
