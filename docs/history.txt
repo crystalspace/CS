@@ -29,6 +29,7 @@ chronological order.
 	- res changed the Win32 call stack generator to not start with the 
 	  stack in the kernel. This also seems to fix call stack generation
 	  on WinXP SP2.
+	- res fixed sprcal3d to work with memtracker enabled.
 27-Sep-2004
 	- dfryer changed "unsigned int" to size_t in
 	  csXMLShaderTech::ActivatePass().  Prototype used size_t; size_t is

@@ -54,6 +54,12 @@
 #include "ivideo/material.h"
 #include "csqint.h"
 
+// Hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include <cal3d/cal3d.h>
 
 struct iObjectRegistry;
