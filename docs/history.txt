@@ -63,6 +63,8 @@ chronological order.
 	  identical (except for default access mode), therefore, it makes more
 	  sense to simply disable this warning than to try to arrive at some
 	  ugly work-around in the code for avoiding it.
+	- Rhad added Field Speed and Field Acceleration interface windows
+	  to partedit.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:
