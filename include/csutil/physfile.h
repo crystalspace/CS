@@ -31,7 +31,7 @@ class csPhysicalFile : public iFile
 {
 public:
   /**
-   * Construct from a filename using fopen() access flags (i.e.  "r", "rb",
+   * Construct from a filename using fopen() access flags (i.e. "r", "rb",
    * "w+", etc.).  It is usually a good idea to open files in binary mode (i.e.
    * "rb, "wb", etc.).  This ensures that operations on "number of bytes"
    * operate as expected.  For instance, requesting 10 bytes with Read() will
@@ -46,7 +46,7 @@ public:
    * optional path argument is used only to seed the stored name for use by the
    * GetName() method.  If not supplied, then an opaque, essentially
    * meaningless name is returned by GetName().  It is usually a good idea to
-   * open files in binary mode (i.e.  "rb, "wb", etc.).  This ensures that
+   * open files in binary mode (i.e. "rb, "wb", etc.).  This ensures that
    * operations on "number of bytes" operate as expected.  For instance,
    * requesting 10 bytes with Read() will return 10 bytes in binary mode
    * (assuming end-of-file has not been reached), whereas in text mode, fewer
@@ -58,7 +58,7 @@ public:
   virtual ~csPhysicalFile();
 
   /**
-   * Returns the path use to construct the object, or "#csPhysicalFile" if no
+   * Returns the path used to construct the object, or "#csPhysicalFile" if no
    * path was given when constructed from an existing FILE*.
    */
   virtual char const* GetName();
