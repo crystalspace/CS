@@ -844,6 +844,7 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/extensions/xf86vmode.h>],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
 	[CS_BUILD_PROPERTY([USE_XFREE86VM], [yes])
+	CS_JAMCONFIG_PROPERTY([XFREE86VM.CFLAGS], [$X_CFLAGS])
 	CS_JAMCONFIG_PROPERTY([XFREE86VM.LFLAGS],
 	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11 dnl
 	    $(X_EXTRA_LIBS)])])], [],

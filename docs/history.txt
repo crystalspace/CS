@@ -102,12 +102,15 @@ chronological order.
 	      into unix.mak where it belongs.
 	- DeSigna:
           - Modified csGraphics2D::Initialize constructor used by
-	    csGraphics2D::CreateOffscreenCanvas(), as it did not
-	    correctly initialize the config accessor member. The font
-	    cache, loaded by G2D, relies on this accessor to get its
-	    config. 
-	  - pgserver uses all the accelerated CS operations
-	    again. Non-functional. 
+	    csGraphics2D::CreateOffscreenCanvas(), as it did not correctly
+	    initialize the config accessor member. The font cache, loaded by
+	    G2D, relies on this accessor to get its config.
+	  - pgserver uses all the accelerated CS operations again.
+	    Non-functional.
+	- Eric Sunshine fixed configure.ac so that it emits XFREE86VM.CFLAGS
+	  to Jamconfig (it was only emitting XFREE86VM.LFLAGS).  This allows
+	  the xextf86vm plugin to build correctly with Jam on platforms where
+	  the X11 headers reside in /usr/X11R6/include.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.
