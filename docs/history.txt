@@ -10,12 +10,35 @@ chronological order.
 	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
 	  (patch #1155282), which adds iAnimTimeUpdateHandler for
 	  sprcal3d. This handler allows clients to override the default
-	  advancement behavhior of csSpriteCal3DMeshObject::Advance(), which
+	  advancement behavior of csSpriteCal3DMeshObject::Advance(), which
 	  normally merely invokes CalModel::update(). Eric also made a number
 	  of improvements to the patch, such as adding missing Doxygen
 	  comments, increasing robustness, and making better use of CS
 	  functionality.  In addition, Eric performed a bit of formatting
 	  cleanup of the sprcal3d-related header files.
+	- Jorrit again renamed SortedInPoint() and SortedInLine() to
+	  PointInClosedMesh() and LineInClosedMesh().
+	- Jorrit added csPolygonMeshTools::BoxInClosedMesh() routine.
+	- Jorrit added csPlane3::GetNormal().
+	- Jorrit added csPlane3::FindPoint() which returns a point on the
+	  plane.
+	- Jorrit added csIntersect3::BoxPlane() which tests if a plane
+	  intersects with a box.
+	- Jorrit added csIntersect3::BoxTriangle() which tests if a triangle
+	  intersects with a box.
+	- Jorrit renamed a great deal of the routines in csIntersect3 so that
+	  they have a more consistent naming. This means that all those
+	  routines now mention the names of the two objects that are being
+	  intersected. For example, IntersectPolygon() has now been renamed
+	  to PlanePolygon(). The apimod document has been updated with all
+	  changes.
+	- Jorrit renamed routines in csIntersect2 in a similar fashion.
+	- Jorrit added csIntersect3::BoxBox() for which the implementation
+	  is actually in csBox3. But this routine complements csIntersect3
+	  nicely.
+	- Jorrit added csIntersect3::FrustumFrustum() for which the
+	  implementation is actually in csFrustum.
+	- Jorrit added 'const' several times to code in csFrustum.
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
 	  C++ operator. So put the original |= back.

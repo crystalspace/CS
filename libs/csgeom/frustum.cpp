@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/math3d.h"
 #include "csutil/blockallocator.h"
 
 // --------------------------------------------------------------------------
@@ -285,7 +286,7 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
     if (z1s && !zs)
     {
       if (
-        csIntersect3::Plane (
+        csIntersect3::SegmentPlane (
             vertices[i1],
             vertices[i],
             *plane,
@@ -297,7 +298,7 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
     else if (!z1s && zs)
     {
       if (
-        csIntersect3::Plane (
+        csIntersect3::SegmentPlane (
             vertices[i1],
             vertices[i],
             *plane,
@@ -379,14 +380,14 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
   if (i < 0) i = num_vertices - 1;
 
   float dummy;
-  csIntersect3::Plane (
+  csIntersect3::SegmentPlane (
       vertices[cw_offset],
       vertices[i],
       Plane_Normal,
       v1,
       isect_cw,
       dummy);
-  csIntersect3::Plane (
+  csIntersect3::SegmentPlane (
       vertices[ccw_offset],
       vertices[ccw_offset + 1],
       Plane_Normal,
@@ -463,7 +464,7 @@ void csFrustum::ClipToPlane (
   if (i < 0) i = num_vertices - 1;
 
   float dist_cw, dist_ccw;
-  csIntersect3::Plane (
+  csIntersect3::SegmentPlane (
       vertices[cw_offset],
       vertices[i],
       plane,
@@ -490,7 +491,7 @@ void csFrustum::ClipToPlane (
     clip_cw.onedge.i2 = clipinfo[i].original.idx;
   }
 
-  csIntersect3::Plane (
+  csIntersect3::SegmentPlane (
       vertices[ccw_offset],
       vertices[ccw_offset + 1],
       plane,
@@ -609,7 +610,7 @@ void csFrustum::ClipToPlane (
   if (i < 0) i = num_vertices - 1;
 
   float dist_cw, dist_ccw;
-  csIntersect3::Plane (
+  csIntersect3::SegmentPlane (
       vertices[cw_offset],
       vertices[i],
       Plane_Normal,
@@ -637,7 +638,7 @@ void csFrustum::ClipToPlane (
     clip_cw.onedge.i2 = clipinfo[i].original.idx;
   }
 
-  csIntersect3::Plane (
+  csIntersect3::SegmentPlane (
       vertices[ccw_offset],
       vertices[ccw_offset + 1],
       Plane_Normal,
@@ -707,7 +708,7 @@ void csFrustum::ClipToPlane (
   }
 }
 
-csPtr<csFrustum> csFrustum::Intersect (const csFrustum &other)
+csPtr<csFrustum> csFrustum::Intersect (const csFrustum &other) const
 {
   if (other.IsEmpty ()) return 0;
   if (other.IsInfinite ())
@@ -787,7 +788,7 @@ csPtr<csFrustum> csFrustum::Intersect (
   return new_frustum;
 }
 
-csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num)
+csPtr<csFrustum> csFrustum::Intersect (csVector3 *poly, int num) const
 {
   csFrustum *new_frustum;
   if (IsInfinite ())

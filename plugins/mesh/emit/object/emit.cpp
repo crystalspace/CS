@@ -506,7 +506,7 @@ void csEmitCylinderTangent::GetValue(csVector3& value, csVector3& given)
   pl.Set(cyldir, pldist); // cylinder plane through given point.
   csVector3 isect;
   float sectdist;
-  if(!csIntersect3::Plane(start, end, pl, isect, sectdist))
+  if(!csIntersect3::SegmentPlane(start, end, pl, isect, sectdist))
     isect.Set(end);
   csVector3 normal = (given - isect).Unit();
 

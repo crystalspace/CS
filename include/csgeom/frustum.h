@@ -28,9 +28,11 @@
 #include "csextern.h"
 
 #include "cstypes.h"
-#include "csgeom/math3d.h"
+#include "csutil/ref.h"
+#include "csgeom/vector3.h"
 
 class csTransform;
+class csPlane3;
 
 /** \name Polygon-to-Frustum relations
  * Return values for csFrustum::Classify. The routine makes a difference
@@ -231,7 +233,7 @@ public:
   void SetMirrored (bool m) { mirrored = m; }
 
   /// Is this frustum mirrored?
-  bool IsMirrored () { return mirrored; }
+  bool IsMirrored () const { return mirrored; }
 
   /**
    * Set the back plane of this frustum.
@@ -325,7 +327,7 @@ public:
    * after usage. If there is no intersection this function
    * returns 0.
    */
-  csPtr<csFrustum> Intersect (const csFrustum& other);
+  csPtr<csFrustum> Intersect (const csFrustum& other) const;
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon
@@ -341,7 +343,7 @@ public:
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
    */
-  csPtr<csFrustum> Intersect (csVector3* poly, int num);
+  csPtr<csFrustum> Intersect (csVector3* poly, int num) const;
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon

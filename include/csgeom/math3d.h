@@ -32,6 +32,8 @@
 #include "csgeom/plane3.h"
 #include "csgeom/plane2.h"
 #include "csgeom/segment.h"
+#include "csgeom/box.h"
+#include "csgeom/frustum.h"
 #include "iutil/dbghelp.h"
 
 class csDVector3;
@@ -268,6 +270,10 @@ public:
  */
 class CS_CSGEOM_EXPORT csIntersect3
 {
+private:
+  static bool BoxPlaneInternal (const csVector3& normal,
+	const csVector3& vert, const csVector3& boxhalfsize);
+
 public:
   /**
    * Intersect a plane with a 3D polygon and return
@@ -275,7 +281,7 @@ public:
    * Returns true if there is an intersection. If false
    * then 'segment' will not be valid.
    */
-  static bool IntersectPolygon (const csPlane3& plane, csPoly3D* poly,
+  static bool PlanePolygon (const csPlane3& plane, csPoly3D* poly,
   	csSegment3& segment);
 
   /**
@@ -287,7 +293,7 @@ public:
    * @@@ WARNING! This function may not work completely ok. It has only
    * barely been tested and is now unused.
    */
-  static int IntersectSegment (csPlane3* planes, int num_planes,
+  static int SegmentFrustum (csPlane3* planes, int num_planes,
   	csSegment3& seg);
 
   /**
@@ -295,9 +301,10 @@ public:
    * is an intersection. In that case the intersection point will
    * be in 'isect'.
    */
-  static bool IntersectTriangle (const csVector3& tr1,
+  static bool SegmentTriangle (const csSegment3& seg,
+  	const csVector3& tr1,
   	const csVector3& tr2, const csVector3& tr3,
-	const csSegment3& seg, csVector3& isect);
+	csVector3& isect);
 
   /**
    * Intersect a 3D segment with a polygon. Returns true if there
@@ -305,9 +312,8 @@ public:
    * be in 'isect'. Note that this function doesn't do
    * backface culling.
    */
-  static bool IntersectPolygon (const csPoly3D& poly,
-  	const csPlane3& poly_plane,
-	const csSegment3& seg, csVector3& isect);
+  static bool SegmentPolygon (const csSegment3& seg, const csPoly3D& poly,
+  	const csPlane3& poly_plane, csVector3& isect);
 
   /**
    * If a number of planes enclose a convex space (with their normals
@@ -317,7 +323,7 @@ public:
    * dist contains the distance to that point (with distance between u and v
    * being 1)
    */
-  static bool Planes (
+  static bool SegmentPlanes (
      const csVector3& u, const csVector3& v,
      const csPlane3* planes, int length,
      csVector3& isect, float& dist);
@@ -326,7 +332,7 @@ public:
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    */
-  static bool Plane (
+  static bool SegmentPlane (
     const csVector3& u, const csVector3& v,
     const csVector3& normal, const csVector3& a, // plane
     csVector3& isect, float& dist);              // intersection point
@@ -352,7 +358,7 @@ public:
    * is got by: x = [(A,B,C) * U + D ] / (A,B,C) * (U - V), where * is the dot 
    * product.  
    */
-  static bool Plane (
+  static bool SegmentPlane (
     const csVector3& u, const csVector3& v,
     const csPlane3& p,                     // plane Ax+By+Cz+D=0
     csVector3& isect,                     // intersection point
@@ -363,7 +369,7 @@ public:
    * planes. Returns true, if there is a single point that fits.
    * If some planes are parallel, then it will return false.
    */
-  static bool Planes (const csPlane3& p1, const csPlane3& p2,
+  static bool ThreePlanes (const csPlane3& p1, const csPlane3& p2,
   	const csPlane3& p3, csVector3& isect);
 
   /**
@@ -414,7 +420,7 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float Z0Plane (
+  static float SegmentZ0Plane (
     const csVector3& v1, const csVector3& v2,
     csVector3& isect);                    // intersection point
 
@@ -424,11 +430,11 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float Z0Plane (
+  static float SegmentZ0Plane (
     const csSegment3& uv,
     csVector3& isect)                    // intersection point
   {
-    return Z0Plane (uv.Start (), uv.End (), isect);
+    return SegmentZ0Plane (uv.Start (), uv.End (), isect);
   }
 
   /**
@@ -437,8 +443,9 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float XPlane (float xval,      // plane x = xval
+  static float SegmentXPlane (
     const csVector3& u, const csVector3& v,
+    float xval,
     csVector3& isect);                    // intersection point
 
   /**
@@ -447,11 +454,12 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float XPlane (float xval,      // plane x = xval
+  static float SegmentXPlane (
     const csSegment3& uv,
+    float xval,
     csVector3& isect)                     // intersection point
   {
-    return XPlane (xval, uv.Start (), uv.End (), isect);
+    return SegmentXPlane (uv.Start (), uv.End (), xval, isect);
   }
 
   /**
@@ -460,8 +468,9 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float YPlane (float yval,      // plane y = yval
+  static float SegmentYPlane (
     const csVector3& u, const csVector3& v,
+    float yval,      // plane y = yval
     csVector3& isect);                    // intersection point
 
   /**
@@ -470,11 +479,12 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float YPlane (float yval,      // plane y = yval
+  static float SegmentYPlane (
     const csSegment3& uv,
+    float yval,      // plane y = yval
     csVector3& isect)                     // intersection point
   {
-    return YPlane (yval, uv.Start (), uv.End (), isect);
+    return SegmentYPlane (uv.Start (), uv.End (), yval, isect);
   }
 
   /**
@@ -483,8 +493,9 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float ZPlane (float zval,      // plane z = zval
+  static float SegmentZPlane (
     const csVector3& u, const csVector3& v,
+    float zval,      // plane z = zval
     csVector3& isect);                    // intersection point
 
   /**
@@ -493,11 +504,12 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float ZPlane (float zval,      // plane z = zval
+  static float SegmentZPlane (
     const csSegment3& uv,
+    float zval,      // plane z = zval
     csVector3& isect)                     // intersection point
   {
-    return ZPlane (zval, uv.Start (), uv.End (), isect);
+    return SegmentZPlane (uv.Start (), uv.End (), zval, isect);
   }
 
   /**
@@ -506,14 +518,14 @@ public:
    * and returns the distance from u to the intersection point.
    * The intersection point is returned in isect.
    */
-  static float AxisPlane (const csVector3& u, const csVector3& v,
+  static float SegmentAxisPlane (const csVector3& u, const csVector3& v,
   	int nr, float pos, csVector3& isect)
   {
     switch (nr)
     {
-      case 0: return XPlane (pos, u, v, isect);
-      case 1: return YPlane (pos, u, v, isect);
-      case 2: return ZPlane (pos, u, v, isect);
+      case 0: return SegmentXPlane (u, v, pos, isect);
+      case 1: return SegmentYPlane (u, v, pos, isect);
+      case 2: return SegmentZPlane (u, v, pos, isect);
     }
     return 0.0;
   }
@@ -522,34 +534,34 @@ public:
    * Intersect a 3D segment with the frustum plane Ax + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float XFrustum (
-    float A, const csVector3& u, const csVector3& v, csVector3& isect);
+  static float SegmentXFrustum (
+    const csVector3& u, const csVector3& v, float A, csVector3& isect);
 
   /**
    * Intersect a 3D segment with the frustum plane Ax + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float XFrustum (
-    float A, const csSegment3& uv, csVector3& isect)
+  static float SegmentXFrustum (
+    const csSegment3& uv, float A, csVector3& isect)
   {
-    return XFrustum (A, uv.Start (), uv.End (), isect);
+    return SegmentXFrustum (uv.Start (), uv.End (), A, isect);
   }
 
   /**
    * Intersect a 3D segment with the frustum plane By + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float YFrustum (
-    float B, const csVector3& u, const csVector3& v, csVector3& isect);
+  static float SegmentYFrustum (
+    const csVector3& u, const csVector3& v, float B, csVector3& isect);
 
   /**
    * Intersect a 3D segment with the frustum plane By + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float YFrustum (
-    float B, const csSegment3& uv, csVector3& isect)
+  static float SegmentYFrustum (
+    const csSegment3& uv, float B, csVector3& isect)
   {
-    return YFrustum (B, uv.Start (), uv.End (), isect);
+    return SegmentYFrustum (uv.Start (), uv.End (), B, isect);
   }
 
   /**
@@ -582,6 +594,50 @@ public:
    */
   static bool BoxSphere (const csBox3& box, const csVector3& center,
 		  float sqradius);
+
+  /**
+   * Test if a plane intersects with a box.
+   */
+  static bool BoxPlane (const csBox3& box, const csPlane3& plane);
+
+  /**
+   * Test if a plane intersects with a box.
+   * 'vert' is one point on the plane.
+   */
+  static bool BoxPlane (const csBox3& box, const csVector3& normal,
+  	const csVector3& vert);
+
+  /**
+   * Test if a triangle intersects with a box.
+   */
+  static bool BoxTriangle (const csBox3& box,
+	const csVector3& tri0, const csVector3& tri1, const csVector3& tri2);
+
+  /**
+   * Test if two boxes intersect.
+   */
+  static bool BoxBox (const csBox3& box1, const csBox3& box2)
+  {
+    return box1.TestIntersect (box2);
+  }
+
+  /**
+   * Calculate intersection of two frustums.
+   */
+  static csPtr<csFrustum> FrustumFrustum (const csFrustum& f1,
+  	const csFrustum& f2)
+  {
+    return f1.Intersect (f2);
+  }
+
+  /**
+   * Calculate intersection of two frustums.
+   */
+  static csPtr<csFrustum> FrustumFrustum (const csFrustum& f1,
+  	csVector3* poly, int num)
+  {
+    return f1.Intersect (poly, num);
+  }
 };
 
 /**

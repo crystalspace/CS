@@ -42,6 +42,7 @@
 #include "ivaria/reporter.h"
 
 #include "csgeom/math.h"
+#include "csgeom/math3d.h"
 
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"

@@ -1217,8 +1217,8 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   csVector3 *vrt = factory->GetVertices ();
   for (i = 0 ; i < max ; i++)
   {
-    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-        vrt[tr[i].c], seg, isect))
+    if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
+        vrt[tr[i].c], isect))
     {
       if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
         csSquaredDist::PointPoint (start, end));
@@ -1248,8 +1248,8 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   csTriangle *tr = factory->GetTriangles();
   for (i = 0 ; i < max ; i++)
   {
-    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-        vrt[tr[i].c], seg, tmp))
+    if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
+        vrt[tr[i].c], tmp))
     {
       temp = csSquaredDist::PointPoint (start, tmp);
       if (temp < dist)

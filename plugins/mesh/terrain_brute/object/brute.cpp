@@ -2107,8 +2107,8 @@ bool csTerrainObject::HitBeam (csTerrBlock* block,
       int yr = y * res;
       for (x = 0 ; x < res-1 ; x++)
       {
-        if (csIntersect3::IntersectTriangle (vt[yr+x],
-		vt[yr+res+x], vt[yr+x+1], seg, tmp))
+        if (csIntersect3::SegmentTriangle (seg, vt[yr+x],
+		vt[yr+res+x], vt[yr+x+1], tmp))
 	{
           temp = csSquaredDist::PointPoint (seg.Start (), tmp);
           if (temp < dist)
@@ -2117,8 +2117,8 @@ bool csTerrainObject::HitBeam (csTerrBlock* block,
 	    dist = temp;
           }
 	}
-        if (csIntersect3::IntersectTriangle (vt[yr+x+1],
-		vt[yr+res+x], vt[yr+res+x+1], seg, tmp))
+        if (csIntersect3::SegmentTriangle (seg, vt[yr+x+1],
+		vt[yr+res+x], vt[yr+res+x+1], tmp))
 	{
           temp = csSquaredDist::PointPoint (seg.Start (), tmp);
           if (temp < dist)

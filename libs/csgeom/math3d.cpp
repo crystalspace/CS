@@ -401,7 +401,7 @@ float csSquaredDist::PointPoly (
 }
 
 //---------------------------------------------------------------------------
-int csIntersect3::IntersectSegment (
+int csIntersect3::SegmentFrustum (
   csPlane3 *planes,
   int num_planes,
   csSegment3 &seg)
@@ -422,7 +422,7 @@ int csIntersect3::IntersectSegment (
     if (c2 < 0) out2 = true;
     if (c1 < 0 && c2 > 0)
     {
-      if (Plane (v1, v2, pl, isect, dist))
+      if (SegmentPlane (v1, v2, pl, isect, dist))
       {
         mod = true;
         v1 = isect;
@@ -431,7 +431,7 @@ int csIntersect3::IntersectSegment (
     }
     else if (c1 > 0 && c2 < 0)
     {
-      if (Plane (v1, v2, pl, isect, dist))
+      if (SegmentPlane (v1, v2, pl, isect, dist))
       {
         mod = true;
         v2 = isect;
@@ -444,7 +444,7 @@ int csIntersect3::IntersectSegment (
   return mod ? 1 : 0;
 }
 
-bool csIntersect3::IntersectPolygon (
+bool csIntersect3::PlanePolygon (
   const csPlane3 &plane,
   csPoly3D *poly,
   csSegment3 &seg)
@@ -465,7 +465,7 @@ bool csIntersect3::IntersectPolygon (
     c = plane.Classify ((*poly)[i]);
     if ((c < 0 && c1 > 0) || (c1 < 0 && c > 0))
     {
-      Plane ((*poly)[i1], (*poly)[i], plane, isect, dist);
+      SegmentPlane ((*poly)[i1], (*poly)[i], plane, isect, dist);
       if (!found_v1)
       {
         v1 = isect;
@@ -488,16 +488,17 @@ bool csIntersect3::IntersectPolygon (
   return true;
 }
 
-bool csIntersect3::IntersectTriangle (
+bool csIntersect3::SegmentTriangle (
+  const csSegment3 &seg,
   const csVector3 &tr1,
   const csVector3 &tr2,
   const csVector3 &tr3,
-  const csSegment3 &seg,
   csVector3 &isect)
 {
   csPlane3 plane (tr1, tr2, tr3);
   float dist;
-  if (!Plane (seg.Start (), seg.End (), plane, isect, dist)) return false;
+  if (!SegmentPlane (seg.Start (), seg.End (), plane, isect, dist))
+    return false;
 
   // 'isect' is the intersection of the segment and the
   // plane. Now we have to see if this intersection is
@@ -537,14 +538,15 @@ bool csIntersect3::IntersectTriangle (
   return (test1 == test2) && (test2 == test3) && (test1 != 0);
 }
 
-bool csIntersect3::IntersectPolygon (const csPoly3D& poly,
-  	const csPlane3& poly_plane,
-	const csSegment3& seg, csVector3& isect)
+bool csIntersect3::SegmentPolygon (
+	const csSegment3& seg,
+	const csPoly3D& poly, const csPlane3& poly_plane,
+	csVector3& isect)
 {
   float dist;
   const csVector3& start = seg.Start ();
   const csVector3& end = seg.End ();
-  if (!Plane (start, end, poly_plane, isect, dist))
+  if (!SegmentPlane (start, end, poly_plane, isect, dist))
     return false;
 
   // If this vector is perpendicular to the plane of the polygon we
@@ -588,7 +590,7 @@ bool csIntersect3::IntersectPolygon (const csPoly3D& poly,
   return true;
 }
 
-bool csIntersect3::Planes (
+bool csIntersect3::SegmentPlanes (
    const csVector3& u, 
    const csVector3& v,
    const csPlane3* planes,
@@ -602,7 +604,7 @@ bool csIntersect3::Planes (
   {
     csVector3 tempisect;
     float tempdist;
-    if(Plane(u,v,planes[i],tempisect,tempdist))
+    if (SegmentPlane(u,v,planes[i],tempisect,tempdist))
     {
       if(dist == -1||tempdist<dist)
       {
@@ -631,7 +633,7 @@ bool csIntersect3::Planes (
   return true;
 }
 
-bool csIntersect3::Plane (
+bool csIntersect3::SegmentPlane (
   const csVector3 &u,
   const csVector3 &v,
   const csVector3 &normal,
@@ -652,7 +654,7 @@ bool csIntersect3::Plane (
   return true;
 }
 
-bool csIntersect3::Plane (
+bool csIntersect3::SegmentPlane (
   const csVector3 &u,
   const csVector3 &v,
   const csPlane3 &p,
@@ -681,7 +683,7 @@ bool csIntersect3::Plane (
   return true;
 }
 
-bool csIntersect3::Planes (
+bool csIntersect3::ThreePlanes (
   const csPlane3 &p1,
   const csPlane3 &p2,
   const csPlane3 &p3,
@@ -776,7 +778,7 @@ bool csIntersect3::PlaneZPlane (const csPlane3 &p1, float z2, csPlane2 &isect)
   return true;
 }
 
-float csIntersect3::Z0Plane (
+float csIntersect3::SegmentZ0Plane (
   const csVector3 &u,
   const csVector3 &v,
   csVector3 &isect)
@@ -788,10 +790,10 @@ float csIntersect3::Z0Plane (
   return r;
 }
 
-float csIntersect3::XPlane (
-  float xval,
+float csIntersect3::SegmentXPlane (
   const csVector3 &u,
   const csVector3 &v,
+  float xval,
   csVector3 &isect)
 {
   float r = (xval - u.x) / (v.x - u.x);
@@ -801,10 +803,10 @@ float csIntersect3::XPlane (
   return r;
 }
 
-float csIntersect3::YPlane (
-  float yval,
+float csIntersect3::SegmentYPlane (
   const csVector3 &u,
   const csVector3 &v,
+  float yval,
   csVector3 &isect)
 {
   float r = (yval - u.y) / (v.y - u.y);
@@ -814,10 +816,10 @@ float csIntersect3::YPlane (
   return r;
 }
 
-float csIntersect3::ZPlane (
-  float zval,
+float csIntersect3::SegmentZPlane (
   const csVector3 &u,
   const csVector3 &v,
+  float zval,
   csVector3 &isect)
 {
   float r = (zval - u.z) / (v.z - u.z);
@@ -827,10 +829,10 @@ float csIntersect3::ZPlane (
   return r;
 }
 
-float csIntersect3::XFrustum (
-  float A,
+float csIntersect3::SegmentXFrustum (
   const csVector3 &u,
   const csVector3 &v,
+  float A,
   csVector3 &isect)
 {
   float r = (A * u.x + u.z) / (A * (u.x - v.x) + u.z - v.z);
@@ -840,10 +842,10 @@ float csIntersect3::XFrustum (
   return r;
 }
 
-float csIntersect3::YFrustum (
-  float B,
+float csIntersect3::SegmentYFrustum (
   const csVector3 &u,
   const csVector3 &v,
+  float B,
   csVector3 &isect)
 {
   float r = (B * u.y + u.z) / (B * (u.y - v.y) + u.z - v.z);
@@ -986,6 +988,191 @@ bool csIntersect3::BoxSphere (const csBox3& box, const csVector3& center,
 {
   csBox3 b (box.Min ()-center, box.Max ()-center);
   return (b.SquaredOriginDist () <= sqradius);
+}
+
+//-------------------------------------------------------------------------
+
+#define AXISTEST_X01(a, b, fa, fb)			   \
+	p0 = a*v0.y - b*v0.z;			       	   \
+	p2 = a*v2.y - b*v2.z;			       	   \
+        if(p0<p2) {min=p0; max=p2;} else {min=p2; max=p0;} \
+	rad = fa * boxhalfsize.y + fb * boxhalfsize.z;     \
+	if(min>rad || max<-rad) return false;
+#define AXISTEST_X2(a, b, fa, fb)			   \
+	p0 = a*v0.y - b*v0.z;			           \
+	p1 = a*v1.y - b*v1.z;			       	   \
+        if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
+	rad = fa * boxhalfsize.y + fb * boxhalfsize.z;     \
+	if(min>rad || max<-rad) return false;
+#define AXISTEST_Y02(a, b, fa, fb)			   \
+	p0 = -a*v0.x + b*v0.z;			      	   \
+	p2 = -a*v2.x + b*v2.z;		       	       	   \
+        if(p0<p2) {min=p0; max=p2;} else {min=p2; max=p0;} \
+	rad = fa * boxhalfsize.x + fb * boxhalfsize.z;     \
+	if(min>rad || max<-rad) return false;
+#define AXISTEST_Y1(a, b, fa, fb)			   \
+	p0 = -a*v0.x + b*v0.z;		      	  	   \
+	p1 = -a*v1.x + b*v1.z;	     	       	  	   \
+        if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
+	rad = fa * boxhalfsize.x + fb * boxhalfsize.z;     \
+	if(min>rad || max<-rad) return false;
+#define AXISTEST_Z12(a, b, fa, fb)			   \
+	p1 = a*v1.x - b*v1.y;			           \
+	p2 = a*v2.x - b*v2.y;			       	   \
+        if(p2<p1) {min=p2; max=p1;} else {min=p1; max=p2;} \
+	rad = fa * boxhalfsize.x + fb * boxhalfsize.y;     \
+	if(min>rad || max<-rad) return false;
+#define AXISTEST_Z0(a, b, fa, fb)			   \
+	p0 = a*v0.x - b*v0.y;				   \
+	p1 = a*v1.x - b*v1.y;			           \
+        if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
+	rad = fa * boxhalfsize.x + fb * boxhalfsize.y;     \
+	if(min>rad || max<-rad) return false;
+#define FINDMINMAX(x0,x1,x2,min,max) \
+  min = max = x0;   \
+  if(x1<min) min=x1;\
+  if(x1>max) max=x1;\
+  if(x2<min) min=x2;\
+  if(x2>max) max=x2;
+
+
+bool csIntersect3::BoxTriangle (const csBox3& box,
+	const csVector3& tri0, const csVector3& tri1, const csVector3& tri2)
+{
+  csVector3 boxcenter = box.GetCenter ();
+  csVector3 boxhalfsize = box.Max () - boxcenter;
+
+  /*
+   * Use separating axis theorem to test overlap between triangle and box
+   * need to test for overlap in these directions:
+   *    1) the {x,y,z}-directions (actually, since we use the AABB of the
+   *       triangle we do not even need to test these)
+   *    2) normal of the triangle
+   *    3) crossproduct(edge from tri, {x,y,z}-directin)
+   *       this gives 3x3=9 more tests
+   */
+
+  float min, max, p0, p1, p2, rad, fex, fey, fez;
+
+  /* Move everything so that the boxcenter is in (0,0,0) */
+  csVector3 v0 = tri0 - boxcenter;
+  csVector3 v1 = tri1 - boxcenter;
+  csVector3 v2 = tri2 - boxcenter;
+
+  /* Compute triangle edges */
+  csVector3 e0 = v1 - v0;	// Edge 0
+  csVector3 e1 = v2 - v1;	// Edge 1
+  csVector3 e2 = v0 - v2;	// Edge 2
+
+  /* Bullet 3:  */
+  /*  Test the 9 tests first (this was faster) */
+  fex = fabsf (e0.x);
+  fey = fabsf (e0.y);
+  fez = fabsf (e0.z);
+  AXISTEST_X01 (e0.z, e0.y, fez, fey);
+  AXISTEST_Y02 (e0.z, e0.x, fez, fex);
+  AXISTEST_Z12 (e0.y, e0.x, fey, fex);
+
+  fex = fabsf (e1.x);
+  fey = fabsf (e1.y);
+  fez = fabsf (e1.z);
+  AXISTEST_X01 (e1.z, e1.y, fez, fey);
+  AXISTEST_Y02 (e1.z, e1.x, fez, fex);
+  AXISTEST_Z0 (e1.y, e1.x, fey, fex);
+
+  fex = fabsf (e2.x);
+  fey = fabsf (e2.y);
+  fez = fabsf (e2.z);
+  AXISTEST_X2 (e2.z, e2.y, fez, fey);
+  AXISTEST_Y1 (e2.z, e2.x, fez, fex);
+  AXISTEST_Z12 (e2.y, e2.x, fey, fex);
+
+  /* Bullet 1: */
+  /*  first test overlap in the {x,y,z}-directions */
+  /*  find min, max of the triangle each direction, and test for overlap in */
+  /*  that direction -- this is equivalent to testing a minimal AABB around */
+  /*  the triangle against the AABB */
+
+  /* Test in X-direction */
+  FINDMINMAX (v0.x,v1.x,v2.x,min,max);
+  if (min > boxhalfsize.x || max < -boxhalfsize.x) return false;
+
+  /* Test in Y-direction */
+  FINDMINMAX (v0.y,v1.y,v2.y,min,max);
+  if (min > boxhalfsize.y || max < -boxhalfsize.y) return false;
+
+  /* Test in Z-direction */
+  FINDMINMAX (v0.z,v1.z,v2.z,min,max);
+  if (min > boxhalfsize.z || max < -boxhalfsize.z) return false;
+
+  /* Bullet 2: */
+  /*  Test if the box intersects the plane of the triangle */
+  /*  compute plane equation of triangle: normal*x+d=0 */
+  csVector3 normal = e0 % e1;
+
+  if (!BoxPlaneInternal (normal, v0, boxhalfsize)) return false;
+
+  return true;   /* box and triangle overlaps */
+}
+
+bool csIntersect3::BoxPlane (const csBox3& box,
+	const csVector3& normal, const csVector3& vert)
+{
+  csVector3 boxcenter = box.GetCenter ();
+  csVector3 boxhalfsize = box.Max () - boxcenter;
+  return BoxPlaneInternal (normal, vert-boxcenter, boxhalfsize);
+}
+
+bool csIntersect3::BoxPlane (const csBox3& box, const csPlane3& plane)
+{
+  csVector3 boxcenter = box.GetCenter ();
+  csVector3 boxhalfsize = box.Max () - boxcenter;
+  return BoxPlaneInternal (plane.GetNormal (), plane.FindPoint ()-boxcenter,
+  	boxhalfsize);
+}
+
+bool csIntersect3::BoxPlaneInternal (const csVector3& normal,
+	const csVector3& vert, const csVector3& boxhalfsize)
+{
+  csVector3 vmin, vmax;
+
+  if (normal.x > 0.0f)
+  {
+    vmin.x = -boxhalfsize.x;
+    vmax.x =  boxhalfsize.x;
+  }
+  else
+  {
+    vmin.x =  boxhalfsize.x;
+    vmax.x = -boxhalfsize.x;
+  }
+  if (normal.y > 0.0f)
+  {
+    vmin.y = -boxhalfsize.y;
+    vmax.y =  boxhalfsize.y;
+  }
+  else
+  {
+    vmin.y =  boxhalfsize.y;
+    vmax.y = -boxhalfsize.y;
+  }
+  if (normal.z > 0.0f)
+  {
+    vmin.z = -boxhalfsize.z;
+    vmax.z =  boxhalfsize.z;
+  }
+  else
+  {
+    vmin.z =  boxhalfsize.z;
+    vmax.z = -boxhalfsize.z;
+  }
+
+  vmin -= vert;
+  vmax -= vert;
+
+  if ((normal * vmin) > 0.0f) return false;
+  if ((normal * vmax) >= 0.0f) return true;
+  return false;
 }
 
 //-------------------------------------------------------------------------
@@ -1351,7 +1538,25 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
     fflush (stdout);
   }
 
+  //==========================================================================
+  // Tests for BoxPlane/BoxTriangle.
+  //==========================================================================
+  csVector3 verts[3];
+  verts[0].Set (4, 5, 4);
+  verts[1].Set (10, 5, 4);
+  verts[2].Set (4, 10, 10);
+  csPlane3 plane (verts[0], verts[1], verts[2]);
+  GEO_ASSERT (csIntersect3::BoxPlane (csBox3 (1, 11, 1, 4, 14, 4), plane)
+  	== false, "boxplane 1");
+  GEO_ASSERT (csIntersect3::BoxPlane (csBox3 (1, 3, 1, 4, 14, 4), plane)
+  	== true, "boxplane 2");
+  GEO_ASSERT (csIntersect3::BoxTriangle (csBox3 (1, 11, 1, 4, 14, 4),
+  		verts[0], verts[1], verts[2]) == false, "boxtri 1");
+  GEO_ASSERT (csIntersect3::BoxTriangle (csBox3 (1, 3, 1, 4, 14, 4),
+  		verts[0], verts[1], verts[2]) == true, "boxtri 2");
+
   rc->DecRef ();
+
   return 0;
 }
 

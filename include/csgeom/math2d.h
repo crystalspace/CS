@@ -169,7 +169,7 @@ public:
    * Returns true if there is an intersection. If false
    * then 'segment' will not be valid.
    */
-  static bool IntersectPolygon (const csPlane2& plane, csPoly2D* poly,
+  static bool PlanePolygon (const csPlane2& plane, csPoly2D* poly,
   	csSegment2& segment);
 
   /**
@@ -177,7 +177,7 @@ public:
    * intersect, with the intersection point returned in isect,  and the
    * distance from a1 of the intersection in dist.
    */
-  static bool Segments (
+  static bool SegmentSegment (
     const csSegment2& a, const csSegment2& b,	// Two segments.
     csVector2& isect, float& dist);         // intersection point and distance
 
@@ -195,7 +195,7 @@ public:
    * Compute the intersection of 2D lines.  Return true if they
    * intersect, with the intersection point returned in isect.
    */
-  static bool Lines (
+  static bool LineLine (
     // Two lines (end is only direction).
     const csSegment2& a, const csSegment2& b,
     csVector2& isect);                      // intersection point
@@ -208,7 +208,7 @@ public:
    * to the given input vector. i.e. a distance of 0.5 means that the
    * intersection point is halfway u and v.
    */
-  static bool Plane (
+  static bool SegmentPlane (
     const csVector2& u, const csVector2& v,
     const csPlane2& p,                     // plane Ax+By+Cz+D=0
     csVector2& isect,                     // intersection point
@@ -222,20 +222,20 @@ public:
    * to the given input vector. i.e. a distance of 0.5 means that the
    * intersection point is halfway u and v.
    */
-  static bool Plane (
+  static bool SegmentPlane (
     const csSegment2& uv,	// Segment.
     const csPlane2& p,                     // plane Ax+By+Cz+D=0
     csVector2& isect,                     // intersection point
     float& dist)                        // distance from u to isect
   {
-    return Plane (uv.Start (), uv.End (), p, isect, dist);
+    return SegmentPlane (uv.Start (), uv.End (), p, isect, dist);
   }
 
   /**
    * Return the intersection point. This version does not test if
    * there really is an intersection. It just assumes there is one.
    */
-  static void PlaneNoTest (const csVector2& u, const csVector2& v,
+  static void SegmentPlaneNoTest (const csVector2& u, const csVector2& v,
                      const csPlane2& p, csVector2& isect, float& dist)
   {
     float x,y, denom;
@@ -249,10 +249,10 @@ public:
    * Return the intersection point. This version does not test if
    * there really is an intersection. It just assumes there is one.
    */
-  static void PlaneNoTest (const csSegment2& uv,
+  static void SegmentPlaneNoTest (const csSegment2& uv,
                      const csPlane2& p, csVector2& isect, float& dist)
   {
-    PlaneNoTest (uv.Start (), uv.End (), p, isect, dist);
+    SegmentPlaneNoTest (uv.Start (), uv.End (), p, isect, dist);
   }
 
   /**
@@ -260,7 +260,7 @@ public:
    * planes. Returns true, if there is a single point that fits.
    * If the planes are parallel, then it will return false.
    */
-  static bool Planes (const csPlane2& p1, const csPlane2& p2,
+  static bool PlanePlane (const csPlane2& p1, const csPlane2& p2,
                       csVector2& isect);
 
 };

@@ -361,7 +361,7 @@ bool csPortalContainer::ClipToPlane (
 
     if (!z1s && zs)
     {
-      csIntersect3::Plane (
+      csIntersect3::SegmentPlane (
           camera_vertices[vt[i1]],
           camera_vertices[vt[i]],
           *portal_plane,
@@ -372,7 +372,7 @@ bool csPortalContainer::ClipToPlane (
     }
     else if (z1s && !zs)
     {
-      csIntersect3::Plane (
+      csIntersect3::SegmentPlane (
           camera_vertices[vt[i1]],
           camera_vertices[vt[i]],
           *portal_plane,

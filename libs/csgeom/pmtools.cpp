@@ -780,7 +780,7 @@ static bool In2D_X (const csVector3& v1, const csVector3& v2,
   return true;
 }
 
-bool csPolygonMeshTools::SortedInPoint (const csVector3& point,
+bool csPolygonMeshTools::PointInClosedMesh (const csVector3& point,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
 	csPlane3* planes)
@@ -828,7 +828,7 @@ bool csPolygonMeshTools::SortedInPoint (const csVector3& point,
   return planes[nearest_idx].Classify (point) < 0;
 }
 
-bool csPolygonMeshTools::SortedInLine (
+bool csPolygonMeshTools::LineInClosedMesh (
 	const csVector3& p1, const csVector3& p2,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
@@ -849,8 +849,34 @@ bool csPolygonMeshTools::SortedInLine (
 
     // Try to intersect.
     csVector3 isect;
-    if (csIntersect3::IntersectTriangle (vertices[tris[i].a],
-    	vertices[tris[i].b], vertices[tris[i].c], seg, isect))
+    if (csIntersect3::SegmentTriangle (seg, vertices[tris[i].a],
+    	vertices[tris[i].b], vertices[tris[i].c], isect))
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool csPolygonMeshTools::BoxInClosedMesh (const csBox3& box,
+  	csVector3* vertices,
+  	csTriangleMinMax* tris, int tri_count,
+	csPlane3* planes)
+{
+  int i;
+  float minx = box.MinX ();
+  float maxx = box.MaxX ();
+
+  for (i = 0 ; i < tri_count ; i++)
+  {
+    // Quick reject of triangles that are outside minx/maxx range.
+    if (tris[i].maxx < minx) continue;
+    if (tris[i].minx > maxx) continue;
+
+    // Try to intersect.
+    if (csIntersect3::BoxTriangle (box, vertices[tris[i].a],
+    	vertices[tris[i].b], vertices[tris[i].c]))
     {
       return false;
     }

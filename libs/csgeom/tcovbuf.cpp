@@ -2071,7 +2071,7 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
           (z1 > .200001 && z2 <= .200001))
       {
         csVector3 isect;
-        csIntersect3::ZPlane (0.2f, camv[vt1], camv[vt2], isect);
+        csIntersect3::SegmentZPlane (camv[vt1], camv[vt2], 0.2f, isect);
         PerspectiveWrong (isect, tr_vert, fov, sx, sy);
         int isect_xa = csQround (tr_vert.x);
         int isect_ya = csQround (tr_vert.y);

@@ -2211,8 +2211,8 @@ bool csSprite3DMeshObject::HitBeamOutline (const csVector3& start,
   for (i = 0 ; i < factory->GetTriangleCount () ; i++)
   {
     csTriangle& tr = tris[i];
-    if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
-    	verts[tr.c], seg, isect))
+    if (csIntersect3::SegmentTriangle (seg, verts[tr.a], verts[tr.b],
+    	verts[tr.c], isect))
     {
       if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
 	                     csSquaredDist::PointPoint (start, end));
@@ -2238,8 +2238,8 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   for (i = 0 ; i < factory->GetTriangleCount () ; i++)
   {
     csTriangle& tr = tris[i];
-    if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
-    	verts[tr.c], seg, tsect))
+    if (csIntersect3::SegmentTriangle (seg, verts[tr.a], verts[tr.b],
+    	verts[tr.c], tsect))
     {
       temp = csSquaredDist::PointPoint (start, tsect);
       if (temp < dist)

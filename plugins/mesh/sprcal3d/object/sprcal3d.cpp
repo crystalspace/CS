@@ -1317,7 +1317,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
       tempisect;
     float
       tempdist;
-    if(csIntersect3::Planes(start,end,planes,6,tempisect,tempdist))
+    if (csIntersect3::SegmentPlanes(start,end,planes,6,tempisect,tempdist))
     {
       hit = true;
       bboxhits[b] = true;
@@ -1386,10 +1386,10 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 		vertices[m][s][(*iteratorFace).vertexId[f]].z = calVector.z;
 	      }
 	    }
-	    if (csIntersect3::IntersectTriangle (
+	    if (csIntersect3::SegmentTriangle (seg,
 		  vertices[m][s][(*iteratorFace).vertexId[0]],
 		  vertices[m][s][(*iteratorFace).vertexId[1]],
-		  vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+		  vertices[m][s][(*iteratorFace).vertexId[2]], tsect))
 	    {
 	      isect = tsect;
 	      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
@@ -1435,7 +1435,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
       tempisect;
     float
       tempdist;
-    if(csIntersect3::Planes(start,end,planes,6,tempisect,tempdist))
+    if(csIntersect3::SegmentPlanes(start,end,planes,6,tempisect,tempdist))
     { 
       hit = true;
       bboxhits[b] = true;
@@ -1509,10 +1509,10 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 	      }
 	    }
 
-	    if (csIntersect3::IntersectTriangle (
+	    if (csIntersect3::SegmentTriangle (seg,
 		  vertices[m][s][(*iteratorFace).vertexId[0]], 
 		  vertices[m][s][(*iteratorFace).vertexId[1]],
-		  vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+		  vertices[m][s][(*iteratorFace).vertexId[2]], tsect))
 	    {
 	      temp = csSquaredDist::PointPoint (start, tsect);
 	      if (temp < dist)

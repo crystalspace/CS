@@ -692,7 +692,7 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   float sqr = pl * pl;
   if (sqr < SMALL_EPSILON) return false; // Too close, Cannot intersect
   float dist;
-  csIntersect3::Plane(start, end, pl, 0, isect, dist);
+  csIntersect3::SegmentPlane(start, end, pl, 0, isect, dist);
   if (pr) *pr = dist;
   csMatrix3 o2t;
   CheckBeam (start, pl, sqr, o2t);

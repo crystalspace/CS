@@ -189,7 +189,7 @@ public:
    * This function also needs an array of planes. You can calculate that
    * with CalculatePlanes().
    */
-  static bool SortedInPoint (const csVector3& point,
+  static bool PointInClosedMesh (const csVector3& point,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
 	csPlane3* planes);
@@ -206,7 +206,24 @@ public:
    * the object. Basically this function tests if the line intersects
    * some polygon in the object and it will return false if it does.
    */
-  static bool SortedInLine (const csVector3& p1, const csVector3& p2,
+  static bool LineInClosedMesh (const csVector3& p1, const csVector3& p2,
+  	csVector3* vertices,
+  	csTriangleMinMax* tris, int tri_count,
+	csPlane3* planes);
+
+  /**
+   * Test if a box is in a closed mesh. The mesh is defined by an
+   * array of triangles which should be sorted on x using the SortTrianglesX()
+   * function. This function does not check if the mesh is really closed.
+   * This function also needs an array of planes. You can calculate that
+   * with CalculatePlanes().
+   * This function does not check if the eight corner points are actually in
+   * the object. If they are not then you will actually reverse the check
+   * and this function will return true if the box is completely outside
+   * the object. Basically this function tests if the box intersects
+   * some polygon in the object and it will return false if it does.
+   */
+  static bool BoxInClosedMesh (const csBox3& box,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
 	csPlane3* planes);

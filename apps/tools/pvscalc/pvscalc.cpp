@@ -115,8 +115,8 @@ bool PVSPolygonNode::HitBeam (const csSegment3& seg)
   size_t i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    if (csIntersect3::IntersectPolygon (*polygons[i],
-    	polygons[i]->GetPlane (), seg, isect))
+    if (csIntersect3::SegmentPolygon (seg, *polygons[i],
+    	polygons[i]->GetPlane (), isect))
       return true;
   }
 
@@ -864,12 +864,12 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
 	mesh_flags.Check (CS_MESH_STATICPOS) &&
     	(staticshape_mesh || staticshape_fact))
   {
-    //bool closed = csPolygonMeshTools::IsMeshClosed (polybase);
-    //bool convex = csPolygonMeshTools::IsMeshConvex (polybase);
-    //if (convex || closed)
-    //printf ("closed=%d convex=%d mesh=%s poly=%d %s\n",
-    // closed, convex, mesh->QueryObject ()->GetName (),
-    // polybase->GetPolygonCount (), (closed && convex) ?  "BOTH" : "");
+    bool closed = csPolygonMeshTools::IsMeshClosed (polybase);
+    bool convex = csPolygonMeshTools::IsMeshConvex (polybase);
+    if (convex || closed)
+    printf ("closed=%d convex=%d mesh=%s poly=%d %s\n",
+     closed, convex, mesh->QueryObject ()->GetName (),
+     polybase->GetPolygonCount (), (closed && convex) ?  "BOTH" : "");
 
     // Increase stats for static objects.
     staticcount++;

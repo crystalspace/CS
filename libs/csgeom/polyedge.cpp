@@ -137,7 +137,7 @@ void csPoly2DEdges::Intersect (
         left.AddEdge (edges[i]);
       else
       {
-        csIntersect2::PlaneNoTest (edges[i], plane, isect, dist);
+        csIntersect2::SegmentPlaneNoTest (edges[i], plane, isect, dist);
         left.AddEdge (edges[i].Start (), isect);
         right.AddEdge (isect, edges[i].End ());
       }
@@ -148,7 +148,7 @@ void csPoly2DEdges::Intersect (
         right.AddEdge (edges[i]);
       else
       {
-        csIntersect2::PlaneNoTest (edges[i], plane, isect, dist);
+        csIntersect2::SegmentPlaneNoTest (edges[i], plane, isect, dist);
         right.AddEdge (edges[i].Start (), isect);
         left.AddEdge (isect, edges[i].End ());
       }

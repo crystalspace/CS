@@ -188,7 +188,8 @@ void csPoly2D::Intersect (
     else
     {
       // We need to split.
-      csIntersect2::Plane (vertices[i1], vertices[i], plane, isect, dist);
+      csIntersect2::SegmentPlane (vertices[i1], vertices[i], plane,
+      	isect, dist);
       right.AddVertex (isect);
       left.AddVertex (isect);
       if (c <= 0)
@@ -285,7 +286,8 @@ void csPoly2D::ClipPlane (const csPlane2 &plane,
     else
     {
       // We need to split.
-      csIntersect2::Plane (vertices[i1], vertices[i], plane, isect, dist);
+      csIntersect2::SegmentPlane (vertices[i1], vertices[i], plane,
+      	isect, dist);
       right.AddVertex (isect);
       if (c > 0)
       {
@@ -409,7 +411,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   {
     // jp to j is an edge which is intersected by pl1. The intersection
     // point is what we need.
-    csIntersect2::Plane (other[jp], other[j], pl1, isect, dist);
+    csIntersect2::SegmentPlane (other[jp], other[j], pl1, isect, dist);
   }
 
   // If the intersection point is on the left of pl2 then we know
@@ -419,7 +421,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   // vertices as well.
   if (pl2.Classify (isect) > EPSILON)
   {
-    csIntersect2::Planes (pl1, pl2, isect);
+    csIntersect2::PlanePlane (pl1, pl2, isect);
     AddVertex (isect);
     i = (i2 + 1) % orig_num;
     while (i != (i1 - 1 + orig_num) % orig_num)
@@ -465,7 +467,7 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
 
   // Otherwise the edge jp to j crosses the second plane. In this
   // case we intersect again and ignore the rest of 'other'.
-  csIntersect2::Plane (other[jp], other[j], pl2, isect, dist);
+  csIntersect2::SegmentPlane (other[jp], other[j], pl2, isect, dist);
   AddVertex (isect);
   i = (i2 + 1) % orig_num;
   while (i != (i1 - 1 + orig_num) % orig_num)

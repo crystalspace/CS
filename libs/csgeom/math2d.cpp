@@ -67,7 +67,7 @@ bool csMath2::PlanesClose (const csPlane2 &p1, const csPlane2 &p2)
 }
 
 //---------------------------------------------------------------------------
-bool csIntersect2::IntersectPolygon (
+bool csIntersect2::PlanePolygon (
   const csPlane2 &plane,
   csPoly2D *poly,
   csSegment2 &seg)
@@ -88,7 +88,7 @@ bool csIntersect2::IntersectPolygon (
     c = plane.Classify ((*poly)[i]);
     if ((c < 0 && c1 > 0) || (c1 < 0 && c > 0))
     {
-      csIntersect2::Plane ((*poly)[i1], (*poly)[i], plane, isect, dist);
+      csIntersect2::SegmentPlane ((*poly)[i1], (*poly)[i], plane, isect, dist);
       if (!found_v1)
       {
         v1 = isect;
@@ -111,7 +111,7 @@ bool csIntersect2::IntersectPolygon (
   return true;
 }
 
-bool csIntersect2::Segments (
+bool csIntersect2::SegmentSegment (
   const csSegment2 &a,
   const csSegment2 &b,
   csVector2 &isect,
@@ -174,7 +174,7 @@ bool csIntersect2::SegmentLine (
   return true;
 }
 
-bool csIntersect2::Lines (
+bool csIntersect2::LineLine (
   const csSegment2 &a,
   const csSegment2 &b,
   csVector2 &isect)
@@ -196,7 +196,7 @@ bool csIntersect2::Lines (
   return true;
 }
 
-bool csIntersect2::Plane (
+bool csIntersect2::SegmentPlane (
   const csVector2 &u,
   const csVector2 &v,
   const csPlane2 &p,
@@ -217,7 +217,7 @@ bool csIntersect2::Plane (
   return true;
 }
 
-bool csIntersect2::Planes (
+bool csIntersect2::PlanePlane (
   const csPlane2 &p1,
   const csPlane2 &p2,
   csVector2 &isect)
@@ -263,7 +263,7 @@ bool csIntersect2::Planes (
     end2.Set (1, (-p2.C () - p2.A ()) / p2.B ());
   }
 
-  return Lines (csSegment2 (start1, end1), csSegment2 (start2, end2), isect);
+  return LineLine (csSegment2 (start1, end1), csSegment2 (start2, end2), isect);
 
 #if 0
   //@@@NOT SURE THAT THIS ROUTINE IS RIGHT AND OPTIMAL

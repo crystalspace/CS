@@ -1326,7 +1326,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 	    float dist;
 	    const csPlane3& wor_plane = sfp->GetParent ()
 	    	->GetPolygonWorldPlaneNoCheck (sfp->GetPolyIdx ());
-	    if (!csIntersect3::Plane (center, thing->Vwor (vt_idx[0]), wor_plane,
+	    if (!csIntersect3::SegmentPlane (center, thing->Vwor (vt_idx[0]), wor_plane,
 	      isect, dist))
 	    {
 	      shadow_it->MarkRelevant (false);

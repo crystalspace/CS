@@ -99,6 +99,9 @@ public:
   /// Return the D component of this plane.
   inline float& D () { return DD; }
 
+  /// Return the normal of this plane.
+  inline const csVector3& GetNormal () const { return norm; }
+
   /// Set the value of the four plane components.
   inline void Set (float a, float b, float c, float d)
   { norm.x = a; norm.y = b; norm.z = c; DD = d; }
@@ -170,6 +173,11 @@ public:
     float f = norm.Norm ();
     if (f) { norm /= f;  DD /= f; }
   }
+
+  /**
+   * Find a point on this plane.
+   */
+  csVector3 FindPoint () const;
 
   /**
    * Clip the polygon in pverts (having num_verts vertices) to this plane.

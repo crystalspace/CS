@@ -41,6 +41,22 @@ void csPlane3::Set (
   DD = -norm * v1;
 }
 
+csVector3 csPlane3::FindPoint () const
+{
+  if (norm.x >= norm.y && norm.x >= norm.z)
+  {
+    return csVector3 (-DD / norm.x, 0, 0);
+  }
+  else if (norm.y >= norm.x && norm.y >= norm.z)
+  {
+    return csVector3 (0, -DD / norm.y, 0);
+  }
+  else
+  {
+    return csVector3 (0, 0, -DD / norm.z);
+  }
+}
+
 typedef csDirtyAccessArray<csVector3> csgeom_csPlane3_Verts;
 typedef csDirtyAccessArray<bool> csgeom_csPlane3_Vis;
 CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Verts, csgeom_csPlane3_Verts,())
@@ -96,14 +112,14 @@ bool csPlane3::ClipPolygon (
 
     if (!z1s && zs)
     {
-      csIntersect3::Plane (pverts[i1], pverts[i], *this,
+      csIntersect3::SegmentPlane (pverts[i1], pverts[i], *this,
       	(*verts)[num_verts], r);
       num_verts++;
       (*verts)[num_verts++] = pverts[i];
     }
     else if (z1s && !zs)
     {
-      csIntersect3::Plane (pverts[i1], pverts[i], *this,
+      csIntersect3::SegmentPlane (pverts[i1], pverts[i], *this,
       	(*verts)[num_verts], r);
       num_verts++;
     }

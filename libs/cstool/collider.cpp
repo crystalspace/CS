@@ -359,8 +359,8 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	  }
 	  // The function below should always return true but you never know
 	  // due to numerical inaccuracies.
-	  if (csIntersect3::IntersectTriangle (tri.a, tri.b, tri.c,
-	  	seg, isect))
+	  if (csIntersect3::SegmentTriangle (seg, tri.a, tri.b, tri.c,
+	  	isect))
 	  {
 	    float squared_dist = csSquaredDist::PointPoint (isect, start);
 	    if (squared_dist < best_squared_dist)
