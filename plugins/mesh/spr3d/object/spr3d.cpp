@@ -748,6 +748,7 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
     skeleton_state = (csSkelState*)tmpl->GetSkeleton ()->CreateState ();
   EnableTweening (tmpl->IsTweeningEnabled ());
   MixMode = tmpl->GetMixMode ();
+  SetLodLevelConfig (factory->GetLodLevelConfig ());
 }
 
 void csSprite3DMeshObject::SetMaterial (iMaterialWrapper *material)
