@@ -115,8 +115,7 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
     if(datatype == "model/md2") rt.SetO2T(csYRotMatrix3(-M_PI/2) * rt.GetO2T());
   }
 
-  csRef<iMeshFactoryWrapper> factory = wrapper->GetFactory();
-  wrapper->HardTransform (rt);
+  wrapper->GetFactory()->HardTransform (rt);
 }
 #undef _MAX
 
