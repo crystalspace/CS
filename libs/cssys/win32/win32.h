@@ -30,8 +30,11 @@
 #ifdef COMP_BC
 // The Borland C++ equivalent of strcasecmp and strncasecmp are
 // stricmp and strnicmp
-#define strcasecmp(s1,s2)    stricmp(s1,s2)
-#define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+//The original below causes warnings
+//#define strcasecmp(s1,s2)    stricmp(s1,s2)
+//#define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
 #endif
 
 #include "csutil/scf.h"
