@@ -79,7 +79,8 @@ void Bot::move (time_t elapsed_time)
   }
 
   csVector3 old_p = GetW2TTranslation ();
-  csVector3 dir = (follow-old_p).Unit ();
+  csVector3 dir = follow-old_p;
+  dir.Normalize ();
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
   csSprite3D::SetMove (new_p);
 

@@ -200,8 +200,31 @@ public:
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   ///
   void PrepareFrame (time_t elapsed_time, time_t current_time);
-  ///
+
+  /**
+   * Draw all things related to debugging (mostly edge drawing).
+   * Must be called with G3D set in 2D mode.
+   */
+  void DrawFrameDebug ();
+
+  /**
+   * Another debug DrawFrame version which is called last. This
+   * one is temporary and contains debugging stuff active for the
+   * current thing that is being debugged.
+   */
+  void DrawFrameExtraDebug ();
+
+  /**
+   * Draw everything for the console.
+   */
+  void DrawFrameConsole ();
+
+  /**
+   * Draw everything for a frame. This includes 3D graphics
+   * and everything related to 2D drawing as well (console, debugging, ...).
+   */
   void DrawFrame (time_t elapsed_time, time_t current_time);
+
   ///
   virtual bool HandleEvent (csEvent &Event);
 

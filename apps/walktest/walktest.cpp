@@ -49,11 +49,9 @@
 #include "csengine/keyval.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
-#include "csengine/collider.h"
 #include "csengine/cspixmap.h"
 #include "csengine/terrain.h"
 #include "csengine/cssprite.h"
-#include "csengine/rapid.h"
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
@@ -63,6 +61,9 @@
 #include "csparser/snddatao.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
+#include "isndsrc.h"
+#include "isndlstn.h"
+#include "isndbuf.h"
 #include "isndrdr.h"
 #include "iimage.h"
 
@@ -88,9 +89,400 @@ REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
+char WalkTest::world_dir [100];
+bool WalkTest::move_3d = false;
+
+WalkTest::WalkTest () :
+  SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
+{
+  extern bool CommandHandler (char *cmd, char *arg);
+  Command::ExtraHandler = CommandHandler;
+  auto_script = NULL;
+  layer = NULL;
+  view = NULL;
+  infinite_maze = NULL;
+  huge_room = NULL;
+  wMissile_boom = NULL;
+  wMissile_whoosh = NULL;
+  cslogo = NULL;
+  world = NULL;
+
+  wf = NULL;
+  map_mode = MAP_OFF;
+  do_fps = true;
+  do_stats = false;
+  do_clear = false;
+  do_edges = false;
+  do_light_frust = false;
+  do_show_coord = false;
+  busy_perf_test = false;
+  do_show_z = false;
+  do_show_palette = false;
+  do_infinite = false;
+  do_huge = false;
+  do_cd = true;
+  do_freelook = false;
+  player_spawned = false;
+  do_gravity = true;
+  inverse_mouse = false;
+  selected_light = NULL;
+  selected_polygon = NULL;
+  move_forward = false;
+  cfg_draw_octree = 0;
+
+  velocity.Set (0, 0, 0);
+  angle.Set (0, 0, 0);
+  angle_velocity.Set (0, 0, 0);
+
+//pl=new PhysicsLibrary;
+
+  timeFPS = 0.0;
+}
+
+WalkTest::~WalkTest ()
+{
+  if (World)
+    World->DecRef ();
+  CHK (delete wf);
+  CHK (delete [] auto_script);
+  CHK (delete layer);
+  CHK (delete view);
+  CHK (delete infinite_maze);
+  CHK (delete huge_room);
+  CHK (delete cslogo);
+  CHK (delete body);
+  CHK (delete legs);
+}
+
+void WalkTest::SetSystemDefaults (csIniFile *Config)
+{
+  superclass::SetSystemDefaults (Config);
+  do_fps = Config->GetYesNo ("WalkTest", "FPS", true);
+  do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
+  do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
+
+  const char *val;
+  if (!(val = GetNameCL ()))
+    val = Config->GetStr ("World", "WORLDFILE", "world");
+  sprintf (world_dir, "/lev/%s", val);
+
+  if (GetOptionCL ("clear"))
+  {
+    do_clear = true;
+    Sys->Printf (MSG_INITIALIZATION, "Screen will be cleared every frame.\n");
+  }
+  else if (GetOptionCL ("noclear"))
+  {
+    do_clear = false;
+    Sys->Printf (MSG_INITIALIZATION, "Screen will not be cleared every frame.\n");
+  }
+
+  if (GetOptionCL ("stats"))
+  {
+    do_stats = true;
+    Sys->Printf (MSG_INITIALIZATION, "Statistics enabled.\n");
+  }
+  else if (GetOptionCL ("nostats"))
+  {
+    do_stats = false;
+    Sys->Printf (MSG_INITIALIZATION, "Statistics disabled.\n");
+  }
+
+  if (GetOptionCL ("fps"))
+  {
+    do_fps = true;
+    Sys->Printf (MSG_INITIALIZATION, "Frame Per Second enabled.\n");
+  }
+  else if (GetOptionCL ("nofps"))
+  {
+    do_fps = false;
+    Sys->Printf (MSG_INITIALIZATION, "Frame Per Second disabled.\n");
+  }
+
+  if (GetOptionCL ("infinite"))
+    do_infinite = true;
+
+  if (GetOptionCL ("huge"))
+    do_huge = true;
+
+  extern bool do_bots;
+  if (GetOptionCL ("bots"))
+    do_bots = true;
+
+  if (GetOptionCL ("colldet"))
+  {
+    do_cd = true;
+    Sys->Printf (MSG_INITIALIZATION, "Enabled collision detection system.\n");
+  }
+  else if (GetOptionCL ("nocolldet"))
+  {
+    do_cd = false;
+    Sys->Printf (MSG_INITIALIZATION, "Disabled collision detection system.\n");
+  }
+
+  if ((val = GetOptionCL ("exec")))
+  {
+    CHK (delete [] auto_script);
+    CHK (auto_script = strnew (val));
+  }
+}
+
+void WalkTest::Help ()
+{
+  SysSystemDriver::Help ();
+  Sys->Printf (MSG_STDOUT, "  -exec=<script>     execute given script at startup\n");
+  Sys->Printf (MSG_STDOUT, "  -[no]clear         clear display every frame (default '%sclear')\n", do_clear ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
+  Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores world file!)\n");
+  Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
+  Sys->Printf (MSG_STDOUT, "  <path>             load world from VFS <path> (default '%s')\n", Config->GetStr ("World", "WORLDFILE", "world"));
+}
+
+//-----------------------------------------------------------------------------
+
+void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
+{
+  // The following will fetch all events from queue and handle them
+  SysSystemDriver::NextFrame (elapsed_time, current_time);
+
+  Sys->world->UpdateParticleSystems(elapsed_time);
+
+  // Record the first time this routine is called.
+  extern bool do_bots;
+  if (do_bots)
+  {
+    static long first_time = -1;
+    static time_t next_bot_at;
+    if (first_time == -1)
+    {
+      first_time = current_time;
+      next_bot_at = current_time+1000*10;
+    }
+    if (current_time > next_bot_at)
+    {
+      extern void add_bot (float size, csSector* where, csVector3 const& pos,
+	float dyn_radius);
+      add_bot (2, view->GetCamera ()->GetSector (),
+        view->GetCamera ()->GetOrigin (), 0);
+      next_bot_at = current_time+1000*10;
+    }
+  }
+  if (!System->Console->IsActive ())
+  {
+    int alt,shift,ctrl;
+    float speed = 1;
+
+    alt = GetKeyState (CSKEY_ALT);
+    ctrl = GetKeyState (CSKEY_CTRL);
+    shift = GetKeyState (CSKEY_SHIFT);
+    if (ctrl) speed = .5;
+    if (shift) speed = 2;
+
+    /// Act as usual...
+    strafe (0,1); look (0,1); step (0,1); rotate (0,1);
+
+    if (Sys->Sound)
+    {
+      iSoundListener *sndListener = Sys->Sound->GetListener();
+      if(sndListener)
+      {
+        // take position/direction from view->GetCamera ()
+        csVector3 v = view->GetCamera ()->GetOrigin ();
+        csMatrix3 m = view->GetCamera ()->GetC2W();
+        csVector3 f = m.Col3();
+        csVector3 t = m.Col2();
+        sndListener->SetPosition(v.x, v.y, v.z);
+        sndListener->SetDirection(f.x,f.y,f.z,t.x,t.y,t.z);
+        //sndListener->SetDirection(...);
+      }
+    }
+  }
+
+  extern void move_bots (time_t);
+  move_bots (elapsed_time);
+
+  if (move_forward) step (1, 0);
+
+  PrepareFrame (elapsed_time, current_time);
+  DrawFrame (elapsed_time, current_time);
+
+  // Execute one line from the script.
+  if (!busy_perf_test)
+  {
+    char buf[256];
+    if (Command::get_script_line (buf, 255)) Command::perform_line (buf);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 //@@@
 int covtree_level = 1;
 bool do_covtree_dump = false;
+
+void WalkTest::DrawFrameDebug ()
+{
+  if (do_show_z)
+  {
+    extern void DrawZbuffer ();
+    DrawZbuffer ();
+  }
+  if (do_show_palette)
+  {
+    extern void DrawPalette ();
+    DrawPalette ();
+  }
+  extern void draw_edges (csRenderView*, int, void*);
+  if (do_edges)
+  {
+    view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+    	draw_edges);
+  }
+  if (selected_polygon || selected_light)
+    view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+	draw_edges, (void*)1);
+  if (do_light_frust && selected_light)
+  {
+    extern void show_frustrum (csLightView*, int, void*);
+    ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
+  }
+  if (cfg_draw_octree)
+  {
+    extern void DrawOctreeBoxes (int);
+    DrawOctreeBoxes (cfg_draw_octree-1);
+  }
+}
+
+void WalkTest::DrawFrameExtraDebug ()
+{
+  csCoverageMaskTree* covtree = Sys->world->GetCovtree ();
+  csSolidBsp* solidbsp = Sys->world->GetSolidBsp ();
+  if (solidbsp)
+  {
+#   if 1
+    Gfx2D->Clear (0);
+    solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
+    extern csPolygon2D debug_poly2d;
+    debug_poly2d.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 255, 0));
+#   elif 0
+    Gfx2D->Clear (0);
+    solidbsp->MakeEmpty ();
+    csCamera* c = view->GetCamera ();
+    csPolygon2D poly1, poly2, poly3, poly4;
+    poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
+    poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
+    poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
+    poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
+    //solidbsp->InsertPolygon (poly1.GetVertices (), poly1.GetNumVertices ());
+    poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
+    poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
+    poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
+    poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
+    printf ("T2:%d ", solidbsp->TestPolygon (poly2.GetVertices (),
+	poly2.GetNumVertices ()));
+    //printf ("P2:%d ", solidbsp->InsertPolygon (poly2.GetVertices (),
+	//poly2.GetNumVertices ()));
+    poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
+    poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
+    poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
+    printf ("T3:%d ", solidbsp->TestPolygon (poly3.GetVertices (),
+	poly3.GetNumVertices ()));
+    printf ("P3:%d ", solidbsp->InsertPolygon (poly3.GetVertices (),
+	poly3.GetNumVertices ()));
+    poly4.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
+    poly4.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
+    poly4.AddPerspective (c->Other2This (csVector3 (2.5, .15, 7)));
+    printf ("T4:%d ", solidbsp->TestPolygon (poly4.GetVertices (),
+	poly4.GetNumVertices ()));
+    printf ("P4:%d\n", solidbsp->InsertPolygon (poly4.GetVertices (),
+	poly4.GetNumVertices ()));
+    //poly1.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 100, 100));
+    //poly2.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 0, 100));
+    poly3.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 0));
+    poly4.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 100));
+    solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
+#   endif
+  }
+  else if (covtree)
+  {
+    Gfx2D->Clear (0);
+#   if 0
+    covtree->GfxDump (Gfx2D, covtree_level);
+#   else
+    //covtree->MakeInvalid ();
+    covtree->MakeEmpty ();
+    csCamera* c = view->GetCamera ();
+    csPolygon2D poly1, poly2, poly3;
+    poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
+    poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
+    poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
+    poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
+    covtree->InsertPolygon (poly1.GetVertices (),
+	poly1.GetNumVertices (), poly1.GetBoundingBox ());
+    poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
+    poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
+    poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
+    poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
+    printf ("T2:%d ", covtree->TestPolygon (poly2.GetVertices (),
+	poly2.GetNumVertices (), poly2.GetBoundingBox ()));
+    printf ("P2:%d ", covtree->InsertPolygon (poly2.GetVertices (),
+	poly2.GetNumVertices (), poly2.GetBoundingBox ()));
+    poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
+    poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
+    poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
+    printf ("T3:%d ", covtree->TestPolygon (poly3.GetVertices (),
+	poly3.GetNumVertices (), poly3.GetBoundingBox ()));
+    printf ("P3:%d\n", covtree->InsertPolygon (poly3.GetVertices (),
+	poly3.GetNumVertices (), poly3.GetBoundingBox ()));
+    covtree->GfxDump (Gfx2D, covtree_level);
+    poly1.Draw (Gfx2D, 0x0303);
+    poly2.Draw (Gfx2D, 0x07e0);
+    poly3.Draw (Gfx2D, 0x008f);
+    //covtree->TestConsistency ();
+#   endif
+  }
+}
+
+void WalkTest::DrawFrameConsole ()
+{
+  csSimpleConsole* scon = (csSimpleConsole*)System->Console;
+  scon->Print (NULL);
+
+  if (!scon->IsActive ())
+  {
+    if (do_fps)
+    {
+      GfxWrite(11, FRAME_HEIGHT-11, 0, -1, "FPS=%f", timeFPS);
+      GfxWrite(10, FRAME_HEIGHT-10, scon->get_fg (), -1, "FPS=%f", timeFPS);
+    }
+    if (do_stats)
+    {
+      char buffer[50];
+      sprintf (buffer, "pc=%d pd=%d po=%d pa=%d pr=%d",
+      	Stats::polygons_considered, Stats::polygons_drawn,
+	Stats::portals_drawn, Stats::polygons_accepted,
+	Stats::polygons_rejected);
+      GfxWrite(FRAME_WIDTH-30*8-1, FRAME_HEIGHT-11, 0, -1, "%s", buffer);
+      GfxWrite(FRAME_WIDTH-30*8, FRAME_HEIGHT-10, scon->get_fg (), -1,
+      	"%s", buffer);
+    }
+    else if (do_show_coord)
+    {
+      char buffer[100];
+      sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",
+        view->GetCamera ()->GetW2CTranslation ().x,
+	view->GetCamera ()->GetW2CTranslation ().y,
+        view->GetCamera ()->GetW2CTranslation ().z,
+	view->GetCamera ()->GetSector()->GetName ());
+      Gfx2D->Write(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
+      Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (),
+      	-1, buffer);
+    }
+  }
+}
 
 void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 {
@@ -127,7 +519,13 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     // Apply lighting to all sprites
     light_statics ();
 
-    if (map_mode != MAP_ON && !do_covtree_dump) view->Draw ();
+    //------------
+    // Here comes the main call to the engine. view->Draw() actually
+    // takes the current camera and starts rendering.
+    //------------
+    if (map_mode != MAP_ON && !do_covtree_dump)
+      view->Draw ();
+
     // no need to clear screen anymore
     drawflags = 0;
   }
@@ -140,71 +538,19 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   {
     wf->GetWireframe ()->Clear ();
     extern void draw_map (csRenderView*, int, void*);
-    view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), draw_map);
+    view->GetWorld ()->DrawFunc (view->GetCamera (),
+    	view->GetClipper (), draw_map);
     wf->GetWireframe ()->Draw (Gfx3D, wf->GetCamera ());
   }
   else
-  {
-    if (do_show_z)
-    {
-      extern void DrawZbuffer ();
-      DrawZbuffer ();
-    }
-    if (do_show_palette)
-    {
-      extern void DrawPalette ();
-      DrawPalette ();
-    }
-    extern void draw_edges (csRenderView*, int, void*);
-    if (do_edges)
-    {
-      view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
-      	draw_edges);
-    }
-    if (selected_polygon || selected_light)
-      view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
-		draw_edges, (void*)1);
-    if (do_light_frust && selected_light)
-    {
-      extern void show_frustrum (csLightView*, int, void*);
-      ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
-    }
-    if (cfg_draw_octree)
-    {
-      extern void DrawOctreeBoxes (int);
-      DrawOctreeBoxes (cfg_draw_octree-1);
-    }
-  }
+    DrawFrameDebug ();
 
+  DrawFrameConsole ();
+
+  // If console is not active we draw a few additional things.
   csSimpleConsole* scon = (csSimpleConsole*)System->Console;
-  scon->Print (NULL);
-
   if (!scon->IsActive ())
   {
-    if (do_fps)
-    {
-      GfxWrite(11, FRAME_HEIGHT-11, 0, -1, "FPS=%f", timeFPS);
-      GfxWrite(10, FRAME_HEIGHT-10, scon->get_fg (), -1, "FPS=%f", timeFPS);
-    } /* endif */
-    if (do_stats)
-    {
-      char buffer[50];
-      sprintf (buffer, "pc=%d pd=%d po=%d pa=%d pr=%d", Stats::polygons_considered,
-        Stats::polygons_drawn, Stats::portals_drawn, Stats::polygons_accepted,
-	Stats::polygons_rejected);
-      GfxWrite(FRAME_WIDTH-30*8-1, FRAME_HEIGHT-11, 0, -1, "%s", buffer);
-      GfxWrite(FRAME_WIDTH-30*8, FRAME_HEIGHT-10, scon->get_fg (), -1, "%s", buffer);
-    }
-    else if (do_show_coord)
-    {
-      char buffer[100];
-      sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",
-        view->GetCamera ()->GetW2CTranslation ().x, view->GetCamera ()->GetW2CTranslation ().y,
-        view->GetCamera ()->GetW2CTranslation ().z, view->GetCamera ()->GetSector()->GetName ());
-      Gfx2D->Write(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
-      Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (), -1, buffer);
-    }
-
     if (cslogo)
     {
       unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
@@ -214,97 +560,8 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 
     // White-board for debugging purposes.
     if (do_covtree_dump)
-    {
-      csCoverageMaskTree* covtree = Sys->world->GetCovtree ();
-      csSolidBsp* solidbsp = Sys->world->GetSolidBsp ();
-      if (solidbsp)
-      {
-#	if 1
-        Gfx2D->Clear (0);
-	solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
-	extern csPolygon2D debug_poly2d;
-	debug_poly2d.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 255, 0));
-#	elif 0
-        Gfx2D->Clear (0);
-	solidbsp->MakeEmpty ();
-	csCamera* c = view->GetCamera ();
-	csPolygon2D poly1, poly2, poly3, poly4;
-	poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
-	poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
-	poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
-	poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
-	//solidbsp->InsertPolygon (poly1.GetVertices (),
-		//poly1.GetNumVertices ());
-	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
-	poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
-	poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
-	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
-	printf ("T2:%d ", solidbsp->TestPolygon (poly2.GetVertices (),
-		poly2.GetNumVertices ()));
-	//printf ("P2:%d ", solidbsp->InsertPolygon (poly2.GetVertices (),
-		//poly2.GetNumVertices ()));
-	poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
-	poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
-	poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
-	printf ("T3:%d ", solidbsp->TestPolygon (poly3.GetVertices (),
-		poly3.GetNumVertices ()));
-	printf ("P3:%d ", solidbsp->InsertPolygon (poly3.GetVertices (),
-		poly3.GetNumVertices ()));
-	poly4.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
-	poly4.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
-	poly4.AddPerspective (c->Other2This (csVector3 (2.5, .15, 7)));
-	printf ("T4:%d ", solidbsp->TestPolygon (poly4.GetVertices (),
-		poly4.GetNumVertices ()));
-	printf ("P4:%d\n", solidbsp->InsertPolygon (poly4.GetVertices (),
-		poly4.GetNumVertices ()));
-	//poly1.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 100, 100));
-	//poly2.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 0, 100));
-	poly3.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 0));
-	poly4.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 100));
-	solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
-#	endif
-      }
-      else if (covtree)
-      {
-        Gfx2D->Clear (0);
-#	if 0
-	covtree->GfxDump (Gfx2D, covtree_level);
-#	else
-	//covtree->MakeInvalid ();
-	covtree->MakeEmpty ();
-	csCamera* c = view->GetCamera ();
-	csPolygon2D poly1, poly2, poly3;
-	poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
-	poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
-	poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
-	poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
-	covtree->InsertPolygon (poly1.GetVertices (),
-		poly1.GetNumVertices (), poly1.GetBoundingBox ());
-	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
-	poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
-	poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
-	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
-	printf ("T2:%d ", covtree->TestPolygon (poly2.GetVertices (),
-		poly2.GetNumVertices (), poly2.GetBoundingBox ()));
-	printf ("P2:%d ", covtree->InsertPolygon (poly2.GetVertices (),
-		poly2.GetNumVertices (), poly2.GetBoundingBox ()));
-	poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
-	poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
-	poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
-	printf ("T3:%d ", covtree->TestPolygon (poly3.GetVertices (),
-		poly3.GetNumVertices (), poly3.GetBoundingBox ()));
-	printf ("P3:%d\n", covtree->InsertPolygon (poly3.GetVertices (),
-		poly3.GetNumVertices (), poly3.GetBoundingBox ()));
-	covtree->GfxDump (Gfx2D, covtree_level);
-	poly1.Draw (Gfx2D, 0x0303);
-	poly2.Draw (Gfx2D, 0x07e0);
-	poly3.Draw (Gfx2D, 0x008f);
-	//covtree->TestConsistency ();
-#	endif
-      }
-    }
-
-  } /* endif */
+      DrawFrameExtraDebug ();
+  }
 
   // Drawing code ends here
   Gfx3D->FinishDraw ();
@@ -314,340 +571,6 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 
 int cnt = 1;
 time_t time0 = (time_t)-1;
-
-int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
-{
-  csVector3 tri1[3]; tri1[0]=t1->p1; tri1[1]=t1->p2; tri1[2]=t1->p3;
-  csVector3 tri2[3]; tri2[0]=t2->p1; tri2[1]=t2->p2; tri2[2]=t2->p3;
-
-  return csMath3::FindIntersection(tri1,tri2,line);
-}
-
-// Define the player bounding box.
-// The camera's lens or person's eye is assumed to be
-// at 0,0,0.  The height (DY), width (DX) and depth (DZ).
-// Is the size of the camera/person and the origin
-// coordinates (OX,OY,OZ) locate the bbox with respect to the eye.
-// This player is 1.8 metres tall (assuming 1cs unit = 1m) (6feet)
-#define DX    cfg_body_width
-#define DY    cfg_body_height
-#define DZ    cfg_body_depth
-#define OY    Sys->cfg_eye_offset
-
-#define DX_L  cfg_legs_width
-#define DZ_L  cfg_legs_depth
-
-#define DX_2  (DX/2)
-#define DZ_2  (DZ/2)
-
-#define DX_2L (DX_L/2)
-#define DZ_2L (DZ_L/2)
-
-#define OYL  Sys->cfg_legs_offset
-#define DYL  (OY-OYL)
-
-void WalkTest::CreateColliders (void)
-{
-  csPolygon3D *p;
-  CHK (csPolygonSet *pb = new csPolygonSet ());
-  pb->SetName ("Player's Body");
-
-  pb->AddVertex(-DX_2, OY,    -DZ_2);
-  pb->AddVertex(-DX_2, OY,    DZ_2);
-  pb->AddVertex(-DX_2, OY+DY, DZ_2);
-  pb->AddVertex(-DX_2, OY+DY, -DZ_2);
-  pb->AddVertex(DX_2,  OY,    -DZ_2);
-  pb->AddVertex(DX_2,  OY,    DZ_2);
-  pb->AddVertex(DX_2,  OY+DY, DZ_2);
-  pb->AddVertex(DX_2,  OY+DY, -DZ_2);
-
-  // Left
-  p = pb->NewPolygon (0);
-
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (2); p->AddVertex (3);
-
-  // Right
-  p = pb->NewPolygon (0);
-  p->AddVertex (4); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (7);
-
-  // Bottom
-  p = pb->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (5); p->AddVertex (4);
-
-  // Top
-  p = pb->NewPolygon (0);
-  p->AddVertex (3); p->AddVertex (2);
-  p->AddVertex (6); p->AddVertex (7);
-
-  // Front
-  p = pb->NewPolygon (0);
-  p->AddVertex (1); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (2);
-
-  // Back
-  p = pb->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (4);
-  p->AddVertex (7); p->AddVertex (3);
-
-  CHK (body = new csRAPIDCollider (pb));
-//  CHK (delete pb);
-
-  CHK (csPolygonSet *pl = new csPolygonSet ());
-
-  pl->AddVertex(-DX_2L, OYL,     -DZ_2L);
-  pl->AddVertex(-DX_2L, OYL,     DZ_2L);
-  pl->AddVertex(-DX_2L, OYL+DYL, DZ_2L);
-  pl->AddVertex(-DX_2L, OYL+DYL, -DZ_2L);
-  pl->AddVertex(DX_2L,  OYL,     -DZ_2L);
-  pl->AddVertex(DX_2L,  OYL,     DZ_2L);
-  pl->AddVertex(DX_2L,  OYL+DYL, DZ_2L);
-  pl->AddVertex(DX_2L,  OYL+DYL, -DZ_2L);
-
-  // Left
-  p = pl->NewPolygon (0);
-
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (2); p->AddVertex (3);
-
-  // Right
-  p = pl->NewPolygon (0);
-  p->AddVertex (4); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (7);
-
-  // Bottom
-  p = pl->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (5); p->AddVertex (4);
-
-  // Top
-  p = pl->NewPolygon (0);
-  p->AddVertex (3); p->AddVertex (2);
-  p->AddVertex (6); p->AddVertex (7);
-
-  // Front
-  p = pl->NewPolygon (0);
-  p->AddVertex (1); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (2);
-
-  // Back
-  p = pl->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (4);
-  p->AddVertex (7); p->AddVertex (3);
-
-  CHK (legs = new csRAPIDCollider(pl));
-//  CHK (delete pl);
-
-  if (!body || !legs)
-    do_cd = false;
-}
-
-#define MAXSECTORSOCCUPIED  20
-
-// No more than 1000 collisions ;)
-collision_pair our_cd_contact[1000];
-int num_our_cd;
-
-int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
-{
-  sa[0] = s;
-  int i, c = 1;
-  float size = d.x * d.x + d.y * d.y + d.z * d.z;
-  for(i = 0;i < s->GetNumPolygons() && c < MAXSECTORSOCCUPIED; i++)
-  {
-    // Get the polygon of for this sector.
-    csPolygon3D* p = (csPolygon3D*) s->GetPolygon (i);
-    csPortal* portal = p->GetPortal ();
-    // Handle only portals.
-    if (portal != NULL)
-    {
-      if (p->GetPlane ()->SquaredDistance (v) < size)
-      {
-        if (Sys->do_infinite && !portal->GetSector ())
-	{
-	  ((InfPortalCS*)portal)->ConnectNewSector ();
-	}
-        sa[c] = portal->GetSector ();
-        c++;
-      }
-    }
-  }
-  return c;
-}
-
-int CollisionDetect (csRAPIDCollider *c, csSector* sp, csTransform *cdt)
-{
-  int hit = 0;
-
-  // Check collision with this sector.
-  csRAPIDCollider::CollideReset();
-  if (c->Collide(*sp, cdt)) hit++;
-  collision_pair *CD_contact = csRAPIDCollider::GetCollisions ();
-
-  for (int i=0 ; i<csRAPIDCollider::numHits ; i++)
-    our_cd_contact[num_our_cd++] = CD_contact[i];
-
-  if (csRAPIDCollider::GetFirstHit() && hit)
-    return 1;
-
-  // Check collision with the things in this sector.
-  csThing *tp = sp->GetFirstThing ();
-  while (tp)
-  {
-    // TODO, if and when Things can move, their transform must be passed in.
-    csRAPIDCollider::numHits = 0;
-    if (c->Collide(*tp, cdt)) hit++;
-
-    CD_contact = csRAPIDCollider::GetCollisions ();
-    for (int i=0 ; i<csRAPIDCollider::numHits ; i++)
-      our_cd_contact[num_our_cd++] = CD_contact[i];
-
-    if (csRAPIDCollider::GetFirstHit() && hit)
-      return 1;
-    tp = (csThing*)(tp->GetNext ());
-    // TODO, should test which one is the closest.
-  }
-
-  return hit;
-}
-
-void DoGravity (csVector3& pos, csVector3& vel)
-{
-  pos=Sys->view->GetCamera ()->GetOrigin ();
-
-  csVector3 new_pos = pos+vel;
-  csMatrix3 m;
-  csOrthoTransform test (m, new_pos);
-
-  csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4.0f*Sys->body->GetRadius(),
-    Sys->view->GetCamera()->GetSector(), n);
-
-  num_our_cd = 0;
-  csRAPIDCollider::SetFirstHit (false);
-  int hits = 0;
-
-  // Check to see if there are any terrains, if so test against those.
-  // This routine will automatically adjust the transform to the highest
-  // terrain at this point.
-  int k;
-  for ( k = 0; k < num_sectors ; k++)
-  {
-    if (n[k]->terrains.Length () > 0)
-    {
-      int i;
-      for (i = 0 ; i < n[k]->terrains.Length () ; i++)
-      {
-	csTerrain* terrain = (csTerrain*)n[k]->terrains[i];
-	hits += terrain->CollisionDetect (&test);
-      }
-    }
-    if (hits)
-    {
-      new_pos = test.GetOrigin ();
-    }
-  }
-  if (hits == 0)
-  {
-    csRAPIDCollider::CollideReset ();
-
-    for ( ; num_sectors-- ; )
-      hits += CollisionDetect (Sys->body, n[num_sectors], &test);
-
-    for (int j=0 ; j<hits ; j++)
-    {
-      csCdTriangle *wall = our_cd_contact[j].tr2;
-      csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
-      if (n*vel<0)
-        continue;
-      vel = -(vel%n)%n;
-    }
-
-    // We now know our (possible) velocity. Let's try to move up or down, if possible
-    new_pos = pos+vel;
-    test = csOrthoTransform (csMatrix3(), new_pos);
-
-    num_sectors = FindSectors (new_pos, 4.0f*Sys->legs->GetRadius(), 
-		Sys->view->GetCamera()->GetSector(), n);
-
-    num_our_cd = 0;
-    csRAPIDCollider::SetFirstHit (false);
-    csRAPIDCollider::numHits = 0;
-    int hit = 0;
-
-    csRAPIDCollider::CollideReset ();
-
-    for ( ; num_sectors-- ; )
-      hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
-    
-    if (!hit)
-    {
-      Sys->on_ground = false;
-      if (Sys->do_gravity && !Sys->move_3d)
-	vel.y -= 0.004;
-    }
-    else
-    {
-      float max_y=-1e10;
-      
-      for (int j=0 ; j<hit ; j++)
-      {
-	csCdTriangle first  = *our_cd_contact[j].tr1;
-	csCdTriangle second = *our_cd_contact[j].tr2;
-
-	csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
-
-	if (n*csVector3(0,-1,0)<0.7) continue;
-
-	csVector3 line[2];
-
-	first.p1 += new_pos;
-	first.p2 += new_pos;
-	first.p3 += new_pos;
-
-	if (FindIntersection (&first,&second,line))
-	{
-	  if (line[0].y>max_y)
-	    max_y=line[0].y;
-	  if (line[1].y>max_y)
-	    max_y=line[1].y;
-	}
-      }
-
-      float p = new_pos.y-max_y+OYL+0.01;
-      if (fabs(p)<DYL-0.01)
-      {
-	if (max_y != -1e10)
-	  new_pos.y = max_y-OYL-0.01;
-
-	if (vel.y<0)
-	  vel.y = 0;
-      }
-      Sys->on_ground = true;
-    }
-  }
-  new_pos -= Sys->view->GetCamera ()->GetOrigin ();
-  if (Sys->world->sectors.Length()==1)
-  {
-    //This is a workaround until sector->FollowSegment() will use the
-    //octree system. In worlds created by map2cs, walking will be
-    //very slow, because of the search for a new sector. This is
-    //not really necessarey, because there is only 1 sector. This
-    //optimisation here is sane in all cases, so it won't hurt anyway.
-    Sys->view->GetCamera ()->MoveWorldUnrestricted(new_pos);
-  }
-  else
-  {
-    Sys->view->GetCamera ()->MoveWorld (new_pos);
-  }
-
-  Sys->velocity = Sys->view->GetCamera ()->GetO2T ()*vel;
-
-  if(!Sys->do_gravity)
-    Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, fabs (Sys->velocity.y));
-}
 
 void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 {
@@ -664,6 +587,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 
   if (do_cd)
   {
+    extern void DoGravity (csVector3& pos, csVector3& vel);
     if (!player_spawned)
     {
       CreateColliders ();

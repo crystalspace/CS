@@ -4,6 +4,9 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards fixed SHM problem on some versions of
 	  Solaris. If SHM fails it will automatically retry without
 	  SHM (X2d driver).
+	- Wouter also fixed the ColorChange functionality in the particle
+	  system. Fixed AddColor. Fixed destructor, UnlinkSprite is
+	  already done by ~csSprite().
 	- Andrew Zabolotny added a SciTech MGL 2D driver (unfinished, won't
 	  compile).
 	- Andrew Zabolotny also did the following changes:
@@ -34,6 +37,30 @@ The history order has been reversed so that new features are at the top.
 	  accessed via these URLs:
 	      http://crystal.sourceforge.net/cvs-snapshots/
 	      ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots/
+	- Fixed old bug with bots (divide by zero for Norm ()).
+	- Fixed another old bug with the missile getting stuck if you
+	  immediatelly fire after starting walktest.
+	- Fixed bug in loader. It would first call Transform() and then
+	  CompressVertices() on a thing. This is wrong and can potentially
+	  (in rare cases) cause severe problems.
+	- Cleaned up WalkTest a little (not much).
+	- Added walkcd.cpp file where all collision detection code
+	  related to WalkTest is placed.
+	- Added walkdemo.cpp file where all special demo code in WalkTest
+	  is added (ghost, skeletal tree, bots, missile, particles, ...)
+	- Added walkcmd.cpp file where all console command stuff is
+	  housed.
+	- Moved constructor and init stuff of WalkTest from keys.cpp
+	  to walktest.cpp where it belongs.
+	- keys.cpp is now much closer to really doing what the name
+	  suggests: handling keys, events, and movement.
+	- Fixed a bug in collision detection for WalkTest. The code
+	  to handle the resulting collisions incorrectly looped on 'hits'
+	  instead of 'num_our_cd'. The result of this was that it was
+	  rather possible to walk through walls or fall through floors.
+	  This occured very easily in STATBSP type levels but could
+	  also affect portal levels.
+	- Robert Bate updated the Mac project files.
 10-Apr-2000
 	- Added 'DETAIL' keyword for THING and SIXFACE and CS_ENTITY_DETAIL
 	  flag to csThing. With this keyword you can indicate detail objects
