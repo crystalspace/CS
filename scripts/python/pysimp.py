@@ -11,10 +11,10 @@ def CreateRoom(matname):
 	print 'Start creating polygons...'
 	global system
 	system=GetSystem()
-	world=system.Query_iWorld()
-	room=world.FindSector("room")
+	engine=system.Query_iEngine()
+	room=engine.FindSector("room")
 	polyset=room.Query_iPolygonSet()
-	material=world.FindMaterial(matname)
+	material=engine.FindMaterial(matname)
 
 	poly=polyset.CreatePolygon('floor')
 	poly.CreateVertex(csVector3(-5,0,5))
