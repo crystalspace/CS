@@ -292,9 +292,9 @@ typedef struct _csKeyModifiers
 #define CSKEY_SPECIAL(code)		(CSKEY_SPECIAL_FIRST + (code))
 /// Helper macro to determine whether a key code identifies a special key.
 #define CSKEY_IS_SPECIAL(rawCode)	\
-  ((rawCode >= CSKEY_SPECIAL_FIRST) && (rawCode <= CSKEY_SPECIAL_LAST))
+  ((rawCode >= CSKEY_SPECIAL_FIRST) && ((rawCode) <= CSKEY_SPECIAL_LAST))
 /// Helper macro to determine the parameter that was given to #CSKEY_SPECIAL.
-#define CSKEY_SPECIAL_NUM(rawCode)	(rawCode - CSKEY_SPECIAL_FIRST)
+#define CSKEY_SPECIAL_NUM(rawCode)	((rawCode) - CSKEY_SPECIAL_FIRST)
 
 /// Up arrow key
 #define CSKEY_UP			CSKEY_SPECIAL(0x00)
@@ -358,7 +358,7 @@ typedef struct _csKeyModifiers
 #define CSKEY_MODIFIERTYPE_SHIFT	5
 /// Helper macro to construct a modifiers key code.
 #define CSKEY_MODIFIER(type, num)		\
-  CSKEY_SPECIAL(CSKEY_MODIFIER_FIRST + (type << CSKEY_MODIFIERTYPE_SHIFT) + num)
+  CSKEY_SPECIAL(CSKEY_MODIFIER_FIRST + ((type) << CSKEY_MODIFIERTYPE_SHIFT) + (num))
 /// Helper macro to test whether a key code identifies a modifier.
 #define CSKEY_IS_MODIFIER(rawCode)	\
   (CSKEY_IS_SPECIAL(rawCode) && 	\
@@ -366,12 +366,18 @@ typedef struct _csKeyModifiers
      (CSKEY_SPECIAL_NUM(rawCode) <= CSKEY_MODIFIER_LAST)))
 /// Helper macro to determine the modifier type of a key code.
 #define CSKEY_MODIFIER_TYPE(rawCode)	\
-  ((rawCode - CSKEY_MODIFIER_FIRST - CSKEY_SPECIAL_FIRST) >> \
+  (((rawCode) - CSKEY_MODIFIER_FIRST - CSKEY_SPECIAL_FIRST) >> \
   CSKEY_MODIFIERTYPE_SHIFT)
 /// Helper macro to determine the modifier number of a key code.
 #define CSKEY_MODIFIER_NUM(rawCode)	\
-  ((rawCode - CSKEY_MODIFIER_FIRST - CSKEY_SPECIAL_FIRST) & \
+  (((rawCode) - CSKEY_MODIFIER_FIRST - CSKEY_SPECIAL_FIRST) & \
   ((1 << CSKEY_MODIFIERTYPE_SHIFT) - 1))  
+
+/// Helper macro to determine if two modifier bitmasks can be considered equal.
+#define CSKEY_MODIFIER_COMPARE(bitmask1, bitmask2)			     \
+  ((bitmask1) == (bitmask2)						     \
+|| ((bitmask1) == (unsigned)(1 << csKeyModifierNumAny) && (bitmask2) != 0)   \
+|| ((bitmask2) == (unsigned)(1 << csKeyModifierNumAny) && (bitmask1) != 0))
 
 /// Construct a key code for the Shift modifier key number \a n.
 #define CSKEY_SHIFT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeShift,n)
@@ -418,14 +424,14 @@ typedef struct _csKeyModifiers
 /// Bit that is set if a key is from the keypad.
 #define CSKEY_PAD_FLAG			0x4000
 /// Helper macro to construct a keypade key code.
-#define CSKEY_PAD_KEY(code) CSKEY_SPECIAL((unsigned int)code | CSKEY_PAD_FLAG)
+#define CSKEY_PAD_KEY(code) CSKEY_SPECIAL((unsigned int)(code) | CSKEY_PAD_FLAG)
 
 /// Helper macro to test whether a key code identifies a keypad key.
-#define CSKEY_IS_PAD_KEY(rawCode)	((rawCode & CSKEY_PAD_FLAG) != 0)
+#define CSKEY_IS_PAD_KEY(rawCode)	(((rawCode) & CSKEY_PAD_FLAG) != 0)
 /**
  * Helper macro to convert a 'pad' key code into a 'normal' special key code.
  */
-#define CSKEY_PAD_TO_NORMAL(rawCode)	(rawCode & (~CSKEY_PAD_FLAG))
+#define CSKEY_PAD_TO_NORMAL(rawCode)	((rawCode) & (~CSKEY_PAD_FLAG))
 
 /// Keypad 1
 #define CSKEY_PAD1			CSKEY_PAD_KEY('1')
