@@ -60,6 +60,7 @@ chronological order.
 	- res updated snapshot.py to use 'cvs.sourceforge.net' as a hostname in
 	  the CVS/Root files for generated CVS snapshots. This seems to be
 	  required after some recent apparent changes in SF's CVS.
+	- Erotoman fixed spr2d uvanimation in NR
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you
