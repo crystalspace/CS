@@ -251,7 +251,10 @@ inline long csQint24 (float inval)
     
 #else /* not CS_IEEE_DOUBLE_FORMAT */
 
-#define csQround(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
+static inline long csQround (double inval)
+{
+  return int (inval + ((inval < 0) ? -0.5 : +0.5));
+}
 #define csQint(x)   (int (x))
 #define csQint8(x)  (int ((x)*256.))
 #define csQint16(x) (int ((x)*65536.))

@@ -219,8 +219,10 @@ void csAntialiasedPolyFill (
     int y = csQint (iverts[i].y);
     if (Grid->xmin > x) Grid->xmin = x;
     if (Grid->ymin > y) Grid->ymin = y;
-    x = csQround (ceil (iverts[i].x));
-    y = csQround (ceil (iverts[i].y));
+    double ceilx = ceil (iverts[i].x);
+    double ceily = ceil (iverts[i].y);
+    x = csQround (ceilx);
+    y = csQround (ceily);
     if (Grid->xmax < x) Grid->xmax = x;
     if (Grid->ymax < y) Grid->ymax = y;
   }

@@ -23,6 +23,21 @@ chronological order.
 	  not have the appropriate "debug" tag, thus causing important
 	  debugging configuration to be omitted from the synthesized project
 	  files.
+	- Jorrit changed all occurances of csQround() in CS that require an
+	  exact correct answer to use the slow version of csQround() (manually
+	  in code) which simply does: (int ((x) + ((x < 0) ? -0.5 : +0.5)))
+	  The reason for this is that experimentation has showed that the
+	  fast versions of csQround() actually give different results on
+	  different systems. Places where these different results can have
+	  bad effects have been fixed. This includes:
+	  	- float2short/float2long endian routines.
+		- places where cached data is compared for validity. A
+		  different result of csQround() can cause (for example)
+		  lightmaps not to load on some system.
+	  The faster csQround() versions are still considerably faster then
+	  the simple function above so I opted against removal for now.
+	- Jorrit also changed the csQround() fallback macro to be an inline
+	  function to avoid double evalulation of the argument.
 	- Eric Sunshine added include/csutil/win32/sanity.inc which #undefines
 	  several Win32 API macros which pollute the global preprocessor
 	  namespace, and which interfere with CS's own method and function

@@ -1487,7 +1487,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
       float xf;
       sscanf (endkw, "%f", &xf);
 
-      int xi = csQround (xf);
+      int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
 
       if (!strcmp (keyword, "LMVERSION"))
       {
