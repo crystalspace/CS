@@ -1,5 +1,20 @@
 The history order is reversed so that new features are at the top.
 
+25-Jul-2002
+	- Eric Sunshine made the following changes to the MingW/MSYS platform
+	  configuration (msys.make and msysconf.sh):
+	    - msysconf.sh is now run only once at configuration time, rather
+	      than twice.
+	    - msysconf.sh now determines whether or not executables and plugins
+	      must be linked explicitly against libmingwex.a, which is a new
+	      library containing functions such as opendir() (which used to be
+	      in libmingw32.a).  Newer interim versions of MingW do not link
+	      automatically against this library, so we must do so explicitly.
+	    - Fixed problem with msysconf.sh configuration where CC and CXX
+	      were not defined, thus all of the tests invoked by this script
+	      which required a compiler would fail.
+	    - msys.mak will now utilize CS/libs/zlib, CS/libs/libpng, and
+	      CS/libs/libjpeg, if present.
 24-Jul-2002
 	- Eric Sunshine corrected the formatting of some makefile help
 	  messages.

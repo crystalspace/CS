@@ -1,27 +1,27 @@
-# This is the makefile for Cygwin32 compiler (gcc for Win32)
+# This is the makefile for MinGW32 compiler (gcc for Win32) with
+# the MSYS configuration environment.
 
 # Friendly names for building environment
-DESCRIPTION.msys = Windows with MinGw / MSYS GNU C/C++
+DESCRIPTION.msys = Windows with MinGW / MSYS GNU C/C++
 DESCRIPTION.OS.msys = Win32
 
 # Choose which drivers you want to build/use
-#PLUGINS+= cscript/cspython
-#PLUGINS+= cscript/cslua
-PLUGINS+= sound/renderer/software
-PLUGINS+= video/canvas/ddraw
-#PLUGINS+= video/canvas/ddraw8
-#PLUGINS+=physics/odedynam
+PLUGINS += video/canvas/ddraw
+#PLUGINS += video/canvas/ddraw8
 
-# udp/tcp network plugin
-PLUGINS+=net/driver/ensocket
+PLUGINS.DYNAMIC += sound/renderer/software
+#PLUGINS.DYNAMIC += cscript/cspython
+#PLUGINS.DYNAMIC += cscript/cslua
+#PLUGINS.DYNAMIC +=physics/odedynam
+PLUGINS += net/driver/ensocket
 
-# if u have the following line uncommented make sure one
+# If you have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom
 # opengl dll installed as GL.dll (e.g. MESA)
-PLUGINS+= video/canvas/openglwin video/renderer/opengl
+PLUGINS += video/canvas/openglwin video/renderer/opengl
 
 # uncomment the line below to build the sound driver
-PLUGINS+= sound/driver/waveoutsd
+PLUGINS += sound/driver/waveoutsd
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -51,7 +51,7 @@ O=.o
 LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
-LIBS.EXE=$(LFLAGS.L)/usr/lib/w32api $(LFLAGS.l)gdi32
+LIBS.EXE=$(LFLAGS.L)/usr/lib/w32api $(LFLAGS.l)gdi32 $(MINGW_LIBS)
 
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1.1 for Win32
@@ -76,21 +76,22 @@ LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=$(LFLAGS.l)z
+Z_LIBS=$(LFLAGS.L)libs/zlib $(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=$(LFLAGS.l)png
+PNG_LIBS=$(LFLAGS.L)libs/libpng $(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=$(LFLAGS.l)jpeg
+JPG_LIBS=$(LFLAGS.L)libs/libjpeg $(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
 # for instance where your dx includes are
-CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx
-#$(CFLAGS.I)/dx7asdk/dxf/include
+CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx \
+  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
+#  $(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe
@@ -196,7 +197,7 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 
 # How to make a shared AKA dynamic library
 DO.SHARED.PLUGIN.CORE = \
-  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(MINGW_LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
@@ -219,8 +220,10 @@ SYSHELP += \
 endif # ifeq ($(MAKESECTION),confighelp)
 
 #--------------------------------------------------------------- configure ---#
-ifeq ($(ROOTCONFIG),config)
+ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
+ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
 SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/msysconf.sh $(INSTALL_DIR)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
+endif # ifeq ($(MAKESECTION),rootdefines)

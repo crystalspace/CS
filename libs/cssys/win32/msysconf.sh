@@ -11,6 +11,9 @@
 
 INSTALL_DIR=$1
 
+CC=gcc
+CXX=gcc
+
 BIN_DIR=bin
 
 # find out architecture
@@ -31,12 +34,25 @@ BIN_DIR=bin
 # Check for python
 . ${BIN_DIR}/haspythn.sh
 
-# test for phyton
-# Phyton doesn't work yet
-#. ${BIN_DIR}/haspythn.sh
+# Test if we need to link explicitly with libmingex.a.  Older versions of MinGW
+# did not have this library, whereas newer interim verions supply it but do not
+# link automatically with it.  The very newest versions (presumably) link with
+# libmingex.a automatically.  To see if libmingex.a is required, we try using
+# opendir(), which exists in libming32.a for older releases, and in libmingex.a
+# for newer releases.
 
-# find install dir
-[ -z "${INSTALL_DIR}" ] && INSTALL_DIR=/usr/local/crystal
-echo "INSTALL_DIR = ${INSTALL_DIR}"
+cat << EOF > comptest.cpp
+#include <dirent.h>
+int main() { DIR* p = opendir("."); return p != 0; }
+EOF
+
+if ${CXX} -o comptest comptest.cpp 2>/dev/null; then
+    true # Do not need any extra flags.
+else
+    ${CXX} -o comptest comptest.cpp -lmingwex 2>/dev/null && \
+        echo "MINGW_LIBS += -lmingwex"
+fi
+
+rm -f comptest.cpp comptest.o comptest.obj comptest.exe comptest
 
 exit 0
