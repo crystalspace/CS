@@ -261,9 +261,6 @@ CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
 AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
     [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	[$cs_cv_sys_pthread_mutex_recursive])])
-AS_IF([test $cs_cv_sys_pthread_mutex_timed != no],
-    [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_TIMED],
-	[$cs_cv_sys_pthread_mutex_timed])])
 
 
 
@@ -558,6 +555,11 @@ CS_COMPILER_IGNORE_UNINITIALIZED([C++], [cs_cv_prog_cxx_ignore_uninitialized],
 CS_COMPILER_IGNORE_PRAGMAS([C++], [cs_cv_prog_cxx_ignore_unknown_pragmas],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
 	[$cs_cv_prog_cxx_ignore_unknown_pragmas], [+])])
+
+# On MacOS/X, use of `long double' in csutil/formatter.h causes complaints.
+CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MANDATORY],
+	[$cs_cv_prog_cxx_ignore_long_double], [+])])
 
 
 

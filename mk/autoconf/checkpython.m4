@@ -47,7 +47,7 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],
     [AC_REQUIRE([CS_CHECK_PTHREAD])
-    CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS
+    CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double])
 
     AC_ARG_WITH([python],
 	[AC_HELP_STRING([--]m4_if([$2],[without],[with],[without])[-python],
@@ -138,16 +138,3 @@ AC_DEFUN([CS_CHECK_PYTHON],
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_CHECK_PYTHON],
     [CS_CHECK_PYTHON(m4_ifval([$3], [$3], [emit]), [$1], [$2])])
-
-
-
-#------------------------------------------------------------------------------
-# CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS
-#	Some Python installations on MacOS/X uses of 'long double' in the
-#	headers which cause excessive warnings from the compiler. Check if
-#	those warnings can be suppressed.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS],
-    [CS_CHECK_BUILD_FLAGS([how to suppress 'long double' warnings],
-	[cs_cv_prog_cxx_ignore_long_double],
-	[CS_CREATE_TUPLE([-Wno-long-double])], [C++])])

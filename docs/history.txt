@@ -13,6 +13,8 @@ chronological order.
 	- Eric Sunshine fixed problem which caused
 	  csPrintfFormatter::OutputFloatHex() to complain that it did not know
 	  how to format floating-point numbers as hexadecimal on MacOS/X.
+	- Eric Sunshine added a -Wno-long-doubles check to configure.ac. This
+	  resolves complaints about csutil/formatter.h on MacOS/X.
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.
