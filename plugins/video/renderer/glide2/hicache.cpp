@@ -46,8 +46,6 @@ HighColorCache::~HighColorCache()
 
 void HighColorCache::Add(iTextureHandle *texture)
 {
-  // gsteenss: original dataptr...
-  //HighColorCacheAndManage_Data *cached_texture;
   int size = 0;
   
   if(type!=HIGHCOLOR_TEXCACHE) return;
@@ -61,8 +59,6 @@ void HighColorCache::Add(iTextureHandle *texture)
 
   size *= bpp/8;
 
-  bool bIsInVideoMemory;
-  
   csTextureMMGlide* txt_mm = (csTextureMMGlide*)texture->GetPrivateObject ();
   csGlideCacheData *cached_texture = (csGlideCacheData *)txt_mm->GetCacheData ();
   
@@ -219,43 +215,19 @@ void HighColorCache::Add(iPolygonTexture *polytex)
 
 void HighColorCache::Clear()
 {
-/*
-  while(head)
-  {
-    HighColorCacheAndManage_Data *n = (HighColorCacheAndManage_Data*)head->next;
-    head->next = head->prev = NULL;
-        
-    Unload(head);
-    manager->freeSpaceMem(((HighColorCacheAndManage_Data *)head)->mempos);
-    delete ((HighColorCacheAndManage_Data *)head)->mempos;
-    ((HighColorCacheAndManage_Data *)head)->mempos=0;           
-
-    if(type==HIGHCOLOR_TEXCACHE) 
-    {
-      IMipMapContainer* texh = NULL;
-      
-      head->pSource->QueryInterface( IID_IMipMapContainer, (void**)texh );
-      assert( texh );
-      
-      texh->SetCacheData(NULL);
-    }
-    else if(type==HIGHCOLOR_LITCACHE)
-    {
-      iLightMap* piLM;
-    
-      head->pSource->QueryInterface( IID_iLightMap, (void**)piLM );
-      assert( piLM );
-      
-      piLM->SetCacheData(NULL);
-    }
-    head = n;
-  }
-*/  
   while(head)
   {
     csGlideCacheData *n = head;
     head = head->next;
-        
+    if (type == HIGHCOLOR_TEXCACHE){
+      iTextureHandle *texh = (iTextureHandle *)n->pSource;
+      texh->SetCacheData (NULL);
+    }
+    else
+    {
+      iLightMap *texh = (iLightMap *)n->pSource;
+      texh->SetCacheData (NULL);
+    }
     Unload(n);
   }    
 

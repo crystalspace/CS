@@ -420,7 +420,6 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_renderstate.alphablend = true;
   m_renderstate.mipmap = true;
   m_renderstate.lighting = true;
-  m_renderstate.textured = true;
 }
 
 csGraphics3DGlide2x::~csGraphics3DGlide2x()
@@ -775,43 +774,62 @@ void csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
 
 void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bool haslight,
                                                    TextureHandler* text, TextureHandler* light,
-                                                   bool /*is_transparent*/)
+                                                   bool is_transparent)
 {
   int i;
-  for (i=0;i<num;i++) 
-  {
-    verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
-    verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
-  }
+
   if (text)
+  {
+    for (i=0;i<num;i++) 
+    {
+      verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
+      verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
+    }
+
     GlideLib_grTexSource (text->tmu->tmu_id, text->loadAddress,
                           GR_MIPMAPLEVELMASK_BOTH, &text->info);
-  if(haslight && light)
-  {
-    for(i=0;i<num;i++)
+    if(haslight && light)
     {
-      verts[i].tmuvtx[1].sow *= light->width*verts[i].oow; 
-      verts[i].tmuvtx[1].tow *= light->height*verts[i].oow;
-    }
-    GlideLib_grTexSource (light->tmu->tmu_id, light->loadAddress,
-                          GR_MIPMAPLEVELMASK_BOTH, &light->info);
+      for(i=0;i<num;i++)
+      {
+        verts[i].tmuvtx[1].sow *= light->width*verts[i].oow; 
+        verts[i].tmuvtx[1].tow *= light->height*verts[i].oow;
+      }
+      GlideLib_grTexSource (light->tmu->tmu_id, light->loadAddress,
+                            GR_MIPMAPLEVELMASK_BOTH, &light->info);
       
-    GlideLib_grTexCombine (text->tmu->tmu_id,
-                           GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
-                            //GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL, GR_COMBINE_FACTOR_ONE,
-                           GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                           FXFALSE,FXFALSE);
+      GlideLib_grTexCombine (text->tmu->tmu_id,
+                             GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
+                             //GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL, GR_COMBINE_FACTOR_ONE,
+                             GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                             FXFALSE,FXFALSE);
        
-  }   
+    }   
+    else
+    {
+      GlideLib_grTexCombine (text->tmu->tmu_id,
+                             GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                             GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                             FXFALSE,FXFALSE);
+    }
+
+    GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
+    GlideLib_grAlphaCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
+  }
   else
   {
-    GlideLib_grTexCombine (text->tmu->tmu_id,
-                           GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-                           GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                           FXFALSE,FXFALSE);
+    GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
+    GlideLib_grAlphaCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
   }
 
-       
+  if (is_transparent)       
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA, GR_BLEND_ONE, GR_BLEND_ZERO );
+  else
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
  /*if(!haslight)
   {
     GlideLib_grTexCombine(0,
@@ -914,12 +932,68 @@ void csGraphics3DGlide2x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 {
   if (poly.num < 3) return;
-  bool lm_exists=true;
+
+  iPolygonTexture* pTex;
+  iLightMap* piLM = NULL;
+  csGlideCacheData* tcache = NULL;
+  csGlideCacheData* lcache = NULL;
+  TextureHandler *thLm  = NULL; 
+  TextureHandler *thTex = NULL;
+  bool lm_exists=false;
   bool is_transparent = false;
   bool is_colorkeyed = false;
-  iPolygonTexture* pTex;
+
+  // retrieve the texture.
+  pTex = poly.poly_texture[0];
+  // get texture and lightmap cache data if avail.
+  if ( m_renderstate.textured )
+  {
+    if ( pTex )
+    {
+      // cache the tex
+      CacheTexture (pTex);
+      csTextureMMGlide* txt_mm = (csTextureMMGlide*)poly.txt_handle->GetPrivateObject ();
+  
+      // get the cache data
+      tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
+      // retrieve the lightmap from the cache.
+      piLM = ( m_renderstate.lighting ? pTex->GetLightMap () : NULL );
+      if ( piLM )
+      {
+        lcache = (csGlideCacheData *)piLM->GetCacheData ();
+        if (lcache!=NULL)
+	{
+	  lm_exists = true;
+	  thLm = (TextureHandler*)lcache->pData;
+	}
+      }
+    }
+    if ( !tcache ) 
+      return;
+    else
+      thTex = (TextureHandler*)tcache->pData;
+  } 
+
+  // set color and transparency
+  UByte a, r, g, b;
+  a=r=g=b=255;
+
+  if ( poly.alpha )
+  {
+    is_transparent = true;
+    a = 255 - (int)(( poly.alpha / 100.f ) * 255.f);
+  }
+  
+  // if we draw a flat shaded polygon we gonna use the mean color
+  if ( !m_renderstate.textured )
+    poly.txt_handle->GetMeanColor ( r, g, b );
+
+  GlideLib_grConstantColorValue ( (a << 24) | (r << 16) | (g << 8) | b );
+  
+  
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
+  float x,y,ooz,z,u,v,lu,lv;
   int i,j;
 
   // set up the geometry.
@@ -932,8 +1006,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   
     if (ABS (poly.normal.D) < 0.06)
     {
-      M = 0;
-      N = 0;
+      M = N = 0;
       O = 1/poly.z_value;
     }
     else
@@ -944,59 +1017,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
     }
     SetupPolygon ( poly, J1, J2, J3, K1, K2, K3, M, N, O );
   }
-
-  // retrieve the texture.
-  pTex = poly.poly_texture[0];
-  csTextureMMGlide* txt_mm = (csTextureMMGlide*)poly.txt_handle->GetPrivateObject ();
-  if (!pTex) return;
-
-  CacheTexture (pTex);
-
-//  if ( poly_alpha != poly.alpha )
-//  {
-    poly_alpha     = poly.alpha;
-    is_transparent = poly_alpha ? true : false;
-    if(is_transparent)
-    {
-      GrColor_t c = 0x00FFFFFF;
-      c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
-      GlideLib_grConstantColorValue (c);
-    }
-    else
-    {
-      GlideLib_grConstantColorValue (0xFFFFFFFF);
-    }
-//  }
-        
-
-  csGlideCacheData* tcache = NULL;
-  csGlideCacheData* lcache = NULL;
   
-  // retrieve the cached texture handle.
-  tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
-/*
-  printf( "pointer %p\n", tcache );
-  printf( "size %ld\n", tcache->lSize );
-  printf( "tex-pointer %p\n", tcache->pSource );
-  printf( "tex-handlerpointer %p\n", tcache->pData );
-  printf( "mempos-pointer %p\n", tcache->mempos );
-  TextureHandler *th = (TextureHandler*)tcache->pData;
-  printf( "loadAddress %ld\n", th->loadAddress );
-  printf( "size %ld\n", th->size );
-  printf( "width, height:  %g %g\n", th->width, th->height );
-*/        
-  // retrieve the lightmap from the cache.
-  iLightMap* piLM = ( m_renderstate.lighting ? pTex->GetLightMap () : NULL );
-
-  if ( piLM )
-  {
-    lcache = (csGlideCacheData *)piLM->GetCacheData ();
-    if (lcache==NULL)
-      lm_exists = false;
-  }
-  else
-    lm_exists=false;
-
   if ( m_dpvertsize < poly.num )
   {
     m_dpverts=new GrVertex[poly.num];
@@ -1008,10 +1029,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
       m_dpverts[i].b = 255;
     }
   }
-  float x,y,ooz,z,u,v,lu,lv;
-  TextureHandler *thLm =NULL, 
-                 *thTex = (TextureHandler *)tcache->pData;
-                  
+
   for(i=0;i < poly.num;i++)
   {
 #ifdef DO_HW_UVZ
@@ -1047,7 +1065,6 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   if (lm_exists)
   {
     float fMinU, fMinV, fMaxU, fMaxV;
-    thLm = (TextureHandler *)lcache->pData;
     pTex->GetTextureBox ( fMinU, fMinV, fMaxU, fMaxV );
       
     float lu_dif, lv_dif,lu_scale, lv_scale;
@@ -1102,7 +1119,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 
 void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
 {
-  GlideLib_grGlideGetState ( &state );
+//  GlideLib_grGlideGetState ( &state );
   if ( m_renderstate.textured && handle )
   {
     csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
@@ -1110,7 +1127,7 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
     m_pTextureCache->Add (handle);
     tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
 
-    m_thTex = (TextureHandler *)tcache->pData;
+    m_thTex = ( tcache ? (TextureHandler *)tcache->pData : NULL );
     if ( m_thTex )
     {
       GlideLib_grTexSource (m_thTex->tmu->tmu_id, m_thTex->loadAddress, 
@@ -1137,7 +1154,6 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   m_dpfx.mixmode = mode;
   m_dpfx.gouraud = m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
   
-  bool blend = true;
   switch (mode & CS_FX_MASK_MIXMODE)
   {
   case CS_FX_MULTIPLY:
@@ -1169,12 +1185,26 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   case CS_FX_COPY:
   default:
     // Color = 0 * DEST + 1 * SRC = SRC
-    blend = false;
     m_dpfx.alpha = 255;
     GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
     break;
   }
-  GlideLib_grConstantColorValue ( m_dpfx.alpha << 24 );
+  
+  UByte r, g, b;
+  r=g=b=255;
+
+  // if we draw a flat shaded polygon we gonna use the mean color
+  if ( !m_renderstate.textured && handle)
+  {
+    handle->GetMeanColor ( r, g, b );
+    GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
+    GlideLib_grAlphaCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                             GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
+  }
+  
+  GlideLib_grConstantColorValue ( (m_dpfx.alpha << 24) | (r << 16) | (g << 8) | b );
 }
 
 void csGraphics3DGlide2x::FinishPolygonFX ()
@@ -1187,12 +1217,12 @@ void csGraphics3DGlide2x::FinishPolygonFX ()
                            FXFALSE,FXFALSE);
   }
   m_thTex = NULL;
-  GlideLib_grGlideSetState ( &state );
+//  GlideLib_grGlideSetState ( &state );
 }
 
 void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  if (poly.num >= 3 && m_thTex)
+  if (poly.num >= 3 && (m_thTex || !m_renderstate.textured))
   {
     if ( poly.num  > m_vertsize )
     {
@@ -1225,8 +1255,10 @@ void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
       m_verts[i].oow = poly.vertices[i].z;
       m_verts[i].x -= SNAP;
       m_verts[i].y -= SNAP;
-      m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
-      m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
+      if ( m_renderstate.textured ){
+        m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
+        m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
+      }
       m_verts[i].a = poly.vertices[i].z;
     }
     
@@ -1250,13 +1282,13 @@ void csGraphics3DGlide2x::CacheTexture (iPolygonTexture *texture)
   m_pLightmapCache->Add (texture);
 }
 
-void csGraphics3DGlide2x::DumpCache(void)
+void csGraphics3DGlide2x::DumpCache (void)
 {
   m_pTextureCache->Dump ();
   m_pLightmapCache->Dump ();
 }
 
-void csGraphics3DGlide2x::ClearCache(void)
+void csGraphics3DGlide2x::ClearCache (void)
 {
   if (m_pTextureCache) m_pTextureCache->Clear ();
   if (m_pLightmapCache) m_pLightmapCache->Clear ();
