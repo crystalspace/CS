@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+10-Mar-2003
+	- Added a few timing printfs in region code to debug long load
+	  times.
 9-Mar-2003
 	- Marten Svanfeldt made the following changes:
 	    - Moved setting of lightposition from meshplugin into engine

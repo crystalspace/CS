@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "csutil/csvector.h"
 #include "csutil/ptrarr.h"
 #include "ivideo/txtmgr.h"
@@ -284,8 +285,11 @@ bool csRegion::ShineLights ()
 
 bool csRegion::Prepare ()
 {
+printf ("Before csRegion::Prepare %d\n", csGetTicks ());
   if (!PrepareTextures ()) return false;
+printf ("Before csRegion::ShineLights %d\n", csGetTicks ());
   if (!ShineLights ()) return false;
+printf ("After csRegion::ShineLights %d\n", csGetTicks ());
   return true;
 }
 
