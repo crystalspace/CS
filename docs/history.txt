@@ -43,6 +43,8 @@ chronological order.
 	- res fixed halos for OR (and also a mem leak related to NR halos).
 	- Eric Sunshine removed hard-coded version number from map2cs in
 	  several locations; replaced with CS_VERSION.
+	- Eric Sunshine fixed a lot of Texinfo errors and warnings in material
+	  recently added to the CS manual.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

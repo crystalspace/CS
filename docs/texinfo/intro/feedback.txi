@@ -8,7 +8,8 @@ If you find a bug in Crystal Space there are two ways to report it to the
 developers. The preferred method of reporting bugs is to use the SourceForge
 support request mechanism that can be found at:
 
-@uref{https://sourceforge.net/tracker/?atid=200649&group_id=649&func=browse}.
+@noindent
+@uref{https://sourceforge.net/tracker/?atid=200649&group_id=649&func=browse}
 
 To use the SourceForge trackers, you must have a SourceForge user id,
 and be logged in.
@@ -25,26 +26,25 @@ Crystal Space version number. If it is a @sc{cvs} snapshot then include
 the time that you downloaded it. If you are using @sc{cvs} directly then
 state when it was that you last did an update.
 @item
-Operating System (Windows (@emph{95, 98/SE/ME, NT4, 2000, XP}), MacOS/X, Unix
---- Linux, FreeBSD, etc. --- @dots{})
+Operating System (Windows (@emph{95, 98/@sc{se}/@sc{me}, @sc{nt}4, 2000,
+@sc{xp}}), MacOS/X, Unix --- Linux, Free@sc{bsd}, etc.  --- @dots{}).
 @item
-the compiler that you used (GCC, MINGW, MSVC, @dots{})
+The compiler that you used (@sc{gcc}, Mingw, @sc{msvc}, @dots{}).
 @item
-which renderer system you are using (old or new renderer).
+Which renderer system you are using (old or new renderer).
 @item
-architecture (Intel x86, AMD x86, SPARC, MIPS, m68k, Alpha, PowerPC, @dots{})
+Architecture (Intel x86, @sc{amd} x86, @sc{sparc}, @sc{mips}, @sc{m68k}, Alpha,
+PowerPC, @dots{}).
 @item
-graphics adapter (brand/model, total on-board memory, driver version, @dots{})
+Graphics adapter (brand/model, total on-board memory, driver version, @dots{}).
 @item
-video settings (color depth, resolution, Crystal Space video driver, @dots{}).
+Video settings (color depth, resolution, Crystal Space video driver, @dots{}).
 @item
-a description of the problem
+Description of the problem.
 @item
-the exact error message (or output of Crystal Space)
+Exact error message (or output of Crystal Space).
 @item
-how to reproduce the crash (if it is reproducible)
+How to reproduce the crash (if it is reproducible).
 @item
-the compiler that you used (if you built Crystal Space from source)
-@item
-a fix for the bug if available (unified diff files are desirable)
+A fix for the bug if available (Unified diff files are desirable).
 @end itemize

@@ -1596,13 +1596,12 @@ The most important change is that @sc{opcode} is now prefered over
 to @sc{rapid} which can't be used in commercial programs), it is faster,
 and uses a lot less memory. In future we will remove the @sc{rapid} plugin.
 
-The @code{iCollideSystem::CollidePath()} function has been moved to
+The @code{iCollideSystem::CollidePath()} utility method has been relocated to
 @code{csColliderHelper::CollidePath()}. In addition there are a few extra
 versions that can make life easier for calculating collisions on a path.
 
 @subheading Isometric Engine
 
-The isometric engine has been removed. It was beyond repair. Isotest application
-is still there and demonstrates how you can simulate isometric look-alike
-with the normal 3D engine.
-
+The isometric engine has been removed.  It was beyond repair.  The
+@samp{isotest} application remains, though, and demonstrates how you can
+simulate an isometric look with the normal 3D engine.

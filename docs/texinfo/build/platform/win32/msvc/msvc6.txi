@@ -103,8 +103,10 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC6 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\visualc6\wkstypical.dsw} (or
-@file{CS\mk\visualc6\wksnewrenderer.dsw} if you want to try the new renderer).
+Load @file{CS\mk\visualc6\wkstypical.dsw}.  (On the other hand, if you want to
+try out the experimental new renderer, open the workspace
+@file{wksnewrenderer.dsw} in the same directory, and select either the
+Release_NR or Debug_NR build mode.)
 
 @item
 Remove all projects you don't want to compile.  To do this, right-click on the

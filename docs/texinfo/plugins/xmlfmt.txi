@@ -365,8 +365,10 @@ When you specify name/value pairs in the world section itself you are
 essentially adding information to the engine class. Here is an example:
 
 @example
-<key name="spawn_monster" type="ghost" location="mainhall" pos="10,1,12" />
-<key name="spawn_monster" type="goblin" location="corridor" pos="15,3,10" />
+<key name="spawn_monster" type="ghost" location="mainhall"
+  pos="10,1,12" />
+<key name="spawn_monster" type="goblin" location="corridor"
+  pos="15,3,10" />
 @end example
 
 @node XML World Element Section, XML World Definition Section, XML Init Section, XML File Format

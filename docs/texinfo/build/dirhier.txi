@@ -66,7 +66,8 @@ manual.  Most users will want to browse the file
 
 @item CS/docs/html/api
 This directory contains the Crystal Space @sc{sdk}'s public @sc{api} reference
-manual rendered in @sc{html} format. See @file{CS/docs/html/api/index.hm.}.
+manual. Most users will want to browse the file
+@file{CS/docs/html/api/index.html}.
 
 @item CS/docs/support
 This directory contains support scripts and templates for automatically
@@ -220,6 +221,7 @@ The 3D @dfn{engine} which drives Crystal Space.
 @table @code
 @item CS/plugins/engine/3d
 The 3D engine plugin.
+@end table
 
 @item CS/plugins/filesys
 Filesystem-related plugins.

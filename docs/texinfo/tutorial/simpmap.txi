@@ -176,7 +176,7 @@ bool Simple::HandleEvent (iEvent& ev)
   @{
     if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
     @{
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      csRef<iEventQueue> q(CS_QUERY_REGISTRY(object_reg,iEventQueue));
       if (q)
 	q->GetEventOutlet()->Broadcast (cscmdQuit);
       return true;
