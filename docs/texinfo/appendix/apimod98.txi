@@ -1158,7 +1158,7 @@ CS_IMPLEMENT_APPLICATION
 
 class MyApp : public csApplicationFramework
 @{
-  /* ... */
+  /* @dots{} */
 @};
 
 int main (int argc, char* argv[]) 
