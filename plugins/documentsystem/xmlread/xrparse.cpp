@@ -556,6 +556,7 @@ char* TrDocumentAttribute::Parse( TrDocument* document, char* p )
     // All attribute values should be in single or double quotes.
     // But this is such a common error that the parser will try
     // its best, even without them.
+    buf = p;
     char* out = buf;
     while (    p && *p                    // existence
         && !isspace( *p ) && *p != '/' && *p != '>' )            // tag end
