@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+16-May-2001
+	- Philip Wyett did a quick update to eliminate 3000 compiler warnings.
+	  Pragma'ed C4291 out, for time being, will come back to this.
+	- Fixed a bad bug with lazy clipping in the OpenGL DrawTriangleMesh
+	  implementation. This would cause crashes on some cards (like ATI).
 15-May-2001
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create

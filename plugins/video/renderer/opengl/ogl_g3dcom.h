@@ -55,14 +55,15 @@ struct csOpenGLCaps
 };
 
 /**
- * Queue to optimize DrawPolygon.
+ * Queue to optimize polygon drawing.
  * Polygons with the same material and other modes will be added to
  * this queue so that they can be rendered in one step.
  */
 class csPolyQueue
 {
 public:
-  bool use_fog;
+  bool use_fog;		// If true fog_color and fog_txt are used.
+  bool do_gouraud;	// If true glcol is used.
   iMaterialHandle* mat_handle;
   int alpha;
   UInt mixmode;
@@ -83,6 +84,7 @@ public:
   int max_vertices;
   GLfloat* glverts;	// 4*max_vertices
   GLfloat* gltxt;	// 2*max_vertices
+  GLfloat* glcol;	// 4*max_vertices
   GLfloat* layer_gltxt;	// 2*max_vertices
   GLfloat* fog_color;	// 3*max_vertices
   GLfloat* fog_txt;	// 2*max_vertices
@@ -109,6 +111,7 @@ public:
 
   GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
   GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
+  GLfloat* GetGLCol (int idx) { return &glcol[idx<<2]; }
   GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
   GLfloat* GetFogColor (int idx) { return &fog_color[idx*3]; }
   GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
@@ -117,7 +120,7 @@ public:
   	poly_textures (NULL), start_vt (NULL), len_vt (NULL),
 	start_tri (NULL), len_tri (NULL),
 	num_vertices (0), max_vertices (0),
-	glverts (NULL), gltxt (NULL), layer_gltxt (NULL),
+	glverts (NULL), gltxt (NULL), glcol (NULL), layer_gltxt (NULL),
 	fog_color (NULL), fog_txt (NULL),
 	num_triangles (0), max_triangles (0),
 	tris (NULL) { }
@@ -130,6 +133,7 @@ public:
     delete[] len_tri;
     delete[] glverts;
     delete[] gltxt;
+    delete[] glcol;
     delete[] layer_gltxt;
     delete[] fog_color;
     delete[] fog_txt;

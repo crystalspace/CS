@@ -1357,6 +1357,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
       poly.mat_handle != queue.mat_handle ||
       poly.alpha != queue.alpha ||
       poly.mixmode != queue.mixmode ||
+      false != queue.do_gouraud ||	// DrawPolygon does not support gouraud
       z_buf_mode != queue.z_buf_mode)
   {
     FlushDrawPolygon ();
@@ -1368,6 +1369,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   // Store information in the queue.
   //========
   queue.use_fog = poly.use_fog;
+  queue.do_gouraud = false;
   queue.mat_handle = poly.mat_handle;
   queue.alpha = poly.alpha;
   queue.mixmode = poly.mixmode;
@@ -2087,6 +2089,10 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       clipped_translate[i] = -1;
   }
 
+  // If we have lazy clipping then the number of vertices remains the same.
+  if (!exact_clipping)
+    num_clipped_vertices = num_vertices;
+
   // Now clip all triangles.
   for (i = 0 ; i < num_triangles ; i++)
   {
@@ -2291,9 +2297,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     tr_verts.SetLimit (num_vertices);
     uv_verts.SetLimit (num_vertices);
-		// @@@ Should not be needed - Work-around for ATI bug ... REDEYE
-    uv_mul_verts.SetLimit (num_vertices);
-		// @@@
     color_verts.SetLimit (num_vertices);
   }
 
@@ -2587,7 +2590,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       int vscale = layer->vscale;
       int ushift = layer->ushift;
       int vshift = layer->vshift;
-
       if (mat->TextureLayerTranslated (j))
       {
         mul_uv = uv_mul_verts.GetArray ();
