@@ -75,9 +75,18 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
 //-----------------------------------------------------------------------------
 - (void)configureTitles:(char const*)title
 {
-  [self releaseTitles]; // Should not be requried, but just in case.
+  [self releaseTitles];
   plainTitle  = [[NSString stringWithCString:title] retain];
   pausedTitle = [[plainTitle stringByAppendingString:@"  [Paused]"] retain];
+}
+
+
+//-----------------------------------------------------------------------------
+// adjustTitle
+//-----------------------------------------------------------------------------
+- (void)adjustTitle
+{
+  [window setTitle:(paused ? pausedTitle : plainTitle)];
 }
 
 
@@ -172,7 +181,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
   [window setContentView:view];
 
   [self configureTitles:title];
-  [window setTitle:plainTitle];
+  [self adjustTitle];
   [window setReleasedWhenClosed:NO];
   [window center];
   [self adjustWindowPosition];
@@ -204,15 +213,29 @@ N2D_PROTO(void,close_window)(NeXTDelegateHandle2D handle)
 
 
 //-----------------------------------------------------------------------------
+// setWindowTitle:
+//-----------------------------------------------------------------------------
+- (void)setWindowTitle:(char const*)title
+{
+  [self configureTitles:title];
+  [self adjustTitle];
+}
+
+N2D_PROTO(void,set_window_title)(NeXTDelegateHandle2D handle, char const* s)
+  { [(NeXTDelegate2D*)handle setWindowTitle:s]; }
+
+
+//-----------------------------------------------------------------------------
 // focusChanged
 //-----------------------------------------------------------------------------
 - (void)focusChanged:(BOOL)focused
 {
-  [window setTitle:(focused ? plainTitle : pausedTitle)];
-  if (focused)
-    [self startTrackingMouse];
-  else
+  paused = !focused;
+  [self adjustTitle];
+  if (paused)
     [self stopTrackingMouse];
+  else
+    [self startTrackingMouse];
 }
 
 N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused)
@@ -345,6 +368,7 @@ N2D_PROTO(int,set_mouse_cursor)
   trackingTag = 0;
   trackingMouse = NO;
   hideMouse = NO;
+  paused = NO;
   plainTitle = 0;
   pausedTitle = 0;
   return self;

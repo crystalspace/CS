@@ -8,6 +8,16 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine renamed csVPrintf() to csPrintfV() for consistency with
 	  other `vararg' functions in the project, such as PerformExtensionV(),
 	  ReportV(), etc.
+	- Eric Sunshine worked around a problem where not all compilers allowed
+	  the global `vararg-style' function csReport() to be declared inline.
+	  In particular, the NextStep compiler exhibited this behavior.
+	- Eric Sunshine cleaned up the reporting code which was recently added
+	  to NeXTDriver2D.cpp.
+	- Eric Sunshine fixed the prototype of NeXTDriver2D::Open() so that it
+	  matches the recently changed prototype of iGraphics2D::Open().
+	- Eric Sunshine implemented iNativeWindow::SetTitle() in NeXTDriver2D.
+	- Eric Sunshine eliminated the now unnecessary inclusion of
+	  cssys/system.h from cssys/general/printf.cpp.
 27-Jul-2001
 	- Removed csSystemDriver::Warn() and Alert().
 	- Removed the console pointer in csSystemDriver.

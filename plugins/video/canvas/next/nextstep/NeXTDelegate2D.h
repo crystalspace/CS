@@ -36,6 +36,7 @@
   NeXTView* view;
   BOOL trackingMouse;
   BOOL hideMouse;
+  BOOL paused;
   char* plainTitle;
   char* pausedTitle;
 }
@@ -48,6 +49,7 @@
 - (BOOL)openWindow:(char const*)title width:(int)width height:(int)height
     frameBuffer:(unsigned char*)frameBuffer bitsPerSample:(int)bitsPerSample;
 - (void)closeWindow;
+- (void)setWindowTitle:(char const*)title;
 - (void)flush;
 - (void)focusChanged:(BOOL)flag;
 - (BOOL)setMouseCursor:(csMouseCursorID)shape;
@@ -67,6 +69,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegate2D);
 N2D_PROTO(int,open_window)(NeXTDelegate2D, char const* title, int width,
     int height, unsigned char* frame_buffer, int bits_per_sample);
 N2D_PROTO(void,close_window)(NeXTDelegate2D);
+N2D_PROTO(void,set_window_title)(NeXTDelegate2D, char const* title);
 N2D_PROTO(void,flush)(NeXTDelegate2D);
 N2D_PROTO(void,focus_changed)(NeXTDelegate2D, int focused);
 N2D_PROTO(int,set_mouse_cursor)(NeXTDelegate2D, csMouseCursorID);

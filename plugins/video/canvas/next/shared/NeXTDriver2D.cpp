@@ -32,6 +32,8 @@
 #include "isys/system.h"
 #include "csver.h"
 
+#define NeXT_REPORTER_ID "crystalspace.canvas.next"
+
 typedef void* NeXTDriverHandle2D;
 #define N2D_PROTO(RET,FUNC) extern "C" RET NeXTDriver2D_##FUNC
 
@@ -73,21 +75,6 @@ bool NeXTDriver2D::Initialize(iSystem* s)
   return ok;
 }
 
-void NeXTDriver2D::Report (int severity, const char* msg, ...)
-{
-  va_list arg;
-  va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
-  if (rep)
-    rep->ReportV (severity, "crystalspace.canvas.next", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
-  va_end (arg);
-}
-
 
 //-----------------------------------------------------------------------------
 // init_driver
@@ -119,8 +106,9 @@ bool NeXTDriver2D::init_driver(int desired_depth)
     }
   }
   else
-    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Bizarre internal error; "
-      "support for 15- and 32-bit RGB only");
+    csReport(System->GetObjectRegistry(), CS_REPORTER_SEVERITY_ERROR,
+      NeXT_REPORTER_ID, "Bizarre internal error; support for 15- and 32-bit "
+      "RGB only");
   return ok;
 }
 
@@ -150,10 +138,10 @@ int NeXTDriver2D::get_desired_depth() const
   }
   if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING,
+    csReport(System->GetObjectRegistry(),
+      CS_REPORTER_SEVERITY_WARNING, NeXT_REPORTER_ID, 
       "WARNING: Ignoring request to simulate %d-bit RGB depth.\n"
-      "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.",
-      depth);
+      "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.", depth);
     depth = 0;
   }
   return depth;
@@ -242,15 +230,15 @@ N2D_PROTO(void,user_close)(NeXTDriverHandle2D handle)
 //-----------------------------------------------------------------------------
 // Open
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::Open(char const* title)
+bool NeXTDriver2D::Open()
 {
-  Report (CS_REPORTER_SEVERITY_NOTIFY, CS_PLATFORM_NAME
-    " 2D graphics driver for Crystal Space " CS_VERSION_NUMBER "\n"
-    "Written by Eric Sunshine <sunshine@sunshineco.com>");
+  csReport(System->GetObjectRegistry(), CS_REPORTER_SEVERITY_NOTIFY,
+    NeXT_REPORTER_ID, CS_PLATFORM_NAME " 2D graphics driver for Crystal Space "
+    CS_VERSION_NUMBER "\nWritten by Eric Sunshine <sunshine@sunshineco.com>");
   
   int ok = 0;
-  if (superclass::Open(title))
-    ok = NeXTDelegate2D_open_window(controller, title, Width, Height,
+  if (superclass::Open())
+    ok = NeXTDelegate2D_open_window(controller, win_title, Width, Height,
        frame_buffer->get_cooked_buffer(),
        frame_buffer->bits_per_sample());
   return (bool)ok;
@@ -264,6 +252,17 @@ void NeXTDriver2D::Close()
 {
   NeXTDelegate2D_close_window(controller);
   superclass::Close();
+}
+
+
+//-----------------------------------------------------------------------------
+// SetTitle
+//-----------------------------------------------------------------------------
+void NeXTDriver2D::SetTitle(char const* s)
+{
+  if (controller != 0)
+    NeXTDelegate2D_set_window_title(controller, s);
+  superclass::SetTitle(s);
 }
 
 

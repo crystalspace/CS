@@ -46,9 +46,9 @@ public:
   NeXTDriver2D(iBase* p) : superclass(p), controller(0), frame_buffer(0) {}
   virtual ~NeXTDriver2D();
   virtual bool Initialize(iSystem*);
-  virtual bool Open(char const* title);
-  void Report (int severity, const char* msg, ...);
+  virtual bool Open();
   virtual void Close();
+  virtual void SetTitle(char const*);
   virtual void Print(csRect* = 0);
   virtual bool SetMouseCursor(csMouseCursorID);
   virtual bool HandleEvent(iEvent&);

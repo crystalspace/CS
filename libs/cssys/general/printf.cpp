@@ -19,24 +19,20 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-
-#include <stdarg.h>
 #include "cssysdef.h"
-#include "cssys/system.h"
 
-// to be called instead of printf (exact same prototype/functionality of printf)
-int csPrintf (const char *str, ...)
+// Replacement for printf(); exact same prototype/functionality as printf()
+int csPrintf(char const* str, ...)
 {
-  va_list arg;
-  va_start (arg, str);
-  int rc = ::vprintf (str, arg);
-  va_end (arg);
+  va_list args;
+  va_start(args, str);
+  int const rc = vprintf(str, args);
+  va_end(args);
   return rc;
 }
 
-// to be called instead of vprintf
-int csPrintfV (const char *str, va_list arg)
+// Replacement for vprintf()
+int csPrintfV(char const* str, va_list args)
 {
-  return ::vprintf (str, arg);
+  return vprintf(str, args);
 }
-

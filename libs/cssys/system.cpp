@@ -68,8 +68,8 @@ void csSystemDriver::ReportSys (int severity, const char* msg, ...)
   }
   else
   {
-    vprintf (msg, arg);
-    printf ("\n");
+    csPrintfV (msg, arg);
+    csPrintf ("\n");
   }
   va_end (arg);
 }

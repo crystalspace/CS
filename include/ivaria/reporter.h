@@ -21,10 +21,11 @@
 
 #include <stdarg.h>
 #include "csutil/scf.h"
-#include "cssys/system.h"
 #include "iutil/objreg.h"
 
 struct iReporter;
+extern int csPrintf(char const*, ...);
+extern int csPrintfV(char const*, va_list);
 
 /**
  * Severity level for iReporter: BUG severity level.
@@ -213,26 +214,38 @@ struct iReporter : public iBase
   }
 };
 
-/**
- * Helper function to use a reporter easily.
- * This function will also work if no reporter is present and
- * use stdout in that case.
+
+/*
+ * Helper class for csReport().  Not all compilers allow a bare `vararg'
+ * function to be inlined, but wrapping the function in a class seems to
+ * appease such compilers.  The NextStep compiler exhibits this particular
+ * behavior.
  */
-inline void csReport (iObjectRegistry* object_reg, int severity,
-	const char* msgId, const char* description, ...)
+class csReporterHelper
 {
-  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  va_list arg;
-  va_start (arg, description);
-  if (reporter)
-    reporter->ReportV (severity, msgId, description, arg);
-  else
+public:
+  static void Report(iObjectRegistry* reg, int severity, char const* msgId,
+    char const* description, ...)
   {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
+    va_list arg;
+    va_start(arg, description);
+    iReporter* reporter = CS_QUERY_REGISTRY(reg, iReporter);
+    if (reporter)
+      reporter->ReportV(severity, msgId, description, arg);
+    else
+    {
+      csPrintfV(description, arg);
+      csPrintf("\n");
+    }
+    va_end (arg);
   }
-  va_end (arg);
-}
+};
+
+/**
+ * Helper function to use a reporter easily.  This function will also work if
+ * no reporter is present and use stdout in that case.
+ */
+#define csReport csReporterHelper::Report
 
 #endif // __IVARIA_REPORTER_H__
 
