@@ -30,6 +30,12 @@ chronological order.
 	  maps this can save a lot of memory.
 	- Jorrit fixed a few more ref-leak problems in the NR texture
 	  manager.
+	- Fritz Elfert changed sprcal3d loader so that it defers scaling
+	  until loading of all model data is completed. Before, scaling
+	  randomly either crashed in cal3d or had no effect at all, depending
+	  on the position of the <scale> attribute in the xml file. Standard
+	  models that come with cal3d should work with this fix now (at least
+	  skeleton does), providing a scale of ~ 0.02.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().
