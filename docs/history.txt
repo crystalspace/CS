@@ -21,6 +21,11 @@ Short-term cleanups that need to be done:
 	  console.  This fixes problems where some sub-systems printed
 	  informational or debugging output without refreshing the desktop
 	  afterward, thus leaving the desktop in an unusable state.
+	- Eric Sunshine fixed numerous crashes in MazeD which occurred when
+	  creating new shapes and volumes.  A number of places were trying to
+	  set the UV coordinates on a csGouraudShaded prior to preparation of
+	  the object via Setup().  Other places were adding vertices to a
+	  polygon without a container.
 23-Aug-1999
 	- Minimize splitter in BSP tree creator uses random selection
 	  instead of initial polygons. This improves BSP tree creation
