@@ -42,7 +42,7 @@
   ghost@aladdin.com
 
  */
-/*
+/**\file
   Independent implementation of MD5 (RFC 1321).
 
   This code implements the MD5 Algorithm defined in RFC 1321.
@@ -79,7 +79,7 @@ public:
   /// 32-bit word
   typedef unsigned int md5_word_t;
 
-  /// Define the state of the MD5 Algorithm
+  /// \internal Define the state of the MD5 Algorithm
   struct md5_state_t
   {
     md5_word_t count[2]; // message length in bits, lsw first

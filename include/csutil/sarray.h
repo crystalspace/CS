@@ -19,9 +19,12 @@
 #ifndef __SARRAY_H__
 #define __SARRAY_H__
 
+/**\file
+ */
+
 /**
- * Create a static array class with the given name that contains
- * elements of the given type.
+ * Create a static array class (descending from csStaticArray) with the given 
+ * name that contains elements of the given type.
  */
 #define CS_DECLARE_STATIC_ARRAY(Name,Type)				\
   CS_PRIVATE_DECLARE_STATIC_ARRAY (Name, Type)
@@ -30,7 +33,7 @@
 //--- implementation of the above macro follows ------------------------------
 //----------------------------------------------------------------------------
 
-/// Helper class for CS_DECLARE_STATIC_ARRAY.
+/// Helper class for #CS_DECLARE_STATIC_ARRAY.
 class csStaticArray
 {
 protected:

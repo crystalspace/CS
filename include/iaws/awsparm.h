@@ -24,6 +24,10 @@
 #include "csutil/csvector.h"
 #include "csutil/csstrvec.h"
 
+/**
+ * \addtogroup aws
+ * @{ */
+
 SCF_VERSION (iAwsParmList, 0, 0, 1);
 
 /**
@@ -72,5 +76,7 @@ struct iAwsParmList : public iBase
   /// Clears the parameter list
   virtual void Clear()=0;
 };
+
+/** @} */
 
 #endif

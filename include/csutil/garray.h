@@ -20,18 +20,21 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
-/**
+/**\file
+ */
+
+/**\internal
  * Default growstep for growing arrays.
  */
 #define CS_GARRAY_GROWSTEP 16
 
-/**
+/**\internal
  * If SetLength() is called and the new length is CS_GARRAY_SHRINKLIMIT
  * smaller than the limit then the new array will be shrinked.
  */
 #define CS_GARRAY_SHRINKLIMIT 1000
 
-// Common macro for declarations below
+/// \internal Common macro for declarations in this file.
 #define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra) \
   class Name								\
   {									\

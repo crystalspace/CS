@@ -21,7 +21,11 @@
 #define __CSWS_H__
 
 /**
- * Current CrystalSpace Windowing System class hierarchy:
+ * \addtogroup csws
+ * @{ */
+ 
+/**
+ * \page CSWSHierachy Current CrystalSpace Windowing System class hierarchy
  * <pre>
  *   |--[ csRect ]			// Rectangle
  *   |--[ csVector ]            	// Vector of some objects (FreeItem = NOP)
@@ -140,5 +144,7 @@ struct iEvent;
 #include "sdefault.h"
 
 #endif // CSWS_INTERNAL
+
+/** @} */
 
 #endif // __CSWS_H__

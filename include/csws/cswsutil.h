@@ -20,6 +20,10 @@
 #ifndef __CSWSUTIL_H__
 #define __CSWSUTIL_H__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #define CSWS_INTERNAL
 #include "csws.h"
 #include "cswindow.h"
@@ -90,5 +94,7 @@ extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
 /// Create and return a new bitmap (2D sprite)
 extern csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   int tw, int th);
+
+/** @} */
 
 #endif // __CSWSUTIL_H__

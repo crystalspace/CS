@@ -52,14 +52,36 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  /**
+   * Set current type. 
+   */
   virtual void SetCurrentType (const char* type);
+  /**
+   * Get current type or NULL if none set.
+   */
   virtual const char* GetCurrentType () const { return current_type; }
+  /**
+   * Set current scope. 
+   */
   virtual void SetCurrentScope (const char* scope);
+  /**
+   * Get current scope or NULL if none set.
+   */
   virtual const char* GetCurrentScope () const { return current_scope; }
+  /**
+   * Cache some data. Returns true if this succeeded.
+   */
   virtual bool CacheData (void* data, uint32 size,
   	const char* type, const char* scope, uint32 id);
+  /**
+   * Retrieve some data from the cache. Returns NULL if the
+   * data could not be found in the cache.
+   */
   virtual iDataBuffer* ReadCache (const char* type, const char* scope,
   	uint32 id);
+  /**
+   * Clear items from the cache. 
+   */
   virtual bool ClearCache (const char* type = NULL, const char* scope = NULL,
   	const uint32* id = NULL);
 };

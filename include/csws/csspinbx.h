@@ -20,6 +20,14 @@
 #ifndef __CSSPINBX_H__
 #define __CSSPINBX_H__
 
+/**\file
+ * Crystal Space Windowing System: spin box class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "cstimer.h"
 #include "csiline.h"
@@ -47,6 +55,7 @@ struct csSpinBoxLimits
   char *ValueFormat;
 };
 
+/// Spin box messages
 enum
 {
   /**
@@ -146,5 +155,7 @@ private:
   /// Spin value depending on spin box state
   void Spin ();
 };
+
+/** @} */
 
 #endif // __CSSPINBX_H__

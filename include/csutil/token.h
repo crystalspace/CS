@@ -19,6 +19,9 @@
 #ifndef __TOKEN_H__
 #define __TOKEN_H__
 
+/**\file
+ */
+
 /// Get a token
 extern char* csGetToken (char** buf);
 /// Get a floating-point number

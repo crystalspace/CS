@@ -20,6 +20,13 @@
 #ifndef __GRIDBAGLAYOUT_G__
 #define __GRIDBAGLAYOUT_G__
 
+/**\file
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cslayout.h"
 
 /**
@@ -135,7 +142,7 @@ public:
     NORTHWEST = 18
   };
 
-  /// used internally  (do not use!)
+  /// \internal used internally  (do not use!)
   enum  GRID_BAG_CONSTANTS_INTERNAL
   {
     _LEFT     = 20,
@@ -143,9 +150,9 @@ public:
     _RIGHT    = 22
   };
 
-  /// for internal uses
+  /// \internal for internal uses
   bool bSized;
-  /// for internal uses
+  /// \internal for internal uses
   csPoint mPrefCompSize;
 };
 
@@ -346,5 +353,7 @@ protected:
   int mColCount;
   int mRowCount;
 };
+
+/** @} */
 
 #endif // __GRIDBAGLAYOUT_G__

@@ -66,7 +66,7 @@ private:
 public:
 
    /**
-    * Bit proxy (for csBitArray::operator[])
+    * \internal Bit proxy (for csBitArray::operator[])
     */
    class BitProxy
    {
@@ -109,6 +109,7 @@ public:
    // Constructors and destructor
    //
    
+   /// construct with <code>size</code> bits.
    explicit csBitArray(unsigned size)
    {
       Init(size);
@@ -117,12 +118,14 @@ public:
       Trim();
    }
    
+   /// construct as duplicate of <code>that</code>.
    csBitArray(const csBitArray &that)
    {
       mpStore = 0;
       *this = that;
    }
    
+   /// destructor
    virtual ~csBitArray()
    {
       if (mLength > 1)
@@ -133,8 +136,7 @@ public:
    // Operators
    //
 
-   
-   
+   /// copy from other array
    csBitArray &operator=(const csBitArray &that)
    {
       if (this != &that)
@@ -149,18 +151,21 @@ public:
       return *this;
    }
 
+   /// return bit at position <code>pos</code>
    BitProxy operator[](unsigned pos)
    {
       assert(pos < mNumBits);
       return BitProxy(*this, pos);
    }
 
+   /// return bit at position <code>pos</code>
    const BitProxy operator[](unsigned pos) const
    {
       assert(pos < mNumBits);
       return BitProxy(CONST_CAST(csBitArray&,*this), pos);
    }
    
+   /// equal to other array
    bool operator==(const csBitArray &that) const
    {
       if (mNumBits != that.mNumBits)
@@ -172,11 +177,13 @@ public:
       return true;
    }
 
+   /// not equal to other array
    bool operator!=(const csBitArray &that) const
    {
       return !(*this == that);
    }
 
+   /// bit-wise and
    csBitArray &operator&=(const csBitArray &that)
    {
       assert(mNumBits == that.mNumBits);
@@ -185,6 +192,7 @@ public:
       return *this;
    }
 
+   /// bit-wise or
    csBitArray operator|=(const csBitArray &that)
    {
       assert(mNumBits == that.mNumBits);
@@ -193,6 +201,7 @@ public:
       return *this;
    }
 
+   /// bit-wise xor
    csBitArray operator^=(const csBitArray &that)
    {
       assert(mNumBits == that.mNumBits);
@@ -201,21 +210,25 @@ public:
       return *this;
    }
 
+   /// Flip all bits
    csBitArray operator~() const
    {
       return csBitArray(*this).FlipAllBits();
    }
 
+   /// bit-wise and
    friend csBitArray operator&(const csBitArray &a1, const csBitArray &a2)
    {
       return csBitArray(a1) &= a2;
    }
 
+   /// bit-wise or
    friend csBitArray operator|(const csBitArray &a1, const csBitArray &a2)
    {
       return csBitArray(a1) |= a2;
    }
 
+   /// bit-wise xor
    friend csBitArray operator^(const csBitArray &a1, const csBitArray &a2)
    {
       return csBitArray(a1) ^= a2;

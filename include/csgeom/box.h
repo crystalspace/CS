@@ -436,7 +436,7 @@ protected:
   csVector3 minbox;
   /// The bottom-right.
   csVector3 maxbox;
-  /// A csBox3 edge.
+  /// \internal A csBox3 edge.
   struct bEdge
   {
     uint8 v1, v2; // Indices of vertex in bounding box (CS_BOX_CORNER_...)

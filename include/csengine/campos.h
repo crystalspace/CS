@@ -74,7 +74,7 @@ public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iCameraPosition implementation ----------------------
-  /// iCameraPosition implementation
+  /// \internal iCameraPosition implementation
   struct CameraPosition : public iCameraPosition
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCameraPosition);

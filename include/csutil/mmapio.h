@@ -5,6 +5,9 @@
  #include "csutil/bitarray.h"
 #endif
 
+/**\file
+ */
+
 /*******************************************************************
 
   Design notes:
@@ -37,13 +40,13 @@
  *******************************************************************/
  
 
-/// Default cache block size
+/// \internal Default cache block size
 const unsigned csmmioDefaultCacheBlockSize = 256;
 
-/// Default cache size (in cache blocks)
+/// \internal Default cache size (in cache blocks)
 const unsigned csmmioDefaultCacheSize = 256;//2048;
 
-/// Default size for hash table (best to use primes here)
+/// \internal Default size for hash table (best to use primes here)
 const unsigned csmmioDefaultHashSize = 211;//1559;
 
 

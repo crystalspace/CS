@@ -20,6 +20,14 @@
 #ifndef __CSMOUSE_H__
 #define __CSMOUSE_H__
 
+/**\file
+ * Crystal Space Windowing System: mouse support
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "csutil/typedvec.h"
@@ -135,5 +143,7 @@ private:
   /// Remove all mouse cursors
   void ClearPointers ();
 };
+
+/** @} */
 
 #endif // __CSMOUSE_H__

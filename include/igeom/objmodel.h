@@ -20,6 +20,13 @@
 #ifndef __IGEOM_OBJMODEL_H__
 #define __IGEOM_OBJMODEL_H__
 
+/**\file
+ */
+
+/**
+ * \addtogroup geom_utils
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 struct iPolygonMesh;
@@ -114,6 +121,8 @@ struct iObjectModel : public iBase
    */
   virtual void GetRadius (csVector3& radius, csVector3& center) = 0;
 };
+
+/** @} */
 
 #endif // __IGEOM_OBJMODEL_H__
 

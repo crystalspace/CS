@@ -20,6 +20,14 @@
 #ifndef __CSCHKBOX_H__
 #define __CSCHKBOX_H__
 
+/**\file
+ * Crystal Space Windowing System: check box button class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 
@@ -37,6 +45,7 @@
 #define CSBS_DEFAULTCHECKBOX    (CSBS_SELECTABLE | \
 				 CSBS_CB2STATE | CSBS_CBAUTO)
 
+/// Check box commands/notifications
 enum
 {
   /**
@@ -98,5 +107,7 @@ protected:
   /// Set checkbox state
   void SetCheckBoxState (csCheckBoxState iNewState);
 };
+
+/** @} */
 
 #endif // __CSCHKBOX_H__

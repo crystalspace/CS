@@ -28,8 +28,13 @@ struct iDataBuffer;
 class csDataStream
 {
 private:
+  /// Pointer to data.
   uint8 *Data;
-  int Position, Size;
+  /// Current position
+  int Position;
+  /// Data size
+  int Size;
+  /// Free the buffer when destroying?
   bool DeleteBuffer;
 
 public:

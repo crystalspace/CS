@@ -76,7 +76,7 @@ public:
 
   //------------------------ iCrossHalo ------------------------------------
   SCF_DECLARE_IBASE_EXT (csHalo);
-  /// iCrossHalo implementation.
+  /// \internal iCrossHalo implementation.
   struct CrossHalo : public iCrossHalo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCrossHalo);
@@ -111,7 +111,7 @@ public:
 
   //------------------------ iNovaHalo ------------------------------------
   SCF_DECLARE_IBASE_EXT (csHalo);
-  /// iNovaHalo implementation.
+  /// \internal iNovaHalo implementation.
   struct NovaHalo : public iNovaHalo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNovaHalo);
@@ -179,7 +179,7 @@ public:
 
   //------------------------ iFlareHalo ------------------------------------
   SCF_DECLARE_IBASE_EXT (csHalo);
-  /// iFlareHalo implementation.
+  /// \internal iFlareHalo implementation.
   struct FlareHalo : public iFlareHalo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csFlareHalo);

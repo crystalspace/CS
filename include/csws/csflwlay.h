@@ -20,6 +20,10 @@
 #ifndef __FLOWLAYOUT_G__
 #define __FLOWLAYOUT_G__
 
+/**
+ * \addtogroup csws
+ * @{ */
+
 #include "cslayout.h"
 
 /**
@@ -103,5 +107,7 @@ public:
     TRAILING = RIGHT  // -/-
   };
 };
+
+/** @} */
 
 #endif // __FLOWLAYOUT_G__

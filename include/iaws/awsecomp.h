@@ -22,6 +22,10 @@
 #include "iutil/event.h"
 
 /**
+ * \addtogroup aws
+ * @{ */
+
+/**
  * Class used to create new AWS components.<p>
  * To create component from scratch, you need to subclass from awsEmbeddedComponent
  * After instantiating from that object, you need to call
@@ -336,5 +340,7 @@ class awsEmbeddedComponentFactory : public iAwsComponentFactory
       wmgr->GetPrefMgr()->RegisterConstant(name, value);
     }
 };
+
+/** @} */
 
 #endif

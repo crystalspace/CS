@@ -20,6 +20,14 @@
 #ifndef __CSWSPAL_H__
 #define __CSWSPAL_H__
 
+/**\file
+ * Crystal Space Windowing System: CSWS palette definition
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 class csApp;
 
 /**
@@ -477,5 +485,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_HINT_TEXT			1
 /// Tip border
 #define CSPAL_HINT_BORDER        	2
+
+/** @} */
 
 #endif // __CSWSPAL_H__

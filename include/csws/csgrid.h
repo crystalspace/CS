@@ -20,6 +20,14 @@
 #ifndef __CSWSGRID_H__
 #define __CSWSGRID_H__
 
+/**\file
+ * Crystal Space Windowing System: grid class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csws/csscrbar.h"
 #include "csutil/csvector.h"
 #include "csutil/csstring.h"
@@ -450,5 +458,7 @@ public:
   virtual void SetStringAt (int row, int col, const char *data);
   csString *GetStringAt (int row, int col);
 };
+
+/** @} */
 
 #endif

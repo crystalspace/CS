@@ -20,6 +20,14 @@
 #ifndef __CSHINTS_H__
 #define __CSHINTS_H__
 
+/**\file
+ * Crystal Space Windowing System: floating hints class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+
 #define CSWS_INTERNAL
 #include "csws.h"
 #include "cscomp.h"
@@ -111,5 +119,7 @@ private:
   // Check if this child has an associated hint
   static bool do_checkhint (csComponent *comp, void *data);
 };
+
+/** @} */
 
 #endif // __CSHINTS_H__

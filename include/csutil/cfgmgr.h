@@ -190,15 +190,15 @@ public:
 
 private:
   friend class csConfigManagerIterator;
-  // optimize mode?
+  /// optimize mode?
   bool Optimize;
-  // pointer to the dynamic config domain
+  /// pointer to the dynamic config domain
   class csConfigDomain *DynamicDomain;
-  // list of all domains (including the dynamic domain)
+  /// list of all domains (including the dynamic domain)
   class csConfigDomain *FirstDomain, *LastDomain;
-  // list of all removed config files (only used in optimize mode)
+  /// list of all removed config files (only used in optimize mode)
   csVector Removed;
-  // list of all iterators
+  /// list of all iterators
   csVector Iterators;
 
   csConfigDomain *FindConfig(iConfigFile *cfg) const;

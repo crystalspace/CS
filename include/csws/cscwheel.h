@@ -20,8 +20,17 @@
 #ifndef __CSCWHEEL_H__
 #define __CSCWHEEL_H__
 
+/**\file
+ * Crystal Space Windowing System: color wheel class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csstatic.h"
 
+/// Color wheel notifications
 enum
 {
   /**
@@ -56,5 +65,7 @@ public:
   void GetHS (float &oH, float &oS)
   { oH = h; oS = s; }
 };
+
+/** @} */
 
 #endif // __CSCWHEEL_H__

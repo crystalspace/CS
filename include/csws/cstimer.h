@@ -22,6 +22,14 @@
 
 #include "cscomp.h"
 
+/**\file
+ * Crystal Space Windowing System: timer class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 /// csTimer class messages
 enum
 {
@@ -72,5 +80,7 @@ public:
   /// Check if timer is running
   bool Running () { return !Stopped; }
 };
+
+/** @} */
 
 #endif // __CSTIMER_H__

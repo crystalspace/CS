@@ -20,10 +20,11 @@
 #define __OBJPOOL_H__
 
 /**
- * This macro defines a 'pool' class for the given type. The pool class can
- * be used to create objects of the given type, but it will re-use older
- * objects if possible to save time. For this reason, unused objects of the
- * given type should not be deleted but given to the pool.
+ * This macro defines a 'pool' class for the given type. The pool class 
+ * (descending from csObjectPool) can be used to create objects of the given 
+ * type, but it will re-use older objects if possible to save time. For this 
+ * reason, unused objects of the given type should not be deleted but given 
+ * to the pool.
  */
 #define CS_DECLARE_OBJECT_POOL(name,type)				\
 class name : protected csObjectPool {					\
@@ -41,7 +42,7 @@ public:									\
   { csObjectPool::Free (o); }						\
 };
 
-/// This is a helper class for DECLARE_OBJECT_POOL
+/// Helper class for #DECLARE_OBJECT_POOL
 class csObjectPool
 {
 protected:
@@ -49,7 +50,9 @@ protected:
   int Num, Max;
 
 public:
+  /// Create a new item
   virtual void* CreateItem () = 0;
+  /// Delete an item
   virtual void FreeItem (void*) = 0;
 
   csObjectPool ()
@@ -62,6 +65,7 @@ public:
   {
     delete[] Objects;
   }
+  /// Get an object from the pool
   void *Alloc ()
   {
     if (Num > 0) {
@@ -71,6 +75,7 @@ public:
       return CreateItem ();
     }
   }
+  /// Give an object back to the pool
   void Free (void* o) {
     if (Num == Max) {
       csSome *old = Objects;

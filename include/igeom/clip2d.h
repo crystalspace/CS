@@ -19,6 +19,13 @@
 #ifndef __IGEOM_CLIP2D_H__
 #define __IGEOM_CLIP2D_H__
 
+/**\file
+ */
+
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csutil/scf.h"
 #include "csgeom/vector2.h"
 #include "csgeom/box.h"
@@ -26,13 +33,13 @@
 /// Maximal number of vertices in output (clipped) polygons
 #define MAX_OUTPUT_VERTICES	64
 
-/*
- * Clipper return codes.
- * <p>The clipper routines return one of the values below so that we can
- * distinguish between the cases when input polygon is completely outside
- * the clipping polygon (thus it is not visible), completely inside the
- * clipping polygon (thus it has not changed) and partially outside,
- * partially inside (thus it was clipped).
+/** \page ClipperReturnCodes Clipper return codes
+ * The clipper routines return one of <code>#CS_CLIP_OUTSIDE</code>, 
+ * <code>#CS_CLIP_INSIDE</code>, <code>#CS_CLIP_CLIPPED</code> so that we can 
+ * distinguish between the cases when input polygon is completely outside the 
+ * clipping polygon (thus it is not visible), completely inside the clipping 
+ * polygon (thus it has not changed) and partially outside, partially inside 
+ * (thus it was clipped).
  */
 
 /// The input polygon is completely outside of clipper polygon
@@ -49,21 +56,19 @@
  */
 struct csVertexStatus
 {
-  /// The type of vertex: unmodified original, on the edge of original, other
+  /**
+   * The type of vertex<p>
+   * <code>#CS_VERTEX_ORIGINAL</code> - unmodified original<br>
+   * <code>#CS_VERTEX_ONEDGE  </code> - on the edge of original<br>
+   * <code>#CS_VERTEX_INSIDE  </code> - other<br>
+   */
   unsigned char Type;
-  /// Original vertex number (for CS_VERTEX_ORIGINAL and CS_VERTEX_ONEDGE)
+  /// Original vertex number (for #CS_VERTEX_ORIGINAL and #CS_VERTEX_ONEDGE)
   unsigned char Vertex;
-  /// Additional information for CS_VERTEX_ONEDGE (0..1, the 't' parameter)
+  /// Additional information for #CS_VERTEX_ONEDGE (0..1, the 't' parameter)
   float Pos;
 };
 
-/*
- * The following are possible values for csVertexStatus.Type field.
- * The csVertexStatus is used by iClipper2D:Clip() routine which is
- * able to output a status structure corresponding to each output vertex.
- * This information is usually used to clip other information associated
- * with polygon vertices (i.e. z, u, v and such).
- */
 /// The output vertex is one of the input vertices
 #define CS_VERTEX_ORIGINAL	0
 /// The output vertex is located on one of the edges of the original polygon
@@ -80,35 +85,39 @@ struct iClipper2D : public iBase
 {
   /**
    * Clip a set of 2D points and return in 'OutPolygon' which is expected
-   * to contain space at least for MAX_OUTPUT_VERTICES elements.
-   * Returns one of CS_CLIP_XXX values defined above.
+   * to contain space at least for #MAX_OUTPUT_VERTICES elements.
+   * Returns one of \link ClipperReturnCodes CS_CLIP_XXX\endlink values.
    */
   virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount) = 0;
 
   /**
    * Clip a set of 2D points.
-   * On output Count is set to number of vertices in output polygon.
+   * On output OutCount is set to number of vertices in output polygon.
    * The output array is expected to contain space for at least
-   * MAX_OUTPUT_VERTICES elements. The bounding box is set to the
+   * #MAX_OUTPUT_VERTICES elements. The bounding box is set to the
    * minimal rectangle that contains the output polygon.
-   * Returns one of CS_CLIP_XXX values defined above.
+   * Returns one of \link ClipperReturnCodes CS_CLIP_XXX\endlink values.
    */
   virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox) = 0;
 
   /**
-   * Same as above but provides additional information on each output
+   * Clips a set of 2D points and provides additional information on each output
    * vertex. The information type can be: vertex is one of original vertices,
    * vertex is on the edge of the original polygon and vertex is arbitrary
    * located inside the original polygon. Both OutPolygon and OutStatus
    * arrays are expected to have enough storage for at least
-   * MAX_OUTPUT_VERTICES elements.
+   * #MAX_OUTPUT_VERTICES elements.<p>
+   * See also \link ClipperReturnCodes Clipper return codes\endlink.
    */
   virtual uint8 Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus) = 0;
 
-  /// Wrapper function: clip a polygon in-place.
+  /**
+   * Wrapper function: clip a polygon in-place.<p>
+   * See also \link ClipperReturnCodes Clipper return codes\endlink.
+   */
   virtual uint8 ClipInPlace (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox) = 0;
 
   /**
@@ -131,6 +140,8 @@ struct iClipper2D : public iBase
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly () = 0;
 };
+
+/** @} */
 
 #endif
 

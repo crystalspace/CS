@@ -65,9 +65,9 @@ public:
   bool SelfTest ();
 
 private:
-  // Initialize the random number generator
+  /// Initialize the random number generator
   void InitRANMAR (unsigned ij, unsigned kl);
-  // Get the next random number in sequence
+  /// Get the next random number in sequence
   float RANMAR ();
 };
 

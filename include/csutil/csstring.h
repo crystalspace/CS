@@ -390,7 +390,7 @@ public:
 #endif
 #undef STR_PADCENTER
 
-  /// Assign a string to another
+  // Assign a string to another
 #define STR_ASSIGN(TYPE) const csString& operator = (TYPE s) { return Replace (s); }
   STR_ASSIGN(const csString&)
   STR_ASSIGN(const char*)

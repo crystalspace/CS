@@ -21,11 +21,18 @@
 #ifndef __CSUTIL_CSINPUTS_H__
 #define __CSUTIL_CSINPUTS_H__
 
+/**\file
+ */
+
 /**
  * Use in `int button' for csevXXXMove events
  * with the backward compatible funcs.
  */
 #define CSAXIS_X -1
+/**
+ * Use in `int button' for csevXXXMove events
+ * with the backward compatible funcs.
+ */
 #define CSAXIS_Y -2
 
 struct iEvent;
@@ -39,35 +46,67 @@ class csEvent;
 extern bool csParseInputDef (const char *name, iEvent *ev,
   bool use_shift = true);
 
+/**
+ * \overload 
+ */
 extern bool csParseInputDef (const char *name, csEvent &ev,
   bool use_shift = true);
 
+/**
+ * Convert a free-format string into an input event as understood by
+ * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
+ * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
+ */
 extern bool csParseKeyDef (const char *name, int &key, int &shift,
   bool use_shift = true);
 
+/**
+ * Convert a free-format string into an input event as understood by
+ * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
+ * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
+ */
 extern bool csParseMouseDef (const char *name, int &button, int &shift,
   bool use_shift = true);
 
+/**
+ * Convert a free-format string into an input event as understood by
+ * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
+ * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
+ */
 extern bool csParseJoystickDef (const char *name, int &button, int &shift,
   bool use_shift = true);
 
 /**
- * Performs the reverse conversion; given an event object
- * the routine will copy a string describing the input combination in
- * human-understandable format.
+ * Given an event object this routine will copy a string describing the 
+ * input combination in human-understandable format.
  */
 extern bool csGetInputDesc (iEvent *ev, char *buf,
   bool use_shift = true);
 
+/**
+ * \overload 
+ */
 extern bool csGetInputDesc (csEvent &ev, char *buf,
   bool use_shift = true);
 
+/**
+ * Given an event object this routine will copy a string describing the 
+ * input combination in human-understandable format.
+ */
 extern bool csGetKeyDesc (int key, int shift, char *buf,
   bool use_shift = true);
 
+/**
+ * Given an event object this routine will copy a string describing the 
+ * input combination in human-understandable format.
+ */
 extern bool csGetMouseDesc (int button, int shift, char *buf,
   bool use_shift = true);
 
+/**
+ * Given an event object this routine will copy a string describing the 
+ * input combination in human-understandable format.
+ */
 extern bool csGetJoyDesc (int button, int shift, char *buf,
   bool use_shift = true);
 

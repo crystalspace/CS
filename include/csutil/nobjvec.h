@@ -24,6 +24,9 @@
 #include "csutil/typedvec.h"
 #include "iutil/object.h"
 
+/**\file
+ */
+
 class csObject;
 struct iObject;
 

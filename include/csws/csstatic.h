@@ -20,6 +20,14 @@
 #ifndef __CSSTATIC_H__
 #define __CSSTATIC_H__
 
+/**\file
+ * Crystal Space Windowing System: static control class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 
 /// Possible static component styles
@@ -174,5 +182,7 @@ protected:
   // Check if focused status of link has changed
   void CheckUp ();
 };
+
+/** @} */
 
 #endif // __CSSTATIC_H__

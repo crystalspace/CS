@@ -30,7 +30,7 @@
 class csVirtualClock : public iVirtualClock
 {
 private:
-  // Elapsed time between last two frames and absolute time in milliseconds
+  /// Elapsed time between last two frames and absolute time in milliseconds
   csTicks ElapsedTime, CurrentTime;
 
 public:
@@ -39,10 +39,26 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  /**
+   * Advance the engine's virtual-time clock.
+   */
   virtual void Advance ();
+  /**
+   * Suspend the engine's virtual-time clock.
+   */
   virtual void Suspend () { }
+  /**
+   * Resume the engine's virtual-time clock.<p>
+   */
   virtual void Resume () { CurrentTime = csTicks (-1); }
+  /**
+   * Query the time elapsed between the two most recent invocations of
+   * Advance().
+   */
   virtual csTicks GetElapsedTicks () const { return ElapsedTime; }
+  /**
+   * Returns the absolute time of the last call to Advance().
+   */
   virtual csTicks GetCurrentTicks () const { return CurrentTime; }
 };
 

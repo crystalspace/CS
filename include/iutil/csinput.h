@@ -21,12 +21,16 @@
 #ifndef __IUTIL_STDINPUT_H__
 #define __IUTIL_STDINPUT_H__
 
-/**
+/**\file
  * These are the low-level interfaces to generic classes of input devices like
  * keyboard, mouse, and joystick.  System-dependent code should inherit
  * system-specific classes from those defined below, implementing as much
  * functionality as possible.
  */
+
+/**
+ * \addtogroup event_handling
+ * @{ */
 
 #include "csutil/scf.h"
 
@@ -127,5 +131,7 @@ struct iJoystickDriver : public iBase
   /// Call this to add a 'joystick moved' event to queue
   virtual void DoMotion (int number, int x, int y) = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_STDINPUT_H__

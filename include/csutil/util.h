@@ -21,6 +21,9 @@
 
 #include <stdio.h>
 
+/**\file
+ */
+
 /// Return a random number.
 long csRndNum (long minRange, long maxRange);
 

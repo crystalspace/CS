@@ -20,12 +20,21 @@
 #ifndef __CSRADBUT_H__
 #define __CSRADBUT_H__
 
+/**\file
+ * Crystal Space Windowing System: radio button class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 
 /// Default radio button style
 #define CSBS_DEFAULTRADIOBUTTON	(CSBS_SELECTABLE)
 
+/// Radio button messages
 enum
 {
   /**
@@ -79,5 +88,7 @@ protected:
   /// Set radio button state
   void SetRadioButtonState (bool iNewState);
 };
+
+/** @} */
 
 #endif // __CSRADBUT_H__

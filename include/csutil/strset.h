@@ -21,6 +21,9 @@
 
 #include "csutil/hashmap.h"
 
+/**\file
+ */
+ 
 /**
  * An identifier for a string. This identifier is equivalent to the contents
  * of a string: If two strings have the same content, they have get the same

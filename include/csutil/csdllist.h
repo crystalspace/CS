@@ -22,7 +22,7 @@
 #include "cstypes.h"
 
 /**
- * This structure should not need to be accessed directly.
+ * \internal This structure should not need to be accessed directly.
  * It is used exclusively by the csDLinkList class.
  */
 struct csDLListItem

@@ -8,6 +8,10 @@
 #ifndef __GRIDLAYOUT_G__
 #define __GRIDLAYOUT_G__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cslayout.h"
 
 /**
@@ -41,5 +45,7 @@ public:
 
   virtual void LayoutContainer ();
 };
+
+/** @} */
 
 #endif // __GRIDLAYOUT_G__

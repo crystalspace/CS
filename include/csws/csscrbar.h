@@ -20,6 +20,14 @@
 #ifndef __CSSCRBAR_H__
 #define __CSSCRBAR_H__
 
+/**\file
+ * Crystal Space Windowing System: scroll bar class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 #include "cstimer.h"
@@ -176,5 +184,7 @@ protected:
   /// Set scroll bar value
   void SetValue (int iValue);
 };
+
+/** @} */
 
 #endif // __CSSCRBAR_H__

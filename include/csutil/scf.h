@@ -20,16 +20,23 @@
 #ifndef __CSSCF_H__
 #define __CSSCF_H__
 
+/**\file
+ */
+
 /*
     PLEASE USE 8-SPACE TAB WIDTH WHEN EDITING THIS FILE!
 */
+
+/** 
+ * \addtogroup scf
+ * @{ */
 
 /**
  * Type of registered interface handle used by iBase::QueryInterface().
  */
 typedef uint32 scfInterfaceID;
 
-/**
+/**\def SCF_TRACE(x)
  * Macro for typing debug strings: Add #define SCF_DEBUG at the top
  * of modules you want to track miscelaneous SCF activity and recompile.
  */
@@ -43,7 +50,7 @@ typedef uint32 scfInterfaceID;
 #  define SCF_TRACE(x)
 #endif
 
-/**
+/**\def SCF_PRINT_CALL_ADDRESS
  * Macro for getting the address we were called from (stack backtracing).
  * This works ONLY For GCC >= 2.8.0
  */
@@ -830,5 +837,7 @@ struct iSCF : public iBase
    */
   virtual iStrVector* QueryClassList (char const* pattern) = 0;
 };
+
+/* @} */
 
 #endif // __CSSCF_H__

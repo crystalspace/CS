@@ -23,6 +23,10 @@
 #include "csutil/scf.h"
 
 /**
+ * \addtogroup geom_utils
+ * @{ */
+ 
+/**
  * A polygon. Note that this structure is only valid if used
  * in combination with a vertex table. The vertex array then
  * contains indices in that table.
@@ -64,6 +68,8 @@ struct iPolygonMesh : public iBase
    */
   virtual void Cleanup () = 0;
 };
+
+/** @} */
 
 #endif // __IGEOM_POLYMESH_H__
 

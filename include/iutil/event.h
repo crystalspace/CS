@@ -23,6 +23,10 @@
 #include "iutil/evdefs.h"
 #include "csutil/scf.h"
 
+/**
+ * \addtogroup event_handling
+ * @{ */
+
 struct iEventHandler;
 
 SCF_VERSION (iEvent, 0, 0, 1);
@@ -78,8 +82,7 @@ struct iEvent : public iBase
   };
 };
 
-/**
- * The overall structure of the basic event flow in Crystal Space:
+/** \page EventFlow Overall structure of the basic event flow in Crystal Space
  * <pre>
  *   ......................
  *   .User application    .
@@ -303,5 +306,8 @@ struct iEventCord
   // Get the subcategory of this cord.
   virtual int GetSubcategory() const = 0;
 };
+
+/** @} */
+
 
 #endif // __IUTIL_EVENT_H__

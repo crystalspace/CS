@@ -21,6 +21,14 @@
 #ifndef __CSTREE_H__
 #define __CSTREE_H__
 
+/**\file
+ * Crystal Space Windowing System: tree box class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csscrbar.h"
 
@@ -525,5 +533,7 @@ protected:
   /// Place scrollbars and the csTreeView.
   void PlaceScrollbars ();
 };
+
+/** @} */
 
 #endif // __CSTREE_H__

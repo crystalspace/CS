@@ -19,8 +19,16 @@
 #ifndef __CSSLIDER_H__
 #define __CSSLIDER_H__
 
+/**\file
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csws/csbutton.h"
 
+/// Splitter messages
 enum
 {
   /**
@@ -70,5 +78,7 @@ public:
   /// Get the position of the splitter
   void GetPos (int &x, int &y);
 };
+
+/** @} */
 
 #endif // __CSSLIDER_H__

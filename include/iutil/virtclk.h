@@ -47,7 +47,7 @@ struct iVirtualClock : public iBase
    * Resume the engine's virtual-time clock.<p>
    * Call this function when the client application begins invoking Advance()
    * again after extended down-time.  This function is the complement of
-   * SuspendVirtualTimeClock().
+   * Suspend().
    */
   virtual void Resume () = 0;
 

@@ -33,7 +33,7 @@ class csObject : public iObject
 {
 protected:
   friend class csObjectIterator;
-  /// Each object have a unique ID associated with it
+  /// Each object has a unique ID associated with it
   CS_ID csid;
 
   /// The array of child nodes

@@ -20,6 +20,9 @@
 #ifndef __HALOGEN_H__
 #define __HALOGEN_H__
 
+/**\file
+ */
+
 /**
  * Generate an halo alpha map given halo iSize (iSize x iSize) and
  * halo intensity factor (0..1) (this is NOT the intensity itself!).

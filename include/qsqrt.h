@@ -30,6 +30,10 @@
 #define __QSQRT_H__
 
 /**
+ * \addtogroup floating_point
+ * @{ */
+
+/**
  * This routine computes sqrt(x) very quickly on Intel and PowerPC platforms.
  */
 static inline float qsqrt (float x);
@@ -43,10 +47,12 @@ static inline float qsqrt (float x);
  */
 static inline float qisqrt (float x);
 
+/** @} */
+
 #if (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_GCC)
 
-/*
-  NB: Single-precision floating-point format (32 bits):
+/** \page SingleFloatFormat: Single-precision floating-point format (32 bits)
+    \internal 	
 	SEEEEEEE.EMMMMMMM.MMMMMMMM.MMMMMMMM
 	S: Sign (0 - positive, 1 - negative)
 	E: Exponent (plus 127, 8 bits)

@@ -26,11 +26,11 @@
 
 struct csCommandLineOption;
 
-/// A utility class that makes it easier to parse the command line.
+/// Utility class that makes it easier to parse the command line.
 class csCommandLineParser : public iCommandLineParser
 {
 private:
-  // A vector of command line options
+  /// A vector of command line options
   CS_DECLARE_TYPED_VECTOR_NODELETE (csCommandLineOptionVectorHelper, csCommandLineOption);
 
   class csCommandLineOptionVector : public csCommandLineOptionVectorHelper
@@ -41,12 +41,12 @@ private:
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
   };
 
-  // The array of all command-line options.
+  /// The array of all command-line options.
   csCommandLineOptionVector Options;
-  // The list of raw filenames on the command line (i.e. without any switches)
+  /// The list of raw filenames on the command line (i.e. without any switches)
   csStrVector Names;
 
-  // Find Nth command-line option and return a pointer to the object (or NULL)
+  /// Find Nth command-line option and return a pointer to the object (or NULL)
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;
 
 public:

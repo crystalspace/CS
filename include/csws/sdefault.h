@@ -20,6 +20,10 @@
 #ifndef __SDEFAULT_H__
 #define __SDEFAULT_H__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csskin.h"
 #include "csbackgr.h"
 
@@ -171,5 +175,6 @@ public:
    virtual void Draw(csComponent &iComp);
  };
 
+/** @} */
 
 #endif // __SDEFAULT_H__

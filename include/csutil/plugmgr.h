@@ -34,39 +34,39 @@ struct iObjectRegistry;
 class csPluginManager : public iPluginManager
 {
 private:
-  /*
+  /**
    * This is a private structure used to keep the list of plugins.
    */
   class csPlugin
   {
   public:
-    // The plugin itself
+    /// The plugin itself
     iComponent *Plugin;
-    // The class ID of the plugin
+    /// The class ID of the plugin
     char *ClassID;
 
-    // Construct the object that represents a plugin
+    /// Construct the object that represents a plugin
     csPlugin (iComponent *iObject, const char *iClassID);
-    // Free storage
+    /// Free storage
     virtual ~csPlugin ();
   };
 
-  /*
+  /**
    * This is a superset of csVector that can find by pointer a plugin.
    */
   class csPluginsVector : public csVector
   {
   public:
-    // Create the vector
+    /// Create the vector
     csPluginsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
-    // Destroy the vector.
+    /// Destroy the vector.
     virtual ~csPluginsVector () { DeleteAll (); }
-    // Find a plugin by its address
+    /// Find a plugin by its address
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
     {
       return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
     }
-    // Overrided Get() to avoid typecasts
+    /// Overrided Get() to avoid typecasts
     csPlugin *Get (int idx)
     { return (csPlugin *)csVector::Get (idx); }
 
@@ -74,7 +74,7 @@ private:
     { delete (csPlugin*)Item; return true; }
   };
 
-  /*
+  /**
    * Class to collect all options for all plug-in modules in the system.
    */
   class csPluginOption
@@ -102,16 +102,16 @@ private:
     }
   };
 
-  // Query all options supported by given plugin and place into OptionList
+  /// Query all options supported by given plugin and place into OptionList
   void QueryOptions (iComponent *iObject);
 
-  // The object registry.
+  /// The object registry.
   iObjectRegistry* object_reg;
 
   /// The list of all plug-ins
   csPluginsVector Plugins;
 
-  /// List of all options for all plug-in modules.
+  // List of all options for all plug-in modules.
   CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
 
 public:
@@ -122,16 +122,26 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  /// Load a plugin and initialize it.
   virtual iBase *LoadPlugin (const char *iClassID,
         const char *iInterface = NULL, int iVersion = 0);
+  /**
+   * Get first of the loaded plugins that supports given interface ID.
+   */
   virtual iBase *QueryPlugin (const char *iInterface, int iVersion);
+  /// Find a plugin given his class ID.
   virtual iBase *QueryPlugin (const char* iClassID,
   	  const char *iInterface, int iVersion);
+  /// Remove a plugin from system driver's plugin list.
   virtual bool UnloadPlugin (iComponent *iObject);
+  /// Register a object that implements the iComponent interface as a plugin.
   virtual bool RegisterPlugin (const char *iClassID,
           iComponent *iObject);
+  /// Get the number of loaded plugins in the plugin manager.
   virtual int GetPluginCount ();
+  /// Get the specified plugin from the plugin manager.
   virtual iBase* GetPlugin (int idx);
+  /// Unload all plugins from this plugin manager.
   virtual void Clear ();
 };
 

@@ -20,6 +20,14 @@
 #ifndef __CSKEYACC_H__
 #define __CSKEYACC_H__
 
+/**\file
+ * Crystal Space Windowing System: keyboard accelerator class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csutil/csvector.h"
 #include "cscomp.h"
 
@@ -62,5 +70,7 @@ public:
   /// The "core" function
   virtual bool PostHandleEvent (iEvent &Event);
 };
+
+/** @} */
 
 #endif // __CSKEYACC_H__

@@ -33,19 +33,19 @@ class csEventQueue;
 class csEventOutlet : public iEventOutlet
 {
 private:
-  // The mask of events to allow from this plug
+  /// The mask of events to allow from this plug
   unsigned EnableMask;
-  // The event plug object
+  /// The event plug object
   iEventPlug *Plug;
-  // The owning event queue
+  /// The owning event queue
   csEventQueue *Queue;
-  // The shared-object registry.
+  /// The shared-object registry.
   iObjectRegistry* Registry;
-  // The shared keyboard driver.
+  /// The shared keyboard driver.
   iKeyboardDriver* KeyboardDriver;
-  // The shared mouse driver.
+  /// The shared mouse driver.
   iMouseDriver* MouseDriver;
-  // The shared joystick driver.
+  /// The shared joystick driver.
   iJoystickDriver* JoystickDriver;
 
   iKeyboardDriver* GetKeyboardDriver();
@@ -55,24 +55,24 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  // Initialize the outlet
+  /// Initialize the outlet
   csEventOutlet (iEventPlug*, csEventQueue*, iObjectRegistry*);
-  // Destroy the outlet
+  /// Destroy the outlet
   virtual ~csEventOutlet ();
 
-  // Create a event object on behalf of the system driver.
+  /// Create a event object on behalf of the system driver.
   virtual iEvent *CreateEvent ();
-  // Put a previously created event into system event queue.
+  /// Put a previously created event into system event queue.
   virtual void Post (iEvent*);
-  // Put a keyboard event into event queue.
+  /// Put a keyboard event into event queue.
   virtual void Key (int iKey, int iChar, bool iDown);
-  // Put a mouse event into event queue.
+  /// Put a mouse event into event queue.
   virtual void Mouse (int iButton, bool iDown, int x, int y);
-  // Put a joystick event into event queue.
+  /// Put a joystick event into event queue.
   virtual void Joystick (int iNumber, int iButton, bool iDown, int x, int y);
-  // Put a broadcast event into event queue.
+  /// Put a broadcast event into event queue.
   virtual void Broadcast (int iCode, void *iInfo);
-  // Broadcast a event to all plugins
+  /// Broadcast a event to all plugins
   virtual void ImmediateBroadcast (int iCode, void *iInfo);
 };
 

@@ -20,6 +20,14 @@
 #ifndef __CSMENU_H__
 #define __CSMENU_H__
 
+/**\file
+ * Crystal Space Windowing System: menu class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 
 /**
@@ -307,5 +315,7 @@ private:
  * }
  * </pre>
  */
+
+/** @} */
 
 #endif // __CSMENU_H__

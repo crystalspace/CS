@@ -19,12 +19,15 @@
 #ifndef __CS_BITSET_H__
 #define __CS_BITSET_H__
 
+/**\file
+ */
+
 #include <stdlib.h>
 #include <string.h>
 
-/// How many bits there are in one byte (usually 8 :-)
+/// \internal How many bits there are in one byte (usually 8 :-)
 #define BITS_PER_BYTE	8
-/// Max value for a byte
+/// \internal Max value for a byte
 #define MAX_BYTE_VALUE	0xff
 
 // Processor-dependent macros

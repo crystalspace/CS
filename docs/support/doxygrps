@@ -1,0 +1,35 @@
+/*
+ * Doxygen groups.
+ * 
+ * These are here rather than the includes because:
+ *  a) Module names aren't sorted; so we can do that here
+ *  b) it's easier to see what Modules are there and what
+ *     identifiers they have
+ *  c) it's easier to change a description
+ *
+ */
+ 
+/**
+ * \defgroup aws AWS
+ */
+ 
+/**
+ * \defgroup csws Crystal Space Windowing System
+ */
+ 
+/**
+ * \defgroup event_handling Event handling
+ */
+ 
+/**
+ * \defgroup floating_point Floating point utility routines
+ */
+ 
+/**
+ * \defgroup geom_utils Geometry utilities
+ */
+ 
+/**
+ * \defgroup scf Shared Class Facility (SCF)
+ */
+

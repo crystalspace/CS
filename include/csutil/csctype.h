@@ -59,6 +59,9 @@
 #ifndef CS_CTYPE_H
 #define CS_CTYPE_H
 
+/**\file
+ */
+
 #include <ctype.h>
 
 #ifdef __cplusplus
@@ -70,18 +73,31 @@ extern "C" {
  * that's legacy libc for ya.  These new macros do not support EOF like
  * the standard macros do.  Tough.
  */
+/** returns true if c is an alphanumeric character. */
 #define cs_isalnum(c) (isalnum(((unsigned char)(c))))
+/** returns true if c is a letter. */
 #define cs_isalpha(c) (isalpha(((unsigned char)(c))))
+/** returns true if c is a control character. */
 #define cs_iscntrl(c) (iscntrl(((unsigned char)(c))))
+/** returns true if c is a digit. */
 #define cs_isdigit(c) (isdigit(((unsigned char)(c))))
+/** returns true if c is a graphic character. */
 #define cs_isgraph(c) (isgraph(((unsigned char)(c))))
+/** returns true if c is a lower-case letter. */
 #define cs_islower(c) (islower(((unsigned char)(c))))
+/** returns true if c is a printable character. */
 #define cs_isprint(c) (isprint(((unsigned char)(c))))
+/** returns true if c is a punctuation character. */
 #define cs_ispunct(c) (ispunct(((unsigned char)(c))))
+/** returns true if c is a space character. */
 #define cs_isspace(c) (isspace(((unsigned char)(c))))
+/** returns true if c is a upper-case letter. */
 #define cs_isupper(c) (isupper(((unsigned char)(c))))
+/** returns true if c is a hex digit. */
 #define cs_isxdigit(c) (isxdigit(((unsigned char)(c))))
+/** converts c to lower-case. */
 #define cs_tolower(c) (tolower(((unsigned char)(c))))
+/** converts c to upper-case. */
 #define cs_toupper(c) (toupper(((unsigned char)(c))))
 
 #ifdef __cplusplus

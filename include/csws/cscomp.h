@@ -20,6 +20,14 @@
 #ifndef __CSCOMP_H__
 #define __CSCOMP_H__
 
+/**\file
+ * Crystal Space Windowing System: Component interface
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+
 #include "csgeom/csrect.h"
 #include "csutil/typedvec.h"
 #include "cstool/cspixmap.h"
@@ -35,8 +43,7 @@ struct iEvent;
 // this is where we store all the csRect for calculating visible areas and clipping in
 CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
 
-/**
- * Component state flags.<p>
+/** \page ComponentStateFlags Component state flags
  * The component state is an (at least) 32-bit integer, which contains
  * up to 32 state flags. These flags marks various transitional states
  * which can change in time depending on the activity of the component
@@ -59,29 +66,30 @@ CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
  * components (see csListBoxItem, for example), and finally all the
  * bits matching the mask 0xff000000 are reserved for user.
  * Pretty generous, eh? ;-)
+ * \sa CSS_VISIBLE
  */
 
-/// Component is visible
+/// Component state flag: Component is visible
 #define CSS_VISIBLE		0x00000001
-/// Component is focused in parent window child list
+/// Component state flag: Component is focused in parent window child list
 #define CSS_FOCUSED		0x00000002
-/// Component is disabled
+/// Component state flag: Component is disabled
 #define CSS_DISABLED		0x00000004
-/// Component can be selected
+/// Component state flag: Component can be selected
 #define CSS_SELECTABLE		0x00000008
-/// Component is the beginning of a group of components
+/// Component state flag: Component is the beginning of a group of components
 #define CSS_GROUP		0x00000010
-/// Move component to top Z-order when selected
+/// Component state flag: Move component to top Z-order when selected
 #define CSS_TOPSELECT		0x00000020
-/// Exclude component from clipping process
+/// Component state flag: Exclude component from clipping process
 #define CSS_TRANSPARENT		0x00000040
-/// Component is modally executing
+/// Component state flag: Component is modally executing
 #define CSS_MODAL		0x00000080
-/// Component is maximized (NEVER change this manually!)
+/// Component state flag: Component is maximized (NEVER change this manually!)
 #define CSS_MAXIMIZED		0x00000100
-/// Component or (some of) his children components are dirty
+/// Component state flag: Component or (some of) his children components are dirty
 #define CSS_DIRTY		0x00000200
-/// Additional state flag used to decide when to finish CheckDirty(); ignore it
+/// Component state flag: Additional state flag used to decide when to finish CheckDirty(); ignore it
 #define CSS_RESTART_DIRTY_CHECK	0x00000400
 
 /**
@@ -234,46 +242,46 @@ enum
   cscmdStopModal
 };
 
-/**
- * Drag mode flags: these flags are used by csComp::Drag to compute
+/** \page DragModeFlags Drag mode flags
+ * These flags are used by csComp::Drag to compute
  * new window coordinates when dragging window with mouse
+ * \sa CS_DRAG_XMIN
  */
-/// Drag left window border
+/// Drag mode flag: Drag left window border
 #define CS_DRAG_XMIN		0x01
-/// Drag right window border
+/// Drag mode flag: Drag right window border
 #define CS_DRAG_XMAX		0x02
-/// Drag top window border
+/// Drag mode flag: Drag top window border
 #define CS_DRAG_YMIN		0x04
-/// Drag bottom window border
+/// Drag mode flag: Drag bottom window border
 #define CS_DRAG_YMAX		0x08
-/// Window is moveable
+/// Drag mode flag: Window is moveable
 #define CS_DRAG_MOVEABLE	0x10
-/// Window is sizeable
+/// Drag mode flag: Window is sizeable
 #define CS_DRAG_SIZEABLE	0x20
-/// All flags above combined (used when dragging with titlebar)
+/// Drag mode flag: All flags above combined (used when dragging with titlebar)
 #define CS_DRAG_ALL		(CS_DRAG_XMIN | CS_DRAG_XMAX | \
 				 CS_DRAG_YMIN | CS_DRAG_YMAX)
 
-/**
- * Bound resize flags.
+/** \page BoundResizeFlags Bound resize flags
  * When the size of certain component changes, it checks all his children
  * what they want to do with their own size. You can lock the distance
  * between certain margin of the component and respective margin of
  * the parent component to stay the same when this happens, using the
  * ResizeMode field (or SetResizeMode() method).
  */
-/// Lock component's left margin with parent's left margin
+/// Bound resize flag: Lock component's left margin with parent's left margin
 #define CS_LOCK_XMIN		0x01
-/// Lock component's right margin with parent's right margin
+/// Bound resize flag: Lock component's right margin with parent's right margin
 #define CS_LOCK_XMAX		0x02
-/// Lock component's top margin with parent's top margin
+/// Bound resize flag: Lock component's top margin with parent's top margin
 #define CS_LOCK_YMIN		0x04
-/// Lock component's bottom margin with parent's bottom margin
+/// Bound resize flag: Lock component's bottom margin with parent's bottom margin
 #define CS_LOCK_YMAX		0x08
-/// Lock all four margins
+/// Bound resize flag: Lock all four margins
 #define CS_LOCK_ALL		(CS_LOCK_XMIN | CS_LOCK_XMAX | \
 				 CS_LOCK_YMIN | CS_LOCK_YMAX)
-/**
+/** \page ChildRepositioning Child repositioning
  * An alternative way for child repositioning consist of the following:
  * independently of each other in both X and Y direction the child can
  * keep its size, and be placed either at the start, center, or end strip
@@ -286,29 +294,29 @@ enum
  * CS_REPOS_{LEFT|RIGHT|HCENTER} modes, but they are compatible with
  * CS_REPOS_{TOP|BOTTOM|VCENTER} modes.
  */
-/// Used to distinguish when component is repositioned or bound locked horizontally
+/// Child repositioning: Used to distinguish when component is repositioned or bound locked horizontally
 #define CS_REPOS_HORIZONTAL	0x10
-/// Used to distinguish when component is repositioned or bound locked vertically
+/// Child repositioning: Used to distinguish when component is repositioned or bound locked vertically
 #define CS_REPOS_VERTICAL	0x20
-/// The mask for extracting the horizontal automatic position
+/// Child repositioning: The mask for extracting the horizontal automatic position
 #define CS_REPOS_H_MASK		(CS_REPOS_HORIZONTAL | 0x3)
-/// The mask for extracting the vertical automatic position
+/// Child repositioning: The mask for extracting the vertical automatic position
 #define CS_REPOS_V_MASK		(CS_REPOS_VERTICAL | 0xc)
-/// The component is automatically placed at the left of the parent window
+/// Child repositioning: The component is automatically placed at the left of the parent window
 #define CS_REPOS_LEFT		(CS_REPOS_HORIZONTAL | 0x0)
-/// The component is automatically placed at the right of the parent window
+/// Child repositioning: The component is automatically placed at the right of the parent window
 #define CS_REPOS_RIGHT		(CS_REPOS_HORIZONTAL | 0x1)
-/// The component is automatically horizontally centered in the parent window
+/// Child repositioning: The component is automatically horizontally centered in the parent window
 #define CS_REPOS_HCENTER	(CS_REPOS_HORIZONTAL | 0x2)
-/// Same as HCENTER but the component is resized by the same amount as parent
+/// Child repositioning: Same as HCENTER but the component is resized by the same amount as parent
 #define CS_REPOS_HCENTERSIZE	(CS_REPOS_HORIZONTAL | 0x3)
-/// The component is automatically placed at the top of the parent window
+/// Child repositioning: The component is automatically placed at the top of the parent window
 #define CS_REPOS_TOP		(CS_REPOS_VERTICAL | 0x0)
-/// The component is automatically placed at the bottom of the parent window
+/// Child repositioning: The component is automatically placed at the bottom of the parent window
 #define CS_REPOS_BOTTOM		(CS_REPOS_VERTICAL | 0x4)
-/// The component is automatically vertically centered in the parent window
+/// Child repositioning: The component is automatically vertically centered in the parent window
 #define CS_REPOS_VCENTER	(CS_REPOS_VERTICAL | 0x8)
-/// Same as VCENTER but the component is resized by the same amount as parent
+/// Child repositioning: Same as VCENTER but the component is resized by the same amount as parent
 #define CS_REPOS_VCENTERSIZE	(CS_REPOS_VERTICAL | 0xc)
 
 /**
@@ -849,5 +857,7 @@ protected:
 private:
   static bool do_handle_event (csComponent *child, void *param);
 };
+
+/** @} */
 
 #endif // __CSCOMP_H__

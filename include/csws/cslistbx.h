@@ -20,6 +20,14 @@
 #ifndef __CSLISTBX_H__
 #define __CSLISTBX_H__
 
+/**\file
+ * Crystal Space Windowing System: list box class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csscrbar.h"
 
@@ -413,5 +421,7 @@ protected:
   /// Make a listbox item visible (same as cscmdListBoxMakeVisible)
   void MakeItemVisible (csComponent *item);
 };
+
+/** @} */
 
 #endif // __CSLISTBX_H__

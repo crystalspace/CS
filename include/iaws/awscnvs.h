@@ -23,6 +23,10 @@
 #include "csutil/typedvec.h"
 #include "ivideo/graph3d.h"
 
+/**
+ * \addtogroup aws
+ * @{ */
+
 SCF_VERSION (iAwsCanvas, 0, 0, 1);
 
 /// Provider for AWS 2D / 3D Driver
@@ -40,6 +44,8 @@ public:
 
   virtual void Show (csRect *area = NULL, iGraphics3D *g3d=NULL, uint8 Alpha=0)=0;
 };
+
+/** @} */
 
 #endif // __AWSCNVS_H__
 

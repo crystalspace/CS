@@ -20,6 +20,10 @@
 #ifndef __BOXLAYOUT_G__
 #define __BOXLAYOUT_G__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cslayout.h"
 
 /**
@@ -46,5 +50,7 @@ class csBoxLayout : public csLayout
  protected:
   int mAxis;
 };
+
+/** @} */
 
 #endif // __BOXLAYOUT_G__

@@ -24,76 +24,106 @@
 
 */
 
+/**\file
+ * Event system related interfaces
+ */
+
+/**
+ * \addtogroup event_handling
+ * @{ */
+
 #ifndef __IUTIL_EVDEFS_H__
 #define __IUTIL_EVDEFS_H__
 
 /// System Events: take care not to define more than 32 event types
 enum
 {
+  /// Nothing happened	
   csevNothing = 0,
-  csevKeyDown,			// A key has been pressed
-  csevKeyUp,			// A key has been released
-  csevMouseMove,		// Mouse has been moved
-  csevMouseDown,		// A mouse button has been pressed
-  csevMouseUp,			// A mouse button has been released
-  csevMouseClick,		// A mouse button has been clicked
-  csevMouseDoubleClick, // A mouse button has been clicked twice
-  csevJoystickMove,		// A joystick axis has been moved
-  csevJoystickDown,		// A joystick button has been pressed
-  csevJoystickUp,		// A joystick button has been released
-  csevCommand,			// Somebody(-thing) sent a command
-  csevBroadcast,		// Somebody(-thing) sent a broadcast command
-  csevNetwork	,		// Something has arrived on network.
-  csevMouseEnter,		// The mouse has entered a component
-  csevMouseExit,		// The mouse has exited a component
-  csevLostFocus,        // The component has lost keyboard focus
-  csevGainFocus,        // The component has gained keyboard focus
-  csevGroupOff,         // A component in a group has been selected,
-                        //  everyone else should go to their off state.
-  csevFrameStart        // The frame is about to draw.
+  /// A key has been pressed
+  csevKeyDown,			
+  /// A key has been released
+  csevKeyUp,			
+  /// Mouse has been moved
+  csevMouseMove,		
+  /// A mouse button has been pressed
+  csevMouseDown,		
+  /// A mouse button has been released
+  csevMouseUp,			
+  /// A mouse button has been clicked
+  csevMouseClick,		
+  /// A mouse button has been clicked twice
+  csevMouseDoubleClick, 
+  /// A joystick axis has been moved
+  csevJoystickMove,		
+  /// A joystick button has been pressed
+  csevJoystickDown,		
+  /// A joystick button has been released
+  csevJoystickUp,		
+  /// Somebody(-thing) sent a command
+  csevCommand,			
+  /// Somebody(-thing) sent a broadcast command
+  csevBroadcast,		
+  /// Something has arrived on network.
+  csevNetwork,		
+  /// The mouse has entered a component
+  csevMouseEnter,		
+  /// The mouse has exited a component
+  csevMouseExit,		
+  /// The component has lost keyboard focus
+  csevLostFocus,        
+  /// The component has gained keyboard focus
+  csevGainFocus,        
+  /**
+   * A component in a group has been selected,
+   * everyone else should go to their off state.
+   */
+  csevGroupOff,         
+  /// The frame is about to draw.
+  csevFrameStart        
 };
 
-/*
- * Event masks.<p>
+/** \page EventMasks Event masks
  * The event masks can be used by plugins to tell an event queue, via
  * iEventQueue::RegisterListener, which kinds of events they want to receive at
  * their HandleEvent() entry.  If a plugin registers to receive CSMASK_Nothing
  * events it is always called once per frame, so that plugin can do some
  * per-frame processing.
+ * \sa CSMASK_Nothing
  */
 /**
- * Empty event.  If a plugin registers to receive this kind of events via
+ * Event mask: Empty event.  If a plugin registers to receive this kind of events via
  * iEventQueue::RegisterListener(plugin, CSMASK_Nothing) this has a special
  * meaning: the plugin will be called at the start of every frame and at the
  * end of every frame with an csevBroadcast event with the Event.Command.Code
  * equal to either cscmdPreProcess or cscmdPostProcess.
  */
 #define CSMASK_Nothing		(1 << csevNothing)
-/// Key down events
+/// Event mask: Key down events
 #define CSMASK_KeyDown		(1 << csevKeyDown)
-/// Key up events
+/// Event mask: Key up events
 #define CSMASK_KeyUp		(1 << csevKeyUp)
-/// Mouse move events
+/// Event mask: Mouse move events
 #define CSMASK_MouseMove	(1 << csevMouseMove)
-/// Mouse down events
+/// Event mask: Mouse down events
 #define CSMASK_MouseDown	(1 << csevMouseDown)
-/// Mouse up events
+/// Event mask: Mouse up events
 #define CSMASK_MouseUp		(1 << csevMouseUp)
-/// Mouse click events
+/// Event mask: Mouse click events
 #define CSMASK_MouseClick	(1 << csevMouseClick)
-/// Mouse double click events
+/// Event mask: Mouse double click events
 #define CSMASK_MouseDoubleClick	(1 << csevMouseDoubleClick)
-/// Joystick movement events
+/// Event mask: Joystick movement events
 #define CSMASK_JoystickMove	(1 << csevJoystickMove)
-/// Joystick button down events
+/// Event mask: Joystick button down events
 #define CSMASK_JoystickDown	(1 << csevJoystickDown)
-/// Joystick button up events
+/// Event mask: Joystick button up events
 #define CSMASK_JoystickUp	(1 << csevJoystickUp)
-/// Command message events
+/// Event mask: Command message events
 #define CSMASK_Command		(1 << csevCommand)
-/// Broadcast message events
+/// Event mask: Broadcast message events
 #define CSMASK_Broadcast	(1 << csevBroadcast)
-/// Network message events
+/// Event mask: Network message events
 #define CSMASK_Network		(1 << csevNetwork)
 
 /// This mask identifies any keyboard event
@@ -122,42 +152,42 @@ enum
 /// Check if the event is a network event
 #define CS_IS_NETWORK_EVENT(e)	((1 << (e).Type) & CSMASK_Network)
 
-/*
- * Event flags masks.
+/** \page EventFlags Event flags masks
  * Every event has a `flags' field which describes miscelaneous
  * aspects of the event. The following constants describes every
  * used bit of the `flags' field.
+ * \sa CSEF_BROADCAST
  */
 /**
- * Ignore `true' returned from HandleEvent which says that
+ * Event flag: Ignore `true' returned from HandleEvent which says that
  * event has been processed and should not be processed anymore.
  * Normally this is set only for csevBroadcast events.
  */
 #define CSEF_BROADCAST		0x00000001
 
-/*
- * Modifier key masks.
+/** \page Modifiers Modifier key masks
  * Every input event (keyboard, mouse and joystick) contains a Modifiers
  * field which is a bitfield consisting of any combination of the masks
  * below. Having one in one of the bits means that the corresponding
  * modifier was pressed at the time when event happened.
+ * \sa CSMASK_SHIFT
  */
-/// "Shift" key mask
+/// Modifier: "Shift" key mask
 #define CSMASK_SHIFT		0x00000001
-/// "Ctrl" key mask
+/// Modifier: "Ctrl" key mask
 #define CSMASK_CTRL		0x00000002
-/// "Alt" key mask
+/// Modifier: "Alt" key mask
 #define CSMASK_ALT		0x00000004
-/// All shift keys
+/// Modifier: All shift keys
 #define CSMASK_ALLSHIFTS	(CSMASK_SHIFT | CSMASK_CTRL | CSMASK_ALT)
-/// Key is pressed for first time or it is an autorepeat?
+/// Modifier: Key is pressed for first time or it is an autorepeat?
 #define CSMASK_FIRST		0x80000000
 
-/*
- * Control key codes.
+/** \page KeyCodes Control key codes
  * Not every existing key on any existing platform is supported by
  * Crystal Space. Instead, we tried to list here all the keys that
  * are common among all platforms on which Crystal Space runs.
+ * \sa CSKEY_ESC
  */
 /// ESCape key
 #define CSKEY_ESC		27
@@ -230,24 +260,25 @@ enum
 /// Numeric keypad '/'
 #define CSKEY_PADDIV		1029
 
-// First and last control key code
+/// First control key code
 #define CSKEY_FIRST		1000
+/// Last control key code
 #define CSKEY_LAST		1029
 
-/**
- * Event class masks.<p>
+/** \page EventClassMasks Event class masks
  * Every event plug should provide information about which event
  * types that may conflict with other event plugs it is able to generate.
  * The system driver checks it and if several event plugs generates
  * conflicting types events, one of them (the one with lower priority)
  * is disabled.
+ * \sa CSEVTYPE_Keyboard, CSEVTYPE_Mouse, CSEVTYPE_Joystick
  */
 
-/// Keyboard events
+/// Event class mask: Keyboard events
 #define CSEVTYPE_Keyboard	0x00000001
-/// Mouse events
+/// Event class mask: Mouse events
 #define CSEVTYPE_Mouse		0x00000002
-/// Joystick events
+/// Event class mask: Joystick events
 #define CSEVTYPE_Joystick	0x00000004
 
 /**
@@ -387,5 +418,7 @@ enum
    */
   cscmdCanvasExposed
 };
+
+/** @} */
 
 #endif // __IUTIL_EVDEFS_H__

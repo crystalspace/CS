@@ -74,7 +74,7 @@ class csSchedulePart;
 class csSchedule
 {
 private:
-  // first part of the scheduled callbacks
+  /// first part of the scheduled callbacks
   csSchedulePart *first;
 
   /// internal, insert part given msec after now into list

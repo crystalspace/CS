@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 
-/**
+/**\file
  * This header file contains a set of macros to construct 'typed vectors'.
  * They are the type-safe variant of csVector. You can perform almost any
  * operation as with csVector, but the contained objects are always
@@ -220,7 +220,7 @@ public:
   }
 };
 
-/*
+/**\internal
  * This is a helper macro for typed vectors. It defines all methods that are
  * valid for usual typed vectors and typed SCF vectors. This basically
  * excludes all methods that have a 'DeleteIt' parameter for
@@ -265,7 +265,7 @@ public:
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
     { return superclass::InsertSorted ((csSome)Item, oEqual, Mode); }
 
-/*
+/**\internal
  * Declares a new vector type NAME as a subclass of csVector.
  * Elements of this vector are of type TYPE. The elements are
  * automatically given to FreeTypedItem() on either Delete() or
@@ -325,7 +325,7 @@ public:
     { return FreeTypedItem ((TYPE *)Item); }				\
   }
 
-/*
+/**\internal
  * Declares a new vector type NAME as a subclass of csVector. Elements
  * of this vector are of type TYPE. The elements are automatically deleted
  * on either Delete() or DeleteAll() or upon vector destruction.
@@ -397,7 +397,7 @@ public:
 #define CS_PRIVATE_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)		\
   CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR (NAME, TYPE, csIBaseVector)
 
-/*
+/**\internal
  * This is a special version of typed vectors that contain SCF objects. The
  * vector will correctly IncRef all added objects and DecRef all removed
  * objects. There is only one exeption: The Pop() function does not DecRef

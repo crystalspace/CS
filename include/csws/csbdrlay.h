@@ -23,6 +23,10 @@
 #include "cslayout.h"
 
 /**
+ * \addtogroup csws
+ * @{ */
+ 
+/**
  * This subclass of csLayoutConstraint additionally stores the location
  * of the attached control.
  */
@@ -168,5 +172,7 @@ class csBorderLayout : public csLayout2
   int mVgap;
 
 };
+
+/** @} */
 
 #endif // __BORDERLAYOUT_G__

@@ -20,57 +20,65 @@
 #ifndef __CSSTDDLG_H__
 #define __CSSTDDLG_H__
 
+/**\file
+ * Crystal Space Windowing System: Standard dialogs
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csutil/scf.h"
 #define CSWS_INTERNAL
 #include "csws.h"
 
-/**
- * Message box style flags (used in csMessageBox (...) as last parameter)<p>
+/**\page MessageBoxStyle Message box style flags (used in csMessageBox (...) as last parameter)
  * These style flags can be combined using logical OR (|) operation;
  * some styles are mutually exclusive (for example, a message box cannot
  * be CSMBS_INFORMATION and CSMBS_WARNING at same time)
+ * \sa CSMBS_NOTYPE
  */
-/// Message has no type
+/// Message box style: Message has no type
 #define CSMBS_NOTYPE		0x00000000
-/// Informational message
+/// Message box style: Informational message
 #define CSMBS_INFORMATION	0x00000001
-/// Same for lazy ones (like me :-)
+/// Message box style: Same for lazy ones (like me :-)
 #define CSMBS_INFO		CSMBS_INFORMATION
-/// Warning message
+/// Message box style: Warning message
 #define CSMBS_WARNING		0x00000002
-/// Same but shorter
+/// Message box style: Same but shorter
 #define CSMBS_WARN		CSMBS_WARNING
-/// Question message
+/// Message box style: Question message
 #define CSMBS_QUESTION		0x00000003
-/// Fatal error
+/// Message box style: Fatal error
 #define CSMBS_ERROR		0x00000004
-/// Invalid operation
+/// Message box style: Invalid operation
 #define CSMBS_STOP		0x00000005
-/// Custom bitmap (texture name/x/y/w/h follows last parameter)
+/// Message box style: Custom bitmap (texture name/x/y/w/h follows last parameter)
 #define CSMBS_CUSTOMICON	0x0000000f
-/// This is the mask used to separate message box style from other flags
+/// Message box style: This is the mask used to separate message box style from other flags
 #define CSMBS_TYPEMASK		0x0000000f
 
-/// Message box contains a "OK" button
+/// Message box style: Message box contains a "OK" button
 #define CSMBS_OK		0x00000010
-/// Message box contains a "Cancel" button
+/// Message box style: Message box contains a "Cancel" button
 #define CSMBS_CANCEL		0x00000020
-/// Message box contains a "Abort" button
+/// Message box style: Message box contains a "Abort" button
 #define CSMBS_ABORT		0x00000040
-/// Message box contains a "Retry" button
+/// Message box style: Message box contains a "Retry" button
 #define CSMBS_RETRY		0x00000080
-/// Message box contains a "Ignore" button
+/// Message box style: Message box contains a "Ignore" button
 #define CSMBS_IGNORE		0x00000100
-/// Message box contains a "OK" button and a "Cancel" button
+/// Message box style: Message box contains a "OK" button and a "Cancel" button
 #define CSMBS_OKCANCEL		(CSMBS_OK | CSMBS_CANCEL)
-/// Message box contains a "Abort" button, a "Retry" button and a "Ignore" button
+/// Message box style: Message box contains a "Abort" button, a "Retry" button and a "Ignore" button
 #define CSMBS_ABORTRETRYIGNORE	(CSMBS_ABORT | CSMBS_RETRY | CSMBS_IGNORE)
 
-/// Message is not program-modal
+/// Message box style: Message is not program-modal
 #define CSMBS_NONMODAL		0x80000000
-/// Align text vertically so that it occupies given height (given as '...')
+/// Message box style: Align text vertically so that it occupies given height (given as '...')
 #define CSMBS_USEHEIGHT		0x40000000
-/// Center all text lines
+/// Message box style: Center all text lines
 #define CSMBS_CENTER		0x20000000
 
 SCF_VERSION (iMessageBoxData, 0, 0, 1);
@@ -138,5 +146,7 @@ csWindow *csColorDialog (csComponent *iParent, const char *iTitle,
 extern void csQueryColorDialog (csWindow *iColorDialog, int &oColor);
 /// Query color dialog contents as R,G,B floating-point numbers
 extern void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, float &oB);
+
+/** @} */
 
 #endif // __CSSTDDLG_H__

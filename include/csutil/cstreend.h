@@ -28,15 +28,19 @@ class csTreeNode
 {
  public:
 
+  /// Returns true if this node has no children.
   bool IsLeaf ()
   { return children.Length () == 0; }
 
+  /// Remove a child node.
   void RemoveChild (csTreeNode *child)
   { int idx = children.Find (child); if (idx != -1) children.Delete (idx); }
 
+  /// Add a child node.
   void AddChild (csTreeNode *child)
   { children.Push (child); child->parent = this; }
 
+  /// Create node, optionally as a child of <code>theParent</code>.
   csTreeNode (csTreeNode *theParent=NULL)
   { parent=theParent; if (parent) parent->children.Push (this); }
 

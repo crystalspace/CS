@@ -21,6 +21,14 @@
 #ifndef __CSBUTTON_H__
 #define __CSBUTTON_H__
 
+/**\file
+ * Crystal Space Windowing System: button class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 
 /// Button style flags: does bitmap and/or text shift when button is pressed?
@@ -57,6 +65,7 @@
 #define CSBS_DEFAULTVALUE	(CSBS_SHIFT | CSBS_SELECTABLE | \
 				 CSBS_TEXTBELOW)
 
+/// Button notifications
 enum
 {
   /**
@@ -270,5 +279,7 @@ protected:
   /// Deselect all button's neightbours in his group
   void DeselectNeighbours ();
 };
+
+/** @} */
 
 #endif // __CSBUTTON_H__

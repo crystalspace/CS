@@ -20,6 +20,10 @@
 #ifndef __IUTIL_EVENTQ_H__
 #define __IUTIL_EVENTQ_H__
 
+/**
+ * \addtogroup event_handling
+ * @{ */
+ 
 #include "csutil/scf.h"
 struct iEvent;
 struct iEventCord;
@@ -145,5 +149,7 @@ struct iEventQueue : public iBase
   /// Query if queue is empty.
   virtual bool IsEmpty () = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_EVENTQ_H__

@@ -20,6 +20,14 @@
 #ifndef __CSWINDOW_H__
 #define __CSWINDOW_H__
 
+/**\file
+ * Crystal Space Windowing System: window class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 
@@ -198,5 +206,7 @@ public:
   uint8 GetAlpha ()
   { return GetState (CSS_TRANSPARENT) ? Alpha : 0; }
 };
+
+/** @} */
 
 #endif // __CSWINDOW_H__

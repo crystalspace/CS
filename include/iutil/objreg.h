@@ -19,6 +19,13 @@
 #ifndef __IUTIL_OBJREG_H__
 #define __IUTIL_OBJREG_H__
 
+/**\file
+ */
+ 
+/**
+ * \addtogroup scf
+ * @{ */
+
 #include "csutil/scf.h"
 
 #define CS_QUERY_REGISTRY_TAG(Reg,Tag)			\
@@ -122,6 +129,8 @@ struct iObjectRegistryIterator : public iBase
    */
   virtual bool Next () = 0;
 };
+
+/** @} */
 
 #endif
 

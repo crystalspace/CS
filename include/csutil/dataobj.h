@@ -32,7 +32,7 @@
 class csDataObject : public csObject
 {
 protected:
-  ///
+  /// Pointer to data.
   void* data;
 
 public:
@@ -56,7 +56,7 @@ public:
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
-  /// iDataObject implementation.
+  /// \internal iDataObject implementation.
   struct DataObject : public iDataObject
   {
     SCF_DECLARE_EMBEDDED_IBASE (csDataObject);

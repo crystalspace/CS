@@ -20,34 +20,42 @@
 #ifndef __CSNOTEBK_H__
 #define __CSNOTEBK_H__
 
+/**\file
+ * Crystal Space Windowing System: notebook class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 #include "csbutton.h"
 
-/**
- * Notebook styles.
+/**\page NotebookStyles Notebook styles
  * There are various styles of notebooks. The position of the tabs,
  * the border style and so on can be different. The masks below
  * can be ORed together to form a compound notebook style; only
  * one value from each group can be choosed.
+ * \sa CSNBS_TABPOS_MASK
  */
 
-/// The mask for tab position bits
+/// Notebook style: The mask for tab position bits
 #define CSNBS_TABPOS_MASK	0x00000003
-/// Use tabs along the top side of notebook (default value)
+/// Notebook style: Use tabs along the top side of notebook (default value)
 #define CSNBS_TABPOS_TOP	0x00000000
-/// Use tabs along the bottom side of notebook
+/// Notebook style: Use tabs along the bottom side of notebook
 #define CSNBS_TABPOS_BOTTOM	0x00000001
-/// Use tabs along the left side of notebook
+/// Notebook style: Use tabs along the left side of notebook
 #define CSNBS_TABPOS_LEFT	0x00000002
-/// Use tabs along the right side of notebook
+/// Notebook style: Use tabs along the right side of notebook
 #define CSNBS_TABPOS_RIGHT	0x00000003
-/// Draw a thin 3D frame around page dialogs
+/// Notebook style: Draw a thin 3D frame around page dialogs
 #define CSNBS_PAGEFRAME		0x00000010
-/// Display page information on the top of notebook
+/// Notebook style: Display page information on the top of notebook
 #define CSNBS_PAGEINFO		0x00000020
-/// Display a flat thin border around tabs instead of 3D look
+/// Notebook style: Display a flat thin border around tabs instead of 3D look
 #define CSNBS_THINTABS		0x00000040
-
+/// Notebook style: default style
 #define CSNBS_DEFAULTVALUE	CSNBS_TABPOS_TOP | \
 				CSNBS_PAGEFRAME | \
 				CSNBS_PAGEINFO
@@ -225,5 +233,7 @@ protected:
   /// Find page index given page pointer
   int FindPage (csComponent *iComponent);
 };
+
+/** @} */
 
 #endif // __CSNOTEBK_H__

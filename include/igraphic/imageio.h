@@ -19,6 +19,9 @@
 #ifndef __IGRAPHIC_IMAGEIO_H__
 #define __IGRAPHIC_IMAGEIO_H__
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 struct iImage;
 struct iDataBuffer;
@@ -26,7 +29,9 @@ class csVector;
 
 SCF_VERSION (iImageIO, 1, 0, 0);
 
+/// \internal format can be read
 #define CS_IMAGEIO_LOAD 1
+/// \internal format can be written
 #define CS_IMAGEIO_SAVE 2
 
 /**

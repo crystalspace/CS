@@ -20,6 +20,14 @@
 #ifndef __CSSKIN_H__
 #define __CSSKIN_H__
 
+/**\file
+ * Crystal Space Windowing System: Skin interface
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csutil/csvector.h"
 
 class csSkin;
@@ -344,5 +352,7 @@ public:
 #define CSWS_SKIN_DECLARE_END	\
     }				\
   }
+
+/** @} */
 
 #endif // __CSSKIN_H__

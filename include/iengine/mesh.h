@@ -19,6 +19,9 @@
 #ifndef __IENGINE_MESH_H__
 #define __IENGINE_MESH_H__
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 #include "csgeom/box.h"
 #include "iutil/eventh.h"

@@ -21,6 +21,10 @@
 
 #if defined (CS_IEEE_DOUBLE_FORMAT)
 
+/**
+ * \addtogroup floating_point
+ * @{ */
+
 /** \file
     Quick floating point to integer conversions.
     <p>
@@ -198,6 +202,8 @@ inline long QInt24 (float inval)
   double dtemp = FIST_MAGIC_QINT24 + inval;
   return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
+
+/** @} */
     
 #else /* not CS_IEEE_DOUBLE_FORMAT */
 

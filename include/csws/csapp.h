@@ -21,6 +21,14 @@
 #ifndef __CSAPP_H__
 #define __CSAPP_H__
 
+/**\file 
+ * Crystal Space Windowing System: Application class interface
+ */
+ 
+/**
+ * \addtogroup csws
+ * @{ */
+
 #include <stdarg.h>
 
 #define CSWS_INTERNAL
@@ -98,7 +106,7 @@ protected:
   /// Are we inbetween StartFrame() and FinishFrame()?
   bool InFrame;
 
-  /// The iComponent interface
+  /// \internal The iComponent interface
   class csAppPlugin : public iComponent
   {
   public:
@@ -114,7 +122,7 @@ protected:
     /// Handle a event and return true if processed
     virtual bool HandleEvent (iEvent &Event);
 
-    /// iEventHandler implementation.
+    /// \internal iEventHandler implementation.
     struct eiEventHandler : public iEventHandler
     {
       SCF_DECLARE_EMBEDDED_IBASE(csAppPlugin);
@@ -124,12 +132,15 @@ protected:
   } *scfiPlugin;
   friend class csAppPlugin;
 
-  /// A structure for keeping modal information on a stack.
+  /// \internal A structure for keeping modal information on a stack.
   struct csModalInfo
   {
-    csComponent* component;	// Component that is modal
-    csComponent* old_focus;	// Old focus before this component was modal
-    iBase* userdata;		// Userdata
+    /// Component that is modal
+    csComponent* component;	
+    /// Old focus before this component was modal
+    csComponent* old_focus;	
+    /// Userdata
+    iBase* userdata;		
   };
   /**
    * This is a stack of csModalInfo instances to keep track of modality.
@@ -482,5 +493,7 @@ protected:
   /// setup palette
   void SetupPalette ();
 };
+
+/** @} */
 
 #endif // __CSAPP_H__

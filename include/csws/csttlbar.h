@@ -20,6 +20,10 @@
 #ifndef __CSTTLBAR_H__
 #define __CSTTLBAR_H__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 
 /**
@@ -35,9 +39,11 @@ public:
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
 
-  /// Get the name of the skip slice for this component
+  /// Get the name of the skin slice for this component
   virtual char *GetSkinName ()
   { return "Titlebar"; }
 };
+
+/** @} */
 
 #endif // __CSTTLBAR_H__

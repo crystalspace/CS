@@ -22,6 +22,10 @@
 #include "csutil/scf.h"
 struct iObjectRegistry;
 
+/**
+ * \addtogroup scf
+ * @{ */
+
 SCF_VERSION (iComponent, 0, 0, 1);
 
 /**
@@ -32,5 +36,7 @@ struct iComponent : public iBase
   /// Initialize the component, and return success status.
   virtual bool Initialize (iObjectRegistry*) = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_COMP_H__

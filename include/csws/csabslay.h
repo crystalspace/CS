@@ -20,10 +20,14 @@
 #ifndef __ABSOLUTELAYOUT_G__
 #define __ABSOLUTELAYOUT_G__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cslayout.h"
 
 /**
- * This is just for completness. Set absolute positions just like you
+ * This is just for completeness. Set absolute positions just like you
  * normally do with SetPos, SetSize and SetRect.
  */
 class csAbsoluteLayout : public csLayout
@@ -35,5 +39,7 @@ class csAbsoluteLayout : public csLayout
   virtual void SuggestSize (int &sugw, int& sugh);
   virtual void LayoutContainer ();
 };
+
+/** @} */
 
 #endif // __ABSOLUTELAYOUT_G__

@@ -20,6 +20,9 @@
 #ifndef __IENGINE_LIGHT_H__
 #define __IENGINE_LIGHT_H__
 
+/**\file
+ */
+ 
 #include "csutil/scf.h"
 #include "iengine/fview.h"
 

@@ -59,7 +59,7 @@ struct  iEvent;
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
 
 /**
- * \defgroup AwsSystemFlags AWS window manager flags
+ * \addtogroup aws
  * @{ */
 
 /**
@@ -77,8 +77,6 @@ const int AWSF_AlwaysEraseWindows=1;
  * context.
  */
 const int AWSF_AlwaysRedrawWindows=2;
-
-/* @} */
 
 SCF_VERSION (iAws, 0, 1, 0);
 
@@ -170,31 +168,36 @@ public:
 
   /**
    * Creates and enables a transition for a window.
-   * see \link AwsWindowTransitions AWS window transitions\endlink.
+   * <code>transition_type</code> is one of AWS_TRANSITION_*.
+   * \sa AWS_TRANSITION_SLIDE_IN_LEFT
    */
   virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1)=0;
 
   /**
    * Creates and enables a transition for a window, using a user specified start or finish (transition type defines which).
-   * see \link AwsWindowTransitions AWS window transitions\endlink.
+   * <code>transition_type</code> is one of AWS_TRANSITION_*.
+   * \sa AWS_TRANSITION_SLIDE_IN_LEFT
    */
   virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)=0;
 
   /**
    * Sets one or more flags for different operating modes. 
-   * see \link AwsSystemFlags AWS window manager flags\endlink.
+   * <code>flags</code> is a combination of AWSF_*.
+   * \sa AWSF_AlwaysEraseWindows
    */
   virtual void SetFlag(unsigned int flags)=0;
 
   /**
    * Clears one or more flags for different operating modes.
-   * see \link AwsSystemFlags AWS window manager flags\endlink.
+   * <code>flags</code> is a combination of AWSF_*.
+   * \sa AWSF_AlwaysEraseWindows
    */
   virtual void ClearFlag(unsigned int flags)=0;
 
   /**
    * Returns the current flags
-   * see \link AwsSystemFlags AWS window manager flags\endlink.
+   * <code>flags</code> is a combination of AWSF_*.
+   * \sa AWSF_AlwaysEraseWindows
    */
   virtual unsigned int GetFlags()=0;
   
@@ -357,7 +360,8 @@ struct iAwsSink : public iBase
 
   /**
    * Returns the last error code set.  This code is good until the next call to this sink.
-   * see \link AwsSinkErrors AWS sink error codes\endlink.
+   * Return value is one of AWS_ERR_SINK_*.
+   * \sa AWS_ERR_SINK_NONE
    */
   virtual unsigned int GetError()=0;
 };
@@ -437,19 +441,22 @@ struct iAwsComponent : public iAwsSource
 
   /**
    * Sets the flag (can handle multiple simultaneous sets). 
-   * see \link AwsComponentFlags AWS component flags\endlink.
+   * <code>flag</code> is one of AWSF_CMP_*.
+   * \sa AWSF_CMP_TRANSPARENT
    */
   virtual void SetFlag(unsigned int flag)=0;
 
   /**
    * Clears the flag (can handle multiple simultaneous clears).
-   * see \link AwsComponentFlags AWS component flags\endlink.
+   * <code>flag</code> is one of AWSF_CMP_*.
+   * \sa AWSF_CMP_TRANSPARENT
    */
   virtual void ClearFlag(unsigned int flag)=0;
 
   /**
    * Returns the current state of the flags.
-   * see \link AwsComponentFlags AWS component flags\endlink.
+   * <code>flag</code> is one of AWSF_CMP_*.
+   * \sa AWSF_CMP_TRANSPARENT
    */
   virtual unsigned int Flags()=0;
 
@@ -674,5 +681,7 @@ struct iAwsKeyFactory : public iBase
    /// Add a connection key
    virtual void AddConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
 };
+
+/* @} */
 
 #endif // __IAWS_AWS_H__

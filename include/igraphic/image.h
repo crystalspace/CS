@@ -19,6 +19,9 @@
 #ifndef __IGRAPHIC_IMAGE_H__
 #define __IGRAPHIC_IMAGE_H__
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 
 /*

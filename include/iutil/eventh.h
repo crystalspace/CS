@@ -19,6 +19,10 @@
 #ifndef __IUTIL_EVENTH_H__
 #define __IUTIL_EVENTH_H__
 
+/**
+ * \addtogroup event_handling
+ * @{ */
+
 #include "csutil/scf.h"
 struct iEvent;
 
@@ -43,5 +47,7 @@ struct iEventHandler : public iBase
    */
   virtual bool HandleEvent (iEvent&) = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_EVENTH_H__

@@ -37,7 +37,7 @@ protected:
   /// The category and subcategory of this events on this cord
   int category, subcategory;
 
-  /// Linked list of plugins
+  /// \internal Linked list of plugins
   struct PluginData
   {
     iEventHandler *plugin;

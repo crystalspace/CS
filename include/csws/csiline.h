@@ -20,6 +20,14 @@
 #ifndef __CSILINE_H__
 #define __CSILINE_H__
 
+/**\file
+ * Crystal Space Windowing System: input line class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 
 /// Possible input line frame styles
@@ -115,5 +123,7 @@ protected:
   /// Set text, drop the selection and don't move the cursor
   void SetTextExt (const char *iText);
 };
+
+/** @} */
 
 #endif // __CSILINE_H__

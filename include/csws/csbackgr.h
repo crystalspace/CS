@@ -20,6 +20,14 @@
 #ifndef __CSBACKGR_H__
 #define __CSBACKGR_H__
 
+/**\file
+ * Crystal Space Windowing System: background class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csgfx/rgbpixel.h"
 
 struct iTextureHandle;
@@ -100,5 +108,7 @@ public:
   void Draw (csComponent &This, int x, int y, int w, int h,
     int xorg, int yorg, uint8 iAlpha);
 };
+
+/** @} */
 
 #endif // __CSBACKGR_H__

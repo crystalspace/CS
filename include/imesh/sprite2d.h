@@ -37,12 +37,12 @@ struct csSprite2DVertex
 
 CS_TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
 
+SCF_VERSION (iSprite2DUVAnimationFrame, 0, 0, 1);
+
 /**
  * This is a single frame in a UV animation. So its not much more than a set of
  * (u.v) coordinates and a duration time.
  */
-SCF_VERSION (iSprite2DUVAnimationFrame, 0, 0, 1);
-
 struct iSprite2DUVAnimationFrame : public iBase
 {
   /**
@@ -96,6 +96,7 @@ struct iSprite2DUVAnimationFrame : public iBase
   virtual void SetDuration (int duration) = 0;
 };
 
+SCF_VERSION (iSprite2DUVAnimation, 0, 0, 1);
 
 /**
  * The animation works by having all frames of an animation sequence
@@ -103,9 +104,6 @@ struct iSprite2DUVAnimationFrame : public iBase
  * So it is basically a set of (u,v) coordinates plus a duration number.
  * for every frame.
  */
-
-SCF_VERSION (iSprite2DUVAnimation, 0, 0, 1);
-
 struct iSprite2DUVAnimation : public iBase
 {
   /**

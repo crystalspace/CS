@@ -20,6 +20,14 @@
 #ifndef __CSGFXPPL_H__
 #define __CSGFXPPL_H__
 
+/**\file
+ * Crystal Space Windowing System: Graphics Pipeline class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csgeom/csrect.h"
 #include "cstool/cspixmap.h"
 #include "ivideo/graph2d.h"
@@ -28,9 +36,9 @@ class csMouse;
 struct iGraphics2D;
 struct iObjectRegistry;
 
-// Maximal number of primitives which can be drawn IN ONE FRAME
+/// Maximal number of primitives which can be drawn IN ONE FRAME
 #define MAX_CSWS_PIPELINE_LENGTH 16384
-// Maximal number of video pages to sync image
+/// Maximal number of video pages to sync image
 #define MAX_SYNC_PAGES 8
 
 /**
@@ -197,5 +205,7 @@ private:
   /// The canvas has been resized, query frame width/height
   void CanvasResize ();
 };
+
+/** @} */
 
 #endif // __CSGFXPPL_H__

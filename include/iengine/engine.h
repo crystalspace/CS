@@ -20,6 +20,9 @@
 #ifndef __IENGINE_ENGINE_H__
 #define __IENGINE_ENGINE_H__
 
+/**\file
+ */
+
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 

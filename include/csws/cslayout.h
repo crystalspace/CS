@@ -20,6 +20,10 @@
 #ifndef __CSLAYOUT_H__
 #define __CSLAYOUT_H__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csws/csdialog.h"
 #include "csgeom/cspoint.h"
 
@@ -186,5 +190,7 @@ class csLayout2 : public csLayout
   virtual float GetLayoutAlignmentX () = 0;
   virtual float GetLayoutAlignmentY () = 0;
 };
+
+/** @} */
 
 #endif // __CSLAYOUT_H__

@@ -22,7 +22,7 @@
 
 /**
  * General 3D sparse matrix class. This is an abstract class.
- * Specific implementations are csWideSparce3D and csDenseSparse3D.
+ * Specific implementations are csWideSparse3D and csDenseSparse3D.
  */
 class csSparse3D
 {
@@ -32,10 +32,10 @@ public:
   ///
   virtual ~csSparse3D () { }
 
-  ///
+  /// 
   virtual void Clear () = 0;
 
-  ///
+  /// 
   virtual void Set (int x, int y, int z, void* obj) = 0;
 
   ///

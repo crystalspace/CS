@@ -20,6 +20,14 @@
 #ifndef __IUTIL_PLUGIN_H__
 #define __IUTIL_PLUGIN_H__
 
+/**\file
+ */
+ 
+/**
+ * \addtogroup scf
+ * @{ */
+
+
 #include "csutil/scf.h"
 
 struct iComponent;
@@ -83,5 +91,7 @@ struct iPluginManager : public iBase
   /// Unload all plugins from this plugin manager.
   virtual void Clear () = 0;
 };
+
+/** @} */
 
 #endif // __IUTIL_PLUGIN_H__

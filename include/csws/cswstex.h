@@ -20,6 +20,10 @@
 #ifndef __CSWSTEX_H__
 #define __CSWSTEX_H__
 
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "csgfx/csimage.h"
 #include "csutil/csvector.h"
 
@@ -128,5 +132,7 @@ public:
     return idx >= 0 ? (csWSTexture *)Get (idx) : (csWSTexture*)NULL;
   }
 };
+
+/** @} */
 
 #endif // __CSWSTEX_H__

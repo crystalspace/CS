@@ -20,6 +20,14 @@
 #ifndef __CSDIALOG_H__
 #define __CSDIALOG_H__
 
+/**\file
+ * Crystal Space Windowing System: dialog window class
+ */
+
+/**
+ * \addtogroup csws
+ * @{ */
+ 
 #include "cscomp.h"
 
 /**
@@ -157,5 +165,7 @@ protected:
   /// Place all dialog items in correspondence to GridX, GridY and SnapSizeToGrid
   bool PlaceItems ();
 };
+
+/** @} */
 
 #endif // __CSDIALOG_H__
