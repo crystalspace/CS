@@ -18,14 +18,13 @@ Crystal Space is a free (LGPL) and portable 3D Game Development Kit written in C
 
 %build
 make linux INSTALL_DIR=%buildroot/usr/local/crystal/
-#make linux
 make all
+##### for manual building... obsolete since it compiles fin on rh8 now
 #make depend
 #make libs        # Make all static libraries
 #make plugins     # Make all plug-in modules including drivers
 #make meshes      # Make all mesh plugins
 #make drivers     # Make all drivers
-#### thanks to one application not building we will just do all the others manually
 #make bumptst      #Make the Crystal Space bumpmap test
 #make wstest       #Make the Crystal Space Windowing System test
 #make demo         #Make the Crystal Space Demo
@@ -138,7 +137,7 @@ rm -rf "$RPM_BUILD_ROOT"
 /usr/local/crystal/include/ivaria/*.h
 /usr/local/crystal/include/ivideo/*.h
 /usr/local/crystal/include/ivideo/effects/*.h
-/usr/local/crystal/include/ivideo/*.h
+/usr/local/crystal/include/ivideo/shader/*.h
 
 /usr/local/crystal/install.log
 
@@ -149,6 +148,15 @@ rm -rf "$RPM_BUILD_ROOT"
 /usr/local/crystal/uninst
 /usr/local/crystal/vfs.cfg
 
+/usr/local/crystal/docs/html/plugins/engine/*.png
+/usr/local/crystal/docs/html/tutorial/howto/msvcproj/*.jpg
+
+/usr/local/crystal/docs/pubapi/doxygen.css
+/usr/local/crystal/lib/*.a
+
 %changelog
+* Tue Dec 24 2002 Che <newrpms.sunsite.dk>
+- Some adaptions for latest cvs tarball
+
 * Thu Nov 14 2002 Che <newrpms.sunsite.dk>
 - Initial rpm release
