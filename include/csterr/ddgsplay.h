@@ -37,10 +37,17 @@ class WEXP ddgSplayKey
         unsigned int _value;
         /// The value broken into pieces.
         struct {
+#if (defined(OS_SOLARIS))
+            /// Triangle index.
+	        unsigned short _index;
+            /// The tree index.
+            unsigned short _tree;
+#else
             /// The tree index.
             unsigned short _tree;
             /// Triangle index.
 	        unsigned short _index;
+#endif
         } _ti;
     };
 
