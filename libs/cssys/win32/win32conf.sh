@@ -92,7 +92,7 @@ if [ $? -eq 0 ]; then
 else
   ${CXX} -o comptest comptest.cpp -lmingwex 2>/dev/null
   if [ $? -eq 0 ]; then
-    echo "MINGW_LIBS += -lmingwex"
+    echo "LIBS.SYSTEM += -lmingwex"
     msg_result "yes"
   else
     msg_result "no"

@@ -55,8 +55,8 @@ if not /%1/ == /mingw32/ goto nomingwex
   gcc conftest.cpp -lmingwex -o conftest.exe >nul
   if not exist conftest.exe goto nomingwex
   del conftest.exe >nul
-  echo $$$ Yes, setting MINGW_LIBS to "-lmingwex"
-  echo MINGW_LIBS = -lmingwex>>config.tmp
+  echo $$$ Yes, adding "-lmingwex" to LIBS.SYSTEM
+  echo LIBS.SYSTEM += -lmingwex>>config.tmp
 
 :nomingwex
   echo ### Testing whether you have (the right version of) NASM installed ...

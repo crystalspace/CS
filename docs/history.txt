@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+1-Jan-2003
+	- Eric Sunshine merged cygwin.mak into win32gcc.mak.  Now there is a
+	  single makefile configuration target for Cygwin and Mingw users.
 31-Dec-2002
 	- Eric Sunshine made the following configuration and makefile changes:
 	    - chkxfree.sh now publishes the additonal makefile variables

@@ -1,8 +1,8 @@
-# This is the makefile for MinGW32 compiler (gcc for Win32)
-# Optionally works with the MSYS environment.
+# This is the makefile for Mingw and Cygwin (gcc for Win32)
+# With Mingw, optionally works with the MSYS environment.
 
 # Friendly names for building environment
-DESCRIPTION.win32gcc = Windows with Mingw
+DESCRIPTION.win32gcc = Windows with Mingw or Cygwin
 DESCRIPTION.OS.win32gcc = Win32
 
 # Choose which drivers you want to build/use
@@ -53,8 +53,9 @@ O=.o
 LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
-# MINGW_LIBS comes from the local config.mak and is set up by win32conf.sh.
-LIBS.EXE= $(LFLAGS.l)gdi32 $(MINGW_LIBS) $(LFLAGS.l)shell32 
+# LIBS.SYSTEM comes from the local config.mak and is set up by win32conf.sh.
+LIBS.EXE= $(LFLAGS.L)/usr/lib/w32api $(LFLAGS.l)gdi32 $(LIBS.SYSTEM) \
+  $(LFLAGS.l)shell32 
 
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1.1 for Win32
@@ -106,16 +107,11 @@ CFLAGS.DLL=
 # General flags for the linker which are used in any case.
 LFLAGS.GENERAL = $(CSTHREAD.LFLAGS)
 
-# Extra linker flags used by MSYS
-ifneq (,$(MSYSTEM))
-LFLAGS.GENERAL += $(LFLAGS.L)/usr/lib/w32api
-endif
-
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=-s
 
 # Flags for the linker which are used when debugging.
-LFLAGS.debug=-g
+LFLAGS.debug=-g3
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg
