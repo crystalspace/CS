@@ -29,6 +29,7 @@ SCF_IMPLEMENT_IBASE_END
 csEventCord::csEventCord(int cat, int subcat) :
   category(cat), subcategory(subcat)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   plugins = NULL;
   // By default, only pass along category 0, subcategory 0 events to the queue.
   pass = (category == 0 && subcategory == 0);

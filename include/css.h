@@ -103,6 +103,7 @@
 #include "iengine/texture.h"
 #include "iengine/viscull.h"
 #include "igeom/clip2d.h"
+#include "igeom/polymesh.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"

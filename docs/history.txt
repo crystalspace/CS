@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+21-May-2002
+	- Added include/igeom/polymesh.h to css.h.
+	- Fixed bug with csEvCord not calling SCF_CONSTRUCT_IBASE in
+	  constructor.
 20-May-2002
 	- csThing now implements GetWriteObject(). Currently it will
 	  just return the full detail version of the thing. A lower
