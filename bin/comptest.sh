@@ -88,6 +88,21 @@ ${CXX} -O2 comptest.cpp -o comptest
 ./comptest 2>/dev/null || echo "CS_QINT_WORKAROUND = yes"
 
 #------------------------------------------------------------------------------
+# Check if compiler is GCC 3.x+. This is needed because GCC 3.x have some 
+# changes which are incompatible with older GCC's.
+#------------------------------------------------------------------------------
+cat << TEST > comptest.cpp
+int main()
+{
+#if (defined  (__GNUC__)) && (__GNUC__ >=3)
+#error Yes, this is GCC 3.x+
+#endif
+return 0;
+}
+TEST
+${CXX} -c comptest.cpp 2>/dev/null || echo "CFLAGS.SYSTEM += -DCOMP_GCC3"
+
+#------------------------------------------------------------------------------
 # Clean up.
 #------------------------------------------------------------------------------
 rm -f comptest.cpp comptest.o comptest
