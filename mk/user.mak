@@ -51,6 +51,7 @@ PLUGINS.DYNAMIC += metaball
 PLUGINS.DYNAMIC += motion
 #PLUGINS.DYNAMIC += csstdldr
 #PLUGINS.DYNAMIC += csgame/gamecore
+PLUGINS.DYNAMIC += iso
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
