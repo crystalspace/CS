@@ -1,5 +1,21 @@
 The history order is reversed so that new features are at the top.
 
+21-Dec-2002
+	- Eric Sunshine removed the NextStep, OpenStep, and MacOS/X Server 1.0
+	  (Rhapsody) ports of Crystal Space.  Implementation files which were
+	  shared with the remaining MacOS/X port were relocated from "next"
+	  directories in the project tree to "macosx" directories.  Class
+	  names, SCF names, resources, makefile variables, makefile targets,
+	  etc.  were renamed so as to mention "OSX", "MACOSX", or "Cocoa" as
+	  appropriate instead of the older "NeXT", "NEXT", and "next".  The
+	  following files and directories were tagged with NEXT_OBSOLETE in
+	  order to simplify recovery from the CVS Attic if necessary.
+	    data/config/next.cfg
+	    docs/texinfo/build/platform/next.txi
+	    docs/texinfo/internal/platform/next.txi
+	    include/cssys/next
+	    libs/cssys/next
+	    plugins/video/canvas/next
 20-Dec-2002
 	- Clarified a few Doxygen comments in the engine.
 	- Added iLightingInfo->StaticLightChanged() to notify a mesh
