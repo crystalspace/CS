@@ -1,79 +1,82 @@
 The history order is reversed so that new features are at the top.
 
 21-Feb-2003
-	- Wyatt Miler suggested a work around for what seems to be a
-	  gcc 3.1 compiler bug which triggers on MacOS/X (PowerPC) in
-	  the tiny XML parser.
-	- Fixed a bug in iEngine->GetNearbyObjects(). This bug could cause
-	  infinite loops in cases where there is a portal from A->B and
-	  then another portal back from B->A which is also visible from
-	  the viewpoint of the center.
+	- Wyatt Miler suggested a work around for what seems to be a gcc 3.1
+	  compiler bug which triggers on MacOS/X (PowerPC) in the tiny XML
+	  parser.
+	- Fixed a bug in iEngine->GetNearbyObjects().  This bug could cause
+	  infinite loops in cases where there is a portal from A->B and then
+	  another portal back from B->A which is also visible from the
+	  viewpoint of the center.
+	- Eric Sunshine augmented the configure script so that it uses libm.a
+	  (if available) when testing for GLU, since apparently some GLU tests
+	  (such as RedHat 8.0) fail without it.
 20-Feb-2003
 	- Anders Stenberg fixed a bug in shader loader causing fragment
 	  programs not to load.
-	- Apparently in some cases AWS calls g2d->SetClipRect() with a
-	  clipping rectangle that goes outside of screen boundaries. This
-	  can cause crashes when using the software renderer and when drawing
-	  primitives that actually go beyond the screen boundaries but stay
-	  in the clipping rectangle. I don't know enough about AWS to fix
-	  this bug in AWS itself but for now I fixed the problem by
-	  clamping the clip rect in g2d to the size of the screen so it is
-	  now impossible to make the clip rect go outside screen boundaries.
+	- Apparently in some cases AWS calls g2d->SetClipRect() with a clipping
+	  rectangle that goes outside of screen boundaries.  This can cause
+	  crashes when using the software renderer and when drawing primitives
+	  that actually go beyond the screen boundaries but stay in the
+	  clipping rectangle.  I don't know enough about AWS to fix this bug in
+	  AWS itself but for now I fixed the problem by clamping the clip rect
+	  in g2d to the size of the screen so it is now impossible to make the
+	  clip rect go outside screen boundaries.
 	- The engine no longer crashes if the camera has a NULL sector.
-	- Removed the totally unused csWireFrame class from the engine.
-	  It was not even possible to use it since there was no SCF
-	  API to access it. And it doesn't belong in the engine anyway.
+	- Removed the totally unused csWireFrame class from the engine.  It was
+	  not even possible to use it since there was no SCF API to access it.
+	  And it doesn't belong in the engine anyway.
 	- Removed the obsolete and broken map commands in walktest.
-	- Fixed a bug in the engine where it would forget to load the
-	  default culler in one of the IntersectSegment functions. So if
-	  the sector was not visited then this could cause a crash.
-	- Matze removed the really unfinished plugins in 
+	- Fixed a bug in the engine where it would forget to load the default
+	  culler in one of the IntersectSegment functions.  So if the sector
+	  was not visited then this could cause a crash.
+	- Matze removed the really unfinished plugins in
 	  plugins/mesh/spr3d/persist/impexp and
-	  plugins/mesh/thing/persist/impexp
-	- Matze removed comments about 8.3 filenames from CS docs. Even djgpp
+	  plugins/mesh/thing/persist/impexp.
+	- Matze removed comments about 8.3 filenames from CS docs.  Even djgpp
 	  (which isn't supported anymore) was able to use long names in win9x.
 	- Matze removed invalid dependencies from netmtest and perl5tst
 	  makefiles.
 19-Feb-2003
-	- Mårten Svanfeldt fixed a bug introduced when adding the new
+	- Marten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing
 	  #ifdef CS_USE_NEW_RENDERER.
-	- Mårten Svanfeldt changed the way lights are handled in new renderer
+	- Marten Svanfeldt changed the way lights are handled in new renderer:
 	    - Lights now have a influence radius which is different from the
-	      normal radius. Influence radius is the distance at which the light
-	      have 1/256 (or 1/512, 1/1024 it is configurable) of the intensity
-	      in the center. Influence radius is used to determin wheter i light
-	      needs to be used or not to draw on a specific spot.
-	    - The way culling of lights and objects work is changed. An more 
+	      normal radius.  Influence radius is the distance at which the
+	      light have 1/256 (or 1/512, 1/1024 it is configurable) of the
+	      intensity in the center.  Influence radius is used to determin
+	      wheter i light needs to be used or not to draw on a specific
+	      spot.
+	    - The way culling of lights and objects work is changed.  An more
 	      in depth description of how it's done is in a comment in
-	      Sector::Draw.
+	      Sector::Draw().
 	    - Shadows now use depthfail shadows if we are in the shadow-volume.
 	- Fixed a memory leak in the OpenGL renderer.
 	- Philip Wyett updated configure script from 0.96 to 0.97dev.
 18-Feb-2003
-	- Philipp Aumayr updated bugplug for render3d api changes and "repaired"
-	  history.txt for Philipp Wyett (wrong indent :o)
+	- Philipp Aumayr updated bugplug for render3d api changes and
+	  "repaired" history.txt for Philipp Wyett (wrong indent :o)
 	- Philip Wyett removed commiter related info from flex skeleton file to
 	  remove it from being generated into skinlex.cpp and creating cvs
 	  changes and conflict.
-	- Applied a patch from Anders Reggestad <anders@pvv.ntnu.no> which
-	  does the following:
-	    - Fixed the windows implementation of csGetTicks() so it is
-	      MT safe.
+	- Applied a patch from Anders Reggestad <anders@pvv.ntnu.no> which does
+	  the following:
+	    - Fixed the windows implementation of csGetTicks() so it is MT
+	      safe.
 	    - Fixed the unix implementation of csGetTicks() so it no longer
 	      overflows (there was currently an overflow every eight hours).
-	    - Fixed the MacOS/X implementation of csGetTicks() so it is
-	      MT safe.
+	    - Fixed the MacOS/X implementation of csGetTicks() so it is MT
+	      safe.
 	    - Fixed a wrapping bug in the virtual clock.
-	- Light ID's are now MD5 keys instead of simple numbers. This is
-	  done to solve a bug with multiple regions and light id's not
-	  matching with the cached light id's in the lightmap cache.
-	  This fixes a bug with pseudo-dynamic lights not working if they
-	  are loaded differently from when they were loading at relighting
-	  time.
+	- Light ID's are now MD5 keys instead of simple numbers.  This is done
+	  to solve a bug with multiple regions and light id's not matching with
+	  the cached light id's in the lightmap cache.  This fixes a bug with
+	  pseudo-dynamic lights not working if they are loaded differently from
+	  when they were loading at relighting time.
 	- Changed iEngine->FindLight(id) to iEngine->FindLightID().
-	- Changed the engine so it now reports the first 4 objects for which
-	  it couldn't load lighting.
+	- Changed the engine so it now reports the first 4 objects for which it
+	  couldn't load lighting.
 17-Feb-2003
 	- Steven Geens reports: milk2spr now mentions apps/tests/mottest as its
 	  code example.
@@ -81,7 +84,7 @@ The history order is reversed so that new features are at the top.
 	  moment and lacks some autoconf macros and msvc setup...
 	- Fixed a problem in the spr3dldr.cpp with 'char*' being used instead
 	  of 'const char*' to store the result of GetAttributeValue().
-	- Greg Block fixed MacOSX load library paths.
+	- Greg Block fixed MacOS/X load library paths.
 	    - We support loading from the install path, "components"
 	      subdirectory (as configured by build)
 	    - We also attempt to load from the current working directory.
@@ -97,7 +100,7 @@ The history order is reversed so that new features are at the top.
 	  awstxtbx.cpp could invoke cursor-- even when cursor==0 when DEL was
 	  pressed.
 	- Daniel Duhprey did the following to the new renderer:
-	    - Moved the lighting parameters into the MeshObject 
+	    - Moved the lighting parameters into the MeshObject
 	    - Added capped volumes specified via a flag in iMeshObject
 	    - Changed renderer to support Carmack's Reverse for capped volumes
 		- Removed itoa in trade for sprintf in gmeshldr
@@ -153,7 +156,7 @@ The history order is reversed so that new features are at the top.
 	    - JNG loader works better with single-frame MNGs
 	    - BMP didn't honor the padding of scanlines to a multiple of 4
 	- res augmented gfxtest to add an alpha channel if none is present.
- 	- res changed csImageFile::convert_pal8() to ensure the image palette 
+ 	- res changed csImageFile::convert_pal8() to ensure the image palette
  	  has at least 256 entries.
 	- Added 'openglcanvas' target which compiles the OpenGL canvas
 	  relevant for the given OS (similar to 'softcanvas').
@@ -221,7 +224,7 @@ The history order is reversed so that new features are at the top.
 	      the particle.
 	    - Field accel EmitGen3D can be given, as above, but for the
 	      acceleration.
-	    - ContainerBox can be specified: particles outside this box are not 
+	    - ContainerBox can be specified: particles outside this box are not
 	      rendered. They are also not respawned, because I'm afraid it would
 	      create too many short-aged particles, and destroy the look of it.
 	    - The loader has XML format for these features.
@@ -234,10 +237,10 @@ The history order is reversed so that new features are at the top.
 	- Marten Svanfeldt optimized shader variable system.
 	- Marten also added fixes to the way the new texture manager handles
 	  cubemaps.
-	- Paul Garceau noted a known bug with Win98/ME platforms having to do with
-	  the use of dllwrap.exe under Msys/Mingw (win32gcc.mak).  This bug has been
-	  relegated to the area of a systems platform specific bug.  It does not affect
-	  any other build platforms, including Cygwin.
+	- Paul Garceau noted a known bug with Win98/ME platforms having to do
+	  with the use of dllwrap.exe under Msys/Mingw (win32gcc.mak).  This
+	  bug has been relegated to the area of a systems platform specific
+	  bug.  It does not affect any other build platforms, including Cygwin.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.
@@ -420,7 +423,7 @@ The history order is reversed so that new features are at the top.
 	      sky, but before wall which is drawn f2b. in map2cs tut6 this
 	      reduces the z-fighting problems, but doesn't solve them.
 	    - Cleaned .scf file loading (no need for version key any more).
-	    - Fixed possible crash in csparser (char* could've been NULL 
+	    - Fixed possible crash in csparser (char* could've been NULL
 	      but was unconditionally delete[]d).
 	- Matthias Braun changed scfreg to allow creation of .scf files
 	  (default now).
@@ -457,7 +460,7 @@ The history order is reversed so that new features are at the top.
 	  Added an assert to protect for future equivalent bugs.
 	- Fixed a bad bug in cs2xml which I introduced yesterday.
 	- The parsing of LEN now actually works with cs2xml.
-	- Anders Stenberg added actual support for different meshtypes 
+	- Anders Stenberg added actual support for different meshtypes
 	  in new renderer. (Triangle strips, quads, points, lines, etc.)
 	- Anders also did a small fix to rndbuf.h.
 	- res did some minor changes in csendian.h to be better accessible via
@@ -469,7 +472,7 @@ The history order is reversed so that new features are at the top.
 	  a simple sample.
 	- res XMLified map2cs. Still needs some work. And cleanup. map2cs
 	  seems to have quite a few features not mentioned anywhere and
-	  probably unknown to everyone. 
+	  probably unknown to everyone.
 7-Feb-2003
 	- Fixed levtool so that by default it now gives usage information
 	  instead of the -list option. That way people will not forget
@@ -527,7 +530,7 @@ The history order is reversed so that new features are at the top.
 	  errors when linking against opengl32.lib (libopengl32.a).
 	- res did the following:
 	    - Added routines for packed RGB/RGBA vs. csRGBcolor/csRGBpixel
-	      conversions; should work correctly on platforms where 
+	      conversions; should work correctly on platforms where
 	      sizeof(csRGBcolor) != 3 or sizeof(csRGBpixel) != 4.
 	    - Minor documentation changes.
 	- Matthias Braun did a little code cleanup in cs-config and made it
@@ -1090,7 +1093,7 @@ The history order is reversed so that new features are at the top.
 	    - Replaced ilogb() with csLog2() in terrbig.
 	    - Leaks fixed in terrbig.
 	    - Walktest now properly cleans up if initialization fails.
-	    - Put static vars from csDynaVis::UpdateCoverageBuffer() into 
+	    - Put static vars from csDynaVis::UpdateCoverageBuffer() into
 	      CS_IMPLEMENT_STATIC_VAR() to fix leaks
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.
@@ -1504,7 +1507,7 @@ The history order is reversed so that new features are at the top.
 	    - Walktest: csInitializer::DestroyApplication() inserted after
 	      cmd line help (required so console window is kept open after
 	      help).
-	    - Commented out a DecRef() which seemed to cause a crash in 
+	    - Commented out a DecRef() which seemed to cause a crash in
 	      csThingObjectType::FindCurveTemplate().
 	- Keith Fulton did the following:
 	    - Fixed bug in DeleteAll of csPArray and csRefArray which
@@ -1565,7 +1568,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl
 	  during configuration process.
 	- Steven Geens made milk2spr add normals to the vertices.
-	- Andreas Busch modified the documentation for spr2d/spr3d/cal2cs 
+	- Andreas Busch modified the documentation for spr2d/spr3d/cal2cs
 	  from old syntax to XML.
 	- Eric Sunshine fixed some Texinfo mark-up errors and eliminated a
 	  number of overfull and underfull hbox warnings reported by TeX.
@@ -1953,7 +1956,7 @@ The history order is reversed so that new features are at the top.
 	    - Added ability for people with GCC 3.0 or above to specify
 	      'athlon' at config time.
 	      e.g. make linux CPU=athlon ARCH=athlon MODE=debug
-	    - Eliminated some compiler warnings under optimize build. 
+	    - Eliminated some compiler warnings under optimize build.
 	    - Some minor code cleaning in lview.cpp.
 	    - Some code cleaning and tweaks. Including case where csColor
 	      ... c.red and c.green were being * by 255 and c.blue was
@@ -2189,13 +2192,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine added to the user manual an `md32spr' tutorial written
 	  by Manjunath Sripadarao <msripada@@evl.uic.edu>.
 	- Keith Fulton added a separate socket vector to the sprite3d objects,
-	  which is copied from the factory at creation time and then is 
-	  independent.  The way sockets were only on factories, only one mesh 
-	  could be assigned to a socket across all parent meshes from a 
+	  which is copied from the factory at creation time and then is
+	  independent.  The way sockets were only on factories, only one mesh
+	  could be assigned to a socket across all parent meshes from a
 	  certain factory.
 16-Dec-2002
 	- Peter Amstutz did the following:
-	    - When an object is reparented to another object with 
+	    - When an object is reparented to another object with
 	      iMeshWrapper()->GetChildren()->Add(), the child gets
 	      removed from the culler entirely.  This is bad.  This
 	      change fixes that so that the object is added back to the
@@ -2559,7 +2562,7 @@ The history order is reversed so that new features are at the top.
 2-Dec-2002
 	- Charlls Al'Quarra did the following:
 	  Fixed the prototype of CS_TYPEDEF_GROWING_ARRAY_EXT on 79: the
-	  move must be of size length - n - 1 instead of limit - n - 1. 
+	  move must be of size length - n - 1 instead of limit - n - 1.
 	  Also added a Macro Extra called HANDLECHUNKS that allow to
 	  handle segments of arrays in one insert/delete call.
 	  I hope i didnt break something this time =^)
@@ -2725,7 +2728,7 @@ The history order is reversed so that new features are at the top.
 	- Marten Svanfeldt fixed problems created by dentoids
 	  commit-problems.
 	- Peter Amstutz did the following to ODE dynamics plugin:
-	  Properly initializes contact joints, including the 
+	  Properly initializes contact joints, including the
 	  EXTREMELY important flag dContactSoftCFM, which is
 	  necessary to avoid instability (phystut is stable now!)
 	- Charlls Al'Quarra did the following:
@@ -3190,7 +3193,7 @@ The history order is reversed so that new features are at the top.
 	- 'res' did the following:
 	    - GL texture bit depth can be specified through configs.
 	    - Forcing a texture format didn't work.
-	    - Moved code to prepare keycolored textures out of 
+	    - Moved code to prepare keycolored textures out of
 	      csTextureHandleOpenGL::FindFormatType() into its own
 	      method.
 	    - Small adjustment so keycolored textures are compressed as well.
@@ -3803,8 +3806,8 @@ The history order is reversed so that new features are at the top.
 	    - Made classinterface for threading.
 	    - Renamed THREAD.INC to CS_THREAD.INC.
 	- 'res' did the following:
-	    - Replaced some EPS files w/ versions without 
-	      %%BeginBinary / %%EndBinary 
+	    - Replaced some EPS files w/ versions without
+	      %%BeginBinary / %%EndBinary
 	    - Removed '% -*-texinfo-*-' which appeared on the first page.
 	    - Removed .vcproj and .sln files form .cvsignore.
 	- Eric Sunshine upgraded CS/docs/texinfo/texinfo.tex to the most recent
@@ -5043,7 +5046,7 @@ The history order is reversed so that new features are at the top.
 	    - Cosmetic changes in SyntaxService node path output.
 	    - Cosmetic changes in message box display.
 	    - A bad XML token emits now a warning, not an error.
-	    - ParseMixmode() is smarter; it detects when more than 1 exclusive 
+	    - ParseMixmode() is smarter; it detects when more than 1 exclusive
 	      mode is specified.
 	    - Removed gl3d-ext from msvcgen required.mak.
 	    - Commented out "#error disable exceptions" in opcode.
@@ -5298,8 +5301,8 @@ The history order is reversed so that new features are at the top.
 	    - Added paragraph about problems w/ non-latin chars in CS path
 	      to MSVC docs.
 	    - More documentation modules.
-	    - Fixed a bug in csComponent::do_handle_event where a 
-	      crash occured after a child component destroyed itself 
+	    - Fixed a bug in csComponent::do_handle_event where a
+	      crash occured after a child component destroyed itself
 	      inside HandleEvent().
 	    - Removed '#include "imap/services.h"' from initapp.cpp.
 	    - When csLoader::LoadImage() doesn't find a file it now tries
@@ -5664,7 +5667,7 @@ The history order is reversed so that new features are at the top.
 	    - Reactivated plugin resource stuff.
 	    - Documentation stuff. added some include file descriptions and
 	      a new module, '3D Engine'.
-	    - Minor changes in documentation (some doxygen stuff, no 
+	    - Minor changes in documentation (some doxygen stuff, no
 	      content changed).
 	- Philip Wyett did the following:
 	    - Fixed include in ms2spr.cpp for the 3rd and LAST time!!!
@@ -5728,12 +5731,12 @@ The history order is reversed so that new features are at the top.
 	      which sometimes caused a crash when making a screenie.
 	    - Made csSpriteBuilder::Build() 'smarter': instead of making an
 	      output vertex of every point of every polygon it now only
-	      outputs vertices with a unique point/normal/texture coord. combo 
+	      outputs vertices with a unique point/normal/texture coord. combo
 	    - Changed default texture corrdinates for files without them
 	      to a planar mapping.
-	    - Added some support for normals to the 3d sprite loader 
+	    - Added some support for normals to the 3d sprite loader
 	      (optional; appear behind a texcoords [V(x,y,z:u,v:nx,ny,nz)],
-	      default to zero so they are calculated by 
+	      default to zero so they are calculated by
 	      csSprite3DMeshObjectFactory::ComputeNormals() when not
 	      specified).
 	    - csSprite3DMeshObjectFactory::ComputeNormals() now only calculates
@@ -5776,10 +5779,10 @@ The history order is reversed so that new features are at the top.
 	- 'res' did the following:
 	    - Added a bit of information on the rc merger script expects
 	      rc files to be shaped.
-	    - Deactivated resource stuff for plugins again, there are 
+	    - Deactivated resource stuff for plugins again, there are
 	      still problems.
 	    - Small changes to calculation of glyph bitmap height and my
-	      workaround for miscalculated sizes. fonts are rendered a bit 
+	      workaround for miscalculated sizes. fonts are rendered a bit
 	      better now.
 	- Philip Wyett did the following:
 	    - Fixed compile error in cs2xml.
@@ -5897,8 +5900,8 @@ The history order is reversed so that new features are at the top.
 	    - Forgot to commit an OpenGL header.
 	    - Temporary fix to msvcgen. disabled .rc generation until we
 	      find out how to properly fix it.
-	    - Found a reason for the crash of the new DrawTriangleMesh(). 
-	      it always passed the pointer of the original triangle data to 
+	    - Found a reason for the crash of the new DrawTriangleMesh().
+	      it always passed the pointer of the original triangle data to
 	      glDrawElements() which caused problems when the mesh is clipped
 	      and the resulting mesh had less triangles than the original. now
 	      it crashes less but isn't bug-free yet. check the sydney level:
@@ -6154,7 +6157,7 @@ The history order is reversed so that new features are at the top.
 	    - Code cleanup while familiarizing myself with code (glx2d.cpp).
 	- Ryan Surkamp created HitBeamOutline functions, should work except
 	  for the fact that the object code doesn't do anything to float
-	  *pr.  Mainly due to the fact that I don't know what it is.  
+	  *pr.  Mainly due to the fact that I don't know what it is.
 	  Left on my todo list is a code cleanup, maybe a debug helper, and
 	  lighting (bcterr).
 	- Ryan removed box / linesegment test. Worked on hit beams.
@@ -6293,7 +6296,7 @@ The history order is reversed so that new features are at the top.
 	- 'res' fixed DLLWRAPWRAP under cmd.
 20-Jul-2002
 	- 'res' added workarounds for crash & weird artifacts with
-	  freefont 2.1.2 (maybe someone with a little more knowledge 
+	  freefont 2.1.2 (maybe someone with a little more knowledge
 	  about freetype than I have should find out the real cause).
 	- Philip Wyett encapsulated the recently added crtdbg.h (msvc only
 	  header) so it is only read into MSVC compiles (for freefnt2).
@@ -7171,7 +7174,7 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett updated links to msvc_libs for MSVC7 to latest
 	  version 0.94e.
 	- Res did the following:
-	    - Removed workaround for bug in mipmap_0... 
+	    - Removed workaround for bug in mipmap_0...
 	    - Reincarnated the glwin32 window z order hack... but not that
 	      ugly anymore.
 	    - Added support for image output options. Currently supported by
@@ -7400,20 +7403,20 @@ updated3-Jun-2002
 	  place the lightmaps correctly and doesn't crash (and well, that's
 	  important :). It seems stable, but is still under observation.
 	- Res did some fixes to OpenGL/windows and ddraw canvases:
-	    - In fullscreen mode glwin32 canvas now behaves the same as 
-	      ddraw canvas when the window is deactivated (through alt+tab 
+	    - In fullscreen mode glwin32 canvas now behaves the same as
+	      ddraw canvas when the window is deactivated (through alt+tab
 	      or win key).
 	    - Window isn't always on top now. there's a method to explicitly
 	      cover the task bar mentioned in the Windows Shell docs. Works
 	      fine on win2000, what about the other ones?
-	    - Added small hack to glwin32 debug build to work around 
+	    - Added small hack to glwin32 debug build to work around
 	      the problem that in fs mode the app window covers the IDE while
 	      debugging.
 	    - glwin32 and ddraw canvas now try to set the fs video mode with
 	      a display frequency specified in the Video.DisplayFrequency
 	      cfgvar. If the modeswitch fails the first time or the
 	      cfgvar == 0 the default frequency is used.
-	    - Added an #ifdef so the latest ddraw.h isn't needed 
+	    - Added an #ifdef so the latest ddraw.h isn't needed
 	      (display frequency frequency req. dd7; won't be enabled
 	      w/ older with headers).
 	- Christopher Nelson added 'State' to SetProperty() for the checkbox
@@ -7593,9 +7596,9 @@ updated3-Jun-2002
 	    - Changed MSVC project name to 'freefnt2'.
 	    - Added command line help for win32 -[no]console.
 	    - Window icon is tried to be loaded from <excutable>.ico.
-	    - glwin32 supports specification of depth buffer bits through 
+	    - glwin32 supports specification of depth buffer bits through
 	      Video.OpenGL.DepthBits cfgvar.
-	    - Added support for AlertV() to win32 canvases (displays a 
+	    - Added support for AlertV() to win32 canvases (displays a
 	      message box).
 	    - g2dtest didn't set the window title.
 	- Philip Wyett changed scf.cfg so original odivx plugin is default
@@ -7628,7 +7631,7 @@ updated3-Jun-2002
 	      Now there is only 'native' support for level 0 (blurring) and
 	      level 1, level 2 and 3 generation weren't used by anything but
 	      gfxtest anyway. Mipmap levels >1 are now generated by creating a
-	      level 1 mipmap repeatedly. 
+	      level 1 mipmap repeatedly.
 	    - Fixed incorrect handling of 1-row/column mipmaps.
 	    - Added iImage::Sharpen() and csImageFile::Sharpen().
 	    - Software and GL have now options to sharpen mipmaps.
@@ -8642,10 +8645,10 @@ updated3-Jun-2002
 	      a set of triangles that pertain to that material. Textures are
 	      mapped on block level, so if sub-blocks have different textures
 	      the texture will be ignored unless that sub-block is expanded
-	      to it's full resolution. This occurs recursively for all blocks.  
+	      to it's full resolution. This occurs recursively for all blocks.
   	    - Created sets of meshes in case I have to setup different
 	      properties for each material. For the moment all meshes are
-	      equivalent except for their triangle list.  
+	      equivalent except for their triangle list.
 	      Note: I still haven't figured out how to tell the engine what
 	      material I want drawn on the triangles. G3dTriangleMesh doesn't
 	      appear to have the ability to do this, so I'll keep
@@ -8983,12 +8986,12 @@ updated3-Jun-2002
 	- Christian Bayle did an initial addition to build daily Debian
 	  package (scripts/debian).
 6-Mar-2002
-	- Matt Reda made the iso engine explicitly remove all mesh factories 
+	- Matt Reda made the iso engine explicitly remove all mesh factories
 	  at iso engine destruction for clarity.
-	- Matt Reda removed extra assignment where g3dpolyfx.mixmode was 
+	- Matt Reda removed extra assignment where g3dpolyfx.mixmode was
 	  being assigned the same value twice for isometric sprites
 	- Matt Reda removed extra screen to world calculation in iso views
-	- Matt Reda added support for splitting walktest into two views. 
+	- Matt Reda added support for splitting walktest into two views.
 	  Shift-S splits to 2 views, Shift-T toggles between the two views
 	  (allowing the user to navigate the level in the two views), and
 	  Shift-U returns to a single view (the currently active one).
@@ -9027,11 +9030,11 @@ updated3-Jun-2002
 	- 'res' changed VFS so that when a file is opened for reading the
 	  directories are not automatically created.
 	- 'res' did the following changes to lightmaps:
-	    - Changed the way lightmap is stored on disk: 
+	    - Changed the way lightmap is stored on disk:
 	      the 4th byte was 0x80 all the time, and the comment on line
 	      159 in lghtmap.cpp says it wasn't even known why :) now the
 	      4th byte is stripped when writing the lightmap and readded when
-	      reading. 
+	      reading.
 	    - Changed lightmap file magic.
 	    - Changed lmversion.
 	- Mathew Sutcliffe added csInputBinder: an auxilliary support class.
@@ -9573,7 +9576,7 @@ updated3-Jun-2002
 	      redraw problems that cause blinking during refresh. I don't
 	      think that this is related to recalculating the layout, because
 	      layouts are only refreshed during a resize and when a window is
-	      created.  
+	      created.
 	    - GridBagLayout has a bug which may be related to that, but I'm
 	      unsure. As it is, layouts work, although GridBagLayout is the
 	      only one that exists and it doesn't behave quite right.
@@ -9664,11 +9667,11 @@ updated3-Jun-2002
 	  but used as "RELATIVE" - changed to declare/define "RELATIVE" so
 	  code compiles (aws).
 12-Feb-2002
-	- Matt Reda moved the event-handling code in the OSX canvases 
-	  from the delegate to a new NSView-derived class.  The old code 
-	  wasn't detecting right button clicks for some odd reason, but 
+	- Matt Reda moved the event-handling code in the OSX canvases
+	  from the delegate to a new NSView-derived class.  The old code
+	  wasn't detecting right button clicks for some odd reason, but
 	  it works now.  Events are passed back through the delegate.
-	- Matt Reda updated the OSX canvases so that when entering/exiting 
+	- Matt Reda updated the OSX canvases so that when entering/exiting
 	  fullscreen mode, both canvases now fade in/out.
 	- Fixed iLoader::LoadLibraryFile() so that it now reports an error
 	  when the engine cannot be found.
@@ -9819,7 +9822,7 @@ updated3-Jun-2002
 	  some of the typecasts to int then switched to storing intermediate
 	  values as floats and rounding the final value. This should give
 	  more accurate result than the old method, which truncated the
-	  calculated value to an int after every calculation. 
+	  calculated value to an int after every calculation.
 	- Norman Kramer did the following:
 	    - Made the cursor in the AWS textbox to blink.
 	    - Ok, since christopher didn't reply to my mail I go ahead and
@@ -9921,7 +9924,7 @@ updated3-Jun-2002
 	  I still have to connect it to the genmesh plugin somehow and do some
 	  tests on it. Also, it has no provision for texturing at the moment.
 29-Jan-2002
-	- Jorge Acereda changed the MD2 importer so that it recognizes 
+	- Jorge Acereda changed the MD2 importer so that it recognizes
 	  sprite actions. Also, scaling and axis conventions are now
 	  coherent with mdl2spr. I hope nobody was using it :-)
 	- Jorge also fixed frame timing.
@@ -9946,7 +9949,7 @@ updated3-Jun-2002
 	    - Added new parameter for CaptureMouse which lets you specify the
 	      component that wishes to capture the mouse. Note that only this
 	      component or it's children will recieve messages until release
-	      is called.  
+	      is called.
 	    - Fixed previously broken functionality where moving from a
 	      component to the window wouldn't send out MouseEnter/Exit
 	      messages. There was a slight bug in awsTextBox that was
@@ -10053,7 +10056,7 @@ updated3-Jun-2002
 	- Christopher Nelson did the following:
 	    - Added headers for the new memory-mapped I/O stuff.
 	      Note that it looks for some bogus defines. The only one I'm
-	      pretty sure of right now is the WIN32 define.  
+	      pretty sure of right now is the WIN32 define.
 	      Note also, that there currently is no _HAS_MEMORY_MAPPED_IO_ in
 	      the build, so that code will never compile, which means that
 	      right now everything falls back to software. The hardware code
@@ -10077,7 +10080,7 @@ updated3-Jun-2002
 	      GetPointer. This will probably increase it's chances of being
 	      inlined, and remove an additional function setup/teardown even
 	      if it doesn't.
-23-Jan-2002 
+23-Jan-2002
         - Jorge Acereda fixed LoadCamera() (crashed if the sector
 	  wasn't found). Rewrote it to be more robust and coherent
 	  (either loads all parameters or none).
@@ -10197,7 +10200,7 @@ updated3-Jun-2002
 	      with walls taken into account.
 	    - AddWall() in isotest.cpp had a few fixes to render walls
 	      correctly.
-	- Diablo-D3 (unknown@panax.com) rewrote the autoconf macro from 
+	- Diablo-D3 (unknown@panax.com) rewrote the autoconf macro from
 	  scratch. The code is now cleaner, has more standard naming and
 	  can even check for a minimum CS version number.
 18-Jan-2002

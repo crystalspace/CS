@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.97dev])
+m4_define([cs_version_number], [0.97])
 
 
 
@@ -1071,8 +1071,8 @@ AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
     AC_CHECK_LIB([m], [pow],
 	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lm], [+])
-	cs_cv_libm=yes],
-	[cs_cv_libm=no])
+	cs_cv_libm=yes cs_cv_libm_libs='-lm'],
+	[cs_cv_libm=no cs_cv_libm_libs=''])
     AC_CHECK_LIB([dl], [dlopen],
 	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-ldl], [+])])
     AC_CHECK_LIB([nsl], [gethostbyname],
@@ -1177,7 +1177,8 @@ m4_define([cs_define_int32],
     ])
 
 AC_DEFUN([CS_CHECK_GL_PREPARE],
-    [AC_REQUIRE([CS_CHECK_PTHREAD])
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
+    AC_REQUIRE([CS_CHECK_PTHREAD])
     AC_REQUIRE([AC_PATH_X])
     AC_REQUIRE([AC_PATH_XTRA])
     AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
@@ -1208,6 +1209,10 @@ CS_CHECK_GL_PREPARE
 cs_gl_plat_cflags=''
 cs_gl_plat_lflags=''
 cs_gl_plat_libs=''
+AS_IF([test $cs_cv_libm = yes],
+    [cs_gl_plat_cflags="$cs_cv_libm_cflags $cs_gl_plat_cflags"
+    cs_gl_plat_lflags="$cs_cv_libm_lflags $cs_gl_plat_lflags"
+    cs_gl_plat_libs="$cs_cv_libm_libs $cs_gl_plat_libs"])
 AS_IF([test $cs_cv_sys_pthread = yes],
     [cs_gl_plat_cflags="$cs_cv_sys_pthread_cflags $cs_gl_plat_cflags"
     cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
@@ -1393,15 +1398,13 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 # also search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIB3DS_PREPARE],
-    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
-    AS_IF([test $cs_cv_libm = yes],
-	[cs_3ds_libs_test='-lm'], [cs_3ds_libs_test=''])])
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])])
 
 CS_CHECK_LIB3DS_PREPARE
 
 CS_CHECK_LIB_WITH([3ds],
     [AC_LANG_PROGRAM([#include <lib3ds/file.h>],[lib3ds_file_new();])],
-    [libs/lib3ds*], [], [], [], [], [], [$cs_3ds_libs_test])
+    [libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs])
 
 AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
