@@ -351,8 +351,8 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
 
     // Fix the page size
     if (amntvis > max) 
-      amntvis = max + 1;
-    int maxval = (float)(max - amntvis + 1);
+      amntvis = max + 1.0f;
+    int maxval = (int)(max - amntvis + 1.0f);
 
     // Fix value in case it's out of range
     value = (value < min ? min : (value > maxval ? maxval : value));
@@ -366,8 +366,8 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
 
     // Fix the page size
     if (amntvis > max) 
-      amntvis = max + 1;
-    int maxval = (float)(max - amntvis + 1);
+      amntvis = max + 1.0f;
+    int maxval = (int)(max - amntvis + 1.0f);
 
     // Fix value in case it's out of range
     value = (value < min ? min : (value > maxval ? maxval : value));
@@ -380,7 +380,7 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     value = *(float *)parm;
 
     // Fix value in case it's out of range
-    int maxval = (float)(max - amntvis + 1);
+    int maxval = (int)(max - amntvis + 1.0f);
 
     value = (value < min ? min : (value > maxval ? maxval : value));
 
