@@ -2231,7 +2231,7 @@ void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer,
 void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 {
   if (vboManager.IsValid())
-    return vboManager->RenderRelease (buffer);
+    vboManager->RenderRelease (buffer);
   else
   {
     iRenderBuffer* master;

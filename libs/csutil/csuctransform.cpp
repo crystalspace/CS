@@ -37,6 +37,7 @@ static size_t ApplyMapping (const UCMapEntry* map, const size_t mapSize,
   size_t bufRemaining = destSize;
   size_t encodedLen = 0;
 
+  // Search for the source char in the mapping table.
   size_t l = 0, r = mapSize;
   while (l < r)
   {
@@ -44,15 +45,19 @@ static size_t ApplyMapping (const UCMapEntry* map, const size_t mapSize,
     const UCMapEntry& entry = map[m];
     if (entry.mapFrom == ch)
     {
+      // Found it...
       if ((entry.mapTo & 0xff000000) == 0)
       {
+	// Simple mapping
 	_OUTPUT_CHAR(dest, entry.mapTo);
       }
       else
       {
+	// Complex mapping (multiple chars)
 	size_t auxLen = entry.mapTo >> 24;
 	size_t auxOffs = entry.mapTo & 0xffffff;
 	utf32_char outCh;
+	// Decode from the auxilary data.
 	while (auxLen > 0)
 	{
 	  int n = csUnicodeTransform::UTF16Decode (mapAux + auxOffs, 
@@ -69,6 +74,7 @@ static size_t ApplyMapping (const UCMapEntry* map, const size_t mapSize,
     else
       r = m;
   }
+  // Nothing found? Return source char.
   _OUTPUT_CHAR(dest, ch);
   return encodedLen;
 }

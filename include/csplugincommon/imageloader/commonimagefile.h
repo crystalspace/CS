@@ -17,8 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PLUGINS_VIDEO_LOADER_COMMON_COMMONIMAGEFILE_H__
-#define __CS_PLUGINS_VIDEO_LOADER_COMMON_COMMONIMAGEFILE_H__
+#ifndef __CS_CSPLUGINCOMMON_IMAGELOADER_COMMONIMAGEFILE_H__
+#define __CS_CSPLUGINCOMMON_IMAGELOADER_COMMONIMAGEFILE_H__
+
+/**\file
+ * Base classes for image loaders.
+ */
 
 #include "csextern.h"
 #include "iutil/databuff.h"
@@ -26,11 +30,23 @@
 #include "csutil/ref.h"
 #include "csgfx/memimage.h"
 
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
+/**
+ * The data type a loader provides. The data is automatically converted
+ * to the needed image format.
+ */
 enum csLoaderDataType
 {
+  /// Invalid data type - the loader didn't set one
   rdtInvalid,
+  /// 24bpp pixel data
   rdtR8G8B8,
+  /// Array of csRGBpixel
   rdtRGBpixel,
+  /// 8-bit paletted data
   rdtIndexed
 };
 
@@ -136,7 +152,9 @@ protected:
    */
   virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source) = 0;
 
+  /// Wait for the current image loading job to finish.
   void WaitForJob() const;
+  /// Convert data from the loader ro actual image data.
   void MakeImageData();
 
   virtual const void *GetImageData ();
@@ -148,4 +166,6 @@ protected:
   virtual csRef<iDataBuffer> GetRawData() const;
 };
 
-#endif // __CS_PLUGINS_VIDEO_LOADER_COMMON_COMMONIMAGEFILE_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_IMAGELOADER_COMMONIMAGEFILE_H__

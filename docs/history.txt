@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-Mar-2005
+	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 28-Feb-2005
 	- Jorrit changed the generation of the light ID so that it is
 	  compatible again for pseudo dynamic lights. Otherwise too many
