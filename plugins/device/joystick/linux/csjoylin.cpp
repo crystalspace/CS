@@ -21,7 +21,11 @@
 #include "csjoylin.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
+<<<<<<< csjoylin.cpp
+#include "csutil/array.h"
+=======
 #include "csutil/csvector.h"
+>>>>>>> 1.15
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -115,7 +119,7 @@ bool csLinuxJoystick::Init ()
 
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));
 
-  csArray<void*> h;
+  csArray<int> fds;
   int fd;
 
   nJoy=0;
@@ -133,7 +137,7 @@ bool csLinuxJoystick::Init ()
     }
     else
       nJoy++;
-    h.Push ((void*) fd);
+    fds.Push(fd);
   }
 
   if (nJoy)
@@ -141,9 +145,11 @@ bool csLinuxJoystick::Init ()
     delete [] joystick;
     joystick = new joydata[nJoy];
     
-    for (int i=0, n=0; i < h.Length (); i++)
+    csArray<int>::Iterator i = fds.GetIterator();
+    int n = 0;
+    while (i.HasNext())
     {
-      fd = (int)h.Get (i);
+      fd = i.Next();
       if (fd > -1)
       {
 	unsigned char axes = 2;
@@ -158,8 +164,8 @@ bool csLinuxJoystick::Init ()
 
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
                 "Joystick number %d (%s) has %d axes and %d buttons. Driver version is %d.%d.%d.\n",
-		i, name, axes, buttons, version >> 16, (version >> 8) & 0xff, version & 0xff);
-        joystick[n].number = i;
+		n, name, axes, buttons, version >> 16, (version >> 8) & 0xff, version & 0xff);
+        joystick[n].number = n;
         joystick[n].fd = fd;
         joystick[n].nButtons = buttons;
         joystick[n].nAxes = axes;
