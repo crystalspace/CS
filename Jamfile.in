@@ -7,16 +7,16 @@ SubDir TOP ;
 RegisterCompileGroups sounddrivers soundloaders imageloaders netdrivers
 		      drivers2d drivers3d meshes walkall openglcanvas 
 		      softcanvas proctexes nrall ;
-Help sounddrivers : "sound drivers compilegroup" ;
-Help soundloaders : "sound loaders compilegroup" ;
-Help imageloaders : "image loaders compilegroup" ;
-Help netdrivers	  : "network drivers compilegroup" ;
-Help drivers2d	  : "2d canvases compilegroup" ;
-Help drivers3d	  : "3d renderers compilegroup" ;
-Help meshes	  : "mesh plugin and loader compilegroup" ;
-Help walkall  	  : "walktest application and all required plugins" ;
-Help openglcanvas : "canvases suitable for the GL renderer" ;
-Help softcanvas   : "canvases suitable for the software renderer" ;
+Help sounddrivers : "sound drivers" ;
+Help soundloaders : "sound loaders" ;
+Help imageloaders : "image loaders" ;
+Help netdrivers	  : "network drivers" ;
+Help drivers2d	  : "2D canvases" ;
+Help drivers3d	  : "3D renderers" ;
+Help meshes	  : "mesh plugins and mesh loader" ;
+Help walkall  	  : "Walktest application and all required plugins" ;
+Help openglcanvas : "canvases for the OpenGL renderer" ;
+Help softcanvas   : "canvases for the software renderer" ;
 
 # Create some clean targets
 CleanDir clean : out ;
@@ -30,6 +30,8 @@ Clean distclean : Jamconfig Jamfile
 		  [ Wildcard *.cex ] ;
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
+Help distclean : "Remove configuration information and built targets" :
+  verbatim ;
 
 Clean maintainerclean : aclocal.m4 configure configure.scan ;
 Depends maintainerclean : distclean ;

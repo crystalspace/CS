@@ -103,3 +103,4 @@ rule PluginMetaData
 # Construct pseudo target plugins
 Depends exe : plugins ;
 NotFile plugins ;
+Help plugins : "plugin modules" ;

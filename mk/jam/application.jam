@@ -108,3 +108,4 @@ rule ShellScript
 # in Jambase
 Depends exe : apps ;
 NotFile apps ;
+Help apps : "applications" ;

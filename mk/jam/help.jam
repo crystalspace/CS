@@ -22,14 +22,14 @@ rule Help
   Always $(target) ;
 }
 
-#----------------------------------------------------------------------------
-                                                                                
-NotFile help ;
-Always help ;
-
 actions quietly PrintHelp
 {
   # target width:15, description width:59
   echo "jam ->$(<)               <- =>$(>)                                                           <=" | \
     $(SED) 's/->\(...............\).*<-/\1/;s/=>\(...........................................................\).*<=/\1/'
 }
+
+NotFile help ;
+Always help ;
+Help all : "entire project" ;
+Help clean : "Remove all built targets from entire project" : verbatim ;

@@ -32,6 +32,14 @@ chronological order.
 	  ARTS_OBSOLETE and EAX_OBSOLETE, respectively.
 	- Eric Sunshine removed the unused and unmaintained GLX/Glide driver.
 	  For easy revival, it has been tagged in CVS with GLXGLIDE_OBSOLETE.
+	- Eric Sunshine fixed aesthetic problem with "jam help" message for
+	  install target. It read "Build the Install crystal", which was not
+	  especially sensible. Made install help message more robust; it now
+	  prefers PROJECT_LONGNAME before PROJECT_NAME, and falls back to
+	  "Install the project" if neither is defined.
+	- Eric Sunshine added help messages for the all, apps, libs, plugins,
+	  clean, and distclean pseudo-targets.  Also fixed some other minor
+	  aesthetic problems with the output of "jam help".
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

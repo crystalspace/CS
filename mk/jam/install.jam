@@ -137,7 +137,10 @@ Always install $(INSTALLTARGETS) ;
 NotFile install $(INSTALLTARGETS) ;
 Depends install : $(INSTALLTARGETS) ;
 
-Help install : "Install $(PACKAGE_NAME)" ;
+if ! $(PACKAGE_INSTALL_NAME) { PACKAGE_INSTALL_NAME = $(PACKAGE_LONGNAME) ; }
+if ! $(PACKAGE_INSTALL_NAME) { PACKAGE_INSTALL_NAME = $(PACKAGE_NAME) ; }
+if ! $(PACKAGE_INSTALL_NAME) { PACKAGE_INSTALL_NAME = "the project" ; }
+Help install : "Install $(PACKAGE_INSTALL_NAME)" : verbatim ;
 
 actions Install1
 {
