@@ -426,10 +426,11 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     float x, y, z;
     if (csScanStr (arg, "%s,%f,%f,%f", sect, &x, &y, &z) != 4)
     {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Expected sector,x,y,z. Got something else!");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected sector,x,y,z. Got something else!");
       return false;
     }
-    iSector* s = engine->FindSector (sect);
+    iSector* s = engine->GetSectors ()->FindByName (sect);
     if (!s)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find this sector!");

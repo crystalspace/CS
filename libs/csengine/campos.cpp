@@ -60,7 +60,7 @@ void csCameraPosition::Set (const char *iSector, const csVector3 &iPosition,
 
 bool csCameraPosition::Load (iCamera* oCamera, iEngine *e)
 {
-  iSector *room = e->FindSector (Sector);
+  iSector *room = e->GetSectors ()->FindByName (Sector);
   if (!room) return false;
   oCamera->SetSector (room);
   oCamera->GetTransform ().SetOrigin (Position);

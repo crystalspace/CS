@@ -672,8 +672,6 @@ CreatePlane(iName,iOrigin,iMatrix)
 
 CreateSector(iName,link)
 
-FindSector(iName,regionOnly)
-
 FindMaterial(iName,regionOnly)
 
 CreateSectorWallsMesh(sector,name)

@@ -202,6 +202,14 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 
 //---------------------------------------------------------------------------
 
+iSector* csLoader::FindSector (const char* name)
+{
+  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+    return Engine->GetCurrentRegion ()->FindSector (name);
+  else
+    return Engine->GetSectors ()->FindByName (name);
+}
+
 bool csLoader::ResolvePortalSectors (iThingState *th)
 {
   int i;
@@ -216,8 +224,7 @@ bool csLoader::ResolvePortalSectors (iThingState *th)
       // If so then this is not a sector we have to resolve.
       // This test is here to make this code a little more robust.
       if (stmp->GetMeshes ()->GetMeshCount () > 0) continue;
-      iSector *snew = Engine->FindSector (stmp->QueryObject ()->GetName (),
-        ResolveOnlyRegion);
+      iSector* snew = FindSector (stmp->QueryObject ()->GetName ());
       if (!snew)
       {
 	ReportError (
@@ -298,7 +305,8 @@ bool csLoader::LoadMap (char* buf)
       	  break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
+            iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
+	    	->FindByName (name);
             if (!t)
 	      t = Engine->CreateMeshFactory(name);
             if (!LoadMeshObjectFactory (t, params))
@@ -322,7 +330,7 @@ bool csLoader::LoadMap (char* buf)
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
-          if (!Engine->FindSector (name, ResolveOnlyRegion))
+          if (!FindSector (name))
 	  {
             if (!ParseSector (name, params))
 	      return false;
@@ -555,9 +563,10 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
+            iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
+	    	->FindByName (name);
             if (!t)
-	      t = Engine->CreateMeshFactory(name);
+	      t = Engine->CreateMeshFactory (name);
             if (!LoadMeshObjectFactory (t, params))
 	    {
 	      ReportError (
@@ -820,7 +829,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	      return false;
 	    }
 
-	    iModelData *Model = ModelConverter->Load (buf->GetUint8 (), buf->GetSize ());
+	    iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
+	    	buf->GetSize ());
 	    buf->DecRef ();
             if (!Model) {
               ReportError (
@@ -837,17 +847,22 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    Model->DecRef ();
 
 	    stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
-		int i;
-	    for (i=0; i<stemp2->GetChildCount (); i++)
-	      stemp->AddChild (stemp2->GetChild (i), csReversibleTransform ());
-	  } else {
+	    int i;
+	    iMeshFactoryList* mfl2 = stemp2->GetChildren ();
+	    iMeshFactoryList* mfl = stemp->GetChildren ();
+	    for (i=0; i<mfl2->GetMeshFactoryCount (); i++)
+	      mfl->AddMeshFactory (mfl2->GetMeshFactory (i));
+	  }
+	  else
+	  {
   	    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
 	  	"crystalspace.mesh.object.sprite.3d", "MeshObj",
 		iMeshObjectType);
   	    if (!type)
   	    {
-      	      type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
-	    	  "MeshObj", iMeshObjectType);
+      	      type = CS_LOAD_PLUGIN (plugin_mgr,
+	      	"crystalspace.mesh.object.sprite.3d", "MeshObj",
+		iMeshObjectType);
     	      printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   	    }
 	    iMeshObjectFactory* fact = type->NewFactory ();
@@ -879,7 +894,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 		name);
 	    return false;
 	  }
-	  stemp->AddChild (t, child_transf);
+	  stemp->GetChildren ()->AddMeshFactory (t);
+	  t->SetTransform (child_transf);
         }
 	break;
 
@@ -1224,7 +1240,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 	else
 	{
 	  csScanStr (params, "%s", str);
-          iMeshFactoryWrapper* t = Engine->FindMeshFactory (str);
+          iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
+	  	->FindByName (str);
           if (!t)
 	  {
 	    ReportError (
@@ -1860,7 +1877,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
       case CS_TOKEN_SECTOR:
         {
           csScanStr (params, "%s", str);
-	  iSector* s = Engine->FindSector (str, ResolveOnlyRegion);
+	  iSector* s = FindSector (str);
           if (!s)
 	  {
 	    ReportError (

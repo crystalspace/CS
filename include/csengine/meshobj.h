@@ -108,17 +108,42 @@ public:
 
   /// override FreeItem
   virtual bool FreeItem (csSome Item);
+  /// Add a mesh factory.
+  virtual void AddMeshFactory (iMeshFactoryWrapper* mesh);
+  /// Remove a mesh factory.
+  virtual void RemoveMeshFactory (iMeshFactoryWrapper* mesh);
 
   class MeshFactoryList : public iMeshFactoryList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryList);
     virtual int GetMeshFactoryCount () const;
     virtual iMeshFactoryWrapper *GetMeshFactory (int idx) const;
-    virtual void AddMeshFactory (iMeshFactoryWrapper *mesh);
-    virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh);
+    virtual void AddMeshFactory (iMeshFactoryWrapper *mesh)
+    {
+      scfParent->AddMeshFactory (mesh);
+    }
+    virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh)
+    {
+      scfParent->RemoveMeshFactory (mesh);
+    }
     virtual iMeshFactoryWrapper *FindByName (const char *name) const;
     virtual int Find (iMeshFactoryWrapper *mesh) const;
   } scfiMeshFactoryList;
+};
+
+/**
+ * Subclass of csMeshFactoryList to hold the children of another mesh factory.
+ */
+class csMeshFactoryFactoryList : public csMeshFactoryList
+{
+private:
+  csMeshFactoryWrapper* meshfact;
+
+public:
+  csMeshFactoryFactoryList () : meshfact (NULL) { }
+  void SetMeshFactory (csMeshFactoryWrapper* m) { meshfact = m; }
+  virtual void AddMeshFactory (iMeshFactoryWrapper* child);
+  virtual void RemoveMeshFactory (iMeshFactoryWrapper* child);
 };
 
 SCF_VERSION (csMeshWrapper, 0, 0, 1);
@@ -572,7 +597,7 @@ public:
   friend struct VisObject;
 };
 
-SCF_VERSION (csMeshFactoryWrapper, 0, 0, 2);
+SCF_VERSION (csMeshFactoryWrapper, 0, 0, 3);
 
 /**
  * The holder class for all implementations of iMeshObjectFactory.
@@ -585,10 +610,11 @@ private:
 
   /// Optional parent of this object (can be NULL).
   csMeshFactoryWrapper* parent;
-  /// Children of this object (other instances of csMeshFactoryWrapper).
-  csNamedObjVector children;
-  /// Default transformations for the children relative to the parent.
-  CS_DECLARE_GROWING_ARRAY (transformations, csReversibleTransform);
+  /// Optional relative transform to parent.
+  csReversibleTransform transform;
+
+  /// Children of this object (other instances of iMeshFactoryWrapper).
+  csMeshFactoryFactoryList children;
 
 private:
   /// Destructor.
@@ -625,6 +651,21 @@ public:
    */
   void HardTransform (const csReversibleTransform& t);
 
+  /// Add a child to this mesh factory.
+  void AddChild (iMeshFactoryWrapper* child);
+  /// Remove a child from this mesh factory.
+  void RemoveChild (iMeshFactoryWrapper* child);
+
+  /**
+   * Get optional relative transform (relative to parent).
+   */
+  csReversibleTransform& GetTransform () { return transform; }
+
+  /**
+   * Set optional relative transform (relative to parent).
+   */
+  void SetTransform (const csReversibleTransform& tr) { transform = tr; }
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
@@ -653,15 +694,18 @@ public:
     }
     virtual iMeshWrapper* CreateMeshWrapper ();
     virtual iMeshFactoryWrapper* GetParentContainer () const;
-    virtual void AddChild (iMeshFactoryWrapper* child,
-    	const csReversibleTransform& transf);
-    virtual void RemoveChild (iMeshFactoryWrapper* child);
-    virtual int GetChildCount () const
+    virtual iMeshFactoryList* GetChildren ()
     {
-      return scfParent->children.Length ();
+      return &(scfParent->children.scfiMeshFactoryList);
     }
-    virtual iMeshFactoryWrapper* GetChild (int idx) const;
-    virtual csReversibleTransform& GetChildTransform (int idx);
+    virtual csReversibleTransform& GetTransform ()
+    {
+      return scfParent->GetTransform ();
+    }
+    virtual void SetTransform (const csReversibleTransform& tr)
+    {
+      scfParent->SetTransform (tr);
+    }
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;
 };

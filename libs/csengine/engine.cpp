@@ -1788,44 +1788,6 @@ iObject* csEngine::FindObjectInRegion (csRegion* region,
   return NULL;
 }
 
-iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
-{
-  if (regionOnly && region)
-  {
-    iObject* obj = FindObjectInRegion (region, *sectors.GetObjectVector (), iName);
-    if (!obj) return NULL;
-    return SCF_QUERY_INTERFACE_FAST (obj, iSector);
-  }
-  else
-    return sectors.FindByName (iName);
-}
-
-iMeshWrapper* csEngine::FindMeshWrapper (const char *iName, bool regionOnly)
-  const
-{
-  if (regionOnly && region)
-  {
-    iObject* obj = FindObjectInRegion (region, *meshes.GetObjectVector (), iName);
-    if (!obj) return NULL;
-    return SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
-  }
-  else
-    return meshes.FindByName (iName);
-}
-
-iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName,
-  bool regionOnly) const
-{
-  if (regionOnly && region)
-  {
-    iObject* obj = FindObjectInRegion (region, *mesh_factories.GetObjectVector (), iName);
-    if (!obj) return NULL;
-    return SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
-  }
-  else
-    return mesh_factories.FindByName (iName);
-}
-
 iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
 {
   csMaterial* mat = new csMaterial ();
@@ -1965,7 +1927,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
 {
   if (name != NULL)
   {
-    iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
+    iMeshFactoryWrapper* factwrap = GetMeshFactories ()->FindByName (name);
     if (factwrap != NULL) return factwrap;
   }
 
@@ -1988,7 +1950,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
 {
   if (name != NULL)
   {
-    iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
+    iMeshFactoryWrapper* factwrap = GetMeshFactories ()->FindByName (name);
     if (factwrap != NULL) return factwrap;
   }
 
@@ -2003,7 +1965,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
 {
   if (name != NULL)
   {
-    iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
+    iMeshFactoryWrapper* factwrap = GetMeshFactories ()->FindByName (name);
     if (factwrap != NULL) return factwrap;
   }
 

@@ -239,7 +239,7 @@ void Demo::SetupFactories ()
   LoadFactory ("photonTorpedo", "/data/demo/objects/photon",
   	"crystalspace.mesh.object.sprite.2d",
 	"crystalspace.mesh.loader.factory.sprite.2d");
-  fact = engine->FindMeshFactory ("th_ship");
+  fact = engine->GetMeshFactories ()->FindByName ("th_ship");
   fact->HardTransform (csTransform (csXRotMatrix3 (-M_PI/2), csVector3 (0)));
 }
 
@@ -499,7 +499,7 @@ void Demo::SetupObjects ()
 
   // Create saturn.
   iMeshWrapper* sat = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ball_factory"), "Saturn",
+  	engine->GetMeshFactories ()->FindByName ("ball_factory"), "Saturn",
   	NULL, csVector3 (0));
   sat->SetRenderPriority (engine->GetRenderPriority ("object"));
   sat->SetZBufMode (CS_ZBUF_USE);
@@ -513,7 +513,7 @@ void Demo::SetupObjects ()
 
   // Create jupiter.
   iMeshWrapper* jup = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ball_factory"), "Jupiter",
+  	engine->GetMeshFactories ()->FindByName ("ball_factory"), "Jupiter",
   	NULL, csVector3 (0));
   jup->SetRenderPriority (engine->GetRenderPriority ("object"));
   jup->SetZBufMode (CS_ZBUF_USE);
@@ -527,7 +527,7 @@ void Demo::SetupObjects ()
 
   // Create the earth.
   iMeshWrapper* earth = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ball_factory"), "Earth",
+  	engine->GetMeshFactories ()->FindByName ("ball_factory"), "Earth",
   	NULL, csVector3 (0));
   earth->SetRenderPriority (engine->GetRenderPriority ("object"));
   earth->SetZBufMode (CS_ZBUF_USE);
@@ -541,7 +541,7 @@ void Demo::SetupObjects ()
 
   // Create the clouds for earth.
   iMeshWrapper* clouds = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ball_factory"), "Clouds",
+  	engine->GetMeshFactories ()->FindByName ("ball_factory"), "Clouds",
   	NULL, csVector3 (0));
   clouds->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   clouds->SetZBufMode (CS_ZBUF_TEST);
@@ -558,7 +558,7 @@ void Demo::SetupObjects ()
   iMeshWrapper* spr3d;
   iSprite3DState* s3d;
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("fighter"), "Fighter1",
+  	engine->GetMeshFactories ()->FindByName ("fighter"), "Fighter1",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
@@ -575,7 +575,7 @@ void Demo::SetupObjects ()
   spr3d->GetChildren ()->AddMesh (tail);
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("fighter"), "Fighter2",
+  	engine->GetMeshFactories ()->FindByName ("fighter"), "Fighter2",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
@@ -592,7 +592,7 @@ void Demo::SetupObjects ()
   spr3d->GetChildren ()->AddMesh (tail);
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("shuttle"), "Shuttle",
+  	engine->GetMeshFactories ()->FindByName ("shuttle"), "Shuttle",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
@@ -609,7 +609,7 @@ void Demo::SetupObjects ()
   spr3d->GetChildren ()->AddMesh (tail);
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("th_ship"), "Shuttle2",
+  	engine->GetMeshFactories ()->FindByName ("th_ship"), "Shuttle2",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
@@ -627,7 +627,7 @@ void Demo::SetupObjects ()
 
   // Create laser.
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("laser"), "LaserBeam1",
+  	engine->GetMeshFactories ()->FindByName ("laser"), "LaserBeam1",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr3d->SetZBufMode (CS_ZBUF_TEST);
@@ -638,7 +638,7 @@ void Demo::SetupObjects ()
   s3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("laser"), "LaserBeam2",
+  	engine->GetMeshFactories ()->FindByName ("laser"), "LaserBeam2",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr3d->SetZBufMode (CS_ZBUF_TEST);
@@ -649,7 +649,7 @@ void Demo::SetupObjects ()
   s3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("laser"), "LaserBeam3",
+  	engine->GetMeshFactories ()->FindByName ("laser"), "LaserBeam3",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr3d->SetZBufMode (CS_ZBUF_TEST);
@@ -664,7 +664,7 @@ void Demo::SetupObjects ()
   //=====
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("station"), "Station2",
+  	engine->GetMeshFactories ()->FindByName ("station"), "Station2",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
@@ -674,48 +674,48 @@ void Demo::SetupObjects ()
   //=====
 
   spr3d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_dummy"), "Station1",
+  	engine->GetMeshFactories ()->FindByName ("ss1_dummy"), "Station1",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
 
   iMeshWrapper* spr3d_tower = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_tower"), "SS1_Tower",
+  	engine->GetMeshFactories ()->FindByName ("ss1_tower"), "SS1_Tower",
   	NULL, csVector3 (0));
   spr3d_tower->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_tower->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_tower);
 
   iMeshWrapper* spr3d_spoke = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_spoke"), "SS1_Spoke",
+  	engine->GetMeshFactories ()->FindByName ("ss1_spoke"), "SS1_Spoke",
   	NULL, csVector3 (0));
   spr3d_spoke->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_spoke->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_spoke);
 
   iMeshWrapper* spr3d_dome = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_dome"), "SS1_Dome",
+  	engine->GetMeshFactories ()->FindByName ("ss1_dome"), "SS1_Dome",
   	NULL, csVector3 (0));
   spr3d_dome->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_dome->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_dome);
 
   iMeshWrapper* spr3d_tail = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_tail"), "SS1_Tail",
+  	engine->GetMeshFactories ()->FindByName ("ss1_tail"), "SS1_Tail",
   	NULL, csVector3 (0));
   spr3d_tail->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_tail->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_tail);
 
   iMeshWrapper* spr3d_arm = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_arm1"), "SS1_Arm1",
+  	engine->GetMeshFactories ()->FindByName ("ss1_arm1"), "SS1_Arm1",
   	NULL, csVector3 (0));
   spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_arm->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_arm);
 
   spr3d_arm = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_arm1"), "SS1_Arm1",
+  	engine->GetMeshFactories ()->FindByName ("ss1_arm1"), "SS1_Arm1",
   	NULL, csVector3 (0));
   spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_arm->SetZBufMode (CS_ZBUF_USE);
@@ -725,7 +725,7 @@ void Demo::SetupObjects ()
   spr3d_arm->GetMovable ()->UpdateMove ();
 
   iMeshWrapper* spr3d_pod1 = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("ss1_pod1"), "SS1_Pod1",
+  	engine->GetMeshFactories ()->FindByName ("ss1_pod1"), "SS1_Pod1",
   	NULL, csVector3 (0));
   spr3d_pod1->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_pod1->SetZBufMode (CS_ZBUF_USE);
@@ -737,7 +737,7 @@ void Demo::SetupObjects ()
   iSprite2DState* s2d;
   iParticle* part;
   spr2d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("photonTorpedo"), "PhotonTorpedo1",
+  	engine->GetMeshFactories ()->FindByName ("photonTorpedo"), "PhotonTorpedo1",
   	NULL, csVector3 (0));
   spr2d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr2d->SetZBufMode (CS_ZBUF_TEST);
@@ -749,7 +749,7 @@ void Demo::SetupObjects ()
   part->DecRef ();
 
   spr2d = engine->CreateMeshWrapper (
-  	engine->FindMeshFactory ("photonTorpedo"), "PhotonTorpedo2",
+  	engine->GetMeshFactories ()->FindByName ("photonTorpedo"), "PhotonTorpedo2",
   	NULL, csVector3 (0));
   spr2d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   spr2d->SetZBufMode (CS_ZBUF_TEST);

@@ -180,7 +180,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     {
       char buf[100];
       cf->Read (buf, 1+len);
-      s = Sys->Engine->FindSector (buf);
+      s = Sys->Engine->GetSectors ()->FindByName (buf);
     }
     reccam->sector = s;
     prev_sector = s;
@@ -268,7 +268,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     &imirror,
     &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
 
-  iSector* s = Sys->Engine->FindSector (sector_name);
+  iSector* s = Sys->Engine->GetSectors ()->FindByName (sector_name);
   delete[] sector_name;
   data->DecRef ();
   if (!s)
@@ -353,7 +353,8 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
 	csVector3 const& pos, float size)
 {
-  iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (tname);
+  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
+  	->FindByName (tname);
   if (!tmpl)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -580,7 +581,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	  sector_name, light_name,
 	  &start_col.red, &start_col.green, &start_col.blue,
 	  &end_col.red, &end_col.green, &end_col.blue, &act_time);
-	iSector* sect = Engine->FindSector (sector_name);
+	iSector* sect = Engine->GetSectors ()->FindByName (sector_name);
 	if (!sect)
 	{
 	  Sys->Report (CS_REPORTER_SEVERITY_WARNING,
@@ -1775,7 +1776,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // See if the mesh exists.
-      iMeshWrapper *wrap = Sys->Engine->FindMeshWrapper (name);
+      iMeshWrapper *wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (wrap)
       {
 	iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (
@@ -1817,7 +1818,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the mesh exists.
-      iMeshWrapper* wrap = Sys->Engine->FindMeshWrapper (name);
+      iMeshWrapper* wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (!wrap)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
       else
@@ -1849,13 +1850,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, motion);
     if(cnt != 2)
     {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Expected parameters 'meshname,motion'!");
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "To get the names use 'listmeshes'");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameters 'meshname,motion'!");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"To get the names use 'listmeshes'");
     }
     else
     {
       // Test to see if the mesh exists.
-      iMeshWrapper* wrap = Sys->Engine->FindMeshWrapper (name);
+      iMeshWrapper* wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (!wrap)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
       else

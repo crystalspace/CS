@@ -29,6 +29,7 @@ struct iCamera;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
 struct iMeshList;
+struct iMeshFactoryList;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 struct iMeshFactoryWrapper;
@@ -305,7 +306,7 @@ struct iMeshWrapper : public iBase
   virtual void Draw (iRenderView* rview) = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 0, 6);
+SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);
 
 /**
  * This interface corresponds to the object in the engine
@@ -343,26 +344,20 @@ struct iMeshFactoryWrapper : public iBase
    */
   virtual iMeshFactoryWrapper* GetParentContainer () const = 0;
 
-  /// Get the number of children.
-  virtual int GetChildCount () const = 0;
-  /// Get a child.
-  virtual iMeshFactoryWrapper* GetChild (int idx) const = 0;
-  /// Get the transformation for a child.
-  virtual csReversibleTransform& GetChildTransform (int idx) = 0;
   /**
-   * Add a child to this object. The transform of that child will be
-   * interpreted relative to this object. An IncRef() on the child will
-   * happen.
+   * Get all the children of this mesh factory.
    */
-  virtual void AddChild (iMeshFactoryWrapper* child,
-  	const csReversibleTransform& transf) = 0;
+  virtual iMeshFactoryList* GetChildren () = 0;
+
   /**
-   * Remove a child from this object. The child will be DecRef()'ed
-   * and thus removed if this was the last reference.
-   * Note that RemoveChild() will not work if the the given mesh factory
-   * is not a child of this mesh factory.
+   * Get optional relative transform (relative to parent).
    */
-  virtual void RemoveChild (iMeshFactoryWrapper* child) = 0;
+  virtual csReversibleTransform& GetTransform () = 0;
+
+  /**
+   * Set optional relative transform (relative to parent).
+   */
+  virtual void SetTransform (const csReversibleTransform& tr) = 0;
 };
 
 SCF_VERSION (iMeshList, 0, 0, 1);

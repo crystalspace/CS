@@ -169,14 +169,14 @@ bool Simple::Initialize (int argc, const char* const argv[],
   {
     // There is a valid starting position defined in the level file.
     iCameraPosition* campos = engine->GetCameraPosition (0);
-    room = engine->FindSector (campos->GetSector ());
+    room = engine->GetSectors ()->FindByName (campos->GetSector ());
     pos = campos->GetPosition ();
   }
   else
   {
     // We didn't find a valid starting position. So we default
     // to going to room called 'room' at position (0,0,0).
-    room = engine->FindSector ("room");
+    room = engine->GetSectors ()->FindByName ("room");
   }
   if (!room)
   {

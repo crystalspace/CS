@@ -399,7 +399,6 @@ struct iEngine : public iBase
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
-  virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
   virtual iMaterialWrapper *FindMaterial (const char *iName,
   	bool regionOnly = false) = 0;
   virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,

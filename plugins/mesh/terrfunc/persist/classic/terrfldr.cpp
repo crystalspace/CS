@@ -176,7 +176,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (pParams, "%s", pStr);
-	  iMeshFactoryWrapper* iFactory = iEngine->FindMeshFactory (pStr);
+	  iMeshFactoryWrapper* iFactory = iEngine->GetMeshFactories ()
+	  	->FindByName (pStr);
 	  if (!iFactory)
 	  {
 	    // @@@ Error handling!

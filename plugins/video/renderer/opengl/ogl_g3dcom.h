@@ -19,8 +19,6 @@
 #ifndef __OGL3DCOM_H__
 #define __OGL3DCOM_H__
 
-#define SCF_DEBUG
-
 // csGraphics3DOGLCommon OpenGL rasterizer class.
 
 // Concieved by Jorrit Tyberghein and Gary Clark

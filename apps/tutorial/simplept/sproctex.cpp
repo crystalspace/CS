@@ -29,6 +29,7 @@
 #include "imap/parser.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
+#include "iengine/sector.h"
 
 csEngineProcTex::csEngineProcTex()
 {
@@ -65,7 +66,7 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   ptG3D = TexHandle->GetProcTextureInterface ();
 
   // set up a view for the engine
-  iSector *room = Engine->FindSector ("room");
+  iSector *room = Engine->GetSectors ()->FindByName ("room");
   View = new csView (Engine, ptG3D);
   View->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
   View->GetCamera ()->SetSector (room);

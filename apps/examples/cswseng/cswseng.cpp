@@ -521,7 +521,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
   }
   else
     room_name = "room";
-  start_sector = engine->FindSector (room_name);
+  start_sector = engine->GetSectors ()->FindByName (room_name);
 
   // Update the engine views.
   int i;

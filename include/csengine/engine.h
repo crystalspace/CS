@@ -1011,9 +1011,6 @@ public:
 
   /// Create a empty sector with given name.
   virtual iSector *CreateSector (const char *iName, bool link = true);
-  /// Find a sector by name
-  virtual iSector *FindSector (const char *iName, bool regionOnly = false)
-    const;
 
   /// Return the list of sectors
   virtual iSectorList *GetSectors ()
@@ -1024,13 +1021,6 @@ public:
   /// Return the list of meshes
   virtual iMeshList *GetMeshes ()
     { return &meshes.scfiMeshList; }
-
-  /// Find a mesh by name
-  virtual iMeshWrapper *FindMeshWrapper (const char *iName,
-  	bool regionOnly = false) const;
-  /// Find a mesh factory by name
-  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
-  	bool regionOnly = false) const;
 
   /// Find a loaded texture by name.
   virtual iTextureWrapper* FindTexture (const char* iName,

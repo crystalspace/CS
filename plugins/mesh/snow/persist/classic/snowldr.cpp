@@ -344,7 +344,8 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
+	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
+	  	->FindByName (str);
 	  if (!fact)
 	  {
 	    // @@@ Error handling!

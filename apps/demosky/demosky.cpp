@@ -144,7 +144,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
   csInitializeApplication (object_reg);
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);

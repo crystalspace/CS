@@ -90,7 +90,7 @@ Simple::~Simple ()
   // about the texture cache is not enough to fix that.       -- mgeisse
 
   engine->SetContext (g3d);
-  engine->GetSectors ()->RemoveSector (engine->FindSector ("room"));
+  engine->GetSectors ()->RemoveSector (engine->GetSectors ()->FindByName ("room"));
 
   engine->SetContext (ProcTexture->GetTextureHandle ()->GetProcTextureInterface ());
 

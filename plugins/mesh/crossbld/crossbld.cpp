@@ -161,14 +161,16 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
   {
     iMeshFactoryWrapper *SubWrapper = Engine->CreateMeshFactory (
       "crystalspace.mesh.object.sprite.3d", NULL);
-    if (!SubWrapper) {
+    if (!SubWrapper)
+    {
       // seems like building 3d sprites is impossible
       return NULL;
     }
 
     iSprite3DFactoryState *sfState = SCF_QUERY_INTERFACE_FAST (
       SubWrapper->GetMeshObjectFactory (), iSprite3DFactoryState);
-    if (!sfState) {
+    if (!sfState)
+    {
       // impossible to query the correct interface, maybe because
       // of a version conflict
       Engine->GetMeshFactories ()->RemoveMeshFactory (SubWrapper);
@@ -179,10 +181,13 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
     BuildSpriteFactory (it.Get (), sfState);
     sfState->DecRef ();
 
-    if (MainWrapper) {
-      MainWrapper->AddChild (SubWrapper, csReversibleTransform ());
+    if (MainWrapper)
+    {
+      MainWrapper->GetChildren ()->AddMeshFactory (SubWrapper);
       /* @@@ remove the sub-wrapper from the iEngine again? */
-    } else MainWrapper = SubWrapper;
+    }
+    else
+      MainWrapper = SubWrapper;
 
     it.Next ();
   }

@@ -384,7 +384,8 @@ void Phyztest::NextFrame ()
     // Report (CS_REPORTER_SEVERITY_DEBUG, "adding chain");
     // use box template
 
-    iMeshFactoryWrapper* bxtmpl = view->GetEngine ()->FindMeshFactory ("box");
+    iMeshFactoryWrapper* bxtmpl = view->GetEngine ()->GetMeshFactories ()
+    	->FindByName ("box");
     if (!bxtmpl)
     {  
       Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'box'");
@@ -442,7 +443,8 @@ void Phyztest::NextFrame ()
     if  ( bot == NULL )
     {
       // add a mesh
-      iMeshFactoryWrapper* tmpl = view->GetEngine ()->FindMeshFactory ("box");
+      iMeshFactoryWrapper* tmpl = view->GetEngine ()->GetMeshFactories ()
+      	->FindByName ("box");
       if (!tmpl)
       {     
 	Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'bot'");

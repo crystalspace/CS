@@ -144,7 +144,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 3, 0);
+SCF_VERSION (iEngine, 0, 4, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -275,36 +275,6 @@ struct iEngine : public iBase
   virtual iMeshFactoryList* GetMeshFactories () = 0;
   /// Get the list of meshes
   virtual iMeshList* GetMeshes () = 0;
-
-  /**
-   * Find a sector by name. If regionOnly is true then the returned
-   * sector will belong to the current region. Note that this is different
-   * from calling iRegion::FindSector() because the latter will also
-   * return sectors that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iSector *FindSector (const char *iName, bool regionOnly = false)
-  	const = 0;
-
-  /**
-   * Find a mesh object by name. If regionOnly is true then the returned
-   * mesh object will belong to the current region. Note that this is different
-   * from calling iRegion::FindMeshObject() because the latter will also
-   * return mesh objects that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iMeshWrapper* FindMeshWrapper (const char *iName,
-  	bool regionOnly = false) const = 0;
-
-  /**
-   * Find a mesh factory by name. If regionOnly is true then the returned
-   * factory will belong to the current region. Note that this is different
-   * from calling iRegion::FindMeshFactory() because the latter will also
-   * return factories that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
-  	bool regionOnly = false) const = 0;
 
   /**
    * Find a texture by name. If regionOnly is true then the returned

@@ -1507,7 +1507,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     else
       room_name = "room";
 
-    room = Engine->FindSector (room_name);
+    room = Engine->GetSectors ()->FindByName (room_name);
     if (!room)
     {
       Report (CS_REPORTER_SEVERITY_ERROR,  "Map does not contain a room called '%s'"

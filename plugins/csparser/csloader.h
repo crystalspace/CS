@@ -62,6 +62,7 @@ struct iReporter;
  */
 class csLoader : public iLoader
 {
+private:
   class csLoaderStats
   {
   public:
@@ -114,7 +115,10 @@ class csLoader : public iLoader
   class csLoaderStats *Stats;
 
   /// -----------------------------------------------------------------------
-  
+ 
+  /// Find a sector (in engine or region).
+  iSector* FindSector (const char* name);
+
   /// Parse a matrix definition
   bool ParseMatrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition

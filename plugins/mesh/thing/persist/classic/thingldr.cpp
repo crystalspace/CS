@@ -965,7 +965,8 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	else
         {
           csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
+	  iMeshFactoryWrapper* fact = engine->GetMeshFactories ()
+	  	->FindByName (str);
           if (!fact)
           {
             printf ("Couldn't find thing factory '%s'!\n", str);
@@ -999,7 +1000,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	else
         {
           csScanStr (params, "%s", str);
-	  iMeshWrapper* wrap = engine->FindMeshWrapper (str);
+	  iMeshWrapper* wrap = engine->GetMeshes ()->FindByName (str);
           if (!wrap)
           {
             printf ("Couldn't find thing '%s'!\n", str);

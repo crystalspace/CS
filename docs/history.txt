@@ -1,5 +1,26 @@
 The history order is reversed so that new features are at the top.
 
+22-Aug-2001
+	- Added GetTransform() and SetTransform to iMeshFactoryWrapper.
+	  This transform is a transformation relative to the parent of the
+	  factory wrapper. It is only useful when a factory wrapper is part
+	  of a hierarchy.
+	- Removed iMeshFactoryWrapper::GetChildTransform() as the transform
+	  is now part of the iMeshFactoryWrapper itself.
+	- Generalized csMeshFactoryList (similar to csMeshList) so that
+	  AddMeshFactory and RemoveMeshFactory can now be overriden by
+	  subclasses for additional functionality.
+	- Added csMeshFactoryFactoryList which implements functionality
+	  specific for keeping mesh factories in another mesh factory.
+	- Removed iMeshFactoryWrapper::GetChildCount, GetChild, AddChild,
+	  and RemoveChild. Instead there is now
+	  iMeshFactoryWrapper::GetChildren() which returns iMeshFactoryList.
+	- Removed SCF_DEBUG calls in OpenGL renderer. These are not needed.
+	- Removed iEngine::FindMeshWrapper, FindMeshFactory, and FindSector.
+	  Use the FindByName in the respective lists instead (using GetSectors,
+	  GetMeshes, and GetMeshFactories). To search for an object in
+	  a region first get the current region and then call
+	  iRegion::FindBla().
 21-Aug-2001
 	- Made destructor of new MD2 importer virtual.
 	- Fixed makefile linking for MD2 importer.
@@ -19,6 +40,9 @@ The history order is reversed so that new features are at the top.
 	- Added iMovable::SetParent().
 	- Removed a few warnings regarding not using the plugin manager.
 	- Fixed Blocks after yesterdays changes.
+	- Norman Kramer fixed a few comments in the software renderer.
+	- Philip Wyett fixed a compile problem in the iso engine caused
+	  by the addition of SetParent() to iMovable.
 20-Aug-2001
 	- Philip Wyett removed duplicate commented out entry for cslua plugin.
 	  Manually updated MSVC project files with CSLUA. This I do

@@ -55,7 +55,7 @@ void FadeOp::Do (csTicks dt)
 RotatePartOp::RotatePartOp (const char* meshName, csTicks total,
 	float aspeed) : total_rotate_time (total), angle_speed (aspeed)
 {
-  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
+  mesh = DemoSequenceManager::demo->engine->GetMeshes ()->FindByName (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -74,7 +74,8 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
 {
   if (meshName)
   {
-    mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
+    mesh = DemoSequenceManager::demo->engine->GetMeshes ()
+    	->FindByName (meshName);
     if (!mesh)
     {
       DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -103,7 +104,8 @@ PathOp::PathOp (csTicks t, const char* meshName, const char* pathName)
   total_path_time = t;
   if (meshName)
   {
-    mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
+    mesh = DemoSequenceManager::demo->engine->GetMeshes ()
+    	->FindByName (meshName);
     if (!mesh)
     {
       DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -132,14 +134,16 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
 	const csVector3& p)
 {
   pos = p;
-  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
+  mesh = DemoSequenceManager::demo->engine->GetMeshes ()
+  	->FindByName (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
     	"Can't find mesh '%s'", meshName);
     exit (0);
   }
-  sector = DemoSequenceManager::demo->engine->FindSector (sectName);
+  sector = DemoSequenceManager::demo->engine->GetSectors ()
+  	->FindByName (sectName);
   if (!sector)
   {
     DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -162,7 +166,8 @@ void SetupMeshOp::Do (csTicks /*dt*/)
 
 ShowMeshOp::ShowMeshOp (const char* meshName)
 {
-  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
+  mesh = DemoSequenceManager::demo->engine->GetMeshes ()
+  	->FindByName (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -182,7 +187,8 @@ void ShowMeshOp::Do (csTicks /*dt*/)
 
 HideMeshOp::HideMeshOp (const char* meshName)
 {
-  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
+  mesh = DemoSequenceManager::demo->engine->GetMeshes ()
+  	->FindByName (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,

@@ -556,7 +556,8 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (skelname);
+  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
+  	->FindByName (skelname);
   if (!tmpl)
   {
     tmpl = Sys->Engine->CreateMeshFactory (
@@ -791,7 +792,8 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 {
   char skelname[50];
   sprintf (skelname, "__skelghost__\n");
-  iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (skelname);
+  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
+  	->FindByName (skelname);
   if (!tmpl)
   {
     tmpl = Sys->Engine->CreateMeshFactory (
@@ -1165,12 +1167,15 @@ void fire_missile ()
   char misname[10];
   sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
 
-  iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->FindMeshFactory (misname);
+  iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
+  	->FindByName (misname);
   if (!tmpl)
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not find '%s' sprite factory!", misname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Could not find '%s' sprite factory!", misname);
   else
   {
-    iMeshWrapper* sp = Sys->view->GetEngine ()->CreateMeshWrapper (tmpl, "missile");
+    iMeshWrapper* sp = Sys->view->GetEngine ()->CreateMeshWrapper (tmpl,
+    	"missile");
 
     sp->GetMovable ()->SetSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp->GetPrivateObject ();
