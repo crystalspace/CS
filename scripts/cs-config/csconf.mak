@@ -42,26 +42,8 @@ CSCONFIG.VMAJOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's
 CSCONFIG.VMINOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
 CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e 's/\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
 
-# Some makefile variables reference $@, and we want that reference to appear
-# verbatim in the synthesized makefile fragment.  Unfortunately, when these
-# variables are referenced inside the $(CSCONFIG.EXE) target, $(CSCONFIG.EXE)
-# is interpolated in place of $@, therefore we must protect $@ against such
-# interpolation.
-# NOTE: This does not solve the more general problem where we want to reproduce
-# the entire variable's value verbatim.  For example, if a variable's value
-# references "$(basename $(notdir $@))", we would like to reproduce that entire
-# function calling sequence in the synthesized makefile fragment.
-# Unfortunately, such cases are not currently handled.
-CSCONFIG.LFLAGS.DLL  = $(subst $@,$$@,$(LFLAGS.DLL))
-CSCONFIG.LFLAGS.EXE  = $(subst $@,$$@,$(LFLAGS.EXE))
-CSCONFIG.LFLAGS.GENERAL = $(subst $@,$$@,$(LFLAGS.GENERAL))
-CSCONFIG.LINK.PLUGIN = $(subst $@,$$@,$(LINK.PLUGIN))
-CSCONFIG.DO.SHARED.PLUGIN.PREAMBLE  = \
-  $(subst $@,$$@,$(DO.SHARED.PLUGIN.PREAMBLE))
-CSCONFIG.DO.SHARED.PLUGIN.POSTAMBLE = \
-  $(subst $@,$$@,$(DO.SHARED.PLUGIN.POSTAMBLE))
-CSCONFIG.PLUGIN.POSTFLAGS = \
-  $(subst $@,$$@,$(PLUGIN.POSTFLAGS))
+# Extract needed makefile fragments directly from target makefile.
+CSCONFIG.MAKEFRAG = sed '/<cs-config>/,/<\/cs-config>/!d;/^\#/d' < $(TARGET_MAKEFILE)
 
 endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
 
@@ -113,13 +95,8 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo $"# Automatically generated. $" 		>> cs-config
 	@echo $"EXE=$(EXE)$" 				>> cs-config
 	@echo $"DLL=$(DLL)$" 				>> cs-config
-	@echo $"LFLAGS.EXE=$(CSCONFIG.LFLAGS.EXE)$" 	>> cs-config
-	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(CSCONFIG.DO.SHARED.PLUGIN.PREAMBLE)$" >> cs-config
-	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(CSCONFIG.DO.SHARED.PLUGIN.POSTAMBLE)$" >> cs-config
 	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$">> cs-config
-	@echo $"LINK.PLUGIN=$(CSCONFIG.LINK.PLUGIN)$" 	>> cs-config
-	@echo $"LFLAGS.DLL=$(CSCONFIG.LFLAGS.DLL)$" 	>> cs-config
-	@echo $"PLUGIN.POSTFLAGS=$(CSCONFIG.PLUGIN.POSTFLAGS)$"	>> cs-config
+	@$(CSCONFIG.MAKEFRAG) >> cs-config
 	@echo $"EOF$"					>> cs-config
 	@echo $"}$"					>> cs-config
 	@echo						>> cs-config

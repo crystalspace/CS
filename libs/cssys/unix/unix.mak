@@ -69,7 +69,9 @@ ifndef CFLAGS.DLL
 endif
 
 # General flags for the linker which are used in any case.
+# <cs-config>
 LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(CSTHREAD.LFLAGS)
+# </cs-config>
 
 # Flags for the linker which are used when profiling.
 ifndef LFLAGS.profile
@@ -77,7 +79,9 @@ LFLAGS.profile = -pg
 endif
 
 # Flags for the linker which are used when building a shared library.
+# <cs-config>
 LFLAGS.DLL = -Wl,-shared -Wl,-soname -Wl,$@
+# </cs-config>
 
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM = -f elf

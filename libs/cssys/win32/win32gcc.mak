@@ -60,7 +60,9 @@ CFLAGS.profile = -pg -O -g
 CFLAGS.DLL =
 
 # General flags for the linker which are used in any case.
+# <cs-config>
 LFLAGS.GENERAL = $(CSTHREAD.LFLAGS)
+# </cs-config>
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize += -s
@@ -75,8 +77,11 @@ DFLAGS.optimize += -s
 DFLAGS.debug =
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$*.def \
-  --no-export-all-symbols --dllname $*
+# <cs-config>
+TARGET.RAW = $(basename $(notdir $@))
+LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$(TARGET.RAW).def \
+  --no-export-all-symbols --dllname $(TARGET.RAW)
+# </cs-config>
 
 # Typical extension for objects and static libraries
 LIB = .a
@@ -102,11 +107,9 @@ INC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.h) $(CSTHREAD.INC)
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND = -e "s/\.ob*j*\:/\$$O:/g"
 
+# <cs-config>
 LFLAGS.EXE = -mconsole
-# Commenting out the following line will make the -noconsole option work
-# but the only way to redirect output will be WITH -noconsole (wacky :-)
-# and the console will not start minimized if a shortcut says it should
-#LFLAGS.EXE += -mconsole
+# </cs-config>
 
 # Use makedep to build dependencies
 DEPEND_TOOL = mkdep
@@ -116,11 +119,12 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-COMMAND_DELIM = ;
-
 # How to make shared libs for cs-config
+# <cs-config>
 LINK.PLUGIN = dllwrap --driver-name=$(LINK)
 PLUGIN.POSTFLAGS = -mwindows -mconsole
+COMMAND_DELIM = ;
+# </cs-config>
 
 # How to make a shared (a.k.a. dynamic) library.
 ifeq ($(MODE),debug)
@@ -133,17 +137,23 @@ COMPILE_RES = windres --include-dir include $(RCFLAGS)
 MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 
-DO.SHARED.PLUGIN.CORE = \
+DO.SHARED.PLUGIN.PREAMBLE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
-    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+    "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) ./ \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
-    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
-  echo $"EXPORTS$">$(OUT)/$*.def $(COMMAND_DELIM) \
-  echo $"	$*_scfInitialize$">>$(OUT)/$*.def $(COMMAND_DELIM) \
-  echo $"	$*_scfFinalize$">>$(OUT)/$*.def $(COMMAND_DELIM) \
-  echo $"	plugin_compiler$">>$(OUT)/$*.def $(COMMAND_DELIM) \
+    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM)
+# <cs-config>
+DO.SHARED.PLUGIN.PREAMBLE += \
+  echo $"EXPORTS$">$(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
+  echo $"	$(TARGET.RAW)_scfInitialize$">>$(OUT)/$(TARGET.RAW).def \
+  $(COMMAND_DELIM) \
+  echo $"	$(TARGET.RAW)_scfFinalize$">>$(OUT)/$(TARGET.RAW).def \
+  $(COMMAND_DELIM) \
+  echo $"	plugin_compiler$">>$(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
+# </cs-config>
+DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) \
     -mwindows
@@ -155,7 +165,7 @@ DO.SHARED.PLUGIN.CORE = \
 
 DO.LINK.EXE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
-    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
+    "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
     $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \

@@ -25,6 +25,14 @@ The history order is reversed so that new features are at the top.
 	- OpenGL canvases no longer depend on the existance of the font
 	  server.
 	- Cleaned up csSector a bit. Added PrepareDraw().
+	- Eric Sunshine changed csconf.mak so that it now extracts sections
+	  delimited by <cs-config> and </cs-config> directly from the
+	  platform-specific makefile and inserts them verbatim into the
+	  generated cs-config script for the -makevars option.  This replaces
+	  the fragile $(subst) magic in csconf.mak which was attempting to
+	  protect $@ in emitted variables, and also generally prevents
+	  clobbering of other makefile special variables, such as $*, and
+	  special functions, such as $(notdir), $(basename), etc.
 23-Jan-2003
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.

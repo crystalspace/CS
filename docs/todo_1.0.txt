@@ -14,9 +14,6 @@ have on CS.  The following modifiers can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
-	[S]  Restoration of dllwrap uses $* which gets eaten by cs-config.
-	     Need to figure out some way to prevent $* from being eaten.  The
-	     technique for protecting $@ does not seem to work for $*.
 	[S]  Very poor OpenGL/performance on MacOS/X and possibly other
 	     platforms.  dfryer@uvic.ca reports that his OpenGL profiler says
 	     that 95% of the time is spent in DrawArrays().  He further reports
@@ -135,6 +132,9 @@ Bugs to fix:
 		    flarge map. Problem is probably the hirarchical mesh
 		    factory there.
 	[S]  The frame around the fancy console looks strange.
+	[**] Restoration of dllwrap uses $* which gets eaten by cs-config.
+	     Need to figure out some way to prevent $* from being eaten.  The
+	     technique for protecting $@ does not seem to work for $*.
 	[S]  Line drawing in software renderer is not stable (overwriting
 	     memory).  This shows with BugPlug and also with AWS in some cases.
 	[**] Add the ability to get different kinds of polygon meshes from

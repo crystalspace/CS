@@ -39,13 +39,22 @@ OBJSRC=$(wildcard src/*.cpp)
 OBJS=$(addsuffix .o, $(basename $(OBJSRC)))
 PLUGIN.OBJSRC=$(wildcard plugin_src/*.cpp)
 PLUGIN.OBJS=$(addsuffix .o, $(basename $(PLUGIN.OBJSRC)))
+OUT=.
 
 #------
 # Tools to use
 #------
 CCC=g++ 
 LINK=g++
-RM=rm
+RM=rm -f
+
+#------
+# Abstractions
+#------
+LFLAGS.L = -L
+LFLAGS.l = -l
+CFLAGS.D = -D
+CFLAGS.I = -I
 
 #------
 # Flags for compiler and linker.
@@ -83,7 +92,7 @@ $(PLUGIN): $(PLUGIN.OBJS)
 	$(DO.PLUGIN) $(PLUGIN.LINKFLAGS) 
 
 clean:
-	$(RM) $(OBJS) $(PLUGIN.OBJS)
+	$(RM) $(OBJS) $(PLUGIN.OBJS) *.def
 
 #------
 # Create dependencies
@@ -102,4 +111,3 @@ $(CSCONFIG.MAK): ./cs-config
 # Include dependencies
 #------
 -include makefile.dep
-
