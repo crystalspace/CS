@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	  unknown function much later in the script.
 	- Eric Sunshine fixed jpgio.mak and pngio.mak so that they work when
 	  USE_PLUGINS=no is specified.
+	- Eric Sunshine fixed vsh.mak and vfstest.mak so that these programs
+	  can link when USE_PLUGINS=no.
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to
