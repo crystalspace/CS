@@ -535,6 +535,7 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
       printf ("INTERNAL ERROR! Don't use gouraud shaded polygons on DETAIL objects right now!\n");
       goto cleanup;
     }
+    p->GetMaterialWrapper ()->Visit ();
     mesh.mat_handle[i] = p->GetMaterialHandle ();
 
     csPolyTxtPlane* txt_plane = lmi->GetTxtPlane ();

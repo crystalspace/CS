@@ -190,6 +190,7 @@ void csSprite2D::Draw (csRenderView& rview)
 
   static G3DPolygonDPFX g3dpolyfx;
   g3dpolyfx.num = vertices.Length ();
+  cstxt->Visit ();
   g3dpolyfx.mat_handle = cstxt->GetMaterialHandle ();
   g3dpolyfx.inv_aspect = rview.GetInvFOV ();
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,

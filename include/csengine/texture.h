@@ -26,9 +26,13 @@
 #include "igraph2d.h"
 #include "itexture.h"
 
+struct csTextureWrapper;
 struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
+
+/// A callback function for when a csTextureWrapper is used.
+typedef void (csTextureCallback) (csTextureWrapper* wrap, void* data);
 
 /**
  * csTextureWrapper represents a texture and its link
@@ -43,6 +47,10 @@ private:
   iTextureHandle* handle;
   // key color
   int key_col_r, key_col_g, key_col_b;
+  // The callback which is called just before texture is used.
+  csTextureCallback* use_callback;
+  // User-data for the callback.
+  void* use_data;
 
 public:
   /// Texture registration flags
@@ -80,6 +88,32 @@ public:
 
   /// Register the texture with the texture manager
   void Register (iTextureManager *txtmng);
+
+  /**
+   * Set a callback which is called just before the texture is used.
+   * This is mainly useful for procedural textures which can then
+   * choose to update their image.
+   */
+  void SetUseCallback (csTextureCallback* callback, void* data)
+  { use_callback = callback; use_data = data; }
+
+  /**
+   * Get the use callback. If there are multiple use callbacks you can
+   * use this function to chain.
+   */
+  csTextureCallback* GetUseCallback () { return use_callback; }
+
+  /**
+   * Get the use data.
+   */
+  void* GetUseData () { return use_data; }
+
+  /**
+   * Visit this texture. This should be called by the engine right
+   * before using the texture. It is responsible for calling the use
+   * callback if there is one.
+   */
+  void Visit () { if (use_callback) use_callback (this, use_data); }
 
   CSOBJTYPE;
   DECLARE_IBASE;

@@ -336,7 +336,10 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
     {
       nd = mesh->getBinTree (i)->uniqueVertex () + mesh->getBinTree (i+1)->uniqueVertex ();
       if (_materialMap && _materialMap[i/2])
+      {
+	_materialMap[i/2]->Visit ();
 	g3dmesh.mat_handle[0] = _materialMap[i/2]->GetMaterialHandle ();
+      }
       // Render this block.
       // For software renderer we need to pass in a little bit at a time.
       g3dmesh.num_vertices = nd;  // Number of shared vertices for all triangles

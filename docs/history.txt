@@ -1,6 +1,38 @@
 The history order has been reversed so that new features are at the top.
 
 20-Dec-2000
+	- Continued work on csfx library. Implemented support for a random
+	  dot proc texture, plasma, fire and water (the last three are
+	  taken from ptlab and were added to that application by Wouter
+	  Wijngaards).
+	- Added the notion of a use-callback for a csTextureWrapper.
+	  This callback will be called right before a texture is used. Using
+	  this callback you can make sure that procedural textures are only
+	  updated when really needed (i.e. a polygon/object using the proc
+	  texture is visible). Note that the callback can be called several
+	  times in one frame if visible. The callback should keep this in
+	  mind and use the current time to check if the callback should do
+	  something.
+	- Extended csTextureWrapper and csMaterialWrapper with a Visit()
+	  function. The engine will call Visit() whenever the texture or
+	  material is used. Visit() will call the use callback.
+	- Note that this Visit() function is on csTextureWrapper and
+	  not on iTextureHandle. This means that (for example) csPixmap
+	  will not be able to fire this callback. If you use a procedural
+	  texture on a csPixmap then you'll have to do the call to Animate
+	  on your own.
+	- Added GetMaterialWrapper() to csCurve.
+	- Extended simple with a demo on how to use the new csfx
+	  library. Added a cube with six sides demonstrating the various
+	  procedural textures. Due to the new texture callback system the
+	  procedural textures are only updated when needed.
+	- There is currently an ugly hack in csProcTexture because there
+	  seems to be a bug in the software procedural texture implementation
+	  when several procedural textures are initialized from Register
+	  to Prepare (i.e. interleaved Register/Prepare as opposed to first
+	  doing all Register and then all Prepare). That's why there is
+	  now an Initialize1 and Initialize2. If the bug is fixed this will
+	  be removed.
 	- Eric Sunshine eliminated a compilation warning in me_matmn.cpp.
 	- Eric Sunshine made the following changes to MetaBalls:
 	    - Fixed bug which prevented statistical text from displaying.  This
@@ -91,6 +123,8 @@ The history order has been reversed so that new features are at the top.
 	      exit).
 	- Fixed python plugin after Andrew broke it with the changes
 	  above (i.e. remove PrepareTexture() from the cs.i file).
+	- Philip Wyett fixed a few compile errors in OpenGL renderer
+	  after Andrew's commit.
 18-Dec-2000
 	- Rene Dudfield fixed a bug in sprite3d. The rand num generator
 	  was not initialized.

@@ -41,6 +41,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  use_callback = NULL;
   (image = Image)->IncRef ();
   key_col_r = -1;
   if(image->HasKeycolor ())
@@ -53,6 +54,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  use_callback = NULL;
   flags = th.flags;
   (image = th.image)->IncRef ();
   key_col_r = th.key_col_r;
@@ -70,6 +72,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  use_callback = NULL;
   ith->IncRef ();
   flags = ith->GetFlags ();
   if (ith->GetKeyColor ())

@@ -209,6 +209,8 @@ public:
   ///
   iMaterialHandle* GetMaterialHandle () { return cstxt ? cstxt->GetMaterialHandle () : (iMaterialHandle*)NULL; }
   ///
+  csMaterialWrapper* GetMaterialWrapper () { return cstxt; }
+  ///
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   /// Return a bounding box in object space for this curve.

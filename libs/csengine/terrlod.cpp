@@ -498,6 +498,7 @@ void csLODTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
 // ???? has this to be done all the time ????
 
+    material->Visit ();
     g3dmesh->mat_handle[0] = material->GetMaterialHandle();
 
     if (rview.callback)

@@ -297,6 +297,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       fog_verts.SetLimit (tess->GetNumVertices ());
     }
 
+    c->GetMaterialWrapper ()->Visit ();
     mesh.mat_handle[0] = c->GetMaterialHandle ();
     mesh.num_vertices = tess->GetNumVertices ();
     mesh.vertices[0] = tess->GetVertices ();

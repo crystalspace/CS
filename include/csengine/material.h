@@ -138,6 +138,13 @@ public:
   /// Register the material with the texture manager
   void Register (iTextureManager *txtmng);
 
+  /**
+   * Visit this material. This should be called by the engine right
+   * before using the material. It will call Visit() on all textures
+   * that are used.
+   */
+  void Visit ();
+
   CSOBJTYPE;
   DECLARE_IBASE;
 

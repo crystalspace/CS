@@ -1239,9 +1239,15 @@ void csSprite3D::Draw (csRenderView& rview)
   // Setup the structure for DrawTriangleMesh.
   G3DTriangleMesh mesh;
   if (force_otherskin)
+  {
     mesh.mat_handle[0] = cstxt->GetMaterialHandle ();
+    cstxt->Visit ();
+  }
   else
+  {
     mesh.mat_handle[0] = tpl->cstxt->GetMaterialHandle ();
+    tpl->cstxt->Visit ();
+  }
   mesh.num_vertices = num_verts_for_lod;
   mesh.vertices[0] = verts;
   mesh.texels[0][0] = real_uv_verts;
