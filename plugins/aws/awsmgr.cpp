@@ -18,6 +18,7 @@
 #include "awstxtbx.h"
 #include "awsradbt.h"
 #include "awschkbx.h"
+#include "awsgrpfr.h"
 
 
 #include <stdio.h>
@@ -788,6 +789,7 @@ awsManager::RegisterCommonComponents()
   (void)new awsTextBoxFactory(this);
   (void)new awsRadButtonFactory(this);
   (void)new awsCheckBoxFactory(this);
+  (void)new awsGroupFrameFactory(this);
 
 
   // Standard sink

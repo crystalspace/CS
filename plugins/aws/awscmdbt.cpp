@@ -44,7 +44,7 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
  
- pm->LookupIntKey("ButtonTextureAlpha", alpha_level); // global get
+ pm->LookupIntKey("OverlayTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
  pm->GetInt(settings, "Toggle", switch_style);
