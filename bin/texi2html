@@ -3116,7 +3116,7 @@ sub GetIndexEntries
 {
   my $normal = shift;
   my $code = shift;
-  my ($entries, $prefix, $key);
+  my ($entries, $prefix, $key) = ({});
   
   for $prefix (keys %$normal)
   {
@@ -3126,14 +3126,17 @@ sub GetIndexEntries
     }
   }
 
-  for $prefix (keys %$code)
+  if (defined($code))
   {
-    unless (exists $normal->{$keys})
+    for $prefix (keys %$code)
     {
-      for $key (keys %{$index->{$prefix}})
+      unless (exists $normal->{$keys})
       {
-	$entries->{$key} = {%{$index->{$prefix}->{$key}}};
-	$entries->{$key}->{html_key} = "<CODE>$entries->{$key}->{html_key}</CODE>";
+        for $key (keys %{$index->{$prefix}})
+        {
+	  $entries->{$key} = {%{$index->{$prefix}->{$key}}};
+	  $entries->{$key}->{html_key} = "<CODE>$entries->{$key}->{html_key}</CODE>";
+        }
       }
     }
   }
@@ -3166,7 +3169,8 @@ sub byAlpha
 sub GetIndexPages
 {
   my $entries = shift;
-  my (@Letters, $key, $EntriesByLetter, $Pages, $page);
+  my (@Letters, $key);
+  my ($EntriesByLetter, $Pages, $page) = ({}, [], {});
   my @keys = sort byAlpha keys %$entries;
 
   for $key (@keys)
