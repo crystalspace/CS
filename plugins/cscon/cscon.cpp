@@ -155,7 +155,7 @@ void csConsole::Draw(csRect * = NULL)
     while (i!=line) {
       // Prevent blank lines from killing us
       if(buffer[i]&&(!buffer[i]->IsEmpty()))
-	piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), -1, -1, buffer[i]->GetData());
+	piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), 0xFFFFFF, -1, buffer[i]->GetData());
       i++;
       pos++;
       if(i>=maxlines)
@@ -163,7 +163,7 @@ void csConsole::Draw(csRect * = NULL)
     }
     // Prevent blank lines from killing us
     if(buffer[line]&&(!buffer[line]->IsEmpty()))
-      piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), -1, -1, buffer[line]->GetData());
+      piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), 0xFFFFFF, -1, buffer[line]->GetData());
     piG3D->FinishDraw();
     piG3D->Print(NULL);
   }
