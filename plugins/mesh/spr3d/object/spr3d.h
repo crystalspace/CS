@@ -38,11 +38,11 @@
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/vbufmgr.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
 struct iObjectRegistry;
-struct iVertexBuffer;
 
 /**
  * A frame for 3D sprite animation.
@@ -950,6 +950,7 @@ private:
    * of frames. Do we create a vertex buffer for every frame?
    * @@@
    */
+  iVertexBufferManager* vbufmgr;
   iVertexBuffer* vbuf;
   /// Vertex buffer for tweening.
   iVertexBuffer* vbuf_tween;
@@ -961,6 +962,14 @@ private:
 
   /// Setup this object.
   void SetupObject ();
+
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
 
 private:
   /**
