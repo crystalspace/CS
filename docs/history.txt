@@ -14,7 +14,7 @@ chronological order.
 	- Jorrit fixed a bug in the static lod code.
 	- Jorrit disabled the assembly routines in Dynavis on linux.
 	  They don't appear to work (crash).
-	- Troy in dynamics.h added bried comments to iRigidBody 
+	- Troy in dynamics.h added brief comments to iRigidBody 
 	  AttachCollider methods to allow them to appear in API docs.
 	- res improved 'detection' of what font cache has to be used for 
 	  software canvases.
