@@ -51,9 +51,11 @@ endif
 
 INC.GLIDE3D2 = $(wildcard plugins/video/renderer/glide/*.h \
   plugins/video/renderer/common/*.h)
-SRC.GLIDE3D2 = $(wildcard plugins/video/renderer/glide/*.cpp \
-  plugins/video/renderer/common/*.cpp)
-OBJ.GLIDE3D2 = $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D2:.cpp=$O)))
+SRC.GLIDE3D2.1 = $(wildcard plugins/video/renderer/glide/*.cpp)
+SRC.GLIDE3D2.2 = $(wildcard plugins/video/renderer/common/*.cpp)
+SRC.GLIDE3D2 = $(SRC.GLIDE3D2.1) $(SRC.GLIDE3D2.2)
+OBJ.GLIDE3D2 = $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D2.1:.cpp=2$O))) \
+$(addprefix $(OUT),$(notdir $(SRC.GLIDE3D2.2:.cpp=$O)))
 DEP.GLIDE3D2 = CSGEOM CSGFXLDR CSUTIL CSSYS
 CFG.GLIDE3D2 = data/config/glide.cfg
 
