@@ -18,7 +18,8 @@
 #  define HALO_PIXTYPE	unsigned int
 #endif
 
-void HALO_NAME (void *src, void *dest, int count, int delta)
+static void HALO_NAME(void *src, void *dest, int count, int delta,
+  int post_shift)
 {
   unsigned char *A = (unsigned char *)src;
   HALO_PIXTYPE *D = (HALO_PIXTYPE *)dest;
@@ -32,7 +33,7 @@ void HALO_NAME (void *src, void *dest, int count, int delta)
         // Get the destination pixel from framebuffer
         unsigned int d = *D;
 #if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d >>= PostShift;
+        d >>= post_shift;
 #endif
 
         // Compute destination R,G,B
@@ -59,7 +60,7 @@ void HALO_NAME (void *src, void *dest, int count, int delta)
 
         // Write the new value back into framebuffer
 #if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d <<= PostShift;
+        d <<= post_shift;
 #endif
         *D = d;
       }
@@ -76,7 +77,7 @@ void HALO_NAME (void *src, void *dest, int count, int delta)
         // Get the destination pixel from framebuffer
         unsigned int d = *D;
 #if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d >>= PostShift;
+        d >>= post_shift;
 #endif
 
         // Compute destination R,G,B
@@ -103,7 +104,7 @@ void HALO_NAME (void *src, void *dest, int count, int delta)
 
         // Write the new value back into framebuffer
 #if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
-        d <<= PostShift;
+        d <<= post_shift;
 #endif
         *D = d;
       }

@@ -75,7 +75,7 @@ public:
 
 //----------------// Halo scanline rasterizing functions for all modes //-----//
 
-void halo_dscan_8 (void *src, void *dest, int count, int delta)
+void halo_dscan_8 (void *src, void *dest, int count, int delta, int /*post_shift*/)
 {
   unsigned char *A = (unsigned char *)src;
   unsigned char *D = (unsigned char *)dest;
@@ -183,10 +183,10 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
 #if defined (TOP8BITS_R8G8B8_USED)
   // Used with R|G|B|A big-endian encoding
-  int PostShift;
+  int PostShift = 0;
 #endif
   // Draw a single scanline of halo
-  void (*dscan) (void *src, void *dest, int count, int delta);
+  void (*dscan)(void *src, void *dest, int count, int delta, int post_shift)=0;
 
   if (G3D->pfmt.PixelBytes == 1)
   {
@@ -215,13 +215,26 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
       break;
     case 2:
       if (G3D->pfmt.GreenBits == 6)
-        dscan = clamp ? halo_dscan_16_565_c : halo_dscan_16_565;
+      {
+        if (clamp)
+	  dscan = halo_dscan_16_565_c;
+	else
+	  dscan = halo_dscan_16_565;
+      }
       else
-        dscan = clamp ? halo_dscan_16_555_c : halo_dscan_16_555;
+      {
+        if (clamp)
+	  dscan = halo_dscan_16_555_c;
+	else
+	  dscan = halo_dscan_16_555;
+      }
       break;
     case 4:
     {
-      dscan = clamp ? halo_dscan_32_c : halo_dscan_32;
+      if (clamp)
+        dscan = halo_dscan_32_c;
+      else
+        dscan = halo_dscan_32;
       unsigned int rs = G3D->pfmt.RedShift;
       unsigned int gs = G3D->pfmt.GreenShift;
 #if defined (TOP8BITS_R8G8B8_USED)
@@ -363,7 +376,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
         unsigned char *d = G3D->line_table [sy] + (xL << pixel_shift);
         unsigned char *s = Alpha + QRound (scaleY * (sy - yTL)) * Width +
           QRound (scaleX * (xL - xTL));
-        dscan (s, d, xR - xL, delta);
+        dscan (s, d, xR - xL, delta, PostShift);
       }
 
       sxL += dxL;
