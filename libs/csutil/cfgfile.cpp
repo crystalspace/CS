@@ -140,7 +140,6 @@ void csConfigNode::SetFloat(float f)
 {
   char output [64];
   cs_snprintf (output, sizeof(output), "%g", f);
-  //scsPrintf (output, "%g", f);
   SetStr (output);
 }
 
