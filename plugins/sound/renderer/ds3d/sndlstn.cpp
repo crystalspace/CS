@@ -27,216 +27,147 @@
 #include "sndrdr.h"
 #include "sndlstn.h"
 
-IMPLEMENT_FACTORY(csSoundListenerDS3D)
-
 IMPLEMENT_IBASE(csSoundListenerDS3D)
 	IMPLEMENTS_INTERFACE(iSoundListener)
 IMPLEMENT_IBASE_END;
 
-csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase)
-{
-	CONSTRUCT_IBASE(piBase);
-
-	fPosX = fPosY = fPosZ = 0.0;
-	fDirTopX = fDirTopY = fDirTopZ = 0.0;
-	fDirFrontX = fDirFrontY = fDirFrontZ = 0.0;
-	fVelX = fVelY = fVelZ = 0.0;
-	fDoppler = 1.0;
-	fDistance = 1.0;
-	fRollOff = 1.0;
-	
-	m_p3DAudioRenderer = NULL;
-	m_pDS3DPrimaryBuffer = NULL;
-	m_pDS3DListener = NULL;
+csSoundListenerDS3D::csSoundListenerDS3D(iBase *piBase) {
+  CONSTRUCT_IBASE(piBase);
+  PrimaryBuffer = NULL;
+  Listener = NULL;
+  Renderer = NULL;
 }
 
-csSoundListenerDS3D::~csSoundListenerDS3D()
-{
-	DestroyListener();
+csSoundListenerDS3D::~csSoundListenerDS3D() {
+  if (Renderer) Renderer->DecRef();
+  if (Listener) Listener->Release();
+  if (PrimaryBuffer) {
+    PrimaryBuffer->Stop();
+    PrimaryBuffer->Release();
+  }
 }
 
-int csSoundListenerDS3D::CreateListener(iSoundRender * render)
-{
-	HRESULT hr;
-	csSoundRenderDS3D *renderDS3D;
+bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
+  srdr->IncRef();
+  Renderer = srdr;
 	
-	if(!render) return E_FAIL;
-	renderDS3D = (csSoundRenderDS3D *)render;
+  DSBUFFERDESC dsbd;
+  ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
+  dsbd.dwSize = sizeof(DSBUFFERDESC);
+  dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D;
 	
-	m_p3DAudioRenderer = renderDS3D->m_p3DAudioRenderer;
+  if (Renderer->AudioRenderer->CreateSoundBuffer
+    (&dsbd, &PrimaryBuffer, NULL) != DS_OK) {
+    Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: Cannot create primary"
+      " sound buffer.\n");
+    return false;
+  }
 	
-	if (!m_p3DAudioRenderer)
-		return(E_FAIL);
-	
-	DSBUFFERDESC    dsbd;
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-	dsbd.dwSize = sizeof(DSBUFFERDESC);
-	
-	dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D;
-	
-	if ((hr = m_p3DAudioRenderer->CreateSoundBuffer(&dsbd, &m_pDS3DPrimaryBuffer, NULL)) != DS_OK)
-	{
-		return E_FAIL;
-	}
-	
-	if ((hr = m_pDS3DPrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &m_pDS3DListener)) != DS_OK)
-	{
-		return E_FAIL;
-	}
-	
-	if ((hr = m_pDS3DListener->SetDopplerFactor(fDoppler, DS3D_IMMEDIATE)) != DS_OK)
-	{
-		return E_FAIL;
-	}
-	
-	if ((hr = m_pDS3DListener->SetDistanceFactor(fDistance, DS3D_IMMEDIATE)) != DS_OK)
-	{
-		return E_FAIL;
-	}
-	
-	if ((hr = m_pDS3DListener->SetRolloffFactor(fRollOff, DS3D_IMMEDIATE)) != DS_OK)
-	{
-		return E_FAIL;
-	}
-	
-	return S_OK;
+  if (PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, 
+    (void **) &Listener) != DS_OK)
+  {
+    Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: Cannot query listener"
+      " interface from primary sound buffer.\n");
+    return false;
+  }
+
+  SetPosition(csVector3(0,0,0));
+  SetVelocity(csVector3(0,0,0));
+  SetDirection(csVector3(0,0,1), csVector3(0,1,0));
+  SetDistanceFactor(1.0);
+  SetDopplerFactor(1.0);
+  SetDistanceFactor(1.0);
+  SetRollOffFactor(1.0);
+  SetEnvironment(ENVIRONMENT_GENERIC);
+  Prepare();
+
+  return true;
 }
 
-int csSoundListenerDS3D::DestroyListener()
-{
-	HRESULT hr;
-	
-	if (m_pDS3DListener)
-	{
-		if ((hr = m_pDS3DListener->Release()) < DS_OK)
-			return(hr);
-		
-		m_pDS3DListener = NULL;
-	}
-	
-	if (m_pDS3DPrimaryBuffer)
-	{
-		if ((hr = m_pDS3DPrimaryBuffer->Stop()) < DS_OK)
-			return(hr);
-		
-		if ((hr = m_pDS3DPrimaryBuffer->Release()) < DS_OK)
-			return(hr);
-		
-		m_pDS3DPrimaryBuffer = NULL;
-	}
-	
-	fDoppler = 1.0f;
-	fDistance = 1.0f;
-	fRollOff = 1.0f;
-	
-	return S_OK;
+void csSoundListenerDS3D::SetPosition(csVector3 v) {
+  Dirty = true;
+  Position = v;
+  Listener->SetPosition( v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetPosition(float x, float y, float z)
-{
-	fPosX = x; fPosY = y; fPosZ = z;
-	m_pDS3DListener->
-		SetPosition( fPosX, fPosY, fPosZ,DS3D_IMMEDIATE );
+void csSoundListenerDS3D::SetDirection(csVector3 f, csVector3 t) {
+  Dirty = true;
+  Front = f;
+  Top = t;
+  Listener->SetOrientation(f.x, f.y, f.z,t.x, t.y, t.z,DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDirection(float fx, float fy, float fz, float tx, float ty, float tz)
-{
-	
-	fDirFrontX = fx; fDirFrontY = fy; fDirFrontZ = fz;
-	fDirTopX = tx; fDirTopY = ty; fDirTopZ = tz;
-	
-	m_pDS3DListener->SetOrientation(
-		fDirFrontX, fDirFrontY, fDirFrontZ,
-		fDirTopX, fDirTopY, fDirTopZ,
-		DS3D_IMMEDIATE);
+void csSoundListenerDS3D::SetHeadSize(float size) {
+//  Dirty = true;
+  HeadSize = size;
+// @@@
 }
 
-void csSoundListenerDS3D::SetHeadSize(float size)
-{
-	fHeadSize = size;
+void csSoundListenerDS3D::SetVelocity(csVector3 v) {
+  Dirty = true;
+  Velocity = v;
+  Listener->SetVelocity(v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetVelocity(float x, float y, float z)
-{
-	fVelX = x; fVelY = y; fVelZ = z;
-	
-	if(!m_pDS3DListener) return;
-	
-	m_pDS3DListener->SetVelocity(
-		fVelX, fVelY, fVelZ,
-		DS3D_IMMEDIATE);
+void csSoundListenerDS3D::SetDopplerFactor(float factor) {
+  Dirty = true;
+  Doppler = factor;
+  Listener->SetDopplerFactor(Doppler, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDopplerFactor(float factor)
-{
-	fDoppler = factor;
-	
-	if(!m_pDS3DListener) return;
-	
-	m_pDS3DListener->SetDopplerFactor(fDoppler, DS3D_IMMEDIATE);
+void csSoundListenerDS3D::SetDistanceFactor(float factor) {
+  Dirty = true;
+  DistanceFactor = factor;
+  Listener->SetDistanceFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetDistanceFactor(float factor)
-{
-	fDistance = factor;
-	
-	if(!m_pDS3DListener) return;
-	
-	m_pDS3DListener->
-		SetDistanceFactor(fDistance, DS3D_IMMEDIATE);
+void csSoundListenerDS3D::SetRollOffFactor(float factor) {
+  Dirty = true;
+  RollOff = factor;
+  Listener->SetRolloffFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerDS3D::SetRollOffFactor(float factor)
-{
-	fRollOff = factor;
-	
-	if(!m_pDS3DListener) return;
-	
-	m_pDS3DListener->SetRolloffFactor(fRollOff, DS3D_IMMEDIATE);
+void csSoundListenerDS3D::SetEnvironment(SoundEnvironment env) {
+//  Dirty = true;
+  Environment = env;
+// @@@
 }
 
-void csSoundListenerDS3D::SetEnvironment(SoundEnvironment env)
-{
-	Environment = env;
+csVector3 csSoundListenerDS3D::GetPosition() {
+  return Position;
 }
 
-void csSoundListenerDS3D::GetPosition(float &x, float &y, float &z)
-{
-	x = fPosX; y = fPosY; z = fPosZ;
+void csSoundListenerDS3D::GetDirection(csVector3 &f, csVector3 &t) {
+  f = Front;
+  t = Top;
 }
 
-void csSoundListenerDS3D::GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz)
-{
-	fx = fDirFrontX; fy = fDirFrontY; fz = fDirFrontZ;
-	tx = fDirTopX; ty = fDirTopY; tz = fDirTopZ;
+float csSoundListenerDS3D::GetHeadSize() {
+  return HeadSize;
 }
 
-float csSoundListenerDS3D::GetHeadSize()
-{
-	return fHeadSize;
+csVector3 csSoundListenerDS3D::GetVelocity() {
+  return Velocity;
 }
 
-void csSoundListenerDS3D::GetVelocity(float &x, float &y, float &z)
-{
-	x = fVelX; y = fVelY; z = fVelZ;
+float csSoundListenerDS3D::GetDopplerFactor() {
+  return Doppler;
 }
 
-float csSoundListenerDS3D::GetDopplerFactor()
-{
-	return fDoppler;
+float csSoundListenerDS3D::GetDistanceFactor() {
+  return DistanceFactor;
 }
 
-float csSoundListenerDS3D::GetDistanceFactor()
-{
-	return fDistance;
+float csSoundListenerDS3D::GetRollOffFactor() {
+  return RollOff;
 }
 
-float csSoundListenerDS3D::GetRollOffFactor()
-{
-	return fRollOff;
+SoundEnvironment csSoundListenerDS3D::GetEnvironment() {
+  return Environment;
 }
 
-SoundEnvironment csSoundListenerDS3D::GetEnvironment()
-{
-	return Environment;
+void csSoundListenerDS3D::Prepare() {
+  if (!Dirty) return;
+  Listener->CommitDeferredSettings();
+  Dirty = false;
 }

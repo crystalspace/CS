@@ -21,59 +21,52 @@
 #if !defined(__CSSOUNDLISTENERDS3D_H__)
 #define __CSSOUNDLISTENERDS3D_H__
 
-#include "cssfxldr/common/snddata.h"
-#include "isndrdr.h"
 #include "isndlstn.h"
+
+class csSoundRenderDS3D;
 
 class csSoundListenerDS3D  : public iSoundListener
 {
+friend class csSoundRenderDS3D;
 public:
-	DECLARE_IBASE;
-	csSoundListenerDS3D(iBase *piBase);
-	virtual ~csSoundListenerDS3D();
+  DECLARE_IBASE;
+  csSoundListenerDS3D(iBase *piBase);
+  virtual ~csSoundListenerDS3D();
 	
-	void SetDirection(float fx, float fy, float fz, float tx, float ty, float tz);
-	void SetPosition(float x, float y, float z);
-	void SetVelocity(float x, float y, float z);
-	void SetDistanceFactor(float factor);
-	void SetRollOffFactor(float factor);
-	void SetDopplerFactor(float factor);
-	void SetHeadSize(float size);
-	void SetEnvironment(SoundEnvironment env);
-	
-	void GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz);
-	void GetPosition(float &x, float &y, float &z);
-	void GetVelocity(float &x, float &y, float &z);
-	float GetDistanceFactor();
-	float GetRollOffFactor();
-	float GetDopplerFactor();
-	float GetHeadSize();
-	SoundEnvironment GetEnvironment();
-	
-public:
-	// Position
-	float fPosX, fPosY, fPosZ;
-	// Velocity
-	float fVelX, fVelY, fVelZ;
-	// Direction
-	float fDirTopX, fDirTopY, fDirTopZ, fDirFrontX, fDirFrontY, fDirFrontZ;
-	// Doppler
-	float fDoppler;
-	// Distance
-	float fDistance;
-	// RollOff
-	float fRollOff;
-	// HeadSize
-	float fHeadSize;
-	// Environment
-	SoundEnvironment Environment;
-	
-	int CreateListener(iSoundRender *render);
-	int DestroyListener();
-	
-	LPDIRECTSOUNDBUFFER		m_pDS3DPrimaryBuffer;
-	LPDIRECTSOUND3DLISTENER	m_pDS3DListener;
-	LPDIRECTSOUND		m_p3DAudioRenderer;
+  virtual void SetDirection (csVector3 Front, csVector3 Top);
+  virtual void SetPosition (csVector3 pos);
+  virtual void SetVelocity (csVector3 v);
+  virtual void SetDistanceFactor (float factor);
+  virtual void SetRollOffFactor (float factor);
+  virtual void SetDopplerFactor (float factor);
+  virtual void SetHeadSize (float size);
+  virtual void SetEnvironment (SoundEnvironment env);
+  virtual void GetDirection (csVector3 &Front, csVector3 &Top);
+  virtual csVector3 GetPosition ();
+  virtual csVector3 GetVelocity ();
+  virtual float GetDistanceFactor ();
+  virtual float GetRollOffFactor ();
+  virtual float GetDopplerFactor ();
+  virtual float GetHeadSize ();
+  virtual SoundEnvironment GetEnvironment ();
+
+  bool Initialize(csSoundRenderDS3D *srdr);
+  void Prepare();
+
+private:
+  csSoundRenderDS3D *Renderer;
+  LPDIRECTSOUNDBUFFER PrimaryBuffer;
+  LPDIRECTSOUND3DLISTENER Listener;
+
+  // we have to store these values outside the ds3d object. This assures that
+  // correct values are returned in the Get*() functions for deferred setup,
+  // which may not have applied the changes yet.
+  bool Dirty;
+  csVector3 Position;
+  csVector3 Velocity;
+  csVector3 Front, Top;
+  float DistanceFactor, RollOff, Doppler, HeadSize;
+  SoundEnvironment Environment;
 };
 
 #endif // __CSSOUNDLISTENERDS3D_H__

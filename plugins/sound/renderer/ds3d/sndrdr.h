@@ -24,8 +24,7 @@
 // SoundRender.H
 // csSoundRenderDS3D class.
 
-#include "csutil/scf.h"
-#include "cssfxldr/common/snddata.h"
+#include "isnddata.h"
 #include "isndrdr.h"
 
 class csSoundListenerDS3D;
@@ -33,33 +32,31 @@ class csSoundListenerDS3D;
 class csSoundRenderDS3D : public iSoundRender
 {
 public:
-	DECLARE_IBASE;
-	csSoundRenderDS3D(iBase *piBase);
-	virtual ~csSoundRenderDS3D();
-	
-	virtual bool Initialize (iSystem *iSys);
+  DECLARE_IBASE;
+  csSoundRenderDS3D(iBase *piBase);
+  virtual ~csSoundRenderDS3D();
+  virtual bool Initialize (iSystem *iSys);
 
-	bool Open();
-	void Close();
-	
-	void Update();
-	
-	void SetVolume(float vol);
-	float GetVolume();
-	
-	void PlayEphemeral(csSoundData *snd, bool loop = false);
-	
-	iSoundListener *GetListener();
-	iSoundSource *CreateSource(csSoundData *snd);
-	iSoundBuffer *CreateSoundBuffer(csSoundData *snd);
-	
-	void MixingFunction() {}
-	
+  virtual bool Open ();
+  virtual void Close ();
+
+  virtual void SetVolume (float vol);
+  virtual float GetVolume ();
+
+  virtual void PlayEphemeral (iSoundData *snd, bool Loop=false);
+  virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d);
+  virtual iSoundListener *GetListener ();
+  virtual const csSoundFormat *GetLoadFormat();
+  virtual void Update();
+  virtual void MixingFunction ();
+
+  void SetDirty();
+
 public:
-	LPDIRECTSOUND		m_p3DAudioRenderer;
-	iSystem* m_piSystem;
-	
-	csSoundListenerDS3D* m_pListener;
+  LPDIRECTSOUND AudioRenderer;
+  iSystem *System;
+  csSoundListenerDS3D *Listener;
+  csSoundFormat LoadFormat;
 };
 
 #endif	//__SOUND_RENDER_DS3D_H__

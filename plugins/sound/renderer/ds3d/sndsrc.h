@@ -21,42 +21,45 @@
 #if !defined(__CSSOUNDSOURCEDS3D_H__)
 #define __CSSOUNDSOURCEDS3D_H__
 
-#include "cssfxldr/common/snddata.h"
-#include "isndrdr.h"
 #include "isndsrc.h"
-
-class csSoundBufferDS3D;
+struct iSoundData;
 
 class csSoundSourceDS3D : public iSoundSource
 {
 public:
-	DECLARE_IBASE;
-	csSoundSourceDS3D(iBase *piBase);
-	virtual ~csSoundSourceDS3D();
-	
-	void SetPosition(float x, float y, float z);
-	void SetVelocity(float x, float y, float z);
-	
-	void GetPosition(float &x, float &y, float &z);
-	void GetVelocity(float &x, float &y, float &z);
-	
-	iSoundBuffer *GetSoundBuffer();
-	
-public:
-	/// Position of sound object
-	float fPosX, fPosY, fPosZ;
-	/// Velocity of sound object
-	float fVelX, fVelY, fVelZ;
-	
-	// SoundBuffer
-	csSoundBufferDS3D *pSoundBuffer;
-	
-	int DestroySource();
-	int CreateSource();
-	
-	LPDIRECTSOUND3DBUFFER	m_pDS3DBuffer3D;
-	LPDIRECTSOUNDBUFFER	m_pDS3DBuffer2D;
-	LPDIRECTSOUND		m_p3DAudioRenderer;
+  DECLARE_IBASE;
+
+  csSoundSourceDS3D(iBase *scfParent);
+  virtual ~csSoundSourceDS3D();
+  bool Initialize(csSoundRenderDS3D *srdr, iSoundData *data, bool is3d);
+
+  virtual void Play (unsigned long playMethod = 0);
+  virtual void Stop ();
+  virtual void SetVolume (float volume);
+  virtual float GetVolume ();
+  virtual void SetFrequencyFactor (float factor);
+  virtual float GetFrequencyFactor ();
+  virtual bool Is3d();
+  virtual void SetPosition(csVector3 pos);
+  virtual csVector3 GetPosition();
+  virtual void SetVelocity(csVector3 spd);
+  virtual csVector3 GetVelocity();
+
+private:
+  // Position and velocity of sound object. These are copies of the internal
+  // values to assure correct return values when calling Get*() while
+  // deferred settings are not yet committed.
+  csVector3 Position, Velocity;
+
+  // sound buffers
+  LPDIRECTSOUND3DBUFFER Buffer3D;
+  LPDIRECTSOUNDBUFFER Buffer2D;
+
+  // renderer
+  csSoundRenderDS3D *Renderer;
+
+  // frequency of sound data
+  unsigned long BaseFrequency;
 };
 
 #endif // __CSSOUNDSOURCEDS3D_H__
