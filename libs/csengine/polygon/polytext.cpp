@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+extern "C" {
 #include <math.h>
-
+}
+#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/fastsqrt.h"
