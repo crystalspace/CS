@@ -39,6 +39,30 @@ chronological order.
 	- Oktal added a couple of missing doxygen comments to hash.h and
 	  make the csHash::Iterator and ::GlobalIterator copy constructors
 	  public (bug found by res).
+	- res made the following changes:
+	    - Updated iFont to support Unicode characters. Also, glyph metrics
+	      are now differentiated between glyph- and bitmap-specific 
+	      metrics. Glyph metrics are the same for mono and gray bitmaps,
+	      but bitmap metrics aren't.
+	    - Updated canvases (actually, font caches) for the iFont changes.
+	    - Enhanced csfgen to output Unicode-enabled CSF fonts.
+	    - Changed to built-in fonts to properly support Unicode.
+	    - Enhanced the font multiplexer. Can multiplex on character level
+	      and can be configured in which order fonts should asked for
+	      glyphs.
+	    - Added the GNOME fonts (Bitstream Vera families) and GNU Unifont
+	      to the repository.
+	    - Changed csHashMap::FindLargerPrime() to return the number passed
+	      in if it's already a prime (and renamed the function to 
+	      FindNextPrime())
+	    - csEvent constructs it's 'attributes' hash map a smaller size.
+	      This should reduce it's memory requirements a bit.
+	    - Made the copy constructors for csHash<>::Iterator and 
+	      GlobalIterator public.
+	- res forgot to update makedep after removing the stdio aliases from 
+	  the Win32 port.
+	- res made csHash<> a friend class of csHash<>:: Iterator and
+	  GlobalIterator.
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.

@@ -27,7 +27,6 @@
 */
 /* $XFree86: xc/config/makedepend/cppsetup.c,v 3.2 1996/12/30 13:57:53 dawes Exp $ */
 
-#define CS_NO_STDIO_REPLACEMENTS
 #include "cssysdef.h"
 #include "def.h"
 #include <ctype.h>

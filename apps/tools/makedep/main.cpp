@@ -37,7 +37,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#define CS_NO_STDIO_REPLACEMENTS
 #include "cssysdef.h"
 #include "def.h"
 

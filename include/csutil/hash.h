@@ -242,6 +242,7 @@ public:
     : hash (hash0), key (key0), bucket (key % hash->Modulo),
       size (hash->Elements[bucket].Length ()) { Return (); }
 
+    friend class csHash<T>;
   public:
     Iterator (const Iterator &o)
     : hash (o.hash), bucket (o.bucket), size (o.size), element (o.element) {}
@@ -277,6 +278,7 @@ public:
   protected:
     GlobalIterator (const csHash<T> *hash0) : hash (hash0) { Zero (); Init (); }
 
+    friend class csHash<T>;
   public:
     GlobalIterator (const Iterator &o) : hash (o.hash), bucket (o.bucket),
       size (o.size), element (o.element) {}
