@@ -11,7 +11,7 @@
 const bool AWS_COMP_DEBUG=true;
 
 
-awsComponent::awsComponent():wmgr(NULL),children(NULL)
+awsComponent::awsComponent():wmgr(NULL),children(NULL), signalsrc(this)
 {
   hidden = true; // initially set it hidden to cause the marking of a dirty rectangle upon first Show ()
 }
@@ -64,6 +64,10 @@ awsComponent::HasChildren()
 iAws *
 awsComponent::WindowManager()
 { return wmgr; }
+
+iAwsComponent *
+awsComponent::GetComponent()
+{ return this; }
     
 /**
  *  This function is normally called automatically by the window manager.  You may call it manually if you wish, but
@@ -117,11 +121,11 @@ awsComponent::GetProperty(char *name, void **parm)
 }
 
 bool 
-awsComponent::SetProperty(char *name, void **parm)
+awsComponent::SetProperty(char *name, void *parm)
 {  
   if (strcmp("Frame", name)==0)
   {
-    csRect *r = (csRect *)(*parm);
+    csRect *r = (csRect *)(parm);
 
     Frame().Set(*r);
     return true;

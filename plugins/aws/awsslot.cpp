@@ -120,7 +120,7 @@ awsSink::RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *))
 }
 
 ///////////////////////////////////// Signal Sources ////////////////////////////////////////////////////////
-awsSource::awsSource() 
+awsSource::awsSource(iAwsComponent *_owner):owner(_owner) 
 {  
 }
 
@@ -134,6 +134,12 @@ awsSource::~awsSource()
   }
 
   slots.SetLength(0);
+}
+
+iAwsComponent *
+awsSource::GetComponent()
+{
+  return owner;
 }
 
 

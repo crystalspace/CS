@@ -138,13 +138,13 @@ awsWindow::GetProperty(char *name, void **parm)
 }
 
 bool 
-awsWindow::SetProperty(char *name, void **parm)
+awsWindow::SetProperty(char *name, void *parm)
 {  
   if (comp.SetProperty(name, parm)) return true;
 
   if (strcmp("Title", name)==0)
   {
-    iString *t = (iString *)(*parm);
+    iString *t = (iString *)(parm);
     if (t)
     {
       title->DecRef();
@@ -159,6 +159,11 @@ awsWindow::SetProperty(char *name, void **parm)
   return false;
 }
 
+iAwsComponent *
+awsWindow::GetComponent()
+{
+  return this;
+}
 
 void 
 awsWindow::SetRedrawTag(unsigned int tag)

@@ -94,17 +94,18 @@ awsCmdButton::GetProperty(char *name, void **parm)
 }
 
 bool 
-awsCmdButton::SetProperty(char *name, void **parm)
-{  
+awsCmdButton::SetProperty(char *name, void *parm)
+{
   if (awsComponent::SetProperty(name, parm)) return true;
 
   if (strcmp("Caption", name)==0)
   {
-    iString *s = (iString *)(*parm);
-
+    iString *s = (iString *)(parm);
+    
     if (s)
     {
       if (caption) caption->DecRef();
+      caption=s;
       caption->IncRef();
       Invalidate();
     }
