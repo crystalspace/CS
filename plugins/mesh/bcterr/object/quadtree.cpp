@@ -160,7 +160,7 @@ void csColQuad::HeightTestExt (csVector3  *point,
             point->y = newpoint.y;
             hits += 1;
           }
-          v = u - 0.1f;
+          /*v = u - 0.1f;
           if ( v >= 0.0)
           {
             newpoint = BezierCompute (v, temp);
@@ -175,7 +175,7 @@ void csColQuad::HeightTestExt (csVector3  *point,
             newpoint.y += 2.0f;
             if (newpoint.y > point->y)
               point->y = newpoint.y;
-          }
+          }*/
           //point->y = newpoint.y + 10.0f;
         }
       }			

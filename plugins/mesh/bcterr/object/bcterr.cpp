@@ -123,7 +123,7 @@ void csSharedLODMesh::CreateMesh (int new_x_verts, int new_z_verts, int edge_res
   x_verts = new_x_verts;
   z_verts = new_z_verts;
   // free = true;
-  num_verts = (x_verts * z_verts) + ( (edge_res + 2) * 4) ;
+  num_verts = (x_verts * z_verts) + ( (edge_res + 3) * 4) ;
   normals = new csVector3[num_verts];
   color = new csColor[num_verts];
   texels = new csVector2[num_verts];
@@ -318,7 +318,7 @@ void csBCTerrBlock::SetupBaseMesh ()
       verts[pos] = work[j];
       if (j == 3) u = 1.0f;
       if (i == 3) v = 1.0f;
-      texels[pos].Set (v,u);
+      texels[pos].Set (u,v);
       color[pos].Set (1,1,1);
       normals[pos].Set(1,1,1);
       pos++;
@@ -452,7 +452,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   size = nowner->factory_state->GetSize ();
   edge_res = nowner->factory_state->GetMaxEdgeResolution ();
   end = default_lod->x_verts * default_lod->z_verts;
-  edges = edge_res;
+  edges = edge_res + 1;
 
   // up
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation up");
@@ -471,7 +471,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       if (u > 0.0f) u = u / u_add;
       if (u < 0.0f) u = 0.0f;
       if (u > 1.0f) u = 1.0f;
-      default_lod->texels[pos].Set ( 0, u);
+      default_lod->texels[pos].Set ( 0.0, u);
       default_lod->color[pos] = work_mesh->color[i];
       pos += 1;
       x1_end += 1;
@@ -1002,9 +1002,9 @@ void csBCTerrBlock::AddEdgeTriangles ( csSharedLODMesh *lod)
     }
     while (edge_pos < work )
     {
-      tri[num_tri].a = edge_pos;
+      tri[num_tri].a = total;
       tri[num_tri].b = edge_pos + x_verts;
-      tri[num_tri].c = total;
+      tri[num_tri].c = edge_pos;
       num_tri++;
       edge_pos += x_verts;
     }
@@ -1763,11 +1763,11 @@ void csBCTerrObject::SetupControlPoints (iImage* im)
  */
 void csBCTerrObject::FreeSharedLOD (const csVector3 point)
 {
-  if (!vis)
+  if (vis == false)
   {
     int i, n;
     csVector3 dist;
-    float distance;
+    float distance, checkdistance;
     n = x_blocks * z_blocks;
     float* Distances = factory_state->GetLODDistances ();
     for (i = 0; i < n; i++)
@@ -1778,11 +1778,11 @@ void csBCTerrObject::FreeSharedLOD (const csVector3 point)
         // currently unused and incomplete
         dist = blocks[i].bbox.GetCenter () - point;
         distance = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
-        if (distance > (Distances[blocks[i].current_lod->level + 1]) )
+        checkdistance = Distances[blocks[i].current_lod->level] * 2;
+        if (distance > checkdistance )
           blocks[i].FreeLOD ();
       }
     }
-    vis = false;
   }
 }
 
@@ -2162,7 +2162,7 @@ csSharedLODMesh* csBCTerrObjectFactory::GetSharedMesh ( int level, csBCTerrBlock
     }
     free_lods = false;
   }
-  level -= user_lod_start;
+  //level -= user_lod_start;
   if (level >= 0)
   {    
     csBCLODOwner* list = owners[level];
