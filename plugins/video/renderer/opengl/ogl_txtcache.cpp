@@ -235,6 +235,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 csSuperLightMap::csSuperLightMap ()
 {
   cacheData = NULL;
+  Handle = 0;
 }
 
 csSuperLightMap::~csSuperLightMap ()
@@ -369,7 +370,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
 
   int i;
   int numLightmaps = s->lightmaps.Length ();
-  GLuint SLMHandle;
   if (s->cacheData)
   {
     //The data is already in cache, let's see
@@ -378,7 +378,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
 
     if (dirty || !s->initialized)
     {
-      SLMHandle = s->cacheData->Handle;
+      GLuint SLMHandle = s->cacheData->Handle;
       for (i = 0; i < numLightmaps; i++)
       {
         if (lmArray[i]->RecalculateDynamicLights ())
@@ -390,8 +390,8 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
           csRect r = rectangleArray[i];
           csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D,
 	  	SLMHandle);
-          glTexSubImage2D (GL_TEXTURE_2D, 0,r.xmin,r.ymin,
-            lmwidth, lmheight,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
+          glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
+            lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
         }
       }
       s->initialized = true;
@@ -418,9 +418,9 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   //width and height
   suplm[index].Alloc (s);
   csSLMCacheData* superLMData = (csSLMCacheData*) suplm[index].cacheData;
+  GLuint SLMHandle;
   superLMData->Handle = SLMHandle = suplm[index].Handle;
   s->slId = index;
-
   for (i = 0; i < numLightmaps; i++)
   {
     lmArray[i]->RecalculateDynamicLights();
@@ -430,8 +430,8 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
     csRGBpixel* lm_data = lm->GetMapData ();
     csRect r = rectangleArray[i];
     csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
-    glTexSubImage2D (GL_TEXTURE_2D, 0,r.xmin,r.ymin,
-      lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
+    glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
+      lmwidth, lmheigth, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
   }
   s->initialized = true;
 }
