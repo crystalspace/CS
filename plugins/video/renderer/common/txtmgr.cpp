@@ -32,7 +32,7 @@
 csTexture::csTexture (csTextureHandle *Parent)
 {
   parent = Parent;
-  DG_ADD (this, "NONAME");
+  DG_ADD (this, NULL);
   DG_TYPE (this, "csTexture");
 }
 
@@ -50,7 +50,7 @@ SCF_IMPLEMENT_IBASE_END
 csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csTextureHandle");
 
   (image = Image)->IncRef ();
@@ -213,7 +213,7 @@ SCF_IMPLEMENT_IBASE_END
 csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csMaterialHandle");
   num_texture_layers = 0;
   if ((material = m) != 0)
@@ -246,7 +246,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, "NONAME");
+  DG_ADDI (this, NULL);
   DG_TYPE (this, "csMaterialHandle");
   material = NULL;
   num_texture_layers = 0;

@@ -117,6 +117,7 @@ iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
   }
   else
     TexHandle = NULL;
+  Image->DecRef ();
 
   return TexHandle;
 }
