@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Nov-2004
+	- res fixed light flare halos for NR.
+	- res changed csRenderLoop::Draw() to save the clipper before drawing
+	  and subsequently restore it. Needed for proper halo visibility
+	  recognition.
+	- res changed the NR texture manager to now unload textures upon 
+	  clearing (ie, context closing).
+	- res slightly augmented the 
+	  csApplicationFramework::SetApplicationName() docs.
 23-Nov-2004
 	- Eric Sunshine fixed bug in csSCF::GetPluginMetadata() in which it had
 	  not been properly (fully) updated to deal with csStringID following

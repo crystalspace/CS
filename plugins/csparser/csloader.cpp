@@ -4332,7 +4332,6 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       break;
     case 3:
       {
-#ifndef CS_USE_NEW_RENDERER
 	iMaterialWrapper* ifmc = halo.flare.mat_center;
 	iMaterialWrapper* ifm1 = halo.flare.mat_spark1;
 	iMaterialWrapper* ifm2 = halo.flare.mat_spark2;
@@ -4355,7 +4354,6 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	flare->AddComponent (3.0f, 3.0f, 3.0f, CS_FX_ADD, ifm1);
 	flare->AddComponent (3.1f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
 	flare->AddComponent (3.3f, 0.15f, 0.15f, CS_FX_ADD, ifm2);
-#endif // CS_USE_NEW_RENDERER
       }
       break;
   }

@@ -28,6 +28,7 @@
 #include "iutil/plugin.h"
 #include "iutil/document.h"
 #include "iutil/vfs.h"
+#include "igeom/clip2d.h"
 #include "iengine/material.h"
 #include "iengine/rendersteps/irsfact.h"
 #include "iengine/rendersteps/igeneric.h"
@@ -65,6 +66,10 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
   {
     ((csRenderView*)rview)->SetupClipPlanes ();
 
+    // Needed so halos are correctly recognized as "visible".
+    csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();
+    int oldClipType = rview->GetGraphics3D()->GetClipType();
+
     csShaderVarStack &varStack = shadermanager->GetShaderVariableStack ();
     shadermanager->PushVariables (varStack);
 
@@ -78,6 +83,8 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     }
     s->DecRecLevel ();
     shadermanager->PopVariables (varStack);
+
+    rview->GetGraphics3D()->SetClipper (oldClipper, oldClipType);
 
     // @@@ See above note about halos.
     iLightList* lights = s->GetLights();

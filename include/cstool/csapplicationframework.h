@@ -279,7 +279,8 @@ public:
    * your derived csApplicationFramework class, but it is safe to call it any
    * number of times.
    * \remarks
-   * The string should be in the form "vendor.application-name".
+   * The string should be in the form "vendor.application-name". Spaces should
+   * be avoided.
    */
   static void SetApplicationName (char *name)
   {

@@ -215,14 +215,16 @@ csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle,
 
 csGLTextureHandle::~csGLTextureHandle()
 {
-  for (size_t i=0; i<vTex.Length(); i++)
-    delete vTex[i];
-  Unload ();
+  Clear ();
   SCF_DESTRUCT_IBASE()
 }
 
 void csGLTextureHandle::Clear()
 {
+  for (size_t i=0; i<vTex.Length(); i++)
+    delete vTex[i];
+  vTex.DeleteAll();
+  Unload ();
 }
 
 void csGLTextureHandle::FreeImage ()

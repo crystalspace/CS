@@ -491,16 +491,21 @@ void csLightFlareHalo::ProcessFlareComponent (
   csVector2 const &start,
   csVector2 const &deltapos)
 {
-#ifndef CS_USE_NEW_RENDERER
   csVector2 pos = start + comp->position * deltapos;
 
-  /// drawing info for the polygon
-  G3DPolygonDPFX dpfx;
-  
   /// Compute size and position of this component
   float hw = (halosize * comp->width) * 0.5f;
   float hh = (halosize * comp->height) * 0.5f;
   
+  csVector2 HaloUV[4] =
+  {
+    csVector2 (0.0, 0.0),
+    csVector2 (0.0, 1.0),
+    csVector2 (1.0, 1.0),
+    csVector2 (1.0, 0.0)
+  };
+
+#ifndef CS_USE_NEW_RENDERER
   // Create a rectangle containing the halo and clip it against screen
   csVector2 HaloPoly[4] =
   {
@@ -510,14 +515,9 @@ void csLightFlareHalo::ProcessFlareComponent (
     csVector2 (pos.x + hw, pos.y - hh)
   };
 
-  csVector2 HaloUV[4] =
-  {
-    csVector2 (0.0, 0.0),
-    csVector2 (0.0, 1.0),
-    csVector2 (1.0, 1.0),
-    csVector2 (1.0, 0.0)
-  };
-
+  /// drawing info for the polygon
+  G3DPolygonDPFX dpfx;
+  
   // Clip the halo against clipper
   int num_clipped_verts;
   csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
@@ -591,5 +591,62 @@ void csLightFlareHalo::ProcessFlareComponent (
   /// draw
   dpfx.mixmode = mode;
   engine.G3D->DrawPolygonFX (dpfx);
+#else
+  if (!comp->image)
+  {
+    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without material.");
+    return ;
+  }
+  iMaterialHandle* mat_handle = comp->image->GetMaterialHandle ();
+  if (!mat_handle)
+  {
+    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without valid material handle.");
+    return ;
+  }
+
+  comp->image->Visit ();
+
+  csSimpleRenderMesh mesh;
+
+  float intensity = flare->GetIntensity ();
+  uint mode = comp->mixmode;
+  if (!((mode & CS_FX_MASK_MIXMODE) == CS_FX_ADD) || (intensity >= 1.0f))
+  {
+    mode |= CS_FX_FLAT;
+    intensity = 1.0f;
+  }
+  else if ((mode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+  {
+    intensity *= (float (mode & CS_FX_MASK_ALPHA) / 255.0f);
+    mesh.alphaType.autoAlphaMode = false;
+    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
+  }
+
+  static uint indices[4] = {0, 1, 2, 3};
+  csVector4 colors[4] = {csVector4 (intensity), csVector4 (intensity), 
+    csVector4 (intensity), csVector4 (intensity)};
+
+  pos.y = ((float)engine.G3D->GetHeight()) - pos.y;
+
+  // Create a rectangle containing the halo and clip it against screen
+  csVector3 HaloPoly[4] =
+  {
+    csVector3 (pos.x - hw, pos.y - hh, 0),
+    csVector3 (pos.x + hw, pos.y - hh, 0),
+    csVector3 (pos.x + hw, pos.y + hh, 0),
+    csVector3 (pos.x - hw, pos.y + hh, 0)
+  };
+
+  mesh.meshtype = CS_MESHTYPE_QUADS;
+  mesh.indexCount = 4;
+  mesh.indices = indices;
+  mesh.vertexCount = 4;
+  mesh.vertices = HaloPoly;
+  mesh.texcoords = HaloUV;
+  mesh.colors = colors;
+  mesh.texture = mat_handle->GetTexture();
+  mesh.mixmode = ((mode & CS_FX_MASK_MIXMODE) != CS_FX_ALPHA) ? mode : CS_FX_COPY;
+
+  engine.G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 #endif // CS_USE_NEW_RENDERER
 }
