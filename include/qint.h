@@ -43,6 +43,9 @@ static inline long QRound (float inval)
 #endif
 }
 
+#if 1
+#define QInt(f) int(f)
+#else
 static inline long QInt (float inval)
 {
 #if defined (COMP_GCC) && defined (PROC_INTEL)
@@ -56,6 +59,7 @@ static inline long QInt (float inval)
   return ((*(long *)&dtemp) - 0x80000000);
 #endif
 }
+#endif
 
 inline long QInt16 (float inval)
 {

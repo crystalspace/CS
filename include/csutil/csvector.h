@@ -173,22 +173,22 @@ inline void csVector::QuickSort (int Mode)
       BASE (ilimit, ithreshold) {}				\
     virtual ~NAME ()						\
     { DeleteAll (); }						\
-    inline TYPE*& operator [] (int n)				\
-    { return (TYPE*&)BASE::operator [] (n); }			\
-    inline TYPE*& Get (int n) const				\
-    { return (TYPE*&)BASE::Get (n); }				\
-    int Find (TYPE* which) const				\
+    inline TYPE *& operator [] (int n)				\
+    { return (TYPE *&)BASE::operator [] (n); }			\
+    inline TYPE *& Get (int n) const				\
+    { return (TYPE *&)BASE::Get (n); }				\
+    int Find (TYPE *which) const				\
     { return BASE::Find ((csSome)which); }			\
-    int FindKey (const TYPE* value) const			\
+    int FindKey (const TYPE *value) const			\
     { return BASE::FindKey ((csSome)value); }			\
-    inline void Push (const TYPE* what)				\
+    inline void Push (const TYPE *what)				\
     { BASE::Push ((csSome)what); }				\
-    inline TYPE* Pop ()						\
-    { return (TYPE*)BASE::Pop (); }				\
-    bool Insert (int n, TYPE* Item)				\
+    inline TYPE *Pop ()						\
+    { return (TYPE *)BASE::Pop (); }				\
+    bool Insert (int n, TYPE *Item)				\
     { return BASE::Insert (n, (csSome)Item); }			\
-    virtual bool FreeItem (TYPE* Item)				\
-    { delete (TYPE*)Item; return true; }			\
+    virtual bool FreeItem (csSome Item)				\
+    { delete (TYPE *)Item; return true; }			\
   }
 
 /**

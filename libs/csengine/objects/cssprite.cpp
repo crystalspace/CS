@@ -121,17 +121,11 @@ csSpriteTemplate::~csSpriteTemplate ()
   CHK (delete skeleton);
   CHK (delete tri_verts);
 
-  if (normal_mesh != NULL)
-  {
-    CHK (delete normal_mesh);
-    CHK (delete [] texel_to_normal);
-  }
+  CHK (delete normal_mesh);
+  CHK (delete [] texel_to_normal);
 
-  if (normal_mesh != NULL)
-  {
-    CHK (delete vertex_mesh);
-    CHK (delete [] texel_to_vertex);
-  }
+  CHK (delete vertex_mesh);
+  CHK (delete [] texel_to_vertex);
 }
 
 void csSpriteTemplate::AddVertices (int num)
@@ -164,9 +158,9 @@ void csSpriteTemplate::AddVertices (int num)
 
   for (frame = 0; frame < frames.Length(); frame++)
   {
-    ((csPoly3D*)(normals.Get (frame)))->SetNumVertices (GetNumNormals ()+num);
-    ((csPoly2D*)(texels.Get (frame)))->SetNumVertices (GetNumTexels ()+num);
-    ((csPoly3D*)(vertices.Get (frame)))->SetNumVertices (GetNumVertices ()+num);
+    normals.Get (frame)->SetNumVertices (GetNumNormals () + num);
+    texels.Get (frame)->SetNumVertices (GetNumTexels () + num);
+    vertices.Get (frame)->SetNumVertices (GetNumVertices () + num);
   }
 }
 
@@ -174,11 +168,11 @@ void csSpriteTemplate::AddTriangle (int a, int b, int c)
 {
   texel_mesh->AddTriangle (a, b, c);
 
-  if (normal_mesh != NULL)
+  if (normal_mesh)
     normal_mesh->AddTriangle
       (texel_to_normal[a], texel_to_normal[b], texel_to_normal[c]);
 
-  if (vertex_mesh != NULL)
+  if (vertex_mesh)
     vertex_mesh->AddTriangle
       (texel_to_vertex[a], texel_to_vertex[b], texel_to_vertex[c]);
 }
@@ -223,7 +217,7 @@ void csSpriteTemplate::GenerateLOD ()
   {
     int j;
     CHK (csVector2* new_texels = new csVector2 [GetNumTexels()]);
-    csPoly2D* tx = (csPoly2D*)(texels.Get(i));
+    csPoly2D* tx = texels.Get(i);
     for (j = 0 ; j < GetNumTexels() ; j++)
       new_texels[translate[j]] = (*tx)[j];
     for (j = 0 ; j < GetNumTexels() ; j++)
@@ -276,7 +270,7 @@ void csSpriteTemplate::ComputeBoundingBox ()
     GetFrame(frame)->SetBoundingBox (box);
   }
   if (skeleton)
-    skeleton->ComputeBoundingBox ( (csPoly3D*) (vertices.Get(0)) );
+    skeleton->ComputeBoundingBox (vertices.Get (0));
     // @@@ should the base frame for the skeleton be a variable?
 }
 
@@ -400,7 +394,7 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
 {
   // Minimize the number of 3D coordinates:
 
-  csPoly3D* verts = (csPoly3D*)(vertices.Get(frame->GetAnmIndex()));
+  csPoly3D* verts = vertices.Get (frame->GetAnmIndex ());
 
   // create an array of ints which maps old vertex indices to new ones
   CHK (int* new_vertices = new int [GetNumVertices()]);
@@ -453,7 +447,7 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
     // create a new vertex array
     csPoly3D* newverts = new csPoly3D (new_vertex_count);
 
-    verts = (csPoly3D*)(vertices.Get(frame_number));
+    verts = vertices.Get (frame_number);
     // copy the old vertex positions into the new array
     for (int v = 0; v < new_vertex_count; v++)
       (*newverts)[v] = (*verts)[new_vertices[v]];
@@ -481,7 +475,7 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
 {
   // Combine normals of adjacent vertices based on one special frame:
 
-  csPoly3D* verts = (csPoly3D*)(vertices.Get(frame->GetAnmIndex()));
+  csPoly3D* verts = vertices.Get (frame->GetAnmIndex ());
 
   // create an array of ints which maps old vertex indices to new ones
   CHK (int* new_vertices = new int [GetNumNormals()]);
@@ -534,7 +528,7 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
     // create a new normals array
     csPoly3D* newverts = new csPoly3D (new_vertex_count);
 
-    verts = (csPoly3D*)(normals.Get(frame_number));
+    verts = normals.Get (frame_number);
 
     // copy the old normals into the new array
     for (int v = 0; v < new_vertex_count; v++)
@@ -573,14 +567,13 @@ int csSpriteTemplate::MergeTexels ()
   CHK (csPoly2D** unique_texel_maps = new csPoly2D* [frames.Length()]);
 
   // add the first frame to the unique texel map list
-  unique_texel_maps [0]
-    = (csPoly2D *)(texels.Get(GetFrame(0)->GetTexIndex()));
+  unique_texel_maps [0] = texels.Get (GetFrame (0)->GetTexIndex ());
   unique_texel_map_count = 1;
 
   // FOR each frame
   for ( frame = 1;  frame < frames.Length(); frame++ )
   {
-    tx = (csPoly2D *)(texels.Get(GetFrame(frame)->GetTexIndex()));
+    tx = texels.Get(GetFrame(frame)->GetTexIndex());
     unique = true;
 
     // FOR each unique texel map
@@ -626,7 +619,7 @@ int csSpriteTemplate::MergeTexels ()
   for ( frame = 0; frame < texels.Length(); frame++ )
   {
     unique = false;
-    tx = (csPoly2D *)(texels.Get(GetFrame(frame)->GetTexIndex()));
+    tx = texels.Get (GetFrame (frame)->GetTexIndex ());
 
     for ( map = 0; map < unique_texel_map_count; map++ )
     {

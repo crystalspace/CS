@@ -166,15 +166,18 @@ private:
 
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
-  csVector texels;
+  /// The array of texels
+  DECLARE_TYPED_VECTOR (csTexelsVector,csPoly2D) texels;
 
   /// This mesh is optimized for skeletal and vertex animation.
   csTriangleMesh* vertex_mesh;
-  csVector vertices;
+  /// The vertices
+  DECLARE_TYPED_VECTOR (csVerticesVector,csPoly3D) vertices;
 
   /// The normal mesh is used for smooth shading control.
   csTriangleMesh* normal_mesh;
-  csVector normals;
+  /// The normals
+  DECLARE_TYPED_VECTOR (csNormalsVector,csPoly3D) normals;
 
   /// Array that maps Texels to Normals
   int* texel_to_normal;
@@ -235,22 +238,22 @@ public:
   void AddVertex () { AddVertices (1); }
 
   /// Query the number of texels.
-  int GetNumTexels () { return ((csPoly2D*)(texels.Get(0)))->GetNumVertices (); }
+  int GetNumTexels () { return texels.Get(0)->GetNumVertices (); }
   ///
   csVector2& GetTexel (int frame, int vertex)
-    { return (*((csPoly2D*)texels.Get(frame)))[vertex]; }
+    { return (*texels.Get(frame)) [vertex]; }
 
   /// Query the number of vertices.
-  int GetNumVertices () { return ((csPoly3D*)(vertices.Get(0)))->GetNumVertices (); }
+  int GetNumVertices () { return vertices.Get (0)->GetNumVertices (); }
   ///
   csVector3& GetVertex (int frame, int vertex)
-    { return (*((csPoly3D*)vertices.Get(frame)))[texel_to_vertex[vertex]]; }
+    { return (*vertices.Get(frame)) [texel_to_vertex [vertex]]; }
 
   /// Query the number of normals.
-  int GetNumNormals () { return ((csPoly3D*)(normals.Get(0)))->GetNumVertices (); }
+  int GetNumNormals () { return normals.Get (0)->GetNumVertices (); }
   ///
   csVector3& GetNormal (int frame, int vertex)
-    { return (*((csPoly3D*)normals.Get(frame)))[texel_to_normal[vertex]]; }
+    { return (*normals.Get(frame)) [texel_to_normal [vertex]]; }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes

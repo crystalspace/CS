@@ -55,16 +55,10 @@ int csBoxClipper::ClassifyBox (csBox &box)
 UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
   csVector2 *OutPolygon, int &OutCount)
 {
-//@@todo
-#if 0
-  csPolygonClipper p (GetClipPoly (), 4, false, false);
-  return p.Clip (InPolygon, InCount, OutPolygon, OutCount);
-#else
 #include "boxclip.inc"
 
   OutCount = OutV;
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
-#endif
 }
 
 UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
