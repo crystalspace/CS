@@ -1216,6 +1216,7 @@ unsigned long converter::tds_read_obj_section ( FILE *filein ) {
   unsigned char       end_found = FALSE;
   int                 i;
   int                 j;
+  int                 num_cor3_prev;
   int                 num_cor3_base;
   int                 num_cor3_inc;
   int                 num_face_inc;
@@ -1269,6 +1270,7 @@ unsigned long converter::tds_read_obj_section ( FILE *filein ) {
           cor3[2][i] = tds_read_float ( filein );
         }
  
+	num_cor3_prev = num_cor3;
         num_cor3 = num_cor3 + num_cor3_inc;
         teller = teller + temp_pointer2;
         break;
@@ -1325,9 +1327,9 @@ unsigned long converter::tds_read_obj_section ( FILE *filein ) {
         }
         temp_pointer2 = tds_read_u_long_int ( filein );
         num_cor3_inc =  ( int ) tds_read_u_short_int ( filein );
-	for (i = 0; i < num_cor3_inc; i++) {
-	  cor3_uv[0][i] = tds_read_float( filein );
-	  cor3_uv[1][i] = tds_read_float( filein );
+	for (i = num_cor3_prev; i < num_cor3_prev+num_cor3_inc; i++) {
+	  cor3_uv[0][i] = 1-tds_read_float( filein );
+	  cor3_uv[1][i] = 1-tds_read_float( filein );
 	}
 	teller = teller + temp_pointer2;
 
