@@ -561,34 +561,15 @@ iSector *csSector::FollowSegment (
 
 void csSector::PrepareDraw (iRenderView *rview)
 {
-#ifdef CS_USE_NEW_RENDERER
-  //draw_busy++;
+#ifndef CS_USE_NEW_RENDERER
+  draw_busy++;
+#endif
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
   rview->SetThisSector (&scfiSector);
 
   int i = sector_cb_vector.Length ()-1;
-  while (i >= 0)
-  {
-    iSectorCallback* cb = sector_cb_vector.Get (i);
-    cb->Traverse (&scfiSector, rview);
-    i--;
-  }
-
-  //culler->VisTest (rview);
-
-#else
-  draw_busy++;
-
-  // Make sure the visibility culler is loaded.
-  GetVisibilityCuller ();
-
-  int i;
-  //  iCamera *icam = rview->GetCamera ();
-  rview->SetThisSector (&scfiSector);
-
-  i = sector_cb_vector.Length ()-1;
   while (i >= 0)
   {
     iSectorCallback* cb = sector_cb_vector.Get (i);
@@ -631,7 +612,6 @@ mov_trans.SetOrigin (csVector3 (0));
       }
     }
   }
-#endif
 }
 
 /*

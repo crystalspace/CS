@@ -1,6 +1,4 @@
 Comparing walktest between NR and OR:
-	- csdemo: objects centered around camera are not correct (i.e.
-	  skyboxes).
 	- Fog is missing.
 	- Halos are missing.
 	- Lens-flare is missing.

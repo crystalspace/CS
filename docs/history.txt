@@ -14,6 +14,9 @@ chronological order.
 	- Jorrit removed the iTextureManager->SetVerbose() function. This was
 	  not used and it is also better to handle this using -verbose
 	  commandline option if needed.
+	- Jorrit fixed the handling of CS_ENTITY_CAMERA objects in the new
+	  renderer. This fixes stuff like skyboxes (like the one used in the
+	  csdemo space demo).
 3-Mar-2004
 	- Eric Sunshine added REGEX.AVAILABLE=no to msvcgen/required.mak to
 	  ensure that generic/regex.c gets included in csutil project file.
