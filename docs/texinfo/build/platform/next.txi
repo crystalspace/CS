@@ -38,8 +38,8 @@ MacOS/X and later.
 If you have downloaded a binary-only package of Crystal Space for MacOS/X,
 MacOS/X Server 1.0 (Rhapsody), OpenStep, or NextStep, you may want to skip over
 the following sections explaining how to build Crystal Space, and jump directly
-to the section explaining how to run the applications, @ref{NeXT Running
-Programs}.
+to the section explaining how to run the applications, 
+@ref{NeXT Running Programs}.
 
 If you are building Crystal Space from source code, you may want to briefly
 scan the section for compiling on generic Unix systems (@pxref{Unix}), though
