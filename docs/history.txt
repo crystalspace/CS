@@ -9,6 +9,15 @@ chronological order.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.
+	- Jorrit extended the genmesh version of HitBeamObject() so that
+	  it will now return the index of the triangle that was hit.
+	  That way it will also work with iSector->HitBeam() and
+	  HitBeamPortals().
+	- Jorrit removed the csRenderContextFrustum class and merged it with 
+	  csRenderContext. There is a one-to-one relationship between
+	  those classes so it doesn't make sense to have the additional
+	  overhead (more pointer redirection, more object management) for this.
+	  Also I'm planning a big redesign of this anyway.
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This
