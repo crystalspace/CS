@@ -71,48 +71,48 @@ int NeXTFrameBuffer32::green_mask() const { return GREEN_MASK; }
 int NeXTFrameBuffer32::blue_mask () const { return BLUE_MASK;  }
 
 unsigned char* NeXTFrameBuffer32::get_raw_buffer() const
-    { return raw_buffer; }
+  { return raw_buffer; }
 unsigned char* NeXTFrameBuffer32::get_cooked_buffer() const
-    { return cooked_buffer; }
+  { return cooked_buffer; }
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTFrameBuffer32::NeXTFrameBuffer32( unsigned int w, unsigned int h ) :
-    NeXTFrameBuffer(w,h)
-    {
-    buffer_size   = NeXTMemory_round_up_to_multiple_of_page_size(
-		    CS_NEXT_BPP * width * height );
-    raw_buffer    = NeXTMemory_allocate_memory_pages( buffer_size );
-    cooked_buffer = NeXTMemory_allocate_memory_pages( buffer_size );
-    memset( cooked_buffer, 0, buffer_size );
-    unsigned char* p = cooked_buffer + 3;	// See 0xff note above.
-    for (unsigned int n = width * height; n > 0; n--, p += 4)
-	*p = 0xff;
-    }
+NeXTFrameBuffer32::NeXTFrameBuffer32(unsigned int w, unsigned int h) :
+  NeXTFrameBuffer(w,h)
+{
+  buffer_size =
+    NeXTMemory_round_up_to_multiple_of_page_size(CS_NEXT_BPP * width * height);
+  raw_buffer    = NeXTMemory_allocate_memory_pages(buffer_size);
+  cooked_buffer = NeXTMemory_allocate_memory_pages(buffer_size);
+  memset(cooked_buffer, 0, buffer_size);
+  unsigned char* p = cooked_buffer + 3;	// See 0xff note above.
+  for (unsigned int n = width * height; n > 0; n--, p += 4)
+    *p = 0xff;
+}
 
 
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
 NeXTFrameBuffer32::~NeXTFrameBuffer32()
-    {
-    NeXTMemory_deallocate_memory_pages( cooked_buffer, buffer_size );
-    NeXTMemory_deallocate_memory_pages( raw_buffer,    buffer_size );
-    }
+{
+  NeXTMemory_deallocate_memory_pages(cooked_buffer, buffer_size);
+  NeXTMemory_deallocate_memory_pages(raw_buffer,    buffer_size);
+}
 
 
 //-----------------------------------------------------------------------------
 // cook
 //-----------------------------------------------------------------------------
 void NeXTFrameBuffer32::cook()
-    {
-    unsigned char const* p = raw_buffer;
-    unsigned char* q = cooked_buffer;
-    for (unsigned int n = width * height; n > 0; n--, p += 4, q += 1)
-	{
-	*q++ = *(p +   RED_OFFSET);
-	*q++ = *(p + GREEN_OFFSET);
-	*q++ = *(p +  BLUE_OFFSET);
-	}
-    }
+{
+  unsigned char const* p = raw_buffer;
+  unsigned char* q = cooked_buffer;
+  for (unsigned int n = width * height; n > 0; n--, p += 4, q += 1)
+  {
+    *q++ = *(p +   RED_OFFSET);
+    *q++ = *(p + GREEN_OFFSET);
+    *q++ = *(p +  BLUE_OFFSET);
+  }
+}

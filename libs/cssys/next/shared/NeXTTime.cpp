@@ -22,16 +22,16 @@
 #include <sys/time.h>
 
 cs_time csSystemDriver::Time()
-    {
-    struct timezone z = { 0, 0 };
-    struct timeval r;
-    gettimeofday( &r, &z );
-    static long base = 0;
-    if (base != 0)
-	return (r.tv_sec - base) * 1000 + r.tv_usec / 1000;
-    else
-	{
-	base = r.tv_sec;
-	return 0;
-	}
-    }
+{
+  struct timezone z = { 0, 0 };
+  struct timeval r;
+  gettimeofday(&r, &z);
+  static long base = 0;
+  if (base != 0)
+    return (r.tv_sec - base) * 1000 + r.tv_usec / 1000;
+  else
+  {
+    base = r.tv_sec;
+    return 0;
+  }
+}

@@ -83,13 +83,13 @@
 
 #if defined(OS_NEXT_NEXTSTEP) || defined(OS_NEXT_OPENSTEP)
 
-static inline char* strdup( char const* s )
-    {
-    if (s == 0) s = "";
-    char* p = (char*)malloc( strlen(s) + 1 );
-    strcpy( p, s );
-    return p;
-    }
+static inline char* strdup(char const* s)
+{
+  if (s == 0) s = "";
+  char* p = (char*)malloc(strlen(s) + 1);
+  strcpy(p, s);
+  return p;
+}
 
 #endif
 
@@ -132,21 +132,21 @@ static inline char* strdup( char const* s )
 
 #include <sys/param.h>
 
-static inline char* getcwd( char* p, size_t size )
-    {
-    char s[ MAXPATHLEN ];
-    char* r = getwd(s);
-    if (r != 0)
-	{
-        strncpy( p, r, size - 1 );
-	p[ size - 1 ] = '\0';
-        r = p;
-	}
-    return r;
-    }
+static inline char* getcwd(char* p, size_t size)
+{
+  char s[ MAXPATHLEN ];
+  char* r = getwd(s);
+  if (r != 0)
+  {
+    strncpy(p, r, size - 1);
+    p[ size - 1 ] = '\0';
+    r = p;
+  }
+  return r;
+}
 
 #endif // SYSDEF_GETCWD
-#endif // OS_NEXT_NEXTSTEP || OS_NEXT_OPENSTEP
+#endif // OS_NEXT_NEXTSTEP || OS_NEXT_OPENSTEP || OS_NEXT_MACOSXS
 
 
 //-----------------------------------------------------------------------------

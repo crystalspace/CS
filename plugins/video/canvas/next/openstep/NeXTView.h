@@ -22,9 +22,9 @@
 @class NSBitmapImageRep;
 
 @interface NeXTView : NSView
-    {
-    NSBitmapImageRep* rep;
-    }
+{
+  NSBitmapImageRep* rep;
+}
 
 - (id)initWithFrame:(NSRect)r;
 - (void)dealloc;

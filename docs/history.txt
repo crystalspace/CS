@@ -34,6 +34,9 @@ The history order is reversed so that new features are at the top.
 	  and then leaking the duplicate.
 	- Eric Sunshine repaired several minor Texinfo mark-up problems in the
 	  new emit.txi.
+	- Eric Sunshine updated the formatting of all Apple/NeXT-related source
+	  and header files to reflect the CS formatting guidelines.  This
+	  change involved some very simple whitespace transformations.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine

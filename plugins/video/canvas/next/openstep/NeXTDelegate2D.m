@@ -43,78 +43,78 @@ typedef void* NeXTDelegateHandle2D;
 //	CS/docs/texinfo/internal/platform/next.txi for details.
 //-----------------------------------------------------------------------------
 - (int)bestBitsPerSample
-    {
-    NSWindowDepth const depth = [NSWindow defaultDepthLimit];
-    NSString* const s = NSColorSpaceFromDepth( depth );
-    if ([s isEqualToString:NSCalibratedRGBColorSpace] ||
-	[s isEqualToString:NSDeviceRGBColorSpace])
-        {
-	int const bps = NSBitsPerSampleFromDepth( depth );
-	if (bps == 4 || bps == 8)
-	    return bps;
-	}
-    return 4;
-    }
+{
+  NSWindowDepth const depth = [NSWindow defaultDepthLimit];
+  NSString* const s = NSColorSpaceFromDepth(depth);
+  if ([s isEqualToString:NSCalibratedRGBColorSpace] ||
+      [s isEqualToString:NSDeviceRGBColorSpace])
+  {
+    int const bps = NSBitsPerSampleFromDepth(depth);
+    if (bps == 4 || bps == 8)
+      return bps;
+  }
+  return 4;
+}
 
-N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
-    { return [(NeXTDelegate2D*)handle bestBitsPerSample]; }
+N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
+  { return [(NeXTDelegate2D*)handle bestBitsPerSample]; }
 
 
 //-----------------------------------------------------------------------------
 // releaseTitles
 //-----------------------------------------------------------------------------
 - (void)releaseTitles
-    {
-    [plainTitle  release];
-    [pausedTitle release];
-    }
+{
+  [plainTitle  release];
+  [pausedTitle release];
+}
 
 
 //-----------------------------------------------------------------------------
 // configureTitles
 //-----------------------------------------------------------------------------
 - (void)configureTitles:(char const*)title
-    {
-    [self releaseTitles]; // Should not be requried, but just in case.
-    plainTitle  = [[NSString stringWithCString:title] retain];
-    pausedTitle = [[plainTitle stringByAppendingString:@"  [Paused]"] retain];
-    }
+{
+  [self releaseTitles]; // Should not be requried, but just in case.
+  plainTitle  = [[NSString stringWithCString:title] retain];
+  pausedTitle = [[plainTitle stringByAppendingString:@"  [Paused]"] retain];
+}
 
 
 //-----------------------------------------------------------------------------
 // startTrackingMouse
 //-----------------------------------------------------------------------------
 - (void)startTrackingMouse
-    {
-    if (!trackingMouse)
-	{
-	NSRect r = [view bounds];
-	NSPoint p = [view convertPoint:
-	    [window mouseLocationOutsideOfEventStream] fromView:0];
-	BOOL mouseInside = [view mouse:p inRect:r];
-	trackingTag = [view addTrackingRect:r owner:self userData:0
-	    assumeInside:mouseInside];
-	[window setAcceptsMouseMovedEvents:mouseInside];
-	if (hideMouse && mouseInside)
-	    NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
-	trackingMouse = YES;
-	}
-    }
+{
+  if (!trackingMouse)
+  {
+    NSRect r = [view bounds];
+    NSPoint p = [view convertPoint:
+      [window mouseLocationOutsideOfEventStream] fromView:0];
+    BOOL mouseInside = [view mouse:p inRect:r];
+    trackingTag = [view addTrackingRect:r owner:self userData:0
+      assumeInside:mouseInside];
+    [window setAcceptsMouseMovedEvents:mouseInside];
+    if (hideMouse && mouseInside)
+      NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+    trackingMouse = YES;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // stopTrackingMouse
 //-----------------------------------------------------------------------------
 - (void)stopTrackingMouse
-    {
-    if (trackingMouse)
-	{
-	[window setAcceptsMouseMovedEvents:NO];
-	[view removeTrackingRect:trackingTag];
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-	trackingMouse = NO;
-	}
-    }
+{
+  if (trackingMouse)
+  {
+    [window setAcceptsMouseMovedEvents:NO];
+    [view removeTrackingRect:trackingTag];
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+    trackingMouse = NO;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -126,19 +126,19 @@ N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
 //	NextStep 3.0 WindowServer release notes for an explanation.
 //-----------------------------------------------------------------------------
 - (void)adjustWindowPosition
-    {
-    NSPoint const p = [window convertBaseToScreen:
-	[view convertPoint:[view bounds].origin toView:0]];
-    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
-    int x = (int)p.x;
-    if ((x & ALIGN) != 0)
-	{
-	NSRect const wr = [window frame];
-	float const dx = p.x - wr.origin.x;
-	x &= ~ALIGN;
-	[window setFrameOrigin:NSMakePoint(x - dx, wr.origin.y)];
-	}
-    }
+{
+  NSPoint const p = [window convertBaseToScreen:
+    [view convertPoint:[view bounds].origin toView:0]];
+  int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
+  int x = (int)p.x;
+  if ((x & ALIGN) != 0)
+  {
+    NSRect const wr = [window frame];
+    float const dx = p.x - wr.origin.x;
+    x &= ~ALIGN;
+    [window setFrameOrigin:NSMakePoint(x - dx, wr.origin.y)];
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -158,156 +158,156 @@ N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
 //	of a Retained non-deferred window are never drawn.
 //-----------------------------------------------------------------------------
 - (BOOL)openWindow:(char const*)title width:(int)width height:(int)height
-    frameBuffer:(unsigned char*)frameBuffer bitsPerSample:(int)bitsPerSample
-    {
-    NSRect const r = {{ 0, 0 }, { width, height }};
-    window = [[NSWindow alloc]
-	initWithContentRect:r
-	styleMask:(NSTitledWindowMask | NSClosableWindowMask)
-	backing:NSBackingStoreRetained
-	defer:YES];
+  frameBuffer:(unsigned char*)frameBuffer bitsPerSample:(int)bitsPerSample
+{
+  NSRect const r = {{ 0, 0 }, { width, height }};
+  window = [[NSWindow alloc]
+    initWithContentRect:r
+    styleMask:(NSTitledWindowMask | NSClosableWindowMask)
+    backing:NSBackingStoreRetained
+    defer:YES];
 
-    view = [[NeXTView alloc] initWithFrame:r];
-    [view setFrameBuffer:frameBuffer bitsPerSample: bitsPerSample];
-    [window setContentView:view];
+  view = [[NeXTView alloc] initWithFrame:r];
+  [view setFrameBuffer:frameBuffer bitsPerSample: bitsPerSample];
+  [window setContentView:view];
 
-    [self configureTitles:title];
-    [window setTitle:plainTitle];
-    [window setReleasedWhenClosed:NO];
-    [window center];
-    [self adjustWindowPosition];
-    [window setDelegate:self];
-    [window makeFirstResponder:view];
-    [window makeKeyAndOrderFront:0];
+  [self configureTitles:title];
+  [window setTitle:plainTitle];
+  [window setReleasedWhenClosed:NO];
+  [window center];
+  [self adjustWindowPosition];
+  [window setDelegate:self];
+  [window makeFirstResponder:view];
+  [window makeKeyAndOrderFront:0];
 
-    [self startTrackingMouse];	// *NOTE*
-    return YES;
-    }
+  [self startTrackingMouse];	// *NOTE*
+  return YES;
+}
 
-N2D_PROTO(int,open_window)( NeXTDelegateHandle2D handle, char const* title,
-    int w, int h, unsigned char* frame_buffer, int bits_per_sample )
-    { return [(NeXTDelegate2D*)handle openWindow:title width:w height:h
-    frameBuffer:frame_buffer bitsPerSample:bits_per_sample]; }
+N2D_PROTO(int,open_window)(NeXTDelegateHandle2D handle, char const* title,
+  int w, int h, unsigned char* frame_buffer, int bits_per_sample)
+  { return [(NeXTDelegate2D*)handle openWindow:title width:w height:h
+  frameBuffer:frame_buffer bitsPerSample:bits_per_sample]; }
 
 
 //-----------------------------------------------------------------------------
 // closeWindow
 //-----------------------------------------------------------------------------
 - (void)closeWindow
-    {
-    [self stopTrackingMouse];
-    [window close];
-    }
+{
+  [self stopTrackingMouse];
+  [window close];
+}
 
-N2D_PROTO(void,close_window)( NeXTDelegateHandle2D handle )
-    { [(NeXTDelegate2D*)handle closeWindow]; }
+N2D_PROTO(void,close_window)(NeXTDelegateHandle2D handle)
+  { [(NeXTDelegate2D*)handle closeWindow]; }
 
 
 //-----------------------------------------------------------------------------
 // focusChanged
 //-----------------------------------------------------------------------------
 - (void)focusChanged:(BOOL)focused
-    {
-    [window setTitle:(focused ? plainTitle : pausedTitle)];
-    if (focused)
-	[self startTrackingMouse];
-    else
-	[self stopTrackingMouse];
-    }
+{
+  [window setTitle:(focused ? plainTitle : pausedTitle)];
+  if (focused)
+    [self startTrackingMouse];
+  else
+    [self stopTrackingMouse];
+}
 
-N2D_PROTO(void,focus_changed)( NeXTDelegateHandle2D handle, int focused )
-    { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused]; }
+N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused)
+  { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused]; }
 
 
 //-----------------------------------------------------------------------------
 // flush
 //-----------------------------------------------------------------------------
 - (void)flush
-    {
-    [view flush];
-    NeXTDriver2D_system_extension( driver, "flushgraphicscontext", 0, 0 );
-    }
+{
+  [view flush];
+  NeXTDriver2D_system_extension(driver, "flushgraphicscontext", 0, 0);
+}
 
-N2D_PROTO(void,flush)( NeXTDelegateHandle2D handle )
-    { [(NeXTDelegate2D*)handle flush]; }
+N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
+  { [(NeXTDelegate2D*)handle flush]; }
 
 
 //-----------------------------------------------------------------------------
 // setMouseCursor:
 //-----------------------------------------------------------------------------
 - (BOOL)setMouseCursor:(csMouseCursorID)shape
-    {
-    hideMouse = YES;
-    if (shape == csmcArrow)
-	{
-	[[NSCursor arrowCursor] set];
-	hideMouse = NO;
-	}
-
-    if (hideMouse)
-	NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
-    else
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-    return !hideMouse;
-    }
+{
+  hideMouse = YES;
+  if (shape == csmcArrow)
+  {
+    [[NSCursor arrowCursor] set];
+    hideMouse = NO;
+  }
+  
+  if (hideMouse)
+    NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+  else
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+  return !hideMouse;
+}
 
 N2D_PROTO(int,set_mouse_cursor)
-    ( NeXTDelegateHandle2D handle, csMouseCursorID shape )
-    { return [(NeXTDelegate2D*)handle setMouseCursor:shape]; }
+  (NeXTDelegateHandle2D handle, csMouseCursorID shape)
+  { return [(NeXTDelegate2D*)handle setMouseCursor:shape]; }
 
 
 //-----------------------------------------------------------------------------
 // mouseEntered:
 //-----------------------------------------------------------------------------
 - (void)mouseEntered:(NSEvent*)p 
-    {
-    if ([p trackingNumber] == trackingTag)
-	{
-	[window setAcceptsMouseMovedEvents:YES];
-	if (hideMouse)
-	    NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
-	}
-    }
+{
+  if ([p trackingNumber] == trackingTag)
+  {
+    [window setAcceptsMouseMovedEvents:YES];
+    if (hideMouse)
+      NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // mouseExited:
 //-----------------------------------------------------------------------------
 - (void)mouseExited:(NSEvent*)p 
-    {
-    if ([p trackingNumber] == trackingTag)
-	{
-	[window setAcceptsMouseMovedEvents:NO];
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-	}
-    }
+{
+  if ([p trackingNumber] == trackingTag)
+  {
+    [window setAcceptsMouseMovedEvents:NO];
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // windowDidBecomeKey:
 //-----------------------------------------------------------------------------
 - (void)windowDidBecomeKey:(NSNotification*)n
-    {
-    [self startTrackingMouse];
-    }
+{
+  [self startTrackingMouse];
+}
 
 
 //-----------------------------------------------------------------------------
 // windowDidResignKey:
 //-----------------------------------------------------------------------------
 - (void)windowDidResignKey:(NSNotification*)n
-    {
-    [self stopTrackingMouse];
-    }
+{
+  [self stopTrackingMouse];
+}
 
 
 //-----------------------------------------------------------------------------
 // windowDidMove:
 //-----------------------------------------------------------------------------
 - (void)windowDidMove:(NSNotification*)n
-    {
-    [self adjustWindowPosition];
-    }
+{
+  [self adjustWindowPosition];
+}
 
 
 //-----------------------------------------------------------------------------
@@ -315,59 +315,59 @@ N2D_PROTO(int,set_mouse_cursor)
 //	Terminate the application when the animation-window closes.
 //-----------------------------------------------------------------------------
 - (BOOL)windowShouldClose:(id)sender
-    {
-    [self stopTrackingMouse];
-    if (hideMouse)
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-    NeXTDriver2D_user_close( driver );
-    return YES;
-    }
+{
+  [self stopTrackingMouse];
+  if (hideMouse)
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+  NeXTDriver2D_user_close(driver);
+  return YES;
+}
 
 
 //-----------------------------------------------------------------------------
 // dispatchEvent:forView:
 //-----------------------------------------------------------------------------
 - (void)dispatchEvent:(NSEvent*)e forView:(NSView*)v
-    {
-    NeXTDriver2D_system_extension( driver, "dispatchevent", e, v );
-    }
+{
+  NeXTDriver2D_system_extension(driver, "dispatchevent", e, v);
+}
 
 
 //-----------------------------------------------------------------------------
 // initWithDriver:
 //-----------------------------------------------------------------------------
 - (id)initWithDriver:(NeXTDriver2D)p
-    {
-    [super init];
-    driver = p;
-    window = 0;
-    view = 0;
-    trackingTag = 0;
-    trackingMouse = NO;
-    hideMouse = NO;
-    plainTitle = 0;
-    pausedTitle = 0;
-    return self;
-    }
+{
+  [super init];
+  driver = p;
+  window = 0;
+  view = 0;
+  trackingTag = 0;
+  trackingMouse = NO;
+  hideMouse = NO;
+  plainTitle = 0;
+  pausedTitle = 0;
+  return self;
+}
 
-N2D_PROTO(NeXTDelegateHandle2D,new)( NeXTDriver2D driver )
-    { return [[NeXTDelegate2D alloc] initWithDriver:driver]; }
+N2D_PROTO(NeXTDelegateHandle2D,new)(NeXTDriver2D driver)
+  { return [[NeXTDelegate2D alloc] initWithDriver:driver]; }
 
 
 //-----------------------------------------------------------------------------
 // dealloc
 //-----------------------------------------------------------------------------
 - (void)dealloc
-    {
-    [window setDelegate:0];
-    [window close];
-    [window release];	// NSWindow releases NeXTView.
-    [self releaseTitles];
-    [super dealloc];
-    }
+{
+  [window setDelegate:0];
+  [window close];
+  [window release]; // NSWindow releases NeXTView.
+  [self releaseTitles];
+  [super dealloc];
+}
 
-N2D_PROTO(void,dispose)( NeXTDelegateHandle2D handle )
-    { [(NeXTDelegate2D*)handle release]; }
+N2D_PROTO(void,dispose)(NeXTDelegateHandle2D handle)
+  { [(NeXTDelegate2D*)handle release]; }
 
 @end
 

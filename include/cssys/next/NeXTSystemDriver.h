@@ -27,35 +27,35 @@
 typedef void* NeXTDelegateHandle;
 
 class NeXTSystemDriver : public csSystemDriver
-    {
-    typedef csSystemDriver superclass;
+{
+  typedef csSystemDriver superclass;
 
 private:
-    NeXTDelegateHandle controller;	// Application & window delegate.
-    iEventOutlet* event_outlet;		// Shared event outlet.
+  NeXTDelegateHandle controller;	// Application & window delegate.
+  iEventOutlet* event_outlet;		// Shared event outlet.
 
-    void init_menu( iConfigFile* );
-    void timer_fired();
-    bool continue_looping() const { return (!ExitLoop && continue_running()); }
-    bool continue_running() const { return !Shutdown; }
+  void init_menu(iConfigFile*);
+  void timer_fired();
+  bool continue_looping() const { return (!ExitLoop && continue_running()); }
+  bool continue_running() const { return !Shutdown; }
 
 public:
-    DECLARE_IBASE_EXT(csSystemDriver);
+  DECLARE_IBASE_EXT(csSystemDriver);
 
-    NeXTSystemDriver();
-    virtual ~NeXTSystemDriver();
-    virtual bool Initialize( int argc, char const* const argv[], char const* );
-    virtual bool SystemExtension( char const*, ... );
-    virtual void Loop();
+  NeXTSystemDriver();
+  virtual ~NeXTSystemDriver();
+  virtual bool Initialize(int argc, char const* const argv[], char const*);
+  virtual bool SystemExtension(char const*, ...);
+  virtual void Loop();
 
-    // Implement iEventPlug interface.
-    struct NeXTSystemEventPlug : public iEventPlug
-	{
-	DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
-	virtual uint GetPotentiallyConflictingEvents();
-	virtual uint QueryEventPriority( uint type );
-	} scfiEventPlug;
-    };
+  // Implement iEventPlug interface.
+  struct NeXTSystemEventPlug : public iEventPlug
+  {
+    DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
+    virtual uint GetPotentiallyConflictingEvents();
+    virtual uint QueryEventPriority(uint type);
+  } scfiEventPlug;
+};
 
 class SysSystemDriver : public NeXTSystemDriver {};
 
@@ -66,7 +66,7 @@ class SysSystemDriver : public NeXTSystemDriver {};
 typedef void* NeXTSystemDriver;
 
 NSD_PROTO(int,system_extension)
-    (NeXTSystemDriver, char const* msg, void* data1, void* data2, void* data3);
+  (NeXTSystemDriver, char const* msg, void* data1, void* data2, void* data3);
 
 #undef NSD_PROTO
 

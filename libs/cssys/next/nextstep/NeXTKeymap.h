@@ -26,17 +26,17 @@
 struct DataStream;
 
 typedef struct _NeXTKeymapBinding
-    {
-    unsigned short code;
-    unsigned short character_set;
-    } NeXTKeymapBinding;
+{
+  unsigned short code;
+  unsigned short character_set;
+} NeXTKeymapBinding;
 
 @interface NeXTKeymap : Object
-    {
+{
 @private
-    NeXTKeymapBinding* bindings;
-    unsigned long nbindings;
-    }
+  NeXTKeymapBinding* bindings;
+  unsigned long nbindings;
+}
 
 - (id)init;
 - (id)free;

@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-NSMenu* NeXTMenuGenerate( char const* menu_ident, NeXTConfigHandle );
+NSMenu* NeXTMenuGenerate(char const* menu_ident, NeXTConfigHandle);
 
 #if defined(__cplusplus)
 }

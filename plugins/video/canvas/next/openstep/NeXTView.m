@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 #include "NeXTView.h"
 #include "NeXTDelegate2D.h"
-#include <limits.h>	// CHAR_BIT
+#include <limits.h> // CHAR_BIT
 #include <assert.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSBitmapImageRep.h>
@@ -33,7 +33,7 @@
 - (BOOL)isOpaque { return YES; }
 
 #define MSG(M) - (void)M:(NSEvent*)e \
-    { [[[self window] delegate] dispatchEvent:e forView:self]; }
+  { [[[self window] delegate] dispatchEvent:e forView:self]; }
 
 MSG(keyDown)
 MSG(keyUp)
@@ -52,22 +52,22 @@ MSG(rightMouseDragged)
 // initWithFrame:
 //-----------------------------------------------------------------------------
 - (id)initWithFrame:(NSRect)r
-    {
-    [super initWithFrame:r];
-    [self allocateGState];
-    rep = 0;
-    return self;
-    }
+{
+  [super initWithFrame:r];
+  [self allocateGState];
+  rep = 0;
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // dealloc
 //-----------------------------------------------------------------------------
 - (void)dealloc
-    {
-    [rep release];
-    [super dealloc];
-    }
+{
+  [rep release];
+  [super dealloc];
+}
 
 
 //-----------------------------------------------------------------------------
@@ -80,53 +80,53 @@ MSG(rightMouseDragged)
 //	frame buffer layout.
 //-----------------------------------------------------------------------------
 - (void)setFrameBuffer:(unsigned char*)buff bitsPerSample:(int)bits_per_sample
-    {
-    NSRect const r = [self bounds];
-    unsigned int const w = (int)r.size.width;
-    unsigned int const h = (int)r.size.height;
-
-    unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
-    unsigned int const bytes_per_pixel = bits_per_sample / 2;
-    unsigned int const bytes_per_row = bytes_per_pixel * w;
-    unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
-
-    assert( bits_per_sample == 4 || bits_per_sample == 8 );
-
-    rep = [[NSBitmapImageRep allocWithZone:[self zone]]
-	initWithBitmapDataPlanes:&buff
-	pixelsWide:w
-	pixelsHigh:h
-	bitsPerSample:bits_per_sample
-	samplesPerPixel:samples_per_pixel
-	hasAlpha:NO
-	isPlanar:NO
-	colorSpaceName:NSCalibratedRGBColorSpace
-	bytesPerRow:bytes_per_row
-	bitsPerPixel:bits_per_pixel];
-    [rep setSize:NSMakeSize( w, h )];
-    }
+{
+  NSRect const r = [self bounds];
+  unsigned int const w = (int)r.size.width;
+  unsigned int const h = (int)r.size.height;
+  
+  unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
+  unsigned int const bytes_per_pixel = bits_per_sample / 2;
+  unsigned int const bytes_per_row = bytes_per_pixel * w;
+  unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
+  
+  assert(bits_per_sample == 4 || bits_per_sample == 8);
+  
+  rep = [[NSBitmapImageRep allocWithZone:[self zone]]
+    initWithBitmapDataPlanes:&buff
+    pixelsWide:w
+    pixelsHigh:h
+    bitsPerSample:bits_per_sample
+    samplesPerPixel:samples_per_pixel
+    hasAlpha:NO
+    isPlanar:NO
+    colorSpaceName:NSCalibratedRGBColorSpace
+    bytesPerRow:bytes_per_row
+    bitsPerPixel:bits_per_pixel];
+  [rep setSize:NSMakeSize(w, h)];
+}
 
 
 //-----------------------------------------------------------------------------
 // drawRect:
 //-----------------------------------------------------------------------------
 - (void)drawRect:(NSRect)r
-    {
-    [rep draw];
-    }
+{
+  [rep draw];
+}
 
 
 //-----------------------------------------------------------------------------
 // flush -- Flush the frame buffer to the window.
 //-----------------------------------------------------------------------------
 - (void)flush
-    {
-    if ([self canDraw])
-	{
-	[self lockFocus];
-	[rep draw];
-	[self unlockFocus];
-	}
-    }
+{
+  if ([self canDraw])
+  {
+    [self lockFocus];
+    [rep draw];
+    [self unlockFocus];
+  }
+}
 
 @end

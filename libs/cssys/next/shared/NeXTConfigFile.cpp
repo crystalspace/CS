@@ -23,20 +23,20 @@
 #define NCF_PROTO(RET,FUNC) RET NeXTConfigFile_##FUNC
 
 NCF_PROTO(char const*,lookup)(
-    NeXTConfigHandle handle, char const* key, char const* fallback )
-    { return ((iConfigFile*)handle)->GetStr( key, fallback ); }
-NCF_PROTO(int,exists)( NeXTConfigHandle handle, char const* section )
-    { return ((iConfigFile*)handle)->SubsectionExists( section ); }
-NCF_PROTO(NeXTConfigIterator,new_iterator)( NeXTConfigHandle handle,
-    char const* section ) { return (NeXTConfigIterator)
-    ((iConfigFile*)handle)->Enumerate( section ); }
-NCF_PROTO(void,dispose_iterator)( NeXTConfigIterator handle )
-    { ((iConfigIterator*)handle)->DecRef(); }
-NCF_PROTO(int,iterator_next)( NeXTConfigIterator handle )
-    { return ((iConfigIterator*)handle)->Next(); }
-NCF_PROTO(char const*,iterator_key)( NeXTConfigIterator handle )
-    { return ((iConfigIterator*)handle)->GetKey( true ); }
-NCF_PROTO(char const*,iterator_data)( NeXTConfigIterator handle )
-    { return ((iConfigIterator*)handle)->GetStr(); }
+  NeXTConfigHandle handle, char const* key, char const* fallback)
+  { return ((iConfigFile*)handle)->GetStr(key, fallback); }
+NCF_PROTO(int,exists)(NeXTConfigHandle handle, char const* section)
+  { return ((iConfigFile*)handle)->SubsectionExists(section); }
+NCF_PROTO(NeXTConfigIterator,new_iterator)(NeXTConfigHandle handle,
+  char const* section) { return (NeXTConfigIterator)
+  ((iConfigFile*)handle)->Enumerate(section); }
+NCF_PROTO(void,dispose_iterator)(NeXTConfigIterator handle)
+  { ((iConfigIterator*)handle)->DecRef(); }
+NCF_PROTO(int,iterator_next)(NeXTConfigIterator handle)
+  { return ((iConfigIterator*)handle)->Next(); }
+NCF_PROTO(char const*,iterator_key)(NeXTConfigIterator handle)
+  { return ((iConfigIterator*)handle)->GetKey(true); }
+NCF_PROTO(char const*,iterator_data)(NeXTConfigIterator handle)
+  { return ((iConfigIterator*)handle)->GetStr(); }
 
 #undef NCF_PROTO

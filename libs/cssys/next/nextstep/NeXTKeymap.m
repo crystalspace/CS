@@ -130,107 +130,107 @@ typedef dword number;
 //	either 1, 2, or 4 bytes, apiece.
 //-----------------------------------------------------------------------------
 typedef struct _DataStream
-    {
-    byte const* data;
-    byte const* data_end;
-    natural number_size; // Size in bytes of a "number" in the stream.
-    } DataStream;
+{
+  byte const* data;
+  byte const* data_end;
+  natural number_size; // Size in bytes of a "number" in the stream.
+} DataStream;
 
-static DataStream* new_data_stream( byte const* data, int size )
-    {
-    DataStream* s = (DataStream*)malloc( sizeof(DataStream) );
-    s->data = data;
-    s->data_end = data + size;
-    s->number_size = 1; // Default to byte-sized numbers.
-    return s;
-    }
+static DataStream* new_data_stream(byte const* data, int size)
+{
+  DataStream* s = (DataStream*)malloc(sizeof(DataStream));
+  s->data = data;
+  s->data_end = data + size;
+  s->number_size = 1; // Default to byte-sized numbers.
+  return s;
+}
 
-static void destroy_data_stream( DataStream* s )
-    {
-    free(s);
-    }
+static void destroy_data_stream(DataStream* s)
+{
+  free(s);
+}
 
 #if defined(END_OF_STREAM_USED)
-static int end_of_stream( DataStream* s )
-    {
-    return (s->data >= s->data_end);
-    }
+static int end_of_stream(DataStream* s)
+{
+  return (s->data >= s->data_end);
+}
 #endif
 
-static void expect_nbytes( DataStream* s, int nbytes )
-    {
-    if (s->data + nbytes > s->data_end)
-	{
-	fputs( "Insufficient data in keymapping data stream.\n", stderr );
-	exit(-1);
-	}
-    }
+static void expect_nbytes(DataStream* s, int nbytes)
+{
+  if (s->data + nbytes > s->data_end)
+  {
+    fputs("Insufficient data in keymapping data stream.\n", stderr);
+    exit(-1);
+  }
+}
 
-static byte get_byte( DataStream* s )
-    {
-    expect_nbytes( s, 1 );
-    return *s->data++;
-    }
+static byte get_byte(DataStream* s)
+{
+  expect_nbytes(s, 1);
+  return *s->data++;
+}
 
-static word get_word( DataStream* s )
-    {
-    word hi, lo;
-    expect_nbytes( s, 2 );
-    hi = *s->data++;
-    lo = *s->data++;
-    return ((hi << 8) | lo);
-    }
+static word get_word(DataStream* s)
+{
+  word hi, lo;
+  expect_nbytes(s, 2);
+  hi = *s->data++;
+  lo = *s->data++;
+  return ((hi << 8) | lo);
+}
 
-static dword get_dword( DataStream* s )
-    {
-    dword b1, b2, b3, b4;
-    expect_nbytes( s, 4 );
-    b4 = *s->data++;
-    b3 = *s->data++;
-    b2 = *s->data++;
-    b1 = *s->data++;
-    return ((b4 << 24) | (b3 << 16) | (b2 << 8) | b1);
-    }
+static dword get_dword(DataStream* s)
+{
+  dword b1, b2, b3, b4;
+  expect_nbytes(s, 4);
+  b4 = *s->data++;
+  b3 = *s->data++;
+  b2 = *s->data++;
+  b1 = *s->data++;
+  return ((b4 << 24) | (b3 << 16) | (b2 << 8) | b1);
+}
 
-static number get_number( DataStream* s )
-    {
-    switch (s->number_size)
-	{
-	case 4:  return get_dword(s);
-	case 2:  return get_word(s);
-	default: return get_byte(s);
-	}
-    }
+static number get_number(DataStream* s)
+{
+  switch (s->number_size)
+  {
+    case 4:  return get_dword(s);
+    case 2:  return get_word(s);
+    default: return get_byte(s);
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // Compute number of bits set in value.
 //-----------------------------------------------------------------------------
-static number bits_set( number mask )
-    {
-    number n = 0;
-    for ( ; mask != 0; mask >>= 1)
-	if ((mask & 0x01) != 0)
-	    n++;
-    return n;
-    }
+static number bits_set(number mask)
+{
+  number n = 0;
+  for (; mask != 0; mask >>= 1)
+    if ((mask & 0x01) != 0)
+      n++;
+  return n;
+}
 
 
 //-----------------------------------------------------------------------------
 // Skip over the Modifier records.
 //-----------------------------------------------------------------------------
-static void skip_modifiers( DataStream* s )
-    {
-    number nmod = get_number(s); // Modifier record count
-    while (nmod-- > 0)
-	{
-	number nscan;
-	get_number(s); // Modifier description code.
-	nscan = get_number(s);
-	while (nscan-- > 0)
-	    get_number(s); // One scan code mapped to this modifier.
-	}
-    }
+static void skip_modifiers(DataStream* s)
+{
+  number nmod = get_number(s); // Modifier record count
+  while (nmod-- > 0)
+  {
+    number nscan;
+    get_number(s); // Modifier description code.
+    nscan = get_number(s);
+    while (nscan-- > 0)
+      get_number(s); // One scan code mapped to this modifier.
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -244,33 +244,33 @@ static void skip_modifiers( DataStream* s )
 // first.
 //-----------------------------------------------------------------------------
 static void unparse_char_codes(
-    DataStream* s, number ncodes, NeXTKeymapBinding* binding )
+  DataStream* s, number ncodes, NeXTKeymapBinding* binding)
+{
+  if (ncodes != 0)
+  {
+    number i;
+    for (i = 0; i < ncodes; i++)
     {
-    if (ncodes != 0)
-	{
-	number i;
-	for (i = 0; i < ncodes; i++)
-	    {
-	    number const char_set = get_number(s);
-	    number const code = get_number(s);
-	    if (i == 0 && char_set != BIND_SPECIAL)
-		{
-		binding->code = code;
-		binding->character_set = char_set;
-		}
-	    }
-	}
+      number const char_set = get_number(s);
+      number const code = get_number(s);
+      if (i == 0 && char_set != BIND_SPECIAL)
+      {
+	binding->code = code;
+	binding->character_set = char_set;
+      }
     }
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // Unparse the number-size flag.
 //-----------------------------------------------------------------------------
-static void unparse_numeric_size( DataStream* s )
-    {
-    word const numbers_are_shorts = get_word(s);
-    s->number_size = numbers_are_shorts ? 2 : 1;
-    }
+static void unparse_numeric_size(DataStream* s)
+{
+  word const numbers_are_shorts = get_word(s);
+  s->number_size = numbers_are_shorts ? 2 : 1;
+}
 
 
 //=============================================================================
@@ -282,128 +282,127 @@ static void unparse_numeric_size( DataStream* s )
 // allocateBindingRecords:
 //-----------------------------------------------------------------------------
 - (void)allocateBindingRecords:(number)n
-    {
-    number const nbytes = n * sizeof(bindings[0]);
-    bindings = (NeXTKeymapBinding*)malloc( nbytes );
-    memset( bindings, INVALID_VALUE, nbytes );
-    nbindings = n;
-    }
+{
+  number const nbytes = n * sizeof(bindings[0]);
+  bindings = (NeXTKeymapBinding*)malloc(nbytes);
+  memset(bindings, INVALID_VALUE, nbytes);
+  nbindings = n;
+}
 
 
 //-----------------------------------------------------------------------------
 // Unparse a list of scan code bindings.
 //-----------------------------------------------------------------------------
 - (void)unparseCharacters:(DataStream*)s
+{
+  number const NOT_BOUND = 0xff;
+  number const nscans = get_number(s);
+  number scan;
+  [self allocateBindingRecords:nscans];
+  for (scan = 0; scan < nscans; scan++)
+  {
+    number const mask = get_number(s);
+    if (mask != NOT_BOUND)
     {
-    number const NOT_BOUND = 0xff;
-    number const nscans = get_number(s);
-    number scan;
-    [self allocateBindingRecords:nscans];
-    for (scan = 0; scan < nscans; scan++)
-	{
-	number const mask = get_number(s);
-	if (mask != NOT_BOUND)
-	    {
-	    number const bits = bits_set( mask );
-	    number const codes = 1 << bits;
-	    unparse_char_codes( s, codes, bindings + scan );
-	    }
-	}
+      number const bits = bits_set(mask);
+      number const codes = 1 << bits;
+      unparse_char_codes(s, codes, bindings + scan);
     }
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // unparseKeymapData:
 //-----------------------------------------------------------------------------
 - (void)unparseKeymapData:(DataStream*)s
-    {
-    unparse_numeric_size(s);
-    skip_modifiers(s);
-    [self unparseCharacters:s];
-    }
+{
+  unparse_numeric_size(s);
+  skip_modifiers(s);
+  [self unparseCharacters:s];
+}
 
 
 //-----------------------------------------------------------------------------
 // unparseActiveKeymap
 //-----------------------------------------------------------------------------
 - (BOOL)unparseActiveKeymap
-    {
-    BOOL rc = NO;
-    NXEventHandle const h = NXOpenEventStatus();
-    if (h == 0)
-	fputs( "Unable to open event status driver.\n", stderr );
+{
+  BOOL rc = NO;
+  NXEventHandle const h = NXOpenEventStatus();
+  if (h == 0)
+    fputs("Unable to open event status driver.\n", stderr);
+  else
+  {
+    NXKeyMapping km;
+    km.size = NXKeyMappingLength(h);
+    if (km.size <= 0)
+      fprintf(stderr, "Bad key mapping length (%d).\n", km.size);
     else
-	{
-	NXKeyMapping km;
-	km.size = NXKeyMappingLength(h);
-	if (km.size <= 0)
-	    fprintf( stderr, "Bad key mapping length (%d).\n", km.size );
-	else
-	    {
-	    km.mapping = (char*)malloc( km.size );
-	    if (NXGetKeyMapping( h, &km ) == 0)
-		fputs( "Unable to get current key mapping.\n", stderr );
-	    else
-		{
-		DataStream* stream =
-		    new_data_stream( (byte const*)km.mapping, km.size );
-		[self unparseKeymapData:stream];
-		destroy_data_stream( stream );
-		rc = YES;
-		}
-	    free( km.mapping );
-	    }
-	NXCloseEventStatus(h);
-	}
-    return rc;
+    {
+      km.mapping = (char*)malloc(km.size);
+      if (NXGetKeyMapping(h, &km) == 0)
+	fputs("Unable to get current key mapping.\n", stderr);
+      else
+      {
+	DataStream* stream = new_data_stream((byte const*)km.mapping, km.size);
+	[self unparseKeymapData:stream];
+	destroy_data_stream(stream);
+	rc = YES;
+      }
+      free(km.mapping);
     }
+    NXCloseEventStatus(h);
+  }
+  return rc;
+}
 
 
 //-----------------------------------------------------------------------------
 // isScanCodeBound:
 //-----------------------------------------------------------------------------
 - (BOOL)isScanCodeBound:(word)code
-    {
-    NeXTKeymapBinding const* const b = [self bindingForScanCode:code];
-    return (b != 0 &&
-	b->code != INVALID_VALUE && b->character_set != INVALID_VALUE);
-    }
+{
+  NeXTKeymapBinding const* const b = [self bindingForScanCode:code];
+  return (b != 0 &&
+    b->code != INVALID_VALUE && b->character_set != INVALID_VALUE);
+}
 
 
 //-----------------------------------------------------------------------------
 // bindingForScanCode:
 //-----------------------------------------------------------------------------
 - (NeXTKeymapBinding const*)bindingForScanCode:(word)code
-    {
-    return (code < nbindings ? bindings + code : 0);
-    }
+{
+  return (code < nbindings ? bindings + code : 0);
+}
 
 
 //-----------------------------------------------------------------------------
 // init
 //-----------------------------------------------------------------------------
 - (id)init
-    {
-    [super init];
-    bindings = 0;
-    nbindings = 0;
-    if (![self unparseActiveKeymap])
-	{
-	fputs( "Unable to parse active NeXT keymapping.\n", stderr );
-	exit(1);
-	}
-    return self;
-    }
+{
+  [super init];
+  bindings = 0;
+  nbindings = 0;
+  if (![self unparseActiveKeymap])
+  {
+    fputs("Unable to parse active NeXT keymapping.\n", stderr);
+    exit(1);
+  }
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // free
 //-----------------------------------------------------------------------------
 - (id)free
-    {
-    if (bindings != 0)
-	free( bindings );
-    return [super free];
-    }
+{
+  if (bindings != 0)
+    free(bindings);
+  return [super free];
+}
 
 @end

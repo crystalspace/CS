@@ -56,24 +56,24 @@ static char* CS_ERROR_MESSAGE = 0;
 // clear_error_message
 //-----------------------------------------------------------------------------
 static void clear_error_message()
-    {
-    if (CS_ERROR_MESSAGE != 0)
-	{
-	free( CS_ERROR_MESSAGE );
-	CS_ERROR_MESSAGE = 0;
-	}
-    }
+{
+  if (CS_ERROR_MESSAGE != 0)
+  {
+    free(CS_ERROR_MESSAGE);
+    CS_ERROR_MESSAGE = 0;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // set_error_message
 //-----------------------------------------------------------------------------
-static void set_error_message( NSString* s )
-    {
-    clear_error_message();
-    CS_ERROR_MESSAGE = (char*)malloc( [s cStringLength] + 1 );
-    [s getCString:CS_ERROR_MESSAGE];
-    }
+static void set_error_message(NSString* s)
+{
+  clear_error_message();
+  CS_ERROR_MESSAGE = (char*)malloc([s cStringLength] + 1);
+  [s getCString:CS_ERROR_MESSAGE];
+}
 
 
 //-----------------------------------------------------------------------------
@@ -82,92 +82,91 @@ static void set_error_message( NSString* s )
 //	symbols; the choice of which is rather arbitrary.
 //-----------------------------------------------------------------------------
 static NSModule handle_collision(NSSymbol sym, NSModule m_old, NSModule m_new)
-    {
-    return m_old;
-    }
+{
+  return m_old;
+}
 
 
 //-----------------------------------------------------------------------------
 // initialize_loader
 //-----------------------------------------------------------------------------
 static void initialize_loader()
-    {
-    static BOOL installed = NO;
-    if (!installed)
-        {
-        static NSLinkEditErrorHandlers const handlers =
-                { 0, handle_collision, 0 };
-        NSInstallLinkEditErrorHandlers( (NSLinkEditErrorHandlers*)&handlers );
-        installed = YES;
-        }
-    }
+{
+  static BOOL installed = NO;
+  if (!installed)
+  {
+    static NSLinkEditErrorHandlers const handlers = { 0, handle_collision, 0 };
+    NSInstallLinkEditErrorHandlers((NSLinkEditErrorHandlers*)&handlers);
+    installed = YES;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTLoadLibrary
 //-----------------------------------------------------------------------------
-NeXTLibraryHandle NeXTLoadLibrary( char const* path )
+NeXTLibraryHandle NeXTLoadLibrary(char const* path)
+{
+  NeXTLibraryHandle handle = 0;
+  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+  initialize_loader();
+  if (access(path, F_OK) == 0)
+  {
+    NSObjectFileImage image = 0;
+    NSObjectFileImageReturnCode rc =
+      NSCreateObjectFileImageFromFile(path, &image);
+    if (rc == NSObjectFileImageSuccess)
     {
-    NeXTLibraryHandle handle = 0;
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    initialize_loader();
-    if (access( path, F_OK ) == 0)
-	{
-	NSObjectFileImage image = 0;
-	NSObjectFileImageReturnCode rc =
-	    NSCreateObjectFileImageFromFile( path, &image );
-	if (rc == NSObjectFileImageSuccess)
-	    {
-	    NSModule const module = NSLinkModule( image, path, TRUE );
-	    if (module != 0)
-		handle = (NeXTLibraryHandle)module;
-	    else
-		set_error_message( [NSString stringWithFormat:
-		    @"NSLinkModule(%s) failed", path] );
-	    }
-	else
-	    set_error_message( [NSString stringWithFormat:
-		@"NSCreateObjectFileImageFromFile(%s) failed (error %d)",
-		path, rc] );
-	}
-    else
+      NSModule const module = NSLinkModule(image, path, TRUE);
+      if (module != 0)
+	handle = (NeXTLibraryHandle)module;
+      else
 	set_error_message(
-	    [NSString stringWithFormat:@"File does not exist (%s)", path] );
-    [pool release];
-    return handle;
+	  [NSString stringWithFormat:@"NSLinkModule(%s) failed", path]);
     }
+    else
+      set_error_message([NSString stringWithFormat:
+	@"NSCreateObjectFileImageFromFile(%s) failed (error %d)",
+	path, rc]);
+  }
+  else
+    set_error_message(
+      [NSString stringWithFormat:@"File does not exist (%s)", path]);
+  [pool release];
+  return handle;
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTGetLibrarySymbol
 //-----------------------------------------------------------------------------
-void* NeXTGetLibrarySymbol( NeXTLibraryHandle handle, char const* s )
-    {
-    void* address = 0;
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    NSString* symbol = [NSString stringWithFormat:@"_%s", s];
-    address = NSAddressOfSymbol( NSLookupAndBindSymbol([symbol cString]) );
-    if (address == 0)
-	NSLog( @"Symbol undefined: %@", symbol );
-    [pool release];
-    return address;
-    }
+void* NeXTGetLibrarySymbol(NeXTLibraryHandle handle, char const* s)
+{
+  void* address = 0;
+  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+  NSString* symbol = [NSString stringWithFormat:@"_%s", s];
+  address = NSAddressOfSymbol(NSLookupAndBindSymbol([symbol cString]));
+  if (address == 0)
+    NSLog(@"Symbol undefined: %@", symbol);
+  [pool release];
+  return address;
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTUnloadLibrary
 //-----------------------------------------------------------------------------
-int NeXTUnloadLibrary( NeXTLibraryHandle handle )
-    {
-    (void)handle;
-    return 1; // Unimplemented (1=success).
-    }
+int NeXTUnloadLibrary(NeXTLibraryHandle handle)
+{
+  (void)handle;
+  return 1; // Unimplemented (1=success).
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTGetLibraryError
 //-----------------------------------------------------------------------------
 char const* NeXTGetLibraryError()
-    {
-    return CS_ERROR_MESSAGE;
-    }
+{
+  return CS_ERROR_MESSAGE;
+}

@@ -30,15 +30,15 @@
 @class NeXTView, View, Window;
 
 @interface NeXTDelegate2D : Object
-    {
-    NeXTDriver2D driver;
-    Window* window;
-    NeXTView* view;
-    BOOL trackingMouse;
-    BOOL hideMouse;
-    char* plainTitle;
-    char* pausedTitle;
-    }
+{
+  NeXTDriver2D driver;
+  Window* window;
+  NeXTView* view;
+  BOOL trackingMouse;
+  BOOL hideMouse;
+  char* plainTitle;
+  char* pausedTitle;
+}
 
 - (id)initWithDriver:(NeXTDriver2D)driver;
 - (id)free;
@@ -61,15 +61,15 @@
 typedef void* NeXTDriverHandle2D;
 typedef void* NeXTDelegate2D;
 
-N2D_PROTO(NeXTDelegate2D,new)( NeXTDriverHandle2D );
-N2D_PROTO(void,dispose)( NeXTDelegate2D );
-N2D_PROTO(int,best_bits_per_sample)( NeXTDelegate2D );
-N2D_PROTO(int,open_window)( NeXTDelegate2D, char const* title, int width,
-    int height, unsigned char* frame_buffer, int bits_per_sample );
-N2D_PROTO(void,close_window)( NeXTDelegate2D );
-N2D_PROTO(void,flush)( NeXTDelegate2D );
-N2D_PROTO(void,focus_changed)( NeXTDelegate2D, int focused );
-N2D_PROTO(int,set_mouse_cursor)( NeXTDelegate2D, csMouseCursorID );
+N2D_PROTO(NeXTDelegate2D,new)(NeXTDriverHandle2D);
+N2D_PROTO(void,dispose)(NeXTDelegate2D);
+N2D_PROTO(int,best_bits_per_sample)(NeXTDelegate2D);
+N2D_PROTO(int,open_window)(NeXTDelegate2D, char const* title, int width,
+    int height, unsigned char* frame_buffer, int bits_per_sample);
+N2D_PROTO(void,close_window)(NeXTDelegate2D);
+N2D_PROTO(void,flush)(NeXTDelegate2D);
+N2D_PROTO(void,focus_changed)(NeXTDelegate2D, int focused);
+N2D_PROTO(int,set_mouse_cursor)(NeXTDelegate2D, csMouseCursorID);
 
 #undef N2D_PROTO
 

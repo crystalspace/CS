@@ -22,10 +22,10 @@
 //-----------------------------------------------------------------------------
 // NeXTMemory_round_up_to_multiple_of_page_size
 //-----------------------------------------------------------------------------
-unsigned int NeXTMemory_round_up_to_multiple_of_page_size( unsigned int size )
-    {
-    return NSRoundUpToMultipleOfPageSize( size );
-    }
+unsigned int NeXTMemory_round_up_to_multiple_of_page_size(unsigned int size)
+{
+  return NSRoundUpToMultipleOfPageSize(size);
+}
 
 
 //-----------------------------------------------------------------------------
@@ -33,16 +33,16 @@ unsigned int NeXTMemory_round_up_to_multiple_of_page_size( unsigned int size )
 //	Allocation via NSAllocateMemoryPages() is guaranteed to be page-aligned
 //	(on Mach, at least).
 //-----------------------------------------------------------------------------
-unsigned char* NeXTMemory_allocate_memory_pages( unsigned int nbytes )
-    {
-    return (unsigned char*)NSAllocateMemoryPages( nbytes );
-    }
+unsigned char* NeXTMemory_allocate_memory_pages(unsigned int nbytes)
+{
+  return (unsigned char*)NSAllocateMemoryPages(nbytes);
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTMemory_deallocate_memory_pages
 //-----------------------------------------------------------------------------
 void NeXTMemory_deallocate_memory_pages(unsigned char* p, unsigned int nbytes)
-    {
-    NSDeallocateMemoryPages( p, nbytes );
-    }
+{
+  NSDeallocateMemoryPages(p, nbytes);
+}

@@ -50,24 +50,24 @@ MSG(rightMouseDragged)
 // initFrame:
 //-----------------------------------------------------------------------------
 - (id)initFrame:(NXRect const*)r
-    {
-    [super initFrame:r];
-    [self setClipping:NO];
-    [self setOpaque:YES];
-    [self allocateGState];
-    rep = 0;
-    return self;
-    }
+{
+  [super initFrame:r];
+  [self setClipping:NO];
+  [self setOpaque:YES];
+  [self allocateGState];
+  rep = 0;
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // free
 //-----------------------------------------------------------------------------
 - (id)free
-    {
-    [rep free];
-    return [super free];
-    }
+{
+  [rep free];
+  return [super free];
+}
 
 
 //-----------------------------------------------------------------------------
@@ -80,56 +80,56 @@ MSG(rightMouseDragged)
 //	frame buffer layout.
 //-----------------------------------------------------------------------------
 - (void)setFrameBuffer:(unsigned char*)buff bitsPerSample:(int)bits_per_sample
-    {
-    NXSize s;
-    unsigned int const w = (unsigned int)bounds.size.width;
-    unsigned int const h = (unsigned int)bounds.size.height;
-
-    unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
-    unsigned int const bytes_per_pixel = bits_per_sample / 2;
-    unsigned int const bytes_per_row = bytes_per_pixel * w;
-    unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
-
-    assert( bits_per_sample == 4 || bits_per_sample == 8 );
-
-    rep = [[NXBitmapImageRep allocFromZone:[self zone]]
-	initData:buff
-	pixelsWide:w
-	pixelsHigh:h
-	bitsPerSample:bits_per_sample
-	samplesPerPixel:samples_per_pixel
-	hasAlpha:NO
-	isPlanar:NO
-	colorSpace:NX_RGBColorSpace
-	bytesPerRow:bytes_per_row
-	bitsPerPixel:bits_per_pixel];
-    s.width  = w;
-    s.height = h;
-    [rep setSize:&s];
-    }
+{
+  NXSize s;
+  unsigned int const w = (unsigned int)bounds.size.width;
+  unsigned int const h = (unsigned int)bounds.size.height;
+  
+  unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
+  unsigned int const bytes_per_pixel = bits_per_sample / 2;
+  unsigned int const bytes_per_row = bytes_per_pixel * w;
+  unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
+  
+  assert(bits_per_sample == 4 || bits_per_sample == 8);
+  
+  rep = [[NXBitmapImageRep allocFromZone:[self zone]]
+    initData:buff
+    pixelsWide:w
+    pixelsHigh:h
+    bitsPerSample:bits_per_sample
+    samplesPerPixel:samples_per_pixel
+    hasAlpha:NO
+    isPlanar:NO
+    colorSpace:NX_RGBColorSpace
+    bytesPerRow:bytes_per_row
+    bitsPerPixel:bits_per_pixel];
+  s.width  = w;
+  s.height = h;
+  [rep setSize:&s];
+}
 
 
 //-----------------------------------------------------------------------------
 // drawSelf::
 //-----------------------------------------------------------------------------
 - (id)drawSelf:(NXRect const*)rects :(int)nrects
-    {
-    [rep draw];
-    return self;
-    }
+{
+  [rep draw];
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // flush -- Flush the frame buffer to the window.
 //-----------------------------------------------------------------------------
 - (void)flush
-    {
-    if ([self canDraw])
-	{
-	[self lockFocus];
-	[rep draw];
-	[self unlockFocus];
-	}
-    }
+{
+  if ([self canDraw])
+  {
+    [self lockFocus];
+    [rep draw];
+    [self unlockFocus];
+  }
+}
 
 @end

@@ -43,107 +43,107 @@ typedef void* NeXTDelegateHandle2D;
 //	CS/docs/texinfo/internal/platform/next.txi for details.
 //-----------------------------------------------------------------------------
 - (int)bestBitsPerSample
-    {
-    NXWindowDepth const depth = [Window defaultDepthLimit];
-    if (NXColorSpaceFromDepth( depth ) == NX_RGBColorSpace)
-        {
-	int const bps = NXBPSFromDepth( depth );
-	if (bps == 4 || bps == 8)
-	    return bps;
-	}
-    return 4;
-    }
+{
+  NXWindowDepth const depth = [Window defaultDepthLimit];
+  if (NXColorSpaceFromDepth(depth) == NX_RGBColorSpace)
+  {
+    int const bps = NXBPSFromDepth(depth);
+    if (bps == 4 || bps == 8)
+      return bps;
+  }
+  return 4;
+}
 
-N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
-    { return [(NeXTDelegate2D*)handle bestBitsPerSample]; }
+N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
+  { return [(NeXTDelegate2D*)handle bestBitsPerSample]; }
 
 
 //-----------------------------------------------------------------------------
 // copyString:suffix:
 //-----------------------------------------------------------------------------
 - (char*)copyString:(char const*)s suffix:(char const*)x
-    {
-    char* p = (char*)malloc( strlen(s) + (x == 0 ? 0 : strlen(x)) + 1 );
-    strcpy( p, s );
-    if (x != 0)
-	strcat( p, x );
-    return p;
-    }
+{
+  char* p = (char*)malloc(strlen(s) + (x == 0 ? 0 : strlen(x)) + 1);
+  strcpy(p, s);
+  if (x != 0)
+    strcat(p, x);
+  return p;
+}
 
 
 //-----------------------------------------------------------------------------
 // freeTitles
 //-----------------------------------------------------------------------------
 - (void)freeTitles
-    {
-    if (plainTitle != 0)
-	{
-	free( plainTitle  ); plainTitle  = 0;
-	free( pausedTitle ); pausedTitle = 0;
-	}
-    }
+{
+  if (plainTitle != 0)
+  {
+    free(plainTitle ); plainTitle  = 0;
+    free(pausedTitle); pausedTitle = 0;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // configureTitles
 //-----------------------------------------------------------------------------
 - (void)configureTitles:(char const*)title
-    {
-    [self freeTitles]; // Should not be requried, but just in case.
-    plainTitle  = [self copyString:title suffix:0];
-    pausedTitle = [self copyString:title suffix:"  [Paused]"];
-    }
+{
+  [self freeTitles]; // Should not be requried, but just in case.
+  plainTitle  = [self copyString:title suffix:0];
+  pausedTitle = [self copyString:title suffix:"  [Paused]"];
+}
 
 
 //-----------------------------------------------------------------------------
 // enableMouseMoved:
 //-----------------------------------------------------------------------------
 - (void)enableMouseMoved:(BOOL)enable
-    {
-    if (enable)
-	[window addToEventMask:NX_MOUSEMOVEDMASK];
-    else
-	[window removeFromEventMask:NX_MOUSEMOVEDMASK];
-    }
+{
+  if (enable)
+    [window addToEventMask:NX_MOUSEMOVEDMASK];
+  else
+    [window removeFromEventMask:NX_MOUSEMOVEDMASK];
+}
 
 
 //-----------------------------------------------------------------------------
 // startTrackingMouse
 //-----------------------------------------------------------------------------
 - (void)startTrackingMouse
-    {
-    if (!trackingMouse)
-	{
-	NXPoint p;
-	NXRect r;
-	BOOL mouseInside;
-	[window getMouseLocation:&p];
-	[view getBounds:&r];
-	[view convertRect:&r toView:0];
-	mouseInside = [view mouse:&p inRect:&r];
-	[window setTrackingRect:&r inside:mouseInside owner:self
-	    tag:TRACK_TAG left:NO right:NO];
-	[self enableMouseMoved:mouseInside];
-	if (hideMouse && mouseInside)
-	    NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
-	trackingMouse = YES;
-	}
-    }
+{
+  if (!trackingMouse)
+  {
+    NXPoint p;
+    NXRect r;
+    BOOL mouseInside;
+    [window getMouseLocation:&p];
+    [view getBounds:&r];
+    [view convertRect:&r toView:0];
+    mouseInside = [view mouse:&p inRect:&r];
+    [window setTrackingRect:&r inside:mouseInside owner:self
+      tag:TRACK_TAG left:NO right:NO];
+    [self enableMouseMoved:mouseInside];
+    if (hideMouse && mouseInside)
+      NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+    trackingMouse = YES;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // stopTrackingMouse
 //-----------------------------------------------------------------------------
 - (void)stopTrackingMouse
-    {
-    if (trackingMouse)
-	{
-	[self enableMouseMoved:NO];
-	[window discardTrackingRect:TRACK_TAG];
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-	trackingMouse = NO;
-	}
-    }
+{
+  if (trackingMouse)
+  {
+    [self enableMouseMoved:NO];
+    [window discardTrackingRect:TRACK_TAG];
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+    trackingMouse = NO;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -155,24 +155,24 @@ N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
 //	NextStep 3.0 WindowServer release notes for an explanation.
 //-----------------------------------------------------------------------------
 - (void)adjustWindowPosition
-    {
-    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
-    int x;
-    NXRect vr;
-    [view getBounds:&vr];
-    [view convertPoint:&vr.origin toView:0];
-    [window convertBaseToScreen:&vr.origin];
-    x = (int)vr.origin.x;
-    if ((x & ALIGN) != 0)
-	{
-	NXRect wr;
-	float dx;
-	x &= ~ALIGN;
-	[window getFrame:&wr];
-	dx = vr.origin.x - wr.origin.x;
-	[window moveTo:(x - dx):wr.origin.y];
-	}
-    }
+{
+  int const ALIGN = (1 << 3) - 1; // 8-pixel alignment
+  int x;
+  NXRect vr;
+  [view getBounds:&vr];
+  [view convertPoint:&vr.origin toView:0];
+  [window convertBaseToScreen:&vr.origin];
+  x = (int)vr.origin.x;
+  if ((x & ALIGN) != 0)
+  {
+    NXRect wr;
+    float dx;
+    x &= ~ALIGN;
+    [window getFrame:&wr];
+    dx = vr.origin.x - wr.origin.x;
+    [window moveTo:(x - dx):wr.origin.y];
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -194,164 +194,164 @@ N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
 //	of a Retained non-deferred window are never drawn.
 //-----------------------------------------------------------------------------
 - (BOOL)openWindow:(char const*)title width:(int)width height:(int)height
-    frameBuffer:(unsigned char*)frameBuffer bitsPerSample:(int)bitsPerSample
-    {
-    NXRect r = {{ 0, 0 }, { width, height }};
-    window = [[Window alloc]
-	initContent:&r
-	style:NX_TITLEDSTYLE
-	backing:NX_RETAINED
-	buttonMask:NX_CLOSEBUTTONMASK
-	defer:YES];
+  frameBuffer:(unsigned char*)frameBuffer bitsPerSample:(int)bitsPerSample
+{
+  NXRect r = {{ 0, 0 }, { width, height }};
+  window = [[Window alloc]
+    initContent:&r
+    style:NX_TITLEDSTYLE
+    backing:NX_RETAINED
+    buttonMask:NX_CLOSEBUTTONMASK
+    defer:YES];
+  
+  view = [[NeXTView alloc] initFrame:&r];
+  [view setFrameBuffer:frameBuffer bitsPerSample:bitsPerSample];
+  [[window setContentView:view] free];
+  
+  [self configureTitles:title];
+  [window setTitle:plainTitle];
+  [window setFreeWhenClosed:NO];
+  [window addToEventMask:
+    NX_FLAGSCHANGEDMASK | NX_LMOUSEDRAGGEDMASK | NX_RMOUSEDRAGGEDMASK];
+  [window center];
+  [self adjustWindowPosition];
+  [window setDelegate:self];
+  [window makeFirstResponder:view];
+  [window makeKeyAndOrderFront:0];
+  
+  [self startTrackingMouse];	// *NOTE*
+  return YES;
+}
 
-    view = [[NeXTView alloc] initFrame:&r];
-    [view setFrameBuffer:frameBuffer bitsPerSample:bitsPerSample];
-    [[window setContentView:view] free];
-
-    [self configureTitles:title];
-    [window setTitle:plainTitle];
-    [window setFreeWhenClosed:NO];
-    [window addToEventMask:
-	NX_FLAGSCHANGEDMASK | NX_LMOUSEDRAGGEDMASK | NX_RMOUSEDRAGGEDMASK];
-    [window center];
-    [self adjustWindowPosition];
-    [window setDelegate:self];
-    [window makeFirstResponder:view];
-    [window makeKeyAndOrderFront:0];
-
-    [self startTrackingMouse];	// *NOTE*
-    return YES;
-    }
-
-N2D_PROTO(int,open_window)( NeXTDelegateHandle2D handle, char const* title,
-    int w, int h, unsigned char* frame_buffer, int bits_per_sample )
-    { return [(NeXTDelegate2D*)handle openWindow:title width:w height:h
-    frameBuffer:frame_buffer bitsPerSample:bits_per_sample]; }
+N2D_PROTO(int,open_window)(NeXTDelegateHandle2D handle, char const* title,
+  int w, int h, unsigned char* frame_buffer, int bits_per_sample)
+  { return [(NeXTDelegate2D*)handle openWindow:title width:w height:h
+  frameBuffer:frame_buffer bitsPerSample:bits_per_sample]; }
 
 
 //-----------------------------------------------------------------------------
 // closeWindow
 //-----------------------------------------------------------------------------
 - (void)closeWindow
-    {
-    [self stopTrackingMouse];
-    [window close];
-    }
+{
+  [self stopTrackingMouse];
+  [window close];
+}
 
-N2D_PROTO(void,close_window)( NeXTDelegateHandle2D handle )
-    { [(NeXTDelegate2D*)handle closeWindow]; }
+N2D_PROTO(void,close_window)(NeXTDelegateHandle2D handle)
+  { [(NeXTDelegate2D*)handle closeWindow]; }
 
 
 //-----------------------------------------------------------------------------
 // focusChanged
 //-----------------------------------------------------------------------------
 - (void)focusChanged:(BOOL)focused
-    {
-    [window setTitle:(focused ? plainTitle : pausedTitle)];
-    if (focused)
-	[self startTrackingMouse];
-    else
-	[self stopTrackingMouse];
-    }
+{
+  [window setTitle:(focused ? plainTitle : pausedTitle)];
+  if (focused)
+    [self startTrackingMouse];
+  else
+    [self stopTrackingMouse];
+}
 
-N2D_PROTO(void,focus_changed)( NeXTDelegateHandle2D handle, int focused )
-    { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused]; }
+N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused)
+  { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused]; }
 
 
 //-----------------------------------------------------------------------------
 // flush
 //-----------------------------------------------------------------------------
 - (void)flush
-    {
-    [view flush];
-    NeXTDriver2D_system_extension( driver, "flushgraphicscontext", 0, 0 );
-    }
+{
+  [view flush];
+  NeXTDriver2D_system_extension(driver, "flushgraphicscontext", 0, 0);
+}
 
-N2D_PROTO(void,flush)( NeXTDelegateHandle2D handle )
-    { [(NeXTDelegate2D*)handle flush]; }
+N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
+  { [(NeXTDelegate2D*)handle flush]; }
 
 
 //-----------------------------------------------------------------------------
 // setMouseCursor:
 //-----------------------------------------------------------------------------
 - (BOOL)setMouseCursor:(csMouseCursorID)shape
-    {
-    hideMouse = YES;
-    if (shape == csmcArrow)
-	{
-	[NXArrow set];
-	hideMouse = NO;
-	}
-
-    if (hideMouse)
-	NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
-    else
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-    return !hideMouse;
-    }
+{
+  hideMouse = YES;
+  if (shape == csmcArrow)
+  {
+    [NXArrow set];
+    hideMouse = NO;
+  }
+  
+  if (hideMouse)
+    NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+  else
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+  return !hideMouse;
+}
 
 N2D_PROTO(int,set_mouse_cursor)
-    ( NeXTDelegateHandle2D handle, csMouseCursorID shape )
-    { return [(NeXTDelegate2D*)handle setMouseCursor:shape]; }
+  (NeXTDelegateHandle2D handle, csMouseCursorID shape)
+  { return [(NeXTDelegate2D*)handle setMouseCursor:shape]; }
 
 
 //-----------------------------------------------------------------------------
 // mouseEntered:
 //-----------------------------------------------------------------------------
 - (id)mouseEntered:(NXEvent*)p
-    {
-    if (p->data.tracking.trackingNum == TRACK_TAG)
-	{
-	[self enableMouseMoved:YES];
-	if (hideMouse)
-	    NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
-	}
-    return self;
-    }
+{
+  if (p->data.tracking.trackingNum == TRACK_TAG)
+  {
+    [self enableMouseMoved:YES];
+    if (hideMouse)
+      NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+  }
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // mouseExited:
 //-----------------------------------------------------------------------------
 - (id)mouseExited:(NXEvent*)p
-    {
-    if (p->data.tracking.trackingNum == TRACK_TAG)
-	{
-	[self enableMouseMoved:NO];
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-	}
-    return self;
-    }
+{
+  if (p->data.tracking.trackingNum == TRACK_TAG)
+  {
+    [self enableMouseMoved:NO];
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+  }
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // windowDidBecomeKey:
 //-----------------------------------------------------------------------------
 - (id)windowDidBecomeKey:(id)sender
-    {
-    [self startTrackingMouse];
-    return self;
-    }
+{
+  [self startTrackingMouse];
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // windowDidResignKey:
 //-----------------------------------------------------------------------------
 - (id)windowDidResignKey:(id)sender
-    {
-    [self stopTrackingMouse];
-    return self;
-    }
+{
+  [self stopTrackingMouse];
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // windowDidMove:
 //-----------------------------------------------------------------------------
 - (id)windowDidMove:(id)sender
-    {
-    [self adjustWindowPosition];
-    return self;
-    }
+{
+  [self adjustWindowPosition];
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
@@ -359,58 +359,58 @@ N2D_PROTO(int,set_mouse_cursor)
 //	Terminate the application when the animation-window closes.
 //-----------------------------------------------------------------------------
 - (id)windowWillClose:(id)sender
-    {
-    [self stopTrackingMouse];
-    if (hideMouse)
-	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
-    NeXTDriver2D_user_close( driver );
-    return self;
-    }
+{
+  [self stopTrackingMouse];
+  if (hideMouse)
+    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+  NeXTDriver2D_user_close(driver);
+  return self;
+}
 
 
 //-----------------------------------------------------------------------------
 // dispatchEvent:forView:
 //-----------------------------------------------------------------------------
 - (void)dispatchEvent:(NXEvent*)e forView:(View*)v
-    {
-    NeXTDriver2D_system_extension( driver, "dispatchevent", e, v );
-    }
+{
+  NeXTDriver2D_system_extension(driver, "dispatchevent", e, v);
+}
 
 
 //-----------------------------------------------------------------------------
 // initWithDriver:
 //-----------------------------------------------------------------------------
 - (id)initWithDriver:(NeXTDriver2D)p
-    {
-    [super init];
-    driver = p;
-    window = 0;
-    view = 0;
-    trackingMouse = NO;
-    hideMouse = NO;
-    plainTitle = 0;
-    pausedTitle = 0;
-    return self;
-    }
+{
+  [super init];
+  driver = p;
+  window = 0;
+  view = 0;
+  trackingMouse = NO;
+  hideMouse = NO;
+  plainTitle = 0;
+  pausedTitle = 0;
+  return self;
+}
 
-N2D_PROTO(NeXTDelegateHandle2D,new)( NeXTDriver2D driver )
-    { return [[NeXTDelegate2D alloc] initWithDriver:driver]; }
+N2D_PROTO(NeXTDelegateHandle2D,new)(NeXTDriver2D driver)
+  { return [[NeXTDelegate2D alloc] initWithDriver:driver]; }
 
 
 //-----------------------------------------------------------------------------
 // free
 //-----------------------------------------------------------------------------
 - (id)free
-    {
-    [window setDelegate:0];
-    [window close];
-    [window free];	// Window frees NeXTView.
-    [self freeTitles];
-    return [super free];
-    }
+{
+  [window setDelegate:0];
+  [window close];
+  [window free];	// Window frees NeXTView.
+  [self freeTitles];
+  return [super free];
+}
 
-N2D_PROTO(void,dispose)( NeXTDelegateHandle2D handle )
-    { [(NeXTDelegate2D*)handle free]; }
+N2D_PROTO(void,dispose)(NeXTDelegateHandle2D handle)
+  { [(NeXTDelegate2D*)handle free]; }
 
 @end
 

@@ -28,14 +28,14 @@ typedef void* NeXTConfigHandle;
 typedef void* NeXTConfigIterator;
 
 NCF_PROTO(char const*,lookup)(
-    NeXTConfigHandle, char const* key, char const* fallback );
-NCF_PROTO(int,exists)( NeXTConfigHandle, char const* section );
+  NeXTConfigHandle, char const* key, char const* fallback);
+NCF_PROTO(int,exists)(NeXTConfigHandle, char const* section);
 NCF_PROTO(NeXTConfigIterator,new_iterator)(
-    NeXTConfigHandle, char const* section );
-NCF_PROTO(void,dispose_iterator)( NeXTConfigIterator );
-NCF_PROTO(int,iterator_next)( NeXTConfigIterator );
-NCF_PROTO(char const*,iterator_key)( NeXTConfigIterator );
-NCF_PROTO(char const*,iterator_data)( NeXTConfigIterator );
+  NeXTConfigHandle, char const* section);
+NCF_PROTO(void,dispose_iterator)(NeXTConfigIterator);
+NCF_PROTO(int,iterator_next)(NeXTConfigIterator);
+NCF_PROTO(char const*,iterator_key)(NeXTConfigIterator);
+NCF_PROTO(char const*,iterator_data)(NeXTConfigIterator);
 
 #undef NCF_PROTO
 

@@ -92,62 +92,62 @@ int NeXTFrameBuffer15::green_mask() const { return GREEN_MASK; }
 int NeXTFrameBuffer15::blue_mask () const { return BLUE_MASK;  }
 
 unsigned char* NeXTFrameBuffer15::get_raw_buffer() const
-    { return raw_buffer; }
+  { return raw_buffer; }
 unsigned char* NeXTFrameBuffer15::get_cooked_buffer() const
-    { return cooked_buffer; }
+  { return cooked_buffer; }
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTFrameBuffer15::NeXTFrameBuffer15( unsigned int w, unsigned int h ) :
-    NeXTFrameBuffer(w,h)
-    {
-    buffer_size   = NeXTMemory_round_up_to_multiple_of_page_size(
-		    CS_NEXT_BPP * width * height );
-    raw_buffer    = NeXTMemory_allocate_memory_pages( buffer_size );
-    cooked_buffer = NeXTMemory_allocate_memory_pages( buffer_size );
-    memset( cooked_buffer, 0, buffer_size );
-    lookup_table  = build_15_to_12_rgb_table();
-    }
+NeXTFrameBuffer15::NeXTFrameBuffer15(unsigned int w, unsigned int h) :
+  NeXTFrameBuffer(w,h)
+{
+  buffer_size =
+    NeXTMemory_round_up_to_multiple_of_page_size(CS_NEXT_BPP * width * height);
+  raw_buffer    = NeXTMemory_allocate_memory_pages(buffer_size);
+  cooked_buffer = NeXTMemory_allocate_memory_pages(buffer_size);
+  memset(cooked_buffer, 0, buffer_size);
+  lookup_table  = build_15_to_12_rgb_table();
+}
 
 
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
 NeXTFrameBuffer15::~NeXTFrameBuffer15()
-    {
-    free( lookup_table );
-    NeXTMemory_deallocate_memory_pages( cooked_buffer, buffer_size );
-    NeXTMemory_deallocate_memory_pages( raw_buffer,    buffer_size );
-    }
+{
+  free(lookup_table);
+  NeXTMemory_deallocate_memory_pages(cooked_buffer, buffer_size);
+  NeXTMemory_deallocate_memory_pages(raw_buffer,    buffer_size);
+}
 
 
 //-----------------------------------------------------------------------------
 // build_15_to_12_rgb_table
 //-----------------------------------------------------------------------------
 unsigned short* NeXTFrameBuffer15::build_15_to_12_rgb_table() const
-    {
-    unsigned int const lim = 1 << 15;
-    unsigned int const nbytes = 2 * lim * sizeof(short); // Doubled table.
-    unsigned short* table = (unsigned short*)malloc(nbytes);
-    unsigned short* p = table;
-    for (unsigned int i = 0; i < lim; i++)
-	*p++ = ENCODE_RED  (DECODE_RED  (i)) |
-	       ENCODE_GREEN(DECODE_GREEN(i)) |
-	       ENCODE_BLUE (DECODE_BLUE (i)) |
-	       ENCODE_ALPHA(0x0f);
-    memcpy( table + lim, table, nbytes / 2 );
-    return table;
-    }
+{
+  unsigned int const lim = 1 << 15;
+  unsigned int const nbytes = 2 * lim * sizeof(short); // Doubled table.
+  unsigned short* table = (unsigned short*)malloc(nbytes);
+  unsigned short* p = table;
+  for (unsigned int i = 0; i < lim; i++)
+    *p++ = ENCODE_RED  (DECODE_RED  (i)) |
+	   ENCODE_GREEN(DECODE_GREEN(i)) |
+	   ENCODE_BLUE (DECODE_BLUE (i)) |
+	   ENCODE_ALPHA(0x0f);
+  memcpy(table + lim, table, nbytes / 2);
+  return table;
+}
 
 
 //-----------------------------------------------------------------------------
 // cook
 //-----------------------------------------------------------------------------
 void NeXTFrameBuffer15::cook()
-    {
-    unsigned short const* src = (unsigned short*)raw_buffer;
-    unsigned short* dst = (unsigned short*)cooked_buffer;
-    for (unsigned int n = width * height; n-- > 0; )
-	*dst++ = lookup_table[ *src++ ];
-    }
+{
+  unsigned short const* src = (unsigned short*)raw_buffer;
+  unsigned short* dst = (unsigned short*)cooked_buffer;
+  for (unsigned int n = width * height; n-- > 0; )
+    *dst++ = lookup_table[ *src++ ];
+}

@@ -25,52 +25,52 @@
 //-----------------------------------------------------------------------------
 // csFindLoadLibrary
 //-----------------------------------------------------------------------------
-csLibraryHandle csFindLoadLibrary( char const* name )
-    {
-    static bool initialized = false;
-    if (!initialized)
-	{
-	initialized = true;
-        csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
-	}
-    return csFindLoadLibrary( 0, name, OS_NEXT_PLUGIN_EXT );
-    }
+csLibraryHandle csFindLoadLibrary(char const* name)
+{
+  static bool initialized = false;
+  if (!initialized)
+  {
+    initialized = true;
+    csAddLibraryPath(OS_NEXT_PLUGIN_DIR);
+  }
+  return csFindLoadLibrary(0, name, OS_NEXT_PLUGIN_EXT);
+}
 
 
 //-----------------------------------------------------------------------------
 // csLoadLibrary
 //-----------------------------------------------------------------------------
-csLibraryHandle csLoadLibrary( char const* path )
-    {
-    return (csLibraryHandle)NeXTLoadLibrary( path );
-    }
+csLibraryHandle csLoadLibrary(char const* path)
+{
+  return (csLibraryHandle)NeXTLoadLibrary(path);
+}
 
 
 //-----------------------------------------------------------------------------
 // csGetLibrarySymbol
 //-----------------------------------------------------------------------------
-void* csGetLibrarySymbol( csLibraryHandle handle, char const* s )
-    {
-    return NeXTGetLibrarySymbol( handle, s );
-    }
+void* csGetLibrarySymbol(csLibraryHandle handle, char const* s)
+{
+  return NeXTGetLibrarySymbol(handle, s);
+}
 
 
 //-----------------------------------------------------------------------------
 // csUnloadLibrary
 //-----------------------------------------------------------------------------
-bool csUnloadLibrary( csLibraryHandle handle )
-    {
-    return (bool)NeXTUnloadLibrary( handle );
-    }
+bool csUnloadLibrary(csLibraryHandle handle)
+{
+  return (bool)NeXTUnloadLibrary(handle);
+}
 
 
 //-----------------------------------------------------------------------------
 // csPrintLibraryError
 //-----------------------------------------------------------------------------
-void csPrintLibraryError( char const* name )
-    {
-    fprintf( stderr, "ERROR: Failed to load plug-in module `%s'.\n", name );
-    char const* s = NeXTGetLibraryError();
-    if (s != 0)
-	fprintf( stderr, "Reason: %s\n", s );
-    }
+void csPrintLibraryError(char const* name)
+{
+  fprintf(stderr, "ERROR: Failed to load plug-in module `%s'.\n", name);
+  char const* s = NeXTGetLibraryError();
+  if (s != 0)
+    fprintf(stderr, "Reason: %s\n", s);
+}

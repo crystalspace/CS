@@ -36,75 +36,75 @@ typedef void* NeXTSystemHandle;
 #define STR_SWITCH_END }}
 
 IMPLEMENT_IBASE_EXT(NeXTSystemDriver)
-    IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemEventPlug)
-    IMPLEMENTS_INTERFACE(iEventPlug)
+  IMPLEMENTS_INTERFACE(iEventPlug)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
 NeXTSystemDriver::NeXTSystemDriver() :
-    csSystemDriver(), controller(0), event_outlet(0)
-    {
-    CONSTRUCT_EMBEDDED_IBASE( scfiEventPlug );
-    printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
-	CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
-    }
+  csSystemDriver(), controller(0), event_outlet(0)
+{
+  CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
+    CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
+}
 
 
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
 NeXTSystemDriver::~NeXTSystemDriver()
-    {
-    if (controller != 0)
-	NeXTDelegate_shutdown( controller );
-    if (event_outlet != 0)
-	event_outlet->DecRef();
-    }
+{
+  if (controller != 0)
+    NeXTDelegate_shutdown(controller);
+  if (event_outlet != 0)
+    event_outlet->DecRef();
+}
 
 
 //-----------------------------------------------------------------------------
 // Initialize
 //-----------------------------------------------------------------------------
-bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
-    char const* cfgfile )
-    {
-    bool ok = false;
-    controller = NeXTDelegate_startup( this );
-    event_outlet = CreateEventOutlet( &scfiEventPlug );
-
-    char path[ MAXPATHLEN ];
-    GetInstallPath( path, sizeof(path) );
-    strcat( path, OS_NEXT_PLUGIN_DIR );
-    csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
-    csAddLibraryPath( path );
-
-    if (superclass::Initialize( argc, argv, cfgfile ))
-	{
-	iConfigFile* next_config = CreateSeparateConfig("/config/next.cfg");
-	init_menu( next_config );
-	next_config->DecRef();
-	ok = true;
-	}
-    return ok;
-    }
+bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
+  char const* cfgfile)
+{
+  bool ok = false;
+  controller = NeXTDelegate_startup(this);
+  event_outlet = CreateEventOutlet(&scfiEventPlug);
+  
+  char path[ MAXPATHLEN ];
+  GetInstallPath(path, sizeof(path));
+  strcat(path, OS_NEXT_PLUGIN_DIR);
+  csAddLibraryPath(OS_NEXT_PLUGIN_DIR);
+  csAddLibraryPath(path);
+  
+  if (superclass::Initialize(argc, argv, cfgfile))
+  {
+    iConfigFile* next_config = CreateSeparateConfig("/config/next.cfg");
+    init_menu(next_config);
+    next_config->DecRef();
+    ok = true;
+  }
+  return ok;
+}
 
 
 //-----------------------------------------------------------------------------
 // init_menu
 //	Generate application menu based upon platform configuration.
 //-----------------------------------------------------------------------------
-void NeXTSystemDriver::init_menu( iConfigFile* next_config )
-    {
-    char const* style =
-	next_config->GetStr( "Platform." OS_NEXT_DESCRIPTION ".menu", 0);
-    if (style != 0)
-	NeXTDelegate_init_app_menu( controller, next_config, style );
-    }
+void NeXTSystemDriver::init_menu(iConfigFile* next_config)
+{
+  char const* style =
+    next_config->GetStr("Platform." OS_NEXT_DESCRIPTION ".menu", 0);
+  if (style != 0)
+    NeXTDelegate_init_app_menu(controller, next_config, style);
+}
 
 
 //-----------------------------------------------------------------------------
@@ -114,9 +114,9 @@ void NeXTSystemDriver::init_menu( iConfigFile* next_config )
 //	terminates and when CSWS modal window is dismissed.
 //-----------------------------------------------------------------------------
 void NeXTSystemDriver::Loop()
-    {
-    NeXTDelegate_start_event_loop( controller );
-    }
+{
+  NeXTDelegate_start_event_loop(controller);
+}
 
 
 //-----------------------------------------------------------------------------
@@ -125,14 +125,14 @@ void NeXTSystemDriver::Loop()
 //	method.
 //-----------------------------------------------------------------------------
 void NeXTSystemDriver::timer_fired()
-    {
-    NextFrame();
-    if (!continue_looping())
-	{
-	NeXTDelegate_stop_event_loop( controller );
-	ExitLoop = false;
-	}
-    }
+{
+  NextFrame();
+  if (!continue_looping())
+  {
+    NeXTDelegate_stop_event_loop(controller);
+    ExitLoop = false;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -195,84 +195,84 @@ void NeXTSystemDriver::timer_fired()
 // the Crystal Space coordinate system where `x' increases from left to right,
 // and `y' increases from top to bottom.
 //-----------------------------------------------------------------------------
-bool NeXTSystemDriver::SystemExtension( char const* cmd, ... )
+bool NeXTSystemDriver::SystemExtension(char const* cmd, ...)
 {
-    bool ok = true;
-    va_list args;
-    va_start( args, cmd );
+  bool ok = true;
+  va_list args;
+  va_start(args, cmd);
 #define AGET(T) va_arg(args,T)
     
-    STR_SWITCH (cmd)
-	STR_CASE (timerfired)
-	    timer_fired();
-	STR_CASE (continuelooping)
-	    int* flag = AGET(int*);
-	    *flag = continue_looping();
-	STR_CASE (continuerunning)
-	    int* flag = AGET(int*);
-	    *flag = continue_running();
-	STR_CASE (flushgraphicscontext)
-	    NeXTDelegate_flush_graphics_context( controller );
-	STR_CASE (dispatchevent)
-	    NeXTEvent const event = AGET(NeXTEvent);
-	    NeXTView  const view  = AGET(NeXTView );
-	    NeXTDelegate_dispatch_event( controller, event, view );
-	STR_CASE (keydown)
-	    int const raw = AGET(int);
-	    int const cooked = AGET(int);
-	    event_outlet->Key( raw, cooked, true );
-	STR_CASE (keyup)
-	    int const raw = AGET(int);
-	    int const cooked = AGET(int);
-	    event_outlet->Key( raw, cooked, false );
-	STR_CASE (mousedown)
-	    int const button = AGET(int);
-	    int const x = AGET(int);
-	    int const y = AGET(int);
-	    event_outlet->Mouse( button, true, x, y );
-	STR_CASE (mouseup)
-	    int const button = AGET(int);
-	    int const x = AGET(int);
-	    int const y = AGET(int);
-	    event_outlet->Mouse( button, false, x, y );
-	STR_CASE (mousemoved)
-	    int const x = AGET(int);
-	    int const y = AGET(int);
-	    event_outlet->Mouse( 0, false, x, y );
-	STR_CASE (hidemouse)
-	    NeXTDelegate_hide_mouse( controller );
-	STR_CASE (showmouse)
-	    NeXTDelegate_show_mouse( controller );
-	STR_CASE (appactivated)
-	    ResumeVirtualTimeClock();
-	    event_outlet->ImmediateBroadcast( cscmdFocusChanged, (void*)true);
-	STR_CASE (appdeactivated)
-	    SuspendVirtualTimeClock();
-	    event_outlet->ImmediateBroadcast( cscmdFocusChanged, (void*)false);
-	STR_CASE (requestshutdown)
-	    event_outlet->ImmediateBroadcast( cscmdQuit, 0 );
-	    NeXTDelegate_stop_event_loop( controller );
-	STR_DEFAULT
-	    ok = false;
-    STR_SWITCH_END
+  STR_SWITCH (cmd)
+    STR_CASE (timerfired)
+      timer_fired();
+    STR_CASE (continuelooping)
+      int* flag = AGET(int*);
+      *flag = continue_looping();
+    STR_CASE (continuerunning)
+      int* flag = AGET(int*);
+      *flag = continue_running();
+    STR_CASE (flushgraphicscontext)
+      NeXTDelegate_flush_graphics_context(controller);
+    STR_CASE (dispatchevent)
+      NeXTEvent const event = AGET(NeXTEvent);
+      NeXTView  const view  = AGET(NeXTView);
+      NeXTDelegate_dispatch_event(controller, event, view);
+    STR_CASE (keydown)
+      int const raw = AGET(int);
+      int const cooked = AGET(int);
+      event_outlet->Key(raw, cooked, true);
+    STR_CASE (keyup)
+      int const raw = AGET(int);
+      int const cooked = AGET(int);
+      event_outlet->Key(raw, cooked, false);
+    STR_CASE (mousedown)
+      int const button = AGET(int);
+      int const x = AGET(int);
+      int const y = AGET(int);
+      event_outlet->Mouse(button, true, x, y);
+    STR_CASE (mouseup)
+      int const button = AGET(int);
+      int const x = AGET(int);
+      int const y = AGET(int);
+      event_outlet->Mouse(button, false, x, y);
+    STR_CASE (mousemoved)
+      int const x = AGET(int);
+      int const y = AGET(int);
+      event_outlet->Mouse(0, false, x, y);
+    STR_CASE (hidemouse)
+      NeXTDelegate_hide_mouse(controller);
+    STR_CASE (showmouse)
+      NeXTDelegate_show_mouse(controller);
+    STR_CASE (appactivated)
+      ResumeVirtualTimeClock();
+      event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)true);
+    STR_CASE (appdeactivated)
+      SuspendVirtualTimeClock();
+      event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
+    STR_CASE (requestshutdown)
+      event_outlet->ImmediateBroadcast(cscmdQuit, 0);
+      NeXTDelegate_stop_event_loop(controller);
+    STR_DEFAULT
+      ok = false;
+  STR_SWITCH_END
 
 #undef AGET
-    va_end(args);
-    return ok;
+  va_end(args);
+  return ok;
 }
 
 NSD_PROTO(int,system_extension)
-    ( NeXTSystemHandle h, char const* msg, void* d1, void* d2, void* d3)
-    { return ((NeXTSystemDriver*)h)->SystemExtension( msg, d1, d2, d3 ); }
+  (NeXTSystemHandle h, char const* msg, void* d1, void* d2, void* d3)
+  { return ((NeXTSystemDriver*)h)->SystemExtension(msg, d1, d2, d3); }
 
 
 //-----------------------------------------------------------------------------
 // iEventPlug Implementation
 //-----------------------------------------------------------------------------
 uint NeXTSystemDriver::NeXTSystemEventPlug::GetPotentiallyConflictingEvents()
-    { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
-uint NeXTSystemDriver::NeXTSystemEventPlug::QueryEventPriority( uint type )
-    { return 150; }
+  { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
+uint NeXTSystemDriver::NeXTSystemEventPlug::QueryEventPriority(uint type)
+  { return 150; }
 
 #undef STR_SWITCH_END
 #undef STR_DEFAULT

@@ -42,87 +42,87 @@ static char* CS_ERROR_MESSAGE = 0;
 // clear_error_message
 //-----------------------------------------------------------------------------
 static void clear_error_message()
-    {
-    if (CS_ERROR_MESSAGE != 0)
-	{
-	free( CS_ERROR_MESSAGE );
-	CS_ERROR_MESSAGE = 0;
-	}
-    }
+{
+  if (CS_ERROR_MESSAGE != 0)
+  {
+    free(CS_ERROR_MESSAGE);
+    CS_ERROR_MESSAGE = 0;
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // set_error_message
 //-----------------------------------------------------------------------------
-static void set_error_message( NXStream* stream )
-    {
-    char* buff;
-    int len, maxlen;
-    clear_error_message();
-    NXGetMemoryBuffer( stream, &buff, &len, &maxlen );
-    if (len > 0)
-	{
-	CS_ERROR_MESSAGE = (char*)malloc( len + 1 );
-	strncpy( CS_ERROR_MESSAGE, buff, len );
-	CS_ERROR_MESSAGE[ len ] = '\0';
-	}
-    }
+static void set_error_message(NXStream* stream)
+{
+  char* buff;
+  int len, maxlen;
+  clear_error_message();
+  NXGetMemoryBuffer(stream, &buff, &len, &maxlen);
+  if (len > 0)
+  {
+    CS_ERROR_MESSAGE = (char*)malloc(len + 1);
+    strncpy(CS_ERROR_MESSAGE, buff, len);
+    CS_ERROR_MESSAGE[ len ] = '\0';
+  }
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTLoadLibrary
 //-----------------------------------------------------------------------------
-NeXTLibraryHandle NeXTLoadLibrary( char const* path )
-    {
-    NeXTLibraryHandle handle = 0;
-    NXStream* stream = NXOpenMemory( 0, 0, NX_WRITEONLY );
-    if (access( path, F_OK ) == 0)
-	{
-	char const* const files[2] = { path, 0 };
-	struct mach_header* header = 0;
-	if (objc_loadModules( (char**)files, stream, 0, &header, 0 ) == 0)
-	    handle = (NeXTLibraryHandle)header;
-	}
-    else
-	NXPrintf( stream, "File does not exist (%s)", path );
-    set_error_message( stream );
-    NXCloseMemory( stream, NX_FREEBUFFER );
-    return handle;
-    }
+NeXTLibraryHandle NeXTLoadLibrary(char const* path)
+{
+  NeXTLibraryHandle handle = 0;
+  NXStream* stream = NXOpenMemory(0, 0, NX_WRITEONLY);
+  if (access(path, F_OK) == 0)
+  {
+    char const* const files[2] = { path, 0 };
+    struct mach_header* header = 0;
+    if (objc_loadModules((char**)files, stream, 0, &header, 0) == 0)
+      handle = (NeXTLibraryHandle)header;
+  }
+  else
+    NXPrintf(stream, "File does not exist (%s)", path);
+  set_error_message(stream);
+  NXCloseMemory(stream, NX_FREEBUFFER);
+  return handle;
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTGetLibrarySymbol
 //-----------------------------------------------------------------------------
-void* NeXTGetLibrarySymbol( NeXTLibraryHandle handle, char const* s )
-    {
-    unsigned long address = 0;
-    NXStream* stream = NXOpenFile( 2, NX_WRITEONLY );
-    char* symbol = (char*)malloc( strlen(s) + 2 ); // '_' + s + '\0'
-    *symbol = '_';
-    strcpy( symbol + 1, s );
-    if (rld_lookup( stream, symbol, &address ) == 0)
-	NXPrintf( stream, "Symbol undefined: %s\n", symbol );
-    NXClose( stream );
-    free( symbol );
-    return (void*)address;
-    }
+void* NeXTGetLibrarySymbol(NeXTLibraryHandle handle, char const* s)
+{
+  unsigned long address = 0;
+  NXStream* stream = NXOpenFile(2, NX_WRITEONLY);
+  char* symbol = (char*)malloc(strlen(s) + 2); // '_' + s + '\0'
+  *symbol = '_';
+  strcpy(symbol + 1, s);
+  if (rld_lookup(stream, symbol, &address) == 0)
+    NXPrintf(stream, "Symbol undefined: %s\n", symbol);
+  NXClose(stream);
+  free(symbol);
+  return (void*)address;
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTUnloadLibrary
 //-----------------------------------------------------------------------------
-int NeXTUnloadLibrary( NeXTLibraryHandle handle )
-    {
-    (void)handle;
-    return 1; // Unimplemented (1=success).
-    }
+int NeXTUnloadLibrary(NeXTLibraryHandle handle)
+{
+  (void)handle;
+  return 1; // Unimplemented (1=success).
+}
 
 
 //-----------------------------------------------------------------------------
 // NeXTGetLibraryError
 //-----------------------------------------------------------------------------
 char const* NeXTGetLibraryError()
-    {
-    return CS_ERROR_MESSAGE;
-    }
+{
+  return CS_ERROR_MESSAGE;
+}

@@ -30,15 +30,15 @@
 @class NeXTKeymap, View, Window;
 
 @interface NeXTDelegate : Object
-    {
-    NeXTSystemDriver driver;
-    NeXTKeymap* keymap;
-    DPSTimedEntry timer;
-    unsigned long modifiers;
-    BOOL mouseHidden;
-    BOOL paused;
-    BOOL autoResume;
-    }
+{
+  NeXTSystemDriver driver;
+  NeXTKeymap* keymap;
+  DPSTimedEntry timer;
+  unsigned long modifiers;
+  BOOL mouseHidden;
+  BOOL paused;
+  BOOL autoResume;
+}
 
 + (NeXTDelegate*)startup:(NeXTSystemDriver)driver;
 + (void)shutdown:(NeXTDelegate*)controller;
@@ -82,15 +82,15 @@ typedef void* NeXTDelegate;
 typedef void* NeXTEvent;
 typedef void* NeXTView;
 
-ND_PROTO(NeXTDelegate,startup)( NeXTSystemHandle );
-ND_PROTO(void,shutdown)( NeXTDelegate );
-ND_PROTO(void,init_app_menu)( NeXTDelegate, NeXTConfigHandle, char const* );
-ND_PROTO(void,start_event_loop)( NeXTDelegate );
-ND_PROTO(void,stop_event_loop)( NeXTDelegate );
-ND_PROTO(void,dispatch_event)( NeXTDelegate, NeXTEvent, NeXTView );
-ND_PROTO(void,hide_mouse)( NeXTDelegate );
-ND_PROTO(void,show_mouse)( NeXTDelegate );
-ND_PROTO(void,flush_graphics_context)( NeXTDelegate );
+ND_PROTO(NeXTDelegate,startup)(NeXTSystemHandle);
+ND_PROTO(void,shutdown)(NeXTDelegate);
+ND_PROTO(void,init_app_menu)(NeXTDelegate, NeXTConfigHandle, char const*);
+ND_PROTO(void,start_event_loop)(NeXTDelegate);
+ND_PROTO(void,stop_event_loop)(NeXTDelegate);
+ND_PROTO(void,dispatch_event)(NeXTDelegate, NeXTEvent, NeXTView);
+ND_PROTO(void,hide_mouse)(NeXTDelegate);
+ND_PROTO(void,show_mouse)(NeXTDelegate);
+ND_PROTO(void,flush_graphics_context)(NeXTDelegate);
 
 #undef ND_PROTO
 

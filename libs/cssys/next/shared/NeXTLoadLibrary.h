@@ -23,9 +23,9 @@ extern "C" {
 
 typedef void* NeXTLibraryHandle;
 
-NeXTLibraryHandle NeXTLoadLibrary( char const* path );
-void* NeXTGetLibrarySymbol( NeXTLibraryHandle, char const* name );
-int NeXTUnloadLibrary( NeXTLibraryHandle );
+NeXTLibraryHandle NeXTLoadLibrary(char const* path);
+void* NeXTGetLibrarySymbol(NeXTLibraryHandle, char const* name);
+int NeXTUnloadLibrary(NeXTLibraryHandle);
 char const* NeXTGetLibraryError();
 
 #if defined(__cplusplus)

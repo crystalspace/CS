@@ -22,9 +22,9 @@
 @class NXBitmapImageRep;
 
 @interface NeXTView : View
-    {
-    NXBitmapImageRep* rep;
-    }
+{
+  NXBitmapImageRep* rep;
+}
 
 - (id)initFrame:(NXRect const*)r;
 - (id)free;
