@@ -3,5 +3,3 @@
   doesn't work with palettes.
   
   those features aren't (really) needed yet, but should be implemented sometime in the future.
-  
-- !!! kill those OpenGL problems
