@@ -32,6 +32,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/fastsqrt.h"
 #include "csutil/garray.h"
+#include "csutil/rng.h"
 #include "igraph3d.h"
 #include "iparticl.h"
 
@@ -40,6 +41,9 @@
 //#define DEFAULT_LIGHTING CS_SPR_LIGHTING_HQ
 #define DEFAULT_LIGHTING CS_SPR_LIGHTING_LQ
 //#define DEFAULT_LIGHTING CS_SPR_LIGHTING_FAST
+
+// Set the default lod used.
+#define DEFAULT_LOD -1
 
 
 //--------------------------------------------------------------------------
@@ -123,6 +127,10 @@ csSpriteTemplate::csSpriteTemplate ()
   do_tweening = true;
   lighting_quality = DEFAULT_LIGHTING;
   lighting_quality_config = CS_SPR_LIGHT_GLOBAL;
+  
+  lod_level = DEFAULT_LOD;
+  lod_level_config = CS_SPR_LOD_GLOBAL;
+  
 }
 
 csSpriteTemplate::~csSpriteTemplate ()
@@ -796,7 +804,7 @@ void csSprite3D::FixVertexColors ()
 }
 
 csTriangleMesh csSprite3D::mesh;
-float csSprite3D::cfg_lod_detail = 30;
+float csSprite3D::global_lod_level = DEFAULT_LOD;
 
 // Set the default lighting quality.
 int csSprite3D::global_lighting_quality = DEFAULT_LIGHTING;
@@ -1119,12 +1127,12 @@ void csSprite3D::Draw (csRenderView& rview)
   int num_verts;
   float fnum = 0.0f;
 
-  // level of detail is cfg_lod_detail squared because the LOD
+  // level of detail is GetLodLevel() squared because the LOD
   // decreases with distance squared.
-  // cfg_lod_detail is the distance at which you will see full detail
-  float level_of_detail = cfg_lod_detail * cfg_lod_detail;
+  // GetLodLevel() is the distance at which you will see full detail
+  float level_of_detail = GetLodLevel() * GetLodLevel();
 
-  if (level_of_detail > 0)
+  if (IsLodEnabled())
   {
     // reduce LOD based on distance from camera to center of sprite
     csBox3 obox;
@@ -1140,7 +1148,7 @@ void csSprite3D::Draw (csRenderView& rview)
     level_of_detail *= aspect;
   }
 
-  if (level_of_detail > 0 && level_of_detail < 1)
+  if (IsLodEnabled() && level_of_detail < 1)
   {
     // We calculate the number of vertices to use for this LOD
     // level. The integer part will be the number of vertices.
@@ -1162,6 +1170,10 @@ void csSprite3D::Draw (csRenderView& rview)
 
   csVector2* real_uv_verts;
   // Do vertex morphing if needed.
+  // 
+  // @@@ Don't understand this piece of code.
+  //   Why is it checking if the level == 0, and negative?  neg is supposed 
+  //    to be off.  zero is a valid on number...???
   if (level_of_detail <= 0 || level_of_detail >= 1)
   {
     real_uv_verts = tpl->GetTexels (cf_idx);
@@ -1338,7 +1350,8 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   // Make sure that the color array is initialized.
   AddVertexColor (0, csColor (0, 0, 0));
 
-  if (GetLightingQuality() != CS_SPR_LIGHTING_FAST)
+  if (GetLightingQuality() == CS_SPR_LIGHTING_LQ ||
+      GetLightingQuality() == CS_SPR_LIGHTING_HQ )
   {
     csSector * sect = movable.GetSector (0);
     if (sect)
@@ -1368,15 +1381,38 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     case CS_SPR_LIGHTING_HQ:   UpdateLightingHQ   (lights, num_lights); break;
     case CS_SPR_LIGHTING_LQ:   UpdateLightingLQ   (lights, num_lights); break;
     case CS_SPR_LIGHTING_FAST: UpdateLightingFast (lights, num_lights); break;
+    case CS_SPR_LIGHTING_RANDOM: UpdateLightingRandom (); break;
   }
 
-  // @@@
+  // @@@ TODO: Make FixVertexColors an option.
   // I would like lighting fast to not bother clamping the colors.
   //   Could we instead put some debug code in lighting fast to check if
   //    in the application programmers app that the colors don't go
   //    over 2.0?
   FixVertexColors ();  // Clamp all vertex colors to 2.0
 }
+
+
+void csSprite3D::UpdateLightingRandom ()
+{
+  int num_texels = tpl->GetNumTexels();
+  float r,g,b;
+
+  for (int i = 0; i < num_texels; i++)
+  {
+    // By seeding the rng with the current time each time, we get a slower
+    //  cycling of colors.
+    // rand_num->Initialize()
+    r = rand_num->Get()*2;
+    g = rand_num->Get()*2;
+    b = rand_num->Get()*2;
+    
+    vertex_colors[i].Set(r,g,b);
+  }
+}
+
+
+
 
 void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
 {

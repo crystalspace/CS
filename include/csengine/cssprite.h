@@ -46,6 +46,7 @@ class csSkeleton;
 class csSkeletonState;
 class csSprite3D;
 class csBspContainer;
+class csRandomGen;
 struct iTextureHandle;
 
 /**
@@ -144,6 +145,7 @@ private:
 #define CS_SPR_LIGHTING_HQ 0
 #define CS_SPR_LIGHTING_LQ 1
 #define CS_SPR_LIGHTING_FAST 2
+#define CS_SPR_LIGHTING_RANDOM 3
 
 
 
@@ -164,6 +166,23 @@ private:
  * lighting level is used by the sprite.
  */
 #define CS_SPR_LIGHT_LOCAL 2
+
+
+/**
+ * Use the global value for determining if LOD is used by the 
+ * sprite, and what level it should be used at.
+ */
+#define CS_SPR_LOD_GLOBAL 0
+
+/**
+ * Use the sprites template lod value.
+ */
+#define CS_SPR_LOD_TEMPLATE 1
+
+/**
+ * Use the LOD value local to the sprite.
+ */
+#define CS_SPR_LOD_LOCAL 2
 
 
 
@@ -207,11 +226,28 @@ private:
   int lighting_quality;
    
   /**
-   * The lighting_quality_config for this template.  
+   * The lighting_quality_config for this template.
    * See macros CS_SPR_LIGHT_*
+   * This is used to set new sprites lighting_quality_config to this one.
    */
   int lighting_quality_config;
 
+  /*
+   * Configuration value for template LOD. 0 is lowest detail, 1 is maximum.
+   * If negative then the base mesh is used and no LOD reduction/computation
+   * is done.
+   */
+  float lod_level;
+  
+  /**
+   * The lighting_quality_config for this template.
+   * See macros CS_SPR_LOD_*
+   * This is used to set new sprites lighting_quality_config to this one.
+   */
+  int lod_level_config;
+  
+  
+   
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   /// The array of texels
@@ -283,6 +319,44 @@ public:
    */
   int GetLightingQualityConfig ()
   { return lighting_quality_config; };
+
+   
+   
+   
+   
+   
+   
+  /// Returns the lod_level for this template.
+  float GetLodLevel() { return lod_level; }
+
+  /// Sets the lod level for this template.  See CS_SPR_LOD_* defs.
+  void SetLodLevel(float level) {lod_level = level; }
+
+
+  /**
+   * Sets which lod config variable that all new sprites created 
+   * from this template will use.
+   * The options are:
+   * <ul>
+   * <li>CS_SPR_LOD_GLOBAL (default)
+   * <li>CS_SPR_LOD_TEMPLATE
+   * <li>CS_SPR_LOD_LOCAL
+   * </ul>
+   */
+  void SetLodLevelConfig (int config_flag)
+  { lod_level_config = config_flag; };
+   
+  /**
+   * Returns what this template is using for determining the lighting quality.
+   */
+  int GetLodLevelConfig ()
+  { return lod_level_config; };
+
+   
+   
+   
+   
+   
    
   /**
    * Generate the collapse order.
@@ -708,9 +782,27 @@ public:
    * If negative then the base mesh is used and no LOD reduction/computation
    * is done.
    */
-  static float cfg_lod_detail;
+  static float global_lod_level;
    
 private:
+   
+  /**
+   * Used to determine where to look for the lod detail level.
+   * The possible values are:
+   *   <ul>
+   *     <li>CS_SPR_LOD_GLOBAL (default)
+   *     <li>CS_SPR_LOD_TEMPLATE
+   *     <li>CS_SPR_LOD_LOCAL
+   *   </ul>
+   */
+  int lod_level_config;
+   
+  /**
+   * Configuration value for an individuals LOD. 0 is lowest detail, 
+   * 1 is maximum.  If negative then the base mesh is used and no LOD 
+   * reduction/computation is done.
+   */
+   float local_lod_level;
 
   /**
    * Quality setting for sprite lighting. See the CS_SPR_LIGHTING_* macros defined
@@ -722,11 +814,11 @@ private:
   /**
    * Used to determine where to look for the quality setting of the lighting.
    * The possible values are:
-   * <ul>
-   * <li>CS_SPR_LIGHT_GLOBAL (default)
-   * <li>CS_SPR_LIGHT_TEMPLATE
-   * <li>CS_SPR_LIGHT_LOCAL
-   * </ul>
+   *   <ul>
+   *     <li>CS_SPR_LIGHT_GLOBAL (default)
+   *     <li>CS_SPR_LIGHT_TEMPLATE
+   *     <li>CS_SPR_LIGHT_LOCAL
+   *   </ul>
    */  
   int lighting_quality_config;
   
@@ -760,37 +852,105 @@ public:
     }
   };
    
-   /**
-    * Sets the local lighting quality for this sprite.  NOTE: you must use
-    * SetLightingQualityConfig (CS_SPR_LIGHT_LOCAL) for the sprite to use this.
-    */
-   void SetLocalLightingQuality(int lighting_quality)
-   { local_lighting_quality = lighting_quality; };
+  /**
+   * Sets the local lighting quality for this sprite.  NOTE: you must use
+   * SetLightingQualityConfig (CS_SPR_LIGHT_LOCAL) for the sprite to use this.
+   */
+  void SetLocalLightingQuality(int lighting_quality)
+  { local_lighting_quality = lighting_quality; };
    
    /**
     * Sets the global lighting quality for all csSprite3Ds.  NOTE: you must use
     * SetLightingQualityConfig(CS_SPR_LIGHT_GLOBAL) for the sprite to use this.
     */
-   void SetGlobalLightingQuality (int lighting_quality)
-   { global_lighting_quality = lighting_quality; };
+  void SetGlobalLightingQuality (int lighting_quality)
+  { global_lighting_quality = lighting_quality; };
    
-   /**
-    * Sets which lighting config variable this sprite will use.
-    * The options are:
-    * <ul>
-    * <li>CS_SPR_LIGHT_GLOBAL (default)
-    * <li>CS_SPR_LIGHT_TEMPLATE
-    * <li>CS_SPR_LIGHT_LOCAL
-    * </ul>
-    */
-   void SetLightingQualityConfig(int config_flag)
-   { lighting_quality_config = config_flag; };
+  /**
+   * Sets which lighting config variable this sprite will use.
+   * The options are:
+   * <ul>
+   * <li>CS_SPR_LIGHT_GLOBAL (default)
+   * <li>CS_SPR_LIGHT_TEMPLATE
+   * <li>CS_SPR_LIGHT_LOCAL
+   * </ul>
+   */
+  void SetLightingQualityConfig(int config_flag)
+  { lighting_quality_config = config_flag; };
    
-   /**
-    * Returns what this sprite is using for determining the lighting quality.
-    */
-   int GetLightingQualityConfig()
-   { return lighting_quality_config; };
+  /**
+   * Returns what this sprite is using for determining the lighting quality.
+   */
+  int GetLightingQualityConfig()
+  { return lighting_quality_config; };
+
+   
+   
+   
+
+   
+   
+  /**
+   * Returns the lod level used by this sprite.
+   */ 
+  float GetLodLevel ()
+  {
+    switch (lod_level_config)
+    {
+      case CS_SPR_LOD_GLOBAL:      return global_lod_level; break;
+      case CS_SPR_LOD_TEMPLATE:    return tpl->GetLodLevel(); break;
+      case CS_SPR_LOD_LOCAL:       return local_lod_level; break;
+      default:
+      {
+	lod_level_config = tpl->GetLodLevelConfig();
+	return tpl->GetLodLevel();
+      }
+    }
+  };
+   
+  /**
+   * Sets the local lod level for this sprite.  NOTE: you must use
+   * SetLodLevelConfig (CS_SPR_LOD_LOCAL) for the sprite to use this.
+   */
+  void SetLocalLodLevel(float lod_level)
+  { local_lod_level = lod_level; };
+   
+  /**
+   * Sets the global lod level for all csSprite3Ds.  NOTE: you must use
+   * SetLodLevelConfig(CS_SPR_LOD_GLOBAL) for the sprite to use this.
+   */
+  void SetGlobalLodLevel (float lod_level)
+  { global_lod_level = lod_level; };
+   
+  /**
+   * Sets which lighting config variable this sprite will use.
+   * The options are:
+   * <ul>
+   *   <li>CS_SPR_LOD_GLOBAL (default)
+   *   <li>CS_SPR_LOD_TEMPLATE
+   *   <li>CS_SPR_LOD_LOCAL
+   * </ul>
+   */
+  void SetLodLevelConfig(int config_flag)
+  { lod_level_config = config_flag; };
+   
+  /**
+   * Returns what this sprite is using for determining the lighting quality.
+   */
+  int GetLodLevelConfig()
+  { return lod_level_config; };
+
+  /**
+   *  Returns true if lod is enabled, else false.
+   */
+  bool IsLodEnabled()
+  { if(GetLodLevel() < 0)
+      return false;
+    else 
+      return true;
+  };
+   
+   
    
 private:
   /**
@@ -858,6 +1018,16 @@ private:
    */
   void UpdateLightingFast (csLight** lights, int num_lights);
 
+  /**
+   * A fairly fast :P totally inaccurate(usually) lighting method.
+   *  Intended for use for things like powerups.
+   */
+  void UpdateLightingRandom ();
+   
+  
+  /// random number generator used for random lighting.
+  csRandomGen *rand_num;
+   
 protected:
   /**
    * Update this sprite in the polygon trees.
