@@ -76,7 +76,9 @@ void csPGFontEngine::MeasureChar (font_descriptor *f, pgpair *pos,
   int ch, int16 angle)
 {
   int x32, y32;
-  GETFONT(f)->GetGlyphSize (ch, x32, y32);
+  static char str[2] = " ";
+  str[0] = ch;
+  GETFONT(f)->GetDimensions (str, x32, y32);
   pos->x = x32;
   pos->y = y32;
 }

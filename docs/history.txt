@@ -69,6 +69,8 @@ chronological order.
 	  project Jamfiles.
 	- Oktal added BFD metadata storage functionality to the GNU make build
 	  system.
+	- Oktal updated fonteng.cpp in the PicoGUI server plugin to keep up-to-
+	  date with changes to the CS iFont interface.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.
