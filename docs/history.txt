@@ -15,6 +15,13 @@ The history order is reversed so that new features are at the top.
 	    - Removed unused -f option.
 	    - Renamed -l to -pl.
 	    - Added new -l to list all objects in 3ds file.
+	    - Added new -m option to convert one specific object
+	      from the 3ds file. Specify the object with a number that you
+	      get from -l. This technique is useful for converting one
+	      3ds file to several 3D sprites.
+	    - The -v option will now also show the local transformation matrix
+	      and translation vector of all objects in the 3ds file. That
+	      is useful for making hierarchical objects in CS.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.
