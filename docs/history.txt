@@ -10,6 +10,9 @@ chronological order.
 	- res made some more fixes to GL text drawing, among it the use of
 	  a variable at a time it had no sensible value yet.
 	- res made a slight tweak to the default GL format reduction order.
+	- res made the GL driver DB to use CS_QUERY_REGISTRY_PLUGIN to
+	  acquire the syntax service plugin.
+	- res fixed some wrong data in gldrivers.xml.
 31-Dec-2004
 	- Jorrit added a dependency from csparser plugin to
 	  'crystalspace.documentsystem' so that it will now correctly

@@ -524,8 +524,9 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d, const char* phase)
     return;
   }
 
-  csRef<iSyntaxService> synsrv = CS_QUERY_REGISTRY (ogl2d->object_reg,
-    iSyntaxService);
+  csRef<iSyntaxService> synsrv;
+  CS_QUERY_REGISTRY_PLUGIN (synsrv, ogl2d->object_reg,
+    "crystalspace.syntax.loader.service.text", iSyntaxService);
 
   csDriverDBReader reader (this, cfgmgr, synsrv, driverDBprio);
 

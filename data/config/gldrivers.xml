@@ -291,7 +291,7 @@
       </conditions>
       <applicable>
 	<usecfg>nolinearfog</usecfg>
-	<usecfg>enableintensityblend</usecfg>
+	<usecfg>emableIntensityBlendText</usecfg>
       </applicable>
     </rule>
     <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
@@ -300,7 +300,7 @@
 	<regexp string="platform" pattern="Win32" />
       </conditions>
       <applicable>
-	<usecfg>disableintensityblend</usecfg>
+	<usecfg>disableIntensityBlendText</usecfg>
 	<!-- NB: this is the default in video.cfg actually. But to ensure the
 	     setting it's made here, too -->
       </applicable>
