@@ -11,6 +11,8 @@ chronological order.
 	  instead of the OpenGL canvas by default.
 	- Jorrit fixed a bug in the NR null3d renderer. It would call
 	  g2d->BeginDraw() to many times.
+	- Jorrit fixed another bug in the NR null3d renderer. It was using
+	  csRef and DecRef() at the same time.
 28-Mar-2004
 	- Eric Sunshine moved csutil's copy of TinyXML into a private namespace
 	  to avoid clashes with other external libraries which also embed

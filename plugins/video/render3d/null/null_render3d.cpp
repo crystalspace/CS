@@ -87,7 +87,7 @@ csNullGraphics3D::~csNullGraphics3D ()
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q != 0) 
       q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef();
+    scfiEventHandler = 0;
   }
   Close ();
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -215,7 +215,8 @@ bool csNullGraphics3D::Open ()
   {
     shadermgr = csPtr<iShaderManager> (CS_LOAD_PLUGIN (
       plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
-    object_reg->Register (shadermgr, "iShaderManager");
+    if (shadermgr)
+      object_reg->Register (shadermgr, "iShaderManager");
   }
 
   string_vertices = strings->Request ("vertices");
@@ -260,7 +261,8 @@ bool csNullGraphics3D::Open ()
   csRef<csShaderVariable> fogvar = csPtr<csShaderVariable>( new csShaderVariable(
     strings->Request ("standardtex fog")));
   fogvar->SetValue (fogtex);
-  shadermgr->AddVariable(fogvar);
+  if (shadermgr)
+    shadermgr->AddVariable(fogvar);
 
   #define CS_NORMTABLE_SIZE 128
 
@@ -334,7 +336,8 @@ bool csNullGraphics3D::Open ()
   csRef<csShaderVariable> normvar = csPtr<csShaderVariable>( new csShaderVariable(
     strings->Request ("standardtex normalization map")));
   normvar->SetValue (normtex);
-  shadermgr->AddVariable(normvar);
+  if (shadermgr)
+    shadermgr->AddVariable(normvar);
 
 
   #define CS_ATTTABLE_SIZE	  128
@@ -367,7 +370,8 @@ bool csNullGraphics3D::Open ()
   csRef<csShaderVariable> attvar = csPtr<csShaderVariable>( new csShaderVariable(
     strings->Request ("standardtex attenuation")));
   attvar->SetValue (atttex);
-  shadermgr->AddVariable(attvar);
+  if (shadermgr)
+    shadermgr->AddVariable(attvar);
 
   return true;
 }
