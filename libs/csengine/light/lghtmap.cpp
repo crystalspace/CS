@@ -301,9 +301,10 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
     memcpy (&ls.light_id, d, sizeof (ls.light_id)); d += sizeof (ls.light_id);
     ls.light_id = convert_endian (ls.light_id);
 
-    light = engine->FindCsLight (ls.light_id);
-    if (light)
+    iStatLight *il = engine->FindLight (ls.light_id);
+    if (il)
     {
+      light = il->GetPrivateObject ();
       csShadowMap* smap = NewShadowMap (light, w, h);
       memcpy (smap->GetArray (), d, lm_size);
     }

@@ -449,6 +449,18 @@ csLightList::csLightList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightList);
 }
 
+iLight* csLightList::FindByID (unsigned long id) const
+{
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+  {
+    iLight* l = Get (i);
+    if (l->GetLightID () == id)
+      return l;
+  }
+  return NULL;
+}
+
 int csLightList::LightList::GetCount () const
   { return scfParent->Length (); }
 iLight *csLightList::LightList::Get (int n) const
@@ -465,3 +477,5 @@ int csLightList::LightList::Find (iLight *obj) const
   { return scfParent->Find (obj); }
 iLight *csLightList::LightList::FindByName (const char *Name) const
   { return scfParent->FindByName (Name); }
+iLight *csLightList::LightList::FindByID (unsigned long id) const
+  { return scfParent->FindByID (id); }

@@ -135,6 +135,9 @@ struct iLightList : public iBase
 
   /// Find a light by name
   virtual iLight *FindByName (const char *Name) const = 0;
+
+  /// Find a light by its ID value
+  virtual iLight *FindByID (unsigned long id) const = 0;
 };
 
 SCF_VERSION (iLightingProcessInfo, 0, 0, 1);

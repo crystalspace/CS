@@ -207,47 +207,12 @@ void csSector::RelinkMesh (iMeshWrapper* mesh)
 
 //----------------------------------------------------------------------
 
-csStatLight* csSector::FindLight (float x, float y, float z, float dist) const
-{
-  int i;
-  for (i = 0 ; i < lights.Length () ; i++)
-  {
-    iLight* l = lights.Get (i) ;
-    if (ABS (x-l->GetCenter ().x) < SMALL_EPSILON &&
-        ABS (y-l->GetCenter ().y) < SMALL_EPSILON &&
-        ABS (z-l->GetCenter ().z) < SMALL_EPSILON &&
-        ABS (dist-l->GetRadius ()) < SMALL_EPSILON)
-    {
-      csLight* cl = l->GetPrivateObject ();
-      return (csStatLight*)cl;
-    }
-  }
-  return NULL;
-}
-
-csStatLight* csSector::FindLight (unsigned long id) const
-{
-  int i;
-  for (i = 0 ; i < lights.Length () ; i++)
-  {
-    iLight* l = lights.Get (i);
-    if (l->GetLightID () == id)
-    {
-      csLight* cl = l->GetPrivateObject ();
-      return (csStatLight*)cl;
-    }
-  }
-  return NULL;
-}
-
-//----------------------------------------------------------------------
-
 void csSector::UseCuller (const char* meshname)
 {
   if (culler_mesh) return;
   iMeshWrapper* cul_mesh = meshes.FindByName (meshname);
   if (!cul_mesh) return;
-  culler_mesh = cul_mesh->GetPrivateObject ();
+  culler_mesh = cul_mesh;
   culler = SCF_QUERY_INTERFACE_FAST (culler_mesh->GetMeshObject (),
   	iVisibilityCuller);
   if (!culler) return;
@@ -362,7 +327,8 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     {
       best_p = ip->GetPrivateObject ();
       best_r = r;
-      if (p_mesh) *p_mesh = mesh ? mesh->GetPrivateObject () : culler_mesh;
+      if (p_mesh) *p_mesh = mesh ? mesh->GetPrivateObject () :
+                            culler_mesh ? culler_mesh->GetPrivateObject () : NULL;
     }
   }
 
@@ -370,7 +336,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     iMeshWrapper* mesh = meshes.Get (i);
-    if (culler_mesh && !only_portals && mesh == &(culler_mesh->scfiMeshWrapper))
+    if (culler_mesh && !only_portals && mesh == culler_mesh)
       continue;	// Already handled above.
     // @@@ UGLY!!!
     iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
@@ -975,12 +941,6 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 }
 
 //---------------------------------------------------------------------------
-
-iStatLight *csSector::eiSector::FindLight (float x, float y, float z,
-	float dist) const
-{
-  return &scfParent->FindLight (x, y, z, dist)->scfiStatLight;
-}
 
 iPolygon3D* csSector::eiSector::HitBeam (const csVector3& start,
 	const csVector3& end, csVector3& isect)

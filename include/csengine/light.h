@@ -603,6 +603,9 @@ public:
   /// constructor
   csLightList ();
 
+  /// Find a light by ID
+  iLight *FindByID (unsigned long id) const;
+
   class LightList : public iLightList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLightList);
@@ -614,6 +617,7 @@ public:
     virtual void RemoveAll ();
     virtual int Find (iLight *obj) const;
     virtual iLight *FindByName (const char *Name) const;
+    virtual iLight *FindByID (unsigned long id) const;
   } scfiLightList;
 };
 

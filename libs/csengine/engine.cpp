@@ -1024,12 +1024,12 @@ void csEngine::ResolveEngineMode ()
     for (i = 0 ; i < sectors.Length () ; i++)
     {
       csSector* s = sectors[i]->GetPrivateObject ();
-      csMeshWrapper* ss = s->GetCullerMesh ();
+      iMeshWrapper* ss = s->GetCullerMesh ();
       if (ss)
       {
 #if 0
 // @@@ Disabled because we can't get at the tree now.
-        csPolygonTree* ptree = ss->GetStaticTree ();
+        csPolygonTree* ptree = ss->GetPrivateObject ()->GetStaticTree ();
         csOctree* otree = (csOctree*)ptree;
 	int num_nodes = otree->GetRoot ()->CountChildren ();
 	if (num_nodes > 30) switch_f2b += 10;
@@ -1545,48 +1545,18 @@ void csEngine::RemoveHalo (csLight* Light)
     halos.Delete (idx);
 }
 
-csStatLight* csEngine::FindCsLight (float x, float y, float z, float dist)
-  const
+iStatLight* csEngine::FindLight (unsigned long light_id) const
 {
-  csStatLight* l;
-  int sn = sectors.Length ();
-  while (sn > 0)
+  for (int i=0; i<sectors.Length (); i++)
   {
-    sn--;
-    csSector* s = sectors[sn]->GetPrivateObject ();
-    l = s->FindLight (x, y, z, dist);
-    if (l) return l;
-  }
-  return NULL;
-}
-
-csStatLight* csEngine::FindCsLight (unsigned long light_id) const
-{
-  csStatLight* l;
-  int sn = sectors.Length ();
-  while (sn > 0)
-  {
-    sn--;
-    csSector* s = sectors[sn]->GetPrivateObject ();
-    l = s->FindLight (light_id);
-    if (l) return l;
-  }
-  return NULL;
-}
-
-csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/) const
-{
-  //@@@### regionOnly
-  int sn = sectors.Length ();
-  while (sn > 0)
-  {
-    sn--;
-    iSector* s = sectors[sn];
-    iLight* il = s->GetLights ()->FindByName (name);
-    if (il)
-    {
-      csLight* l = il->GetPrivateObject ();
-      return (csStatLight*)l;
+    iLight *l = sectors [i]->GetLights ()->FindByID (light_id);
+    if (l) {
+      iStatLight *sl = SCF_QUERY_INTERFACE (l, iStatLight);
+      if (sl) {
+        // @@@ this might destroy the object!
+        sl->DecRef ();
+	return sl;
+      }
     }
   }
   return NULL;
@@ -1594,7 +1564,20 @@ csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/) const
 
 iStatLight* csEngine::FindLight (const char* name, bool regionOnly) const
 {
-  return &FindCsLight(name, regionOnly)->scfiStatLight;
+  // @@@### regionOnly
+  for (int i=0; i<sectors.Length (); i++)
+  {
+    iLight *l = sectors [i]->GetLights ()->FindByName (name);
+    if (l) {
+      iStatLight *sl = SCF_QUERY_INTERFACE (l, iStatLight);
+      if (sl) {
+        // @@@ this might destroy the object!
+        sl->DecRef ();
+	return sl;
+      }
+    }
+  }
+  return NULL;
 }
 
 void csEngine::AddDynLight (csDynLight* dyn)

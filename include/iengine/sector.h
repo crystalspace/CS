@@ -71,10 +71,6 @@ struct iSector : public iBase
   /// Get the list of static and pseudo-dynamic lights in this sector.
   virtual iLightList* GetLights () = 0;
 
-  /// Find a light with the given position and radius.
-  virtual iStatLight *FindLight (float x, float y, float z, float dist)
-    const = 0;
-
   /// Calculate lighting for all objects in this sector
   virtual void ShineLights () = 0;
   /// Version of ShineLights() which only affects one mesh object.

@@ -126,7 +126,7 @@ private:
    * This is a pointer to the csMeshWrapper which implements the visibility
    * culler.
    */
-  csMeshWrapper* culler_mesh;
+  iMeshWrapper* culler_mesh;
 
   /**
    * The visibility culler for this sector or NULL if none.
@@ -223,16 +223,6 @@ public:
    */
   csLightList& GetLights () { return lights; }
 
-  /**
-   * Find a light with the given position and radius.
-   */
-  csStatLight* FindLight (float x, float y, float z, float dist) const;
-
-  /**
-   * Find the light with the given object id.
-   */
-  csStatLight* FindLight (unsigned long id) const;
-
   //----------------------------------------------------------------------
   // Visibility Stuff
   //----------------------------------------------------------------------
@@ -240,7 +230,7 @@ public:
   /**
    * Get the mesh which implements the visibility culler.
    */
-  csMeshWrapper* GetCullerMesh () const { return culler_mesh; }
+  iMeshWrapper* GetCullerMesh () const { return culler_mesh; }
 
   /**
    * Look for the mesh object and see if it implements iVisibilityCuller.
@@ -453,7 +443,6 @@ public:
       return &(scfParent->lights.scfiLightList);
     }
 
-    virtual iStatLight *FindLight (float x, float y, float z, float dist) const;
     virtual void ShineLights ()
     { scfParent->ShineLights (); }
     virtual void ShineLights (iMeshWrapper* mesh)

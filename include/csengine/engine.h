@@ -807,23 +807,6 @@ public:
     iDrawFuncCallback* callback);
 
   /**
-   * Locate the first static light which is closer than 'dist' to the
-   * given position. This function scans all sectors and locates
-   * the first one which statisfies that criterium.
-   */
-  csStatLight* FindCsLight (float x, float y, float z, float dist) const;
-
-  /**
-   * Find the light with the given light id.
-   */
-  csStatLight* FindCsLight (unsigned long id) const;
-
-  /**
-   * Find the light with the given name.
-   */
-  csStatLight* FindCsLight (const char* name, bool regionOnly = false) const;
-
-  /**
    * Create an iterator to iterate over all static lights of the engine.
    */
   csLightIt* NewLightIterator (iRegion* region = NULL)
@@ -949,6 +932,8 @@ public:
   virtual iStatLight* CreateLight (const char* name,
   	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
+  /// Find a static/pseudo-dynamic light by ID.
+  virtual iStatLight* FindLight (unsigned long light_id) const;
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const;
