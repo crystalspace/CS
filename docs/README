@@ -26,7 +26,7 @@ Crystal Space is still very much in development.  It has now become a real
 Internet Project! Everyone who feels inclined can contribute to the source.
 There are several things that still need to be done.  See the 'docs/todo.html'
 file for more information about what is missing and a list of current known
-bugs.  [NOTE: todo.html is out of date.]
+bugs.
 
 Crystal Space is free and should remain free.  Crystal Space falls under the
 GNU copyleft license for libraries.  To see what this means read the COPYING
@@ -58,8 +58,7 @@ happen but if it does, the author (Jorrit Tyberghein) is not responsible!
 Important Note! Crystal Space is still in beta.  This means that there are
 many known and unknown bugs and that things in general may not work as
 expected (or may not work at all).  The known bugs are in docs/todo.html; I'm
-currently still busy making the list of unknown bugs :-)  [NOTE: todo.html is
-out of date.]
+currently still busy making the list of unknown bugs :-)
 
 However Crystal Space starts to become useful.  There are actually already a
 few projects starting to use CS.
