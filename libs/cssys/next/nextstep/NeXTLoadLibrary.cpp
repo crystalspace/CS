@@ -76,5 +76,3 @@ bool csUnloadLibrary( csLibraryHandle )
     {
     return true; // Unimplemented.
     }
-
-#endif // NO_COM_SUPPORT
