@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+18-Feb-2002
+	- Added experimental code to allow video mode selection using
+	  AWS. This does not work yet and the API is subject to change
+	  so I don't recommend using this yet. Also add a 'simpvs'
+	  application that uses this feature.
 15-Feb-2002
 	- Reverted 'res' change to win32gcc.mak since it breaks compile of
 	  ddraw plugin. The problem is that the -lddraw library link command
