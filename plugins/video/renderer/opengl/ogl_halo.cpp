@@ -88,8 +88,8 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
   for(int i = 0;i<iHeight;i++)
     memcpy(Alpha+(i*Width),iAlpha+(i*iWidth),iWidth); //Copy the supplied alphamap
 
-  x_scale=(1.0*iWidth)/Width;   //Calculate the scale between halo size and our texture size
-  y_scale=(1.0*iHeight)/Height; // (used for drawing)
+  x_scale=int((1.0*iWidth)/Width);   //Calculate the scale between halo size and our texture size
+  y_scale=int((1.0*iHeight)/Height); // (used for drawing)
 
   glGenTextures(1,&halohandle); //Create handle
   glBindTexture(GL_TEXTURE_2D,halohandle);  //Activate handle
@@ -120,7 +120,7 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
 {
   (void) w;
   (void) h;
-  int width=G3D->GetWidth();
+//  int width=G3D->GetWidth();
   int height=G3D->GetHeight();
   int i;
   csVector2 *texcoords=new csVector2[iVertCount];
@@ -152,7 +152,7 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
   if(iIntensity!=prev_intensity)
   {
     for(int i=0;i<Size;i++)
-      backAlpha[i]=(float)iIntensity*Alpha[i];
+      backAlpha[i]=(unsigned char)(iIntensity*Alpha[i]);
     glTexSubImage2D(GL_TEXTURE_2D,
       0,  //Base level
       0,  //X-offset
