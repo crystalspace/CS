@@ -89,9 +89,8 @@ csSector::~csSector ()
   // sector is destructed.
   CS_ASSERT (references.Length () == 0);
 
-  // Meshes and collections are not deleted by the calls below. They
+  // Meshes are not deleted by the calls below. They
   // belong to csEngine.
-  collections.DeleteAll ();
   meshes.DeleteAll ();
   int i;
   for (i = 0 ; i < mesh_priority_queues.Length () ; i++)
@@ -222,31 +221,6 @@ csMeshWrapper* csSector::GetMesh (const char* name) const
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* s = (csMeshWrapper*)meshes[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
-  }
-  return NULL;
-}
-
-//----------------------------------------------------------------------
-
-void csSector::AddCollection (csCollection* col)
-{
-  collections.Push ((csSome)col);
-}
-
-void csSector::UnlinkCollection (csCollection* col)
-{
-  int idx = collections.Find ((csSome)col);
-  if (idx != -1) collections.Delete (idx);
-}
-
-csCollection* csSector::GetCollection (const char* name) const
-{
-  int i;
-  for (i = 0 ; i < collections.Length () ; i++)
-  {
-    csCollection* s = (csCollection*)collections[i];
     if (!strcmp (name, s->GetName ()))
       return s;
   }
@@ -1155,27 +1129,6 @@ iStatLight *csSector::eiSector::FindLight (float x, float y, float z,
 	float dist) const
 {
   return &scfParent->FindLight (x, y, z, dist)->scfiStatLight;
-}
-
-iCollection* csSector::eiSector::GetCollection (int n) const
-{
-  return &(scfParent->GetCollection (n)->scfiCollection);
-}
-
-void csSector::eiSector::AddCollection (iCollection* col)
-{
-  scfParent->AddCollection ((csCollection*)(col->GetPrivateObject ()));
-}
-
-iCollection* csSector::eiSector::GetCollection (const char *name) const
-{
-  csCollection* tw = (csCollection*)(scfParent->GetCollection (name));
-  return tw ? &tw->scfiCollection : NULL;
-}
-
-void csSector::eiSector::UnlinkCollection (iCollection* col)
-{
-  scfParent->UnlinkCollection ((csCollection*)(col->GetPrivateObject ()));
 }
 
 iStatLight* csSector::eiSector::GetLight (int n) const

@@ -33,7 +33,6 @@ class csEngine;
 class csStatLight;
 class csMeshWrapper;
 class csPolygon3D;
-class csCollection;
 class csCamera;
 class csDynLight;
 class csPolygon2DQueue;
@@ -67,11 +66,6 @@ private:
    * queue. This is a vector of vectors.
    */
   csVector mesh_priority_queues;
-
-  /**
-   * List of collections in this sector.
-   */
-  csVector collections;
 
   /**
    * List of references (portals?) to this sector.
@@ -195,41 +189,6 @@ public:
    * Find the given mesh by name.
    */
   csMeshWrapper* GetMesh (const char* name) const;
-
-  //----------------------------------------------------------------------
-  // Collection manipulation functions
-  //----------------------------------------------------------------------
-
-  /**
-   * Add a collection to this sector.
-   */
-  void AddCollection (csCollection* col);
-
-  /**
-   * Unlink a collection from this sector.
-   */
-  void UnlinkCollection (csCollection* col);
-
-  /**
-   * Get the number of collections in this sector.
-   */
-  int GetCollectionCount () const
-  {
-    return collections.Length ();
-  }
-
-  /**
-   * Get the specified collection.
-   */
-  csCollection* GetCollection (int idx) const
-  {
-    return (csCollection*)collections[idx];
-  }
-
-  /**
-   * Find a collection with the given name.
-   */
-  csCollection* GetCollection (const char* name) const;
 
   //----------------------------------------------------------------------
   // Light manipulation functions
@@ -488,15 +447,6 @@ public:
     virtual iMeshWrapper *GetMesh (const char *name) const;
     virtual void UnlinkMesh (iMeshWrapper *pMesh)
     { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
-
-    virtual int GetCollectionCount () const
-    {
-      return scfParent->GetCollectionCount ();
-    }
-    virtual iCollection* GetCollection (int n) const;
-    virtual void AddCollection (iCollection* col);
-    virtual iCollection* GetCollection (const char *name) const;
-    virtual void UnlinkCollection (iCollection* col);
 
     virtual void AddLight (iStatLight *light);
     virtual int GetLightCount () const { return scfParent->GetLightCount (); }

@@ -22,7 +22,6 @@
 #include "csgeom/matrix3.h"
 #include "csutil/csobject.h"
 #include "csutil/csvector.h"
-#include "csengine/movable.h"
 #include "iengine/collectn.h"
 
 class csSector;
@@ -32,21 +31,13 @@ SCF_VERSION (csCollection, 0, 0, 1);
 
 /**
  * A collection object is for conveniance of the script language.
- * Objects are (currently) not really hierarchical in Crystal Space.
- * A collection simulates a hierarchy. The script can then perform
- * operations like 'move' and 'transform' on all the objects in
- * the collection together.
+ * It simply groups objects which are related in some way.
  */
 class csCollection : public csObject
 {
-  friend class csMovable;
-
 private:
   /// The list of objects contained in this csCollection.
   csVector objects;
-
-  /// Position in the world.
-  csMovable movable;
 
   /// Handle to the engine plug-in.
   csEngine* engine;
@@ -55,36 +46,11 @@ private:
   ///
   virtual ~csCollection ();
 
-protected:
-  /// Move this collection to the specified sector.
-  virtual void MoveToSector (csSector* s);
-
-  /// Remove this collection from all sectors (but not from the engine).
-  virtual void RemoveFromSectors ();
-
-  /**
-   * Update transformations after the collection has moved
-   * (through updating the movable instance).
-   * This MUST be done after you change the movable otherwise
-   * some of the internal data structures will not be updated
-   * correctly. This function is called by movable.UpdateMove().
-   */
-  virtual void UpdateMove ();
-
 public:
   /**
    * Create a new csCollection with the given name.
    */
   csCollection (csEngine* engine);
-
-  /**
-   * Get the movable instance for this collection.
-   * It is very important to call GetMovable().UpdateMove()
-   * after doing any kind of modification to this movable
-   * to make sure that internal data structures are
-   * correctly updated.
-   */
-  csMovable& GetMovable () { return movable; }
 
   /**
    * Find an object with the given name inside this collection.
@@ -111,8 +77,6 @@ public:
     virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iObject *QueryObject()
       { return scfParent; }
-    virtual iMovable* GetMovable () const
-      { return &(scfParent->GetMovable().scfiMovable); }
     virtual iObject* FindObject (char* name) const
       { return scfParent->FindObject(name); }
     virtual int GetObjectCount () const

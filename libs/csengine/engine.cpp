@@ -1426,7 +1426,6 @@ void csEngine::RemoveMesh (iMeshWrapper* mesh)
 
 void csEngine::RemoveCollection (csCollection* collection)
 {
-  collection->GetMovable ().ClearSectors ();
   int idx = collections.Find (collection);
   if (idx == -1) return;
   collections.Delete (idx);

@@ -25,7 +25,7 @@
 
 class csVector3;
 class csMatrix3;
-struct iObject;
+struct iMeshWrapper;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
 CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, iSector);
@@ -79,10 +79,9 @@ private:
   iMovable* parent;
 
   /**
-   * Object on which this movable operates (csThing or
-   * csMeshWrapper currently).
+   * Mesh on which this movable operates.
    */
-  iObject* object;
+  iMeshWrapper* object;
 
   /// Update number.
   long updatenr;
@@ -96,8 +95,8 @@ public:
   /// Destructor.
   virtual ~csMovable ();
 
-  /// Set object on which this movable operates.
-  void SetObject (iObject* obj) { object = obj; }
+  /// Set mesh on which this movable operates.
+  void SetMeshWrapper (iMeshWrapper* obj) { object = obj; }
 
   /// Set the parent movable.
   void SetParent (iMovable* parent);

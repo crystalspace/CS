@@ -86,7 +86,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   is_visible = false;
   wor_bbox_movablenr = -1;
   parent = theParent;
-  movable.SetObject (this);
+  movable.SetMeshWrapper (&scfiMeshWrapper);
 
   iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
@@ -117,7 +117,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   is_visible = false;
   wor_bbox_movablenr = -1;
   parent = theParent;
-  movable.SetObject (this);
+  movable.SetMeshWrapper (&scfiMeshWrapper);
 
   iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)

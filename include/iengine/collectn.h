@@ -22,10 +22,9 @@
 
 #include "csutil/scf.h"
 
-struct iMovable;
 struct iObject;
 
-SCF_VERSION (iCollection, 0, 0, 2);
+SCF_VERSION (iCollection, 0, 0, 3);
 
 /**
  * A collection object is for conveniance of the script language.
@@ -37,15 +36,6 @@ struct iCollection : public iBase
 
   /// Query the iObject for this collection
   virtual iObject *QueryObject() = 0;
-
-  /**
-   * Get the movable instance for this collection.
-   * It is very important to call GetMovable().UpdateMove()
-   * after doing any kind of modification to this movable
-   * to make sure that internal data structures are
-   * correctly updated.
-   */
-  virtual iMovable* GetMovable () const = 0;
 
   /// Find an object with the given name inside this collection.
   virtual iObject* FindObject (char* name) const = 0;

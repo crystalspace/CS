@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,12 +32,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCollection::csCollection (csEngine* engine) :
-  csObject(), objects (8,8), movable ()
+  csObject(), objects (8,8)
 {
   SCF_CONSTRUCT_IBASE(NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiCollection);
 
-  movable.SetObject (this);
   csCollection::engine = engine;
   engine->AddToCurrentRegion (this);
 }
@@ -56,23 +55,3 @@ iObject* csCollection::FindObject (char* name)
   return NULL;
 }
 
-void csCollection::UpdateMove ()
-{
-}
-
-void csCollection::MoveToSector (csSector* s)
-{
-  s->AddCollection (this);
-}
-
-void csCollection::RemoveFromSectors ()
-{
-  int i;
-  const iSectorList *sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
-  {
-    iSector* ss = sectors->GetSector (i);
-    if (ss)
-      ss->UnlinkCollection (&scfiCollection);
-  }
-}

@@ -33,6 +33,9 @@ The history order is reversed so that new features are at the top.
 	  It even shows a graphical progress bar (this is now possible
 	  with the new iProgressMeter interface I made yesterday)
 	  Don't expect too much fancy graphics though! That's for later :-)
+	- Collections are no longer objects that can be added to a sector.
+	  They no longer have a movable. This is not very useful and
+	  it simplifies the engine again.
 	- Philip Wyett added lua support to VC port of CS. VC6 users
 	  can through the cslua plugin take advantage of the lua as a
 	  scripting choice for your development.
