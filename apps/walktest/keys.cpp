@@ -38,11 +38,13 @@
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csutil/scanstr.h"
+#include "csutil/impexp.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "cssndldr/common/sndbuf.h"
 #include "csparser/sndbufo.h"
 #include "csparser/csloader.h"
+#include "csparser/crossbld.h"
 #include "csscript/csscript.h"
 #include "csgeom/math3d.h"
 #include "isndsrc.h"
@@ -75,6 +77,36 @@ void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
   sprite->MoveToSector (where);
 }
 
+// Load a sprite from a general format (3DS, MD2, ...)
+// This creates a sprite template which you can then add using add_sprite ().
+void load_sprite (char *filename, char *templatename, char* txtname)
+{
+  // First check if the texture exists.
+  if (!Sys->view->GetWorld ()->GetTextures ()->GetTextureMM (txtname))
+  {
+    Sys->Printf (MSG_CONSOLE, "Couldn't find texture '%s' in memory!\n", txtname);
+    return;
+  }
+
+  // read in the model file
+  converter filedata;
+  if (filedata.ivcon (filename) == ERROR)
+  {
+    Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
+    return;
+  }
+
+  // convert data from the 'filedata' structure into a CS sprite template
+  csCrossBuild_SpriteTemplateFactory builder;
+  csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (filedata);
+
+  // add this sprite to the world
+  csNameObject::AddName (*result, templatename);
+  result->SetTexture (Sys->view->GetWorld ()->GetTextures (), txtname);
+
+  Sys->view->GetWorld ()->sprite_templates.Push (result);
+}
+
 csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 const& pos, float size)
 {
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (tname, true);
@@ -90,9 +122,6 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 con
   spr->SetMove (pos);
   csMatrix3 m; m.Identity (); m = m * size;
   spr->SetTransform (m);
-
-  CHK (csDataObject* sprdata = new csDataObject ((void*)1));
-  spr->ObjAdd (sprdata);
 
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;
@@ -944,7 +973,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
     Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity\n");
-    Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, addskel, addghost\n");
+    Sys->Printf (MSG_CONSOLE, " addbot, delbot, loadsprite, addsprite, addskel, addghost\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
@@ -1259,6 +1288,17 @@ static bool CommandHandler (char *cmd, char *arg)
       sp->SetTransform (m);
       move_sprite (sp, Sys->view->GetCamera ()->GetSector (), pos);
     }
+  }
+  else if (!strcasecmp (cmd, "loadsprite"))
+  {
+    char filename[100], tempname[100], txtname[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s,%s,%s", filename, tempname, txtname);
+    if (cnt != 3)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'file','template','texture'!\n");
+    }
+    else load_sprite (filename, tempname, txtname);
   }
   else if (!strcasecmp (cmd, "addsprite"))
   {

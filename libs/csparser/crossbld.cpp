@@ -125,6 +125,8 @@ csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild(converter &buildsource)
   // will go into model-specific cross builder classes -GJH
   ivconbuild_Quake2Actions(*newtemplate);
 
+  newtemplate->GenerateLOD ();
+
   return newtemplate;
 }
 
