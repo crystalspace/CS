@@ -14,24 +14,48 @@ installations and optional technologies such as DirectInput, DirectX, and
 Direct3D.
 
 @menu
-* Win32 Quick Start:: Quick Start
-* Win32 Workspace:: Workspace
+* Win32 General:: General Information
+* Win32 Compile:: Compiling CS
+* Win32 Workspace:: Structure of the Workspace
+* Win32 User App:: Compiling your own Program using CS
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
-@node Win32 Quick Start, Win32 Workspace, Win32, Win32
-@subsubsection Quick Start
+@node Win32 General
+@subsubsection General Information
 
-To compile Crystal Space, you'll have to perform the following steps using
-Microsoft Visual C++ 6.0.  If anything doesn't work, see the Win32 @sc{faq},
-@ref{Win32 FAQ}.
+In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you may also
+need the DirectX 6.1 @sc{sdk}. Otherwise you cannot compile this graphics
+module, so you can't use hardware acceleration with DirectX. But then you
+still need the DirectX 5.0 @sc{sdk}, which is included in @sc{msvc} 6.0.
+(note that @samp{SDK} is more than the runtime libraries usually bundles with
+games). Make sure that @sc{msvc} links to these new libraries, not to the
+older DirectX @sc{sdk} usually coming with @sc{msvc}. @sc{msvc} 6.0 also
+included the OpenGL @sc{sdk}, which you can use to build the OpenGL graphics
+module. Note that you can always use a higher version of DirectX.
+
+If you are using @sc{msvc} 5.0, you will need the following: DirectX 5.0 or
+6.1 (no hardware accelerated graphics with 5.0) for graphics and sound,
+and optionally OpenGL for graphics.
+
+If you just want to build Crystal Space using those @sc{api}s, but don't need
+any documentation or samples, you can get a minimum version of these
+@sc{api}s from NooTe's homepage at (look at the @samp{Sources} section):
+
+@uref{http://www.multimania.com/noote/CrystalSpace}
+
+@node Win32 Compile
+@subsubsection Compiling CS
+
+To compile Crystal Space, you'll have to perform the following steps.
+If anything doesn't work, see the Win32 @sc{faq}, @ref{Win32 FAQ}.
 
 @enumerate
 @item
 Load @file{mk/visualc/csall.dsw}.
 
 @item
-Make ``grpAll'' your active project.
+Make @samp{grpAll} your active project.
 
 @item
 Select menu @emph{Build/Rebuild All}.
@@ -39,267 +63,67 @@ Select menu @emph{Build/Rebuild All}.
 @item
 After a while the compilation should finish with almost no warnings and no
 errors.
-
-@item
-Change your settings in @file{cryst.cfg} (included in the ``Configuration
-Files'' folder in the CrystalSpace project) to the following (or whatever you
-prefer):
-
-@example
-DRIVER = crystalspace.graphics3d.software
-WORLDFILE = flarge
-@end example
-
-This will set up CrystalSpace to run in software mode using the world file
-@file{flarge}.  @emph{Make sure that you have downloaded a worldfile from the
-Crystal Space web site before this.}  These files are in @sc{zip} format and
-should be placed in the @file{CS/data} directory.  Do not attempt to extract
-this archive---Crystal Space decompresses the @sc{zip} file on the fly.
-
-@item
-Open @emph{Project/Settings}, select ``WalkTest'' on the left list.  Select
-the ``Debug'' tab in the register, select category ``General'' and enter the
-same directory the @sc{exe} sits in as work directory.  If the executable
-would be in @file{C:\CS\walktest.exe}, you should select @file{C:\CS\} as
-working directory.  Make sure you do these settings for ``Win32 Debug'' and
-``Win32 Release'' (using the combo box on top of the left list).  Then confirm
-the settings by pressing @sc{ok}.  Now select ``WalkTest Files'' in the
-Workspace files tab, click the right mouse button and select ``Set as Active
-Project''.  Now call @emph{Build/Execute walktest.exe}.  Alternatively, you
-can switch to the windows explorer and run @file{walktest}.
 @end enumerate
 
-@node Win32 Workspace, Win32 FAQ, Win32 Quick Start, Win32
-@subsubsection Workspace
+@node Win32 Rundemo
+@subsubsection Running the demo apps
+
+The first app you should try is @emph{Walktest}. This program shows many of
+the features of the 3d engine. You can run it either by starting it from the
+windows explorer (it should be at @file{.../cs/walktest.exe}, or you can
+select Walktest as the active project and then select
+@emph{Build/Execute walktest.exe}.
+
+If you want to run a debug session, you first have to set the working
+directory. Open @emph{Project/Settings}, select the appWalktest project,
+switch to the @emph{Debug} tab and enter the base CS directory as the
+working directory for debug sessions (for example, @file{c:\cs\}). Be sure
+to to this for @emph{Debug} and @emph{Release} builds. @*
+This is some sort of bug. We are currently looking for a way to add this to
+the CVS repository.
+
+You can now continue with the next platform-independent step. The remaining
+Windows-specific sections are only important when you want to compile your
+own application using CS.
+
+@node Win32 Workspace
+@subsubsection Structure of the Workspace
 
 The Crystal Space workspace is divided into several projects.  They all exist
 as separate project files (@file{*.dsp}).  All of them are being bound
 together by a workspace @file{csall.dsw}.  This workspace will also ensure
-correct linking between the various projects, so you need to use a predefined
-workspace or, if you create your own, you will have to set project
-dependencies right.
+correct linking between the various projects.
 
-Currently the project files are created by using @sc{ms} Visual C++ 6.0.  You
-can use @sc{msvc} 5.0 but need to create your own workspace to hold the
-project files (@file{*.dsp}).
+Currently the project files are created for @sc{ms} Visual C++ 6.0. You can
+use @sc{msvc} 5.0, but do this at your own risk. @xref{Win32 General}.
 
 The workspace uses a prefix system for naming the projects and grouping them.
 There are currently four prefixes in use.  The prefix @file{grp} is used to
 group the projects into the three main categories: @emph{libraries},
 @emph{plug-ins}, and @emph{applications}.  There is also a special group
-``grpAll'' that contains the three major groups ``grpLibs'',
-``grpApplications'', and ``grpPlugins'.  These groups are composed of the
-following components.
+@samp{grpAll} that contains the three major groups @samp{grpLibs},
+@samp{grpApplications}, and @samp{grpPlugins}.
 
-@itemize @bullet
-@item
-Projects that output a library (@file{.lib}) are prefixed with ``lib''.
+The @emph{Libraries} are C++ libraries that you can link into your own
+programs. Some of these libraries are part of the core of CS. You can find
+more information about this in @ref{Libraries}. Their output are @file{.LIB}
+files.
 
-@table @code
-@item libCSclear
-More information on the CrystalClear project can be found at the CrystalClear
-project page @uref{http://crystalclear.sourceforge.net/} and elsewhere in
-this manual.  @xref{CrystalClear}.
+The @emph{Plugins} are also programming libraries, but they use a special
+mechanism called @sc{scf} as their interface to your program. This
+separates their interface from the internals of the library and thus allows
+dynamic linking. In fact, some of the @emph{Libraries} also use @sc{scf}.
+The rule for the MSVC workspace is simple: The @emph{Plugins} are projects
+that build a dynamic library (@file{.DLL}). You can find more information
+in @ref{Plug-In Drivers}.
 
-@item libCSengine
-The core component of the Crystal Space 3D engine.
+The @emph{Applications} are programs using some of these libraries, so they
+produce @file{.EXE} files.
 
-@item libCSgame
-A library intended to make creation of games simpler by providing a more game
-oriented @sc{api} of the engine.
+@node Win32 User App
+@subsubsection Compiling your own Program using CS
 
-@item libCSgeom
-This library contains commonly used 2D and 3D geometry classes and utility
-functions.
-
-@item libCSgfxldr
-This library is capable of loading and saving graphic images in various
-formats.
-
-@item libCSobject
-Library that implementats @samp{csObject}.
-
-@item libCSparser
-Library contains the components needed to load and parse a map file.
-
-@item libCSphyzik
-The ``Phyziks'' library is a dynamics modeling and simulation engine.  The
-core of the engine is a numerical integrator that solves the equations of
-motion for given bodies.  Different types of bodies will have different
-equations of motion.  A simple example would be the equations of motion for
-the center of mass of a rigid body.  @xref{csPhyziks}.
-
-@item libCSscript
-Library contains a very simple scripting system.
-
-@item libCSsfxldr
-Library used to load sounds in various formats.
-
-@item libCSsys
-Library contains the platform specific portion of the Crystal Space Engine.
-
-@item libCSterr
-Library contains the terrain rendering code.
-
-@item libCStools
-Library containing useful application tools such as the statically linked
-@samp{csSimpleConsole} class.  (A newer plug-in based console can be used
-instead.)
-
-@item libCSutil
-Contains the implementation of various utility classes and functions including
-@sc{scf} (@pxref{SCF}) and @sc{vfs} (@pxref{VFS}).
-
-@item libCSws
-The Crystal Space Windowing System (@sc{csws}) provides a clean, effective and
-cross-platform base for creating Crystal Space-related utilites.  @xref{CSWS}.
-
-@item libCSwin32dll
-Handles the @sc{dll} entry for Windows @sc{dll} modules.
-
-@item libCSwin32exe
-Handles the @sc{exe} entry for Windows @sc{exe} files.
-@end table
-
-@item
-Projects that output a plug-in module (@file{.dll}) are prefixed with ``plg''.
-
-@table @code
-@item plgCrystalClear
-Contains the bulk of the Crystal Clear application framework.
-
-@item plgCSfont
-Font plug-in that implements the basic Crystal Space fonts.
-
-@item plgCSNetMan
-A network manager plug-in.
-
-@item plgDirectDraw3dDX61render
-DirectX Renderer plug-in designed to work on DirectX 6.1 and later.
-
-@item plgDirectDraw2D
-Canvas driver (2D) designed to run on any version of DirectX.
-
-@item plgDirectDraw2dDX61
-Canvas driver (2D) specifically written for DirectX 6.1 and later.
-
-@item plgDungeon
-Random level generator plug-in for Crystal Space written by Martin Geisse
-(@email{mgeisse@@gmx.net}).
-
-@item plgFreeFont
-Font plug-in that implements the FreeType system for Crystal Space.  Allows
-the use of TrueType fonts in CrystalSpace.  (Fonts not provided.)
-
-@item plgOpenGL2D
-Canvas plug-in for OpenGL renderer to use.
-
-@item plgOpenGLRender
-OpenGL renderer plug-in.
-
-@item plgSoftwareRender
-Software renderer plug-in.
-
-@item plgSoundDriverWaveOut
-Sound driver plug-in for @sc{wav} based sound devices.
-
-@item plgSoundRenderDS3D
-Sound renderer plug-in for the DirectSound 3D @sc{api}.
-
-@item plgSoundRenderSoftware
-Software based sound renderer plug-in.
-
-@item plgCScon
-Plug-in containing ``Funky Console'' and a standard console implementation.
-
-@item plgCSSocket
-Basic socket-based network plug-in (cross-platform).
-
-@item plgColDetRapid
-Plug-in that implements the @sc{rapid} system of collision detection.
-
-@item plgMetaBalls
-Plug-in that encapsulate the MetaBall code.
-
-@item plgSCFDog
-@itemx plgSCFWorm
-Example plug-ins for the @sc{scf} Tutorial.  @xref{SCF}.
-@end table
-
-@item
-Projects that output an application (@file{.exe}) are prefixed with ``app''.
-
-@table @code
-@item appBlocks
-A 3D tetris like game built using Crystal Space.
-
-@item appCCTest
-A test application for the Crystal Clear framework.
-
-@item appCSWSTest
-A test application for the CSWS subsystem.  @xref{CSWS}.
-
-@item appDemoNets
-A test application for the networking system.
-
-@item appDTSimple
-A test application for procedural textures.
-
-@item appDungeon
-Application which employs the random dungeon generator (@file{plgDungeon}).
-
-@item appMap2cs
-Utility which converts Quake map files to Crystal Space format.
-@xref{map2cs}.
-
-@item appMazeD
-An editor based on Crystal Space and CSWS.
-
-@item appMDS2SPR
-Utility which converts Quake 1 @sc{mdl} and Quake 2 @sc{md2} modesl to Crystal
-Space @sc{spr} format.
-
-@item appMetademo
-A test application for the MetaBall plug-in (@file{plgMetaBalls}).
-
-@item appPhyzTest
-A test application for @file{libPhyzik}.
-
-@item appSCFReg
-An @sc{scf} application for registering @sc{dll}'s and updating
-@file{scf.cfg}.
-
-@item appSCFZoo
-A simple application for the @sc{scf} tutorial.  @xref{SCF}.
-
-@item appShooter
-A simple 3D shooter game created with Crystal Space and the game library,
-@file{libCSgame}.
-
-@item appSimple
-A simple application used as the basis of the ``simple'' Crystal Space
-tutorial.  @xref{Tutorial Simple}.
-
-@item appWalkTest
-The basic Crystal Space test application.  Contains many bleeding-edge
-features of the engine (quite messy).
-
-@item appNetdrvClient
-A test application for the network subsystem
-
-@item appNetdrvServer
-A test application for the network subsystem
-
-@item appNSTPc
-The client side of the NetSpace (@sc{nstp}) system.
-
-@item appNSTPs
-The server side of the NetSpace (@sc{nstp} system.
-
-@item appSquawk
-Test application which implements multiple camera views.
-@end table
-@end itemize
+@@@@@@
 
 @node Win32 FAQ, , Win32 Workspace, Win32
 @subsubsection Frequently Asked Questions (@sc{faq})
@@ -307,28 +131,6 @@ Test application which implements multiple camera views.
 This is the list of frequently asked questions for the Win32 port of Crsytal
 Space.  Please consult this list if you are having difficulty building or
 using the project.
-
-@subsubheading General Questions
-
-@itemize @bullet
-@item
-Q. @emph{How do I compile Crystal Space using Visual C++ 5.0?}
-
-A. @sc{msvc} 5.0 should work, if you have installed the latest Service
-Release, and the necessary @sc{sdk}'s (esp.  DirectX.  You will need at least
-the DirectX 5.0 @sc{sdk}.  The DirectX runtime version, that is usually
-bundled with games will not be enough!).  It should be enough to follow the
-steps described in this doc.  If you have further questions, you might want to
-contact Brad `GreyBear' Davis (@email{jbdavis@@uswest.net}), as he has
-recently reported successful compilation of Crystal Space, using @sc{msvc}
-5.0.
-
-@item
-Q. @emph{How do I compile Crystal Space using Visual C++ 6.0?}
-
-A. Refer to the Quick Start section, @xref{Win32 Quick Start}.  Be sure to do
-exactly what is written there.  If that doesn't work, read on.
-@end itemize
 
 @subsubheading Compilation
 
@@ -343,10 +145,10 @@ plugins\video\canvas\ddraw61\ig2d.h(16) : error C2061:
   syntax error : identifier 'LPDIRECTDRAWSURFACE4'
 @end example
 
-A. You have not installed the correct DirectX @sc{sdk}.  (Or it is not
-installed properly, which means manual adjustment of the library and include
-directorys in @sc{msvc}.) Either install the @sc{sdk} correctly or unload the
-DirectX 6.1 related projects.
+A. You are not using the DirectX @sc{sdk} 6.1 or higher. Either you have not
+installed the correct DirectX @sc{sdk}, or you haven't told @sc{msvc} to use
+it instead of the older @sc{sdk} included with @sc{msvc}. Either install the
+@sc{sdk} correctly or unload the DirectX 6.1 related projects.
 
 @item
 Q. @emph{Where are the @file{zlib.h}, @file{png.h} and @file{jpeglib.h} files?}
@@ -380,24 +182,6 @@ CS\libs\cssys\win32\lib\libjpeg.lib
 Note that the source code package generally already contains the files from
 the @file{include} and @file{libs} directories, so you may not have to bother
 with them.  The @sc{cvs} repository contains these files as well.
-
-@item
-Q. @emph{Will I need to install additional @sc{sdk}'s?}
-
-A. If you are using @sc{msvc} 6.0 (which is highly recommended), you have all
-needed headers and libraries for DirectX 5 and OpenGL installed.  If you want
-to use Glide, @sc{eax}, @sc{a3d} or DirectX 6, you will have to download the
-@sc{sdk}'s from the appropriate sites.  If you want to just build Crystal
-Space using those @sc{api}s, but don't need any documentation or samples, you
-can get a minimum version of these @sc{api}s from NooTe's homepage at:
-
-@uref{http://www.multimania.com/noote/CrystalSpace}
-
-Look at the ``Sources'' section.  You will need @sc{a3d} 2.0, @sc{eax} 1.0 and
-Glide2x.  Of course, you can also get the full @sc{sdk} at Aureal (@sc{a3d}),
-CreativeLabs (@sc{eax}) and 3D/FX (Glide).  You can get the most current
-DirectX @sc{sdk} from @uref{http://www.microsoft.com} (but they sometimes
-remove it after a while, so you can't be certain.)
 @end itemize
 
 @subsubheading Linking
@@ -407,8 +191,8 @@ remove it after a while, so you can't be certain.)
 Q. @emph{Where are the files @file{png.lib} and @file{zlib.lib}?}
 
 A. Just look above at the question about @file{zlib.h} and @file{png.h}.
-It's the same problem, and if you have already done what is explained there, I
-can't do much for you!
+It's the same problem, and if you have already done what is explained there,
+I can't do much for you!
 
 @item
 Q. @emph{I've got unresolved symbols.}
@@ -505,10 +289,8 @@ you wait a while, this will probably be fixed, or at least be worked around.
 @xref{Mailing Lists}.
 
 @item
-Q. @emph{I compile for the first time, and I have a problem that you haven't
-solved here!}
+Q. @emph{I have a problem that you haven't solved here!}
 
 A. Try sending a note to the Crystal Space mailing list and asking your
-question there.  @xref{Mailing Lists}.  As a last resort, you might also try
-contacting Thomas Hieber at @email{thieber@@gmx.net}.
+question there.  @xref{Mailing Lists}.
 @end itemize

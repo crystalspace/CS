@@ -41,6 +41,10 @@ instance:
 WORLDFILE=flarge
 @end example
 
+If your map isn't one of those from the CS homepage, you also have to add it
+to @file{vfs.cfg}. Look at the entries for the other maps to see how to do
+this.
+
 Note that on most platforms Crystal Space currently only supports 256-color
 displays (with a colormap) or 15/16/32-bit truecolor displays, though some
 platforms may be more tolerant and implement provide support for additional
