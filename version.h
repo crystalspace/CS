@@ -13,8 +13,6 @@
 #  define OS_VERSION "Solaris"
 #elif defined(OS_LINUX)
 #  define OS_VERSION "Linux"
-#elif defined(OS_IRIX)
-#  define OS_VERSION "IRIX"
 #elif defined(OS_BSD)
 #  define OS_VERSION "BSD"
 #elif defined(OS_IRIX)
