@@ -156,6 +156,18 @@ Next, click on the @emph{Link} tab.
 In the @emph{Object/library modules} text box add the Crystal Space libraries
 as named below into the box with those already listed.
 
+For debug builds use the following names. The @emph{_d} indicates a debug CS library.
+
+@iftex
+@code{libcssys_d.lib libcsutil_d.lib libcsgeom_d.lib}@*
+@code{libcsgfx_d.lib libcstool_d.lib}
+@end iftex
+@ifnottex
+@code{libcssys_d.lib libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib}
+@end ifnottex
+
+For release builds use the following naming for the CS libraries.
+
 @iftex
 @code{libcssys.lib libcsutil.lib libcsgeom.lib}@*
 @code{libcsgfx.lib libcstool.lib}
