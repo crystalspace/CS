@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
 4-Mar-2003
+        - Andrew Craig fixed coordshow text drawing in walktest.  If you had 
+          a long sector name it was often cut off.  
 	- Fixed a bug in the OpenGL canvas text drawer where the
 	  state of GL_TEXTURE_COORD_ARRAY was not properly queried.
 	- Fixed another mixup in the OpenGL canvas text drawer where

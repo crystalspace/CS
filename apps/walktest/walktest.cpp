@@ -601,12 +601,21 @@ void WalkTest::DrawFrameConsole ()
     {
       char buffer[100];
       sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",
-        view->GetCamera ()->GetTransform ().GetO2TTranslation ().x,
-	view->GetCamera ()->GetTransform ().GetO2TTranslation ().y,
-        view->GetCamera ()->GetTransform ().GetO2TTranslation ().z,
-	view->GetCamera ()->GetSector()->QueryObject ()->GetName ());
-      GfxWrite (FRAME_WIDTH - 24 * 8 - 1, FRAME_HEIGHT - fh - 3, 0, -1, buffer);
-      GfxWrite (FRAME_WIDTH - 24 * 8, FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, buffer);
+      view->GetCamera ()->GetTransform ().GetO2TTranslation ().x,
+      view->GetCamera ()->GetTransform ().GetO2TTranslation ().y,
+      view->GetCamera ()->GetTransform ().GetO2TTranslation ().z,
+      view->GetCamera ()->GetSector()->QueryObject ()->GetName ());
+
+      int buffWidth, buffHeight;
+      Font->GetDimensions( buffer, buffWidth, buffHeight );
+
+      GfxWrite ( FRAME_WIDTH - buffWidth - 1, 
+                 FRAME_HEIGHT - fh - 3, 0, -1, 
+                 buffer);
+
+      GfxWrite (FRAME_WIDTH - buffWidth, 
+                FRAME_HEIGHT - fh - 2, fgcolor_stats, -1, 
+                buffer);
     }
   }
 }
