@@ -29,6 +29,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/terrfunc.h"
+#include "imesh/terrain.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
 #include "cstool/keyval.h"
@@ -155,6 +156,8 @@ SCF_VERSION (TerrainInfo, 0, 0, 1);
 struct TerrainInfo : public csObject
 {
   iTerrFuncState* terrfunc;
+  iTerrainObjectState* terrain;
+  iMovable* movable;
   SCF_DECLARE_IBASE_EXT (csObject);
 };
 
@@ -197,11 +200,17 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 	{
 	  hits += ti->terrfunc->CollisionDetect (&test);
 	}
+	if (ti->terrain)
+	{
+	  hits += ti->terrain->CollisionDetect (ti->movable, &test);
+	}
       }
       else
       {
 	ti = csPtr<TerrainInfo> (new TerrainInfo ());
 	ti->terrfunc = 0;	// No terrain found yet.
+	ti->terrain = 0;
+	ti->movable = 0;
         int i;
         for (i = 0 ; i < ml->GetCount () ; i++)
         {
@@ -213,6 +222,15 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 	    hits += state->CollisionDetect (&test);
 	    ti->terrfunc = state;
 	    break;
+	  }
+	  csRef<iTerrainObjectState> tstate (SCF_QUERY_INTERFACE (
+	    terrain->GetMeshObject (), iTerrainObjectState));
+	  csRef<iMovable> m = terrain->GetMovable ();
+	  if (tstate)
+	  {
+	    hits += tstate->CollisionDetect (m, &test);
+	    ti->terrain = tstate;
+	    ti->movable = m;
 	  }
         }
 	csRef<iObject> iobj (SCF_QUERY_INTERFACE (ti, iObject));
