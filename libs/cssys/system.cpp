@@ -30,6 +30,7 @@
 #include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
+#include "csutil/cfgfile.h"
 #include "iplugin.h"
 #include "ivfs.h"
 #include "iconsole.h"
@@ -1108,6 +1109,11 @@ iConfigFile *csSystemDriver::GetConfig ()
 iConfigFile *csSystemDriver::CreateConfig (const char *iFileName, bool iVFS)
 {
   return new csIniFile (iFileName, iVFS ? VFS : NULL);
+}
+
+iConfigFileNew *csSystemDriver::CreateConfigNew (const char *iFileName, bool iVFS)
+{
+  return new csConfigFile (iFileName, iVFS ? VFS : NULL);
 }
 
 bool csSystemDriver::SaveConfig ()

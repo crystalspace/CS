@@ -437,6 +437,11 @@ public:
   virtual iConfigFile *GetConfig ();
   /// Create a new configuration file object which resides on VFS
   virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true);
+  /**
+   * Create a new configuration file object which resides on VFS. This method
+   * uses a new format for the config files, not the INI format.
+   */
+  virtual iConfigFileNew *CreateConfigNew (const char *iFileName, bool iVFS = true);
   /// Save system configuration file if it was changed
   virtual bool SaveConfig ();
 

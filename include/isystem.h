@@ -155,6 +155,7 @@ struct iEventOutlet;
 struct iEventPlug;
 struct iEventCord;
 struct iStrVector;
+struct iConfigFileNew;
 
 SCF_VERSION (iSystem, 4, 0, 1);
 
@@ -292,6 +293,11 @@ struct iSystem : public iBase
   virtual iConfigFile *GetConfig () = 0;
   /// Create a new configuration file object which resides on VFS
   virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true) = 0;
+  /**
+   * Create a new configuration file object which resides on VFS. This method
+   * uses a new format for the config files, not the INI format.
+   */
+  virtual iConfigFileNew *CreateConfigNew (const char *iFileName, bool iVFS = true) = 0;
   /// Save system configuration file if it was changed
   virtual bool SaveConfig () = 0;
 
