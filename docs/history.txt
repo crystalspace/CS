@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+20-Sep-2000
+	- Jerry A. Segler Jr added initial CSWS Theme support.
 19-Sep-2000
 	- Andrew fixed a small bug in csws/cscomp.cpp.
 	- Andrew updated csComponent comment to reflect the fact that
