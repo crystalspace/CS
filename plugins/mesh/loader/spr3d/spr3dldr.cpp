@@ -278,7 +278,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
     {
       //@@@ Error handling!
       //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      con->DecRef ();
+      if (con) con->DecRef ();
       return false;
     }
     switch (cmd)
@@ -291,7 +291,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 	  if (!LoadSkeleton (newlimb, params))
 	  {
 	    //@@@
-	    con->DecRef ();
+	    if (con) con->DecRef ();
 	    return false;
 	  }
 	}
@@ -330,7 +330,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 	  //@@@ Error handling!
 	  //CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
 	  //fatal_exit (0, false);
-	  con->DecRef ();
+	  if (con) con->DecRef ();
 	  return false;
 	}
 	break;
@@ -349,11 +349,11 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
     //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
         //csGetLastOffender ());
     //fatal_exit (0, false);
-    con->DecRef ();
+    if (con) con->DecRef ();
     return false;
   }
 
-  con->DecRef ();
+  if (con) con->DecRef ();
   return true;
 }
 

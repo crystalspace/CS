@@ -2,6 +2,10 @@ The history order has been reversed so that new features are at the top.
 
 28-Mar-2001
 	- Finished the split of csFrustumView and csFrustumContext.
+	- Fixed a bug in the sprite loader with regards to skeletal sprites.
+	- Added a normal sprite, a skeletal sprite, and the hierarchical
+	  robot to flarge.
+	- Added 'meshes' target to 'walkall'.
 27-Mar-2001
 	- Philip Wyett eliminated VC6 compiler warning about empty control
 	  statement.
