@@ -379,7 +379,7 @@ protected:
     struct slotList
     {
       slotList () : head (0), tail (0), usedSlots (0), slotsActivatedLastFrame (0),
-        slotSize (0), totalCount (0), slotsActivatedThisFrame(0), 
+        slotsActivatedThisFrame(0), slotSize (0), totalCount (0),
         slotsReusedLastFrame (0), slotsReusedThisFrame (0)
       {}
       csGLVBOBufferSlot *head, *tail;
@@ -387,9 +387,9 @@ protected:
       // Statistical data
       uint usedSlots;
       uint slotsActivatedLastFrame, slotsActivatedThisFrame;
-      uint slotsReusedLastFrame, slotsReusedThisFrame;
       size_t slotSize;
       uint totalCount;
+      uint slotsReusedLastFrame, slotsReusedThisFrame;
 
       //listmanagements
       void PushFront (csGLVBOBufferSlot *slot)

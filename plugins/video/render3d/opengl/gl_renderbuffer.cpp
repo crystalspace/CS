@@ -56,10 +56,10 @@ csGLRenderBuffer::csGLRenderBuffer (csGLVBOBufferManager * vbomgr, size_t size,
                                     int componentCount, size_t rangeStart, 
                                     size_t rangeEnd, bool copy)
   : bufferType (type), comptype (componentType), bufferSize (size), 
-  compCount (componentCount), stride (0), offset (0), 
-  rangeStart (rangeStart), rangeEnd (rangeEnd), version (0), 
-  doCopy (copy), isLocked (false), buffer (0), vbooffset (0), 
-  isIndex (false), vboSlot (0), vbomgr (vbomgr)
+  compCount (componentCount), stride (0), offset (0),
+  vbooffset (0), rangeStart (rangeStart), rangeEnd (rangeEnd),
+  version (0), doCopy (copy), isLocked (false),
+  isIndex (false), buffer (0), vboSlot (0), vbomgr (vbomgr)
 {
   SCF_CONSTRUCT_IBASE (0);
   compGLType = compGLtypes[componentType];
@@ -232,8 +232,8 @@ static csString ByteFormat (size_t size)
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext
                                             , csGLStateCache *state,
                                             iObjectRegistry* p)
-  : ext (ext), statecache (state), verbose (false), superVerbose (false),
-  object_reg (p)
+  : ext (ext), statecache (state), object_reg (p),
+    verbose (false), superVerbose (false)
 {
   SCF_CONSTRUCT_IBASE(0);
   
