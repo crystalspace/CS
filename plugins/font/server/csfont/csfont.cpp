@@ -109,6 +109,7 @@ csFontDef* csDefaultFontServer::ReadFntFile(const char *file)
   char *cp = **fntfile;
   int val = 0;
   int FontSize = 10;
+  int span = 0;
   /// find the //XX parts
   while ((cp = strstr(cp, "//XX")) != 0)
   {
@@ -233,7 +234,7 @@ csFontDef* csDefaultFontServer::ReadFntFile(const char *file)
   }
   cp++;
 
-  for(int span=0; span<16; span++)
+  for(span=0; span<16; span++)
   {
     for(i=span*16; i<span*16+16; i++)
     {
