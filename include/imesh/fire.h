@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,20 +33,36 @@ struct iFireState : public iBase
 {
   /// Set the number of particles to use.
   virtual void SetNumberParticles (int num) = 0;
+  /// Get the number of particles.
+  virtual int GetNumberParticles () const = 0;
   /// Set the size of the fire drops.
   virtual void SetDropSize (float dropwidth, float dropheight) = 0;
+  /// Get the size of the fire drops.
+  virtual void GetDropSize (float& dropwidth, float& dropheight) const = 0;
   /// Set origin of the fire.
   virtual void SetOrigin (const csVector3& origin) = 0;
+  /// Get origin of the fire.
+  virtual const csVector3& GetOrigin () const = 0;
   /// Set direction of the fire.
   virtual void SetDirection (const csVector3& dir) = 0;
+  /// Get direction of the fire.
+  virtual const csVector3& GetDirection () const = 0;
   /// Enable or disable lighting.
   virtual void SetLighting (bool l) = 0;
+  /// See if lighting is enabled.
+  virtual bool GetLighting () const = 0;
   /// Set swirl.
   virtual void SetSwirl (float swirl) = 0;
+  /// Get swirl.
+  virtual float GetSwirl () const = 0;
   /// Set color scale.
   virtual void SetColorScale (float colscale) = 0;
+  /// Get color scale.
+  virtual float GetColorScale () const = 0;
   /// Set total time.
   virtual void SetTotalTime (float tottime) = 0;
+  /// Get total time.
+  virtual float GetTotalTime () const = 0;
 };
 
 #endif

@@ -91,49 +91,72 @@ public:
 
   /// Set the number of particles to use.
   void SetNumberParticles (int num) { initialized = false; number = num; }
-  /// Set the size of the fountain drops.
+  /// Get the number of particles.
+  int GetNumberParticles () const { return number; }
+  /// Set the size of the fire drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
   }
+  /// Get the size of the fire drops.
+  void GetDropSize (float& dropwidth, float& dropheight) const
+  { dropwidth = drop_width; dropheight = drop_height; }
   /// Set origin of the fire.
   void SetOrigin (const csVector3& origin)
   {
     initialized = false;
     csFireMeshObject::origin = origin;
   }
+  /// Get origin of the fire.
+  const csVector3& GetOrigin () const 
+  { return origin; }
   /// Set direction of the fire.
   void SetDirection (const csVector3& direction)
   {
     initialized = false;
     csFireMeshObject::direction = direction;
   }
+  /// Get direction of the fire.
+  const csVector3& GetDirection () const
+  { return direction; }
   /// Enable or disable lighting.
   void SetLighting (bool l)
   {
     initialized = false;
     lighted_particles = l;
   }
+  /// See if lighting is enabled. 
+  bool GetLighting () const
+  { return lighted_particles; }
   /// Set swirl.
   void SetSwirl (float swirl)
   {
     initialized = false;
     csFireMeshObject::swirl = swirl;
   }
+  /// Get swirl.
+  float GetSwirl () const
+  { return swirl; }
   /// Set color scale.
   void SetColorScale (float colscale)
   {
     initialized = false;
     color_scale = colscale;
   }
+  /// Get color scale.
+  float GetColorScale () const
+  { return color_scale; }
   /// Set total time.
   void SetTotalTime (float tottime)
   {
     initialized = false;
     total_time = tottime;
   }
+  /// Get total time.
+  float GetTotalTime () const
+  { return total_time; }
 
   /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
@@ -152,33 +175,65 @@ public:
     {
       scfParent->SetNumberParticles (num);
     }
+    virtual int GetNumberParticles () const 
+    { 
+      return scfParent->GetNumberParticles (); 
+    }
     virtual void SetDropSize (float dropwidth, float dropheight)
     {
       scfParent->SetDropSize (dropwidth, dropheight);
+    }
+    virtual void GetDropSize (float& dropwidth, float& dropheight) const
+    {
+      scfParent->GetDropSize (dropwidth, dropheight);
     }
     virtual void SetOrigin (const csVector3& origin)
     {
       scfParent->SetOrigin (origin);
     }
+    virtual const csVector3& GetOrigin () const
+    {
+      return scfParent->GetOrigin ();
+    }
     virtual void SetLighting (bool l)
     {
       scfParent->SetLighting (l);
+    }
+    virtual bool GetLighting () const
+    {
+      return scfParent->GetLighting ();
     }
     virtual void SetDirection (const csVector3& dir)
     {
       scfParent->SetDirection (dir);
     }
+    virtual const csVector3& GetDirection () const
+    {
+      return scfParent->GetDirection ();
+    }
     virtual void SetSwirl (float swirl)
     {
       scfParent->SetSwirl (swirl);
+    }
+    virtual float GetSwirl () const
+    {
+      return scfParent->GetSwirl ();
     }
     virtual void SetColorScale (float colscale)
     {
       scfParent->SetColorScale (colscale);
     }
+    virtual float GetColorScale () const
+    {
+      return scfParent->GetColorScale ();
+    }
     virtual void SetTotalTime (float ttime)
     {
       scfParent->SetTotalTime (ttime);
+    }
+    virtual float GetTotalTime () const
+    {
+      return scfParent->GetTotalTime ();
     }
   } scfiFireState;
   friend class FireState;
