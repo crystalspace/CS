@@ -188,13 +188,13 @@ WalkTest::~WalkTest ()
 void WalkTest::SetSystemDefaults (iConfigFileNew *Config)
 {
   superclass::SetSystemDefaults (Config);
-  do_fps = Config->GetBool ("WalkTest.Settings.FPS", true);
-  do_stats = Config->GetBool ("WalkTest.Settings.Stats", false);
-  do_cd = Config->GetBool ("WalkTest.Settings.Colldet", true);
+  do_fps = Config->GetBool ("Walktest.Settings.FPS", true);
+  do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
+  do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
 
   const char *val;
   if (!(val = GetNameCL ()))
-    val = Config->GetStr ("Walktest.WorldFile");
+    val = Config->GetStr ("Walktest.Settings.WorldFile");
   sprintf (map_dir, "/lev/%s", val);
 
   if (GetOptionCL ("clear"))
@@ -269,7 +269,8 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores map file!)\n");
   Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores map file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n", Config->GetStr ("Walktest.WorldFile", "world"));
+  Sys->Printf (MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n",
+        Config->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
 
 //-----------------------------------------------------------------------------
@@ -1205,7 +1206,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   view = new csView (engine, Gfx3D);
 
   // Get the collide system plugin.
-  const char* p = Config->GetStr ("WalkTest.CollDetPlugIn",
+  const char* p = Config->GetStr ("Walktest.Settings.CollDetPlugIn",
   	"crystalspace.colldet.rapid");
   collide_system = LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
   if (!collide_system)
@@ -1308,7 +1309,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
         //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
         //  name, name, name);
 	const char *valfiletype = "";
-	valfiletype = Config->GetStr ("Walktest.WorldZipType", "");
+	valfiletype = Config->GetStr ("Walktest.Settings.WorldZipType", "");
 	if (strcmp (valfiletype, "") ==0)
 	{
 	  valfiletype = "zip";
