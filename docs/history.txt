@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+24-Mar-2002
+	- Matze checked in some of his 3ds2lev changes in, the face
+	  optimisation is disabled by default because it still fails on
+	  some levels... I hope I can find the bug that causes this soon...
 23-Mar-2002
 	- Fixed a bug in the patch from Loic which prevented CS
 	  from properly working if CRYSTAL var is unset and if
@@ -173,7 +177,13 @@ The history order is reversed so that new features are at the top.
 	  vice versa.
 	- Fixed the csParseInputDef and csGetInputDesc so that they now
 	  return bool on success/failure of conversion.
+<<<<<<< history.txt
+	- small fix from Rene Dudfied <illumen@yahoo.com> to make fpu80x86.h
+	  compiling with gcc >= 3.0.4
+	- Matze added some declarations to inpnames.h
+=======
 	- Richard Uren added a new loader for the isometric engine.
+>>>>>>> 1.2397
 4-Mar-2002
 	- Fixed the tutorials in the docs so that they are up-to-date with
 	  regards to changes that happened a long time ago in csInitializer.

@@ -43,124 +43,6 @@ int modelnum = -1;
 #define MODE_ZYX 5
 int mode_xyz = MODE_XYZ;
 
-
-/*
- * Moves (or relocates) the whole scene.
- * All meshes are moved.
- * All lights are moved.
- */
-void Lib3dsMove (Lib3dsFile* p3dsFile, float32 x, float32 y, float32 z)
-{
-
-  // a vertex
-  Lib3dsPoint *pCurPoint;
-
-  // used for coords of vertex
-  float *xyz;
-
-  // set the current mesh to the first in the file
-  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
-
-  // as long as we have a valid mesh...
-  while( p3dsMesh )
-  {
-    // get the number of vertices in the current mesh
-    int numVertices = p3dsMesh->points;
-
-    // vertexes pointer
-    pCurPoint = p3dsMesh->pointL;
-
-    for ( int i = 0 ; i < numVertices ; i++ )
-    {
-        // index to the position on the list using index
-        xyz = pCurPoint->pos;
-
-        // Move the vertex
-        xyz[0]+=x;
-        xyz[1]+=y;
-        xyz[2]+=z;
-
-        // go to next vertex
-        pCurPoint++;
-    }
-    p3dsMesh = p3dsMesh->next;
-  }
-
-  // move lights
-  Lib3dsLight *pCurLight = p3dsFile->lights;
-
-  while (pCurLight) {
-
-    pCurLight->position[0]+=x;
-    pCurLight->position[1]+=y;
-    pCurLight->position[2]+=z;
-
-    pCurLight = pCurLight->next;
-  }
-}
-
-/*
- * Scales the whole scene.
- * All meshes are scaled.
- * All lights are scaled.
- */
-void Lib3dsScale (Lib3dsFile* p3dsFile, float32 x, float32 y, float32 z)
-{
-
-  // a vertex
-  Lib3dsPoint *pCurPoint;
-
-  // used for coords of vertex
-  float *xyz;
-
-  // set the current mesh to the first in the file
-  Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
-
-  // as long as we have a valid mesh...
-  while( p3dsMesh )
-  {
-    // get the number of vertices in the current mesh
-    int numVertices = p3dsMesh->points;
-
-    // vertexes pointer
-    pCurPoint = p3dsMesh->pointL;
-
-    for ( int i = 0 ; i < numVertices ; i++ )
-    {
-        // index to the position on the list using index
-        xyz = pCurPoint->pos;
-
-        // Scale the vertex
-        xyz[0]*=x;
-        xyz[1]*=y;
-        xyz[2]*=z;
-
-        // go to next vertex
-        pCurPoint++;
-    }
-    // go to next mesh
-    p3dsMesh = p3dsMesh->next;
-  }
-
-  // scale lights
-  Lib3dsLight *pCurLight = p3dsFile->lights;
-
-  while (pCurLight) {
-
-    pCurLight->position[0]*=x;
-    pCurLight->position[1]*=y;
-    pCurLight->position[2]*=z;
-
-    // scale range of light on 'x' scaling
-    pCurLight->outer_range*=x;
-    pCurLight->inner_range*=x;
-
-    pCurLight = pCurLight->next;
-  }
-
-
-}
-
 /**
  * Simply switch x,y,z coord depending on the selected MODE_XYZ
  */
@@ -381,14 +263,16 @@ int main (int argc, char * argv[])
   char * infn=0, * outfn=0, * name=DEFNAME;
   FILE * outf;
   int n;
-  float32 xscale = 0, yscale = 0, zscale = 0;
-  float32 xrelocate = 0, yrelocate = 0, zrelocate = 0;
+  float xscale = 1, yscale = 1, zscale = 1;
+  float xrelocate = 0, yrelocate = 0, zrelocate = 0;
 
   flags = 0;
   curmodel = 0;
   modelnum = -1;
   mode_xyz = MODE_XZY;
   flags |= FLAG_SWAP_V; // default to lower left texture origin
+  /*flags |= FLAG_REMOVEDOUBLEVERTICES;
+  flags |= FLAG_COMBINEFACES;*/
 
   argc--;
   argv++;
@@ -402,16 +286,15 @@ int main (int argc, char * argv[])
 	 "Jorrit Tyberghein and Luca Pancallo.\n"
          "Use:  %s [params...] inputfile.3DS [outputfile]\n"
                "params:\n"
-               " -o name   Object name (default "DEFNAME")\n"
+               " -o name   Object name (default '"DEFNAME"')\n"
                " -v        Verbose mode on\n"
                " -vv       Very verbose mode on\n"
                " -l        Don't convert but list objects in 3ds file\n"
-               " -c        Centre objects\n"
+	       " -n	   don't optimize (no combining of triangles to polys)\n"
                " -s x y z  Scale objects (x,y,z = floats)\n"
                " -r x y z  Relocate objects (x,y,z = floats)\n"
                " -pl       Make polygons lit\n"
                " -f        Don't ask for file overwrite (force)\n"
-               " -d        Don't remove duplicated vertices\n"
                " -3        Output 3D sprite instead of level\n"
                " -m num    Output only one object from 3DS (use -l to list)\n"
 	       " -tl       Make texture origin lower left (default)\n"
@@ -427,7 +310,6 @@ int main (int argc, char * argv[])
   }
 
   // Get the parameters and filenames
-
   for (n=0; n<argc; n++)
   {
     if (argv[n][0] == '-' || argv[n][0] == '/')
@@ -440,7 +322,6 @@ int main (int argc, char * argv[])
 		  break;
         case 'R': if (n+3<argc)
 		  {
-		    flags |= FLAG_RELOCATE;
                     xrelocate = atof(argv[++n]);
                     yrelocate = atof(argv[++n]);
                     zrelocate = atof(argv[++n]);
@@ -453,7 +334,6 @@ int main (int argc, char * argv[])
 		  break;
         case 'S': if (n+3<argc)
 		  {
-		    flags |= FLAG_SCALE;
                     xscale = atof(argv[++n]);
                     yscale = atof(argv[++n]);
                     zscale = atof(argv[++n]);
@@ -481,7 +361,6 @@ int main (int argc, char * argv[])
 		  break;
 	case 'C': flags |= FLAG_CENTRE; break;
 	case 'F': flags |= FLAG_OVERWR; break;
-	case 'D': flags |= FLAG_NORMDUP; break;
 	case '3': flags |= FLAG_SPRITE; break;
 	case 'L': flags |= FLAG_LIST; break;
         case 'M': if (n+1<argc) sscanf (argv[++n], "%d", &modelnum);
@@ -503,6 +382,10 @@ int main (int argc, char * argv[])
 		    mode_xyz = MODE_ZXY;
 		  else
 		    mode_xyz = MODE_ZYX;
+		  break;
+	case 'N': 
+		  flags |= FLAG_COMBINEFACES;
+		  flags |= FLAG_REMOVEDOUBLEVERTICES;
 		  break;
 	default:  fprintf (stderr, "Bad param: %s\n",argv[n]);
 		  return 1;
@@ -534,8 +417,7 @@ int main (int argc, char * argv[])
   // <--------- opening input and output files--------->
 
   // Read inputfile
-  cs3ds2LevConverter *converter = new cs3ds2LevConverter();
-  Lib3dsFile *p3dsFile = converter->LoadFile(infn);
+  Lib3dsFile *p3dsFile = lib3ds_file_load(infn);
   if (!p3dsFile ) {
     fprintf (stderr, "Failed to open %s\n", infn);
     return 1;
@@ -590,14 +472,6 @@ int main (int argc, char * argv[])
     Move (scene, -scene->centre.x, -scene->centre.y, -scene->centre.z);
   */
 
-  // scale model if requested
-  if (flags & FLAG_SCALE)
-    Lib3dsScale (p3dsFile, xscale, yscale, zscale);
-
-  // move (relocate) model if requested
-  if (flags & FLAG_RELOCATE)
-    Lib3dsMove (p3dsFile, -xrelocate, -yrelocate, -zrelocate);
-
   // swap xyz if requested
   if (mode_xyz != MODE_XYZ)
     Lib3dsConvertXYZ (p3dsFile);
@@ -625,7 +499,10 @@ int main (int argc, char * argv[])
     }
   }
 
+  // create writer
   CSWriter writer(outf, p3dsFile);
+  writer.SetScale(xscale, yscale, zscale);
+  writer.SetTranslate(xrelocate, yrelocate, zrelocate);
 
   // Output data in CS format
   if (!(flags & FLAG_LIST))
@@ -639,26 +516,5 @@ int main (int argc, char * argv[])
   }
 
   return 0;
-}
-
-
-/**
- * Is it better to have it as a class?
- */
-cs3ds2LevConverter::cs3ds2LevConverter() {
-
-}
-
-
-cs3ds2LevConverter::~cs3ds2LevConverter() {
-
-}
-
-Lib3dsFile *cs3ds2LevConverter::LoadFile( char *filename )
-{
-
-  Lib3dsFile *pFile = lib3ds_file_load(filename);
-
-  return pFile;
 }
 

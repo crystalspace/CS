@@ -14,41 +14,54 @@
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
 
+class csVector3;
+class csPlane3;
+
 class Writer
 {
 public:
-    Writer(const char* fname);
-    Writer(FILE* f); 
-    ~Writer();
-
-    void Indent(int sp=2);
-    void UnIndent(int sp=2);
-
-    void WriteL (const char* line, ...);
-    void Write (const char* line, ...);
-    void WriteV (const char* line, va_list args);
+  Writer(const char* fname);
+  Writer(FILE* f); 
+  ~Writer();
+  
+  void Indent(int sp=2);
+  void UnIndent(int sp=2);
+  
+  void WriteL (const char* line, ...);
+  void Write (const char* line, ...);
+  void WriteV (const char* line, va_list args);
 protected:
-    bool indented;
-    int indentlevel;
-    FILE* file;    
+  bool indented;
+  int indentlevel;
+  FILE* file;    
 };
 
 class CSWriter : public Writer
 {
 public:
-    CSWriter(const char* filename, Lib3dsFile* data3d);
-    CSWriter(FILE* f, Lib3dsFile* data3d);
-    ~CSWriter();
+  CSWriter(const char* filename, Lib3dsFile* data3d);
+  CSWriter(FILE* f, Lib3dsFile* data3d);
+  ~CSWriter();
+  
+  bool WriteFile();
+  
+  void WriteHeader();
+  void WriteFooter();
+  void WriteObjects(bool lighting);
+  void WriteVertices(Lib3dsMesh* mesh);
+  void WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh);
 
-    bool WriteFile();
-    
-    void WriteHeader();
-    void WriteFooter();
-    void WriteObjects(bool lighting);
-    void WriteVertices(Lib3dsMesh* mesh);
+  void SetScale(float x, float y, float z);
+  void SetTranslate(float x, float y, float z);
 protected:
-    Lib3dsFile* p3dsFile;
-    unsigned int* newpointmap;
+  inline bool CombineTriangle (Lib3dsMesh* mesh, csPlane3*& plane, int* poly,
+      int& plen, int trinum);
+    
+  Lib3dsFile* p3dsFile;
+  int* newpointmap;
+  csVector3* vectors;
+  float xscale, yscale, zscale;
+  float xrelocate, yrelocate, zrelocate;
 };
 
 #endif

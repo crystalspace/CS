@@ -1,7 +1,9 @@
 /*
  *  CS Object output
  *  Author: Luca Pancallo 2000.09.28
+ *   heavily modified by Matze Braun <MatzeBraun@gmx.de>
  */
+#include "cssysdef.h"
 
 #include "3dsout.h"
 #include "3ds2lev.h"
@@ -9,6 +11,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+
+#include "csgeom/vector3.h"
+#include "csgeom/plane3.h"
 
 // includes for lib3ds
 #include <lib3ds/camera.h>
@@ -20,8 +25,6 @@
 #include <lib3ds/mesh.h>
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
-
-extern int flags;
 
 //---------------------------------------------------------------------------
 Writer::Writer (const char* fname)
@@ -95,17 +98,36 @@ CSWriter::CSWriter(const char* filename, Lib3dsFile* data3d)
     : Writer (filename), p3dsFile(data3d)
 {
   newpointmap = NULL;
+  vectors = NULL;
 }
 
 CSWriter::CSWriter(FILE* f, Lib3dsFile* data3d)
     : Writer(f), p3dsFile(data3d)
 {
-  if (newpointmap)
-    delete[] newpointmap;
+  newpointmap = NULL;
+  vectors = NULL;
 }
 
 CSWriter::~CSWriter()
 {
+  if (newpointmap)
+    delete[] newpointmap;
+  if (vectors)
+    delete[] vectors;  
+}
+
+void CSWriter::SetScale(float x, float y, float z)
+{
+  xscale = x;
+  yscale = y;
+  zscale = z;
+}
+
+void CSWriter::SetTranslate(float x, float y, float z)
+{
+  xrelocate = x;
+  yrelocate = y;
+  zrelocate = z;
 }
 
 /**
@@ -242,22 +264,30 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
 	v = texel[0][1];
       }
 
-      Write ("V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
+      Write ("V(%g,%g,%g:", 
+	      xyz[0]*xscale + xrelocate, 
+	      xyz[1]*yscale + yrelocate,
+	      xyz[2]*zscale + zrelocate);
       WriteL ("%g,%g)",u, (flags & FLAG_SWAP_V ? 1.-v : v));
     }
   }
   else
   {
     if (newpointmap)
+    {
       delete[] newpointmap;
-    newpointmap = new unsigned int[mesh->points];
-    memset (newpointmap, 0, sizeof(unsigned int) * mesh->points);
+      delete[] vectors;
+    }
+    newpointmap = new int [mesh->points];
+    vectors = new csVector3 [mesh->points];
+    for (unsigned int i=0;i<mesh->points;i++)
+      newpointmap[i]=-1;
 
-    unsigned int newpoint = 0;
+    int newpoint = 0;
     for (unsigned int v = 0; v < mesh->points; v++)
     {
       // doubled point? then do nothing
-      if (newpointmap[v] != 0)
+      if (newpointmap[v] != -1)
 	continue;
       
       float* xyz1 = mesh->pointL[v].pos;
@@ -266,12 +296,218 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
 	float* xyz2 = mesh->pointL[v2].pos;
 
 	if (xyz1[0] == xyz2[0] && xyz1[1]==xyz2[1] && xyz1[2] == xyz2[2])
+	{
 	  newpointmap[v2] = newpoint;
+	  vectors[v2].Set(xyz1[0], xyz1[1], xyz1[2]);
+	}
       }
       newpointmap[v] = newpoint;
-      WriteL ("VERTEX (%g,%g,%g)    ; %d", xyz1[0], xyz1[1], xyz1[2], newpoint);
+      vectors[v].Set(xyz1[0], xyz1[1], xyz1[2]);
+      WriteL ("VERTEX (%g,%g,%g)    ; %d",
+	      xyz1[0]*xscale + xrelocate,
+	      xyz1[1]*yscale + yrelocate,
+	      xyz1[2]*zscale + zrelocate,
+	      newpoint);
       newpoint++;
     }
+  }
+}
+
+/* This function tries to combine the triangle with number trinum with a
+ * polygon (that has been perhaps already combined with other triangles?
+ */
+typedef unsigned short facenum;
+
+bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csPlane3*& plane, int* poly,
+	int& plen, int trinum)
+{
+  facenum* ppoints = mesh->faceL[trinum].points;
+  int points[3];
+  points[0] = newpointmap[ppoints[0]];
+  points[1] = newpointmap[ppoints[1]];
+  points[2] = newpointmap[ppoints[2]];
+
+  // this holds the numbers of the 2 shared vertices
+  facenum sharedfaces[2];
+  // this is the number of the vertice that is left on the triangle
+  facenum nonshared;
+  
+  bool found=false;
+  for (int i=0;i<3;i++)
+  {
+    for (int i2=0; i2<plen; i2++)
+    {
+      // a point found that is the same on both polys
+      // then the next point must correspond to the next (or last) point
+      // on the triangle we compare with
+      if (poly[i2]==points[i])
+      {
+	int tp = poly[ (i2+1) % plen ];
+	if (tp == points[ (i+1) % 3 ] )
+	{
+	  found=true;
+	  sharedfaces[0]=poly[i2];
+	  sharedfaces[1]=tp;
+	  // you can write i+2 instead of i-1 (in fact it avoids errors where
+	  // i==0
+	  nonshared = points[ (i+2) % 3 ];
+	  goto pointfound;
+	}
+	else if (tp == points[ (i+2) % 3 ])
+	{
+	  found=true;
+	  sharedfaces[0]=poly[i2];
+	  sharedfaces[1]=tp;
+	  nonshared = points[ (i+1) % 3 ];
+	  goto pointfound;
+	}
+      }
+    }
+  }
+  
+pointfound:
+  if (!found)
+    return false;
+
+  // all points on the same plane?
+  if (!plane)
+  {
+    plane = new csPlane3(vectors[poly[0]], vectors[poly[1]],
+	vectors[poly[2]]);
+    plane->Normalize();
+  }
+
+  if (plane->Distance (vectors[nonshared]) > 0.1)
+  {
+    printf ("PlaneTestFailed: %g\n", plane->Distance (vectors[nonshared]));
+    return false;
+  }
+
+  // combine the triangle with the poly (insert the nonshared triangle point
+  // between the 2 shared points in the poly
+  int p;
+  for (p=0; p < plen; p++)
+  {
+    if (poly[p]==nonshared)
+    {
+      printf ("Warning!!! object '%s' contains a face that overlapps another"
+	  "face!\n", mesh->name);
+      return false;
+    }
+    if (poly[p]==sharedfaces[0])
+      break;
+  }
+  plen++;
+  p++;
+  for (int p2=plen; p2>p; p2--)
+  {
+    poly[p2]=poly[p2-1];
+    if (poly[2]==nonshared)
+    {
+      printf ("Error!!! object '%s' contains a face that overlapps "
+  	  "another face! This poly will be eventually invalid!\n", mesh->name);
+      poly[0]=sharedfaces[0];
+      poly[1]=sharedfaces[1];
+      poly[2]=nonshared;
+      plen=3;
+      return true;
+    }	  
+  }
+  poly[p]=nonshared;
+
+  // check if the 
+  return true;
+}
+
+void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
+{
+  if (flags & FLAG_SPRITE)
+  {
+    for (unsigned int f = 0; f < mesh->faces; f++)
+    {
+      unsigned short* xyz = mesh->faceL[f].points;
+      WriteL ("TRIANGLE (%d,%d,%d)", xyz[0], xyz[1], xyz[2]);
+    }
+  }
+  else
+  {
+    bool *used = new bool[mesh->faces];
+    memset (used, 0, sizeof(bool) * mesh->faces);
+
+    // check if the object is mapped with a method we support
+    bool outputuv = true;
+    if (!mesh->texelL || mesh->texels!=mesh->points)
+      outputuv = false;
+    if (mesh->map_data.maptype != LIB3DS_MAP_NONE)
+      outputuv = false;
+    if (!outputuv)
+    {
+      printf ("Mesh Object '%s' uses an unsupported mapping type."
+	 " Mapping for this object is ignored\n", mesh->name);
+    }
+
+    for (unsigned int f = 0; f < mesh->faces; f++)
+    {
+      if (used[f])
+	continue;
+      
+      WriteL ("POLYGON 'x%d_%d'  (", numMesh, f);
+      Indent();
+      unsigned short* ppp = mesh->faceL[f].points; 
+      int poly[1000];
+      int plen=3;
+      poly[0] = newpointmap[ppp[0]];
+      poly[1] = newpointmap[ppp[1]];
+      poly[2] = newpointmap[ppp[2]];
+      csPlane3* plane=NULL;
+
+      // iterate over triangles and try to combine some to make more efficient
+      // polgons
+      if (flags & FLAG_COMBINEFACES)
+      {
+  	for (unsigned int f2 = f+1; f2 < mesh->faces; f2++)
+    	{
+  	  if ( !used[f2] && CombineTriangle(mesh, plane, poly, plen, f2) )
+	  {
+  	    used[f2]=true;
+	    // XXX: It should work without this...
+	    break;
+	  }
+    	}
+      }
+      Write ("VERTICES (");
+      int mappoints[3]; int np=0;
+      for (int i=0; i<plen; i++)
+      {
+	if (poly[i] == newpointmap[ppp[np]])
+	  mappoints[np++]=i;
+	Write ("%d%s", poly[i], i!=plen-1 ? "," : "");
+      }
+      Write(")");
+      
+      if (!lighting)
+	Write (" LIGHTING (no)");
+      WriteL("");
+
+      if (outputuv)
+      {
+	Write ("TEXTURE (UV (");
+	float *uvcoords = mesh->texelL [ ppp[0] ];
+	Write ("%d,%g,%g,", mappoints[0],
+	    uvcoords[0], flags & FLAG_SWAP_V ? (1.f - uvcoords[1]) : uvcoords[1] );
+	uvcoords = mesh->texelL [ ppp[1] ];
+	Write ("%d,%g,%g,", mappoints[1],
+	    uvcoords[0], flags & FLAG_SWAP_V ? (1.f - uvcoords[1]) : uvcoords[1] );
+	uvcoords = mesh->texelL [ ppp[2] ];
+	WriteL ("%d,%g,%g))", mappoints[2],
+	    uvcoords[0], flags & FLAG_SWAP_V ? (1.f - uvcoords[1]) : uvcoords[1] );
+      }
+      
+      UnIndent();
+      WriteL (")"); // close POLYGON
+    }
+
+    delete[] used;
   }
 }
 
@@ -283,6 +519,10 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
 void CSWriter::WriteObjects (bool lighting)
 {
   Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+
+  // if a light is present in the 3ds file force LIGHTNING (yes)
+  if (p3dsFile->lights)
+    lighting = true;  
 
   if (flags & FLAG_SPRITE)
   {
@@ -322,7 +562,7 @@ void CSWriter::WriteObjects (bool lighting)
                 Lib3dsMesh tmp = p3dsMeshArray[j];
                 p3dsMeshArray[j] = p3dsMeshArray[n];
                 p3dsMeshArray[n] = tmp;
-                break;
+                //break;
              }
           }
         }
@@ -347,148 +587,95 @@ void CSWriter::WriteObjects (bool lighting)
   int numMesh = 0;
   while (p3dsMesh)
   {
-
     if (flags & FLAG_SPRITE)
     {
     }
     else
     {
-        // on "_s_" decide if MESHOBJ or PART
-        if (strstr(p3dsMesh->name, "_s_"))
-        {
-            if (!staticObj)
-            {
-                WriteL ("MESHOBJ 'static' (");
-		Indent();
-		WriteL ("PLUGIN ('thing')");
-                WriteL ("ZFILL()");
-	        WriteL ("PRIORITY('wall')");
-		WriteL ("PARAMS(");
-		Indent();
-		WriteL ("VISTREE()");
-		Write ("; Object Name: '%s'" , p3dsMesh->name);
-                WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
-                WriteL ("PART '%s' (", p3dsMesh->name);
-		Indent();
-                staticObj = true;
-            }
-            else
-            {
-                WriteL ("PART '%s' (", p3dsMesh->name);
-		Indent();
-            }
-            part = true;
-        }
-        // else always MESHOBJ
-        else
-        {
-            // close previous PART and MESHOBJ if present
-            if (part)
-            {
-		UnIndent();
-                WriteL (")"); WriteL (""); // end PART
-		UnIndent();
-                WriteL (")"); WriteL (""); // end MESHOBJ
-		part = false;
-            }
-            Write ("; Object Name : %s ", p3dsMesh->name);
-            WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
-
-            WriteL ("MESHOBJ '%s' (", p3dsMesh->name);
-	    Indent();
-	    WriteL ("PLUGIN ('thing')");
-	    WriteL ("ZUSE ()");
-            // handles transparent objects
-            if (strstr(p3dsMesh->name, "_t_"))
-                WriteL ("PRIORITY('alpha')");
-            else
-                WriteL ("PRIORITY('object')");
-            WriteL ("PARAMS (");
-	    Indent();
-
-            meshobj = true;
-        }
-    }
-    WriteL ("MATERIAL ('%s')", p3dsMesh->faceL->material);
-
-    // <--output vertexes-->
-
-    WriteVertices(p3dsMesh);
-
-    // <--output faces-->
-
-    // get the number of faces in the current mesh
-    int numFaces = p3dsMesh->faces;
-    Lib3dsFace *pCurFace = p3dsMesh->faceL;
-    Lib3dsTexel *pTexelList = p3dsMesh->texelL;
-
-    // output faces
-    int i;
-    for (i=0; i<numFaces; i++)
-    {
-      if (flags & FLAG_SPRITE)
+      // on "_s_" decide if MESHOBJ or PART
+      if (strstr(p3dsMesh->name, "_s_"))
       {
-        WriteL ("TRIANGLE (%d,%d,%d)",
-		pCurFace->points[0], pCurFace->points[1], pCurFace->points[2]);
+	if (!staticObj)
+	{
+	  WriteL ("MESHOBJ 'static' (");
+	  Indent();
+	  WriteL ("PLUGIN ('thing')");
+	  WriteL ("ZFILL()");
+	  WriteL ("PRIORITY('wall')");
+	  WriteL ("PARAMS(");
+	  Indent();
+	  WriteL ("VISTREE()");
+	  Write ("; Object Name: '%s'" , p3dsMesh->name);
+	  WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
+	  WriteL ("PART '%s' (", p3dsMesh->name);
+	  Indent();
+	  staticObj = true;
+	}
+	else
+	{
+	  WriteL ("PART '%s' (", p3dsMesh->name);
+	  Indent();
+	}
+	part = true;
       }
+      // else always MESHOBJ
       else
       {
-        // if a light is present in the 3ds file force LIGHTNING (yes)
-        if (p3dsFile->lights)
-            lighting = true;
-
-        WriteL ("POLYGON 'x%d_%d'  (", numMesh, i);
+	// close previous PART and MESHOBJ if present
+	if (part)
+	{
+	  UnIndent();
+	  WriteL (")"); WriteL (""); // end PART
+	  UnIndent();
+	  WriteL (")"); WriteL (""); // end MESHOBJ
+	  part = false;
+	}
+	Write ("; Object Name : %s ", p3dsMesh->name);
+	WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
+	
+    	WriteL ("MESHOBJ '%s' (", p3dsMesh->name);
 	Indent();
-	unsigned int p1,p2,p3;
-	p1 = newpointmap[pCurFace->points[0]];
-	p2 = newpointmap[pCurFace->points[1]];
-	p3 = newpointmap[pCurFace->points[2]];
-	Write ("VERTICES (%d,%d,%d)", p1, p2, p3);
-	if (!lighting)
-	  Write (" LIGHTING (no)");
-	WriteL("");
-
-        if (pTexelList)
-        {
-          Lib3dsTexel *mapV0 = (Lib3dsTexel*)pTexelList[pCurFace->points[0]];
-          float u0 = mapV0[0][0];
-          float v0 = mapV0[0][1];
-          Lib3dsTexel *mapV1 = (Lib3dsTexel*)pTexelList[pCurFace->points[1]];
-          float u1 = mapV1[0][0];
-          float v1 = mapV1[0][1];
-          Lib3dsTexel *mapV2 = (Lib3dsTexel*)pTexelList[pCurFace->points[2]];
-          float u2 = mapV2[0][0];
-          float v2 = mapV2[0][1];
-          WriteL ("TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))",
-                 u0, (flags & FLAG_SWAP_V ? 1.-v0 : v0),
-                 u1, (flags & FLAG_SWAP_V ? 1.-v1 : v1),
-                 u2, (flags & FLAG_SWAP_V ? 1.-v2 : v2));
-        }
-
-	UnIndent();
-        WriteL (")"); // close polygon
+	WriteL ("PLUGIN ('thing')");
+	WriteL ("ZUSE ()");
+	// handles transparent objects
+	if (strstr(p3dsMesh->name, "_t_"))
+	  WriteL ("PRIORITY('alpha')");
+	else
+	  WriteL ("PRIORITY('object')");
+	WriteL ("PARAMS (");
+	Indent();
+	
+    	meshobj = true;
       }
-
-      // go to next face
-      pCurFace++;
     }
-
+    WriteL ("MATERIAL ('%s')", p3dsMesh->faceL->material);
+    
+    // <--output vertexes-->
+    
+    WriteVertices(p3dsMesh);
+    
+    // <--output faces-->
+    
+    WriteFaces(p3dsMesh, lighting, numMesh);
+    
+    // move to next object/part
+    
     if (meshobj) {
-	UnIndent();
-	WriteL(")"); WriteL(""); // close PARAMS tag
-	UnIndent();
-	WriteL(")"); WriteL(""); // close MESHOBJ
-        meshobj = false;
+      UnIndent();
+      WriteL(")"); WriteL(""); // close PARAMS tag
+      UnIndent();
+      WriteL(")"); WriteL(""); // close MESHOBJ
+      meshobj = false;
     } else {
-	UnIndent();
-	WriteL (")");
+      UnIndent();
+      WriteL (")");
     }
-
+    
     // increment mesh count
     numMesh++;
     p3dsMesh = p3dsMesh->next;
   } // ~end while (p3dsMesh)
-
+  
   // if working on static object closes MESHOBJECT
   if (part)
   {
