@@ -4,10 +4,10 @@ JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
 if ! $(JAMCONFIG_READ)
 {
-    EXIT "Couldn't find config. Please run 'configure' first!" ;
+    EXIT "Could not locat configuration. Please run 'configure' first." ;
 }
 
-# Setup compiler flags
+# Set up compiler flags
 COMPILER.CFLAGS = -Wall -Wno-unknown-pragmas ;
 COMPILER.CFLAGS.optimize = -O3 -fomit-frame-pointer -ffast-math ;
 COMPILER.CFLAGS.debug = -g3 [ FDefines CS_DEBUG ] ;

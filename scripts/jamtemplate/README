@@ -1,10 +1,10 @@
-The script in this directory, can create a basic buildsystem (jam based) for
-external CS projects. It sets up jamrules, autoconf macros, a configure script,
-a source directory and a simple main.cpp file.
+The script in this directory can set up a skeleton build system (based upon
+Jam) for external Crystal Space projects.  It sets up Jam support, Autoconf
+macros, a configure script, a source directory and a simple main.cpp file.
 
-To run the script change to some directory where you want to have the project
-created and make sure you've setup the CRYSTAL environment variable. Then just
-invoke the script. Example:
+To run the script go to some directory under which you want to have the project
+created, and make sure you have set the CRYSTAL environment variable.  Then,
+just invoke the script.  Example:
 
   $CRYSTAL/scripts/jamtemplate/createproject.sh
  

@@ -1,10 +1,12 @@
-			    #LONGNAME#
+#LONGNAME#
+#HOMEPAGE#
 
-		by #AUTHOR#<#EMAIL#>
+By #AUTHOR# <#EMAIL#>
+#COPYRIGHT#
 
 XXX WARNING: This is a sample README file it seems that the author of the
-XXX          project didn't modify it yet. You'll only find generic
-XXX	     informations in here.
+XXX          project has not yet modified it. You will only find generic
+XXX	     information here.
 
 Contents
 1. Introduction
@@ -25,27 +27,27 @@ XXX Fill in some text
 
 2.1 Jam
 
- The build system is based on jam. If you don't have jam installed yet, then
- check your distribution for a jam package or get the source directly and
- compile/install jam yourself. You can find the source here:
+ The build system is based upon Jam rather than 'make'.  If you do not yet have
+ jam installed, then check your distribution for a Jam package or download the
+ source and compile/install Jam yourself.  You can find the source here:
 
     ftp://ftp.perforce.com/pub/jam/
 
- You'll need at least jam version 2.4.
+ You will need at least version 2.4.
 
 2.2 Building
 
- 0. cd into the source directory
- 1. Run "./configure" with some options if you wish. You get a list of possible
-   options when you invoke configure with --help
- 2. Run "jam"
+ 1. Go to the top-level directory in the project tree.
+ 2.  Run "./configure", possibly with some options, if you wish.  You can see a
+    list of possible options by invoking configure with the "--help".
+ 3. Run "jam".
 
 2.3 Installing
 
- 0. Build the project
- 1. Make sure you have write permissions to the install directories. On
-    unix/linux this usually means that you have to be the root user.
- 2. Run "jam install"
+ 1. Build the project.
+ 2. Ensure that you have write permissions to the install directories. On
+    Unix/Linux this usually means that you need to be the 'root' user.
+ 3. Run "jam install".
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,6 +57,5 @@ XXX Fill in some text
 
 4. Contact
 
-Bug-Reports, Suggestions, Calls-For-Help, Greeting Cards should be send to
+Bug-Reports, suggestions, requests, and greeting cards should be send to
 #EMAIL#
-

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Apr-2004
+	- Marten fixed a bug in xmlshader where it assumed the syntax-service
+	  was already loaded.  Now it loads it if needed.
+	- Eric Sunshine rewrote gobs of unportable shell programming in the
+	  jamtemplate/createproject.sh script. Also generally cleaned up and
+	  unified the rest of the jamtemplate resources.
 28-Apr-2004
 	- Eric Sunshine applied a few scripting-related patches from Michael
 	  Franz Aigner <crystal-space@amfranz.com>:
@@ -75,8 +81,6 @@ chronological order.
 	  needed.
 	- res enabled the glRasterPos hack in glcommon2d.cpp for NR, too.
 	- res fixed the interpretation of some header fields in the DDS loader.
-	- Marten fixed a bug in xmlshader where it assumed the syntax-service was
-	  already loaded. Now it loads it if needed.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

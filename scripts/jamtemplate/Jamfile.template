@@ -1,17 +1,26 @@
 SubDir TOP ;
 
-# Construct a distclean target
-Clean distclean : config.log config.status config.cache aclocal.m4
-		  Jamconfig config.h ;
-CleanDir distclean : autom4te.cache out ;
+Clean distclean :
+    aclocal.m4
+    config.h
+    config.log
+    config.status
+    config.cache
+    Jamconfig ;
+CleanDir distclean :
+    autom4te.cache
+    out ;
 Depends distclean : clean ;
 
-Clean maintainerclean : configure aclocal.m4 config.h.in ;
+Clean maintainerclean :
+  aclocal.m4
+  configure
+  config.h.in ;
 Depends maintainerclean : distclean ;
 
-Description clean : "Cleanup objectfiles and targets" ;
-Description distclean : "Cleanup objectfiles and build configuration" ;
+Description clean : "Remove all built targets" ;
+Description distclean : "Remove built targets and configuration" ;
 Description maintainerclean :
-		"Cleanup all objectfiles, buildconfig and generated files." ;
+    "Remove built targets, configuration, and generated files." ;
 
 SubInclude TOP src ;
