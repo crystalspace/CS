@@ -37,6 +37,7 @@ chronological order.
 	      macros have been obsoleted by the above change.
 	- res fixed jobber.pl to use 'crystalspace' as the package name in the
 	  fake Jamconfig.
+	- PK fixed a compile error of vc8 beta 1 in regcomp.c.
 20-Sep-2004
         - Andrew Craig fixed memory leak in csparser.
 	- PK did the following:
