@@ -11,6 +11,12 @@ The history order is reversed so that new features are at the top.
 	- Continued working on the new lighting system. It is almost
 	  starting to work now. But the last straw is always the most
 	  difficult one :-) It is still not enabled by default.
+	- Michael Voasse did the following:
+	    - Bugplug: Added NULL assignment to poly ( line 274 ).
+	      This was allowing bugplug to use an unassigned Polygon3D
+	      pointer.
+	    - Terrfunc: Removed unecessary increment from hit beam.
+	- Wouter Wijngaards made isogrid more resistant against overflows.
 12-Jul-2001
 	- Added iPolygon3D::GetPolygonID ().
 	- Extended BugPlug to show the name and ID of the selected polygon.
