@@ -520,17 +520,18 @@ bool MsModel::ReadMsFile(const char* msfile)
     return setError("Couldn't scan for the number of joints.",file);
   }
   joints = new struct Joint*[nbJoints];
-  for(int i = 0;i<nbJoints;i++)
+  int i;
+  for(i = 0;i<nbJoints;i++)
   {
     joints[i] = NULL;
   }
   char** parents = new char*[nbJoints];
-  for(int i = 0;i<nbJoints;i++)
+  for(i = 0;i<nbJoints;i++)
   {
     parents[i]= new char[MS_MAX_NAME];
   }
   char** names = new char*[nbJoints];
-  for(int i = 0;i<nbJoints;i++)
+  for(i = 0;i<nbJoints;i++)
   {
     names[i]= new char[MS_MAX_NAME];
   }
@@ -650,17 +651,18 @@ bool MsModel::ReadMsFile(const char* msfile)
   }
   
   //Initializing all children indices to -1.
-  for(int i = 0;i<nbJoints;i++)
+  int j;
+  for(i = 0;i<nbJoints;i++)
   {
     joints[i]->children = new int[nbJoints];
-    for(int j = 0;j<nbJoints;j++)
+    for(j = 0;j<nbJoints;j++)
     {
       joints[i]->children[j]=-1;
     }
   }
   
   //Filling in the children
-  for(int i = 0;i<nbJoints;i++)
+  for(i = 0;i<nbJoints;i++)
   {
     //find out if it's a root joint.
     if(strcmp(parents[i], "no parent" ) == 0)
@@ -699,6 +701,7 @@ bool MsModel::WriteSPR(const char* spritename)
 {
   FILE *f;
   char *spritefilename;
+  int i;
 
   if (spritename == NULL || strlen(spritename) == 0)
   {
@@ -720,13 +723,13 @@ bool MsModel::WriteSPR(const char* spritename)
   csReversibleTransform* inv = new csReversibleTransform[nbJoints];
   if(nbJoints>0)
   {
-    for(int i = 0;i<nbJoints;i++)
+    for(i = 0;i<nbJoints;i++)
     {
       csMatrix3 m = joints[i]->transform->matrix;
       csVector3 v = joints[i]->transform->move;
       inv[i] = csReversibleTransform (m, -m.GetInverse () * v);
     }
-    for(int i = 0;i<nbJoints;i++)
+    for(i = 0;i<nbJoints;i++)
     {
       //find out if it's a root joint.
       if(joints[i]->parent==-1)
@@ -734,7 +737,7 @@ bool MsModel::WriteSPR(const char* spritename)
         transform(inv,i,-1);
       }
     }
-    for(int i = 0;i<nbJoints;i++)
+    for(i = 0;i<nbJoints;i++)
     {
       inv[i] = inv[i].GetInverse();
     }
