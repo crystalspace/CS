@@ -30,6 +30,7 @@ The history order is reversed so that new features are at the top.
 	- Removed the unneeded includes from cssys/system.h and cssys/sysdriv.h
 	  from most of CS.
 	- Slightly updated the simple.txi tutorial. Work in progress though.
+	- Philip Wyett did a few fixes that Jorrit forgot to do.
 9-Oct-2001
 	- Removed iSystem::GetObjectRegistry().
 	- The object registry is now a parameter to the system driver and
