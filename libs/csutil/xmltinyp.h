@@ -68,22 +68,22 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual const char* GetName () const
+  virtual const char* GetName ()
   {
     return attr->Name ();
   }
 
-  virtual const char* GetValue () const
+  virtual const char* GetValue ()
   {
     return attr->Value ();
   }
 
-  virtual int GetValueAsInt () const
+  virtual int GetValueAsInt ()
   {
     return attr->IntValue ();
   }
 
-  virtual float GetValueAsFloat () const
+  virtual float GetValueAsFloat ()
   {
     const char* val = attr->Value ();
     float f;

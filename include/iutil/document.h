@@ -79,13 +79,13 @@ SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 struct iDocumentAttribute : public iBase
 {
   /// Get name of this attribute.
-  virtual const char* GetName () const = 0;
+  virtual const char* GetName () = 0;
   /// Get value of this attribute.
-  virtual const char* GetValue () const = 0;
+  virtual const char* GetValue () = 0;
   /// Get value of this attribute as integer.
-  virtual int GetValueAsInt () const = 0;
+  virtual int GetValueAsInt () = 0;
   /// Get value of this attribute as float.
-  virtual float GetValueAsFloat () const = 0;
+  virtual float GetValueAsFloat () = 0;
   /// Set name of this attribute.
   virtual void SetName (const char* name) = 0;
   /// Set value of this attribute.
