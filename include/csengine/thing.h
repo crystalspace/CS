@@ -848,6 +848,8 @@ public:
     virtual iPolygon3D *GetPolygon (int idx);
     virtual iPolygon3D *GetPolygon (const char* name);
     virtual iPolygon3D *CreatePolygon (const char *iName);
+    virtual int GetPortalCount ();
+    virtual iPortal* GetPortal (int idx);
     virtual int GetVertexCount () { return scfParent->num_vertices; }
     virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
     virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }

@@ -245,6 +245,20 @@ public:
   csMovable& GetMovable () { return movable; }
 
   /**
+   * This routine will find out in which sectors a mesh object
+   * is positioned. To use it the mesh has to be placed in one starting
+   * sector. This routine will then start from that sector, find all
+   * portals that touch the sprite and add all additional sectors from
+   * those portals. Note that this routine using a bounding sphere for
+   * this test so it is possible that the mesh will be added to sectors
+   * where it really isn't located (but the sphere is).
+   * <p>
+   * If the mesh is already in several sectors those additional sectors
+   * will be ignored and only the first one will be used for this routine.
+   */
+  void PlaceMesh ();
+
+  /**
    * Check if this object is hit by this object space vector.
    * BBox version.
    */
@@ -363,6 +377,10 @@ public:
     virtual iMovable* GetMovable () const
     {
       return &(scfParent->movable.scfiMovable);
+    }
+    virtual void PlaceMesh ()
+    {
+      scfParent->PlaceMesh ();
     }
     virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
           csVector3& isect, float* pr)

@@ -110,7 +110,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 0, 16);
+SCF_VERSION (iMeshWrapper, 0, 0, 17);
 
 /**
  * This interface corresponds to the object in the engine
@@ -153,6 +153,20 @@ struct iMeshWrapper : public iBase
    * correctly updated.
    */
   virtual iMovable* GetMovable () const = 0;
+
+  /**
+   * This routine will find out in which sectors a mesh object
+   * is positioned. To use it the mesh has to be placed in one starting
+   * sector. This routine will then start from that sector, find all
+   * portals that touch the sprite and add all additional sectors from
+   * those portals. Note that this routine using a bounding sphere for
+   * this test so it is possible that the mesh will be added to sectors
+   * where it really isn't located (but the sphere is).
+   * <p>
+   * If the mesh is already in several sectors those additional sectors
+   * will be ignored and only the first one will be used for this routine.
+   */
+  virtual void PlaceMesh () = 0;
 
   /**
    * Check if this object is hit by this object space vector.

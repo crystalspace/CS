@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+19-Aug-2001
+	- Added iThingState::GetPortalCount() and GetPortal(int) so you
+	  can query all portals from a thing.
+	- Added iMeshWrapper::PlaceMesh() function which will take position
+	  the mesh in all relevant sectors. To do that it will use the
+	  bounding sphere of the mesh and ONE sector which should already
+	  be initialized in the movable of the mesh BEFORE calling
+	  PlaceMesh(). Note that this routine is not finished yet.
+	  It only goes one level deep so it will fail to correctly
+	  place meshes that cross several consecutive portals. Also it
+	  doesn't take child mesh objects in consideration yet.
+	  NOTE: The function doesn't do anything useful yet! I have to
+	  continue implementation.
+	- Fixed the crossbld makefile so that it actually links.
 17-Aug-2001
 	- Integrated a few patches from Matze Braun <matze@braunis.de>
 	  to make sure that CS compiles cleanly with gcc3.0. To enable

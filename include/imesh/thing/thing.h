@@ -27,6 +27,7 @@ class csVector3;
 class csMatrix3;
 struct iSector;
 struct iPolygon3D;
+struct iPortal;
 struct iGraphics3D;
 struct iFrustumView;
 struct iCurve;
@@ -51,7 +52,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 0, 8);
+SCF_VERSION (iThingState, 0, 0, 9);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -74,14 +75,19 @@ struct iThingState : public iBase
    */
   virtual void CompressVertices () = 0;
 
-  /// Query number of polygons in set
+  /// Query number of polygons in this thing.
   virtual int GetPolygonCount () = 0;
   /// Get a polygon from set by his index.
   virtual iPolygon3D *GetPolygon (int idx) = 0;
   /// Get a polygon from set by name.
   virtual iPolygon3D *GetPolygon (const char* name) = 0;
-  /// Create a new polygon and return a pointer to it
+  /// Create a new polygon and return a pointer to it.
   virtual iPolygon3D *CreatePolygon (const char *iName = NULL) = 0;
+
+  /// Query number of portals in this thing.
+  virtual int GetPortalCount () = 0;
+  /// Get a portal.
+  virtual iPortal* GetPortal (int idx) = 0;
 
   /// Query number of vertices in set
   virtual int GetVertexCount () = 0;

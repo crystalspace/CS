@@ -290,6 +290,37 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
   }
 }
 
+void csMeshWrapper::PlaceMesh ()
+{
+  if (movable.GetSectorCount () == 0) return;	// Do nothing
+
+  csVector3 radius, center;
+  mesh->GetRadius (radius, center);
+  iSector* sector = movable.GetSector (0);
+  movable.SetSector (sector);	// Make sure all other sectors are removed
+
+  // @@@ This function is currently ignoring children but that's
+  // not good!
+  // @@@ This function only goes one level deep in portals. Should be fixed!
+  // @@@ It would be nice if we could find a more optimal portal representation
+  // for large sectors.
+  int i, j;
+  for (i = 0 ; i < sector->GetMeshCount () ; i++)
+  {
+    iMeshWrapper* mesh = sector->GetMesh (i);
+    iThingState* thing = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
+	iThingState);
+    if (thing)
+    {
+      for (j = 0 ; j < thing->GetPortalCount () ; j++)
+      {
+	iPortal* portal = thing->GetPortal (j);
+	// @@@ TODO!!!
+      }
+      thing->DecRef ();
+    }
+  }
+}
 
 int csMeshWrapper::HitBeamBBox (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)

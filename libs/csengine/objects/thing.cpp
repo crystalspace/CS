@@ -2690,6 +2690,17 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
   return ip;
 }
 
+int csThing::ThingState::GetPortalCount ()
+{
+  return scfParent->portal_polygons.Length ();
+}
+
+iPortal* csThing::ThingState::GetPortal (int idx)
+{
+  csPolygon3D* p = (csPolygon3D*)(scfParent->portal_polygons)[idx];
+  return &(p->GetPortal ()->scfiPortal);
+}
+
 //---------------------------------------------------------------------------
 
 iMeshObjectFactory* csThing::MeshObject::GetFactory () const
