@@ -21,6 +21,7 @@
 #include "ivaria/reporter.h"
 #include "csutil/util.h"
 #include "csutil/csstring.h"
+#include <windows.h>
 
 // using DirectInput -- included from csjoywin.h
 #define INITGUID
@@ -30,12 +31,14 @@
 #include "cssys/win32/win32.h"
 
 // no config yet
-// #define CS_WINDOWS_JOYSTICK_CFG "/config/joystwin.cfg"
+// #define CS_WINDOWS_JOYSTICK_CFG "/config/joywin.cfg"
 // #define CS_WINDOWS_JOYSTICK_KEY "Device.JoyWin."
 
 // #define CS_LINUX_JOYSTICK_OLD_EVENTS // the values of the first two axis are sent only
 
 CS_IMPLEMENT_PLUGIN;
+
+SCF_IMPLEMENT_FACTORY (csWindowsJoystick);
 
 SCF_IMPLEMENT_IBASE (csWindowsJoystick)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
@@ -107,7 +110,7 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
         }
       }    
       if ((joystick[i].state[nstate].lX != joystick[i].state[last_state].lX) ||
-              (joystick[i].state[nstate].lY != joystick[i].state[last_state].lY))
+        (joystick[i].state[nstate].lY != joystick[i].state[last_state].lY))
       {
         EventOutlet->Joystick (i, 0, 0, joystick[i].state[nstate].lX,
 	joystick[i].state[nstate].lY);
@@ -197,9 +200,15 @@ bool csWindowsJoystick::Init ()
 	delete[] devProduct;
       }
     
+#ifdef CS_DEBUG
       joystick[i].device->SetCooperativeLevel (window,
-        DISCL_EXCLUSIVE | DISCL_FOREGROUND); 
-        // according to DX SDK 4 joysticks
+        DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+#else
+      joystick[i].device->SetCooperativeLevel (window,
+        DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+#endif  
+         
+      // according to DX SDK 4 joysticks
       joystick[i].device->Acquire();	
       /*
         This is one of the crazy things in DInput: (Un)Acquire! 
@@ -251,6 +260,3 @@ void csWindowsJoystick::Report (int severity, const char* msg, ...)
     msg, arg);
   va_end (arg);
 }
-
-SCF_IMPLEMENT_FACTORY (csWindowsJoystick);
-

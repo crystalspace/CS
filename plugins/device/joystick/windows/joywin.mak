@@ -61,12 +61,12 @@ JOYWIN.CFLAGS =
 ifeq ($(USE_PLUGINS),yes)
   JOYWIN = $(OUTDLL)/joywin$(DLL)
   LIB.JOYWIN = $(foreach d,$(DEP.JOYWIN),$($d.LIB))
-  LIB.JOYWIN.SPECIAL = $(LFLAGS.l)dinput
+  LIB.JOYWIN.SPECIAL = $(LFLAGS.l)dinput $(LFLAGS.l)dxguid
   TO_INSTALL.DYNAMIC_LIBS += $(JOYWIN)
 else
   JOYWIN = $(OUT)/$(LIBPREFIX)joywin$(LIB)
   DEP.EXE += $(JOYWIN)
-  LIBS.EXE += $(LFLAGS.l)dinput
+  LIBS.EXE += $(LFLAGS.l)dinput $(LFLAGS.l)dxguid
   SCF.STATIC += joywin
   TO_INSTALL.STATIC_LIBS += $(JOYWIN)
 endif

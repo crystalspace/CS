@@ -182,6 +182,9 @@ endif
 ifeq ($(LINUXJOYSTICK.AVAILABLE),yes)
 PLUGINS.DYNAMIC += device/joystick/linux
 endif
+ifeq ($(DIRECTX.AVAILABLE),yes)
+PLUGINS.DYNAMIC += device/joystick/windows
+endif
 
 PLUGINS.DYNAMIC += documentsystem/binary
 PLUGINS.DYNAMIC += documentsystem/xmltiny
