@@ -97,7 +97,7 @@ csSoundRenderDS3D::~csSoundRenderDS3D()
       q->RemoveListener (scfiEventHandler);
       q->DecRef ();
     }
-    scfiEventHandler-DecRef ();
+    scfiEventHandler->DecRef ();
   }
   Close();
 }
