@@ -25,7 +25,10 @@ type:
 @end example
 
 This will create a script called @file{cs-config}. Copy that script
-unmodified to the directory where your project is located.
+unmodified to the directory where your project is located. Note that this
+script is platform dependent so you should not put it in your project's
+CVS. Everyone who does a checkout of your project will have to generate
+its own @file{cs-config} script by doing @code{make csconfig}.
 
 @subsubheading Makefile
 @cindex Makefile
