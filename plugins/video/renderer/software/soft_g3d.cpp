@@ -206,11 +206,15 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
     G2D->DecRef ();
   if (line_table)
     CHKB (delete [] line_table);
+
+  CHK(delete config;)
 }
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
   (System = iSys)->IncRef ();
+
+  width = height = -1;
 
   if (!System->RegisterDriver ("iGraphics3D", this))
     return false;
@@ -237,7 +241,6 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
   zdist_mipmap3 = config->GetFloat ("Mipmapping", "DMIPMAP3", 40.0);
 
-  width = height = -1;
   return true;
 }
 
@@ -611,6 +614,9 @@ bool csGraphics3DSoftware::Open (const char *Title)
 
 void csGraphics3DSoftware::Close()
 {
+  if ((width == height) && (width == -1))
+    return;
+
   for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     if (fog_tables [i].table)
       delete [] fog_tables [i].table;
@@ -624,8 +630,6 @@ void csGraphics3DSoftware::Close()
 
   CHK (delete tcache); tcache = NULL;
 
-  if ((width == height) && (width == -1))
-    return;
   G2D->Close ();
   width = height = -1;
 }
