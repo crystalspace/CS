@@ -142,14 +142,15 @@ void ConstructModelTask::doTask()
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // Get the model converter and cross builder
-  csRef<iModelConverter> modconv = CS_QUERY_REGISTRY (object_reg,
-    iModelConverter);
-  csRef<iCrossBuilder> xbuild = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
+  csRef<iModelConverter> modconv;
+  csRef<iCrossBuilder> xbuild;
+  CS_QUERY_REGISTRY_PLUGIN(modconv, object_reg, "crystalspace.modelconverter.multiplexer", iModelConverter);
+  CS_QUERY_REGISTRY_PLUGIN(xbuild, object_reg, "crystalspace.mesh.crossbuilder", iCrossBuilder); 
 
   // Check they were loaded
   if (!modconv || !xbuild)
   {
-    LOG ("ConstructModelTask", 2, "Need model converter and cross builder, " <<
+    LOG ("ConstructModelTask", 2, "Failed to load model converter and cross builder plugins, " <<
          "ignoring model (" << name << ")");
     return;
   }

@@ -164,12 +164,17 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   csMetaMaterial::object_reg = objreg;
 
   eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
-  if (! eventq) return false;
+  if (! eventq) 
+  {
+    LOG("csVosA3DL", 1, "Error initializing: no event queue in registry!");
+    return false;
+  }
   eventq->RegisterListener (this, CSMASK_FrameProcess);
 
   localsite.assign(new Site(true), false);
   localsite->addSiteExtension(new LocalSocketSiteExtension());
 
+/*
   csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (objreg, iDynamics);
   if (dynamics)
   {
@@ -178,9 +183,10 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   }
   else
   {
+*/
     LOG("csVosA3DL", 2, "Not using dynamics system");
     dynsys = NULL;
-  }
+ // }
 
   return true;
 }
@@ -223,3 +229,5 @@ void csVosA3DL::decrementRelightCounter()
   }
   LOG ("csVosA3DL", 3, "relight counter decremented to " << relightCounter);
 }
+
+

@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Jul-2004
+    - Reed changed VOSA3DL to load required plugins on demand rather than 
+      assume they were already loaded.
 	- Eric Sunshine fixed bug in jamtemplate/app.cpp.template where it
 	  asked SCF to scan CEL plugin path multiple times.
 	- Eric Sunshine made parsing of MAKEFLAGS in make emulation layer more
