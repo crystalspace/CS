@@ -73,7 +73,7 @@ public:
   T* GetArray ()
   {
     if (this->Length () > 0) // see *1*
-      return &this->Get (0)
+      return &this->Get (0);
     else
       return 0;
   }
