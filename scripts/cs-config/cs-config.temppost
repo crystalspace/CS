@@ -50,6 +50,8 @@ Options:
 	[--exec-prefix]
 	[--version]
 	[--longversion]
+	[--libdir]
+	[--includedir]
 	[--libs]
 	[--cflags]
 	[--cxxflags]
@@ -198,6 +200,14 @@ while test $# -gt 0; do
         ;;
     --longversion)
 	echo $longversion
+	exit 0
+	;;
+    --libdir)
+	echo $libdir
+	exit 0
+	;;
+    --includedir)
+	echo $includedir
 	exit 0
 	;;
     --cflags)
