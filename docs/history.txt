@@ -1,7 +1,22 @@
 The history order is reversed so that new features are at the top.
 
-25-Fev-2003
-	- Mårten Svanfeldt made these changes:
+26-Feb-2003
+	- Eric Sunshine made the following changes to the configure script:
+	    - Fixed bug: The utility variable cs_optimize_flags was being
+	      constructed incorrectly, with the result that it was always
+	      empty, rather than containing the detected optimization flags.
+	    - Removed the bogus qsqrt(1)==0 test which was supposed to detect
+	      buggy gcc 3.2.x.  It turns out that Matze made an error in his
+	      trials (printing a float with an int format directive), thus his
+	      results were invalid.
+	    - The special-case -fPIC directive for the qsqrt() check is now
+	      used only if the compiler understands -fPIC.
+	    - Documented Matze's -fPIC assumption.  (Please keep the comments
+	      up-to-date.)
+	    - The libpng test now employs -lm (if available) since it is
+	      reported that RedHat 8.x requires this library.
+25-Feb-2003
+	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
 	    - Added a flag to make objects not cast hardarebased shadows.
 	    - Added a (temporary) fix to avoid the mip-mapping errors in
@@ -15,7 +30,7 @@ The history order is reversed so that new features are at the top.
 	- res changed the mipmap creation code in the OpenGL texture
 	  renderer to take better advantage of precalculated mipmaps.
 24-Feb-2003
-	- Mårten Svanfeldt made these changes:
+	- Marten Svanfeldt made these changes:
 	    - Modified the light/shadow culling algoritm.
 	    - Changed the way to mask color and alphawrites in new renderer.
 	    - Added the posibility to specify color and/or alphamasking from
