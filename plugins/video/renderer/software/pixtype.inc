@@ -43,9 +43,15 @@
 #  define PI_GB	8
 #  define PI_BB	8
 #  if defined (TOP8BITS_R8G8B8_USED)
-#    define PI_RS	24
-#    define PI_GS	16
-#    define PI_BS	8
+#    if defined (CS_BIG_ENDIAN)
+#      define PI_RS	24
+#      define PI_GS	16
+#      define PI_BS	8
+#    else
+#      define PI_RS	0
+#      define PI_GS	8
+#      define PI_BS	16
+#    endif
 #  elif defined (CS_BIG_ENDIAN)
 #    define PI_RS	0
 #    define PI_GS	8
