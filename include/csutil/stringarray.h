@@ -152,19 +152,6 @@ public:
         return i;
     return -1;
   }
-
-  /**
-   * Insert a string element at a sorted position, using a specialized
-   * csArrayCompareFunction. Assumes array is already sorted.
-   */
-/*
-  int InsertSorted (const char* const &newstr,
-    csArrayCmpDecl(char const*, char const*, compare) =
-    csArrayCmp(CaseSensitiveCompare), int* equal_index = 0)
-  {
-    return superclass::InsertSorted(newstr, csArrayCmp(compare), equal_index);
-  }
-*/
 };
 
 #endif // __CS_STRINGARRAY_H__
