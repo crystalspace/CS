@@ -1718,37 +1718,30 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
 AC_CHECK_PROGS([CGC], [cgc])
 CS_BUILD_PROPERTY([CGC], [$CGC])
 
-AC_DEFUN([CS_CHECK_LIBCG_PREPARE],
-    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])])
-
-CS_CHECK_LIBCG_PREPARE
-
 AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
-    CS_CHECK_BUILD([for Cg], [cs_cv_libCg],
+    CS_CHECK_LIB_WITH([Cg],
 	[AC_LANG_PROGRAM(
 	    [[#include <Cg/cg.h>]],
-	    [CGcontext c = cgCreateContext();])],
-	[CS_CREATE_TUPLE([],[],[-lcg]) \
-	CS_CREATE_TUPLE([],[],[-lCg])], [],
-	[], [], [],
-	[$cs_cv_libm_cflags],
-	[$cs_cv_libm_lflags],
-	[$cs_cv_libm_libs])])
-CS_CHECK_LIBCG
+	    [CGcontext c = cgCreateContext()])],
+	[], [], [], [],
+	[$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs],
+	[cg CG])
 
-AS_IF([test $cs_cv_libCg = yes],
-    [CS_CHECK_BUILD([for CgGL], [cs_cv_libCgGL],
-	[AC_LANG_PROGRAM(
-	    [[#include <Cg/cg.h>
-	    #include <Cg/cgGL.h>]],
-	    [CGprogram p; cgGLBindProgram(p);])],
-	[CS_CREATE_TUPLE([],[],[-lcgGL]) \
-	CS_CREATE_TUPLE([],[],[-lCgGL])], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [], [],
-	[$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
-	[$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
-	[$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs])])
+    AS_IF([test $cs_cv_libCg = yes],
+	[CS_CHECK_LIB_WITH([CgGL],
+	    [AC_LANG_PROGRAM(
+		[[#include <Cg/cg.h>
+		#include <Cg/cgGL.h>]],
+		[CGprogram p; cgGLBindProgram(p)])],
+	    [], [],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
+	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
+	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
+	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
+	    [cggl cgGL CGGL])])])
+
+CS_CHECK_LIBCG
 
 
 
