@@ -24,8 +24,6 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "cssys/unix/unix.h"
-#include "cssys/system.h"
-#include "ivideo/graph3d.h"
 
 // Put an #ifndef OS_XXX around this if your system does not support locale.
 // In a long-term perspective, if we find such a system, we should add the
@@ -52,49 +50,4 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 void SysSystemDriver::Sleep (int SleepTime)
 {
   usleep (SleepTime * 1000);
-}
-
-bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
-{
-  char *path = getenv ("CRYSTAL");
-  if (!path)
-  {
-    // no setting, use the default.
-    // is the current dir a possible install? try opening scf.cfg,
-    if (!access ("scf.cfg", F_OK))
-    {
-      strncpy (oInstallPath, "", iBufferSize);
-      return true;
-    }
-    // default install place
-    if (!access ("/usr/local/crystal/scf.cfg", F_OK))
-    {
-      strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
-      return true;
-    }
-    // debian install place
-    if (!access ("/usr/lib/crystalspace/scf.cfg", F_OK))
-    {
-      strncpy (oInstallPath, "/usr/lib/crystalspace/", iBufferSize);
-      return true;
-    }
-    /// no install location can be found
-    Printf(CS_MSG_FATAL_ERROR, "Fatal: No Crystal Space install detected.\n");
-    strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
-    return true;
-  }
-
-  // Well, we won't check for brain-damaged cases here such as iBufferSize < 3
-  // since we presume user has even a little brains...
-
-  strncpy (oInstallPath, path, iBufferSize);
-  // check for ending '/'
-  size_t len = strlen (oInstallPath);
-  // empty stands for current directory
-  if (!len)
-    oInstallPath [len++] = '.';
-  if (oInstallPath [len - 1] != '/')
-    oInstallPath [len++] = '/';
-  oInstallPath [len] = 0;
-  return true;
 }

@@ -127,9 +127,14 @@ else
 endif
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
-  libs/cssys/os2/csos2.cpp libs/cssys/os2/scancode.cpp \
-  libs/cssys/os2/loadlib.cpp libs/cssys/general/findlib.cpp \
+SRC.SYS_CSSYS = \
+  libs/cssys/os2/csos2.cpp \
+  libs/cssys/os2/scancode.cpp \
+  libs/cssys/os2/loadlib.cpp \
+  libs/cssys/general/printf.cpp \
+  libs/cssys/general/timing.cpp \
+  libs/cssys/general/findlib.cpp \
+  libs/cssys/general/instpath.cpp \
   libs/cssys/general/getopt.cpp
 
 # The C compiler (autodetected)

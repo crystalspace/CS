@@ -102,6 +102,38 @@ The history order is reversed so that new features are at the top.
 	  necessary since the Apple/NeXT ports now access configuration
 	  information from `next.cfg' via iConfigManager, rather than
 	  iConfigFile,
+	- Eric Sunshine made the following changes to the installation path
+	  gleaning mechanism:
+	    - Added class method csSystemDriver::InstallPath().  Since this is
+	      a class method, installation path information is now available to
+	      clients even when no iSystem is available.  This may be useful
+	      for certain utility programs which never actually instantiate a
+	      system driver.
+	    - csSystemDriver now implements iSystem::GetInstallPath() as a
+	      simple wrapper over the class method InstallPath().
+	    - Added libs/cssys/unix/instpath.cpp which implements
+	      csSystemDriver::InstallPath() for Unix platforms.
+	    - Added libs/cssys/win32/instpath.cpp which implements
+	      csSystemDriver::InstallPath() for Windows.
+	    - Added libs/cssys/general/instpath.cpp which generically
+	      implments csSystemDriver::InstallPath() for other platforms.
+	    - Adjusted makefiles and project files to reference the new
+	      instpath.cpp source files as appropriate.
+	    - Eliminated the apparently useless PS2 override of
+	      iSystem::GetInstallPath().
+	- Eric Sunshine modified the Apple/NeXT plugin loading mechanism so
+	  that it utilizes the new csSystemDriver::InstallPath() method so that
+	  installed plugin modules may be found even when a system driver has
+	  not been intantiated.  (Not every application instantiates a system
+	  driver.)  Previously, NeXTSystemDriver::Initialize() was responsible
+	  for adding the `install path' to the plugin module search list, but
+	  this is now handled entirely by the plugin loading mechanism.
+	- Eric Sunshine fixed the PS2 system driver so that it no longer
+	  includes the Unix port's system driver header (cssys/unix.h).
+	- Eric Sunshine fixed a couple problems with bugplug.mak.  First, it
+	  neglected to install its configuration file `bugplug.cfg' at `make
+	  install' time.  Second, it failed to add `bugplug.cfg' to the
+	  generated MSVC DSP file.
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow

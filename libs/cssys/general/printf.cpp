@@ -1,8 +1,6 @@
 /*
-    DOS support for Crystal Space 3D library
+    Generic Console Output Support
     Copyright (C) 1998 by Jorrit Tyberghein
-    Written by David N. Arnold <derek_arnold@fuse.net>
-    Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

@@ -20,21 +20,16 @@
 #define __UNIX_H__
 
 #include "csutil/scf.h"
-#include "cssys/csinput.h"
 #include "cssys/system.h"
-#include "ivideo/graph2d.h"
 
-/// Unix version.
+// Unix version.
 class SysSystemDriver : public csSystemDriver
 {
 public:
   // Constructor
   SysSystemDriver ();
-
   // Sleep for given number of 1/1000 seconds
   virtual void Sleep (int SleepTime);
-  /// Get the installation path.
-  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 };
 
 #endif // __UNIX_H__

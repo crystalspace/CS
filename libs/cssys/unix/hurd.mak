@@ -122,9 +122,14 @@ LFLAGS.DLL=-Wl,-shared
 NASMFLAGS.SYSTEM=-f elf
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
-  libs/cssys/unix/loadlib.cpp libs/cssys/general/findlib.cpp \
-  libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp
+SRC.SYS_CSSYS = \
+  libs/cssys/unix/unix.cpp \
+  libs/cssys/unix/utiming.cpp \
+  libs/cssys/unix/loadlib.cpp \
+  libs/cssys/unix/instpath.cpp \
+  libs/cssys/general/findlib.cpp \
+  libs/cssys/general/printf.cpp \
+  libs/cssys/general/getopt.cpp
 
 # The C compiler.
 #CC=gcc -c

@@ -909,32 +909,7 @@ cs_time csSystemDriver::GetTime ()
 
 bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
-  char *path = getenv ("CRYSTAL");
-  if (!path || !*path)
-  {
-    // Won't check here for the schisofrenic case when iBufferSize == 0;
-    // Crystal Space is bloated enough without that...
-    oInstallPath [0] = 0;
-    return true;
-  }
-
-  size_t pl = strlen (path);
-  // See if we have to add an ending path separator to the directory
-  bool addsep = (path [pl - 1] != PATH_SEPARATOR)
-#if defined (OS_DOS) || defined (OS_OS2) || defined (OS_WIN32)
-             && (path [pl - 1] != '/')
-#endif
-    ;
-  if (addsep)
-    pl++;
-
-  if (pl >= iBufferSize)
-    pl = iBufferSize - 1;
-  memcpy (oInstallPath, path, pl);
-  if (addsep)
-    oInstallPath [pl - 1] = PATH_SEPARATOR;
-  oInstallPath [pl] = 0;
-  return true;
+  return InstallPath (oInstallPath, iBufferSize);
 }
 
 void csSystemDriver::Printf (int mode, const char *format, ...)

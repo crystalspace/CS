@@ -96,17 +96,18 @@ CFLAGS.DLL=
 LFLAGS.GENERAL=
 
 # Flags for the linker which are used when debugging.
-LFLAGS.debug= -gdwarf-2
+LFLAGS.debug=-gdwarf-2
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL= -nostart
+LFLAGS.DLL=-nostart
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS=$(wildcard libs/cssys/be/*.cpp) \
   libs/cssys/general/findlib.cpp \
+  libs/cssys/general/instpath.cpp \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/getopt.cpp
 

@@ -76,13 +76,6 @@ bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
   bool ok = false;
   controller = NeXTDelegate_startup(this);
   event_outlet = CreateEventOutlet(&scfiEventPlug);
-  
-  char path[ MAXPATHLEN ];
-  GetInstallPath(path, sizeof(path));
-  strcat(path, OS_NEXT_PLUGIN_DIR);
-  csAddLibraryPath(OS_NEXT_PLUGIN_DIR);
-  csAddLibraryPath(path);
-  
   if (superclass::Initialize(argc, argv, cfgfile))
   {
     csConfigAccess next_config(this, "/config/next.cfg", true,

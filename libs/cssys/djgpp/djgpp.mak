@@ -109,9 +109,14 @@ LFLAGS.DLL=
 NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/general/timing.cpp libs/cssys/djgpp/djgpp.cpp \
-  libs/cssys/djgpp/printf.cpp libs/cssys/general/getopt.cpp \
-  libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s
+SRC.SYS_CSSYS = \
+  libs/cssys/djgpp/djgpp.cpp \
+  libs/cssys/djgpp/printf.cpp \
+  libs/cssys/djgpp/djmousys.s \
+  libs/cssys/djgpp/djkeysys.s \
+  libs/cssys/general/getopt.cpp \
+  libs/cssys/general/instpath.cpp \
+  libs/cssys/general/timing.cpp
 ifeq ($(USE_PLUGINS),yes)
 SRC.SYS_CSSYS += libs/cssys/djgpp/loadlib.cpp libs/cssys/general/findlib.cpp
 endif

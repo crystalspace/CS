@@ -132,9 +132,14 @@ ARFLAGS=cr
 NASMFLAGS.SYSTEM=-f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/win32/win32.cpp libs/cssys/win32/dir.cpp \
-  libs/cssys/general/printf.cpp libs/cssys/win32/timing.cpp \
-  libs/cssys/win32/loadlib.cpp libs/cssys/general/findlib.cpp \
+SRC.SYS_CSSYS = \
+  libs/cssys/win32/win32.cpp \
+  libs/cssys/win32/dir.cpp \
+  libs/cssys/win32/timing.cpp \
+  libs/cssys/win32/loadlib.cpp \
+  libs/cssys/win32/instpath.cpp \
+  libs/cssys/general/findlib.cpp \
+  libs/cssys/general/printf.cpp \
   libs/cssys/general/getopt.cpp
 
 # The C compiler

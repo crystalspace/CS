@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2001 by Brandon Ehle
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,17 +24,14 @@
 #include "cssys/system.h"
 #include "ivideo/graph2d.h"
 
-/// PS2 version.
+// PS2 version.
 class SysSystemDriver : public csSystemDriver
 {
 public:
   // Constructor
   SysSystemDriver ();
-
   // Sleep for given number of 1/1000 seconds
   virtual void Sleep (int SleepTime);
-  /// Get the installation path.
-  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 };
 
 #endif // __UNIX_H__

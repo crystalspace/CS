@@ -356,6 +356,9 @@ public:
    */
   static cs_time Time ();
 
+  /// Get the installation path.
+  static bool InstallPath (char *oInstallPath, size_t iBufferSize);
+
   /// Print a string into debug.txt
   static void debug_out (bool flush, const char* str);
 

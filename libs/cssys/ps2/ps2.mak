@@ -109,10 +109,15 @@ LFLAGS.DLL=NOT SUPPORTED
 NASMFLAGS.SYSTEM=-f elf
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/ps2/ps2dummy.cpp libs/cssys/ps2/ps2.cpp \
-  libs/cssys/general/findlib.cpp libs/cssys/ps2/ptiming.cpp \
-  libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp \
-  libs/cssys/ps2/loadlib.cpp
+SRC.SYS_CSSYS = \
+  libs/cssys/ps2/ps2dummy.cpp \
+  libs/cssys/ps2/ps2.cpp \
+  libs/cssys/ps2/ptiming.cpp \
+  libs/cssys/ps2/loadlib.cpp \
+  libs/cssys/general/findlib.cpp \
+  libs/cssys/general/instpath.cpp \
+  libs/cssys/general/printf.cpp \
+  libs/cssys/general/getopt.cpp
 
 # The C compiler.
 CC=ee-g++ -c

@@ -20,7 +20,9 @@
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#include "cssys/system.h"
 #include "NeXTLoadLibrary.h"
+#include <sys/param.h>
 
 //-----------------------------------------------------------------------------
 // csFindLoadLibrary
@@ -31,7 +33,11 @@ csLibraryHandle csFindLoadLibrary(char const* name)
   if (!initialized)
   {
     initialized = true;
+    char path[ MAXPATHLEN ];
+    csSystemDriver::InstallPath(path, sizeof(path));
+    strcat(path, OS_NEXT_PLUGIN_DIR);
     csAddLibraryPath(OS_NEXT_PLUGIN_DIR);
+    csAddLibraryPath(path);
   }
   return csFindLoadLibrary(0, name, OS_NEXT_PLUGIN_EXT);
 }
