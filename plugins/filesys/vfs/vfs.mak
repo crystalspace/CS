@@ -44,7 +44,7 @@ endif
 INC.VFS = $(wildcard plugins/filesys/vfs/*.h)
 SRC.VFS = $(wildcard plugins/filesys/vfs/*.cpp)
 OBJ.VFS = $(addprefix $(OUT),$(notdir $(SRC.VFS:.cpp=$O)))
-DEP.VFS = CSSYS CSUTIL
+DEP.VFS = CSSYS CSUTIL CSSYS
 CFG.VFS = vfs.cfg
 
 TO_INSTALL.ROOT += $(CFG.VFS)
