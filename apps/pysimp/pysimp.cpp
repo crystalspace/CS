@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     
-    pysimp - A simple application demonstraing the usage of the ode physic
+    pysimp - A simple application demonstraing the usage of the python
     plugin.
 */
 
