@@ -81,6 +81,7 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactory::eiParticlesFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iParticlesFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iParticlesStateBase)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csParticlesFactory::csParticlesFactory (csParticlesType* p,
@@ -151,6 +152,7 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiParticlesObjectState)
   SCF_IMPLEMENTS_INTERFACE (iParticlesObjectState)
+  SCF_IMPLEMENTS_INTERFACE (iParticlesStateBase)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiObjectModel)
