@@ -1726,7 +1726,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [CGcontext c = cgCreateContext()])],
 	[], [], [], [],
 	[$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs],
-	[cg Cg CG])
+	[cg CG])
 
     AS_IF([test $cs_cv_libCg = yes],
 	[CS_CHECK_LIB_WITH([CgGL],
@@ -1739,7 +1739,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
-	    [cggl cgGL CgGL CGGL])])])
+	    [cggl cgGL CGGL])])])
 
 CS_CHECK_LIBCG
 

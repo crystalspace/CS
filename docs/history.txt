@@ -19,6 +19,10 @@ chronological order.
 	  "aliases" feature of CS_CHECK_LIB_WITH().
 	- res added another alias for Cg resp. CgGL: the Linux Cg libs use a
 	  mixed case 'Cg' in the names.
+	- Eric Sunshine reverted Frank's last change to the Cg and CgGL checks.
+	  The "Cg" and "CgGL" capitalizations are already accounted for by the
+	  first argument of CS_CHECK_LIB_WITH(), which is the library's most
+	  common name.
 11-Mar-2004
 	- Eric Sunshine performed an overhaul of the "Creating an External
 	  Crystal Space Application" HOWTO since it was extremely outdated.
