@@ -651,6 +651,7 @@ PREDEFINED             = CS_COMPILER_GCC \
 			 "CS_CSTOOL_EXPORT=" \
 			 "CS_CSUTIL_EXPORT=" \
 			 "CS_CSWS_EXPORT=" \
+			 "CS_CSPLUGINCOMMON_EXPORT=" \
 			 "SCF_VERSION(a,b,c,d)=" \
 			 "csArrayTemplate(K)=template <class K>" \
 			 "csArrayCmpDecl(T1,T2)=csArrayCmp<T1,T2>" \
