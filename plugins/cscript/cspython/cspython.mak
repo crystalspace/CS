@@ -75,7 +75,7 @@ INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
 SRC.CSPYTHON = \
   $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON))
 OBJ.CSPYTHON = $(addprefix $(OUT),$(notdir $(SRC.CSPYTHON:.cpp=$O)))
-DEP.CSPYTHON = CSGEOM CSSYS CSUTIL CSSYS
+DEP.CSPYTHON = CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSPYTHON
 DSP.CSPYTHON.NAME = cspython

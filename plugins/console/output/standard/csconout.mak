@@ -38,7 +38,7 @@ endif
 INC.CSCONOUT = $(wildcard plugins/console/output/standard/*.h)
 SRC.CSCONOUT = $(wildcard plugins/console/output/standard/*.cpp)
 OBJ.CSCONOUT = $(addprefix $(OUT),$(notdir $(SRC.CSCONOUT:.cpp=$O)))
-DEP.CSCONOUT = CSUTIL CSGEOM CSSYS
+DEP.CSCONOUT = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += CSCONOUT
 DSP.CSCONOUT.NAME = csconout

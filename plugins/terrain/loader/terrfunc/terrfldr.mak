@@ -38,7 +38,7 @@ endif
 INC.TERRFLDR = $(wildcard plugins/terrain/loader/terrfunc/*.h)
 SRC.TERRFLDR = $(wildcard plugins/terrain/loader/terrfunc/*.cpp)
 OBJ.TERRFLDR = $(addprefix $(OUT),$(notdir $(SRC.TERRFLDR:.cpp=$O)))
-DEP.TERRFLDR = CSGEOM CSUTIL CSSYS
+DEP.TERRFLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += TERRFLDR
 DSP.TERRFLDR.NAME = terrfldr

@@ -41,7 +41,7 @@ INC.DDG = $(wildcard plugins/terrain/object/ddg/*.h \
 SRC.DDG = $(wildcard plugins/terrain/object/ddg/*.cpp \
   plugins/terrain/object/ddg/*/*.cpp)
 OBJ.DDG = $(addprefix $(OUT),$(notdir $(SRC.DDG:.cpp=$O)))
-DEP.DDG = CSGEOM CSUTIL CSSYS
+DEP.DDG = CSGEOM CSUTIL CSSYS CSUTIL
 CFLAGS.DDG = $(CFLAGS.I)plugins/terrain/object/ddg
 
 MSVC.DSP += DDG

@@ -44,7 +44,7 @@ endif
 INC.SOCKET = $(wildcard plugins/net/driver/socket/*.h)
 SRC.SOCKET = $(wildcard plugins/net/driver/socket/*.cpp)
 OBJ.SOCKET = $(addprefix $(OUT),$(notdir $(SRC.SOCKET:.cpp=$O)))
-DEP.SOCKET = CSSYS CSUTIL
+DEP.SOCKET = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SOCKET
 DSP.SOCKET.NAME = cssocket

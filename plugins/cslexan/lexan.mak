@@ -41,7 +41,7 @@ endif
 INC.LEXAN = $(wildcard plugins/cslexan/*.h)
 SRC.LEXAN = $(wildcard plugins/cslexan/*.cpp)
 OBJ.LEXAN = $(addprefix $(OUT),$(notdir $(SRC.LEXAN:.cpp=$O)))
-DEP.LEXAN = CSUTIL CSSYS
+DEP.LEXAN = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += LEXAN
 DSP.LEXAN.NAME = cslexan

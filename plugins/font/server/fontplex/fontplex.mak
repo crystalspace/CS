@@ -37,7 +37,7 @@ endif
 INC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.h)
 SRC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.cpp)
 OBJ.FONTPLEX = $(addprefix $(OUT),$(notdir $(SRC.FONTPLEX:.cpp=$O)))
-DEP.FONTPLEX = CSUTIL CSSYS
+DEP.FONTPLEX = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FONTPLEX
 DSP.FONTPLEX.NAME = fontplex

@@ -45,7 +45,7 @@ endif
 INC.SEQUENCE = $(wildcard plugins/sequence/*.h)
 SRC.SEQUENCE = $(wildcard plugins/sequence/*.cpp)
 OBJ.SEQUENCE = $(addprefix $(OUT),$(notdir $(SRC.SEQUENCE:.cpp=$O)))
-DEP.SEQUENCE = CSGEOM CSSYS CSUTIL
+DEP.SEQUENCE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SEQUENCE
 DSP.SEQUENCE.NAME = sequence

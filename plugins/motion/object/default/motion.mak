@@ -42,7 +42,7 @@ endif
 INC.MOTION = $(wildcard plugins/motion/object/default/*.h)
 SRC.MOTION = $(wildcard plugins/motion/object/default/*.cpp)
 OBJ.MOTION = $(addprefix $(OUT),$(notdir $(SRC.MOTION:.cpp=$O)))
-DEP.MOTION = CSGEOM CSSYS CSUTIL
+DEP.MOTION = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += MOTION
 DSP.MOTION.NAME = motion

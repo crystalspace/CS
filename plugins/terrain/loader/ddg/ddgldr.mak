@@ -38,7 +38,7 @@ endif
 INC.DDGLDR = $(wildcard plugins/terrain/loader/ddg/*.h)
 SRC.DDGLDR = $(wildcard plugins/terrain/loader/ddg/*.cpp)
 OBJ.DDGLDR = $(addprefix $(OUT),$(notdir $(SRC.DDGLDR:.cpp=$O)))
-DEP.DDGLDR = CSGEOM CSUTIL CSSYS
+DEP.DDGLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += DDGLDR
 DSP.DDGLDR.NAME = ddgldr

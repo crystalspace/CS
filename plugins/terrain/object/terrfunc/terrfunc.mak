@@ -38,7 +38,7 @@ endif
 INC.TERRFUNC = $(wildcard plugins/terrain/object/terrfunc/*.h)
 SRC.TERRFUNC = $(wildcard plugins/terrain/object/terrfunc/*.cpp)
 OBJ.TERRFUNC = $(addprefix $(OUT),$(notdir $(SRC.TERRFUNC:.cpp=$O)))
-DEP.TERRFUNC = CSGEOM CSUTIL CSSYS
+DEP.TERRFUNC = CSGEOM CSUTIL CSSYS CSUTIL
 CFLAGS.TERRFUNC = $(CFLAGS.I)plugins/terrain/object/terrfunc
 
 MSVC.DSP += TERRFUNC
