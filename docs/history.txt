@@ -1,8 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+6-Oct-2002
+	- Eric Sunshine upgraded CS/docs/texinfo/texinfo.tex to the most recent
+	  version.
 4-Oct-2002
-        - Jonathan Tarbox added a SquaredNorm() member function to the csDVector
-          class
+        - Jonathan Tarbox added a SquaredNorm() member function to the
+          csDVector class
 	- Eric Sunshine eliminated volumes of compilation warnings throughout
 	  the project.
 	- Updated faq related to smart pointers and added new entry about
