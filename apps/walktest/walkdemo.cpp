@@ -132,7 +132,7 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0));
     exp->MoveToSector (sector);
-    exp->SetColor (csColor (.25,.25,.25));
+    exp->SetColor (csColor (.35,.35,.35));
   }
 }
 
