@@ -6,7 +6,7 @@
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
 @copyright{} 1999, 2000, 2001, 2002, 2003, 2004 by Eric Sunshine.  Last updated
-30 April 2004.}
+2 May 2004.}
 
 Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
 comments about this port, please contact Eric Sunshine at
@@ -41,7 +41,7 @@ Space, and jump directly to the section explaining how to run the applications
 @subsubsection Library Prerequisites
 
 In addition to obtaining the project source code (@pxref{Where to Get}), you
-may also need to download and compile several support libraries used for image
+may also want to download and compile several support libraries used for image
 manipulation (@pxref{External Libraries}).  The libraries @samp{libpng} and
 @samp{libjpeg}, which are present on many Unix installations, are absent from
 MacOS/X.  The optional @samp{libmng} is less common.
@@ -151,6 +151,16 @@ snapshots, are packaged with Unix line-terminators, which are acceptable on all
 supported platforms.  These virgin packages themselves can be transported
 between Windows and MacOS/X safely
 
+Crystal Space can be built from the command-line (Terminal.app) using either
+@file{make} or Jam (@pxref{GettingJam}).  Both tools work equally well.  In the
+examples below, wherever @samp{make -k} is used, you can instead substitute
+@file{jam} if you so desire.  @emph{Note}: Apple ships a very old and
+highly modified version of Jam with MacOS/X which is unsuitable for building
+Crystal Space.  If this is the only Jam which you have installed, then just
+build Crystal Space using @file{make}.  Alternately, you may download and
+install a more recent version of Jam (@pxref{GettingJam}). Jam might also be
+available via Fink (though it was not at the time of this writing).
+
 The Crystal Space project consists of a number of components and example
 programs.  The following commands are all issued from within the top level
 Crystal Space source code directory named @file{CS}.
@@ -185,6 +195,17 @@ For a full list of configuration options, type:
 ./configure --help
 @end example
 
+If the Crystal Space source directory is read-only, if it is shared between
+several developers, or if you simply dislike building a project within its
+source tree, you can instead configure and build from a different directory.
+For instance:
+
+@example
+mkdir $HOME/builddir
+cd $HOME/builddir
+/path/to/CS/configure --enable-debug
+@end example
+
 Once the project has been configured, you can begin building the Crystal Space
 demonstration programs.  Alternately, if you are interested in building only
 certain components of the system, such as drivers or libraries, then you can do
@@ -201,6 +222,12 @@ drivers, and plug-in modules is to invoke the makefile target @samp{all}:
 
 @example
 make -k all
+@end example
+
+Alternately, if you are using Jam:
+
+@example
+jam all
 @end example
 
 This can be a fairly time consuming operation.  If you would like to be more
@@ -233,20 +260,27 @@ All programs require at least some plug-in modules to be present, so be sure to
 build those, as well, by invoking the @samp{plugins} makefile target as
 illustrated above if you have not already invoked the @samp{all} target.
 
-Once you have built the project, you may want to install it as a @emph{software
-development kit} (@sc{sdk}).  The installation phase installs everything needed
-to create your own programs using Crystal Space.  Some resources, such as
-demonstration applications and certain data files are not installed since they
-are not required for development.  Installing the @sc{sdk} is optional.  If you
-simply wish to run the example programs, then you need not invoke the
-installation phase.
+Once you have built the project, you will probably want to install it as a
+@dfn{software development kit} (@sc{sdk}).  The installation phase installs
+everything needed to create your own programs using Crystal Space.  Some
+resources, such as demonstration applications and certain data files are not
+installed since they are not required for development.  Installing the @sc{sdk}
+is optional, though recommended.  If you simply wish to run the example
+programs, then you need not invoke the installation phase.
 
 By default, Crystal Space is installed in @file{/usr/local/crystal}, however
-you can specify a different location when you configure the makefiles, as
+you can specify a different location when you configure the project, as
 explained above.  Installation can be performed with the following command:
 
 @example
 make install
+@end example
+
+Once you have installed the project, you can release disk space used by the
+build process:
+
+@example
+make distclean
 @end example
 
 @node MacOS/X Running Programs, , MacOS/X Building, MacOS/X

@@ -6,7 +6,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 4 February 2004.}
+@emph{Last updated 3 May 2004.}
 
 In order to successfully compile the Crystal Space 3D Software Development
 Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio 6}
@@ -72,23 +72,6 @@ include files and libraries and being that we wish Visual C++ to see and use
 this new @sc{sdk} before all possible others on your system, you must click on
 and drag both paths you have entered to the top of the list.
 
-@subsubheading Simple Direct Media Layer - Optional
-
-Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
-can be used as an alternative to the default Direct Draw canvas for use with
-the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
-have the supported 1.2.3 development runtime for your version of @sc{msvc} be
-it 5 or 6.  Please remember to add the @file{include} and @file{lib}
-directories to the global @sc{msvc} options, so @sc{msvc} can see them.
-
-@uref{http://www.libsdl.org}
-
-Also remember to copy the @file{sdl.dll} into the @file{CS\} root directory
-or add it to your systems path before using the SDL2D canvas.
-
-For instructions on using a specific canvas including
-the @sc{sdl2d} canvas @ref{Common Command Line Options}
-
 @subsubheading Python - Optional
 
 Crystal Space contains support for Python scripting and thus has projects
@@ -98,36 +81,6 @@ compiler can see those files.  If you wish to compile with Python support you
 must install Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
-
-@subsubheading Creative @sc{eax} 2.0 - Optional
-
-In order to build the Crytal Space @sc{eax} 2.0 environmental audio plugin
-(@emph{plgsndrdreax}), requires you have the @sc{eax} 2.0 @sc{sdk} on your
-system.  The @sc{sdk} can be obtained from the following location:
-
-@noindent
-@ifnottex
-@uref{http://developer.creative.com/articles/article.asp?cat=1&sbcat=31&top=37&aid=61&file=EAX20SDK.exe}
-@end ifnottex
-@iftex
-@code{http://developer.creative.com/articles/article.asp?}@*
-@code{cat=1&sbcat=31&top=37&aid=61&file=EAX20SDK.exe}
-@end iftex
-
-@noindent
-Developer documentation for @sc{eax} 2.0 can be found here:
-
-@noindent
-@ifnottex
-@uref{http://developer.creative.com/articles/article.asp?cat=1&sbcat=31&top=37&aid=62&file=EAX20ext.pdf}
-@end ifnottex
-@iftex
-@code{http://developer.creative.com/articles/article.asp?}@*
-@code{cat=1&sbcat=31&top=37&aid=62&file=EAX20ext.pdf}
-@end iftex
-
-After installation you will need to point @sc{msvc} to the @sc{sdk}'s include
-and lib paths.
 
 @subsubheading Compiling Crystal Space
 
@@ -209,10 +162,6 @@ Crystal Space.
 @file{wksall.dsw} --- Builds all modules, even the experimental ones.
 
 @item
-@file{wkswalkall.dsw} --- Builds Walktest and the plugin modules most often
-needed by Walktest.
-
-@item
 @file{wksnewrenderer.dsw} --- Same as @file{wkstypical.dsw}, but builds the new
 experimental renderer, rather than the old one.  When using this workspace, you
 also need to select either the @emph{Release_NR} or @emph{Debug_NR} build mode,
@@ -225,7 +174,7 @@ The workspace uses a prefix system for naming contained projects:
 @item
 @file{app} --- Prefixes application projects.
 @item
-@file{lib} --- Prefixes static library projects.
+@file{lib} --- Prefixes library projects.
 @item
 @file{plg} --- Prefixes plugin module projects.
 @item
@@ -250,41 +199,9 @@ produce @file{.exe} files.
 
 @subsubheading Compiling Your Own Program Using Crystal Space
 
-It is assumed that you have set up @sc{msvc} projects before.  If you want to
-create a project using Crystal Space, you have two possibilities how to do
-this: You can either create the project inside the Crystal Space workspace, or
-you can create a new workspace.  Either way, you have to do the usual setup,
-like adding the source files.  In addition to this, you must perform the
-following steps.
-
-@itemize @bullet
-@item
-Set the output path to the @file{CS\} root directory.  Any Crystal Space
-application must be executed in this directory.  If you want to run it in
-another directory, you must copy the file @file{vfs.cfg}, the data directory
-and all plugins (@file{.dll}) into this new directory, or set the CRYSTAL
-environment variable to point at your Crystal Space directory.
-
-@item
-Set the include paths.  Simply open one of the application projects coming with
-Crystal Space, for example WalkTest, select @emph{Project Settings/C/C++} and
-copy all command line options that look like this: @samp{/I "../../anything"}.
-
-@item
-Add the Crystal Space libraries.  If you are using the Crystal Space workspace,
-simply add dependencies to the Crystal Space projects.  Otherwise you have to
-link to the @file{.lib} files.  To do this, either add these files to the
-project like source files or add them as command line options in @emph{Project
-Settings/C/C++}.  Note that if you add them like source files, you may wish
-to add the release libraries to a @emph{Release} folder and the debug libs to
-a @emph{Debug} folder, and disable each of these
-(@emph{Project Settings/General}) for the opposite type of build.
-
-@item
-Add external libraries (@file{zlib}, @file{libjpeg}, @file{DirectX}, ...).
-They can be added just like the Crystal Space libraries, except that you can
-not use project dependencies.
-@end itemize
+There is a @sc{howto} which explains how to create an @sc{msvc6} project file
+for your own program which utilizes Crystal Space.
+@xref{HOWTO Creating External MSVC 6 Application}.
 
 @subsubheading Frequently Asked Questions (@sc{faq})
 @anchor{MSVC6 FAQ}

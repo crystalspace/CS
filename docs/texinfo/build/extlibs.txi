@@ -2,43 +2,48 @@
 @node External Libraries, Platform Instructions, Requirements, Building
 @section External Libraries
 
-Crystal Space relies upon several external, and publicly available
+Crystal Space may utilize several optional external, and publicly available
 development libraries.  These libraries are:
 
 @itemize @bullet
 @item
-@code{zlib}
+zlib
 @item
-@code{libpng}
+libpng
 @item
-@code{libjpeg}
+libjpeg
 @item
 Freetype2
 @item
 @sc{ode}
 @item
-@code{lib3ds}
+Cal3D
 @item
-Ogg Vorbis libraries
+lib3ds
 @item
-@code{libmng}
+Ogg/Vorbis
+@item
+libmng
 @item
 MikMod
 @end itemize
 
-Many computer systems come with these libraries pre-installed.
-If the libraries are not already available on your system, then see the
-following sections for information about how to obtain them.
-
-Note that all libraries except @code{zlib} are optional. CrystalSpace will
-compile and work, but not all plugins will be available.
+Most of these libraries are optional.  If you do not have them installed, then
+Crystal Space will still function, though features related to the missing
+libraries will be disabled.  Despite being optional, at the very minimum, you
+should at least ensure that zlib, libpng, and libjpeg are installed since much
+useful functionality depends upon those libraries.  Many computer systems come
+with these libraries pre-installed.  If the libraries are not already available
+on your system, then see the following sections for information about how to
+obtain them.
 
 @subheading The ``cs-win32libs'' Package
 @anchor{cs-win32libs}
 
-Microsoft Visual C++ 6 and above, MinGW/MSYS and Cygwin users can download a 
-single package which contains all headers, pre-built library files, and dynamic 
-link libraries in pre-compiled form from the following location:
+Rather than having to install these components manually, Microsoft Visual C++ 6
+& 7, MinGW/MSYS, and Cygwin users can download a single package which contains
+all common headers, pre-built library files, and dynamic link libraries in
+pre-compiled form from the following location:
 
 @noindent
 @ifnottex
@@ -54,8 +59,8 @@ link libraries in pre-compiled form from the following location:
 @cindex Libraries, zlib
 @cindex Compression library, zlib
 
-Crystal Space relies upon the @code{zlib} library for reading @sc{zip} files.
-You can download @code{zlib} from:
+Crystal Space relies upon the @code{zlib} library for reading @sc{zip} files,
+and for a few other uses.  You can download @code{zlib} from:
 
 @noindent
 @uref{http://www.gzip.org/zlib/}
@@ -99,7 +104,7 @@ if you have permission to do so, it is best to install the library.
 @cindex Freetype2
 @cindex Libraries, Freetype2
 
-Crystal Space can utilize the Freetype2 library to display TrueType fonts. You
+Crystal Space can utilize the FreeType2 library to display TrueType fonts. You
 can get the latest version at:
 
 @noindent
@@ -116,11 +121,11 @@ the latest version at:
 @noindent
 @uref{http://opende.sourceforge.net/download.html}
 
-@subheading Ogg Vorbis libraries
-@cindex Ogg Vorbis
-@cindex Libraries, Ogg Vorbis
+@subheading Ogg/Vorbis libraries
+@cindex Ogg/Vorbis
+@cindex Libraries, Ogg/Vorbis
 
-With this libraries you can use the Ogg Vorbis sound plugin. You can get the
+With this libraries you can use the Ogg/Vorbis sound plugin. You can get the
 latest version at:
 
 @noindent
@@ -129,10 +134,10 @@ latest version at:
 @subheading libmng
 @cindex libmng
 @cindex Libraries, libmng
-@cindex MNG/JNG library
+@cindex @sc{mng}/@sc{jng} library
 
 Crystal Space can optionally utilize the @code{libmng} library for reading
-MNG/JNG graphic files.  You can download @code{libmng} from:
+@sc{mng}/@sc{jng} graphic files.  You can download @code{libmng} from:
 
 @noindent
 @uref{http://www.libmng.com/downloadpublic.html}

@@ -98,15 +98,13 @@ here:
 @url{http://crystal.sourceforge.net/docs/online/api/}
 
 In addition, all of the above documents may be downloaded for offline viewing
-from the following location.  They are packaged with a variety of compression
-technologies, including @sc{bzip2}, @sc{gzip}, and @sc{zip}.
+from the following location.
 
 @url{http://crystal.sourceforge.net/docs/download/}
 
 @noindent
-Currently these documents are only available in @sc{html} format, but may 
-be available as @sc{pdf}, PostScript, @sc{dvi}, and possibly other 
-formats in the near future.
+The downloadable documentation may be available in a number of formats.  At the
+very least, it will be available as @sc{html}.
 
 Developers can generate their own copies of these manuals from the
 Crystal Space source package by invoking certain makefile targets.  The
@@ -119,16 +117,14 @@ Reference Manual} can be converted to @sc{html} format by invoking the
 @samp{apihtml} and @samp{apidevhtml} makefile targets, respectively.
 
 These makefile targets place the generated output in appropriately named
-subdirectories of @file{$@{builddir@}/out/docs}.  The hierarchy of
-subdirectories mirrors that of @file{CS/docs} where the master copies of these
-documents are kept.
+subdirectories of @file{$@{builddir@}/out/docs}.
 
 @node Mailing Lists, Internet Relay Chat (IRC), Where to Get, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
 
-There are four mailing lists for the Crystal Space project which may be of
-interest to users and developers.
+There are several mailing lists for Crystal Space which may be of interest to
+users and developers.
 
 The discussion list used for general and in-depth discussion of Crystal Space
 and related projects.
@@ -141,6 +137,18 @@ follow the instructions there.  This page also contains instructions for
 unsubscribing.
 
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main/}
+
+The list for developers and others interested in discussion about actual
+implementation and design.
+
+@noindent
+Mailing List: @email{crystal-develop@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-develop/}
 
 The announcement list is for people interested in being notified of
 important announcements which affect the Crystal Space community, such as
@@ -159,6 +167,8 @@ People who are interested in being notified of changes which are made to
 Crystal Space's @sc{cvs} repository can subscribe to the @sc{cvs}
 notification list.  A notification message is sent to members of this list
 each time a change is made to the resources within the @sc{cvs} repository.
+This is an excellent resource for keeping up-to-date with regards to changes
+to the project. Please consider subscribing.
 
 @noindent
 Mailing List: @email{crystal-cvs@@lists.sourceforge.net}.
@@ -182,6 +192,19 @@ unsubscribing.
 
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-docs/}
 
+The @emph{tracker} mailing list receives notifications each time a change is
+made to one of the Crystal Space tracker databases, such as ``Bugs'', ``Feature
+Requests'', etc., at SourceForge.
+
+@noindent
+Mailing List: @email{crystal-tracker@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there. This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-tracker/}
+
 @node Internet Relay Chat (IRC), Feedback, Mailing Lists, CS Introduction
 @section Internet Relay Chat (@sc{irc})
 @cindex Internet Relay Chat (@sc{irc})
@@ -191,10 +214,10 @@ The Crystal Space developers are often available online for live chat via the
 Internet Relay Chat (@sc{irc}) system.  If you are unfamiliar with @sc{irc}, a
 good place to learn about it is @uref{http://irchelp.org/}.  The Crystal
 Space developers inhabit a channel named @code{#CrystalSpace} on the FreeNode
-Network (@sc{FreeNode}). You can find more information about @sc{FreeNode} at
+Network. You can find more information about FreeNode at
 @uref{http://freenode.net/}, including a list of servers. There are a few
-redirection servers that you should be able to connect to right away. Try
-connecting to one located close (geographically) to you for the least lag.
+redirection servers to which you should be able to connect right away. Try
+connecting to one located closest (geographically) to you for the least lag.
 
 @example
 irc.au.freenode.net

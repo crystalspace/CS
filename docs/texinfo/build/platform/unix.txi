@@ -25,15 +25,9 @@ between Windows and Unix safely
 
 @subsubheading Compiling on Unix
 
-The makefiles require @sc{gnu} make, which is typically named @file{make} on
-most systems. If this is not the case then substitute @file{gmake},
-@file{gnumake} or whatever @sc{gnu} make is called on your system. It is
-@emph{not} possible to build Crystal Space using any other make program. If you
-do not have a suitable make program, then you can instead build the project
-with Jam, which is available from:
-
-@noindent
-@uref{ftp://ftp.perforce.com/jam}
+Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
+Both tools work equally well.  In the examples below, wherever @samp{make -k}
+is used, you can instead substitute @file{jam} if you so desire.
 
 You first need to configure the project for your platform.  You do this
 by running the configuration script.  For example, from within the @file{CS}
@@ -56,14 +50,15 @@ For a list of useful configuration options, invoke:
 ./configure --help=short
 @end example
 
-You can optionally invoke the @samp{depend} make target to ensure that all
-build-time dependencies are correct.  This is only important if you intend to
-make changes to the Crystal Space sources and want to be sure that all files
-will be recompiled that are in need of recompilation.  You can, however, can
-safely omit this step if desired.
+If the Crystal Space source directory is read-only, if it is shared between
+several developers, or if you simply dislike building a project within its
+source tree, you can instead configure and build from a different directory.
+For instance:
 
 @example
-make depend
+mkdir $HOME/builddir
+cd $HOME/builddir
+/path/to/CS/configure --enable-debug
 @end example
 
 Now, you can actually build the entire project:
@@ -72,12 +67,27 @@ Now, you can actually build the entire project:
 make -k all
 @end example
 
+Alternately, if you have Jam installed:
+
+@example
+jam all
+@end example
+
 The build process will create an executable for each demonstration program or
-tool, and a dynamic-load-library for each plugin modules (with extension
-@file{*.so} on Linux and most Unix platforms).  Plugin modules include 3D
+tool, and a dynamic-load-library for each plugin module (with extension
+@file{.so} on Linux and most Unix platforms).  Plugin modules include 3D
 renderers, 2D canvases, 3D engine, isometric engine, etc.
 
-You can now run the executable @file{walktest}.
+Finally, if you want to utilize Crystal Space as a software development kit
+(@sc{sdk}), you can install it and then clean up the detritus of the build
+process:
+
+@example
+make install
+make distclean
+@end example
+
+You can now try running the @file{walktest} demonstration. @xref{Quick Start}.
 
 @subsubheading Renderer Selection
 
@@ -99,12 +109,3 @@ Alternately, you can choose the software renderer from the command-line:
 
 The software renderer interacts with X11, placing output on the display
 indicated by the @samp{DISPLAY} environment variable.
-
-Finally, if you want to utilize Crystal Space as a software development kit
-(@sc{sdk}), you can install it and then clean up the detritus of the build
-process:
-
-@example
-make install
-make distclean
-@end example

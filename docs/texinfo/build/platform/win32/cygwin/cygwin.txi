@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 20 Janurary 2004.}
+@emph{Last updated 3 May 2004.}
 
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
 compiler for Windows created by Red Hat Inc. and other third party
@@ -15,7 +15,11 @@ contributors.
 
 A full or extensive Cygwin installation can take up alot of hard disk space.
 Please be careful if installing on low free space disks.  A typical install can
-be around 400@sc{mb} and large above 700@sc{mb}.
+be around 400@sc{mb} and large above 700@sc{mb}.  Note, however, that a full
+installation of Cygwin is not required for building Crystal Space.  It is
+possible to get by with a fairly minimal installation consisting of the
+@sc{gcc} compiler and linker suite and related tools, and several support
+libraries as discussed below.
 
 @subsubheading Obtaining Cygwin
 
@@ -25,8 +29,7 @@ obtained from their official website.
 @noindent
 @uref{http://www.cygin.com/}
 
-The installation program @file{setup.exe} must be downloaded to your system.
-You can download it using the following link:
+The installation program @file{setup.exe} must be downloaded to your computer.
 
 @noindent
 @uref{http://www.cygwin.com/setup.exe}
@@ -42,7 +45,7 @@ Cygwin packages.
 @picturessss{build,platform,win32,cygwin,cygshot1}
 
 @end ifnotinfo
-Click/double click on @file{setup.exe} icon to begin the installation process.
+Launch @file{setup.exe} to begin the installation process.
 
 You will first be prompted with a Cygwin welcome dialog.  It provides basic
 information about the setup program, such as its version number.
@@ -55,13 +58,13 @@ Click on the @emph{Next} button to continue.
 
 The next dialog you will see is the @emph{Choose a Download Source} dialog.
 Here you need to choose if you wish to download and install directly from the
-internet or download to your system so you can install it later.  Cygwin, like
-Linux, can install, uninstall, and update using this program.  So, the decision
+internet or download to your system so you can install it later.  Cygwin
+can install, uninstall, and update using this program.  So, the decision
 is whether or not you want to download and keep the downloaded files around in
 order to avoid a large download at a later date if you re-install.  If you have
 a fast Internet connection, then you can download and install directly without
 saving the packages to your disk drive.  This is a matter of personal
-preference which we leave to you.
+preference.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot3}
@@ -82,14 +85,14 @@ other users of that computer to have access to Cygwin.  Also you are asked if
 you wish to use @sc{dos} text file line-ending format (@sc{cr/lf}) or Unix
 format (@sc{lf}).  This is all a matter of preference for the user.  If you are
 a pure Windows users it is suggested that you choose the @sc{dos} option.
-However, if you might move files to a Unix machine, for instance, it might be
+However, if you might move files to a Unix machine, for instance, it could be
 favorable to use the Unix option.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot4}
 
 @end ifnotinfo
-After deciding on a root install location and other options, click on the
+After deciding upon a root install location and other options, click on the
 @emph{Next} button to continue.
 
 The next dialog you will see is the @emph{Select Local Package Directory}
@@ -100,11 +103,11 @@ Cygwin @file{setup.exe} program.
 @picturessss{build,platform,win32,cygwin,cygshot5}
 
 @end ifnotinfo
-If they correspond click on the @emph{Next} button to continue.
+If they correspond, click on the @emph{Next} button to continue.
 
-The next dialog you will see is the @emph{Select Your Internet Connection}
+The next dialog is the @emph{Select Your Internet Connection}
 dialog.  This lets you specify the type of connection you have.  Most of the
-time it will be a @emph{Direct Connection} you have.  However, if you access
+time it will be a @emph{Direct Connection}.  However, if you access
 the Internet via proxy server, then select that option and enter the necessary
 information.
 
@@ -116,16 +119,17 @@ After choosing your internet connection type, click on the @emph{Next} button
 to continue.
 
 The next dialog you will see is the @emph{Choose A Download Site} dialog.
-Choose a download location in or as close to your own country as possible.
+Choose a download location in or as close to your own geographical location as
+possible.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot7}
 
 @end ifnotinfo
-After choosing the closest download location, click on the @emph{Next} button
+After choosing the closest download site, click on the @emph{Next} button
 to continue.
 
-The next dialog you will see is the @emph{Select Packages To Install} dialog.
+The next dialog is the @emph{Select Packages To Install} dialog.
 This shows a tree with selectable packages in the branches.  If you have
 sufficient disk space and a high-speed Internet connection, you may wish to
 install the majority of the tools.  On the other hand, if you want to install
@@ -142,7 +146,7 @@ Note: You do not need to install the @emph{Apache server}, @emph{XFree} or
 simply repeat the install process and install the package(s) you missed.
 
 Important: The above @emph{Select Packages To Install} section is subject to
-change.
+change as Cygwin makes additional packages available.
 
 After choosing the packages for installing, click on the @emph{Next} button to
 continue.
@@ -150,7 +154,7 @@ continue.
 At this point the installer will download and install the selected packages and
 perform post build steps, such as the generation of documentation, etc.
 
-The next dialog you will see is the @emph{Create Icons} dialog.  If you are
+The next dialog is the @emph{Create Icons} dialog.  If you are
 performing a fresh install and want these icons, then check the boxes.  If you
 are updating you need not check the boxes if you already have the icons.
 
@@ -160,30 +164,31 @@ are updating you need not check the boxes if you already have the icons.
 @end ifnotinfo
 After making your selection, click on the @emph{Finish} button to continue.
 
-After all this you will be prompted with a dialog to tell you that the
+After all this, you will be prompted with a dialog to tell you that the
 installation is complete.  Click on the @emph{Ok} button to finish the
 installation process.
 
-@subsubheading Using cs-win32libs
+@subsubheading Using ``cs-win32libs''
 
 You can use the ``cs-win32libs'' package to obtain the third-party libraries
 to build Crystal Space.  @xref{cs-win32libs}.
 
-You may want to select ``Cygwin typical'' in the ``Select Components'' screen. 
-You can further adjust the selection of installed components depending on your 
-actual set up (e.g. install MinGW-related components if you plan to also use 
-CrystalSpace with MinGW/MSYS).
+You may want to select ``Cygwin typical'' in the ``Select Components'' screen
+when installing @file{cs-win32libs}.  You can further adjust the selection of
+installed components depending upon your actual set up (e.g. install
+MinGW-related components if you plan to also use CrystalSpace with MinGW/MSYS).
 
-After the installation, when support for the Cygwin development environment 
-was opted to be installed, the Cygwin shell startup file will be augmented 
-so a helper script named ``cslibs-config'' can be found when building Crystal 
-Space, causing the contained library and header files to be used.
+After the installation, if you opted to set up support for the Cygwin
+development environment, the Cygwin shell startup file will be augmented so a
+helper script named @file{cslibs-config} can be found when configuring Crystal
+Space.  The Crystal Space configure script queries @file{cslibs-config} to
+determine where the @file{cs-win32libs} resources are located.
 
-Alternatively, you can also use the @code{zlib}, @code{libpng} and 
-@code{libjpg} versions that are shipped with Cygwin and compile the remaining
-third-party libraries yourself.  In this case, follow the instructions in the
-next paragraphs; otherwise, you can skip to the paragraph 
-``Building Crystal Space''.
+Alternatively, you can use the @code{zlib}, @code{libpng} and @code{libjpg}
+libraries which ship with Cygwin and compile the remaining third-party
+libraries yourself.  In this case, follow the instructions in the following
+sections; otherwise, you can skip to the section
+@ref{Cygwin: Building Crystal Space}.
 
 @subsubheading Installing DirectX 8 @sc{sdk} for Cygwin
 
@@ -201,19 +206,19 @@ type @samp{make install}.
 @subsubheading Open Dynamics Engine (required for physics plugin)
 
 The Open Dynamics Engine library is required for successful compilation of the
-Crystal Space @sc{ode} physics plugin.  You can obtain the latest source tar
-ball via the web link below.
+Crystal Space @sc{ode} physics plugin.  You can obtain the latest source
+archive at:
 
 @noindent
 @uref{http://opende.sourceforge.net/}
 
-In order to successfully compile, you will need to do a couple of things.  Open
-a Cygwin Bash prompt and navigate to where you extracted the files (that is,
-the directory which contains the @file{Makefile}).
+In order to successfully build it, you will need to perform a couple additional
+tasks.  Open a Cygwin Bash prompt and navigate to where you extracted the files
+(that is, the directory which contains the @file{Makefile}).
 
-Sadly, unlike on other platforms, during configuration the @emph{lib} directory
-would be created for you.  However, under Cygwin it will not be, so you must do
-it yourself.  At the command prompt enter the following command and hit return.
+Sadly, though the @file{lib} directory will be created during configuration on
+all other platforms, this will not happen on Cygwin, so you must do it
+yourself.  At the command prompt enter the following command and hit return.
 
 @example
 mkdir lib
@@ -249,7 +254,7 @@ library.
 make ode-lib
 @end example
 
-After once again being returned to the Bash prompt, you can proceed and install
+Again at the Bash prompt, you can proceed and install
 @sc{ode} into Cygwin.  The easiest way to install @sc{ode} is as follows.  Copy
 the @file{lib} and @file{include} directories and paste them into your Cygwin
 @emph{/usr} directory.  You will be prompted about overwriting files, and
@@ -257,9 +262,9 @@ you should just answer @file{Yes to All}.
 
 @subsubheading Installing the @sc{mng} Library (optional)
 
-In order to successfully build the optional @emph{jng} plugin, you must have
-@emph{mng} installed on your system.  You can download it via the following
-link.
+In order to successfully build the optional Crystal Space @emph{jng} plugin,
+you must have libmng installed on your system.  You can download it via the
+following link.
 
 @noindent
 @uref{ftp://sunsite.dk/projects/crystal/support/general/libmng-1.0.4.tar.gz}
@@ -270,40 +275,80 @@ directory which contains the @file{install-sh}).  Next, at the command prompt
 type @samp{make install}.
 
 @subsubheading Building Crystal Space
+@anchor{Cygwin: Building Crystal Space}
+
+Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
+Both tools work equally well.  The @file{cs-win32libs} package contains a
+pre-built version of Jam which you can invoke simply by typing @samp{jam} at
+the Cygwin Bash prompt.  In the examples below, wherever @samp{make -k}
+is used, you can instead substitute @file{jam} if you so desire.
 
 Open a Cygwin Bash prompt via the desktop shortcut or the via item in the
-Programs menu.  Navigate to the @file{CS\} directory and issue the following
+Programs menu.  Navigate to the @file{CS/} directory and issue the following
 commands:
 
 @example
 ./configure
-make depend
 make -k all
 @end example
-
-Note that making the @samp{depend} target is optional and can be omitted if you
-do not plan to make any changes to the Crystal Space source or header files.
 
 The @samp{-k} option used in the @samp{make -k all} command instructs the
 project builder to ignore errors and continue compiling regardless.  This can
 be useful in cases when localized errors appear in the project since often they
 affect only a single module.
 
-Finally, you can install the Crystal Space @sc{sdk} as follows:
+Alternately, if you wish to use Jam to build the project:
+
+@example
+./configure
+jam all
+@end example
+
+If you prefer to build a @dfn{debug} version of Crystal Space, substitute
+the following commands for those shown above:
+
+@example
+./configure --enable-debug
+make -k all
+@end example
+
+If the Crystal Space source directory is read-only, if it is shared between
+several developers, or if you simply dislike building a project within its
+source tree, you can instead configure and build from a different directory.
+For instance:
+
+@example
+mkdir $HOME/builddir
+cd $HOME/builddir
+/path/to/CS/configure --enable-debug
+make -k all
+@end example
+
+Finally, if you want to utilize Crystal Space as a software development kit
+(@sc{sdk}), you can install it and then clean up the detritus of the build
+process:
 
 @example
 make install
+make distclean
 @end example
 
-@subsubheading Additional Command Line Compile Options
+@subsubheading Additional Build Options
 
-You can also insert the @samp{clean} makefile target into the @samp{make}
-command, as follows:
+Sometimes it is a good idea to remove all of the built programs and executable
+files and start from scratch.  You can do this with the following commands:
 
 @example
-make -k clean all
+make clean
+make -k all
 @end example
 
-@noindent
-This will first remove all object files, libraries, etc.  from the
-@file{out\WIN32\X86\debug} directory and then re-build the entire project.
+Once in a while it is even a good idea to completely clean and re-configure the
+project.  This may be required if you are using the bleeding-edge version of
+Crystal Space from the @sc{cvs} repository after some radical change.
+
+@example
+make distclean
+./configure
+make -k all
+@end example

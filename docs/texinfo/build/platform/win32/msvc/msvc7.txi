@@ -6,7 +6,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 4 Feburary 2004.}
+@emph{Last updated 3 May 2004.}
 
 In order to successfully compile the Crystal Space 3D Software Development Kit
 (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio @sc{.net}}
@@ -72,23 +72,6 @@ include files and libraries and being that we wish Visual C++ to see and use
 this new @sc{sdk} before all possible others on your system, you must click on
 and drag both paths you have entered to the top of the list.
 
-@subsubheading Simple Direct Media Layer - Optional
-
-Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
-can be used as an alternative to the default Direct Draw canvas for use with
-the Crystal Space software 3D renderer.  To compile the @sc{sdl2d} canvas you
-must have the supported 1.2.3 development runtime for your version of @sc{msvc}
-be it 5 or 6.  Please remember to add the @file{include} and @file{lib}
-directories to the global @sc{msvc} options, so @sc{msvc} can see them.
-
-@uref{http://www.libsdl.org}
-
-Also remember to copy the @file{sdl.dll} into the @file{CS\} root directory
-or add it to your systems path before using the @sc{sdl2d} canvas.
-
-For instructions on using a specific canvas including
-the @sc{sdl2d} canvas @ref{Common Command Line Options}
-
 @subsubheading Python - Optional
 
 Crystal Space contains support for Python scripting and thus has projects
@@ -103,36 +86,6 @@ must install Python 2.2 or later, which can be obtained from:
 full advantage of the debug elements - you should have Python 2.2.3 or 2.3.0
 installed on your system. Whichever version you decide to use, make sure you
 download the comparable msvc_libs.
-
-@subsubheading Creative @sc{eax} 2.0 - Optional
-
-In order to build the Crystal Space @sc{eax} 2.0 environmental audio plugin
-(@emph{plgsndrdreax}), requires you have the @sc{eax} 2.0 @sc{sdk} on your
-system.  The @sc{sdk} can be obtained from the following location:
-
-@noindent
-@ifnottex
-@uref{http://developer.creative.com/articles/article.asp?cat=1&sbcat=31&top=37&aid=61&file=EAX20SDK.exe}
-@end ifnottex
-@iftex
-@code{http://developer.creative.com/articles/article.asp?}@*
-@code{cat=1&sbcat=31&top=37&aid=61&file=EAX20SDK.exe}
-@end iftex
-
-@noindent
-Developer documentation for @sc{eax} 2.0 can be found here:
-
-@noindent
-@ifnottex
-@uref{http://developer.creative.com/articles/article.asp?cat=1&sbcat=31&top=37&aid=62&file=EAX20ext.pdf}
-@end ifnottex
-@iftex
-@code{http://developer.creative.com/articles/article.asp?}@*
-@code{cat=1&sbcat=31&top=37&aid=62&file=EAX20ext.pdf}
-@end iftex
-
-After installation you will need to point @sc{msvc} to the @sc{sdk}'s include
-and lib paths.
 
 @subsubheading Compiling Crystal Space
 
@@ -202,10 +155,6 @@ Crystal Space.
 @file{wksall.sln} --- Builds all modules, even the experimental ones.
 
 @item
-@file{wkswalkall.sln} --- Builds Walktest and the plugin modules most often
-needed by Walktest.
-
-@item
 @file{wksnewrenderer.sln} --- Same as @file{wkstypical.sln}, but builds the new
 experimental renderer, rather than the old one.  When using this workspace, you
 also need to select either the @emph{Release_NR} or @emph{Debug_NR} build mode,
@@ -218,7 +167,7 @@ The workspace uses a prefix system for naming contained projects:
 @item
 @file{app} --- Prefixes application projects.
 @item
-@file{lib} --- Prefixes static library projects.
+@file{lib} --- Prefixes library projects.
 @item
 @file{plg} --- Prefixes plugin module projects.
 @item
@@ -243,12 +192,16 @@ produce @file{.exe} files.
 
 @subsubheading Compiling Your Own Program Using Crystal Space
 
-@emph{TODO} Point this to the @sc{howto} for creating apps under @sc{msvc7}.
+There is a @sc{howto} which explains how to create an @sc{msvc7} project file
+for your own program which utilizes Crystal Space.
+@xref{HOWTO Creating External MSVC 7 Application}.
 
 @subsubheading Frequently Asked Questions (@sc{faq})
 @anchor{MSVC7 FAQ}
 
-@emph{TODO}
+This is the list of frequently asked questions for the Win32 port of Crystal
+Space.  Please consult this list if you are having difficulty building or using
+the project.
 
 @subsubheading Compilation
 
@@ -268,9 +221,9 @@ remove it before installing the @file{cs-win32libs} package as outlined above.
 Unfortunately, the @file{msvc_libs} package was a simple @sc{zip} file with no
 means of uninstalling whatsoever. However, the header and library files were
 located in the @file{include\cssys\win32} resp. @file{libs\cssys\win32\cssys}
-directories, but as the @code{cssys} library has been merged into @code{csutil},
-CS' files in those directories has been relocated as well, so you can safely 
-remove these directories.
+directories, but as the @code{cssys} library has been merged into
+@code{csutil}, CS' files in those directories has been relocated as well, so
+you can safely remove these directories.
 
 However, the @file{msvc_libs} package also contained a couple of @sc{dll} 
 files, copied to CS' root directory.  To remove them, use the following batch 

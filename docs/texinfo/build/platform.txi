@@ -3,13 +3,11 @@
 @section Platform Specific Instructions
 
 When working with Crystal Space, always keep in mind that this is a
-multiplatform project. Sometimes not all features will work correctly on all
-platforms. Sometimes a specific port may even be broken due to changes in other
-ports. Since the introduction of @sc{cvs}, this is usually only for a short
-time so if you got your version from @sc{cvs}, it usually pays off to post a
-message describing the problems to the Crystal Space mailing list describing
-you problem and include the exact error messages. If you wait a while, this
-will probably be fixed, or at least be worked around. @xref{Mailing Lists}.
+multi-platform project.  Sometimes not all features will work correctly or be
+available on all platforms.  If you are using the @sc{cvs} version of Crystal
+Space and run across a problem, it usually pays off to post a message to the
+Crystal Space mailing list describing you problem along with relevant
+diagnostic messages.  @xref{Mailing Lists}.
 
 For some ports there is additional reference information explaining the
 internal workings of the port. When such detailed information exists, you will

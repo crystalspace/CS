@@ -3,11 +3,7 @@
 @subsection Windows using Microsoft Visual C++ 
 @cindex Windows, Building
 
-Crystal Space currently supports compilation primarily with
-Microsoft Visual C++ 7, but supports the older version 6 as well as the 
-latest version 7.1. 
-Please select the link to the version you wish to compile
-Crystal Space with for info, compile instructions and @sc{faq}.
+Crystal Space can be built with Microsoft Visual C++ 6 and 7.
 
 @menu
 * MSVC6:: Microsoft Visual C++ 6

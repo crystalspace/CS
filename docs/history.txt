@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-May-2004
+	- Eric Sunshine augmented all the "build" instructions in the user
+	  manual to indicate that the project can be built with both Jam and
+	  'make'.  Also added information explaining how to obtain, build, and
+	  install Jam.  Finally, updated much outdated or incorrect information
+	  in the "Introduction" and "Build and Install" chapters.
 2-May-2004
 	- Eric Sunshine changed pubapi.dox so that it no longer excludes
 	  $(TOP)/include/csutil/win32 and csutil/unix.  In the past, these were

@@ -3,93 +3,138 @@
 @section Requirements
 @cindex Requirements
 
-@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org}, on 2002-06-21.}
+To utilize Crystal Space you need at least the following resources.
 
-To utilize Crystal Space you need at least the following resources:
+@strong{Hardware}: To fully utilize the 3D engine a 3D-accelerated graphics
+card is highly recommended, however you can get by without it by using the
+software renderer if you have a fast enough system.  The minimum recommended
+processor on the x86 architecture is one of the i586 family (Pentium).
 
-@itemize @bullet
-@item
-Hardware: To fully utilize the 3D engine a 3D-accelerated graphics card is
-highly recommended. You can get away without it by using the software renderer
-if you have a fast enough system. The minimum recommended processor on the x86
-architecture is one of the i586 family (Pentium).
+@strong{Operating System}: You will need to be running a supported Operating
+System.  Currently Crystal Space supports: Windows (32 bit), Unix (Linux,
+FreeBSD, etc.), and MacOS/X.
 
-@item
-Operating System: You will need to be running a supported Operating System.
-Currently Crystal Space supports: Windows (32 bit), Unix (Linux, FreeBSD,
-etc.), and MacOS/X.
+@strong{Development Environment}: You may build Crystal Space yourself, or you
+may download a pre-built @sc{sdk} package.  If you are using the @sc{cvs}
+version of Crystal Space, then you will need to build it yourself.  To do so
+you will need a supported C++ compiler such as the @sc{gnu} Compiler Collection
+(@sc{gcc}) or Microsoft Visual C++.  If you plan to use the scripting
+capabilities of Crystal Space you will also need an interpreter for each
+scripting language you use.
 
-@item
-Development Environment: If you plan to use Crystal Space it is recommended
-that you compile it yourself from source. To do so you will need a supported
-C++ compiler such as the @sc{gnu} Compiler Collection (@sc{gcc}) or Microsoft
-Visual C++. If you plan to use the scripting capabilities of Crystal Space
-you will also need an interpreter for each scripting language you use.
-
-@item
-Crystal Space Package: The latest release of Crystal Space can be downloaded
-from:
+@strong{Crystal Space Package}: The latest release of Crystal Space can be
+downloaded from:
 
 @noindent
-@url{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?page=Download}
+@uref{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?page=Download}
 
 The release includes all of the source code, some pre-generated documentation,
-and a few example data files.  Or, if you're feeling brave you can download the
-latest @sc{cvs} snapshot:
+and a few example data files.  Alternately, you can download the latest
+@sc{cvs} snapshot, which is often a great improvement over the latest release,
+and often as, or more, stable.
 
 @noindent
-@url{http://crystal.sourceforge.net/cvs-snapshots/}
+@uref{http://crystal.sourceforge.net/cvs-snapshots/}
 
 You can also checkout the source directly from the @sc{cvs} repository.
 Directions for doing this can be found here:
 
 @noindent
-@url{http://sourceforge.net/cvs/?group_id=649}
+@uref{http://sourceforge.net/cvs/?group_id=649}
 
-@item
-External Dependencies: Crystal Space can use a number of optional libraries and
-tools to provide a more robust set of features.  A brief list of the current
-dependencies is presented here.  @xref{External Libraries}.
+@strong{External Dependencies}: Crystal Space can use a number of optional
+libraries and tools to provide a more robust set of features.  A brief list of
+the current dependencies is presented here.  @xref{External Libraries}.
 
-@table @emph
+@table @asis
 @item Z Library
 zlib is used for compression and archiving.
 
 @noindent
-@url{http://www.gzip.org/zlib/}
+@uref{http://www.gzip.org/zlib/}
 
 @item @sc{png} Library
 libpng is used for loading Portable Network Graphics image files.
 
 @noindent
-@url{http://www.libpng.org/pub/png/libpng.html}
+@uref{http://www.libpng.org/pub/png/libpng.html}
 
 @item @sc{jpeg} Library
 libjpeg is used for loading @emph{Joint Photographics Experts Group} image
 files.
 
 @noindent
-@url{http://www.ijg.org/files/}
+@uref{http://www.ijg.org/files/}
+
+@item Jam
+@anchor{GettingJam}
+Jam is a @file{make} replacement with a much more intuitive and expressive file
+format.  Internally, the Crystal Space build system is predicated upon Jam,
+however Crystal Space also features a @file{make} @dfn{emulation} layer which
+allows you to build and install the project using @file{make}, so there is no
+strict need to download or install Jam.  If, however, you plan to work on the
+Crystal Space build system or create your own external project based upon Jam,
+then you can download it from this location:
+
+@noindent
+@uref{ftp://ftp.perforce.com/jam/}
+
+@noindent
+Jam documentation can be found at the Jam home page; see @file{Jam.html},
+@file{Jambase.html}, and @file{Jamfile.html}.
+
+@noindent
+@uref{http://www.perforce.com/jam/jam.html}
+
+Jam is included pre-built in the @file{cs-win32libs} convenience package
+(@pxref{cs-win32libs}), so Mingw and Cygwin users who use that package get Jam
+for free.  Other users will want to build it from source code.  For such users,
+once Jam has been downloaded, follow these simple steps to build and install
+it.  These instructions illustrate Jam 2.5, which is current as of this
+writing.
+
+@example
+unzip jam-2.5.zip
+cd jam-2.5
+make
+./jam0 install
+@end example
+
+If you are a Unix user, then you will probably need to have administrator
+privilege to install the executable since it will be installed as
+@file{/usr/local/bin/jam}.  To gain administrator privilege, you can use the
+@samp{sudo} command:
+
+@example
+sudo ./jam0 install
+@end example
+
+If you want to install Jam at a location other than the default, then set the
+@samp{BINDIR} variable to the directory in which you want it installed (this
+example shows it being installed in the user's private @file{$HOME/bin}
+directory):
+
+@example
+sudo ./jam0 -sBINDIR=$HOME/bin install
+@end example
 
 @item The Netwide Assembler
 @sc{nasm} is used by Crystal Space on certain platforms for assembly language
 routines, for performance enhancement.  This is optional.
 
 @noindent
-@url{http://nasm.sourceforge.net/}
+@uref{http://nasm.sourceforge.net/}
 
 @item @sc{ascii} Art Library
-aalib is used for 2D rendering in text mode.  This is optional and only needed
-for fun.  Currently a modified version of aalib is required and can be
+This library is used for 2D rendering in text mode.  This is optional and only
+needed for fun.  Currently a modified version of aalib is required and can be
 downloaded from:
 
 @noindent
-@url{ftp://sunsite.dk/pub/projects/crystal/support/aalib/}
+@uref{http://aa-project.sourceforge.net/}
 @end table
 
-@item
-Maps and such are needed if you want to see examples of Crystal Space at work.
+@strong{Maps}: Needed if you want to see examples of Crystal Space at work.
 A few data files are provided in the Crystal Space release itself, but more can
-be downloaded from @url{ftp://ftp.sunsite.dk/pub/projects/crystal/}. Most files
-can just be placed in the CS/data directory and left alone.
-@end itemize
+be downloaded from @uref{ftp://ftp.sunsite.dk/pub/projects/crystal/}.  Most
+files can just be placed in the CS/data directory.
