@@ -323,6 +323,21 @@ bool csFrustumVis::VisTest (iRenderView* rview)
   // Update all objects (mark them invisible and update in kdtree if needed).
   UpdateObjects ();
 
+{
+// @@@ Temporariy work around until a bug is fixed with the kdtree
+// and moving objects!
+  int i;
+  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  {
+    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      visobj_vector[i];
+    iVisibilityObject* visobj = visobj_wrap->visobj;
+    visobj->MarkVisible ();
+  }
+
+return true;
+}
+
   // Data for the vis tester.
   FrustTest_Front2BackData data;
 
@@ -542,7 +557,6 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 		iMeshWrapper);
 	if (mesh)
 	{
-	  printf ("GOT mesh!\n"); fflush (stdout);
 	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
 	    iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),

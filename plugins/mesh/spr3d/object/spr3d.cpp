@@ -76,13 +76,8 @@ csSpriteFrame::~csSpriteFrame ()
 void csSpriteFrame::SetName (char const* n)
 {
   delete [] name;
-  if (n)
-  {
-    name = new char [strlen (n)+1];
-    strcpy (name, n);
-  }
-  else
-    name = 0;
+  if (n) name = csStrNew (n);
+  else name = NULL;
 }
 
 //--------------------------------------------------------------------------
@@ -948,7 +943,8 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
 {
   if (!vertex_colors)
   {
-    vertex_colors = new csColor [factory->GetVertexCount ()];
+    int vt = factory->GetVertexCount ();
+    vertex_colors = new csColor [vt];
     int j;
     for (j = 0 ; j < factory->GetVertexCount (); j++)
       vertex_colors[j] = base_color;
@@ -960,7 +956,7 @@ void csSprite3DMeshObject::ResetVertexColors ()
 {
   if (vertex_colors)
   {
-	int i;
+    int i;
     for (i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i] = base_color;
   }
@@ -1271,8 +1267,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     }
     mw->DecRef();
   }
-    
-    
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();

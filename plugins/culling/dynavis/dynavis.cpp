@@ -1193,7 +1193,6 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 		iMeshWrapper);
 	if (mesh)
 	{
-	  printf ("GOT mesh!\n"); fflush (stdout);
 	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
 	    iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),

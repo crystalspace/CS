@@ -1,5 +1,21 @@
 The history order is reversed so that new features are at the top.
 
+15-Jul-2002
+	- Fixed a compiler error in spr3d by rearranging the code a little
+	  bit.
+	- Temporary fix to frustvis so that all objects are marked visible.
+	  This fixes a problem in levels with moving objects. Apparently
+	  the kd-tree is not updated correctly. This fix will just mark
+	  all objects as visible. Dynavis has the same bug but this hack-fix
+	  has not been applied to Dynavis.
+	- Reverted all changes to graph2d.cpp made by Noah Falk and
+	  Matt Reda. These changes break procedural textures. If you looked
+	  at the textured rotating cube in walktest/flarge (main room on
+	  the right) then you would see that the procedural texture was
+	  not mapped correctly. Please only reapply the clipping changes
+	  to graph2d with a correctly functional procedural texture
+	  clipping. Side note: last (buggy) revision in CVS was 1.84.
+	  I reverted back to version 1.81.
 12-Jul-2002
 	- csPluginManager::LoadPlugin() is now a bit smarter. If a plugin
 	  is already on the plugin list it will not add it anymore. So you
