@@ -25,6 +25,7 @@
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "csutil/ptrarr.h"
+#include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/bugplug.h"
@@ -174,6 +175,7 @@ private:
   csRef<iVFS> VFS;
   csRef<iVirtualClock> vc;
   bool initialized;
+  csConfigAccess config;
 
   //------------------------------------------------------------------
   // Specific debugging options.
@@ -248,6 +250,13 @@ private:
    */
   void HideSpider (iCamera* camera);
 
+  /// MIME type of the screenshot image to save
+  const char* captureMIME;
+  /// image saver options for the screenshot file
+  const char* captureOptions;
+  /// format of the screenshot filename (e.g. "/this/cryst%03d.png")
+  char* captureFormat;
+  int captureFormatNumberMax;
   /**
    * Make a screenshot.
    */

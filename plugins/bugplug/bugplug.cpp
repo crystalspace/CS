@@ -25,6 +25,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "csutil/debug.h"
+#include "csutil/snprintf.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
@@ -150,6 +151,8 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_view.boxes = NULL;
   debug_view.object = NULL;
   debug_view.drag_point = -1;
+
+  captureFormat = NULL;
 }
 
 csBugPlug::~csBugPlug ()
@@ -182,6 +185,7 @@ csBugPlug::~csBugPlug ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+  delete[] captureFormat;
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
@@ -242,7 +246,82 @@ void csBugPlug::SetupPlugin ()
 
   if (!Conout) Conout = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
 
-  ReadKeyBindings ("/config/bugplug.cfg");
+  config.AddConfig (object_reg, "/config/bugplug.cfg");
+
+  ReadKeyBindings (config->GetStr ("Bugplug.Keybindings", 
+    "/config/bugplug.key"));
+
+  captureFormat = csStrNew (config->GetStr ("Bugplug.Capture.FilenameFormat",
+    "/this/cryst000.png"));
+  // since this string is passed to format later,
+  // replace all '%' with '%%'
+  {
+    char* newstr = new char[strlen(captureFormat)*2 + 1];
+    memset (newstr, 0, strlen(captureFormat)*2 + 1);
+
+    char* pos = captureFormat;
+    while (pos)
+    {
+      char* percent = strchr (pos, '%');
+      if (percent)
+      {
+	strncat (newstr, pos, percent-pos);
+	strcat (newstr, "%%");
+	pos = percent + 1;
+      }
+      else
+      {
+	strcat (newstr, pos);
+	pos = NULL;
+      }
+    }
+    delete[] captureFormat;
+    captureFormat = newstr;
+  }
+  // scan for the rightmost string of digits
+  // and create an appropriate format string
+  {
+    captureFormatNumberMax = 1;
+    int captureFormatNumberDigits = 0;
+
+    char* end = strrchr (captureFormat, 0);
+    if (end != captureFormat)
+    {
+      do
+      {
+	end--;
+      }
+      while ((end >= captureFormat) && (!isdigit (*end)));
+      if (end >= captureFormat)
+      {
+	do
+	{
+	  captureFormatNumberMax *= 10;
+	  captureFormatNumberDigits++; 
+	  end--;
+	}
+	while ((end >= captureFormat) && (isdigit (*end)));
+	
+	char nameForm [6];
+	cs_snprintf (nameForm, 6, "%%0%dd", captureFormatNumberDigits);
+
+	int newlen = strlen(captureFormat)+strlen(nameForm)-
+	  captureFormatNumberDigits+1;
+	char* newCapForm = new char[newlen];
+	memset (newCapForm, 0, newlen);
+	strncpy (newCapForm, captureFormat, end-captureFormat+1);
+	strcat (newCapForm, nameForm);
+	strcat (newCapForm, end+captureFormatNumberDigits+1);
+	delete[] captureFormat;
+	captureFormat = newCapForm;
+      }
+    }
+  }
+
+  captureMIME = config->GetStr ("Bugplug.Capture.Image.MIME",
+    "image/png");
+
+  captureOptions = config->GetStr ("Bugplug.Capture.Image.Options");
 
   initialized = true;
 
@@ -518,13 +597,17 @@ bool csBugPlug::EatMouse (iEvent& event)
 void csBugPlug::CaptureScreen ()
 {
   int i = 0;
-  char name [25];
+  char name[CS_MAXPATHLEN];
+
+  bool exists = false;
   do
   {
-    sprintf (name, "/this/cryst%03d.png", i++);
+    cs_snprintf (name, CS_MAXPATHLEN, captureFormat, i);
+    if (exists = VFS->Exists (name)) i++;
   }
-  while (i < 1000 && VFS->Exists (name));
-  if (i >= 1000)
+  while ((i < captureFormatNumberMax) && (exists));
+
+  if (i >= captureFormatNumberMax)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Too many screenshot files in current directory");
@@ -541,7 +624,8 @@ void csBugPlug::CaptureScreen ()
   csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
   if (imageio)
   {
-    csRef<iDataBuffer> db (imageio->Save (img, "image/png"));
+    csRef<iDataBuffer> db (imageio->Save (img, captureMIME, 
+      captureOptions));
     if (db)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
@@ -551,6 +635,11 @@ void csBugPlug::CaptureScreen ()
         Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"There was an error while writing screen shot");
       }
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	      "Could not encode screen shot");
     }
   }
 }
@@ -1119,6 +1208,18 @@ void GfxWrite (iGraphics2D* g2d, iFont* font,
   g2d->Write (font, x, y, fg, bg, buf);
 }
 
+static inline void BugplugBox (iGraphics2D* G2D, 
+			       int x, int y, int  w, int h)
+{
+  int bgcolor = G2D->FindRGB (255, 255, 192);
+  G2D->DrawBox (x, y, w, h, bgcolor);
+  int bordercolor = G2D->FindRGB (192, 192, 64);
+  G2D->DrawLine (x, y, x+w, y, bordercolor);
+  G2D->DrawLine (x+w, y, x+w, y+h, bordercolor);
+  G2D->DrawLine (x+w, y+h, x, y+h, bordercolor);
+  G2D->DrawLine (x, y+h, x, y, bordercolor);
+}
+
 bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
@@ -1211,13 +1312,12 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       int y = sh/2 - (fh+5*2)/2;
       int w = 200;
       int h = fh+5*2;
-      int bgcolor = G2D->FindRGB (255, 255, 0);
-      G2D->DrawBox (x, y, w, h, bgcolor);
+      BugplugBox (G2D, x, y, w, h);
       int fgcolor = G2D->FindRGB (0, 0, 0);
       char* msg;
       if (process_next_key) msg = "Press a BugPlug key...";
       else msg = "Click on screen...";
-      G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg);
+      G2D->Write (fnt, x+5, y+5, fgcolor, -1, msg);
     }
   }
 
@@ -1241,15 +1341,14 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       int y = sh/2 - (fh*2+5*3)/2;
       int w = sw-20;
       int h = fh*2+5*3;
-      int bgcolor = G2D->FindRGB (255, 255, 0);
-      G2D->DrawBox (x, y, w, h, bgcolor);
+      BugplugBox (G2D, x, y, w, h);
       int fgcolor = G2D->FindRGB (0, 0, 0);
       int maxlen = fnt->GetLength (msg_string, w-10);
       if (maxlen < 80) msg_string[maxlen] = 0;
-      G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg_string);
+      G2D->Write (fnt, x+5, y+5, fgcolor, -1, msg_string);
       maxlen = fnt->GetLength (edit_string, w-10);
       if (maxlen < 80) edit_string[maxlen] = 0;
-      G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, bgcolor, edit_string);
+      G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, -1, edit_string);
       char cursor[83];
       strcpy (cursor, edit_string);
       cursor[edit_cursor] = 0;

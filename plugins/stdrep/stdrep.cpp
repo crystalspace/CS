@@ -198,9 +198,10 @@ bool csReporterListener::Report (iReporter*, int severity,
   if (dest_stderr[severity])
     fputs (msg.GetData(), stderr);
   if (dest_console[severity] && console)
-    console->PutText (msg.GetData());
+    console->PutText ("%s", msg.GetData());
   if (dest_alert[severity] && nativewm)
-    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!", "Ok", msg.GetData());
+    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!", "Ok", "%s",
+      msg.GetData());
   if (dest_debug[severity] && !debug_filename.IsEmpty())
   {
     if (!debug_file.IsValid())
