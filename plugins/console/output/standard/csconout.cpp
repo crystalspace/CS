@@ -63,7 +63,7 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   scfiEventHandler = 0;
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
-  bg_rgb.Set (32, 32, 32);	// Shadow defaults to darkgray
+  shadow_rgb.Set (32, 32, 32);	// Shadow defaults to darkgray
   transparent = false;		// Default to no transparency
   do_snap = true;		// Default to snapping
   // Initialize the cursor state variables
