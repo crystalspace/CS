@@ -50,6 +50,9 @@ struct awsListItem
 
   /// Tells what the minimum height of this item needs to be, taking into account children
   int GetHeight(iAwsPrefManager *pm);
+
+  /// Destroys this particular list item.
+  ~awsListItem();
 };
 
 /// Manages a row of items
@@ -72,6 +75,9 @@ struct awsListRow
 
   /// Gets the minimum height of the row, does NOT recurse for children.
   int GetHeight(iAwsPrefManager *pm, int colcount);
+
+  /// Destroys a list row properly ( but not it's children. )
+  ~awsListRow();
 };
 
 /// Manages a column of items
@@ -198,7 +204,10 @@ private:
 
    /// Inserts an item
    static void GetSelectedItem(void *owner, iAwsParmList &parmlist);
-   
+
+   /// Clears the entire list
+   static void ClearList(void *owner, iAwsParmList &parmlist);
+
 protected:
    /// Used, but shouldn't be (remnant of radio-button code)
    void ClearGroup();

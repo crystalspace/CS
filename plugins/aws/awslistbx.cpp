@@ -40,6 +40,12 @@ const int hsRow=2;
 // awsListRow implementation 
 //
 
+awsListRow::~awsListRow()
+{
+  if (cols)
+    delete [] cols;
+}
+
 int 
 awsListRow::GetHeight(iAwsPrefManager *pm, int colcount)
 {
@@ -61,6 +67,12 @@ awsListRow::GetHeight(iAwsPrefManager *pm, int colcount)
 //////////////////////////////////////////////////////////////////////////
 // awsListItem implementation 
 //
+
+awsListItem::~awsListItem()
+{
+  SCF_DEC_REF(text);
+  SCF_DEC_REF(image);
+}
 
 int
 awsListItem::GetHeight(iAwsPrefManager *pm)
@@ -91,6 +103,7 @@ control_type(0), ncolumns(1), sel(NULL)
   actions.Register("InsertItem", &InsertItem);
   actions.Register("DeleteItem", &DeleteItem);
   actions.Register("GetSelectedItem", &GetSelectedItem);
+  actions.Register("ClearList", &ClearList);
 }
 
 awsListBox::~awsListBox()
@@ -188,6 +201,7 @@ awsListBox::SetProperty(char *name, void *parm)
   return false;
 }
 
+static 
 int
 DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
 {
@@ -196,7 +210,7 @@ DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
   if (i)
   {
     if (with_delete)
-      v->Delete(i);
+      v->Delete(i, true);
 
     return i;
   }
@@ -209,7 +223,7 @@ DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
       if (r->children && (j=DoFindItem(r->children,text,with_delete))>=0)
       {
         if (with_delete)
-          r->children->Delete(j);
+          r->children->Delete(j, true);
 
         return j;
       }
@@ -218,6 +232,27 @@ DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
 
   return -1;
 }
+
+static
+void
+DoRecursiveClearList(awsListRowVector *v)
+{ 
+  int i;
+
+  for (i=0; i<v->Length(); ++i)
+  {
+    awsListRow *r = (awsListRow *)((*v)[i]);
+    if (r->children)
+    {
+       DoRecursiveClearList(r->children);
+       delete r->children;
+    }
+     
+  }
+
+  v->DeleteAll(true);
+}
+
 
 /////////////// Scripted Actions /////////////////////////////////////////////////////////////
 void 
@@ -367,6 +402,13 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
 
 }
 
+void 
+awsListBox::ClearList(void *owner, iAwsParmList &parmlist)
+{
+  awsListBox *lb = (awsListBox *)owner;
+
+  DoRecursiveClearList(&lb->rows);
+}
 
 bool 
 awsListBox::Execute(char *action, iAwsParmList &parmlist)
