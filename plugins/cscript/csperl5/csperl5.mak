@@ -149,7 +149,7 @@ $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(OUTDIRS)
 endif
 
 ifeq ($(DO_SWIGPERL5INST),yes)
-swigperl5inst: $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+swigperl5inst: $(OUTDIRS) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
 
 $(SWIG.PERL5.C): $(SWIG.PERL5.C.IN)
 	-$(RM) $@
