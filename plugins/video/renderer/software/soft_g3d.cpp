@@ -562,7 +562,7 @@ STDMETHODIMP csGraphics3DSoftware::Initialize ()
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
     config->GetYesNo ("Hardware", "INTERLACING", false));
 
-  SetCacheSize (config->GetInt ("Hardware", "CACHE", DEFAULT_CACHE_SIZE));
+  SetCacheSize (config->GetInt ("TextureManager", "CACHE", DEFAULT_CACHE_SIZE));
 
   zdist_mipmap1 = config->GetFloat ("Mipmapping", "DMIPMAP1", 12.0);
   zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
