@@ -1616,7 +1616,7 @@ void csThing::DrawPolygonArrayDPM (
   csBox3 bbox3;
   if (
     GetScreenBoundingBox (
-        icam->GetFOV (),
+        (float) icam->GetFOV (),
         icam->GetShiftX (),
         icam->GetShiftY (),
         tr_o2c,
@@ -2501,7 +2501,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   }
 
   bool rc = true;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, (uint32) ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -2566,7 +2566,7 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
   for (i = 0; i < GetCurveCount (); i++)
     if (!curves.Get (i)->WriteToCache (&mf)) goto stop;
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    	"thing_lm", NULL, ~0))
+    	"thing_lm", NULL, (uint32) ~0))
     goto stop;
 
   rc = true;
