@@ -2456,7 +2456,8 @@ csPtr<iStatLight> csEngine::CreateLight (
   if (name) light->SetName (name);
 
   csRef<iStatLight> il (SCF_QUERY_INTERFACE (light, iStatLight));
-  return csPtr<iStatLight> ((iStatLight*)il);	// DecRef is ok here.
+  light->DecRef ();
+  return csPtr<iStatLight> (il);
 }
 
 csPtr<iDynLight> csEngine::CreateDynLight (
@@ -2475,7 +2476,8 @@ csPtr<iDynLight> csEngine::CreateDynLight (
   AddDynLight (light);
 
   csRef<iDynLight> il (SCF_QUERY_INTERFACE (light, iDynLight));
-  return csPtr<iDynLight> (il);	// DecRef is ok here.
+  light->DecRef ();
+  return csPtr<iDynLight> (il);
 }
 
 void csEngine::RemoveDynLight (iDynLight *light)
