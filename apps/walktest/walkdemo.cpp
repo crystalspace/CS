@@ -1197,7 +1197,7 @@ void light_statics ()
       {
         if (state->GetSkeletonState ())
 	{
-          const char* name = wrap->GetName ();
+          //const char* name = wrap->GetName ();
           //@@@if (!strcmp (name, "__skelghost__")) move_ghost (wrap);
 	}
       }
