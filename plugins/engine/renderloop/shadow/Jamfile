@@ -1,0 +1,3 @@
+SubDir TOP plugins engine renderloop shadow ;
+
+SubInclude TOP plugins engine renderloop shadow stencil ;

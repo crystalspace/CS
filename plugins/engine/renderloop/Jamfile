@@ -5,5 +5,4 @@ SubInclude TOP plugins engine renderloop common ;
 
 SubInclude TOP plugins engine renderloop loader ;
 SubInclude TOP plugins engine renderloop stdsteps ;
-SubInclude TOP plugins engine renderloop shadow stencil ;
-
+SubInclude TOP plugins engine renderloop shadow ;
