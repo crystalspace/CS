@@ -160,6 +160,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+#ifdef CS_USE_NEW_RENDERER
 csStringID csThingStatic::vertex_name = csInvalidStringID;
 csStringID csThingStatic::texel_name = csInvalidStringID;
 csStringID csThingStatic::normal_name = csInvalidStringID;
@@ -167,6 +168,7 @@ csStringID csThingStatic::color_name = csInvalidStringID;
 csStringID csThingStatic::index_name = csInvalidStringID;
 csStringID csThingStatic::tangent_name = csInvalidStringID;
 csStringID csThingStatic::binormal_name = csInvalidStringID;
+#endif
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 	: static_polygons (32, 64)

@@ -20,6 +20,7 @@ chronological order.
 	  to use a 0 render priority.
 	- Keith updated the example .cal3d file in
 	  /plugins/mesh/sprcal3d/persist.
+	- Jorrit fixed a compile error in thing.cpp for old renderer.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
