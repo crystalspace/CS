@@ -21,6 +21,10 @@
 
 #include "csgeom/math2d.h"
 
+#ifdef CS_USE_NEW_RENDERER
+#define iGraphics3D iRender3D
+#endif
+
 struct iGraphics2D;
 struct iGraphics3D;
 

@@ -266,10 +266,12 @@ struct iThingState : public iBase
   virtual void ReplaceMaterials (iMaterialList* matList,
   	const char* prefix) = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Has this thing fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled).
   virtual csFog* GetFog () const = 0;
+#endif CS_USE_NEW_RENDERER
 
   /// Sets dynamic ambient light for this thing
   virtual void SetDynamicAmbientLight(const csColor& color) = 0;

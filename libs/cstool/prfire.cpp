@@ -258,6 +258,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
     }
   g2d->FinishDraw ();
 #else
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   /// draw firetexture
@@ -278,6 +279,7 @@ void csProcFire::Animate (csTicks /*current_time*/)
   g2d->Blit (0, 0, mat_w, mat_h, data);
   delete[] data;
   g3d->FinishDraw ();
+#endif // CS_USE_NEW_RENDERER
 #endif
 }
 

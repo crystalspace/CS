@@ -132,6 +132,7 @@ void csProcDots::Animate (csTicks current_time)
   if (elapsed < 100) return;
   if (elapsed > 2000) elapsed = 2000;
 
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderTarget (tex->GetTextureHandle (), true);
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   csTicks i;
@@ -139,6 +140,7 @@ void csProcDots::Animate (csTicks current_time)
     g2d->DrawPixel (GetRandom (mat_w), GetRandom (mat_h),
     	palette[GetRandom (255)]);
   elapsed = elapsed % 50;	// Keep remainder for more accuracy.
+#endif // CS_USE_NEW_RENDERER
 #endif
   g3d->FinishDraw ();
 }

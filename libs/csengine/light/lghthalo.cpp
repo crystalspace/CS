@@ -24,9 +24,11 @@
 #include "csutil/halogen.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "ivideo/graph3d.h"
+
+
 
 // The speed at which halo brightens/vanishes in milliseconds per frame
 #define HALO_FRAME_TIME 20
@@ -184,7 +186,11 @@ bool csLightHalo::IsVisible (csEngine const &Engine, csVector3 &v)
 
     if (Engine.top_clipper->IsInside (csVector2 (v.x, v.y)))
     {
+      #ifndef CS_USE_NEW_RENDERER
       float zv = Engine.G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
+      #else
+      float zv = 1;
+      #endif
       return v.z <= zv;
     }
   }
@@ -351,6 +357,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const &engine)
     g3dpoly->vertices[i].component = v1 + t * (v2 - v1); \
   }
 
+#ifndef CS_USE_NEW_RENDERER
 static void PreparePolygonFX2 (
   G3DPolygonDPFX *g3dpoly,
   csVector2 *clipped_verts,
@@ -454,6 +461,7 @@ static void PreparePolygonFX2 (
     }
   }
 }
+#endif CS_USE_NEW_RENDERER
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
@@ -463,6 +471,7 @@ void csLightFlareHalo::ProcessFlareComponent (
   csVector2 const &start,
   csVector2 const &deltapos)
 {
+#ifndef CS_USE_NEW_RENDERER
   int i;
 
   /// compute size and position of this component
@@ -562,4 +571,5 @@ void csLightFlareHalo::ProcessFlareComponent (
   /// draw
   dpfx.mixmode = mode;
   engine.G3D->DrawPolygonFX (dpfx);
+#endif // CS_USE_NEW_RENDERER
 }

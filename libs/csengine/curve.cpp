@@ -30,6 +30,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 
+
 struct csCoverageMatrix
 {
   // Each float corresponds to a lightmap grid cell and contains
@@ -78,7 +79,9 @@ csCurveTesselated::csCurveTesselated (int num_v, int num_t)
   ControlPoints = new csVector2[num_v];
   Colors = new csColor[num_v];
   NumTriangles = num_t;
+#ifndef CS_USE_NEW_RENDERER
   Triangles = new csTriangle[num_t];
+#endif // CS_USE_NEW_RENDERER
   ColorsValid = false;
 }
 
@@ -88,7 +91,9 @@ csCurveTesselated::~csCurveTesselated ()
   delete[] TextureCoords;
   delete[] ControlPoints;
   delete[] Colors;
+#ifndef CS_USE_NEW_RENDERER
   delete[] Triangles;
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csCurveTesselated::UpdateColors (csLightMap *LightMap)
@@ -99,6 +104,7 @@ void csCurveTesselated::UpdateColors (csLightMap *LightMap)
   int lm_height = LightMap->GetWidth ();
 
   int j;
+#ifndef CS_USE_NEW_RENDERER
   for (j = 0; j < GetTriangleCount (); j++)
   {
     csTriangle &ct = Triangles[j];
@@ -123,6 +129,7 @@ void csCurveTesselated::UpdateColors (csLightMap *LightMap)
     Colors[ct.c].green = ((float)map[lm_idx].green) / 256.0f;
     Colors[ct.c].blue = ((float)map[lm_idx].blue) / 256.0f;
   }
+#endif // CS_USE_NEW_RENDERER
 
   ColorsValid = true;
 }
@@ -130,16 +137,20 @@ void csCurveTesselated::UpdateColors (csLightMap *LightMap)
 // --- csCurve ---------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csCurve)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCurve)
+#ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVertexBufferManagerClient)
+#endif CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
   SCF_IMPLEMENTS_INTERFACE(iCurve)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+#ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE(iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#endif CS_USE_NEW_RENDERER
 
 unsigned long csCurve:: LastCurveID = 0;
 
@@ -155,11 +166,15 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   LightmapUpToDate(false)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
+#ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif CS_USE_NEW_RENDERER
 
   CurveID = LastCurveID++;
+#ifndef CS_USE_NEW_RENDERER
   vbufmgr = NULL;
   SetupVertexBuffer ();
+#endif CS_USE_NEW_RENDERER
 
   // Call to make sure csBezier2 is properly initialized.
   csBezier2::Initialize ();
@@ -173,9 +188,12 @@ csCurve::~csCurve ()
   delete LightMap;
   delete[] uv2World;
   delete[] uv2Normal;
+#ifndef CS_USE_NEW_RENDERER
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
+#endif CS_USE_NEW_RENDERER
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csCurve::SetupVertexBuffer ()
 {
   if (!vbuf)
@@ -187,6 +205,7 @@ void csCurve::SetupVertexBuffer ()
     vbufmgr->AddClient (&scfiVertexBufferManagerClient);
   }
 }
+#endif CS_USE_NEW_RENDERER
 
 void csCurve::SetMaterial (iMaterialWrapper *m)
 {
@@ -676,6 +695,7 @@ float csCurve::GetArea ()
   csCurveTesselated *ct = Tesselate (10000);
 
   csVector3 *vertex = ct->GetVertices ();
+#ifndef CS_USE_NEW_RENDERER
   csTriangle t;
 
   // loop through all of our triangles and sum thier areas
@@ -685,6 +705,7 @@ float csCurve::GetArea ()
     t = ct->GetTriangle (i);
     area += ABS (csMath3::Area3 (vertex[t.a], vertex[t.b], vertex[t.c]));
   }
+#endif // CS_USE_NEW_RENDERER
 
   return area / 2.0f;
 }
@@ -823,6 +844,7 @@ iCurveTemplate *csCurve::Curve::GetParentTemplate ()
   return &(scfParent->GetParentTemplate ()->scfiCurveTemplate);
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
@@ -831,6 +853,7 @@ void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
     scfParent->vbufmgr = NULL;
   }
 }
+#endif CS_USE_NEW_RENDERER
 
 // --- csCurveTemplate -------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csCurveTemplate)
@@ -920,6 +943,7 @@ csCurveTesselated *csBezierCurve::Tesselate (
     }
   }
 
+#ifndef CS_USE_NEW_RENDERER
   for (i = 0; i < res; i++)
   {
     for (j = 0; j < res; j++)
@@ -942,6 +966,7 @@ csCurveTesselated *csBezierCurve::Tesselate (
       down.c = bl;
     }
   }
+#endif CS_USE_NEW_RENDERER
 
   return previous_tesselation;
 }

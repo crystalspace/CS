@@ -22,6 +22,8 @@
 
 #include "csutil/strset.h"
 
+#include "iengine/material.h"
+
 class csVector3;
 class csVector2;
 class csColor;
@@ -48,23 +50,23 @@ struct iRenderBuffer : public iBase
 {
   
   /// Get a raw pointer to the bufferdata as different datatypes
-  virtual float* GetFloatBuffer() = 0;
-  virtual unsigned char* GetUCharBuffer() = 0;
-  virtual unsigned int* GetUIntBuffer() = 0;
-  virtual csVector3* GetVector3Buffer() = 0;
-  virtual csVector2* GetVector2Buffer() = 0;
-  virtual csColor* GetColorBuffer() = 0;
+  virtual float* GetFloatBuffer () = 0;
+  virtual unsigned char* GetUCharBuffer () = 0;
+  virtual unsigned int* GetUIntBuffer () = 0;
+  virtual csVector3* GetVector3Buffer () = 0;
+  virtual csVector2* GetVector2Buffer () = 0;
+  virtual csColor* GetColorBuffer () = 0;
 
   /// Get type of buffer (where it's located)
   virtual CS_RENDERBUFFER_TYPE GetBufferType() = 0;
 
   /// Get number of indices in the data (as different datatypes)
-  virtual int GetFloatLength() = 0;
+  virtual int GetFloatLength () = 0;
   virtual int GetUCharLength() = 0;
-  virtual int GetUIntLength() = 0;
-  virtual int GetVec3Length() = 0;
-  virtual int GetVec2Length() = 0;
-  virtual int GetColorLength() = 0;
+  virtual int GetUIntLength () = 0;
+  virtual int GetVec3Length () = 0;
+  virtual int GetVec2Length () = 0;
+  virtual int GetColorLength () = 0;
 };
 
 SCF_VERSION (iRenderBufferManager, 0, 0, 1);
@@ -72,13 +74,13 @@ SCF_VERSION (iRenderBufferManager, 0, 0, 1);
 struct iRenderBufferManager : public iBase
 {
   /// Allocate a buffer of the specified type and return it
-  virtual csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location) = 0;
+  virtual csPtr<iRenderBuffer> GetBuffer (int buffersize, CS_RENDERBUFFER_TYPE location) = 0;
   
   /// Lock a specified buffer. Return true if successful
-  virtual bool LockBuffer(iRenderBuffer* buffer) = 0;
+  virtual bool LockBuffer (iRenderBuffer* buffer) = 0;
 
   /// Unlock buffer
-  virtual void UnlockBuffer(iRenderBuffer* buffer) = 0;
+  virtual void UnlockBuffer (iRenderBuffer* buffer) = 0;
 };
 
 SCF_VERSION (iStreamSource, 0, 0, 1);
@@ -86,7 +88,7 @@ SCF_VERSION (iStreamSource, 0, 0, 1);
 struct iStreamSource : public iBase
 {
   /// Get a named buffer
-  virtual iRenderBuffer* GetBuffer(csStringID name) = 0;
+  virtual iRenderBuffer* GetBuffer (csStringID name) = 0;
 };
 
 class csRenderMesh
@@ -107,6 +109,7 @@ public:
 private: 
   meshtype type;
   csRef<iStreamSource> streamsource;
+  csRef<iMaterialWrapper> matwrap;
 
 public:
   /// Special attributes. Please don't change, it's used as flags
@@ -121,25 +124,32 @@ public:
   virtual void SetStreamSource (iStreamSource* streamsource)
     { csRenderMesh::streamsource = streamsource; }
   /// Get buffer source
-  virtual iStreamSource* GetStreamSource()
+  virtual iStreamSource* GetStreamSource ()
     { return streamsource; }
 
   /// Set mesh type
-  virtual void SetType(meshtype type) 
+  virtual void SetType (meshtype type) 
     { csRenderMesh::type = type; }
   /// Get mesh type
-  virtual meshtype GetType() 
+  virtual meshtype GetType () 
     { return type; }
 
+  /// Set material wrapper
+  virtual void SetMaterialWrapper (iMaterialWrapper* matwrap)
+    { csRenderMesh::matwrap = matwrap; }
+  /// Get material wrapper
+  virtual iMaterialWrapper* GetMaterialWrapper ()
+    { return matwrap; }
+
   /// Get lighting information
-  virtual iLightingInfo* GetLightingInfo() { return NULL; }
+  virtual iLightingInfo* GetLightingInfo () { return NULL; }
 
   /**
    * Special case for lightmap. To get lightmaps into renderers
    * not able to do multitexture, here is a handle to the lightmap
    * texture
    */
-  virtual iTextureHandle* GetLightmapHandle() { return NULL; }
+  virtual iTextureHandle* GetLightmapHandle () { return NULL; }
 };
 
 

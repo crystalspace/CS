@@ -136,6 +136,7 @@ void csProcPlasma::Animate (csTicks current_time)
   //    (g2d->GetWidth()/palsize)+5, 10, palette[i]);
   //}
 
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
@@ -172,7 +173,7 @@ void csProcPlasma::Animate (csTicks current_time)
   delete[] data;
 
   g3d->FinishDraw ();
-
+#endif // CS_USE_NEW_RENDERER
   anims0 += frameincr0;
   anims1 += frameincr1;
   anims2 += frameincr2;

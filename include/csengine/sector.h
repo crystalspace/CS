@@ -25,11 +25,12 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "iutil/objref.h"
-#include "ivideo/graph3d.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
 #include "csengine/rdrprior.h"
 #include "iengine/sector.h"
+#include "ivideo/graph3d.h"
+
 
 class csEngine;
 class csProgressPulse;
@@ -125,8 +126,10 @@ private:
   /// Engine handle.
   csEngine* engine;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Fog information.
   csFog fog;
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * This is a pointer to the csMeshWrapper which implements the visibility
@@ -421,6 +424,7 @@ public:
   /// Get the engine for this sector.
   csEngine* GetEngine () const { return engine; }
 
+#ifndef CS_USE_NEW_RENDERER
   /// Return true if this has fog.
   bool HasFog () const { return fog.enabled; }
 
@@ -439,6 +443,7 @@ public:
 
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
+#endif // CS_USE_NEW_RENDERER
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -480,6 +485,7 @@ public:
       { scfParent->SetDynamicAmbientLight(color); }  
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
+#ifndef CS_USE_NEW_RENDERER
     virtual bool HasFog () const
       { return scfParent->HasFog (); }
     virtual csFog *GetFog () const
@@ -488,6 +494,7 @@ public:
       { scfParent->SetFog (density, color); }
     virtual void DisableFog ()
       { scfParent->DisableFog (); }
+#endif // CS_USE_NEW_RENDERER
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
     virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,

@@ -35,6 +35,11 @@
 #include <string.h>
 #include <assert.h>
 
+/*#ifndef CS_USE_NEW_RENDERER
+  #define CS_USE_NEW_RENDERER
+  #define iGraphics3D iRender3D
+#endif*/
+
 #ifndef TRUE
   #define TRUE 1
 #endif

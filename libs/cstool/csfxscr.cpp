@@ -62,49 +62,64 @@ void csfxFadeToColor(iGraphics3D *g3d, float fadevalue, const csColor& color)
   uint8 green = int(255*color.green);
   uint8 blue = int(255*color.blue);
   float fade = 1.0 - fadevalue;
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, NULL, CS_FX_SETALPHA(fade), red, green, blue);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csfxFadeOut(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, multval, multval);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csfxFadeTo(iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue)
 {
   float fade = 1.0f - fadevalue;
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, mat, CS_FX_SETALPHA(fade), 0, 0, 0);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csfxGreenScreen(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, 255, multval);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csfxRedScreen(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, 255, multval, multval);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csfxBlueScreen(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = 255 - int(255.*fadevalue);
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, NULL, CS_FX_MULTIPLY, multval, multval, 255);
+#endif // CS_USE_NEW_RENDERER
 }
 
 
 void csfxWhiteOut(iGraphics3D *g3d, float fadevalue)
 {
   uint8 multval = int(255.*fadevalue);
+#ifndef CS_USE_NEW_RENDERER
   csfxScreenDPFX(g3d, NULL, CS_FX_ADD, multval, multval, multval);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   const csColor& bottomcolor, uint mixmode)
 {
+#ifndef CS_USE_NEW_RENDERER
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;
   dpfx.use_fog = false;
@@ -150,12 +165,14 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   g3d->SetRenderState(G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawPolygonFX(dpfx);
   g3d->SetRenderState(G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
+#endif // CS_USE_NEW_RENDERER
 }
 
 
 void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
   uint8 r, uint8 g, uint8 b)
 {
+#ifndef CS_USE_NEW_RENDERER
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;
   dpfx.use_fog = false;
@@ -200,5 +217,6 @@ void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawPolygonFX (dpfx);
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
+#endif // CS_USE_NEW_RENDERER
 }
 

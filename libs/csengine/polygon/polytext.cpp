@@ -31,9 +31,10 @@
 #include "csengine/lghtmap.h"
 #include "csutil/bitset.h"
 #include "csutil/debug.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "ivideo/graph3d.h"
+
 
 //------------------------------------------------------------------------------
 
@@ -59,8 +60,10 @@ csPolyTexture::csPolyTexture ()
 
 csPolyTexture::~csPolyTexture ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (csEngine::current_engine->G3D)
     csEngine::current_engine->G3D->RemoveFromCache (this);
+#endif // CS_USE_NEW_RENDERER
   CS_ASSERT (cache_data[0] == NULL);
   CS_ASSERT (cache_data[1] == NULL);
   CS_ASSERT (cache_data[2] == NULL);

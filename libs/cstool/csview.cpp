@@ -102,6 +102,7 @@ void csView::ClearView ()
 {
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
+
   delete Clipper; Clipper = NULL;
   delete RectView; RectView = NULL;
 
@@ -156,9 +157,11 @@ void csView::UpdateView ()
 void csView::Draw ()
 {
   UpdateClipper();
+#ifndef CS_USE_NEW_RENDERER
   G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (),
 			      (int)Camera->GetShiftY () );
 
+#endif // CS_USE_NEW_RENDERER
   Engine->Draw (Camera, Clipper);
 }
 

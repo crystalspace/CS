@@ -384,7 +384,9 @@ void csSpriteBuilderMesh::Finish ()
 
 void csSpriteBuilderMesh::StoreTriangle (int a, int b, int c)
 {
+#ifndef CS_USE_NEW_RENDERER
   Out->AddTriangle (a, b, c);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csSpriteBuilderMesh::StoreMaterial (iModelDataMaterial *mat)
@@ -404,7 +406,9 @@ int csSpriteBuilderMesh::StoreFrameInfo (int FrameCount, int VertexCount)
 
 void csSpriteBuilderMesh::EnableTiling ()
 {
+#ifndef CS_USE_NEW_RENDERER
   Out->SetMixMode (Out->GetMixMode () | CS_FX_TILING);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csSpriteBuilderMesh::BeginFrame (int Num)

@@ -43,6 +43,10 @@
 #include "csutil/cmdhelp.h"
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
+#include "iengine/engine.h"
+
+/*#include "csengine/material.h"
+#include "csengine/texture.h"*/
 
 #include "r3dtest.h"
 
@@ -54,8 +58,9 @@ private:
   csRef<iRender3D> r3d;
   csRef<iRenderBuffer> vertices;
   csRef<iRenderBuffer> indices;
+  csRef<iRenderBuffer> texcoords;
 
-  csStringID vertices_name, indices_name;
+  csStringID vertices_name, indices_name, texcoords_name;
 
 public:
 
@@ -69,6 +74,8 @@ public:
 
     vertices = r3d->GetBufferManager ()->GetBuffer (
       sizeof (csVector3)*8, CS_BUF_STATIC);
+    texcoords = r3d->GetBufferManager ()->GetBuffer (
+      sizeof (csVector2)*8, CS_BUF_STATIC);
     indices = r3d->GetBufferManager ()->GetBuffer (
       sizeof (unsigned int)*36, CS_BUF_STATIC);
 
@@ -82,22 +89,33 @@ public:
     vbuf[6] = csVector3 (-1, -1,  1);
     vbuf[7] = csVector3 ( 1, -1,  1);
 
+    csVector2* tcbuf = texcoords->GetVector2Buffer ();
+    tcbuf[0] = csVector2 (0, 0);
+    tcbuf[1] = csVector2 (1, 0);
+    tcbuf[2] = csVector2 (0, 1);
+    tcbuf[3] = csVector2 (1, 1);
+    tcbuf[4] = csVector2 (0, 0);
+    tcbuf[5] = csVector2 (1, 0);
+    tcbuf[6] = csVector2 (0, 1);
+    tcbuf[7] = csVector2 (1, 1);
+
     unsigned int* ibuf = indices->GetUIntBuffer ();
-    ibuf[ 0] = 0;  ibuf[ 1] = 1;  ibuf[ 2] = 4;
-    ibuf[ 3] = 1;  ibuf[ 4] = 5;  ibuf[ 5] = 4;
-    ibuf[ 6] = 0;  ibuf[ 7] = 3;  ibuf[ 8] = 1;
-    ibuf[ 9] = 0;  ibuf[10] = 2;  ibuf[11] = 3;
-    ibuf[12] = 4;  ibuf[13] = 7;  ibuf[14] = 6;
-    ibuf[15] = 4;  ibuf[16] = 5;  ibuf[17] = 7;
-    ibuf[18] = 1;  ibuf[19] = 3;  ibuf[20] = 5;
-    ibuf[21] = 3;  ibuf[22] = 7;  ibuf[23] = 5;
-    ibuf[24] = 2;  ibuf[25] = 0;  ibuf[26] = 6;
-    ibuf[27] = 0;  ibuf[28] = 4;  ibuf[29] = 6;
-    ibuf[30] = 2;  ibuf[31] = 6;  ibuf[32] = 3;
+    ibuf[ 0] = 0;  ibuf[ 1] = 4;  ibuf[ 2] = 1;
+    ibuf[ 3] = 1;  ibuf[ 4] = 4;  ibuf[ 5] = 5;
+    ibuf[ 6] = 0;  ibuf[ 7] = 1;  ibuf[ 8] = 3;
+    ibuf[ 9] = 0;  ibuf[10] = 3;  ibuf[11] = 2;
+    ibuf[12] = 4;  ibuf[13] = 6;  ibuf[14] = 7;
+    ibuf[15] = 4;  ibuf[16] = 7;  ibuf[17] = 5;
+    ibuf[18] = 1;  ibuf[19] = 5;  ibuf[20] = 3;
+    ibuf[21] = 3;  ibuf[22] = 5;  ibuf[23] = 7;
+    ibuf[24] = 2;  ibuf[25] = 6;  ibuf[26] = 0;
+    ibuf[27] = 0;  ibuf[28] = 6;  ibuf[29] = 4;
+    ibuf[30] = 2;  ibuf[31] = 3;  ibuf[32] = 6;
     ibuf[33] = 3;  ibuf[34] = 7;  ibuf[35] = 6;
 
     vertices_name = r3d->GetStringContainer ()->Request ("vertices");
     indices_name = r3d->GetStringContainer ()->Request ("indices");
+    texcoords_name = r3d->GetStringContainer ()->Request ("texture coordinates");
   }
 
   iRenderBuffer* GetBuffer(csStringID name)
@@ -106,6 +124,9 @@ public:
       return vertices;
     if (name == indices_name)
       return indices;
+    if (name == texcoords_name)
+      return texcoords;
+    return NULL;
   }
 };
 
@@ -129,13 +150,25 @@ R3DTest::~R3DTest ()
 
 void R3DTest::SetupFrame ()
 {
-  /*// First get elapsed time from the virtual clock.
+  // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
 
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);*/
 
-  iFontServer* fntsvr = r3d->Get2DDriver ()->GetFontServer ();
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+  static int FPS = 0;
+  static int framecount = 0;
+  static int timeaccum = 0;
+  framecount++;
+  timeaccum += elapsed_time;
+  if (framecount == 10)
+  {
+    FPS = 10000.0/(float)timeaccum;
+    framecount = 0;
+    timeaccum = 0;
+  }
+
+  iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
   CS_ASSERT (fntsvr != NULL);
   csRef<iFont> fnt (fntsvr->GetFont (0));
   if (fnt == NULL)
@@ -147,8 +180,8 @@ void R3DTest::SetupFrame ()
     return;
 
   char asdf[1024];
-  sprintf (asdf, "Le test!", testmesh);
-  r3d->Get2DDriver ()->Write (fnt, 10, 50, -1, -1, asdf);
+  sprintf (asdf, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d", FPS);
+  r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF0000, -1, asdf);
   r3d->FinishDraw ();
 
   // Tell 3D driver we're going to display 3D things.
@@ -160,15 +193,16 @@ void R3DTest::SetupFrame ()
 
   csRenderMesh mesh;
 
+  mesh.SetMaterialWrapper (matwrap);
   mesh.SetStreamSource (testmesh);
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
 
   csReversibleTransform trans;
   static float a = 0;
-  a += 0.005;
-  trans.RotateThis (csVector3 (1,0,0), a);
-  trans.RotateThis (csVector3 (0,1,0), a);
-  trans.RotateThis (csVector3 (0,0,1), a);
+  a += speed;
+  trans.RotateThis (csVector3 (1,0,0), a*2.0);
+  trans.RotateThis (csVector3 (0,1,0), a*1.5);
+  trans.RotateThis (csVector3 (0,0,1), a*1.0);
   trans.SetOrigin (csVector3 (0,0,5));
   r3d->SetWVMatrix (&trans);
   r3d->DrawMesh (&mesh);
@@ -211,12 +245,13 @@ bool R3DTest::Initialize ()
 {
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
-	CS_REQUEST_FONTSERVER,
+        CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iRender3D),
+        CS_REQUEST_ENGINE,
 	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
-        CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iRender3D),
-	CS_REQUEST_END))
+ 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
@@ -239,12 +274,39 @@ bool R3DTest::Initialize ()
     return false;
   }
 
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (vc == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iVirtualClock plugin!");
+    return false;
+  }
+
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (vfs == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iVFS plugin!");
+    return false;
+  }
+
   r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
   if (r3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.r3dtest",
     	"No iRender3D plugin!");
+    return false;
+  }
+
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (engine == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iEngine plugin!");
     return false;
   }
 
@@ -258,6 +320,44 @@ bool R3DTest::Initialize ()
   }
 
   testmesh = new csTestMesh (r3d);
+
+  csRef<iDataBuffer> buf (vfs->ReadFile ("/lib/std/portal.jpg"));
+  if (!buf || !buf->GetSize ())
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.r3dtes",
+    	"Could not open image file 'portal.jpg' on VFS!");
+    return NULL;
+  }
+
+
+  csRef<iImageIO> imldr = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  if (imldr == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iImageIO plugin!");
+    return false;
+  }
+
+  int format = r3d->GetTextureManager ()->GetTextureFormat ();
+  csRef<iImage> im = imldr->Load (buf->GetUint8 (), buf->GetSize (), format);
+  csRef<iTextureHandle> txthandle = 
+    r3d->GetTextureManager ()->RegisterTexture (im, 0);
+
+  iTextureWrapper *txtwrap =
+	engine->GetTextureList ()->NewTexture(txthandle);
+  txtwrap->SetImageFile(im);
+
+  csRef<iMaterial> mat (engine->CreateBaseMaterial (txtwrap, 0, NULL, NULL));
+  matwrap = engine->GetMaterialList ()->NewMaterial (mat);
+
+  txtwrap->Register (r3d->GetTextureManager ());
+  txtwrap->GetTextureHandle()->Prepare ();
+  matwrap->Register (r3d->GetTextureManager ());
+  matwrap->GetMaterialHandle ()->Prepare ();
+
+  engine->Prepare ();
 
   return true;
 }

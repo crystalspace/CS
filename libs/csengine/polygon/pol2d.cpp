@@ -29,10 +29,11 @@
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
 #include "csengine/portal.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/graph3d.h"
+
 
 // An ugly hack to avoid "local relocation entries in non-writable section"
 // linkage error on OpenStep/HPPA/Sparc when csEngine library is linked into
@@ -114,6 +115,7 @@ void csPolygon2D::Draw (iGraphics2D * g2d, int col)
     g3dpoly->vertices[i].component = v1 + t * (v2 - v1); \
   }
 
+#ifndef CS_USE_NEW_RENDERER
 void PreparePolygonFX2 (
   G3DPolygonDPFX *g3dpoly,
   csVector2 *clipped_verts,
@@ -417,6 +419,7 @@ void csPolygon2D::DrawFilled (
   csPolyPlane *plane,
   csZBufMode zbufMode)
 {
+#ifndef CS_USE_NEW_RENDERER
   int i;
   bool debug = false;
   iCamera *icam = rview->GetCamera ();
@@ -620,6 +623,7 @@ void csPolygon2D::DrawFilled (
     g3dpoly.uvz = NULL;
 #endif
   }
+#endif
 }
 
 void csPolygon2D::FillZBuf (
@@ -627,6 +631,8 @@ void csPolygon2D::FillZBuf (
   csPolygon3D *poly,
   csPolyPlane *plane)
 {
+#ifndef CS_USE_NEW_RENDERER
+
   rview->GetGraphics3D ()->SetRenderState (
       G3DRENDERSTATE_ZBUFFERMODE,
       CS_ZBUF_FILLONLY);
@@ -666,6 +672,7 @@ void csPolygon2D::FillZBuf (
   g3dpoly.normal.D () = Dc;
 
   rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
+#endif
 }
 
 void csPolygon2D::AddFogPolygon (
@@ -678,6 +685,7 @@ void csPolygon2D::AddFogPolygon (
   CS_ID id,
   int fogtype)
 {
+#ifndef CS_USE_NEW_RENDERER
   int i;
 
   CS_LOCAL_STATIC (G3DPolygonDFP, g3dpoly);
@@ -708,7 +716,9 @@ void csPolygon2D::AddFogPolygon (
 
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawFogPolygon (id, g3dpoly, fogtype);
+#endif // CS_USE_NEW_RENDERER
 }
+#endif // CS_USE_NEW_RENDERER
 
 //---------------------------------------------------------------------------
 csPolygon2DQueue::csPolygon2DQueue (int max_size)

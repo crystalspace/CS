@@ -65,6 +65,7 @@ public:
    */
   void Draw (iGraphics2D* g2d, int col);
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Draw a texture mapped polygon.
    * 'plane' should be a correctly transformed plane (transformed to camera
@@ -86,6 +87,7 @@ public:
    */
   void AddFogPolygon (iGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
   	bool mirror, CS_ID id, int fog_type);
+#endif CS_USE_NEW_RENDERER
 };
 
 /**

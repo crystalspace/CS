@@ -21,9 +21,10 @@
 #include "csengine/engine.h"
 #include "csengine/polygon.h"
 #include "csgeom/polyclip.h"
-#include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
+#include "ivideo/graph3d.h"
+
 
 SCF_IMPLEMENT_IBASE(csFrustumView)
   SCF_IMPLEMENTS_INTERFACE(iFrustumView)

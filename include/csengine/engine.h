@@ -29,18 +29,21 @@
 #include "csgeom/math3d.h"
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
-#include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
 #include "csengine/sharevar.h"
 #include "iengine/engine.h"
 #include "iengine/collectn.h"
 #include "iengine/campos.h"
-#include "ivideo/graph3d.h"
 #include "iutil/dbghelp.h"
+#include "csengine/thing.h"
+#include "ivideo/graph3d.h"
 
-class csRegion;
+
+class csCBufferCube;
+class csPoly2DPool;
 class csRadiosity;
+class csRegion;
 class csSector;
 class csMeshWrapper;
 class csTextureList;
@@ -49,12 +52,10 @@ class csPolygon3D;
 class csCamera;
 class csStatLight;
 class csDynLight;
-class csCBufferCube;
 class csEngine;
 class csLight;
 class csCBuffer;
 class csXORBuffer;
-class csPoly2DPool;
 class csLightPatchPool;
 class csLightHalo;
 class csRenderView;
@@ -305,8 +306,10 @@ public:
    * for cleaning this up.
    */
   csRef<iCacheManager> cache_mgr;
+#ifndef CS_USE_NEW_RENDERER
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
+#endif CS_USE_NEW_RENDERER
   /// Does the 3D driver require power-of-two lightmaps?
   bool NeedPO2Maps;
   /// Maximum texture aspect ratio

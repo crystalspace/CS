@@ -157,7 +157,11 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
 
+#ifndef CS_USE_NEW_RENDERER
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#else
+  g3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#endif // CS_USE_NEW_RENDERER
   g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
 
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));

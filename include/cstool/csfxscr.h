@@ -100,8 +100,13 @@ void csfxWhiteOut(iGraphics3D *g3d, float fadevalue);
  * also other mixmodes can be used.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
+#ifndef CS_USE_NEW_RENDERER
 void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   const csColor& bottomcolor, uint mixmode = CS_FX_COPY);
+#else
+void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
+  const csColor& bottomcolor, uint mixmode);
+#endif // CS_USE_NEW_RENDERER
 
 
 /**

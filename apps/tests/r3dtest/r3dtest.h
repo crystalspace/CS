@@ -22,8 +22,11 @@
 #include <stdarg.h>
 #include "csutil/ref.h"
 
+struct iEngine;
 struct iObjectRegistry;
 struct iEvent;
+struct iMaterialWrapper;
+struct iVFS;
 
 
 class csTestMesh;
@@ -32,7 +35,11 @@ class R3DTest
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iEngine> engine;
   csRef<iRender3D> r3d;
+  csRef<iVFS> vfs;
+  csRef<iVirtualClock> vc;
+  csRef<iMaterialWrapper> matwrap;
   iSector* room;
 
   csTestMesh* testmesh;

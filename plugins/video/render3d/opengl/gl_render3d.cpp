@@ -26,6 +26,7 @@
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
+#include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/eventq.h"
@@ -39,6 +40,8 @@
 
 #include "gl_render3d.h"
 #include "gl_sysbufmgr.h"
+#include "gl_txtcache.h"
+#include "gl_txtmgr.h"
 #include "glextmanager.h"
 
 #include "ivideo/effects/efserver.h"
@@ -90,6 +93,10 @@ csGLRender3D::csGLRender3D (iBase *parent)
 csGLRender3D::~csGLRender3D()
 {
   delete strings;
+
+  delete buffermgr;
+  delete txtcache;
+  delete txtmgr;
 }
 
 void csGLRender3D::Report (int severity, const char* msg, ...)
@@ -107,6 +114,12 @@ void csGLRender3D::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
+int csGLRender3D::GetMaxTextureSize ()
+{
+  GLint max;
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
+  return max;
+}
 
 ////////////////////////////////////////////////////////////////////
 //                         iRender3D
@@ -117,6 +130,23 @@ void csGLRender3D::Report (int severity, const char* msg, ...)
 
 bool csGLRender3D::Open ()
 {
+  csRef<iPluginManager> plugin_mgr (
+    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+    iCommandLineParser));
+
+  config.AddConfig(object_reg, "/config/r3dopengl.cfg");
+
+  const char *driver = cmdline->GetOption ("canvas");
+  if (!driver)
+    driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
+
+  // @@@ Should check what canvas to load
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  if (!G2D)
+    return false;
+
   if (!G2D->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
@@ -130,8 +160,6 @@ bool csGLRender3D::Open ()
   effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
   {
-    csRef<iPluginManager> plugin_mgr (
-      CS_QUERY_REGISTRY (object_reg, iPluginManager));
     effectserver = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
@@ -141,6 +169,8 @@ bool csGLRender3D::Open ()
   ext.InitExtensions (gl);
 
   buffermgr = new csSysRenderBufferManager ();
+  txtcache = new csGLTextureCache (1024*1024*32, this);
+  txtmgr = new csGLTextureManager (object_reg, GetDriver2D (), config, this);
 
   return true;
 }
@@ -155,6 +185,8 @@ bool csGLRender3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
 
+  glEnable (GL_CULL_FACE);
+  glCullFace (GL_BACK);
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
     glDepthMask (GL_TRUE);
@@ -231,11 +263,41 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   csRef<iStreamSource> source = mymesh->GetStreamSource ();
   csRef<iRenderBuffer> vertexbuf = source->GetBuffer (strings->Request ("vertices"));
+  csRef<iRenderBuffer> texcoordbuf = source->GetBuffer (strings->Request ("texture coordinates"));
   csRef<iRenderBuffer> indexbuf = source->GetBuffer (strings->Request ("indices"));
 
-  //G2D->BeginDraw ();
+  if (!vertexbuf)
+    return;
+
+  csRef<iMaterialHandle> mathandle;
+  if (mymesh->GetMaterialWrapper ())
+    mathandle = mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
+
+  csRef<iTextureHandle> txthandle;
+  if (mathandle)
+    txthandle = mathandle->GetTexture ();
+
+  if (txthandle)
+  {
+    txtcache->Cache (txthandle);
+    csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+	    txthandle->GetPrivateObject ();
+    csTxtCacheData *cachedata = (csTxtCacheData *)gltxthandle->GetCacheData ();
+
+    glBindTexture (GL_TEXTURE_2D, cachedata->Handle);
+    glEnable (GL_TEXTURE_2D);
+  } else glDisable (GL_TEXTURE_2D);
+
+
+  glColor3f (1,1,1);
   glVertexPointer (3, GL_FLOAT, 0, vertexbuf->GetFloatBuffer ());
   glEnableClientState (GL_VERTEX_ARRAY);
+
+  if (texcoordbuf)
+  {
+    glTexCoordPointer (2, GL_FLOAT, 0, texcoordbuf->GetFloatBuffer ());
+    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  }
   /*glIndexPointer (GL_INT, 0, vertexbuf->GetUIntBuffer ());
   glEnableClientState (GL_INDEX_ARRAY);
   glDrawArrays (GL_TRIANGLES, 0, indexbuf->GetUIntLength ());*/
@@ -277,16 +339,6 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
-
-  csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
-
-  // @@@ Should check what canvas to load
-  G2D = CS_LOAD_PLUGIN (plugin_mgr, 
-    "crystalspace.graphics2d.glwin32", iGraphics2D);
-  if (!G2D)
-    return false;
 
   return true;
 }

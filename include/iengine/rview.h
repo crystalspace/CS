@@ -29,9 +29,18 @@
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
-#include "ivideo/graph3d.h"
 #include "iengine/engine.h"
 
+#ifndef CS_USE_NEW_RENDERER
+#include "ivideo/graph3d.h"
+#else
+#include "ivideo/render3d.h"
+#define iGraphics3D iRender3D
+#endif // CS_USE_NEW_RENDERER
+
+#ifndef CS_USE_NEW_RENDERER
+struct csFog;
+#endif CS_USE_NEW_RENDERER
 struct iEngine;
 struct iClipper2D;
 struct iGraphics2D;
@@ -39,7 +48,6 @@ struct iGraphics3D;
 struct iCamera;
 struct iSector;
 struct iPolygon3D;
-struct csFog;
 class csRenderView;
 class csReversibleTransform;
 class csVector3;
@@ -75,8 +83,10 @@ public:
    */
   bool has_outgoing_plane;
 
+#ifndef CS_USE_NEW_RENDERER
   /// The structure describing the fog.
   csFog* fog;
+#endif CS_USE_NEW_RENDERER
 };
 
 /**
@@ -164,6 +174,7 @@ public:
    */
   bool do_clip_frustum;
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Every fogged sector we encountered results in an extra structure in the
    * following list. This is only used if we are doing vertex based fog.
@@ -175,6 +186,7 @@ public:
    * recursion level.
    */
   bool added_fog_info;
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * A number indicating the recursion level we are in. Starts with 0.
@@ -261,6 +273,7 @@ struct iRenderView : public iBase
   /// Enable the use of a clip frustum.
   virtual void UseClipFrustum (bool u) = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Every fogged sector we encountered results in an extra structure in the
    * following list. This is only used if we are doing vertex based fog.
@@ -279,10 +292,12 @@ struct iRenderView : public iBase
    * Reset fog info.
    */
   virtual void ResetFogInfo () = 0;
+#endif // CS_USE_NEW_RENDERER
   /**
    * Get the current camera.
    */
   virtual iCamera* GetCamera () = 0;
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Calculate the fog information in the given G3DPolygonDP structure.
    */
@@ -309,6 +324,7 @@ struct iRenderView : public iBase
 
   virtual void CalculateFogMesh (const csTransform &tr_o2c, 
     G3DPolygonMesh &mesh) = 0;
+#endif CS_USE_NEW_RENDERER
 
 
   /**

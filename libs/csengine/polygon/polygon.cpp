@@ -40,10 +40,11 @@
 #include "csgeom/matrix2.h"
 #include "qint.h"
 #include "qsqrt.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/graph3d.h"
+
 
 // This is a static vector array which is adapted to the
 // right size everytime it is used. In the beginning it means
@@ -95,7 +96,9 @@ csPolyTexType::csPolyTexType ()
   DG_ADDI (this, NULL);
   DG_TYPE (this, "csPolyTexType");
   Alpha = 0;
+#ifndef CS_USE_NEW_RENDERER
   MixMode = CS_FX_COPY;
+#endif // CS_USE_NEW_RENDERER
 }
 
 csPolyTexType::~csPolyTexType ()
@@ -705,7 +708,9 @@ bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 bool csPolygon3D::IsTransparent ()
 {
   if (GetAlpha ()) return true;
+#ifndef CS_USE_NEW_RENDERER
   if (txt_info->GetMixMode () != CS_FX_COPY) return true;
+#endif // CS_USE_NEW_RENDERER
 
   iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
   return txt_handle && ((txt_handle->GetAlphaMap () || txt_handle->GetKeyColor ()));
@@ -828,6 +833,8 @@ void csPolygon3D::HardTransform (const csReversibleTransform &t)
 
 void csPolygon3D::Finish ()
 {
+  #ifndef CS_USE_NEW_RENDERER
+
   if (orig_poly) return ;
 #ifdef DO_HW_UVZ
   if (uvz)
@@ -857,9 +864,13 @@ void csPolygon3D::Finish ()
       // If material has no texture, switch our type to POLYTXT_NONE
       if (!material->GetMaterialHandle ()->GetTexture ())
       {
+#ifndef CS_USE_NEW_RENDERER
         uint mixmode = scfiPolygon3D.GetPolyTexType ()->GetMixMode ();
+#endif // CS_USE_NEW_RENDERER
         SetTextureType (POLYTXT_NONE);
+#ifndef CS_USE_NEW_RENDERER
         scfiPolygon3D.GetPolyTexType ()->SetMixMode (mixmode);
+#endif // CS_USE_NEW_RENDERER
         return ;
       }
       break;
@@ -917,6 +928,7 @@ void csPolygon3D::Finish ()
 #ifdef DO_HW_UVZ
   SetupHWUV ();
 #endif
+#endif CS_USE_NEW_RENDERER
 }
 
 #ifdef DO_HW_UVZ

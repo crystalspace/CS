@@ -209,8 +209,10 @@ private:
   /// Optional reference to the parent csMeshFactoryWrapper.
   iMeshFactoryWrapper* factory;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Z-buf mode to use for drawing this object.
   csZBufMode zbufMode;
+#endif // CS_USE_NEW_RENDERER
 
   /// Flag indicating whether this mesh should try to imposter or not
   bool imposter_active;
@@ -281,10 +283,12 @@ public:
   /// Get the mesh object.
   iMeshObject* GetMeshObject () const {return mesh;}
 
+#ifndef CS_USE_NEW_RENDERER
   /// Set the Z-buf drawing mode to use for this object.
   void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
   /// Get the Z-buf drawing mode.
   csZBufMode GetZBufMode () const { return zbufMode; }
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * Set a callback which is called just before the object is drawn.
@@ -586,6 +590,7 @@ public:
     {
       return scfParent->flags;
     }
+#ifndef CS_USE_NEW_RENDERER
     virtual void SetZBufMode (csZBufMode mode)
     {
       scfParent->SetZBufMode (mode);
@@ -594,6 +599,7 @@ public:
     {
       return scfParent->GetZBufMode ();
     }
+#endif CS_USE_NEW_RENDERER
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);

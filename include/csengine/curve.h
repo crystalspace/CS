@@ -30,9 +30,10 @@
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csutil/csobject.h"
+#include "imesh/thing/curve.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
-#include "imesh/thing/curve.h"
+
 
 class csThing;
 class csCurveTemplate;
@@ -59,8 +60,10 @@ private:
   csVector2* ControlPoints;
   // Colors for the vertices.
   csColor* Colors;
+#ifndef CS_USE_NEW_RENDERER
   // Triangles.
   csTriangle* Triangles;
+#endif // CS_USE_NEW_RENDERER
 
   // Number of vertices
   int NumVertices;
@@ -90,10 +93,12 @@ public:
   inline csVector2* GetControlPoints ();
   /// Return the array of vertex colors
   inline csColor* GetColors ();
+#ifndef CS_USE_NEW_RENDERER
   /// Return the array of triangles
   inline csTriangle* GetTriangles ();
   /// Return a single triangle @@@ why?
   inline csTriangle& GetTriangle (int i);
+#endif CS_USE_NEW_RENDERER
   /// Return true if the colors table is valid.
   inline bool AreColorsValid () const;
 
@@ -152,6 +157,7 @@ private:
   csVector3* uv2Normal;
 
   /// Vertex buffer.
+#ifndef CS_USE_NEW_RENDERER
   csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
 
@@ -165,6 +171,7 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
+#endif // CS_USE_NEW_RENDERER
 
 
 public:
@@ -187,8 +194,10 @@ public:
   /// Get the ID of this curve.
   inline unsigned long GetCurveID () const;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Get the vertex buffer for this curve.
   iVertexBuffer* GetVertexBuffer () const { return vbuf; }
+#endif // CS_USE_NEW_RENDERER
 
   /// Return the material handle for this curve
   inline iMaterialHandle* GetMaterialHandle () const;
@@ -478,10 +487,12 @@ inline csVector2* csCurveTesselated::GetControlPoints ()
 { return ControlPoints; }
 inline csColor* csCurveTesselated::GetColors ()
 { return Colors; }
+#ifndef CS_USE_NEW_RENDERER
 inline csTriangle* csCurveTesselated::GetTriangles ()
 { return Triangles; }
 inline csTriangle& csCurveTesselated::GetTriangle (int i)
 { return Triangles[i]; }
+#endif // CS_USE_NEW_RENDERER
 inline bool csCurveTesselated::AreColorsValid () const
 { return ColorsValid; }
 

@@ -24,10 +24,11 @@
 #include "csengine/engine.h"
 #include "csengine/thing.h"
 #include "csutil/debug.h"
-#include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
+#include "ivideo/graph3d.h"
+
 
 // ---------------------------------------------------------------------------
 // csMeshWrapper
@@ -74,7 +75,9 @@ csMeshWrapper::csMeshWrapper (
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = mesh;
   factory = NULL;
+#ifndef CS_USE_NEW_RENDERER
   zbufMode = CS_ZBUF_USE;
+#endif CS_USE_NEW_RENDERER
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
   imposter_active = false;
@@ -101,7 +104,9 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = 0;
   factory = NULL;
+#ifndef CS_USE_NEW_RENDERER
   zbufMode = CS_ZBUF_USE;
+#endif CS_USE_NEW_RENDERER
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
 }
@@ -256,7 +261,9 @@ void csMeshWrapper::DrawInt (iRenderView *rview)
       }
 
       UpdateDeferedLighting (movable.GetFullPosition ());
+#ifndef CS_USE_NEW_RENDERER
       mesh->Draw (rview, &movable.scfiMovable, zbufMode);
+#endif CS_USE_NEW_RENDERER
     }
   }
 

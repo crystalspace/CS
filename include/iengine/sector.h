@@ -82,6 +82,7 @@ struct iSector : public iBase
   /// Get the iObject for this sector.
   virtual iObject *QueryObject() = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Has this sector fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled)
@@ -90,6 +91,7 @@ struct iSector : public iBase
   virtual void SetFog (float density, const csColor& color) = 0;
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
+#endif // CS_USE_NEW_RENDERER
 
   /// Get the list of meshes in this sector.
   virtual iMeshList* GetMeshes () = 0;

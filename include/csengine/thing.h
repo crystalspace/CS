@@ -232,11 +232,13 @@ private:
    */
   csVector portal_polygons;
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * If we are a detail object then this will contain a reference to a
    * polygon buffer for the 3D renderer. This can be used by DrawPolygonMesh.
    */
   iPolygonBuffer* polybuf;
+#endif // CS_USE_NEW_RENDERER
   /**
    * An array of materials that are used with the polygon buffer.
    */
@@ -284,8 +286,10 @@ private:
    */
   long light_frame_number;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Fog information.
   csFog fog;
+#endif // CS_USE_NEW_RENDERER
 
   /// Dynamic ambient light assigned to this thing.
   csColor dynamic_ambient;
@@ -382,6 +386,7 @@ private:
    */
   void InvalidateThing ();
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Draw the given array of polygons in the current thing.
    * This version uses iGraphics3D->DrawPolygonMesh()
@@ -396,6 +401,7 @@ private:
    */
   static void DrawPolygonArray (csPolygonInt** polygon, int num,
 	iRenderView* rview, csZBufMode zMode);
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * Test a number of polygons against the c-buffer and insert them to the
@@ -405,12 +411,14 @@ private:
   static void* TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs);
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
    * and clipped version of the 3D polygon.
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	iRenderView* d, csZBufMode zMode);
+#endif CS_USE_NEW_RENDERER
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -832,6 +840,7 @@ public:
    */
   bool DrawTest (iRenderView* rview, iMovable* movable);
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Draw this thing given a view and transformation.
    */
@@ -847,6 +856,7 @@ public:
    * this thing).
    */
   bool DrawFoggy (iRenderView* rview, iMovable* movable);
+#endif // CS_USE_NEW_RENDERER
 
   //----------------------------------------------------------------------
   // Lighting
@@ -1020,6 +1030,7 @@ public:
    */
   int GetCenter () { return center_idx; }
 
+#ifndef CS_USE_NEW_RENDERER
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
 
@@ -1038,6 +1049,7 @@ public:
 
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
+#endif // CS_USE_NEW_RENDERER
 
   /// Sets dynamic ambient light for this thing
   void SetDynamicAmbientLight(const csColor& color)
@@ -1160,10 +1172,12 @@ public:
     {
       scfParent->AddCurveVertex (v, uv);
     }
+#ifndef CS_USE_NEW_RENDERER
     virtual bool HasFog () const
     { return scfParent->HasFog (); }
     virtual csFog *GetFog () const
     { return &scfParent->GetFog (); }
+#endif CS_USE_NEW_RENDERER
 
     /// Sets dynamic ambient light for this thing
     virtual void SetDynamicAmbientLight (const csColor& color)
@@ -1346,11 +1360,13 @@ public:
     }
     virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
       	iMovable* /*movable*/) { }
+#ifndef CS_USE_NEW_RENDERER
     virtual bool Draw (iRenderView* rview, iMovable* movable,
     	csZBufMode zMode)
     {
       return scfParent->Draw (rview, movable, zMode);
     }
+#endif CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return NULL; }

@@ -171,6 +171,7 @@ void csProcWater::Animate (csTicks current_time)
       GetImage (cur_image, x,y) = wt;
     }
 
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   /// draw texture
@@ -186,5 +187,6 @@ void csProcWater::Animate (csTicks current_time)
       g2d->DrawPixel (x, y, palette[col*palsize/256] );
     }
   g3d->FinishDraw ();
+#endif // CS_USE_NEW_RENDERER
 }
 

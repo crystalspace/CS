@@ -513,6 +513,7 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
 
   iGraphics3D* g3d = skytex->GetG3D ();
   iGraphics2D* g2d = skytex->GetG2D ();
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderTarget (skytex->GetTextureWrapper ()->GetTextureHandle (),
   	true);
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
@@ -576,6 +577,7 @@ void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
     }
 
   g3d->FinishDraw();
+#endif // CS_USE_NEW_RENDERER
 
   /// did a rendering
   skytex->UnsetForceRender();

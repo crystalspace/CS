@@ -465,10 +465,12 @@ struct iIsoMeshSprite : iIsoSprite {
   /// get the transformation matrix used for this mesh.
   virtual const csMatrix3& GetTransform() const = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /// Set the zbuf mode for the mesh
   virtual void SetZBufMode(csZBufMode mode) = 0;
   /// Get the zbuf mode for the mesh
   virtual csZBufMode GetZBufMode() const = 0;
+#endif // CS_USE_NEW_RENDERER
 };
 
 

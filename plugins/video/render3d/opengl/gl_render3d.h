@@ -25,10 +25,12 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 
+#include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/strset.h"
 
+#include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
@@ -37,6 +39,9 @@
 
 #include "glextmanager.h"
 
+class csGLTextureCache;
+class csGLTextureHandle;
+class csGLTextureManager;
 
 struct iObjectRegistry;
 struct iTextureManager;
@@ -52,14 +57,19 @@ struct iEvent;
 class csGLRender3D : public iRender3D
 {
 private:
+friend csGLTextureHandle;
+friend csGLTextureCache;
+friend csGLTextureManager;
+
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
-  csRef<iTextureManager> texturemgr;
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
   csRef<iEffectServer> effectserver;
 
   csGLExtensionManager ext;
+  csGLTextureCache *txtcache;
+  csGLTextureManager *txtmgr;
   
   int current_drawflags;
 
@@ -69,6 +79,8 @@ private:
   csRender3dCaps rendercaps;
 
   csStringSet* strings;
+
+  csConfigAccess config;
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -82,6 +94,8 @@ public:
   csGLRender3D (iBase *parent);
   virtual ~csGLRender3D ();
 
+  int GetMaxTextureSize ();
+
   ////////////////////////////////////////////////////////////////////
   //                            iRender3d
   ////////////////////////////////////////////////////////////////////
@@ -94,12 +108,12 @@ public:
 
   /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
   /// and therefore it shouldn't be decref-ed by caller.
-  iGraphics2D* Get2DDriver() 
+  iGraphics2D* GetDriver2D() 
     { return G2D; }
 
   /// Get a pointer to our texture manager
   iTextureManager* GetTextureManager() 
-    { return texturemgr; }
+    { return (iTextureManager*)txtmgr; }
 
   /**
    * Get a pointer to the VB-manager
@@ -112,11 +126,15 @@ public:
   iLightingManager* GetLightingManager() 
     { return lightmgr; }
 
-  /// Dimensions of window
+  /// Set dimensions of window
   void SetDimensions (int width, int height)
     { viewwidth = width; viewheight = height; }
-  void GetDimensions (int &width, int &height) 
-    { width = viewwidth; height = viewheight; }
+  /// Get width of window
+  int GetWidth () 
+    { return viewwidth; }
+  /// Get height of window
+  int GetHeight () 
+    { return viewheight; }
 
   /// Capabilities of the driver
   csRender3dCaps* GetCaps() 

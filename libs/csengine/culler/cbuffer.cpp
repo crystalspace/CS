@@ -23,6 +23,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 
+
 //---------------------------------------------------------------------------
 csCBufferLine::csCBufferLine ()
 {

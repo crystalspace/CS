@@ -84,8 +84,10 @@ struct iMeshObject : public iBase
    * object was probably visible. DrawTest() will be called before
    * this function (possibly with an UpdateLighting() in between.
    */
+#ifndef CS_USE_NEW_RENDERER
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * Register a callback to the mesh object which will be called

@@ -40,7 +40,6 @@
 #include "csutil/hashmap.h"
 #include "csutil/debug.h"
 #include "csutil/csmd5.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
@@ -55,6 +54,8 @@
 #include "iengine/fview.h"
 #include "qint.h"
 #include "qsqrt.h"
+#include "ivideo/graph3d.h"
+
 
 long csThing::current_light_frame_number = 0;
 
@@ -146,7 +147,9 @@ csThing::csThing (iBase *parent) :
   num_cam_verts = 0;
 
   draw_busy = 0;
+#ifndef CS_USE_NEW_RENDERER
   fog.enabled = false;
+#endif // CS_USE_NEW_RENDERER
   bbox = NULL;
   obj_bbox_valid = false;
   light_frame_number = -1;
@@ -174,7 +177,9 @@ csThing::csThing (iBase *parent) :
 
   curves_transf_ok = false;
 
+#ifndef CS_USE_NEW_RENDERER
   polybuf = NULL;
+#endif // CS_USE_NEW_RENDERER
   polybuf_materials = NULL;
   cachename = NULL;
 
@@ -184,7 +189,9 @@ csThing::csThing (iBase *parent) :
 
 csThing::~csThing ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (polybuf) polybuf->DecRef ();
+#endif // CS_USE_NEW_RENDERER
   delete[] polybuf_materials;
 
   if (wor_verts == obj_verts)
@@ -285,8 +292,10 @@ const char* csThing::GetCacheName ()
 
 void csThing::MarkLightmapsDirty ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (polybuf)
     polybuf->MarkLightmapsDirty ();
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csThing::CleanupThingEdgeTable ()
@@ -1019,11 +1028,13 @@ csPolygon3D *csThing::NewPolygon (csMaterialWrapper *material)
 
 void csThing::InvalidateThing ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (polybuf)
   {
     polybuf->DecRef ();
     polybuf = NULL;
   }
+#endif // CS_USE_NEW_RENDERER
 
   delete[] polybuf_materials;
   polybuf_materials = NULL;
@@ -1545,6 +1556,7 @@ bool csThing::HitBeamObject (const csVector3& start,
   return false;
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csThing::DrawOnePolygon (
   csPolygon3D *p,
   csPolygon2D *poly,
@@ -1576,7 +1588,6 @@ void csThing::DrawOnePolygon (
     // been drawn. The texture plane needs to be kept because this polygon
     // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane *keep_plane = NULL;
-
     if (
       d->GetGraphics3D ()->GetRenderState (
           G3DRENDERSTATE_TRANSPARENCYENABLE))
@@ -1585,7 +1596,6 @@ void csThing::DrawOnePolygon (
     {
       keep_plane = new csPolyPlane (*(p->GetPlane ()));
     }
-
     // Before we draw through the portal we see if we are rendering
     // for an object that uses a static tree (i.e. c-buffer). If that is
     // the case we clear the c-buffer for the portal shape. We can safely
@@ -1823,6 +1833,7 @@ void csThing::PreparePolygonBuffer ()
 
   delete[] matpol;
 }
+#endif // CS_USE_NEW_RENDERER
 
 void csThing::GetTransformedBoundingBox (
   const csReversibleTransform &trans,
@@ -1901,6 +1912,7 @@ float csThing::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csThing::DrawPolygonArrayDPM (
   csPolygonInt ** /*polygon*/,
   int /*num*/,
@@ -1955,6 +1967,7 @@ void csThing::DrawPolygonArrayDPM (
   rview->CalculateFogMesh(tr_o2c,mesh);
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
+#endif // CS_USE_NEW_RENDERER
 
 #ifdef CS_DEBUG
 bool viscnt_enabled;
@@ -2558,6 +2571,7 @@ void PolyMeshHelper::Setup ()
     // have their 'vertices' array cleaned up. These polygons were generated
     // from curves.
     curve_poly_start = num_poly;
+#ifndef CS_USE_NEW_RENDERER
     for (i = 0; i < thing->GetCurveCount (); i++)
     {
       csCurve *c = thing->curves.Get (i);
@@ -2583,6 +2597,7 @@ void PolyMeshHelper::Setup ()
       memcpy (vertices + num_verts, vts, sizeof (csVector3) * num_vt);
       num_verts += num_vt;
     }
+#endif // CS_USE_NEW_RENDERER
   }
 }
 
@@ -2710,6 +2725,7 @@ csPolygon3D *csThing::IntersectSphere (
 }
 
 /// The list of fog vertices
+#ifndef CS_USE_NEW_RENDERER
 CS_TYPEDEF_GROWING_ARRAY (engine3d_StaticFogVerts, G3DFogInfo);
 CS_IMPLEMENT_STATIC_VAR (GetStaticFogVerts, engine3d_StaticFogVerts,())
 
@@ -2842,6 +2858,7 @@ bool csThing::DrawCurves (
 
   return true;                                  //@@@ RETURN correct vis info
 }
+#endif // CS_USE_NEW_RENDERER
 
 bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 {
@@ -3166,6 +3183,7 @@ void csThing::DrawPolygonsFromQueue (
   csPolygon2DQueue *queue,
   iRenderView *rview)
 {
+#ifndef CS_USE_NEW_RENDERER
   csPolygon3D *poly3d;
   csPolygon2D *poly2d;
   csPoly2DPool *render_pool = csEngine::current_engine->render_pol2d_pool;
@@ -3179,6 +3197,7 @@ void csThing::DrawPolygonsFromQueue (
     DrawOnePolygon (poly3d, poly2d, rview, CS_ZBUF_FILL);
     render_pool->Free (poly2d);
   }
+#endif // CS_USE_NEW_RENDERER
 }
 
 void *csThing::DrawPolygons (
@@ -3188,11 +3207,14 @@ void *csThing::DrawPolygons (
   bool /*same_plane*/,
   void *data)
 {
+#ifndef CS_USE_NEW_RENDERER
   iRenderView *d = (iRenderView *)data;
   csThing::DrawPolygonArray (polygon, num, d, CS_ZBUF_FILL);
+#endif // CS_USE_NEW_RENDERER
   return NULL;
 }
 
+#ifndef CS_USE_NEW_RENDERER
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
   iCamera *icam = rview->GetCamera ();
@@ -3412,6 +3434,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
   draw_busy--;
   return true;                                  // @@@@ RETURN correct vis info
 }
+#endif CS_USE_NEW_RENDERER
 
 void csThing::RegisterVisObject (iVisibilityObject *visobj)
 {

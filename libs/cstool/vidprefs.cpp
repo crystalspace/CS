@@ -37,6 +37,8 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/txtmgr.h"
 
+#ifndef CS_USE_NEW_RENDERER
+
 csVideoPreferences::csVideoPreferences ()
 {
   object_reg = NULL;
@@ -329,3 +331,4 @@ void csVideoPreferences::SetOpenGL (void* vp, iAwsSource* source)
   vidprefs->SetOpenGLL (source);
 }
 
+#endif // CS_USE_NEW_RENDERER

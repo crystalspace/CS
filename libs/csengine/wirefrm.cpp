@@ -23,8 +23,9 @@
 #include "csengine/wirefrm.h"
 #include "csengine/engine.h"
 #include "csengine/camera.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+
 
 csWfColor::csWfColor (iGraphics2D *g2d, int r, int g, int b)
 {
@@ -157,11 +158,13 @@ void csWfLine::Draw (iGraphics3D *g, csCamera *c, int ortho)
   {
     csVector3 cam1 = c->Other2This (v1);
     csVector3 cam2 = c->Other2This (v2);
+#ifndef CS_USE_NEW_RENDERER
     g->DrawLine (
         cam1,
         cam2,
         c->GetFOV (),
         color->GetColor ((cam1.z + cam2.z) / 2));
+#endif // CS_USE_NEW_RENDERER
   }
   else
   {
@@ -265,8 +268,10 @@ void csWfPolygon::Draw (iGraphics3D *g, csCamera *c, int ortho)
     {
       cam1 = c->Other2This (vertices[i]);
       cam2 = c->Other2This (vertices[(i + 1) % num_vertices]);
+#ifndef CS_USE_NEW_RENDERER
       g->DrawLine (cam1, cam2, c->GetFOV (), col);
       if (vis) g->DrawLine (cam1, cen, c->GetFOV (), vcol);
+#endif // CS_USE_NEW_RENDERER
     }
   }
   else

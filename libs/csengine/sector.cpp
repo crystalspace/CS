@@ -24,16 +24,18 @@
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "iutil/objreg.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-#include "csengine/cbufcube.h"
 #include "csengine/engine.h"
 #include "csengine/sector.h"
-#include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "iengine/rview.h"
+#include "csengine/polygon.h"
+#include "csengine/cbufcube.h"
+
+
 
 // Option variable: render portals?
 bool csSector:: do_portals = true;
@@ -124,7 +126,9 @@ csSector::csSector (csEngine *engine) :
   csSector::engine = engine;
   culler_mesh = NULL;
   engine->AddToCurrentRegion (this);
+#ifndef CS_USE_NEW_RENDERER
   fog.enabled = false;
+#endif // CS_USE_NEW_RENDERER
   draw_busy = 0;
   meshes.SetSector (this);
   lights.SetSector (this);
@@ -646,12 +650,15 @@ void csSector::Draw (iRenderView *rview)
     i--;
   }
 
+#ifndef CS_USE_NEW_RENDERER
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
+#endif // CS_USE_NEW_RENDERER
 
   if (rview->GetCallback ())
   {
     rview->CallCallback (CS_CALLBACK_SECTOR, (void *) &scfiSector);
   }
+#ifndef CS_USE_NEW_RENDERER
   else
   {
     if (HasFog ())
@@ -685,6 +692,7 @@ void csSector::Draw (iRenderView *rview)
 
   if (rview->AddedFogInfo ())
     rview->GetFirstFogInfo ()->has_outgoing_plane = false;
+#endif // CS_USE_NEW_RENDERER
 
   /*
    * Draw meshes.
@@ -713,10 +721,17 @@ void csSector::Draw (iRenderView *rview)
 
     if (prev_sector)
     {
+#ifndef CS_USE_NEW_RENDERER
       draw_prev_sector = prev_sector->HasFog () ||
         rview->GetPortalPolygon ()->IsTransparent () ||
         rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
             CS_PORTAL_WARP);
+#else
+      draw_prev_sector = 
+        rview->GetPortalPolygon ()->IsTransparent () ||
+        rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
+            CS_PORTAL_WARP);
+#endif // CS_USE_NEW_RENDERER
     }
 
     // First sort everything based on render priority and return
@@ -756,6 +771,7 @@ void csSector::Draw (iRenderView *rview)
   {
     rview->CallCallback (CS_CALLBACK_SECTOREXIT, (void *) &scfiSector);
   }
+#ifndef CS_USE_NEW_RENDERER
   else
   {
     // Handle the fog, if any
@@ -797,6 +813,7 @@ void csSector::Draw (iRenderView *rview)
       }
     }
   }
+#endif // CS_USE_NEW_RENDERER
 
   draw_busy--;
 

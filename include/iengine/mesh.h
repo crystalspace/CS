@@ -29,7 +29,14 @@
 #include "csgeom/box.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
+#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/graph3d.h"
+#else
+#include "ivideo/render3d.h"
+#define iGraphics3D iRender3D
+#endif // CS_USE_NEW_RENDERER
+
 
 struct iMeshObject;
 struct iCamera;
@@ -287,11 +294,13 @@ struct iMeshWrapper : public iBase
    * <li>#CS_ZBUF_TEST: only read the Z-buffer but do not write.
    * </ul>
    */
+#ifndef CS_USE_NEW_RENDERER
   virtual void SetZBufMode (csZBufMode mode) = 0;
   /**
    * Get the Z-buf drawing mode.
    */
   virtual csZBufMode GetZBufMode () const = 0;
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * Do a hard transform of this object.

@@ -19,14 +19,16 @@
 #include "cssysdef.h"
 #include "csengine/rview.h"
 #include "csengine/engine.h"
-#include "csengine/polygon.h"
-#include "csengine/sector.h"
-#include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
+#include "csengine/sector.h"
+#include "csengine/polygon.h"
+#include "csgeom/polyclip.h"
+#include "iutil/dbghelp.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/vbufmgr.h"
+
 
 SCF_IMPLEMENT_IBASE(csRenderView)
   SCF_IMPLEMENTS_INTERFACE(iRenderView)
@@ -154,6 +156,7 @@ static void InitializeFogTable ()
 }
 #endif
 #define SMALL_D 0.01f
+#ifndef CS_USE_NEW_RENDERER
 void csRenderView::CalculateFogPolygon (G3DPolygonDP &poly)
 {
   if (!ctxt->fog_info || poly.num < 3)
@@ -787,6 +790,7 @@ void csRenderView::CalculateFogMesh (
     }
   }
 }
+#endif CS_USE_NEW_RENDERER
 
 void csRenderView::UpdateFrustum (
   iClipper2D *clip,

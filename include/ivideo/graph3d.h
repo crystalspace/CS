@@ -49,6 +49,8 @@ struct iHalo;
 struct csRGBpixel;
 struct csPixelFormat;
 
+#ifndef CS_USE_NEW_RENDERER
+
 #define CS_FOG_FRONT  0
 #define CS_FOG_BACK   1
 #define CS_FOG_VIEW   2
@@ -761,6 +763,10 @@ struct iGraphics3D : public iBase
    */
   virtual iTextureHandle* GetRenderTarget () const = 0;
 };
+#else
+#include "ivideo/render3d.h"
+#define iGraphics3D iRender3D
+#endif // CS_USE_NEW_RENDERER
 
 #endif // __IVIDEO_GRAPH3D_H__
 

@@ -20,6 +20,8 @@
 #ifndef __IVIDEO_VBUFMGR_H__
 #define __IVIDEO_VBUFMGR_H__
 
+#ifndef CS_USE_NEW_RENDERER
+
 /**\file
  */
 #include "csutil/scf.h"
@@ -232,6 +234,8 @@ struct iVertexBufferManager : public iBase
   virtual void AddClient (iVertexBufferManagerClient *client) = 0;
   virtual void RemoveClient (iVertexBufferManagerClient *client) = 0;
 };
+
+#endif // CS_USE_NEW_RENDERER
 
 #endif // __IVIDEO_VBUFMGR_H__
 

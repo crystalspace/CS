@@ -25,24 +25,18 @@
 #include "csengine/camera.h"
 #include "csengine/campos.h"
 #include "csengine/light.h"
-#include "csengine/polygon.h"
-#include "csengine/pol2d.h"
-#include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
-#include "csengine/cbufcube.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
 #include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
-#include "csengine/radiosty.h"
 #include "csengine/region.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
-#include "csgeom/polypool.h"
 #include "csgfx/csimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
@@ -53,7 +47,6 @@
 #include "igraphic/imageio.h"
 #include "ivideo/halo.h"
 #include "ivideo/txtmgr.h"
-#include "ivideo/graph3d.h"
 #include "iutil/vfs.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -65,12 +58,21 @@
 #include "imap/reader.h"
 #include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
-#include "imesh/thing/polytmap.h"
-#include "imesh/thing/curve.h"
 #include "ivaria/reporter.h"
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
+#include "csgeom/polypool.h"
+#include "csengine/cbufcube.h"
+#include "csengine/polygon.h"
+#include "csengine/pol2d.h"
+#include "csengine/radiosty.h"
+#include "csengine/thing.h"
+#include "imesh/thing/curve.h"
+#include "imesh/thing/polytmap.h"
+#include "ivideo/graph3d.h"
+
+
 
 //---------------------------------------------------------------------------
 void csEngine::Report (const char *description, ...)
@@ -650,8 +652,13 @@ csEngine::csEngine (iBase *iParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   DG_TYPE (&scfiObject, "csEngine");
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  cbufcube = NULL;
+  cbufcube = new csCBufferCube (1024);
+  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
+  thing_type = new csThingObjectType (NULL);
+  rad_debug = NULL;
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
   object_reg = NULL;
@@ -660,7 +667,6 @@ csEngine::csEngine (iBase *iParent) :
   render_context = NULL;
   shared_variables = NULL;
   c_buffer = NULL;
-  cbufcube = NULL;
   region = NULL;
   current_camera = NULL;
   current_engine = this;
@@ -671,7 +677,6 @@ csEngine::csEngine (iBase *iParent) :
   freeze_pvs = false;
   clear_zbuf = false;
   clear_screen = false;
-  rad_debug = NULL;
   nextframe_pending = 0;
   default_max_lightmap_w = 256;
   default_max_lightmap_h = 256;
@@ -679,20 +684,17 @@ csEngine::csEngine (iBase *iParent) :
   default_clear_zbuf = false;
   default_clear_screen = false;
 
-  cbufcube = new csCBufferCube (1024);
   InitCuller ();
 
   textures = new csTextureList ();
   materials = new csMaterialList ();
   shared_variables = new csSharedVariableList();
 
-  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
   lightpatch_pool = new csLightPatchPool ();
 
   BuildSqrtTable ();
   resize = false;
 
-  thing_type = new csThingObjectType (NULL);
   ClearRenderPriorities ();
 
 # ifdef CS_DEBUG
@@ -723,12 +725,12 @@ csEngine::~csEngine ()
 
   render_priorities.DeleteAll ();
 
-  delete materials;
-  delete textures;
   delete render_pol2d_pool;
-  delete lightpatch_pool;
   delete cbufcube;
   delete rad_debug;
+  delete materials;
+  delete textures;
+  delete lightpatch_pool;
   delete c_buffer;
   delete shared_variables;
 }
@@ -740,7 +742,11 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!virtual_clock) return false;
 
+#ifndef CS_USE_NEW_RENDERER
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#else
+  G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#endif // CS_USE_NEW_RENDERER
   if (!G3D)
   {
     // If there is no G3D then we still allow initialization of the
@@ -790,17 +796,23 @@ bool csEngine::HandleEvent (iEvent &Event)
         {
           if (G3D)
           {
+#ifndef CS_USE_NEW_RENDERER
             csGraphics3DCaps *caps = G3D->GetCaps ();
             fogmethod = caps->fog;
             NeedPO2Maps = caps->NeedsPO2Maps;
             MaxAspectRatio = caps->MaxAspectRatio;
-
+#else
+            NeedPO2Maps = false;
+            MaxAspectRatio = 4096;
+#endif // CS_USE_NEW_RENDERER
             frame_width = G3D->GetWidth ();
             frame_height = G3D->GetHeight ();
           }
           else
           {
+#ifndef CS_USE_NEW_RENDERER
             fogmethod = G3DFOGMETHOD_NONE;
+#endif // CS_USE_NEW_RENDERER
             NeedPO2Maps = false;
             MaxAspectRatio = 4096;
             frame_width = 640;
@@ -847,7 +859,9 @@ bool csEngine::HandleEvent (iEvent &Event)
 void csEngine::DeleteAll ()
 {
   nextframe_pending = 0;
+#ifndef CS_USE_NEW_RENDERER
   if (G3D) G3D->ClearCache ();
+#endif // CS_USE_NEW_RENDERER
   halos.DeleteAll ();
   collections.DeleteAll ();
 
@@ -1128,7 +1142,9 @@ bool csEngine::Prepare (iProgressMeter *meter)
   iTextureManager *txtmgr = G3D->GetTextureManager ();
   txtmgr->FreeImages ();
 
+#ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
+#endif // CS_USE_NEW_RENDERER
 
   // Prepare lightmaps if we have any sectors
   if (sectors.Length ()) ShineLights (NULL, meter);
@@ -1527,9 +1543,11 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   rview.SetCallback (NULL);
 
   // First initialize G3D with the right clipper.
+#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
+#endif // CS_USE_NEW_RENDERER
 
   iSector *s = c->GetSector ();
   s->Draw (&rview);
@@ -1542,7 +1560,9 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
       if (!halos.Get (halo)->Process (elapsed, *this)) halos.Delete (halo);
   }
 
+#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csEngine::DrawFunc (
@@ -1557,14 +1577,18 @@ void csEngine::DrawFunc (
   rview.SetCallback (callback);
 
   // First initialize G3D with the right clipper.
+#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
+#endif // CS_USE_NEW_RENDERER
 
   iSector *s = c->GetSector ();
   s->Draw (&rview);
 
+#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csEngine::AddHalo (csLight *Light)
@@ -1587,8 +1611,12 @@ void csEngine::AddHalo (csLight *Light)
   // If halo is not inside visible region, return
   if (!top_clipper->IsInside (csVector2 (v.x, v.y))) return ;
 
+#ifndef CS_USE_NEW_RENDERER
   // Check if light is not obscured by anything
   float zv = G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
+#else
+  float zv = 1;
+#endif // CS_USE_NEW_RENDERER
   if (v.z > zv) return ;
 
   // Halo size is 1/4 of the screen height; also we make sure its odd
@@ -1606,6 +1634,7 @@ void csEngine::AddHalo (csLight *Light)
 
   // Okay, put the light into the queue: first we generate the alphamap
   unsigned char *Alpha = Light->GetHalo ()->Generate (hs);
+#ifndef CS_USE_NEW_RENDERER
   iHalo *handle = G3D->CreateHalo (
       Light->GetColor ().red,
       Light->GetColor ().green,
@@ -1613,7 +1642,9 @@ void csEngine::AddHalo (csLight *Light)
       Alpha,
       hs,
       hs);
-
+#else
+  iHalo *handle = NULL;
+#endif // CS_USE_NEW_RENDERER
   // We don't need alpha map anymore
   delete[] Alpha;
 
@@ -2340,7 +2371,9 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
 {
   csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
   	"crystalspace.mesh.object.thing", name, sector));
+#ifndef CS_USE_NEW_RENDERER
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
+#endif CS_USE_NEW_RENDERER
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }
@@ -2352,7 +2385,9 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
   	"crystalspace.mesh.object.thing", name, sector));
   thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
+#ifndef CS_USE_NEW_RENDERER
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
+#endif CS_USE_NEW_RENDERER
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }
