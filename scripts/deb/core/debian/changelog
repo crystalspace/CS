@@ -1,3 +1,12 @@
+crystalspace (0.96-20030205-3) unstable; urgency=low
+
+  * CFLAGS += -fsigned-char for build failure on arm (Closes: bug#181222)
+  Thanks to Julien Moine (speedblue@debian.org)
+  * Compile even static lib with -fPIC to solve other build failure
+  until upstream support for dynamic libs should (Closes: bug#182253)
+
+ -- Christian Bayle <bayle@debian.org>  Wed, 26 Feb 2003 23:22:33 +0100
+
 crystalspace (0.96-20030205-2) unstable; urgency=low
 
   * New upstream version from R0_96 branch (Closes: bug#180419)
