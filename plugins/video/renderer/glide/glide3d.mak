@@ -1,1 +1,0 @@
--include $(addprefix plugins/video/renderer/glide/v, $(addsuffix .sub, $(GLIDE_VERSIONS) ))

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+5-Jul-2001
+	- Removed Glide renderer and canvases due to lack of
+	  maintenance. It was not functional either.
 4-Jul-2001
 	- Added iCamera::SetTransform() which should be used to directly
 	  set the transform. It is illegal to assign to the result of
