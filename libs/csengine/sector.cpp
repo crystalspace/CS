@@ -623,17 +623,6 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** p
   return NULL;
 }
 
-// csThingArray is a subclass of csCleanable which is registered
-// to csWorld.cleanup.
-class csThingArray : public csCleanable
-{
-public:
-  csThing** array;
-  int size;
-  csThingArray () : array (NULL), size (0) { }
-  virtual ~csThingArray () { CHK (delete [] array); }
-};
-
 csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
 {
   csFrustrum* lf = lview.light_frustrum;
@@ -643,21 +632,14 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
   csPolygonSetBBox* bbox;
   bool vis;
 
-  // This is a static vector array which is adapted to the
-  // right size everytime it is used. In the beginning it means
-  // that this array will grow a lot but finally it will
-  // stabilize to a maximum size (not big). The advantage of
-  // this approach is that we don't have a static array which can
-  // overflow. And we don't have to do allocation every time we
-  // come here. We register this memory to the 'cleanup' array
-  // in csWorld so that it will be freed later.
-  static csThingArray* cleanable = NULL;
-
-  if (!cleanable)
-  {
-    CHK (cleanable = new csThingArray ());
-    csWorld::current_world->cleanup.Push (cleanable);
-  }
+  /**
+   * First count all things to see how big we should allocate
+   * our array.
+   */
+  num_things = 0;
+  sp = first_thing;
+  while (sp) { num_things++; sp = (csThing*)(sp->GetNext ()); }
+  CHK (csThing** visible_things = new csThing* [num_things]);
 
   num_things = 0;
   sp = first_thing;
@@ -697,7 +679,7 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
           // To test this we consider all six faces of the bounding
           // box and see if a single ray from the light frustrum passes
           // through any of those faces.
-          csVector3& ray = lf->GetVertex (0);
+          //csVector3& ray = lf->GetVertex (0);
           // Unfinished!!! Here we need some more code but I'm not sure
           // how to do this efficiently.
           //@@@@@@@@@@@@@@@@@@
@@ -711,26 +693,10 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
       }
     }
 
-    if (vis)
-    {
-      num_things++;
-      if (num_things > cleanable->size)
-      {
-        CHK (csThing** new_array = new csThing* [cleanable->size+5]);
-        if (cleanable->array)
-        {
-          memcpy (new_array, cleanable->array, sizeof (csThing*)*cleanable->size);
-          CHK (delete [] cleanable->array);
-        }
-        cleanable->array = new_array;
-        cleanable->size += 5;
-      }
-      cleanable->array[num_things-1] = sp;
-    }
-
+    if (vis) visible_things[num_things++] = sp;
     sp = (csThing*)(sp->GetNext ());
   }
-  return cleanable->array;
+  return visible_things;
 }
 
 void csSector::CalculateLighting (csLightView& lview)
@@ -801,6 +767,7 @@ void csSector::CalculateLighting (csLightView& lview)
     sp = visible_things[i];
     if (!sp->IsMerged ()) sp->CalculateLighting (lview);
   }
+  CHK (delete [] visible_things);
 
   // Restore the shadow list in 'lview' and then delete
   // all the shadow frustrums that were added in this recursion
