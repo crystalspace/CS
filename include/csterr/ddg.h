@@ -49,6 +49,9 @@
 #endif
 // Various assert macros.
 //
+#define ddgAssert(a)
+#define ddgAsserts(a,b)
+#define ddgMemorySet(a,b)
 #ifndef WIN32
 #ifndef OPTIM
 #define _DEBUG

@@ -88,6 +88,8 @@ public:
 	{
 		return (n - _base) /_scale;
 	}
+	/// Try all ways to load a height map from TGN/BT/DEM/DTED/GTOPO30 file.
+	bool loadTerrain(const char *filename);
 	/** Load an image buffer from a memory buffer.
 	 * Return true on error.
 	 */
@@ -96,12 +98,12 @@ public:
 	/** Read an image buffer from a Terragen file.
 	 * Return true on error.
 	 */
-	bool readTGN(char *file);
+	bool readTGN(const char *file);
 
 	/** Write an image buffer to a Terragen file.
 	 * Return true on error.
 	 */
-	bool writeTGN(char *file, unsigned int base, unsigned int scale);
+	bool writeTGN(const char *file);
 	/** Generate a height map and fill this image with the
 	 *  contents.
 	 */
@@ -137,12 +139,14 @@ public:
 	void setmaxf( float m) { setmax( int (iconvert(m))); }
 	/// Set min value.
 	void setminf( float m) { setmin( int (iconvert(m))); }
-	/// Pull the edge of the heightmap down to 0.
-	void closeEdge(void);
+	/// Pull the edge of the heightmap down to l.
+	void closeEdge(float l);
 	/// Initialize with a sin curve
 	void sin(void);
 	/// Read terrain data from PGM data.
-	bool readPGM(char* data, int desired_max);
+	bool readPGM(const char* data, int desired_max);
+	/// Save height map as TGA image.
+	bool saveAsTGA(const char *filename);
 
 };
 

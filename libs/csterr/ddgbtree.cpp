@@ -26,21 +26,11 @@
 extern void transformer(csVector3 vin, csVector3 *vout);
 
 // Constant used for identifying brothers.
-const	unsigned int BINIT = 0xFFFFFFFF;
+const	unsigned int ddgNINIT = 0xFFFFFFFF;
 
 // ----------------------------------------------------------------------
 
 csVector3 ddgTBinTree::_unit;
-/// Set the unit vector.
-void ddgTBinTree::unit(csVector3 *v)
-{
-	_unit = *v;
-}
-/// Return the unit vector.
-csVector3 * ddgTBinTree::unit(void)
-{
-	return &_unit;
-}
 
 #if 0
 ostream& operator << ( ostream&s, ddgTBinTree *b )
@@ -68,9 +58,10 @@ ostream& operator << ( ostream&s, ddgTBinTree b )
 #endif
 
 /// s = size along one edge of mesh, mesh is 'square'.
-ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgHeightMap* h, int dr, int dc, bool mirror )
+ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgTreeIndex i, ddgHeightMap* h, int dr, int dc, bool mirror )
 {
     _init = false;
+	_index = i;
 	_mesh = m;
     _dr = dr;
     _dc = dc;
@@ -82,8 +73,15 @@ ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgHeightMap* h, int dr, int dc, bool 
 	_tri = new ddgMTri[triNo()+2];
 	// Initialize split queue with top triangle.
 	init();
-	// Add to the mesh.
-	_mesh->addBinTree(this);
+	// Top level triangles.
+	tri(0)->_state.all = 0;
+	tri(1)->_state.all = 0;
+	tri(0)->reset();
+	tri(1)->reset();
+	tri(triNo())->_state.all = 0;
+	tri(triNo()+1)->_state.all = 0;
+	tri(triNo())->reset();
+	tri(triNo()+1)->reset();
 	insertSQ(1);
 }
 
@@ -104,30 +102,30 @@ bool ddgTBinTree::init( void )
 		return false;
 	else
 		_init = true;
-	//          va     1 size,0
-	// Dummy entries.
-	tri(triNo())->thick( 9999);
-	tri(triNo()+1)->thick(9999);
-	// Top level triangles.
-	tri(0)->_state.all = 0;
-	tri(1)->_state.all = 0;
-	tri(0)->_cbufindex = 0;
-	tri(1)->_cbufindex = 0;
-	tri(1)->reset();
-	tri(triNo())->_state.all = 0;
-	tri(triNo()+1)->_state.all = 0;
-	tri(triNo())->_cbufindex = 0;
-	tri(triNo()+1)->_cbufindex = 0;
 
-    split(1,0,triNo(),triNo()+1,1);
+	float th = split(1,0,triNo(),triNo()+1,1);
+	ddgAssert( maxTh < 0xFFFF);
 
-	tri(0)->thick( tri(2)->thick()> tri(3)->thick()?tri(2)->thick():tri(3)->thick());
-	tri(1)->thick( tri(4)->thick()> tri(5)->thick()?tri(4)->thick():tri(5)->thick());
-	tri(triNo())->thick(
-		tri(0)->thick()> tri(1)->thick()?tri(0)->thick():tri(1)->thick());
-	tri(triNo()+1)->thick(tri(triNo())->thick()); 
+	tri(0)->thick( th);
+	tri(1)->thick( th);
+	tri(triNo())->thick(th);
+	tri(triNo()+1)->thick(th); 
 
 	return false;
+}
+
+void ddgTBinTree::initWtoC( ddgTBinMesh * /*mesh*/)
+{
+	csVector3 ev0,ev1,tmp;
+//	float * meshWtoC = mesh->wtoc();
+//	int i;
+//	for(i = 0; i < 16; i++)
+//	_wtoc.m[i] = meshWtoC[i];
+
+	transformer( csVector3(0,0,0), &ev0 );
+	transformer( csVector3(0,1,0), &ev1 );
+	tmp = ev1 - ev0;
+	_unit = tmp;
 }
 
 /**
@@ -174,97 +172,120 @@ float ddgTBinTree::split( unsigned int level,
 /// Remove triangle i.
 void ddgTBinTree::removeSQ(ddgTriIndex tindex )
 {
-    if (tri(tindex)->_state.flags.sq)
-    {
-	    tri(tindex)->_state.flags.sq = false;
-		// If we were visible and not a leaf node actually remove us.
-		_mesh->remCountIncr();
-		unsigned int p = priority(tindex);
-		_mesh->qs()->remove(_index,tindex,p);
+    ddgAsserts(tindex >=0 && tindex <= triNo()+2,"Index is out of range.");
+    ddgAsserts(tri(tindex)->_state.flags.sq,"Triangle is not in split queue.");
+    ddgAsserts(!_mesh->merge() || !tri(tindex)->_state.flags.mq,"Triangle also in merge queue!");
 
-		// If we were visible, reduce the count.
-		if (!tri(tindex)->_vis.flags.none)
-		{
-			_visTri--;
-		}
+	tri(tindex)->_state.flags.sq = false;
+	// If we were visible and not a leaf node actually remove us.
+	_mesh->remCountIncr();
+	unsigned int p = tri(tindex)->priority();
+//	ddgAsserts(tindex == 1 || p < 2 || p < tri(parent(tindex))->priority(),"Child has greater priority than parent!");
+
+	_mesh->qs()->remove(_index,tindex,p);
+	// If we were visible, reduce the count.
+	if (!tri(tindex)->_vis.flags.allout)
+	{
+		ddgAssert(_visTri > 0);
+		_visTri--;
 	}
-	// If this triangle is in the merge queue and
-	// it has a brother which is already in the
-	// merge queue, then remove it from the merge queue.
-	if (tri(parent(tindex))->_state.flags.mq)
+
+	//  then remove it from the merge queue if it is there.
+	if (_mesh->merge())
 		removeMQ(parent(tindex));
 }
 
 /// Insert triangle i into queue.
 void ddgTBinTree::insertSQ(ddgTriIndex tindex)
 {
-	reset(tindex,0);
-	tri(tindex)->_state.flags.sq = true;
-	_mesh->insCountIncr();
-	tri(tindex)->resetDelay();
-	unsigned int p = priority(tindex);
-	// Find insertion point.
-	_mesh->qs()->insert(_index,tindex,p);
+    ddgAsserts(tindex >=0 && tindex < triNo()+2,"Index is out of range.");
+    ddgAsserts(!tri(tindex)->_state.flags.sq,"Triangle already in split queue.");
 
-	ddgTriIndex b = 0;
-	// If we are the child of a merge diamond.
-	// The merge diamond is no longer mergable.
-	if (tindex > 3 && tri(parent(parent(tindex)))->_state.flags.mq)
-		removeMQ(parent(parent(tindex)));
-	else if (tindex > 3 && (b = brother(tindex)) &&
-        brotherTree(tindex)->tri(parent(parent(b)))->_state.flags.mq)
-		brotherTree(tindex)->removeMQ(parent(parent(b)));
-	if (isDiamond(tindex))
-		insertMQ(parent(tindex));
+	if (_mesh->merge())
+	{
+		removeMQ(tindex);
+	}
+	tri(tindex)->_state.flags.sq = true;
+	reset(tindex);
+	_mesh->insCountIncr();
+	tri(tindex)->resetPriorityDelay();
+	// Find insertion point.
+	unsigned int p = priority(tindex);
+	ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
+
+	_mesh->qs()->insert(_index,tindex,p);
+	if (_mesh->merge())
+	{
+		if (tindex  > 1 && isDiamond(parent(tindex)))
+			insertMQ(parent(tindex));
+	}
 }
 
-/// Remove triangle i.
+/*
+ Remove triangle i from merge queue if it is in the queue.
+ If it is not, but its neigbour is, then remove it instead.
+ If neither is in the merge queue, do nothing.
+*/
 void ddgTBinTree::removeMQ(ddgTriIndex tindex)
 {
-	ddgTriIndex b;
-	ddgTBinTree *bt;
+    ddgAsserts(tindex >=0 && tindex < triNo()+2,"Index is out of range.");
 	// See which is actually in the queue and remove it.
+	ddgTriIndex n = neighbour(tindex);
+	ddgTBinTree *nt = n ? neighbourTree(tindex) : 0;
+
 	if (tri(tindex)->_state.flags.mq)
 	{
-		unsigned int p = priority(tindex);
+		ddgAsserts(!tri(tindex)->_state.flags.sq,"Triangle is also in split queue!");
+		ddgAsserts(!n || !nt->tri(n)->_state.flags.mq,"Cant both be in merge queue");
+		unsigned int p = tri(tindex)->priority();
+//		ddgAsserts(tindex == 1 || p < 2 || p < tri(parent(tindex))->priority(),"Child has greater priority than parent!");
+
 		_mesh->qm()->remove(_index,tindex,p);
-	    tri(tindex)->_state.flags.mq = false;
+		_mesh->remCountIncr();
+		tri(tindex)->_state.flags.mq = false;
 	}
-	else if ((b = brother(tindex)) != 0)
+	else if (n && nt->tri(n)->_state.flags.mq)
 	{
-		bt = brotherTree(tindex);
-		unsigned int p = bt->priority(b);
-		_mesh->qm()->remove(bt->index(),b,p);
-	    bt->tri(b)->_state.flags.mq = false;
+		nt->removeMQ(n);
 	}
-	_mesh->remCountIncr();
 }
 
-/// Insert triangle i into queue.
+/*
+ Insert triangle i into queue if it isn't already there.
+ */
 void ddgTBinTree::insertMQ(ddgTriIndex tindex)
 {
-	// If we have a brother,
+    ddgAsserts(tindex >=0 && tindex < triNo()+2,"Index is out of range.");
+	// If we have a neighbour,
 	// Insert the one with higher priority into the queue.
-	ddgTriIndex b = brother(tindex);
-	ddgTBinTree *bt = b ? brotherTree(tindex) : 0;
-	ddgMTri *ti;
-	_mesh->insCountIncr();
-	if (b && priority(tindex) > bt->priority(b))
+	ddgTriIndex n = neighbour(tindex);
+	ddgTBinTree *nt = n ? neighbourTree(tindex) : 0;
+
+	if (n)
+		nt->tri(n)->resetPriorityDelay();
+	tri(tindex)->resetPriorityDelay();
+	unsigned int p = priority(tindex);
+
+	if (n && p < nt->priority(n))
 	{
-		ti = bt->tri(b);
-		ti->resetDelay();
-		_mesh->qm()->insert(bt->index(),b,bt->priority(b));
+		if (!nt->tri(n)->_state.flags.mq)
+			nt->insertMQ(n);
 	}
-	else
+	else if (!_tri[tindex]._state.flags.mq)
 	{
-		ti = tri(tindex);
-		ti->resetDelay();
-		_mesh->qm()->insert(_index,tindex,priority(tindex));
+	    ddgAsserts(!_tri[tindex]._state.flags.sq,"Triangle is also in Split Queue!");
+		ddgAsserts(!n|| !nt->tri(n)->_state.flags.mq,"Cant both be in merge queue");
+		_mesh->insCountIncr();
+
+		ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
+
+		_mesh->qm()->insert(_index,tindex,p);
+		tri(tindex)->_state.flags.mq = true;
 	}
-	ti->_state.flags.mq = true;
 }
 
-/** Split a triangle while keeping the mesh consistent.
+/*
+ * Split a triangle while keeping the mesh consistent.
  * there should be no T junctions. 'i' is a triangle index number.
  */
 void ddgTBinTree::forceSplit( ddgTriIndex tindex)
@@ -278,10 +299,10 @@ void ddgTBinTree::forceSplit( ddgTriIndex tindex)
         // Then we cannot force the parent to split.
         if (tindex < 2)
             return;
+        ddgAssert(tindex > 1);
         // TODO, optimize to not insert ourselves (tindex),
         // because we need to remove ourselves again anyways.
 		forceSplit(parent(tindex));
-		tri(tindex)->_state.flags.split = true;
 	}
     // We are in the queue at this time, remove ourselves.
 	if (tri(tindex)->_state.flags.sq)
@@ -293,14 +314,14 @@ void ddgTBinTree::forceSplit( ddgTriIndex tindex)
 	insertSQ(l);
 	insertSQ(r);
 
-    // If this triangle has a merge brother, it also needs to be in the split queue.
-	if (brother(tindex))
+    // If this triangle has a merge neighbour, it also needs to be in the split queue.
+	if (neighbour(tindex))
 	{
 		// Make sure its children are in the queue.
-		if (!brotherTree(tindex)->tri(left(brother(tindex)))->_state.flags.sq
-		 || !brotherTree(tindex)->tri(right(brother(tindex)))->_state.flags.sq)
+		if (!neighbourTree(tindex)->tri(left(neighbour(tindex)))->_state.flags.sq
+		 || !neighbourTree(tindex)->tri(right(neighbour(tindex)))->_state.flags.sq)
 		{
-			brotherTree(tindex)->forceSplit(brother(tindex));
+			neighbourTree(tindex)->forceSplit(neighbour(tindex));
 		}
 	}
 }
@@ -309,37 +330,38 @@ void ddgTBinTree::forceSplit( ddgTriIndex tindex)
 void ddgTBinTree::forceMerge( ddgTriIndex tindex)
 {
     // This triangle is in the merge queue.
-    // This triangle's brother must not be in the merge queue.
+    ddgAssert(tri(tindex)->_state.flags.mq);
+    // This triangle's neighbour must not be in the merge queue.
+    ddgAssert(!neighbour(tindex) || !neighbourTree(tindex)->tri(neighbour(tindex))->_state.flags.mq);
     // The children are in the split queue.
- 	// Remove its children and brothers children.
-	// Insert self and brother.
-	removeMQ(tindex);
+    ddgAssert(isDiamond(tindex));
+	// Remove its children and neighbours children.
 	removeSQ(left(tindex));
 	removeSQ(right(tindex));
-
+	// Insert self and neighbour.
 	insertSQ(tindex);
-	tri(tindex)->_state.flags.merged = true;
-    if (brother(tindex))
+	ddgTriIndex n = neighbour(tindex);
+	ddgTBinTree *nt = n ? neighbourTree(tindex) : 0;
+    if (n)
     {
-		brotherTree(tindex)->removeSQ(left(brother(tindex)));
-		brotherTree(tindex)->removeSQ(right(brother(tindex)));
-		brotherTree(tindex)->insertSQ(brother(tindex));
-		tri(brother(tindex))->_state.flags.merged = true;
+		nt->removeSQ(left(n));
+		nt->removeSQ(right(n));
+		nt->insertSQ(n);
     }
 }
 
-/// Return if a triangle is part of a mergeble diamond.
-// It is if its children and its brother's children are in the
-// split queue.
-bool ddgTBinTree::isDiamond(ddgTriIndex i)
+// Return if a triangle is part of a mergeble diamond.
+// It is if its children and its neighbour's children are in the split queue.
+// If true, then this triangle's parent or neighbour should be in the merge queue.
+bool ddgTBinTree::isDiamond(ddgTriIndex tindex)
 {
 
-    ddgTriIndex f = parent(i),		// Father.
-				 u = brother(f);	// Uncle.
-	if ( u < BINIT 
-       && tri(left(f))->_state.flags.sq && tri(right(f))->_state.flags.sq
-       && (!u || (brotherTree(u)->tri(left(u))->_state.flags.sq
-               && brotherTree(u)->tri(right(u))->_state.flags.sq)))
+    ddgTriIndex n = neighbour(tindex);		// Uncle.
+	ddgTBinTree *nt = n ? neighbourTree(n) : NULL;
+	if ( n < ddgNINIT 
+       && tri(left(tindex))->_state.flags.sq && tri(right(tindex))->_state.flags.sq
+       && (!n || (nt->tri(left(n))->_state.flags.sq
+               && nt->tri(right(n))->_state.flags.sq)))
 		return true;
 
 	return false;
@@ -349,47 +371,69 @@ bool ddgTBinTree::isDiamond(ddgTriIndex i)
  * Return if a mergeble diamond is within the viewing frustrum.
  * Returns true if at least one child is partially visible.
  */
-bool ddgTBinTree::isDiamondVisible(ddgTriIndex i)
+bool ddgTBinTree::isDiamondVisible(ddgTriIndex tindex)
 {
 
-    ddgTriIndex f = parent(i),		// Father.
-				 u = brother(f);	// Uncle.
-	if (tri(i)->_vis.flags.none)
+    ddgTriIndex f = parent(tindex),		// Father.
+				 u = neighbour(f);		// Uncle.
+	ddgAssert(u<ddgNINIT);
+	if (tri(tindex)->_vis.flags.allout && !u)
 		return false;
 	if (!u)
 		return true;
-	if (brotherTree(u)->tri(u)->_vis.flags.none)
+	if (neighbourTree(u)->tri(u)->_vis.flags.allout)
 		return false;
 
 	return true;
 }
 
 // Reset upto the point that the triangle are inserted but not below.
-void ddgTBinTree::reset(ddgTriIndex tvc, unsigned int level)
+void ddgTBinTree::reset(ddgTriIndex tindex)
 {
-    tri(tvc)->reset();  // Reset all but queue status.
-	if (level)
-	{
-		if (!tri(tvc)->_state.flags.sq)
-		{
-			reset(left(tvc),level-1);
-			reset(right(tvc),level-1);
-		}
-		else if (level>1)
-		{
-			tri(left(tvc))->_state.flags.dirty = true;
-			tri(right(tvc))->_state.flags.dirty = true;
-		}
-    }
+	ddgAsserts(tindex <= triNo(), "No leaf node was found in the queue!");
 
+	tri(tindex)->reset();  // Reset all but queue status.
+
+	// This will only go as far as the leaves which are currently in the split queue.
+	if (!tri(tindex)->_state.flags.sq)
+	{
+		reset(left(tindex));
+		reset(right(tindex));
+	}
 }
 
-void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
+/// Return the camera space vector.
+csVector3* ddgTBinTree::pos(ddgTriIndex tindex)
+{
+	csVector3 *ptri;
+	if (tri(tindex)->_cbufindex == 0)
+	{
+		// Get new entry if we need it.
+		tri(tindex)->_cbufindex = _mesh->vcache()->alloc();
+	}
+	ptri = _mesh->vcache()->get( tri(tindex)->_cbufindex );
+	// Transform the vertex if we need to.
+	if (tri(tindex)->_state.flags.coord != true)
+	{
+		static csVector3 wpqr;
+		vertex(tindex,&wpqr);
+		transformer( wpqr, ptri );
+		tri(tindex)->_state.flags.coord = true;
+	}
+	// Return the cache index to the transformed vertex.
+	return ptri;
+}
+
+void ddgTBinTree::visibility(ddgTriIndex tvc)
 {
 	ddgTriIndex tva = parent(tvc),
 		tv0 = v0(tvc),
 		tv1 = v1(tvc);
  
+    ddgAssert(_mesh->camBBox());
+	ddgAsserts(tvc <= triNo(), " No leaf node was found in the queue!");
+
+	bool oldVis = tri(tvc)->_vis.flags.allout;
 	// If visibility information is not valid.
 	if (tri(tvc)->_vis.visibility == ddgINIT)
 	{
@@ -409,15 +453,9 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			csVector3 *ptri;
 			csVector3 vu, vl;
 			csVector3 th;
-			csVector3 *un = unit();
+			csVector3 *un = &_unit;
 			// Calculate the parent.
 			ptri = pos(tva);
-			if (!tri(tva)->_state.flags.coord)
-			{
-				vertex(tva,&wpqr);
-				transformer( wpqr, ptri );
-				tri(tva)->_state.flags.coord = true;
-			}
 			th = (*un)*(tri(tvc)->thick());
 			vu = *ptri+th;
 			vl = *ptri-th;
@@ -427,12 +465,6 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 
 			// Calculate the left and right vertex.
 			ptri = pos(tv0);
-			if (!tri(tv0)->_state.flags.coord)
-			{
-				vertex(tv0,&wpqr);
-				transformer( wpqr, ptri );
-				tri(tv0)->_state.flags.coord = true;
-			}
 			th= (*un) *(tri(tv0)->thick());
 			vu = *ptri+th;
 			vl = *ptri-th;
@@ -440,12 +472,6 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			csMath3::SetMinMax(vl,pmin,pmax);
 
 			ptri = pos(tv1);
-			if (!tri(tv1)->_state.flags.coord)
-			{
-				vertex(tv1,&wpqr);
-				transformer( wpqr, ptri );
-				tri(tv1)->_state.flags.coord = true;
-			}
 			th = (*un)*(tri(tv1)->thick());
 			vu = *ptri+th;
 			vl = *ptri-th;
@@ -463,29 +489,37 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 				tri(tvc)->_vis = _mesh->camBBox()->visibleSpace(ddgBBox(pmin,pmax), thfov);
 			}
 		}
-		if (tri(tvc)->_state.flags.sq && !tri(tvc)->_vis.flags.none)
+		if (tri(tvc)->_state.flags.sq && !tri(tvc)->_vis.flags.allout)
 			// This triangle is in the mesh and is visible.
 		{
 			_visTri++;
 		}
 	}
-	// 
-	if (!tri(tvc)->_state.flags.sq && level )
+	// Check if we need to reset the priority delay
+	if (oldVis != tri(tvc)->_vis.flags.allout)
 	{
-		visibility(left(tvc),level-1);
-		visibility(right(tvc),level-1);
+		tri(tvc)->resetPriorityDelay();
 	}
+	// This will only go as far as the leaves which are currently in the split queue.
+	if (!tri(tvc)->_state.flags.sq )
+	{
+		visibility(left(tvc));
+		visibility(right(tvc));
+	}
+
 }
 
 // Recusively update priorities.
-void ddgTBinTree::priorityUpdate(ddgTriIndex tindex, unsigned int level)
+void ddgTBinTree::priorityUpdate(ddgTriIndex tindex)
 { 
+	ddgAsserts(tindex <= triNo(), " No leaf node was found in the queue!");
 	// If priority information is not valid.
-	if (!tri(tindex)->_state.flags.priority
+	if (!tri(tindex)->getPriorityDelay()
 		&& (tri(tindex)->_state.flags.sq || tri(tindex)->_state.flags.mq))
 	{
 		unsigned int op = tri(tindex)->priority();
 		unsigned int p = priority(tindex);
+		ddgAsserts(tindex == 1 || p < 2 || p < priority(parent(tindex)),"Child has greater priority than parent!");
 
 		if (op != p)
 		{
@@ -503,38 +537,36 @@ void ddgTBinTree::priorityUpdate(ddgTriIndex tindex, unsigned int level)
 			}
 		}
 	}
-	// 
-	if (!tri(tindex)->_state.flags.sq && level )
+	// This will only go as far as the leaves which are currently in the split queue.
+	if (!tri(tindex)->_state.flags.sq )
 	{
-		priorityUpdate(left(tindex),level-1);
-		priorityUpdate(right(tindex),level-1);
+		priorityUpdate(left(tindex));
+		priorityUpdate(right(tindex));
 	}
 }
 
 // Priority of Triangle tindex.
 unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 {
-	// Wedgies priority is uptodate.
-	if (tri(tvc)->_state.flags.priority)
-		return tri(tvc)->priority();
+    ddgAssert(tvc <= triNo());
 
-	// Ensure triangle's visibility is uptodate.
-	if (!tri(tvc)->_state.flags.coord)
+	// Wedgie's priority is uptodate.
+	if (tri(tvc)->getPriorityDelay())
 	{
-		visibility(tvc,0);
+		return tri(tvc)->priority();
 	}
 
-	tri(tvc)->_state.flags.priority = true;
+	// Ensure triangle's visibility is uptodate.
+	if (tri(tvc)->_vis.visibility == ddgINIT)
+	{
+		visibility(tvc);
+	}
 
 	// Wedgie is not visible.
-	if (tri(tvc)->_vis.flags.none )
-		return tri(tvc)->priority( 0 );
-
-	// For progressive calculation, don't bother recalcing unles delay = 1;
-	if (tri(tvc)->delay() > 0)
+	if (tri(tvc)->_vis.flags.allout )
 	{
-		tri(tvc)->decrDelay();
-		return tri(tvc)->priority();
+		tri(tvc)->setPriorityDelay( 1 );
+		return tri(tvc)->priority( 0 );
 	}
 
 	// Our priority data is out of date, recalculate it.
@@ -570,58 +602,97 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	}
 
 	// Calculate the maximum screen space thickness.
-	csVector3 th = (*unit())*(tri(tvc)->thick());
+	csVector3 th = _unit*(tri(tvc)->thick());
 
 	float result = ddgMAXPRI;
 #define ddgEPSILON 0.00001
-	csVector3 *vp = pos(tva);
 	float a = th[0],
-		  b = th[2],
-		  c = th[1],
-		  p = vp->x,
-		  q = vp->y,
-		  r = vp->z,
-		  d, da, d0, d1,
-		  m, ma, m0, m1;
-	if (r*r <= c*c + ddgEPSILON)
-		goto skip;
-	da = (sq(a*r-c*p)+sq(b*r-c*q));
-	ma = 2.0 / (r*r - c*c);
-	vp = pos(tv0);
-    p = vp->x;
-    q = vp->y;
-    r = vp->z;
-	if (r*r <= c*c + ddgEPSILON)
-		goto skip;
-	d0 = (sq(a*r-c*p)+sq(b*r-c*q));
-	m0 = 2.0 / (r*r - c*c);
-	vp = pos(tv1);
-    p = vp->x;
-    q = vp->y;
-    r = vp->z;
-	if (r*r <= c*c + ddgEPSILON)
-		goto skip;
-	d1 = (sq(a*r-c*p)+sq(b*r-c*q));
-	m1 = 2.0 / (r*r - c*c);
+		  b = th[1],
+		  c = th[2], cc,
+		  p[3], tp[3],
+		  q[3], tq[3],
+		  r[3],
+		  rr[3],
+		  d[3], dd,
+		  m[3], mm;
+	cc = c*c;
 
-    d = ddgUtil::max(da,ddgUtil::max(d0,d1));
-    m = ddgUtil::max(ma,ddgUtil::max(m0,m1));
-	result = sqrt(d) * m;
+	// Check for invalid values.
+    r[0] = pos(tv0)->z;
+	rr[0] = r[0]*r[0];
+	if (rr[0] <= cc + ddgEPSILON)
+		goto skip;
+    r[1] = pos(tv1)->z;
+	rr[1] = r[1]*r[1];
+	if (rr[1] <= cc + ddgEPSILON)
+		goto skip;
+	r[2] = pos(tva)->z;
+	rr[2] = r[2]*r[2];
+	if (rr[2] <= cc + ddgEPSILON)
+		goto skip;
+
+	// Perform expensive screen space error calculations.
+    p[0] = pos(tv0)->x;
+    q[0] = -1*pos(tv0)->y;
+	tp[0] = a*r[0]-c*p[0];
+	tq[0] = b*r[0]-c*q[0];
+	d[0] = (sq(tp[0])+sq(tq[0]));
+	m[0] = 2.0 / (rr[0] - cc);
+
+    p[1] = pos(tv1)->x;
+    q[1] = -1*pos(tv1)->y;
+	tp[1] = a*r[1]-c*p[1];
+	tq[1] = b*r[1]-c*q[1];
+	d[1] = (sq(tp[1])+sq(tq[1]));
+	m[1] = 2.0 / (rr[1] - cc);
+
+	p[2] = pos(tva)->x;
+	q[2] = -1*pos(tva)->y;
+	tp[2] = a*r[2]-c*p[2];
+	tq[2] = b*r[2]-c*q[2];
+	d[2] = (sq(tp[2])+sq(tq[2]));
+	m[2] = 2.0 / (rr[2] - cc);
+
+	// Find the maximum of both d and m.
+    dd = ddgUtil::max(d[2],ddgUtil::max(d[0],d[1]));
+    mm = ddgUtil::max(m[2],ddgUtil::max(m[0],m[1]));
+	// Calculate priority.
+	result = sqrt(dd) * mm;
+
+	// Map the priority into a range from 0 to ddgMAXPRI.
 	result = ddgUtil::clamp(result*1000,1,ddgMAXPRI);
 skip:
 	_mesh->priCountIncr();
-	// Map the priority into a range from 0 to ddgMAXPRI.
-	tri(tvc)->priority( (unsigned short)result);
+	// This puts in invalid values unless parents priority is always updated.
+	unsigned short tpriority = result;
+
+	if (tvc > 1 && tpriority > 1)
+	{
+		unsigned short ppriority = priority(parent(tvc)); 
+		if (ppriority <= tpriority)
+		{
+			tpriority = ppriority;
+			if (tpriority > 1)
+				tpriority--;
+		}
+	}
+
+	tri(tvc)->priority(tpriority);
+
 	// Calculate recalc delay.
 	float zMin = pos(tva,2);
 	if ( zMin < pos(tv0,2)) zMin = pos(tv0,2);
 	if ( zMin < pos(tv1,2)) zMin = pos(tv1,2);
-#ifdef DDG
-	if (zMin < 2*_mesh->progDist())
-		tri(tvc)->setDelay(2);
-	else if (zMin < _mesh->progDist())
-		tri(tvc)->setDelay(1);
-#endif
+
+	// Z is negative decreasing with distance.
+	int v = 1;
+	if (_mesh->progdist() != 0)
+	{
+		v = zMin / _mesh->progdist();
+		v = ddgUtil::clamp(v,1,15);
+	}
+	tri(tvc)->setPriorityDelay(v);
+
 	return tri(tvc)->priority();
 }
 
@@ -630,32 +701,31 @@ float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz
 {
 	// Is this triangle mirrored.
     float m = (dx+dz > 1.0) ? 1.0 : 0.0;
-    float h1 = height((unsigned int)(r+ m),  (unsigned int)(c + m));
+    float h1 = height(r+ m,  c + m);
     float h2 = height(r,  c+1);
     float h3 = height(r+1,c);
-	// Handle special cases.
-	if (dx == m && dz == m)
-		return h1;
-	// Handle special cases.
-	if (dx == 0 && dz == 1)
-		return h2;
-	// Handle special cases.
-	if (dx == 1 && dz == 0)
-		return h3;
-	// Calculate new point on h2 h3 that intersects line h1 p.
-	float k = 1 / (dx + dz);
-	ddgVector2 n(k-dx*k,1-k-dz*k);
-	float sz = n.size();
-	// Interpolate new height.
-	float nh = sz * (h2 - h3)+h3;
-	// Calculate distance from new point to h1
-	ddgVector2 nh1(m-dx*k,m-dz*k);
-	float snh1 = nh1.size();
-	// Calculate distance from p to h1.
-	ddgVector2 ph1(m-dx,m-dz);
-	// Interpolate new height.
-	float sph1 = ph1.size();
-	float ph = sph1/snh1 * (nh - h1) + h1;
-    return ph;
+	csVector3 p0(m,h1,m),
+			   p1(0,h2,1),
+			   p2(1,h3,0),
+			   v(dx,0,dz);
+/*
+	ddgPlane p(p0,p1,p2);
+	p.projectAlongY(&v);
+*/
+    return v.y;
 }
 
+#ifdef _DEBUG
+bool ddgTBinTree::verify( ddgTriIndex tindex )
+{
+	if  (_mesh->merge() && tindex < _mesh->triNo()/2 && isDiamond(tindex))
+	{
+		ddgTriIndex n = neighbour(tindex);
+		ddgTBinTree *nt = n ? neighbourTree(tindex) : 0;
+		if ((tri(tindex)->_state.flags.mq == false) &&
+			(n&& nt->tri(n)->_state.flags.mq == false))
+			return true;
+	}
+	return false;
+}
+#endif

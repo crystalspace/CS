@@ -31,8 +31,8 @@ typedef union ddgCFlags {
 		bool bin:1;				/// Bottom.
 		bool nin:1;				/// Near.
 		bool fin:1;				/// Far.
-		bool all:1;				/// 0 = dontknow, 1 = all in, 2 = all out, 3 = undefined.
-		bool none:1;
+		bool allin:1;			/// all in.
+		bool allout:1;			/// all out.
 		} flags; 
 	unsigned char visibility;
 } ddgClipFlags; 

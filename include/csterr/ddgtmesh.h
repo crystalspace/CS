@@ -48,14 +48,14 @@ public:
 	 */
 	ddgTriIndex v0, v1;
 	/**
-	 * Index of the merge diamond which is our brother.
+	 * Index of the merge diamond which is our neighbour.
 	 * If we are on an edge, this may be in another TBinTree, and the
 	 * neighbour field will indicate which one.
 	 */
-	unsigned int brother;
+	ddgTriIndex neighbour;
 	/**
-	 * If this is not zero, the brother is in another TBinTree.
-	 * the flag indicates which neighbour the edge is in.
+	 * If this is not zero, the neighbour is in another TBinTree.
+	 * the flag indicates which neighbour tree the edge is in.
 	 * 0 - inner, 1 - top, 2 - left, 3 - diag.
 	 */
 	Edge edge(void)
@@ -93,11 +93,22 @@ public:
 	/// Initialize the cache.
 	void init (unsigned int size );
 	/// Get entry.
-	csVector3		*get(unsigned short index);
+	inline csVector3		*get(unsigned short index)
+	{
+		return &(_cache[index]);
+	}
 	/// New entry.
-	unsigned short	alloc(void);
+	inline unsigned short	alloc(void)
+	{
+		ddgAssert(_used + 1 < _size);
+		_used++;
+		return _used;
+	}
 	/// Reset cache to empty.
-	void reset(void);
+	inline void reset(void)
+	{
+		_used = 0;
+	}
 };
 
 /**
@@ -145,16 +156,16 @@ public:
  *           |/
  *   0,size  + n+1 (v0)
  *</pre>
- * Brothers and Merge Diamonds:<br>
+ * Neighbours and Merge Diamonds:<br>
  * If the triangles 2 and 3 are split again, their vc vertices will lie
  * halfway between vertices 0 and 1.  They will produce 4 children which
  * all share this common vc, however since the triangles (2 and 3) are
  * seperate triangles, the vc point is stored twice, once for 2 and once for 3.
  * To keep the mesh from cracking, if 2 is split, 3 must split also. No
  * T-junctions are allowed.  Because of this rule, 2 and 3 are considered
- * brothers and they form a merge diamond.
- * There is no easy way to know which triangle is the brother of another,
- * for this reason brother indices are precomputed and stored in a table.
+ * neighbours and they form a merge diamond.
+ * There is no easy way to know which triangle is the neighbour of another,
+ * for this reason neigbour indices are precomputed and stored in a table.
  * All other indices are readily available from the given triangle's own index.
  *<p><h4>
  * The mesh update process:
@@ -208,14 +219,10 @@ class WEXP ddgTBinMesh
 	ddgSplayTree	*_qs;
 	/// Merge queue.
 	ddgSplayTree	*_qm;
-	/// Z depth queue.
-	ddgSplayTree	*_qz;
 	/// Split queue iterator
 	ddgSplayIterator		*_qsi;
 	/// Merge queue
 	ddgSplayIterator		*_qmi;
-	/// Z depth queue iterator.
-	ddgSplayIterator		*_qzi;
 	/// Number of rows of bintrees.
 	unsigned int	_nr;
 	/// Number of columns of bintrees.
@@ -226,14 +233,18 @@ class WEXP ddgTBinMesh
     ddgBBox         *_camBBox;
     /// The field of view.
     float           _tanHalfFOV;
-	/// The number of triangles that should be displayed.
-	unsigned int	_detail;
+	/// The min number of triangles that should be displayed.
+	unsigned int	_mindetail;
+	/// The max number of triangles that should be displayed.
+	unsigned int	_maxdetail;
 	/// Distant clip range triangles beyond this point are not needed.
 	float		_farclip;
 	/// Near clip range triangles beyond this point are not needed.
 	float		_nearclip;
 	/// Triangles beyond this point have their priority recalculated once every n frames.
 	float		_progDist;
+	/// Merge queue active.
+	bool		_merge;
 	/// Total number of triangles rendered.  For statistics.
 	unsigned int _triCount;
 	/// Total number of priorities calculated.
@@ -244,6 +255,8 @@ class WEXP ddgTBinMesh
 	unsigned int _remCount;
 	/// Total number of queue updates.
 	unsigned int _movCount;
+	/// Number of balanceOperations this frame.
+	unsigned int _balanceCount;
 public:
 	/**
      * Constructor, pass in the size of the BinTree.
@@ -260,9 +273,9 @@ public:
 	/// Initialize the mesh.
 	bool init( double *worldToCameraMatrix, ddgBBox *camClipBox, float fov );
 	/**
-	 * Initialize the brother field of all triangles.
+	 * Initialize the neighbour field of all triangles.
 	 */
-	void initBrothers( void );
+	void initNeighbours( void );
 	/**
 	 *  Initialize the vertex and row/col data of the STri. 
 	 *  Passed in are the triangles which carry the points
@@ -281,68 +294,44 @@ public:
         return stri[i].edge();
     }
 
-	/// Function to add a bintree.
-	void addBinTree( ddgTBinTree *bt );
-	/// Function to remove a bintree.
-	void removeBinTree( ddgTBinTree *bt );
-	/// Return the bintree for a given index.
-	ddgTBinTree *getBinTree( ddgTreeIndex i)
-	{ assert(i < _bintreeMax); return _bintree[i]; }
-
 	/// Return the required LOD.
-	unsigned int detail( void ) { return _detail; }
+	unsigned int mindetail( void ) { return _mindetail; }
 	/// Set the required LOD.
-	void detail( unsigned int d ) { _detail = d; }
+	void mindetail( unsigned int d ) { _mindetail = d; }
+	/// Return the required LOD.
+	unsigned int maxdetail( void ) { return _maxdetail; }
+	/// Set the required LOD.
+	void maxdetail( unsigned int d ) { _maxdetail = d; }
 
 	/// Return the split queue 
 	ddgSplayTree *qs(void) { return _qs; }
 	/// Return the merge queue 
 	ddgSplayTree *qm(void) { return _qm; }
-	/// Return the merge queue 
-	ddgSplayTree *qz(void) { return _qz; }
 	/// Return an iterator for the visible set of triangles.
 	ddgSplayIterator* qsi(void) { return _qsi; }
-	/// Return an iterator for the visible set of triangles.
-	ddgSplayIterator* qzi(void) { return _qzi; }
 	/// Return a priority from the merge queue.
 	unsigned int prioritySQ( ddgSplayIterator *i );
 	/// Return the tree of an item from the split queue.
 	ddgTBinTree* treeSQ( ddgSplayIterator *i )
 	{
-		ddgSplayKey *sk = _qs->retrieve(i->current());
-		return getBinTree(sk->tree());
+		return getBinTree(_qs->retrieve(i->current())->tree());
 	}
 	/// Return an item from the split queue.
 	unsigned int indexSQ(ddgSplayIterator *i)
 	{
-		ddgSplayKey *sk = _qs->retrieve(i->current());
-		return sk->index();
+		return  _qs->retrieve(i->current())->index();
 	}
 	/// Return a priority from the merge queue.
 	unsigned int priorityMQ( ddgSplayIterator *i );
 	/// Return the tree of an item from the merge queue.
 	ddgTBinTree* treeMQ( ddgSplayIterator *i )
 	{
-		ddgSplayKey *sk = _qm->retrieve(i->current());
-		return getBinTree(sk->tree());
+		return getBinTree(_qm->retrieve(i->current())->tree());
 	}
 	/// Return an item from the split queue.
 	unsigned int indexMQ(ddgSplayIterator *i)
 	{
-		ddgSplayKey *sk = _qm->retrieve(i->current());
-		return sk->index();
-	}
-	/// Return the tree of an item from the merge queue.
-	ddgTBinTree* treeZQ( ddgSplayIterator *i )
-	{
-		ddgSplayKey *sk = _qz->retrieve(i->current());
-		return getBinTree(sk->tree());
-	}
-	/// Return an item from the split queue.
-	unsigned int indexZQ(ddgSplayIterator *i)
-	{
-		ddgSplayKey *sk = _qz->retrieve(i->current());
-		return sk->index();
+		return _qm->retrieve(i->current())->index();
 	}
 	/// Return the number of triangles.
 	unsigned int triNo(void) { return _triNo; }
@@ -378,9 +367,19 @@ public:
 	/// Get dirty state.
 	bool dirty( void ) { return _dirty; }
 
-	/// Calculate the optimal set of triangles for the mesh at current camera pos.
-	void calculate(void);
+	/**
+	 * Calculate the optimal set of triangles for the mesh at current camera pos.
+	 * returns true if any calculation was performed.
+	 */
+	bool calculate(void);
 
+	/// Function to add a bintree.
+	void addBinTree( ddgTBinTree *bt );
+	/// Function to remove a bintree.
+	void removeBinTree( ddgTBinTree *bt );
+	/// Return the bintree for a given index.
+	ddgTBinTree *getBinTree( ddgTreeIndex i)
+	{ ddgAssert(i < _bintreeMax && i >= 0); return _bintree[i]; }
 	/// Distant clip range triangles beyond this point are not needed.
 	float		farclip(void) { return _farclip; }
 	/// Near clip range triangles beyond this point are not needed.
@@ -390,9 +389,9 @@ public:
 	/// Near clip range triangles beyond this point are not needed.
 	inline void nearclip(float n) { _nearclip = n; }
 	/// Return the row/col index and tree at a given location.
-	void progDist(float p ) { _progDist = p; }
+	void progdist(float p ) { _progDist = p; }
 	/// Return the row/col index and tree at a given location.
-	float progDist(void) { return _progDist; }
+	float progdist(void) { return _progDist; }
 	/// Return the vertex cache.
 	ddgVCache	*vcache(void) { return &_vcache; }
 	/**
@@ -409,6 +408,10 @@ public:
 	 * Cannot be called before init.
      */
     float height(float x, float z);
+	/// Turn the usage of the merge queue on/off, should only be called inbetween frames.
+	void merge( bool m ) { _merge = m; }
+	/// Indicate if the merge queue is on/off.
+	bool merge( void ) { return _merge; }
 	/// Total number of triangles rendered.
     void triCountIncr(void) { _triCount++; }
 	/// Total number of priorities calculated.

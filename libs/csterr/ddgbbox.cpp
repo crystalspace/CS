@@ -75,10 +75,10 @@ ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 			&& (b.maxx() < 0 || b.maxx() <= b.minz() )
 			&& (b.maxy() < 0 || b.maxy() <= b.minz() )
 			&& (b.miny() > 0 || fabs(b.miny()) <= b.minz() ))
-			vis.flags.all = true;			// All Inside
+			vis.flags.allin = true;			// All Inside
 	}
 	else
-		vis.flags.none = true;				// All Outside.
+		vis.flags.allout = true;				// All Outside.
 
 	return vis;
 }

@@ -12,6 +12,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+2-Feb-2000
+	- Large update to terrain engine from Alex Pfaffe.
+	    - Now renders 3000 triangles instead of only about 1000.
+	    - Large speed increase (from 6 FPS to about 17 FPS in
+	      software).
 1-Feb-2000
 	- Improved demo screen for Blocks again.
 	- First block in demo is now actually random.

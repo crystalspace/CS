@@ -34,8 +34,9 @@
 #include "csterr/worditer.h"
 
 #define PGM_MAGIC "P2"
-
+#define NO_DEM 1
 // ----------------------------------------------------------------------
+unsigned long ddgEndianTest = 0x12345678L;
 
 ddgHeightMap::~ddgHeightMap(void)
 {
@@ -47,8 +48,9 @@ void ddgHeightMap::allocate( unsigned short r, unsigned short  c )
 	_cols = c;
 	_rows = r;
 	delete _pixbuffer;
-	assert(sizeof(short) == 2);
+	ddgAssert(sizeof(short) == 2);
 	_pixbuffer = new short[_cols*_rows];
+	ddgAsserts(_pixbuffer,"Failed to Allocate memory");
 }
 
 // ----------------------------------------------------------------------
@@ -64,7 +66,7 @@ bool ddgHeightMap::readMemory( unsigned short *buf )
 // ----------------------------------------------------------------------
 // load:
 
-bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scale)
+bool ddgHeightMap::writeTGN(const char *filename)
 {
 	FILE *fptr = filename && filename[0] ? fopen(filename,"wb") : 0;
 
@@ -80,8 +82,8 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 
 	// SIZE.
 	unsigned char ch1, ch2;
-	ch1 = _cols % 256;
-	ch2 = _cols - ch1 * 256;
+	ch1 = (_cols - 1) % 256;
+	ch2 = ((_cols - 1) - ch1) / 256;
 	fputc(ch1,fptr);
 	fputc(ch2,fptr);
 	// Padding 2 bytes.
@@ -95,7 +97,7 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	}
 
 	ch1 = _cols % 256;
-	ch2 = _cols - ch1 * 256;
+	ch2 = (_cols - ch1) / 256;
 	fputc(ch1,fptr);
 	fputc(ch2,fptr);
 	// Padding 2 bytes.
@@ -109,7 +111,7 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	}
 
 	ch1 = _rows % 256;
-	ch2 = _rows - ch1 * 256;
+	ch2 = (_rows - ch1) / 256;
 	fputc(ch1,fptr);
 	fputc(ch2,fptr);
 	// Padding 2 bytes.
@@ -122,30 +124,59 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 		goto error;
 	}
 
+	unsigned int scale, base;
+	scale = _scale * 65536;
+	base = _base;
 	ch1 = scale % 256;
-	ch2 = scale - ch1 * 256;
+	ch2 = (scale - ch1) / 256;
 	fputc(ch1,fptr);
 	fputc(ch2,fptr);
 
 	ch1 = base % 256;
-	ch2 = base - ch1 * 256;
+	ch2 = (base - ch1) / 256;
 	fputc(ch1,fptr);
 	fputc(ch2,fptr);
 
 	// Write data
-	int r, c;
+	if (*((unsigned char*)&ddgEndianTest) == 0x12)
+	{
+		char s;
+		int i;
+		for (i = 0; i < 2 * _rows * _cols; i=i+2)
+		{
+			s = _pixbuffer[i];
+			_pixbuffer[i] = _pixbuffer[i+1];
+			_pixbuffer[i+1] = s;
+		}
+	}
+	int r;
+	int cnt;
 	r = 0;
 
 	while (r < _rows)
 	{
-		for (c = 0; c < _cols; c++)
+		if ((cnt = fwrite(&(_pixbuffer[r*_cols]),2,_cols,fptr)) < (int)_cols)
 		{
-			ch1 = _pixbuffer[c + r * _cols] % 256;
-			ch2 = _pixbuffer[c + r * _cols] - ch1 * 256;
-			fputc(ch1,fptr);
-			fputc(ch2,fptr);
+			if (feof(fptr))
+			{
+				ddgAsserts(false,"Error writing to file!");
+			}
+			fclose(fptr);
+			return true;
 		}
 		r++;
+	}
+	// Swap byte order for machines with different endian.
+	if (*((unsigned char*)&ddgEndianTest) == 0x12)
+	{
+		char s;
+		int i;
+		for (i = 0; i < 2 * _rows * _cols; i=i+2)
+		{
+			s = _pixbuffer[i];
+			_pixbuffer[i] = _pixbuffer[i+1];
+			_pixbuffer[i+1] = s;
+		}
 	}
 	// File termination segment.
 	fputc(0,fptr);
@@ -157,15 +188,15 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 	return true;
 
 error:
-	fclose(fptr);
+	if (fptr)
+		fclose(fptr);
 	return false;
 }
 
-bool ddgHeightMap::readTGN(char *file)
+
+bool ddgHeightMap::readTGN(const char *file)
 {
 	FILE *fptr = file && file[0] ? fopen(file,"rb") : 0;
-	unsigned long test_value = 0x12345678L;
-	bool endian = (*((unsigned char*)&test_value) == 0x12);
 
 	if (!fptr)
 	{
@@ -262,7 +293,7 @@ bool ddgHeightMap::readTGN(char *file)
 		r++;
 	}
 	// Swap byte order for machines with different endian.
-	if  (endian)
+	if  (*((unsigned char*)&ddgEndianTest) == 0x12)
 	{
 		char s;
 		int i;
@@ -289,7 +320,7 @@ bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float oct )
 	float lacun = 2.0;
 	float fractalDim = 0.25;
 	float offset = 0.7;
-	double size = 3.0;  // sample range = 0 to 3 
+	double size = 3.0*r/256.0;  // sample range = 0 to 3 
 	short cc;
 	double n;
 	double v[3];
@@ -300,7 +331,7 @@ bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float oct )
 		for (ci = 0; ci < c; ci++)
 		{
 			n = ddgNoise::hybridmultifractal(v,fractalDim,lacun,oct,offset);	// Returns 0 to 1.
-			cc = (short) ddgUtil::clamp(n*75.0,0,255);	// Scale to fill range.
+			cc = (short) ddgUtil::clamp(n*0x3FFF-0x7FFF,-0x7FFF,0x7FFF);	// Scale to fill range.
 			set(ri,ci, cc);
 			v[1]+= size/c;
 		}
@@ -401,17 +432,18 @@ void ddgHeightMap::setmax( int m)
 		}
 }
 
-void ddgHeightMap::closeEdge(void)
+void ddgHeightMap::closeEdge(float l)
 {
+	l = iconvert(l);
 	for (unsigned r = 0; r < _rows; r++)
 	{
-		set(r,0,0);
-		set(r,_cols-1,0);
+		set(r,0,l);
+		set(r,_cols-1,l);
 	}
 	for (unsigned c = 0; c < _cols; c++ )
 	{
-		set(0,c,0);
-		set(_rows-1,c,0);
+		set(0,c,l);
+		set(_rows-1,c,l);
 	}
 }
 
@@ -423,6 +455,85 @@ void ddgHeightMap::sin(void)
 			set(r,c,(short)(10000*(ddgAngle::sin(180.0*(float)r/(float)_rows)
 				         +ddgAngle::sin(180.0*(float)c/(float)_cols))));
 		}
+}
+
+// Save image of height field.
+bool ddgHeightMap::saveAsTGA(const char * /*s*/)
+{
+#ifdef DDG
+	ddgImage * img = new ddgImage(rows(),cols(),1);
+	unsigned int r, c;
+	unsigned short f;
+	for (r = 0; r < rows(); r++)
+	for (c = 0; c < cols(); c++)
+	{
+		f = get(r,c);
+		img->set(r,c,(unsigned char) (f/256.0));
+	}
+	return img->writeTGA(s);
+#else
+	return true;
+#endif
+}
+
+bool ddgHeightMap::loadTerrain(const char *filename)
+{
+	bool retval = false;
+	retval = readTGN(filename);
+
+#ifndef NO_DEM
+	if (retval)
+	{
+		// Try one of the other formats.
+		ElevationGrid *eg = new ElevationGrid;
+
+		// Try to get one of the formats to load the file.
+		if (!eg->LoadFromBT(filename)
+		 ||	!eg->LoadFromDEM( filename)
+		 || !eg->LoadFromDTED(filename)
+		 || !eg->LoadFromGTOPO30(filename)
+		)
+		{
+			int		gr,gc, i,j,v ;
+			int min = eg->m_fMinHeight;
+			int max = eg->m_fMaxHeight;
+			float scale = 0x7FFF/max;
+			unsigned short r,c;
+			// TODO calc based on grid corners/heightdelta.
+			float s = 0.003,
+				  b = 0;
+
+			cerr << "Loaded DEM " << eg->GetName( ) << endl;
+
+			setScaleAndBase(s ,b);
+
+			eg->GetDimensions(gc, gr);
+			r = gr;
+			c = gc;
+			allocate(r,c);
+			for (i = 0; i < r; i++)
+			{
+				for (j = 0; j < c; j++)
+				{
+					// Scale and rebase to 0.
+					v = eg->GetFValue(i,j);
+					if (v == INVALID_ELEVATION) v = 0;
+					v = (v * scale); // WORLD_SCALE
+					v = ddgUtil::clamp(v,-0x7FFF,0x7FFF);
+					set(i,j,v);
+				}
+			}
+			cerr << "Terrain loaded " << rows() << "x" << cols() << endl;
+			retval = false;
+		}
+		else
+		{
+			retval = true;
+		}
+		delete eg;
+	}
+#endif
+	return (retval);
 }
 
 /*
@@ -456,7 +567,7 @@ int stringToInt(char *str)
 	6. Error reporting is only via the return value but is commented :)
 	7. PGMs aren't really meant to be fast, and this function isn't either
 */
-bool ddgHeightMap::readPGM(char* data, int desired_max)
+bool ddgHeightMap::readPGM(const char* data, int desired_max)
 {
 	int	max_grey;
 	int width;
@@ -464,7 +575,7 @@ bool ddgHeightMap::readPGM(char* data, int desired_max)
 	
 	char* token;
 	
-	WordIterator st(data, " \n\t");
+	WordIterator st((char*)data, " \n\t");
 	
 	token = st.nextWord();
 	if (!strncmp(token, PGM_MAGIC, strlen(PGM_MAGIC)))

@@ -27,6 +27,7 @@ class csTextureHandle;
 class ddgTBinMesh;
 class ddgHeightMap;
 class ddgBBox;
+class ddgVBuffer;
 class csVector3;
 
 class ddgColor3
@@ -55,6 +56,8 @@ private:
   ddgHeightMap* height;
   ///
   ddgBBox* clipbox;
+  ///
+  ddgVBuffer *vbuf;
   /// Terrain handle.
   csTextureHandle *_textureMap;
   /// World to camera transformation matrix.

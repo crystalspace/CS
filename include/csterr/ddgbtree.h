@@ -24,10 +24,11 @@
 /**
  * A triangle object maintained by a TBinTree mesh.
  * The data in this class is unique for each TBinTree.
- * 2+2+2+1+1+1=9 bytes. Compiler aligns to 10
- * Convert to Structure Of Arrays.
+ * 2+2+2+1+1=8 bytes.
+ * Should be able to do this in 8 bytes.
  */
-#define ddgMAXPRI 50000
+#define ddgMAXPRI 0xFFFF
+#define ddgMINPRI 0
 class WEXP ddgMTri {
 	friend class ddgTBinTree;
 	friend class ddgTBinMesh;  // May be able to remove dependency.
@@ -47,25 +48,25 @@ class WEXP ddgMTri {
 	 * at rendertime it is reused as an index into the vertex buffers.
 	 */
 	unsigned short _cbufindex;
-	/// Refresh priority delay.  Reset to 0 when entering queue. (1 byte)
-	unsigned char _delay;
-    /// The flags which incidate which frustrum sides we intersected. (1 byte)
+	unsigned short _vbufindex;
+   /// The flags which incidate which frustrum sides we intersected. (1 byte)
 	ddgClipFlags _vis;
 	/// Flags indicating the triangle's state.
 	typedef union {
 		unsigned char all;
 		struct {
-	        bool sq:1;			/// 1 Flag is true if triangle is in the split queue.
-            bool mq:1;			/// 2 Flag is true if triangle is in the merge queue.
-	        bool merged:1;		/// 5 Flag is true if triangle was merged in this frame.
-	        bool split:1;		/// 6 Flag is true if triangle was split in this frame.
-	        bool coord:1;		/// 3 Flag is true if coord cpqr is correct for frame.
-	        bool priority:1;	/// 4 Flag is true if priority is correct for frame.
-	        bool dirty:1;       /// 7 Flag is true if the triangle was initialized.
-	        bool vbuffer:1;     /// 8 Flag is true if vertex is in buffer in this frame.
+			// if priority fields == 0, priority must be recalced.
+	        bool priority0:1;	/// 0 delay bit 0 LSB.
+	        bool priority1:1;	/// 1 .
+	        bool priority2:1;	/// 2 .
+	        bool priority3:1;	/// 3 delay bit 3 MSB.
+	        bool coord:1;		/// 4 Flag is true if coord cpqr is correct for frame.
+	        bool vbuffer:1;     /// 5 Flag is true if the coord is in the vertex buffer for frame.
+	        bool sq:1;			/// 6 Flag is true if triangle is in the split queue.
+            bool mq:1;			/// 7 Flag is true if triangle is in the merge queue.
 		} flags;
 	} ddgStateFlags;
-    /// State of triangle. (1 byte)
+    /// State of triangle.												(1 byte)
     ddgStateFlags  _state;
 public:
 	/// Return the objects visibility flags.
@@ -77,9 +78,9 @@ public:
     /// Return the priority of this triangle.
     inline unsigned short  priority(void) { return _priority; }
     /// Set the buffer index of this triangle.
-    inline unsigned int  vbufindex(unsigned int i) { return _cbufindex = i; }
+    inline unsigned int  vbufindex(unsigned int i) { return _vbufindex = i; }
     /// Return the buffer index of this triangle.
-    inline unsigned int  vbufindex(void) { return _cbufindex; }
+    inline unsigned int  vbufindex(void) { return _vbufindex; }
     /// Set the buffer flag for this triangle.
     inline unsigned int  setvbufflag(void) { return _state.flags.vbuffer = true; }
 	///	get wedge thickness.
@@ -89,23 +90,51 @@ public:
     /// Reset all but queue status.
     inline void reset()
 	{
-		_state.flags.merged = false;
-		_state.flags.split =false;
-		_state.flags.coord = false;
-		_state.flags.priority = false;
-		_state.flags.dirty = false;
-		_state.flags.vbuffer = false;
-	    _vis.visibility = ddgINIT;
-		_cbufindex = 0; 
+		_state.flags.coord = _state.flags.vbuffer = false;
+		decrPriorityDelay();
+		_vis.visibility = ddgINIT;
+		_cbufindex = 0;
 	}
-	/// Set priority delay.
-	inline void setDelay(unsigned char d) { _delay = d; }
-	/// Reset priority delay.
-	inline void resetDelay() { _delay = 0; }
-	/// Reset priority delay.
-	inline void decrDelay() { _delay--; }
-	/// Reset priority delay.
-	inline unsigned int delay() { return _delay; }
+
+	/// Set priority delay.  v should be a value from 0 to 15. 0 - invalid.
+	inline void setPriorityDelay(unsigned char v)
+	{
+		resetPriorityDelay();
+		_state.all += v;
+	}
+	/// Reset priority delay to zero.
+	inline void resetPriorityDelay()
+	{
+#ifdef WIN32
+		_state.all &= 0xF0;
+#else
+		_state.flags.priority0 =
+		_state.flags.priority1 =
+		_state.flags.priority2 =
+		_state.flags.priority3 = false;
+#endif
+	}
+	/// Decrement the delay by one.
+	inline void decrPriorityDelay()
+	{
+		unsigned char v = getPriorityDelay();
+		if (v>0)
+			setPriorityDelay(v-1);
+		ddgAssert(getPriorityDelay()>=0 && getPriorityDelay() < 16);
+	}
+	/// Return priority delay.
+	inline unsigned char getPriorityDelay()
+	{
+#ifdef WIN32
+		return _state.all & 0x0F;
+#else
+		return
+			   ( _state.flags.priority3 ? 8 : 0)
+			+  ( _state.flags.priority2 ? 4 : 0)
+			+  ( _state.flags.priority1 ? 2 : 0)
+			+  ( _state.flags.priority0 ? 1 : 0);
+#endif
+	}
 };
 
 
@@ -179,7 +208,7 @@ public:
 	/**
 	 *  Construct a Bintree mesh.
 	 */
-	ddgTBinTree(ddgTBinMesh *m, ddgHeightMap* h, int dr = 0, int dc = 0, bool mirror = false);
+	ddgTBinTree(ddgTBinMesh *m, ddgTreeIndex i, ddgHeightMap* h, int dr = 0, int dc = 0, bool mirror = false);
 	/// Destroy the Bintree mesh.
 	~ddgTBinTree(void);
 
@@ -198,10 +227,6 @@ public:
 	/// Set the neighbouring bin tree.
 	inline void pNeighbourLeft(ddgTBinTree* t) { _pNeighbourLeft = t; }
 
-	/// Set the unit vector.
-	static void unit(csVector3 *v);
-	/// Return the unit vector.
-	static csVector3 * unit(void);
 	/// Returns the column offset in the height map.
 	int dc(void) { return _dc; }
 	/// Returns the row offset in the height map.
@@ -301,34 +326,35 @@ public:
 		return i/2;
 	}
 	/// Return the index of the left child.
-	static ddgTriIndex right(ddgTriIndex i)
-	{
-		return i*2;
-	}
-	/// Return the index of the left child.
 	static ddgTriIndex left(ddgTriIndex i)
 	{
 		return right(i)+1;
 	}
-	/// Return the quad brother. If 0 there is no brother.
-	ddgTriIndex brother( ddgTriIndex i)
+	/// Return the index of the left child.
+	static ddgTriIndex right(ddgTriIndex i)
+	{
+		return i*2;
+	}
+	/// Return the quad neighbour. If 0 there is no neighbour.
+	ddgTriIndex neighbour( ddgTriIndex i)
 	{
 		switch(_mesh->edge(i))
 		{
 		case eINNER:
-			return _mesh->stri[i].brother;
+			return _mesh->stri[i].neighbour;
 		case eTOP:
-			return _pNeighbourTop ? _mesh->stri[i].brother : 0;
+			return _pNeighbourTop ? _mesh->stri[i].neighbour : 0;
 		case eLEFT:
-			return _pNeighbourLeft ? _mesh->stri[i].brother : 0;
+			return _pNeighbourLeft ? _mesh->stri[i].neighbour : 0;
 		case eDIAG:
-			return _pNeighbourDiag ? _mesh->stri[i].brother : 0;
+			return _pNeighbourDiag ? _mesh->stri[i].neighbour : 0;
 		default:
+			ddgAsserts(0,"Invalid edge");
 			return 0;
 		}
 	}
-	/// Return the bintree of the brother.
-	ddgTBinTree *brotherTree( ddgTriIndex i)
+	/// Return the bintree of the neighbour.
+	ddgTBinTree *neighbourTree( ddgTriIndex i)
 	{
 		switch(_mesh->edge(i))
 		{
@@ -341,6 +367,7 @@ public:
 		case eDIAG:
 			return _pNeighbourDiag;
 		default:
+			ddgAsserts(0,"Invalid edge");
 			return 0;
 		}
 	}
@@ -361,14 +388,14 @@ public:
 		return (tri(i)->vis().visibility > 0) ? true : false;
 	}
 
-	/// Calculate visibility of a triangle.
-	void visibility(ddgTriIndex tvc, unsigned int level = 0);
+	/// Calculate visibility of tree below a triangle.
+	void visibility(ddgTriIndex tvc);
 
-	/// Reset flags.
-	void reset(ddgTriIndex tvc, unsigned int level = 0);
+	/// Reset flags in the tree below this triangle.
+	void reset(ddgTriIndex tvc);
 
-	/// Update priorities of all triangles in the mesh.
-	void priorityUpdate(ddgTriIndex tvc, unsigned int level = 0);
+	/// Update priorities of all triangles below this triangle.
+	void priorityUpdate(ddgTriIndex tvc);
 	/**
 	 *  Split this triangle into 2, and return the thickness.
 	 *  Splitting occurs along this points parent's 
@@ -406,26 +433,21 @@ public:
 
 	/// The mesh that manages this bintree.
 	ddgTBinMesh *mesh(void) { return _mesh; }
-	/// Set the index in the mesh.
-	void index(unsigned int i) { _index = i; }
 	/// Return the index in the mesh.
 	unsigned int index(void) { return _index; }
+	/// Init wtoc.
+	static void initWtoC( ddgTBinMesh *mesh);
 	/// Return the camera space vector.
-	inline csVector3* pos(ddgTriIndex ti)
-	{
-		if (tri(ti)->_cbufindex == 0)
-		{
-		// Get new entry.
-			tri(ti)->_cbufindex = _mesh->vcache()->alloc();
-		}
-		return _mesh->vcache()->get( tri(ti)->_cbufindex );
-	}
+	csVector3* pos(ddgTriIndex ti);
 	/// Return the camera space vector.
 	inline float pos(ddgTriIndex ti, unsigned int i)
 	{
 		return (*pos( ti ))[i];
 	}
-
+#ifdef _DEBUG
+	/// Test if queue status is correct for this triangle, return true on error.
+	bool verify( ddgTriIndex tindex );
+#endif
 };
 
 #endif

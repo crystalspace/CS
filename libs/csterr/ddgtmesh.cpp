@@ -23,14 +23,14 @@
 #include "csterr/ddgsplay.h"
 #include "csterr/ddgbtree.h"
 
-extern void transformer(csVector3 vin, csVector3 *vout);
 
 // ----------------------------------------------------------------------
 // NOTE This value is the maximum number of vertices that can be converted
 // per frame, this is approximatesly 3x the number of triangles in the frame.
-#define ddgVCACHESIZE	15000
+#define ddgVCACHESIZE	20000
 ddgVCache::ddgVCache( void )
 {
+	_cache = 0;
 	_size = 0;
 	_used = 0;
 }
@@ -46,24 +46,6 @@ ddgVCache::~ddgVCache( void )
 {
 	delete _cache;
 }
-/// Get entry.
-csVector3		*ddgVCache::get(unsigned short index)
-{
-	return &_cache[index];
-}
-/// New entry.
-unsigned short	ddgVCache::alloc(void)
-{
-	assert(_used + 1 < _size);
-	_used++;
-	return _used;
-}
-///
-void ddgVCache::reset(void)
-{
-	_used = 0;
-}
-
 
 /// Return a priority from the split queue.
 unsigned int ddgTBinMesh::prioritySQ( ddgSplayIterator *i )
@@ -87,11 +69,14 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	_bintreeMax = 2*(heightMap->cols()-1)/(ddgTBinMesh_size) * (heightMap->rows()-1)/(ddgTBinMesh_size);
 	typedef ddgTBinTree *ddgTBinTreeP;
 	_bintree = new ddgTBinTreeP[_bintreeMax];
-	_detail = 2000;
-	_farclip = 150;
 
+	_mindetail = 3000;
+	_maxdetail = 3200;
+
+	_farclip = 150;
 	_nearclip = 0;
-	_progDist = _farclip/3;
+	_progDist = _farclip/15;
+	_merge = true;
 	// Allocate memory for transformed vertices.
 	_vcache.init(ddgVCACHESIZE);
 
@@ -102,11 +87,9 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	// Queues to hold the visible, clipped and sorted visible triangles.
 	_qs = new ddgSplayTree( );
 	_qm = new ddgSplayTree( );
-	_qz = new ddgSplayTree( );
 	// By default the iterators support 1000 levels of nesting.
 	_qsi = new ddgSplayIterator(_qs);
 	_qmi = new ddgSplayIterator(_qm);
-	_qzi = new ddgSplayIterator(_qz);
 
 	unsigned int i;
 	for (i = 0; i < _bintreeMax; i++ )
@@ -126,7 +109,7 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	stri[1].row = (ddgTBinMesh_size)/2;
 	stri[1].col = (ddgTBinMesh_size)/2;
     initVertex(1,0,_triNo,_triNo+1,1);
-	initBrothers();
+	initNeighbours();
 
     _tanHalfFOV = tan(ddgAngle::degtorad(90.0/2.0));
     _camBBox = NULL;
@@ -140,6 +123,8 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	_remCount = 0;
 	/// Total number of queue updates by this camera.
 	_movCount = 0;
+	// Force calculate to run 1st time.
+	_balanceCount = 1;
 
 }
 
@@ -148,7 +133,6 @@ ddgTBinMesh::~ddgTBinMesh(void)
 	delete stri;
 	delete _qs;
 	delete _qm;
-	delete _qz;
 
 	delete _bintree;
 }
@@ -162,7 +146,6 @@ void ddgTBinMesh::addBinTree( ddgTBinTree *bt )
 	if (i < _bintreeMax)
 	{
 		_bintree[i] = bt;
-		bt->index(i);
 	}
 }
 /// Function to remove a bintree.
@@ -172,7 +155,6 @@ void ddgTBinMesh::removeBinTree( ddgTBinTree *bt )
 	while (i < _bintreeMax && _bintree[i] != bt) i++;
 	if (i < _bintreeMax)
 	{
-		_bintree[i]->index(0);
 		_bintree[i] = NULL;
 	}
 }
@@ -182,6 +164,7 @@ void ddgTBinMesh::removeBinTree( ddgTBinTree *bt )
  */
 bool ddgTBinMesh::init( double *worldToCameraMatrix, ddgBBox *camClipBox, float fov )
 {
+	ddgAssert(camClipBox);
     // Set world to camera transformation matrix.
     _wtoc = worldToCameraMatrix; 
     // Set the camera bounding box.
@@ -196,13 +179,24 @@ bool ddgTBinMesh::init( double *worldToCameraMatrix, ddgBBox *camClipBox, float 
 	_nc = (heightMap->cols()-1)/ddgTBinMesh_size;
 	_nr = (heightMap->rows()-1)/ddgTBinMesh_size;
 
-//cerr << "Creating " << _nc << " x " << _nr << " Tiles" << endl;
+#ifdef DDG
+	cerr << "Creating " << _nc << " x " << _nr << " Tiles" << endl;
+#endif
+	ddgTBinTree::initWtoC(this);
+
+	ddgTreeIndex index = 0;
 	for (i = 0; i < _nr; i++)
 	{
 		for (j = 0; j < _nc; j++)
 		{
-			bintree1 = new ddgTBinTree(this,heightMap,i*ddgTBinMesh_size,j*ddgTBinMesh_size);
-			bintree2 = new ddgTBinTree(this,heightMap,(i+1)*ddgTBinMesh_size,(j+1)*ddgTBinMesh_size,true);
+			bintree1 = new ddgTBinTree(this,index,heightMap,i*ddgTBinMesh_size,j*ddgTBinMesh_size);
+			ddgMemorySet(ddgTBinTree,1);
+			addBinTree(bintree1);
+			index++;
+			bintree2 = new ddgTBinTree(this,index,heightMap,(i+1)*ddgTBinMesh_size,(j+1)*ddgTBinMesh_size,true);
+			ddgMemorySet(ddgTBinTree,1);
+			addBinTree(bintree2);
+			index++;
 		}
 	}
 
@@ -212,16 +206,17 @@ bool ddgTBinMesh::init( double *worldToCameraMatrix, ddgBBox *camClipBox, float 
 		for (j = 0; j < _nc; j++)
 		{
 			_bintree[2*(i*_nc+j)]->pNeighbourDiag( _bintree[2*(i*_nc+j)+1]);
-			_bintree[2*(i*_nc+j)]->pNeighbourLeft( (j==0)? 0: _bintree[2*(i*_nc+j-1)+1]);
-			_bintree[2*(i*_nc+j)]->pNeighbourTop( (i==0)? 0: _bintree[2*((i-1)*_nc+j)+1]);
+			_bintree[2*(i*_nc+j)]->pNeighbourLeft( (j==0)? NULL: _bintree[2*(i*_nc+j-1)+1]);
+			_bintree[2*(i*_nc+j)]->pNeighbourTop( (i==0)? NULL: _bintree[2*((i-1)*_nc+j)+1]);
 			//
 			_bintree[2*(i*_nc+j)+1]->pNeighbourDiag( _bintree[2*(i*_nc+j)]);
-			_bintree[2*(i*_nc+j)+1]->pNeighbourLeft( (j+1==_nc)? 0: _bintree[2*(i*_nc+j+1)]);
-			_bintree[2*(i*_nc+j)+1]->pNeighbourTop( (i+1==_nr)? 0: _bintree[2*((i+1)*_nc+j)]);
+			_bintree[2*(i*_nc+j)+1]->pNeighbourLeft( (j+1==_nc)? NULL: _bintree[2*(i*_nc+j+1)]);
+			_bintree[2*(i*_nc+j)+1]->pNeighbourTop( (i+1==_nr)? NULL: _bintree[2*((i+1)*_nc+j)]);
 		}
 	}
-	i = 0;
-
+#ifdef DDG
+	cerr << endl << "Calculating wedgies:";
+#endif
     return false;
 }
 
@@ -254,28 +249,28 @@ void ddgTBinMesh::initVertex( unsigned int level,
 
 }
 
-// Constant used for identifying brothers.
-const	unsigned int BINIT = 0xFFFFFFFF;
+// Constant used for identifying neighbour.
+const	unsigned int ddgNINIT = 0xFFFFFFFF;
 
-// Precompute the brother field, this is used for merge diamonds.
-// This function can now initialize in constant time, there is an algoritm!!!
-// This function used to take 101689 ticks on a 256x256 mesh,
-//  it now takes only 168, that is over 600x faster (previous logic was O(nxn)).
-void ddgTBinMesh::initBrothers( void )
+// Precompute the neighbour field, this is used for merge diamonds.
+// This function can now initialize in constant time, there is an algoritm!
+void ddgTBinMesh::initNeighbours( void )
 {
-	// Find the brothers of all triangles.
+	// Find the neighbours of all triangles.
 	unsigned int t, b, k = 2, lk = 1, l = 0, klk, kk, kt;
 
-	// initialize all brothers to BINIT.
+	// initialize all neighbours to ddgNINIT.
 	for (t = 0; t < _triNo+2; t++)
-		stri[t].brother = BINIT;
+		stri[t].neighbour = ddgNINIT;
 
-	stri[1].brother = 1;
-	stri[0].brother = 0;
-	stri[_triNo].brother = _triNo;
-	stri[_triNo+1].brother = _triNo+1;
-//cerr << "Computing brothers...";
-	// Find the brother of each tri.
+	stri[1].neighbour = 1;
+	stri[0].neighbour = 0;
+	stri[_triNo].neighbour = _triNo;
+	stri[_triNo+1].neighbour = _triNo+1;
+#ifdef DDG
+	cerr << "Computing neighbour...";
+#endif
+	// Find the neighbour of each tri.
 	while ((++l) < _maxLevel)
 	{
         b = lk;
@@ -284,45 +279,48 @@ void ddgTBinMesh::initBrothers( void )
 		for (t = 0; t < lk; t++) // Only do half because of symmetry.
 		{
 			kt = k+t;
-			if (stri[kt].brother != BINIT)
+			if (stri[kt].neighbour != ddgNINIT)
 			{
 				continue;
 			}
             else if (l > 2 && l % 2 == 1) // Odd levels are a double copy of prev even level.
             {
-                stri[kt].brother = stri[lk+t].brother + b;
-                stri[klk+t].brother = stri[lk+t].brother + lk + b;
+                stri[kt].neighbour = stri[lk+t].neighbour + b;
+                stri[klk+t].neighbour = stri[lk+t].neighbour + lk + b;
             }
     	    // Check Edge cases
-			else if ((b = edge(kt)) != 0)
+			else if (b = edge(kt))
 			{
 				if (b==3) // Diagonal.
 				{
-				stri[kt].brother = kk-t-1;
-				stri[kk-t-1].brother = kt;
+				stri[kt].neighbour = kk-t-1;
+				stri[kk-t-1].neighbour = kt;
 				}
 				else
 				{
-				stri[kt].brother = klk-t-1;
-				stri[kk-t-1].brother = klk+t;
+				stri[kt].neighbour = klk-t-1;
+				stri[kk-t-1].neighbour = klk+t;
 				}
 			}
 			// Normal case
 			else
 			{
+				ddgAssert(stri[kt].neighbour == ddgNINIT);
 				// If the same row in the previous level was known, inherit.
                 if (lk && t < lk && !edge(lk + t))
                 {
-					stri[kt].brother = stri[lk + t].brother + lk;
-					stri[stri[kt].brother].brother = kt;
-					stri[klk+t].brother = stri[lk + t].brother + k;
-					stri[lk+stri[kt].brother].brother = klk + t;
+					stri[kt].neighbour = stri[lk + t].neighbour + lk;
+					stri[stri[kt].neighbour].neighbour = kt;
+					stri[klk+t].neighbour = stri[lk + t].neighbour + k;
+					stri[lk+stri[kt].neighbour].neighbour = klk + t;
                 }
-                else // It is a new brother.
+                else // It is a new neighbour.
                 {
 					b = k - 1 - t;
-					stri[kt].brother = k+b;
-					stri[k+b].brother = kt;
+					ddgAssert ( stri[kt].col == stri[k+b].col
+					  && stri[kt].row == stri[k+b].row);
+					stri[kt].neighbour = k+b;
+					stri[k+b].neighbour = kt;
                 }
 			}
 		}
@@ -331,87 +329,75 @@ void ddgTBinMesh::initBrothers( void )
 	}
 }
 
-void ddgTBinMesh::calculate( void )
+bool ddgTBinMesh::calculate( void )
 {
-	_dirty = true; // Assume always dirty for CS
-	if (_dirty)
+	// Dont do anything if we didnt move and the current frame is done.
+	if (!_dirty && !_balanceCount)
+		return  false;
+
+	unsigned int i = 0;
+	// Calc transform of unit vector once per frame and scale the rest.
+	ddgTBinTree::initWtoC(this);
+
+	// Reset the visibility counter.
+	_visTri = 0;
+	_vcache.reset();
+	// Calculate visibility info for all triangle currently in the mesh
+	// at the current camera position.
+	static bool lastMerge = false;
+	if (!lastMerge || !merge())
 	{
-		csVector3 ev0,ev1, tmp;
-		unsigned int i = 0;
-
-		// Calc transform of unit vector once per frame and scale the rest.
-		transformer( csVector3(0,0,0), &ev0 );
-		transformer( csVector3(0,1,0), &ev1 );
-		tmp = ev1 - ev0;
-		ddgTBinTree::unit( &tmp);
-		// Reset the visibility counter.
-		_visTri = 0;
-		_vcache.reset();
-		// Calculate visibility info for all triangle currently in the mesh
-		// at the current camera position.
-		while (i < _bintreeMax)
-		{
-			if (_bintree[i])
-			{
-				_bintree[i]->resetVisTri();
-				_bintree[i]->tri(_bintree[i]->triNo())->reset();
-				_bintree[i]->tri(_bintree[i]->triNo()+1)->reset();
-				_bintree[i]->tri(0)->reset();
-
-				_bintree[i]->reset(1,maxLevel());
-				_bintree[i]->visibility(1,maxLevel());
-			}
-			i++;
-		}
-		// Update priorities based on frustrum culling etc.
-		// If a priority has changed, the triangle needs to be removed and reinserted
-		i = 0;
-		while (i < _bintreeMax)
-		{
-			if (_bintree[i])
-			{
-				_bintree[i]->priorityUpdate(1,maxLevel());
-			}
-			i++;
-		}
-	
-		// See if there are merge diamonds which are not visible, if so, merge them.
-		{
-			bool done = false;
-			ddgTriIndex tindex;
-			ddgTBinTree *bt;
-			while(!done && _qm->size())
-			{
-			// This not the most efficient way but will do for now, perhaps this
-			// operation can be rolled in to the priority Update?
-				_qmi->reset();
-				ddgSplayKey *sk;
-				while (!_qmi->end()) 
-				{
-					sk = _qm->retrieve(_qmi->current());
-					bt = getBinTree(sk->tree());
-					tindex = sk->index();
-					if (!bt->isDiamondVisible(tindex)
-						&& !bt->tri(tindex)->state().flags.merged)
-					{
-						bt->forceMerge(tindex);
-						break;
-					}
-					_qmi->next();
-				}
-				if (_qmi->end())
-				  done = true;
-			}
-		}
-	
-		// Get the optimal number of triangles in the queue.
-		balanceQueue();
-        // Track the number of triangles produced be this calculation.
-	    _triCount += _qs->size();
-
-		_dirty = false;
+		clearSQ();
+		clearMQ();
 	}
 
+	while (i < _bintreeMax)
+	{
+		if (_bintree[i])
+		{
+			_bintree[i]->resetVisTri();
+			_bintree[i]->tri(triNo())->reset();
+			_bintree[i]->tri(triNo()+1)->reset();
+			_bintree[i]->tri(0)->reset();
+			if (!lastMerge || !merge())
+			{
+				// Top level triangles.
+				_bintree[i]->tri(0)->_state.all = 0;
+				_bintree[i]->tri(1)->_state.all = 0;
+				_bintree[i]->tri(triNo())->_state.all = 0;
+				_bintree[i]->tri(triNo()+1)->_state.all = 0;
+				_bintree[i]->tri(0)->reset();
+				_bintree[i]->tri(1)->reset();
+				_bintree[i]->tri(triNo())->reset();
+				_bintree[i]->tri(triNo()+1)->reset();
+				_bintree[i]->insertSQ(1);
+			}
+			_bintree[i]->reset(1);
+			_bintree[i]->visibility(1);
+
+		}
+		i++;
+	}
+	// Update priorities based on frustrum culling etc.
+	// If a priority has changed, the triangle needs to be removed and reinserted
+	i = 0;
+	while (i < _bintreeMax)
+	{
+		if (_bintree[i])
+		{
+			_bintree[i]->priorityUpdate(1);
+		}
+		i++;
+	}
+
+	// Get the optimal number of triangles in the queue.
+	_balanceCount = balanceQueue();
+	lastMerge = merge();
+    // Track the number of triangles produced be this calculation.
+	_triCount += _qs->size();
+
+	_dirty = false;
+	return _balanceCount ? true : false;
 }
 
 // Destroy all elements in the queue.
@@ -441,59 +427,47 @@ void ddgTBinMesh::clearMQ(void)
 	_qm->clear();
 }
 
-//
+// Returns false if we are blocked from splitting any further.
 bool ddgTBinMesh::splitQueue(void)
 {
-	bool done = false;
 	bool split = false;
 	// Remove the biggest item, split it.
 	_qsi->reset(true);
-	while (!split)
+	while (!_qsi->end())
 	{
 		ddgTBinTree *bt = treeSQ(_qsi);
 		ddgTriIndex i = indexSQ(_qsi);
-		if ( i < _triNo/2 
-			&& !bt->tri(i)->_state.flags.split
-			&& !bt->tri(i)->_state.flags.merged
-			&& !bt->tri(i)->_vis.flags.none) // Not a leaf!
+		if ( i < _triNo/2  // Not a leaf!
+			&& !bt->tri(i)->_vis.flags.allout)
 		{
 			bt->forceSplit(i);
 			split = true;
+			break;
 		}
-		else
-		{
-			if (_qsi->end())
-				done = split = true;
-			_qsi->next();
-		}
-	}
-	return done;
+		_qsi->prev();
+	} 
+	return split;
 }
 
-//
+// Returns false if we are blocked from merging any further.
 bool ddgTBinMesh::mergeQueue(void)
 {
-	bool done = false;
 	bool merged = false;
 	// Remove the smallest item, merge it.
 	_qmi->reset();
-	while (!merged)
+	while (!_qmi->end())
 	{
 		ddgTBinTree *bt = treeMQ(_qmi);
 		ddgTriIndex i = indexMQ(_qmi);
-		if ( i > 1 && !bt->tri(i)->_state.flags.merged) // Not a root!
+		if ( i > 0 )	 // Not a root!
 		{
 			bt->forceMerge(i);
 			merged = true;
+			break;
 		}
-		else
-		{
-			if (_qmi->end())
-				done = merged = true;
-			_qmi->next();
-		}
+		_qmi->next();
 	}
-	return done;
+	return merged;
 }
 
 unsigned int ddgTBinMesh::updateVisibleTri(void)
@@ -512,78 +486,62 @@ unsigned int ddgTBinMesh::updateVisibleTri(void)
 }
 /* Reoptimize the mesh by splitting high priority triangles
  * and merging low priority diamonds.
+ * Return the number of balance operations done.
  */
 unsigned int ddgTBinMesh::balanceQueue(void)
 {
-	unsigned int minTri = _detail;
-	unsigned int maxTri = _detail+20;
-	//unsigned int maxPri = 400; // Unused
-	unsigned int maxSp = 0, minMp = 0, qsz;
-	qsz =  _qs->size();
-	if (qsz)
-	{
-		_qsi->reset(true);
-		maxSp = prioritySQ(_qsi);
-	}
-	if (_qm->size())
-	{
-		_qmi->reset();
-		minMp = priorityMQ(_qmi);
-	}
-	// Loops should be gone no that we have the flags to indicate if a triangle has been split/merged
+	// Loops should be gone now that we have the flags to indicate if a triangle has been split/merged
 	// in this cycle.
-    unsigned int maxLoop = 1000; // Don't make more than 1000 adjustments. 
+    unsigned int maxLoop = merge()?_mindetail/4 : 0xFFFF; // Don't make more than maxLoop adjustments.
+	unsigned int priDiff = _mindetail/30;		// Allowable difference in priorities between queues.
+	unsigned int minDiff = _mindetail+_mindetail/100; // Min # triangles to start merging.
     unsigned int count = 0;
-    unsigned int pmaxSp = 0, pminMp = 0, pqs = 0, pqm = 0;
+	bool merged = true, split = true;
     // General case.
-	while (
-        (( updateVisibleTri() > maxTri) &&_qm->size() )||    // Too many triangles.
-        (_visTri < minTri ) ||                  // Too few triangles.
-        (_qm->size() &&                         // Right amount of tris, but:
-              (maxSp)			                // Highest split priority >
-            > (minMp)                           // Lowest merge priority.
-        ))
-
+	while (merged || split)			// We are still making progress.
 	{
+		updateVisibleTri();
+		merged = split = false;
         // See if we need to merge
-		if ( _qm->size() &&
-            (   _visTri > maxTri                          // We have too many triangles.
-             || (maxSp > minMp && _visTri >= maxTri) )    // Some non-contributing triangles, can be merged.
-           )
+		if ( merge() && _qm->size())
 		{
 			// Merge the diamond of lowest priority.
-			mergeQueue();
+			if ( _visTri > _maxdetail)  // We have too many triangles.
+			{
+				merged = mergeQueue();
+			}
+			else	// Check if the queues are balanced.
+			{
+				_qmi->reset();
+				_qsi->reset(true);
+				unsigned int pm = priorityMQ(_qmi);
+				unsigned int ps = prioritySQ(_qsi);
+				if ((pm == 0)			// We have useless merge diamonds, merge these 1st.
+										// We safely beyond the minimum # of triangles, and
+										// there is significant difference between the
+										// priorities of the split and merge queues.
+				  ||(_visTri > minDiff &&  (ps > pm + priDiff)) )
+				{
+					merged = mergeQueue();
+				}
+			}
 		}
 		// See if we need to split.
-		if ((_visTri < minTri                           // We don't have enough triangles.
-             || (_visTri < maxTri && maxSp > minMp ) )  // We have triangles which should be split.
-            )
+		if (!merged && _visTri < _mindetail )                     // We don't have enough triangles.
 		{
 			// So  split the triangle of highest priority.
-			splitQueue();
+			split = splitQueue();
 		}
 
-        if (count++ > maxLoop)
+		if (merged || split)
+			count++;
+
+        if ( count > maxLoop )
         {
             break;  // We are taking too long.
         }
-        if (maxSp == pmaxSp && minMp == pminMp && _qs->size() == pqs && _qm->size() == pqm)
-            break;  // We are not making progress.
-        pmaxSp = maxSp;
-        pminMp = minMp;
-        pqs = _qs->size();
-        pqm = _qm->size();
-		if (pqs)
-		{
-			_qsi->reset(true);
-		    maxSp = prioritySQ(_qsi);
-		}
-		if (pqm)
-		{
-			_qmi->reset();
-			minMp = priorityMQ(_qmi);
-		}
 	}
+
 	return count;
 }
 
