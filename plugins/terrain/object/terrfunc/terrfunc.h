@@ -162,6 +162,7 @@ public:
   /// Set the normal function to use for the terrain.
   void SetNormalFunction (csTerrainNormalFunction* func, void* d)
   { normal_func = func; normal_func_data = d; initialized = false; }
+  void SetHeightMap (iImage* im, float hscale, float hshift);
 
   ///--------------------- iTerrainObject implementation ---------------------
   DECLARE_IBASE;
@@ -339,15 +340,17 @@ public:
     {
       return scfParent->GetColor ();
     }
-    virtual void SetHeightFunction (csTerrainHeightFunction* func,
-    	void* d)
+    virtual void SetHeightFunction (csTerrainHeightFunction* func, void* d)
     {
       scfParent->SetHeightFunction (func, d);
     }
-    virtual void SetNormalFunction (csTerrainNormalFunction* func,
-    	void* d)
+    virtual void SetNormalFunction (csTerrainNormalFunction* func, void* d)
     {
       scfParent->SetNormalFunction (func, d);
+    }
+    virtual void SetHeightMap (iImage* im, float hscale, float hshift)
+    {
+      scfParent->SetHeightMap (im, hscale, hshift);
     }
     virtual void SetLODDistance (int lod, float dist)
     {

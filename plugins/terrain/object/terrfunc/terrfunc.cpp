@@ -31,6 +31,8 @@
 #include "iengine/rview.h"
 #include "isys/system.h"
 #include "ivideo/txtmgr.h"
+#include "igraphic/image.h"
+#include "csgfx/rgbpixel.h"
 #include "isys/vfs.h"
 #include "terrfunc.h"
 #include "qint.h"
@@ -77,6 +79,61 @@ csTerrBlock::~csTerrBlock ()
 static float TerrFunc (void*, float x, float y)
 {
   return 8. * (sin (x*40.)+cos (y*40.));
+}
+
+struct HeightMapData
+{
+  iImage* im;
+  int iw, ih;	// Image width and height.
+  float w, h;	// Image width and height.
+  csRGBpixel* p;
+  float hscale, hshift;
+};
+
+static float HeightMapFunc (void* data, float x, float y)
+{
+  HeightMapData* hm = (HeightMapData*)data;
+  float dw = fmod (x*hm->w, 1);
+  float dh = fmod (y*hm->h, 1);
+  int ix = int (x*hm->w);
+  int iy = int (y*hm->h);
+  int iw = hm->iw;
+  int ih = hm->ih;
+  int idx = iy * iw + ix;
+  float col00, col01, col10, col11;
+  csRGBpixel* p = hm->p;
+  col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
+  if (ix < iw)
+    col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
+  else
+    col10 = col00;
+  if (iy < ih)
+    col01 = float (p[idx+iw].red + p[idx+iw].green + p[idx+iw].blue)/3.;
+  else
+    col01 = col00;
+  if (ix < iw && iy < ih)
+    col11 = float (p[idx+iw+1].red + p[idx+iw+1].green + p[idx+iw+1].blue)/3.;
+  else
+    col11 = col00;
+  float col0010 = col00 * (1-dw) + col10 * dw;
+  float col0111 = col01 * (1-dw) + col11 * dw;
+  float col = col0010 * (1-dh) + col0111 * dh;
+  return col * hm->hscale + hm->hshift;
+}
+
+void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
+{
+  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+  data->im = im;
+  data->iw = im->GetWidth ();
+  data->ih = im->GetHeight ();
+  data->w = float (data->iw);
+  data->h = float (data->ih);
+  data->p = (csRGBpixel*)im->GetImageData ();
+  data->hscale = hscale;
+  data->hshift = hshift;
+  data->im->IncRef ();
+  SetHeightFunction (HeightMapFunc, (void*)data);
 }
 
 csTerrFuncObject::csTerrFuncObject (iSystem* pSys,

@@ -114,6 +114,8 @@ class csLoader : public iLoader
 
   /// Parse and load a single texture
   void txt_process (char *name, char* buf);
+  /// Parse and load a height texture
+  void heightgen_process (char* buf);
   /// Parse and load a single material
   void mat_process (char *name, char* buf, const char* prefix = NULL);
 

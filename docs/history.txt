@@ -3,6 +3,22 @@ The history order is reversed so that new features are at the top.
 4-May-2001
 	- Philip Wyett fixed the signed/unsigned warnings in the
 	  sequence manager.
+	- Wouter Wijngaards fixed a typo in the simple tutorial in the docs.
+	  A const char const* argv[] was missing the first const.
+	  This caused Initialize not to override SysSystemdriver Initialize,
+	  and this caused people to go crazy at the broken example. :-)
+	- Wouter fixed some bugs in the terrain image generator.
+	  Works now. But the debug printf needs to be enabled, otherwise
+	  the blue channel seems to be lost (images turn yellow). Weird.
+	- Added iTerrFuncState::SetHeightMap() to set a heightmap instead
+	  of a function. Any iImage can be used. It will average the
+	  red, green, and blue components. Size of the image is also not
+	  important (except for terrain accuracy of course). Linear
+	  interpolation is used to get inbetween values.
+	- Added HEIGHTMAP keyword to the terrfunc loader.
+	- Added new HEIGHTGEN keyword to the loader. With this keyword it
+	  is now possible to use the new class from Wouter to dynamically
+	  generate textures in combination with a heightmap.
 3-May-2001
 	- Wouter Wijngaards did the following:
 	  added a class that can generate iImages for terrain textures on

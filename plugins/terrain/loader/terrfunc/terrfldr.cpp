@@ -24,6 +24,9 @@
 #include "csutil/scanstr.h"
 #include "iengine/engine.h"
 #include "isys/system.h"
+#include "isys/vfs.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
 #include "iterrain/terrfunc.h"
 #include "iterrain/object.h"
 #include "iengine/terrain.h"
@@ -35,6 +38,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (GROUPMATERIAL)
   CS_TOKEN_DEF (BLOCKS)
   CS_TOKEN_DEF (GRID)
+  CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (TOPLEFT)
   CS_TOKEN_DEF (SCALE)
   CS_TOKEN_DEF (DIRLIGHT)
@@ -120,6 +124,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     CS_TOKEN_TABLE (GROUPMATERIAL)
     CS_TOKEN_TABLE (BLOCKS)
     CS_TOKEN_TABLE (GRID)
+    CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (TOPLEFT)
     CS_TOKEN_TABLE (SCALE)
     CS_TOKEN_TABLE (DIRLIGHT)
@@ -238,6 +243,44 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  float cost;
 	  ScanStr (pParams, "%d,%f", &lod, &cost);
 	  iTerrainState->SetMaximumLODCost (lod, cost);
+	}
+	break;
+      case CS_TOKEN_HEIGHTMAP:
+        {
+	  float hscale, hshift;
+	  ScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
+	  iVFS* vfs = QUERY_PLUGIN (pSystem, iVFS);
+	  if (!vfs)
+	  {
+	    printf ("No VFS!\n");
+	    exit (0);
+	  }
+	  iImageIO* loader = QUERY_PLUGIN_ID (pSystem,
+	  	CS_FUNCID_IMGLOADER, iImageIO);
+	  if (!loader)
+	  {
+	    printf ("No image loader!\n");
+	    exit (0);
+	  }
+
+	  iDataBuffer* buf = vfs->ReadFile (pStr);
+	  if (!buf || !buf->GetSize ())
+	  {
+	    printf ("Can't open file '%s' in vfs!\n", pStr);
+	    exit (0);
+	  }
+	  iImage* ifile = loader->Load (buf->GetUint8 (), buf->GetSize (),
+	  	CS_IMGFMT_TRUECOLOR);
+	  if (!ifile)
+	  {
+	    printf ("Error loading image '%s'!\n", pStr);
+	    exit (0);
+	  }
+	  iTerrainState->SetHeightMap (ifile, hscale, hshift);
+	  ifile->DecRef ();
+	  buf->DecRef ();
+	  loader->DecRef ();
+	  vfs->DecRef ();
 	}
 	break;
     }

@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 
 struct iEngine;
+struct iImage;
 class csVector3;
 class csColor;
 
@@ -36,7 +37,7 @@ typedef float (csTerrainHeightFunction)(void* data, float dx, float dy);
  */
 typedef csVector3 (csTerrainNormalFunction)(void* data, float dx, float dy);
 
-SCF_VERSION (iTerrFuncState, 0, 0, 3);
+SCF_VERSION (iTerrFuncState, 0, 0, 4);
 
 /**
  * This interface describes the API for the terrain object.
@@ -78,6 +79,8 @@ struct iTerrFuncState : public iBase
   /// Set the normal function to use for the terrain.
   virtual void SetNormalFunction (csTerrainNormalFunction* func,
   	void* data) = 0;
+  /// Use the given iImage to get a height function from.
+  virtual void SetHeightMap (iImage* im, float hscale, float hshift) = 0;
 
   /**
    * Set the distance at which to switch to the given lod level

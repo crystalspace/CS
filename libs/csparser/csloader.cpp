@@ -22,6 +22,7 @@
 #include "csutil/cfgfile.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
+#include "csfx/gentrtex.h"
 #include "csgfx/csimage.h"
 #include "csparser/crossbld.h"
 #include "csparser/csloader.h"
@@ -126,6 +127,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FRAME)
   CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (HARDMOVE)
+  CS_TOKEN_DEF (HEIGHTGEN)
+  CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (INVISIBLE)
   CS_TOKEN_DEF (KEY)
@@ -671,7 +674,8 @@ void csLoader::txt_process (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_2D;
         else
-          System->Printf (MSG_WARNING, "Warning! Invalid FOR_2D() value, 'yes' or 'no' expected\n");
+          System->Printf (MSG_WARNING,
+	  	"Warning! Invalid FOR_2D() value, 'yes' or 'no' expected\n");
         break;
       case CS_TOKEN_FOR_3D:
         if (strcasecmp (params, "yes") == 0)
@@ -679,7 +683,8 @@ void csLoader::txt_process (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_3D;
         else
-          System->Printf (MSG_WARNING, "Warning! Invalid FOR_3D() value, 'yes' or 'no' expected\n");
+          System->Printf (MSG_WARNING,
+	  	"Warning! Invalid FOR_3D() value, 'yes' or 'no' expected\n");
         break;
       case CS_TOKEN_PERSISTENT:
         flags |= CS_TEXTURE_PROC_PERSISTENT;
@@ -692,8 +697,9 @@ void csLoader::txt_process (char *name, char* buf)
         ScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);
         break;
       case CS_TOKEN_FILTER:
-        System->Printf (MSG_WARNING, "Warning! TEXTURE/FILTER statement is obsolete"
-                               " and does not do anything!\n");
+        System->Printf (MSG_WARNING,
+		"Warning! TEXTURE/FILTER statement is obsolete"
+                " and does not do anything!\n");
         break;
       case CS_TOKEN_FILE:
         filename = params;
@@ -704,7 +710,8 @@ void csLoader::txt_process (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags |= CS_TEXTURE_NOMIPMAPS;
         else
-          System->Printf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
+          System->Printf (MSG_WARNING,
+	  	"Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
         break;
       case CS_TOKEN_DITHER:
         if (strcasecmp (params, "yes") == 0)
@@ -712,14 +719,17 @@ void csLoader::txt_process (char *name, char* buf)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_DITHER;
         else
-          System->Printf (MSG_WARNING, "Warning! Invalid DITHER() value, 'yes' or 'no' expected\n");
+          System->Printf (MSG_WARNING,
+	  	"Warning! Invalid DITHER() value, 'yes' or 'no' expected\n");
         break;
     }
   }
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    System->Printf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a texture specification!\n", csGetLastOffender ());
+    System->Printf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing a texture specification!\n",
+	csGetLastOffender ());
     fatal_exit (0, false);
   }
 
@@ -731,6 +741,134 @@ void csLoader::txt_process (char *name, char* buf)
   if (tex && do_transp)
     tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
+}
+
+struct HeightMapData
+{
+  iImage* im;
+  int iw, ih;	// Image width and height.
+  float w, h;	// Image width and height.
+  csRGBpixel* p;
+  float hscale, hshift;
+};
+
+static float HeightMapFunc (void* data, float x, float y)
+{
+  HeightMapData* hm = (HeightMapData*)data;
+  float dw = fmod (x*hm->w, 1);
+  float dh = fmod (y*hm->h, 1);
+  int ix = int (x*hm->w);
+  int iy = int (y*hm->h);
+  int iw = hm->iw;
+  int ih = hm->ih;
+  int idx = iy * iw + ix;
+  float col00, col01, col10, col11;
+  csRGBpixel* p = hm->p;
+  col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
+  if (ix < iw)
+    col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
+  else
+    col10 = col00;
+  if (iy < ih)
+    col01 = float (p[idx+iw].red + p[idx+iw].green + p[idx+iw].blue)/3.;
+  else
+    col01 = col00;
+  if (ix < iw && iy < ih)
+    col11 = float (p[idx+iw+1].red + p[idx+iw+1].green + p[idx+iw+1].blue)/3.;
+  else
+    col11 = col00;
+  float col0010 = col00 * (1-dw) + col10 * dw;
+  float col0111 = col01 * (1-dw) + col11 * dw;
+  float col = col0010 * (1-dh) + col0111 * dh;
+  return col * hm->hscale + hm->hshift;
+}
+
+static void SetHeightMap (csGenerateTerrainImage* gen, iImage* im,
+	float hscale, float hshift)
+{
+  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+  data->im = im;
+  data->iw = im->GetWidth ();
+  data->ih = im->GetHeight ();
+  data->w = float (data->iw);
+  data->h = float (data->ih);
+  data->p = (csRGBpixel*)im->GetImageData ();
+  data->hscale = hscale;
+  data->hshift = hshift;
+  data->im->IncRef ();
+  gen->SetHeightFunction (HeightMapFunc, (void*)data);
+}
+
+void csLoader::heightgen_process (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (HEIGHTMAP)
+    CS_TOKEN_TABLE (LAYER)
+    CS_TOKEN_TABLE (TEXTURE)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char *params;
+  char* name;
+  int w = 256, h = 256;
+  csGenerateTerrainImage* gen = new csGenerateTerrainImage ();
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_HEIGHTMAP:
+        {
+	  char heightmap[255];
+	  float hscale, hshift;
+          ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  SetHeightMap (gen, img, hshift, hscale);
+	  img->DecRef ();
+	}
+	break;
+      case CS_TOKEN_LAYER:
+        {
+	  float height;
+	  char imagename[255];
+	  csVector2 scale, offset;
+          ScanStr (params, "%f,%s,%f,%f,%f,%f",
+		&height, imagename, &scale.x, &scale.y,
+		&offset.x, &offset.y);
+	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
+	  gen->AddLayer (height, img, scale, offset);
+	  img->DecRef ();
+	}
+        break;
+      case CS_TOKEN_TEXTURE:
+        {
+	  int totalw, totalh, startx, starty, partw, parth;
+	  ScanStr (params, "%d,%d,%d,%d,%d,%d", &totalw, &totalh,
+	  	&startx, &starty, &partw, &parth);
+	  iImage* img = gen->Generate (totalw, totalh, startx, starty,
+	  	partw, parth);
+	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
+	  	->RegisterTexture (img, CS_TEXTURE_3D);
+	  if (!TexHandle)
+	    System->Printf (MSG_WARNING,
+	    	"cannot create texture!");
+	  iTextureWrapper *TexWrapper = Engine->GetTextureList ()
+	  	->NewTexture (TexHandle);
+	  TexWrapper->QueryObject ()->SetName (name);
+	}
+	break;
+    }
+  }
+
+  delete gen;
+
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    System->Printf (MSG_FATAL_ERROR,
+    	"Token '%s' not found while parsing a heightgen specification!\n",
+	csGetLastOffender ());
+    fatal_exit (0, false);
+  }
 }
 
 static UInt ParseMixmode (char* buf)
@@ -1289,6 +1427,7 @@ bool csLoader::LoadTextures (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (HEIGHTGEN)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -1299,13 +1438,17 @@ bool csLoader::LoadTextures (char* buf)
   {
     if (!params)
     {
-      System->Printf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      System->Printf (MSG_FATAL_ERROR,
+      	"Expected parameters instead of '%s'!\n", buf);
       fatal_exit (0, false);
     }
     switch (cmd)
     {
       case CS_TOKEN_TEXTURE:
         txt_process (name, params);
+        break;
+      case CS_TOKEN_HEIGHTGEN:
+        heightgen_process (params);
         break;
     }
   }
