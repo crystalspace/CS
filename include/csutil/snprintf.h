@@ -4,14 +4,14 @@
 #include <stdarg.h>
 
 #if defined(__cplusplus)
-extern "C" {
+//extern "C" {
 #endif
 
 extern int cs_snprintf(char *, size_t, const char *, /*args*/ ...);
 extern int cs_vsnprintf(char *, size_t, const char *, va_list);
 
 #if defined(__cplusplus)
-}
+//}
 #endif
 
 #endif

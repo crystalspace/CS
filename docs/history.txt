@@ -54,6 +54,11 @@ The history order is reversed so that new features are at the top.
 	  Unfortunately, cs-config still has a number of shortcomings on some
 	  platforms, and will require some more work before it can be useful
 	  on those platforms.
+	- *Probably* fixed the problem with cs_snprintf not linking
+	  correctly. It works correctly for me on linux now. I fixed
+	  it by removing the 'extern "C"' around the declarations
+	  of cs_snprintf. Reenabled the use of cs_snprintf in three
+	  of the csutil files.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up
