@@ -1217,7 +1217,6 @@ bool csVFS::Initialize (iObjectRegistry *object_reg)
 
   basedir = csStrNew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
-  printf ("Config: %s\n", vfsconfigpath);
   config.Load (vfsconfigpath);
   return ReadConfig ();
 }

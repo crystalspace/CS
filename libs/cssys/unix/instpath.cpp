@@ -46,7 +46,6 @@ char* csGetConfigPath ()
     // is the current dir a possible install? try opening scf.cfg,
     if (!access ("scf.cfg", F_OK))                                    
     {
-      printf ("ConfigPath: .\n");
       return csStrNew (".");
     }
 
@@ -72,7 +71,6 @@ char* csGetConfigPath ()
   {
     strncpy (path, crystal, 300);
     strcat (path, "/etc");
-    printf ("ConfigPath: %s\n", path);
     return path;
   }
   
@@ -82,7 +80,6 @@ char* csGetConfigPath ()
   if (!access (path, F_OK))
   {
     strncpy (path, crystal, 320);
-    printf ("ConfigPath: %s\n", path);
     return path;
   }
     
