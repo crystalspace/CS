@@ -1,8 +1,42 @@
 The history order has been reversed so that new features are at the top.
 
+26-Sep-2000
+	- Did a few small fixes to the makefiles and csgame so that the apps
+	  link again after Andrew's changes.
+	- Added thing saving to levtool.
+	- Andrew Zabolotny did the following changes:
+	  - Made VFS a separate plug-in. This involves some minor changes
+	    in programs that use Crystal Space outside of CVS (all the
+	    sources in CVS have been updated): you have to remove all lines:
+		  REGISTER_STATIC_PLUGIN (vfs)
+	    from main source file; also you have to replace
+		  #include "csutil/vfs.h"
+	    with
+		  #include "ivfs.h"
+	    if you didn't this before (in any case VFS is always used through
+	    the SCF interface, so it is not likely there is any code left that
+	    makes use of the csVFS class directly).
+	  - Fixed a bug in perfstat plugin that sometimes leads to "0.00"
+	    being steady displayed instead of FPS.
+	  - Added the ability to determine file size without opening the
+	    file on VFS.
+	  - Changed walktest to maximal theoretical FPS of 100. Previously
+	    walktest never would *move* faster than at 40FPS. That is, the
+	    refresh rate can be even 500 FPS but you will never see anything
+	    moving faster than 100FPS. This should make the motion more
+	    smooth on powerful videocards.
+	  - Added acceleration ("run") to walktest by pressing SHIFT key.
+	    I have moved all "immediate move" commands (i_up, i_left and so
+	    on) to ctrl+# key bindings; that is, what previously has been
+	    achieved with shift+up you will get now by pressing
+	    ctrl+shift+up and so on. These commands are for debugging
+	    mostly anyway, and they conflict (they were conflicting before
+	    as well) with normal motion.
 25-Sep-2000
 	- Optimized radiosity inner loop a bit. This could give a
 	  significant speedup.
+	- Andrew fixed the modifications from Jerry with regards to
+	  CSWS themes to conform more to CS coding style.
 24-Sep-2000
 	- Eric Sunshine worked around namespace collisions in csUtil/Parser
 	  and csLoader caused by Microsoft Windows' namespace pollution.  All

@@ -45,7 +45,7 @@ wstest: $(OUTDIRS) $(CSWSTEST.EXE)
 clean: wstestclean
 
 $(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(CSWS.LIB) \
-  $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
 	$(DO.LINK.EXE)
 
 wstestclean:
