@@ -287,7 +287,6 @@ void csEventQueue::RemoveAllListeners ()
 {
   for (int i = Listeners.Length() - 1; i >= 0; i--)
   {
-		printf ("Removing listener...\n");
 		iBase* listener = Listeners[i].object;
     if (busy_looping <= 0)
     {
