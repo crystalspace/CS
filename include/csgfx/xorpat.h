@@ -19,16 +19,25 @@
 
 /**\file
  */
+ 
+/**\addtogroup gfx
+ * @{ 
+ */
 
 #ifndef __CS_XORPAT_H__
 #define __CS_XORPAT_H__
 
 /**
- * Create an iImage with a nice XOR pattern.
- * recdepth - "recursion depth", clamped to range 1-8
+ * Create an iImage with a nice XOR pattern with 2^\p recdepth
+ * shades of from white to black.
+ * \param width Width of the image to create
+ * \param height Height of the image to create
+ * \param recdepth "recursion depth", clamped to range 1-8.
  */
 extern csPtr<iImage> csCreateXORPatternImage(int width, int height,
 					     int recdepth);
+
+/** @} */
 
 #endif // __CS_XORPAT_H__
 

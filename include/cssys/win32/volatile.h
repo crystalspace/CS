@@ -47,4 +47,7 @@
 #	undef DO_DINPUT_KEYBOARD
 #endif
 
+#define CS_RGBCOLOR_SANE
+#define CS_RGBPIXEL_SANE
+
 #endif // __CS_WIN32_VOLATILE_H__
