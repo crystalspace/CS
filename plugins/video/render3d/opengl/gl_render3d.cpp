@@ -809,6 +809,13 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
   SetWriteMask (true,true,true,true);
 
+  int i = 0;
+  for (i = 0; i < 16; i++)
+  {
+    texunit[i] = NULL;
+    texunitenabled[i] = false;
+  }
+
   if (render_target)
   {
     int txt_w, txt_h;
