@@ -22,6 +22,12 @@
 
 #include "csgeom/vector2.h"
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 /**
  * A 2x2 matrix.
  */
@@ -124,6 +130,8 @@ public:
   /// Divide a matrix by a scalar.
   friend csMatrix2 operator/ (const csMatrix2& m, float f);
 };
+
+/** @} */
 
 #endif // __CS_MATRIX2_H__
 

@@ -19,6 +19,12 @@
 #ifndef __CS_SUBREC_H__
 #define __CS_SUBREC_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/csrect.h"
 
 /**
@@ -75,6 +81,8 @@ public:
    */
   void Dump ();
 };
+
+/** @} */
 
 #endif // __CS_SUBREC_H__
 

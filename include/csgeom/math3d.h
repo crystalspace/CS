@@ -24,6 +24,12 @@
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/plane2.h"
@@ -505,6 +511,8 @@ public:
     return false;
   }
 };
+
+/** @} */
 
 #endif // __CS_MATH3D_H__
 

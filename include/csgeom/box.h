@@ -20,6 +20,13 @@
 #ifndef __CS_BOX_H__
 #define __CS_BOX_H__
 
+/**\file 
+ * Bounding boxes for 2D and 3D space.
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "cstypes.h"	// for bool
 #include "vector2.h"
 #include "vector3.h"
@@ -34,30 +41,46 @@ class csTransform;
  */
 #define CS_BOUNDINGBOX_MAXVALUE 1000000000.
 
-/// For csBox2::GetCorner().
+/**\name Corner indices
+ * For csBox2::GetCorner().
+ * @{ */
+/// min X, min Y
 #define CS_BOX_CORNER_xy 0
+/// min X, max Y
 #define CS_BOX_CORNER_xY 1
+/// max X, min Y
 #define CS_BOX_CORNER_Xy 2
+/// max X, max Y
 #define CS_BOX_CORNER_XY 3
+/** @} */
 
 /**
- * Indices of edges for cxBox2.
+ * \name Indices of edges for cxBox2.
  * Index e+1 is opposite edge of e (with e even).
- */
+ * @{ */
+/// from min X, min Y to max X, min Y
 #define CS_BOX_EDGE_xy_Xy 0
+/// from max X, min Y to min X, min Y
 #define CS_BOX_EDGE_Xy_xy 1
+/// from max X, min Y to max X, max Y
 #define CS_BOX_EDGE_Xy_XY 2
+/// from max X, max Y to max X, min Y
 #define CS_BOX_EDGE_XY_Xy 3
+/// from max X, max Y to min X, max Y
 #define CS_BOX_EDGE_XY_xY 4
+/// from min X, max Y to max X, max Y
 #define CS_BOX_EDGE_xY_XY 5
+/// from min X, max Y to min X, min Y
 #define CS_BOX_EDGE_xY_xy 6
+/// from min X, min Y to min X, max Y
 #define CS_BOX_EDGE_xy_xY 7
+/** @} */
 
 /**
  * A bounding box in 2D space.
  * In order to operate correctly, this bounding box assumes that all values
  * entered or compared against lie within the range
- * (-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE).  It is not
+ * (-#CS_BOUNDINGBOX_MAXVALUE, #CS_BOUNDINGBOX_MAXVALUE).  It is not
  * recommended to use points outside of this range.
  */
 class csBox2
@@ -100,7 +123,7 @@ public:
    * to 3. This contrasts with Min() and Max() because
    * those are only the min and max corners.
    * Corner 0 = xy, 1 = xY, 2 = Xy, 3 = XY.
-   * Use CS_BOX_CORNER_??? defines.
+   * Use #CS_BOX_CORNER_xy etc. defines.
    */
   csVector2 GetCorner (int corner) const;
 
@@ -121,8 +144,8 @@ public:
   void SetSize (const csVector2& s);
 
   /**
-   * Given an edge index (CS_BOX_EDGE_???) return the two vertices
-   * (index CS_BOX_CORNER_???).
+   * Given an edge index (#CS_BOX_EDGE_xy_Xy etc.) return the two vertices
+   * (index #CS_BOX_CORNER_xy etc.).
    */
   void GetEdgeInfo (int edge, int& v1, int& v2) const
   {
@@ -132,7 +155,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 7 (CS_BOX_EDGE_???).
+   * from 0 to 7 (#CS_BOX_EDGE_xy_Xy etc.).
    */
   csSegment2 GetEdge (int edge) const
   {
@@ -141,7 +164,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 7 (CS_BOX_EDGE_???).
+   * from 0 to 7 (#CS_BOX_EDGE_xy_Xy etc.).
    */
   void GetEdge (int edge, csSegment2& e) const
   {
@@ -369,64 +392,106 @@ public:
 };
 
 /**
- * Indices of corner vertices for csBox3.
+ * \name Indices of corner vertices for csBox3.
  * Used by csBox3::GetCorner().
- */
+ * @{ */
+/// min X, min Y, min Z
 #define CS_BOX_CORNER_xyz 0
+/// min X, min Y, max Z
 #define CS_BOX_CORNER_xyZ 1
+/// min X, max Y, min Z
 #define CS_BOX_CORNER_xYz 2
+/// min X, max Y, max Z
 #define CS_BOX_CORNER_xYZ 3
+/// min X, min Y, min Z
 #define CS_BOX_CORNER_Xyz 4
+/// max X, min Y, max Z
 #define CS_BOX_CORNER_XyZ 5
+/// max X, max Y, min Z
 #define CS_BOX_CORNER_XYz 6
+/// max X, max Y, max Z
 #define CS_BOX_CORNER_XYZ 7
+/** @} */
 
 /**
- * Indices of faces for csBox3.
+ * \name Indices of faces for csBox3.
  * Used by csBox3::GetSide().
- */
+ * @{ */
+/// min X
 #define CS_BOX_SIDE_x 0
+/// max X
 #define CS_BOX_SIDE_X 1
+/// min Y
 #define CS_BOX_SIDE_y 2
+/// max Y
 #define CS_BOX_SIDE_Y 3
+/// min Z
 #define CS_BOX_SIDE_z 4
+/// max Z
 #define CS_BOX_SIDE_Z 5
+/// inside
 #define CS_BOX_INSIDE 6
+/** @} */
 
 /**
- * Indices of edges for cxBox3.
+ * \name Indices of edges for cxBox3.
  * Index e+1 is opposite edge of e (with e even).
- */
+ * @{ */
+/// from max X, min Y, min Z to min X, min Y, min Z
 #define CS_BOX_EDGE_Xyz_xyz 0
+/// from min X, min Y, min Z to max X, min Y, min Z
 #define CS_BOX_EDGE_xyz_Xyz 1
+/// from min X, min Y, min Z to min X, max Y, min Z
 #define CS_BOX_EDGE_xyz_xYz 2
+/// from min X, max Y, min Z to min X, min Y, min Z
 #define CS_BOX_EDGE_xYz_xyz 3
+/// from min X, max Y, min Z to max X, max Y, min Z
 #define CS_BOX_EDGE_xYz_XYz 4
+/// from max X, max Y, min Z to min X, max Y, min Z
 #define CS_BOX_EDGE_XYz_xYz 5
+/// from max X, max Y, min Z to max X, min Y, min Z
 #define CS_BOX_EDGE_XYz_Xyz 6
+/// from max X, min Y, min Z to max X, max Y, min Z
 #define CS_BOX_EDGE_Xyz_XYz 7
+/// from max X, min Y, min Z to max X, min Y, max Z
 #define CS_BOX_EDGE_Xyz_XyZ 8
+/// from max X, min Y, max Z to max X, min Y, min Z
 #define CS_BOX_EDGE_XyZ_Xyz 9
+/// from max X, min Y, max Z to max X, max Y, max Z
 #define CS_BOX_EDGE_XyZ_XYZ 10
+/// from max X, max Y, max Z to max X, min Y, max Z
 #define CS_BOX_EDGE_XYZ_XyZ 11
+/// from max X, max Y, max Z to max X, max Y, min Z
 #define CS_BOX_EDGE_XYZ_XYz 12
+/// from max X, max Y, min Z to max X, max Y, max Z
 #define CS_BOX_EDGE_XYz_XYZ 13
+/// from max X, max Y, max Z to min X, max Y, max Z
 #define CS_BOX_EDGE_XYZ_xYZ 14
+/// from min X, max Y, max Z to max X, max Y, max Z
 #define CS_BOX_EDGE_xYZ_XYZ 15
+/// from min X, max Y, max Z to min X, max Y, min Z
 #define CS_BOX_EDGE_xYZ_xYz 16
+/// from min X, max Y, min Z to min X, max Y, max Z
 #define CS_BOX_EDGE_xYz_xYZ 17
+/// from min X, max Y, max Z to min X, min Y, max Z
 #define CS_BOX_EDGE_xYZ_xyZ 18
+/// from min X, min Y, max Z to min X, max Y, max Z
 #define CS_BOX_EDGE_xyZ_xYZ 19
+/// from min X, min Y, max Z to min X, min Y, min Z
 #define CS_BOX_EDGE_xyZ_xyz 20
+/// from min X, min Y, min Z to min X, min Y, max Z
 #define CS_BOX_EDGE_xyz_xyZ 21
+/// from min X, min Y, max Z to max X, min Y, max Z
 #define CS_BOX_EDGE_xyZ_XyZ 22
+/// from max X, min Y, max Z to min X, min Y, max Z
 #define CS_BOX_EDGE_XyZ_xyZ 23
+/** @} */
 
 /**
  * A bounding box in 3D space.
  * In order to operate correctly, this bounding box assumes that all values
  * entered or compared against lie within the range
- * (-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE).  It is not
+ * (-#CS_BOUNDINGBOX_MAXVALUE, #CS_BOUNDINGBOX_MAXVALUE).  It is not
  * recommended to use points outside of this range.
  */
 class csBox3
@@ -481,13 +546,13 @@ public:
    * those are only the min and max corners.
    * Corner 0 = xyz, 1 = xyZ, 2 = xYz, 3 = xYZ,
    *        4 = Xyz, 5 = XyZ, 6 = XYz, 7 = XYZ.
-   * Use CS_BOX_CORNER_??? defines.
+   * Use #CS_BOX_CORNER_xyz etc. defines.
    */
   csVector3 GetCorner (int corner) const;
 
   /**
-   * Given an edge index (CS_BOX_EDGE_???) return the two vertices
-   * (index CS_BOX_CORNER_???) and left/right faces (CS_BOX_SIDE_???).
+   * Given an edge index (#CS_BOX_EDGE_Xyz_xyz etc.) return the two vertices
+   * (index #CS_BOX_CORNER_xyz etc.) and left/right faces (#CS_BOX_SIDE_x etc.).
    */
   void GetEdgeInfo (int edge, int& v1, int& v2, int& fleft, int& fright) const
   {
@@ -498,8 +563,8 @@ public:
   }
 
   /**
-   * Given a face index (CS_BOX_SIDE_???) return the four edges oriented
-   * clockwise around this face (CS_BOX_EDGE_???).
+   * Given a face index (#CS_BOX_SIDE_x etc.) return the four edges oriented
+   * clockwise around this face (#CS_BOX_EDGE_Xyz_xyz etc.).
    */
   uint8* GetFaceEdges (int face) const
   {
@@ -524,13 +589,13 @@ public:
 
   /**
    * Get a side of this box as a 2D box.
-   * Use CS_BOX_SIDE_??? defines.
+   * Use #CS_BOX_SIDE_x etc. defines.
    */
   csBox2 GetSide (int side) const;
 
   /**
    * Fill the array (which should be three long at least)
-   * with all visible sides (CS_BOX_SIDE_??? defines) as seen
+   * with all visible sides (#CS_BOX_SIDE_x etc. defines) as seen
    * from the given point.
    * Returns the number of visible sides.
    */
@@ -547,7 +612,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 23 (use one of the CS_BOX_EDGE_??? indices).
+   * from 0 to 23 (use one of the #CS_BOX_EDGE_Xyz_xyz etc. indices).
    * The returned edge is undefined for any other index.
    */
   csSegment3 GetEdge (int edge) const
@@ -557,7 +622,7 @@ public:
 
   /**
    * Return every edge (segment) of this bounding box
-   * from 0 to 23 (use one of the CS_BOX_EDGE_??? indices).
+   * from 0 to 23 (use one of the #CS_BOX_EDGE_Xyz_xyz etc. indices).
    * The returned edge is undefined for any other index.
    */
   void GetEdge (int edge, csSegment3& e) const
@@ -747,7 +812,7 @@ public:
 
   /**
    * Test if this box is adjacent to the other one.
-   * Return -1 if not adjacent or else any of the CS_BOX_SIDE_???
+   * Return -1 if not adjacent or else any of the #CS_BOX_SIDE_x etc.
    * flags to indicate the side of this box that the other
    * box is adjacent with.
    */
@@ -837,5 +902,7 @@ public:
   /// Tests if a point is contained in a box.
   friend bool operator< (const csVector3& point, const csBox3& box);
 };
+
+/** @} */
 
 #endif // __CS_BOX_H__

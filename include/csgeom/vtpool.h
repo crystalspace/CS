@@ -19,6 +19,12 @@
 #ifndef __CS_VTPOOL_H__
 #define __CS_VTPOOL_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/vector3.h"
 
 /**
@@ -155,5 +161,7 @@ public:
   /// Fetch the singleton instance of this pool.
   CS_DECLARE_STATIC_CLASSVAR_REF(default_pool,GetDefaultPool,csPooledVertexArrayPool)
 };
+
+/** @} */
 
 #endif // __CS_VTPOOL_H__

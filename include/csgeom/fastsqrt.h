@@ -20,8 +20,18 @@
 #ifndef __FASTSQRT_H__
 #define __FASTSQRT_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
+/// declare table of square roots
 extern void BuildSqrtTable ();
+/// fast square root, looks up table build by BuildSqrtTable().
 extern float FastSqrt (float n);
+
+/** @} */
 
 #endif // __FASTSQRT_H__
 

@@ -19,6 +19,12 @@
 #ifndef __CS_PATH_H__
 #define __CS_PATH_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/spline.h"
 
 /**
@@ -138,5 +144,7 @@ public:
     pos.z = GetInterpolatedDimension (8);
   }
 };
+
+/** @} */
 
 #endif // __CS_PATH_H__

@@ -19,6 +19,12 @@
 #ifndef __CS_SPLINE_H__
 #define __CS_SPLINE_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 /**
  * A spline superclass.
  * This spline can control several dimensions at once.
@@ -206,6 +212,8 @@ public:
   /// Create a CatmullRom spline with d dimensions and p points.
   csCatmullRomSpline (int d, int p) : csBSpline (d, p) { }
 };
+
+/** @} */
 
 #endif // __CS_SPLINE_H__
 

@@ -20,6 +20,12 @@
 #ifndef __CS_PLANE2_H__
 #define __CS_PLANE2_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #define CS_POLY_IN 1
 #define CS_POLY_ON 0
 #define CS_POLY_OUT -1
@@ -139,5 +145,7 @@ public:
     if (f) { norm /= f;  CC /= f; }
   }
 };
+
+/** @} */
 
 #endif // __CS_PLANE2_H__

@@ -19,6 +19,12 @@
 #ifndef __CS_POLYIDX_H__
 #define __CS_POLYIDX_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 /**
  * The following class represents a general polygon.
  * Vertices are indexed relative to some vertex array instead of directly
@@ -106,5 +112,7 @@ public:
    */
   int AddVertex (int i);
 };
+
+/** @} */
 
 #endif // __CS_POLYIDX_H__

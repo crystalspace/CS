@@ -22,6 +22,12 @@
 #ifndef __CS_POLYCLIP_H__
 #define __CS_POLYCLIP_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/math2d.h"
 #include "csgeom/polypool.h"
 #include "igeom/clip2d.h"
@@ -174,5 +180,7 @@ public:
   virtual csVector2 *GetClipPoly ()
   { return ClipPoly; }
 };
+/** @} */
+
 
 #endif // __CS_POLYCLIP_H__

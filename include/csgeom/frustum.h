@@ -19,17 +19,23 @@
 #ifndef __CS_FRUSTRUM_H__
 #define __CS_FRUSTRUM_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "cstypes.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vtpool.h"
 
 class csTransform;
 
-/**
+/** \name Polygon-to-Frustum relations
  * Return values for csFrustum::Classify. The routine makes a difference
  * whenever a polygon is fully outside the frustum, fully inside, fully
  * covers the frustum or is partly inside, partly outside.
- */
+ * @{ */
 /// The polygon is fully outside frustum
 #define CS_FRUST_OUTSIDE	0
 /// The polygon is fully inside frustum
@@ -38,6 +44,7 @@ class csTransform;
 #define CS_FRUST_COVERED	2
 /// The polygon is partially inside frustum
 #define CS_FRUST_PARTIAL	3
+/** @} */
 
 /**
  * Structure for use with ClipToPlane. This structure
@@ -382,7 +389,7 @@ public:
 
   /**
    * Check if a polygon intersects with the frustum (i.e.
-   * is visible in the frustum). Returns one of CS_FRUST_XXX values.
+   * is visible in the frustum). Returns one of #CS_FRUST_OUTSIDE etc. values.
    * Frustum and polygon should be given relative to (0,0,0).
    */
   static int Classify (csVector3* frustum, int num_frust,
@@ -443,5 +450,7 @@ public:
   /// Decrement reference counter
   void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
 };
+
+/** @} */
 
 #endif // __CS_FRUSTRUM_H__

@@ -19,6 +19,12 @@
 #ifndef __CS_PMTOOLS_H__
 #define __CS_PMTOOLS_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 class csVector3;
 class csPlane3;
 struct iPolygonMesh;
@@ -107,6 +113,8 @@ public:
 	bool* outline_verts,
 	float& valid_radius);
 };
+
+/** @} */
 
 #endif // __CS_PMTOOLS_H__
 

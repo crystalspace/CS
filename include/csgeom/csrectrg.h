@@ -19,6 +19,13 @@
 #ifndef __CS_CSRECTREGION_H__
 #define __CS_CSRECTREGION_H__
 
+/**\file 
+ * Splittable 2D rectangles.
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/csrect.h"
 
 #ifdef CS_DEBUG     
@@ -152,7 +159,7 @@ public:
 
 #endif // CS_DEBUG
 
-
+/** @} */
 
 
 #endif //__CS_CSRECTREGION_H__

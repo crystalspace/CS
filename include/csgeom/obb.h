@@ -20,6 +20,12 @@
 #ifndef CS_OBB_H
 #define CS_OBB_H
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/box.h"
 #include "csgeom/matrix3.h"
 
@@ -142,6 +148,8 @@ public:
   bool ProjectOBB (float fov, float sx, float sy, csBox2& sbox,
 	float& min_z, float& max_z);
 };
+
+/** @} */
 
 #endif
 

@@ -20,6 +20,12 @@
 #ifndef __CS_VECTOR3_H__
 #define __CS_VECTOR3_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
@@ -241,5 +247,7 @@ public:
             && (ABS(z) < precision);
   }
 };
+
+/** @} */
 
 #endif // __CS_VECTOR3_H__

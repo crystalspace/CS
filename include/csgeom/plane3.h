@@ -20,6 +20,12 @@
 #ifndef __CS_PLANE3_H__
 #define __CS_PLANE3_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
 #endif
@@ -180,6 +186,8 @@ public:
    */
   bool ClipPolygon (csVector3*& pverts, int& num_verts, bool reversed = false);
 };
+
+/** @} */
 
 #endif // __CS_PLANE3_H__
 

@@ -19,6 +19,12 @@
 #ifndef __CS_SPHERE_H__
 #define __CS_SPHERE_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "cstypes.h"
 #include "vector3.h"
 
@@ -74,6 +80,8 @@ public:
     return *this;
   }
 };
+
+/** @} */
 
 #endif // __CS_SPHERE_H__
 

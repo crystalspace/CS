@@ -19,6 +19,12 @@
 #ifndef __CS_POLYEDGE_H__
 #define __CS_POLYEDGE_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/math2d.h"
 #include "csgeom/segment.h"
 
@@ -225,5 +231,7 @@ public:
     }
   }
 };
+
+/** @} */
 
 #endif // __CS_POLYEDGE_H__

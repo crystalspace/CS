@@ -19,6 +19,12 @@
 #ifndef __CS_POLYPOOL_H__
 #define __CS_POLYPOOL_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/poly2d.h"
 
 /**
@@ -112,5 +118,6 @@ public:
   }
 };
 
+/** @} */
 
 #endif // __CS_POLYPOOL_H__

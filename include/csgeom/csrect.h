@@ -21,6 +21,13 @@
 #ifndef __CS_RECT_H__
 #define __CS_RECT_H__
 
+/**\file 
+ * Rectangle class
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 /**
  * Rectangle class: simple class for manipulating 2D rectangles.
  * This class is somewhat similar to Box, but uses integer coordinates.<p>
@@ -202,5 +209,7 @@ public:
   /// Contracts the whole rect by n units
   void Inset(int n);
 };
+
+/** @} */
 
 #endif // __CS_RECT_H__

@@ -23,6 +23,12 @@
 
 #include "cstypes.h"
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #ifndef ABS
 #define ABS(x) ((x)<0?-(x):(x))
 #endif
@@ -670,5 +676,7 @@ public:
   static double YFrustum (
     double B, const csDVector3& u, const csDVector3& v, csDVector3& isect);
 };
+
+/** @} */
 
 #endif // __CS_MATH3D_D_H__

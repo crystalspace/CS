@@ -20,6 +20,12 @@
 #ifndef __CS_TRANSFORM_H__
 #define __CS_TRANSFORM_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/matrix3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/sphere.h"
@@ -574,6 +580,8 @@ public:
   virtual void SetT2O (const csMatrix3& m)
   { m_t2o = m;  m_o2t = m_t2o.GetTranspose (); }
 };
+
+/** @} */
 
 #endif // __CS_TRANSFORM_H__
 

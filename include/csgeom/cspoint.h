@@ -19,6 +19,13 @@
 #ifndef __CSPOINT_H__
 #define __CSPOINT_H__
 
+/**\file 
+ * 2D point object.
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 /**
  * A 2D point object
  */
@@ -43,6 +50,8 @@ struct csPoint
   void Set (csPoint &v)
   { x = v.x; y = v.y; }
 };
+
+/** @} */
 
 #endif
 

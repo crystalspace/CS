@@ -19,6 +19,12 @@
 #ifndef __CS_POLY3D_H__
 #define __CS_POLY3D_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/math3d.h"
 
 // Values returned by classify.
@@ -297,5 +303,7 @@ public:
    */
   int AddVertexSmart (float x, float y, float z);
 };
+
+/** @} */
 
 #endif // __CS_POLY3D_H__

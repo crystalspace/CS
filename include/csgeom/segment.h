@@ -19,6 +19,12 @@
 #ifndef __CS_SEGMENT_H__
 #define __CS_SEGMENT_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 
@@ -103,5 +109,7 @@ public:
   /// Get the end of the segment.
   csVector3& End () { return end; }
 };
+
+/** @} */
 
 #endif // __CS_SEGMENT_H__

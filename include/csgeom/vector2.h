@@ -20,6 +20,12 @@
 #ifndef __CS_VECTOR2_H__
 #define __CS_VECTOR2_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 /**
  * A 2D vector.
  */
@@ -103,5 +109,7 @@ public:
   inline friend bool operator> (float f, const csVector2& v)
   { return ABS(v.x)<f && ABS(v.y)<f; }
 };
+
+/** @} */
 
 #endif // __CS_VECTOR2_H__

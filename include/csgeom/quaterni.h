@@ -19,6 +19,12 @@
 #ifndef __CS_QUATERNION_H__
 #define __CS_QUATERNION_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "qsqrt.h"
@@ -168,5 +174,6 @@ public:
   float r,x,y,z;
 };
 
+/** @} */
 
 #endif // __CS_QUATERNION_H__

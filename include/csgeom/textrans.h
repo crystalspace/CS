@@ -19,6 +19,12 @@
 #ifndef __CS_TEXTRANS_H__
 #define __CS_TEXTRANS_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/matrix3.h"
 
 /**
@@ -83,5 +89,7 @@ public:
 	float xv, float yv, float zv,
 	float xw, float yw, float zw);
 };
+
+/** @} */
 
 #endif // __CS_TEXTRANS_H__

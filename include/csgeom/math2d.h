@@ -20,6 +20,12 @@
 #ifndef __CS_MATH2D_H__
 #define __CS_MATH2D_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #define CS_POLY_IN 1
 #define CS_POLY_ON 0
 #define CS_POLY_OUT -1
@@ -252,5 +258,7 @@ public:
                       csVector2& isect);
 
 };
+
+/** @} */
 
 #endif // __CS_MATH_H__

@@ -67,6 +67,7 @@ p {
 
 td.head {
   color: white;
+  background: #BFBED0 url("b2w.jpg") top repeat-x;  
   padding-left:1.2cm; 
 }
 
@@ -75,9 +76,6 @@ td.head {
 
 td.head {
   color: black;
-}
-
-center {
   background: white;
 }
 

@@ -22,6 +22,12 @@
 
 #include "csgeom/csrect.h"
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 class csVector2;
 
 /**
@@ -43,5 +49,7 @@ typedef void (*csAAPFCBBox) (int x, int y, int w, int h, void *arg);
  */
 extern void csAntialiasedPolyFill (csVector2 *iVertices, int iVertexCount,
   void *iArg, csAAPFCBPixel iPutPixel, csAAPFCBBox iDrawBox = NULL);
+
+/** @} */
 
 #endif // __CS_POLYAA_H__

@@ -19,6 +19,12 @@
 #ifndef __CS_POLY2D_H__
 #define __CS_POLY2D_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 
@@ -227,5 +233,7 @@ public:
   /// Create a poly2d.
   virtual csPoly2D* Create () { csPoly2D* p = new csPoly2D (); return p; }
 };
+
+/** @} */
 
 #endif // __CS_POLY2D_H__

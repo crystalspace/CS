@@ -20,6 +20,12 @@
 #ifndef __CSGEOM_TESSELAT_H__
 #define __CSGEOM_TESSELAT_H__
 
+/**\file 
+ */
+/**
+ * \addtogroup geom_utils
+ * @{ */
+
 #include "vector3.h"
 
 /**
@@ -122,5 +128,7 @@ public:
   // Perform the tesselation.  See class documentation for a full description.
   static int Tesselate(const GridCell&, csVector3* vertices);
 };
+
+/** @} */
 
 #endif // __CSGEOM_TESSELAT_H__
