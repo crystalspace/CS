@@ -22,6 +22,11 @@ The history order has been reversed so that new features are at the top.
 	- Fixed phyztest due to the latest collision detection changes.
 	- Wouter, Samuel and Jorrit experimented a bit with some problems
 	  with 'usleep' in unix.cpp.
+	- Added iMaterial and iMaterialHandle. Extended iTextureManager
+	  to have the ability to register materials. Provided a default
+	  implementation for this for the 3D renderers. Nothing related
+	  to materials really works right now. These are only stubs to
+	  make a future implementation easier.
 2-Aug-2000
 	- Martin Geisse added 2d animations and aligned pixmaps.
 	- Norman Kramer fixed funcon plugin so that use_fog=false for DPFX.

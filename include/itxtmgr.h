@@ -29,6 +29,8 @@ class csRect;
 
 struct iImage;
 struct iTextureHandle;
+struct iMaterial;
+struct iMaterialHandle;
 
 /*
  * Texture registration flags. During texture registration you should tell
@@ -95,7 +97,7 @@ struct iTextureHandle;
 
 
 
-SCF_VERSION (iTextureManager, 1, 0, 0);
+SCF_VERSION (iTextureManager, 1, 1, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -166,6 +168,34 @@ struct iTextureManager : public iBase
    * you have to reload them all and start all over.
    */
   virtual void FreeImages () = 0;
+
+  /**
+   * Register a material. The given input image is IncRef'd and DecRef'ed
+   * later when FreeMaterials () is called. If you want to keep the input
+   * material make sure you have called IncRef yourselves.
+   */
+  virtual iMaterialHandle* RegisterMaterial (iMaterial* material) = 0;
+
+  /**
+   * Unregister a material.
+   */
+  virtual void UnregisterMaterial (iMaterialHandle* handle) = 0;
+
+  /**
+   * Prepare this material.
+   */
+  virtual void PrepareMaterial (iMaterialHandle *handle) = 0;
+
+  /**
+   * Prepare all materials.
+   */
+  virtual void PrepareMaterials () = 0;
+
+  /**
+   * Call this function if you want to release all iMaterial's as
+   * given to this texture manager.
+   */
+  virtual void FreeMaterials () = 0;
 
   /**
    * Reset all reserved colors in palette. This function should be called

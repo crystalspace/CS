@@ -21,6 +21,7 @@
 
 #include "csutil/csvector.h"
 #include "itxtmgr.h"
+#include "imater.h"
 #include "itexture.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -210,6 +211,35 @@ public:
 };
 
 /**
+ * This class is the top-level representation of a material.
+ * Stub implementation only at the moment. Materials are not
+ * yet implemented.
+ */
+class csMaterialMM : public iMaterialHandle
+{
+protected:
+  /// A texture.
+  iTextureHandle* texture;
+  /// Original material.
+  iMaterial* material;
+
+public:
+  ///
+  csMaterialMM (iMaterial* material);
+  ///
+  virtual ~csMaterialMM ();
+
+  /// Release the original material (iMaterial).
+  void FreeMaterial ();
+
+  ///---------------------- iMaterialHandle implementation ----------------------
+  DECLARE_IBASE;
+
+  ///
+  virtual iTextureHandle* GetTexture () { return texture; }
+};
+
+/**
  * General version of the texture manager.
  * Each 3D driver should derive a texture manager class from this one
  * and implement the missing functionality.
@@ -243,6 +273,33 @@ protected:
 
   /// List of textures.
   csTexVector textures;
+
+  // Private class used to keep a list of objects derived from csMaterialMM
+  class csMatVector : public csVector
+  {
+  public:
+    // Initialize the array
+    csMatVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) 
+    { }
+    // Free all materials when the object is destroyed
+    virtual ~csMatVector ()
+    { DeleteAll (); }
+    // Shortcut to avoid typecasts
+    csMaterialMM *Get (int index)
+    { return (csMaterialMM *)csVector::Get (index); }
+    // Free a single texture
+    virtual bool FreeItem (csSome Item)
+    {
+      if (Item) ((csMaterialMM *)Item)->DecRef ();
+      return true;
+    }
+    // Add a material to this list
+    int Push (csMaterialMM *what)
+    { what->IncRef (); return csVector::Push (what); }
+  };
+
+  /// List of materials.
+  csMatVector materials;
 
   ///
   iSystem *System;
@@ -302,6 +359,36 @@ public:
    */
   virtual bool GetAlphaMap ()
   { return false; }
+
+  /**
+   * Default stub implementation until the
+   * material system is actually working.
+   */
+  virtual iMaterialHandle* RegisterMaterial (iMaterial* material);
+
+  /**
+   * Default stub implementation until the
+   * material system is actually working.
+   */
+  virtual void UnregisterMaterial (iMaterialHandle* handle);
+
+  /**
+   * Default stub implementation until the
+   * material system is actually working.
+   */
+  virtual void PrepareMaterial (iMaterialHandle* handle);
+
+  /**
+   * Default stub implementation until the
+   * material system is actually working.
+   */
+  virtual void PrepareMaterials ();
+
+  /**
+   * Default stub implementation until the
+   * material system is actually working.
+   */
+  virtual void FreeMaterials ();
 };
 
 #endif // __TXTMGR_H__

@@ -25,8 +25,10 @@
 #include "csutil/inifile.h"
 #include "qint.h"
 #include "iimage.h"
+#include "imater.h"
 #include "isystem.h"
 #include "igraph2d.h"
+
 //---------------------------------------------------------- csTextureMM -----//
 
 IMPLEMENT_IBASE (csTextureMM)
@@ -152,6 +154,32 @@ void csTextureMM::AdjustSizePo2 ()
     image->Rescale (newwidth, newheight);
 }
 
+//---------------------------------------------------------- csMaterialMM -----//
+
+IMPLEMENT_IBASE (csMaterialMM)
+  IMPLEMENTS_INTERFACE (iMaterialHandle)
+IMPLEMENT_IBASE_END
+
+csMaterialMM::csMaterialMM (iMaterial* material)
+{
+  CONSTRUCT_IBASE (NULL);
+  csMaterialMM::material = material;
+  material->IncRef ();
+  texture = material->GetTexture ();
+}
+
+csMaterialMM::~csMaterialMM ()
+{
+  FreeMaterial ();
+}
+
+void csMaterialMM::FreeMaterial ()
+{
+  if (!material) return;
+  material->DecRef ();
+  material = NULL;
+}
+
 //------------------------------------------------------------ csTexture -----//
 
 void csTexture::compute_masks ()
@@ -169,7 +197,7 @@ IMPLEMENT_IBASE (csTextureManager)
 IMPLEMENT_IBASE_END
 
 csTextureManager::csTextureManager (iSystem* iSys, iGraphics2D *iG2D)
-  : textures (16, 16)
+  : textures (16, 16), materials (16, 16)
 {
   System = iSys;
   verbose = false;
@@ -219,3 +247,34 @@ void csTextureManager::SetPalette ()
 void csTextureManager::ResetPalette ()
 {
 }
+
+iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
+{
+  if (!material) return NULL;
+  csMaterialMM* mat = new csMaterialMM (material);
+  materials.Push (mat);
+  return mat;
+}
+
+void csTextureManager::UnregisterMaterial (iMaterialHandle* handle)
+{
+  csMaterialMM* mat = (csMaterialMM*)handle;
+  int idx = materials.Find (mat);
+  if (idx >= 0) materials.Delete (idx);
+}
+
+void csTextureManager::PrepareMaterial (iMaterialHandle* handle)
+{
+  (void)handle;
+}
+
+void csTextureManager::PrepareMaterials ()
+{
+}
+
+void csTextureManager::FreeMaterials ()
+{
+  for (int i = 0 ; i < materials.Length () ; i++)
+    materials.Get (i)->FreeMaterial ();
+}
+
