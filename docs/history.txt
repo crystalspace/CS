@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 10-Feb-2003
+	- Marten Svanfeldt fixed various bugs in TextureManager
+	- Philipp Aumayr added new TextureManager for Render3D with support
+	  for 1D, 3D and CubeMap Textures. iTextureManager and iTexture interface
+	  was extended to do so (#ifdef CS_USE_NEW_RENDERER)
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
 	- Philip Wyett moved the flicker-note texture into 'stdtex.zip',
