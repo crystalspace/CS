@@ -81,6 +81,16 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
   csRef<iRenderStepContainer> liContainer =
     SCF_QUERY_INTERFACE (step, iRenderStepContainer);
 
+  csRef<iRenderStepType> stencilType =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.step.shadow.stencil.type",
+      iRenderStepType);
+
+//  csRef<iRenderStepFactory> stencilFact = stencilType->NewFactory ();
+
+//  step = stencilFact->Create ();
+//  liContainer->AddStep (step);
+
   step = genFact->Create ();
   liContainer->AddStep (step);
 

@@ -22,32 +22,62 @@
 
 #include "ivideo/rndbuf.h"
 
+enum csGLRenderBufferLockType
+{
+  CS_GLBUF_RENDERLOCK_ARRAY,
+  CS_GLBUF_RENDERLOCK_ELEMENTS
+};
+
+class csGLRenderBuffer : public iRenderBuffer
+{
+protected:
+  friend class csGLRender3D;
+
+  int size, compcount, compSize;
+  csRenderBufferType type;
+  csRenderBufferComponentType comptype;
+  GLenum compGLType;
+public:
+  SCF_DECLARE_IBASE;
+
+  csGLRenderBuffer (int size, csRenderBufferType type,
+    csRenderBufferComponentType comptype, int compcount);
+  
+  virtual ~csGLRenderBuffer () { }
+
+  /// Get type of buffer (where it's located)
+  virtual csRenderBufferType GetBufferType() const { return type; }
+
+  /// Get the size of the buffer (in bytes)
+  virtual int GetSize() const { return size; }
+
+  /// Gets the number of components per element
+  virtual int GetComponentCount () const { return compcount; }
+
+  /// Gets the component type
+  virtual csRenderBufferComponentType GetComponentType () const
+  { return comptype; }
+
+  virtual void* RenderLock (csGLRenderBufferLockType type) = 0;
+};
+
+
 SCF_VERSION(csSysRenderBuffer, 0,0,2);
 /**
 * This is a general buffer to be used by the renderer. It can ONLY be
 * created by the renderer
 */
-class csSysRenderBuffer : public iRenderBuffer
+class csSysRenderBuffer : public csGLRenderBuffer
 {
 private:
   void *buffer;
-  int size, compcount;
-  csRenderBufferType type;
-  csRenderBufferComponentType comptype;
   bool locked;
 public:
-  SCF_DECLARE_IBASE;
-
   csSysRenderBuffer (void *buffer, int size, csRenderBufferType type,
-    csRenderBufferComponentType comptype, int compcount)
+    csRenderBufferComponentType comptype, int compcount) :
+    csGLRenderBuffer (size, type, comptype, compcount)
   {
-    SCF_CONSTRUCT_IBASE (0)
-
     csSysRenderBuffer::buffer = buffer;
-    csSysRenderBuffer::size = size;
-    csSysRenderBuffer::type = type;
-    csSysRenderBuffer::comptype = comptype;
-    csSysRenderBuffer::compcount = compcount;
     locked = false;
   }
 
@@ -70,18 +100,7 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() { locked = false; }
 
-  /// Get type of buffer (where it's located)
-  virtual csRenderBufferType GetBufferType() const { return type; }
-
-  /// Get the size of the buffer (in bytes)
-  virtual int GetSize() const { return size; }
-
-  /// Gets the number of components per element
-  virtual int GetComponentCount () const { return compcount; }
-
-  /// Gets the component type
-  virtual csRenderBufferComponentType GetComponentType () const
-  { return comptype; }
+  virtual void* RenderLock (csGLRenderBufferLockType type);
 };
 
 
@@ -90,27 +109,20 @@ SCF_VERSION(csVBORenderBuffer, 0,0,2);
 * This is a HW buffer to be used by the renderer. It can ONLY be
 * created by the renderer
 */
-class csVBORenderBuffer : public iRenderBuffer
+class csVBORenderBuffer : public csGLRenderBuffer
 {
 private:
   uint bufferId;
-  int size, compcount;
-  csRenderBufferType type;
-  csRenderBufferComponentType comptype;
   bool locked;
   csRenderBufferLockType lastLock;
+  csGLRenderBufferLockType lastRLock;
   csGLExtensionManager *ext;
 public:
-  SCF_DECLARE_IBASE;
-
   csVBORenderBuffer (int size, csRenderBufferType type,
-    csRenderBufferComponentType comptype, int compcount, csGLExtensionManager *ext)
+    csRenderBufferComponentType comptype, int compcount, 
+    csGLExtensionManager *ext) :
+    csGLRenderBuffer (size, type, comptype, compcount)
   {
-    SCF_CONSTRUCT_IBASE (0)
-    csVBORenderBuffer::size = size;
-    csVBORenderBuffer::type = type;
-    csVBORenderBuffer::comptype = comptype;
-    csVBORenderBuffer::compcount = compcount;
     csVBORenderBuffer::ext = ext;
     locked = false;
     ext->glGenBuffersARB (1, &bufferId);
@@ -132,26 +144,23 @@ public:
   */
   virtual void* Lock(csRenderBufferLockType lockType)
   {
-    if (locked)
-      return 0;
-
-    switch (lockType)
+    if (!locked)
     {
-    case CS_BUF_LOCK_RENDER:
-      locked = true; lastLock = lockType;
-      return (void*)bufferId;
-    case CS_BUF_LOCK_NORMAL:
-      locked = true; lastLock = lockType;
-      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
-      return ext->glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+      switch (lockType)
+      {
+	case CS_BUF_LOCK_NORMAL:
+	  RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+	  lastLock = CS_BUF_LOCK_NORMAL;
+	  return ext->glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+      }
     }
-    return 0;
+    return (void*)-1;
   }
 
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() 
   {
-    if (lastLock = CS_BUF_LOCK_NORMAL)
+    if (lastLock == CS_BUF_LOCK_NORMAL)
     {
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
       ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
@@ -160,18 +169,7 @@ public:
     lastLock = CS_BUF_LOCK_NOLOCK;
   }
 
-  /// Get type of buffer (where it's located)
-  virtual csRenderBufferType GetBufferType() const { return type; }
-
-  /// Get the size of the buffer (in bytes)
-  virtual int GetSize() const { return size; }
-
-  /// Gets the number of components per element
-  virtual int GetComponentCount () const { return compcount; }
-
-  /// Gets the component type
-  virtual csRenderBufferComponentType GetComponentType () const
-  { return comptype; }
+  virtual void* RenderLock (csGLRenderBufferLockType type);
 };
 
 

@@ -1,27 +1,27 @@
 # This is a subinclude file used to define the rules needed
-# to build the stencil plug-in.
+# to build the rlsstencil plug-in.
 
 # Driver description
-DESCRIPTION.stencil = Crystal Space Stencil Shadow renderstep plugin
+DESCRIPTION.rlsstencil = Crystal Space Stencil Shadow renderstep plugin
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make stencil      Make the $(DESCRIPTION.stencil)$"
+  $(NEWLINE)echo $"  make rlsstencil      Make the $(DESCRIPTION.rlsstencil)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: stencil stencilclean
-all plugins: stencil
+.PHONY: rlsstencil rlsstencilclean
+all plugins: rlsstencil
 
-stencil:
+rlsstencil:
 	$(MAKE_TARGET) MAKE_DLL=yes
-stencilclean:
+rlsstencilclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -30,67 +30,61 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 ifeq ($(USE_PLUGINS),yes)
-  STENCIL = $(OUTDLL)/stencil$(DLL)
-  LIB.STENCIL = $(foreach d,$(DEP.STENCIL),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(STENCIL)
+  RLSSTENCIL = $(OUTDLL)/rlsstencil$(DLL)
+  LIB.RLSSTENCIL = $(foreach d,$(DEP.RLSSTENCIL),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(RLSSTENCIL)
 else
-  STENCIL = $(OUT)/$(LIB_PREFIX)stencil$(LIB)
-  DEP.EXE += $(STENCIL)
-  SCF.STATIC += stencil
-  TO_INSTALL.STATIC_LIBS += $(STENCIL)
+  RLSSTENCIL = $(OUT)/$(LIB_PREFIX)rlsstencil$(LIB)
+  DEP.EXE += $(RLSSTENCIL)
+  SCF.STATIC += rlsstencil
+  TO_INSTALL.STATIC_LIBS += $(RLSSTENCIL)
 endif
 
-DIR.STENCIL = plugins/video/render3d/renderloop
-INF.STENCIL = $(SRCDIR)/$(DIR.STENCIL)/shadow/stencil/stencil.csplugin
-INC.STENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
-   $(DIR.STENCIL)/shadow/stencil/*.h \
-   $(DIR.STENCIL)/common/parserenderstep.h \
-   $(DIR.STENCIL)/common/basesteptype.h \
-   $(DIR.STENCIL)/common/basestepfactory.h \
-   $(DIR.STENCIL)/common/basesteploader.h))
-SRC.STENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
-   $(DIR.STENCIL)/shadow/stencil/*.cpp \
-   $(DIR.STENCIL)/common/parserenderstep.cpp \
-   $(DIR.STENCIL)/common/basesteptype.cpp \
-   $(DIR.STENCIL)/common/basestepfactory.cpp \
-   $(DIR.STENCIL)/common/basesteploader.cpp ))
-OBJ.STENCIL = $(addprefix $(OUT)/,$(notdir $(SRC.STENCIL:.cpp=$O)))
-DEP.STENCIL = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DIR.RLSSTENCIL = plugins/video/render3d/renderloop
+INF.RLSSTENCIL = $(SRCDIR)/$(DIR.RLSSTENCIL)/shadow/rlsstencil/rlsstencil.csplugin
+INC.RLSSTENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
+   $(DIR.RLSSTENCIL)/shadow/rlsstencil/*.h \
+  plugins/video/render3d/renderloop/common/*.h))
+SRC.RLSSTENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
+   $(DIR.RLSSTENCIL)/shadow/rlsstencil/*.cpp \
+  plugins/video/render3d/renderloop/common/*.cpp))
+OBJ.RLSSTENCIL = $(addprefix $(OUT)/,$(notdir $(SRC.RLSSTENCIL:.cpp=$O)))
+DEP.RLSSTENCIL = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 
-TO_INSTALL.CONFIG += $(CFG.STENCIL)
+TO_INSTALL.CONFIG += $(CFG.RLSSTENCIL)
 
-MSVC.DSP += STENCIL
-DSP.STENCIL.NAME = stencil
-DSP.STENCIL.TYPE = plugin
+MSVC.DSP += RLSSTENCIL
+DSP.RLSSTENCIL.NAME = rlsstencil
+DSP.RLSSTENCIL.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: stencil stencilclean
+.PHONY: rlsstencil rlsstencilclean
 
-stencil: $(OUTDIRS) $(STENCIL)
+rlsstencil: $(OUTDIRS) $(RLSSTENCIL)
 
-$(STENCIL): $(OBJ.STENCIL) $(LIB.STENCIL)
+$(RLSSTENCIL): $(OBJ.RLSSTENCIL) $(LIB.RLSSTENCIL)
 	$(DO.PLUGIN)
 
-$(OUT)/%$O: $(SRCDIR)/$(DIR.STENCIL)/shadow/stencil/%.cpp
-	$(DO.COMPILE.CPP) $(STENCIL.CFLAGS)
+$(OUT)/%$O: $(SRCDIR)/$(DIR.RLSSTENCIL)/shadow/rlsstencil/%.cpp
+	$(DO.COMPILE.CPP) $(RLSSTENCIL.CFLAGS)
 
-$(OUT)/%$O: $(SRCDIR)/$(DIR.STENCIL)/common/%.cpp
-	$(DO.COMPILE.CPP) $(STENCIL.CFLAGS)
+$(OUT)/%$O: $(SRCDIR)/$(DIR.RLSSTENCIL)/common/%.cpp
+	$(DO.COMPILE.CPP) $(RLSSTENCIL.CFLAGS)
 
-clean: stencilclean
-stencilclean:
-	$(RM) $(STENCIL) $(OBJ.STENCIL)
+clean: rlsstencilclean
+rlsstencilclean:
+	$(RM) $(RLSSTENCIL) $(OBJ.RLSSTENCIL)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/stencil.dep
-$(OUTOS)/stencil.dep: $(SRC.STENCIL)
+dep: $(OUTOS)/rlsstencil.dep
+$(OUTOS)/rlsstencil.dep: $(SRC.RLSSTENCIL)
 	$(DO.DEP)
 else
--include $(OUTOS)/stencil.dep
+-include $(OUTOS)/rlsstencil.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -1152,7 +1152,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     if (mesh_triangle_dirty_flag)
     {
       index_buffer = r3d->CreateRenderBuffer (
-        sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX,
+        sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1);
       mesh_triangle_dirty_flag = false;
       unsigned int *ibuf = (unsigned int *)index_buffer->Lock(

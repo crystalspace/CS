@@ -863,7 +863,7 @@ void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
 
   if (!index_buffer)
     index_buffer = r3d->CreateRenderBuffer (num_indices  * sizeof (int), 
-      CS_BUF_INDEX, CS_BUFCOMP_INT, 1);
+      CS_BUF_STATIC, CS_BUFCOMP_INT, 1);
 
   int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
   
@@ -1959,6 +1959,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();  
   }
+  return true;
 #else
   if (can_move)
   {

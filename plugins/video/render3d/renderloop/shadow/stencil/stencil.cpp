@@ -128,7 +128,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     entry->meshLightPos = meshlightpos;
     if (entry->shadow_index_buffer == 0) { 
       entry->shadow_index_buffer = r3d->CreateRenderBuffer (
-        sizeof (unsigned int)*triangle_count*12, CS_BUF_INDEX,
+        sizeof (unsigned int)*triangle_count*12, CS_BUF_STATIC/*CS_BUF_INDEX*/,
         CS_BUFCOMP_UNSIGNED_INT, 1);
     }
 
@@ -411,12 +411,21 @@ csStencilShadowStep::~csStencilShadowStep ()
 bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
   r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
   // Load the shadow vertex program 
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shmgr) {
-    printf ("Unable to load ShaderManager!\n");
-	return false;
+    shmgr = CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.render3d.shadermanager",
+      iShaderManager);
+
+    if (!shmgr) {
+      printf ("Unable to load ShaderManager!\n");
+      return false;
+    }
   }
   shadow = shmgr->CreateShader ();
   if (!shadow) {
@@ -492,6 +501,10 @@ float s, e;
     {
       rmesh.indexstart = 0;
       rmesh.indexend = index_range;
+      /*
+        WTF? The same mesh drawn twice, one immediately after another? -
+	That has to be optimized, kids! [res]
+       */
       r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
       r3d->DrawMesh (&rmesh);
       r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);

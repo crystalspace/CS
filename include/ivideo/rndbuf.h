@@ -48,13 +48,14 @@ enum csRenderBufferType
 {
   CS_BUF_DYNAMIC,
   CS_BUF_STATIC,
-  CS_BUF_INDEX
+  //CS_BUF_INDEX
+  // @@@ what about CS_BUF_STREAM ? ...
 };
 
 /// Type of components
 enum csRenderBufferComponentType
 {
-  CS_BUFCOMP_BYTE,
+  CS_BUFCOMP_BYTE = 0,
   CS_BUFCOMP_UNSIGNED_BYTE,
   CS_BUFCOMP_SHORT,
   CS_BUFCOMP_UNSIGNED_SHORT,
@@ -73,7 +74,7 @@ enum csRenderBufferLockType
 {
   CS_BUF_LOCK_NOLOCK,
   CS_BUF_LOCK_NORMAL,
-  CS_BUF_LOCK_RENDER
+  //CS_BUF_LOCK_RENDER
 };
 
 SCF_VERSION (iRenderBuffer, 0, 0, 2);
@@ -85,8 +86,8 @@ SCF_VERSION (iRenderBuffer, 0, 0, 2);
 struct iRenderBuffer : public iBase
 {
   /**
-   * Lock the buffer to allow writing and give us a pointer to the data
-   * The pointer will be 0 if there was some error
+   * Lock the buffer to allow writing and give us a pointer to the data.
+   * The pointer will be (void*)-1 if there was some error.
    */
   virtual void* Lock(csRenderBufferLockType lockType) = 0;
 

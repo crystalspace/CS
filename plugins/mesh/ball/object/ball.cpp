@@ -645,7 +645,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     if (ball_triangle_dirty_flag)
     {
       index_buffer = r3d->CreateRenderBuffer (
-        sizeof (unsigned int)*ball_triangles*3, CS_BUF_INDEX,
+        sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1);
       ball_triangle_dirty_flag = false;
       unsigned int *ibuf = (unsigned int *)index_buffer->Lock(

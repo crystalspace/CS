@@ -22,22 +22,70 @@
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 
-SCF_IMPLEMENT_IBASE (csSysRenderBuffer)
-SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
+SCF_IMPLEMENT_IBASE (csGLRenderBuffer)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csVBORenderBuffer)
-SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
-SCF_IMPLEMENT_IBASE_END
+csGLRenderBuffer::csGLRenderBuffer 
+  (int size, csRenderBufferType type, csRenderBufferComponentType comptype, 
+   int compcount)
+{
+  static const int compSizes[] = 
+    {sizeof (char), sizeof (unsigned char), 
+     sizeof (short), sizeof (unsigned short),
+     sizeof (int), sizeof (unsigned int),
+     sizeof (float),
+     sizeof (double)
+    };
+  static const GLenum compGLtypes[] =
+    {GL_BYTE, GL_UNSIGNED_BYTE,
+     GL_SHORT, GL_UNSIGNED_SHORT,
+     GL_INT, GL_UNSIGNED_INT,
+     GL_FLOAT,
+     GL_DOUBLE};
+
+  SCF_CONSTRUCT_IBASE (0)
+  csGLRenderBuffer::size = size;
+  csGLRenderBuffer::type = type;
+  csGLRenderBuffer::comptype = comptype;
+  csGLRenderBuffer::compcount = compcount;
+
+  compSize = compSizes [comptype];
+  compGLType = compGLtypes [comptype];
+}
+
+//-----------------------------------------------------------------
+
+void* csSysRenderBuffer::RenderLock (csGLRenderBufferLockType type)
+{
+  return Lock (CS_BUF_LOCK_NORMAL);
+}
+
+//-----------------------------------------------------------------
+
+void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
+{
+  if (locked) return (void*)-1;
+  
+  locked = true; 
+  ext->glBindBufferARB (
+    (type == CS_GLBUF_RENDERLOCK_ARRAY) ? GL_ARRAY_BUFFER_ARB : 
+      GL_ELEMENT_ARRAY_BUFFER_ARB, bufferId);
+  lastRLock = type;
+
+  return (void*)0;
+}
+
+//-----------------------------------------------------------------
 
 csPtr<iRenderBuffer> csGLRender3D::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount)
 {
-  if (use_hw_render_buffers && type != CS_BUF_INDEX)
+  if (use_hw_render_buffers)
   {
-    csVBORenderBuffer *buffer = new csVBORenderBuffer (
-      size, type, componentType, componentCount, ext);
+    csVBORenderBuffer *buffer = new csVBORenderBuffer 
+      (size, type, componentType, componentCount, ext);
     return csPtr<iRenderBuffer> (buffer);
   }
   else

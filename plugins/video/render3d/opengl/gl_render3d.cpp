@@ -137,6 +137,9 @@ csGLRender3D::csGLRender3D (iBase *parent)
     texunitenabled[i] = false;
   }
   lastUsedShaderpass = 0;
+
+  txtcache = 0;
+  txtmgr = 0;
 }
 
 csGLRender3D::~csGLRender3D()
@@ -175,7 +178,7 @@ int csGLRender3D::GetMaxTextureSize () const
   GLint max;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
   if (max == 0)
-    max = 128; //@@ Assume we support at least 128x128 textures
+    max = 256; //@@ Assume we support at least 256^2 textures
   return max;
 }
 
@@ -890,6 +893,12 @@ bool csGLRender3D::BeginDraw (int drawflags)
   }
   if (drawflags & CSDRAW_2DGRAPHICS)
   {
+    if (use_hw_render_buffers)
+    {
+      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+      ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    }
+
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     SetGlOrtho (false);
@@ -1084,23 +1093,20 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
     vertattrib[attrib] = 0;
   }
   
-  static GLenum type[] = {GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, 
-    GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE };
-  void* data = buffer->Lock (CS_BUF_LOCK_RENDER);
-  if (data)
+  void* data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
+  if (data != (void*)-1)
   {
     if (ext->glEnableVertexAttribArrayARB) ext->glEnableVertexAttribArrayARB (attrib);
     if (bind)
     {
       if (use_hw_render_buffers)
       {
-        ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, (uint)data);
-        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount ()
-          , type[buffer->GetComponentType ()], true, 0, 0);
+        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, true, 0, 0);
       }
       else
-        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount ()
-        , type[buffer->GetComponentType ()], true, 0, data);
+        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, true, 0, data);
     }
     vertattrib[attrib] = buffer;
     vertattribenabled[attrib] = true;
@@ -1376,29 +1382,28 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-
-  glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
-
   iRenderBufferSource* source = mymesh->buffersource;
-  iRenderBuffer* indexbuf =
-    source->GetRenderBuffer (string_indices);
+  csGLRenderBuffer* indexbuf =
+    (csGLRenderBuffer*)source->GetRenderBuffer (string_indices);
   if (!indexbuf)
     return;
 
-  SetMixMode (mymesh->mixmode, 0, true);
+  void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS); //indexbuf->Lock(CS_BUF_LOCK_RENDER);
+  if (bufData != (void*)-1)
+  {
+    SetMixMode (mymesh->mixmode, 0, true);
 
-  if (bugplug)
-    bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
+    if (bugplug)
+      bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
-  glDrawElements (
-    primitivetype,
-    mymesh->indexend-mymesh->indexstart,
-    GL_UNSIGNED_INT,
-    ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-    +mymesh->indexstart);
+    glDrawElements (
+      primitivetype,
+      mymesh->indexend - mymesh->indexstart,
+      indexbuf->compGLType,
+      ((uint8*)bufData) + (indexbuf->compSize * mymesh->indexstart));
 
-  indexbuf->Release();
-  glDisableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
+    indexbuf->Release();
+  }
 
   /*if (clip_planes_enabled)
   {

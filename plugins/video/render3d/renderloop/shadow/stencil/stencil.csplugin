@@ -10,6 +10,7 @@
         <description>stencil shadow render loop step</description>
         <requires>
           <class>crystalspace.render3d.</class>
+	  <class>crystalspace.render3d.shadermanager</class>
         </requires>
       </class>
       <class>
@@ -18,6 +19,7 @@
         <description>stencil shadow render loop step type</description>
         <requires>
           <class>crystalspace.render3d.</class>
+	  <class>crystalspace.render3d.shadermanager</class>
         </requires>
       </class>
     </classes>
