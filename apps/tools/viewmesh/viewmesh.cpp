@@ -83,6 +83,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   sprite = NULL;
   dialog = NULL;
   cammode = movenormal;
+  spritepos = csVector3(0,10,0);
 }
 
 ViewMesh::~ViewMesh ()
@@ -334,8 +335,6 @@ void ViewMesh::ConstructMenu()
   menu->Hide();
 }
 
-#define SPRITEPOS   spritepos
-
 void ViewMesh::Draw()
 {
   // First get elapsed time from the system driver.
@@ -381,26 +380,26 @@ void ViewMesh::Draw()
 	    c->GetTransform().SetOrigin (orig + VEC_UP * 4 * speed);
 	  if (GetKeyState (CSKEY_PGDN))
 	    c->GetTransform().SetOrigin (orig + VEC_DOWN * 4 * speed);
-	  c->GetTransform().LookAt (SPRITEPOS-orig, csVector3(0,1,0) );
+	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
   	  break;
 	}
       case rotateorigin:
 	{
 	  csVector3 orig = c->GetTransform().GetOrigin();
 	  if (GetKeyState (CSKEY_LEFT))
-	    orig = csYRotMatrix3(-speed) * (orig-SPRITEPOS) + SPRITEPOS;
+	    orig = csYRotMatrix3(-speed) * (orig-spritepos) + spritepos;
 	  if (GetKeyState (CSKEY_RIGHT))
-	    orig = csYRotMatrix3(speed) * (orig-SPRITEPOS) + SPRITEPOS;
+	    orig = csYRotMatrix3(speed) * (orig-spritepos) + spritepos;
 	  if (GetKeyState (CSKEY_UP))
-	    orig = csXRotMatrix3(speed) * (orig-SPRITEPOS) + SPRITEPOS;
+	    orig = csXRotMatrix3(speed) * (orig-spritepos) + spritepos;
 	  if (GetKeyState (CSKEY_DOWN))
-	    orig = csXRotMatrix3(-speed) * (orig-SPRITEPOS) + SPRITEPOS;  
+	    orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;  
 	  c->GetTransform().SetOrigin(orig);
 	  if (GetKeyState (CSKEY_PGUP))
 	    c->Move(VEC_FORWARD * 4 * speed);
 	  if (GetKeyState (CSKEY_PGDN))
 	    c->Move(VEC_BACKWARD * 4 * speed);
-	  c->GetTransform().LookAt (SPRITEPOS-orig, csVector3(0,1,0) );	
+	  c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );	
 	  break;
 	}
       default:
