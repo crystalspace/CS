@@ -136,7 +136,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 1, 31);
+SCF_VERSION (iEngine, 0, 1, 32);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -561,11 +561,6 @@ struct iEngine : public iPlugIn
    * Get the list of all materials.
    */
   virtual iMaterialList* GetMaterialList () const = 0;
-
-  /**
-   * Advance the frames of all objects given the current time.
-   */
-  virtual void NextFrame (cs_time current_time) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

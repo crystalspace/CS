@@ -114,6 +114,10 @@ public:
   void DecRef ()
   { RefCount--; }
 
+  /// Get the reference count.
+  int GetRefCount ()
+  { return RefCount; }
+
   /// Try to free the library, if refcount is zero
   bool TryUnload ()
   {
@@ -320,6 +324,11 @@ void scfFactory::DecRef ()
   if (Library)
     Library->DecRef ();
 #endif
+}
+
+int scfFactory::GetRefCount ()
+{
+  return scfRefCount;
 }
 
 void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)

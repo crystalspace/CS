@@ -46,6 +46,7 @@ class csBox2;
 class csBox3;
 
 class csSpider;
+class csShadow;
 
 //--------------------------------------------------------------------------
 // Command codes.
@@ -85,6 +86,8 @@ class csSpider;
 #define DEBUGCMD_FOV		1019	// Set fov
 #define DEBUGCMD_FOVANGLE	1020	// Set fov in angles
 #define DEBUGCMD_TERRVIS	1021	// Enable/disable terrain visibility
+#define DEBUGCMD_MESHBBOX	1022	// Show BBOX of selected mesh
+#define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
 
 /**
  * For key mappings.
@@ -136,6 +139,12 @@ private:
 
   /// Toggle a G3D boolean option.
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
+
+  /// The selected mesh.
+  iMeshWrapper* selected_mesh;
+
+  /// Shadow!
+  csShadow* shadow;
 
   /// Spider!
   csSpider* spider;

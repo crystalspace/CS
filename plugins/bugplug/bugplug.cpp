@@ -28,6 +28,7 @@
 #include "csgeom/box.h"
 #include "bugplug.h"
 #include "spider.h"
+#include "shadow.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/event.h"
@@ -79,15 +80,24 @@ csBugPlug::csBugPlug (iBase *iParent)
   edit_string[0] = 0;
   initialized = false;
   spider = new csSpider ();
+  shadow = new csShadow ();
   spider_hunting = false;
+  selected_mesh = NULL;
+  shadow->SetShadowMesh (selected_mesh);
 }
 
 csBugPlug::~csBugPlug ()
 {
+  if (selected_mesh) selected_mesh->DecRef ();
   if (spider)
   {
     if (Engine) spider->UnweaveWeb (Engine);
     delete spider;
+  }
+  if (shadow)
+  {
+    if (Engine) shadow->RemoveFromEngine (Engine);
+    delete shadow;
   }
   if (Engine) Engine->DecRef ();
   if (G3D) G3D->DecRef ();
@@ -258,8 +268,8 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   iSector* sector = camera->GetSector ();
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
   csVector3 isect;
-  iPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
-  (void)sel;
+  sector->HitBeam (origin, origin + (vw-origin) * 60, isect);
+  iObject* sel = sector->HitBeam (origin, origin + (vw-origin) * 60, NULL);
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
@@ -269,6 +279,35 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   System->Printf (MSG_DEBUG_0,
     "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n",
     v.x, v.y, v.z, vw.x, vw.y, vw.z);
+
+  if (sel)
+  {
+    iMeshWrapper* mesh = QUERY_INTERFACE (sel, iMeshWrapper);
+    if (mesh)
+    {
+      // First release the ref to the previous selected_mesh.
+      if (selected_mesh) selected_mesh->DecRef ();
+
+      // The QUERY_INTERFACE increased the reference to this mesh. We
+      // don't DecRef() it to make sure it doesn't get deleted while
+      // BugPlug still has a reference.
+      // But of course we have to make sure that it will actually get
+      // deleted when the app/engine wants it deleted. So BugPlug will
+      // monitor the ref count of this mesh and decrease its own reference
+      // as soon as the ref count reaches one.
+      selected_mesh = mesh;
+      const char* n = selected_mesh->QueryObject ()->GetName ();
+      System->Printf (MSG_CONSOLE, "BugPlug found mesh '%s'!\n",
+      	n ? n : "<noname>");
+      bool bbox, rad;
+      shadow->GetShowOptions (bbox, rad);
+      shadow->SetShadowMesh (selected_mesh);
+      if (bbox || rad)
+	shadow->AddToEngine (Engine);
+      else
+	shadow->RemoveFromEngine (Engine);
+    }
+  }
 }
 
 bool csBugPlug::EatMouse (iEvent& event)
@@ -547,6 +586,36 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug has no engine to work on!\n");
 	}
         break;
+      case DEBUGCMD_MESHBBOX:
+	{
+	  bool bbox, rad;
+	  shadow->GetShowOptions (bbox, rad);
+          bbox = !bbox;
+	  System->Printf (MSG_CONSOLE,
+	    	"BugPlug %s bounding box display.\n",
+		bbox ? "enabled" : "disabled");
+	  shadow->SetShowOptions (bbox, rad);
+	  if ((bbox || rad) && selected_mesh)
+	    shadow->AddToEngine (Engine);
+	  else
+	    shadow->RemoveFromEngine (Engine);
+	}
+        break;
+      case DEBUGCMD_MESHRAD:
+        {
+	  bool bbox, rad;
+	  shadow->GetShowOptions (bbox, rad);
+          rad = !rad;
+	  System->Printf (MSG_CONSOLE,
+	    	"BugPlug %s bounding sphere display.\n",
+		rad ? "enabled" : "disabled");
+	  shadow->SetShowOptions (bbox, rad);
+	  if ((bbox || rad) && selected_mesh)
+	    shadow->AddToEngine (Engine);
+	  else
+	    shadow->RemoveFromEngine (Engine);
+	}
+        break;
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
@@ -567,6 +636,19 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     int bgcolor_clear = G3D->GetTextureManager ()->FindRGB (0, 255, 255);
     G2D->Clear (bgcolor_clear);
+  }
+  if (selected_mesh)
+  {
+    // Here we see if we have the last ref count to the selected mesh.
+    // In that case we also release it.
+    if (selected_mesh->GetRefCount () == 1)
+    {
+      shadow->SetShadowMesh (NULL);
+      shadow->RemoveFromEngine (Engine);
+      selected_mesh->DecRef ();
+      selected_mesh = NULL;
+      System->Printf (MSG_CONSOLE, "Selected mesh is deleted!");
+    }
   }
   return false;
 }
@@ -752,6 +834,8 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "fov"))		return DEBUGCMD_FOV;
   if (!strcmp (cmd, "fovangle"))	return DEBUGCMD_FOVANGLE;
   if (!strcmp (cmd, "terrvis"))		return DEBUGCMD_TERRVIS;
+  if (!strcmp (cmd, "meshbbox"))	return DEBUGCMD_MESHBBOX;
+  if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
 
   return DEBUGCMD_UNKNOWN;
 }

@@ -86,6 +86,8 @@ struct iBase
   virtual void IncRef () = 0;
   /// Decrement the reference count.
   virtual void DecRef () = 0;
+  /// Get the ref count (only for debugging).
+  virtual int GetRefCount () = 0;
   /// Query a particular interface embedded into this object.
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion) = 0;
   /**
@@ -124,6 +126,7 @@ public:									\
   OuterClass *scfParent;	/* The parent object */			\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
+  virtual int GetRefCount ();						\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -180,6 +183,16 @@ void Class::DecRef ()							\
 }
 
 /**
+ * The IMPLEMENT_IBASE_GETREFCOUNT() macro implements GetRefCount()
+ * for a class in a C++ source module.
+ */
+#define IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
+int Class::GetRefCount ()						\
+{									\
+  return scfRefCount;							\
+}
+
+/**
  * The IMPLEMENT_IBASE_QUERY() macro implements the opening boilerplate for the
  * QueryInterface() method for a class in a C++ source module.  Typically, this
  * macro is automatically employed by the IMPLEMENT_IBASE() convenience macro.
@@ -209,6 +222,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 #define IMPLEMENT_IBASE(Class)						\
   IMPLEMENT_IBASE_INCREF(Class)						\
   IMPLEMENT_IBASE_DECREF(Class)						\
+  IMPLEMENT_IBASE_GETREFCOUNT(Class)					\
   IMPLEMENT_IBASE_QUERY(Class)
 
 /**
@@ -243,6 +257,16 @@ void Class::DecRef ()							\
 }
 
 /**
+ * The IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT() macro implements
+ * the GetRefCount() method for an embedded class in a C++ source module.
+ */
+#define IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)			\
+int Class::GetRefCount ()						\
+{									\
+  return scfParent->GetRefCount ();					\
+}
+
+/**
  * The IMPLEMENT_EMBEDDED_IBASE_QUERY() macro implements the opening
  * boilerplate for the QueryInterface() method for an embedded class in a C++
  * source module.  Typically, this macro is automatically employed by the
@@ -273,6 +297,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 #define IMPLEMENT_EMBEDDED_IBASE(Class)					\
   IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
   IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
+  IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)				\
   IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)
 
 /**
@@ -326,6 +351,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   typedef ParentClass __scf_superclass;					\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
+  virtual int GetRefCount ();						\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -350,6 +376,18 @@ void Class::IncRef ()							\
 void Class::DecRef ()							\
 {									\
   __scf_superclass::DecRef ();						\
+}
+
+/**
+ * The IMPLEMENT_IBASE_EXT_GETREFCOUNT() macro implements the GetRefCount()
+ * method for a class extending another SCF class in a C++ source module.
+ * Typically, this macro is automatically employed by the
+ * IMPLEMENT_IBASE_EXT() convenience macro.
+ */
+#define IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)				\
+int Class::GetRefCount ()						\
+{									\
+  return __scf_superclass::GetRefCount ();				\
 }
 
 /**
@@ -379,6 +417,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 #define IMPLEMENT_IBASE_EXT(Class)					\
   IMPLEMENT_IBASE_EXT_INCREF(Class)					\
   IMPLEMENT_IBASE_EXT_DECREF(Class)					\
+  IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)				\
   IMPLEMENT_IBASE_EXT_QUERY(Class)
 
 /**

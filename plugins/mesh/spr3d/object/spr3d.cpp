@@ -293,17 +293,30 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
   for ( frame = 0 ; frame < GetFrameCount () ; frame++ )
   {
     csBox3 box;
-    GetFrame(frame)->GetBoundingBox (box);
 
+    csVector3 max_sq_radius (0);
     box.StartBoundingBox (GetVertex (frame, 0));
     for ( vertex = 1 ; vertex < GetTexelCount() ; vertex++ )
-      box.AddBoundingVertexSmart (GetVertex (frame, vertex));
+    {
+      csVector3& v = GetVertex (frame, vertex);
+      box.AddBoundingVertexSmart (v);
+      csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+    }
 
-    GetFrame(frame)->SetBoundingBox (box);
+    GetFrame (frame)->SetBoundingBox (box);
+    GetFrame (frame)->SetRadius (csVector3 (
+    	qsqrt (max_sq_radius.x),
+	qsqrt (max_sq_radius.y),
+	qsqrt (max_sq_radius.z)));
   }
   if (skeleton)
-    skeleton->ComputeBoundingBox (vertices.Get (0));
+  {
     // @@@ should the base frame for the skeleton be a variable?
+    skeleton->ComputeBoundingBox (vertices.Get (0));
+  }
 }
 
 csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
@@ -754,7 +767,8 @@ void csSprite3DMeshObject::GetTransformedBoundingBox (
 
   if (skeleton_state)
   {
-    skeleton_state->ComputeBoundingBox (trans, camera_bbox);
+    skeleton_state->ComputeBoundingBox (trans, camera_bbox,
+    	factory->vertices.Get (0));
   }
   else
   {
@@ -824,7 +838,8 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
 {
   if (skeleton_state)
   {
-    skeleton_state->ComputeBoundingBox (csTransform (), b);
+    skeleton_state->ComputeBoundingBox (csTransform (), b,
+    	factory->vertices.Get (0));
   }
   else
   {
@@ -835,9 +850,21 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
 
 csVector3 csSprite3DMeshObject::GetRadius ()
 {
-  csBox3 b;
-  GetObjectBoundingBox (b);
-  return (b.Max () - b.Min ()) * .5f;
+  csVector3 r;
+  if (skeleton_state)
+  {
+    skeleton_state->ComputeSqRadius (csTransform (), r,
+    	factory->vertices.Get (0));
+    r.x = qsqrt (r.x);
+    r.y = qsqrt (r.y);
+    r.z = qsqrt (r.z);
+  }
+  else
+  {
+    csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
+    cframe->GetRadius (r);
+  }
+  return r;
 }
 
 void csSprite3DMeshObject::SetupObject ()
@@ -1503,8 +1530,8 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   }
 }
 
-bool csSprite3DMeshObject::HitBeamObject (const csVector3& start, const csVector3& end,
-	csVector3& isect, float* pr)
+bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
 {
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.

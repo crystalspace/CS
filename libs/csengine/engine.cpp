@@ -1155,6 +1155,8 @@ void csEngine::StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview)
 
 void csEngine::Draw (iCamera* c, iClipper2D* view)
 {
+  ControlMeshes ();
+
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c->GetPrivateObject (), view, rview);
   rview.SetCallback (NULL);
@@ -1180,6 +1182,8 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
 void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
   iDrawFuncCallback* callback)
 {
+  ControlMeshes ();
+
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c->GetPrivateObject (), view, rview);
   rview.SetCallback (callback);
@@ -1321,8 +1325,11 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
   dyn->SetPrev (NULL);
 }
 
-void csEngine::NextFrame (cs_time current_time)
+void csEngine::ControlMeshes ()
 {
+  cs_time elapsed_time, current_time;
+  System->GetElapsedTime (elapsed_time, current_time);
+
   nextframe_pending = current_time;
 
   // Delete particle systems that self-destructed now.
@@ -2067,7 +2074,8 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
     if (factwrap != NULL) return factwrap;
   }
 
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, classId, "MeshObj", iMeshObjectType);
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, classId, "MeshObj",
+  	iMeshObjectType);
   if (!type) type = LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();

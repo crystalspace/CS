@@ -132,41 +132,21 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   if (max_lv > max_lv2) max_lv = max_lv2;
 
   int src = min_lu + min_lv * lm_w;
+  CS_ASSERT (src >= 0);
   int src_dlu = lm_w - (max_lu - min_lu);
 
-  // @@@ Jorrit: the code below is a bit clumsy. When an overflow
-  // is detected we calculate the number of lightmap lines that
-  // cannot be calculated due to overflowing the lightmap bounds (why
-  // this can happen in the first place is a mistery).
-  // For those lines we will reuse the last line of the lightmap
-  // that we can safely use.
-  int src_end = src + (src_dlu + max_lu-min_lu) * (max_lv-min_lv)
-  	- src_dlu + lm_w + 1;
-  int overflow_lv;
-  if (src_end > lm_size)
-    overflow_lv = max_lv - ((src_end-lm_size+lm_w-1) / lm_w);
-  else
-    overflow_lv = max_lv;
+  // @@@ Jorrit: the code below is a bit clumsy. For some reason
+  // the loop below can easily go beyond lightmap boundary. To avoid
+  // this problem there is now a test to see if we stay within bounds.
+  int src_end = lm_size - lm_w - 1;
 
   int lmlm_w = lm_w << 2;
-  int src_old = src;
   for (int lv = min_lv; lv < max_lv; lv++)
   {
-#if 0
-    if (lv >= overflow_lv)
-    {
-      // Go back one line in the lightmap data.
-      src_old = src_old - lm_w;
-    }
-#endif
-
     for (int lu = min_lu; lu < max_lu; lu++)
     {
-      int lmsrc = src_old << 2;
-#if 0
-      CS_ASSERT (src_old >= 0);
-      CS_ASSERT ((src_old + lm_w + 1) < lm_size);
-#endif
+      if (src >= src_end) return;
+      int lmsrc = src << 2;
 #define GET(map, col)				\
       UByte col##00, col##10, col##01, col##11;	\
       col##00 = map [lmsrc];			\
@@ -194,10 +174,10 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
       // If this lightmap cell did not change, do not recalculate
       if (old_lm [src] == cellid)
-      { src_old++; src++; continue; }
+      { src++; continue; }
 
       old_lm [src] = cellid;
-      src_old++; src++;
+      src++;
 
       int u = lu << pt_cell_shift;
       int v = lv << pt_cell_shift;
@@ -255,7 +235,6 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
       }
     }
     src += src_dlu;
-    src_old += src_dlu;
   }
 }
 

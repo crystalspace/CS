@@ -113,7 +113,7 @@ void csSector::CleanupReferences ()
   while (references.Length () > 0)
   {
     iReference* ref = (iReference*)references[references.Length ()-1];
-#   if CS_DEBUG
+#   ifdef CS_DEBUG
     // Sanity check.
     iReferencedObject* refobj = ref->GetReferencedObject ();
     CS_ASSERT (refobj == &scfiReferencedObject);
@@ -1258,15 +1258,16 @@ iPolygon3D* csSector::eiSector::HitBeam (const csVector3& start,
 iObject* csSector::eiSector::HitBeam (const csVector3& start,
 	const csVector3& end, iPolygon3D** polygonPtr)
 {
-  csPolygon3D* p;
+  csPolygon3D* p = NULL;
   csObject* obj = scfParent->HitBeam (start, end, polygonPtr ? &p : NULL);
   if (obj)
   {
-    iObject* iobj = QUERY_INTERFACE (obj, iObject);
-    iobj->DecRef ();
-    return iobj;
+    if (p)
+    {
+      *polygonPtr = &(p->scfiPolygon3D);
+    }
   }
-  else return NULL;
+  return (iObject*)obj;
 }
 
 iSector* csSector::eiSector::FollowSegment (csReversibleTransform& t,

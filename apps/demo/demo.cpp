@@ -933,8 +933,6 @@ void Demo::NextFrame ()
     seqmgr->DebugPositionObjects (view->GetCamera (), debug_time);
   }
 
-  engine->NextFrame (current_time);
-
   if (map_enabled == MAP_EDIT_FORWARD)
   {
     csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);

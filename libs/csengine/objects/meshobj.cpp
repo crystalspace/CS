@@ -32,6 +32,7 @@ IMPLEMENT_IBASE_EXT_QUERY (csMeshWrapper)
 IMPLEMENT_IBASE_EXT_QUERY_END
 
 IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
+IMPLEMENT_IBASE_EXT_GETREFCOUNT(csMeshWrapper)
 
 // We implement a custom DecRef() in order to work around a shortcoming of the
 // NextStep compiler.  The UnlinkMesh(this) invocation which appears here used
@@ -54,7 +55,7 @@ IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
 void csMeshWrapper::DecRef()
 {
   CS_ASSERT (scfRefCount > 0);
-#if CS_DEBUG
+#ifdef CS_DEBUG
   if (scfRefCount == 1)
   {
     int idx = csEngine::current_engine->meshes.Find (this);
@@ -300,9 +301,9 @@ bool csMeshWrapper::HitBeamObject (const csVector3& start,
 bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
 	csVector3& isect, float* pr)
 {
-  const csReversibleTransform& trans = movable.GetTransform ();
-  csVector3 startObj = trans * start;
-  csVector3 endObj = trans * end;
+  csReversibleTransform trans = movable.GetFullTransform ();
+  csVector3 startObj = trans.Other2This (start);
+  csVector3 endObj = trans.Other2This (end);
   bool rc = HitBeamObject (startObj, endObj, isect, pr);
   if (rc)
     isect = trans.This2Other (isect);

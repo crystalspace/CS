@@ -219,7 +219,7 @@ void csRegion::Region::DeleteAll ()
       copy[i] = NULL;
     }
 
-#if defined(CS_DEBUG)
+#ifdef CS_DEBUG
   // Sanity check (only in debug mode). There should be no more
   // non-NULL references in the copy array now.
   for (i = 0 ; i < copy.Length () ; i++)

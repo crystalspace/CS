@@ -56,6 +56,8 @@ private:
 
   /// Bounding box in object space for this frame.
   csBox3 box;
+  /// Radius in object space for this frame.
+  csVector3 radius;
 
 public:
   ///
@@ -85,12 +87,22 @@ public:
    * This has to be called after setting up the frame and before
    * using it.
    */
-  void SetBoundingBox (csBox3& b) { box = b; }
+  void SetBoundingBox (const csBox3& b) { box = b; }
 
   /**
    * Get the bounding box in object space.
    */
   void GetBoundingBox (csBox3& b) const { b = box; }
+
+  /**
+   * Set the radius of this frame in object space.
+   */
+  void SetRadius (const csVector3& r) { radius = r; }
+
+  /**
+   * Get the radius of this frame in object space.
+   */
+  void GetRadius (csVector3& r) const { r = radius; }
 
   DECLARE_IBASE;
 };
@@ -328,7 +340,7 @@ public:
   void GenerateLOD ();
 
   /**
-   * Compute the object space bounding box for all frames in this
+   * Compute the object space bounding box and radius for all frames in this
    * template. This has to be called after setting up the template and before
    * using it.
    */

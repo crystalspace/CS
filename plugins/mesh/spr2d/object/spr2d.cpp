@@ -80,13 +80,17 @@ void csSprite2DMeshObject::SetupObject ()
     {
       // If there is no lighting then we need to copy the color_init
       // array to color.
+      float max_sq_dist = 0;
       for (int i = 0 ; i < vertices.Length () ; i++)
       {
-        vertices[i].color = vertices[i].color_init;
-        vertices[i].color.Clamp (2, 2, 2);
+        csSprite2DVertex& v = vertices[i];
+        v.color = vertices[i].color_init;
+        v.color.Clamp (2, 2, 2);
+	float sqdist = v.pos.x*v.pos.x + v.pos.y*v.pos.y;
+	if (sqdist > max_sq_dist) max_sq_dist = sqdist;
       }
-      // @@@ TODO: compute radius
-      radius.Set (1, 1, 1);;
+      float max_dist = qsqrt (max_sq_dist);
+      radius.Set (max_dist, max_dist, max_dist);
     }
   }
 }

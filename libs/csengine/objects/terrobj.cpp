@@ -26,7 +26,9 @@
 IMPLEMENT_IBASE_EXT_QUERY (csTerrainWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainWrapper)
 IMPLEMENT_IBASE_EXT_QUERY_END
+
 IMPLEMENT_IBASE_EXT_INCREF(csTerrainWrapper)
+IMPLEMENT_IBASE_EXT_GETREFCOUNT(csTerrainWrapper)
 
 // We implement a custom DecRef() in order to work around a shortcoming of the
 // NextStep compiler.  The UnlinkTerrain(this) invocation which appears here

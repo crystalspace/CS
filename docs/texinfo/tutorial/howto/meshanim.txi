@@ -14,25 +14,8 @@ get lit by surrounding lights.
 Not all meshes support animation. All particle systems and 3D sprites
 have animation.
 
-But on their own particle systems and meshes will not animate. To enable
-animation for all meshes in loaded in the engine you have to call
-@code{iEngine::NextFrame()} in your @code{NextFrame} routine. Usually this
-goes like this:
-
-@example
-void MyGame::NextFrame ()
-@{
-  SysSystemDriver::NextFrame ();
-  cs_time elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
-  engine->NextFrame (current_time);
-@}
-@end example
-
-Note that calling engine->NextFrame() will not actually do the animation.
-It will only tell the engine that every mesh will have to update it's
-animation to the given time as soon as that mesh is visible.
-So it is very efficient to call this function.
+The engine is smart enough to only animate mesh objects that are actually
+visible on screen.
 
 @subsubheading Lighting Meshes
 

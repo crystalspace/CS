@@ -487,6 +487,11 @@ private:
   csObject* FindObjectInRegion (csRegion* region,
 	const csNamedObjVector& vector, const char* name) const;
 
+  /**
+   * Controll animation and delete meshes that want to die.
+   */
+  void ControlMeshes ();
+
 public:
   /**
    * The current camera for drawing the world.
@@ -883,11 +888,6 @@ public:
    * Find the light with the given name.
    */
   csStatLight* FindCsLight (const char* name, bool regionOnly = false) const;
-
-  /**
-   * Advance the frames of all objects given the current time.
-   */
-  virtual void NextFrame (cs_time current_time);
 
   /**
    * Unlink and delete (using DecRef()) a mesh from the engine.

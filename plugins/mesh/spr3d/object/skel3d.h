@@ -52,6 +52,8 @@ private:
 
   /// Bounding box in object space for this limb.
   csBox3 box;
+  /// Radius in object space for this limb.
+  csVector3 radius;
 
   /// The name of this Limb.
   char* name;
@@ -79,6 +81,9 @@ public:
   /// Get the bounding box.
   void GetBoundingBox (csBox3& b) const { b = box; }
 
+  /// Get the radius.
+  void GetRadius (csVector3& r) const { r = radius; }
+
   /// Add a child limb.
   void AddChild (csSkelLimb* child);
 
@@ -99,7 +104,7 @@ public:
   void RemapVertices (int* mapping);
 
   /**
-   * Compute the object space bounding box for this limb.
+   * Compute the object space bounding box and radius for this limb.
    */
   void ComputeBoundingBox (csPoly3D* source);
 
@@ -226,12 +231,20 @@ public:
    * This is a recursive function which traverses all limbs and creates
    * a combined transformation along the way.
    */
-  virtual void Transform (const csTransform& tr, csVector3* source, csVector3* dest);
+  virtual void Transform (const csTransform& tr, csVector3* source,
+  	csVector3* dest);
 
   /**
    * Calculate the real bounding box for the given state.
    */
-  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box,
+  	csPoly3D* source);
+
+  /**
+   * Calculate the real squared radius for the given state.
+   */
+  virtual void ComputeSqRadius (const csTransform& tr,
+  	csVector3& max_sq_radius, csPoly3D* source);
 
   /// Get first child.
   csSkelLimbState* GetFirstChild () { return children; }
@@ -272,7 +285,7 @@ private:
   csTransform trans;
 
 protected:
-  /// Create an empty limb with an identity transformation (protected constructor).
+  /// Create an empty limb with an identity transformation (protected).
   csSkelConnectionState ();
 
 public:
@@ -280,10 +293,18 @@ public:
   virtual ~csSkelConnectionState () { }
 
   /// Transform the vertices in the given frame to the destination frame.
-  virtual void Transform (const csTransform& tr, csVector3* source, csVector3* dest);
+  virtual void Transform (const csTransform& tr, csVector3* source,
+  	csVector3* dest);
 
   /// Calculate the real bounding box for the given state.
-  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box,
+  	csPoly3D* source);
+
+  /**
+   * Calculate the real squared radius for the given state.
+   */
+  virtual void ComputeSqRadius (const csTransform& tr,
+  	csVector3& max_sq_radius, csPoly3D* source);
 
   /// Set the transformation.
   void SetTransformation (const csTransform& tr) { trans = tr; }
@@ -367,7 +388,14 @@ public:
   virtual ~csSkelState () { }
 
   /// Calculate the real bounding box for the given state.
-  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box,
+  	csPoly3D* source);
+
+  /**
+   * Calculate the real radius for the given state.
+   */
+  virtual void ComputeSqRadius (const csTransform& tr,
+  	csVector3& max_sq_radius, csPoly3D* source);
 
   DECLARE_IBASE_EXT (csSkelLimbState);
 

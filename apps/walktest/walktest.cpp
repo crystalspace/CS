@@ -403,9 +403,6 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     wentity->NextFrame (elapsed_time);
   }
 
-  // Move all particle systems and meshes.
-  Sys->Engine->NextFrame (current_time);
-
   // Record the first time this routine is called.
   extern bool do_bots;
   if (do_bots)

@@ -1,6 +1,36 @@
 The history order is reversed so that new features are at the top.
 
 25-Jun-2001
+	- Added iBase::GetRefCount(). This way you can now get the reference
+	  counter from any SCF interface. Note that this is ONLY for debugging
+	  purposes! Any misuse of this function for anything but debugging
+	  will be severly punished! :-)
+	- BugPlug now has the ability to select a mesh on screen (by clicking
+	  on it). It will automatically detect when the mesh is deleted and
+	  correctly unselect it then. BugPlug uses the new GetRefCount()
+	  function to do that (yes! BugPlug is about debugging, so it can
+	  do that!)
+	- Eliminated csEngine and iEngine::NextFrame(). Now this is done
+	  automatically in csEngine::Draw() and DrawFunc().
+	- Made iSector::HitBeam() a little bit more efficient and also
+	  fixed a small bug: the polygon was not filled in.
+	- Fixed csMeshWrapper::HitBeam() so that it now takes the full
+	  transform instead of the transform. That way it works for
+	  hierarchical objects too.
+	- Fixed a bad bug in Spider (BugPlug). DecRef() was called on Spider
+	  before it was removed from the engine. This has recently been
+	  forbidden. This bug caused BugPlug to crash whenever Spider catched
+	  a camera.
+	- Added 'meshbbox' and 'meshrad' commands in BugPlug. 'meshbbox'
+	  shows the bounding box of the currently selected mesh. 'meshrad'
+	  shows the bounding sphere of the currently selected mesh.
+ 	- BugPlug is the hiding place for many dark creatures. While Spider
+	  only places a curse on the country and any unsuspecting wanderer
+	  that might visit the country, Shadow takes possession of some
+	  creature and clings to it with all its power. Unless Shadow
+	  willingly releases the creature there is nothing that can be done
+	  to unbind Shadow. The Shadow slowly devours the poor creature from
+	  all its knowledge.
 	- Eric Sunshine fixed a problem with mdl2spr where it failed to load
 	  the PNG plugin.  Also fixed it so that it only attempts to load the
 	  PNG plugin if absolutely required (for instance, to save skins from
@@ -26,7 +56,29 @@ The history order is reversed so that new features are at the top.
 	    - Added a definition of OPENGL_2D_DRIVER to next/csosdefs.h.
 	- Eric Sunshine fixed ogl_halo.cpp so that it no longer unnecessarily
 	  includes <windows.h>.
+	- Michael Voasse added half of the animation documentation. He
+	  added the links accidentally during his last commit, so he added
+	  what he had completed so far.
+	- Michael also added SetVertices() methods to Sprite3d, modified
+	  metagen to hand over the pointer to its vertex buffer (and all
+	  the other arrays it uses ). *WARNING* you will need to
+	  recompile csparser, spr3d and spr3dldr to return a
+	  successful build. This is as per the patch sent earlier
+	  to the dev list.
+	- Michael added some further documentation to tesselat.h to explain
+	  what it does and how it does it.
 24-Jun-2001
+	- 'Fixed' the lightmap overflow bug in software renderer. It is
+	  not really an elegant bug fix as I simply test for overflow
+	  but it seems to work.
+	- Correctly implemented GetRadius() for the sprite2d mesh object.
+	- Optimized skeletal sprite bounding box calculation by doing
+	  the calculation on the vertices instead of the bounding box
+	  if a limb has less than 8 vertices. Even if the limb has slightly
+	  more than 8 vertices we also do this for the increased accuracy
+	  this gets us.
+	- Calculation of radius for 3D sprites is now very accurate and
+	  correctly accounts for current frame and skeletal state.
 	- Eric Sunshine repaired DemoSequenceLoader::LoadPath() so that it no
 	  longer allocates 10,000 element arrays of `float' and 'csVector3' on
 	  the stack, since such huge arrays are frequently unportable.  In this

@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "spr3d.h"
+#include "qsqrt.h"
 
 IMPLEMENT_IBASE (csSkelLimb)
   IMPLEMENTS_INTERFACE (iSkeletonLimb)
@@ -105,9 +106,21 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
 {
   if (num_vertices)
   {
+    csVector3 max_sq_radius (0);
     box.StartBoundingBox ((*source)[vertices[0]]);
     for (int i = 1 ; i < num_vertices ; i++)
-      box.AddBoundingVertexSmart ((*source)[vertices[i]]);
+    {
+      const csVector3& v = (*source)[vertices[i]];
+      box.AddBoundingVertexSmart (v);
+      csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+    }
+    radius.Set (
+    	qsqrt (max_sq_radius.x),
+	qsqrt (max_sq_radius.y),
+	qsqrt (max_sq_radius.z));
   }
 
   csSkelLimb* c = children;
@@ -236,26 +249,139 @@ void csSkelConnectionState::Transform (const csTransform& tr,
 }
 
 void csSkelLimbState::ComputeBoundingBox (const csTransform& tr,
-	csBox3& box)
+	csBox3& box, csPoly3D* source)
 {
   if (num_vertices)
   {
-    csBox3 b;
-    tmpl->GetBoundingBox (b);
-    box.AddBoundingVertex (tr * b.GetCorner (0));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (1));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (2));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (3));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (4));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (5));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (6));
-    box.AddBoundingVertexSmart (tr * b.GetCorner (7));
+    if (num_vertices < 10)
+    {
+      // This is an optimization. If a limb has less than 8 vertices
+      // then it is more optimal to compute the transformed bounding
+      // box based on vertices than on the precalculated limb bounding
+      // box. Not even is it more efficient, it is also more accurate
+      // (i.e. bounding box will be closer to reality). For this gain
+      // of accuracy we will also use this technique if a limb
+      // has slightly more than 8 vertices.
+      int i;
+      for (i = 0 ; i < num_vertices ; i++)
+      {
+        const csVector3& v = (*source)[vertices[i]];
+        box.AddBoundingVertex (tr * v);
+      }
+    }
+    else
+    {
+      // The number of vertices in this limb is big enough so that
+      // it is better (though less accurate) to just use the bounding
+      // box.
+      csBox3 b;
+      tmpl->GetBoundingBox (b);
+      box.AddBoundingVertex (tr * b.GetCorner (0));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (1));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (2));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (3));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (4));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (5));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (6));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (7));
+    }
   }
 
   csSkelLimbState* c = children;
   while (c)
   {
-    c->ComputeBoundingBox (tr, box);
+    c->ComputeBoundingBox (tr, box, source);
+    c = c->GetNext ();
+  }
+}
+
+void csSkelLimbState::ComputeSqRadius (const csTransform& tr,
+	csVector3& max_sq_radius, csPoly3D* source)
+{
+  if (num_vertices)
+  {
+    // See the comment with ComputeBoundingBox above. The same
+    // optimization applies here.
+    if (num_vertices < 10)
+    {
+      int i;
+      for (i = 0 ; i < num_vertices ; i++)
+      {
+        csVector3 v = tr * (*source)[vertices[i]];
+	csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+	if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+	if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+	if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      }
+    }
+    else
+    {
+      csVector3 trans_origin = tr * csVector3 (0);
+      csVector3 rad;
+      tmpl->GetRadius (rad);
+      csVector3 sq_radius = trans_origin - rad;
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin + csVector3 (-rad.x, rad.y, rad.z);
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin + csVector3 (rad.x, -rad.y, rad.z);
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin + csVector3 (rad.x, rad.y, -rad.z);
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin + csVector3 (-rad.x, rad.y, -rad.z);
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin + csVector3 (-rad.x, -rad.y, rad.z);
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin + csVector3 (rad.x, -rad.y, -rad.z);
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      sq_radius = trans_origin - rad;
+      sq_radius.x = sq_radius.x*sq_radius.x;
+      sq_radius.y = sq_radius.y*sq_radius.y;
+      sq_radius.z = sq_radius.z*sq_radius.z;
+      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+    }
+  }
+
+  csSkelLimbState* c = children;
+  while (c)
+  {
+    c->ComputeSqRadius (tr, max_sq_radius, source);
     c = c->GetNext ();
   }
 }
@@ -280,10 +406,17 @@ csSkelConnectionState::csSkelConnectionState ()
 }
 
 void csSkelConnectionState::ComputeBoundingBox (
-  const csTransform& tr, csBox3& box)
+  const csTransform& tr, csBox3& box, csPoly3D* source)
 {
   csTransform tr_new = tr * trans;
-  csSkelLimbState::ComputeBoundingBox (tr_new, box);
+  csSkelLimbState::ComputeBoundingBox (tr_new, box, source);
+}
+
+void csSkelConnectionState::ComputeSqRadius (const csTransform& tr,
+	csVector3& max_sq_radius, csPoly3D* source)
+{
+  csTransform tr_new = tr * trans;
+  csSkelLimbState::ComputeSqRadius (tr_new, max_sq_radius, source);
 }
 
 IMPLEMENT_IBASE_EXT (csSkelState)
@@ -306,8 +439,16 @@ csSkelState::csSkelState ()
 }
 
 void csSkelState::ComputeBoundingBox (const csTransform& tr,
-	csBox3& box)
+	csBox3& box, csPoly3D* source)
 {
   box.StartBoundingBox ();
-  csSkelLimbState::ComputeBoundingBox (tr, box);
+  csSkelLimbState::ComputeBoundingBox (tr, box, source);
 }
+
+void csSkelState::ComputeSqRadius (const csTransform& tr,
+	csVector3& max_sq_radius, csPoly3D* source)
+{
+  max_sq_radius.Set (0, 0, 0);
+  csSkelLimbState::ComputeSqRadius (tr, max_sq_radius, source);
+}
+

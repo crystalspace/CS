@@ -203,11 +203,13 @@ public:
   static int CalcLightMapWidth (int w)
   {
     return 1 + ((w + lightcell_size - 1) >> lightcell_shift);
+    //return 1 + ((w + lightcell_size) >> lightcell_shift); //@@@ EXP
   }
   /// Return the height of a lightmap given a texture size.
   static int CalcLightMapHeight (int h)
   {
     return 1 + ((h + lightcell_size - 1) >> lightcell_shift);
+    //return 1 + ((h + lightcell_size) >> lightcell_shift); //@@@ EXP
   }
 
   ///

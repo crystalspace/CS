@@ -52,7 +52,7 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
 
 bool csSpider::WeaveWeb (iEngine* engine)
 {
-  if (wrap) { wrap->DecRef (); wrap = NULL; }
+  if (wrap) { engine->RemoveMesh (wrap); wrap = NULL; }
   if (engine->GetSectorCount () <= 0) return false;
   wrap = engine->CreateMeshObject (this, "_@Spider@_");
   iMovable* movable = wrap->GetMovable ();
@@ -70,7 +70,7 @@ void csSpider::UnweaveWeb (iEngine* engine)
 {
   if (wrap)
   {
-    wrap->DecRef ();
+    engine->RemoveMesh (wrap);
     wrap = NULL;
   }
 }
