@@ -38,6 +38,8 @@
 #  define DO_MMX
 #endif
 
+//#define CS_USE_NEW_RENDERER
+
 // If you don't want to use direct input, comment this out
 // keyboard handler will default to window message handling.
 #if defined(COMP_GCC)
@@ -48,5 +50,11 @@
 
 #define CS_RGBCOLOR_SANE
 #define CS_RGBPIXEL_SANE
+
+#ifdef _WIN64
+  #define CS_PLATFORM_IS_64BITS
+#endif
+
+#define CS_WCHAR_T_SIZE 2
 
 #endif // __CS_WIN32_VOLATILE_H__
