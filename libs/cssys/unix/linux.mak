@@ -17,13 +17,14 @@ PLUGINS+=video/format/avi
 # CODECS (some formats are dynamic, that is they need codecs to encod/decode data)
 # OpenDivX : you need an additional library you can get from www.projectmayo.com
 #PLUGINS+=video/format/codecs/opendivx
+PLUGINS+=video/format/codecs/rle
 
 # Uncomment the following to build GGI 2D and/or SDL drivers
 #PLUGINS+=video/canvas/ggi 
 #PLUGINS+=video/canvas/sdl 
 
 # Uncomment the following to build sound drivers
-#PLUGINS+=sound/driver/oss sound/renderer/software
+PLUGINS+=sound/driver/oss sound/renderer/software
 
 # Uncomment some of the following if you have a special MESA version that uses
 # some of the following hardware/software renderers.  Also set the entry Driver
