@@ -105,7 +105,11 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetString (settings, "Disallow", disallow);
   pm->GetString (settings, "MaskChar", maskchar);
 
-  if (text) {
+  int _focusable = 0;
+  pm->GetInt (settings, "Focusable", _focusable);
+	focusable = _focusable;
+  
+	if (text) {
       cursor = text->Length ();
       text = new scfString(*text);
   } else
