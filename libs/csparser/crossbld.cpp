@@ -25,6 +25,7 @@
 #include "csparser/crossbld.h"
 #include "csobject/nameobj.h"
 #include "csengine/world.h"
+#include "csgfxldr/csimage.h"
 #include "cssys/common/system.h"
 #include "csutil/csstrvec.h"
 #include "itexture.h"
