@@ -88,8 +88,8 @@ void csGraphics2DGlideX::Initialize()
 
 
   Depth=16;
-	
-  DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
+	  
+  DrawPixel = DrawPixelGlide;   WriteChar = WriteChar16;
   GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
     
   // calculate CS's pixel format structure. 565
@@ -496,4 +496,59 @@ void csGraphics2DGlideX::ProcessEvents (void *Param)
         //if (event.type == CompletionType) shm_busy = 0;
         break;
     }
+}
+
+void csGraphics2DGlideX::DrawLine (int x1, int y1, int x2, int y2, int color)
+{
+  // can't do this while framebuffer is locked...
+  if (locked) return;
+ 
+  GrVertex a,b;
+  a.x=x1; a.y=y1;
+  b.x=x2; b.y=y2;
+
+  grConstantColorValue(color);
+  grDrawLine(&a,&b);
+}
+
+void csGraphics2DGlideX::DrawHorizLine (int x1, int x2, int y, int color)
+{
+  // can't do this while framebuffer is locked...
+  if (locked) return; 
+ 
+  GrVertex a,b;
+  a.x=x1; a.y=y;
+  b.x=x2; b.y=y;
+
+  grConstantColorValue(color);
+  grDrawLine(&a,&b);
+}
+
+void csGraphics2DGlideX::DrawPixelGlide (int x, int y, int color)
+{
+  // can't do this while framebuffer is locked...
+  if (locked) return;
+
+  GrVertex p;
+  p.x=x; p.y=y;
+
+  grConstantColorValue(color);
+  grDrawPoint(&p);
+}
+
+void csGraphics2DGlideX::WriteCharGlide (int x, int y, int fg, int bg, char c)
+{
+  // not implemented yet...
+}
+
+void csGraphics2DGlideX::DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy,
+  int sw, int sh, int tx, int ty, int tw, int th)
+{
+  // not implemented yet...
+}
+
+unsigned char* csGraphics2DGlideX::GetPixelAtGlide (int x, int y)
+{
+  // not implemented yet...
+  return NULL;
 }

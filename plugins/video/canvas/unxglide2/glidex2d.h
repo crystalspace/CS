@@ -117,6 +117,15 @@ public:
   /// Set mouse cursor shape
   virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
 
+  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
+  virtual void DrawHorizLine (int x1, int x2, int y, int color);
+  
+  void DrawPixelGlide (int x, int y, int color);
+  void WriteCharGlide (int x, int y, int fg, int bg, char c);
+  void DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy, 
+                        int sw, int sh, int tx, int ty, int tw, int th);
+  unsigned char* GetPixelAtGlide (int x, int y);          
+
 protected:
   /// This function is functionally equivalent to csSystemDriver::CsPrintf
   void CsPrintf (int msgtype, char *format, ...);
