@@ -97,6 +97,11 @@ private:
   bool parse_xml_atom(oper_arg &, csStringID, const char *, const char *);
   /// Parse a Lisplike S-expression
   bool parse_sexp(cons *, iDocumentNode *);
+  /** Parse an S-expression form
+      Used to recurse down the S-expression's nested lists. */
+  bool parse_sexp_form(const char *& text, cons *);
+  /// Parse an S-expression atom 
+  bool parse_sexp_atom(const char *& text, cons *);
 
   /// Compile a cons list into the oper_array.
   bool compile_cons(const cons *, int & acc_top);

@@ -105,6 +105,8 @@ chronological order.
 	      claimed to be ordered by date of initial contribution, however,
 	      in reality, there was much randomness of entries, and the
 	      date-based claim was more misleading than not.)
+	- DeSigna began the implementation of the sexp parser, for use with
+	  shader-expressions.
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception

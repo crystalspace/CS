@@ -1394,9 +1394,118 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
 
 bool csShaderExpression::parse_sexp(cons * head, iDocumentNode * node)
 {
-  /* @@@ todo */
+  const char * text = node->GetValue();
+  cons * cptr = head;
+
+  if (text[0] == '(') 
+    return parse_sexp_form(text, cptr);
+  else
+    return parse_sexp_atom(text, cptr);
+  
+  return true;
+}
+
+bool csShaderExpression::parse_sexp_form(const char *& text, cons * head) {
   
   return false;
+}
+
+bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
+  if (isdigit(*text) || 
+      (*text == '-' && isdigit(text[1])) ||
+      (*text == '+' && isdigit(text[1])) ||
+      (*text == '.' && isdigit(text[1])))        /* TYPE_NUMBER */
+  { /* @@@ Optimize to use strtod directly, and endval_ptr to check for error conditions ! */
+    const char * tmp = text;
+    
+    while (!isspace(*tmp) && *tmp)
+      tmp++;
+    
+    int size = tmp - text;
+    CS_ALLOC_STACK_ARRAY(char, tmp2, size + 1);
+    memcpy(tmp2, text, size);
+    tmp2[size] = 0;
+
+    if (!parse_xml_atom(head->car, TYPE_NUMBER, "num", tmp2))
+      return false;
+
+    text = tmp;
+  } else if (*text == '#' && text[1] == '(') {   /* TYPE_VECTOR* */ 
+    int args = 0;
+    float arg[4];
+    char * tmp = NULL;
+
+    text += 2;
+
+    errno = 0;
+
+    while (args < 4) {
+      arg[args++] = (float)strtod(text, &tmp);
+      
+      if (isspace(*tmp))
+	tmp++;
+
+      if (*tmp == ')')
+	break;
+
+      if (*tmp == 0) {
+	DEBUG_PRINTF("End of parse string inside atom.\n");
+	return false;
+      }
+
+      text = tmp;
+    }
+
+    if (*text != ')') {
+      DEBUG_PRINTF("Vector doesn't terminate with ')', or too many elements in vector.\n");
+      return false;
+    }
+
+    if (args == 4)
+      head->car.type = TYPE_VECTOR4;
+    else if (args == 3)
+      head->car.type = TYPE_VECTOR3;
+    else if (args == 2)
+      head->car.type = TYPE_VECTOR2;
+    else {
+      DEBUG_PRINTF("Odd number of elements in parsed vector: %i.\n", args);
+
+      return false;
+    }
+
+    switch (args) {    /* Everything falls through */
+    case 4:
+      head->car.vec4.w = arg[3];
+    case 3:
+      head->car.vec4.z = arg[2];
+    case 2:
+      head->car.vec4.y = arg[1];
+    default:
+      head->car.vec4.x = arg[0];
+    }
+
+    text++;
+  } else {
+    const char * tmp = text;
+
+    while (*tmp && !isspace(*tmp)) 
+      tmp++;
+
+    int size = tmp - text;
+    CS_ALLOC_STACK_ARRAY(char, tmp2, size + 1);
+    memcpy(tmp2, text, size);
+    tmp2[size] = 0;
+
+    head->car.type = TYPE_VARIABLE;
+    head->car.var = strset->Request(tmp2);
+
+    text = tmp;
+  }
+
+  head->cdr = NULL;
+  CS_ASSERT(head->car.type != TYPE_INVALID);
+  
+  return true;
 }
 
 bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const char * type_str, const char * val_str)
@@ -1407,6 +1516,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
 
   switch (type)
   {
+    /* @@@ Since this shares common code with the sexp parser, it may want its own func (?) */
     case TYPE_NUMBER:
     {
       errno = 0;
