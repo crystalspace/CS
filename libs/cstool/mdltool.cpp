@@ -28,6 +28,106 @@
 #include "cstool/mdltool.h"
 
 // ---------------------------------------------------------------------------
+// csSingleIndexVertexSet
+// ---------------------------------------------------------------------------
+
+csSingleIndexVertexSet::csSingleIndexVertexSet (bool v, bool n, bool c, bool t)
+{
+  Delete = true;
+  Count = 0;
+  if (v) Vertices = new csIntArray ();
+  else Vertices = NULL;
+  if (n) Normals = new csIntArray ();
+  else Normals = 0;
+  if (c) Colors = new csIntArray ();
+  else Colors = 0;
+  if (t) Texels = new csIntArray ();
+  else Texels = 0;
+}
+
+csSingleIndexVertexSet::csSingleIndexVertexSet (csIntArray *v, csIntArray *n,
+  csIntArray *c, csIntArray *t, bool del)
+{
+  Delete = del;
+  Count = 0;
+  if (v) Count = v->Length ();
+  if (n) Count = n->Length ();
+  if (c) Count = c->Length ();
+  if (t) Count = t->Length ();
+
+  Vertices = v;
+  Normals = n;
+  Colors = c;
+  Texels = t;
+}
+
+csSingleIndexVertexSet::~csSingleIndexVertexSet ()
+{
+  if (Delete) {
+    delete Vertices;
+    delete Normals;
+    delete Colors;
+    delete Texels;
+  }
+}
+
+int csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color, int Texel)
+{
+  int i;
+
+  for (i=0; i<Count; i++)
+  {
+    if (((!Vertices) || (Vertex == Vertices->Get (i))) &&
+        ((!Normals) || (Normal == Normals->Get (i))) &&
+        ((!Colors) || (Color == Colors->Get (i))) &&
+        ((!Texels) || (Texel == Texels->Get (i))))
+      return i;
+  }
+  if (Vertices) Vertices->Push (Vertex);
+  if (Normals) Normals->Push (Normal);
+  if (Colors) Colors->Push (Color);
+  if (Texels) Texels->Push (Texel);
+  Count++;
+  return Count - 1;
+}
+
+void csSingleIndexVertexSet::Add (int Count, int *ver, int *nrm, int *col, int *tex)
+{
+  int i;
+
+  for (i=0; i<Count; i++)
+  {
+    Add (ver ? ver[i] : -1, nrm ? nrm[i] : -1,
+	 col ? col[i] : -1, tex ? tex[i] : -1);
+  }
+}
+
+int csSingleIndexVertexSet::GetVertexCount () const
+{
+  return Count;
+}
+
+int csSingleIndexVertexSet::GetVertex (int n) const
+{
+  return Vertices->Get (n);
+}
+
+int csSingleIndexVertexSet::GetNormal (int n) const
+{
+  return Normals->Get (n);
+}
+
+int csSingleIndexVertexSet::GetColor (int n) const
+{
+  return Colors->Get (n);
+}
+
+int csSingleIndexVertexSet::GetTexel (int n) const
+{
+  return Texels->Get (n);
+}
+
+// ---------------------------------------------------------------------------
 // Some helper declarations
 // ---------------------------------------------------------------------------
 
@@ -1040,41 +1140,15 @@ void csModelDataTools::BuildVertexArray (
 	csIntArray* SpriteTexels,
 	csIntArray* PolyVertices)
 {
-  // build the vertex array
+  int i;
   PolyVertices->SetLength (0);
-  int i, j;
+  csSingleIndexVertexSet set (SpriteVertices,
+    SpriteNormals, SpriteColors, SpriteTexels, false);
+
   for (i=0; i<poly->GetVertexCount (); i++)
   {
-    int SpriteVertexIndex = -1;
-    int PolyVertex = poly->GetVertex (i);
-    int PolyNormal = poly->GetNormal (i);
-    int PolyColor = poly->GetColor (i);
-    int PolyTexel = poly->GetTexel (i);
-
-    for (j=0; j<SpriteVertices->Length (); j++)
-    {
-      int SpriteVertex = SpriteVertices ? SpriteVertices->Get (j) : PolyVertex;
-      int SpriteNormal = SpriteNormals ? SpriteNormals->Get (j) : PolyNormal;
-      int SpriteColor = SpriteColors ? SpriteColors->Get (j) : PolyColor;
-      int SpriteTexel = SpriteTexels ? SpriteTexels->Get (j) : PolyTexel;
-
-      if (SpriteVertex == PolyVertex &&
-	  SpriteNormal == PolyNormal &&
-	  SpriteColor == PolyColor &&
-	  SpriteTexel == PolyTexel)
-      {
-	SpriteVertexIndex = j;
-	break;
-      }
-    }
-    if (SpriteVertexIndex == -1)
-    {
-      SpriteVertexIndex = SpriteVertices->Length ();
-      if (SpriteTexels) SpriteTexels->Push (PolyTexel);
-      if (SpriteNormals) SpriteNormals->Push (PolyNormal);
-      if (SpriteColors) SpriteColors->Push (PolyColor);
-      if (SpriteVertices) SpriteVertices->Push (PolyVertex);
-    }
-    PolyVertices->Push (SpriteVertexIndex);
+    int idx = set.Add (poly->GetVertex (i), poly->GetNormal (i),
+      poly->GetColor (i), poly->GetTexel (i));
+    PolyVertices->Push (idx);
   }
 }

@@ -19,8 +19,9 @@
 #ifndef __MDLTOOL_H__
 #define __MDLTOOL_H__
 
+#include "csutil/intarray.h"
+
 class csString;
-class csIntArray;
 struct iObject;
 struct iModelData;
 struct iModelDataObject;
@@ -30,6 +31,67 @@ struct csModelDataVertexMap
 {
   int VertexCount, NormalCount, ColorCount, TexelCount;
   int *Vertices, *Normals, *Colors, *Texels;
+};
+
+/**
+ * This class can be used to construct objects which use a single index for
+ * vertex. normal, color and texel lists, from objects that don't.
+ */
+class csSingleIndexVertexSet
+{
+private:
+  // delete the lists upon destruction?
+  bool Delete;
+  // number of vertices. This is stored outside the lists because not all lists
+  // may be available, making it hard to get the vertex count from the lists.
+  int Count;
+  // the lists
+  csIntArray *Vertices, *Normals, *Colors, *Texels;
+public:
+
+  /**
+   * Create a new set. You can chosse which lists to use. For example, if
+   * you choose not to use a color list then colors will not be used when
+   * searching for a vertex, and calls to GetColor() are not allowed.
+   */
+  csSingleIndexVertexSet (bool ver = true, bool nrm = true,
+    bool col = true, bool tex = true);
+
+  /**
+   * Create a set from existing lists. If NULL is passed for a list then
+   * that list will not be used. Note that this is different from adding
+   * all elements of the given lists because the lists will be kept and
+   * modified every time a vertex is added to the set.
+   */
+  csSingleIndexVertexSet (csIntArray *Vertices, csIntArray *Normals,
+    csIntArray *Colors, csIntArray *Texels, bool DeleteLists);
+
+  /// Destructor
+  ~csSingleIndexVertexSet ();
+
+  /**
+   * Add a vertex to the set. This function accepts the four separate indices
+   * and returns the single index. Certain elements are ignored if no lists
+   * exist for them (if demanded so at construction of the set).
+   */
+  int Add (int Vertex, int Normal, int Color, int Texel);
+
+  /**
+   * Add several vertices at once.
+   */
+  void Add (int num, int *Vertices, int *Normal, int *Colors, int *Texels);
+
+  /// Return the number of contained vertices
+  int GetVertexCount () const;
+
+  /// Get a vertex index
+  int GetVertex (int n) const;
+  /// Get a normal index
+  int GetNormal (int n) const;
+  /// Get a color index
+  int GetColor (int n) const;
+  /// Get a texel index
+  int GetTexel (int n) const;
 };
 
 /// A set of utility functions to deal with model data components
