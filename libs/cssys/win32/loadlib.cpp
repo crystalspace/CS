@@ -46,13 +46,16 @@ csLibraryHandle csLoadLibrary (const char* iName)
   CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (iName) + 5);
   strcpy (dllPath, iName);
   char* dot = strrchr (dllPath, '.');
-  if (dot && (strcasecmp (dot, ".dll") != 0))
+  if ((!dot) || (strcasecmp (dot, ".dll") != 0))
   {
-    strcpy (dot, ".dll");
-  }
-  else
-  {
-    strcat (dllPath, ".dll");
+    if (dot && (strcasecmp (dot, ".csplugin") == 0))
+    {
+      strcpy (dot, ".dll");
+    }
+    else
+    {
+      strcat (dllPath, ".dll");
+    }
   }
 
   handle = LoadLibraryEx (dllPath, 0, LOADLIBEX_FLAGS);
@@ -252,13 +255,16 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (fullPath) + 5);
   strcpy (dllPath, fullPath);
   char* dot = strrchr (dllPath, '.');
-  if (dot && (strcasecmp (dot, ".dll") != 0))
+  if ((!dot) || (strcasecmp (dot, ".dll") != 0))
   {
-    strcpy (dot, ".dll");
-  }
-  else
-  {
-    strcat (dllPath, ".dll");
+    if (dot && (strcasecmp (dot, ".csplugin") == 0))
+    {
+      strcpy (dot, ".dll");
+    }
+    else
+    {
+      strcat (dllPath, ".dll");
+    }
   }
 
   csRef<iString> result = 
