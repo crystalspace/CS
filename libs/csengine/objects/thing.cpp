@@ -222,7 +222,7 @@ void csThing::GenerateCacheName ()
 {
   csBox3 b;
   GetBoundingBox (b);
-  
+
   csMemFile mf;
   long l;
   l = convert_endian ((long)num_vertices);
@@ -248,7 +248,7 @@ void csThing::GenerateCacheName ()
 		strlen (sect->QueryObject ()->GetName ()));
     }
   }
-  
+
   l = convert_endian ((long)QInt ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = convert_endian ((long)QInt ((b.MinY () * 1000)+.5));
@@ -282,7 +282,13 @@ const char* csThing::GetCacheName ()
   }
   return cachename;
 }
-  
+
+void csThing::MarkLightmapsDirty ()
+{
+  if (polybuf)
+    polybuf->MarkLightmapsDirty ();
+}
+
 void csThing::CleanupThingEdgeTable ()
 {
   int i;
@@ -393,7 +399,7 @@ void csThing::UpdateTransformation (const csTransform &c, long cam_cameranr)
 }
 
 
-void csThing::SetSmoothingFlag(bool smooth) 
+void csThing::SetSmoothingFlag(bool smooth)
 {
   smoothed = smooth;
 }
@@ -407,7 +413,7 @@ void csThing::CalculateNormals()
   obj_normals = new csVector3[num_vertices];
 	csVector3** normals = new csVector3*[num_vertices];
 
-  for(i = 0; i < num_vertices; i++) 
+  for(i = 0; i < num_vertices; i++)
   {
     normals[i] = new csVector3[polyCount];
     obj_normals[i].x = obj_normals[i].y = obj_normals[i].z = 0.0;
@@ -422,7 +428,7 @@ void csThing::CalculateNormals()
     csPolygon3D* p = polygons.Get(j);
     vertIndices = p->GetVertexIndices();
     csVector3 normal = p->GetPlane()->GetWorldPlane().Normal();
-    
+
     // Add the normal to all the vertexs of the polygon
     int vertCount = p->GetVertexCount();
     for(k = 0; k < vertCount; k++)
@@ -489,7 +495,7 @@ void csThing::Prepare ()
     RemoveUnusedVertices ();
   }
 
-  if (smoothed) 
+  if (smoothed)
     CalculateNormals();
 
   int i;
@@ -823,7 +829,7 @@ void csThing::CompressVertices ()
     int *idx = pi.GetVertexIndices ();
     for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = vt[idx[j]].new_idx;
   }
-  
+
   delete[] vt;
 
   // If there is a bounding box we recreate it.
@@ -1028,7 +1034,7 @@ void csThing::InvalidateThing ()
   bbox = NULL;
   CleanupThingEdgeTable ();
 
-  
+
 
   shapenr++;
   scfiPolygonMeshLOD.Cleanup ();

@@ -1131,6 +1131,7 @@ void csPolygon3D::SetTextureSpace (
 
 void csPolygon3D::MakeDirtyDynamicLights ()
 {
+  thing->MarkLightmapsDirty ();
   csPolygon3D *p;
   if (orig_poly)
     p = orig_poly;

@@ -289,7 +289,10 @@ private:
 
   /// Dynamic ambient light assigned to this thing.
   csColor dynamic_ambient;
-  /// Version number of ambient light color determines whether recalc is necessary in poly.
+  /**
+   * Version number of ambient light color determines whether recalc
+   * is necessary in poly.
+   */
   int ambient_version;
 
   /**
@@ -594,17 +597,14 @@ public:
 
   // Smoothing handling Functions
 
-  /// Returns the smothing flag
+  /// Returns the smothing flag.
   bool GetSmoothingFlag () { return smoothed; }
 
-  /// Sets the smoothing flag
+  /// Sets the smoothing flag.
   void SetSmoothingFlag (bool smooth);
 
-  ///Returns the normals array
+  /// Returns the normals array.
   csVector3* GetNormals () { return obj_normals; }
-
-
-
 
   //----------------------------------------------------------------------
   // Curve handling functions
@@ -882,8 +882,8 @@ public:
   /// Get the cache name.
   const char* GetCacheName ();
 
-  /// Marks the whole object as it is affected by any light
-  void MarkLightmapsDirty();
+  /// Marks the whole object as it is affected by any light.
+  void MarkLightmapsDirty ();
 
   //----------------------------------------------------------------------
   // Utility functions

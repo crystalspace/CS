@@ -353,7 +353,7 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
     {
       const unsigned char* extensions = glGetString(GL_EXTENSIONS);
       if (!extensions)
-  return; //  no need to look any further
+	return; //  no need to look any further
 
       // check the extension string for each extension in turn
       char* extbuf = new char[strlen((const char*)extensions)+1];
