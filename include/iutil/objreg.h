@@ -46,6 +46,12 @@ struct iObjectRegistry : public iBase
    * be registered multiple times but in that case it is probably
    * best to have different tags so they can be distinguished.
    * This function will increase the ref count of the given object.
+   * <p>
+   * Note that a given tag (if non-NULL) may only be registered once.
+   * This function will return false otherwise.
+   * <p>
+   * This function will also fail if this object registry is being
+   * cleared.
    */
   virtual bool Register (iBase*, char const* tag = NULL) = 0;
 

@@ -251,7 +251,7 @@ csString &csString::Format(const char *format, ...)
   // Keep trying until the buffer is big enough to hold the entire string
   while(NewSize < 0)
   {
-    NewSize = cs_vsnprintf(Data, MaxSize, format, args);
+    NewSize = vsprintf(Data, format, args);
     // Increasing by the size of the format streams seems logical enough
     if(NewSize < 0)
       SetCapacity(MaxSize + strlen(format));

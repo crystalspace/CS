@@ -34,40 +34,40 @@ struct iPolygon3D;
 struct iThingState;
 struct iEngine;
 struct iMaterialWrapper;
+struct iReporter;
 
 class csTextSyntaxService : public iSyntaxService
 {
- protected:
+protected:
   float list[30];
   int num;
-  bool success;
-  char *last_error;
   csString text;
+  iObjectRegistry* object_reg;
+  iReporter* reporter;
 
-  void SetError (const char *msg, ...);
   void OptimizePolygon (iPolygon3D *p);
 
- public:
+public:
 
   SCF_DECLARE_IBASE;
   csTextSyntaxService (iBase *parent);
   virtual ~csTextSyntaxService ();
 
-  /// return the last error occured
-  virtual const char *GetLastError ();
+  bool Initialize (iObjectRegistry* object_reg);
 
   virtual bool ParseMatrix (char *buffer, csMatrix3 &m);
   virtual bool ParseVector (char *buffer, csVector3 &v);
   virtual bool ParseMixmode (char *buffer, UInt &mixmode);
   virtual bool ParseShading (char *buf, int &shading);
-  virtual bool ParseTexture (char *buf, const csVector3* vref, UInt &texspec, 
-			     csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
-			     csMatrix3 &tx_m, csVector3 &tx_v,
-			     csVector2 &uv_shift,
-			     int &idx1, csVector2 &uv1,
-			     int &idx2, csVector2 &uv2,
-			     int &idx3, csVector2 &uv3,
-			     char *plane, const char *polyname);
+  virtual bool ParseTexture (
+  	char *buf, const csVector3* vref, UInt &texspec, 
+	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
+	csMatrix3 &tx_m, csVector3 &tx_v,
+	csVector2 &uv_shift,
+	int &idx1, csVector2 &uv1,
+	int &idx2, csVector2 &uv2,
+	int &idx3, csVector2 &uv3,
+	char *plane, const char *polyname);
 
   virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror, 
 			   csMatrix3 &m, csVector3 &before, csVector3 &after);
@@ -77,27 +77,34 @@ class csTextSyntaxService : public iSyntaxService
 			    iThingState* thing_state, int vt_offset);
 
 
-  virtual const char* MatrixToText (const csMatrix3 &m, int indent, bool newline=true);
-  virtual const char* VectorToText (const char *vname, const csVector3 &v, int indent, 
+  virtual const char* MatrixToText (
+  	const csMatrix3 &m, int indent, bool newline=true);
+  virtual const char* VectorToText (
+  	const char *vname, const csVector3 &v, int indent, 
 				    bool newline=true);
-  virtual const char* VectorToText (const char *vname, float x, float y, float z, int indent,
-				    bool newline=true);
-  virtual const char* VectorToText (const char *vname, const csVector2 &v, int indent,
-				    bool newline=true);
-  virtual const char* VectorToText (const char *vname, float x, float y, int indent,
-				    bool newline=true);
+  virtual const char* VectorToText (
+  	const char *vname, float x, float y, float z, int indent,
+	bool newline=true);
+  virtual const char* VectorToText (
+  	const char *vname, const csVector2 &v, int indent,
+	bool newline=true);
+  virtual const char* VectorToText (
+  	const char *vname, float x, float y, int indent,
+	bool newline=true);
 
-  virtual const char* BoolToText (const char *vname, bool b, int indent, bool newline=true);
+  virtual const char* BoolToText (
+  	const char *vname, bool b, int indent, bool newline=true);
 
-  virtual const char* MixmodeToText (UInt mixmode, int indent, bool newline = true);
+  virtual const char* MixmodeToText (
+  	UInt mixmode, int indent, bool newline = true);
 
  private:
   /// make it plugable
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTextSyntaxService);
-    virtual bool Initialize (iObjectRegistry *)
-    {return true;}
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    { return scfParent->Initialize (object_reg); }
   }scfiComponent;
   friend struct eiComponent;
 };

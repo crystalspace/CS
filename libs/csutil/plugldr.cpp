@@ -274,7 +274,7 @@ bool csPluginLoader::LoadPlugins ()
   {
     // Alternate videodriver
     char temp [100];
-    cs_snprintf (temp, 100, "crystalspace.graphics3d.%s", val);
+    sprintf (temp, "crystalspace.graphics3d.%s", val);
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.pluginloader.loadplugins",
     	"Using alternative 3D driver: %s", temp);
@@ -286,7 +286,7 @@ bool csPluginLoader::LoadPlugins ()
     char temp [100];
     if (!strchr (val, '.'))
     {
-      cs_snprintf (temp, 100, "crystalspace.graphics2d.%s", val);
+      sprintf (temp, "crystalspace.graphics2d.%s", val);
       CommandLine->ReplaceOption ("canvas", temp);
     }
   }
@@ -342,7 +342,18 @@ bool csPluginLoader::LoadPlugins ()
     iBase *plg = plugin_mgr->LoadPlugin (r.ClassID, NULL, 0);
     if (plg)
     {
-      object_reg->Register (plg, r.Tag);
+      if (!object_reg->Register (plg, r.Tag))
+      {
+        if (r.Tag)
+          csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	    "crystalspace.pluginloader.loadplugins",
+    	    "Duplicate tag '%s' found for plugin '%s'!", r.Tag, r.ClassID);
+        else
+          csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	    "crystalspace.pluginloader.loadplugins",
+    	    "Could not register plugin '%s'!", r.ClassID);
+        return false;
+      }
       plg->DecRef ();
     }
   }

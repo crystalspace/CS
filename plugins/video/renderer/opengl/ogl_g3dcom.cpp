@@ -389,7 +389,12 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   if (!G2D)
     return false;
-  object_reg->Register (G2D, "iGraphics2D");
+  if (!object_reg->Register (G2D, "iGraphics2D"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	"Could not register the canvas!");
+    return false;
+  }
 
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 

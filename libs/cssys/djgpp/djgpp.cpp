@@ -93,7 +93,11 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   EnablePrintf = true;
 
   DosHelper* doshelper = new DosHelper (this);
-  object_reg->Register (doshelper, "iDosHelper");
+  if (!object_reg->Register (doshelper, "iDosHelper"))
+  {
+    printf ("Could not register iDosHelper!\n");
+    exit (0);
+  }
 
   EventOutlet = NULL;
 }

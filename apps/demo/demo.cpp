@@ -901,9 +901,13 @@ bool Demo::Initialize (int argc, const char* const argv[],
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
-    abort ();
+    return false;
   }
-  object_reg->Register (engine, "iEngine");
+  if (!object_reg->Register (engine, "iEngine"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not register engine!");
+    return false;
+  }
   engine->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);

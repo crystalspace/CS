@@ -79,7 +79,15 @@ bool csGraphics3DSoftware::Initialize (iObjectRegistry *object_reg)
   if (!driver)
     driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  if (G2D) object_reg->Register (G2D, "iGraphics2D");
+  if (G2D)
+  {
+    if (!object_reg->Register (G2D, "iGraphics2D"))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR,
+	  "Could not register the canvas!");
+      return false;
+    }
+  }
   return G2D ? true : false;
 }
 

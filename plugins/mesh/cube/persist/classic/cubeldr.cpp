@@ -25,18 +25,19 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
-#include "iutil/plugin.h"
+#include "iengine/material.h"
 #include "imesh/cube.h"
 #include "imap/services.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
-#include "iutil/strvec.h"
 #include "csutil/util.h"
+#include "iutil/strvec.h"
+#include "iutil/plugin.h"
 #include "iutil/object.h"
-#include "iengine/material.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -101,32 +102,69 @@ SCF_EXPORT_CLASS_TABLE (cubeldr)
     "Crystal Space Cube Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csCubeFactoryLoader::csCubeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
+  reporter = NULL;
 }
 
 csCubeFactoryLoader::~csCubeFactoryLoader ()
 {
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csCubeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    object_reg->Register (synldr, "iSyntaxService");
+    if (!synldr)
+    {
+      ReportError (reporter,
+	"crystalspace.cubeloader.parse.initialize",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      ReportError (reporter,
+	"crystalspace.cubeloader.parse.initialize",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
   else synldr->IncRef ();
 
-  return synldr != NULL;
+  return true;
 }
 
 iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
@@ -224,26 +262,44 @@ csCubeFactorySaver::csCubeFactorySaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
+  reporter = NULL;
 }
 
 csCubeFactorySaver::~csCubeFactorySaver ()
 {
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csCubeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    object_reg->Register (synldr, "iSyntaxService");
+    if (!synldr)
+    {
+      ReportError (reporter,
+	"crystalspace.cubesaver.parse.initialize",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      ReportError (reporter,
+	"crystalspace.cubesaver.parse.initialize",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
   else synldr->IncRef ();
 
-  return synldr != NULL;
+  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -285,16 +341,20 @@ csCubeLoader::csCubeLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  reporter = NULL;
 }
 
 csCubeLoader::~csCubeLoader ()
 {
+  SCF_DEC_REF (reporter);
 }
 
 bool csCubeLoader::Initialize (iObjectRegistry* object_reg)
 {
   csCubeLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -349,16 +409,20 @@ csCubeSaver::csCubeSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  reporter = NULL;
 }
 
 csCubeSaver::~csCubeSaver ()
 {
+  SCF_DEC_REF (reporter);
 }
 
 bool csCubeSaver::Initialize (iObjectRegistry* object_reg)
 {
   csCubeSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 

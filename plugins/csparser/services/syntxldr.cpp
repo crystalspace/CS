@@ -39,6 +39,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN;
 
@@ -54,8 +55,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csTextSyntaxService);
 
 SCF_EXPORT_CLASS_TABLE (cssynldr)
-  SCF_EXPORT_CLASS (csTextSyntaxService, "crystalspace.syntax.loader.service.text", 
-		    "Crystal Space loader services for textual CS syntax")
+  SCF_EXPORT_CLASS (csTextSyntaxService,
+  	"crystalspace.syntax.loader.service.text", 
+	"Crystal Space loader services for textual CS syntax")
 SCF_EXPORT_CLASS_TABLE_END
 
 CS_TOKEN_DEF_START
@@ -112,33 +114,45 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CLIP)
 CS_TOKEN_DEF_END
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
-  last_error = new char[200];
-  last_error[0] = '\0';
-  success = true;
+  reporter = NULL;
 }
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
-  delete [] last_error;
+  SCF_DEC_REF (reporter);
 }
 
-const char *csTextSyntaxService::GetLastError ()
+bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 {
-  return last_error;
-}
-
-void csTextSyntaxService::SetError (const char *msg, ...)
-{
-  va_list args;
-  va_start (args, msg);
-  vsprintf (last_error, msg, args);
-  va_end (args);
-  success = false;
+  csTextSyntaxService::object_reg = object_reg;
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
+  return true;
 }
 
 bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
@@ -161,7 +175,6 @@ bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
   float scaler;
   const csMatrix3 identity;
 
-  success = true;
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
@@ -190,7 +203,11 @@ bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
           m *= csYRotMatrix3 (list[1]);
         }
         else
-	  SetError ("Badly formed rotation: '%s'\n", params);
+	{
+	  ReportError (reporter, "crystalspace.syntax.matrix",
+	    "Badly formed rotation: '%s'", params);
+	  return false;
+	}
         break;
       case CS_TOKEN_SCALE_X:
         csScanStr (params, "%f", &scaler);
@@ -211,7 +228,11 @@ bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
 	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
         else
-	  SetError ("Badly formed scale: '%s'\n", params);
+	{
+	  ReportError (reporter, "crystalspace.syntax.matrix",
+	    "Badly formed scale: '%s'", params);
+	  return false;
+	}
         break;
     }
   }
@@ -228,15 +249,17 @@ bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
         list[3], list[4], list[5],
         list[6], list[7], list[8]);
     else
-      SetError ("Badly formed matrix '%s'\n", buf);
+    {
+      ReportError (reporter, "crystalspace.syntax.matrix",
+	"Badly formed matrix '%s'", buf);
+      return false;
+    }
   }
-  return success;
+  return true;
 }
 
 bool csTextSyntaxService::ParseVector (char *buf, csVector3 &v)
 {
-  success = true;
-
   csScanStr (buf, "%F", list, &num);
   if (num == 3)
   {
@@ -245,8 +268,12 @@ bool csTextSyntaxService::ParseVector (char *buf, csVector3 &v)
     v.z = list[2];
   }
   else
-    SetError("Malformed vector parameter");
-  return success;
+  {
+    ReportError (reporter, "crystalspace.syntax.vector",
+      "Malformed vector parameter");
+    return false;
+  }
+  return true;
 }
 
 bool csTextSyntaxService::ParseMixmode (char *buf, UInt &mixmode)
@@ -267,14 +294,14 @@ bool csTextSyntaxService::ParseMixmode (char *buf, UInt &mixmode)
   char* params;
 
   mixmode = 0;
-  success = true;
 
   while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
   {
     if (!params)
     {
-      SetError ("Expected parameters instead of '%s'!\n", buf);
-      break;
+      ReportError (reporter, "crystalspace.syntax.mixmode",
+        "Expected parameters instead of '%s'!", buf);
+      return false;
     }
     switch (cmd)
     {
@@ -294,9 +321,13 @@ bool csTextSyntaxService::ParseMixmode (char *buf, UInt &mixmode)
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
-    SetError ("Token '%s' not found while parsing the modes!\n",
-	      csGetLastOffender ());
-  return success;
+  {
+    ReportError (reporter, "crystalspace.syntax.mixmode",
+      "Token '%s' not found while parsing the modes!",
+      csGetLastOffender ());
+    return false;
+  }
+  return true;
 }
 
 bool csTextSyntaxService::ParseShading (char *buf, int &shading)
@@ -311,7 +342,6 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
   char *params, *name;
   long cmd;
 
-  success = true;
   shading = 0;
   while ((cmd = csGetObject (&buf, texturing_commands, &name, &params)) > 0)
     switch (cmd)
@@ -330,21 +360,26 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
       break;
     default:
       if (cmd == CS_PARSERR_TOKENNOTFOUND)
-	SetError ("Token '%s' not found while parsing the shading specification!\n",
-		  csGetLastOffender ());
+      {
+	ReportError (reporter, "crystalspace.syntax.shading",
+	  "Token '%s' not found while parsing the shading specification!",
+	  csGetLastOffender ());
+        return false;
+      }
     };
 
-  return success;
+  return true;
 }
 
-bool csTextSyntaxService::ParseTexture (char *buf, const csVector3* vref, UInt &texspec, 
-					csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
-					csMatrix3 &tx_m, csVector3 &tx_v,
-					csVector2 &uv_shift,
-					int &idx1, csVector2 &uv1,
-					int &idx2, csVector2 &uv2,
-					int &idx3, csVector2 &uv3,
-					char *plane, const char *polyname)
+bool csTextSyntaxService::ParseTexture (
+	char *buf, const csVector3* vref, UInt &texspec, 
+	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
+	csMatrix3 &tx_m, csVector3 &tx_v,
+	csVector2 &uv_shift,
+	int &idx1, csVector2 &uv1,
+	int &idx2, csVector2 &uv2,
+	int &idx3, csVector2 &uv3,
+	char *plane, const char *polyname)
 {
   CS_TOKEN_TABLE_START (tex_commands)
     CS_TOKEN_TABLE (ORIG)
@@ -369,13 +404,12 @@ bool csTextSyntaxService::ParseTexture (char *buf, const csVector3* vref, UInt &
   float flist[100];
   int num;
 
-  success = true;
-
   while ((cmd = csGetObject(&buf, tex_commands, &name, &params)) > 0)
   {
     if (!params)
     {
-      SetError ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Expected parameters instead of '%s'!", buf);
       return false;
     }
     switch (cmd)
@@ -463,29 +497,36 @@ bool csTextSyntaxService::ParseTexture (char *buf, const csVector3* vref, UInt &
   {
     if (!len.y)
     {
-      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Bad texture specification for POLYGON '%s'", polyname);
       len.y = 1;
+      return false;
     }
     if (!len.z)
     {
-      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Bad texture specification for POLYGON '%s'", polyname);
       len.z = 1;
+      return false;
     }
   }
   else
   {
     if (!len.y)
     {
-      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Bad texture specification for POLYGON '%s'", polyname);
       len.y = 1;
+      return false;
     }
   }
 
-  return success;
+  return true;
 }
 
-bool csTextSyntaxService::ParseWarp (char *buf, csVector &flags, bool &mirror, 
-				     csMatrix3 &m, csVector3 &before, csVector3 &after)
+bool csTextSyntaxService::ParseWarp (
+	char *buf, csVector &flags, bool &mirror, 
+	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
 
   CS_TOKEN_TABLE_START (portal_commands)
@@ -502,12 +543,12 @@ bool csTextSyntaxService::ParseWarp (char *buf, csVector &flags, bool &mirror,
   char *params, *name;
   long cmd;
 
-  success = true;
   while ((cmd = csGetObject (&buf, portal_commands, &name, &params)) > 0)
   {
     if (!params)
     {
-      SetError ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter, "crystalspace.syntax.warp",
+        "Expected parameters instead of '%s'!", buf);
       return false;
     }
     switch (cmd)
@@ -540,7 +581,7 @@ bool csTextSyntaxService::ParseWarp (char *buf, csVector &flags, bool &mirror,
     }
   }
 
-  return success;
+  return true;
 }
 
 void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
@@ -561,9 +602,10 @@ void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
   p->SetTextureType (POLYTXT_NONE);
 }
 
-bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
-				       float default_texlen,
-				       iThingState* thing_state, int vt_offset)
+bool csTextSyntaxService::ParsePoly3d (
+	iEngine* engine, iPolygon3D* poly3d, char* buf,
+	float default_texlen,
+	iThingState* thing_state, int vt_offset)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -617,13 +659,12 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
 
   char str[255];
 
-  success = true;
-
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter, "crystalspace.syntax.polygon",
+        "Expected parameters instead of '%s'!", buf);
       te->DecRef ();
       return false;
     }
@@ -636,7 +677,8 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
 		FindByName (str/*@@@, onlyRegion*/);
         if (mat == NULL)
         {
-          printf ("Couldn't find material named '%s'!\n", str);
+          ReportError (reporter, "crystalspace.syntax.polygon",
+            "Couldn't find material named '%s'!", str);
           te->DecRef ();
           return false;
         }
@@ -882,16 +924,18 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    SetError ("Token '%s' not found while parsing a polygon!\n",
-	      csGetLastOffender ());
+    ReportError (reporter, "crystalspace.syntax.polygon",
+      "Token '%s' not found while parsing a polygon!",
+      csGetLastOffender ());
     te->DecRef ();
     return false;
   }
 
   if (poly3d->GetVertexCount () < 3)
   {
-    SetError ("Polygon in line %d contains just %d vertices!\n",
-	      csGetParserLine (), poly3d->GetVertexCount ());
+    ReportError (reporter, "crystalspace.syntax.polygon",
+      "Polygon in line %d contains just %d vertices!",
+      csGetParserLine (), poly3d->GetVertexCount ());
     te->DecRef ();
     return false;
   }
@@ -913,15 +957,27 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
     if (texspec & CSTEX_V2)
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
-        printf ("Bad texture specification for PLANE '%s'\n", name);
+      {
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Bad texture specification for PLANE '%s'", name);
+	return false;
+      }
       else if ((tx2-tx_orig) < SMALL_EPSILON)
-        printf ("Bad texture specification for PLANE '%s'\n", name);
+      {
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Bad texture specification for PLANE '%s'", name);
+	return false;
+      }
       else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.y, tx2, tx_len.z);
     }
     else
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
-        printf ("Bad texture specification for PLANE '%s'\n", name);
+      {
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Bad texture specification for PLANE '%s'", name);
+	return false;
+      }
       else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.x);
     }
   }
@@ -930,7 +986,10 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
     iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
     if (!pl)
     {
-      printf ("Can't find plane '%s' for polygon '%s'\n", plane_name, poly3d->QueryObject ()->GetName ());
+      ReportError (reporter, "crystalspace.syntax.polygon",
+        "Can't find plane '%s' for polygon '%s'",
+      	plane_name, poly3d->QueryObject ()->GetName ());
+      return false;
     }
     poly3d->SetTextureSpace (pl);
   }
@@ -1027,7 +1086,8 @@ bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char
   return true;
 }
 
-const char* csTextSyntaxService::MatrixToText (const csMatrix3 &m, int indent, bool newline)
+const char* csTextSyntaxService::MatrixToText (
+	const csMatrix3 &m, int indent, bool newline)
 {
   char line[100];
   csString ind = csString::PadLeft (' ', indent);
@@ -1056,7 +1116,8 @@ const char* csTextSyntaxService::MatrixToText (const csMatrix3 &m, int indent, b
   return text;
 }
 
-const char* csTextSyntaxService::VectorToText (const char *vname, float x, float y, float z,
+const char* csTextSyntaxService::VectorToText (
+	const char *vname, float x, float y, float z,
 					       int indent, bool newline)
 {
   char line[100];
@@ -1069,13 +1130,15 @@ const char* csTextSyntaxService::VectorToText (const char *vname, float x, float
   return text;
 }
 
-const char* csTextSyntaxService::VectorToText (const char *vname, const csVector3 &v, int indent,
+const char* csTextSyntaxService::VectorToText (
+	const char *vname, const csVector3 &v, int indent,
 					       bool newline)
 {
   return VectorToText (vname, v.x, v.y, v.z, indent, newline);
 }
 
-const char* csTextSyntaxService::VectorToText (const char *vname, float x, float y, int indent,
+const char* csTextSyntaxService::VectorToText (
+	const char *vname, float x, float y, int indent,
 					       bool newline)
 {
   char line[100];
@@ -1088,13 +1151,15 @@ const char* csTextSyntaxService::VectorToText (const char *vname, float x, float
   return text;
 }
 
-const char* csTextSyntaxService::VectorToText (const char *vname, const csVector2 &v, int indent,
-					       bool newline)
+const char* csTextSyntaxService::VectorToText (
+	const char *vname, const csVector2 &v, int indent,
+	bool newline)
 {
   return VectorToText (vname, v.x, v.y, indent, newline, newline);
 }
 
-const char* csTextSyntaxService::BoolToText (const char *vname, bool b, int indent, bool newline)
+const char* csTextSyntaxService::BoolToText (
+	const char *vname, bool b, int indent, bool newline)
 {
   char line[100];
   csString ind = csString::PadLeft (' ', indent);
@@ -1106,7 +1171,8 @@ const char* csTextSyntaxService::BoolToText (const char *vname, bool b, int inde
   return text;
 }
 
-const char* csTextSyntaxService::MixmodeToText (UInt mixmode, int indent, bool newline)
+const char* csTextSyntaxService::MixmodeToText (
+	UInt mixmode, int indent, bool newline)
 {
   csString ind = csString::PadLeft (' ', indent);
   

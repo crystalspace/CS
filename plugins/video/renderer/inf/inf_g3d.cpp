@@ -135,7 +135,13 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
   	iGraphics2D);
   if (!G2D)
     return false;
-  object_reg->Register (G2D, "iGraphics2D");
+  if (!object_reg->Register (G2D, "iGraphics2D"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+  	"crystalspace.graphics3d.infinite",
+	"Could not register the canvas!");
+    return false;
+  }
 
   texman = new csTextureManagerInfinite (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);

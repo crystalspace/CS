@@ -231,11 +231,24 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    object_reg->Register (synldr, "iSyntaxService");
+    if (!synldr)
+    {
+      ReportError (reporter,
+	"crystalspace.ballloader.parse.initialize",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      ReportError (reporter,
+	"crystalspace.ballloader.parse.initialize",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
   else
     synldr->IncRef ();
-  return synldr != NULL;
+  return true;
 }
 
 iBase* csBallLoader::Parse (const char* string, iEngine* engine,
@@ -373,7 +386,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	if (!synldr->ParseMixmode (params, mm))
 	{
 	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
-		       synldr->GetLastError ());
+	  	"Error parsing mixmode!");
 	  if (ballstate) ballstate->DecRef ();
 	  mesh->DecRef ();
 	  return NULL;
@@ -414,11 +427,24 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    object_reg->Register (synldr, "iSyntaxService");
+    if (!synldr)
+    {
+      ReportError (reporter,
+	"crystalspace.ballsaver.parse.initialize",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      ReportError (reporter,
+	"crystalspace.ballsaver.parse.initialize",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
   else
     synldr->IncRef ();
-  return synldr != NULL;
+  return true;
 }
 
 void csBallSaver::WriteDown (iBase* obj, iStrVector *str,

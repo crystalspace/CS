@@ -143,9 +143,14 @@ bool PicViewApp::Initialize ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.picview", "No image loader plugin!");
-    abort ();
+    return false;
   }
-  object_reg->Register (image_loader, "iImageIO");
+  if (!object_reg->Register (image_loader, "iImageIO"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.picview", "Unable to register image loader!");
+    return false;
+  }
   
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   pG3D->IncRef ();

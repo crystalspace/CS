@@ -130,14 +130,14 @@ void csConfigNode::SetStr(const char *s)
 void csConfigNode::SetInt(int n)
 {
   char output [32];
-  cs_snprintf (output, 32, "%d", n);
+  sprintf (output, "%d", n);
   SetStr (output);
 }
 
 void csConfigNode::SetFloat(float f)
 {
   char output [64];
-  cs_snprintf (output, 32, "%g", f);
+  sprintf (output, "%g", f);
   SetStr (output);
 }
 

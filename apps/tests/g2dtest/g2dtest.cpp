@@ -890,7 +890,13 @@ int main (int argc, char *argv[])
       canvas = tmp;
     }
     System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, iGraphics2D);
-    object_reg->Register (System.myG2D, "iGraphics2D");
+    if (!object_reg->Register (System.myG2D, "iGraphics2D"))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	  "crystalspace.application.g2dtest",
+	  "Unable to register canvas!");
+      return -1;
+    }
   }
   else System.myG2D->IncRef ();
 

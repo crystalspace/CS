@@ -46,6 +46,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/services.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -169,6 +170,26 @@ SCF_EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
 
+static void ReportError (iReporter* reporter, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (reporter)
+  {
+    reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
 //---------------------------------------------------------------------------
 
 csThingLoader::csThingLoader (iBase* pParent)
@@ -176,27 +197,44 @@ csThingLoader::csThingLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
+  reporter = NULL;
 }
 
 csThingLoader::~csThingLoader ()
 {
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csThingLoader::Initialize (iObjectRegistry* object_reg)
 {
   csThingLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    object_reg->Register (synldr, "iSyntaxService");
+    if (!synldr)
+    {
+      ReportError (reporter,
+	"crystalspace.thingloader.parse.initialize",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      ReportError (reporter,
+	"crystalspace.thingloader.parse.initialize",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
   else
     synldr->IncRef ();
-  return synldr != NULL;
+  return true;
 }
 
 class ThingLoadInfo
@@ -220,8 +258,9 @@ public:
   }   
 };
 
-static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshWrapper* imeshwrap,
-	iEngine* engine,
+static bool load_thing_part (iReporter* reporter,
+	iSyntaxService *synldr, ThingLoadInfo& info,
+	iMeshWrapper* imeshwrap, iEngine* engine,
 	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -259,7 +298,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+	"crystalspace.thingloader.parse.badformat",
+        "Expected parameters instead of '%s'!", buf);
       return false;
     }
     switch (cmd)
@@ -267,7 +308,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
       case CS_TOKEN_VISTREE:
         if (!isParent)
 	{
-	  printf ("VISTREE flag only for top-level thing!\n");
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.vistree",
+	    "VISTREE flag only for top-level thing!");
 	  return false;
 	}
         else thing_state->GetFlags ().Set (CS_THING_VISTREE);
@@ -275,7 +318,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
       case CS_TOKEN_FASTMESH:
         if (!isParent)
 	{
-	  printf ("FASTMESH flag only for top-level thing!\n");
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.fastmesh",
+	    "FASTMESH flag only for top-level thing!");
 	  return false;
 	}
         else thing_state->GetFlags ().Set (CS_THING_FASTMESH);
@@ -283,7 +328,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
       case CS_TOKEN_MOVEABLE:
         if (!isParent)
 	{
-	  printf ("MOVEABLE flag only for top-level thing!\n");
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.moveable",
+	    "MOVEABLE flag only for top-level thing!");
 	  return false;
 	}
         else thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
@@ -292,7 +339,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
       case CS_TOKEN_FACTORY:
         if (!isParent)
 	{
-	  printf ("FACTORY or TEMPLATE statement only for top-level thing!\n");
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.factory",
+	    "FACTORY or TEMPLATE statement only for top-level thing!");
 	  return false;
 	}
 	else
@@ -302,7 +351,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
 	  	->FindByName (str);
           if (!fact)
           {
-            printf ("Couldn't find thing factory '%s'!\n", str);
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.factory",
+              "Couldn't find thing factory '%s'!", str);
             return false;
           }
 	  iThingState* tmpl_thing_state = SCF_QUERY_INTERFACE (
@@ -311,7 +362,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
 	    imeshwrap->SetFactory (fact);
 	  if (!tmpl_thing_state)
 	  {
-            printf ("Object '%s' is not a thing!\n", str);
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.factory",
+              "Object '%s' is not a thing!", str);
             return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
@@ -327,7 +380,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
       case CS_TOKEN_CLONE:
         if (!isParent)
 	{
-	  printf ("CLONE statement only for top-level thing!\n");
+	  ReportError (reporter,
+	    "crystalspace.thingloader.parse.clone",
+	    "CLONE statement only for top-level thing!");
 	  return false;
 	}
 	else
@@ -336,7 +391,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
 	  iMeshWrapper* wrap = engine->GetMeshes ()->FindByName (str);
           if (!wrap)
           {
-            printf ("Couldn't find thing '%s'!\n", str);
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.clone",
+              "Couldn't find thing '%s'!", str);
             return false;
           }
 
@@ -344,7 +401,9 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
 	  	wrap->GetMeshObject (), iThingState);
 	  if (!tmpl_thing_state)
 	  {
-            printf ("Object '%s' is not a thing!\n", str);
+	    ReportError (reporter,
+	      "crystalspace.thingloader.parse.clone",
+              "Object '%s' is not a thing!", str);
             return false;
 	  }
 	  thing_state->MergeTemplate (tmpl_thing_state, info.default_material);
@@ -358,7 +417,7 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (synldr, info, imeshwrap, engine,
+	if (!load_thing_part (reporter, synldr, info, imeshwrap, engine,
 		thing_state, params, thing_state->GetVertexCount (), false))
 	  return false;
         break;
@@ -378,9 +437,7 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
 	  	&x, &y, &z, &rx, &ry, &rz, &num);
           if (num < 0) { num = -num; dir = -1; }
           else dir = 1;
-		  {
-		  int i;
-          for (i = 0 ; i < num ; i++)
+          for (int i = 0 ; i < num ; i++)
           {
             float rad;
             if (dir == 1) rad = TWO_PI * (num-i-1)/(float)num;
@@ -397,12 +454,14 @@ static bool load_thing_part (iSyntaxService *synldr, ThingLoadInfo& info, iMeshW
 	    { cz = z; cx = x+cc*rx; cy = y+ss*ry; }
             thing_state->CreateVertex (csVector3 (cx, cy, cz));
           }
-		  }
         }
         break;
       case CS_TOKEN_FOG:
-      	printf ("FOG for things is currently not supported!\n\
-Nag to Jorrit about this feature if you want it.\n");
+	ReportError (reporter,
+	      "crystalspace.thingloader.parse.fog",
+      	      "FOG for things is currently not supported!\n\
+Nag to Jorrit about this feature if you want it.");
+	return false;
 #if 0
 //@@@
         if (!isParent)
@@ -514,7 +573,9 @@ Nag to Jorrit about this feature if you want it.\n");
 		/*@@@ REGIONS?, onlyRegion*/);
         if (info.default_material == NULL)
         {
-          printf ("Couldn't find material named '%s'!\n", str);
+	  ReportError (reporter,
+	      "crystalspace.thingloader.parse.material",
+              "Couldn't find material named '%s'!", str);
           return false;
         }
         break;
@@ -530,7 +591,9 @@ Nag to Jorrit about this feature if you want it.\n");
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing a thing!\n",
+    ReportError (reporter,
+	"crystalspace.thingloader.parse.badformat",
+	"Token '%s' not found while parsing a thing!",
     	csGetLastOffender ());
     return false;
   }
@@ -557,7 +620,7 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  if (!load_thing_part (synldr, info, imeshwrap, engine, thing_state,
+  if (!load_thing_part (reporter, synldr, info, imeshwrap, engine, thing_state,
   	buf, 0, true))
   {
     fact->DecRef ();
@@ -573,16 +636,20 @@ csThingSaver::csThingSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  reporter = NULL;
 }
 
 csThingSaver::~csThingSaver ()
 {
+  SCF_DEC_REF (reporter);
 }
 
 bool csThingSaver::Initialize (iObjectRegistry* object_reg)
 {
   csThingSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -605,27 +672,44 @@ csPlaneLoader::csPlaneLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
+  reporter = NULL;
 }
 
 csPlaneLoader::~csPlaneLoader ()
 {
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
 {
   csPlaneLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
     synldr = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    object_reg->Register (synldr, "iSyntaxService");
+    if (!synldr)
+    {
+      ReportError (reporter,
+	"crystalspace.planeloader.parse.initialize",
+	"Could not load the syntax services!");
+      return false;
+    }
+    if (!object_reg->Register (synldr, "iSyntaxService"))
+    {
+      ReportError (reporter,
+	"crystalspace.planeloader.parse.initialize",
+	"Could not register the syntax services!");
+      return false;
+    }
   }
   else
     synldr->IncRef ();
-  return synldr != NULL;
+  return true;
 }
 
 iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
@@ -664,7 +748,9 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+	"crystalspace.planeloader.parse.badformat",
+        "Expected parameters instead of '%s'!", buf);
       return NULL;
     }
     switch (cmd)
@@ -715,7 +801,9 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing a plane!\n",
+    ReportError (reporter,
+	"crystalspace.planeloader.parse.badformat",
+        "Token '%s' not found while parsing a plane!",
     	csGetLastOffender ());
     return NULL;
   }
@@ -725,12 +813,16 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
     {
       if (!tx1_len)
       {
-        printf ("Bad texture specification for PLANE '%s'\n", name);
+	ReportError (reporter,
+	  "crystalspace.planeloader.parse.badplane",
+          "Bad texture specification for PLANE '%s'", name);
 	tx1_len = 1;
       }
       if (!tx2_len)
       {
-        printf ("Bad texture specification for PLANE '%s'\n", name);
+	ReportError (reporter,
+	  "crystalspace.planeloader.parse.badplane",
+          "Bad texture specification for PLANE '%s'", name);
 	tx2_len = 1;
       }
       if ((tx1-tx_orig) < SMALL_EPSILON)
@@ -741,7 +833,9 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
     }
     else
     {
-      printf ("Not supported!\n");
+      ReportError (reporter,
+	  "crystalspace.planeloader.parse.badplane",
+          "Not supported!");
       return NULL;
     }
   else
@@ -756,16 +850,20 @@ csPlaneSaver::csPlaneSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  reporter = NULL;
 }
 
 csPlaneSaver::~csPlaneSaver ()
 {
+  SCF_DEC_REF (reporter);
 }
 
 bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
 {
   csPlaneSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -780,16 +878,20 @@ csBezierLoader::csBezierLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  reporter = NULL;
 }
 
 csBezierLoader::~csBezierLoader ()
 {
+  SCF_DEC_REF (reporter);
 }
 
 bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBezierLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -822,7 +924,9 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
   {
     if (!params)
     {
-      printf ("Expected parameters instead of '%s'!\n", buf);
+      ReportError (reporter,
+	  "crystalspace.bezierloader.parse.badformat",
+          "Expected parameters instead of '%s'!", buf);
       return NULL;
     }
     switch (cmd)
@@ -838,7 +942,9 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
 		FindByName (str/*@@@, onlyRegion*/);
         if (mat == NULL)
         {
-          printf ("Couldn't find material named '%s'!\n", str);
+	  ReportError (reporter,
+	    "crystalspace.bezierloader.parse.material",
+            "Couldn't find material named '%s'!", str);
           return NULL;
         }
         tmpl->SetMaterial (mat);
@@ -850,7 +956,9 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
           csScanStr (params, "%D", list, &num);
           if (num != 9)
           {
-            printf ("Wrong number of vertices to bezier!\n");
+	    ReportError (reporter,
+	      "crystalspace.bezierloader.parse.vertices",
+              "Wrong number of vertices to bezier! %d should be 9!", num);
             return NULL;
           }
           for (i = 0 ; i < num ; i++) tmpl->SetVertex (i, list[i]);
@@ -860,8 +968,10 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing a bezier template!\n",
-    	csGetLastOffender ());
+    ReportError (reporter,
+	  "crystalspace.bezierloader.parse.badformat",
+          "Token '%s' not found while parsing a bezier template!",
+    	  csGetLastOffender ());
     return NULL;
   }
   return tmpl;
@@ -873,16 +983,20 @@ csBezierSaver::csBezierSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  reporter = NULL;
 }
 
 csBezierSaver::~csBezierSaver ()
 {
+  SCF_DEC_REF (reporter);
 }
 
 bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBezierSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->IncRef ();
   return true;
 }
 

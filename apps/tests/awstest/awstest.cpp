@@ -162,26 +162,26 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");
     return false;
   }
 
   csInitializer::SetupCommandLineParser (object_reg, argc, argv);
   if (!csInitializer::RequestPlugins (object_reg, CS_REQUEST_END))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");
     return false;
   }
 
   if (!csInitializer::Initialize (object_reg))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");
     return false;
   }
 
   if (!csInitializer::SetupEventHandler (object_reg, AwsEventHandler))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not setup event handler!");
     return false;
   }
 
@@ -197,28 +197,32 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load the engine plugin.
-  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...\n");
+  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...");
   engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d", iEngine);
   if (!engine)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the engine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not load the engine plugin!");
     return false;
   }
-  object_reg->Register (engine, "iEngine");
+  if (!object_reg->Register (engine, "iEngine"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not register engine!");
+    return false;
+  }
     
-  QUERY_REG (myG3D, iGraphics3D, "Couldn't load iGraphics3D plugin !\n");
-  QUERY_REG (myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin !\n");
-  QUERY_REG (myVFS, iVFS, "Couldn't load  iVFS plugin !\n");
-  QUERY_REG (myConsole, iConsoleOutput, "Couldn't load iConsoleOutput plugin !\n");
+  QUERY_REG (myG3D, iGraphics3D, "Couldn't load iGraphics3D plugin!");
+  QUERY_REG (myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin!");
+  QUERY_REG (myVFS, iVFS, "Couldn't load  iVFS plugin!");
+  QUERY_REG (myConsole, iConsoleOutput, "Couldn't load iConsoleOutput plugin!");
   
   // Load AWS
-  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS...\n");
+  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS...");
   aws = CS_LOAD_PLUGIN(plugin_mgr,
   	"crystalspace.window.alternatemanager", iAws);
   
   if (!aws)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the AWS plugin!\n");
+    Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the AWS plugin!");
     return false;
   }
     
@@ -226,10 +230,14 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   loader = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.level.loader", iLoader);
   if (!loader)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     return false;
   }
-  object_reg->Register (loader, "iLoader");
+  if (!object_reg->Register (loader, "iLoader"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not register loader!");
+    return false;
+  }
  
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
@@ -237,7 +245,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   if (!csInitializer::OpenApplication (object_reg))
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Error opening system!\n");
+    Report(CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     return false;
   }
 
@@ -267,18 +275,18 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "The Alternate Window System Test Harness.\n");
+    "The Alternate Window System Test Harness.");
   
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
     exit (1);
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
@@ -358,7 +366,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   engine->Prepare ();
 
-  Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------\n");
+  Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
   
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
@@ -391,7 +399,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   
   /////////
   
-  Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.\n");
+  Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
   return true;
 }

@@ -459,7 +459,11 @@ SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
   Win32Helper* winhelper = new Win32Helper (this);
-  object_reg->Register (winhelper, "iWin32Helper");
+  if (!object_reg->Register (winhelper, "iWin32Helper"))
+  {
+    printf ("Could not register iWin32Helper!\n");
+    exit (0);
+  }
 }
 
 SysSystemDriver::~SysSystemDriver ()

@@ -28,6 +28,7 @@ struct iEngine;
 struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
+struct iReporter;
 
 /**
  * Thing loader.
@@ -38,6 +39,7 @@ private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iSyntaxService *synldr;
+  iReporter* reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -69,6 +71,7 @@ class csThingSaver : public iSaverPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iReporter* reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -101,6 +104,7 @@ private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
   iSyntaxService *synldr;
+  iReporter* reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -132,6 +136,7 @@ class csPlaneSaver : public iSaverPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iReporter* reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -163,6 +168,7 @@ class csBezierLoader : public iLoaderPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iReporter* reporter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -194,6 +200,7 @@ class csBezierSaver : public iSaverPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iReporter* reporter;
 
 public:
   SCF_DECLARE_IBASE;

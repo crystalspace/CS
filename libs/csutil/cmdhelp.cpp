@@ -43,25 +43,25 @@ void csCommandLineHelper::Help (iConfig* config)
     switch (option.type)
     {
       case CSVAR_BOOL:
-        cs_snprintf (opt,  30, "  -[no]%s", option.name);
-	cs_snprintf (desc, 80, "%s (%s) ", option.description, def.GetBool ()
+        sprintf (opt,  "  -[no]%s", option.name);
+	sprintf (desc, "%s (%s) ", option.description, def.GetBool ()
 		? "yes" : "no");
 	break;
       case CSVAR_CMD:
-        cs_snprintf (opt,  30, "  -%s", option.name);
+        sprintf (opt, "  -%s", option.name);
 	strcpy (desc, option.description);
 	break;
       case CSVAR_FLOAT:
-        cs_snprintf (opt,  30, "  -%s=<val>", option.name);
-	cs_snprintf (desc, 80, "%s (%g)", option.description, def.GetFloat ());
+        sprintf (opt,  "  -%s=<val>", option.name);
+	sprintf (desc, "%s (%g)", option.description, def.GetFloat ());
 	break;
       case CSVAR_LONG:
-        cs_snprintf (opt,  30, "  -%s=<val>", option.name);
-	cs_snprintf (desc, 80, "%s (%ld)", option.description, def.GetLong ());
+        sprintf (opt,  "  -%s=<val>", option.name);
+	sprintf (desc, "%s (%ld)", option.description, def.GetLong ());
 	break;
       case CSVAR_STRING:
-        cs_snprintf (opt,  30, "  -%s=<val>", option.name);
-	cs_snprintf (desc, 80, "%s (%s)", option.description, def.GetString ()
+        sprintf (opt,  "  -%s=<val>", option.name);
+	sprintf (desc, "%s (%s)", option.description, def.GetString ()
 		? def.GetString () : "none");
 	break;
     }

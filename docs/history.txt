@@ -1,6 +1,26 @@
 The history order is reversed so that new features are at the top.
 
 16-Oct-2001
+	- iObjectRegistry::Register() will now return false if something
+	  is registered with a duplicate tag (exception is the NULL tag).
+	- csPluginLoader will now check the return value of Register() and
+	  report an error to the reporter if it returns false.
+	- Added proper error handling for Register() to various other
+	  places in the project.
+	- Removed newlines from error messages sent to the reporter in
+	  awstest. When using the reporter don't end your errors/warnings
+	  with newline. The reporter will take care of that.
+	- The thing loader plugin now uses the reporter to report error
+	  situations.
+	- Changed the text syntax services so that they now use the
+	  reporter instead of the SetError() mechanism. Removed
+	  GetLastError() from iSyntaxService.
+	- Fixed Doxygen comments for iSyntaxService.
+	- Reverted all calls to the new cs_...printf() to original printf()
+	  calls because they caused bad problems. There seems to be a
+	  bug in the cs_snprintf() implementation which corrupts the output.
+	  One sympton of this problem was that -video=opengl didn't work
+	  anymore.
 	- Michael Voase did the following:
 	  - Update bin/unixconf.sh to seperate gcc from g++
 15-Oct-2001

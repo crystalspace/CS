@@ -138,7 +138,13 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   if (!G2D)
     return false;
-  object_reg->Register (G2D, "iGraphics2D");
+  if (!object_reg->Register (G2D, "iGraphics2D"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+  	"crystalspace.graphics3d.line",
+	"Could not register the canvas!");
+    return false;
+  }
 
   texman = new csTextureManagerLine (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
