@@ -3883,7 +3883,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   char* buf = System->VFS->ReadFile (filename, size);
   if (!buf || !size) {
     CsPrintf (MSG_WARNING,
-      "Cannot read sound file \"%s\" from VFS\n", filename);
+      "Cannot open sound file \"%s\" from VFS\n", filename);
     return NULL;
   }
 
@@ -3906,7 +3906,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 
   /* check for valid sound data */
   if (!Sound) {
-    CsPrintf (MSG_WARNING, "The sound file \"%s\" is corrupt!\n", filename);
+    CsPrintf (MSG_WARNING, "Cannot create sound data from file \"%s\"!\n", filename);
     return NULL;
   }
 
