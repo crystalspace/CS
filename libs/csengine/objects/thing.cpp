@@ -3422,8 +3422,8 @@ bool csThing::VisTest (const csBox3& box)
     csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
     iVisibilityObject *vo = vinf->visobj;
     CheckVisUpdate (vinf);
-    csBox3 bbox;
-    vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
+    csPolyTreeBBox *pt_bbox = vinf->bbox;
+    const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
     if (bbox.TestIntersect (box))
       vo->MarkVisible ();
     else
@@ -3446,8 +3446,8 @@ bool csThing::VisTest (const csSphere& sphere)
     csVisObjInfo *vinf = (csVisObjInfo *)visobjects[i];
     iVisibilityObject *vo = vinf->visobj;
     CheckVisUpdate (vinf);
-    csBox3 bbox;
-    vo->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
+    csPolyTreeBBox *pt_bbox = vinf->bbox;
+    const csBox3& bbox = pt_bbox->GetWorldBoundingBox ();
     if (csIntersect3::BoxSphere (bbox, pos, sqradius))
       vo->MarkVisible ();
     else

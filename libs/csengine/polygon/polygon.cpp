@@ -296,7 +296,7 @@ csPolygon3D::csPolygon3D (
   polygon_id = 0;
 
   if (material)
-    SetMaterial (material);
+    csPolygon3D::material = material;
   else
     csPolygon3D::material = NULL;
 
@@ -426,12 +426,14 @@ void csPolygon3D::SetParent (csThing *thing)
 void csPolygon3D::SetTextureType (int type)
 {
   if (txt_info)
-    if (txt_info->GetTextureType () == type) return ; // Already that type
-  else
   {
-    DG_UNLINK ((csObject *)this, txt_info);
-    txt_info->DecRef ();
-    txt_info = NULL;
+    if (txt_info->GetTextureType () == type) return ; // Already that type
+    else
+    {
+      DG_UNLINK ((csObject *)this, txt_info);
+      txt_info->DecRef ();
+      txt_info = NULL;
+    }
   }
 
   switch (type)

@@ -77,7 +77,13 @@ struct iPolygon3D : public iBase
   virtual iPolygonTexture *GetTexture () = 0;
   /// Get the material handle for the texture manager.
   virtual iMaterialHandle *GetMaterialHandle () = 0;
-  /// Set the material for this polygon.
+  /**
+   * Set the material for this polygon. WARNING: if you initially
+   * created the polygon with a material without texture then
+   * POLYTXT_NONE will be used for this polygon. In that case
+   * you need to call SetTextureType(POLYTXT_LIGHTMAP) again to
+   * really enable texture mapping.
+   */
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
   /// Get the material for this polygon.
   virtual iMaterialWrapper* GetMaterial () = 0;

@@ -8,6 +8,11 @@ The history order is reversed so that new features are at the top.
 	- Removed RegisterShadowReceiver() (and unregister) from
 	  iVisibilityCuller. The culling system will have to detect this
 	  on its own by doing SCF_QUERY_INTERFACE.
+	- Updated a comment in iPolygon3D::SetMaterial() to indicate a
+	  potential problem.
+	- Fixed a bug in the octree version of VisTest(box/sphere). It
+	  would use the object space bounding box instead of the world
+	  space bounding box for testing.
 30-Jun-2002
 	- Thing mesh objects now implement iShadowCaster.
 	  csSector::CheckFrustum() will now use that instead of directly
