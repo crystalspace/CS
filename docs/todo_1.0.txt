@@ -158,7 +158,7 @@ API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
 	     coordinates (for selection). This is useful for Quark++.
 	[F]  Ability to close portals in map loader.
-	[F]  Automatic generation of lightmap cache names using MD5
+	[**] Automatic generation of lightmap cache names using MD5
 	     checksum of geometry. This is important for dynamic
 	     loading/reloading of worlds.
 	[F]  Support iPolygonMesh (for collision detection) in more

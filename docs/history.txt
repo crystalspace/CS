@@ -7,6 +7,19 @@ The history order is reversed so that new features are at the top.
 	  find in the current directory and the data dir if you start it
 	  without commandline. In that case you can click and select the
 	  data file that you want to run.
+	- When you don't use LMCACHE keyword CS will now automatically
+	  assign a name to every thing. Currently this name is based
+	  on an MD5 checksum of the following information:
+	      - Bounding box of the thing.
+	      - Number of vertices
+	      - Number of polygons/curves
+	      - Name
+	  This should guarantee sufficient uniqueness. If not we can always
+	  add more data to this MD5 generation. This MD5 key will be
+	  converted to a 32-byte name which is then used for caching
+	  lightmaps and octree. This will make it easier to dynamically
+	  load levels even when other parts of the level are already loaded
+	  without the user having to manually specify LMCACHE.
 12-Mar-2002
 	- Made the lightmap cache for pseudo-dynamic lightmaps (shadow
 	  maps) a bit more robust. Previously changing pseudo-dynamic

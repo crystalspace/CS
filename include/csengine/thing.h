@@ -380,6 +380,9 @@ private:
   /// Compute table of thing edges if needed.
   void ComputeThingEdgeTable ();
 
+  /// Generate a cachename based on geometry.
+  void GenerateCacheName ();
+
 public:
   /**
    * Create an empty thing.
@@ -789,7 +792,7 @@ public:
     cachename = n ? csStrNew (n) : 0;
   }
   /// Get the cache name.
-  const char* GetCacheName () const { return cachename; }
+  const char* GetCacheName ();
 
   //----------------------------------------------------------------------
   // Utility functions
