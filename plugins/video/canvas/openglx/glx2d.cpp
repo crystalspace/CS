@@ -65,7 +65,10 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.glx2d", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -119,7 +122,12 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   // Create the event outlet
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
+  }
+
+  plugin_mgr->DecRef ();
 
   return true;
 }

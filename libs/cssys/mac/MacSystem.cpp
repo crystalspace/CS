@@ -303,6 +303,7 @@ void SysSystemDriver::Alert(const char* s)
     if ( theG2D ) {
         theG2D->DecRef();
     }
+    plugin_mgr->DecRef ();
 }
 
 
@@ -337,6 +338,7 @@ void SysSystemDriver::Warn(const char* s)
     if ( theG2D ) {
         theG2D->DecRef();
     }
+    plugin_mgr->DecRef ();
 }
 
 
@@ -449,7 +451,11 @@ that is called in the loop should move to a cscmdPreProcess event.
   if (!EventOutlet)
   {
     iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-    if (q != 0) EventOutlet = q->CreateEventOutlet (this);
+    if (q != 0)
+    {
+      EventOutlet = q->CreateEventOutlet (this);
+      q->DecRef ();
+    }
   }
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -463,6 +469,7 @@ that is called in the loop should move to a cscmdPreProcess event.
     mDriverNeedsEvent = mIG2D->DoesDriverNeedEvent ();
     mIG2D->SetColorPalette ();
   }
+  plugin_mgr->DecRef ();
 
 #if ! SCAN_KEYBOARD
   SetEventMask( everyEvent );

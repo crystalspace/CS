@@ -39,7 +39,7 @@ private:
 public:
   csObjectRegistry ();
   /// Client must explicitly call Clear().
-  virtual ~csObjectRegistry () {}
+  virtual ~csObjectRegistry ();
 
   SCF_DECLARE_IBASE;
   virtual void Clear ();

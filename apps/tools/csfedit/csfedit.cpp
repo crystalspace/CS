@@ -977,6 +977,7 @@ csEditFont::csEditFont(csApp *iApp, const char *fromfile)
   /*  @@@ need to be able to get VFS names
   iVFS *VFS = CS_QUERY_REGISTRY (System->object_reg, iVFS);
   iDataBuffer *fntfile = VFS->ReadFile (fromfile);
+  VFS->DecRef ();
   if (!fntfile)
   {
     csReport (System->object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -1583,6 +1584,7 @@ int main (int argc, char* argv[])
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
+  g3d->DecRef ();
   if (nw) nw->SetTitle ("Crystal Space Font Editor");
 
   if (!csInitializer::OpenApplication (object_reg))
@@ -1598,6 +1600,8 @@ int main (int argc, char* argv[])
   DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
     DefaultSkin.Prefix = cfg->GetStr ("CSWS.Skin.Variant", NULL);
+  cmdline->DecRef ();
+  cfg->DecRef ();
 
   // Create our application object
   CsfEdit app (object_reg, DefaultSkin);

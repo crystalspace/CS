@@ -53,9 +53,10 @@ csInputDriver::~csInputDriver()
 {
   // Force a refetch of Queue in order to double check its validity since, at
   // shutdown time, the event queue might already have been destroyed.
-  Queue = 0;
+  if (Queue) { Queue->DecRef (); Queue = 0; }
   GetEventQueue();
   StopListening();
+  if (Queue) Queue->DecRef ();
 }
 
 void csInputDriver::SetSCFParent(iBase* p)
@@ -67,7 +68,9 @@ void csInputDriver::SetSCFParent(iBase* p)
 iEventQueue* csInputDriver::GetEventQueue()
 {
   if (Queue == 0)
+  {
     Queue = CS_QUERY_REGISTRY(Registry, iEventQueue);
+  }
   return Queue;
 }
 
@@ -186,6 +189,10 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
     cfg->GetInt ("MouseDriver.DoubleClickDist", 2));
 }
 
+csMouseDriver::~csMouseDriver ()
+{
+}
+
 void csMouseDriver::Reset ()
 {
   for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
@@ -197,7 +204,10 @@ void csMouseDriver::Reset ()
 iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
 {
   if (Keyboard == 0)
+  {
     Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
+    Keyboard->DecRef ();
+  }
   return Keyboard;
 }
 
@@ -288,7 +298,10 @@ void csJoystickDriver::Reset ()
 iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 {
   if (Keyboard == 0)
+  {
     Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
+    Keyboard->DecRef ();
+  }
   return Keyboard;
 }
 

@@ -134,10 +134,12 @@ csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -169,10 +171,12 @@ csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csEmitFactorySaver::~csEmitFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -215,10 +219,12 @@ csEmitLoader::csEmitLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csEmitLoader::~csEmitLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
@@ -597,10 +603,12 @@ csEmitSaver::csEmitSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csEmitSaver::~csEmitSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csEmitSaver::Initialize (iObjectRegistry* object_reg)

@@ -50,9 +50,12 @@ bool csGraphics2DGLBe::Initialize(iObjectRegistry* p)
   {
     iReporter* reporter = CS_QUERY_REGISTRY (p, iReporter);
     if (reporter)
+    {
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.canvas.glbe2d",
       	"Crystal Space BeOS OpenGL 2D driver.");
+      reporter->DecRef ();
+    }
     // Get current screen information.
     BScreen screen(B_MAIN_SCREEN_ID);
     screen_frame = screen.Frame();
@@ -92,6 +95,7 @@ bool csGraphics2DGLBe::Open()
   iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
   CS_ASSERT (behelper != NULL);
   behelper->BeginUI ();
+  behelper->DecRef ();
 
   return superclass::Open();
 }
@@ -135,7 +139,9 @@ bool csGraphics2DGLBe::SetMouseCursor(csMouseCursorID shape)
 {
   iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
   CS_ASSERT (behelper != NULL);
-  return behelper->SetCursor (shape);
+  bool rc = behelper->SetCursor (shape);
+  behelper->DecRef ();
+  return rc;
 }
 
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)

@@ -89,10 +89,12 @@ csTerrFuncFactoryLoader::csTerrFuncFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -126,10 +128,12 @@ csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csTerrFuncLoader::~csTerrFuncLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
@@ -345,6 +349,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  iTerrainState->SetHeightMap (ifile, hscale, hshift);
 	  ifile->DecRef ();
 	  buf->DecRef ();
+	  vfs->DecRef ();
+	  loader->DecRef ();
 	}
 	break;
     }

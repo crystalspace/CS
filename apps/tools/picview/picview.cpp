@@ -141,10 +141,8 @@ bool PicViewApp::Initialize ()
     	"crystalspace.application.picview", "No image loader plugin!");
     return false;
   }
-  image_loader->IncRef ();
 
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  pG3D->IncRef ();
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
   iTextureManager* txtmgr = pG3D->GetTextureManager ();
@@ -157,7 +155,6 @@ bool PicViewApp::Initialize ()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  VFS->IncRef ();
   VFS->ChDir ("/tmp");
   files = VFS->FindFiles ("/this/*");
   cur_idx = 0;
@@ -341,6 +338,7 @@ int main (int argc, char* argv[])
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   cmdline->AddOption ("mode", "1024x768");
+  cmdline->DecRef ();
   
   if (!csInitializer::Initialize (object_reg))
   {
@@ -361,6 +359,7 @@ int main (int argc, char* argv[])
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
+  g3d->DecRef ();
   if (nw) nw->SetTitle ("Crystal Space Picture Viewer");
 
   if (!csInitializer::OpenApplication (object_reg))

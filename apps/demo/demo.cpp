@@ -77,7 +77,10 @@ void Demo::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.demo", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -88,6 +91,7 @@ void Demo::Report (int severity, const char* msg, ...)
 
 Demo::Demo ()
 {
+  vc = NULL;
   engine = NULL;
   seqmgr = NULL;
   myG3D = NULL;
@@ -102,6 +106,7 @@ Demo::Demo ()
 
 Demo::~Demo ()
 {
+  if (vc) vc->DecRef ();
   if (font) font->DecRef ();
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
@@ -892,7 +897,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No keyboard driver!");
     return false;
   }
-  kbd->IncRef();
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
@@ -903,6 +907,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
     return false;
   }
+  plugin_mgr->DecRef ();
   if (!object_reg->Register (engine, "iEngine"))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not register engine!");
@@ -916,7 +921,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No 3D driver!");
     return false;
   }
-  myG3D->IncRef ();
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
@@ -924,7 +928,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No 2D driver!");
     return false;
   }
-  myG2D->IncRef ();
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
@@ -932,7 +935,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No VFS!");
     return false;
   }
-  myVFS->IncRef ();
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   if (!myConsole)
@@ -940,7 +942,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No console!");
     return false;
   }
-  myConsole->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
@@ -1811,7 +1812,11 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       if (Event.Key.Code == CSKEY_ESC)
       {
 	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-	if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+	if (q)
+	{
+	  q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  q->DecRef ();
+	}
         return true;
       }
       switch (Event.Key.Char)

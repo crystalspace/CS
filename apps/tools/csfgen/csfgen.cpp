@@ -127,7 +127,6 @@ static bool Convert (const char *fontfile)
     printf ("Font server plugin has not been loaded.\n");
     return false;
   }
-  fs->IncRef ();
 
   iFont *font = fs->LoadFont (fontfile);
   if (font == NULL)

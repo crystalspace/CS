@@ -123,10 +123,12 @@ csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFireFactoryLoader::~csFireFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -158,10 +160,12 @@ csFireFactorySaver::csFireFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFireFactorySaver::~csFireFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -204,10 +208,12 @@ csFireLoader::csFireLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFireLoader::~csFireLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFireLoader::Initialize (iObjectRegistry* object_reg)
@@ -437,10 +443,12 @@ csFireSaver::csFireSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFireSaver::~csFireSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFireSaver::Initialize (iObjectRegistry* object_reg)

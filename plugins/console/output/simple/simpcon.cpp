@@ -105,7 +105,6 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
 
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D) return false;
-  G3D->IncRef ();
   G2D = G3D->GetDriver2D ();
 
   FrameWidth = G2D->GetWidth ();
@@ -162,7 +161,10 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   // We want to see broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
 
   return true;
 }

@@ -115,6 +115,13 @@ csObjectRegistry::csObjectRegistry () : clearing (false)
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
+csObjectRegistry::~csObjectRegistry ()
+{
+  CS_ASSERT (registry.Length () == 0);
+  CS_ASSERT (tags.Length () == 0);
+  CS_ASSERT (clearing == false);
+}
+
 void csObjectRegistry::Clear ()
 {
   clearing = true;
@@ -126,9 +133,9 @@ void csObjectRegistry::Clear ()
     // for it during its own destruction.
     iBase* b = (iBase*)registry[i];
     char* t = (char*)tags[i];
-    registry.Delete(i); // Remove from list before DecRef().
-    tags.Delete(i);
-    b->DecRef();
+    registry.Delete (i); // Remove from list before DecRef().
+    tags.Delete (i);
+    b->DecRef ();
     delete[] t;
   }
   clearing = false;
@@ -136,6 +143,7 @@ void csObjectRegistry::Clear ()
 
 bool csObjectRegistry::Register (iBase* obj, char const* tag)
 {
+  CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing)
   {
     // Don't allow adding an object with an already existing tag.
@@ -151,6 +159,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
 
 void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
+  CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing)
   {
     int i;
@@ -163,8 +172,9 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
         if ((t == 0 && tag == 0) || (t != 0 && tag != 0 && !strcmp (tag, t)))
         {
           delete[] t;
-          b->DecRef();
-	  registry.Delete(i);
+	  registry.Delete (i);
+	  tags.Delete (i);
+          b->DecRef ();
 	  if (tag != 0) // For a tagged object, we're done.
 	    break;
         }
@@ -175,18 +185,24 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 
 iBase* csObjectRegistry::Get (char const* tag)
 {
+  CS_ASSERT (registry.Length () == tags.Length ());
   int i;
   for (i = registry.Length() - 1; i >= 0; i--)
   {
     char* t = (char*)tags[i];
     if (t && !strcmp (tag, t))
-      return (iBase*)registry[i];
+    {
+      iBase* b = (iBase*)registry[i];
+      b->IncRef ();
+      return b;
+    }
   }
   return NULL;
 }
 
 iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
 {
+  CS_ASSERT (registry.Length () == tags.Length ());
   int i;
   for (i = registry.Length() - 1; i >= 0; i--)
   {
@@ -201,7 +217,6 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
 	fflush (stdout);
 	return NULL;
       }
-      interf->DecRef ();
       return interf;
     }
   }

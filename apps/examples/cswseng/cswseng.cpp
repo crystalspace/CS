@@ -112,6 +112,7 @@ bool ceEngineView::HandleEvent (iEvent &Event)
 	iVirtualClock* vc = CS_QUERY_REGISTRY (app->object_reg, iVirtualClock);
         elapsed_time = vc->GetElapsedTicks ();
 	current_time = vc->GetCurrentTicks ();
+	vc->DecRef ();
 
         // Now rotate the camera according to keyboard state
         float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -367,21 +368,18 @@ bool ceCswsEngineApp::Initialize ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  LevelLoader->IncRef ();
   
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  pG3D->IncRef ();
   // Disable double buffering since it kills performance
   pG3D->GetDriver2D ()->DoubleBuffer (false);
   iTextureManager* txtmgr = pG3D->GetTextureManager ();
@@ -405,7 +403,6 @@ bool ceCswsEngineApp::Initialize ()
   // because otherwise precalc_info file will be written into MazeD.zip
   // The /tmp dir is fine for this.
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  VFS->IncRef ();
   VFS->ChDir ("/tmp");
 
   // Now prepare the engine
@@ -417,7 +414,6 @@ bool ceCswsEngineApp::Initialize ()
   if (Console)
   {
     // Tell the console to shut up so that Printf() won't clobber CSWS
-    Console->IncRef ();
     Console->SetVisible (false);
     Console->AutoUpdate (false);
   }
@@ -591,6 +587,7 @@ int main (int argc, char* argv[])
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   cmdline->AddOption ("mode", "800x600");
+  cmdline->DecRef ();
 
   if (!csInitializer::Initialize (object_reg))
   {
@@ -609,6 +606,7 @@ int main (int argc, char* argv[])
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
+  g3d->DecRef ();
   if (nw) nw->SetTitle ("Crystal Space Example: CSWS And Engine");
 
   if (!csInitializer::OpenApplication (object_reg))

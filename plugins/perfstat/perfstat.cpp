@@ -76,6 +76,7 @@ csPerfStats::csPerfStats (iBase *iParent)
   paused = false;
   frame_start = 0;
   frame_count = 0;
+  plugin_mgr = NULL;
   ResetStats ();
 }
 
@@ -85,6 +86,7 @@ csPerfStats::~csPerfStats ()
   delete [] file_name;
   delete [] margin;
   delete frame;
+  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csPerfStats::Initialize (iObjectRegistry *object_reg)
@@ -93,7 +95,10 @@ bool csPerfStats::Initialize (iObjectRegistry *object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->DecRef ();
+  }
   sub_section = super_section = NULL;
   // default resolution
   resolution = 500;
@@ -242,6 +247,7 @@ void csPerfStats::PrintSectionStats (int severity)
     rep->Report (severity, "crystalspace.perfstats", "Mean FPS     : %f", mean_fps);
     rep->Report (severity, "crystalspace.perfstats", "Lowest FPS   : %f", lowest_fps);
     rep->Report (severity, "crystalspace.perfstats", "Highest FPS  : %f", highest_fps);
+    rep->DecRef ();
   }
 }
 
@@ -429,6 +435,7 @@ void csPerfStats::WriteMainHeader ()
     CS_ASSERT (entry->len <= len_guess);
 
     statvec->Push (entry);
+    g3d->DecRef ();
 }
 
 void csPerfStats::WriteSubSummary ()
@@ -601,6 +608,7 @@ bool csPerfStats::WriteFile ()
   // Is there a limit to the size of buffer which can be written at once?
   iFile* cf;
   cf = vfs->Open (file_name, VFS_FILE_WRITE);
+  vfs->DecRef ();
   cf->Write (buffer, total_len);
   cf->DecRef ();
 

@@ -125,10 +125,12 @@ csFountainFactoryLoader::csFountainFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFountainFactoryLoader::~csFountainFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -160,10 +162,12 @@ csFountainFactorySaver::csFountainFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFountainFactorySaver::~csFountainFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -207,10 +211,12 @@ csFountainLoader::csFountainLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFountainLoader::~csFountainLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
@@ -445,10 +451,12 @@ csFountainSaver::csFountainSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csFountainSaver::~csFountainSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csFountainSaver::Initialize (iObjectRegistry* object_reg)

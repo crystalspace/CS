@@ -110,9 +110,10 @@ SysSystemDriver::~SysSystemDriver()
   if (event_outlet != 0)
     event_outlet->DecRef();
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (q != NULL);
   q->RemoveListener (&scfiEventHandler);
+  q->DecRef ();
 }
 
 
@@ -143,10 +144,11 @@ bool SysSystemDriver::Initialize ()
   if (strlen(path) > 0)
     chdir(path);
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (q != NULL);
   event_outlet = q->CreateEventOutlet(this);
   q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+  q->DecRef ();
 
   if (be_app == 0)			// *2*
     (void)new BApplication("application/x-vnd.xsware-crystal");

@@ -425,11 +425,15 @@ public:
   {
     iEngine* Query_iEngine()
     {
-      return CS_QUERY_REGISTRY (self, iEngine);
+      iEngine* en = CS_QUERY_REGISTRY (self, iEngine);
+      en->DecRef ();
+      return en;
     }
     iGraphics3D* Query_iGraphics3D()
     {
-      return CS_QUERY_REGISTRY (self, iGraphics3D);
+      iGraphics3D* g3d = CS_QUERY_REGISTRY (self, iGraphics3D);
+      g3d->DecRef ();
+      return g3d;
     }
     void Print(int mode, const char* format) {
       printf (format); 

@@ -73,7 +73,10 @@ void csIsoEngine::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.engine.iso", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -108,7 +111,10 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
   // Tell system driver that we want to handle broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
   return true;
 }
 
@@ -127,7 +133,6 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
           Report (CS_REPORTER_SEVERITY_ERROR, "IsoEngine: could not get G3D.");
           return false;
         }
-	g3d->IncRef ();
         g2d = g3d->GetDriver2D ();
         if (!g2d) 
         {
@@ -287,7 +292,6 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
     	"Failed to load file %s.", vfsfilename);
     goto create_out;
   }
-  imgloader->IncRef ();
 
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if(VFS==NULL)
@@ -296,7 +300,6 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
     	"Failed to load file %s.", vfsfilename);
     goto create_out;
   }
-  VFS->IncRef ();
 
   buf = VFS->ReadFile (vfsfilename);
   if(!buf) 
@@ -402,6 +405,7 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
 
   if(!mesh_type) 
     mesh_type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
+  plugin_mgr->DecRef ();
   if(!mesh_type) 
     return NULL;
 

@@ -330,7 +330,12 @@ bool csPluginLoader::LoadPlugins ()
 
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (object_reg))
+  {
+    CommandLine->DecRef ();
+    Config->DecRef ();
+    plugin_mgr->DecRef ();
     return false;
+  }
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
@@ -344,6 +349,9 @@ bool csPluginLoader::LoadPlugins ()
     {
       if (!object_reg->Register (plg, r.Tag))
       {
+        CommandLine->DecRef ();
+        Config->DecRef ();
+        plugin_mgr->DecRef ();
         if (r.Tag)
           csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	    "crystalspace.pluginloader.loadplugins",
@@ -360,6 +368,10 @@ bool csPluginLoader::LoadPlugins ()
 
   // flush all removed config files
   Config->FlushRemoved();
+
+  CommandLine->DecRef ();
+  Config->DecRef ();
+  plugin_mgr->DecRef ();
   return true;
 }
 
@@ -376,5 +388,6 @@ void csPluginLoader::RequestPlugin (const char *iPluginName,
     strcat (buf, interfaceName);
   }
   CommandLine->AddOption ("plugin", buf);
+  CommandLine->DecRef ();
 }
 

@@ -58,6 +58,7 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	iSequenceManager);
+  plugin_mgr->DecRef ();
   if (!seqmgr)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,

@@ -97,6 +97,7 @@ bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
   iOs2Helper* os2helper = CS_QUERY_REGISTRY (object_reg, iOs2Helper);
   CS_ASSERT (os2helper != NULL);
   os2helper->StartGUI ();
+  os2helper->DecRef ();
 
   // Initialize OpenGL
   if (!gdGLInitialize ())
@@ -138,14 +139,16 @@ bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
     HardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse"))
     HardwareCursor = false;
+  cmdline->DecRef ();
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
+  }
 
   KeyboardDriver = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver);
-  if (KeyboardDriver != 0)
-    KeyboardDriver->IncRef();
 
   return true;
 }

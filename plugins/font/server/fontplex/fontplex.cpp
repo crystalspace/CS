@@ -69,6 +69,7 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
     if (!b) break;
     iFontServer* fs = SCF_QUERY_INTERFACE (b, iFontServer);
     fontservers.Push (fs);
+    b->DecRef ();
   }
   if (!fontservers.Length ())
   {

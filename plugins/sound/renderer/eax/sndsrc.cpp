@@ -76,7 +76,10 @@ void csSoundSourceEAX::Report (int severity, const char* msg, ...)
   iReporter* rep = CS_QUERY_REGISTRY (Renderer->object_reg,
   	iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.sound.eax", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);

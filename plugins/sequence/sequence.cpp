@@ -197,7 +197,10 @@ bool csSequenceManager::Initialize (iObjectRegistry *r)
   object_reg = r;
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->DecRef ();
+  }
   return true;
 }
 

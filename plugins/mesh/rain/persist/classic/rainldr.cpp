@@ -119,10 +119,12 @@ csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csRainFactoryLoader::~csRainFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -153,10 +155,12 @@ csRainFactorySaver::csRainFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csRainFactorySaver::~csRainFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -198,10 +202,12 @@ csRainLoader::csRainLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csRainLoader::~csRainLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csRainLoader::Initialize (iObjectRegistry* object_reg)
@@ -397,10 +403,12 @@ csRainSaver::csRainSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csRainSaver::~csRainSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csRainSaver::Initialize (iObjectRegistry* object_reg)

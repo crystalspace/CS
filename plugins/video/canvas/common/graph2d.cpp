@@ -83,6 +83,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   win_title = csStrNew ("Crystal Space Application");
   object_reg = NULL;
   AllowResizing = false;
+  plugin_mgr = NULL;
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
@@ -101,7 +102,6 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   if (!FontServer)
   {
     FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
-    if (FontServer) FontServer->IncRef ();
   }
 #ifdef CS_DEBUG
   if (!FontServer)
@@ -133,7 +133,10 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
 
   return true;
 }
@@ -146,6 +149,7 @@ void csGraphics2D::ChangeDepth (int d)
 
 csGraphics2D::~csGraphics2D ()
 {
+  if (plugin_mgr) plugin_mgr->DecRef ();
   if (FontServer)
     FontServer->DecRef ();
   Close ();

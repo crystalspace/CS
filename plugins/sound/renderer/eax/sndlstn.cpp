@@ -78,6 +78,7 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
       reporter->Report (CS_REPORTER_SEVERITY_WARNING, 
         "crystalspace.sound.eax", "EAX listener: "
         "Cannot create primary sound buffer (%s).\n", Renderer->GetError(r));
+    if (reporter) reporter->DecRef ();
     return false;
   }
 	
@@ -87,6 +88,7 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
       reporter->Report (CS_REPORTER_SEVERITY_WARNING, 
         "crystalspace.sound.eax", "EAX listener: Cannot query listener"
         " interface from primary sound buffer (%s).\n", Renderer->GetError(r));
+    if (reporter) reporter->DecRef ();
     return false;
   }
 
@@ -122,6 +124,7 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   SetRollOffFactor(1.0);
   SetEnvironment(ENVIRONMENT_GENERIC);
   Prepare();
+  if (reporter) reporter->DecRef ();
 
   return true;
 }

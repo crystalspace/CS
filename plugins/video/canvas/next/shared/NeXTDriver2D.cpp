@@ -72,10 +72,12 @@ bool NeXTDriver2D::Initialize(iObjectRegistry* r)
   {
     assistant = CS_QUERY_REGISTRY(r, iNeXTAssistant);
     CS_ASSERT(assistant != 0);
-    assistant->IncRef();
     iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
     if (q != 0)
+    {
       q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
+      q->DecRef ();
+    }
     controller = NeXTDelegate2D_new(this);
     ok = init_driver(get_desired_depth());
   }
@@ -148,6 +150,7 @@ int NeXTDriver2D::get_desired_depth() const
       "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.", depth);
     depth = 0;
   }
+  cmdline->DecRef ();
   return depth;
 }
 
@@ -201,7 +204,10 @@ void NeXTDriver2D::user_close()
 {
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->GetEventOutlet()->Broadcast(cscmdContextClose, (iGraphics2D*)this);
+    q->DecRef ();
+  }
   assistant->request_shutdown();
 }
 

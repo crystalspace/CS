@@ -188,6 +188,7 @@ bool csInitializer::SetupCommandLineParser (
   iCommandLineParser* c = CS_QUERY_REGISTRY (r, iCommandLineParser);
   CS_ASSERT (c != NULL);
   c->Initialize (argc, argv);
+  c->DecRef ();
   return true;
 }
 
@@ -211,6 +212,7 @@ bool csInitializer::SetupConfigManager (
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
   iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  plugin_mgr->DecRef ();
   if (!VFS)
   {
     VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
@@ -228,6 +230,7 @@ bool csInitializer::SetupConfigManager (
     if (!cfg->Load (configName, VFS))
     {
       VFS->DecRef ();
+      Config->DecRef ();
       return false;
     }
   VFS->DecRef ();
@@ -254,6 +257,7 @@ bool csInitializer::SetupConfigManager (
   }
 
   config_done = true;
+  Config->DecRef ();
   return true;
 }
 
@@ -297,6 +301,7 @@ bool csInitializer::SetupEventHandler (
   if (q)
   {
     q->RegisterListener (evhdlr, eventmask);
+    q->DecRef ();
     installed_event_handler = evhdlr;
     return true;
   }
@@ -332,6 +337,7 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
   iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
   CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
+  EventQueue->DecRef ();
   return true;
 }
 
@@ -342,6 +348,7 @@ void csInitializer::CloseApplication (iObjectRegistry* r)
   iEventQueue* EventQueue = CS_QUERY_REGISTRY (r, iEventQueue);
   CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
+  EventQueue->DecRef ();
 }
 
 void csInitializer::DestroyApplication (iObjectRegistry* r)
@@ -351,7 +358,9 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   if (installed_event_handler)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (r, iEventQueue);
+    CS_ASSERT (q != NULL);
     q->RemoveListener (installed_event_handler);
+    q->DecRef ();
   }
   delete global_sys;
 

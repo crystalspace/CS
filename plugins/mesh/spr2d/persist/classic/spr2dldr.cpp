@@ -142,11 +142,13 @@ csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite2DFactoryLoader::~csSprite2DFactoryLoader ()
 {
   if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -154,7 +156,6 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csSprite2DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -363,11 +364,13 @@ csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite2DFactorySaver::~csSprite2DFactorySaver ()
 {
   if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -375,7 +378,6 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
   csSprite2DFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -426,10 +428,12 @@ csSprite2DLoader::csSprite2DLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite2DLoader::~csSprite2DLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
 }
 
@@ -438,7 +442,6 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
   csSprite2DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -618,10 +621,12 @@ csSprite2DSaver::csSprite2DSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite2DSaver::~csSprite2DSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
 }
 
@@ -630,7 +635,6 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   csSprite2DSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 

@@ -282,6 +282,7 @@ void csSurfMeshObject::SetupVertexBuffer ()
    iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
    // @@@ priority should be a parameter.
    vbufmgr = g3d->GetVertexBufferManager ();
+   g3d->DecRef ();
    vbuf = vbufmgr->CreateBuffer (0);
    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
    mesh.buffers[0] = vbuf;

@@ -74,7 +74,10 @@ void csGraphics2DSVGALib::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.svgalib", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -156,6 +159,7 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
     q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
   }
   return true;
 }

@@ -75,13 +75,13 @@
   { \
     Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return false; \
-  } \
-  else myPlug->IncRef ();
+  }
 
 extern awsTest *System;
 
 awsTest::awsTest()
 {
+  vc = NULL;
   engine = NULL;
   myG3D = NULL;
   myG2D = NULL;
@@ -121,6 +121,7 @@ awsTest::awsTest()
 
 awsTest::~awsTest()
 {
+  SCF_DEC_REF (vc);
   SCF_DEC_REF (view);
   SCF_DEC_REF (font);
   SCF_DEC_REF (aws);
@@ -194,7 +195,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load the engine plugin.
-  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...");
   engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d", iEngine);
   if (!engine)
   {
@@ -206,7 +207,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not register engine!");
     return false;
   }
-    
+  plugin_mgr->DecRef ();
+
   QUERY_REG (myG3D, iGraphics3D, "Couldn't load iGraphics3D plugin!");
   QUERY_REG (myG2D, iGraphics2D, "Couldn't load  iGraphics2D plugin!");
   QUERY_REG (myVFS, iVFS, "Couldn't load  iVFS plugin!");
@@ -451,7 +453,11 @@ awsTest::HandleEvent (iEvent &Event)
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
   
@@ -465,7 +471,10 @@ awsTest::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.awstest", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);

@@ -77,7 +77,10 @@ bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
   object_reg = r;
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener(&scfiEventHandler, CSMASK_Command | CSMASK_Broadcast);
+    q->DecRef ();
+  }
   Config.AddConfig(object_reg, "/config/sound.cfg");
   return true;
 }
@@ -88,7 +91,10 @@ void csSoundDriverWaveOut::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.sound.driver.waveout", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);

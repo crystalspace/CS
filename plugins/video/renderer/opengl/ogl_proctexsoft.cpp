@@ -113,6 +113,7 @@ public:
   { 
     DeleteAll (); 
     SCF_DEC_REF (soft_man);
+    SCF_DEC_REF (plugin_mgr);
   }
   // Free an item from array
   virtual bool FreeItem (csSome Item)
@@ -207,7 +208,10 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
   {
     iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
     if (q != 0)
+    {
       q->GetEventOutlet()->Broadcast(cscmdContextClose,(void*)dummy_g2d);
+      q->DecRef ();
+    }
   }
   SCF_DEC_REF (dummy_g2d);
   SCF_DEC_REF (g3d);

@@ -102,7 +102,10 @@ void Blocks::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.blocks", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -117,11 +120,9 @@ void Blocks::Report (int severity, const char* msg, ...)
   { \
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return -1; \
-  } \
-  else myPlug->IncRef ();
+  }
 
 Blocks* Sys = NULL;
-iPluginManager* plugin_mgr = NULL;
 
 #define Gfx3D Sys->myG3D
 #define Gfx2D Sys->myG2D
@@ -322,6 +323,7 @@ char* TextEntryMenu::GetSelectedEntry ()
 //-----------------------------------------------------------------------------
 Blocks::Blocks ()
 {
+  vc = NULL;
   engine = NULL;
   view = NULL;
   LevelLoader = NULL;
@@ -420,7 +422,8 @@ Blocks::~Blocks ()
     engine->DeleteAll ();
     engine->DecRef ();
   }
-  if (view) view->DecRef ();;
+  if (view) view->DecRef ();
+  if (vc) vc->DecRef ();
   delete keyconf_menu;
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
@@ -1504,7 +1507,11 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 #endif
 	  iObjectRegistry* object_reg = Sys->object_reg;
 	  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-	  if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  if (q)
+	  {
+	    q->GetEventOutlet()->Broadcast (cscmdQuit);
+	    q->DecRef ();
+	  }
 	  break;
       }
       break;
@@ -2345,6 +2352,7 @@ void Blocks::InitEngine ()
       backsound = w->GetSound ()->Play (true);
       w->DecRef ();
     }
+    snd->DecRef ();
   }
 }
 
@@ -2925,6 +2933,7 @@ void Blocks::ReadConfig ()
   // Network stuff.
   IsServer = Config->GetYesNo ("Blocks.Network.Server", false);
 #endif
+  keys->DecRef ();
 }
 
 void Blocks::WriteConfig ()
@@ -2967,6 +2976,7 @@ void Blocks::WriteConfig ()
         }
     }
   keys->Save ();
+  keys->DecRef ();
 }
 
 // -----------------------------------------------------------------
@@ -3196,16 +3206,12 @@ int main (int argc, char* argv[])
   // The virtual clock.
   Sys->vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-
   Sys->myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!Sys->myG3D)
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return -1;
   }
-  Sys->myG3D->IncRef ();
 
   Sys->myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!Sys->myG2D)
@@ -3213,7 +3219,6 @@ int main (int argc, char* argv[])
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return -1;
   }
-  Sys->myG2D->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = Gfx2D->GetNativeWindow ();
@@ -3235,13 +3240,11 @@ int main (int argc, char* argv[])
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No engine plugin!");
     return -1;
   }
-  Sys->engine->IncRef ();
 
   Sys->thing_type = Sys->engine->GetThingType ();
 
   QUERY_REG (Sys->myVFS, iVFS, "No iVFS plugin!");
   Sys->myNetDrv = CS_QUERY_REGISTRY (object_reg, iNetworkDriver);
-  if (Sys->myNetDrv) Sys->myNetDrv->IncRef ();
 
   // Get a font handle
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
@@ -3253,7 +3256,6 @@ int main (int argc, char* argv[])
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     return -1;
   }
-  Sys->LevelLoader->IncRef ();
 
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
@@ -3279,7 +3281,9 @@ int main (int argc, char* argv[])
   // Change to virtual directory where Blocks data is stored
   //if (!)
 
+  iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   csString world_file(config->GetStr ("Blocks.Data", "/data/blocks"));
+  config->DecRef ();
   world_file.Append("/");
   if (!Sys->myVFS->Exists (world_file.GetData()))
   {

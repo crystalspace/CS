@@ -119,10 +119,12 @@ csHazeFactoryLoader::csHazeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csHazeFactoryLoader::~csHazeFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -339,10 +341,12 @@ csHazeFactorySaver::csHazeFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csHazeFactorySaver::~csHazeFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -440,10 +444,12 @@ csHazeLoader::csHazeLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csHazeLoader::~csHazeLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
@@ -559,10 +565,12 @@ csHazeSaver::csHazeSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csHazeSaver::~csHazeSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csHazeSaver::Initialize (iObjectRegistry* object_reg)

@@ -132,6 +132,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
+  plugin_mgr = NULL;
   ogl_g3d = this;
   texture_cache = NULL;
   lightmap_cache = NULL;
@@ -191,6 +192,7 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 {
   Close ();
   if (G2D) G2D->DecRef ();
+  if (plugin_mgr) plugin_mgr->DecRef ();
 
   // see note above
   tr_verts.DecRef ();
@@ -212,7 +214,10 @@ void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -228,7 +233,10 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
   return true;
 }
 
@@ -383,6 +391,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   	iCommandLineParser);
 
   const char *driver = cmdline->GetOption ("canvas");
+  cmdline->DecRef ();
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
@@ -1185,6 +1194,7 @@ void csGraphics3DOGLCommon::Print (csRect * area)
     iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
     elapsed_time = vc->GetElapsedTicks ();
     current_time = vc->GetCurrentTicks ();
+    vc->DecRef ();
     /// Smooth last n frames, to avoid jitter when objects appear/disappear.
     static int num = 10;
     static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };

@@ -128,6 +128,7 @@ void csPluginManager::QueryOptions (iComponent *iObject)
     }
     Config->DecRef ();
   }
+  CommandLine->DecRef ();
 }
 
 iBase *csPluginManager::LoadPlugin (const char *iClassID,

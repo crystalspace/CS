@@ -60,14 +60,12 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
       	"could not load the image loader plugin. This is a fatal error.");
   }
-  loader->IncRef ();
 
   if (!vfs)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
       	"could not load the VFS plugin. This is a fatal error.");
   }
-  vfs->IncRef ();
 
   if (!vfs->Mount("/aws", "./data/awsdef.zip"))
   {

@@ -70,6 +70,8 @@ Video::Video ()
   LevelLoader = NULL;
   myG3D = NULL;
   kbd = NULL;
+  vc = NULL;
+  plugin_mgr = NULL;
 }
 
 Video::~Video ()
@@ -80,6 +82,8 @@ Video::~Video ()
     pVideoFormat->Unload ();
     pVideoFormat->DecRef ();
   }
+  if (vc) vc->DecRef ();
+  if (plugin_mgr) plugin_mgr->DecRef ();
   if (view) view->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
   if (myG3D) myG3D->DecRef ();
@@ -93,7 +97,10 @@ void Video::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.video", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -182,34 +189,30 @@ bool Video::Initialize (int argc, const char* const argv[],
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   // Find the pointer to level loader plugin
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  LevelLoader->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    exit (-1);
   }
-  myG3D->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
-    abort ();
+    exit (-1);
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -359,6 +362,7 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening the video file.");
       iFile *pFile = pVFS->Open ("/this/data/video.avi", VFS_FILE_READ);
+      pVFS->DecRef ();
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Scanning the video file.");
       if (pFile && pVideoFormat->Load (pFile))
       {
@@ -467,7 +471,11 @@ bool Video::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

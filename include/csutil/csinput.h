@@ -142,6 +142,8 @@ public:
   /// Initialize mouse interface.
   csMouseDriver (iObjectRegistry*);
 
+  virtual ~csMouseDriver ();
+
   /// Set double-click mouse parameters
   virtual void SetDoubleClickTime (int iTime, size_t iDist);
 

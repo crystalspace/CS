@@ -70,10 +70,12 @@ ViewMesh::ViewMesh ()
   loader = NULL;
   g3d = NULL;
   kbd = NULL;
+  vc = NULL;
 }
 
 ViewMesh::~ViewMesh ()
 {
+  if (vc) vc->DecRef ();
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
@@ -87,7 +89,10 @@ void ViewMesh::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.viewmesh", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -170,41 +175,34 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    exit (-1);
   }
-  g3d->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
-    abort ();
+    exit (-1);
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -330,10 +328,14 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
 
   txtmgr->SetPalette ();
 
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+
   const char* meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetName (3);
+  cmdline->DecRef ();
   float scale = 1;
   if (scaleTxt != NULL)
   {
@@ -399,7 +401,11 @@ bool ViewMesh::HandleEvent (iEvent& Event)
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

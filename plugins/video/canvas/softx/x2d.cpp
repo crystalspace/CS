@@ -78,7 +78,10 @@ void csGraphics2DXLib::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.softx", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -96,7 +99,10 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
 
   xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, iXWindow);
   if (!xwin)
+  {
+    plugin_mgr->DecRef ();
     return false;
+  }
   dpy = xwin->GetDisplay ();
   screen_num = xwin->GetScreen ();
 
@@ -110,6 +116,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   do_shm = Config->GetBool ("Video.XSHM", true);
   if (cmdline->GetOption ("XSHM")) do_shm = true;
   if (cmdline->GetOption ("noXSHM")) do_shm = false;
+  cmdline->DecRef ();
 
   if (do_shm)
   {
@@ -135,7 +142,9 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
   }
+  plugin_mgr->DecRef ();
   return true;
 }
 

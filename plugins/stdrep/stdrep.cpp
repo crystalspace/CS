@@ -117,8 +117,15 @@ csReporterListener::~csReporterListener ()
   // DontUseMeAnymoreSincerelyYourReporterOfChoice () which is called by
   // iReporter destructor for all listeners still in the listenerqueue
   //  .. norman
+  if (reporter) reporter->DecRef ();
   iReporter *rep = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (rep && rep == reporter) reporter->RemoveReporterListener (&scfiReporterListener);
+  if (rep)
+  {
+    if (rep == reporter)
+      reporter->RemoveReporterListener (&scfiReporterListener);
+    rep->DecRef ();
+  }
+  if (console) console->DecRef ();
 }
 
 bool csReporterListener::Initialize (iObjectRegistry *object_reg)
@@ -188,6 +195,7 @@ void csReporterListener::SetDebugFile (const char* filename)
 
 void csReporterListener::SetDefaults ()
 {
+  if (console) console->DecRef ();
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   nativewm = NULL;
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -199,8 +207,13 @@ void csReporterListener::SetDefaults ()
       nativewm = SCF_QUERY_INTERFACE (g2d, iNativeWindowManager);
       if (nativewm) nativewm->DecRef ();
     }
+    g3d->DecRef ();
   }
-  if (reporter) reporter->RemoveReporterListener (&scfiReporterListener);
+  if (reporter)
+  {
+    reporter->RemoveReporterListener (&scfiReporterListener);
+    reporter->DecRef ();
+  }
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (reporter) reporter->AddReporterListener (&scfiReporterListener);
   delete[] debug_file;

@@ -68,7 +68,10 @@ void DemoSky::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.demosky", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -79,6 +82,7 @@ void DemoSky::Report (int severity, const char* msg, ...)
 
 DemoSky::DemoSky ()
 {
+  vc = NULL;
   view = NULL;
   engine = NULL;
   sky = NULL;
@@ -98,8 +102,9 @@ DemoSky::DemoSky ()
 DemoSky::~DemoSky ()
 {
   delete flock;
-  if (view) view->DecRef ();;
-  if(font) font->DecRef ();
+  if (vc) vc->DecRef ();
+  if (view) view->DecRef ();
+  if (font) font->DecRef ();
   if (LevelLoader) LevelLoader->DecRef ();
   if (engine) engine->DecRef ();
   if (myG2D) myG2D->DecRef ();
@@ -218,41 +223,36 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  LevelLoader->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    exit (-1);
   }
-  myG3D->IncRef ();
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
-    abort ();
+    exit (-1);
   }
-  myG2D->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
-    abort ();
+    exit (-1);
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
@@ -464,7 +464,11 @@ bool DemoSky::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

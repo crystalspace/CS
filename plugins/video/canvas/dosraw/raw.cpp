@@ -59,7 +59,10 @@ void csGraphics2DDOSRAW::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.dosraw", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -167,6 +170,7 @@ bool csGraphics2DDOSRAW::Open ()
   iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
   CS_ASSERT (doshelper != NULL);
   doshelper->DoEnablePrintf (false);
+  doshelper->DecRef ();
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -207,6 +211,7 @@ void csGraphics2DDOSRAW::Close ()
   iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
   CS_ASSERT (doshelper != NULL);
   doshelper->DoEnablePrintf (true);
+  doshelper->DecRef ();
 }
 
 void csGraphics2DDOSRAW::Print (csRect *area)
@@ -251,6 +256,7 @@ bool csGraphics2DDOSRAW::SetMousePosition (int x, int y)
   iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
   CS_ASSERT (doshelper != NULL);
   doshelper->SetMousePosition (x, y);
+  doshelper->DecRef ();
 }
 
 bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape)

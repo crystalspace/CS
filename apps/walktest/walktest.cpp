@@ -187,6 +187,8 @@ WalkTest::WalkTest () :
   mySound = NULL;
   myMotionMan = NULL;
   collide_system = NULL;
+  vc = NULL;
+  plugin_mgr = NULL;
 
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
@@ -195,6 +197,8 @@ WalkTest::WalkTest () :
 
 WalkTest::~WalkTest ()
 {
+  SCF_DEC_REF (vc);
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (myVFS);
   SCF_DEC_REF (myConsole);
   SCF_DEC_REF (myG2D);
@@ -234,6 +238,7 @@ void WalkTest::Report (int severity, const char* msg, ...)
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.system", msg, arg);
+    rep->DecRef ();
   }
   else
   {
@@ -323,6 +328,8 @@ void WalkTest::SetDefaults ()
     do_logo = false;
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
+  cmdline->DecRef ();
+  Config->DecRef ();
 }
 
 void WalkTest::Help ()
@@ -339,6 +346,7 @@ void WalkTest::Help ()
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
+  cfg->DecRef ();
 }
 
 //-----------------------------------------------------------------------------
@@ -1105,12 +1113,16 @@ void CaptureScreen ()
     iDataBuffer *db = imageio->Save (img, "image/png");
     if (db)
     {
-       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
-      if (!Sys->myVFS->WriteFile (name, (const char*)db->GetData (), db->GetSize ()))
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
+      if (!Sys->myVFS->WriteFile (name, (const char*)db->GetData (),
+      		db->GetSize ()))
+      {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"There was an error while writing screen shot");
+      }
       db->DecRef ();
     }
+    imageio->DecRef ();
   }
   img->DecRef ();
 }
@@ -1317,7 +1329,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -1326,7 +1337,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
-  myG3D->IncRef ();
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
@@ -1334,7 +1344,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return false;
   }
-  myG2D->IncRef ();
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
@@ -1342,7 +1351,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
-  myVFS->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -1350,21 +1358,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
     return false;
   }
-  kbd->IncRef();
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
-  if (myConsole) 
-    myConsole->IncRef ();
   mySound = CS_QUERY_REGISTRY (object_reg, iSoundRender);
-  if (mySound) mySound->IncRef ();
   myMotionMan = CS_QUERY_REGISTRY (object_reg, iMotionManager);
-  if (myMotionMan) myMotionMan->IncRef ();
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Created by Jorrit Tyberghein and others...");
 
   // Get all collision detection and movement config file parameters.
+  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
   cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
   cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
@@ -1380,6 +1384,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   cfg_legs_width = cfg->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
   cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
   cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
+  cfg->DecRef ();
 
 #ifdef CS_DEBUG
   // enable all kinds of useful FPU exceptions on a x86
@@ -1420,7 +1425,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     return false;
   }
-  Engine->IncRef ();
 
   // Find the level loader plugin
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
@@ -1429,7 +1433,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
   }
-  LevelLoader->IncRef ();
 
   // Find the model converter plugin
   ModelConverter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
@@ -1438,7 +1441,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No model converter plugin!");
     return false;
   }
-  ModelConverter->IncRef ();
 
   // Find the model crossbuilder plugin
   CrossBuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
@@ -1447,7 +1449,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No model crossbuilder plugin!");
     return false;
   }
-  CrossBuilder->IncRef ();
 
   // performance statistics module, also takes care of fps
   perf_stats = CS_QUERY_REGISTRY (object_reg, iPerfStats);
@@ -1456,8 +1457,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_WARNING,
     	"No iPerfStats plugin: you will have no performance statistics!");
   }
-  else
-    perf_stats->IncRef ();
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -1655,7 +1654,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     ConsoleInput = CS_QUERY_REGISTRY (object_reg, iConsoleInput);
     if (ConsoleInput)
     {
-      ConsoleInput->IncRef ();
       ConsoleInput->Bind (myConsole);
       ConsoleInput->SetPrompt ("cs# ");
       csCommandProcessor::PerformCallback* cb =

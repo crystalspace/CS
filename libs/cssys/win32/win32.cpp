@@ -497,6 +497,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
   CS_ASSERT (q != NULL);
   q->RegisterListener (this, CSMASK_Nothing | CSMASK_Broadcast);
+  q->DecRef ();
 }
 
 Win32Assistant::~Win32Assistant ()
@@ -511,7 +512,10 @@ void Win32Assistant::Shutdown()
 {
   iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
   if (q != 0)
+  {
     q->RemoveListener(this);
+    q->DecRef ();
+  }
 }
 
 void Win32Assistant::SetWinCursor (HCURSOR cur)
@@ -531,7 +535,10 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
   {
     iEventQueue* q = CS_QUERY_REGISTRY(registry, iEventQueue);
     if (q != 0)
+    {
       EventOutlet = q->CreateEventOutlet(this);
+      q->DecRef ();
+    }
   }
   return EventOutlet;
 }

@@ -46,8 +46,6 @@ private:
   static iGraphics3D* g3d;
   /// The iObjectRegistry interface to use.
   static iObjectRegistry* object_reg;
-  /// The plugin manager.
-  static iPluginManager* plugin_mgr;
   /// The console.
   static iConsoleOutput* console;
 

@@ -236,7 +236,10 @@ void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.openglwin", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -253,8 +256,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   if (!m_piWin32Assistant)
       SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.");
-  m_piWin32Assistant->IncRef();
-  
+
   // Get the creation parameters //
   m_hInstance = m_piWin32Assistant->GetInstance();
   m_nCmdShow  = m_piWin32Assistant->GetCmdShow();

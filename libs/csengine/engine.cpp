@@ -603,6 +603,7 @@ iCamera* camera_hack = NULL;
 csEngine::~csEngine ()
 {
   DeleteAll ();
+  if (plugin_mgr) plugin_mgr->DecRef ();
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
@@ -634,11 +635,9 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
     // (i.e. for calculating lighting and so on).
     Warn ("No 3D driver!");
   }
-  else G3D->IncRef ();
 
   if (!(VFS = CS_QUERY_REGISTRY (object_reg, iVFS)))
     return false;
-  VFS->IncRef ();
 
   if (G3D)
     G2D = G3D->GetDriver2D ();
@@ -649,17 +648,17 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
   ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!ImageLoader)
     Warn ("No image loader. Loading images will fail.");
-  else
-    ImageLoader->IncRef ();
 
   // Reporter is optional.
   Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (Reporter) Reporter->IncRef ();
 
   // Tell event queue that we want to handle broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q != 0)
+  if (q)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
   
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
@@ -1318,6 +1317,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   Elapsed = vc->GetElapsedTicks ();
   Current = vc->GetCurrentTicks ();
+  vc->DecRef ();
   int halo;
   for (halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
@@ -1481,6 +1481,7 @@ void csEngine::ControlMeshes ()
   iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
+  vc->DecRef ();
 
   nextframe_pending = current_time;
 

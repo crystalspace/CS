@@ -144,6 +144,7 @@ void csLua::Print(bool Error, const char *msg)
     else
       rep->Report (Mode, "crystalspace.script.lua",
       	"%s", msg);
+    rep->DecRef ();
   }
 }
 

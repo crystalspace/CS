@@ -54,6 +54,7 @@ PerfTest::PerfTest ()
 {
   draw_3d = true;
   draw_2d = true;
+  vc = NULL;
   myG3D = NULL;
   myVFS = NULL;
   ImageLoader = NULL;
@@ -62,6 +63,7 @@ PerfTest::PerfTest ()
 
 PerfTest::~PerfTest ()
 {
+  SCF_DEC_REF (vc);
   SCF_DEC_REF (myG3D);
   SCF_DEC_REF (myVFS);
   if (ImageLoader) ImageLoader->DecRef();
@@ -73,7 +75,10 @@ void PerfTest::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.perftest", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -175,8 +180,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
@@ -184,7 +187,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
-  myG3D->IncRef ();
 
   iGraphics2D* myG2D = myG3D->GetDriver2D ();
   iNativeWindow* nw = myG2D->GetNativeWindow ();
@@ -204,7 +206,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No image loader plugin!");
     return false;
   }
-  ImageLoader->IncRef ();
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
@@ -212,7 +213,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
-  myVFS->IncRef ();
 
   // Setup the texture manager
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
@@ -244,6 +244,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   const char *val;
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
   if ((val = cmdline->GetOption ("2d")))
   {
     current_tester = new StringTester ();
@@ -254,6 +256,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
   if ((val = cmdline->GetOption ("3d")))
     draw_2d = false;
+  cmdline->DecRef ();
 
   needs_setup = true;
 
@@ -309,7 +312,11 @@ void PerfTest::SetupFrame ()
 	else
 	{
 	  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-	  if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  if (q)
+	  {
+	    q->GetEventOutlet()->Broadcast (cscmdQuit);
+	    q->DecRef ();
+	  }
         }
       }
     }
@@ -322,7 +329,6 @@ void PerfTest::SetupFrame ()
     iConsoleOutput *Console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
     if (Console)
     {
-      Console->IncRef ();
       Console->Clear ();
       Console->DecRef ();
     }
@@ -345,7 +351,11 @@ bool PerfTest::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
   else if ((Event.Type == csevKeyDown) && (Event.Key.Code == ' '))

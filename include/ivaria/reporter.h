@@ -230,7 +230,10 @@ public:
     va_start(arg, description);
     iReporter* reporter = CS_QUERY_REGISTRY(reg, iReporter);
     if (reporter)
+    {
       reporter->ReportV(severity, msgId, description, arg);
+      reporter->DecRef ();
+    }
     else
     {
       csPrintfV(description, arg);

@@ -132,10 +132,12 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
   width = height = -1;
 
   const char *driver = cmdline->GetOption ("canvas");
+  cmdline->DecRef ();
   if (!driver)
     driver = config->GetStr ("Video.Line.Canvas", LINE_CS_SOFTWARE_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))
@@ -151,7 +153,10 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
 
   return true;
 }

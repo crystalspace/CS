@@ -77,6 +77,7 @@ void ProcCallback::UseTexture (iTextureWrapper*)
   iVirtualClock* vc = CS_QUERY_REGISTRY (pt->object_reg, iVirtualClock);
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
+  vc->DecRef ();
   if (pt->last_cur_time == current_time) return;
   pt->Animate (current_time);
   pt->last_cur_time = current_time;
@@ -91,6 +92,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
   	object_reg, iPluginManager);
   iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  plugin_mgr->DecRef ();
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
   proc_image->DecRef ();

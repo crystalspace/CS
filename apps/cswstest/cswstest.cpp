@@ -1057,6 +1057,8 @@ int main (int argc, char* argv[])
   DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
     DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", NULL);
+  cmdline->DecRef ();
+  config->DecRef ();
 
   // Create our application object
   csWsTest *app = new csWsTest (object_reg, DefaultSkin);

@@ -41,6 +41,7 @@ void CrystGLView::UserAction() const
   iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
   CS_ASSERT (behelper != NULL);
   behelper->UserAction (Looper()->CurrentMessage());
+  behelper->DecRef ();
 }
 
 void CrystGLView::KeyDown(char const* bytes, int32 numBytes)
@@ -112,6 +113,7 @@ bool CrystGLWindow::QuitRequested()
   CS_ASSERT (behelper != NULL);
   behelper->ContextClose(g2d);
   behelper->Quit ();
+  behelper->DecRef ();
   return false; // Allow Crystal Space to close window itself.
 }
 

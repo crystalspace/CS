@@ -102,13 +102,10 @@ int main(int argc, const char* const args[])
 
   // get a soundloader
   iSoundLoader *pLoader = CS_QUERY_REGISTRY (object_reg, iSoundLoader);
-  if (pLoader) pLoader->IncRef ();
   // we read the soundata the CS way, that is through VFS
   iVFS *pVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (pVFS) pVFS->IncRef ();
   // well, since we want to try our renderer, we should request it now
   iSoundRender *pSR = CS_QUERY_REGISTRY (object_reg, iSoundRender);
-  if (pSR) pSR->IncRef ();
   
   // load the sound
   iDataBuffer *db = pVFS->ReadFile (args[1]);

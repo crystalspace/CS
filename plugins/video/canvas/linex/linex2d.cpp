@@ -74,7 +74,10 @@ void csGraphics2DLineXLib::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.linex", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -109,6 +112,7 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
       plugin_mgr->UnloadPlugin (fsc);
       fsc->DecRef ();
     }
+    fs->DecRef ();
   }
   // Also DecRef the FontServer since csGraphics2D::Initialize IncRef'ed it
   if (FontServer)
@@ -126,7 +130,9 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
     //q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
   }
+  plugin_mgr->DecRef ();
   return true;
 }
 

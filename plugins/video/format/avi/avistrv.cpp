@@ -83,10 +83,8 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   csAVIStreamVideo::object_reg = object_reg;
   if (pG3D) pG3D->DecRef ();
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (pG3D) pG3D->IncRef ();
   if (pG2D) pG2D->DecRef ();
   pG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
-  if (pG2D) pG2D->IncRef ();
 
   pIA->w = 0;
   pIA->h = 0;

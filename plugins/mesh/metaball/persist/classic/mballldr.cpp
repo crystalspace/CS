@@ -119,10 +119,12 @@ csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csMetaBallFactoryLoader::~csMetaBallFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -154,10 +156,12 @@ csMetaBallFactorySaver::csMetaBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csMetaBallFactorySaver::~csMetaBallFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csMetaBallFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -181,10 +185,12 @@ csMetaBallLoader::csMetaBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csMetaBallLoader::~csMetaBallLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
@@ -386,10 +392,12 @@ csMetaBallSaver::csMetaBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csMetaBallSaver::~csMetaBallSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csMetaBallSaver::Initialize (iObjectRegistry* object_reg)

@@ -119,10 +119,12 @@ csSurfFactoryLoader::csSurfFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSurfFactoryLoader::~csSurfFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSurfFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -154,10 +156,12 @@ csSurfFactorySaver::csSurfFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSurfFactorySaver::~csSurfFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSurfFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -181,10 +185,12 @@ csSurfLoader::csSurfLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSurfLoader::~csSurfLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSurfLoader::Initialize (iObjectRegistry* object_reg)
@@ -362,10 +368,12 @@ csSurfSaver::csSurfSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSurfSaver::~csSurfSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSurfSaver::Initialize (iObjectRegistry* object_reg)

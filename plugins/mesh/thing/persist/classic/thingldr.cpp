@@ -198,10 +198,12 @@ csThingLoader::csThingLoader (iBase* pParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csThingLoader::~csThingLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
   SCF_DEC_REF (reporter);
 }
@@ -211,7 +213,6 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   csThingLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
@@ -232,8 +233,6 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
-  else
-    synldr->IncRef ();
   return true;
 }
 
@@ -637,10 +636,12 @@ csThingSaver::csThingSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csThingSaver::~csThingSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (reporter);
 }
 
@@ -649,7 +650,6 @@ bool csThingSaver::Initialize (iObjectRegistry* object_reg)
   csThingSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -673,10 +673,12 @@ csPlaneLoader::csPlaneLoader (iBase* pParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csPlaneLoader::~csPlaneLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
   SCF_DEC_REF (reporter);
 }
@@ -686,7 +688,6 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   csPlaneLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
@@ -707,8 +708,6 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
-  else
-    synldr->IncRef ();
   return true;
 }
 
@@ -851,10 +850,12 @@ csPlaneSaver::csPlaneSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csPlaneSaver::~csPlaneSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (reporter);
 }
 
@@ -863,7 +864,6 @@ bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
   csPlaneSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -879,10 +879,12 @@ csBezierLoader::csBezierLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csBezierLoader::~csBezierLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (reporter);
 }
 
@@ -891,7 +893,6 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
   csBezierLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -984,10 +985,12 @@ csBezierSaver::csBezierSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csBezierSaver::~csBezierSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (reporter);
 }
 
@@ -996,7 +999,6 @@ bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
   csBezierSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 

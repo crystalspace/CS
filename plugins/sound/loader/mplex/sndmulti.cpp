@@ -94,7 +94,6 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 
 bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg) 
 {
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -104,6 +103,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
 
   iStrVector* list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
   int const nmatches = list->Length();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if (nmatches != 0)
   {
     int i;
@@ -137,6 +137,8 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
       Loaders.Push((iSoundLoader*)pushback.Get (i));
   }
   list->DecRef();
+  if (reporter) reporter->DecRef ();
+  plugin_mgr->DecRef ();
   return true;
 }
 

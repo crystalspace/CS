@@ -66,10 +66,12 @@ PySimple::PySimple ()
   LevelLoader = NULL;
   myG3D = NULL;
   kbd = NULL;
+  vc = NULL;
 }
 
 PySimple::~PySimple ()
 {
+  SCF_DEC_REF (vc);
   SCF_DEC_REF (myG3D);
   if (view)
     delete view;
@@ -85,7 +87,10 @@ void PySimple::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.pysimple", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -175,7 +180,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     exit (0);
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   // Find the pointer to engine plugin
@@ -183,9 +187,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
@@ -193,15 +196,13 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D loader plugin!");
     return false;
   }
-  myG3D->IncRef ();
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  LevelLoader->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -209,7 +210,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
     return false;
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
@@ -257,6 +257,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     return 0;
   }
 
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   if(testpython)
   {
     // Initialize the python plugin.
@@ -292,6 +293,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
       is->DecRef();
     }
   }
+  plugin_mgr->DecRef ();
 
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3 (0, 5, 0), 10,
@@ -359,7 +361,11 @@ bool PySimple::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

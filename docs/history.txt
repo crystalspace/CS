@@ -12,6 +12,15 @@ The history order is reversed so that new features are at the top.
 	- Updated iObjectRegistry::Get(scfInterfaceID, int) so that this
 	  function again returns the requested interfaces. Eric changed
 	  this yesterday to return the original object pointer.
+	- Did a fundamental change to CS_QUERY_REGISTRY and
+	  CS_QUERY_REGISTRY_TAG. These macros are now guaranteed to
+	  increase the reference count of the returned object. In the
+	  past they didn't.
+	- Fixed a bad bug in csObjectRegistry::Unregister(). It would
+	  only delete the 'registry' vector and not the 'tags' vector.
+	  Why this bug only presented itself now I don't know.
+	- At this moment my changes cause big leaks in SCF at exit. I have
+	  not yet been able to find out why.
 16-Oct-2001
 	- iObjectRegistry::Register() will now return false if something
 	  is registered with a duplicate tag (exception is the NULL tag).

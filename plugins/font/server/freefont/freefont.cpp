@@ -67,7 +67,10 @@ void csFreeTypeServer::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.font.freefont", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -79,7 +82,6 @@ void csFreeTypeServer::Report (int severity, const char* msg, ...)
 bool csFreeTypeServer::Initialize (iObjectRegistry *object_reg)
 {
   csFreeTypeServer::object_reg = object_reg;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   if (TT_Init_FreeType (&engine))
   {
@@ -89,7 +91,6 @@ bool csFreeTypeServer::Initialize (iObjectRegistry *object_reg)
   }
 
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  VFS->IncRef ();
   ftconfig.AddConfig(object_reg, "config/freetype.cfg");
  
   defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);

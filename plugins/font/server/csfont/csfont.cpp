@@ -77,10 +77,12 @@ csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csDefaultFontServer::~csDefaultFontServer()
 {
+  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 iFont *csDefaultFontServer::LoadFont (const char *filename)
@@ -153,6 +155,7 @@ csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
   iVFS *VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   iDataBuffer *fntfile = VFS->ReadFile (file);
+  VFS->DecRef ();
   if (!fntfile)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

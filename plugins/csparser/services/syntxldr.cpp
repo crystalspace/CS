@@ -151,7 +151,6 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 {
   csTextSyntaxService::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 

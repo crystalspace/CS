@@ -63,12 +63,12 @@ SCF_IMPLEMENT_IBASE(csDefaultQuitEventHandler)
   SCF_IMPLEMENTS_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-bool csDefaultRunLoop(iObjectRegistry* r)
+bool csDefaultRunLoop (iObjectRegistry* r)
 {
   iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
   if (!q) return false;
   iEventQueue* ev = CS_QUERY_REGISTRY(r, iEventQueue);
-  if (!ev) return false;
+  if (!ev) { q->DecRef (); return false; }
   iVirtualClock* vc = CS_QUERY_REGISTRY(r, iVirtualClock);
 
   csDefaultQuitEventHandler eh;
@@ -76,11 +76,15 @@ bool csDefaultRunLoop(iObjectRegistry* r)
 
   while (!eh.ShouldShutdown())
   {
-    if (vc != 0)
+    if (vc)
       vc->Advance();
     ev->Process();
   }
 
-  q->RemoveListener(&eh);
+  q->RemoveListener (&eh);
+  q->DecRef ();
+  ev->DecRef ();
+  if (vc) vc->DecRef ();
   return true;
 }
+

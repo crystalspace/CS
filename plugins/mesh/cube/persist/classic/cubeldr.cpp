@@ -128,12 +128,14 @@ csCubeFactoryLoader::csCubeFactoryLoader (iBase* pParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csCubeFactoryLoader::~csCubeFactoryLoader ()
 {
   SCF_DEC_REF (synldr);
   SCF_DEC_REF (reporter);
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -141,7 +143,6 @@ bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csCubeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
@@ -162,7 +163,6 @@ bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
-  else synldr->IncRef ();
 
   return true;
 }
@@ -263,12 +263,14 @@ csCubeFactorySaver::csCubeFactorySaver (iBase* pParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   synldr = NULL;
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csCubeFactorySaver::~csCubeFactorySaver ()
 {
   SCF_DEC_REF (synldr);
   SCF_DEC_REF (reporter);
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -276,7 +278,6 @@ bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
   csCubeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
   {
@@ -297,7 +298,6 @@ bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
-  else synldr->IncRef ();
 
   return true;
 }
@@ -342,11 +342,13 @@ csCubeLoader::csCubeLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csCubeLoader::~csCubeLoader ()
 {
   SCF_DEC_REF (reporter);
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csCubeLoader::Initialize (iObjectRegistry* object_reg)
@@ -354,7 +356,6 @@ bool csCubeLoader::Initialize (iObjectRegistry* object_reg)
   csCubeLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -410,11 +411,13 @@ csCubeSaver::csCubeSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csCubeSaver::~csCubeSaver ()
 {
   SCF_DEC_REF (reporter);
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csCubeSaver::Initialize (iObjectRegistry* object_reg)
@@ -422,7 +425,6 @@ bool csCubeSaver::Initialize (iObjectRegistry* object_reg)
   csCubeSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 

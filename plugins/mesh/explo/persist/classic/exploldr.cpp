@@ -125,10 +125,12 @@ csExplosionFactoryLoader::csExplosionFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csExplosionFactoryLoader::~csExplosionFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -160,10 +162,12 @@ csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csExplosionFactorySaver::~csExplosionFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csExplosionFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -207,10 +211,12 @@ csExplosionLoader::csExplosionLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csExplosionLoader::~csExplosionLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
@@ -445,10 +451,12 @@ csExplosionSaver::csExplosionSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csExplosionSaver::~csExplosionSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csExplosionSaver::Initialize (iObjectRegistry* object_reg)

@@ -70,7 +70,10 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.console.output.fancy", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -109,20 +112,19 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
     return false;
-  VFS->IncRef ();
 
   csConfigAccess ini(object_reg, "/config/fancycon.cfg");
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   base = CS_LOAD_PLUGIN (plugin_mgr, baseclass, iConsoleOutput);
+  plugin_mgr->DecRef ();
   if (!base)
     return false;
 
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D)
     return false;
-  G3D->IncRef ();
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();
 
@@ -131,7 +133,10 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   // Tell event queue that we want to handle broadcast events
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
 
   int x, y, w, h;
   base->PerformExtension("GetPos", &x, &y, &w, &h);
@@ -152,7 +157,6 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
 	  if (!pix_loaded)
 	  {
             ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-	    if (ImageLoader) ImageLoader->IncRef ();
 	    LoadPix ();
 	    pix_loaded = true;
 	  }

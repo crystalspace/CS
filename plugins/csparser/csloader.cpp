@@ -1889,6 +1889,7 @@ csLoader::csLoader(iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
+  plugin_mgr = NULL;
   object_reg = NULL;
   VFS = NULL;
   ImageLoader = NULL;
@@ -1907,6 +1908,7 @@ csLoader::csLoader(iBase *p)
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
+  SCF_DEC_REF(plugin_mgr);
   SCF_DEC_REF(Reporter);
   SCF_DEC_REF(VFS);
   SCF_DEC_REF(ImageLoader);
@@ -1920,8 +1922,7 @@ csLoader::~csLoader()
 }
 
 #define GET_PLUGIN(var, intf, msgname)	\
-  var = CS_QUERY_REGISTRY(object_reg, intf); \
-  if (var) var->IncRef ();
+  var = CS_QUERY_REGISTRY(object_reg, intf);
 
 bool csLoader::Initialize(iObjectRegistry *object_Reg)
 {
@@ -1941,7 +1942,6 @@ bool csLoader::Initialize(iObjectRegistry *object_Reg)
       "Failed to initialize the loader: No VFS plugin.");
     return false;
   }
-  VFS->IncRef ();
 
   // get all optional plugins
   GET_PLUGIN (ImageLoader, iImageIO, "image-loader");

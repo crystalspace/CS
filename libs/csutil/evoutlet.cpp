@@ -59,8 +59,6 @@ i##X##Driver* csEventOutlet::Get##X##Driver() \
   if (X##Driver == 0) \
   { \
     X##Driver = CS_QUERY_REGISTRY(Registry, i##X##Driver); \
-    if (X##Driver != 0) \
-      X##Driver->IncRef(); \
   } \
   return X##Driver; \
 }

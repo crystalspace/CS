@@ -194,7 +194,10 @@ void csGraphics2DSDL::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.sdl", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -385,6 +388,7 @@ bool csGraphics2DSDL::Open()
     q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
     if (!EventOutlet)
       EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
   }
   return true;
 }

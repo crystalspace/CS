@@ -304,7 +304,10 @@ bool csGraphics3DSoftwareCommon::Initialize (iObjectRegistry* p)
   object_reg = p;
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
   return true;
 }
 
@@ -345,6 +348,7 @@ void csGraphics3DSoftwareCommon::NewInitialize ()
 #ifdef DO_MMX
   do_mmx = config->GetBool ("Video.Software.MMX", true);
 #endif
+  cmdline->DecRef ();
 }
 
 void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
@@ -369,6 +373,7 @@ void csGraphics3DSoftwareCommon::Report (int severity, const char* msg, ...)
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.video.software", msg, arg);
+    rep->DecRef ();
   }
   else
   {

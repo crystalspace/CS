@@ -139,7 +139,6 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
   // Get the font server, as we've bypassed csGraphics2D::Initialize
   FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
-  if (FontServer) FontServer->IncRef ();
 
   return (iGraphics2D*)this;
 }
@@ -152,7 +151,10 @@ void csProcTextureSoft2D::Close ()
   csGraphics2D::Close ();
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->GetEventOutlet()->Broadcast (cscmdContextClose, this);
+    q->DecRef ();
+  }
 }
 
 void csProcTextureSoft2D::Print (csRect *area)

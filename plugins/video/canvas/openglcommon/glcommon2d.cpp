@@ -98,6 +98,7 @@ bool csGraphics2DGLCommon::Open ()
 
   glViewport (0, 0, Width, Height);
   Clear (0);
+  if (reporter) reporter->DecRef ();
 
   return true;
 }

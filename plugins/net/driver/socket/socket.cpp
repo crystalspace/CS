@@ -241,8 +241,11 @@ bool csSocketDriver::eiComponent::Initialize(iObjectRegistry* object_reg)
   scfParent->object_reg = object_reg;
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener(&(scfParent->scfiEventHandler),
     	CSMASK_Command | CSMASK_Broadcast);
+    q->DecRef ();
+  }
   return true;
 }
 

@@ -82,6 +82,7 @@ Simple::Simple ()
   loader = NULL;
   g3d = NULL;
   kbd = NULL;
+  vc = NULL;
 }
 
 Simple::~Simple ()
@@ -112,6 +113,7 @@ Simple::~Simple ()
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
+  if (vc) vc->DecRef ();
 }
 
 void Cleanup ()
@@ -189,16 +191,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-  // Find the pointer to VFS.
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (!VFS)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-    	"No iVFS plugin!");
-    exit (1);
-  }
-
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
@@ -208,7 +200,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iEngine plugin!");
     exit (1);
   }
-  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
@@ -218,7 +209,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iLoader plugin!");
     exit (1);
   }
-  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
@@ -228,7 +218,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iGraphics3D pluginn");
     exit (1);
   }
-  g3d->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -238,7 +227,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iKeyboardDriver pluginn");
     exit (1);
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -281,14 +269,26 @@ bool Simple::Initialize (int argc, const char* const argv[])
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   // Create the procedural texture and a material for it
   ProcTexture = new csEngineProcTex ();
+  // Find the pointer to VFS.
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"No iVFS plugin!");
+    exit (1);
+  }
+
   if (!ProcTexture->Initialize (g3d, engine, VFS, loader))
   {
+    VFS->DecRef ();
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
     	"Could not initialize procedural texture!");
     Cleanup ();
     exit (1);
   }
+  VFS->DecRef ();
   iTextureWrapper *tw = engine->GetTextureList ()->NewTexture
       (ProcTexture->GetTextureHandle());
   iMaterialWrapper *ProcMat = engine->CreateMaterial ("procmat", tw);
@@ -342,7 +342,11 @@ bool Simple::HandleEvent (iEvent& Event)
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

@@ -83,7 +83,10 @@ void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.sound.software", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -106,6 +109,7 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, iSoundDriver);
+  plugin_mgr->DecRef ();
   if (!SoundDriver)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -116,8 +120,11 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
   // set event callback
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener(&scfiEventHandler,
       CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+    q->DecRef ();
+  }
 
   // read the config file
   Config.AddConfig(object_reg, "/config/sound.cfg");
@@ -162,6 +169,7 @@ bool csSoundRenderSoftware::Open()
 
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
+  vc->DecRef ();
   LastTime = ct;
 
   return true;

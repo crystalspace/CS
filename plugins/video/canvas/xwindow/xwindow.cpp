@@ -90,7 +90,10 @@ void csXWindow::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.window.x", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -116,6 +119,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) do_hwmouse = true;
   if (cmdline->GetOption ("nosysmouse")) do_hwmouse = false;
+  cmdline->DecRef ();
   // Open display
   dpy = XOpenDisplay (NULL);
 
@@ -136,7 +140,10 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   // Create the event outlet
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
+  }
 
   int opcode, first_event, first_error;
   if (XQueryExtension (dpy, CS_XEXT_XF86VM, 
@@ -144,6 +151,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   {
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
     xf86vm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_XF86VM_SCF_ID, iXExtF86VM);
+    plugin_mgr->DecRef ();
   }
   return true;
 }
@@ -328,7 +336,10 @@ bool csXWindow::Open ()
   // Tell event queue to call us on every frame
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->DecRef ();
+  }
 
   if (xf86vm)
   {

@@ -77,7 +77,10 @@ void csBugPlug::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.bugplug", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -90,6 +93,7 @@ csBugPlug::csBugPlug (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   Engine = NULL;
+  plugin_mgr = NULL;
   object_reg = NULL;
   G3D = NULL;
   G2D = NULL;
@@ -121,6 +125,7 @@ csBugPlug::~csBugPlug ()
     if (Engine) shadow->RemoveFromEngine (Engine);
     delete shadow;
   }
+  if (plugin_mgr) plugin_mgr->DecRef ();
   if (Engine) Engine->DecRef ();
   if (G3D) G3D->DecRef ();
   if (Conout) Conout->DecRef ();
@@ -139,8 +144,11 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
   	CSMASK_MouseUp|CSMASK_MouseDown);
+    q->DecRef ();
+  }
   return true;
 }
 
@@ -149,17 +157,8 @@ void csBugPlug::SetupPlugin ()
   if (initialized) return;
 
   if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!Engine)
-  {
-    // No engine. It is possible that we are working with the iso-engine.
-  }
-  else Engine->IncRef ();
 
-  if (!G3D)
-  {
-    G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-    if (G3D) G3D->IncRef ();
-  }
+  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D)
   {
     initialized = true;
@@ -175,22 +174,14 @@ void csBugPlug::SetupPlugin ()
     return;
   }
 
-  if (!VFS)
-  {
-    VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-    if (VFS) VFS->IncRef ();
-  }
+  if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
     printf ("No VFS!\n");
     return;
   }
 
-  if (!Conout)
-  {
-    Conout = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
-    if (Conout) Conout->IncRef ();
-  }
+  if (!Conout) Conout = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
 
   ReadKeyBindings ("/config/bugplug.cfg");
 

@@ -69,14 +69,14 @@ bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
 {
   app->VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!app->VFS) return false;
-  app->VFS->IncRef ();
 
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q != 0)
+  if (q != NULL)
   {
     app->EventOutlet = q->GetEventOutlet();
     // We want ALL the events! :)
     q->RegisterListener (&scfiEventHandler, (unsigned int)(~0));
+    q->DecRef ();
   }
   return true;
 }
@@ -128,11 +128,7 @@ csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   LastMouseContainer = NULL;
 
   KeyboardDriver = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (KeyboardDriver != 0)
-    KeyboardDriver->IncRef();
   MouseDriver = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
-  if (MouseDriver != 0)
-    MouseDriver->IncRef();
 
   OldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;
@@ -155,7 +151,10 @@ csApp::~csApp ()
 
   iEventQueue *eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (eq)
+  {
     eq->RemoveListener (&scfiPlugin->scfiEventHandler);
+    eq->DecRef ();
+  }
   plugin_mgr->UnloadPlugin (scfiPlugin);
 
   // Delete all children prior to shutting down the system
@@ -170,6 +169,12 @@ csApp::~csApp ()
   if (MouseDriver != 0)
     MouseDriver->DecRef();
 
+  if (vc)
+    vc->DecRef ();
+  if (event_queue)
+    event_queue->DecRef ();
+  if (plugin_mgr)
+    plugin_mgr->DecRef ();
   if (VFS)
     VFS->DecRef ();
   if (DefaultFont)
@@ -207,7 +212,6 @@ bool csApp::Initialize ()
   config.AddConfig (object_reg, "/config/csws.cfg");
 
   FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
-  FontServer->IncRef ();
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
   DefaultFontSize = 8;
 
@@ -215,8 +219,6 @@ bool csApp::Initialize ()
   if (!ImageLoader)
     Printf (CS_REPORTER_SEVERITY_WARNING,
       "No image loader. Loading images will fail.\n");
-  else
-    ImageLoader->IncRef ();
 
   // Now initialize all skin slices
   InitializeSkin ();

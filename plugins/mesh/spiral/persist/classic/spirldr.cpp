@@ -117,10 +117,12 @@ csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSpiralFactoryLoader::~csSpiralFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
@@ -151,10 +153,12 @@ csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSpiralFactorySaver::~csSpiralFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSpiralFactorySaver::Initialize (iObjectRegistry* object_reg)
@@ -195,10 +199,12 @@ csSpiralLoader::csSpiralLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSpiralLoader::~csSpiralLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
@@ -368,10 +374,12 @@ csSpiralSaver::csSpiralSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  plugin_mgr = NULL;
 }
 
 csSpiralSaver::~csSpiralSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csSpiralSaver::Initialize (iObjectRegistry* object_reg)

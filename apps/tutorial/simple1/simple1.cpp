@@ -66,10 +66,12 @@ Simple::Simple ()
   loader = NULL;
   g3d = NULL;
   kbd = NULL;
+  vc = NULL;
 }
 
 Simple::~Simple ()
 {
+  if (vc) vc->DecRef ();
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
@@ -161,7 +163,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
 	"No iEngine plugin!");
     exit (1);
   }
-  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
@@ -171,7 +172,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iLoader plugin!");
     exit (1);
   }
-  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
@@ -181,7 +181,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iGraphics3D plugin!");
     exit (1);
   }
-  g3d->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -191,7 +190,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iKeyboardDriver plugin!");
     exit (1);
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -327,7 +325,11 @@ bool Simple::HandleEvent (iEvent& Event)
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 
@@ -390,7 +392,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  csDefaultRunLoop(simple->object_reg);
+  csDefaultRunLoop (simple->object_reg);
 
   // Cleanup.
   Cleanup ();

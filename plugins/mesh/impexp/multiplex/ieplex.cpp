@@ -114,6 +114,7 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
     if (ldr)
       Converters.Push(ldr);
   }
+  plugin_mgr->DecRef ();
 
   for (i=0; i<Converters.Length (); i++)
   {

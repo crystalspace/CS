@@ -102,6 +102,7 @@ bool csGraphics2DBeLib::Open()
     iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
     CS_ASSERT (behelper != NULL);
     behelper->BeginUI ();
+    behelper->DecRef ();
   }
   return ok;
 }
@@ -136,7 +137,9 @@ bool csGraphics2DBeLib::SetMouseCursor(csMouseCursorID shape)
 {
   iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
   CS_ASSERT (behelper != NULL);
-  return behelper->SetCursor (shape);
+  bool rc = behelper->SetCursor (shape);
+  behelper->DecRef ();
+  return rc;
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)

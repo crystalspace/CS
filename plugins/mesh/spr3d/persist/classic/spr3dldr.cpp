@@ -163,10 +163,12 @@ csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
 }
 
@@ -175,7 +177,6 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csSprite3DFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -721,10 +722,12 @@ csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite3DFactorySaver::~csSprite3DFactorySaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
 }
 
@@ -733,7 +736,6 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
   csSprite3DFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -886,10 +888,12 @@ csSprite3DLoader::csSprite3DLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite3DLoader::~csSprite3DLoader ()
 {
+  SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
 }
 
@@ -898,7 +902,6 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
   csSprite3DLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 
@@ -1073,10 +1076,12 @@ csSprite3DSaver::csSprite3DSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  plugin_mgr = NULL;
 }
 
 csSprite3DSaver::~csSprite3DSaver ()
 {
+  SCF_DEC_REF (plugin_mgr);
   if (reporter) reporter->DecRef ();
 }
 
@@ -1085,7 +1090,6 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
   csSprite3DSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->IncRef ();
   return true;
 }
 

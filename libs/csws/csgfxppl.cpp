@@ -66,13 +66,11 @@ void csGraphicsPipeline::Initialize (iObjectRegistry *object_reg)
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (G3D)
   {
-    G3D->IncRef ();
     (G2D = G3D->GetDriver2D ())->IncRef ();
   }
   else
   {
     G2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
-    G2D->IncRef ();
   }
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
   CanvasResize ();

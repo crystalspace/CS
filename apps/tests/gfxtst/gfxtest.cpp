@@ -569,7 +569,6 @@ int main (int argc, char *argv[])
     printf("could not load image loader");
     return -1;
   }
-  ImageLoader->IncRef ();
   ImageLoader->SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)

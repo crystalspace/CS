@@ -81,7 +81,10 @@ void csGraphics2DAlleg::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.canvas.allegro", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -133,6 +136,7 @@ bool csGraphics2DAlleg::Initialize (iObjectRegistry *object_reg)
   {
     q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
     EventOutlet = q->CreateEventOutlet (this);
+    q->DecRef ();
   }
   return true;
 }
@@ -173,6 +177,7 @@ bool csGraphics2DAlleg::Open ()
   iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
   CS_ASSERT (doshelper != NULL);
   doshelper->DoEnablePrintf (false);
+  doshelper->DecRef ();
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -239,6 +244,7 @@ void csGraphics2DAlleg::Close (void)
   iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
   CS_ASSERT (doshelper != NULL);
   doshelper->DoEnablePrintf (true);
+  doshelper->DecRef ();
 
   set_gfx_mode (GFX_TEXT, 0, 0, 0, 0);
 }

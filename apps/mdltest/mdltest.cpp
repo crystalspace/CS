@@ -112,7 +112,10 @@ void Simple::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.mdltest", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -267,6 +270,7 @@ iModelData *Simple::ImportModel (const char *fn)
 
 Simple::Simple ()
 {
+  vc = NULL;
   view = NULL;
   engine = NULL;
   loader = NULL;
@@ -276,6 +280,7 @@ Simple::Simple ()
 
 Simple::~Simple ()
 {
+  if (vc) vc->DecRef ();
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
@@ -363,73 +368,62 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    exit (-1);
   }
-  g3d->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
-    abort ();
+    exit (-1);
   }
-  kbd->IncRef();
 
   crossbuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
   if (!crossbuilder)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iCrossBuilder plugin!");
-    abort ();
+    exit (-1);
   }
-  crossbuilder->IncRef ();
 
   converter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
   if (!converter)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!");
-    abort ();
+    exit (-1);
   }
-  converter->IncRef ();
 
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
-    abort ();
+    exit (-1);
   }
-  vfs->IncRef ();
 
   iImageIO *imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!imageio)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!\n");
-    abort ();
+    exit (-1);
   }
-  imageio->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -464,7 +458,10 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // -------------------------------------------------------------------------
 
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
   const char *Filename = cmdline->GetName (0);
+  cmdline->DecRef ();
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel ();
 
   csModelDataTools::MergeObjects (Model, true);
@@ -534,7 +531,11 @@ bool Simple::HandleEvent (iEvent& Event)
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

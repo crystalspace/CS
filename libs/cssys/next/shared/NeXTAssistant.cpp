@@ -94,8 +94,6 @@ iEventQueue* NeXTAssistant::get_event_queue()
   if (event_queue == 0 && registry != 0)
   {
     event_queue = CS_QUERY_REGISTRY(registry, iEventQueue);
-    if (event_queue != 0)
-      event_queue->IncRef();
   }
   return event_queue;
 }
@@ -277,6 +275,7 @@ bool csDefaultRunLoop(iObjectRegistry* r)
   if (a != 0)
   {
     iNeXTAssistantLocal* al = SCF_QUERY_INTERFACE(a, iNeXTAssistantLocal);
+    a->DecRef ();
     if (al != 0)
     {
       al->start_event_loop();
@@ -311,6 +310,9 @@ bool csPlatformShutdown(iObjectRegistry* r)
 {
   iNeXTAssistant* a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
   if (a != 0)
+  {
     r->Unregister(a, "NeXTAssistant"); // DecRefs() assistant as a side-effect.
+    a->DecRef ();
+  }
   return true;
 }

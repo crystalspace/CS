@@ -126,6 +126,7 @@ Lighter::Lighter ()
   engine = NULL;
   loader = NULL;
   g3d = NULL;
+  vc = NULL;
 }
 
 Lighter::~Lighter ()
@@ -133,6 +134,7 @@ Lighter::~Lighter ()
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
+  if (vc) vc->DecRef ();
 }
 
 void Lighter::Report (int severity, const char* msg, ...)
@@ -141,7 +143,10 @@ void Lighter::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.cslight", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -200,40 +205,27 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  if (!VFS)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
-    abort ();
-  }
-
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  loader->IncRef ();
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    exit (-1);
   }
-  g3d->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   g2d = g3d->GetDriver2D ();
@@ -273,6 +265,9 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 
   engine->SetLightingCacheMode (CS_ENGINE_CACHE_WRITE);
 
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+
   char map_dir[255];
   const char* val = cmdline->GetName ();
   if (!val)
@@ -282,6 +277,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     Cleanup ();
     exit (1);
   }
+  cmdline->DecRef ();
   // if an absolute path is given, copy it. Otherwise prepend "/lev/".
   if (val[0] == '/')
     strcpy (map_dir, val);
@@ -291,6 +287,13 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   // Check the map and mount it if required
   char tmp [100];
   sprintf (tmp, "%s/", map_dir);
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
+    exit (-1);
+  }
+
   if (!VFS->Exists (map_dir))
   {
     char *name = strrchr (map_dir, '/');
@@ -306,6 +309,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 
   // Set VFS current directory to the level we want to load.
   VFS->ChDir (map_dir);
+  VFS->DecRef ();
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {

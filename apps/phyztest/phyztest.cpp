@@ -147,12 +147,14 @@ Phyztest::Phyztest ()
   kbd = NULL;
   room_collwrap = NULL;
   bot_sto = NULL;
+  vc = NULL;
 }
 
 Phyztest::~Phyztest ()
 {
   delete bot_sto;
-  SCF_DEC_REF (room_collwrap)
+  SCF_DEC_REF (vc);
+  SCF_DEC_REF (room_collwrap);
   SCF_DEC_REF (cdsys);
   SCF_DEC_REF (view);
   SCF_DEC_REF (courierFont);
@@ -169,7 +171,10 @@ void Phyztest::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.phyztest", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -251,48 +256,42 @@ bool Phyztest::Initialize (int argc, const char* const argv[],
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    abort ();
+    exit (-1);
   }
-  myG3D->IncRef ();
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
-    abort ();
+    exit (-1);
   }
-  myG2D->IncRef ();
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    abort ();
+    exit (-1);
   }
-  engine->IncRef ();
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    abort ();
+    exit (-1);
   }
-  LevelLoader->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
-    abort ();
+    exit (-1);
   }
-  kbd->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -312,8 +311,10 @@ bool Phyztest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.rapid",
   	iCollideSystem);
+  plugin_mgr->DecRef ();
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Phyztest Crystal Space Application version 0.1.");
@@ -332,7 +333,11 @@ bool Phyztest::Initialize (int argc, const char* const argv[],
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "LIBRARY NOT LOADED!...");
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet ()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet ()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return false;
   }
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
@@ -698,7 +703,11 @@ bool Phyztest::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet ()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet ()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
   if ((Event.Type == csevBroadcast) && 

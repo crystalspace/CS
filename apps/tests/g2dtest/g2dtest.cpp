@@ -159,6 +159,7 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
   {
     EventOutlet = q->GetEventOutlet();
     EventOutlet->IncRef();
+    q->DecRef ();
   }
 }
 
@@ -898,7 +899,8 @@ int main (int argc, char *argv[])
       return -1;
     }
   }
-  else System.myG2D->IncRef ();
+  plugin_mgr->DecRef ();
+  cmdline->DecRef ();
 
   if (!System.myG2D)
   {

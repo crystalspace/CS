@@ -90,11 +90,13 @@ BumpTest::BumpTest ()
   myG3D = NULL;
   kbd = NULL;
   room = NULL;
+  vc = NULL;
 }
 
 BumpTest::~BumpTest ()
 {
   delete prBump;
+  if (vc) vc->DecRef ();
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
@@ -108,7 +110,10 @@ void BumpTest::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.bumptest", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -333,7 +338,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
-  engine->IncRef ();
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
@@ -341,7 +345,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
-  LevelLoader->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
@@ -349,7 +352,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
-  myG3D->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -357,7 +359,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
     abort ();
   }
-  kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
@@ -559,7 +560,11 @@ bool BumpTest::BumpHandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
 

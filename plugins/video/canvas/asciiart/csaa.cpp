@@ -70,7 +70,6 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   config.AddConfig(object_reg, "/config/video.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
-  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   HardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
 
   aa_defparams.width =
@@ -129,7 +128,10 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q = System->CreateEventOutlet (this);
+    q->DecRef ();
+  }
   return true;
 }
 

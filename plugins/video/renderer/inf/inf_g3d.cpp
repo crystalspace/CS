@@ -133,6 +133,7 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.infinite",
   	iGraphics2D);
+  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))
@@ -148,7 +149,10 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->DecRef ();
+  }
 
   return true;
 }

@@ -41,10 +41,13 @@ csConfigAccess::~csConfigAccess()
   if (object_reg)
   {
     iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-    int i;
     if (cfgmgr)
+    {
+      int i;
       for (i = 0; i < ConfigFiles.Length (); i++)
 	cfgmgr->RemoveDomain ((iConfigFile *)ConfigFiles.Get (i));
+      cfgmgr->DecRef ();
+    }
   }
 }
 
@@ -60,16 +63,20 @@ void csConfigAccess::AddConfig (iObjectRegistry *object_reg, const char *fname,
     //CS_ASSERT (VFS != NULL);
   }
   ConfigFiles.Push (cfgmgr->AddDomain (fname, VFS, priority));
+  cfgmgr->DecRef ();
+  if (VFS) VFS->DecRef ();
 }
 
 iConfigFile *csConfigAccess::operator->()
 {
   iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  cfg->DecRef ();
   return cfg;
 }
 
 csConfigAccess::operator iConfigFile* ()
 {
   iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  cfg->DecRef ();
   return cfg;
 }

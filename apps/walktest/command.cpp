@@ -53,7 +53,6 @@ iCamera* csCommandProcessor::camera = NULL;
 iGraphics3D* csCommandProcessor::g3d = NULL;
 iConsoleOutput* csCommandProcessor::console = NULL;
 iObjectRegistry* csCommandProcessor::object_reg = NULL;
-iPluginManager* csCommandProcessor::plugin_mgr = NULL;
 iFile* csCommandProcessor::script = NULL;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
@@ -75,7 +74,6 @@ void csCommandProcessor::Initialize (iEngine* engine, iCamera* camera,
   csCommandProcessor::g3d = g3d;
   csCommandProcessor::console = console;
   csCommandProcessor::object_reg = objreg;
-  csCommandProcessor::plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
 }
 
 bool csCommandProcessor::PerformLine (const char* line)
@@ -315,7 +313,11 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   if (!strcasecmp (cmd, "quit"))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
   }
   else if (!strcasecmp (cmd, "help"))
   {
@@ -367,6 +369,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
   {
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
     csVariant lod_level;
@@ -375,9 +378,11 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_float (arg, &f, "LOD detail", -1, 1000000);
     lod_level.SetFloat (f);
     SetConfigOption (type, "sprlod", lod_level);
+    plugin_mgr->DecRef ();
   }
   else if (!strcasecmp (cmd, "sprlight"))
   {
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
     csVariant lqual;
@@ -386,6 +391,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_long (arg, &l, "sprite lighting quality", 0, 3);
     lqual.SetLong (l);
     SetConfigOption (type, "sprlq", lqual);
+    plugin_mgr->DecRef ();
   }
   else if (!strcasecmp (cmd, "dnl"))
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "");
@@ -481,6 +487,7 @@ bool csCommandProcessor::start_script (const char* scr)
   iVFS* v = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (v)
   {
+    v->DecRef ();
     if (v->Exists (scr))
     {
       iFile* f = v->Open (scr, VFS_FILE_READ);

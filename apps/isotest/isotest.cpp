@@ -58,6 +58,7 @@ IsoTest *System;
 
 IsoTest::IsoTest ()
 {
+  vc = NULL;
   engine = NULL;
   view = NULL;
   world = NULL;
@@ -74,6 +75,7 @@ IsoTest::IsoTest ()
 
 IsoTest::~IsoTest ()
 {
+  if (vc) vc->DecRef ();
   if (player) player->DecRef ();
   if (light) light->DecRef();
   if (view) view->DecRef();
@@ -92,7 +94,10 @@ void IsoTest::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.application.isotest", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -202,7 +207,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No IsoEngine plugin!");
     return false;
   }
-  engine->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
@@ -210,7 +214,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
-  myG3D->IncRef ();
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
@@ -218,7 +221,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return false;
   }
-  myG2D->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -226,7 +228,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
     return false;
   }
-  kbd->IncRef();
 
   mouse = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
   if (!mouse)
@@ -234,7 +235,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iMouseDriver!");
     return false;
   }
-  mouse->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
@@ -248,6 +248,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   iFontServer *fsvr = CS_QUERY_REGISTRY (object_reg, iFontServer);
   font = fsvr->LoadFont(CSFONT_LARGE);
+  fsvr->DecRef ();
 
   // Setup the texture manager
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
@@ -771,7 +772,11 @@ bool IsoTest::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->DecRef ();
+    }
     return true;
   }
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == '\t'))

@@ -480,5 +480,8 @@ void csTextureManagerNull::SetPalette ()
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
+  {
     q->GetEventOutlet()->ImmediateBroadcast (cscmdPaletteChanged, this);
+    q->DecRef ();
+  }
 }

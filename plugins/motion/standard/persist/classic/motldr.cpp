@@ -112,7 +112,6 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
 	printf("Motion Loader: Virtual file system not loaded.. aborting\n");
 	return false;
   }
-  vfs->IncRef ();
   motman = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.motion.manager.default", iMotionManager);
   if (!motman)
@@ -236,7 +235,10 @@ void csMotionLoader::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
+  {
     rep->ReportV (severity, "crystalspace.motion.loader", msg, arg);
+    rep->DecRef ();
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -507,4 +509,5 @@ void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEng
   }
   else	
   printf("Motion Saver: Motion manager not loaded... aborting\n");
+  plugin_mgr->DecRef ();
 }

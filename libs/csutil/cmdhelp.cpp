@@ -74,7 +74,10 @@ void csCommandLineHelper::Help (iConfig* config)
 void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 	iCommandLineParser* cmdline)
 {
-  if (!cmdline) cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  if (!cmdline)
+    cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  else
+    cmdline->IncRef ();
   CS_ASSERT (cmdline != NULL);
 
   // First send a global cscmdCommandLineHelp event.
@@ -87,6 +90,7 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     // help the application usually exits. This means there is no chance
     // to actually process the event in the queue.
     evout->ImmediateBroadcast (cscmdCommandLineHelp, NULL);
+    evq->DecRef ();
   }
 
   iPluginManager* plgmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -109,6 +113,8 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
       config->DecRef ();
     }
   }
+  plgmgr->DecRef ();
+  cmdline->DecRef ();
 
   //@@@???
   printf (
@@ -122,8 +128,13 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
 	iCommandLineParser* cmdline)
 {
-  if (!cmdline) cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  if (!cmdline)
+    cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  else
+    cmdline->IncRef ();
   CS_ASSERT (cmdline != NULL);
-  return cmdline->GetOption ("help") != NULL;
+  bool rc = cmdline->GetOption ("help") != NULL;
+  cmdline->DecRef ();
+  return rc;
 }
 
