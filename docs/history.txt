@@ -4242,7 +4242,7 @@ chronological order.
 	      iObjectRegistry reference _after_ they had already dereferenced
 	      the argument, which meant that the reference type information had
 	      already been thrown away.	 Thus, the tests _always_ failed.  The
-	      iCollideSystem::GetCollisionParis() override suffered from the
+	      iCollideSystem::GetCollisionPairs() override suffered from the
 	      same bug when checking if its first argument was an
 	      iCollideSystem reference.	 They now use the high-level
 	      SWIG_ConvertPtr() to check the type and perform the dereference,
