@@ -119,7 +119,7 @@ void csPolygon2D::DrawFilled (
   g3dpoly.num = num_vertices;
   if (poly->GetMaterialWrapper ()) poly->GetMaterialWrapper ()->Visit ();
   g3dpoly.mat_handle = poly->GetMaterialHandle ();
-  g3dpoly.mixmode = poly->GetLightMapInfo ()->GetMixMode ();
+  g3dpoly.mixmode = poly->GetMixMode ();
   g3dpoly.mixmode &= ~(CS_FX_ALPHA | CS_FX_MASK_ALPHA);
   if (poly->GetAlpha ())
     g3dpoly.mixmode |= CS_FX_SETALPHA_INT (poly->GetAlpha ());

@@ -242,7 +242,7 @@ private:
   csPolygon3D* polygon;
 
   /// How to map the lightmap on the polygon.
-  csLightMapMapping mapping;
+  csLightMapMapping* mapping;
 
   /// LightMap.
   csLightMap* lm;
@@ -271,7 +271,7 @@ public:
   static float cfg_cosinus_factor;
 
   /// Constructor.
-  csPolyTexture ();
+  csPolyTexture (csLightMapMapping* mapping);
   /// Destructor.
   virtual ~csPolyTexture ();
 
@@ -294,11 +294,6 @@ public:
 
   /// Get the cslightmap, for engine internal use (users see GetLightMap below)
   csLightMap *GetCSLightMap() { return lm; }
-
-  /**
-   * Calculate the bounding box in (u,v) space for the lighted texture.
-   */
-  void CreateBoundingTextureBox ();
 
   /**
    * Initialize the lightmaps.
@@ -332,7 +327,7 @@ public:
   virtual iMaterialHandle *GetMaterialHandle ();
   virtual const csLightMapMapping& GetMapping () const
   {
-    return mapping;
+    return *mapping;
   }
 
   /// Check if dynamic lighting information should be recalculated

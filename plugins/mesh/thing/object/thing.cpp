@@ -1107,7 +1107,8 @@ void csThing::HardTransform (const csReversibleTransform &t)
         if (lmi && lmi->GetPolyTxtPlane () == pl)
         {
           lmi->SetTxtPlane (new_pl->GetPrivateObject ());
-          lmi->Setup (p, p->GetMaterialWrapper ());
+	  lmi->GetPolyTex ()->SetPolygon (p);
+	  p->CreateBoundingTextureBox ();
         }
       }
     }

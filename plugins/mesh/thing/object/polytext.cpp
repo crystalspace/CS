@@ -47,7 +47,7 @@ SCF_IMPLEMENT_IBASE(csPolyTexture)
   SCF_IMPLEMENTS_INTERFACE(iPolygonTexture)
 SCF_IMPLEMENT_IBASE_END
 
-csPolyTexture::csPolyTexture ()
+csPolyTexture::csPolyTexture (csLightMapMapping* mapping)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
@@ -57,6 +57,7 @@ csPolyTexture::csPolyTexture ()
   polygon = NULL;
   shadow_bitmap = NULL;
   light_version = 0;
+  csPolyTexture::mapping = mapping;
 }
 
 csPolyTexture::~csPolyTexture ()
@@ -132,61 +133,6 @@ void csPolyTexture::SetLightMap (csLightMap *lightmap)
   }
 
   lm = lightmap;
-}
-
-void csPolyTexture::CreateBoundingTextureBox ()
-{
-  // First we compute the bounding box in 2D texture space (uv-space).
-  float min_u = 1000000000.;
-  float min_v = 1000000000.;
-  float max_u = -1000000000.;
-  float max_v = -1000000000.;
-
-  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-
-  int i;
-  csVector3 v1, v2;
-  for (i = 0; i < polygon->GetVertices ().GetVertexCount (); i++)
-  {
-    v1 = polygon->Vobj (i);           // Coordinates of vertex in object space.
-    v1 -= txt_pl->v_obj2tex;
-    v2 = (txt_pl->m_obj2tex) * v1;    // Coordinates of vertex in texture space.
-    if (v2.x < min_u) min_u = v2.x;
-    if (v2.x > max_u) max_u = v2.x;
-    if (v2.y < min_v) min_v = v2.y;
-    if (v2.y > max_v) max_v = v2.y;
-  }
-
-  // used in hardware accel drivers
-  mapping.Fmin_u = min_u;
-  mapping.Fmax_u = max_u;
-  mapping.Fmin_v = min_v;
-  mapping.Fmax_v = max_v;
-
-  int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
-  if (mat_handle && mat_handle->GetTexture ())
-    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
-  else
-    ww = hh = 64;
-  mapping.Imin_u = QRound (min_u * ww);
-  mapping.Imin_v = QRound (min_v * hh);
-  int Imax_u = QRound (max_u * ww);
-  int Imax_v = QRound (max_v * hh);
-
-  mapping.h = Imax_v - mapping.Imin_v;
-  mapping.w_orig = Imax_u - mapping.Imin_u;
-  mapping.w = 1;
-  mapping.shf_u = 0;
-  while (true)
-  {
-    if (mapping.w_orig <= mapping.w) break;
-    mapping.w <<= 1;
-    mapping.shf_u++;
-  }
-
-  mapping.fdu = min_u * ww;
-  mapping.fdv = min_v * hh;
 }
 
 bool csPolyTexture::RecalculateDynamicLights ()
@@ -390,16 +336,16 @@ void csPolyTexture::FillLightMap (
     float inv_ww = 1.0f / float (ww);
     float inv_hh = 1.0f / float (hh);
     v.z = 0;
-    v.x = (-2 * csLightMap::lightcell_size + mapping.Imin_u) * inv_ww;
-    v.y = (-2 * csLightMap::lightcell_size + mapping.Imin_v) * inv_hh;
+    v.x = (-2 * csLightMap::lightcell_size + mapping->Imin_u) * inv_ww;
+    v.y = (-2 * csLightMap::lightcell_size + mapping->Imin_v) * inv_hh;
     poly[0] = m_t2w * v + v_t2w - lightpos;
-    v.x = ((lm->rwidth + 2) * csLightMap::lightcell_size + mapping.Imin_u)
+    v.x = ((lm->rwidth + 2) * csLightMap::lightcell_size + mapping->Imin_u)
     	* inv_ww;
     poly[1] = m_t2w * v + v_t2w - lightpos;
-    v.y = ((lm->rheight + 2) * csLightMap::lightcell_size + mapping.Imin_v)
+    v.y = ((lm->rheight + 2) * csLightMap::lightcell_size + mapping->Imin_v)
     	* inv_hh;
     poly[2] = m_t2w * v + v_t2w - lightpos;
-    v.x = (-2 * csLightMap::lightcell_size + mapping.Imin_u) * inv_ww;
+    v.x = (-2 * csLightMap::lightcell_size + mapping->Imin_u) * inv_ww;
     poly[3] = m_t2w * v + v_t2w - lightpos;
 
     // To transform a frustum coordinate to lightmap space we use
@@ -442,8 +388,8 @@ void csPolyTexture::FillLightMap (
     csVector3 TL = Mw2t * (lightpos - Vw2t);
     float wl = float (ww) * inv_lightcell_size;
     float hl = float (hh) * inv_lightcell_size;
-    float ul = -float (mapping.Imin_u) * inv_lightcell_size;
-    float vl = -float (mapping.Imin_v) * inv_lightcell_size;
+    float ul = -float (mapping->Imin_u) * inv_lightcell_size;
+    float vl = -float (mapping->Imin_v) * inv_lightcell_size;
     csVector3 trans_u (Mw2t.m11 * wl, Mw2t.m12 * wl, Mw2t.m13 * wl);
     float shift_u = TL.x * wl + ul;
     csVector3 trans_v (Mw2t.m21 * hl, Mw2t.m22 * hl, Mw2t.m23 * hl);
@@ -545,10 +491,10 @@ void csPolyTexture::FillLightMap (
 void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
 {
   int lw = 1 +
-    ((mapping.w_orig + csLightMap::lightcell_size - 1) >>
+    ((mapping->w_orig + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
   int lh = 1 +
-    ((mapping.h + csLightMap::lightcell_size - 1) >>
+    ((mapping->h + csLightMap::lightcell_size - 1) >>
     	csLightMap::lightcell_shift);
 
   int u, uv;
@@ -610,8 +556,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
       v1 = txt_pl->m_world2tex * (lp->GetVertex (mi) + lightpos
       	- txt_pl->v_world2tex);
-      f_uv[i].x = (v1.x * ww - mapping.Imin_u) * inv_lightcell_size;
-      f_uv[i].y = (v1.y * hh - mapping.Imin_v) * inv_lightcell_size;
+      f_uv[i].x = (v1.x * ww - mapping->Imin_u) * inv_lightcell_size;
+      f_uv[i].y = (v1.y * hh - mapping->Imin_v) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
       if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
     }
@@ -749,8 +695,8 @@ b:
         ru = u << csLightMap::lightcell_shift;
         rv = sy << csLightMap::lightcell_shift;
 
-        v1.x = (float)(ru + mapping.Imin_u) * invww;
-        v1.y = (float)(rv + mapping.Imin_v) * invhh;
+        v1.x = (float)(ru + mapping->Imin_u) * invww;
+        v1.y = (float)(rv + mapping->Imin_v) * invhh;
         v1.z = 0;
         v2 = vv + m_t2w * v1;
 
@@ -883,7 +829,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
       bool created = false;
       if (!smap)
       {
-        smap = lm->NewShadowMap (light, mapping.w, mapping.h);
+        smap = lm->NewShadowMap (light, mapping->w, mapping->h);
 	created = true;
       }
 
@@ -891,8 +837,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
       bool relevant = shadow_bitmap->UpdateShadowMap (
         shadowmap,
         csLightMap::lightcell_shift,
-        mapping.Imin_u,
-        mapping.Imin_v,
+        mapping->Imin_u,
+        mapping->Imin_v,
         mul_u,
         mul_v,
         m_t2w,
@@ -921,8 +867,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
     shadow_bitmap->UpdateLightMap (
         lightmap,
         csLightMap::lightcell_shift,
-        mapping.Imin_u,
-        mapping.Imin_v,
+        mapping->Imin_u,
+        mapping->Imin_v,
         mul_u,
         mul_v,
         m_t2w,

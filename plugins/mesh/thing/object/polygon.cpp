@@ -63,36 +63,17 @@ static engine3d_VectorArray *VectorArray = NULL;
 
 //---------------------------------------------------------------------------
 
-csPolyTexLightMap::csPolyTexLightMap ()
+csPolyTexLightMap::csPolyTexLightMap (csLightMapMapping* mapping)
 {
-  DG_ADDI (this, NULL);
-  DG_TYPE (this, "csPolyTexLightMap");
   txt_plane = NULL;
-  tex = new csPolyTexture ();
-  DG_LINK (this, tex);
+  tex = new csPolyTexture (mapping);
   lightmap_up_to_date = false;
-  Alpha = 0;
-#ifndef CS_USE_NEW_RENDERER
-  MixMode = CS_FX_COPY;
-#endif // CS_USE_NEW_RENDERER
 }
 
 csPolyTexLightMap::~csPolyTexLightMap ()
 {
-  if (tex)
-  {
-    DG_UNLINK (this, tex);
-    tex->DecRef ();
-  }
-
+  if (tex) tex->DecRef ();
   if (txt_plane) txt_plane->DecRef ();
-  DG_REM (this);
-}
-
-void csPolyTexLightMap::Setup (csPolygon3D *poly3d, iMaterialWrapper *mat)
-{
-  tex->SetPolygon (poly3d);
-  tex->CreateBoundingTextureBox ();
 }
 
 csPolyTexture *csPolyTexLightMap::GetPolyTex ()
@@ -138,13 +119,13 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
-  DG_TYPE ((csObject *)this, "csPolygon3D");
   thing = NULL;
 
   csPolygon3D::material = material;
   name = NULL;
 
   txt_info = NULL;
+  mapping = NULL;
 
   portal = NULL;
 
@@ -159,18 +140,19 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
   uvz = NULL;
   isClipped = false;
 #endif
+
+  Alpha = 0;
+#ifndef CS_USE_NEW_RENDERER
+  MixMode = CS_FX_COPY;
+#endif // CS_USE_NEW_RENDERER
 }
 
 csPolygon3D::~csPolygon3D ()
 {
   delete[] name;
 
-  if (txt_info)
-  {
-    DG_UNLINK ((csObject *)this, txt_info);
-    delete txt_info;
-    txt_info = NULL;
-  }
+  delete txt_info;
+  delete mapping;
 
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
@@ -196,6 +178,63 @@ csPolygon3D::~csPolygon3D ()
 #endif
 }
 
+void csPolygon3D::CreateBoundingTextureBox ()
+{
+  if (!mapping) mapping = new csLightMapMapping ();
+
+  // First we compute the bounding box in 2D texture space (uv-space).
+  float min_u = 1000000000.;
+  float min_v = 1000000000.;
+  float max_u = -1000000000.;
+  float max_v = -1000000000.;
+
+  csPolyTxtPlane *txt_pl = txt_info->GetTxtPlane ();
+
+  int i;
+  csVector3 v1, v2;
+  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  {
+    v1 = Vobj (i);           	      // Coordinates of vertex in object space.
+    v1 -= txt_pl->v_obj2tex;
+    v2 = (txt_pl->m_obj2tex) * v1;    // Coordinates of vertex in texture space.
+    if (v2.x < min_u) min_u = v2.x;
+    if (v2.x > max_u) max_u = v2.x;
+    if (v2.y < min_v) min_v = v2.y;
+    if (v2.y > max_v) max_v = v2.y;
+  }
+
+  // used in hardware accel drivers
+  mapping->Fmin_u = min_u;
+  mapping->Fmax_u = max_u;
+  mapping->Fmin_v = min_v;
+  mapping->Fmax_v = max_v;
+
+  int ww, hh;
+  iMaterialHandle* mat_handle = GetMaterialHandle ();
+  if (mat_handle && mat_handle->GetTexture ())
+    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  else
+    ww = hh = 64;
+  mapping->Imin_u = QRound (min_u * ww);
+  mapping->Imin_v = QRound (min_v * hh);
+  int Imax_u = QRound (max_u * ww);
+  int Imax_v = QRound (max_v * hh);
+
+  mapping->h = Imax_v - mapping->Imin_v;
+  mapping->w_orig = Imax_u - mapping->Imin_u;
+  mapping->w = 1;
+  mapping->shf_u = 0;
+  while (true)
+  {
+    if (mapping->w_orig <= mapping->w) break;
+    mapping->w <<= 1;
+    mapping->shf_u++;
+  }
+
+  mapping->fdu = min_u * ww;
+  mapping->fdv = min_v * hh;
+}
+
 void csPolygon3D::SetParent (csThing *thing)
 {
   if (thing == csPolygon3D::thing) return ;           // Nothing to do.
@@ -212,14 +251,15 @@ void csPolygon3D::EnableTextureMapping (bool enable)
 
   if (enable)
   {
-    txt_info = new csPolyTexLightMap ();
-    DG_LINK ((csObject *)this, txt_info);
+    mapping = new csLightMapMapping ();
+    txt_info = new csPolyTexLightMap (mapping);
   }
   else
   {
-    DG_UNLINK ((csObject *)this, txt_info);
     delete txt_info;
     txt_info = NULL;
+    delete mapping;
+    mapping = NULL;
   }
 }
 
@@ -369,14 +409,14 @@ bool csPolygon3D::eiPolygon3DStatic::SetPlane (const char *iName)
 
 bool csPolygon3D::IsTransparent ()
 {
-  if (!txt_info) return true;
-  if (GetAlpha ()) return true;
+  if (Alpha) return true;
 #ifndef CS_USE_NEW_RENDERER
-  if (txt_info->GetMixMode () != CS_FX_COPY) return true;
+  if (MixMode != CS_FX_COPY) return true;
 #endif // CS_USE_NEW_RENDERER
 
   iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
-  return txt_handle && ((txt_handle->GetAlphaMap () || txt_handle->GetKeyColor ()));
+  return txt_handle && ((txt_handle->GetAlphaMap ()
+  	|| txt_handle->GetKeyColor ()));
 }
 
 int csPolygon3D::Classify (const csPlane3 &pl)
@@ -540,16 +580,16 @@ void csPolygon3D::Finish ()
     return;
   }
 
-  txt_info->Setup (this, material);
+  txt_info->tex->SetPolygon (this);
+  CreateBoundingTextureBox ();
   txt_info->tex->SetLightMap (NULL);
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
-  const csLightMapMapping& mapping = txt_info->tex->mapping;
   if (flags.Check (CS_POLY_LIGHTING))
   {
-    int lmw = csLightMap::CalcLightMapWidth (mapping.w_orig);
-    int lmh = csLightMap::CalcLightMapHeight (mapping.h);
+    int lmw = csLightMap::CalcLightMapWidth (mapping->w_orig);
+    int lmh = csLightMap::CalcLightMapHeight (mapping->h);
     int max_lmw, max_lmh;
     thing->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
@@ -565,7 +605,7 @@ void csPolygon3D::Finish ()
 
       csColor ambient;
       thing->thing_type->engine->GetAmbientLight (ambient);
-      lm->Alloc (mapping.w_orig, mapping.h,
+      lm->Alloc (mapping->w_orig, mapping->h,
       	int(ambient.red * 255.0f),
       	int(ambient.green * 255.0f),
       	int(ambient.blue * 255.0f));
@@ -1608,11 +1648,12 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
 {
   if (txt_info)
   {
+    CS_ASSERT (mapping != NULL);
     if (txt_info->tex->lm == NULL) return NULL;
     const char* error = txt_info->tex->lm->ReadFromCache (
           file,
-          txt_info->tex->mapping.w_orig,
-          txt_info->tex->mapping.h,
+          mapping->w_orig,
+          mapping->h,
           this,
 	  NULL,
 	  thing->thing_type->engine);

@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 20-Mar-2003
 	- Split iThingState with iThingState and iThingFactoryState.
 	- Renamed GetPolygonStatic() to GetPolygon().
+	- Moved alpha and MixMode from csPolyTexLightMap to csPolygon3D.
+	- Moved csLightMapMapping (mapping) from csPolygonTexture to
+	  csPolygon3D.
 19-Mar-2003
 	- Removed a few unused flags from csPolygon3D.
 	- In order to be able to make real thing factories (that don't use

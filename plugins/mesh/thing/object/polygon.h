@@ -57,21 +57,6 @@ class csPolyTexLightMap
   friend class csPolygon3D;
 
 private:
-  /**
-   * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
-   * Valid values are from 0 to 100; some renderers in some modes will
-   * approximate it (and some values like 25/50/75 are optimized for speed).
-   * Note that alpha is in range 0..255, 0 for 0% and 255 for 100%.
-   */
-  uint16 Alpha;
-
-  /**
-   * MixMode to use for drawing this polygon (plus alpha value
-   * which is stored separately). The GetMixMode() function will
-   * overlap both variables to get one compound value.
-   */
-  uint MixMode;
-
   /// The transformed texture for this polygon.
   csPolyTexture *tex;
 
@@ -88,15 +73,12 @@ private:
 
 private:
   /// Constructor.
-  csPolyTexLightMap ();
+  csPolyTexLightMap (csLightMapMapping* mapping);
 
   /// Destructor.
   ~csPolyTexLightMap ();
 
 public:
-  /// Setup for the given polygon and material.
-  void Setup (csPolygon3D* poly3d, iMaterialWrapper* math);
-
   /// Get the polytexture (lighted texture)
   csPolyTexture* GetPolyTex ();
 
@@ -108,17 +90,6 @@ public:
    * Return the texture plane of this polygon.
    */
   iPolyTxtPlane* GetPolyTxtPlane () const;
-
-  /// Get the alpha value for this polygon
-  int GetAlpha () { return Alpha; }
-  /// Set the alpha value for this polygon
-  void SetAlpha (int a) { Alpha = a; }
-
-  /// Sets the mode that is used for DrawPolygonFX.
-  void SetMixMode (uint m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
-
-  /// Gets the mode that is used for DrawPolygonFX.
-  uint GetMixMode () { return (MixMode | Alpha); }
 
   /**
    * Set the texture plane.
@@ -234,6 +205,24 @@ private:
    */
   csPolyTexLightMap *txt_info;
 
+  /// How to map the lightmap on the polygon.
+  csLightMapMapping* mapping;
+
+  /**
+   * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
+   * Valid values are from 0 to 100; some renderers in some modes will
+   * approximate it (and some values like 25/50/75 are optimized for speed).
+   * Note that alpha is in range 0..255, 0 for 0% and 255 for 100%.
+   */
+  uint16 Alpha;
+
+  /**
+   * MixMode to use for drawing this polygon (plus alpha value
+   * which is stored separately). The GetMixMode() function will
+   * overlap both variables to get one compound value.
+   */
+  uint MixMode;
+
   /**
    * Return twice the signed area of the polygon in world space coordinates
    * using the yz, zx, and xy components.  In effect this calculates the
@@ -274,6 +263,12 @@ public:
    * some stuff is shared).
    */
   virtual ~csPolygon3D ();
+
+  /**
+   * Calculate the bounding box in (u,v) space for the lighted texture.
+   * This is used in case of lightmapping.
+   */
+  void CreateBoundingTextureBox ();
 
   /**
    * Enable or disable texture mapping.
@@ -850,8 +845,10 @@ public:
   bool PointOnPolygon (const csVector3& v);
 
   /// Get the alpha transparency value for this polygon.
-  int GetAlpha ()
-  { return txt_info ? txt_info->GetAlpha () : 0; }
+  int GetAlpha () const
+  {
+    return Alpha;
+  }
 
   /**
    * Set the alpha transparency value for this polygon (only if
@@ -860,8 +857,10 @@ public:
    * 75, and 100 will always work but other values may give
    * only the closest possible to one of the above.
    */
-  void SetAlpha (int iAlpha)
-  { if (txt_info) txt_info->SetAlpha (iAlpha); }
+  void SetAlpha (int alpha)
+  {
+    Alpha = alpha;
+  }
 
   /// Get the material handle for the texture manager.
   iMaterialHandle *GetMaterialHandle ();
@@ -871,14 +870,18 @@ public:
     return txt_info ? txt_info->GetPolyTex () : (iPolygonTexture*)NULL;
   }
 
+  /// Sets the mode that is used for DrawPolygonFX.
   void SetMixMode (uint m)
   {
-    if (txt_info) txt_info->SetMixMode (m);
+    MixMode = m & ~CS_FX_MASK_ALPHA;
   }
-  uint GetMixMode ()
+
+  /// Gets the mode that is used for DrawPolygonFX.
+  uint GetMixMode () const
   {
-    return txt_info ? txt_info->GetMixMode () : 0;
+    return (MixMode | Alpha);
   }
+
   iPolyTxtPlane* GetPolyTxtPlane () const
   {
     return txt_info ? txt_info->GetPolyTxtPlane () : NULL;

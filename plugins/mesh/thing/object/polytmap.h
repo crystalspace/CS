@@ -35,9 +35,8 @@ SCF_VERSION (csPolyTxtPlane, 0, 0, 1);
  */
 class csPolyTxtPlane : public csObject
 {
-  ///
   friend class csPolygon2D;
-  ///
+  friend class csPolygon3D;
   friend class csPolyTexture;
 
 private:
