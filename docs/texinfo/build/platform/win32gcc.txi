@@ -73,11 +73,12 @@ Adjust your @samp{PATH} environment variable.  On Windows 95 and 98 edit the
 SET PATH=C:\mingw32\bin
 @end example
 
-You must also add the following variable, so that @sc{gcc} can find the Python
+You must also add the following variables, so that @sc{gcc} can find the Python
 header files.
 
 @example
 SET PYTHON_INC=C:\mingw32\include
+SET PYTHONPATH=C:\mingw32\lib
 @end example
 
 @noindent
