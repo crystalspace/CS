@@ -21,6 +21,10 @@
 
 #include "csutil/scf.h"
 
+#if defined (OS_LINUX)
+#include <X11/Xlib.h>
+#endif
+
 SCF_VERSION (iGraphics2DGlide, 0, 0, 1);
 
 /**
@@ -39,6 +43,7 @@ struct iGraphics2DGlide : public iBase
   /// Query the display handle
   virtual Display *GetDisplay () = 0;
 #endif
+  virtual void SetVRetrace( bool wait4vretrace );
 };
 
 #endif // __IGLIDE2D_H__
