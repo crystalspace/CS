@@ -40,8 +40,14 @@ void csPlane3::Set (
   DD = -norm * v1;
 }
 
-static CS_DECLARE_GROWING_ARRAY (verts, csVector3);
-static CS_DECLARE_GROWING_ARRAY (vis, bool);
+CS_TYPEDEF_GROWING_ARRAY (csgeom_csPlane3_Verts, csVector3);
+CS_TYPEDEF_GROWING_ARRAY (csgeom_csPlane3_Vis, bool);
+CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Verts, csgeom_csPlane3_Verts,)
+CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Vis, csgeom_csPlane3_Vis,)
+
+static csgeom_csPlane3_Verts &verts = *GetStatic_csgeom_csPlane3_Verts ();
+static csgeom_csPlane3_Vis &vis = *GetStatic_csgeom_csPlane3_Vis ();
+
 static void CPInit (int len)
 {
   verts.SetLimit (len);

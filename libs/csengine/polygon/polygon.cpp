@@ -55,8 +55,11 @@
 // csPolygon3D is created and an DecRef each time it is deleted.
 // Thus, when the engine is cleaned, the array is automatically
 // cleaned too.
-static CS_DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 
+CS_TYPEDEF_GROWING_ARRAY_REF (engine3d_VectorArray, csVector3);
+CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, engine3d_VectorArray,)
+
+static engine3d_VectorArray &VectorArray = *GetStaticVectorArray();
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csPolyTexType)
   SCF_IMPLEMENTS_INTERFACE(iPolyTexType)

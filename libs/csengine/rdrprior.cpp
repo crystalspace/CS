@@ -83,7 +83,8 @@ struct comp_mesh_comp
   iMeshWrapper *mesh;
 };
 
-static CS_DECLARE_GROWING_ARRAY (comp_mesh_z, comp_mesh_comp);
+CS_TYPEDEF_GROWING_ARRAY (engine3d_comp_mesh_z, comp_mesh_comp);
+CS_IMPLEMENT_STATIC_VAR (GetStaticComp_Mesh_Comp, engine3d_comp_mesh_z,)
 
 static int comp_mesh (const void *el1, const void *el2)
 {
@@ -99,6 +100,7 @@ static int comp_mesh (const void *el1, const void *el2)
 
 void csRenderQueueSet::Sort (iRenderView *rview, int priority)
 {
+  static engine3d_comp_mesh_z &comp_mesh_z = *GetStaticComp_Mesh_Comp ();
   if (!Queues[priority]) return ;
 
   int rendsort = csEngine::current_engine->GetRenderPrioritySorting (

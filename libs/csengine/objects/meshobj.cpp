@@ -165,10 +165,12 @@ void csMeshWrapper::SetRenderPriority (long rp)
 }
 
 /// The list of lights that hit the mesh
-static CS_DECLARE_GROWING_ARRAY_REF (light_worktable, iLight *);
+CS_TYPEDEF_GROWING_ARRAY_REF (engine3d_LightWorkTable, iLight *);
+CS_IMPLEMENT_STATIC_VAR (GetStaticLightWorkTable, engine3d_LightWorkTable,)
 
 void csMeshWrapper::UpdateDeferedLighting (const csVector3 &pos)
 {
+  static engine3d_LightWorkTable &light_worktable = *GetStaticLightWorkTable ();
   const iSectorList *movable_sectors = movable.GetSectors ();
   if (defered_num_lights && movable_sectors->GetCount () > 0)
   {

@@ -2465,13 +2465,15 @@ csPolygon3D *csThing::IntersectSphere (
 }
 
 /// The list of fog vertices
-static CS_DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+CS_TYPEDEF_GROWING_ARRAY (engine3d_StaticFogVerts, G3DFogInfo);
+CS_IMPLEMENT_STATIC_VAR (GetStaticFogVerts, engine3d_StaticFogVerts,)
 
 bool csThing::DrawCurves (
   iRenderView *rview,
   iMovable *movable,
   csZBufMode zMode)
 {
+  static engine3d_StaticFogVerts &fog_verts = *GetStaticFogVerts ();
   if (GetCurveCount () <= 0) return false;
 
   iCamera *icam = rview->GetCamera ();

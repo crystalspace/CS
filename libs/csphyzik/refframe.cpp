@@ -39,9 +39,11 @@ ctReferenceFrame::ctReferenceFrame
 //	parent_frame = ref ? ref : &universe();
 }
 
+CS_IMPLEMENT_STATIC_VAR (GetStatic_ctReferenceFrame, ctReferenceFrame,)
+
 ctReferenceFrame& ctReferenceFrame::universe ()
 {
-  static ctReferenceFrame basis;
+  static ctReferenceFrame &basis = *GetStatic_ctReferenceFrame ();
   static bool initialized = false;
   if (!initialized)
   {
@@ -57,9 +59,11 @@ ctDeltaReferenceFrame::ctDeltaReferenceFrame ()
 	reference_count = 0; is_universe_frame = false;
 }
 
+CS_IMPLEMENT_STATIC_VAR (GetStatic_ctDeltaReferenceFrame, ctDeltaReferenceFrame,)
+
 ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe ()
 {
-  static ctDeltaReferenceFrame basis;
+  static ctDeltaReferenceFrame &basis = *GetStatic_ctDeltaReferenceFrame ();
   static bool initialized = false;
   if (!initialized)
   {
