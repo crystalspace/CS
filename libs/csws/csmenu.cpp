@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: menu class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,10 +25,9 @@
 #include "csws/csmenu.h"
 #include "csws/csapp.h"
 #include "csinput/csinput.h"
-#include "csengine/texture.h"
 
 // Menu texture name
-#define MENU_TEXTURE_NAME       "tex/menu.png"
+#define MENU_TEXTURE_NAME       "csws::Menu"
 // Amount of space at left and at right of each menu item
 #define MENUITEM_XSPACE         (9+2)
 // Amount of space at top and at bottom of each menu item

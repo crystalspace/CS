@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OSDEFS_H__
-#define __OSDEFS_H__
+#ifndef __CSOSDEFS_H__
+#define __CSOSDEFS_H__
 
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dosraw"
@@ -48,4 +48,4 @@ void _chdrive (char drive)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
-#endif // __OSDEFS_H__
+#endif // __CSOSDEFS_H__

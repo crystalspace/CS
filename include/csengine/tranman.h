@@ -22,7 +22,6 @@
 #include "cscom/com.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
-#include "csengine/sysitf.h"
 #include "csgeom/poly3d.h"
 
 /**

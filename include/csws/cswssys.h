@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Miscelaneous CSWS utilites
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,12 +20,12 @@
 #ifndef __CSWSSYS_H__
 #define __CSWSSYS_H__
 
-#include "cssys/common/sysdriv.h"
-#include "cssys/common/system.h"
+#include "cssys/sysdriv.h"
+#include "cssys/system.h"
 #include "csws/csapp.h"
 
-// A special variation of SysSystemDriver for csApp
-class appSystemDriver : public SysSystemDriver
+// A special variation of SysSystemDriver for CSWS
+class cswsSystemDriver : public SysSystemDriver
 {
   friend void cleanup ();
 
@@ -35,18 +34,15 @@ class appSystemDriver : public SysSystemDriver
   int *linecolor;
   int textcolor;
   csApp *application;
-  csWorld *world;
 
 public:
-  /// Initialize the application's system driver given csApp and csWorld
-  appSystemDriver (csApp *ParentApp, csWorld *ParentWorld);
+  /// Initialize the application's system driver given application object
+  cswsSystemDriver (csApp *ParentApp);
   /// Destroy the system driver object
-  virtual ~appSystemDriver ();
+  virtual ~cswsSystemDriver ();
   /// Initialize system driver and debug console
   virtual bool Initialize (int argc, char *argv[],
     const char *iConfigName, const char *iVfsConfigName, IConfig *config);
-  /// Close debug console
-  void CloseConsole ();
   /// Call application to process queued events
   virtual void NextFrame (long elapsed_time, long current_time);
   /// Replace DemoWrite() for output to debug console

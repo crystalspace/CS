@@ -19,42 +19,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/*
-    NOTE: Currently Allegro support is completely broken.
-    I don't see a single reason for using it, anyway.
-*/
-
 #include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/dosraw/raw.h"
 #include "cssys/djgpp/idjgpp.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 
-#ifdef USE_ALLEGRO
-#  include "allegro.h"
-#else
-#  include "djvidsys.h"
-#endif
+#include "djvidsys.h"
 
 static VideoSystem VS;
-
-#ifdef USE_ALLEGRO
-BITMAP *_vdata;
-#endif
 
 //--------------------------------------------------------- Static COM stuff ---
 
 static DllRegisterData gRegData =
 {
   &CLSID_DosRawGraphics2D,
-#ifdef USE_ALLEGRO
-  "crystalspace.graphics2d.allegro",
-  "Crystal Space 2D graphics driver for DOS/DJGPP using Allegro video library"
-#else
   "crystalspace.graphics2d.dosraw",
   "Crystal Space 2D graphics driver for DOS/DJGPP using raw framebuffer access"
-#endif
 };
 
 void Raw2DRegister ()

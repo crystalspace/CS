@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "walktest/walktest.h"
 #include "walktest/bot.h"
 #include "walktest/infmaze.h"
@@ -40,7 +40,6 @@
 #include "csengine/collider.h"
 #include "csutil/scanstr.h"
 #include "csutil/impexp.h"
-#include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "cssfxldr/common/snddata.h"
 #include "csparser/snddatao.h"
@@ -69,7 +68,7 @@ void SaveCamera (const char *fName)
   fprintf (f, "%f %f %f\n", m_o2t.m11, m_o2t.m12, m_o2t.m13);
   fprintf (f, "%f %f %f\n", m_o2t.m21, m_o2t.m22, m_o2t.m23); 
   fprintf (f, "%f %f %f\n", m_o2t.m31, m_o2t.m32, m_o2t.m33);
-  fprintf (f, "%s\n", csNameObject::GetName(*c->GetSector ()));
+  fprintf (f, "%s\n", c->GetSector ()->GetName ());
   fprintf (f, "%d\n", c->IsMirrored ());
   fprintf (f, "%f %f %f\n", Sys->angle.x, Sys->angle.y, Sys->angle.z);
   fclose (f);
@@ -167,7 +166,7 @@ void load_sprite (char *filename, char *templatename, char* txtname)
   CHK (delete filedata);
 
   // add this sprite to the world
-  csNameObject::AddName (*result, templatename);
+  result->SetName (templatename);
   result->SetTexture (Sys->view->GetWorld ()->GetTextures (), txtname);
 
   Sys->view->GetWorld ()->sprite_templates.Push (result);
@@ -182,7 +181,7 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 con
     return NULL;
   }
   csSprite3D* spr = tmpl->NewSprite ();
-  csNameObject::AddName (*spr, sname);
+  spr->SetName (sname);
   Sys->view->GetWorld ()->sprites.Push (spr);
   spr->MoveToSector (where);
   spr->SetMove (pos);
@@ -353,7 +352,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth, int wi
   if (!tmpl)
   {
     CHK (tmpl = new csSpriteTemplate ());
-    csNameObject::AddName (*tmpl, skelname);
+    tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
     tmpl->SetTexture (Sys->world->GetTextures (), "white.gif");
     int vertex_idx = 0;
@@ -538,7 +537,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, in
   if (!tmpl)
   {
     CHK (tmpl = new csSpriteTemplate ());
-    csNameObject::AddName (*tmpl, skelname);
+    tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
     tmpl->SetTexture (Sys->world->GetTextures (), "green.gif");
     int vertex_idx = 0;
@@ -664,7 +663,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radiu
   if (!tmpl) return;
   Bot* bot;
   CHK (bot = new Bot (tmpl));
-  csNameObject::AddName (*bot, "bot");
+  bot->SetName ("bot");
   Sys->view->GetWorld ()->sprites.Push (bot);
   bot->MoveToSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
@@ -1014,7 +1013,7 @@ void light_statics ()
     csSkeletonState* sk_state = spr->GetSkeletonState ();
     if (sk_state)
     {
-      const char* name = csNameObject::GetName (*spr);
+      const char* name = spr->GetName ();
       //if (!strcmp (name, "__skeltree__")) animate_skeleton_tree (sk_state);
       if (!strcmp (name, "__skelghost__"))
       {
@@ -1338,7 +1337,7 @@ static bool CommandHandler (char *cmd, char *arg)
     else
     {
       csSprite3D* sp = tmpl->NewSprite ();
-      csNameObject::AddName (*sp, "missile");
+      sp->SetName ("missile");
       Sys->view->GetWorld ()->sprites.Push (sp);
       sp->MoveToSector (Sys->view->GetCamera ()->GetSector ());
       ms->sprite = sp;
@@ -2150,7 +2149,7 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
           screenPoint.y = Event->Mouse.y;
           closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
           if (closestSprite)
-            Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", csNameObject::GetName(*closestSprite));
+            Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
           else
             Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
 	}
@@ -2270,7 +2269,7 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
       {
       nextSprite = (csSprite3D*)Sys->world->sprites[spriteIndex];
 
-//      Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", csNameObject::GetName(*nextSprite));
+//      Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", nextSprite->GetName ());
       if (nextSprite != baseSprite)
          {
          thisZLocation = nextSprite->GetScreenBoundingBox(*camera, screenBoundingBox);

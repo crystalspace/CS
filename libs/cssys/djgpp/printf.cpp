@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 // to be called before all printf() calls
 void csSystemDriver::console_open ()

@@ -23,10 +23,9 @@
 
 #include "sysdef.h"
 #include "csparser/crossbld.h"
-#include "csobject/nameobj.h"
 #include "csengine/world.h"
 #include "csgfxldr/csimage.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "csutil/csstrvec.h"
 #include "itexture.h"
 #include "itxtmgr.h"
@@ -221,11 +220,10 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
         CHK (char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1]);
         strcpy(prefixedname,prefixstring);
 	strcat(prefixedname,filename);
-	csNameObject::AddName(*defaulttexture,prefixedname);
+	defaulttexture->SetName (prefixedname);
 	CHK (delete[] prefixedname);
       }
-	csNameObject::AddName(*defaulttexture,filename);
-
+      defaulttexture->SetName (filename);
     }
 
     currententry = pakarchive.next_file(currententry);
@@ -339,7 +337,7 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File(
   delete modelfile;
 
   // name this texture as appropriate
-  csNameObject::AddName(*newtemplate,modelname);
+  newtemplate->SetName (modelname);
 
   /* make this template available for use in the given CS world */
   importdestination->sprite_templates.Push(newtemplate);
@@ -362,9 +360,8 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File(
 
   csTextureHandle *defaultskin = Import_Quake2Textures(skinpath,modelname,importdestination);
   
-  newtemplate->SetTexture( importdestination->GetTextures(),
-  			   const_cast<char *>( csNameObject::GetName(*defaultskin))
-			   );
+  newtemplate->SetTexture(importdestination->GetTextures (),
+    const_cast<char *>(defaultskin->GetName ()));
 
   newtemplate->GenerateLOD ();
   newtemplate->ComputeBoundingBox ();
@@ -458,10 +455,10 @@ csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
         CHK (char *prefixedname = new char[strlen(skinfilename)+strlen(prefixstring)+1]);
         strcpy(prefixedname,prefixstring);
 	strcat(prefixedname,skinfilename);
-	csNameObject::AddName(*defaulttexture,prefixedname);
+	defaulttexture->SetName (prefixedname);
 	CHK (delete[] prefixedname);
       }
-      csNameObject::AddName(*defaulttexture,skinfilename);
+      defaulttexture->SetName (skinfilename);
 
     }
   } /* end for(int skinfileindex...) */

@@ -26,7 +26,7 @@
 #include "csutil/impexp.h"
 
 // all int's in an MD2 file are little endian
-#include "cssys/common/csendian.h"
+#include "cssys/csendian.h"
 
 // upper bound onsize of biggest data element (vertex, polygon) in an MD2 file
 static int const MAX_DATAELEMENT_SIZE = 8192;

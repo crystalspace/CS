@@ -22,7 +22,6 @@
 #include "csengine/polytext.h"
 #include "csengine/lghtmap.h"
 #include "csengine/polyset.h"
-#include "csobject/nameobj.h"
 #include "ipolygon.h"
 
 IMPLEMENT_COMPOSITE_UNKNOWN( csPolygonSet, PolygonSet )
@@ -30,7 +29,7 @@ IMPLEMENT_COMPOSITE_UNKNOWN( csPolygonSet, PolygonSet )
 STDMETHODIMP IPolygonSet::GetName(const char** szName)
 {
     METHOD_PROLOGUE( csPolygonSet, PolygonSet );
-    *szName = csNameObject::GetName(*pThis);
+    *szName = pThis->GetName ();
     return S_OK;
 }
 
@@ -39,7 +38,7 @@ IMPLEMENT_COMPOSITE_UNKNOWN( csPolygon3D, Polygon3D )
 STDMETHODIMP IPolygon3D::GetName(const char** szName)
 {
     METHOD_PROLOGUE( csPolygon3D, Polygon3D );
-    *szName = csNameObject::GetName(*pThis);
+    *szName = pThis->GetName ();
     return S_OK;
 }
 

@@ -21,10 +21,10 @@
 #include <stdlib.h>
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
-#include "cssys/common/sysdriv.h"
-#include "cssys/common/console.h"
-#include "csgeom/csrect.h"
+#include "cssys/system.h"
+#include "cssys/sysdriv.h"
+#include "cssys/console.h"
+#include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"

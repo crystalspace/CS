@@ -21,7 +21,7 @@
 
 #include "cscom/com.h"
 #include "csinput/csinput.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "iunix.h"
 #include "igraph2d.h"
 

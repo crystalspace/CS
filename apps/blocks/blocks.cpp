@@ -18,7 +18,7 @@
 
 #define SYSDEF_ACCESS
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "csparser/csloader.h"
 #include "apps/blocks/blocks.h"
 #include "csutil/inifile.h"
@@ -35,7 +35,6 @@
 #include "csengine/lghtmap.h"
 #include "csengine/thing.h"
 #include "csengine/thingtpl.h"
-#include "csobject/nameobj.h"
 #include "csengine/textrans.h"
 #include "csengine/csview.h"
 #include "igraph3d.h"
@@ -141,7 +140,7 @@ void Blocks::add_pilar_template ()
 {
   float dim = BLOCK_DIM/2.;
   CHK (pilar_tmpl = new csThingTemplate ());
-  csNameObject::AddName (*pilar_tmpl, "pilar");
+  pilar_tmpl->SetName ("pilar");
   pilar_tmpl->AddVertex (-dim, 0, dim);
   pilar_tmpl->AddVertex (dim, 0, dim);
   pilar_tmpl->AddVertex (dim, 0, -dim);
@@ -229,7 +228,7 @@ void Blocks::add_pilar (int x, int y)
 {
   csThing* pilar;
   CHK (pilar = new csThing ());
-  csNameObject::AddName (*pilar, "pilar");
+  pilar->SetName ("pilar");
   pilar->SetSector (room);
   pilar->SetFlags (CS_ENTITY_MOVEABLE, 0);
   pilar->MergeTemplate (pilar_tmpl, pilar_txt, 1);
@@ -244,7 +243,7 @@ void Blocks::add_cube_template ()
 {
   float dim = BLOCK_DIM/2.;
   CHK (cube_tmpl = new csThingTemplate ());
-  csNameObject::AddName (*cube_tmpl, "cube");
+  cube_tmpl->SetName ("cube");
   cube_tmpl->AddVertex (-dim, -dim, dim);
   cube_tmpl->AddVertex (dim, -dim, dim);
   cube_tmpl->AddVertex (dim, -dim, -dim);
@@ -374,7 +373,7 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
 {
   csThing* cube;
   CHK (cube = new csThing ());
-  csNameObject::AddName (*cube, "cube");
+  cube->SetName ("cube");
   cube->SetSector (room);
   cube->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
   csVector3 shift (dx*BLOCK_DIM, dy*BLOCK_DIM, dz*BLOCK_DIM);
@@ -890,7 +889,7 @@ int main (int argc, char* argv[])
   csTextureHandle* tm = csLoader::LoadTexture (Sys->world, "txt3", "mystone2.gif");
 
   room = Sys->world->NewSector ();
-  csNameObject::AddName (*room, "room");
+  room->SetName ("room");
   Sys->set_cube_room (room);
   csPolygon3D* p;
   p = room->NewPolygon (tm);

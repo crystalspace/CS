@@ -17,7 +17,6 @@
 */
 
 #include "sysdef.h"
-#include "csengine/sysitf.h"
 #include "csengine/skeleton.h"
 #include "csengine/cssprite.h"
 

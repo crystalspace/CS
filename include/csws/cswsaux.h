@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: auxiliary includes and definitions
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,14 +26,6 @@
 #include <string.h>
 
 #include "version.h"
-#include "csengine/camera.h"
-#include "csengine/polygon.h"
-#include "csengine/sector.h"
-#include "csengine/world.h"
-#include "csengine/light.h"
-#include "csengine/dynlight.h"
-#include "csengine/lghtmap.h"
-#include "csengine/stats.h"
 #include "igraph3d.h"
 #include "csutil/inifile.h"
 #include "csutil/parser.h"

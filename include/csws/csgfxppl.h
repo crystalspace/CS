@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Graphics Pipeline class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,9 +20,8 @@
 #ifndef __CSGFXPPL_H__
 #define __CSGFXPPL_H__
 
-#include "cssys/common/system.h"	//@@@??? Is this needed?
 #include "csutil/csbase.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "csengine/csspr2d.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
@@ -161,7 +159,7 @@ private:
   void RestoreArea (ImageArea *Area, bool Free);
 
   /// Free buffer used to keep an area of screen
-  void FreeArea (ImageArea *Area) { System->piG2D->FreeArea (Area); }
+  void FreeArea (ImageArea *Area);
 
   /// Clear screen with specified color
   void Clear (int color);

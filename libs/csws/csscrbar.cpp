@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: scroll bar class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,7 +21,6 @@
 #include "csws/csscrbar.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
-#include "csengine/texture.h"
 
 // Minimal scroll button size
 #define CSSB_MINIMAL_KNOBSIZE   (3+3+8)
@@ -40,7 +38,7 @@
 // Scroll time interval in milliseconds
 #define SCROLL_REPEAT_INTERVAL  100
 
-#define SCROLLBAR_TEXTURE_NAME  "tex/scrollbar.png"
+#define SCROLLBAR_TEXTURE_NAME  "csws::ScrollBar"
 
 csSprite2D *csScrollBar::sprarrows[12] =
 { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
@@ -62,7 +60,7 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
     // Load arrow and scroller images
     if (!sprscroller[0])
     {
-      csTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
+      ITextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
       for (int i = 0; i < 12; i++)
         CHKB (sprarrows [i] = new csSprite2D (scrolltex, i * 9, 0, 9, 9));
       CHK (sprscroller [0] = new csSprite2D (scrolltex, 12 * 9 + 0, 0, 7, 8));

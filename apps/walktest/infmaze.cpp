@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "walktest/infmaze.h"
 #include "walktest/walktest.h"
 #include "csutil/sparse3d.h"
@@ -30,7 +30,6 @@
 #include "csengine/lghtmap.h"
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
-#include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 
 InfiniteMaze::InfiniteMaze ()
@@ -66,7 +65,7 @@ void InfiniteMaze::create_one_side (csSector* room, char* pname,
 
   csPolygon3D* p;
   p = room->NewPolygon (tm);
-  csNameObject::AddName(*p,pname);
+  p->SetName (pname);
   p->AddVertex (cx+sx*x1, cy+sy*y1, cz+sz*z1);
   p->AddVertex (cx+sx*x2, cy+sy*y2, cz+sz*z2);
   p->AddVertex (cx+sx*x3, cy+sy*y3, cz+sz*z3);
@@ -125,7 +124,7 @@ InfRoomData* InfiniteMaze::create_six_room (csWorld* world, int x, int y, int z)
   char buf[50];
   sprintf (buf, "r%d_%d_%d", x, y, z);
   csSector* room = world->NewSector();
-  csNameObject::AddName(*room,buf);
+  room->SetName (buf);
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;

@@ -33,7 +33,6 @@
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
 #include "csengine/lppool.h"
-#include "csobject/nameobj.h"
 #include "csutil/cleanup.h"
 #include "igraph3d.h"
 #include "itexture.h"
@@ -281,8 +280,8 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 	vertices (4)
 {
-  const char* tname = csNameObject::GetName(poly);
-  if (tname) csNameObject::AddName(*this, tname);
+  const char* tname = poly.GetName ();
+  if (tname) SetName (tname);
 
   poly_set = poly.poly_set;
   sector = poly.sector;

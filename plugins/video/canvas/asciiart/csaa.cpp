@@ -22,7 +22,7 @@
 #include <limits.h>
 #include "sysdef.h"
 #include "cscom/com.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "csinput/csevent.h"
 #include "csutil/inifile.h"
 #include "isystem.h"

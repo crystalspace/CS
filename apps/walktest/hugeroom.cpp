@@ -25,7 +25,6 @@
 #include "csengine/texture.h"
 #include "csengine/light.h"
 #include "csengine/thing.h"
-#include "csobject/nameobj.h"
 
 extern WalkTest* Sys;
 
@@ -114,7 +113,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
   CHK (csPolygon3D* p = new csPolygon3D (tm));
   char polname[10];
   sprintf (polname, "p%d", pol_nr);
-  csNameObject::AddName (*p, polname); 
+  p->SetName (polname); 
   pol_nr++;
   p->SetSector (sector);
   p->SetParent (thing);
@@ -154,7 +153,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
 csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 {
   CHK (csThing* thing = new csThing ());
-  csNameObject::AddName (*thing, "t"); 
+  thing->SetName ("t"); 
 
 #ifdef ROOM_SMALL
   int txt = (rand () & 0x8) ? 1 : 2;
@@ -228,7 +227,7 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
   CHK (csThing* thing = new csThing ());
-  csNameObject::AddName (*thing, "t"); 
+  thing->SetName ("t"); 
 
   float y_low = -wall_dim+1;
   float y_high = y_low + ydim;
@@ -265,7 +264,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 {
   this->world = world;
   csSector* room = world->NewSector();
-  csNameObject::AddName (*room, "sector");
+  room->SetName ("sector");
 
   if (seed == 0) seed = rand ();
   srand (seed);
@@ -411,7 +410,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 
 #if defined(ROOM_CITY)
   CHK (csThing* floorthing = new csThing ());
-  csNameObject::AddName (*floorthing, "floor"); 
+  floorthing->SetName ("floor"); 
   create_wall (room, floorthing,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
   	csVector3 (wall_dim, -wall_dim+1, wall_dim),
@@ -422,7 +421,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   floorthing->Transform ();
 #elif !defined(ROOM_SMALL)
   CHK (csThing* floorthing = new csThing ());
-  csNameObject::AddName (*floorthing, "floor"); 
+  floorthing->SetName ("floor"); 
   create_wall (room, floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);
   create_wall (room, floorthing, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),

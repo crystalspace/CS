@@ -22,7 +22,7 @@
 #define __CSOS2_H__
 
 #include "csinput/csinput.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "icsos2.h"
 
 /**

@@ -18,7 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "csinput/csinput.h"
 #include "NeXTSystemInterface.h"
 class NeXTSystemProxy;

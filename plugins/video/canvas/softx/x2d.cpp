@@ -22,7 +22,7 @@
 #include "cssys/unix/iunix.h"
 #include "csinput/csevent.h"
 #include "cs2d/softx/x2d.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 
 BEGIN_INTERFACE_TABLE (csGraphics2DXLib)

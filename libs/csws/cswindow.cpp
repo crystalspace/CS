@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: window class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,7 +24,8 @@
 #include "csws/csapp.h"
 #include "csws/csdialog.h"
 #include "csws/cswsutil.h"
-#include "csengine/texture.h"
+
+#define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"
 
 #define ADD_SYSMENU_ENTRIES(menu) \
   if (iWindowStyle & CSWS_BUTMAXIMIZE) \
@@ -133,10 +133,10 @@ void csWindow::SetButtBitmap (csButton *button, char *id_n, char *id_p)
   int tx,ty,tw,th;
   FindCFGBitmap (*(app->titlebardefs), id_n, &tx, &ty, &tw, &th);
   CHK (csSprite2D *bmpn = new csSprite2D (app->GetTexture (
-    app->titletexturename), tx, ty, tw, th));
+    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th));
   FindCFGBitmap (*(app->titlebardefs), id_p, &tx, &ty, &tw, &th);
   CHK (csSprite2D *bmpp = new csSprite2D (app->GetTexture (
-    app->titletexturename), tx, ty, tw, th));
+    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th));
   button->SetBitmap (bmpn, bmpp);
 }
 

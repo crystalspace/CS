@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Windowing System: object vector class
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,22 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OSDEFS_H__
-#define __OSDEFS_H__
+#include "sysdef.h"
+#include "csutil/csobjvec.h"
 
-// The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER_BEOS "crystalspace.graphics2d.be"
+bool csObjVector::FreeItem (csSome Item)
+{
+  if (Item)
+    delete (csBase *) Item;
+  return true;
+}
 
-#define SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER_BEOS
-
-// The 2D graphics driver used by OpenGL renderer
-#define OPENGL_2D_DRIVER	"crystalspace.graphics2d.glbe"
-
-// The 2D graphics driver used by Glide renderer
-#define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidebe"
-
-#if defined (SYSDEF_DIR)
-#  define __NEED_GENERIC_ISDIR
-#endif
-
-#endif // __OSDEFS_H__
+csObjVector::~csObjVector ()
+{
+  DeleteAll ();
+}

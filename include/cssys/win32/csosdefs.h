@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OSDEFS_H__
-#define __OSDEFS_H__
+#ifndef __CSOSDEFS_H__
+#define __CSOSDEFS_H__
 
 // For GUI applications, use "csMain" instead of "main".
 // For console applications, use regular "main".
@@ -112,4 +112,4 @@
 #  include <io.h>
 #endif
 
-#endif // __OSDEFS_H__
+#endif // __CSOSDEFS_H__

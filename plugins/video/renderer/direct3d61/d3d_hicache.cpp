@@ -22,7 +22,7 @@
 // Written by Dan Ogles
 // modified (changed the two include-branches) for DX6.1 by Tristan McLure  (09/08/1999)
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 #include "cs3d/direct3d61/d3d_hicache.h"
 #include "cs3d/direct3d61/d3d_txtmgr.h"

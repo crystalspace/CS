@@ -32,7 +32,6 @@
 #include "csengine/camera.h"
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
-#include "csobject/nameobj.h"
 #include "csutil/cleanup.h"
 #include "igraph3d.h"
 #include "itexture.h"
@@ -645,8 +644,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
       if (FAILED (rview->g3d->DrawPolygon (g3dpoly)))
       {
         CsPrintf (MSG_STDOUT, "Drawing polygon '%s/%s' failed!\n",
-                  csNameObject::GetName(*((csSector*)poly->GetParent ())),
-                  csNameObject::GetName(*poly));
+                  ((csSector*)poly->GetParent ())->GetName (),
+                  poly->GetName());
       }
     }
   }

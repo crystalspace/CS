@@ -38,7 +38,7 @@
 
 //CS Sys
 #ifndef NO_CSSYS
-#include "cssys/common/sysdriv.h"
+#include "cssys/sysdriv.h"
 #endif
 
 //CS Geom

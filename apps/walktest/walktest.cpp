@@ -23,11 +23,10 @@
 #include "walktest/hugeroom.h"
 #include "version.h"
 #include "qint.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "apps/support/command.h"
 #include "cstools/simpcons.h"
 #include "csparser/csloader.h"
-#include "csgeom/csrect.h"
 #include "csgeom/frustrum.h"
 #include "csengine/dumper.h"
 #include "csengine/csview.h"
@@ -49,7 +48,7 @@
 #include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
 #include "csutil/impexp.h"
-#include "csobject/nameobj.h"
+#include "csutil/csrect.h"
 #include "csobject/dataobj.h"
 #include "csgfxldr/csimage.h"
 #include "cssfxldr/common/snddata.h"
@@ -187,7 +186,7 @@ void select_object (csRenderView* rview, int type, void* entity)
     {
       csPolygonSet* ps = (csPolygonSet*)(last_poly->GetParent ());
       Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
-        csNameObject::GetName(*ps), csNameObject::GetName(*last_poly));
+        ps->GetName (), last_poly->GetName ());
       Dumper::dump (polygon, "csPolygon2D");
       Dumper::dump (last_poly);
       if (check_poly && !last_poly->GetPortal ())
@@ -226,10 +225,10 @@ void select_object (csRenderView* rview, int type, void* entity)
 	    //check_light = false;
 	  }
           Sys->Printf (MSG_CONSOLE, "Selected light %s/(%f,%f,%f).\n",
-                    csNameObject::GetName(*sector), light->GetCenter ().x,
+                    sector->GetName (), light->GetCenter ().x,
                     light->GetCenter ().y, light->GetCenter ().z);
           Sys->Printf (MSG_DEBUG_0, "Selected light %s/(%f,%f,%f).\n",
-                    csNameObject::GetName(*sector), light->GetCenter ().x,
+                    sector->GetName (), light->GetCenter ().x,
                     light->GetCenter ().y, light->GetCenter ().z);
         }
       }
@@ -353,9 +352,9 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
   if (type == CALLBACK_POLYGON)
   {
     csPolygon3D* poly = (csPolygon3D*)entity;
-    const char* name = csNameObject::GetName (*poly);
+    const char* name = poly->GetName ();
     if (!name) name = "(NULL)";
-    const char* pname = csNameObject::GetName (*(csPolygonSet*)poly->GetParent ());
+    const char* pname = ((csPolygonSet*)poly->GetParent ())->GetName ();
     if (!pname) pname = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%sPolygon '%s/%s' ------\n",
     	dump_visible_indent, indent_spaces, pname, name);
@@ -388,7 +387,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
   else if (type == CALLBACK_SECTOR)
   {
     csSector* sector = (csSector*)entity;
-    const char* name = csNameObject::GetName (*sector);
+    const char* name = sector->GetName ();
     if (!name) name = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Sector '%s' ------------\n",
     	dump_visible_indent+1, indent_spaces, name);
@@ -404,7 +403,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
   else if (type == CALLBACK_SECTOREXIT)
   {
     csSector* sector = (csSector*)entity;
-    const char* name = csNameObject::GetName (*sector);
+    const char* name = sector->GetName ();
     if (!name) name = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%sEXIT Sector '%s' ------------\n",
     	dump_visible_indent, indent_spaces, name);
@@ -413,7 +412,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
   else if (type == CALLBACK_THING)
   {
     csThing* thing = (csThing*)entity;
-    const char* name = csNameObject::GetName (*thing);
+    const char* name = thing->GetName ();
     if (!name) name = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Thing '%s' ------------\n",
     	dump_visible_indent+1, indent_spaces, name);
@@ -429,7 +428,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
   else if (type == CALLBACK_THINGEXIT)
   {
     csThing* thing = (csThing*)entity;
-    const char* name = csNameObject::GetName (*thing);
+    const char* name = thing->GetName ();
     if (!name) name = "(NULL)";
     Sys->Printf (MSG_DEBUG_0, "%03d%sEXIT Thing '%s' ------------\n",
     	dump_visible_indent, indent_spaces, name);
@@ -521,7 +520,7 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       char buffer[100];
       sprintf (buffer, "%2.2f,%2.2f,%2.2f: %s",
         view->GetCamera ()->GetW2CTranslation ().x, view->GetCamera ()->GetW2CTranslation ().y,
-        view->GetCamera ()->GetW2CTranslation ().z, csNameObject::GetName(*(view->GetCamera ()->GetSector())));
+        view->GetCamera ()->GetW2CTranslation ().z, view->GetCamera ()->GetSector()->GetName ());
       Gfx2D->Write(FRAME_WIDTH-24*8-1, FRAME_HEIGHT-11, 0, -1, buffer);
       Gfx2D->Write(FRAME_WIDTH-24*8, FRAME_HEIGHT-10, scon->get_fg (), -1, buffer);
     }
@@ -701,7 +700,7 @@ void WalkTest::CreateColliders (void)
 {
   csPolygon3D *p;
   CHK (csPolygonSet *pb = new csPolygonSet());
-  csNameObject::AddName(*pb, "Player's Body");
+  pb->SetName ("Player's Body");
 
   pb->AddVertex(-DX_2, OY,    -DZ_2);
   pb->AddVertex(-DX_2, OY,    DZ_2);
@@ -1457,7 +1456,7 @@ int main (int argc, char* argv[])
       int w, h;
       ITextureHandle* phTex = texh->GetTextureHandle();
       phTex->GetBitmapDimensions(w,h);
-      CHK (Sys->cslogo = new csSprite2D (texh, 0, 0, w, h));
+      CHK (Sys->cslogo = new csSprite2D (phTex, 0, 0, w, h));
     }
 
     // Look for the start sector in this world.

@@ -17,17 +17,16 @@
 */
 
 #include "sysdef.h"
-#include "cssys/common/csendian.h"
+#include "cssys/csendian.h"
+#include "csengine/sysitf.h"
 #include "csengine/lghtmap.h"
 #include "csengine/polygon.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/light.h"
 #include "csengine/world.h"
-#include "csengine/sysitf.h"
 #include "csutil/util.h"
 #include "csutil/vfs.h"
-#include "csobject/nameobj.h"
 
 //---------------------------------------------------------------------------
 
@@ -285,13 +284,13 @@ struct LightHeader
 
 void CacheName (char* buf, csPolygonSet* owner, int index, char* suffix)
 {
-  const char* name = csNameObject::GetName (*owner);
+  const char* name = owner->GetName ();
   if (!name)
     CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
 
   if (owner->GetType () == csThing::Type())
   {
-    const char* pname = csNameObject::GetName (*(owner->GetSector ()));
+    const char* pname = owner->GetSector ()->GetName ();
     if (!pname)
       CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
     sprintf (buf, "lm/%s_%s_%d%s", pname ? pname : ".", name ? name : ".", index, suffix);

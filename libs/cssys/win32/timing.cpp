@@ -21,7 +21,7 @@
 #include <time.h>
 #include <sys/timeb.h>
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 // This function should return milliseconds since some specific
 // time. If you don't have milliseconds easily just rewrite by

@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "cssys/common/sysdriv.h"
+#include "cssys/sysdriv.h"
 #include "csengine/collider.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"

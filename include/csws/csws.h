@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: main interface file
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -84,11 +83,10 @@ class csApp;
 
 // Include all Windowing System components
 #include "csutil/csbase.h"		// Base class
-#include "csgeom/csrect.h"		// Rectangle class
+#include "csutil/csrect.h"		// Rectangle class
 #include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csstrvec.h"		// Vector of string objects
-#include "csengine/csobjvec.h"		// Vector of csBase heirs
-#include "csengine/csview.h"		// CrystalSpace view
+#include "csutil/csobjvec.h"		// Vector of csBase heirs
 #include "csinput/csevent.h"		// Event class
 #include "csinput/cseventq.h"		// Event Queue class
 #include "csinput/csinput.h"		// Keyboard codes
@@ -110,6 +108,7 @@ class csApp;
 #include "cslistbx.h"			// List box class
 #include "csdialog.h"			// User dialogs
 #include "cswindow.h"			// Window class
+#include "cswstex.h"			// Windowing System textures
 #include "csapp.h"			// Windowing System application
 #include "cswsutil.h"			// Windowing System shortcuts and utilites
 

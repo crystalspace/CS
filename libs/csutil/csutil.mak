@@ -26,7 +26,8 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/csutil
 
 CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
-SRC.CSUTIL = $(wildcard libs/csutil/*.cpp libs/csutil/*/*.cpp libs/csutil/*/*/*.cpp)
+SRC.CSUTIL = $(filter-out %csscf.cpp, \
+  $(wildcard libs/csutil/*.cpp libs/csutil/*/*.cpp libs/csutil/*/*/*.cpp))
 OBJ.CSUTIL = $(addprefix $(OUT),$(notdir $(SRC.CSUTIL:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

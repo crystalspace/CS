@@ -24,7 +24,7 @@
 #include "csinput/csinput.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/inifile.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "cs3d/glide2/glidelib.h"
 #include "isystem.h"
 

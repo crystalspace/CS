@@ -21,7 +21,7 @@
 // An abstract class: derive the specific class from this class
 // Written by Dan Ogles
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "cs3d/glide2/gl_txtmgr.h"
 #include "cs3d/glide2/hicache.h"
 #include "itexture.h"

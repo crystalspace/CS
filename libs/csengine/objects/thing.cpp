@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csobject/nameobj.h"
+#include "csengine/sysitf.h"
 #include "csengine/thing.h"
 #include "csengine/thingtpl.h"
 #include "csengine/polygon.h"
@@ -30,12 +30,10 @@
 #include "csengine/sector.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
-#include "csengine/sysitf.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "itexture.h"
 #include "qint.h"
-
 
 //---------------------------------------------------------------------------
 
@@ -551,7 +549,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     csPolygonTemplate* pt = tpl->GetPolygon (i);
     csPolygon3D* p;
     p = NewPolygon (pt->GetTexture ());
-    csNameObject::AddName(*p, pt->GetName());
+    p->SetName (pt->GetName());
     if (!pt->GetTexture ()) p->SetTexture (default_texture);
     csLightMapped* pol_lm = p->GetLightMapInfo ();
     if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
@@ -584,7 +582,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   {
     csCurveTemplate* pt = tpl->GetCurve (i);
     csCurve* p = pt->MakeCurve ();
-    csNameObject::AddName(*p, csNameObject::GetName(*pt));
+    p->SetName(pt->GetName ());
     p->SetParent (this);
 
     if (!pt->GetTextureHandle ()) p->SetTextureHandle (default_texture);

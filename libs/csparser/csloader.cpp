@@ -48,7 +48,6 @@
 #include "cssfxldr/sndload.h"
 #include "csparser/snddatao.h"
 #include "csgfxldr/csimage.h"
-#include "csobject/nameobj.h"
 #include "csscript/objtrig.h"
 #include "csscript/scripts.h"
 
@@ -259,7 +258,7 @@ csPolyPlane* csLoader::load_polyplane (char* buf, char* name)
   long cmd;
   char* params;
   CHK( csPolyPlane* ppl = new csPolyPlane() );
-  csNameObject::AddName(*ppl, name);
+  ppl->SetName (name);
 
   bool tx1_given = false, tx2_given = false;
   csVector3 tx1_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
@@ -334,7 +333,7 @@ void csLoader::load_light (char* name, char* buf)
   TOKEN_TABLE_END
 
   CHK (CLights *theLite = new CLights());
-  csNameObject::AddName(*theLite,name);
+  theLite->SetName (name);
 
   long cmd;
   char *params;
@@ -410,7 +409,7 @@ csCollection* csLoader::load_collection (char* name, csWorld* w, char* buf)
   char* params;
 
   CHK( csCollection* collection = new csCollection() );
-  csNameObject::AddName(*collection, name);
+  collection->SetName (name);
 
   char str[255];
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
@@ -705,7 +704,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       {
         CsPrintf (MSG_FATAL_ERROR,
                   "Trigger '%s' not supported or known for object '%s'!\n",
-                  str, csNameObject::GetName(ps));
+                  str, ps.GetName ());
         fatal_exit (0, false);
       }
       break;
@@ -748,7 +747,7 @@ csThing* csLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
   char* xname;
 
   CHK (csThing* thing = new csThing ());
-  csNameObject::AddName (*thing, name);
+  thing->SetName (name);
 
   LoadStat::things_loaded++;
 
@@ -1000,7 +999,7 @@ csThing* csLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
   while (done < todo_end)
   {
     csPolygon3D *p = thing->NewPolygon (todo[done].texture);
-    csNameObject::AddName(*p,todo[done].poly);
+    p->SetName (todo[done].poly);
     p->AddVertex (todo[done].v4);
     p->AddVertex (todo[done].v3);
     p->AddVertex (todo[done].v2);
@@ -1048,7 +1047,7 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
   char* xname;
 
   CHK( csThing* thing = new csThing() );
-  csNameObject::AddName(*thing,name);
+  thing->SetName (name);
 
   LoadStat::things_loaded++;
   PSLoadInfo info(w, textures);
@@ -1186,7 +1185,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   char* params, * params2;
 
   CHK(csPolygon3D *poly3d = new csPolygon3D (default_texture));
-  csNameObject::AddName(*poly3d,polyname);
+  poly3d->SetName (polyname);
 
   csTextureHandle* tex = NULL;
   poly3d->SetSector (sec);
@@ -1265,7 +1264,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {
           ScanStr (params, "%s", str);
           CHK(csSector *s = new csSector());
-          csNameObject::AddName(*s,str);
+          s->SetName (str);
           poly3d->SetCSPortal (s);
           LoadStat::portals_loaded++;
         }
@@ -1516,7 +1515,7 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
   (void)w; (void)default_lightx; (void)sec; (void)parent;
 
   CHK (csBezier *poly3d = new csBezier ());
-  csNameObject::AddName(*poly3d,polyname);
+  poly3d->SetName (polyname);
   poly3d->SetTextureHandle (default_texture);
   csTextureHandle* tex = NULL;
 //TODO??  poly3d->SetSector(sec);
@@ -1636,9 +1635,8 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
 //---------------------------------------------------------------------------
 
-ImageFile* csLoader::load_image (const char* name, csWorld* w)
+ImageFile* csLoader::load_image (const char* name)
 {
-  (void) w;
   size_t size;
   ImageFile *ifile = NULL;
   char *buf = VFS->ReadFile (name, size);
@@ -1659,7 +1657,7 @@ ImageFile* csLoader::load_image (const char* name, csWorld* w)
     return NULL;
   }
 
-  csNameObject::AddName (*ifile, name);
+  ifile->SetName (name);
   return ifile;
 }
 
@@ -1701,7 +1699,7 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
     fatal_exit (0, false);
   }
 
-  ImageFile *image = load_image (filename, world);
+  ImageFile *image = load_image (filename);
   if (!image)
     return;
 
@@ -1710,7 +1708,7 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
   // not have power-of-two dimensions...
 
   csTextureHandle *tex = textures->NewTexture (image);
-  csNameObject::AddName (*tex,name);
+  tex->SetName (name);
 
   if (do_transp)
     tex->SetTransparent (QInt (transp.red * 255.),
@@ -1939,7 +1937,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
   char *params, *params2;
 
   CHK(csBezierTemplate *ptemplate = new csBezierTemplate());
-  csNameObject::AddName(*ptemplate, ptname);
+  ptemplate->SetName (ptname);
 
   ptemplate->SetParent (parent);
 
@@ -2081,7 +2079,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf,
   int i;
 
   CHK( csThingTemplate *tmpl = new csThingTemplate() );
-  csNameObject::AddName(*tmpl,tname);
+  tmpl->SetName (tname);
   long cmd;
   char* params;
   csTextureHandle* default_texture = NULL;
@@ -2250,7 +2248,7 @@ csThingTemplate* csLoader::load_sixtpl(char* tname,char* buf,csTextureList* text
   int i;
 
   CHK (csThingTemplate* tmpl = new csThingTemplate ());
-  csNameObject::AddName(*tmpl,tname);
+  tmpl->SetName (tname);
 
   csTextureHandle* texture = NULL;
   float tscale = 1;
@@ -2676,7 +2674,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
   bool do_stat_bsp = false;
 
   CHK(csSector* sector = new csSector());
-  csNameObject::AddName(*sector,secname);
+  sector->SetName (secname);
 
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
 
@@ -2853,7 +2851,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
       case TOKEN_SPRITE:
         {
           CHK (csSprite3D* sp = new csSprite3D ());
-          csNameObject::AddName(*sp,name);
+          sp->SetName (name);
           LoadSprite (sp, w, params, textures);
           w->sprites.Push (sp);
           sp->MoveToSector (sector);
@@ -3003,7 +3001,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
         break;
       default:
         CsPrintf (MSG_FATAL_ERROR, "Unrecognized token in room '%s'!\n",
-                  csNameObject::GetName(*sector));
+                  sector->GetName ());
         fatal_exit (0, false);
     }
   }
@@ -3129,7 +3127,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
       else texture = colors[idx].texture;
 
       p = sector->NewPolygon (texture);
-      csNameObject::AddName(*p,todo[done].poly);
+      p->SetName (todo[done].poly);
       p->AddVertex (todo[done].v1);
       p->AddVertex (todo[done].v2);
       p->AddVertex (todo[done].v3);
@@ -3163,7 +3161,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
 
     // This will later be defined correctly
     CHK( portal = new csSector () );
-    csNameObject::AddName(*portal,portals[i].sector);
+    portal->SetName (portals[i].sector);
     p->SetCSPortal (portal);
     LoadStat::portals_loaded++;
     if (portals[i].is_warp)
@@ -3213,7 +3211,7 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
   bool do_stat_bsp = false;
 
   CHK( csSector* sector = new csSector() );
-  csNameObject::AddName(*sector,secname);
+  sector->SetName (secname);
 
   LoadStat::sectors_loaded++;
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
@@ -3245,7 +3243,7 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
       case TOKEN_SPRITE:
         {
           CHK (csSprite3D* sp = new csSprite3D ());
-          csNameObject::AddName(*sp,name);
+          sp->SetName (name);
           LoadSprite (sp, w, params, textures);
           w->sprites.Push (sp);
           sp->MoveToSector (sector);
@@ -3373,7 +3371,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     {
       sprintf (end_poly_name, "%d_%d_A", i, j);
       CHK (csPolygon3D* p = new csPolygon3D (texture));
-      csNameObject::AddName(*p,poly_name);
+      p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
       p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
@@ -3394,7 +3392,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       LoadStat::polygons_loaded++;
       sprintf (end_poly_name, "%d_%d_B", i, j);
       CHK (p = new csPolygon3D (texture));
-      csNameObject::AddName(*p,poly_name);
+      p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
       p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
@@ -3437,7 +3435,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   {
     sprintf (end_poly_name, "%d_%d", num/2, j);
     CHK (csPolygon3D* p = new csPolygon3D (texture));
-    csNameObject::AddName(*p,poly_name);
+    p->SetName (poly_name);
     p->SetSector (&sector);
     p->SetParent (&sector);
     p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
@@ -3492,7 +3490,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
   }
 
   CHK (csTerrain* terr = new csTerrain ());
-  csNameObject::AddName (*terr, name);
+  terr->SetName (name);
 
   // Otherwise read file, if that fails generate a random map.
   if (!terr->Initialize (heightmap))
@@ -3532,7 +3530,7 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename, csWorl
   }
 
   CHK (sndobj = new csSoundDataObject (snd));
-  csNameObject::AddName (*sndobj, name);
+  sndobj->SetName (name);
 
   return sndobj;
 }
@@ -3588,7 +3586,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
             if (!t)
             {
               CHK (t = new csSpriteTemplate ());
-              csNameObject::AddName(*t,name);
+              t->SetName (name);
               world->sprite_templates.Push (t);
             }
             LoadSpriteTemplate (t, params, world->GetTextures ());
@@ -3667,14 +3665,13 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
         {
           csPortal* portal = p->GetPortal ();
           csSector *stmp = portal->GetSector ();
-          csSector *snew = (csSector*)(world->sectors).FindByName(
-                                       csNameObject::GetName(*stmp) );
+          csSector *snew = (csSector*)(world->sectors).FindByName(stmp->GetName ());
           if (!snew)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
-                      " polygon '%s/%s'!\n", csNameObject::GetName(*stmp),
-                      csNameObject::GetName( *((csObject*)(p->GetParent())) ),
-                      csNameObject::GetName(*p));
+                      " polygon '%s/%s'!\n", stmp->GetName (),
+                      ((csObject*)p->GetParent ())->GetName (),
+                      p->GetName ());
             fatal_exit (0, false);
           }
           portal->SetSector (snew);
@@ -3820,7 +3817,7 @@ bool csLoader::LoadLibrary (csWorld* world, char* buf)
             if (!t)
             {
               CHK (t = new csSpriteTemplate ());
-              csNameObject::AddName(*t, name);
+              t->SetName (name);
               world->sprite_templates.Push (t);
             }
             LoadSpriteTemplate (t, params, world->GetTextures ());
@@ -3860,9 +3857,9 @@ bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
 
 csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const char* fname)
 {
-  ImageFile *image = load_image (fname, world);
+  ImageFile *image = load_image (fname);
   csTextureHandle *tm = world->GetTextures ()->NewTexture (image);
-  csNameObject::AddName(*tm, name);
+  tm->SetName (name);
   return tm;
 }
 

@@ -33,7 +33,6 @@
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
 #include "csengine/quadcube.h"
-#include "csobject/nameobj.h"
 #include "csgeom/bsp.h"
 #include "csgeom/polypool.h"
 #include "csgeom/quadtree.h"
@@ -320,7 +319,7 @@ csPolygon3D* csPolygonSet::GetPolygon (char* name)
   for (i = 0 ; i < num_polygon ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
-    const char* n = csNameObject::GetName (*p);
+    const char* n = p->GetName ();
     if (n && !strcmp (n, name)) return p;
   }
   return NULL;
@@ -361,7 +360,7 @@ csCurve* csPolygonSet::GetCurve (char* name)
   for (i = 0 ; i < num_curves ; i++)
   {
     csCurve* p = (csCurve*)polygons[i];
-    if (!strcmp (csNameObject::GetName(*p), name)) return p;
+    if (!strcmp (p->GetName (), name)) return p;
   }
   return NULL;
 }

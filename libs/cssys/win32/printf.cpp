@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 #include <windows.h>
 

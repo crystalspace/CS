@@ -19,11 +19,9 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csengine/sysitf.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
-#include "csobject/nameobj.h"
 
 //---------------------------------------------------------------------------
 

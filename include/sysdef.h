@@ -78,39 +78,39 @@
 #endif
 
 #ifdef OS_WIN32
-#  include "cssys/win32/osdefs.h"
+#  include "cssys/win32/csosdefs.h"
 #endif
 
 #if defined (COMP_WCC) && defined (OS_DOS)
-#  include "cssys/wcc/osdefs.h"
+#  include "cssys/wcc/csosdefs.h"
 #endif
 
 #if defined (COMP_GCC) && defined (OS_DOS)
-#  include "cssys/djgpp/osdefs.h"
+#  include "cssys/djgpp/csosdefs.h"
 #endif
 
 #if defined (OS_MACOS)
-#  include "cssys/mac/osdefs.h"
+#  include "cssys/mac/csosdefs.h"
 #endif
 
 #if defined (OS_UNIX) && !defined(OS_BE)
-#  include "cssys/unix/osdefs.h"
+#  include "cssys/unix/csosdefs.h"
 #endif
 
 #if defined (OS_AMIGAOS)
-#  include "cssys/amiga/osdefs.h"
+#  include "cssys/amiga/csosdefs.h"
 #endif
 
 #if defined (OS_OS2)
-#  include "cssys/os2/osdefs.h"
+#  include "cssys/os2/csosdefs.h"
 #endif
 
 #if defined (OS_BE)
-#  include "cssys/be/osdefs.h"
+#  include "cssys/be/csosdefs.h"
 #endif
 
 #if defined (OS_NEXT)
-#  include "cssys/next/osdefs.h"
+#  include "cssys/next/csosdefs.h"
 #endif
 
 //--//--//--//--//--/ Allow system-dependent header files to override these --//

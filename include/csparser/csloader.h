@@ -118,7 +118,7 @@ public:
         CLights* default_lightx, csSector* sec, csPolygonSet* parent);
 
   ///
-  static ImageFile* load_image(const char* name, csWorld* w);
+  static ImageFile* load_image(const char* name);
   ///
   static void txt_process (char *name, char* buf, csTextureList* textures, csWorld *world);
   ///

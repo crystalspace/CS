@@ -21,7 +21,7 @@
 // Written by xtrochu and Nathaniel
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "cs3d/glide2/g3dglide.h"
 #include "cs3d/glide2/glcache.h"
 #include "cs3d/glide2/glidelib.h"

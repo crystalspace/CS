@@ -41,7 +41,6 @@
 #include "csengine/cssprite.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
-#include "csobject/nameobj.h"
 
 void Dumper::dump (csMatrix3* m, char* name)
 {
@@ -78,14 +77,14 @@ void Dumper::dump (csBox* b)
 void Dumper::dump (csCamera* c)
 {
   CsPrintf (MSG_DEBUG_0, "csSector: %s\n", 
-            c->sector ? csNameObject::GetName(*(c->sector)) : "(?)");
+            c->sector ? c->sector->GetName () : "(?)");
   dump (&c->v_o2t, "Camera vector");
   dump (&c->m_o2t, "Camera matrix");
 }
 
 void Dumper::dump (csPolyPlane* p)
 {
-  const char* pl_name = csNameObject::GetName (*p);
+  const char* pl_name = p->GetName ();
   CsPrintf (MSG_DEBUG_0, "PolyPlane '%s' id=%ld:\n", pl_name ? pl_name : "(no name)",
             p->GetID ());
   dump (&p->m_obj2tex, "Mot");
@@ -102,8 +101,8 @@ void Dumper::dump (csPolyPlane* p)
 void Dumper::dump (csPolygon3D* p)
 {
   csPolygonSet* ps = (csPolygonSet*)p->GetParent ();
-  CsPrintf (MSG_DEBUG_0, "Dump polygon '%s/%s' id=%ld:\n", csNameObject::GetName(*ps),
-  	csNameObject::GetName(*p), p->GetID ());
+  CsPrintf (MSG_DEBUG_0, "Dump polygon '%s/%s' id=%ld:\n", ps->GetName (),
+  	p->GetName (), p->GetID ());
   if (p->GetUnsplitPolygon ())
   {
     CsPrintf (MSG_DEBUG_0, "    Split from polygon with id=%ld\n",
@@ -115,7 +114,7 @@ void Dumper::dump (csPolygon3D* p)
   {
     csPortal* portal = p->portal;
     CsPrintf (MSG_DEBUG_0, "    Polygon is a CS portal to sector '%s'.\n", 
-                csNameObject::GetName(*(portal->GetSector())) );
+      portal->GetSector()->GetName ());
     CsPrintf (MSG_DEBUG_0, "    Alpha=%d\n", p->GetAlpha ());
   }
   int i;
@@ -147,9 +146,9 @@ void Dumper::dump (csPolygonSet* p)
 {
   CsPrintf (MSG_DEBUG_0, "========================================================\n");
   CsPrintf (MSG_DEBUG_0, "Dump sector '%s' id=%ld:\n", 
-            csNameObject::GetName(*p), p->GetID ());
+    p->GetName (), p->GetID ());
   CsPrintf (MSG_DEBUG_0, "    num_vertices=%d max_vertices=%d num_polygon=%d max_polygon=%d\n",
-	p->num_vertices, p->max_vertices, p->num_polygon, p->max_polygon);
+    p->num_vertices, p->max_vertices, p->num_polygon, p->max_polygon);
   CsPrintf (MSG_DEBUG_0, "This sector %s a BSP.\n", p->bsp ? "uses" : "doesn't use");
   int i;
 
@@ -202,7 +201,7 @@ void Dumper::dump (csWorld* w)
 void Dumper::dump (csSpriteTemplate* s)
 {
   CsPrintf (MSG_DEBUG_0, "Dump sprite template '%s' id=%ld:\n", 
-            csNameObject::GetName(*s), s->GetID ());
+    s->GetName (), s->GetID ());
   CsPrintf (MSG_DEBUG_0, "%d vertices.\n", s->num_vertices);
   CsPrintf (MSG_DEBUG_0, "%d triangles.\n", s->GetBaseMesh ()->GetNumTriangles ());
   CsPrintf (MSG_DEBUG_0, "%d frames.\n", s->GetNumFrames ());
@@ -212,7 +211,7 @@ void Dumper::dump (csSpriteTemplate* s)
 void Dumper::dump (csSprite3D* s)
 {
   CsPrintf (MSG_DEBUG_0, "Dump sprite '%s' id=%ld:\n", 
-            csNameObject::GetName(*s), s->GetID ());
+    s->GetName (), s->GetID ());
   dump (s->tpl);
   dump (&s->m_obj2world, "Object->world");
   dump (&s->v_obj2world, "Object->world");

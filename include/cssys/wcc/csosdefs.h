@@ -17,28 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OSDEFS_H__
-#define __OSDEFS_H__
+#ifndef __CSOSDEFS_H__
+#define __CSOSDEFS_H__
 
-extern char* get_software_2d_driver ();
-#define SOFTWARE_2D_DRIVER get_software_2d_driver ()
-
-// The 2D graphics drivers used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER_SVGA	"crystalspace.graphics2d.svgalib"
-#define SOFTWARE_2D_DRIVER_GGI	"crystalspace.graphics2d.libggi"
-#define SOFTWARE_2D_DRIVER_XLIB	"crystalspace.graphics2d.xlib"
-
-// The 2D graphics driver used by OpenGL renderer
-#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glx"
-
-// The 2D graphics driver used by Glide renderer
-#define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidex"
-
-// The sound driver
-#define SOUND_DRIVER "crystalspace.sound.driver.oss"
+// The 2D graphics driver used by software renderer on this platform
+#define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.raw"
 
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
-#endif // __OSDEFS_H__
+#if defined (SYSDEF_ACCESS)
+#  include <io.h>
+#endif
+
+#endif // __CSOSDEFS_H__

@@ -23,7 +23,7 @@
 
 #include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "cssys/os2/icsos2.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 

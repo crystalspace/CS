@@ -27,7 +27,7 @@
 #include <Beep.h>
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "csbe.h"
 #include "csutil/inifile.h"
 

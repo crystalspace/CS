@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: color wheel class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,7 +21,7 @@
 #include "csws/cscwheel.h"
 #include "csws/csapp.h"
 
-#define COLORWHEEL_TEXTURE_NAME	"tex/colorwheel.png"
+#define COLORWHEEL_TEXTURE_NAME	"csws::ColorWheel"
 
 static int cwref = 0;
 static csSprite2D *cwspr = NULL;

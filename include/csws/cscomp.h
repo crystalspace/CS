@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Component interface
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,8 +21,8 @@
 #define __CSCOMP_H__
 
 #include "csutil/csbase.h"
-#include "csgeom/csrect.h"
-#include "csengine/csobjvec.h"
+#include "csutil/csrect.h"
+#include "csutil/csobjvec.h"
 #include "csengine/csspr2d.h"
 #include "cswspal.h"
 

@@ -19,7 +19,7 @@
 #include "sysdef.h"
 
 #include "csgeom/math3d.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "cssys/win32/win32.h"
 #include "csutil/inifile.h"
 #include "igraph3d.h"

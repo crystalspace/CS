@@ -21,7 +21,7 @@
 #include "sysdef.h"
 #include "cs2d/svgalib/svga.h"
 #include "cssys/unix/iunix.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "csinput/csinput.h"
 #include "isystem.h"
 

@@ -21,7 +21,7 @@
 
 #include "cscom/com.h"
 #include "csgeom/math3d.h"
-#include "csengine/csobjvec.h"
+#include "csobject/nobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/tranman.h"
 #include "csobject/csobj.h"
@@ -191,7 +191,7 @@ public:
    * objects of type csSector*. Use NewSector() to add sectors
    * to the world.
    */
-  csObjVector sectors;
+  csNamedObjVector sectors;
 
   /**
    * List of planes. This vector contains objects of type
@@ -199,13 +199,13 @@ public:
    * planes. Default planes which are created for polygons
    * are not in this list.
    */
-  csObjVector planes;
+  csNamedObjVector planes;
 
   /**
    * List of collections. This vector contains objects of type
    * csCollection*.
    */
-  csObjVector collections;
+  csNamedObjVector collections;
 
   /**
    * List of sprite templates. This vector contains objects of
@@ -213,7 +213,7 @@ public:
    * a template for a sprite. This function can optionally look in
    * all loaded libraries as well.
    */
-  csObjVector sprite_templates;
+  csNamedObjVector sprite_templates;
 
   /**
    * List of thing templates. This vector contains objects of
@@ -221,7 +221,7 @@ public:
    * a template for a thing. This function can optionally look in
    * all loaded libraries as well.
    */
-  csObjVector thing_templates;
+  csNamedObjVector thing_templates;
 
   /**
    * List of all sprites in the world. This vector contains objects
@@ -231,7 +231,7 @@ public:
    * as well. Note that after you add a sprite to the list you still
    * need to add it to all sectors that you want it to be visible in.
    */
-  csObjVector sprites;
+  csNamedObjVector sprites;
 
   // Remember dimensions of display.
   static int frame_width, frame_height;

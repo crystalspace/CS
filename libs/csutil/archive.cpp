@@ -1,7 +1,6 @@
 /*
     ZIP archive support for Crystal Space 3D library
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,7 +26,7 @@
 #define SYSDEF_UNLINK
 #define SYSDEF_ACCESS
 #include "sysdef.h"
-#include "cssys/common/csendian.h"
+#include "cssys/csendian.h"
 #include "csutil/util.h"
 #include "csutil/archive.h"
 

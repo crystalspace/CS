@@ -19,7 +19,7 @@
 #ifndef SECTOR_H
 #define SECTOR_H
 
-#include "csengine/csobjvec.h"
+#include "csobject/nobjvec.h"
 #include "csengine/polyset.h"
 #include "csengine/rview.h"
 #include "csgeom/math3d.h"
@@ -53,19 +53,19 @@ public:
    * need to be in the world list. This vector contains objects
    * of type csSprite3D*.
    */
-  csObjVector sprites;
+  csNamedObjVector sprites;
 
   /**
    * All static and pseudo-dynamic lights in this sector.
    * This vector contains objects of type csStatLight*.
    */
-  csObjVector lights;
+  csNamedObjVector lights;
 
   /**
    * List of terrain objects in this sector. This vector
    * contains objects of type csTerrain*.
    */
-  csObjVector terrains;
+  csNamedObjVector terrains;
 
 private:
   /// First thing in this sector.

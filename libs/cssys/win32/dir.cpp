@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "cssys/win32/win32.h"
 
 #ifdef __NEED_OPENDIR_PROTOTYPE

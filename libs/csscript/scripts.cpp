@@ -20,15 +20,14 @@
 #include "csscript/scripts.h"
 #include "csscript/intscri.h"
 #include "csscript/primscri.h"
-#include "csengine/csobjvec.h"
 #include "csengine/sysitf.h"
-#include "csobject/nameobj.h"
+#include "csobject/nobjvec.h"
 
 //---------------------------------------------------------------------------
 
-csObjVector& Get_Script_List()
+csNamedObjVector& Get_Script_List()
 {
-  static csObjVector scripts;
+  static csNamedObjVector scripts;
   return scripts;
 }
 
@@ -59,7 +58,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   if (!strncmp (params, "prim", (int)(par-params)))
   {
     CHK (PrimScript* sc = new PrimScript (layer));
-    csNameObject::AddName (*sc, name);
+    sc->SetName (name);
     par++;
     sc->load (&par);
     s = (csScript*)sc;
@@ -67,7 +66,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   else if (!strncmp (params, "int", (int)(par-params)))
   {
     CHK (IntScript* sc = new IntScript (layer));
-    csNameObject::AddName (*sc, name);
+    sc->SetName (name);
     par++;
     sc->load (par);
     s = (csScript*)sc;

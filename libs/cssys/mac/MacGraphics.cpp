@@ -28,7 +28,7 @@
 
 #include "sysdef.h"
 #include "cscom/com.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "csgeom/csrect.h"
 
 #include <SegLoad.h>

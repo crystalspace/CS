@@ -20,7 +20,6 @@
 #define HALO_H
 
 #include "csgeom/math3d.h"
-#include "csengine/csobjvec.h"
 #include "ihalo.h"
 
 /// This is used to keep track of halo information.

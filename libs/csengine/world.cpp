@@ -46,7 +46,6 @@
 #include "csengine/lppool.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
-#include "csobject/nameobj.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
@@ -312,7 +311,7 @@ csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name)
   {
     sn--;
     csSpriteTemplate* s = (csSpriteTemplate*)sprite_templates[sn];
-    if (!strcmp (name, csNameObject::GetName(*s))) return s;
+    if (!strcmp (name, s->GetName ())) return s;
   }
 
   return NULL;
@@ -325,7 +324,7 @@ csThingTemplate* csWorld::GetThingTemplate (const char* name)
   {
     tn--;
     csThingTemplate* s = (csThingTemplate*)thing_templates[tn];
-    if (!strcmp (name, csNameObject::GetName(*s))) return s;
+    if (!strcmp (name, s->GetName ())) return s;
   }
   return NULL;
 }
@@ -405,7 +404,7 @@ void csWorld::PrepareTextures (IGraphics3D* g3d)
         CsPrintf (MSG_WARNING,
           "Invalid texture image '%s' dimenstions!\n"
           "The width (%d) and height (%d) should be a power of two.\n",
-          csNameObject::GetName (*th), Width, Height);
+          th->GetName (), Width, Height);
     }
 
     ITextureHandle* handle;

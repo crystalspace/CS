@@ -25,7 +25,7 @@
 #include "cs2d/be/belibg2d.h"
 #include "cs2d/be/CrystWindow.h"
 #include "cssys/be/beitf.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 
 BEGIN_INTERFACE_TABLE(csGraphics2DBeLib)

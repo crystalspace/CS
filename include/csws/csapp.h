@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Application class interface
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,10 +23,10 @@
 #define CSWS_INTERNAL
 #include "csws.h"
 #include "cscomp.h"
+#include "cswstex.h"
 #include "csgfxppl.h"
 #include "csinput/cseventq.h"
 #include "csutil/csstrvec.h"
-#include "csengine/texture.h"
 
 /**
  * Application's background styles
@@ -50,7 +49,7 @@ enum csAppBackgroundStyle
 class csApp : public csComponent
 {
 protected:
-  friend class appSystemDriver;
+  friend class cswsSystemDriver;
 
   /// The graphics pipeline
   csGraphicsPipeline *GfxPpl;
@@ -58,8 +57,8 @@ protected:
   csMouse *Mouse;
   /// The event queue
   csEventQueue *EventQueue;
-  /// The world object
-  csWorld *World;
+  /// The list of windowing system textures
+  csWSTexVector Textures;
   /// Application background style
   csAppBackgroundStyle BackgroundStyle;
   /// Window list width and height
@@ -75,7 +74,7 @@ protected:
 
   /// Set up initial application layout (read configs, create windows, menus etc)
   virtual bool InitialSetup (int argc, char *argv[],
-    const char *ConfigName, const char *VfsConfigName, const char* dataDir);
+    const char *iConfigName, const char *iVfsConfigName, const char* iDataDir);
 
 public:
   /// Application's adaptive palette
@@ -91,19 +90,10 @@ public:
   /// This is set to TRUE each time top-level window list changes
   bool WindowListChanged;
 
-  /// The following variables are initialized by reading sys/csws.cfg
-  /// Mouse cursor texture
-  char *mousetexturename, *mousetextureparm;
-  /// Titlebar buttons texture
-  char *titletexturename, *titletextureparm;
   /// Titlebar buttons definitions
   csStrVector *titlebardefs;
-  /// Dialog buttons (radio- and check- boxes) texture
-  char *dialogtexturename, *dialogtextureparm;
   /// Dialog buttons definitions
   csStrVector *dialogdefs;
-  /// Custom textures
-  csStrVector *customtexturename, *customtextureparm;
   /// Global "Insert" key state
   bool insert;
 
@@ -113,8 +103,7 @@ public:
   virtual ~csApp ();
 
   /// Shut down the program
-  void ShutDown ()
-  { System->Shutdown = true; }
+  void ShutDown ();
 
   /// The windowing system is idle: do some lazy work
   void Idle ();
@@ -125,22 +114,29 @@ public:
   /// This should be called once per frame by system driver
   virtual void NextFrame ();
 
-  /// Set world for textures, config files etc.
-  virtual void SetWorld (csWorld *AppWorld);
+  /// Display a string on the console using almost usual printf() syntax
+  void printf (int mode, char* str, ...);
 
-  /// Get world for textures, config files etc.
-  csWorld* GetWorld () { return World; }
+  /// Add a single texture to application's texture list
+  bool LoadTexture (const char *iTexName, const char *iTexParams,
+    bool i2D, bool i3D);
+
+  /// Prepare textures for usage (register them with the graphics driver)
+  virtual void PrepareTextures ();
 
   /// Start endless event loop
   virtual void Loop ();
 
   /// Return application's texture list
-  csTextureList *GetTextures ()
-  { return World->GetTextures (); }
+  csWSTexVector *GetTextures ()
+  { return &Textures; }
 
   /// Find a texture by name
-  csTextureHandle *GetTexture (char *Name)
-  { return GetTextures ()->GetTextureMM (Name); }
+  ITextureHandle *GetTexture (char *Name)
+  {
+    csWSTexture *tex = GetTextures ()->FindTexture (Name);
+    return tex ? tex->GetHandle () : NULL;
+  }
 
   /// Return application's global mouse object
   csMouse *GetMouse () { return Mouse; }
@@ -161,8 +157,7 @@ public:
   virtual bool HandleEvent (csEvent &Event);
 
   /// Return active page number
-  int GetPage ()
-  { int Page; System->piGI->GetPage (Page); return Page; }
+  int GetPage ();
 
   /// Capture all mouse events (or disable capture if NULL)
   csComponent *CaptureMouse (csComponent *who)
@@ -279,8 +274,6 @@ protected:
   virtual void LoadConfig ();
 
 private:
-  /// load textures used by all child objects
-  void LoadTextures ();
   /// setup palette
   void SetupPalette ();
   /// Flush graphics pipeline

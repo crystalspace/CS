@@ -44,7 +44,7 @@
 #include "igraph2D.h"
 #endif
 
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 // Maximal path length
 #ifndef MAXPATHLEN

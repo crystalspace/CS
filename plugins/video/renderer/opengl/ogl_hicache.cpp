@@ -21,7 +21,7 @@
 // An abstract class: derive the specific class from this class
 // Written by Dan Ogles
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "cs3d/opengl/ogl_hicache.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
 #include "ilghtmap.h"

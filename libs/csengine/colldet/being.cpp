@@ -20,7 +20,6 @@
 #include "sysdef.h"
 #include "csengine/sysitf.h"
 #include "csengine/being.h"
-#include "csobject/nameobj.h"
 #include "csengine/cdobj.h"
 
 ///
@@ -63,7 +62,7 @@ csBeing* csBeing::PlayerSpawn (char *name)
   
   csPolygon3D *p;
   CHK (csPolygonSet* playerps = new csPolygonSet());
-  csNameObject::AddName(*playerps, name);
+  playerps->SetName (name);
 
   playerps->AddVertex(OX,    OY,    OZ); 
   playerps->AddVertex(OX,    OY,    OZ+DZ); 

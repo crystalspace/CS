@@ -22,7 +22,6 @@
 #include "csengine/sector.h"
 #include "csengine/light.h"
 #include "csengine/world.h"
-#include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(Bot,csSprite3D);
 

@@ -39,7 +39,6 @@
 #include "csengine/quadcube.h"
 #include "csgeom/bsp.h"
 #include "csgeom/octree.h"
-#include "csobject/nameobj.h"
 #include "ihalo.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -147,7 +146,7 @@ void csSector::UseStaticTree (int mode, bool octree)
 
   if (static_thing) return;
   CHK (static_thing = new csThing ());
-  csNameObject::AddName (*static_thing, "__static__");
+  static_thing->SetName ("__static__");
 
   static_thing->SetSector (this);
   csThing* sp = first_thing;
@@ -1338,7 +1337,8 @@ csThing* csSector::GetThing (const char* name)
   csThing* s = first_thing;
   while (s)
   {
-    if (!strcmp (name, csNameObject::GetName(*s))) return s;
+    if (!strcmp (name, s->GetName ()))
+      return s;
     s = (csThing*)(s->GetNext ());
   }
   return NULL;

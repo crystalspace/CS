@@ -19,7 +19,6 @@
 #include "sysdef.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
-#include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(csCollection,csObject);
 
@@ -30,7 +29,7 @@ csObject* csCollection::FindObject (char* name)
   for (int i = 0 ; i < objects.Length() ; i++)
   {
     csObject* csobj = (csObject*)(objects[i]);
-    if (!strcmp ( csNameObject::GetName(*csobj), name)) return csobj;
+    if (!strcmp ( csobj->GetName (), name)) return csobj;
   }
   return NULL;
 }

@@ -22,7 +22,7 @@
 
 #include "sysdef.h"
 #include "cs3d/glide2/glidelib.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include "csutil/inifile.h"
 
 #if defined(OS_WIN32)

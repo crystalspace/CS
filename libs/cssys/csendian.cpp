@@ -19,7 +19,7 @@
 #include <string.h>
 
 #include "sysdef.h"
-#include "cssys/common/csendian.h"
+#include "cssys/csendian.h"
 
 //---------------------------------------------------------------------------
 

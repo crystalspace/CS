@@ -21,7 +21,7 @@
 // An abstract class: derive the specific class from this class
 // Written by Dan Ogles
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 #include "cs3d/direct3d5/d3d_hicache.h"
 #include "cs3d/direct3d5/d3d_txtmgr.h"

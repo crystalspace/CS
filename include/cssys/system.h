@@ -265,7 +265,7 @@ protected:
   csColOption* CollectOptions (IConfig* config, csColOption* already_collected);
 
   /**
-   * Show an alert. This function is called by csPrintf and
+   * Show an alert. This function is called by CsPrintf and
    * should show an alert in case of an error.
    * The default implementation writes the message in debug.txt
    * and on standard output.
@@ -273,7 +273,7 @@ protected:
   virtual void Alert (const char* msg);
 
   /**
-   * Show a warning. This function is called by csPrintf and
+   * Show a warning. This function is called by CsPrintf and
    * should show an alert in case of a warning.
    * The default implementation writes a message in debug.txt
    * and on standard output.
@@ -331,6 +331,9 @@ protected:
 
 // CrystalSpace global variables
 extern csSystemDriver *System;
+
+// Most used routine used for console/debug/etc output ...
+extern void CsPrintf (int mode, char* str, ...);
 
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);

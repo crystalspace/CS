@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: input line class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,10 +23,9 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "csinput/csinput.h"
-#include "csengine/texture.h"
 
 // Spin box texture name
-#define SPINBOX_TEXTURE_NAME		"tex/spinbox.png"
+#define SPINBOX_TEXTURE_NAME		"csws::SpinBox"
 // Automatical spinning period in milliseconds
 #define AUTO_SPIN_INTERVAL		100
 // The pause between first click and autorepeat

@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System client system driver
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -37,28 +36,26 @@ void debug_dump ()
  */
 void cleanup ()
 {
-  if (System && ((appSystemDriver *)System)->application)
-    CHKB (delete ((appSystemDriver *)System)->application);
+  if (System && ((cswsSystemDriver *)System)->application)
+    CHKB (delete ((cswsSystemDriver *)System)->application);
   System = NULL;
 }
 
-// -------------------------------------------------- appSystemDriver class ---
+// -------------------------------------------------- cswsSystemDriver class ---
 
-appSystemDriver::appSystemDriver (csApp *ParentApp, csWorld *ParentWorld) :
+cswsSystemDriver::cswsSystemDriver (csApp *ParentApp) :
   SysSystemDriver ()
 {
   textline = NULL;
   application = ParentApp;
-  world = ParentWorld;
 }
 
-appSystemDriver::~appSystemDriver ()
+cswsSystemDriver::~cswsSystemDriver ()
 {
   application = NULL;
-  world = NULL;
 }
 
-bool appSystemDriver::Initialize (int argc, char *argv[],
+bool cswsSystemDriver::Initialize (int argc, char *argv[],
   const char *iConfigName, const char *iVfsConfigName, IConfig *config)
 {
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName, iVfsConfigName, config))
@@ -82,52 +79,20 @@ bool appSystemDriver::Initialize (int argc, char *argv[],
     linecolor [i] = cs_Color_Black;
   } /* endfor */
 
-  // Now open temporary console
-  world->Initialize (GetISystemFromSystem (System), piG3D, Config, Vfs);
-
   // Open the visual, initialize keyboard and mouse
   Open (application->GetText ());
 
-  // Setup application palette etc
-  application->SetWorld (world);
-
-  // Can only set up the palette after SetWorld() has been called (above),
-  // since it calls csWorld::Prepare() which blasts any existing palette.
-  // Unfortunately, Prepare() leaves the palette in such a state that we can
-  // not add any additional palette entries, but must instead re-initialize
-  // it.  Fortunately re-initializing it is harmless at this point in time
-  // during application start-up since there was no useful information in the
-  // palette anyhow.
-
-  // Create a uniform palette: r(3)g(3)b(2)
-  ITextureManager* txtmgr;
-  piG3D->GetTextureManager (&txtmgr);
-  txtmgr->Initialize ();
-
-  int r,g,b;
-  for (r = 0; r < 8; r++)
-    for (g = 0; g < 8; g++)
-      for (b = 0; b < 4; b++)
-        txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-
-  txtmgr->Prepare ();
-  txtmgr->AllocPalette ();
-  application->SetupPalette ();
+  // Initialize palette etc (no textures at this time anyway)
+  application->PrepareTextures ();
 
   atexit (cleanup);
   return true;
 };
 
-void appSystemDriver::CloseConsole ()
-{
-  // Compute and set the work palette (instead of console palette)
-  application->SetWorld (world);
-}
-
 /*
  * The routine to update the screen in demo mode.
  */
-void appSystemDriver::DemoWrite (const char* buf)
+void cswsSystemDriver::DemoWrite (const char* buf)
 {
   char *crpos;
   while ((crpos = strchr (buf, '\n')))
@@ -177,7 +142,7 @@ void appSystemDriver::DemoWrite (const char* buf)
   } /* endif */
 }
 
-void appSystemDriver::Alert (const char *msg)
+void cswsSystemDriver::Alert (const char *msg)
 {
   csSystemDriver::Alert (msg);
   if (DemoReady)
@@ -189,7 +154,7 @@ void appSystemDriver::Alert (const char *msg)
   }
 }
 
-void appSystemDriver::Warn (const char *msg)
+void cswsSystemDriver::Warn (const char *msg)
 {
   csSystemDriver::Warn (msg);
   if (DemoReady)
@@ -201,7 +166,7 @@ void appSystemDriver::Warn (const char *msg)
   }
 }
 
-void appSystemDriver::NextFrame (long elapsed_time, long current_time)
+void cswsSystemDriver::NextFrame (long elapsed_time, long current_time)
 {
   SysSystemDriver::NextFrame (elapsed_time, current_time);
   application->NextFrame ();

@@ -26,7 +26,7 @@
 #include <AppleEvents.h>
 #include <Events.h>
 #include <Files.h>
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 #define	MAX_ARGS	25
 

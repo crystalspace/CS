@@ -79,6 +79,12 @@ public:
   /// Deletes the given object, removing it from the object tree
   void ObjRemove (csObject* obj);
 
+  /// Set object name
+  void SetName (const char *Name);
+
+  /// Query object name
+  const char *GetName ();
+
 #ifdef __USE_CS_ID_CODE
   ///
   CS_ID GetID () const { return csid_value; }

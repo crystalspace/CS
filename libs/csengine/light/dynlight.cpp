@@ -47,7 +47,6 @@
 #include "sysdef.h"
 #include "csengine/dynlight.h"
 #include "csengine/world.h"
-#include "csobject/nameobj.h"
 #include "csutil/util.h"
 #include "isystem.h"
 
@@ -100,7 +99,7 @@ CLights *CLights::FindByName(char *theName)
 	{
 	for (int x = 0; x < numLights; ++x)
 		{
-		if (!strcmp(csNameObject::GetName(*(theLights[x])), theName))
+		if (!strcmp(theLights[x]->GetName (), theName))
 			return theLights[x];
 		}
 	return (CLights*)0; // this could be bad news

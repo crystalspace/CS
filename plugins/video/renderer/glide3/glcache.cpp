@@ -21,7 +21,7 @@
 // Written by xtrochu and Nathaniel
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 //#include "engine/polygon/polygon.h"	BAD NOT ALLOWED @@@ USE IPOLYGON.H INSTEAD!
 //#include "engine/polygon/polytext.h"
 //#include "engine/camera.h"

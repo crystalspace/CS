@@ -19,7 +19,6 @@
 
 #include "sysdef.h"
 #include "csgeom/polyclip.h"
-#include "csengine/sysitf.h"
 #include "csengine/csview.h"
 #include "csengine/world.h"
 #include "csengine/pol2d.h"

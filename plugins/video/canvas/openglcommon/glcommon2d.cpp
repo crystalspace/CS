@@ -24,7 +24,7 @@
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "cssys/unix/iunix.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 #include "itexture.h"
 

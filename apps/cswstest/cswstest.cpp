@@ -18,7 +18,7 @@
 
 #define SYSDEF_PATH
 #include "sysdef.h"
-#include "csengine/sysitf.h"
+#include "cssys/system.h"
 #include "csws/csws.h"
 
 class csWsTest : public csApp
@@ -61,8 +61,8 @@ bool csWsTest::InitialSetup (int argc, char *argv[],
   // For GUI apps double buffering is a performance hit
   System->piG2D->DoubleBuffer (false);
 
-  CsPrintf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
-  CsPrintf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
+  printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
+  printf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
 
   // create a window
   csComponent *window = new csWindow (this, "-- Drag me --",

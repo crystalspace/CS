@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Component
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +20,7 @@
 #include <stddef.h>
 #include <ctype.h>
 #include "sysdef.h"
+#include "cssys/system.h"
 #include "csengine/csspr2d.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"

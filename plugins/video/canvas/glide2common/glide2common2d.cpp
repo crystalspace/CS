@@ -30,7 +30,7 @@
 #endif
 #include "csutil/inifile.h"
 #include "cs3d/glide2/glidelib.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 #include "itexture.h"
 

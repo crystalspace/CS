@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: mouse support
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,14 +18,14 @@
 */
 
 #include "sysdef.h"
+#include "cssys/system.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
 #include "csinput/csevent.h"
-#include "csengine/texture.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
 
-#define MOUSE_CFG "sys/mouse.cfg"
+#define MOUSE_TEXTURE_NAME	"csws::Mouse"
 
 csMousePointer::csMousePointer (csComponent *iParent, int ID, int x, int y,
   int w, int h, int hsx, int hsy) : csComponent (iParent)
@@ -74,7 +73,7 @@ void csMousePointer::Free ()
   }
 }
 
-void csMousePointer::SetTexture (csTextureHandle *tex)
+void csMousePointer::SetTexture (ITextureHandle *tex)
 {
   if (Cursor)
     CHKB (delete Cursor);
@@ -129,13 +128,15 @@ void csMouse::NewPointer (char *id, char *posdef)
 
 static bool do_set_texture (csComponent *child, void *param)
 {
-  ((csMousePointer *)child)->SetTexture ((csTextureHandle *)param);
+  ((csMousePointer *)child)->SetTexture ((ITextureHandle *)param);
   return false;
 }
 
 void csMouse::Setup ()
 {
-  ForEach (do_set_texture, app->GetTexture (app->mousetexturename));
+  ITextureHandle *tex = app->GetTexture (MOUSE_TEXTURE_NAME);
+  if (tex)
+    ForEach (do_set_texture, tex);
 }
 
 bool csMouse::HandleEvent (csEvent &Event)
@@ -169,7 +170,7 @@ bool csMouse::SetCursor (csMouseCursorID ID)
   if (Cur)
   {
     if (SUCCEEDED (System->piG2D->SetMouseCursor (ID,
-      Cur->Cursor->GetTextureHandle ()->GetTextureHandle ())))
+      Cur->Cursor->GetTextureHandle ())))
       invisible = true;
     else
     {

@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: timer class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +20,7 @@
 #include "sysdef.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
+#include "cssys/system.h"
 
 csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
   : csComponent (iParent)

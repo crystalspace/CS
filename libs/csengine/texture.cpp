@@ -21,7 +21,6 @@
 #include "sysdef.h"
 #include "csengine/texture.h"
 #include "csgfxldr/csimage.h"
-#include "csobject/nameobj.h"
 #include "itxtmgr.h"
 
 //---------------------------------------------------------------------------
@@ -45,8 +44,7 @@ csTextureHandle::csTextureHandle (csTextureHandle &th) :
   transp_g = th.transp_g;
   transp_b = th.transp_b;
   SetTextureHandle (th.GetTextureHandle ());
-  const char *name = csNameObject::GetName (th);
-  csNameObject::AddName (*this, name);
+  SetName (th.GetName ());
 }
 
 csTextureHandle::~csTextureHandle ()
@@ -131,7 +129,7 @@ int csTextureList::GetTextureIdx (const char* name)
   const char* texture_name;
   for (i = 0 ; i < num_textures ; i++)
   {
-    texture_name = csNameObject::GetName(*(textures[i]));
+    texture_name = textures[i]->GetName ();
     if (texture_name && !strcmp (texture_name, name)) return i;
   }
   return -1;

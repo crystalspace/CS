@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csgeom/polyint.h"
-#include "csengine/csobjvec.h"
+#include "csobject/nobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"
@@ -207,9 +207,9 @@ private:
   int* emerge_from;
 
   /// The frames
-  csObjVector frames;
+  csNamedObjVector frames;
   /// The actions (a vector of csSpriteAction objects)
-  csObjVector actions;
+  csNamedObjVector actions;
 
 public:
   /// Create the sprite template
@@ -339,7 +339,7 @@ private:
 
 public:
   /// List of sectors where this sprite is.
-  csObjVector sectors;
+  csNamedObjVector sectors;
 
   /**
    * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.

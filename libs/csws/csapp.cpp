@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Application class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,13 +17,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdarg.h>
 #include "sysdef.h"
+#include "qint.h"
 #include "csparser/csloader.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
 #include "csutil/csstrvec.h"
+#include "csutil/scanstr.h"
 #include "csinput/cseventq.h"
-#include "csengine/sysitf.h"
 #include "csws/cswssys.h"
 #include "csws/cslistbx.h"
 #include "csws/csmouse.h"
@@ -40,35 +41,30 @@
 #define CSWS_CFG "csws.cfg"
 
 TOKEN_DEF_START
-  TOKEN_DEF (MOUSECURSORIMAGEFILE)
   TOKEN_DEF (MOUSECURSOR)
-  TOKEN_DEF (TITLEBUTTONIMAGEFILE)
   TOKEN_DEF (TITLEBUTTON)
-  TOKEN_DEF (DIALOGBUTTONIMAGEFILE)
   TOKEN_DEF (DIALOGBUTTON)
-  TOKEN_DEF (CUSTOMTEXTURE)
+  TOKEN_DEF (TEXTURE)
+  TOKEN_DEF (TRANSPARENT)
+  TOKEN_DEF (FILE)
 TOKEN_DEF_END
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csApp  -//--
 
 csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csComponent (NULL)
 {
-  app = this;           // so that all inserted windows will inherit it
-  World = NULL;         // No world so far
+  app = this;			// so that all inserted windows will inherit it
   text = NULL;
-  SetText (AppTitle);   // application title string
-  MouseOwner = NULL;    // no mouse owner
-  KeyboardOwner = NULL; // no keyboard owner
-  FocusOwner = NULL;    // no focus owner
+  SetText (AppTitle);		// application title string
+  MouseOwner = NULL;		// no mouse owner
+  KeyboardOwner = NULL;		// no keyboard owner
+  FocusOwner = NULL;		// no focus owner
+  titlebardefs =
+  dialogdefs = NULL;
   RedrawFlag = true;
   WindowListChanged = false;
   LoopLevel = 0;
   BackgroundStyle = iBackgroundStyle;
-  mousetexturename = mousetextureparm =
-  titletexturename = titletextureparm =
-  dialogtexturename = dialogtextureparm = NULL;
-  titlebardefs = dialogdefs =
-  customtexturename = customtextureparm = NULL;
   insert = true;
 
   oldMouseCursorID = csmcNone;
@@ -81,9 +77,8 @@ csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csC
   Mouse->app = this;
   CHK (GfxPpl = new csGraphicsPipeline ());
 
-  // Create the world
-  CHK (World = new csWorld ());
-  CHK (System = new appSystemDriver (this, World));
+  // Create the system driver object
+  CHK (System = new cswsSystemDriver (this));
 }
 
 csApp::~csApp ()
@@ -91,28 +86,10 @@ csApp::~csApp ()
   // Delete all children prior to shutting down the system
   DeleteAll ();
 
-  if (World)
-    CHKB (delete World);
-  if (mousetexturename)
-    CHKB (free (mousetexturename));
-  if (mousetextureparm)
-    CHKB (free (mousetextureparm));
-  if (titletexturename)
-    CHKB (free (titletexturename));
-  if (titletextureparm)
-    CHKB (free (titletextureparm));
   if (titlebardefs)
     CHKB (delete titlebardefs);
-  if (dialogtexturename)
-    CHKB (free (dialogtexturename));
-  if (dialogtextureparm)
-    CHKB (free (dialogtextureparm));
   if (dialogdefs)
     CHKB (delete dialogdefs);
-  if (customtexturename)
-    CHKB (delete customtexturename);
-  if (customtextureparm)
-    CHKB (delete customtextureparm);
 
   if (Mouse)
     CHKB (delete Mouse);
@@ -123,26 +100,31 @@ csApp::~csApp ()
     CHK (delete System);
 }
 
-void csApp::SetWorld (csWorld *AppWorld)
+void csApp::printf (int mode, char* str, ...)
 {
-  World = AppWorld;
-  World->Prepare (System->piG3D);
-  ITextureManager* txtmgr;
-  System->piG3D->GetTextureManager (&txtmgr);
-  txtmgr->AllocPalette ();
-  SetupPalette ();
+  char buf[1024];
+  va_list arg;
+  va_start (arg, str);
+  vsprintf (buf, str, arg);
+  va_end (arg);
+  System->Printf (mode, buf);
+}
+
+void csApp::ShutDown ()
+{
+  System->Shutdown = true;
 }
 
 bool csApp::InitialSetup (int argc, char *argv[],
-  const char *ConfigName, const char *VfsConfigName, const char* dataDir)
+  const char *iConfigName, const char *iVfsConfigName, const char* iDataDir)
 {
-  System->Initialize (argc, argv, ConfigName, VfsConfigName, World->GetEngineConfigCOM ());
+  System->Initialize (argc, argv, iConfigName, iVfsConfigName, NULL);
 
   // For GUI apps double buffering is a serious performance hit
   System->piG2D->DoubleBuffer (false);
 
   // Change to the directory on VFS where we keep our data
-  System->Vfs->ChDir (dataDir);
+  System->Vfs->ChDir (iDataDir);
 
   EventQueue = System->EventQueue;
 
@@ -154,14 +136,20 @@ bool csApp::InitialSetup (int argc, char *argv[],
   WindowListWidth = Width / 3;
   WindowListHeight = Width / 6;
 
-  // Tell CsPrintf() console is ready
+  // Tell printf() console is ready
   System->DemoReady = true;
 
   LoadConfig ();
-  LoadTextures ();
-  // Close the debug console (and set up new palette)
-  ((appSystemDriver *)System)->CloseConsole ();
+  // Compute and set the work palette (instead of console palette)
+  PrepareTextures ();
   return true;
+}
+
+int csApp::GetPage ()
+{
+  int Page;
+  System->piGI->GetPage (Page);
+  return Page;
 }
 
 void csApp::Loop ()
@@ -199,22 +187,75 @@ void csApp::Update ()
   Mouse->Undraw ();
 }
 
+bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
+  bool i2D, bool i3D)
+{
+  TOKEN_TABLE_START (texcommands)
+    TOKEN_TABLE (FILE)
+    TOKEN_TABLE (TRANSPARENT)
+  TOKEN_TABLE_END
+
+  const char *filename = iTexName;
+  char *buffer = strnew (iTexParams);
+  char *bufptr = buffer;
+  bool transp = false;
+  float tr, tg, tb;
+
+  int cmd;
+  char *name, *params;
+  while ((cmd = csGetObject (&bufptr, texcommands, &name, &params)) > 0)
+    switch (cmd)
+    {
+      case TOKEN_FILE:
+        filename = params;
+        break;
+      case TOKEN_TRANSPARENT:
+        transp = true;
+        ScanStr (params, "%f,%f,%f", &tr, &tg, &tb);
+        break;
+      default:
+        CHK (delete [] buffer);
+        return false;
+    }
+
+  // Now load the texture
+  ImageFile *image;
+  size_t size;
+  char *fbuffer = System->Vfs->ReadFile (filename, size);
+  CHK (delete [] buffer);
+  if (!fbuffer || !size)
+  {
+    printf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
+    return false;
+  }
+
+  image = ImageLoader::load ((UByte *)fbuffer, size);
+  CHK (delete [] fbuffer);
+
+  if (image && (image->get_status () & IFE_Corrupt))
+  {
+    printf (MSG_WARNING, "'%s': %s!\n", filename, image->get_status_mesg ());
+    CHK (delete image);
+    return false;
+  }
+
+  csWSTexture *tex = new csWSTexture (iTexName, image, i2D, i3D);
+  if (transp)
+    tex->SetTransparent (QInt (tr * 255.), QInt (tg * 255.), QInt (tb * 255.));
+  Textures.Push (tex);
+
+  return true;
+}
+
 void csApp::LoadConfig ()
 {
   TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (MOUSECURSORIMAGEFILE)
     TOKEN_TABLE (MOUSECURSOR)
-    TOKEN_TABLE (TITLEBUTTONIMAGEFILE)
     TOKEN_TABLE (TITLEBUTTON)
-    TOKEN_TABLE (DIALOGBUTTONIMAGEFILE)
     TOKEN_TABLE (DIALOGBUTTON)
-    TOKEN_TABLE (CUSTOMTEXTURE)
+    TOKEN_TABLE (TEXTURE)
   TOKEN_TABLE_END
 
-  if (!customtexturename)
-    CHKB (customtexturename = new csStrVector (16, 16));
-  if (!customtextureparm)
-    CHKB (customtextureparm = new csStrVector (16, 16));
   if (!titlebardefs)
     CHKB (titlebardefs = new csStrVector (16, 16));
   if (!dialogdefs)
@@ -224,31 +265,19 @@ void csApp::LoadConfig ()
   char *cswscfg = System->Vfs->ReadFile (CSWS_CFG, cswscfglen);
   if (!cswscfg)
   {
-    CsPrintf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
+    printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
     fatal_exit (0, true);			// cfg file not found
     return;
   }
 
   int cmd;
-  char *oldcfg = cswscfg, *name, *params;
-  while ((cmd = csGetObject (&cswscfg, commands, &name, &params)) > 0)
+  char *cfg = cswscfg, *name, *params;
+  while ((cmd = csGetObject (&cfg, commands, &name, &params)) > 0)
     switch (cmd)
     {
-      case TOKEN_MOUSECURSORIMAGEFILE:
-      {
-        mousetexturename = strdup (name);
-        mousetextureparm = strdup (params);
-        break;
-      }
       case TOKEN_MOUSECURSOR:
       {
         Mouse->NewPointer (name, params);
-        break;
-      }
-      case TOKEN_TITLEBUTTONIMAGEFILE:
-      {
-        titletexturename = strdup (name);
-        titletextureparm = strdup (params);
         break;
       }
       case TOKEN_TITLEBUTTON:
@@ -258,12 +287,6 @@ void csApp::LoadConfig ()
         titlebardefs->Push (tmp);
         break;
       }
-      case TOKEN_DIALOGBUTTONIMAGEFILE:
-      {
-        dialogtexturename = strdup (name);
-        dialogtextureparm = strdup (params);
-        break;
-      }
       case TOKEN_DIALOGBUTTON:
       {
         CHK (char *tmp = new char [strlen (name) + 1 + strlen (params) + 1]);
@@ -271,72 +294,42 @@ void csApp::LoadConfig ()
         dialogdefs->Push (tmp);
         break;
       }
-      case TOKEN_CUSTOMTEXTURE:
-      {
-        customtexturename->Push (strdup (name));
-        customtextureparm->Push (strdup (params));
+      case TOKEN_TEXTURE:
+        LoadTexture (name, params, true, false);
         break;
-      }
       default:
-        CsPrintf (MSG_FATAL_ERROR, "Unknown token in csws.cfg! (%s)\n", cswscfg);
+        printf (MSG_FATAL_ERROR, "Unknown token in csws.cfg! (%s)\n", cfg);
         fatal_exit (0, false);			// Unknown token
     }
-  CHK (delete[] oldcfg);
+  CHK (delete[] cswscfg);
 }
 
-void csApp::LoadTextures ()
+void csApp::PrepareTextures ()
 {
-  // Build a list of all required textures: first compute the length
-  int i, txlen = 1;
+  ITextureManager *txtmgr;
+  System->piG3D->GetTextureManager (&txtmgr);
 
-#define ADD_LEN(tex,par) \
-  txlen += (tex ? strlen (tex) : 0) + (par ? strlen (par) : 0) + \
-    strlen ("TEXTURE '' ()\n");
+  // Clear all textures from texture manager
+  txtmgr->Initialize ();
 
-  ADD_LEN (mousetexturename, mousetextureparm);
-  ADD_LEN (titletexturename, titletextureparm);
-  ADD_LEN (dialogtexturename, dialogtextureparm);
-  for (i = 0; i < customtexturename->Length (); i++)
-    ADD_LEN ((char *)customtexturename->Get (i),
-             (char *)customtextureparm->Get (i));
-#undef ADD_LEN
+  // Create a uniform palette: r(3)g(3)b(2)
+  int r,g,b;
+  for (r = 0; r < 8; r++)
+    for (g = 0; g < 8; g++)
+      for (b = 0; b < 4; b++)
+        txtmgr->ReserveColor (r * 32, g * 32, b * 64);
 
-  CHK (char *texcfg = new char [txlen]);
-  int txfil = 0;
+  // Register all CSWS textures to the texture manager
+  for (int i = 0; i < Textures.Length (); i++)
+    Textures.Get (i)->Register (txtmgr);
 
-#define ADD_TEX(tex,par) \
-  { \
-    sprintf (texcfg + txfil, "TEXTURE '%s' (%s)\n", tex ? tex : "", par ? par : ""); \
-    txfil += strlen (texcfg + txfil); \
-  }
-
-  ADD_TEX (mousetexturename, mousetextureparm);
-  ADD_TEX (titletexturename, titletextureparm);
-  ADD_TEX (dialogtexturename, dialogtextureparm);
-  for (i = 0; i < customtexturename->Length (); i++)
-    ADD_TEX ((char *)customtexturename->Get (i),
-             (char *)customtextureparm->Get (i));
-  texcfg [txfil] = 0;
-#undef ADD_TEX
-
-  csLoader::LoadTextures (World->GetTextures (), texcfg, World);
-  CHK (delete [] texcfg);
-
-  // Now mark all textures for 2D usage and unmark for 3D usage
-  csTextureList *texlist = GetTextures ();
-  if (texlist)
-  {
-    for (i = 0; i < texlist->GetNumTextures (); i++)
-    {
-      csTextureHandle *texh = texlist->GetTextureMM (i);
-      if (texh)
-      {
-        texh->for_2d = true;
-        texh->for_3d = false;
-      }
-    }
-  }
-
+  // Prepare all the textures.
+  txtmgr->Prepare ();
+  // Allocate a common palette for texture (256-color mode)
+  txtmgr->AllocPalette ();
+  // Look in palette for colors we need for windowing system
+  SetupPalette ();
+  // Finally, set up mouse pointer images
   Mouse->Setup ();
 }
 

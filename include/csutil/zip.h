@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    ZIP archive support for Crystal Space 3D library
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

@@ -1,0 +1,618 @@
+<title>
+Crystal Space Shared Class Facility
+</title>
+
+<body text=#FFFFFF link=#00D0D0 vlink=#00FFFF bgcolor=#003050>
+
+<h1>Goal</h1>
+
+<p>
+This library is intended for separating C++ class implementations
+from programs that use them; this is achieved by separating class
+implementations into a separate module (currently only shared libraries
+are supported). There is very little requirements to the shared library
+itself: this helps to address many problems regarding shared library
+facility differences encountered on different platforms. In fact, it is
+possible to use some different mechanism for SCF, for example inter-process
+communication (through pipes, shared memory or whatever); communication
+through network or through a COM or CORBA request broker, although currently
+there are only two minimal configurations supported: using shared libraries
+and using static linkage (for platforms that don't have shared library
+support).
+</p>
+
+<h1>How it works</h1>
+
+<p>
+This paragraph contains technical details about SCF. If you're not interested
+in details, you can skip directly to next chapter which explains how SCF should
+be used from end-user point of view.
+</p>
+
+<p>
+SCF is somewhat similar to COM. That's because historically Crystal Space
+initially used COM for inter-module communications. Thanks to Dan Ogles for
+the initial implementation of a cross-platform COM library; his implementation
+was a good testbed for this SCF implementation.
+</p>
+
+<p>
+The differences between COM and SCF are due to increased need in a
+easier-to-use and maybe a more lightweighted interface than COM. The COM
+implementation caused some problems (because of bugs in EGCS 1.1.X and
+in the NeXT C++ compiler). Also it has some problems due to native Windows
+types used in COM; this experience has been taken into account
+while developing SCF.
+</p>
+
+<p>
+The main paradigm of SCF, as in COM/CORBA/Java/etc is interface.
+You define an <i>interface</i>, that is, a set of abstract methods that
+you want to access within some object. SCF interfaces are plain C++ structs
+(or classes, it doesn't matter much except that if you're using classes you
+will have to add the "public:" keyword). Theoretically interface can contain
+even member variables and inline methods (but no non-virtual methods and
+constructors), BUT! this practice is not encouraged because later someone
+can want to add an COM/CORBA/whatever layer between client and the actual
+object, and this will not be possible if interface would contain variables
+or inline methods. If you don't plan to use COM/CORBA later, you can use
+variables and inline functions as much as you want.
+<br>
+Here is an example of an interface:
+</p>
+
+<pre>
+struct IDog
+{
+  virtual bool IsAlive () = 0;
+  virtual char *GetName () = 0;
+  virtual void SetName (char *iName) = 0;
+  virtual void Barf (int iHowLoud) = 0;
+  virtual void Run (int iSpeed, float iDirection) = 0;
+  virtual bool GetChildren (IObjVector *oBrood) = 0;
+};
+</pre>
+
+<p>
+Note the last method that gets a pointer of IObjVector type. IObjVector is
+yet another interface. We could pass a pointer to an csObjVector as well,
+but this will mean both modules (caller and callee) should have same idea
+about what a csObjVector is... and if it happened you compiled the shared
+library with a slightly different version of csObjVector (that, say, had
+one member variable less) you will end up with an SIGSEGV.
+</p>
+
+<p>
+Now let's write <i>a particular implementation</i> of the above interface.
+</p>
+
+<pre>
+#include "idog.h"
+
+class MyDog : public IDog
+{
+  ... member functions/variables go here ...
+
+  char *Name;
+public:
+  virtual bool IsAlive ();
+  virtual char *GetName ();
+  virtual void SetName (char *iName);
+  virtual void Barf (int iHowLoud);
+  virtual void Run (int iSpeed, float iDirection);
+  virtual bool GetChildren (IObjVector *oBrood);
+
+  ... some additional member functions/variables go here ...
+};
+
+bool MyDog::IsAlive ()
+{
+  return true;
+};
+
+char *MyDog::GetName ()
+{
+  return Name;
+}
+
+void MyDog::GetName (char *iName)
+{
+  if (Name)
+    free (Name);
+  Name = strcpy (iName);
+}
+
+... and so on ...
+</pre>
+
+<p>
+Now we put the actual implementation into a separate module (i.e. into a shared
+library), and include into client just the interface file "idog.h". Now, since
+the client don't have an idea how we should build a object of the MyDog
+class, the only thing left is to provide a function that will return a
+newly-allocated object of that class. Here is how we do it:
+</p>
+
+<pre>
+static IDog *Create_IDog ()
+{
+  return new MyDog ();
+}
+</pre>
+
+<p>
+Okay, we did it. Now back to the client: to work with a object that implements
+the IDog interface we need to load the shared library, get a pointer to
+Create_MyDog function, call it and get a new MyDog object. Further we work
+with this pointer as if it were pointing an IDog object:
+</p>
+
+<pre>
+handle = LoadLibrary ("libdog.so");
+IDog (*Create_IDog) () = GetLibrarySymbol ("Create_IDog");
+IDog *dog = Create_IDog ();
+printf ("Doggy's name is %s\n", dog->GetName ());
+dog->Barf (100);
+...
+</pre>
+
+<p>
+Of course, you don't have to do all this stuff with current SCF implementation.
+The SCF library provides a number of macros and functions that almost hides the
+implementation details from end-user.
+</p>
+
+<h1>SCF library usage</h1>
+
+<p>
+The only include file you need in both your client and server modules is
+<i>"csscf.h"</i>. It contain a number of macros and functions that you will
+need for easier use of SCF. For the client, you will also have to add the
+csscf.cpp source code file to your project, on the server-side you don't need
+it (inline macros defined in "csscf.h" are enough).
+</p>
+
+<p>
+The SCF header file provides a macro called "csInterface" that expands to
+"struct". You should use this "keyword" whenever you define an interface,
+because the header files will be easier to understand.
+<p>
+
+<p>
+To simplify things, all exported classes are supposed to be derived from
+some basical interface called IBase. IBase defines three interface functions:
+</p>
+
+<dl>
+  <dt>void AddRef ();
+  <dd>This function should be called each time you get a new reference to
+  a object and store it for a long-time usage.
+  <dt>void Release ();
+  <dd>Call this function to decrement the object's reference count. When
+  reference count reaches zero, the object is automatically deleted
+  (if it is not an interface embedded within another object).
+  <dt>IBase *QueryInterface (const char *iItfName, int iVersion);
+  <dd>This method will return a pointer to an interface or to an embedded
+  interface (see the description of embedded interfaces below).
+</dl>
+
+<p>
+To simplify things even more, "csscf.h" file provides several macros that
+provide default declaration and default implementation of these three methods.
+DECLARE_IBASE macro will declare above three methods within any class definition
+that is derived from IBase. The IMPLEMENT_IBASE will add the default
+implementation of these function to your module. Example:
+</p>
+
+<pre>
+csInterface ITest : public IBase
+{
+  ...
+};
+
+class Test : public ITest
+{
+  DECLARE_IBASE
+};
+
+IMPLEMENT_IBASE (Test)
+</pre>
+
+<p>
+In reality, we need a bit more macros because the QueryInterface() function is
+not static - it depends on the interfaces implemented by given object. In fact,
+IMPLEMENT_IBASE defines the AddRef, Release() and the beginning of the
+QueryInterface function, but not the end of that function (i.e. the closing
+brace). That's because you have to use an additional macro called
+IMPLEMENTS_INTERFACE that will add the code required to support all implemented
+interface inside the QueryInterface():
+</p>
+
+<pre>
+IMPLEMENT_IBASE (Test)
+  IMPLEMENTS_INTERFACE (ITest)
+IMPLEMENT_IBASE_END
+</pre>
+
+<p>
+Since all classes are supposed to be derived from IBase, the IMPLEMENT_IBASE
+automatically supplies the <code>IMPLEMENTS_INTERFACE (IBase)</code> line
+so you only have to enumerate non-standard interfaces your object implements.
+</p>
+
+<p>
+The DECLARE_IBASE macro also defines two member variables: csfRefCount and
+csfParent. csfRefCount is the counter for external references to this object
+and is used by AddRef() and Release() methods. The csfParent method points
+to parent object and is also used by AddRef() and Release(). Objects are chained
+in a tree-like fashion, and an AddRef to third object in chain will also
+call csfParent->AddRef(); same about Release(). The object tree looks like
+this:
+</p>
+
+<pre>
+[ClassFactory]
+  +--[Object]
+       +--[Embedded interface]
+       +--[Embedded interface]
+            +--[Sub-embedded interface]
+</pre>
+
+<p>
+Thus, if we call the AddRef method for "Sub-embedded interface", we also will
+increment reference count for Object and ClassFactory.
+</p>
+
+<p>
+You also should call the CONSTRUCT_IBASE(Parent) inside your class constructor,
+this macro will initialize scfRefCount to zero and scfParent to the value you
+pass to this macro. In fact, constructor of any class should receive one
+argument (IBase *) which should then be passed to CONSTRUCT_IBASE macro.
+</p>
+
+<h2>Embedded interfaces</h2>
+
+<p>
+Sometimes we will want one object to implement several interfaces. For example,
+the 3D graphics driver could provide a basic IGraphics3D interface and several
+additional optional interfaces such as IHalo, IBumpMap and so on. Such
+"additional" interfaces are called "embedded interfaces" since with SCF you
+implement them by embedding an additional object inside the "main" class that
+will provide the required interface. Here is an example:
+</p>
+
+<pre>
+class MyGraphics3D : publuc IGraphics3D
+{
+  // declare the IHalo embedded interface
+  class MyHalo : public IHalo
+  {
+    ...
+  } scfIHalo;
+  // declare the IBumpMap embedded interface
+  class MyBumpMap : public IBumpMap
+  {
+    ...
+  } scfIBumpMap;
+
+public:
+  ...
+};
+</pre>
+
+<p>
+Note that you don't need to use some "special" names for classes; use anything
+you want (i.e. the "My" prefix is not required; you could name above class
+"GraphixThreeDeeImplementation", this is true for embedded classes as well).
+But most macros that have the word "EMBEDDED" within their names (see below)
+relies on embedded object names to be scf##InterfaceName, that is, scfIBase,
+scfITest, scfIGraphics3D and so on.
+</p>
+
+<p>
+When you declare the IBase methods within an embedded class, you can use
+the DECLARE_EMBEDDED_IBASE(OuterClass) macro instead of DECLARE_IBASE.
+In this case the scfParent member will be of "OuterClass *" type rather than
+"IBase *"; this will allow member class to talk with his parent directly,
+thus allowing for direct member variables/functions access. In fact,
+DECLARE_IBASE macro expands to DECLARE_EMBEDDED_IBASE(IBase).
+</p>
+
+<p>
+You also should use IMPLEMENT_EMBEDDED_IBASE macro instead of IMPLEMENT_IBASE
+because IMPLEMENT_IBASE will destroy the object when its reference count will
+reach zero; if you will do the same for an embedded interface you will fail
+because the object is allocated/freed at the same time when parent object is.
+</p>
+
+<p>
+And finally, in parent object's constructor you should initialize all embedded
+interface objects with the CONSTRUCT_EMBEDDED_IBASE(InterfaceName) macro. This
+will initialize scfRefCount and scfParent fields within scf##InterfaceName
+member variables to appropiate values (zero and "this"). Here is how we do it:
+</p>
+
+<pre>
+MyGraphics3D::MyGraphics3D (IBase *iParent)
+{
+  CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE (IHalo);
+  CONSTRUCT_EMBEDDED_IBASE (IBumpMap);
+  ...
+}
+</pre>
+
+<h2>Interface versions</h2>
+
+<p>
+Unlike COM, SCF supports interface versions. That is, a shared library could
+implement verion 0.3.6 of given interface, and if client requests that interface
+of a version lower or equal than 0.3.6, a correct interface pointer is returned.
+Inside each "i###.h" file you define a macro called VERSION_I### that defines
+the current version of given interface. To correctly support different versions
+of interfaces you should follow the following guidelines:
+</p>
+
+<ul>
+  <li>Do not insert new methods into existing interfaces. Instead, you should
+  append them after last defined method.
+  <li>If your change made the interface invalid for clients that expect
+  older versions of interfaces, increase the major version number, and
+  set minor and micro versions to zero.
+  <li>If your changes are relatively minor, but you do a major release,
+  increase the minor version number and drop the micro version to zero.
+  <li>If you're in developement process, and did a minor change to the
+  interface, increase the micro version.
+</ul>
+
+<p>
+The possible range for major and minor version numbers is 0..255, and the
+range for micro version number is 0..65535.
+</p>
+
+<p>
+When you query an interface, you always should tell what interface version are
+you looking for. If module cannot provide an interface compatible with the
+requested version, the QueryInterface() will return NULL (same as if interface
+wouldn't be available at all). You can use scfCompatibleVersion () to
+check whenever requested version is compatible with interface version.
+In fact, the IMPLEMENTS_INTERFACE and IMPLEMENTS_EMBEDDED_INTERFACE macros
+use this function.
+</p>
+
+<h2>Client side</h2>
+
+<p>
+Now let's explain how to use all this mess from client side. First, we should
+be able to create objects that implements the interfaces we want. For this,
+you should use the CREATE_INSTANCE macro. It receives two arguments: the name
+of external class, and the name of the interface it implements. So, if we
+know class MyGraphics3D implements the IGraphics3D interface, you should write:
+</p>
+
+<pre>
+IGraphics3D *G3D = CREATE_INSTANCE (MyGraphics3D, IGraphics3D);
+if (!G3D)
+{
+  fprintf (stderr, "Cannot create an object of the MyGraphics3D class!\n");
+  abort ();
+}
+</pre>
+
+<p>
+Now you can use the object any way you like, just like standard C++:
+</p>
+
+<pre>
+G3D->BeginDraw ();
+G3D->DrawLine (...);
+G3D->DrawPolygon (...);
+G3D->EndDraw ();
+</pre>
+
+<p>
+When you are done using the G3D pointer (say, when program exits), you should
+free that object by calling G3D->Release (). After this you cannot use G3D
+anymore; you should create another instance of IGraphics3D for this.
+</p>
+
+<p>
+To query an embedded interface, you will want to use the QUERY_INTERFACE macro;
+it also receives two arguments, first being the object you are querying for the
+embedded interface and second being the name of the interface you want. Example:
+</p>
+
+<pre>
+IHalo *halo = QUERY_INTERFACE (G3D, IHalo);
+if (!halo)
+{
+  fprintf (stderr, "The 3D graphics driver doesn't support halo drawing!\n");
+  return;
+}
+</pre>
+
+<h1>Example</h1>
+
+<p>
+Here is a completely working example. It implements an shared class that
+has a base and an embedded interface. Here are the interface files for the
+IDog interface (the base interface of our class) and the IName interface (the
+interface embedded into our class):
+</p>
+
+<h2>idog.h</h2>
+<pre>
+#include "csscf.h"
+
+// the version number of our interface
+#define VERSION_IDog	SCF_VERSION (0, 0, 1)
+
+csInterface IDog : public IBase
+{
+  virtual void Walk () = 0;
+  virtual void Barf (char *iWhat) = 0;
+};
+</pre>
+
+<h2>iname.h</h2>
+<pre>
+#include "csscf.h"
+
+// the version number of our interface
+#define VERSION_IName	SCF_VERSION (0, 0, 1)
+
+csInterface IName : public IBase
+{
+  virtual char *GetName () = 0;
+  virtual void SetName (char *iName) = 0;
+};
+</pre>
+
+<p>
+Now here is the implementation of a class that provides both above interfaces:
+</p>
+
+<h2>dog.cpp</h2>
+<pre>
+#include "idog.h"
+#include "iname.h"
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+class csDog : public IDog
+{
+  char *Name;
+
+  // Embedded interface
+  class csName : public IName
+  {
+  public:
+    virtual char *GetName ();
+    virtual void SetName (char *iName);
+    DECLARE_EMBEDDED_IBASE (csDog)
+  } scfIName;
+  friend class csName;
+
+public:
+  csDog (IBase *iParent);
+  virtual void Walk ();
+  virtual void Barf (char *iWhat);
+  DECLARE_IBASE
+};
+
+//--------------- implementation ----------------
+
+IMPLEMENT_IBASE (csDog)
+  IMPLEMENTS_INTERFACE (IDog)
+  IMPLEMENTS_EMBEDDED_INTERFACE (IName)
+IMPLEMENT_IBASE_END
+
+csDog::csDog (IBase *iParent)
+{
+  CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE (scfIName);
+  Name = NULL;
+}
+
+void csDog::Walk ()
+{
+  printf ("%s: I'm walking\n", Name);
+}
+
+void csDog::Barf (char *iWhat)
+{
+  printf ("I'm %s: barf, barf, %s\n", Name, iWhat);
+}
+
+// IName interface for dog
+
+IMPLEMENT_EMBEDDED_IBASE (csDog::csName)
+  IMPLEMENTS_INTERFACE (IName)
+IMPLEMENT_IBASE_END
+
+char *csDog::csName::GetName ()
+{
+  return scfParent->Name;
+}
+
+void csDog::csName::SetName (char *iName)
+{
+  if (scfParent->Name)
+    free (scfParent->Name);
+  scfParent->Name = strdup (iName);
+}
+
+// ... and now export all classes
+
+IMPLEMENT_FACTORY (csDog)
+</pre>
+
+<p>
+The above three files should be compiled together to get a shared library. The
+shared library should export the Create_csDog function (implemented with the
+IMPLEMENT_FACTORY macro). On most platforms this is achieved automatically,
+on OS/2 you will need to write an .def file for this (you need it anyway).
+And finally, here is the source code for a client application that uses the
+csDog class:
+</p>
+
+<h2>doggy.cpp</h2>
+<pre>
+#include &lt;stdio.h&gt;
+#include "csscf.h"
+
+#include "idog.h"
+#include "iname.h"
+
+// for static linkage (no-op when using dynamic linking)
+REGISTER_SCF_CLASS (csDog)
+REGISTER_SCF_CLASS (csWorm)
+
+int main ()
+{
+  scfInitialize ();
+
+  IDog *dog = CREATE_INSTANCE (csDog, IDog);
+  if (!dog)
+    fprintf (stderr, "No csDog shared class!\n");
+  else
+  {
+    IName *name = QUERY_INTERFACE (dog, IName);
+    if (!name)
+      fprintf (stderr, "dog does not support IName interface!\n");
+    else
+    {
+      name->SetName ("Droopy");
+      dog->Walk ();
+      dog->Barf ("hello!");
+      printf ("Dog's name is %s\n", name->GetName ());
+      name->Release ();
+    }
+    dog->Release ();
+  }
+
+  scfFinish ();
+}
+</pre>
+
+<p>
+Easy, eh? Now the last thing: SCF uses a file called "scf.cfg" for storing
+class name &lt;-&gt; shared library name mapping. File format is easy:
+<code>ClassName = SharedLibraryName</code>. So, for the above example to
+work you have to add a line that reads "csDog = libdog.so" (or .dll) to the
+respective system-dependent section of scf.cfg.
+</p>
+
+<hr>
+<p>
+Original SCF design & concept by Andrew Zabolotny, 1999
+<br>
+This particular SCF implementation is Copyright (C) 1999 by Andrew Zabolotny,
+<a href="mailto:bit@eltech.ru">&lt;bit@eltech.ru&gt;</a>
+<br>
+Written for the Crystal Space project,
+distributed under GNU Library General Public License (LGPL)
+</p>
+
+</body>

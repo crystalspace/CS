@@ -22,19 +22,20 @@
 #include "sysdef.h"
 #include "cssfxldr/common/snddata.h"
 #include "csparser/snddatao.h"
-#include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(csSoundDataObject,csObject);
 
-csSoundDataObject::~csSoundDataObject()
-{ if (sndbuf) CHKB(delete sndbuf); }
-
-csSoundData* csSoundDataObject::GetSound(csObject& csobj, const char* name)
+csSoundDataObject::~csSoundDataObject ()
 {
-  csObjIterator i = csobj.ObjGet(csSoundDataObject::Type());
-  while (!i.IsNull())
+  if (sndbuf) CHKB(delete sndbuf);
+}
+
+csSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)
+{
+  csObjIterator i = csobj.ObjGet (csSoundDataObject::Type ());
+  while (!i.IsNull ())
   {
-    if (strcmp(name, csNameObject::GetName(*i)) == 0)
+    if (strcmp (name, (*i).GetName ()) == 0)
       return ((csSoundDataObject&)(*i)).GetSound();
     ++i;
   }

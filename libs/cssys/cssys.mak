@@ -36,14 +36,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cssys/common $(sort $(dir $(SRC.SYS_CSSYS)))
+vpath %.cpp libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
 
 ifneq ($(MEM),)
   SRC.SYS_CSSYS_EXE+=memory.cpp
   SRC.SYS_CSSYS_DLL+=memory.cpp
 endif
 
-SRC.CSSYS = $(wildcard libs/cssys/common/*.cpp $(SRC.SYS_CSSYS))
+SRC.CSSYS = $(wildcard libs/cssys/*.cpp $(SRC.SYS_CSSYS))
 ifeq ($(MAKE_DLL),yes)
   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB_SUFFIX)
   SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)

@@ -23,7 +23,6 @@
 #include "sysdef.h"
 #include "types.h"
 #include "csgeom/math3d.h"
-#include "csgeom/csrect.h"
 #include "csgfxldr/bmpimage.h"
 
 //---------------------------------------------------------------------------

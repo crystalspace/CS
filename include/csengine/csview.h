@@ -29,7 +29,7 @@ class csCamera;
 class csWorld;
 class csSector;
 class csClipper;
-interface IGraphics3D;
+struct IGraphics3D;
 
 /**
  * The csView class encapsulates the top-level Crystal Space

@@ -22,11 +22,11 @@
 #include <string.h>
 
 #include "sysdef.h"
-#include "cssys/common/system.h"
-#include "cssys/common/sysdriv.h"
+#include "cssys/system.h"
+#include "cssys/sysdriv.h"
 #include "cstools/simpcons.h"
-#include "csgeom/csrect.h"
 #include "csinput/csinput.h"
+#include "csutil/csrect.h"
 #include "csutil/inifile.h"
 #include "igraph2d.h"
 #include "itxtmgr.h"

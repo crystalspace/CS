@@ -17,7 +17,6 @@
 */
 
 #include "sysdef.h"
-#include "csengine/sysitf.h"
 #include "csengine/config.h"
 #include "csengine/world.h"
 #include "csengine/sector.h"

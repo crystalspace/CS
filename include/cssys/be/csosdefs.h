@@ -17,14 +17,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OSDEFS_H__
-#define __OSDEFS_H__
+#ifndef __CSOSDEFS_H__
+#define __CSOSDEFS_H__
 
 // The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.amiga"
+#define SOFTWARE_2D_DRIVER_BEOS "crystalspace.graphics2d.be"
+
+#define SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER_BEOS
+
+// The 2D graphics driver used by OpenGL renderer
+#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glbe"
+
+// The 2D graphics driver used by Glide renderer
+#define GLIDE_2D_DRIVER "crystalspace.graphics2d.glidebe"
 
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
-#endif // __OSDEFS_H__
+#endif // __CSOSDEFS_H__

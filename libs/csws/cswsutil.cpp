@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Miscelaneous CSWS utilites
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,10 +31,10 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csinput/csinput.h"
-#include "csengine/texture.h"
+#include "cssys/system.h"
 #include "itxtmgr.h"
 
-#define MSGBOX_TEXTURE "tex/msgicons.png"
+#define MSGBOX_TEXTURE "csws::MessageBoxIcons"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Window list --//--
 
@@ -204,7 +203,7 @@ csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
 csSprite2D *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   int tw, int th)
 {
-  csTextureHandle *tex = app->GetTexture (texturename);
+  ITextureHandle *tex = app->GetTexture (texturename);
   csSprite2D *spr;
   if (tex)
     CHKB (spr = new csSprite2D (tex, tx, ty, tw, th))
@@ -420,16 +419,17 @@ void RectUnion (csObjVector &rect, csRect &result)
 
 void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
 {
+  char temp[256];
   *x = -1;
   for (int i = 0; i < sv.Length (); i++)
   {
     char *butdef = (char *)(sv[i]);
     if (strncmp (id, butdef, strlen (id)) == 0)
     {
-      char temp[256];
       if (ScanStr (butdef, "%s %d,%d,%d,%d", &temp, x, y, w, h) < 0)
       {
-        CsPrintf (MSG_FATAL_ERROR, "%s: csws.cfg parse error in string: %s\n", id, butdef);
+        sprintf (temp, "%s: csws.cfg parse error in string: %s\n", id, butdef);
+        System->Printf (MSG_FATAL_ERROR, temp);
         fatal_exit (0, false);
       }
       break;
@@ -437,7 +437,8 @@ void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
   } /* endfor */
   if (*x < 0)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot find titlebar button definition %s in csws.cfg\n", id);
+    sprintf (temp, "Cannot find titlebar button definition %s in csws.cfg\n", id);
+    System->Printf (MSG_FATAL_ERROR, temp);
     fatal_exit (0, false);
   } /* endif */
 }
@@ -526,7 +527,7 @@ void RGB2HLS (float r, float g, float b, float &h, float &l, float &s)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//-- File open dialog --//--
 
-#define FILEDLG_TEXTURE_NAME "tex/filedlg.png"
+#define FILEDLG_TEXTURE_NAME "csws::FileDialog"
 
 // private class
 class cspFileDialog : public csDialog

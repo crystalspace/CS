@@ -26,10 +26,11 @@
 
 IMPLEMENT_DEFAULT_COM(Object);
 
-STDMETHODIMP csObject::AddName(IString *iname) {
-	csSTR name(iname);
-	csNameObject::AddName(*this, name);
-	return S_OK;
+STDMETHODIMP csObject::AddName(IString *iname)
+{
+  csSTR name(iname);
+  SetName (name);
+  return S_OK;
 }
 #endif
 CSOBJTYPE_IMPL(csObject,NULLCLASS);
@@ -89,4 +90,14 @@ void csObject::ObjRemove(csObject* obj)
 { 
   ObjRelease(obj);
   if (obj) CHKB(delete obj); 
+}
+
+void csObject::SetName (const char *Name)
+{
+  csNameObject::AddName (*this, Name);
+}
+
+const char *csObject::GetName ()
+{
+  return csNameObject::GetName (*this);
 }

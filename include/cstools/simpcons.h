@@ -20,7 +20,7 @@
 #ifndef __SIMPCONS_H
 #define __SIMPCONS_H
 
-#include "cssys/common/console.h"
+#include "cssys/console.h"
 #include "cscom/com.h"
 
 interface ITextureManager;

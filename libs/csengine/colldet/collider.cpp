@@ -20,7 +20,6 @@
 #include "sysdef.h"
 #include "csengine/collider.h"
 #include "csengine/triangle.h"
-#include "csobject/nameobj.h"
 
 int CD_num_cols_alloced = 0;
 collision_pair *CD_contact = 0;
@@ -147,8 +146,8 @@ void csCollider::Activate (bool on)
 // Return object's name.
 const char *csCollider::GetName ()
 {
-  if (_type == POLYGONSET) return csNameObject::GetName(*_ps);
-  if (_type == SPRITE3D)   return csNameObject::GetName(*_sp);
+  if (_type == POLYGONSET) return _ps->GetName ();
+  if (_type == SPRITE3D)   return _sp->GetName ();
   return "UNKNOWN";
 }
 

@@ -19,7 +19,6 @@
 #include "sysdef.h"
 #include "csscript/csscript.h"
 #include "csscript/trigger.h"
-#include "csobject/nameobj.h"
 #include "csengine/sysitf.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
@@ -103,7 +102,7 @@ const csIdType& LanguageLayer::object_type (csObject* obj)
 
 const char* LanguageLayer::object_name (csObject* obj)
 {
-  return csNameObject::GetName(*obj);
+  return obj->GetName();
 }
 
 csObject* LanguageLayer::get_world ()

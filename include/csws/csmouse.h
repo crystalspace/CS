@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: mouse support
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,9 +21,8 @@
 #define __CSMOUSE_H__
 
 #include "cscomp.h"
+#include "itexture.h"
 #include "csengine/csspr2d.h"
-
-class csTextureHandle;
 
 /**
  * This class encapsulates mouse pointer
@@ -59,7 +57,7 @@ public:
   void Free ();
 
   /// Set mouse cursor texture
-  void SetTexture (csTextureHandle *tex);
+  void SetTexture (ITextureHandle *tex);
 };
 
 /**

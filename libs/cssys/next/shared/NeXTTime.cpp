@@ -17,7 +17,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "sysdef.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 #include <libc.h>
 #include <sys/time.h>
 

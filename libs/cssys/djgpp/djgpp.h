@@ -24,7 +24,7 @@
 
 #include "idjgpp.h"
 #include "csinput/csinput.h"
-#include "cssys/common/system.h"
+#include "cssys/system.h"
 
 /// DJGPP version.
 class SysSystemDriver : public csSystemDriver

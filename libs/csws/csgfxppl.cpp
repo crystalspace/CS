@@ -1,7 +1,6 @@
 /*
     Crystal Space Windowing System: Graphics Pipeline class
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,6 +21,7 @@
 #include <assert.h>
 #include "sysdef.h"
 #include "qint.h"
+#include "cssys/system.h"
 #include "csws/csgfxppl.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
@@ -111,6 +111,11 @@ void csGraphicsPipeline::RestoreArea (ImageArea *Area, bool Free)
   if (!pe) return;
   pe->ResArea.Area = Area;
   pe->ResArea.Free = Free;
+}
+
+void csGraphicsPipeline::FreeArea (ImageArea *Area)
+{
+  System->piG2D->FreeArea (Area);
 }
 
 void csGraphicsPipeline::Clear (int color)
