@@ -6,9 +6,6 @@ SubDir TOP ;
 # Common include directories.
 IncludeDir ;
 IncludeDir "include" ;
-IncludeDir apps ;
-IncludeDir libs ;
-IncludeDir plugins ;
 IncludeDir $(BUILDTOP) include : : ignoresubdir ;
 
 # Define our compile groups
