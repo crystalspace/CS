@@ -235,10 +235,10 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
   /// which is heightchange / distance * cameraslant
   float e = dmax;
   /// if camera in quad: dist = 0;
-  float dist = 0;
+  float dist = 1.;
   if( (campos.x < minx) || (campos.x > maxx) || (campos.z < miny)
     || (campos.z > maxy))
-    dist = qisqrt( (campos.x-midx)*(campos.x-midx) + 
+    dist = 1. / (1.+ (campos.x-midx)*(campos.x-midx) + 
       (campos.z-midy)*(campos.z-midy) );
   e *= dist;
   /// if camera in quad, camslant = 1 (full length is visible)
@@ -249,9 +249,9 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
 
   /// can this quad be displayed?
   bool OK = true;
-  float maxerror = 1./200.;
+  float maxerror = 1./500.;
   if(e > maxerror) OK = false;
-
+  
   if(OK) return; // no need to divide
 
   /// debug prints

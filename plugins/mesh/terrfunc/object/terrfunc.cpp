@@ -1645,7 +1645,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       if (do_vis_test)
       {
         CS_ASSERT (block.node != NULL);
-        if (!block.node->IsVisible ()) continue;
+        if (!quaddiv_enabled && !block.node->IsVisible ()) continue;
       }
       int clip_portal, clip_plane, clip_z_plane;
       if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
