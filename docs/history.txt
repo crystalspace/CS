@@ -40,8 +40,10 @@ chronological order.
 	  msvcgen.jam which tried to insure that the resource file (.rc) had
 	  the correct path in the generated project file.  The more correct fix
 	  involved slightly re-ordering the --strip-root options given to
-	  msvcgen.pl.  Also fixed a couple other minor bugs, and did a bit of
-	  cleanup.
+	  msvcgen.pl.  As a happy side-effect, removal the hack also fixes a
+	  bug in which it was unconditionally referencing mk/visualc7, despite
+	  the fact that MSVC_VERSION might be "6".  Also fixed a couple other
+	  minor bugs, and did a bit of cleanup.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
