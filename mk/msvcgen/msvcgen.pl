@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Microsoft Visual C++ DSW and DSP project file generator.
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 2;
+my $PROG_VERSION = 3;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 $main::opt_dsp = 0;
 $main::opt_d = 0;	# Alias for 'dsp'.
@@ -259,7 +259,7 @@ sub load_templates {
 #------------------------------------------------------------------------------
 sub interpolate {
     my ($pattern, $value, $buffer) = @_;
-    $value = join(' ', @{$value}) if ref($value) eq 'ARRAY';
+    $value = join(' ', @{$value}) if ref($value) and ref($value) eq 'ARRAY';
     ${$buffer} =~ s/$pattern/$value/g;
 }
 
