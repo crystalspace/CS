@@ -118,7 +118,7 @@ public:
       delete prev;
       prev = current;
     }
-    size = 0; prev = 0; current = head;
+    size = 0; head->next = prev = 0; current = head;
   }
 
   /// Remove all nodes, delete contents of nodes
@@ -132,7 +132,7 @@ public:
       delete prev;
       prev = current;
     }
-    size = 0; prev = 0; current = head;
+    size = 0; head->next = prev = 0; current = head;
   }
 
   /// Get number of items in list
