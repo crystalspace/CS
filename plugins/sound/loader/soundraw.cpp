@@ -168,8 +168,8 @@ const csSoundFormat *csSoundStreamRaw::GetFormat() {
   return &Data->Format;
 }
 
-long csSoundStreamRaw::GetNumSamples() {
-  return Data->NumSamples;
+bool csSoundStreamRaw::MayPrecache() {
+  return true;
 }
 
 void csSoundStreamRaw::Restart() {
@@ -177,8 +177,10 @@ void csSoundStreamRaw::Restart() {
 }
 
 void *csSoundStreamRaw::Read(long &Num) {
+  // test if we should return as much data as possible
+  if (Num == -1) Num = Data->NumSamples - Position;
   // decrease size of data if we reached the end of the sound
-  if (Position+Num>Data->NumSamples) Num=Data->NumSamples-Position;
+  if (Position + Num > Data->NumSamples) Num = Data->NumSamples-Position;
   // set up return data
   void *d;
   if (Data->Format.Bits==16) {

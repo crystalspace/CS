@@ -57,8 +57,8 @@ public:
 
   // return the format descriptor
   virtual const csSoundFormat *GetFormat();
-  // return the number of samples or -1
-  virtual long GetNumSamples();
+  // return true if the samples may be precached
+  virtual bool MayPrecache();
   // reset the stream to the beginning
   virtual void Restart();
   // read the sound buffer

@@ -66,10 +66,11 @@ struct iSoundStream : public iBase
   virtual const csSoundFormat *GetFormat() = 0;
 
   /**
-   * Get the total number of samples that can be read from this stream or
-   * -1 if unknown
+   * Returns true if the sound data may be precached. This is true for
+   * 'normal' sounds, but false for MP3 decoding (would waste the memory
+   * advantage), runtime-generated sound (unknown in advance), ...
    */
-  virtual long GetNumSamples() = 0;
+  virtual bool MayPrecache() = 0;
 
   /**
    * Reset this stream to the beginning. This is used when a looped sound
@@ -86,13 +87,18 @@ struct iSoundStream : public iBase
    * Read a data buffer from the stream. When calling, NumSamples should be
    * The number of samples you want to read. After calling, it contains the
    * number of samples actually read. If this is less than the number you
-   * wanted to read, the stream is finished and can be DecRef'ed.
+   * wanted to read, the stream is finished and can be DecRef'ed. <p>
+   *
+   * Alternatively NumSamples may be set to -1 to read as much as possible.
+   * NumSamples is also set to the number of samples actually read, so if
+   * it is set to 0 the sound is finished. <p>
+   *
    * When you don't need the buffer anymore, call DiscardBuffer() to get
-   * rid of it.
+   * rid of it. You must do this even if you receive 0 samples.
    */
   virtual void *Read(long &NumSamples) = 0;
 
-  // discard a buffer returned by Read()
+  // discard a buffer returned by Read().
   virtual void DiscardBuffer(void *buf) = 0;
 };
 
