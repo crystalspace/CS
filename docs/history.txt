@@ -4,6 +4,19 @@ The history order has been reversed so that new features are at the top.
 	- Philip Wyett added 'include imap/parser.h" and fixed many
 	  of a slew of compiler errors in the app. App is
 	  still broken though at present.
+	- Martin Geisse fixed a few more applications with regards to
+	  the csparser stuff.
+	- Martin also did further work on csloader:
+	    - Added a new image format flag that indicates an invalid
+	      format. This flag may not be used in csImage or the
+	      image loader, but higher-level modules such as csloader
+	      may use this flag to say 'use the default format'. It's much
+	      like the NULL pointer.
+	    - Extended csLoader::LoadImage() so you can choose an
+	      alternate format for the image.
+	    - Extended csLoader::LoadTexture() so you can choose an
+	      alternate texture manager for the texture.
+	    - Ptlab uses the extended LoadImage() instead of its own function.
 13-Apr-2001
 	- Martin Geisse did the following changes:
 	    - Added texture loading methods to iLoaderNew. The loader now
