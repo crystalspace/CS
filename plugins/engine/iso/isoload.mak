@@ -24,45 +24,45 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/engine/isoload
+vpath %.cpp plugins/engine/iso
 
 ifeq ($(USE_PLUGINS),yes)
-  ISO = $(OUTDLL)isoload$(DLL)
-  LIB.ISO = $(foreach d,$(DEP.ISO),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(ISO)
+  ISOLOAD = $(OUTDLL)isoload$(DLL)
+  LIB.ISOLOAD = $(foreach d,$(DEP.ISO),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(ISOLOAD)
 else
-  ISO = $(OUT)$(LIB_PREFIX)isoload$(LIB)
+  ISOLOAD = $(OUT)$(LIB_PREFIX)isoload$(LIB)
   DEP.EXE += $(ISO)
   SCF.STATIC += isoload
-  TO_INSTALL.STATIC_LIBS += $(ISO)
+  TO_INSTALL.STATIC_LIBS += $(ISOLOAD)
 endif
 
-INC.ISO = $(wildcard plugins/engine/iso/*.h)
-SRC.ISO = $(wildcard plugins/engine/iso/*.cpp)
-OBJ.ISO = $(addprefix $(OUT),$(notdir $(SRC.ISO:.cpp=$O)))
-DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
+INC.ISOLOAD = $(wildcard plugins/engine/iso/*.h)
+SRC.ISOLOAD = $(wildcard plugins/engine/iso/*.cpp)
+OBJ.ISOLOAD = $(addprefix $(OUT),$(notdir $(SRC.ISOLOAD:.cpp=$O)))
+DEP.ISOLOAD = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
-MSVC.DSP += ISO
-DSP.ISO.NAME = isoload
-DSP.ISO.TYPE = plugin
+MSVC.DSP += ISOLOAD
+DSP.ISOLOAD.NAME = isoload
+DSP.ISOLOAD.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: isoload isoloadclean
-isoload: $(OUTDIRS) $(ISO)
+isoload: $(OUTDIRS) $(ISOLOAD)
 
-$(ISO): $(OBJ.ISO) $(LIB.ISO)
+$(ISOLOAD): $(OBJ.ISOLOAD) $(LIB.ISOLOAD)
 	$(DO.PLUGIN)
 
 clean: isoloadclean
 isoloadclean:
-	-$(RM) $(ISO) $(OBJ.ISO)
+	-$(RM) $(ISOLOAD) $(OBJ.ISOLOAD)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)isoload.dep
-$(OUTOS)isoload.dep: $(SRC.ISO)
+$(OUTOS)isoload.dep: $(SRC.ISOLOAD)
 	$(DO.DEP)
 else
 -include $(OUTOS)isoload.dep
