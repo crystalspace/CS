@@ -158,10 +158,7 @@ void csNetworkManager::Poll (iNetworkConnection *conn, csTicks t)
       stream.SetPosition (0);
 
       csRef<iEvent> e = eventout->CreateEvent ();
-      e->Time = t;
       e->Type = csevNetwork;
-      e->Category = 0;
-      e->SubCategory = 0;
       e->Network.From = conn;
       e->Network.Data = packet;
       eventout->Post (e);
@@ -193,8 +190,6 @@ void csNetworkManager::Poll (iNetworkSocket2 *sock, csTicks t)
       csRef<iEvent> e = eventout->CreateEvent ();
       e->Time = t;
       e->Type = csevNetwork;
-      e->Category = 0;
-      e->SubCategory = 0;
       e->Network.From2 = sock;
       e->Network.Data2 = packet;
       eventout->Post (e);

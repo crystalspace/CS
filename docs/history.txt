@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+5-June-2003
+	- Oktal removed the setting to 0 of event category and subcategory
+	  now that the event queue does that for us.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the
