@@ -54,7 +54,7 @@ private:
   };
 
   struct FogInfo;
-  friend FogInfo;
+  friend struct FogInfo;
   struct FogInfo
   {
     FogMode mode;
