@@ -990,10 +990,12 @@ struct iGraphics3D : public iBase
    * \param size Size of the buffer in bytes.
    * \param type Type of buffer; CS_BUF_DYNAMIC, CS_BUF_STATIC or 
    *  CS_BUF_STREAM.
-   * \param componentType Components Types; CS_BUFCOMP_FLOAT, CS_BUFCOMP_INT, etc
+   * \param componentType Components Types; CS_BUFCOMP_FLOAT, CS_BUFCOMP_INT,
+   *        etc
    * \param componentCount Number of components per element (e.g. 4 for RGBA)
-   * \param copy if true (default) then this buffer will make a copy of the data.
-   *        hardware vertex buffers and interleaved buffers will always copy data.
+   * \param copy if true (default) then this buffer will make a copy of the
+   *        data. Hardware vertex buffers and interleaved buffers will always
+   *        copy data.
    */
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
@@ -1008,8 +1010,9 @@ struct iGraphics3D : public iBase
    *  the created buffer.
    * \param rangeEnd Maximum index value that is expected to be written to 
    *  the created buffer.
-   * \param copy if true (default) then this buffer will make a copy of the data.
-   *        hardware vertex buffers and interleaved buffers will always copy data.
+   * \param copy if true (default) then this buffer will make a copy of the
+   *        data. Hardware vertex buffers and interleaved buffers will always
+   *        copy data.
    */
   virtual csPtr<iRenderBuffer> CreateIndexRenderBuffer (size_t size, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
@@ -1171,6 +1174,12 @@ struct iGraphics3D : public iBase
 
   /// Clear the texture cache.
   virtual void ClearCache () = 0;
+
+  /**
+   * Precache a texture. This might free up temporary memory and
+   * makes later usage of the texture faster.
+   */
+  virtual void PrecacheTexture (iTextureHandle* texture) = 0;
 
   /**
    * Remove some polygon from the cache.

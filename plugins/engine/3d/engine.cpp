@@ -1821,6 +1821,15 @@ void csEngine::PrecacheDraw (iRegion* region)
     if (!region || region->IsInRegion (s->QueryObject ()))
       s->GetVisibilityCuller ()->PrecacheCulling ();
   }
+
+  size_t i;
+  for (i = 0 ; i < textures->Length () ; i++)
+  {
+    iTextureWrapper* txt = textures->Get (i);
+    if (txt->GetTextureHandle ())
+      if (!region || region->IsInRegion (txt->QueryObject ()))
+        G3D->PrecacheTexture (txt->GetTextureHandle ());
+  }
 }
 
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)

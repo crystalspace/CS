@@ -63,6 +63,8 @@ public:
   GLint internalFormat;
   GLint size;
   int w, h, d, components;
+
+  void CleanupImageData ();
    ///
   int get_width () const { return w; }
   ///

@@ -130,9 +130,14 @@ void csGLTextureCache::Cache (iTextureHandle *txt_handle)
       txt_handle->GetPrivateObject ();
 
     // unit is not in memory. load it into the cache
+#if 0
     while (total_size + txt_mm->size >= cache_size)
+    {
       // out of memory. remove units from bottom of list.
       Unload (tail);
+    printf ("XXX\n"); fflush (stdout);
+    }
+#endif
 
     // now load the unit.
     num++;
@@ -359,6 +364,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	  togl->image_data);
 	//g3d->CheckGLError ("glCompressedTexImage2DARB()");
       }
+      togl->CleanupImageData ();
     }
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
@@ -376,6 +382,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
                     txt_mm->SourceFormat (),
                     txt_mm->SourceType (),
                     togl->image_data);
+      togl->CleanupImageData ();
     }
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
@@ -409,6 +416,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
                       data);
         data += cursize;
       }
+      togl->CleanupImageData ();
     }
   }
 }

@@ -12,6 +12,19 @@ chronological order.
 	  CreateIndexRenderBuffer() which is default to true. Meshes can
 	  set that to false if they keep the data for the buffer in their
 	  own memory. Currently not yet implemented. API change only.
+	- Jorrit changed the NR OpenGL texture cache so that it never unloads
+	  textures but leaves this for the OpenGL driver. i.e. it is no
+	  longer a cache.
+	- Jorrit changed the NR OpenGL texture cache so that it removes the
+	  image data after uploading the texture to OpenGL. This can save
+	  a LOT of memory in big levels (75 megabytes less memory for
+	  PlaneShift levels).
+	- Jorrit added an iGraphics3D->PrecacheTexture() to precache the
+	  texture for the renderer. For the NR OpenGL renderer this will
+	  cause the upload of the texture to the renderer and also free
+	  of the memory. The other renderers do nothing with this flag.
+	- Jorrit changed engine->PrecacheDraw() to also call PrecacheTexture()
+	  for all textures.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections

@@ -95,14 +95,19 @@ csGLTexture::csGLTexture(csGLTextureHandle *p, iImage *Image)
   h = Image->GetHeight ();
   image_data = 0;
   Parent = p;
-  image_data = 0;
   size = 0;
   compressed = GL_FALSE;
 }
 
 csGLTexture::~csGLTexture()
 {
+  CleanupImageData ();
+}
+
+void csGLTexture::CleanupImageData ()
+{
   delete[] image_data;
+  image_data = 0;
 }
 
 /*

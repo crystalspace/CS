@@ -237,8 +237,6 @@ private:
   void ApplyObjectToCamera ();
   void SetupProjection ();
 
-  void CacheTexture(iTextureHandle* itex);
-
   csZBufMode GetZModePass2 (csZBufMode mode);
 
   iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
@@ -487,6 +485,8 @@ public:
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);
   virtual float GetZBuffValue (int, int);
+
+  virtual void PrecacheTexture (iTextureHandle* texture);
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by

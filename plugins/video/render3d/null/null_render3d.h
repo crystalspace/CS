@@ -168,6 +168,7 @@ public:
     int iWidth, int iHeight) { return 0; }
   void DumpCache() { }
   void ClearCache () { }
+  void PrecacheTexture (iTextureHandle*) { }
   void RemoveFromCache (iRendererLightmap* rlm) { }
   iVertexBufferManager* GetVertexBufferManager () { return 0; }
   bool IsLightmapOK (int lmw, int lmh, int lightCellSize) { return false; }

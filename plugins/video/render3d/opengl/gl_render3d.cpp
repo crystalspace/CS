@@ -1991,6 +1991,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   SetMirrorMode (false);
 }
 
+void csGLGraphics3D::PrecacheTexture (iTextureHandle* texture)
+{
+  txtcache->Cache (texture);
+}
+
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
