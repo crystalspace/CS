@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 26-Apr-2001
+	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
+	  outputs worm.dll and dog.dll.
+	- Philip changed the makefile system so that INTEL is replaced
+	  with X86. This will please people that have an AMD processor :-)
 	- Extended the fire particle system loader with a new ORIGINBOX
 	  keyword which allows the origin to be specified as a box. The
 	  fire particle system could already do that but the loader didn't
