@@ -22,7 +22,7 @@ AC_DEFUN(AC_PATH_CRYSTAL,
 dnl Get the cflags and libraries from the cs-config script
 dnl
 AC_ARG_WITH(cs-prefix, AC_HELP_STRING([--with-cs-prefix=PFX],[Prefix where Crystal Space is installed (optional)]), CRYSTAL="$withval", )
-AC_ARG_ENABLE(cstest, AC_HELP_STRING([--disable-cstest],[Do not try to compile and run a test Crystal Space program]), disable_cstest=yes, )
+AC_ARG_ENABLE(cstest, AC_HELP_STRING([--disable-cstest],[Do not try to compile and run a test Crystal Space program]), , enable_cstest=yes)
 AC_ARG_VAR([CRYSTAL],     [Prefix Where Crystal Space is installed])
 dnl if you really want to use autoconf 2.13 (not recommended) comment out the
 dnl line above.
@@ -58,12 +58,11 @@ if test "x$CRYSTAL" = x ; then
    fi
 fi
 
-
 # Well, either we found cs by now, or we caused an error.
 # Now we define stuff, then check if we are running a new enough version
 
 if test "x$no_cs" = "x" ; then
-	min_cs_version=ifelse([$1], ,0.93,$1)
+	min_cs_version=ifelse([$1], ,0.94,$1)
 	AC_MSG_CHECKING(for Crystal Space - version >= $min_cs_version)
 	CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cflags $4`
 	CRYSTAL_CXXFLAGS=`$CSCONF $csconf_args --cxxflags $4`
@@ -72,9 +71,9 @@ if test "x$no_cs" = "x" ; then
 	CRYSTAL_LONGVERSION=`$CSCONF --longversion $4`
 
 	cs_major_version=`$CSCONF $cs_args --version | \
-	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)?/\1/'`
 	cs_minor_version=`$CSCONF $cs_args --version | \
-	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)?/\2/'`
 
 	if test "x$CRYSTAL_LIBS" = "x" ; then
 		no_cs=yes
@@ -87,32 +86,20 @@ fi
 
 if test x$enable_cstest = xyes ; then
    ac_save_CFLAGS="$CFLAGS"
+   ac_save_CXXFLAGS="$CXXFLAGS"
    ac_save_LIBS="$LIBS"
    CFLAGS="$CFLAGS $CRYSTAL_CFLAGS"
+   CXXFLAGS="$CXXFLAGS $CRYSTAL_CXXFLAGS"
    LIBS="$LIBS $CRYSTAL_LIBS"
 
-rm -f conf.cstest
-AC_TRY_RUN([
+   AC_LANG_SAVE()
+   AC_LANG(C++)
+   AC_TRY_RUN([
 #include <cssysdef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-char*
-my_strdup (char *str)
-{
-  char *new_str;
-  
-  if (str)
-    {
-      new_str = (char *)malloc ((strlen (str) + 1) * sizeof(char));
-      strcpy (new_str, str);
-    }
-  else
-    new_str = NULL;
-  
-  return new_str;
-}
+#include <stdio.h>
+
+#include <csutil/util.h>
 
 CS_IMPLEMENT_APPLICATION
 
@@ -121,60 +108,57 @@ int main (int argc, char *argv[])
   int major, minor, micro;
   char *tmp_version;
 
-  { FILE *fp = fopen("conf.cstest", "a"); if (fp) fclose(fp); }
-
   /* HP/UX 9 writes to sscanf strings */
-  tmp_version = my_strdup("$min_cs_version");
-  if (sscanf(tmp_version, "%d.%d", &major, &minor) != 3) {
+  tmp_version = csStrNew ("$min_cs_version");
+  if (sscanf (tmp_version, "%d.%d", &major, &minor) != 2)
+  {
      printf("%s, bad version string\n", "$min_cs_version");
-     exit(1);
-   }
+     return 1;
+  }
 
-   if (($cs_major_version > major) ||
-      (($cs_major_version == major) && ($cs_minor_version > minor)) ||
-      (($cs_major_version == major) && ($cs_minor_version == minor))
-    {
-      return 0;
-    }
+  if (($cs_major_version > major) ||
+     (($cs_major_version == major) && ($cs_minor_version > minor)) ||
+     (($cs_major_version == major) && ($cs_minor_version == minor)))
+  {
+    return 0;
+  }
   else
-    {
-      printf("\n*** 'cs-config --version' returned %d.%d, but the minimum version\n", $cs_major_version, $cs_minor_version);
-      printf("*** of Crystal Space required is %d.%d. If cs-config is correct, then it is\n", major, minor);
-      printf("*** best to upgrade to the required version.\n");
-      printf("*** If cs-config was wrong, set the environment variable CRYSTAL\n");
-      printf("*** to point to the correct copy of cs-config, and remove the file\n");
-      printf("*** config.cache before re-running configure\n");
-      return 1;
-    }
+  {
+    printf("\n*** 'cs-config --version' returned %d.%d, but the minimum version\n", $cs_major_version, $cs_minor_version);
+    printf("*** of Crystal Space required is %d.%d. If cs-config is correct, then it is\n", major, minor);
+    printf("*** best to upgrade to the required version.\n");
+    printf("*** If cs-config was wrong, set the environment variable CRYSTAL\n");
+    printf("*** to point to the correct copy of cs-config, and remove the file\n");
+    printf("*** config.cache before re-running configure\n");
+    return 1;
+  }
 }
 
 ],, no_cs=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-  fi
+  CFLAGS="$ac_save_CFLAGS"
+  CXXFLAGS="$ac_save_CXXFLAGS"
+  LIBS="$ac_save_LIBS"
+  AC_LANG_RESTORE()
+fi
 
-  if test "x$no_cs" = "x" ; then
-     AC_MSG_RESULT($CRYSTAL_LONGVERSION)
-     ifelse([$2], , :, [$2])     
-  else
-     AC_MSG_RESULT(no)
-       if test -f conf.cstest ; then
-        :
-       else
-          echo "*** Could not run Crystal Space test program, checking why..."
-          CFLAGS="$CFLAGS $CRYSTAL_CFLAGS"
-          LIBS="$LIBS $CRYSTAL_LIBS"
-          CFLAGS="$ac_save_CFLAGS"
-          LIBS="$ac_save_LIBS"
-       fi
-     CRYSTAL_CFLAGS=""
-     CRYSTAL_LIBS=""
-     ifelse([$3], , :, [$3])
-  fi
-  AC_SUBST(CRYSTAL_CFLAGS)
-  AC_SUBST(CRYSTAL_CXXFLAGS)
-  AC_SUBST(CRYSTAL_LIBS)
-  AC_SUBST(CRYSTAL_VERSION)
-  AC_SUBST(CRYSTAL_LONGVERSION)
-  rm -f conf.cstest
+if test "x$no_cs" = "x" ; then
+   AC_MSG_RESULT($CRYSTAL_LONGVERSION)
+   ifelse([$2], , :, [$2])     
+else
+   AC_MSG_RESULT(no)
+   echo "*** Could not run Crystal Space test program, checking why..."
+   CRYSTAL_CFLAGS=""
+   CRYSTAL_CXXFLAGS=""
+   CRYSTAL_VERSION=""
+   CRYSTAL_LONGVERSION=""
+   CRYSTAL_LIBS=""
+   ifelse([$3], , :, [$3])
+fi
+
+AC_SUBST(CRYSTAL_CFLAGS)
+AC_SUBST(CRYSTAL_CXXFLAGS)
+AC_SUBST(CRYSTAL_LIBS)
+AC_SUBST(CRYSTAL_VERSION)
+AC_SUBST(CRYSTAL_LONGVERSION)
 ])
+
