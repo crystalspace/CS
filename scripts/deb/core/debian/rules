@@ -104,14 +104,15 @@ ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
 	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
 endif
 
-	# Compile static libs without -fPIC (except for ia64, hppa and alpha)
-ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), ia64))
-ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
-ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), alpha))
-	cd $(CURDIR)/CS; $(MAKE) libs
-endif
-endif
-endif
+	# Compile static libs without -fPIC (except for ia64, amd64, hppa and alpha)
+#ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), amd64))
+#ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), ia64))
+#ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
+#ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), alpha))
+#	cd $(CURDIR)/CS; $(MAKE) libs
+#endif
+#endif
+#endif
 	# Force -fPIC as compiling/linking option
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
