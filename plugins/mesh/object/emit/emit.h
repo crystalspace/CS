@@ -397,6 +397,8 @@ public:
     virtual iEmitCone* CreateCone() {return new csEmitCone(scfParent);}
     virtual iEmitMix* CreateMix() {return new csEmitMix(scfParent);}
     virtual iEmitLine* CreateLine() {return new csEmitLine(scfParent);}
+    virtual iEmitCylinder* CreateCylinder() 
+      {return new csEmitCylinder(scfParent);}
     virtual iEmitSphereTangent* CreateSphereTangent() 
       {return new csEmitSphereTangent(scfParent);}
     virtual iEmitCylinderTangent* CreateCylinderTangent() 

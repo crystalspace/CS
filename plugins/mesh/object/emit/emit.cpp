@@ -529,7 +529,10 @@ void csEmitMeshObject::SetupObject ()
     float drop_height = 0.3;
     for (int i=0 ; i < number ; i++)
     {
-      AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
+      if(using_rect_sprites)
+        AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
+      else AppendRegularSprite (drop_sides, drop_radius, mat, 
+        lighted_particles);
       StartParticle(i);
       /// age each particle randomly, to spread out particles over ages.
       int elapsed = QInt(GetRandomFloat(0,time_to_live));

@@ -29,6 +29,7 @@ SCF_VERSION (iEmitFixed, 0, 0, 1);
 SCF_VERSION (iEmitSphere, 0, 0, 1);
 SCF_VERSION (iEmitBox, 0, 0, 1);
 SCF_VERSION (iEmitCone, 0, 0, 1);
+SCF_VERSION (iEmitCylinder, 0, 0, 1);
 SCF_VERSION (iEmitMix, 0, 0, 1);
 SCF_VERSION (iEmitLine, 0, 0, 1);
 SCF_VERSION (iEmitSphereTangent, 0, 0, 1);
@@ -156,6 +157,8 @@ struct iEmitFactoryState : public iBase
   virtual iEmitMix* CreateMix() = 0;
   /// create an emitter
   virtual iEmitLine* CreateLine() = 0;
+  /// create an emitter
+  virtual iEmitCylinder* CreateCylinder() = 0;
   /// create an emitter
   virtual iEmitSphereTangent* CreateSphereTangent() = 0;
   /// create an emitter
