@@ -16,6 +16,7 @@ The history order is reversed so that new features are at the top.
 	- Added -splitgeom which will try to split all large objects
 	  (using -minsize option which defaults to 20%) into smaller
 	  objects (i.e. it will divide them in 8 sub-objects).
+	- Fixed levtool so it only operates on non-movable things.
 5-Dec-2002
 	- 'levtool' will now split all parts in seperate units. A unit
 	  is defined as a set of polygons that are connected and that

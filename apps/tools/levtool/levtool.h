@@ -266,6 +266,11 @@ public:
   bool IsMeshAThing (iDocumentNode* meshnode);
 
   /**
+   * Test if a mesh object is movable.
+   */
+  bool IsMeshMovable (iDocumentNode* meshnode);
+
+  /**
    * Scan all sectors and find all thing objects and push them
    * on the things vector.
    */

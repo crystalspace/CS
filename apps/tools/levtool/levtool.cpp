@@ -684,6 +684,15 @@ bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
   return false;
 }
 
+bool LevTool::IsMeshMovable (iDocumentNode* meshnode)
+{
+  csRef<iDocumentNode> paramsnode = meshnode->GetNode ("params");
+  if (!paramsnode) return false;
+  csRef<iDocumentNode> movnode = paramsnode->GetNode ("moveable");
+  if (!movnode) return false;
+  return true;
+}
+
 void LevTool::ParsePart (ltThing* thing, iDocumentNode* partnode,
 	iDocumentNode* meshnode)
 {
@@ -769,7 +778,8 @@ void LevTool::FindAllThings (iDocument* doc)
         csRef<iDocumentNode> child2 = it2->Next ();
         if (child2->GetType () != CS_NODE_ELEMENT) continue;
         const char* value2 = child2->GetValue ();
-	if (!strcmp (value2, "meshobj") && IsMeshAThing (child2))
+	if (!strcmp (value2, "meshobj") && IsMeshAThing (child2)
+		&& !IsMeshMovable (child2))
 	{
 	  ParseThing (child2);
 	}
@@ -982,7 +992,8 @@ void LevTool::CloneAndSplitDynavis (iDocumentNode* node, iDocumentNode* newnode,
     csRef<iDocumentNode> child = it->Next ();
     const char* value = child->GetValue ();
     if (is_sector && child->GetType () == CS_NODE_ELEMENT &&
-    	(!strcmp (value, "meshobj")) && IsMeshAThing (child))
+    	(!strcmp (value, "meshobj")) && IsMeshAThing (child) &&
+		!IsMeshMovable (child))
     {
       SplitThing (child, newnode);
     }
