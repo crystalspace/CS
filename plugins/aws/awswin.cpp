@@ -6,7 +6,7 @@
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
 #include "csutil/snprintf.h"
-#include "aws/iawsdefs.h"
+#include "iaws/iawsdefs.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -399,10 +399,10 @@ awsManager::Redraw()
                   
         for(i=0; i<dirty.Count(); ++i)
         {
-          
-          if(DEBUG_MANAGER) printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count()); 
-
           csRect dr(dirty.RectAt(i));
+
+          if(DEBUG_MANAGER) printf("aws-debug: consider rect:%d of %d\n", i, dirty.Count()); 
+          
 
           // Find out if we need to erase.
          /* if (!UsingDefaultContext)
@@ -414,14 +414,14 @@ awsManager::Redraw()
               ptG2D->DrawBox(dr.xmin-1, dr.ymin-1, dr.xmax+1, dr.ymax+1, erasefill);
           }*/
           
-          if (dr.Intersects(curwin->Frame())
+          if (dr.Intersects(curwin->Frame()))
             cr.Union(dr);
                 
         } // end gather all dirty rects that touch this window.
 
         // Get the intersection between the window and the clip rect.
 
-        RedrawWindow(curwin, dr);
+        RedrawWindow(curwin, cr);
 
       } // end if this window is dirty
 
