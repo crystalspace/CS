@@ -247,7 +247,7 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
                   << imagedata->getSiteName().c_str();
 
     // VFS uses ':' as a seperator
-    for (int i=0; cachefilename[i]; i++)
+    for (size_t i=0; cachefilename[i]; i++)
     {
       if ((cachefilename[i] == ':'))
         cachefilename[i] = '_';
