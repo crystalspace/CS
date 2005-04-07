@@ -1,6 +1,6 @@
 /*
-  Crystal Space Generic Memory Block Allocator
-  Copyright (C) 2003 by Jorrit Tyberghein
+  Crystal Space Generic Object Block Allocator
+  Copyright (C)2005 by Eric sunshine <sunshine@sunshineco.com>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CSUTIL_BLKALLOC_H__
-#define __CSUTIL_BLKALLOC_H__
+#ifndef __CSUTIL_BLOCK_ALLOCATOR_H__
+#define __CSUTIL_BLOCK_ALLOCATOR_H__
 
 /**\file
  * Generic Memory Block Allocator
@@ -25,6 +25,8 @@
 
 #include "csextern.h"
 #include "array.h"
+#include "bitarray.h"
+#include "sysfunc.h"
 
 // hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -40,182 +42,202 @@
 /**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has no memory overhead per
- * allocation (unless the objects are smaller than 8 bytes) and is extremely
- * fast, both for Alloc() and Free(). Only restriction is it can only be used
- * for the same type of object.
+ * allocation (unless the objects are smaller than sizeof(void*) bytes) and is
+ * extremely fast, both for Alloc() and Free(). The only restriction is that
+ * any specific allocator can be used for just one type of object (the type for
+ * which the template is instantiated).
  * \remarks The objects are properly constructed and destructed.
+ * <p>
+ * \remarks Assumes that the class \c T with which the template is instantiated
+ *   has a default (zero-argument) constructor. Alloc() uses this constructor
+ *   to initialize each vended object.
  * <p>
  * \remarks Defining the macro CS_BLOCKALLOC_DEBUG will cause freed objects to
  *   be overwritten with '0xfb' bytes. This can be useful to track use of
  *   already freed objects, as they can be more easily recognized (as some
  *   members will be likely bogus.)
- * \warning This class does VERY little error checking!
  * \sa csArray
  * \sa csMemoryPool
  */
 template <class T>
 class csBlockAllocator
 {
-private:
-  // A dummy structure for a linked list of free items.
-  struct csFreeList
+protected: // 'protected' allows access by test-suite.
+  struct FreeNode
   {
-    csFreeList* next;
-    size_t numfree;		// Free elements in this block.
+    FreeNode* next;
   };
 
-  // A memory block (a series of 'size' objects).
-  struct csBlock
+  struct BlockKey
   {
-    void* memory;
-    csFreeList* firstfree;	// Linked list of free items in this block.
-    csBlock () : memory (0), firstfree (0) {}
-    ~csBlock ()
-    {
-      if (memory)
-      {
-#	ifdef CS_MEMORY_TRACKER
-	int32* ptr = ((int32*)memory)-2;
-	mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
-	free (ptr);
-#	else
-        free (memory);
-#	endif
-      }
-    }
+    uint8 const* addr;
+    size_t blocksize;
+    BlockKey(uint8 const* p, size_t n) : addr(p), blocksize(n) {}
   };
 
-  csArray<csBlock> blocks;
+  csArray<uint8*> blocks;	// List of allocated blocks; sorted by address.
   size_t size;			// Number of elements per block.
-  size_t elsize;		// Element size (bigger than 8).
+  size_t elsize;		// Element size; >= sizeof(void*).
   size_t blocksize;		// Size in bytes per block.
+  FreeNode* freenode;		// Head of the chain of free nodes.
+  bool pedantic;		// Warn about nodes not explicitly freed.
 
-  // First block that contains a free element.
-  size_t firstfreeblock;
+  /**
+   * Comparison function for FindBlock() which does a "fuzzy" search given an
+   * arbitrary address.  It checks if the address falls somewhere within a
+   * block rather than checking if the address exactly matches the start of the
+   * block (which is the only information recorded in blocks[] array).
+   */
+  static int FuzzyCmp(uint8* const& block, BlockKey const& k)
+  {
+    return (block + k.blocksize <= k.addr ? -1 : (block > k.addr ? 1 : 0));
+  }
 
   /**
    * Find the memory block which contains the given memory.
    */
-  size_t FindBlock (void* m)
+  size_t FindBlock(void const* m) const
   {
-    size_t i;
-    for (i = 0 ; i < blocks.Length () ; i++)
-    {
-      csBlock* b = &blocks[i];
-      if (b->memory <= m)
-      {
-        char* eb = ((char*)b->memory) + blocksize;
-	if (((char*)m) < eb)
-	  return i;
-      }
-    }
-    return (size_t)-1;
+    return blocks.FindSortedKey(
+      csArrayCmp<uint8*,BlockKey>(BlockKey((uint8*)m, blocksize), FuzzyCmp));
   }
 
   /**
-   * If the current free block is full, find a new one. If needed
-   * create a new one.
+   * Allocate a block and initialize its free-node chain.
+   * \return The returned address is both the reference to the overall block,
+   *   and the address of the first free node in the chain.
    */
-  void FindAndUpdateFreeBlock (size_t potentialnextfree)
+  uint8* AllocBlock() const
   {
-    CS_ASSERT (blocks.Length() != 0);
-    firstfreeblock = potentialnextfree;
-    while (firstfreeblock < blocks.Length ()
-		&& blocks[firstfreeblock].firstfree == 0)
-      ++firstfreeblock;
-
-    if (firstfreeblock == blocks.Length ())
-    {
-      firstfreeblock = blocks.Push (csBlock ());
-      csBlock& bl = blocks[firstfreeblock];
-#     ifdef CS_MEMORY_TRACKER
-      char buf[255];
-      sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
-      int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
-      *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
-      *ptr++ = blocksize;
-      bl.memory = (void*)ptr;
-#     else
-      bl.memory = (void*)malloc (blocksize);
-#     endif
-      bl.firstfree = (csFreeList*)bl.memory;
-      bl.firstfree->next = 0;
-      bl.firstfree->numfree = size;
-    }
-  }
-
-  /**
-   * Destroys all living objects and releases all memory allocated by the pool.
-   * \remarks Unconditionally disposes of all memory. Does NOT maintain the one
-   *   pre-allocated page expected by Alloc() and other methods, thus after
-   *   invocation of this method, it is not safe to invoke any other methods
-   *   which expect at least one block to be present.
-   */
-  void DisposeAll()
-  {
-#if 0
-    for (size_t i = blocks.Length(); i-- > 0; )
-    {
-      csBlock const& bl = blocks[i];
-      uint8* el = (uint8*)bl.memory;
-      uint8 const* blockend = el + blocksize;
-      uint8 const* nextfree = (uint8*)bl.firstfree;
-      CS_ASSERT(nextfree == 0 || (nextfree >= el && nextfree < blockend));
-      for ( ; el < blockend; el += elsize)
-      {
-	if (nextfree == 0 || el < nextfree)
-	  ((T*)el)->~T();
-	else if (nextfree != 0)
-	  nextfree = (uint8*)((csFreeList*)nextfree)->next;
-      }
-    }
-    blocks.Empty();
-    firstfreeblock = (size_t)-1;
-#endif
-  }
-
-public:
-  /**
-   * Construct a new block allocator which uses \c nelem elements per
-   * block. Bigger values for \c nelem will improve allocation performance, but
-   * at the cost of having some potential waste if you do not add \c nelem
-   * elements to the pool.  For instance, if \c nelem is 50 but you only add 3
-   * elements to the pool, then the space for the remaining 47 elements, though
-   * allocated, will remain unused (until you add more elements).
-   */
-  csBlockAllocator (size_t nelem = 32)
-  {
-    size = nelem;
-    elsize = sizeof (T);
-    if (elsize < sizeof (csFreeList))
-      elsize = sizeof (csFreeList);
-    blocksize = elsize * size;
-
-    size_t idx = blocks.Push (csBlock ());
-    csBlock& bl = blocks[idx];
-#   ifdef CS_MEMORY_TRACKER
+    uint8* block;
+#ifdef CS_MEMORY_TRACKER
     char buf[255];
     sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
     int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
     *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
     *ptr++ = blocksize;
-    bl.memory = (void*)ptr;
-#   else
-    bl.memory = (void*)malloc (blocksize);
-#   endif
-    bl.firstfree = (csFreeList*)bl.memory;
-    bl.firstfree->next = 0;
-    bl.firstfree->numfree = size;
+    block = (uint8*)ptr;
+#else
+    block = (uint8*)malloc(blocksize);
+#endif
 
-    firstfreeblock = 0;
+    // Build the free-node chain (all nodes are free in the new block).
+    FreeNode* nextfree = 0;
+    uint8* node = block + (size - 1) * elsize;
+    for ( ; node >= block; node -= elsize)
+    {
+      FreeNode* slot = (FreeNode*)node;
+      slot->next = nextfree;
+      nextfree = slot;
+    }
+    CS_ASSERT((uint8*)nextfree == block);
+    return block;
+  }
+
+  /**
+   * Dispose of a block.
+   */
+  void FreeBlock(uint8* p) const
+  {
+#ifdef CS_MEMORY_TRACKER
+    int32* ptr = ((int32*)p)-2;
+    mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
+    free (ptr);
+#else
+    free (p);
+#endif
+  }
+
+  /**
+   * Destroy an object, optionally warning if pedanticism is desired.
+   */
+  void DestroyObject(T* p, bool warn = false) const
+  {
+    p->~T();
+#ifdef CS_DEBUG
+    if (warn)
+      csPrintfErr("NOTFIY: csBlockAllocator(%p) destroying potentially leaked "
+		  "object at %p.\n", this, p);
+#endif
+#ifdef CS_BLOCKALLOC_DEBUG
+    memset (p, 0xfb, elsize);
+#endif
+  }
+
+  /**
+   * Get a usage mask showing all used (1's) and free (0's) nodes in
+   * the entire allocator.
+   */
+  csBitArray GetAllocationMap() const
+  {
+    csBitArray mask(size * blocks.GetSize());
+    mask.FlipAllBits();
+    for (FreeNode* p = freenode; p != 0; p = p->next)
+    {
+      size_t const n = FindBlock(p);
+      CS_ASSERT(n != csArrayItemNotFound);
+      size_t const slot = ((uint8*)p - blocks[n]) / elsize; // Slot in block.
+      mask.ClearBit(n * size + slot);
+    }
+    return mask;
+  }
+
+  /**
+   * Destroys all living objects and releases all memory allocated by the pool.
+   * \param warn_unfreed If true, in debug mode warn about objects not
+   *   explicitly released via Free().
+   */
+  void DisposeAll(bool warn_unfreed)
+  {
+    csBitArray const mask(GetAllocationMap());
+    size_t node = 0;
+    for (size_t b = 0, bN = blocks.GetSize(); b < bN; b++)
+    {
+      for (uint8 *p = blocks[b], *pN = p + blocksize; p < pN; p += elsize)
+	if (mask.IsBitSet(node++))
+	  DestroyObject((T*)p, warn_unfreed);
+      FreeBlock(blocks[b]);
+    }
+    blocks.DeleteAll();
+    freenode = 0;
+  }
+
+public:
+  /**
+   * Construct a new block allocator.
+   * \param nelem Number of elements to store in each allocation unit.
+   * \param warn_unfreed If true, in debug mode warn about objects not
+   *   explicitly released via Free().
+   * \remarks Bigger values for \c nelem will improve allocation performance,
+   *   but at the cost of having some potential waste if you do not add
+   *   \c nelem elements to each pool.  For instance, if \c nelem is 50 but you
+   *   only add 3 elements to the pool, then the space for the remaining 47
+   *   elements, though allocated, will remain unused (until you add more
+   *   elements).
+   * <p>
+   * \remarks If use use csBlockAllocator as a convenient and lightweight
+   *   garbage collection facility (for which it is well-suited), and expect it
+   *   to dispose of allocated objects when the pool itself is destroyed, then
+   *   set \c warn_unfreed to false. On the other hand, if you use
+   *   csBlockAllocator only as a fast allocator but intend to manage each
+   *   object's life time manually, then you may want to set \c warn_unfreed to
+   *   true in order to receive diagnostics about objects which you have
+   *   forgotten to release explicitly via manual invocation of Free().
+   */
+  csBlockAllocator(size_t nelem = 32, bool warn_unfreed = false) :
+    size(nelem), elsize(sizeof(T)), freenode(0), pedantic(warn_unfreed)
+  {
+    if (elsize < sizeof (FreeNode))
+      elsize = sizeof (FreeNode);
+    blocksize = elsize * size;
   }
 
   /**
    * Destroy all allocated objects and release memory.
    */
-  ~csBlockAllocator ()
+  ~csBlockAllocator()
   {
-    DisposeAll();
+    DisposeAll(pedantic);
   }
 
   /**
@@ -225,210 +247,81 @@ public:
    */
   void Empty()
   {
-    DisposeAll();
-    FindAndUpdateFreeBlock(0);
+    DisposeAll(false);
   }
 
   /**
-   * Compact the block allocator so that all blocks that are completely
-   * free are removed. The blocks that still contain elements are not touched.
+   * Compact the block allocator so that all blocks that are completely unused
+   * are removed. The blocks that still contain elements are not touched.
    */
-  void Compact ()
+  void Compact()
   {
-    CS_ASSERT (blocks.Length() != 0);
-    size_t i = blocks.Length () - 1;
-    while (i > firstfreeblock)
+    bool compacted = false;
+    csBitArray mask(GetAllocationMap());
+    for (size_t b = blocks.GetSize(); b-- > 0; )
     {
-      if (blocks[i].firstfree == (csFreeList*)blocks[i].memory 
-	&& blocks[i].firstfree->numfree == size)
+      size_t const node = b * size;
+      if (!mask.AreSomeBitsSet(node, size))
       {
-	CS_ASSERT (blocks[i].firstfree->next == 0);
-        blocks.DeleteIndex (i);
-      }
-      i--;
-    }
-  }
-
-  /**
-   * Allocate a new element.
-   */
-  T* Alloc ()
-  {
-    CS_ASSERT (blocks.Length() != 0);
-
-    // This routine makes sure there is ALWAYS free space available.
-    csBlock& freebl = blocks[firstfreeblock];
-    void* ptr = (void*)(freebl.firstfree);
-
-    if (freebl.firstfree->numfree >= 2)
-    {
-      // Still room in this block after allocation.
-      csFreeList* nf = (csFreeList*)(((char*)ptr)+elsize);
-      nf->next = freebl.firstfree->next;
-      nf->numfree = freebl.firstfree->numfree-1;
-      freebl.firstfree = nf;
-    }
-    else
-    {
-      // We need a new block later.
-      freebl.firstfree = freebl.firstfree->next;
-      if (!freebl.firstfree)
-      {
-        // This block has no more free space. We need a new one.
-	FindAndUpdateFreeBlock (firstfreeblock + 1);
+	FreeBlock(blocks[b]);
+	blocks.DeleteIndex(b);
+	mask.Delete(node, size);
+	compacted = true;
       }
     }
 
-    return new (ptr) T;
-  }
-
-  /**
-   * Deallocate an element. It is ok to give a 0 pointer here.
-   */
-  void Free (T* el)
-  {
-    if (!el) return;
-
-    size_t idx = FindBlock ((void*)el);
-    CS_ASSERT_MSG (
-      "csBlockAllocator<>::Free() called with invalid element address",
-      idx != (size_t)-1);
-
-    el->~T();
-
-#ifdef CS_BLOCKALLOC_DEBUG
-    memset (el, 0xfb, elsize);
-#endif
-
-    // If the index is lower than the index of the first free block
-    // then we update the firstfreeblock index.
-    if (idx < firstfreeblock)
-      firstfreeblock = idx;
-
-    csBlock& bl = blocks[idx];
-    if (bl.firstfree == 0)
+    // If blocks were deleted, then free-node chain broke, so rebuild it.
+    if (compacted)
     {
-      // Block has no free items so we create the first free item
-      // here.
-      bl.firstfree = (csFreeList*)el;
-      bl.firstfree->next = 0;
-      bl.firstfree->numfree = 1;
-    }
-    else
-    {
-      csFreeList* p_el = (csFreeList*)el;
-
-      if (p_el < bl.firstfree)
+      FreeNode* nextfree = 0;
+      size_t const bN = blocks.GetSize();
+      size_t node = bN * size;
+      for (size_t b = bN; b-- > 0; )
       {
-        // New free element is before the current free element.
-	if (((char*)bl.firstfree) - ((char*)p_el) == (int)elsize)
+	uint8* const p0 = blocks[b];
+	for (uint8* p = p0 + (size - 1) * elsize; p >= p0; p -= elsize)
 	{
-	  // New free element is directly before the current free
-	  // element.
-	  p_el->next = bl.firstfree->next;
-	  p_el->numfree = bl.firstfree->numfree+1;
-	}
-	else
-	{
-	  // There is a gap.
-	  p_el->next = bl.firstfree;
-	  p_el->numfree = 1;
-	}
-
-	bl.firstfree = p_el;
-      }
-      else
-      {
-        // New free element is after the current free element.
-	// First we find the two free blocks that enclose the new
-	// free element.
-	csFreeList* fl_before = bl.firstfree;
-	csFreeList* fl_after = bl.firstfree->next;
-	while (fl_after != 0 && fl_after < p_el)
-	{
-	  fl_before = fl_after;
-	  fl_after = fl_after->next;
-	}
-
-	// 'fl_before_end' points to the memory right after the free block
-	// that is directly before the new free element. We use
-	// 'fl_before_end' later.
-	char* fl_before_end = ((char*)fl_before) + fl_before->numfree * elsize;
-
-	if (!fl_after)
-	{
-	  // The new free element is after the last free block. First check
-	  // if the new free element directly follows that free block.
-	  // If so we can extend that.
-	  if (fl_before_end == (char*)p_el)
+	  if (!mask.IsBitSet(--node))
 	  {
-	    // Yes, extend.
-	    ++(fl_before->numfree);
-	  }
-	  else
-	  {
-	    // No, we have to create a new free block.
-	    p_el->next = 0;
-	    p_el->numfree = 1;
-	    fl_before->next = p_el;
-	  }
-	}
-	else
-	{
-	  // We have a block before and after the new free block.
-	  // First we check if the new free item exactly between
-	  // fl_before and fl_after.
-	  if (fl_before_end == (char*)p_el
-	  	&& ((char*)p_el) + elsize == (char*)fl_after)
-	  {
-	    // Perfect fit, merge fl_before and fl_after.
-	    fl_before->next = fl_after->next;
-	    fl_before->numfree = fl_before->numfree + 1 + fl_after->numfree;
-	  }
-	  else if (fl_before_end == (char*)p_el)
-	  {
-	    // New free item fits directly after fl_before.
-	    ++(fl_before->numfree);
-	  }
-	  else if (((char*)p_el) + elsize == (char*)fl_after)
-	  {
-	    // New free item fits directly before fl_after.
-	    fl_before->next = p_el;
-	    p_el->next = fl_after->next;
-	    p_el->numfree = fl_after->numfree+1;
-	  }
-	  else
-	  {
-	    // We need a new free block.
-	    fl_before->next = p_el;
-	    p_el->next = fl_after;
-	    p_el->numfree = 1;
+	    FreeNode* slot = (FreeNode*)p;
+	    slot->next = nextfree;
+	    nextfree = slot;
 	  }
 	}
       }
+      freenode = nextfree;
     }
   }
 
   /**
-   * For debugging: dump contents.
+   * Allocate a new object. Its default (no-argument) constructor is invoked.
    */
-  void Dump ()
+  T* Alloc()
   {
-    int i;
-    printf ("=============================\nelsize = %zu\n", elsize);
-    for (i = 0 ; i < blocks.Length () ; i++)
+    if (freenode == 0)
     {
-      printf ("Block %d\n", i);
-      csFreeList* fl = blocks[i].firstfree;
-      char* m = (char*)blocks[i].memory;
-      while (fl)
-      {
-        printf ("  free %td %zu\n", (((char*)fl) - m) / elsize, fl->numfree);
-	fl = fl->next;
-      }
+      uint8* p = AllocBlock();
+      blocks.InsertSorted(p);
+      freenode = (FreeNode*)p;
     }
-    printf ("=============================\n");
-    fflush (stdout);
+    void* const node = freenode;
+    freenode = freenode->next;
+    return new (node) T;
+  }
+
+  /**
+   * Deallocate an object. It is safe to provide a null pointer.
+   */
+  void Free(T* p)
+  {
+    if (p != 0)
+    {
+      CS_ASSERT(FindBlock(p) != csArrayItemNotFound);
+      DestroyObject(p, false);
+      FreeNode* f = (FreeNode*)p;
+      f->next = freenode;
+      freenode = f;
+    }
   }
 };
 
@@ -436,4 +329,4 @@ public:
 # define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
 
-#endif
+#endif // __CSUTIL_BLOCK_ALLOCATOR_H__

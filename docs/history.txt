@@ -23,6 +23,24 @@ chronological order.
 	  FOOLIB.LFLAGS, etc.  By default it is ".", but a good choice for use
 	  with the CS_SUBST_EMITTER() for emitting to makefiles is "_", which
 	  gives variable names such as FOOLIB_CFLAGS, FOOLIB_LFLAGS, etc.
+	- Eric Sunshine rewrote and re-engineered csBlockAllocator<> from
+	  scratch; greatly simplifying its implementation and internal
+	  representation, so that it is now much easier to understand and
+	  maintain. Common operations, such as Alloc() and Free() are now
+	  faster; especially Free(), which is now essentially zero-cost,
+	  whereas it used to perform a (potentially quite expensive) linear
+	  scan, plus a good deal of complicated and convoluted logic. Also
+	  enhanced the Doxygen comments by a fair amount.
+	- Eric Sunshine added a `pedantic' flag to the csBlockAllocator<>
+	  constructor which clients can set to get warnings about objects which
+	  have not been handed explicitly to Free() before the allocator itself
+	  is destroyed.  This may be useful in cases where the client is using
+	  csBlockAllocator<> only as a quick-allocation mechanism and wants to
+	  manage object destruction manually, rather than allowing
+	  csBlockAllocator<> to act as a light-weight garbage collector (which
+	  is its default and intended behavior).
+	- Eric Sunshine added a csBlockAllocator<> test-suite
+	  (blockallocator.t). Run with `jam check'.
 6-Apr-2005
 	- res made the following changes:
 	    - The simpleformer loader now doesn't let the loader choose the
