@@ -505,7 +505,7 @@ T *BinaryTreeIterator<T>::Next(void)
 template <class T>
 T *BinaryTreeIterator<T>::Prev(void)
 {
-    csPrintf ("***BinaryTreeIterator::Prev not implemented yet!!!!\n");
+    printf ("***BinaryTreeIterator::Prev not implemented yet!!!!\n");
     return 0; // not implemented yet
 }
 
