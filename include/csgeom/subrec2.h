@@ -18,10 +18,10 @@
 */
 
 #ifdef CS_COMPILER_GCC
-  #warning csutil/subrec2.h is deprecated; use csutil/subrec.h instead
+  #warning csgeom/subrec2.h is deprecated; use csgeom/subrec.h instead
 #endif
 #ifdef CS_COMPILER_MSVC
-  #pragma message ("csutil/subrec2.h is deprecated; use csutil/subrec.h instead")
+  #pragma message ("csgeom/subrec2.h is deprecated; use csgeom/subrec.h instead")
 #endif
 
 #define csSubRect2		csSubRect
