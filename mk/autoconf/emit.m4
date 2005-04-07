@@ -51,7 +51,7 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 
 
 #------------------------------------------------------------------------------
-# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX, [EMITTER])
+# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX, [EMITTER], [DELIMITER])
 #	Record the results of CS_CHECK_BUILD() or CS_CHECK_LIB_WITH() via some
 #	emitter.  If CACHE-VAR indicates that the build succeeded, then the
 #	following properties are emitted:
@@ -63,13 +63,21 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 #	EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
 #	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
 #	KEY/VALUE tuple. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
+#	DELIMITER is the token to insert after PREFIX in the composed names. If
+#	omitted, it defaults to ".". When emitting to makefiles (via
+#	CS_SUBST_EMITTER), you probably should set DELIMITER to "_", which will
+#	create makefile variables named PREFIX_CFLAGS, PREFIX_LFLAGS, etc.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_RESULT],
     [AS_IF([test "$$1" = yes],
-	[CS_EMIT_BUILD_PROPERTY([$2.AVAILABLE], [yes], [], [], [$3])
-	CS_EMIT_BUILD_PROPERTY([$2.CFLAGS], [$$1_cflags], [], [], [$3])
-	CS_EMIT_BUILD_PROPERTY([$2.LFLAGS], [$$1_lflags $$1_libs],
-	    [], [], [$3])])])
+	[_CS_EMIT_BUILD_RESULT([$2], [$4], [AVAILABLE], [yes], [$3])
+	_CS_EMIT_BUILD_RESULT([$2], [$4], [CFLAGS], [$$1_cflags], [$3])
+	_CS_EMIT_BUILD_RESULT([$2], [$4], [LFLAGS], [$$1_lflags $$1_libs],
+	    [$3])])])
+
+# _CS_EMIT_BUILD_RESULT(PREFIX, [DELIMITER], SUFFIX, VALUE, [EMITTER])
+AC_DEFUN([_CS_EMIT_BUILD_RESULT],
+    [CS_EMIT_BUILD_PROPERTY([$1]m4_default([$2],[.])[$3],[$4],[],[],[$5])])
 
 
 
