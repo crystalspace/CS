@@ -17,6 +17,12 @@ chronological order.
 	- Eric Sunshine fixed long-standing bug in csBitArray::AreSomeBitsSet()
 	  where it would fail an input-validation assertion even if the input
 	  was valid.
+	- Eric Sunshine added a DELIMITER argument to CS_EMIT_BUILD_RESULT() in
+	  emit.m4. This allows clients to adjust the delimiter inserted after
+	  PREFIX when composing variable names, such as FOOLIB.CFLAGS,
+	  FOOLIB.LFLAGS, etc.  By default it is ".", but a good choice for use
+	  with the CS_SUBST_EMITTER() for emitting to makefiles is "_", which
+	  gives variable names such as FOOLIB_CFLAGS, FOOLIB_LFLAGS, etc.
 6-Apr-2005
 	- res made the following changes:
 	    - The simpleformer loader now doesn't let the loader choose the
