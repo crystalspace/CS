@@ -146,7 +146,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     return cacheData;
   }
   csRect texRect;
-  csSubRect2* sr = 0;
+  csSubRect* sr = 0;
 
   csBitmapMetrics bmetrics;
   csRef<iDataBuffer> alphaData;

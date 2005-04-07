@@ -1311,6 +1311,8 @@ csXMLShader::~csXMLShader ()
   delete[] filename;
   delete resolver;
   delete[] vfsStartDir;
+  delete[] allShaderMeta.name;
+  delete[] allShaderMeta.description;
 }
 
 int csXMLShader::CompareTechniqueKeeper (

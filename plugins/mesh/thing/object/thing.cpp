@@ -26,7 +26,6 @@
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
 #include "csgeom/subrec.h"
-#include "csgeom/subrec2.h"
 #include "csgfx/memimage.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
@@ -528,7 +527,7 @@ void csThingStatic::DistributePolyLMs (
       while (inputQueues[curQueue].polys.Length () > 0)
       {
 	bool stuffed = false;
-	csSubRect2* slmSR;
+	csSubRect* slmSR;
 	int polyIdx = inputQueues[curQueue].polys.Pop ();
 	csPolygon3DStatic* sp = static_polygons[polyIdx];
 

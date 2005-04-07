@@ -41,6 +41,11 @@ chronological order.
 	  is its default and intended behavior).
 	- Eric Sunshine added a csBlockAllocator<> test-suite
 	  (blockallocator.t). Run with `jam check'.
+	- res replaced csSubRectangles with csSubRectangles2. (The old
+	  csSubRectangles was removed and csSubRectangles2 was renamed to
+	  csSubRectangles.)
+	- res fixed a csString passed through '...' in csfgen.
+	- res fixed some VC6 errors in xmlshader.
 6-Apr-2005
 	- res made the following changes:
 	    - The simpleformer loader now doesn't let the loader choose the

@@ -21,7 +21,7 @@
 #define __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__
 
 #include "csextern_gl.h"
-#include "csgeom/subrec2.h"
+#include "csgeom/subrec.h"
 #include "csgeom/vector2.h"
 #include "csutil/dirtyaccessarray.h"
 
@@ -35,7 +35,7 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
 {
   struct GLGlyphCacheData : public csFontCache::GlyphCacheData
   {
-    csSubRect2* subrect;
+    csSubRect* subrect;
     float tx1, ty1, tx2, ty2;
     size_t texNum;
     csBitmapMetrics bmetrics;
@@ -68,7 +68,7 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
   {
     GLuint handle;
     GLuint mirrorHandle;
-    csSubRectangles2* glyphRects;
+    csSubRectangles* glyphRects;
 
     CacheTexture () 
     { 
@@ -80,7 +80,7 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
     }
     void InitRects (int size) 
     { 
-      glyphRects = new csSubRectangles2 (csRect (0, 0, size, size));
+      glyphRects = new csSubRectangles (csRect (0, 0, size, size));
     }
   };
   csArray<CacheTexture> textures;

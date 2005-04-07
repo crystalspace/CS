@@ -53,7 +53,6 @@
 #include "csgeom/sphere.h"
 #include "csgeom/spline.h"
 #include "csgeom/subrec.h"
-#include "csgeom/subrec2.h"
 #include "csgeom/tcovbuf.h"
 #include "csgeom/textrans.h"
 #include "csgeom/transfrm.h"

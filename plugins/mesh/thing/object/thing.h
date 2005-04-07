@@ -22,7 +22,7 @@
 #include "csgeom/csrect.h"
 #include "csgeom/objmodel.h"
 #include "csgeom/pmtools.h"
-#include "csgeom/subrec2.h"
+#include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/memimage.h"
 #include "csgfx/shadervar.h"
@@ -250,7 +250,7 @@ public:
   struct StaticSuperLM
   {
     int width, height;
-    csSubRectangles2* rects;
+    csSubRectangles* rects;
     int freeLumels;
 
     StaticSuperLM (int w, int h) : width(w), height(h)
@@ -263,11 +263,11 @@ public:
       delete rects;
     }
 
-    csSubRectangles2* GetRects ()
+    csSubRectangles* GetRects ()
     {
       if (rects == 0)
       {
-	rects = new csSubRectangles2 (csRect (0, 0, width, height));
+	rects = new csSubRectangles (csRect (0, 0, width, height));
       }
       return rects;
     }

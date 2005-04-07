@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001-2005 by Jorrit Tyberghein
+		  2003-2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +21,7 @@
 #define __CS_SUBREC_H__
 
 /**\file 
+ * Stuff small rectangles into a bigger one
  */
 /**
  * \addtogroup geom_utils
@@ -29,21 +31,7 @@
 
 #include "csgeom/csrect.h"
 
-/**
- * Sub-rectangle
- */
-class csSubRect : public csRect
-{
-public:
-  csSubRect* next, * prev;
-
-  /// Create a new rectangle.
-  csSubRect (int ixmin, int iymin, int ixmax, int iymax)
-  	: csRect (ixmin, iymin, ixmax, iymax), next (0), prev (0) { }
-
-  /// Copy constructor.
-  csSubRect (const csRect &copy) : csRect (copy), next (0), prev (0) { }
-};
+class csSubRect;
 
 /**
  * A class managing allocations of sub-rectangles. i.e. this class represents
@@ -52,12 +40,16 @@ public:
  */
 class CS_CRYSTALSPACE_EXPORT csSubRectangles
 {
+  friend class csSubRect;
 protected:
   /// Dimensions of this region.
   csRect region;
   /// First empty region.
-  csSubRect* first;
+  csSubRect* root;
 
+  csSubRect* AllocSubrect ();
+  
+  void Grow (csSubRect* sr, int ow, int oh, int nw, int nh);
 public:
   /// Allocate a new empty region with the given size.
   csSubRectangles (const csRect& region);
@@ -74,9 +66,21 @@ public:
   void Clear ();
 
   /**
-   * Allocate a new rectangle. Return false if there is no room
+   * Allocate a new rectangle. Returns 0 if there is no room
    */
-  bool Alloc (int w, int h, csRect& rect);
+  csSubRect* Alloc (int w, int h, csRect& rect);
+
+  /**
+   * Reclaim a subrectangle, meaning, the space occupied by the subrect can be
+   * reused by subsequent Alloc() calls.
+   */
+  void Reclaim (csSubRect* subrect);
+
+  /**
+   * Increase the size of the region.
+   * You can only grow upwards.
+   */
+  bool Grow (int newWidth, int newHeight);
 
   /**
    * For debugging: dump all free rectangles.

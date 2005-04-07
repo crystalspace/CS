@@ -206,10 +206,10 @@ struct iShaderRenderInterface : public iBase
 struct csShaderMetadata
 {
   /// Name of the shader
-  const char *name;
+  char *name;
 
   /// Descriptive string
-  const char *description;
+  char *description;
 
   /**
    * Number of lights this shader can process in a pass. 
