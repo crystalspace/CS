@@ -1565,32 +1565,26 @@ AS_IF([test $cs_cv_libsdl = yes],
 #------------------------------------------------------------------------------
 # Check for VOS.
 #------------------------------------------------------------------------------
-AC_ARG_WITH([vos], [AC_HELP_STRING([--with-vos=dir],
-    [specify location of VOS pkg-config files])])
-AS_IF([test -z "$with_vos"], [with_vos=yes])
+CS_CHECK_LIB_WITH([metaobject_a3dl],
+    [AC_LANG_PROGRAM(
+	[[#include <vos/metaobjects/a3dl/object3d.hh>]],
+	[A3DL::Object3D o(0); o.setPosition(0,0,0);])],
+    [], [C++], [], [], [], [], [], [libmetaobject_a3dl])
 
-AS_IF([test "$with_vos" != no && test "$with_vos" != yes],
-    [AS_IF([test -n "$PKG_CONFIG_PATH"],
- 	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"],
-	[PKG_CONFIG_PATH="$with_vos"])
-    export PKG_CONFIG_PATH])
-CS_CHECK_PKG_CONFIG
+AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
+    [CS_CHECK_LIB_WITH([metaobject_misc],
+	[AC_LANG_PROGRAM(
+	    [[#include <vos/metaobjects/misc/metadata.hh>]],
+	    [VOS::Metadata m(0); m.setCreationTime(0);])],
+	[], [C++], [], [],
+	[$cs_cv_libmetaobject_a3dl_cflags],
+	[$cs_cv_libmetaobject_a3dl_lflags],
+	[$cs_cv_libmetaobject_a3dl_libs],
+	[libmetaobject_misc])],
+    [cs_cv_libmetaobject_misc=no])
 
-m4_define([cs_vos_pkgs], [libmetaobject_a3dl libmetaobject_misc])
-AS_IF([test "$with_vos" != no],
-    [AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
-	[AS_IF([test -n "$PKG_CONFIG"],
-	    [AS_IF([AC_RUN_LOG([$PKG_CONFIG --exists libmetaobject_a3dl])],
-		[cs_cv_libvos=yes
-		cs_cv_libvos_cflags=CS_RUN_PATH_NORMALIZE(
-		    [$PKG_CONFIG --cflags cs_vos_pkgs])
-		cs_cv_libvos_lflags=''
-		cs_cv_libvos_libs=CS_RUN_PATH_NORMALIZE(
-		    [$PKG_CONFIG --libs cs_vos_pkgs])],
-		[cs_cv_libvos=no])],
-	    [cs_cv_libvos=no])])
-    AS_IF([test $cs_cv_libvos = yes],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])])
+AS_IF([test $cs_cv_libmetaobject_misc = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libmetaobject_misc], [VOS])])
 
 
 
@@ -1605,66 +1599,50 @@ AS_IF([test "$with_vos" != no],
 # try the result of --libs and --gl-libs together; if that fails, then we try
 # only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
-AC_ARG_WITH([wx],
-    [AC_HELP_STRING([--without-wx], [do not use wxWidgets SDK])])
-    AS_IF([test -z "$with_wx"],	[with_wx=yes])
-	    
-AS_IF([test "$with_wx" != no],
-    [CS_CHECK_TOOLS([WXCONFIG], [wx-config])
-    AC_CACHE_CHECK([for wxWidgets], [cs_cv_wxwidgets],
-	[AS_IF([test -n "$WXCONFIG"],
-	    [cs_cv_wxwidgets=yes
-	    cs_cv_wxwidgets_cflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --cxxflags])
-	    cs_cv_wxwidgets_lflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --ldflags])
-	    cs_cv_wxwidgets_libs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --libs])
-	    cs_cv_wxwidgets_gllibs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --gl-libs])],
-	    [cs_cv_wxwidgets=no])])
+CS_CHECK_LIB_WITH([wx],
+    [AC_LANG_PROGRAM(
+	[[#include "wx/wxprec.h"
+	#ifdef __BORLANDC__
+	#pragma hdrstop
+	#endif
+	#ifndef WX_PRECOMP
+	#include "wx/wx.h"
+	#endif
+	]],
+	[[wxWindow* p = 0; int w,h; p->GetClientSize(&w,&h);]])],
+    [], [C++])
     
-    AS_IF([test $cs_cv_wxwidgets = yes],
-	[CS_CHECK_BUILD([if wxWidgets SDK is usable], [cs_cv_wxwidgets_ok],
-	    [AC_LANG_PROGRAM(
-		[[#include "wx/wxprec.h"
-		#ifdef __BORLANDC__
-		#pragma hdrstop
-		#endif
-		#ifndef WX_PRECOMP
-		#include "wx/wx.h"
-		#endif
-		]],
-		[[wxWindow* p = 0; int w,h; p->GetClientSize(&w,&h);]])],
-	    [], [C++], [], [], [],
-	    [$cs_cv_wxwidgets_cflags],
-	    [$cs_cv_wxwidgets_lflags],
-	    [$cs_cv_wxwidgets_libs])],
-	[cs_cv_wxwidgets_ok=no])
+AS_IF([test $cs_cv_libwx = yes],
+    [AS_IF([test -z "$cs_cv_libwx_opengl"],
+	[AS_IF([test -n "$CONFIG_WX"],
+	    [cs_cv_libwx_gllibs=CS_RUN_PATH_NORMALIZE([$CONFIG_WX --gl-libs])],
+	    [cs_cv_libwx_gllibs=''])])
+    CS_CHECK_BUILD([if wxWidgets is built with OpenGL support],
+	[cs_cv_libwx_opengl],
+	[AC_LANG_PROGRAM(
+	    [[#include "wx/wxprec.h"
+	    #ifdef __BORLANDC__
+	    #pragma hdrstop
+	    #endif
+	    #ifndef WX_PRECOMP
+	    #include "wx/wx.h"
+	    #endif
+	    #include "wx/glcanvas.h"
+	    ]],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)])],
+	[CS_CREATE_TUPLE(
+	    [$cs_cv_libwx_cflags],
+	    [$cs_cv_libwx_lflags],
+	    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs]) \
+	CS_CREATE_TUPLE(
+	    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
+	    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
+	    [$cs_cv_libwx_libs   $cs_cv_libglu_libs])],
+	[C++])],
+    [cs_cv_libwx_opengl=no])
     
-    AS_IF([test $cs_cv_wxwidgets_ok = yes],
-	[CS_CHECK_BUILD([if wxWidgets is built with OpenGL support],
-	    [cs_cv_wxwidgets_opengl],
-	    [AC_LANG_PROGRAM(
-		[[#include "wx/wxprec.h"
-		#ifdef __BORLANDC__
-		#pragma hdrstop
-		#endif
-		#ifndef WX_PRECOMP
-		#include "wx/wx.h"
-		#endif
-		#include "wx/glcanvas.h"
-		]],
-		[wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)])],
-	    [CS_CREATE_TUPLE(
-		[$cs_cv_wxwidgets_ok_cflags],
-		[$cs_cv_wxwidgets_ok_lflags],
-		[$cs_cv_wxwidgets_ok_libs   $cs_cv_wxwidgets_gllibs]) \
-	    CS_CREATE_TUPLE(
-		[$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags],
-		[$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags],
-		[$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs])],
-	    [C++])],
-	[cs_cv_wxwidgets_opengl=no])
-    
-    AS_IF([test $cs_cv_wxwidgets_opengl = yes],
-	[CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])])])
+AS_IF([test $cs_cv_libwx_opengl = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libwx_opengl], [WX])])
 
 
 

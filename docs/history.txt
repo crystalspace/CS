@@ -9,6 +9,11 @@ chronological order.
 7-Apr-2005
 	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
 	  plugin due to csString::operator[] ambiguity.
+	- Eric Sunshine rewrote the wxWidgets and VOS checks in configure.ac so
+	  that they are predicated upon CS_CHECK_LIB_WITH(). Not only does this
+	  simplify the checks, but it also gives them --with-LIB, pkg-config
+	  support, and LIB-config support for free, thus there is no long any
+	  need to perform such task manually for these checks.
 6-Apr-2005
 	- res made the following changes:
 	    - The simpleformer loader now doesn't let the loader choose the
