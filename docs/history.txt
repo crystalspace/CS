@@ -14,6 +14,9 @@ chronological order.
 	  simplify the checks, but it also gives them --with-LIB, pkg-config
 	  support, and LIB-config support for free, thus there is no long any
 	  need to perform such task manually for these checks.
+	- Eric Sunshine fixed long-standing bug in csBitArray::AreSomeBitsSet()
+	  where it would fail an input-validation assertion even if the input
+	  was valid.
 6-Apr-2005
 	- res made the following changes:
 	    - The simpleformer loader now doesn't let the loader choose the

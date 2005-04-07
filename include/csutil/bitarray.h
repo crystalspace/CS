@@ -354,7 +354,7 @@ public:
    */
   bool AreSomeBitsSet (size_t pos, size_t count) const
   {
-    CS_ASSERT (pos + count < mNumBits);
+    CS_ASSERT (pos + count <= mNumBits);
     while (count > 0)
     {
       size_t index = GetIndex (pos);
