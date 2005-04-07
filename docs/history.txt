@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Apr-2005
+	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
+	  plugin due to csString::operator[] ambiguity.
 6-Apr-2005
 	- res made the following changes:
 	    - The simpleformer loader now doesn't let the loader choose the
