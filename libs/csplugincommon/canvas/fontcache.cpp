@@ -174,7 +174,7 @@ csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
 	  pg = 0;
 	}
       }
-      knownFont->fontSize = font->GetSize ();
+      knownFont->fontSize = (int)font->GetSize ();
       purgeableFonts.Delete (knownFont);
     }
   }
@@ -185,7 +185,7 @@ csFontCache::KnownFont* csFontCache::CacheFont (iFont* font)
 {
   KnownFont* knownFont = new KnownFont;
   knownFont->font = font;
-  knownFont->fontSize = font->GetSize ();
+  knownFont->fontSize = (int)font->GetSize ();
 
   knownFonts.InsertSorted (knownFont, KnownFontArrayCompareItems);
 
