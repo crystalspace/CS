@@ -361,7 +361,8 @@ public:
       size_t offset = GetOffset (pos);
       size_t checkCount = MIN(count, cell_size - offset);
             
-      store_type mask = ((1 << checkCount) - 1) << offset;
+      store_type mask = 
+	((checkCount == cell_size) ? ~0 : ((1 << checkCount) - 1)) << offset;
       if (mpStore[index] & mask) return true;
       pos += checkCount;
       count -= checkCount;

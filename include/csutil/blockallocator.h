@@ -156,7 +156,7 @@ protected: // 'protected' allows access by test-suite.
     p->~T();
 #ifdef CS_DEBUG
     if (warn)
-      csPrintfErr("NOTFIY: csBlockAllocator(%p) destroying potentially leaked "
+      csPrintfErr("NOTIFY: csBlockAllocator(%p) destroying potentially leaked "
 		  "object at %p.\n", this, p);
 #endif
 #ifdef CS_BLOCKALLOC_DEBUG

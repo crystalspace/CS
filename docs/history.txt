@@ -13,6 +13,13 @@ chronological order.
 	  continues to be recognized for backward compatibility.)
 	- Eric Sunshine added entry to the "Release Notes 1.00" appendix
 	  explaining that the public CS headers are now ansi-pedantic-clean.
+	- res worked around a subtle problem in csBitArray::AreSomeBitsSet().
+	  This method computes a mask which is used to check whether a set of
+	  bits in the array is set. The mask computation uses a shift-left
+	  where the shift amount was in some cases the number of bits in the
+	  storage type. On x86 this amount is 32, but a '<< 32' is actually a
+	  no-op there. This caused a wrong mask (all 0) to be computed and 
+	  subsequently AreSomeBitsSet() would return a wrong value.
 7-Apr-2005
 	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
 	  plugin due to csString::operator[] ambiguity.

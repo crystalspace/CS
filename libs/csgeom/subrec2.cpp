@@ -490,7 +490,7 @@ csSubRectangles::csSubRectangles (const csRect &region)
 csSubRectangles::~csSubRectangles ()
 {
   GetSubRecAlloc ()->Free (root);
-  //GetSubRecAlloc ()->Compact ();
+  GetSubRecAlloc ()->Compact ();
 }
 
 csSubRect* csSubRectangles::AllocSubrect ()
