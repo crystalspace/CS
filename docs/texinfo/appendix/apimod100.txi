@@ -1578,11 +1578,12 @@ change.
 @subheading @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
 
 @samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
-by @samp{csStringSet::GlobalIterator} and @samp{csStringHash::GlobalIterator},
-respectively.  Rather than instantiating iterators directly, you now ask the
-set or hash for an iterator. This brings the @samp{csStringSet} and
-@samp{csStringHash} @sc{api}'s in line with other container classes which vend
-iterators. Given old code which is using @samp{csStringSetIterator}:
+with @samp{csStringSet::GlobalIterator} and
+@samp{csStringHash::GlobalIterator}, respectively.  Rather than instantiating
+iterators directly, you now ask the set or hash for an iterator. This brings
+the @samp{csStringSet} and @samp{csStringHash} @sc{api}'s in line with other
+container classes which vend iterators. Given old code which is using
+@samp{csStringSetIterator}:
 
 @example
 csStringSet set;
