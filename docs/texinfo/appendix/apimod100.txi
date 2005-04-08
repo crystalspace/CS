@@ -1619,3 +1619,11 @@ questionable use.
 @item
 @code{csIndPrint} and @file{csutil/indprint.h}
 @end itemize
+
+@subheading C++ Standard Conformance
+
+Crystal Space's public header files are now C++ Language Standard
+conformant. This means that Crystal Space-based projects which choose to adhere
+strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
+@samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
+headers safely.

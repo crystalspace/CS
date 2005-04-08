@@ -11,6 +11,8 @@ chronological order.
 	  names as `--with-foo', rather than `--with-libfoo' since the former
 	  seems to be more idiomatic. (The old `--with-libfoo' form, however,
 	  continues to be recognized for backward compatibility.)
+	- Eric Sunshine added entry to the "Release Notes 1.00" appendix
+	  explaining that the public CS headers are now ansi-pedantic-clean.
 7-Apr-2005
 	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
 	  plugin due to csString::operator[] ambiguity.
