@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Apr-2005
+	- Eric Sunshine changed CS_CHECK_LIB_WITH() so that it publishes option
+	  names as `--with-foo', rather than `--with-libfoo' since the former
+	  seems to be more idiomatic. (The old `--with-libfoo' form, however,
+	  continues to be recognized for backward compatibility.)
 7-Apr-2005
 	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
 	  plugin due to csString::operator[] ambiguity.

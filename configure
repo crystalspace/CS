@@ -914,86 +914,85 @@ Optional Packages:
   --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
-  --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
+  --with-Xxf86vm=dir      specify location of libXxf86vm if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libXaw=dir       specify location of libXaw if not detected
+  --with-Xaw=dir          specify location of libXaw if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
-  --with-libz=dir         specify location of libz if not detected
+  --with-z=dir            specify location of libz if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libpng=dir       specify location of libpng if not detected
+  --with-png=dir          specify location of libpng if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libjpeg=dir      specify location of libjpeg if not detected
+  --with-jpeg=dir         specify location of libjpeg if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-liblcms=dir      specify location of liblcms if not detected
+  --with-lcms=dir         specify location of liblcms if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libmng=dir       specify location of libmng if not detected
+  --with-mng=dir          specify location of libmng if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libmikmod=dir    specify location of libmikmod if not detected
+  --with-mikmod=dir       specify location of libmikmod if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libogg=dir       specify location of libogg if not detected
+  --with-ogg=dir          specify location of libogg if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libvorbis=dir    specify location of libvorbis if not detected
+  --with-vorbis=dir       specify location of libvorbis if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libvorbisfile=dir
-                          specify location of libvorbisfile if not detected
+  --with-vorbisfile=dir   specify location of libvorbisfile if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-lib3ds=dir       specify location of lib3ds if not detected
+  --with-3ds=dir          specify location of lib3ds if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libode=dir       specify location of libode if not detected
+  --with-ode=dir          specify location of libode if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libfreetype2=dir specify location of libfreetype2 if not detected
+  --with-freetype2=dir    specify location of libfreetype2 if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libcal3d=dir     specify location of libcal3d if not detected
+  --with-cal3d=dir        specify location of libcal3d if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libsdl=dir       specify location of libsdl if not detected
+  --with-sdl=dir          specify location of libsdl if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libmetaobject_a3dl=dir
+  --with-metaobject_a3dl=dir
                           specify location of libmetaobject_a3dl if not
                           detected automatically; searches dir/include,
                           dir/lib, and dir
-  --with-libmetaobject_misc=dir
+  --with-metaobject_misc=dir
                           specify location of libmetaobject_misc if not
                           detected automatically; searches dir/include,
                           dir/lib, and dir
-  --with-libwx=dir        specify location of libwx if not detected
+  --with-wx=dir           specify location of libwx if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libCg=dir        specify location of libCg if not detected
+  --with-Cg=dir           specify location of libCg if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libCgGL=dir      specify location of libCgGL if not detected
+  --with-CgGL=dir         specify location of libCgGL if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libasound=dir    specify location of libasound if not detected
+  --with-asound=dir       specify location of libasound if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libaa=dir        specify location of libaa if not detected
+  --with-aa=dir           specify location of libaa if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libcaca=dir      specify location of libcaca if not detected
+  --with-caca=dir         specify location of libcaca if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libcppunit=dir   specify location of libcppunit if not detected
+  --with-cppunit=dir      specify location of libcppunit if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
-  --with-libbfd=dir       specify location of libbfd if not detected
+  --with-bfd=dir          specify location of libbfd if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
 
@@ -18952,20 +18951,26 @@ fi
 
 
 
-# Check whether --with-libXxf86vm or --without-libXxf86vm was given.
-if test "${with_libXxf86vm+set}" = set; then
-  withval="$with_libXxf86vm"
+# Check whether --with-Xxf86vm or --without-Xxf86vm was given.
+if test "${with_Xxf86vm+set}" = set; then
+  withval="$with_Xxf86vm"
 
 fi;
 
-    if test -z "$with_libXxf86vm"; then
-  with_libXxf86vm=yes
+    # Backward compatibility: Recognize --with-libXxf86vm as alias for --with-Xxf86vm.
+    if test -n "$with_libXxf86vm" && test -z "$with_Xxf86vm"; then
+  with_Xxf86vm="$with_libXxf86vm"
 fi
 
-    if test "$with_libXxf86vm" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_Xxf86vm"; then
+  with_Xxf86vm=yes
+fi
+
+    if test "$with_Xxf86vm" != no; then
+  # If --with-Xxf86vm value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libXxf86vm" != "$cs_cv_with_libXxf86vm"; then
+	if test "$with_Xxf86vm" != "$cs_cv_with_Xxf86vm"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -18973,7 +18978,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libXxf86vm = yes; then
+	if test $with_Xxf86vm = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -19251,8 +19256,8 @@ fi
 fi
 
 
-	if test $with_libXxf86vm != yes; then
-  cs_check_lib_paths=$with_libXxf86vm
+	if test $with_Xxf86vm != yes; then
+  cs_check_lib_paths=$with_Xxf86vm
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -19691,7 +19696,7 @@ else
 fi
 
 
-    cs_cv_with_libXxf86vm="$with_libXxf86vm"
+    cs_cv_with_Xxf86vm="$with_Xxf86vm"
     if test "$cs_cv_libXxf86vm" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -19719,20 +19724,26 @@ fi
 
 
 
-# Check whether --with-libXaw or --without-libXaw was given.
-if test "${with_libXaw+set}" = set; then
-  withval="$with_libXaw"
+# Check whether --with-Xaw or --without-Xaw was given.
+if test "${with_Xaw+set}" = set; then
+  withval="$with_Xaw"
 
 fi;
 
-    if test -z "$with_libXaw"; then
-  with_libXaw=yes
+    # Backward compatibility: Recognize --with-libXaw as alias for --with-Xaw.
+    if test -n "$with_libXaw" && test -z "$with_Xaw"; then
+  with_Xaw="$with_libXaw"
 fi
 
-    if test "$with_libXaw" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_Xaw"; then
+  with_Xaw=yes
+fi
+
+    if test "$with_Xaw" != no; then
+  # If --with-Xaw value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libXaw" != "$cs_cv_with_libXaw"; then
+	if test "$with_Xaw" != "$cs_cv_with_Xaw"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -19740,7 +19751,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libXaw = yes; then
+	if test $with_Xaw = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -20018,8 +20029,8 @@ fi
 fi
 
 
-	if test $with_libXaw != yes; then
-  cs_check_lib_paths=$with_libXaw
+	if test $with_Xaw != yes; then
+  cs_check_lib_paths=$with_Xaw
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -20452,7 +20463,7 @@ else
 fi
 
 
-    cs_cv_with_libXaw="$with_libXaw"
+    cs_cv_with_Xaw="$with_Xaw"
     if test "$cs_cv_libXaw" = yes; then
   if test "$cs_cv_libXaw" = yes; then
   cs_build_prop_val="yes"
@@ -23656,20 +23667,26 @@ fi
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libz or --without-libz was given.
-if test "${with_libz+set}" = set; then
-  withval="$with_libz"
+# Check whether --with-z or --without-z was given.
+if test "${with_z+set}" = set; then
+  withval="$with_z"
 
 fi;
 
-    if test -z "$with_libz"; then
-  with_libz=yes
+    # Backward compatibility: Recognize --with-libz as alias for --with-z.
+    if test -n "$with_libz" && test -z "$with_z"; then
+  with_z="$with_libz"
 fi
 
-    if test "$with_libz" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_z"; then
+  with_z=yes
+fi
+
+    if test "$with_z" != no; then
+  # If --with-z value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libz" != "$cs_cv_with_libz"; then
+	if test "$with_z" != "$cs_cv_with_z"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -23677,7 +23694,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libz = yes; then
+	if test $with_z = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -24228,8 +24245,8 @@ fi
 fi
 
 
-	if test $with_libz != yes; then
-  cs_check_lib_paths=$with_libz
+	if test $with_z != yes; then
+  cs_check_lib_paths=$with_z
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/zlib*"
 fi
@@ -24764,7 +24781,7 @@ else
 fi
 
 
-    cs_cv_with_libz="$with_libz"
+    cs_cv_with_z="$with_z"
     if test "$cs_cv_libz" = yes; then
   if test "$cs_cv_libz" = yes; then
   cs_build_prop_val="yes"
@@ -24808,20 +24825,26 @@ fi
 if test "$cs_cv_libz" = yes; then
 
 
-# Check whether --with-libpng or --without-libpng was given.
-if test "${with_libpng+set}" = set; then
-  withval="$with_libpng"
+# Check whether --with-png or --without-png was given.
+if test "${with_png+set}" = set; then
+  withval="$with_png"
 
 fi;
 
-    if test -z "$with_libpng"; then
-  with_libpng=yes
+    # Backward compatibility: Recognize --with-libpng as alias for --with-png.
+    if test -n "$with_libpng" && test -z "$with_png"; then
+  with_png="$with_libpng"
 fi
 
-    if test "$with_libpng" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_png"; then
+  with_png=yes
+fi
+
+    if test "$with_png" != no; then
+  # If --with-png value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libpng" != "$cs_cv_with_libpng"; then
+	if test "$with_png" != "$cs_cv_with_png"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -24829,7 +24852,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libpng = yes; then
+	if test $with_png = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -25380,8 +25403,8 @@ fi
 fi
 
 
-	if test $with_libpng != yes; then
-  cs_check_lib_paths=$with_libpng
+	if test $with_png != yes; then
+  cs_check_lib_paths=$with_png
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libpng*"
 fi
@@ -25916,7 +25939,7 @@ else
 fi
 
 
-    cs_cv_with_libpng="$with_libpng"
+    cs_cv_with_png="$with_png"
     if test "$cs_cv_libpng" = yes; then
   if test "$cs_cv_libpng" = yes; then
   cs_build_prop_val="yes"
@@ -25954,20 +25977,26 @@ fi
 # search CS/libs/*jpeg*.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libjpeg or --without-libjpeg was given.
-if test "${with_libjpeg+set}" = set; then
-  withval="$with_libjpeg"
+# Check whether --with-jpeg or --without-jpeg was given.
+if test "${with_jpeg+set}" = set; then
+  withval="$with_jpeg"
 
 fi;
 
-    if test -z "$with_libjpeg"; then
-  with_libjpeg=yes
+    # Backward compatibility: Recognize --with-libjpeg as alias for --with-jpeg.
+    if test -n "$with_libjpeg" && test -z "$with_jpeg"; then
+  with_jpeg="$with_libjpeg"
 fi
 
-    if test "$with_libjpeg" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_jpeg"; then
+  with_jpeg=yes
+fi
+
+    if test "$with_jpeg" != no; then
+  # If --with-jpeg value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libjpeg" != "$cs_cv_with_libjpeg"; then
+	if test "$with_jpeg" != "$cs_cv_with_jpeg"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -25975,7 +26004,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libjpeg = yes; then
+	if test $with_jpeg = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -26526,8 +26555,8 @@ fi
 fi
 
 
-	if test $with_libjpeg != yes; then
-  cs_check_lib_paths=$with_libjpeg
+	if test $with_jpeg != yes; then
+  cs_check_lib_paths=$with_jpeg
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/*jpeg*"
 fi
@@ -27066,7 +27095,7 @@ else
 fi
 
 
-    cs_cv_with_libjpeg="$with_libjpeg"
+    cs_cv_with_jpeg="$with_jpeg"
     if test "$cs_cv_libjpeg" = yes; then
   if test "$cs_cv_libjpeg" = yes; then
   cs_build_prop_val="yes"
@@ -27104,20 +27133,26 @@ fi
 # library, and utilize it explicitly if present.
 #------------------------------------------------------------------------------
 
-# Check whether --with-liblcms or --without-liblcms was given.
-if test "${with_liblcms+set}" = set; then
-  withval="$with_liblcms"
+# Check whether --with-lcms or --without-lcms was given.
+if test "${with_lcms+set}" = set; then
+  withval="$with_lcms"
 
 fi;
 
-    if test -z "$with_liblcms"; then
-  with_liblcms=yes
+    # Backward compatibility: Recognize --with-liblcms as alias for --with-lcms.
+    if test -n "$with_liblcms" && test -z "$with_lcms"; then
+  with_lcms="$with_liblcms"
 fi
 
-    if test "$with_liblcms" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_lcms"; then
+  with_lcms=yes
+fi
+
+    if test "$with_lcms" != no; then
+  # If --with-lcms value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_liblcms" != "$cs_cv_with_liblcms"; then
+	if test "$with_lcms" != "$cs_cv_with_lcms"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -27125,7 +27160,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_liblcms = yes; then
+	if test $with_lcms = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -27403,8 +27438,8 @@ fi
 fi
 
 
-	if test $with_liblcms != yes; then
-  cs_check_lib_paths=$with_liblcms
+	if test $with_lcms != yes; then
+  cs_check_lib_paths=$with_lcms
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib /usr/include/lcms| /usr/local/include/lcms|"
 fi
@@ -27835,24 +27870,30 @@ else
 fi
 
 
-    cs_cv_with_liblcms="$with_liblcms"
+    cs_cv_with_lcms="$with_lcms"
 
 
 
-# Check whether --with-libmng or --without-libmng was given.
-if test "${with_libmng+set}" = set; then
-  withval="$with_libmng"
+# Check whether --with-mng or --without-mng was given.
+if test "${with_mng+set}" = set; then
+  withval="$with_mng"
 
 fi;
 
-    if test -z "$with_libmng"; then
-  with_libmng=yes
+    # Backward compatibility: Recognize --with-libmng as alias for --with-mng.
+    if test -n "$with_libmng" && test -z "$with_mng"; then
+  with_mng="$with_libmng"
 fi
 
-    if test "$with_libmng" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_mng"; then
+  with_mng=yes
+fi
+
+    if test "$with_mng" != no; then
+  # If --with-mng value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libmng" != "$cs_cv_with_libmng"; then
+	if test "$with_mng" != "$cs_cv_with_mng"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -27860,7 +27901,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libmng = yes; then
+	if test $with_mng = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -28411,8 +28452,8 @@ fi
 fi
 
 
-	if test $with_libmng != yes; then
-  cs_check_lib_paths=$with_libmng
+	if test $with_mng != yes; then
+  cs_check_lib_paths=$with_mng
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libmng*"
 fi
@@ -28947,7 +28988,7 @@ else
 fi
 
 
-    cs_cv_with_libmng="$with_libmng"
+    cs_cv_with_mng="$with_mng"
     if test "$cs_cv_libmng" = yes; then
   if test "$cs_cv_libmng" = yes; then
   cs_build_prop_val="yes"
@@ -28983,20 +29024,26 @@ fi
 # search CS/libs/libmikmod*.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libmikmod or --without-libmikmod was given.
-if test "${with_libmikmod+set}" = set; then
-  withval="$with_libmikmod"
+# Check whether --with-mikmod or --without-mikmod was given.
+if test "${with_mikmod+set}" = set; then
+  withval="$with_mikmod"
 
 fi;
 
-    if test -z "$with_libmikmod"; then
-  with_libmikmod=yes
+    # Backward compatibility: Recognize --with-libmikmod as alias for --with-mikmod.
+    if test -n "$with_libmikmod" && test -z "$with_mikmod"; then
+  with_mikmod="$with_libmikmod"
 fi
 
-    if test "$with_libmikmod" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_mikmod"; then
+  with_mikmod=yes
+fi
+
+    if test "$with_mikmod" != no; then
+  # If --with-mikmod value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libmikmod" != "$cs_cv_with_libmikmod"; then
+	if test "$with_mikmod" != "$cs_cv_with_mikmod"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -29004,7 +29051,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libmikmod = yes; then
+	if test $with_mikmod = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -29282,8 +29329,8 @@ fi
 fi
 
 
-	if test $with_libmikmod != yes; then
-  cs_check_lib_paths=$with_libmikmod
+	if test $with_mikmod != yes; then
+  cs_check_lib_paths=$with_mikmod
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libmikmod*"
 fi
@@ -29714,7 +29761,7 @@ else
 fi
 
 
-    cs_cv_with_libmikmod="$with_libmikmod"
+    cs_cv_with_mikmod="$with_mikmod"
     if test "$cs_cv_libmikmod" = yes; then
   if test "$cs_cv_libmikmod" = yes; then
   cs_build_prop_val="yes"
@@ -29750,20 +29797,26 @@ fi
 # also search CS/libs/libogg*, CS/libs/libvorbis.*, CS/libs/libvorbisfile*.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libogg or --without-libogg was given.
-if test "${with_libogg+set}" = set; then
-  withval="$with_libogg"
+# Check whether --with-ogg or --without-ogg was given.
+if test "${with_ogg+set}" = set; then
+  withval="$with_ogg"
 
 fi;
 
-    if test -z "$with_libogg"; then
-  with_libogg=yes
+    # Backward compatibility: Recognize --with-libogg as alias for --with-ogg.
+    if test -n "$with_libogg" && test -z "$with_ogg"; then
+  with_ogg="$with_libogg"
 fi
 
-    if test "$with_libogg" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_ogg"; then
+  with_ogg=yes
+fi
+
+    if test "$with_ogg" != no; then
+  # If --with-ogg value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libogg" != "$cs_cv_with_libogg"; then
+	if test "$with_ogg" != "$cs_cv_with_ogg"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -29771,7 +29824,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libogg = yes; then
+	if test $with_ogg = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -30049,8 +30102,8 @@ fi
 fi
 
 
-	if test $with_libogg != yes; then
-  cs_check_lib_paths=$with_libogg
+	if test $with_ogg != yes; then
+  cs_check_lib_paths=$with_ogg
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libogg*"
 fi
@@ -30481,7 +30534,7 @@ else
 fi
 
 
-    cs_cv_with_libogg="$with_libogg"
+    cs_cv_with_ogg="$with_ogg"
     if test "$cs_cv_libogg" = yes; then
   if test "$cs_cv_libogg" = yes; then
   cs_build_prop_val="yes"
@@ -30512,20 +30565,26 @@ fi
 
 if test "$cs_cv_libogg" = yes; then
 
-# Check whether --with-libvorbis or --without-libvorbis was given.
-if test "${with_libvorbis+set}" = set; then
-  withval="$with_libvorbis"
+# Check whether --with-vorbis or --without-vorbis was given.
+if test "${with_vorbis+set}" = set; then
+  withval="$with_vorbis"
 
 fi;
 
-    if test -z "$with_libvorbis"; then
-  with_libvorbis=yes
+    # Backward compatibility: Recognize --with-libvorbis as alias for --with-vorbis.
+    if test -n "$with_libvorbis" && test -z "$with_vorbis"; then
+  with_vorbis="$with_libvorbis"
 fi
 
-    if test "$with_libvorbis" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_vorbis"; then
+  with_vorbis=yes
+fi
+
+    if test "$with_vorbis" != no; then
+  # If --with-vorbis value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libvorbis" != "$cs_cv_with_libvorbis"; then
+	if test "$with_vorbis" != "$cs_cv_with_vorbis"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -30533,7 +30592,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libvorbis = yes; then
+	if test $with_vorbis = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -30811,8 +30870,8 @@ fi
 fi
 
 
-	if test $with_libvorbis != yes; then
-  cs_check_lib_paths=$with_libvorbis
+	if test $with_vorbis != yes; then
+  cs_check_lib_paths=$with_vorbis
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libvorbis.*"
 fi
@@ -31243,7 +31302,7 @@ else
 fi
 
 
-    cs_cv_with_libvorbis="$with_libvorbis"
+    cs_cv_with_vorbis="$with_vorbis"
     if test "$cs_cv_libvorbis" = yes; then
   if test "$cs_cv_libvorbis" = yes; then
   cs_build_prop_val="yes"
@@ -31276,20 +31335,26 @@ fi
 
 if test "$cs_cv_libvorbis" = yes; then
 
-# Check whether --with-libvorbisfile or --without-libvorbisfile was given.
-if test "${with_libvorbisfile+set}" = set; then
-  withval="$with_libvorbisfile"
+# Check whether --with-vorbisfile or --without-vorbisfile was given.
+if test "${with_vorbisfile+set}" = set; then
+  withval="$with_vorbisfile"
 
 fi;
 
-    if test -z "$with_libvorbisfile"; then
-  with_libvorbisfile=yes
+    # Backward compatibility: Recognize --with-libvorbisfile as alias for --with-vorbisfile.
+    if test -n "$with_libvorbisfile" && test -z "$with_vorbisfile"; then
+  with_vorbisfile="$with_libvorbisfile"
 fi
 
-    if test "$with_libvorbisfile" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_vorbisfile"; then
+  with_vorbisfile=yes
+fi
+
+    if test "$with_vorbisfile" != no; then
+  # If --with-vorbisfile value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libvorbisfile" != "$cs_cv_with_libvorbisfile"; then
+	if test "$with_vorbisfile" != "$cs_cv_with_vorbisfile"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -31297,7 +31362,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libvorbisfile = yes; then
+	if test $with_vorbisfile = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -31575,8 +31640,8 @@ fi
 fi
 
 
-	if test $with_libvorbisfile != yes; then
-  cs_check_lib_paths=$with_libvorbisfile
+	if test $with_vorbisfile != yes; then
+  cs_check_lib_paths=$with_vorbisfile
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libvorbisfile*"
 fi
@@ -32009,7 +32074,7 @@ else
 fi
 
 
-    cs_cv_with_libvorbisfile="$with_libvorbisfile"
+    cs_cv_with_vorbisfile="$with_vorbisfile"
     if test "$cs_cv_libvorbisfile" = yes; then
   if test "$cs_cv_libvorbisfile" = yes; then
   cs_build_prop_val="yes"
@@ -32051,20 +32116,26 @@ fi
 
 
 
-# Check whether --with-lib3ds or --without-lib3ds was given.
-if test "${with_lib3ds+set}" = set; then
-  withval="$with_lib3ds"
+# Check whether --with-3ds or --without-3ds was given.
+if test "${with_3ds+set}" = set; then
+  withval="$with_3ds"
 
 fi;
 
-    if test -z "$with_lib3ds"; then
-  with_lib3ds=yes
+    # Backward compatibility: Recognize --with-lib3ds as alias for --with-3ds.
+    if test -n "$with_lib3ds" && test -z "$with_3ds"; then
+  with_3ds="$with_lib3ds"
 fi
 
-    if test "$with_lib3ds" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_3ds"; then
+  with_3ds=yes
+fi
+
+    if test "$with_3ds" != no; then
+  # If --with-3ds value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_lib3ds" != "$cs_cv_with_lib3ds"; then
+	if test "$with_3ds" != "$cs_cv_with_3ds"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -32072,7 +32143,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_lib3ds = yes; then
+	if test $with_3ds = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -32623,8 +32694,8 @@ fi
 fi
 
 
-	if test $with_lib3ds != yes; then
-  cs_check_lib_paths=$with_lib3ds
+	if test $with_3ds != yes; then
+  cs_check_lib_paths=$with_3ds
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/lib3ds*"
 fi
@@ -33159,7 +33230,7 @@ else
 fi
 
 
-    cs_cv_with_lib3ds="$with_lib3ds"
+    cs_cv_with_3ds="$with_3ds"
 
 
 if test $cs_cv_lib3ds = yes; then
@@ -33515,20 +33586,26 @@ fi
 # Therefore, we need to check if `extern "C"' is needed.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libode or --without-libode was given.
-if test "${with_libode+set}" = set; then
-  withval="$with_libode"
+# Check whether --with-ode or --without-ode was given.
+if test "${with_ode+set}" = set; then
+  withval="$with_ode"
 
 fi;
 
-    if test -z "$with_libode"; then
-  with_libode=yes
+    # Backward compatibility: Recognize --with-libode as alias for --with-ode.
+    if test -n "$with_libode" && test -z "$with_ode"; then
+  with_ode="$with_libode"
 fi
 
-    if test "$with_libode" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_ode"; then
+  with_ode=yes
+fi
+
+    if test "$with_ode" != no; then
+  # If --with-ode value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libode" != "$cs_cv_with_libode"; then
+	if test "$with_ode" != "$cs_cv_with_ode"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -33536,7 +33613,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libode = yes; then
+	if test $with_ode = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -33814,8 +33891,8 @@ fi
 fi
 
 
-	if test $with_libode != yes; then
-  cs_check_lib_paths=$with_libode
+	if test $with_ode != yes; then
+  cs_check_lib_paths=$with_ode
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libode*"
 fi
@@ -34246,7 +34323,7 @@ else
 fi
 
 
-    cs_cv_with_libode="$with_libode"
+    cs_cv_with_ode="$with_ode"
 
 
 if test $cs_cv_libode = yes; then
@@ -35640,20 +35717,26 @@ PATH=$PATH$PATH_SEPARATOR/sw/lib/freetype2/bin
 export PATH
 
 
-# Check whether --with-libfreetype2 or --without-libfreetype2 was given.
-if test "${with_libfreetype2+set}" = set; then
-  withval="$with_libfreetype2"
+# Check whether --with-freetype2 or --without-freetype2 was given.
+if test "${with_freetype2+set}" = set; then
+  withval="$with_freetype2"
 
 fi;
 
-    if test -z "$with_libfreetype2"; then
-  with_libfreetype2=yes
+    # Backward compatibility: Recognize --with-libfreetype2 as alias for --with-freetype2.
+    if test -n "$with_libfreetype2" && test -z "$with_freetype2"; then
+  with_freetype2="$with_libfreetype2"
 fi
 
-    if test "$with_libfreetype2" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_freetype2"; then
+  with_freetype2=yes
+fi
+
+    if test "$with_freetype2" != no; then
+  # If --with-freetype2 value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libfreetype2" != "$cs_cv_with_libfreetype2"; then
+	if test "$with_freetype2" != "$cs_cv_with_freetype2"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -35661,7 +35744,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libfreetype2 = yes; then
+	if test $with_freetype2 = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -36212,8 +36295,8 @@ fi
 fi
 
 
-	if test $with_libfreetype2 != yes; then
-  cs_check_lib_paths=$with_libfreetype2
+	if test $with_freetype2 != yes; then
+  cs_check_lib_paths=$with_freetype2
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -36750,7 +36833,7 @@ else
 fi
 
 
-    cs_cv_with_libfreetype2="$with_libfreetype2"
+    cs_cv_with_freetype2="$with_freetype2"
 
 
 if test $cs_cv_libfreetype2 = yes; then
@@ -37295,20 +37378,26 @@ fi
 # Check for Cal3D.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libcal3d or --without-libcal3d was given.
-if test "${with_libcal3d+set}" = set; then
-  withval="$with_libcal3d"
+# Check whether --with-cal3d or --without-cal3d was given.
+if test "${with_cal3d+set}" = set; then
+  withval="$with_cal3d"
 
 fi;
 
-    if test -z "$with_libcal3d"; then
-  with_libcal3d=yes
+    # Backward compatibility: Recognize --with-libcal3d as alias for --with-cal3d.
+    if test -n "$with_libcal3d" && test -z "$with_cal3d"; then
+  with_cal3d="$with_libcal3d"
 fi
 
-    if test "$with_libcal3d" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_cal3d"; then
+  with_cal3d=yes
+fi
+
+    if test "$with_cal3d" != no; then
+  # If --with-cal3d value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libcal3d" != "$cs_cv_with_libcal3d"; then
+	if test "$with_cal3d" != "$cs_cv_with_cal3d"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -37316,7 +37405,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libcal3d = yes; then
+	if test $with_cal3d = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -37594,8 +37683,8 @@ fi
 fi
 
 
-	if test $with_libcal3d != yes; then
-  cs_check_lib_paths=$with_libcal3d
+	if test $with_cal3d != yes; then
+  cs_check_lib_paths=$with_cal3d
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -38026,7 +38115,7 @@ else
 fi
 
 
-    cs_cv_with_libcal3d="$with_libcal3d"
+    cs_cv_with_cal3d="$with_cal3d"
 
 
 if test $cs_cv_libcal3d = yes; then
@@ -38377,20 +38466,26 @@ fi
 # Check for SDL.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libsdl or --without-libsdl was given.
-if test "${with_libsdl+set}" = set; then
-  withval="$with_libsdl"
+# Check whether --with-sdl or --without-sdl was given.
+if test "${with_sdl+set}" = set; then
+  withval="$with_sdl"
 
 fi;
 
-    if test -z "$with_libsdl"; then
-  with_libsdl=yes
+    # Backward compatibility: Recognize --with-libsdl as alias for --with-sdl.
+    if test -n "$with_libsdl" && test -z "$with_sdl"; then
+  with_sdl="$with_libsdl"
 fi
 
-    if test "$with_libsdl" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_sdl"; then
+  with_sdl=yes
+fi
+
+    if test "$with_sdl" != no; then
+  # If --with-sdl value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libsdl" != "$cs_cv_with_libsdl"; then
+	if test "$with_sdl" != "$cs_cv_with_sdl"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -38398,7 +38493,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libsdl = yes; then
+	if test $with_sdl = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -38676,8 +38771,8 @@ fi
 fi
 
 
-	if test $with_libsdl != yes; then
-  cs_check_lib_paths=$with_libsdl
+	if test $with_sdl != yes; then
+  cs_check_lib_paths=$with_sdl
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -39110,7 +39205,7 @@ else
 fi
 
 
-    cs_cv_with_libsdl="$with_libsdl"
+    cs_cv_with_sdl="$with_sdl"
 
 
 if test $cs_cv_libsdl = yes; then
@@ -39463,20 +39558,26 @@ fi
 # Check for VOS.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libmetaobject_a3dl or --without-libmetaobject_a3dl was given.
-if test "${with_libmetaobject_a3dl+set}" = set; then
-  withval="$with_libmetaobject_a3dl"
+# Check whether --with-metaobject_a3dl or --without-metaobject_a3dl was given.
+if test "${with_metaobject_a3dl+set}" = set; then
+  withval="$with_metaobject_a3dl"
 
 fi;
 
-    if test -z "$with_libmetaobject_a3dl"; then
-  with_libmetaobject_a3dl=yes
+    # Backward compatibility: Recognize --with-libmetaobject_a3dl as alias for --with-metaobject_a3dl.
+    if test -n "$with_libmetaobject_a3dl" && test -z "$with_metaobject_a3dl"; then
+  with_metaobject_a3dl="$with_libmetaobject_a3dl"
 fi
 
-    if test "$with_libmetaobject_a3dl" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_metaobject_a3dl"; then
+  with_metaobject_a3dl=yes
+fi
+
+    if test "$with_metaobject_a3dl" != no; then
+  # If --with-metaobject_a3dl value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libmetaobject_a3dl" != "$cs_cv_with_libmetaobject_a3dl"; then
+	if test "$with_metaobject_a3dl" != "$cs_cv_with_metaobject_a3dl"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -39484,7 +39585,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libmetaobject_a3dl = yes; then
+	if test $with_metaobject_a3dl = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -40035,8 +40136,8 @@ fi
 fi
 
 
-	if test $with_libmetaobject_a3dl != yes; then
-  cs_check_lib_paths=$with_libmetaobject_a3dl
+	if test $with_metaobject_a3dl != yes; then
+  cs_check_lib_paths=$with_metaobject_a3dl
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -40571,25 +40672,31 @@ else
 fi
 
 
-    cs_cv_with_libmetaobject_a3dl="$with_libmetaobject_a3dl"
+    cs_cv_with_metaobject_a3dl="$with_metaobject_a3dl"
 
 
 if test $cs_cv_libmetaobject_a3dl = yes; then
 
-# Check whether --with-libmetaobject_misc or --without-libmetaobject_misc was given.
-if test "${with_libmetaobject_misc+set}" = set; then
-  withval="$with_libmetaobject_misc"
+# Check whether --with-metaobject_misc or --without-metaobject_misc was given.
+if test "${with_metaobject_misc+set}" = set; then
+  withval="$with_metaobject_misc"
 
 fi;
 
-    if test -z "$with_libmetaobject_misc"; then
-  with_libmetaobject_misc=yes
+    # Backward compatibility: Recognize --with-libmetaobject_misc as alias for --with-metaobject_misc.
+    if test -n "$with_libmetaobject_misc" && test -z "$with_metaobject_misc"; then
+  with_metaobject_misc="$with_libmetaobject_misc"
 fi
 
-    if test "$with_libmetaobject_misc" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_metaobject_misc"; then
+  with_metaobject_misc=yes
+fi
+
+    if test "$with_metaobject_misc" != no; then
+  # If --with-metaobject_misc value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libmetaobject_misc" != "$cs_cv_with_libmetaobject_misc"; then
+	if test "$with_metaobject_misc" != "$cs_cv_with_metaobject_misc"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -40597,7 +40704,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libmetaobject_misc = yes; then
+	if test $with_metaobject_misc = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -41148,8 +41255,8 @@ fi
 fi
 
 
-	if test $with_libmetaobject_misc != yes; then
-  cs_check_lib_paths=$with_libmetaobject_misc
+	if test $with_metaobject_misc != yes; then
+  cs_check_lib_paths=$with_metaobject_misc
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -41684,7 +41791,7 @@ else
 fi
 
 
-    cs_cv_with_libmetaobject_misc="$with_libmetaobject_misc"
+    cs_cv_with_metaobject_misc="$with_metaobject_misc"
 
 else
   cs_cv_libmetaobject_misc=no
@@ -41733,20 +41840,26 @@ fi
 # only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
 
-# Check whether --with-libwx or --without-libwx was given.
-if test "${with_libwx+set}" = set; then
-  withval="$with_libwx"
+# Check whether --with-wx or --without-wx was given.
+if test "${with_wx+set}" = set; then
+  withval="$with_wx"
 
 fi;
 
-    if test -z "$with_libwx"; then
-  with_libwx=yes
+    # Backward compatibility: Recognize --with-libwx as alias for --with-wx.
+    if test -n "$with_libwx" && test -z "$with_wx"; then
+  with_wx="$with_libwx"
 fi
 
-    if test "$with_libwx" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_wx"; then
+  with_wx=yes
+fi
+
+    if test "$with_wx" != no; then
+  # If --with-wx value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libwx" != "$cs_cv_with_libwx"; then
+	if test "$with_wx" != "$cs_cv_with_wx"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -41754,7 +41867,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libwx = yes; then
+	if test $with_wx = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -42032,8 +42145,8 @@ fi
 fi
 
 
-	if test $with_libwx != yes; then
-  cs_check_lib_paths=$with_libwx
+	if test $with_wx != yes; then
+  cs_check_lib_paths=$with_wx
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -42478,7 +42591,7 @@ else
 fi
 
 
-    cs_cv_with_libwx="$with_libwx"
+    cs_cv_with_wx="$with_wx"
 
 
 if test $cs_cv_libwx = yes; then
@@ -43277,20 +43390,26 @@ fi
 
 
 
-# Check whether --with-libCg or --without-libCg was given.
-if test "${with_libCg+set}" = set; then
-  withval="$with_libCg"
+# Check whether --with-Cg or --without-Cg was given.
+if test "${with_Cg+set}" = set; then
+  withval="$with_Cg"
 
 fi;
 
-    if test -z "$with_libCg"; then
-  with_libCg=yes
+    # Backward compatibility: Recognize --with-libCg as alias for --with-Cg.
+    if test -n "$with_libCg" && test -z "$with_Cg"; then
+  with_Cg="$with_libCg"
 fi
 
-    if test "$with_libCg" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_Cg"; then
+  with_Cg=yes
+fi
+
+    if test "$with_Cg" != no; then
+  # If --with-Cg value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libCg" != "$cs_cv_with_libCg"; then
+	if test "$with_Cg" != "$cs_cv_with_Cg"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -43298,7 +43417,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libCg = yes; then
+	if test $with_Cg = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -44122,8 +44241,8 @@ fi
 fi
 
 
-	if test $with_libCg != yes; then
-  cs_check_lib_paths=$with_libCg
+	if test $with_Cg != yes; then
+  cs_check_lib_paths=$with_Cg
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -44762,7 +44881,7 @@ else
 fi
 
 
-    cs_cv_with_libCg="$with_libCg"
+    cs_cv_with_Cg="$with_Cg"
 
 
     if test $cs_cv_libCg = yes; then
@@ -45088,20 +45207,26 @@ fi
 
     if test $cs_cv_libCg_recent = yes; then
 
-# Check whether --with-libCgGL or --without-libCgGL was given.
-if test "${with_libCgGL+set}" = set; then
-  withval="$with_libCgGL"
+# Check whether --with-CgGL or --without-CgGL was given.
+if test "${with_CgGL+set}" = set; then
+  withval="$with_CgGL"
 
 fi;
 
-    if test -z "$with_libCgGL"; then
-  with_libCgGL=yes
+    # Backward compatibility: Recognize --with-libCgGL as alias for --with-CgGL.
+    if test -n "$with_libCgGL" && test -z "$with_CgGL"; then
+  with_CgGL="$with_libCgGL"
 fi
 
-    if test "$with_libCgGL" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_CgGL"; then
+  with_CgGL=yes
+fi
+
+    if test "$with_CgGL" != no; then
+  # If --with-CgGL value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libCgGL" != "$cs_cv_with_libCgGL"; then
+	if test "$with_CgGL" != "$cs_cv_with_CgGL"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -45109,7 +45234,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libCgGL = yes; then
+	if test $with_CgGL = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -47025,8 +47150,8 @@ fi
 fi
 
 
-	if test $with_libCgGL != yes; then
-  cs_check_lib_paths=$with_libCgGL
+	if test $with_CgGL != yes; then
+  cs_check_lib_paths=$with_CgGL
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -48083,7 +48208,7 @@ else
 fi
 
 
-    cs_cv_with_libCgGL="$with_libCgGL"
+    cs_cv_with_CgGL="$with_CgGL"
     if test "$cs_cv_libCgGL" = yes; then
   if test "$cs_cv_libCgGL" = yes; then
   cs_build_prop_val="yes"
@@ -48573,20 +48698,26 @@ fi
 # Check for Advanced Linux Sound Architecture (ALSA)
 #------------------------------------------------------------------------------
 
-# Check whether --with-libasound or --without-libasound was given.
-if test "${with_libasound+set}" = set; then
-  withval="$with_libasound"
+# Check whether --with-asound or --without-asound was given.
+if test "${with_asound+set}" = set; then
+  withval="$with_asound"
 
 fi;
 
-    if test -z "$with_libasound"; then
-  with_libasound=yes
+    # Backward compatibility: Recognize --with-libasound as alias for --with-asound.
+    if test -n "$with_libasound" && test -z "$with_asound"; then
+  with_asound="$with_libasound"
 fi
 
-    if test "$with_libasound" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_asound"; then
+  with_asound=yes
+fi
+
+    if test "$with_asound" != no; then
+  # If --with-asound value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libasound" != "$cs_cv_with_libasound"; then
+	if test "$with_asound" != "$cs_cv_with_asound"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -48594,7 +48725,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libasound = yes; then
+	if test $with_asound = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -48872,8 +49003,8 @@ fi
 fi
 
 
-	if test $with_libasound != yes; then
-  cs_check_lib_paths=$with_libasound
+	if test $with_asound != yes; then
+  cs_check_lib_paths=$with_asound
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -49304,7 +49435,7 @@ else
 fi
 
 
-    cs_cv_with_libasound="$with_libasound"
+    cs_cv_with_asound="$with_asound"
     if test "$cs_cv_libasound" = yes; then
   if test "$cs_cv_libasound" = yes; then
   cs_build_prop_val="yes"
@@ -50343,20 +50474,26 @@ fi
 # Check for Ascii Art library (aalib).
 #------------------------------------------------------------------------------
 
-# Check whether --with-libaa or --without-libaa was given.
-if test "${with_libaa+set}" = set; then
-  withval="$with_libaa"
+# Check whether --with-aa or --without-aa was given.
+if test "${with_aa+set}" = set; then
+  withval="$with_aa"
 
 fi;
 
-    if test -z "$with_libaa"; then
-  with_libaa=yes
+    # Backward compatibility: Recognize --with-libaa as alias for --with-aa.
+    if test -n "$with_libaa" && test -z "$with_aa"; then
+  with_aa="$with_libaa"
 fi
 
-    if test "$with_libaa" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_aa"; then
+  with_aa=yes
+fi
+
+    if test "$with_aa" != no; then
+  # If --with-aa value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libaa" != "$cs_cv_with_libaa"; then
+	if test "$with_aa" != "$cs_cv_with_aa"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -50364,7 +50501,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libaa = yes; then
+	if test $with_aa = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -50915,8 +51052,8 @@ fi
 fi
 
 
-	if test $with_libaa != yes; then
-  cs_check_lib_paths=$with_libaa
+	if test $with_aa != yes; then
+  cs_check_lib_paths=$with_aa
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -51451,7 +51588,7 @@ else
 fi
 
 
-    cs_cv_with_libaa="$with_libaa"
+    cs_cv_with_aa="$with_aa"
     if test "$cs_cv_libaa" = yes; then
   if test "$cs_cv_libaa" = yes; then
   cs_build_prop_val="yes"
@@ -51486,20 +51623,26 @@ fi
 # Check for Colour Ascii Art library (libcaca).
 #------------------------------------------------------------------------------
 
-# Check whether --with-libcaca or --without-libcaca was given.
-if test "${with_libcaca+set}" = set; then
-  withval="$with_libcaca"
+# Check whether --with-caca or --without-caca was given.
+if test "${with_caca+set}" = set; then
+  withval="$with_caca"
 
 fi;
 
-    if test -z "$with_libcaca"; then
-  with_libcaca=yes
+    # Backward compatibility: Recognize --with-libcaca as alias for --with-caca.
+    if test -n "$with_libcaca" && test -z "$with_caca"; then
+  with_caca="$with_libcaca"
 fi
 
-    if test "$with_libcaca" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_caca"; then
+  with_caca=yes
+fi
+
+    if test "$with_caca" != no; then
+  # If --with-caca value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libcaca" != "$cs_cv_with_libcaca"; then
+	if test "$with_caca" != "$cs_cv_with_caca"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -51507,7 +51650,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libcaca = yes; then
+	if test $with_caca = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -51785,8 +51928,8 @@ fi
 fi
 
 
-	if test $with_libcaca != yes; then
-  cs_check_lib_paths=$with_libcaca
+	if test $with_caca != yes; then
+  cs_check_lib_paths=$with_caca
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -52217,7 +52360,7 @@ else
 fi
 
 
-    cs_cv_with_libcaca="$with_libcaca"
+    cs_cv_with_caca="$with_caca"
     if test "$cs_cv_libcaca" = yes; then
   if test "$cs_cv_libcaca" = yes; then
   cs_build_prop_val="yes"
@@ -53388,20 +53531,26 @@ fi
 # CppUnit test fragments with file extension ".t".
 #------------------------------------------------------------------------------
 
-# Check whether --with-libcppunit or --without-libcppunit was given.
-if test "${with_libcppunit+set}" = set; then
-  withval="$with_libcppunit"
+# Check whether --with-cppunit or --without-cppunit was given.
+if test "${with_cppunit+set}" = set; then
+  withval="$with_cppunit"
 
 fi;
 
-    if test -z "$with_libcppunit"; then
-  with_libcppunit=yes
+    # Backward compatibility: Recognize --with-libcppunit as alias for --with-cppunit.
+    if test -n "$with_libcppunit" && test -z "$with_cppunit"; then
+  with_cppunit="$with_libcppunit"
 fi
 
-    if test "$with_libcppunit" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_cppunit"; then
+  with_cppunit=yes
+fi
+
+    if test "$with_cppunit" != no; then
+  # If --with-cppunit value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libcppunit" != "$cs_cv_with_libcppunit"; then
+	if test "$with_cppunit" != "$cs_cv_with_cppunit"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -53409,7 +53558,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libcppunit = yes; then
+	if test $with_cppunit = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -53687,8 +53836,8 @@ fi
 fi
 
 
-	if test $with_libcppunit != yes; then
-  cs_check_lib_paths=$with_libcppunit
+	if test $with_cppunit != yes; then
+  cs_check_lib_paths=$with_cppunit
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -54119,7 +54268,7 @@ else
 fi
 
 
-    cs_cv_with_libcppunit="$with_libcppunit"
+    cs_cv_with_cppunit="$with_cppunit"
 
 
     if test $cs_cv_libcppunit = yes; then
@@ -60155,20 +60304,26 @@ fi
 
 if test $cs_check_libbfd = yes; then
 
-# Check whether --with-libbfd or --without-libbfd was given.
-if test "${with_libbfd+set}" = set; then
-  withval="$with_libbfd"
+# Check whether --with-bfd or --without-bfd was given.
+if test "${with_bfd+set}" = set; then
+  withval="$with_bfd"
 
 fi;
 
-    if test -z "$with_libbfd"; then
-  with_libbfd=yes
+    # Backward compatibility: Recognize --with-libbfd as alias for --with-bfd.
+    if test -n "$with_libbfd" && test -z "$with_bfd"; then
+  with_bfd="$with_libbfd"
 fi
 
-    if test "$with_libbfd" != no; then
-  # If --with-lib value is same as cached value, then assume other
+
+    if test -z "$with_bfd"; then
+  with_bfd=yes
+fi
+
+    if test "$with_bfd" != no; then
+  # If --with-bfd value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libbfd" != "$cs_cv_with_libbfd"; then
+	if test "$with_bfd" != "$cs_cv_with_bfd"; then
   cs_ignore_cache=yes
 else
   cs_ignore_cache=no
@@ -60176,7 +60331,7 @@ fi
 
 
 	cs_check_lib_flags=''
-	if test $with_libbfd = yes; then
+	if test $with_bfd = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
 
     if test "$cs_prog_path_prepared" != yes; then
@@ -60454,8 +60609,8 @@ fi
 fi
 
 
-	if test $with_libbfd != yes; then
-  cs_check_lib_paths=$with_libbfd
+	if test $with_bfd != yes; then
+  cs_check_lib_paths=$with_bfd
 else
   cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
 fi
@@ -60886,7 +61041,7 @@ else
 fi
 
 
-    cs_cv_with_libbfd="$with_libbfd"
+    cs_cv_with_bfd="$with_bfd"
 
 else
   cs_cv_libbfd=no
