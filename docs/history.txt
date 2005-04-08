@@ -20,6 +20,8 @@ chronological order.
 	  storage type. On x86 this amount is 32, but a '<< 32' is actually a
 	  no-op there. This caused a wrong mask (all 0) to be computed and 
 	  subsequently AreSomeBitsSet() would return a wrong value.
+	- res augmented csPrintfFormatter<> to correctly handle output 
+	  precision for strings.
 7-Apr-2005
 	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
 	  plugin due to csString::operator[] ambiguity.

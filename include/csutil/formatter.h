@@ -746,6 +746,8 @@ class csPrintfFormatter
       const T* ptr = stringPtr;
       while (*ptr++ != 0) len++;
     }
+    if (currentFormat.precision > -1)
+      len = MIN(len, (size_t)currentFormat.precision);
     while (len > 0)
     {
       utf32_char ch;
