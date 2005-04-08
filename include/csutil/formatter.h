@@ -736,7 +736,7 @@ class csPrintfFormatter
   {
     if (stringPtr == 0)
     {
-      OutputString (writer, currentFormat, (utf8_char*)"(nil)");
+      OutputString (writer, currentFormat, (utf8_char*)"(null)");
       return;
     }
 
@@ -1308,7 +1308,7 @@ public:
 	    fakeFormat.precision = sizeof (uintptr_t) * 2;
 	    if (params[currentFormat.paramIdx].vPtr == 0)
 	    {
-	      OutputString (writer, fakeFormat, (utf8_char*)"(null)");
+	      OutputString (writer, fakeFormat, (utf8_char*)"(nil)");
 	    }
 	    else
 	    {
