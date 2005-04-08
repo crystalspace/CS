@@ -449,8 +449,6 @@ chronological order.
 	  few parameters to csReport().
 	- res fixed a the std_foo shaders for the recent xmlshader changes.
 	- res fixed a crash with the terrain level.
-
-
 	- res fixed a crash when using the std_lighting_detail shader.
 	- Eric Sunshine merged the csutil, csgeom, csgfx, cstool, csws, and
 	  csplugincommon libraries into a single physical link library named
