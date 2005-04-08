@@ -114,7 +114,7 @@ csDefaultFontServer::~csDefaultFontServer()
   SCF_DESTRUCT_IBASE();
 }
 
-csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
+csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, float size)
 {
   // First of all, look for an already loaded font
   csDefaultFont* font = fonts.Get (filename, 0);
@@ -587,7 +587,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
       if (alpha)
       {
 	glyphData.alphaOffs = aOffs;
-	glyphData.alphaSize = aSize;
+	glyphData.alphaSize = aSize ? aSize : ~0;
 	aOffs += aSize;
 	memcpy (&glyphData.aMetrics, &(aMetrics[i]), sizeof (csBitmapMetrics));
       }
@@ -621,7 +621,7 @@ void csDefaultFont::SetSize (int)
 {
 }
 
-int csDefaultFont::GetSize ()
+float csDefaultFont::GetSize ()
 {
   return 0;
 }

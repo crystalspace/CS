@@ -76,10 +76,10 @@ public:
 
   csFontPlexer (csFontServerMultiplexor* parent, 
     char* fontid, iFont* primary, 
-    int size, csFontLoaderOrder* order);
+    float size, csFontLoaderOrder* order);
   virtual ~csFontPlexer ();
 
-  virtual int GetSize ();
+  virtual float GetSize ();
   virtual void GetMaxSize (int &oW, int &oH);
   virtual bool GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics);
 
@@ -165,7 +165,7 @@ public:
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
-  virtual csPtr<iFont> LoadFont (const char *filename, int size = 10);
+  virtual csPtr<iFont> LoadFont (const char *filename, float size = 10.0f);
 
   struct eiComponent : public iComponent
   {

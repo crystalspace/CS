@@ -22,6 +22,11 @@ chronological order.
 	  subsequently AreSomeBitsSet() would return a wrong value.
 	- res augmented csPrintfFormatter<> to correctly handle output 
 	  precision for strings.
+	- res fixed the font plexer which sometimes ignored scaling for the 
+	  first successfully loaded entry of a substitution sequences.
+	- res made iFontServer->Load() accept floats as font sizes.
+	- res tweaked a few FT2 warning messages.
+	- res fixed csfont to consider empty alpha data as "glyph not present".
 7-Apr-2005
 	- Eric Sunshine fixed build error in csMetaTexture::Setup() in VOS
 	  plugin due to csString::operator[] ambiguity.

@@ -66,9 +66,8 @@ iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
 {
   if (!loaded)
   {
-    font = server->LoadFont (fontName,
-      csQround ((float)parent->size * scale));
     loaded = true;
+    font = server->LoadFont (fontName, parent->size * scale);
   }
   return font;
 }
@@ -204,10 +203,10 @@ void csFontServerMultiplexor::NotifyDelete (csFontPlexer* font,
 }
 
 csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename, 
-						int size)
+						float size)
 {
   csString fontid;
-  fontid.Format ("%d:%s", size, filename);
+  fontid.Format ("%g:%s", size, filename);
   iFont* font = loadedFonts.Get ((const char*)fontid, 0);
   if (font != 0)
   {
@@ -242,9 +241,11 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename,
   size_t i;
   for (i = 0; i < order->Length (); i++)
   {
-    primary = (*order)[i].font = 
-      (*order)[i].server->LoadFont ((*order)[i].fontName, size);
-    (*order)[i].loaded = true;
+    csFontLoadOrderEntry& orderEntry = (*order)[i];
+    primary = orderEntry.font = 
+      orderEntry.server->LoadFont (orderEntry.fontName, 
+	size * orderEntry.scale);
+    orderEntry.loaded = true;
     if (primary != 0) break;
   }
   if (primary == 0)
@@ -363,7 +364,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csFontPlexer::csFontPlexer (csFontServerMultiplexor* parent,
 			    char* fontid, iFont* primary, 
-			    int size, csFontLoaderOrder* order)
+			    float size, csFontLoaderOrder* order)
 {
   SCF_CONSTRUCT_IBASE(0);
 
@@ -390,7 +391,7 @@ csFontPlexer::~csFontPlexer ()
   SCF_DESTRUCT_IBASE();
 }
 
-int csFontPlexer::GetSize ()
+float csFontPlexer::GetSize ()
 {
   return size;
 }

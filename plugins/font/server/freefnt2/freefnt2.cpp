@@ -126,7 +126,7 @@ bool csFreeType2Server::FreetypeError (int errorCode, int reportSeverity,
     va_end (arg);
 
     Report (reportSeverity,
-      "%s: %s (%d)", 
+      "%s: %s (code %d)", 
       msg.GetData (), GetErrorDescription (errorCode), errorCode);
     return true;
   }
@@ -148,7 +148,7 @@ bool csFreeType2Server::FreetypeError (int errorCode, const char* message,
     va_end (arg);
 
     Report (CS_REPORTER_SEVERITY_WARNING,
-      "%s: %s (%d)", 
+      "%s: %s (code %d)", 
       msg.GetData (), GetErrorDescription (errorCode), errorCode);
     return true;
   }
@@ -193,7 +193,7 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
+csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, float size)
 {
   // First of all look for an alias in config file
   if (ftconfig && fontset)
@@ -206,7 +206,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
     if (s) filename = s;
   }
   csString fontid;
-  fontid.Format ("%d:%s", size, filename);
+  fontid.Format ("%g:%s", size, filename);
   // see if we already loaded that face/size pair
   csRef<iFont> font = fonts.Get ((const char*)fontid, 0);
   if (font)
@@ -309,7 +309,7 @@ SCF_IMPLEMENT_IBASE_END
 csFreeType2Font::csFreeType2Font (csFreeType2Server* server, 
 				  char* fontid,
 				  csFt2FaceWrapper* face, 
-				  int iSize) :
+				  float iSize) :
   DeleteCallbacks (4, 4)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -321,15 +321,21 @@ csFreeType2Font::csFreeType2Font (csFreeType2Server* server,
 
   FT_New_Size (face->face, &size);
   FT_Activate_Size (size);
-  if (server->FreetypeError (FT_Set_Char_Size (face->face, 0, 
-    iSize * 64, 96, 96), 
-    "Could not set character dimensions for %s",
-    name))
+  int ftError = FT_Set_Char_Size (face->face, 0, 
+    (int)(iSize * 64.0f), 96, 96);
+  if (ftError != 0)
   {
-    server->FreetypeError (FT_Set_Pixel_Sizes (face->face, 0, 
-      iSize), 
-      "Could not set character pixel dimensions for %s",
-      name);
+    int ftError2 = FT_Set_Pixel_Sizes (face->face, 0, 
+      (int)iSize);
+    if (ftError2 != 0)
+    {
+      server->FreetypeError (ftError, 
+	"Could not set character dimensions for %s",
+	name);
+      server->FreetypeError (ftError2, 
+	"Could not set character pixel dimensions for %s",
+	name);
+    }
   }
 }
 
@@ -348,7 +354,7 @@ csFreeType2Font::~csFreeType2Font ()
   SCF_DESTRUCT_IBASE();
 }
 
-int csFreeType2Font::GetSize ()
+float csFreeType2Font::GetSize ()
 {
   return fontSize;
 }
@@ -446,6 +452,10 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
   {
     return 0;
   }
+
+  if (face->face->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY)
+    // That's not what we want.
+    return 0;
 
   int stride = face->face->glyph->bitmap.width;
   int maxrows = (size->metrics.height + 63) >> 6;
@@ -621,7 +631,7 @@ int csFreeType2Font::GetAscent ()
 
 int csFreeType2Font::GetDescent ()
 {
-  return -((size->metrics.descender + 63) >> 6);
+  return ((-size->metrics.descender + 63) >> 6);
 }
 
 bool csFreeType2Font::HasGlyph (utf32_char c)

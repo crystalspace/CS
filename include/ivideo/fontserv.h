@@ -102,7 +102,7 @@ struct csGlyphMetrics
   int advance;
 };
 
-SCF_VERSION (iFont, 5, 0, 1);
+SCF_VERSION (iFont, 5, 1, 0);
 
 /**
  * A font object.
@@ -132,7 +132,7 @@ struct iFont : public iBase
    * Query current font size in Point. If server does not support rescalable
    * fonts, this method returns 0.
    */
-  virtual int GetSize () = 0;
+  virtual float GetSize () = 0;
 
   /**
    * Return the maximum width and height of a single glyph, in pixels.
@@ -254,7 +254,7 @@ struct iFontServer : public iBase
    * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char* filename, 
-    int size = 10) = 0;
+    float size = 10.0f) = 0;
 };
 
 /** @} */

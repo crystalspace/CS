@@ -63,7 +63,7 @@ public:
   // The font id, used to identify a face/size pair
   char* fontid;
   // Size of this font
-  int fontSize;
+  float fontSize;
   // The list of delete callbacks
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
   /*
@@ -79,7 +79,7 @@ public:
 
   /// Constructor
   csFreeType2Font (csFreeType2Server* server, char* fontid, 
-    csFt2FaceWrapper* face, int iSize);
+    csFt2FaceWrapper* face, float iSize);
 
   /// Destructor
   virtual ~csFreeType2Font ();
@@ -88,7 +88,7 @@ public:
    * Query current font size. If server does not support rescalable
    * fonts, this method returns 0.
    */
-  virtual int GetSize ();
+  virtual float GetSize ();
 
   /**
    * Return the maximum width and height of a single glyph.
@@ -214,7 +214,7 @@ public:
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
-  virtual csPtr<iFont> LoadFont (const char *filename, int size = 10);
+  virtual csPtr<iFont> LoadFont (const char *filename, float size = 10.0f);
 
   struct eiComponent : public iComponent
   {

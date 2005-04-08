@@ -113,7 +113,7 @@ public:
    * Query current font size. If server does not support rescalable
    * fonts, this method returns 0.
    */
-  virtual int GetSize ();
+  virtual float GetSize ();
 
   /**
    * Return the maximum width and height of a single glyph.
@@ -229,7 +229,7 @@ public:
    * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char *filename,
-    int size = 10);
+    float size = 10.0f);
 
   /// Called by child fonts to be added to font registry
   void NotifyCreate (csDefaultFont *font);
