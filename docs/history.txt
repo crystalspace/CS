@@ -26,6 +26,13 @@ chronological order.
 	    - Fixed a csString passed through '...' in csfgen (really).
 	    - Fixed gfxtest at some place were a 0 char* could be passed to a
 	      function that expected a non-0 char*.
+	- res applied a patch from David Bronke <whitelynx@gmail.com> that 
+	  makes the "FancyConsole.General.Archive" fancycon option optional;
+	  if it is not present, it is assumed that the path in 
+	  "FancyConsole.General.Mount" is correctly set up and contains the
+	  data.
+	- res applied a patch from David Bronke <whitelynx@gmail.com> that 
+	  allows a different font size for the standard console.
 8-Apr-2005
 	- Eric Sunshine changed CS_CHECK_LIB_WITH() so that it publishes option
 	  names as `--with-foo', rather than `--with-libfoo' since the former

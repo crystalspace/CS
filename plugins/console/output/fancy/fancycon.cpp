@@ -467,10 +467,10 @@ void csFancyConsole::LoadPix ()
 
   const char* dir = ini->GetStr ("FancyConsole.General.Archive");
   const char* mountdir = ini->GetStr ("FancyConsole.General.Mount");
-  if (!dir || !mountdir)
+  if (!*mountdir)
     Report (CS_REPORTER_SEVERITY_WARNING,
       "FancyConsole: Data resource location unknown");
-  else if (VFS->Mount (mountdir, dir))
+  else if (*dir || VFS->Mount (mountdir, dir))
   {
     VFS->PushDir ();
     VFS->ChDir (mountdir);
@@ -497,7 +497,8 @@ void csFancyConsole::LoadPix ()
     deco.by = ini->GetInt ("FancyConsole.General.by");
 
     VFS->PopDir ();
-    VFS->Unmount (mountdir, dir);
+    if (strlen (dir))
+      VFS->Unmount (mountdir, dir);
   }
   else
     Report (CS_REPORTER_SEVERITY_WARNING,
