@@ -1246,7 +1246,9 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
 
   //Check the type-string in <shader>
   const char* shaderName = templ->GetAttributeValue ("name");
-  const char* shaderType = templ->GetAttributeValue ("type");
+  const char* shaderType = templ->GetAttributeValue ("compiler");
+  // Prefer "compiler" about (somewhat ambiguous) "type"
+  if (shaderType == 0) shaderType = templ->GetAttributeValue ("type");
   if ((shaderType == 0) || (xmltokens.Request (shaderType) != 
     XMLTOKEN_XMLSHADER))
   {
