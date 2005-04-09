@@ -33,6 +33,12 @@ chronological order.
 	  data.
 	- res applied a patch from David Bronke <whitelynx@gmail.com> that 
 	  allows a different font size for the standard console.
+	- res fixed a wrongly initialized struct member in csShaderProgram that
+	  caused <variablemapping>s to malfunction which in turn caused a lot 
+	  of problems when shaders were used.
+	- res fixed a belated variable initialization in csGraphics2DGLCommon
+	  which caused csdemo (and possibly other programs) to come up black.
+	- res cleaned up opengl.cfg a bit.
 8-Apr-2005
 	- Eric Sunshine changed CS_CHECK_LIB_WITH() so that it publishes option
 	  names as `--with-foo', rather than `--with-libfoo' since the former

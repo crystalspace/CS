@@ -114,6 +114,9 @@ bool csGraphics2DGLCommon::Open ()
   fontCache = GLFontCache;
 
   statecache->Enable_GL_SCISSOR_TEST ();
+  vpWidth = Width;
+  vpHeight = Height;
+  vpSet = false;
 
   if (!csGraphics2D::Open ())
     return false;
@@ -242,9 +245,6 @@ bool csGraphics2DGLCommon::Open ()
 
   glViewport (0, 0, Width, Height);
   Clear (0);
-  vpWidth = Width;
-  vpHeight = Height;
-  vpSet = false;
 
   return true;
 }

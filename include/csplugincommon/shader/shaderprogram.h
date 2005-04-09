@@ -97,12 +97,14 @@ protected:
     { 
       userVal = 0;
       mappingParam.name = s;
+      mappingParam.valid = true;
     }
     VariableMapEntry (const csShaderVarMapping& other) :
       csShaderVarMapping (other.name, other.destination)
     {
       userVal = 0;
       mappingParam.name = other.name;
+      mappingParam.valid = true;
     }
   };
   csArray<VariableMapEntry> variablemap;
