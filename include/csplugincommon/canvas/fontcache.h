@@ -144,7 +144,7 @@ public:
   {
     iFont* font;
     /// The font size this font was cached for
-    int fontSize;
+    float fontSize;
     PlaneGlyphsArray planeGlyphs;
   };
   /// the current clipping rect

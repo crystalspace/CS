@@ -20,6 +20,8 @@
 #ifndef __CS_GL_R2T_BACKEND_H__
 #define __CS_GL_R2T_BACKEND_H__
 
+#include "csgeom/csrect.h"
+
 class csGLGraphics3D;
 
 struct iTextureHandle;
@@ -34,11 +36,10 @@ public:
   virtual ~csGLRender2TextureBackend();
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent) = 0;
-  virtual void BeginDrawCommon () = 0;
-  virtual void BeginDraw2D () = 0;
-  virtual void BeginDraw3D () = 0;
+  virtual void BeginDraw (int drawflags) = 0;
   virtual void SetupProjection () = 0;
   virtual void FinishDraw () = 0;
+  virtual void SetClipRect (const csRect& clipRect) = 0;
 };
 
 #endif // __CS_GL_R2T_BACKEND_H__

@@ -269,17 +269,23 @@ bool csGraphics2DGLCommon::BeginDraw ()
 {
   if (!csGraphics2D::BeginDraw ())
     return false;
-  if (FrameBufferLocked != 1)
-    return true;
+  //if (FrameBufferLocked != 1)
+    //return true;
 
-  statecache->SetMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  glOrtho (0, vpWidth, 0, vpHeight, -1.0, 10.0);
+  /* Note: the renderer relies on this function to setup
+   * matrices etc. So be careful when changing stuff. */
+
   glViewport (0, 0, vpWidth, vpHeight);
-
-  // not needed really, should persist between draws
-  //statecache->Enable_GL_SCISSOR_TEST ();
-  //glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
+  if (!hasRenderTarget)
+  {
+    statecache->SetMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho (0, vpWidth, 0, vpHeight, -1.0, 10.0);
+  }
+  else
+  {
+    // Assume renderer does the correct setup for RT
+  }
 
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();

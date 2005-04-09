@@ -34,26 +34,44 @@ void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 
   if (handle)
   {
-    int w, h;
-    handle->GetRendererDimensions (w, h);
-    G3D->GetDriver2D()->PerformExtension ("vp_set", w, h);
+    render_target->GetRendererDimensions (txt_w, txt_h);
+    G3D->GetDriver2D()->PerformExtension ("vp_set", txt_w, txt_h);
   }
   else
     G3D->GetDriver2D()->PerformExtension ("vp_reset");
 }
 
-void csGLRender2TextureFramebuf::BeginDrawCommon ()
+void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
 {
-  int txt_w, txt_h;
-  render_target->GetRendererDimensions (txt_w, txt_h);
+  GLRENDER3D_OUTPUT_STRING_MARKER((" "));
   if (!rt_cliprectset)
   {
     G3D->GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
       rt_old_maxx, rt_old_maxy);
-    G3D->GetDriver2D()->SetClipRect (-1, -1, txt_w+1, txt_h+1);
-    rt_cliprectset = true;
+    if ((rt_old_minx != 0) && (rt_old_miny != 0)
+      && (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
+    {
+      G3D->GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
+      rt_cliprectset = true;
+    }
   }
 
+  /* Note: the renderer relies on this function to setup
+   * matrices etc. So be careful when changing stuff. */
+
+  if (drawflags & CSDRAW_3DGRAPHICS)
+  {
+  }
+  else if (drawflags & CSDRAW_2DGRAPHICS)
+  {
+    /*
+      Render target: draw everything flipped.
+    */
+    G3D->statecache->SetMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho (0., (GLdouble) txt_w, (GLdouble) txt_h, 0., 
+      -1.0, 10.0);
+  }
   if (!rt_onscreen)
   {
     G3D->statecache->SetShadeModel (GL_FLAT);
@@ -63,52 +81,31 @@ void csGLRender2TextureFramebuf::BeginDrawCommon ()
     G3D->SetZMode (CS_ZBUF_NONE);
 
     glBegin (GL_QUADS);
-    glTexCoord2f (0, 0); glVertex2i (0, 0);
-    glTexCoord2f (0, 1); glVertex2i (0, txt_h);
-    glTexCoord2f (1, 1); glVertex2i (txt_w, txt_h);
-    glTexCoord2f (1, 0); glVertex2i (txt_w, 0);
+    glTexCoord2f (0, 0); glVertex2i (0, txt_h);
+    glTexCoord2f (0, 1); glVertex2i (0, 0);
+    glTexCoord2f (1, 1); glVertex2i (txt_w, 0);
+    glTexCoord2f (1, 0); glVertex2i (txt_w, txt_h);
     glEnd ();
     rt_onscreen = true;
   }
-}
-
-void csGLRender2TextureFramebuf::BeginDraw2D ()
-{
-  int txt_w, txt_h;
-  render_target->GetRendererDimensions (txt_w, txt_h);
-  /*
-    Render target: draw everything flipped.
-  */
-  glOrtho (0., (GLdouble) txt_w, (GLdouble) txt_h, 0., 
-    -1.0, 10.0);
-  G3D->statecache->SetCullFace (GL_BACK);
-}
-
-void csGLRender2TextureFramebuf::BeginDraw3D ()
-{
   G3D->statecache->SetCullFace (GL_BACK);
 }
 
 void csGLRender2TextureFramebuf::SetupProjection ()
 {
-  int txt_w, txt_h;
-  render_target->GetRendererDimensions (txt_w, txt_h);
-
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
   glOrtho (0., (GLdouble) txt_w, (GLdouble) txt_h, 0., 
     -1.0, 10.0);
 }
 
 void csGLRender2TextureFramebuf::FinishDraw ()
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
   if (rt_cliprectset)
   {
     rt_cliprectset = false;
     G3D->GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
       rt_old_maxx, rt_old_maxy);
-    G3D->statecache->SetMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glOrtho (0., G3D->GetWidth(), 0., G3D->GetHeight(), -1.0, 10.0);
-    glViewport (0, 0, G3D->GetWidth(), G3D->GetHeight());
   }
 
   G3D->statecache->SetCullFace (GL_FRONT);
@@ -120,8 +117,6 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     G3D->SetZMode (CS_ZBUF_NONE);
     G3D->statecache->Disable_GL_BLEND ();
     G3D->statecache->Disable_GL_ALPHA_TEST ();
-    int txt_w, txt_h;
-    render_target->GetRendererDimensions (txt_w, txt_h);
     csGLTextureHandle* tex_mm = (csGLTextureHandle *)
       render_target->GetPrivateObject ();
     tex_mm->Precache ();
@@ -144,7 +139,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 
       // @@@ BAD BAD BAD BAD CAST
       void* imgdata = CS_CONST_CAST(void*, image->GetImageData ());
-      glReadPixels (0, 0/*G3D->GetHeight() - txt_h*/, txt_w, txt_h, GL_RGBA, 
+      glReadPixels (0, 0, txt_w, txt_h, GL_RGBA, 
 	GL_UNSIGNED_BYTE, imgdata);
 
       /*
@@ -160,9 +155,14 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     else
     {
       G3D->PrepareAsRenderTarget (tex_mm);
-      glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, /*G3D->GetHeight()-txt_h*/0,
-        txt_w, txt_h, 0);
+      glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
     }
   }
 }
 
+void csGLRender2TextureFramebuf::SetClipRect (const csRect& clipRect)
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  glScissor (clipRect.xmin, txt_h - clipRect.ymax, clipRect.Width(),
+    clipRect.Height());
+}

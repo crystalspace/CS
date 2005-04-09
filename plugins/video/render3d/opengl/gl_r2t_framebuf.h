@@ -33,17 +33,18 @@ class csGLRender2TextureFramebuf : public csGLRender2TextureBackend
   bool rt_cliprectset;
   /// Old clip rect to restore after rendering on a proc texture.
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
+  /// Render target dimensions
+  int txt_w, txt_h;
 public:
   csGLRender2TextureFramebuf (csGLGraphics3D* G3D) 
     : csGLRender2TextureBackend (G3D) { }
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
 
-  virtual void BeginDrawCommon ();
-  virtual void BeginDraw2D ();
-  virtual void BeginDraw3D ();
+  virtual void BeginDraw (int drawflags);
   virtual void SetupProjection ();
   virtual void FinishDraw ();
+  virtual void SetClipRect (const csRect& clipRect);
 };
 
 #endif // __CS_GL_R2T_FRAMEBUF_H__

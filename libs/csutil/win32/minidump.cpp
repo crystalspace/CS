@@ -394,7 +394,7 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
   {
     char tempPath[MAX_PATH];
     GetTempPath (sizeof (tempPath), tempPath);
-    csStringFast<MAX_PATH+32> reportName;
+    static csStringFast<MAX_PATH+32> reportName;
     reportName.Format ("%s\\cscrash%" PRIu32 ".zip", tempPath, 
       (uint32)GetCurrentProcessId ());
 

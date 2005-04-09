@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Apr-2005
+	- res made the XML shader compiler check for a less ambiguous 
+	  "compiler" (in comparison to "type") attribute in shaders first.
+	- res renamed the <shader> "type" attributes of CS' shaders to 
+	  "compiler".
+	- res made the following changes:
+	    - Added CS_FUNCTION_NAME macro, gives name of current function.
+	    - Added support for GL_GREMEDY_string_marker extension. The GL
+	      renderer uses it to write some out some info. Helpful to link
+	      GL operations to CS methods in a GL trace.
+	    - Made some cleanups & simplifications to the GL render-to-texture
+	      code.
+	    - Made some cleanups & simplifications to the GL renderer and 
+	      cavases in general - mostly cut down redundant matrix and 
+	      viewport setups.
+	    - Fixed returning of a stack var in minidump.cpp.
+	    - Changed csFontCache to store the size of known fonts in floats.
+	    - Fixed a csString passed through '...' in csfgen (really).
+	    - Fixed gfxtest at some place were a 0 char* could be passed to a
+	      function that expected a non-0 char*.
 8-Apr-2005
 	- Eric Sunshine changed CS_CHECK_LIB_WITH() so that it publishes option
 	  names as `--with-foo', rather than `--with-libfoo' since the former
@@ -65,7 +85,6 @@ chronological order.
 	- res replaced csSubRectangles with csSubRectangles2. (The old
 	  csSubRectangles was removed and csSubRectangles2 was renamed to
 	  csSubRectangles.)
-	- res fixed a csString passed through '...' in csfgen.
 	- res fixed some VC6 errors in xmlshader.
 6-Apr-2005
 	- res made the following changes:

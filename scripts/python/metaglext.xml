@@ -6385,4 +6385,10 @@
     <token name="GL_PIXEL_PACK_BUFFER_BINDING_EXT" value="0x88ED" />
     <token name="GL_PIXEL_UNPACK_BUFFER_BINDING_EXT" value="0x88EF" />
   </extension>
+  <extension name="GL_GREMEDY_string_marker" type="GL">
+    <function name="glStringMarkerGREMEDY" return="GLvoid" pointer="false">
+      <arg name="len" type="GLsizei" const="false" pointer="false" />
+      <arg name="string" type="GLvoid" const="true" pointer="true" />
+    </function>
+  </extension>
 </extensionlist>

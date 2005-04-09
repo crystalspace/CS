@@ -449,7 +449,7 @@ static bool Convert (const char *fontfile)
   FILE *out = fopen (outfile, opt.sourcecode ? "w" : "wb");
   if (!out)
   {
-    csPrintf ("Could not open output file %s\n", outfile);
+    csPrintf ("Could not open output file %s\n", outfile.GetData());
     return false;
   }
 

@@ -9718,6 +9718,18 @@ typedef GLvoid (csAPIENTRY* csGLGENERATEMIPMAPEXT) (GLenum target);
  * @{ */
 
 /** @} */
+/**\name GL_GREMEDY_string_marker constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt">http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_GREMEDY_string_marker functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt">http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLSTRINGMARKERGREMEDY) (GLsizei len, const GLvoid* string);
+
+/** @} */
 
 
 // end of definitions
@@ -14577,6 +14589,16 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_GREMEDY_string_marker functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt">http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt</a>.
+   * @{ */
+  #ifndef GLSTRINGMARKERGREMEDY_DECL
+  #define GLSTRINGMARKERGREMEDY_DECL
+  csGLSTRINGMARKERGREMEDY glStringMarkerGREMEDY;
+  #endif
+
+
+  /** @} */
 
 // end of functions
 };
@@ -15063,6 +15085,9 @@ public:
   /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt">GL_EXT_pixel_buffer_object</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_EXT_pixel_buffer_object(). */
   bool CS_GL_EXT_pixel_buffer_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt">GL_GREMEDY_string_marker</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_GREMEDY_string_marker(). */
+  bool CS_GL_GREMEDY_string_marker;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -15225,6 +15250,7 @@ protected:
   bool tested_CS_GL_ARB_texture_rectangle;
   bool tested_CS_GL_EXT_framebuffer_object;
   bool tested_CS_GL_EXT_pixel_buffer_object;
+  bool tested_CS_GL_GREMEDY_string_marker;
 
 };
 
@@ -20880,6 +20906,36 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_pixel_buffer_object)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt">GL_GREMEDY_string_marker</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_GREMEDY_string_marker. */
+  void InitGL_GREMEDY_string_marker ()
+  {
+    if (tested_CS_GL_GREMEDY_string_marker) return;
+    if (!extstrGL) return;
+    tested_CS_GL_GREMEDY_string_marker = true;
+    const char* ext = "GL_GREMEDY_string_marker";
+
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_GREMEDY_string_marker = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_GREMEDY_string_marker;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glStringMarkerGREMEDY, GLSTRINGMARKERGREMEDY);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_GREMEDY_string_marker)
     }
     else
     {

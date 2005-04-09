@@ -71,6 +71,18 @@ struct iLightingManager;
 
 struct iEvent;
 
+#ifdef CS_DEBUG
+#define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
+  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, __FILE__, __LINE__, \
+    csString().Format fmtParam .GetData())
+#define GLRENDER3D_OUTPUT_LOCATION_MARKER				    \
+  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, __FILE__, __LINE__, \
+    "")
+#else
+#define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)
+#define GLRENDER3D_OUTPUT_LOCATION_MARKER
+#endif
+
 class csGLGraphics3D;
 class csOpenGLHalo : public iHalo
 {
@@ -341,6 +353,8 @@ public:
   virtual ~csGLGraphics3D ();
 
   iStringSet* GetStrings () { return strings; }
+  static void OutputMarkerString (const char* function, const char* file,
+    int line, const char* message);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D

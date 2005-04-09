@@ -21,14 +21,13 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iOpenGLInterface, 0, 0, 1);
+
 /**
  * A common interface to be implemented by the platform specific opengl canvases.
  * Currently covers only aspects that are different for opengl on different platforms
  * like the "GetProcAddress"
  */
-
-SCF_VERSION (iOpenGLInterface, 0, 0, 1);
-
 struct iOpenGLInterface : public iBase
 {
   /**

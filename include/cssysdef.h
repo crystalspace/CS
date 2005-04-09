@@ -788,4 +788,16 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #endif
 
+/**\def CS_FUNCTION_NAME
+ * Macro that resolves to a compiler-specific variable or string that contains 
+ * the name of the current function.
+ */
+#if defined(CS_COMPILER_GCC)
+#  define CS_FUNCTION_NAME		__PRETTY_FUNCTION__
+#elif defined(__FUNCTION__)
+#  define CS_FUNCTION_NAME		__FUNCTION__
+#else
+#  define CS_FUNCTION_NAME		"<?\?\?>"
+#endif
+
 #endif // __CS_CSSYSDEF_H__

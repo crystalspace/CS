@@ -415,7 +415,7 @@ static bool process_file (const char *fname)
   switch (opt.outputmode)
   {
     case 0:
-      success = output_picture (fname, suffix, ifile);
+      success = output_picture (fname, suffix.GetDataSafe(), ifile);
       break;
     case 1:
       success = display_picture (ifile);

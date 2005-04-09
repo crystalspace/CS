@@ -153,7 +153,7 @@ csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
     (idx != csArrayItemNotFound) ? knownFonts[idx] : 0;
   if (knownFont != 0)
   {
-    if (knownFont->fontSize != font->GetSize ())
+    if ((knownFont->fontSize - font->GetSize ()) > EPSILON)
     {
       for (size_t i = 0; i < knownFont->planeGlyphs.Length (); i++)
       {
@@ -174,7 +174,7 @@ csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
 	  pg = 0;
 	}
       }
-      knownFont->fontSize = (int)font->GetSize ();
+      knownFont->fontSize = font->GetSize ();
       purgeableFonts.Delete (knownFont);
     }
   }
@@ -185,7 +185,7 @@ csFontCache::KnownFont* csFontCache::CacheFont (iFont* font)
 {
   KnownFont* knownFont = new KnownFont;
   knownFont->font = font;
-  knownFont->fontSize = (int)font->GetSize ();
+  knownFont->fontSize = font->GetSize ();
 
   knownFonts.InsertSorted (knownFont, KnownFontArrayCompareItems);
 

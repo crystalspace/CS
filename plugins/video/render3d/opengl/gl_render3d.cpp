@@ -37,6 +37,8 @@
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
+#include "cstool/bitmasktostr.h"
+
 #include "igeom/clip2d.h"
 
 #include "iutil/cmdline.h"
@@ -166,6 +168,18 @@ csGLGraphics3D::~csGLGraphics3D()
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
+}
+
+void csGLGraphics3D::OutputMarkerString (const char* function, 
+					 const char* file,
+					 int line, const char* message)
+{
+  if (ext && ext->CS_GL_GREMEDY_string_marker)
+  {
+    csString marker;
+    marker.Format ("[%s %s():%d] %s", file, function, line, message);
+    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -789,6 +803,9 @@ bool csGLGraphics3D::Open ()
   {
     ext->InitGL_ATI_separate_stencil ();
   }
+#ifdef CS_DEBUG
+  ext->InitGL_GREMEDY_string_marker ();
+#endif
 
   rendercaps.minTexHeight = 2;
   rendercaps.minTexWidth = 2;
@@ -1061,8 +1078,18 @@ void csGLGraphics3D::Close ()
     G2D->Close ();
 }
 
+CS_BITMASKTOSTR_MASK_TABLE_BEGIN(drawflagNames)
+  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_2DGRAPHICS)
+  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_3DGRAPHICS)
+  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_CLEARZBUFFER)
+  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_CLEARSCREEN)
+CS_BITMASKTOSTR_MASK_TABLE_END;
+
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
+  GLRENDER3D_OUTPUT_STRING_MARKER(("drawflags = %s", 
+    csBitmaskToString::GetStr (drawflags, drawflagNames)));
+
   SetWriteMask (true, true, true, true);
 
   clipportal_dirty = true;
@@ -1077,18 +1104,16 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   // if 2D graphics is not locked, lock it
   if ((drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-   && (!(current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
+   != (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)))
   {
     if (!G2D->BeginDraw ())
       return false;
+    GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
   const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
 
-  if (render_target)
-    r2tbackend->BeginDrawCommon (); 
-
-  int clearMask;
+  int clearMask = 0;
   const bool doStencilClear = 
     (drawflags & CSDRAW_3DGRAPHICS) && stencil_clipping_available;
   const bool doZbufferClear = (drawflags & CSDRAW_CLEARZBUFFER)
@@ -1113,17 +1138,16 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   else
     delayClearFlags = clearMask;
 
+  /* Note: this function relies on the canvas and/or the R2T backend to setup
+   * matrices etc. So be careful when changing stuff. */
+
+  if (render_target)
+    r2tbackend->BeginDraw (drawflags); 
+
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
-    glViewport (0, 0, viewwidth, viewheight);
     needProjectionUpdate = true;
 
-    if (render_target)
-      r2tbackend->BeginDraw3D (); 
-    //statecache->SetCullFace (render_target ? GL_BACK : GL_FRONT);
-
-    statecache->SetMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
 //    object2camera.Identity ();
     //@@@ TODO FIX
     return true;
@@ -1150,20 +1174,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
         statecache->ActivateTU ();
       }
 
-      statecache->SetMatrixMode (GL_PROJECTION);
-      glLoadIdentity ();
-      if (render_target)
-	r2tbackend->BeginDraw2D (); 
-      else
-	SetGlOrtho (false);
-      //glViewport (0, 0, viewwidth, viewheight);
-      glViewport (0, 0, viewwidth, viewheight);
       needProjectionUpdate = false; 
       /* Explicitly avoid update. The 3D mode projection will not work in
        * 2D mode. */
 
-      statecache->SetMatrixMode (GL_MODELVIEW);
-      glLoadIdentity ();
 //      object2camera.Identity ();
       //@@@ TODO FIX
 
@@ -1173,7 +1187,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       // So alpha blending works w/ 2D drawing
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     }
-    return true;//G2D->BeginDraw ();
+    return true;
   }
 
   current_drawflags = 0;
@@ -1223,7 +1237,6 @@ void csGLGraphics3D::FinishDraw ()
   
   SetMirrorMode (false);
 
-  //render_target = 0;
   current_drawflags = 0;
 }
 
@@ -2243,10 +2256,12 @@ void csGLGraphics3D::SwapIfNeeded()
 
   if (wantToSwap)
   {
+    GLRENDER3D_OUTPUT_STRING_MARKER(("<< delayed swap >>"));
     G2D->Print (0);
     wantToSwap = false;
     if (delayClearFlags != 0)
     {
+      GLRENDER3D_OUTPUT_STRING_MARKER(("<< delayed clear >>"));
       glClear (delayClearFlags);
       delayClearFlags = 0;
     }
@@ -2363,13 +2378,14 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     }
 
     const csRect scissorRect ((int)floorf (scissorbox.MinX ()), 
-      // @@@ UGLY UGLY UGLY
-      render_target ? viewheight - (int)ceilf (scissorbox.MaxY ()) : (int)floorf (scissorbox.MinY ()), 
+      (int)floorf (scissorbox.MinY ()), 
       (int)ceilf (scissorbox.MaxX ()), 
-      // @@@ UGLY UGLY UGLY
-      render_target ? viewheight - (int)floorf (scissorbox.MinY ()) : (int)ceilf (scissorbox.MaxY ()));
-    glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
-      scissorRect.Height());
+      (int)ceilf (scissorbox.MaxY ()));
+    if (render_target)
+      r2tbackend->SetClipRect (scissorRect);
+    else
+      glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
+	scissorRect.Height());
   }
   else if (hasOld2dClip)
   {
