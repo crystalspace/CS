@@ -5061,11 +5061,13 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     if (m) return true;
   }
 
-  const char* type = shaderNode->GetAttributeValue ("type");
+  const char* type = shaderNode->GetAttributeValue ("compiler");
+  if (type == 0)
+    type = shaderNode->GetAttributeValue ("type");
   if (type == 0)
   {
     SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
-      "'type' attribute is missing!");
+      "'compiler' attribute is missing!");
     return false;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
