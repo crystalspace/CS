@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "cstool/basetexfact.h"
+#include "cstool/bitmasktostr.h"
 #include "cstool/collider.h"
 #include "cstool/csanim2d.h"
 #include "cstool/csapplicationframework.h"
