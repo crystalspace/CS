@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="reflect">
+<shader compiler="xmlshader" name="reflect">
   <shadervars>
       <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.1, 0.1, 0.1</shadervar>
   </shadervars>

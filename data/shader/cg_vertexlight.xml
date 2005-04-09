@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="light">
+<shader compiler="xmlshader" name="light">
   <technique priority="300">
     <pass>
       <mixmode><add /></mixmode>

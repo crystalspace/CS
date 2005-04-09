@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="sky_scattering">
+<shader compiler="xmlshader" name="sky_scattering">
   <shadervars>
     <!-- beta1 = Rayleigh -->
     <!-- .2

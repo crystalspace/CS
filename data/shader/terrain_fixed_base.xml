@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="terrain_fixed_base">
+<shader compiler="xmlshader" name="terrain_fixed_base">
   <shadervars>
     <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.8, 0.8, 0.8</shadervar>
   </shadervars>

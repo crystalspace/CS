@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="shadowextrude">
+<shader compiler="xmlshader" name="shadowextrude">
   <technique priority="100">
     <pass>
       <mixmode>

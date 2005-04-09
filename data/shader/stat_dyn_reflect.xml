@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="stat_dyn_reflect">
+<shader compiler="xmlshader" name="stat_dyn_reflect">
   <!--
       Shader for "masked reflections".
       

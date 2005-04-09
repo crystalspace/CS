@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="splatting_bump">
+<shader compiler="xmlshader" name="splatting_bump">
   <technique priority="200">
     <pass>
       <mixmode><srcalphaadd/></mixmode>

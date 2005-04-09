@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<shader type="xmlshader" name="ambient">
+<shader compiler="xmlshader" name="ambient">
     <!-- This should be defined by renderloop somehow and track sector ambient -->
     <shadervars>
 	<shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.2, 0.2, 0.4</shadervar>

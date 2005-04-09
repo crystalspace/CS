@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="light_bumpmap">
+<shader compiler="xmlshader" name="light_bumpmap">
   <technique priority="350">
     <pass>
       <mixmode>

@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="water">
+<shader compiler="xmlshader" name="water">
   <shadervars>
       <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">1, 1, 1</shadervar>
   </shadervars>

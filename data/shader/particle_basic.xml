@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<shader type="xmlshader" name="particle_basic">
+<shader compiler="xmlshader" name="particle_basic">
 	<technique priority="50">
 		<pass>
 		  <mixmode><!--alpha/--><premultalpha /></mixmode>

@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="splatting_base">
+<shader compiler="xmlshader" name="splatting_base">
   <technique priority="200">
     <pass>
       <mixmode><copy/></mixmode>

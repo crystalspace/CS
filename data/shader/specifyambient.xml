@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<shader type="xmlshader" name="specifyambient">
+<shader compiler="xmlshader" name="specifyambient">
   <!-- This is a variant of 'ambient' shader that doesn't hardcode the
          STANDARD_LIGHT_AMBIENT. So you can use this to set a different ambient
 	 on a material -->

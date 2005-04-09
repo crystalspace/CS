@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<shader type="xmlshader" name="std_lighting_detail_add">
+<shader compiler="xmlshader" name="std_lighting_detail_add">
   <technique priority="200">
     <tag>detail texture</tag>
     <pass>

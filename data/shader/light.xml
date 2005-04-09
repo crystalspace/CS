@@ -1,4 +1,4 @@
-<shader type="xmlshader" name="light">
+<shader compiler="xmlshader" name="light">
   <technique priority="200">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
