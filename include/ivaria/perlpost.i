@@ -387,7 +387,7 @@
   void CS_REQUEST_IMAGELOADER
     (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
   {
-    __scfid__ = "crystalspace.graphic.image.io.multiplex";
+    __scfid__ = "crystalspace.graphic.image.io.multiplexer";
     __iface__ = "iImageIO";
     csRequestPlugin (__iface__, __idnum__, __ver__);
   }

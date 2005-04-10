@@ -59,7 +59,7 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   csRef<iImageIO> il = CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.graphic.image.io.multiplex", iImageIO);
+    "crystalspace.graphic.image.io.multiplexer", iImageIO);
   if (!il)
   {
     csPrintf ("Couldn't load image multiplexer!\n");

@@ -156,7 +156,7 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
   //---------
   // iImageIO
   //---------
-  imageio = CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphic.image.io.multiplex",
+  imageio = CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphic.image.io.multiplexer",
   	iImageIO);
   if (!imageio)
   {

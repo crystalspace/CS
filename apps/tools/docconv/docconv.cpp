@@ -197,7 +197,7 @@ void DocConv::Main ()
   else
   {
     xml = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.documentsystem.multiplex", iDocumentSystem));
+      "crystalspace.documentsystem.multiplexer", iDocumentSystem));
     if (xml == 0)
       xml = (csPtr<iDocumentSystem> (
 	new csTinyDocumentSystem ()));

@@ -191,7 +191,7 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
     return CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
 
   def CS_REQUEST_IMAGELOADER ():
-    return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex",
+    return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer",
       iImageIO)
 
   def CS_REQUEST_NULL3D ():

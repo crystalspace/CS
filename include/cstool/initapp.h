@@ -80,7 +80,7 @@ struct iVerbosityManager;
   CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
 /// Request default image loader.
 #define CS_REQUEST_IMAGELOADER \
-  CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex", iImageIO)
+  CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer", iImageIO)
 /// Request null 3D renderer
 #define CS_REQUEST_NULL3D \
   CS_REQUEST_PLUGIN("crystalspace.graphics3d.null",iGraphics3D)
