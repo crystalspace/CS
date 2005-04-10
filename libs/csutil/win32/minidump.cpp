@@ -424,7 +424,8 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
       void* callstackEntry = reportZip->NewFile ("callstack.txt");
       csString s;
       csString line;
-      for (size_t i = 0; i < stack->GetEntryCount(); i++)
+      const size_t entryCount = stack->GetEntryCount();
+      for (size_t i = 0; i < entryCount; i++)
       {
 	line.Clear();
 	bool hasFunc = stack->GetFunctionName (i, s);
@@ -451,14 +452,16 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
 
 //#define TEST_EXCEPTION_HANDLER
 
+extern "C" BOOL WINAPI IsDebuggerPresent();
+
 LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
   struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
 #ifdef TEST_EXCEPTION_HANDLER
-  MessageBoxA (0, "Attach debugger now", "Exception handler test", 
-    MB_OK | MB_ICONWARNING);
+  csPrintf ("Attach debugger now\n");
+  while (!IsDebuggerPresent()) { Sleep (200); }
+  DebugBreak();
 #endif
-
   LONG ret = EXCEPTION_EXECUTE_HANDLER;
 
   static bool nest = false;
@@ -483,20 +486,19 @@ LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
       csString buf;
       buf.Format ("The application crashed. Dump has been written to %s", 
 	dumpFileName);
-      MessageBoxA (0, buf, 0, MB_OK | MB_ICONERROR);
+      csPrintfErr ("%s\n", buf.GetData());
+      MessageBoxA (0, buf, 0, MB_OK | MB_ICONERROR | MB_TASKMODAL);
     }
   }
 
 #ifdef CS_DEBUG
   if (oldFilter != 0)
     ret = oldFilter (ExceptionInfo);
-  nest = false;
-  return ret;
 #else
   ExitProcess (0xb4dc0de);
+#endif
   nest = false;
   return ret;
-#endif
 }
 
 void cswinMinidumpWriter::EnableCrashMinidumps (FnCrashMinidumpHandler handler)

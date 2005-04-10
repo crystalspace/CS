@@ -1505,7 +1505,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   min_i = max_i = 0;
   min_y = max_y = poly.vertices[0].y;
   // count 'real' number of vertices
-  int num_vertices = 1;
+  size_t num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
     // Sometimes double precision in the clipper is not enough.
@@ -1614,14 +1614,14 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  size_t scanL1, scanL2, scanR1, scanR2;// scan vertex left/right start/final
+  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // sl X left/right and deltas
   int sy, fyL, fyR;                     // sl Y, final Y left, final Y right
   int xL, xR;
   int screenY;
 
   sxL = sxR = dxL = dxR = 0;
-  scanL2 = scanR2 = max_i;
+  scanL2 = scanR2 = (int)max_i;
   sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
   for ( ; ; )
@@ -1639,7 +1639,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
         if (scanR2 == min_i)
 	  return;
         scanR1 = scanR2;
-	if (++scanR2 >= poly.num)
+	if (++scanR2 >= (int)poly.num)
 	  scanR2 = 0;
 
         leave = false;
@@ -1660,7 +1660,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
       {
         scanL1 = scanL2;
 	if (--scanL2 < 0)
-	  scanL2 = poly.num - 1;
+	  scanL2 = (int)poly.num - 1;
 
         leave = false;
         fyL = csQround (poly.vertices [scanL2].y);
@@ -1771,7 +1771,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
   min_i = max_i = 0;
   min_y = max_y = poly.vertices[0].y;
   // count 'real' number of vertices
-  int num_vertices = 1;
+  size_t num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
     if (poly.vertices[i].y > max_y)
@@ -1818,14 +1818,14 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  size_t scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
+  int scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;           // scanline X left/right and deltas
   int sy, fyL, fyR;                   // scanline Y, final Y left, final Y right
   int xL, xR;
   int screenY;
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
-  scanL2 = scanR2 = max_i;
+  scanL2 = scanR2 = (int)max_i;
   sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
   for ( ; ; )
@@ -1843,7 +1843,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
         if (scanR2 == min_i)
           return;
         scanR1 = scanR2;
-	if (++scanR2 >= poly.num)
+	if (++scanR2 >= (int)poly.num)
 	  scanR2 = 0;
 
         leave = false;
@@ -1864,7 +1864,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
       {
         scanL1 = scanL2;
 	if (--scanL2 < 0)
-	  scanL2 = poly.num - 1;
+	  scanL2 = (int)poly.num - 1;
 
         leave = false;
         fyL = csQround (poly.vertices [scanL2].y);
@@ -2006,7 +2006,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   min_z = (M_zero ? 0 : poly.vertices[0].x) + t*poly.vertices[0].y;
 
   // count 'real' number of vertices
-  int num_vertices = 1;
+  size_t num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
     // Jorrit: Removed the test below because it causes polygons
@@ -2269,7 +2269,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
-  size_t scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // sl X left/right and deltas
   int sy, fyL, fyR;                     // sl Y, final Y left, final Y right
   int xL, xR;
@@ -2279,7 +2279,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   if (has_lightmap)
   {
     sxL = sxR = dxL = dxR = 0;
-    scanL2 = scanR2 = max_i;
+    scanL2 = scanR2 = (int)max_i;
     sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
     // Find the largest texture rectangle that is going to be displayed
@@ -2301,7 +2301,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
           if (scanR2 == min_i)
             goto texr_done;
           scanR1 = scanR2;
-          if (++scanR2 >= poly.num)
+          if (++scanR2 >= (int)poly.num)
             scanR2 = 0;
 
           leave = false;
@@ -2322,7 +2322,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
         {
           scanL1 = scanL2;
           if (--scanL2 < 0)
-            scanL2 = poly.num - 1;
+            scanL2 = (int)poly.num - 1;
 
           leave = false;
           fyL = csQround (poly.vertices [scanL2].y);
@@ -2466,7 +2466,7 @@ texr_done:
   if (!dscan) return;
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
-  scanL2 = scanR2 = max_i;
+  scanL2 = scanR2 = (int)max_i;
   sy = fyL = fyR = csQround (poly.vertices [scanL2].y);
 
   if (do_alpha) 
@@ -2491,7 +2491,7 @@ texr_done:
         if (scanR2 == min_i)
           goto finish;
         scanR1 = scanR2;
-	if (++scanR2 >= poly.num)
+	if (++scanR2 >= (int)poly.num)
 	  scanR2 = 0;
 
         leave = false;
@@ -2512,7 +2512,7 @@ texr_done:
       {
         scanL1 = scanL2;
 	if (--scanL2 < 0)
-	  scanL2 = poly.num - 1;
+	  scanL2 = (int)poly.num - 1;
 
         leave = false;
         fyL = csQround (poly.vertices [scanL2].y);
@@ -3168,7 +3168,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   struct
   {
     // Start and final vertex number
-    size_t sv, fv;
+    signed char sv, fv;
     // The X coordinates and its per-scanline delta; also the final Y coordinate
     int x, dxdy, fy;
     // The `U/V/Z' texture coordinates and their per-scanline delta
@@ -3178,8 +3178,8 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   } L,R;
 
 // Start of code to stop MSVC bitching about uninitialized variables
-  L.sv = R.sv = top;
-  L.fv = R.fv = top;
+  L.sv = R.sv = (signed char)top;
+  L.fv = R.fv = (signed char)top;
   int sy = L.fy = R.fy = csQround (poly.vertices [top].y);
 
   L.x = R.x = 0;
@@ -3222,7 +3222,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         if (R.fv == bot)
           return;
         R.sv = R.fv;
-	if (++R.fv >= poly.num)
+	if (++R.fv >= (int)poly.num)
 	  R.fv = 0;
 
         leave = false;
@@ -3281,7 +3281,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           return;
         L.sv = L.fv;
 	if (--L.fv < 0)
-	  L.fv = poly.num - 1;
+	  L.fv = (int)poly.num - 1;
 
         leave = false;
 	L.fy = csQround (poly.vertices [(int)L.fv].y);
@@ -4011,7 +4011,7 @@ static void DoAddPerspective (csPoly2D& dest, const csVector3& v,
   //dest.GetBoundingBox ().AddBoundingVertex (p);
 }
 
-static bool DoPolyPerspective (csVector3* verts, size_t num_verts, 
+static bool DoPolyPerspective (csVector3* verts, int num_verts, 
 			       csPoly2D& dest, /*bool mirror,*/
 			       float aspect, float shift_x, float shift_y,
 			       const csPlane3& plane_cam)
@@ -4532,10 +4532,10 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     
     csPolygonRenderData* spoly = polyRender->polys[i];
 
-    size_t numVerts = spoly->num_vertices;
+    int numVerts = spoly->num_vertices;
     CS_ALLOC_STACK_ARRAY(csVector3, camVerts, numVerts);
 
-    size_t v;
+    int v;
     int cnt_vis = 0;
     csVector3* obj_verts = *(spoly->p_obj_verts);
     for (v = 0; v < numVerts; v++)

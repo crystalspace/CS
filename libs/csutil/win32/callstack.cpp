@@ -147,7 +147,6 @@ BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
 void cswinCallStack::AddFrame (const STACKFRAME64& frame, 
 			       csDirtyAccessArray<StackEntry>& entries)
 {
-  csString str;
   StackEntry& entry = entries.GetExtend (entries.Length ());
 
   entry.instrPtr = frame.AddrPC.Offset;
@@ -180,7 +179,6 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame,
   }
   if (result)
   {
-    str.Clear ();
     SymCallbackInfo callbackInfo;
     csDirtyAccessArray<StackEntry::Param> params;
     callbackInfo.params = &params;
@@ -193,7 +191,7 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame,
       const size_t n = params.Length();
       entry.params = new StackEntry::Param[n + 1];
       memcpy (entry.params, params.GetArray(), n * sizeof (StackEntry::Param));
-      entry.params[n].name = 0;
+      entry.params[n].name = csInvalidStringID;
     }
   }
   else
@@ -281,7 +279,7 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
   str.Clear();
   StackEntry::Param* param = entries[num].params;
   bool first = true;
-  while (param->name != 0)
+  while (param->name != csInvalidStringID)
   {
     if (!first) { str << ", "; } else { first = false; }
     str << strings.Request (param->name);
@@ -613,6 +611,8 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
     stack->entries = new cswinCallStack::StackEntry[n + 1];
     memcpy (stack->entries, entries.GetArray(), 
       sizeof (cswinCallStack::StackEntry) * n);
+    // Actually just the 'params' members need to be 0 but wth...
+    memset (entries.GetArray(), 0, sizeof (cswinCallStack::StackEntry) * n);
   }
 
   return stack;

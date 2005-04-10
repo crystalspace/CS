@@ -51,7 +51,7 @@
 #define CS_FORMATTER_TYPENAME_QUALIFIER
 #endif
 
-/**\addtogroup csutil
+/**\addtogroup util
  * @{ */
 
 /**

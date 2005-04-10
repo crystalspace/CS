@@ -289,7 +289,6 @@ bool csGraphics2DGLCommon::BeginDraw ()
 
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
-  glColor3f (1., 0., 0.);
   glClearColor (0., 0., 0., 0.);
 
   statecache->SetShadeModel (GL_FLAT);

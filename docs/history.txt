@@ -13,6 +13,10 @@ chronological order.
 	- Eric Sunshine fixed assertion failure caused by
 	  csStringBase::ExpandIfNeeded() failing to allocate a backing-store
 	  given the following expression: csStringBase s; s = "";
+	- res fixed some issues in the Win32 callstack and minidump writer. 
+	- res removed an unnecessary glColor3f() from csGraphics2DGLCommon.
+	- res fixed problems in the software renderer caused by some recent
+	  size_t changes.
 9-Apr-2005
 	- res made the XML shader compiler check for a less ambiguous 
 	  "compiler" (in comparison to "type") attribute in shaders first.
