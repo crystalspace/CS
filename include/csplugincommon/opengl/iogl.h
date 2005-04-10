@@ -31,7 +31,7 @@ SCF_VERSION (iOpenGLInterface, 0, 0, 1);
 struct iOpenGLInterface : public iBase
 {
   /**
-   * Retrieve the address of the function <funcname>.
+   * Retrieve the address of the function &lt;funcname&gt;.
    * Return 0 if not available.
    */
   virtual void *GetProcAddress (const char *funcname) = 0;
