@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Apr-2005
+	- res applied a patch from David Bronke <whitelynx@gmail.com> that 
+	  fixes the SCF IDs for the multiplexer plugins to be consistent
+	  (end on .multiplexer, not .multiplexor or .multiplex).
 9-Apr-2005
 	- res made the XML shader compiler check for a less ambiguous 
 	  "compiler" (in comparison to "type") attribute in shaders first.

@@ -1628,3 +1628,16 @@ conformant. This means that Crystal Space-based projects which choose to adhere
 strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
 @samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
 headers safely.
+
+@subheading Plugin class @sc{id} changes
+
+Some plugins now have different class @sc{id}s; when you receive errors that
+some plugins could not be loaded check the list below whether the class
+@sc{id} might be different now.
+
+@itemize @bullet
+@item
+All plugins that provide ``multiplexer'' functionality have now class @sc{id}s
+that end on @samp{.multiplexer}, e.g. 
+@samp{crystalspace.graphic.image.io.multiplexer}.
+@end itemize
