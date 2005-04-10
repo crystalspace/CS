@@ -595,7 +595,8 @@ function find_path($find)
 //-----------------------------------------------------------------------------
 function redirect($uri)
 {
-    global $HTTP_HOST;
+    global $_SERVER;
+    $HTTP_HOST = $_SERVER["HTTP_HOST"];
     header("Location: http://$HTTP_HOST$uri");
     exit();
 }
@@ -801,9 +802,9 @@ function dispatch_uri($uri)
 //-----------------------------------------------------------------------------
 // Main: Dispatch the input URI.
 //-----------------------------------------------------------------------------
-$uri = $spoofpath;
+$uri = $_GET["spoofpath"];
 if (strlen($uri) == 0)
-    $uri = $REQUEST_URI;
+    $uri = $_SERVER["REQUEST_URI"];
 dispatch_uri($uri);
 
 //-----------------------------------------------------------------------------

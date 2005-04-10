@@ -112,19 +112,19 @@ copyright = "Copyright (C) 2000-2005 by " + author_info
 #        destination package name.
 #------------------------------------------------------------------------------
 
-cvsroot = ":pserver:anonymous@cvs1:/cvsroot/crystal"
-fixcvsroot = ":pserver:anonymous@cvs.sourceforge.net:/cvsroot/crystal"
+cvsroot = ":pserver:anonymous@cvs.crystalspace3d.org:/cvsroot/crystal"
+fixcvsroot = ":pserver:anonymous@cvs.crystalspace3d.org:/cvsroot/crystal"
 cvsmodule = "CS"
 moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
-snapdir = "/home/groups/c/cr/crystal/htdocs/cvs-snapshots"
+snapdir = "/home/crystal/www/htdocs/cvs-snapshots"
 checksumfile = "checksums.md5"
 checksumprog = "md5sum"
 keepsnapshots = 1
 keepdiffs = 14
 keeplogs = 14
-workdir = "/home/groups/c/cr/crystal"
+workdir = "/home/crystal"
 warnlevel = 0
 
 archivers = (
