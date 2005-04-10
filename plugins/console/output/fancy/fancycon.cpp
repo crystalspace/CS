@@ -470,7 +470,7 @@ void csFancyConsole::LoadPix ()
   if (!*mountdir)
     Report (CS_REPORTER_SEVERITY_WARNING,
       "FancyConsole: Data resource location unknown");
-  else if (*dir || VFS->Mount (mountdir, dir))
+  else if ((*dir && VFS->Mount (mountdir, dir)) || *mountdir)
   {
     VFS->PushDir ();
     VFS->ChDir (mountdir);
