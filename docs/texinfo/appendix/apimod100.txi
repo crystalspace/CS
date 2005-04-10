@@ -722,7 +722,8 @@ for more information regarding this issue.
 @subheading Naming Normalization
 
 The following @sc{scf} class names have been normalized in order to be
-consistent with the names of all other available ``null'' plugins:
+consistent with the names of all other available ``null'' and ``multiplexer''
+plugins:
 
 @itemize @bullet
 @item
@@ -731,6 +732,11 @@ consistent with the names of all other available ``null'' plugins:
 @item
 @code{crystalspace.graphics2d.null2d} @result{}
 @code{crystalspace.graphics2d.null}
+@item
+@code{crystalspace.documentsystem.multiplex} @result{}
+@code{crystalspace.documentsystem.multiplexer}
+@code{crystalspace.graphic.image.io.multiplex} @result{}
+@code{crystalspace.graphic.image.io.multiplexer}
 @end itemize
 
 For @sc{api} consistency and uniformity between container classes, the
@@ -1628,16 +1634,3 @@ conformant. This means that Crystal Space-based projects which choose to adhere
 strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
 @samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
 headers safely.
-
-@subheading Plugin class @sc{id} changes
-
-Some plugins now have different class @sc{id}s; when you receive errors that
-some plugins could not be loaded check the list below whether the class
-@sc{id} might be different now.
-
-@itemize @bullet
-@item
-All plugins that provide ``multiplexer'' functionality have now class @sc{id}s
-that end on @samp{.multiplexer}, e.g. 
-@samp{crystalspace.graphic.image.io.multiplexer}.
-@end itemize
