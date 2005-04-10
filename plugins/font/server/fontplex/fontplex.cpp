@@ -85,51 +85,51 @@ void csFontLoaderOrder::AppendSmart (const csFontLoaderOrder& other)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFontServerMultiplexor)
+SCF_IMPLEMENT_IBASE (csFontServerMultiplexer)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFontServerMultiplexor::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFontServerMultiplexer::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_FACTORY (csFontServerMultiplexor)
+SCF_IMPLEMENT_FACTORY (csFontServerMultiplexer)
 
-csFontServerMultiplexor::FontServerMapEntry::FontServerMapEntry (
+csFontServerMultiplexer::FontServerMapEntry::FontServerMapEntry (
   const char* name, iFontServer* server)
 {
   FontServerMapEntry::name = csStrNew (name);
   FontServerMapEntry::server = server;
 }
 
-csFontServerMultiplexor::FontServerMapEntry::FontServerMapEntry (
+csFontServerMultiplexer::FontServerMapEntry::FontServerMapEntry (
   const FontServerMapEntry& source)
 {
   name = csStrNew (source.name);
   server = source.server;
 }
 
-csFontServerMultiplexor::FontServerMapEntry::~FontServerMapEntry ()
+csFontServerMultiplexer::FontServerMapEntry::~FontServerMapEntry ()
 {
   delete[] name;
 }
 
-csFontServerMultiplexor::csFontServerMultiplexor (iBase *pParent)
+csFontServerMultiplexer::csFontServerMultiplexer (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
-csFontServerMultiplexor::~csFontServerMultiplexor ()
+csFontServerMultiplexer::~csFontServerMultiplexer ()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
 }
 
-bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
+bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
-  csFontServerMultiplexor::object_reg = object_reg;
+  csFontServerMultiplexer::object_reg = object_reg;
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);
@@ -182,7 +182,7 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.font.fontplex",
-        "Font server multiplexor: WARNING, no slave font servers found!");
+        "Font server multiplexer: WARNING, no slave font servers found!");
   }
 
   csString fallbackKey;
@@ -195,14 +195,14 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-void csFontServerMultiplexor::NotifyDelete (csFontPlexer* font, 
+void csFontServerMultiplexer::NotifyDelete (csFontPlexer* font, 
 					    char* fontid)
 {
   loadedFonts.Delete (fontid, font);
   delete[] fontid;
 }
 
-csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename, 
+csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename, 
 						float size)
 {
   csString fontid;
@@ -263,7 +263,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename,
   }
 }
 
-void csFontServerMultiplexor::ParseFontLoaderOrder (
+void csFontServerMultiplexer::ParseFontLoaderOrder (
   csFontLoaderOrder& order, const char* str)
 {
   while ((str != 0) && (*str != 0))
@@ -315,7 +315,7 @@ void csFontServerMultiplexor::ParseFontLoaderOrder (
   }
 }
 
-csPtr<iFontServer> csFontServerMultiplexor::ResolveFontServer (const char* name)
+csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);
@@ -362,7 +362,7 @@ SCF_IMPLEMENT_IBASE (csFontPlexer)
   SCF_IMPLEMENTS_INTERFACE (iFont)
 SCF_IMPLEMENT_IBASE_END
 
-csFontPlexer::csFontPlexer (csFontServerMultiplexor* parent,
+csFontPlexer::csFontPlexer (csFontServerMultiplexer* parent,
 			    char* fontid, iFont* primary, 
 			    float size, csFontLoaderOrder* order)
 {

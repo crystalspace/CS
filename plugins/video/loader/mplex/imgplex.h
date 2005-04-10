@@ -32,7 +32,7 @@
  * Through this plugin you can load/save a set of different formats.
  * It works by loading other plzugins and transfers execution to them.
  */
-class csMultiplexImageIO : public iImageIO
+class csImageIOMultiplexer : public iImageIO
 {
  protected:
   csRefArray<iImageIO> list;
@@ -52,8 +52,8 @@ class csMultiplexImageIO : public iImageIO
  public:
   SCF_DECLARE_IBASE;
 
-  csMultiplexImageIO (iBase *pParent);
-  virtual ~csMultiplexImageIO ();
+  csImageIOMultiplexer (iBase *pParent);
+  virtual ~csImageIOMultiplexer ();
 
   virtual bool Initialize (iObjectRegistry*);
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
@@ -66,7 +66,7 @@ class csMultiplexImageIO : public iImageIO
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csMultiplexImageIO);
+    SCF_DECLARE_EMBEDDED_IBASE(csImageIOMultiplexer);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;

@@ -33,13 +33,13 @@
 #include "dsplex.h"
 
 #define DSCLASSPREFIX "crystalspace.documentsystem."
-#define DOCPLEX_CLASSNAME DSCLASSPREFIX "multiplex"
+#define DOCPLEX_CLASSNAME DSCLASSPREFIX "multiplexer"
 
 SCF_IMPLEMENT_IBASE (csPlexDocument)
   SCF_IMPLEMENTS_INTERFACE (iDocument)
 SCF_IMPLEMENT_IBASE_END
 
-csPlexDocument::csPlexDocument (csRef<csMplexDocumentSystem> aPlexer)
+csPlexDocument::csPlexDocument (csRef<csDocumentSystemMultiplexer> aPlexer)
 {
   SCF_CONSTRUCT_IBASE (0);
   plexer = aPlexer;
@@ -253,27 +253,27 @@ int csPlexDocument::Changeable ()
   }
 }
 
-SCF_IMPLEMENT_IBASE(csMplexDocumentSystem)
+SCF_IMPLEMENT_IBASE(csDocumentSystemMultiplexer)
   SCF_IMPLEMENTS_INTERFACE(iDocumentSystem)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-csMplexDocumentSystem::csMplexDocumentSystem(iBase* parent) : autolist (0, 1)
+csDocumentSystemMultiplexer::csDocumentSystemMultiplexer(iBase* parent) : autolist (0, 1)
 {
   SCF_CONSTRUCT_IBASE(parent);
 }
 
-csMplexDocumentSystem::~csMplexDocumentSystem ()
+csDocumentSystemMultiplexer::~csDocumentSystemMultiplexer ()
 {
   SCF_DESTRUCT_IBASE();
 }
 
-csRef<iDocument> csMplexDocumentSystem::CreateDocument ()
+csRef<iDocument> csDocumentSystemMultiplexer::CreateDocument ()
 {
   return csPtr<iDocument> (new csPlexDocument (this));
 }
 
-bool csMplexDocumentSystem::Initialize (iObjectRegistry* object_reg)
+bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
 {
   if (object_reg)
   {
@@ -314,7 +314,7 @@ bool csMplexDocumentSystem::Initialize (iObjectRegistry* object_reg)
   return false;
 }
 
-csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (size_t num)
+csRef<iDocumentSystem> csDocumentSystemMultiplexer::LoadNextPlugin (size_t num)
 {
   csRef<iDocumentSystem> res;
   if (num < orderedlist.Length())
@@ -361,7 +361,7 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (size_t num)
   return res;
 }
 
-void csMplexDocumentSystem::RewardPlugin (size_t num)
+void csDocumentSystemMultiplexer::RewardPlugin (size_t num)
 {
   size_t anum;
   if ((num >= orderedlist.Length()) && 
@@ -375,6 +375,6 @@ void csMplexDocumentSystem::RewardPlugin (size_t num)
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (csMplexDocumentSystem)
+SCF_IMPLEMENT_FACTORY (csDocumentSystemMultiplexer)
 
 

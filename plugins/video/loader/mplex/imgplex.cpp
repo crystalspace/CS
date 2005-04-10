@@ -26,23 +26,23 @@
 #include "ivaria/reporter.h"
 #include "csutil/util.h"
 
-#define IMGPLEX_CLASSNAME "crystalspace.graphic.image.io.multiplex"
+#define IMGPLEX_CLASSNAME "crystalspace.graphic.image.io.multiplexer"
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE(csMultiplexImageIO);
+SCF_IMPLEMENT_IBASE(csImageIOMultiplexer);
   SCF_IMPLEMENTS_INTERFACE(iImageIO);
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMultiplexImageIO::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csImageIOMultiplexer::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_FACTORY(csMultiplexImageIO);
+SCF_IMPLEMENT_FACTORY(csImageIOMultiplexer);
 
 
-csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
+csImageIOMultiplexer::csImageIOMultiplexer (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -50,7 +50,7 @@ csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
   global_dither = false;
 }
 
-csMultiplexImageIO::~csMultiplexImageIO ()
+csImageIOMultiplexer::~csImageIOMultiplexer ()
 {
   if (classlist) classlist->DeleteAll ();
   classlist = 0;
@@ -59,7 +59,7 @@ csMultiplexImageIO::~csMultiplexImageIO ()
   SCF_DESTRUCT_IBASE();
 }
 
-bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
+bool csImageIOMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
   if (object_reg)
   {
@@ -75,7 +75,7 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
   return false;
 }
 
-void csMultiplexImageIO::StoreDesc (
+void csImageIOMultiplexer::StoreDesc (
 	const csImageIOFileFormatDescriptions& format)
 {
   // add the formats coming in to our ever growing list
@@ -84,7 +84,7 @@ void csMultiplexImageIO::StoreDesc (
     formats.Push (format[i]);
 }
 
-bool csMultiplexImageIO::LoadNextPlugin ()
+bool csImageIOMultiplexer::LoadNextPlugin ()
 {
   if (!classlist) return false;
   
@@ -118,21 +118,21 @@ bool csMultiplexImageIO::LoadNextPlugin ()
   return true;
 }
 
-const csImageIOFileFormatDescriptions& csMultiplexImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 {
   // need all plugins.
   while (LoadNextPlugin()); 
   return formats;
 }
 
-void csMultiplexImageIO::SetDithering (bool iEnable)
+void csImageIOMultiplexer::SetDithering (bool iEnable)
 {
   global_dither = iEnable;
   for (size_t i = 0; i < list.Length (); i++)
     list[i]->SetDithering (global_dither);
 }
 
-csPtr<iImage> csMultiplexImageIO::Load (iDataBuffer* buf, int iFormat)
+csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 {
   bool consecutive = false; // set to true if we searched the list completely.
   do
@@ -169,7 +169,7 @@ csPtr<iImage> csMultiplexImageIO::Load (iDataBuffer* buf, int iFormat)
   return 0;
 }
 
-csPtr<iDataBuffer> csMultiplexImageIO::Save (
+csPtr<iDataBuffer> csImageIOMultiplexer::Save (
   iImage *image, iImageIO::FileFormatDescription *format,
   const char* extraoptions)
 {
@@ -199,7 +199,7 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (
   return 0;
 }
 
-csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
+csPtr<iDataBuffer> csImageIOMultiplexer::Save (iImage *image, const char *mime,
   const char* extraoptions)
 {
   // same algortihm as in Load()

@@ -24,7 +24,7 @@
 
 struct iObjectRegistry;
 
-class csMplexDocumentSystem : public iDocumentSystem, public iComponent
+class csDocumentSystemMultiplexer : public iDocumentSystem, public iComponent
 {
 private:
   friend struct csPlexDocument;
@@ -40,8 +40,8 @@ private:
 public:
   SCF_DECLARE_IBASE;
   
-  csMplexDocumentSystem (iBase* parent = 0);
-  virtual ~csMplexDocumentSystem ();
+  csDocumentSystemMultiplexer (iBase* parent = 0);
+  virtual ~csDocumentSystemMultiplexer ();
 	
   virtual bool Initialize (iObjectRegistry* objreg);
 
@@ -51,16 +51,16 @@ public:
 struct csPlexDocument : public iDocument
 {
 private:
-  friend class csMplexDocumentSystem;
+  friend class csDocumentSystemMultiplexer;
 
-  csRef<csMplexDocumentSystem> plexer;
+  csRef<csDocumentSystemMultiplexer> plexer;
 
   csRef<iDocument> wrappedDoc;
   csString lasterr;
 public:
   SCF_DECLARE_IBASE;
 
-  csPlexDocument (csRef<csMplexDocumentSystem> aPlexer);
+  csPlexDocument (csRef<csDocumentSystemMultiplexer> aPlexer);
   virtual ~csPlexDocument ();
 
   virtual void Clear ();

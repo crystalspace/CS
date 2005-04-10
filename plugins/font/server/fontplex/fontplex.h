@@ -31,7 +31,7 @@
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 
-class csFontServerMultiplexor;
+class csFontServerMultiplexer;
 class csFontPlexer;
 
 struct csFontLoadOrderEntry
@@ -64,9 +64,9 @@ class csFontPlexer : public iFont
 private:
   friend struct csFontLoadOrderEntry;
 
-  csRef<csFontServerMultiplexor> parent;
+  csRef<csFontServerMultiplexer> parent;
   char* fontid;
-  int size;
+  float size;
   iFont* primaryFont;
 
   csFontLoaderOrder* order;
@@ -74,7 +74,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csFontPlexer (csFontServerMultiplexor* parent, 
+  csFontPlexer (csFontServerMultiplexer* parent, 
     char* fontid, iFont* primary, 
     float size, csFontLoaderOrder* order);
   virtual ~csFontPlexer ();
@@ -121,7 +121,7 @@ public:
  * ...
  * </code>
  */
-class csFontServerMultiplexor : public iFontServer
+class csFontServerMultiplexer : public iFontServer
 {
 private:
   iObjectRegistry* object_reg;
@@ -154,9 +154,9 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Create the plugin object
-  csFontServerMultiplexor (iBase *pParent);
+  csFontServerMultiplexer (iBase *pParent);
   /// Destructor: nothing to do
-  virtual ~csFontServerMultiplexor ();
+  virtual ~csFontServerMultiplexer ();
 
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -169,7 +169,7 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csFontServerMultiplexor);
+    SCF_DECLARE_EMBEDDED_IBASE(csFontServerMultiplexer);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;

@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.documentsystem.multiplex</name>
-        <implementation>csMplexDocumentSystem</implementation>
+        <implementation>csDocumentSystemMultiplexer</implementation>
         <description>Document system multiplexer</description>
       </class>
     </classes>

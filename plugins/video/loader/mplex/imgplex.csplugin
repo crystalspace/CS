@@ -4,9 +4,9 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.graphic.image.io.multiplex</name>
-        <implementation>csMultiplexImageIO</implementation>
-        <description>Image file format multiplex plug-in.</description>
+        <name>crystalspace.graphic.image.io.multiplexer</name>
+        <implementation>csImageIOMultiplexer</implementation>
+        <description>Image file format multiplexer plug-in.</description>
       </class>
     </classes>
   </scf>
