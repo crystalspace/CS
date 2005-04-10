@@ -470,39 +470,42 @@ void csFancyConsole::LoadPix ()
   if (!*mountdir)
     Report (CS_REPORTER_SEVERITY_WARNING,
       "FancyConsole: Data resource location unknown");
-  else if ((*dir && VFS->Mount (mountdir, dir)) || *mountdir)
+  else 
   {
-    VFS->PushDir ();
-    VFS->ChDir (mountdir);
+    if (!*dir || VFS->Mount (mountdir, dir))
+    {
+      VFS->PushDir ();
+      VFS->ChDir (mountdir);
 
-    // scan in all sections
-    PrepPix (ini, "Background", deco.bgnd, true);
-    PrepPix (ini, "TopLeft", deco.border[0], false);
-    PrepPix (ini, "Top", deco.border[1], false);
-    PrepPix (ini, "TopRight", deco.border[2], false);
-    PrepPix (ini, "Right", deco.border[3], false);
-    PrepPix (ini, "BottomRight", deco.border[4], false);
-    PrepPix (ini, "Bottom", deco.border[5], false);
-    PrepPix (ini, "BottomLeft", deco.border[6], false);
-    PrepPix (ini, "Left", deco.border[7], false);
+      // scan in all sections
+      PrepPix (ini, "Background", deco.bgnd, true);
+      PrepPix (ini, "TopLeft", deco.border[0], false);
+      PrepPix (ini, "Top", deco.border[1], false);
+      PrepPix (ini, "TopRight", deco.border[2], false);
+      PrepPix (ini, "Right", deco.border[3], false);
+      PrepPix (ini, "BottomRight", deco.border[4], false);
+      PrepPix (ini, "Bottom", deco.border[5], false);
+      PrepPix (ini, "BottomLeft", deco.border[6], false);
+      PrepPix (ini, "Left", deco.border[7], false);
 
-    // internal increase/decrease
-    deco.p2lx = ini->GetInt ("FancyConsole.General.p2lx");
-    deco.p2rx = ini->GetInt ("FancyConsole.General.p2rx");
-    deco.p2ty = ini->GetInt ("FancyConsole.General.p2ty");
-    deco.p2by = ini->GetInt ("FancyConsole.General.p2by");
-    deco.lx = ini->GetInt ("FancyConsole.General.lx");
-    deco.rx = ini->GetInt ("FancyConsole.General.rx");
-    deco.ty = ini->GetInt ("FancyConsole.General.ty");
-    deco.by = ini->GetInt ("FancyConsole.General.by");
+      // internal increase/decrease
+      deco.p2lx = ini->GetInt ("FancyConsole.General.p2lx");
+      deco.p2rx = ini->GetInt ("FancyConsole.General.p2rx");
+      deco.p2ty = ini->GetInt ("FancyConsole.General.p2ty");
+      deco.p2by = ini->GetInt ("FancyConsole.General.p2by");
+      deco.lx = ini->GetInt ("FancyConsole.General.lx");
+      deco.rx = ini->GetInt ("FancyConsole.General.rx");
+      deco.ty = ini->GetInt ("FancyConsole.General.ty");
+      deco.by = ini->GetInt ("FancyConsole.General.by");
 
-    VFS->PopDir ();
-    if (strlen (dir))
-      VFS->Unmount (mountdir, dir);
+      VFS->PopDir ();
+      if (strlen (dir))
+	VFS->Unmount (mountdir, dir);
+    }
+    else
+      Report (CS_REPORTER_SEVERITY_WARNING,
+    	  "Could not mount %s on %s", dir, mountdir);
   }
-  else
-    Report (CS_REPORTER_SEVERITY_WARNING,
-    	"Could not mount %s on %s", dir, mountdir);
 }
 
 void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
