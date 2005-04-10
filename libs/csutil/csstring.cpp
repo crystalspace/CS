@@ -130,7 +130,7 @@ csStringBase& csStringBase::AppendFmtV (const char* format, va_list args)
 
 void csStringBase::ExpandIfNeeded(size_t NewSize)
 {
-  if (NewSize + 1 > GetCapacity() + 1) // GLOBAL NOTE *1*
+  if (GetData() == 0 || NewSize + 1 > GetCapacity() + 1) // GLOBAL NOTE *1*
     SetCapacityInternal (NewSize, true);
 }
 

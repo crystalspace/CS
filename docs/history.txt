@@ -10,6 +10,9 @@ chronological order.
 	- res applied a patch from David Bronke <whitelynx@gmail.com> that 
 	  fixes the SCF IDs for the multiplexer plugins to be consistent
 	  (end on .multiplexer, not .multiplexor or .multiplex).
+	- Eric Sunshine fixed assertion failure caused by
+	  csStringBase::ExpandIfNeeded() failing to allocate a backing-store
+	  given the following expression: csStringBase s; s = "";
 9-Apr-2005
 	- res made the XML shader compiler check for a less ambiguous 
 	  "compiler" (in comparison to "type") attribute in shaders first.
