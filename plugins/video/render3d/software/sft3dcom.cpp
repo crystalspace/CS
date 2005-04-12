@@ -1636,7 +1636,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
       if (sy <= fyR)
       {
         // Check first if polygon has been finished
-        if (scanR2 == min_i)
+        if (scanR2 == (int)min_i)
 	  return;
         scanR1 = scanR2;
 	if (++scanR2 >= (int)poly.num)
@@ -1840,7 +1840,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
       if (sy <= fyR)
       {
         // Check first if polygon has been finished
-        if (scanR2 == min_i)
+        if (scanR2 == (int)min_i)
           return;
         scanR1 = scanR2;
 	if (++scanR2 >= (int)poly.num)
@@ -2298,7 +2298,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
         if (sy <= fyR)
         {
           // Check first if polygon has been finished
-          if (scanR2 == min_i)
+          if (scanR2 == (int)min_i)
             goto texr_done;
           scanR1 = scanR2;
           if (++scanR2 >= (int)poly.num)
@@ -2488,7 +2488,7 @@ texr_done:
       if (sy <= fyR)
       {
         // Check first if polygon has been finished
-        if (scanR2 == min_i)
+        if (scanR2 == (int)min_i)
           goto finish;
         scanR1 = scanR2;
 	if (++scanR2 >= (int)poly.num)
@@ -3219,7 +3219,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       if (sy <= R.fy)
       {
         // Check first if polygon has been finished
-        if (R.fv == bot)
+        if (R.fv == (int)bot)
           return;
         R.sv = R.fv;
 	if (++R.fv >= (int)poly.num)
@@ -3277,7 +3277,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       } /* endif */
       if (sy <= L.fy)
       {
-        if (L.fv == bot)
+        if (L.fv == (int)bot)
           return;
         L.sv = L.fv;
 	if (--L.fv < 0)
