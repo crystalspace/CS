@@ -22,7 +22,6 @@
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
-#include "csutil/debug.h"
 #include "csutil/event.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
@@ -289,8 +288,6 @@ bool IsoTest::CreateActor ()
 
 bool IsoTest::Initialize ()
 {
-  csDebuggingGraph::SetupGraph (object_reg);
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_OPENGL3D,
