@@ -199,6 +199,7 @@
   INTERFACE_APPLY(iObjectModel)
   INTERFACE_APPLY(iObjectModelListener)
   INTERFACE_APPLY(iObjectRegistry)
+  INTERFACE_APPLY(iPath)
   INTERFACE_APPLY(iPluginManager)
   INTERFACE_APPLY(iPolygonMesh)
   INTERFACE_APPLY(iPortal)
@@ -212,6 +213,8 @@
   INTERFACE_APPLY(iSimpleFormerState)
   INTERFACE_APPLY(iSector)
   INTERFACE_APPLY(iSectorList)
+  INTERFACE_APPLY(iShaderManager)
+  INTERFACE_APPLY(iShaderVariableContext)
   INTERFACE_APPLY(iSoundHandle)
   INTERFACE_APPLY(iSoundLoader)
   INTERFACE_APPLY(iSoundRender)
@@ -227,6 +230,7 @@
   INTERFACE_APPLY(iStreamFormat)
   INTERFACE_APPLY(iString)
   INTERFACE_APPLY(iStringArray)
+  INTERFACE_APPLY(iStringSet)
   INTERFACE_APPLY(iTerrainFactoryState)
   INTERFACE_APPLY(iTerrainObjectState)
   INTERFACE_APPLY(iTerraFormer)
@@ -364,6 +368,7 @@
 %apply float * OUTPUT { float & w };
 %apply float * OUTPUT { float & ra };
 %apply float * OUTPUT { float & rb };
+%apply float * OUTPUT { float * pr }; // iMeshObject::HitBeam*().
 
 // input/output arguments
 %apply bool * INOUT { bool & mirror };
@@ -827,9 +832,11 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "igeom/clip2d.h"
 %include "igeom/objmodel.h"
-
+%include "igeom/path.h"
 %include "igeom/polymesh.h"
+%include "csgeom/path.h"
 %include "csgeom/polymesh.h"
+%include "csgeom/spline.h"
 
 %include "iengine/fview.h"
 %include "iengine/light.h"
@@ -884,8 +891,9 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 %include "iutil/vfs.h"
 #ifndef CS_MINI_SWIG
-%include "iutil/object.h"
 %include "iutil/dbghelp.h"
+%include "iutil/object.h"
+%include "iutil/strset.h"
 #endif // CS_MINI_SWIG
 %include "iutil/objreg.h"
 #ifndef CS_MINI_SWIG
@@ -958,8 +966,8 @@ TYPEMAP_OUT_csWrapPtr
 
 #ifndef CS_MINI_SWIG
 %include "ivideo/halo.h"
-
 %include "ivideo/shader/shader.h"
+
 %rename(GetKeyColorStatus) iTextureHandle::GetKeyColor() const;
 %include "ivideo/texture.h"
 
@@ -1019,6 +1027,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/terraform.h"
 
 %include "csutil/csobject.h"
+%include "csutil/strset.h"
 
 %include "cstool/csview.h"
 %include "cstool/collider.h"

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Apr-2005
+	- Eric Sunshine added iPath, csPath, iShaderManager,
+	  iShaderVariableContext, iStringSet, csSpline, and csStringSet to
+	  cspace.i. These additions should make it possible to compose
+	  pure-Python versions of `isotest' and `pathtut'.
+	- Eric Sunshine resolved some Swig complaints about csStringFast<>.
 10-Apr-2005
 	- res applied a patch from David Bronke <whitelynx@gmail.com> that 
 	  fixes the SCF IDs for the multiplexer plugins to be consistent

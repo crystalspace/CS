@@ -1075,10 +1075,22 @@ public:
 #endif
 };
 
+#ifndef SWIG
+/**
+ * Superclass of csString; normally csStringFast<>.
+ * \internal This is just an implementation detail to pacify Swig which
+ *   otherwise complains that it does not know anything about csStringFast<>.
+ */
+typedef csStringFast<> csStringFastDefault;
+#else
+#define csStringFastDefault csStringFast<36>
+%template(csStringParent) csStringFast<36>;
+#endif
+
 /**
  * Thin wrapper around csStringFast<> with its default buffer size.
  */
-class csString : public csStringFast<>
+class csString : public csStringFastDefault
 {
 public:
   /// Create an empty csString object.
