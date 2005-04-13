@@ -3381,6 +3381,50 @@ _cspace.iObjectModel_swigregister(iObjectModelPtr)
 
 iObjectModel_scfGetVersion = _cspace.iObjectModel_scfGetVersion
 
+class iPath(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iPath, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iPath, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iPath instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Length(*args): return _cspace.iPath_Length(*args)
+    def CalculateAtTime(*args): return _cspace.iPath_CalculateAtTime(*args)
+    def GetCurrentIndex(*args): return _cspace.iPath_GetCurrentIndex(*args)
+    def SetPositionVectors(*args): return _cspace.iPath_SetPositionVectors(*args)
+    def SetUpVectors(*args): return _cspace.iPath_SetUpVectors(*args)
+    def SetForwardVectors(*args): return _cspace.iPath_SetForwardVectors(*args)
+    def SetPositionVector(*args): return _cspace.iPath_SetPositionVector(*args)
+    def SetUpVector(*args): return _cspace.iPath_SetUpVector(*args)
+    def SetForwardVector(*args): return _cspace.iPath_SetForwardVector(*args)
+    def GetPositionVector(*args): return _cspace.iPath_GetPositionVector(*args)
+    def GetUpVector(*args): return _cspace.iPath_GetUpVector(*args)
+    def GetForwardVector(*args): return _cspace.iPath_GetForwardVector(*args)
+    def GetTime(*args): return _cspace.iPath_GetTime(*args)
+    def SetTime(*args): return _cspace.iPath_SetTime(*args)
+    def GetInterpolatedPosition(*args): return _cspace.iPath_GetInterpolatedPosition(*args)
+    def GetInterpolatedUp(*args): return _cspace.iPath_GetInterpolatedUp(*args)
+    def GetInterpolatedForward(*args): return _cspace.iPath_GetInterpolatedForward(*args)
+    def __del__(self, destroy=_cspace.delete_iPath):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPath_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iPath_scfGetVersion)
+
+class iPathPtr(iPath):
+    def __init__(self, this):
+        _swig_setattr(self, iPath, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iPath, 'thisown', 0)
+        _swig_setattr(self, iPath,self.__class__,iPath)
+_cspace.iPath_swigregister(iPathPtr)
+
+iPath_scfGetVersion = _cspace.iPath_scfGetVersion
+
 CS_POLYMESH_CLOSED = _cspace.CS_POLYMESH_CLOSED
 CS_POLYMESH_NOTCLOSED = _cspace.CS_POLYMESH_NOTCLOSED
 CS_POLYMESH_CONVEX = _cspace.CS_POLYMESH_CONVEX
@@ -3452,6 +3496,64 @@ class iPolygonMeshPtr(iPolygonMesh):
 _cspace.iPolygonMesh_swigregister(iPolygonMeshPtr)
 
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
+
+class csPath(csCatmullRomSpline,iPath):
+    __swig_setmethods__ = {}
+    for _s in [csCatmullRomSpline,iPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csPath, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csCatmullRomSpline,iPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csPath instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["scfRefCount"] = _cspace.csPath_scfRefCount_set
+    __swig_getmethods__["scfRefCount"] = _cspace.csPath_scfRefCount_get
+    if _newclass:scfRefCount = property(_cspace.csPath_scfRefCount_get, _cspace.csPath_scfRefCount_set)
+    __swig_setmethods__["scfWeakRefOwners"] = _cspace.csPath_scfWeakRefOwners_set
+    __swig_getmethods__["scfWeakRefOwners"] = _cspace.csPath_scfWeakRefOwners_get
+    if _newclass:scfWeakRefOwners = property(_cspace.csPath_scfWeakRefOwners_get, _cspace.csPath_scfWeakRefOwners_set)
+    def scfRemoveRefOwners(*args): return _cspace.csPath_scfRemoveRefOwners(*args)
+    __swig_setmethods__["scfParent"] = _cspace.csPath_scfParent_set
+    __swig_getmethods__["scfParent"] = _cspace.csPath_scfParent_get
+    if _newclass:scfParent = property(_cspace.csPath_scfParent_get, _cspace.csPath_scfParent_set)
+    def IncRef(*args): return _cspace.csPath_IncRef(*args)
+    def DecRef(*args): return _cspace.csPath_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csPath_GetRefCount(*args)
+    def AddRefOwner(*args): return _cspace.csPath_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.csPath_RemoveRefOwner(*args)
+    def QueryInterface(*args): return _cspace.csPath_QueryInterface(*args)
+    def __init__(self, *args):
+        _swig_setattr(self, csPath, 'this', _cspace.new_csPath(*args))
+        _swig_setattr(self, csPath, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csPath):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    def Length(*args): return _cspace.csPath_Length(*args)
+    def CalculateAtTime(*args): return _cspace.csPath_CalculateAtTime(*args)
+    def GetCurrentIndex(*args): return _cspace.csPath_GetCurrentIndex(*args)
+    def GetTime(*args): return _cspace.csPath_GetTime(*args)
+    def SetTime(*args): return _cspace.csPath_SetTime(*args)
+    def SetPositionVectors(*args): return _cspace.csPath_SetPositionVectors(*args)
+    def SetUpVectors(*args): return _cspace.csPath_SetUpVectors(*args)
+    def SetForwardVectors(*args): return _cspace.csPath_SetForwardVectors(*args)
+    def SetPositionVector(*args): return _cspace.csPath_SetPositionVector(*args)
+    def SetUpVector(*args): return _cspace.csPath_SetUpVector(*args)
+    def SetForwardVector(*args): return _cspace.csPath_SetForwardVector(*args)
+    def GetPositionVector(*args): return _cspace.csPath_GetPositionVector(*args)
+    def GetUpVector(*args): return _cspace.csPath_GetUpVector(*args)
+    def GetForwardVector(*args): return _cspace.csPath_GetForwardVector(*args)
+    def GetInterpolatedPosition(*args): return _cspace.csPath_GetInterpolatedPosition(*args)
+    def GetInterpolatedUp(*args): return _cspace.csPath_GetInterpolatedUp(*args)
+    def GetInterpolatedForward(*args): return _cspace.csPath_GetInterpolatedForward(*args)
+
+class csPathPtr(csPath):
+    def __init__(self, this):
+        _swig_setattr(self, csPath, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csPath, 'thisown', 0)
+        _swig_setattr(self, csPath,self.__class__,csPath)
+_cspace.csPath_swigregister(csPathPtr)
 
 class csPolygonMesh(iPolygonMesh):
     __swig_setmethods__ = {}
@@ -7144,6 +7246,41 @@ class iObjectIteratorPtr(iObjectIterator):
         _swig_setattr(self, iObjectIterator,self.__class__,iObjectIterator)
 _cspace.iObjectIterator_swigregister(iObjectIteratorPtr)
 
+class iStringSet(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iStringSet, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iStringSet, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iStringSet instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Request(*args): return _cspace.iStringSet_Request(*args)
+    def Contains(*args): return _cspace.iStringSet_Contains(*args)
+    def Delete(*args): return _cspace.iStringSet_Delete(*args)
+    def Empty(*args): return _cspace.iStringSet_Empty(*args)
+    def Clear(*args): return _cspace.iStringSet_Clear(*args)
+    def GetSize(*args): return _cspace.iStringSet_GetSize(*args)
+    def IsEmpty(*args): return _cspace.iStringSet_IsEmpty(*args)
+    def __del__(self, destroy=_cspace.delete_iStringSet):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringSet_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iStringSet_scfGetVersion)
+
+class iStringSetPtr(iStringSet):
+    def __init__(self, this):
+        _swig_setattr(self, iStringSet, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iStringSet, 'thisown', 0)
+        _swig_setattr(self, iStringSet,self.__class__,iStringSet)
+_cspace.iStringSet_swigregister(iStringSetPtr)
+csInvalidStringID = cvar.csInvalidStringID
+
+iStringSet_scfGetVersion = _cspace.iStringSet_scfGetVersion
+
 class iObjectRegistry(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9345,6 +9482,8 @@ class iShaderVariableContext(iBase):
             if self.thisown: destroy(self)
         except: pass
 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShaderVariableContext_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iShaderVariableContext_scfGetVersion)
 
 class iShaderVariableContextPtr(iShaderVariableContext):
     def __init__(self, this):
@@ -9352,6 +9491,8 @@ class iShaderVariableContextPtr(iShaderVariableContext):
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableContext, 'thisown', 0)
         _swig_setattr(self, iShaderVariableContext,self.__class__,iShaderVariableContext)
 _cspace.iShaderVariableContext_swigregister(iShaderVariableContextPtr)
+
+iShaderVariableContext_scfGetVersion = _cspace.iShaderVariableContext_scfGetVersion
 
 TagNeutral = _cspace.TagNeutral
 TagForbidden = _cspace.TagForbidden
@@ -9383,6 +9524,8 @@ class iShaderManager(iShaderVariableContext):
             if self.thisown: destroy(self)
         except: pass
 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShaderManager_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iShaderManager_scfGetVersion)
 
 class iShaderManagerPtr(iShaderManager):
     def __init__(self, this):
@@ -9390,6 +9533,8 @@ class iShaderManagerPtr(iShaderManager):
         if not hasattr(self,"thisown"): _swig_setattr(self, iShaderManager, 'thisown', 0)
         _swig_setattr(self, iShaderManager,self.__class__,iShaderManager)
 _cspace.iShaderManager_swigregister(iShaderManagerPtr)
+
+iShaderManager_scfGetVersion = _cspace.iShaderManager_scfGetVersion
 
 class iShaderRenderInterface(iBase):
     __swig_setmethods__ = {}
