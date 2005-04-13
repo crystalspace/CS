@@ -13,6 +13,9 @@ chronological order.
 	      transparent areas a bit.
 	    - Fixed some warnings in csfgen.
 	    - A bit more cleanup and simplification of GL render-to-texture.
+	- res reduced the Jam line length limit on MSYS to 8192 chars.
+	- res added some experimental support for the EXT_framebuffer_object
+	  GL extension for render-to-texture.
 12-Apr-2005
 	- Eric Sunshine added iPath, csPath, iShaderManager,
 	  iShaderVariableContext, iStringSet, csSpline, and csStringSet to

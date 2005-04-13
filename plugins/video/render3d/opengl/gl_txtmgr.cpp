@@ -907,6 +907,7 @@ GLuint csGLTextureHandle::GetHandle ()
     && (G3D->ext->CS_GL_EXT_framebuffer_object)
     && IsNeedMips())
   {
+    G3D->statecache->SetTexture (GL_TEXTURE_2D, Handle);
     G3D->ext->glGenerateMipmapEXT (GL_TEXTURE_2D);
     SetNeedMips (false);
   }

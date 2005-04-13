@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 
 #include "csgfx/bakekeycolor.h"
-#include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
 #include "csgfx/packrgb.h"
 
@@ -148,6 +147,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 	tex_mm->SetWasRenderTarget (true);
       }
       glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
+      tex_mm->SetNeedMips (true);
     }
   }
 }

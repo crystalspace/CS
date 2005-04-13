@@ -27,6 +27,7 @@
 /// Render2texture backend using the framebuffer
 class csGLRender2TextureFramebuf : public csGLRender2TextureBackend
 {
+protected:
   /// Current render target.
   csRef<iTextureHandle> render_target;
   /// If true then the current render target has been put on screen.

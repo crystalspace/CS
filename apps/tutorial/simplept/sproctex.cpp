@@ -23,7 +23,7 @@ csEngineProcTex::csEngineProcTex() : csProcTexture ()
   mat_w = 256;
   mat_h = 256;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
+  texFlags = CS_TEXTURE_3D;
 }
 
 csEngineProcTex::~csEngineProcTex ()
@@ -37,7 +37,7 @@ bool csEngineProcTex::LoadLevel ()
   csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   // load a map file to display
   vfs->PushDir ();
-  vfs->ChDir ("/lev/flarge/");
+  vfs->ChDir ("/lev/partsys/");
   bool Success = (loader->LoadMapFile ("world", false));
   vfs->PopDir ();
   if (!Success) return false;

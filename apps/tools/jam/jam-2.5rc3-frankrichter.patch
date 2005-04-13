@@ -13,11 +13,68 @@ Build from an MSYS or Cygwin shell prompt using the following command:
 
   make CC=gcc CFLAGS=-DMSYS
 
-The complete patch can be found in the file jam-2.5rc3-frankricther.patch.
+The complete patch can be found in the file jam-2.5rc3-frankrichter.patch.
 
-diff -u -r -d -N jam-2.5/execunix.c jam/execunix.c
---- jam-2.5/execunix.c	2003-04-23 00:45:50.000000000 -0400
-+++ jam/execunix.c	2004-04-28 19:40:32.000000000 -0400
+diff -urd jam-2.5/Jambase jam/Jambase
+--- jam-2.5/Jambase	Sun Sep 21 18:16:25 2003
++++ jam/Jambase	Sun Nov 23 14:04:25 2003
+@@ -425,6 +425,13 @@
+ 	CC		?= gcc ;
+ 	YACC		?= bison -y ;
+ 
++    case MSYS :
++	CC		?= gcc ;
++	CCFLAGS		+= -DMSYS ;
++	JAMSHELL	?= sh -c ;
++	RANLIB		?= ranlib ;
++	SUFEXE		?= .exe ;
++
+     case CYGWIN :	
+ 	CC		?= gcc ;
+ 	CCFLAGS 	+= -D__cygwin__ ;
+diff -urd jam-2.5/Jamfile jam/Jamfile
+--- jam-2.5/Jamfile	Sun Sep 21 18:16:32 2003
++++ jam/Jamfile	Sun May  2 09:43:12 2004
+@@ -23,6 +23,7 @@
+ #
+ 
+ if $(NT) 	{ code = execunix.c filent.c pathunix.c ; } 
++else if $(OS) = MSYS { code = execunix.c filent.c pathunix.c ; } 
+ else if $(MINGW) { code = execunix.c filent.c pathunix.c ; } 
+ else if $(OS2)	{ code = execunix.c fileos2.c pathunix.c ; } 
+ else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; } 
+diff -urd jam-2.5/Makefile jam/Makefile
+--- jam-2.5/Makefile	Sun Sep 21 18:17:50 2003
++++ jam/Makefile	Sun Nov 23 14:04:25 2003
+@@ -27,10 +27,10 @@
+ 
+ # NT (with Microsoft compiler)
+ # People with DevStudio settings already in shell environment.
+-#CC = cl /nologo
+-#CFLAGS = -DNT 
+-#TARGET = /Fejam0
+-#EXENAME = .\jam0.exe
++CC = cl /nologo
++CFLAGS = -DNT 
++TARGET = /Fejam0
++EXENAME = .\jam0.exe
+ 
+ # Interix - gcc
+ #CC = gcc
+@@ -42,6 +42,10 @@
+ # MingW32
+ #CC = gcc
+ #CFLAGS = -DMINGW
++
++# MSYS
++# CC = gcc
++# CFLAGS = -DMSYS
+ 
+ # MPEIX
+ #CC = gcc
+diff -urd jam-2.5/execunix.c jam/execunix.c
+--- jam-2.5/execunix.c	Sun Sep 21 18:15:15 2003
++++ jam/execunix.c	Wed Dec 17 18:21:58 2003
 @@ -50,7 +50,7 @@
  # include <process.h>
  # endif
@@ -40,10 +97,13 @@ diff -u -r -d -N jam-2.5/execunix.c jam/execunix.c
  
  	    if( !( tempdir = getenv( "TEMP" ) ) &&
  		!( tempdir = getenv( "TMP" ) ) )
-@@ -166,6 +166,35 @@
- 	}
- # endif
+@@ -163,6 +163,35 @@
+ 	    fclose( f );
  
+ 	    string = cmdtab[ slot ].tempfile;
++	}
++# endif
++
 +# ifdef OS_MSYS
 +	{
 +	  char* str_quoted = cmdtab[ slot ].tempfile =
@@ -70,15 +130,12 @@ diff -u -r -d -N jam-2.5/execunix.c jam/execunix.c
 +
 +	  strcat (str_quoted, "\"");
 +	  string = str_quoted;
-+	}
-+# endif
-+
- 	/* Forumulate argv */
- 	/* If shell was defined, be prepared for % and ! subs. */
- 	/* Otherwise, use stock /bin/sh (on unix) or cmd.exe (on NT). */
-diff -u -r -d -N jam-2.5/filent.c jam/filent.c
---- jam-2.5/filent.c	2003-04-23 00:45:50.000000000 -0400
-+++ jam/filent.c	2004-04-28 19:40:32.000000000 -0400
+ 	}
+ # endif
+ 
+diff -urd jam-2.5/filent.c jam/filent.c
+--- jam-2.5/filent.c	Sun Sep 21 18:15:20 2003
++++ jam/filent.c	Sun Nov 23 16:48:20 2003
 @@ -32,7 +32,7 @@
  # include "filesys.h"
  # include "pathsys.h"
@@ -99,9 +156,9 @@ diff -u -r -d -N jam-2.5/filent.c jam/filent.c
  	    }
  	    else
  	    {
-diff -u -r -d -N jam-2.5/fileunix.c jam/fileunix.c
---- jam-2.5/fileunix.c	2003-04-23 00:45:51.000000000 -0400
-+++ jam/fileunix.c	2004-04-28 19:40:32.000000000 -0400
+diff -urd jam-2.5/fileunix.c jam/fileunix.c
+--- jam-2.5/fileunix.c	Sun Sep 21 18:15:27 2003
++++ jam/fileunix.c	Sun Nov 23 14:21:49 2003
 @@ -54,7 +54,11 @@
  # include <unistd.h>
  # define STRUCT_DIRENT struct direct 
@@ -124,39 +181,86 @@ diff -u -r -d -N jam-2.5/fileunix.c jam/fileunix.c
  
  #define	ARMAG	"!<arch>\n"
  #define	SARMAG	8
-diff -u -r -d -N jam-2.5/headers.c jam/headers.c
---- jam-2.5/headers.c	2003-04-23 00:45:51.000000000 -0400
-+++ jam/headers.c	2004-04-28 19:40:32.000000000 -0400
-@@ -105,6 +105,9 @@
+diff -urd jam-2.5/headers.c jam/headers.c
+--- jam-2.5/headers.c	Tue Oct 14 14:27:18 2003
++++ jam/headers.c	Sun Nov 23 13:46:51 2003
+@@ -105,7 +105,7 @@
  
  	while( fgets( buf, sizeof( buf ), f ) )
  	{
+-	  char* p = (buf && strlen (buf) > 0) ? buf[strlen (buf) - 1] : 0;
 +	  char* p = (buf && strlen (buf) > 0) ? &buf[strlen (buf) - 1] : 0;
-+	  if (p && (*p == '\r')) *p = 0;
-+	  
+ 	  if (p && (*p == '\r')) *p = 0;
+ 	  
  	    for( i = 0; i < rec; i++ )
- 		if( regexec( re[i], buf ) && re[i]->startp[1] )
- 	    {
-diff -u -r -d -N jam-2.5/Jambase jam/Jambase
---- jam-2.5/Jambase	2003-04-23 00:45:49.000000000 -0400
-+++ jam/Jambase	2004-04-28 19:40:32.000000000 -0400
-@@ -425,6 +425,13 @@
- 	CC		?= gcc ;
- 	YACC		?= bison -y ;
+Only in jam: jam-2.5rc3-frankrichter.patch
+diff -urd jam-2.5/jam.c jam/jam.c
+--- jam-2.5/jam.c	Sun Sep 21 18:16:20 2003
++++ jam/jam.c	Sat May 15 10:03:00 2004
+@@ -161,7 +161,7 @@
  
-+    case MSYS :
-+	CC		?= gcc ;
-+	CCFLAGS		+= -DMSYS ;
-+	JAMSHELL	?= sh -c ;
-+	RANLIB		?= ranlib ;
-+	SUFEXE		?= .exe ;
+ # ifndef use_environ
+ # define use_environ environ
+-# if !defined( __WATCOM__ ) && !defined( OS_OS2 ) && !defined( OS_NT ) 
++# if !defined( __WATCOM__ ) && !defined( OS_OS2 ) && !defined( OS_NT )
+ extern char **environ;
+ # endif
+ # endif
+@@ -286,7 +286,7 @@
+ 	}
+ 
+ 	/* And JAMUNAME */
+-# ifdef unix
++# if defined(unix) && !defined(__NeXT__)
+ 	{
+ 	    struct utsname u;
+ 
+diff -urd jam-2.5/jam.h jam/jam.h
+--- jam-2.5/jam.h	Sun Sep 21 18:17:25 2003
++++ jam/jam.h	Wed Apr 13 10:54:09 2005
+@@ -138,6 +138,16 @@
+ # define DOWNSHIFT_PATHS
+ 
+ # endif
 +
-     case CYGWIN :	
- 	CC		?= gcc ;
- 	CCFLAGS 	+= -D__cygwin__ ;
-diff -u -r -d -N jam-2.5/jambase.c jam/jambase.c
---- jam-2.5/jambase.c	2003-04-23 00:57:10.000000000 -0400
-+++ jam/jambase.c	2004-04-28 19:40:32.000000000 -0400
++/*
++ * MSYS
++ */
++# ifdef MSYS
++
++# define MAXLINE 8192	/* reportedly, MSYS' sh has a limit of 8k on *
++			 * command lines */
++
++# endif
+ 
+ /*
+  * OS2
+@@ -223,6 +233,11 @@
+ # define OS_COHERENT
+ # define NO_VFORK
+ # endif
++# ifdef MSYS
++# define OSMINOR "OS=MSYS"
++# define OS_MSYS
++# undef USE_FILEUNIX
++# endif
+ # ifdef __cygwin__
+ # define OSMINOR "OS=CYGWIN"
+ # define OS_CYGWIN
+@@ -364,8 +379,10 @@
+ # include <sys/types.h>
+ # include <sys/stat.h>
+ 
++# ifndef OS_MSYS
+ # ifndef OS_MPEIX
+ # include <sys/file.h>
++# endif
+ # endif
+ 
+ # include <fcntl.h>
+diff -urd jam-2.5/jambase.c jam/jambase.c
+--- jam-2.5/jambase.c	Sun Sep 21 18:16:28 2003
++++ jam/jambase.c	Sun Nov 23 14:04:25 2003
 @@ -241,6 +241,12 @@
  "case AMIGA :\n",
  "CC		?= gcc ;\n",
@@ -170,67 +274,13 @@ diff -u -r -d -N jam-2.5/jambase.c jam/jambase.c
  "case CYGWIN :	\n",
  "CC		?= gcc ;\n",
  "CCFLAGS 	+= -D__cygwin__ ;\n",
-diff -u -r -d -N jam-2.5/jam.c jam/jam.c
---- jam-2.5/jam.c	2003-04-23 00:45:51.000000000 -0400
-+++ jam/jam.c	2004-04-30 17:59:31.000000000 -0400
-@@ -286,7 +286,7 @@
- 	}
+diff -urd jam-2.5/patchlevel.h jam/patchlevel.h
+--- jam-2.5/patchlevel.h	Sun Sep 21 18:17:42 2003
++++ jam/patchlevel.h	Sun Feb 13 23:25:18 2005
+@@ -1,5 +1,5 @@
+ /* Keep JAMVERSYM in sync with VERSION. */
+ /* It can be accessed as $(JAMVERSION) in the Jamfile. */
  
- 	/* And JAMUNAME */
--# ifdef unix
-+# if defined(unix) && !defined(__NeXT__)
- 	{
- 	    struct utsname u;
- 
-diff -u -r -d -N jam-2.5/Jamfile jam/Jamfile
---- jam-2.5/Jamfile	2003-04-23 00:45:49.000000000 -0400
-+++ jam/Jamfile	2004-04-28 19:40:32.000000000 -0400
-@@ -23,6 +23,7 @@
- #
- 
- if $(NT) 	{ code = execunix.c filent.c pathunix.c ; } 
-+else if $(OS) = MSYS { code = execunix.c filent.c pathunix.c ; } 
- else if $(MINGW) { code = execunix.c filent.c pathunix.c ; } 
- else if $(OS2)	{ code = execunix.c fileos2.c pathunix.c ; } 
- else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; } 
-diff -u -r -d -N jam-2.5/jam.h jam/jam.h
---- jam-2.5/jam.h	2003-04-23 00:45:51.000000000 -0400
-+++ jam/jam.h	2004-04-28 19:40:32.000000000 -0400
-@@ -223,6 +223,11 @@
- # define OS_COHERENT
- # define NO_VFORK
- # endif
-+# ifdef MSYS
-+# define OSMINOR "OS=MSYS"
-+# define OS_MSYS
-+# undef USE_FILEUNIX
-+# endif
- # ifdef __cygwin__
- # define OSMINOR "OS=CYGWIN"
- # define OS_CYGWIN
-@@ -364,9 +369,11 @@
- # include <sys/types.h>
- # include <sys/stat.h>
- 
-+# ifndef OS_MSYS
- # ifndef OS_MPEIX
- # include <sys/file.h>
- # endif
-+# endif
- 
- # include <fcntl.h>
- # include <stdio.h>
-diff -u -r -d -N jam-2.5/Makefile jam/Makefile
---- jam-2.5/Makefile	2003-04-23 00:45:50.000000000 -0400
-+++ jam/Makefile	2004-04-28 19:40:32.000000000 -0400
-@@ -43,6 +43,10 @@
- #CC = gcc
- #CFLAGS = -DMINGW
- 
-+# MSYS
-+# CC = gcc
-+# CFLAGS = -DMSYS
-+
- # MPEIX
- #CC = gcc
- #CFLAGS = -I/usr/include -D_POSIX_SOURCE
+-#define VERSION "2.5rc3"
++#define VERSION "2.5rc3-CS"
+ #define JAMVERSYM "JAMVERSION=2.5"

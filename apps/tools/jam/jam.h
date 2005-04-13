@@ -140,6 +140,16 @@
 # endif
 
 /*
+ * MSYS
+ */
+# ifdef MSYS
+
+# define MAXLINE 8192	/* reportedly, MSYS' sh has a limit of 8k on *
+			 * command lines */
+
+# endif
+
+/*
  * OS2
  */
 

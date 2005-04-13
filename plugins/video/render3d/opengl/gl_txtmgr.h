@@ -132,8 +132,6 @@ private:
   void SetSizeAdjusted (bool b) { texFlags.SetBool (flagSizeAdjusted, b); }
   bool IsTranspSet() const { return texFlags.Check (flagTranspSet); }
   void SetTranspSet (bool b) { texFlags.SetBool (flagTranspSet, b); }
-  bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
-  void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
   void *cachedata;
 
@@ -154,6 +152,8 @@ public:
   int target;
   bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
   void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
+  bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
+  void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
   csGLTextureHandle (iImage* image, int flags, csGLGraphics3D *iG3D);
 

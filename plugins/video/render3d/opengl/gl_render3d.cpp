@@ -61,6 +61,7 @@
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
 #include "gl_r2t_framebuf.h"
+#include "gl_r2t_ext_fb_o.h"
 
 #include "csplugincommon/opengl/glextmanager.h"
 
@@ -1041,8 +1042,16 @@ bool csGLGraphics3D::Open ()
   cache_clip_z_plane = -1;
 
   const char* r2tBackendStr;
-  r2tBackendStr = "framebuffer";
-  r2tbackend = new csGLRender2TextureFramebuf (this);
+  if (ext->CS_GL_EXT_framebuffer_object)
+  {
+    r2tBackendStr = "EXT_framebuffer_object";
+    r2tbackend = new csGLRender2TextureEXTfbo (this);
+  }
+  else
+  {
+    r2tBackendStr = "framebuffer";
+    r2tbackend = new csGLRender2TextureFramebuf (this);
+  }
   
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Render-to-texture backend: %s",
