@@ -417,7 +417,7 @@ static bool Convert (const char *fontfile)
 
   {
     int oldsize = opt.fontsize;
-    opt.fontsize = font->GetSize ();
+    opt.fontsize = (int)font->GetSize ();
     if (opt.fontsize != oldsize)
       csPrintf ("Could not set font size %d, using size %d\n",
         oldsize, opt.fontsize);

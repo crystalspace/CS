@@ -111,6 +111,7 @@ private:
     flagSizeAdjusted = 1 << 26,
     /// Is the color valid?
     flagTranspSet = 1 << 25,
+    flagNeedMips = 1 << 24,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -131,6 +132,8 @@ private:
   void SetSizeAdjusted (bool b) { texFlags.SetBool (flagSizeAdjusted, b); }
   bool IsTranspSet() const { return texFlags.Check (flagTranspSet); }
   void SetTranspSet (bool b) { texFlags.SetBool (flagTranspSet, b); }
+  bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
+  void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
   void *cachedata;
 
@@ -245,6 +248,7 @@ public:
 
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data);
+  void SetupAutoMipping();
 
   /// Get the texture target
   virtual int GetTextureTarget () const { return target; }

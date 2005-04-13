@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/csstring.h"
+#include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/memimage.h"
@@ -152,9 +153,7 @@ void csImageVolumeMaker::AppendPending ()
       int kr, kg, kb;
       image->GetKeyColor (kr, kg, kb);
       csRGBpixel transp (kr, kg, kb);
-      csRGBpixel fill (0, 0, 0);
-      image = csImageManipulate::RenderKeycolorToAlpha (image,
-	transp, fill);
+      image = csBakeKeyColor::Image (image, transp);
     }
     if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
     {

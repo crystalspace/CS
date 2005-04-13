@@ -319,6 +319,9 @@ void csSoftwareTextureHandle::Blit (int x, int y, int width, int height, unsigne
     }
   }
 
+  // We don't generate mipmaps or so...
+  flags |= CS_TEXTURE_NOMIPMAPS;
+
   UpdateTexture ();  
 }
 

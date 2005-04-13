@@ -84,6 +84,8 @@ public:
 class csSoftwareTextureHandle : public csTextureHandle
 {
 protected:
+  friend class csSoftwareGraphics3DCommon;
+
   /**
    * Private colormap -> global colormap table
    * For 16- and 32-bit modes this array contains a 256-element array

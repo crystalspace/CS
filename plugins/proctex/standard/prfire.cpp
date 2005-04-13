@@ -57,7 +57,7 @@ csProcFire::csProcFire (iTextureFactory* p,int w, int h) : csProcTexture(p)
 
   postsmooth = 0;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
+  texFlags = CS_TEXTURE_3D;
 }
 
 csProcFire::~csProcFire ()

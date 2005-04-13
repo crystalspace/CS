@@ -77,15 +77,6 @@ public:
    */
   static csRef<iImage> Sharpen (iImage* source, int strength, 
     csRGBpixel* transp = 0);
-  /**
-   * Set alpha of all pixels to 0 that match \a transpColor.
-   * Pixels that have non-transparent neighbours will be set to the mean
-   * color of all non-transparent neighbours, otherwise to \a fillColor.
-   * \remarks Intermediately uses a truecolor images, i.e. paletted images
-   *  are not handled with maximum efficiency.
-   */
-  static csRef<iImage> RenderKeycolorToAlpha (iImage* source, 
-    const csRGBpixel& transpColor, const csRGBpixel& fillColor);
 };
 
 #endif // __CS_CSGFX_IMAGEMANIPULATE_H__

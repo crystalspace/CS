@@ -478,13 +478,6 @@ public:
   /// Indicate that drawing is finished
   void FinishDraw ();
 
-  /**
-   * Prepare as render target. This basically makes sure
-   * mipmapping will be ok for this texture. This function does
-   * nothing if it has already been called before.
-   */
-  void PrepareAsRenderTarget (csGLTextureHandle* tex_mm);
-
   /// Do backbuffer printing
   void Print (csRect const* area);
 

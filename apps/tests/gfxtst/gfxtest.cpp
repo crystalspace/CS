@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 #include <string.h>
 
+#include "csgfx/bakekeycolor.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagetools.h"
 #include "csgfx/memimage.h"
@@ -315,8 +316,7 @@ static bool process_file (const char *fname)
       ifile->GetKeyColor (kr, kg, kb);
       transp.Set (kr, kg, kb);
     }
-    csRGBpixel fill (transp);
-    ifile = csImageManipulate::RenderKeycolorToAlpha (ifile, transp, fill);
+    ifile = csBakeKeyColor::Image (ifile, transp);
   }
 
   csString suffix;

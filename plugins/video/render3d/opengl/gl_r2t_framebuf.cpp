@@ -19,7 +19,10 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/bakekeycolor.h"
+#include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
+#include "csgfx/packrgb.h"
 
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
@@ -113,14 +116,9 @@ void csGLRender2TextureFramebuf::FinishDraw ()
   if (rt_onscreen)
   {
     rt_onscreen = false;
-    //statecache->Enable_GL_TEXTURE_2D ();
-    G3D->SetZMode (CS_ZBUF_NONE);
-    G3D->statecache->Disable_GL_BLEND ();
-    G3D->statecache->Disable_GL_ALPHA_TEST ();
     csGLTextureHandle* tex_mm = (csGLTextureHandle *)
       render_target->GetPrivateObject ();
     tex_mm->Precache ();
-    //statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
     // Texture is in tha cache, update texture directly.
     G3D->ActivateTexture (tex_mm);
     /*
@@ -129,32 +127,26 @@ void csGLRender2TextureFramebuf::FinishDraw ()
       */
     if (tex_mm->GetKeyColor ())
     {
-      tex_mm->SetWasRenderTarget (true);
-      csRef<iImage>& image = tex_mm->GetImage();
-      if (image == 0) // @@@ How to deal with cubemaps?
-      {
-	image.AttachNew (new csImageMemory (
-	  txt_w, txt_h, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-      }
-
-      // @@@ BAD BAD BAD BAD CAST
-      void* imgdata = CS_CONST_CAST(void*, image->GetImageData ());
+      // @@@ Processing sucks, but how else to handle keycolor?
+      const size_t numPix = txt_w * txt_h;
+      pixelScratch.SetLength (numPix * 4);
       glReadPixels (0, 0, txt_w, txt_h, GL_RGBA, 
-	GL_UNSIGNED_BYTE, imgdata);
-
-      /*
-	@@@ Optimize a bit. E.g. the texture shouldn't be uncached and cached again
-	every time.
-	*/
-      tex_mm->UpdateTexture ();
-      //tex_mm->InitTexture (txtmgr, G2D->GetPixelFormat ());
-      tex_mm->Unprepare ();
-      tex_mm->PrepareInt();
-      tex_mm->Precache ();
+	GL_UNSIGNED_BYTE, pixelScratch.GetArray());
+      csRGBpixel key;
+      tex_mm->GetKeyColor (key.red, key.green, key.blue);
+      csBakeKeyColor::RGBA2D (pixelScratch.GetArray(), 
+	pixelScratch.GetArray(), txt_w, txt_h, key);
+      tex_mm->Blit (0, 0, txt_w, txt_h, pixelScratch.GetArray());
     }
     else
     {
-      G3D->PrepareAsRenderTarget (tex_mm);
+      // Texture was not used as a render target before.
+      // Make some necessary adjustments.
+      if (!tex_mm->IsWasRenderTarget())
+      {
+	tex_mm->SetupAutoMipping();
+	tex_mm->SetWasRenderTarget (true);
+      }
       glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
     }
   }

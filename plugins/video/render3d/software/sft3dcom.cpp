@@ -2143,7 +2143,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // Mipmapping.
   int mipmap;
-  if (rstate_mipmap == 1)
+  if ((rstate_mipmap == 1) || (tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
     mipmap = 0;
   else if (rstate_mipmap == 0)
   {
@@ -3661,6 +3661,8 @@ void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
   csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
 	    render_target->GetPrivateObject ();
   tex_mm->Setup332Palette ();
+  // We don't generate mipmaps or so...
+  tex_mm->flags |= CS_TEXTURE_NOMIPMAPS;
 
   rt_onscreen = !persistent;
   rt_cliprectset = false;

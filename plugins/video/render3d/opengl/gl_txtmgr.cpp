@@ -24,6 +24,7 @@
 #include "csutil/databuf.h"
 #include "csutil/debug.h"
 #include "csutil/util.h"
+#include "csgfx/bakekeycolor.h"
 #include "csgfx/csimgvec.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
@@ -658,11 +659,53 @@ void csGLTextureHandle::Blit (int x, int y, int width,
   Precache ();
   G3D->ActivateTexture (this);
   // Make sure mipmapping is ok.
-  G3D->PrepareAsRenderTarget (this);
+  if (!IsWasRenderTarget())
+  {
+    bool doSetRGBA = (x == 0) && (y == 0) && (width == actual_width)
+      && (height == actual_height);
+
+    // Pull texture data and set as RGBA again, to prevent compression (slooow)
+    // on subsequent glTexSubImage() calls.
+    uint8* pixels;
+    if (doSetRGBA)
+    {
+      pixels = new uint8[actual_width * actual_height * 4];
+      glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    }
+    SetupAutoMipping();
+    SetWasRenderTarget (true);
+    if (doSetRGBA)
+    {
+      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, actual_width, 
+	actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+      delete[] pixels;
+    }
+    else
+    {
+      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, actual_width, 
+	actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+      return;
+    }
+  }
   // Do the copy.
   glTexSubImage2D (GL_TEXTURE_2D, 0, x, y, 
       width, height,
       GL_RGBA, GL_UNSIGNED_BYTE, data);
+  //SetNeedMips (true);
+}
+
+void csGLTextureHandle::SetupAutoMipping()
+{
+  // Set up mipmap generation
+  if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
+    /*&& (!G3D->ext->CS_GL_EXT_framebuffer_object)*/)
+  {
+    if (G3D->ext->CS_GL_SGIS_generate_mipmap)
+      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    else
+      glTexParameteri  (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+	txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  }
 }
 
 void csGLTextureHandle::Load ()
@@ -860,6 +903,13 @@ void csGLTextureHandle::UpdateTexture ()
 GLuint csGLTextureHandle::GetHandle ()
 {
   Precache ();
+  if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
+    && (G3D->ext->CS_GL_EXT_framebuffer_object)
+    && IsNeedMips())
+  {
+    G3D->ext->glGenerateMipmapEXT (GL_TEXTURE_2D);
+    SetNeedMips (false);
+  }
   return Handle;
 }
 
@@ -928,9 +978,7 @@ void csGLTextureHandle::PrepareKeycolor (csRef<iImage>& image,
   csRGBpixel mean_color;
   CheckAlpha (w, h, d, _src, &transp_color, alphaType);
   if (alphaType == csAlphaMode::alphaNone) return; // Nothing to fix up
-  ComputeMeanColor (w, h, d, _src, &transp_color, mean_color);
-  image = csImageManipulate::RenderKeycolorToAlpha (image, transp_color, 
-    mean_color);
+  image = csBakeKeyColor::Image (image, transp_color);
 }
 
 SCF_IMPLEMENT_IBASE (csGLMaterialHandle)

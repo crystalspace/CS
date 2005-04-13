@@ -20,6 +20,8 @@
 #ifndef __CS_GL_R2T_FRAMEBUF_H__
 #define __CS_GL_R2T_FRAMEBUF_H__
 
+#include "csutil/dirtyaccessarray.h"
+
 #include "gl_r2t_backend.h"
 
 /// Render2texture backend using the framebuffer
@@ -35,6 +37,8 @@ class csGLRender2TextureFramebuf : public csGLRender2TextureBackend
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   /// Render target dimensions
   int txt_w, txt_h;
+
+  csDirtyAccessArray<uint8> pixelScratch;
 public:
   csGLRender2TextureFramebuf (csGLGraphics3D* G3D) 
     : csGLRender2TextureBackend (G3D) { }
