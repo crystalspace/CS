@@ -3842,6 +3842,54 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iPath ##############
+
+package cspace::iPath;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Length = *cspacec::iPath_Length;
+*CalculateAtTime = *cspacec::iPath_CalculateAtTime;
+*GetCurrentIndex = *cspacec::iPath_GetCurrentIndex;
+*SetPositionVectors = *cspacec::iPath_SetPositionVectors;
+*SetUpVectors = *cspacec::iPath_SetUpVectors;
+*SetForwardVectors = *cspacec::iPath_SetForwardVectors;
+*SetPositionVector = *cspacec::iPath_SetPositionVector;
+*SetUpVector = *cspacec::iPath_SetUpVector;
+*SetForwardVector = *cspacec::iPath_SetForwardVector;
+*GetPositionVector = *cspacec::iPath_GetPositionVector;
+*GetUpVector = *cspacec::iPath_GetUpVector;
+*GetForwardVector = *cspacec::iPath_GetForwardVector;
+*GetTime = *cspacec::iPath_GetTime;
+*SetTime = *cspacec::iPath_SetTime;
+*GetInterpolatedPosition = *cspacec::iPath_GetInterpolatedPosition;
+*GetInterpolatedUp = *cspacec::iPath_GetInterpolatedUp;
+*GetInterpolatedForward = *cspacec::iPath_GetInterpolatedForward;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iPath($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iPath_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csMeshedPolygon ##############
 
 package cspace::csMeshedPolygon;
@@ -3910,6 +3958,72 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iPolygonMesh_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPath ##############
+
+package cspace::csPath;
+@ISA = qw( cspace cspace::csCatmullRomSpline cspace::iPath );
+%OWNER = ();
+%ITERATORS = ();
+*swig_scfRefCount_get = *cspacec::csPath_scfRefCount_get;
+*swig_scfRefCount_set = *cspacec::csPath_scfRefCount_set;
+*swig_scfWeakRefOwners_get = *cspacec::csPath_scfWeakRefOwners_get;
+*swig_scfWeakRefOwners_set = *cspacec::csPath_scfWeakRefOwners_set;
+*scfRemoveRefOwners = *cspacec::csPath_scfRemoveRefOwners;
+*swig_scfParent_get = *cspacec::csPath_scfParent_get;
+*swig_scfParent_set = *cspacec::csPath_scfParent_set;
+*IncRef = *cspacec::csPath_IncRef;
+*DecRef = *cspacec::csPath_DecRef;
+*GetRefCount = *cspacec::csPath_GetRefCount;
+*AddRefOwner = *cspacec::csPath_AddRefOwner;
+*RemoveRefOwner = *cspacec::csPath_RemoveRefOwner;
+*QueryInterface = *cspacec::csPath_QueryInterface;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPath(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPath($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Length = *cspacec::csPath_Length;
+*CalculateAtTime = *cspacec::csPath_CalculateAtTime;
+*GetCurrentIndex = *cspacec::csPath_GetCurrentIndex;
+*GetTime = *cspacec::csPath_GetTime;
+*SetTime = *cspacec::csPath_SetTime;
+*SetPositionVectors = *cspacec::csPath_SetPositionVectors;
+*SetUpVectors = *cspacec::csPath_SetUpVectors;
+*SetForwardVectors = *cspacec::csPath_SetForwardVectors;
+*SetPositionVector = *cspacec::csPath_SetPositionVector;
+*SetUpVector = *cspacec::csPath_SetUpVector;
+*SetForwardVector = *cspacec::csPath_SetForwardVector;
+*GetPositionVector = *cspacec::csPath_GetPositionVector;
+*GetUpVector = *cspacec::csPath_GetUpVector;
+*GetForwardVector = *cspacec::csPath_GetForwardVector;
+*GetInterpolatedPosition = *cspacec::csPath_GetInterpolatedPosition;
+*GetInterpolatedUp = *cspacec::csPath_GetInterpolatedUp;
+*GetInterpolatedForward = *cspacec::csPath_GetInterpolatedForward;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8067,6 +8181,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iStringSet ##############
+
+package cspace::iStringSet;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Request = *cspacec::iStringSet_Request;
+*Contains = *cspacec::iStringSet_Contains;
+*Delete = *cspacec::iStringSet_Delete;
+*Empty = *cspacec::iStringSet_Empty;
+*Clear = *cspacec::iStringSet_Clear;
+*GetSize = *cspacec::iStringSet_GetSize;
+*IsEmpty = *cspacec::iStringSet_IsEmpty;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iStringSet($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iStringSet_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iObjectRegistry ##############
 
 package cspace::iObjectRegistry;
@@ -10303,6 +10455,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iShaderVariableContext_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -10345,6 +10498,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iShaderManager_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13275,4 +13429,5 @@ bless $iSCF_SCF, cspace::iSCF;
 *AWSF_AlwaysRedrawWindows = *cspacec::AWSF_AlwaysRedrawWindows;
 *AWSF_RaiseOnMouseOver = *cspacec::AWSF_RaiseOnMouseOver;
 *AWSF_KeyboardControl = *cspacec::AWSF_KeyboardControl;
+*csInvalidStringID = *cspacec::csInvalidStringID;
 1;
