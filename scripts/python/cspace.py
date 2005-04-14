@@ -359,7 +359,6 @@ class csStringSet(_object):
     def Clear(*args): return _cspace.csStringSet_Clear(*args)
     def GetSize(*args): return _cspace.csStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.csStringSet_IsEmpty(*args)
-    def GetIterator(*args): return _cspace.csStringSet_GetIterator(*args)
 
 class csStringSetPtr(csStringSet):
     def __init__(self, this):
@@ -2495,7 +2494,6 @@ class csPluginRequestArray(_object):
         _swig_setattr(self, csPluginRequestArray, 'thisown', 1)
     def GetSize(*args): return _cspace.csPluginRequestArray_GetSize(*args)
     def Length(*args): return _cspace.csPluginRequestArray_Length(*args)
-    def SetSize(*args): return _cspace.csPluginRequestArray_SetSize(*args)
     def Get(*args): return _cspace.csPluginRequestArray_Get(*args)
     def Push(*args): return _cspace.csPluginRequestArray_Push(*args)
     def Pop(*args): return _cspace.csPluginRequestArray_Pop(*args)
@@ -2508,7 +2506,6 @@ class csPluginRequestArray(_object):
     def DeleteIndex(*args): return _cspace.csPluginRequestArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _cspace.csPluginRequestArray_DeleteRange(*args)
-    def DeleteFast(*args): return _cspace.csPluginRequestArray_DeleteFast(*args)
 
 class csPluginRequestArrayPtr(csPluginRequestArray):
     def __init__(self, this):

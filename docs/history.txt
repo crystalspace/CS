@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Apr-2005
+	- Eric Sunshine tweaked cspace.i for recent changes to csArray<> and
+	  csStringSet which caused compilation failure in Swig-generated code.
 13-Apr-2005
 	- res made the following changes:
 	    - Moved keycolor baking out of csImageManipulate into its own 

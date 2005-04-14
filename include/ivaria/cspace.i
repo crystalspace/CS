@@ -486,11 +486,17 @@ TYPEMAP_OUT_csWrapPtr
 // %typemap(default). The %extend-ing and extra code takes place after all
 // %include's are done, mentioning the header(s) it is related to.
 
+%ignore csOrdering;
+%ignore csArrayCmp;
+%ignore csArrayElementHandler;
+%ignore csArrayMemoryAllocator;
+%ignore csSafeCopyArrayMemoryAllocator;
+%ignore csSafeCopyArray;
 %ignore csArray::Capacity;
 %ignore csArray::DefaultCompare;
-%ignore csArray::DefaultCompareKey;
 %ignore csArray::Delete;
 %ignore csArray::DeleteAll;
+%ignore csArray::DeleteFast;
 %ignore csArray::Find;
 %ignore csArray::FindKey;
 %ignore csArray::FindSortedKey;
@@ -504,14 +510,13 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::Section;
 %ignore csArray::SetCapacity;
 %ignore csArray::SetLength;
+%ignore csArray::SetSize;
 %ignore csArray::ShrinkBestFit;
 %ignore csArray::Sort;
 %ignore csArray::TransferTo;
 %ignore csArray::operator=;
 %ignore csArray::operator[];
-%ignore csArrayElementHandler::Construct;
-%ignore csArrayElementHandler::Destroy;
-%ignore csArrayElementHandler::InitRegion;
+%ignore csArray::Iterator;
 %include "csutil/array.h"
 
 %ignore scfInitialize;
@@ -529,6 +534,9 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/cscolor.h"
 
 %include "csutil/cmdhelp.h"
+
+%ignore csStringSet::GlobalIterator;
+%ignore csStringSet::GetIterator;
 %include "csutil/strset.h"
 
 %ignore iString::SetCapacity;
@@ -820,11 +828,34 @@ TYPEMAP_OUT_csWrapPtr
 %typemap(default) const char * configName { $1 = 0; }
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
-%ignore csArray<csPluginRequest>::operator[];
-%ignore csArray<csPluginRequest>::Put;
+%ignore csArray<csPluginRequest>::Capacity;
+%ignore csArray<csPluginRequest>::DefaultCompare;
+%ignore csArray<csPluginRequest>::Delete;
+%ignore csArray<csPluginRequest>::DeleteAll;
+%ignore csArray<csPluginRequest>::DeleteFast;
+%ignore csArray<csPluginRequest>::Find;
+%ignore csArray<csPluginRequest>::FindKey;
+%ignore csArray<csPluginRequest>::FindSortedKey;
 %ignore csArray<csPluginRequest>::Get(size_t); // Non-const.
-%ignore csArray<csPluginRequest>::Top();       // Non-const.
+%ignore csArray<csPluginRequest>::GetExtend;
 %ignore csArray<csPluginRequest>::GetIndex;
+%ignore csArray<csPluginRequest>::GetIterator;
+%ignore csArray<csPluginRequest>::InitRegion;
+%ignore csArray<csPluginRequest>::InsertSorted;
+%ignore csArray<csPluginRequest>::Iterator;
+%ignore csArray<csPluginRequest>::Iterator;
+%ignore csArray<csPluginRequest>::PushSmart;
+%ignore csArray<csPluginRequest>::Put;
+%ignore csArray<csPluginRequest>::Section;
+%ignore csArray<csPluginRequest>::SetCapacity;
+%ignore csArray<csPluginRequest>::SetLength;
+%ignore csArray<csPluginRequest>::SetSize;
+%ignore csArray<csPluginRequest>::ShrinkBestFit;
+%ignore csArray<csPluginRequest>::Sort;
+%ignore csArray<csPluginRequest>::Top();       // Non-const.
+%ignore csArray<csPluginRequest>::TransferTo;
+%ignore csArray<csPluginRequest>::operator=;
+%ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
 #ifndef CS_MINI_SWIG
@@ -1027,7 +1058,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/terraform.h"
 
 %include "csutil/csobject.h"
-%include "csutil/strset.h"
 
 %include "cstool/csview.h"
 %include "cstool/collider.h"
