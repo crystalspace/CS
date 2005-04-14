@@ -20,6 +20,7 @@ CompileGroups bugplug    : walkall ;
 CompileGroups csconin    : walkall ;
 CompileGroups csfont     : walkall ;
 CompileGroups csgifimg   : walkall ;
+CompileGroups fontplex   : walkall ;
 if $(JPEG.AVAILABLE) = "yes"
 {
   CompileGroups csjpgimg : walkall ;
