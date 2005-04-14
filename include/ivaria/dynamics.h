@@ -495,6 +495,13 @@ struct iRigidBody : public iBase
   /// Get the physic properties. 0 parameters are ignored
   virtual void GetProperties (float* mass, csVector3* center,
     csMatrix3* inertia) = 0;
+  /// Get mass
+  virtual float GetMass () = 0;
+  /// Get center
+  virtual csVector3 GetCenter () = 0;
+  /// Get inertia
+  virtual csMatrix3 GetInertia () = 0;
+
   /// Set total mass to targetmass, and adjust properties
   virtual void AdjustTotalMass (float targetmass) = 0;
 

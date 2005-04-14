@@ -1284,7 +1284,26 @@ void csODERigidBody::GetProperties (float* mass,
      m.I[8], m.I[9], m.I[10]);
   }
 }
-
+float csODERigidBody::GetMass ()
+{
+  dMass m;
+  dBodyGetMass (bodyID, &m);
+  return m.mass;
+}
+csVector3 csODERigidBody::GetCenter ()
+{
+  dMass m;
+  dBodyGetMass (bodyID, &m);
+  return csVector3 (m.c[0], m.c[1], m.c[2]);
+}
+csMatrix3 csODERigidBody::GetInertia ()
+{
+  dMass m;
+  dBodyGetMass (bodyID, &m);
+  return csMatrix3 (m.I[0], m.I[1], m.I[2],
+                    m.I[4], m.I[5], m.I[6],
+                    m.I[8], m.I[9], m.I[10]);
+}
 void csODERigidBody::AdjustTotalMass (float targetmass)
 {
   dMass m;
@@ -1417,6 +1436,217 @@ void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 csRef<iRigidBody> csStrictODEJoint::GetAttachedBody (int b)
 {
   return (b == 0) ? body[0] : body[1];
+}
+void  csStrictODEJoint::SetParam (int joint_type, int parameter, int axis, float value)
+{
+  int param = parameter;
+
+  switch (axis) 
+  {
+    case 1:
+      switch (param)
+      {
+      case dParamLoStop:
+        param = dParamLoStop2;
+      break;
+      case dParamHiStop:
+        param = dParamHiStop2;
+      break;
+      case dParamVel:
+        param = dParamVel2;
+      break;
+      case dParamFMax:
+        param = dParamFMax2;
+      break;
+      case dParamFudgeFactor:
+        param = dParamFudgeFactor2;
+      break;
+      case dParamBounce:
+        param = dParamBounce2;
+      break;
+      case dParamCFM:
+        param = dParamCFM2;
+      break;
+      case dParamStopERP:
+        param = dParamStopERP2;
+      break;
+      case dParamStopCFM:
+        param = dParamStopCFM2;
+      break;
+      case dParamSuspensionERP:
+        param = dParamSuspensionERP2;
+      break;
+      case dParamSuspensionCFM:
+        param = dParamSuspensionCFM2;
+      break;
+      }
+      break;    
+
+    case 2:
+      switch (param)
+      {
+      case dParamLoStop:
+        param = dParamLoStop3;
+      break;
+      case dParamHiStop:
+        param = dParamHiStop3;
+      break;
+      case dParamVel:
+        param = dParamVel3;
+      break;
+      case dParamFMax:
+        param = dParamFMax3;
+      break;
+      case dParamFudgeFactor:
+        param = dParamFudgeFactor3;
+      break;
+      case dParamBounce:
+        param = dParamBounce3;
+      break;
+      case dParamCFM:
+        param = dParamCFM3;
+      break;
+      case dParamStopERP:
+        param = dParamStopERP3;
+      break;
+      case dParamStopCFM:
+        param = dParamStopCFM3;
+      break;
+      case dParamSuspensionERP:
+        param = dParamSuspensionERP3;
+      break;
+      case dParamSuspensionCFM:
+        param = dParamSuspensionCFM3;
+      break;
+      }
+      break;
+    default:
+      ; // do nothing
+  }
+
+  switch (joint_type)
+  {
+    case CS_ODE_JOINT_TYPE_HINGE:
+      dJointSetHingeParam (jointID, param, value);
+      break;
+    case CS_ODE_JOINT_TYPE_SLIDER:
+      dJointSetSliderParam (jointID, param, value);
+      break;
+    case CS_ODE_JOINT_TYPE_HINGE2:
+      dJointSetHinge2Param (jointID, param, value);
+      break;
+    case CS_ODE_JOINT_TYPE_AMOTOR:
+      dJointSetAMotorParam (jointID, param, value);
+      break;
+    default:
+      ; // do nothing
+  }
+}
+
+float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
+{
+  int param = parameter;
+
+  switch (axis) 
+  {
+    case 1:
+      switch (param)
+      {
+      case dParamLoStop:
+        param = dParamLoStop2;
+      break;
+      case dParamHiStop:
+        param = dParamHiStop2;
+      break;
+      case dParamVel:
+        param = dParamVel2;
+      break;
+      case dParamFMax:
+        param = dParamFMax2;
+      break;
+      case dParamFudgeFactor:
+        param = dParamFudgeFactor2;
+      break;
+      case dParamBounce:
+        param = dParamBounce2;
+      break;
+      case dParamCFM:
+        param = dParamCFM2;
+      break;
+      case dParamStopERP:
+        param = dParamStopERP2;
+      break;
+      case dParamStopCFM:
+        param = dParamStopCFM2;
+      break;
+      case dParamSuspensionERP:
+        param = dParamSuspensionERP2;
+      break;
+      case dParamSuspensionCFM:
+        param = dParamSuspensionCFM2;
+      break;
+      }
+      break;    
+
+    case 2:
+      switch (param)
+      {
+      case dParamLoStop:
+        param = dParamLoStop3;
+      break;
+      case dParamHiStop:
+        param = dParamHiStop3;
+      break;
+      case dParamVel:
+        param = dParamVel3;
+      break;
+      case dParamFMax:
+        param = dParamFMax3;
+      break;
+      case dParamFudgeFactor:
+        param = dParamFudgeFactor3;
+      break;
+      case dParamBounce:
+        param = dParamBounce3;
+      break;
+      case dParamCFM:
+        param = dParamCFM3;
+      break;
+      case dParamStopERP:
+        param = dParamStopERP3;
+      break;
+      case dParamStopCFM:
+        param = dParamStopCFM3;
+      break;
+      case dParamSuspensionERP:
+        param = dParamSuspensionERP3;
+      break;
+      case dParamSuspensionCFM:
+        param = dParamSuspensionCFM3;
+      break;
+      }
+      break;
+    default:
+      ; // do nothing
+  }
+
+  switch (joint_type)
+  {
+    case CS_ODE_JOINT_TYPE_HINGE:
+      return dJointGetHingeParam (jointID, param);
+      break;
+    case CS_ODE_JOINT_TYPE_SLIDER:
+      return dJointGetSliderParam (jointID, param);
+      break;
+    case CS_ODE_JOINT_TYPE_HINGE2:
+      return dJointGetHinge2Param (jointID, param);
+      break;
+    case CS_ODE_JOINT_TYPE_AMOTOR:
+      return dJointGetAMotorParam (jointID, param);
+      break;
+    default:
+      return 0.0; 
+  }
 }
 
 //-------------------------------------------------------------------------------

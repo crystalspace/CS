@@ -331,6 +331,106 @@ struct iODEJointState : public iBase
   virtual void SetHinge2Anchor (const csVector3& point) = 0;
 };
 
+/**
+ * General joint state. 
+ */
+struct iODEGenralJointState : public iBase
+{
+  /**
+   * Set low stop angle or position. For rotational joints, this 
+   * stop must be greater than - pi to be effective. 
+   */
+  virtual void SetLoStop (float value, int axis) = 0;
+  
+  /**
+   * Set high stop angle or position. For rotational joints, this stop must 
+   * be less than pi to be effective. If the high stop is less than the low 
+   * stop then both stops will be ineffective.
+   */
+  virtual void SetHiStop (float value, int axis) = 0;
+
+  /// Set desired motor velocity (this will be an angular or linear velocity).
+  virtual void SetVel (float value, int axis) = 0;
+  
+  /**
+   * Set the maximum force or torque that the motor will use to achieve the desired 
+   * velocity. This must always be greater than or equal to zero. Setting this to zero 
+   * turns off the motor.
+   */
+  virtual void SetFMax (float value, int axis) = 0;
+  
+  /**
+   * Set the fudge factor. The current joint stop/motor implementation has a small 
+   * problem: when the joint is at one stop and the motor is set to move it away from 
+   * the stop, too much force may be applied for one time step, causing a ``jumping'' 
+   * motion. This fudge factor is used to scale this excess force. It should have a value 
+   * between zero and one (the default value). If the jumping motion is too visible in a 
+   * joint, the value can be reduced. Making this value too small can prevent the motor 
+   * from being able to move the joint away from a stop.
+   */
+  virtual void SetFudgeFactor (float value, int axis) = 0;
+
+  /**
+   * Set the bouncyness of the stops. This is a restitution parameter in the range 0..1. 
+   * 0 means the stops are not bouncy at all, 1 means maximum bouncyness.
+   */
+  virtual void SetBounce (float value, int axis) = 0;
+
+  /// Set the constraint force mixing (CFM) value for joint used when not at a stop.
+  virtual void SetCFM (float value, int axis) = 0;
+
+  /// Set the error reduction parameter (ERP) used by the stops.
+  virtual void SetStopERP (float value, int axis) = 0;
+
+  /**
+   * Set the constraint force mixing (CFM) value for joint used by the stops. 
+   * Together with the ERP value this can be used to get spongy or soft stops. 
+   * Note that this is intended for unpowered joints, it does not really work as expected 
+   * when a powered joint reaches its limit.
+   */
+  virtual void SetStopCFM (float value, int axis) = 0;
+
+  /// Set suspension error reduction parameter (ERP). 
+  virtual void SetSuspensionERP (float value, int axis) = 0;
+  
+  /// Set suspension constraint force mixing (CFM) value.
+  virtual void SetSuspensionCFM (float value, int axis) = 0;
+
+  /// Get low stop angle or position.   
+  virtual float GetLoStop (int axis) = 0;
+
+  /// Get high stop angle or position.
+  virtual float GetHiStop (int axis) = 0;
+
+  /// Get desired motor velocity (this will be an angular or linear velocity).
+  virtual float GetVel (int axis) = 0;
+
+  /// Get the maximum force or torque that the motor will use to achieve the desired velocity.
+  virtual float GetFMax (int axis) = 0;
+  
+  ///Get the fudge factor.
+  virtual float GetFudgeFactor (int axis) = 0;
+
+  /// Get the bouncyness of the stops.
+  virtual float GetBounce (int axis) = 0;
+
+  /// Get the constraint force mixing (CFM) value for joint used when not at a stop.
+  virtual float GetCFM (int axis) = 0;
+
+  /// Get the error reduction parameter (ERP) used by the stops.
+  virtual float GetStopERP (int axis) = 0;
+
+  /// Get the constraint force mixing (CFM) value for joint used by the stops. 
+  virtual float GetStopCFM (int axis) = 0;
+
+  /// Get suspension error reduction parameter (ERP). 
+  virtual float GetSuspensionERP (int axis) = 0;
+
+  /// Get suspension constraint force mixing (CFM) value.
+  virtual float GetSuspensionCFM (int axis) = 0;
+
+};
+
 enum ODEAMotorMode
 {
   CS_ODE_AMOTOR_MODE_USER = dAMotorUser,
@@ -340,17 +440,17 @@ enum ODEAMotorMode
 SCF_VERSION (iODEAMotorJointState, 0, 0, 1);
 
 /**
-* ODE AMotor joint. An angular motor (AMotor) allows the relative 
-* angular velocities of two bodies to be controlled. The angular 
-* velocity can be controlled on up to three axes, allowing torque 
-* motors and stops to be set for rotation about those axes. This 
-* is mainly useful in conjunction with ball joints (which do not 
-* constrain the angular degrees of freedom at all), but it can be 
-* used in any situation where angular control is needed. To use an 
-* AMotor with a ball joint, simply attach it to the same two bodies 
-* that the ball joint is attached to.   
-*/
-struct iODEAMotorJoint : public iBase
+ * ODE AMotor joint. An angular motor (AMotor) allows the relative 
+ * angular velocities of two bodies to be controlled. The angular 
+ * velocity can be controlled on up to three axes, allowing torque 
+ * motors and stops to be set for rotation about those axes. This 
+ * is mainly useful in conjunction with ball joints (which do not 
+ * constrain the angular degrees of freedom at all), but it can be 
+ * used in any situation where angular control is needed. To use an 
+ * AMotor with a ball joint, simply attach it to the same two bodies 
+ * that the ball joint is attached to.   
+ */
+struct iODEAMotorJoint : public iODEGenralJointState
 {
 
   /**
@@ -451,6 +551,7 @@ struct iODEAMotorJoint : public iBase
   
   /// Get an attached body (valid values for body are 0 and 1)
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+
 };
 
 SCF_VERSION (iODEHingeJointState, 0, 0, 1);
@@ -458,7 +559,7 @@ SCF_VERSION (iODEHingeJointState, 0, 0, 1);
 /**
  * ODE hinge joint (contrainted translation and 1 free rotation axis).  
  */
-struct iODEHingeJoint : public iBase
+struct iODEHingeJoint : public iODEGenralJointState
 {
   /**
    * Set the joint anchor point. The joint will try to keep this point

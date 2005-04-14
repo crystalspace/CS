@@ -595,6 +595,12 @@ public:
     { scfParent->SetProperties (mass, center, inertia); }
     void GetProperties (float* mass, csVector3* center, csMatrix3* inertia) 
     { scfParent->GetProperties (mass, center, inertia); }
+    float GetMass () 
+    { return scfParent->GetMass (); }
+    csVector3 GetCenter () 
+    { return scfParent->GetCenter (); }
+    csMatrix3 GetInertia () 
+    { return scfParent->GetInertia (); }
     void AdjustTotalMass (float targetmass) 
     { scfParent->AdjustTotalMass (targetmass); }
     void AddForce (const csVector3& force) 
@@ -682,6 +688,9 @@ public:
   	const csMatrix3& inertia);
   void GetProperties (float* mass, csVector3* center,
     csMatrix3* inertia);
+  float GetMass ();
+  csVector3 GetCenter ();
+  csMatrix3 GetInertia ();
   void AdjustTotalMass (float targetmass);
 
   void AddForce (const csVector3& force);
@@ -718,6 +727,9 @@ struct csStrictODEJoint
   dBodyID bodyID[2];
   void Attach (iRigidBody *body1, iRigidBody *body2);
   csRef<iRigidBody> GetAttachedBody (int body);
+  void SetParam (int joint_type, int param, int axis, float value);
+  float GetParam (int joint_type, int param, int axis);
+
 };
 
 /**
@@ -750,6 +762,52 @@ struct ODEAMotorJoint : public csStrictODEJoint, iODEAMotorJoint
   ODEAMotorJoint (dWorldID w_id);
   virtual ~ODEAMotorJoint ();
 
+  void SetLoStop (float value, int axis) 
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis, value);};
+  void SetHiStop (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis, value);};
+  void SetVel (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamVel, axis, value);};
+  void SetFMax (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFMax, axis, value);};
+  void SetFudgeFactor (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFudgeFactor, axis, value);};
+  void SetBounce (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamBounce, axis, value);};
+  void SetCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamCFM, axis, value);};
+  void SetStopERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopERP, axis, value);};
+  void SetStopCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopCFM, axis, value);};
+  void SetSuspensionERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionERP, axis, value);};
+  void SetSuspensionCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis, value);};
+
+  float GetLoStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis);};
+  float GetHiStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis);};
+  float GetVel (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamVel, axis);};
+  float GetFMax (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFMax, axis);};
+  float GetFudgeFactor (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFudgeFactor, axis);};
+  float GetBounce (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamBounce, axis);};
+  float GetCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamCFM, axis);};
+  float GetStopERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopERP, axis);};
+  float GetStopCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopCFM, axis);};
+  float GetSuspensionERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionERP, axis);};
+  virtual float GetSuspensionCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis);};
+
   void SetAMotorMode (ODEAMotorMode mode) {dJointSetAMotorMode (jointID, mode);};
   ODEAMotorMode GetAMotorMode () { return (ODEAMotorMode)dJointGetAMotorMode (jointID);};
   void SetAMotorNumAxes (int axis_num) {dJointSetAMotorNumAxes (jointID, axis_num);};
@@ -775,6 +833,52 @@ struct ODEHingeJoint : public csStrictODEJoint, iODEHingeJoint
 
   ODEHingeJoint (dWorldID w_id);
   virtual ~ODEHingeJoint ();
+
+  void SetLoStop (float value, int axis) 
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamLoStop, axis, value);};
+  void SetHiStop (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamHiStop, axis, value);};
+  void SetVel (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamVel, axis, value);};
+  void SetFMax (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFMax, axis, value);};
+  void SetFudgeFactor (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFudgeFactor, axis, value);};
+  void SetBounce (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamBounce, axis, value);};
+  void SetCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamCFM, axis, value);};
+  void SetStopERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopERP, axis, value);};
+  void SetStopCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopCFM, axis, value);};
+  void SetSuspensionERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionERP, axis, value);};
+  void SetSuspensionCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionCFM, axis, value);};
+
+  float GetLoStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamLoStop, axis);};
+  float GetHiStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamHiStop, axis);};
+  float GetVel (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamVel, axis);};
+  float GetFMax (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFMax, axis);};
+  float GetFudgeFactor (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFudgeFactor, axis);};
+  float GetBounce (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamBounce, axis);};
+  float GetCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamCFM, axis);};
+  float GetStopERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopERP, axis);};
+  float GetStopCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopCFM, axis);};
+  float GetSuspensionERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionERP, axis);};
+  virtual float GetSuspensionCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionCFM, axis);};
 
   void SetHingeAnchor (const csVector3 &pos) {dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);};
   void SetHingeAxis (const csVector3 &axis) {dJointSetHingeAxis (jointID, axis.x, axis.y, axis.z);};
