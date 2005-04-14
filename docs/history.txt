@@ -11,6 +11,7 @@ chronological order.
 	  csStringSet which caused compilation failure in Swig-generated code.
 	- Jorrit fixed the font plex config in walktest.cfg.
 	- Jorrit enabled multiplexer for bindox and xmlread for walktest.cfg.
+	- res added the fontplex plugin to the walkall target.
 13-Apr-2005
 	- res made the following changes:
 	    - Moved keycolor baking out of csImageManipulate into its own 
