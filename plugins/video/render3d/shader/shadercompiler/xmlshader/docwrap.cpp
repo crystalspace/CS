@@ -129,271 +129,275 @@ struct csWrappedDocumentNode::NodeProcessingState
 
 //#define DUMP_CONDITION_IDS
 
+void csWrappedDocumentNode::ProcessSingleWrappedNode (
+  NodeProcessingState* state, iDocumentNode* node)
+{
+  const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_ERROR;
+  csArray<WrapperStackEntry>& wrapperStack = state->wrapperStack;
+  WrapperStackEntry& currentWrapper = state->currentWrapper;
+  bool handled = false;
+  if (node->GetType() == CS_NODE_UNKNOWN)
+  {
+    csString replaceScratch;
+    const char* nodeValue = ReplaceEntities (node->GetValue(),
+      replaceScratch);
+    if ((nodeValue != 0) && (*nodeValue == '?') && 
+      (*(nodeValue + strlen (nodeValue) - 1) == '?'))
+    {
+      const char* valStart = nodeValue + 1;
+      while (*valStart == ' ') valStart++;
+      CS_ASSERT (*valStart != 0);
+      size_t valLen = strlen (valStart) - 1;
+      if (valLen == 0)
+      {
+	Report (syntaxErrorSeverity, node,
+	  "Empty processing instruction");
+      }
+      else
+      {
+	while (*(valStart + valLen - 1) == ' ') valLen--;
+	const char* space = strchr (valStart, ' ');
+	/* The rightmost spaces were skipped and don't interest us
+	    any more. */
+	if (space >= valStart + valLen) space = 0;
+	size_t cmdLen;
+	if (space != 0)
+	{
+	  cmdLen = space - valStart;
+	}
+	else
+	{
+	  cmdLen = valLen;
+	}
+
+	if (TokenEquals (valStart, cmdLen, "if"))
+	{
+	  WrapperStackEntry newWrapper;
+	  newWrapper.child = new WrappedChild;
+	  const char* result = resolver->ParseCondition (space + 1,
+	    valLen - cmdLen - 1, newWrapper.child->condition);
+	  if (result)
+	  {
+	    csString condStr;
+	    condStr.Append (space + 1, valLen - cmdLen);
+	    Report (syntaxErrorSeverity, node,
+	      "Error parsing condition '%s': %s", condStr.GetData(),
+	      result);
+	    newWrapper.child->condition = csCondAlwaysFalse;
+	  }
+#ifdef DUMP_CONDITION_IDS
+	  csPrintf ("condition %s = %zu\n", 
+	    csString().Append (valStart, valLen).GetDataSafe (),
+	    newWrapper.child->condition);
+#endif
+      
+	  resolver->AddNode (
+	    currentWrapper.condNodes[currentWrapper.currentCondNode], 
+	    newWrapper.child->condition, newWrapper.condNodes[0], 
+	    newWrapper.condNodes[1]);
+
+	  currentWrapper.child->childrenWrappers.Push (newWrapper.child);
+	  wrapperStack.Push (currentWrapper);
+	  currentWrapper = newWrapper;
+	}
+	else if (TokenEquals (valStart, cmdLen, "endif"))
+	{
+	  bool okay = true;
+	  if (space != 0)
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "'endif' has parameters");
+	    okay = false;
+	  }
+	  if (okay && (wrapperStack.Length() == 0))
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "'endif' without 'if' or 'elsif'");
+	    okay = false;
+	  }
+	  if (okay)
+	    currentWrapper = wrapperStack.Pop ();
+	}
+	else if (TokenEquals (valStart, cmdLen, "else"))
+	{
+	  bool okay = true;
+	  if (space != 0)
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "'else' has parameters");
+	    okay = false;
+	  }
+	  if (okay && (wrapperStack.Length() == 0))
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "'else' without 'if' or 'elsif'");
+	    okay = false;
+	  }
+	  if (okay && (currentWrapper.currentCondNode != 0))
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "Double 'else'");
+	    okay = false;
+	  }
+	  if (okay)
+	  {
+	    //currentWrapper.currentCondNode = 1;
+	    WrapperStackEntry oldCurrentWrapper = currentWrapper;
+	    currentWrapper = wrapperStack.Pop ();
+	    WrapperStackEntry newWrapper = oldCurrentWrapper;
+	    newWrapper.child = new WrappedChild;
+	    newWrapper.currentCondNode = 1;
+	    newWrapper.child->condition = oldCurrentWrapper.child->condition;
+	    newWrapper.child->conditionValue = false;
+
+	    currentWrapper.child->childrenWrappers.Push (newWrapper.child);
+	    wrapperStack.Push (currentWrapper);
+	    currentWrapper = newWrapper;
+	  }
+	}
+	else if (TokenEquals (valStart, cmdLen, "elsif"))
+	{
+	  bool okay = true;
+	  if (wrapperStack.Length() == 0)
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "'elsif' without 'if' or 'elsif'");
+	    okay = false;
+	  }
+	  if (okay && (currentWrapper.currentCondNode != 0))
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "Double 'else'");
+	    okay = false;
+	  }
+	  if (okay)
+	  {
+	    //currentWrapper.currentCondNode = 1;
+	    WrapperStackEntry oldCurrentWrapper = currentWrapper;
+	    currentWrapper = wrapperStack.Pop ();
+	    WrapperStackEntry elseWrapper = oldCurrentWrapper;
+	    elseWrapper.child = new WrappedChild;
+	    elseWrapper.currentCondNode = 1;
+	    elseWrapper.child->condition = oldCurrentWrapper.child->condition;
+	    elseWrapper.child->conditionValue = false;
+
+	    currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
+
+	    WrapperStackEntry newWrapper;
+	    newWrapper.child = new WrappedChild;
+	    const char* result = resolver->ParseCondition (space + 1,
+	      valLen - cmdLen - 1, newWrapper.child->condition);
+	    if (result)
+	    {
+	      csString condStr;
+	      condStr.Append (space + 1, valLen - cmdLen);
+	      Report (syntaxErrorSeverity, node,
+		"Error parsing condition '%s': %s", condStr.GetData(),
+		result);
+	    }
+#ifdef DUMP_CONDITION_IDS
+	  csPrintf ("condition %s = %zu\n", 
+	    csString().Append (valStart, valLen).GetDataSafe (),
+	    newWrapper.child->condition);
+#endif
+      
+	    resolver->AddNode (
+	      elseWrapper.condNodes[elseWrapper.currentCondNode], 
+	      newWrapper.child->condition, newWrapper.condNodes[0], 
+	      newWrapper.condNodes[1]);
+
+	    elseWrapper.child->childrenWrappers.Push (newWrapper.child);
+	    wrapperStack.Push (elseWrapper);
+	    currentWrapper = newWrapper;
+	  }
+	}
+	else if (TokenEquals (valStart, cmdLen, "include"))
+	{
+	  bool okay = true;
+	  csString filename;
+	  const char* space = strchr (valStart, ' ');
+	  /* The rightmost spaces were skipped and don't interest us
+	    any more. */
+          if (space != 0)
+	  {
+	    filename.Replace (space + 1, valLen - cmdLen - 1);
+	    filename.Trim ();
+	  }
+	  if ((space == 0) || (filename.IsEmpty ()))
+	  {
+	    Report (syntaxErrorSeverity, node,
+	      "'include' without filename");
+	    okay = false;
+	  }
+	  if (okay)
+	  {
+	    csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+	    CS_ASSERT (vfs.IsValid ());
+	    csRef<iFile> include = vfs->Open (filename, VFS_FILE_READ);
+	    if (!include.IsValid ())
+	    {
+	      Report (syntaxErrorSeverity, node,
+		"could not open '%s'", filename.GetData ());
+	    }
+	    else
+	    {
+	      csRef<iDocumentSystem> docsys (
+		CS_QUERY_REGISTRY(objreg, iDocumentSystem));
+	      if (docsys == 0)
+		docsys.AttachNew (new csTinyDocumentSystem ());
+
+	      csRef<iDocument> includeDoc = docsys->CreateDocument ();
+	      const char* err = includeDoc->Parse (include, true);
+	      if (err != 0)
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "error parsing '%s': %s", filename.GetData (), err);
+	      }
+	      else
+	      {
+		csRef<iDocumentNode> includeNode = includeDoc->GetRoot ();
+		csRef<iDocumentNodeIterator> it = includeNode->GetNodes ();
+		while (it->HasNext ())
+		{
+		  csRef<iDocumentNode> child = it->Next ();
+		  ProcessSingleWrappedNode (state, child);
+		}
+	      }
+	    }
+	  }
+	}
+	else
+	{
+	  csString cmdStr;
+	  cmdStr.Append (valStart, cmdLen);
+	  Report (syntaxErrorSeverity, node,
+	    "Unknown command '%s'", cmdStr.GetData());
+	}
+
+	handled = true;
+      }
+    }
+  }
+  if (!handled)
+  {
+    WrappedChild* newWrapper = new WrappedChild;
+    newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
+      this, shared));
+    currentWrapper.child->childrenWrappers.Push (newWrapper);
+  }
+}
+
 void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state, 
 						iDocumentNode* wrappedNode)
 {
-  const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_ERROR;
-
   if ((wrappedNode->GetType() == CS_NODE_ELEMENT)
     || (wrappedNode->GetType () == CS_NODE_DOCUMENT))
   {
-    csArray<WrapperStackEntry>& wrapperStack = state->wrapperStack;
-    WrapperStackEntry& currentWrapper = state->currentWrapper;
-    
     csRef<iDocumentNodeIterator> iter = wrappedNode->GetNodes ();
     while (iter->HasNext ())
     {
-      bool handled = false;
       csRef<iDocumentNode> node = iter->Next();
-      if (node->GetType() == CS_NODE_UNKNOWN)
-      {
-	csString replaceScratch;
-	const char* nodeValue = ReplaceEntities (node->GetValue(),
-	  replaceScratch);
-	if ((nodeValue != 0) && (*nodeValue == '?') && 
-	  (*(nodeValue + strlen (nodeValue) - 1) == '?'))
-	{
-	  const char* valStart = nodeValue + 1;
-	  while (*valStart == ' ') valStart++;
-	  CS_ASSERT (*valStart != 0);
-	  size_t valLen = strlen (valStart) - 1;
-	  if (valLen == 0)
-	  {
-	    Report (syntaxErrorSeverity, node,
-	      "Empty processing instruction");
-	  }
-	  else
-	  {
-	    while (*(valStart + valLen - 1) == ' ') valLen--;
-	    const char* space = strchr (valStart, ' ');
-	    /* The rightmost spaces were skipped and don't interest us
-	       any more. */
-	    if (space >= valStart + valLen) space = 0;
-	    size_t cmdLen;
-	    if (space != 0)
-	    {
-	      cmdLen = space - valStart;
-	    }
-	    else
-	    {
-	      cmdLen = valLen;
-	    }
-
-	    if (TokenEquals (valStart, cmdLen, "if"))
-	    {
-	      WrapperStackEntry newWrapper;
-	      newWrapper.child = new WrappedChild;
-	      const char* result = resolver->ParseCondition (space + 1,
-		valLen - cmdLen - 1, newWrapper.child->condition);
-	      if (result)
-	      {
-		csString condStr;
-		condStr.Append (space + 1, valLen - cmdLen);
-		Report (syntaxErrorSeverity, node,
-		  "Error parsing condition '%s': %s", condStr.GetData(),
-		  result);
-		newWrapper.child->condition = csCondAlwaysFalse;
-	      }
-#ifdef DUMP_CONDITION_IDS
-	      csPrintf ("condition %s = %zu\n", 
-		csString().Append (valStart, valLen).GetDataSafe (),
-		newWrapper.child->condition);
-#endif
-    	  
-	      resolver->AddNode (
-		currentWrapper.condNodes[currentWrapper.currentCondNode], 
-		newWrapper.child->condition, newWrapper.condNodes[0], 
-		newWrapper.condNodes[1]);
-
-	      currentWrapper.child->childrenWrappers.Push (newWrapper.child);
-	      wrapperStack.Push (currentWrapper);
-	      currentWrapper = newWrapper;
-	    }
-	    else if (TokenEquals (valStart, cmdLen, "endif"))
-	    {
-	      bool okay = true;
-	      if (space != 0)
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'endif' has parameters");
-		okay = false;
-	      }
-	      if (okay && (wrapperStack.Length() == 0))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'endif' without 'if' or 'elsif'");
-		okay = false;
-	      }
-	      if (okay)
-		currentWrapper = wrapperStack.Pop ();
-	    }
-	    else if (TokenEquals (valStart, cmdLen, "else"))
-	    {
-	      bool okay = true;
-	      if (space != 0)
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'else' has parameters");
-		okay = false;
-	      }
-	      if (okay && (wrapperStack.Length() == 0))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'else' without 'if' or 'elsif'");
-		okay = false;
-	      }
-	      if (okay && (currentWrapper.currentCondNode != 0))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "Double 'else'");
-		okay = false;
-	      }
-	      if (okay)
-	      {
-		//currentWrapper.currentCondNode = 1;
-		WrapperStackEntry oldCurrentWrapper = currentWrapper;
-		currentWrapper = wrapperStack.Pop ();
-		WrapperStackEntry newWrapper = oldCurrentWrapper;
-		newWrapper.child = new WrappedChild;
-		newWrapper.currentCondNode = 1;
-		newWrapper.child->condition = oldCurrentWrapper.child->condition;
-		newWrapper.child->conditionValue = false;
-
-		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
-		wrapperStack.Push (currentWrapper);
-		currentWrapper = newWrapper;
-	      }
-	    }
-	    else if (TokenEquals (valStart, cmdLen, "elsif"))
-	    {
-	      bool okay = true;
-	      if (wrapperStack.Length() == 0)
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'elsif' without 'if' or 'elsif'");
-		okay = false;
-	      }
-	      if (okay && (currentWrapper.currentCondNode != 0))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "Double 'else'");
-		okay = false;
-	      }
-	      if (okay)
-	      {
-		//currentWrapper.currentCondNode = 1;
-		WrapperStackEntry oldCurrentWrapper = currentWrapper;
-		currentWrapper = wrapperStack.Pop ();
-		WrapperStackEntry elseWrapper = oldCurrentWrapper;
-		elseWrapper.child = new WrappedChild;
-		elseWrapper.currentCondNode = 1;
-		elseWrapper.child->condition = oldCurrentWrapper.child->condition;
-		elseWrapper.child->conditionValue = false;
-
-		currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
-
-		WrapperStackEntry newWrapper;
-		newWrapper.child = new WrappedChild;
-		const char* result = resolver->ParseCondition (space + 1,
-		  valLen - cmdLen - 1, newWrapper.child->condition);
-		if (result)
-		{
-		  csString condStr;
-		  condStr.Append (space + 1, valLen - cmdLen);
-		  Report (syntaxErrorSeverity, node,
-		    "Error parsing condition '%s': %s", condStr.GetData(),
-		    result);
-		}
-#ifdef DUMP_CONDITION_IDS
-	      csPrintf ("condition %s = %zu\n", 
-		csString().Append (valStart, valLen).GetDataSafe (),
-		newWrapper.child->condition);
-#endif
-      	  
-		resolver->AddNode (
-		  elseWrapper.condNodes[elseWrapper.currentCondNode], 
-		  newWrapper.child->condition, newWrapper.condNodes[0], 
-		  newWrapper.condNodes[1]);
-
-		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
-		wrapperStack.Push (elseWrapper);
-		currentWrapper = newWrapper;
-	      }
-	    }
-	    else if (TokenEquals (valStart, cmdLen, "include"))
-	    {
-	      bool okay = true;
-	      csString filename;
-	      const char* space = strchr (valStart, ' ');
-	      /* The rightmost spaces were skipped and don't interest us
-		any more. */
-              if (space != 0)
-	      {
-		filename.Replace (space + 1, valLen - cmdLen - 1);
-		filename.Trim ();
-	      }
-	      if ((space == 0) || (filename.IsEmpty ()))
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "'include' without filename");
-		okay = false;
-	      }
-	      if (okay)
-	      {
-		csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
-		CS_ASSERT (vfs.IsValid ());
-		csRef<iFile> include = vfs->Open (filename, VFS_FILE_READ);
-		if (!include.IsValid ())
-		{
-		  Report (syntaxErrorSeverity, node,
-		    "could not open '%s'", filename.GetData ());
-		}
-		else
-		{
-		  csRef<iDocumentSystem> docsys (
-		    CS_QUERY_REGISTRY(objreg, iDocumentSystem));
-		  if (docsys == 0)
-		    docsys.AttachNew (new csTinyDocumentSystem ());
-
-		  csRef<iDocument> includeDoc = docsys->CreateDocument ();
-		  const char* err = includeDoc->Parse (include, true);
-		  if (err != 0)
-		  {
-		    Report (syntaxErrorSeverity, node,
-		      "error parsing '%s': %s", filename.GetData (), err);
-		  }
-		  else
-		  {
-		    csRef<iDocumentNode> includeNode = includeDoc->GetRoot ();
-		    csRef<iDocumentNodeIterator> it = includeNode->GetNodes ();
-		    while (it->HasNext ())
-		    {
-		      csRef<iDocumentNode> child = it->Next ();
-		      ProcessWrappedNode (state, child);
-		    }
-		  }
-		}
-	      }
-	    }
-	    else
-	    {
-	      csString cmdStr;
-	      cmdStr.Append (valStart, cmdLen);
-	      Report (syntaxErrorSeverity, node,
-		"Unknown command '%s'", cmdStr.GetData());
-	    }
-
-	    handled = true;
-	  }
-	}
-      }
-      if (!handled)
-      {
-	WrappedChild* newWrapper = new WrappedChild;
-	newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
-	  this, shared));
-	currentWrapper.child->childrenWrappers.Push (newWrapper);
-      }
+      ProcessSingleWrappedNode (state, node);
     }
   }
 }

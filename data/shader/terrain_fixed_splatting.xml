@@ -40,6 +40,8 @@
         </fixedfp>
       </fp>
     </pass>
+    <!-- @@@ Fog currently sucks -->
+    <?include snippets/fog-pass.inc ?>
   </technique>
   
   <!-- Some HW doesn't even handle the linear fog correctly at all. 

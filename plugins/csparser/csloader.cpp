@@ -5020,11 +5020,14 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   csRef<iDocumentNode> shaderNode;
   csRef<iDocumentNode> fileChild = node->GetNode ("file");
 
+  bool vfsPop = false;
+  csRef<iVFS> vfs;
+
   if (fileChild)
   {
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-    csRef<iFile> shaderFile = vfs->Open (
-      fileChild->GetContentsValue (), VFS_FILE_READ);
+    vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csString filename (fileChild->GetContentsValue ());
+    csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
 
     if(!shaderFile)
     {
@@ -5048,6 +5051,13 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       return false;
     }
     shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+    size_t slash = filename.FindLast ('/');
+    if (slash != (size_t)-1)
+    {
+      vfsPop = true;
+      vfs->PushDir();
+      vfs->ChDir (filename.Slice (0, slash+1));
+    }
   }
   else
   {
@@ -5072,6 +5082,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
   csRef<iShader> shader = shcom->CompileShader (shaderNode);
+  if (vfsPop && vfs) vfs->PopDir();
   if (shader)
   {
     shader->SetFileName(fileChild->GetContentsValue ());

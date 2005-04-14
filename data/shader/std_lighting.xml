@@ -23,18 +23,13 @@
 	  <buffer source="texture coordinate lightmap" destination="texture coordinate lightmap" />
 	  <texture name="tex lightmap" destination="lightmap" />
 	<?endif?>
-	<?if vars."fog density".float &gt; 0 ?>
-	  <texture name="standardtex fog" destination="pea soup" />
-	<?endif?>
+	<?include snippets/fog-mappings.inc ?>
 	<vp plugin="glfixed">
 	  <fixedvp>
 	    <?if !vars."tex diffuse".texture ?>
 	      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
 	    <?endif?>
-	    <?if vars."fog density".float &gt; 0 ?>
-	      <texgen type="fog" layer="pea soup"/>
-	      <constantcolor layer="pea soup" type="shadervar">fog color</constantcolor>
-	    <?endif?>
+	    <?include snippets/fog-fvp.inc ?>
 	  </fixedvp>
 	</vp>
 	<fp plugin="glfixed">
@@ -65,16 +60,7 @@
 		<alphaoperation operation="replace" />
 	      </layer>
 	    <?endif?>
-	    <?if vars."fog density".float &gt; 0 ?>
-	      <layer name="pea soup">
-		<colorsource num="0" source="constant color" modifier="color"/>
-		<colorsource num="1" source="previous layer" modifier="color"/>
-		<colorsource num="2" source="texture" modifier="alpha"/>
-		<coloroperation operation="interpolate" />
-		<alphasource num="0" source="previous layer" modifier="alpha"/>
-		<alphaoperation operation="replace"/>
-	      </layer>
-	    <?endif?>
+	    <?include snippets/fog-ffp.inc ?>
 	  </fixedfp>
 	</fp>
       </pass>
@@ -105,28 +91,6 @@
             <texture name="tex lightmap" destination="unit 0" />
         </pass>
       <?endif?>
-      <?if vars."fog density".float &gt; 0 ?>
-        <pass>
-          <mixmode><alpha /></mixmode><!-- @@@ probably not always desired -->
-          <zmode><zmesh2 /></zmode>
-          <texture name="standardtex fog" destination="unit 0" />
-          <vp plugin="glfixed">
-            <fixedvp>
-              <texgen type="fog" layer="0"/>
-              <constantcolor layer="0" type="shadervar">fog color</constantcolor>
-            </fixedvp>
-          </vp>
-          <fp plugin="glfixed">
-            <fixedfp>
-              <layer>
-                <colorsource num="0" source="constant color" modifier="color"/>
-                <coloroperation operation="replace" />
-                <alphasource num="0" source="texture" modifier="alpha"/>
-                <alphaoperation operation="replace" />
-              </layer>
-            </fixedfp>
-          </fp>
-        </pass>
-      <?endif?>
+      <?include snippets/fog-pass.inc ?>
     </technique>
 </shader>

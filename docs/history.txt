@@ -12,6 +12,12 @@ chronological order.
 	- Jorrit fixed the font plex config in walktest.cfg.
 	- Jorrit enabled multiplexer for bindox and xmlread for walktest.cfg.
 	- res added the fontplex plugin to the walkall target.
+	- res made some fixes so shader inclusion (via <?include?>) of 
+	  relative paths works.
+	- res made a pathetic attempt to modularize shaders by putting some
+	  fog stuff into include files.
+	- res augmented the fixed terrain shader to support fog - isn't 
+	  correct yet, though.
 13-Apr-2005
 	- res made the following changes:
 	    - Moved keycolor baking out of csImageManipulate into its own 

@@ -134,6 +134,7 @@ class csWrappedDocumentNode : public iDocumentNode
   friend class WrapperWalker;
 
   struct NodeProcessingState;
+  void ProcessSingleWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode ();
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
