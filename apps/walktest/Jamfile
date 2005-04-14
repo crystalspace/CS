@@ -35,10 +35,6 @@ CompileGroups dynavis    : walkall ;
 CompileGroups engine     : walkall ;
 CompileGroups engseq     : walkall ;
 CompileGroups fontplex   : walkall ;
-if $(FT2.AVAILABLE) = "yes"
-{
-  CompileGroups freefnt2 : walkall ;
-}
 CompileGroups frustvis   : walkall ;
 CompileGroups imgplex    : walkall ; 
 CompileGroups meshes     : walkall ; 
