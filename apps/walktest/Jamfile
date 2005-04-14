@@ -20,7 +20,6 @@ CompileGroups bugplug    : walkall ;
 CompileGroups csconin    : walkall ;
 CompileGroups csfont     : walkall ;
 CompileGroups csgifimg   : walkall ;
-CompileGroups fontplex   : walkall ;
 if $(JPEG.AVAILABLE) = "yes"
 {
   CompileGroups csjpgimg : walkall ;
@@ -44,7 +43,6 @@ CompileGroups opcode     : walkall ;
 CompileGroups reporter   : walkall ;
 CompileGroups sequence   : walkall ;
 CompileGroups simpcon    : walkall ;
-CompileGroups softcanvas : walkall ;
 CompileGroups stdpt      : walkall ;
 CompileGroups stdrep     : walkall ;
 if $(ZLIB.AVAILABLE) = "yes"
