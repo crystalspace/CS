@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/bakekeycolor.h"
 #include "csgfx/csimgvec.h"
 #include "csgfx/csrgbvct.h"
 #include "csgfx/gradient.h"
