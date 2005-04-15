@@ -31,7 +31,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"

@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "ivideo/codec.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "iutil/plugin.h"
 
 struct iSector;

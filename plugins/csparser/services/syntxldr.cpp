@@ -49,7 +49,7 @@
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "imap/ldrctxt.h"
 
 // Only used for unit-testing. The parser does not otherwise

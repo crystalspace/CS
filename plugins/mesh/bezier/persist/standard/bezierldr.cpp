@@ -41,7 +41,7 @@
 #include "ivideo/material.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "ivaria/reporter.h"
 #include "bezierldr.h"
 #include "csqint.h"

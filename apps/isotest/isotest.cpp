@@ -34,7 +34,7 @@
 #include "iengine/sector.h"
 #include "iengine/texture.h"
 #include "igraphic/imageio.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
 #include "iutil/csinput.h"

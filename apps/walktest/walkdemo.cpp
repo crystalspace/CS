@@ -58,7 +58,7 @@
 #include "imesh/rain.h"
 #include "imesh/spiral.h"
 #include "imesh/sprite3d.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 
 extern WalkTest* Sys;
 

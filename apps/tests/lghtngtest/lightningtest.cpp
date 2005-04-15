@@ -46,7 +46,7 @@
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
 #include "igraphic/imageio.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"

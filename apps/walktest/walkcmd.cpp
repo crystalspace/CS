@@ -65,7 +65,7 @@
 #include "iengine/portalcontainer.h"
 #include "iengine/sharevar.h"
 #include "imesh/object.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "imap/saver.h"
 
 #include "ivaria/mapnode.h"

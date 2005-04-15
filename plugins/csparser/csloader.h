@@ -22,7 +22,7 @@
 
 #include <stdarg.h>
 #include "ivideo/graph3d.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/util.h"

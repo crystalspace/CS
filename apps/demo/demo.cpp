@@ -52,7 +52,7 @@
 #include "imesh/stars.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"

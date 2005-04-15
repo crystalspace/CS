@@ -42,7 +42,7 @@
 #include "iengine/movable.h"
 #include "iengine/region.h"
 #include "iengine/sector.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "imap/writer.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"

@@ -28,6 +28,7 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs csutil   getopt.h    ]
   [ ConcatDirs csutil   objpool.h   ]
   [ ConcatDirs csutil   zip.h       ]
+  [ ConcatDirs imap     parser.h    ]
   [ ConcatDirs inetwork vosapi.h    ]
   [ ConcatDirs ivaria   ode.h       ]
   [ ConcatDirs ivideo   wxwin.h     ]

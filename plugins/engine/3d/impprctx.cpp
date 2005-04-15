@@ -30,7 +30,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/graph2d.h"
-//#include "imap/parser.h"
+//#include "imap/loader.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/sector.h"

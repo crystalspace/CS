@@ -34,7 +34,7 @@
 #include "iengine/light.h"
 #include "iengine/sector.h"
 #include "igraphic/imageio.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/csinput.h"
