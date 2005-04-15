@@ -1005,7 +1005,10 @@ bool csEngine::HandleEvent (iEvent &Event)
             csRef<iShaderCompiler> shcom (ShaderManager->
               GetCompiler ("XMLShader"));
 
-	    char const* shaderPath = "/shader/std_lighting.xml";
+	    // @@@ Standard shader loading here?
+	    VFS->PushDir();
+	    VFS->ChDir ("/shader/");
+	    char const* shaderPath = "std_lighting.xml";
             csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
 	    if (shaderFile.IsValid())
 	      shaderDoc->Parse (shaderFile, true);
@@ -1016,6 +1019,7 @@ bool csEngine::HandleEvent (iEvent &Event)
               GetNode ("shader"));
             ShaderManager->RegisterShader (default_shader);
             default_shadertype = Strings->Request ("standard");
+	    VFS->PopDir();
 
             shaderDoc = docsys->CreateDocument ();
             shaderPath = "/shader/std_lighting_portal.xml";
