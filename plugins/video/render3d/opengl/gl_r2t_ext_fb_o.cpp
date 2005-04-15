@@ -155,7 +155,7 @@ void csGLRender2TextureEXTfbo::FinishDraw ()
     rt_onscreen = false;
   csGLRender2TextureFramebuf::FinishDraw();
 
-  csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-    render_target->GetPrivateObject ();
+  //csGLTextureHandle* tex_mm = (csGLTextureHandle *)
+  //  render_target->GetPrivateObject ();
   //tex_mm->SetNeedMips (true);
 }
