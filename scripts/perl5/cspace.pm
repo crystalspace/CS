@@ -500,7 +500,6 @@ sub DESTROY {
 *Clear = *cspacec::csStringSet_Clear;
 *GetSize = *cspacec::csStringSet_GetSize;
 *IsEmpty = *cspacec::csStringSet_IsEmpty;
-*GetIterator = *cspacec::csStringSet_GetIterator;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -2797,7 +2796,6 @@ sub new {
 
 *GetSize = *cspacec::csPluginRequestArray_GetSize;
 *Length = *cspacec::csPluginRequestArray_Length;
-*SetSize = *cspacec::csPluginRequestArray_SetSize;
 *Get = *cspacec::csPluginRequestArray_Get;
 *Push = *cspacec::csPluginRequestArray_Push;
 *Pop = *cspacec::csPluginRequestArray_Pop;
@@ -2810,7 +2808,6 @@ sub new {
 *DeleteIndex = *cspacec::csPluginRequestArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
-*DeleteFast = *cspacec::csPluginRequestArray_DeleteFast;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12108,6 +12105,9 @@ package cspace::iRigidBody;
 *GetAngularVelocity = *cspacec::iRigidBody_GetAngularVelocity;
 *SetProperties = *cspacec::iRigidBody_SetProperties;
 *GetProperties = *cspacec::iRigidBody_GetProperties;
+*GetMass = *cspacec::iRigidBody_GetMass;
+*GetCenter = *cspacec::iRigidBody_GetCenter;
+*GetInertia = *cspacec::iRigidBody_GetInertia;
 *AdjustTotalMass = *cspacec::iRigidBody_AdjustTotalMass;
 *AddForce = *cspacec::iRigidBody_AddForce;
 *AddTorque = *cspacec::iRigidBody_AddTorque;
