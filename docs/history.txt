@@ -18,6 +18,11 @@ chronological order.
 	  fog stuff into include files.
 	- res augmented the fixed terrain shader to support fog - isn't 
 	  correct yet, though.
+ 	- Piotr Obrzut added limit/motor support for ODE joints states (currently 
+	  aplied to hinge and amotor joints).
+	- Piotr Obrzut added new methods for rigid body to get paramters: mass, 
+          inertia and center of mass.
+
 13-Apr-2005
 	- res made the following changes:
 	    - Moved keycolor baking out of csImageManipulate into its own 
