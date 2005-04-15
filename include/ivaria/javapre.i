@@ -248,7 +248,7 @@ APPLY_FOR_EACH_INTERFACE
 // automatically. Prior versions do not.
 #if (SWIG_VERSION < 0x010323)
 #define IEVENTOUTLET_BROADCAST \
-public void Broadcast (int iCode) { Broadcast(iCode, null); }
+public void Broadcast (int iCode) { Broadcast(iCode, 0); }
 #else
 #define IEVENTOUTLET_BROADCAST
 #endif

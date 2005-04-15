@@ -31,6 +31,8 @@ chronological order.
 	- Eric Sunshine augmented library.jam so that it asks $(AR) to suppress
 	  the unnecessary "ar: created libfoo.a" messages. This makes for a
 	  slightly cleaner build log.
+	- Eric Sunshine updated ivaria/javapre.i for void* --> intptr_t changes
+	  in iEventOutlet. (bug #1183672)
 14-Apr-2005
 	- Eric Sunshine tweaked cspace.i for recent changes to csArray<> and
 	  csStringSet which caused compilation failure in Swig-generated code.
