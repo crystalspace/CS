@@ -18,6 +18,9 @@
 #
 #============================================================================
 
+# Suppress ar's noisy report that it created the archive we asked it to create.
+if $(AR) && $(AR[2]) = ru { AR = $(AR[1]) ruc ; }
+
 ##  Library libname : sources [ : options ]
 ##    Build a library out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You

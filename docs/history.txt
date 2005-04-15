@@ -28,6 +28,9 @@ chronological order.
 	  BitProxy was overkill; to wit, for a `const' operation, the
 	  mutableness which BitProxy imparted was pointless. (The non-const
 	  operator[] still returns a BitProxy.)
+	- Eric Sunshine augmented library.jam so that it asks $(AR) to suppress
+	  the unnecessary "ar: created libfoo.a" messages. This makes for a
+	  slightly cleaner build log.
 14-Apr-2005
 	- Eric Sunshine tweaked cspace.i for recent changes to csArray<> and
 	  csStringSet which caused compilation failure in Swig-generated code.
