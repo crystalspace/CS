@@ -33,6 +33,11 @@ chronological order.
 	  slightly cleaner build log.
 	- Eric Sunshine updated ivaria/javapre.i for void* --> intptr_t changes
 	  in iEventOutlet. (bug #1183672)
+	- res fixed GL DrawSimpleMesh() to (again) set the requried identity
+	  transform after drawing in screenspace and 2D mode.
+	- res fixed the GL renderer to properly respect the mirror flag again.
+	- res made the fixed terrain shader to (almost) properly support fog
+	  on (2) 3 TU hardware.
 14-Apr-2005
 	- Eric Sunshine tweaked cspace.i for recent changes to csArray<> and
 	  csStringSet which caused compilation failure in Swig-generated code.

@@ -12,9 +12,11 @@
       <vp plugin="glfixed">
 	<fixedvp>
 	  <constantcolor layer="0" type="vector4">0,0,0,1</constantcolor>
+	  <?include snippets/fog-fvp.inc ?>
 	</fixedvp>
       </vp>
       <texture name="tex diffuse" destination="unit 0" />
+      <?include snippets/fog-mappings.inc ?>
       <fp plugin="glfixed">
         <fixedfp>
 	  <fog>
@@ -30,6 +32,7 @@
             <alphasource num="0" source="constant color" modifier="alpha"/>
 	    <alphaoperation operation="replace"/>
 	  </layer>
+	  <?include snippets/fog-ffp.inc ?>
         </fixedfp>
       </fp>
     </pass>

@@ -7,7 +7,59 @@
     <tag>linear_fog</tag>
     <tag>terrain_splatting</tag>
     <pass>
-      <mixmode><add /></mixmode>
+      <mixmode><srcalphaadd /></mixmode>
+      <alphamode><smooth /></alphamode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <vp plugin="glfixed">
+	<fixedvp>
+	  <texmatrix layer="0">
+	    <scale type="shadervar">texture scale</scale>
+	  </texmatrix>
+	  <?include snippets/fog-fvp.inc ?>
+	</fixedvp>
+      </vp>
+      <texture name="tex diffuse" destination="unit 0"/>
+      <texture name="splat alpha map" destination="unit 1"/>
+      <?include snippets/fog-mappings.inc ?>
+      <fp plugin="glfixed">
+        <fixedfp>
+	  <fog>
+	    <mode>linear</mode>
+	    <start type="float">0</start>
+	    <end type="shadervar">texture lod distance</end>
+	    <fogcolor type="vector3">0,0,0</fogcolor>
+	  </fog>
+          <layer>
+            <colorsource num="0" source="texture" modifier="color"/>
+            <colorsource num="1" source="primary color" modifier="color"/>
+            <coloroperation operation="modulate" scale="2" />
+          </layer>
+          <layer> 
+            <colorsource num="0" source="previous layer" modifier="color"/>
+            <coloroperation operation="replace"/>
+	    <alphasource num="0" source="texture" modifier="replace"/>
+            <alphaoperation operation="replace"/>
+          </layer>
+	  <?if vars."fog density".float &gt; 0 ?>
+	    <layer name="pea soup">
+	      <colorsource num="0" source="constant color" modifier="color"/>
+	      <colorsource num="1" source="previous layer" modifier="color"/>
+	      <colorsource num="2" source="texture" modifier="alpha"/>
+	      <coloroperation operation="interpolate" />
+	      <alphasource num="0" source="previous layer" modifier="alpha"/>
+	      <alphaoperation operation="replace"/>
+	    </layer>
+	  <?endif?>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+  
+  <technique priority="250"> 
+    <tag>linear_fog</tag>
+    <tag>terrain_splatting</tag>
+    <pass>
+      <mixmode><srcalphaadd /></mixmode>
       <alphamode><smooth /></alphamode>
       <buffer source="texture coordinate 0" destination="texture coordinate 1" />
       <vp plugin="glfixed">
@@ -27,7 +79,7 @@
 	    <end type="shadervar">texture lod distance</end>
 	    <fogcolor type="vector3">0,0,0</fogcolor>
 	  </fog>
-          <layer> 
+          <layer>
             <colorsource num="0" source="texture" modifier="color"/>
             <colorsource num="1" source="primary color" modifier="color"/>
             <coloroperation operation="modulate" scale="2" />
@@ -35,13 +87,18 @@
           <layer> 
             <colorsource num="0" source="previous layer" modifier="color"/>
             <colorsource num="1" source="texture" modifier="alpha"/>
-            <coloroperation operation="modulate"/>
+            <coloroperation operation="replace"/>
+	    <alphasource num="0" source="texture" modifier="replace"/>
+            <alphaoperation operation="replace"/>
           </layer>
         </fixedfp>
       </fp>
     </pass>
-    <!-- @@@ Fog currently sucks -->
-    <?include snippets/fog-pass.inc ?>
+    <!-- NOTE: technically, this is wrong in case the sector fog starts
+      -- closer than splatting distance (the closer the sector fog starts the
+      -- worse). But practically, "it looks okay", and I don't see how a 
+      -- 100% correct appearance could be achieved without a 3rdTU (which we 
+      -- don't have if we use this tech). -->
   </technique>
   
   <!-- Some HW doesn't even handle the linear fog correctly at all. 

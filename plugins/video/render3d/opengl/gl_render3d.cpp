@@ -1215,7 +1215,7 @@ void csGLGraphics3D::FinishDraw ()
     SetRenderTarget (0);
   }
   
-  SetMirrorMode (false);
+  //SetMirrorMode (false);
 
   current_drawflags = 0;
 }
@@ -1871,12 +1871,20 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       }
   }
 
-  /*if (current_shadow_state == CS_SHADOW_VOLUME_PASS2 ||
+  bool mirrorflag;
+  if (current_shadow_state == CS_SHADOW_VOLUME_PASS2 ||
       current_shadow_state == CS_SHADOW_VOLUME_FAIL1)
-    SetMirrorMode (!mymesh->do_mirror);
+    mirrorflag = !mymesh->do_mirror;
   else
-    SetMirrorMode (mymesh->do_mirror);*/
+    mirrorflag = mymesh->do_mirror;
 
+  // Flip face culling if we do mirroring
+  GLenum cullFace;
+  statecache->GetCullFace (cullFace);
+  if (mirrorflag)
+  {
+    statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
+  }
 
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
@@ -1935,6 +1943,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   //SetMirrorMode (false);
+  statecache->SetCullFace (cullFace);
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
@@ -2635,7 +2644,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     {
       // Bring it back, that old new york rap! 
       // Or well, at least that old identity transform
-      //SetObjectToCameraInternal (csReversibleTransform ());
+      SetWorldToCamera (csReversibleTransform ());
     }
   }
 
