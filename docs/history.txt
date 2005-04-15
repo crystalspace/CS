@@ -6,23 +6,44 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Apr-2005
+	- Eric Sunshine fixed bug in csBitArray::SetSize() where it failed to
+	  clear newly added bits when the array was enlarged.
+	- Eric Sunshine fixed bug in csBitArray::SetSize() where it
+	  unnecessarily allocated a new backing-store even when the old
+	  backing-store was already the correct size.
+	- Eric Sunshine fixed csBitArray design flaw which prevented it from
+	  being used safely in the context of csArray<csBitArray> since it
+	  maintained pointers to its own internal members. These pointers could
+	  become corrupt if csArray<> re-located the bit array.
+	- Eric Sunshine fixed `delete' vs. `delete[]' bugs in csBitArray.
+	- Eric Sunshine fixed problem in csBitArray::Delete() where it could
+	  break the invariant that the number of elements allocated for the
+	  backing-store must be just large enough to hold the desired number of
+	  bits, but no larger.  Several methods, such as Trim(),
+	  AllBitsFalse(), most of the operator overloads, etc., were predicated
+	  upon this invariant, and behaved erratically when it was broken.
+	- Eric Sunshine changed the `const' csBitArray::operator[] so that it
+	  returns a simple `bool' rather than a csBitArray::BitProxy since the
+	  BitProxy was overkill; to wit, for a `const' operation, the
+	  mutableness which BitProxy imparted was pointless. (The non-const
+	  operator[] still returns a BitProxy.)
 14-Apr-2005
 	- Eric Sunshine tweaked cspace.i for recent changes to csArray<> and
 	  csStringSet which caused compilation failure in Swig-generated code.
 	- Jorrit fixed the font plex config in walktest.cfg.
-	- Jorrit enabled multiplexer for bindox and xmlread for walktest.cfg.
+	- Jorrit enabled multiplexer for bindoc and xmlread for walktest.cfg.
 	- res added the fontplex plugin to the walkall target.
 	- res made some fixes so shader inclusion (via <?include?>) of 
 	  relative paths works.
 	- res made a pathetic attempt to modularize shaders by putting some
 	  fog stuff into include files.
-	- res augmented the fixed terrain shader to support fog - isn't 
-	  correct yet, though.
- 	- Piotr Obrzut added limit/motor support for ODE joints states (currently 
-	  aplied to hinge and amotor joints).
-	- Piotr Obrzut added new methods for rigid body to get paramters: mass, 
-          inertia and center of mass.
-
+	- res augmented the fixed terrain shader to support fog; isn't correct
+	  yet, though.
+ 	- Piotr Obrzut added limit/motor support for ODE joints states
+	  (currently aplied to hinge and amotor joints).
+	- Piotr Obrzut added new methods for rigid body to get paramters: mass,
+	  inertia and center of mass.
 13-Apr-2005
 	- res made the following changes:
 	    - Moved keycolor baking out of csImageManipulate into its own 

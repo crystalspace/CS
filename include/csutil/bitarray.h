@@ -41,6 +41,7 @@ class CS_CRYSTALSPACE_EXPORT csBitArray
 {
 public:
   typedef unsigned long store_type;
+
 private:
   friend class csBitArrayHashKeyHandler;
   enum
@@ -49,22 +50,53 @@ private:
     cell_size     = sizeof(store_type) * bits_per_byte
   };
 
-  store_type *mpStore;
-  store_type mSingleWord; // Use this buffer when mLength is 1
-  size_t mLength;       // Length of mpStore in units of store_type
+  store_type* mpStore;
+  store_type  mSingleWord; // Use this buffer when mLength is 1
+  size_t mLength;          // Length of mpStore in units of store_type
   size_t mNumBits;
 
-  /// Get the index and bit offset for a given bit number.
-  static inline size_t GetIndex (size_t bit_num)
+  /// Get the GetStore()[] index for a given bit number.
+  static size_t GetIndex (size_t bit_num)
   {
     return bit_num / cell_size;
   }
 
-  static inline size_t GetOffset (size_t bit_num)
+  /// Get the offset within GetStore()[GetIndex()] for a given bit number.
+  static size_t GetOffset (size_t bit_num)
   {
     return bit_num % cell_size;
   }
 
+  /**
+   * Get a constant pointer to bit store, which may be internal mSingleWord or
+   * heap-allocated mpStore.
+   */
+  store_type const* GetStore() const
+  {
+    return mLength <= 1 ? &mSingleWord : mpStore;
+  }
+
+  /**
+   * Get a non-constant pointer to bit store, which may be internal mSingleWord
+   * or heap-allocated mpStore.
+   */
+  store_type* GetStore()
+  {
+    return mLength <= 1 ? &mSingleWord : mpStore;
+  }
+
+  /// Force overhang bits at the end to 0.
+  void Trim()
+  {
+    size_t extra_bits = mNumBits % cell_size;
+    if (mLength > 0 && extra_bits != 0)
+      GetStore()[mLength - 1] &= ~((~(store_type)0) << extra_bits);
+  }
+
+  /**
+   * Resize the array to \a newSize bits. If this operations enlarges the
+   * array, the newly added bits are cleared.
+   */
   void SetSize (size_t newSize)
   {
     size_t newLength;
@@ -73,39 +105,42 @@ private:
     else
       newLength = 1 + GetIndex (newSize - 1);
 
-    // Avoid allocation if length is 1 (common case)
-    store_type* newStore;
-    if (newLength <= 1)
-      newStore = &mSingleWord;
-    else
-      newStore = new store_type[newLength];
-    
-    if (newLength > 0)
+    if (newLength != mLength)
     {
-      if (mLength > 0)
-      {
-	if (newStore != mpStore)
-	  memcpy (newStore, mpStore, 
-	    (MIN (mLength, newLength)) * sizeof (store_type));
-      }
+      // Avoid allocation if length is 1 (common case)
+      store_type* newStore;
+      if (newLength <= 1)
+	newStore = &mSingleWord;
       else
-	memset (newStore, 0, newLength * sizeof (store_type));
+	newStore = new store_type[newLength];
+
+      if (newLength > 0)
+      {
+	if (mLength > 0)
+	{
+	  store_type const* oldStore = GetStore();
+	  if (newStore != oldStore)
+	  {
+	    memcpy (newStore, oldStore, 
+	      (MIN (mLength, newLength)) * sizeof (store_type));
+	    if (newLength > mLength)
+	      memset(newStore + mLength, 0,
+		     (newLength - mLength) * sizeof (store_type));
+	  }
+	}
+	else
+	  memset (newStore, 0, newLength * sizeof (store_type));
+      }
+
+      if (mpStore != 0)
+	delete[] mpStore;
+
+      mpStore = newLength > 1 ? newStore : 0;
+      mLength = newLength;
     }
 
-    if (mLength > 1)
-      delete mpStore;
-
-    mpStore = newStore;
     mNumBits = newSize;
-    mLength = newLength;
-  }
-
-  /// Force overhang bits at the end to 0
-  inline void Trim()
-  {
-    size_t extra_bits = mNumBits % cell_size;
-    if (mLength > 0 && extra_bits != 0)
-      mpStore[mLength - 1] &= ~((~(store_type) 0) << extra_bits);
+    Trim();
   }
 
 public:
@@ -142,7 +177,10 @@ public:
       return mArray.IsBitSet (mPos);
     }
 
-    /// Flip state of this bit.
+    /**
+     * Flip state of this bit.
+     * \return New state of bit.
+     */
     bool Flip()
     {
       mArray.FlipBit (mPos);
@@ -157,8 +195,6 @@ public:
   csBitArray () : mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
     SetSize (0);
-    // Clear last bits
-    Trim();
   }
 
   /**
@@ -168,8 +204,6 @@ public:
     mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
   {
     SetSize (size);
-    // Clear last bits
-    Trim();
   }
 
   /**
@@ -184,8 +218,8 @@ public:
   /// Destructor.
   ~csBitArray()
   {
-    if (mLength > 1)
-      delete mpStore;
+    if (mpStore != 0)
+      delete[] mpStore;
   }
 
   /// Return the number of stored bits.
@@ -202,8 +236,6 @@ public:
   void SetLength (size_t newSize)
   {
     SetSize (newSize);
-    // Clear last bits
-    Trim ();
   }
 
   //
@@ -216,67 +248,74 @@ public:
     if (this != &that)
     {
       SetSize (that.mNumBits);
-      memcpy (mpStore, that.mpStore, mLength * sizeof(store_type));
+      memcpy (GetStore(), that.GetStore(), mLength * sizeof(store_type));
     }
     return *this;
   }
 
-  /// Return bit at position <code>pos</code>.
+  /// Return bit at position \a pos.
   BitProxy operator[] (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
     return BitProxy(*this, pos);
   }
 
-  /// Return bit at position <code>pos</code>.
-  const BitProxy operator[] (size_t pos) const
+  /// Return bit at position \a pos.
+  bool operator[] (size_t pos) const
   {
-    CS_ASSERT (pos < mNumBits);
-    return BitProxy(CS_CONST_CAST(csBitArray&,*this), pos);
+    return IsBitSet(pos);
   }
 
-  /// Equal to other array.
+  /// Equal to other array?
   bool operator==(const csBitArray &that) const
   {
     if (mNumBits != that.mNumBits)
       return false;
 
+    store_type const* p0 = GetStore();
+    store_type const* p1 = that.GetStore();
     for (unsigned i = 0; i < mLength; i++)
-      if (mpStore[i] != that.mpStore[i])
+      if (p0[i] != p1[i])
         return false;
     return true;
   }
 
-  /// Not equal to other array.
+  /// Not equal to other array?
   bool operator != (const csBitArray &that) const
   {
     return !(*this == that);
   }
 
-  /// Bit-wise `and'.
+  /// Bit-wise `and'. The arrays must be the same length.
   csBitArray& operator &= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
+    store_type* p0 = GetStore();
+    store_type const* p1 = that.GetStore();
     for (size_t i = 0; i < mLength; i++)
-      mpStore[i] &= that.mpStore[i];
+      p0[i] &= p1[i];
     return *this;
   }
 
-  /// Bit-wise `or'.
+  /// Bit-wise `or'. The arrays must be the same length.
   csBitArray operator |= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
+    store_type* p0 = GetStore();
+    store_type const* p1 = that.GetStore();
     for (size_t i = 0; i < mLength; i++)
-      mpStore[i] |= that.mpStore[i];
+      p0[i] |= p1[i];
     return *this;
   }
 
-  /// Bit-wise `xor'.
+  /// Bit-wise `xor'. The arrays must be the same length.
   csBitArray operator ^= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
+    store_type* p0 = GetStore();
+    store_type const* p1 = that.GetStore();
     for (size_t i = 0; i < mLength; i++)
-      mpStore[i] ^= that.mpStore[i];
+      p0[i] ^= p1[i];
     return *this;
   }
 
@@ -286,19 +325,19 @@ public:
     return csBitArray(*this).FlipAllBits();
   }
 
-  /// Bit-wise `and'.
+  /// Bit-wise `and'. The arrays must be the same length.
   friend csBitArray operator& (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) &= a2;
   }
 
-  /// Bit-wise `or'.
+  /// Bit-wise `or'. The arrays must be the same length.
   friend csBitArray operator | (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) |= a2;
   }
 
-  /// Bit-wise `xor'.
+  /// Bit-wise `xor'. The arrays must be the same length.
   friend csBitArray operator ^ (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) ^= a2;
@@ -311,70 +350,73 @@ public:
   /// Set all bits to false.
   void Clear()
   {
-    memset (mpStore, 0, mLength * sizeof(store_type));
+    memset (GetStore(), 0, mLength * sizeof(store_type));
   }
 
   /// Set the bit at position pos to true.
   void SetBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
-    mpStore[GetIndex(pos)] |= 1 << GetOffset(pos);
+    GetStore()[GetIndex(pos)] |= ((store_type)1) << GetOffset(pos);
   }
 
   /// Set the bit at position pos to false.
   void ClearBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
-    mpStore[GetIndex(pos)] &= ~(1 << GetOffset(pos));
+    GetStore()[GetIndex(pos)] &= ~(((store_type)1) << GetOffset(pos));
   }
 
   /// Toggle the bit at position pos.
   void FlipBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
-    mpStore[GetIndex(pos)] ^= 1 << GetOffset(pos);
+    GetStore()[GetIndex(pos)] ^= ((store_type)1) << GetOffset(pos);
   }
 
   /// Set the bit at position \a pos to the given value.
-  void Set (size_t pos, bool val)
+  void Set (size_t pos, bool val = true)
   {
-    val ? SetBit(pos) : ClearBit(pos);
+    if (val)
+      SetBit(pos);
+    else
+      ClearBit(pos);
   }
 
   /// Returns true if the bit at position \a pos is true.
   bool IsBitSet (size_t pos) const
   {
     CS_ASSERT (pos < mNumBits);
-    return (mpStore[GetIndex(pos)] & (1 << GetOffset(pos))) != 0;
+    return (GetStore()[GetIndex(pos)] & (((store_type)1) << GetOffset(pos)))
+      != 0;
   }
 
-  /**
-   * Checks whether at least one of \a count bits is set from position 
-   * \a pos on.
-   */
+  /// Checks whether at least one of \a count bits is set starting at \a pos.
   bool AreSomeBitsSet (size_t pos, size_t count) const
   {
     CS_ASSERT (pos + count <= mNumBits);
+    store_type const* p = GetStore();
     while (count > 0)
     {
       size_t index = GetIndex (pos);
       size_t offset = GetOffset (pos);
       size_t checkCount = MIN(count, cell_size - offset);
-            
-      store_type mask = 
-	((checkCount == cell_size) ? ~0 : ((1 << checkCount) - 1)) << offset;
-      if (mpStore[index] & mask) return true;
+      store_type mask = ((checkCount == cell_size) ? ~(store_type)0 :
+			 ((((store_type)1) << checkCount) - 1)) << offset;
+      if (p[index] & mask)
+	return true;
       pos += checkCount;
       count -= checkCount;
     }
     return false;
   }
   
-  /// Returns true iff all bits are false.
+  /// Returns true if all bits are false.
   bool AllBitsFalse() const
   {
-    for (unsigned i=0; i < mLength; i++)
-      if (mpStore[i] != 0)
+    store_type const* p = GetStore();
+    for (size_t i = 0; i < mLength; i++)
+      if (p[i] != 0)
         return false;
     return true;
   }
@@ -382,9 +424,9 @@ public:
   /// Change value of all bits
   csBitArray &FlipAllBits()
   {
-    for (unsigned i=0; i < mLength; i++)
-      mpStore[i] = ~mpStore[i];
-
+    store_type* p = GetStore();
+    for (size_t i = 0; i < mLength; i++)
+      p[i] = ~p[i];
     Trim();
     return *this;
   }
@@ -403,8 +445,7 @@ public:
       size_t ntail = mNumBits - src;
       while (ntail-- > 0)
 	Set(dst++, IsBitSet(src++));
-      mNumBits -= count;
-      Trim();
+      SetSize(mNumBits - count);
     }
   }
 
@@ -416,17 +457,16 @@ public:
   {
     CS_ASSERT(pos + count <= mNumBits);
     csBitArray a(count);
-    // Slow, but simple and effective.
     for (size_t i = pos, o = 0; i < pos + count; i++)
       if (IsBitSet(i))
 	a.SetBit(o++);
     return a;
   }
 
-  /// Return the full array.
+  /// Return the full backing-store.
   store_type* GetArrayBits()
   {
-    return mpStore;
+    return GetStore();
   }
 
   /**
@@ -435,6 +475,7 @@ public:
    */
   store_type GetSingleWord()
   {
+    CS_ASSERT(mpStore == 0);
     return mSingleWord;
   }
 
@@ -444,6 +485,7 @@ public:
    */
   void SetSingleWord (store_type sw)
   {
+    CS_ASSERT(mpStore == 0);
     mSingleWord = sw;
   }
 };
@@ -463,12 +505,13 @@ public:
       uint ui[uintCount];
     } bitStoreToUint;
     uint hash = 0;
+    csBitArray::store_type const* p = key.GetStore();
     // @@@ Not very good. Find a better hash function; however, it should
     // return the same hash for two bit arrays that are the same except for
     // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
     for (size_t i = 0; i < key.mLength; i++)
     {
-      bitStoreToUint.store = key.mpStore[i];
+      bitStoreToUint.store = p[i];
       for (size_t j = 0; j < uintCount; j++)
 	hash += bitStoreToUint.ui[j];
     }
@@ -476,19 +519,24 @@ public:
   }
   static bool CompareKeys (const csBitArray& key1, const csBitArray& key2)
   {
+    csBitArray::store_type const* p0 = key1.GetStore();
+    csBitArray::store_type const* p1 = key2.GetStore();
     size_t compareNum = MIN (key1.mLength, key2.mLength);
     size_t i = 0;
     for (; i < compareNum; i++)
-      if (key1.mpStore[i] != key2.mpStore[i]) return false;
+      if (p0[i] != p1[i])
+	return false;
     if (key1.mLength > key2.mLength)
     {
       for (; i < key1.mLength; i++)
-	if (key1.mpStore[i] != 0) return false;
+	if (p0[i] != 0)
+	  return false;
     }
     else
     {
       for (; i < key2.mLength; i++)
-	if (key2.mpStore[i] != 0) return false;
+	if (p1[i] != 0)
+	  return false;
     }
     return true;
   }
