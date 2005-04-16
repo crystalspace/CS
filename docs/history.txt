@@ -16,6 +16,16 @@ chronological order.
 	  iTextureHandle.
 	- Luca replaced use of imap/parser.h with imap/loader.h in 
 	  CS\libs\cstool/initapp.cpp .
+	- res fixed the HOM in terrainf.
+	- res added the ability to not use the specified default shader in
+	  case shaders of a certain type are present on a material to the 
+	  generic renderstep. This works around the problem that for terrainf,
+	  the "use default shader" logic kicked in for materials that are only
+	  intended during the splatting passes (and thus causing incorrect 
+	  terrain rendering). However, in the future a better way to only use
+	  certain materials in certain passes should be devised.
+	- res tweaked the movie recorder framerate a bit so the intervals
+	  between frames are more regular.
 15-Apr-2005
 	- Eric Sunshine fixed bug in csBitArray::SetSize() where it failed to
 	  clear newly added bits when the array was enlarged.
