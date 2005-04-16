@@ -26,7 +26,7 @@
  * Render loop interfaces.
  */
 /**
- * \addtogroup engine3d
+ * \addtogroup engine3d_rloop
  * @{ */
 
 #include "csutil/scf.h"

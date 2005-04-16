@@ -23,6 +23,13 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * Generic render step.
+ */
+
+/**\addtogroup engine3d_rloop
+ * @{ */
+
 SCF_VERSION (iLightIterRenderStep, 0, 0, 1);
 
 /// Document me!@@@
@@ -38,5 +45,7 @@ struct iLightRenderStep : public iBase
   virtual void Perform (iRenderView* rview, iSector* sector,
     iLight* light, csShaderVarStack &stacks) = 0;
 };
+
+/** @} */
 
 #endif

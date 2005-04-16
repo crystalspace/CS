@@ -101,6 +101,9 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 	  step->SetDefaultShader (defshader);
 	}
 	break;
+      case XMLTOKEN_NODEFAULTTRIGGER:
+	step->AddDisableDefaultTriggerType (child->GetContentsValue ());
+	break;
       default:
 	{
 	  csZBufMode zmode;
@@ -486,7 +489,19 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
 #endif
       iShader* meshShader = hdl->GetShader (shadertype);
-      if (meshShader == 0) meshShader = defShader;
+      if (meshShader == 0) 
+      {
+	bool doDefault = true;
+	for (size_t i = 0; i < disableDefaultTypes.Length(); i++)
+	{
+	  if (hdl->GetShader (disableDefaultTypes[i]) != 0)
+	  {
+	    doDefault = false;
+	    break;
+	  }
+	}
+	if (doDefault) meshShader = defShader;
+      }
       size_t newTicket = meshShader ? ticketHelper.GetTicket (
 	mesh->material->GetMaterial (), meshShader, 
 	sameShaderMeshSvcs[n], mesh) : ~0;
@@ -556,3 +571,16 @@ csZBufMode csGenericRenderStep::GetZBufMode () const
   return zmode;
 }
 
+void csGenericRenderStep::AddDisableDefaultTriggerType (const char* type)
+{
+  csStringID shadertype = strings->Request (type);
+  if (shadertype == csInvalidStringID) return;
+  disableDefaultTypes.Push (shadertype);
+}
+
+void csGenericRenderStep::RemoveDisableDefaultTriggerType (const char* type)
+{
+  csStringID shadertype = strings->Request (type);
+  if (shadertype == csInvalidStringID) return;
+  disableDefaultTypes.Delete (shadertype);
+}

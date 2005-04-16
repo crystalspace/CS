@@ -24,6 +24,13 @@
 #include "csutil/refarr.h"
 #include "ivideo/shader/shader.h"
 
+/**\file
+ * Generic render step.
+ */
+
+/**\addtogroup engine3d_rloop
+ * @{ */
+
 struct iRenderView;
 struct iSector;
 
@@ -35,5 +42,7 @@ struct iRenderStep : public iBase
   virtual void Perform (iRenderView* rview, iSector* sector,
     csShaderVarStack &stacks) = 0;
 };
+
+/** @} */
 
 #endif

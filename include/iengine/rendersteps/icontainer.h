@@ -23,6 +23,13 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * Generic render step.
+ */
+
+/**\addtogroup engine3d_rloop
+ * @{ */
+
 struct iRenderStep;
 
 SCF_VERSION (iRenderStepContainer, 0, 0, 1);
@@ -36,5 +43,7 @@ struct iRenderStepContainer : public iBase
   virtual size_t AddStep (iRenderStep* step) = 0;
   virtual size_t GetStepCount () = 0;
 };
+
+/** @} */
 
 #endif

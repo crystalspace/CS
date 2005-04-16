@@ -187,7 +187,7 @@
         <numrim>8</numrim>
         <reversed>yes</reversed>
         <material>ScatterSky</material>
-        <color red="0" green="0" blue="1" />
+        <color red="0" green="0" blue="0" />
       </params>
       <zfill />
       <priority>sky</priority>

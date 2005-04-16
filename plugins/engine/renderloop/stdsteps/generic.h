@@ -102,6 +102,9 @@ private:
   csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
   size_t visible_meshes_index;	// First free index in the visible meshes.
 
+  /* @@@ Ugly. */
+  csArray<csStringID> disableDefaultTypes;
+
   static csStringID o2c_matrix_name;
   static csStringID o2c_vector_name;
   static csStringID fogplane_name;
@@ -133,6 +136,9 @@ public:
   { defShader = shader; }
   virtual iShader* GetDefaultShader () const
   { return defShader; }
+
+  virtual void AddDisableDefaultTriggerType (const char* type);
+  virtual void RemoveDisableDefaultTriggerType (const char* type);
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
     size_t ticket, iShaderVariableContext** meshContext, 

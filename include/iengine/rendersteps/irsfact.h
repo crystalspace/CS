@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup gfx3d
+ * \addtogroup engine3d_rloop
  * @{ */
  
 #include "csutil/scf.h"

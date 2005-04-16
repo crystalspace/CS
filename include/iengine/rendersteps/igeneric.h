@@ -32,7 +32,7 @@
 
 struct iShader;
 
-SCF_VERSION (iGenericRenderStep, 0, 0, 2);
+SCF_VERSION (iGenericRenderStep, 0, 0, 3);
 
 /**
  * A generic render step.
@@ -66,6 +66,15 @@ struct iGenericRenderStep : public iBase
   virtual void SetDefaultShader (iShader* shader) = 0;
   /// Get the default shader.
   virtual iShader* GetDefaultShader () const = 0;
+
+  /* @@@ Those below are not nice */
+  /**
+   * Add a shader type that, when present on a material, prevents the
+   * "use default shader" logic to not kick in.
+   */
+  virtual void AddDisableDefaultTriggerType (const char* type) = 0;
+  /// Remove a shader type that prevents default shader usage.
+  virtual void RemoveDisableDefaultTriggerType (const char* type) = 0;
 };
 
 /** @} */

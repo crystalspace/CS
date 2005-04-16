@@ -20,6 +20,9 @@
           <shadertype>standard</shadertype>
           <zoffset>no</zoffset>
           <zuse />
+	  <defaultshader name="std_lighting" />
+	  <nodefaulttrigger>ambient</nodefaulttrigger>
+	  <nodefaulttrigger>terrain splat</nodefaulttrigger>
         </step>
   </steps>
 </params>
