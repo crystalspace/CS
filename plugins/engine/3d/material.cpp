@@ -63,7 +63,6 @@ csMaterial::csMaterial (csEngine* engine)
   SetDiffuse (CS_DEFMAT_DIFFUSE);
   SetAmbient (CS_DEFMAT_AMBIENT);
   SetReflection (CS_DEFMAT_REFLECTION);
-  shadersCustomized = false;
 }
 
 csMaterial::csMaterial (csEngine* engine,
@@ -86,7 +85,6 @@ csMaterial::csMaterial (csEngine* engine,
   SetDiffuse (CS_DEFMAT_DIFFUSE);
   SetAmbient (CS_DEFMAT_AMBIENT);
   SetReflection (CS_DEFMAT_REFLECTION);
-  shadersCustomized = false;
 }
 
 csMaterial::~csMaterial ()
@@ -105,8 +103,6 @@ csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
   }
   return var;
 }
-
-
 
 csRGBcolor& csMaterial::GetFlatColor ()
 { 
@@ -233,12 +229,6 @@ void csMaterial::SetTextureWrapper (csStringID name, iTextureWrapper* tex)
 
 void csMaterial::SetShader (csStringID type, iShader* shd)
 {
-  if (!shadersCustomized)
-  {
-    shaders.PutUnique (engine->default_shadertype, 0);
-    shadersCustomized = true;
-  }
-
   shaders.PutUnique (type, shd);
 }
 

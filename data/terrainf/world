@@ -187,7 +187,7 @@
         <numrim>8</numrim>
         <reversed>yes</reversed>
         <material>ScatterSky</material>
-        <color red="0" green="0" blue="0" />
+        <color red="0" green="0" blue="1" />
       </params>
       <zfill />
       <priority>sky</priority>
@@ -219,5 +219,7 @@
       </move>
     </meshobj>
 
+    <!-- Uncomment for ...fog: -->
+    <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->
   </sector>
 </world>

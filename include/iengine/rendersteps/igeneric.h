@@ -23,7 +23,16 @@
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 
-SCF_VERSION (iGenericRenderStep, 0, 0, 1);
+/**\file
+ * Generic render step.
+ */
+
+/**\addtogroup engine3d_rloop
+ * @{ */
+
+struct iShader;
+
+SCF_VERSION (iGenericRenderStep, 0, 0, 2);
 
 /**
  * A generic render step.
@@ -49,6 +58,16 @@ struct iGenericRenderStep : public iBase
   virtual void SetZBufMode (csZBufMode zmode) = 0;
   /// Get Z buffer mode.
   virtual csZBufMode GetZBufMode () const = 0;
+
+  /**
+   * Set the default shader that is used if a material doesn't provide one
+   * for the shader type of this step.
+   */
+  virtual void SetDefaultShader (iShader* shader) = 0;
+  /// Get the default shader.
+  virtual iShader* GetDefaultShader () const = 0;
 };
+
+/** @} */
 
 #endif

@@ -103,6 +103,8 @@ public:
 
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
 
+  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node);
+
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);
   virtual void ReportBadToken (iDocumentNode* badtokennode);

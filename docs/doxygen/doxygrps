@@ -99,6 +99,10 @@
 	 */
  
 	/**
+	 * \defgroup engine3d_rloop Renderloops & Rendersteps
+	 */
+ 
+	/**
 	 * \defgroup engine3d_textures Textures & Materials
 	 */
  

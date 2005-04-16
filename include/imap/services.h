@@ -57,7 +57,7 @@ struct iKeyValuePair;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 7, 0);
+SCF_VERSION (iSyntaxService, 1, 7, 1);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -280,6 +280,18 @@ struct iSyntaxService : public iBase
    * Parse a user render buffer.
    */
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node) = 0;
+  
+  /**
+   * Parse a node that is a reference to a shader. Those nodes look like 
+   * <tt>&lt;<i>nodename</i> name="shadername" file="/path/to/shader.xml" 
+   * /&gt;</tt>. First, the shader manager is queried for a shader of the name
+   * specified in the <tt>name</tt> attribute. If this failed, the shader is
+   * attempted to be loaded from the <tt>file</tt> specified. Note that if the 
+   * name  appearing in the shader file and the name of the <tt>name</tt>
+   * attribute mismatches, this method fails (and the loaded shader is not
+   * registered with the shader manager),
+   */
+  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node) = 0;
 };
 
 /** @} */

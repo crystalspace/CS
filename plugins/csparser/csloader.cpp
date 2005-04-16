@@ -5032,8 +5032,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     if(!shaderFile)
     {
       ReportWarning ("crystalspace.maploader",
-	"Unable to open shader file '%s'!",
-	fileChild->GetContentsValue ());
+	"Unable to open shader file '%s'!", filename.GetData());
       return false;
     }
 
@@ -5047,7 +5046,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     {
       ReportWarning ("crystalspace.maploader",
 	"Could not parse shader file '%s': %s",
-	fileChild->GetContentsValue (), err);
+	filename.GetData(), err);
       return false;
     }
     shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");

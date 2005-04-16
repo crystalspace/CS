@@ -48,6 +48,7 @@
 #include "iutil/object.h"
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "imap/loader.h"
 #include "imap/ldrctxt.h"
@@ -1359,6 +1360,84 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     return 0;
   }
   return buffer;
+}
+
+csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
+{
+  static const char* msgid = "crystalspace.syntax.shaderred";
+
+  const char* shaderName = node->GetAttributeValue ("name");
+  if (shaderName == 0)
+  {
+    ReportError (msgid, node, "no 'name' attribute");
+    return 0;
+  }
+
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShader> shader = shmgr->GetShader (shaderName);
+  if (shader.IsValid()) return shader;
+
+  const char* shaderFileName = node->GetAttributeValue ("file");
+  if (shaderFileName != 0)
+  {
+    bool vfsPop = false;
+    csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csString filename (shaderFileName);
+    csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
+
+    if(!shaderFile)
+    {
+      Report (msgid, CS_REPORTER_SEVERITY_WARNING, node,
+	"Unable to open shader file '%s'!", shaderFileName);
+      return 0;
+    }
+
+    csRef<iDocumentSystem> docsys =
+      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+    if (docsys == 0)
+      docsys.AttachNew (new csTinyDocumentSystem ());
+    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+    const char* err = shaderDoc->Parse (shaderFile, false);
+    if (err != 0)
+    {
+      Report (msgid, CS_REPORTER_SEVERITY_WARNING, node,
+	"Could not parse shader file '%s': %s",
+	shaderFileName, err);
+      return 0;
+    }
+    csRef<iDocumentNode> shaderNode = 
+      shaderDoc->GetRoot ()->GetNode ("shader");
+    size_t slash = filename.FindLast ('/');
+    if (slash != (size_t)-1)
+    {
+      vfsPop = true;
+      vfs->PushDir();
+      vfs->ChDir (filename.Slice (0, slash+1));
+    }
+
+    const char* type = shaderNode->GetAttributeValue ("compiler");
+    if (type == 0)
+      type = shaderNode->GetAttributeValue ("type");
+    if (type == 0)
+    {
+      ReportError (msgid, shaderNode,
+	"%s: 'compiler' attribute is missing!", shaderFileName);
+      return 0;
+    }
+    csRef<iShaderCompiler> shcom = shmgr->GetCompiler (type);
+    shader = shcom->CompileShader (shaderNode);
+    if (vfsPop && vfs) vfs->PopDir();
+    if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
+    {
+      shader->SetFileName (shaderFileName);
+      shmgr->RegisterShader (shader);
+    }
+    else 
+      return 0;
+    return shader;
+  }
+
+  return 0;
 }
 
 void csTextSyntaxService::ReportError (const char* msgid,

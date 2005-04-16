@@ -65,14 +65,6 @@ public:
   CS_LEAKGUARD_DECLARE (csMaterial);
 
   /**
-   * @@@ Slight hack: when the engine creates a material, it implicitly sets
-   * the "standard" shader. When later a shader is set and 
-   * shadersCustomized is false, the "standard" shader will be set to
-   * 0. This is done so users can "unset" the standard shader.
-   */
-  bool shadersCustomized;
-
-  /**
    * create an empty material
    */
   csMaterial (csEngine* engine);

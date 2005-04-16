@@ -95,6 +95,12 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_SHADERTYPE:
 	step->SetShaderType (child->GetContentsValue ());
 	break;
+      case XMLTOKEN_DEFAULTSHADER:
+	{
+	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  step->SetDefaultShader (defshader);
+	}
+	break;
       default:
 	{
 	  csZBufMode zmode;
@@ -480,6 +486,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
 #endif
       iShader* meshShader = hdl->GetShader (shadertype);
+      if (meshShader == 0) meshShader = defShader;
       size_t newTicket = meshShader ? ticketHelper.GetTicket (
 	mesh->material->GetMaterial (), meshShader, 
 	sameShaderMeshSvcs[n], mesh) : ~0;

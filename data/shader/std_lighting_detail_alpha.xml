@@ -50,6 +50,7 @@
         </fixedfp>
       </fp>
     </pass>
+    <?include snippets/fog-pass.inc ?>
   </technique>
   <technique priority="150">
     <tag>detail texture</tag>
@@ -99,6 +100,7 @@
       <buffer source="texture coordinate lightmap" destination="texture coordinate 0" />
       <texture name="tex lightmap" destination="unit 0" />
     </pass>
+    <?include snippets/fog-pass.inc ?>
   </technique>
   <technique priority="100">
     <pass>
@@ -125,6 +127,7 @@
         </fixedfp>
       </fp>
     </pass>
+    <?include snippets/fog-pass.inc ?>
   </technique>
   <technique priority="75">
     <pass>
@@ -147,5 +150,6 @@
       <buffer name="texture coordinate lightmap" destination="texture coordinate 0" />
       <texture name="tex lightmap" destination="unit 0" />
     </pass>
+    <?include snippets/fog-pass.inc ?>
   </technique>
 </shader>

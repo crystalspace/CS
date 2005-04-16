@@ -88,6 +88,7 @@ private:
   csRef<iStringSet> strings;
   csWeakRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
+  csRef<iShader> defShader;
 
   bool currentSettings;
   csArray<csShaderVariableContext> shadervars;
@@ -127,6 +128,11 @@ public:
 
   virtual void SetZBufMode (csZBufMode zmode);
   virtual csZBufMode GetZBufMode () const;
+
+  virtual void SetDefaultShader (iShader* shader)
+  { defShader = shader; }
+  virtual iShader* GetDefaultShader () const
+  { return defShader; }
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
     size_t ticket, iShaderVariableContext** meshContext, 

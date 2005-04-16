@@ -165,5 +165,6 @@
         <!-- no special VPs or FPs needed. -->
       </pass>
     <?endif?>
+    <?include snippets/fog-pass.inc ?>
   </technique>
 </shader>

@@ -945,22 +945,6 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   // Set up the RL manager.
   renderLoopManager = new csRenderLoopManager (this);
 
-  // Now, try to load the user-specified default render loop.
-  const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
-  if (!configLoop)
-  {
-    defaultRenderLoop = CreateDefaultRenderLoop ();
-  }
-  else
-  {
-    defaultRenderLoop = renderLoopManager->Load (configLoop);
-    if (!defaultRenderLoop)
-      return false;
-  }
-
-  // Register it.
-  renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, defaultRenderLoop);
-
   csLightManager* light_mgr = new csLightManager ();
   object_reg->Register (light_mgr, "iLightManager");
   light_mgr->DecRef ();
@@ -1005,7 +989,6 @@ bool csEngine::HandleEvent (iEvent &Event)
             csRef<iShaderCompiler> shcom (ShaderManager->
               GetCompiler ("XMLShader"));
 
-	    // @@@ Standard shader loading here?
 	    VFS->PushDir();
 	    VFS->ChDir ("/shader/");
 	    char const* shaderPath = "std_lighting.xml";
@@ -1019,10 +1002,9 @@ bool csEngine::HandleEvent (iEvent &Event)
               GetNode ("shader"));
             ShaderManager->RegisterShader (default_shader);
             default_shadertype = Strings->Request ("standard");
-	    VFS->PopDir();
 
             shaderDoc = docsys->CreateDocument ();
-            shaderPath = "/shader/std_lighting_portal.xml";
+            shaderPath = "std_lighting_portal.xml";
             shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
             if (shaderFile.IsValid())
               shaderDoc->Parse (shaderFile, true);
@@ -1032,6 +1014,26 @@ bool csEngine::HandleEvent (iEvent &Event)
             csRef<iShader> portal_shader = shcom->CompileShader (shaderDoc->GetRoot ()->
               GetNode ("shader"));
             ShaderManager->RegisterShader (portal_shader);
+	    VFS->PopDir();
+
+	    csConfigAccess cfg (object_reg);
+	    // Now, try to load the user-specified default render loop.
+	    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 
+	      0);
+	    if (!configLoop)
+	    {
+	      defaultRenderLoop = CreateDefaultRenderLoop ();
+	    }
+	    else
+	    {
+	      defaultRenderLoop = renderLoopManager->Load (configLoop);
+	      if (!defaultRenderLoop)
+		return false;
+	    }
+
+	    // Register it.
+	    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
+	      defaultRenderLoop);
 
             frame_width = G3D->GetWidth ();
             frame_height = G3D->GetHeight ();
@@ -1890,8 +1892,6 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   G3D->SetClipper (0, CS_CLIPPER_NONE);
 }
 
-
-
 csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 {
   csRef<iRenderLoop> loop = renderLoopManager->Create ();
@@ -1915,6 +1915,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
     genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
   
     genStep->SetShaderType ("standard");
+    genStep->SetDefaultShader (default_shader);
     genStep->SetZBufMode (CS_ZBUF_MESH);
     genStep->SetZOffset (false);
     genStep->SetPortalTraversal (true);
@@ -2867,13 +2868,9 @@ iMaterialWrapper *csEngine::CreateMaterial (
   const char *name,
   iTextureWrapper *texture)
 {
-  csMaterial *mat = new csMaterial (this, texture);
+  csRef<csMaterial> mat;
+  mat.AttachNew (new csMaterial (this, texture));
   iMaterialWrapper *wrapper = materials->NewMaterial (mat, name);
-
-  mat->SetShader (default_shadertype, default_shader);
-  mat->shadersCustomized = false;
-
-  mat->DecRef ();
 
   return wrapper;
 }
@@ -2944,16 +2941,11 @@ void csEngine::FireRemoveSector (iSector* sector)
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 {
-  csMaterial *mat = new csMaterial (this);
+  csRef<csMaterial> mat;
+  mat.AttachNew (new csMaterial (this));
   if (txt) mat->SetTextureWrapper (txt);
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-
-  mat->SetShader (default_shadertype, default_shader);
-  mat->shadersCustomized = false;
-
-  mat->DecRef ();
-
   return csPtr<iMaterial> (imat);
 }
 
@@ -2963,16 +2955,11 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
   iTextureWrapper **wrappers,
   csTextureLayer *layers)
 {
-  csMaterial *mat = new csMaterial (this);
+  csRef<csMaterial> mat;
+  mat.AttachNew (new csMaterial (this));
   if (txt) mat->SetTextureWrapper (txt);
 
-
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-
-  mat->SetShader (default_shadertype, default_shader);
-  mat->shadersCustomized = false;
-
-  mat->DecRef ();
 
   return csPtr<iMaterial> (imat);
 }
