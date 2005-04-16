@@ -11,6 +11,9 @@ chronological order.
 	  which is used when a material doesn't have a shader for a specific
 	  shader type.
 	- res added support for fog to the std_lighting_detail shaders.
+	- res removed the practically useless iMaterialHandle interface. 
+	  Similar functionality can be achieved by using either iMaterial or
+	  iTextureHandle.
 15-Apr-2005
 	- Eric Sunshine fixed bug in csBitArray::SetSize() where it failed to
 	  clear newly added bits when the array was enlarged.
