@@ -2593,10 +2593,9 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   iMaterialWrapper* mw = Engine->FindMaterial (name);
   if (mw) return mw;
   // Create a new material.
-  csRef<iMaterial> mat (Engine->CreateBaseMaterial (0, 0, 0, 0));
+  csRef<iMaterial> mat (Engine->CreateBaseMaterial (0));
   mat->SetFlatColor (csRGBcolor (int (r*255), int (g*255), int (b*255)));
   mw = Engine->GetMaterialList ()->NewMaterial (mat, name);
-  mw->Register (G3D->GetTextureManager ());
   return mw;
 }
 

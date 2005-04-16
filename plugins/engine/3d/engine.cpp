@@ -1271,14 +1271,6 @@ void csEngine::PrepareTextures ()
     if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
     if (!csth->KeepImage ()) csth->SetImageFile (0);
   }
-
-  // Then register all materials to the texture manager.
-  int j;
-  for (j = 0; j < materials->GetCount (); j++)
-  {
-    iMaterialWrapper *csmh = materials->Get (j);
-    if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
-  }
 }
 
 void csEngine::PrepareMeshes ()
@@ -2946,21 +2938,6 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   if (txt) mat->SetTextureWrapper (txt);
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-  return csPtr<iMaterial> (imat);
-}
-
-csPtr<iMaterial> csEngine::CreateBaseMaterial (
-  iTextureWrapper *txt,
-  int num_layers,
-  iTextureWrapper **wrappers,
-  csTextureLayer *layers)
-{
-  csRef<csMaterial> mat;
-  mat.AttachNew (new csMaterial (this));
-  if (txt) mat->SetTextureWrapper (txt);
-
-  csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-
   return csPtr<iMaterial> (imat);
 }
 

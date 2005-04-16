@@ -40,7 +40,6 @@ struct csLightMapMapping;
 struct iImage;
 struct iTextureHandle;
 struct iMaterial;
-struct iMaterialHandle;
 
 /**\name Texture registration flags.
  * During texture registration you should tell
@@ -170,33 +169,6 @@ struct iTextureManager : public iBase
    * restrictions. This is done later before texture is first used.
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
-
-  /**
-   * Register a material. The input material is IncRef'd and DecRef'ed
-   * later when FreeMaterials () is called or the material handle is destroyed
-   * by calling DecRef on it enough times. If you want to keep the input
-   * material make sure you have called IncRef yourselves. <p>
-   *
-   * The material is unregistered at destruction, i.e. as soon as the last
-   * reference to the material handle is released.
-   */
-  virtual csPtr<iMaterialHandle> RegisterMaterial (iMaterial* material) = 0;
-
-  /**
-   * Register a material based on a texture handle. This is a short-cut
-   * to quickly make materials based on a single texture.
-   *
-   * The material is unregistered at destruction, i.e. as soon as the last
-   * reference to the material handle is released.
-   */
-  virtual csPtr<iMaterialHandle> RegisterMaterial (
-  	iTextureHandle* txthandle) = 0;
-
-  /**
-   * Call this function if you want to release all iMaterial's as
-   * given to this texture manager.
-   */
-  virtual void FreeMaterials () = 0;
 
   /**
    * Query the basic format of textures that can be registered with this

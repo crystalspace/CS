@@ -60,10 +60,8 @@ SCF_VERSION (iMaterial, 0, 1, 0);
 
 /**
  * This class represents a material as seen from the engine
- * view. You need to register this to the texture manager to get
- * a handle to an internal compiled material. This interface
- * plays same role related to iMaterialHandle as iImage plays
- * related to iTextureHandle.
+ * view. Because it is also a shader variable context it can be used directly 
+ * for rendering.
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
@@ -108,68 +106,28 @@ struct iMaterial : public iShaderVariableContext
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
+   * \deprecated Use the shader variable system instead.
    */
   virtual void GetFlatColor (csRGBpixel &oColor,
     bool useTextureMean = true) = 0;
   /**
    * Set the flat shading color.
+   * \deprecated Use the shader variable system instead.
    */
   virtual void SetFlatColor (const csRGBcolor& col) = 0;
 
   /**
    * Get light reflection parameters for this material.
+   * \deprecated Use the shader variable system instead.
    */
   virtual void GetReflection (
     float &oDiffuse, float &oAmbient, float &oReflection) = 0;
   /**
    * Set the reflection parameters.
+   * \deprecated Use the shader variable system instead.
    */
   virtual void SetReflection (float oDiffuse, float oAmbient,
     float oReflection) = 0;
-};
-
-SCF_VERSION (iMaterialHandle, 0, 0, 2);
-
-/**
- * This class represents a material handle (compiled material)
- * for the 3D rasterizer.
- * <p>
- * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iTextureManager::RegisterMaterial()
- *   </ul>
- * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iMaterialWrapper::GetMaterialHandle()
- *   </ul>
- * Main users of this interface:
- *   <ul>
- *   <li>3D renderer implementations (iGraphics3D).
- *   </ul>
- */
-struct iMaterialHandle : public iBase
-{
-  /**
-   * Get shader associated with a shader type
-   */
-  virtual iShader* GetShader (csStringID type) = 0;
-
-  /**
-   * Get a texture from the material.
-   */
-  virtual iTextureHandle *GetTexture () = 0;
-
-  /**
-   * Get the flat color. If the material has a texture assigned, this
-   * will return the mean texture color.
-   */
-  virtual void GetFlatColor (csRGBpixel &oColor) = 0;
-
-  /**
-   * Get light reflection parameters for this material.
-   */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient,
-  	float &oReflection) = 0;
 };
 
 /** @} */

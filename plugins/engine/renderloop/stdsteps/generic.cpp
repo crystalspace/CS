@@ -476,11 +476,11 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 	exit (-1);
       }
 #endif
-      iMaterialHandle* hdl = mesh->material->GetMaterialHandle ();
+      iMaterial* hdl = mesh->material->GetMaterial ();
 #ifdef CS_DEBUG
       if (!hdl)
       {
-        csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material handle!\n",
+        csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material!\n",
 	  mesh->db_mesh_name);
 	exit (-1);
       }

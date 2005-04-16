@@ -216,8 +216,6 @@ private:
   csRef<iMaterial> material;
   /// The corresponding iMaterialEngine.
   csRef<iMaterialEngine> matEngine;
-  /// The handle as returned by iTextureManager.
-  csRef<iMaterialHandle> handle;
 
 private:
   /// Release material handle
@@ -228,18 +226,8 @@ public:
 
   /// Construct a material handle given a material.
   csMaterialWrapper (iMaterial* Image);
-  /// Construct a csMaterialWrapper from a pre-registered material handle.
-  csMaterialWrapper (iMaterialHandle *ith);
   /// Copy constructor
   csMaterialWrapper (csMaterialWrapper &);
-
-  /**
-   * Change the material handle. Note: This will also change the base
-   * material to 0.
-   */
-  void SetMaterialHandle (iMaterialHandle *mat);
-  /// Get the material handle.
-  iMaterialHandle* GetMaterialHandle () { return handle; }
 
   /**
    * Change the base material. Note: The changes will not be visible until
@@ -248,9 +236,6 @@ public:
   void SetMaterial (iMaterial* material);
   /// Get the original material.
   iMaterial* GetMaterial () { return material; }
-
-  /// Register the material with the texture manager
-  void Register (iTextureManager *txtmng);
 
   /**
    * Visit this material. This should be called by the engine right
@@ -270,16 +255,10 @@ public:
     { return scfParent; }
     virtual iMaterialWrapper *Clone () const
     { return &(new csMaterialWrapper (*scfParent))->scfiMaterialWrapper; }
-    virtual void SetMaterialHandle (iMaterialHandle *mat)
-    { scfParent->SetMaterialHandle (mat); }
-    virtual iMaterialHandle* GetMaterialHandle ()
-    { return scfParent->GetMaterialHandle (); }
     virtual void SetMaterial (iMaterial* material)
     { scfParent->SetMaterial (material); }
     virtual iMaterial* GetMaterial ()
     { return scfParent->GetMaterial (); }
-    virtual void Register (iTextureManager *txtmng)
-    { scfParent->Register (txtmng); }
     virtual void Visit ()
     { scfParent->Visit (); }
     virtual bool IsVisitRequired () const
@@ -307,8 +286,6 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
-  	const char* name);
-  virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith,
   	const char* name);
   virtual int GetCount () const { return (int)list.Length (); }
   virtual iMaterialWrapper *Get (int n) const { return list[n]; }

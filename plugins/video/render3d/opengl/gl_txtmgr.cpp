@@ -1,4 +1,3 @@
-
 /*
     Copyright (C) 1998-2004 by Jorrit Tyberghein
 	      (C) 2003 by Philip Aumayr
@@ -982,81 +981,7 @@ void csGLTextureHandle::PrepareKeycolor (csRef<iImage>& image,
   image = csBakeKeyColor::Image (image, transp_color);
 }
 
-SCF_IMPLEMENT_IBASE (csGLMaterialHandle)
-  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
-SCF_IMPLEMENT_IBASE_END
-
-csGLMaterialHandle::csGLMaterialHandle (iMaterial* m,
-	csGLTextureManager *parent)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  material = m;
-  texman = parent;
-}
-
-csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t,
-	csGLTextureManager *parent)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  texman = parent;
-  texture = t;
-}
-
-csGLMaterialHandle::~csGLMaterialHandle ()
-{
-  FreeMaterial ();
-  texman->UnregisterMaterial (this);
-  SCF_DESTRUCT_IBASE()
-}
-
-void csGLMaterialHandle::FreeMaterial ()
-{
-  material = 0;
-}
-
-iShader* csGLMaterialHandle::GetShader (csStringID type)
-{ 
-  return material ? material->GetShader (type) : 0; 
-}
-
-iTextureHandle* csGLMaterialHandle::GetTexture ()
-{
-  if (material)
-  {
-    return material->GetTexture (texman->nameDiffuseTexture);
-  }
-  else
-  {
-    return texture;
-  }
-}
-
-void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor)
-{ 
-  if (material)
-  {
-    material->GetFlatColor (oColor);
-  }
-  else
-  {
-    texture->GetMeanColor (oColor.red, oColor.green, oColor.blue);
-  }
-}
-
-void csGLMaterialHandle::GetReflection (float &oDiffuse, float &oAmbient,
-  float &oReflection)
-{ 
-  if (material)
-  {
-    material->GetReflection (oDiffuse, oAmbient, oReflection);
-  }
-  else
-  {
-    oDiffuse = CS_DEFMAT_DIFFUSE;
-    oAmbient = CS_DEFMAT_AMBIENT;
-    oReflection = CS_DEFMAT_REFLECTION;
-  }
-}
+//---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csGLTextureManager)
   SCF_IMPLEMENTS_INTERFACE(iTextureManager)
@@ -1068,7 +993,7 @@ static const csGLTextureClassSettings defaultSettings =
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *iG3D) : 
-  textures (16, 16), materials (16, 16)
+  textures (16, 16)
 {
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
@@ -1292,12 +1217,6 @@ void csGLTextureManager::Clear()
   }
 }
 
-void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
-{
-  size_t const idx = materials.Find (handle);
-  if (idx != csArrayItemNotFound) materials.DeleteIndexFast (idx);
-}
-
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 {
   csGLStateCache* statecache = csGLGraphics3D::statecache;
@@ -1354,46 +1273,6 @@ void csGLTextureManager::UnregisterTexture (csGLTextureHandle* handle)
 {
   size_t const idx = textures.Find (handle);
   if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
-}
-
-csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
-	iMaterial* material)
-{
-  if (!material) return 0;
-  csGLMaterialHandle *mat = new csGLMaterialHandle (material, this);
-  materials.Push (mat);
-
-  // @@@ Dunno if this should be _here_ really.
-  csRef<iShaderManager> shadman = 
-    CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  //shadman->AddChild (material);
-  
-  return csPtr<iMaterialHandle> (mat);
-}
-
-csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
-      iTextureHandle* txthandle)
-{
-  if (!txthandle) return 0;
-  csGLMaterialHandle *mat = new csGLMaterialHandle (txthandle, this);
-  materials.Push (mat);
-
-  // @@@ Dunno if this should be _here_ really.
-  csRef<iShaderManager> shadman = 
-    CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  //shadman->AddChild (mat->GetMaterial ());
-
-  return csPtr<iMaterialHandle> (mat);
-}
-
-void csGLTextureManager::FreeMaterials ()
-{
-  size_t i;
-  for (i = 0; i < materials.Length (); i++)
-  {
-    csGLMaterialHandle* mat = materials[i];
-    if (mat) mat->FreeMaterial ();
-  }
 }
 
 int csGLTextureManager::GetTextureFormat ()

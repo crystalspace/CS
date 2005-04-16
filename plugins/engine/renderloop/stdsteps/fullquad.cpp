@@ -284,7 +284,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (mat != 0)
     {
       mat->Visit(); // @@@ here?
-      shader = mat->GetMaterialHandle()->GetShader (settings.shadertype);
+      shader = mat->GetMaterial()->GetShader (settings.shadertype);
     }
   }
 

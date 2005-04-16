@@ -259,11 +259,6 @@ public:
   /// Destructor.
   virtual ~csHazeMeshObject ();
 
-  /** draw (and clip) a polygon, give nr of vertices, arrays of vert, uv
-   * pts are in screenspace (sx, sy, iz), uvs in texturespace (u, v)
-   */
-  void DrawPoly(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
-    int num, const csVector3* pts, const csVector2* uvs);
   /**
    *  Compute the outline of a particular hull.
    *  Pass a hull and its layerscale.
@@ -282,19 +277,6 @@ public:
   void ProjectO2S(csReversibleTransform& tr_o2c, float fov, float shiftx,
     float shifty, const csVector3& objpos, csVector3& scrpos, 
     csVector3* campos);
-  /** recursively draw a polygon - type 0=center 1,2 is rim, with
-    alternative interpolation.
-    quality is the minimal cos of the angle.
-      .9999 is maximum quality (infinite polygons).
-      .90 is nice quality.
-      0.70 is lower quality.
-      0.50 is low quality.
-      -1 is lowest quality (no adaptation)
-    recursion will only go until >= maxdepth. Pass depth=0 at start.
-    */
-  void DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
-    int num_sides, csVector3* pts, csVector2* uvs,
-    float layer_scale, float quality, int depth, int maxdepth);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent)
@@ -306,6 +288,17 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
+  /** 
+   * Recursively generate geometry. 
+   * \a type 0=center 1,2 is rim, with alternative interpolation.
+   * \a quality is the minimal cos of the angle.
+   *  .9999 is maximum quality (infinite polygons).
+   *  .90 is nice quality.
+   *  0.70 is lower quality.
+   *  0.50 is low quality.
+   *  -1 is lowest quality (no adaptation)
+   * Recursion will only go until >= maxdepth. Pass depth=0 at start.
+   */
   void GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d, 
     int num_sides, csVector3* scrpts, csVector3* campts, csVector2* uvs,
     float layer_scale, float quality, int depth, int maxdepth);

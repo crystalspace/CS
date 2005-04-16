@@ -174,7 +174,7 @@ struct G3DPolygonDP : public G3DPolygonDFP
   bool use_fog;
 
   /// The material handle as returned by iTextureManager.
-  iMaterialHandle* mat_handle;
+  iMaterial* mat;
 
   /// Transformation matrices for the texture. @@@ BAD NAME
   G3DCam2TextureTransform cam2tex;
@@ -259,11 +259,7 @@ struct G3DTriangleMesh
   /// DrawPolygonFX flag.
   uint mixmode;
   float morph_factor;
-  /**
-  * Vertex buffers. Note that all vertex buffers used here MUST
-  * have the same number of vertices.
-  */
-  iMaterialHandle* mat_handle;
+  iMaterial* mat;
   /// Information for fogging the vertices.
   G3DFogInfo* vertex_fog;
 
@@ -857,12 +853,6 @@ public:
     if (unit != 0) return false;
     activeTex = txthandle;
     return true;
-  }
-
-  /// Activate a texture (Should probably handled some better way)
-  bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0)
-  {
-    return false;
   }
 
   virtual void SetTextureState (int* units, iTextureHandle** textures, int count)

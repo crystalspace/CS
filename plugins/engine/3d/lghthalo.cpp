@@ -376,10 +376,10 @@ void csLightFlareHalo::ProcessFlareComponent (
     csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without material.");
     return ;
   }
-  iMaterialHandle* mat_handle = comp->image->GetMaterialHandle ();
-  if (!mat_handle)
+  iMaterial* mat = comp->image->GetMaterial ();
+  if (!mat)
   {
-    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without valid material handle.");
+    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without valid material.");
     return ;
   }
 
@@ -423,7 +423,7 @@ void csLightFlareHalo::ProcessFlareComponent (
   mesh.vertices = HaloPoly;
   mesh.texcoords = HaloUV;
   mesh.colors = colors;
-  mesh.texture = mat_handle->GetTexture();
+  mesh.texture = mat->GetTexture();
   mesh.mixmode = ((mode & CS_FX_MASK_MIXMODE) != CS_FX_ALPHA) ? mode : CS_FX_COPY;
 
   engine.G3D->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);

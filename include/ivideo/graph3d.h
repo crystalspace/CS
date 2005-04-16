@@ -55,7 +55,6 @@ struct iPolygonBuffer;
 struct iPolygonRenderer;
 struct iTextureManager;
 struct iTextureHandle;
-struct iMaterialHandle;
 struct iMaterial;
 struct iClipper2D;
 struct iHalo;

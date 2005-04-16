@@ -27,12 +27,12 @@
 
 #include "csutil/scf.h"
 
-struct iMaterialHandle;
 struct iFile;
 struct iStream;
 struct iVideoStream;
 struct iAudioStream;
 struct iCodec;
+struct iTextureHandle;
 
 /**
  * Stream format capability enumeration.
@@ -224,7 +224,7 @@ struct iVideoStream : public iStream
   /**
    * Call this if you want to use the frames as textures on your own polygons.
    */
-  virtual iMaterialHandle* NextFrameGetMaterial () = 0;
+  virtual iTextureHandle* NextFrameGetTexture () = 0;
 
 };
 

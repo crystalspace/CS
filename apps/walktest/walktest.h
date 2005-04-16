@@ -280,7 +280,7 @@ public:
   bool do_fs_fadetxt;
   float fs_fadetxt_fade;
   bool fs_fadetxt_dir;
-  iMaterialHandle* fs_fadetxt_mat;
+  iTextureHandle* fs_fadetxt_txt;
 
   bool do_fs_red;
   float fs_red_fade;

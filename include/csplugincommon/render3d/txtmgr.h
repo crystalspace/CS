@@ -249,66 +249,6 @@ public:
 };
 
 /**
- * This class is the top-level representation of a material.
- */
-class CS_CRYSTALSPACE_EXPORT csMaterialHandle : public iMaterialHandle
-{
-protected:
-  /// Original material.
-  csRef<iMaterial> material;
-  /// Parent texture manager
-  csRef<csTextureManager> texman;
-  /// Texture handle, if created from one
-  csRef<iTextureHandle> texture;
-
-public:
-  ///
-  csMaterialHandle (iMaterial* material, csTextureManager *parent);
-  ///
-  csMaterialHandle (iTextureHandle* texture, csTextureManager *parent);
-  ///
-  virtual ~csMaterialHandle ();
-
-  /// Release the original material (iMaterial).
-  void FreeMaterial ();
-
-  /// Get the material.
-  iMaterial* GetMaterial () { return material; }
-
-  //--------------------- iMaterialHandle implementation ----------------------
-  SCF_DECLARE_IBASE;
-
-  /**
-   * Get shader associated with a shader type
-   */
-  virtual iShader *GetShader (csStringID type) 
-  { return material->GetShader(type); }
-
-  /**
-   * Get a texture from the material.
-   */
-  virtual iTextureHandle *GetTexture ();
-
-  /**
-   * Get the flat color. If the material has a texture assigned, this
-   * will return the mean texture color.
-   */
-  virtual void GetFlatColor (csRGBpixel &oColor)
-  { 
-    material->GetFlatColor (oColor);
-  }
-
-  /**
-   * Get light reflection parameters for this material.
-   */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection)
-  { 
-    material->GetReflection (oDiffuse, oAmbient, oReflection);
-  }
-};
-
-/**
  * General version of the texture manager.
  * Each 3D driver should derive a texture manager class from this one
  * and implement the missing functionality.
@@ -322,13 +262,6 @@ protected:
 
   /// List of textures.
   csTexVector textures;
-
-  // Private class used to keep a list of objects derived from csMaterialHandle
-  //typedef csArray<csMaterialHandle*> csMatVector;
-  typedef csWeakRefArray<csMaterialHandle> csMatVector;
-
-  /// List of materials.
-  csMatVector materials;
 
   ///
   iObjectRegistry *object_reg;
@@ -350,17 +283,10 @@ public:
   /// Destroy the texture manager
   virtual ~csTextureManager ();
 
-  /**
-   * Called from csMaterialHandle destructor to notify parent texture
-   * manager that a material is going to be destroyed.
-   */
-  void UnregisterMaterial (csMaterialHandle* handle);
-
   /// Clear (free) all textures
   virtual void Clear ()
   {
     textures.DeleteAll ();
-    materials.DeleteAll ();
   }
 
   /**
@@ -371,26 +297,6 @@ public:
    * bits that fit the CS_IMGFMT_MASK mask matters.
    */
   virtual int GetTextureFormat ();
-
-  /**
-   * Register a material. The input material wrapper is IncRef'd and DecRef'ed
-   * later when FreeMaterials () is called or the material handle is destroyed
-   * by calling DecRef on it enough times. If you want to keep the input
-   * material make sure you have called IncRef yourselves.
-   */
-  virtual csPtr<iMaterialHandle> RegisterMaterial (iMaterial* material);
-
-  /**
-   * Register a material based on a texture handle. This is a short-cut
-   * to quickly make materials based on a single texture.
-   */
-  virtual csPtr<iMaterialHandle> RegisterMaterial (iTextureHandle* txthandle);
-
-  /**
-   * Default stub implementation until the
-   * material system is actually working.
-   */
-  virtual void FreeMaterials ();
 };
 
 #endif // __CS_TXTMGR_H__

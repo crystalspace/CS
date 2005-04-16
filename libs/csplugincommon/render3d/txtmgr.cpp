@@ -222,73 +222,6 @@ const char* csTextureHandle::GetTextureClass ()
   return texman->texClassIDs.Request (texClass);
 }
 
-//----------------------------------------------------- csMaterialHandle -----//
-
-SCF_IMPLEMENT_IBASE (csMaterialHandle)
-  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
-SCF_IMPLEMENT_IBASE_END
-
-csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  DG_ADDI (this, 0);
-  DG_TYPE (this, "csMaterialHandle");
-  texman = parent;
-  material = m;
-  if (material != 0)
-  {
-    csRef<iTextureHandle> texture = GetTexture ();
-    // @@@ really, all textures should be linked
-    if (texture)
-    {
-      DG_LINK (this, texture);
-    }
-  }
-}
-
-csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  DG_ADDI (this, 0);
-  DG_TYPE (this, "csMaterialHandle");
-  // @@@ Need iMaterial, or a shader branch or so!!!
-  texman = parent;
-  texture = t;
-  if (texture)
-  {
-    DG_LINK (this, texture);
-  }
-}
-
-csMaterialHandle::~csMaterialHandle ()
-{
-  FreeMaterial ();
-  texman->UnregisterMaterial (this);
-  DG_REM (this);
-  SCF_DESTRUCT_IBASE()
-}
-
-void csMaterialHandle::FreeMaterial ()
-{
-  if (texture)
-  {
-    DG_UNLINK (this, texture);
-  }
-  material = 0;
-}
-
-iTextureHandle* csMaterialHandle::GetTexture ()
-{
-  if (material)
-  {
-    return material->GetTexture (texman->nameDiffuseTexture);
-  }
-  else
-  {
-    return texture;
-  }
-}
-
 //------------------------------------------------------------ csTexture -----//
 
 void csTexture::compute_masks ()
@@ -307,7 +240,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 	iGraphics2D *iG2D)
-	: textures (16, 16), materials (16, 16)
+	: textures (16, 16)
 {
   SCF_CONSTRUCT_IBASE (0);
   csTextureManager::object_reg = object_reg;
@@ -333,37 +266,4 @@ void csTextureManager::read_config (iConfigFile* /*config*/)
 int csTextureManager::GetTextureFormat ()
 {
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
-}
-
-csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (iMaterial* material)
-{
-  if (!material) return 0;
-  csMaterialHandle *mat = new csMaterialHandle (material, this);
-  materials.Push (mat);
-  return csPtr<iMaterialHandle> (mat);
-}
-
-csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (
-	iTextureHandle* txthandle)
-{
-  if (!txthandle) return 0;
-  csMaterialHandle *mat = new csMaterialHandle (txthandle, this);
-  materials.Push (mat);
-  return csPtr<iMaterialHandle> (mat);
-}
-
-void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
-{
-  size_t idx = materials.Find (handle);
-  if (idx != csArrayItemNotFound) materials.DeleteIndexFast (idx);
-}
-
-void csTextureManager::FreeMaterials ()
-{
-  size_t i;
-  for (i = 0; i < materials.Length (); i++)
-  {
-    csMaterialHandle* mat = materials.Get (i);
-    if (mat) mat->FreeMaterial ();
-  }
 }

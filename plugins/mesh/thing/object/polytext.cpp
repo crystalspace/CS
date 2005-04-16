@@ -254,9 +254,9 @@ void csPolyTexture::FillLightMap (
   csVector3 &lightpos = light_frustum->GetOrigin ();
   float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
-  iMaterialHandle* mat_handle = spoly->GetMaterialHandle ();
-  if (mat_handle && mat_handle->GetTexture ())
-    mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
+  iMaterial* mat = spoly->GetMaterial ();
+  if (mat && mat->GetTexture ())
+    mat->GetTexture ()->GetRendererDimensions (ww, hh);
   else
     ww = hh = 64;
 
@@ -472,8 +472,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
       csLightMap::lightcell_shift);
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
-  mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
+  iMaterial* mat = polygon->GetStaticPoly()->GetMaterial();
+  mat->GetTexture ()->GetRendererDimensions (ww, hh);
 
   float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
@@ -1029,9 +1029,9 @@ void csPolyTexture::UpdateFromShadowBitmap (
   CS_ASSERT (shadow_bitmap != 0);
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
-  if (mat_handle && mat_handle->GetTexture ())
-    mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
+  iMaterial* mat = polygon->GetStaticPoly()->GetMaterial();
+  if (mat && mat->GetTexture ())
+    mat->GetTexture ()->GetRendererDimensions (ww, hh);
   else
     ww = hh = 64;
 

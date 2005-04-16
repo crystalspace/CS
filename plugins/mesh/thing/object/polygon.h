@@ -502,7 +502,7 @@ public:
   bool PointOnPolygon (const csVector3& v);
 
   /// Get the material handle for the texture manager.
-  iMaterialHandle *GetMaterialHandle ();
+  iMaterial* GetMaterial ();
 
   /// Make a clone of this static polygon.
   csPolygon3DStatic* Clone (csThingStatic* new_parent);

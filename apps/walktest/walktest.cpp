@@ -516,8 +516,7 @@ void WalkTest::DrawFullScreenFX2D (csTicks /*elapsed_time*/,
 {
   if (do_fs_inter)
   {
-    iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-    csfxInterference (Gfx2D, txtmgr, fs_inter_amount, fs_inter_anim,
+    csfxInterference (Gfx2D, fs_inter_amount, fs_inter_anim,
     	fs_inter_length);
     fs_inter_anim = fmod (fabs (float (current_time)/3000.0), 1.);
   }
@@ -544,7 +543,7 @@ void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
   }
   if (do_fs_fadetxt)
   {
-    csfxFadeTo (Gfx3D, fs_fadetxt_mat, fs_fadetxt_fade);
+    csfxFadeTo (Gfx3D, fs_fadetxt_txt, fs_fadetxt_fade);
     float t3 = fabs (float (current_time)/3000.0);
     fs_fadetxt_fade = fmod (t3, 1.0f);
     fs_fadetxt_dir = fmod (t3, 2.0f) >= 1;

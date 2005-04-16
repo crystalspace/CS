@@ -25,8 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csgeom/vector4.h"
 
-void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
-  float amount, float anim, float length)
+void csfxInterference(iGraphics2D *g2d, float amount, float anim, float length)
 {
 #define SEMIRAND anim = (anim + 0.137564f) - int(anim + 0.137564f);
   if (amount == 0) amount = 0.000001f;
@@ -73,10 +72,10 @@ void csfxFadeOut(iGraphics3D *g3d, float fadevalue)
   csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, multval);
 }
 
-void csfxFadeTo(iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue)
+void csfxFadeTo(iGraphics3D *g3d, iTextureHandle *tex, float fadevalue)
 {
   float fade = 1.0f - fadevalue;
-  csfxScreenDPFX(g3d, mat, CS_FX_SETALPHA(fade), 255, 255, 255);
+  csfxScreenDPFX(g3d, tex, CS_FX_SETALPHA(fade), 255, 255, 255);
 }
 
 void csfxGreenScreen(iGraphics3D *g3d, float fadevalue)
@@ -164,15 +163,15 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
 }
 
 
-void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
+void csfxScreenDPFX(iGraphics3D *g3d, iTextureHandle *tex, uint mixmode,
   uint8 r, uint8 g, uint8 b)
 {
   csfxScreenDPFXPartial (g3d, 0, 0, g3d->GetWidth (), g3d->GetHeight (),
-    mat, mixmode, r, g, b);
+    tex, mixmode, r, g, b);
 }
 
 void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
-  iMaterialHandle *mat, uint mixmode, uint8 r, uint8 g, uint8 b)
+  iTextureHandle *tex, uint mixmode, uint8 r, uint8 g, uint8 b)
 {
   csSimpleRenderMesh mesh;
   static uint indices[4] = {0, 1, 2, 3};
@@ -191,7 +190,7 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   mesh.vertices = verts;
   mesh.texcoords = texels;
   mesh.colors = colors;
-  mesh.texture = mat ? mat->GetTexture () : 0;
+  mesh.texture = tex;
   // @@@ Bit of a hack
   if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
   {

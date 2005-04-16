@@ -687,7 +687,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   csVector3* layer_pts = 0;
   csVector2* layer_uvs = 0;
   csVector3* cam_pts = 0;
-  ComputeHullOutline(hull, layer_scale, campos, tr_o2c, fov, shx, shy,
+  ComputeHullOutline (hull, layer_scale, campos, tr_o2c, fov, shx, shy,
     layer_num, layer_poly, layer_pts, &cam_pts, layer_uvs);
   if(layer_num <= 0)
   {
@@ -866,57 +866,6 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
   }
 }
 
-
-
-void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
-     iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs,
-     float layer_scale, float quality, int depth, int maxdepth)
-{
-  /// only triangles
-  (void)num_sides;
-  CS_ASSERT(num_sides == 3);
-  // check if the angle is OK
-  csVector2 dir1;
-  dir1.x = pts[1].x - pts[0].x;
-  dir1.y = pts[1].y - pts[0].y;
-  csVector2 dir2;
-  dir2.x = pts[2].x - pts[0].x;
-  dir2.y = pts[2].y - pts[0].y;
-  csVector2 normdir1 = dir1 / dir1.Norm();
-  csVector2 normdir2 = dir2 / dir2.Norm();
-  float cosangle = normdir1 * normdir2;
-  //csPrintf("cosangle %g, quality %g\n", cosangle, quality);
-  if(cosangle > quality || depth >= maxdepth)
-  {
-    // draw it
-    DrawPoly(rview, g3d, mat, 3, pts, uvs);
-    return;
-  }
-  // split up
-  csVector3 oldpos = pts[2];
-  csVector2 olduv = uvs[2];
-  pts[2] = (pts[1] + pts[2])*0.5;
-  csVector2 newdir;
-  newdir.x = pts[2].x - pts[0].x;
-  newdir.y = pts[2].y - pts[0].y;
-  newdir /= newdir.Norm();
-  uvs[2].Set(0.5, 0.5);
-  uvs[2] += newdir * layer_scale;
-  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality, 
-    depth+1, maxdepth);
-  // other half
-  csVector3 oldpos1 = pts[1];
-  csVector2 olduv1 = uvs[1];
-  pts[1] = pts[2];
-  uvs[1] = uvs[2];
-  pts[2] = oldpos;
-  uvs[2] = olduv;
-  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality, 
-    depth+1, maxdepth);
-  pts[1] = oldpos1;
-  uvs[1] = olduv1;
-}
-
 void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   float shiftx, float shifty, const csVector3& objpos, csVector3& scrpos, 
   csVector3* campos)
@@ -927,12 +876,6 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
   float inv_z = fov * scrpos.z; // = iz
   scrpos.x = scrpos.x * inv_z + shiftx;
   scrpos.y = scrpos.y * inv_z + shifty;
-}
-
-void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
-  iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
-{
-
 }
 
 void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox)

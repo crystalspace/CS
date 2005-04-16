@@ -30,7 +30,6 @@
  
 class csMaterialWrapper;
 struct iMaterial;
-struct iMaterialHandle;
 struct iTextureManager;
 struct iTextureWrapper;
 struct iObject;
@@ -39,10 +38,9 @@ SCF_VERSION (iMaterialWrapper, 0, 0, 5);
 
 /**
  * A material wrapper is an engine-level object that wraps around an actual
- * material (iMaterialHandle). Every material in the engine is represented
- * by a material wrapper, which keeps the pointer to the material handle, its
- * name, and possibly the base material object that was registered to create
- * the material handle.
+ * material (iMaterial). Every material in the engine is represented by a 
+ * material wrapper, which keeps the pointer to the material and its name, and 
+ * possibly the base material object.
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
@@ -74,23 +72,12 @@ struct iMaterialWrapper : public iBase
   virtual iMaterialWrapper *Clone () const = 0;
 
   /**
-   * Change the material handle. Note: This will also change the base
-   * material to 0.
-   */
-  virtual void SetMaterialHandle (iMaterialHandle *mat) = 0;
-  /// Get the material handle.
-  virtual iMaterialHandle* GetMaterialHandle () = 0;
-
-  /**
    * Change the base material. Note: The changes will not be visible until
    * you re-register the material.
    */
   virtual void SetMaterial (iMaterial* material) = 0;
   /// Get the original material.
   virtual iMaterial* GetMaterial () = 0;
-
-  /// Register the material with the texture manager
-  virtual void Register (iTextureManager *txtmng) = 0;
 
   /**
    * Visit this material. This should be called by the engine right
@@ -161,13 +148,6 @@ struct iMaterialList : public iBase
 {
   /// Create a new material.
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
-  	const char* name) = 0;
-
-  /**
-   * Create a engine wrapper for a pre-prepared iTextureHandle
-   * The handle will be IncRefed.
-   */
-  virtual iMaterialWrapper *NewMaterial (iMaterialHandle *ith,
   	const char* name) = 0;
 
   /// Return the number of materials in this list

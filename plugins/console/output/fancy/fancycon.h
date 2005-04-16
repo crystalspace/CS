@@ -26,13 +26,13 @@
 
 struct iGraphics2D;
 struct iGraphics3D;
-struct iMaterialHandle;
 struct iVFS;
 struct iImageIO;
+struct iTextureHandle;
 
 struct ConDecoBorder
 {
-  csRef<iMaterialHandle> mat;
+  csRef<iTextureHandle> txt;
   bool do_keycolor;
   uint8 kr, kg, kb;
   bool do_stretch;

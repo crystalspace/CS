@@ -293,64 +293,6 @@ public:
   GLuint GetHandle ();
 };
 
-/*
-*
-* new MaterialHandle Implementation
-* by Phil Aumayr (phil@rarebyte.com)
-*
-*/
-class csGLMaterialHandle : public iMaterialHandle
-{
-protected:
-  /// Original material.
-  csRef<iMaterial> material;
-  /// Texture handle, if created from one
-  csRef<iTextureHandle> texture;
-  /// Parent texture manager
-  csGLTextureManager* texman;
-
-public:
-  CS_LEAKGUARD_DECLARE(csGLMaterialHandle);
-
-  ///
-  csGLMaterialHandle (iMaterial* material, csGLTextureManager *parent);
-  ///
-  csGLMaterialHandle (iTextureHandle* texture, csGLTextureManager *parent);
-  ///
-  virtual ~csGLMaterialHandle ();
-
-  /// Release the original material (iMaterial).
-  void FreeMaterial ();
-
-  /// Get the material.
-  iMaterial* GetMaterial () { return material; }
-
-  //--------------------- iMaterialHandle implementation ----------------------
-  SCF_DECLARE_IBASE;
-
-  /**
-   * Get associated shader
-   */
-  virtual iShader* GetShader (csStringID type);
-
-  /**
-   * Get a texture from the material.
-   */
-  virtual iTextureHandle *GetTexture ();
-
-  /**
-   * Get the flat color. If the material has a texture assigned, this
-   * will return the mean texture color.
-   */
-  virtual void GetFlatColor (csRGBpixel &oColor);
-
-  /**
-   * Get light reflection parameters for this material.
-   */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection);
-};
-
 class csGLSuperLightmap;
 
 /**
@@ -455,10 +397,6 @@ private:
   typedef csWeakRefArray<csGLTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
-  // Private class used to keep a list of objects derived from csMaterialHandle
-  typedef csWeakRefArray<csGLMaterialHandle> csMatVector;
-  /// List of materials.
-  csMatVector materials;
 
   csPixelFormat pfmt;
 
@@ -518,12 +456,6 @@ public:
   }
 
   /**
-   * Called from csMaterialHandle destructor to notify parent texture
-   * manager that a material is going to be destroyed.
-   */
-  void UnregisterMaterial (csGLMaterialHandle* handle);
-
-  /**
    * Helper function to make sure a texture isn't selected on any TU.
    * Useful when deleting a texture.
    */
@@ -544,33 +476,6 @@ public:
   void UnregisterTexture (csGLTextureHandle* handle);
 
   /**
-   * Register a material. The input material is IncRef'd and DecRef'ed
-   * later when FreeMaterials () is called or the material handle is destroyed
-   * by calling DecRef on it enough times. If you want to keep the input
-   * material make sure you have called IncRef yourselves. <p>
-   *
-   * The material is unregistered at destruction, i.e. as soon as the last
-   * reference to the material handle is released.
-   */
-  virtual csPtr<iMaterialHandle> RegisterMaterial (iMaterial* material);
-
-  /**
-   * Register a material based on a texture handle. This is a short-cut
-   * to quickly make materials based on a single texture.
-   *
-   * The material is unregistered at destruction, i.e. as soon as the last
-   * reference to the material handle is released.
-   */
-  virtual csPtr<iMaterialHandle> RegisterMaterial (
-  	iTextureHandle* txthandle);
-
-  /**
-   * Call this function if you want to release all iMaterial's as
-   * given to this texture manager.
-   */
-  virtual void FreeMaterials ();
-
-  /**
    * Query the basic format of textures that can be registered with this
    * texture manager. It is very likely that the texture manager will
    * reject the texture if it is in an improper format. The alpha channel
@@ -582,11 +487,6 @@ public:
   virtual csPtr<iSuperLightmap> CreateSuperLightmap(int width, int height);
 
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
-
-  virtual int GetMaterialIndex (iMaterialHandle* mat)
-  {
-    return (int)materials.Find ((csGLMaterialHandle*)mat); // @@@ Evil cast?
-  }
 
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);

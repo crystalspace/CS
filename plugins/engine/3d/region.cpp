@@ -291,17 +291,6 @@ bool csRegion::PrepareTextures ()
     }
   }
 
-  // Then register all materials to the texture manager.
-  iter->Reset ();
-  while (iter->HasNext ())
-  {
-    csRef<iMaterialWrapper> csmh (SCF_QUERY_INTERFACE (
-        iter->Next (),
-        iMaterialWrapper));
-    if (csmh)
-      if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
-  }
-
   return true;
 }
 

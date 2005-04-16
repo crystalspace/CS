@@ -47,6 +47,7 @@
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/material.h"
 #include "iutil/vfs.h"
 #include "iutil/config.h"
 #include "iengine/light.h"
@@ -78,9 +79,9 @@ double ParseScaleFactor(iObjectIterator* it);
 // Use a view's clipping rect to calculate a bounding box
 void BoundingBoxForView(iView *view, csBox2 *box)
 {
-    int vertexCount = view->GetClipper()->GetVertexCount();
+    size_t vertexCount = view->GetClipper()->GetVertexCount();
     csVector2 *clip = view->GetClipper()->GetClipPoly();
-    for (int i = 0; i < vertexCount; i++)
+    for (size_t i = 0; i < vertexCount; i++)
         box->AddBoundingVertex(clip[i]);
 }
 
@@ -1650,7 +1651,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->FindByName (buf);
       if (mat)
       {
-        Sys->fs_fadetxt_mat = mat->GetMaterialHandle ();
+        Sys->fs_fadetxt_txt = mat->GetMaterial()->GetTexture ();
       }
       else
       {

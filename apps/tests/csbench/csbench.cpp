@@ -495,7 +495,6 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
 	matinput->SetShader (shadertype2, shader2);
       iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (
       	matinput, 0);
-      mat->Register (g3d->GetTextureManager ());
       genmesh->SetMaterialWrapper (mat);
       ws->ReplaceMaterial (oldmat, mat);
 

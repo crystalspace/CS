@@ -1565,11 +1565,11 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   }*/
 
   csRGBpixel color;
-  iTextureHandle *txt_handle = poly.mat_handle->GetTexture ();
+  iTextureHandle *txt_handle = poly.mat->GetTexture ();
   if (txt_handle)
     txt_handle->GetMeanColor (color.red, color.green, color.blue);
   else
-    poly.mat_handle->GetFlatColor (color);
+    poly.mat->GetFlatColor (color);
 
   /* @@@
   if (lm)

@@ -194,11 +194,11 @@ void csFancyConsole::Draw3D (csRect *oArea)
   {
     // determine what space left to draw the actual console
     memset (&bordersize, 0, sizeof (bordersize));
-    if (deco.border [0].mat)
-      deco.border [0].mat->GetTexture ()->GetRendererDimensions (
+    if (deco.border [0].txt)
+      deco.border [0].txt->GetRendererDimensions (
         bordersize.xmin, bordersize.ymin);
-    if (deco.border[4].mat)
-      deco.border [4].mat->GetTexture ()->GetRendererDimensions (
+    if (deco.border[4].txt)
+      deco.border [4].txt->GetRendererDimensions (
         bordersize.xmax, bordersize.ymax);
 
     SetTransparency (true); // Otherwise 2D-part will overdraw what we paint.
@@ -216,7 +216,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   // first draw the background
   // do we draw gouraud/flat or with texture ?
 
-  bool with_color = (deco.bgnd.mat == 0);
+  bool with_color = (deco.bgnd.txt == 0);
 
   csRect size (outersize);
   size.xmin +=  bordersize.xmin - deco.p2lx - deco.lx;
@@ -240,7 +240,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   if (!deco.bgnd.do_stretch)
   {
     int w, h;
-    deco.bgnd.mat->GetTexture ()->GetRendererDimensions (w, h);
+    deco.bgnd.txt->GetRendererDimensions (w, h);
     u_stretch = ((float)(size.xmax - size.xmin)) / ((float)w);
     v_stretch = ((float)(size.ymax - size.ymin)) / ((float)h);
   }
@@ -288,7 +288,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   mesh.vertexCount = 4;
 
   if (!with_color)
-    mesh.texture = deco.bgnd.mat->GetTexture();
+    mesh.texture = deco.bgnd.txt;
   mesh.colors = colors;
 
   mesh.meshtype = CS_MESHTYPE_QUADS;
@@ -331,7 +331,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
 void csFancyConsole::DrawBorder (int x, int y, int width, int height,
   ConDecoBorder &border, int align)
 {
-  if (border.mat)
+  if (border.txt)
   {
     csSimpleRenderMesh mesh;
     static uint indices[4] = {0, 1, 2, 3};
@@ -343,7 +343,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
     float u_stretch = 1.0, v_stretch = 1.0;
     int w, h;
 
-    border.mat->GetTexture ()->GetRendererDimensions (w, h);
+    border.txt->GetRendererDimensions (w, h);
     switch (align)
     {
       case 1:
@@ -414,7 +414,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
       colors [i].w = alpha;
     }
 
-    mesh.texture = border.mat->GetTexture();
+    mesh.texture = border.txt;
     mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;
     
     mesh.vertices = vertices;
@@ -515,7 +515,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   Keyname.Clear() << "FancyConsole." << sect << ".pic";
   const char* pix = ini->GetStr (Keyname, "");
 
-  border.mat = 0;
+  border.txt = 0;
   border.do_keycolor = false;
   border.do_alpha = false;
   border.do_stretch = false;
@@ -530,9 +530,8 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
         ImageLoader->Load (Fbuf, tm->GetTextureFormat ()));
       if (image)
       {
-	csRef<iTextureHandle> txt (
-	  tm->RegisterTexture (image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS));
-	border.mat = tm->RegisterMaterial (txt);
+	border.txt =
+	  tm->RegisterTexture (image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
 
         Keyname.Clear() << "FancyConsole." << sect << ".x";
 	border.offx = ini->GetInt (Keyname, 0);
@@ -548,7 +547,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
 	  const char *kc = ini->GetStr(Keyname, "0,0,0" );
 	  sscanf( kc, "%d,%d,%d", &r, &g, &b );
 	  border.kr=r; border.kg=g; border.kb=b;
-	  border.mat->GetTexture ()->SetKeyColor(
+	  border.txt->SetKeyColor(
 	    border.kr, border.kg, border.kb);
 	}
 

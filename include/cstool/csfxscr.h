@@ -45,7 +45,7 @@ struct iTextureManager;
  * Use this routine in 2D drawing mode.
  */
 CS_CRYSTALSPACE_EXPORT void csfxInterference (iGraphics2D *g2d, 
-  iTextureManager *txtmgr, float amount, float anim, float length);
+  float amount, float anim, float length);
 
 /**
  * Fade the screen to black. The fadevalue determines how much fading is
@@ -60,7 +60,7 @@ CS_CRYSTALSPACE_EXPORT void csfxFadeOut (iGraphics3D *g3d, float fadevalue);
  * fadevalue 0: no fading, fadevalue 1: only given texture is visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-CS_CRYSTALSPACE_EXPORT void csfxFadeTo (iGraphics3D *g3d, iMaterialHandle *mat, 
+CS_CRYSTALSPACE_EXPORT void csfxFadeTo (iGraphics3D *g3d, iTextureHandle *tex, 
   float fadevalue);
 
 /**
@@ -113,7 +113,7 @@ CS_CRYSTALSPACE_EXPORT void csfxShadeVert (iGraphics3D *g3d, const csColor& topc
  * Do a fullscreen drawpolygonFX draw, used by some other routines.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-CS_CRYSTALSPACE_EXPORT void csfxScreenDPFX (iGraphics3D *g3d, iMaterialHandle *mat, 
+CS_CRYSTALSPACE_EXPORT void csfxScreenDPFX (iGraphics3D *g3d, iTextureHandle *tex, 
   uint mixmode, uint8 r, uint8 g, uint8 b);
 
 /**
@@ -121,7 +121,7 @@ CS_CRYSTALSPACE_EXPORT void csfxScreenDPFX (iGraphics3D *g3d, iMaterialHandle *m
  * Rest the same as the fullscreen version.
  */
 CS_CRYSTALSPACE_EXPORT void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, 
-  int w, int h, iMaterialHandle *mat, uint mixmode, uint8 r, uint8 g, uint8 b);
+  int w, int h, iTextureHandle *tex, uint mixmode, uint8 r, uint8 g, uint8 b);
 
 #endif // __CS_CSFXSCR_H__
 

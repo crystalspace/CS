@@ -375,14 +375,14 @@ void csPolygon3DStatic::SetMaterial (iMaterialWrapper *material)
   csPolygon3DStatic::material = material;
 }
 
-iMaterialHandle *csPolygon3DStatic::GetMaterialHandle ()
+iMaterial *csPolygon3DStatic::GetMaterial ()
 {
-  return material ? material->GetMaterialHandle () : 0;
+  return material ? material->GetMaterial () : 0;
 }
 
 bool csPolygon3DStatic::IsTransparent ()
 {
-  iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
+  iTextureHandle *txt_handle = GetMaterial ()->GetTexture ();
   return txt_handle && ((txt_handle->GetAlphaMap ()
     || txt_handle->GetKeyColor ()));
 }
@@ -523,10 +523,10 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   polygon_data.tmapping->SetTextureBox (min_u, min_v, max_u, max_v);
 
   int ww, hh;
-  iMaterialHandle* mat_handle = GetMaterialHandle ();
-  if (mat_handle && mat_handle->GetTexture ())
+  iMaterial* mat = GetMaterial ();
+  if (mat && mat->GetTexture ())
   {
-    rc = mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
+    rc = mat->GetTexture ()->GetRendererDimensions (ww, hh);
     if (!rc) ww = hh = 64;
   }
   else
@@ -589,8 +589,8 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
 
   if (IsTextureMappingEnabled ())
   {
-    if (!material || (material->GetMaterialHandle () &&
-      !material->GetMaterialHandle ()->GetTexture ()))
+    if (!material || (material->GetMaterial () &&
+      !material->GetMaterial ()->GetTexture ()))
     {
       //EnableTextureMapping (false);
       //return true;

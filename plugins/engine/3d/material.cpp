@@ -307,20 +307,12 @@ csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
 }
 
-csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) : csObject()
-{
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-
-  handle = ith;
-}
-
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 
   material = w.material;
   matEngine = w.matEngine;
-  handle = w.handle;
 }
 
 csMaterialWrapper::~csMaterialWrapper ()
@@ -332,20 +324,6 @@ void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
   material = m;
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
-}
-
-void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
-{
-  material = 0;
-  matEngine = 0;
-
-  handle = m;
-}
-
-void csMaterialWrapper::Register (iTextureManager *txtmgr)
-{
-  if (handle) return;
-  handle = txtmgr->RegisterMaterial (material);
 }
 
 void csMaterialWrapper::Visit ()
@@ -385,18 +363,6 @@ iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 {
   iMaterialWrapper *tm = &
     (new csMaterialWrapper (material))->scfiMaterialWrapper;
-  tm->QueryObject ()->SetName (name);
-  if (name)
-    mat_hash.Put (name, tm);
-  list.Push (tm);
-  tm->DecRef ();
-  return tm;
-}
-
-iMaterialWrapper *csMaterialList::NewMaterial (iMaterialHandle *ith,
-	const char* name)
-{
-  iMaterialWrapper *tm = &(new csMaterialWrapper (ith))->scfiMaterialWrapper;
   tm->QueryObject ()->SetName (name);
   if (name)
     mat_hash.Put (name, tm);

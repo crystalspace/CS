@@ -38,7 +38,6 @@ class csFrustum;
 class csMatrix3;
 class csColor;
 class csBox3;
-struct csTextureLayer;
 
 struct iSector;
 struct iFrustumView;
@@ -328,24 +327,6 @@ struct iEngine : public iBase
    * if you load the material after iEngine::Prepare() has been called.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt) = 0;
-
-  /**
-   * Create a base material that can be used to give to the texture
-   * manager. This version also supports texture layers.
-   * Assign to a csRef.
-   * \param txt the base texture (lowermost texture layer)
-   * \param num_layers the number of texture layers supplid in 
-   * the next parameter
-   * \param wrappers an array of pointers to iTextureWrapper objects,
-   * supplying the texture to use for each texture layer
-   * \param layers an array of csTextureLayer structures cooresponding
-   * to each texture layer and describing how the layer is aligned and blended
-   * with the layers beneath it.
-   * \see CreateBaseMaterial(iTextureWrapper* txt) note about
-   * registering/preparing materials.
-   */
-  virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
-  	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
 
   /**
    * Create a texture from a file.

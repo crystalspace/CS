@@ -42,7 +42,7 @@ class csAVIStreamVideo : public iVideoStream
   csAVIFormat *pAVI;
   csImageArea *pIA;
 
-  csRef<iMaterialHandle> pMaterial;
+  csRef<iTextureHandle> pTexture;
   csRef<iGraphics3D> pG3D;
   csRef<iGraphics2D> pG2D;
   iObjectRegistry *object_reg;
@@ -55,7 +55,7 @@ class csAVIStreamVideo : public iVideoStream
   void rgba_interleave (char *data);
 
   bool LoadCodec (uint8 *pInitData, uint32 nInitDataLen, uint8 *pFormatEx, uint32 nFormatEx);
-  void makeMaterial ();
+  void makeTexture ();
   bool NextFrameGetData ();
   void PrepImageArea ();
 
@@ -83,7 +83,7 @@ class csAVIStreamVideo : public iVideoStream
   virtual void GetStreamDescription (csVideoStreamDescription &desc);
   virtual bool SetRect (int x, int y, int w, int h);
   virtual bool SetFXMode (uint mode);
-  virtual iMaterialHandle* NextFrameGetMaterial ();
+  virtual iTextureHandle* NextFrameGetTexture ();
 };
 
 #endif // __CS_AVI_VIDEOSTREAM_H__

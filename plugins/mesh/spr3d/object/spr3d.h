@@ -570,9 +570,6 @@ public:
   /// Get the material
   iMaterialWrapper* GetMaterial () const
   { return cstxt; }
-  /// Get the material handle.
-  iMaterialHandle* GetMaterialHandle () const
-  { return cstxt->GetMaterialHandle (); }
   /// Set the material used for this sprite
   void SetMaterial (iMaterialWrapper *material);
 

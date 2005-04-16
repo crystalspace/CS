@@ -111,7 +111,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
     polyfx.z[i] = 1;
   }
 */
-  pMaterial = 0;
+  pTexture = 0;
   return LoadCodec (pInitData, nInitDataLen, pFormatEx, nFormatEx);
 }
 
@@ -175,12 +175,12 @@ bool csAVIStreamVideo::SetFXMode (uint mode)
   return true;
 }
 
-iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
+iTextureHandle* csAVIStreamVideo::NextFrameGetTexture ()
 {
   if (NextFrameGetData ())
   {
-    makeMaterial ();
-    return pMaterial;
+    makeTexture ();
+    return pTexture;
   }
   return 0;
 }
@@ -424,12 +424,10 @@ void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
     }
 }
 
-void csAVIStreamVideo::makeMaterial ()
+void csAVIStreamVideo::makeTexture ()
 {
   iTextureManager *txtmgr = pG3D->GetTextureManager();
-  csRef<iTextureHandle> pFrameTex (
-  	txtmgr->RegisterTexture (memimage, CS_TEXTURE_NOMIPMAPS));
-  pMaterial = txtmgr->RegisterMaterial (pFrameTex);
+  pTexture = txtmgr->RegisterTexture (memimage, CS_TEXTURE_NOMIPMAPS);
 }
 
 bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
