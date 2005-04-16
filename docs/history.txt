@@ -14,6 +14,8 @@ chronological order.
 	- res removed the practically useless iMaterialHandle interface. 
 	  Similar functionality can be achieved by using either iMaterial or
 	  iTextureHandle.
+	- Luca replaced use of imap/parser.h with imap/loader.h in 
+	  CS\libs\cstool/initapp.cpp .
 15-Apr-2005
 	- Eric Sunshine fixed bug in csBitArray::SetSize() where it failed to
 	  clear newly added bits when the array was enlarged.

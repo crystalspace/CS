@@ -37,7 +37,7 @@
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "igraphic/imageio.h"
-#include "imap/parser.h"
+#include "imap/loader.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdlconv.h"
 #include "isound/loader.h"
