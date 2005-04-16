@@ -104,7 +104,7 @@ protected:
   HRESULT InitFail (HRESULT hRet, LPCTSTR szError);
 
   DirectDetection DDetection;
-  DirectDetectionDevice *DirectDevice;
+  const DirectDetectionDevice *DirectDevice;
 
   csWin32CustomCursors cursors;
 

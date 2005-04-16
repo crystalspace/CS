@@ -184,8 +184,8 @@ bool csGraphics2DDDraw3::Open ()
   }
 
   // Get ahold of the main DirectDraw object...
-  DDetection.checkDevices2D ();
-  DirectDevice = DDetection.findBestDevice2D (DisplayNumber);
+  DDetection.CheckDevices2D ();
+  DirectDevice = DDetection.FindBestDevice (DisplayNumber);
 
   if (DirectDevice == 0)
   {
@@ -193,7 +193,7 @@ bool csGraphics2DDDraw3::Open ()
     return false;
   }
 
-  LPGUID pGuid = 0;
+  const GUID* pGuid = 0;
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
 
@@ -202,7 +202,7 @@ bool csGraphics2DDDraw3::Open ()
 
   // Create a DD object for either the primary device or the secondary.
   HRESULT ddrval;
-  if ((ddrval = DirectDrawCreate (pGuid, &m_lpDD, 0)) != DD_OK)
+  if ((ddrval = DirectDrawCreate ((LPGUID)pGuid, &m_lpDD, 0)) != DD_OK)
   {
     InitFail (ddrval, "DirectDrawCreate FAILED (Code: %08lx)\n");
     return false;

@@ -26,6 +26,10 @@ chronological order.
 	  certain materials in certain passes should be devised.
 	- res tweaked the movie recorder framerate a bit so the intervals
 	  between frames are more regular.
+	- res cleaned up the DirectDetection code. Mostly removed the unneeded
+	  3D detection stuff.
+	- res changed the CS loader to only report missing optional plugins
+	  when in verbose mode.
 15-Apr-2005
 	- Eric Sunshine fixed bug in csBitArray::SetSize() where it failed to
 	  clear newly added bits when the array was enlarged.

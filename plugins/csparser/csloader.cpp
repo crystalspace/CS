@@ -929,12 +929,12 @@ csLoader::~csLoader()
 
 #define GET_PLUGIN(var, intf, msgname)				\
   var = CS_QUERY_REGISTRY(object_reg, intf);			\
-  if (!var) ReportNotify ("Could not get " msgname);
+  if (!var && do_verbose) ReportNotify ("Could not get " msgname);
 
 #define GET_CRITICAL_PLUGIN(var, intf, msgname)			\
   var = CS_QUERY_REGISTRY(object_reg, intf);			\
   if (!var) { ReportError ("crystalspace.maploader",		\
-    "Failed to initialize the loader: "				\
+    "Failed to initialize loader: "				\
     "Could not get " msgname); return false; }
 
 bool csLoader::Initialize (iObjectRegistry *object_Reg)

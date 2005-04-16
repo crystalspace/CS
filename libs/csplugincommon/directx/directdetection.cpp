@@ -82,33 +82,16 @@ void DirectDetection::SystemFatalError (char *str, HRESULT hRes)
 
 DirectDetection::DirectDetection ()
 {
-  Devices = 0;
   object_reg = 0;
 }
 
 DirectDetection::~DirectDetection ()
 {
-  if (Devices)
-  {
-    DirectDetectionDevice *cur = Devices;
-    while (cur)
-    {
-      DirectDetectionDevice *next = cur->next;
-      delete[] cur->DeviceName2D;
-      delete[] cur->DeviceDescription2D;
-      delete cur;
-      cur = next;
-    }
-  }
-
-  Devices = 0;
 }
 
 /// find the best 2d device
-DirectDetectionDevice * DirectDetection::findBestDevice2D(int displayNumber)
+const DirectDetectionDevice* DirectDetection::FindBestDevice (int displayNumber)
 {
-  DirectDetectionDevice * cur;
-
   // If displayNumber is 0, then we use the primary display; otherwise, if
   // it is greater than 0, then we try using the indicated display.  If the
   // indicated display does not exist, then we use the primary display.
@@ -116,179 +99,31 @@ DirectDetectionDevice * DirectDetection::findBestDevice2D(int displayNumber)
   {
     csString devName2d("\\\\.\\Display");
     devName2d.Append(displayNumber);
-    for(cur = Devices; cur != 0; cur = cur->next)
+    for (size_t i = 0; i < Devices.Length(); i++)
     {
-      char const* const s = cur->DeviceName2D;
+      const DirectDetectionDevice& cur = Devices[i];
+      char const* const s = cur.DeviceName2D;
       if (s != 0 && devName2d.CompareNoCase(s))
-        return cur;
+        return &cur;
     }
     // Requested display not found; fall through and search for primary.
   }
   
-  for (cur = Devices; cur != 0; cur = cur->next)
+  for (size_t i = 0; i < Devices.Length(); i++)
   {
-    if (cur->Only2D && cur->IsPrimary2D) 
-      return cur;
+    const DirectDetectionDevice& cur = Devices[i];
+    if (cur.IsPrimary2D) 
+      return &cur;
   }
   
   return 0;
 }
 
-/// find the best 3d device
-DirectDetectionDevice *DirectDetection::findBestDevice3D (bool fscreen)
-{
-  DirectDetectionDevice *ret = 0;
-  DirectDetectionDevice *cur = Devices;
-  int poids = 0;
-
-  while (cur != 0)
-  {
-    // This device have 3d device
-    if (!cur->Only2D && cur->Can3D)
-    {
-      int curpoids = 0;
-
-      // calculation of weight
-      if (cur->Hardware) curpoids += 200;
-      if (cur->Texture) curpoids += 50;
-      if (cur->HighColor) curpoids += 25;
-      if (cur->VideoMemoryTexture) curpoids += 15;
-      if (cur->Mipmap) curpoids += 35;
-      if (cur->Perspective) curpoids += 25;
-      if (cur->ZBuffer) curpoids += 50;
-      if (cur->AlphaBlend && cur->AlphaBlendType == 1) curpoids += 50;
-      if (cur->AlphaBlend && cur->AlphaBlendType == 2) curpoids += 25;
-
-      // is better and support windowed mode if display is not fullscreen ?
-      if (curpoids > poids && (!fscreen ? cur->Windowed : true))
-      {
-        ret = cur;
-        poids = curpoids;
-      }
-    }
-    cur = cur->next;
-  }
-
-  return ret;
-}
-
 /// add a 2d device in list
-int DirectDetection::addDevice (DirectDetection2D *dd2d)
+int DirectDetection::AddDevice (const DirectDetectionDevice& dd2d)
 {
-  DirectDetectionDevice *ddd = new DirectDetectionDevice ();
-
-  memcpy ((DirectDetection2D *)ddd, dd2d, sizeof (DirectDetection2D));
-  ddd->Only2D = true;
-
-  ddd->next = Devices;
-  Devices = ddd;
-
+  Devices.Push (dd2d);
   return 0;
-}
-
-/// add a 3d device in list
-int DirectDetection::addDevice (DirectDetection3D *dd3d)
-{
-  DirectDetectionDevice * ddd = new DirectDetectionDevice ();
-
-  memcpy ((DirectDetection3D *)ddd, dd3d, sizeof (DirectDetection3D));
-  ddd->Only2D = false;
-
-  ddd->next = Devices;
-  Devices = ddd;
-
-  return 0;
-}
-
-/// Enumeration of direct3d devices
-static HRESULT WINAPI DirectDetectionD3DEnumCallback (LPGUID lpGuid,
-  LPSTR lpDeviceDescription, LPSTR lpDeviceName, LPD3DDEVICEDESC lpHWDesc,
-  LPD3DDEVICEDESC lpHELDesc, LPVOID lpContext)
-{
-  struct toy
-  {
-    DirectDetection * ddetect;
-    DirectDetection2D * dd2d;
-  } *toy = (struct toy *)lpContext;
-
-  DirectDetection *ddetect = toy->ddetect;
-  DirectDetection3D dd3d (toy->dd2d);
-
-  // don't accept software devices.
-  // eventually this will be an option.
-  if (!lpHWDesc->dcmColorModel) return D3DENUMRET_OK;
-
-  // Record the D3D driver's information
-  wchar_t* buf;
-
-  buf = cswinAnsiToWide (lpDeviceName);
-  dd3d.DeviceName3D = csStrNew (buf);
-  delete[] buf;
-
-  buf = cswinAnsiToWide (lpDeviceDescription);
-  dd3d.DeviceDescription3D = csStrNew (buf);
-  delete[] buf;
-
-  if (lpGuid != 0)
-  {
-    CopyMemory (&dd3d.Guid3D, lpGuid, sizeof (GUID));
-    dd3d.IsPrimary3D = false;
-  }
-  else
-  {
-    ZeroMemory (&dd3d.Guid3D, sizeof (GUID));
-    dd3d.IsPrimary3D = false;
-  }
-
-  // whether this is hardware or not.
-  if (lpHWDesc->dcmColorModel)
-  {
-    dd3d.Hardware = true;
-    CopyMemory (&dd3d.Desc3D, lpHWDesc, sizeof (D3DDEVICEDESC));
-  }
-  else
-  {
-    dd3d.Hardware = false;
-    CopyMemory (&dd3d.Desc3D, lpHELDesc, sizeof (D3DDEVICEDESC));
-  }
-
-  // does this driver to texture-mapping?
-  dd3d.Perspective =
-    (dd3d.Desc3D.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_PERSPECTIVE) ? true : false;
-
-  // z-buffer?
-  dd3d.ZBuffer = dd3d.Desc3D.dwDeviceZBufferBitDepth ? true : false;
-
-  // alpha transparency?
-  if ((dd3d.Desc3D.dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_SRCCOLOR)
-   && (dd3d.Desc3D.dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_DESTCOLOR))
-  {
-    dd3d.AlphaBlend = true;
-    dd3d.AlphaBlendType = 1;
-  }
-  else if ((dd3d.Desc3D.dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_SRCALPHA)
-        && (dd3d.Desc3D.dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_SRCCOLOR))
-  {
-    dd3d.AlphaBlend = true;
-    dd3d.AlphaBlendType = 2;
-  }
-
-  if ((dd3d.Desc3D.dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_SRCALPHA)
-   && (dd3d.Desc3D.dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_INVSRCCOLOR))
-  {
-    dd3d.AlphaBlendHalo = true;
-  }
-
-  // is hi-color?
-  dd3d.HighColor = (dd3d.Desc3D.dwDeviceRenderBitDepth & DDBD_16) ? true : false;
-
-  // can load textures into video-memory?
-  dd3d.VideoMemoryTexture = (dd3d.Desc3D.dwDevCaps & D3DDEVCAPS_TEXTUREVIDEOMEMORY) ? true : false;
-
-  // add this device
-  ddetect->addDevice (&dd3d);
-
-  return (D3DENUMRET_OK);
 }
 
 /// Enumeration of directdraw devices
@@ -299,7 +134,7 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   LPDIRECTDRAW pDD = 0;
   DDCAPS DriverCaps;
   DDCAPS HELCaps;
-  DirectDetection2D dd2d;
+  DirectDetectionDevice dd2d;
   DirectDetection *ddetect = (DirectDetection *)lpContext;
   HRESULT hRes;
 
@@ -348,10 +183,6 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
     dd2d.IsPrimary2D = true;
   }
 
-  // can enable a 3d device
-  if (DriverCaps.dwCaps & DDCAPS_3D)
-    dd2d.Can3D = true;
-
   // can run in windowed mode
 #if (DIRECTDRAW_VERSION < 0x0600)
   if (DriverCaps.dwCaps & DDCAPS_GDI)
@@ -360,76 +191,17 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
 #endif
     dd2d.Windowed = true;
 
-  // can have mipmapped surfaces
-  if (DriverCaps.ddsCaps.dwCaps & DDSCAPS_MIPMAP)
-    dd2d.Mipmap = true;
-
-  // can have textured surfaces
-  if (DriverCaps.ddsCaps.dwCaps & DDSCAPS_TEXTURE)
-    dd2d.Texture = true;
-
   // add this device
-  ddetect->addDevice (&dd2d);
+  ddetect->AddDevice (dd2d);
 
   pDD->Release ();
 
   return DDENUMRET_OK;
 }
 
-bool DirectDetection::checkDevices ()
+bool DirectDetection::CheckDevices ()
 {
-  return checkDevices3D ();
-}
-
-bool DirectDetection::checkDevices3D ()
-{
-  // first check 2d devices
-  if (checkDevices2D ())
-  {
-    DirectDetectionDevice *cur = Devices;
-    while (cur)
-    {
-      // for each 2d device which have a 3d device
-      if (cur->Only2D && cur->Can3D)
-      {
-        LPDIRECTDRAW lpDD = 0;
-        LPDIRECT3D lpD3D = 0;
-        struct toy
-        {
-          DirectDetection * ddetect;
-          DirectDetection2D * dd2d;
-        } toy = {this, cur};
-
-        LPGUID pGuid = 0;
-        if (!cur->IsPrimary2D) pGuid = &cur->Guid2D;
-
-        HRESULT hRes;
-        if (FAILED (hRes = DirectDrawCreate (pGuid, &lpDD, 0)))
-	{
-	  ReportResult (CS_REPORTER_SEVERITY_WARNING, 
-	    "Can't create DirectDraw device",
-	    hRes);
-	  cur = cur->next;
-	  continue;
-	}
-
-        lpDD->QueryInterface (IID_IDirect3D, (LPVOID *)&lpD3D);
-        if (FAILED (hRes = lpD3D->EnumDevices (DirectDetectionD3DEnumCallback, (LPVOID *)&toy)))
-	{
-	  ReportResult (CS_REPORTER_SEVERITY_WARNING, 
-	    "Error when enumerating Direct3D devices.",
-	    hRes);
-	  cur = cur->next;
-	  continue;
-	}
-
-        lpD3D->Release ();
-        lpDD->Release ();
-      }
-      cur = cur->next;
-    }
-  }
-  return true;
+  return CheckDevices2D ();
 }
 
 static BOOL WINAPI OldCallback(GUID FAR *lpGUID, LPSTR pDesc, LPSTR pName,
@@ -440,7 +212,7 @@ static BOOL WINAPI OldCallback(GUID FAR *lpGUID, LPSTR pDesc, LPSTR pName,
 }
 
 /// check 2d devices
-bool DirectDetection::checkDevices2D ()
+bool DirectDetection::CheckDevices2D ()
 {
   HINSTANCE libraryHandle = LoadLibrary ("ddraw.dll");
 
@@ -488,7 +260,7 @@ bool DirectDetection::checkDevices2D ()
   //Free the library.
   FreeLibrary (libraryHandle);
 
-  if (Devices == 0)
+  if (Devices.Length() == 0)
   {
     ReportResult (CS_REPORTER_SEVERITY_WARNING, 
       "No 2D devices found.",
@@ -501,26 +273,9 @@ bool DirectDetection::checkDevices2D ()
 /// have 2d devices into list ?
 bool DirectDetection::Have2DDevice ()
 {
-  DirectDetectionDevice * cur = Devices;
-
-  while (cur)
+  for (size_t i = 0; i < Devices.Length(); i++)
   {
-    if (cur->Only2D && cur->IsPrimary2D) return true;
-    cur = cur->next;
-  }
-
-  return false;
-}
-
-/// have 3d devices into list ?
-bool DirectDetection::Have3DDevice ()
-{
-  DirectDetectionDevice * cur = Devices;
-
-  while (cur)
-  {
-    if (!cur->Only2D && cur->Can3D) return true;
-    cur = cur->next;
+    if (Devices[i].IsPrimary2D) return true;
   }
 
   return false;
