@@ -570,7 +570,6 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
     parent->compiler->LoadSVBlock (varNode, &svcontext);
 
   // copy over metadata from parent
-  metadata.name = csStrNew (parent->allShaderMeta.name);
   metadata.description = csStrNew (parent->allShaderMeta.description);
   metadata.numberOfLights = node->GetAttributeValueAsInt ("lights");
 
@@ -1285,6 +1284,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   csXMLShader::compiler = compiler;
   g3d = compiler->g3d;
   csXMLShader::forcepriority = forcepriority;
+  useFallbackContext = false;
 
   shadermgr = CS_QUERY_REGISTRY (compiler->objectreg, iShaderManager);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
@@ -1301,6 +1301,12 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
 
   ParseGlobalSVs ();
+
+  csRef<iDocumentNode> fallbackNode = shaderSource->GetNode ("fallbackshader");
+  if (fallbackNode.IsValid())
+  {
+    fallbackShader = compiler->synldr->ParseShaderRef (fallbackNode);
+  }
 }
 
 csXMLShader::~csXMLShader ()
@@ -1313,7 +1319,6 @@ csXMLShader::~csXMLShader ()
   delete[] filename;
   delete resolver;
   delete[] vfsStartDir;
-  delete[] allShaderMeta.name;
   delete[] allShaderMeta.description;
 }
 
@@ -1498,14 +1503,31 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       }
       compiler->vfs->PopDir ();
 
+      var.prepared = true;
       if (var.tech == 0)
       {
-	// @@@ Or a warning instead?
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "No technique validated for shader '%s'", GetName());
+	if (fallbackShader.IsValid())
+	{
+	  if (compiler->do_verbose)
+	  {
+	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "No technique validated for shader '%s': using fallback", 
+	      GetName());
+	  }
+	  size_t vc = resolver->GetVariantCount();
+	  if (vc == 0) vc = 1;
+	  vi = fallbackShader->GetTicket (modes, stacks) + vc;	    
+	  var.ticketOverride = vi;
+	}
+	else
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	    "No technique validated for shader '%s'", GetName());
       }
-
-      var.prepared = true;
+    }
+    else
+    {
+      if (var.ticketOverride != (size_t)~0)
+	vi = var.ticketOverride;
     }
   }
   resolver->SetEvalParams (0, 0);
@@ -1514,6 +1536,12 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 
 bool csXMLShader::ActivatePass (size_t ticket, size_t number)
 { 
+  if (IsFallbackTicket (ticket))
+  {
+    useFallbackContext = true;
+    return fallbackShader->ActivatePass (GetFallbackTicket (ticket), number);
+  }
+
   CS_ASSERT_MSG ("ActivatePass() has already been called.",
     activeTech == 0);
   activeTech = (ticket != csArrayItemNotFound) ? variants[ticket].tech :
@@ -1523,6 +1551,12 @@ bool csXMLShader::ActivatePass (size_t ticket, size_t number)
 
 bool csXMLShader::DeactivatePass (size_t ticket)
 { 
+  if (IsFallbackTicket (ticket))
+  {
+    useFallbackContext = false;
+    return fallbackShader->DeactivatePass (GetFallbackTicket (ticket));
+  }
+
   bool ret = activeTech ? activeTech->DeactivatePass() : false; 
   activeTech = 0;
   return ret;

@@ -99,7 +99,7 @@ struct iShaderVariableContext : public iBase
   */
   virtual void PopVariables (csShaderVarStack &stacks) const = 0;
 
-  /// Determine whether this SV contains any variables at all.
+  /// Determine whether this SV context contains any variables at all.
   virtual bool IsEmpty () const = 0;
 };
 
@@ -205,9 +205,6 @@ struct iShaderRenderInterface : public iBase
  */
 struct csShaderMetadata
 {
-  /// Name of the shader
-  char *name;
-
   /// Descriptive string
   char *description;
 
@@ -220,7 +217,7 @@ struct csShaderMetadata
 
   /// Constructor to null out parameters
   csShaderMetadata ()
-    : name (0), description (0), numberOfLights (0)
+    : description (0), numberOfLights (0)
   {}
 };
 

@@ -41,4 +41,6 @@
       </fp>
     </pass>
   </technique>
+
+  <fallbackshader name="std_lighting" />
 </shader>

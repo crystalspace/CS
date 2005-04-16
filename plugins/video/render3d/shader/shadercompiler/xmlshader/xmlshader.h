@@ -283,14 +283,34 @@ class csXMLShader : public iShader, public csObject
   {
     csXMLShaderTech* tech;
     bool prepared;
+    size_t ticketOverride;
 
     ShaderVariant() 
     {
       tech = 0;
       prepared = false;
+      ticketOverride = (size_t)~0;
     }
   };
   csArray<ShaderVariant> variants;
+
+  /// Shader we fall back to if none of the techs validate
+  csRef<iShader> fallbackShader;
+  /// Identify whether a ticker refers to the fallback shader
+  bool IsFallbackTicket (size_t ticket) const
+  { 
+    size_t vc = resolver->GetVariantCount();
+    if (vc == 0) vc = 1;
+    return ticket >= vc;
+  }
+  /// Extract the fallback's ticker number
+  size_t GetFallbackTicket (size_t ticket) const
+  { 
+    size_t vc = resolver->GetVariantCount();
+    if (vc == 0) vc = 1;
+    return ticket - vc;
+  }
+  bool useFallbackContext;
 
   csShaderVariableContext globalSVContext;
   void ParseGlobalSVs ();
@@ -329,6 +349,8 @@ public:
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)
   {
+    if (IsFallbackTicket (ticket))
+      return fallbackShader->GetNumberOfPasses (GetFallbackTicket (ticket));
     csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
       variants[ticket].tech : 0;
     return tech ? tech->GetNumberOfPasses () : 0;
@@ -342,6 +364,10 @@ public:
     csRenderMeshModes& modes,
     const csShaderVarStack &stacks)
   { 
+    if (IsFallbackTicket (ticket))
+      return fallbackShader->SetupPass (GetFallbackTicket (ticket),
+	mesh, modes, stacks);
+
     CS_ASSERT_MSG ("A pass must be activated prior calling SetupPass()",
       activeTech);
     return activeTech->SetupPass (mesh, modes, stacks); 
@@ -353,6 +379,9 @@ public:
    */
   virtual bool TeardownPass (size_t ticket)
   { 
+    if (IsFallbackTicket (ticket))
+      return fallbackShader->TeardownPass (GetFallbackTicket (ticket));
+
     CS_ASSERT_MSG ("A pass must be activated prior calling TeardownPass()",
       activeTech);
     return activeTech->TeardownPass(); 
@@ -364,6 +393,9 @@ public:
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata (size_t ticket) const
   {
+    if (IsFallbackTicket (ticket))
+      return fallbackShader->GetMetadata (GetFallbackTicket (ticket));
+
     if (ticket == csArrayItemNotFound)
       return allShaderMeta;
     else
@@ -377,18 +409,29 @@ public:
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
   { 
+    if (useFallbackContext)
+    {
+      fallbackShader->AddVariable (variable);
+      return;
+    }
     GetUsedSVContext().AddVariable (variable); 
   }
 
   /// Get a named variable from this context
   csShaderVariable* GetVariable (csStringID name) const
   { 
+    if (useFallbackContext)
+      return fallbackShader->GetVariable (name);
     return GetUsedSVContext().GetVariable (name); 
   }
 
   /// Get Array of all ShaderVariables
   const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return activeTech->svcontext.GetShaderVariables(); }
+  { 
+    if (useFallbackContext)
+      return fallbackShader->GetShaderVariables();
+    return GetUsedSVContext().GetShaderVariables(); 
+  }
 
   /**
    * Push the variables of this context onto the variable stacks
@@ -396,6 +439,11 @@ public:
    */
   void PushVariables (csShaderVarStack &stacks) const
   { 
+    if (useFallbackContext)
+    {
+      fallbackShader->PushVariables (stacks);
+      return;
+    }
     GetUsedSVContext().PushVariables (stacks); 
   }
 
@@ -405,27 +453,26 @@ public:
    */
   void PopVariables (csShaderVarStack &stacks) const
   { 
+    if (useFallbackContext)
+    {
+      fallbackShader->PopVariables (stacks);
+      return;
+    }
     GetUsedSVContext().PopVariables (stacks); 
   }
 
-  /// Set object name
-  virtual void SetName (const char *iName)
+  bool IsEmpty() const
   {
-    csObject::SetName (iName);
-    delete [] allShaderMeta.name;
-    allShaderMeta.name = csStrNew (iName);
+    if (useFallbackContext)
+      return fallbackShader->IsEmpty();
+    return GetUsedSVContext().IsEmpty();
   }
-  
+
   /// Set object description
   void SetDescription (const char *desc)
   {
     delete [] allShaderMeta.description;
     allShaderMeta.description = csStrNew (desc);
-  }
-
-  bool IsEmpty() const
-  {
-    return GetUsedSVContext().IsEmpty();
   }
 
   /// Return some info on this shader

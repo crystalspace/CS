@@ -30,6 +30,9 @@ chronological order.
 	  3D detection stuff.
 	- res changed the CS loader to only report missing optional plugins
 	  when in verbose mode.
+	- res removed the redundant csShaderMetadata::name.
+	- res added "fallback shaders" to xmlshader. The fallback is used if
+	  no technique of the shader validated.
 15-Apr-2005
 	- Eric Sunshine fixed bug in csBitArray::SetSize() where it failed to
 	  clear newly added bits when the array was enlarged.

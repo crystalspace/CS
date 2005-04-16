@@ -109,4 +109,5 @@
     </pass>
   </technique>
 
+  <fallbackshader name="terrain_fixed_splatting" file="terrain_fixed_splatting.xml" />
 </shader>
