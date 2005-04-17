@@ -4591,11 +4591,8 @@ class iMaterialWrapper(iBase):
         return "<%s.%s; proxy of C++ iMaterialWrapper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def QueryObject(*args): return _cspace.iMaterialWrapper_QueryObject(*args)
     def Clone(*args): return _cspace.iMaterialWrapper_Clone(*args)
-    def SetMaterialHandle(*args): return _cspace.iMaterialWrapper_SetMaterialHandle(*args)
-    def GetMaterialHandle(*args): return _cspace.iMaterialWrapper_GetMaterialHandle(*args)
     def SetMaterial(*args): return _cspace.iMaterialWrapper_SetMaterial(*args)
     def GetMaterial(*args): return _cspace.iMaterialWrapper_GetMaterial(*args)
-    def Register(*args): return _cspace.iMaterialWrapper_Register(*args)
     def Visit(*args): return _cspace.iMaterialWrapper_Visit(*args)
     def IsVisitRequired(*args): return _cspace.iMaterialWrapper_IsVisitRequired(*args)
     def __del__(self, destroy=_cspace.delete_iMaterialWrapper):
@@ -9564,9 +9561,6 @@ class csShaderMetadata(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csShaderMetadata, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csShaderMetadata instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["name"] = _cspace.csShaderMetadata_name_set
-    __swig_getmethods__["name"] = _cspace.csShaderMetadata_name_get
-    if _newclass:name = property(_cspace.csShaderMetadata_name_get, _cspace.csShaderMetadata_name_set)
     __swig_setmethods__["description"] = _cspace.csShaderMetadata_description_set
     __swig_getmethods__["description"] = _cspace.csShaderMetadata_description_get
     if _newclass:description = property(_cspace.csShaderMetadata_description_get, _cspace.csShaderMetadata_description_set)
@@ -9800,8 +9794,6 @@ class iTextureManager(iBase):
     def __repr__(self):
         return "<%s.%s; proxy of C++ iTextureManager instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def RegisterTexture(*args): return _cspace.iTextureManager_RegisterTexture(*args)
-    def RegisterMaterial(*args): return _cspace.iTextureManager_RegisterMaterial(*args)
-    def FreeMaterials(*args): return _cspace.iTextureManager_FreeMaterials(*args)
     def GetTextureFormat(*args): return _cspace.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _cspace.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _cspace.iTextureManager_GetMaxTextureSize(*args)
@@ -9865,33 +9857,6 @@ class iMaterialPtr(iMaterial):
 _cspace.iMaterial_swigregister(iMaterialPtr)
 
 iMaterial_scfGetVersion = _cspace.iMaterial_scfGetVersion
-
-class iMaterialHandle(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMaterialHandle, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iMaterialHandle, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ iMaterialHandle instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def GetShader(*args): return _cspace.iMaterialHandle_GetShader(*args)
-    def GetTexture(*args): return _cspace.iMaterialHandle_GetTexture(*args)
-    def GetFlatColor(*args): return _cspace.iMaterialHandle_GetFlatColor(*args)
-    def GetReflection(*args): return _cspace.iMaterialHandle_GetReflection(*args)
-    def __del__(self, destroy=_cspace.delete_iMaterialHandle):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-
-class iMaterialHandlePtr(iMaterialHandle):
-    def __init__(self, this):
-        _swig_setattr(self, iMaterialHandle, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iMaterialHandle, 'thisown', 0)
-        _swig_setattr(self, iMaterialHandle,self.__class__,iMaterialHandle)
-_cspace.iMaterialHandle_swigregister(iMaterialHandlePtr)
 
 CS_POS_BY_FRAME = _cspace.CS_POS_BY_FRAME
 CS_POS_BY_TIME = _cspace.CS_POS_BY_TIME
@@ -10122,7 +10087,7 @@ class iVideoStream(iStream):
     def GetStreamDescription(*args): return _cspace.iVideoStream_GetStreamDescription(*args)
     def SetRect(*args): return _cspace.iVideoStream_SetRect(*args)
     def SetFXMode(*args): return _cspace.iVideoStream_SetFXMode(*args)
-    def NextFrameGetMaterial(*args): return _cspace.iVideoStream_NextFrameGetMaterial(*args)
+    def NextFrameGetTexture(*args): return _cspace.iVideoStream_NextFrameGetTexture(*args)
     def __del__(self, destroy=_cspace.delete_iVideoStream):
         try:
             if self.thisown: destroy(self)
