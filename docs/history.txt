@@ -13,6 +13,8 @@ chronological order.
 	  accessors.
 	- res updated the API mod docs for the iMaterialHandle removal.
 	- res updated texi2html to version 1.76.
+	- res overhauled the csShaderVariable assignment operator and added a
+	  copy constructor to csShaderVariable.
 16-Apr-2005
 	- res added support for a default shader to the generic render step,
 	  which is used when a material doesn't have a shader for a specific

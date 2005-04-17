@@ -28,69 +28,29 @@ csShaderVariable::csShaderVariable (csStringID name) :
 {
 }
 
-csShaderVariable& csShaderVariable::operator= (csShaderVariable& copyFrom)
+csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
 {
   Name = copyFrom.Name;
-  if (copyFrom.accessor != 0)
+  Type = copyFrom.Type;
+  accessor = copyFrom.accessor;
+  switch (copyFrom.Type)
   {
-    Type = copyFrom.Type;
-    accessor = copyFrom.accessor;
-  }
-  else
-  {
-    switch (copyFrom.Type)
-    {
-      case INT:
-	{
-	  int val;
-	  copyFrom.GetValue (val); 
-	  SetValue (val);
-	}
-	break;
-      case TEXTURE:
-	{
-	  if (copyFrom.TextureWrapValue != 0)
-	  {
-	    iTextureWrapper *val;
-	    copyFrom.GetValue (val);  SetValue (val);
-	  }
-	  else
-	  {
-	    iTextureHandle* val;
-	    copyFrom.GetValue (val);  SetValue (val);
-	  }
-	}
-	break;
-      case RENDERBUFFER:
-	{
-	  iRenderBuffer* val;
-	  copyFrom.GetValue (val);  SetValue (val);
-	}
-	break;
-      case FLOAT: // Stored in VectorValue.
-      case COLOR: // Ditto.
-      case VECTOR2:
-      case VECTOR3:
-      case VECTOR4:
-	{
-	  csVector4 v; 
-	  copyFrom.GetValue (v); SetValue (v);
-	  Type = copyFrom.Type;
-	}
-	break;
-      case MATRIX:
-	{
-	  csMatrix3 v;
-	  copyFrom.GetValue(v); SetValue(v);
-	}
-	break;
-      case TRANSFORM:
-	{
-	  csReversibleTransform v;
-	  copyFrom.GetValue(v); SetValue(v);
-	}
-	break;
-    }
+    case MATRIX:
+      SetValue (*copyFrom.MatrixValuePtr);
+      break;
+    case TRANSFORM:
+      SetValue (*copyFrom.TransformPtr);
+      break;
+    default:
+      {
+	// Just copy everything that doesn't need special handling
+	TextureHandValue = copyFrom.TextureHandValue;
+	TextureWrapValue = copyFrom.TextureWrapValue;
+	RenderBuffer = copyFrom.RenderBuffer;
+	VectorValue = copyFrom.VectorValue;
+	Int = copyFrom.Int;
+      }
+      break;
   }
   return *this;
 }

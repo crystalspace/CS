@@ -112,12 +112,15 @@ public:
 
   /// Constructor
   csShaderVariable (csStringID name);
+  csShaderVariable (const csShaderVariable& other)
+  { *this = other; }
   virtual ~csShaderVariable ()
   {
     delete MatrixValuePtr;
+    delete TransformPtr;
   }
 
-  csShaderVariable& operator= (csShaderVariable& copyFrom);
+  csShaderVariable& operator= (const csShaderVariable& copyFrom);
 
   /// Get type of data stored
   VariableType GetType() const { return Type; }
