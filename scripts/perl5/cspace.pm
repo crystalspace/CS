@@ -5198,11 +5198,8 @@ package cspace::iMaterialWrapper;
 %ITERATORS = ();
 *QueryObject = *cspacec::iMaterialWrapper_QueryObject;
 *Clone = *cspacec::iMaterialWrapper_Clone;
-*SetMaterialHandle = *cspacec::iMaterialWrapper_SetMaterialHandle;
-*GetMaterialHandle = *cspacec::iMaterialWrapper_GetMaterialHandle;
 *SetMaterial = *cspacec::iMaterialWrapper_SetMaterial;
 *GetMaterial = *cspacec::iMaterialWrapper_GetMaterial;
-*Register = *cspacec::iMaterialWrapper_Register;
 *Visit = *cspacec::iMaterialWrapper_Visit;
 *IsVisitRequired = *cspacec::iMaterialWrapper_IsVisitRequired;
 sub DESTROY {
@@ -10546,8 +10543,6 @@ package cspace::csShaderMetadata;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_name_get = *cspacec::csShaderMetadata_name_get;
-*swig_name_set = *cspacec::csShaderMetadata_name_set;
 *swig_description_get = *cspacec::csShaderMetadata_description_get;
 *swig_description_set = *cspacec::csShaderMetadata_description_set;
 *swig_numberOfLights_get = *cspacec::csShaderMetadata_numberOfLights_get;
@@ -10822,8 +10817,6 @@ package cspace::iTextureManager;
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
-*RegisterMaterial = *cspacec::iTextureManager_RegisterMaterial;
-*FreeMaterials = *cspacec::iTextureManager_FreeMaterials;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
 *GetMaxTextureSize = *cspacec::iTextureManager_GetMaxTextureSize;
@@ -10879,40 +10872,6 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iMaterial_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iMaterialHandle ##############
-
-package cspace::iMaterialHandle;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*GetShader = *cspacec::iMaterialHandle_GetShader;
-*GetTexture = *cspacec::iMaterialHandle_GetTexture;
-*GetFlatColor = *cspacec::iMaterialHandle_GetFlatColor;
-*GetReflection = *cspacec::iMaterialHandle_GetReflection;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iMaterialHandle($self);
-        delete $OWNER{$self};
-    }
-}
-
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -11177,7 +11136,7 @@ package cspace::iVideoStream;
 *GetStreamDescription = *cspacec::iVideoStream_GetStreamDescription;
 *SetRect = *cspacec::iVideoStream_SetRect;
 *SetFXMode = *cspacec::iVideoStream_SetFXMode;
-*NextFrameGetMaterial = *cspacec::iVideoStream_NextFrameGetMaterial;
+*NextFrameGetTexture = *cspacec::iVideoStream_NextFrameGetTexture;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
