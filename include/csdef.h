@@ -97,8 +97,8 @@
 // Platforms which have floating-point variations of the standard math.h
 // cos(), sin(), tan(), sqrt(), etc. functions should define
 // CS_HAVE_MATH_H_FLOAT_FUNCS. For platforms which do not provide these
-// macros, we fake them up.
-#if !defined(CS_HAVE_MATH_H_FLOAT_FUNCS)
+// macros or if strict-ANSI conformance is requested, we fake them up.
+#if !defined(CS_HAVE_MATH_H_FLOAT_FUNCS) || defined(__STRICT_ANSI__)
   #define acosf(X)    CS_STATIC_CAST(float,acos(X))
   #define asinf(X)    CS_STATIC_CAST(float,asin(X))
   #define atan2f(X,Y) CS_STATIC_CAST(float,atan2(X,Y))

@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Apr-2005
+	- Eric Sunshine augmented csdef.h so that it also fakes up the
+	  floating-point cosf(), sinf(), sqrtf(), etc. if strict-ANSI
+	  conformance is requested (via gcc's -ansi and -pedantic options, for
+	  instance). According to research, these functions are not specified
+	  in any standard, though they are noted in "Future Library
+	  Directions". http://docs.hp.com/en/B2355-90695/sqrt.3M.html
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
