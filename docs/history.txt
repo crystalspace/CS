@@ -9,6 +9,9 @@ chronological order.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
+	- res fixed csShaderVariable::operator=() to correctly handle 
+	  accessors.
+	- res updated the API mod docs for the iMaterialHandle removal.
 16-Apr-2005
 	- res added support for a default shader to the generic render step,
 	  which is used when a material doesn't have a shader for a specific

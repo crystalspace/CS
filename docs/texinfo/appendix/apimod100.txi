@@ -157,6 +157,11 @@ them from your applications if you used them):
 @code{iTextureManager::PrepareTextures()}
 @end itemize
 
+@subheading Material Registration
+
+Registering an @code{iMaterialWrapper} with the texture manager is not 
+necessary any more; any such calls can be removed.
+
 @subheading Input Definitions
 
 The file @file{csutil/inpnames.h} has been renamed to
@@ -1542,8 +1547,8 @@ To allow more control over how geometry is transformed when using shaders the
 @samp{csRenderMesh::object2camera} has been split into two transforms:
 @samp{object2world} and @samp{world2camera}. The @samp{object2world} transform
 is sent via a shader variable, while @samp{world2camera} is specified via
-@code{iGraphics3D::SetWorldToCamera()} (but it is also available as shader
-variable.
+@code{iGraphics3D::SetWorldToCamera()} (but it is also available as a shader
+variable to shader programs).
 
 @subheading @samp{chunklod} Terrain Removal
 
@@ -1625,6 +1630,10 @@ questionable use.
 @code{csCrystalBall} and @file{csgeom/crysball.h}
 @item
 @code{csIndPrint} and @file{csutil/indprint.h}
+@item
+@code{iMaterialHandle} (Equivalent functionality can be achieved by using
+@code{iTextureHandle} or @code{iMaterial} directly, whichever is more
+appropriate.)
 @end itemize
 
 @subheading C++ Standard Conformance
@@ -1634,3 +1643,10 @@ conformant. This means that Crystal Space-based projects which choose to adhere
 strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
 @samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
 headers safely.
+
+@subheading @file{imap/parser.h} Deprecated
+
+The @file{imap/parser.h} file for long only contained a simple inclusion of 
+@file{imap/loader.h} which contains the interfaces to access the @sc{cs} map
+loader. Now, @file{imap/parser.h} is ``officially'' deprecated and deprecation 
+warnings have been added. Use @file{imap/loader.h} instead.
