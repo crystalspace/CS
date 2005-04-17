@@ -36,6 +36,7 @@
 
 // it's important that cssysdef.h is included AFTER the above #ifdef
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 
 #ifdef CS_MEMORY_TRACKER_IMPLEMENT
 #  define CS_MEMORY_TRACKER
@@ -81,7 +82,7 @@ void operator delete[] (void* p)
 {
   if (p) _free_dbg (p, _NORMAL_BLOCK);
 }
-#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
 #elif defined(MEMDEBUG_EXTENSIVE) // CS_COMPILER_MSVC
 //========================================================================
@@ -105,19 +106,19 @@ void operator delete[] (void* p)
 #define DETECT_WALL_SAME 8
 
 #define DETECT      "ABCDabcd01234567890+"
-#define DETECTAR    "ABCDabcd+09876543210"	// 8 first bytes same as DETECT
+#define DETECTAR    "ABCDabcd+09876543210"      // 8 first bytes same as DETECT
 #define DETECTFREE  "FreeFreeFreeFreeFree"
 #define DETECT_NEW  0xda
 #define DETECT_FREE 0x9d
 
 struct csMemTrackerEntry
 {
-  char* start;		// 0 if not used or else pointer to memory.
+  char* start;          // 0 if not used or else pointer to memory.
   size_t size;
-  bool freed;		// If true then this memory entry is freed.
-  unsigned long age;	// Time when 'free' was done.
-  char* alloc_file;	// Filename at allocation time.
-  int alloc_line;	// Line number.
+  bool freed;           // If true then this memory entry is freed.
+  unsigned long age;    // Time when 'free' was done.
+  char* alloc_file;     // Filename at allocation time.
+  int alloc_line;       // Line number.
 };
 
 // This is the size of the table with all memory allocations
@@ -233,20 +234,20 @@ static csMemTrackerEntry& FindFreeMemEntry ()
       for (;;)
       {
         CompactMemEntries (older_age);
-	if (first_free_idx >= DETECT_TABLE_SIZE-5)
-	{
-	  older_age += DETECT_TABLE_OLDER/10;
-	  if (older_age > global_age-10)
-	  {
-	    csPrintf ("Increase DETECT_TABLE_SIZE!\n");
-	    fflush (stdout);
-	    exit (0);
-	  }
-	}
-	else
-	{
-	  break;
-	}
+        if (first_free_idx >= DETECT_TABLE_SIZE-5)
+        {
+          older_age += DETECT_TABLE_OLDER/10;
+          if (older_age > global_age-10)
+          {
+            csPrintf ("Increase DETECT_TABLE_SIZE!\n");
+            fflush (stdout);
+            exit (0);
+          }
+        }
+        else
+        {
+          break;
+        }
       }
     }
   }
@@ -273,7 +274,7 @@ static csMemTrackerEntry* FindMemEntry (char* mem)
 static void ShowBlockInfo (csMemTrackerEntry& me)
 {
   csPrintf ("BLOCK: start=%08p size=%zu freed=%d\n", me.start,
-  	me.size, (int)me.freed);
+        me.size, (int)me.freed);
 # ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
   csPrintf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
 # endif
@@ -298,57 +299,57 @@ static void MemoryCheck ()
       memcpy (&s, rc+DETECT_WALL, 4);
       if (s != me.size)
       {
-	ShowBlockInfo (me);
+        ShowBlockInfo (me);
         csPrintf("CHK: Size in table does not correspond to size in block!\n");
-	fflush (stdout);
-	DEBUG_BREAK;
+        fflush (stdout);
+        DEBUG_BREAK;
       }
       if (me.freed)
       {
-	if (strncmp (rc, DETECTFREE, DETECT_WALL) != 0)
-	{
-	  ShowBlockInfo (me);
-	  csPrintf ("CHK: Bad start of block for freed block!\n");
-	  fflush (stdout);
-	  DEBUG_BREAK;
-	}
-	if (strncmp (rc+4+DETECT_WALL+s, DETECTFREE, DETECT_WALL) != 0)
-	{
-	  ShowBlockInfo (me);
-	  csPrintf ("CHK: Bad end of block for freed block!\n");
-	  fflush (stdout);
-	  DEBUG_BREAK;
-	}
+        if (strncmp (rc, DETECTFREE, DETECT_WALL) != 0)
+        {
+          ShowBlockInfo (me);
+          csPrintf ("CHK: Bad start of block for freed block!\n");
+          fflush (stdout);
+          DEBUG_BREAK;
+        }
+        if (strncmp (rc+4+DETECT_WALL+s, DETECTFREE, DETECT_WALL) != 0)
+        {
+          ShowBlockInfo (me);
+          csPrintf ("CHK: Bad end of block for freed block!\n");
+          fflush (stdout);
+          DEBUG_BREAK;
+        }
 #if DETECT_KEEP_FREE_MEMORY
         unsigned int j;
-	for (j = 0 ; j < s ; j++)
-	{
-	  if (me.start[j] != (char)DETECT_FREE)
-	  {
-	    ShowBlockInfo (me);
-	    csPrintf ("CHK: Freed memory is used at offset (%u)!\n", j);
-	    fflush (stdout);
-	    DEBUG_BREAK;
-	  }
-	}
+        for (j = 0 ; j < s ; j++)
+        {
+          if (me.start[j] != (char)DETECT_FREE)
+          {
+            ShowBlockInfo (me);
+            csPrintf ("CHK: Freed memory is used at offset (%u)!\n", j);
+            fflush (stdout);
+            DEBUG_BREAK;
+          }
+        }
 #endif
       }
       else
       {
-	if (strncmp (rc, DETECT, DETECT_WALL_SAME) != 0)
-	{
-	  ShowBlockInfo (me);
-	  csPrintf ("CHK: Bad start of block!\n");
-	  fflush (stdout);
-	  DEBUG_BREAK;
-	}
-	if (strncmp (rc+4+DETECT_WALL+s, DETECT, DETECT_WALL_SAME) != 0)
-	{
-	  ShowBlockInfo (me);
-	  csPrintf ("CHK: Bad end of block!\n");
-	  fflush (stdout);
-	  DEBUG_BREAK;
-	}
+        if (strncmp (rc, DETECT, DETECT_WALL_SAME) != 0)
+        {
+          ShowBlockInfo (me);
+          csPrintf ("CHK: Bad start of block!\n");
+          fflush (stdout);
+          DEBUG_BREAK;
+        }
+        if (strncmp (rc+4+DETECT_WALL+s, DETECT, DETECT_WALL_SAME) != 0)
+        {
+          ShowBlockInfo (me);
+          csPrintf ("CHK: Bad end of block!\n");
+          fflush (stdout);
+          DEBUG_BREAK;
+        }
       }
     }
   }
@@ -478,7 +479,7 @@ void operator delete (void* p)
       (char*)p);
   if (me->size != s)
     DumpError("ERROR! Size in table does not correspond with size in block!\n",
-    	0, (char*)p);
+        0, (char*)p);
   if (me->freed)
     DumpError ("ERROR! According to table memory is already freed!\n", 0,
       (char*)p);
@@ -522,10 +523,10 @@ void operator delete[] (void* p)
       (char*)p);
   if (me->size != s)
     DumpError("ERROR! Size in table does not correspond with size in block!\n",
-    	0, (char*)p);
+        0, (char*)p);
   if (me->freed)
     DumpError ("ERROR! According to table memory is already freed!\n", 0,
-    	(char*)p);
+        (char*)p);
 # if DETECT_KEEP_FREE_MEMORY
   me->freed = true;
   me->age = global_age;
@@ -538,7 +539,7 @@ void operator delete[] (void* p)
 #endif
 }
 
-#elif defined(MEMDEBUG_CHECKALLOC)	// CS_COMPILER_MSVC
+#elif defined(MEMDEBUG_CHECKALLOC)      // CS_COMPILER_MSVC
 //========================================================================
 // This alternative branch allows for checking allocated memory amounts.
 //========================================================================
@@ -555,7 +556,7 @@ void* operator new (size_t s, void* filename, int line)
   *rc++ = 0xdeadbeef;
   *rc++ = s;
   csPrintf ("+ %p %zu %zu %s\n",
-	    &alloc_total, alloc_total, alloc_cnt, filename);
+            &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -567,7 +568,7 @@ void* operator new[] (size_t s, void* filename, int line)
   *rc++ = 0xdeadbeef;
   *rc++ = s;
   csPrintf ("+ %p %zu %zu %s\n",
-	    &alloc_total, alloc_total, alloc_cnt, filename);
+            &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -595,9 +596,9 @@ void operator delete[] (void* p)
     csPrintf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
-#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif defined(MEMDEBUG_DUMPALLOC)	// CS_COMPILER_MSVC
+#elif defined(MEMDEBUG_DUMPALLOC)       // CS_COMPILER_MSVC
 //========================================================================
 // This alternative branch allows for dumping all memory allocations.
 //========================================================================
@@ -611,7 +612,7 @@ void* operator new (size_t s, void* filename, int line)
   alloc_total += s;
   alloc_cnt++;
   if (s > 1000) { csPrintf ("new s=%zu tot=%zu/%zu file=%s line=%d\n",
-  	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
+        s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
 void* operator new[] (size_t s, void* filename, int line)
@@ -620,7 +621,7 @@ void* operator new[] (size_t s, void* filename, int line)
   alloc_cnt++;
   if (s > 1000)
     csPrintf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
-	      s, alloc_total, alloc_cnt, filename, line); fflush (stdout);
+              s, alloc_total, alloc_cnt, filename, line); fflush (stdout);
   return (void*)malloc (s);
 }
 void operator delete (void* p)
@@ -631,9 +632,9 @@ void operator delete[] (void* p)
 {
   if (p) free (p);
 }
-#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#else	// CS_COMPILER_MSVC
+#else   // CS_COMPILER_MSVC
 //========================================================================
 // If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
 // the correct overloaded operators even if we don't do debugging.
@@ -657,9 +658,9 @@ void operator delete[] (void* p)
 {
   if (p) free (p);
 }
-#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#endif  // CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#endif	// CS_COMPILER_MSVC
+#endif  // CS_COMPILER_MSVC
 
 //#elif defined(MEMDEBUG_MEMORY_TRACKER)
 //#endif  // CS_COMPILER_MSVC
@@ -683,7 +684,7 @@ void operator delete[] (void* p)
 class csMemTrackerModule
 {
 public:
-  char* Class;		// Name of class or 0 for application level.
+  char* Class;          // Name of class or 0 for application level.
   csMemTrackerInfo* mti_table[10000];
   int mti_table_count;
 
@@ -697,14 +698,14 @@ public:
     int tomove = mti_table_count - idx;
     if (tomove > 0)
       memmove (mti_table+idx+1, mti_table+idx,
-      	  sizeof (csMemTrackerInfo*) * tomove);
+          sizeof (csMemTrackerInfo*) * tomove);
     mti_table_count++;
     mti_table[idx] = (csMemTrackerInfo*)malloc (sizeof (csMemTrackerInfo));
     mti_table[idx]->Init (filename);
   }
 
   csMemTrackerInfo* FindInsertMtiTableEntry (
-	char* filename, int start, int end)
+        char* filename, int start, int end)
   {
     // Binary search.
     if (mti_table_count <= 0)
@@ -779,14 +780,14 @@ public:
       if (!summary_only)
       {
         csPrintf ("    %8zu %8zu %8d %8d %s\n", mti->current_alloc,
-    	    mti->max_alloc, mti->current_count, mti->max_count,
-	    mti->file);
+            mti->max_alloc, mti->current_count, mti->max_count,
+            mti->file);
       }
       total_current_alloc += mti->current_alloc;
       total_current_count += mti->current_count;
     }
     csPrintf ("total_alloc=%zu total_count=%d Module=%s\n",
-    	total_current_alloc, total_current_count, Class);
+        total_current_alloc, total_current_count, Class);
     fflush (stdout);
   }
 };
@@ -797,7 +798,7 @@ public:
 class csMemTrackerRegistry : public iMemoryTracker
 {
 public:
-  csMemTrackerModule* modules[500];	// @@@ Hardcoded!
+  csMemTrackerModule* modules[500];     // @@@ Hardcoded!
   int num_modules;
 
   SCF_DECLARE_IBASE;
@@ -846,16 +847,16 @@ void mtiRegisterModule (char* Class)
   if (iSCF::SCF->object_reg)
   {
     csRef<iMemoryTracker> mtiTR = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    	iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker",
-	iMemoryTracker);
+        iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker",
+        iMemoryTracker);
     if (!mtiTR)
     {
       mtiTR = csPtr<iMemoryTracker>((iMemoryTracker*)new csMemTrackerRegistry);
       iSCF::SCF->object_reg->Register (mtiTR,
-      	"crystalspace.utilities.memorytracker");
+        "crystalspace.utilities.memorytracker");
     }
     mti_this_module = ((csMemTrackerRegistry*)(iMemoryTracker*)mtiTR)
-    	->NewMemTrackerModule (Class);
+        ->NewMemTrackerModule (Class);
   }
   else
   {
@@ -867,10 +868,10 @@ void mtiRegisterModule (char* Class)
 csMemTrackerInfo* mtiRegisterAlloc (size_t s, void* filename)
 {
   if (mti_this_module == 0)
-    return 0;	// Don't track this alloc yet.
+    return 0;   // Don't track this alloc yet.
 
   csMemTrackerInfo* mti = mti_this_module->FindInsertMtiTableEntry (
-  	(char*)filename);
+        (char*)filename);
   mti->current_count++;
   mti->current_alloc += s;
   if (mti->current_count > mti->max_count)
