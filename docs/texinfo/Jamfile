@@ -10,7 +10,7 @@ if $(CMD.MAKEINFO)
 if $(CMD.TEXI2HTML)
 {
   TEXI2HTML.INIT = [ ConcatDirs $(TOP) docs support texi2html.init ] ;
-  FLAGS.TEXI2HTML on manualhtml += -init_file=$(TEXI2HTML.INIT) -prefix=cs ;
+  FLAGS.TEXI2HTML on manualhtml += -prefix=cs ;
   Texi2HTML manualhtml : cs-unix.txi : html manual ;
   Help manualhtml : "Convert user manual to HTML format" ;
 }

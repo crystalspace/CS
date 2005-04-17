@@ -22,7 +22,7 @@ if $(PERL)
 {
   PATH.RUNTEXI2HTML = [ ConcatDirs $(TOP) docs support runtexi2html.sh ] ;
   CMD.RUNTEXI2HTML ?= "$(SHELL) $(PATH.RUNTEXI2HTML)" ;
-  PATH.TEXI2HTML = [ ConcatDirs $(TOP) docs support texi2html ] ;
+  PATH.TEXI2HTML = [ ConcatDirs $(TOP) docs support texi2html.pl ] ;
   CMD.TEXI2HTML ?= "$(PERL) $(PATH.TEXI2HTML)" ;
 }
 

@@ -23,4 +23,6 @@ for i in $IMAGEFILES; do
 done
 
 # run texi2html
-$TEXI2HTML $FLAGS -subdir="$OUTDIR" "$TEXIFILE"
+# @@@ Find better way to get texi2html home dir
+export T2H_HOME="$OLDDIR/$IMAGEDIR/../support"
+$TEXI2HTML $FLAGS -subdir="$OUTDIR" $TEXIFILE
