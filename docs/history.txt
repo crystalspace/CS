@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Apr-2005
+	- res made the shader manager store the shaders in a sorted list (to
+	  allow for quicker retrieval).
 16-Apr-2005
 	- res added support for a default shader to the generic render step,
 	  which is used when a material doesn't have a shader for a specific

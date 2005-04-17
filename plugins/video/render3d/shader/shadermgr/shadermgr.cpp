@@ -239,44 +239,68 @@ void csShaderManager::UpdateStandardVariables()
   sv_time->SetValue ((float)vc->GetCurrentTicks() / 1000.0f);
 }
 
+static int ShaderCompare (iShader* const& s1,
+			  iShader* const& s2)
+{
+  return strcasecmp (s1->QueryObject ()->GetName(), 
+    s2->QueryObject ()->GetName());
+}
+
 void csShaderManager::RegisterShader (iShader* shader)
 {
   if (shader != 0)
-    shaders.Push (shader);
+    shaders.InsertSorted (shader, &ShaderCompare);
 }
 
 void csShaderManager::UnregisterShader (iShader* shader)
 {
   if (shader != 0)
-    shaders.Delete (shader);
+  {
+    size_t index = shaders.FindSortedKey (
+      csArrayCmp<iShader*, iShader*> (shader, &ShaderCompare));
+    if (index != csArrayItemNotFound) shaders.DeleteIndex (index);
+  }
+}
+
+static int ShaderCompareName (iShader* const& s1,
+			      const char* const& name)
+{
+  return strcasecmp (s1->QueryObject ()->GetName(), 
+    name);
 }
 
 iShader* csShaderManager::GetShader(const char* name)
 {
-  size_t i;
-  for (i = 0; i < shaders.Length(); ++i)
-  {
-    iShader* shader = shaders.Get(i);
-    if (strcasecmp(shader->QueryObject ()->GetName(), name) == 0)
-      return shader;
-  }
+  size_t index = shaders.FindSortedKey (
+    csArrayCmp<iShader*, const char*> (name, &ShaderCompareName));
+  if (index != csArrayItemNotFound) return shaders[index];
+
   return 0;
+}
+
+static int CompilerCompare (iShaderCompiler* const& c1,
+			    iShaderCompiler* const& c2)
+{
+  return strcasecmp (c1->GetName(), c2->GetName());
 }
 
 void csShaderManager::RegisterCompiler(iShaderCompiler* compiler)
 {
-  compilers.Push(compiler);
+  compilers.InsertSorted (compiler, &CompilerCompare);
+}
+
+static int CompilerCompareName (iShaderCompiler* const& c1,
+				const char* const& name)
+{
+  return strcasecmp (c1->GetName(), name);
 }
 
 iShaderCompiler* csShaderManager::GetCompiler(const char* name)
 {
-  size_t i;
-  for (i = 0; i < compilers.Length(); ++i)
-  {
-    iShaderCompiler* compiler = compilers.Get(i);
-    if (strcasecmp(compiler->GetName(), name) == 0)
-      return compiler;
-  }
+  size_t index = compilers.FindSortedKey (
+    csArrayCmp<iShaderCompiler*, const char*> (name, &CompilerCompareName));
+  if (index != csArrayItemNotFound) return compilers[index];
+
   return 0;
 }
 
