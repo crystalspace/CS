@@ -62,6 +62,9 @@ private:
   /// Number of bytes to allocate for each block.
   size_t granularity;
 
+  csMemoryPool(csMemoryPool const&);   // Illegal; unimplemented.
+  void operator=(csMemoryPool const&); // Illegal; unimplemented.
+
 public:
   /**
    * Construct a new memory pool. If a size is provided, it is taken as a
