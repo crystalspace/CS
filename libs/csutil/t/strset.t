@@ -29,6 +29,7 @@ public:
   void testDelete();
   void testSizing();
   void testIterator();
+  void testClone();
 
   CPPUNIT_TEST_SUITE(csStringSetTest);
     CPPUNIT_TEST(testRequest);
@@ -36,6 +37,7 @@ public:
     CPPUNIT_TEST(testDelete);
     CPPUNIT_TEST(testSizing);
     CPPUNIT_TEST(testIterator);
+    CPPUNIT_TEST(testClone);
   CPPUNIT_TEST_SUITE_END();
 };
 
@@ -123,4 +125,17 @@ void csStringSetTest::testIterator()
       CPPUNIT_ASSERT_EQUAL(i, cow);
   }
   CPPUNIT_ASSERT_EQUAL(n, 3);
+}
+
+void csStringSetTest::testClone()
+{
+  csStringSet s0;
+  csStringID const foo = s0.Request("foo");
+  csStringID const bar = s0.Request("bar");
+  csStringSet s1(s0);
+  CPPUNIT_ASSERT_EQUAL(foo, s1.Request("foo"));
+  CPPUNIT_ASSERT_EQUAL(bar, s1.Request("bar"));
+  CPPUNIT_ASSERT_EQUAL(std::string("foo"), std::string(s1.Request(foo)));
+  CPPUNIT_ASSERT_EQUAL(std::string("bar"), std::string(s1.Request(bar)));
+  CPPUNIT_ASSERT_EQUAL(s0.Request("cow"), s1.Request("cow"));
 }
