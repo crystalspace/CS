@@ -39,7 +39,7 @@ sub doctoc_index {
   	open(my $INDEXFILE, "<$docroot/$srcfile");
   	while (<$INDEXFILE>) {
   			chomp $_;
-				if ( /<A HREF=\"(.*)\#(.*)\" style=\"text-decoration:none\"><b>(.*)<\/b><\/A>/ ) { # a letter
+				if ( /<A HREF=\"(.*?)\#(.*?)\" class=\"summary-letter\"><b>(.*?)<\/b><\/A>/i ) { # a letter
 						if (!exists($letterindexed{$3})) {
   							print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
@@ -60,7 +60,7 @@ EOTOCENTRY
   			open(my $INDEXFILE, "<$docroot/$_");
   			while (<$INDEXFILE>) {
   					chomp $_;
-  					if ( /<TR><TD><\/TD><TD valign=top><A HREF=\"(.*)\">(.*)<\/A><\/TD><TD valign=top><A HREF=\".*\">(.*)<\/A><\/TD><\/TR>/ ) {
+  					if ( /<TR><TD><\/TD><TD valign=\"top\"><A HREF=\"(.*?)\">(.*?)<\/A><\/TD><TD valign=\"top\"><A HREF=\".*?\">(.*?)<\/A><\/TD><\/TR>/i ) {
 		  					my $ilink = $1;
 		  					my $igroup = $2;
 		  					my $ititle = $3;
