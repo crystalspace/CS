@@ -10,7 +10,9 @@ applications or plugins may carry different licenses, as noted below.
 @menu
 * Library Copying:: @sc{gnu} Lesser General Public License
 * NonLGPL:: Portions of Crystal Space Covered Under Different Licenses
+* Copying:: @sc{gnu} General Public License
 @end menu
 
 @imports{appendix,lgpl.txi}
 @imports{appendix,nonlgpl.txi}
+@imports{appendix,gpl.txi}

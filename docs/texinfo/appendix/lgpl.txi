@@ -122,6 +122,9 @@ be combined with the library in order to run.
 @iftex
 @appendixsubsec TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 @end iftex
+@ifhtml
+@appendixsubsec TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+@end ifhtml
 @ifinfo
 @center GNU LESSER GENERAL PUBLIC LICENSE
 @center TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
@@ -480,6 +483,9 @@ and reuse of software generally.
 @iftex
 @heading NO WARRANTY
 @end iftex
+@ifhtml
+@center NO WARRANTY
+@end ifhtml
 @ifinfo
 @center NO WARRANTY
 @end ifinfo
@@ -511,6 +517,9 @@ DAMAGES.
 @iftex
 @heading END OF TERMS AND CONDITIONS
 @end iftex
+@ifhtml
+@center END OF TERMS AND CONDITIONS
+@end ifhtml
 @ifinfo
 @center END OF TERMS AND CONDITIONS
 @end ifinfo
