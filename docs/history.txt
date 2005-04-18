@@ -101,6 +101,8 @@ chronological order.
 	  csStringHash, csStringSet, and csPluginPaths.
 	- Eric Sunshine eliminated some `size_t' vs. `int' warnings in
 	  pvscalc.cpp.
+	- Eric Sunshine performed minor cleanup, corrections, and re-writing in
+	  apimod100.txi.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).

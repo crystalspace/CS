@@ -159,8 +159,8 @@ them from your applications if you used them):
 
 @subheading Material Registration
 
-Registering an @code{iMaterialWrapper} with the texture manager is not 
-necessary any more; any such calls can be removed.
+Registering an @samp{iMaterialWrapper} with the texture manager is no longer
+necessary; any such calls can be removed.
 
 @subheading Input Definitions
 
@@ -1631,9 +1631,9 @@ questionable use.
 @item
 @code{csIndPrint} and @file{csutil/indprint.h}
 @item
-@code{iMaterialHandle} (Equivalent functionality can be achieved by using
-@code{iTextureHandle} or @code{iMaterial} directly, whichever is more
-appropriate.)
+@code{iMaterialHandle}. Equivalent functionality can be achieved by using
+@samp{iTextureHandle} or @samp{iMaterial} directly; whichever is more
+appropriate.
 @end itemize
 
 @subheading C++ Standard Conformance
@@ -1646,7 +1646,9 @@ headers safely.
 
 @subheading @file{imap/parser.h} Deprecated
 
-The @file{imap/parser.h} file for long only contained a simple inclusion of 
-@file{imap/loader.h} which contains the interfaces to access the @sc{cs} map
-loader. Now, @file{imap/parser.h} is ``officially'' deprecated and deprecation 
-warnings have been added. Use @file{imap/loader.h} instead.
+All functionality in the header @file{imap/parser.h} was long ago moved to
+@file{imap/loader.h}, which declares interfaces to access the Crystal Space
+map loader. At that time, @file{imap/parser.h} became a very thin wrapper which
+merely included @file{imap/loader.h} and did nothing more. Since
+@file{imap/parser.h} has no useful purpose, it is now officially deprecated,
+and deprecation warnings have been added. Use @file{imap/loader.h} instead.
