@@ -75,12 +75,17 @@ protected: // 'protected' allows access by test-suite.
     BlockKey(uint8 const* p, size_t n) : addr(p), blocksize(n) {}
   };
 
-  csArray<uint8*> blocks;	// List of allocated blocks; sorted by address.
-  size_t size;			// Number of elements per block.
-  size_t elsize;		// Element size; >= sizeof(void*).
-  size_t blocksize;		// Size in bytes per block.
-  FreeNode* freenode;		// Head of the chain of free nodes.
-  bool pedantic;		// Warn about nodes not explicitly freed.
+  csArray<uint8*> blocks;       // List of allocated blocks; sorted by address.
+  size_t size;                  // Number of elements per block.
+  size_t elsize;                // Element size; >= sizeof(void*).
+  size_t blocksize;             // Size in bytes per block.
+  FreeNode* freenode;           // Head of the chain of free nodes.
+  bool pedantic;                // Warn about nodes not explicitly freed.
+  bool insideDisposeAll;        // Flag to ignore calls to Compact() and
+                                //  Free() if they're called recursively
+                                //  while disposing the entire allocation set.
+                                //  Recursive calls to Alloc() will signal an
+                                //  assertion failure.
 
   /**
    * Comparison function for FindBlock() which does a "fuzzy" search given an
@@ -157,7 +162,7 @@ protected: // 'protected' allows access by test-suite.
 #ifdef CS_DEBUG
     if (warn)
       csPrintfErr("NOTIFY: csBlockAllocator(%p) destroying potentially leaked "
-		  "object at %p.\n", this, p);
+                  "object at %p.\n", this, p);
 #endif
 #ifdef CS_BLOCKALLOC_DEBUG
     memset (p, 0xfb, elsize);
@@ -189,17 +194,19 @@ protected: // 'protected' allows access by test-suite.
    */
   void DisposeAll(bool warn_unfreed)
   {
+    insideDisposeAll = true;
     csBitArray const mask(GetAllocationMap());
     size_t node = 0;
     for (size_t b = 0, bN = blocks.GetSize(); b < bN; b++)
     {
       for (uint8 *p = blocks[b], *pN = p + blocksize; p < pN; p += elsize)
-	if (mask.IsBitSet(node++))
-	  DestroyObject((T*)p, warn_unfreed);
+          if (mask.IsBitSet(node++))
+            DestroyObject((T*)p, warn_unfreed);
       FreeBlock(blocks[b]);
     }
     blocks.DeleteAll();
     freenode = 0;
+    insideDisposeAll = false;
   }
 
 public:
@@ -225,7 +232,8 @@ public:
    *   forgotten to release explicitly via manual invocation of Free().
    */
   csBlockAllocator(size_t nelem = 32, bool warn_unfreed = false) :
-    size(nelem), elsize(sizeof(T)), freenode(0), pedantic(warn_unfreed)
+    size(nelem), elsize(sizeof(T)), freenode(0), pedantic(warn_unfreed),
+    insideDisposeAll(false)
   {
     if (elsize < sizeof (FreeNode))
       elsize = sizeof (FreeNode);
@@ -256,6 +264,8 @@ public:
    */
   void Compact()
   {
+    if (insideDisposeAll) return;
+
     bool compacted = false;
     csBitArray mask(GetAllocationMap());
     for (size_t b = blocks.GetSize(); b-- > 0; )
@@ -263,10 +273,10 @@ public:
       size_t const node = b * size;
       if (!mask.AreSomeBitsSet(node, size))
       {
-	FreeBlock(blocks[b]);
-	blocks.DeleteIndex(b);
-	mask.Delete(node, size);
-	compacted = true;
+        FreeBlock(blocks[b]);
+        blocks.DeleteIndex(b);
+        mask.Delete(node, size);
+        compacted = true;
       }
     }
 
@@ -278,16 +288,16 @@ public:
       size_t node = bN * size;
       for (size_t b = bN; b-- > 0; )
       {
-	uint8* const p0 = blocks[b];
-	for (uint8* p = p0 + (size - 1) * elsize; p >= p0; p -= elsize)
-	{
-	  if (!mask.IsBitSet(--node))
-	  {
-	    FreeNode* slot = (FreeNode*)p;
-	    slot->next = nextfree;
-	    nextfree = slot;
-	  }
-	}
+        uint8* const p0 = blocks[b];
+        for (uint8* p = p0 + (size - 1) * elsize; p >= p0; p -= elsize)
+        {
+          if (!mask.IsBitSet(--node))
+          {
+            FreeNode* slot = (FreeNode*)p;
+            slot->next = nextfree;
+            nextfree = slot;
+          }
+        }
       }
       freenode = nextfree;
     }
@@ -298,6 +308,12 @@ public:
    */
   T* Alloc()
   {
+    if (insideDisposeAll)
+    {
+        csPrintfErr("ERROR: csBlockAllocator(%p) tried to allocate memory while inside DisposeAll()", this);
+      CS_ASSERT(false);
+    }
+
     if (freenode == 0)
     {
       uint8* p = AllocBlock();
@@ -314,7 +330,7 @@ public:
    */
   void Free(T* p)
   {
-    if (p != 0)
+    if (p != 0 && !insideDisposeAll)
     {
       CS_ASSERT(FindBlock(p) != csArrayItemNotFound);
       DestroyObject(p, false);

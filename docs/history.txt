@@ -14,6 +14,10 @@ chronological order.
 	  in any standard, though they are noted in "Future Library
 	  Directions". http://docs.hp.com/en/B2355-90695/sqrt.3M.html
 	- res fixed the user manual to have a index.html again.
+	- Peter Amstutz fixed a bug in csutil/blockallocator.h wherein
+	  if a destructor called by DisposeAll() in turn Free()s an object from 
+	  the same allocator, it triggers a double-free bug when DisposeAll()
+	  attempts to also destroy the same object.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
