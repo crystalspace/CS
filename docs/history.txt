@@ -123,6 +123,8 @@ chronological order.
 	- res added a copy of the GPL to the manual (since very few parts of
 	  CS use it).
 	- res applied some slight markup fixes to lgpl.txi.
+	- Eric Sunshine updated CS/docs/support/winhelp/gendoctoc.pl to work
+	  with texi2html.pl v1.76.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
