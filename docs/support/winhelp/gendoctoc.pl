@@ -124,7 +124,7 @@ sub doctoc_section {
   	while (<$INDEXFILE>) {
   			chomp $_;
 				if ( ( /<A NAME=\".*?\" HREF=\"(.*?)\">(.*?)<\/A>/i ) # like in cs_ovr.html
-		  			|| ( /<TR><TD ALIGN=\"left\" VALIGN=\"TOP\"><A HREF=\"(.*?)\">(.*?)<\/A><\/TD><TD>&nbsp;&nbsp;<\/TD><TD ALIGN=\"left\" VALIGN=\"TOP\"><\/TD><\/TR>/i ) ) { # every other file
+		  			|| ( /<TR><TD ALIGN=\"left\" VALIGN=\"TOP\"><A HREF=\"(.*?)\">(.*?)<\/A><\/TD><TD>&nbsp;&nbsp;<\/TD><TD ALIGN=\"left\" VALIGN=\"TOP\">/i ) ) { # every other file
 		  			my $seclink = $1;
 		  			(my $sectitle = $2) =~ s/(<.*?>)//g; # strip html code
 		  			$sectitle = HTMLEntities::encode($sectitle);
