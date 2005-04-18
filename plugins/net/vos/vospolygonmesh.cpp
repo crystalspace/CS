@@ -23,6 +23,12 @@
 
 #include "cssysdef.h"
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include <vos/metaobjects/a3dl/material.hh>
 #include <vos/metaobjects/a3dl/portal.hh>
 
@@ -64,6 +70,9 @@ public:
                            std::string n, iSector *s);
   virtual ~ConstructPolygonMeshTask();
   virtual void doTask();
+  void doStatic(iEngine* engine);
+  void doGenmesh(iEngine* engine);
+  void doTexturing(std::vector<int>& polymap, iThingFactoryState* thingfac);
 };
 
 ConstructPolygonMeshTask::ConstructPolygonMeshTask(iObjectRegistry *objreg,
@@ -77,14 +86,8 @@ ConstructPolygonMeshTask::~ConstructPolygonMeshTask()
 {
 }
 
-void ConstructPolygonMeshTask::doTask()
+void ConstructPolygonMeshTask::doStatic(iEngine* engine)
 {
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-
-  LOG("ConstructPolygonMeshTask", 3, "constructing polygon mesh " << name);
-
-  if(isStatic)
-  {
     LOG("ConstructPolygonMeshTask", 3, "is static mesh");
 
     csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
@@ -142,7 +145,158 @@ void ConstructPolygonMeshTask::doTask()
       }
     }
 
+    doTexturing(polymap, thingfac);
 
+    thingfac->SetSmoothingFlag(true);
+
+    LOG("ConstructPolygonMeshTask", 3, "creating mesh wrapper for "
+        << name << " in sector " << sector);
+
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
+      factory, name.c_str(), sector, csVector3(0, 0, 0));
+
+    if(materials.size())
+    {
+      meshwrapper->GetMeshObject()->SetMaterialWrapper
+        ((meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
+    }
+    else
+    {
+      meshwrapper->GetMeshObject()->SetMaterialWrapper(
+                                            csMetaMaterial::GetCheckerboard());
+    }
+
+    csRef<iThingState> thingstate = SCF_QUERY_INTERFACE(
+                             meshwrapper->GetMeshObject(), iThingState);
+
+    //thingstate->SetMovingOption(CS_THING_MOVE_OCCASIONAL);
+    thingstate->SetMovingOption(CS_THING_MOVE_NEVER);
+
+    factory->GetMeshObjectFactory()->GetFlags().Set(CS_THING_NOCOMPRESS);
+    meshwrapper->GetFlags().Set(CS_ENTITY_NOSHADOWS);
+
+    //transformgroup->GetChildren()->Add(meshwrapper);
+
+    //if(portals.size()) meshwrapper->SetRenderPriority(
+    //  engine->GetRenderPriority("portal"));
+
+    // Set up dynamics for mesh
+    LOG("ConstructPolygonMeshTask", 3, "setting up dynamics");
+    if (dynsys)
+    {
+      csRef<iRigidBody> collider = dynsys->CreateBody ();
+      collider->SetProperties (1, csVector3 (0), csMatrix3 ());
+      collider->SetPosition (csVector3(0, 0, 0));
+      collider->AttachMesh (meshwrapper);
+
+      const csMatrix3 tm;
+      const csVector3 tv (0);
+      csOrthoTransform t (tm, tv);
+      collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
+
+      if (polygonmesh->isLocal())
+    collider->SetMoveCallback (polygonmesh->GetCSinterface());
+
+      polygonmesh->GetCSinterface()->SetCollider (collider);
+    }
+
+    LOG("ConstructPolygonMeshTask", 3, "done with " << name);
+
+    polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
+
+    vosa3dl->decrementRelightCounter();
+}
+
+void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
+{
+    csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
+      "crystalspace.mesh.object.genmesh", "polygonmesh_factory");
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
+      factory, name.c_str(), sector);
+
+    if(materials.hasMore())
+      meshwrapper->GetMeshObject()->SetMaterialWrapper(
+                (meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
+    else
+      meshwrapper->GetMeshObject()->SetMaterialWrapper(
+                                            csMetaMaterial::GetCheckerboard());
+    csRef<iGeneralFactoryState> genmesh = SCF_QUERY_INTERFACE(
+                        factory->GetMeshObjectFactory(), iGeneralFactoryState);
+
+    // Load vertices
+    genmesh->SetVertexCount(verts.size());
+    csVector3* vertices = genmesh->GetVertices();
+    size_t i;
+    for(i = 0; i < verts.size(); i++)
+    {
+      vertices[i].x = verts[i].x;
+      vertices[i].y = verts[i].y;
+      vertices[i].z = verts[i].z;
+    }
+
+    int num = 0;
+    for(i = 0; i < polys.size(); i++)
+    {
+      num += polys[i].size() - 2;
+    }
+    // XXX check this property below and save it in the task structure above
+    // so we can do this check
+    //bool dbl = getDoubleSided();
+    bool dbl = false;
+    if(dbl) num *= 2;
+    genmesh->SetTriangleCount(num);
+    csTriangle* triangles = genmesh->GetTriangles();
+    num = 0;
+    for(size_t i = 0; i < polys.size(); i++)
+    {
+      for(size_t c = 2; c < polys[i].size(); c++)
+      {
+        triangles[num].a = polys[i][0];
+        triangles[num].b = polys[i][c-1];
+        triangles[num].c = polys[i][c];
+        num++;
+        if(dbl)
+        {
+          triangles[num].a = polys[i][0];
+          triangles[num].b = polys[i][c];
+          triangles[num].c = polys[i][c-1];
+          num++;
+        }
+      }
+    }
+
+    if((size_t)genmesh->GetVertexCount() < texels.size())
+    {
+      LOG("terangreal::polygonmesh", 2, "Warning: there are more texels than existing vertices; increasing mesh's vertex count...");
+      genmesh->SetVertexCount(texels.size());
+    }
+    csVector2* gmtexels = genmesh->GetTexels();
+    for(size_t i = 0; i < texels.size(); i++)
+    {
+      gmtexels[i].x = texels[i].x;
+      gmtexels[i].y = texels[i].y;
+    }
+
+    genmesh->Invalidate();
+    genmesh->CalculateNormals();
+
+    csRef<iGeneralMeshState> gm = SCF_QUERY_INTERFACE(
+                            meshwrapper->GetMeshObject(), iGeneralMeshState);
+    gm->SetLighting(true);
+
+    /* XXX TODO: Make these be optional properties, on by default */
+    /* Do we need to call engine->ForceRelight() now? XXX */
+    gm->SetShadowReceiving(false);
+    gm->SetShadowCasting(false);
+
+    // TODO: Set up dynamics for genmesh
+
+    polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
+}
+
+void ConstructPolygonMeshTask::doTexturing(std::vector<int>& polymap,
+                                           iThingFactoryState* thingfac)
+{
     if(texels.size() > 0)
     {
       for(size_t i = 0; i < polys.size(); i++)
@@ -228,7 +382,7 @@ void ConstructPolygonMeshTask::doTask()
           */
 
         if(i >= texsp.size()) {
-          // Just throw the material at the polygon. 
+          // Just throw the material at the polygon.
           // (this takes care of objects with color but no textures.)
           vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(*materials);
           thingfac->SetPolygonMaterial(p, mat->GetMaterialWrapper());
@@ -368,150 +522,21 @@ void ConstructPolygonMeshTask::doTask()
       }
     }
 
-    thingfac->SetSmoothingFlag(true);
+}
 
-    LOG("ConstructPolygonMeshTask", 3, "creating mesh wrapper for "
-        << name << " in sector " << sector);
+void ConstructPolygonMeshTask::doTask()
+{
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
-      factory, name.c_str(), sector, csVector3(0, 0, 0));
+  LOG("ConstructPolygonMeshTask", 3, "constructing polygon mesh " << name);
 
-    if(materials.size())
-    {
-      meshwrapper->GetMeshObject()->SetMaterialWrapper
-        ((meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
-    }
-    else
-    {
-      meshwrapper->GetMeshObject()->SetMaterialWrapper(
-                                            csMetaMaterial::GetCheckerboard());
-    }
-
-    csRef<iThingState> thingstate = SCF_QUERY_INTERFACE(
-                             meshwrapper->GetMeshObject(), iThingState);
-
-    //thingstate->SetMovingOption(CS_THING_MOVE_OCCASIONAL);
-    thingstate->SetMovingOption(CS_THING_MOVE_NEVER);
-
-    factory->GetMeshObjectFactory()->GetFlags().Set(CS_THING_NOCOMPRESS);
-    meshwrapper->GetFlags().Set(CS_ENTITY_NOSHADOWS);
-
-    //transformgroup->GetChildren()->Add(meshwrapper);
-
-    //if(portals.size()) meshwrapper->SetRenderPriority(
-    //  engine->GetRenderPriority("portal"));
-
-    // Set up dynamics for mesh
-    LOG("ConstructPolygonMeshTask", 3, "setting up dynamics");
-    if (dynsys)
-    {
-      csRef<iRigidBody> collider = dynsys->CreateBody ();
-      collider->SetProperties (1, csVector3 (0), csMatrix3 ());
-      collider->SetPosition (csVector3(0, 0, 0));
-      collider->AttachMesh (meshwrapper);
-
-      const csMatrix3 tm;
-      const csVector3 tv (0);
-      csOrthoTransform t (tm, tv);
-      collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
-
-      if (polygonmesh->isLocal())
-    collider->SetMoveCallback (polygonmesh->GetCSinterface());
-
-      polygonmesh->GetCSinterface()->SetCollider (collider);
-    }
-
-    LOG("ConstructPolygonMeshTask", 3, "done with " << name);
-
-    polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
-
-    vosa3dl->decrementRelightCounter();
+  if(isStatic)
+  {
+    doStatic(engine);
   }
   else
   {
-    csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.genmesh", "polygonmesh_factory");
-    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
-      factory, name.c_str(), sector);
-
-    if(materials.hasMore())
-      meshwrapper->GetMeshObject()->SetMaterialWrapper(
-                (meta_cast<csMetaMaterial>(*materials))->GetMaterialWrapper());
-    else
-      meshwrapper->GetMeshObject()->SetMaterialWrapper(
-                                            csMetaMaterial::GetCheckerboard());
-    csRef<iGeneralFactoryState> genmesh = SCF_QUERY_INTERFACE(
-                        factory->GetMeshObjectFactory(), iGeneralFactoryState);
-
-    // Load vertices
-    genmesh->SetVertexCount(verts.size());
-    csVector3* vertices = genmesh->GetVertices();
-    size_t i;
-    for(i = 0; i < verts.size(); i++)
-    {
-      vertices[i].x = verts[i].x;
-      vertices[i].y = verts[i].y;
-      vertices[i].z = verts[i].z;
-    }
-
-    int num = 0;
-    for(i = 0; i < polys.size(); i++)
-    {
-      num += polys[i].size() - 2;
-    }
-    // XXX check this property below and save it in the task structure above
-    // so we can do this check
-    //bool dbl = getDoubleSided();
-    bool dbl = false;
-    if(dbl) num *= 2;
-    genmesh->SetTriangleCount(num);
-    csTriangle* triangles = genmesh->GetTriangles();
-    num = 0;
-    for(size_t i = 0; i < polys.size(); i++)
-    {
-      for(size_t c = 2; c < polys[i].size(); c++)
-      {
-        triangles[num].a = polys[i][0];
-        triangles[num].b = polys[i][c-1];
-        triangles[num].c = polys[i][c];
-        num++;
-        if(dbl)
-        {
-          triangles[num].a = polys[i][0];
-          triangles[num].b = polys[i][c];
-          triangles[num].c = polys[i][c-1];
-          num++;
-        }
-      }
-    }
-
-    if((size_t)genmesh->GetVertexCount() < texels.size())
-    {
-      LOG("terangreal::polygonmesh", 2, "Warning: there are more texels than existing vertices; increasing mesh's vertex count...");
-      genmesh->SetVertexCount(texels.size());
-    }
-    csVector2* gmtexels = genmesh->GetTexels();
-    for(size_t i = 0; i < texels.size(); i++)
-    {
-      gmtexels[i].x = texels[i].x;
-      gmtexels[i].y = texels[i].y;
-    }
-
-    genmesh->Invalidate();
-    genmesh->CalculateNormals();
-
-    csRef<iGeneralMeshState> gm = SCF_QUERY_INTERFACE(
-                            meshwrapper->GetMeshObject(), iGeneralMeshState);
-    gm->SetLighting(true);
-
-    /* XXX TODO: Make these be optional properties, on by default */
-    /* Do we need to call engine->ForceRelight() now? XXX */
-    gm->SetShadowReceiving(false);
-    gm->SetShadowCasting(false);
-
-    // TODO: Set up dynamics for genmesh
-
-    polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
+    doGenmesh(engine);
   }
 
   if(chainedtask) {

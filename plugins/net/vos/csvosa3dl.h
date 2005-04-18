@@ -24,6 +24,12 @@
 #ifndef _CSA3DL_H_
 #define _CSA3DL_H_
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include <vos/vos/site.hh>
 #include <vos/vutil/taskqueue.hh>
 

@@ -131,7 +131,7 @@ void LoadObjectTask::doTask()
     }
     else
     {
-    sector->addObject3D (obj3d->GetCSinterface());
+      sector->addObject3D (obj3d->GetCSinterface());
       if (wrapper->GetMovable()->GetSectors()->Find (sector->GetSector()))
       {
         LOG("LoadObjectTask", 3, "Object already setup and in sector");
@@ -139,10 +139,10 @@ void LoadObjectTask::doTask()
       else
       {
         LOG("LoadObjectTask", 3, "Object already setup, setting sector");
-    if( wrapper->GetMovable()->GetSectors()->Find(sector->GetSector()) < 0) {
-      wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
-      wrapper->GetMovable()->UpdateMove();
-    }
+        if (wrapper->GetMovable()->GetSectors()->Find(sector->GetSector()) < 0) {
+          wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
+          wrapper->GetMovable()->UpdateMove();
+        }
       }
     }
   }
@@ -150,17 +150,17 @@ void LoadObjectTask::doTask()
   {
     if (toRemove)
     {
-    sector->removeObject3D (obj3d->GetCSinterface());
+      sector->removeObject3D (obj3d->GetCSinterface());
       LOG("LoadObjectTask", 2, "Attempting to remove empty meshwrapper!");
     }
     else
     {
       LOG("LoadObjectTask", 3, "Setting up object3D")
-    if (obj3d->GetCSinterface() == NULL)
-    LOG("NEIL-LOG", 1, "Uh oh");
+        if (obj3d->GetCSinterface() == NULL)
+          LOG("NEIL-LOG", 1, "Uh oh");
 
-    sector->addObject3D (obj3d->GetCSinterface());
-    TaskQueue::defaultTQ().addTask(new SetupObjectTask(vosa3dl, obj3d, sector));
+      sector->addObject3D (obj3d->GetCSinterface());
+      TaskQueue::defaultTQ().addTask(new SetupObjectTask(vosa3dl, obj3d, sector));
     }
   }
 }

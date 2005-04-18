@@ -22,6 +22,13 @@
 */
 
 #include "cssysdef.h"
+
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include "voslight.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"

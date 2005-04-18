@@ -78,17 +78,17 @@ public:
 class csMetaSector : public virtual A3DL::Sector
 {
 private:
-	csRef<csVosSector> csvossector;
+  csRef<csVosSector> csvossector;
 
 public:
-	csMetaSector(VOS::VobjectBase* superobject);
-	virtual ~csMetaSector() { }
+  csMetaSector(VOS::VobjectBase* superobject);
+  virtual ~csMetaSector() { }
 
-	static VOS::MetaObject* new_csMetaSector(VOS::VobjectBase* superobject,
-		const std::string& type);
+  static VOS::MetaObject* new_csMetaSector(VOS::VobjectBase* superobject,
+    const std::string& type);
 
-	csRef<csVosSector> GetCsVosSector() { return csvossector; }
-	void SetCsVosSector(csRef<csVosSector> s) { csvossector = s; }
+  csRef<csVosSector> GetCsVosSector() { return csvossector; }
+  void SetCsVosSector(csRef<csVosSector> s) { csvossector = s; }
 };
 
 

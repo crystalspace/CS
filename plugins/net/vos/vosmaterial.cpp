@@ -23,6 +23,12 @@
 
 #include "cssysdef.h"
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include "csgfx/memimage.h"
 #include "csgfx/xorpat.h"
 #include "iutil/objreg.h"
@@ -191,7 +197,7 @@ void ConstructMaterialTask::doTask()
     csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(
       imat, 0);
     if(!material) return;
-    material->Register(txtmgr);
+    //material->Register(txtmgr);
 
     if(metamaterial->materialwrapper.IsValid())
       engine->GetMaterialList()->Remove(metamaterial->materialwrapper);
@@ -229,7 +235,7 @@ void csMetaMaterial::CreateCheckerboard()
   tw->SetImageFile(im);
   csRef<iMaterial> mat = engine->CreateBaseMaterial(tw);
   checkerboard = engine->GetMaterialList()->NewMaterial (mat, 0);
-  checkerboard->Register(txtmgr);
+  //checkerboard->Register(txtmgr);
 }
 
   /** Return CS iMaterialWrapper interface for this object */

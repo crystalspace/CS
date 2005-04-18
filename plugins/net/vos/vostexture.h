@@ -64,8 +64,8 @@ public:
   virtual void notifyChildReplaced(VOS::VobjectEvent& event);
   virtual void notifyChildRemoved(VOS::VobjectEvent& event);
 
-  static VOS::MetaObject* new_csMetaTexture(
-    VOS::VobjectBase* superobject, const std::string& type);
+  static VOS::MetaObject* new_csMetaTexture(VOS::VobjectBase* superobject,
+                                            const std::string& type);
 
   friend class ConstructTextureTask;
   friend class ConstructMozTextureTask;

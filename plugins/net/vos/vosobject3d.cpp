@@ -59,6 +59,13 @@ csVosObject3D::csVosObject3D(csMetaObject3D* obj3d, VUtil::RefCounted* rc)
 
 csVosObject3D::~csVosObject3D()
 {
+  if (meshwrapper.IsValid())
+  {
+    csRef<iEngine> engine = CS_QUERY_REGISTRY (object3d->getVosA3DL()->GetObjectRegistry(),
+                                               iEngine);
+    meshwrapper->QueryObject()->ObjRemove(this);
+    engine->GetMeshes()->Remove(meshwrapper);
+  }
   SCF_DESTRUCT_IBASE();
 }
 
@@ -70,12 +77,16 @@ csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
 void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 {
   LOG("vosobject3d", 3, "setting mesh wrapper on " << object3d->getURLstr());
-  if(meshwrapper.IsValid()) {
+
+
+  if (meshwrapper.IsValid())
+  {
     csRef<iEngine> engine = CS_QUERY_REGISTRY (object3d->getVosA3DL()->GetObjectRegistry(),
                                                iEngine);
-  meshwrapper->QueryObject()->ObjRemove(this);
+    meshwrapper->QueryObject()->ObjRemove(this);
     engine->GetMeshes()->Remove(meshwrapper);
   }
+
   meshwrapper = mw;
   meshwrapper->QueryObject()->ObjAdd(this);
 }
@@ -151,6 +162,7 @@ ConstructObject3DTask::~ConstructObject3DTask()
 void ConstructObject3DTask::doTask()
 {
   csRef<iMeshWrapper> mw = obj->GetCSinterface()->GetMeshWrapper();
+
   LOG("vosobject3d", 3, "ConstructObject3DTask: creating " << obj->getURLstr()
       << " at " << pos.x << " " << pos.y << " " << pos.z);
   if(hardpos.x != 0 || hardpos.y != 0 || hardpos.z != 0) {
@@ -158,7 +170,7 @@ void ConstructObject3DTask::doTask()
         << " to " << hardpos.x << " " << hardpos.y << " " << hardpos.z);
   }
 
-  if(mw.IsValid())
+  if (mw.IsValid())
   {
     csReversibleTransform ht(hardtrans, hardpos);
     mw->GetFactory()->HardTransform(ht);
@@ -169,7 +181,7 @@ void ConstructObject3DTask::doTask()
 
     csRef<iThingState> thingstate = SCF_QUERY_INTERFACE(
                              mw->GetMeshObject(), iThingState);
-    if(thingstate.IsValid()) thingstate->Unprepare();
+    if (thingstate.IsValid()) thingstate->Unprepare();
   }
 }
 
@@ -356,7 +368,7 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
         vRef<RemoteProperty> rp = meta_cast<RemoteProperty> (event.getChild());
         if(rp.isValid())
         {
-          rp->enableAsyncReplace(true);
+          rp->enableAsyncReplace (true);
         }
       }
     }
@@ -370,7 +382,7 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
     {
       metamaterial = VOS::meta_cast<csMetaMaterial> (getMaterial());
       LOG("vosobject3d", 3, "getting material " << metamaterial.isValid());
-      metamaterial->Setup(vosa3dl);
+      metamaterial->Setup (vosa3dl);
 
       updateMaterial();
     }
@@ -452,6 +464,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 void csMetaObject3D::changePosition (const csVector3 &pos)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+
   LOG("vosobject3d", 3, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
   if (mw.IsValid())
@@ -469,6 +482,7 @@ void csMetaObject3D::changePosition (const csVector3 &pos)
 void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+
   if (mw.IsValid())
   {
   // NOTE:Movable doesn't support scaling, if it did we'd need to incorporate
@@ -487,6 +501,7 @@ void csMetaObject3D::changeMaterial (iMaterialWrapper* mat)
 {
   LOG("vosobject3d", 3, "changing material on " << getURLstr());
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+
   if (mw.IsValid())
   {
     mw->GetMeshObject()->SetMaterialWrapper(mat);
