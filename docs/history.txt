@@ -118,6 +118,8 @@ chronological order.
 	  in some instances and also prevented some @node directives from being
 	  repaired.
 	- Eric Sunshine installed the latest lgpl.txi from the GNU web site.
+	- Eric Sunshine eliminated some warnings in the CS manual reported by
+	  the new texi2html v1.76.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
