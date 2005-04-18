@@ -944,7 +944,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    do_verbose = verbosemgr->CheckFlag ("loader");
+    do_verbose = verbosemgr->Enabled ("loader");
   else
     do_verbose = false;
 

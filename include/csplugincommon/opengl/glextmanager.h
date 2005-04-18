@@ -15297,7 +15297,7 @@ private:
     csRef<iVerbosityManager> verbosemgr (
       CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
     
-    if (!verbosemgr->CheckFlag ("renderer"))
+    if (!verbosemgr->Enabled ("renderer"))
       return;
     
     va_list arg;

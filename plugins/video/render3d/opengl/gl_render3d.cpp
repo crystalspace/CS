@@ -740,7 +740,7 @@ bool csGLGraphics3D::Open ()
 
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
-  if (verbosemgr) verbose = verbosemgr->CheckFlag ("renderer");
+  if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
   if (!verbose) bugplug = 0;
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",

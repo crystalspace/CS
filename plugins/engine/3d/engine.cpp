@@ -907,7 +907,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    do_verbose = verbosemgr->CheckFlag ("engine");
+    do_verbose = verbosemgr->Enabled ("engine");
   if (do_verbose)
   {
     bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);

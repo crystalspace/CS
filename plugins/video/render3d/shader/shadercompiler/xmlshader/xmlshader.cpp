@@ -1118,7 +1118,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    do_verbose = verbosemgr->CheckFlag ("renderer", "shader");
+    do_verbose = verbosemgr->Enabled ("renderer.shader");
   else
     do_verbose = false;
     

@@ -110,7 +110,7 @@ bool csLinuxJoystick::Init ()
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    verbose = verbosemgr->CheckFlag ("joystick");
+    verbose = verbosemgr->Enabled ("joystick");
 
   config.AddConfig (object_reg, CS_LINUX_JOYSTICK_CFG);
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));

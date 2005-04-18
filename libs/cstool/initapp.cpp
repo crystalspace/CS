@@ -51,7 +51,6 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/strset.h"
-#include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
 #include "ivaria/conin.h"
@@ -204,17 +203,24 @@ iCommandLineParser* csInitializer::CreateCommandLineParser(
 iVerbosityManager* csInitializer::CreateVerbosityManager (
   iObjectRegistry* r)
 {
-  csRef<iVerbosityManager> vm;
-  const char* verbosity = 0;
+  csVerbosityManager* v = new csVerbosityManager;
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (
     r, iCommandLineParser));
   if (cmdline.IsValid())
   {
-    verbosity = cmdline->GetOption ("verbose");
+    for (size_t i = 0; ; i++)
+    {
+      char const* flags = cmdline->GetOption ("verbose", i);
+      if (flags != 0)
+	v->Parse(flags);
+      else
+	break;
+    }
   }
-  vm.AttachNew (new csVerbosityManager (verbosity));
+  csRef<iVerbosityManager> vm;
+  vm.AttachNew (v);
   r->Register (vm, "iVerbosityManager");
-  return vm;
+  return v;
 }
 
 iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
@@ -232,9 +238,7 @@ static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
     CS_QUERY_REGISTRY(r, iVerbosityManager));
   bool verbose = CS_LOAD_LIB_VERBOSE;
   if (verbosemgr.IsValid())
-  {
-    verbose = verbosemgr->CheckFlag ("loadlib");
-  }
+    verbose = verbosemgr->Enabled("loadlib");
   csSetLoadLibraryVerbose (verbose);
 }
 

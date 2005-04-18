@@ -86,8 +86,8 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
     CS_QUERY_REGISTRY (p, iVerbosityManager));
   if (verbosemgr)
   {
-    verbose = verbosemgr->CheckFlag ("renderer");
-    if (verbose) superVerbose = verbosemgr->CheckFlag ("vbo");
+    verbose = verbosemgr->Enabled ("renderer");
+    if (verbose) superVerbose = verbosemgr->Enabled ("renderer.vbo");
   }
 
   size_t vbSize = 8*1024*1024;

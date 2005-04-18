@@ -265,6 +265,7 @@ private:
   float lod_distance;
 
   iObjectRegistry* object_reg;
+  bool verbose;
   csWeakRef<iGraphics3D> g3d;
   iBase* logparent;
   csTerrainFactory* pFactory;

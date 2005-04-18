@@ -1238,7 +1238,7 @@ bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    do_verbose = verbosemgr->CheckFlag ("bezier");
+    do_verbose = verbosemgr->Enabled ("bezier");
 
   return true;
 }

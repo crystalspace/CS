@@ -62,7 +62,7 @@ class DiskFile : public csFile
   csRef<iDataBuffer> alldata;
   // constructor
   DiskFile(int Mode, VfsNode* ParentNode, size_t RIndex,
-  	const char* NameSuffix);
+	   const char* NameSuffix, unsigned int verbosity);
   // set Error according to errno
   void CheckError ();
   // whether this file was opened for writing or reading
@@ -123,7 +123,7 @@ private:
   size_t fpos;
   // constructor
   ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
-    const char *NameSuffix, VfsArchive *ParentArchive);
+    const char *NameSuffix, VfsArchive *ParentArchive, unsigned int verbosity);
 
 public:
   SCF_DECLARE_IBASE;
@@ -160,7 +160,13 @@ public:
   int Writing;
   // The system driver
   iObjectRegistry *object_reg;
+  // Verbosity flags.
+  unsigned int verbosity;
 
+  bool IsVerbose(unsigned int mask) const
+  {
+    return (verbosity & mask) != 0;
+  }
   void UpdateTime ()
   {
     LastUseTime = csGetTicks ();
@@ -181,29 +187,29 @@ public:
     return (RefCount == 0) &&
       (csGetTicks () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
   }
-  VfsArchive (const char *filename, iObjectRegistry *object_reg)
-  	: csArchive (filename)
+  VfsArchive (const char *filename, iObjectRegistry *object_reg,
+	      unsigned int verbosity) : csArchive (filename)
   {
     RefCount = 0;
     Writing = 0;
     VfsArchive::object_reg = object_reg;
-    UpdateTime (); // OpenStep compiler requires having seen this already.
-#ifdef VFS_DEBUG
-    csPrintf ("VFS: opening archive \"%s\"\n", filename);
-#endif
+    VfsArchive::verbosity = verbosity;
+    UpdateTime ();
+    if (IsVerbose(csVFS::VERBOSITY_DEBUG))
+      csPrintf ("VFS_DEBUG: opening archive \"%s\"\n", filename);
     // We need a recursive mutex.
     archive_mutex = csMutex::Create (true);
   }
   virtual ~VfsArchive ()
   {
     CS_ASSERT (RefCount == 0);
-#ifdef VFS_DEBUG
-    csPrintf ("VFS: archive \"%s\" closing (writing=%d)\n", GetName (), Writing);
-#endif
+    bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
+    if (debug)
+      csPrintf ("VFS_DEBUG: archive \"%s\" closing (writing=%d)\n",
+		GetName (), Writing);
     Flush ();
-#ifdef VFS_DEBUG
-    csPrintf ("VFS: archive \"%s\" closed\n", GetName ());
-#endif
+    if (debug)
+      csPrintf ("VFS_DEBUG: archive \"%s\" closed\n", GetName ());
   }
 };
 
@@ -301,9 +307,12 @@ public:
   csStringArray UPathV;
   // The object registry.
   iObjectRegistry *object_reg;
+  // Verbosity flags.
+  unsigned int verbosity;
 
   // Initialize the object
-  VfsNode (char *iPath, const char *iConfigKey, iObjectRegistry *object_reg);
+  VfsNode (char *iPath, const char *iConfigKey, iObjectRegistry *object_reg,
+	   unsigned int verbosity);
   // Destroy the object
   virtual ~VfsNode ();
 
@@ -340,13 +349,14 @@ static VfsArchiveCache *ArchiveCache = 0;
 // -------------------------------------------------------------- csFile --- //
 
 csFile::csFile (int Mode, VfsNode *ParentNode, size_t RIndex,
-  const char *NameSuffix)
+		const char *NameSuffix, unsigned int verbosity)
 {
   (void)Mode;
   Node = ParentNode;
   Index = RIndex;
   Size = 0;
   Error = VFS_STATUS_OK;
+  csFile::verbosity = verbosity;
 
   size_t vpl = strlen (Node->VPath);
   size_t nsl = strlen (NameSuffix);
@@ -437,9 +447,11 @@ SCF_IMPLEMENT_IBASE_END
 // #define VFS_DISKFILE_MAPPING
 
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
-  const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
+		    const char *NameSuffix, unsigned int verbosity) :
+  csFile (Mode, ParentNode, RIndex, NameSuffix, verbosity)
 {
   SCF_CONSTRUCT_IBASE (0);
+  bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
   size_t nsl = strlen (NameSuffix);
@@ -458,9 +470,8 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   int t;
   for (t = 1; t <= 2; t++)
   {
-#ifdef VFS_DEBUG
-    csPrintf ("VFS: Trying to open disk file \"%s\"\n", fName);
-#endif
+    if (debug)
+      csPrintf ("VFS_DEBUG: Trying to open disk file \"%s\"\n", fName);
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
         file = fopen (fName, "wb");
     else if ((Mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
@@ -502,10 +513,8 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
         CheckError ();
     }
   }
-#ifdef VFS_DEBUG
-  if (file)
-    csPrintf ("VFS: Successfully opened, handle = %d\n", fileno (file));
-#endif
+  if (debug && file)
+    csPrintf ("VFS_DEBUG: Successfully opened, handle = %d\n", fileno (file));
 
 #if defined(VFS_DISKFILE_MAPPING) && defined(CS_HAVE_MEMORY_MAPPED_IO)
   if ((Error == VFS_STATUS_OK) && (!writemode) && 
@@ -515,6 +524,9 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     alldata = csPtr<iDataBuffer> (TryCreateMapping ());
     if (alldata)
     {
+      if (debug)
+	csPrintf ("VFS_DEBUG: Successfully memory mapped, handle = %d\n",
+		  fileno (file));
       fclose (file);
       file = 0;
       SetPos (0);
@@ -526,12 +538,13 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
 
 DiskFile::~DiskFile ()
 {
-#ifdef VFS_DEBUG
-  if (file)
-    csPrintf ("VFS: Closing some file with handle = %d\n", fileno (file));
-  else
-    csPrintf ("VFS: Deleting an unsuccessfully opened file\n");
-#endif
+  if (IsVerbose(csVFS::VERBOSITY_DEBUG))
+  {
+    if (file)
+      csPrintf ("VFS_DEBUG: Closing a file with handle = %d\n", fileno (file));
+    else
+      csPrintf ("VFS_DEBUG: Deleting an unsuccessfully opened file\n");
+  }
 
   if (file)
     fclose (file);
@@ -542,6 +555,7 @@ DiskFile::~DiskFile ()
 
 void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 {
+  bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
   size_t pbl = strlen (PathBase);
   size_t pl = pbl + strlen (PathSuffix) + 1;
   char *path = new char [pl];
@@ -562,9 +576,8 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 
     char oldchar = *cur;
     *cur = 0;
-#ifdef VFS_DEBUG
-    csPrintf ("VFS: Trying to create directory \"%s\"\n", path);
-#endif
+    if (debug)
+      csPrintf ("VFS_DEBUG: Trying to create directory \"%s\"\n", path);
     CS_MKDIR (path);
     *cur = oldchar;
     if (*cur)
@@ -821,8 +834,8 @@ SCF_IMPLEMENT_IBASE (ArchiveFile)
 SCF_IMPLEMENT_IBASE_END
 
 ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
-  const char *NameSuffix, VfsArchive *ParentArchive) :
-  csFile (Mode, ParentNode, RIndex, NameSuffix)
+  const char *NameSuffix, VfsArchive *ParentArchive, unsigned int verbosity) :
+  csFile (Mode, ParentNode, RIndex, NameSuffix, verbosity)
 {
   SCF_CONSTRUCT_IBASE (0);
   Archive = ParentArchive;
@@ -831,15 +844,15 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   fh = 0;
   data = 0;
   fpos = 0;
+  bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
 
   csScopedMutexLock lock (Archive->archive_mutex);
   Archive->UpdateTime ();
   ArchiveCache->CheckUp ();
 
-#ifdef VFS_DEBUG
-  csPrintf ("VFS: Trying to open file \"%s\" from archive \"%s\"\n",
-    NameSuffix, Archive->GetName ());
-#endif
+  if (debug)
+    csPrintf ("VFS_DEBUG: Trying to open file \"%s\" from archive \"%s\"\n",
+	      NameSuffix, Archive->GetName ());
 
   if ((Mode & VFS_FILE_MODE) == VFS_FILE_READ)
   {
@@ -865,9 +878,9 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
 
 ArchiveFile::~ArchiveFile ()
 {
-#ifdef VFS_DEBUG
-  csPrintf ("VFS: Closing some file from archive \"%s\"\n", Archive->GetName ());
-#endif
+  if (IsVerbose(csVFS::VERBOSITY_DEBUG))
+    csPrintf("VFS_DEBUG: Closing a file from archive \"%s\"\n",
+	     Archive->GetName());
 
   csScopedMutexLock lock (Archive->archive_mutex);
   if (fh)
@@ -961,11 +974,12 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
 // ------------------------------------------------------------- VfsNode --- //
 
 VfsNode::VfsNode (char *iPath, const char *iConfigKey,
-	iObjectRegistry *object_reg)
+		  iObjectRegistry *object_reg, unsigned int verbosity)
 {
   VPath = iPath;
   ConfigKey = csStrNew (iConfigKey);
   VfsNode::object_reg = object_reg;
+  VfsNode::verbosity = verbosity;
 }
 
 VfsNode::~VfsNode ()
@@ -1221,7 +1235,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
           continue;
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, object_reg));
+        ArchiveCache->Push (new VfsArchive (rpath, object_reg, verbosity));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -1278,7 +1292,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
     if (rpath [strlen (rpath) - 1] == CS_PATH_SEPARATOR)
     {
       // rpath is a directory
-      f = new DiskFile (Mode, this, i, FileName);
+      f = new DiskFile (Mode, this, i, FileName, verbosity);
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
@@ -1302,11 +1316,11 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
 	}
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, object_reg));
+        ArchiveCache->Push (new VfsArchive (rpath, object_reg, verbosity));
       }
 
-      f = new ArchiveFile (Mode, this, i, FileName,
-      	ArchiveCache->Get (idx));
+      f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get(idx),
+			   verbosity);
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
@@ -1349,7 +1363,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
           continue;
 
         idx = ArchiveCache->Length ();
-        ArchiveCache->Push (new VfsArchive (rpath, object_reg));
+        ArchiveCache->Push (new VfsArchive (rpath, object_reg, verbosity));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -1478,19 +1492,20 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csVFS)
 
 
-csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
+csVFS::csVFS (iBase *iParent) :
+  basedir(0),
+  resdir(0),
+  appdir(0),
+  dirstack(8,8),
+  object_reg(0),
+  auto_name_counter(0),
+  verbosity(VERBOSITY_NONE)
 {
-  object_reg = 0;
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
-  basedir = 0;
-  resdir = 0;
-  appdir = 0;
-  auto_name_counter = 0;
-  CS_ASSERT (!ArchiveCache);
   ArchiveCache = new VfsArchiveCache ();
   mutex = csMutex::Create (true); // We need a recursive mutex.
 }
@@ -1554,14 +1569,19 @@ static bool load_vfs_config(csConfigFile& cfg, char const* dir,
 
 bool csVFS::Initialize (iObjectRegistry* r)
 {
-  bool verbose = false;
   object_reg = r;
   basedir = alloc_normalized_path(csGetConfigPath());
 
-  csRef<iVerbosityManager> verbosemgr (
+  csRef<iVerbosityManager> vm (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
-  if (verbosemgr) 
-    verbose = verbosemgr->CheckFlag ("vfs");
+  if (vm.IsValid()) 
+  {
+    verbosity = VERBOSITY_NONE;
+    if (vm->Enabled("vfs.debug", false)) verbosity |= VERBOSITY_DEBUG;
+    if (vm->Enabled("vfs.scan",  true )) verbosity |= VERBOSITY_SCAN;
+    if (vm->Enabled("vfs.mount", true )) verbosity |= VERBOSITY_MOUNT;
+  }
+
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   if (cmdline)
@@ -1573,9 +1593,10 @@ bool csVFS::Initialize (iObjectRegistry* r)
   // Order-sensitive: Mounts in first-loaded configuration file take precedence
   // over conflicting mounts in files loaded later.
   csStringSet seen;
-  load_vfs_config(config, resdir,  seen, verbose);
-  load_vfs_config(config, appdir,  seen, verbose);
-  load_vfs_config(config, basedir, seen, verbose);
+  bool const verbose_scan = IsVerbose(VERBOSITY_SCAN);
+  load_vfs_config(config, resdir,  seen, verbose_scan);
+  load_vfs_config(config, appdir,  seen, verbose_scan);
+  load_vfs_config(config, basedir, seen, verbose_scan);
 
   return ReadConfig ();
 }
@@ -1592,7 +1613,7 @@ bool csVFS::ReadConfig ()
 bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
   char *xp = _ExpandPath (VirtualPath, true);
-  VfsNode *e = new VfsNode (xp, VirtualPath, object_reg);
+  VfsNode *e = new VfsNode (xp, VirtualPath, object_reg, GetVerbosity());
   if (!e->AddRPath (RealPath, this))
   {
     delete e;
@@ -1982,16 +2003,15 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 
   if (!VirtualPath || !RealPath)
     return false;
-#ifdef VFS_DEBUG
-  csPrintf("VFS: Mounted dir: Vpath %s, Rpath %s",VirtualPath, RealPath);
-#endif
+  if (IsVerbose(VERBOSITY_MOUNT))
+    csPrintf("VFS_MOUNT: Mounted: Vpath %s, Rpath %s\n",VirtualPath,RealPath);
   VfsNode *node;
   char suffix [2];
   if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
    || suffix [0])
   {
     char *xp = _ExpandPath (VirtualPath, true);
-    node = new VfsNode (xp, VirtualPath, object_reg);
+    node = new VfsNode (xp, VirtualPath, object_reg, GetVerbosity());
     NodeList.Push (node);
   }
 
@@ -2015,6 +2035,10 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   if (!VirtualPath)
     return false;
 
+  if (IsVerbose(VERBOSITY_MOUNT))
+    csPrintf("VFS_MOUNT: Unmounting: Vpath %s, Rpath %s\n",
+	     VirtualPath, RealPath);
+
   VfsNode *node;
   char suffix [2];
   if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
@@ -2033,6 +2057,10 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
     if (idx != csArrayItemNotFound)
       NodeList.DeleteIndex (idx);
   }
+
+  if (IsVerbose(VERBOSITY_MOUNT))
+    csPrintf("VFS_MOUNT: Unmounted: Vpath %s, Rpath %s\n",
+	     VirtualPath, RealPath);
 
   return true;
 }
@@ -2284,7 +2312,8 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
     CS_ASSERT(defpath != 0);
     size_t const len = strlen(defpath);
     if (len > 0 && defpath[len - 1] != VFS_PATH_SEPARATOR)
-      cs_snprintf (path, sizeof(path), "%s%c%s", defpath, VFS_PATH_SEPARATOR, suffix);
+      cs_snprintf (path, sizeof(path), "%s%c%s", defpath, VFS_PATH_SEPARATOR,
+		   suffix);
     else
       cs_snprintf (path, sizeof(path), "%s%s", defpath, suffix);
   }

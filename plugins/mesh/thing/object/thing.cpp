@@ -2839,7 +2839,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    csThingObjectType::do_verbose = verbosemgr->CheckFlag ("thing");
+    csThingObjectType::do_verbose = verbosemgr->Enabled ("thing");
 
   csRef<iTextureManager> txtmgr = g->GetTextureManager ();
 

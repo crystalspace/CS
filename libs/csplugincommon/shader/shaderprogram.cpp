@@ -50,7 +50,7 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (objectReg, iVerbosityManager));
   if (verbosemgr) 
-    doVerbose = verbosemgr->CheckFlag ("renderer", "shader");
+    doVerbose = verbosemgr->Enabled("renderer.shader");
   else
     doVerbose = false;
 }

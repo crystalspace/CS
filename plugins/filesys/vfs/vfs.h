@@ -44,12 +44,16 @@ protected:
   char *Name;
   // File size (initialized in constructor)
   size_t Size;
-  // last error code
+  // Last error code
   int Error;
+  // Verbosity flags.
+  unsigned int verbosity;
 
   // The constructor for csFile
   csFile (int Mode, VfsNode *ParentNode, size_t RIndex,
-  	const char *NameSuffix);
+	  const char *NameSuffix, unsigned int verbosity);
+  // Is verbosity enabled for a mode or set of modes?
+  bool IsVerbose(unsigned int mask) const { return (verbosity & mask) != 0; }
 
 public:
   /// Instead of fclose() do "delete file" or file->DecRef ()
@@ -138,6 +142,18 @@ private:
   // ChDirAuto() may need to generate unique temporary names for mount points.
   // It uses a counter to do so.
   int auto_name_counter;
+  // Verbosity flags.
+  unsigned int verbosity;
+
+public:
+  enum
+  {
+    VERBOSITY_NONE  = 0,
+    VERBOSITY_DEBUG = 1 << 0,
+    VERBOSITY_SCAN  = 1 << 1,
+    VERBOSITY_MOUNT = 1 << 2,
+    VERBOSITY_ALL  = ~0
+  };
 
 public:
   SCF_DECLARE_IBASE;
@@ -146,6 +162,11 @@ public:
   csVFS (iBase *iParent);
   /// Virtual File System destructor
   virtual ~csVFS ();
+
+  /// Is verbosity enabled for a mode or set of modes?
+  bool IsVerbose(unsigned int mask) const { return (verbosity & mask) != 0; }
+  /// Get verbosity flags.
+  unsigned int GetVerbosity() const { return verbosity; }
 
   /// Set current working directory
   virtual bool ChDir (const char *Path);

@@ -790,14 +790,6 @@ public:
 
 bool csTerrainObject::ReadCDLODFromCache ()
 {
-  int i;
-
-  bool verbose = false;
-  csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
-  if (verbosemgr) 
-    verbose = verbosemgr->CheckFlag ("bruteblock");
-  
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
   if (cmdline->GetOption ("recalc"))
@@ -856,7 +848,7 @@ bool csTerrainObject::ReadCDLODFromCache ()
   polymesh_tri_count = (int)csConvertEndian (ptc);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
 
-  for (i = 0 ; i < polymesh_tri_count ; i++)
+  for (int i = 0 ; i < polymesh_tri_count ; i++)
   {
     uint32 a, b, c;
     cf->Read ((char*)&a, 4); a = csConvertEndian (a);
@@ -967,16 +959,11 @@ void csTerrainObject::SetupPolyMeshData ()
   memcpy (normals, terrasampler->SampleVector3 (normals_name),
     res * res * sizeof (csVector3));
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (pFactory->object_reg,
-  	iCommandLineParser);
-  bool verbose = cmdline->GetOption ("verbose") != 0;
   if (verbose)
-  {
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.mesh.bruteblock",
     	  "Optimizing CD Mesh for Terrain: tris %d ...",
     	  polymesh_tri_count);
-  }
 
   // Set up the base mesh which will be used in the LOD
   // reduction algorithm. After setting up this mesh we
@@ -1026,11 +1013,9 @@ void csTerrainObject::SetupPolyMeshData ()
 	&lodalgo);
 
   if (verbose)
-  {
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.mesh.bruteblock",
     	  "Optimizing done: result %d", polymesh_tri_count);
-  }
 
   WriteCDLODToCache ();
 
@@ -1173,6 +1158,10 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
 
   baseContext = new csShaderVariableContext();
+
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  verbose = verbosemgr.IsValid() ? verbosemgr->Enabled ("bruteblock") : false;
 }
 
 csTerrainObject::~csTerrainObject ()
@@ -1672,21 +1661,14 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   const csVector3* lm_normals = terrasampler->SampleVector3 (normals_name);
 
   csColor col;
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (pFactory->object_reg,
-  	iCommandLineParser);
-  bool verbose = cmdline->GetOption ("verbose") != 0;
   size_t i;
   float light_radiussq = csSquare (li->GetCutoffDistance ());
   for (i = 0 ; i < staticLights.Length() ; i++)
   {
-    if (verbose)
+    if (verbose && (i % 10000 == 0))
     {
-      if (i % 10000 == 0)
-      {
-	csPrintf ("%zu out of %zu\n", i,
-	  staticLights.Length ());
-	fflush (stdout);
-      }
+      csPrintf ("%zu out of %zu\n", i, staticLights.Length ());
+      fflush (stdout);
     }
     /*
       A small fraction of the normal is added to prevent unwanted

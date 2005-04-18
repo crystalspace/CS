@@ -185,7 +185,7 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
   {
-    bool verbose = verbosemgr->CheckFlag ("stdrep");
+    bool verbose = verbosemgr->Enabled ("stdrep");
     if (verbose)
     {
       dest_stdout[CS_REPORTER_SEVERITY_WARNING] = true;

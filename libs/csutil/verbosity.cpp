@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
-	      (C) 2004 by Frank Richter
+    Copyright (C) 2005 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,183 +17,177 @@
 */
 
 #include "cssysdef.h"
-
 #include "csutil/verbosity.h"
+#include "csutil/stringarray.h"
+#include "csutil/sysfunc.h"
+#include "csutil/util.h"
+#include <ctype.h>
 
-bool csCheckVerbosity (int argc, const char* const argv[], 
-  const char* msgClass, const char* msgSubclass)
+static bool word_p(char c, size_t n) { return c == '_' || isalnum(c); }
+static bool name_p(char c, size_t n)
+{ return (n == 0 && (c == '-' || c == '+')) || c == '.' || word_p(c,n); }
+
+csVerbosityParser csParseVerbosity (int argc, const char* const argv[])
 {
-  bool verbose = false;
-  const char* verboseFlags = 0;
-
+  csVerbosityParser v;
   for (int i = 1; i < argc; ++i)
   {
     char const* s = argv[i];
     if (*s == '-')
     {
       do { ++s; } while (*s == '-');
-      const char* eqSign = strchr (s, '=');
-      if (strncmp(s, "verbose", eqSign ? (eqSign - s) : strlen (s)) == 0)
-      {
-	verbose = true;
-	if (eqSign != 0)
-	  verboseFlags = eqSign + 1;
-	break;
-      }
-    }
+      const char* eq = strchr(s, '=');
+      if (csStrNCaseCmp(s, "verbose", eq ? (eq - s) : strlen (s)) == 0)
+	v.Parse(eq != 0 ? eq + 1 : "");
+    } // Allow multiple `--verbose' options, so do not break out of loop.
   }
-  
-  if (verbose)
-  {
-    csVerbosityParser vp (verboseFlags ? verboseFlags : "");
-    return vp.CheckFlag (msgClass, msgSubclass);
-  }
+  return v;
+}
 
+bool csCheckVerbosity (int argc, const char* const argv[],
+		       const char* flags, bool fuzzy)
+{
+  csVerbosityParser v(csParseVerbosity(argc, argv));
+  return v.Enabled(flags, fuzzy);
+}
+
+csVerbosityParser::csVerbosityParser (const char* s)
+{
+  Parse(s);
+}
+
+// Emit a parse-related error, highlighting the problem location.
+bool csVerbosityParser::Error(char const* msg, char const* s, size_t pos)
+{
+  csPrintfErr("ERROR: Verbosity parser: %s: %-*.*s<<ERROR>>%s\n",
+	      msg, pos, pos, s, s + pos);
   return false;
 }
 
-int csVerbosityParser::VfKeyCompare (const VerbosityFlag& vf, 
-				      const char* const& K)
+bool csVerbosityParser::Split(char const* s, char delim, SplitPredicate pred,
+			      bool empty_okay, csStringArray& tokens)
 {
-  return strcmp (vf.msgClass, K);
-}
-
-int csVerbosityParser::VfCompare (const VerbosityFlag& vf1, 
-				   const VerbosityFlag& vf2)
-{
-  return strcmp (vf1.msgClass, vf2.msgClass);
-}
-
-csVerbosityParser::csVerbosityParser (const char* flags)
-{
-  if (flags == 0)
+  bool ok = true;
+  tokens.Empty();
+  if (s == 0) s = "";
+  char const* t = s;
+  if (*s != '\0')
   {
-    defaultGlobalFlag = ForceResult | DefFalse;
-  }
-  else if (*flags == 0)
-  {
-    defaultGlobalFlag = ForceResult | DefTrue;
-  }
-  else
-  {
-    defaultGlobalFlag = DefTrue;
-    
-    CS_ALLOC_STACK_ARRAY (char, msgClassStr, strlen (flags) + 1);
-    strcpy (msgClassStr, flags);
-    char* msgClass = msgClassStr;
-    
-    while (msgClass != 0)
+    while (ok)
     {
-      char* nextClass = strchr (msgClass, ',');
-      if (nextClass != 0)
-      {
-	*nextClass = 0;
-	nextClass++;
-      }
-      
-      // Check for default class verbosity. + = verbose, - = not verbose
-      bool defaultFlag = true;
-      if (msgClass[0] == '+')
-      {
-        defaultFlag = true;
-	msgClass++;
-      }
-      else if (msgClass[0] == '-')
-      {
-        defaultFlag = false;
-	msgClass++;
-      }
-      if (*msgClass == 0) break;
-      
-      /* Special class "*": set default global verbosity.
-       * Ie you can turn on everything, or disable everything by default but 
-       * a specific set of classes.
-       */
-      if (strcmp (msgClass, "*") == 0)
-      {
-        defaultGlobalFlag = (defaultGlobalFlag & ~DefMask) 
-          | (defaultFlag ? DefTrue : DefFalse);
-      }
+      Str token;
+      char const* const s0 = s;
+      while (pred(*s, s - s0))
+	token << *s++;
+      if (token.IsEmpty())
+	ok = Error("malformed input", t, s - t);
       else
       {
-        /* Look for verbosity flag entry. The same class can be specified multiple times.
-         * The last setting overrides all other before. */
-        size_t vfIndex = verbosityFlags.FindSortedKey (
-          csArrayCmp<VerbosityFlag, const char*> (msgClass, &VfKeyCompare));
-        if (vfIndex == csArrayItemNotFound)
-        {
-          VerbosityFlag newVF;
-          newVF.msgClass = msgClass;
-          newVF.defaultFlag = defaultFlag;
-          vfIndex = verbosityFlags.InsertSorted (newVF, &VfCompare);
-        }
-        
-        VerbosityFlag& vf = verbosityFlags[vfIndex];
-        char* subclass = strchr (msgClass, ':');
-        if (subclass != 0)
-        {
-          *subclass = 0;
-          subclass++;
-          
-          while ((subclass != 0) && (*subclass != 0))
-          {
-            char* nextSubclass = strchr (subclass, ',');
-            if (nextSubclass != 0)
-            {
-              *nextSubclass = 0;
-              nextSubclass++;
-            }
-            
-            /* Check for default subclass verbosity.
-             * Again, you can only enable or disable verbosity for speficic 
-             * subclasses. */
-            bool subFlag = vf.defaultFlag;
-            if (subclass[0] == '+')
-            {
-              subFlag = true;
-              subclass++;
-            }
-            else if (subclass[0] == '-')
-            {
-              subFlag = false;
-              subclass++;
-            }
-            if (strcmp (subclass, "*") == 0)
-            {
-              /* Default subclass verbosity. Effectively sets default class verbosity.
-               * I.e. in cases like "+foo:-*" or "-foo:+*" the "*" flag has precedence.
-               * (A subclass specifier should override a class specifier.) */
-              vf.defaultFlag = subFlag;
-            }
-            else
-            {
-              vf.msgSubclasses.PutUnique (subclass, subFlag);
-            }
-            
-            subclass = nextSubclass;
-          }
-        }
+	tokens.Push(token);
+	if (*s == delim && s[1] == '\0')
+	  ok = Error("orphaned delimiter", t, s - t);
+	else if (*s == delim)
+	  s++;
+	else if (*s == '\0')
+	  break;
+	else // (*s != '\0')
+	  ok = Error("unexpected token", t, s - t);
       }
-      msgClass = nextClass;
+    }
+  }
+  if (ok && !empty_okay && tokens.IsEmpty())
+    ok = Error("missing input", t, s - t);
+  return ok;
+}
+
+csVerbosityParser::Str csVerbosityParser::Join(
+  csStringArray const& tokens, Str delim)
+{
+  Str name;
+  for (size_t i = 0, n = tokens.Length(); i < n; i++)
+  {
+    if (i != 0) name << delim;
+    name << tokens[i];
+  }
+  return name;
+}
+
+// Parse enable/disable flag; default is `enable': ([+-]?)
+bool csVerbosityParser::ParseToggle(char const*& s)
+{
+  bool enable = true;
+  char const c = *s;
+  if (c == '+' || c == '-')
+  {
+    enable = (c == '+');
+    s++;
+  }
+  return enable;
+}
+
+// Parse verbosity class: (symbol(\.symbol)*) where symbol => ([[:alnum:]_]+)
+bool csVerbosityParser::ParseFlag(char const* s, csStringArray& tokens,
+				  bool empty_okay)
+{
+  return Split(s, '.', word_p, empty_okay, tokens);
+}
+
+// Parse classes: (class(,class)*)
+void csVerbosityParser::Parse(char const* s)
+{
+  if (s != 0)
+  {
+    csStringArray names;
+    if (Split(s, ',', name_p, true, names))
+    {
+      for (size_t i = 0, n = names.Length(); i < n; i++)
+      {
+	csStringArray tokens;
+	char const* flag = names[i];
+	bool const enable = ParseToggle(flag);
+	if (ParseFlag(flag, tokens, false))
+	{
+	  if (flags.IsEmpty())
+	    flags.Register("", !enable); // Fallback case.
+	  Str name(Join(tokens,"."));
+	  flags.Register(name, enable);
+	}
+      }
+      if (flags.IsEmpty()) // Bare `--verbose'; enable full verbosity.
+	flags.Register("", true);
     }
   }
 }
 
-bool csVerbosityParser::CheckFlag (const char* msgClass, 
-				    const char* msgSubclass)
+bool csVerbosityParser::TestFlag(Str name, bool& enable) const
 {
-  if (defaultGlobalFlag & ForceResult) return defaultGlobalFlag & DefMask;
-    
-  size_t vfIndex = verbosityFlags.FindSortedKey (
-    csArrayCmp<VerbosityFlag, const char*> (msgClass, &VfKeyCompare));
-  if (vfIndex != csArrayItemNotFound)
+  csStringID const b = flags.Request(name.GetDataSafe());
+  bool const ok = (b != csInvalidStringID);
+  if (ok)
+    enable = (bool)b;
+  return ok;
+}
+
+bool csVerbosityParser::Enabled(char const* flag, bool fuzzy) const
+{
+  bool enable = false;
+  if (!fuzzy)
+    TestFlag(flag, enable);
+  else
   {
-    const VerbosityFlag& vf = verbosityFlags[vfIndex];
-    return (msgSubclass != 0) ? vf.msgSubclasses.Get (
-      msgSubclass, vf.defaultFlag) : vf.defaultFlag;
+    csStringArray tokens;
+    if (ParseFlag(flag, tokens, true))
+    {
+      for (size_t i = 0, n = tokens.Length(); i <= n; i++)
+      {
+	if (TestFlag(Join(tokens,"."), enable))
+	  break;
+	else if (i < n)
+	  tokens.Truncate(n - i - 1);
+      }
+    }
   }
-  
-  return defaultGlobalFlag & DefMask;
+  return enable;
 }
 
 SCF_IMPLEMENT_IBASE(csVerbosityManager)

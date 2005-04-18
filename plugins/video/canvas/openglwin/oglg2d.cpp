@@ -513,7 +513,7 @@ bool csGraphics2DOpenGL::Open ()
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    detector.SetVerbose (verbosemgr->CheckFlag ("renderer", "win32gldriver"));
+    detector.SetVerbose (verbosemgr->Enabled ("renderer.windows.gldriver"));
   
   // create the window.
   if (FullScreen)

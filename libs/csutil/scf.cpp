@@ -52,7 +52,7 @@ class csSCF : public iSCF
 {
 private:
   csRef<csMutex> mutex;
-  bool verbose;
+  unsigned int verbose;
 
   csStringSet contexts;
   csStringID staticContextID;
@@ -68,9 +68,9 @@ private:
   { return s != 0 ? s : "{none}"; }
   void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
     const char* context = 0);
-  void ScanPluginsInt(csPluginPaths*, char const* context);
+  void ScanPluginsInt(csPluginPaths const*, char const* context);
 
-  friend void scfInitialize (csPluginPaths*, bool);
+  friend void scfInitialize (csPluginPaths const*, unsigned int);
 
 public:
   SCF_DECLARE_IBASE;
@@ -78,13 +78,18 @@ public:
   /// The global table of all known interface names
   csStringSet InterfaceRegistry;
   
-  /// constructor
-  csSCF (bool);
-  /// destructor
+  /**
+   * Constructor.
+   * \param verbosity One or more of the \c SCF_VERBOSE_FOO constants combined
+   *   with bitwise-or to control verbosity.
+   */
+  csSCF (unsigned int verbosity);
+  /// Destructor.
   virtual ~csSCF ();
 
-  bool IsVerbose() const { return verbose; }
-  void SetVerbose(bool v) { verbose = v; }
+  bool IsVerbose(unsigned int mask) const { return (verbose & mask) != 0; }
+  unsigned int GetVerbose() const { return verbose; }
+  void SetVerbose(unsigned int v) { verbose = v; }
 
   virtual void RegisterClasses (iDocument*, const char* context = 0);
   virtual void RegisterClasses (char const*, const char* context = 0);
@@ -197,7 +202,7 @@ scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
   LibraryName = libraryName;
   const char* lib = get_library_name(LibraryName);
 
-  if (PrivateSCF->IsVerbose())
+  if (PrivateSCF->IsVerbose(SCF_VERBOSE_PLUGIN_LOAD))
     csPrintfErr("SCF_NOTIFY: loading plugin %s to satisfy request for %s\n",
       lib, core);
 
@@ -234,7 +239,7 @@ scfSharedLibrary::~scfSharedLibrary ()
   {
     if (initFunc && finisFunc)
       finisFunc();
-    if (PrivateSCF->IsVerbose())
+    if (PrivateSCF->IsVerbose(SCF_VERBOSE_PLUGIN_LOAD))
       csPrintfErr("SCF_NOTIFY: unloading plugin %s\n",
 	get_library_name(LibraryName));
     csUnloadLibrary (LibraryHandle);
@@ -499,7 +504,8 @@ SCF_IMPLEMENT_IBASE (csSCF);
 #endif
 SCF_IMPLEMENT_IBASE_END;
 
-void csSCF::ScanPluginsInt (csPluginPaths* pluginPaths, const char* context)
+void csSCF::ScanPluginsInt (csPluginPaths const* pluginPaths,
+			    const char* context)
 {
   if (pluginPaths)
   {
@@ -510,7 +516,7 @@ void csSCF::ScanPluginsInt (csPluginPaths* pluginPaths, const char* context)
     for (i = 0; i < pluginPaths->GetCount(); i++)
     {
       csPluginPath const& pathrec = (*pluginPaths)[i];
-      if (verbose)
+      if (IsVerbose(SCF_VERBOSE_PLUGIN_SCAN))
       {
 	char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
 	csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
@@ -562,6 +568,17 @@ void csSCF::ScanPluginsInt (csPluginPaths* pluginPaths, const char* context)
   }
 }
 
+static unsigned int parse_verbosity(int argc, const char* const argv[])
+{
+  csVerbosityParser p(csParseVerbosity(argc, argv));
+  unsigned int v = SCF_VERBOSE_NONE;
+  if (p.Enabled("scf.plugin.scan"    )) v |= SCF_VERBOSE_PLUGIN_SCAN;
+  if (p.Enabled("scf.plugin.load"    )) v |= SCF_VERBOSE_PLUGIN_LOAD;
+  if (p.Enabled("scf.plugin.register")) v |= SCF_VERBOSE_PLUGIN_REGISTER;
+  if (p.Enabled("scf.class.register" )) v |= SCF_VERBOSE_CLASS_REGISTER;
+  return v;
+}
+
 /* Flag indicating whether external linkage was used when building the 
  * application. Determines whether SCF scans for plugins at startup.
  */
@@ -571,30 +588,29 @@ const bool scfStaticallyLinked = false;
 extern bool scfStaticallyLinked;
 #endif
 
-void scfInitialize (csPluginPaths* pluginPaths, bool verbose)
+void scfInitialize (csPluginPaths const* pluginPaths, unsigned int verbose)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF (verbose);
-  else if (verbose && !PrivateSCF->IsVerbose())
-    PrivateSCF->SetVerbose(verbose);
+  else if (verbose != SCF_VERBOSE_NONE)
+    PrivateSCF->SetVerbose(verbose | PrivateSCF->GetVerbose());
   PrivateSCF->ScanPluginsInt (pluginPaths, 0);
 }
 
 void scfInitialize (int argc, const char* const argv[])
 {
+  unsigned int const verbosity = parse_verbosity(argc, argv);
   if (scfStaticallyLinked)
-  {
-    scfInitialize (0, csCheckVerbosity (argc, argv, "scf"));
-  }
+    scfInitialize (0, verbosity);
   else
   {
     csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
-    scfInitialize (pluginPaths, csCheckVerbosity (argc, argv, "scf"));
+    scfInitialize (pluginPaths, verbosity);
     delete pluginPaths;
   }
 }
 
-csSCF::csSCF (bool v) : verbose(v),
+csSCF::csSCF (unsigned int v) : verbose(v),
 #ifdef CS_REF_TRACKER
   refTracker(0), 
 #endif
@@ -693,7 +709,7 @@ void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode,
 {
   bool const seen = pluginPath != 0 && libraryNames->Contains(pluginPath);
 
-  if (verbose)
+  if (IsVerbose(SCF_VERBOSE_PLUGIN_REGISTER))
   {
     char const* s = pluginPath != 0 ? pluginPath : "{unknown}";
     char const* c = GetContextName(context);
@@ -809,7 +825,7 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
 
-  if (verbose)
+  if (IsVerbose(SCF_VERBOSE_CLASS_REGISTER))
     csPrintfErr("SCF_NOTIFY: registering class %s in context `%s' (from %s)\n",
       iClassID, GetContextName(context), iLibraryName);
 
@@ -862,7 +878,7 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
 
-  if (verbose)
+  if (IsVerbose(SCF_VERBOSE_CLASS_REGISTER))
     csPrintfErr("SCF_NOTIFY: registering class %s in context `%s' "
       "(statically linked)\n", iClassID, GetContextName(context));
 
@@ -962,7 +978,7 @@ bool csSCF::RegisterPlugin (const char* path)
 {
   csRef<iDocument> metadata;
   csRef<iString> msg;
-  if (verbose)
+  if (IsVerbose(SCF_VERBOSE_PLUGIN_REGISTER))
     csPrintfErr("SCF_NOTIFY: registering plugin %s (no context)\n", path);
 
   if ((msg = csGetPluginMetadata (path, metadata)) != 0)

@@ -14,11 +14,91 @@ chronological order.
 	  in any standard, though they are noted in "Future Library
 	  Directions". http://docs.hp.com/en/B2355-90695/sqrt.3M.html
 	- res fixed the user manual to have a index.html again.
-	- Peter Amstutz fixed a bug in csutil/blockallocator.h wherein
-	  if a destructor called by DisposeAll() in turn Free()s an object from 
-	  the same allocator, it triggers a double-free bug when DisposeAll()
+	- Peter Amstutz fixed a bug in csutil/blockallocator.h wherein if a
+	  destructor called by DisposeAll() in turn Free()'s an object from the
+	  same allocator, it triggers a double-free bug when DisposeAll()
 	  attempts to also destroy the same object.
-	- Peter Amstutz updated the csvosa3dl plugin in response to CS iMaterial API change
+	- Peter Amstutz updated the csvosa3dl plugin in response to CS
+	  iMaterial API change.
+	- Eric Sunshine re-wrote and re-designed entirely from scratch the
+	  verbosity utilities csVerbosityParser, csVerbosityManager,
+	  iVerbosityManager, and csCheckVerbosity().
+	    - Verbosity identifiers have been generalized. Rather than being
+	      restricted only to `class' and `class:subclass' combinations,
+	      verbosity identifiers can now extend the relationship to any
+	      depth. The notation has changed, as well. Some example verbosity
+	      identifiers: "scf", "scf.plugin", "scf.plugin.scan",
+	      "scf.plugin.load", "scf.plugin.load.debug", etc.
+	    - The implied parent/child relationship of Verbosity identifiers is
+	      now respected. For instance, an explicit "+foo" will now
+	      implicitly enable verbosity for all children of `foo', such as
+	      "foo.bar", "foo.baz", "foo.baz.cow", etc. Searches for verbosity
+	      settings progress from most to least specific. In checking if
+	      "foo.bar.baz" is enabled, csVerbosityParser will now first check
+	      "foo.bar.baz". If it fails to find an exact match, it will check
+	      the verbosity setting of the parent "foo.bar". If that fails,
+	      then it will check "foo", and so on. Because searches run from
+	      most to least specific, combinations such as
+	      "-foo,+foo.bar,-foo.bar.baz" are possible. This disables
+	      verbosity for `foo' and all of its children, except for `foo.bar'
+	      and its children, which are enabled, with the exception of
+	      `foo.bar.baz', which is disabled.
+	    - Verbosity identifiers are now interpreted much more intuitively
+	      than previously. For example, `--verbose=vfs' (or `+vfs') now
+	      enables verbosity for only "vfs". Previously, it enabled
+	      verbosity for all modules (i.e. essentially it was the same as a
+	      bare `--verbose'). Likewise, `--verbose=-vfs' enables verbosity
+	      for all modules except "vfs".  Previously, with the old
+	      `class:subclass' scheme, "+foo" would enable verbosity only for
+	      `foo', but not any of its subclasses, such as "foo:bar",
+	      "foo:baz", etc. To also include the subclasses, one had to write
+	      "+foo,+foo:*". Because the new dotted verbosity identifiers form
+	      a sort of inheritance hierarchy, such resolution is now
+	      automatic; searches are made from the most specific identifier to
+	      the least specific.
+	    - Eliminated a number of corner-case bugs in the old CheckFlag()
+	      resolution scheme which gave unexpected and undesirable results.
+	      For instance, "-*,+vfs:*" failed to return `true' when tested
+	      against "vfs:foo".
+	    - The internal representation of csVerbosityParser has been
+	      simplified significantly, thus making it easier to understand and
+	      maintain.
+	    - csVerbosityParser is now more heap-friendly and consumes less
+	      memory.
+	    - csVerbosityParser::CheckFlag() has been renamed to Enabled(), and
+	      now accepts a single dotted-identifier in place of the older and
+	      less flexible `class' and `subclass' arguments.  Ditto for
+	      csVerbosityManager and iVerbosityManager. (The old CheckFlag() is
+	      still available for backward compatibility, though heavily
+	      deprecated.)
+	    - Greatly enhanced the Doxygen documentation of the
+	      verbosity-related utilities.
+	    - Added a Parse() method to csVerbosityParser, csVerbosityManager,
+	      and iVerbosityManager which allows verbosity options to be
+	      specified incrementally, rather than only at construction time.
+	    - Crystal Space-based applications now accept and recognize
+	      multiple invocations of `--verbose' on the command-line rather
+	      than respecting only the first `--verbose' and ignoring all
+	      subsequent ones.
+	    - Added csutil/t/verbosity.t, a test-suite for the
+	      verbosity-related utilities.
+	- Eric Sunshine increased the verbosity granularity of SCF. It now
+	  recognizes these verbosity classes:
+	    scf.plugin.scan	 Reports directories scanned.
+	    scf.plugin.load      Reports plugins loaded/unloaded.
+	    scf.plugin.register  Reports plugins found and registered.
+	    scf.class.register   Reports classes within plugins registered.
+	- Eric Sunshine increased the verbosity granularity of VFS. It now
+	  recognizes these verbosity classes:
+	    vfs.scan   Reports directories scanned for vfs.cfg.
+	    vfs.mount  Reports mounts/unmounts.
+	    vfs.debug  Reports low-level debugging information (only enabled
+	               via explicit `+vfs.debug'; does not inherit from `vfs').
+	- Eric Sunshine made it illegal to copy csMemoryPool (either via
+	  constructor or assignment) since such an operation makes no sense in
+	  this context.
+	- Eric Sunshine added copy constructors and assignment operators to
+	  csStringHash, csStringSet, and csPluginPaths.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
@@ -1723,7 +1803,7 @@ chronological order.
 	    - Changed how static plugin information is handled. The metadata
 	      etc. is now kept inside the plugin _static library and referenced
 	      by the SCF_USE_STATIC_PLUGIN macro.
-	    - Made Jam SubVariants nesteable.
+	    - Made Jam SubVariants nestable.
 	    - Changed DoSourceGrist to not replace already existing grist.
 	    - Fixed shared libs to also have install rules.
 	- res tweaked the VC7 project files release configuration. Notably,

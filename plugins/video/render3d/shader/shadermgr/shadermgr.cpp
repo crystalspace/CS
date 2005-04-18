@@ -107,7 +107,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (objectreg, iVerbosityManager));
   if (verbosemgr) 
-    do_verbose = verbosemgr->CheckFlag ("renderer", "shader");
+    do_verbose = verbosemgr->Enabled ("renderer.shader");
   else
     do_verbose = false;
 

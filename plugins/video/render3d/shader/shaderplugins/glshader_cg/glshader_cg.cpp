@@ -81,7 +81,7 @@ void csGLShader_CG::ErrorCallback ()
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
-    doVerbose = verbosemgr->CheckFlag ("renderer", "shader");
+    doVerbose = verbosemgr->Enabled ("renderer.shader");
   else
     doVerbose = false;
   if (!doVerbose) return;

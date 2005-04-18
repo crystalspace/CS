@@ -90,7 +90,7 @@ void csGLFontCache::Setup()
     CS_QUERY_REGISTRY (G2D->object_reg, iVerbosityManager));
   bool do_verbose = false;
   if (verbosemgr) 
-    do_verbose = verbosemgr->CheckFlag ("renderer", "fontcache");
+    do_verbose = verbosemgr->Enabled ("renderer.fontcache");
   if (do_verbose)
   {
     int textMethod;

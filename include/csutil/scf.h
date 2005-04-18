@@ -47,7 +47,7 @@ typedef unsigned long scfInterfaceID;
 #ifdef SCF_DEBUG
 #  define SCF_TRACE(x)							\
    {									\
-     printf ("SCF [%s:%d]:\n", __FILE__, (int)__LINE__);			\
+     printf ("SCF [%s:%d]:\n", __FILE__, (int)__LINE__);		\
      printf x; SCF_PRINT_CALL_ADDRESS					\
    }
 #else
@@ -848,6 +848,20 @@ public:
   scfInterface<Interface>::GetID (), scfInterface<Interface>::GetVersion())))
 
 /**
+ * SCF verbosity flags. For use with scfInitialize(). Combine with bitwise-or
+ * to select more than one.
+ */
+enum
+{
+  SCF_VERBOSE_NONE            = 0,      ///< No diagnostic information.
+  SCF_VERBOSE_PLUGIN_SCAN     = 1 << 0, ///< Directories scanned for plugins.
+  SCF_VERBOSE_PLUGIN_LOAD     = 1 << 1, ///< Plugins loaded and unloaded.
+  SCF_VERBOSE_PLUGIN_REGISTER = 1 << 2, ///< Plugins discovered and registered.
+  SCF_VERBOSE_CLASS_REGISTER  = 1 << 3, ///< Classes registered within plugins.
+  SCF_VERBOSE_ALL             = ~0      ///< All diagnostic information.
+};
+
+/**
  * This function should be called to initialize client SCF library.
  * If a number of plugin paths are provided, the directories will be
  * scanned for plugins and their SCF-related registry data will be retrieved.
@@ -858,18 +872,18 @@ public:
  * different set of directories each time).
  * \param pluginPaths Directories that will be scanned for plugins. If this
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
- * \param verbose If true, diagnostic information will be emitted for each path
- *   scanned and each plugin queried.
+ * \param verbose One or more of the \c SCF_VERBOSE_FOO flags combined with
+ *   bitwise-or which control SCF verbosity.
  * \remark The path list is ignored for static builds.
  */
-extern CS_CRYSTALSPACE_EXPORT void scfInitialize(csPluginPaths* pluginPaths,
-  bool verbose = false);
+CS_CRYSTALSPACE_EXPORT void scfInitialize(csPluginPaths const* pluginPaths,
+  unsigned int verbose = SCF_VERBOSE_NONE);
 
 /**
  * This function should be called to initialize client SCF library.
  * It uses the default plugin paths provided by csGetPluginPaths().
  */
-extern CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[]);
+CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[]);
 
 /**
  * This function checks whenever an interface is compatible with given version.
