@@ -688,6 +688,11 @@ sub CS_element_file_name
     my $is_top = shift;
     my $docu_name = shift;
     
+    if ($element->{'file'} eq 'index.html')
+    {
+      return $element->{'file'};
+    }
+    
     my $secname = $element->{'number'};
     $secname =~ s/\.$//;
     $secname = $element->{'id'} unless $secname;

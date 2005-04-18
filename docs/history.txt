@@ -13,6 +13,7 @@ chronological order.
 	  instance). According to research, these functions are not specified
 	  in any standard, though they are noted in "Future Library
 	  Directions". http://docs.hp.com/en/B2355-90695/sqrt.3M.html
+	- res fixed the user manual to have a index.html again.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
