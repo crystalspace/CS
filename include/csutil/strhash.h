@@ -43,14 +43,20 @@ private:
   HashType registry;
   csMemoryPool pool;
 
+  void Copy(csStringHash const&);
+
 public:
   typedef HashType::GlobalIterator GlobalIterator;
 
 public:
   /// Constructor.
   csStringHash (size_t size = 23);
+  /// Copy constructor.
+  csStringHash (csStringHash const& h) { Copy(h); }
   /// Destructor.
   ~csStringHash ();
+  /// Assignment operator.
+  csStringHash& operator=(csStringHash const& h) { Copy(h); return *this; }
 
   /**
    * Register a string with an ID.

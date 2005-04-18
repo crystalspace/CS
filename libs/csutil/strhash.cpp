@@ -29,6 +29,17 @@ csStringHash::~csStringHash ()
   Empty ();
 }
 
+void csStringHash::Copy(csStringHash const& h)
+{
+  GlobalIterator it(h.GetIterator());
+  while (it.HasNext())
+  {
+    char const* s;
+    csStringID id = it.Next(s);
+    Register(s, id);
+  }
+}
+
 const char* csStringHash::Register (const char* s, csStringID id)
 {
   char const* t = pool.Store(s);

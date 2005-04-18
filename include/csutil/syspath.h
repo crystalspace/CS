@@ -126,7 +126,8 @@ CS_CRYSTALSPACE_EXPORT csString csGetResourceDir (const char* argv0);
  * \remark Expects the paths to be fully qualified. Use csExpandPath() to 
  *   ensure this.
  */
-CS_CRYSTALSPACE_EXPORT bool csPathsIdentical (const char* path1, const char* path2);
+CS_CRYSTALSPACE_EXPORT bool csPathsIdentical (const char* path1,
+					      const char* path2);
 
 /**
  * This structure contains information about a plugin path.
@@ -170,9 +171,18 @@ struct CS_CRYSTALSPACE_EXPORT csPluginPath
  */
 class CS_CRYSTALSPACE_EXPORT csPluginPaths
 {
+private:
   csArray<csPluginPath> paths;
 public:
-  csPluginPaths () : paths (4, 4) { }
+  /// Constructor.
+  csPluginPaths () : paths (4, 4) {}
+  /// Copy constructor.
+  csPluginPaths(csPluginPaths const& o) : paths(o.paths) {}
+  /// Destructor.
+  ~csPluginPaths() {}
+  /// Assignment operator.
+  csPluginPaths& operator=(csPluginPaths const& o)
+  { paths = o.paths; return *this; }
 
   /**
    * Add a path, but only if it isn't in the list already.
@@ -205,7 +215,6 @@ public:
 	delete[] paths[i].type;
 	paths[i].type = csStrNew (type);
 	delete[] pathExpanded;
-  
 	return i;
       }
     }
@@ -214,9 +223,10 @@ public:
     return (paths.Push (pluginPath));
   }
   
-  size_t GetCount () { return paths.Length(); }
-  csPluginPath const& operator [] (size_t n) const
-  { return paths[n]; }
+  /// Return number of contained paths.
+  size_t GetCount () const { return paths.Length(); }
+  /// Retrieve the n'th path record.
+  csPluginPath const& operator [] (size_t n) const { return paths[n]; }
 };
 
 /** @} */

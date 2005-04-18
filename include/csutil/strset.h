@@ -43,14 +43,20 @@ class CS_CRYSTALSPACE_EXPORT csStringSet
   csHash<const char*, csStringID> reverse; // ID to string mapping.
   csStringID next_id;
 
+  void Copy(csStringSet const&);
+
 public:
   typedef csStringHash::GlobalIterator GlobalIterator;
 
 public:
   /// Constructor.
   csStringSet (size_t size = 23);
+  /// Copy constructor.
+  csStringSet (csStringSet const& s) { Copy(s); }
   /// Destructor.
   ~csStringSet ();
+  /// Assignment operator.
+  csStringSet& operator=(csStringSet const& s) { Copy(s); return *this; }
 
   /**
    * Request the numeric ID for the given string.
