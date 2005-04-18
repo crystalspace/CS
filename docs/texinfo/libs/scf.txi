@@ -8,7 +8,7 @@
 document and Crystal Space's particular @sc{scf} implementation were written,
 and are copyright @copyright{} 1999 by Andrew Zabolotny,
 @email{bit@@eltech.ru}.  @sc{scf} is distributed under the @sc{gnu} Library
-General Public License (@sc{lgpl}).  @xref{License}.}
+General Public License (@sc{lgpl}).  @xref{Licenses}.}
 
 @noindent
 @emph{Documentation revised significantly by Eric Sunshine,

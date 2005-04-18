@@ -1,8 +1,8 @@
 @c -*-texinfo-*-
-@node NonLGPL, , License, CS Introduction
-@section Parts of CS covered under different licenses
+@node NonLGPL, , Library Copying, Licenses
+@appendixsec Portions of Crystal Space Covered Under Different Licenses
 
-Some parts of CrystalSpace are @emph{not} covered under @sc{lgpl} license, you
+Some portions of CrystalSpace are @emph{not} covered by @sc{lgpl} license. You
 might have to consider this, depending on how you intend to distribute your
 finished product.
 
@@ -11,7 +11,7 @@ finished product.
 @code{map2cs}, the Quake @sc{map} to Crystal Space converter in 
 @file{apps/import/map2cs}
 
-Licensed under the @sc{gnu} General Public License which can be downloaded 
+Licensed under the @sc{gnu} General Public License which, can be downloaded 
 at:
 
 @noindent

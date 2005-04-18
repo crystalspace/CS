@@ -316,7 +316,7 @@ fits your needs is to contribute to the project yourself.
 
 @strong{A2}: Crystal Space is under the @sc{lgpl} licensing policy so you can
 make commercial or shareware products using it.  For more details about what
-you can and cannot do, see the license, @ref{License}.
+you can and cannot do, see the license, @ref{Licenses}.
 
 @item
 @strong{Q}: How stable is the @sc{api} for Crystal Space?

@@ -110,6 +110,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Glossary::
 * FAQ:: Frequently Asked Questions (@sc{faq})
 * Release Notes::
+* Licenses::
 * Index::
 @end menu
 @end ifinfo
@@ -135,7 +136,7 @@ For a list of available topics, see the
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
 
-@node Index, , Release Notes, Top
+@node Index, , Licenses, Top
 @unnumbered Index
 
 @printindex cp

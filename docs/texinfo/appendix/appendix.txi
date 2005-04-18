@@ -2,3 +2,4 @@
 @imports{appendix,glossary.txi}
 @imports{appendix,faq.txi}
 @imports{appendix,apimod.txi}
+@imports{appendix,licenses.txi}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Release Notes, Index, FAQ, Top
+@node Release Notes, Licenses, FAQ, Top
 @appendix Release Notes
 @cindex Release Notes
 

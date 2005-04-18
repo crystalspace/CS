@@ -60,7 +60,7 @@ engine. Jorrit will gladly add contributed code to Crystal Space
 provided he can use the code.
 
 Note that you also need to agree to the @sc{lgpl} details but it
-shouldn't be a real problem for OSS developers. @xref{License}.
+shouldn't be a real problem for OSS developers. @xref{Licenses}.
 
 We are always interested in hearing what other people are doing with
 Crystal Space. Even if you only use Crystal Space for small private projects

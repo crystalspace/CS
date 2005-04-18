@@ -39,7 +39,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'nodefix.pl';
-my $PROG_VERSION = '1.2';
+my $PROG_VERSION = '1.3';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -207,6 +207,19 @@ sub parse_node {
 }
 
 #------------------------------------------------------------------------------
+# Get a node's depth. Internally, a negative depth is used as a flag to
+# indicate that a node's depth has not been changed by one of the sectioning
+# commands. The first sectioning directive following a @node is allowed to
+# change the node's depth; subsequent sectioning directives do not. This
+# function always returns the node's real (positive) depth.
+#------------------------------------------------------------------------------
+sub node_depth {
+    my $node = shift;
+    my $depth = $node->{'depth'};
+    return $depth < 0 ? -$depth - 1 : $depth;
+}
+
+#------------------------------------------------------------------------------
 # Scan a @node line and construct a node record.
 #------------------------------------------------------------------------------
 sub scan_node {
@@ -220,7 +233,7 @@ sub scan_node {
 	'new'   => { 'next' => '',     'prev' => '',     'up' => '',   },
 	'title' => $nname,
 	'file'  => $main::current_file,
-	'depth' => $current_depth,
+	'depth' => -$current_depth - 1,
 	'menu'  => undef,
 	'dirty' => 0,
     };
@@ -313,7 +326,7 @@ sub scan_depth {
     $current_depth += $depth_adjustment if
 	($depth_adjustment < 0 && $current_depth > $depth_min) ||
 	($depth_adjustment > 0 && $current_depth < $depth_max);
-    if ($current_node) {
+    if ($current_node && $current_node->{'depth'} < 0) {
 	$current_node->{'depth'} = $current_depth;
 	$current_node->{'title'} = $title;
     }
@@ -407,7 +420,7 @@ sub repair_nodes {
     my $last_depth = -1;
     my $node;
     foreach $node (@node_list) {
-	my $depth = $node->{'depth'};
+	my $depth = node_depth($node);
 	my $parent_depth = ($depth > 0 ? $depth - 1 : 0);
 
 	if ($depth < $last_depth) {
@@ -472,12 +485,12 @@ sub repair_menus {
 	my $menu = $menu_node->{'menu'};
 	next unless $menu;
 
-	my $item_depth = $menu_node->{'depth'} + 1; # Node depth of menu items.
+	my $item_depth = node_depth($menu_node) + 1; # Node depth of items.
 	my $items = [];
 	my $j;
 	for ($j = $i + 1; $j < @node_list; $j++) {
 	    my $node = $node_list[$j];
-	    my $node_depth = $node->{'depth'};
+	    my $node_depth = node_depth($node);
 	    next if $node_depth > $item_depth;
 	    last if $node_depth < $item_depth;
 	    add_menu_item($items, $node->{'name'}, $node->{'title'});

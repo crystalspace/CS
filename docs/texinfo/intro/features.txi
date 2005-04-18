@@ -6,7 +6,7 @@
 The first feature to mention here is that Crystal Space is an Open Source
 project (or a Free Software project, depending on your religion) that is
 freely available under the @sc{gnu} Lesser General Public License
-(@sc{gnu lgpl}). @xref{License}. This means a number of things for developers,
+(@sc{gnu lgpl}). @xref{Licenses}. This means a number of things for developers,
 but perhaps most important is that any program you write may freely link to the
 Crystal Space libraries.
 

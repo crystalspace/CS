@@ -103,6 +103,21 @@ chronological order.
 	  pvscalc.cpp.
 	- Eric Sunshine performed minor cleanup, corrections, and re-writing in
 	  apimod100.txi.
+	- Eric Sunshine fixed long-standing bug in nodefix.pl (Eric's tool
+	  which repairs Texinfo @node and @menu directives) which caused nodes
+	  to be assigned the wrong "depth" and title if multiple sectioning
+	  commands of different depths followed a single @node directive. For
+	  instance:
+	    @node Foo
+	    @section Foo You
+	    Some text.
+	    @subsection Foo Me
+	    Some more text.
+	  This would incorrectly assign a sub-section depth to node `Foo'
+	  rather than a section depth. The bug caused navigation to be borked
+	  in some instances and also prevented some @node directives from being
+	  repaired.
+	- Eric Sunshine installed the latest lgpl.txi from the GNU web site.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
