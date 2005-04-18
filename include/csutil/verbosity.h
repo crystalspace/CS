@@ -93,7 +93,7 @@ class csStringArray;
  * <li><tt>--verbose=+scf,-scf.register,+scf.register.class</tt> Enables
  *     verbosity for only `scf' and its children except `scf.register' or any
  *     of its children other than `scf.register.class which is explicitly
- *     enabled.
+ *     enabled.</li>
  * </ul>
  * \sa csVerbosityManager
  * \sa csCheckVerbosity
