@@ -18,6 +18,7 @@ chronological order.
 	  if a destructor called by DisposeAll() in turn Free()s an object from 
 	  the same allocator, it triggers a double-free bug when DisposeAll()
 	  attempts to also destroy the same object.
+	- Peter Amstutz updated the csvosa3dl plugin in response to CS iMaterial API change
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
