@@ -458,8 +458,8 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     // Now count the number of objects that are completely
     // on the left and the number of objects completely on the right
     // side. The remaining objects are cut by this position.
-    int left = 0;
-    int right = 0;
+    size_t left = 0;
+    size_t right = 0;
     for (j = 0 ; j < boxlist.Length () ; j++)
     {
       const csBox3& bbox = boxlist[j];
@@ -467,7 +467,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       if (bbox.Max (axis) < a-.0001) left++;
       else if (bbox.Min (axis) > a+.0001) right++;
     }
-    int cut = boxlist.Length ()-left-right;
+    size_t cut = boxlist.Length ()-left-right;
     // If we have no object on the left or right then this is a bad
     // split which we should never take.
     float qual;
@@ -496,7 +496,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_xY)) &&
       	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_XY));
 
-      float qual_cut = 1.0 - (float (cut) * inv_num_objects);
+      float qual_cut = 1.0 - (float ((int)cut) * inv_num_objects);
       float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
       // Bonus for using axis plane.
       qual = 0.6 + (6.0 * qual_cut + qual_balance);
@@ -1127,7 +1127,7 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   // buffer.
   csChainHull2D::SortXY (poly.GetArray (), poly.Length ());
   csVector2* hull = new csVector2[poly.Length ()];
-  int hull_points = csChainHull2D::CalculatePresorted (poly.GetArray (),
+  size_t hull_points = csChainHull2D::CalculatePresorted (poly.GetArray (),
   	poly.Length (), hull);
 
   // Now we calculate the bounding 2D box of those points. That will
@@ -1135,7 +1135,7 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   // to coordinates on the coverage buffer.
   csBox2 bbox (hull[0]);
   size_t i;
-  for (i = 1 ; i < (size_t)hull_points ; i++)
+  for (i = 1 ; i < hull_points ; i++)
     bbox.AddBoundingVertexSmart (hull[i]);
   plane.offset = bbox.Min ();
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
@@ -1152,7 +1152,7 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   // Before we do that we have to transform the hull to coverage buffer
   // space.
   DB(("  Hull:\n"));
-  for (i = 0 ; i < (size_t)hull_points ; i++)
+  for (i = 0 ; i < hull_points ; i++)
   {
     DB(("    N:%zu (%s)\n", i, intern_str(hull[i].Description())));
     hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
@@ -1239,7 +1239,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   size_t i;
   for (i = 1 ; i < 8 ; i++)
   {
-    if (!polygon.ProjectAxisPlane (source.GetCorner (i),
+    if (!polygon.ProjectAxisPlane (source.GetCorner ((int)i),
   	plane.axis, plane.where, &poly))
       return false;
 

@@ -99,6 +99,8 @@ chronological order.
 	  this context.
 	- Eric Sunshine added copy constructors and assignment operators to
 	  csStringHash, csStringSet, and csPluginPaths.
+	- Eric Sunshine eliminated some `size_t' vs. `int' warnings in
+	  pvscalc.cpp.
 17-Apr-2005
 	- res made the shader manager store the shaders in a sorted list (to
 	  allow for quicker retrieval).
