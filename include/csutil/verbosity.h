@@ -175,7 +175,7 @@ public:
    *   should be avoided, and an explicit match of \a flag is warranted. For
    *   example, a module may want to provide a way to emit low-level debugging
    *   messages when requested explicitly, but not normally emit them when a
-   *   general <tt>--verbose</t> is in effect. In such cases, setting \a fuzzy
+   *   general <tt>--verbose</tt> is in effect. In such cases, setting \a fuzzy
    *   to false would be appropriate.
    * <p>
    * \remarks See the class description for detailed information regarding the
