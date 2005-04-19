@@ -42,12 +42,13 @@
 
 extern WalkTest *Sys;
 
-int FindIntersection(csCollisionPair& cd,csVector3 line[2])
+int FindIntersection(csCollisionPair& cd,csSegment3& line)
 {
   csVector3 tri1[3]; tri1[0]=cd.a1; tri1[1]=cd.b1; tri1[2]=cd.c1;
   csVector3 tri2[3]; tri2[0]=cd.a2; tri2[1]=cd.b2; tri2[2]=cd.c2;
 
-  return csMath3::FindIntersection(tri1,tri2,line);
+  bool coplanar;
+  return csIntersect3::TriangleTriangle(tri1,tri2,line,coplanar);
 }
 
 // Define the player bounding box.
@@ -328,14 +329,14 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 
 	if (n*csVector3(0,-1,0)<0.7) continue;
 
-	csVector3 line[2];
+	csSegment3 line;
 
 	if (FindIntersection (cd,line))
 	{
-	  if (line[0].y>max_y)
-	    max_y=line[0].y;
-	  if (line[1].y>max_y)
-	    max_y=line[1].y;
+	  if (line.Start().y>max_y)
+	    max_y=line.Start().y;
+	  if (line.End().y>max_y)
+	    max_y=line.End().y;
 	}
       }
 

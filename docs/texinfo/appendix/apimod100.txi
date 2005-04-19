@@ -844,6 +844,10 @@ first the segment argument followed by the triangle argument.
 @code{ZPlane()} @result{} @code{SegmentZPlane()}
 @end itemize
 
+In addition to that the function @code{csMath3::FindIntersection()} has been
+removed and is replaced with a new @code{csIntersect3::TriangleTriangle()}
+routine which is faster and more correct.
+
 @noindent
 The same improvements have been made to @code{csIntersect2}:
 

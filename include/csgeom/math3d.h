@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2005 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -90,17 +90,6 @@ public:
    */
   static bool Visible (const csVector3& p, const csPlane3& pl)
   { return pl.Classify (p) <= 0; }
-
-  /**
-   * Calculate the line, that is the result of the Intersection of
-   * triangle 1  and triangle 2. This Method returns false, if there is
-   * no intersection. If there is an intersection, the start of the line
-   * is in line[0] and the end of the line is in line[1] and the method
-   * return true;
-   */
-  static bool FindIntersection (const csVector3  tri1[3],
-                                const csVector3  tri2[3],
-                                csVector3        line[2]);
 
   /**
    * Calculates a vector lying a specified distance between two other vectors.
@@ -638,6 +627,28 @@ public:
   {
     return f1.Intersect (poly, num);
   }
+
+  /**
+   * Test intersection between two triangles.
+   * @param tri1 Vertices of triangle 1
+   * @param tri2 Vertices of triangle 2
+   * @return true if the triangles intersect, otherwise false
+   */
+  static bool TriangleTriangle (const csVector3 tri1[3],
+			 const csVector3 tri2[3]);
+
+  /**
+   * Calculate intersection between two triangles and return it
+   * in isectline.
+   * @param tri1 Vertices of triangle 1
+   * @param tri2 Vertices of triangle 2
+   * @param[out] isectline The line segment where they intersect
+   * @param[out] coplanar Returns whether the triangles are coplanar
+   * @return true if the triangles intersect, otherwise false
+   */
+  static bool TriangleTriangle (const csVector3 tri1[3],
+			 const csVector3 tri2[3],
+			 csSegment3& isectline, bool& coplanar);
 };
 
 /**
