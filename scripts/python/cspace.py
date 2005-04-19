@@ -141,6 +141,12 @@ _cspace.iFactory_swigregister(iFactoryPtr)
 
 iFactory_scfGetVersion = _cspace.iFactory_scfGetVersion
 
+SCF_VERBOSE_NONE = _cspace.SCF_VERBOSE_NONE
+SCF_VERBOSE_PLUGIN_SCAN = _cspace.SCF_VERBOSE_PLUGIN_SCAN
+SCF_VERBOSE_PLUGIN_LOAD = _cspace.SCF_VERBOSE_PLUGIN_LOAD
+SCF_VERBOSE_PLUGIN_REGISTER = _cspace.SCF_VERBOSE_PLUGIN_REGISTER
+SCF_VERBOSE_CLASS_REGISTER = _cspace.SCF_VERBOSE_CLASS_REGISTER
+SCF_VERBOSE_ALL = _cspace.SCF_VERBOSE_ALL
 
 scfCompatibleVersion = _cspace.scfCompatibleVersion
 class iSCF(iBase):
@@ -352,6 +358,7 @@ class csStringSet(_object):
             if self.thisown: destroy(self)
         except: pass
 
+    def assign(*args): return _cspace.csStringSet_assign(*args)
     def Request(*args): return _cspace.csStringSet_Request(*args)
     def Contains(*args): return _cspace.csStringSet_Contains(*args)
     def Delete(*args): return _cspace.csStringSet_Delete(*args)
