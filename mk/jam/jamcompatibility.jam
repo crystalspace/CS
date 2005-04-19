@@ -46,7 +46,11 @@ if $(JAMVERSION) < 2.4
 # this file as a last-minute assertion.  Unfortunately, however, it seems that
 # references to $(SHELL) in any of the included files get bound at the point
 # of reference, thus we need to perform this filtering as early as possible.
-if [ Match (csh) : $(SHELL) ]
+# Furthermore, on Windows, if the MSYS installation path contains a space (such
+# as "c:\Program Files\msys"), the space will cause `actions' to fail which
+# employ $(SHELL) indirectly through some other variable.  Therefore, handle
+# this case as well.
+if [ Match (csh) : $(SHELL) ] || $(SHELL[2])
 {
   SHELL = "/bin/sh" ;
 }
