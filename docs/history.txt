@@ -18,6 +18,8 @@ chronological order.
 	- Khaki Lord added two new functions csIntersect3::TriangleTriangle().
 	  These replace the old and partially broken function
 	  csMath3::FindIntersection().
+	- res made some tweaks to the VC7 project templates and some headers
+	  to have VC8beta2 compile CS happily.
 18-Apr-2005
 	- Eric Sunshine augmented csdef.h so that it also fakes up the
 	  floating-point cosf(), sinf(), sqrtf(), etc. if strict-ANSI

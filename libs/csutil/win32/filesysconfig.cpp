@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <sys/stat.h>
 #include "cssysdef.h"
+#include <sys/stat.h>
 #include "csutil/cfgfile.h"
 #include "csutil/sysfunc.h"
 #include "shellstuff.h"

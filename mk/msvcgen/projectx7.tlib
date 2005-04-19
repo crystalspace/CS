@@ -82,7 +82,6 @@
 [% MACRO compiler_debug BLOCK -%]
 				Optimization="0"
 				MinimalRebuild="TRUE"
-				BrowseInformation="1"
 				DebugInformationFormat="4"
 				RuntimeTypeInfo="TRUE"
 				RuntimeLibrary="3"

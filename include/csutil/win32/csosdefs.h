@@ -102,6 +102,14 @@
     // However, doing this in debug builds prevents Edit & Continue from
     // functioning properly :/
   #endif
+
+  // VC8 quirks
+  #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1400)
+    // Also note quirk in csconfig.h
+
+    #include "SpecStrings.h"	// See file for explanation
+  #endif
+  
 #endif
 
 #ifndef WINVER
