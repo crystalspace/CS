@@ -2,10 +2,10 @@
 @appendixsec @sc{gnu} General Public License
 
 @noindent
-@emph{Note: Don't be scared by the @sc{gpl} here, it only applies to very few 
-modules in CrystalSpace - most of it, including essential components, are
-licensed under the @sc{lgpl}. @xref{NonLGPL}.}
-@noindent
+@emph{Note: Do not be scared off by the @sc{gpl} presented here. It applies
+only to a very few modules or applications (@pxref{NonLGPL}.}). The vast
+majority of Crystal Space, including essential components, are licensed under
+the @sc{lgpl} (@pxref{Library Copying}).
 
 @cindex @sc{gpl}, General Public License
 @center Version 2, June 1991
