@@ -7,11 +7,11 @@ Default Window=main
 Default topic=html\api\index.html
 Display compile progress=Yes
 Full-text search=Yes
-Language=0x409 Englisch (USA)
+Language=0x409 Englisch (United States)
 Title=Crystal Space Public API Reference
 
 [WINDOWS]
-main=,"apitoc.hhc",,"html\api\index.html","html\api\index.html","javascript:window.open('http://www.crystalspace3d.org/'); history.go(-1);","CS Homepage",,,0x2120,,0x4304e,,,,,,,,0
+main=,"apitoc.hhc",,"html\api\index.html","html\api\index.html","javascript:window.open('http://www.crystalspace3d.org/'); history.go(-1);","CS Homepage",,,0x22520,,0x4304e,,,,,,,,0
 
 
 [INFOTYPES]

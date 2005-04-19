@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Apr-2005
+	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
+	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
+	  user to perform arbitrary searches in the generated help file, thus
+	  making it much more useful.
 18-Apr-2005
 	- Eric Sunshine augmented csdef.h so that it also fakes up the
 	  floating-point cosf(), sinf(), sqrtf(), etc. if strict-ANSI
