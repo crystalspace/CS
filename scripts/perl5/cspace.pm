@@ -493,6 +493,7 @@ sub DESTROY {
     }
 }
 
+*__copy__ = *cspacec::csStringSet___copy__;
 *Request = *cspacec::csStringSet_Request;
 *Contains = *cspacec::csStringSet_Contains;
 *Delete = *cspacec::csStringSet_Delete;
@@ -12883,6 +12884,12 @@ package cspace;
 sub CS_WCHAR_T_SIZE () { $cspacec::CS_WCHAR_T_SIZE }
 sub CS_VOIDED_PTR () { $cspacec::CS_VOIDED_PTR }
 sub SCF_STATIC_CLASS_CONTEXT () { $cspacec::SCF_STATIC_CLASS_CONTEXT }
+sub SCF_VERBOSE_NONE () { $cspacec::SCF_VERBOSE_NONE }
+sub SCF_VERBOSE_PLUGIN_SCAN () { $cspacec::SCF_VERBOSE_PLUGIN_SCAN }
+sub SCF_VERBOSE_PLUGIN_LOAD () { $cspacec::SCF_VERBOSE_PLUGIN_LOAD }
+sub SCF_VERBOSE_PLUGIN_REGISTER () { $cspacec::SCF_VERBOSE_PLUGIN_REGISTER }
+sub SCF_VERBOSE_CLASS_REGISTER () { $cspacec::SCF_VERBOSE_CLASS_REGISTER }
+sub SCF_VERBOSE_ALL () { $cspacec::SCF_VERBOSE_ALL }
 sub CS_DBGHELP_UNITTEST () { $cspacec::CS_DBGHELP_UNITTEST }
 sub CS_DBGHELP_BENCHMARK () { $cspacec::CS_DBGHELP_BENCHMARK }
 sub CS_DBGHELP_TXTDUMP () { $cspacec::CS_DBGHELP_TXTDUMP }
