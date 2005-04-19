@@ -1,4 +1,4 @@
-@node Copying
+@node Copying, , NonLGPL, Licenses
 @appendixsec @sc{gnu} General Public License
 
 @noindent

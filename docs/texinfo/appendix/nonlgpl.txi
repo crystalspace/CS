@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node NonLGPL, , Library Copying, Licenses
+@node NonLGPL, Copying, Library Copying, Licenses
 @appendixsec Portions of Crystal Space Covered Under Different Licenses
 
 Some portions of CrystalSpace are @emph{not} covered by @sc{lgpl} license. You
