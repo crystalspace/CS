@@ -11,6 +11,10 @@ chronological order.
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
 	  user to perform arbitrary searches in the generated help file, thus
 	  making it much more useful.
+	- Eric Sunshine disabled $USE_ISO in CS/docs/support/texi2html.init
+	  since it caused the Texinfo @result{} to be rendered as an unknown
+	  glyph in the Microsoft Compressed Help (.chm) files (at least on the
+	  Windows platforms I tested, which admittedly are old).
 18-Apr-2005
 	- Eric Sunshine augmented csdef.h so that it also fakes up the
 	  floating-point cosf(), sinf(), sqrtf(), etc. if strict-ANSI

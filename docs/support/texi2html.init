@@ -73,7 +73,7 @@ $INVISIBLE_MARK = '';
 # -iso
 # if this value is true, ISO8859 characters are used for special symbols 
 # (like copyright, etc).
-$USE_ISO = 1;
+$USE_ISO = 0;
 
 # -I
 # add a directory to the list of directories where @include files are
