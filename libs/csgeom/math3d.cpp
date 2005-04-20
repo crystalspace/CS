@@ -28,9 +28,6 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/segment.h"
 #include "csgeom/box.h"
-#include "csgeom/obb.h"
-#include "csgeom/pmtools.h"
-#include "igeom/polymesh.h"
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
 
@@ -1099,62 +1096,6 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
   GEO_ASSERT (ABS (r-.5) < .00001, "BoxSegment");
 
   //==========================================================================
-  // Tests for csOBB.
-  //==========================================================================
-
-  csVector3 vertex_table[22];
-  vertex_table[0].Set (10, 10, 10);
-  vertex_table[1].Set (0, 0, 2);
-  vertex_table[2].Set (1, 0, 3);
-  vertex_table[3].Set (2, 0, 0);
-  csOBB obb;
-  obb.FindOBB (vertex_table, 4);
-  int i;
-  for (i = 0 ; i < 8 ; i++)
-  {
-    csVector3 v = obb.GetCorner (i);
-    csPrintf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
-    fflush (stdout);
-  }
-  obb.FindOBBAccurate (vertex_table, 4);
-  for (i = 0 ; i < 8 ; i++)
-  {
-    csVector3 v = obb.GetCorner (i);
-    csPrintf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
-    fflush (stdout);
-  }
-
-  vertex_table[0].Set (-2, -2, 2);
-  vertex_table[1].Set (2, -2, 2);
-  vertex_table[2].Set (-2, -2, -2);
-  vertex_table[3].Set (2, -2, -2);
-  vertex_table[4].Set (-2, 2, 2);
-  vertex_table[5].Set (2, 2, 2);
-  vertex_table[6].Set (-2, 2, -2);
-  vertex_table[7].Set (2, 2, -2);
-  vertex_table[8].Set (0, 0, -3);
-  vertex_table[9].Set (3, 0, 0);
-  vertex_table[10].Set (0, 0, 3);
-  vertex_table[11].Set (-3, 0, 0);
-  vertex_table[12].Set (0, 3, 0);
-  vertex_table[13].Set (0, -3, 0);
-  vertex_table[14].Set (-3, -3, -3);
-  vertex_table[15].Set (-3, -3, 3);
-  vertex_table[16].Set (-3, 3, -3);
-  vertex_table[17].Set (-3, 3, 3);
-  vertex_table[18].Set (3, -3, -3);
-  vertex_table[19].Set (3, -3, 3);
-  vertex_table[20].Set (3, 3, -3);
-  vertex_table[21].Set (3, 3, 3);
-  obb.FindOBB (vertex_table, 22);
-  for (i = 0 ; i < 8 ; i++)
-  {
-    csVector3 v = obb.GetCorner (i);
-    csPrintf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
-    fflush (stdout);
-  }
-
-  //==========================================================================
   // Tests for BoxPlane/BoxTriangle.
   //==========================================================================
   csVector3 verts[3];
@@ -1175,4 +1116,3 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
 
   return 0;
 }
-
