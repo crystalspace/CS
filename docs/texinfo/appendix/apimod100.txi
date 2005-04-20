@@ -248,15 +248,27 @@ global namespace.
 @item
 @code{BadRepetition} @result{} @code{csrxBadRepetition}
 @item
+@code{big_endian_float()} @result{} @code{csBigEndianFloat()}
+@item
+@code{big_endian_long()} @result{} @code{csBigEndianLong()}
+@item
+@code{big_endian_longlong()} @result{} @code{csBigEndianLongLong()}
+@item
+@code{big_endian_short()} @result{} @code{csBigEndianShort()}
+@item
 @code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
 @item
 @code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
 @item
 @code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
 @item
+@code{convert_endian()} @result{} @code{csConvertEndian()}
+@item
 @code{DO_MMX} @result{} @code{CS_HAVE_MMX}
 @item
 @code{DO_NASM} @result{} @code{CS_HAVE_NASM}
+@item
+@code{double2longlong()} @result{} @code{csDoubleToLongLong()}
 @item
 @code{ErrBraces} @result{} @code{csrxErrBraces}
 @item
@@ -278,11 +290,37 @@ global namespace.
 @item
 @code{ErrUnknown} @result{} @code{csrxErrUnknown}
 @item
+@code{float2long()} @result{} @code{csFloatToLong()}
+@item
+@code{float2short()} @result{} @code{csFloatToShort()}
+@item
+@code{get_le_float16()} @result{} @code{csGetLittleEndianFloat16()}
+@item
+@code{get_le_float32()} @result{} @code{csGetLittleEndianFloat32()}
+@item
+@code{get_le_long()} @result{} @code{csGetLittleEndianLong()}
+@item
+@code{get_le_short()} @result{} @code{csGetLittleEndianShort()}
+@item
 @code{IgnoreCase} @result{} @code{csrxIgnoreCase}
 @item
-@code{MKDIR()} @result{} @code{CS_MKDIR()}
+@code{little_endian_float()} @result{} @code{csLittleEndianFloat()}
+@item
+@code{little_endian_long()} @result{} @code{csLittleEndianLong()}
+@item
+@code{little_endian_longlong()} @result{} @code{csLittleEndianLongLong()}
+@item
+@code{little_endian_short()} @result{} @code{csLittleEndianShort()}
+@item
+@code{long2float()} @result{} @code{csLongToFloat()}
+@item
+@code{longlong2double()} @result{} @code{csLongLongToDouble()}
 @item
 @code{MemEntry} @result{} @code{csMemTrackerEntry}
+@item
+@code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
+@item
+@code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
 @item
 @code{MemTrackerInfo} @result{} @code{csMemTrackerInfo}
 @item
@@ -290,9 +328,13 @@ global namespace.
 @item
 @code{MemTrackerRegistry} @result{} @code{csMemTrackerRegistry}
 @item
-@code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
+@code{MKDIR()} @result{} @code{CS_MKDIR()}
 @item
-@code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
+@code{mmioInfo} @result{} @code{csMemMapInfo}
+@item
+@code{__NEED_GENERIC_ISDIR} @result{} @code{CS_USE_CUSTOM_ISDIR}
+@item
+@code{__NEED_OPENDIR_PROTOTYPE} @result{} @code{CS_WIN32_USE_CUSTOM_OPENDIR}
 @item
 @code{NewLine} @result{} @code{csrxNewLine}
 @item
@@ -329,63 +371,13 @@ global namespace.
 @item
 @code{QInt8()} @result{} @code{csQfixed8()}
 @item
-@code{QRound()} @result{} @code{csQround()}
-@item
-@code{RegisterMemoryTrackerModule()} @result{} @code{mtiRegisterModule()}
-@item
-@code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
-@item
-@code{TEMP_FILE} @result{} @code{CS_TEMP_FILE}
-@item
-@code{UnMemoryMapFile()} @result{} @code{csUnMemoryMapFile()}
-@item
-@code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
-@item
-@code{__NEED_GENERIC_ISDIR} @result{} @code{CS_USE_CUSTOM_ISDIR}
-@item
-@code{__NEED_OPENDIR_PROTOTYPE} @result{} @code{CS_WIN32_USE_CUSTOM_OPENDIR}
-@item
-@code{big_endian_float()} @result{} @code{csBigEndianFloat()}
-@item
-@code{big_endian_long()} @result{} @code{csBigEndianLong()}
-@item
-@code{big_endian_longlong()} @result{} @code{csBigEndianLongLong()}
-@item
-@code{big_endian_short()} @result{} @code{csBigEndianShort()}
-@item
-@code{convert_endian()} @result{} @code{csConvertEndian()}
-@item
-@code{double2longlong()} @result{} @code{csDoubleToLongLong()}
-@item
-@code{float2long()} @result{} @code{csFloatToLong()}
-@item
-@code{float2short()} @result{} @code{csFloatToShort()}
-@item
-@code{get_le_float16()} @result{} @code{csGetLittleEndianFloat16()}
-@item
-@code{get_le_float32()} @result{} @code{csGetLittleEndianFloat32()}
-@item
-@code{get_le_long()} @result{} @code{csGetLittleEndianLong()}
-@item
-@code{get_le_short()} @result{} @code{csGetLittleEndianShort()}
-@item
-@code{little_endian_float()} @result{} @code{csLittleEndianFloat()}
-@item
-@code{little_endian_long()} @result{} @code{csLittleEndianLong()}
-@item
-@code{little_endian_longlong()} @result{} @code{csLittleEndianLongLong()}
-@item
-@code{little_endian_short()} @result{} @code{csLittleEndianShort()}
-@item
-@code{long2float()} @result{} @code{csLongToFloat()}
-@item
-@code{longlong2double()} @result{} @code{csLongLongToDouble()}
-@item
-@code{mmioInfo} @result{} @code{csMemMapInfo}
-@item
 @code{qisqrt()} @result{} @code{csQisqrt()}
 @item
+@code{QRound()} @result{} @code{csQround()}
+@item
 @code{qsqrt()} @result{} @code{csQsqrt()}
+@item
+@code{RegisterMemoryTrackerModule()} @result{} @code{mtiRegisterModule()}
 @item
 @code{set_le_float16()} @result{} @code{csSetLittleEndianFloat16()}
 @item
@@ -396,6 +388,14 @@ global namespace.
 @code{set_le_short()} @result{} @code{csSetLittleEndianShort()}
 @item
 @code{short2float()} @result{} @code{csShortToFloat()}
+@item
+@code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
+@item
+@code{TEMP_FILE} @result{} @code{CS_TEMP_FILE}
+@item
+@code{UnMemoryMapFile()} @result{} @code{csUnMemoryMapFile()}
+@item
+@code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
 @end itemize
 
 @subheading @file{cssysdef.h} Changes
