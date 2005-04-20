@@ -1,0 +1,3 @@
+SubDir TOP data shader snippets ;
+
+InstallData [ Wildcard *.inc ] : data shader snippets ;

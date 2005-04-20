@@ -45,6 +45,7 @@ chronological order.
 	  framework.
 	- Eric Sunshine augmented unittest.jam so that it adds an appropriate
 	  help message to `jam help'.
+	- Eric Sunshine added 'jam install' goop for CS/data/shader/snippets.
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
