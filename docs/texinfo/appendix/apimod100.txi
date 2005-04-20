@@ -1206,7 +1206,7 @@ only relocated, not removed.
 Forbidding direct manipulation of an @samp{iImage}'s pixel data has the 
 following consequences:
 
-@itemize bullet
+@itemize @bullet
 @item
 The @code{Clone()} function was removed. The
 @samp{csImageMemory} class provides a constructor that copies the pixel data
