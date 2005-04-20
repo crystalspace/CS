@@ -63,7 +63,7 @@ CS_IMPLEMENT_APPLICATION
 // The global pointer to PartEdit
 PartEdit *System;
 
-awsSink *s;
+PartEditSink *s;
 
 PartEdit::PartEdit (iObjectRegistry* object_reg)
 {
@@ -1026,7 +1026,7 @@ bool PartEdit::Initialize ()
   aws->SetupCanvas (NULL,g2d,g3d);
 
   // Setup sink.  
-  s = new awsSink();
+  s = new PartEditSink();
   iAwsSink* sink = aws->GetSinkMgr()->CreateSink((intptr_t)s);
 
   s->SetSink(sink);

@@ -112,12 +112,12 @@ enum Emitters {
 
 #define SECTION_COUNT SECTION_FINAL_SECTION
 
-class awsSink
+class PartEditSink
 {
 
   iAws     *wmgr;
   csRef<iAwsSink> sink;
-  static awsSink *asink;
+  static PartEditSink *asink;
   csRef<iVFS> vfs;
 
   struct st_FreeScrollData {
@@ -589,7 +589,7 @@ private:
   static void FillSectionList(intptr_t sk, iAwsSource *source);
 
   /// Static callback to handle selection/state changes in the section list box
-  static void awsSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source);
+  static void PartEditSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source);
 
 
 
@@ -1386,8 +1386,8 @@ private:
 
 
 public:
-  awsSink();
-  virtual ~awsSink();
+  PartEditSink();
+  ~PartEditSink();
 
   void SetSink(iAwsSink *s);
   iAwsSink *GetSink() { return sink; }

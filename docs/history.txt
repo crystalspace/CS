@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Apr-2005
+	- Eric Sunshine fixed launch and termination crashers in partedit.
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the

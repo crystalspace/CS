@@ -51,7 +51,7 @@
 // This macro implements a static callback function which records the pointer to the iAwsComponent that calls the trigger
 // The function named here should be attached to the creation trigger of the aws component
 #define IMPLEMENT_REGISTER_FUNCTION(function,componentvar)  \
-void awsSink::function(intptr_t sk, iAwsSource *source) \
+void PartEditSink::function(intptr_t sk, iAwsSource *source) \
 { \
   asink->componentvar=source->GetComponent(); \
 } 
@@ -61,7 +61,7 @@ void awsSink::function(intptr_t sk, iAwsSource *source) \
 // converts it to a float, stores the float in a given variable beneath the global pointer 'asink'
 // and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
 #define IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(function,floatvar,invalidate_flag,update) \
-void awsSink::function(intptr_t sk, iAwsSource *source) \
+void PartEditSink::function(intptr_t sk, iAwsSource *source) \
 { \
   iString *textvalue; \
   if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
@@ -79,7 +79,7 @@ void awsSink::function(intptr_t sk, iAwsSource *source) \
 // converts it to a integer, stores the integer in a given variable beneath the global pointer 'asink'
 // and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
 #define IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(function,intvar,invalidate_flag,update) \
-void awsSink::function(intptr_t sk, iAwsSource *source) \
+void PartEditSink::function(intptr_t sk, iAwsSource *source) \
 { \
   iString *textvalue; \
   if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
@@ -97,7 +97,7 @@ void awsSink::function(intptr_t sk, iAwsSource *source) \
 // and stores the result (on/off) in a given boolean variable beneath the global pointer 'asink'
 // It also sets a different boolean variable beneath 'asink' to true to signal that a data update has occurred.
 #define IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(function,boolvar,invalidate_flag,update) \
-void awsSink::function(intptr_t sk, iAwsSource *source) \
+void PartEditSink::function(intptr_t sk, iAwsSource *source) \
 { \
   bool *p_bvalue; \
   if (source->GetComponent()->GetProperty("State",(intptr_t*)&p_bvalue)) \
@@ -140,9 +140,9 @@ void awsSink::function(intptr_t sk, iAwsSource *source) \
   component->SetProperty("State",(intptr_t)&bvalue);
 
 
-awsSink * awsSink::asink = NULL;
+PartEditSink * PartEditSink::asink = NULL;
 
-awsSink::awsSink() : wmgr(0) 
+PartEditSink::PartEditSink() : wmgr(0) 
 {
 	asink = this;
 
@@ -166,11 +166,11 @@ awsSink::awsSink() : wmgr(0)
 
 }
 
-awsSink::~awsSink()
+PartEditSink::~PartEditSink()
 {
 }
 
-void awsSink::SetSink(iAwsSink *s)
+void PartEditSink::SetSink(iAwsSink *s)
 {
   sink = s;
 
@@ -949,21 +949,21 @@ void awsSink::SetSink(iAwsSink *s)
   FreeScrollData.iawscomponent_AssociatedTextBox=NULL;
 }
 
-void awsSink::SetWindowManager(iAws *_wmgr)
+void PartEditSink::SetWindowManager(iAws *_wmgr)
 {
   wmgr=_wmgr;
 }
 
 
 
-void awsSink::RegisterSectionSelection(intptr_t sk, iAwsSource *source)
+void PartEditSink::RegisterSectionSelection(intptr_t sk, iAwsSource *source)
 {
   asink->iawscomponent_SectionSelection = source->GetComponent();
   return;
 }
 
 
-void awsSink::FillSectionList(intptr_t sk, iAwsSource *source)
+void PartEditSink::FillSectionList(intptr_t sk, iAwsSource *source)
 {
   asink->iawscomponent_SectionList = source->GetComponent();
   iAwsParmList *pl=0;
@@ -1044,7 +1044,7 @@ void awsSink::FillSectionList(intptr_t sk, iAwsSource *source)
 
 }
 
-void awsSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source)
+void PartEditSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source)
 {
   int i;
   iAwsParmList *pl=0;
@@ -1181,24 +1181,24 @@ IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicFilter,GraphicSelectionData.iawscompo
 IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicFileList,GraphicSelectionData.iawscomponent_GraphicFileList)
 
 
-const char *awsSink::GetGraphicCWD()
+const char *PartEditSink::GetGraphicCWD()
 {
   return GraphicSelectionData.currentdirectory->GetData();
 }
 
-void awsSink::SetGraphicCWD(const char *cwd)
+void PartEditSink::SetGraphicCWD(const char *cwd)
 {
   GraphicSelectionData.currentdirectory->Clear();
   GraphicSelectionData.currentdirectory->Append(cwd);
   FillGraphicFileList();
 }
 
-const char *awsSink::GetGraphicFile()
+const char *PartEditSink::GetGraphicFile()
 {
   return GraphicSelectionData.currentfilepath->GetData();
 }
 
-void awsSink::SetGraphicFile(const char *filestr)
+void PartEditSink::SetGraphicFile(const char *filestr)
 {
   GraphicSelectionData.currentfilepath->Clear();
   GraphicSelectionData.currentfilepath->Append(GraphicSelectionData.currentdirectory);
@@ -1206,12 +1206,12 @@ void awsSink::SetGraphicFile(const char *filestr)
 }
 
 
-const char *awsSink::GetGraphicFilter()
+const char *PartEditSink::GetGraphicFilter()
 {
   return GraphicSelectionData.filter->GetData();
 }
 
-void awsSink::SetGraphicFilter(const char *filterstr)
+void PartEditSink::SetGraphicFilter(const char *filterstr)
 {
   GraphicSelectionData.filter->Clear();
   GraphicSelectionData.filter->Append(filterstr);
@@ -1219,7 +1219,7 @@ void awsSink::SetGraphicFilter(const char *filterstr)
 }
 
 /// Static callback to handle graphic file working directory change.
-void awsSink::AwsSetGraphicFilter(intptr_t sk, iAwsSource *source)
+void PartEditSink::AwsSetGraphicFilter(intptr_t sk, iAwsSource *source)
 {
   iString *cwd;
   csRef<iString> path=new scfString();
@@ -1265,7 +1265,7 @@ void awsSink::AwsSetGraphicFilter(intptr_t sk, iAwsSource *source)
 }
 
   /// Static callback to handle graphic file selection change
-void awsSink::AwsGraphicFileSelected(intptr_t sk, iAwsSource *source)
+void PartEditSink::AwsGraphicFileSelected(intptr_t sk, iAwsSource *source)
 {
   // Read the selected value
   iString *filename;
@@ -1308,7 +1308,7 @@ void awsSink::AwsGraphicFileSelected(intptr_t sk, iAwsSource *source)
 }
 
 
-void awsSink::FillGraphicFileList()
+void PartEditSink::FillGraphicFileList()
 {
   if (GraphicSelectionData.iawscomponent_GraphicFileList != 0 && vfs != 0)
   {
@@ -1422,7 +1422,7 @@ IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetAlphaBlend,
  * Although this is a radio button, it only has 2 options, so we can treat it like a checkbox if we 
  * only examine the state of one of the buttons.
  */
-void awsSink::AwsSetParticleType(intptr_t sk, iAwsSource *source)
+void PartEditSink::AwsSetParticleType(intptr_t sk, iAwsSource *source)
 {
   bool *p_bvalue;
   if (asink->EmitterStateData.iawscomponent_RectParticlesRadio->GetProperty("State",(intptr_t*)&p_bvalue))
@@ -1472,22 +1472,22 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMaxZ,
 									 UpdateEmitterStateDisplay)
 
 
-bool awsSink::EmitterStateChanged()
+bool PartEditSink::EmitterStateChanged()
 {
   return EmitterStateData.settings_changed;
 }
 
-void awsSink::ClearEmitterStateChanged()
+void PartEditSink::ClearEmitterStateChanged()
 {
   EmitterStateData.settings_changed=false;
 }
 
-EmitterState *awsSink::GetEmitterState()
+EmitterState *PartEditSink::GetEmitterState()
 {
   return &(EmitterStateData.state);
 }
 
-void awsSink::SetEmitterState(EmitterState *source)
+void PartEditSink::SetEmitterState(EmitterState *source)
 {
   memcpy(&(EmitterStateData.state),source,sizeof(EmitterState));
   UpdateEmitterStateDisplay();
@@ -1495,7 +1495,7 @@ void awsSink::SetEmitterState(EmitterState *source)
 }
 
 
-void awsSink::UpdateEmitterStateDisplay()
+void PartEditSink::UpdateEmitterStateDisplay()
 {
   bool bvalue;
   csRef<iString> value;
@@ -1771,29 +1771,29 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTWeight,
 									 UpdateInitialPositionStateDisplay)
 
 
-bool awsSink::InitialPositionStateChanged()
+bool PartEditSink::InitialPositionStateChanged()
 {
   return InitialPositionData.settings_changed;
 }
 
-void awsSink::ClearInitialPositionStateChanged()
+void PartEditSink::ClearInitialPositionStateChanged()
 {
   InitialPositionData.settings_changed=false;
 }
 
-Emitter3DState *awsSink::GetInitialPositionState()
+Emitter3DState *PartEditSink::GetInitialPositionState()
 {
   return &(InitialPositionData.state);
 }
 
-void awsSink::SetInitialPositionState(Emitter3DState *source)
+void PartEditSink::SetInitialPositionState(Emitter3DState *source)
 {
   memcpy(&(InitialPositionData.state),source,sizeof(Emitter3DState));
   ClearInitialPositionStateChanged();
   UpdateInitialPositionStateDisplay();
 }
 
-void awsSink::UpdateInitialPositionStateDisplay()
+void PartEditSink::UpdateInitialPositionStateDisplay()
 {
   csRef<iString> value;
 
@@ -2114,29 +2114,29 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTWeight,
 									 UpdateInitialSpeedStateDisplay)
 
 
-bool awsSink::InitialSpeedStateChanged()
+bool PartEditSink::InitialSpeedStateChanged()
 {
   return InitialSpeedData.settings_changed;
 }
 
-void awsSink::ClearInitialSpeedStateChanged()
+void PartEditSink::ClearInitialSpeedStateChanged()
 {
   InitialSpeedData.settings_changed=false;
 }
 
-Emitter3DState *awsSink::GetInitialSpeedState()
+Emitter3DState *PartEditSink::GetInitialSpeedState()
 {
   return &(InitialSpeedData.state);
 }
 
-void awsSink::SetInitialSpeedState(Emitter3DState *source)
+void PartEditSink::SetInitialSpeedState(Emitter3DState *source)
 {
   memcpy(&(InitialSpeedData.state),source,sizeof(Emitter3DState));
   ClearInitialSpeedStateChanged();
   UpdateInitialSpeedStateDisplay();
 }
 
-void awsSink::UpdateInitialSpeedStateDisplay()
+void PartEditSink::UpdateInitialSpeedStateDisplay()
 {
   csRef<iString> value;
 
@@ -2458,29 +2458,29 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTWeight,
 									 UpdateInitialAccelerationStateDisplay)
 
 
-bool awsSink::InitialAccelerationStateChanged()
+bool PartEditSink::InitialAccelerationStateChanged()
 {
   return InitialAccelerationData.settings_changed;
 }
 
-void awsSink::ClearInitialAccelerationStateChanged()
+void PartEditSink::ClearInitialAccelerationStateChanged()
 {
   InitialAccelerationData.settings_changed=false;
 }
 
-Emitter3DState *awsSink::GetInitialAccelerationState()
+Emitter3DState *PartEditSink::GetInitialAccelerationState()
 {
   return &(InitialAccelerationData.state);
 }
 
-void awsSink::SetInitialAccelerationState(Emitter3DState *source)
+void PartEditSink::SetInitialAccelerationState(Emitter3DState *source)
 {
   memcpy(&(InitialAccelerationData.state),source,sizeof(Emitter3DState));
   ClearInitialAccelerationStateChanged();
   UpdateInitialAccelerationStateDisplay();
 }
 
-void awsSink::UpdateInitialAccelerationStateDisplay()
+void PartEditSink::UpdateInitialAccelerationStateDisplay()
 {
   csRef<iString> value;
 
@@ -2807,29 +2807,29 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTWeight,
 									 UpdateFieldSpeedStateDisplay)
 
 
-bool awsSink::FieldSpeedStateChanged()
+bool PartEditSink::FieldSpeedStateChanged()
 {
   return FieldSpeedData.settings_changed;
 }
 
-void awsSink::ClearFieldSpeedStateChanged()
+void PartEditSink::ClearFieldSpeedStateChanged()
 {
   FieldSpeedData.settings_changed=false;
 }
 
-FieldState *awsSink::GetFieldSpeedState()
+FieldState *PartEditSink::GetFieldSpeedState()
 {
   return &(FieldSpeedData.state);
 }
 
-void awsSink::SetFieldSpeedState(FieldState *source)
+void PartEditSink::SetFieldSpeedState(FieldState *source)
 {
   memcpy(&(FieldSpeedData.state),source,sizeof(FieldState));
   ClearFieldSpeedStateChanged();
   UpdateFieldSpeedStateDisplay();
 }
 
-void awsSink::UpdateFieldSpeedStateDisplay()
+void PartEditSink::UpdateFieldSpeedStateDisplay()
 {
   csRef<iString> value;
   bool bvalue;
@@ -3158,29 +3158,29 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTWeight,
 									 UpdateFieldAccelStateDisplay)
 
 
-bool awsSink::FieldAccelStateChanged()
+bool PartEditSink::FieldAccelStateChanged()
 {
   return FieldAccelerationData.settings_changed;
 }
 
-void awsSink::ClearFieldAccelStateChanged()
+void PartEditSink::ClearFieldAccelStateChanged()
 {
   FieldAccelerationData.settings_changed=false;
 }
 
-FieldState *awsSink::GetFieldAccelState()
+FieldState *PartEditSink::GetFieldAccelState()
 {
   return &(FieldAccelerationData.state);
 }
 
-void awsSink::SetFieldAccelState(FieldState *source)
+void PartEditSink::SetFieldAccelState(FieldState *source)
 {
   memcpy(&(FieldAccelerationData.state),source,sizeof(FieldState));
   ClearFieldAccelStateChanged();
   UpdateFieldAccelStateDisplay();
 }
 
-void awsSink::UpdateFieldAccelStateDisplay()
+void PartEditSink::UpdateFieldAccelStateDisplay()
 {
   csRef<iString> value;
   bool bvalue;
@@ -3513,29 +3513,29 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTWeight,
 									 UpdateAttractorStateDisplay)
 
 
-bool awsSink::AttractorStateChanged()
+bool PartEditSink::AttractorStateChanged()
 {
   return AttractorData.settings_changed;
 }
 
-void awsSink::ClearAttractorStateChanged()
+void PartEditSink::ClearAttractorStateChanged()
 {
   AttractorData.settings_changed=false;
 }
 
-AttractorState *awsSink::GetAttractorState()
+AttractorState *PartEditSink::GetAttractorState()
 {
   return &(AttractorData.state);
 }
 
-void awsSink::SetAttractorState(AttractorState *source)
+void PartEditSink::SetAttractorState(AttractorState *source)
 {
   memcpy(&(AttractorData.state),source,sizeof(AttractorState));
   ClearAttractorStateChanged();
   UpdateAttractorStateDisplay();
 }
 
-void awsSink::UpdateAttractorStateDisplay()
+void PartEditSink::UpdateAttractorStateDisplay()
 {
   csRef<iString> value;
 
@@ -3617,7 +3617,7 @@ IMPLEMENT_REGISTER_FUNCTION(RegisterFSScrollBar,FreeScrollData.iawscomponent_FSS
 ////
 //  "Free Scroll" test
 ////
-void awsSink::FreeScrollSetComponent(bool floatval,intptr_t value_pointer,iAwsComponent *associated,bool *invalidate_pointer)
+void PartEditSink::FreeScrollSetComponent(bool floatval,intptr_t value_pointer,iAwsComponent *associated,bool *invalidate_pointer)
 {
   csRef<iString> value;
   asink->FreeScrollData.iawscomponent_AssociatedTextBox=associated;
@@ -3747,7 +3747,7 @@ void awsSink::FreeScrollSetComponent(bool floatval,intptr_t value_pointer,iAwsCo
   }
 }
 
-void awsSink::AwsSetFSScrollBar(intptr_t sk, iAwsSource *source)
+void PartEditSink::AwsSetFSScrollBar(intptr_t sk, iAwsSource *source)
 {
   csRef<iString> value;
   float *value_as_float;
@@ -3775,7 +3775,7 @@ void awsSink::AwsSetFSScrollBar(intptr_t sk, iAwsSource *source)
   }
 }
 
-void awsSink::AwsSetFSTextBox(intptr_t sk, iAwsSource *source)
+void PartEditSink::AwsSetFSTextBox(intptr_t sk, iAwsSource *source)
 {
   iString *textvalue;
   csRef<iString> value;
@@ -3812,12 +3812,12 @@ IMPLEMENT_REGISTER_FUNCTION(RegisterAgingMoments,AgingMomentsData.iawscomponent_
 
 
 
-void awsSink::SetVFS(csRef<iVFS> newvfs)
+void PartEditSink::SetVFS(csRef<iVFS> newvfs)
 {
   vfs=newvfs;
 }
 
-csRef<iVFS> awsSink::GetVFS()
+csRef<iVFS> PartEditSink::GetVFS()
 {
   return vfs;
 }
