@@ -1559,7 +1559,6 @@ package cspace::csMath3;
 %ITERATORS = ();
 *WhichSide3D = *cspacec::csMath3_WhichSide3D;
 *Visible = *cspacec::csMath3_Visible;
-*FindIntersection = *cspacec::csMath3_FindIntersection;
 *Between = *cspacec::csMath3_Between;
 *SetMinMax = *cspacec::csMath3_SetMinMax;
 *DoubleArea3 = *cspacec::csMath3_DoubleArea3;
@@ -1672,6 +1671,7 @@ package cspace::csIntersect3;
 *BoxTriangle = *cspacec::csIntersect3_BoxTriangle;
 *BoxBox = *cspacec::csIntersect3_BoxBox;
 *FrustumFrustum = *cspacec::csIntersect3_FrustumFrustum;
+*TriangleTriangle = *cspacec::csIntersect3_TriangleTriangle;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csIntersect3(@_);
