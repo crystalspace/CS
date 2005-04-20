@@ -43,6 +43,8 @@ chronological order.
 	- Eric Sunshine mirgrated the csOBB unit tests out of csgeom/math3d.cpp
 	  and over to csgeom/t/obb.t in the new cppunit-based testing
 	  framework.
+	- Eric Sunshine augmented unittest.jam so that it adds an appropriate
+	  help message to `jam help'.
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the

@@ -572,3 +572,4 @@ UnitTestDisabled check_all ;
 NotFile check checkclean check_all check_allclean ;
 Depends check : check_all ;
 Depends clean : checkclean ;
+Help check : "Run unit tests" ;
