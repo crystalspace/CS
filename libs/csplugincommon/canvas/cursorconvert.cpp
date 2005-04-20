@@ -25,6 +25,20 @@
 
 #include "csplugincommon/canvas/cursorconvert.h"
 
+#define DEBUG_WRITE_IMAGES
+
+static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
+{
+  register int max = MAX (tR, tG);
+  max = MAX (max, tB);
+
+  sR -= tR; sG -= tG; sB -= tB;
+
+  return R_COEF_SQ * sR * sR * (32 - ((max - tR) >> 3)) +
+         G_COEF_SQ * sG * sG * (32 - ((max - tG) >> 3)) +
+         B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
+}
+
 bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap, 
 				       uint8*& mask,
 				       const csRGBcolor forecolor, 
@@ -39,7 +53,7 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
   csColorQuantizer quantizer;
   quantizer.Begin ();
 
-  csRGBpixel pal[2];
+  csRGBpixel pal[3];
   pal[0] = forecolor;
   pal[1] = backcolor;
   csRGBpixel transp;
@@ -55,46 +69,16 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
 #endif
   }
   quantizer.Count (pal, 2, &transp);
-
-  bool res = InternalConvertTo1bpp (myImage, quantizer, bitmap, mask, 
-    forecolor, backcolor, transp, XbitOrder);
-
-  quantizer.End ();
-
-  return res;
-}
-
-static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
-{
-  register int max = MAX (tR, tG);
-  max = MAX (max, tB);
-
-  sR -= tR; sG -= tG; sB -= tB;
-
-  return R_COEF_SQ * sR * sR * (32 - ((max - tR) >> 3)) +
-         G_COEF_SQ * sG * sG * (32 - ((max - tG) >> 3)) +
-         B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
-}
-
-bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
-					       csColorQuantizer& quantizer, 
-					       uint8*& bitmap, uint8*& mask,
-					       const csRGBcolor forecolor, 
-					       const csRGBcolor backcolor, 
-					       csRGBpixel keycolor,
-					       bool XbitOrder)
-{
-  csRGBpixel* pal = 0;
+  csRGBpixel* palPtr = 0;
   int maxcolors = 3; // fg, bg, keycolor
-  quantizer.Palette (pal, maxcolors, &keycolor);
-
+  quantizer.Palette (palPtr, maxcolors, &transp);
   int i;
   int best_dist = 1000000;
   int fgIndex = -1;
   for (i = 1 ; i < maxcolors ; i++)
   {
     int dist = rgb_dist (forecolor.red, forecolor.green, forecolor.blue, 
-      pal[i].red, pal[i].green, pal[i].blue);
+      palPtr[i].red, palPtr[i].green, palPtr[i].blue);
     if (dist < best_dist)
     {
       best_dist = dist;
@@ -105,6 +89,66 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
   if (fgIndex == -1)
     return false;
 
+  bool res = InternalConvertTo1bpp (myImage, quantizer, bitmap, mask, 
+    fgIndex, transp, palPtr, maxcolors, XbitOrder);
+
+  quantizer.End ();
+  delete[] palPtr;
+
+  return res;
+}
+
+bool csCursorConverter::ConvertTo1bppAutoColor (iImage* image, uint8*& bitmap, 
+				                uint8*& mask,
+				                csRGBcolor& forecolor, 
+				                csRGBcolor& backcolor, 
+				                const csRGBcolor* keycolor,
+				                bool XbitOrder)
+{
+  csRef<csImageMemory> myImage;
+  myImage.AttachNew (new csImageMemory (image, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+  myImage->SetName (image->GetName ());
+
+  csColorQuantizer quantizer;
+  quantizer.Begin ();
+
+  csRGBpixel transp;
+  if (keycolor)
+    transp = *keycolor;
+  else
+  {
+    transp.Set (255, 0, 255);
+    StripAlphaFromRGBA (myImage, transp);
+#ifdef DEBUG_WRITE_IMAGES
+    csDebugImageWriter::DebugImageWrite (myImage, "cursor-%s-stripped.png",
+      image->GetName ());
+#endif
+  }
+  quantizer.Count ((csRGBpixel*)myImage->GetImageData(), 
+    myImage->GetWidth() * myImage->GetHeight(), &transp);
+  csRGBpixel* pal = 0;
+  int maxcolors = 3; // fg, bg, keycolor
+  quantizer.Palette (pal, maxcolors, &transp);
+  int fgIndex = (pal[0] != transp) ? 0 : 1;
+
+  bool res = InternalConvertTo1bpp (myImage, quantizer, bitmap, mask, 
+    fgIndex, transp, pal, maxcolors, XbitOrder);
+
+  quantizer.End ();
+  delete[] pal;
+
+  return res;
+}
+
+bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
+					       csColorQuantizer& quantizer, 
+					       uint8*& bitmap, uint8*& mask,
+					       int fgIndex,
+					       csRGBpixel keycolor,
+					       csRGBpixel* pal, 
+					       int maxcolors, 
+					       bool XbitOrder)
+{
   const int imgW = image->GetWidth ();
   const int imgH = image->GetHeight ();
   uint8* outPixels = new uint8[imgW * imgH];
@@ -123,7 +167,6 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
       image->GetName ());
   }
 #endif
-  delete[] pal;
 
   const int bytesPerBitmapLine = (imgW + 7) / 8;
   const int bitmapSize = bytesPerBitmapLine * imgH;

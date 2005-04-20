@@ -42,8 +42,8 @@ class CS_CRYSTALSPACE_EXPORT csCursorConverter
 {
   static bool InternalConvertTo1bpp (iImage* image, 
     csColorQuantizer& quantizer, uint8*& bitmap, uint8*& mask,
-    const csRGBcolor forecolor, const csRGBcolor backcolor, 
-    csRGBpixel keycolor, bool XbitOrder);
+    int fgIndex, csRGBpixel keycolor, csRGBpixel* pal, int maxcolors, 
+    bool XbitOrder);
 public:
   /**
    * Convert an image to 1bpp, computing an appropriate bitmap (by dithering
@@ -52,6 +52,14 @@ public:
    */
   static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
+    const csRGBcolor* keycolor = 0, bool XbitOrder = false);
+  /**
+   * Convert an image to 1bpp, computing an appropriate bitmap. The difference
+   * to ConvertTo1bpp() is that this method computes appropriate 
+   * foreground and background colors.
+   */
+  static bool ConvertTo1bppAutoColor (iImage* image, uint8*& bitmap, 
+    uint8*& mask, csRGBcolor& forecolor, csRGBcolor& backcolor, 
     const csRGBcolor* keycolor = 0, bool XbitOrder = false);
   /**
    * Convert an image to 8bpp, computing an appropriate palette and sets

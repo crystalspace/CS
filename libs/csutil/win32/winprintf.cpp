@@ -54,9 +54,9 @@ static const WORD ansiToWindows[8] =
 
 static int _cs_fputs (const char* string, FILE* stream)
 {
-  UINT cp;
-  HANDLE hCon; 
-  WORD textAttr, oldAttr;
+  UINT cp = CP_ACP;
+  HANDLE hCon = 0; 
+  WORD textAttr = 0, oldAttr = 0;
   bool isTTY = _isatty (_fileno (stream));
   if (isTTY) 
   {

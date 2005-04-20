@@ -25,14 +25,14 @@
  * 2005-04-15 ported to CS by Andrew Dai
  */
 
-#include <math.h>
 #include "cssysdef.h"
+#include <math.h>
 
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
 #include "csgeom/segment.h"
 
-#define FABS(x) ((float)fabs(x))        /* implement as is fastest on your machine */
+#define FABS(x) (fabsf(x))        /* implement as is fastest on your machine */
 
 /* if USE_EPSILON_TEST is true then we do a check: 
          if |dv|<SMALL_EPSILON then dv=0.0;

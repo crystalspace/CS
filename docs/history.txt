@@ -46,6 +46,12 @@ chronological order.
 	- Eric Sunshine augmented unittest.jam so that it adds an appropriate
 	  help message to `jam help'.
 	- Eric Sunshine added 'jam install' goop for CS/data/shader/snippets.
+	- res fixed some warnings reportedly emitted by GCC in winprintf.cpp.
+	- res added a method to csCursorConverter to generate a 1bpp cursor,
+	  but foreground and background color are automatically determined
+	  (instead of having to be provided by the user).
+	- res fixed VS8 compiler warnings caused by a wrong include order in
+	  tritri.cpp and also made the FABS macro use fabsf().
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
