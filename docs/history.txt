@@ -37,6 +37,9 @@ chronological order.
 	    NotBOL         --> csrxNotBOL
 	    NotEOL         --> csrxNotEOL
 	- Eric Sunshine removed the do-nothing csUtilDebugHelper.
+	- Eric Sunshine mirgrated the csPolygonMesh unit tests out of
+	  csgeom/math3d.cpp and over to csgeom/t/polymesh.t in the new
+	  cppunit-based testing framework. Invoke `jam check' to run the tests.
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
