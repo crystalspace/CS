@@ -3945,7 +3945,7 @@ sub t2h_default_image($$$$)
    my $preformatted = shift;
    my $file_name = shift;
    return "[ $base ]" if ($preformatted);
-   return "<img src=\"$file\" alt=\"$base\">";
+   return "<img src=\"$file_name\" alt=\"$base\">";
 }
 
 # address put in footer describing when was generated and who did the manual

@@ -8,6 +8,12 @@ chronological order.
 
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
+	- Eric Sunshine fixed configuration problem in texi2html.init which
+	  caused texi2html v1.76 to emit <img src="..."> tags with paths to the
+	  images in the original source directory (such as
+	  "../docs/texinfo/foo/bar.jpg") rather than correct paths relative to
+	  the output directory (such as "foo/bar.jpg"). This prevented images
+	  from displaying in the generated HTML translation of the CS manual.
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
