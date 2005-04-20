@@ -31,12 +31,15 @@ csStringHash::~csStringHash ()
 
 void csStringHash::Copy(csStringHash const& h)
 {
-  GlobalIterator it(h.GetIterator());
-  while (it.HasNext())
+  if (&h != this)
   {
-    char const* s;
-    csStringID id = it.Next(s);
-    Register(s, id);
+    GlobalIterator it(h.GetIterator());
+    while (it.HasNext())
+    {
+      char const* s;
+      csStringID id = it.Next(s);
+      Register(s, id);
+    }
   }
 }
 

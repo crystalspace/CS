@@ -31,9 +31,12 @@ csStringSet::~csStringSet ()
 
 void csStringSet::Copy(csStringSet const& s)
 {
-  registry = s.registry;
-  reverse  = s.reverse;
-  next_id  = s.next_id;
+  if (&s != this)
+  {
+    registry = s.registry;
+    reverse  = s.reverse;
+    next_id  = s.next_id;
+  }
 }
 
 csStringID csStringSet::Request (const char* s)

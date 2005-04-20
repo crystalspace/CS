@@ -182,7 +182,7 @@ public:
   ~csPluginPaths() {}
   /// Assignment operator.
   csPluginPaths& operator=(csPluginPaths const& o)
-  { paths = o.paths; return *this; }
+  { if (&o != this) paths = o.paths; return *this; }
 
   /**
    * Add a path, but only if it isn't in the list already.
