@@ -27,7 +27,6 @@
 #include "iutil/vfs.h"
 #include "cstool/initapp.h"
 #include "csgeom/math3d.h"
-#include "csutil/utiltest.h"
 #include "iengine/viscull.h"
 #include "ivaria/collider.h"
 #include "imap/services.h"
@@ -112,12 +111,6 @@ static int DoStuff (iObjectRegistry* object_reg)
   csGeomDebugHelper* geomdbghelp = new csGeomDebugHelper ();
   Test (geomdbghelp, "csgeom");
   delete geomdbghelp;
-
-  csPrintf ("================================================================\n");
-
-  csUtilDebugHelper* utildbghelp = new csUtilDebugHelper ();
-  Test (utildbghelp, "csutil");
-  delete utildbghelp;
 
   csPrintf ("================================================================\n");
 

@@ -36,6 +36,7 @@ chronological order.
 	    NoMatch        --> csrxNoMatch
 	    NotBOL         --> csrxNotBOL
 	    NotEOL         --> csrxNotEOL
+	- Eric Sunshine removed the do-nothing csUtilDebugHelper.
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
