@@ -1255,8 +1255,6 @@ class csMath3(_object):
     if _newclass:WhichSide3D = staticmethod(_cspace.csMath3_WhichSide3D)
     __swig_getmethods__["Visible"] = lambda x: _cspace.csMath3_Visible
     if _newclass:Visible = staticmethod(_cspace.csMath3_Visible)
-    __swig_getmethods__["FindIntersection"] = lambda x: _cspace.csMath3_FindIntersection
-    if _newclass:FindIntersection = staticmethod(_cspace.csMath3_FindIntersection)
     __swig_getmethods__["Between"] = lambda x: _cspace.csMath3_Between
     if _newclass:Between = staticmethod(_cspace.csMath3_Between)
     __swig_getmethods__["SetMinMax"] = lambda x: _cspace.csMath3_SetMinMax
@@ -1298,8 +1296,6 @@ _cspace.csMath3_swigregister(csMath3Ptr)
 csMath3_WhichSide3D = _cspace.csMath3_WhichSide3D
 
 csMath3_Visible = _cspace.csMath3_Visible
-
-csMath3_FindIntersection = _cspace.csMath3_FindIntersection
 
 csMath3_Between = _cspace.csMath3_Between
 
@@ -1419,6 +1415,8 @@ class csIntersect3(_object):
     if _newclass:BoxBox = staticmethod(_cspace.csIntersect3_BoxBox)
     __swig_getmethods__["FrustumFrustum"] = lambda x: _cspace.csIntersect3_FrustumFrustum
     if _newclass:FrustumFrustum = staticmethod(_cspace.csIntersect3_FrustumFrustum)
+    __swig_getmethods__["TriangleTriangle"] = lambda x: _cspace.csIntersect3_TriangleTriangle
+    if _newclass:TriangleTriangle = staticmethod(_cspace.csIntersect3_TriangleTriangle)
     def __init__(self, *args):
         _swig_setattr(self, csIntersect3, 'this', _cspace.new_csIntersect3(*args))
         _swig_setattr(self, csIntersect3, 'thisown', 1)
@@ -1484,6 +1482,8 @@ csIntersect3_BoxTriangle = _cspace.csIntersect3_BoxTriangle
 csIntersect3_BoxBox = _cspace.csIntersect3_BoxBox
 
 csIntersect3_FrustumFrustum = _cspace.csIntersect3_FrustumFrustum
+
+csIntersect3_TriangleTriangle = _cspace.csIntersect3_TriangleTriangle
 
 class csGeomDebugHelper(iDebugHelper):
     __swig_setmethods__ = {}
