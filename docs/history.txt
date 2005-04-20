@@ -14,6 +14,28 @@ chronological order.
 	  "../docs/texinfo/foo/bar.jpg") rather than correct paths relative to
 	  the output directory (such as "foo/bar.jpg"). This prevented images
 	  from displaying in the generated HTML translation of the CS manual.
+	- Eric Sunshine renamed the following csRegExpMatchError and
+	  csRegExpMatchFlags constants in order to avoid global namespace
+	  pollution.
+	    BadBraces      --> csrxBadBraces
+	    BadPattern     --> csrxBadPattern
+	    BadRepetition  --> csrxBadRepetition
+	    ErrBraces      --> csrxErrBraces
+	    ErrBrackets    --> csrxErrBrackets
+	    ErrCharType    --> csrxErrCharType
+	    ErrCollate     --> csrxErrCollate
+	    ErrEscape      --> csrxErrEscape
+	    ErrParentheses --> csrxErrParentheses
+	    ErrRange       --> csrxErrRange
+	    ErrSpace       --> csrxErrSpace
+	    ErrSubReg      --> csrxErrSubReg
+	    ErrUnknown     --> csrxErrUnknown
+	    IgnoreCase     --> csrxIgnoreCase
+	    NewLine        --> csrxNewLine
+	    NoError        --> csrxNoError
+	    NoMatch        --> csrxNoMatch
+	    NotBOL         --> csrxNotBOL
+	    NotEOL         --> csrxNotEOL
 19-Apr-2005
 	- Eric Sunshine enabled the Microsoft HTML Help "search" feature in
 	  CS/docs/support/winhelp/csapi.hhp and csmanual.hhp. This allows the
@@ -22,7 +44,7 @@ chronological order.
 	- Eric Sunshine disabled $USE_ISO in CS/docs/support/texi2html.init
 	  since it caused the Texinfo @result{} to be rendered as an unknown
 	  glyph in the Microsoft Compressed Help (.chm) files (at least on the
-	  Windows platforms I tested, which admittedly are old).
+	  Windows platforms I tested which, admittedly, are old).
 	- Khaki Lord added two new functions csIntersect3::TriangleTriangle().
 	  These replace the old and partially broken function
 	  csMath3::FindIntersection().
@@ -51,7 +73,7 @@ chronological order.
 	      depth. The notation has changed, as well. Some example verbosity
 	      identifiers: "scf", "scf.plugin", "scf.plugin.scan",
 	      "scf.plugin.load", "scf.plugin.load.debug", etc.
-	    - The implied parent/child relationship of Verbosity identifiers is
+	    - The implied parent/child relationship of verbosity identifiers is
 	      now respected. For instance, an explicit "+foo" will now
 	      implicitly enable verbosity for all children of `foo', such as
 	      "foo.bar", "foo.baz", "foo.baz.cow", etc. Searches for verbosity
@@ -165,7 +187,7 @@ chronological order.
 	  Similar functionality can be achieved by using either iMaterial or
 	  iTextureHandle.
 	- Luca replaced use of imap/parser.h with imap/loader.h in 
-	  CS\libs\cstool/initapp.cpp .
+	  CS/libs/cstool/initapp.cpp .
 	- res fixed the HOM in terrainf.
 	- res added the ability to not use the specified default shader in
 	  case shaders of a certain type are present on a material to the 

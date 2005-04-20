@@ -32,66 +32,66 @@
 enum csRegExpMatchError
 {
   /// No problems during matching.
-  NoError,
+  csrxNoError,
   /// The pattern didn't match the string.
-  NoMatch,
+  csrxNoMatch,
   /**
    * There was an invalid \c \\{...\\} construct in the regular expression. 
    * A valid \c \\{...\\} construct must contain either a single number, or 
    * two numbers in increasing order separated by a comma.
    */
-  BadBraces,
+  csrxBadBraces,
   /**
    * There was a syntax error in the regular expression. 
    */
-  BadPattern,
+  csrxBadPattern,
   /**
    * A repetition operator such as ? or * appeared in a bad position (with no 
    * preceding subexpression to act on). 
    */
-  BadRepetition,
+  csrxBadRepetition,
   /**
    * The regular expression referred to an invalid collating element (one not 
    * defined in the current locale for string collation).
    */
-  ErrCollate,
+  csrxErrCollate,
   /**
    * The regular expression referred to an invalid character class name. 
    */
-  ErrCharType,
+  csrxErrCharType,
   /** 
    * The regular expression ended with \c \\. 
    */
-  ErrEscape,
+  csrxErrEscape,
   /**
    * There was an invalid number in the \c \\digit construct. 
    */
-  ErrSubReg,
+  csrxErrSubReg,
   /**
    * There were unbalanced square brackets in the regular expression. 
    */
-  ErrBrackets,
+  csrxErrBrackets,
   /**
    * An extended regular expression had unbalanced parentheses, or a basic 
    * regular expression had unbalanced \c \\( and \c \\).
    */
-  ErrParentheses,
+  csrxErrParentheses,
   /**
    * The regular expression had unbalanced \c \\{ and \c \\}. 
    */
-  ErrBraces,
+  csrxErrBraces,
   /**
    * One of the endpoints in a range expression was invalid. 
    */
-  ErrRange,
+  csrxErrRange,
   /**
    * Out of memory.
    */
-  ErrSpace,
+  csrxErrSpace,
   /**
    * Unknown error.
    */
-  ErrUnknown
+  csrxErrUnknown
 };
 
 /**
@@ -102,7 +102,7 @@ enum csRegExpMatchFlags
   /**
    * Ignore case when matching letters.
    */
-  IgnoreCase = 1,
+  csrxIgnoreCase = 1,
   /**
    * Treat a newline in string as dividing string into multiple lines, so that 
    * \c $ can match before the newline and \c ^ can match after. Also, don't 
@@ -111,18 +111,18 @@ enum csRegExpMatchFlags
    *
    * Otherwise, newline acts like any other ordinary character. 
    */
-  NewLine = 2,
+  csrxNewLine = 2,
   /**
    * Do not regard the beginning of the specified string as the beginning of a 
    * line; more generally, don't make any assumptions about what text might 
    * precede it. 
    */
-  NotBOL = 4,
+  csrxNotBOL = 4,
   /**
    * Do not regard the end of the specified string as the end of a line; more 
    * generally, don't make any assumptions about what text might follow it.
    */
-  NotEOL = 8
+  csrxNotEOL = 8
 };
 
 /**
@@ -177,7 +177,7 @@ public:
    * \param string String against which to attempt match.
    * \param flags One or more of csRegExpMatchFlags.  Flags are combined using
    *   the bitwise-or \p | operator.
-   * \return NoError in case of success, else an error code.
+   * \return csrxNoError in case of success, else an error code.
    * \note Also check the "Implementation note" in the csRegExpMatcher
    *  description.
    */
@@ -190,7 +190,7 @@ public:
    *  (sub)expression matches.
    * \param flags One or more of csRegExpMatchFlags.  Flags are combined using
    *   the bitwise-or \p | operator.
-   * \return NoError in case of success, else an error code.
+   * \return csrxNoError in case of success, else an error code.
    * \note Also check the "Implementation note" in the csRegExpMatcher
    *  description.
    */

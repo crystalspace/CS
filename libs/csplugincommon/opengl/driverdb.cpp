@@ -227,7 +227,7 @@ bool csDriverDBReader::ParseRegexp (iDocumentNode* node, bool& result)
   }
 
   csRegExpMatcher re (pattern);
-  result = (re.Match (str) == NoError);
+  result = (re.Match (str) == csrxNoError);
   return true;
 }
 

@@ -72,7 +72,7 @@ bool litObjectSelectByKeyValueRE::SelectObject (iObject* obj)
       if (!strcmp (keyname, kp->GetKey ()))
       {
         const char* v = kp->GetValue (keyattrtype);
-	if (v && matcher.Match (v) == NoError)
+	if (v && matcher.Match (v) == csrxNoError)
 	  return true;
       }
     }

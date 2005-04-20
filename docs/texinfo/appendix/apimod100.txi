@@ -242,6 +242,109 @@ global namespace.
 
 @itemize @bullet
 @item
+@code{BadBraces} @result{} @code{csrxBadBraces}
+@item
+@code{BadPattern} @result{} @code{csrxBadPattern}
+@item
+@code{BadRepetition} @result{} @code{csrxBadRepetition}
+@item
+@code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
+@item
+@code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
+@item
+@code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
+@item
+@code{DO_MMX} @result{} @code{CS_HAVE_MMX}
+@item
+@code{DO_NASM} @result{} @code{CS_HAVE_NASM}
+@item
+@code{ErrBraces} @result{} @code{csrxErrBraces}
+@item
+@code{ErrBrackets} @result{} @code{csrxErrBrackets}
+@item
+@code{ErrCharType} @result{} @code{csrxErrCharType}
+@item
+@code{ErrCollate} @result{} @code{csrxErrCollate}
+@item
+@code{ErrEscape} @result{} @code{csrxErrEscape}
+@item
+@code{ErrParentheses} @result{} @code{csrxErrParentheses}
+@item
+@code{ErrRange} @result{} @code{csrxErrRange}
+@item
+@code{ErrSpace} @result{} @code{csrxErrSpace}
+@item
+@code{ErrSubReg} @result{} @code{csrxErrSubReg}
+@item
+@code{ErrUnknown} @result{} @code{csrxErrUnknown}
+@item
+@code{IgnoreCase} @result{} @code{csrxIgnoreCase}
+@item
+@code{MKDIR()} @result{} @code{CS_MKDIR()}
+@item
+@code{MemEntry} @result{} @code{csMemTrackerEntry}
+@item
+@code{MemTrackerInfo} @result{} @code{csMemTrackerInfo}
+@item
+@code{MemTrackerModule} @result{} @code{csMemTrackerModule}
+@item
+@code{MemTrackerRegistry} @result{} @code{csMemTrackerRegistry}
+@item
+@code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
+@item
+@code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
+@item
+@code{NewLine} @result{} @code{csrxNewLine}
+@item
+@code{NoError} @result{} @code{csrxNoError}
+@item
+@code{NoMatch} @result{} @code{csrxNoMatch}
+@item
+@code{NotBOL} @result{} @code{csrxNotBOL}
+@item
+@code{NotEOL} @result{} @code{csrxNotEOL}
+@item
+@code{OS_DOS} @result{} @code{CS_PLATFORM_DOS}
+@item
+@code{OS_MACOSX} @result{} @code{CS_PLATFORM_MACOSX}
+@item
+@code{OS_UNIX} @result{} @code{CS_PLATFORM_UNIX}
+@item
+@code{OS_WIN32} @result{} @code{CS_PLATFORM_WIN32}
+@item
+@code{PATH_DELIMITER} @result{} @code{CS_PATH_DELIMITER}
+@item
+@code{PATH_SEPARATOR} @result{} @code{CS_PATH_SEPARATOR}
+@item
+@code{PROC_arch} @result{} @code{CS_PROCESSOR_arch} (where @samp{arch} is
+@samp{X86}, @samp{M68K}, etc.)
+@item
+@code{ProcEventHandler()} @result{} @code{csProcTexEventHandler}
+@item
+@code{QInt()} @result{} @code{csQint()}
+@item
+@code{QInt16()} @result{} @code{csQfixed16()}
+@item
+@code{QInt24()} @result{} @code{csQfixed24()}
+@item
+@code{QInt8()} @result{} @code{csQfixed8()}
+@item
+@code{QRound()} @result{} @code{csQround()}
+@item
+@code{RegisterMemoryTrackerModule()} @result{} @code{mtiRegisterModule()}
+@item
+@code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
+@item
+@code{TEMP_FILE} @result{} @code{CS_TEMP_FILE}
+@item
+@code{UnMemoryMapFile()} @result{} @code{csUnMemoryMapFile()}
+@item
+@code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
+@item
+@code{__NEED_GENERIC_ISDIR} @result{} @code{CS_USE_CUSTOM_ISDIR}
+@item
+@code{__NEED_OPENDIR_PROTOTYPE} @result{} @code{CS_WIN32_USE_CUSTOM_OPENDIR}
+@item
 @code{big_endian_float()} @result{} @code{csBigEndianFloat()}
 @item
 @code{big_endian_long()} @result{} @code{csBigEndianLong()}
@@ -250,17 +353,7 @@ global namespace.
 @item
 @code{big_endian_short()} @result{} @code{csBigEndianShort()}
 @item
-@code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
-@item
-@code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
-@item
-@code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
-@item
 @code{convert_endian()} @result{} @code{csConvertEndian()}
-@item
-@code{DO_MMX} @result{} @code{CS_HAVE_MMX}
-@item
-@code{DO_NASM} @result{} @code{CS_HAVE_NASM}
 @item
 @code{double2longlong()} @result{} @code{csDoubleToLongLong()}
 @item
@@ -288,58 +381,11 @@ global namespace.
 @item
 @code{longlong2double()} @result{} @code{csLongLongToDouble()}
 @item
-@code{MemEntry} @result{} @code{csMemTrackerEntry}
-@item
-@code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
-@item
-@code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
-@item
-@code{MemTrackerInfo} @result{} @code{csMemTrackerInfo}
-@item
-@code{MemTrackerModule} @result{} @code{csMemTrackerModule}
-@item
-@code{MemTrackerRegistry} @result{} @code{csMemTrackerRegistry}
-@item
-@code{MKDIR()} @result{} @code{CS_MKDIR()}
-@item
 @code{mmioInfo} @result{} @code{csMemMapInfo}
-@item
-@code{__NEED_GENERIC_ISDIR} @result{} @code{CS_USE_CUSTOM_ISDIR}
-@item
-@code{__NEED_OPENDIR_PROTOTYPE} @result{} @code{CS_WIN32_USE_CUSTOM_OPENDIR}
-@item
-@code{OS_DOS} @result{} @code{CS_PLATFORM_DOS}
-@item
-@code{OS_MACOSX} @result{} @code{CS_PLATFORM_MACOSX}
-@item
-@code{OS_UNIX} @result{} @code{CS_PLATFORM_UNIX}
-@item
-@code{OS_WIN32} @result{} @code{CS_PLATFORM_WIN32}
-@item
-@code{PATH_DELIMITER} @result{} @code{CS_PATH_DELIMITER}
-@item
-@code{PATH_SEPARATOR} @result{} @code{CS_PATH_SEPARATOR}
-@item
-@code{PROC_arch} @result{} @code{CS_PROCESSOR_arch} (where @samp{arch} is
-@samp{X86}, @samp{M68K}, etc.)
-@item
-@code{ProcEventHandler()} @result{} @code{csProcTexEventHandler}
-@item
-@code{QInt()} @result{} @code{csQint()}
-@item
-@code{QInt8()} @result{} @code{csQfixed8()}
-@item
-@code{QInt16()} @result{} @code{csQfixed16()}
-@item
-@code{QInt24()} @result{} @code{csQfixed24()}
 @item
 @code{qisqrt()} @result{} @code{csQisqrt()}
 @item
-@code{QRound()} @result{} @code{csQround()}
-@item
 @code{qsqrt()} @result{} @code{csQsqrt()}
-@item
-@code{RegisterMemoryTrackerModule()} @result{} @code{mtiRegisterModule()}
 @item
 @code{set_le_float16()} @result{} @code{csSetLittleEndianFloat16()}
 @item
@@ -350,14 +396,6 @@ global namespace.
 @code{set_le_short()} @result{} @code{csSetLittleEndianShort()}
 @item
 @code{short2float()} @result{} @code{csShortToFloat()}
-@item
-@code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
-@item
-@code{TEMP_FILE} @result{} @code{CS_TEMP_FILE}
-@item
-@code{UnMemoryMapFile()} @result{} @code{csUnMemoryMapFile()}
-@item
-@code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
 @end itemize
 
 @subheading @file{cssysdef.h} Changes

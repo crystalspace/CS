@@ -25,8 +25,8 @@
 static int exec_flags(int flags)
 {
   int execflags = 0;
-  if (flags & NotBOL) execflags |= REG_NOTBOL;
-  if (flags & NotEOL) execflags |= REG_NOTEOL;
+  if (flags & csrxNotBOL) execflags |= REG_NOTBOL;
+  if (flags & csrxNotEOL) execflags |= REG_NOTEOL;
   return execflags;
 }
 
@@ -35,8 +35,8 @@ bool csRegExpMatcher::Compile (int flags, bool nosub)
   int needFlags = 0;
   if (extendedRE) needFlags |= REG_EXTENDED;
   if (nosub) needFlags |= REG_NOSUB;
-  if (flags & IgnoreCase) needFlags |= REG_ICASE;
-  if (flags & NewLine) needFlags |= REG_NEWLINE;
+  if (flags & csrxIgnoreCase) needFlags |= REG_ICASE;
+  if (flags & csrxNewLine) needFlags |= REG_NEWLINE;
 
   if ((regex == 0) || 
     ((needFlags & ~REG_NOSUB) != (compiledFlags & ~REG_NOSUB)) ||
@@ -51,23 +51,23 @@ bool csRegExpMatcher::Compile (int flags, bool nosub)
 
     switch (res)
     {
-      case 0:		  compileError = NoError;	  break;
-      case REG_BADBR:	  compileError = BadBraces;	  break;
-      case REG_BADPAT:	  compileError = BadPattern;	  break;
-      case REG_BADRPT:	  compileError = BadRepetition;	  break;
-      case REG_ECOLLATE:  compileError = ErrCollate;	  break;
-      case REG_ECTYPE:	  compileError = ErrCharType;	  break;
-      case REG_EESCAPE:	  compileError = ErrEscape;	  break;
-      case REG_ESUBREG:	  compileError = ErrSubReg;	  break;
-      case REG_EBRACK:	  compileError = ErrBrackets;	  break;
-      case REG_EPAREN:	  compileError = ErrParentheses;  break;
-      case REG_EBRACE:	  compileError = ErrBraces;	  break;
-      case REG_ERANGE:	  compileError = ErrRange;	  break;
-      case REG_ESPACE:	  compileError = ErrSpace;	  break;
-      default:            compileError = ErrUnknown;      break;
+      case 0:		  compileError = csrxNoError;        break;
+      case REG_BADBR:	  compileError = csrxBadBraces;      break;
+      case REG_BADPAT:	  compileError = csrxBadPattern;     break;
+      case REG_BADRPT:	  compileError = csrxBadRepetition;  break;
+      case REG_ECOLLATE:  compileError = csrxErrCollate;     break;
+      case REG_ECTYPE:	  compileError = csrxErrCharType;    break;
+      case REG_EESCAPE:	  compileError = csrxErrEscape;	     break;
+      case REG_ESUBREG:	  compileError = csrxErrSubReg;      break;
+      case REG_EBRACK:	  compileError = csrxErrBrackets;    break;
+      case REG_EPAREN:	  compileError = csrxErrParentheses; break;
+      case REG_EBRACE:	  compileError = csrxErrBraces;      break;
+      case REG_ERANGE:	  compileError = csrxErrRange;       break;
+      case REG_ESPACE:	  compileError = csrxErrSpace;       break;
+      default:            compileError = csrxErrUnknown;     break;
     }
   }
-  return (compileError == NoError);
+  return (compileError == csrxNoError);
 }
 
 csRegExpMatcher::csRegExpMatcher (const char* pattern, bool extendedRE) : 
@@ -92,7 +92,7 @@ csRegExpMatchError csRegExpMatcher::Match (const char* string, int flags)
   if (!Compile (flags, true))
     return compileError;
   return (regexec ((regex_t*)regex, string, 0, 0, exec_flags(flags)) == 0) ?
-    NoError : NoMatch;
+    csrxNoError : csrxNoMatch;
 }
 
 csRegExpMatchError csRegExpMatcher::Match (const char* string, 
@@ -106,7 +106,7 @@ csRegExpMatchError csRegExpMatcher::Match (const char* string,
   CS_ALLOC_STACK_ARRAY(regmatch_t, re_matches, ((regex_t*)regex)->re_nsub);
   if (regexec ((regex_t*)regex, string, ((regex_t*)regex)->re_nsub,
       re_matches, exec_flags(flags)) != 0)
-    return NoMatch;
+    return csrxNoMatch;
 
   for (size_t i = 0; i < ((regex_t*)regex)->re_nsub; i++)
   {
@@ -115,6 +115,6 @@ csRegExpMatchError csRegExpMatcher::Match (const char* string,
     match.endOffset = re_matches[i].rm_eo;
     matches.Push (match);
   }
-  return NoError;
+  return csrxNoError;
 }
 

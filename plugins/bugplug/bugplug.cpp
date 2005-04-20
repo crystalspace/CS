@@ -388,7 +388,7 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   for (i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* mesh = ml->Get (i);
-    if (NoError == matcher.Match (mesh->QueryObject ()->GetName ()))
+    if (csrxNoError == matcher.Match (mesh->QueryObject ()->GetName ()))
     {
       cnt++;
       AddSelectedMesh (mesh);

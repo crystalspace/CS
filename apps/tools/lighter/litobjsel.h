@@ -88,14 +88,14 @@ public:
   virtual const char* IsValid ()
   {
     csRegExpMatchError rc = matcher.Match ("");
-    if (rc == NoError || rc == NoMatch) return 0;
+    if (rc == csrxNoError || rc == csrxNoMatch) return 0;
     static csString error_string;
     error_string.Format ("Regexp error %d", (int)rc);
     return error_string;
   }
   virtual bool SelectObject (iObject* obj)
   {
-    return matcher.Match (obj->GetName ()) == NoError;
+    return matcher.Match (obj->GetName ()) == csrxNoError;
   }
 };
 
@@ -209,7 +209,7 @@ public:
   virtual const char* IsValid ()
   {
     csRegExpMatchError rc = matcher.Match ("");
-    if (rc == NoError || rc == NoMatch) return 0;
+    if (rc == csrxNoError || rc == csrxNoMatch) return 0;
     static csString error_string;
     error_string.Format ("Regexp error %d", (int)rc);
     return error_string;
