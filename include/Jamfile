@@ -85,8 +85,6 @@ CS_MASTER_HEADER_REJECTS =
   }
 }
 
-Echo "REJECTS" $(CS_MASTER_HEADER_REJECTS) ;
-
 CS_MASTER_HEADER_BOILERPLATE =
 "/*
     This library is free software; you can redistribute it and/or
