@@ -12,6 +12,8 @@ chronological order.
 	  header all of the cs-win32libs headers, as well as the new
 	  special-purpose <csutil/win32/SpecStrings.h>.
 	- Eric Sunshine fixed `delete' vs. `delete[]' bug in csMemoryPool.
+	- Eric Sunshine fixed a few problems in various unit tests reported by
+	  valgrind.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which
