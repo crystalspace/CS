@@ -14,6 +14,13 @@ chronological order.
 	- Eric Sunshine fixed `delete' vs. `delete[]' bug in csMemoryPool.
 	- Eric Sunshine fixed a few problems in various unit tests reported by
 	  valgrind.
+	- Eric Sunshine augmented configure.ac so that the "enable exceptions"
+	  check also attempts to employ -fno-omit-frame-pointer, since the
+	  omission of frame pointers is incompatible with exception handling.
+	  (One would think, therefore, that g++ would employ this option
+	  automatically when it sees -fexceptions, but it doesn't.) This fixes
+	  problem where unit-test driver program itself would crash in
+	  "optimize" mode whenever one of the tests failed.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which

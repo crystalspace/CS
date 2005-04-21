@@ -567,7 +567,9 @@ CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
 # Check if C++ exceptions can be enabled and disabled.
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([how to enable C++ exceptions],
-    [cs_cv_prog_cxx_enable_exceptions], [CS_CREATE_TUPLE([-fexceptions])],
+    [cs_cv_prog_cxx_enable_exceptions],
+    [CS_CREATE_TUPLE([-fexceptions -fno-omit-frame-pointer]) \
+    CS_CREATE_TUPLE([-fexceptions])],
     [C++], [COMPILER.C++FLAGS.EXCEPTIONS.ENABLE])
 
 CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
