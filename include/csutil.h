@@ -125,6 +125,7 @@
 #include "csutil/win32/DbgHelpAPI.h"
 #include "csutil/win32/minidump.h"
 #include "csutil/win32/registrycfg.h"
+#include "csutil/win32/SpecStrings.h"
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"
 #endif
