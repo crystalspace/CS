@@ -61,8 +61,9 @@ public:
 
 int csObjectRegistryTest::countIterations(csRef<iObjectRegistryIterator> iter)
 {
-  int count;
-  for (count = 0; iter->HasNext(); iter->Next(), count++) {}
+  int count = 0;
+  for ( ; iter->HasNext(); iter->Next())
+    count++;
   return count;
 }
 
@@ -86,7 +87,9 @@ void csObjectRegistryTest::setUp()
 
 void csObjectRegistryTest::tearDown()
 {
-  delete objreg;
+  CPPUNIT_ASSERT_EQUAL(objreg->GetRefCount(), 1);
+  objreg->Clear();
+  objreg->DecRef();
 }
 
 void csObjectRegistryTest::testRegister()
