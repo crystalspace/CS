@@ -35,6 +35,58 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs ivideo   wxwin.h             ]
   ;
 
+{
+  local CSWIN32LIBS_REJECTS =
+    caca.h
+    d3d.h
+    d3dcaps.h
+    d3dtypes.h
+    ddraw.h
+    dinput.h
+    dsound.h
+    ft2build.h
+    jconfig.h
+    jerror.h
+    jinclude.h
+    jmorecfg.h
+    jpeglib.h
+    libmng.h
+    libmng_chunk_descr.h
+    libmng_chunk_io.h
+    libmng_chunk_prc.h
+    libmng_chunks.h
+    libmng_cms.h
+    libmng_conf.h
+    libmng_data.h
+    libmng_display.h
+    libmng_dither.h
+    libmng_error.h
+    libmng_filter.h
+    libmng_jpeg.h
+    libmng_memory.h
+    libmng_object_prc.h
+    libmng_objects.h
+    libmng_pixels.h
+    libmng_read.h
+    libmng_trace.h
+    libmng_types.h
+    libmng_write.h
+    libmng_zlib.h
+    mikmod.h
+    png.h
+    pngconf.h
+    zconf.h
+    zlib.h
+    ;
+  local h ;
+  for h in $(CSWIN32LIBS_REJECTS)
+  {
+    CS_MASTER_HEADER_REJECTS += [ ConcatDirs csutil win32 $(h) ] ;
+  }
+}
+
+Echo "REJECTS" $(CS_MASTER_HEADER_REJECTS) ;
+
 CS_MASTER_HEADER_BOILERPLATE =
 "/*
     This library is free software; you can redistribute it and/or
@@ -56,6 +108,8 @@ CS_MASTER_HEADER_BOILERPLATE =
 
 rule MasterHeaderCsUtil
 {
+  local rejects = $(1) ;
+
   # Order of platforms is significant: MacOS/X must appear before Unix since
   # it is also Unix, but we want only the MacOS/X-specific headers.
   local platforms = macosx unix win32 ;
@@ -65,11 +119,11 @@ rule MasterHeaderCsUtil
   local p ;
   for p in $(platforms)
   {
-    local files =
-      [ Filter
-        [ Sort [ Wildcard [ ConcatDirs csutil $(p) ] : *.h ] ] :
-          [ ConcatDirs csutil $(p) csosdefs.h ]
-          [ ConcatDirs csutil $(p) csconfig.h ] ] ;
+    local local_rejects = $(rejects)
+      [ ConcatDirs csutil $(p) csosdefs.h ]
+      [ ConcatDirs csutil $(p) csconfig.h ] ;
+    local files = [ Filter [ Sort
+      [ Wildcard [ ConcatDirs csutil $(p) ] : *.h ] ] : $(local_rejects) ] ;
     if $(files)
     {
       lines +=
@@ -83,13 +137,13 @@ rule MasterHeaderCsUtil
     lines += "#endif" ;
   }
   return [ MasterHeader csutil :
-    [ Filter [ Wildcard csutil : *.h ] : $(CS_MASTER_HEADER_REJECTS) ] :
+    [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] :
     $(CS_MASTER_HEADER_BOILERPLATE) :
     $(lines) ] ;
 }
 
 CS_MASTER_HEADERS =
-  [ MasterHeaderCsUtil ]
+  [ MasterHeaderCsUtil $(CS_MASTER_HEADER_REJECTS) ]
   [ DirectoryMasterHeaders
       csgeom
       csgfx

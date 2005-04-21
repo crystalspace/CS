@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Apr-2005
+	- Eric Sunshine augmented CS_MASTER_HEADER_REJECTS in
+	  CS/include/Jamfile so that it filters out of the <csutil.h> master
+	  header all of the cs-win32libs headers, as well as the new
+	  special-purpose <csutil/win32/SpecStrings.h>.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which
