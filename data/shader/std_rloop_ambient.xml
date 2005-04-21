@@ -6,6 +6,7 @@
       <shadertype>ambient</shadertype>
       <portaltraversal />
       <zuse />
+      <defaultshader name="ambient" file="ambient.xml" />
     </step>
   </steps>
 </params>

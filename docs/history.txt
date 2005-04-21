@@ -31,6 +31,10 @@ chronological order.
 	  mode.
 	- mdmkolbe fixed an uninitialized variable warning and an
 	  unsigned/signed comparison warning in GCC.
+	- res made all the renderloops to employ the <defaultshader> feature.
+	- res augmented the map loader to change into the directory containing 
+	  a renderloop before loading it from file.
+	- res fixed a VC8 warning in cscaca.cpp.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which

@@ -8,6 +8,7 @@
       <zoffset>yes</zoffset>
       <portaltraversal />
       <zuse />
+      <defaultshader name="ambient" file="ambient.xml" />
     </step>
     <step plugin="crystalspace.renderloop.step.lightiter">
       <steps>
@@ -16,6 +17,7 @@
 	  <shadertype>diffuse</shadertype>
 	  <zoffset>no</zoffset>
 	  <ztest />
+	  <defaultshader name="light_bumpmap" file="light_bumpmap.xml" />
 	</step>
       </steps>
     </step>

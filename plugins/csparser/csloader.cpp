@@ -571,27 +571,42 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
   	iBase* context, const char* fname)
 {
   csRef<iDocument> doc;
-  bool er = LoadStructuredDoc (fname, buf, doc);
-  if (!er) return 0;
-  if (doc)
+  csString filename (fname);
+  size_t slashPos = filename.FindLast ('/');
+  bool vfsPop = false;
+  if (slashPos != (size_t)-1)
   {
-    // First find the <params> node in the loaded file.
-    csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
-    if (!paramsnode)
+    VFS->PushDir();
+    VFS->ChDir (filename.Slice (0, slashPos + 1));
+    filename.DeleteAt (0, slashPos + 1);
+  }
+  bool er = LoadStructuredDoc (filename, buf, doc);
+  csRef<iBase> ret;
+  if (er)
+  {
+    if (doc)
     {
-      SyntaxService->ReportError (
-	      "crystalspace.maploader.load.plugin",
-              doc->GetRoot (), "Could not find <params> in '%s'!", fname);
-      return 0;
+      // First find the <params> node in the loaded file.
+      csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
+      if (!paramsnode)
+      {
+        SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                doc->GetRoot (), "Could not find <params> in '%s'!", fname);
+      }
+      else
+      {
+        ret = plug->Parse (paramsnode, ldr_context, context);
+      }
     }
-    return plug->Parse (paramsnode, ldr_context, context);
+    else
+    {
+      ReportError ("crystalspace.maploader.load.plugin",
+	      "File does not appear to be a structured map file (%s)!", fname);
+    }
   }
-  else
-  {
-    ReportError ("crystalspace.maploader.load.plugin",
-	    "File does not appear to be a structured map file (%s)!", fname);
-    return 0;
-  }
+  if (vfsPop) VFS->PopDir();
+  return csPtr<iBase> (ret);
 }
 
 //---------------------------------------------------------------------------

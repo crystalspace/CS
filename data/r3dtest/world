@@ -75,59 +75,38 @@
 	    <class>normalmap</class>
         </texture>
     </textures>
-    <shaders>
-	<shader><file>/shader/ambient.xml</file></shader>
-	<shader><file>/shader/light_bumpmap.xml</file></shader>
-	<shader><file>/shader/light.xml</file></shader>
-    </shaders>
     <materials>
       <material name="CRETE3_CEIL02A">
         <texture>CRETE3_CEIL02A</texture>
         <shadervar name="tex normal" type="texture">CRETE3_CEIL02A_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRETE2_FLR01">
         <texture>CRETE2_FLR01</texture>
         <shadervar name="tex normal" type="texture">CRETE2_FLR01_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="C2A1_W1">
         <texture>C2A1_W1</texture>
         <shadervar name="tex normal" type="texture">C2A1_W1_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRATE02B">
         <texture>CRATE02B</texture>
         <shadervar name="tex normal" type="texture">CRATE02B_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRATE02">
         <texture>CRATE02</texture>
         <shadervar name="tex normal" type="texture">CRATE02_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="{GRATE2A">
         <texture>{GRATE2A</texture>
         <shadervar name="tex normal" type="texture">{GRATE2A_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="C2A2_SATORB">
         <texture>C2A2_SATORB</texture>
         <shadervar name="tex normal" type="texture">C2A2_SATORB_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="Torus">
         <texture>C2A1_W1</texture>
         <shadervar name="tex normal" type="texture">C2A1_W1_NORM</shadervar>
-        <shader type="ambient">ambient</shader>
-        <shader type="diffuse">light_bumpmap</shader>
       </material>
     </materials>
     <renderpriorities>
