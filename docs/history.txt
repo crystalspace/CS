@@ -21,6 +21,14 @@ chronological order.
 	  automatically when it sees -fexceptions, but it doesn't.) This fixes
 	  problem where unit-test driver program itself would crash in
 	  "optimize" mode whenever one of the tests failed.
+	- Eric Sunshine fixed problem in csOBB::FindOBBAccurate() in which very
+	  tiny differences in vector lengths between optimize and debug modes
+	  resulted in different vectors being chosen for composition of the new
+	  matrix. This tended to result in very large differences in the
+	  client's view when it retrieved the box's corners, which essentially
+	  were scrambled between optimize and debug modes. This correction
+	  fixes the failure of the csOBBTest test-unit (obb.t) in optimize
+	  mode.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which

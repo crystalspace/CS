@@ -23,7 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csqsqrt.h"
 
-//=============================================================================
+//============================================================================
 
 void csOBBFrozen::Copy (const csOBB& obb, const csReversibleTransform& trans)
 {
@@ -469,8 +469,10 @@ void csOBB::FindOBBAccurate (const csVector3 *vertex_table, int num)
     }
   }
   dir1.Normalize ();
-  csVector3 dir2 = (vertex_table[num-1] - ((dir1 * vertex_table[num-1]) * dir1)) -
+  csVector3 dir2 =
+    (vertex_table[num-1] - ((dir1 * vertex_table[num-1]) * dir1)) -
     (vertex_table[0] - ((dir1 * vertex_table[0]) * dir1));
+
   float len2 = dir2.Norm();
   for (i = 0; i < num; i ++)
   {
@@ -482,24 +484,20 @@ void csOBB::FindOBBAccurate (const csVector3 *vertex_table, int num)
       vj -= (vj * dir1) * dir1;
       csVector3 n = vj - vi;
       float nlen = n.Norm();
-      if (nlen > len2)
+      if (nlen > len2 + SMALL_EPSILON)
       {
         dir2 = n;
         len2 = nlen;
       }
     }
   }
-
   dir2.Normalize ();
 
   csVector3 dir3 = dir1 % dir2;
 
   csOBB mvbb (dir1, dir2, dir3);
   for (i = 0; i < num; i ++)
-  {
     mvbb.AddBoundingVertex (vertex_table[i]);
-  }
 
   *this = mvbb;
 }
-
