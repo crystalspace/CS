@@ -665,22 +665,23 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 
     // Pull texture data and set as RGBA again, to prevent compression (slooow)
     // on subsequent glTexSubImage() calls.
-    uint8* pixels;
     if (doSetRGBA)
     {
-      pixels = new uint8[actual_width * actual_height * 4];
+      uint8* pixels = new uint8[actual_width * actual_height * 4];
       glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-    }
-    SetupAutoMipping();
-    SetWasRenderTarget (true);
-    if (doSetRGBA)
-    {
+
+      SetWasRenderTarget (true);
+      SetupAutoMipping();
+
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, actual_width, 
 	actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
       delete[] pixels;
     }
     else
     {
+      SetWasRenderTarget (true);
+      SetupAutoMipping();
+
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, actual_width, 
 	actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
       return;

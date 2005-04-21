@@ -475,7 +475,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     {
       qual = -1.0;
     }
-    else if (left == (int)boxlist.Length () || right == (int)boxlist.Length ())
+    else if (left == boxlist.Length () || right == boxlist.Length ())
     {
       qual = -1.0;
     }

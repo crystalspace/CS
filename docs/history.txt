@@ -29,6 +29,8 @@ chronological order.
 	  were scrambled between optimize and debug modes. This correction
 	  fixes the failure of the csOBBTest test-unit (obb.t) in optimize
 	  mode.
+	- mdmkolbe fixed an uninitialized variable warning and an
+	  unsigned/signed comparison warning in GCC.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which
