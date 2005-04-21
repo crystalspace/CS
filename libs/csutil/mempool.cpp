@@ -44,6 +44,8 @@ void* csMemoryPool::Alloc(size_t n)
 
 void csMemoryPool::Empty()
 {
+  for (size_t i = blocks.Length(); i-- > 0; )
+    delete[] blocks[i];
   blocks.Empty();
   remaining = 0;
 }

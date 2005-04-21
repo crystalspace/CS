@@ -25,7 +25,7 @@
 
 #include "cssysdef.h"
 #include "csextern.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -56,7 +56,7 @@ class CS_CRYSTALSPACE_EXPORT csMemoryPool
 {
 private:
   /// Array of pointers to heap-allocated blocks.
-  csPDelArray<uint8> blocks;
+  csArray<uint8*> blocks;
   /// Number of unallocated bytes remaining in most recently allocated block.
   size_t remaining;
   /// Number of bytes to allocate for each block.

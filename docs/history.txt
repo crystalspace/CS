@@ -11,6 +11,7 @@ chronological order.
 	  CS/include/Jamfile so that it filters out of the <csutil.h> master
 	  header all of the cs-win32libs headers, as well as the new
 	  special-purpose <csutil/win32/SpecStrings.h>.
+	- Eric Sunshine fixed `delete' vs. `delete[]' bug in csMemoryPool.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which
