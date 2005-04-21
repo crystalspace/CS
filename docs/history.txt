@@ -45,10 +45,10 @@ chronological order.
 	    NotBOL         --> csrxNotBOL
 	    NotEOL         --> csrxNotEOL
 	- Eric Sunshine removed the do-nothing csUtilDebugHelper.
-	- Eric Sunshine mirgrated the csPolygonMesh unit tests out of
+	- Eric Sunshine migrated the csPolygonMesh unit tests out of
 	  csgeom/math3d.cpp and over to csgeom/t/polymesh.t in the new
 	  cppunit-based testing framework. Invoke `jam check' to run the tests.
-	- Eric Sunshine mirgrated the csOBB unit tests out of csgeom/math3d.cpp
+	- Eric Sunshine migrated the csOBB unit tests out of csgeom/math3d.cpp
 	  and over to csgeom/t/obb.t in the new cppunit-based testing
 	  framework.
 	- Eric Sunshine augmented unittest.jam so that it adds an appropriate
