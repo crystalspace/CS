@@ -286,8 +286,6 @@ private:
 
   void SetZModeInternal (csZBufMode mode);
 
-  void SetMirrorMode (bool mirror);
-
   void CalculateFrustum ();
 
   void SetupStencil ();

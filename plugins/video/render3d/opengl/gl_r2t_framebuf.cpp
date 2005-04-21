@@ -71,8 +71,7 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     */
     G3D->statecache->SetMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glOrtho (0., (GLdouble) txt_w, (GLdouble) txt_h, 0., 
-      -1.0, 10.0);
+    G3D->SetGlOrtho (true);
   }
   if (!rt_onscreen)
   {
@@ -96,8 +95,7 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
 void csGLRender2TextureFramebuf::SetupProjection ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-  glOrtho (0., (GLdouble) txt_w, (GLdouble) txt_h, 0., 
-    -1.0, 10.0);
+  G3D->SetGlOrtho (true);
 }
 
 void csGLRender2TextureFramebuf::FinishDraw ()

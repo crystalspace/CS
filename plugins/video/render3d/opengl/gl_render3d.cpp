@@ -369,14 +369,6 @@ void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
   }
 }
 
-void csGLGraphics3D::SetMirrorMode (bool mirror)
-{
-  if (mirror)
-    statecache->SetCullFace (GL_BACK);
-  else
-    statecache->SetCullFace (GL_FRONT);
-}
-
 void csGLGraphics3D::CalculateFrustum ()
 {
   if (frustum_valid) return;
@@ -1215,8 +1207,6 @@ void csGLGraphics3D::FinishDraw ()
     SetRenderTarget (0);
   }
   
-  //SetMirrorMode (false);
-
   current_drawflags = 0;
 }
 
@@ -1664,7 +1654,7 @@ GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint start,
   glDrawElements (mode, count, type, indices);
 }
 
-void makeGLMatrix (const csReversibleTransform& t, float matrix[16])
+static void makeGLMatrix (const csReversibleTransform& t, float matrix[16])
 {
   const csMatrix3 &orientation = t.GetO2T();
   const csVector3 &translation = t.GetO2TTranslation();
@@ -1942,7 +1932,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   glPopMatrix ();
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
-  //SetMirrorMode (false);
   statecache->SetCullFace (cullFace);
 }
 

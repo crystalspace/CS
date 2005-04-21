@@ -35,6 +35,7 @@ chronological order.
 	- res augmented the map loader to change into the directory containing 
 	  a renderloop before loading it from file.
 	- res fixed a VC8 warning in cscaca.cpp.
+	- res made some minor cleanups in the GL renderer.
 20-Apr-2005
 	- Eric Sunshine fixed launch and termination crashers in partedit.
 	- Eric Sunshine fixed configuration problem in texi2html.init which
