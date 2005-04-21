@@ -152,6 +152,7 @@ private:
   csPolygonMeshEdge* edges;
   int nedges;
   csPlane3 planes[6];
+  int active_edge;
 
 public:
   void setUp();
@@ -178,6 +179,7 @@ void csPolygonMeshTest::setUp()
 {
   edges = csPolygonMeshTools::CalculateEdges(&mesh, nedges);
   csPolygonMeshTools::CalculatePlanes(&mesh, planes);
+  active_edge = csPolygonMeshTools::CheckActiveEdges(edges, nedges, planes);
 }
 
 void csPolygonMeshTest::tearDown()
@@ -216,8 +218,7 @@ void csPolygonMeshTest::testEdges()
 
 void csPolygonMeshTest::testPlanes()
 {
-  int aedge = csPolygonMeshTools::CheckActiveEdges(edges, nedges, planes);
-  CPPUNIT_ASSERT_EQUAL(aedge, 12);
+  CPPUNIT_ASSERT_EQUAL(active_edge, 12);
   CPPUNIT_ASSERT(edges[ 0].active);
   CPPUNIT_ASSERT(edges[ 1].active);
   CPPUNIT_ASSERT(edges[ 2].active);
