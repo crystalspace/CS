@@ -142,7 +142,7 @@ Re-wrote csfgen, the font generator.
 Contributed to the engine, the map loader, the event system and various other
 parts of Crystal Space.
 @item
-Creaetd a nice memory debugger (now defunct).
+Created a nice memory debugger (now defunct).
 @end itemize
 
 @item
