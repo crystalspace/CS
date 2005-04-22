@@ -331,7 +331,7 @@ have the same basename as your built plugin module, but with extension
 meta-information file should be named @file{myplugin.csplugin}. At build-time,
 the meta-information may be embedded directly into the plugin module if
 supported by the platform and if embedding is enabled. If not, then then the
-@file{cs.plugin} file will be laid down alongside the built plugin module.
+@file{.csplugin} file will be laid down alongside the built plugin module.
 
 The meta-information file is a structured @sc{xml}-format document, and can
 contain any information relevant to the plugin module; it is not limited only
