@@ -15,7 +15,7 @@ chronological order.
 	- res fixed a bug WalkTest::GfxWrite() where csString::Format() was
 	  used when FormatV() should have been.
 	- res fixed csLoader::LoadStructuredMap() to properly restored the old
-	  VFS directory whan a ChDir() was performed.
+	  VFS directory when a ChDir() was performed.
 	- res made the new operators in csutil/mempool.h non-static as GCC 4
 	  doesn't like that.
 	- Eric Sunshine fixed memory leak in csPython::Store().
