@@ -60,7 +60,7 @@ csVerbosityParser::csVerbosityParser (const char* s)
 bool csVerbosityParser::Error(char const* msg, char const* s, size_t pos)
 {
   csPrintfErr("ERROR: Verbosity parser: %s: %-*.*s<<ERROR>>%s\n",
-	      msg, pos, pos, s, s + pos);
+	      msg, (int)pos, (int)pos, s, s + pos);
   return false;
 }
 
