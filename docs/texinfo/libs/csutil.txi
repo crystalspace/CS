@@ -100,7 +100,8 @@ as needed to accommodate additions and insertions.
 suitable for any C++ type, including basic types (such as @samp{int}) and
 user-defined types (such as objects).  This class guarantees proper
 construction and destruction of objects as they are added to, and removed from
-the array.  See @file{csutil/array.h}.
+the array. The array types described below are all derived from
+@code{csArray<T>}. See @file{csutil/array.h}.
 
 @item
 @code{csDirtyAccessArray<T>}: Similar to @code{csArray<T>}, this array type can
@@ -113,7 +114,7 @@ use is when you absolutely need access to the internal memory containing the
 array of items.  This can be useful, for instance, if you need to interface
 with some external @sc{api} (such as OpenGL) which does not understand
 @code{csArray<>}, and which expects a simple pointer to the array elements.
-See @file{csutil/garray.h}.
+See @file{csutil/dirtyaccessarray.h}.
 
 @item
 @code{csRefArray<T>}: This is the preferred way to store an array of pointers
