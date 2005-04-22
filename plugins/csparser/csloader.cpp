@@ -4780,7 +4780,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  {
       	    SyntaxService->ReportError (
 	      	"crystalspace.maploader.load.meshobject",
-		child, "'meshlib' requires a name in sector '%s'!",
+		child, "'meshlib' requires a name (sector '%s')!",
 		secname ? secname : "<noname>");
 	    goto error;
 	  }
@@ -4790,15 +4790,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
       	    SyntaxService->ReportError (
 	      	"crystalspace.maploader.load.meshobject",
 		child,
-		"Could not find mesh object '%s' in sector '%s' for MESHLIB!",
-		meshname, secname ? secname : "<noname>");
-	    goto error;
-	  }
-	  if (mesh->GetMovable ()->GetSectors ()->GetCount () > 0)
-	  {
-      	    SyntaxService->ReportError (
-	      	"crystalspace.maploader.load.meshobject",
-		child, "Mesh '%s' is already in another sector in sector '%s'!",
+		"Could not find mesh object '%s' (sector '%s') for MESHLIB!",
 		meshname, secname ? secname : "<noname>");
 	    goto error;
 	  }
@@ -4807,7 +4799,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	    // Error is already reported.
 	    goto error;
 	  }
-          mesh->GetMovable ()->SetSector (sector);
+          mesh->GetMovable ()->GetSectors ()->Add (sector);
 	  mesh->GetMovable ()->UpdateMove ();
         }
         break;

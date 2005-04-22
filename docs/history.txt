@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Apr-2005
+	- Jorrit fixed meshlib in csparser so that it will add the sector to
+	  the mesh instead of just setting it. That way you can use meshlib
+	  to put a mesh in multiple sectors.
 21-Apr-2005
 	- Eric Sunshine augmented CS_MASTER_HEADER_REJECTS in
 	  CS/include/Jamfile so that it filters out of the <csutil.h> master
