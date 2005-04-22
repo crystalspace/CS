@@ -178,19 +178,20 @@ bool csPython::RunText(const char* Text)
 
 bool csPython::Store(const char* name, void* data, void* tag)
 {
-  PyObject * obj = csWrapTypedObject(data, (const char*)tag, 0);
+  bool ok = false;
+  PyObject *obj = csWrapTypedObject(data, (const char*)tag, 0);
   char *mod_name = csStrNew(name);
-  char * var_name = strrchr(mod_name, '.');
-  if(!var_name)
-    return false;
-  *var_name = 0;
-  ++var_name;
-  PyObject * module = PyImport_ImportModule(mod_name);
-  PyModule_AddObject(module, (char*)var_name, obj);
-
+  char *var_name = strrchr(mod_name, '.');
+  if (var_name)
+  {
+    *var_name = '\0';
+    ++var_name;
+    PyObject * module = PyImport_ImportModule(mod_name);
+    PyModule_AddObject(module, var_name, obj);
+    ok = true;
+  }
   delete[] mod_name;
-
-  return true;
+  return ok;
 }
 
 bool csPython::LoadModule(const char* name)
