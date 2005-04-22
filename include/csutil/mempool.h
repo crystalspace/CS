@@ -130,9 +130,9 @@ public:
  * // ... it is now safe to destroy `pool' ...
  * \endcode
  */
-static inline void* operator new(size_t n, csMemoryPool& p)
+inline void* operator new(size_t n, csMemoryPool& p)
 { return p.Alloc(n); }
-static inline void* operator new(size_t n, csMemoryPool* p)
+inline void* operator new(size_t n, csMemoryPool* p)
 { return p->Alloc(n); }
 /** @} */
 

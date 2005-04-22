@@ -16,6 +16,8 @@ chronological order.
 	  used when FormatV() should have been.
 	- res fixed csLoader::LoadStructuredMap() to properly restored the old
 	  VFS dir whan a ChDir() was performed.
+	- res made the new operators in csutil/mempool.h non-static as GCC 4
+	  doesn't like that.
 21-Apr-2005
 	- Eric Sunshine augmented CS_MASTER_HEADER_REJECTS in
 	  CS/include/Jamfile so that it filters out of the <csutil.h> master
