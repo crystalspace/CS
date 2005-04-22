@@ -14,6 +14,8 @@ chronological order.
 	  to put a mesh in multiple sectors.
 	- res fixed a bug WalkTest::GfxWrite() where csString::Format() was
 	  used when FormatV() should have been.
+	- res fixed csLoader::LoadStructuredMap() to properly restored the old
+	  VFS dir whan a ChDir() was performed.
 21-Apr-2005
 	- Eric Sunshine augmented CS_MASTER_HEADER_REJECTS in
 	  CS/include/Jamfile so that it filters out of the <csutil.h> master

@@ -579,6 +579,7 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
     VFS->PushDir();
     VFS->ChDir (filename.Slice (0, slashPos + 1));
     filename.DeleteAt (0, slashPos + 1);
+    vfsPop = true;
   }
   bool er = LoadStructuredDoc (filename, buf, doc);
   csRef<iBase> ret;
