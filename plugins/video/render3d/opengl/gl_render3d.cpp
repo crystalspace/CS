@@ -1049,7 +1049,7 @@ bool csGLGraphics3D::Open ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Render-to-texture backend: %s",
       r2tBackendStr);
 
-  enableDelaySwap = config->GetBool ("Video.OpenGL.DelaySwap", true);
+  enableDelaySwap = config->GetBool ("Video.OpenGL.DelaySwap", false);
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Delayed buffer swapping: %s",
       enableDelaySwap ? "enabled" : "disabled");
