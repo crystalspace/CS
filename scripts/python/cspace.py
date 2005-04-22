@@ -2344,8 +2344,6 @@ csPrintf = _cspace.csPrintf
 
 csFPrintf = _cspace.csFPrintf
 
-csFPrintfV = _cspace.csFPrintfV
-
 csPrintfErr = _cspace.csPrintfErr
 
 csGetTicks = _cspace.csGetTicks

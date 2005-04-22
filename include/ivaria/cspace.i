@@ -814,6 +814,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore csGetPlatformConfig;
 %ignore csPrintfV;
+%ignore csFPrintfV;
 %ignore csPrintfErrV;
 %include "csutil/sysfunc.h"
 

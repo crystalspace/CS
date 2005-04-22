@@ -19,6 +19,9 @@ chronological order.
 	- res made the new operators in csutil/mempool.h non-static as GCC 4
 	  doesn't like that.
 	- Eric Sunshine fixed memory leak in csPython::Store().
+	- Eric Sunshine fixed compilation error in csPython on some 64-bit
+	  platforms caused by assignment of array to an array (va_list to
+	  va_list).
 21-Apr-2005
 	- Eric Sunshine augmented CS_MASTER_HEADER_REJECTS in
 	  CS/include/Jamfile so that it filters out of the <csutil.h> master
