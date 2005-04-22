@@ -305,7 +305,6 @@ void ViewMesh::LoadTexture(const char* path, const char* file, const char* name)
       return;
     }
     txt->Register (g3d->GetTextureManager ());
-    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (name);
     engine->PrepareTextures();
   }
 }
