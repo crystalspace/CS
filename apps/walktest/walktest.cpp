@@ -472,7 +472,7 @@ void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
   csString buf;
 
   va_start (arg, str);
-  buf.Format (str, arg);
+  buf.FormatV (str, arg);
   va_end (arg);
 
   myG2D->Write (Font, x, y, fg, bg, buf);

@@ -7,9 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 22-Apr-2005
+	- res changed the default setting for "delayed swap" to "disabled" when no
+	  config setting is present.
 	- Jorrit fixed meshlib in csparser so that it will add the sector to
 	  the mesh instead of just setting it. That way you can use meshlib
 	  to put a mesh in multiple sectors.
+	- res fixed a bug WalkTest::GfxWrite() where csString::Format() was
+	  used when FormatV() should have been.
 21-Apr-2005
 	- Eric Sunshine augmented CS_MASTER_HEADER_REJECTS in
 	  CS/include/Jamfile so that it filters out of the <csutil.h> master
