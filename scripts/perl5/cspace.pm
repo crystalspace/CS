@@ -64,7 +64,6 @@ package cspace;
 *csPlatformShutdown = *cspacec::csPlatformShutdown;
 *csPrintf = *cspacec::csPrintf;
 *csFPrintf = *cspacec::csFPrintf;
-*csFPrintfV = *cspacec::csFPrintfV;
 *csPrintfErr = *cspacec::csPrintfErr;
 *csGetTicks = *cspacec::csGetTicks;
 *csSleep = *cspacec::csSleep;
