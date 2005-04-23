@@ -15,6 +15,11 @@ chronological order.
 	- res added support for the new GCC 4 ELF visibility features. When
 	  available, the default visibility is "hidden", and only when functions
 	  or classes are exported their visibility is "default".
+	- res fixed z-fill support in GL ClosePortal().
+	- res changed the fixed terrain render loop to do portal traversal in
+	  the "standard", not "ambient" step.
+	- res augmented csIdentStrings to return the value of an identifier if
+	  no appropriate string was found.
 22-Apr-2005
 	- res changed the default setting for "delayed swap" to "disabled" when
 	  no configuration setting is present.

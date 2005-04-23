@@ -31,13 +31,13 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
 
-#include "cstool/fogmath.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
 #include "cstool/bitmasktostr.h"
+#include "cstool/fogmath.h"
 
 #include "igeom/clip2d.h"
 
@@ -74,6 +74,14 @@ csGLStateCache* csGLGraphics3D::statecache = 0;
 csGLExtensionManager* csGLGraphics3D::ext = 0;
 
 const int CS_CLIPPER_EMPTY = 0xf008412;
+
+#include "gl_stringlists.h"
+
+CS_IMPLEMENT_STATIC_CLASSVAR(MakeAString, scratch, GetScratch, csString, ())
+CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, formatter, GetFormatter,
+                                   char, [sizeof(MakeAString::Formatter)])
+CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, reader, GetReader,
+                                   char, [sizeof(MakeAString::Reader)])
 
 CS_IMPLEMENT_PLUGIN
 
@@ -177,8 +185,21 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
 {
   if (ext && ext->CS_GL_GREMEDY_string_marker)
   {
-    csString marker;
+    csStringFast<256> marker;
     marker.Format ("[%s %s():%d] %s", file, function, line, message);
+    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
+  }
+}
+
+void csGLGraphics3D::OutputMarkerString (const char* function, 
+					 const char* file,
+					 int line, MakeAString& message)
+{
+  if (ext && ext->CS_GL_GREMEDY_string_marker)
+  {
+    csStringFast<256> marker;
+    marker.Format ("[%s %s():%d] %s", file, function, line, 
+      message.GetStr());
     ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
   }
 }
@@ -1079,13 +1100,6 @@ void csGLGraphics3D::Close ()
   if (G2D)
     G2D->Close ();
 }
-
-CS_BITMASKTOSTR_MASK_TABLE_BEGIN(drawflagNames)
-  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_2DGRAPHICS)
-  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_3DGRAPHICS)
-  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_CLEARZBUFFER)
-  CS_BITMASKTOSTR_MASK_TABLE_DEFINE(CSDRAW_CLEARSCREEN)
-CS_BITMASKTOSTR_MASK_TABLE_END;
 
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
@@ -2108,6 +2122,7 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
 				 bool floating)
 {
   csClipPortal* cp = new csClipPortal ();
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p", cp));
   cp->poly = new csVector2[numVertices];
   memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
   cp->num_poly = (int)numVertices;
@@ -2127,9 +2142,19 @@ void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
 {
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, (int)use_zfill_portal));
 
   if (use_zfill_portal)
   {
+    // First setup projection matrix for 2D drawing.
+    statecache->SetMatrixMode (GL_PROJECTION);
+    glPushMatrix ();
+    glLoadIdentity ();
+    SetGlOrtho (false);
+    statecache->SetMatrixMode (GL_MODELVIEW);
+    glPushMatrix ();
+    glLoadIdentity ();
+
     GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
     statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
     statecache->SetColorMask (false, false, false, false);
@@ -2149,6 +2174,12 @@ void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
     statecache->SetCullFace (oldcullface);
     if (tex2d)
       statecache->Enable_GL_TEXTURE_2D ();
+
+    // Restore matrices
+    statecache->SetMatrixMode (GL_MODELVIEW);
+    glPopMatrix ();
+    statecache->SetMatrixMode (GL_PROJECTION);
+    glPopMatrix ();
   }
   
   delete cp;
@@ -2253,6 +2284,8 @@ void csGLGraphics3D::SetupClipPortals ()
 
   csClipPortal* cp = clipportal_stack.Top ();
 
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p", cp));
+
   // First setup projection matrix for 2D drawing.
   statecache->SetMatrixMode (GL_PROJECTION);
   glPushMatrix ();
@@ -2299,6 +2332,7 @@ void csGLGraphics3D::SetupClipPortals ()
   glVertex3f (-1.0f, -1.0f, -1.0f);
   glEnd ();
 
+  // Restore matrices
   statecache->SetMatrixMode (GL_MODELVIEW);
   glPopMatrix ();
   statecache->SetMatrixMode (GL_PROJECTION);
@@ -2317,6 +2351,9 @@ void csGLGraphics3D::SetupClipPortals ()
 
 void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 {
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %s", clipper, 
+    ClipperTypes.StringForIdent (cliptype)));
+
   //clipper = new csBoxClipper (10, 10, 200, 200);
   csGLGraphics3D::clipper = clipper;
   if (!clipper) cliptype = CS_CLIPPER_NONE;

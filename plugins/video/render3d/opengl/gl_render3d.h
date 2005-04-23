@@ -35,6 +35,8 @@
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
+#include "csutil/csuctransform.h"
+#include "csutil/formatter.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
@@ -71,10 +73,59 @@ struct iLightingManager;
 
 struct iEvent;
 
+class MakeAString
+{
+public:
+  class csStringFmtWriter
+  {
+    csStringBase& str;
+  public:
+    csStringFmtWriter (csStringBase& str) : str (str) {}
+    void Put (utf32_char ch) 
+    { 
+      utf8_char dest[CS_UC_MAX_UTF8_ENCODED];
+      size_t n = (size_t)csUnicodeTransform::Encode (ch, dest, 
+        sizeof (dest) / sizeof (utf8_char));
+      str.Append ((char*)dest, n);
+    }
+    size_t GetTotal() const { return str.Length(); }
+  };
+
+  typedef csPrintfFormatter<csStringFmtWriter, csFmtDefaultReader<utf8_char> > 
+    Formatter;
+  typedef csFmtDefaultReader<utf8_char> Reader;
+  CS_DECLARE_STATIC_CLASSVAR(scratch, GetScratch, csString);
+  CS_DECLARE_STATIC_CLASSVAR(reader, GetReader, char);
+  CS_DECLARE_STATIC_CLASSVAR(formatter, GetFormatter, char);
+
+  MakeAString (const char* fmt, ...)
+  {
+    new (GetReader()) Reader ((utf8_char*)fmt, strlen (fmt));
+    va_list args;
+    va_start (args, fmt);
+    new ((Formatter*)GetFormatter()) Formatter ((Reader*)GetReader(), args);
+    va_end (args);
+  }
+  ~MakeAString()
+  {
+    ((Formatter*)GetFormatter())->~Formatter();
+  }
+  const char* GetStr()
+  {
+    csString& scratch = *(GetScratch());
+    scratch.Empty();
+    csStringFmtWriter writer (scratch);
+    ((Formatter*)GetFormatter())->Format (writer);
+    if (!scratch.IsEmpty())
+      scratch.Truncate (scratch.Length() - 1);
+    return scratch.GetData();
+  }
+};
+
 #ifdef CS_DEBUG
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
-  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, __FILE__, __LINE__, \
-    csString().Format fmtParam .GetData())
+  { MakeAString mas fmtParam; csGLGraphics3D::OutputMarkerString (          \
+    CS_FUNCTION_NAME, __FILE__, __LINE__, mas); }
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER				    \
   csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, __FILE__, __LINE__, \
     "")
@@ -353,6 +404,8 @@ public:
   iStringSet* GetStrings () { return strings; }
   static void OutputMarkerString (const char* function, const char* file,
     int line, const char* message);
+  static void OutputMarkerString (const char* function, const char* file,
+    int line, MakeAString& message);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D

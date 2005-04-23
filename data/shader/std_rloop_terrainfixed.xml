@@ -6,7 +6,6 @@
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>ambient</shadertype>
           <zoffset>yes</zoffset>
-	  <portaltraversal/>
           <zuse />
         </step>
         <!-- draws terrain splatting -->
@@ -23,6 +22,7 @@
 	  <defaultshader name="std_lighting" />
 	  <nodefaulttrigger>ambient</nodefaulttrigger>
 	  <nodefaulttrigger>terrain splat</nodefaulttrigger>
+	  <portaltraversal/>
         </step>
   </steps>
 </params>

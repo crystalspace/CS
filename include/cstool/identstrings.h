@@ -38,10 +38,15 @@ public:
 protected:
   const csIdentString* strings;
   size_t stringCount;
+  csString* scratch;
 public:
-  csIdentStrings (const csIdentString* str, size_t cnt) :
-    strings(str), stringCount(cnt) { }
-  /// Obtain the name of \a ident.
+  csIdentStrings (const csIdentString* str, csString* scratch, size_t cnt) :
+    strings(str), stringCount(cnt), scratch(scratch) { }
+  /**
+   * Obtain the name of \a ident.
+   * \remarks The returned string is only guaranteed to be valid until the
+   *  next StringForIdent() call.
+   */
   const char* StringForIdent (int ident)
   {
     size_t l = 0, r = stringCount;
@@ -61,7 +66,8 @@ public:
 	r = m;
       }
     }
-    return 0;
+    scratch->Format ("%d", ident);
+    return scratch->GetData();
   }
 };
 
@@ -99,7 +105,9 @@ public:
 #define CS_IDENT_STRING_LIST_END(ListName)				\
     {0, 0}								\
   };									\
+  CS_IMPLEMENT_STATIC_VAR(Get##ListName##Scratch, csString, ());	\
   static csIdentStrings ListName (ListName##_strings, 			\
+    Get##ListName##Scratch(),						\
     (sizeof (ListName##_strings) / sizeof (csIdentStrings::csIdentString)) - 1);
 
 #endif // __CS_CSTOOL_IDENTSTRINGS_H__
