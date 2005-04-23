@@ -40,13 +40,21 @@
 
 // Defaults for platforms that do not define their own.
 #ifndef CS_EXPORT_SYM_DLL
-#  define CS_EXPORT_SYM_DLL
+#  ifdef CS_HAVE_GCC_VISIBILITY
+#    define CS_EXPORT_SYM_DLL  __attribute__ ((visibility ("default")))
+#  else
+#    define CS_EXPORT_SYM_DLL
+#  endif
 #endif
 #ifndef CS_IMPORT_SYM_DLL
 #  define CS_IMPORT_SYM_DLL extern
 #endif
 #ifndef CS_EXPORT_SYM
-#  define CS_EXPORT_SYM
+#  if defined(CS_HAVE_GCC_VISIBILITY) && defined(CS_BUILD_SHARED_LIBS)
+#    define CS_EXPORT_SYM  __attribute__ ((visibility ("default")))
+#  else
+#    define CS_EXPORT_SYM
+#  endif
 #endif
 #ifndef CS_IMPORT_SYM
 #  define CS_IMPORT_SYM
@@ -201,7 +209,7 @@ struct csMemMapInfo
  * extra `__declspec' goop when exporting a function from a plug-in module.
  */
 #if !defined(CS_EXPORTED_FUNCTION)
-#  define CS_EXPORTED_FUNCTION extern "C"
+#  define CS_EXPORTED_FUNCTION extern "C" CS_EXPORT_SYM_DLL
 #endif
 
 /**\def CS_EXPORTED_NAME(Prefix, Suffix)

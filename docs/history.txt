@@ -12,6 +12,9 @@ chronological order.
 	  renaming of WIN32_VOLATILE to CS_WIN32_CONFIG.
 	- res changed texi2html.init to not emit a comment with the current
 	  date.
+	- res added support for the new GCC 4 ELF visibility features. When
+	  available, the default visibility is "hidden", and only when functions
+	  or classes are exported their visibility is "default".
 22-Apr-2005
 	- res changed the default setting for "delayed swap" to "disabled" when
 	  no configuration setting is present.

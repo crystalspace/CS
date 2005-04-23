@@ -760,6 +760,30 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 
 
 #------------------------------------------------------------------------------
+# Check if "hidden" visibilty for inline functions is supported.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is supported],
+    [cs_cv_prog_cxx_visibility_inlines_hidden],
+    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],
+    [C++], [COMPILER.C++FLAGS], [+])
+
+
+
+#------------------------------------------------------------------------------
+# Check if setting a default symbol visibility is supported.
+# @@@ Makes the assumption that when -fvisibility is supported GCC style 
+# visibility attributes are also available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if -fvisibility=hidden is supported], 
+    [cs_cv_prog_cxx_visibility_hidden], [],
+    [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], 
+    [-fvisibility=hidden], [+])
+    CS_HEADER_PROPERTY([CS_HAVE_GCC_VISIBILITY])])
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler- and CPU-specific code generation flags.  These flags are
 # mutually exclusive.  Exclusivity is enforced by the CS_CHECK_CODE_GEN_FLAG()
 # macro.  Note that use of these flags typically means that the resulting
