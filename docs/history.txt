@@ -10,6 +10,8 @@ chronological order.
 	- res updated the JPG versions of the screenshots for the KDevelop,
 	  VC6 and VC7 tutorials to reflect the library consolidation and
 	  renaming of WIN32_VOLATILE to CS_WIN32_CONFIG.
+	- res changed texi2html.init to not emit a comment with the current
+	  date.
 22-Apr-2005
 	- res changed the default setting for "delayed swap" to "disabled" when
 	  no configuration setting is present.

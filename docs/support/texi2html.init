@@ -931,7 +931,7 @@ sub T2H_DEFAULT_print_page_head($)
     print $fh <<EOT;
 $DOCTYPE
 <html>
-$Texi2HTML::THISDOC{'copying'}<!-- Created on $Texi2HTML::THISDOC{today} by $Texi2HTML::THISDOC{program} -->
+$Texi2HTML::THISDOC{'copying'}<!-- Created by $Texi2HTML::THISDOC{program} -->
 <!--
 $Texi2HTML::THISDOC{program_authors}
 -->
