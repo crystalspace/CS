@@ -26,6 +26,8 @@ chronological order.
 	  builds. (The idea is that it might be useful in some cases, e.g. when
 	  debug utilities don't use the debug information but rather only the 
 	  list of externally visible symbols for symbol name resolution.)
+	- res worked around visual borkedness in the "terrain" level caused by
+	  the splatting and base layers being drawn when they shouldn't.
 22-Apr-2005
 	- res changed the default setting for "delayed swap" to "disabled" when
 	  no configuration setting is present.

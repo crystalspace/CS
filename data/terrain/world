@@ -53,34 +53,34 @@
   <materials>
     <material name="ScatterSky">
       <color red="0" green="0" blue="0" /> 
-      <shader type="ambient">sky_scattering</shader>
+      <shader type="terrain_base">sky_scattering</shader>
     </material>
     <material name="Base">
       <texture>basemap</texture>
       <shadervar name="tex normal" type="texture">base_normalmap</shadervar>
       <!-- <shader type="ambient">splatting_scattering_base</shader> -->
-      <shader type="ambient">splatting_scattering_base</shader>
+      <shader type="terrain_base">splatting_scattering_base</shader>
     </material>
     <material name="Marble">
       <texture>andrew_marble4.jpg</texture>
       <shadervar name="tex normal" type="texture">blobbyDOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
-      <shader type="diffuse">splatting_scattering</shader>
+      <shader type="terrain_splat">splatting_scattering</shader>
     </material>
     <material name="Stone">
       <texture>stone4.gif</texture>
       <shadervar name="tex normal" type="texture">stone2DOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">64,64</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
-      <shader type="diffuse">splatting_scattering</shader>
+      <shader type="terrain_splat">splatting_scattering</shader>
     </material>
     <material name="Grass">
       <texture>grass.png</texture>
       <shadervar name="tex normal" type="texture">grassDOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
-      <shader type="diffuse">splatting_scattering</shader>
+      <shader type="terrain_splat">splatting_scattering</shader>
     </material>
   </materials>
 
@@ -109,13 +109,35 @@
 
   <addon>
   	<plugin>crystalspace.renderloop.loop.loader</plugin>
-        <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
+	<!-- @@@ NOTE a custom RL is needed to ensure that the base & splat
+	  -- meshes are only drawn once -->
+	<params>
+	  <name>rloop_terrain</name>
+	  <steps>
+	    <step plugin="crystalspace.renderloop.step.generic">
+	      <shadertype>terrain_base</shadertype>
+	      <zoffset>yes</zoffset>
+	      <portaltraversal />
+	      <zuse />
+	    </step>
+	    <step plugin="crystalspace.renderloop.step.lightiter">
+	      <steps>
+		<!-- diffuse lighting -->
+		<step plugin="crystalspace.renderloop.step.generic">
+		  <shadertype>terrain_splat</shadertype>
+		  <zoffset>no</zoffset>
+		  <ztest />
+		</step>
+	      </steps>
+	    </step>
+	  </steps>
+	</params>
   </addon>
 
   <settings>
     <clearzbuf>yes</clearzbuf>
     <lightmapcellsize>16</lightmapcellsize>
-    <renderloop>std_rloop_diffuse</renderloop>
+    <renderloop>rloop_terrain</renderloop>
   </settings>
 
   <start>
