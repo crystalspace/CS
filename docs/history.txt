@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Apr-2005
+	- res updated the JPG versions of the screenshots for the KDevelop,
+	  VC6 and VC7 tutorials to reflect the library consolidation and
+	  renaming of WIN32_VOLATILE to CS_WIN32_CONFIG.
 22-Apr-2005
 	- res changed the default setting for "delayed swap" to "disabled" when
 	  no configuration setting is present.
