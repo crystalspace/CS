@@ -765,21 +765,42 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is supported],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],
-    [C++], [COMPILER.C++FLAGS], [+])
+    [C++], [COMPILER.CFLAGS.optimize], [+])
 
 
 
 #------------------------------------------------------------------------------
 # Check if setting a default symbol visibility is supported.
-# @@@ Makes the assumption that when -fvisibility is supported GCC style 
-# visibility attributes are also available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([if -fvisibility=hidden is supported], 
     [cs_cv_prog_cxx_visibility_hidden], [],
     [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], 
-    [-fvisibility=hidden], [+])
-    CS_HEADER_PROPERTY([CS_HAVE_GCC_VISIBILITY])])
+    [cs_cv_prog_cxx_have_visibility_hidden='yes'],
+    [cs_cv_prog_cxx_have_visibility_hidden='no'])
+
+
+
+#------------------------------------------------------------------------------
+# Check if GCC style visibility attributes are available.
+#------------------------------------------------------------------------------
+m4_define([cs_declare_attr_visibility_default], 
+    [__attribute__((visibility("default")))])
+AC_CACHE_CHECK([whether GCC visibility attribute is available],
+    [cs_cv_prog_cxx_visibility_attribute],
+    [CS_BUILD_IFELSE(
+	[AC_LANG_PROGRAM([cs_declare_attr_visibility_default void f();], [])], 
+	[], [C++], 
+	[cs_cv_prog_cxx_visibility_attribute='yes'],
+	[cs_cv_prog_cxx_visibility_attribute='no'], [], [], [], [],
+	[visibility])])
+
+# Both -fvisibility=hidden and the visibility attribute is available, only 
+# then enable their use.
+AS_IF([test "$cs_cv_prog_cxx_visibility_attribute" != no],
+    [AS_IF([test "$cs_cv_prog_cxx_have_visibility_hidden" != no],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.optimize], 
+	[-fvisibility=hidden], [+])
+	CS_HEADER_PROPERTY([CS_HAVE_GCC_VISIBILITY])])])
 
 
 
@@ -1819,7 +1840,8 @@ CS_CHECK_LIB_WITH([aa],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([caca],
     [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])])
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
+    [libcaca])
 
 
 

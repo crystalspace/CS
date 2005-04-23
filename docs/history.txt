@@ -20,6 +20,12 @@ chronological order.
 	  the "standard", not "ambient" step.
 	- res augmented csIdentStrings to return the value of an identifier if
 	  no appropriate string was found.
+	- res changed the caca test to also check for "-llibcaca" (needed for
+	  cs-win32libs caca).
+	- res changed the ELF visibility features to only be used for optimize
+	  builds. (The idea is that it might be useful in some cases, e.g. when
+	  debug utilities don't use the debug information but rather only the 
+	  list of externally visible symbols for symbol name resolution.)
 22-Apr-2005
 	- res changed the default setting for "delayed swap" to "disabled" when
 	  no configuration setting is present.
