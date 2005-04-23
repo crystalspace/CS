@@ -266,7 +266,7 @@ Crystal Space release library names:
 
 @noindent
 @iftex
-@code{libcrystalspace.lib libcrystalspaceirectx.lib}@*
+@code{libcrystalspace.lib libcrystalspace_directx.lib}@*
 @code{libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end iftex
 @ifnottex
