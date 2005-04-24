@@ -16,6 +16,14 @@ chronological order.
 	- res worked around an issue were, when to close to a portal polygon,
 	  the polygon would get clipped and stencil & Z filling would be 
 	  wrong.
+	- Vincent Knecht updated rpm/cs.spec:
+	    - Removed csbumptest.cfg occurences.
+	    - Changed release numbering scheme so one knows the date of
+	      tested snapshot.
+	    - Put maps relighting in a for loop. Added terrain and terrainf
+	      to the list.
+	    - Changed occurences of %{name} to %{csprefix} where value is
+	      not dependent upon package name.
 23-Apr-2005
 	- res updated the JPG versions of the screenshots for the KDevelop,
 	  VC6 and VC7 tutorials to reflect the library consolidation and

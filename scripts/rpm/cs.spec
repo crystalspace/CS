@@ -1,7 +1,8 @@
-%define name    crystalspace
-%define version 0.99
-%define release 11
-%define prefix	/usr
+%define name     crystalspace
+%define version  0.99
+%define release  0.cvs20050424.1
+%define prefix   /usr
+%define csprefix crystalspace
 
 %define with_DEBUG 0
 %{?_without_debug: %{expand: %%global with_DEBUG 0}}
@@ -79,31 +80,31 @@ make all
 DESTDIR=%{buildroot} make install
 
 %post -n %{name}-utils
-%{_bindir}/cslight -canvas=null -video=null flarge
-%{_bindir}/cslight -canvas=null -video=null partsys
+for map in flarge partsys terrain terrainf ;            \
+  do %{_bindir}/cslight -canvas=null -video=null $map ; \
+  done ;
 
 %clean
-rm -rf "$RPM_BUILD_ROOT"
+%{__rm} -rf %{buildroot}
 
 %files -n %{name}
 %defattr(-,root,root)
 
-%{_sysconfdir}/%{name}/*
-%exclude %{_sysconfdir}/%{name}/awstest.cfg
-%exclude %{_sysconfdir}/%{name}/awstut.cfg
-%exclude %{_sysconfdir}/%{name}/csbumptest.cfg
-%exclude %{_sysconfdir}/%{name}/csdemo.cfg
-%exclude %{_sysconfdir}/%{name}/g2dtest.cfg
-%exclude %{_sysconfdir}/%{name}/heightmapgen.cfg
-%exclude %{_sysconfdir}/%{name}/lighter.xml
-%exclude %{_sysconfdir}/%{name}/map2cs.cfg
-%exclude %{_sysconfdir}/%{name}/walktest.cfg
-%exclude %{_sysconfdir}/%{name}/waterdemo.cfg
+%{_sysconfdir}/%{csprefix}/*
+%exclude %{_sysconfdir}/%{csprefix}/awstest.cfg
+%exclude %{_sysconfdir}/%{csprefix}/awstut.cfg
+%exclude %{_sysconfdir}/%{csprefix}/csdemo.cfg
+%exclude %{_sysconfdir}/%{csprefix}/g2dtest.cfg
+%exclude %{_sysconfdir}/%{csprefix}/heightmapgen.cfg
+%exclude %{_sysconfdir}/%{csprefix}/lighter.xml
+%exclude %{_sysconfdir}/%{csprefix}/map2cs.cfg
+%exclude %{_sysconfdir}/%{csprefix}/walktest.cfg
+%exclude %{_sysconfdir}/%{csprefix}/waterdemo.cfg
 
-%{_libdir}/%{name}/*
+%{_libdir}/%{csprefix}/*
 
-%{_datadir}/%{name}/data/*
-%exclude %{_datadir}/%{name}/data/maps/*
+%{_datadir}/%{csprefix}/data/*
+%exclude %{_datadir}/%{csprefix}/data/maps/*
 
 %files -n %{name}-utils
 %defattr(-,root,root)
@@ -112,25 +113,24 @@ rm -rf "$RPM_BUILD_ROOT"
 %exclude %{_bindir}/cs-config
 %exclude %{_bindir}/*.cex
 
-%{_datadir}/%{name}/data/maps/*
-%{_datadir}/%{name}/conversion/*
+%{_datadir}/%{csprefix}/data/maps/*
+%{_datadir}/%{csprefix}/conversion/*
 
-%{_sysconfdir}/%{name}/awstest.cfg
-%{_sysconfdir}/%{name}/awstut.cfg
-%{_sysconfdir}/%{name}/csbumptest.cfg
-%{_sysconfdir}/%{name}/csdemo.cfg
-%{_sysconfdir}/%{name}/g2dtest.cfg
-%{_sysconfdir}/%{name}/heightmapgen.cfg
-%{_sysconfdir}/%{name}/lighter.xml
-%{_sysconfdir}/%{name}/map2cs.cfg
-%{_sysconfdir}/%{name}/walktest.cfg
-%{_sysconfdir}/%{name}/waterdemo.cfg
+%{_sysconfdir}/%{csprefix}/awstest.cfg
+%{_sysconfdir}/%{csprefix}/awstut.cfg
+%{_sysconfdir}/%{csprefix}/csdemo.cfg
+%{_sysconfdir}/%{csprefix}/g2dtest.cfg
+%{_sysconfdir}/%{csprefix}/heightmapgen.cfg
+%{_sysconfdir}/%{csprefix}/lighter.xml
+%{_sysconfdir}/%{csprefix}/map2cs.cfg
+%{_sysconfdir}/%{csprefix}/walktest.cfg
+%{_sysconfdir}/%{csprefix}/waterdemo.cfg
 
 %files -n %{name}-doc
 %defattr(-,root,root)
 
 %docdir docs
-%{_datadir}/doc/%{name}-%{version}/*
+%{_datadir}/doc/%{csprefix}-%{version}/*
 
 %files -n %{name}-devel
 %defattr(-,root,root)
@@ -140,13 +140,20 @@ rm -rf "$RPM_BUILD_ROOT"
 
 # (vk) Scripting related files are here for now
 %{_bindir}/*.cex
-%{_datadir}/%{name}/bindings/*
+%{_datadir}/%{csprefix}/bindings/*
 
-%{_datadir}/%{name}/build/*
+%{_datadir}/%{csprefix}/build/*
 
-%{prefix}/include/%{name}/*
+%{_includedir}/%{csprefix}/*
 
 %changelog
+* Sun Apr 24 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20050424.1
+- Removed csbumptest.cfg occurences.
+- Changed release numbering scheme so one knows the date of tested snapshot.
+- Put maps relighting in a for loop. Added terrain and terrainf to the list.
+- Changed occurences of %{name} to %{csprefix} where value is not dependent
+  upon package name.
+
 * Fri Mar 25 2005 Frank Richter <resqu@gmx.ch> 0.99-11
 - The CSWS library has been retired.
 
