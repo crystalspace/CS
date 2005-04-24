@@ -24,6 +24,11 @@ chronological order.
 	      to the list.
 	    - Changed occurences of %{name} to %{csprefix} where value is
 	      not dependent upon package name.
+	- res moved the object-to-world transform back into csCoreRenderMesh.
+	  This is less problematic than transferring this in an SV as under 
+	  some circumstances every rendermesh of a mesh object needs separate 
+	  object-to-world transforms (spr2d is an example), but usually a mesh
+	  uses a single SV context for all RMs.
 23-Apr-2005
 	- res updated the JPG versions of the screenshots for the KDevelop,
 	  VC6 and VC7 tutorials to reflect the library consolidation and
