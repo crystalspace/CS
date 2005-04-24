@@ -384,7 +384,7 @@ private:
 
   // Draw a 2D polygon (screen space coordinates) with correct Z information
   // given the plane. This function will not set up any texture mapping,
-  // shading, or color.
+  // shading, or color. Expects identity MODELVIEW and PROJECTION matrices!
   void Draw2DPolygon (csVector2* poly, int num_poly, const csPlane3& normal);
 
   bool enableDelaySwap;

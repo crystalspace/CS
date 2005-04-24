@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Apr-2005
+	- res fixed some issues with Z-filling portals (which didn't exactly
+	  Z-fill).
+	- res fixed SetupClipPortals() to clear the stencil buffer before 
+	  drawing the stencil mask. Previously, when nested floating portals
+	  were used, the stencil mask of "inner" portals was merely added to
+	  the mask of "outer" portals due the lack of clearing.
+	- res worked around an issue were, when to close to a portal polygon,
+	  the polygon would get clipped and stencil & Z filling would be 
+	  wrong.
 23-Apr-2005
 	- res updated the JPG versions of the screenshots for the KDevelop,
 	  VC6 and VC7 tutorials to reflect the library consolidation and

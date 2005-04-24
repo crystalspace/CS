@@ -2146,15 +2146,6 @@ void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
 
   if (use_zfill_portal)
   {
-    // First setup projection matrix for 2D drawing.
-    statecache->SetMatrixMode (GL_PROJECTION);
-    glPushMatrix ();
-    glLoadIdentity ();
-    SetGlOrtho (false);
-    statecache->SetMatrixMode (GL_MODELVIEW);
-    glPushMatrix ();
-    glLoadIdentity ();
-
     GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
     statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
     statecache->SetColorMask (false, false, false, false);
@@ -2165,6 +2156,14 @@ void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
     bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     statecache->Disable_GL_TEXTURE_2D ();
     statecache->SetShadeModel (GL_FLAT);
+
+    // Setup projection matrix for 2D drawing.
+    statecache->SetMatrixMode (GL_PROJECTION);
+    glPushMatrix ();
+    glLoadIdentity ();
+    statecache->SetMatrixMode (GL_MODELVIEW);
+    glPushMatrix ();
+    glLoadIdentity ();
 
     SetZModeInternal (CS_ZBUF_FILLONLY);
     Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
@@ -2244,6 +2243,12 @@ void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
     O = -normal.C () * inv_Dc;
   }
 
+  // Basically a GL ortho matrix
+  const float P0 = 2.0f / (float)viewwidth;
+  const float P5 = 2.0f / (float)viewheight;
+  const float P10 = -2.0f / 11.0f;
+  const float P11 = -9.0f / 11.0f;
+
   int v;
   glBegin (GL_TRIANGLE_FAN);
   csVector2* vt = poly;
@@ -2253,7 +2258,34 @@ void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
     float sy = vt->y - asp_center_y;
     float one_over_sz = M * sx + N * sy + O;
     float sz = 1.0f / one_over_sz;
-    glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
+    // This is what we would do if we'd use glOrtho():
+    //glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
+
+    // The vector that results from a GL ortho transform
+    csVector4 bar ((vt->x * sz) * P0 - sz,
+      (vt->y * sz) * P5 - sz,
+      -P10 + sz * P11,
+      sz);
+    /* Now it can happen that a vertex of a polygon gets clipped when it's
+     * very close to the near plane. In practice that causes sonme of the 
+     * portal magic (stencil area setup, Z fill) to go wrong when the camera
+     * is close to the portal. We "fix" this by checking whether the vertex
+     * would get clipped and ... */
+    const float bar_w = bar.w, minus_bar_w = -bar_w;
+    if ((bar.x < minus_bar_w) || (bar.x > bar_w) 
+      || (bar.y < minus_bar_w) || (bar.y > bar_w) 
+      || (bar.z < minus_bar_w) || (bar.z > bar_w))
+    {
+      /* If yes, "fix" the vertex sent to GL by replacing the Z value with one
+       * that won't cause clipping. */
+      const float hackedZ = 1.0f - EPSILON;
+      glVertex3f (bar.x/bar_w, bar.y/bar_w, hackedZ);
+    }
+    else
+    {
+      // If not, proceed as usual.
+      glVertex4f (bar.x, bar.y, bar.z, bar.w);
+    }
     vt++;
   }
   glEnd ();
@@ -2286,11 +2318,10 @@ void csGLGraphics3D::SetupClipPortals ()
 
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p", cp));
 
-  // First setup projection matrix for 2D drawing.
+  // Setup projection matrix for 2D drawing.
   statecache->SetMatrixMode (GL_PROJECTION);
   glPushMatrix ();
   glLoadIdentity ();
-  SetGlOrtho (false);
   statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity ();
@@ -2313,6 +2344,8 @@ void csGLGraphics3D::SetupClipPortals ()
 
   SetZModeInternal (CS_ZBUF_TEST);
 
+  // @@@ Maybe this can be avoided?
+  glClear (GL_STENCIL_BUFFER_BIT);
   Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
 
   // Use the stencil area.
@@ -2321,9 +2354,6 @@ void csGLGraphics3D::SetupClipPortals ()
 
   // First clear the z-buffer here.
   SetZModeInternal (CS_ZBUF_FILLONLY);
-
-  statecache->SetMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
 
   glBegin (GL_QUADS);
   glVertex3f (-1.0f, 1.0f, -1.0f);
