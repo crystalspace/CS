@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/particlesys/particle.h"
+#include "cstool/rbuflock.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
@@ -71,8 +72,6 @@ csNewParticleSystem::csNewParticleSystem (
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
-  vertices = 0;
-
   texels = 0;
   triangles = 0;
   colors = 0;
@@ -86,7 +85,6 @@ csNewParticleSystem::~csNewParticleSystem ()
   delete[] texels;
   delete[] triangles;
   delete[] colors;
-  delete[] vertices;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticleState);
 }
 
@@ -209,13 +207,8 @@ void csNewParticleSystem::SetupObject ()
       *c++ = Color;
     }
 
-    delete[] vertices;
     VertexCount = ParticleCount * 4;
     TriangleCount = ParticleCount * 2;
-    vertices = new csVector3 [VertexCount];
-    vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-        VertexCount, CS_BUF_DYNAMIC, 
-        CS_BUFCOMP_FLOAT, 3);
     texel_buffer = csRenderBuffer::CreateRenderBuffer (
         VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 2);
@@ -226,11 +219,7 @@ void csNewParticleSystem::SetupObject ()
         TriangleCount*3, CS_BUF_DYNAMIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, VertexCount - 1);
 
-    bufferHolder.AttachNew (new csRenderBufferHolder);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+    lastDataUpdateFrame = ~0;
   }
 }
 
@@ -349,8 +338,28 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   csReversibleTransform trans = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     trans /= movable->GetFullTransform ();
-  
-  SetupParticles (trans, vertices);
+
+  const uint currentFrame = rview->GetCurrentFrameNumber ();
+
+  bool frameDataCreated;
+  PerFrameData& frameData = perFrameHolder.GetUnusedData (frameDataCreated,
+    currentFrame);
+  if (frameDataCreated 
+    || (frameData.vertex_buffer->GetElementCount() != VertexCount))
+  {
+    frameData.vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+      VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+    frameData.bufferHolder.AttachNew (new csRenderBufferHolder);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 
+      frameData.vertex_buffer);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 
+      texel_buffer);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+  }
+
+  SetupParticles (trans, 
+    csRenderBufferLock<csVector3>(frameData.vertex_buffer));
 
   if (Lighting && light_mgr)
   {
@@ -364,20 +373,23 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
 
   Material->Visit ();
 
-  vertex_buffer->CopyInto (vertices, VertexCount);
-  texel_buffer->CopyInto (texels, VertexCount);
-  color_buffer->CopyInto (colors, VertexCount);
-  index_buffer->CopyInto (triangles,TriangleCount * 3);
+  if (currentFrame != lastDataUpdateFrame)
+  {
+    texel_buffer->CopyInto (texels, VertexCount);
+    color_buffer->CopyInto (colors, VertexCount);
+    index_buffer->CopyInto (triangles, TriangleCount * 3);
+    lastDataUpdateFrame = currentFrame;
+  }
 
   bool meshCreated;
   csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, 
-    rview->GetCurrentFrameNumber ());
+    currentFrame);
 
   if (meshCreated)
   {
-    rm->buffers = bufferHolder;
     rm->variablecontext.AttachNew (new csShaderVariableContext);
   }
+  rm->buffers = frameData.bufferHolder;
 
   // Prepare for rendering.
   rm->mixmode = MixMode;

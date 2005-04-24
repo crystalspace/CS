@@ -23,6 +23,7 @@
  */
 
 #include "csextern.h"
+#include "cstool/framedataholder.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/rendermeshholder.h"
 #include "imesh/partsys.h"
@@ -72,12 +73,17 @@ protected:
   bool initialized;
 
   csRenderMeshHolderSingle rmHolder;
-  csRef<csRenderBufferHolder> bufferHolder;
+  struct PerFrameData
+  {
+    csRef<csRenderBufferHolder> bufferHolder;
+    csRef<iRenderBuffer> vertex_buffer;
+  };
+  csFrameDataHolder<PerFrameData> perFrameHolder;
+  uint lastDataUpdateFrame;
 
   int VertexCount;
   int TriangleCount;
-  csVector3* vertices;
-  csRef<iRenderBuffer> vertex_buffer;
+  //csVector3* vertices;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;

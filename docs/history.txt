@@ -29,6 +29,9 @@ chronological order.
 	  some circumstances every rendermesh of a mesh object needs separate 
 	  object-to-world transforms (spr2d is an example), but usually a mesh
 	  uses a single SV context for all RMs.
+	- res fixed csNewParticleSystem to properly handle the case were the
+	  mesh is drawn multiple times a frame (as it e.g. happens with the
+	  fountain in flarge).
 23-Apr-2005
 	- res updated the JPG versions of the screenshots for the KDevelop,
 	  VC6 and VC7 tutorials to reflect the library consolidation and
