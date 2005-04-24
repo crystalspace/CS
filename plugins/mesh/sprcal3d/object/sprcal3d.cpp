@@ -187,7 +187,6 @@ csStringID csSpriteCal3DMeshObjectFactory::texel_name = csInvalidStringID;
 csStringID csSpriteCal3DMeshObjectFactory::normal_name = csInvalidStringID;
 csStringID csSpriteCal3DMeshObjectFactory::color_name = csInvalidStringID;
 csStringID csSpriteCal3DMeshObjectFactory::index_name = csInvalidStringID;
-csStringID csSpriteCal3DMeshObjectFactory::string_object2world = csInvalidStringID;
 
 void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
@@ -227,8 +226,7 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
     (texel_name == csInvalidStringID) ||
     (normal_name == csInvalidStringID) ||
     (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID) ||
-    (string_object2world == csInvalidStringID))
+    (index_name == csInvalidStringID))
   {
     csRef<iStringSet> strings = 
       CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -238,7 +236,6 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
     normal_name = strings->Request ("normals");
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
-    string_object2world = strings->Request ("object2world transform");
   }
 
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
@@ -1710,7 +1707,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = camera->IsMirrored ();
     rm->worldspace_origin = wo;
-    rm->variablecontext->GetVariableAdd (factory->string_object2world)->SetValue (o2wt);
+    rm->object2world = o2wt;
     rm->geometryInstance = this;
   }
   currentMovable = movable;

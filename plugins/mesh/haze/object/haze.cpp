@@ -433,7 +433,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csStringID csHazeMeshObject::vertex_name = csInvalidStringID;
 csStringID csHazeMeshObject::texel_name = csInvalidStringID;
 csStringID csHazeMeshObject::index_name = csInvalidStringID;
-csStringID csHazeMeshObject::string_object2world = csInvalidStringID;
 
 csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 {
@@ -471,13 +470,11 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID) ||
-    (string_object2world == csInvalidStringID))
+    (index_name == csInvalidStringID))
   {
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     index_name = strings->Request ("indices");
-    string_object2world = strings->Request ("object2world transform");
   }
 }
 
@@ -804,8 +801,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   rm->clip_z_plane = clip_z_plane;
   rm->do_mirror = camera->IsMirrored ();
 
-  rm->variablecontext->GetVariableAdd (string_object2world)->
-    SetValue (camera->GetTransform ());
+  rm->object2world = camera->GetTransform ();
 
   rm->indexend = (uint)GetTempIndices()->Length();
 

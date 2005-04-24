@@ -242,7 +242,6 @@ private:
   csStringID string_point_scale;
   csStringID string_texture_diffuse;
   csStringID string_world2camera;
-  csStringID string_object2world;
 
   csConfigAccess config;
 

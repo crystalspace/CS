@@ -249,8 +249,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->indexstart = 0;
   rm->worldspace_origin = movable->GetFullPosition ();
 
-  rm->variablecontext->GetVariableAdd (factory->string_object2world)->
-    SetValue (tr_o2c.GetInverse ()* camera->GetTransform ());
+  rm->object2world = tr_o2c.GetInverse () * camera->GetTransform ();
   rm->indexend = (uint)vertices.Length();
 
 
@@ -741,7 +740,6 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pPare
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

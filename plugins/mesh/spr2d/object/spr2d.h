@@ -350,7 +350,6 @@ public:
   csRef<iLightManager> light_mgr;
   iObjectRegistry* object_reg;
   csWeakRef<iGraphics3D> g3d;
-  csStringID string_object2world;
 public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iMeshObjectType* pParent,

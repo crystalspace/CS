@@ -309,7 +309,6 @@ public:
   csRefArray<iPolygonRenderer> polyRenderers;
 
   static csStringID texLightmapName;
-  static csStringID string_object2world;
 
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);

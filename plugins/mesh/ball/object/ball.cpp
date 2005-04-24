@@ -602,8 +602,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
     meshPtr->buffers = bufferHolder;
     meshPtr->variablecontext.AttachNew (new csShaderVariableContext);
   }
-  meshPtr->variablecontext->GetVariableAdd (((csBallMeshObjectFactory*)factory)->string_object2world)->
-    SetValue (o2wt);
+  meshPtr->object2world = o2wt;
   meshPtr->geometryInstance = (void*)factory;
   
   num = 1;
@@ -1061,7 +1060,6 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iMeshObjectType* pParent,
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, 
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()

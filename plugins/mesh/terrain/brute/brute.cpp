@@ -600,7 +600,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       rm->material = terr->palette[i-1];
       rm->variablecontext = terr->paletteContexts[i-1];
     }
-    rm->variablecontext->GetVariableAdd (terr->string_object2world)->SetValue (o2wt);
+    rm->object2world = o2wt;
     rm->worldspace_origin = wo;
     terr->returnMeshes->Push (rm);
   }
@@ -1140,7 +1140,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   normals_name = strings->Request ("normals");
   texcoords_name = strings->Request ("texture coordinates");
   colors_name = strings->Request ("colors");
-  string_object2world = strings->Request ("object2world transform");
 
   //terr_func = &((csTerrainFactory*)pFactory)->terr_func;
   terraformer = ((csTerrainFactory*)pFactory)->terraformer;

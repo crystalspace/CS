@@ -467,7 +467,7 @@ private:
   void SetupFactory ();
 
 public:
-  static csStringID heights_name, foliage_density_name, foliage_types_name, string_object2world;
+  static csStringID heights_name, foliage_density_name, foliage_types_name;
 
   iObjectRegistry* object_reg;
   iBase* logparent;

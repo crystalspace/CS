@@ -293,7 +293,7 @@ private:
   // Use for clipping during rendering.
   csPlane3 planes[10];
 
-  csStringID vertices_name, normals_name, texcoords_name, colors_name, string_object2world;
+  csStringID vertices_name, normals_name, texcoords_name, colors_name;
 
   bool initialized;
 

@@ -496,7 +496,6 @@ protected:
   csStringID string_texture_diffuse;
   csStringID string_texture_lightmap;
   csStringID string_material_flatcolor;
-  csStringID string_object2world;
   csStringID string_world2camera;
 
   csRef<iShaderManager> shadermgr;

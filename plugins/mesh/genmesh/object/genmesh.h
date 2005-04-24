@@ -615,7 +615,6 @@ public:
 
   csRef<iVirtualClock> vc;
 
-  static csStringID string_object2world;
   uint buffers_version;
 
   bool back2front;

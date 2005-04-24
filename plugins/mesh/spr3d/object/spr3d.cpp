@@ -258,7 +258,6 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iMeshObjectType* pPare
   initialized = false;
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 }
 
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
@@ -1578,8 +1577,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
     rmesh->buffers = bufferHolder;
     rmesh->variablecontext = svcontext;
   }
-  rmesh->variablecontext->GetVariableAdd (factory->string_object2world)->
-    SetValue (movable->GetFullTransform ());
+  rmesh->object2world = movable->GetFullTransform ();
 
   rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
   n = 1;

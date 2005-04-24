@@ -435,7 +435,6 @@ bool csStencil2ShadowStep::Initialize (iObjectRegistry* objreg)
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 
   return true;
 }
@@ -601,8 +600,7 @@ void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2
 
   csRenderMesh rmesh;
   rmesh.variablecontext.AttachNew (new csShaderVariableContext);
-  rmesh.variablecontext->GetVariableAdd (string_object2world)->SetValue (
-    mesh->GetMovable()->GetFullTransform ());
+  rmesh.object2world = mesh->GetMovable()->GetFullTransform ();
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   rmesh.material = 0;
   rmesh.buffers = cache_entry->bufferHolder;

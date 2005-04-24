@@ -1117,8 +1117,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->variablecontext = svcontext;
     meshPtr->buffers = bufferHolder;
     meshPtr->geometryInstance = (void*)factory;
-    meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
-      SetValue (o2wt);
+    meshPtr->object2world = o2wt;
 
     renderMeshes[0] = meshPtr;
   } else {
@@ -1152,8 +1151,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       CS_ASSERT (mater != 0);
       meshPtr->worldspace_origin = wo;
       meshPtr->variablecontext = svcontext;
-      meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
-        SetValue (o2wt);
+      meshPtr->object2world = o2wt;
 
       subMeshes[i]->bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
         bufferHolder->GetAccessorMask() 
@@ -1472,8 +1470,6 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::eiRenderBufferAccessor)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
-csStringID csGenmeshMeshObjectFactory::string_object2world = csInvalidStringID;
-
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   iMeshObjectType *pParent, iObjectRegistry* object_reg)
 {
@@ -1516,7 +1512,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 
   mesh_vertices_dirty_flag = false;
   mesh_texels_dirty_flag = false;

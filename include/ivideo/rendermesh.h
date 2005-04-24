@@ -143,6 +143,9 @@ struct csCoreRenderMesh
   // @@@ FIXME: SW needs it
   /// Material used for this mesh
   iMaterialWrapper* material;
+
+  /// Transform object space -> world space
+  csReversibleTransform object2world;
 };
 
 /**

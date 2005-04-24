@@ -105,11 +105,10 @@ private:
   /* @@@ Ugly. */
   csArray<csStringID> disableDefaultTypes;
 
-  static csStringID o2c_matrix_name;
-  static csStringID o2c_vector_name;
   static csStringID fogplane_name;
   static csStringID fogdensity_name;
   static csStringID fogcolor_name;
+  static csStringID string_object2world;
 public:
   SCF_DECLARE_IBASE;
 

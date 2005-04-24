@@ -185,7 +185,6 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   radius_name = strings->Request ("point radius");
   scale_name = strings->Request ("point scale");
-  string_object2world = strings->Request ("object2world transform");
 
   matwrap = p->material;
 
@@ -622,8 +621,8 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   mesh->worldspace_origin = o2wt.GetOrigin ();
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
-  mesh->variablecontext = svcontext; // Cast for gcc 2.95.x.
-  mesh->variablecontext->GetVariableAdd (string_object2world)->SetValue (o2wt);
+  mesh->variablecontext = svcontext;
+  mesh->object2world = o2wt;
   mesh->buffers = bufferHolder;
   if (point_sprites)
     mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;

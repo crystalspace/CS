@@ -187,7 +187,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csStringID csThingStatic::texLightmapName = csInvalidStringID;
-csStringID csThingStatic::string_object2world = csInvalidStringID;
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 	last_range (0, -1),
@@ -222,10 +221,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   if ((texLightmapName == csInvalidStringID))
   {
     texLightmapName = thing_type->stringset->Request ("tex lightmap");
-  }
-  if ((string_object2world == csInvalidStringID))
-  {
-    string_object2world = thing_type->stringset->Request ("object2world transform");
   }
 }
 
@@ -2563,8 +2558,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
     rm->lastFrame = currentFrame;
-    rm->variablecontext->GetVariableAdd (static_data->string_object2world)->
-      SetValue (t);
+    rm->object2world = t;
 
     // Jorrit: Moved the code below to PrepareRenderMeshes().
     //rm->variablecontext->GetVariable (static_data->texLightmapName)->

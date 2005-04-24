@@ -236,7 +236,7 @@ public:
   csWeakRef<iEngine> engine;
   
   static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name, string_object2world;
+    index_name;
 
   /// Create the sprite template.
   csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent,

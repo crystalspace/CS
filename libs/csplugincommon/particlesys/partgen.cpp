@@ -97,7 +97,6 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 
   vertices = 0;
   texels = 0;
@@ -411,7 +410,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->material = m;
   CS_ASSERT (m != 0);
   rm->worldspace_origin = movable->GetFullPosition ();
-  rm->variablecontext->GetVariableAdd (string_object2world)->SetValue (camera->GetTransform ());  
+  rm->object2world = camera->GetTransform ();  
 
   n = 1;
   return &rm;

@@ -149,7 +149,6 @@ private:
   csArray<csPlane3> camera_planes;
 
   int clip_portal, clip_plane, clip_z_plane;
-  csStringID string_object2world;
 
   // Drawing stuff...
   bool csPortalContainer::ClipToPlane (int portal_idx, csPlane3 *portal_plane,

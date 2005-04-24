@@ -440,8 +440,7 @@ csRenderMesh** csFoliageMeshObject::GetRenderMeshes (
     meshPtr->buffers = bufferHolder;
     meshPtr->variablecontext = variableContext;
   }
-  meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
-    SetValue (o2wt);
+  meshPtr->object2world = o2wt;
   meshPtr->geometryInstance = (void*)factory;
  
   n = 1;
@@ -566,7 +565,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csStringID csFoliageMeshObjectFactory::heights_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::foliage_density_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::foliage_types_name = csInvalidStringID;
-csStringID csFoliageMeshObjectFactory::string_object2world = csInvalidStringID;
 
 csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (
 	iMeshObjectType *pParent, iObjectRegistry* object_reg)
@@ -599,7 +597,6 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (
     heights_name = strings->Request ("heights");
     foliage_density_name = strings->Request ("foliage_density");
     foliage_types_name = strings->Request ("foliage_types");
-    string_object2world = strings->Request ("object2world transform");
   }
 
   mesh_vertices_dirty_flag = true;

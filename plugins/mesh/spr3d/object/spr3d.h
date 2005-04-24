@@ -357,7 +357,6 @@ private:
   csPDelArray<csPoly3D> normals;
 
   csFlags flags;
-  csStringID string_object2world;
 
   /**
    * Connectivity information for this sprite template.

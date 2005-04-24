@@ -129,7 +129,6 @@ csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_r
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -160,7 +159,7 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
   {
     meshPtr->variablecontext.AttachNew (new csShaderVariableContext);
   }
-  meshPtr->variablecontext->GetVariableAdd (string_object2world)->SetValue (o2wt);
+  meshPtr->object2world = o2wt;
   num = 1;
   return &meshPtr;
 }

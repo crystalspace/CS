@@ -147,11 +147,10 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-csStringID csGenericRenderStep::o2c_matrix_name;
-csStringID csGenericRenderStep::o2c_vector_name;
 csStringID csGenericRenderStep::fogplane_name;
 csStringID csGenericRenderStep::fogdensity_name;
 csStringID csGenericRenderStep::fogcolor_name;
+csStringID csGenericRenderStep::string_object2world;
 
 SCF_IMPLEMENT_IBASE(csGenericRenderStep)
   SCF_IMPLEMENTS_INTERFACE(iRenderStep)
@@ -178,6 +177,7 @@ csGenericRenderStep::csGenericRenderStep (
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
+  string_object2world = strings->Request ("object2world transform");
 
   visible_meshes_index = 0;
 }
@@ -200,6 +200,8 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   {
     shaderManager = CS_QUERY_REGISTRY (objreg, iShaderManager);
   }
+  csRef<csShaderVariable> svO2W = 
+    shadervars.Top ().GetVariable(string_object2world);
   shaderManager->PushVariables (stacks);
 
   iMaterial *material = 0;
@@ -218,6 +220,8 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       if (meshContext->IsEmpty())
 	meshContext = 0;
       if ((!portalTraversal) && mesh->portal != 0) continue;
+
+      svO2W->SetValue (mesh->object2world);
 
       if ((mesh->material->GetMaterial () != material)
 	|| (meshContext != lastMeshContext))
@@ -397,8 +401,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   size_t currentTicket = ~0;
 
   shadervars.Push (csShaderVariableContext ());
-  shadervars.Top ().GetVariableAdd (o2c_matrix_name);
-  shadervars.Top ().GetVariableAdd (o2c_vector_name);
+  shadervars.Top ().GetVariableAdd (string_object2world);
 
   csRef<csShaderVariable> sv;
   if (sector->HasFog())

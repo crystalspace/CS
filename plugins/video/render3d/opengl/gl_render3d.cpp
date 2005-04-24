@@ -975,7 +975,6 @@ bool csGLGraphics3D::Open ()
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   string_world2camera = strings->Request ("world2camera transform");
-  string_object2world = strings->Request ("object2world transform");
 
   /* @@@ All those default textures, better put them into the engine? */
 
@@ -1726,13 +1725,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   if (debug_inhibit_draw) 
     return;
 
-  csReversibleTransform o2w;
-
-  CS_ASSERT (string_object2world<(csStringID)stacks.Length () 
-      && stacks[string_object2world].Length () > 0);
-    
-  stacks[string_object2world].Top ()->GetValue (o2w);
-  
+  const csReversibleTransform& o2w = mymesh->object2world;
 
   float matrix[16];
   makeGLMatrix (o2w, matrix);
@@ -2626,7 +2619,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     SetWorldToCamera (camtrans);
   }
   
-  scrapContext.GetVariableAdd (string_object2world)->SetValue (mesh.object2world);
+  rmesh.object2world = mesh.object2world;
 
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
