@@ -26,6 +26,7 @@
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
+#include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"

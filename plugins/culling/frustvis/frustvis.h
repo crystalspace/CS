@@ -26,6 +26,7 @@
 #include "csutil/parray.h"
 #include "csutil/scf.h"
 #include "csutil/hash.h"
+#include "csutil/set.h"
 #include "csgeom/plane3.h"
 #include "igeom/objmodel.h"
 #include "iengine/viscull.h"

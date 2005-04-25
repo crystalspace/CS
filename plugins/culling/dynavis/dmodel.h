@@ -23,6 +23,13 @@
 #include "csutil/hash.h"
 #include "csutil/scf.h"
 
+// @@@ Hack(s) to avoid problems with static linking
+#ifdef DYNAVIS_DEBUG
+#define csOutlineInfo		csOutlineInfo_DEBUG
+#define csDynavisObjectModel	csDynavisObjectModel_DEBUG
+#define csObjectModelManager	csObjectModelManager_DEBUG
+#endif
+
 class csDynavisObjectModel;
 class csObjectModelManager;
 struct csPolygonMeshEdge;

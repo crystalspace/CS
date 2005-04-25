@@ -24,6 +24,7 @@
 
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
+#include "csutil/set.h"
 
 #include "mapstd.h"
 #include "map.h"

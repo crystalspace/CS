@@ -19,6 +19,13 @@ chronological order.
 	  be achieved by using csFrameDataHolder<csDirtyAccessArray<
 	  csRenderMesh*> >) and renamed csRenderMeshHolderSingle to
 	  csRenderMeshHolder.
+	- res moved csSet<> out of csutil/hash.h into its own header file. 
+	  While csSet<> internally depends on csHash<>, this is an 
+	  implementation detail that could change in the future. Hence, to 
+	  hide this detail and reduce the need to make any adjustments in case 
+	  the implementation of csSet<> would change the class has been
+	  relocated.
+	- res worked around some static linking issues with dynavis_debug.
 24-Apr-2005
 	- res fixed some issues with Z-filling portals (which didn't exactly
 	  Z-fill).

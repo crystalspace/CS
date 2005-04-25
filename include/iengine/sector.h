@@ -30,6 +30,7 @@
 #include "cstypes.h"
 #include "csutil/scf.h"
 #include "csutil/hash.h"
+#include "csutil/set.h"
 #include "iutil/object.h"
 
 class csVector3;

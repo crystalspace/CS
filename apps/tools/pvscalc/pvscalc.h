@@ -27,6 +27,7 @@
 #include "csutil/csbaseeventh.h"
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
+#include "csutil/set.h"
 #include "csutil/strhash.h"
 #include "iengine/engine.h"
 #include "imap/loader.h"

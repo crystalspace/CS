@@ -27,6 +27,7 @@
 #include "csutil/hash.h"
 #include "csutil/blockallocator.h"
 #include "csutil/scf.h"
+#include "csutil/set.h"
 #include "csutil/leakguard.h"
 #include "igeom/objmodel.h"
 #include "iengine/movable.h"
@@ -35,12 +36,18 @@
 #include "iengine/viscull.h"
 #include "dmodel.h"
 #include "dhistmgr.h"
+#include "wqueue.h"
+
+// @@@ Hack(s) to avoid problems with static linking
+#ifdef DYNAVIS_DEBUG
+#define csVisibilityObjectWrapper	csVisibilityObjectWrapper_DEBUG
+#define csDynaVis			csDynaVis_DEBUG
+#endif
 
 class csKDTree;
 class csKDTreeChild;
 class csCoverageBuffer;
 class csTiledCoverageBuffer;
-class csWriteQueue;
 class csDynaVis;
 struct csTestRectData;
 struct iPolygonMesh;

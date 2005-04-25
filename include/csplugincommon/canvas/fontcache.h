@@ -29,6 +29,7 @@
 #include "csutil/list.h"
 #include "csutil/blockallocator.h"
 #include "csutil/refcount.h"
+#include "csutil/set.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 

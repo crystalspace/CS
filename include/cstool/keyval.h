@@ -25,6 +25,7 @@
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
+#include "csutil/set.h"
 #include "ivaria/keyval.h"
 
 /**

@@ -1703,3 +1703,12 @@ and deprecation warnings have been added. Use @file{imap/loader.h} instead.
 
 Following the removal of @code{csRenderMeshHolderMultiple} (see above),
 @code{csRenderMeshHolderSingle} has been renamed to @code{csRenderMeshHolder}. 
+
+@subheading @code{csSet<>} Relocation
+
+The class @code{csSet<>} was moved out from @file{csutil/hash.h} into its own 
+header file, @file{csutil/set.h}. While @code{csSet<>} internally depends on
+@code{csHash<>}, this is an implementation detail that could change in the
+future. Hence, to hide this detail and reduce the need to make any adjustments
+in case the implementation of @code{csSet<>} would change the class has been
+relocated.

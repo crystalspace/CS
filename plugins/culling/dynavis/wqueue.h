@@ -23,6 +23,11 @@
 #include "csgeom/math2d.h"
 #include "iutil/dbghelp.h"
 
+// @@@ Hack(s) to avoid problems with static linking
+#ifdef DYNAVIS_DEBUG
+#define csWriteQueue	csWriteQueue_DEBUG
+#endif
+
 class csBox2;
 
 struct csWriteQueueElement

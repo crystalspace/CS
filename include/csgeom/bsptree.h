@@ -25,6 +25,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/hash.h"
 #include "csutil/blockallocator.h"
+#include "csutil/set.h"
 
 struct iGraphics3D;
 struct csTriangle;

@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.culling.dynavis_debug</name>
-        <implementation>csDynaVis</implementation>
+        <implementation>csDynaVis_DEBUG</implementation>
         <description>Dynamic Visibility System (Debug Version)</description>
       </class>
     </classes>

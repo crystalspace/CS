@@ -30,6 +30,7 @@
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/set.h"
 #include "csutil/strhash.h"
 #include "ivideo/graph3d.h"
 #include "csgfx/shadervar.h"

@@ -27,6 +27,11 @@
 #include "iengine/viscull.h"
 #include "dmodel.h"
 
+// @@@ Hack(s) to avoid problems with static linking
+#ifdef DYNAVIS_DEBUG
+#define csVisibilityObjectHistory	csVisibilityObjectHistory_DEBUG
+#endif
+
 enum csVisReason
 {
   INVISIBLE_PARENT = 0,	// Invisible because some parent node is invisible.
