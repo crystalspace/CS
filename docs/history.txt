@@ -26,6 +26,10 @@ chronological order.
 	  the implementation of csSet<> would change the class has been
 	  relocated.
 	- res worked around some static linking issues with dynavis_debug.
+	- res removed uses of strncpy(). (strncpy() does more than you expect
+	  [it fills the destination buffer up to then end with 0] and less
+	  than you want [it doesn't guarantee null termination].)
+	- res fixed some signed vs unsigned warnings.
 24-Apr-2005
 	- res fixed some issues with Z-filling portals (which didn't exactly
 	  Z-fill).

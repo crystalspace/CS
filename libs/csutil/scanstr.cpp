@@ -148,7 +148,7 @@ int csScanStr (const char* in, const char* format, ...)
 	    const char* in2 = strchr (in, '\'');
 	    if (in2)
 	    {
-	      strncpy (a, in, (int)(in2-in));
+	      memcpy (a, in, (int)(in2-in));
 	      a[(int)(in2-in)] = 0;
 	      in = in2+1;
 	    }
@@ -163,7 +163,7 @@ int csScanStr (const char* in, const char* format, ...)
 	  {
 	    const char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyz"
 	      "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789./-");
-	    strncpy (a, in, (int)(in2-in));
+	    memcpy (a, in, (int)(in2-in));
 	    a[(int)(in2-in)] = 0;
 	    in = in2;
 	    num++;

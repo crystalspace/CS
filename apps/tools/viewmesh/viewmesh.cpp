@@ -1530,19 +1530,16 @@ void ViewMesh::ClearButton (intptr_t awst, iAwsSource *s)
 bool ViewMesh::ParseDir(const char* filename)
 {
   const char* colon = strchr (filename, ':');
-  char* path;
+  csString path;
   CS_ALLOC_STACK_ARRAY(char, fn, strlen(filename) + 1);
   if (colon)
   {
     int pathlen = colon-filename;
-    path = new char[pathlen+1];
     strcpy (fn, colon+1);
-    strncpy (path, filename, pathlen);
-    path[pathlen] = 0;
+    path.Append (filename, pathlen);
     if (!vfs->ChDirAuto (path, 0, 0, colon+1))
     {
       ReportError ("Couldn't find '%s' in '%s'!", colon+1, path);
-      delete[] path;
       return false;
     }
     // If there is a path after the colon we skip every entry in that
@@ -1563,20 +1560,15 @@ bool ViewMesh::ParseDir(const char* filename)
   else
   {
     // grab the directory.
-    path = new char[strlen(filename)+1];
-    strcpy (path, filename);
-    strcpy (fn, path);
-    char* slash = strrchr (path, '/');
-    char* dir;
-    if (slash)
+    path = filename;
+    size_t slashPos = path.FindLast ('/');
+    if (slashPos != (size_t)-1)
     {
-      strcpy (fn, slash + 1);
-      *slash = 0;
-      dir = path;
+      path.Truncate (slashPos);
     }
     else
-      dir = "/";
-    if (!vfs->ChDir(dir))
+      path = "/";
+    if (!vfs->ChDir (path))
       return false;
     return true;
   }

@@ -164,7 +164,9 @@ static inline char* FindConfigPath ()
 
     if (GetShellFolderPath (CSIDL_PROGRAM_FILES, programpath))
     {
-      strncpy (path, programpath, MIN(sizeof(programpath), 1024-30));
+      size_t maxLen = MIN(sizeof(programpath), 1024-30);
+      memcpy (path, programpath, maxLen);
+      path[maxLen] = 0;
       strcat (path, "\\" CS_PACKAGE_NAME);
       return csStrNew (path);
     }
@@ -172,7 +174,7 @@ static inline char* FindConfigPath ()
 
   // nothing helps, use default
   // which is "C:\Program Files\CrystalSpace"
-  strncpy(path, "C:\\Program Files\\" CS_PACKAGE_NAME, 1024);
+  strcpy (path, "C:\\Program Files\\" CS_PACKAGE_NAME);
 
   return csStrNew (path);
 }

@@ -280,7 +280,10 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
     LineMessageNumber--;
   }
 
-  strncpy (LineMessage [LineMessageNumber], iText, SIZE_LINE - 1);
+  size_t len = strlen (iText);
+  len = MIN (len, SIZE_LINE-1);
+  memcpy (LineMessage [LineMessageNumber], iText, len);
+  LineMessage [LineMessageNumber][len] = 0;
   LinesChanged [LineMessageNumber] = true;
 
   LineTime = csGetTicks () + 4000;

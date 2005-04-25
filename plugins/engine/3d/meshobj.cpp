@@ -1277,11 +1277,10 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
   if (!p) return meshes_hash.Get (Name, 0);
 
   int firstsize = p-Name;
-  char* firstname = (char*)alloca (firstsize+1);
-  strncpy (firstname, Name, firstsize);
-  firstname[firstsize] = 0;
+  csString firstName;
+  firstName.Append (Name, firstsize);
 
-  iMeshWrapper* m = meshes_hash.Get (firstname, 0);
+  iMeshWrapper* m = meshes_hash.Get (csStrKey (firstName), 0);
   if (!m) return 0;
   return m->GetChildren ()->FindByName (p+1);
 }

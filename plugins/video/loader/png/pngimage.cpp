@@ -21,8 +21,9 @@
 #include "csgfx/imagetools.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
-#include "csutil/databuf.h"
 #include "csutil/csendian.h"
+#include "csutil/csstring.h"
+#include "csutil/databuf.h"
 #include <math.h>
 
 extern "C"
@@ -157,13 +158,18 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     const char *opt_end = strchr (current_opt, ',');
     if (!opt_end) opt_end = strchr (current_opt, 0);
 
-    char *opt_key = new char[opt_end - current_opt + 1];
-    strncpy (opt_key, current_opt, opt_end - current_opt);
-    opt_key[opt_end - current_opt] = 0;
+    csString opt_key;
+    opt_key.Append (current_opt, opt_end - current_opt);
     current_opt = opt_end;
 
-    char *opt_value = strchr (opt_key, '=');
-    if (opt_value) *opt_value++ = 0;
+    csString opt_value;
+    size_t opt_value_pos = opt_key.FindFirst ('=');
+    if (opt_value_pos != (size_t)-1)
+    {
+      opt_key.SubString (opt_value, opt_value_pos + 1, 
+        opt_key.Length() - opt_value_pos);
+      opt_key.Truncate (opt_value_pos);
+    }
 
     if (!strcmp (opt_key, "compress"))
     {
@@ -174,8 +180,6 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     {
       interlace = true;
     }
-
-    delete opt_key;
   }
 
   if (compress < 0) compress = 0;

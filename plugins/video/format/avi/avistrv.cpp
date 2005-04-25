@@ -74,7 +74,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk->currentframepos = 0;
   csString buf;
   buf.Format ("%02" PRIu16 "d%c", nStreamNumber, pf->compression == 0 ? 'b' : 'c');
-  strncpy (pChunk->id, buf, 5);
+  strcpy (pChunk->id, buf);
 
   nStream = nStreamNumber;
   csAVIStreamVideo::object_reg = object_reg;

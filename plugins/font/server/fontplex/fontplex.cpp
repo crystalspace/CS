@@ -269,35 +269,33 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
   while ((str != 0) && (*str != 0))
   {
     const char* comma = strchr (str, ',');
+    csString fontName;
     size_t partLen = (comma ? (comma - str) : strlen (str));
-    CS_ALLOC_STACK_ARRAY (char, part, partLen + 1);
-    strncpy (part, str, partLen);
-    part[partLen] = 0;
+    fontName.Append (str, partLen);
 
-    char* fontName = part;
-    char* newserver = 0;
-    char* fontScale = 0;
-    char* p;
+    csString newserver;
+    csString fontScale;
 
-    if ((p = strchr (fontName, ':')))
+    size_t pos;
+
+    if ((pos = fontName.FindFirst (':')) != (size_t)-1)
     {
-      newserver = fontName;
-      *p = 0;
-      fontName = p + 1;
+      fontName.SubString (newserver, 0, pos);
+      fontName.DeleteAt (0, pos);
     }
-    if ((p = strrchr (fontName, '@')))
+    if ((pos = fontName.FindFirst ('@')) != (size_t)-1)
     {
-      fontScale = p + 1;
-      *p = 0;
+      fontName.SubString (fontScale, 0, pos);
+      fontName.DeleteAt (0, pos);
     }
 
     float scale;
-    if ((!fontScale) || (sscanf (fontScale, "%f", &scale) <= 0))
+    if ((fontScale.IsEmpty()) || (sscanf (fontScale, "%f", &scale) <= 0))
     {
       scale = 1.0f;
     }
 
-    if (newserver)
+    if (!newserver.IsEmpty())
     {
       csRef<iFontServer> fs = ResolveFontServer (newserver);
       if (fs)

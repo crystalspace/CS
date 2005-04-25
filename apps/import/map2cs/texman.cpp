@@ -127,16 +127,14 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
 {
   assert(m_pMap);
 
-  char CleanedUpTextureName[200];
-  strcpy(CleanedUpTextureName, TextureName);
-  CleanupTexturename(CleanedUpTextureName);
+  csString CleanedUpTextureName (TextureName);
+  CleanupTexturename (CleanedUpTextureName);
 
-  char InternalName[200];
-  strncpy (InternalName, CleanedUpTextureName, sizeof(InternalName));
+  csString InternalName (CleanedUpTextureName);
 
   // clean out some chars like '/' etc.
   size_t p=0;
-  for (p=0; p<strlen(InternalName); p++)
+  for (p=0; p<InternalName.Length(); p++)
   {
     if (strchr ("/\\", InternalName[p]))
     {
@@ -232,19 +230,19 @@ bool CTextureManager::AddAllTexturesToVFS(csRef<iVFS> VFS, const char* path)
   return ok;
 }
 
-void CTextureManager::CleanupTexturename(char* Name)
+void CTextureManager::CleanupTexturename (csString& Name)
 {
   int i;
 
   for (i=0; i<int(sizeof(Q3Extensions)/sizeof(Q3Extensions[0])); i++)
   {
     size_t ExtensionLen = strlen(Q3Extensions[i]);
-    size_t NameLen      = strlen(Name);
-    if (NameLen>ExtensionLen)
+    if (Name.Length() > ExtensionLen)
     {
-      if (strcmp(Name+NameLen-ExtensionLen, Q3Extensions[i])==0)
+      if (strcmp (Name.GetData() + Name.Length() - ExtensionLen, 
+        Q3Extensions[i])==0)
       {
-        Name[NameLen-ExtensionLen] = 0;
+        Name.Truncate (Name.Length() - ExtensionLen);
         return;
       }
     }

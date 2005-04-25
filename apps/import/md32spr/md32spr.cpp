@@ -1179,7 +1179,7 @@ char *basename(const char *path, char *base)
   {
     sz = strlen(file);
   }
-  strncpy(base, file, sz);
+  memcpy (base, file, sz);
   base[sz] = '\0';
   return base;
 }
@@ -1196,7 +1196,7 @@ char *filename(char *path, char *file)
   fname = new char[strlen(path)];
   splitpath(path, dir, strlen(path), fname, strlen(path));
   sz = strlen(fname);
-  strncpy(file, fname, sz);
+  memcpy (file, fname, sz);
   file[sz] = '\0';
   return file;
 }

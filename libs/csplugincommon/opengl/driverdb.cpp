@@ -306,15 +306,14 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
     rel = ge;
   else
   {
-    CS_ALLOC_STACK_ARRAY(char, relstr, rellen + 1);
-    strncpy (relstr, relation, rellen);
-    relstr[rellen] = 0;
+    csString relstr;
+    relstr.Append (relation, rellen);
 
     synsrv->Report (
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "Unknown relation '%s'", relstr);
+      "Unknown relation '%s'", relstr.GetData());
     return false;
   }
 

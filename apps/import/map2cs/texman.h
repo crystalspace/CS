@@ -63,7 +63,7 @@ public:
   CTextureFile* GetTexture (size_t index) {return m_StoredTextures[index];}
 
 protected:
-  void CleanupTexturename(char* Name);
+  void CleanupTexturename (csString& Name);
 
   /// A pointer to the global map.
   CMapFile* m_pMap;

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include <sys/stat.h>
 #include "csutil/cfgfile.h"
+#include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "shellstuff.h"
 
@@ -46,9 +47,8 @@ static void MakeDir (const char* name)
   if (!bslash)
     return;
   const size_t len = bslash - name;
-  CS_ALLOC_STACK_ARRAY (char, upPath, len + 1);
-  strncpy (upPath, name, len);
-  upPath[len] = 0;
+  csString upPath;
+  upPath.Append (name, len);
 
   MakeDir (upPath);
   CreateDirectoryA (name, 0);

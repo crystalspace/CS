@@ -235,7 +235,7 @@ void csReplaceAll(char *dest, const char *src, const char *search,
     int beforelen = found - srcpos;
     sizeleft -= beforelen;
     if(sizeleft <= 0) { destpos[0]=0; return; }
-    strncpy(destpos, srcpos, beforelen);
+    memcpy (destpos, srcpos, beforelen);
     destpos += beforelen;
     srcpos += beforelen;
     destpos[0]=0;

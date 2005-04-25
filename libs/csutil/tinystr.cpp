@@ -143,7 +143,7 @@ void TiXmlString::append( const char* str, size_t len )
       cstring = (char*)malloc (new_alloc);
 
     // append the suffix. It does exist, otherwize we wouldn't be expanding 
-    strncpy (cstring + length(), str, len);
+    memcpy (cstring + length(), str, len);
     cstring [new_size - 1] = 0;
 
     // update member variables
@@ -153,7 +153,7 @@ void TiXmlString::append( const char* str, size_t len )
   else
   {
     // we know we can safely append the new string
-    strncpy (cstring + length(), str, len);
+    memcpy (cstring + length(), str, len);
     clength += len;
     cstring [clength] = 0;
    }

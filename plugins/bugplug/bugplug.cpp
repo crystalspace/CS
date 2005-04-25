@@ -316,18 +316,16 @@ void csBugPlug::SetupPlugin ()
 	}
 	while ((end >= captureFormat) && (isdigit (*end)));
 	
-	char nameForm [6];
-	cs_snprintf (nameForm, 6, "%%0%dd", captureFormatNumberDigits);
+	csString nameForm;
+	nameForm.Format ("%%0%dd", captureFormatNumberDigits);
 
-	size_t newlen = strlen(captureFormat)+strlen(nameForm)-
-	  captureFormatNumberDigits+1;
-	char* newCapForm = new char[newlen];
-	memset (newCapForm, 0, newlen);
-	strncpy (newCapForm, captureFormat, end-captureFormat+1);
-	strcat (newCapForm, nameForm);
-	strcat (newCapForm, end+captureFormatNumberDigits+1);
+        csString newCapForm;
+        newCapForm.Append (captureFormat, end-captureFormat+1);
+        newCapForm.Append (nameForm);
+        newCapForm.Append (end+captureFormatNumberDigits+1);
+
 	delete[] captureFormat;
-	captureFormat = newCapForm;
+	captureFormat = csStrNew (newCapForm);
       }
     }
   }
@@ -2066,17 +2064,16 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
 
 int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
 {
-  char cmd[256];
+  csString cmd;
   char const* spc = strchr (cmdstr, ' ');
   if (spc)
   {
-    strncpy (cmd, cmdstr, spc - cmdstr);
-    cmd[spc - cmdstr] = 0;
+    cmd.Append (cmdstr, spc - cmdstr);
     strcpy (args, spc + 1);
   }
   else
   {
-    strcpy(cmd, cmdstr);
+    cmd = cmdstr;
     args[0] = 0;
   }
 

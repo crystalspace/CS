@@ -345,7 +345,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   PerFrameData& frameData = perFrameHolder.GetUnusedData (frameDataCreated,
     currentFrame);
   if (frameDataCreated 
-    || (frameData.vertex_buffer->GetElementCount() != VertexCount))
+    || (frameData.vertex_buffer->GetElementCount() != (uint)VertexCount))
   {
     frameData.vertex_buffer = csRenderBuffer::CreateRenderBuffer (
       VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);

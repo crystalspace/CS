@@ -563,17 +563,16 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   {
     if (framesets[i].group)
     {
-      char name_action[64];
-      memset(name_action, 0, 64);
+      csString name_action;
 
       size_t base_action = strlen(framesets[i].frames[0].name);
       for (j = (int)strlen(framesets[i].frames[0].name) - 1; j > 1; j--)
         if (!isdigit(framesets[i].frames[0].name[j]))
 	  break;
       base_action=j + 1;
-      strncpy(name_action, framesets[i].frames[0].name, base_action);
+      name_action.Append (framesets[i].frames[0].name, base_action);
 
-      csFPrintf(f, "\t\t<action name=\"%s\">", name_action);
+      csFPrintf(f, "\t\t<action name=\"%s\">", name_action.GetData());
 
       for (j = 0; j < framesets[i].nbframes; j++)
       {
@@ -593,17 +592,16 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	  framesets[i].frames[0].name, framesets[i].frames[0].name, delayMdl);
       else
       {
-        char name_action[64];
-        memset(name_action, 0, 64);
+        csString name_action;
 
         int base_action;
         for (j = (int)strlen(framesets[i].frames[0].name) - 1; j > 1; j--)
           if (!isdigit(framesets[i].frames[0].name[j]))
 	    break;
         base_action=j + 1;
-        strncpy(name_action, framesets[i].frames[0].name, base_action);
+        name_action.Append (framesets[i].frames[0].name, base_action);
 
-        csFPrintf(f, "\t\t<action name=\"%s\">", name_action);
+        csFPrintf(f, "\t\t<action name=\"%s\">", name_action.GetData());
 
         csFPrintf(f, " <f name=\"%s\" delay=\"%d\"/>", framesets[i].frames[0].name, delayMdl);
         for (j = i + 1; j < outFrames; j++, i++)

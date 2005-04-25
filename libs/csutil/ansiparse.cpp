@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "csutil/ansiparse.h"
+#include "csutil/csstring.h"
 
 bool csAnsiParser::ParseAnsi (const char* str, size_t& ansiCommandLen, 
 			      CommandClass& cmdClass, size_t& textLen)
@@ -77,9 +78,8 @@ bool csAnsiParser::DecodeCommand (const char*& cmd, size_t& cmdLen,
     {
       paramLen = semicolon - cmd;
     }
-    CS_ALLOC_STACK_ARRAY(char, paramStr, paramLen + 1);
-    strncpy (paramStr, cmd, paramLen);
-    paramStr[paramLen] = 0;
+    csString paramStr;
+    paramStr.Append (cmd, paramLen);
     int param;
     char dummy;
     if (sscanf (paramStr, "%d%c", &param, &dummy) == 1)

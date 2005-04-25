@@ -59,7 +59,7 @@ public:
    */
   T& GetUnusedData (bool& created, uint frameNumber)
   {
-    if ((clearReq != ~0) && (clearReq != frameNumber))
+    if ((clearReq != (uint)~0) && (clearReq != frameNumber))
       data.DeleteAll();
     lastFrame = frameNumber;
     created = false;

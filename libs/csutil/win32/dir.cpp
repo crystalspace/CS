@@ -65,8 +65,11 @@ dirent *readdir (DIR *dirp)
 {
   if (dirp->findHandle != INVALID_HANDLE_VALUE)
   {
-    strncpy (dirp->currentEntry.d_name, dirp->findData.cFileName, 
-      sizeof (dirp->currentEntry.d_name) - 1);
+    size_t nameLen = strlen (dirp->findData.cFileName);
+    nameLen = MIN (nameLen, sizeof (dirp->currentEntry.d_name) - 1);
+    memcpy (dirp->currentEntry.d_name, dirp->findData.cFileName, 
+      nameLen);
+    dirp->currentEntry.d_name[nameLen] = 0;
     dirp->currentEntry.d_size = dirp->findData.nFileSizeLow;
     dirp->currentEntry.dwFileAttributes = dirp->findData.dwFileAttributes;
     if (!FindNextFileA (dirp->findHandle, &dirp->findData))

@@ -375,8 +375,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
       }
       else
       {
-        char name_action[64];
-        memset(name_action, 0, 64);
+        csString name_action;
 
         int base_action;
         for (j = (int)strlen(frames[i].name)-1; j > 1; j--)
@@ -390,9 +389,9 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         {
           base_action=j + 1;
         }
-        strncpy(name_action, frames[i].name, base_action);
+        name_action.Append (frames[i].name, base_action);
 
-        csFPrintf(f, "\t\t<action name=\"%s\">", name_action);
+        csFPrintf(f, "\t\t<action name=\"%s\">", name_action.GetData());
 
         csFPrintf(f, " <f name=\"%s\" delay=\"%d\"/>", frames[i].name, delayMdl);
         for (j=i + 1; j < outFrames; j++, i++)

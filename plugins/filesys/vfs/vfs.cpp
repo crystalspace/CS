@@ -1017,8 +1017,10 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
 
       // Now parse this path
       char rpath [CS_MAXPATHLEN + 1];
-      strncpy(rpath, src, CS_MAXPATHLEN);
-      rpath[CS_MAXPATHLEN] = '\0';
+      size_t len = strlen (src);
+      len = MIN (len, CS_MAXPATHLEN);
+      memcpy (rpath, src, len);
+      rpath[len] = '\0';
       RPathV.Push (rpath);
       src = cur + 1;
     } /* endif */

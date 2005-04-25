@@ -65,7 +65,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
     char* bs = (char*)strchr (pos, '\\');
     if (bs)
     {
-      strncpy (buf, pos, (bs - pos));
+      memcpy (buf, pos, (bs - pos));
       buf[bs - pos] = 0;
     }
     else
@@ -80,7 +80,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
     {
       BUFCAT ("\\");
       char* bufEnd = (char*)strchr (lpszLongPath, 0);
-      strncpy (bufEnd, buf, bufRemain - 1);
+      memcpy (bufEnd, buf, bufRemain - 1);
       bufEnd[bufRemain - 1] = 0;
 
       WIN32_FIND_DATA fd;
