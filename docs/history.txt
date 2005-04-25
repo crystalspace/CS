@@ -14,6 +14,7 @@ chronological order.
 	  you can just specify files relatively in the library itself.
 	  The old syntax still works and behaviour hasn't changed there.
 	  That means that with old syntax the VFS path is not changed.
+	- res converted the teapot texture to a PNG.
 24-Apr-2005
 	- res fixed some issues with Z-filling portals (which didn't exactly
 	  Z-fill).
