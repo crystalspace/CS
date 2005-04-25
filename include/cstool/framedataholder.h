@@ -44,15 +44,11 @@ class csFrameDataHolder
   csArray<FrameData> data;
   size_t lastData;
   uint nextShrink;
+  uint lastFrame, clearReq;
 public:
-  csFrameDataHolder ()
-  {
-    lastData = 0;
-    nextShrink = 0;
-  }
-  ~csFrameDataHolder ()
-  {
-  }
+  csFrameDataHolder () : lastData(0), nextShrink(0), lastFrame(~0), clearReq(~0)
+  { }
+  ~csFrameDataHolder () { }
 
   /**
    * Retrieve an instance of the type \a T whose associated frame number
@@ -63,6 +59,9 @@ public:
    */
   T& GetUnusedData (bool& created, uint frameNumber)
   {
+    if ((clearReq != ~0) && (clearReq != frameNumber))
+      data.DeleteAll();
+    lastFrame = frameNumber;
     created = false;
     if ((data.Length() == 0) || (data[lastData].lastFrame == frameNumber))
     {
@@ -98,12 +97,16 @@ public:
   
   /**
    * Remove all allocated instances.
-   * \remark Warning! Do not use when some instances are still in use
-   *  somewhere!
+   * \remarks Warning! Don't use if pointers etc. to contained data still in 
+   *  use!
+   * \remarks Does not clear the allocated data instantly but rather upon the
+   *  next frame (ie when the \a frameNumbe parameter passed to 
+   *  GetUnusedData() differs from the last).
    */
   void Clear ()
   {
-    data.DeleteAll();
+    // Don't clear just yet, rather, clear when we enter the next frame.
+    clearReq = lastFrame;
   }
 };
 

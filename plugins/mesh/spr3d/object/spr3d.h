@@ -1281,7 +1281,7 @@ private:
 
   // Remembered info between DrawTest and Draw.
 
-  csRenderMeshHolderSingle rmHolder;  
+  csRenderMeshHolder rmHolder;  
 
   bool initialized;
 

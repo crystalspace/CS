@@ -338,17 +338,18 @@ private:
   csFlags object_flags;
   csFlags factory_flags;
 
-  csRenderMeshHolderMultiple rmHolder;
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > rmListHolder;
+  csRenderMeshHolder rmHolder;
 
-  struct BezierRenderBuffer
+  struct PerFrameData
   {
-    size_t count;
-    csRef<iRenderBuffer> buffer;
-
-    BezierRenderBuffer() : count(0) { }
+    size_t vertCount;
+    csRef<iRenderBuffer> vertices;
+    csRef<iRenderBuffer> colors;
+    csRef<iRenderBuffer> texcoords;
+    csRef<iRenderBuffer> indices;
   };
-  csFrameDataHolder<BezierRenderBuffer> renderBuffers;
-  csFrameDataHolder<BezierRenderBuffer> indexBuffers;
+  csFrameDataHolder<PerFrameData> frameBufferHolder;
   static csStringID vertex_name, texel_name, color_name, index_name;
 private:
   /**

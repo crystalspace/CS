@@ -220,7 +220,7 @@ private:
   /// vector of csHazeLayer
   csPDelArray<csHazeLayer> layers;
 
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
 
   struct HazeRenderBuffer
   {

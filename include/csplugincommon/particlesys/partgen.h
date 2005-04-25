@@ -108,7 +108,7 @@ protected:
   /// particle position
   csVector3 *part_pos;
 
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
 
   csRef<csRenderBufferHolder> bufferHolder;
   size_t VertexCount;

@@ -286,8 +286,8 @@ private:
   int materialMapW, materialMapH;
 
   csDirtyAccessArray<csRenderMesh*>* returnMeshes;
-  csRenderMeshHolderSingle rmHolder;
-  csRenderMeshHolderMultiple returnMeshesHolder;
+  csRenderMeshHolder rmHolder;
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > returnMeshesHolder;
   csReversibleTransform tr_o2c;
 
   // Use for clipping during rendering.

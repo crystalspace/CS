@@ -1056,7 +1056,7 @@ void csThingStatic::FillRenderMeshes (
     const csStaticPolyGroup& pg = 
       (i < litPolys.Length ()) ? *(litPolys[i]) : 
         *(unlitPolys[i - litPolys.Length ()]) ;
-    csRenderMesh* rm = new csRenderMesh;
+    csRenderMesh* rm = thing_type->blk_rendermesh.Alloc();
 
     csRef<iPolygonRenderer> polyRenderer;
     if (polyRenderers.Length () <= i)
@@ -1854,7 +1854,7 @@ void csThing::Prepare ()
       if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
       else movablenr--;
 
-      rmHolder.Clear();
+      meshesHolder.Clear();
 
       materials_to_visit.DeleteAll ();
 
@@ -1885,7 +1885,7 @@ void csThing::Prepare ()
   if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
   else movablenr--;
 
-  rmHolder.Clear();
+  meshesHolder.Clear();
 
   materials_to_visit.DeleteAll ();
 
@@ -2466,9 +2466,9 @@ void csThing::PrepareRenderMeshes (
   for (i = 0; i < renderMeshes.Length () ; i++)
   {
     // @@@ Is this needed?
-    if (renderMeshes[i]->variablecontext != 0)
-      renderMeshes[i]->variablecontext->DecRef ();
-    delete renderMeshes[i];
+    //if (renderMeshes[i]->variablecontext != 0)
+      //renderMeshes[i]->variablecontext->DecRef ();
+    static_data->thing_type->blk_rendermesh.Free (renderMeshes[i]);
   }
   renderMeshes.DeleteAll ();
   static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
@@ -2498,8 +2498,9 @@ void csThing::PrepareForUse ()
 
   UpdateDirtyLMs ();
 
+  bool meshesCreated;
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
-    rmHolder.GetUnusedMeshes (0);
+    meshesHolder.GetUnusedData (meshesCreated, 0);
   if (renderMeshes.Length() == 0)
   {
     PrepareRenderMeshes (renderMeshes);
@@ -2538,8 +2539,9 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   	clip_z_plane);
 
   const uint currentFrame = rview->GetCurrentFrameNumber ();
+  bool meshesCreated;
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
-    rmHolder.GetUnusedMeshes (currentFrame);
+    meshesHolder.GetUnusedData (meshesCreated, currentFrame);
  
   if (renderMeshes.Length() == 0)
   {

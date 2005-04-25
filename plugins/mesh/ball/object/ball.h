@@ -80,7 +80,7 @@ private:
   unsigned int* ball_indices;
   int ball_triangles;
   
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;

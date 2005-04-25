@@ -1680,8 +1680,10 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   }
 
   SetupRenderMeshes ();
-  csDirtyAccessArray<csRenderMesh*>& meshes = 
-    rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
+  const uint currentFrame = rview->GetCurrentFrameNumber ();
+  bool created;
+  csDirtyAccessArray<csRenderMesh*>& meshes = rmArrayHolder.GetUnusedData (
+    created, currentFrame);
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
@@ -1691,7 +1693,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     csRenderMesh* rm;
     if (m >= meshes.Length())
     {
-      rm = new csRenderMesh (*allRenderMeshes[m]);
+      rm = rmHolder.GetUnusedMesh (created, currentFrame);
+      *rm = *allRenderMeshes[m];
       meshes.Push (rm);
     }
     else
@@ -2237,7 +2240,7 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
           rm->material = mat;
 	}
       }
-      rmHolder.Clear();
+      rmArrayHolder.Clear();
       return true;
     }
   }

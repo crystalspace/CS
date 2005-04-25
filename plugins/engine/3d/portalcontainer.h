@@ -160,7 +160,7 @@ private:
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);
 
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
 
   csFlags flags;
   csMeshWrapper* meshwrapper;

@@ -1677,6 +1677,9 @@ questionable use.
 @code{iMaterialHandle}. Equivalent functionality can be achieved by using
 @samp{iTextureHandle} or @samp{iMaterial} directly; whichever is more
 appropriate.
+@item
+@code{csRenderMeshHolderMultiple}. Equivalent functionality can be achieved by 
+using @samp{csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> >}.
 @end itemize
 
 @subheading C++ Standard Conformance
@@ -1695,3 +1698,8 @@ map loader. At that time, @file{imap/parser.h} became a very thin wrapper which
 merely included @file{imap/loader.h} and did nothing more. Since
 @file{imap/parser.h} has no useful purpose, it is now officially deprecated,
 and deprecation warnings have been added. Use @file{imap/loader.h} instead.
+
+@subheading @code{csRenderMeshHolderSingle} Renamed
+
+Following the removal of @code{csRenderMeshHolderMultiple} (see above),
+@code{csRenderMeshHolderSingle} has been renamed to @code{csRenderMeshHolder}. 

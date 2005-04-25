@@ -44,7 +44,7 @@ class csProtoMeshObject : public iMeshObject
 private:
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
 
   // The standard render buffer holder. It takes care of giving
   // the renderer all required renderbuffers.

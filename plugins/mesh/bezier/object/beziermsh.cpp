@@ -869,17 +869,19 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   csVector3 camera_origin = obj_cam.GetT2OTranslation ();
 
   const uint currentFrame = rview->GetCurrentFrameNumber();
-  csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes (
-    currentFrame);
+  bool listCreated;
+  csDirtyAccessArray<csRenderMesh*>& meshes = rmListHolder.GetUnusedData (
+    listCreated, currentFrame);
   meshes.SetLength (GetCurveCount(), 0);
 
   csCurve *c;
   for (i = 0; i < GetCurveCount (); i++)
   {
-    csRenderMesh* rm = meshes.Get (i);
-    if (rm == 0)
+    bool meshCreated;
+    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, currentFrame);
+    meshes[i] = rm;
+    if (meshCreated)
     {
-      rm = meshes[i] = new csRenderMesh;
       rm->buffers.AttachNew (new csRenderBufferHolder);
       rm->variablecontext.AttachNew (new csShaderVariableContext);
     }
@@ -918,62 +920,34 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     
     csRenderBufferHolder* holder = rm->buffers;
     /* @@@ TODO: use an SV accessor for geometry delivery */
-    bool bufferCreated;
+    bool frameBuffersCreated;
+    PerFrameData& frameBuffers = frameBufferHolder.GetUnusedData (
+      frameBuffersCreated, currentFrame);
+    if (frameBuffersCreated || (frameBuffers.vertCount < tess->GetVertexCount ()))
     {
-      BezierRenderBuffer& vertices = renderBuffers.GetUnusedData (bufferCreated, 
-	currentFrame);
-      if (bufferCreated || (vertices.count < (tess->GetVertexCount () * 3)))
-      {
-	vertices.buffer = csRenderBuffer::CreateRenderBuffer (
-	  tess->GetVertexCount (), CS_BUF_STREAM, 
-	  CS_BUFCOMP_FLOAT, 3);
-      }
-      vertices.buffer->CopyInto (tess->GetVertices(), tess->GetVertexCount ());
-
-      holder->SetRenderBuffer (CS_BUFFER_POSITION, vertices.buffer);
+      frameBuffers.vertices = csRenderBuffer::CreateRenderBuffer (
+	tess->GetVertexCount (), CS_BUF_STREAM, 
+	CS_BUFCOMP_FLOAT, 3);
+      frameBuffers.colors = csRenderBuffer::CreateRenderBuffer (
+	tess->GetVertexCount (), CS_BUF_STREAM, 
+	CS_BUFCOMP_FLOAT, 3);
+      frameBuffers.texcoords = csRenderBuffer::CreateRenderBuffer (
+	tess->GetVertexCount (), CS_BUF_STREAM, 
+	CS_BUFCOMP_FLOAT, 2);
+      frameBuffers.indices = csRenderBuffer::CreateIndexRenderBuffer (
+	tess->GetTriangleCount () * 3, CS_BUF_STREAM, 
+	CS_BUFCOMP_UNSIGNED_INT, 0, tess->GetVertexCount ());
+      frameBuffers.vertCount = tess->GetVertexCount ();
     }
 
-    {
-      BezierRenderBuffer& colors = renderBuffers.GetUnusedData (bufferCreated, 
-	currentFrame);
-      if (bufferCreated || (colors.count < (tess->GetVertexCount () * 3)))
-      {
-	colors.buffer = csRenderBuffer::CreateRenderBuffer (
-	  tess->GetVertexCount (), CS_BUF_STREAM, 
-	  CS_BUFCOMP_FLOAT, 3);
-      }
-      colors.buffer->CopyInto (tess->GetColors(), tess->GetVertexCount ());
-
-      holder->SetRenderBuffer (CS_BUFFER_COLOR, colors.buffer);
-    }
-
-    {
-      BezierRenderBuffer& texcoords = renderBuffers.GetUnusedData (bufferCreated, 
-	currentFrame);
-      if (bufferCreated || (texcoords.count < (tess->GetVertexCount () * 2)))
-      {
-	texcoords.buffer = csRenderBuffer::CreateRenderBuffer (
-	  tess->GetVertexCount (), CS_BUF_STREAM, 
-	  CS_BUFCOMP_FLOAT, 2);
-      }
-      texcoords.buffer->CopyInto (tess->GetTxtCoords(), tess->GetVertexCount ());
-
-      holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texcoords.buffer);
-    }
-
-    {
-      BezierRenderBuffer& indices = indexBuffers.GetUnusedData (bufferCreated, 
-	currentFrame);
-      if (bufferCreated || (indices.count < (tess->GetTriangleCount() * 3)))
-      {
-	indices.buffer = csRenderBuffer::CreateIndexRenderBuffer (
-	  tess->GetTriangleCount () * 3, CS_BUF_STREAM, 
-	  CS_BUFCOMP_UNSIGNED_INT, 0, tess->GetVertexCount ());
-      }
-      indices.buffer->CopyInto (tess->GetTriangles(), tess->GetTriangleCount ()*3);
-
-      holder->SetRenderBuffer (CS_BUFFER_INDEX, indices.buffer);
-    }
+    frameBuffers.vertices->CopyInto (tess->GetVertices(), tess->GetVertexCount ());
+    holder->SetRenderBuffer (CS_BUFFER_POSITION, frameBuffers.vertices);
+    frameBuffers.colors->CopyInto (tess->GetColors(), tess->GetVertexCount ());
+    holder->SetRenderBuffer (CS_BUFFER_COLOR, frameBuffers.colors);
+    frameBuffers.texcoords->CopyInto (tess->GetTxtCoords(), tess->GetVertexCount ());
+    holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, frameBuffers.texcoords);
+    frameBuffers.indices->CopyInto (tess->GetTriangles(), tess->GetTriangleCount ()*3);
+    holder->SetRenderBuffer (CS_BUFFER_INDEX, frameBuffers.indices);
 
     rm->indexstart = 0;
     rm->indexend = (uint)tess->GetTriangleCount() * 3;

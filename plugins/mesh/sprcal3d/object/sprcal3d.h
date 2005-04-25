@@ -700,7 +700,8 @@ private:
   csRef<iStringSet> strings;
   csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
   csArray<csArray<csRenderMesh> > renderMeshes;
-  csRenderMeshHolderMultiple rmHolder;
+  csRenderMeshHolder rmHolder;
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > rmArrayHolder;
   csWeakRef<iGraphics3D> G3D;
   iMovable* currentMovable;
 

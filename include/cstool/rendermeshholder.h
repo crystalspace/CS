@@ -39,7 +39,7 @@ struct csRenderMesh;
  * \remark Uses csFrameDataHolder internally. See it's documentation for some
  *  additional information.
  */
-class CS_CRYSTALSPACE_EXPORT csRenderMeshHolderSingle
+class CS_CRYSTALSPACE_EXPORT csRenderMeshHolder
 {
   struct CS_CRYSTALSPACE_EXPORT csRenderMeshPtr
   {
@@ -60,49 +60,6 @@ public:
    *  meshes.
    */
   csRenderMesh*& GetUnusedMesh (bool& created, uint frameNumber);
-};
-
-/**
- * Helper class to retrieve an unused array of csRenderMesh*.
- * Manages a list of csRenderMesh* array and returns one whose first contained
- * csRenderMesh has it's \a inUse member set to false (the assumption is that 
- * when one mesh is unused, all are).
- */
-class CS_CRYSTALSPACE_EXPORT csRenderMeshHolderMultiple
-{
-  csArray<csDirtyAccessArray<csRenderMesh*>*> rmHolderList;
-  csArray<csDirtyAccessArray<csRenderMesh*>*> clearQueue;
-  size_t rmHolderListIndex;
-public:
-  /**
-   * Whether to delete the rendermeshes contained in the managed
-   * arrays.
-   */
-  bool deleteMeshes;
-
-  /**
-   * Construct a new render mesh array holder.
-   * \param deleteMeshes Whether to delete the contained rendermeshes.
-   */
-  csRenderMeshHolderMultiple (bool deleteMeshes = true);
-  ~csRenderMeshHolderMultiple ();
-
-  /**
-   * Retrieve an unused array of csRenderMesh*.
-   * \param frameNumber Current frame number - used to determine unused 
-   *  meshes.
-   */
-  csDirtyAccessArray<csRenderMesh*>& GetUnusedMeshes (uint frameNumber);
-
-  /**
-   * Instruct the mesh holder to throw away all currently used csRenderMesh*
-   * arrays, effectively using clean arrays on subsequent calls when an 
-   * unused array is needed.
-   * \remark The arrays are *not* immediately deleted, this is delayed until
-   *  they really aren't used any more (determined by the frame number).
-   *  This has to be considered if manual mesh deletion was enabled.
-   */
-  void Clear();
 };
 
 #endif // __CS_CSTOOL_RENDERMESHHOLDER_H__

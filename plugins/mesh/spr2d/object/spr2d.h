@@ -93,7 +93,7 @@ protected:
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 
   csRef<csRenderBufferHolder> bufferHolder;
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
   csRef<iRenderBuffer> vertex_buffer;
   bool vertices_dirty;
   csRef<iRenderBuffer> texel_buffer;

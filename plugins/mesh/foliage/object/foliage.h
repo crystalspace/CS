@@ -206,7 +206,7 @@ public:
    */
   void Draw (iGraphics3D* g3d, iRenderView* rview,
       uint32 frustum_mask, const csReversibleTransform& transform,
-      csRenderMeshHolderSingle& rmHolder);
+      csRenderMeshHolder& rmHolder);
 };
 
 /**
@@ -217,7 +217,7 @@ class csFoliageMeshObject : public iMeshObject
 private:
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
 
   // The standard render buffer holder. It takes care of giving
   // the renderer all required renderbuffers.

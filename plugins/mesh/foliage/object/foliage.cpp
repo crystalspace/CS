@@ -274,7 +274,7 @@ void csFoliageMeshBlock::CreateBuffers ()
 
 void csFoliageMeshBlock::Draw (iGraphics3D* g3d, iRenderView* rview,
       uint32 frustum_mask, const csReversibleTransform& transform,
-      csRenderMeshHolderSingle& rmHolder)
+      csRenderMeshHolder& rmHolder)
 {
   if (setup)
   {

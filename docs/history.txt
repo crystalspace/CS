@@ -15,6 +15,10 @@ chronological order.
 	  The old syntax still works and behaviour hasn't changed there.
 	  That means that with old syntax the VFS path is not changed.
 	- res converted the teapot texture to a PNG.
+	- res removed csRenderMeshHolderMultiple (equivalent functionality can 
+	  be achieved by using csFrameDataHolder<csDirtyAccessArray<
+	  csRenderMesh*> >) and renamed csRenderMeshHolderSingle to
+	  csRenderMeshHolder.
 24-Apr-2005
 	- res fixed some issues with Z-filling portals (which didn't exactly
 	  Z-fill).

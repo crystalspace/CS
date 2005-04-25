@@ -596,7 +596,9 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     {
       rm->material = material;
       rm->variablecontext = terr->baseContext;
-    } else {
+    } 
+    else 
+    {
       rm->material = terr->palette[i-1];
       rm->variablecontext = terr->paletteContexts[i-1];
     }
@@ -1093,7 +1095,6 @@ csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
 
 csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
                                     csTerrainFactory *pFactory)
-                                    : returnMeshesHolder (false)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -1986,7 +1987,8 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
 
   rootblock->CalcLOD (rview);
 
-  returnMeshes = &returnMeshesHolder.GetUnusedMeshes (
+  bool rmCreated;
+  returnMeshes = &returnMeshesHolder.GetUnusedData (rmCreated, 
     rview->GetCurrentFrameNumber ());
   returnMeshes->Empty ();
 

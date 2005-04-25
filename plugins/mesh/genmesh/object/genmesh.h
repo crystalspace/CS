@@ -82,7 +82,7 @@ struct csGenmeshSubMesh
 {
   csRef<iRenderBuffer> index_buffer;
   csRef<iMaterialWrapper> material;
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
   csRef<csRenderBufferHolder> bufferHolder;
   int tricount;
 };
@@ -94,7 +94,7 @@ class csGenmeshMeshObject : public iMeshObject
 {
 private:
 
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;

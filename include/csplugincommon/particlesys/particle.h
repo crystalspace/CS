@@ -72,7 +72,7 @@ protected:
 
   bool initialized;
 
-  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolder rmHolder;
   struct PerFrameData
   {
     csRef<csRenderBufferHolder> bufferHolder;
@@ -83,7 +83,6 @@ protected:
 
   int VertexCount;
   int TriangleCount;
-  //csVector3* vertices;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;

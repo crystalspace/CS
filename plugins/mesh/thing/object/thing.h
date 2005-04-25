@@ -666,7 +666,7 @@ private:
   bool IsLmDirty() { return internalFlags.Check (8); }
   void SetLmDirty (bool b) { internalFlags.SetBool (8, b); }
 
-  csRenderMeshHolderMultiple rmHolder;
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > meshesHolder;
 
   void PrepareRenderMeshes (csDirtyAccessArray<csRenderMesh*>& renderMeshes);
 
@@ -1164,6 +1164,7 @@ public:
   csBlockAllocator<intar6>* blk_polidx6;
   csBlockAllocator<intar20>* blk_polidx20;
   csBlockAllocator<intar60>* blk_polidx60;
+  csBlockAllocator<csRenderMesh> blk_rendermesh;
 
   csLightingScratchBuffer lightingScratch;
 
