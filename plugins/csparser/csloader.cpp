@@ -1120,19 +1120,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_LIBRARY:
 	{
-	  const char* name = child->GetAttributeValue ("checkdupes");
-	  bool dupes = ldr_context->CheckDupes ();
-	  if (name)
-	  {
-	    if (!strcasecmp (name, "true") || !strcasecmp (name, "yes") ||
-	    	!strcasecmp (name, "1") || !strcasecmp (name, "on"))
-	      dupes = true;
-	    else
-	      dupes = false;
-	  }
-	  if (!LoadLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		dupes))
+	  if (!LoadLibraryFromNode (ldr_context, child))
 	    return false;
 	  break;
 	}
@@ -1188,6 +1176,49 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
   return true;
 }
 
+bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
+	iDocumentNode* child)
+{
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  const char* name = child->GetAttributeValue ("checkdupes");
+  bool dupes = ldr_context->CheckDupes ();
+  if (name)
+  {
+    if (!strcasecmp (name, "true") || !strcasecmp (name, "yes") ||
+	    	!strcasecmp (name, "1") || !strcasecmp (name, "on"))
+      dupes = true;
+    else
+      dupes = false;
+  }
+  const char* file = child->GetAttributeValue ("file");
+  if (file)
+  {
+    const char* path = child->GetAttributeValue ("path");
+    if (path)
+    {
+      vfs->PushDir ();
+      vfs->ChDir (path);
+    }
+    bool rc = LoadLibraryFile (file,
+	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
+		  dupes);
+    if (path)
+    {
+      vfs->PopDir ();
+    }
+    if (!rc)
+      return false;
+  }
+  else
+  {
+    if (!LoadLibraryFile (child->GetContentsValue (),
+	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
+		ldr_context->CheckDupes ()))
+    return false;
+  }
+  return true;
+}
+
 bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   if (!Engine)
@@ -1215,19 +1246,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
       {
         case XMLTOKEN_LIBRARY:
 	{
-	  const char* name = child->GetAttributeValue ("checkdupes");
-	  bool dupes = ldr_context->CheckDupes ();
-	  if (name)
-	  {
-	    if (!strcasecmp (name, "true") || !strcasecmp (name, "yes") ||
-	    	!strcasecmp (name, "1") || !strcasecmp (name, "on"))
-	      dupes = true;
-	    else
-	      dupes = false;
-	  }
-	  if (!LoadLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes ()))
+	  if (!LoadLibraryFromNode (ldr_context, child))
 	    return false;
 	  break;
 	}

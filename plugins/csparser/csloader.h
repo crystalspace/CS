@@ -554,6 +554,8 @@ public:
 	iRegion* region, bool curRegOnly, bool checkDupes);
   virtual bool LoadLibraryFile (const char* filename, iRegion* region,
   	bool curRegOnly, bool checkDupes);
+  bool LoadLibraryFromNode (iLoaderContext* ldr_context,
+	iDocumentNode* child);
 
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes);

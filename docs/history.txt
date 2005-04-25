@@ -8,6 +8,12 @@ chronological order.
 
 25-Apr-2005
 	- res added a teapot mesh provided by Erroroman.
+	- Jorrit added a new syntax for <library>. You can now specify:
+	    <library path="/lib/bla" file="library" />
+	  In this case the VFS current dir will be set to /lib/bla so that
+	  you can just specify files relatively in the library itself.
+	  The old syntax still works and behaviour hasn't changed there.
+	  That means that with old syntax the VFS path is not changed.
 24-Apr-2005
 	- res fixed some issues with Z-filling portals (which didn't exactly
 	  Z-fill).
