@@ -13,6 +13,10 @@ chronological order.
 	  available) instead of names with numbers counted from the first 
 	  section (e.g. SEC353) to reduce the number of updates caused by 
 	  inserting a new section.
+	- Luca replaced in the AWS documentation the wrong name for the 
+	  signalChanged of the TextBox (the correct name is 
+	  signalTextBoxChanged), and added the documentation for the others
+	  TextBox's signals as well.
 25-Apr-2005
 	- res added a teapot mesh provided by Erroroman.
 	- Jorrit added a new syntax for <library>. You can now specify:

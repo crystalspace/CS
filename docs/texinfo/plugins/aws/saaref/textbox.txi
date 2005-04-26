@@ -9,11 +9,20 @@ A textbox' type is ``Text Box''.
 Textboxes send the following signals.
 
 @table @code
-@item signalChanged
+@item signalTextBoxChanged
 Generated when the content of the textbox has changed.
 
-@item signalLostFocus
+@item signalTextBoxLostFocus
 Generated when the textbox has lost it's input focus.
+
+@item signalEnterKeyPressed
+Generated when the 'enter' key is pressed.
+
+@item signalTabKeyPressed
+Generated when the 'tab' key is pressed.
+
+@item signalTextBoxFocused
+Generated when the textbox gains the focus.
 @end table
 
 @subsubheading Attributes
