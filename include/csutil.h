@@ -97,6 +97,7 @@
 #include "csutil/scfstrset.h"
 #include "csutil/schedule.h"
 #include "csutil/scopedmutexlock.h"
+#include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sockets.h"
 #include "csutil/sparse3d.h"
