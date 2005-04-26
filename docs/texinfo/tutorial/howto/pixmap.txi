@@ -59,8 +59,7 @@ will return the loaded image with an @code{iImage} pointer.
 Now you have to make sure the image becomes a texture that is usable for
 drawing on screen. This is done with @code{txtmgr->RegisterTexture()}. Because
 we are going to use the texture for a pixmap (which is 2D) we use the
-@samp{CS_TEXTURE_2D} flag. After registering the texture we have to
-@code{Prepare()} it for use.
+@samp{CS_TEXTURE_2D} flag.
 
 @subsubheading Using the Texture in a Pixmap
 

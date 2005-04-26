@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Apr-2005
+	- Jorrit fixed a mention of the removed 'Prepare()' from the
+	  pixmap howto.
 25-Apr-2005
 	- res added a teapot mesh provided by Erroroman.
 	- Jorrit added a new syntax for <library>. You can now specify:
