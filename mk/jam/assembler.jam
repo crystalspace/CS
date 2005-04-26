@@ -24,6 +24,10 @@ if $(CMD.NASM)
 rule NasmRule
 {
   local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
+  if $(>)
+  {
+      object = $(object:B=$(>)_$(object:B)) ;
+  }
   Nasm $(object) : $(<) ;
   return $(object) ;
 }

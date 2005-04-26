@@ -24,6 +24,10 @@ if $(CMD.OBJC)
 rule ObjCRule
 {
   local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
+  if $(>)
+  {
+      object = $(object:B=$(>)_$(object:B)) ;
+  }
   ObjC $(object) : $(<) ;
   return $(object) ;
 }
@@ -51,6 +55,10 @@ if $(CMD.OBJC++)
 rule ObjC++Rule
 {
   local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
+  if $(>)
+  {
+      object = $(object:B=$(>)_$(object:B)) ;
+  }
   ObjC++ $(object) : $(<) ;
   return $(object) ;
 }

@@ -43,7 +43,7 @@ if $(CMD.FLEX)
     SEARCH on $(cfile) = $(LOCATE_TARGET) ;
    
     Flex $(cfile) : $(<) ;
-    object = [ CompileObjects $(cfile) ] ;
+    object = [ CompileObjects $(cfile) : $(>) ] ;
     
     return $(object) ;
   }
@@ -58,7 +58,7 @@ if $(CMD.FLEX)
     SEARCH on $(cppfile) = $(LOCATE_TARGET) ;
 
     Flex $(cppfile) : $(<) ;
-    object = [ CompileObjects $(cppfile) ] ;
+    object = [ CompileObjects $(cppfile) : $(>) ] ;
 
     return $(object) ;
   }
@@ -96,7 +96,7 @@ if $(CMD.BISON)
     # Work around for jam warning about independant target when we put both
     # headerfile and cppfile in the bison line...
     Includes $(cppfile) : $(headerfile) ;
-    object = [ CompileObjects $(cfile) ] ;
+    object = [ CompileObjects $(cfile) : $(>) ] ;
     SEARCH on $(cfile) = $(LOCATE_TARGET) ;
     SEARCH on $(headerfile) = $(LOCATE_TARGET) ;
 
@@ -121,7 +121,7 @@ if $(CMD.BISON)
     # Work around for jam warning about independant target when we put both
     # headerfile and cppfile in the bison line...
     Includes $(cppfile) : $(headerfile) ;
-    object = [ CompileObjects $(cppfile) ] ;
+    object = [ CompileObjects $(cppfile) : $(>) ] ;
     SEARCH on $(cppfile) = $(LOCATE_TARGET) ;
     SEARCH on $(headerfile) = $(LOCATE_TARGET) ;
 

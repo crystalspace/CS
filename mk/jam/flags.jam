@@ -109,7 +109,7 @@ rule ExternalLibs
     CFlags $(<) : $($(i).CFLAGS) ;
     LFlags $(<) : $($(i).LFLAGS) ;
     
-    if $($(<)_TYPE) = library
+    #if $($(<)_TYPE) = library
     {
       $(<).EXTERNALLIBS += $(i) ;
     }

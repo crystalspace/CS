@@ -16,47 +16,115 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
   CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
 }
 
-CompileGroups bugplug    : walkall ;
-CompileGroups csconin    : walkall ;
-CompileGroups csfont     : walkall ;
-CompileGroups csgifimg   : walkall ;
+# List of plugins which should be go into walkall.
+WALKALL.PLUGINLIST =
+  ball
+  ballldr
+  bezier
+  bezierldr
+  bugplug
+  csconin
+  csddsimg
+  csfont
+  csgifimg
+  csparser
+  cssynldr
+  dynavis
+  emit
+  emitldr
+  engine
+  engseq
+  explo
+  exploldr
+  fire
+  fireldr
+  fountain
+  fountldr
+  frustvis
+  genmesh
+  gmeshanim
+  gmeshldr
+  gmeshskelanim
+  haze
+  hazeldr
+  ieplex
+  imgplex
+  nullmesh
+  opcode
+  protomesh
+  protomeshldr
+  rain
+  rainldr
+  rendloop_loader
+  rendstep_std
+  reporter
+  sequence
+  shadermgr
+  simpcon
+  simpleformer
+  simpleformerldr
+  snow
+  snowldr
+  spiral
+  spirldr
+  spr2d
+  spr2dldr
+  spr3d
+  spr3dldr
+  starldr
+  stars
+  stdpt
+  stdrep
+  thing
+  thingldr
+  vfs
+  xmlread
+  xmlshader
+  ;
+
 if $(JPEG.AVAILABLE) = "yes"
 {
-  CompileGroups csjpgimg : walkall ;
+  WALKALL.PLUGINLIST += csjpgimg ;
 }
-CompileGroups csddsimg   : walkall ;
-CompileGroups csparser   : walkall ;
 if $(PNG.AVAILABLE) = "yes"
 {
-  CompileGroups cspngimg : walkall ;
+  WALKALL.PLUGINLIST += cspngimg ;
 }
-CompileGroups cssynldr   : walkall ; 
-CompileGroups dynavis    : walkall ;
-CompileGroups engine     : walkall ;
-CompileGroups engseq     : walkall ;
-CompileGroups fontplex   : walkall ;
-CompileGroups frustvis   : walkall ;
-CompileGroups imgplex    : walkall ; 
-CompileGroups meshes     : walkall ; 
-CompileGroups ptanimimg  : walkall ;
-CompileGroups opcode     : walkall ;
-CompileGroups reporter   : walkall ;
-CompileGroups sequence   : walkall ;
-CompileGroups simpcon    : walkall ;
-CompileGroups stdpt      : walkall ;
-CompileGroups stdrep     : walkall ;
-if $(ZLIB.AVAILABLE) = "yes"
-{
-  CompileGroups vfs      : walkall ;
-}
-CompileGroups walktest   : walkall ;
-CompileGroups xmlread    : walkall ;
+
 if $(GL.AVAILABLE) = "yes"
 {
-  CompileGroups openglcanvas : walkall ;
+  WALKALL.PLUGINLIST += gl3d glshader_arb glshader_fixed ;
+  
+  # GL canvases
+  if $(GLX.AVAILABLE) = "yes" { STATIC.PLUGINLIST += glx2d ; }
+  if $(TARGET.OS) = "WIN32" && $(GL.AVAILABLE) = "yes"
+    { WALKALL.PLUGINLIST += glwin32 ; }
+  if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
+    { WALKALL.PLUGINLIST += glosx2d ; }
 }
-CompileGroups softcanvas : walkall ;
-CompileGroups renderall  : walkall ;
+else
+{
+  # Software canvases. 
+  if $(X11.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += x2d xextshm xwin ; }
+  if $(XFREE86VM.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += xext86vm ; }
+  if $(DIRECTX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += ddraw2d ; }
+  if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += cgdriver2d ; }
+  #if $(LIBCACA.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += cacacanvas ; }
+}
+
+for p in $(WALKALL.PLUGINLIST)
+{
+  CompileGroups $(p) : walkall ;
+}
+
+# Plugins that are linked statically into walktest_static.
+WALKTEST_STATIC.PLUGINLIST =
+  $(WALKALL.PLUGINLIST)
+  bruteblock
+  crossbld
+  csbmpimg
+  rendstep_stencil
+  ;
 
 Description walktest_static : "WalkTest demo (static build)" ;
 
@@ -65,6 +133,6 @@ Application walktest_static : [ Wildcard *.cpp *.h ] :
   independent noinstall nohelp ;
 CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
 MsvcDefine walktest_static : CS_STATIC_LINKED ;
-LinkWith walktest_static : crystalspace ;
-LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
+LinkWith walktest_static : crystalspace_staticplugins crystalspace ;
+LinkStaticPlugins walktest_static : $(WALKTEST_STATIC.PLUGINLIST) ;
 SubVariant ;

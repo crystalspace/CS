@@ -531,15 +531,17 @@ rule ConcatDirs
   return $(result) ;
 }
 
-##  SplitToList var
+##  SplitToList var [: separator]
 ##    Splits var into a list. Uses spaces as a separator.
 rule SplitToList
 {
-  local list;
+  local list = ;
   local unsplit = $(<) ;
+  local sep = $(2) ;
+  if ! $(sep) { delim = " " ; }
   while $(unsplit) != ""
   {
-    local split = [ Match "(.*) (.*)" : $(unsplit) ] ;
+    local split = [ Match "(.*)$(sep)(.*)" : $(unsplit) ] ;
     if $(split[1]) = ""
     {
       list += $(unsplit) ;

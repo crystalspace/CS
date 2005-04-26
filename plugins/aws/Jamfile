@@ -9,6 +9,11 @@ if ! [ Property build : projgen ]
     FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp skinparse.hpp ] 
 	skinlex.ll skinpars.yy ;
     BisonFlags skinpars.yy : "-p aws" ;
+    
+    # @@@ Not nice but works ...
+    SubVariant static ;
+    BisonFlags skinpars.yy : "-p aws" ;
+    SubVariant ;
 
     # skinlex.cpp includes the generated skinpars.hpp, so we must ensure that
     # skinpars.hpp is generated before skinlex.cpp, since we do not want
@@ -44,10 +49,14 @@ if ! [ Property build : projgen ]
     # should be searched automatically since #include "skinpars.hpp" is used,
     # and LOCATE_TARGET is the "current directory" in this case, but we do this
     # for that extra measure of insurance.)
-    # @@@ ../$(SEARCH_SOURCE) is a hack to make aws_static work
     C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
-      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE)
-        [ ConcatDirs $(DOTDOT) $(SEARCH_SOURCE) ] ] ;
+      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
+
+    # @@@ Very hacky but works ...
+    SubVariant static ;
+    C++FLAGS on [ DoObjectGrist aws_skinpars$(SUFOBJ) aws_skinlex$(SUFOBJ) ] +=
+      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
+    SubVariant ;
   }
 }
 

@@ -65,11 +65,14 @@ rule Plugin
     SubVariant static ;
     local statictarget = $(<)_static ;
     local staticreginfoobject = [ BuildStaticRegFile $(<) : $(statictarget) ] ;
-    
-    Library $(statictarget) : $(>) $(staticreginfoobject) : $(3) independent noinstall nohelp notest ;
-    SEARCH on $(statictarget) += $(LOCATE_TARGET) ;
-    CFlags $(statictarget) : [ FDefines CS_STATIC_LINKED ] : nostatic ;
-    LFlags $(statictarget) : $(LINKLIBS) : nostatic ;
+
+    # Add objects to the big heap of crystalspace_staticplugins-content-to-be
+    local objects = [ CompileObjects $(sources) : $(<) ] ;
+    MakeLocate $(objects) : $(LOCATE_TARGET) ;
+    STATICPLUGINS.SOURCES += $(staticreginfoobject) ;
+    STATICPLUGINS.SOURCES += $(objects) ;
+    STATICPLUGINS.SUBTARGETS += $(<) ;
+    STATICPLUGINS.OBJECTS.$(<) += $(objects) ;
     
     SubVariant ;
   }
@@ -87,7 +90,7 @@ rule Plugin
     Depends plugins : $(<) ;
   }
 
-  # construct install atrget
+  # construct install target
   if ! [ IsElem noinstall : $(3) ]
   {
     SystemInstallPlugin $(target) ;

@@ -17,6 +17,11 @@ chronological order.
 	  signalChanged of the TextBox (the correct name is 
 	  signalTextBoxChanged), and added the documentation for the others
 	  TextBox's signals as well.
+	- res changed the Jam static plugins support to create one big library
+	  "crystalspace_staticplugins" instead of a single lib for every 
+	  plugin.
+	- res moved the static plugins list from Jamrules to the walktest
+	  Jamfile (where it really belongs).
 25-Apr-2005
 	- res added a teapot mesh provided by Erroroman.
 	- Jorrit added a new syntax for <library>. You can now specify:

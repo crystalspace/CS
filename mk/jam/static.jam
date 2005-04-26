@@ -23,7 +23,7 @@ rule BuildStaticRegFile
 {
   local statictarget = $(>) ;
   # prepare source files
-  local sources = [ DoObjectGrist _cs_static_reg.cpp ] ;
+  local sources = [ DoObjectGrist _$(<)_static_reg.cpp ] ;
   local object = [ CompileObject $(sources) ] ;
 
   MakeLocate $(sources) : $(LOCATE_TARGET) ;
@@ -74,9 +74,6 @@ rule BuildStaticUseFile
 ##  LinkStaticPlugins target : plugins
 rule LinkStaticPlugins
 {
-  # link with static plugins
-  LinkWith $(<) : $(>)_static ;
-
   # construct flags
   local deplibs libs i ;
   for i in $(>)
