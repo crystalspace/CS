@@ -4415,12 +4415,18 @@ sub rearrange_elements()
                 {
                     $section->{'number'} = $number;
                 }    
+		$section->{'id'} = $section->{'number'};
                 $level--;
             }
             my $toplevel_number = $previous_numbers[$toplevel];
             $toplevel_number = 0 if (!defined($toplevel_number));
             $section->{'number'} = "$toplevel_number.$section->{'number'}";
+	    $section->{'id'} = $section->{'number'};
         }
+	else
+	{
+	    $section->{'id'} = $section->{'texi'};
+	}
         # find the previous section
         if (defined($previous_sections[$section->{'level'}]))
         {

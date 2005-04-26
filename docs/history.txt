@@ -9,6 +9,10 @@ chronological order.
 26-Apr-2005
 	- Jorrit fixed a mention of the removed 'Prepare()' from the
 	  pixmap howto.
+	- res patched texi2html to use section numbers (e.g. 1.1.2, where 
+	  available) instead of names with numbers counted from the first 
+	  section (e.g. SEC353) to reduce the number of updates caused by 
+	  inserting a new section.
 25-Apr-2005
 	- res added a teapot mesh provided by Erroroman.
 	- Jorrit added a new syntax for <library>. You can now specify:
