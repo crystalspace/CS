@@ -1217,7 +1217,7 @@ void csODERigidBody::SetTransform (const csOrthoTransform& trans)
 {
   csVector3 pos = trans.GetOrigin ();
   dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
-  csMatrix3 rot = trans.GetO2T ();
+  csMatrix3 rot = trans.GetT2O ();
   dMatrix3 mat;
   mat[0] = rot.m11; mat[1] = rot.m12; mat[2] = rot.m13; mat[3]  = 0;
   mat[4] = rot.m21; mat[5] = rot.m22; mat[6] = rot.m23; mat[7]  = 0;
@@ -1233,7 +1233,7 @@ const csOrthoTransform csODERigidBody::GetTransform () const
   rot.m11 = mat[0]; rot.m12 = mat[1]; rot.m13 = mat[2];
   rot.m21 = mat[4]; rot.m22 = mat[5]; rot.m23 = mat[6];
   rot.m31 = mat[8]; rot.m32 = mat[9]; rot.m33 = mat[10];
-  return csOrthoTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
+  return csOrthoTransform (rot.GetInverse(), csVector3 (pos[0], pos[1], pos[2]));
 }
 
 void csODERigidBody::SetLinearVelocity (const csVector3& vel)
@@ -2202,12 +2202,12 @@ void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
 {
   // Dont do anything if nothing has changed
   if (mesh->GetMovable()->GetPosition() == t.GetOrigin() &&
-	  mesh->GetMovable()->GetTransform().GetT2O() == t.GetO2T())
+	  mesh->GetMovable()->GetTransform().GetT2O() == t.GetT2O())
 	return;
 
   // Update movable
   mesh->GetMovable ()->SetPosition (t.GetOrigin ());
-  mesh->GetMovable ()->GetTransform ().SetT2O (t.GetO2T ());
+  mesh->GetMovable ()->GetTransform ().SetT2O (t.GetT2O ());
   mesh->GetMovable ()->UpdateMove ();
 }
 
