@@ -12,7 +12,7 @@ Recurse InstallHeader : .h .i .inc .fun .tok ;
 
 # A list of headers which should not appear in any master-header, either
 # because they reference external resources (which causes build-time problems
-# if the preprocessor does not know where to find those resources), because
+# if the preprocessor does not know where to find those resources) or because
 # they are specialized polymorphic files intended for inclusion several times
 # under different contexts.
 CS_MASTER_HEADER_REJECTS =
@@ -35,9 +35,9 @@ CS_MASTER_HEADER_REJECTS =
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
-  [ ConcatDirs csgeom   subrec2.h           ]
-  [ ConcatDirs csutil   garray.h            ]
-  [ ConcatDirs csutil   objpool.h           ]
+  [ ConcatDirs csgeom   subrec2.h ]
+  [ ConcatDirs csutil   garray.h  ]
+  [ ConcatDirs csutil   objpool.h ]
   ;
 
 {
