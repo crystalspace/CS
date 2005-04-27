@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Apr-2005
+	- Jorrit fixed a bug in csColliderHelper::InitializeCollisionWrapper().
+	  In case the factory had a collider mesh then the routine would
+	  create a collider from that and ignore the children of the mesh.
+	- Jorrit changed csColliderHelper::InitializeCollisionWrapper() so that
+	  it now returns the collider wrapper that was created.
 26-Apr-2005
 	- Jorrit fixed a mention of the removed 'Prepare()' from the
 	  pixmap howto.

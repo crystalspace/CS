@@ -143,8 +143,9 @@ public:
    * <p>
    * This function will also initialize colliders for the children of the
    * mesh.
+   * \return the created collider wrapper.
    */
-  static void InitializeCollisionWrapper (iCollideSystem* colsys,
+  static csColliderWrapper* InitializeCollisionWrapper (iCollideSystem* colsys,
   	iMeshWrapper* mesh);
 
   /**
