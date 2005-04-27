@@ -92,8 +92,8 @@ chronological order.
 	- res changed texi2html.init to not emit a comment with the current
 	  date.
 	- res added support for the new GCC 4 ELF visibility features. When
-	  available, the default visibility is "hidden", and only when functions
-	  or classes are exported their visibility is "default".
+	  available, the default visibility is "hidden", and only when
+	  functions or classes are exported their visibility is "default".
 	- res fixed z-fill support in GL ClosePortal().
 	- res changed the fixed terrain render loop to do portal traversal in
 	  the "standard", not "ambient" step.
