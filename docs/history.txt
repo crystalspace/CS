@@ -12,6 +12,11 @@ chronological order.
 	  create a collider from that and ignore the children of the mesh.
 	- Jorrit changed csColliderHelper::InitializeCollisionWrapper() so that
 	  it now returns the collider wrapper that was created.
+	- res slightly changed the Jamfile in include/ to specify deprecated
+	  headers separately from the other rejected headers. (The idea is that
+	  deprecated headers will probably be removed at some point, and then
+	  they're hopefully easier spotted in the rejects and less likelier 
+	  forgotten to be removed.)
 26-Apr-2005
 	- Jorrit fixed a mention of the removed 'Prepare()' from the
 	  pixmap howto.

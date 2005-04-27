@@ -14,25 +14,30 @@ Recurse InstallHeader : .h .i .inc .fun .tok ;
 # because they reference external resources (which causes build-time problems
 # if the preprocessor does not know where to find those resources), because
 # they are specialized polymorphic files intended for inclusion several times
-# under different contexts, or because they are deprecated.
+# under different contexts.
 CS_MASTER_HEADER_REJECTS =
   [ Wildcard [ ConcatDirs csplugincommon directx ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon macosx  ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon opengl  ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon win32   ] : *.h ]
-  [ ConcatDirs csgeom   subrec2.h           ]
   [ ConcatDirs cstool   tokenlist.h         ]
   [ ConcatDirs csutil   archive.h           ]
   [ ConcatDirs csutil   csosdefs.h          ]
-  [ ConcatDirs csutil   garray.h            ]
   [ ConcatDirs csutil   getopt.h            ]
-  [ ConcatDirs csutil   objpool.h           ]
   [ ConcatDirs csutil   zip.h               ]
   [ ConcatDirs csutil   win32 SpecStrings.h ]
   [ ConcatDirs imap     parser.h            ]
   [ ConcatDirs inetwork vosapi.h            ]
   [ ConcatDirs ivaria   ode.h               ]
   [ ConcatDirs ivideo   wxwin.h             ]
+  ;
+
+# List of headers that should not appear in the master-headers because they 
+# are deprecated.
+CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs csgeom   subrec2.h           ]
+  [ ConcatDirs csutil   garray.h            ]
+  [ ConcatDirs csutil   objpool.h           ]
   ;
 
 {
