@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Apr-2005
+	- Erroroman fixed a bug in iRigidBody->GetTransform() where wrong
+	  matrices were used. ODE works only with t2o matrices for geometry 
+	  transforms, but they were passed like o2t matrices to CS transforms.
 	- Jorrit fixed a bug in csColliderHelper::InitializeCollisionWrapper().
 	  In case the factory had a collider mesh then the routine would
 	  create a collider from that and ignore the children of the mesh.
