@@ -33,26 +33,26 @@ Here is the map:
         <v x="-10" y="-1" z="-10"/> <v x="10" y="-1" z="-10"/>
         <v x="-10" y="4" z="10"/> <v x="10" y="4" z="10"/>
         <v x="-10" y="4" z="-10"/> <v x="10" y="4" z="-10"/>
-	<material>wood</material>
+        <material>wood</material>
         <texlen>4</texlen>
         <p name="up">
-	  <v>6</v> <v>7</v> <v>5</v> <v>4</v>
-	</p>
+          <v>6</v> <v>7</v> <v>5</v> <v>4</v>
+        </p>
         <p name="down">
-	  <v>3</v> <v>2</v> <v>0</v> <v>1</v>
-	</p>
+          <v>3</v> <v>2</v> <v>0</v> <v>1</v>
+        </p>
         <p name="back">
-	  <v>7</v> <v>6</v> <v>2</v> <v>3</v>
-	</p>
+          <v>7</v> <v>6</v> <v>2</v> <v>3</v>
+        </p>
         <p name="front">
-	  <v>4</v> <v>5</v> <v>1</v> <v>0</v>
-	</p>
+          <v>4</v> <v>5</v> <v>1</v> <v>0</v>
+        </p>
         <p name="left">
-	  <v>6</v> <v>4</v> <v>0</v> <v>2</v>
-	</p>
+          <v>6</v> <v>4</v> <v>0</v> <v>2</v>
+        </p>
         <p name="right">
-	  <v>5</v> <v>7</v> <v>3</v> <v>1</v>
-	</p>
+          <v>5</v> <v>7</v> <v>3</v> <v>1</v>
+        </p>
       </params>
     </meshobj>
     <light>
