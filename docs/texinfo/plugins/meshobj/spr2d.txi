@@ -88,9 +88,9 @@ milliseconds and the u,v coordinates to use.
 @itemize @bullet
 @example
 <frame name="framename">
- <duration>milliseconds</duration>
- <v u="" v="" />
- @dots{} u,v coo list
+  <duration>milliseconds</duration>
+  <v u="" v="" />
+  @dots{} u,v coo list
 </frame>
 @end example
 @end itemize
@@ -128,8 +128,8 @@ Select an uv animation from the list of animations declared in the template
 @itemize @bullet
 @example
 <animate name="animationname">
-    <timing>milliseconds</timing>
-    <loop>yes/no</loop>
+  <timing>milliseconds</timing>
+  <loop>yes/no</loop>
 </animate>
 @end example
 @itemize @bullet
@@ -151,84 +151,83 @@ This is how our world file looks:
 
 @example
 <world>
-    <textures>
-        <texture name="blow">
-            <file>blow.png</file>
-        </texture>
-    </textures>
-    <materials>
-        <material name="explosion">
-            <texture>blow</texture>
-        </material>
-    </materials>
-    <meshobj name="Explosion">
-        <plugin>crystalspace.mesh.loader.factory.sprite.2d</plugin>
-        <params>
-            <material>explosion</material>
-            <uvanimation name="boom">
-                <frame name="first">
-                    <duration>100</duration>
-                    <v u="0" v="0" />
-                    <v u="0.5" v="0" />
-                    <v u="0.5" v="0.5" />
-                    <v u="0" v="0.5" />
-                </frame>
-                <frame name="second">
-                    <duration>100</duration>
-                    <v u="0.5" v="0" />
-                    <v u="1" v="0" />
-                    <v u="1" v="0.5" />
-                    <v u="0.5" v="0.5" />
-                </frame>
-                <frame name="third">
-                    <duration>100</duration>
-                    <v u="0" v="0.5" />
-                    <v u="0.5" v="0.5" />
-                    <v u="0.5" v="1" />
-                    <v u="0" v="1" />
-                </frame>
-                <frame name="fourth">
-                    <duration>100</duration>
-                    <v u="0.5" v="0.5" />
-                    <v u="1" v="0.5" />
-                    <v u="1" v="1" />
-                    <v u="0.5" v="1" />
-                </frame>
-            </uvanimation>
-        </params>
+  <textures>
+    <texture name="blow">
+      <file>blow.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name="explosion">
+      <texture>blow</texture>
+    </material>
+  </materials>
+  <meshobj name="Explosion">
+    <plugin>crystalspace.mesh.loader.factory.sprite.2d</plugin>
+    <params>
+      <material>explosion</material>
+      <uvanimation name="boom">
+        <frame name="first">
+          <duration>100</duration>
+          <v u="0" v="0" />
+          <v u="0.5" v="0" />
+          <v u="0.5" v="0.5" />
+          <v u="0" v="0.5" />
+        </frame>
+        <frame name="second">
+          <duration>100</duration>
+          <v u="0.5" v="0" />
+          <v u="1" v="0" />
+          <v u="1" v="0.5" />
+          <v u="0.5" v="0.5" />
+        </frame>
+        <frame name="third">
+          <duration>100</duration>
+          <v u="0" v="0.5" />
+          <v u="0.5" v="0.5" />
+          <v u="0.5" v="1" />
+          <v u="0" v="1" />
+        </frame>
+        <frame name="fourth">
+          <duration>100</duration>
+          <v u="0.5" v="0.5" />
+          <v u="1" v="0.5" />
+          <v u="1" v="1" />
+          <v u="0.5" v="1" />
+        </frame>
+      </uvanimation>
+    </params>
+  </meshobj>
+  <sector name="space">
+  <!-- define all the stuff in space @dots{}
+       and now one of the enemies right after we met him -->
+    <meshobj name="Kaboom">
+      <plugin>crystalspace.mesh.loader.sprite.2d</plugin>
+      <params>
+        <v x="-1" y="1" />
+        <v x="1" y="1" />
+        <v x="1" y="-1" />
+        <v x="-1" y="-1" />
+        <uv u="0" v="0" />
+        <uv u="1" v="0" />
+        <uv u="1" v="1" />
+        <uv u="0" v="1" />
+        <color red="1" green="1" blue="1" />
+        <color red="1" green="1" blue="1" />
+        <color red="1" green="1" blue="1" />
+        <color red="1" green="1" blue="1" />
+        <lighting>no</lighting>
+        <!-- show the animation, use the timings attached to
+             the frames, loop -->
+        <animate name="boom">
+          <timing>0</timing>
+          <loop>yes</loop>
+        </animate>
+      </params>
+      <move>
+        <v x="0" y="0" z="0">
+      </move>
     </meshobj>
-    <sector name="space">
-    <!-- define all the stuff in space
-         @dots{}
-         and now one of the enemies right after we met him -->
-        <meshobj name="Kaboom">
-	    <plugin>crystalspace.mesh.loader.sprite.2d</plugin>
-	    <params>
-		<v x="-1" y="1" />
-    	        <v x="1" y="1" />
-    		<v x="1" y="-1" />
-	        <v x="-1" y="-1" />
-		<uv u="0" v="0" />
-		<uv u="1" v="0" />
-	        <uv u="1" v="1" />
-		<uv u="0" v="1" />
-	        <color red="1" green="1" blue="1" />
-		<color red="1" green="1" blue="1" />
-	        <color red="1" green="1" blue="1" />
-		<color red="1" green="1" blue="1" />
-	        <lighting>no</lighting>
-		<!-- show the animation, use the timings attached to
-	    	     the frames, loop -->
-    	    	<animate name="boom">
-		    <timing>0</timing>
-	    	    <loop>yes</loop>
-		</animate>
-	    </params>
-	    <move>
-		<v x="0" y="0" z="0">
-	    </move>
-	</meshobj>
-    </sector>
+  </sector>
 </world>
 
 @end example
