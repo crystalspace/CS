@@ -51,32 +51,32 @@ Using static @sc{lod} from a map file is fairly easy. Here is an example:
 
 @example
 <meshobj name="loddy">
-    <nullmesh>
-	<min x="-1" y="0" z="-1" />
-	<max x="1" y="2" z="1" />
-    </nullmesh>
-    <staticlod>
-	<distance d0="100" d1="10" />
-    </staticlod>
-    <meshobj name="loddy_lowdetail">
-        <lodlevel>0</lodlevel>
-	@dots{}
-    </meshobj>
-    <meshobj name="loddy_mediumdetail">
-        <lodlevel>1</lodlevel>
-	@dots{}
-    </meshobj>
-    <meshobj name="loddy_highdetail_upper">
-        <lodlevel>2</lodlevel>
-	@dots{}
-    </meshobj>
-    <meshobj name="loddy_highdetail_lower">
-        <lodlevel>2</lodlevel>
-	@dots{}
-    </meshobj>
-    <move>
-        @dots{}
-    </move>
+  <nullmesh>
+    <min x="-1" y="0" z="-1" />
+    <max x="1" y="2" z="1" />
+  </nullmesh>
+  <staticlod>
+    <distance d0="100" d1="10" />
+  </staticlod>
+  <meshobj name="loddy_lowdetail">
+    <lodlevel>0</lodlevel>
+    @dots{}
+  </meshobj>
+  <meshobj name="loddy_mediumdetail">
+    <lodlevel>1</lodlevel>
+    @dots{}
+  </meshobj>
+  <meshobj name="loddy_highdetail_upper">
+    <lodlevel>2</lodlevel>
+    @dots{}
+  </meshobj>
+  <meshobj name="loddy_highdetail_lower">
+    <lodlevel>2</lodlevel>
+    @dots{}
+  </meshobj>
+  <move>
+    @dots{}
+  </move>
 </meshobj>
 @end example
 
@@ -91,21 +91,24 @@ the camera.
 
 Internally @sc{lod} uses a function to calculate a detail value betwen
 0 and 1 (0 meaning lowest detail, 1 meaning highest):
+
 @example
-  float lod = m * distance + a;
+float lod = m * distance + a;
 @end example
+
 The result of this function is capped so it is always between 0 and 1.
 
-Inside the @samp{staticlod} block you can directly specify the @samp{m}
-and @samp{a} values but it is often easier to use a short-cut and specify
-@samp{d0} and @samp{d1} instead. In the example above we set @samp{d0} equal
-to 100 which means that at distance 100 and beyond we will go to lowest possible
-detail. We also set @samp{d1} equal to 10 which means that at distance 10
-or less the object will use highest detail. Internally @samp{d0} and @samp{d1}
-are transformed to @samp{m} and @samp{a} using the following equation:
+Inside the @samp{staticlod} block you can directly specify the @samp{m} and
+@samp{a} values but it is often easier to use a short-cut and specify @samp{d0}
+and @samp{d1} instead. In the example above we set @samp{d0} equal to 100 which
+means that at distance 100 and beyond we will go to lowest possible detail. We
+also set @samp{d1} equal to 10 which means that at distance 10 or less the
+object will use highest detail. Internally @samp{d0} and @samp{d1} are
+transformed to @samp{m} and @samp{a} using the following equation:
+
 @example
-  float m = 1.0 / (d1-d0);
-  float a = -m * d0;
+float m = 1.0 / (d1-d0);
+float a = -m * d0;
 @end example
 
 After this we have four child meshes representing the different detail
@@ -127,14 +130,14 @@ use @samp{meshref} to make an instance of that hierarchical factory
 Note that it is also possible to use variables for @samp{m} and @samp{v}.
 One can do that like this:
 @example
-    <variables>
-        <variable name="Lod M" value="-.1" />
-        <variable name="Lod A" value=".5" />
-    </variables>
-    @dots{}
-    <staticlod>
-	<distance varm="Lod M" vara="Lod A" />
-    </staticlod>
+<variables>
+  <variable name="Lod M" value="-.1" />
+  <variable name="Lod A" value=".5" />
+</variables>
+@dots{}
+<staticlod>
+  <distance varm="Lod M" vara="Lod A" />
+</staticlod>
 @end example
 The advantage of this technique is that one can then use the same
 @sc{lod} values for different objects and modify them easily. Also one
@@ -149,28 +152,28 @@ an example which roughly does the same as our map example in the previous
 section:
 
 @example
-  csRef<iMeshWrapper> loddy_mesh = Engine->CreateMeshWrapper (
-	"crystalspace.mesh.object.null", "loddy");
-  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
-    	loddy_mesh->GetMeshObject (), iNullMeshState);
-  nullmesh->SetBoundingBox (csBox3 (
-	csVector3 (-1, 0, -1), csVector3 (1, 2, 1)));
+csRef<iMeshWrapper> loddy_mesh = Engine->CreateMeshWrapper (
+  "crystalspace.mesh.object.null", "loddy");
+csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
+  loddy_mesh->GetMeshObject (), iNullMeshState);
+nullmesh->SetBoundingBox (csBox3 (
+  csVector3 (-1, 0, -1), csVector3 (1, 2, 1)));
 
-  iLODControl* lodctrl = loddy_mesh->CreateStaticLOD ();
-  float d0 = 100;
-  float d1 = 10;
-  float m = 1.0 / (d1-d0);
-  float a = -m * d0;
-  lodctrl->SetLOD (m, a);
+iLODControl* lodctrl = loddy_mesh->CreateStaticLOD ();
+float d0 = 100;
+float d1 = 10;
+float m = 1.0 / (d1-d0);
+float a = -m * d0;
+lodctrl->SetLOD (m, a);
 
-  csRef<iMeshWrapper> loddy_lowdetail = @dots{}
-  loddy_mesh->GetChildren ()->Add (loddy_lowdetail);
-  loddy_mesh->AddMeshToStaticLOD (0, loddy_lowdetail);
-  @dots{}
-  csRef<iMeshWrapper> loddy_meddetail = @dots{}
-  loddy_mesh->GetChildren ()->Add (loddy_meddetail);
-  loddy_mesh->AddMeshToStaticLOD (1, loddy_meddetail);
-  @dots{}
+csRef<iMeshWrapper> loddy_lowdetail = @dots{}
+loddy_mesh->GetChildren ()->Add (loddy_lowdetail);
+loddy_mesh->AddMeshToStaticLOD (0, loddy_lowdetail);
+@dots{}
+csRef<iMeshWrapper> loddy_meddetail = @dots{}
+loddy_mesh->GetChildren ()->Add (loddy_meddetail);
+loddy_mesh->AddMeshToStaticLOD (1, loddy_meddetail);
+@dots{}
 @end example
 
 @subsubheading Progressive @sc{lod}
