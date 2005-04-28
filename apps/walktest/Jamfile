@@ -91,6 +91,10 @@ if $(PNG.AVAILABLE) = "yes"
 {
   WALKALL.PLUGINLIST += cspngimg ;
 }
+if $(CAL3D.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
+}
 
 if $(GL.AVAILABLE) = "yes"
 {
