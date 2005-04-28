@@ -124,6 +124,12 @@ struct iODEDynamicState : public iBase
 
 SCF_VERSION (iODEDynamicSystemState, 0, 0, 1);
 
+struct iODEBallJoint;
+struct iODEHingeJoint;
+struct iODEAMotorJoint;
+struct iODEUniversalJoint;
+struct iODESliderJoint;
+
 /**
  * This class exposes parameters specific to odedynam as an implementation
  * of iDynamics.  In most cases SystemState should not be modified directly
@@ -223,6 +229,33 @@ struct iODEDynamicSystemState : public iBase
    */
   virtual void EnableFastObjects (bool enable) = 0;
   virtual bool FastObjectsEnabled () = 0;
+
+  /// Create a ball joint and add it to he simulation
+  virtual csPtr<iODEBallJoint> CreateBallJoint () = 0;
+  
+  /// Create a hinge joint and add it to he simulation
+  virtual csPtr<iODEHingeJoint> CreateHingeJoint () = 0;
+
+  /// Create a AMotor joint and add it to he simulation
+  virtual csPtr<iODEAMotorJoint> CreateAMotorJoint () = 0;
+
+  /// Create a Universal joint and add it to he simulation
+  virtual csPtr<iODEUniversalJoint> CreateUniversalJoint () = 0;
+
+  /// Remove a ball joint from the simulation
+  virtual void RemoveJoint (iODEBallJoint* joint) = 0;
+
+  /// Remove a hinge joint from the simulation
+  virtual void RemoveJoint (iODEHingeJoint* joint) = 0;
+
+  /// Remove a AMotor joint from the simulation
+  virtual void RemoveJoint (iODEAMotorJoint* joint) = 0;
+
+  /// Remove a Universal joint from the simulation
+  virtual void RemoveJoint (iODEUniversalJoint* joint) = 0;
+
+  /// Remove a Slider joint from the simulation
+  virtual void RemoveJoint (iODESliderJoint* joint) = 0;
 
 };
 
@@ -334,7 +367,7 @@ struct iODEJointState : public iBase
 /**
  * General joint state. 
  */
-struct iODEGenralJointState : public iBase
+struct iODEGeneralJointState : public iBase
 {
   /**
    * Set low stop angle or position. For rotational joints, this 
@@ -429,6 +462,91 @@ struct iODEGenralJointState : public iBase
   /// Get suspension constraint force mixing (CFM) value.
   virtual float GetSuspensionCFM (int axis) = 0;
 
+  /**
+   * Attach the joint to some new bodies. If the joint is already attached, it 
+   * will be detached from the old bodies first. To attach this joint to only 
+   * one body, set body1 or body2 to zero - a zero body refers to the static 
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * it will have no effect on the simulation.
+   */
+  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
+
+  /// Get an attached body (valid values for body are 0 and 1)
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+
+};
+
+SCF_VERSION (iODESliderJoint, 0, 0, 1);
+
+struct iODESliderJoint : public iODEGeneralJointState
+{
+  ///Set the slider axis.
+  virtual void SetSliderAxis (float x, float y, float z) = 0;
+
+  ///Get the slider axis.
+  virtual csVector3 GetSliderAxis () = 0;
+
+  /**
+   * Get the slider linear position (i.e. the slider's "extension").
+   * When the axis is set, the current position of the attached bodies 
+   * is examined and that position will be the zero position.
+   */
+  virtual float GetSliderPosition () = 0;
+
+  ///Get the time derivative of slider position.
+  virtual float GetSliderPositionRate () = 0;
+};
+
+SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
+/**
+ * A universal joint is like a ball and socket joint that constrains 
+ * an extra degree of rotational freedom. Given axis 1 on body 1, and 
+ * axis 2 on body 2 that is perpendicular to axis 1, it keeps them 
+ * perpendicular. In other words, rotation of the two bodies about the 
+ * direction perpendicular to the two axes will be equal.
+ */
+struct iODEUniversalJoint : public iBase 
+{
+  ///Set universal anchor.
+  virtual void SetUniversalAnchor (float x, float y, float z) = 0;
+
+  ///Set axis on body 1 (should be perpendicular to axis 2)
+  virtual void SetUniversalAxis1 (float x, float y, float z) = 0;
+
+  ///Set axis on body 2 (should be perpendicular to axis 1)
+  virtual void SetUniversalAxis2 (float x, float y, float z) = 0;
+
+  /**
+   * Get the joint anchor point, in world coordinates. This returns 
+   * the point on body 1. If the joint is perfectly satisfied, this 
+   * will be the same as the point on body 2.
+   */
+  virtual csVector3 GetUniversalAnchor1 () = 0;
+
+  /**
+   * Get the joint anchor point, in world coordinates. This returns 
+   * the point on body 2. If the joint is perfectly satisfied, this 
+   * will be the same as the point on body 1.
+   */
+  virtual csVector3 GetUniversalAnchor2 () = 0;
+
+  ///Get universal axis on body 1.
+  virtual csVector3 GetUniversalAxis1 () = 0;
+
+  ///Get universal axis on body 2.
+  virtual csVector3 GetUniversalAxis2 () = 0;
+
+  /**
+   * Attach the joint to some new bodies. If the joint is already attached, it 
+   * will be detached from the old bodies first. To attach this joint to only 
+   * one body, set body1 or body2 to zero - a zero body refers to the static 
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * it will have no effect on the simulation.
+   */
+  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
+
+  /// Get an attached body (valid values for body are 0 and 1)
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
 };
 
 enum ODEAMotorMode
@@ -437,7 +555,7 @@ enum ODEAMotorMode
   CS_ODE_AMOTOR_MODE_EULER = dAMotorEuler,
 };
 
-SCF_VERSION (iODEAMotorJointState, 0, 0, 1);
+SCF_VERSION (iODEAMotorJoint, 0, 0, 1);
 
 /**
  * ODE AMotor joint. An angular motor (AMotor) allows the relative 
@@ -450,7 +568,7 @@ SCF_VERSION (iODEAMotorJointState, 0, 0, 1);
  * AMotor with a ball joint, simply attach it to the same two bodies 
  * that the ball joint is attached to.   
  */
-struct iODEAMotorJoint : public iODEGenralJointState
+struct iODEAMotorJoint : public iODEGeneralJointState
 {
 
   /**
@@ -540,26 +658,14 @@ struct iODEAMotorJoint : public iODEGenralJointState
    */
   virtual float GetAMotorAngleRate (int axis_num) = 0;
   
-  /**
-   * Attach the joint to some new bodies. If the joint is already attached, it 
-   * will be detached from the old bodies first. To attach this joint to only 
-   * one body, set body1 or body2 to zero - a zero body refers to the static 
-   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
-   * it will have no effect on the simulation.
-   */
-  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
-  
-  /// Get an attached body (valid values for body are 0 and 1)
-  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
-
 };
 
-SCF_VERSION (iODEHingeJointState, 0, 0, 1);
+SCF_VERSION (iODEHingeJoint, 0, 0, 1);
 
 /**
  * ODE hinge joint (contrainted translation and 1 free rotation axis).  
  */
-struct iODEHingeJoint : public iODEGenralJointState
+struct iODEHingeJoint : public iODEGeneralJointState
 {
   /**
    * Set the joint anchor point. The joint will try to keep this point
@@ -607,20 +713,9 @@ struct iODEHingeJoint : public iODEGenralJointState
    */
   virtual csVector3 GetAnchorError () = 0;
 
-  /**
-   * Attach the joint to some new bodies. If the joint is already attached, it 
-   * will be detached from the old bodies first. To attach this joint to only 
-   * one body, set body1 or body2 to zero - a zero body refers to the static 
-   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
-   * it will have no effect on the simulation.
-   */
-  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
-  
-  /// Get an attached body (valid values for body are 0 and 1)
-  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
 };
 
-SCF_VERSION (iODEBallJointState, 0, 0, 1);
+SCF_VERSION (iODEBallJoint, 0, 0, 1);
 
 /**
  * ODE ball and socket joint (contrainted translation and free rotation).  

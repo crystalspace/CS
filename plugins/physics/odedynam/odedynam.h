@@ -326,19 +326,7 @@ public:
     { scfParent->RemoveGroup (group); }
     csPtr<iJoint> CreateJoint ()
     { return scfParent->CreateJoint (); }
-    csPtr<iODEBallJoint> CreateBallJoint ()
-    { return scfParent->CreateBallJoint (); }
-    csPtr<iODEAMotorJoint> CreateAMotorJoint ()
-    { return scfParent->CreateAMotorJoint (); }
-    csPtr<iODEHingeJoint> CreateHingeJoint ()
-    { return scfParent->CreateHingeJoint (); }
     void RemoveJoint (iJoint *joint)
-    { scfParent->RemoveJoint (joint); }
-    void RemoveJoint (iODEBallJoint *joint)
-    { scfParent->RemoveJoint (joint); }
-    void RemoveJoint (iODEAMotorJoint *joint)
-    { scfParent->RemoveJoint (joint); }
-    void RemoveJoint (iODEHingeJoint *joint)
     { scfParent->RemoveJoint (joint); }
     iDynamicsMoveCallback* GetDefaultMoveCallback ()
     { return scfParent->GetDefaultMoveCallback (); }
@@ -439,6 +427,27 @@ public:
     { return scfParent->AutoDisableEnabled (); }
     void SetAutoDisableParams (float linear, float angular, int steps, float time)
     { scfParent->SetAutoDisableParams (linear, angular, steps, time); }
+    csPtr<iODEBallJoint> CreateBallJoint ()
+    { return scfParent->CreateBallJoint (); }
+    csPtr<iODEUniversalJoint> CreateUniversalJoint ()
+    { return scfParent->CreateUniversalJoint (); }
+    csPtr<iODEAMotorJoint> CreateAMotorJoint ()
+    { return scfParent->CreateAMotorJoint (); }
+    csPtr<iODEHingeJoint> CreateHingeJoint ()
+    { return scfParent->CreateHingeJoint (); }
+    csPtr<iODESliderJoint> CreateSliderJoint ()
+    { return scfParent->CreateSliderJoint (); }
+    void RemoveJoint (iODEBallJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEAMotorJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEHingeJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEUniversalJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODESliderJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+
   } scfiODEDynamicSystemState;
 
 
@@ -469,10 +478,15 @@ public:
   virtual csPtr<iODEBallJoint> CreateBallJoint (); 
   virtual csPtr<iODEHingeJoint> CreateHingeJoint (); 
   virtual csPtr<iODEAMotorJoint> CreateAMotorJoint (); 
+  virtual csPtr<iODEUniversalJoint> CreateUniversalJoint (); 
+  virtual csPtr<iODESliderJoint> CreateSliderJoint (); 
+
   virtual void RemoveJoint (iJoint* joint);
   virtual void RemoveJoint (iODEBallJoint* joint);
   virtual void RemoveJoint (iODEAMotorJoint* joint);
   virtual void RemoveJoint (iODEHingeJoint* joint);
+  virtual void RemoveJoint (iODEUniversalJoint* joint);
+  virtual void RemoveJoint (iODESliderJoint* joint);
 
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 
@@ -736,9 +750,89 @@ struct csStrictODEJoint
 * This implements the ball joint.  It does this by strict copying
 * ODEs interface. 
 */
+struct ODESliderJoint : public csStrictODEJoint, iODESliderJoint 
+{
+  SCF_DECLARE_IBASE;
+
+  ODESliderJoint (dWorldID w_id);
+  virtual ~ODESliderJoint ();
+
+    void SetLoStop (float value, int axis) 
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis, value);};
+  void SetHiStop (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis, value);};
+  void SetVel (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamVel, axis, value);};
+  void SetFMax (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFMax, axis, value);};
+  void SetFudgeFactor (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFudgeFactor, axis, value);};
+  void SetBounce (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamBounce, axis, value);};
+  void SetCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamCFM, axis, value);};
+  void SetStopERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopERP, axis, value);};
+  void SetStopCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopCFM, axis, value);};
+  void SetSuspensionERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionERP, axis, value);};
+  void SetSuspensionCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis, value);};
+
+  float GetLoStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis);};
+  float GetHiStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis);};
+  float GetVel (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamVel, axis);};
+  float GetFMax (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFMax, axis);};
+  float GetFudgeFactor (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFudgeFactor, axis);};
+  float GetBounce (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamBounce, axis);};
+  float GetCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamCFM, axis);};
+  float GetStopERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopERP, axis);};
+  float GetStopCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopCFM, axis);};
+  float GetSuspensionERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionERP, axis);};
+  virtual float GetSuspensionCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis);};
+
+  void SetSliderAxis (float x, float y, float z) {dJointSetSliderAxis (jointID, x, y, z);};
+  csVector3 GetSliderAxis ();
+  float GetSliderPosition () {return dJointGetSliderPosition (jointID);};
+  float GetSliderPositionRate () {return dJointGetSliderPositionRate (jointID);};
+
+  void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
+  csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
+};
+
+struct ODEUniversalJoint : public csStrictODEJoint, iODEUniversalJoint
+{
+  SCF_DECLARE_IBASE;
+
+  ODEUniversalJoint (dWorldID w_id);
+  virtual ~ODEUniversalJoint ();
+
+  void SetUniversalAnchor (float x, float y, float z) {dJointSetUniversalAnchor (jointID, x, y, z);};
+  void SetUniversalAxis1 (float x, float y, float z) {dJointSetUniversalAxis1 (jointID, x, y, z);};
+  void SetUniversalAxis2 (float x, float y, float z) {dJointSetUniversalAxis2 (jointID, x, y, z);};
+  csVector3 GetUniversalAnchor1 ();
+  csVector3 GetUniversalAnchor2 ();
+  csVector3 GetUniversalAxis1 ();
+  csVector3 GetUniversalAxis2 ();
+
+  void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
+  csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
+};
+
 struct ODEBallJoint : public csStrictODEJoint, iODEBallJoint
 {
-
   SCF_DECLARE_IBASE;
 
   ODEBallJoint (dWorldID w_id);

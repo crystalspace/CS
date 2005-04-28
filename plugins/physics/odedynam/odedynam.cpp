@@ -95,12 +95,20 @@ SCF_IMPLEMENT_IBASE (ODEBallJoint)
   SCF_IMPLEMENTS_INTERFACE (iODEBallJoint)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (ODESliderJoint)
+  SCF_IMPLEMENTS_INTERFACE (iODESliderJoint)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_IBASE (ODEHingeJoint)
   SCF_IMPLEMENTS_INTERFACE (iODEHingeJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (ODEAMotorJoint)
   SCF_IMPLEMENTS_INTERFACE (iODEAMotorJoint)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (ODEUniversalJoint)
+  SCF_IMPLEMENTS_INTERFACE (iODEUniversalJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEDefaultMoveCallback)
@@ -556,6 +564,18 @@ csPtr<iJoint> csODEDynamicSystem::CreateJoint ()
   return csPtr<iJoint> (joint);
 }
 
+csPtr<iODEUniversalJoint> csODEDynamicSystem::CreateUniversalJoint ()
+{
+  ODEUniversalJoint* joint = new ODEUniversalJoint (GetWorldID());
+  return  csPtr<iODEUniversalJoint> (joint);
+}
+
+csPtr<iODESliderJoint> csODEDynamicSystem::CreateSliderJoint ()
+{
+  ODESliderJoint* joint = new ODESliderJoint (GetWorldID());
+  return  csPtr<iODESliderJoint> (joint);
+}
+
 csPtr<iODEHingeJoint> csODEDynamicSystem::CreateHingeJoint ()
 {
   ODEHingeJoint* joint = new ODEHingeJoint (GetWorldID());
@@ -574,6 +594,11 @@ csPtr<iODEBallJoint> csODEDynamicSystem::CreateBallJoint ()
   return  csPtr<iODEBallJoint> (joint);
 }
 
+void csODEDynamicSystem::RemoveJoint (iODEUniversalJoint *joint)
+{
+  delete joint; //FIXME: should it be here? (use joints vector?)
+}
+
 void csODEDynamicSystem::RemoveJoint (iODEHingeJoint *joint)
 {
   delete joint; //FIXME: should it be here? (use joints vector?)
@@ -583,6 +608,10 @@ void csODEDynamicSystem::RemoveJoint (iODEAMotorJoint *joint)
   delete joint; //FIXME: should it be here? (use joints vector?)
 }
 void csODEDynamicSystem::RemoveJoint (iODEBallJoint *joint)
+{
+  delete joint; //FIXME: should it be here? (use joints vector?)
+}
+void csODEDynamicSystem::RemoveJoint (iODESliderJoint *joint)
 {
   delete joint; //FIXME: should it be here? (use joints vector?)
 }
@@ -1233,7 +1262,7 @@ const csOrthoTransform csODERigidBody::GetTransform () const
   rot.m11 = mat[0]; rot.m12 = mat[1]; rot.m13 = mat[2];
   rot.m21 = mat[4]; rot.m22 = mat[5]; rot.m23 = mat[6];
   rot.m31 = mat[8]; rot.m32 = mat[9]; rot.m33 = mat[10];
-  return csOrthoTransform (rot.GetInverse(), csVector3 (pos[0], pos[1], pos[2]));
+  return csOrthoTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
 void csODERigidBody::SetLinearVelocity (const csVector3& vel)
@@ -1648,7 +1677,58 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
       return 0.0; 
   }
 }
-
+//-------------------------------------------------------------------------------
+ODESliderJoint::ODESliderJoint (dWorldID w_id)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  jointID = dJointCreateSlider (w_id, 0);
+}
+ODESliderJoint::~ODESliderJoint ()
+{
+  SCF_DESTRUCT_IBASE();
+  dJointDestroy (jointID);
+}
+csVector3 ODESliderJoint::GetSliderAxis ()
+{
+  dVector3 pos;
+  dJointGetSliderAxis (jointID, pos);  
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+//-------------------------------------------------------------------------------
+ODEUniversalJoint::ODEUniversalJoint (dWorldID w_id)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  jointID = dJointCreateUniversal (w_id, 0);
+}
+ODEUniversalJoint::~ODEUniversalJoint ()
+{
+  SCF_DESTRUCT_IBASE();
+  dJointDestroy (jointID);
+}
+csVector3 ODEUniversalJoint::GetUniversalAnchor1 ()
+{
+  dVector3 pos;
+  dJointGetUniversalAnchor (jointID, pos);  
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+csVector3 ODEUniversalJoint::GetUniversalAnchor2 ()
+{
+  dVector3 pos;
+  dJointGetUniversalAnchor2 (jointID, pos);  
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+csVector3 ODEUniversalJoint::GetUniversalAxis1 ()
+{
+  dVector3 pos;
+  dJointGetUniversalAxis1 (jointID, pos);  
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+csVector3 ODEUniversalJoint::GetUniversalAxis2 ()
+{
+  dVector3 pos;
+  dJointGetUniversalAxis2 (jointID, pos);  
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
 //-------------------------------------------------------------------------------
 
 ODEAMotorJoint::ODEAMotorJoint (dWorldID w_id)
