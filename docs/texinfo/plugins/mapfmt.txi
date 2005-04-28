@@ -13,11 +13,11 @@
 @c        should appear on a line following the production itself.  The '|' is
 @c        automatically inserted.
 @c    simpleprod{} represents a production for which no expansion is given.
-@c    comma{} represent the punctuation symbol 'comma'.  It is used when a
+@c    acomma{} represent the punctuation symbol 'comma'.  It is used when a
 @c        comma must appear within the expansion of a production, since one
 @c        can not use an actual comma, as it would be interpreted as a macro
 @c        delimeter, instead.
-@c    COMMA{} represents a comma wrapped as a @token{}.
+@c    ACOMMA{} represents a comma wrapped as a @token{}.
 @c    LP{} represents a left parenthesis '(' wrapped as a @token{}.
 @c    RP{} represents a right parenthesis ')' wrapped as a @token{}.
 @c
@@ -63,12 +63,12 @@
 @nonterm{\a\}
 @end macro
 
-@macro comma
+@macro acomma
 ,
 @end macro
 
-@macro COMMA
-@token{@comma{}}
+@macro ACOMMA
+@token{@acomma{}}
 @end macro
 
 @macro LP
@@ -135,7 +135,7 @@ utilized, or the one to the right, but not both.  An example follows.
 
 @production{flip, @token{HEAD} | @token{TAIL}}@*
 @production{wager, @token{WAGER} @nonterm{flip}
-    @LP{} @nonterm{money} [ @COMMA{} @nonterm{money} @dots{} ] @RP{}}
+    @LP{} @nonterm{money} [ @ACOMMA{} @nonterm{money} @dots{} ] @RP{}}
 
 In this example, a @samp{WAGER} may be followed by either @samp{HEAD} or
 @samp{TAIL}, and then by a parenthesized list of monetary values separated by
@@ -200,7 +200,7 @@ backslash.
 
 @subsubheading Number List
 @production{number-list,
-    @nonterm{number} [ @COMMA{} @nonterm{number} ] @dots{}}
+    @nonterm{number} [ @ACOMMA{} @nonterm{number} ] @dots{}}
 
 @subsubheading Boolean Value
 @production{yes, @token{yes} | @token{true} | @token{on} | @token{1}}@*
@@ -214,7 +214,7 @@ backslash.
 @production{gray, 0..1}@*
 @production{color-grayscale, @nonterm{gray}}@*
 @production{color-general,
-    @nonterm{red} @COMMA{} @nonterm{green} @COMMA{} @nonterm{blue}}@*
+    @nonterm{red} @ACOMMA{} @nonterm{green} @ACOMMA{} @nonterm{blue}}@*
 @production{color, @nonterm{color-grayscale} | @nonterm{color-general}}
 
 @subsubheading Vectors and Coordinates
@@ -227,14 +227,14 @@ points forward.
 @production{z, @nonterm{number}}@*
 @production{u, @nonterm{number}}@*
 @production{v, @nonterm{number}}@*
-@production{vector-2d, @nonterm{x} @COMMA{} @nonterm{z}}@*
-@production{vector-3d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z}}@*
-@production{vector-4d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{}
-    @nonterm{z} @COMMA{} @nonterm{r} }@*
+@production{vector-2d, @nonterm{x} @ACOMMA{} @nonterm{z}}@*
+@production{vector-3d, @nonterm{x} @ACOMMA{} @nonterm{y} @ACOMMA{} @nonterm{z}}@*
+@production{vector-4d, @nonterm{x} @ACOMMA{} @nonterm{y} @ACOMMA{}
+    @nonterm{z} @ACOMMA{} @nonterm{r} }@*
 @production{vertex-idx, @nonterm{integer}}@*
 @production{coordinate, @nonterm{vector-3d}}@*
 @production{coordinate-2d, @nonterm{vector-2d}}@*
-@production{texture-coordinate, @nonterm{u} @COMMA{} @nonterm{v}}
+@production{texture-coordinate, @nonterm{u} @ACOMMA{} @nonterm{v}}
 
 @subsubheading Object Names
 
@@ -271,12 +271,12 @@ objects but doesn't otherwise use them. You can iterate over these
 keys in the code.
 
 @production{key,
-    @token{KEY} @LP{} @nonterm{keyname} @COMMA{} @nonterm{keyvalue} @RP{}}
+    @token{KEY} @LP{} @nonterm{keyname} @ACOMMA{} @nonterm{keyvalue} @RP{}}
 
 @subsubheading Fog
 @production{density, @nonterm{number}}@*
 @production{fog-desc,
-    @token{FOG} @LP{} @nonterm{color} @COMMA{} @nonterm{density} @RP{}}@*
+    @token{FOG} @LP{} @nonterm{color} @ACOMMA{} @nonterm{density} @RP{}}@*
 @production{alpha-nr, @token{0} | @token{25} | @token{50} | @token{75}}@*
 @production{alpha, @token{ALPHA} @LP{} @nonterm{alpha-nr} @RP{}}
 
@@ -295,8 +295,8 @@ keys in the code.
 @production{complex-matrix-scaler, @nonterm{stated-matrix-x-scaler}}@*
     @prodnext{@nonterm{stated-matrix-y-scaler}}@*
     @prodnext{@nonterm{stated-matrix-z-scaler}}@*
-@production{full-matrix-scaler, @nonterm{matrix-x-scaler} @COMMA{}
-    @nonterm{matrix-y-scaler} @COMMA{} @nonterm{matrix-z-scaler}}@*
+@production{full-matrix-scaler, @nonterm{matrix-x-scaler} @ACOMMA{}
+    @nonterm{matrix-y-scaler} @ACOMMA{} @nonterm{matrix-z-scaler}}@*
 @production{uniform-matrix-scaler, @nonterm{matrix-scaler}}@*
 @production{simple-matrix-scaler, @token{SCALE} @LP{}
     @nonterm{uniform-matrix-scaler} | @nonterm{full-matrix-scaler} @RP{}}@*
@@ -314,8 +314,8 @@ keys in the code.
     @token{ROT_Z} @LP{} @nonterm{rotation-z-angle} @RP{}}@*
 @production{complex-rotation-matrix, @nonterm{rotation-x-matrix} |
     @nonterm{rotation-y-matrix} | @nonterm{rotation-z-matrix}}@*
-@production{rotation-angles, @nonterm{rotation-x-angle} @COMMA{}
-    @nonterm{rotation-y-angle} @COMMA{} @nonterm{rotation-z-angle}}@*
+@production{rotation-angles, @nonterm{rotation-x-angle} @ACOMMA{}
+    @nonterm{rotation-y-angle} @ACOMMA{} @nonterm{rotation-z-angle}}@*
 @production{simple-rotation-matrix,
     @token{ROT} @LP{} @nonterm{rotation-angles} @RP{}}
 
@@ -324,8 +324,8 @@ keys in the code.
 @production{complex-matrix,
     @nonterm{rotation-matrix} | @nonterm{compound-matrix-scaler}}@*
 @production{simple-scaled-matrix, @nonterm{uniform-matrix-scaler}}@*
-@production{normal-matrix, @nonterm{vector-3d} @COMMA{} @nonterm{vector-3d}
-    @COMMA{} @nonterm{vector-3d}}@*
+@production{normal-matrix, @nonterm{vector-3d} @ACOMMA{} @nonterm{vector-3d}
+    @ACOMMA{} @nonterm{vector-3d}}@*
 @production{identity-matrix, @token{IDENTITY}}@*
 @production{matrix-type, @nonterm{identity-matrix}}@*
     @prodnext{@nonterm{normal-matrix}}@*
@@ -344,7 +344,7 @@ It is recommended to use the new syntax for lights.
 
 @production{dynamic-flag, @token{0} | @token{1}}@*
 @production{light-oldsyntax, @nonterm{coordinate} @token{:} @nonterm{radius}
-    @COMMA{} @nonterm{color-general} @COMMA{} @nonterm{dynamic-flag}}
+    @ACOMMA{} @nonterm{color-general} @ACOMMA{} @nonterm{dynamic-flag}}
 
 @production{light-center, @token{CENTER} @LP{} @nonterm{coordinate} @RP{}}@*
 @production{light-radius, @token{RADIUS} @LP{} @nonterm{radius} @RP{}}@*
@@ -560,7 +560,7 @@ internal list first.
     @prodnext{@nonterm{start-up}}@*
     @prodnext{@nonterm{start-forward}}@*
 @production{start-newsyntax, [ @nonterm{start-comp} @dots{} ]}@*
-@production{start-oldsyntax, @nonterm{sector-name} @COMMA{}
+@production{start-oldsyntax, @nonterm{sector-name} @ACOMMA{}
     @nonterm{coordinate}}@*
 @production{start, @token{START}
     @LP{} @nonterm{start-oldsyntax} | @nonterm{start-newsyntax} @RP{}}
@@ -593,7 +593,7 @@ Same remark as for mesh objects: the stuff that is inside the
 @production{rendpri-setting,
     @token{BACK2FRONT} | @token{FRONT2BACK} | @token{NONE}}@*
 @production{rendpri-comp, @token{PRIORITY} @nonterm{priority-name}
-    @LP{} @nonterm{rendpri-value} @COMMA{} @nonterm{rendpri-setting} @RP{}}@*
+    @LP{} @nonterm{rendpri-value} @ACOMMA{} @nonterm{rendpri-setting} @RP{}}@*
 @production{renderpriorities, @token{RENDERPRIORITIES}
     @LP{} [ @nonterm{rendpri-comp} @dots{} ] @RP{}}
 
@@ -602,7 +602,7 @@ Same remark as for mesh objects: the stuff that is inside the
 @production{setting-clearzbuf, @token{CLEARZBUF} @LP{} @nonterm{yes-no} @RP{}}@*
 @production{setting-clearscreen, @token{CLEARSCREEN} @LP{} @nonterm{yes-no} @RP{}}@*
 @production{setting-lightmapcellsize, @token{LIGHTMAPCELLSIZE} @LP{} @nonterm{pos-integer} @RP{}}@*
-@production{setting-maxlightmapsize, @token{MAXLIGHTMAPSIZE} @LP{} @nonterm{pos-integer} @COMMA{} @nonterm{pos-integer} @RP{}}@*
+@production{setting-maxlightmapsize, @token{MAXLIGHTMAPSIZE} @LP{} @nonterm{pos-integer} @ACOMMA{} @nonterm{pos-integer} @RP{}}@*
 @production{settings-comp, @nonterm{setting-ambient}}@*
     @prodnext{@nonterm{setting-clearzbuf}}@*
     @prodnext{@nonterm{setting-clearscreen}}@*
@@ -784,7 +784,7 @@ it not suited for computer generated output.  Ignore @samp{ROOM} and
 @unmacro production
 @unmacro simpleprod
 @unmacro prodnext
-@unmacro comma
-@unmacro COMMA
+@unmacro acomma
+@unmacro ACOMMA
 @unmacro LP
 @unmacro RP

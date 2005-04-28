@@ -148,8 +148,10 @@ in the previous section:
     <texture>wood</texture>
     <shader type="standard">std_lighting_detail_alpha</shader>
     <shadervar name="tex detail" type="texture">plasma</shadervar>
-    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
-    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
+    <shadervar name="detail texture scale"
+               type="vector2">10,10</shadervar>
+    <shadervar name="detail texture color"
+               type="vector4">1,1,1,0.25</shadervar>
   </material>
 </materials>
 @end example

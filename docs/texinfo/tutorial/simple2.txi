@@ -172,7 +172,8 @@ void Simple::CreateSprites ()
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
         imeshfact, "MySprite", room,
         csVector3 (-3, 5, 3)));
-  csMatrix3 m; m.Identity (); m *= 5.;	// Don't do this scale in your own code!!!
+  csMatrix3 m; m.Identity ();
+  m *= 5.; // Don't do this scale in your own code! (see discussion)
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> spstate (

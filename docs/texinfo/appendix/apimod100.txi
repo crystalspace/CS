@@ -749,14 +749,14 @@ should be condensed.  Most implementations of @samp{iDocument} will attempt to
 respect this option if possible.  For implementations where it does not make
 sense, the option will be ignored.
 
-Previously, @sc{xml} implementations of @samp{iDocument} condensed whitespace
-in @samp{CS_NODE_TEXT} nodes at @code{Parse()} time.  This is no longer the
-case.  Whitespace is now preserved by default.  If the new behavior is
-unsuitable for your case, use the new argument to @code{iDocument::Parse()} to
-indicate that whitespace should be condensed.  This change was made in order to
-conform to the latest @sc{xml} specification which states that @sc{xml}
-scanners must preserve whitespace by default.  Consult the following documents
-for more information regarding this issue.
+Previously, @sc{xml}-based implementations of the @samp{iDocument} interface
+condensed whitespace in @samp{CS_NODE_TEXT} nodes at @code{Parse()} time.  This
+is no longer the case.  Whitespace is now preserved by default.  If the new
+behavior is unsuitable for your case, use the new argument to
+@code{iDocument::Parse()} to indicate that whitespace should be condensed.
+This change was made in order to conform to the latest @sc{xml} specification
+which states that @sc{xml} scanners must preserve whitespace by default.
+Consult the following documents for more information regarding this issue.
 
 @noindent
 @uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
@@ -777,9 +777,15 @@ plugins:
 @code{crystalspace.graphics2d.null}
 @item
 @code{crystalspace.documentsystem.multiplex} @result{}
+@iftex
+@*
+@end iftex
 @code{crystalspace.documentsystem.multiplexer}
 @item
 @code{crystalspace.graphic.image.io.multiplex} @result{}
+@iftex
+@*
+@end iftex
 @code{crystalspace.graphic.image.io.multiplexer}
 @end itemize
 
@@ -1632,7 +1638,7 @@ change.
 @subheading @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
 
 @samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
-with @samp{csStringSet::GlobalIterator} and
+with the iterator classes @samp{csStringSet::GlobalIterator} and
 @samp{csStringHash::GlobalIterator}, respectively.  Rather than instantiating
 iterators directly, you now ask the set or hash for an iterator. This brings
 the @samp{csStringSet} and @samp{csStringHash} @sc{api}'s in line with other
@@ -1674,13 +1680,17 @@ questionable use.
 @item
 @code{csIndPrint} and @file{csutil/indprint.h}
 @item
-@code{iMaterialHandle}. Equivalent functionality can be achieved by using
-@samp{iTextureHandle} or @samp{iMaterial} directly; whichever is more
-appropriate.
+@code{iMaterialHandle}.  Use @samp{iTextureHandle} or @samp{iMaterial} directly
+(whichever is more appropriate) to achieve equivalent functionality.
 @item
 @code{csRenderMeshHolderMultiple}. Equivalent functionality can be achieved by 
 using @samp{csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> >}.
 @end itemize
+
+@subheading @code{csRenderMeshHolderSingle} Renamed
+
+@samp{csRenderMeshHolderSingle} has been renamed to @samp{csRenderMeshHolder}
+as a consequence of the removal of @samp{csRenderMeshHolderMultiple}.
 
 @subheading C++ Standard Conformance
 
@@ -1699,16 +1709,9 @@ merely included @file{imap/loader.h} and did nothing more. Since
 @file{imap/parser.h} has no useful purpose, it is now officially deprecated,
 and deprecation warnings have been added. Use @file{imap/loader.h} instead.
 
-@subheading @code{csRenderMeshHolderSingle} Renamed
+@subheading @code{csSet<>} Relocation and Changes
 
-Following the removal of @code{csRenderMeshHolderMultiple} (see above),
-@code{csRenderMeshHolderSingle} has been renamed to @code{csRenderMeshHolder}. 
-
-@subheading @code{csSet<>} Relocation
-
-The class @code{csSet<>} was moved out from @file{csutil/hash.h} into its own 
-header file, @file{csutil/set.h}. While @code{csSet<>} internally depends on
-@code{csHash<>}, this is an implementation detail that could change in the
-future. Hence, to hide this detail and reduce the need to make any adjustments
-in case the implementation of @code{csSet<>} would change the class has been
-relocated.
+The declaration of @code{csSet<>} was moved out from @file{csutil/hash.h} and
+into its own header file, @file{csutil/set.h}. The method
+@code{csSet<>::GetHash()} has likewise been removed since it unnecessarily
+exposed an underlying implementation detail of @code{csSet<>}.

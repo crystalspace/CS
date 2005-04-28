@@ -77,7 +77,8 @@ public:
 
   /**
    * Construct a new empty set.
-   * The given size will be passed to the hash map.
+   * \a size, \a grow_rate, and \a max_size allow fine-tuning of how the set
+   *   manages its internal allocations.
    */
   csSet (int size = 23, int grow_rate = 5, int max_size = 20000)
   	: map (size, grow_rate, max_size)
@@ -158,11 +159,8 @@ public:
     return GetSize() == 0;
   }
 
-  /// Return the hash map for this hash set.
-  HashType* GetHash () { return &map; }
-
   /**
-   * Return an iterator for the hash set, to iterate over all elements.
+   * Return an iterator for the set which iterates over all elements.
    * \warning Modifying the set while you have open iterators will cause
    *   undefined behaviour.
    */

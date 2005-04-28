@@ -96,7 +96,6 @@ technical information.
 This is edition @value{EDITION} of the Crystal Space manual for Crystal Space
 version @value{VERSION}, last updated @value{UPDATED}.
 
-@ifnottex
 @menu
 * CS Introduction:: Introduction
 * Building:: Building and Installing
@@ -113,7 +112,6 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Licenses::
 * Index::
 @end menu
-@end ifnottex
 
 @import{cpyright.txi}
 @end ifnottex
