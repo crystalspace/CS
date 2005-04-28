@@ -29,6 +29,8 @@
 #include "iutil/evdefs.h"
 #include "iutil/event.h"
 #include "csstring.h"
+#include "comparator.h"
+#include "hash.h"
 
 struct iEvent;
 class csInputBinder;
@@ -157,8 +159,8 @@ public:
   /// Generate a hash value from the object.
   uint32 ComputeHash () const;
 
-  /// Return a boolean indicating whether the two definitions are equal.
-  bool Compare (csInputDefinition const &) const;
+  /// Returns an int indicating the relation og the two definitions.
+  int Compare (csInputDefinition const &) const;
 
   /**
    * Helper function to parse a string (eg. "Ctrl+A") into values describing
@@ -216,15 +218,34 @@ public:
    */
   static csString GetOtherString (int type, int num, const csKeyModifiers *mods,
     bool distinguishModifiers = true);
+};
 
-  /// Allows this class to be used as a csHash key handler.
-  static unsigned int ComputeHash (const csInputDefinition &key)
-  { return key.ComputeHash (); }
+/**
+ * csComparator<> specialization for csInputDefinition to allow its use as 
+ * e.g. hash key type.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csInputDefinition, csInputDefinition>
+{
+public:
+  static int Compare (csInputDefinition const& r1, csInputDefinition const& r2)
+  {
+    return r1.Compare (r2);
+  }
+};
 
-  /// Allows this class to be used as a csHash key handler.
-  static bool CompareKeys (const csInputDefinition &key1,
-			   const csInputDefinition &key2)
-  { return key1.Compare (key2); }
+/**
+ * csHashComputer<> specialization for csInputDefinition to allow its use as 
+ * hash key type.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csInputDefinition>
+{
+public:
+  static uint ComputeHash (csInputDefinition const& key)
+  {
+    return key.ComputeHash (); 
+  }
 };
 
 #endif // __CS_UTIL_INPUTDEF_H__

@@ -24,7 +24,6 @@
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/set.h"
 #include "ivaria/keyval.h"
 
@@ -40,8 +39,8 @@ class CS_CRYSTALSPACE_EXPORT csKeyValuePair : public csObject, public iKeyValueP
 {
 private:
   const char *m_Value;	// Points to a string in the hash below.
-  csHash<csStrKey, csStrKey, csConstCharHashKeyHandler> values;
-  csSet<csStrKey, csConstCharHashKeyHandler> names;
+  csHash<csStrKey, csStrKey> values;
+  csSet<csStrKey> names;
 
 public:
   /// The constructor. Requires both key and value. Data is being copied!

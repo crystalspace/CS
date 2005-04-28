@@ -27,7 +27,6 @@
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/rdrprior.h"
@@ -629,7 +628,7 @@ class csSectorList : public iSectorList
 {
 private:
   csRefArrayObject<iSector> list;
-  csHash<iSector*,csStrKey,csConstCharHashKeyHandler> sectors_hash;
+  csHash<iSector*,csStrKey> sectors_hash;
 
 public:
   SCF_DECLARE_IBASE;

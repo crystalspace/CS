@@ -29,7 +29,6 @@
 #include "csutil/refarr.h"
 #include "csutil/cfgacc.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 
 class csFontServerMultiplexer;
 class csFontPlexer;
@@ -139,9 +138,8 @@ private:
     FontServerMapEntry (const FontServerMapEntry& source);
     ~FontServerMapEntry ();
   };
-  csHash<FontServerMapEntry, csStrKey, 
-    csConstCharHashKeyHandler> fontServerMap;
-  csHash<iFont*, const char*, csConstCharHashKeyHandler> loadedFonts;
+  csHash<FontServerMapEntry, csStrKey> fontServerMap;
+  csHash<iFont*, const char*> loadedFonts;
 
   csFontLoaderOrder fallbackOrder;
 

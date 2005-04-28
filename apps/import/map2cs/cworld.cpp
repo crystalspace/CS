@@ -23,7 +23,6 @@
 #include "csver.h"
 
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/set.h"
 
 #include "mapstd.h"
@@ -544,8 +543,8 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
 
   FindAdditionalTextures();
 
-  csSet<csStrKey, csConstCharHashKeyHandler> userMaterials;
-  csSet<csStrKey, csConstCharHashKeyHandler> userTextures;
+  csSet<csStrKey> userMaterials;
+  csSet<csStrKey> userTextures;
 
   const char* mats = pEntity->GetValueOfKey("usermaterials");
   csString mat;

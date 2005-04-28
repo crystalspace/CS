@@ -325,8 +325,7 @@ csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
   }
   if (fs == 0)
   {
-    csHash<FontServerMapEntry, csStrKey, 
-    csConstCharHashKeyHandler>::Iterator it = 
+    csHash<FontServerMapEntry, csStrKey>::Iterator it = 
       fontServerMap.GetIterator (name);
 
     while (it.HasNext ())

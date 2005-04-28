@@ -138,8 +138,7 @@ const char* csSaver::GetPluginName (const char* plugin, const char* type)
 
 bool csSaver::SavePlugins (iDocumentNode* parent)
 {
-  csHash<csStrKey, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
-    plugins.GetIterator ();
+  csHash<csStrKey, csStrKey>::GlobalIterator it = plugins.GetIterator ();
   csRef<iDocumentNode> pluginNode =
     parent->CreateNodeBefore (CS_NODE_ELEMENT, before);
   pluginNode->SetValue ("plugins");

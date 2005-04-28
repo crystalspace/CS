@@ -24,7 +24,6 @@
 #include "csextern.h"
 #include "iutil/event.h"
 #include "hashr.h"
-#include "hashhandlers.h"
 #include "csendian.h"
 #include "weakref.h"
 #include "cseventq.h"

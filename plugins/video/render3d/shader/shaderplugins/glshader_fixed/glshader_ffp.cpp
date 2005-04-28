@@ -455,7 +455,7 @@ void csGLShaderFFP::CompactLayers()
     layerMap[p] = (int)(p - layerOfs);
     texlayers = newlayers;
 
-    csHash<int, csStrKey, csConstCharHashKeyHandler>::GlobalIterator layerNameIt 
+    csHash<int, csStrKey>::GlobalIterator layerNameIt 
       = layerNames.GetIterator();
     while (layerNameIt.HasNext())
     {

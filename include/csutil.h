@@ -62,7 +62,6 @@
 #include "csutil/formatter.h"
 #include "csutil/fpu80x86.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/hashr.h"
 #include "csutil/inputdef.h"
 #include "csutil/leakguard.h"

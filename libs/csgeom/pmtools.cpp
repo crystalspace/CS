@@ -422,22 +422,30 @@ struct AdjacencyCounter
   }
 };
 
-class PolyEdgeHashKeyHandler
+CS_SPECIALIZE_TEMPLATE
+class csComparator<PolyEdge, PolyEdge>
 {
 public:
-  static uint32 ComputeHash (const PolyEdge& key)
+  static int Compare (PolyEdge const& key1, PolyEdge const& key2)
+  {
+    if (key1.v1 != key2.v1)
+      return key1.v1 - key2.v1;
+    else
+      return key1.v2 - key2.v2;
+  }
+};
+
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<PolyEdge>
+{
+public:
+  static uint ComputeHash (PolyEdge const& key)
   {
     uint32 key2 = 
       (key.v2 >> 24) | ((key.v2 >> 8) & 0xff00) | 
       ((key.v2 << 8) & 0xff0000) | (key.v2 << 24);
     return (((uint32)key.v1) ^ key2);
   }
-
-  static bool CompareKeys (const PolyEdge& key1, const PolyEdge& key2)
-  {
-    return ((key1.v1 == key2.v1) && (key1.v2 == key2.v2));
-  }
-
 };
 
 /*
@@ -455,8 +463,7 @@ public:
  */
 bool csPolygonMeshTools::IsMeshClosed (iPolygonMesh* polyMesh)
 {
-  csHash<AdjacencyCounter, PolyEdge, PolyEdgeHashKeyHandler>
-    adjacency;
+  csHash<AdjacencyCounter, PolyEdge> adjacency;
 
   int numIncorrect = 0;
 

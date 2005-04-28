@@ -416,35 +416,41 @@ uint32 csInputDefinition::ComputeHash () const
   }
 }
 
-bool csInputDefinition::Compare (const csInputDefinition &other) const
+int csInputDefinition::Compare (const csInputDefinition &other) const
 {
   if (modifiersHonored || other.modifiersHonored)
     for (int type = 0; type < csKeyModifierTypeLast; type++)
       if (! CSKEY_MODIFIER_COMPARE (modifiers.modifiers[type],
 				    other.modifiers.modifiers[type]))
-        return false;
+      {
+        return (int)modifiers.modifiers[type] 
+          - (int)other.modifiers.modifiers[type];
+      }
 
-  if (containedType != other.containedType) return false;
+  if (containedType != other.containedType)
+  {
+    return (int)containedType - (int)other.containedType;
+  }
 
   if (containedType == csevKeyboard)
   {
     if (keyboard.isCooked)
     {
       if (other.keyboard.isCooked)
-        return keyboard.code == other.keyboard.code;
+        return (int)keyboard.code - (int)other.keyboard.code;
       else
-        return keyboard.code == RawToCooked (other.keyboard.code);
+        return (int)keyboard.code - (int)RawToCooked (other.keyboard.code);
     }
     else
     {
       if (other.keyboard.isCooked)
-        return keyboard.code == other.keyboard.code;
+        return (int)keyboard.code - (int)other.keyboard.code;
       else
-        return RawToCooked (keyboard.code) == other.keyboard.code;
+        return (int)RawToCooked (keyboard.code) - (int)other.keyboard.code;
     }
   }
   else
-    return mouseButton == other.mouseButton;
+    return (int)mouseButton - (int)other.mouseButton;
 }
 
 bool csInputDefinition::ParseKey (const char *str, utf32_char *raw,

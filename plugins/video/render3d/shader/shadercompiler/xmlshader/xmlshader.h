@@ -217,7 +217,7 @@ class csShaderConditionResolver : public iConditionResolver
   csPDelArray<csConditionNode> condNodes;
   csConditionNode* rootNode;
   size_t nextVariant;
-  csHash<size_t, csBitArray, csBitArrayHashKeyHandler> variantIDs;
+  csHash<size_t, csBitArray> variantIDs;
 
   const csRenderMeshModes* modes;
   const csShaderVarStack* stacks;

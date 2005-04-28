@@ -30,7 +30,7 @@
 
 csWin32CustomCursors::~csWin32CustomCursors ()
 {
-  csHash<CachedCursor, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
+  csHash<CachedCursor, csStrKey>::GlobalIterator it =
     cachedCursors.GetIterator();
 
   while (it.HasNext())

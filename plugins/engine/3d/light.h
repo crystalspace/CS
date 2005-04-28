@@ -25,7 +25,6 @@
 #include "csutil/flags.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/refarr.h"
 #include "plugins/engine/3d/lview.h"
 #include "iengine/light.h"
@@ -94,8 +93,7 @@ protected:
   csRefArray<iLightCallback> light_cb_vector;
 
   /// Type of element contained in \c lightinginfos set.
-  typedef csSet<csRef<iLightingInfo>, csRefHashKeyHandler<iLightingInfo > >
-    LightingInfo;
+  typedef csSet<csRef<iLightingInfo> > LightingInfo;
 
   /// Set of meshes that we are currently affecting.
   LightingInfo lightinginfos;
@@ -523,7 +521,7 @@ class csLightList : public iLightList
 {
 private:
   csRefArrayObject<iLight> list;
-  csHash<iLight*,csStrKey,csConstCharHashKeyHandler> lights_hash;
+  csHash<iLight*,csStrKey> lights_hash;
 
 public:
   SCF_DECLARE_IBASE;

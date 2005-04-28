@@ -25,7 +25,7 @@
  * A basic set for objects.
  */
 
-/**\addtogroup util
+/**\addtogroup util_containers
  * @{ */
 
 /**
@@ -33,11 +33,11 @@
  * You can basically use this to test for the occurrence
  * of some object quickly.
  */
-template <class T, class KeyHandler = csIntegralHashKeyHandler<T> > 
+template <class T> 
 class csSet
 {
 public:
-  typedef csHash<bool, T, KeyHandler> HashType;
+  typedef csHash<bool, T> HashType;
 
 private:
   typedef typename_qualifier HashType::GlobalIterator ParentIter;
@@ -51,11 +51,10 @@ public:
   protected:
     ParentIter iter;
     GlobalIterator () {}
-    GlobalIterator (const csSet<T, KeyHandler>* s) :
-      iter(s->map.GetIterator()) {}
+    GlobalIterator (const csSet<T>* s) : iter(s->map.GetIterator()) {}
 
   public:
-    friend class csSet<T, KeyHandler>;
+    friend class csSet<T>;
 
     GlobalIterator (const GlobalIterator& o) : iter(o.iter) {}
     GlobalIterator& operator=(const GlobalIterator& o)
@@ -170,6 +169,6 @@ public:
   }
 };
 
-/** @}*/
+/** @} */
 
 #endif // __CS_UTIL_SET_H__

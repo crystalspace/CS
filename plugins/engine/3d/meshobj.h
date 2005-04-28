@@ -28,7 +28,6 @@
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csgfx/shadervarcontext.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
@@ -57,7 +56,7 @@ class csMeshList : public iMeshList
 {
 private:
   csRefArrayObject<iMeshWrapper> list;
-  csHash<iMeshWrapper*,csStrKey,csConstCharHashKeyHandler> meshes_hash;
+  csHash<iMeshWrapper*,csStrKey> meshes_hash;
 
 public:
   SCF_DECLARE_IBASE;
@@ -107,7 +106,7 @@ class csMeshFactoryList : public iMeshFactoryList
 {
 private:
   csRefArrayObject<iMeshFactoryWrapper> list;
-  csHash<iMeshFactoryWrapper*,csStrKey,csConstCharHashKeyHandler>
+  csHash<iMeshFactoryWrapper*,csStrKey>
   	factories_hash;
 
 public:

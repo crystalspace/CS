@@ -23,7 +23,6 @@
 #define __CS_CSENGINE_RENDERLOOP_H__
 
 #include "csutil/hashr.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/refarr.h"
 #include "iengine/renderloop.h"
 #include "iutil/strset.h"
@@ -59,8 +58,7 @@ public:
 
 class csRenderLoopManager : public iRenderLoopManager
 {
-  csHashReversible<csRef<iRenderLoop>, const char*, 
-    csConstCharHashKeyHandler, csRefHashKeyHandler<iRenderLoop> > loops;
+  csHashReversible<csRef<iRenderLoop>, const char*> loops;
   csStringSet strings;
 
   csEngine* engine;

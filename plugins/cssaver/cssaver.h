@@ -37,7 +37,7 @@ class csSaver : public iSaver
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
   csRef<iPluginManager> plugin_mgr;
-  csHash<csStrKey, csStrKey, csConstCharHashKeyHandler> plugins;
+  csHash<csStrKey, csStrKey> plugins;
   csRef<iDocumentNode> before;
 
 public:

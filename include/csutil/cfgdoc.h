@@ -28,7 +28,6 @@
 #include "iutil/cfgfile.h"
 #include "iutil/document.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 
 class csConfigDocumentIterator;
 
@@ -66,7 +65,7 @@ class CS_CRYSTALSPACE_EXPORT csConfigDocument : public iConfigFile
       delete[] originalKey;
     }
   };
-  csHash<KeyInfo, csStrKey, csConstCharHashKeyHandler> keys;
+  csHash<KeyInfo, csStrKey> keys;
 
   void ParseDocument (iDocument* doc, bool Merge = false,
     bool NewWins = true);

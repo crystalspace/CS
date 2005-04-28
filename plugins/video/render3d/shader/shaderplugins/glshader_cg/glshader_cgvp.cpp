@@ -158,7 +158,7 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
     csStringReader reader (compiledProgram);
     csString newProgram;
 
-    csHash<csString, csProgVarStr, csConstCharHashKeyHandler> varSemantics;
+    csHash<csProgVarStr, csString> varSemantics;
 
     /* Parser #blah information emitted by Cg from start of VP code, use it to
      * glean state matrix semantic for certain vars. */
@@ -248,7 +248,7 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
 
     // Write out our own PARAMs.
     csArray<csShaderVarMapping> mappings;
-    csHash<csProgVarStr, csProgVarStr, csConstCharHashKeyHandler> progVarMap;
+    csHash<csProgVarStr, csString> progVarMap;
 
     CGparameter parameter = cgGetFirstLeafParameter (program, CG_PROGRAM);
     while (parameter)
@@ -375,11 +375,11 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
 	if (*token != '#')
 	{
 	  // Process a line of code
-	  csHash<csProgVarStr, csProgVarStr, csConstCharHashKeyHandler>::GlobalIterator
-	    mapIt (progVarMap.GetIterator());
+	  csHash<csProgVarStr, csString>::GlobalIterator mapIt (
+            progVarMap.GetIterator());
 	  while (mapIt.HasNext())
 	  {
-	    csProgVarStr oldStr;
+	    csString oldStr;
 	    csProgVarStr newStr = mapIt.Next (oldStr);
 	    line.ReplaceAll (oldStr, newStr);
 	  }

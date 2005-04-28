@@ -28,7 +28,6 @@
 #include "iutil/event.h"
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/weakref.h"
 #include "cstool/cspixmap.h"
 
@@ -67,7 +66,7 @@ private:
   csWeakRef<iGraphics3D> g3d;
   iTextureManager* txtmgr;
   csRef<iImageIO> io;
-  csHash<CursorInfo *, csStrKey, csConstCharHashKeyHandler> cursors;
+  csHash<CursorInfo *, csStrKey> cursors;
   
   /// The currently selected cursor
   csString current;

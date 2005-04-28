@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Apr-2005
+	- res renamed csOrdering<> to the more general csComparator<>.
+	- res changed csHash<> from using so-called "hash key handlers" to use
+	  the csHashComputer<> and csComparator<> templates to perform hash
+	  computation resp. key comparison.
 27-Apr-2005
 	- Erroroman fixed a bug in iRigidBody->GetTransform() where wrong
 	  matrices were used. ODE works only with t2o matrices for geometry 

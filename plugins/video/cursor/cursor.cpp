@@ -359,7 +359,7 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
 
   // Add to hashlist
   {
-    csHash<CursorInfo*, csStrKey, csConstCharHashKeyHandler>::Iterator it =
+    csHash<CursorInfo*, csStrKey>::Iterator it =
       cursors.GetIterator (name);
     while (it.HasNext ())
     {
@@ -477,8 +477,7 @@ bool csCursor::RemoveCursor (const char *name)
 
 void csCursor::RemoveAllCursors ()
 {
-  csHash<CursorInfo*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
-    cursors.GetIterator ();
+  csHash<CursorInfo*, csStrKey>::GlobalIterator it = cursors.GetIterator ();
   while (it.HasNext ())
   {
     CursorInfo* ci = it.Next ();

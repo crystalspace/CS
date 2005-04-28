@@ -71,10 +71,11 @@ CS_CRYSTALSPACE_EXPORT int csStrNCaseCmp(char const* str1, char const* str2,
   size_t n);
 
 /**
- * Helper class to convert widechar* to char*(UTF-8) strings for use
+ * Helper class to convert wchar_t* to char* (UTF-8 encoded) strings for use
  * as function parameters.
- * Use of this helper class is more convenient than an a 
- * csStrNewW() / delete[], but essentially does the same.
+ * Use of this helper class is more convenient than a csStrNew() / delete[]
+ * pair, but essentially does the same (with the convenience of automatic
+ * cleanup).
  * \code
  *   wchar_t* wstr = L"Hello World";
  *    ... 
@@ -106,10 +107,11 @@ public:
 };
 
 /**
- * Helper class to convert (UTF-8)widechar* to char* strings for use
+ * Helper class to convert char* (UTF-8 encoded )to wchar_t* strings for use
  * as function parameters.
- * Use of this helper class is more convenient than an a 
- * csStrNewW() / delete[], but essentially does the same.
+ * Use of this helper class is more convenient than a csStrNewW() / delete[]
+ * pair, but essentially does the same (with the convenience of automatic
+ * cleanup).
  */
 struct csCtoW
 {
@@ -203,8 +205,8 @@ CS_CRYSTALSPACE_EXPORT void csReplaceAll (char *dest, const char *src,
  * string.  \p max is size in bytes of \p dest.
  * \deprecated Use csReplaceAll() instead.
  */
-/* CS_DEPRECATED_METHOD */
-CS_CRYSTALSPACE_EXPORT inline void csFindReplace (char *dest, const char *src,
+CS_DEPRECATED_METHOD 
+inline void csFindReplace (char *dest, const char *src,
   const char *search, const char *replace, int max)
 { csReplaceAll(dest, src, search, replace, max); }
 

@@ -25,6 +25,8 @@
  * Generic Array Template
  */
 
+#include "comparator.h"
+
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # undef new
@@ -37,33 +39,8 @@
 #include <typeinfo>
 #endif
 
-/**
- * A template providing various comparison and ordering functions.
- */
-template <class T1, class T2>
-class csOrdering
-{
-public:
-  /**
-   * Compare two objects of the same type or different types (T1 and T2).
-   * \param r1 Reference to first object.
-   * \param r2 Reference to second object.
-   * \return Zero if the objects are equal; less-than-zero if the first object
-   *   is less than the second; or greater-than-zero if the first object is
-   *   greater than the second.
-   * \remarks Assumes the existence of T1::operator<(T2) and T2::operator<(T1).
-   *   If T1 and T2 are the same type T, then only T::operator<(T) is assumed
-   *   (of course).  This is the default comparison function used by csArray
-   *   for searching and sorting if the client does not provide a custom
-   *   function.
-   */
-  static int Compare(T1 const &r1, T2 const &r2)
-  {
-    if (r1 < r2) return -1;
-    else if (r2 < r1) return 1;
-    else return 0;
-  }
-};
+/**\addtogroup util_containers
+ * @{ */
 
 // Define CSARRAY_INHIBIT_TYPED_KEYS if the compiler is too old or too buggy to
 // properly support templated functions within a templated class.  When this is
@@ -127,7 +104,7 @@ public:
    *   Default comparison function if client does not supply one.
    */
   static int DefaultCompare(T const& r, K const& k)
-    { return csOrdering<T,K>::Compare(r,k); }
+    { return csComparator<T,K>::Compare(r,k); }
 private:
   K key;
   CF cmp;
@@ -160,7 +137,7 @@ public:
   virtual operator CF() const { return cmp; }
   operator K const&() const { return key; }
   static int DefaultCompare(T const& r, K const& k)
-    { return csOrdering<T,K>::Compare(r,k); }
+    { return csComparator<T,K>::Compare(r,k); }
 private:
   K key;
   CF cmp;
@@ -429,7 +406,7 @@ public:
    */
   static int DefaultCompare(T const& r1, T const& r2)
   {
-    return csOrdering<T,T>::Compare(r1,r2);
+    return csComparator<T,T>::Compare(r1,r2);
   }
 
   /**
@@ -1101,5 +1078,7 @@ public:
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
+
+/** @} */
 
 #endif

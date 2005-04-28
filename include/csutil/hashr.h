@@ -26,13 +26,14 @@
 
 #include "hash.h"
  
+/**\addtogroup util_containers
+ * @{ */
+
 /// A csHash<> that maintains a reverse hash for indexing keys by values.
-template <class T, class K = uint32, 
-  class KeyHandler = csIntegralHashKeyHandler<K>,
-  class ReverseKeyHandler = csIntegralHashKeyHandler<T> > 
-class csHashReversible : public csHash<T, K, KeyHandler>
+template <class T, class K = unsigned int> 
+class csHashReversible : public csHash<T, K>
 {
-  csHash<K, T, ReverseKeyHandler> reverse;
+  csHash<K, T> reverse;
 public:
   /**
    * Construct a hash table with an array of the given size,
@@ -48,7 +49,7 @@ public:
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
   csHashReversible (int size = 23, int grow_rate = 5, int max_size = 20000) :
-    csHash<T, K, KeyHandler> (size, grow_rate, max_size), 
+    csHash<T, K> (size, grow_rate, max_size), 
     reverse (size, grow_rate, max_size)
   {
   }
@@ -57,7 +58,7 @@ public:
     */
   void Put (const K& key, const T &value)
   {
-    csHash<T, K, KeyHandler>::Put (key, value);
+    csHash<T, K>::Put (key, value);
     reverse.Put (value, key);
   }
 
@@ -79,5 +80,7 @@ public:
     return reverse.Get (key, fallback);
   }
 };
+
+/** @} */
 
 #endif // __CS_UTIL_HASHR_H__

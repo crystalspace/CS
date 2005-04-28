@@ -153,7 +153,14 @@
 
 /**
  * \defgroup util Utilities
+ * @{
  */
+ 
+	/**
+	 * \defgroup util_containers Containers
+	 */
+	 
+/** @} */ 
  
 /**
  * \defgroup vfs Virtual File System (VFS)

@@ -23,7 +23,6 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "cstypes.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
@@ -152,7 +151,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   csString cfgKey;
   const csString keyPrefix ("Video.ShaderManager.Tags.");
-  csSet<csStrKey, csConstCharHashKeyHandler> knownKeys;
+  csSet<csStrKey> knownKeys;
   csRef<iConfigIterator> it (config->Enumerate (keyPrefix));
   while (it->Next ())
   {

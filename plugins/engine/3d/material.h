@@ -24,7 +24,6 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/leakguard.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -276,7 +275,7 @@ class csMaterialList : public iMaterialList
 {
 private:
   csRefArrayObject<iMaterialWrapper> list;
-  csHash<iMaterialWrapper*,csStrKey,csConstCharHashKeyHandler> mat_hash;
+  csHash<iMaterialWrapper*,csStrKey> mat_hash;
 
 public:
   /// Initialize the array

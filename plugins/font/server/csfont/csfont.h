@@ -25,7 +25,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "csutil/weakref.h"
@@ -211,7 +210,7 @@ private:
 
   // A list of csDefaultFont pointers.
   //csRefArray<csDefaultFont> fonts;
-  csHash<csDefaultFont*, csStrKey, csConstCharHashKeyHandler> fonts;
+  csHash<csDefaultFont*, csStrKey> fonts;
 
   /// read a font file from vfs
   csDefaultFont *ReadFontFile(const char *file);

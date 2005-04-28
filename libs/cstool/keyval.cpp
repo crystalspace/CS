@@ -83,8 +83,7 @@ csRef<iStringArray> csKeyValuePair::GetValueNames () const
 {
   csRef<iStringArray> ret;
   ret.AttachNew (new scfStringArray ());
-  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
-    names.GetIterator ();
+  csSet<csStrKey>::GlobalIterator it = names.GetIterator ();
   while (it.HasNext ())
   {
     ret->Push (it.Next ());

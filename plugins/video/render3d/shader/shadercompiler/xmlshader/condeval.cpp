@@ -22,51 +22,6 @@
 #include "condeval.h"
 #include "tokenhelper.h"
 
-bool csConditionEvaluator::OperationHashKeyHandler::IsOpCommutative (
-  ConditionOp op)
-{
-  return (op == opAnd) || (op == opOr) || (op == opEqual) || (op == opNEqual);
-}
-
-uint csConditionEvaluator::OperationHashKeyHandler::ActualHash (
-  ConditionOp operation, const CondOperand& left, const CondOperand& right)
-{
-  CondOperation tempOp;
-  tempOp.operation = operation;
-  tempOp.left = left;
-  tempOp.right = right;
-  return csHashCompute ((char*)&tempOp, sizeof (tempOp));
-}
-
-uint csConditionEvaluator::OperationHashKeyHandler::ComputeHash (
-  const CondOperation& operation)
-{
-  uint result = ActualHash (operation.operation, operation.left, 
-    operation.right);
-  if (IsOpCommutative (operation.operation))
-    result ^= ActualHash (operation.operation, operation.right, 
-    operation.left);
-  return result;
-}
-
-bool csConditionEvaluator::OperationHashKeyHandler::CompareKeys (
-  const CondOperation& op1, const CondOperation& op2)
-{
-  if (op1.operation == op2.operation)
-  {
-    bool result = (memcmp (&op1.left, &op2.left, sizeof (CondOperand)) == 0)
-      && (memcmp (&op1.right, &op2.right, sizeof (CondOperand)) == 0);
-    if (IsOpCommutative (op1.operation))
-    {
-      result = result 
-	|| ((memcmp (&op1.left, &op2.right, sizeof (CondOperand)) == 0)
-	&& (memcmp (&op1.right, &op2.left, sizeof (CondOperand)) == 0));
-    }
-    return result;
-  }
-  return false;
-}
-
 csConditionEvaluator::csConditionEvaluator (iStringSet* strings) : 
   nextConditionID(0)
 {

@@ -22,7 +22,6 @@
 
 #include "csextern_win.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csgfx/rgbpixel.h"
 
 class CS_CSPLUGINCOMMON_WIN_EXPORT csWin32CustomCursors
@@ -39,7 +38,7 @@ class CS_CSPLUGINCOMMON_WIN_EXPORT csWin32CustomCursors
     }
     CachedCursor (HCURSOR h, bool b) : cursor (h), destroyAsIcon (b) {}
   };
-  csHash<CachedCursor, csStrKey, csConstCharHashKeyHandler> cachedCursors;
+  csHash<CachedCursor, csStrKey> cachedCursors;
   csArray<CachedCursor> blindCursors;
 
   CachedCursor CreateMonoCursor (iImage* image, const csRGBcolor* keycolor, 

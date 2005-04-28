@@ -42,7 +42,7 @@ class CS_CRYSTALSPACE_EXPORT csInputBinder : public iInputBinder
     AxisCmd (unsigned cmd0, int sens0)
     : cmd (cmd0), val (0), sens (sens0) {}
   };
-  typedef csHash<AxisCmd *, csInputDefinition, csInputDefinition> AxisHash;
+  typedef csHash<AxisCmd *, csInputDefinition> AxisHash;
   AxisHash axisHash;
   csArray<AxisCmd *> axisArray;
 
@@ -53,7 +53,7 @@ class CS_CRYSTALSPACE_EXPORT csInputBinder : public iInputBinder
     BtnCmd (unsigned cmd0, bool toggle0)
     : cmd (cmd0), down (false), toggle (toggle0) {}
   };
-  typedef csHash<BtnCmd *, csInputDefinition, csInputDefinition> BtnHash;
+  typedef csHash<BtnCmd *, csInputDefinition> BtnHash;
   BtnHash btnHash;
   csArray<BtnCmd *> btnArray;
 

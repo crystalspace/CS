@@ -25,7 +25,6 @@
 #include "ivaria/reporter.h"
 #include "csutil/cfgdoc.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "csutil/regexp.h"
 #include "csutil/xmltiny.h"
 
@@ -49,7 +48,7 @@ private:
     One
   };
 
-  csHash<csRef<csConfigDocument>, csStrKey, csConstCharHashKeyHandler> configs;
+  csHash<csRef<csConfigDocument>, csStrKey> configs;
 public:
   CS_LEAKGUARD_DECLARE (csDriverDBReader);
 

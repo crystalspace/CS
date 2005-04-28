@@ -56,7 +56,7 @@ SCF_VERSION (iEvent, 0, 2, 0);
 // Event data structs. Defined outside of iEvent to allow SWIG to
 // handle the nested structs and union. Does not break any code.
 
-/**\page Keyboard Keyboard events
+/**\page Keyboard Keyboard events.
  * Keyboard events are emitted when the user does something with the keyboard -
  * presses down a key ("key down" events), holds it down (more "key down" 
  * events in a specific interval - "auto-repeat") and releases it ("key up".)
@@ -222,7 +222,7 @@ enum csEventError
   csEventErrUhOhUnknown
 };
 
-/// Various atteibute data types supported by the event system (iEvent).
+/// Various attribute data types supported by the event system (iEvent).
 enum csEventAttributeType
 {
   /**

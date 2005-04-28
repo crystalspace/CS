@@ -30,6 +30,120 @@
 #include "expparser.h"
 
 /**
+  * Possible operations for a node in the internal expression
+  * representation.
+  */
+enum ConditionOp
+{
+  opInvalid = 0,
+
+  opNot,
+  opAnd,
+  opOr,
+
+  opEqual,
+  opNEqual,
+  opLesser,
+  opLesserEq
+};
+/// Possible types of operands.
+enum OperandType
+{
+  operandNone,
+  operandOperation,
+
+  operandFloat,
+  operandInt,
+  operandBoolean,
+  operandSV,
+  operandSVValueInt,
+  operandSVValueFloat,
+  operandSVValueTexture,
+  operandSVValueBuffer,
+};
+/// An actual operand.
+struct CondOperand
+{
+  OperandType type;
+  union
+  {
+    int intVal;
+    float floatVal;
+    bool boolVal;
+    csStringID svName;
+    csConditionID operation;
+  };
+  CondOperand ()
+  { memset (this, 0, sizeof (*this)); }
+};
+/// An operation.
+struct CondOperation
+{
+  ConditionOp operation;
+  CondOperand left;
+  CondOperand right;
+
+  CondOperation ()
+  { operation = opInvalid; }
+};
+
+static bool IsOpCommutative (ConditionOp op)
+{
+  return (op == opAnd) || (op == opOr) || (op == opEqual) || (op == opNEqual);
+}
+
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<CondOperation>
+{
+  static uint ActualHash (ConditionOp operation, const CondOperand& left, 
+    const CondOperand& right)
+  {
+    CondOperation tempOp;
+    tempOp.operation = operation;
+    tempOp.left = left;
+    tempOp.right = right;
+    return csHashCompute ((char*)&tempOp, sizeof (tempOp));
+  }
+public:
+  static uint ComputeHash (CondOperation const& operation)
+  {
+    uint result = ActualHash (operation.operation, operation.left, 
+      operation.right);
+    if (IsOpCommutative (operation.operation))
+      result ^= ActualHash (operation.operation, operation.right, 
+      operation.left);
+    return result;
+  }
+};
+
+CS_SPECIALIZE_TEMPLATE
+class csComparator<CondOperation, CondOperation>
+{
+public:
+  static int Compare (CondOperation const& op1, CondOperation const& op2)
+  {
+    if (op1.operation == op2.operation)
+    {
+      bool result = (memcmp (&op1.left, &op2.left, sizeof (CondOperand)) == 0) 
+        && (memcmp (&op1.right, &op2.right, sizeof (CondOperand)) == 0);
+      if (IsOpCommutative (op1.operation))
+      {
+        result = result 
+	  || ((memcmp (&op1.left, &op2.right, sizeof (CondOperand)) == 0)
+	  && (memcmp (&op1.right, &op2.left, sizeof (CondOperand)) == 0));
+      }
+      if (result) return 0;
+      // @@@ Hm, just some order...
+      return (int)csHashComputer<CondOperation>::ComputeHash (op1)
+        - (int)csHashComputer<CondOperation>::ComputeHash (op2);
+    }
+    else
+      return (int)op1.operation - (int)op2.operation;
+  }
+};
+
+
+/**
  * Processes an expression tree and converts it into an internal 
  * representation and allows later evaluation of those expression.
  */
@@ -37,66 +151,6 @@ class csConditionEvaluator
 {
   /// Used to resolve SV names.
   csRef<iStringSet> strings;
-
-  /**
-   * Possible operations for a node in the internal expression
-   * representation.
-   */
-  enum ConditionOp
-  {
-    opInvalid = 0,
-
-    opNot,
-    opAnd,
-    opOr,
-
-    opEqual,
-    opNEqual,
-    opLesser,
-    opLesserEq
-  };
-  /// Possible types of operands.
-  enum OperandType
-  {
-    operandNone,
-    operandOperation,
-
-    operandFloat,
-    operandInt,
-    operandBoolean,
-    operandSV,
-    operandSVValueInt,
-    operandSVValueFloat,
-    operandSVValueTexture,
-    operandSVValueBuffer,
-  };
-  /// An actual operand.
-  struct CondOperand
-  {
-    OperandType type;
-    union
-    {
-      int intVal;
-      float floatVal;
-      bool boolVal;
-      csStringID svName;
-      csConditionID operation;
-    };
-    CondOperand ()
-    { memset (this, 0, sizeof (*this)); }
-  };
-  /// An operation.
-  struct CondOperation;
-  friend struct CondOperation;
-  struct CondOperation
-  {
-    ConditionOp operation;
-    CondOperand left;
-    CondOperand right;
-
-    CondOperation ()
-    { operation = opInvalid; }
-  };
 
   class OperationHashKeyHandler
   {
@@ -116,8 +170,7 @@ class csConditionEvaluator
   friend class OperationHashKeyHandler;
 
   csConditionID nextConditionID;
-  csHashReversible<csConditionID, CondOperation, OperationHashKeyHandler>
-    conditions;
+  csHashReversible<csConditionID, CondOperation> conditions;
 
   // Evaluation cache
   csBitArray condChecked;

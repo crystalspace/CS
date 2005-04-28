@@ -786,7 +786,7 @@ void csBugPlug::ListLoadedPlugins ()
     iPluginManager);
   csRef<iPluginIterator> plugiter (plugmgr->GetPlugins ());
 
-  csSet<const char*, csConstCharHashKeyHandler> printedPlugins;
+  csSet<const char*> printedPlugins;
   Report (CS_REPORTER_SEVERITY_NOTIFY, 
     "Loaded plugins:");
   while (plugiter->HasNext())

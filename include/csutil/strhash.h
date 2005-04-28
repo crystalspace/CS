@@ -21,7 +21,6 @@
 
 #include "csextern.h"
 #include "hash.h"
-#include "hashhandlers.h"
 #include "mempool.h"
 #include "iutil/strset.h"
 
@@ -39,7 +38,7 @@
 class CS_CRYSTALSPACE_EXPORT csStringHash
 {
 private:
-  typedef csHash<csStringID, char const*, csConstCharHashKeyHandler> HashType;
+  typedef csHash<csStringID, char const*> HashType;
   HashType registry;
   csMemoryPool pool;
 

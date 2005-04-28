@@ -25,6 +25,11 @@
 
 #include "csextern.h"
 #include "array.h"
+#include "comparator.h"
+#include "util.h"
+
+/**\addtogroup util_containers
+ * @{ */
 
 /**
  * Compute a hash key for a null-terminated string.
@@ -43,13 +48,16 @@ CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*);
 CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*, size_t length);
 
 /**
- * A hash key handler for integral types and types that can be casted to such.
+ * Template for hash value computing.
+ * Default implementation is suitable for integral types and types that can be 
+ * casted to such.
  */
 template <class T>
-class csIntegralHashKeyHandler
+class csHashComputer
 {
 public:
-  static unsigned int ComputeHash (const T& key)
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (const T& key)
   {
 #if (CS_PROCESSOR_SIZE == 32)
 #if (_MSC_VER >= 1300)
@@ -59,28 +67,121 @@ public:
       a key alone to retrieve a value). The __w64 causes VC7 to not emit that
       warning (on 32bit compilers at least).
      */
-    return (unsigned int __w64)key;  
+    // void* cast is to make csRef<>s work.
+    return (unsigned int __w64)(void*)key;  
 #else
-    return (unsigned int)key;  
+    return (unsigned int)(void*)key;  
 #endif
 #else
-    // Cast to uint64 first to avoid compiler warnings about truncation.
-    return (unsigned int)((uint64)key);
+    // Cast to uintptr_t first to avoid compiler warnings about truncation.
+    return (unsigned int)((uintptr_t)(void*)key);
 #endif
   }
+};
 
-  static bool CompareKeys (const T& key1, const T& key2)
+/**
+ * csHashComputer<> specialization for strings that uses csHashCompute().
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<const char*>
+{
+public:
+  static uint ComputeHash (const char* const& key)
   {
-    return (key1 == key2);
+    return csHashCompute (key);
+  }
+};
+
+/**
+ * Template that can be used as a base class for hash computers for POD 
+ * structs.
+ * Example:
+ * \code
+ * CS_SPECIALIZE_TEMPLATE csHashComputer<MyStruct> : 
+ *   public csHashComputerStruct<MyStruct> {};
+ * \endcode
+ */
+template <class T>
+class csHashComputerStruct
+{
+public:
+  static uint ComputeHash (const T& key)
+  {
+    return csHashCompute ((char*)&key, sizeof (T));
+  }
+};
+
+/**
+ * This is a simple helper class to make a copy of a const char*.
+ * This can be used to have a hash that makes copies of the keys.
+ */
+class csStrKey
+{
+private:
+  char* str;
+
+public:
+  csStrKey () { str = 0; }
+  csStrKey (const char* s) { str = csStrNew (s); }
+  csStrKey (const csStrKey& c) { str = csStrNew (c.str); }
+  ~csStrKey () { delete[] str; }
+  csStrKey& operator=(const csStrKey& o)
+  {
+    delete[] str; str = csStrNew (o.str);
+    return *this;
+  }
+  operator const char* () const { return str; }
+};
+
+/**
+ * csHashComputer<> specialization for csStrKey that uses csHashCompute().
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csStrKey>
+{
+public:
+  static uint ComputeHash (csStrKey const& key)
+  {
+    return csHashCompute ((const char*)key);
+  }
+};
+
+/**
+ * csComparator<> specialization for csStrKey that uses strcmp().
+ */
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csStrKey, csStrKey>
+{
+public:
+  static int Compare (csStrKey const& r1, csStrKey const& r2)
+  {
+    return strcmp ((const char*)r1, (const char*)r2);
+  }
+};
+
+/**
+ * csHashComputer<> specialization for csString that uses csHashCompute().
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csString>
+{
+public:
+  static uint ComputeHash (csString const& key)
+  {
+    return csHashCompute ((const char*)key);
   }
 };
 
 /**
  * A generic hash table class,
  * which grows dynamically and whose buckets are unsorted arrays.
+ * The hash value of a key is computed using csHashComputer<>, two keys are
+ * compared using csComparator<>. You need to provide appropriate 
+ * specializations of those templates if you want use non-integral types 
+ * (other thanconst char*, csStrKey and csString for which appropriate 
+ * specializations are already provided) or special hash algorithms. 
  */
-template <class T, class K = unsigned int, 
-  class KeyHandler = csIntegralHashKeyHandler<K> > 
+template <class T, class K = unsigned int> 
 class csHash
 {
 protected:
@@ -130,7 +231,7 @@ private:
       {
         const Element& srcElem = src[j - 1];
         csArray<Element>& dst = 
-	  Elements.Get (KeyHandler::ComputeHash (srcElem.key) % Modulo);
+	  Elements.Get (csHashComputer<K>::ComputeHash (srcElem.key) % Modulo);
         if (&src != &dst)
         {
           dst.Push (srcElem);
@@ -177,7 +278,7 @@ public:
   void Put (const K& key, const T &value)
   {
     csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     values.Push (Element (key, value));
     Size++;
     if (values.Length () > Elements.Length () / GrowRate
@@ -188,13 +289,13 @@ public:
   csArray<T> GetAll (const K& key) const
   {
     const csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     csArray<T> ret (values.Length () / 2);
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
       const Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key)) 
+      if (csComparator<K, K>::Compare (v.key, key) == 0) 
 	ret.Push (v.value);
     }
     return ret;
@@ -204,12 +305,12 @@ public:
   void PutUnique (const K& key, const T &value)
   {
     csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
       Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key))
+      if (csComparator<K, K>::Compare (v.key, key) == 0)
       {
         v.value = value;
         return;
@@ -235,10 +336,10 @@ public:
   bool Contains (const K& key) const
   {
     const csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
-      if (KeyHandler::CompareKeys (values[i].key, key)) 
+      if (csComparator<K, K>::Compare (values[i].key, key) == 0) 
 	return true;
     return false;
   }
@@ -258,12 +359,12 @@ public:
   const T* GetElementPointer (const K& key) const
   {
     const csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
       const Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key))
+      if (csComparator<K, K>::Compare (v.key, key) == 0)
 	return &v.value;
     }
 
@@ -277,12 +378,12 @@ public:
   T* GetElementPointer (const K& key)
   {
     csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
       Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key))
+      if (csComparator<K, K>::Compare (v.key, key) == 0)
 	return &v.value;
     }
 
@@ -296,12 +397,12 @@ public:
   const T& Get (const K& key, const T& fallback) const
   {
     const csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
       const Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key))
+      if (csComparator<K, K>::Compare (v.key, key) == 0)
 	return v.value;
     }
 
@@ -315,12 +416,12 @@ public:
   T& Get (const K& key, T& fallback)
   {
     csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
       Element& v = values[i];
-      if (KeyHandler::CompareKeys (v.key, key))
+      if (csComparator<K, K>::Compare (v.key, key) == 0)
 	return v.value;
     }
 
@@ -345,11 +446,11 @@ public:
   {
     bool ret = false;
     csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     for (size_t i = values.Length (); i > 0; i--)
     {
       const size_t idx = i - 1;
-      if (KeyHandler::CompareKeys (values[idx].key, key))
+      if (csComparator<K, K>::Compare (values[idx].key, key) == 0)
       {
 	values.DeleteIndexFast (idx);
         ret = true;
@@ -364,11 +465,11 @@ public:
   {
     bool ret = false;
     csArray<Element> &values = 
-      Elements[KeyHandler::ComputeHash (key) % Modulo];
+      Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     for (size_t i = values.Length (); i > 0; i--)
     {
       const size_t idx = i - 1;
-      if (KeyHandler::CompareKeys (values[idx].key, key) && 
+      if ((csComparator<K, K>::Compare (values[idx].key, key) == 0) && 
 	(values[idx].value == value))
       {
         values.DeleteIndexFast (idx);
@@ -399,26 +500,27 @@ public:
   class Iterator
   {
   private:
-    const csHash<T, K, KeyHandler>* hash;
+    const csHash<T, K>* hash;
     const K key;
     size_t bucket, size, element;
 
     void Seek ()
     {
       while ((element < size) && 
-        ! KeyHandler::CompareKeys (hash->Elements[bucket][element].key, key))
+        (csComparator<K, K>::Compare (hash->Elements[bucket][element].key, 
+	key) != 0))
           element++;
     }
 
   protected:
-    Iterator (const csHash<T, K, KeyHandler>* hash0, const K& key0) :
+    Iterator (const csHash<T, K>* hash0, const K& key0) :
       hash(hash0),
       key(key0), 
-      bucket(KeyHandler::ComputeHash(key) % hash->Modulo),
+      bucket(csHashComputer<K>::ComputeHash (key) % hash->Modulo),
       size(hash->Elements[bucket].Length ())
       { Reset (); }
 
-    friend class csHash<T, K, KeyHandler>;
+    friend class csHash<T, K>;
   public:
     /// Copy constructor.
     Iterator (const Iterator &o) :
@@ -463,7 +565,7 @@ public:
   class GlobalIterator
   {
   private:
-    const csHash<T, K, KeyHandler> *hash;
+    const csHash<T, K> *hash;
     size_t bucket, size, element;
 
     void Zero () { bucket = element = 0; }
@@ -486,14 +588,14 @@ public:
     }
 
   protected:
-    GlobalIterator (const csHash<T, K, KeyHandler> *hash0) : hash (hash0) 
+    GlobalIterator (const csHash<T, K> *hash0) : hash (hash0) 
     { 
       Zero (); 
       Init (); 
       FindItem ();
     }
 
-    friend class csHash<T, K, KeyHandler>;
+    friend class csHash<T, K>;
   public:
     /// Copy constructor.
     GlobalIterator (const Iterator &o) :
@@ -590,5 +692,7 @@ public:
     return GlobalIterator (this);
   }
 };
+
+/** @} */
 
 #endif

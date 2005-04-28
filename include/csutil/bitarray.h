@@ -31,8 +31,12 @@
  */
 
 #include "csextern.h"
+#include "comparator.h"
+#include "hash.h"
 
-class csBitArrayHashKeyHandler;
+class csBitArray;
+CS_SPECIALIZE_TEMPLATE class csComparator<csBitArray, csBitArray>;
+CS_SPECIALIZE_TEMPLATE class csHashComputer<csBitArray>;
 
 /**
  * A one-dimensional array of bits, similar to STL bitset.
@@ -43,7 +47,8 @@ public:
   typedef unsigned long store_type;
 
 private:
-  friend class csBitArrayHashKeyHandler;
+  friend class csComparator<csBitArray, csBitArray>;
+  friend class csHashComputer<csBitArray>;
   enum
   {
     bits_per_byte = 8,
@@ -491,12 +496,47 @@ public:
 };
 
 /**
- * Hash key handler, allows bit arrays to be used as hash keys.
+ * csComparator<> specialization for csBitArray to allow its use as 
+ * e.g. hash key type.
  */
-class csBitArrayHashKeyHandler
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csBitArray, csBitArray>
 {
 public:
-  static unsigned int ComputeHash (const csBitArray& key)
+  static int Compare (csBitArray const& key1, csBitArray const& key2)
+  {
+    csBitArray::store_type const* p0 = key1.GetStore();
+    csBitArray::store_type const* p1 = key2.GetStore();
+    size_t compareNum = MIN (key1.mLength, key2.mLength);
+    size_t i = 0;
+    for (; i < compareNum; i++)
+      if (p0[i] != p1[i])
+	return (int)p0[i] - (int)p1[i];
+    if (key1.mLength > key2.mLength)
+    {
+      for (; i < key1.mLength; i++)
+	if (p0[i] != 0)
+	  return (int)p0[i];
+    }
+    else
+    {
+      for (; i < key2.mLength; i++)
+	if (p1[i] != 0)
+	  return -((int)p1[i]);
+    }
+    return 0;
+  }
+};
+
+/**
+ * csHashComputer<> specialization for csBitArray to allow its use as 
+ * hash key type.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csBitArray>
+{
+public:
+  static uint ComputeHash (csBitArray const& key)
   {
     const size_t uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
     union
@@ -517,29 +557,7 @@ public:
     }
     return hash;
   }
-  static bool CompareKeys (const csBitArray& key1, const csBitArray& key2)
-  {
-    csBitArray::store_type const* p0 = key1.GetStore();
-    csBitArray::store_type const* p1 = key2.GetStore();
-    size_t compareNum = MIN (key1.mLength, key2.mLength);
-    size_t i = 0;
-    for (; i < compareNum; i++)
-      if (p0[i] != p1[i])
-	return false;
-    if (key1.mLength > key2.mLength)
-    {
-      for (; i < key1.mLength; i++)
-	if (p0[i] != 0)
-	  return false;
-    }
-    else
-    {
-      for (; i < key2.mLength; i++)
-	if (p1[i] != 0)
-	  return false;
-    }
-    return true;
-  }
 };
+
 
 #endif // __CS_BITARRAY_H__

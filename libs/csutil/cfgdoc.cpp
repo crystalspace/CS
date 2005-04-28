@@ -29,8 +29,7 @@
 class csConfigDocumentIterator : public iConfigIterator
 {
   csRef<csConfigDocument> doc;
-  csHash<csConfigDocument::KeyInfo, csStrKey, 
-    csConstCharHashKeyHandler>::GlobalIterator* iterator;
+  csHash<csConfigDocument::KeyInfo, csStrKey>::GlobalIterator* iterator;
   char* subsection;
   size_t subsectionLen;
   const csConfigDocument::KeyInfo* currentKey;
@@ -68,8 +67,8 @@ csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* doc,
   subsection = csStrNew (Subsection);
   subsectionLen = subsection ? strlen (subsection) : 0;
   csConfigDocumentIterator::doc = doc;
-  iterator = new csHash<csConfigDocument::KeyInfo, csStrKey, 
-    csConstCharHashKeyHandler>::GlobalIterator (doc->keys.GetIterator ());
+  iterator = new csHash<csConfigDocument::KeyInfo, 
+    csStrKey>::GlobalIterator (doc->keys.GetIterator ());
 }
 
 csConfigDocumentIterator::~csConfigDocumentIterator()
