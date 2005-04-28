@@ -116,6 +116,7 @@ for p in $(WALKALL.PLUGINLIST)
 {
   CompileGroups $(p) : walkall ;
 }
+CompileGroups walktest : walkall ;
 
 # Plugins that are linked statically into walktest_static.
 WALKTEST_STATIC.PLUGINLIST =
