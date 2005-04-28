@@ -54,6 +54,7 @@ by the copyright holders.
 @subtitle Last updated @value{UPDATED}
 @author Jorrit Tyberghein
 @author Eric Sunshine
+@author Frank Richter
 @author Andrew Zabolotny
 
 @page
