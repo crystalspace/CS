@@ -1016,7 +1016,7 @@ bool csEngine::HandleEvent (iEvent &Event)
             ShaderManager->RegisterShader (portal_shader);
 	    VFS->PopDir();
 
-	    csConfigAccess cfg (object_reg);
+            csConfigAccess cfg (object_reg, "/config/engine.cfg");
 	    // Now, try to load the user-specified default render loop.
 	    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 
 	      0);

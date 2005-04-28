@@ -116,6 +116,18 @@ protected:
 
   const char* GetKeycodeString (utf32_char code);
   bool IsKeyboardDebugging ();
+
+  /// Application lost focus.
+  virtual void LostFocus() { Reset(); }
+  virtual void GainFocus() { RestoreKeys(); }
+
+  /// iEventHandler implementation
+  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
+    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 public:
   SCF_DECLARE_IBASE;
 
@@ -143,8 +155,7 @@ public:
     bool autoRepeat = false, csKeyCharType charType = csKeyCharTypeNormal);
 
   /**
-   * Query the state of a key. All key codes in range 0..255,
-   * CSKEY_FIRST..CSKEY_LAST are supported. Returns true if
+   * Query the state of a key. All key codes are supported. Returns true if
    * the key is pressed, false if not.
    */
   virtual bool GetKeyState (utf32_char codeRaw);
@@ -171,20 +182,8 @@ public:
 
   virtual csPtr<iKeyComposer> CreateKeyComposer ();
 
-  /// Application lost focus.
-  virtual void LostFocus() { Reset(); }
-  virtual void GainFocus() { RestoreKeys(); }
-
   /// Fills in the 'cooked' key code of an event with only a 'raw' key code.
   virtual csEventError SynthesizeCooked (iEvent *);
-
-  /// iEventHandler implementation
-  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
-    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
-  friend struct eiEventHandler;
 };
 
 /**

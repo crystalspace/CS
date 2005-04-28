@@ -37,7 +37,7 @@
 class CS_CRYSTALSPACE_EXPORT csBakeKeyColor
 {
 public:
-  // @{
+  //@{
   /**
    * Set alpha of all pixels to 0 that match \a transpColor.
    * The color of pixels made transparent is changed such that it has the
@@ -48,7 +48,7 @@ public:
   static csRef<iImage> Image (iImage* source, const csRGBpixel& transpColor);
   static void RGBA2D (uint8* dest, const uint8* source, int w, int h, 
     const csRGBpixel& transpColor);
-  // @}
+  //@}
 };
 
 /** @} */

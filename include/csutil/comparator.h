@@ -1,8 +1,6 @@
 /*
-  Crystal Space Generic Array Template
-  Copyright (C) 2003 by Matze Braun
-  Copyright (C) 2003 by Jorrit Tyberghein
-  Copyright (C) 2003,2004 by Eric Sunshine
+  Template providing various comparison and ordering functions.
+  Copyright (C) 2005 by Eric Sunshine
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -27,7 +25,7 @@
 
 #include "csstring.h"
 
-/**\addtogroup util
+/**\addtogroup util_containers
  * @{ */
 
 /**
@@ -59,20 +57,33 @@ public:
 };
 
 /**
- * csComparator<> specialization for strings that uses strcmp().
+ * Template that can be used as a base class for comparaots for 
+ * string types (must support cast to const char*).
+ * Example:
+ * \code
+ * CS_SPECIALIZE_TEMPLATE csComparator<MyString> : 
+ *   public csComparatorString<MyString> {};
+ * \endcode
  */
-CS_SPECIALIZE_TEMPLATE
-class csComparator<const char*, const char*>
+template <class T>
+class csComparatorString
 {
 public:
-  static int Compare (const char* const& r1, const char* const& r2)
+  static int Compare (T const& r1, T const& r2)
   {
-    return strcmp (r1, r2);
+    return strcmp ((const char*)r1, (const char*)r2);
   }
 };
 
 /**
- * Template that can be used as a base class for hash comparators for POD 
+ * csComparator<> specialization for strings that uses strcmp().
+ */
+CS_SPECIALIZE_TEMPLATE
+class csComparator<const char*, const char*> :
+  public csComparatorString<const char*> {};
+
+/**
+ * Template that can be used as a base class for comparators for POD 
  * structs.
  * Example:
  * \code
@@ -94,14 +105,11 @@ public:
  * csComparator<> specialization for csString that uses strcmp().
  */
 CS_SPECIALIZE_TEMPLATE
-class csComparator<csString, csString>
-{
-public:
-  static int Compare (csString const& r1, csString const& r2)
-  {
-    return strcmp (r1, r2);
-  }
-};
+class csComparator<csString, csString> :
+  public csComparatorString<csString> {};
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csStringBase, csStringBase> :
+  public csComparatorString<csStringBase> {};
 
 /** @} */
 

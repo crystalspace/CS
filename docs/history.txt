@@ -7,14 +7,23 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Apr-2005
-- Piotr Obrzut added Universal and Slider joints into strict ODE joints interfaces
-- Piotr Obrzut fixed bug in latest bugfix in iRigidBody->GetTransform()
-- Piotr Obrzut moved creating/delating strict ode joints functions from iDynamicSystem to iODEDynamicSystemState
-28-Apr-2005
 	- res renamed csOrdering<> to the more general csComparator<>.
 	- res changed csHash<> from using so-called "hash key handlers" to use
 	  the csHashComputer<> and csComparator<> templates to perform hash
 	  computation resp. key comparison.
+	- Piotr Obrzut added Universal and Slider joints into strict ODE 
+	  joints interfaces.
+	- Piotr Obrzut fixed bug in latest bugfix in 
+	  iRigidBody->GetTransform().
+	- Piotr Obrzut moved creating/delating strict ode joints functions .
+	  from iDynamicSystem to iODEDynamicSystemState.
+	- res made a few doxygen fixes.
+	- res fixed a small bug in the engine where engine.cfg wasn't used when
+	  the "Engine.RenderLoop.Default" setting was checked.
+	- res added small helper templates for simple string comparator and 
+	  hash computer creation and added such for csStringBase.
+	- res fixed some warnings in map2cs, viewmesh and cssaver.
+	- res fixed xwindow to compile again.
 27-Apr-2005
 	- Erroroman fixed a bug in iRigidBody->GetTransform() where wrong
 	  matrices were used. ODE works only with t2o matrices for geometry 

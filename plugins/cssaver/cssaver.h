@@ -27,7 +27,6 @@
 #include "iutil/plugin.h"
 #include "csutil/cscolor.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 
 struct iSyntaxService;
 

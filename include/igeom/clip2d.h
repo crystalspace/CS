@@ -56,8 +56,8 @@
 /**
  * The clipper can output additional information about each vertex in
  * output polygon. This is used for generating U/V/Z values and so on,
- * if they are needed.
- * @{ */
+ * if they are needed. 
+ */
 struct csVertexStatus
 {
   /**

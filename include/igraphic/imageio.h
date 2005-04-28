@@ -25,8 +25,7 @@
 
 /**
  * \addtogroup gfx2d
- * @{
- */
+ * @{ */
 
 #include "csutil/scf.h"
 #include "csutil/array.h"

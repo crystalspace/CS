@@ -142,8 +142,8 @@ struct iFoliageObject : public iBase
 SCF_VERSION (iFoliageFactoryState, 0, 0, 1);
 
 /**
- * The foliage mesh can be used to make foliage (plants, boulders,
- * ...) that fits nicely with a terrain.
+ * The foliage mesh can be used to make foliage (plants, boulders, ...) that 
+ * fits nicely with a terrain.
  * The general API for the foliage factory. Here you define the
  * actual geometry which is shared between all foliage mesh instances.
  * <p>

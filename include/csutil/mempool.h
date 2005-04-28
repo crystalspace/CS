@@ -33,6 +33,9 @@
 #endif
 #include <new>
 
+/**\addtogroup util_containers
+ * @{ */
+
 /**
  * A quick-allocation pool for storage of arbitrary data. Pointers to
  * allocations made from the pool are guaranteed to remain valid as long as the
@@ -134,6 +137,8 @@ inline void* operator new(size_t n, csMemoryPool& p)
 { return p.Alloc(n); }
 inline void* operator new(size_t n, csMemoryPool* p)
 { return p->Alloc(n); }
+/** @} */
+
 /** @} */
 
 #endif //  __CS_CSUTIL_MEMPOOL_H__

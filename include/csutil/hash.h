@@ -80,17 +80,29 @@ public:
 };
 
 /**
+ * Template that can be used as a base class for hash computers for 
+ * string types (must support cast to const char*).
+ * Example:
+ * \code
+ * CS_SPECIALIZE_TEMPLATE csHashComputer<MyString> : 
+ *   public csHashComputerString<MyString> {};
+ * \endcode
+ */
+template <class T>
+class csHashComputerString
+{
+public:
+  static uint ComputeHash (const T& key)
+  {
+    return csHashCompute ((const char*)key);
+  }
+};
+
+/**
  * csHashComputer<> specialization for strings that uses csHashCompute().
  */
 CS_SPECIALIZE_TEMPLATE
-class csHashComputer<const char*>
-{
-public:
-  static uint ComputeHash (const char* const& key)
-  {
-    return csHashCompute (key);
-  }
-};
+class csHashComputer<const char*> : public csHashComputerString<const char*> {};
 
 /**
  * Template that can be used as a base class for hash computers for POD 
@@ -137,40 +149,21 @@ public:
  * csHashComputer<> specialization for csStrKey that uses csHashCompute().
  */
 CS_SPECIALIZE_TEMPLATE
-class csHashComputer<csStrKey>
-{
-public:
-  static uint ComputeHash (csStrKey const& key)
-  {
-    return csHashCompute ((const char*)key);
-  }
-};
+class csHashComputer<csStrKey> : public csHashComputerString<csStrKey> {};
 
 /**
  * csComparator<> specialization for csStrKey that uses strcmp().
  */
 CS_SPECIALIZE_TEMPLATE
-class csComparator<csStrKey, csStrKey>
-{
-public:
-  static int Compare (csStrKey const& r1, csStrKey const& r2)
-  {
-    return strcmp ((const char*)r1, (const char*)r2);
-  }
-};
+class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
 
 /**
  * csHashComputer<> specialization for csString that uses csHashCompute().
  */
 CS_SPECIALIZE_TEMPLATE
-class csHashComputer<csString>
-{
-public:
-  static uint ComputeHash (csString const& key)
-  {
-    return csHashCompute ((const char*)key);
-  }
-};
+class csHashComputer<csString> : public csHashComputerString<csString> {};
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csStringBase> : public csHashComputerString<csStringBase> {};
 
 /**
  * A generic hash table class,

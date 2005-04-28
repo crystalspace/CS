@@ -186,8 +186,8 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
       if (pTexture->IsVisible() && pTexture->IsStored())
       {
 	csPrintf ("Warning: texture '%s'('%s') is missing.\n"
-	  "         Using '%s' instead!\n",  TextureName, InternalName, 
-	  defaultname);
+	  "         Using '%s' instead!\n",  TextureName, 
+	  InternalName.GetData(), defaultname);
       }
       m_StoredTextures.Push(pTexture);
       return pTexture;
@@ -197,7 +197,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   CTextureFile* pTexture = 0;
 
   csPrintf("Warning: texture '%s'('%s') is missing.\n        Making a new null texture.\n",
-    TextureName, CleanedUpTextureName);
+    TextureName, CleanedUpTextureName.GetData());
   pTexture = new CTextureFile;
   pTexture->SetTexturename (InternalName);
   pTexture->SetFilename    (CleanedUpTextureName);

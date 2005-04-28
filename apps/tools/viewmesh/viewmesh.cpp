@@ -1539,7 +1539,7 @@ bool ViewMesh::ParseDir(const char* filename)
     path.Append (filename, pathlen);
     if (!vfs->ChDirAuto (path, 0, 0, colon+1))
     {
-      ReportError ("Couldn't find '%s' in '%s'!", colon+1, path);
+      ReportError ("Couldn't find '%s' in '%s'!", colon+1, path.GetData());
       return false;
     }
     // If there is a path after the colon we skip every entry in that

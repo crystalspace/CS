@@ -21,6 +21,9 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ */
+
 struct iSequence;
 struct iSequenceManager;
 struct iSequenceTrigger;

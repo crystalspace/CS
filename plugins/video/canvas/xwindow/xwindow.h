@@ -23,7 +23,6 @@
 #include <stdarg.h>
 #include "csutil/scf.h"
 #include "csutil/hash.h"
-#include "csutil/hashhandlers.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -84,7 +83,7 @@ class csXWindow : public iXWindow, public iEventPlug
   /// A empty pixmap
   Pixmap EmptyPixmap;
   /// List of image-based cursors
-  csHash<Cursor, csStrKey, csConstCharHashKeyHandler> cachedCursors;
+  csHash<Cursor, csStrKey> cachedCursors;
   //------------------------------------------------------------
 
   void Report (int severity, const char* msg, ...);

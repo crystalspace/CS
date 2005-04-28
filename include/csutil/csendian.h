@@ -204,14 +204,13 @@ static inline double csLongLongToDouble (int64 i)
   return ldexp (mant, exp);
 }
 
-/**\name Floating point conversions.
+/**\name Floating point conversions
  * The following routines are used for converting floating-point numbers
  * into 16-bit shorts and back. This is useful for low-precision data.
  * They use the 1.4.12 format. The range of numbers that can be represented
  * in this format is from 2^-8 to 2^7. The precision for numbers near to
  * 2^-8 (0.00390625) is near 0.000001, for numbers near 2^7 (128) is near 0.03.
- */
-/** @{ */
+ * @{ */
 
 /// Convert a float to a cross-platform 16-bit format (no endianess adjustments!)
 static inline short csFloatToShort (float f)
