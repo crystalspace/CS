@@ -44,9 +44,12 @@ public:
    *   greater than the second.
    * \remarks Assumes the existence of T1::operator<(T2) and T2::operator<(T1).
    *   If T1 and T2 are the same type T, then only T::operator<(T) is assumed
-   *   (of course).  This is the default comparison function used by csArray
-   *   for searching and sorting if the client does not provide a custom
-   *   function.
+   *   (naturally).
+   * <p>
+   * \remarks This is the default comparison function used by csArray<> for
+   *   searching and sorting if the client does not provide a custom
+   *   function. It is also used by csSet<> when checking for object
+   *   containment.
    */
   static int Compare(T1 const &r1, T2 const &r2)
   {
@@ -57,9 +60,9 @@ public:
 };
 
 /**
- * Template that can be used as a base class for comparaots for 
- * string types (must support cast to const char*).
- * Example:
+ * Template that can be used as a base class for comparators for string
+ * types. Assumes presence of `operator char const*()' (the cast operator).
+ * Also works for normal C-strings.  Example:
  * \code
  * CS_SPECIALIZE_TEMPLATE csComparator<MyString> : 
  *   public csComparatorString<MyString> {};
@@ -82,10 +85,22 @@ CS_SPECIALIZE_TEMPLATE
 class csComparator<const char*, const char*> :
   public csComparatorString<const char*> {};
 
+/** @{ */
 /**
- * Template that can be used as a base class for comparators for POD 
- * structs.
- * Example:
+ * csComparator<> specialization for csString that uses strcmp().
+ */
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csString, csString> :
+  public csComparatorString<csString> {};
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csStringBase, csStringBase> :
+  public csComparatorString<csStringBase> {};
+/** @} */
+
+/**
+ * Template that can be used as a base class for comparators for POD (plain old
+ * data) types. It uses memcmp() to compare the raw memory representing the two
+ * items.  Example:
  * \code
  * CS_SPECIALIZE_TEMPLATE csHashComputer<MyStruct> : 
  *   public csComparatorStruct<MyStruct> {};
@@ -100,16 +115,6 @@ public:
     return memcmp (&r1, &r2, sizeof (T));
   }
 };
-
-/**
- * csComparator<> specialization for csString that uses strcmp().
- */
-CS_SPECIALIZE_TEMPLATE
-class csComparator<csString, csString> :
-  public csComparatorString<csString> {};
-CS_SPECIALIZE_TEMPLATE
-class csComparator<csStringBase, csStringBase> :
-  public csComparatorString<csStringBase> {};
 
 /** @} */
 
