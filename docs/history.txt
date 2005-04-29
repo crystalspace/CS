@@ -7,6 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Apr-2005
+	- Eric Sunshine removed csSet<>::GetHash() since it exposed internal
+	  implementation details of csSet<> and was unnecessarily dangerous.
+	- Eric Sunshine upgraded CS/docs/texinfo/texinfo.tex to the latest
+	  master version maintained by GNU.
+	- Eric Sunshine resolved a number of `hbox' warnings, plus some errors
+	  reported by TeX.
 	- res renamed csOrdering<> to the more general csComparator<>.
 	- res changed csHash<> from using so-called "hash key handlers" to use
 	  the csHashComputer<> and csComparator<> templates to perform hash
