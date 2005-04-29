@@ -159,7 +159,7 @@ public:
   /// Generate a hash value from the object.
   uint32 ComputeHash () const;
 
-  /// Returns an int indicating the relation og the two definitions.
+  /// Returns a number indicating the relation of the two definitions.
   int Compare (csInputDefinition const &) const;
 
   /**

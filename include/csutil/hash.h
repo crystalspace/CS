@@ -171,7 +171,7 @@ class csHashComputer<csStringBase> : public csHashComputerString<csStringBase> {
  * The hash value of a key is computed using csHashComputer<>, two keys are
  * compared using csComparator<>. You need to provide appropriate 
  * specializations of those templates if you want use non-integral types 
- * (other thanconst char*, csStrKey and csString for which appropriate 
+ * (other than const char*, csStrKey and csString for which appropriate 
  * specializations are already provided) or special hash algorithms. 
  */
 template <class T, class K = unsigned int> 
