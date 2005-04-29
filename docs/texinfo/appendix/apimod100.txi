@@ -1739,5 +1739,5 @@ of a @code{csComparator<>} specialization---however, @code{csHashComputer<>}
 still needs to be specialized. As a convenience, Crystal Space already provides
 specializations for the commonly used types @samp{csString}, @samp{const char*}
 and @samp{csStrKey}; and the default comparison semantics of @samp{operator <}
-and @samp{operator >} handle the remaining base types and any composite types
-which provide these operators.
+and @samp{operator >} handle the remaining fundamental types and any composite
+types which provide these operators.
