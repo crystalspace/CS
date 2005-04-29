@@ -1,6 +1,6 @@
 # emit.m4                                                      -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -51,7 +51,7 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 
 
 #------------------------------------------------------------------------------
-# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX, [EMITTER], [DELIMITER])
+# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX, [EMITTER])
 #	Record the results of CS_CHECK_BUILD() or CS_CHECK_LIB_WITH() via some
 #	emitter.  If CACHE-VAR indicates that the build succeeded, then the
 #	following properties are emitted:
@@ -63,21 +63,13 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 #	EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
 #	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
 #	KEY/VALUE tuple. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
-#	DELIMITER is the token to insert after PREFIX in the composed names. If
-#	omitted, it defaults to ".". When emitting to makefiles (via
-#	CS_SUBST_EMITTER), you probably should set DELIMITER to "_", which will
-#	create makefile variables named PREFIX_CFLAGS, PREFIX_LFLAGS, etc.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_RESULT],
     [AS_IF([test "$$1" = yes],
-	[_CS_EMIT_BUILD_RESULT([$2], [$4], [AVAILABLE], [yes], [$3])
-	_CS_EMIT_BUILD_RESULT([$2], [$4], [CFLAGS], [$$1_cflags], [$3])
-	_CS_EMIT_BUILD_RESULT([$2], [$4], [LFLAGS], [$$1_lflags $$1_libs],
-	    [$3])])])
-
-# _CS_EMIT_BUILD_RESULT(PREFIX, [DELIMITER], SUFFIX, VALUE, [EMITTER])
-AC_DEFUN([_CS_EMIT_BUILD_RESULT],
-    [CS_EMIT_BUILD_PROPERTY([$1]m4_default([$2],[.])[$3],[$4],[],[],[$5])])
+	[CS_EMIT_BUILD_PROPERTY([$2.AVAILABLE], [yes], [], [], [$3])
+	CS_EMIT_BUILD_PROPERTY([$2.CFLAGS], [$$1_cflags], [], [], [$3])
+	CS_EMIT_BUILD_PROPERTY([$2.LFLAGS], [$$1_lflags $$1_libs],
+	    [], [], [$3])])])
 
 
 
@@ -127,9 +119,9 @@ AC_DEFUN([CS_EMIT_BUILD_FLAGS],
 #
 #	- If EMITTER is omitted, then CS_NULL_EMITTER is returned, effectively
 #	  disabling output by the CS_EMIT_FOO() macro.
-#	- If EMITTER is the literal string "emit" or "yes", then it asks the
-#	  CS_EMIT_FOO() macro to use its default emitter by returning an empty
-#	  string.
+#	- If EMITTER is the literal string "emit" or "yes", then it returns an
+#	  empty string, which signals to the CS_EMIT_FOO() macro that is should
+#	  use its default emitter.
 #	- Any other value for EMITTER is passed along as-is to the
 #	  CS_EMIT_FOO() macro.
 #------------------------------------------------------------------------------
@@ -154,20 +146,27 @@ AC_DEFUN([CS_NULL_EMITTER], [:
 
 #------------------------------------------------------------------------------
 # CS_SUBST_EMITTER(KEY, VALUE, [APPEND])
-#	An emitter wrapped around AC_SUBST(). Invokes AC_SUBST(KEY,VALUE).  The
-#	APPEND argument is ignored.  Suitable for use as the EMITTER argument
-#	of one of the CS_EMIT_FOO() macros.
+#	An emitter wrapped around AC_SUBST(). Invokes
+#	AC_SUBST(AS_TR_SH(KEY),VALUE).  The APPEND argument is ignored.
+#	Suitable for use as the EMITTER argument of one of the CS_EMIT_FOO()
+#	macros.  The call to AS_TR_SH() ensures that KEY is transformed into a
+#	valid shell variable. For instance, if a macro attempts to emit
+#	MYLIB.CFLAGS and MYLIB.LFLAGS via CS_SUBST_EMITTER(), then the names
+#	will be transformed to MYLIB_CFLAGS and MYLIB_LFLAGS, respectively, for
+#	the invocation of AC_SUBST().
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_SUBST_EMITTER], [AC_SUBST([$1],[$2])])
+AC_DEFUN([CS_SUBST_EMITTER], [AC_SUBST(AS_TR_SH([$1]),[$2])])
 
 
 
 #------------------------------------------------------------------------------
 # CS_DEFINE_EMITTER(KEY, VALUE, [APPEND])
 #	An emitter wrapped around AC_DEFINE_UNQUOTED(). Invokes
-#	AC_DEFINE_UNQUOTED(KEY,VALUE).  The APPEND argument is ignored.
-#	Suitable for use as the EMITTER argument of one of the CS_EMIT_FOO()
-#	macros.
+#	AC_DEFINE_UNQUOTED(AS_TR_CPP(KEY),VALUE).  The APPEND argument is
+#	ignored.  Suitable for use as the EMITTER argument of one of the
+#	CS_EMIT_FOO() macros. The call to AS_TR_CPP() ensures that KEY is a
+#	well-formed token for the C-preprocessor.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_DEFINE_EMITTER],
-    [AC_DEFINE_UNQUOTED([$1],[$2],[Define when feature is available])])
+    [AC_DEFINE_UNQUOTED(AS_TR_CPP([$1]),[$2],
+	[Define when feature is available])])

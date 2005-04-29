@@ -89,8 +89,6 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    cs_cv_python_ext=`AC_RUN_LOG([$PYTHON -c \
 		'import distutils.sysconfig; \
 		print (distutils.sysconfig.get_config_var("SO") or "")'])`
-	    CS_EMIT_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_python_ext],
-		[], [], CS_EMITTER_OPTIONAL([$1]))
 
 	    AS_IF([test -n "$cs_pyver" &&
 		   test -n "$cs_cv_pybase_cflags" &&
@@ -111,7 +109,9 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	# account for this by trying -bundle, rather than linking against the
 	# library.
 	AS_IF([test $cs_cv_python_sdk = yes],
-	    [cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
+	    [CS_EMIT_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_python_ext],
+		[], [], CS_EMITTER_OPTIONAL([$1]))
+	    cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],[-framework Python])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],[-l$cs_cv_pybase])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],[-l$cs_pywinlib])"

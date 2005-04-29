@@ -109,6 +109,7 @@ Instantiate()
 	s^#VERSION#^$VERSION^g; \
 	s^#COPYRIGHT#^$COPYRIGHT^g; \
 	s^#USECEL#^$USECEL^g; \
+	s^#GPLCOMPATIBLE#^$GPLCOMPATIBLE^g; \
 	" > "$TARGET"
 }
 
@@ -175,7 +176,7 @@ The information about the author is mentioned in the README file and in the
 configuration script so that people see a support address when they invoke
 "./configure --help".  When asked for the copyright information, type the full
 copyright notice as you wish it to appear in the generated files. For instance:
-Copyright (C)2004 by Duffer McFluffer
+Copyright (C)2005 by Duffer McFluffer
 
 __EOF__
 ReadValueStrict AUTHOR "Author:"
@@ -184,9 +185,27 @@ ReadValue COPYRIGHT "Copyright:"
 
 cat << __EOF__
 
+**** License
+The meta-information which describes a plugin module can be embedded directly
+into the plugin itself on some platforms or laid down alongside the plugin in a
+separate *.csplugin file. On Unix, embedding is accomplished with the
+GPL-licensed libbfd library, which can be used legally with projects carrying a
+GPL or GPL-compatible license. If your project is not compatible with GPL, then
+embedding via libbfd should be disabled by default on Unix to prevent libbfd's
+GPL license from infecting your project. Your response to this question
+controls the default embedding setting on Unix (though the end-user can
+override the default with the configure script's --enable-meta-info-embedding
+option). If you are unsure of the answer, then respond "no".
+
+__EOF__
+
+CheckYesNo GPLCOMPATIBLE "GPL-compatible" no
+
+cat << __EOF__
+
 **** Dependencies
 The Crystal Entity Layer (CEL) is a set of classes and modules which layer
-game-oriented facilities atop Crystal Space. (http://cel.sourceforge.net)
+game-oriented facilities atop Crystal Space. (http://cel.sourceforge.net/)
 The Autoconf configuration script and Jam build system can be set up to work
 with CEL if your project will utilize this SDK.
 
@@ -252,7 +271,9 @@ cat << __EOF__
 
 You should now examine the generated project and customize it as needed.  In
 particular, the files README, app$PROJECTNAME.cpp, and app$PROJECTNAME.h will
-require modification.
+require modification. Also consult "./configure --help" and "jam help" (after
+configuring the project) to learn about your project's build-system
+capabilities.
 
 Have fun with Crystal Space.
 __EOF__

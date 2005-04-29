@@ -83,11 +83,6 @@ CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
 CS_CHECK_TOOLS([WINDRES], [windres])
 CS_EMIT_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES])
 
-CS_CHECK_TOOLS([OBJCOPY], [objcopy])
-AS_IF([test -n "$OBJCOPY"],
-    [CS_EMIT_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
-
 CS_CHECK_PROGS([FLEX], [flex])
 CS_EMIT_BUILD_PROPERTY([CMD.FLEX], [$FLEX])
 
@@ -101,6 +96,9 @@ CS_EMIT_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])
 
 CS_CHECK_PROGS([TEXI2DVI], [texi2dvi])
 CS_EMIT_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])
+
+CS_CHECK_PROGS([TEXI2PDF], [texi2pdf])
+CS_EMIT_BUILD_PROPERTY([CMD.TEXI2PDF], [$TEXI2PDF])
 
 CS_CHECK_PROGS([DVIPS], [dvips])
 CS_EMIT_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])
@@ -2298,104 +2296,16 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 
 
 #------------------------------------------------------------------------------
-# Determine if plugin meta-information should be embedded directly into the
-# plugin module or if it should exist in a stand-alone .csplugin file.  The
-# macro CS_CHECK_ENABLE_META_EMBEDDING sets the shell variable
-# enable_meta_info_embedding to yes or no.
+# Determine if plugin meta-information should be embedded directly into plugin
+# modules or if it should exist in stand-alone .csplugin files.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_ENABLE_META_EMBEDDING],
-    [AC_REQUIRE([CS_CHECK_HOST])
-    AC_MSG_CHECKING([whether to embed plugin meta-information])
-    case $cs_host_target in
-	unix) cs_embed_meta_info_default=no ;;
-	*) cs_embed_meta_info_default=yes ;;
-    esac
-    AC_ARG_ENABLE([meta-info-embedding],
-	[AC_HELP_STRING([--enable-meta-info-embedding],
-	    [store plugin meta-information directly inside plugin modules if
-	    supported by platform; if disabled, meta-information is stored in
-	    stand-alone .csplugin files; this is enabled by default for
-	    non-Unix platforms, and disabled by default for Unix platforms
-	    since the Unix implementation requires the GPL-licensed libbfd
-	    library; enable this option on Unix only if you are certain you
-	    want a GPL-licensed library infecting your project])],
-	[], [enable_meta_info_embedding=$cs_embed_meta_info_default])
-    AC_MSG_RESULT([$enable_meta_info_embedding])])
-
-CS_CHECK_ENABLE_META_EMBEDDING
-CS_EMIT_BUILD_PROPERTY([EMBED_META], [$enable_meta_info_embedding])
+CS_META_INFO_EMBED([emit])
 AS_IF([test $enable_meta_info_embedding = yes],
-    [CS_HEADER_PROPERTY([CS_EMBED_PLUGIN_META])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if libbfd is present (part of GNU binutils).
-#
-# WARNING
-#
-# libbfd carries a GPL license which is incompatible with the LGPL license of
-# Crystal Space.  On platforms for which libbfd can be used, we check for and
-# utilize this library only if explicitly requested by the user via
-# --enable-meta-info-embedding.
-#
-# IMPLEMENTATION NOTES
-#
-# It seems that some platforms have two version of libiberty installed: one
-# from binutils and one from gcc.  The binutils version resides in /usr/lib,
-# whereas the gcc version resides in the gcc installation directory.  The gcc
-# version, by default, takes precedence at link time over the binutils version.
-# Unfortunately, in broken cases, the gcc version of libiberty is missing
-# htab_create_alloc() which is required by some libbfd functions.  The
-# extensive secondary check of libbfd catches this anomalous case of broken gcc
-# libiberty.  It turns out that it is possible to make the linker prefer the
-# binutils version by specifying -L/usr/lib, thus the extensive test attempts
-# to do so in an effort to resolve this unfortunate issue.
-#
-# Furthermore, recent versions of Mingw supply libbfd and libiberty.  Since
-# Crystal Space uses native Win32 API for meta-information embedding on
-# Windows, we do not require these libraries on Windows.  More importantly,
-# users do not want to see these GPL-licensed libraries appear in the link
-# statement for plugin modules, thus we explicitly disable this test on
-# Windows.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_ENABLE_LIBBFD_TEST],
-    [AC_REQUIRE([CS_CHECK_ENABLE_META_EMBEDDING])
-    AC_REQUIRE([AC_CANONICAL_HOST])
-    AS_IF([test $enable_meta_info_embedding = yes],
-	[case $host_os in
-	    mingw*|cygwin*) cs_check_libbfd=no ;;
-	    *) cs_check_libbfd=yes ;;
-	esac],
-	[cs_check_libbfd=no])])
-
-CS_CHECK_ENABLE_LIBBFD_TEST
-
-AS_IF([test $cs_check_libbfd = yes],
-    [CS_CHECK_LIB_WITH([bfd],
-	[AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
-	[], [], [], [], [], [], [-liberty])],
-    [cs_cv_libbfd=no])
-
-AS_IF([test $cs_cv_libbfd = yes],
-    [CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
-	[AC_LANG_PROGRAM([[#include <bfd.h>]],
-	    [bfd* p;
-	    asection* s;
-	    bfd_init();
-	    p = bfd_openr(0,0);
-	    bfd_check_format(p,bfd_object);
-	    bfd_get_section_by_name(p,0);
-	    bfd_section_size(p,s);
-	    bfd_get_section_contents(p,s,0,0,0);
-	    bfd_close(p);])],
-	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([],[-L/usr/lib],[])], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libbfd_ok], [LIBBFD])
-	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],[$cs_cv_libbfd_ok_cflags],[+])
-	CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],[$cs_cv_libbfd_ok_lflags],[+])
-	CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],[$cs_cv_libbfd_ok_libs],[+])],
-	[], [],
-	[$cs_cv_libbfd_cflags], [$cs_cv_libbfd_lflags], [$cs_cv_libbfd_libs])])
+    [CS_HEADER_PROPERTY([CS_EMBED_PLUGIN_META])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+	[AS_ESCAPE([$(EMBED_META.CFLAGS)])], [+])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
+	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])])
 
 
 
