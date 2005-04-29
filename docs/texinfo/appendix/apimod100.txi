@@ -3,6 +3,10 @@
 @appendixsec Release Notes from 0.98 to 1.00
 @cindex Release Notes
 
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com} and
+Frank Richter, @email{resqu@@gmx.ch}.}
+
 This section documents the major changes between versions 0.98 and 1.00 of
 Crystal Space.
 
@@ -985,9 +989,9 @@ For consistency with like-named macros (such as @samp{CS_PROCESSOR_NAME} and
 @code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
 @end itemize
 
-The @code{csOrdering<>} method has been renamed to the more general 
-@code{csComparator<>} (to reflect the fact that this template can perform both
-ordering and equality comparisons).
+The @code{csOrdering<>} template has been renamed to the more general
+@code{csComparator<>} to reflect the fact that this template can perform both
+ordering and equality comparisons.
 
 @subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 
@@ -1722,14 +1726,18 @@ exposed an underlying implementation detail of @code{csSet<>}.
 
 @subheading @code{csHash<>} Changes
 
-The way @code{csHash<>} handles support for arbitrary key types has been 
-changed. Previously, a so-called ``hash key handler'' was passed as a template
-parameter that computed hash keys and compared keys. Now, the hash computation
-is handled through the @code{csHashComputer<>} template and key comparison 
-through @code{csComparator<>}. To provide hash computation and comparisons for 
-specific types used as hash keys, specializations of the templates mentioned
-above are needed. Alternatively the default comparator uses the @code{<} and 
-@code{>} operators, so you can also implement those instead of a 
-@code{csComparator<>} specialization - however, @code{csHashComputer<>} still 
-needs to be specialized. @sc{cs} already provides specializations for the 
-commonly used types @samp{csString}, @samp{const char*} and @samp{csStrKey}.
+The way @code{csHash<>} handles support for arbitrary key types has been
+changed. Previously, a so-called ``hash key handler'' was passed as an optional
+third template parameter that computed hash keys and was able to compare
+keys. Now, the hash computation is handled through the new
+@code{csHashComputer<>} template, and key comparison through
+@code{csComparator<>}. To provide hash computation and comparisons for specific
+types used as hash keys, specializations of the templates mentioned above are
+needed. Alternatively the default comparator uses the @samp{operator <} and
+@samp{operator >} operators, so you can also implement those operators instead
+of a @code{csComparator<>} specialization---however, @code{csHashComputer<>}
+still needs to be specialized. As a convenience, Crystal Space already provides
+specializations for the commonly used types @samp{csString}, @samp{const char*}
+and @samp{csStrKey}; and the default comparison semantics of @samp{operator <}
+and @samp{operator >} handle the remaining base types and any composite types
+which provide these operators.
