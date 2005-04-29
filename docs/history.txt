@@ -17,6 +17,8 @@ chronological order.
 	  `Match' is now instead invoked indirectly.
 	- Eric Sunshine made a few small corrections and enhancements to
 	  documentation and Doxygen comments.
+	- Vincent Knecht updated Installdata and vfs.cfg.template to add the
+	  teapot so that flarge level is usable when installed.
 28-Apr-2005
 	- Eric Sunshine removed csSet<>::GetHash() since it exposed internal
 	  implementation details of csSet<> and was unnecessarily dangerous.
