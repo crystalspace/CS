@@ -760,7 +760,7 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #------------------------------------------------------------------------------
 # Check if "hidden" visibilty for inline functions is supported.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is supported],
+CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is accepted],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],
     [C++], [COMPILER.CFLAGS.optimize], [+])
@@ -770,7 +770,7 @@ CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is supported],
 #------------------------------------------------------------------------------
 # Check if setting a default symbol visibility is supported.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([if -fvisibility=hidden is supported], 
+CS_CHECK_BUILD([if -fvisibility=hidden is accepted],
     [cs_cv_prog_cxx_visibility_hidden], [],
     [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++],
     [cs_cv_prog_cxx_have_visibility_hidden='yes'],
@@ -783,7 +783,7 @@ CS_CHECK_BUILD([if -fvisibility=hidden is supported],
 #------------------------------------------------------------------------------
 m4_define([cs_declare_attr_visibility_default], 
     [__attribute__((visibility("default")))])
-AC_CACHE_CHECK([whether GCC visibility attribute is available],
+AC_CACHE_CHECK([if GCC supports visibility attribute],
     [cs_cv_prog_cxx_visibility_attribute],
     [CS_BUILD_IFELSE(
 	[AC_LANG_PROGRAM([cs_declare_attr_visibility_default void f();], [])], 
@@ -900,14 +900,14 @@ AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
 	[C++], [COMPILER.CFLAGS.optimize], [+],
 	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_optimize"])
 
-    CS_EMIT_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
+    CS_EMIT_BUILD_FLAGS([if -fomit-frame-pointer is accepted],
 	[cs_cv_prog_cxx_omit_frame_pointer],
 	[CS_CREATE_TUPLE([-fomit-frame-pointer])],
 	[C++], [COMPILER.CFLAGS.optimize], [+],
 	[cs_optimize_flags="$cs_optimize_flags \
 	    $cs_cv_prog_cxx_omit_frame_pointer"])
 
-    CS_EMIT_BUILD_FLAGS([if $CXX recognizes -ffast-math],
+    CS_EMIT_BUILD_FLAGS([if -ffast-math is accepted],
 	[cs_cv_prog_cxx_fast_math],
 	[CS_CREATE_TUPLE([-ffast-math])], [C++],
 	[COMPILER.CFLAGS.optimize], [+],
@@ -1862,7 +1862,7 @@ CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
 #------------------------------------------------------------------------------
 # Check if backtrace() is available.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for backtrace() support], [cs_cv_backtrace],
+CS_CHECK_BUILD([for backtrace], [cs_cv_backtrace],
     [AC_LANG_PROGRAM(
 	[[#ifdef HAVE_SYS_TYPES_H
 	#include <sys/types.h>
@@ -1878,7 +1878,7 @@ CS_CHECK_BUILD([for backtrace() support], [cs_cv_backtrace],
 #------------------------------------------------------------------------------
 # Check if setenv() is available.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for setenv() support], [cs_cv_setenv],
+CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
     [AC_LANG_PROGRAM(
 	[[#ifdef HAVE_SYS_TYPES_H
 	#include <sys/types.h>
@@ -2276,12 +2276,14 @@ AC_DEFUN([CS_CHECK_QSQRT],
     [AC_REQUIRE([CS_CHECK_HOST_CPU])
     AC_REQUIRE([AC_PROG_CXX])
     AC_REQUIRE([CS_CHECK_FORCE_CPUSUBTYPE_ALL])
-    AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
+    AC_CACHE_CHECK([if assembly-coded csQsqrt() compiles],
+	[cs_cv_cxx_qsqrt_ok],
 	[AS_IF([test $ac_compiler_gnu = yes],
 	    [CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [[#define CS_PROCESSOR_$cs_host_cpu_normalized
 		    #define CS_COMPILER_GCC
+		    #define __CS_CSSYSDEF_H__
 		    #include <csqsqrt.h>]],
 		    [float n = csQsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([-I$srcdir/include])], [C++],

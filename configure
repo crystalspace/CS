@@ -12899,8 +12899,8 @@ fi
 #------------------------------------------------------------------------------
 # Check if "hidden" visibilty for inline functions is supported.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking if -fvisibility-inlines-hidden is supported" >&5
-echo $ECHO_N "checking if -fvisibility-inlines-hidden is supported... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking if -fvisibility-inlines-hidden is accepted" >&5
+echo $ECHO_N "checking if -fvisibility-inlines-hidden is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_visibility_inlines_hidden_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13069,8 +13069,8 @@ fi
 # Check if setting a default symbol visibility is supported.
 #------------------------------------------------------------------------------
 if test "" != yes; then
-  echo "$as_me:$LINENO: checking if -fvisibility=hidden is supported" >&5
-echo $ECHO_N "checking if -fvisibility=hidden is supported... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if -fvisibility=hidden is accepted" >&5
+echo $ECHO_N "checking if -fvisibility=hidden is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_visibility_hidden+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13223,8 +13223,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_visibility_hidden" >&5
 echo "${ECHO_T}$cs_cv_prog_cxx_visibility_hidden" >&6
 else
-  echo "$as_me:$LINENO: checking if -fvisibility=hidden is supported" >&5
-echo $ECHO_N "checking if -fvisibility=hidden is supported... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if -fvisibility=hidden is accepted" >&5
+echo $ECHO_N "checking if -fvisibility=hidden is accepted... $ECHO_C" >&6
 	    ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13390,8 +13390,8 @@ fi
 # Check if GCC style visibility attributes are available.
 #------------------------------------------------------------------------------
 
-echo "$as_me:$LINENO: checking whether GCC visibility attribute is available" >&5
-echo $ECHO_N "checking whether GCC visibility attribute is available... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking if GCC supports visibility attribute" >&5
+echo $ECHO_N "checking if GCC supports visibility attribute... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_visibility_attribute+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -16520,8 +16520,8 @@ fi
 fi
 
 
-    echo "$as_me:$LINENO: checking if $CXX recognizes -fomit-frame-pointer" >&5
-echo $ECHO_N "checking if $CXX recognizes -fomit-frame-pointer... $ECHO_C" >&6
+    echo "$as_me:$LINENO: checking if -fomit-frame-pointer is accepted" >&5
+echo $ECHO_N "checking if -fomit-frame-pointer is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_omit_frame_pointer_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -16685,8 +16685,8 @@ fi
 fi
 
 
-    echo "$as_me:$LINENO: checking if $CXX recognizes -ffast-math" >&5
-echo $ECHO_N "checking if $CXX recognizes -ffast-math... $ECHO_C" >&6
+    echo "$as_me:$LINENO: checking if -ffast-math is accepted" >&5
+echo $ECHO_N "checking if -ffast-math is accepted... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_fast_math_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -53728,8 +53728,8 @@ fi
 # Check if backtrace() is available.
 #------------------------------------------------------------------------------
 if test "" != yes; then
-  echo "$as_me:$LINENO: checking for backtrace() support" >&5
-echo $ECHO_N "checking for backtrace() support... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for backtrace" >&5
+echo $ECHO_N "checking for backtrace... $ECHO_C" >&6
 if test "${cs_cv_backtrace+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -53886,8 +53886,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_backtrace" >&5
 echo "${ECHO_T}$cs_cv_backtrace" >&6
 else
-  echo "$as_me:$LINENO: checking for backtrace() support" >&5
-echo $ECHO_N "checking for backtrace() support... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for backtrace" >&5
+echo $ECHO_N "checking for backtrace... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -54063,8 +54063,8 @@ fi
 # Check if setenv() is available.
 #------------------------------------------------------------------------------
 if test "" != yes; then
-  echo "$as_me:$LINENO: checking for setenv() support" >&5
-echo $ECHO_N "checking for setenv() support... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for setenv" >&5
+echo $ECHO_N "checking for setenv... $ECHO_C" >&6
 if test "${cs_cv_setenv+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -54220,8 +54220,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_setenv" >&5
 echo "${ECHO_T}$cs_cv_setenv" >&6
 else
-  echo "$as_me:$LINENO: checking for setenv() support" >&5
-echo $ECHO_N "checking for setenv() support... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for setenv" >&5
+echo $ECHO_N "checking for setenv... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -61052,8 +61052,8 @@ fi
 
 
 
-    echo "$as_me:$LINENO: checking if csQsqrt() compiles" >&5
-echo $ECHO_N "checking if csQsqrt() compiles... $ECHO_C" >&6
+    echo "$as_me:$LINENO: checking if assembly-coded csQsqrt() compiles" >&5
+echo $ECHO_N "checking if assembly-coded csQsqrt() compiles... $ECHO_C" >&6
 if test "${cs_cv_cxx_qsqrt_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -61137,6 +61137,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #define CS_PROCESSOR_$cs_host_cpu_normalized
 		    #define CS_COMPILER_GCC
+		    #define __CS_CSSYSDEF_H__
 		    #include <csqsqrt.h>
 int
 main ()
@@ -61219,7 +61220,7 @@ fi
 
 #------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into plugin
-# modules or if it should exist in a stand-alone .csplugin files.
+# modules or if it should exist in stand-alone .csplugin files.
 #------------------------------------------------------------------------------
 
     echo "$as_me:$LINENO: checking whether to embed plugin meta-information" >&5

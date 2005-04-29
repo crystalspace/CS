@@ -17,6 +17,40 @@ chronological order.
 	  `Match' is now instead invoked indirectly.
 	- Eric Sunshine made a few small corrections and enhancements to
 	  documentation and Doxygen comments.
+	- Eric Sunshine extracted the various plugin meta-info embedding checks
+	  from configure.ac and wrapped them in a new macro named
+	  CS_META_INFO_EMBED() in embed.m4 so that the functionality can be
+	  re-used by external projects.
+	- Eric Sunshine updated jamtemplate's configure.template to utilize the
+	  new CS_META_INFO_EMBED() macro. This allows external projects to
+	  employ meta-info embedding easily for their own plugins (no extra
+	  effort required).
+	- Eric Sunshine augmented the CS_SUBST_EMITTER() and
+	  CS_DEFINE_EMITTER() macros in emit.m4 so that they properly transform
+	  the KEY argument into a form suitable for the output medium. For
+	  instance, if some macro attempts to emit the variables MYLIB.CFLAGS
+	  and MYLIB.LFLAGS via CS_SUBST_EMITTER(), then it will transform the
+	  names into valid shell variables MYLIB_CFLAGS and MYLIB_LFLAGS,
+	  respectively. This makes it safe to use these two emitters with the
+	  many Autoconf checks which have been authored for use with Crystal
+	  Space and its clients. As a corollary, removed the recently-added
+	  (7-Apr-2005) DELIMITER argument from CS_EMIT_BUILD_RESULT() since it
+	  essentially was an ugly hack to make it safe to use
+	  CS_SUBST_EMITTER() with CS_EMIT_BUILD_RESULT(). The new approach is
+	  much cleaner and fully automatic.
+	- Eric Sunshine fixed bug in CS_CHECK_PYTHON() in checkpython.m4 where
+	  it behaved differently between cached and uncached runs;
+	  specifically, it emitted the PYTHON.MODULE_EXT build variable only
+	  for uncached runs.
+	- Eric Sunshine added a `texi2pdf' check to configure.ac since the
+	  Texi2PDF rule in docs.jam will utilize this tool if present.
+	- Eric Sunshine added numerous checks to jamtemplate's
+	  configure.template for tools commonly used by the Crystal Space Jam
+	  build system.
+	- Eric Sunshine fixed problem with the csQsqrt() in configure.ac which
+	  made it fail always. Specifically, it was trying to include
+	  <cssysdef.h> despite the fact that <cssysdef.h> is unusable before
+	  the project has been configured.
 	- Vincent Knecht updated Installdata and vfs.cfg.template to add the
 	  teapot so that flarge level is usable when installed.
 28-Apr-2005
