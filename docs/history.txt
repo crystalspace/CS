@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Apr-2005
+	- Eric Sunshine added csRef<>::operator< so that csRef<> can be used as
+	  the subject of csComparator<>, which uses operator< for comparisons.
 29-Apr-2005
 	- Eric Sunshine worked around flaw in SplitToList in helper.jam which
 	  made it entirely non-functional. The problem was that when Jam sees

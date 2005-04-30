@@ -314,6 +314,16 @@ public:
   {
     return r1.obj != obj;
   }
+  /**
+   * Test the relationship of the addresses of two objects.
+   * \remarks Mainly useful when csRef<> is used as the subject of
+   *   csComparator<>, which employs operator< for comparisons.
+   */
+  inline friend bool operator < (const csRef& r1, const csRef& r2)
+  {
+    return r1.obj < r2.obj;
+  }
+
 
   /// Dereference underlying object.
   T* operator -> () const
