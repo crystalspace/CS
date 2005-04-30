@@ -20,32 +20,8 @@
 #include "null_render3d.h"
 #include "null_txt.h"
 
-#define DP_NAME DrawPixmap16_555
-#define DP_PIXTYPE uint16
-#define DP_PIXFORM_R5G5B5
-#include "drawsprt.inc"
-
-#define DP_NAME DrawPixmap16_565
-#define DP_PIXTYPE uint16
-#define DP_PIXFORM_R5G6B5
-#include "drawsprt.inc"
-
-#define DP_NAME DrawPixmap32
-#define DP_PIXTYPE uint32
-#define DP_PIXFORM_R8G8B8
-#include "drawsprt.inc"
-
 void csNullGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  if (pfmt.PixelBytes == 2)
-  {
-    if (pfmt.GreenBits == 5)
-      DrawPixmap16_555 (G2D, txtmgr, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
-    else
-      DrawPixmap16_565 (G2D, txtmgr, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
-  }
-  else
-    DrawPixmap32 (G2D, txtmgr, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
 }

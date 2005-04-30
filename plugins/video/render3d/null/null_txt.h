@@ -35,37 +35,16 @@ class csTextureManagerNull;
 class csTextureNull : public csTexture
 {
 public:
-  /// The bitmap
-  uint8 *bitmap;
-  /// The alpha map (0 if no alphamap)
-  uint8 *alphamap;
-  /// The image (temporary storage)
-  iImage *image;
-
   /// Create a csTexture object
   csTextureNull (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
   {
-    bitmap = 0;
-    alphamap = 0;
-    image = Image;
-    image->IncRef();
     w = Image->GetWidth ();
     h = Image->GetHeight ();
     compute_masks ();
   }
   /// Destroy the texture
   virtual ~csTextureNull ()
-  { delete [] bitmap;
-    delete [] alphamap;
-    if (image) image->DecRef ();
-  }
-
-  /// Return a pointer to texture data
-  uint8 *get_bitmap ()
-  { return bitmap; }
-  /// Return a pointer to alpha map data
-  uint8 *get_alphamap ()
-  { return alphamap; }
+  { }
 };
 
 /**
@@ -75,19 +54,7 @@ public:
 class csTextureHandleNull : public csTextureHandle
 {
 protected:
-  /**
-   * Private colormap -> global colormap table
-   * For 16- and 32-bit modes this array contains a 256-element array
-   * of either shorts or longs to convert any image pixel from 8-bit
-   * paletted format to the native pixel format.
-   */
-  void *pal2glob;
-
-  /// The private palette
-  csRGBpixel palette [256];
-
-  /// Number of used colors in palette
-  int palette_size;
+  csString imageName;
 
   /// Is already prepared.
   bool prepared;
@@ -99,7 +66,8 @@ protected:
   csTexture *NewTexture (iImage *Image, bool ismipmap);
 
   /// Compute the mean color for the just-created texture
-  void ComputeMeanColor ();
+  void ComputeMeanColor (iImage* image);
+  void ComputeMeanColor () {}
 
 public:
   /// Create the mipmapped texture object
@@ -108,31 +76,12 @@ public:
   virtual ~csTextureHandleNull ();
 
   /**
-   * Create the [Private colormap] -> global colormap table.
-   * In 256-color modes we find the correspondense between private texture
-   * colormap and the global colormap; in truecolor modes we just build
-   * a [color index] -> [truecolor value] conversion table.
-   */
-  void remap_texture (csTextureManager *texman);
-
-  /// Query the private texture colormap
-  csRGBpixel *GetColorMap () { return palette; }
-  /// Query the number of colors in the colormap
-  int GetColorMapSize () { return palette_size; }
-
-  /// Query palette -> native format table
-  void *GetPaletteToGlobal () { return pal2glob; }
-
-  /**
    * Query if the texture has an alpha channel.<p>
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
   bool GetAlphaMap ()
-  { return !!((csTextureNull *)get_texture (0))->get_alphamap (); }
-
-  /// Prepare the texture for usage
-  void PrepareInt ();
+  { return false; }
 
   csAlphaMode::AlphaType GetAlphaType () { return csAlphaMode::alphaNone; }
 
@@ -142,7 +91,7 @@ public:
   { GetRendererDimensions (mw, mh, md); }
   void SetTextureTarget (int target) { }
   int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
-  const char* GetImageName () const { return image->GetName (); }
+  const char* GetImageName () const { return imageName; }
 };
 
 /**

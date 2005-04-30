@@ -9,6 +9,11 @@ chronological order.
 30-Apr-2005
 	- Eric Sunshine added csRef<>::operator< so that csRef<> can be used as
 	  the subject of csComparator<>, which uses operator< for comparisons.
+	- res changed the null renderer texture handle to not keep a ref to
+	  the image.
+	- res removed some unnecessary code from csNullGraphics3D::DrawPixmap(),
+	  which amounts to "everything" as the renderer is a "null" renderer
+	  after all.
 29-Apr-2005
 	- Eric Sunshine worked around flaw in SplitToList in helper.jam which
 	  made it entirely non-functional. The problem was that when Jam sees
