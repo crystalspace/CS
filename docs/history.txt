@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-May-2005
+	- res removed iTextureHandle->GetMeanColor() which was of questionable
+	  use.
+	- res removed the "SpecStrings.h quirk". The latest version of the
+	  Win32 Platform SDK seems to fix the issues, no macro redefinitions
+	  are reported.
+	- res removed the ARRAYSIZE macro from the opcode plugin as it 
+	  conflicted with a macro of the same name from the latest Platform 
+	  SDK.
 30-Apr-2005
 	- Eric Sunshine added csRef<>::operator< so that csRef<> can be used as
 	  the subject of csComparator<>, which uses operator< for comparisons.

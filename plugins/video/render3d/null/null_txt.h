@@ -65,10 +65,6 @@ protected:
   /// Create a new texture object
   csTexture *NewTexture (iImage *Image, bool ismipmap);
 
-  /// Compute the mean color for the just-created texture
-  void ComputeMeanColor (iImage* image);
-  void ComputeMeanColor () {}
-
 public:
   /// Create the mipmapped texture object
   csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);

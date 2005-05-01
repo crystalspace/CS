@@ -122,9 +122,6 @@ protected:
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
 
-  /// Helper function: Initialises according to given palette
-  void SetupFromPalette ();
-
   /// the texture manager
   csRef<csSoftwareTextureManager> texman;
 

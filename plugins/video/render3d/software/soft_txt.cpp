@@ -219,26 +219,6 @@ void csSoftwareTextureHandle::ComputeMeanColor ()
     }
 
   quant.End ();
-
-  SetupFromPalette ();
-}
-
-void csSoftwareTextureHandle::SetupFromPalette ()
-{
-  int i;
-  // Compute the mean color from the palette
-  csRGBpixel *src = palette;
-  unsigned r = 0, g = 0, b = 0;
-  for (i = palette_size; i > 0; i--)
-  {
-    csRGBpixel pix = *src++;
-    r += pix.red;
-    g += pix.green;
-    b += pix.blue;
-  }
-  mean_color.red   = r / palette_size;
-  mean_color.green = g / palette_size;
-  mean_color.blue  = b / palette_size;
 }
 
 void csSoftwareTextureHandle::remap_texture ()

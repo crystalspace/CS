@@ -167,8 +167,6 @@ public:
   void CreateMipMaps();
   void PrepareKeycolor (csRef<iImage>& image, const csRGBpixel& transp_color,
     csAlphaMode::AlphaType& alphaType);
-  void ComputeMeanColor (int w, int h, int d, csRGBpixel *src, 
-    const csRGBpixel* transp_color, csRGBpixel& mean_color);
   void CheckAlpha (int w, int h, int d, csRGBpixel *src, 
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
   csRef<iImage>& GetImage () { return image; }
@@ -255,9 +253,6 @@ public:
 
   /// Get the original image name
   virtual const char* GetImageName () const;
-
-  /// Get the mean color.
-  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData ();

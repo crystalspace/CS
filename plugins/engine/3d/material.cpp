@@ -123,15 +123,7 @@ csRGBcolor& csMaterial::GetFlatColor ()
   
 void csMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
 {
-  iTextureHandle* texh = GetTexture (nameDiffuseTexture);
-  if (useTextureMean && texh)
-  {
-    texh->GetMeanColor (oColor.red, oColor.green, oColor.blue);
-  }
-  else
-  {
-    oColor = GetFlatColor ();
-  }
+  oColor = GetFlatColor ();
 }
 
 float csMaterial::GetDiffuse ()

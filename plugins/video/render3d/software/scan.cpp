@@ -187,9 +187,7 @@ void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
   Scan.and_h = untxt->get_h_mask ();
   Scan.PaletteTable = texture->GetPaletteToGlobal ();
 
-  uint8 r, g, b;
-  texture->GetMeanColor (r, g, b);
-  Scan.FlatColor = g3d->GetDriver2D ()->FindRGB (r, g, b);
+  Scan.FlatColor = g3d->GetDriver2D ()->FindRGB (255, 255, 255);
 
   if (g3d->do_lighting)
   {

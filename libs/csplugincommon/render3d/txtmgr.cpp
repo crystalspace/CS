@@ -142,8 +142,6 @@ void csTextureHandle::CreateMipmaps ()
     tex [3] = NewTexture (i3, true);
     DG_LINK (this, tex[3]);
   }
-
-  ComputeMeanColor ();
 }
 
 void csTextureHandle::SetKeyColor (bool Enable)
@@ -171,13 +169,6 @@ void csTextureHandle::GetKeyColor (uint8 &r, uint8 &g, uint8 &b) const
 bool csTextureHandle::GetKeyColor () const
 {
   return transp;
-}
-
-void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b) const
-{
-  r = mean_color.red;
-  g = mean_color.green;
-  b = mean_color.blue;
 }
 
 bool csTextureHandle::GetRendererDimensions (int &mw, int &mh)

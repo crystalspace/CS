@@ -107,9 +107,8 @@
   #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1400)
     // Also note quirk in csconfig.h
 
-    #include "SpecStrings.h"	// See file for explanation
+    // Nothing else atm.
   #endif
-  
 #endif
 
 #ifndef WINVER

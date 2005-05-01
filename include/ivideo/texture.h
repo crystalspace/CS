@@ -139,9 +139,6 @@ struct iTextureHandle : public iBase
    */
   virtual const char* GetImageName () const = 0;
 
-  /// Get the mean color.
-  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const = 0;
-
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData () = 0;
 

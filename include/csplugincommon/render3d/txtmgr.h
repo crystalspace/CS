@@ -74,8 +74,6 @@ protected:
   bool transp;
   /// The transparent color
   csRGBpixel transp_color;
-  /// Mean color used when texture mapping is disabled.
-  csRGBpixel mean_color;
 
   csStringID texClass;
 public:
@@ -118,9 +116,6 @@ public:
   /// Create a new texture object (should be implemented by heirs)
   virtual csTexture* NewTexture (iImage *Image, bool ismipmap = false) = 0;
 
-  /// Compute the mean color for the just-created texture
-  virtual void ComputeMeanColor () = 0;
-
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data) { }
 
@@ -152,9 +147,6 @@ public:
   {
     GetRendererDimensions (w, h);
   }
-
-  /// Get the mean color.
-  virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b) const;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData ()

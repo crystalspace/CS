@@ -594,20 +594,9 @@ void csPortal::CheckFrustum (iFrustumView *lview,
       if (alpha)
       {
         float fr, fg, fb;
-        if (filter_texture)
-        {
-          uint8 mr, mg, mb;
-          filter_texture->GetMeanColor (mr, mg, mb);
-          fr = mr / 255.0f;
-          fg = mg / 255.0f;
-          fb = mb / 255.0f;
-        }
-        else
-        {
-          fr = filter_r;
-          fg = filter_g;
-          fb = filter_b;
-        }
+        fr = filter_r;
+        fg = filter_g;
+        fb = filter_b;
 
         restore_color = true;
         old_color = linfo->GetColor ();

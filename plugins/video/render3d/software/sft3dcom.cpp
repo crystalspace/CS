@@ -1565,10 +1565,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
   csRGBpixel color;
   iTextureHandle *txt_handle = poly.mat->GetTexture ();
-  if (txt_handle)
-    txt_handle->GetMeanColor (color.red, color.green, color.blue);
-  else
-    poly.mat->GetFlatColor (color);
+  poly.mat->GetFlatColor (color);
 
   /* @@@
   if (lm)
@@ -4863,9 +4860,10 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
       poly.flat_color_g = flatcol.green;
       poly.flat_color_b = flatcol.blue;
     }
-    else if (poly.tex_handle)
-      poly.tex_handle->GetMeanColor (poly.flat_color_r, poly.flat_color_g,
-	poly.flat_color_b);
+    else 
+    {
+      poly.flat_color_r = poly.flat_color_g = poly.flat_color_b = 255;
+    }
   }
 
   poly.use_fog = false;

@@ -232,12 +232,6 @@ const char* csGLTextureHandle::GetImageName () const
     return origName;
 }
 
-void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, 
-				      uint8 &blue) const
-{
-  red = green = blue = 0;
-}
-
 void *csGLTextureHandle::GetCacheData ()
 {
   return cachedata;
@@ -912,36 +906,6 @@ GLuint csGLTextureHandle::GetHandle ()
     SetNeedMips (false);
   }
   return Handle;
-}
-
-void csGLTextureHandle::ComputeMeanColor (int w, int h, int d, csRGBpixel *src,
-					  const csRGBpixel* transp_color,
-					  csRGBpixel& mean_color)
-{
-  int pixels = w * h * d;
-  unsigned r = 0, g = 0, b = 0;
-  CS_ASSERT (pixels > 0);
-  int count = pixels;
-  pixels = 0;
-  while (count--)
-  {
-    const csRGBpixel &pix = *src++;
-    if ((!transp_color || !transp_color->eq (pix)) && pix.alpha)
-    {
-      r += pix.red;
-      g += pix.green;
-      b += pix.blue;
-      pixels++;
-    }
-  }
-  if (pixels)
-  {
-    mean_color.red   = r / pixels;
-    mean_color.green = g / pixels;
-    mean_color.blue  = b / pixels;
-  }
-  else
-    mean_color.red = mean_color.green = mean_color.blue = 0;
 }
 
 void csGLTextureHandle::CheckAlpha (int w, int h, int d, csRGBpixel *src, 

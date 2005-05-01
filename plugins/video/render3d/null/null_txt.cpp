@@ -39,7 +39,6 @@ csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   prepared = true;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
-  ComputeMeanColor (image);
   FreeImage(); // Bye bye. Don't need you any more
 }
 
@@ -52,48 +51,6 @@ csTextureHandleNull::~csTextureHandleNull ()
 csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool /*ismipmap*/)
 {
   return new csTextureNull (this, Image);
-}
-
-void csTextureHandleNull::ComputeMeanColor (iImage* image)
-{
-  int w = image->GetWidth();
-  int h = image->GetHeight();
-  int d = image->GetDepth();
-  const csRGBpixel *src = (csRGBpixel*)image->GetImageData();
-  csRGBpixel* transp_color = 0;
-  csRGBpixel keycolor;
-  if (image->HasKeyColor())
-  {
-    int r, g, b;
-    image->GetKeyColor (r, g, b);
-    keycolor.Set (r, g, b);
-    transp_color = &keycolor;
-  }
-
-  int pixels = w * h * d;
-  unsigned r = 0, g = 0, b = 0;
-  CS_ASSERT (pixels > 0);
-  int count = pixels;
-  pixels = 0;
-  while (count--)
-  {
-    const csRGBpixel &pix = *src++;
-    if ((!transp_color || !transp_color->eq (pix)) && pix.alpha)
-    {
-      r += pix.red;
-      g += pix.green;
-      b += pix.blue;
-      pixels++;
-    }
-  }
-  if (pixels)
-  {
-    mean_color.red   = r / pixels;
-    mean_color.green = g / pixels;
-    mean_color.blue  = b / pixels;
-  }
-  else
-    mean_color.red = mean_color.green = mean_color.blue = 0;
 }
 
 //----------------------------------------------- csTextureManagerNull ---//
