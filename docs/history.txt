@@ -38,6 +38,9 @@ chronological order.
 	  future.)
 	- Jorrit fixed a bug in the new csEventTimer->GetTimeLeft(). It wasn't
 	  correcting the return value for the accumulated elapsed time.
+	- Eric Sunshine fixed configure.ac so that it adds
+	  -fvisibility-inlines-hidden to C++FLAGS rather than CFLAGS since this
+	  is a C++-only option.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.

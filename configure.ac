@@ -763,7 +763,7 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is accepted],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],
-    [C++], [COMPILER.CFLAGS.optimize], [+])
+    [C++], [COMPILER.C++FLAGS.optimize], [+])
 
 
 

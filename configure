@@ -13055,7 +13055,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_visibility_inlines_hidden_ok" >&6
   cs_build_prop_val="$cs_cv_prog_cxx_visibility_inlines_hidden"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.optimize += \"$cs_build_prop_val\" ;
 "
 fi
 
