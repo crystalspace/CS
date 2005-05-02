@@ -326,6 +326,7 @@ error:
     fontdef.text_height = (int)(fontdef.Height * 1.75);
   }
 
+  csDefaultFont* newfont = 0;
   bool newStyleFont = (hasCharRanges | hasBitmapMetrics | hasGlyphAdvance);
   if (newStyleFont)
   {
@@ -459,7 +460,7 @@ error:
       alphaData.AttachNew (new csParasiticDataBuffer (fntfile, 
 	bitmapOffs + bitmapSize, alphaSize));
     }
-    return new csDefaultFont (this, fontdef.Name, ranges.GetArray (), 
+    newfont = new csDefaultFont (this, fontdef.Name, ranges.GetArray (), 
       fontdef.Height, ascent, descent, fontdef.text_height,
       fontdef.underline_position, fontdef.underline_thickness,
       gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
@@ -516,12 +517,13 @@ error:
       alphaData.AttachNew (new csParasiticDataBuffer (fntfile, 
 	binOffs + fontdefGlyphs + fontsize, alphasize));
     }
-    return new csDefaultFont (this, fontdef.Name, ranges, fontdef.Height,
+    newfont = new csDefaultFont (this, fontdef.Name, ranges, fontdef.Height,
       fontdef.Height - fontdef.Baseline, fontdef.Baseline, fontdef.text_height,
       fontdef.underline_position, fontdef.underline_thickness,
       gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
       alphaData, fontdefAlpha ? bMetrics.GetArray () : 0);
   }
+  return newfont;
 }
 
 
