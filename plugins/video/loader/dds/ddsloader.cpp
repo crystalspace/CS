@@ -180,7 +180,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
   if ((head.flags & minimumflags) != minimumflags)
     return 0;
 
-  uint bpp; 
+  uint bpp = 0;
   csDDSRawDataType dataType = IdentifyPixelFormat (head.pixelformat,
     bpp);
   if (dataType == csrawUnsupported)
