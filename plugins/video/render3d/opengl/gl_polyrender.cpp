@@ -44,7 +44,7 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
 {
   SCF_CONSTRUCT_IBASE(0);
   csGLPolygonRenderer::parent = parent;
-  renderBufferNum = ~0;
+  renderBufferNum = (uint)~0;
   polysNum = 0;
   buffer_accessor.AttachNew (new BufferAccessor(this));
   shadermanager = parent->shadermgr;
