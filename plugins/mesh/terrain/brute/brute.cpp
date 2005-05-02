@@ -102,7 +102,7 @@ csTerrBlock::csTerrBlock (csTerrainObject *terr)
   normal_data = 0;
   texcoord_data = 0;
   color_data = 0;
-  last_colorVersion = ~0;
+  last_colorVersion = (uint)~0;
 
   built = false;
 
@@ -209,7 +209,7 @@ void csTerrBlock::SetupMesh ()
     color_data[i].Set (0.5, 0.5, 0.5);
   }
   built = true;
-  last_colorVersion = ~0;
+  last_colorVersion = (uint)~0;
 }
 
 void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
@@ -1154,7 +1154,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   lmres = 257;
 
   colorVersion = 0;
-  last_colorVersion = ~0;
+  last_colorVersion = (uint)~0;
   dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
 
   baseContext = new csShaderVariableContext();
@@ -1394,7 +1394,7 @@ bool csTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
   delete[] cachename;
 
   bool rc = false;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lm", 0, ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lm", 0, (uint32)~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -1507,7 +1507,7 @@ bool csTerrainObject::WriteToCache (iCacheManager* cache_mgr)
 
 
   rc = cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    "bruteblock_lm", 0, ~0);
+    "bruteblock_lm", 0, (uint32)~0);
   cache_mgr->SetCurrentScope (0);
   return rc;
 }

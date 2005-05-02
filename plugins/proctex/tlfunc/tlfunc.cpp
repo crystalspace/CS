@@ -203,7 +203,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
   if (do_cache)
   {
     csRef<iDataBuffer> data = cache->ReadCache(cache_type,
-      cache_scope, ~0);
+      cache_scope, (uint32)~0);
 
     if (data)
     {
@@ -272,7 +272,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
     if (data.IsValid())
     {
       cache->CacheData (data->GetData(), data->GetSize(),
-	cache_type, cache_scope, ~0);
+	cache_type, cache_scope, (uint32)~0);
       cache->Flush ();
     }
   }
@@ -290,6 +290,4 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
   TexWrapper->SetImageFile (Image);
 
   return csPtr<iBase> (TexWrapper);
-
 }
-
