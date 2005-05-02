@@ -46,7 +46,7 @@ void litLightMapMapper::InitializeMapping (const csArray<csVector3>& poly,
   // PolyToLM() function.
   offset.Set (0, 0);
   // Now find the minimum u and v.
-  csVector2 min_uv;
+  csVector2 min_uv(0,0);
   PolyToLM (poly[0], min_uv);
   size_t i;
   for (i = 1 ; i < poly.Length () ; i++)
