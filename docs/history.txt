@@ -46,6 +46,8 @@ chronological order.
 	  a method 'uint GetHash() const' which is used. A side-effect of this
 	  change is that pointers (e.g. Foo*) can't be directly used as hash 
 	  keys any more; instead, csPtrKey<> must be used (e.g. csPtrKey<Foo>).
+	- res fixed a software renderer crash introduced with the 
+	  GetMeanColor() removal.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.

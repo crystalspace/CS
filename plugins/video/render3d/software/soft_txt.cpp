@@ -137,7 +137,7 @@ csTexture *csSoftwareTextureHandle::NewTexture (iImage *newImage,
   return new csSoftwareTexture (this, Image);
 }
 
-void csSoftwareTextureHandle::ComputeMeanColor ()
+void csSoftwareTextureHandle::ComputePalette ()
 {
   int i;
 
@@ -251,6 +251,7 @@ void csSoftwareTextureHandle::PrepareInt ()
   if (prepared) return;
   prepared = true;
   CreateMipmaps ();
+  ComputePalette();
   remap_texture ();
   FreeImage ();
 }

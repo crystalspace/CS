@@ -119,8 +119,8 @@ protected:
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
 
-  /// Compute the mean color for the just-created texture
-  virtual void ComputeMeanColor ();
+  /// Compute the palette for the just-created texture
+  virtual void ComputePalette ();
 
   /// the texture manager
   csRef<csSoftwareTextureManager> texman;
