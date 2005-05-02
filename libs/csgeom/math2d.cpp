@@ -76,7 +76,7 @@ bool csIntersect2::PlanePolygon (
   csVector2 &v2 = seg.End ();
   size_t i, i1;
   float c, c1;
-  csVector2 isect;
+  csVector2 isect(0.0,0.0);
   float dist;
   i1 = poly->GetVertexCount () - 1;
   c1 = plane.Classify ((*poly)[i1]);
