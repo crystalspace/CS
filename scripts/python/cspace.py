@@ -9703,7 +9703,6 @@ class iTextureHandle(iBase):
     def GetTextureTarget(*args): return _cspace.iTextureHandle_GetTextureTarget(*args)
     def Blit(*args): return _cspace.iTextureHandle_Blit(*args)
     def GetImageName(*args): return _cspace.iTextureHandle_GetImageName(*args)
-    def GetMeanColor(*args): return _cspace.iTextureHandle_GetMeanColor(*args)
     def GetCacheData(*args): return _cspace.iTextureHandle_GetCacheData(*args)
     def SetCacheData(*args): return _cspace.iTextureHandle_SetCacheData(*args)
     def GetPrivateObject(*args): return _cspace.iTextureHandle_GetPrivateObject(*args)
