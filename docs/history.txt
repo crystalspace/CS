@@ -26,6 +26,16 @@ chronological order.
 	- Jorrit fixed serious logical errors in the csEventTimer class.
 	  It was not handling accumulated elapsed time well after the first
 	  time.
+	- Eric Sunshine applied some more ugly 64-bit printf()-format directive
+	  hacks to csevent.cpp.
+	- Eric Sunshine eliminated all of the `#if' special-cases for the
+	  default csHashComputer<> by using uintptr_t as a common-denominator.
+	  Also added a csRef<> specialization of csHashComputer<> to make
+	  csRef<> work with the simplified default csHashComputer<>. (This was
+	  necessary in order to get csHashComputer<> working on 64-bit
+	  platforms, though Frank and I are discussing various other solutions,
+	  so this particular implementation detail may change in the near
+	  future.)
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.
