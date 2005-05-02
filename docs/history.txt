@@ -12,6 +12,11 @@ chronological order.
 	  explicit destructor invocation.
 	- Eric Sunshine resolved a bunch of compilation warnings and errors
 	  reported by gcc4.
+	- Eric Sunshine removed the ability to set the so-called `Apple' menu
+	  via csutil/macosx/OSXMenu and data/config/macosx.cfg.  Apparently,
+	  this feature has become obsolete in MacOS/X 10.4 and is no longer
+	  available in the Cocoa API (though I could not find any information
+	  about the deprecation in the Cocoa release notes).
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.

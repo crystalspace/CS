@@ -133,10 +133,9 @@ static void menu_add_item(NSMenu* menu, char const* key,
 // menu_add_submenu
 //	Looks up the named keys in the configuration file.  Recursively calls
 //	build_menu() to generate the submenu.  Pays particular attention to key
-//	"type" which, if present, may be one of "apple", "window", or
-//	"services".  A "type" qualification means that the menu should be
-//	configured as the NSApplication's Apple, Window, or Services menu,
-//	respectively.
+//	"type" which, if present, may be "window" or "services".  A "type"
+//	qualification means that the menu should be configured as the
+//	NSApplication's Window, or Services menu, respectively.
 //-----------------------------------------------------------------------------
 static void menu_add_submenu(NSMenu* menu, char const* name,
   OSXConfigHandle config, id assistant)
@@ -154,8 +153,6 @@ static void menu_add_submenu(NSMenu* menu, char const* name,
     if (type != 0)
     {
       STR_SWITCH (type)
-	STR_CASE (apple)
-	  [NSApp setAppleMenu:sub];
 	STR_CASE (window)
 	  [NSApp setWindowsMenu:sub];
 	STR_CASE (services)
