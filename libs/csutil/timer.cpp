@@ -150,7 +150,7 @@ bool csEventTimer::HandleEvent (iEvent& event)
 
 csTicks csEventTimer::GetTimeLeft (size_t idx) const
 {
-  return csTicks (timerevents[idx].time_left);
+  return csTicks (timerevents[idx].time_left-accumulate_elapsed);
 }
 
 size_t csEventTimer::FindTimerEvent (iTimerEvent* ev)

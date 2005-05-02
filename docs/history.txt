@@ -36,6 +36,8 @@ chronological order.
 	  platforms, though Frank and I are discussing various other solutions,
 	  so this particular implementation detail may change in the near
 	  future.)
+	- Jorrit fixed a bug in the new csEventTimer->GetTimeLeft(). It wasn't
+	  correcting the return value for the accumulated elapsed time.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.
