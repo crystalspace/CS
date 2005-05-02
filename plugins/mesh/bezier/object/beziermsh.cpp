@@ -1011,7 +1011,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
   }
 
   bool rc = true;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bezier_lm", 0, ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bezier_lm", 0, (uint32)~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -1059,7 +1059,7 @@ bool csBezierMesh::WriteToCache (iCacheManager* cache_mgr)
   for (i = 0; i < GetCurveCount (); i++)
     if (!curves.Get (i)->WriteToCache (&mf)) goto stop;
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    	"bezier_lm", 0, ~0))
+    	"bezier_lm", 0, (uint32)~0))
     goto stop;
 
   rc = true;
