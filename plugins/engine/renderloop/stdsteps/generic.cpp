@@ -398,7 +398,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   size_t lastidx = 0;
   size_t numSSM = 0;
   iShader* shader = 0;
-  size_t currentTicket = ~0;
+  size_t currentTicket = (size_t)~0;
 
   shadervars.Push (csShaderVariableContext ());
   shadervars.Top ().GetVariableAdd (string_object2world);
@@ -507,7 +507,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
       size_t newTicket = meshShader ? ticketHelper.GetTicket (
 	mesh->material->GetMaterial (), meshShader, 
-	sameShaderMeshSvcs[n], mesh) : ~0;
+	sameShaderMeshSvcs[n], mesh) : (size_t)~0;
       if ((meshShader != shader) || (newTicket != currentTicket))
       {
         // @@@ Need error reporter

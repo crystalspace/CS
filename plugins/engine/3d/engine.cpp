@@ -1446,7 +1446,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   iCacheManager* cm = GetCacheManager ();
   csRef<iDataBuffer> data = 0;
   if (lightcache_mode & CS_ENGINE_CACHE_READ)
-    data = cm->ReadCache ("lm_precalc_info", 0, ~0);
+    data = cm->ReadCache ("lm_precalc_info", 0, (uint32)~0);
 
   if (!data)
   {
@@ -1500,7 +1500,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
       current.lightmap_size);
     if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
     {
-      cm->CacheData (data.GetData(), data.Length(), "lm_precalc_info", 0, ~0);
+      cm->CacheData (data.GetData(), data.Length(), "lm_precalc_info", 0, (uint32)~0);
     }
     if (do_relight)
     {
