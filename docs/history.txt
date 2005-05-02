@@ -23,6 +23,9 @@ chronological order.
 	  (incompatible) `Point' types.
 	- Jorrit extended iEventTimer and csEventTimer with methods to query
 	  the number of events and how much time they need before firing.
+	- Jorrit fixed serious logical errors in the csEventTimer class.
+	  It was not handling accumulated elapsed time well after the first
+	  time.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.

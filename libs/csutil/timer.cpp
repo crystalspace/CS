@@ -143,6 +143,7 @@ bool csEventTimer::HandleEvent (iEvent& event)
       if (te.time_left < minimum_time) minimum_time = te.time_left;
     }
   }
+  accumulate_elapsed = 0;
 
   return true;
 }
@@ -170,7 +171,14 @@ void csEventTimer::AddTimerEvent (iTimerEvent* ev, csTicks delay)
   te.delay = delay;
   te.time_left = delay;
   timerevents.Push (te);
-  if (delay < (csTicks)minimum_time) minimum_time = delay;
+  if (minimum_time == 2000000000)
+  {
+    // Minimum time was equal to infinite. In that case we
+    // have to clear accumulate_elapsed.
+    minimum_time = delay;
+    accumulate_elapsed = 0;
+  }
+  else if (delay < (csTicks)minimum_time) minimum_time = delay;
 }
 
 void csEventTimer::RemoveTimerEvent (iTimerEvent* ev)
