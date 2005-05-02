@@ -158,7 +158,7 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
   {
     portal = 0;
     geometryInstance = 0;
-    lastFrame = ~0;
+    lastFrame = (uint)~0;
   }
 
   ~csRenderMesh () {}

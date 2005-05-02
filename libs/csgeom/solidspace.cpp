@@ -154,7 +154,7 @@ bool csSolidSpace::CheckBox (const csBox3& bbox, csSolidSpaceNode* node,
     {
       delete[] node->children;
       node->children = 0;
-      node->bits = ~0;
+      node->bits = (uint32)~0;
     }
     return true;
   }

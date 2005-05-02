@@ -471,7 +471,7 @@ static int blueloop (int restart)
 
 static void maxfill (uint32 *buffer, long rside, long gside, long bside)
 {
-  register uint32 maxv = ~0;
+  register uint32 maxv = (uint32)~0;
   register long i;
   register uint32* bp;
 
