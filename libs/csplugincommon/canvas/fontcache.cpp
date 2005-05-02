@@ -82,10 +82,11 @@ void csFontCache::PurgeEmptyPlanes ()
 {
   if (purgeableFonts.GetSize() == 0) return;
 
-  csSet<void*>::GlobalIterator fontIt (purgeableFonts.GetIterator ());
+  csSet<csPtrKey<KnownFont> >::GlobalIterator fontIt (
+    purgeableFonts.GetIterator ());
   while (fontIt.HasNext ())
   {
-    KnownFont* knownFont = (KnownFont*)fontIt.Next ();
+    csPtrKey<KnownFont> knownFont = fontIt.Next ();
 
     PlaneGlyphsArray& planeGlyphs = knownFont->planeGlyphs;
     for (size_t j = 0; j < planeGlyphs.Length(); j++)

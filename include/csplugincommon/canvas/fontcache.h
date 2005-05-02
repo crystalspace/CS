@@ -154,7 +154,7 @@ protected:
 
   /// Array of known fonts.
   csArray<KnownFont*> knownFonts;
-  csSet<void*> purgeableFonts;
+  csSet<csPtrKey<KnownFont> > purgeableFonts;
 
   /// Find an LRU entry for a specific font/glyph pair.
   LRUEntry* FindLRUEntry (KnownFont* font, utf32_char glyph);
