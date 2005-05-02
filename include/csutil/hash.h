@@ -50,8 +50,7 @@ CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*, size_t length);
 
 /**
  * Template for hash value computing.
- * Default implementation is suitable for integral types and types that can be 
- * casted to such.
+ * Expects that T has a method 'uint GetHash() const'.
  */
 template <class T>
 class csHashComputer
@@ -60,23 +59,96 @@ public:
   /// Compute a hash value for \a key.
   static uint ComputeHash (const T& key)
   {
-    // Cast to uintptr_t first to avoid compiler warnings about truncation.
-    return (unsigned int)((uintptr_t)key);
+    return key.GetHash();
   }
 };
 
 /**
- * Specialization for csRef<> of the default csHashComputer<> template.
+ * Template for hash value computing, suitable for integral types and types 
+ * that can be casted to such.
  */
-CS_SPECIALIZE_TEMPLATE
 template <class T>
-class csHashComputer< csRef<T> >
+class csHashComputerIntegral
 {
 public:
-  static uint ComputeHash (const csRef<T>& key)
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (const T& key)
   {
-    return (unsigned int)((uintptr_t)(T*)key);
+    return (uintptr_t)key;
   }
+};
+
+//@{
+/**
+ * csHashComputer<> specialization for an integral type.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<void*> : public csHashComputerIntegral<void*> {};
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<unsigned int> : 
+  public csHashComputerIntegral<unsigned int> {}; 
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<long> : public csHashComputerIntegral<long> {}; 
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<unsigned long> : 
+  public csHashComputerIntegral<unsigned long> {}; 
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<float>
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (float key)
+  {
+    union
+    {
+      float f;
+      uint u;
+    } float2uint;
+    float2uint.f = key;
+    return float2uint.u;
+  }
+};
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<double>
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (double key)
+  {
+    union
+    {
+      double f;
+      uint u;
+    } double2uint;
+    double2uint.f = key;
+    return double2uint.u;
+  }
+};
+//@}
+
+/**
+ * A helper template to use pointers as keys for hashes.
+ */
+template <typename T>
+class csPtrKey
+{
+  T* ptr;
+public:
+  csPtrKey () : ptr(0) {}
+  csPtrKey (T* ptr) : ptr(ptr) {}
+  csPtrKey (csPtrKey const& other) : ptr (other.ptr) {}
+
+  uint GetHash () const { return (uintptr_t)ptr; }
+  inline friend bool operator < (const csPtrKey& r1, const csPtrKey& r2)
+  { return r1.ptr < r2.ptr; }
+  operator T* () const
+  { return ptr; }
+  T* operator -> () const
+  { return ptr; }
+  csPtrKey& operator = (csPtrKey const& other)
+  { ptr = other.ptr; return *this; }
 };
 
 /**
@@ -143,27 +215,14 @@ public:
     return *this;
   }
   operator const char* () const { return str; }
+  uint GetHash() const { return csHashCompute (str); }
 };
-
-/**
- * csHashComputer<> specialization for csStrKey that uses csHashCompute().
- */
-CS_SPECIALIZE_TEMPLATE
-class csHashComputer<csStrKey> : public csHashComputerString<csStrKey> {};
 
 /**
  * csComparator<> specialization for csStrKey that uses strcmp().
  */
 CS_SPECIALIZE_TEMPLATE
 class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
-
-/**
- * csHashComputer<> specialization for csString that uses csHashCompute().
- */
-CS_SPECIALIZE_TEMPLATE
-class csHashComputer<csString> : public csHashComputerString<csString> {};
-CS_SPECIALIZE_TEMPLATE
-class csHashComputer<csStringBase> : public csHashComputerString<csStringBase> {};
 
 /**
  * A generic hash table class,

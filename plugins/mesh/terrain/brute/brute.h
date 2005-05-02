@@ -330,8 +330,8 @@ private:
   csColor dynamic_ambient;
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
-  csSet<iLight*> affecting_lights;
-  csHash<csShadowArray*, iLight*> pseudoDynInfo;
+  csSet<csPtrKey<iLight> > affecting_lights;
+  csHash<csShadowArray*, csPtrKey<iLight> > pseudoDynInfo;
   void UpdateColors ();
   //=============
 

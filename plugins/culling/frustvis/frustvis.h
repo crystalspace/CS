@@ -105,7 +105,7 @@ private:
 
   // This hash set holds references to csFrustVisObjectWrapper instances
   // that require updating in the culler.
-  csSet<csFrustVisObjectWrapper*> update_queue;
+  csSet<csPtrKey<csFrustVisObjectWrapper> > update_queue;
   // The 'updating' flag is true if the objects are being updated. This flag
   // is to prevent us from updating it again (if the callback is fired
   // again).

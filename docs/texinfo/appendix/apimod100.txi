@@ -1724,6 +1724,10 @@ into its own header file, @file{csutil/set.h}. The method
 @code{csSet<>::GetHash()} has likewise been removed since it unnecessarily
 exposed an underlying implementation detail of @code{csSet<>}.
 
+However, this implementation detail still affects the use of @code{csSet<>} as
+for storage of pointers in a @code{csSet<>} the @code{csPtrKey<>} wrapper must
+be used.
+
 @subheading @code{csHash<>} Changes
 
 The way @code{csHash<>} handles support for arbitrary key types has been
@@ -1735,9 +1739,16 @@ keys. Now, the hash computation is handled through the new
 types used as hash keys, specializations of the templates mentioned above are
 needed. Alternatively the default comparator uses the @samp{operator <} and
 @samp{operator >} operators, so you can also implement those operators instead
-of a @code{csComparator<>} specialization---however, @code{csHashComputer<>}
-still needs to be specialized. As a convenience, Crystal Space already provides
-specializations for the commonly used types @samp{csString}, @samp{const char*}
-and @samp{csStrKey}; and the default comparison semantics of @samp{operator <}
-and @samp{operator >} handle the remaining fundamental types and any composite
-types which provide these operators.
+of a @code{csComparator<>} specialization. The default @code{csHashComputer<>}
+implementation assumes that a type provides a @samp{GetHash()} method that
+computes the hash value for an object. However, this means that integral types 
+need a specialization. As a convenience, Crystal Space already provides 
+specializations of @code{csHashComputer<>} for a number of commonly used 
+intergrals. Further, @code{csComparator<>} and/or @code{csHashComputer<>} 
+specializations are provided for the commonly used types @samp{csString}, 
+@samp{const char*} and @samp{csStrKey}; and the default comparison semantics of 
+@samp{operator <} and @samp{operator >} handle the remaining fundamental types 
+and any composite types which provide these operators. Pointers (other than 
+@samp{void*} for which exists a specialization) as hash keys are a special 
+case: to use a pointer of type @samp{Foo*} as a hash key, employ 
+@samp{csPtrKey<Foo>} as the key type in the hash declaration. 

@@ -83,6 +83,10 @@ public:
   virtual void MovableDestroyed (iMovable*) { }
 };
 
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csPVSVisObjectWrapper*> : 
+  public csHashComputerIntegral<csPVSVisObjectWrapper*> {};
+
 /**
  * A PVS based visisibility culling system.
  */

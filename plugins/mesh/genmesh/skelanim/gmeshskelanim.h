@@ -264,7 +264,8 @@ struct sac_move_execution
 class csSkelAnimControlRunnable : public iGenMeshSkeletonScript
 {
 public:
-	typedef csHash<bone_transform_data*,csSkelBone*> TransformHash;
+	typedef csHash<bone_transform_data*, csPtrKey<csSkelBone> > 
+	  TransformHash;
 private:
 	csSkelAnimControlScript* script;
 	csGenmeshSkelAnimationControl* anim_control;

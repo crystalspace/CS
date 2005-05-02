@@ -1482,13 +1482,13 @@ bool csTerrainObject::WriteToCache (iCacheManager* cache_mgr)
   }
   uint8 c = 1;
 
-  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt (
+  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt (
     pseudoDynInfo.GetIterator ());
   while (pdlIt.HasNext ())
   {
     mf.Write ((char*)&c, sizeof (c));
 
-    iLight* l;
+    csPtrKey<iLight> l;
     csShadowArray* shadowArr = pdlIt.Next (l);
     const char* lid = l->GetLightID ();
     mf.Write ((char*)lid, 16);
@@ -1561,11 +1561,11 @@ void csTerrainObject::UpdateColors ()
     staticColors[i] = staticLights[i] + baseColor;
   }
 
-  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt =
+  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt =
 	pseudoDynInfo.GetIterator ();
   while (pdlIt.HasNext ())
   {
-    iLight* light;
+    csPtrKey<iLight> light;
     csShadowArray* shadowArr = pdlIt.Next (light);
     float* intensities = shadowArr->shadowmap;
     const csColor& lightcol = light->GetColor ();

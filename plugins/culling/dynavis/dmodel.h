@@ -148,7 +148,7 @@ public:
 class csObjectModelManager
 {
 private:
-  typedef csHash<csDynavisObjectModel*,iObjectModel*> ModelHash;
+  typedef csHash<csDynavisObjectModel*, csPtrKey<iObjectModel> > ModelHash;
   ModelHash models;
 
 public:

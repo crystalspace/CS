@@ -348,6 +348,9 @@ public:
   void Invalidate()
   { *this = (T*)0; }
 
+  /// Return a hash value for this smart pointer.
+  uint GetHash() const
+  { return (uintptr_t)obj;  }
 };
 
 #undef CSREF_TRACK_INCREF

@@ -1381,7 +1381,7 @@ bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
 
 void PVSCalcSector::MarkInvisible (PVSCalcNode* sourcenode,
 	PVSCalcNode* destnode,
-	csSet<PVSCalcNode*>& invisible_nodes)
+	csSet<csPtrKey<PVSCalcNode> >& invisible_nodes)
 {
   invisible_nodes.Add (destnode);
   pvstree->MarkInvisible (sourcenode->node, destnode->node);
@@ -1414,7 +1414,7 @@ void PVSCalcSector::MarkInvisible (PVSCalcNode* sourcenode,
 
 bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 	PVSCalcNode* destnode,
-	csSet<PVSCalcNode*>& invisible_nodes)
+	csSet<csPtrKey<PVSCalcNode> >& invisible_nodes)
 {
   // If sourcenode is equal to node then visibility is obvious. In that
   // case we don't proceed since all children of node will also be visible
@@ -1577,7 +1577,7 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 }
 
 void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
-	csSet<PVSCalcNode*> invisible_nodes, int& nodecounter)
+	csSet<csPtrKey<PVSCalcNode> > invisible_nodes, int& nodecounter)
 {
   nodecounter--;
   csTicks currenttime = csGetTicks ();
@@ -1705,7 +1705,7 @@ void PVSCalcSector::Calculate (bool do_quick)
   // node that we're currently considering. That means that those nodes
   // are automatically invisible for the children too and don't have
   // to be considered anymore.
-  csSet<PVSCalcNode*> invisible_nodes;
+  csSet<csPtrKey<PVSCalcNode> > invisible_nodes;
   int nodecounter = countnodes;
   starttime = csGetTicks ();
   total_invisnodes = 0;

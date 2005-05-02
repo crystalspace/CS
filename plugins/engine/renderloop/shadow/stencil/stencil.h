@@ -59,7 +59,7 @@ private:
     csRef<iRenderBuffer> shadow_index_buffer;
     int edge_start, index_range;
   };
-  csHash<csLightCacheEntry*, iLight*> lightcache;
+  csHash<csLightCacheEntry*, csPtrKey<iLight> > lightcache;
 
   csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> shadow_normal_buffer;
@@ -127,7 +127,8 @@ private:
   csRefArray<iLightRenderStep> steps;
 
   csArray<iMeshWrapper*> shadowMeshes;
-  csHash< csRef<csStencilShadowCacheEntry>, iMeshWrapper*> shadowcache;
+  csHash< csRef<csStencilShadowCacheEntry>, csPtrKey<iMeshWrapper> > 
+    shadowcache;
 
   void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
     iShader *shader, size_t shaderTicket, size_t pass);

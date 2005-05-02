@@ -150,12 +150,12 @@ csLightIterRenderStep::csLightIterRenderStep (
 
 csLightIterRenderStep::~csLightIterRenderStep ()
 {
-  csHash<LightSVAccessor*, iLight*>::GlobalIterator it =
+  csHash<LightSVAccessor*, csPtrKey<iLight> >::GlobalIterator it =
     knownLights.GetIterator();
 
   while (it.HasNext())
   {
-    iLight* light;
+    csPtrKey<iLight> light;
     LightSVAccessor* cb = it.Next (light);
     light->RemoveLightCallback (cb);
   }

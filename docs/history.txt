@@ -41,6 +41,11 @@ chronological order.
 	- Eric Sunshine fixed configure.ac so that it adds
 	  -fvisibility-inlines-hidden to C++FLAGS rather than CFLAGS since this
 	  is a C++-only option.
+	- res changed the way the default csHashComputer<> works; instead of
+	  casting the key value to an uint, it rather assumes the key type has
+	  a method 'uint GetHash() const' which is used. A side-effect of this
+	  change is that pointers (e.g. Foo*) can't be directly used as hash 
+	  keys any more; instead, csPtrKey<> must be used (e.g. csPtrKey<Foo>).
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.

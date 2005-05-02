@@ -127,7 +127,7 @@ private:
   };
   friend class LightSVAccessor;
 
-  csHash<LightSVAccessor*, iLight*> knownLights;
+  csHash<LightSVAccessor*, csPtrKey<iLight> > knownLights;
   csRef<iTextureHandle> attTex;
 
   LightSVAccessor* GetLightAccessor (iLight* light);

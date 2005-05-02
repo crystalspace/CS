@@ -41,7 +41,7 @@
 
 //---------------------------------------------------------------------------
 
-/*
+/**
  * Event handler that takes care of updating all procedural
  * textures that were visible last frame.
  */
@@ -50,7 +50,7 @@ class csProcTexEventHandler : public iEventHandler
 private:
   iObjectRegistry* object_reg;
   // Set of textures that needs updating next frame.
-  csSet<csProcTexture*> textures;
+  csSet<csPtrKey<csProcTexture> > textures;
 
 public:
   csProcTexEventHandler (iObjectRegistry* r)
@@ -86,11 +86,11 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
-  csSet<csProcTexture*> keep_tex;
+  csSet<csPtrKey<csProcTexture> > keep_tex;
   if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
   {
     {
-      csSet<csProcTexture*>::GlobalIterator it = textures.GetIterator();
+      csSet<csPtrKey<csProcTexture> >::GlobalIterator it = textures.GetIterator();
       while (it.HasNext ())
       {
         csProcTexture* pt = it.Next ();
@@ -105,7 +105,7 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
     }
     textures.DeleteAll ();
     // enqueue 'always animate' textures for next cycle
-    csSet<csProcTexture*>::GlobalIterator it = keep_tex.GetIterator();
+    csSet<csPtrKey<csProcTexture> >::GlobalIterator it = keep_tex.GetIterator();
     while (it.HasNext ())
     {
       csProcTexture* pt = it.Next ();

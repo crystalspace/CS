@@ -300,7 +300,7 @@ struct iSector : public iBase
    * by this list are portals that are on some mesh object that is
    * actually located in this sector.
    */
-  virtual const csSet<iMeshWrapper*>& GetPortalMeshes () const = 0;
+  virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const = 0;
   /**
    * Register a mesh with a portal. @@@ TO BE REMOVED...
    */

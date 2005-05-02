@@ -252,7 +252,7 @@ class csSoftSuperLightmap : public iSuperLightmap
   csRef<iTextureHandle> tex;
   void FreeRLM (csSoftRendererLightmap* rlm);
 
-  csHashReversible<csSoftRendererLightmap*, int> idmap;
+  csHashReversible<csPtrKey<csSoftRendererLightmap>, int> idmap;
 public:
   csSoftRendererLightmap* GetRlmForID (int id);
 

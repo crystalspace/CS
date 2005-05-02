@@ -277,7 +277,7 @@ void csGenmeshMeshObject::SetAnimationControl (
 
 void csGenmeshMeshObject::ClearPseudoDynLights ()
 {
-  csHash<csShadowArray*, iLight*>::GlobalIterator it (
+  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator it (
     pseudoDynInfo.GetIterator ());
   while (it.HasNext ())
   {
@@ -497,13 +497,13 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
   }
   uint8 c = 1;
 
-  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt (
+  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt (
     pseudoDynInfo.GetIterator ());
   while (pdlIt.HasNext ())
   {
     mf.Write ((char*)&c, sizeof (c));
 
-    iLight* l;
+    csPtrKey<iLight> l;
     csShadowArray* shadowArr = pdlIt.Next (l);
     const char* lid = l->GetLightID ();
     mf.Write ((char*)lid, 16);
@@ -939,17 +939,17 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
   }
 
   csReversibleTransform trans = movable->GetFullTransform ();
-  csSet<iLight*>::GlobalIterator it = affecting_lights.GetIterator ();
+  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.GetIterator ();
   while (it.HasNext ())
   {
     iLight* l = (iLight*)it.Next ();
     UpdateLightingOne (trans, l);
   }
-  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt =
+  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt =
     pseudoDynInfo.GetIterator ();
   while (pdlIt.HasNext ())
   {
-    iLight* l;
+    csPtrKey<iLight> l;
     csShadowArray* shadowArr = pdlIt.Next (l);
     csColor c = l->GetColor ();
     if (c.red > EPSILON || c.green > EPSILON || c.blue > EPSILON)

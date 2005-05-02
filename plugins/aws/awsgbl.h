@@ -88,7 +88,7 @@ private:
    * its gridbag constraints. The Keys in comptable are the components
    * and thevalues are the instances of GridBagConstraints.
    */
-  csHash<awsGridBagConstraints,iAwsComponent*> comptable;
+  csHash<awsGridBagConstraints, csPtrKey<iAwsComponent> > comptable;
 
   /**
    * This field holds a gridbag constraints instance containing the

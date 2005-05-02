@@ -118,7 +118,7 @@ private:
   /**
    * List of meshes that have portals that leave from this sector.
    */
-  csSet<iMeshWrapper*> portal_meshes;
+  csSet<csPtrKey<iMeshWrapper> > portal_meshes;
 
   /**
    * The same meshes above but each mesh in their own render priority
@@ -503,7 +503,7 @@ public:
   //----------------------------------------------------------------------
   // Portal stuff.
   //----------------------------------------------------------------------
-  const csSet<iMeshWrapper*>& GetPortalMeshes () const
+  const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
   { return portal_meshes; }
   void RegisterPortalMesh (iMeshWrapper* mesh);
   void UnregisterPortalMesh (iMeshWrapper* mesh);
@@ -599,7 +599,7 @@ public:
       scfParent->CheckFrustum (lview);
     }
 
-    virtual const csSet<iMeshWrapper*>& GetPortalMeshes () const
+    virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
     {
       return scfParent->GetPortalMeshes ();
     }

@@ -37,7 +37,7 @@ bool csEngineProcTex::LoadLevel ()
   csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   // load a map file to display
   vfs->PushDir ();
-  vfs->ChDir ("/lev/partsys/");
+  vfs->ChDir ("/lev/flarge/");
   bool Success = (loader->LoadMapFile ("world", false));
   vfs->PopDir ();
   if (!Success) return false;

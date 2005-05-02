@@ -400,7 +400,7 @@ private:
   iTextureHandle* render_context;
 
   /// Array of objects that want to die next frame (iMeshWrapper*).
-  csSet<iMeshWrapper*> want_to_die;
+  csSet<csPtrKey<iMeshWrapper> > want_to_die;
 
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   //csRadiosity* rad_debug;

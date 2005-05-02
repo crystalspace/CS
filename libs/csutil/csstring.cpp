@@ -33,6 +33,7 @@ extern "C"
 }
 #include "csutil/csstring.h"
 #include "csutil/formatter.h"
+#include "csutil/hash.h"
 
 csStringBase::~csStringBase ()
 {
@@ -565,4 +566,9 @@ csStringBase& csStringBase::PadCenter (size_t iNewSize, char iChar)
     p [Size] = '\0';
   }
   return *this;
+}
+
+uint csStringBase::GetHash() const
+{
+  return csHashCompute (GetData());
 }

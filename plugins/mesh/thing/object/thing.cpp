@@ -296,7 +296,7 @@ void csThingStatic::PrepareLMLayout ()
 {
   if (IsLmPrepared()) return;
 
-  csHash<csStaticPolyGroup*, iMaterialWrapper*> polysSorted;
+  csHash<csStaticPolyGroup*, csPtrKey<iMaterialWrapper> > polysSorted;
 
   int i;
   for (i = 0; i < (int)static_polygons.Length (); i++)
@@ -335,8 +335,8 @@ void csThingStatic::PrepareLMLayout ()
    */
   csArray<csStaticPolyGroup*> polys;
   {
-    csHash<csStaticPolyGroup*, iMaterialWrapper*>::GlobalIterator polyIt = 
-      polysSorted.GetIterator ();
+    csHash<csStaticPolyGroup*, csPtrKey<iMaterialWrapper> >::GlobalIterator 
+      polyIt = polysSorted.GetIterator ();
 
     while (polyIt.HasNext ())
     {
@@ -2585,7 +2585,8 @@ void csThing::PrepareLMs ()
   csThingObjectType* thing_type = static_data->thing_type;
   iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
 
-  csHash<csRef<iSuperLightmap>, csThingStatic::StaticSuperLM*> superLMs;
+  csHash<csRef<iSuperLightmap>, 
+    csPtrKey<csThingStatic::StaticSuperLM> > superLMs;
 
   size_t i;
   for (i = 0; i < static_data->litPolys.Length(); i++)

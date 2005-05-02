@@ -141,11 +141,11 @@ private:
   /// Dynamic ambient light assigned to this genmesh.
   csColor dynamic_ambient;
   uint32 ambient_version;
-  csHash<csShadowArray*, iLight*> pseudoDynInfo;
+  csHash<csShadowArray*, csPtrKey<iLight> > pseudoDynInfo;
 
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
-  csSet<iLight*> affecting_lights;
+  csSet<csPtrKey<iLight> > affecting_lights;
   // In case we are not using the iLightingInfo system then we
   // GetRenderMeshes() will updated the following array:
   csArray<iLight*> relevant_lights;

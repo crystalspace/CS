@@ -128,7 +128,7 @@ private:
   csRefArray<iLightRenderStep> steps;
 
   csArray<iMeshWrapper*> shadowMeshes;
-  csHash< csRef<csStencil2ShadowCacheEntry>, iMeshWrapper*> shadowcache;
+  csHash<csRef<csStencil2ShadowCacheEntry>, csPtrKey<iMeshWrapper> > shadowcache;
 
   void Report (int severity, const char* msg, ...);
 

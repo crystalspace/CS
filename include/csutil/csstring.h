@@ -863,6 +863,11 @@ public:
    */
   virtual char* Detach ()
   { char* d = Data; Data = 0; Size = 0; MaxSize = 0; return d; }
+  /**
+   * GetHash() as expected by the default csHashComputer<> implementation to
+   * allow use of csStrings as hash keys.
+   */
+  uint GetHash() const;
 };
 
 /// Concatenate a null-terminated C-string with a csStringBase.

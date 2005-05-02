@@ -177,7 +177,7 @@ protected:
   csConfigAccess config;
   iObjectRegistry *object_reg;
   bool verbose, superVerbose;
-  csHash<RenderBufferAux, iRenderBuffer*> bufferData;
+  csHash<RenderBufferAux, csPtrKey<iRenderBuffer> > bufferData;
 
   enum
   {

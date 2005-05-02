@@ -302,7 +302,8 @@ void csFrustumVis::UpdateObjects ()
 {
   updating = true;
   {
-    csSet<csFrustVisObjectWrapper*>::GlobalIterator it = update_queue.GetIterator ();
+    csSet<csPtrKey<csFrustVisObjectWrapper> >::GlobalIterator it = 
+      update_queue.GetIterator ();
     while (it.HasNext ())
     {
       csFrustVisObjectWrapper* vw = it.Next ();

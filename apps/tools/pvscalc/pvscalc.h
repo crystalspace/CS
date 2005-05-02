@@ -190,7 +190,7 @@ struct PVSCalcNode
   PVSPolygonNode* polygon_tree;
 
   // Invisible nodes for this node.
-  csSet<PVSCalcNode*> invisible_nodes;
+  csSet<csPtrKey<PVSCalcNode> > invisible_nodes;
   // If true we have calculated visibility information for this node.
   bool calculated_pvs;
   // How many nodes are represented by this node. For a leaf this will
@@ -457,7 +457,7 @@ private:
    * found invisible. Otherwise false.
    */
   bool RecurseDestNodes (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
-	csSet<PVSCalcNode*>& invisible_nodes);
+	csSet<csPtrKey<PVSCalcNode> >& invisible_nodes);
 
   /**
    * Help function to mark destnode to be invisible from sourcenode
@@ -465,7 +465,7 @@ private:
    * the invisible_nodes set.
    */
   void MarkInvisible (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
-	csSet<PVSCalcNode*>& invisible_nodes);
+	csSet<csPtrKey<PVSCalcNode> >& invisible_nodes);
 
   /**
    * Traverse the kdtree for source nodes and calculate the visibility set
@@ -475,7 +475,7 @@ private:
    * to be able to print out some progress.
    */
   void RecurseSourceNodes (PVSCalcNode* sourcenode,
-  	csSet<PVSCalcNode*> invisible_nodes, int& nodecounter);
+  	csSet<csPtrKey<PVSCalcNode> > invisible_nodes, int& nodecounter);
 
   /**
    * Collect all geometry from this mesh if static.

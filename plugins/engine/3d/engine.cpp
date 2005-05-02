@@ -2025,7 +2025,8 @@ void csEngine::ControlMeshes ()
   nextframe_pending = virtual_clock->GetCurrentTicks ();
 
   // Delete particle systems that self-destructed now.
-  csSet<iMeshWrapper*>::GlobalIterator it = want_to_die.GetIterator();
+  csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = 
+    want_to_die.GetIterator();
   while (it.HasNext ())
   {
     iMeshWrapper* mesh = it.Next ();

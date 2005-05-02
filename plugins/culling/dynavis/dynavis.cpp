@@ -453,8 +453,8 @@ void csDynaVis::UpdateObjects ()
 {
   updating = true;
   {
-    csSet<csVisibilityObjectWrapper*>::GlobalIterator it = update_queue.
-    	GetIterator ();
+    csSet<csPtrKey<csVisibilityObjectWrapper> >::GlobalIterator it = 
+      update_queue.GetIterator ();
     while (it.HasNext ())
     {
       csVisibilityObjectWrapper* vw = it.Next ();
