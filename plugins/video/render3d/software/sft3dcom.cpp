@@ -1418,13 +1418,15 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
 /*
  * For the four interpolation modes.
  */
-struct
+struct csSft3DCom
 {
   int step1, shift1;
   int step2, shift2;
   int step3, shift3;
   int step4, shift4;
-} inter_modes[4] =
+};
+
+static csSft3DCom inter_modes[4] =
 {
   { 128, 7, 64, 6, 32, 5, 16, 4 },      // Selective
   { 32, 5, 32, 5, 32, 5, 32, 5 },       // 32-steps
