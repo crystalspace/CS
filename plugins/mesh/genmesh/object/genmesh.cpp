@@ -410,7 +410,7 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   delete[] cachename;
 
   bool rc = false;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", 0, ~0);
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", 0, (uint32)~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
@@ -522,7 +522,7 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
 
 
   rc = cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    "genmesh_lm", 0, ~0);
+    "genmesh_lm", 0, (uint32)~0);
   cache_mgr->SetCurrentScope (0);
   return rc;
 }
@@ -627,7 +627,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     ac_normals = anim_ctrl->AnimatesNormals ();
   }
 
-  uint bufferMask = CS_BUFFER_ALL_MASK;
+  uint bufferMask = (uint)CS_BUFFER_ALL_MASK;
 
   size_t i;
   iStringSet* strings = factory->GetStrings();

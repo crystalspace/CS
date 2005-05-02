@@ -353,8 +353,8 @@ csGenmeshAnimationControl::csGenmeshAnimationControl (
   animated_verts = 0;
   animated_colors = 0;
 
-  last_update_time = ~0;
-  last_version_id = ~0;
+  last_update_time = (csTicks)~0;
+  last_version_id = (uint32)~0;
 
   animates_vertices = fact->AnimatesVertices ();
   animates_texels = fact->AnimatesTexels ();
@@ -425,7 +425,7 @@ void csGenmeshAnimationControl::UpdateArrays (int num_verts)
     animated_verts = new csVector3[num_verts];
     delete[] animated_colors;
     animated_colors = new csColor[num_verts];
-    last_version_id = ~0;
+    last_version_id = (uint32)~0;
   }
 }
 
@@ -675,7 +675,7 @@ size_t csGenmeshAnimationControlFactory::FindGroupIndex (
   for (i = 0 ; i < groups.Length () ; i++)
     if (strcmp (groups[i]->GetName (), groupname) == 0)
       return i;
-  return ~0;
+  return (size_t)~0;
 }
 
 const char* csGenmeshAnimationControlFactory::ParseGroup (iDocumentNode* node,

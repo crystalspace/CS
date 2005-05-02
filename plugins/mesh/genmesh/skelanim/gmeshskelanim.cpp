@@ -573,8 +573,8 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 	transformed_verts = 0;
 	animated_colors = 0;
 
-	last_update_time = ~0;
-	last_version_id = ~0;
+	last_update_time = (csTicks)~0;
+	last_version_id = (uint32)~0;
 
 	animates_vertices = fact->AnimatesVertices ();
 	animates_texels = fact->AnimatesTexels ();
@@ -676,7 +676,7 @@ void csGenmeshSkelAnimationControl::UpdateArrays (int num_verts)
 		delete[] animated_colors;
 		animated_colors = new csColor[num_verts];
 
-		last_version_id = ~0;
+		last_version_id = (uint32)~0;
 	}
 }
 
@@ -994,7 +994,7 @@ size_t csGenmeshSkelAnimationControlFactory::FindBoneIndex (
 	for (i = 0 ; i < bones.Length () ; i++)
 		if (strcmp (bones[i]->GetName (), bonename) == 0)
 			return i;
-	return ~0;
+	return (size_t)~0;
 }
 
 const char* csGenmeshSkelAnimationControlFactory::ParseBone (iDocumentNode* node,
