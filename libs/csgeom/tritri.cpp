@@ -442,7 +442,7 @@ bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
   float d1,d2;
   float du0,du1,du2,dv0,dv1,dv2;
   csVector3 D;
-  float isect1[2], isect2[2];
+  float isect1[2] = {0,0}, isect2[2] = {0,0};
   csVector3 isectpointA[2];
   csVector3 isectpointB[2];
   float du0du1,du0du2,dv0dv1,dv0dv2;

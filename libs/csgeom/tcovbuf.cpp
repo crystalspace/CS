@@ -2430,7 +2430,7 @@ bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data,
   for (ty = data.startrow ; ty <= data.endrow ; ty++)
   {
     bool do_vermask = false;
-    vermask = ~0;
+    vermask = (csTileCol)~0;
     if (ty == data.startrow && (data.bbox.miny & (NUM_TILEROW-1)) != 0)
     {
       vermask = csCoverageTile::precalc_end_lines[
@@ -2487,7 +2487,7 @@ bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data,
   for (ty = data.startrow ; ty <= data.endrow ; ty++)
   {
     bool do_vermask = false;
-    vermask = ~0;
+    vermask = (csTileCol)~0;
     if (ty == data.startrow && (data.bbox.miny & (NUM_TILEROW-1)) != 0)
     {
       vermask = csCoverageTile::precalc_end_lines[
