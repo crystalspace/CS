@@ -857,7 +857,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
 
-  str.Format ("Seed %zu\n", seed);
+  str.Format ("Seed %u\n", seed);
 
   //=================
   // Test if after Clear() the tree is sufficiently empty :-)
@@ -1144,10 +1144,10 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   csTicks pass4 = csGetTicks ();
 
-  csPrintf ("Creating the tree:        %zu ms\n", pass1-pass0);
-  csPrintf ("Unoptimized Front2Back:   %zu ms\n", pass2-pass1);
-  csPrintf ("Flatten + FullDistribute: %zu ms\n", pass3-pass2);
-  csPrintf ("Optimized Front2Back:     %zu ms\n", pass4-pass3);
+  csPrintf ("Creating the tree:        %u ms\n", pass1-pass0);
+  csPrintf ("Unoptimized Front2Back:   %u ms\n", pass2-pass1);
+  csPrintf ("Flatten + FullDistribute: %u ms\n", pass3-pass2);
+  csPrintf ("Optimized Front2Back:     %u ms\n", pass4-pass3);
 
   return pass4-pass0;
 }
