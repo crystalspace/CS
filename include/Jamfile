@@ -20,25 +20,24 @@ CS_MASTER_HEADER_REJECTS =
   [ Wildcard [ ConcatDirs csplugincommon macosx  ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon opengl  ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon win32   ] : *.h ]
-  [ ConcatDirs cstool   tokenlist.h         ]
-  [ ConcatDirs csutil   archive.h           ]
-  [ ConcatDirs csutil   csosdefs.h          ]
-  [ ConcatDirs csutil   getopt.h            ]
-  [ ConcatDirs csutil   zip.h               ]
-  [ ConcatDirs csutil   win32 SpecStrings.h ]
-  [ ConcatDirs imap     parser.h            ]
-  [ ConcatDirs inetwork vosapi.h            ]
-  [ ConcatDirs ivaria   ode.h               ]
-  [ ConcatDirs ivideo   wxwin.h             ]
+  [ ConcatDirs cstool   tokenlist.h ]
+  [ ConcatDirs csutil   archive.h   ]
+  [ ConcatDirs csutil   csosdefs.h  ]
+  [ ConcatDirs csutil   getopt.h    ]
+  [ ConcatDirs csutil   zip.h       ]
+  [ ConcatDirs imap     parser.h    ]
+  [ ConcatDirs inetwork vosapi.h    ]
+  [ ConcatDirs ivaria   ode.h       ]
+  [ ConcatDirs ivideo   wxwin.h     ]
   ;
 
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
-  [ ConcatDirs csgeom   subrec2.h      ]
-  [ ConcatDirs csutil   garray.h       ]
-  [ ConcatDirs csutil   hashhandlers.h ]
-  [ ConcatDirs csutil   objpool.h      ]
+  [ ConcatDirs csgeom subrec2.h      ]
+  [ ConcatDirs csutil garray.h       ]
+  [ ConcatDirs csutil hashhandlers.h ]
+  [ ConcatDirs csutil objpool.h      ]
   ;
 
 {
