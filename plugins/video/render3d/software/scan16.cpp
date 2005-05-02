@@ -627,9 +627,10 @@
     do									\
     {									\
       uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
-      *_dest++ = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
+      *_dest = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
       uu += duu;							\
       vv += dvv;							\
+      dest++;								\
     }									\
     while (_dest <= _destend)
 #include "scanln.inc"
@@ -647,11 +648,10 @@
     {									\
       uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
       if (tex)								\
-        *_dest++ = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
-      else								\
-        ++_dest;							\
+        *_dest = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
       uu += duu;							\
       vv += dvv;							\
+      dest++;								\
     }									\
     while (_dest <= _destend)
 #include "scanln.inc"

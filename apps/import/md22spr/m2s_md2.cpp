@@ -153,15 +153,14 @@ bool Md2::ReadMDLFile(const char* mdlfile)
 
   // read mdl header
   md2_t header;
-  memset(header, 0, sizeof(header));
   if (fread(&header, sizeof(md2_t), 1, f) != 1)
     return setError("Cannot read mdl header", f);
 
   // byteswap header
   int32 * ph = (int32*) &header;
   int32 * phe = ph + sizeof(md2_t) / sizeof(int32);
-  while (ph < phe)
-    *ph++ = csConvertEndian(*ph);
+  for ( ; ph < phe; ph++)
+    *ph = csConvertEndian(*ph);
 
   // skins ops
   fseek(f, header.ofsskins, SEEK_SET);
