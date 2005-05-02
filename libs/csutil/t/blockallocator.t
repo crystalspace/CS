@@ -17,7 +17,7 @@
 */
 
 #include "csutil/blockallocator.h"
-#include "csutil/hash.h"
+#include "csutil/set.h"
 
 /**
  * Test csBlockAllocator operations.
