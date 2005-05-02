@@ -296,7 +296,7 @@ void Name (void (*p)())                                                \
 
 #ifndef CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION
 #  define CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
-    CS_CRYSTALSPACE_EXPORT 							\
+    CS_CRYSTALSPACE_EXPORT 						\
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #endif
 
