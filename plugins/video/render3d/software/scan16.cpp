@@ -630,7 +630,7 @@
       *_dest = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
       uu += duu;							\
       vv += dvv;							\
-      dest++;								\
+      _dest++;								\
     }									\
     while (_dest <= _destend)
 #include "scanln.inc"
@@ -651,7 +651,7 @@
         *_dest = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
       uu += duu;							\
       vv += dvv;							\
-      dest++;								\
+      _dest++;								\
     }									\
     while (_dest <= _destend)
 #include "scanln.inc"
