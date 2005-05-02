@@ -26,6 +26,7 @@
 #include "csextern.h"
 #include "array.h"
 #include "comparator.h"
+#include "ref.h"
 #include "util.h"
 
 /**\addtogroup util_containers
@@ -59,23 +60,22 @@ public:
   /// Compute a hash value for \a key.
   static uint ComputeHash (const T& key)
   {
-#if (CS_PROCESSOR_SIZE == 32)
-#if (_MSC_VER >= 1300)
-    /*
-      VC7 with 64bit warnings complains about a pointer truncation when T is
-      a pointer. This isn't serious (as csHash<> does not rely on the hash of
-      a key alone to retrieve a value). The __w64 causes VC7 to not emit that
-      warning (on 32bit compilers at least).
-     */
-    // void* cast is to make csRef<>s work.
-    return (unsigned int __w64)(void*)key;  
-#else
-    return (unsigned int)(void*)key;  
-#endif
-#else
     // Cast to uintptr_t first to avoid compiler warnings about truncation.
-    return (unsigned int)((uintptr_t)(void*)key);
-#endif
+    return (unsigned int)((uintptr_t)key);
+  }
+};
+
+/**
+ * Specialization for csRef<> of the default csHashComputer<> template.
+ */
+CS_SPECIALIZE_TEMPLATE
+template <class T>
+class csHashComputer< csRef<T> >
+{
+public:
+  static uint ComputeHash (csRef<T>& key)
+  {
+    return (unsigned int)((uintptr_t)(T*)key);
   }
 };
 
