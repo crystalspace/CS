@@ -73,7 +73,7 @@ template <class T>
 class csHashComputer< csRef<T> >
 {
 public:
-  static uint ComputeHash (csRef<T>& key)
+  static uint ComputeHash (const csRef<T>& key)
   {
     return (unsigned int)((uintptr_t)(T*)key);
   }
