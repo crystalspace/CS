@@ -44,7 +44,7 @@ csSoftwareTextureHandle::csSoftwareTextureHandle (
     AdjustSizePo2 ();
   this->texman = texman;
   use_332_palette = false;
-  update_number = ~0;
+  update_number = (uint32)~0;
   is_palette_init = false;
   prepared = false;
   palette_size = 256;

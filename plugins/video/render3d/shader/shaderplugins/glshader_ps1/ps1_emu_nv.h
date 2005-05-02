@@ -93,7 +93,7 @@ public:
   csShaderGLPS1_NV (csGLShader_PS1* shaderPlug)
     : csShaderGLPS1_Common(shaderPlug) 
   {
-    tex_program_num = ~0;
+    tex_program_num = (GLuint)~0;
   }
   virtual ~csShaderGLPS1_NV ()
   {
