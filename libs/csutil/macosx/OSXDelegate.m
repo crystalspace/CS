@@ -30,7 +30,6 @@
 #import <AppKit/NSMenu.h>
 #import <AppKit/NSView.h>
 #import <Foundation/NSAutoreleasePool.h>
-#import <Foundation/NSFileManager.h>
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSProcessInfo.h>
 #import <Foundation/NSString.h>

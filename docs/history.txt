@@ -17,6 +17,10 @@ chronological order.
 	  this feature has become obsolete in MacOS/X 10.4 and is no longer
 	  available in the Cocoa API (though I could not find any information
 	  about the deprecation in the Cocoa release notes).
+	- Eric Sunshine blindly worked around compilation error on MacOS/X 10.4
+	  where Apple-provided headers IOGraphicsTypes.h and MacTypes.h, which
+	  were being included indirectly by OSXDelegate.m, where both declaring
+	  (incompatible) `Point' types.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.
