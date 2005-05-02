@@ -6,7 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-01-May-2005
+2-May-2005
+ 	- Eric Sunshine fixed compilation error in MakeAString::~MakeAString()
+	  in gl_render3d.h where MSVC6 was not able to see through typedef in
+	  explicit destructor invocation.
+1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.
 	- res removed the "SpecStrings.h quirk". The latest version of the

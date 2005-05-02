@@ -108,7 +108,8 @@ public:
   }
   ~MakeAString()
   {
-    ((Formatter*)GetFormatter())->~Formatter();
+    ((Formatter*)GetFormatter())->~csPrintfFormatter<csStringFmtWriter,
+	csFmtDefaultReader<utf8_char> >();
   }
   const char* GetStr()
   {
