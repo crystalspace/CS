@@ -67,7 +67,7 @@ static const char* FBStatusStr (GLenum status)
     default:
       {
 	static csString msg;
-	msg.Format ("unknown %x", status);
+	msg.Format ("unknown %lx", (unsigned long)status);
 	return msg;
       }
   }
