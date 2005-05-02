@@ -122,7 +122,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       double rot_angle = 0;
       double x_scale = 1.0;
       double y_scale = 1.0;
-      CdVector3 v_tx_right, v_tx_up;
+      CdVector3 v_tx_right(0), v_tx_up(0);
 
       //Read the three vectors, that define the position of the plane
       if (!ReadVector(pParser, v1))       return false;
