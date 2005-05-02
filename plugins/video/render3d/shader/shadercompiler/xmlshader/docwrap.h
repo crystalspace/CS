@@ -34,8 +34,8 @@
 class csWrappedDocumentNodeIterator;
 
 typedef size_t csConditionID;
-const csConditionID csCondAlwaysFalse = ~0;
-const csConditionID csCondAlwaysTrue = ~1;
+const csConditionID csCondAlwaysFalse = (csConditionID)~0;
+const csConditionID csCondAlwaysTrue = (csConditionID)~1;
 
 struct csConditionNode;
 class csWrappedDocumentNodeFactory;

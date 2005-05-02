@@ -51,7 +51,7 @@ int csXMLShaderTech::textureUnits[shaderPass::TEXTUREMAX];
 size_t csXMLShaderTech::lastTexturesCount;
 
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
-  passes(0), passesCount(0), currentPass(~0),
+  passes(0), passesCount(0), currentPass((size_t)~0),
   xmltokens (parent->compiler->xmltokens)
 {
   csXMLShaderTech::parent = parent;
@@ -633,7 +633,7 @@ bool csXMLShaderTech::DeactivatePass ()
   if(currentPass>=passesCount)
     return false;
   shaderPass *thispass = &passes[currentPass];
-  currentPass = ~0;
+  currentPass = (size_t)~0;
 
   if(thispass->vproc) thispass->vproc->Deactivate ();
   if(thispass->vp) thispass->vp->Deactivate ();
