@@ -153,6 +153,7 @@ bool Md2::ReadMDLFile(const char* mdlfile)
 
   // read mdl header
   md2_t header;
+  memset(header, 0, sizeof(header));
   if (fread(&header, sizeof(md2_t), 1, f) != 1)
     return setError("Cannot read mdl header", f);
 
