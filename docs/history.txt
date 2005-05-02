@@ -10,6 +10,8 @@ chronological order.
  	- Eric Sunshine fixed compilation error in MakeAString::~MakeAString()
 	  in gl_render3d.h where MSVC6 was not able to see through typedef in
 	  explicit destructor invocation.
+	- Eric Sunshine resolved a bunch of compilation warnings and errors
+	  reported by gcc4.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.
@@ -24,9 +26,9 @@ chronological order.
 	  the subject of csComparator<>, which uses operator< for comparisons.
 	- res changed the null renderer texture handle to not keep a ref to
 	  the image.
-	- res removed some unnecessary code from csNullGraphics3D::DrawPixmap(),
-	  which amounts to "everything" as the renderer is a "null" renderer
-	  after all.
+	- res removed some unnecessary code from
+	  csNullGraphics3D::DrawPixmap(), which amounts to "everything" as the
+	  renderer is a "null" renderer after all.
 29-Apr-2005
 	- Eric Sunshine worked around flaw in SplitToList in helper.jam which
 	  made it entirely non-functional. The problem was that when Jam sees
