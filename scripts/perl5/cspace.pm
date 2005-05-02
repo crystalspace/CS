@@ -10709,7 +10709,6 @@ package cspace::iTextureHandle;
 *GetTextureTarget = *cspacec::iTextureHandle_GetTextureTarget;
 *Blit = *cspacec::iTextureHandle_Blit;
 *GetImageName = *cspacec::iTextureHandle_GetImageName;
-*GetMeanColor = *cspacec::iTextureHandle_GetMeanColor;
 *GetCacheData = *cspacec::iTextureHandle_GetCacheData;
 *SetCacheData = *cspacec::iTextureHandle_SetCacheData;
 *GetPrivateObject = *cspacec::iTextureHandle_GetPrivateObject;
