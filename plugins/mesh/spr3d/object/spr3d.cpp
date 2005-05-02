@@ -1349,9 +1349,7 @@ void csSprite3DMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-
-    bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_ALL_MASK);
-
+    bufferHolder->SetAccessor (scfiRenderBufferAccessor, (uint32)CS_BUFFER_ALL_MASK);
     InitSprite ();
   }
 }

@@ -248,7 +248,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor (this));
 
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, ~0);  
+  bufferHolder->SetAccessor (scfiRenderBufferAccessor, (uint32)~0);
 
   csShaderVariable* sv;
   sv = svcontext->GetVariableAdd (radius_name);

@@ -128,7 +128,7 @@ void csSprite2DMeshObject::SetupObject ()
     bufferHolder.AttachNew (new csRenderBufferHolder);
     csRef<iRenderBufferAccessor> newAccessor;
     newAccessor.AttachNew (new eiRenderBufferAccessor (this));
-    bufferHolder->SetAccessor (newAccessor, CS_BUFFER_ALL_MASK);
+    bufferHolder->SetAccessor (newAccessor, (uint32)CS_BUFFER_ALL_MASK);
     svcontext.AttachNew (new csShaderVariableContext);
   }
 }
