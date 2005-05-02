@@ -23,13 +23,12 @@
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
 #include "csutil/datastrm.h"
+#include "csutil/csendian.h"
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
 #include "csutil/parray.h"
 #include "csutil/util.h"
-
-// all int's in an MD2 file are little endian
-#include "csutil/csendian.h"
+#include <ctype.h>
 
 // upper bound onsize of biggest data element (vertex, polygon) in an MD2 file
 static int const MAX_DATAELEMENT_SIZE = 8192;
@@ -214,9 +213,8 @@ static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
 
 static void extractActionName (const char * str, char * act)
 {
-  unsigned i = 0;
-  while (str[i] > '9')
-    act[i++] = str[i];
+  for (size_t i = 0; str[i] != '\0' && !isdigit(str[i]); i++)
+    act[i] = str[i];
   act[i] = 0;
 }
 
