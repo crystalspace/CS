@@ -213,7 +213,8 @@ static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
 
 static void extractActionName (const char * str, char * act)
 {
-  for (size_t i = 0; str[i] != '\0' && !isdigit(str[i]); i++)
+  size_t i;
+  for (i = 0; str[i] != '\0' && !isdigit(str[i]); i++)
     act[i] = str[i];
   act[i] = 0;
 }
