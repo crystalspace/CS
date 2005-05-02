@@ -62,11 +62,13 @@ static void cmd_rpath (char *args);
 static void cmd_mounts (char *args);
 static void cmd_rmounts (char *args);
 
-struct
+struct VshCmdList;
 {
   const char *command;
   void (*handler) (char *args);
-} cmdlist [] =
+};
+
+VshCmdList cmdlist const [] =
 {
   { "?",       cmd_help    },
   { "cat",     cmd_cat     },
