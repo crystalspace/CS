@@ -41,7 +41,7 @@ csExactCuller::csExactCuller (int w, int h)
   z_buffer = new float[w*h];
   for (int i = 0 ; i < w*h ; i++)
   {
-    scr_buffer[i] = ~0;
+    scr_buffer[i] = (uint32)~0;
     z_buffer[i] = 1000000000000.0f;
   }
 

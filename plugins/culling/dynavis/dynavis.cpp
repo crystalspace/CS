@@ -3380,7 +3380,7 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
   if (dbghelp)
   {
     csTicks r = dbghelp->Benchmark (num_iterations);
-    csPrintf ("kdtree:   %zu ms\n", r);
+    csPrintf ("kdtree:   %u ms\n", r);
     rc += r;
   }
   delete kdtree;
