@@ -21,6 +21,8 @@ chronological order.
 	  where Apple-provided headers IOGraphicsTypes.h and MacTypes.h, which
 	  were being included indirectly by OSXDelegate.m, where both declaring
 	  (incompatible) `Point' types.
+	- Jorrit extended iEventTimer and csEventTimer with methods to query
+	  the number of events and how much time they need before firing.
 1-May-2005
 	- res removed iTextureHandle->GetMeanColor() which was of questionable
 	  use.

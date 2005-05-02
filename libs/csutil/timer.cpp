@@ -147,6 +147,11 @@ bool csEventTimer::HandleEvent (iEvent& event)
   return true;
 }
 
+csTicks csEventTimer::GetTimeLeft (size_t idx) const
+{
+  return csTicks (timerevents[idx].time_left);
+}
+
 size_t csEventTimer::FindTimerEvent (iTimerEvent* ev)
 {
   size_t i;

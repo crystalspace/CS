@@ -63,6 +63,9 @@ public:
   virtual void RemoveTimerEvent (iTimerEvent* ev);
   virtual void RemoveAllTimerEvents ();
 
+  virtual size_t GetEventCount () const { return timerevents.Length (); }
+  virtual csTicks GetTimeLeft (size_t idx) const;
+
   /**
    * This is a static method to easily get the standard
    * global timer (name 'crystalspace.timer.standard' in the object

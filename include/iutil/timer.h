@@ -53,6 +53,12 @@ struct iEventTimer : public iBase
 
   /// Clear all timer events.
   virtual void RemoveAllTimerEvents () = 0;
+
+  /// Query the number of events still in the queue.
+  virtual size_t GetEventCount () const = 0;
+
+  /// Query the number of ticks before the specified event fires.
+  virtual csTicks GetTimeLeft (size_t idx) const = 0;
 };
 
 #endif // __CS_IUTIL_TIMER_H__
