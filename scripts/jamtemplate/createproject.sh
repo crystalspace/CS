@@ -205,7 +205,7 @@ cat << __EOF__
 
 **** Dependencies
 The Crystal Entity Layer (CEL) is a set of classes and modules which layer
-game-oriented facilities atop Crystal Space. (http://cel.sourceforge.net/)
+game-oriented facilities atop Crystal Space. (http://cel.crystalspace3d.org/)
 The Autoconf configuration script and Jam build system can be set up to work
 with CEL if your project will utilize this SDK.
 

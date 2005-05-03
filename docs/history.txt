@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-May-2005
+	- Eric Sunshine updated various resources to point at Crystal Entity
+	  Layer's new official domain cel.crystalspace3d.org.  (We also respond
+	  to cel.crystalspace3d.net and cel.crystalspace3d.com.)
 2-May-2005
  	- Eric Sunshine fixed compilation error in MakeAString::~MakeAString()
 	  in gl_render3d.h where MSVC6 was not able to see through typedef in
