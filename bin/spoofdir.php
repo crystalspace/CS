@@ -435,8 +435,8 @@ $ignore['^index\..+$'     ] = true;
 $ignore["^$prog_name\$"   ] = true;
 $ignore["^$globalconfig\$"] = true;
 $ignore["^$localconfig\$" ] = true;
-$ignore['^CVS\$'          ] = true;
-$ignore['^RCS\$'          ] = true;
+$ignore['^CVS$'           ] = true;
+$ignore['^RCS$'           ] = true;
 $ignore['^\.'             ] = true;
 
 $indexfile['^index.s?html?$'  ] = true; // index.htm, index.html, index.shtml
