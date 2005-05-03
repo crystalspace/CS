@@ -121,27 +121,22 @@ packprefix = "cs-"
 snapdir = "/home/crystal/www/htdocs/cvs-snapshots"
 checksumfile = "checksums.md5"
 checksumprog = "md5sum"
-keepsnapshots = 1
+keepsnapshots = 2
 keepdiffs = 14
 keeplogs = 14
-workdir = "/home/crystal"
+workdir = "/tmp"
 warnlevel = 0
 
 archivers = (
+    {"name": "gzip",
+     "dir": {"ext": "tgz", "cmd": "tar --create --file=- @S | gzip > @D"},
+     "file": {"ext": "gz", "cmd": "gzip --stdout @S > @D"}},
     {"name": "bzip2",
      "dir": {"ext": "tar.bz2", "cmd": "tar --create --file=- @S | bzip2 > @D"},
-     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},)
-
-#archivers = (
-#    {"name": "gzip",
-#     "dir": {"ext": "tgz", "cmd": "tar --create --file=- @S | gzip > @D"},
-#     "file": {"ext": "gz", "cmd": "gzip --stdout @S > @D"}},
-#    {"name": "bzip2",
-#     "dir": {"ext": "tar.bz2", "cmd": "tar --create --file=- @S | bzip2 > @D"},
-#     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},
-#    {"name": "zip",
-#     "dir": {"ext": "zip", "cmd": "zip -q -r @D @S"},
-#     "file": {"ext": "zip", "cmd": "zip -q @D @S"}})
+     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},
+    {"name": "zip",
+     "dir": {"ext": "zip", "cmd": "zip -q -r @D @S"},
+     "file": {"ext": "zip", "cmd": "zip -q @D @S"}})
 
 #------------------------------------------------------------------------------
 # Directory Stack Class
