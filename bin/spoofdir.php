@@ -104,7 +104,7 @@
 //-----------------------------------------------------------------------------
 
 $prog_name = 'spoofdir.php';
-$prog_version = '8';
+$prog_version = '9';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 
@@ -435,8 +435,9 @@ $ignore['^index\..+$'     ] = true;
 $ignore["^$prog_name\$"   ] = true;
 $ignore["^$globalconfig\$"] = true;
 $ignore["^$localconfig\$" ] = true;
-$ignore['^CVS$'           ] = true;
-$ignore['^RCS$'           ] = true;
+$ignore['^CVS\$'          ] = true;
+$ignore['^RCS\$'          ] = true;
+$ignore['^\.'             ] = true;
 
 $indexfile['^index.s?html?$'  ] = true; // index.htm, index.html, index.shtml
 $indexfile['^index.php[1-9]?$'] = true; // index.php, index.php3, index.php4
