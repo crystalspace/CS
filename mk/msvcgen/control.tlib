@@ -49,7 +49,7 @@ groups = [
 #------------------------------------------------------------------------------
 # Each project file can support multiple build configurations, such as Release
 # and Debug.  The builds[] array of hashes defines the build modes which will
-# appear in the project file.  Each hash provide fine-grained control of
+# appear in the project file.  Each hash provides fine-grained control of
 # settings specific to a particular build modes.  Other than `tag', `name', and
 # `priority', the hash keys are fairly arbitrary.  The remaining keys are
 # accessed by the compose() macro (macros.tlib) based upon an essentially
