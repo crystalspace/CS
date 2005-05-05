@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-May-2005
+	- res fixed a VC7.0 linking error related to 
+	  csColliderHelper::InitializeCollisionWrapper(). (See collider.h for
+	  details.)
 3-May-2005
 	- Eric Sunshine updated various resources to point at Crystal Entity
 	  Layer's new official domain cel.crystalspace3d.org.  (We also respond

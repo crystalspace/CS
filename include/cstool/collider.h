@@ -38,6 +38,19 @@ struct iRegion;
 struct iMeshWrapper;
 struct iSector;
 
+/* The 'class csColliderWrapper' is here to work around a VC7.0 issue. It 
+ * seems that, depending on whether VC7.0 sees a compound declared as
+ * 'struct' or 'class' first, it sometimes generated different decorated
+ * symbol names. 'csColliderWrapper' is a class, so commonly, in headers
+ * etc. it would be forward-declared as 'class csColliderWrapper'. However,
+ * the SCF_VERSION causes a forward declaration as a 'struct', with the
+ * consequence that when csColliderWrapper was not already forward-declared
+ * all decorated name will refer to 'struct csColliderWrapper' in some files.
+ * But possibly, when forward-declaration was used, 'class csColliderWrapper'
+ * will be used in other objects, causing linking errors. This is worked
+ * around by having a 'class' forward declaration here.
+ */
+class csColliderWrapper;
 SCF_VERSION (csColliderWrapper, 0, 0, 3);
 
 /**
