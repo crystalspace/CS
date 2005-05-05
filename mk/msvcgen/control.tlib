@@ -29,7 +29,7 @@
 #        Provides a human-readable name for the group within the project file.
 #    types
 #        Regular expression controlling which files will be used to populate
-#        the group.  Filenames matching `types' will be including in the group.
+#        the group.  Filenames matching `types' will be included in the group.
 #------------------------------------------------------------------------------
 groups = [
   {
