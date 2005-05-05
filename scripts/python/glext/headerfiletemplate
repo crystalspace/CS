@@ -107,7 +107,7 @@ typedef void GLvoid;
 typedef int GLint;
 typedef uint GLuint;
 typedef int GLsizei;
-typedef enum GLenum;
+typedef uint GLenum;
 typedef float GLfloat;
 typedef double GLdouble;
 typedef unsigned char GLubyte;
