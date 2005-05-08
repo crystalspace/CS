@@ -43,7 +43,7 @@ private:
   csVosA3DL* vosa3dl;
   VUtil::vRef<csMetaSector> sectorvobj;
 
-  csSet <iVosObject3D *> loadedObjects;
+  csSet < csPtrKey<iVosObject3D> > loadedObjects;
 
   bool isLit;
   int waitingForChildren;
@@ -63,7 +63,7 @@ public:
 
   virtual VUtil::vRef<VOS::Vobject> GetVobject();
 
-  virtual const csSet<iVosObject3D*> &GetObject3Ds();
+  virtual const csSet< csPtrKey<iVosObject3D> > &GetObject3Ds();
 
   void addObject3D (iVosObject3D *obj);
   void removeObject3D (iVosObject3D *obj);

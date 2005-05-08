@@ -286,7 +286,7 @@ csVosSector::~csVosSector()
   SCF_DESTRUCT_IBASE();
 }
 
-const csSet<iVosObject3D*> &csVosSector::GetObject3Ds()
+const csSet< csPtrKey<iVosObject3D> > &csVosSector::GetObject3Ds()
 {
   return loadedObjects;
 }
