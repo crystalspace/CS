@@ -626,7 +626,7 @@ private:
     { return (iMaterialWrapper*)id; }
 #else
     int nextId;
-    csHashReversible<int, iMaterialWrapper*> matHash;
+    csHashReversible<int, csPtrKey<iMaterialWrapper> > matHash;
     MaterialToIdMapper() : nextId(0), matHash (7, 3) {}
 
     int GetIdForMaterial (iMaterialWrapper* mat)

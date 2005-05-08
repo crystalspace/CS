@@ -110,17 +110,16 @@ protected:
 
   csRenderMeshHolder rmHolder;
 
-  csRef<csRenderBufferHolder> bufferHolder;
   size_t VertexCount;
   size_t TriangleCount;
-  csVector3* vertices;
-  csVector2* texels;
-  csColor* colors;
-
-  csRef<iRenderBuffer> vertex_buffer;
-  csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> normal_buffer;
-  csRef<iRenderBuffer> color_buffer;
+  struct PerFrameData
+  {
+    csRef<csRenderBufferHolder> bufferHolder;
+    csRef<iRenderBuffer> vertex_buffer;
+    csRef<iRenderBuffer> texel_buffer;
+    csRef<iRenderBuffer> color_buffer;
+  };
+  csFrameDataHolder<PerFrameData> perFrameHolder;
   csRef<iRenderBuffer> index_buffer;
 
   csRef<iGraphics3D> g3d;

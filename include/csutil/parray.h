@@ -94,7 +94,7 @@ public:
    * from the array and returned. You are responsible for deleting the
    * pointer later.
    */
-  T* Extract (int n)
+  T* Extract (size_t n)
   {
     T* ret = GetAndClear (n);
     this->DeleteIndex (n); // see *1*

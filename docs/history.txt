@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-May-2005
+	- res made the following changes:
+	    - Fixed a 64-bit compilation error in sprcal3d.
+	    - Changed the GL renderer to query the maximum clip plane number
+	      from GL instead of using a hardcoded 6.
+	    - Fixed phystut to use the correct csString::FormatV() instead of
+	      Format() in one place.
+	    - Fixed csParticleSystem to correctly support mesh objects being 
+	      rendered multiple times a frame.
+	    - Fixed an use of 'int' instead of 'size_t' in csPDelArray.
 5-May-2005
 	- res fixed a VC7.0 linking error related to 
 	  csColliderHelper::InitializeCollisionWrapper(). (See collider.h for

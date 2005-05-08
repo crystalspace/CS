@@ -488,6 +488,9 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
 {
   if (!(add_clipper || add_near_clip || add_z_clip)) return 0;
 
+  GLRENDER3D_OUTPUT_STRING_MARKER(("(%d, %d, %d)", (int)add_clipper, 
+    (int)add_near_clip, (int)add_z_clip));
+
   statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity ();
@@ -619,7 +622,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // If one of the following flags is true then this means
   // that we will have to do plane clipping using glClipPlane for the near
   // or z=0 plane.
-  bool do_plane_clipping = (do_near_plane && clip_plane != CS_CLIP_NOT);
+  bool do_plane_clipping = (do_near_plane && (clip_plane != CS_CLIP_NOT));
   bool do_z_plane_clipping = (clip_z_plane != CS_CLIP_NOT);
 
   bool m_prefer_stencil = (stencil_threshold >= 0) && 
@@ -629,14 +632,15 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // z-plane clipping and/or near-plane clipping. These additional planes
   // will not be usable for portal clipping (if we're using OpenGL plane
   // clipping).
-  size_t reserved_planes = int (do_plane_clipping) + int (do_z_plane_clipping);
+  int reserved_planes = int (do_plane_clipping) + int (do_z_plane_clipping);
 
   if (clip_portal != CS_CLIP_NOT)//@@@??? && cliptype != CS_CLIPPER_OPTIONAL)
   {
     // Some clipping may be required.
     if (m_prefer_stencil)
       clip_with_stencil = true;
-    else if (clipper && (clipper->GetVertexCount () > 6-reserved_planes))
+    else if (clipper && 
+      (clipper->GetVertexCount () > (size_t)(maxClipPlanes - reserved_planes)))
     {
       if (broken_stencil || !stencil_clipping_available)
       {
@@ -677,8 +681,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     for (int i = 0 ; i < planes ; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
-  // @@@ Hard coded max number of planes (6). Maybe not so good.
-  for (int i = planes ; i < 6 ; i++)
+  for (int i = planes ; i < maxClipPlanes; i++)
     glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 }
 
@@ -859,6 +862,8 @@ bool csGLGraphics3D::Open ()
     glGetIntegerv (GL_ALPHA_BITS, &abits);
     rendercaps.DestinationAlpha = abits > 0;
   }
+
+  glGetIntegerv (GL_MAX_CLIP_PLANES, &maxClipPlanes);
 
   // check for support of VBO
   vbo_thresshold = config->GetInt ("Video.OpenGL.VBOThresshold", 0);

@@ -672,7 +672,7 @@ void Simple::Write(int x,int y,int fg,int bg,const char *str,...)
   csString buf;
 
   va_start (arg,str);
-  buf.Format (str, arg);
+  buf.FormatV (str, arg);
   va_end (arg);
 
   g2d->Write (courierFont, x, y, fg, bg, buf);

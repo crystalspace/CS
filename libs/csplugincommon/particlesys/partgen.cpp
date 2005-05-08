@@ -98,19 +98,11 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
-  vertices = 0;
-  texels = 0;
-  colors = 0;
   part_sides = 0;
-
 }
 
 csParticleSystem::~csParticleSystem()
 {
-  delete[] vertices;
-  delete[] texels;
-  delete[] colors;
-
   if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -134,22 +126,6 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
   VertexCount = number * part_sides;
   TriangleCount = number * (part_sides-2);
 
-  delete[] texels;
-  texels = new csVector2 [VertexCount];
-  delete[] colors;
-  colors = new csColor [VertexCount];
-  delete[] vertices;
-  vertices = new csVector3 [VertexCount];
-
-  vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-        VertexCount, CS_BUF_DYNAMIC, 
-        CS_BUFCOMP_FLOAT, 3);
-  texel_buffer = csRenderBuffer::CreateRenderBuffer (
-        VertexCount, CS_BUF_DYNAMIC, 
-        CS_BUFCOMP_FLOAT, 2);
-  color_buffer = csRenderBuffer::CreateRenderBuffer (
-        VertexCount, CS_BUF_DYNAMIC,
-        CS_BUFCOMP_FLOAT, 3);
   index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
         TriangleCount*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, VertexCount - 1);
@@ -170,13 +146,6 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
       }
     }
   }
-
-  bufferHolder.AttachNew (new csRenderBufferHolder);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
-
 }
 
 void csParticleSystem::RemoveParticles ()
@@ -356,10 +325,39 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 
   SetupBuffers (sprite2ds[0]->GetVertices ().Length ());
 
+  const uint currentFrame = rview->GetCurrentFrameNumber ();
+
+  bool frameDataCreated;
+  PerFrameData& frameData = perFrameHolder.GetUnusedData (frameDataCreated,
+    currentFrame);
+  if (frameDataCreated 
+    || (frameData.vertex_buffer->GetElementCount() != (uint)VertexCount))
+  {
+    frameData.vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+      VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+    frameData.texel_buffer = csRenderBuffer::CreateRenderBuffer (
+      VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2);
+    frameData.color_buffer = csRenderBuffer::CreateRenderBuffer (
+      VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+
+    frameData.bufferHolder.AttachNew (new csRenderBufferHolder);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 
+      frameData.vertex_buffer);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 
+      frameData.texel_buffer);
+    frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 
+      frameData.color_buffer);
+  }
+
   size_t i;
-  csColor* c = colors;
-  csVector3* vt = vertices;
-  csVector2* txt = texels;
+  //csColor* c = colors;
+  //csVector3* vt = vertices;
+  //csVector2* txt = texels;
+  size_t p = 0;
+  csRenderBufferLock<csColor> c (frameData.color_buffer);
+  csRenderBufferLock<csVector3> vt (frameData.vertex_buffer);
+  csRenderBufferLock<csVector2> txt (frameData.texel_buffer);
   for (i = 0 ; i < sprite2ds.Length () ; i++)
   {
     csColoredVertices& sprvt = sprite2ds[i]->GetVertices ();
@@ -369,30 +367,27 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     size_t j;
     for (j = 0 ; j < part_sides ; j++)
     {
-      *vt++ = pos + csVector3 (sprvt[j].pos.x, sprvt[j].pos.y, 0);
-      *c++ = sprvt[j].color;
-      (*txt++).Set (sprvt[j].u, sprvt[j].v);
+      vt[p] = pos + csVector3 (sprvt[j].pos.x, sprvt[j].pos.y, 0); 
+      c[p] = sprvt[j].color;
+      txt[p].Set (sprvt[j].u, sprvt[j].v);
+      p++;
     }
   }
 
   iMaterialWrapper* m = sprite2ds[0]->GetMaterialWrapper ();
   m->Visit ();
 
-  vertex_buffer->CopyInto (vertices, VertexCount);
-  texel_buffer->CopyInto (texels, VertexCount);
-  color_buffer->CopyInto (colors, VertexCount);
   //index_buffer->CopyToBuffer (triangles,
   //    	sizeof (unsigned int) * TriangleCount *3);
 
   bool meshCreated;
-  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, 
-    rview->GetCurrentFrameNumber ());
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, currentFrame);
 
   if (meshCreated)
   {
-    rm->buffers = bufferHolder;
     rm->variablecontext.AttachNew (new csShaderVariableContext);
   }
+  rm->buffers = frameData.bufferHolder;
 
   // Prepare for rendering.
   rm->mixmode = sprite2ds[0]->GetMixMode ();
