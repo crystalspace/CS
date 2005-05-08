@@ -27,7 +27,7 @@
 #include "ivaria/dynamics.h"
 #include "csutil/hash.h"
 
-/** @file 
+/** @file
     This defines the plugin interface for the Crystal Space
     Virtual Object System (VOS) Abstract 3D Layer plugin (A3DL).  VOS
     is an object-oriented distributed network architechture; A3DL is a
@@ -38,12 +38,14 @@
     will need the download the VOS software from in order to use this
     plugin.
 
-    @note This is very much a work in progress, although I hope to see
-    it progress a lot over the next few weeks. Particular planned
-    features (obviously not present in the current interface) include
-    being able to access the underlying VOS API, and being able to
-    take the current CS engine state and export to remote clients
-    using VOS.
+    @note This is very much a work in progress.  You can access the
+    underlying VOS API using QUERY_INTERFACE to get iVosApi (defined
+    in ivosapi.h).  Something that we'd like to do (but this does not
+    currently support) is to be able to take the current CS engine
+    state and export to remote clients using VOS, and generally wrap
+    VOS enough that you could take a Crystal Space app that doesn't
+    know anything about networking and sprinkle it with the magic VOS
+    plugin powder and make it multiuser... :-)
 */
 
 
@@ -72,7 +74,7 @@ struct iVosObject3D : public iBase
 
 
 
-SCF_VERSION (iVosSector, 0, 1, 1);
+SCF_VERSION (iVosSector, 0, 2, 0);
 
 /** This interface bridges between a VOS sector and a Crystal Space
     sector. */
@@ -90,10 +92,10 @@ struct iVosSector : public iBase
   virtual csRef<iSector> GetSector() = 0;
 
   /** Get the list of object3ds which have been loaded into this sector. This
-   *  list will change in size as objects are loaded and removed - does not 
+   *  list will change in size as objects are loaded and removed - does not
    *  represent the list of objects in the A3DL sector
    */
-  virtual const csSet<iVosObject3D*> &GetObject3Ds() = 0;
+  virtual const csSet< csPtrKey<iVosObject3D> > &GetObject3Ds() = 0;
 };
 
 
