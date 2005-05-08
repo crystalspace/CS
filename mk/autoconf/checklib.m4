@@ -1,6 +1,6 @@
 # checklib.m4                                                  -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -35,9 +35,13 @@ AC_PREREQ([2.56])
 #		it manually.
 #	/sw -- Fink, the MacOS/X manager of Unix packages, installs here by
 #		default.
+#	/opt/local -- DarwinPorts installs here by default.
 #------------------------------------------------------------------------------
 m4_define([cs_lib_paths_default],
-    [/usr/local/include|/usr/local/lib /sw/include|/sw/lib])
+    [/usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib])
 
 
 
@@ -52,9 +56,14 @@ m4_define([cs_lib_paths_default],
 #		to search here automatically.
 #	/sw/lib/pkgconfig -- Fink, the MacOS/X manager of Unix packages,
 #		installs .pc files here by default.
+#	/opt/local/lib/pkgconfig -- DarwinPorts installs .pc files here by
+#		default.
 #------------------------------------------------------------------------------
 m4_define([cs_pkg_paths_default],
-    [/usr/local/lib/pkgconfig, /sw/lib/pkgconfig])
+    [/usr/local/lib/pkgconfig,
+    /sw/lib/pkgconfig,
+    /opt/local/lib/pkgconfig,
+    /opt/lib/pkgconfig])
 
 
 

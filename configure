@@ -19694,7 +19694,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -19880,7 +19880,10 @@ fi
 	if test $with_Xxf86vm != yes; then
   cs_check_lib_paths=$with_Xxf86vm
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -20467,7 +20470,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -20653,7 +20656,10 @@ fi
 	if test $with_Xaw != yes; then
   cs_check_lib_paths=$with_Xaw
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -24410,7 +24416,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -24683,7 +24689,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -24869,7 +24875,10 @@ fi
 	if test $with_z != yes; then
   cs_check_lib_paths=$with_z
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/zlib*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/zlib*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -25568,7 +25577,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -25841,7 +25850,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -26027,7 +26036,10 @@ fi
 	if test $with_png != yes; then
   cs_check_lib_paths=$with_png
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libpng*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libpng*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -26720,7 +26732,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -26993,7 +27005,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -27179,7 +27191,10 @@ fi
 	if test $with_jpeg != yes; then
   cs_check_lib_paths=$with_jpeg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/*jpeg*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/*jpeg*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -27876,7 +27891,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -28062,7 +28077,10 @@ fi
 	if test $with_lcms != yes; then
   cs_check_lib_paths=$with_lcms
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib /usr/include/lcms| /usr/local/include/lcms|"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib /usr/include/lcms| /usr/local/include/lcms|"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -28617,7 +28635,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -28890,7 +28908,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -29076,7 +29094,10 @@ fi
 	if test $with_mng != yes; then
   cs_check_lib_paths=$with_mng
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libmng*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libmng*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -29767,7 +29788,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -29953,7 +29974,10 @@ fi
 	if test $with_mikmod != yes; then
   cs_check_lib_paths=$with_mikmod
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libmikmod*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libmikmod*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -30540,7 +30564,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -30726,7 +30750,10 @@ fi
 	if test $with_ogg != yes; then
   cs_check_lib_paths=$with_ogg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libogg*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libogg*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -31308,7 +31335,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -31494,7 +31521,10 @@ fi
 	if test $with_vorbis != yes; then
   cs_check_lib_paths=$with_vorbis
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libvorbis.*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libvorbis.*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -32078,7 +32108,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -32264,7 +32294,10 @@ fi
 	if test $with_vorbisfile != yes; then
   cs_check_lib_paths=$with_vorbisfile
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libvorbisfile*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libvorbisfile*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -32859,7 +32892,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -33132,7 +33165,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -33318,7 +33351,10 @@ fi
 	if test $with_3ds != yes; then
   cs_check_lib_paths=$with_3ds
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/lib3ds*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/lib3ds*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -34329,7 +34365,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -34515,7 +34551,10 @@ fi
 	if test $with_ode != yes; then
   cs_check_lib_paths=$with_ode
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib $srcdir/libs/libode*"
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib $srcdir/libs/libode*"
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -36460,7 +36499,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -36733,7 +36772,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -36919,7 +36958,10 @@ fi
 	if test $with_freetype2 != yes; then
   cs_check_lib_paths=$with_freetype2
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -38121,7 +38163,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -38307,7 +38349,10 @@ fi
 	if test $with_cal3d != yes; then
   cs_check_lib_paths=$with_cal3d
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -39209,7 +39254,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -39395,7 +39440,10 @@ fi
 	if test $with_sdl != yes; then
   cs_check_lib_paths=$with_sdl
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -40301,7 +40349,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -40574,7 +40622,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -40760,7 +40808,10 @@ fi
 	if test $with_metaobject_a3dl != yes; then
   cs_check_lib_paths=$with_metaobject_a3dl
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -41420,7 +41471,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -41693,7 +41744,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -41879,7 +41930,10 @@ fi
 	if test $with_metaobject_misc != yes; then
   cs_check_lib_paths=$with_metaobject_misc
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -42583,7 +42637,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -42769,7 +42823,10 @@ fi
 	if test $with_wx != yes; then
   cs_check_lib_paths=$with_wx
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -44133,7 +44190,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -44406,7 +44463,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -44679,7 +44736,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -44865,7 +44922,10 @@ fi
 	if test $with_Cg != yes; then
   cs_check_lib_paths=$with_Cg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -45950,7 +46010,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -46223,7 +46283,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -46496,7 +46556,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -46769,7 +46829,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -47042,7 +47102,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -47315,7 +47375,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -47588,7 +47648,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -47774,7 +47834,10 @@ fi
 	if test $with_CgGL != yes; then
   cs_check_lib_paths=$with_CgGL
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -49441,7 +49504,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -49627,7 +49690,10 @@ fi
 	if test $with_asound != yes; then
   cs_check_lib_paths=$with_asound
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -51217,7 +51283,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -51490,7 +51556,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -51676,7 +51742,10 @@ fi
 	if test $with_aa != yes; then
   cs_check_lib_paths=$with_aa
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -52366,7 +52435,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -52639,7 +52708,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -52825,7 +52894,10 @@ fi
 	if test $with_caca != yes; then
   cs_check_lib_paths=$with_caca
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -54651,7 +54723,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -54837,7 +54909,10 @@ fi
 	if test $with_cppunit != yes; then
   cs_check_lib_paths=$with_cppunit
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths
@@ -61592,7 +61667,7 @@ done
   PKG_CONFIG=$ac_ct_PKG_CONFIG
 fi
 
-	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+	PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
     export PKG_CONFIG_PATH
 	cs_prog_pkg_config_checked=yes
 fi
@@ -61778,7 +61853,10 @@ fi
 	if test $with_bfd != yes; then
   cs_check_lib_paths=$with_bfd
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
 fi
 
 	for cs_lib_item in $cs_check_lib_paths

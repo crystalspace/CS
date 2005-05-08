@@ -16,6 +16,10 @@ chronological order.
 	    - Fixed csParticleSystem to correctly support mesh objects being 
 	      rendered multiple times a frame.
 	    - Fixed an use of 'int' instead of 'size_t' in csPDelArray.
+	- Eric Sunshine augmented checklib.m4 so that it also consults
+	  /opt/local and /opt when looking for pkg-config files, foo-config
+	  scripts, and raw library installation locations since /opt/local is
+	  the default installation of DarwinPorts packages.
 5-May-2005
 	- res fixed a VC7.0 linking error related to 
 	  csColliderHelper::InitializeCollisionWrapper(). (See collider.h for
