@@ -88,10 +88,12 @@ if $(CMD.BISON)
 
     # Jam's header file scannning doesn't use grist so we have to workaround
     # this here.
-    Includes $(headerfile:G=$(SUBVARIANT:J=!)) : $(headerfile) ;
-
+    Includes $(headerfile:G=$(SOURCE_GRIST:E)!$(SUBVARIANT:J=!)) : $(headerfile) ;
+  
     MakeLocate $(cfile) $(headerfile) : $(LOCATE_TARGET) ;
     
+    BISON.FLAGS on $(cfile) = 
+      [ on [ DoSourceGrist $(<:S=.c) ] GetVar BISON.FLAGS ] ;
     Bison $(cfile) : $(<) ;
     # Work around for jam warning about independant target when we put both
     # headerfile and cppfile in the bison line...
@@ -112,11 +114,13 @@ if $(CMD.BISON)
 
     # Jam's header file scannning doesn't use grist so we have to workaround
     # this here.
-    Includes $(headerfile:G=$(SUBVARIANT:J=!)) : $(headerfile) ;
+    Includes $(headerfile:G=$(SOURCE_GRIST:E)!$(SUBVARIANT:J=!)) : $(headerfile) ;
 
     MakeLocate $(cppfile) : $(LOCATE_TARGET) ;
     MakeLocate $(headerfile) : $(LOCATE_TARGET) ;
     
+    BISON.FLAGS on $(cppfile) = 
+      [ on [ DoSourceGrist $(<:S=.cpp) ] GetVar BISON.FLAGS ] ;
     Bison $(cppfile) : $(<) ;
     # Work around for jam warning about independant target when we put both
     # headerfile and cppfile in the bison line...
@@ -140,11 +144,11 @@ if $(CMD.BISON)
     
     if $(<:S) = .yy
     {
-      target = [ DoObjectGrist $(<:S=.cpp) $(<:S=.hpp) ] ;
+      target = [ DoSourceGrist $(<:S=.cpp) $(<:S=.hpp) ] ;
     }
     else
     {
-      target = [ DoObjectGrist $(<:S=.c) $(<:S=.h) ] ;
+      target = [ DoSourceGrist $(<:S=.c) $(<:S=.h) ] ;
     }
     BISON.FLAGS on $(target) += $(>) ;
   }

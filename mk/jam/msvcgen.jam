@@ -1166,6 +1166,8 @@ rule Win32Resource
   MergeResources $($(<)_RCNAME) : $(>) ;
 }
 
+rule StaticPluginLibrary { }
+
 #----------------------------------------------------------------------------
 
 actions MsvcBuildFile

@@ -78,6 +78,18 @@ rule CompileObjects
   return $(targets) ;
 }
 
+##  PrefixSuffix [prefix] : filename : suffix
+##    Replaces the suffix of 'filename' with 'suffix' and prepends 'prefix' to
+##    it. 
+rule PrefixSuffix
+{
+  local prefix = $(1) ;
+  local name = $(2) ;
+  local suffix = $(3) ;
+  if ! $(prefix) { prefix = "" ; }
+  return $(name:B=$(prefix)$(name:B):S=$(suffix)) ;
+}
+
 #----------------------------------------------------------------------------
 # private part
 

@@ -164,7 +164,7 @@ protected:
 
   /// Wait for the current image loading job to finish.
   void WaitForJob() const;
-  /// Convert data from the loader ro actual image data.
+  /// Convert data from the loader to actual image data.
   void MakeImageData();
 
   virtual const void *GetImageData ();

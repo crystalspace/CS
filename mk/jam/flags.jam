@@ -43,18 +43,11 @@ rule LinkWith
       
   Depends $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
-
-  if $($(<)_TYPE) = plugin
-  {
-    $(<)_static.NEEDLIBS += $(>) ;
-  }
 }
 
 ##  CFlags target : flags [ : options ]
 ##    Sets cflags on all sourcefiles of a library, plugin or application target
 ##    This rule affects c++ and c compiler flags.
-##    Options
-##      nostatic - Do not apply the flags to a "_static" variation.
 rule CFlags
 {
   CheckOptions nostatic : $(3) : $(<) ;
@@ -62,28 +55,16 @@ rule CFlags
   CCFLAGS on $($(<)_OBJECTS) += $(>) ;
   C++FLAGS on $($(<)_OBJECTS) += $(>) ;
 
-  if ! [ IsElem nostatic : $(3) ] && $($(<)_TYPE) = plugin
-  {
-    CFlags $(<)_static : $(>) ;
-  }
-
   UnitTestCFlags $(<) : $(>) : $(3) ;
 }
 
 ##  LFlags target : flags [ : options ]
 ##    Sets linker flags for a library, plugin or application target
-##    Options
-##      nostatic - Do not apply the flags to a "_static" variation.
 rule LFlags
 {
   CheckOptions nostatic : $(3) : $(<) ;
 
   LINKLIBS on $($(<)_TARGET) += $(>) ;
-
-  if ! [ IsElem nostatic : $(3) ] && $($(<)_TYPE) = plugin
-  {
-    $(<)_static.LFLAGS += $(>) ;
-  }
 
   UnitTestLFlags $(<) : $(>) : $(3) ;
 }
@@ -109,10 +90,7 @@ rule ExternalLibs
     CFlags $(<) : $($(i).CFLAGS) ;
     LFlags $(<) : $($(i).LFLAGS) ;
     
-    if $($(<)_TYPE) = library
-    {
-      $(<).EXTERNALLIBS += $(i) ;
-    }
+    $(<).EXTERNALLIBS += $(i) ;
   }
 }
 

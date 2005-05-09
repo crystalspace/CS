@@ -23,11 +23,8 @@ if $(CMD.CC)
 
 rule CcRule
 {
-    local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
-    if $(>)
-    {
-	object = $(object:B=$(>)_$(object:B)) ;
-    }
+    local object = 
+      [ DoObjectGrist [ PrefixSuffix $(>)_ : $(<) : $(SUFOBJ) ] ] ;
     Cc $(object) : $(<) ;
     return $(object) ;
 }
@@ -54,11 +51,8 @@ if $(CMD.C++)
 
 rule C++Rule
 {
-    local object = [ DoObjectGrist $(<:S=$(SUFOBJ)) ] ;
-    if $(>)
-    {
-	object = $(object:B=$(>)_$(object:B)) ;
-    }
+    local object = 
+      [ DoObjectGrist [ PrefixSuffix $(>)_ : $(<) : $(SUFOBJ) ] ] ;
     C++ $(object) : $(<) ;
     return $(object) ;
 }

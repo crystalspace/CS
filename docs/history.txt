@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-May-2005
+	- res cleaned up some of the static plugin related stuff and changes
+	  as suggested by Eric.
+	- res moved the staticplugins library creation into a rule in 
+	  static.jam to facilitate reuse.
+	- res made CCFLAGS and C++FLAGS be properly copied to static lib 
+	  objects.
+	- res made BisonFlags work with subvariants.
+	- res added a install_staticplugins target.
 8-May-2005
 	- res made the following changes:
 	    - Fixed a 64-bit compilation error in sprcal3d.

@@ -209,7 +209,11 @@ struct csMemMapInfo
  * extra `__declspec' goop when exporting a function from a plug-in module.
  */
 #if !defined(CS_EXPORTED_FUNCTION)
-#  define CS_EXPORTED_FUNCTION extern "C" CS_EXPORT_SYM_DLL
+#  if defined(CS_STATIC_LINKED)
+#    define CS_EXPORTED_FUNCTION extern "C"
+#  else
+#    define CS_EXPORTED_FUNCTION extern "C" CS_EXPORT_SYM_DLL
+#  endif
 #endif
 
 /**\def CS_EXPORTED_NAME(Prefix, Suffix)

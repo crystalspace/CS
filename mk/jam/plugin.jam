@@ -70,12 +70,27 @@ rule Plugin
     # monolithic static library containing objects for all plugins (useful for
     # statically linking the plugins into an application if the client so
     # desires).
-    local objects = [ CompileObjects $(sources) : $(<) ] ;
-    MakeLocate $(objects) : $(LOCATE_TARGET) ;
-    STATICPLUGINS.SOURCES += $(staticreginfoobject) ;
-    STATICPLUGINS.SOURCES += $(objects) ;
+    local staticobjects = [ CompileObjects $(sources) : $(<) ] ;
+
+    local obj_remain = $(objects) ;
+    local staticobj_remain = $(staticobjects) ;
+    
+    while $(obj_remain)
+    {
+      local obj = $(obj_remain[1]) ;
+      local staticobj = $(staticobj_remain[1]) ;
+    
+      STATICPLUGINS.OBJECTS.$(staticobj) = $(obj) ;
+
+      obj_remain = $(obj_remain[2-]) ;
+      staticobj_remain = $(staticobj_remain[2-]) ;
+    }
+
+    MakeLocate $(staticobjects) : $(LOCATE_TARGET) ;
+    STATICPLUGINS.OBJECTS += $(staticreginfoobject) ;
+    STATICPLUGINS.OBJECTS += $(staticobjects) ;
     STATICPLUGINS.SUBTARGETS += $(<) ;
-    STATICPLUGINS.OBJECTS.$(<) += $(objects) ;
+    STATICPLUGINS.OBJECTS.$(<) += $(staticobjects) ;
     
     SubVariant ;
   }

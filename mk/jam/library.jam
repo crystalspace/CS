@@ -39,22 +39,25 @@ if $(AR) && $(AR[2]) = ru { AR = $(AR[1]) ruc ; }
 ##	shared: Create as a shared library on supported platforms.
 ##	nohelp: Do not invoke Help for this target.
 ##      notest: Do not set up unit-testing support for this target.
-##      objsrc: All of the sourcefiles are actually object files. 
 rule Library
 {
   local options = $(3) ;
-  CheckOptions noinstall independent shared nohelp notest objsrc : $(options) : $(<) ;
+  CheckOptions noinstall independent shared nohelp notest : $(options) : $(<) ;
 
   local target = [ ConstructLibraryTarget $(<) : $(options) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
   local objects ;
-  if ! [ IsElem objsrc : $(options) ]
+  local i ;
+  for i in $(sources)
   {
-    objects = [ CompileObjects $(sources) ] ;
-  }
-  else
-  {
-    objects = $(sources) ;
+    if $(i:S) = $(SUFOBJ)
+    {
+      objects += $(i) ;
+    }
+    else
+    {
+      objects += [ CompileObjects $(i) ] ;
+    }
   }
 
   $(<)_TYPE = library ;

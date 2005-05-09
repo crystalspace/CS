@@ -97,6 +97,35 @@ rule LinkStaticPlugins
   ExtraObjects $(<) : $(staticobject) : inheritcflags ;
 }
 
+##  StaticPluginLibrary name
+rule StaticPluginLibrary
+{
+  local name = $(<) ;
+  Library $(name) : $(STATICPLUGINS.OBJECTS) : noinstall notest ;
+  SEARCH on $(name) += $(LOCATE_TARGET) ;
+  MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
+  CFlags $(name) : 
+    [ FDefines CS_STATIC_LINKED ] 
+    : nostatic ;
+  if $(STATICPLUGINS.DEPENDS)
+  {
+    LibDepends $(name) : $(STATICPLUGINS.DEPENDS) ;
+  }
+  # Copy a variety of flags
+  for o in $(STATICPLUGINS.OBJECTS)
+  {
+    local sourceobj = $(STATICPLUGINS.OBJECTS.$(o)) ;
+    if $(sourceobj)
+    {
+      CCFLAGS on $(o) += [ on $(sourceobj) GetVar CCFLAGS ] ;
+      C++FLAGS on $(o) += [ on $(sourceobj) GetVar C++FLAGS ] ;
+    }
+  }
+ 
+  Depends install_staticplugins : 
+    [ DoInstall [ ConstructLibraryTarget $(name) ] : $(libdir) ] ;
+}
+
 #----------------------------------------------------------------------------
 
 actions GenerateStaticPluginBoilerplate

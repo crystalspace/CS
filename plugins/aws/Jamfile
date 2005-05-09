@@ -6,15 +6,10 @@ if ! [ Property build : projgen ]
 {
   if $(CMD.BISON) && $(CMD.FLEX)
   {
-    FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp skinparse.hpp ] 
+    FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp skinpars.hpp ] 
 	skinlex.ll skinpars.yy ;
     BisonFlags skinpars.yy : "-p aws" ;
     
-    # @@@ Not nice but works ...
-    SubVariant static ;
-    BisonFlags skinpars.yy : "-p aws" ;
-    SubVariant ;
-
     # skinlex.cpp includes the generated skinpars.hpp, so we must ensure that
     # skinpars.hpp is generated before skinlex.cpp, since we do not want
     # skinlex.cpp accidentally including the factory-supplied skinpars.hpp from
@@ -24,6 +19,17 @@ if ! [ Property build : projgen ]
     local parseh = [ DoObjectGrist skinpars.hpp ] ;
     Depends $(lex) : $(parse) ;
     Includes $(parse) : $(parseh) ;
+
+    # @@@ Have the build order above respected for static builds.
+    {
+      SubVariant static ;
+      local lex = [ DoObjectGrist skinlex.cpp ] ;
+      local parse = [ DoObjectGrist skinpars.cpp ] ;
+      local parseh = [ DoObjectGrist skinpars.hpp ] ;
+      Depends $(lex) : $(parse) ;
+      Includes $(parse) : $(parseh) ;
+      SubVariant ;
+    }
 
     # Construct a rule for copying the generated sources from Bison and Flex
     # into the source directories.
@@ -51,12 +57,6 @@ if ! [ Property build : projgen ]
     # for that extra measure of insurance.)
     C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
       [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
-
-    # @@@ Very hacky but works ...
-    SubVariant static ;
-    C++FLAGS on [ DoObjectGrist aws_skinpars$(SUFOBJ) aws_skinlex$(SUFOBJ) ] +=
-      [ FIncludes $(LOCATE_TARGET) $(SEARCH_SOURCE) ] ;
-    SubVariant ;
   }
 }
 

@@ -26,29 +26,6 @@ SubInclude TOP plugins stdrep ;
 SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;
 
-if ! [ Property build : projgen ]
-{
 # Assemble big static plugins lib
 Description crystalspace_staticplugins : "Crystal Space static plugins library" ;
-Library crystalspace_staticplugins : $(STATICPLUGINS.SOURCES) : independent noinstall notest objsrc ;
-SEARCH on $(crystalspace_staticplugins) += $(LOCATE_TARGET) ;
-MsvcDefine crystalspace_staticplugins : $(STATICPLUGINS.MSVC_DEFINES) ;
-CFlags crystalspace_staticplugins : 
-  [ FDefines CS_STATIC_LINKED ] 
-  : nostatic ;
-if $(STATICPLUGINS.DEPENDS)
-{
-  LibDepends crystalspace_staticplugins : $(STATICPLUGINS.DEPENDS) ;
-}
-
-# Jump a bit through hoops to only assign external lib CFLAGS/LFLAGS to 
-# objects that really need them.
-for t in $(STATICPLUGINS.SUBTARGETS)
-{
-  local cflags = $($($(t).EXTERNALLIBS).CFLAGS) ;
-  local lflags = $($($(t).EXTERNALLIBS).LFLAGS) ;
-  CCFLAGS on $(STATICPLUGINS.OBJECTS.$(t)) += $(cflags) ;
-  C++FLAGS on $(STATICPLUGINS.OBJECTS.$(t)) += $(cflags) ;
-  LINKLIBS on $(STATICPLUGINS.OBJECTS.$(t)) += $(lflags) ;
-}
-}
+StaticPluginLibrary crystalspace_staticplugins ;
