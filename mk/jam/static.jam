@@ -124,6 +124,7 @@ rule StaticPluginLibrary
  
   Depends install_staticplugins : 
     [ DoInstall [ ConstructLibraryTarget $(name) ] : $(libdir) ] ;
+  INSTALLEDLIBS_OPTIONAL += $(name) ;
 }
 
 #----------------------------------------------------------------------------

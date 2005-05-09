@@ -28,6 +28,15 @@ else
     IFS=$my_IFS
 fi
 
+# Check for optional libs, add to list if present.
+
+for l in $liblist_opt
+do
+  if test -r "$libdir/lib$l.a" ; then
+    liblist="$liblist $l"
+  fi
+done
+
 usage()
 {
 	cat <<EOF

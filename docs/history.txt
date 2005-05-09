@@ -15,6 +15,9 @@ chronological order.
 	  objects.
 	- res made BisonFlags work with subvariants.
 	- res added a install_staticplugins target.
+	- res added support for "optional" libraries; this affects the 
+	  behaviour of cs-config for such libs: they are only reported as
+	  available if they were actually built.
 8-May-2005
 	- res made the following changes:
 	    - Fixed a 64-bit compilation error in sprcal3d.

@@ -39,10 +39,12 @@ if $(AR) && $(AR[2]) = ru { AR = $(AR[1]) ruc ; }
 ##	shared: Create as a shared library on supported platforms.
 ##	nohelp: Do not invoke Help for this target.
 ##      notest: Do not set up unit-testing support for this target.
+##	optional: Affects handling of the library in cs-config; it is only
+##		  reported as available when actually built.
 rule Library
 {
   local options = $(3) ;
-  CheckOptions noinstall independent shared nohelp notest : $(options) : $(<) ;
+  CheckOptions noinstall independent shared nohelp notest optional : $(options) : $(<) ;
 
   local target = [ ConstructLibraryTarget $(<) : $(options) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
@@ -188,7 +190,14 @@ rule LibraryStatic
     }
     
     # Add to global library list
-    INSTALLEDLIBS += $(<) ;
+    if [ IsElem optional : $(options) ]
+    {
+      INSTALLEDLIBS_OPTIONAL += $(<) ;
+    }
+    else
+    {
+      INSTALLEDLIBS += $(<) ;
+    }
   }
 
   if $(CRELIB)
@@ -245,7 +254,14 @@ rule LibraryShared
     }
     
     # Add to global library list
-    INSTALLEDLIBS += $(<) ;
+    if [ IsElem optional : $(options) ]
+    {
+      INSTALLEDLIBS_OPTIONAL += $(<) ;
+    }
+    else
+    {
+      INSTALLEDLIBS += $(<) ;
+    }
   }
 
   Depends $(<) : $(linklib) ;

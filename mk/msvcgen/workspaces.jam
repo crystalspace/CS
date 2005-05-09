@@ -29,4 +29,4 @@ MsvcGenWorkspace typical : : "grp.+_(?!typical$)" wx static ;
 MsvcGenWorkspace wxtypical : : "grp.+_(?!wxtypical$)" static ;
 
 # Workspace for static variants of plugins and apps.
-MsvcGenWorkspace static : static ^lib.* : "grp.+_(?!static$)" wx ; #"grplibs_(?!static$)" 
+MsvcGenWorkspace static : static ^lib.* : "grp.+_(?!static$)" wx ;

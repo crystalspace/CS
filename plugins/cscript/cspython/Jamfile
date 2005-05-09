@@ -62,7 +62,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   InstallCSPythonPY $(cspacepy) : bindings python ;
 
   Description crystalspace_python : "Python-specific support" ;
-  Library crystalspace_python : $(common) : shared independent ;
+  Library crystalspace_python : $(common) : shared independent optional ;
   LibDepends crystalspace_python : crystalspace ;
   ExternalLibs crystalspace_python : PYTHON ;
   CFlags crystalspace_python : $(CSPYTHON.CFLAGS) ;

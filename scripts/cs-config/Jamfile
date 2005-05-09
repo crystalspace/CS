@@ -12,7 +12,7 @@ rule csConfigGen
 
   local l d e s liblist libdep libdepstr libstrings libaddstrings ;
   
-  for l in $(INSTALLEDLIBS)
+  for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
   {
     libaddstrings += "    $(l)) \
 	addlib \"-l$(l)\" 	\
@@ -50,6 +50,7 @@ rule csConfigGen
   Depends $(<) : $(MAKEVARS) ;
 
   liblist on $(<) = [ Sort $(INSTALLEDLIBS) ] ;
+  liblist_opt on $(<) = [ Sort $(INSTALLEDLIBS_OPTIONAL) ] ;
   libstrings on $(<) = $(libstrings) ;
   libaddstrings on $(<) = $(libaddstrings) ;
 
@@ -171,6 +172,9 @@ checklibname()
 
 liblist="\
  $(liblist)
+"
+liblist_opt="\
+ $(liblist_opt)
 "
 __END__
 
