@@ -8,7 +8,14 @@ chronological order.
 
 10-May-2005
 	- res further worked towards an easier use of static plugins for 
-	  external projects.
+	  external projects:
+	    - External dependencies etc. are dumped into a Jamfile.
+	    - cs-config has been augmented to report above Jamfile so it can
+	      be employed by external projects.
+	    - The LinkStaticPlugins rule is now suitable to be employed by
+	      and for external packages.
+	    - Miscellaneous changes and additions to make static linking in 
+	      external projects work.
 9-May-2005
 	- res cleaned up some of the static plugin related stuff and changes
 	  as suggested by Eric.

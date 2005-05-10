@@ -71,42 +71,64 @@ rule BuildStaticUseFile
   return $(object) ;
 }
 
-##  LinkStaticPlugins [package :] target : plugins
+##  LinkStaticPlugins target : plugins [: optionalplugins] [: package]
+##    Builds the plugins in 'plugins' (and 'optionalplugins') statically into 
+##    'target'. Can be used both for static plugins from the local project or
+##    an external project. In the latter case, the project's static plugin
+##    library has to have been built, also, the "<package>.STATICDEPS" 
+##    variable must contain a path to a specially generated Jamfile that 
+##    contains information about the plugins provided by as well as external
+##    dependencies. The static plugins library for both local and external 
+##    package must be explicitly linked into 'target'.
 rule LinkStaticPlugins
 {
-  local package ;
-  local target ;
-  local plugins ;
-  if $(3)
-  {
-    package = $(1) ;
-    target = $(2) ;
-    plugins = $(3) ;
-  }
-  else
-  {
-    target = $(1) ;
-    plugins = $(2) ;
-  }
+  local package target plugins optplugins ;
+  # Fetch the parameters
+  target = $(1) ;
+  plugins = $(2) ;
+  optplugins = $(3) ;
+  package = $(4) ;
   
   if $(package)
   {
+    # External static plugins.
+    # First include static plugin info
     if ! $(HAVE_STATICDEPS.$(package))
     {
       include $($(package).STATICDEPS) ;
       HAVE_STATICDEPS.$(package) = yes ;
     }
-    local libs p ;
+    local lflags p ;
+    # Collect optional plugins
+    for p in $(optplugins)
+    {
+      if [ IsElem $(p) : $(STATICPLUGINS.AVAILABLE) ]
+      {
+	plugins += $(p) ;
+      }
+    }
+    # Grab flags
     for p in $(plugins)
     {
+      NotFile $(p) ;
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
-      libs += $(STATICPLUGIN.$(p).LFLAGS) ;
+      lflags += $(STATICPLUGIN.$(p).LFLAGS) ;
     }
-    LFlags $(target) : [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+    LFlags $(target) : [ Reverse [ RemoveDups [ Reverse $(lflags) ] ] ] ;
   }
   else
   {
+    # Local static plugins
     local lflags libs p ;
+    # Collect optional plugins
+    for p in $(optplugins)
+    {
+      if $($(p)_TARGET)
+      {
+	plugins += $(p) ;
+      }
+    }
+    # Grab flags
     for p in $(plugins)
     {
       lflags += [ Filter $($(p).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
@@ -122,19 +144,33 @@ rule LinkStaticPlugins
 }
 
 ##  StaticPluginLibrary name
+##    Create a library thta monolithically contains statically linkable 
+##    versions of all plugins, and also provides a target to install this
+##    library ("install_staticplugins") as well as resources to facilitate the
+##    use of that library from external projects. This library is intended to
+##    be used together with the "LinkStaticPlugins" rule.
 rule StaticPluginLibrary
 {
   local name = $(<) ;
+  local t ;
+  # Set up library
   Library $(name) : $(STATICPLUGINS.OBJECTS) : noinstall notest ;
   SEARCH on $(name) += $(LOCATE_TARGET) ;
   MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
   CFlags $(name) : 
     [ FDefines CS_STATIC_LINKED ] 
     : nostatic ;
-  if $(STATICPLUGINS.DEPENDS)
+  for t in $(STATICPLUGINS.SUBTARGETS)
   {
-    LibDepends $(name) : $(STATICPLUGINS.DEPENDS) ;
+    local deplibs ;
+    if $($(t).NEEDLIBS)
+    {
+      deplibs += $($(t).NEEDLIBS) ;
+    }
+    deplibs = [ RemoveDups $(deplibs) ] ;
+    Depends $(name) : $(deplibs) ;
   }
+  
   # Copy a variety of flags
   local o ;
   for o in $(STATICPLUGINS.OBJECTS)
@@ -147,15 +183,16 @@ rule StaticPluginLibrary
     }
   }
 
+  # Write out needed CFLAGS, LFLAGS
   STATICPLUGINS.DEPENDENCIES = $(name).jam ;
   MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(LOCATE.OBJECTS)/libs ;
-  local t ;
   for t in $(STATICPLUGINS.SUBTARGETS)
   {
     WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;
   }
   Depends $(name) : $(STATICPLUGINS.DEPENDENCIES) ;
  
+  # Install targets
   Depends install_staticplugins : 
     [ DoInstall [ ConstructLibraryTarget $(name) ] : $(libdir) ] ;
   Depends install_staticplugins : $(STATICPLUGINS.DEPENDENCIES) ;
@@ -167,32 +204,38 @@ rule StaticPluginLibrary
 
 #----------------------------------------------------------------------------
 
+# Write out CFLAGS, LFLAGS needed by a plugin
 rule WriteDependencies
 {
   local cflags ;
   local lflags ;
   local depfile = $(<) ;
-  local target = $(>) ;
-  local depfile_gristed = $(depfile:G=$(target)) ;
+  local plugin = $(>) ;
+  local depfile_gristed = $(depfile:G=$(plugin)) ;
   MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
   
+  # Collect flags
+  local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
+  lflags += -l$(libs) ;
+  
   local l ;
-  for l in $($(target).EXTERNALLIBS)
+  for l in $($(plugin).EXTERNALLIBS)
   {
     cflags += $($(l).CFLAGS) ;
     lflags += [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
   }
-  lflags += $($(target).LFLAGS) ;
+  lflags += [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
   CFLAGS on $(depfile_gristed) = "$(cflags)" ;
   LFLAGS on $(depfile_gristed) = "$(lflags)" ;
+  
   if $($(depfile).FIRSTTIME) != "yes"
   {
-    WriteDepFlags1 $(depfile_gristed) : $(target) ;
+    WriteDepFlags1 $(depfile_gristed) : $(plugin) ;
     $(depfile).FIRSTTIME = "yes" ;
   }
   else
   {
-    WriteDepFlags2 $(depfile_gristed) : $(target) ;
+    WriteDepFlags2 $(depfile_gristed) : $(plugin) ;
   }
   Depends $(depfile) : $(depfile_gristed) ;
 }
@@ -200,6 +243,7 @@ rule WriteDependencies
 actions WriteDepFlags1 
 {
   cat << EOT > $(<)
+STATICPLUGINS.AVAILABLE += $(>) ;
 STATICPLUGIN.$(>).CFLAGS = $(CFLAGS) ;
 STATICPLUGIN.$(>).LFLAGS = $(LFLAGS) ;
 EOT
@@ -208,6 +252,7 @@ EOT
 actions WriteDepFlags2 
 {
   cat << EOT >> $(<)
+STATICPLUGINS.AVAILABLE += $(>) ;
 STATICPLUGIN.$(>).CFLAGS = $(CFLAGS) ;
 STATICPLUGIN.$(>).LFLAGS = $(LFLAGS) ;
 EOT

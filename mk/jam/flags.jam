@@ -65,7 +65,8 @@ rule LFlags
 {
   CheckOptions nostatic : $(3) : $(<) ;
 
-  LINKLIBS on $($(<)_TARGET) += $(>) ;
+  NotFile $(>) ;
+  NEEDLIBS on $($(<)_TARGET) += $(>) ;
   $(<).LFLAGS += $(>) ;
 
   UnitTestLFlags $(<) : $(>) : $(3) ;
