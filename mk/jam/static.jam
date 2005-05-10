@@ -160,6 +160,8 @@ rule StaticPluginLibrary
   CFlags $(name) : 
     [ FDefines CS_STATIC_LINKED ] 
     : nostatic ;
+  # Collect library dependencies. The idea is to built all libs needed by the
+  # static plugins when "jam static_plugin_target" is invoked.
   for t in $(STATICPLUGINS.SUBTARGETS)
   {
     local deplibs ;
