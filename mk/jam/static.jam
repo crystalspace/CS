@@ -27,7 +27,6 @@ rule BuildStaticRegFile
   local object = [ CompileObject $(sources) ] ;
 
   MakeLocate $(sources) : $(LOCATE_TARGET) ;
-  SEARCH on $(sources) = $(LOCATE_TARGET) ;
   MakeLocate $(object) : $(LOCATE_TARGET) ;
 
   local metalist metafile i ;
@@ -47,54 +46,79 @@ rule BuildStaticRegFile
 
 rule BuildStaticUseFile
 {
-  local statictarget = $(>) ;
   # prepare source files
-  local sources = [ DoObjectGrist _cs_static_use.cpp ] ;
+  local sources ;
+  if $(3)
+  {
+    sources = [ DoObjectGrist _cs_static_use_$(3).cpp ] ;
+  }
+  else
+  {
+    sources = [ DoObjectGrist _cs_static_use.cpp ] ;
+  }
   local object = [ CompileObject $(sources) ] ;
 
   MakeLocate $(sources) : $(LOCATE_TARGET) ;
   SEARCH on $(sources) = $(LOCATE_TARGET) ;
   MakeLocate $(object) : $(LOCATE_TARGET) ;
-
-  local metalist metafile i ;
-  for i in $(<)
-  {
-    metafile = $($(i)_METAFILE) ;
-    metalist += $(metafile) ;
-    Depends $(sources) : $(metafile) ;
-  }
   
+  C++FLAGS on $(object) += $($($(>).EXTERNALLIBS).CFLAGS) ;
+
   GenerateStaticPluginBoilerplate $(sources) ;
-  GenerateStaticPluginInstantiation $(sources) : $(metalist) ;
+  GenerateStaticPluginInstantiation $(sources) : $(<) ;
   Clean $(statictarget)clean : $(sources) ; 
   Clean $(statictarget)clean : $(object) ; 
   return $(object) ;
 }
 
-##  LinkStaticPlugins target : plugins
+##  LinkStaticPlugins [package :] target : plugins
 rule LinkStaticPlugins
 {
-  # construct flags
-  local deplibs libs i ;
-  for i in $(>)
+  local package ;
+  local target ;
+  local plugins ;
+  if $(3)
   {
-    deplibs += $($(i)_static.NEEDLIBS) ;
-    LFlags $(<) : $($(i)_static.LFLAGS) ;
+    package = $(1) ;
+    target = $(2) ;
+    plugins = $(3) ;
   }
-  for i in $(deplibs) {
-    libs += $(i) $($(i)_depends) ;
+  else
+  {
+    target = $(1) ;
+    plugins = $(2) ;
   }
-  # We must eliminate the duplicates in reverse order in order to ensure that
-  # we do not destroy the overall library ordering since Unix linkers are
-  # order-sensitive.
-  libs = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
-  libs = lib$(libs)$(SUFLIB) ;     
-  Depends $($(<)_TARGET) : $(libs) ;
-  NEEDLIBS on $($(<)_TARGET) += $(libs) ;
-
+  
+  if $(package)
+  {
+    if ! $(HAVE_STATICDEPS.$(package))
+    {
+      include $($(package).STATICDEPS) ;
+      HAVE_STATICDEPS.$(package) = yes ;
+    }
+    local libs p ;
+    for p in $(plugins)
+    {
+      CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
+      libs += $(STATICPLUGIN.$(p).LFLAGS) ;
+    }
+    LFlags $(target) : [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+  }
+  else
+  {
+    local lflags libs p ;
+    for p in $(plugins)
+    {
+      lflags += [ Filter $($(p).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+      libs += $($(p).NEEDLIBS) ;
+    }
+    LFlags $(target) : [ Reverse [ RemoveDups [ Reverse $(lflags) ] ] ] ;
+    LinkWith $(target) : [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+  }
+  
   # construct initialization sourcefile
-  local staticobject = [ BuildStaticUseFile $(>) : $(<) ] ;
-  ExtraObjects $(<) : $(staticobject) : inheritcflags ;
+  local staticobject = [ BuildStaticUseFile $(plugins) : $(target) : $(package) ] ;
+  ExtraObjects $(target) : $(staticobject) : inheritcflags ;
 }
 
 ##  StaticPluginLibrary name
@@ -112,6 +136,7 @@ rule StaticPluginLibrary
     LibDepends $(name) : $(STATICPLUGINS.DEPENDS) ;
   }
   # Copy a variety of flags
+  local o ;
   for o in $(STATICPLUGINS.OBJECTS)
   {
     local sourceobj = $(STATICPLUGINS.OBJECTS.$(o)) ;
@@ -121,13 +146,72 @@ rule StaticPluginLibrary
       C++FLAGS on $(o) += [ on $(sourceobj) GetVar C++FLAGS ] ;
     }
   }
+
+  STATICPLUGINS.DEPENDENCIES = $(name).jam ;
+  MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(LOCATE.OBJECTS)/libs ;
+  local t ;
+  for t in $(STATICPLUGINS.SUBTARGETS)
+  {
+    WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;
+  }
+  Depends $(name) : $(STATICPLUGINS.DEPENDENCIES) ;
  
   Depends install_staticplugins : 
     [ DoInstall [ ConstructLibraryTarget $(name) ] : $(libdir) ] ;
+  Depends install_staticplugins : $(STATICPLUGINS.DEPENDENCIES) ;
+  Depends install_staticplugins : 
+    [ DoInstall $(STATICPLUGINS.DEPENDENCIES) : $(libdir) ] ;
+    
   INSTALLEDLIBS_OPTIONAL += $(name) ;
 }
 
 #----------------------------------------------------------------------------
+
+rule WriteDependencies
+{
+  local cflags ;
+  local lflags ;
+  local depfile = $(<) ;
+  local target = $(>) ;
+  local depfile_gristed = $(depfile:G=$(target)) ;
+  MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
+  
+  local l ;
+  for l in $($(target).EXTERNALLIBS)
+  {
+    cflags += $($(l).CFLAGS) ;
+    lflags += [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+  }
+  lflags += $($(target).LFLAGS) ;
+  CFLAGS on $(depfile_gristed) = "$(cflags)" ;
+  LFLAGS on $(depfile_gristed) = "$(lflags)" ;
+  if $($(depfile).FIRSTTIME) != "yes"
+  {
+    WriteDepFlags1 $(depfile_gristed) : $(target) ;
+    $(depfile).FIRSTTIME = "yes" ;
+  }
+  else
+  {
+    WriteDepFlags2 $(depfile_gristed) : $(target) ;
+  }
+  Depends $(depfile) : $(depfile_gristed) ;
+}
+
+actions WriteDepFlags1 
+{
+  cat << EOT > $(<)
+STATICPLUGIN.$(>).CFLAGS = $(CFLAGS) ;
+STATICPLUGIN.$(>).LFLAGS = $(LFLAGS) ;
+EOT
+}
+
+actions WriteDepFlags2 
+{
+  cat << EOT >> $(<)
+STATICPLUGIN.$(>).CFLAGS = $(CFLAGS) ;
+STATICPLUGIN.$(>).LFLAGS = $(LFLAGS) ;
+EOT
+}
 
 actions GenerateStaticPluginBoilerplate
 {
@@ -188,7 +272,7 @@ actions piecemeal GenerateStaticPluginInstantiation
 {
   for x in $(>)
   do
-    n=`basename $x $(SUFMETA)`
+    n=`basename $x`
     echo "SCF_USE_STATIC_PLUGIN($n)" >>$(<)
   done
 }

@@ -125,6 +125,7 @@ fi
 syslibs=" $(LINKLIBS) "
 common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "
 common_cxxflags=" $(COMPILER.CFLAGS.MANDATORY) $(COMPILER.C++FLAGS.MANDATORY) "
+staticdeps="$(STATICPLUGINS.DEPENDENCIES)"
 
 makevars()
 {

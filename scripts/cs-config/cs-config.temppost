@@ -53,6 +53,7 @@ Options:
 	[--cxxflags]
 	[--available-libs]
 	[--makevars]
+	[--staticdeps]
 	[--help]
 Libraries:
 EOF
@@ -173,6 +174,12 @@ show_cflags=""
 show_cxxflags=""
 show_availlibs=""
 
+if test "`uname -s | sed -e 's+\(.*\)_.*+\1+'`" = "MINGW32" ; then
+  libdir_local=`echo $libdir | sed -e 's+^/\(.\)\(.*\)+\1:\2+'`
+else
+  libdir_local=$libdir
+fi
+
 if test $# -eq 0; then
 	usage 1>&2
 	exit 1
@@ -226,6 +233,10 @@ while test $# -gt 0; do
 	;;
     --available-libs)
 	show_availlibs=true
+	;;
+    --static-deps)
+	echo $libdir_local/$staticdeps
+	exit 0
 	;;
     *)
 	raw_names="$raw_names $1"

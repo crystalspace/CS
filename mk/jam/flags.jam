@@ -43,6 +43,7 @@ rule LinkWith
       
   Depends $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
+  $(<).NEEDLIBS += $(rawlibs) ;
 }
 
 ##  CFlags target : flags [ : options ]
@@ -65,6 +66,7 @@ rule LFlags
   CheckOptions nostatic : $(3) : $(<) ;
 
   LINKLIBS on $($(<)_TARGET) += $(>) ;
+  $(<).LFLAGS += $(>) ;
 
   UnitTestLFlags $(<) : $(>) : $(3) ;
 }
@@ -84,13 +86,13 @@ rule LFlags
 ##    library.
 rule ExternalLibs
 {
-  local i ;
-  for i in $(>)
+  local extlib ;
+  for extlib in $(>)
   {
-    CFlags $(<) : $($(i).CFLAGS) ;
-    LFlags $(<) : $($(i).LFLAGS) ;
+    CFlags $(<) : $($(extlib).CFLAGS) ;
+    LFlags $(<) : $($(extlib).LFLAGS) ;
     
-    $(<).EXTERNALLIBS += $(i) ;
+    $(<).EXTERNALLIBS += $(extlib) ;
   }
 }
 

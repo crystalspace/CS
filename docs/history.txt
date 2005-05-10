@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-May-2005
+	- res further worked towards an easier use of static plugins for 
+	  external projects.
 9-May-2005
 	- res cleaned up some of the static plugin related stuff and changes
 	  as suggested by Eric.
