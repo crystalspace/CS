@@ -27,5 +27,4 @@ SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;
 
 # Assemble big static plugins lib
-Description crystalspace_staticplugins : "Crystal Space static plugins library" ;
 StaticPluginLibrary crystalspace_staticplugins ;

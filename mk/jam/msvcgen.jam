@@ -843,15 +843,9 @@ rule LinkStaticPlugins
   local staticuse_out = $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
   MakeLocate $(staticuse_out) : $(outdir) ;
   SEARCH on $(staticuse_out) = $(outdir) ;
-  local metalist metafile i ;
-  for i in $(>)
-  {
-    metafile = $($(i)_METAFILE) ;
-    metalist += $(metafile) ;
-    Depends $(staticuse_out) : $(metafile) ;
-  }
+  
   GenerateStaticPluginBoilerplate $(staticuse_out) ;
-  GenerateStaticPluginInstantiation $(staticuse_out) : $(metalist) ;
+  GenerateStaticPluginInstantiation $(staticuse_out) : $(>) ;
   Always $(staticuse_out) ;
   Depends msvcgen : $(staticuse_out) ;
 

@@ -12,6 +12,9 @@ chronological order.
 	- res added a proper clean rule for the static deps file.
 	- res fixed a linking issue where a lib dependency was passed to the
 	  linker before the depending lib instead after it.
+	- res added a "staticplugins" convenience target to build the static
+	  plugins and other needed libs at once.
+	- res fixed the static use files generated for VC projects.
 10-May-2005
 	- res further worked towards an easier use of static plugins for 
 	  external projects:

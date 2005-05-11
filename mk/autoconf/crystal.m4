@@ -59,7 +59,7 @@ AC_DEFUN([CS_PATH_CRYSTAL_CHECK],
 AC_ARG_VAR([CRYSTAL], [Prefix Where Crystal Space is installed])
 AC_ARG_ENABLE([cstest],
     [AC_HELP_STRING([--enable-cstest],
-	[verify that the Crystal Spsace SDK is actually usable
+	[verify that the Crystal Space SDK is actually usable
 	(default YES)])], [], [enable_cstest=yes])
 
 # Try to find an installed cs-config.
