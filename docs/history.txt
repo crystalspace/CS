@@ -10,6 +10,8 @@ chronological order.
 	- res fixed the crystalspace_staticplugins target to be independent,
 	  ie it is not being built when the other libs are.
 	- res added a proper clean rule for the static deps file.
+	- res fixed a linking issue where a lib dependency was passed to the
+	  linker before the depending lib instead after it.
 10-May-2005
 	- res further worked towards an easier use of static plugins for 
 	  external projects:

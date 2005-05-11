@@ -33,8 +33,6 @@ rule LinkWith
     LibDepends $(<) : $(rawlibs) ;
   }                           
   
-  LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
-  
   local i libs ;
   for i in $(rawlibs)
   {
@@ -44,6 +42,8 @@ rule LinkWith
   Depends $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
   $(<).NEEDLIBS += $(rawlibs) ;
+
+  LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
 }
 
 ##  CFlags target : flags [ : options ]
