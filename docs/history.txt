@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-May-2005
+	- res fixed the crystalspace_staticplugins target to be independent,
+	  ie it is not being built when the other libs are.
+	- res added a proper clean rule for the static deps file.
 10-May-2005
 	- res further worked towards an easier use of static plugins for 
 	  external projects:

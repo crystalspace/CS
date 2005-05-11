@@ -147,31 +147,23 @@ rule LinkStaticPlugins
 ##    Create a library thta monolithically contains statically linkable 
 ##    versions of all plugins, and also provides a target to install this
 ##    library ("install_staticplugins") as well as resources to facilitate the
-##    use of that library from external projects. This library is intended to
-##    be used together with the "LinkStaticPlugins" rule.
+##    use of that library from external projects. Also, most plugins will
+##    probably themselves depend on other libraries; while those are correctly
+##    linked in with the static plugins, they are not built or installed when
+##    the static plugin library is.
+##    This library is intended to be used together with the 
+##    "LinkStaticPlugins" rule.
 rule StaticPluginLibrary
 {
   local name = $(<) ;
   local t ;
   # Set up library
-  Library $(name) : $(STATICPLUGINS.OBJECTS) : noinstall notest ;
+  Library $(name) : $(STATICPLUGINS.OBJECTS) : noinstall notest independent ;
   SEARCH on $(name) += $(LOCATE_TARGET) ;
   MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
   CFlags $(name) : 
     [ FDefines CS_STATIC_LINKED ] 
     : nostatic ;
-  # Collect library dependencies. The idea is to built all libs needed by the
-  # static plugins when "jam static_plugin_target" is invoked.
-  for t in $(STATICPLUGINS.SUBTARGETS)
-  {
-    local deplibs ;
-    if $($(t).NEEDLIBS)
-    {
-      deplibs += $($(t).NEEDLIBS) ;
-    }
-    deplibs = [ RemoveDups $(deplibs) ] ;
-    Depends $(name) : $(deplibs) ;
-  }
   
   # Copy a variety of flags
   local o ;
@@ -193,6 +185,7 @@ rule StaticPluginLibrary
     WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;
   }
   Depends $(name) : $(STATICPLUGINS.DEPENDENCIES) ;
+  Clean $(name)clean : $(STATICPLUGINS.DEPENDENCIES) ;
  
   # Install targets
   Depends install_staticplugins : 
