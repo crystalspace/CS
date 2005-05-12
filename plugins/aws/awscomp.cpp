@@ -348,6 +348,15 @@ bool awsComponent::GetProperty (const char *name, intptr_t *parm)
   return false;
 }
 
+bool awsComponent::SetProperty (const std::string &name, autom::keeper &_value)
+{
+	awsPropertyBase *prop = properties.Find(name);
+
+	if (prop==0) return false;
+
+	return prop->Set(_value);
+}
+
 bool awsComponent::SetProperty (const char *name, intptr_t parm)
 {
   if (strcmp ("Frame", name) == 0)

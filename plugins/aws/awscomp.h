@@ -212,6 +212,46 @@ public:
 #endif
 
   /**
+   * Sets the property specified, setting the property to whatever is in @_value.
+   * Returns false if there's no such property, or if the property is
+   * read-only.
+   */
+  virtual bool SetProperty (const std::string &name, autom::keeper &_value);
+
+  /**
+   * Sets the property specified, setting the property to the integer @_value.
+   * Returns false if there's no such property, or if the property is
+   * read-only. Overloaded convenience function for integers.
+   */
+  virtual bool SetProperty (const std::string &name, int _value)
+  {
+	  autom::keeper k(new autom::integer(_value));
+	  return SetProperty(name, k);
+  }
+
+  /**
+   * Sets the property specified, setting the property to the float @_value.
+   * Returns false if there's no such property, or if the property is
+   * read-only. Overloaded convenience function for integers.
+   */
+  virtual bool SetProperty (const std::string &name, float _value)
+  {
+	  autom::keeper k(new autom::floating(_value));
+	  return SetProperty(name, k);
+  }
+
+  /**
+   * Sets the property specified, setting the property to the float @_value.
+   * Returns false if there's no such property, or if the property is
+   * read-only. Overloaded convenience function for integers.
+   */
+  virtual bool SetProperty (const std::string &name, const std::string &_value)
+  {
+	  autom::keeper k(new autom::string(_value));
+	  return SetProperty(name, k);
+  }
+  
+  /**
    * Sets the property specified, setting the proprty to whatever is in parm.
    * Returns false if there's no such property.
    */
