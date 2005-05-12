@@ -64,6 +64,20 @@ chronological order.
 	  Set a read-only property never results in signal generation.  In this
 	  way it is simple for a programmer to know when changes to any given
 	  property occur.
+	- Christopher Nelson Added several fixes, made some functions much more 
+	  std::string friendly.  I also added full automation for awsComp.  This 
+	  includes scripting functions for show, hide, and move_to.
+
+	   The Execute() function now runs scripts, and is much more friendly than 
+	   the old execute function.  
+
+	  Parameters can now be embedded into the call, just like you would expect 
+	  with any normal scripting language.  This will be useful for embedding 
+	  actions into window definition files, and filling up list boxes, etc.
+
+	  The checkbox widget now has the new properties built-in, as well as the new 
+	  signal architecture.  The old stuff still works for it too.
+
 11-May-2005
 	- res fixed the crystalspace_staticplugins target to be independent;
 	  i.e. it is not being built when the other libs are.
