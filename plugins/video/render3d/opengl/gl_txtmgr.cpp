@@ -659,7 +659,7 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 
     // Pull texture data and set as RGBA again, to prevent compression (slooow)
     // on subsequent glTexSubImage() calls.
-    if (doSetRGBA)
+    if (!doSetRGBA)
     {
       uint8* pixels = new uint8[actual_width * actual_height * 4];
       glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);

@@ -391,7 +391,7 @@ void csGraphics2DGLCommon::GetPixelFormatString (const GLPixelFormat& format,
   str.Clear();
   for (int v = 0; v < glpfvValueCount; v++)
   {
-    str.Append (csString().Format ("%s: %d ", valueNames[v], format[v]));
+    str.AppendFmt ("%s: %d ", valueNames[v], format[v]);
   }
 }
 

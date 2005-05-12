@@ -290,12 +290,10 @@ list::operator+=(const keeper &k)
 }
 
 keeper 
-list::at(long long index)
+list::at(size_t index)
 {
-	unsigned int i=(unsigned int)index;
-	
-	if (i>value.size()) return keeper(Nil());
-	else return keeper(value.at(i));	
+	if (index>value.size()) return keeper(Nil());
+	else return keeper(value.at(index));	
 }
 
 //////////////////// Reference Object //////////////////////////////////////

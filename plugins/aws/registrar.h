@@ -61,11 +61,11 @@ namespace autom
 			
 			cont_ptr cont=lobby;
 			
-			if (split(const_cast<std::string&>(name), '@', parts)>1)
+			if (std::split(const_cast<std::string&>(name), '@', parts)>1)
 			{
 				std::vector<std::string> cont_names;
 				
-				if (split(parts[1], '.', cont_names))
+				if (std::split(parts[1], '.', cont_names))
 				{					
 					// Find the container, but do not create it. It MUST exist.
 					for(std::vector<std::string>::iterator pos=cont_names.begin(); pos!=cont_names.end(); ++pos)				

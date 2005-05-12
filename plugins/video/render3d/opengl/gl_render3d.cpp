@@ -1059,12 +1059,12 @@ bool csGLGraphics3D::Open ()
   cache_clip_z_plane = -1;
 
   const char* r2tBackendStr;
-  if (ext->CS_GL_EXT_framebuffer_object)
+  /*if (ext->CS_GL_EXT_framebuffer_object)
   {
     r2tBackendStr = "EXT_framebuffer_object";
     r2tbackend = new csGLRender2TextureEXTfbo (this);
   }
-  else
+  else*/
   {
     r2tBackendStr = "framebuffer";
     r2tbackend = new csGLRender2TextureFramebuf (this);

@@ -76,7 +76,6 @@
 #include "plugins/engine/3d/radiosty.h"
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/stats.h"
 #include "plugins/engine/3d/texture.h"
 
 CS_IMPLEMENT_PLUGIN

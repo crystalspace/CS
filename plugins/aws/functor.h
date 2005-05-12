@@ -125,7 +125,7 @@ namespace autom
 		}
 		
 		/** Adds the named parameter, assume that it's an integer. */
-		bool addIntParm(const std::string &parm_name, long long _value)
+		bool addIntParm(const std::string &parm_name, longlong _value)
 		{
 			parms.insert(std::make_pair(parm_name, new integer(_value)));	
 			return true;

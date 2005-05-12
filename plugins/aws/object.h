@@ -146,7 +146,7 @@ namespace autom
 	/** Encapsulates an integer value. */
 	class integer : public object
 	{
-		long long value;
+		longlong value;
 		
 	public:
 		integer():object(T_INT) {}
@@ -154,9 +154,9 @@ namespace autom
 		/** Copy constructor. */
 		integer(const integer& i):object(i, T_INT), value(i.value) {}
 		
-		integer(long long i):object(T_INT), value(i) {}
+		integer(longlong i):object(T_INT), value(i) {}
 		
-		long long Value() { return value; }
+		longlong Value() { return value; }
 		
 		explicit integer(object& o):object(o, T_INT)
 		{
@@ -350,10 +350,10 @@ namespace autom
 		list operator+=(const keeper &k);
 		
 		/** Returns a keeper to the object at index i of the list.  If I is out of bounds, then a keeper to NIL is returned.  */
-		keeper at(long long i);
+		keeper at(size_t i);
 		
 		/** Returns the size of the list. */
-		long long size() { return value.size(); }
+		size_t size() { return value.size(); }
 	};	
 	
 	class function;

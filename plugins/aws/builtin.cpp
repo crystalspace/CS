@@ -70,8 +70,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 						
-		long long l = left->toInt().Value();
-		long long r = right->toInt().Value();
+		longlong l = left->toInt().Value();
+		longlong r = right->toInt().Value();
 											
 		return func_parm(new integer((l < r ? l : r)));
 
@@ -82,8 +82,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		long long l = left->toInt().Value();
-		long long r = right->toInt().Value();
+		longlong l = left->toInt().Value();
+		longlong r = right->toInt().Value();
 											
 		return func_parm(new integer((l > r ? l : r)));
 
@@ -94,8 +94,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		long long l = left->toInt().Value();
-		long long r = right->toInt().Value();
+		longlong l = left->toInt().Value();
+		longlong r = right->toInt().Value();
 											
 		return func_parm(new integer(l < r));
 
@@ -106,8 +106,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		long long l = left->toInt().Value();
-		long long r = right->toInt().Value();
+		longlong l = left->toInt().Value();
+		longlong r = right->toInt().Value();
 											
 		return func_parm(new integer(l < r));
 
