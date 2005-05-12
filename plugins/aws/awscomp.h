@@ -183,12 +183,6 @@ public:
    */
   virtual bool HandleEvent (iEvent &Event);
 
-  /**
-   * Gets the property specified, setting the parameter to a COPY of the
-   * property's value. Returns false if there's no such property.
-   */
-  virtual bool GetProperty (const char* name, intptr_t *parm);
-
   //////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// Properties ////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////
@@ -199,6 +193,70 @@ public:
   /** The frame. */
   awsRectProperty CompFrame;
 
+  /**
+   * Gets the property specified, copying the property into @_value.
+   * Returns false if there's no such property, or if the property is
+   * write-only.
+   */
+  virtual bool GetProperty (const std::string &name, autom::keeper &_value);
+
+  /**
+   * Gets the property specified, copy the property into the integer @_value.
+   * Returns false if there's no such property, or if the property is
+   * write-only. Overloaded convenience function for integers.
+   */
+  virtual bool GetProperty (const std::string &name, int _value)
+  {
+	  autom::keeper k;
+
+	  bool result=GetProperty(name, k);
+	  if (result==false) return false;
+
+	  _value=k->toInt().Value();
+
+	  return true;
+  }
+
+  /**
+   * Gets the property specified, copy the property into the float @_value.
+   * Returns false if there's no such property, or if the property is
+   * write-only. Overloaded convenience function for floats.
+   */
+  virtual bool GetProperty (const std::string &name, float _value)
+  {
+	  autom::keeper k;
+
+	  bool result=GetProperty(name, k);
+	  if (result==false) return false;
+
+	  _value=k->toFloat().Value();
+
+	  return true;
+  }
+
+  /**
+   * Gets the property specified, copy the property into the string @_value.
+   * Returns false if there's no such property, or if the property is
+   * write-only. Overloaded convenience function for strings.
+   */
+  virtual bool GetProperty (const std::string &name, std::string &_value)
+  {
+	  autom::keeper k;
+
+	  bool result=GetProperty(name, k);
+	  if (result==false) return false;
+
+	  _value=k->toString().Value();
+
+	  return true;
+  }
+
+  /**
+   * Gets the property specified, setting the parameter to a COPY of the
+   * property's value. Returns false if there's no such property.
+   */
+  virtual bool GetProperty (const char* name, intptr_t *parm);
+  
 
 #ifndef AWS_VOIDP_IS_ERROR
   /**

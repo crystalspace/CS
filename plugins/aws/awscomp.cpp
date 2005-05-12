@@ -320,6 +320,15 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
+bool awsComponent::GetProperty (const std::string &name, autom::keeper &_value)
+{
+    awsPropertyBase *prop = properties.Find(name);
+
+	if (prop==0) return false;
+
+	return prop->Get(_value);
+}
+
 bool awsComponent::GetProperty (const char *name, intptr_t *parm)
 {
   if (strcmp ("Frame", name) == 0)
