@@ -46,7 +46,9 @@ awsComponent::awsComponent ()
     signalsrc (),
     redraw_tag (0),
     focusable (false),
-    self(0)
+    self(0),
+    _destructionMark( false ),
+	pType("Type", properties, false)
 {
   self = this;
   signalsrc.SetOwner (self);
@@ -65,7 +67,10 @@ awsComponent::awsComponent (iAwsComponent* wrapper)
     signalsrc (),
     redraw_tag (0),
     focusable (false),
-    self(wrapper)
+    self(wrapper),
+    _destructionMark( false ),
+	pType("Type", properties, false)
+
 {
   signalsrc.SetOwner (self);
   SCF_CONSTRUCT_IBASE (0);
@@ -292,6 +297,19 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
         temp->DecRef ();
       }
     }
+
+    iString *setStr = NULL;
+    const csStringArray &cusProps = pm->GetCustomStringProperties();
+    for( size_t i = 0; i < cusProps.Length(); ++i )
+    {
+      const char *tp = cusProps[ i ];
+      pm->GetString( settings, tp, setStr );
+      if( NULL != setStr )
+      {
+        csRef< iString > tr( setStr );
+        _customStringProps.Put( pm->NameToId( tp ), tr );
+      }
+    }
   }
   return true;
 }
@@ -311,6 +329,16 @@ bool awsComponent::GetProperty (const char *name, intptr_t *parm)
     *parm = (intptr_t)s;
     return true;
   }
+  
+  unsigned long nameId = wmgr->GetPrefMgr()->NameToId( name );
+  csRef< iString > nullStr;
+  csRef< iString > cusPropVal = _customStringProps.Get( nameId, nullStr );
+  if( cusPropVal.IsValid() )
+  {
+    iString *s = new scfString (*cusPropVal);
+    *parm = (intptr_t)s;
+    return true;
+  }
   return false;
 }
 
@@ -320,6 +348,13 @@ bool awsComponent::SetProperty (const char *name, intptr_t parm)
   {
     csRect *r = (csRect *) (parm);
     self->ResizeTo (*r);
+    return true;
+  }
+  
+  if( csArrayItemNotFound != wmgr->GetPrefMgr()->GetCustomStringProperties().Find( name ) )
+  {
+    csRef< iString > ts( ( iString* ) parm );
+    _customStringProps.PutUnique( wmgr->GetPrefMgr()->NameToId( name ), ts );
     return true;
   }
   return false;

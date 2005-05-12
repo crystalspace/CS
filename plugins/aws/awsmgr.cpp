@@ -1170,12 +1170,56 @@ bool awsManager::HandleEvent (iEvent &Event)
   case csevBroadcast:
     if (Event.Command.Code == cscmdPreProcess)
     {
-      DispatchEventRecursively(GetTopComponent(), Event);
+      DeleteMarkedComponentsRecursively(top);
+      DispatchEventRecursively(top, Event);
     }
     break;
   }
   
   return false;
+}
+
+void awsManager::DeleteMarkedComponentsRecursively(iAwsComponent *&c)
+{
+  if( NULL != c )
+  {
+    if( c->GetMarkToDelete() )
+    {
+      iAwsComponent *tc = c;
+      iAwsComponent *nc = c->ComponentBelow();
+      tc->Hide();
+      tc->Unlink();
+      // The component doesn't have to be DecRef-ed anymore.
+      // tc->DecRef();
+      c = nc;
+      DeleteMarkedComponentsRecursively( c );
+    }
+    else
+    {
+      iAwsComponent *tc = c->GetTopChild();
+      DeleteMarkedComponentsRecursively( tc );
+      c->SetTopChild( tc );
+      tc = c->ComponentBelow();
+      DeleteMarkedComponentsRecursively( tc );
+      c->SetComponentBelow( tc );
+    }
+  }
+}
+
+void awsManager::MarkToDeleteRecursively( iAwsComponent *c )
+{
+  c->MarkToDelete();
+  MarkChildToDeleteRecursively(c->GetTopChild());
+}
+
+void awsManager::MarkChildToDeleteRecursively( iAwsComponent *c )
+{
+  while( NULL != c )
+  {
+    c->MarkToDelete();
+    MarkChildToDeleteRecursively(c->GetTopChild());
+    c = c->ComponentBelow();
+  }
 }
 
 void awsManager::DispatchEventRecursively(iAwsComponent *c, iEvent &ev)
@@ -1379,6 +1423,7 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("No", 0);
 
   GetPrefMgr ()->RegisterConstant ("signalComponentCreated", 0xefffffff);
+  GetPrefMgr ()->RegisterConstant ("signalComponentDestroyed", 0xeffffffe);
 
   GetPrefMgr ()->RegisterConstant ("mouseOver", 1);
   GetPrefMgr ()->RegisterConstant ("mouseClick", 2);

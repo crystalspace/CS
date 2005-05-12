@@ -26,6 +26,7 @@
 #include "csgeom/csrect.h"
 #include "awsprefs.h"
 #include "awsslot.h"
+#include "property.h"
 #include "csutil/array.h"
 
 class awsCanvas;
@@ -108,6 +109,12 @@ protected:
   /// Focusable flag.
   bool focusable;
 
+  /// Values of custom string properties.
+  csHash< csRef< iString >, unsigned long > _customStringProps;
+
+  /// Flag if this component will be deleted in the next frame.
+  bool _destructionMark;
+
   /**
    * Most of the time "self" points at 'this', which is the component itself,
    * however, when we are acting as the proxy for an awsEmbeddedComponent, then
@@ -116,6 +123,10 @@ protected:
    * method invocations which must be handled by the wrapping component.
    */
   iAwsComponent* self;
+
+  /// The bag of properties for this component.
+  awsPropertyBag properties;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -177,6 +188,16 @@ public:
    * property's value. Returns false if there's no such property.
    */
   virtual bool GetProperty (const char* name, intptr_t *parm);
+
+  //////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////// Properties ////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
+
+  /** The type of the component. */
+  awsProperty pType;
+
+
+
 
 #ifndef AWS_VOIDP_IS_ERROR
   /**
@@ -495,6 +516,23 @@ public:
 
   /// Triggered when a child becomes unfocused.
   virtual void OnUnsetFocus ();
+
+  /// Set destruction mark.
+  virtual void MarkToDelete()
+  {
+    if( !_destructionMark )
+    {
+      _destructionMark = true;
+      Broadcast (0xeffffffe);
+    }
+  }
+
+  /// Return destruction mark.
+  virtual bool GetMarkToDelete()
+  {
+    return _destructionMark;
+  }
+
 protected:
   /// Recursively moves children (and all nested children) by relative amount.
   virtual void MoveChildren (int delta_x, int delta_y);

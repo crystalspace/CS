@@ -184,6 +184,16 @@ iAwsComponent *awsSource::GetComponent ()
 
 bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
 {
+  size_t n = slots.Length();
+  for( size_t i = 0; i < n; ++i )
+  {
+    SlotSignalMap *ssm = slots.Get( i );
+    if( ssm->slot == slot && ssm->signal == signal )
+    {
+      return true;
+    }
+  }
+
   SlotSignalMap *ssm = new SlotSignalMap;
   ssm->slot = slot;
   ssm->signal = signal;

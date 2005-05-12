@@ -593,6 +593,9 @@ private:
 
   /// constant value heap.
   csPDelArray<constant_entry> constants;
+
+  /// Array of custom string value of components to be read.
+  csStringArray _customStringProps;
 public:
   SCF_DECLARE_IBASE;
 
@@ -834,6 +837,12 @@ public:
 
   ///reates a new connection node factory.
   virtual iAwsConnectionNodeFactory *CreateConnectionNodeFactory ();
+
+  /// Add custom string property to be read for all components.
+  virtual void AddCustomStringProperty (const char *prop);
+
+  /// Get all the custom string properties in the manager.
+  virtual const csStringArray &GetCustomStringProperties();
 };
 
 #endif // __CS_AWS_PREFS_H__

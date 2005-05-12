@@ -419,8 +419,22 @@ public:
   /// Dispatch event to the component and all its children.
   static void DispatchEventRecursively(iAwsComponent *c, iEvent &ev);
 
+  /// Call this if you want to delete marked components immediately.
+  virtual void DeleteMarkedComponents()
+  {
+    DeleteMarkedComponentsRecursively(top);
+  }
+
+  /// Call this if you want to delete marked components immediately.
+  static void DeleteMarkedComponentsRecursively(iAwsComponent *&c);
+
   /// Notify the manager about component destruction.
   virtual void ComponentDestroyed(iAwsComponent *comp);
+
+  /// Mark component and all its children to delete.
+  virtual void MarkToDeleteRecursively( iAwsComponent *c );
+  
+  static void MarkChildToDeleteRecursively( iAwsComponent *c );
 };
 
 #endif // __CS_AWS_H__

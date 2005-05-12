@@ -215,6 +215,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
 
   // Post load work...
   awstxt->tex->SetKeyColor (key_r, key_g, key_b);
+  awstxt->tex->SetTextureClass( "nocompress" );
 
   textures.Push (awstxt);
 

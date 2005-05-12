@@ -660,3 +660,13 @@ iAwsConnectionNodeFactory *awsPrefManager::CreateConnectionNodeFactory ()
 {
   return new awsConnectionNodeFactory (wmgr);
 }
+
+void awsPrefManager::AddCustomStringProperty (const char *prop)
+{
+  _customStringProps.Push( prop );
+}
+
+const csStringArray &awsPrefManager::GetCustomStringProperties()
+{
+  return _customStringProps;
+}

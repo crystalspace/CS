@@ -25,6 +25,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
+#include "ivaria/reporter.h"
 
 awsCmdButton::awsCmdButton ()
   : is_down (false),
@@ -98,9 +99,25 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     pm->GetString (settings, "BitmapFocused", tn2);
     pm->GetString (settings, "BitmapClicked", tn3);
     if (pm->GetInt (settings, "Stretched", stretch)) stretched = stretch;
-    if (tn1) tex[0] = pm->GetTexture (tn1->GetData (), tn1->GetData ());
-    if (tn2) tex[1] = pm->GetTexture (tn2->GetData (), tn2->GetData ());
-    if (tn3) tex[2] = pm->GetTexture (tn3->GetData (), tn3->GetData ());
+
+#define GET_TEXTURE( t_id )     \
+  if (tn##t_id) \
+  {\
+    tex[t_id - 1] = pm->GetTexture (tn##t_id->GetData (), tn##t_id->GetData ());\
+    if( 0 == tex[t_id - 1] )\
+    {\
+      csReport( _wmgr->GetObjectRegistry(), CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws", \
+        "Texture \"%s\" could not be found", tn##t_id->GetData () );\
+      return false;\
+    }\
+  }
+
+    GET_TEXTURE( 1 );
+    GET_TEXTURE( 2 );
+    GET_TEXTURE( 3 );
+
+#undef GET_TEXTURE
+
   }
   else
     return false;
@@ -275,7 +292,7 @@ void awsCmdButton::OnDraw (csRect clip)
       th);
   }
   
-  if (tex[0])
+  if (style != fsBitmap && tex[0])
   {
     int img_w, img_h;
     int itx = tx;
@@ -315,8 +332,8 @@ void awsCmdButton::OnDraw (csRect clip)
     
     g3d->DrawPixmap (
       tex[0],
-      Frame ().xmin + is_down + itx + 2,
-      Frame ().ymin + is_down + ity + 2,
+      Frame ().xmin + itx + 2,
+      Frame ().ymin + ity + 2,
       img_w,
       img_h,
       0,
@@ -332,38 +349,41 @@ void awsCmdButton::OnDraw (csRect clip)
   }
   
   // Draw the caption, if there is one and the style permits it.
-  if (caption)
+  if (style != fsBitmap)
   {
-    // Draw the text.
-    g2d->Write (
-      WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-      Frame ().xmin + tx + is_down,
-      Frame ().ymin + ty + is_down,
-      WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
-      -1,
-      caption->GetData ());
-
-    if (can_raise && style == fsNormal)
+    if( caption )
     {
-      int x, y;
-      int y1 = Frame ().ymin + ty + th + 2 + is_down, y2 = Frame ().ymin +
-        ty - 2 + is_down, x1 = Frame ().xmin + is_down + 4,
-        x2 = Frame ().xmax + is_down - 4;
+      // Draw the text.
+      g2d->Write (
+        WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+        Frame ().xmin + tx + is_down,
+        Frame ().ymin + ty + is_down,
+        WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+        -1,
+        caption->GetData ());
 
-      for (x = x1; x < x2; ++x)
+      if (can_raise && style == fsNormal)
       {
-        g2d->DrawPixel (x, y1, (x & 1 ? hi : lo));
-        g2d->DrawPixel (x, y2, (x & 1 ? hi : lo));
-      }
+        int x, y;
+        int y1 = Frame ().ymin + ty + th + 2 + is_down, y2 = Frame ().ymin +
+          ty - 2 + is_down, x1 = Frame ().xmin + is_down + 4,
+          x2 = Frame ().xmax + is_down - 4;
 
-      for (y = y2; y < y1; ++y)
-      {
-        g2d->DrawPixel (x1, y, (y & 1 ? hi : lo));
-        g2d->DrawPixel (x2, y, (y & 1 ? hi : lo));
+        for (x = x1; x < x2; ++x)
+        {
+          g2d->DrawPixel (x, y1, (x & 1 ? hi : lo));
+          g2d->DrawPixel (x, y2, (x & 1 ? hi : lo));
+        }
+
+        for (y = y2; y < y1; ++y)
+        {
+          g2d->DrawPixel (x1, y, (y & 1 ? hi : lo));
+          g2d->DrawPixel (x2, y, (y & 1 ? hi : lo));
+        }
       }
     }
   }
-  else if (style == fsBitmap)
+  else
   {
     int texindex;
     int w, h;
@@ -379,8 +399,8 @@ void awsCmdButton::OnDraw (csRect clip)
 
     g3d->DrawPixmap (
       tex[texindex],
-      Frame ().xmin+is_down,
-      Frame ().ymin+is_down,
+      Frame ().xmin,
+      Frame ().ymin,
       stretched ? Frame ().Width () : w,
       stretched ? Frame ().Height () : h,
       0,
