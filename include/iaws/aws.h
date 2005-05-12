@@ -30,6 +30,7 @@
 #include "csgeom/cspoint.h"
 #include "iutil/event.h"
 #include "iutil/string.h"
+#include <string>
 
 struct iAws;
 struct iAwsCanvas;
@@ -454,7 +455,7 @@ public:
   virtual void MarkToDeleteRecursively(iAwsComponent *comp)=0;
 };
 
-SCF_VERSION (iAwsPrefManager, 0, 0, 3);
+SCF_VERSION (iAwsPrefManager, 0, 0, 4);
 
 /// Interface for the preferences manager (window manager needs one.)
 struct iAwsPrefManager : public iBase
@@ -520,6 +521,11 @@ public:
   /// Get the value of an integer from a given component node
   virtual bool GetString(iAwsComponentNode *node, const char* name,
   	iString *&val)=0;
+
+  /// Get the value of a string from a given component node.
+  virtual bool GetString(iAwsComponentNode *node, const char *name,
+	std::string &val)=0;
+
 
   /// Get the a color from a given component node
   virtual bool GetRGB(iAwsComponentNode *node, const char* name,
