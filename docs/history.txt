@@ -6,9 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-May-2005
+	- Eric Sunshine augmented the ResponseFile rule in helper.jam so that
+	  it respects the LOCATE variable (possible set by the MakeLocate rule)
+	  on the generated file rather than always assuming that
+	  $(LOCATE_TARGET) should be used if the directory was not specified
+	  explicitly at rule invocation.
 11-May-2005
-	- res fixed the crystalspace_staticplugins target to be independent,
-	  ie it is not being built when the other libs are.
+	- res fixed the crystalspace_staticplugins target to be independent;
+	  i.e. it is not being built when the other libs are.
 	- res added a proper clean rule for the static deps file.
 	- res fixed a linking issue where a lib dependency was passed to the
 	  linker before the depending lib instead after it.

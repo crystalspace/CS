@@ -163,21 +163,23 @@ rule Recurse
 ##    which would otherwise be specified via the command-line.  This is often
 ##    called a "response file".  The ResponseFile rule can be used to create a
 ##    response file named 'file' in 'directory' containing 'items', one per
-##    line.  If 'directory' is not specified, then the file is placed in
-##    $(LOCATE_TARGET).  If there is a possibility that the same 'file' name
-##    might be used in other contexts, be sure to grist it appropriately to
-##    avoid conflicts.  This rule assumes that 'items' contains bound entries
-##    unless the "notfile" option is specified, in which case the NotFile rule
-##    is automatically invoked for each item.  This rule may be invoked
-##    multiple times for the same 'file' in order to populate the file
-##    incrementally.  As an internal optimization to keep performance
-##    relatively sane, ResponseFile temporarily inserts 'delim' between 'items'
-##    when emitting them, and then substitutes newline for 'delim' just before
-##    writing the items to 'file'. 'delim' must be a one-character string. If
-##    not specified, "@" is used. If "@" is likely to appear in 'items', then
-##    choose a different character for 'delim'; one which is known to not
-##    appear in 'items'.  The rule returns 'file' to make it convenient to
-##    daisy chain with invocations of other rules, such as Depends or Always.
+##    line.  As a convenience, if 'directory' is not specified, and if the
+##    MakeLocate rule has not already been invoked for 'file' or LOCATE has not
+##    been set for 'file', then the file is placed in $(LOCATE_TARGET).  If
+##    there is a possibility that the same 'file' name might be used in other
+##    contexts, be sure to grist it appropriately to avoid conflicts.  This
+##    rule assumes that 'items' contains bound entries unless the "notfile"
+##    option is specified, in which case the NotFile rule is automatically
+##    invoked for each item.  This rule may be invoked multiple times for the
+##    same 'file' in order to populate the file incrementally.  As an internal
+##    optimization to keep performance relatively sane, ResponseFile
+##    temporarily inserts 'delim' between 'items' when emitting them, and then
+##    substitutes newline for 'delim' just before writing the items to
+##    'file'. 'delim' must be a one-character string. If not specified, "@" is
+##    used. If "@" is likely to appear in 'items', then choose a different
+##    character for 'delim'; one which is known to not appear in 'items'.  The
+##    rule returns 'file' to make it convenient to daisy-chain with invocations
+##    of other rules, such as RmTemps, Depends, or Always.
 ##    Options:
 ##      notfile: Invoke NotFile for each item automatically; otherwise, assume
 ##               that each item is a bound file.
@@ -212,8 +214,18 @@ rule ResponseFile
     NotFile $(items) ;
   }
 
-  if ! $(dir) { dir = $(LOCATE_TARGET) ; }
-  MakeLocate $(file) : $(dir) ;
+  if $(dir)
+  {
+    MakeLocate $(file) : $(dir) ;
+  }
+  else
+  {
+    local target_dir = [ on $(file) GetVar LOCATE ] ;
+    if ! $(target_dir)
+    {
+      MakeLocate $(file) : $(LOCATE_TARGET) ;
+    }
+  }
 
   local i ;
   for i in $(items)
