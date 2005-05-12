@@ -559,7 +559,7 @@ rule SplitToList
   local matcher = Match ; # See IMPLEMENTATION NOTE above.
   local unsplit = $(<) ;
   local sep = $(2) ;
-  if ! $(sep) { delim = " " ; }
+  if ! $(sep) { sep = " " ; }
   while $(unsplit) != ""
   {
     local split = [ $(matcher) "(.*)$(sep)(.*)" : $(unsplit) ] ;
