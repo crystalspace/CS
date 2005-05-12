@@ -48,7 +48,8 @@ awsComponent::awsComponent ()
     focusable (false),
     self(0),
     _destructionMark( false ),
-	CompType(false)
+	CompType(false),
+	CompFrame(frame)
 {
   self = this;
   signalsrc.SetOwner (self);
@@ -69,7 +70,8 @@ awsComponent::awsComponent (iAwsComponent* wrapper)
     focusable (false),
     self(wrapper),
     _destructionMark( false ),
-	CompType(false)
+	CompType(false),
+	CompFrame(frame)
 
 {
   signalsrc.SetOwner (self);
@@ -219,6 +221,7 @@ bool awsComponent::Create (
 
   /// Bind properties.
   CompType.Bind("Type", properties);
+  CompFrame.Bind("Frame", properties);
 
   /// Set ourself up by querying the settings.
   if (!self->Setup (wmgr, settings))

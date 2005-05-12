@@ -119,17 +119,17 @@ public:
 			return true;
 		}
 		else return false;
-	}
+	}	
 };
 
-/** A special property that lets us store rects, and only rects. */
+/**  A bound property.  This property is bound to some csRect. */
 class awsRectProperty : virtual public awsPropertyBase
 {
 	/** The rect we store. */
-	csRect value;
+	csRect &value;
 
 public:
-	awsRectProperty(bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable)
+	awsRectProperty(csRect &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
 	{
 	}
 
@@ -180,6 +180,132 @@ public:
 
 	/** Gets the value of this property if allowed, returns false if not allowed. */
 	virtual bool Get(csRect &_value)
+	{
+		if (readable)
+		{
+			value = _value;
+            return true;
+		}
+		else return false;		
+	}
+
+};
+
+/**  A bound property.  This property is bound to some int. */
+class awsIntProperty : virtual public awsPropertyBase
+{
+	/** The int we store. */
+	int &value;
+
+public:
+	awsIntProperty(int &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+	{
+	}
+
+	virtual ~awsIntProperty()
+	{
+	}
+
+	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
+	 * cannot be successfully converted to a rect.  */
+	virtual bool Set(autom::keeper &_value)
+	{
+		if (writeable)
+		{
+			value = (int)_value->toInt().Value();
+			return true;
+		}
+		else return false;
+	}
+
+	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+	virtual bool Set(const int &_value)
+	{
+		if (writeable)
+		{
+			value = _value;
+            return true;
+		}
+		else return false;		
+	}
+	
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(autom::keeper &_value)
+	{
+        if (readable)
+		{			
+			_value.AttachNew(new autom::integer(value));
+			return true;
+		}       
+		else return false;
+	}
+
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(int &_value)
+	{
+		if (readable)
+		{
+			value = _value;
+            return true;
+		}
+		else return false;		
+	}
+
+};
+
+/**  A bound property.  This property is bound to some float. */
+class awsFloatProperty : virtual public awsPropertyBase
+{
+	/** The int we store. */
+	float &value;
+
+public:
+	awsFloatProperty(float &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+	{
+	}
+
+	virtual ~awsFloatProperty()
+	{
+	}
+
+	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
+	 * cannot be successfully converted to a rect.  */
+	virtual bool Set(autom::keeper &_value)
+	{
+		if (writeable)
+		{
+			value = (float)_value->toFloat().Value();
+			return true;
+		}
+		else return false;
+	}
+
+	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+	virtual bool Set(const float &_value)
+	{
+		if (writeable)
+		{
+			value = _value;
+            return true;
+		}
+		else return false;		
+	}
+	
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(autom::keeper &_value)
+	{
+        if (readable)
+		{			
+			_value.AttachNew(new autom::floating(value));
+			return true;
+		}       
+		else return false;
+	}
+
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(float &_value)
 	{
 		if (readable)
 		{

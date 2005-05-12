@@ -196,6 +196,9 @@ public:
   /** The type of the component. */
   awsProperty CompType;
 
+  /** The frame. */
+  awsRectProperty CompFrame;
+
 
 #ifndef AWS_VOIDP_IS_ERROR
   /**
