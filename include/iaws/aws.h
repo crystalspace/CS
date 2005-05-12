@@ -25,6 +25,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
+#include "csutil/stringarray.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
 #include "iutil/event.h"
@@ -445,6 +446,12 @@ public:
 
   /// Notify the manager about component destruction.
   virtual void ComponentDestroyed(iAwsComponent *comp)=0;
+
+  /// Call this if you want to delete marked components immediately.
+  virtual void DeleteMarkedComponents()=0;
+
+  /// Mark the component and its sub-components to be deleted.
+  virtual void MarkToDeleteRecursively(iAwsComponent *comp)=0;
 };
 
 SCF_VERSION (iAwsPrefManager, 0, 0, 3);
@@ -605,6 +612,12 @@ public:
 
   /// Creates a new connection node factory
   virtual iAwsConnectionNodeFactory *CreateConnectionNodeFactory()=0;
+
+  /// Add custom string property to be read for all components.
+  virtual void AddCustomStringProperty (const char *prop)=0;
+
+  /// Get all the custom string properties in the manager.
+  virtual const csStringArray &GetCustomStringProperties()=0;
 };
 
 
@@ -1119,6 +1132,12 @@ struct iAwsComponent : public iAwsSource
 
   /// Sets the top child
   virtual void SetTopChild(iAwsComponent* child)=0;
+
+  /// Mark the component to be deleted in PreProcess phase of the next frame.
+  virtual void MarkToDelete()=0;
+
+  /// Return the delete mark.
+  virtual bool GetMarkToDelete()=0;
 };
 
 

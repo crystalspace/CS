@@ -45,7 +45,10 @@ class awsEmbeddedComponent : public iAwsComponent
 
 public:
   awsEmbeddedComponent() { }
-  virtual ~awsEmbeddedComponent() { }
+  virtual ~awsEmbeddedComponent() 
+  { 
+    comp->WindowManager()->ComponentDestroyed( this );
+  }
 
 public:
   /// Gets the component owner for this (sources are embedded)
@@ -503,6 +506,14 @@ public:
   /// Triggered when a child looses focus
   virtual void OnUnsetFocus()
   { comp->OnUnsetFocus(); }
+
+  /// Mark the component to be deleted in PreProcess phase of the next frame.
+  virtual void MarkToDelete()
+  { comp->MarkToDelete(); }
+
+  /// Return the delete mark.
+  virtual bool GetMarkToDelete()
+  { return comp->GetMarkToDelete(); }
 };
 
 /**
