@@ -386,6 +386,15 @@ bool awsComponent::SetProperty (const char *name, intptr_t parm)
 
 bool awsComponent::Execute (const char* action, iAwsParmList* parmlist)
 {
+	std::string code(action);
+	autom::function f;
+
+	if (f.parseObject(code.begin(), code.end()))
+	{
+		f.addIntParm("comp_id", (long long)this);
+		autom::keeper result = f.Execute();
+	}
+
   if (strcmp ("MoveTo", action) == 0)
   {
   }
@@ -1255,6 +1264,59 @@ void awsComponent::OnUnsetFocus ()
   return ;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
+///////////////////////////// Automation Handlers ////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+class component_builtin : public autom::function::slot
+{	
+public:
+	component_builtin() {}
+	~component_builtin() {}
+
+	autom::function::rc_parm hide_(autom::function &fn)
+	{
+		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+
+		if (comp) comp->Hide();
+
+		return autom::keeper(autom::Nil());
+	}
+
+	autom::function::rc_parm show_(autom::function &fn)
+	{
+		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+
+		if (comp) comp->Show();
+
+		return autom::keeper(autom::Nil());
+	}
+
+	autom::function::rc_parm move_to_(autom::function &fn)
+	{
+		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+	
+		int x = fn["x"]->toInt().Value();
+		int y = fn["y"]->toInt().Value();
+
+		if (comp) comp->MoveTo(x, y);
+
+		return autom::keeper(autom::Nil());
+	}
+
+	void Register()
+	{		
+		AUTOM_REGISTER("hide@widget", this, hide_);		
+		AUTOM_REGISTER("show@widget", this, show_);
+		AUTOM_REGISTER("move_to@widget", this, move_to_);
+	}
+
+};
+
+static component_builtin component_scripting;
+
+
 /**
  * A factory is simply a class that knows how to build your component. 
  * Although components aren't required to have a factory, they will not
@@ -1288,11 +1350,13 @@ awsComponentFactory::~awsComponentFactory ()
 
 iAwsComponent *awsComponentFactory::Create ()
 {
+ 
   return new awsComponent;
 }
 
 void awsComponentFactory::Register (const char *name)
 {
+  component_scripting.Register();
   wmgr->RegisterComponentFactory (this, name);
 }
 

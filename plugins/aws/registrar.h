@@ -92,37 +92,7 @@ namespace autom
 		 *
 		 *  Would create containers user, profile, and usage; and then create size inside the usage container. 
 		 */
-		void assign(const std::string &name, func_ptr func)
-		{
-			std::vector<std::string> parts;
-			
-			cont_ptr cont=lobby;			
-			
-			if (split(const_cast<std::string&>(name), '@', parts)>1)
-			{
-				std::vector<std::string> cont_names;
-				
-				if (split(parts[1], '.', cont_names))
-				{																	
-					// Find the container - creating it if necessary.							
-					for(std::vector<std::string>::iterator pos=cont_names.begin(); pos!=cont_names.end(); ++pos)				
-					{		
-						container::cont_map_type::iterator name_pos = cont->cont_map.find(*pos);
-
-						if (name_pos==cont->cont_map.end())
-							 cont->cont_map.insert(make_pair(*pos, new container()));					
-						
-						cont = name_pos->second;							
-					}				
-
-				}	
-				
-			}
-		
-			
-			// Assign the function name
-			cont->func_map[parts[0]] = func;							
-		}									
+		void assign(const std::string &name, func_ptr func);
 	};
 	
 	
@@ -142,6 +112,9 @@ namespace autom
 	/** Returns a garbage-collected pointer that is safe for application usage. */
 	keeper Compile(std::string &str);
 	
+	/** Makes it easier to register a callback function for the automation handler. */
+	#define AUTOM_REGISTER(funcname, object_pointer, member_function) autom::Registrar()->assign(funcname, std::make_pair(object_pointer, (autom::function::slot_mem_ptr)member_function));
+
 } //end namespace
 
 #endif

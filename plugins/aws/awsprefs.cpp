@@ -589,6 +589,27 @@ bool awsPrefManager::GetString (
   return false;
 }
 
+bool 
+awsPrefManager::GetString (iAwsComponentNode *node,  const char *name, std::string &val)
+{
+  if (!node) return false;
+
+  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
+
+  if (k)
+  {
+    if (k->Type () == KEY_STR)
+    {
+      csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
+      val.assign(stringKey->Value()->GetData());
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
 iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
   unsigned long id = NameToId (name);

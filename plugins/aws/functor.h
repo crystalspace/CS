@@ -132,7 +132,7 @@ namespace autom
 		}
 		
 		/** Adds the named parameter, assume that it's a float. */
-		bool addIntParm(const std::string &parm_name, double _value)
+		bool addFloatParm(const std::string &parm_name, double _value)
 		{
 			parms.insert(std::make_pair(parm_name, new floating(_value)));
 			return true;
@@ -166,6 +166,14 @@ namespace autom
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
 		virtual std::string reprObject();
+
+		/** Executes the function and returns the value the function returns (if any.) */
+		virtual rc_parm Execute()
+		{
+			if (Called.Valid() || bind()) rv=Called(*this);
+			
+			return rv;
+		}
 				
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);					

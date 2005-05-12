@@ -29,6 +29,7 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "awstex.h"
+#include <string>
 
 /**\file
  * This is the pseudo-symbol table for the definitions keeper.  Windows and
@@ -661,7 +662,7 @@ public:
   /// Get the value of an integer from a given component node.
   virtual bool GetInt (iAwsComponentNode *node, const char *name, int &val);
 
-  /// Get the value of an integer from a given component node.
+  /// Get the value of a float from a given component node.
   virtual bool GetFloat (
     iAwsComponentNode *node,
     const char *name,
@@ -673,11 +674,17 @@ public:
     const char *name,
     csRect &rect);
 
-  /// Get the value of an integer from a given component node.
+  /// Get the value of a string from a given component node.
   virtual bool GetString (
     iAwsComponentNode *node,
     const char *name,
     iString * &val);
+
+  /// Get the value of a string from a given component node.
+  virtual bool GetString (
+    iAwsComponentNode *node,
+    const char *name,
+	std::string &val);
 
   /// Get the a color from a given component node.
   virtual bool GetRGB (

@@ -32,9 +32,8 @@ awsCheckBox::awsCheckBox ()
     is_on (false),
     frame_style (0),
     alpha_level (96),
-    alignment (0),
-    caption (0),
-	Caption(caption_),
+    alignment (0),   
+	Caption(caption),
 	State(is_on)
 {
   tex[0] = tex[1] = tex[2] = tex[3] = 0;
@@ -90,7 +89,7 @@ bool awsCheckBox::GetProperty (const char *name, intptr_t *parm)
   {
     const char *st = 0;
 
-    if (caption) st = caption->GetData ();
+    st = caption.c_str();
 
     iString *s = new scfString (st);
     *parm = (intptr_t)s;
@@ -116,19 +115,10 @@ bool awsCheckBox::SetProperty (const char *name, intptr_t parm)
     iString *s = (iString *) (parm);
 
     if (s && s->Length ())
-    {
-      if (caption) caption->DecRef ();
-      caption = s;
-      caption->IncRef ();
-      Invalidate ();
+    {     
+      Caption.Set(s->GetData());            
     }
-    else
-    {
-      if (caption)
-        caption->DecRef ();
 
-      caption = 0;
-    }
     return true;
   }
   else if (strcmp ("State", name) == 0)
@@ -224,15 +214,15 @@ void awsCheckBox::OnDraw (csRect /*clip*/)
   }
 
   // Draw the caption, if there is one and the style permits it.
-  if (caption)
+  if (!caption.empty())
   {
     int tw, th, tx, ty, mcc;
 
     mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
-      caption->GetData (),
+      caption.c_str (),
       Frame ().Width () - txw - 2);
 
-    scfString tmp (caption->GetData ());
+    scfString tmp (caption.c_str());
     tmp.Truncate (mcc);
 
     // Get the size of the text.
@@ -282,7 +272,9 @@ bool awsCheckBox::OnMouseUp (int, int, int)
     else
       State.Set(false);
 
+	Clicked(this);
     Broadcast (signalClicked);
+
     is_down = false;
   }
 
@@ -310,20 +302,21 @@ bool awsCheckBox::OnMouseEnter ()
 bool awsCheckBox::OnKeyboard (const csKeyEventData& eventData)
 {
   bool eventEaten = false;
+
   switch(eventData.codeCooked)
   {
   case CSKEY_ENTER:
     eventEaten = true;
     if (!is_on)
-      is_on = true;
+		State.Set(true);
     else
-      is_on = false;
+	    State.Set(false);
+
+	Clicked(this);
     Broadcast (signalClicked);
     break;
   }
-  
-  Invalidate ();
-  
+    
   return eventEaten;
 }
 
