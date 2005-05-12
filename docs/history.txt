@@ -15,6 +15,11 @@ chronological order.
 	- Eric Sunshine resolved "using independent target" warnings issued by
 	  Jam when creating static-linking goop and during mscvgen runs. Also
 	  simplified the GenerateStaticPluginFoo rules in static.jam a bit.
+	- Eric Sunshine rewrote the Help rule in help.jam so that the padding
+	  of the target and description columns is performed directly by Jam
+	  rather than by external commands. This should give some overall
+	  speed-up of "jam help", especially on Windows where process creation
+	  is expensive and slow.
 11-May-2005
 	- res fixed the crystalspace_staticplugins target to be independent;
 	  i.e. it is not being built when the other libs are.

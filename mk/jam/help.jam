@@ -50,20 +50,34 @@ rule Description
 ##    help".
 rule Help
 {
-  local target = $(<:G=help) ;
+  local target = $(<) ;
   local desc = $(>) ;
+
+  if ! $(target) { target = "" ; }
+  if ! $(desc) { desc = "" ; }
+
+  # target width:20, description width:54
+  local target_pad = "                    " ;
+  local target_pat = "...................." ;
+  local desc_pad = "                                                      " ;
+  local desc_pat = "......................................................" ;
+
+  local m = Match ; # Indirect invocation allows variables in pattern regex.
+  local target_str = [ $(m) "($(target_pat)).*" : "$(target)$(target_pad)" ] ;
+  local desc_str = [ $(m) "($(desc_pat)).*" : "$(desc)$(desc_pad)" ] ;
+  local help = "jam $(target_str) $(desc_str)" ;
+
+  target = $(target:G=help) ;
   Depends help : $(target) ;
-  NotFile $(desc) ;
-  PrintHelp $(target) : $(desc) ;
+  NotFile $(help) ;
+  PrintHelp $(target) : $(help) ;
   Always $(target) ;
   NotFile $(target) ;
 }
 
 actions quietly PrintHelp
 {
-  # target width:20, description width:54
-  echo "jam ->$(<:G=)                    <- =>$(>)                                                      <=" | \
-    $(SED) 's/->\(....................\).*<-/\1/;s/=>\(......................................................\).*<=/\1/'
+  echo "$(>)"
 }
 
 NotFile help ;
