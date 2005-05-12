@@ -22,6 +22,11 @@ chronological order.
 	  is expensive and slow.
 	- res added a small blurb with notes on string formatting in CS to the
 	  API docs.
+	- Christopher added a type-safe properties system and automation to AWS.
+         None of the old property code has been removed.  I will first change over
+	 all the widgets that use it, then the apps, then remove the old shtuff.
+        - Christopher added the changes made by Bedrich Zaba.
+
 11-May-2005
 	- res fixed the crystalspace_staticplugins target to be independent;
 	  i.e. it is not being built when the other libs are.
