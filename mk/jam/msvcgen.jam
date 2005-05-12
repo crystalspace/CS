@@ -840,11 +840,11 @@ rule LinkStaticPlugins
 
   # Generate static plugin instantiation
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
-  local staticuse_out = $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
+  local staticuse_out =
+    $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
   MakeLocate $(staticuse_out) : $(outdir) ;
   SEARCH on $(staticuse_out) = $(outdir) ;
   
-  GenerateStaticPluginBoilerplate $(staticuse_out) ;
   GenerateStaticPluginInstantiation $(staticuse_out) : $(>) ;
   Always $(staticuse_out) ;
   Depends msvcgen : $(staticuse_out) ;
@@ -893,7 +893,6 @@ rule Plugin
   local staticreg_out = $(MSVC.PREFIX.library)$(<)_staticreg.cpp ;
   MakeLocate $(staticreg_out) : $(outdir) ;
   SEARCH on $(staticreg_out) = $(outdir) ;
-  GenerateStaticPluginBoilerplate $(staticreg_out) ;
   GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
   Always $(staticreg_out) ;
   Depends msvcgen : $(staticreg_out) ;

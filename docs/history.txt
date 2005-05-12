@@ -12,6 +12,9 @@ chronological order.
 	  on the generated file rather than always assuming that
 	  $(LOCATE_TARGET) should be used if the directory was not specified
 	  explicitly at rule invocation.
+	- Eric Sunshine resolved "using independent target" warnings issued by
+	  Jam when creating static-linking goop and during mscvgen runs. Also
+	  simplified the GenerateStaticPluginFoo rules in static.jam a bit.
 11-May-2005
 	- res fixed the crystalspace_staticplugins target to be independent;
 	  i.e. it is not being built when the other libs are.
