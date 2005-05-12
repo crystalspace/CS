@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 # CEL detection macros
-# (C)2003 by Matthias Braun <matze@braunis.de>
+# Copyright (C)2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -23,131 +23,144 @@
 # The script will set the CEL_AVAILABLE, CEL_VERSION, CEL_LIBS and CEL_CFLAGS
 # variables.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_PATH_CEL_HELPER],
-[
-AC_ARG_WITH(cel-prefix, AC_HELP_STRING([--with-cel-prefix=PFX], [Prefix where to Cel is installed (optional)]),
-    [CELPREFIX="$withval"], [CELPREFIX=""])
-AC_ARG_ENABLE(cel-test, AC_HELP_STRING([--disable-cel-test], [Do not try to compile and run a cel test program]), enable_celtest="$enableval",
-        enable_celtest="no")
+m4_define([cel_min_version_default], [0.99])
+
+AC_DEFUN([CS_PATH_CEL_CHECK],
+[AC_ARG_WITH([cel-prefix], 
+    [AC_HELP_STRING([--with-cel-prefix=CEL_PREFIX], 
+	[Prefix where to CEL is installed (optional)])],
+    [CEL="$withval"
+    export CEL])
+AC_ARG_VAR([CEL], [Prefix Where CEL is installed])
+AC_ARG_ENABLE([cel-test], 
+    AC_HELP_STRING([--disable-cel-test], 
+      [Do not try to compile and run a cel test program]), 
+      [enable_celtest="$enableval"], [enable_celtest="no"])
 
 no_cel=no
 
-if test -z "$CELPREFIX"; then
-    CS_CHECK_PROGS(CELCONFIG, cel-config, "")
-    if test -z "$CELCONFIG"; then
-        CS_CHECK_PROGS(CELCONFIG, cel-config, "", $CEL)
-        if test -n "$CELCONFIG"; then
-            CELCONFIG="$CEL/cel-config"
-        fi
-    fi
-else
-    CS_CHECK_PROGS(CELCONFIG, cel-config, "", $CELPREFIX/bin)
-    if test -n "$CELCONFIG"; then
-        CELCONFIG="$CELPREFIX/bin/cel-config"
-    fi
-fi
+# Try to find an installed cel-config.
+cel_path=''
+AS_IF([test -n "$CEL"],
+    [my_IFS=$IFS; IFS=$PATH_SEPARATOR
+    for cel_dir in $CEL; do
+	AS_IF([test -n "$cel_path"], [cel_path="$cel_path$PATH_SEPARATOR"])
+	cel_path="$cel_path$cel_dir$PATH_SEPARATOR$cel_dir/bin"
+    done
+    IFS=$my_IFS])
 
-if test -z "$CELCONFIG"; then
-    AC_MSG_WARN([Can't find cel-config script])
-    no_cel=yes
-fi
+AS_IF([test -n "$cel_path"], [cel_path="$cel_path$PATH_SEPARATOR"])
+cel_path="$cel_path$PATH$PATH_SEPARATOR/usr/local/cel/bin"
 
-if test "$no_cel" = "no" ; then
-    AC_MSG_CHECKING([for CEL - version >= $1])
-    CEL_CFLAGS=`$CELCONFIG --cflags`
-    CEL_LIBS=`$CELCONFIG --libs`
-    CEL_LFLAGS=`$CELCONFIG --lflags`
-    CEL_INCLUDE_DIR=`$CELCONFIG --includedir`
-    CEL_PLUGIN_DIR=`$CELCONFIG --plugindir`
-    CEL_VERSION=`$CELCONFIG --version`
-    CEL_AVAILABLE=yes
-    
-    if test -z "$CEL_VERSION"; then
-        AC_MSG_RESULT(no)
-        no_cs=yes
-    fi
-fi
+AC_PATH_TOOL([CEL_CONFIG_TOOL], [cel-config], [], [$cel_path])
 
-if test "$no_cs" = "yes"; then
-    enable_celtest=no
-fi
+AS_IF([test -n "$CEL_CONFIG_TOOL"],
+    [cfg="$CEL_CONFIG_TOOL"
 
-if test "$enable_celtest" != "no"; then
-    AC_LANG_SAVE
-    AC_LANG_CPLUSPLUS
+    CS_CHECK_PROG_VERSION([CEL], [$cfg --version],
+	[m4_default([$1],[cel_min_version_default])], [9.9|.9],
+	[cel_sdk=yes], [cel_sdk=no])
 
-    ac_save_CXXFLAGS="$CXXFLAGS"
-    ac_save_LIBS="$LIBS"
+    AS_IF([test $cel_sdk = yes],
+	[cel_liblist="$4"
+	cel_optlibs=CS_TRIM([$5])
+	AS_IF([test -n "$cel_optlibs"],
+	    [cel_optlibs=`$cfg --available-libs $cel_optlibs`
+	    cel_liblist="$cel_liblist $cel_optlibs"])
+	CEL_VERSION=`$cfg --version $cel_liblist`
+	CEL_CFLAGS=CS_RUN_PATH_NORMALIZE([$cfg --cflags $cel_liblist])
+	CEL_LIBS=CS_RUN_PATH_NORMALIZE([$cfg --lflags $cel_liblist])
+	CEL_INCLUDE_DIR=CS_RUN_PATH_NORMALIZE(
+	    [$cfg --includedir $cel_liblist])
+	CEL_AVAILABLE_LIBS=`$cfg --available-libs`
+	CEL_STATICDEPS=`$cfg --static-deps`
+	AS_IF([test -z "$CEL_LIBS"], [cel_sdk=no])])],
+    [cel_sdk=no])
 
-    CXXFLAGS="$CXXFLAGS $CRYSTAL_CFLAGS $CEL_CFLAGS"
-    LIBS="$LIBS $CRYSTAL_LIBS $CEL_LIBS"
+AS_IF([test "$cel_sdk" = yes && test "$enable_celtest" = yes],
+    [CS_CHECK_BUILD([if Crystal Space SDK is usable], [cel_cv_crystal_sdk],
+	[AC_LANG_PROGRAM(
+	    [#include <cssysdef.h>
+	    #include <physicallayer/entity.h>
+	    CS_IMPLEMENT_APPLICATION],
+	    [/* TODO a nice testapp... */])],
+	[CS_CREATE_TUPLE([$CEL_CFLAGS],[],[$CEL_LIBS])], [C++],
+	[], [cel_sdk=no])])
 
-    AC_TRY_RUN([
-#include <cssysdef.h>
-
-#include <physicallayer/entitiy.h>
-            
-CS_IMPLEMENT_APPLICATION
-
-int main(int argc, char** argv)
-{
-    // TODO a nice testapp...
-    return 0;
-}
-],, [no_cel=yes
-AC_MSG_RESULT(no)], [echo "$ac_n cross compiling; assumed OK. $ac_c"])
-
-    CXXFLAGS="$ac_save_CXXFLAGS"
-    LIBS="$ac_save_LIBS"
-    AC_LANG_RESTORE
-fi
-
-if test "$no_cel" = "no"; then
-    AC_MSG_RESULT($CEL_VERSION)
-    ifelse([$2], [], [:], [$2])
-else
-    CEL_CFLAGS=""
-    CEL_VERSION=""
-    CEL_LIBS=""
-    CEL_LFLAGS=""
-    CEL_INCLUDE_DIR=""
-    CEL_PLUGIN_DIR=""
-    CEL_AVAILABLE="no"
-    ifelse([$3], [], [:], [$3])
-fi
-
+AS_IF([test "$cel_sdk" = yes],
+   [CEL_AVAILABLE=yes
+   $2],
+   [CEL_AVAILABLE=no
+   CEL_CFLAGS=''
+   CEL_VERSION=''
+   CEL_LIBS=''
+   CEL_INCLUDE_DIR=''
+   $3])
 ])
 
-dnl AC_PATH_CEL([Minimum-version, [ACTION-IF_FOUND, [ACTION-IF-NOT-FOUND]]])
-dnl Test for cel and sets CEL_VERSION, CEL_CFLAGS, CEL_LIBS and CEL_AVAILABLE
-dnl variables (this version uses AC_SUBST for the results)
-AC_DEFUN([AC_PATH_CEL], [
 
-CS_PATH_CEL_HELPER($1,$2,$3)
+#------------------------------------------------------------------------------
+# CS_PATH_CEL_HELPER([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                        [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS],
+#                        [OPTIONAL-LIBS])
+#	Deprecated: Backward compatibility wrapper for CS_PATH_CEL_CHECK().
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CEL_HELPER],
+[CS_PATH_CEL_CHECK([$1],[$2],[$3],[$4],[$5])])
 
+
+#------------------------------------------------------------------------------
+# CS_PATH_CEL([MINIMUM-VERSION], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#                 [REQUIRED-LIBS], [OPTIONAL-LIBS])
+#	Convenience wrapper for CS_PATH_CEL_CHECK() which also invokes
+#	AC_SUBST() for CEL_AVAILABLE, CEL_VERSION, CEL_CFLAGS,
+#	CEL_LIBS, CEL_INCLUDE_DIR, and CEL_AVAILABLE_LIBS.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CEL],
+[CS_PATH_CEL_CHECK([$1],[$2],[$3],[$4],[$5])
+AC_SUBST([CEL_AVAILABLE])
+AC_SUBST([CEL_VERSION])
 AC_SUBST([CEL_CFLAGS])
 AC_SUBST([CEL_LIBS])
-AC_SUBST([CEL_LFLAGS])
 AC_SUBST([CEL_INCLUDE_DIR])
-AC_SUBST([CEL_PLUGIN_DIR])
-AC_SUBST([CEL_VERSION])
-AC_SUBST([CEL_AVAILABLE])
+AC_SUBST([CEL_AVAILABLE_LIBS])
+AC_SUBST([CEL_STATICDEPS])])
 
+
+#------------------------------------------------------------------------------
+# CS_PATH_CEL_EMIT([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                      [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS], [OPTIONAL-LIBS],
+#                      [EMITTER])
+#	Convenience wrapper for CS_PATH_CEL_CHECK() which also emits
+#	CEL_AVAILABLE, CEL_VERSION, CEL_CFLAGS, CEL_LIBS,
+#	CEL_INCLUDE_DIR, and CEL_AVAILABLE_LIBS as the build properties
+#	CEL.AVAILABLE, CEL.VERSION, CEL.CFLAGS, CEL.LIBS,
+#	CEL.INCLUDE_DIR, and CEL.AVAILABLE_LIBS, respectively, using
+#	EMITTER.  EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
+#	property and value. If EMITTER is omitted, then
+#	CS_EMIT_BUILD_PROPERTY()'s default emitter is used.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CEL_EMIT],
+[CS_PATH_CEL_CHECK([$1],[$2],[$3],[$4],[$5])
+_CS_PATH_CEL_EMIT([CEL.AVAILABLE],[$CEL_AVAILABLE],[$6])
+_CS_PATH_CEL_EMIT([CEL.VERSION],[$CEL_VERSION],[$6])
+_CS_PATH_CEL_EMIT([CEL.CFLAGS],[$CEL_CFLAGS],[$6])
+_CS_PATH_CEL_EMIT([CEL.LFLAGS],[$CEL_LIBS],[$6])
+_CS_PATH_CEL_EMIT([CEL.INCLUDE_DIR],[$CEL_INCLUDE_DIR],[$6])
+_CS_PATH_CEL_EMIT([CEL.AVAILABLE_LIBS],[$CEL_AVAILABLE_LIBS],[$6])
+_CS_PATH_CEL_EMIT([CEL.STATICDEPS],[$CEL_STATICDEPS],[$6])
 ])
 
-dnl CS_PATH_CEL([Minimum-version, [ACTION-IF-FOUND, [ACTION-IF-NOT-FOUND]]])
-dnl Test for cel and sets CEL_VERSION, CEL_CFLAGS, CEL_LIBS and CEL_AVAILABLE
-dnl variables (this version uses CS_SUBST for the results)
-AC_DEFUN([CS_PATH_CEL], [
+AC_DEFUN([_CS_PATH_CEL_EMIT],
+[CS_EMIT_BUILD_PROPERTY([$1],[$2],[],[],[$3])])
 
-CS_PATH_CEL_HELPER([$1],[$2],[$3])
 
-CS_JAMCONFIG_PROPERTY([CEL.CFLAGS], [$CEL_CFLAGS])
-CS_JAMCONFIG_PROPERTY([CEL.LIBS], [$CEL_LIBS])
-CS_JAMCONFIG_PROPERTY([CEL.LFLAGS], [$CEL_LFLAGS])
-CS_JAMCONFIG_PROPERTY([CEL.INCLUDE_DIR], [$CEL_INCLUDE_DIR])
-CS_JAMCONFIG_PROPERTY([CEL.PLUGIN_DIR], [$CEL_PLUGIN_DIR])
-CS_JAMCONFIG_PROPERTY([CEL.VERSION], [$CEL_VERSION])
-CS_JAMCONFIG_PROPERTY([CEL.AVAILABLE], [$CEL_AVAILABLE])
-
-])
+#------------------------------------------------------------------------------
+# CS_PATH_CEL_JAM([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                     [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS], [OPTIONAL-LIBS])
+#	Deprecated: Jam-specific backward compatibility wrapper for
+#	CS_PATH_CEL_EMIT().
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_PATH_CEL_JAM],
+[CS_PATH_CEL_EMIT([$1],[$2],[$3],[$4],[$5],[CS_JAMCONFIG_PROPERTY])])
