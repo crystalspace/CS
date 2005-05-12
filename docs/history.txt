@@ -22,11 +22,48 @@ chronological order.
 	  is expensive and slow.
 	- res added a small blurb with notes on string formatting in CS to the
 	  API docs.
-	- Christopher added a type-safe properties system and automation to AWS.
-         None of the old property code has been removed.  I will first change over
-	 all the widgets that use it, then the apps, then remove the old shtuff.
-        - Christopher added the changes made by Bedrich Zaba.
-
+	- Christopher Nelson applied patch to AWS from Bedrich Zaba
+	  <frogbride@seznam.cz>:
+	    - Component destroy signal added (component is not destroyed
+	      immediately, but during the preprocess event of the next frame,
+	      because the pointer to the source component must be valid in slot
+	      call).
+	    - Command button:
+	        o Errors about missing textures are written out when Bitmap
+		  style used.
+		o Bitmap screen position dependency on button state removed (1
+		  pixel offset).
+		o When Bitmap style used then no caption is drawn.
+	    - Support for custom string properties.
+	    - Protection against double registering of slot.
+	    - Report line number of parse error.
+	- Christopher Nelson added AWS automation support files.  Initial
+	  implementation of safe, scriptable properties.
+	- Christopher Nelson added AWS bound properties.  They bind to some
+	  pre-existing variable (such as a member class variable) and handle
+	  all the conversion to/from that type from the type-agnostic
+	  automation objects.  They also include overloaded convenience
+	  functions that let you set the value using the native type (e.g,
+	  csRect, int, float.)
+	- Christopher Nelson added new AWS type-safe, SetProperty()
+	  with overloaded convenience functions.  Uses the property
+	  bag to find the property, and the automation type to
+	  transfer the value.  None of the old property code has been
+	  removed.  I will first change over all the widgets that use
+	  it, then the apps, then remove the old shtuff.
+	- Christopher Nelson added AWS GetProperty() functions similar to the
+	  SetProperty functions.
+	- Christopher Nelson added sigslot implementation from
+	  sigslot.sourceforge.net to AWS.  This is actually the fixed version
+	  from a link on the forums that actually compiles with recent
+	  compilers.  Also added two signals to the properties.  You can
+	  subscribe to both the Binding and Changed signals.  The Binding
+	  signal is fired whenever a property is bound to a given name.  (A
+	  property may only be bound to one name at a time.)  The Changed
+	  signal fires each time a successful Set operation occurs.  Trying to
+	  Set a read-only property never results in signal generation.  In this
+	  way it is simple for a programmer to know when changes to any given
+	  property occur.
 11-May-2005
 	- res fixed the crystalspace_staticplugins target to be independent;
 	  i.e. it is not being built when the other libs are.
