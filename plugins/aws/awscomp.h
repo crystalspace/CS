@@ -194,9 +194,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////////
 
   /** The type of the component. */
-  awsProperty pType;
-
-
+  awsProperty CompType;
 
 
 #ifndef AWS_VOIDP_IS_ERROR

@@ -48,7 +48,7 @@ awsComponent::awsComponent ()
     focusable (false),
     self(0),
     _destructionMark( false ),
-	pType("Type", properties, false)
+	CompType(false)
 {
   self = this;
   signalsrc.SetOwner (self);
@@ -69,7 +69,7 @@ awsComponent::awsComponent (iAwsComponent* wrapper)
     focusable (false),
     self(wrapper),
     _destructionMark( false ),
-	pType("Type", properties, false)
+	CompType(false)
 
 {
   signalsrc.SetOwner (self);
@@ -216,6 +216,9 @@ bool awsComponent::Create (
 {
   self->SetID (settings->Name ());
   self->SetParent (parent);
+
+  /// Bind properties.
+  CompType.Bind("Type", properties);
 
   /// Set ourself up by querying the settings.
   if (!self->Setup (wmgr, settings))

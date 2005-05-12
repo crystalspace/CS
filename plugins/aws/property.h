@@ -26,22 +26,7 @@
 #include "csutil/scanstr.h"
 #include <map>
 
-class awsPropertyBase
-{
-protected:
-	/** True if it is possible to read this property. */
-	bool readable;
-
-	/** True if it is possible to write this property. */
-	bool writeable;
-
-public:
-	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
-	virtual bool Set(autom::keeper &_value)=0;
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)=0;
-};
+class awsPropertyBase;
 
 /** A bag of properties.  This lets us search for them.  The actual properties are automatically registered when they're created. */
 class awsPropertyBag
@@ -71,6 +56,32 @@ public:
 	}
 };
 
+class awsPropertyBase
+{
+protected:
+	/** True if it is possible to read this property. */
+	bool readable;
+
+	/** True if it is possible to write this property. */
+	bool writeable;
+
+public:
+	awsPropertyBase(bool _writeable=true, bool _readable=true):readable(_readable), writeable(_writeable) {}
+	virtual ~awsPropertyBase() {}
+
+	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
+	virtual bool Set(autom::keeper &_value)=0;
+
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(autom::keeper &_value)=0;
+
+	/** Binds this property to the property bag. */
+	virtual void Bind(const std::string &name, awsPropertyBag &bag)
+	{		
+		bag.Register(name, this);
+	}
+};
+
 
 /** A property is intended to be a class member.  You should never create a property via new.  It maintains a value of some type, either string, int, float, or list. */
 class awsProperty : virtual public awsPropertyBase
@@ -80,11 +91,8 @@ class awsProperty : virtual public awsPropertyBase
 	
 public:
 	/** Creates a new property, registers it with a bag, and optionally sets it's access. */
-	awsProperty(const std::string &name, awsPropertyBag &bag, bool _writeable=true, bool _readable=true)
-	{
-		readable=_readable;
-		writeable=_writeable;
-		bag.Register(name, this);
+	awsProperty(bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable)
+	{	
 	}
 
 	virtual ~awsProperty() 
@@ -121,16 +129,12 @@ class awsRectProperty : virtual public awsPropertyBase
 	csRect value;
 
 public:
-	awsRectProperty(const std::string &name, awsPropertyBag &bag, bool _writeable=true, bool _readable=true)
+	awsRectProperty(bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable)
 	{
-		readable=_readable;
-		writeable=_writeable;
-		bag.Register(name, this);
 	}
 
 	virtual ~awsRectProperty()
 	{
-
 	}
 
 	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
