@@ -96,6 +96,7 @@ public:
   /**
    * Add a new object to the debug graph and link to its parent.
    * If 'scf' is true 'object' is an iBase.
+   * \sa \ref FormatterNotes
    */
   static void AddObject (iObjectRegistry* object_reg,
   	void* object, bool scf, char* file, int linenr,
@@ -103,6 +104,7 @@ public:
 
   /**
    * Attach a new description to an object in the graph.
+   * \sa \ref FormatterNotes
    */
   static void AttachDescription (iObjectRegistry* object_reg,
   	void* object, char* description, ...) CS_GNUC_PRINTF (3, 4);

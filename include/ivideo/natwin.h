@@ -54,6 +54,7 @@ struct iNativeWindowManager : public iBase
    * Type is one of CS_ALERT_???.
    * \remarks All strings are expected to be UTF-8 encoded.
    * \sa #CS_ALERT_ERROR
+   * \sa \ref FormatterNotes
    */
   virtual void Alert (int type, const char* title, const char* okMsg,
   	const char* msg, ...) CS_GNUC_PRINTF (5, 6) = 0;
@@ -62,6 +63,7 @@ struct iNativeWindowManager : public iBase
    * Type is one of CS_ALERT_???.
    * \remarks All strings are expected to be UTF-8 encoded.
    * \sa #CS_ALERT_ERROR
+   * \sa \ref FormatterNotes
    */
   virtual void AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;

@@ -252,6 +252,7 @@ struct iString : public iBase
    * Format this string using sprintf()-style formatting directives.
    * \remarks Automatically allocates sufficient memory to hold result.  Newly
    *   formatted string replaces previous string value.
+   * \sa \ref FormatterNotes
    */
   virtual void Format (const char* format, ...) CS_GNUC_PRINTF (2, 3) = 0;
 
@@ -260,6 +261,7 @@ struct iString : public iBase
    * \return Reference to itself.
    * \remarks Automatically allocates sufficient memory to hold result.  Newly
    *   formatted string replaces previous string value.
+   * \sa \ref FormatterNotes
    */
   virtual void FormatV (const char* format, va_list args) = 0;
 

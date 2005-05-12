@@ -34,6 +34,7 @@ struct iProgressMeter : public iBase
   /**
    * Set the id and description of what we are currently monitoring.
    * An id can be something like "crystalspace.engine.lighting.calculation".
+   * \sa \ref FormatterNotes
    */
   virtual void SetProgressDescription (const char* id,
   	const char* description, ...) CS_GNUC_PRINTF (3, 4) = 0;
@@ -41,6 +42,7 @@ struct iProgressMeter : public iBase
   /**
    * Set the id and description of what we are currently monitoring.
    * An id can be something like "crystalspace.engine.lighting.calculation".
+   * \sa \ref FormatterNotes
    */
   virtual void SetProgressDescriptionV (const char* id,
   	const char* description, va_list) = 0;

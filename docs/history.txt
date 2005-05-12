@@ -20,6 +20,8 @@ chronological order.
 	  rather than by external commands. This should give some overall
 	  speed-up of "jam help", especially on Windows where process creation
 	  is expensive and slow.
+	- res added a small blurb with notes on string formatting in CS to the
+	  API docs.
 11-May-2005
 	- res fixed the crystalspace_staticplugins target to be independent;
 	  i.e. it is not being built when the other libs are.

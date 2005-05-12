@@ -169,9 +169,15 @@ public:
    */
   virtual void ReplaceAll (const char* search, const char* replacement);
 
-  /// Format.
+  /**
+   * Format.
+   * \sa \ref FormatterNotes
+   */
   virtual void Format (const char* format, ...) CS_GNUC_PRINTF (2, 3);
-  /// Format.
+  /**
+   * Format.
+   * \sa \ref FormatterNotes
+   */
   virtual void FormatV (const char* format, va_list args);
 
   /// Replace contents of this string with the contents of another

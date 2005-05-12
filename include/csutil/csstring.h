@@ -158,6 +158,7 @@ public:
   /** @{ */
   /**
    * Append a string formatted using cs_snprintf()-style formatting directives.
+   * \sa \ref FormatterNotes
    */
   csStringBase& AppendFmt (const char* format, ...) CS_GNUC_PRINTF (2, 3);
   csStringBase& AppendFmtV (const char* format, va_list args);
@@ -523,6 +524,7 @@ public:
    * \return Reference to itself.
    * \remarks Automatically allocates sufficient memory to hold result.  Newly
    *   formatted string replaces previous string value.
+   * \sa \ref FormatterNotes
    */
   csStringBase& Format (const char* format, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -531,6 +533,7 @@ public:
    * \return Reference to itself.
    * \remarks Automatically allocates sufficient memory to hold result.  Newly
    *   formatted string replaces previous string value.
+   * \sa \ref FormatterNotes
    */
   csStringBase& FormatV (const char* format, va_list args);
 

@@ -310,6 +310,7 @@ private:
    * \remarks
    * The error displayed with this function will be identified with the
    * framework library string name identifier.
+   * \sa \ref FormatterNotes
    */
   static bool ReportLibError (const char* description, ...)
   {
@@ -328,6 +329,7 @@ public:
    * \remarks
    * The error displayed with this function will be identified with the
    * application string name identifier set with SetApplicationName().
+   * \sa \ref FormatterNotes
    */
   static bool ReportError (const char* description, ...)
   {
@@ -345,6 +347,7 @@ public:
    * \remarks
    * The warning displayed with this function will be identified with the
    * application string name identifier set with SetApplicationName().
+   * \sa \ref FormatterNotes
    */
   static void ReportWarning (const char* description, ...)
   {
@@ -361,6 +364,7 @@ public:
    * \remarks
    * The info displayed with this function will be identified with the
    * application string name identifier set with SetApplicationName().
+   * \sa \ref FormatterNotes
    */
   static void ReportInfo (const char* description, ...)
   {

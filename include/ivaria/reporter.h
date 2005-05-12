@@ -164,12 +164,14 @@ struct iReporter : public iBase
    * Report something. The given message ID should be formed like:
    * 'crystalspace.{source}.{type}.{detail}'. Example:
    * 'crystalspace.sprite2dloader.parse.material'.
+   * \sa \ref FormatterNotes
    */
   virtual void Report (int severity, const char* msgId,
   	const char* description, ...) CS_GNUC_PRINTF(4, 5) = 0;
 
   /**
    * Report something. va_list version.
+   * \sa \ref FormatterNotes
    */
   virtual void ReportV (int severity, const char* msgId,
   	const char* description, va_list) CS_GNUC_PRINTF(4, 0) = 0;
@@ -222,30 +224,35 @@ struct iReporter : public iBase
 
   /**
    * Report error.
+   * \sa \ref FormatterNotes
    */
   inline void ReportError (const char* msgId, const char* description, ...)
     CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report warning.
+   * \sa \ref FormatterNotes
    */
   inline void ReportWarning (const char* msgId, const char* description, ...)
     CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report notification.
+   * \sa \ref FormatterNotes
    */
   inline void ReportNotify (const char* msgId, const char* description, ...)
     CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report bug.
+   * \sa \ref FormatterNotes
    */
   inline void ReportBug (const char* msgId, const char* description, ...)
     CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report debug.
+   * \sa \ref FormatterNotes
    */
   inline void ReportDebug (const char* msgId, const char* description, ...)
     CS_GNUC_PRINTF (3, 4);
@@ -310,6 +317,7 @@ public:
    * Helper function to use a reporter easily.  This function will also work if
    * no reporter is present and use stdout in that case.
    * \remark You can use the #csReportV macro for even more convenience.
+   * \sa \ref FormatterNotes
    */
   static inline void ReportV(iObjectRegistry* reg, int severity,
     char const* msgId, char const* description, va_list args)
@@ -319,6 +327,7 @@ public:
    * Helper function to use a reporter easily.  This function will also work if
    * no reporter is present and use stdout in that case.
    * \remark You can use the #csReport macro for even more convenience.
+   * \sa \ref FormatterNotes
    */
   static inline void Report(iObjectRegistry* reg, int severity,
     char const* msgId, char const* description, ...)

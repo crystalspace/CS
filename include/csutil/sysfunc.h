@@ -86,17 +86,20 @@ CS_CRYSTALSPACE_EXPORT bool csPlatformShutdown(iObjectRegistry*);
  * CS version of printf.
  * It accepts UTF-8 strings and converts it, if required, to the platforms
  * native codepage.
+ * \sa \ref FormatterNotes
  */
 CS_CRYSTALSPACE_EXPORT int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 /**
  * CS version of vprintf.
  * \copydoc csPrintf()
+ * \sa \ref FormatterNotes
  */
 CS_CRYSTALSPACE_EXPORT int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 /**
  * CS version of fprintf (file, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will not flush file.
+ * \sa \ref FormatterNotes
  */
 CS_CRYSTALSPACE_EXPORT int csFPrintf (FILE* file, const char* str, ...) 
   CS_GNUC_PRINTF (2, 3);
@@ -104,6 +107,7 @@ CS_CRYSTALSPACE_EXPORT int csFPrintf (FILE* file, const char* str, ...)
  * CS version of vfprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will not flush file.
+ * \sa \ref FormatterNotes
  */
 CS_CRYSTALSPACE_EXPORT int csFPrintfV (FILE* file, const char* str, va_list arg) 
   CS_GNUC_PRINTF (2, 0);
@@ -111,6 +115,7 @@ CS_CRYSTALSPACE_EXPORT int csFPrintfV (FILE* file, const char* str, va_list arg)
  * CS version of vfprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
+ * \sa \ref FormatterNotes
  */
 CS_CRYSTALSPACE_EXPORT int csPrintfErrV (const char* str, va_list arg) 
   CS_GNUC_PRINTF (1, 0);
@@ -118,6 +123,7 @@ CS_CRYSTALSPACE_EXPORT int csPrintfErrV (const char* str, va_list arg)
  * CS version of fprintf (stderr, str, ...). 
  * \copydoc csPrintf()
  * \remarks Will flush stderr.
+ * \sa \ref FormatterNotes
  */
 CS_CRYSTALSPACE_EXPORT int csPrintfErr (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 

@@ -78,6 +78,7 @@ public:
   /**
    * Set the id and description of what we are currently monitoring.
    * An id can be something like "crystalspace.engine.lighting.calculation".
+   * \sa \ref FormatterNotes
    */
   virtual void CS_GNUC_PRINTF (3, 4)
       SetProgressDescription (const char*, const char*, ...) { }

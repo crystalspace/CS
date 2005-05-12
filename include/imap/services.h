@@ -217,6 +217,7 @@ struct iSyntaxService : public iBase
 			    
   /**
    * Report an error and also gives a path in the XML tree.
+   * \sa \ref FormatterNotes
    */
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...) CS_GNUC_PRINTF(4,5) = 0;
@@ -229,6 +230,7 @@ struct iSyntaxService : public iBase
 
   /**
    * Report something, also gives a path in the XML tree.
+   * \sa \ref FormatterNotes
    */
   virtual void Report (const char* msgid, int severity, 
     iDocumentNode* errornode, const char* msg, ...) CS_GNUC_PRINTF(5,6) = 0;

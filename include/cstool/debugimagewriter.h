@@ -54,6 +54,7 @@ public:
    * \remarks \a filename is a string with printf() style format specifiers.
    * \remarks If \a filename does not contain an absolute VFS path, it will
    *  be treated as relative to "/tmp/".
+   * \sa \ref FormatterNotes
    */
   static void DebugImageWrite (iImage* image, const char* filename, ...)
   {

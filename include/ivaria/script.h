@@ -60,6 +60,7 @@ struct iScriptObject : public iBase
    * Call a method in the object, with no return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, const char *format, ...)
     CS_GNUC_PRINTF(3, 4) = 0;
@@ -68,6 +69,7 @@ struct iScriptObject : public iBase
    * Call a method in the object, with int return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, int &ret, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -76,6 +78,7 @@ struct iScriptObject : public iBase
    * Call a method in the object, with float return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, float &ret, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -84,6 +87,7 @@ struct iScriptObject : public iBase
    * Call a method in the object, with double return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, double &ret, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -92,6 +96,7 @@ struct iScriptObject : public iBase
    * Call a method in the object, with string return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, csRef<iString>&, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -100,6 +105,7 @@ struct iScriptObject : public iBase
    * Call a method in the object, with object return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, csRef<iScriptObject>&,
     const char *fmt, ...) CS_GNUC_PRINTF(4, 5) = 0;
@@ -209,6 +215,7 @@ struct iScript : public iBase
    * Call a subroutine in the script, with no return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, const char *format, ...)
     CS_GNUC_PRINTF(3, 4) = 0;
@@ -217,6 +224,7 @@ struct iScript : public iBase
    * Call a subroutine in the script, with int return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, int &ret, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -225,6 +233,7 @@ struct iScript : public iBase
    * Call a subroutine in the script, with float return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, float &ret, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -233,6 +242,7 @@ struct iScript : public iBase
    * Call a subroutine in the script, with double return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, double &ret, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -241,6 +251,7 @@ struct iScript : public iBase
    * Call a subroutine in the script, with string return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, csRef<iString>&, const char *fmt, ...)
     CS_GNUC_PRINTF(4, 5) = 0;
@@ -249,6 +260,7 @@ struct iScript : public iBase
    * Call a subroutine in the script, with object return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual bool Call (const char *name, csRef<iScriptObject> &ret,
     const char *fmt, ...) CS_GNUC_PRINTF(4, 5) = 0;
@@ -257,6 +269,7 @@ struct iScript : public iBase
    * Create an object in the script.
    * Returns 0 if the constructor fails.
    * CtorFormat is a printf-style format string for the arguments.
+   * \sa \ref FormatterNotes
    */
   virtual csRef<iScriptObject> NewObject (const char *type,
     const char *ctorFormat, ...) CS_GNUC_PRINTF(3, 4) = 0;
