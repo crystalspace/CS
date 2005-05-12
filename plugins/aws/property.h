@@ -21,6 +21,7 @@
 
 
 #include "registrar.h"
+#include "sigslot.h"
 #include "csgeom/csrect.h"
 #include "csutil/snprintf.h"
 #include "csutil/scanstr.h"
@@ -35,6 +36,7 @@ class awsPropertyBag
 
 	/** The map of properties. */
 	property_map props;
+
 public:
 	awsPropertyBag() {}
 	~awsPropertyBag() {}
@@ -43,6 +45,12 @@ public:
 	void Register(const std::string &name, awsPropertyBase *p)
 	{
 		props.insert(std::make_pair(name, p));
+	}
+
+	/** Unregisters a property. */
+	void Unregister(const std::string &name)
+	{
+		props.erase(name);
 	}
 
 	/** Finds the pointer to some property. It returns a raw pointer because it is not expected that
@@ -65,9 +73,21 @@ protected:
 	/** True if it is possible to write this property. */
 	bool writeable;
 
+	/** The name of the proeprty. */
+	std::string name;
+
 public:
 	awsPropertyBase(bool _writeable=true, bool _readable=true):readable(_readable), writeable(_writeable) {}
-	virtual ~awsPropertyBase() {}
+
+	virtual ~awsPropertyBase()
+	{	
+	}
+
+	/** This signal is fired whenever the property is changed. */
+	autom::signal2<const std::string &, awsPropertyBase *> Changed;
+
+	/** This signal is fired whenever the property is being bound.  Occurs BEFORE the binding is registered. */
+	autom::signal3<const std::string &, const std::string &, awsPropertyBase *> Binding;
 
 	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
 	virtual bool Set(autom::keeper &_value)=0;
@@ -76,9 +96,14 @@ public:
 	virtual bool Get(autom::keeper &_value)=0;
 
 	/** Binds this property to the property bag. */
-	virtual void Bind(const std::string &name, awsPropertyBag &bag)
-	{		
-		bag.Register(name, this);
+	virtual void Bind(const std::string &_name, awsPropertyBag &bag)
+	{	
+		Binding(name, _name, this);
+
+		bag.Unregister(name);
+
+		name=_name;
+		bag.Register(_name, this);
 	}
 };
 
@@ -105,6 +130,7 @@ public:
 		if (writeable) 
 		{ 
 			value=_value; 
+			Changed(name, this);
 			return true; 
 		}
 		else return false;
@@ -145,7 +171,11 @@ public:
 		if (writeable)
 		{
 			std::string s(_value->toString().Value());
-			if (csScanStr(s.c_str(), "(%d, %d)-(%d, %d)", &value.xmin, &value.ymin, &value.xmax, &value.ymax)!=-1) return true;
+			if (csScanStr(s.c_str(), "(%d, %d)-(%d, %d)", &value.xmin, &value.ymin, &value.xmax, &value.ymax)!=-1) 
+			{
+				Changed(name, this);
+				return true;
+			}
 			else return false;
 		}
 		else return false;
@@ -157,6 +187,7 @@ public:
 		if (writeable)
 		{
 			value = _value;
+			Changed(name, this);
             return true;
 		}
 		else return false;		
@@ -214,6 +245,7 @@ public:
 		if (writeable)
 		{
 			value = (int)_value->toInt().Value();
+			Changed(name, this);
 			return true;
 		}
 		else return false;
@@ -225,6 +257,7 @@ public:
 		if (writeable)
 		{
 			value = _value;
+			Changed(name, this);
             return true;
 		}
 		else return false;		
@@ -277,6 +310,7 @@ public:
 		if (writeable)
 		{
 			value = (float)_value->toFloat().Value();
+			Changed(name, this);
 			return true;
 		}
 		else return false;
@@ -288,6 +322,7 @@ public:
 		if (writeable)
 		{
 			value = _value;
+			Changed(name, this);
             return true;
 		}
 		else return false;		
