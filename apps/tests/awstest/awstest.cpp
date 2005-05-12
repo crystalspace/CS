@@ -320,7 +320,11 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (test4) test4->Show();
   if (test5) test5->Show();
 
-  if (test2) test2->Show();
+  if (test2) 
+  {
+	  test2->Show();
+	  test2->Execute(":move_to@widget(x=500, y=0)");
+  }
   //s->SetTestWin(test2);
 
   /////////
