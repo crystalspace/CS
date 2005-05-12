@@ -33,7 +33,9 @@ awsCheckBox::awsCheckBox ()
     frame_style (0),
     alpha_level (96),
     alignment (0),
-    caption (0)
+    caption (0),
+	Caption(caption_),
+	State(is_on)
 {
   tex[0] = tex[1] = tex[2] = tex[3] = 0;
   SetFlag (AWSF_CMP_ALWAYSERASE);
@@ -47,6 +49,13 @@ const char *awsCheckBox::Type ()
 {
   return "Check Box";
 }
+
+void 
+awsCheckBox::visualStateChanged(const std::string &name, awsPropertyBase *property)
+{
+	Invalidate();
+}
+
 
 bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
@@ -66,6 +75,10 @@ bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   int _focusable = 0;
   pm->GetInt (settings, "Focusable", _focusable);
   focusable = _focusable;
+
+  State.Changed.connect(this, visualStateChanged);
+  Caption.Changed.connect(this, visualStateChanged);
+
   return true;
 }
 
@@ -120,7 +133,7 @@ bool awsCheckBox::SetProperty (const char *name, intptr_t parm)
   }
   else if (strcmp ("State", name) == 0)
   {
-    is_on = *(bool *)parm;
+    State.Set(*(bool *)parm);
     return true;
   }
   return false;
@@ -265,9 +278,9 @@ bool awsCheckBox::OnMouseUp (int, int, int)
   if (is_down)
   {
     if (!is_on)
-      is_on = true;
+      State.Set(true);
     else
-      is_on = false;
+      State.Set(false);
 
     Broadcast (signalClicked);
     is_down = false;

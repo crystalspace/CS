@@ -290,7 +290,7 @@ public:
 /**  A bound property.  This property is bound to some float. */
 class awsFloatProperty : virtual public awsPropertyBase
 {
-	/** The int we store. */
+	/** The float we store. */
 	float &value;
 
 public:
@@ -341,6 +341,136 @@ public:
 
 	/** Gets the value of this property if allowed, returns false if not allowed. */
 	virtual bool Get(float &_value)
+	{
+		if (readable)
+		{
+			value = _value;
+            return true;
+		}
+		else return false;		
+	}
+
+};
+
+/**  A bound property.  This property is bound to some bool. */
+class awsBoolProperty : virtual public awsPropertyBase
+{
+	/** The bool we store. */
+	bool &value;
+
+public:
+	awsBoolProperty(bool &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+	{
+	}
+
+	virtual ~awsBoolProperty()
+	{
+	}
+
+	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a bool, int, or list 
+	 * cannot be successfully converted to a rect.  */
+	virtual bool Set(autom::keeper &_value)
+	{
+		if (writeable)
+		{
+			value = (bool)_value->toInt().Value();
+			Changed(name, this);
+			return true;
+		}
+		else return false;
+	}
+
+	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+	virtual bool Set(const bool &_value)
+	{
+		if (writeable)
+		{
+			value = _value;
+			Changed(name, this);
+            return true;
+		}
+		else return false;		
+	}
+	
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(autom::keeper &_value)
+	{
+        if (readable)
+		{			
+			_value.AttachNew(new autom::integer(value));
+			return true;
+		}       
+		else return false;
+	}
+
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(bool &_value)
+	{
+		if (readable)
+		{
+			value = _value;
+            return true;
+		}
+		else return false;		
+	}
+
+};
+
+/**  A bound property.  This property is bound to some std::string. */
+class awsStringProperty : virtual public awsPropertyBase
+{
+	/** The std::string we store. */
+	std::string &value;
+
+public:
+	awsStringProperty(std::string &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+	{
+	}
+
+	virtual ~awsStringProperty()
+	{
+	}
+
+	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a std::string, int, or list 
+	 * cannot be successfully converted to a rect.  */
+	virtual bool Set(autom::keeper &_value)
+	{
+		if (writeable)
+		{
+			value = _value->toString().Value();
+			Changed(name, this);
+			return true;
+		}
+		else return false;
+	}
+
+	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+	virtual bool Set(const std::string &_value)
+	{
+		if (writeable)
+		{
+			value = _value;
+			Changed(name, this);
+            return true;
+		}
+		else return false;		
+	}
+	
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(autom::keeper &_value)
+	{
+        if (readable)
+		{			
+			_value.AttachNew(new autom::string(value));
+			return true;
+		}       
+		else return false;
+	}
+
+	/** Gets the value of this property if allowed, returns false if not allowed. */
+	virtual bool Get(std::string &_value)
 	{
 		if (readable)
 		{

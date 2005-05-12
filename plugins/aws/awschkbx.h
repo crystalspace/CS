@@ -21,7 +21,7 @@
 
 #include "awscomp.h"
 
-class awsCheckBox : public awsComponent
+class awsCheckBox : public awsComponent, public autom::has_slots<>
 {
 private:
   /// True when button is down, false if up.
@@ -47,9 +47,26 @@ private:
 
   /// Caption text for this component.
   iString *caption;
+
+  /// Caption text for this component.
+  std::string caption_;
+
+protected:
+	void visualStateChanged(const std::string &name, awsPropertyBase *property);
+
 public:
   awsCheckBox ();
   virtual ~awsCheckBox ();
+
+   //////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////// Properties ////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
+
+  /** The check box's caption. */
+  awsStringProperty Caption;
+
+  /** The state of the check box. */
+  awsBoolProperty State;
 
   /// Alignment constants.
   enum

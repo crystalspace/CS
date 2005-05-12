@@ -121,18 +121,21 @@ namespace autom
 		bool addStringParm(const std::string &parm_name, const std::string &_value)
 		{
 			parms.insert(std::make_pair(parm_name, new string(_value)));	
+			return true;
 		}
 		
 		/** Adds the named parameter, assume that it's an integer. */
 		bool addIntParm(const std::string &parm_name, long long _value)
 		{
 			parms.insert(std::make_pair(parm_name, new integer(_value)));	
+			return true;
 		}
 		
 		/** Adds the named parameter, assume that it's a float. */
 		bool addIntParm(const std::string &parm_name, double _value)
 		{
-			parms.insert(std::make_pair(parm_name, new floating(_value)));	
+			parms.insert(std::make_pair(parm_name, new floating(_value)));
+			return true;
 		}
 		
 		/** Copies all of the parameters from the given function into this function. */
