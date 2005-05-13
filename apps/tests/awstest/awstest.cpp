@@ -323,7 +323,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (test2) 
   {
 	  test2->Show();
-	  test2->Execute(":move_to@widget(x=500, y=0)");
+	  test2->Execute(":MoveTo@Widget(x=500, y=0)");
   }
   //s->SetTestWin(test2);
 

@@ -391,38 +391,11 @@ bool awsComponent::Execute (const char* action, iAwsParmList* parmlist)
 
 	if (f.parseObject(code.begin(), code.end()))
 	{
-		f.addIntParm("comp_id", (long long)this);
+		f.addIntParm("comp_id", (long long)self);
 		autom::keeper result = f.Execute();
 	}
-
-  if (strcmp ("MoveTo", action) == 0)
-  {
-  }
-  else if (strcmp ("Hide", action) == 0)
-  {
-    self->Hide ();
-    return true;
-  }
-  else if (strcmp ("Show", action) == 0)
-  {
-    self->Show ();
-    return true;
-  }
-  else if (strcmp ("Invalidate", action) == 0)
-  {
-    self->Invalidate ();
-    return true;
-  }
-  else if (strcmp ("HideWindow", action) == 0)
-  {
-    if (self->Window ())
-    {
-      self->Window ()->GetComponent ()->Hide ();
-      self->WindowManager ()->InvalidateUpdateStore ();
-    }
-    return true;
-  }
-  else if (strcmp ("Overlaps", action) == 0)
+  
+  if (strcmp ("Overlaps", action) == 0)
   {
     if (!parmlist)
       return false;
@@ -1293,6 +1266,31 @@ public:
 		return autom::keeper(autom::Nil());
 	}
 
+	autom::function::rc_parm invalidate_(autom::function &fn)
+	{
+		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+
+		if (comp) comp->Invalidate();
+
+		return autom::keeper(autom::Nil());
+	}
+
+	autom::function::rc_parm hide_window_(autom::function &fn)
+	{
+		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+
+		if (comp) 
+		{
+			if (comp->Window ())
+			{
+				comp->Window ()->GetComponent ()->Hide ();
+				comp->WindowManager ()->InvalidateUpdateStore ();
+			}
+		}
+
+		return autom::keeper(autom::Nil());
+	}
+
 	autom::function::rc_parm move_to_(autom::function &fn)
 	{
 		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
@@ -1307,9 +1305,11 @@ public:
 
 	void Register()
 	{		
-		AUTOM_REGISTER("hide@widget", this, hide_);		
-		AUTOM_REGISTER("show@widget", this, show_);
-		AUTOM_REGISTER("move_to@widget", this, move_to_);
+		AUTOM_REGISTER("Hide@Widget", this, hide_);		
+		AUTOM_REGISTER("Show@Widget", this, show_);
+		AUTOM_REGISTER("Invalidate@Widget", this, invalidate_);
+		AUTOM_REGISTER("HideWindow@Widget", this, hide_window_);
+		AUTOM_REGISTER("MoveTo@Widget", this, move_to_);
 	}
 
 };
