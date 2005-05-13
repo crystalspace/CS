@@ -33,6 +33,9 @@ chronological order.
 	  not a copy. (That allows to change the value without going through 
 	  the proper accessor methods.)
 	- res removed usage of csString from some interfaces.
+	- res worked around a compile error in the Cg plugin reported by
+	  Sebastien Marchal where the WIN32 macro was used in an #if, however,
+	  it is not always defined with a value.
 12-May-2005
 	- Eric Sunshine augmented the ResponseFile rule in helper.jam so that
 	  it respects the LOCATE variable (possible set by the MakeLocate rule)
