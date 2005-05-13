@@ -1,0 +1,10 @@
+@c -*-texinfo-*-
+@node AWS Window Scripting, , , AWS
+@subsection Automation Objects Available for Windows
+
+@multitable @columnfractions .25 .5 .25
+@headitem Name @tab Description @tab Example
+
+
+
+@end multitable
