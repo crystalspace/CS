@@ -27,6 +27,7 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 * AWS Signals and Actions Reference:: @sc{aws} Standard Component Signal and Action Reference
 * AWS Architecture:: In-Depth Explanation of @sc{aws} Architecture
 * AWS QT Designer and AWS:: Using QT Designer To Create @sc{aws} Definition Files
+* AWS Automation:: Automation: Properties and Scripting
 @end menu
 
 @importss{plugins,aws,quick.txi}
@@ -36,3 +37,4 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 @importsss{plugins,aws,saaref,saaref.txi}
 @importss{plugins,aws,indepth.txi}
 @importss{plugins,aws,qtaws.txi}
+@importss{plugins,aws,automation.txi}
