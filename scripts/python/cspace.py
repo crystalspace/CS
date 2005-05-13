@@ -2828,6 +2828,8 @@ class iAws(iBase):
     def AllWindowsHidden(*args): return _cspace.iAws_AllWindowsHidden(*args)
     def ComponentIsInTransition(*args): return _cspace.iAws_ComponentIsInTransition(*args)
     def ComponentDestroyed(*args): return _cspace.iAws_ComponentDestroyed(*args)
+    def DeleteMarkedComponents(*args): return _cspace.iAws_DeleteMarkedComponents(*args)
+    def MarkToDeleteRecursively(*args): return _cspace.iAws_MarkToDeleteRecursively(*args)
     def __del__(self, destroy=_cspace.delete_iAws):
         try:
             if self.thisown: destroy(self)
@@ -2892,6 +2894,8 @@ class iAwsPrefManager(iBase):
     def GetConstantValue(*args): return _cspace.iAwsPrefManager_GetConstantValue(*args)
     def CreateKeyFactory(*args): return _cspace.iAwsPrefManager_CreateKeyFactory(*args)
     def CreateConnectionNodeFactory(*args): return _cspace.iAwsPrefManager_CreateConnectionNodeFactory(*args)
+    def AddCustomStringProperty(*args): return _cspace.iAwsPrefManager_AddCustomStringProperty(*args)
+    def GetCustomStringProperties(*args): return _cspace.iAwsPrefManager_GetCustomStringProperties(*args)
     def __del__(self, destroy=_cspace.delete_iAwsPrefManager):
         try:
             if self.thisown: destroy(self)
@@ -3144,6 +3148,8 @@ class iAwsComponent(iAwsSource):
     def LinkAbove(*args): return _cspace.iAwsComponent_LinkAbove(*args)
     def LinkBelow(*args): return _cspace.iAwsComponent_LinkBelow(*args)
     def SetTopChild(*args): return _cspace.iAwsComponent_SetTopChild(*args)
+    def MarkToDelete(*args): return _cspace.iAwsComponent_MarkToDelete(*args)
+    def GetMarkToDelete(*args): return _cspace.iAwsComponent_GetMarkToDelete(*args)
     def __del__(self, destroy=_cspace.delete_iAwsComponent):
         try:
             if self.thisown: destroy(self)
