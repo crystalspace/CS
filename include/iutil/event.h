@@ -56,10 +56,10 @@ SCF_VERSION (iEvent, 0, 2, 0);
 // Event data structs. Defined outside of iEvent to allow SWIG to
 // handle the nested structs and union. Does not break any code.
 
-/**\page Keyboard Keyboard events.
+/**\page Keyboard Keyboard events
  * Keyboard events are emitted when the user does something with the keyboard -
  * presses down a key ("key down" events), holds it down (more "key down" 
- * events in a specific interval - "auto-repeat") and releases it ("key up".)
+ * events in a specific interval - "auto-repeat") and releases it ("key up").
  * <p>
  * Every keyboard event has a bunch of data associated with it. First, there
  * is a code to identify the key: the 'raw' code. It uniquely identifies the 
