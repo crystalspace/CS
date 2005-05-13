@@ -89,11 +89,11 @@ struct iSpriteCal3DSocket : public iBase
   /// Attach a secondary mesh
   virtual size_t AttachSecondary (iMeshWrapper*, csReversibleTransform) = 0;
   /// Detach a secondary mesh by name
-  virtual void DetachSecondary (const csString & mesh_name) = 0;
+  virtual void DetachSecondary (const char* mesh_name) = 0;
   /// Detach a secondary mesh by index
   virtual void DetachSecondary (size_t index) = 0;
   /// Finds the index of the given attached secondary mesh
-  virtual size_t FindSecondary (const csString & mesh_name) = 0;
+  virtual size_t FindSecondary (const char* mesh_name) = 0;
 };
 
 

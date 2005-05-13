@@ -678,13 +678,7 @@ public:
   virtual bool GetString (
     iAwsComponentNode *node,
     const char *name,
-    iString * &val);
-
-  /// Get the value of a string from a given component node.
-  virtual bool GetString (
-    iAwsComponentNode *node,
-    const char *name,
-	std::string &val);
+    iString* val);
 
   /// Get the a color from a given component node.
   virtual bool GetRGB (

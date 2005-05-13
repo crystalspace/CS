@@ -16,6 +16,23 @@ chronological order.
 	- res applied a patch from Seth Yastrov <syastrov@gmail.com> to
 	  augment the iRenderStepContainer interface with get, delete, and 
 	  find methods.
+	- res removed std::string from the AWS headers; while use of the STL
+	  is accepted inside plugins, it is not a good idea to use it in
+	  interfaces, as there's no guarantee on binary compatibility 
+	  (e.g. implementations of stl::string from different e.g. compiler 
+	  versions might be incompatible). Also, it necessitates the inclusion
+	  of <string>, which means that through the crystalspace.h header
+	  external projects are suddenly "contaminated" with STL includes.
+	  Lastly we prefer the use of our own containers in public headers.
+	  The offending method has been replaced with one that replaces the
+	  contents of a user-supplied iString*.
+	- res removed iAwsPrefManager::GetString() that changes a user-provided
+	  reference to an iString*. This is not safe as it does not ensure
+	  proper refcounting; also, it differs semantically from the other
+	  Get*() methods as a reference to the original value is returned and
+	  not a copy. (That allows to change the value without going through 
+	  the proper accessor methods.)
+	- res removed usage of csString from some interfaces.
 12-May-2005
 	- Eric Sunshine augmented the ResponseFile rule in helper.jam so that
 	  it respects the LOCATE variable (possible set by the MakeLocate rule)

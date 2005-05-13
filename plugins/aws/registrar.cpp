@@ -34,11 +34,11 @@ registrar::assign(const std::string &name, func_ptr func)
 	
 	cont_ptr cont=lobby;			
 	
-	if (split(const_cast<std::string&>(name), '@', parts)>1)
+	if (std::split(const_cast<std::string&>(name), '@', parts)>1)
 	{
 		std::vector<std::string> cont_names;
 		
-		if (split(parts[1], '.', cont_names))
+		if (std::split(parts[1], '.', cont_names))
 		{																	
 			// Find the container - creating it if necessary.							
 			for(std::vector<std::string>::iterator pos=cont_names.begin(); pos!=cont_names.end(); ++pos)				
@@ -46,7 +46,7 @@ registrar::assign(const std::string &name, func_ptr func)
 				container::cont_map_type::iterator name_pos = cont->cont_map.find(*pos);
 
 				if (name_pos==cont->cont_map.end())											 
-					name_pos = (cont->cont_map.insert(make_pair(*pos, new container()))).first;									
+				  name_pos = (cont->cont_map.insert(std::make_pair(*pos, new container()))).first;									
 				
 				cont = name_pos->second;							
 			}				

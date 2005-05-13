@@ -274,6 +274,14 @@ struct iString : public iBase
   virtual void Replace (const iString* str, size_t count = (size_t)-1) = 0;
 
   /**
+   * Replace contents of this string with the contents of another.
+   * \param str String from which new content of this string will be copied.
+   * \param count Number of characters to copy.  If (size_t)-1 is specified,
+   *   then all characters will be copied.
+   */
+  virtual void Replace (const char* str, size_t count = (size_t)-1) = 0;
+
+  /**
    * Check if another string is equal to this one.
    * \param Str Other string.
    * \return True if they are equal; false if not.

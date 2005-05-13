@@ -30,7 +30,6 @@
 #include "csgeom/cspoint.h"
 #include "iutil/event.h"
 #include "iutil/string.h"
-#include <string>
 
 struct iAws;
 struct iAwsCanvas;
@@ -518,13 +517,12 @@ public:
   virtual bool GetRect(iAwsComponentNode *node, const char* name,
   	csRect &rect)=0;
 
-  /// Get the value of an integer from a given component node
-  virtual bool GetString(iAwsComponentNode *node, const char* name,
-  	iString *&val)=0;
-
-  /// Get the value of a string from a given component node.
+  /**
+   * Get the value of a string from a given component node.
+   * Replaces the contents of \a val.
+   */
   virtual bool GetString(iAwsComponentNode *node, const char *name,
-	std::string &val)=0;
+	iString* val)=0;
 
 
   /// Get the a color from a given component node

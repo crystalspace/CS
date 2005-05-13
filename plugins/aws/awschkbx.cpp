@@ -64,7 +64,9 @@ bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->GetInt (settings, "Alpha", alpha_level);
   pm->GetInt (settings, "Align", alignment);
-  pm->GetString (settings, "Caption", caption);
+  scfString capStr;
+  pm->GetString (settings, "Caption", &capStr);
+  caption = capStr.GetData();
 
   tex[0] = pm->GetTexture ("CheckBoxUp");
   tex[1] = pm->GetTexture ("CheckBoxDn");

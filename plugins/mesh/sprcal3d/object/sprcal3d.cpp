@@ -125,7 +125,7 @@ size_t csSpriteCal3DSocket::AttachSecondary (iMeshWrapper * mesh, csReversibleTr
   return secondary_meshes.Length()-1;
 }
 
-void csSpriteCal3DSocket::DetachSecondary (const csString & mesh_name)
+void csSpriteCal3DSocket::DetachSecondary (const char* mesh_name)
 {
   size_t a=FindSecondary(mesh_name);
   if (a < secondary_meshes.Length())
@@ -137,11 +137,12 @@ void csSpriteCal3DSocket::DetachSecondary (size_t index)
   secondary_meshes.DeleteIndex(index);
 }
 
-size_t csSpriteCal3DSocket::FindSecondary (const csString & mesh_name)
+size_t csSpriteCal3DSocket::FindSecondary (const char* mesh_name)
 {
   for (size_t a=0; a<secondary_meshes.Length(); ++a)
   {
-    if (secondary_meshes[a].mesh->QueryObject()->GetName() == mesh_name)
+    if (strcmp (secondary_meshes[a].mesh->QueryObject()->GetName(), 
+      mesh_name) == 0)
       return a;
   }
   return secondary_meshes.Length();

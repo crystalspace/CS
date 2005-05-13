@@ -567,32 +567,11 @@ bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name,
   return false;
 }
 
-bool awsPrefManager::GetString (
-  iAwsComponentNode *node,
-  const char *name,
-  iString * &val)
-{
-  if (!node) return false;
-
-  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
-
-  if (k)
-  {
-    if (k->Type () == KEY_STR)
-    {
-      csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
-      val = stringKey->Value ();
-      return true;
-    }
-  }
-
-  return false;
-}
-
 bool 
-awsPrefManager::GetString (iAwsComponentNode *node,  const char *name, std::string &val)
+awsPrefManager::GetString (iAwsComponentNode *node,  const char *name, iString* val)
 {
   if (!node) return false;
+  if (!val) return false;
 
   iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
@@ -601,7 +580,7 @@ awsPrefManager::GetString (iAwsComponentNode *node,  const char *name, std::stri
     if (k->Type () == KEY_STR)
     {
       csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
-      val.assign(stringKey->Value()->GetData());
+      val->Replace (stringKey->Value());
       return true;
     }
   }

@@ -183,6 +183,9 @@ public:
   /// Replace contents of this string with the contents of another
   virtual void Replace (const iString* iStr, size_t iCount = (size_t)-1);
 
+  /// Replace contents of this string with the contents of another
+  virtual void Replace (const char* iStr, size_t iCount = (size_t)-1);
+
   /// Check if two strings are equal
   virtual bool Compare (const iString* iStr) const;
 

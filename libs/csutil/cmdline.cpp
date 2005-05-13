@@ -177,17 +177,17 @@ bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
   return result;
 }
 
-const csString& csCommandLineParser::GetResourceDir ()
+const char* csCommandLineParser::GetResourceDir ()
 {
   return resDir;
 }
 
-const csString& csCommandLineParser::GetAppDir ()
+const char* csCommandLineParser::GetAppDir ()
 {
   return appDir;
 }
 
-const csString& csCommandLineParser::GetAppPath ()
+const char* csCommandLineParser::GetAppPath ()
 {
   return appPath;
 }

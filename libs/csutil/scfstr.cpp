@@ -124,6 +124,9 @@ void scfString::FormatV (const char* format, va_list args)
 void scfString::Replace (const iString* iStr, size_t iCount)
 { s.Replace (iStr->GetData (), iCount); }
 
+void scfString::Replace (const char* str, size_t iCount)
+{ s.Replace (str, iCount); }
+
 bool scfString::Compare (const iString* iStr) const
 { return s.Compare (iStr->GetData ()); }
 
