@@ -13,6 +13,9 @@ chronological order.
 	- res changed the VC project generator to also generate a single big
 	  library for static projects. Also added some support for static 
 	  plugins in external (VC) projects.
+	- res applied a patch from Seth Yastrov <syastrov@gmail.com> to
+	  augment the iRenderStepContainer interface with get, delete, and 
+	  find methods.
 12-May-2005
 	- Eric Sunshine augmented the ResponseFile rule in helper.jam so that
 	  it respects the LOCATE variable (possible set by the MakeLocate rule)

@@ -149,7 +149,10 @@ public:
     csShaderVarStack &stacks);
 
   virtual size_t AddStep (iRenderStep* step);
-  virtual size_t GetStepCount ();
+  virtual bool DeleteStep (iRenderStep* step);
+  virtual iRenderStep* GetStep (size_t n) const;
+  virtual size_t Find (iRenderStep* step) const;
+  virtual size_t GetStepCount () const;
 
   struct ShadowDrawVisCallback : public iVisibilityCullerListener
   {

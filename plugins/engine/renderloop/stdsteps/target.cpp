@@ -223,7 +223,22 @@ size_t csTargetRenderStep::AddStep (iRenderStep* step)
   return steps.Push (step);
 }
 
-size_t csTargetRenderStep::GetStepCount ()
+bool csTargetRenderStep::DeleteStep (iRenderStep* step)
+{
+  return steps.Delete(step);
+}
+
+iRenderStep* csTargetRenderStep::GetStep (size_t n) const
+{
+  return steps.Get(n);
+}
+
+size_t csTargetRenderStep::Find (iRenderStep* step) const
+{
+  return steps.Find(step);
+}
+
+size_t csTargetRenderStep::GetStepCount () const
 {
   return steps.Length();
 }

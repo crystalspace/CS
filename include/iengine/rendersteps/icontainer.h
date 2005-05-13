@@ -32,16 +32,23 @@
 
 struct iRenderStep;
 
-SCF_VERSION (iRenderStepContainer, 0, 0, 1);
+SCF_VERSION (iRenderStepContainer, 0, 1, 0);
 
 /**
  * Container for render steps.
- * \todo Add more step management methods.
  */
 struct iRenderStepContainer : public iBase
 {
+  /// Add a step
   virtual size_t AddStep (iRenderStep* step) = 0;
-  virtual size_t GetStepCount () = 0;
+  /// Remove a given step
+  virtual bool DeleteStep (iRenderStep* step) = 0;
+  /// Obtain a step
+  virtual iRenderStep* GetStep (size_t n) const = 0;
+  /// Find the index of a step
+  virtual size_t Find (iRenderStep* step) const = 0;
+  /// Get the number of steps
+  virtual size_t GetStepCount () const = 0;
 };
 
 /** @} */

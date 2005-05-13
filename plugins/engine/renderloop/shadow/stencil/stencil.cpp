@@ -689,7 +689,28 @@ size_t csStencilShadowStep::AddStep (iRenderStep* step)
   return steps.Push (lrs);
 }
 
-size_t csStencilShadowStep::GetStepCount ()
+bool csStencilShadowStep::DeleteStep (iRenderStep* step)
+{
+  csRef<iLightRenderStep> lrs = 
+    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+  if (!lrs) return false;
+  return steps.Delete(lrs);
+}
+
+iRenderStep* csStencilShadowStep::GetStep (size_t n) const
+{
+  return (iRenderStep*) steps.Get(n);
+}
+
+size_t csStencilShadowStep::Find (iRenderStep* step) const
+{
+  csRef<iLightRenderStep> lrs = 
+    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+  if (!lrs) return csArrayItemNotFound;
+  return steps.Find(lrs);
+}
+
+size_t csStencilShadowStep::GetStepCount () const
 {
   return steps.Length();
 }

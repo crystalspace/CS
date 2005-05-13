@@ -98,7 +98,22 @@ size_t csRenderLoop::AddStep (iRenderStep* step)
   return steps.Push (step);
 }
 
-size_t csRenderLoop::GetStepCount ()
+bool csRenderLoop::DeleteStep (iRenderStep* step)
+{
+  return steps.Delete(step);
+}
+
+iRenderStep* csRenderLoop::GetStep (size_t n) const
+{
+  return steps.Get(n);
+}
+
+size_t csRenderLoop::Find (iRenderStep* step) const
+{
+  return steps.Find(step);
+}
+
+size_t csRenderLoop::GetStepCount () const
 {
   return steps.Length();
 }

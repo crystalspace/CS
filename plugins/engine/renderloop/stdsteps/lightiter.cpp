@@ -315,7 +315,28 @@ size_t csLightIterRenderStep::AddStep (iRenderStep* step)
   return steps.Push (lrs);
 }
 
-size_t csLightIterRenderStep::GetStepCount ()
+bool csLightIterRenderStep::DeleteStep (iRenderStep* step)
+{
+  csRef<iLightRenderStep> lrs = 
+    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+  if (!lrs) return false;
+  return steps.Delete(lrs);
+}
+
+iRenderStep* csLightIterRenderStep::GetStep (size_t n) const
+{
+  return (iRenderStep*) steps.Get(n);
+}
+
+size_t csLightIterRenderStep::Find (iRenderStep* step) const
+{
+  csRef<iLightRenderStep> lrs = 
+    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+  if (!lrs) return csArrayItemNotFound;
+  return steps.Find(lrs);
+}
+
+size_t csLightIterRenderStep::GetStepCount () const
 {
   return steps.Length();
 }
