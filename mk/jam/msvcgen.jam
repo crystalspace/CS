@@ -274,7 +274,7 @@ else
     }
     else
     {
-      MSVCGEN_JAMOPTIONS += -dx ;
+      MSVCGEN_JAMOPTIONS += -d5 ;
     }
   }
 }
@@ -662,6 +662,7 @@ rule MsvcProject
     "librarydebug|$(MSVC.LIBRARY_DEBUG.$(type))"
     "librarydelay|$(MSVC.LIBRARY_DELAY)"
     "librarydelay|$(MSVC.LIBRARY_DELAY.$(type))"
+    "static|$($(rawname)_STATIC)"
     $(MSVCGEN_VARIABLES)
     : notfile : $(respdir) ;
   MsvcRmTemps msvcgen : $(respfile) ;
@@ -674,7 +675,16 @@ rule MsvcProject
   {
     if [ IsElem $(i:S) : .h .hpp .hxx .H .c .cc .cpp .cxx .C .m .mm .M ]
     {
-      ResponseFile $(respfile) : "file|$(i:R=$(SEARCH_SOURCE))" : notfile :
+      local fileinproj ;
+      if $($(rawname)_STATIC) = "yes"
+      {
+	fileinproj = $(i) ;
+      }
+      else
+      {
+	fileinproj = $(i:R=$(SEARCH_SOURCE)) ;
+      }
+      ResponseFile $(respfile) : "file|$(fileinproj)" : notfile :
 	$(respdir) ;
     }
   }
@@ -815,45 +825,102 @@ rule RegisterWellKnownCompileGroups
 
 rule LinkStaticPlugins
 {
+  local package target plugins optplugins ;
+  # Fetch the parameters
+  target = $(1) ;
+  plugins = $(2) ;
+  optplugins = $(3) ;
+  package = $(4) ;
+  
   # link with static plugins
-  LinkWith $(<) : $(>)_static ;
+  LinkWith $(target) : $(STATICPLUGINS.LIBRARY) ;
 
-  # construct flags
-  local deplibs libs i ;
-  for i in $(>)
+  if $(package)
   {
-    deplibs += $($(i).NEEDLIBS) ;
-    ExternalLibs $(<) : $($(i).EXTERNALLIBS) ;
-    
+    # External static plugins.
+    # First include static plugin info
+    if ! $(HAVE_STATICDEPS.$(package))
+    {
+      include $($(package).STATICDEPS) ;
+      HAVE_STATICDEPS.$(package) = yes ;
+    }
+    local lflags.debug lflags.release p mode ;
+    # Collect optional plugins
+    for p in $(optplugins)
+    {
+      if [ IsElem $(p) : $(STATICPLUGINS.AVAILABLE) ]
+      {
+	plugins += $(p) ;
+      }
+    }
+    # Grab flags
+    for p in $(plugins)
+    {
+      NotFile $(p) ;
+      for mode in debug release
+      {
+	MsvcCFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS.$(mode)) : $(mode) ;
+	lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
+      }
+    }
     for mode in debug release
     {
-      MsvcExternalLibrary $(<) : $($(i)_$(mode)_EXTERNALLIBS) : $(mode) ;
-      MsvcExternalLibrary $(<) : $($(i)_$(mode)_EXTERNALLIBS) : $(mode) ;
+      MsvcLFlags $(target) : 
+	[ Reverse [ RemoveDups [ Reverse $(lflags.$(mode)) ] ] ] : $(mode) ;
     }
   }
-  # We must eliminate the duplicates in reverse order in order to ensure that
-  # we do not destroy the overall library ordering since Unix linkers are
-  # order-sensitive.
-  #libs = [ Reverse [ RemoveDups [ Reverse $(deplibs) ] ] ] ;
-  #libs = lib$(libs)$(SUFLIB) ;
-  LinkWith $(<) : $(deplibs) ;
+  else
+  {
+    # Local static plugins
+    local libs p ;
+    # Collect optional plugins
+    for p in $(optplugins)
+    {
+      if $($(p)_TYPE)
+      {
+	plugins += $(p) ;
+      }
+    }
+    # Grab flags
+    for p in $(plugins)
+    {
+      libs += $($(p).NEEDLIBS) ;
+
+      ExternalLibs $(target) : $($(p).EXTERNALLIBS) ;
+      for mode in debug release
+      {
+	MsvcExternalLibrary $(target) : $($(p)_$(mode)_EXTERNALLIBS) : $(mode) ;
+	MsvcExternalLibrary $(target) : $($(p)_$(mode)_EXTERNALLIBS) : $(mode) ;
+      }
+    }
+    LinkWith $(target) : $(libs) ;
+  }
 
   # Generate static plugin instantiation
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
-  local staticuse_out =
-    $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
+  local staticuse_out ;
+  if $(package)
+  {
+    # @@@ Prefix hardcoded
+    staticuse_out = $(MSVC.PREFIX.appgui)$(<)_staticuse_$(package).cpp ; 
+  }
+  else
+  {
+    staticuse_out =
+      $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
+  }
   MakeLocate $(staticuse_out) : $(outdir) ;
   SEARCH on $(staticuse_out) = $(outdir) ;
   
-  GenerateStaticPluginInstantiation $(staticuse_out) : $(>) ;
+  GenerateStaticPluginInstantiation $(staticuse_out) : $(plugins) ;
   Always $(staticuse_out) ;
   Depends msvcgen : $(staticuse_out) ;
 
   # Add usefile to project
-  ResponseFile $($(<)_PRJ_RESPFILE) : 
+  ResponseFile $($(target)_PRJ_RESPFILE) : 
     "file|$(staticuse_out:R=$(outdir))" : notfile :
-    $($(<)_PRJ_RESPDIR) ;
-  Depends $(<) : $(staticuse_out) ;
+    $($(target)_PRJ_RESPDIR) ;
+  Depends $(target) : $(staticuse_out) ;
 }
 
 rule Application
@@ -887,6 +954,8 @@ rule Plugin
   MsvcProject $(<) : plugin : $(<:S=.dll) : $(>) ;
   CompileGroups $(<) : all plugins ;
 
+  STATICPLUGINS.SOURCE += $(>:R=$(SEARCH_SOURCE)) ;
+
   # Generate static variant of plugin
   #  Static registry
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
@@ -896,17 +965,8 @@ rule Plugin
   GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
   Always $(staticreg_out) ;
   Depends msvcgen : $(staticreg_out) ;
-  
-  #  VC project
-  local staticname = $(<)_static ;
-  SubVariant static ;
-  Library $(staticname) : $(>) : $(3) independent noinstall nohelp notest ;
-  MsvcDefine $(staticname) : CS_STATIC_LINKED ;
-  ResponseFile $($(staticname)_PRJ_RESPFILE) : 
-    "file|$(staticreg_out:R=$(outdir))" : notfile :
-    $($(staticname)_PRJ_RESPDIR) ;
-  Depends $(staticname) : $(staticreg_out) ;
-  SubVariant ;
+  STATICPLUGINS.SOURCE += $(outdir)/$(staticreg_out) ;
+  STATICPLUGINS.SUBTARGETS += $(<) ;
 }
 
 rule Library
@@ -915,6 +975,107 @@ rule Library
   $(<)_TYPE = library ;
   MsvcProject $(<) : library : $(<:S=.lib) : $(>) ;
   CompileGroups $(<) : all libs ;
+}
+
+rule StaticPluginLibrary
+{
+  local name = $(<) ;
+  local t ;
+  $(name)_STATIC = "yes" ;
+  # Set up library
+  Library $(name) : $(STATICPLUGINS.SOURCE) ;
+  MsvcDefine $(name) : CS_STATIC_LINKED ;
+  _MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
+
+  # Write out needed CFLAGS, LFLAGS
+  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  STATICPLUGINS.DEPENDENCIES = $(name)_msvc.jam ;
+  MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(outdir) ;
+  SEARCH on $(STATICPLUGINS.DEPENDENCIES) = $(outdir) ;
+  for t in $(STATICPLUGINS.SUBTARGETS)
+  {
+    NotFile $(t) ;
+    WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;
+  }
+  Always $(STATICPLUGINS.DEPENDENCIES) ;
+  Depends msvcgen : $(STATICPLUGINS.DEPENDENCIES) ;
+  
+  STATICPLUGINS.LIBRARY = $(name) ;
+}
+
+# Write out CFLAGS, LFLAGS needed by a plugin
+rule WriteDependencies
+{
+  local cflags.debug cflags.release ;
+  local lflags.debug lflags.release ;
+  local depfile = $(<) ;
+  local plugin = $(>) ;
+  local depfile_gristed = $(depfile:G=$(plugin)) ;
+  MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
+  
+  # Collect flags
+  local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
+  lflags.debug += $(MSVC.PREFIX.library)$(libs)_d.lib ;
+  lflags.release += $(MSVC.PREFIX.library)$(libs).lib ;
+  
+  local l ;
+  for l in $($(plugin).EXTERNALLIBS)
+  {
+    if $($(l).DEFINES.DEBUG)
+    {
+      cflags.debug += "\"/D $($(l).DEFINES.DEBUG)\"" ;
+      cflags.release += "\"/D $($(l).DEFINES)\"" ;
+    }
+    else
+    {
+      cflags.debug += "\"/D $($(l).DEFINES)\"" ;
+      cflags.release += "\"/D $($(l).DEFINES)\"" ;
+    }
+  }
+  local mode ;
+  for mode in debug release
+  {
+    lflags.$(mode) += $($(plugin).LFLAGS.$(mode))  ;
+    lflags.$(mode) += $($(plugin)_$(mode)_EXTERNALLIBS)  ;
+  }
+  CFLAGS.DEBUG on $(depfile_gristed) = "$(cflags.debug)" ;
+  CFLAGS.RELEASE on $(depfile_gristed) = "$(cflags.release)" ;
+  LFLAGS.DEBUG on $(depfile_gristed) = "$(lflags.debug)" ;
+  LFLAGS.RELEASE on $(depfile_gristed) = "$(lflags.release)" ;
+  
+  if $($(depfile).FIRSTTIME) != "yes"
+  {
+    WriteDepFlags1 $(depfile_gristed) : $(plugin) ;
+    $(depfile).FIRSTTIME = "yes" ;
+  }
+  else
+  {
+    WriteDepFlags2 $(depfile_gristed) : $(plugin) ;
+  }
+  Depends $(depfile) : $(depfile_gristed) ;
+  Always $(depfile_gristed) ;
+}
+
+actions WriteDepFlags1 
+{
+  cat << EOT > $(<)
+STATICPLUGINS.AVAILABLE += $(>) ;
+STATICPLUGIN.$(>).CFLAGS.debug = $(CFLAGS.DEBUG) ;
+STATICPLUGIN.$(>).CFLAGS.release = $(CFLAGS.RELEASE) ;
+STATICPLUGIN.$(>).LFLAGS.debug = $(LFLAGS.DEBUG) ;
+STATICPLUGIN.$(>).LFLAGS.release = $(LFLAGS.RELEASE) ;
+EOT
+}
+
+actions WriteDepFlags2 
+{
+  cat << EOT >> $(<)
+STATICPLUGINS.AVAILABLE += $(>) ;
+STATICPLUGIN.$(>).CFLAGS.debug = $(CFLAGS.DEBUG) ;
+STATICPLUGIN.$(>).CFLAGS.release = $(CFLAGS.RELEASE) ;
+STATICPLUGIN.$(>).LFLAGS.debug = $(LFLAGS.DEBUG) ;
+STATICPLUGIN.$(>).LFLAGS.release = $(LFLAGS.RELEASE) ;
+EOT
 }
 
 rule RegisterCompileGroups
@@ -1003,12 +1164,9 @@ rule _MsvcRespEmit
 rule MsvcExternalLibrary1
 {
   _MsvcRespEmit $(1) : $(2) : library : $(3) ;
-  if $($(1)_TYPE) = plugin
-  {
-    local mode = $(3) ;
-    mode ?= debug release ;
-    $(1)_$(mode)_EXTERNALLIBS += $(2) ;
-  }
+  local mode = $(3) ;
+  mode ?= debug release ;
+  $(1)_$(mode)_EXTERNALLIBS += $(2) ;
 }
 
 # MsvcDefine target [ : key [ : value [ : mode ]]]
@@ -1031,6 +1189,7 @@ rule MsvcDefine1
       def = $(key) ;
     }
     _MsvcRespEmit $(target) : $(def) : define : $(mode) ;
+    STATICPLUGINS.MSVC_DEFINES += $(def) ;
   }
 }
 
@@ -1053,6 +1212,8 @@ rule MsvcCFlags1
 #   (See documentation above.)
 rule MsvcLFlags1
 {
+  local modes = [ MsvcClassifyMode $(3) ] ;
+  $(target).LFLAGS.$(modes) += $(2) ;
   _MsvcRespEmit $(1) : $(2) : lflags : $(3) ;
 }
 
@@ -1103,15 +1264,7 @@ rule ExternalLibs
     _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcIncDirs : INCDIRS ;
     _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcLibDirs : LIBDIRS ;
     
-    if $($(<)_TYPE) = library
-    {
-      $(<).EXTERNALLIBS += $(i) ;
-    }
-  }
-  # Mild hack to propagate external dependencies to static variants
-  if $($(<)_TYPE) = plugin
-  {
-    ExternalLibs $(<)_static : $(>) ;
+    $(<).EXTERNALLIBS += $(i) ;
   }
 }
 
@@ -1158,8 +1311,6 @@ rule Win32Resource
   Depends $($(<)_RCNAME) : $(>) ;
   MergeResources $($(<)_RCNAME) : $(>) ;
 }
-
-rule StaticPluginLibrary { }
 
 #----------------------------------------------------------------------------
 

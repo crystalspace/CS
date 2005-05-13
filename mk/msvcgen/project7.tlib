@@ -123,6 +123,18 @@ END -%]
 			[%- FOREACH file IN items %]
 			<File
 				RelativePath="[% path([my.doc.sourceroot.0, file]) %]">
+				[%- IF my.doc.static %]
+				[%- UNLESS file.match('\\.(h|hpp|rc)$') %]
+				[%- FOREACH build IN builds %]
+				<FileConfiguration
+					Name="[% build.name %]|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="[% workbuild([file.replace('/', '_'), '.obj']) %]"/>
+				</FileConfiguration>
+				[%- END %]
+				[%- END %]
+				[%- END %]
 			</File>
 			[%- END %]
 		</Filter>

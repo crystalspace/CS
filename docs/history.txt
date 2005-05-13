@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-May-2005
+	- res changed the win32kbd_identstrs.h to only use the "recent key
+	  codes" when VK_SLEEP is actually present (and not based on compiler
+	  type and version).
+	- res changed the VC project generator to also generate a single big
+	  library for static projects. Also added some support for static 
+	  plugins in external (VC) projects.
 12-May-2005
 	- Eric Sunshine augmented the ResponseFile rule in helper.jam so that
 	  it respects the LOCATE variable (possible set by the MakeLocate rule)

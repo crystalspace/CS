@@ -8,6 +8,8 @@ Application vsh
 ;
 LinkWith vsh : crystalspace ;
 
+if [ Property build : projgen_version ] != 6
+{
 Description vsh_static : "Virtual Shell tool (static build)" ;
 
 SubVariant static ;
@@ -18,3 +20,4 @@ MsvcDefine vsh_static : CS_STATIC_LINKED ;
 LinkWith vsh_static : crystalspace_staticplugins crystalspace ;
 LinkStaticPlugins vsh_static : vfs ;
 SubVariant ;
+}

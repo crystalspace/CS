@@ -42,7 +42,6 @@ CG.LIBS = cg.lib cgGL.lib ;
 DIRECTX.AVAILABLE = yes ;
 DIRECTX.LIBS = dsound.lib ddraw.lib dinput.lib ;
 FT2.AVAILABLE = yes ;
-FT2.INCDIRS = ../../include/csutil/win32/freetype2 ;
 FT2.LIBS = freetype2.lib ;
 GL.AVAILABLE = yes ;
 GL.LIBS = opengl32.lib ;

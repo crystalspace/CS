@@ -22,7 +22,7 @@
 
 #include "cstool/identstrings.h"
 
-#if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
+#if defined(VK_SLEEP)
 #define CS_USE_RECENT_WIN32KBD_IDENTSTRS
 #else
 #undef CS_USE_RECENT_WIN32KBD_IDENTSTRS

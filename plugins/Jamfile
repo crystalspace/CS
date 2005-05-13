@@ -26,5 +26,8 @@ SubInclude TOP plugins stdrep ;
 SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;
 
+if [ Property build : projgen_version ] != 6
+{
 # Assemble big static plugins lib
 StaticPluginLibrary crystalspace_staticplugins ;
+}
