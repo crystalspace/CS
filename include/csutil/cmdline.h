@@ -113,18 +113,18 @@ public:
    * GetAppDir(); however, on MacOS/X, it is the "Resources" directory within
    * the Cocoa application wrapper.
    */
-  virtual const csString& GetResourceDir ();
+  virtual const char* GetResourceDir ();
 
   /**
    * Returns the directory in which the application executable resides; or the
    * directory in which the Cocoa application wrapper resides on MacOS/X.
    */
-  virtual const csString& GetAppDir ();
+  virtual const char* GetAppDir ();
 
   /**
    * Returns the full path to the application executable.
    */
-  virtual const csString& GetAppPath ();
+  virtual const char* GetAppPath ();
 };
 
 #endif // __CS_CMDLINE_H__
