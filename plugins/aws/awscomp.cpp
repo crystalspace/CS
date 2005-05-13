@@ -391,7 +391,7 @@ bool awsComponent::Execute (const char* action, iAwsParmList* parmlist)
 
 	if (f.parseObject(code.begin(), code.end()))
 	{
-		f.addIntParm("comp_id", (long long)self);
+		f.addIntParm("comp_id", (longlong)self);
 		autom::keeper result = f.Execute();
 	}
   
