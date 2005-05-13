@@ -3188,6 +3188,8 @@ package cspace::iAws;
 *AllWindowsHidden = *cspacec::iAws_AllWindowsHidden;
 *ComponentIsInTransition = *cspacec::iAws_ComponentIsInTransition;
 *ComponentDestroyed = *cspacec::iAws_ComponentDestroyed;
+*DeleteMarkedComponents = *cspacec::iAws_DeleteMarkedComponents;
+*MarkToDeleteRecursively = *cspacec::iAws_MarkToDeleteRecursively;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -3256,6 +3258,8 @@ package cspace::iAwsPrefManager;
 *GetConstantValue = *cspacec::iAwsPrefManager_GetConstantValue;
 *CreateKeyFactory = *cspacec::iAwsPrefManager_CreateKeyFactory;
 *CreateConnectionNodeFactory = *cspacec::iAwsPrefManager_CreateConnectionNodeFactory;
+*AddCustomStringProperty = *cspacec::iAwsPrefManager_AddCustomStringProperty;
+*GetCustomStringProperties = *cspacec::iAwsPrefManager_GetCustomStringProperties;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -3550,6 +3554,8 @@ package cspace::iAwsComponent;
 *LinkAbove = *cspacec::iAwsComponent_LinkAbove;
 *LinkBelow = *cspacec::iAwsComponent_LinkBelow;
 *SetTopChild = *cspacec::iAwsComponent_SetTopChild;
+*MarkToDelete = *cspacec::iAwsComponent_MarkToDelete;
+*GetMarkToDelete = *cspacec::iAwsComponent_GetMarkToDelete;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
