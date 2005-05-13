@@ -44,6 +44,8 @@ and all slots must belong to some class.  You can have other things in your clas
 have to have one object set aside for dealing with that stuff.  Slots can be where they ought to be: near the data
 and functions that want to know about them.
 
+@code
+{
 
 class myslots : public autom::has_slots<>
 {
@@ -69,6 +71,7 @@ public:
 	}
 };
 
+}
 
 There's a little bit of code there, but let's look at each of the pieces.  The first thing to note is that
 the class MUST inherit from autom::has_slots<>.  Otherwise it won't have the code needed to host slots.
@@ -86,20 +89,20 @@ our titleChanged function will be called whenever @samp{Title.Set()} succeeds.
 
 @subsubheading Properties Q&A
 
-Question: How do I know what component or window a property is associated with?
-Answer: Currently, the code must know that somehow.  Either because you as the developer
+@strong{Question:} @emph{How do I know what component or window a property is associated with?}
+@strong{Answer:} Currently, the code must know that somehow.  Either because you as the developer
 knows that a certain object's slots only ever connect to a given window or component, or
 through some other previous knowledge.  Eventually there will be a global registry that will
 allow you to lookup that sort of information.
 
-Question: Why don't properties store the component and/or window they're associated with?
-Answer: Properties are designed to be used in a number of contexts.  Building in information
+@strong{Question:}@emph{ Why don't properties store the component and/or window they're associated with? }
+@strong{Answer:} Properties are designed to be used in a number of contexts.  Building in information
 about component or window ownership implies that properties must belong to a component.  That
 may or may not be true in the future.
 
-Question: Why do I have to use a keeper and do all that gobbledygook with the toString()->Value()
+@strong{Question:} @emph{ Why do I have to use a keeper and do all that gobbledygook with the toString()->Value() }
 stuff?
-Answer: Property values are inherently type-agnostic.  In the case of a bound property, the value is
+@strong{Answer:} Property values are inherently type-agnostic.  In the case of a bound property, the value is
 always converted to the concrete type the property is bound to.  However, the property may still be
 set with any sort of type supported (int, float, string).  The conversions are implicitly handled when 
 needed.  The keeper is just a shorter name for csRef<object *>, and provides automatic lifespan handling
@@ -122,6 +125,8 @@ progress.Caption.Set(k);
 
 Then, when the progress bar's status is updated and it redraws, it will do something like this:
 
+@code
+{
 ...
 
 autom::keeper k;
@@ -133,14 +138,15 @@ std::string caption_text = k->toString().Value();
 
 Instead of getting the string we set for the property, the string is evaluated as a function, and we get the result.  In this case
 it would happen to be how many bytes were received.  Had we set the value as a simple string, that string would have been displayed.
+}
 
 @subsubheading Scripting Tutorial
 
 
 @subsubheading Scripting Q&A
 
-Question: When I call autom::Compile with a string it doesn't return an automation string object.  It just returns nil.  Why?
-Answer:  If you try to compile a string it must have double quotes around it, just like in C and C++ and a myriad other languages.
+@strong{Question:} @emph{ When I call autom::Compile with a string it doesn't return an automation string object.  It just returns nil.  Why? }
+@strong{Answer:}  If you try to compile a string it must have double quotes around it, just like in C and C++ and a myriad other languages.
 If all you are trying to do is generate a automation string object from a pre-existing string, use @samp{new autom::string(existing_string)}.
 It understands that the string is pre-composed and doesn't parse it.  Therefore it's also much faster.
 
