@@ -38,6 +38,8 @@
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
 
+#define NEW_CONFIG_SCANNING
+
 CS_IMPLEMENT_PLUGIN
 
 // Characters ignored in VFS paths (except in middle)
@@ -1572,7 +1574,36 @@ static bool load_vfs_config(csConfigFile& cfg, char const* dir,
 bool csVFS::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
+#ifdef NEW_CONFIG_SCANNING
+  static const char* vfsSubdirs[] = {
+    "etc/" CS_PACKAGE_NAME,
+    "etc", 
+    "",
+    0};
+
+  csPathsList configPaths;
+  const char* crystalconfig = getenv("CRYSTAL_CONFIG");
+  if (crystalconfig)
+    configPaths.AddUniqueExpanded (crystalconfig);
+  
+  csPathsList* basedirs = 
+    csInstallationPathsHelper::GetPlatformInstallationPaths();
+  configPaths.AddUniqueExpanded (*basedirs * csPathsList  (vfsSubdirs));
+  delete basedirs;
+
+  configPaths.AddUniqueExpanded (".");
+#ifdef CS_CONFIGDIR
+  configPaths.AddUniqueExpanded (CS_CONFIGDIR);
+#endif
+
+  configPaths = csPathsUtilities::LocateFile (configPaths, "vfs.cfg", true);
+  if (configPaths.Length() > 0)
+  {
+    basedir = alloc_normalized_path (configPaths[0].path);
+  }
+#else
   basedir = alloc_normalized_path(csGetConfigPath());
+#endif
 
   csRef<iVerbosityManager> vm (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
@@ -1598,7 +1629,20 @@ bool csVFS::Initialize (iObjectRegistry* r)
   bool const verbose_scan = IsVerbose(VERBOSITY_SCAN);
   load_vfs_config(config, resdir,  seen, verbose_scan);
   load_vfs_config(config, appdir,  seen, verbose_scan);
+#ifdef NEW_CONFIG_SCANNING
+  bool result =	load_vfs_config(config, resdir,  seen, verbose_scan);
+  if (result && (basedir == 0))
+    basedir = alloc_normalized_path (resdir);
+  result = load_vfs_config(config, appdir,  seen, verbose_scan);
+  if (result && (basedir == 0))
+    basedir = alloc_normalized_path (appdir);
+  for (size_t i = 0; i < configPaths.Length(); i++)
+  {
+    load_vfs_config(config, configPaths[i].path,  seen, verbose_scan);
+  }
+#else
   load_vfs_config(config, basedir, seen, verbose_scan);
+#endif
 
   return ReadConfig ();
 }

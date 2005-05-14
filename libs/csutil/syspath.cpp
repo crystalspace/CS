@@ -157,6 +157,24 @@ csPathsList operator* (const csPathsList& left, const csPathsList& right)
 #endif
 #endif
 
+csPathsList csPathsUtilities::LocateFile (const csPathsList& paths, 
+					  const char* file, bool thorough)
+{
+  csPathsList newPaths;
+  csStringFast<CS_MAXPATHLEN> scratch;
+  for (size_t i = 0; i < paths.Length(); i++)
+  {
+    scratch.Replace (paths[i].path);
+    scratch << CS_PATH_SEPARATOR << file;
+    if (access (scratch, F_OK) == 0)
+    {
+      newPaths.AddUnique (paths[i]);
+      if (!thorough) break;
+    }
+  }
+  return newPaths;
+}
+
 void csPathsUtilities::FilterInvalid (csPathsList& paths)
 {
   size_t i = paths.Length();

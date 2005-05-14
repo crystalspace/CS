@@ -14,12 +14,24 @@ chronological order.
 	- res fixed a wrong message ID in the particles loader.
 	- res fixed a bug in csStringBase where replacing a string with an
 	  empty string didn't work.
-	- res made some compile fixes to syspathc.cpp.
+	- res made some compile fixes to syspath.cpp.
 	- res added a test for csPathsList.
 	- Erroroman added missing <?include snippets/fog-pass.inc ?> in 
 	  terrain_fixed_base.xml.
 	- Erroroman updated export_genmesh_skelanim.mcr to support Skin
 	  modifier and bones.
+	- res fixed botched string splitting in 
+	  csPathsList::csPathsList(const char*).
+	- res added an alternative way to VFS to scan for data locations.
+	  As before, first the application resource and application directories
+	  are scanned for vfs.cfg files, after that, a list of possible vfs.cfg
+	  locactions based on the list of installation paths is scanned. The 
+	  first directory of the installation directory list is taken as the 
+	  "base directory". If that list actually does not contain a directory
+	  with vfs.cfg, the first of the app. res. and app. directories is 
+	  taken as the base dir (this is different from the old behaviour). To
+	  get the old behaviour (only scan single dir, don't use app. res. or
+	  app. as base dir) #undefine NEW_CONFIG_SCANNING.
 13-May-2005
 	- res changed the win32kbd_identstrs.h to only use the "recent key
 	  codes" when VK_SLEEP is actually present (and not based on compiler
