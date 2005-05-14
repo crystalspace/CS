@@ -14,6 +14,8 @@ chronological order.
 	- res fixed a wrong message ID in the particles loader.
 	- res fixed a bug in csStringBase where replacing a string with an
 	  empty string didn't work.
+	- res made some compile fixes to syspathc.cpp.
+	- res added a test for csPathsList.
 13-May-2005
 	- res changed the win32kbd_identstrs.h to only use the "recent key
 	  codes" when VK_SLEEP is actually present (and not based on compiler

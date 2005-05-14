@@ -38,7 +38,7 @@ csPathsList::csPathsList (const char* pathList)
 
   const char* remain = pathList;
   const char* delim;
-  while (delim = strchr (pathList, CS_PATH_DELIMITER))
+  while ((delim = strchr (pathList, CS_PATH_DELIMITER)) != 0)
   {
     scratch.Replace (remain, delim - remain);
     AddUnique (scratch);
@@ -123,7 +123,7 @@ csPathsList operator* (const csPathsList& left, const csPathsList& right)
       const csPathsList::Entry& p2 = right[r];
       scratch.Replace (p1.path);
       if ((scratch.Length() > 1) 
-	|| ((scratch.Length() == 1) && (scratch[0] != CS_PATH_SEPARATOR)))
+	|| ((scratch.Length() == 1) && (scratch.GetAt(0) != CS_PATH_SEPARATOR)))
       {
 	scratch << CS_PATH_SEPARATOR;
       }
