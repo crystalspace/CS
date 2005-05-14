@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS Automation, AWS Custom Components, AWS Quick Start, AWS
+@node AWS Automation, , AWS QT Designer and AWS, AWS
 @subsection Automation: Properties and Scripting
 
 

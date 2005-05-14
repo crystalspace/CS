@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS QT Designer and AWS, , AWS Architecture, AWS
+@node AWS QT Designer and AWS, AWS Automation, AWS Architecture, AWS
 @subsection Using QT Designer To Create @sc{aws} Definition Files
 
 On many platforms Trolltechs Designer is available, a tool that lets you create graphical user interfaces like
