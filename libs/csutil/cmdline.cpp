@@ -43,9 +43,9 @@ csCommandLineParser::~csCommandLineParser()
 
 void csCommandLineParser::Initialize (int argc, const char* const argv[])
 {
-  resDir  = csGetResourceDir (argv[0]);
-  appDir  = csGetAppDir      (argv[0]);
-  appPath = csGetAppPath     (argv[0]);
+  resDir  = csInstallationPathsHelper::GetResourceDir (argv[0]);
+  appDir  = csInstallationPathsHelper::GetAppDir      (argv[0]);
+  appPath = csInstallationPathsHelper::GetAppPath     (argv[0]);
 
   for (int i = 1; i < argc; i++)
   {

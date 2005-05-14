@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <limits.h>
 
-char* csExpandPath (const char* path)
+char* csPathsUtilities::ExpandPath (const char* path)
 {
   // Remember where we are.
   char old_path[CS_MAXPATHLEN];
@@ -53,7 +53,7 @@ char* csExpandPath (const char* path)
   return (csStrNew (normalized_path));
 }
 
-bool csPathsIdentical (const char* path1, const char* path2)
+bool csPathsUtilities::PathsIdentical (const char* path1, const char* path2)
 {
   return (strcmp (path1, path2) == 0);
 }

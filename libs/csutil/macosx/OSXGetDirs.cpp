@@ -46,7 +46,7 @@
 bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
 {
   bool ok = false;
-  csString apppath = csGetAppPath(argv0);
+  csString apppath = csInstallationPathsHelper::GetAppPath(argv0);
   if (!apppath.IsEmpty())
   {
     size_t slash = apppath.FindLast(CS_PATH_SEPARATOR);
@@ -91,7 +91,7 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
 //	executable.  Returns the empty string if unable to determine the
 //	directory.
 //-----------------------------------------------------------------------------
-csString csGetAppDir(char const* argv0)
+csString csInstallationPathsHelper::GetAppDir(char const* argv0)
 {
   csString dir, name;
   bool is_gui;
@@ -112,7 +112,7 @@ csString csGetAppDir(char const* argv0)
 //	non-MacOS/X platforms.  Returns the empty string if unable to determine
 //	the directory.
 //-----------------------------------------------------------------------------
-csString csGetResourceDir(char const* argv0)
+csString csInstallationPathsHelper::GetResourceDir(char const* argv0)
 {
   csString dir, name;
   bool is_gui;

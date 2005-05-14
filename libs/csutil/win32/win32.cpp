@@ -156,16 +156,16 @@ static inline void ToLower (char *dst, const char *src)
   *d=0;
 }
 
-static inline bool AddToPathEnv (char *dir, char **pathEnv)
+static inline bool AddToPathEnv (csString dir, char **pathEnv)
 {
   // check if installdir is in the path.
   bool gotpath = false;
 
-  size_t dlen = strlen(dir);
+  size_t dlen = dir.Length();
   // csGetInstallDir() might return "" (current dir)
   if (dlen != 0)
   {
-    ToLower (dir, dir);
+    dir.Downcase();
   
     if (*pathEnv)
     {
@@ -213,7 +213,7 @@ bool csPlatformStartup(iObjectRegistry* r)
 {
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
 
-  csPluginPaths* pluginpaths = csGetPluginPaths (cmdline->GetAppPath());
+  csPathsList* pluginpaths = csGetPluginPaths (cmdline->GetAppPath());
 
   /*
     When it isn't already in the PATH environment,
@@ -243,7 +243,7 @@ bool csPlatformStartup(iObjectRegistry* r)
     {
       csString path;
 
-      for (int i = 0; i < pluginpaths->GetCount(); i++)
+      for (int i = 0; i < pluginpaths->Length(); i++)
       {
 	if (((*pluginpaths)[i].path != 0) && (*((*pluginpaths)[i].path) != 0))
 	{

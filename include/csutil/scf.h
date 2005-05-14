@@ -30,7 +30,7 @@
  * \addtogroup scf
  * @{ */
 
-class csPluginPaths;
+class csPathsList;
 
 #include "ref.h"
 #include "array.h"
@@ -876,7 +876,7 @@ enum
  *   bitwise-or which control SCF verbosity.
  * \remark The path list is ignored for static builds.
  */
-CS_CRYSTALSPACE_EXPORT void scfInitialize(csPluginPaths const* pluginPaths,
+CS_CRYSTALSPACE_EXPORT void scfInitialize(csPathsList const* pluginPaths,
   unsigned int verbose = SCF_VERBOSE_NONE);
 
 /**

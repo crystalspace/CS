@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <limits.h>
 
-csString csGetAppPath (const char* argv0)
+csString csInstallationPathsHelper::GetAppPath (const char* argv0)
 {
   csString fullpath;
 

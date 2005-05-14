@@ -509,15 +509,15 @@ csRef<iStringArray> csScanPluginDir (const char* dir,
   return csPtr<iStringArray> (messages);
 }
 
-csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStringArray>& plugins)
+csRef<iStringArray> csScanPluginDirs (csPathsList* dirs, 
+				      csRef<iStringArray>& plugins)
 {
   iStringArray* messages = 0;
 
   if (!plugins)
     plugins.AttachNew (new scfStringArray ());
 
-  for (size_t i = 0; i < dirs->GetCount (); i++)
+  for (size_t i = 0; i < dirs->Length (); i++)
   {
     iStringArray* dirMessages = 0;
     InternalScanPluginDir (dirMessages, (*dirs)[i].path, 

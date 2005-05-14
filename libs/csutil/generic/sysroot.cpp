@@ -22,7 +22,7 @@
 #include "csutil/scfstringarray.h"
 #include "csutil/util.h"
 
-csRef<iStringArray> csFindSystemRoots()
+csRef<iStringArray> csInstallationPathsHelper::FindSystemRoots()
 {
   scfStringArray* p = new scfStringArray(0);
   p->Push("/");

@@ -22,9 +22,9 @@
 #include "csutil/util.h"
 #include <string.h>
 
-csString csGetAppDir (const char* argv0)
+csString csInstallationPathsHelper::GetAppDir (const char* argv0)
 {
-  csString appdir = csGetAppPath(argv0);
+  csString appdir = GetAppPath(argv0);
   size_t slash = appdir.FindLast(CS_PATH_SEPARATOR);
   if (slash != (size_t)-1)
     appdir.Truncate(slash);

@@ -97,16 +97,15 @@ CS_CRYSTALSPACE_EXPORT bool csGetLoadLibraryVerbose();
  * \return If any errors occured, a vector of error descriptions.
  */
 CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDir (const char* dir, 
-				   csRef<iStringArray>& plugins,
-				   bool recursive = true);
+  csRef<iStringArray>& plugins, bool recursive = true);
 
 /**
  * Scan some given directories for plugins.
  * Accepts the same parameters as csScanPluginDir(), with the exception of
  * \p dirs.
  */				
-CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
-				    csRef<iStringArray>& plugins);
+CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDirs (csPathsList* dirs,   
+  csRef<iStringArray>& plugins);
 
 /**
  * Retrive a plugin's metadata.

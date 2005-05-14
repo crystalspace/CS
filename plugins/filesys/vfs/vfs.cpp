@@ -1812,7 +1812,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
   csScopedMutexLock lock (mutex);
   if (Path != 0)
   {
-    csRef<iStringArray> roots = csFindSystemRoots();
+    csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
     size_t i;
     size_t n = roots->Length ();
     for (i = 0 ; i < n ; i++)

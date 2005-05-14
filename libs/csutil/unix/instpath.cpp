@@ -105,17 +105,17 @@ csString csGetConfigPath ()
   return CS_CONFIGDIR;
 }
 
-csPluginPaths* csGetPluginPaths (const char* argv0)
+csPathsList* csGetPluginPaths (const char* argv0)
 {
-  csPluginPaths* paths = new csPluginPaths;
+  csPluginPaths* paths = new csPathsList;
 
   csString resPath = csGetResourceDir (argv0);
   if (!resPath.IsEmpty())
-    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
+    paths->AddUniqueExpanded (resPath, DO_SCAN_RECURSION, "app");
 
   csString appPath = csGetAppDir (argv0);
   if (!appPath.IsEmpty())
-    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
+    paths->AddUniqueExpanded (appPath, DO_SCAN_RECURSION, "app");
 
   const char* crystal = getenv("CRYSTAL");
   if (crystal)
@@ -136,9 +136,9 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
 
       libpath1 << crystalPath.Slice (pos, subStrLen) << "/lib";
       libpath2 << libpath1 << "/" CS_PACKAGE_NAME;
-      paths->AddOnce(libpath2, DO_SCAN_RECURSION, "plugins");
-      paths->AddOnce(libpath1, DO_SCAN_RECURSION, "plugins");
-      paths->AddOnce(crystal,  DO_SCAN_RECURSION, "plugins");
+      paths->AddUniqueExpanded(libpath2, DO_SCAN_RECURSION, "plugins");
+      paths->AddUniqueExpanded(libpath1, DO_SCAN_RECURSION, "plugins");
+      paths->AddUniqueExpanded(crystal,  DO_SCAN_RECURSION, "plugins");
       
       pos += subStrLen + 1;
     }
@@ -146,10 +146,10 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
 
   const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
   if (crystal_plugin)
-    paths->AddOnce(crystal_plugin, DO_SCAN_RECURSION, "plugins");
+    paths->AddUniqueExpanded(crystal_plugin, DO_SCAN_RECURSION, "plugins");
 
   if (!crystal && !crystal_plugin)
-    paths->AddOnce(CS_PLUGINDIR, DO_SCAN_RECURSION, "plugins");
+    paths->AddUniqueExpanded(CS_PLUGINDIR, DO_SCAN_RECURSION, "plugins");
     
   return paths;
 }

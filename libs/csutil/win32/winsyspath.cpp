@@ -106,7 +106,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
 // on the destructor for some unknown reason.
 static cswinCacheDLL hKernel32 ("kernel32.dll");
 
-char* csExpandPath (const char* path)
+char* csPathsUtilities::ExpandPath (const char* path)
 {
   if (path == 0 || *path == '\0')
     return 0;
@@ -141,12 +141,12 @@ char* csExpandPath (const char* path)
   return (csStrNew (fullName));
 }
 
-bool csPathsIdentical (const char* path1, const char* path2)
+bool csPathsUtilities::PathsIdentical (const char* path1, const char* path2)
 {
   return (strcasecmp (path1, path2) == 0);
 }
 
-csString csGetAppPath (const char*)
+csString csInstallationPathsHelper::GetAppPath (const char*)
 {
   char appPath[MAX_PATH];
   GetModuleFileName (0, appPath, MAX_PATH - 1);

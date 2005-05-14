@@ -20,6 +20,7 @@
 #define __CS_SYS_WIN32_SHELLSTUFF_H__
 
 #include <shlobj.h>
+#include "csutil/csstring.h"
 #include "cachedll.h"
 
 // This file contains some newer SHELL32 stuff, for example not found
@@ -78,6 +79,50 @@ GetShellFolderPath (int CSIDL, char* path)
       MAlloc->Release ();
     }
   }
+  return result;
+}
+
+static inline bool GetShellFolderPath (int CSIDL, csString& path)
+{
+  bool result = false;
+  char buf[MAX_PATH];
+
+  // ShFolder.dll can 'emulate' special folders on older Windowses.
+  static cswinCacheDLL shell32 ("shell32.dll");
+  static cswinCacheDLL shFolder ("shfolder.dll");
+	
+  SHGETFOLDERPATHAPROC SHGetFolderPathA;
+  SHGetFolderPathA = 
+    (SHGETFOLDERPATHAPROC) GetProcAddress (shell32, "SHGetFolderPathA");
+
+  if (!SHGetFolderPathA && shFolder)
+  {
+    SHGetFolderPathA = 
+      (SHGETFOLDERPATHAPROC) GetProcAddress (shFolder, "SHGetFolderPathA");
+  }
+
+  if (SHGetFolderPathA)
+  {
+    result = (SHGetFolderPathA (0, CSIDL, 0, 
+      SHGFP_TYPE_CURRENT, buf) == S_OK);
+  }
+  else
+  {
+    // no shfolder? Try normal shell32 instead
+    LPMALLOC MAlloc;
+    LPITEMIDLIST pidl;
+
+    if (SUCCEEDED(SHGetMalloc (&MAlloc)))
+    {
+      if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL, &pidl)))
+      {
+	result = SHGetPathFromIDListA (pidl, buf);
+	MAlloc->Free (pidl);
+      }
+      MAlloc->Release ();
+    }
+  }
+  if (result) path.Replace (buf);
   return result;
 }
 

@@ -36,6 +36,19 @@ chronological order.
 	- res worked around a compile error in the Cg plugin reported by
 	  Sebastien Marchal where the WIN32 macro was used in an #if, however,
 	  it is not always defined with a value.
+	- res wrapped a number of functions in syspath.h into a static class.
+	- res added some functions to generally deal with lists of paths. The
+	  idea is to work towards proper support of the fact that CS can be 
+	  spread out over multiple directories, to also inconveniences like the
+	  inconsistent meaning of the path returned csGetConfigPath() across
+	  platforms (and inversely make things like plugin and vfs.cfg 
+	  searching more consistent across platforms) but also to offer some
+	  tools for external projects to deal with installation path issues.
+	- res renamed csPluginPaths to csPathsList to reflect its more general
+	  use.
+	- res enabled some new plugin paths determination code that is shared 
+	  by all platforms (can be disabled by #undefining NEW_PLUGIN_PATHS in
+	  scf.cpp).
 12-May-2005
 	- Eric Sunshine augmented the ResponseFile rule in helper.jam so that
 	  it respects the LOCATE variable (possible set by the MakeLocate rule)

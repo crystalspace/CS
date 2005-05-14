@@ -32,6 +32,12 @@
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
 
+#define NEW_PLUGIN_PATHS
+
+#ifdef NEW_PLUGIN_PATHS
+#define csGetPluginPaths  csInstallationPathsHelper::GetPluginPaths
+#endif
+
 #ifdef CS_REF_TRACKER
 #include "reftrack.h"
 #endif
@@ -68,9 +74,9 @@ private:
   { return s != 0 ? s : "{none}"; }
   void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
     const char* context = 0);
-  void ScanPluginsInt(csPluginPaths const*, char const* context);
+  void ScanPluginsInt(csPathsList const*, char const* context);
 
-  friend void scfInitialize (csPluginPaths const*, unsigned int);
+  friend void scfInitialize (csPathsList const*, unsigned int);
 
 public:
   SCF_DECLARE_IBASE;
@@ -504,7 +510,7 @@ SCF_IMPLEMENT_IBASE (csSCF);
 #endif
 SCF_IMPLEMENT_IBASE_END;
 
-void csSCF::ScanPluginsInt (csPluginPaths const* pluginPaths,
+void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
 			    const char* context)
 {
   if (pluginPaths)
@@ -515,12 +521,12 @@ void csSCF::ScanPluginsInt (csPluginPaths const* pluginPaths,
     size_t i, j;
     for (i = 0; i < pluginPaths->GetCount(); i++)
     {
-      csPluginPath const& pathrec = (*pluginPaths)[i];
+      csPathsList::Entry const& pathrec = (*pluginPaths)[i];
       if (IsVerbose(SCF_VERBOSE_PLUGIN_SCAN))
       {
 	char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
 	csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
-	  "(context `%s'; recursive %s)\n", x, pathrec.path,
+	  "(context `%s'; recursive %s)\n", x, pathrec.path.GetData(),
 	  GetContextName(pathrec.type),
 	  pathrec.scanRecursive ? "yes" : "no");
       }
@@ -588,7 +594,7 @@ const bool scfStaticallyLinked = false;
 extern bool scfStaticallyLinked;
 #endif
 
-void scfInitialize (csPluginPaths const* pluginPaths, unsigned int verbose)
+void scfInitialize (csPathsList const* pluginPaths, unsigned int verbose)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF (verbose);
@@ -604,7 +610,7 @@ void scfInitialize (int argc, const char* const argv[])
     scfInitialize (0, verbosity);
   else
   {
-    csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
+    csPathsList* pluginPaths = csGetPluginPaths (argv[0]);
     scfInitialize (pluginPaths, verbosity);
     delete pluginPaths;
   }
@@ -969,8 +975,8 @@ bool csSCF::UnregisterClass (const char *iClassID)
 void csSCF::ScanPluginsPath (const char* path, bool recursive,
   const char* context)
 {
-  csPluginPaths paths;
-  paths.AddOnce (path, recursive);
+  csPathsList paths;
+  paths.AddUniqueExpanded (path, recursive);
   ScanPluginsInt (&paths, context);
 }
 

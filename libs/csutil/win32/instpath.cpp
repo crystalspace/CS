@@ -69,10 +69,68 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   return false;
 }
 
+typedef csStringFast<MAX_PATH> csFilenameString;
+
+static inline bool GetRegistryInstallPath (const HKEY parentKey, 
+					   csFilenameString& oInstallPath)
+{
+  const char* pValueName = "InstallPath";
+  DWORD dwType;
+  DWORD bufSize;
+  HKEY m_pKey;
+  LONG result;
+
+  result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
+    0, KEY_READ, &m_pKey);
+  if (result == ERROR_SUCCESS)
+  {
+    result = RegQueryValueEx(
+      m_pKey,
+      pValueName,
+      0,
+      &dwType,
+      0,
+      &bufSize);
+    if (result != ERROR_SUCCESS)
+    {
+      RegCloseKey (m_pKey);
+      return false;
+    }
+    CS_ALLOC_STACK_ARRAY(char, buf, bufSize + 1);
+    result = RegQueryValueEx(
+      m_pKey,
+      pValueName,
+      0,
+      &dwType,
+      (LPBYTE)buf,
+      &bufSize);
+    buf[bufSize] = 0;
+
+    RegCloseKey (m_pKey);
+
+    if ((ERROR_SUCCESS == result) && 
+      ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ)))
+    {
+      if (dwType == REG_EXPAND_SZ)
+      {
+	char expandedPath[32*1024];
+
+	ExpandEnvironmentStrings (buf, expandedPath, 
+	  sizeof(expandedPath));
+	oInstallPath.Replace (expandedPath);
+      }
+      else
+	oInstallPath.Replace (buf);
+      return true;
+    }
+  }
+  return false;
+}
+
 // ensures that the path has no trailing path delimiter
 static inline char* NewPathWOTrailingDelim (const char *path)
 {
-  char *newPath = csExpandPath (path);
+  char *newPath = csPathsUtilities::ExpandPath (path);
   if ((newPath != 0) && (strlen (newPath) > 0))
   {
     char *end = &newPath[strlen(newPath) - 1];
@@ -199,4 +257,70 @@ csString csGetConfigPath ()
   return cachedCfgPath->path;
 }
 
+csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
+{
+  // override the default to get install path from
+  // 1. CRYSTAL environment variable
+  // 2. this machine's system registry
+  // 3. if current working directory contains 'vfs.cfg' use this dir.
+  // 4. The dir where the app is
+  // 5. A "CrystalSpace" subfolder under the "Program Files" dir.
+  // 6. hard-wired default path
 
+  // try env variable first
+  // we check this before we check registry, so that one app can putenv() to
+  // use a special private build of CrystalSpace, while other apps fall back on
+  // the shared systemwide registry strategy; this is the best approach unless
+  // someone implements a SetInstallPath() to override it before Open() is
+  // called.
+  const char *envpath = getenv ("CRYSTAL");
+  if (envpath && *envpath)
+  {
+    // Multiple paths, split.
+    // Note that MSYS converts :-separated paths to ;-separation in Win32 style.
+    return 
+      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+  }
+
+  csPathsList* paths = new csPathsList;
+
+  {
+    // try the registry
+    csFilenameString path;
+    if (GetRegistryInstallPath (HKEY_CURRENT_USER, path))
+      paths->AddUniqueExpanded (csPathsList (path));
+    if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, path))
+      paths->AddUniqueExpanded (csPathsList (path));
+    if (paths->Length() > 0)
+      return paths;
+  }
+
+  // No luck to fetch a config setting. Add in order:
+  // - current directory
+  // - application directory
+  // - %ProgramFiles%\CrystalSpace
+  // - C:\Program Files\CrystalSpace
+
+  paths->AddUniqueExpanded (".");
+
+  {
+    char apppath[MAX_PATH + 1];
+    GetModuleFileName (0, apppath, sizeof(apppath)-1);
+    char* slash = strrchr (apppath, '\\');
+    if (slash) *(slash+1) = 0;
+    paths->AddUniqueExpanded (apppath);
+  }
+
+  {
+    csString path;
+    if (GetShellFolderPath (CSIDL_PROGRAM_FILES, path))
+    {
+      path << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
+      paths->AddUniqueExpanded (path);
+    }
+  }
+
+  paths->AddUniqueExpanded ("C:\\Program Files\\" CS_PACKAGE_NAME);
+
+  return paths;
+}

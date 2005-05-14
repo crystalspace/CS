@@ -183,7 +183,7 @@ csRef<iStringArray> csScanPluginDir (const char* dir,
   return csPtr<iStringArray> (messages);
 }
 
-csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs, 
+csRef<iStringArray> csScanPluginDirs (csPathsList* dirs, 
 				    csRef<iStringArray>& plugins)
 {
   iStringArray* messages = 0;

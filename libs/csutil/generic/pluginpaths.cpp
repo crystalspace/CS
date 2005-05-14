@@ -26,44 +26,44 @@
 // causes a lot of needless scanning. For now it is disabled.
 #define DO_SCAN_RECURSION false
 
-csPluginPaths* csGetPluginPaths (const char* argv0)
+csPathsList* csGetPluginPaths (const char* argv0)
 {
-  csPluginPaths* paths = new csPluginPaths;
+  csPathsList* paths = new csPathsList;
 
-  csString appPath = csGetAppDir (argv0);
-  csString resPath = csGetResourceDir (argv0);
+  csString appPath = csInstallationPathsHelper::GetAppDir (argv0);
+  csString resPath = csInstallationPathsHelper::GetResourceDir (argv0);
   csString configPath = csGetConfigPath ();
   
   // Don't add "/" since it won't work on Windows.
   if (!resPath.IsEmpty() && resPath != CS_PATH_SEPARATOR)
-    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
+    paths->AddUniqueExpanded (resPath, DO_SCAN_RECURSION, "app");
   if (!appPath.IsEmpty() && appPath != CS_PATH_SEPARATOR)
-    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
+    paths->AddUniqueExpanded (appPath, DO_SCAN_RECURSION, "app");
 
   if (!configPath.IsEmpty())
   {
     csString tmp;
     tmp << configPath << CS_PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
     tmp << configPath << CS_PATH_SEPARATOR << "lib" << CS_PATH_SEPARATOR
 	<< CS_PACKAGE_NAME;
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
     tmp << configPath << CS_PATH_SEPARATOR << CS_PACKAGE_NAME
 	<< CS_PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
     tmp.Clear();
     tmp << configPath << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded (tmp, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 
-    paths->AddOnce (configPath, false, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded (configPath, false, CS_PACKAGE_NAME);
 
 #ifdef CS_PLUGINDIR
-    paths->AddOnce (CS_PLUGINDIR, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
+    paths->AddUniqueExpanded (CS_PLUGINDIR, DO_SCAN_RECURSION, CS_PACKAGE_NAME);
 #endif
   }
     

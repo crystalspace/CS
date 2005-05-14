@@ -24,7 +24,7 @@
 #include "csutil/util.h"
 #include "csutil/syspath.h"
 
-csRef<iStringArray> csFindSystemRoots()
+csRef<iStringArray> csInstallationPathsHelper::FindSystemRoots()
 {
   int const lim = 199;
   char* buffer = new char[lim + 1];
