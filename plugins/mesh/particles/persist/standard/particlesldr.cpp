@@ -187,7 +187,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
         if (!mat)
         {
-          synldr->ReportError ("crystalspace.ballloader.parse.unknownmaterial",
+          synldr->ReportError ("crystalspace.particles.factory.loader",
 	    child, "Couldn't find material '%s'!", matname);
           return 0;
         }

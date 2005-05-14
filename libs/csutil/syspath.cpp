@@ -67,7 +67,7 @@ size_t csPathsList::AddUnique (const char* path1, bool scanRecursive,
   if (path1 == 0) return (size_t)-1;
 
   csString path (path1);
-  if (!path.IsEmpty() && ((path[path.Length()-1] == CS_PATH_SEPARATOR)
+  if ((path.Length() > 1) && ((path[path.Length()-1] == CS_PATH_SEPARATOR)
     || (path[path.Length()-1] == '/')))
     path.Truncate (path.Length()-1);
 
@@ -122,7 +122,8 @@ csPathsList operator* (const csPathsList& left, const csPathsList& right)
     {
       const csPathsList::Entry& p2 = right[r];
       scratch.Replace (p1.path);
-      if (!scratch.IsEmpty())
+      if ((scratch.Length() > 1) 
+	|| ((scratch.Length() == 1) && (scratch[0] != CS_PATH_SEPARATOR)))
       {
 	scratch << CS_PATH_SEPARATOR;
       }

@@ -108,3 +108,26 @@ csString csGetConfigPath()
 
   return ".";
 }
+
+csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
+{
+  const char *envpath = getenv ("CRYSTAL");
+  if (envpath && *envpath)
+  {
+    return 
+      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+  }
+
+  char buff[FILENAME_MAX];
+  if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
+    paths->AddUniqueExpanded (buff);
+
+  csPathsList* paths = new csPathsList;
+  paths->AddUniqueExpanded (".");
+#if defined(CS_CONFIGDIR)
+  paths->AddUniqueExpanded (CS_CONFIGDIR);
+#endif
+  paths->AddUniqueExpanded ("/Library/CrystalSpace");
+  paths->AddUniqueExpanded ("/usr/local");
+  return paths;
+}
