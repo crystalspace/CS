@@ -118,11 +118,12 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
       new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
   }
 
+  csPathsList* paths = new csPathsList;
+
   char buff[FILENAME_MAX];
   if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
     paths->AddUniqueExpanded (buff);
 
-  csPathsList* paths = new csPathsList;
   paths->AddUniqueExpanded (".");
 #if defined(CS_CONFIGDIR)
   paths->AddUniqueExpanded (CS_CONFIGDIR);
