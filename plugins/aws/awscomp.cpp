@@ -46,10 +46,10 @@ awsComponent::awsComponent ()
     signalsrc (),
     redraw_tag (0),
     focusable (false),
-    self(0),
     _destructionMark( false ),
-	CompType(false),
-	CompFrame(frame)
+    self(0),
+    CompType(false),
+    CompFrame(frame)
 {
   self = this;
   signalsrc.SetOwner (self);
@@ -68,11 +68,10 @@ awsComponent::awsComponent (iAwsComponent* wrapper)
     signalsrc (),
     redraw_tag (0),
     focusable (false),
+    _destructionMark(false),
     self(wrapper),
-    _destructionMark( false ),
-	CompType(false),
-	CompFrame(frame)
-
+    CompType(false),
+    CompFrame(frame)
 {
   signalsrc.SetOwner (self);
   SCF_CONSTRUCT_IBASE (0);
@@ -389,10 +388,12 @@ bool awsComponent::Execute (const char* action, iAwsParmList* parmlist)
 	std::string code(action);
 	autom::function f;
 
-	if (f.parseObject(code.begin(), code.end()))
+	std::string::iterator b0 = code.begin();
+        std::string::iterator const bN = code.end();
+	if (f.parseObject(b0, bN))
 	{
-		f.addIntParm("comp_id", (longlong)self);
-		autom::keeper result = f.Execute();
+	  f.addIntParm("comp_id", (longlong)(intptr_t)self);
+	  autom::keeper result = f.Execute();
 	}
   
   if (strcmp ("Overlaps", action) == 0)
@@ -1250,7 +1251,7 @@ public:
 
 	autom::function::rc_parm hide_(autom::function &fn)
 	{
-		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+	  awsComponent *comp = (awsComponent *)(intptr_t)(fn["comp_id"]->toInt().Value());
 
 		if (comp) comp->Hide();
 
@@ -1259,7 +1260,7 @@ public:
 
 	autom::function::rc_parm show_(autom::function &fn)
 	{
-		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+	  awsComponent *comp = (awsComponent *)(intptr_t)(fn["comp_id"]->toInt().Value());
 
 		if (comp) comp->Show();
 
@@ -1268,7 +1269,7 @@ public:
 
 	autom::function::rc_parm invalidate_(autom::function &fn)
 	{
-		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+	  awsComponent *comp = (awsComponent *)(intptr_t)(fn["comp_id"]->toInt().Value());
 
 		if (comp) comp->Invalidate();
 
@@ -1277,7 +1278,7 @@ public:
 
 	autom::function::rc_parm hide_window_(autom::function &fn)
 	{
-		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+	  awsComponent *comp = (awsComponent *)(intptr_t)(fn["comp_id"]->toInt().Value());
 
 		if (comp) 
 		{
@@ -1293,7 +1294,7 @@ public:
 
 	autom::function::rc_parm move_to_(autom::function &fn)
 	{
-		awsComponent *comp = (awsComponent *)(fn["comp_id"]->toInt().Value());
+	  awsComponent *comp = (awsComponent *)(intptr_t)(fn["comp_id"]->toInt().Value());
 	
 		int x = fn["x"]->toInt().Value();
 		int y = fn["y"]->toInt().Value();
