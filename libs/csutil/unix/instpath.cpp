@@ -107,13 +107,13 @@ csString csGetConfigPath ()
 
 csPathsList* csGetPluginPaths (const char* argv0)
 {
-  csPluginPaths* paths = new csPathsList;
+  csPathsList* paths = new csPathsList;
 
-  csString resPath = csGetResourceDir (argv0);
+  csString resPath = csInstallationPathsHelper::GetResourceDir (argv0);
   if (!resPath.IsEmpty())
     paths->AddUniqueExpanded (resPath, DO_SCAN_RECURSION, "app");
 
-  csString appPath = csGetAppDir (argv0);
+  csString appPath = csInstallationPathsHelper::GetAppDir (argv0);
   if (!appPath.IsEmpty())
     paths->AddUniqueExpanded (appPath, DO_SCAN_RECURSION, "app");
 
@@ -151,5 +151,20 @@ csPathsList* csGetPluginPaths (const char* argv0)
   if (!crystal && !crystal_plugin)
     paths->AddUniqueExpanded(CS_PLUGINDIR, DO_SCAN_RECURSION, "plugins");
     
+  return paths;
+}
+
+csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
+{
+  const char *envpath = getenv ("CRYSTAL");
+  if (envpath && *envpath)
+  {
+    return 
+      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+  }
+
+  csPathsList* paths = new csPathsList;
+  paths->AddUniqueExpanded (".");
+  paths->AddUniqueExpanded (CS_CONFIGDIR);
   return paths;
 }

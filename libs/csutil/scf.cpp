@@ -519,7 +519,7 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
     csRef<iStringArray> plugins;
 
     size_t i, j;
-    for (i = 0; i < pluginPaths->GetCount(); i++)
+    for (i = 0; i < pluginPaths->Length(); i++)
     {
       csPathsList::Entry const& pathrec = (*pluginPaths)[i];
       if (IsVerbose(SCF_VERBOSE_PLUGIN_SCAN))
@@ -541,7 +541,7 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       if ((messages != 0) && (messages->Length() > 0))
       {
 	csPrintfErr("SCF_WARNING: the following issue(s) arose while "
-	  "scanning '%s':", pathrec.path);
+	  "scanning '%s':", pathrec.path.GetData());
 	for (j = 0; j < messages->Length(); j++)
 	  csPrintfErr(" %s\n", messages->Get (j));
       }
@@ -568,7 +568,8 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
 	// legal for non-CS libraries to exist alongside CS plugins in the
 	// scanned directories.
 	if (metadata)
-	  RegisterClasses(plugin, metadata, context ? context : pathrec.type);
+	  RegisterClasses(plugin, metadata, 
+	    context ? context : pathrec.type.GetData());
       }
     }
   }

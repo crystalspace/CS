@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/util.h"
 
