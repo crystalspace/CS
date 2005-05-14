@@ -16,6 +16,10 @@ chronological order.
 	  empty string didn't work.
 	- res made some compile fixes to syspathc.cpp.
 	- res added a test for csPathsList.
+	- Erroroman added missing <?include snippets/fog-pass.inc ?> in 
+	  terrain_fixed_base.xml.
+	- Erroroman updated export_genmesh_skelanim.mcr to support Skin
+	  modifier and bones.
 13-May-2005
 	- res changed the win32kbd_identstrs.h to only use the "recent key
 	  codes" when VK_SLEEP is actually present (and not based on compiler

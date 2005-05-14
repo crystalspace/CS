@@ -35,6 +35,7 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 	
 		-- functions declaration
 		global tokenize
+		global find_object_by_name
 		global export_bones_transform
 		struct bone_vertex_weight (bone, v_idx, weight)
 		struct vertex_convert_data (vtx_id, original_vtx_id)
@@ -62,6 +63,20 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 				i = i + 1
 			)
 			outarray
+		)
+
+		fn find_object_by_name obj_name = 
+		(
+			result = undefined
+			for o in objects do
+			(
+				if (o.name == obj_name) then
+				(
+					result = o
+					exit
+				)
+			)
+			result
 		)
 
 		fn export_bones_transform obj bone_obj spd bones_verts outFile=
@@ -143,7 +158,7 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 		root_bone = undefined
 		for i=1 to objects.count do 
 		(
-			if ((classOf objects[i] == Biped_Object) and (objects[i].parent == undefined)) then
+			if ((classOf objects[i] == Biped_Object or classOf objects[i] == BoneGeometry or (classOf objects[i]) == Bone) and (objects[i].parent == undefined)) then
 				root_bone = objects[i]
 			if (classOf objects[i] == Editable_Mesh) then
 				obj = objects[i]
@@ -241,8 +256,8 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 			b = (faceVerts[3]-1) as Integer
 			c = (faceVerts[2]-1) as Integer
 
-			--format "        <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" a b c to:outFile
-			format "        <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" c b a to:outFile
+			format "        <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" b c a to:outFile
+			--format "        <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" c b a to:outFile
 		)
 		
 		format "    <autonormals />\n" to:outFile
@@ -250,11 +265,23 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 		----------------------------------------------------------------------------------
 
 		obj_physique = undefined
+		obj_skin = undefined
 		for i = 1 to obj.modifiers.count do
 		(
 			if (classOf obj.modifiers[i] == Physique) then
 			(
 				obj_physique = obj.modifiers[i]
+			)
+		)
+
+		if (obj_physique == undefined) then
+		(
+			for i = 1 to obj.modifiers.count do
+			(
+				if (classOf obj.modifiers[i] == Skin) then
+				(
+					obj_skin = obj.modifiers[i]
+				)
 			)
 		)
 
@@ -268,22 +295,53 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 					original_vtx_id = vtx_data.original_vtx_id
 			)
 
-			for b=1 to physiqueOps.getVertexBoneCount obj original_vtx_id do
+			if (obj_physique != undefined) then
 			(
-				bone = physiqueOps.getVertexBone obj original_vtx_id b
-				weight = physiqueOps.getVertexWeight obj original_vtx_id b
-				b_found = false
-				for b in bones_vertices do
+				for b=1 to physiqueOps.getVertexBoneCount obj original_vtx_id do
 				(
-					if ((b.bone == bone) and (b.v_idx == (v - 1))) then
+					bone = physiqueOps.getVertexBone obj original_vtx_id b
+					weight = physiqueOps.getVertexWeight obj original_vtx_id b
+					b_found = false
+					for bv in bones_vertices do
 					(
-						b.weight = b.weight + weight
-						b_found = true
+						if ((bv.bone == bone) and (bv.v_idx == (v - 1))) then
+						(
+							bv.weight = bv.weight + weight
+							b_found = true
+						)
+					)
+
+					if (b_found == false) then
+					(
+						append bones_vertices (bone_vertex_weight bone (v-1) weight )
 					)
 				)
+			)
+			else
+			if (obj_skin != undefined) then
+			(
+				affect_bones_count = skinOps.GetVertexWeightCount obj_skin original_vtx_id
+				for ab = 1 to affect_bones_count do
+				(
+					weight = skinOps.GetVertexWeight obj_skin original_vtx_id ab
+					bone_index = skinOps.GetVertexWeightBoneID obj_skin original_vtx_id ab
+					bone = find_object_by_name (skinOps.GetBoneName obj_skin bone_index 0)
 
-				if (b_found == false) then
-					append bones_vertices (bone_vertex_weight bone (v-1) weight )
+					b_found = false
+					for bv in bones_vertices do
+					(
+						if ((bv.bone == bone) and (bv.v_idx == (v - 1))) then
+						(
+							bv.weight = bv.weight + weight
+							b_found = true
+						)
+					)
+
+					if (b_found == false) then
+					(
+						append bones_vertices (bone_vertex_weight bone (v-1) weight )
+					)
+				)
 			)
 		)
 
@@ -295,18 +353,63 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 		format "\n" to:outFile
 		format "      <script name=\"main\">\n" to:outFile
 
-
 		----------------------ANIMATION SCRIPT---------------------------
 		format "\n" to:outFile
 
 		key_frame_times = #()
 		for t in objects do
 		(
-			if ((classOf t) == Biped_Object) then
+			if ((classOf t) == Biped_Object or (classOf t) == BoneGeometry or (classOf t) == Bone) then
 			(
 				try
 				(
 					bip = t.transform.controller
+					for t in bip.keys do
+					(
+						found = false
+						for fr in key_frame_times do
+						(
+							if (t.time == fr) then
+							(
+								found = true
+							)
+						)
+						if (found == false) then
+						(
+							append key_frame_times t.time
+						)
+					)
+				)
+				catch
+				(
+				)
+
+				try
+				(
+					bip = t.rotation.controller
+					for t in bip.keys do
+					(
+						found = false
+						for fr in key_frame_times do
+						(
+							if (t.time == fr) then
+							(
+								found = true
+							)
+						)
+						if (found == false) then
+						(
+							append key_frame_times t.time
+						)
+					)
+				)
+				catch
+				(
+				)
+
+				try
+				(
+					bip = t.position.controller
 					for t in bip.keys do
 					(
 						found = false
@@ -324,6 +427,7 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 				catch
 				(
 				)
+
 			)
 		)
 
@@ -332,7 +436,7 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 
 		for t in objects do
 		(
-			if ((classOf t) == Biped_Object) then
+			if ((classOf t) == Biped_Object or (classOf t) == BoneGeometry or (classOf t) == Bone) then
 			(
 				if (t.parent != undefined) then
 				(
@@ -369,7 +473,7 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 			for t in objects do
 			(
 				--if ((classOf t) == Biped_Object and t.name == "Bip01 L Thigh") then
-				if ((classOf t) == Biped_Object) then
+				if ((classOf t) == Biped_Object or (classOf t) == BoneGeometry or (classOf t) == Bone) then
 				(
 					biped_base_transform = undefined
 
@@ -429,10 +533,14 @@ rollout Test1 "Export GenMesh Skelanim to CS" width:238 height:345
 					if (abs(biped_position.z - biped_transforms[bp_index].pos.z) > 0.0001) then
 						write_z_rot = true
 
+					--if (t.parent != undefined) and (write_x_rot or write_y_rot or write_z_rot) then
 					if write_x_rot or write_y_rot or write_z_rot then
 					(
 						biped_animation_found = true
-						format "        <move bone=\"%\" duration=\"%\" x=\"%\" y=\"%\" z=\"%\"/>\n" t.name duration (biped_position.x*xscale) (biped_position.z*zscale) (biped_position.y*yscale) to:outFile
+						local xMove = (biped_position.x * xscale) + xrelocate
+						local yMove = (biped_position.z * yscale) + yrelocate
+						local zMove = (biped_position.y * zscale) + zrelocate
+						format "        <move bone=\"%\" duration=\"%\" x=\"%\" y=\"%\" z=\"%\"/>\n" t.name duration xMove yMove zMove to:outFile
 					)
 
 					biped_transforms[bp_index].pos = biped_position
