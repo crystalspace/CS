@@ -564,7 +564,7 @@ public:
    * \remarks Internally uses the various flavours of Append().
    */
   template<typename T>
-  csStringBase& Replace (T const& val) { Size = 0; return Append (val); }
+  csStringBase& Replace (T const& val) { Truncate (0); return Append (val); }
 
   /**
    * Check if another string is equal to this one.
