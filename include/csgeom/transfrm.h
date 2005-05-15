@@ -49,6 +49,9 @@ protected:
   csVector3 v_o2t;
 
 public:
+  // Needed for GCC4. Otherwise emits a flood of "virtual functions but
+  // non-virtual destructor" warnings.
+  virtual ~csTransform() {};
   /**
    * Initialize with the identity transformation.
    */

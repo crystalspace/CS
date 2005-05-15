@@ -67,6 +67,8 @@ chronological order.
 	  image library).
 	- res corrected the "a8r8g8b8" texture format to "a8b8g8r8".
 	- res fixed a number of Linux compiler errors in the DDS plugin.
+	- res worked around the gcc4 "non-virtual destructor" warning spam
+	  for interfaces (and some other classes, too).
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,
