@@ -88,8 +88,8 @@ public:
     };
     Entry (const Entry& src)
     {
-      path = csStrNew (src.path);
-      type = csStrNew (src.type);
+      path = src.path;
+      type = src.type;
       scanRecursive = src.scanRecursive;
     };
   };

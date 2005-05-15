@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-May-2005
+	- Eric Sunshine fixed memory leaks in the csPathsList::Entry copy
+	  constructor.
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,
