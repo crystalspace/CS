@@ -9,7 +9,7 @@
 #include "fCodeBook.h"
 #include "Lloyd.h"
 #include "MedianCut.h"
-#include "Math.h"
+#include <math.h>
 
 namespace ImageLib
 {

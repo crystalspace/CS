@@ -5,7 +5,7 @@
 */
 
 #include "ccHeap.h"
-#include <Assert.h>
+#include <assert.h>
 
 namespace ImageLib
 {

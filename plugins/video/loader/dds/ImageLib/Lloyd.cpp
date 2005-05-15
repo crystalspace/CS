@@ -4,11 +4,11 @@
 
 */
 
-#include <StdIO.h>
+#include <stdio.h>
 #include "Lloyd.h"
-#include <StdLib.h>
-#include <Math.h>
-#include <Assert.h>
+#include <stdlib.h>
+#include <math.h>
+#include <assert.h>
 
 namespace ImageLib
 {

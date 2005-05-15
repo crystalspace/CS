@@ -26,8 +26,11 @@
 /* Types used by ImageLib, but are typedefed by the Win32 SDK. */
 #ifndef WIN32
 typedef uint8 BYTE;
+typedef uint16 WORD;
 typedef uint32 DWORD;
 typedef bool BOOL;
+#define TRUE true
+#define FALSE false
 #endif
 
 #ifndef __min

@@ -19,7 +19,7 @@
 
 #include "csutil/csendian.h"
 
-static void CopyLEUI32s (void* dest, const void* source, size_t count)
+static inline void CopyLEUI32s (void* dest, const void* source, size_t count)
 {
   uint32* d = (uint32*)dest; uint32* s = (uint32*)source;
   while (count-- > 0)

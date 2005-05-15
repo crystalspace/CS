@@ -5,8 +5,8 @@
 */
 
 #include "cfVector.h"
-#include <String.h>
-#include <Math.h>
+#include <string.h>
+#include <math.h>
 
 namespace ImageLib
 {

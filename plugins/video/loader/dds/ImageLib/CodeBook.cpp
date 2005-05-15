@@ -6,9 +6,9 @@
 
 #include "CodeBook.h"
 #include "fCodeBook.h"
-#include <String.h>
-#include <StdIO.h>
-#include <Math.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
 #include "Image.h"
 
 namespace ImageLib

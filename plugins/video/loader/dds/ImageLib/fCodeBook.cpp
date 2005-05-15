@@ -6,8 +6,8 @@
 
 #include "fCodeBook.h"
 #include "CodeBook.h"
-#include <StdIO.h>
-#include <Math.h>
+#include <stdio.h>
+#include <math.h>
 
 namespace ImageLib
 {

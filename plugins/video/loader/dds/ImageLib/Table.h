@@ -72,7 +72,7 @@ public:
 // Note: Sort just uses the C lib qsort function. If we restricted
 // all tlTable elements to have well defined <,>,== then we wouldn't need
 // this callback function.
-typedef int(__cdecl *CompareFnc) ( const void *elem1, const void *elem2 );
+typedef int(*CompareFnc) ( const void *elem1, const void *elem2 );
 
 
 template <class Type> class Table

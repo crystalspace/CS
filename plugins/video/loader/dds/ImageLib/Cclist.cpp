@@ -390,7 +390,7 @@ unsigned long Hash;
 	{
 		if(node->name)
 		{
-			if((Hash == node->nameHash) && (!(stricmp(node->name, name))) )
+			if((Hash == node->nameHash) && (!(strcasecmp(node->name, name))) )
 			{
 				retn = node;
 				break;		// Found it!
@@ -412,7 +412,7 @@ ccNode *n = GetHead();
 
 static BOOL CheckAlpha(ccNode *n, ccNode *nn)
 {
-	return( (stricmp(n->GetName(), nn->GetName() )) > 0);
+	return( (strcasecmp(n->GetName(), nn->GetName() )) > 0);
 }
 
 void ccList::SortAlpha()
@@ -620,7 +620,7 @@ ccHashNodePtr	*Ptr;
 	while(Ptr)
 	{
 		Node = Ptr->GetNodePtr();
-		if( !(stricmp(Node->Name, FindName)) )
+		if( !(strcasecmp(Node->Name, FindName)) )
 			return Node;
 		else
 			Ptr = (ccHashNodePtr *)Ptr->GetNext();
