@@ -119,7 +119,7 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 
   char const* envpath = getenv ("CRYSTAL");
   if (envpath != 0 && *envpath != '\0')
-    paths->AppendUnique(csPathsUtilities::ExpandAll(csPathsList(envpath)));
+    paths->AddUnique(csPathsUtilities::ExpandAll(csPathsList(envpath)));
 
   char buff[FILENAME_MAX];
   if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
