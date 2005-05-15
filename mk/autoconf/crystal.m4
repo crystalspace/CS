@@ -56,7 +56,7 @@ AC_DEFUN([CS_PATH_CRYSTAL_CHECK],
 	value used when installing the SDK])],
 	[CRYSTAL="$withval"
 	export CRYSTAL])
-AC_ARG_VAR([CRYSTAL], [Prefix Where Crystal Space is installed])
+AC_ARG_VAR([CRYSTAL], [Prefix where Crystal Space is installed])
 AC_ARG_ENABLE([cstest],
     [AC_HELP_STRING([--enable-cstest],
 	[verify that the Crystal Space SDK is actually usable
