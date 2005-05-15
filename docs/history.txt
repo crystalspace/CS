@@ -9,6 +9,18 @@ chronological order.
 15-May-2005
 	- Eric Sunshine fixed memory leaks in the csPathsList::Entry copy
 	  constructor.
+	- Eric Sunshine fixed a number of bugs and copy/paste errors recently
+	  introduced into cel.m4. The most serious issues included:
+	    - CEL test program succeeded _always_ if the CS test program had
+	      succeeded regardless of whether the CEL SDK itself was actually
+	      usable.
+	    - CEL test program attempted to #include <cssysdef.h> but was never
+	      told where to find the CS headers.
+	    - CEL test program invoked CS_IMPLEMENT_APPLICATION, which results
+	      in declaration of two main() functions on Windows, which leads
+	      ultimately to failure.
+	    - Name of variable to enable/disable the CEL test program did not
+	      match variable used later in script.
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,

@@ -1,4 +1,5 @@
-#------------------------------------------------------------------------------
+# cel.m4                                                       -*- Autoconf -*-
+#==============================================================================
 # CEL detection macros
 # Copyright (C)2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
@@ -16,28 +17,49 @@
 #    along with this library; if not, write to the Free Software Foundation,
 #    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-#------------------------------------------------------------------------------
-# Checks for Cel paths and libs,
-# This scripts tries first if it can find a cs-config in the actual path
-# if yes it just uses that. If not it look if CEL var is set.
-# The script will set the CEL_AVAILABLE, CEL_VERSION, CEL_LIBS and CEL_CFLAGS
-# variables.
-#------------------------------------------------------------------------------
+#==============================================================================
+AC_PREREQ([2.56])
+
 m4_define([cel_min_version_default], [0.99])
 
+#------------------------------------------------------------------------------
+# CS_PATH_CEL_CHECK([MINIMUM-VERSION], [ACTION-IF-FOUND],
+#                   [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS], [OPTIONAL-LIBS])
+#	Checks for Crystal Entity Layer (CEL) paths and libraries by consulting
+#	cel-config. It first looks for cel-config in the paths mentioned by
+#	$CEL, then in the paths mentioned by $PATH, and then in
+#	/usr/local/cel/bin.  Emits an error if it can not locate cel-config, if
+#	the CEL test program fails, or if the available version number is
+#	unsuitable.  Exports the variables CEL_CONFIG_TOOL, CEL_AVAILABLE,
+#	CEL_VERSION, CEL_CFLAGS, CEL_LIBS, CEL_INCLUDE_DIR, and
+#	CEL_AVAILABLE_LIBS.  If the check succeeds, then CEL_AVAILABLE will be
+#	'yes', and the other variables set to appropriate values. If it fails,
+#	then CEL_AVAILABLE will be 'no', and the other variables empty.  If
+#	REQUIRED-LIBS is specified, then it is a list of CEL libraries which
+#	must be present, and for which appropriate compiler and linker flags
+#	will be reflected in CEL_CFLAGS and CEL_LFLAGS. If OPTIONAL-LIBS is
+#	specified, then it is a list of CEL libraries for which appropriate
+#	compiler and linker flags should be returned if the libraries are
+#	available.  It is not an error for an optional library to be
+#	absent. The client can check CEL_AVAILABLE_LIBS for a list of all
+#	libraries available for this particular installation of CEL.  The
+#	returned list is independent of REQUIRED-LIBS and OPTIONAL-LIBS.  Use
+#	the results of the check like this: CFLAGS="$CFLAGS $CEL_CFLAGS" and
+#	LDFLAGS="$LDFLAGS $CEL_LIBS"
+#------------------------------------------------------------------------------
 AC_DEFUN([CS_PATH_CEL_CHECK],
-[AC_ARG_WITH([cel-prefix], 
-    [AC_HELP_STRING([--with-cel-prefix=CEL_PREFIX], 
-	[Prefix where to CEL is installed (optional)])],
+[AC_REQUIRE([CS_PATH_CRYSTAL_CHECK])
+AC_ARG_WITH([cel-prefix], 
+    [AC_HELP_STRING([--with-cel-prefix=CEL_PREFIX],
+	[specify location of CEL installation; this is the \$prefix value used
+        when installing the SDK])],
     [CEL="$withval"
     export CEL])
-AC_ARG_VAR([CEL], [Prefix Where CEL is installed])
-AC_ARG_ENABLE([cel-test], 
-    AC_HELP_STRING([--disable-cel-test], 
-      [Do not try to compile and run a cel test program]), 
-      [enable_celtest="$enableval"], [enable_celtest="no"])
-
-no_cel=no
+AC_ARG_VAR([CEL], [Prefix where CEL is installed])
+AC_ARG_ENABLE([celtest], 
+    [AC_HELP_STRING([--enable-celtest], 
+	[verify that the CEL SDK is actually usable (default YES)])], [],
+	[enable_celtest=yes])
 
 # Try to find an installed cel-config.
 cel_path=''
@@ -78,14 +100,14 @@ AS_IF([test -n "$CEL_CONFIG_TOOL"],
     [cel_sdk=no])
 
 AS_IF([test "$cel_sdk" = yes && test "$enable_celtest" = yes],
-    [CS_CHECK_BUILD([if Crystal Space SDK is usable], [cel_cv_crystal_sdk],
+    [CS_CHECK_BUILD([if CEL SDK is usable], [cel_cv_cel_sdk],
 	[AC_LANG_PROGRAM(
 	    [#include <cssysdef.h>
-	    #include <physicallayer/entity.h>
-	    CS_IMPLEMENT_APPLICATION],
-	    [/* TODO a nice testapp... */])],
+	    #include <physicallayer/entity.h>],
+	    [/* TODO write a suitable test */])],
 	[CS_CREATE_TUPLE([$CEL_CFLAGS],[],[$CEL_LIBS])], [C++],
-	[], [cel_sdk=no])])
+	[], [cel_sdk=no], [],
+	[$CRYSTAL_CFLAGS], [], [$CRYSTAL_LIBS])])
 
 AS_IF([test "$cel_sdk" = yes],
    [CEL_AVAILABLE=yes

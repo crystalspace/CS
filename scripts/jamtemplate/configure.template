@@ -126,7 +126,7 @@ m4_if(cel_desired, [yes],
 AS_IF([test -z "$with_cel"], [with_cel=yes])
 
 AS_IF([test $with_cel != no],
-[CS_PATH_CEL([0.99], [],
+[CS_PATH_CEL_EMIT([0.99], [],
   [AC_MSG_ERROR([
 *** CEL could not be found or was unusable. The latest version is always
 *** available from http://cel.crystalspace3d.org/
