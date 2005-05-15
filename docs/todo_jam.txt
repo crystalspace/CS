@@ -66,8 +66,17 @@ W - Wishlist (the build also works without this feature)
     time specifically for inclusion in the unit test program? Once this issue
     is resolved, re-enable invocations of UnitTest in the Application and
     Plugin rules.
+[L] The 'clean' targets for msvcgen error out when Jam's -j option is used to
+    run multiple build commands in parallel. If msvcgen has run and needs
+    cleaning at 'clean' time, Jam will attempt to invoke separate commands "rm
+    -rf ./out/mk/msvc" and "rm -rf ./out/mk/msvc ./out/msvcgen/build7
+    ./out/msvcgen/temp7" in parallel, and the command which cleans only
+    ./out/mk/msvc will fail with an "./out/mk/msvc not found" error. This
+    problem does not occur when commands are run serially.
 [L] Jorrit reports that with the command "jam -sMODE=profile walktest_static",
-    dynavis/debug/static/dynavis.o gets compiled twice.
+    dynavis/debug/static/dynavis.o gets compiled twice. (Is this still valid?
+    Static plugin support has changed a good deal since this was reported
+    originally.)
 [L] msvcgen.jam: Consider overhauling the "configuration" file handling rule so
     that it associates configuration files with built targets.  This will allow
     the generated projects to reference configuration files.  Rather than the
@@ -83,26 +92,6 @@ W - Wishlist (the build also works without this feature)
 [L] msvcgen.jam: When modules reference sources or headers outside of the local
     source directory via some number of ".."'s, these resources appear as
     "../../foo/bar/../../this/module" in the generated project file.
-[L] Eliminate the need for the documentation-building shell scripts; the ones
-    which copy image files from docs/texinfo/* into the build directory.  Jam
-    is sufficiently expressive that it should be able to handle the
-    image-copying and other functionality without depending upon these external
-    tools.
-[L] The Texi2Info, Texi2PS, and Texi2PDF rules needs to clean up the "image"
-    files (.jpg, .png, .gif, .txt, etc.) which are copied from the source
-    directory to the build directory.  These files are fully incorporated into
-    the generated documentation files as part of the conversion, and are not
-    needed after conversion has completed.
-[L] The Texi2DVI, Texi2PS, and Texi2PDF rules need to be augmented to maintain
-    the TeX .log so that it can be reviewed for problems by the user.  Also, it
-    might be wise to scan the file for common problems, such as error messages
-    (denoted by "!") and warnings (such as the common 'hbox' warning) and
-    present those messages to the user.
-[L] The dvi, ps, pdf documentation rules name the resulting file
-    cs-unix.{dvi,ps,pdf} rather than crystalspace.{dvi,ps,pdf}.
-[L] The info rule names the resulting file crystal.info, rather than
-    crystalspace.info.
-
 [W] Add support to create Microsoft CHM format documentation packages.
 [W] Finish the tool for extracting the documentation from the rules files.
 [W] Create templates for some IDEs.  Generating a template for KDevelop3.x is
@@ -122,6 +111,25 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] Eliminate the need for the documentation-building shell scripts; the ones
+    which copy image files from docs/texinfo/* into the build directory.  Jam
+    is sufficiently expressive that it should be able to handle the
+    image-copying and other functionality without depending upon these external
+    tools.
+[*] The Texi2Info, Texi2PS, and Texi2PDF rules needs to clean up the "image"
+    files (.jpg, .png, .gif, .txt, etc.) which are copied from the source
+    directory to the build directory.  These files are fully incorporated into
+    the generated documentation files as part of the conversion, and are not
+    needed after conversion has completed.
+[*] The Texi2DVI, Texi2PS, and Texi2PDF rules need to be augmented to maintain
+    the TeX .log so that it can be reviewed for problems by the user.  Also, it
+    might be wise to scan the file for common problems, such as error messages
+    (denoted by "!") and warnings (such as the common 'hbox' warning) and
+    present those messages to the user.
+[*] The dvi, ps, pdf documentation rules incorrectly name the resulting file
+    cs-unix.{dvi,ps,pdf} rather than crystalspace.{dvi,ps,pdf}.
+[*] The info rule incorrectly names the resulting file crystal.info, rather
+    than crystalspace.info.
 [*] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
 [*] The csjava shared library gets the wrong file extension (.csplugin) on

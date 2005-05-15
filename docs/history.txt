@@ -26,6 +26,38 @@ chronological order.
 	  renamed component_funcs.txi and window_funcs.txi to
 	  componentfuncs.txi and windowfuncs.txi, respectively, since the
 	  underscores caused TeX to barf.
+	- Eric Sunshine rewrote the documentation generation Jam rules
+	  (docs.jam) entirely from scratch, enhancing them and repairing
+	  defects.
+	    - The documentation rules are now completely self-contained.
+	      Removed the ugly support scripts runmakeinfo.sh, runtexi2dvi.sh,
+	      and runtexi2html.sh.
+	    - The rules now do a much better job of cleaning up after
+	      themselves by removing files needed only during the actual
+	      conversion process. They also avoid copying files unnecessarily.
+	    - The TeX, PS, and PDF conversion actions now capture output from
+	      the invoked tools and direct the user to consult the captured
+	      information when problems are detected. Previously, the
+	      documentation rules unconditionally threw away all generated
+	      output, which made it impossible to diagnose conversion problems.
+	    - The TeX conversion rule now actively scans the captured output
+	      for TeX `hbox' warnings and informs the user to consult the
+	      captured output when they are detected. Previously, this
+	      information was simply thrown away, which made it impossible to
+	      determine if TeX was emitting complaints about formatting.
+	    - The documentation conversion rules now perform proper dependency
+	      tracking, which means that they now know whether or not a
+	      converted document needs to be re-generated. Previously,
+	      conversion occurred unconditionally each time the conversion
+	      targets were invoked.
+	    - Simplified client-side usage by making all of the conversion
+	      rules available even if the necessary tools are not found (in
+	      which case the rules become no-ops). This way, clients can invoke
+	      the rules unconditionally, without having to know the underlying
+	      implementation details, such as which tools are employed by each
+	      rule.
+	    - Greatly enhanced the documentation for the documentation
+	      generation rules.
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,

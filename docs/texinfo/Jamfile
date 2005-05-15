@@ -1,47 +1,34 @@
 SubDir TOP docs texinfo ;
 
-if $(CMD.MAKEINFO)
 {
-  Texi2Info manualinfo : cs-unix.txi : info : info manual ;
-  FLAGS.MAKEINFO on manualinfo += --output=crystal.info ;
-  Help manualinfo : "Convert user manual to Info format" ;
-}
-  
-if $(CMD.TEXI2HTML)
-{
-  TEXI2HTML.INIT = [ ConcatDirs $(TOP) docs support texi2html.init ] ;
-  FLAGS.TEXI2HTML on manualhtml += -prefix=cs ;
-  Texi2HTML manualhtml : cs-unix.txi : html manual ;
-  Help manualhtml : "Convert user manual to HTML format" ;
-}
+local alltexi = cs-unix.txi [ Filter [ Recurse : .txi ] :
+  cs-unix.txi cs-dos.txi cs-mac.txi dosdef.txi macdef.txi unixdef.txi ] ;
 
-if $(CMD.TEXI2DVI)
-{
-  Texi2DVI manualdvi : cs-unix.txi : dvi manual ;
-  Help manualdvi : "Convert user manual to DVI format" ;
-}
+Texi2Info manualinfo : $(alltexi) : info : info manual : crystalspace.info ;
+Help manualinfo : "Convert user manual to Info format" ;
 
-if $(CMD.TEXI2DVI) && $(CMD.DVIPS)
-{
-  Texi2PS manualps : cs-unix.txi : ps manual ;
-  Help manualps : "Convert user manual to PostScript format" ;
-}
+Texi2HTML manualhtml : $(alltexi) : html manual : : -prefix=cs ;
+Help manualhtml : "Convert user manual to HTML format" ;
 
-if $(CMD.TEXI2DVI) && $(CMD.DVIPDF)
-{
-  Texi2PDF manualpdf : cs-unix.txi : pdf manual ;
-  Help manualpdf : "Convert user manual to PDF format" ;
-}
+Texi2DVI manualdvi : $(alltexi) : dvi manual : csmanual.dvi ;
+Help manualdvi : "Convert user manual to DVI format" ;
+
+Texi2PS manualps : $(alltexi) : ps manual : csmanual.ps ;
+Help manualps : "Convert user manual to PostScript format" ;
+
+Texi2PDF manualpdf : $(alltexi) : pdf manual : csmanual.pdf ;
+Help manualpdf : "Convert user manual to PDF format" ;
 
 if $(PERL)
 {
-  NODEFIX = [ ConcatDirs $(TOP) docs support nodefix.pl ] ;
+  NODEFIX ?= [ ConcatDirs $(TOP) docs support nodefix.pl ] ;
 
   rule RepairNodes
   {
     Depends $(<) : $(>) ;
     NotFile $(<) ;
     Always $(<) ;
+    SEARCH on $(>) = $(3) ;
     TEXINFO.INCDIR on $(<) = $(3) ;
   }
 
@@ -52,4 +39,6 @@ if $(PERL)
 
   RepairNodes repairdoc : cs-unix.txi : $(SUBDIR) ;
   Help repairdoc : "Repair Texinfo @node and @menu directives" ;
+}
+
 }

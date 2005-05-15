@@ -3,8 +3,8 @@ SubDir TOP docs doxygen ;
 if $(CMD.DOXYGEN)
 {
 CSDOXY_FILES = [ Wildcard *.css *.png ] ;
-Doxygen apihtml    : pubapi.dox : html api    : $(CSDOXY_FILES) ;
-Doxygen apidevhtml : devapi.dox : html apidev : $(CSDOXY_FILES) ;
+Doxygen apihtml    : pubapi.dox $(CSDOXY_FILES) : html api    : index.html ;
+Doxygen apidevhtml : devapi.dox $(CSDOXY_FILES) : html apidev : index.html ;
 Help apihtml    : "Build the public API reference manual"    ;
 Help apidevhtml : "Build the developer API reference manual" ;
 }
