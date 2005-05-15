@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-May-2005
+	- Eric Sunshine fixed more compilation errors and warnings in AWS
+	  reported by gcc. (There are still some additional errors unresolved,
+	  though.)
 	- Wouter fixed a print call in scanplugins.cpp.
 	- res added csInstallationPathsHelper::GetPlatformInstallationPaths()
 	  for OS/X.
