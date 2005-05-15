@@ -131,6 +131,9 @@ public:
   // previous time the sound handles were updated
   csTicks LastTime;
 
+  // sound renderer has been opened
+  bool isOpen;
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderSoftware);

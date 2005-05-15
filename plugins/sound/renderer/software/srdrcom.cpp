@@ -72,6 +72,7 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(0)
   owning = downing = false;
   data = csCondition::Create ();
   mixing = csMutex::Create (true);
+  isOpen = false;
 }
 
 void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
@@ -148,7 +149,9 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 
 bool csSoundRenderSoftware::Open()
 {
+  if(isOpen) return true;
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Software Sound Renderer selected");
+  isOpen = true;
   CS_ASSERT (Config != 0);
 
   if (!SoundDriver) return false;
@@ -236,6 +239,7 @@ void csSoundRenderSoftware::Close()
   owning = false;
   downing = false;
   mixing->Release ();
+  isOpen = false;
 }
 
 csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)

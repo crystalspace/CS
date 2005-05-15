@@ -58,6 +58,8 @@ chronological order.
 	      rule.
 	    - Greatly enhanced the documentation for the documentation
 	      generation rules.
+	- Wouter Wijngaards added a check to the software sound renderer to
+	  guard against multiple calls of Open(). It would deadlock otherwise.
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,
