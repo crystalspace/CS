@@ -44,12 +44,12 @@ enum csDDSRawDataType
   csrawDXT3,
   csrawDXT4,
   csrawDXT5,
-  csrawA8R8G8B8,
+  csrawB8G8R8A8,
 
   csrawUnsupported,
 
   csrawAlphaFirst = csrawUnknownAlpha,
-  csrawAlphaLast = csrawDXT5
+  csrawAlphaLast = csrawB8G8R8A8
 };
 
 class csDDSImageIO : public iImageIO, public iComponent
@@ -74,7 +74,6 @@ private:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
 
-  void CopyLEUI32s (void* dest, const void* source, size_t count);
   csDDSRawDataType IdentifyPixelFormat (const dds::PixelFormat& pf, 
     uint& bpp);
 };

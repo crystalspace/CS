@@ -60,6 +60,12 @@ chronological order.
 	      generation rules.
 	- Wouter Wijngaards added a check to the software sound renderer to
 	  guard against multiple calls of Open(). It would deadlock otherwise.
+	- res fixed some gcc compiler warnings in the Win32 port.
+	- res added saving support to the DDS plugin. Currently can only save
+	  power-of-two 2D images without mipmaps and supports B8G8R8, A8B8R8G8,
+	  DXT1 and DXT3 formats (latter two by utilizing Jason Dories' PD 
+	  image library).
+	- res corrected the "a8r8g8b8" texture format to "a8b8g8r8".
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,

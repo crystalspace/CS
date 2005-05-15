@@ -527,7 +527,7 @@ csRef<iStringArray> csScanPluginDirs (csPathsList* dirs,
     {
       csString tmp;
       tmp.Format ("The following issue(s) came up while scanning '%s':",
-	(*dirs)[i].path);
+	(*dirs)[i].path.GetData());
 
       AppendStrVecString (messages, tmp);
 

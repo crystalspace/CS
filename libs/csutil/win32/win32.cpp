@@ -263,7 +263,7 @@ bool csPlatformStartup(iObjectRegistry* r)
     char* pathEnv = csStrNew (getenv("PATH"));
     bool pathChanged = false;
 
-    for (size_t i = 0; i < pluginpaths->GetCount(); i++)
+    for (size_t i = 0; i < pluginpaths->Length(); i++)
     {
       // @@@ deal with path recursion here?
       if (AddToPathEnv ((*pluginpaths)[i].path, &pathEnv)) pathChanged = true;

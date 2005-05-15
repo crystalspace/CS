@@ -23,12 +23,14 @@
 #include "ivaria/reporter.h"
 #include "dds.h"
 #include "ddsloader.h"
+#include "ddsutil.h"
+#include "ddssaver.h"
 
 #define DDS_MIME "image/dds"
 
 static iImageIO::FileFormatDescription formatlist[1] =
 {
-  {DDS_MIME, "RGBA", CS_IMAGEIO_LOAD}
+  {DDS_MIME, "RGBA", CS_IMAGEIO_LOAD | CS_IMAGEIO_SAVE}
 };
 
 csDDSImageIO::csDDSImageIO (iBase* parent)
@@ -58,15 +60,6 @@ const csImageIOFileFormatDescriptions& csDDSImageIO::GetDescription ()
 
 void csDDSImageIO::SetDithering (bool)
 {
-}
-
-void csDDSImageIO::CopyLEUI32s (void* dest, const void* source, size_t count)
-{
-  uint32* d = (uint32*)dest; uint32* s = (uint32*)source;
-  while (count-- > 0)
-  {
-    *(d++) = csGetLittleEndianLong (s++);
-  }
 }
 
 csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf, 
@@ -136,7 +129,7 @@ csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf,
 	&& (pf.bluemask == 0x00000ff))
       {
 	if ((pf.flags & dds::DDPF_ALPHAPIXEL) && (pf.alphamask == 0xff000000))
-	  type = csrawA8R8G8B8;
+	  type = csrawB8G8R8A8;
       }
     }
   }
@@ -211,6 +204,8 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 
   if ((dataType < csrawAlphaFirst) || (dataType > csrawAlphaLast))
     format &= ~CS_IMGFMT_ALPHA;
+  else
+    format |= CS_IMGFMT_ALPHA;
   if ((format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
     format = (format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
 
@@ -262,13 +257,16 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image,
     iImageIO::FileFormatDescription* format, const char* options)
 {
-  return 0;
+  return Save (image, format->mime, options);
 }
 
 csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image, const char* mime,
 				       const char* options)
 {
-  return 0;
+  if (strcmp (mime, DDS_MIME) != 0) return 0;
+  csImageLoaderOptionsParser optparser (options);
+  csDDSSaver saver;
+  return saver.Save (image, optparser);
 }
 
 //---------------------------------------------------------------------------
@@ -424,8 +422,8 @@ static const char* RawTypeString (csDDSRawDataType type)
       return "b8g8r8";
     case csrawR5G6B5:
       return "r5g6b5";
-    case csrawA8R8G8B8:
-      return "a8r8g8b8";
+    case csrawB8G8R8A8:
+      return "b8g8r8a8";
     case csrawLum8:
       return "l8";
     default:

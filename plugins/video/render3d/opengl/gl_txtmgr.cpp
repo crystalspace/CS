@@ -581,11 +581,11 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
       uploadData.sourceType = GL_UNSIGNED_SHORT_5_6_5;
     }
     else if (G3D->ext->CS_GL_version_1_2
-      && (strcmp (rawFormat, "a8r8g8b8") == 0))
+      && (strcmp (rawFormat, "b8g8r8a8") == 0))
     {
       uploadData.image_data = imageRaw->GetUint8();
       uploadData.sourceFormat = GL_BGRA;
-      uploadData.sourceType = GL_UNSIGNED_INT_8_8_8_8_REV;
+      uploadData.sourceType = GL_UNSIGNED_BYTE;
     }
     else if (strcmp (rawFormat, "l8") == 0)
     {

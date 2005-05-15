@@ -2,8 +2,14 @@ SubDir TOP plugins video loader dds ;
 
 Description csddsimg : "dds image loader" ;
 
+DDS_IMAGELIB_REJECT =
+  [ Wildcard ImageLib : Load*.* ]
+  [ Wildcard ImageLib : CodeBook4MMX*.* ]
+  [ ConcatDirs ImageLib Usage.cpp ]
+  ;
 Plugin csddsimg
 	: [ Wildcard *.cpp *.h ]
+	[ Filter [ Wildcard ImageLib : *.cpp *.h ] : $(DDS_IMAGELIB_REJECT) ]
 ;
 LinkWith csddsimg : crystalspace ;
 
