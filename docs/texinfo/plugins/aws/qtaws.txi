@@ -2,75 +2,98 @@
 @node AWS QT Designer and AWS, AWS Automation, AWS Architecture, AWS
 @subsection Using QT Designer To Create @sc{aws} Definition Files
 
-On many platforms Trolltechs Designer is available, a tool that lets you create graphical user interfaces like
-Dialogs, Forms etc. It saves the interface description in an easy to read format (XML -  even though i was not 
-able to locate a formal document type description (DTD) for it, it's format is pretty obvious).
+On many platforms TrollTech's Designer is available: a tool that lets you
+create graphical user interfaces like dialogs, forms, etc. It saves the
+interface description in an easy to read format (@sc{xml}---even though i was
+not able to locate a formal document type description (@sc{dtd}) for it, it's
+format is pretty obvious).
 
-You should be aware that not all features the Designer is capable of can be translated into @sc{aws} simply because
-they are not available in @sc{aws}. The same is true for features available in @sc{aws} but not in Designer.
+You should be aware that not all features the Designer is capable of can be
+translated into @sc{aws}, simply because they are not available in
+@sc{aws}. The same is true for features available in @sc{aws} but not in
+Designer.
 
-@subsubheading What you need
+@subsubheading What You Need
 
-Since Designer saves its interface description in XML writing an extensible stylesheet to transform it into @sc{aws} format
-was an obvious choice. So you will need a XSLT stylesheet processor. You can either choose a commercial product or
-the excellent Xalan which is part of the Apache project. You can get it for free here:
+Since Designer saves its interface description in @sc{xml} writing an
+extensible stylesheet to transform it into @sc{aws} format was an obvious
+choice. So you will need a @sc{xslt} stylesheet processor. You can either
+choose a commercial product or the excellent Xalan which is part of the Apache
+project. You can get it for free here:
+
+@noindent
 @uref{http://xml.apache.org}
-For development i used the Xalan Java 2 version at: @uref{http://xml.apache.org/xalan-j/index.html}
 
-@subsubheading How to use it
+@noindent
+For development, I used the Xalan Java 2 version at:
 
-Design your dialog or widget in Designer and save it somewhere.
-To process the stylesheet with the java version of Xalan you call:
+@noindent
+@uref{http://xml.apache.org/xalan-j/index.html}
+
+@subsubheading How To Use It
+
+Design your dialog or widget in Designer and save it somewhere.  To process the
+stylesheet with the Java version of Xalan you invoke:
+
 @example
 java org.apache.xalan.xslt.Process \
     -IN path/to/the/saved/designer/file.ui \
     -XSL path/to/CS/scripts/aws/qt2aws.xsl
 @end example
 
-If you use Designer 1.1 (that comes with @sc{qt2}) you use qt2aws.xsl. The new Designer version 2.0 (which comes with QT3) changed it's .ui DTD slightly. In case you use Designer2.0 use qt3aws.xsl.
+If you use Designer 1.1 (that comes with @sc{qt2}), use the style sheet
+@file{qt2aws.xsl}. The new Designer version 2.0 (which comes with @sc{qt3})
+changed its @samp{.ui} @sc{dtd} slightly. In case you use Designer2.0 specify
+@file{qt3aws.xsl}.
 
 Append the output to a file containing skin definitions.
 
-@subsubheading What controls are converted ?
+@subsubheading What Controls Are Converted?
 
 @multitable @columnfractions 0.4 0.2 0.4
 @item @strong{QT Class} @tab @tab @strong{AWS Class}
-@item QPushButton @tab ==> @tab Command Button
-@item QRadioButton @tab ==> @tab Radio Button
-@item QSlider @tab ==> @tab Scroll Bar
-@item QButtonGroup @tab ==> @tab Group Frame
-@item QGroupBox @tab ==> @tab Group Frame
-@item QFrame @tab ==> @tab Group Frame
-@item QCheckBox @tab ==> @tab Check Box
-@item QLineEdit @tab ==> @tab Text Box
-@item QTextView @tab ==> @tab Multiline Edit
-@item QLabel @tab ==> @tab Label
-@item QLabel with Pixmap @tab ==> @tab Image View
-@item QListBox @tab ==> @tab List Box
-@item QListView @tab ==> @tab List Box
-@item QDialog @tab ==> @tab Window
-@item QWidget @tab ==> @tab Window
-@item QTabWidget @tab ==> @tab Notebook
+@item QPushButton @tab @result{} @tab Command Button
+@item QRadioButton @tab @result{} @tab Radio Button
+@item QSlider @tab @result{} @tab Scroll Bar
+@item QButtonGroup @tab @result{} @tab Group Frame
+@item QGroupBox @tab @result{} @tab Group Frame
+@item QFrame @tab @result{} @tab Group Frame
+@item QCheckBox @tab @result{} @tab Check Box
+@item QLineEdit @tab @result{} @tab Text Box
+@item QTextView @tab @result{} @tab Multiline Edit
+@item QLabel @tab @result{} @tab Label
+@item QLabel with Pixmap @tab @result{} @tab Image View
+@item QListBox @tab @result{} @tab List Box
+@item QListView @tab @result{} @tab List Box
+@item QDialog @tab @result{} @tab Window
+@item QWidget @tab @result{} @tab Window
+@item QTabWidget @tab @result{} @tab Notebook
 @end multitable
 
 @subheading Special Notes
 
-@subsubheading @sc{aws} Signals and special properties
+@subsubheading @sc{aws} Signals and Special Properties
 
-You can place special information in the controls @strong{whatsThis} property. The content will be broken into tokens
-separated by the pipe (@sc{"|"}). A token consist of a token identifier, the colon @sc{:} and token text.
-The following tokens are recognized:
+You can place special information in the control's @samp{whatsThis}
+property. The content will be broken into tokens separated by the pipe
+(@samp{|}) character or vertical bar. A token consist of a token identifier, a
+colon @samp{:} and token text.  The following tokens are recognized:
 
-@itemize
-@item connect token
-@itemize
-@item token identifier: c
-@item token text: a list of comma separated items
-@item example:
+@itemize @bullet
+@item
+connect token
+@itemize @bullet
+@item
+token identifier: c
+@item
+token text: a list of comma separated items
+@item
+example:
 @example
 c:signalClicked,mySink::OnClick,signalBreak,mySink::ByeBye
 @end example
 
+@noindent
 This will be translated into
 
 @example
@@ -82,15 +105,20 @@ connect
 @end example
 @end itemize
 
-@item literal token
+@item
+literal token
 @itemize
-@item token identifier: l
-@item token text: some text
-@item example:
+@item
+token identifier: l
+@item
+token text: some text
+@item
+example:
 @example
 l:LeftEye: "Blue"
 @end example
 
+@noindent
 This will be translated into
 
 @example
@@ -100,36 +128,44 @@ LeftEye: "Blue"
 @end itemize
 
 Both examples from above would be concatenated and placed in the
-@strong{whatsThis} property and would look like this:
+@samp{whatsThis} property, and would look like this:
 
 @example
 c:signalClicked,mySink::OnClick,signalBreak,
     mySink::ByeBye|l:LeftEye: "Blue"
 @end example
 
-@subsubheading How to handle your own @sc{aws} controls
+@subsubheading How to Handle Your Own @sc{aws} Controls
 
-If you coded your own @sc{aws} control you can still use @sc{qt} to layout the control (at least the common parameters 
-like size and position). For this to work simply choose one of the supported controls and use it as a placeholder.
-Additionally you use the  token identifier 't' in the @strong{whatsThis} property of that control to name of your control class.
+If you coded your own @sc{aws} control you can still use @sc{qt} to layout the
+control (at least the common parameters like size and position). For this to
+work simply choose one of the supported controls and use it as a placeholder.
+Additionally you use the token identifier @samp{t} in the @samp{whatsThis}
+property of that control to name your control class.
 
-Example:
-
-I have created my own push button control. The name of the control class is awsMyFancyPushButtonControl. Since it uses
-all the properties of the standard @sc{aws} command button i cleverly use the QPushButton as my placeholder and set all
-the properties i need and QPushButton already offers like size, position, button text and others. Additionally i set the
-t token identifier in property @strong{whatsThis} to awsMyFancyPushButtonControl.
+As an example, I have created my own push button control. The name of the
+control class is @samp{awsMyFancyPushButtonControl}. Since it uses all the
+properties of the standard @sc{aws} command button, I cleverly use
+@samp{QPushButton} as my placeholder and set all the properties I need and
+which @samp{QPushButton} already offers, such size, position, button text and
+others. Additionally I set the @samp{t} token identifier in property
+@samp{whatsThis} to @samp{awsMyFancyPushButtonControl}.
 
 @itemize
-@item class type token
+@item
+class type token
 @itemize
-@item token identifier: t
-@item token text: the name of your class
-@item example:
+@item
+token identifier: t
+@item
+token text: the name of your class
+@item
+example:
 @example
 t:awsMyFancyPushButtonControl
 @end example
 
+@noindent
 This will be translated into
 
 @example

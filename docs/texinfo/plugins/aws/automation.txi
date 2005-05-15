@@ -1,152 +1,189 @@
 @c -*-texinfo-*-
-@node AWS Automation, , AWS QT Designer and AWS, AWS
-@subsection Automation: Properties and Scripting
+@node AWS Automation, AWS Component Scripting, AWS QT Designer and AWS, AWS
+@subsection @sc{aws} Automation: Properties and Scripting
 
-
-@sc{aws} uses an automation mechanism to allow components to respond to each other, 
-and to notify the programmer of events based on user input.
+@sc{aws} uses an automation mechanism to allow components to respond to each
+other, and to notify the programmer of events based upon user input.
 
 @subsubheading About Properties
 
-The first mechanism we'll talk about is properties.  Properties perform two important 
-roles: 
+The first mechanism we'll talk about is properties.  Properties perform two
+important roles:
 
 @enumerate
 @item
- Access control: That is, some properties can be read, and some can be written.  Others
- may have both access abilities enabled.
+@emph{Access control}: That is, some properties can be read, and some can be
+written.  Others may have both access abilities enabled.
 @item
- Notification: When a property is changed it is possible to get a notification of the change.
+@emph{Notification}: When a property is changed it is possible to get a
+notification of the change.
 @end enumerate
 
-Every property has two signals: @samp{Changed} and @samp{Binding}.  The first signal is fired when 
-the property is set.  The changed signal doesn't try to differentiate between old values and new values,
-so the property may have been set to the same actual value.  The second signal is fired when the property 
-is being bound to some name and property bag.  A property may be bound to different names, but it will only
-be bound to one name at a time.  It is possible to register a property with multiple bags, but it is not
-recommended since it will be difficult for a client to know what the property is associated with in that case.
-(Generally one can assume that if they are listening for a property, they know what the property is associated
-with.  Perhaps you have one slot that listens for a number of change signals for some component.  In that case,
-you may take different steps based on the name of the property changed - but you KNOW that all the properties 
-belong to one given object.)
+Every property has two signals: @samp{Changed} and @samp{Binding}.  The first
+signal is fired when the property is set.  The @samp{Changed} signal doesn't
+try to differentiate between old values and new values, so the property may
+have been set to the same actual value.  The second signal is fired when the
+property is being bound to some name and property bag.  A property may be bound
+to different names, but it will only be bound to one name at a time.  It is
+possible to register a property with multiple bags, but it is not recommended
+since it will be difficult for a client to know what the property is associated
+with in that case.  (Generally clients can assume that if they are listening
+for a property, they know with what the property is associated.  Perhaps you
+have one slot that listens for a number of change signals for some component.
+In that case, you may take different steps based on the name of the property
+changed---but you @emph{know} that all the properties belong to one given
+object.)
 
 @subsubheading Using Properties
 
-Properties are very easy to use.  For example, say you have a window called @samp{login.}  All windows have
-a property called title.  You would like to set the title of the window regardless of what appears in the
-window definition file.
+Properties are very easy to use.  For example, say you have a window called
+``login''.  All windows have a property called @samp{Title}.  You would like to
+set the title of the window regardless of what appears in the window definition
+file.
 
-@samp{login.Title.Set("Login to System");}
+@example
+login.Title.Set("Login to System");
+@end example
 
-That's it.  The window takes care of setting the value, invalidating itself, and getting redrawn.  What if you
-wanted to know when the @samp{Title} property was changed?  In that case you would have to have a slot for that,
-and all slots must belong to some class.  You can have other things in your class besides slots, that way you don't
-have to have one object set aside for dealing with that stuff.  Slots can be where they ought to be: near the data
-and functions that want to know about them.
+That's it.  The window takes care of setting the value, invalidating itself,
+and getting redrawn.  What if you wanted to know when the @samp{Title} property
+was changed?  In that case you would have to have a @dfn{slot} for that, and
+all slots must belong to some class.  You can have other things in your class
+besides slots, that way you don't have to have one object set aside for dealing
+with that stuff.  Slots can be where they ought to be: near the data and
+functions that want to know about them.
 
-@code
-{
-
+@example
 class myslots : public autom::has_slots<>
-{
+@{
 public:
-	void titleChanged(const std::string &name, awsPropertyBase *property)
-	{
-		autom::keeper k;
-				
-		if (property->Get(k))
-		{
-			std::string new_title = k->toString().Value();
-			csPrintf("Title changed to: %s\n", new_title.c_str());
-		}
-		else
-		{
-			csPrintf("Access to read title denied!\n");
-		}
-	}
-	
-	void setup(awsWindow *win)
-	{
-		win->Title.Changed.connect(this, titleChanged);
-	}
-};
+  void titleChanged(const std::string &name,
+                    awsPropertyBase *property)
+  @{
+    autom::keeper k;
+    if (property->Get(k))
+    @{
+      std::string new_title = k->toString().Value();
+      csPrintf("Title changed to: %s\n", new_title.c_str());
+    @}
+    else
+    @{
+      csPrintf("Access to read title denied!\n");
+    @}
+  @}
+  
+  void setup(awsWindow *win)
+  @{
+    win->Title.Changed.connect(this, titleChanged);
+  @}
+@};
+@end example
 
-}
+There's a little bit of code there, but let's look at each of the pieces.  The
+first thing to note is that the class @strong{must} inherit from
+@code{autom::has_slots<>}; otherwise it won't have the code needed to host
+slots.
 
-There's a little bit of code there, but let's look at each of the pieces.  The first thing to note is that
-the class MUST inherit from autom::has_slots<>.  Otherwise it won't have the code needed to host slots.
+The next thing to notice is the function signature for the slot.  The return
+type @strong{must} be @samp{void}, and the other two parameters must be exactly
+as shown.  Different signals may have different slot signatures, but for
+property change signals, the signature is exactly as shown above.
 
-The next thing to notice is the function signature for the slot.  The returntype MUST be void, and the other
-two parameters must be exactly as they are too.  Different signals may have different slot signatures, but
-for property change signals, the signature is exactly as shown above.
-
-@samp{name} is the name of the property that changed.  @samp{property} is a pointer to the property that changed.
-In order to get the value of the property, you must call the @samp{Get} function.  If it returns false, then
-read access is denied for that particular property.  There is no way to read a property that is write-only. 
-
-Finally, notice the setup function.  it calls the connect function on the Changed signal.  This means that
-our titleChanged function will be called whenever @samp{Title.Set()} succeeds.
+@samp{name} is the name of the property that changed.  @samp{property} is a
+pointer to the property that changed.  In order to get the value of the
+property, you must call the @code{Get()} function.  If it returns false, then
+read access is denied for that particular property.  There is no way to read a
+property that is write-only.  Finally, notice the @code{setup()} function. It
+calls the @samp{connect()} function on the @samp{Changed} signal.  This means
+that our @code{titleChanged()} function will be called whenever
+@code{Title.Set()} succeeds.
 
 @subsubheading Properties Q&A
 
-@strong{Question:} @emph{How do I know what component or window a property is associated with?}
-@strong{Answer:} Currently, the code must know that somehow.  Either because you as the developer
-knows that a certain object's slots only ever connect to a given window or component, or
-through some other previous knowledge.  Eventually there will be a global registry that will
-allow you to lookup that sort of information.
+@noindent
+@strong{Question:} @emph{How do I know with what component or window a property
+is associated?}
 
-@strong{Question:}@emph{ Why don't properties store the component and/or window they're associated with? }
-@strong{Answer:} Properties are designed to be used in a number of contexts.  Building in information
-about component or window ownership implies that properties must belong to a component.  That
-may or may not be true in the future.
+@noindent
+@strong{Answer:} Currently, the code must know that somehow; either because
+you as the developer knows that a certain object's slots only ever connect to a
+given window or component, or through some other previous knowledge.
+Eventually there will be a global registry that will allow you to look up that
+sort of information.
 
-@strong{Question:} @emph{ Why do I have to use a keeper and do all that gobbledygook with the toString()->Value() }
-stuff?
-@strong{Answer:} Property values are inherently type-agnostic.  In the case of a bound property, the value is
-always converted to the concrete type the property is bound to.  However, the property may still be
-set with any sort of type supported (int, float, string).  The conversions are implicitly handled when 
-needed.  The keeper is just a shorter name for csRef<object *>, and provides automatic lifespan handling
-for those types.  They go away when all references to them have disappeared.
+@noindent
+@strong{Question:} @emph{Why don't properties store the component and/or window
+with which they are associated?}
+
+@noindent
+@strong{Answer:} Properties are designed to be used in a number of contexts.
+Building in information about component or window ownership implies that
+properties must belong to a component.  That may or may not be true in the
+future.
+
+@noindent
+@strong{Question:} @emph{Why do I have to use a keeper and do all that
+gobbledygook with the} @code{toString()->Value()} @emph{stuff?}
+
+@noindent
+@strong{Answer:} Property values are inherently type-agnostic.  In the case of
+a bound property, the value is always converted to the concrete type to which
+the property is bound.  However, the property may still be set with any sort of
+type supported (int, float, string).  The conversions are handled implicitly
+when needed.  The keeper is just a shorter name for @code{csRef<object*>}, and
+provides automatic lifespan handling for those types.  They go away when all
+references to them have disappeared.
 
 @subsubheading Scripting
 
-Scripting is intimately related to properties, because properties use the scripting system to store their
-values.  In fact, it is entirely possible to have properties who's value resolves to a dynamically executed 
-function.
+Scripting is intimately related to properties, because properties use the
+scripting system to store their values.  In fact, it is entirely possible to
+have a property whose value resolves to a dynamically executed function.
 
-For example, imagine that you wanted to have a property that belonged to a progress bar widget.  The progress bar
-widget might be receiving updates from a file transfer object.  Perhaps the progress bar widget can display some
-text.  For this progress bar we want the text to show how many bytes have been transferred below the progress display.  
-The widget itself doesn't know what the text is, or when it has changed.  You don't want to update the text at EVERY change, 
-because that might be slow.  Instead, you set a property called @samp{Caption} as follows:
+For example, imagine that you wanted to have a property that belonged to a
+progress bar widget.  The progress bar widget might be receiving updates from a
+file transfer object.  Perhaps the progress bar widget can display some text.
+For this progress bar we want the text to show below the progress display how
+many bytes have been transferred.  The widget itself doesn't know what the text
+is, or when it has changed.  You don't want to update the text at @emph{every}
+change, because that might be slow.  Instead, you set a property called
+@samp{Caption} as follows:
 
-autom::keeper k = autom::Compile(":BytesReceived@FileTransfer()")
+@example
+autom::keeper k = autom::Compile(":BytesReceived@@FileTransfer()")
 progress.Caption.Set(k);
+@end example
 
-Then, when the progress bar's status is updated and it redraws, it will do something like this:
+Then, when the progress bar's status is updated and it redraws, it will do
+something like this:
 
-@code
-{
-...
-
+@example
+@dots{}
 autom::keeper k;
 Caption.Get(k);
-
 std::string caption_text = k->toString().Value();
+@dots{}
+@end example
 
-...
-
-Instead of getting the string we set for the property, the string is evaluated as a function, and we get the result.  In this case
-it would happen to be how many bytes were received.  Had we set the value as a simple string, that string would have been displayed.
-}
+Instead of getting the string we set for the property, the string is evaluated
+as a function, and we get the result.  In this case it would happen to be how
+many bytes were received.  Had we set the value as a simple string, that string
+would have been displayed.
 
 @subsubheading Scripting Tutorial
 
+@@@@@@ FIXME: Write this.
 
 @subsubheading Scripting Q&A
 
-@strong{Question:} @emph{ When I call autom::Compile with a string it doesn't return an automation string object.  It just returns nil.  Why? }
-@strong{Answer:}  If you try to compile a string it must have double quotes around it, just like in C and C++ and a myriad other languages.
-If all you are trying to do is generate a automation string object from a pre-existing string, use @samp{new autom::string(existing_string)}.
-It understands that the string is pre-composed and doesn't parse it.  Therefore it's also much faster.
+@noindent
+@strong{Question:} @emph{When I call} @code{autom::Compile()} @emph{with a
+string it doesn't return an automation string object.  It just returns nil.
+Why?}
 
+@noindent
+@strong{Answer:} If you try to compile a string it must have double quotes
+around it, just like in C and C++ and myriad other languages.  If all you are
+trying to do is generate a automation string object from a pre-existing string,
+use @samp{new autom::string(existing_string)}.  It understands that the string
+is pre-composed and doesn't parse it.  Therefore it's also much faster.

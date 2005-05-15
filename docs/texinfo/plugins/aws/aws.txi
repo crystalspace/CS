@@ -17,7 +17,7 @@ components via a @dfn{signal}/@dfn{slot} mechanism. All @sc{gui} aspects can be
 modified by the @sc{gui} designer in definition files without the
 need to recompile the base application. This allows game interfaces to be
 easily @dfn{skinned} by non-programmers.  For example code, see 
-@code{apps/tutorial/awstut} and @code{apps/tests/awstest}.
+@file{CS/apps/tutorial/awstut} and @file{CS/apps/tests/awstest}.
 
 @menu
 * AWS Quick Start:: Quick Start
@@ -27,7 +27,9 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 * AWS Signals and Actions Reference:: @sc{aws} Standard Component Signal and Action Reference
 * AWS Architecture:: In-Depth Explanation of @sc{aws} Architecture
 * AWS QT Designer and AWS:: Using QT Designer To Create @sc{aws} Definition Files
-* AWS Automation:: Automation: Properties and Scripting
+* AWS Automation:: @sc{aws} Automation: Properties and Scripting
+* AWS Component Scripting:: Automation Objects Available for Components
+* AWS Window Scripting:: Automation Objects Available for Windows
 @end menu
 
 @importss{plugins,aws,quick.txi}
@@ -38,3 +40,5 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 @importss{plugins,aws,indepth.txi}
 @importss{plugins,aws,qtaws.txi}
 @importss{plugins,aws,automation.txi}
+@importsss{plugins,aws,scripting,componentfuncs.txi}
+@importsss{plugins,aws,scripting,windowfuncs.txi}

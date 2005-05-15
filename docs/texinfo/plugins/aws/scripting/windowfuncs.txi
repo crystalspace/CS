@@ -1,0 +1,12 @@
+@c -*-texinfo-*-
+@node AWS Window Scripting, , AWS Component Scripting, AWS
+@subsection Automation Objects Available for Windows
+
+@multitable @columnfractions .25 .40 .35
+@headitem Name @tab Example @tab Description
+
+@item @code{Dummy@@Window}
+@tab  @code{:Dummy@@Window()}
+@tab  Do something to the window.
+
+@end multitable

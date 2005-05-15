@@ -21,6 +21,11 @@ chronological order.
 	      ultimately to failure.
 	    - Name of variable to enable/disable the CEL test program did not
 	      match variable used later in script.
+	- Eric Sunshine fixed a lot of Texinfo markup problems in the AWS
+	  documentation, as well as some grammatical and spelling errors.  Also
+	  renamed component_funcs.txi and window_funcs.txi to
+	  componentfuncs.txi and windowfuncs.txi, respectively, since the
+	  underscores caused TeX to barf.
 14-May-2005
 	- Eric Sunshine fixed more compilation errors and warnings in AWS
 	  reported by gcc. (There are still some additional errors unresolved,

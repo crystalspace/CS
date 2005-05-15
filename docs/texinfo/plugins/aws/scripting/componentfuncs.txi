@@ -1,0 +1,31 @@
+@c -*-texinfo-*-
+@node AWS Component Scripting, AWS Window Scripting, AWS Automation, AWS
+@subsection Automation Objects Available for Components
+
+All components inherit the following scripting capabilities.
+
+@multitable @columnfractions .25 .40 .35
+@headitem Name @tab Example @tab Description
+
+@item @code{Hide@@Widget}
+@tab  @code{:Hide@@Widget()}
+@tab  Hides the given widget.
+
+@item @code{Show@@Widget}
+@tab  @code{:Show@@Widget()}
+@tab  Shows the given widget.
+
+@item @code{Invalidate@@Widget}
+@tab  @code{:Invalidate@@Widget()}
+@tab  Invalidates the given widget.  (This forces a redraw.)
+
+@item @code{HideWindow@@Widget}
+@tab  @code{:HideWindow@@Widget()}
+@tab  Hides the window that the widget belongs to.
+
+@item @code{MoveTo@@Widget}
+@tab  @code{:MoveTo@@Widget(x=500, y=500)}
+@tab  Moves the widget to the x and y coordinates specified.  If either
+coordinate is missing, zero is assumed for it.
+
+@end multitable
