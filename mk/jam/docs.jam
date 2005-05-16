@@ -248,7 +248,7 @@ rule Doxygen
   local doxyfile  = $(infiles[1]) ;
   local resources = $(infiles[2-]) ;
   local outdir    = [ FDirName $(LOCATE.DOCS) $(subdir) ] ;
-  local grist     = $(SOURCE_GRIST) ;
+  local grist     = "$(SOURCE_GRIST)!$(target)" ;
 
   if ! $(outfile)
   {
