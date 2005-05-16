@@ -1306,11 +1306,14 @@ public:
 
 	void Register()
 	{		
-		AUTOM_REGISTER("Hide@Widget", this, hide_);		
-		AUTOM_REGISTER("Show@Widget", this, show_);
-		AUTOM_REGISTER("Invalidate@Widget", this, invalidate_);
-		AUTOM_REGISTER("HideWindow@Widget", this, hide_window_);
-		AUTOM_REGISTER("MoveTo@Widget", this, move_to_);
+	  AUTOM_REGISTER("Hide@Widget", this, 
+	    &component_builtin::hide_);
+	  AUTOM_REGISTER("Show@Widget", this, &component_builtin::show_);
+	  AUTOM_REGISTER("Invalidate@Widget", this, 
+	    &component_builtin::invalidate_);
+	  AUTOM_REGISTER("HideWindow@Widget", this, 
+	    &component_builtin::hide_window_);
+	  AUTOM_REGISTER("MoveTo@Widget", this, &component_builtin::move_to_);
 	}
 
 };

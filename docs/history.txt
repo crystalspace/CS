@@ -12,6 +12,10 @@ chronological order.
 	  style sheets, for instance) to be copied to the wrong output
 	  directory if the Doxygen rule was invoked multiple times (such as
 	  once for the 'apihtml' target and once for the 'apidevhtml' target).
+	- res fixed some AWS compile errors on MinGW/GCC 3.4.2.
+	- res added a #define for strtoll for MSVC (which is there called
+	  "_strtoi64") so strtoll can be used anywhere string->longlong
+	  conversions are needed.
 15-May-2005
 	- Eric Sunshine fixed memory leaks in the csPathsList::Entry copy
 	  constructor.

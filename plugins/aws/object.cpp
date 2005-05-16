@@ -120,11 +120,7 @@ integer::parseObject(std::string::iterator &pos, const std::string::iterator &en
 	for(; pos!=end && isdigit(*pos); ++pos)	
 		temp+=(*pos);			
 
-	#ifdef WIN32
-	value = _strtoi64(temp.c_str(), 0, 10);
-	#else
 	value = strtoll(temp.c_str(), 0, 10);
-	#endif
 	
 	return true;
 }

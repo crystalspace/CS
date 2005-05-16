@@ -335,6 +335,10 @@ struct csMemMapInfo
 #  define strncasecmp _strnicmp
 #endif
 
+#if defined (CS_COMPILER_MSVC)
+#  define strtoll	_strtoi64
+#endif
+
 // Maximal path length
 #ifndef CS_MAXPATHLEN
 #  ifdef _MAX_FNAME

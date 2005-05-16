@@ -77,8 +77,8 @@ bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Focusable", _focusable);
   focusable = _focusable;
 
-  State.Changed.connect(this, visualStateChanged);
-  Caption.Changed.connect(this, visualStateChanged);
+  State.Changed.connect(this, &awsCheckBox::visualStateChanged);
+  Caption.Changed.connect(this, &awsCheckBox::visualStateChanged);
 
   return true;
 }
