@@ -150,6 +150,8 @@ public:
   csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
   int target;
+  /// Format used for last Blit() call
+  TextureBlitDataFormat texFormat;
   bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
   void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
   bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
@@ -245,7 +247,7 @@ public:
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md);
 
   virtual void Blit (int x, int y, int width, int height,
-    unsigned char const* data);
+    unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
   void SetupAutoMipping();
 
   /// Get the texture target

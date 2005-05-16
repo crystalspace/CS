@@ -64,7 +64,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, 
 				      csGLGraphics3D *iG3D) 
-  : origName(0), uploadData(0)
+  : origName(0), uploadData(0), texFormat((TextureBlitDataFormat)-1)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->image = image;
@@ -102,7 +102,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
 				      csGLGraphics3D *iG3D)
-  : origName(0), uploadData(0)
+  : origName(0), uploadData(0), texFormat((TextureBlitDataFormat)-1)
 {
   SCF_CONSTRUCT_IBASE(0);
   G3D = iG3D;
@@ -644,47 +644,56 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
 }
 
 void csGLTextureHandle::Blit (int x, int y, int width,
-    int height, unsigned char const* data)
+    int height, unsigned char const* data, TextureBlitDataFormat format)
 {
   // @@@ Keycolor not yet supported here!
   
   // Activate the texture.
   Precache ();
   G3D->ActivateTexture (this);
+  GLuint textureFormat = (format == RGBA8888) ? GL_RGBA : GL_BGRA;
   // Make sure mipmapping is ok.
-  if (!IsWasRenderTarget())
+  if (!IsWasRenderTarget() || (texFormat != format))
   {
-    bool doSetRGBA = (x == 0) && (y == 0) && (width == actual_width)
+    texFormat = format;
+    bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
       && (height == actual_height);
 
-    // Pull texture data and set as RGBA again, to prevent compression (slooow)
-    // on subsequent glTexSubImage() calls.
-    if (!doSetRGBA)
+    // Pull texture data and set as RGBA/BGRA again, to prevent compression 
+    // (slooow) on subsequent glTexSubImage() calls.
+    if (!isWholeImage)
     {
       uint8* pixels = new uint8[actual_width * actual_height * 4];
-      glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+      glGetTexImage (GL_TEXTURE_2D, 0, textureFormat, GL_UNSIGNED_BYTE, 
+	pixels);
 
-      SetWasRenderTarget (true);
-      SetupAutoMipping();
+      if (!IsWasRenderTarget())
+      {
+	SetWasRenderTarget (true);
+	SetupAutoMipping();
+      }
 
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, actual_width, 
-	actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+      glTexImage2D (GL_TEXTURE_2D, 0, textureFormat, actual_width, 
+	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, pixels);
       delete[] pixels;
     }
     else
     {
-      SetWasRenderTarget (true);
-      SetupAutoMipping();
+      if (!IsWasRenderTarget())
+      {
+	SetWasRenderTarget (true);
+	SetupAutoMipping();
+      }
 
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, actual_width, 
-	actual_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+      glTexImage2D (GL_TEXTURE_2D, 0, textureFormat, actual_width, 
+	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, data);
       return;
     }
   }
   // Do the copy.
   glTexSubImage2D (GL_TEXTURE_2D, 0, x, y, 
       width, height,
-      GL_RGBA, GL_UNSIGNED_BYTE, data);
+      textureFormat, GL_UNSIGNED_BYTE, data);
   //SetNeedMips (true);
 }
 

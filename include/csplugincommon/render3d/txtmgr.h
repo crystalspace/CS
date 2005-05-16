@@ -117,7 +117,7 @@ public:
   virtual csTexture* NewTexture (iImage *Image, bool ismipmap = false) = 0;
 
   virtual void Blit (int x, int y, int width, int height,
-    unsigned char const* data) { }
+    unsigned char const* data, TextureBlitDataFormat) { }
 
   ///--------------------- iTextureHandle implementation ----------------------
   SCF_DECLARE_IBASE;

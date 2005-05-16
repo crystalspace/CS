@@ -202,7 +202,7 @@ public:
   virtual const char* GetImageName () const { return image->GetName (); }
 
   virtual void Blit (int x, int y, int width, int height,
-    unsigned char const* data);
+    unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
 };
 
 class csSoftSuperLightmap;

@@ -256,7 +256,9 @@ void csSoftwareTextureHandle::PrepareInt ()
   FreeImage ();
 }
 
-void csSoftwareTextureHandle::Blit (int x, int y, int width, int height, unsigned char const* data)
+void csSoftwareTextureHandle::Blit (int x, int y, int width, int height,
+				    unsigned char const* data, 
+				    TextureBlitDataFormat format)
 {
   Setup332Palette ();
 
@@ -285,10 +287,20 @@ void csSoftwareTextureHandle::Blit (int x, int y, int width, int height, unsigne
     {
       
       uint8 r,g,b,a;
-      r = *src++;
-      g = *src++;
-      b = *src++;
-      a = *src++;
+      if (format == RGBA8888)
+      {
+	r = *src++;
+	g = *src++;
+	b = *src++;
+	a = *src++;
+      }
+      else
+      {
+	b = *src++;
+	g = *src++;
+	r = *src++;
+	a = *src++;
+      }
 
       //compute palette-index
       uint8 palIndex;

@@ -35,7 +35,7 @@
 struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 4, 0);
+SCF_VERSION (iTextureHandle, 2, 4, 1);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -127,12 +127,21 @@ struct iTextureHandle : public iBase
    */
   virtual int GetTextureTarget () const = 0;
 
+  /// Format of the pixel data that is passed to iTextureHandle->Blit()
+  enum TextureBlitDataFormat
+  {
+    /// RGBA, 8 bits per pixel
+    RGBA8888 = 0,
+    /// BGRA, 8 bits per pixel
+    BGRA8888
+  };
+
   /**
-   * Blit a memory block to this texture. Format of the image is RGBA
-   * in bytes. Row by row.
+   * Blit a memory block to this texture. Format of the image is determined
+   * by the \a format parameter. Row by row.
    */
   virtual void Blit (int x, int y, int width, int height,
-    unsigned char const* data) = 0;
+    unsigned char const* data, TextureBlitDataFormat format = RGBA8888) = 0;
 
   /**
    * Get the original image name.
