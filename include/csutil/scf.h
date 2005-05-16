@@ -79,7 +79,7 @@ struct iBase
 protected:
   // Needed for GCC4. Otherwise emits a flood of "virtual functions but
   // non-virtual destructor" warnings.
-  virtual ~iBase() {};
+  virtual ~iBase() {}
 public:
   /// Increment the number of references to this object.
   virtual void IncRef () = 0;

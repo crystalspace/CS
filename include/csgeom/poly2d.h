@@ -224,7 +224,7 @@ class csPoly2DFactory
 public:
   // Needed for GCC4. Otherwise emits a flood of "virtual functions but
   // non-virtual destructor" warnings.
-  virtual ~csPoly2DFactory() {};
+  virtual ~csPoly2DFactory() {}
 
   /// A shared factory that you can use.
    CS_DECLARE_STATIC_CLASSVAR(sharedFactory,SharedFactory,csPoly2DFactory)
