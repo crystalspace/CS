@@ -18,6 +18,10 @@ chronological order.
 	  conversions are needed.
 	- res added the ability to iTextureHandle::Blit() to optionally accept
 	  BGRA data.
+	- Eric Sunshine converted dynamic_cast<> usage in AWS to static_cast<>
+	  since, in each case, the object being cast was known to be of the
+	  desired type, so the dynamic_cast<> was overkill. More importantly,
+	  this alleviates the need to enable RTTI for the AWS plugin.
 15-May-2005
 	- Eric Sunshine fixed memory leaks in the csPathsList::Entry copy
 	  constructor.

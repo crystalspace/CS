@@ -145,7 +145,7 @@ public:
 		else
 		{
 			object *o = ln;
-			list *l = dynamic_cast<list *>(o);
+			list *l = CS_STATIC_CAST(list*,o);
 			return func_parm(new integer(l->size()));
 		}		
 	}
@@ -159,7 +159,7 @@ public:
 		else
 		{
 			object *o = ln;
-			list *l = dynamic_cast<list *>(o);
+			list *l = CS_STATIC_CAST(list*,o);
 			return func_parm(l->at(index->toInt().Value()));
 		}		
 	}
@@ -243,7 +243,7 @@ public:
 
 		if (body->ObjectType() == object::T_FUNCTION)
 		{
-			function *b = dynamic_cast<function *>((object *)body);
+			function *b = CS_STATIC_CAST(function*,(object*)body);
 			return func_parm(b->clone(&fn));
 		}
 		else
