@@ -118,7 +118,7 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 	//					   )
 	//				)	
 	
-	std::string::iterator start=pos;
+//	std::string::iterator start=pos;
 	
 // 	filter::console_output out;
 	
