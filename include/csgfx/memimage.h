@@ -22,6 +22,7 @@
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
+#include "csutil/refarr.h"
 #include "imagetools.h"
 #include "rgbpixel.h"
 #include "imagebase.h"
@@ -68,6 +69,7 @@ protected:
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
   csImageType imageType;
+  csArray<csRef<iImage> > mipmaps;
 
   /**
    * csImageMemory constructor, only set a format, no dimensions.
@@ -208,6 +210,32 @@ public:
   virtual csImageType GetImageType() const { return imageType; }
   void SetImageType (csImageType type) { imageType = type; }
 
+  virtual uint HasMipmaps () const 
+  { 
+    size_t num = mipmaps.Length();
+    while ((num > 0) && (mipmaps[num-1] == 0)) num--;
+    return (uint)num; 
+  }
+  virtual csRef<iImage> GetMipmap (uint num) 
+  { 
+    if (num == 0) return this;
+    if (num <= mipmaps.Length()) return mipmaps[num-1];
+    return 0; 
+  }
+  /**
+   * Set a mipmap of this image.
+   * \remark You can set any mipmap except number 0 to your liking, however,
+   *  no sanity checking is performed! That is, you can set mipmaps to 0,
+   *  leave out mipmaps and provide more mipmaps than the image really needs -
+   *  this can be problematic as most clients will expect non-null mipmaps. 
+   *  (Note however that trailing 0 mipmaps will not be reported.)
+   */
+  bool SetMipmap (uint num, iImage* mip)
+  {
+    if (num == 0) return false;
+    mipmaps.GetExtend (num-1) = mip;
+    return true;
+  }
 
   /// Copy an image as subpart into this image.
   bool Copy (iImage* srcImage, int x, int y, int width, int height);

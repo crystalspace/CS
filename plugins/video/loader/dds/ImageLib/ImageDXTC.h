@@ -43,6 +43,7 @@ private:
 	void		EmitMultiColorBlock4(WORD *pDest, CodeBook &cb, Color *pSrc);
 	void		EmitMultiColorBlockTrans(WORD *pDest, CodeBook &cb, Color *pSrc);
 	void		Emit4BitAlphaBlock(WORD *pDest, Color *pSrc);
+	//void		EmitDXT5AlphaBlock(WORD *pDest, Color *pSrc);
 
 
 public:
@@ -64,6 +65,7 @@ public:
 
 	void	CompressDXT1(Image32 *pSrcImg);		// Potentially called by FromImage32
 	void	CompressDXT3(Image32 *pSrcImg);		// Potentially called by FromImage32
+	//void	CompressDXT5(Image32 *pSrcImg);		// Potentially called by FromImage32
 };
 
 } // end of namespace ImageLib

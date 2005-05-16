@@ -27,7 +27,7 @@
 
 #include "ImageLib/Image.h"
 
-bool csDDSSaver::SaveB8G8R8 (csMemFile& out, iImage* image)
+bool csDDSSaver::FmtB8G8R8::Save (csMemFile& out, iImage* image)
 {
   size_t pixNum = image->GetWidth() * image->GetHeight() * image->GetDepth();
   csRGBpixel* pix = (csRGBpixel*)image->GetImageData();
@@ -44,7 +44,7 @@ bool csDDSSaver::SaveB8G8R8 (csMemFile& out, iImage* image)
   return true;
 }
 
-bool csDDSSaver::SaveB8G8R8A8 (csMemFile& out, iImage* image)
+bool csDDSSaver::FmtB8G8R8A8::Save (csMemFile& out, iImage* image)
 {
   size_t pixNum = image->GetWidth() * image->GetHeight() * image->GetDepth();
   csRGBpixel* pix = (csRGBpixel*)image->GetImageData();
@@ -63,14 +63,18 @@ bool csDDSSaver::SaveB8G8R8A8 (csMemFile& out, iImage* image)
   return true;
 }
 
-bool csDDSSaver::SaveDXT (csMemFile& out, iImage* image, 
-			  ImageLib::DXTCMethod method)
+bool csDDSSaver::FmtDXT::Save (csMemFile& out, iImage* image)
 {
+  const int imgW = image->GetWidth();
+  if ((imgW > 4) && ((imgW & 3) != 0)) return 0;
+  const int imgH = image->GetHeight();
+  if ((imgH > 4) && ((imgH & 3) != 0)) return 0;
+
   ImageLib::Image32* img = new ImageLib::Image32;
-  img->SetSize (image->GetWidth(), image->GetHeight());
+  img->SetSize (imgW, imgH);
   ImageLib::Color* p = img->GetPixels();
 
-  const size_t imagePixels = image->GetWidth() * image->GetHeight();
+  const size_t imagePixels = imgW * imgH;
   size_t pixNum = imagePixels;
   csRGBpixel* pix = (csRGBpixel*)image->GetImageData();
   while (pixNum-- > 0)
@@ -85,28 +89,37 @@ bool csDDSSaver::SaveDXT (csMemFile& out, iImage* image,
   }
 
   // Floyd/Steinberg (modified) error diffusion
-  img->DiffuseError((method == ImageLib::DC_DXT3) ? 4 : 8, 5, 6, 5);
+  bool dither = false;
+  if (options.GetBool ("dither", dither))
+  {
+    img->DiffuseError((method == ImageLib::DC_DXT3) ? 4 : 8, 5, 6, 5);
+  }
 
   // Build the DXTC texture
   ImageLib::ImageDXTC dxtc;
   dxtc.FromImage32 (img, method);
 
   out.Write ((char*)dxtc.GetBlocks(), 
-    imagePixels / ((method == ImageLib::DC_DXT1) ? 2 : 1));
+    MAX(imagePixels, 16) / ((method == ImageLib::DC_DXT1) ? 2 : 1));
 
   delete img;
 
   return true;
 }
 
+uint csDDSSaver::SaveMips (csMemFile& out, iImage* image, Format* format)
+{
+  for (uint m = 0; m <= image->HasMipmaps(); m++)
+  {
+    csRef<iImage> mip = image->GetMipmap (m);
+    if (!format->Save (out, mip)) return 0;
+  }
+  return m;
+}
+
 csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image, 
   const csImageLoaderOptionsParser& options)
 {
-  // @@@ What about non-PO2 images?
-  if (!csIsPowerOf2 (image->GetWidth()) || !csIsPowerOf2 (image->GetHeight()))
-    return 0;
-  if (image->GetImageType() != csimg2D) return 0;
-
   if ((image->GetFormat() & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
   {
     image.AttachNew (new csImageMemory (image,
@@ -114,7 +127,7 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
   }
 
   csString format (
-    (image->GetFormat() & CS_IMGFMT_ALPHA) ? "a8r8g8b8" : "b8g8r8");
+    (image->GetFormat() & CS_IMGFMT_ALPHA) ? "b8g8r8a8" : "b8g8r8");
   if (options.GetString ("format", format))
   {
     if (format == "dxt")
@@ -125,7 +138,8 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
 	format = "dxt1";
     }
   }
-
+  bool noMipMaps = false;
+  options.GetBool ("nomipmaps", noMipMaps);
 
   dds::Header ddsHead;
   memset (&ddsHead, 0, sizeof (ddsHead));
@@ -138,8 +152,30 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
   ddsHead.height = image->GetHeight();
   ddsHead.pixelformat.size = sizeof(ddsHead.pixelformat);
   ddsHead.capabilities.caps1 = dds::DDSCAPS_TEXTURE;
+  if (image->HasMipmaps() && !noMipMaps)
+  {
+    ddsHead.mipmapcount = image->HasMipmaps()+1;
+    ddsHead.flags |= dds::DDSD_MIPMAPCOUNT;
+    ddsHead.capabilities.caps1 |= dds::DDSCAPS_MIPMAP | dds::DDSCAPS_COMPLEX;
+  }
+  if (image->GetImageType() == csimg3D)
+  {
+    ddsHead.depth = image->GetDepth();
+    ddsHead.flags |= dds::DDSD_DEPTH;
+    ddsHead.capabilities.caps1 |= dds::DDSCAPS_COMPLEX;
+    ddsHead.capabilities.caps2 |= dds::DDSCAPS2_VOLUME;
+  }
+  else if ((image->GetImageType() == csimgCube) 
+    && (image->HasSubImages() > 5))
+  {
+    ddsHead.capabilities.caps1 |= dds::DDSCAPS_COMPLEX;
+    ddsHead.capabilities.caps2 |= dds::DDSCAPS2_CUBEMAP
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEX | dds::DDSCAPS2_CUBEMAP_POSITIVEX
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEY | dds::DDSCAPS2_CUBEMAP_POSITIVEY
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEZ | dds::DDSCAPS2_CUBEMAP_POSITIVEZ;
+  }
 
-  SaverFunc saverFn = 0;
+  Format* saver = 0;
   if (format == "b8g8r8")
   {
     ddsHead.pixelformat.bitdepth = 24;
@@ -147,7 +183,7 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
     ddsHead.pixelformat.greenmask = 0x0000ff00;
     ddsHead.pixelformat.bluemask = 0x000000ff;
     ddsHead.pixelformat.flags = dds::DDPF_RGB;
-    saverFn = &SaveB8G8R8;
+    saver = new FmtB8G8R8;
   }
   else if (format == "b8g8r8a8")
   {
@@ -157,20 +193,23 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
     ddsHead.pixelformat.bluemask = 0x000000ff;
     ddsHead.pixelformat.alphamask = 0xff000000;
     ddsHead.pixelformat.flags = dds::DDPF_RGB | dds::DDPF_ALPHAPIXEL;
-    saverFn = &SaveB8G8R8A8;
+    saver = new FmtB8G8R8A8;
   }
   else if (format == "dxt1")
   {
+    if (image->GetImageType() != csimg2D) return 0;
     ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
     ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','1');
-    saverFn = &SaveDXT1;
+    saver = new FmtDXT (ImageLib::DC_DXT1, options);
   }
   else if (format == "dxt3")
   {
+    if (image->GetImageType() != csimg2D) return 0;
     ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
     ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','3');
-    saverFn = &SaveDXT3;
+    saver = new FmtDXT (ImageLib::DC_DXT3, options);
   }
+  if (!saver) return 0;
 
   csMemFile outFile;
   {
@@ -182,7 +221,50 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
       outFile.Write ((char*)&x, sizeof (x));
     }
   }
-  if (!saverFn || !saverFn (outFile, image)) return 0;
+  if (image->GetImageType() == csimgCube)
+  {
+    const uint mipcount = ddsHead.mipmapcount ? ddsHead.mipmapcount : 1;
+    for (int i = 0; i < 6; i++)
+    {
+      if (noMipMaps)
+      {
+	if (!saver->Save (outFile, image->GetSubImage (i))) 
+	{
+	  delete saver;
+	  return 0;
+	}
+      }
+      else
+      {
+	if (SaveMips (outFile, image->GetSubImage (i), saver) 
+	  != mipcount)
+	{
+	  delete saver;
+	  return 0;
+	}
+      }
+    }
+  }
+  else
+  {
+    if (noMipMaps)
+    {
+      if (!saver->Save (outFile, image)) 
+      {
+	delete saver;
+	return 0;
+      }
+    }
+    else
+    {
+      if (!SaveMips (outFile, image, saver)) 
+      {
+	delete saver;
+	return 0;
+      }
+    }
+  }
+  delete saver;
 
   csRef<iDataBuffer> fileData (outFile.GetAllData());
   return csPtr<iDataBuffer> (fileData);

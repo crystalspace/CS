@@ -31,16 +31,33 @@ struct iImage;
 
 class csDDSSaver
 {
-  typedef bool (*SaverFunc) (csMemFile& out, iImage* image);
+  class Format
+  {
+  public:
+    virtual ~Format() {}
+    virtual bool Save (csMemFile& out, iImage* image) = 0;
+  };
+  class FmtB8G8R8 : public Format
+  {
+    virtual bool Save (csMemFile& out, iImage* image);
+  };
+  class FmtB8G8R8A8 : public Format
+  {
+    virtual bool Save (csMemFile& out, iImage* image);
+  };
+  class FmtDXT : public Format
+  {
+  protected:
+    ImageLib::DXTCMethod method;
+    const csImageLoaderOptionsParser& options;
+  public:
+    FmtDXT (ImageLib::DXTCMethod method, 
+      const csImageLoaderOptionsParser& options) : method(method), 
+      options(options) {}
+    virtual bool Save (csMemFile& out, iImage* image);
+  };
 
-  static bool SaveB8G8R8 (csMemFile& out, iImage* image);
-  static bool SaveB8G8R8A8 (csMemFile& out, iImage* image);
-  static bool SaveDXT (csMemFile& out, iImage* image, 
-    ImageLib::DXTCMethod method);
-  static bool SaveDXT1 (csMemFile& out, iImage* image)
-  { return SaveDXT (out, image, ImageLib::DC_DXT1); }
-  static bool SaveDXT3 (csMemFile& out, iImage* image)
-  { return SaveDXT (out, image, ImageLib::DC_DXT3); }
+  uint SaveMips (csMemFile& out, iImage* image, Format* format);
 public:
   csPtr<iDataBuffer> Save (csRef<iImage> image, 
     const csImageLoaderOptionsParser& options);

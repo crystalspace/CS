@@ -57,15 +57,17 @@ void ImageDXTC::SetSize(long x, long y)
 	XSize = x;
 	YSize = y;
 
+	size_t pixNum = ((XSize + 3) / 4) * ((YSize + 3) / 4) * 16;
+
 	switch(Method)
 	{
 	case DC_DXT1:
-		pBlocks = new WORD[XSize * YSize / 2];
+		pBlocks = new WORD[pixNum / 2];
 		break;
 
 	case DC_DXT3:
 	//case DC_DXT5:
-		pBlocks = new WORD[XSize * YSize];
+		pBlocks = new WORD[pixNum];
 		break;
 
 	default:
@@ -110,6 +112,10 @@ AlphaType Alpha;
 	case DC_DXT3:
 		CompressDXT3(pSrc);
 		break;
+
+	/*case DC_DXT5:
+		CompressDXT5(pSrc);
+		break;*/
 	}
 }
 
@@ -291,6 +297,7 @@ Color		*pSrcPix, C, C2;
 long		xx, yy, AlphaCount;
 fCodebook	fcbSrc, fcb;
 DXTCGen		GQuant;
+Color*		allocSource = 0;
 
 	SetMethod(DC_DXT1);
 	SetSize(pSrcImg->GetXSize(), pSrcImg->GetYSize());
@@ -301,6 +308,16 @@ DXTCGen		GQuant;
 	dcb2.SetCount(4);
 
 	pSrc = pSrcImg->GetPixels();
+	if ((XSize < 4) || (YSize < 4))
+	{
+	  allocSource = new Color[4 * 4];
+	  memset (allocSource, 0, 4 * 4 * sizeof(Color));
+	  for(y=0; y<YSize; y++)
+	  {
+	    memcpy (allocSource + (y * 4), pSrc + (y * XSize), 
+	      sizeof(Color) * XSize);
+	  }
+	}
 	pDest = pBlocks;
 	for(y=0; y<YSize; y+=4)
 	{
@@ -310,9 +327,11 @@ DXTCGen		GQuant;
 			cb2.SetCount(0);
 			AlphaCount = 0;
 			pSrcPix = pSrc;
-			for(yy=0; yy<4; yy++)
+			const long maxYY = MIN(YSize-y, 4);
+			for(yy=0; yy<maxYY; yy++)
 			{
-				for(xx=0; xx<4; xx++)
+				const long maxXX = MIN(XSize-x, 4);
+				for(xx=0; xx<maxXX; xx++)
 				{
 					C.Col = pSrcPix[xx].Col & Mask1565;
 					if(C.a == 0x00)
@@ -386,6 +405,7 @@ DXTCGen		GQuant;
 		}
 		pSrc += XSize*3;
 	}
+	delete[] allocSource;
 }
 
 // ----------------------------------------------------------------------------
@@ -401,6 +421,8 @@ Color		*pSrcPix, C, C2;
 long		xx, yy;
 fCodebook	fcbSrc, fcb;
 DXTCGen		GQuant;
+Color*		allocSource = 0;
+
 	SetMethod(DC_DXT3);
 	SetSize(pSrcImg->GetXSize(), pSrcImg->GetYSize());
 
@@ -410,6 +432,16 @@ DXTCGen		GQuant;
 	dcb2.SetCount(4);
 
 	pSrc = pSrcImg->GetPixels();
+	if ((XSize < 4) || (YSize < 4))
+	{
+	  allocSource = new Color[4 * 4];
+	  memset (allocSource, 0, 4 * 4 * sizeof(Color));
+	  for(y=0; y<YSize; y++)
+	  {
+	    memcpy (allocSource + (y * 4), pSrc + (y * XSize), 
+	      sizeof(Color) * XSize);
+	  }
+	}
 	pDest = pBlocks;
 	for(y=0; y<YSize; y+=4)
 	{
@@ -418,9 +450,11 @@ DXTCGen		GQuant;
 			// Compute a unique color list for the block
 			cb2.SetCount(0);
 			pSrcPix = pSrc;
-			for(yy=0; yy<4; yy++)
+			const long maxYY = MIN(YSize-y, 4);
+			for(yy=0; yy<maxYY; yy++)
 			{
-				for(xx=0; xx<4; xx++)
+				const long maxXX = MIN(XSize-x, 4);
+				for(xx=0; xx<maxXX; xx++)
 				{
 					C.Col = pSrcPix[xx].Col & Mask0565;
 					cb[yy*4 + xx] = *(cbVector *)&C;
@@ -463,8 +497,103 @@ DXTCGen		GQuant;
 		}
 		pSrc += XSize*3;
 	}
+	delete[] allocSource;
 }
 
+
+// ----------------------------------------------------------------------------
+// Build a DXT3 image from an Image32
+// ----------------------------------------------------------------------------
+/*
+void ImageDXTC::CompressDXT5(Image32 *pSrcImg)
+{
+long		x, y;
+WORD		*pDest;
+Color		*pSrc;
+CodeBook	cb, cb2, dcb, dcb2;
+Color		*pSrcPix, C, C2;
+long		xx, yy;
+fCodebook	fcbSrc, fcb;
+DXTCGen		GQuant;
+Color*		allocSource = 0;
+
+	SetMethod(DC_DXT5);
+	SetSize(pSrcImg->GetXSize(), pSrcImg->GetYSize());
+
+	cb.SetCount(16);
+	cb2.SetSize(16);
+	dcb.SetCount(4);
+	dcb2.SetCount(4);
+
+	pSrc = pSrcImg->GetPixels();
+	if ((XSize < 4) || (YSize < 4))
+	{
+	  allocSource = new Color[4 * 4];
+	  memset (allocSource, 0, 4 * 4 * sizeof(Color));
+	  for(y=0; y<YSize; y++)
+	  {
+	    memcpy (allocSource + (y * 4), pSrc + (y * XSize), 
+	      sizeof(Color) * XSize);
+	  }
+	}
+	pDest = pBlocks;
+	for(y=0; y<YSize; y+=4)
+	{
+		for(x=0; x<XSize; x+=4)
+		{
+			// Compute a unique color list for the block
+			cb2.SetCount(0);
+			pSrcPix = pSrc;
+			const long maxYY = MIN(YSize-y, 4);
+			for(yy=0; yy<maxYY; yy++)
+			{
+				const long maxXX = MIN(XSize-x, 4);
+				for(xx=0; xx<maxXX; xx++)
+				{
+					C.Col = pSrcPix[xx].Col & Mask0565;
+					cb[yy*4 + xx] = *(cbVector *)&C;
+					cb2.AddVector( *(cbVector *)&C );
+				}
+				pSrcPix += XSize;
+			}
+
+			EmitDXT5AlphaBlock(pDest, pSrc);
+			pDest += 4;
+
+			switch(cb2.NumCodes())
+			{
+			case 1:
+				C.Col = *(long *)&cb2[0];
+				Emit1ColorBlock(pDest, C);
+				break;
+
+			case 2:
+				C = *((Color *)&cb2[0]);
+				C2 = *((Color *)&cb2[1]);
+				Emit2ColorBlock(pDest, C, C2, pSrc);
+				break;
+
+			default:
+				{
+					long e3 = GQuant.Execute3(cb2, cb, dcb);
+					long e4 = GQuant.Execute4(cb2, cb, dcb2);
+
+					if(e3 < e4)
+						EmitMultiColorBlock3(pDest, dcb, pSrc);
+					else
+						EmitMultiColorBlock4(pDest, dcb2, pSrc);
+				}
+				break;
+			}
+
+			pDest += 4;
+			pSrc += 4;
+		}
+		pSrc += XSize*3;
+	}
+	delete[] allocSource;
+}
+*/
 
 // ----------------------------------------------------------------------------
 // Block emission routines follow - These routines take a block of input colors,
@@ -755,5 +884,66 @@ WORD Alpha;
 		pSrc += XSize;
 	}
 }
+
+/*
+void ImageDXTC::EmitDXT5AlphaBlock(WORD *pDest, Color *pSrc)
+{
+  int x, y, Shift;
+  WORD Alpha;
+  int minAlpha = 255, maxAlpha = 0;
+  int opCnt = 0, trCnt = 0;
+
+  for(y=0; y<4; y++)
+  {
+    for(x=0; x<4; x+=2)
+    {
+      Color& C1 = pSrc[y*4 + x];
+      Color& C2 = pSrc[y*4 + x+1];
+      if (C1.a < C2.a)
+      {
+	if (C1.a != 0)
+	{
+	  if (C1.a < minAlpha) minAlpha = C1.a;
+	}
+	else
+	  trCnt++;
+	if (C2.a != 0xff) 
+	{
+	  if (C2.a > maxAlpha) maxAlpha = C2.a;
+	}
+	else
+	  opCnt++;
+      }
+      else
+      {
+	if (C2.a != 0)
+	{
+	  if (C2.a < minAlpha) minAlpha = C2.a;
+	}
+	else
+	  trCnt++;
+	if (C1.a != 0xff) 
+	{
+	  if (C1.a > maxAlpha) maxAlpha = C1.a;
+	}
+	else
+	  opCnt++;
+      }
+    }
+  }
+
+  for(y=0; y<4; y++)
+  {
+	  Alpha = 0;
+	  for(x=0; x<4; x++)
+	  {
+		  Shift = x*4;
+		  Alpha |= (pSrc[x].a >> 4) << Shift;
+	  }
+	  pDest[y] = Alpha;
+	  pSrc += XSize;
+  }
+}
+*/
 
 } // end of namespace ImageLib
