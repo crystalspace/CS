@@ -7,6 +7,9 @@
 /**\file
  * Implementations of [v][a]snprintf()
  */
+/**\addtogroup util
+ * @{
+ */
 
 /**
  * Portable implementation of snprintf()
@@ -31,7 +34,7 @@ extern CS_CRYSTALSPACE_EXPORT int cs_asprintf (char **, const char *, ...)
     CS_GNUC_PRINTF (2, 3);
 /**
  * Portable implementation of vasprintf().
- * \copydoc asprintf
+ * \copydoc cs_asprintf
  * \sa \ref FormatterNotes
  */
 extern CS_CRYSTALSPACE_EXPORT int cs_vasprintf (char **, const char *, va_list)
