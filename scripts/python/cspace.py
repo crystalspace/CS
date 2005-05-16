@@ -838,6 +838,11 @@ class csTransform(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csTransform, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csTransform instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_csTransform):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
     def __init__(self, *args):
         _swig_setattr(self, csTransform, 'this', _cspace.new_csTransform(*args))
         _swig_setattr(self, csTransform, 'thisown', 1)
@@ -856,11 +861,6 @@ class csTransform(_object):
     if _newclass:GetReflect = staticmethod(_cspace.csTransform_GetReflect)
     def __mul__(*args): return _cspace.csTransform___mul__(*args)
     def __rmul__(*args): return _cspace.csTransform___rmul__(*args)
-    def __del__(self, destroy=_cspace.delete_csTransform):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
 
 class csTransformPtr(csTransform):
     def __init__(self, this):
@@ -1225,15 +1225,15 @@ class csPoly2DFactory(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csPoly2DFactory, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csPoly2DFactory instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def Create(*args): return _cspace.csPoly2DFactory_Create(*args)
-    def __init__(self, *args):
-        _swig_setattr(self, csPoly2DFactory, 'this', _cspace.new_csPoly2DFactory(*args))
-        _swig_setattr(self, csPoly2DFactory, 'thisown', 1)
     def __del__(self, destroy=_cspace.delete_csPoly2DFactory):
         try:
             if self.thisown: destroy(self)
         except: pass
 
+    def Create(*args): return _cspace.csPoly2DFactory_Create(*args)
+    def __init__(self, *args):
+        _swig_setattr(self, csPoly2DFactory, 'this', _cspace.new_csPoly2DFactory(*args))
+        _swig_setattr(self, csPoly2DFactory, 'thisown', 1)
 
 class csPoly2DFactoryPtr(csPoly2DFactory):
     def __init__(self, this):
