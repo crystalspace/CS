@@ -22,7 +22,6 @@
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
-#include "csutil/refarr.h"
 #include "imagetools.h"
 #include "rgbpixel.h"
 #include "imagebase.h"
