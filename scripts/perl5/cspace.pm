@@ -1090,6 +1090,17 @@ package cspace::csTransform;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csTransform($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csTransform(@_);
@@ -1109,17 +1120,6 @@ sub new {
 *Other2This = *cspacec::csTransform_Other2This;
 *GetReflect = *cspacec::csTransform_GetReflect;
 *__mult__ = *cspacec::csTransform___mult__;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csTransform($self);
-        delete $OWNER{$self};
-    }
-}
-
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -1519,13 +1519,6 @@ package cspace::csPoly2DFactory;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Create = *cspacec::csPoly2DFactory_Create;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPoly2DFactory(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -1535,6 +1528,13 @@ sub DESTROY {
         cspacec::delete_csPoly2DFactory($self);
         delete $OWNER{$self};
     }
+}
+
+*Create = *cspacec::csPoly2DFactory_Create;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPoly2DFactory(@_);
+    bless $self, $pkg if defined($self);
 }
 
 sub DISOWN {
