@@ -17,6 +17,7 @@ chronological order.
 	  rare cases.
 	- res added support for mipmap generation to gfxtest.
 	- res added DXT5 compression support to the DDS saver.
+	- res made the PNG, JPG, JNG savers use csImageLoaderOptionsParser.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and

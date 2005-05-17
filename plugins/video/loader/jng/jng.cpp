@@ -28,6 +28,7 @@
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
+#include "csplugincommon/imageloader/optionsparser.h"
 #include "ivaria/reporter.h"
 
 extern "C"
@@ -358,60 +359,28 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
        compress=50
        progressive,compress=30
    */
-  const char *current_opt = extraoptions;
-  while (current_opt && *current_opt)
+  csImageLoaderOptionsParser optparser (extraoptions);
+  optparser.GetBool ("progressive", progressive);
+  if (optparser.GetInt ("compress", quality))
   {
-    if (*current_opt == ',') current_opt++;
-
-    const char *opt_end = strchr (current_opt, ',');
-    if (!opt_end) opt_end = strchr (current_opt, 0);
-
-    csString opt_key;
-    opt_key.Append (current_opt, opt_end - current_opt);
-    current_opt = opt_end;
-
-    csString opt_value;
-    size_t opt_value_pos = opt_key.FindFirst ('=');
-    if (opt_value_pos != (size_t)-1)
-    {
-      opt_key.SubString (opt_value, opt_value_pos + 1, 
-        opt_key.Length() - opt_value_pos);
-      opt_key.Truncate (opt_value_pos);
-    }
-
-    if (!strcmp (opt_key, "compress"))
-    {
-      if (opt_value)
-      {
-	quality = 100 - atoi (opt_value);
-        if (alpha_jpeg_quality == -1) alpha_jpeg_quality = quality;
-      }
-    }
-    else if (!strcmp (opt_key, "progressive"))
-    {
-      progressive = true;
-    }
-    else if (!strcmp (opt_key, "jng_lossy_alpha"))
-    {
-      alpha_jpeg = true;
-      if (alpha_jpeg_quality == -1) alpha_jpeg_quality = quality;
-    }
-    else if (!strcmp (opt_key, "jng_alpha_compress"))
-    {
-      if (opt_value)
-      {
-	alpha_jpeg_quality = 100 - atoi (opt_value);
-	alpha_png_compress = atoi (opt_value) / 10;
-      }
-    }
+    quality = 100 - quality;
+    if (quality < 0) quality = 0;
+    if (quality > 100) quality = 100;
+    if (alpha_jpeg_quality == -1) alpha_jpeg_quality = quality;
   }
-
-  if (quality < 0) quality = 0;
-  if (quality > 100) quality = 100;
-  if (alpha_jpeg_quality < 0) alpha_jpeg_quality = 0;
-  if (alpha_jpeg_quality > 100) alpha_jpeg_quality = 100;
-  if (alpha_png_compress < 0) alpha_png_compress = 0;
-  if (alpha_png_compress > 9) alpha_png_compress = 9;
+  if (optparser.GetBool ("jng_lossy_alpha", alpha_jpeg))
+  {
+    if (alpha_jpeg_quality == -1) alpha_jpeg_quality = quality;
+  }
+  if (optparser.GetInt ("jng_alpha_compress", alpha_png_compress))
+  {
+    alpha_jpeg_quality = 100 - alpha_png_compress;
+    if (alpha_jpeg_quality < 0) alpha_jpeg_quality = 0;
+    if (alpha_jpeg_quality > 100) alpha_jpeg_quality = 100;
+    alpha_png_compress /= 10;
+    if (alpha_png_compress < 0) alpha_png_compress = 0;
+    if (alpha_png_compress > 9) alpha_png_compress = 9;
+  }
 
   mng_handle handle = mng_initialize ( mng_ptr(this), cb_alloc, 
                                       cb_free, MNG_NULL);

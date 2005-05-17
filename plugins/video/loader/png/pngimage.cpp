@@ -24,6 +24,7 @@
 #include "csutil/csendian.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csplugincommon/imageloader/optionsparser.h"
 #include <math.h>
 
 extern "C"
@@ -135,7 +136,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     return 0;
 
   int compress = 6;
-  volatile bool interlace = false;
+  bool interlace = false;
   /*
      parse output options.
      options are a comma-separated list and can be either
@@ -150,40 +151,14 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
        compress=50
        progressive,compress=30
    */
-  const char *current_opt = extraoptions;
-  while (current_opt && *current_opt)
+  csImageLoaderOptionsParser optparser (extraoptions);
+  optparser.GetBool ("progressive", interlace);
+  if (optparser.GetInt ("compress", compress))
   {
-    if (*current_opt == ',') current_opt++;
-
-    const char *opt_end = strchr (current_opt, ',');
-    if (!opt_end) opt_end = strchr (current_opt, 0);
-
-    csString opt_key;
-    opt_key.Append (current_opt, opt_end - current_opt);
-    current_opt = opt_end;
-
-    csString opt_value;
-    size_t opt_value_pos = opt_key.FindFirst ('=');
-    if (opt_value_pos != (size_t)-1)
-    {
-      opt_key.SubString (opt_value, opt_value_pos + 1, 
-        opt_key.Length() - opt_value_pos);
-      opt_key.Truncate (opt_value_pos);
-    }
-
-    if (!strcmp (opt_key, "compress"))
-    {
-      if (opt_value)
-	compress = atoi (opt_value) / 10;
-    }
-    else if (!strcmp (opt_key, "progressive"))
-    {
-      interlace = true;
-    }
+    compress /= 10;
+    if (compress < 0) compress = 0;
+    if (compress > 9) compress = 9;
   }
-
-  if (compress < 0) compress = 0;
-  if (compress > 9) compress = 9;
 
   datastore ds;
 

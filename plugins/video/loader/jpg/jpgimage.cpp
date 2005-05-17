@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "csutil/scf.h"
+#include "csplugincommon/imageloader/optionsparser.h"
 #include "jpgimage.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
@@ -210,8 +211,8 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
   } /* endswitch */
 
   // compression options
-  volatile int quality = 80;
-  volatile bool progressive = false;
+  int quality = 80;
+  bool progressive = false;
 
   /*
      parse output options.
@@ -227,40 +228,14 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
        compress=50
        progressive,compress=30
    */
-  const char *current_opt = extraoptions;
-  while (current_opt && *current_opt)
+  csImageLoaderOptionsParser optparser (extraoptions);
+  optparser.GetBool ("progressive", progressive);
+  if (optparser.GetInt ("compress", quality))
   {
-    if (*current_opt == ',') current_opt++;
-
-    const char *opt_end = strchr (current_opt, ',');
-    if (!opt_end) opt_end = strchr (current_opt, 0);
-
-    csString opt_key;
-    opt_key.Append (current_opt, opt_end - current_opt);
-    current_opt = opt_end;
-
-    csString opt_value;
-    size_t opt_value_pos = opt_key.FindFirst ('=');
-    if (opt_value_pos != (size_t)-1)
-    {
-      opt_key.SubString (opt_value, opt_value_pos + 1, 
-        opt_key.Length() - opt_value_pos);
-      opt_key.Truncate (opt_value_pos);
-    }
-
-    if (!strcmp (opt_key, "compress"))
-    {
-      if (opt_value)
-	quality = 100 - atoi (opt_value);
-    }
-    else if (!strcmp (opt_key, "progressive"))
-    {
-      progressive = true;
-    }
+    quality = 100 - quality;
+    if (quality < 0) quality = 0;
+    if (quality > 100) quality = 100;
   }
-
-  if (quality < 0) quality = 0;
-  if (quality > 100) quality = 100;
 
   JSAMPLE* volatile row = 0;
   struct jpg_datastore ds;
