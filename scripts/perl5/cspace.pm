@@ -10713,6 +10713,8 @@ package cspace::iTextureHandle;
 *GetRendererDimensions = *cspacec::iTextureHandle_GetRendererDimensions;
 *GetOriginalDimensions = *cspacec::iTextureHandle_GetOriginalDimensions;
 *GetTextureTarget = *cspacec::iTextureHandle_GetTextureTarget;
+*RGBA8888 = *cspacec::iTextureHandle_RGBA8888;
+*BGRA8888 = *cspacec::iTextureHandle_BGRA8888;
 *Blit = *cspacec::iTextureHandle_Blit;
 *GetImageName = *cspacec::iTextureHandle_GetImageName;
 *GetCacheData = *cspacec::iTextureHandle_GetCacheData;
