@@ -12,3 +12,7 @@ Notes:
 - Everything was stuffed into a namespace.
 - The files CodeBook4MMX.*, Load*.* and Usage.cpp are only here for 
   completeness' sake, but aren't used by CS itself.
+
+Additions:
+- Support for images <4x4.
+- DXT5 saving.

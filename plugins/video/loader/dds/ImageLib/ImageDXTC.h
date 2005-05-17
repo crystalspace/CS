@@ -19,7 +19,7 @@ typedef enum
 	DC_None,
 	DC_DXT1,
 	DC_DXT3,
-	//DC_DXT5,
+	DC_DXT5,
 } DXTCMethod;
 
 
@@ -43,9 +43,11 @@ private:
 	void		EmitMultiColorBlock4(WORD *pDest, CodeBook &cb, Color *pSrc);
 	void		EmitMultiColorBlockTrans(WORD *pDest, CodeBook &cb, Color *pSrc);
 	void		Emit4BitAlphaBlock(WORD *pDest, Color *pSrc);
-	//void		EmitDXT5AlphaBlock(WORD *pDest, Color *pSrc);
 
-
+	void		Emit1AlphaBlock (WORD *pDest, Color c);
+	void		Emit2AlphaBlock (WORD *pDest, Color c, Color c2, Color *pSrc);
+	void		EmitMultiAlphaBlock8(WORD *pDest, CodeBook &cb, Color *pSrc);
+	void		EmitMultiAlphaBlock6(WORD *pDest, CodeBook &cb, Color *pSrc);
 public:
 	ImageDXTC();
 	~ImageDXTC();
@@ -65,7 +67,7 @@ public:
 
 	void	CompressDXT1(Image32 *pSrcImg);		// Potentially called by FromImage32
 	void	CompressDXT3(Image32 *pSrcImg);		// Potentially called by FromImage32
-	//void	CompressDXT5(Image32 *pSrcImg);		// Potentially called by FromImage32
+	void	CompressDXT5(Image32 *pSrcImg);		// Potentially called by FromImage32
 };
 
 } // end of namespace ImageLib

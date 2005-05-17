@@ -99,8 +99,13 @@ bool csDDSSaver::FmtDXT::Save (csMemFile& out, iImage* image)
   ImageLib::ImageDXTC dxtc;
   dxtc.FromImage32 (img, method);
 
-  out.Write ((char*)dxtc.GetBlocks(), 
-    MAX(imagePixels, 16) / ((method == ImageLib::DC_DXT1) ? 2 : 1));
+  uint16* dxtBlocks = (uint16*)dxtc.GetBlocks();
+  size_t wordCount = (MAX(imgW, 4)*MAX(imgH, 4)) / ((method == ImageLib::DC_DXT1) ? 4 : 2);
+  while (wordCount-- > 0)
+  {
+    uint16 ui16 = csLittleEndianShort (*dxtBlocks++);
+    out.Write ((char*)&ui16, sizeof (ui16));
+  }
 
   delete img;
 
@@ -134,7 +139,7 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
     if (format == "dxt")
     {
       if (image->GetFormat() & CS_IMGFMT_ALPHA)
-	format = "dxt3"; // "dxt5";
+	format = "dxt5";
       else
 	format = "dxt1";
     }
@@ -209,6 +214,13 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
     ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
     ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','3');
     saver = new FmtDXT (ImageLib::DC_DXT3, options);
+  }
+  else if (format == "dxt5")
+  {
+    if (image->GetImageType() != csimg2D) return 0;
+    ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
+    ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','5');
+    saver = new FmtDXT (ImageLib::DC_DXT5, options);
   }
   if (!saver) return 0;
 

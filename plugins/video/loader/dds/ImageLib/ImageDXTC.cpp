@@ -15,6 +15,7 @@ namespace ImageLib
 
 const unsigned long Mask1565 = 0xf8fcf880;
 const unsigned long Mask0565 = 0xf8fcf800;
+const unsigned long MaskAlpha = 0x000000ff;
 
 ImageDXTC::ImageDXTC()
 {
@@ -66,7 +67,7 @@ void ImageDXTC::SetSize(long x, long y)
 		break;
 
 	case DC_DXT3:
-	//case DC_DXT5:
+	case DC_DXT5:
 		pBlocks = new WORD[pixNum];
 		break;
 
@@ -113,9 +114,9 @@ AlphaType Alpha;
 		CompressDXT3(pSrc);
 		break;
 
-	/*case DC_DXT5:
+	case DC_DXT5:
 		CompressDXT5(pSrc);
-		break;*/
+		break;
 	}
 }
 
@@ -502,19 +503,18 @@ Color*		allocSource = 0;
 
 
 // ----------------------------------------------------------------------------
-// Build a DXT3 image from an Image32
+// Build a DXT5 image from an Image32
 // ----------------------------------------------------------------------------
-/*
 void ImageDXTC::CompressDXT5(Image32 *pSrcImg)
 {
 long		x, y;
 WORD		*pDest;
 Color		*pSrc;
-CodeBook	cb, cb2, dcb, dcb2;
+CodeBook	cb, cb2, dcb, dcb2, cbA, cbA2, dcbA, dcbA2;
 Color		*pSrcPix, C, C2;
 long		xx, yy;
 fCodebook	fcbSrc, fcb;
-DXTCGen		GQuant;
+DXTCGen		GQuant, GQuantA;
 Color*		allocSource = 0;
 
 	SetMethod(DC_DXT5);
@@ -524,6 +524,10 @@ Color*		allocSource = 0;
 	cb2.SetSize(16);
 	dcb.SetCount(4);
 	dcb2.SetCount(4);
+	cbA.SetCount(16);
+	cbA2.SetSize(16);
+	dcbA.SetCount(8);
+	dcbA2.SetCount(8);
 
 	pSrc = pSrcImg->GetPixels();
 	if ((XSize < 4) || (YSize < 4))
@@ -543,6 +547,7 @@ Color*		allocSource = 0;
 		{
 			// Compute a unique color list for the block
 			cb2.SetCount(0);
+			cbA2.SetCount(0);
 			pSrcPix = pSrc;
 			const long maxYY = MIN(YSize-y, 4);
 			for(yy=0; yy<maxYY; yy++)
@@ -553,11 +558,36 @@ Color*		allocSource = 0;
 					C.Col = pSrcPix[xx].Col & Mask0565;
 					cb[yy*4 + xx] = *(cbVector *)&C;
 					cb2.AddVector( *(cbVector *)&C );
+
+					C.Col = pSrcPix[xx].Col & MaskAlpha;
+					cbA[yy*4 + xx] = *(cbVector *)&C;
+					cbA2.AddVector( *(cbVector *)&C );
 				}
 				pSrcPix += XSize;
 			}
 
-			EmitDXT5AlphaBlock(pDest, pSrc);
+			switch (cbA2.NumCodes())
+			{
+			  case 1:
+			    C.Col = *(long *)&cbA2[0];
+			    Emit1AlphaBlock (pDest, C);
+			    break;
+			  case 2:
+			    C = *((Color *)&cbA2[0]);
+			    C2 = *((Color *)&cbA2[1]);
+			    Emit2AlphaBlock (pDest, C, C2, pSrc);
+			    break;
+			  default:
+			    {
+			      long e8 = GQuant.Execute8(cbA2, cbA, dcbA);
+			      long e6 = GQuant.Execute6(cbA2, cbA, dcbA2);
+			      if (e8 < e6)
+				EmitMultiAlphaBlock8(pDest, dcbA, pSrc);
+			      else
+				EmitMultiAlphaBlock6(pDest, dcbA2, pSrc);
+			    }
+			    break;
+			}
 			pDest += 4;
 
 			switch(cb2.NumCodes())
@@ -593,7 +623,6 @@ Color*		allocSource = 0;
 	}
 	delete[] allocSource;
 }
-*/
 
 // ----------------------------------------------------------------------------
 // Block emission routines follow - These routines take a block of input colors,
@@ -885,65 +914,176 @@ WORD Alpha;
 	}
 }
 
-/*
-void ImageDXTC::EmitDXT5AlphaBlock(WORD *pDest, Color *pSrc)
+void ImageDXTC::Emit1AlphaBlock (WORD *pDest, Color c)
 {
-  int x, y, Shift;
-  WORD Alpha;
-  int minAlpha = 255, maxAlpha = 0;
-  int opCnt = 0, trCnt = 0;
+  pDest[0] = c.a * 0x101;
+  pDest[1] = 0;
+  pDest[2] = 0;
+  pDest[3] = 0;
+}
 
-  for(y=0; y<4; y++)
+void ImageDXTC::Emit2AlphaBlock (WORD *pDest, Color c, Color c2, Color *pSrc)
+{
+  uint v1, v2;
+  if (c.a > c2.a)
   {
-    for(x=0; x<4; x+=2)
+    pDest[0] = c.a | (c2.a << 8);
+    v1 = 0x0; v2 = 0x1;
+  }
+  else
+  {
+    pDest[0] = c2.a | (c.a << 8);
+    v1 = 0x1; v2 = 0x0;
+  }
+  uint alpha[2];
+  alpha[0] = alpha[1] = 0;
+  for (int i = 0; i < 2; i++)
+  {
+    int shift = 0;
+    for (int y = 0; y < 2; y++)
     {
-      Color& C1 = pSrc[y*4 + x];
-      Color& C2 = pSrc[y*4 + x+1];
-      if (C1.a < C2.a)
+      for (int x = 0; x < 4; x++)
       {
-	if (C1.a != 0)
-	{
-	  if (C1.a < minAlpha) minAlpha = C1.a;
-	}
+	if (pSrc[x].a == c.a)
+	  alpha[i] |= v1 << shift;
 	else
-	  trCnt++;
-	if (C2.a != 0xff) 
-	{
-	  if (C2.a > maxAlpha) maxAlpha = C2.a;
-	}
-	else
-	  opCnt++;
+	  alpha[i] |= v2 << shift;
+	shift += 3;
       }
-      else
-      {
-	if (C2.a != 0)
-	{
-	  if (C2.a < minAlpha) minAlpha = C2.a;
-	}
-	else
-	  trCnt++;
-	if (C1.a != 0xff) 
-	{
-	  if (C1.a > maxAlpha) maxAlpha = C1.a;
-	}
-	else
-	  opCnt++;
-      }
+      pSrc += XSize;
     }
   }
-
-  for(y=0; y<4; y++)
-  {
-	  Alpha = 0;
-	  for(x=0; x<4; x++)
-	  {
-		  Shift = x*4;
-		  Alpha |= (pSrc[x].a >> 4) << Shift;
-	  }
-	  pDest[y] = Alpha;
-	  pSrc += XSize;
-  }
+  pDest[1] = alpha[0] & 0xffff;
+  pDest[2] = (alpha[0] >> 16) | ((alpha[1] & 0xff) << 8);
+  pDest[3] = alpha[1] >> 8;
 }
-*/
+
+void ImageDXTC::EmitMultiAlphaBlock8 (WORD *pDest, CodeBook &cb, Color *pSrc)
+{
+  Color C, C2;
+
+  C = *((Color *)&cb[0]);
+  C2 = *((Color *)&cb[1]);
+
+  if(C.a > C2.a)
+  {
+    pDest[0] = C.a | (C2.a << 8);
+  }
+  else if (C.a < C2.a)
+  {
+    *((Color *)&cb[0]) = C2;
+    *((Color *)&cb[1]) = C;
+    C = *((Color *)&cb[2]);		// Shuffle the color table order around
+    C2 = *((Color *)&cb[7]);
+    *((Color *)&cb[2]) = C2;
+    *((Color *)&cb[7]) = C;
+    C = *((Color *)&cb[3]);		// Shuffle the color table order around
+    C2 = *((Color *)&cb[6]);
+    *((Color *)&cb[3]) = C2;
+    *((Color *)&cb[6]) = C;
+    C = *((Color *)&cb[4]);		// Shuffle the color table order around
+    C2 = *((Color *)&cb[5]);
+    *((Color *)&cb[4]) = C2;
+    *((Color *)&cb[5]) = C;
+
+    C = *((Color *)&cb[0]);
+    C2 = *((Color *)&cb[1]);
+
+    pDest[0] = C.a | (C2.a << 8);
+  }
+  else
+  {
+    // Both colors are equal - Emit the block and return
+    pDest[0] = C.a * 0x101;
+    pDest[1] = pDest[2] = pDest[3] = 0;
+    return;
+  }
+
+  pDest[1] = 0;
+  pDest[2] = 0;
+  pDest[3] = 0;
+
+  uint alpha[2];
+  alpha[0] = alpha[1] = 0;
+  for (int i = 0; i < 2; i++)
+  {
+    int shift = 0;
+    for (int y = 0; y < 2; y++)
+    {
+      for (int x = 0; x < 4; x++)
+      {
+	long Index = cb.FindVectorSlow( *((cbVector *)(pSrc+x)) );
+	alpha[i] |= Index << shift;
+	shift += 3;
+      }
+      pSrc += XSize;
+    }
+  }
+  pDest[1] = alpha[0] & 0xffff;
+  pDest[2] = (alpha[0] >> 16) | ((alpha[1] & 0xff) << 8);
+  pDest[3] = alpha[1] >> 8;
+}
+
+void ImageDXTC::EmitMultiAlphaBlock6 (WORD *pDest, CodeBook &cb, Color *pSrc)
+{
+  Color C, C2;
+
+  C = *((Color *)&cb[0]);
+  C2 = *((Color *)&cb[1]);
+
+  if(C.a < C2.a)
+  {
+    pDest[0] = C.a | (C2.a << 8);
+  }
+  else if (C.a > C2.a)
+  {
+    *((Color *)&cb[0]) = C2;
+    *((Color *)&cb[1]) = C;
+    C = *((Color *)&cb[2]);		// Shuffle the color table order around
+    C2 = *((Color *)&cb[5]);
+    *((Color *)&cb[2]) = C2;
+    *((Color *)&cb[5]) = C;
+    C = *((Color *)&cb[3]);		// Shuffle the color table order around
+    C2 = *((Color *)&cb[4]);
+    *((Color *)&cb[3]) = C2;
+    *((Color *)&cb[4]) = C;
+
+    C = *((Color *)&cb[0]);
+    C2 = *((Color *)&cb[1]);
+
+    pDest[0] = C.a | (C2.a << 8);
+  }
+  else
+  {
+    // Both colors are equal - Emit the block and return
+    pDest[0] = C.a * 0x101;
+    pDest[1] = pDest[2] = pDest[3] = 0;
+    return;
+  }
+
+  pDest[1] = 0;
+  pDest[2] = 0;
+  pDest[3] = 0;
+
+  uint alpha[2];
+  alpha[0] = alpha[1] = 0;
+  for (int i = 0; i < 2; i++)
+  {
+    int shift = 0;
+    for (int y = 0; y < 2; y++)
+    {
+      for (int x = 0; x < 4; x++)
+      {
+	long Index = cb.FindVectorSlow( *((cbVector *)(pSrc+x)) );
+	alpha[i] |= Index << shift;
+	shift += 3;
+      }
+      pSrc += XSize;
+    }
+  }
+  pDest[1] = alpha[0] & 0xffff;
+  pDest[2] = (alpha[0] >> 16) | ((alpha[1] & 0xff) << 8);
+  pDest[3] = alpha[1] >> 8;
+}
 
 } // end of namespace ImageLib

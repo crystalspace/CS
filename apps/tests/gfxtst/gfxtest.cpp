@@ -63,7 +63,9 @@ static struct option long_options[] =
   {"paletted", no_argument, 0, '8'},
   {"truecolor", no_argument, 0, 'c'},
   {"strip-alpha", no_argument, 0, 'a'},
+  {"add-alpha", no_argument, 0, 'A'},
   {"sharpen", required_argument, 0, 'p'},
+  {"mipmaps", no_argument, 0, 'N'},
   {"save", optional_argument, 0, 'S'},
   {"mime", required_argument, 0, 'M'},
   {"options", required_argument, 0, 'O'},
@@ -91,6 +93,7 @@ static struct
   bool stripalpha;
   bool addalpha;
   int sharpen;
+  bool mipmaps;
 } opt =
 {
   false,
@@ -106,7 +109,8 @@ static struct
   1/500.0f,
   false,
   false,
-  0
+  0,
+  false
 };
 // Dont move inside the struct!
 static csRGBpixel transpcolor;
@@ -136,6 +140,7 @@ static int display_help ()
   csPrintf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
   csPrintf ("  -A   --add-alpha     Add alpha channel, if not present\n");
   csPrintf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
+  csPrintf ("  -N   --mipmaps       Generate mipmaps for the image\n");
   csPrintf ("------------------ Output options (-S, -D, -H are exclusive):  -----------------\n");
   csPrintf ("  -S   --save[=#]      Output an image (default)\n");
   csPrintf ("  -M   --mime=#        Output file mime type (default: image/png)\n");
@@ -411,6 +416,21 @@ static bool process_file (const char *fname)
       opt.transp ? &transpcolor : 0);
   }
 
+  if (opt.mipmaps)
+  {
+    csImageMemory* newImage = new csImageMemory (ifile);
+    csRef<iImage> mip = ifile;
+    uint m = 1;
+    while ((mip->GetWidth() > 1) || (mip->GetHeight() > 1) 
+      || (mip->GetDepth() > 1))
+    {
+      mip = csImageManipulate::Mipmap (mip, 1, opt.transp ? &transpcolor : 0);
+      newImage->SetMipmap (m, mip);
+      m++;
+    }
+    ifile.AttachNew (newImage);
+  }
+
   bool success = false;
   switch (opt.outputmode)
   {
@@ -435,7 +455,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVFT", long_options, 0)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVFTN", long_options, 0)) != EOF)
     switch (c)
     {
       case '?':
@@ -455,6 +475,9 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         break;
       case 'A':
         opt.addalpha = true;
+        break;
+      case 'N':
+        opt.mipmaps = true;
         break;
       case 'P':
 	if (optarg && sscanf (optarg, "%s", prefix_name) != 1)
