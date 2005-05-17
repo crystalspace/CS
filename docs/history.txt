@@ -8,6 +8,10 @@ chronological order.
 
 17-May-2005
 	- Jorrit fixed a compile error in the DDS saver.
+	- Jorrit removed the virtual destructor in iBase and csRunnable
+	  as it causes bad problems on destruction of mesh wrappers for
+	  some weird reason (pure virtual calls at destruction).
+	  The warnings with GCC4 will have to be solved some other way.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and

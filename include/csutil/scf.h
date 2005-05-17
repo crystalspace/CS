@@ -76,10 +76,12 @@ typedef unsigned long scfInterfaceID;
  */
 struct iBase
 {
-protected:
-  // Needed for GCC4. Otherwise emits a flood of "virtual functions but
-  // non-virtual destructor" warnings.
-  virtual ~iBase() {}
+// Jorrit: removed the code below as it causes 'pure virtual' method
+// calls to happen upon destruction.
+//protected:
+  //// Needed for GCC4. Otherwise emits a flood of "virtual functions but
+  //// non-virtual destructor" warnings.
+  //virtual ~iBase() {}
 public:
   /// Increment the number of references to this object.
   virtual void IncRef () = 0;
