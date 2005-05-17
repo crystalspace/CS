@@ -109,7 +109,8 @@ bool csDDSSaver::FmtDXT::Save (csMemFile& out, iImage* image)
 
 uint csDDSSaver::SaveMips (csMemFile& out, iImage* image, Format* format)
 {
-  for (uint m = 0; m <= image->HasMipmaps(); m++)
+  uint m;
+  for (m = 0; m <= image->HasMipmaps(); m++)
   {
     csRef<iImage> mip = image->GetMipmap (m);
     if (!format->Save (out, mip)) return 0;
