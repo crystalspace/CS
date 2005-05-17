@@ -68,6 +68,10 @@ protected:
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
   csImageType imageType;
+  /// Mip map images.
+  /* @@@ This is not csRefArray<iImage> as this does not return csRef<iImage>&
+   * from GetExtend() or operator[], which is needed here.
+   */
   csArray<csRef<iImage> > mipmaps;
 
   /**
