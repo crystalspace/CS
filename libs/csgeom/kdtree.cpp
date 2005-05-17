@@ -276,6 +276,9 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
   if (mina < node_bbox.Min (axis)) mina = node_bbox.Min (axis);
   if (maxa > node_bbox.Max (axis)) maxa = node_bbox.Max (axis);
 
+  // If mina and maxa are almost the same then reject.
+  if (fabs (mina-maxa) < 0.0001f) return -1.0f;
+
   // Do 10 tests to find best split location. This should
   // probably be a configurable parameter.
 

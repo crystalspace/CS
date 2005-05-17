@@ -12,6 +12,9 @@ chronological order.
 	  as it causes bad problems on destruction of mesh wrappers for
 	  some weird reason (pure virtual calls at destruction).
 	  The warnings with GCC4 will have to be solved some other way.
+	- Jorrit fixed a problem in the csKDTree code which could cause
+	  frustvis and dynavis to get into infinite recursion in some very
+	  rare cases.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and
