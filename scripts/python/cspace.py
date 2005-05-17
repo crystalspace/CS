@@ -9707,6 +9707,8 @@ class iTextureHandle(iBase):
     def GetRendererDimensions(*args): return _cspace.iTextureHandle_GetRendererDimensions(*args)
     def GetOriginalDimensions(*args): return _cspace.iTextureHandle_GetOriginalDimensions(*args)
     def GetTextureTarget(*args): return _cspace.iTextureHandle_GetTextureTarget(*args)
+    RGBA8888 = _cspace.iTextureHandle_RGBA8888
+    BGRA8888 = _cspace.iTextureHandle_BGRA8888
     def Blit(*args): return _cspace.iTextureHandle_Blit(*args)
     def GetImageName(*args): return _cspace.iTextureHandle_GetImageName(*args)
     def GetCacheData(*args): return _cspace.iTextureHandle_GetCacheData(*args)
