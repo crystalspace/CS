@@ -37,7 +37,7 @@ struct iProgressMeter : public iBase
    * \sa \ref FormatterNotes
    */
   virtual void SetProgressDescription (const char* id,
-  	const char* description, ...) CS_GNUC_PRINTF (3, 4) = 0;
+        const char* description, ...) CS_GNUC_PRINTF (3, 4) = 0;
 
   /**
    * Set the id and description of what we are currently monitoring.
@@ -45,13 +45,13 @@ struct iProgressMeter : public iBase
    * \sa \ref FormatterNotes
    */
   virtual void SetProgressDescriptionV (const char* id,
-  	const char* description, va_list) = 0;
+        const char* description, va_list) = 0;
 
   /**
-   * Increment the meter by one unit.
+   * Increment the meter by n units, default 1.
    * If the meter reaches 100% it should automatically stop itself.
    */
-  virtual void Step () = 0;
+  virtual void Step (unsigned int n = 1) = 0;
   /// Reset the meter to 0%.
   virtual void Reset () = 0;
   /// Reset the meter and print the initial tick mark ("0%").
