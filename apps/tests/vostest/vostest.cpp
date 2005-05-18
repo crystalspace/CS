@@ -55,6 +55,7 @@
 #include "ivaria/engseq.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/event.h"
+#include "csutil/cspmeter.h"
 
 #include "inetwork/vosa3dl.h"
 #include "inetwork/vosapi.h"
@@ -174,6 +175,7 @@ bool Vostest::Initialize ()
                                       CS_REQUEST_IMAGELOADER,
                                       CS_REQUEST_REPORTER,
                                       CS_REQUEST_REPORTERLISTENER,
+                                      CS_REQUEST_CONSOLEOUT,
                                       CS_REQUEST_PLUGIN("crystalspace.network.vos.a3dl", iVosA3DL),
                                       CS_REQUEST_END))
   {
@@ -282,7 +284,18 @@ bool Vostest::Initialize ()
 
   try {
     csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
-    vossector->Load();
+
+    csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(object_reg, iConsoleOutput);
+    if(console.IsValid())
+    {
+      csTextProgressMeter* meter = new csTextProgressMeter(console);
+      vossector->Load(meter);
+    }
+    else
+    {
+      vossector->Load();
+    }
+
     view->GetCamera()->SetSector(vossector->GetSector());
 #else
     csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
