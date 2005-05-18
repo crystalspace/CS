@@ -29,6 +29,8 @@ chronological order.
 	  creates a csTinyDocumentSystem instance on the heap to an extension
 	  of csTinyDocumentSystem that just adds iComponent. This should avoid
 	  ref-counting related issues with xmltiny.
+	- res augmented csfgen to store some of the lately added font 
+	  attributes in CSF files.
 17-May-2005
 	- Jorrit fixed a compile error in the DDS saver.
 	- Jorrit removed the virtual destructor in iBase and csRunnable
