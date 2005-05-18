@@ -35,9 +35,9 @@ SCF_IMPLEMENT_IBASE (csTinyDocumentSystem)
   SCF_IMPLEMENTS_INTERFACE (iDocumentSystem)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyDocumentSystem::csTinyDocumentSystem ()
+csTinyDocumentSystem::csTinyDocumentSystem (iBase* parent)
 {
-  SCF_CONSTRUCT_IBASE (0);
+  SCF_CONSTRUCT_IBASE (parent);
 }
 
 csTinyDocumentSystem::~csTinyDocumentSystem ()

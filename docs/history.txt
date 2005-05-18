@@ -6,18 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-17-May-2005
-	- Jorrit fixed a compile error in the DDS saver.
-	- Jorrit removed the virtual destructor in iBase and csRunnable
-	  as it causes bad problems on destruction of mesh wrappers for
-	  some weird reason (pure virtual calls at destruction).
-	  The warnings with GCC4 will have to be solved some other way.
-	- Jorrit fixed a problem in the csKDTree code which could cause
-	  frustvis and dynavis to get into infinite recursion in some very
-	  rare cases.
-	- res added support for mipmap generation to gfxtest.
-	- res added DXT5 compression support to the DDS saver.
-	- res made the PNG, JPG, JNG savers use csImageLoaderOptionsParser.
+18-May-2005
 	- Peter Amstutz changed iProgressMeter::Step() so that it takes an
 	  unsigned int parameter indicating the number of steps to advance
 	  the meter (with a default value of 1)
@@ -36,6 +25,22 @@ chronological order.
 	  not get a proper parameter type set. This manifested itself in e.g.
 	  a non-working parallax shader.
 	- res fixed some memory leaks and crashing in the bindoc plugin.
+	- res changed the xmltiny plugin class implementation from a class that
+	  creates a csTinyDocumentSystem instance on the heap to an extension
+	  of csTinyDocumentSystem that just adds iComponent. This should avoid
+	  ref-counting related issues with xmltiny.
+17-May-2005
+	- Jorrit fixed a compile error in the DDS saver.
+	- Jorrit removed the virtual destructor in iBase and csRunnable
+	  as it causes bad problems on destruction of mesh wrappers for
+	  some weird reason (pure virtual calls at destruction).
+	  The warnings with GCC4 will have to be solved some other way.
+	- Jorrit fixed a problem in the csKDTree code which could cause
+	  frustvis and dynavis to get into infinite recursion in some very
+	  rare cases.
+	- res added support for mipmap generation to gfxtest.
+	- res added DXT5 compression support to the DDS saver.
+	- res made the PNG, JPG, JNG savers use csImageLoaderOptionsParser.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and

@@ -131,47 +131,23 @@ int csTinyDocWrapper::Changeable ()
   return tinydoc->Changeable();
 }
 
-class csTinyXMLPlugin : public iDocumentSystem, public iComponent
+class csTinyXMLPlugin : public csTinyDocumentSystem, public iComponent
 {
-private:
-  csTinyDocumentSystem *tiny;
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csTinyDocumentSystem);
 
-  csTinyXMLPlugin (iBase* parent = 0);
-  virtual ~csTinyXMLPlugin ();
+  csTinyXMLPlugin (iBase* parent) : csTinyDocumentSystem (parent) {}
 
   virtual bool Initialize (iObjectRegistry* objreg);
-
-  csRef<iDocument> CreateDocument ();
 };
 
-SCF_IMPLEMENT_IBASE(csTinyXMLPlugin)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentSystem)
+SCF_IMPLEMENT_IBASE_EXT(csTinyXMLPlugin)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-csTinyXMLPlugin::csTinyXMLPlugin(iBase* parent)
-{
-  SCF_CONSTRUCT_IBASE(parent);
-  tiny = new csTinyDocumentSystem ();
-}
-
-csTinyXMLPlugin::~csTinyXMLPlugin()
-{
-  delete tiny;
-  SCF_DESTRUCT_IBASE();
-}
+SCF_IMPLEMENT_IBASE_EXT_END
 
 bool csTinyXMLPlugin::Initialize (iObjectRegistry* objreg)
 {
   return true;
-}
-
-csRef<iDocument> csTinyXMLPlugin::CreateDocument ()
-{
-  return csPtr<iDocument> (new csTinyDocWrapper (
-    tiny->CreateDocument ()));
 }
 
 CS_IMPLEMENT_PLUGIN

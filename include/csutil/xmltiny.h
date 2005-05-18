@@ -31,7 +31,7 @@ class TiDocumentNode;
 class CS_CRYSTALSPACE_EXPORT csTinyDocumentSystem : public iDocumentSystem
 {
 public:
-  csTinyDocumentSystem ();
+  csTinyDocumentSystem (iBase* parent = 0);
   virtual ~csTinyDocumentSystem ();
 
   SCF_DECLARE_IBASE;
