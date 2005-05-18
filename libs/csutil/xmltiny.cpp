@@ -172,11 +172,10 @@ SCF_IMPLEMENT_IBASE_QUERY(csTinyXmlNode)
   SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc)
+csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc) :
+  node(0), node_children(0), next_pool(0)
 {
   SCF_CONSTRUCT_IBASE (0);
-  node = 0;
-  node_children = 0;
   csTinyXmlNode::doc = doc;	// Increase reference.
 }
 
