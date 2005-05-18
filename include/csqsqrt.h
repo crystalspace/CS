@@ -74,7 +74,7 @@ static inline float csQsqrt(float x)
   };
     
   return y0;
-};
+}
 
 /*
  * Similar to csQsqrt() above, except we do not multiply by x at the end, and
@@ -90,7 +90,7 @@ static inline float csQisqrt(float x)
   y0 = y0 * (1.5f - x0 * y0 * y0);
 
   return y0;
-};
+}
 
 #else
 
