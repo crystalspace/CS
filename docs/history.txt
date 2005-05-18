@@ -18,6 +18,10 @@ chronological order.
 	- res added support for mipmap generation to gfxtest.
 	- res added DXT5 compression support to the DDS saver.
 	- res made the PNG, JPG, JNG savers use csImageLoaderOptionsParser.
+	- Peter Amstutz changed iProgressMeter::Step() so that it takes an
+	  unsigned int parameter indicating the number of steps to advance
+	  the meter (with a default value of 1)
+	- Peter Amstutz added progress meter support to the csvosa3dl plugin
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and
