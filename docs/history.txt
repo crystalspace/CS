@@ -28,6 +28,9 @@ chronological order.
 	- res made the Cg plugin report program profiles in verbose mode.
 	- Wouter Wijngaards added 0 initialization for binormalVerticesNum
 	  and tangentVerticesNum in gl_polyrender.h. It could cause a crash.
+	- Wouter Wijngaards removed unused G3DFOGMETHOD from igraphics3D.h.
+	- Wouter Wijngaards added GetCaps() support to Soft3d so now walktest
+	  works with r3dtest level in software mode.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and

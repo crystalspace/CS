@@ -327,8 +327,6 @@ public:
 
 /**
  * The basic software renderer class.
- * This class is the parent for both "normal" software renderer
- * as well as for procedural texture class.
  */
 class csSoftwareGraphics3DCommon : public iGraphics3D
 {
@@ -563,7 +561,7 @@ public:
   bool ilace_fastmove;
 
   /// Render capabilities
-  //csGraphics3DCaps Caps;
+  csGraphics3DCaps Caps;
 
   // An experimental filter feature.
   static int filter_bf;
@@ -665,19 +663,6 @@ public:
 
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
-
-  /// Set a renderstate boolean.
-  //virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
-
-  /// Get a renderstate value.
-  //virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
-
-  /**
-   * Get the current driver's capabilities.  Each driver implements their own
-   * function.
-   */
-  /*virtual csGraphics3DCaps *GetCaps ()
-  { return &Caps; }*/
 
   /// Get address of Z-buffer at specific point
   virtual uint32 *GetZBuffAt (int x, int y)
@@ -884,7 +869,7 @@ public:
 
   /// Capabilities of the driver
   const csGraphics3DCaps* GetCaps() const
-  { return 0; }
+  { return &Caps; }
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode) 
@@ -964,11 +949,13 @@ public:
   {
   }
 
+  /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val)
   {
     return 0;
   }
 
+  /// Get a renderstate value.
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const
   {
     return 0;

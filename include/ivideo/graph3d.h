@@ -237,14 +237,6 @@ enum csVertexAttrib
   //@}
 };
 
-/// 
-enum G3D_FOGMETHOD
-{
-  G3DFOGMETHOD_NONE = 0x00,
-  G3DFOGMETHOD_ZBUFFER = 0x01,
-  G3DFOGMETHOD_VERTEX = 0x02
-};
-
 /**\name Mix modes for DrawPolygonFX ()
  * The constants can be ORed together if they belong to different masks.
  * @{ */
@@ -385,7 +377,6 @@ struct csGraphics3DCaps
   bool CanClip;
   int minTexHeight, minTexWidth;
   int maxTexHeight, maxTexWidth;
-  G3D_FOGMETHOD fog;
   bool NeedsPO2Maps;
   int MaxAspectRatio;
 

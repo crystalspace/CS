@@ -322,8 +322,6 @@ public:
    * for cleaning this up.
    */
   csRef<iCacheManager> cache_mgr;
-  /// The fog mode this G3D implements
-  G3D_FOGMETHOD fogmethod;
   /// Maximum texture aspect ratio
   int MaxAspectRatio;
   /// The list of all regions currently loaded.
