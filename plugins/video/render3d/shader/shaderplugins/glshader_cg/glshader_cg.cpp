@@ -234,5 +234,11 @@ bool csGLShader_CG::Open()
 bool csGLShader_CG::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    doVerbose = verbosemgr->Enabled ("renderer.shader");
+  else
+    doVerbose = false;
   return true;
 }

@@ -172,6 +172,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   if(profile == CG_PROFILE_UNKNOWN)
     profile = cgGLGetLatestProfile (type);
 
+  if (shaderPlug->doVerbose)
+  {
+    shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Cg program '%s': using profile %s", description, 
+      cgGetProfileString (profile));
+  }
+
   program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
     programStr, profile, entrypoint ? entrypoint : "main", 
     GetProfileCompilerArgs (profile));

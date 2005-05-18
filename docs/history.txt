@@ -23,6 +23,9 @@ chronological order.
 	  the meter (with a default value of 1)
 	- Peter Amstutz added progress meter support to the csvosa3dl plugin
 	- Wouter Wijngaards added the new iProgressMeter::Step() in cslight.
+	- res fixed a couple of OS/X Tiger compile problems reported by Per
+	  Eckerdal.
+	- res made the Cg plugin report program profiles in verbose mode.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and

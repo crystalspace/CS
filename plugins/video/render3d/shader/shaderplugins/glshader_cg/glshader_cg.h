@@ -54,6 +54,7 @@ public:
   bool debugDump;
   char* dumpDir;
   bool doNVVPrealign;
+  bool doVerbose;
 
   SCF_DECLARE_IBASE;
   
