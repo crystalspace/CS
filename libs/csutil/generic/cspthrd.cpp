@@ -172,7 +172,10 @@ bool csPosixMutexRecursiveEmulator::Release ()
 
   count -= 1;
   if (count == 0)
+  {
+    owner = 0;
     lasterr = pthread_mutex_unlock (&mutex);
+  }
   
   CS_SHOW_ERROR;
   return lasterr == 0;
