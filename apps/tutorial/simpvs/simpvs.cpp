@@ -197,7 +197,7 @@ bool Simple::Application()
 
   engine->Prepare ();
 
-  view = new csView (engine, g3d);
+  view.AttachNew (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
