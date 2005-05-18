@@ -279,7 +279,7 @@ private:
   int stencilclipnum;
   bool stencil_initialized;	// Stencil clipper is initialized from 'clipper'
   bool clip_planes_enabled;	// glClipPlane is enabled.
-  int maxClipPlanes;            // Number of planes available for clipping
+  GLint maxClipPlanes;            // Number of planes available for clipping
   csWeakRef<iClipper2D> clipper;// Current clipper from engine.
   int cliptype;			// One of CS_CLIPPER_...
   int cache_clip_portal;	// Cache values for SetupClipper().
