@@ -79,11 +79,12 @@ void csCsLightProgressMeter::SetProgressDescriptionV (const char* /*id*/,
   cur_description.FormatV (description, list);
 }
 
-void csCsLightProgressMeter::Step()
+void csCsLightProgressMeter::Step(unsigned int n)
 {
   if (current < total)
   {
-    current++;
+    current+=n;
+    if (current>total) current = total;
 
     int const units = (current == total ? 100 :
       (((100 * current) / total) / granularity) * granularity);

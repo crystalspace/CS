@@ -71,7 +71,7 @@ public:
   virtual void SetProgressDescriptionV (const char*, const char*, va_list);
 
   /// Increment the meter by one unit and print a tick mark.
-  virtual void Step ();
+  virtual void Step (unsigned int i = 1);
   /// Reset the meter to 0%.
   virtual void Reset () { current = 0; anchor = 0; }
   /// Reset the meter and print the initial tick mark ("0%").

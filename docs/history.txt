@@ -22,6 +22,7 @@ chronological order.
 	  unsigned int parameter indicating the number of steps to advance
 	  the meter (with a default value of 1)
 	- Peter Amstutz added progress meter support to the csvosa3dl plugin
+	- Wouter Wijngaards added the new iProgressMeter::Step() in cslight.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and
