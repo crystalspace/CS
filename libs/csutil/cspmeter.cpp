@@ -27,8 +27,8 @@ SCF_IMPLEMENT_IBASE (csTextProgressMeter)
 SCF_IMPLEMENT_IBASE_END
 
 csTextProgressMeter::csTextProgressMeter (iConsoleOutput* cons, int n)
-	: console (cons), granularity(10), tick_scale(2),
-	  total(n), current(0), anchor(0)
+        : console (cons), granularity(10), tick_scale(2),
+          total(n), current(0), anchor(0)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -38,11 +38,11 @@ csTextProgressMeter::~csTextProgressMeter()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csTextProgressMeter::Step()
+void csTextProgressMeter::Step(unsigned int n)
 {
   if (current < total)
   {
-    current++;
+    current += n;
     int const units = (current == total ? 100 :
       (((100 * current) / total) / granularity) * granularity);
     int const extent = units / tick_scale;
@@ -53,9 +53,9 @@ void csTextProgressMeter::Step()
       for (i = anchor + 1; i <= extent; i++)
       {
         if (i % (10 / tick_scale) != 0)
-	   buff << '.';
-	else
-	  buff.AppendFmt ("%d%%", i * tick_scale);
+           buff << '.';
+        else
+          buff.AppendFmt ("%d%%", i * tick_scale);
       }
       console->PutText ("%s", buff.GetData());
       anchor = extent;
