@@ -140,4 +140,4 @@ be downloaded from the @file{maps} subdirectory of each release.  Most files
 can just be placed in the @file{CS/data} directory.
 
 @noindent
-@uref{http://www.crystalspace3d.org/support/release}
+@uref{http://www.crystalspace3d.org/support/release/}
