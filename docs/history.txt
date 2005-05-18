@@ -26,6 +26,8 @@ chronological order.
 	- res fixed a couple of OS/X Tiger compile problems reported by Per
 	  Eckerdal.
 	- res made the Cg plugin report program profiles in verbose mode.
+	- Wouter Wijngaards added 0 initialization for binormalVerticesNum
+	  and tangentVerticesNum in gl_polyrender.h. It could cause a crash.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and

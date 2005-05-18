@@ -67,7 +67,8 @@ private:
     SCF_DECLARE_IBASE;
 
     BufferAccessor (csGLPolygonRenderer *renderer)
-      : renderer(renderer), normalVerticesNum (0)
+      : renderer(renderer), normalVerticesNum (0), binormalVerticesNum (0),
+        tangentVerticesNum (0)
     {
       SCF_CONSTRUCT_IBASE(0);
     }
