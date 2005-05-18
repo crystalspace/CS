@@ -37,6 +37,16 @@ chronological order.
 	  ftp://sunsite.dk/projects/crystal/ since some people still have
 	  trouble accessing sunsite.dk (and because sunsite.dk isn't always
 	  reliable).
+	- res made some changes to allow for a smooth restart of CS. Changes
+	  include:
+	    - Added logic to reset static variables (created with the static
+	      variable macros) to 0 when they're destroyed.
+	    - Added logic to reset cached SCF IDs to -1 on shutdown.
+	    - Fixed the Win32 port to post a Windows quit message only when
+	      the window is closed by the user, not upon destruction.
+	- res changes the simpvs app to present the video switching menu all
+	  the time. When a selection is made there, the new renderer will be
+	  stored in the configuration and CS restarted.
 17-May-2005
 	- Jorrit fixed a compile error in the DDS saver.
 	- Jorrit removed the virtual destructor in iBase and csRunnable

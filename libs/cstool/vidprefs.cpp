@@ -44,81 +44,6 @@ csVideoPreferences::csVideoPreferences ()
 
 csVideoPreferences::~csVideoPreferences ()
 {
-  CleanUp ();
-}
-
-void csVideoPreferences::CleanUp ()
-{
-  csRef<iConfigManager> cfgmgr (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  csRef<iPluginManager> plugmgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
-  aws_canvas = 0;
-  if (imageio)
-  {
-    object_reg->Unregister (imageio, "iImageIO");
-    csRef<iComponent> comp (SCF_QUERY_INTERFACE (imageio, iComponent));
-    plugmgr->UnloadPlugin (comp);
-    imageio = 0;
-  }
-  if (aws)
-  {
-    object_reg->Unregister (aws, "iAws");
-    csRef<iComponent> comp (SCF_QUERY_INTERFACE (aws, iComponent));
-    plugmgr->UnloadPlugin (comp);
-    aws = 0;
-  }
-  if (g3d)
-  {
-    object_reg->Unregister (g3d, "iGraphics3D");
-    csRef<iComponent> comp (SCF_QUERY_INTERFACE (g3d, iComponent));
-    plugmgr->UnloadPlugin (comp);
-    g3d = 0;
-  }
-  if (g2d)
-  {
-    object_reg->Unregister (g2d, "iGraphics2D");
-    csRef<iComponent> comp (SCF_QUERY_INTERFACE (g2d, iComponent));
-    plugmgr->UnloadPlugin (comp);
-    g2d = 0;
-  }
-  if (fontserv)
-  {
-    object_reg->Unregister (fontserv, "iFontServer");
-    csRef<iComponent> comp (SCF_QUERY_INTERFACE (fontserv, iComponent));
-    plugmgr->UnloadPlugin (comp);
-    fontserv = 0;
-  }
-  vfs = 0;
-
-  cfgmgr->FlushRemoved ();
-}
-
-void csVideoPreferences::SelectMode ()
-{
-  CleanUp ();
-  csRef<iPluginManager> plugmgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
-  csRef<iFontServer> fs (
-  	CS_LOAD_PLUGIN (plugmgr, "crystalspace.font.server.default",
-  	iFontServer));
-  object_reg->Register (fs, "iFontServer");
-
-  if (mode == 0)
-  {
-    csRef<iGraphics3D> g (
-    	CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.software",
-  	iGraphics3D));
-    object_reg->Register (g, "iGraphics3D");
-  }
-  else
-  {
-    csRef<iGraphics3D> g (
-    	CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.opengl",
-  	iGraphics3D));
-    object_reg->Register (g, "iGraphics3D");
-  }
 }
 
 bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
@@ -141,72 +66,11 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs)
   {
-    vfs = CS_LOAD_PLUGIN (plugmgr, "crystalspace.kernel.vfs", iVFS);
-    if (vfs)
-      object_reg->Register (vfs, "iVFS");
-  }
-  if (!vfs)
-  {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.tools.vidprefs",
       "Couldn't find VFS plugin!");
     return false;
   }
-
-  //---------
-  // iImageIO
-  //---------
-  imageio = CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphic.image.io.multiplexer",
-  	iImageIO);
-  if (!imageio)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.tools.vidprefs",
-      "Couldn't load image loader!");
-    return false;
-  }
-  object_reg->Register (imageio, "iImageIO");
-
-  //---------
-  // iFontServer
-  //---------
-  fontserv = CS_LOAD_PLUGIN (plugmgr, "crystalspace.font.server.default",
-  	iFontServer);
-  if (!fontserv)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.tools.vidprefs",
-      "Couldn't load font server!");
-    return false;
-  }
-  object_reg->Register (fontserv, "iFontServer");
-
-  //---------
-  // iGraphics3D
-  //---------
-  g3d = CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.software",
-  	iGraphics3D);
-  if (!g3d)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.tools.vidprefs",
-      "Couldn't load software renderer!");
-    return false;
-  }
-  object_reg->Register (g3d, "iGraphics3D");
-
-  //---------
-  // iGraphics2D
-  //---------
-  g2d = g3d->GetDriver2D ();
-  if (!g2d)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.tools.vidprefs",
-      "Couldn't find a 2D canvas!");
-    return false;
-  }
-  object_reg->Register (g2d, "iGraphics2D");
 
   //---------
   // AWS
@@ -222,14 +86,8 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
   object_reg->Register (aws, "iAws");
   exit_loop = false;
 
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.tools.vidprefs",
-    	"Error opening system!");
-    return false;
-  }
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g2d = g3d->GetDriver2D ();
 
   //---------
   // The window
@@ -275,7 +133,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
     if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return true;
-    g2d->Clear (0);
+    //g2d->Clear (0);
     aws->Redraw ();
     aws->Print (g3d, 64);
     return false;
@@ -286,16 +144,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
     g3d->Print (0);
     return false;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdSystemClose)
-  {
-    return false;
-  }
-  else
-  {
-    aws->HandleEvent (ev);
-    return false;
-  }
-
+  aws->HandleEvent (ev);
   return false;
 }
 
@@ -303,8 +152,7 @@ void csVideoPreferences::SetSoftwareL (iAwsSource *)
 {
   csPrintf ("Software mode!\n"); fflush (stdout);
 
-  csInitializer::CloseApplication (object_reg);
-  mode = 0;
+  mode = "crystalspace.graphics3d.software";
   exit_loop = true;
 }
 
@@ -312,8 +160,7 @@ void csVideoPreferences::SetOpenGLL (iAwsSource *)
 {
   csPrintf ("OpenGL mode!\n"); fflush (stdout);
 
-  csInitializer::CloseApplication (object_reg);
-  mode = 1;
+  mode = "crystalspace.graphics3d.opengl";
   exit_loop = true;
 }
 

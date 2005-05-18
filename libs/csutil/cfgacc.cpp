@@ -41,6 +41,12 @@ csConfigAccess::csConfigAccess(iObjectRegistry *object_reg, const char *fname,
   AddConfig (object_reg, fname, vfs, priority);
 }
 
+csConfigAccess::csConfigAccess(iObjectRegistry *object_reg, iConfigFile* cfg,
+  int priority)
+{
+  AddConfig (object_reg, cfg, priority);
+}
+
 csConfigAccess::~csConfigAccess()
 {
   if (object_reg)
@@ -68,6 +74,15 @@ void csConfigAccess::AddConfig (iObjectRegistry *object_reg, const char *fname,
     //CS_ASSERT (VFS != 0);
   }
   ConfigFiles.Push (cfgmgr->AddDomain (fname, VFS, priority));
+}
+
+void csConfigAccess::AddConfig (iObjectRegistry *object_reg, iConfigFile* cfg,
+  int priority)
+{
+  csConfigAccess::object_reg = object_reg;
+  csRef<iConfigManager> cfgmgr (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  cfgmgr->AddDomain (cfg, priority);
+  ConfigFiles.Push (cfg);
 }
 
 iConfigFile *csConfigAccess::operator->()

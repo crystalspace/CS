@@ -428,28 +428,30 @@ void Name (void (*p)())                                                \
 #ifndef CS_IMPLEMENT_STATIC_VAR_EXT
 #define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
 extern "C" {                                                            \
+static Type *getterFunc ## _v=0;                                        \
 static Type* getterFunc ();                                             \
 static void getterFunc ## _kill ();					\
 static void getterFunc ## _kill_array ();				\
 void getterFunc ## _kill ()                                      	\
 {                                                                       \
   (void)(&getterFunc ## _kill_array);					\
-  delete getterFunc ();                                                 \
+  delete getterFunc ## _v;                                              \
+  getterFunc ## _v = 0;							\
 }                                                                       \
 void getterFunc ## _kill_array ()                                	\
 {                                                                       \
   (void)(&getterFunc ## _kill);						\
-  delete [] getterFunc ();                                              \
+  delete [] getterFunc ## _v;                                           \
+  getterFunc ## _v = 0;							\
 }                                                                       \
 Type* getterFunc ()                                                     \
 {                                                                       \
-  static Type *v=0;                                                     \
-  if (!v)                                                               \
+  if (!getterFunc ## _v)                                                \
   {                                                                     \
-    v = new Type initParam;                                             \
+    getterFunc ## _v = new Type initParam;                              \
     csStaticVarCleanup (getterFunc ## kill_how);        		\
   }                                                                     \
-  return v;                                                             \
+  return getterFunc ## _v;                                              \
 }                                                                       \
 }
 #endif

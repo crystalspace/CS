@@ -470,4 +470,7 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   CS_STATIC_VARIABLE_CLEANUP
 
   iSCF::SCF->Finish();
+
+  config_done = false;
+  installed_event_handler = 0;
 }

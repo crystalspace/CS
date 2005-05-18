@@ -77,6 +77,12 @@ void csApplicationFramework::End ()
 void csApplicationFramework::OnExit ()
 {
 }
+
+void csApplicationFramework::Restart()
+{
+  restartFlag = true;
+  Quit();
+}
   
 bool csApplicationFramework::Initialize (int argc, char *argv[])
 {
@@ -115,5 +121,14 @@ int csApplicationFramework::Main (int argc, char* argv[])
   else if (!Start ())
     iReturn = 2;
   End ();
+  restartFlag &= (iReturn == 0);
+
   return iReturn;
+}
+
+bool csApplicationFramework::DoRestart()
+{
+  bool r = restartFlag;
+  restartFlag = false;
+  return r;
 }

@@ -439,10 +439,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * This is a common macro used in all IMPLEMENTS_XXX_INTERFACE macros
  */
 #define SCF_IMPLEMENTS_INTERFACE_COMMON(Interface,Object)		\
-  static scfInterfaceID Interface##_scfID = (scfInterfaceID)-1;		\
-  if (Interface##_scfID == (scfInterfaceID)-1)				\
-    Interface##_scfID = iSCF::SCF->GetInterfaceID (#Interface);		\
-  if (iInterfaceID == Interface##_scfID &&				\
+  if (iInterfaceID == scfInterface<Interface>::GetID() &&		\
     scfCompatibleVersion (iVersion, scfInterface<Interface>::GetVersion())) \
   {									\
     (Object)->IncRef ();						\
@@ -774,6 +771,15 @@ struct Name;								\
 CS_SPECIALIZE_TEMPLATE							\
 class scfInterface<Name>						\
 {									\
+  static scfInterfaceID& GetMyID()					\
+  {									\
+    static scfInterfaceID ID = (scfInterfaceID)-1;			\
+    return ID;								\
+  }									\
+  static void CleanupID()						\
+  {									\
+    GetMyID() = (scfInterfaceID)-1;					\
+  }									\
 public:									\
   static int GetVersion()						\
   {									\
@@ -781,9 +787,13 @@ public:									\
   }									\
   static scfInterfaceID GetID()						\
   {									\
-    static scfInterfaceID ID = (scfInterfaceID)-1;			\
+    scfInterfaceID& ID = GetMyID();					\
     if (ID == (scfInterfaceID)(-1))					\
+    {									\
       ID = iSCF::SCF->GetInterfaceID(#Name);				\
+      /* Mild hack to reset SCF ID on CS shutdown */			\
+      csStaticVarCleanup (CleanupID);					\
+    }									\
     return ID;								\
   }									\
   static char const* GetName()						\

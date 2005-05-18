@@ -19,13 +19,11 @@
 #ifndef __SIMPVS_H__
 #define __SIMPVS_H__
 
-#include <stdarg.h>
 #include <crystalspace.h>
 
-class Simple
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
@@ -34,18 +32,20 @@ private:
   iSector* room;
   csRef<iView> view;
 
-  static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
 
+  csVideoPreferences* vidprefs;
+  void SaveVideoPreference();
 public:
-  Simple (iObjectRegistry* object_reg);
-  ~Simple ();
+  Simple ();
+  virtual ~Simple ();
 
-  bool Initialize ();
-  bool Initialize2 ();
   void Start ();
+
+  bool OnInitialize (int argc, char* argv[]);
+  bool Application ();
 };
 
 #endif // __SIMPVS_H__

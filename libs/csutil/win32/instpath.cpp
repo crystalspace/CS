@@ -241,8 +241,8 @@ static inline char* FindConfigPath ()
 struct _CfgPath {
   char* path;
 
-  _CfgPath() : path(0) { };
-  ~_CfgPath() { delete[] path; };
+  _CfgPath() : path(0) { }
+  ~_CfgPath() { delete[] path; }
 };
 
 CS_IMPLEMENT_STATIC_VAR (getCachedCfgPath, _CfgPath, ())

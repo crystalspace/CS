@@ -698,11 +698,13 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	}
       }
       break;
-    case WM_DESTROY:
-    {
-      PostQuitMessage (0);
-      return 0L;
-    }
+    case WM_SYSCOMMAND:
+      if (wParam == SC_CLOSE)
+      {
+	PostQuitMessage (0);
+	return TRUE;
+      }
+      break;
     case WM_SYSCHAR:
     case WM_CHAR:
     case WM_UNICHAR:

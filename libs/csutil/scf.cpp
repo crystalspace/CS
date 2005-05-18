@@ -650,6 +650,7 @@ csSCF::~csSCF ()
 {
   delete ClassRegistry;
   ClassRegistry = 0;
+  SortClassRegistry = false;
   UnloadUnusedModules ();
   delete LibraryRegistry;
   LibraryRegistry = 0;

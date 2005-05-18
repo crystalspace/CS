@@ -47,12 +47,18 @@ public:
   /// constructor (also adds a config file)
   csConfigAccess(iObjectRegistry *object_reg, const char *Filename,
     bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);
+  /// constructor (also adds a config object)
+  csConfigAccess(iObjectRegistry *object_reg, iConfigFile* file,
+    int Priority = iConfigManager::ConfigPriorityPlugin);
   /// destructor
   ~csConfigAccess();
 
   /// add a config file
   void AddConfig(iObjectRegistry *object_reg, const char *Filename,
     bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);
+  /// add a config object
+  void AddConfig(iObjectRegistry *object_reg, iConfigFile* file,
+    int Priority = iConfigManager::ConfigPriorityPlugin);
   /// access to system configuration
   iConfigFile *operator->();
   /// access to system configuration

@@ -135,7 +135,12 @@ private:
    * set in the derived class' constructor.
    */
   static char* m_ApplicationStringName;
-
+  
+  /**
+   * Flag to indicate whether the application should be restarted instead of
+   * quitted.
+   */
+  bool restartFlag;
 protected:
   /**
    * Constructor
@@ -304,6 +309,13 @@ public:
   {
     csDefaultRunLoop (object_reg);
   }
+
+  /**
+   * Restart application.
+   * \remarks
+   * This method internally uses Quit().
+   */
+  void Restart();
 private:
   /**
    * Display an error notification.
@@ -380,6 +392,9 @@ public:
    * Starts up the application framework, to be called from main().
    */
   int Main (int argc, char* argv[]);
+
+  /// Query whether the application is to be restarted instead of exited.
+  bool DoRestart();
 };
 
 /** @} */

@@ -22,17 +22,14 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-// The global pointer to simple
-Simple *simple;
-csVideoPreferences* vidprefs = 0;
-
-Simple::Simple (iObjectRegistry* object_reg)
+Simple::Simple () : vidprefs(0)
 {
-  Simple::object_reg = object_reg;
+  SetApplicationName ("CrystalSpace.SimpVS");
 }
 
 Simple::~Simple ()
 {
+  delete vidprefs;
 }
 
 void Simple::SetupFrame ()
@@ -73,27 +70,16 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (vidprefs)
-  {
-    if (vidprefs->HandleEvent (ev))
-    {
-      vidprefs->SelectMode ();
-      delete vidprefs;
-      vidprefs = 0;
-      if (!Initialize2 ()) exit (0);
-    }
-    return true;
-  }
-
+  bool res = false;
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    simple->SetupFrame ();
-    return true;
+    SetupFrame ();
+    res = true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
-    simple->FinishFrame ();
-    return true;
+    FinishFrame ();
+    res = true;
   }
   else if ((ev.Type == csevKeyboard) && 
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
@@ -102,127 +88,87 @@ bool Simple::HandleEvent (iEvent& ev)
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-    return true;
+    res = true;
   }
 
-  return false;
+  if (((ev.Type != csevBroadcast) || (ev.Command.Code != cscmdQuit)) && vidprefs)
+  {
+    if (vidprefs->HandleEvent (ev))
+    {
+      SaveVideoPreference();
+      Restart();
+      return true;
+    }
+  }
+  return res;
 }
 
-bool Simple::SimpleEventHandler (iEvent& ev)
+void Simple::SaveVideoPreference()
 {
-  return simple->HandleEvent (ev);
+  if (!vidprefs) return;
+  csRef<iConfigFile> userConfig (csGetPlatformConfig (GetApplicationName()));
+  csConfigAccess config (object_reg, userConfig, 
+    iConfigManager::ConfigPriorityUserApp);
+  config->SetStr ("System.Plugins.iGraphics3D", vidprefs->GetModePlugin());
 }
 
-bool Simple::Initialize ()
+bool Simple::OnInitialize(int argc, char* argv[])
 {
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-	"Can't initialize event handler!");
-    return false;
-  }
+  if (!csInitializer::SetupConfigManager (object_reg, "/config/simpvs.cfg",
+    GetApplicationName()))
+    return ReportError("Failed to initialize config!");
 
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    return false;
-  }
-
-  vidprefs = new csVideoPreferences ();
-  if (!vidprefs->Setup (object_reg))
-  {
-    delete vidprefs;
-    return false;
-  }
-
-  return true;
-}
-
-bool Simple::Initialize2 ()
-{
   if (!csInitializer::RequestPlugins (object_reg,
+	CS_REQUEST_VFS,
 	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
 	CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-	"Can't initialize plugins!");
-    return false;
-  }
+    return ReportError("Can't initialize plugins!");
+
+  if (!RegisterQueue(GetObjectRegistry()))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+}
+
+bool Simple::Application()
+{
+  // Open the main system. This will open all the previously loaded plug-ins.
+  if (!Open())
+    return ReportError("Error opening system!");
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!vc)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-	"Can't find the virtual clock!");
-    return false;
-  }
+    return ReportError("Can't find the virtual clock!");
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-	"No iEngine plugin!");
-    return false;
-  }
+    return ReportError("No iEngine plugin!");
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-    	"No iLoader plugin!");
-    return false;
-  }
+    return ReportError("No iLoader plugin!");
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-    	"No iKeyboardDriver plugin!");
-    return false;
-  }
+    return ReportError("No iKeyboardDriver plugin!");
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-    	"No iGraphics3D plugin!");
-    return false;
-  }
-
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-    	"Error opening system!");
-    return false;
-  }
+    return ReportError("No iGraphics3D plugin!");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpvs",
-    	"Error loading 'stone4' texture!");
-    return false;
-  }
+    return ReportError("Error loading 'stone4' texture!");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
@@ -256,28 +202,32 @@ bool Simple::Initialize2 ()
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  vidprefs = new csVideoPreferences ();
+  if (!vidprefs->Setup (object_reg))
+  {
+    delete vidprefs;
+    vidprefs = 0;
+  }
+
+  Run();
+
   return true;
 }
 
-void Simple::Start ()
-{
-  csDefaultRunLoop (object_reg);
-}
-
-/*---------------------------------------------------------------------*
+/*-------------------------------------------------------------------------*
  * Main function
- *---------------------------------------------------------------------*/
+ *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-  simple = new Simple (object_reg);
-
-  if (simple->Initialize ())
-    simple->Start ();
-
-  delete simple;
-  csInitializer::DestroyApplication (object_reg);
-
-  return 0;
+  int result;
+  bool again;
+  do
+  {
+    Simple simple;
+    result = simple.Main(argc, argv);
+    again = simple.DoRestart();
+  }
+  while (again);
+  return result;
 }
