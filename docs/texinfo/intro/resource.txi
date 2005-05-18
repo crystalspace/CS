@@ -32,14 +32,15 @@ from the following location:
 @uref{http://sourceforge.net/project/showfiles.php?group_id=649}
 
 @noindent
-Levels and data for Crystal Space's current stable release can be
-downloaded via @sc{ftp} from sunsite.dk:
+Maps and data for Crystal Space's current stable release can be obtained from
+the Crystal Space download site. The resources for each release are contained
+in a separate subdirectory:
 
-@uref{ftp://sunsite.dk/pub/projects/crystal/cs098}
+@uref{http://www.crystalspace3d.org/support/release/}
 
 @noindent
-Older release data and separate packages may also be found one directory up
-at:
+Older release data and separate packages may be found at the old download
+site:
 
 @uref{ftp://sunsite.dk/pub/projects/crystal/}
 

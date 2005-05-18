@@ -136,5 +136,8 @@ downloaded from:
 
 @strong{Maps}: Needed if you want to see examples of Crystal Space at work.
 A few data files are provided in the Crystal Space release itself, but more can
-be downloaded from @uref{ftp://ftp.sunsite.dk/pub/projects/crystal/}.  Most
-files can just be placed in the CS/data directory.
+be downloaded from the @file{maps} subdirectory of each release.  Most files
+can just be placed in the @file{CS/data} directory.
+
+@noindent
+@uref{http://www.crystalspace3d.org/support/release}

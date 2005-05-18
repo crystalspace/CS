@@ -648,8 +648,7 @@ void WalkTest::DrawFrame2D (void)
      * to look better on various backgrounds than the usual logo, which only looks
      * good on black.
      * The logo was drawn as an SVG image using Sodipodi, so it should be usable in
-     * many other contexts if desired. The originals should appear on sunsite.dk
-     * sometime soon. If not, email Micah to get them.
+     * many other contexts if desired.
      */
 
     // Margin to the edge of the screen, as a fraction of screen width

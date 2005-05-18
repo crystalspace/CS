@@ -196,7 +196,7 @@ The Microsoft DirectX 8 @sc{sdk} which the Cygwin port uses is one created
 especially for it.  You can download it via the following link.
 
 @noindent
-@uref{ftp://sunsite.dk/projects/crystal/support/cygwin/DXforCygwin.zip}
+@uref{http://www.crystalspace3d.org/support/cygwin/DXforCygwin.zip}
 
 To install, extract the archive to a location of your choice.  Open a Cygwin
 Bash prompt and navigate to where you extracted the files (that is, the
@@ -263,11 +263,7 @@ you should just answer @file{Yes to All}.
 @subsubheading Installing the @sc{mng} Library (optional)
 
 In order to successfully build the optional Crystal Space @emph{jng} plugin,
-you must have libmng installed on your system.  You can download it via the
-following link.
-
-@noindent
-@uref{ftp://sunsite.dk/projects/crystal/support/general/libmng-1.0.4.tar.gz}
+you must have libmng installed on your system. @xref{GettingLibmng}.
 
 To install, extract the archive to a location of your choice.  Open a Cygwin
 Bash prompt and navigate to where you extracted the files (that is, the

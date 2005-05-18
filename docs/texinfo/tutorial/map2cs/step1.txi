@@ -27,14 +27,14 @@ Texture Pack 1 - More than 150 free textures from the Crystal Space texture
 archive in 3.4@sc{mb}.  They are already converted to the @sc{wad} format, so
 you can directly use them.
 
-@uref{ftp://sunsite.dk/projects/crystal/support/map2cs/cstex_1.zip}
+@uref{http://www.crystalspace3d.org/support/map2cs/cstex_1.zip}
 
 @item
 Texture Pack 2 - More than 250 free textures from the Crystal Space texture
 archive in 8.6@sc{mb}.  They are already converted to the @sc{wad} format, so
 you can directly use them.
 
-@uref{ftp://sunsite.dk/projects/crystal/support/map2cs/cstex_2.zip}
+@uref{http://www.crystalspace3d.org/support/map2cs/cstex_2.zip}
 @end itemize
 
 @subsubheading Links to Optional and Alternative Tools

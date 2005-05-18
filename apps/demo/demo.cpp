@@ -408,7 +408,7 @@ void Demo::SetupFrame ()
     GfxWrite (tx, ty, col_black, col_bg,
     	"Download 'demodata.zip' from"); ty += 10;
     GfxWrite (tx, ty, col_fgdata, col_bg,
-    	"    ftp://sunsite.dk/projects/crystal/cs098/levels/demodata.zip"); ty += 10;
+    	"    http://www.crystalspace3d.org/support/release/cs098/maps/demodata.zip"); ty += 10;
 
     ty += 10;
 

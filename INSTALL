@@ -31,7 +31,7 @@ package containing many of the 3rd-party supporting libraries utilized by
 Crystal Space, and which are commonly already installed on Unix platforms, but
 not on Microsoft Windows.
 
-ftp://sunsite.dk/projects/crystal/support/win32/cs-win32libs-x.xxry_yyy.exe
+http://www.crystalspace3d.org/support/win32/cs-win32libs-x.xxry_yyy.exe
 
 You will find versions of cs-win32libs for the stable release of Crystal Space,
 as well as for the bleeding-edge developer version of Crystal Space.  Download

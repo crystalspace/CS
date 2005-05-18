@@ -55,11 +55,7 @@ MacOS/X.
 
 Alternately, the libraries can be built manually.  You can download the
 required external library source code packages from their canonical download
-sites (@pxref{External Libraries}) or, as a convenience, you can find them all
-in Crystal Space ``support'' download directory at the following location:
-
-@noindent
-@uref{ftp://sunsite.dk/projects/crystal/support/general/}
+sites (@pxref{External Libraries}).
 
 If you have permission to do so, it is best to install the @sc{jpeg}, @sc{png},
 and @sc{mng} libraries in standard locations by following the installation
@@ -115,11 +111,11 @@ The most commonly used map file is @file{flarge} since it demonstrates many of
 the special features of the engine rather than focusing on merely one or two
 areas.  This map is typically distributed as part of the Crystal Space package
 and can be found in the @file{CS/data/flarge} directory.  You can download
-additional example map files from the @file{levels} subdirectory at the
-download site:
+additional example map files from the @file{maps} subdirectory of each release
+of Crystal Space at the download site:
 
 @noindent
-@uref{ftp://sunsite.dk/projects/crystal/}
+@uref{http://www.crystalspace3d.org/support/release/}
 
 @noindent
 Be sure to place the map files into the @file{CS/data} directory.

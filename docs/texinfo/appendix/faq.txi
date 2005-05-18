@@ -20,9 +20,14 @@ More FAQs can also be found online in the Crystal Space Wiki:@*
 @strong{Q}: From where can I download Crystal Space?
 
 @strong{A}: The latest release of Crystal Space is always available from the
-Crystal Space home page, and from the Crystal Space @sc{ftp} site
-@uref{ftp://sunsite.dk/projects/crystal/}. You can
-also access the bleeding-edge developmental version.  @xref{Where to Get}.
+Crystal Space home page, and from the Crystal Space download site:
+
+@noindent
+@uref{http://www.crystalspace3d.org/support/release/}
+
+@noindent
+You can also access the bleeding-edge developmental version.
+@xref{Where to Get}.
 
 @item
 @strong{Q}: What do I need to compile Crystal Space?

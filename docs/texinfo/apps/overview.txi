@@ -23,7 +23,13 @@ A self-running space demo. It requires the @file{demodata.zip} file
 that you can get from:
 
 @noindent
-@url{ftp://sunsite.dk/projects/crystal/cs096/levels/demodata.zip}
+@ifnottex
+@url{http://www.crystalspace3d.org/support/release/cs098/maps/demodata.zip}
+@end ifnottex
+@iftex
+@code{http://www.crystalspace3d.org/support/release/cs098/maps/}@*
+@code{demodata.zip}
+@end iftex
 
 @cindex @file{csfedit}
 @cindex Applications, @file{csfedit}

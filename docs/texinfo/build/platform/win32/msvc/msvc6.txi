@@ -6,7 +6,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 3 May 2004.}
+@emph{Last updated 18 May 2005.}
 
 In order to successfully compile the Crystal Space 3D Software Development
 Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio 6}
@@ -371,31 +371,6 @@ the Crystal Space project is installed.  Next set the working directory to
 If after doing this, you are still getting the same error, make sure that you 
 have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
 @end itemize
-
-@subsubheading Blasting the Past
-
-If you have previously used the long-deprecated and ancient @file{msvc_libs}
-package, it's recommended you remove it before installing the
-@file{cs-win32libs} package as outlined above.  Unfortunately, the
-@file{msvc_libs} package was a simple @sc{zip} file with no means of
-uninstalling whatsoever. However, the header and library files were located in
-the @file{include\cssys\win32} and @file{libs\cssys\win32\cssys} directories,
-but as the @code{cssys} library has been merged into @code{csutil}, Crystal
-Space's files in those directories has been relocated as well, so you can
-safely remove these directories.
-
-However, the @file{msvc_libs} package also contained a couple of @sc{dll} 
-files, copied to the @file{CS\} root directory.  To remove them, use the
-following batch file that removes all @sc{dll} files contained in the different
-versions of the @file{msvc_libs} package:
-
-@noindent
-@ifnottex
-@uref{ftp://sunsite.dk/projects/crystal/support/win32/remove_msvc_libs.bat}
-@end ifnottex
-@iftex
-@code{ftp://sunsite.dk/projects/crystal/support/win32/remove_msvc_libs.bat}
-@end iftex
 
 @subsubheading Miscellaneous
 

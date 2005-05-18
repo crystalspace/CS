@@ -31,6 +31,12 @@ chronological order.
 	  ref-counting related issues with xmltiny.
 	- res augmented csfgen to store some of the lately added font 
 	  attributes in CSF files.
+	- Eric Sunshine moved a number of the important downloadable CS
+	  resources, such as cs-win32libs, over to
+	  http://www.crystalspace.org/support/ from
+	  ftp://sunsite.dk/projects/crystal/ since some people still have
+	  trouble accessing sunsite.dk (and because sunsite.dk isn't always
+	  reliable).
 17-May-2005
 	- Jorrit fixed a compile error in the DDS saver.
 	- Jorrit removed the virtual destructor in iBase and csRunnable
