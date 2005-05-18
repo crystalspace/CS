@@ -85,8 +85,8 @@ public:
   virtual void CS_GNUC_PRINTF (3, 0)
       SetProgressDescriptionV (const char*, const char*, va_list) { }
 
-  /// Increment the meter by one unit and print a tick mark.
-  virtual void Step ();
+  /// Increment the meter by n units (default 1) and print a tick mark.
+  virtual void Step (unsigned int n = 1);
   /// Reset the meter to 0%.
   virtual void Reset () { current = 0; anchor = 0; }
   /// Reset the meter and print the initial tick mark ("0%").
