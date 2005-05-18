@@ -58,7 +58,7 @@ public:
   csVosSector(iObjectRegistry *o, csVosA3DL* vosa3dl, csMetaSector* sec);
   virtual ~csVosSector();
 
-  virtual void Load();
+  virtual void Load(iProgressMeter* progress = 0);
   virtual csRef<iSector> GetSector();
 
   virtual VUtil::vRef<VOS::Vobject> GetVobject();

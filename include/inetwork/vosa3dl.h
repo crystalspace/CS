@@ -25,6 +25,7 @@
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
 #include "ivaria/dynamics.h"
+#include "ivaria/pmeter.h"
 #include "csutil/hash.h"
 
 /** @file
@@ -74,7 +75,7 @@ struct iVosObject3D : public iBase
 
 
 
-SCF_VERSION (iVosSector, 0, 2, 0);
+SCF_VERSION (iVosSector, 0, 3, 0);
 
 /** This interface bridges between a VOS sector and a Crystal Space
     sector. */
@@ -83,9 +84,10 @@ struct iVosSector : public iBase
   /** Begin loading this sector in the background.  Network activity
       occurs in another thread, so this method returns immediately.
       An event is posted to the global event queue when the download is complete.
-      @bug the download-complete event is not yet posted.
+      @param progress if supplied, this will be called back (in the CS thread)
+      periodically to indicate download progress
   */
-  virtual void Load() = 0;
+  virtual void Load(iProgressMeter* progress = 0) = 0;
 
   /** Get the Crystal Space iSector for this sector.  This will be
       empty until Load() is called. */

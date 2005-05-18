@@ -165,20 +165,82 @@ void LoadObjectTask::doTask()
   }
 }
 
+class ProgressTask : public VUtil::Task
+{
+private:
+  iProgressMeter* meter;
+  std::string action;
+  unsigned int step;
+  unsigned int total;
+
+public:
+  ProgressTask(iProgressMeter* m, const std::string& a, unsigned int t)
+    : meter(m), action(a), total(t)
+    {
+    }
+
+  ProgressTask(iProgressMeter* m, unsigned int s)
+    : meter(m), step(s)
+    {
+    }
+
+  virtual void doTask()
+    {
+      if (action != "") {
+        meter->SetProgressDescription("crystalspace.network.vos.a3dl.progress", action.c_str());
+        meter->SetTotal(total);
+        meter->SetGranularity(1);
+      }
+      else
+      {
+        meter->Step(step);
+      }
+    }
+};
+
+class SimpleProgress : public VOS::ProgressMeterCallback
+{
+private:
+  iProgressMeter* meter;
+  csVosA3DL* vosa3dl;
+  unsigned int prevProg;
+
+public:
+  SimpleProgress(iProgressMeter* m, csVosA3DL* v)
+    : meter(m), vosa3dl(v), prevProg(0)
+    {
+    }
+
+  virtual void notifyTaskStart(const std::string& task, unsigned int total)
+    {
+      //printf("foo start!\n");
+      prevProg = 0;
+      vosa3dl->mainThreadTasks.push(new ProgressTask(meter, task, total));
+    }
+
+  virtual void notifyProgress(unsigned int progress)
+    {
+      //printf("foo progress %i!\n", progress);
+      vosa3dl->mainThreadTasks.push(new ProgressTask(meter, progress - prevProg));
+      prevProg = progress;
+    }
+};
+
 /// Task for setting up the object from within a non-CS thread///
 class LoadSectorTask : public Task
 {
 public:
   csVosA3DL* vosa3dl;
   csRef<csVosSector> sector;
+  iProgressMeter* meter;
 
-  LoadSectorTask(csVosA3DL* va, csVosSector* vs);
+  LoadSectorTask(csVosA3DL* va, csVosSector* vs, iProgressMeter* meter);
   virtual ~LoadSectorTask();
   virtual void doTask();
 };
 
-LoadSectorTask::LoadSectorTask (csVosA3DL *va, csVosSector *vs)
-    : vosa3dl(va), sector(vs)
+LoadSectorTask::LoadSectorTask (csVosA3DL *va, csVosSector *vs, iProgressMeter* m)
+  : vosa3dl(va), sector(vs), meter(m)
 {
 }
 
@@ -226,6 +288,9 @@ void LoadSectorTask::doTask()
 
   LOG("csVosSector", 2, "Starting search");
 
+  SimpleProgress* sp = 0;
+  if (meter != 0) sp = new SimpleProgress(meter, vosa3dl);
+
     rs->search(sector->GetVobject(), "sector", 0,
                        "rule sector\n"
                        "do acquire and parent-listen and children-listen to this object\n"
@@ -255,8 +320,11 @@ void LoadSectorTask::doTask()
                        "do acquire and parent-listen and property-listen to this object \n"
                        "\n"
                        "rule extrap-property\n"
-                       "do acquire and parent-listen and extrap-property-listen to this object\n"
-                       );
+                       "do acquire and parent-listen and extrap-property-listen to this object\n",
+
+               sp);
+
+    if (sp) delete sp;
 
   LOG("csVosSector", 2, "Search completed");
   }
@@ -301,12 +369,12 @@ void csVosSector::removeObject3D (iVosObject3D *obj)
   loadedObjects.Delete (obj);
 }
 
-void csVosSector::Load()
+void csVosSector::Load(iProgressMeter* progress)
 {
   if(! didLoad) {
   didLoad = true;
     waitingForChildren = sectorvobj->numChildren();
-    TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this));
+    TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this, progress));
   }
 }
 
