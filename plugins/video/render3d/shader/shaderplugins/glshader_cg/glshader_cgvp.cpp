@@ -158,9 +158,9 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
     csStringReader reader (compiledProgram);
     csString newProgram;
 
-    csHash<csProgVarStr, csString> varSemantics;
+    csHash<csProgVarStr, csProgVarStr> varSemantics;
 
-    /* Parser #blah information emitted by Cg from start of VP code, use it to
+    /* Parse #blah information emitted by Cg from start of VP code, use it to
      * glean state matrix semantic for certain vars. */
     csString line;
     while (reader.GetLine (line))

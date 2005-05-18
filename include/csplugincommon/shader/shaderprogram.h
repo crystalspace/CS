@@ -76,9 +76,9 @@ protected:
     ProgramParamType type;
 
     ProgramParam() : valid (false), vectorValue (0.0f), 
-      name(csInvalidStringID) { }
+      name(csInvalidStringID), type(ParamInvalid) { }
     ProgramParam(const csVector4& def) : valid (false), 
-      vectorValue (def), name(csInvalidStringID) { }
+      vectorValue (def), name(csInvalidStringID), type(ParamInvalid) { }
   };
   void ResolveParamStatic (ProgramParam& param,
     csArray<iShaderVariableContext*> &staticContexts);

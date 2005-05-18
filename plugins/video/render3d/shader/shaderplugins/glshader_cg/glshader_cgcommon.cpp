@@ -108,6 +108,7 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
 		cgGLSetParameter2f(param, v2.x, v2.y);
 	    }
 	    break;    
+	  case csShaderVariable::COLOR:
 	  case csShaderVariable::VECTOR3:
 	    {
 	      csVector3 v3;

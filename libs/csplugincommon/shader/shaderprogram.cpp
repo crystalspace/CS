@@ -256,13 +256,36 @@ bool csShaderProgram::RetrieveParamValue (ProgramParam& param,
   if (!var && (param.name != csInvalidStringID) &&
       param.name < (csStringID)stacks.Length () && 
       stacks[param.name].Length () > 0)
+  {
     var = stacks[param.name].Top ();
+  }
   if (var)
   {
-    if (var->GetType() == csShaderVariable::MATRIX)
+    const csShaderVariable::VariableType varType = var->GetType();
+    if (varType == csShaderVariable::MATRIX)
       var->GetValue (param.matrixValue);
     else
       var->GetValue (param.vectorValue);
+    switch (varType)
+    {
+      case csShaderVariable::INT:
+      case csShaderVariable::FLOAT:
+	param.type = ParamFloat;
+	break;
+      case csShaderVariable::VECTOR2:
+	param.type = ParamVector2;
+	break;    
+      case csShaderVariable::COLOR:
+      case csShaderVariable::VECTOR3:
+	param.type = ParamVector3;
+	break;
+      case csShaderVariable::VECTOR4:
+	param.type = ParamVector4;
+	break;
+      case csShaderVariable::MATRIX:
+	param.type = ParamMatrix;
+	break;
+    }
   }
 
   return ((var != 0) || (param.name == csInvalidStringID));
