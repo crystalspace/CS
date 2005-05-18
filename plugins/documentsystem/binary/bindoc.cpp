@@ -1509,10 +1509,11 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   if (nodeData->flags & BD_NODE_HAS_ATTR)
   {
     unsigned int i;
+    csRef<csBinaryDocAttribute> attr;
     for (i = 0; i < attrCount; i++)
     {
       startsScratch[i] = csLittleEndianLong ((uint32)nodesFile->GetPos() - attrStart);
-      csBinaryDocAttribute* attr = doc->GetPoolAttr ();
+      attr.AttachNew (doc->GetPoolAttr ());
       attr->SetTo (nodeData->atGetItem (i), this);
       attr->Store (nodesFile);
     }
@@ -1525,10 +1526,11 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
     unsigned int i;
+    csRef<csBinaryDocNode> node;
     for (i = 0; i < childCount; i++)
     {
       startsScratch[i] = csLittleEndianLong ((uint32)nodesFile->GetPos() - childStart);
-      csBinaryDocNode* node = doc->GetPoolNode();
+      node.AttachNew (doc->GetPoolNode());
       node->SetTo (nodeData->ctGetItem (i), this);
       node->Store (nodesFile);
     }
@@ -1711,21 +1713,28 @@ const char* csBinaryDocument::GetInIDString (uint32 ID) const
 
 void csBinaryDocument::Clear ()
 {
+  if (root && (root->flags & BD_NODE_MODIFIED))
+    delete root;
   data = 0; 
   dataStart = 0;
-  delete root; root = 0;
+  root = 0;
 }
 
 csRef<iDocumentNode> csBinaryDocument::CreateRoot ()
 {
   Clear();
   root = new csBdNode (BD_NODE_TYPE_DOCUMENT);
+  root->SetDoc (this);
   return csPtr<iDocumentNode> (GetRootNode ());
 }
 
 csRef<iDocumentNode> csBinaryDocument::GetRoot ()
 {
-  if (!root) root = new csBdNode (BD_NODE_TYPE_DOCUMENT);
+  if (!root) 
+  {
+    root = new csBdNode (BD_NODE_TYPE_DOCUMENT);
+    root->SetDoc (this);
+  }
   return csPtr<iDocumentNode> (GetRootNode ());
 }
 
@@ -1817,7 +1826,9 @@ const char* csBinaryDocument::Write (iFile* out)
   csMemFile* outNodes = new csMemFile;
   if (root)
   {
-    GetRootNode()->Store (outNodes);
+    csRef<csBinaryDocNode> rootNode;
+    rootNode.AttachNew (GetRootNode());
+    rootNode->Store (outNodes);
   }
   else
   {

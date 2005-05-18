@@ -35,6 +35,7 @@ chronological order.
 	  parameters that are retrieved from the supplied shader var stacks did
 	  not get a proper parameter type set. This manifested itself in e.g.
 	  a non-working parallax shader.
+	- res fixed some memory leaks and crashing in the bindoc plugin.
 16-May-2005
 	- Eric Sunshine fixed gristing problem in newly re-written Doxygen rule
 	  (docs.jam) which potentially caused Doxygen support files (images and
