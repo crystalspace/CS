@@ -174,7 +174,7 @@ rule LinkStaticPlugins
 }
 
 ##  StaticPluginLibrary name
-##    Create a library thta monolithically contains statically linkable 
+##    Create a library that monolithically contains statically linkable 
 ##    versions of all plugins, and also provides a target to install this
 ##    library ("install_staticplugins") as well as resources to facilitate the
 ##    use of that library from external projects. Also, most plugins will
