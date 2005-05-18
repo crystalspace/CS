@@ -175,10 +175,11 @@ struct iDocumentNode : public iBase
 
   /**
    * Compare this node with another node. You have to use this
-   * function to compare document nodes as equality on the
+   * function to compare document node objects as equality on the
    * iDocumentNode pointer itself doesn't work in all cases
    * (iDocumentNode is just a wrapper of the real node in some
    * implementations).
+   * \remarks Does *not* check equality of contents!
    */
   virtual bool Equals (iDocumentNode* other) = 0;
 
