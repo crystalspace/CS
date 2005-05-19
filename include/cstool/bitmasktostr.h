@@ -44,6 +44,8 @@ public:
     /// Name of the mask. Emitted when \a bits are set in a given mask.
     const char* name;
   };
+  /// string used to store the prettified strings.
+  CS_DECLARE_STATIC_CLASSVAR_REF(scratch, GetScratch, csString)
   /**
    * Retrieve "pretty" string for value composed of bit masks ORed together.
    * \param mask The value for which a string should be retrieved.
@@ -54,26 +56,24 @@ public:
    */
   static const char* GetStr (uint mask, const MaskNames* names)
   {
-    static csString str;
-    
     if (mask == 0)
       return "0";
     
-    str.Clear();
+    GetScratch().Clear();
     while (names->bits != 0)
     {
       if (mask & names->bits)
       {
-	str <<  " | " << names->name;
+	GetScratch() <<  " | " << names->name;
 	mask &= ~names->bits;
       }
       names++;
     }
     if (mask != 0)
     {
-      str.AppendFmt (" | %#x", mask);
+      GetScratch().AppendFmt (" | %#x", mask);
     }
-    return str.GetData() + 3;
+    return GetScratch().GetData() + 3;
   }
 };
 
