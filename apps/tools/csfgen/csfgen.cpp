@@ -189,7 +189,7 @@ public:
     else 
     {
       csFPrintf (out, "CSF [Font=%s.%d Height=%d Ascent=%d Descent=%d "
-	"TextHeight=%d UnderlinePosition=%s UnderlineThickness=%d "
+	"TextHeight=%d UnderlinePosition=%d UnderlineThickness=%d "
 	"HasCharRanges=1 HasBitmapMetrics=1 HasGlyphAdvance=1",
 	fontname, opt.fontsize, maxheight, font->GetAscent (), 
 	font->GetDescent (), font->GetTextHeight(), 

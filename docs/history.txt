@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-May-2005
+	- Wouter Wijngaards changed the csfgen font information print 
+	  to %d for the Underline position integer.
 18-May-2005
 	- Peter Amstutz changed iProgressMeter::Step() so that it takes an
 	  unsigned int parameter indicating the number of steps to advance
