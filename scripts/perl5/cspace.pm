@@ -9957,8 +9957,6 @@ package cspace::csGraphics3DCaps;
 *swig_maxTexHeight_set = *cspacec::csGraphics3DCaps_maxTexHeight_set;
 *swig_maxTexWidth_get = *cspacec::csGraphics3DCaps_maxTexWidth_get;
 *swig_maxTexWidth_set = *cspacec::csGraphics3DCaps_maxTexWidth_set;
-*swig_fog_get = *cspacec::csGraphics3DCaps_fog_get;
-*swig_fog_set = *cspacec::csGraphics3DCaps_fog_set;
 *swig_NeedsPO2Maps_get = *cspacec::csGraphics3DCaps_NeedsPO2Maps_get;
 *swig_NeedsPO2Maps_set = *cspacec::csGraphics3DCaps_NeedsPO2Maps_set;
 *swig_MaxAspectRatio_get = *cspacec::csGraphics3DCaps_MaxAspectRatio_get;
@@ -13245,9 +13243,6 @@ sub CS_VATTRIB_12 () { $cspacec::CS_VATTRIB_12 }
 sub CS_VATTRIB_13 () { $cspacec::CS_VATTRIB_13 }
 sub CS_VATTRIB_14 () { $cspacec::CS_VATTRIB_14 }
 sub CS_VATTRIB_15 () { $cspacec::CS_VATTRIB_15 }
-sub G3DFOGMETHOD_NONE () { $cspacec::G3DFOGMETHOD_NONE }
-sub G3DFOGMETHOD_ZBUFFER () { $cspacec::G3DFOGMETHOD_ZBUFFER }
-sub G3DFOGMETHOD_VERTEX () { $cspacec::G3DFOGMETHOD_VERTEX }
 sub CS_FX_MASK_MIXMODE () { $cspacec::CS_FX_MASK_MIXMODE }
 sub CS_FX_COPY () { $cspacec::CS_FX_COPY }
 sub CS_FX_MULTIPLY () { $cspacec::CS_FX_MULTIPLY }
