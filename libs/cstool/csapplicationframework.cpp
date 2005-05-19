@@ -59,6 +59,9 @@ csApplicationFramework::~csApplicationFramework ()
     DestroyApplication (object_reg);
   object_reg = 0;
   m_Ptr = 0;
+  // reset static vars
+  m_ApplicationStringName = "user app";
+  m_FoundationStringName = "crystalspace.libcsappframe";
 }
 
 

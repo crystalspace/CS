@@ -95,14 +95,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  * int main (int argc, char* argv[]) 
  * {
- *   MyApp myApp;
- *   return myApp.Main (argc, argv);
+ *   return csApplicationRunner<MyApp>::Run (argc, argv);
  * }
  * \endcode
  * \par
  * csApplicationFramework itself is derived from csInitializer for convenience,
  * allowing overridden members to call csInitializer methods without qualifying
- * them with csInitializer::.
+ * them with <tt>csInitializer::</tt>.
  */
 class CS_CRYSTALSPACE_EXPORT csApplicationFramework : public csInitializer
 {
@@ -390,11 +389,40 @@ public:
   
   /**
    * Starts up the application framework, to be called from main().
+   * \remarks It is possible that upon return of this method the
+   *  application did not quite but rather only requested a
+   *  restart. Hence, a loop should be used that checks the return
+   *  value of DoRestart() and, if requested, recreates the application
+   *  object and runs Main() again. The csApplicationRunner<> is a
+   *  convenient way to implement this.
    */
   int Main (int argc, char* argv[]);
 
   /// Query whether the application is to be restarted instead of exited.
   bool DoRestart();
+};
+
+/**
+ * Helper template to run a csApplicationFramework-derived application class.
+ */
+template <class T>
+class csApplicationRunner
+{
+public:
+  /// Run the application.
+  static int Run (int argc, char* argv[])
+  {
+    int result;
+    bool again;
+    do
+    {
+      T app;
+      result = app.Main (argc, argv);
+      again = app.DoRestart();
+    }
+    while (again);
+    return result;
+  }
 };
 
 /** @} */

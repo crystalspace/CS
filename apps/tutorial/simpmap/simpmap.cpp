@@ -244,5 +244,5 @@ bool Simple::LoadMap ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  return Simple().Main(argc, argv);
+  return csApplicationRunner<Simple>::Run (argc, argv);
 }

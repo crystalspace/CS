@@ -258,5 +258,5 @@ void PicView::ButtonScale (intptr_t app, iAwsSource *source)
  *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  return PicView().Main(argc, argv);
+  return csApplicationRunner<PicView>::Run (argc, argv);
 }

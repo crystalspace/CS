@@ -220,14 +220,5 @@ bool Simple::Application()
  *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  int result;
-  bool again;
-  do
-  {
-    Simple simple;
-    result = simple.Main(argc, argv);
-    again = simple.DoRestart();
-  }
-  while (again);
-  return result;
+  return csApplicationRunner<Simple>::Run (argc, argv);
 }
