@@ -291,5 +291,12 @@ void Simple::CreateSprites ()
  *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  /* Runs the application. 
+   *
+   * csApplicationRunner<> is a small wrapper to support "restartable" 
+   * applications (ie where CS needs to be completely shut down and loaded 
+   * again). Simple1 does not use that functionality itself, however, it
+   * allows you to later use "Simple.Restart();" and it'll just work.
+   */
   return csApplicationRunner<Simple>::Run (argc, argv);
 }
