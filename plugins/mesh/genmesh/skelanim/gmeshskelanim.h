@@ -78,8 +78,10 @@ private:
 	csArray<sac_vertex_data> vertices;
 	csSkelBone* parent;
 	csRefArray<csSkelBone> bones;
+	csReversibleTransform next_transform;
 	csReversibleTransform transform;
 	csReversibleTransform full_transform;
+	csRef<iGenMeshSkeletonBoneUpdateCallback> cb;
 
 	BoneTransformMode bone_mode;
 	iRigidBody *rigid_body;
@@ -118,6 +120,9 @@ public:
 
 	void UpdateRotation();
 	void UpdatePosition();
+	void FireCallback() 
+		{ if (cb) cb->UpdateTransform(this, next_transform); }
+
 	//------------------------------------------------------------------------
 
 	csSkelBone (csGenmeshSkelAnimationControl *animation_control);
@@ -127,6 +132,7 @@ public:
 	virtual const char* GetName () const { return name; }
 	virtual void SetName (const char* name) {csSkelBone::name = csStrNew (name); }
 	virtual csReversibleTransform &GetTransform () { return transform; }
+	virtual void SetTransform (const csReversibleTransform &transform) { csSkelBone::transform = transform; }
 	virtual csReversibleTransform &GetFullTransform () { return full_transform; }
 	virtual iGenMeshSkeletonBone* GetParent () { return parent; }
 	virtual void GetSkinBox (csBox3 &box, csVector3 &center);
@@ -137,7 +143,32 @@ public:
 	virtual int GetChildrenCount () { return (int)bones.Length () ;}
 	virtual iGenMeshSkeletonBone *GetChild (int i) { return bones[i]; }
 	virtual iGenMeshSkeletonBone *FindChild (const char *name);
+	virtual void SetUpdateCallback (iGenMeshSkeletonBoneUpdateCallback *callback) 
+		{ cb = callback; }
+	virtual iGenMeshSkeletonBoneUpdateCallback *GetUpdateCallback () 
+		{ return cb; };
 };
+
+class csSkelBoneDefaultUpdateCallback : public iGenMeshSkeletonBoneUpdateCallback
+{
+public:
+	SCF_DECLARE_IBASE;
+	csSkelBoneDefaultUpdateCallback()
+	{
+		SCF_CONSTRUCT_IBASE(0);
+	}
+	
+	virtual ~csSkelBoneDefaultUpdateCallback()
+	{
+		SCF_DESTRUCT_IBASE();
+	}
+
+	virtual void UpdateTransform(iGenMeshSkeletonBone *bone, const csReversibleTransform & transform)
+	{
+		bone->SetTransform(transform);
+	}
+};
+
 
 /**
  * Possible opcodes for instructions in a script.
@@ -322,7 +353,7 @@ class csGenmeshSkelAnimationControl :
 {
 private:
 	iObjectRegistry* object_reg;
-	csRef<iVirtualClock> virt_clk;
+	//csRef<iVirtualClock> virt_clk;
 
 	csGenmeshSkelAnimationControlFactory* factory;
 
@@ -341,7 +372,6 @@ private:
 	static csArray<csColor> bone_colors;
 	csRefArray<csSkelBone> bones;
 	csArray<size_t> parent_bones;
-
 
 	// Copied from the factory.
 	bool animates_vertices;
@@ -364,38 +394,15 @@ private:
 	// Update animation state. Set the 'dirty_XXX' flags to true if
 	// the arrays need updating too.
 	//void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
-	void UpdateAnimation (csTicks current);
-
 	bool vertices_mapped;
 	void TransformVerticesToBones (const csVector3* verts, int num_verts);
 
 public:
+	void UpdateAnimation (csTicks current);
+
 	csRefArray<csSkelBone>& GetBones () { return bones; }
 	csArray<size_t>& GetParentBones () { return parent_bones; }
 	csRefArray<csSkelAnimControlRunnable> & GetRunningScripts () { return running_scripts; }
-
-	bool HandleEvent (iEvent& ev);
-
-	class EventHandler : public iEventHandler
-	{
-	private:
-		csGenmeshSkelAnimationControl* parent;
-	public:
-		EventHandler (csGenmeshSkelAnimationControl* parent)
-		{
-			SCF_CONSTRUCT_IBASE (0);
-			EventHandler::parent = parent;
-		}
-		virtual ~EventHandler ()
-		{
-			SCF_DESTRUCT_IBASE ();
-		}
-		SCF_DECLARE_IBASE;
-		virtual bool HandleEvent (iEvent& ev)
-		{
-			return parent->HandleEvent (ev);
-		}
-	} *scfiEventHandler;
 
 	/// Constructor.
 	csGenmeshSkelAnimationControl (csGenmeshSkelAnimationControlFactory* fact, iObjectRegistry* object_reg);
@@ -431,16 +438,16 @@ public:
 	virtual void Stop (const char* scriptname);
 	virtual void Stop (iGenMeshSkeletonScript *script);
 
-	virtual void SetAlwaysUpdate(bool always_update) 
-		{ csGenmeshSkelAnimationControl::always_update = always_update; }
-	virtual bool GetAlwaysUpdate() 
-		{ return always_update; }
+	virtual void SetAlwaysUpdate(bool always_update);
+	virtual bool GetAlwaysUpdate() { return always_update; }
+	virtual iGenMeshSkeletonControlFactory *GetFactory() 
+		{ return (iGenMeshSkeletonControlFactory *)factory; };
 };
 
 /**
  * Genmesh animation control factory.
  */
-class csGenmeshSkelAnimationControlFactory : public iGenMeshAnimationControlFactory
+class csGenmeshSkelAnimationControlFactory : public iGenMeshSkeletonControlFactory
 {
 private:
 	csGenmeshSkelAnimationControlType* type;
@@ -463,6 +470,8 @@ private:
 	// This flag is set to true if there are hierarchical bones.
 	bool has_hierarchical_bones;
 
+	bool always_update;
+
 	// This is a table that contains a mapping for every vertex to the bones
 	// that contain that vertex.
 	csArray<csArray<sac_bone_data> > bones_vertices;
@@ -477,6 +486,8 @@ private:
 	csString error_buf;
 
 public:
+	void RegisterAUAnimation(csGenmeshSkelAnimationControl *anim);
+	void UnregisterAUAnimation(csGenmeshSkelAnimationControl *anim);
 	/// Constructor.
 	csGenmeshSkelAnimationControlFactory (csGenmeshSkelAnimationControlType* type,
 		iObjectRegistry* object_reg);
@@ -507,6 +518,15 @@ public:
 	// --- For iGenMeshAnimationControlFactory -------------------------
 	virtual const char* Load (iDocumentNode* node);
 	virtual const char* Save (iDocumentNode* parent);
+
+	// --- For iGenMeshSkeletonControlFactory -------------------------
+	virtual const char* LoadScriptFile(const char *filename);
+	virtual void DeleteScript(const char *script_name);
+	virtual void DeleteAllScripts();
+	virtual void SetAlwaysUpdate(bool always_update)
+		{ csGenmeshSkelAnimationControlFactory::always_update = always_update; }
+	virtual bool GetAlwaysUpdate()
+		{ return always_update; }
 };
 
 /**
@@ -516,14 +536,38 @@ class csGenmeshSkelAnimationControlType : public iGenMeshAnimationControlType
 {
 private:
 	iObjectRegistry* object_reg;
+	csRef<iVirtualClock> vc;
+	csRefArray<csGenmeshSkelAnimationControl> always_update_animations;
+
+	void UpdateAUAnimations(csTicks current_ticks)
+	{
+		size_t i;
+		size_t au_anim_length = always_update_animations.Length();
+		for(i = 0; i < au_anim_length; i++)
+		{
+			always_update_animations[i]->UpdateAnimation(current_ticks);
+		}
+	}
 
 public:
+	void RegisterAUAnimation(csGenmeshSkelAnimationControl *anim)
+	{
+		always_update_animations.Push(anim);
+	}
+
+	void UnregisterAUAnimation(csGenmeshSkelAnimationControl *anim)
+	{
+		always_update_animations.Delete(anim);
+	}
+
 	/// Constructor.
 	csGenmeshSkelAnimationControlType (iBase*);
 	/// Destructor.
 	virtual ~csGenmeshSkelAnimationControlType ();
 	/// Initialize.
 	bool Initialize (iObjectRegistry* object_reg);
+	/// Event handler.
+	bool HandleEvent (iEvent& ev);
 
 	virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory ();
 
@@ -537,6 +581,27 @@ public:
 			return scfParent->Initialize (object_reg);
 		}
 	} scfiComponent;
+
+  class EventHandler : public iEventHandler
+  {
+  private:
+    csGenmeshSkelAnimationControlType* parent;
+  public:
+    EventHandler (csGenmeshSkelAnimationControlType* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      EventHandler::parent = parent;
+    }
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      return parent->HandleEvent (ev);
+    }
+  } *scfiEventHandler;
 };
 
 #endif // __CS_GENMESHSKELANIM_H__

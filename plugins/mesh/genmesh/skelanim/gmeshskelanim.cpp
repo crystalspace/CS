@@ -46,16 +46,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csGenmeshSkelAnimationControlType)
 
 SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlFactory)
-	SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControlFactory)
+	SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlFactory)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControl)
 	SCF_IMPLEMENTS_INTERFACE (iGenMeshAnimationControl)
 	SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonControlState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControl::EventHandler)
-	SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkelBone)
@@ -64,6 +60,14 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkelAnimControlRunnable)
 	SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonScript)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csSkelBoneDefaultUpdateCallback)
+	SCF_IMPLEMENTS_INTERFACE (iGenMeshSkeletonBoneUpdateCallback)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csGenmeshSkelAnimationControlType::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
@@ -76,6 +80,7 @@ csSkelBone::csSkelBone (csGenmeshSkelAnimationControl *animation_control)
 	rot.x = rot.y = rot.z = 0;
 	anim_control = animation_control;
 	bone_mode = BM_SCRIPT;
+	cb = csPtr<iGenMeshSkeletonBoneUpdateCallback>(new csSkelBoneDefaultUpdateCallback());
 };
 
 csSkelBone::~csSkelBone ()
@@ -139,7 +144,7 @@ void csSkelBone::UpdateRotation()
 		if (updated)
 		{
 			rot.quat = q;
-			transform.SetO2T (csMatrix3(q));
+			next_transform.SetO2T (csMatrix3(q));
 		}
 	}
 	else
@@ -186,7 +191,7 @@ void csSkelBone::UpdateRotation()
 		if (updated)
 		{
 			rot.quat = q;
-			transform.SetO2T (csMatrix3(q));
+			next_transform.SetO2T (csMatrix3(q));
 		}
 	}
 }
@@ -222,7 +227,7 @@ void csSkelBone::UpdatePosition()
 			final_pos_y /= script_factors_total;
 			final_pos_z /= script_factors_total;
 		}
-		transform.SetOrigin (csVector3(final_pos_x, final_pos_y, final_pos_z));
+		next_transform.SetOrigin (csVector3(final_pos_x, final_pos_y, final_pos_z));
 	}
 }
 
@@ -258,6 +263,7 @@ void csSkelBone::CopyFrom (csSkelBone *other)
 	//Why?
 	rot.quat.y = -rot.quat.y;
 	//rot.quat = csQuaternion(transform.GetO2T());
+	next_transform = transform;
 }
 
 void csSkelBone::GetSkinBox (csBox3 &box, csVector3 &center)
@@ -561,12 +567,6 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 	SCF_CONSTRUCT_IBASE (0);
 	csGenmeshSkelAnimationControl::object_reg = object_reg;
 
-	scfiEventHandler = new EventHandler (this);
-	csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-	if (q != 0)
-		q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-
-	virt_clk = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 	factory = fact;
 	num_animated_verts = 0;
 	animated_verts = 0;
@@ -587,43 +587,23 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 	dirty_normals = true;
 	vertices_mapped = false;
 
-	always_update = true;
+	always_update = false;
 }
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
+	factory->UnregisterAUAnimation(this);
 	delete[] animated_verts;
 	delete[] animated_colors;
-
-	if (scfiEventHandler)
-	{
-		csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-		if (q)
-			q->RemoveListener (scfiEventHandler);
-		scfiEventHandler->DecRef ();
-	}
-
 	SCF_DESTRUCT_IBASE ();
-}
-
-bool csGenmeshSkelAnimationControl::HandleEvent (iEvent& ev)
-{
-	if (!num_animated_verts) 
-		return false;
-
-	if (ev.Type == csevBroadcast && (ev.Command.Code == cscmdPreProcess) && always_update)
-	{
-		UpdateAnimation (virt_clk->GetCurrentTicks());
-		return true;
-	}
-	
-	return false;
 }
 
 //void csGenmeshSkelAnimationControl::UpdateAnimation (csTicks current,
 //	int num_verts, uint32 version_id)
 void csGenmeshSkelAnimationControl::UpdateAnimation (csTicks current)
 {
+	if (!vertices_mapped) 
+		return;
 	// Make sure our arrays have the correct size.
 	//UpdateArrays (num_verts);
 	bool mod = false;
@@ -658,6 +638,33 @@ void csGenmeshSkelAnimationControl::UpdateAnimation (csTicks current)
 		dirty_texels = true;
 		dirty_colors = true;
 		dirty_normals = true;
+
+		size_t i;
+		for (i = 0 ; i < bones.Length () ; i++)
+		{
+			bones[i]->UpdateRotation();
+			bones[i]->UpdatePosition();
+			bones[i]->FireCallback();
+		}
+
+		// Update the animated vertices now.
+		for (i = 0 ; i < parent_bones.Length () ; i++)
+		{
+			csRef<csSkelBone> parent_bone = bones[parent_bones[i]];
+			switch (parent_bone->GetMode ())
+			{
+				case BM_NONE:
+				case BM_SCRIPT:
+					parent_bone->UpdateBones ();
+				break;
+				case BM_PHYSICS:
+					if (parent_bone->GetRigidBody ())
+						parent_bone->UpdateBones (parent_bone->GetRigidBody ());
+					else
+						parent_bone->UpdateBones ();
+				break;
+			}
+		}
 	}
 }
 
@@ -768,15 +775,18 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
 		//UpdateAnimation (current, num_verts, version_id);
 	}
 
+	/*
 	for (i = 0 ; i < bones.Length () ; i++)
 	{
 		bones[i]->UpdateRotation();
 		bones[i]->UpdatePosition();
 	}
+	*/
 
 	// Update the animated vertices now.
 	if (dirty_vertices)
 	{
+		/*
 		for (i = 0 ; i < parent_bones.Length () ; i++)
 		{
 			csRef<csSkelBone> parent_bone = bones[parent_bones[i]];
@@ -794,6 +804,7 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
 				break;
 			}
 		}
+		*/
 		
 		csArray<csArray<sac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
 		for (i = 0 ; i < (size_t)num_verts ; i++)
@@ -913,6 +924,12 @@ iGenMeshSkeletonBone *csGenmeshSkelAnimationControl::FindBone (const char *name)
 	return 0;
 }
 
+void csGenmeshSkelAnimationControl::SetAlwaysUpdate(bool always_update)
+{
+	always_update ? factory->RegisterAUAnimation(this) : factory->UnregisterAUAnimation(this);
+	csGenmeshSkelAnimationControl::always_update = always_update; 
+}
+
 //-------------------------------------------------------------------------
 
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
@@ -928,6 +945,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 	animates_colors = false;
 	animates_normals = false;
 	has_hierarchical_bones = false;
+	always_update = false;
 }
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
@@ -942,6 +960,10 @@ csPtr<iGenMeshAnimationControl> csGenmeshSkelAnimationControlFactory::
 	size_t i;
 	for (i = 0 ; i < autorun_scripts.Length () ; i++)
 		ctrl->Execute (autorun_scripts[i]);
+	if (always_update)
+	{
+		ctrl->SetAlwaysUpdate(true);
+	}
 	return csPtr<iGenMeshAnimationControl> (ctrl);
 }
 
@@ -975,6 +997,19 @@ csSkelAnimControlScript* csGenmeshSkelAnimationControlFactory::FindScript (
 		if (strcmp (scripts[i]->GetName (), scriptname) == 0)
 			return scripts[i];
 	return 0;
+}
+
+const char* csGenmeshSkelAnimationControlFactory::LoadScriptFile(const char *filename)
+{
+	return 0;
+}
+
+void csGenmeshSkelAnimationControlFactory::DeleteScript(const char *script_name)
+{
+}
+
+void csGenmeshSkelAnimationControlFactory::DeleteAllScripts()
+{
 }
 
 csSkelBone* csGenmeshSkelAnimationControlFactory::FindBone (
@@ -1237,6 +1272,15 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 					autorun_scripts.Push (scriptname);
 				}
 				break;
+			case XMLTOKEN_UPDATE:
+				{
+					const char* update_mode = child->GetAttributeValue ("mode");
+					if (!strcmp(update_mode, "always"))
+					{
+						always_update = true;
+					}
+				}
+				break;
 			default:
 				error_buf.Format (
 				"Don't recognize token '%s' in anim control!",
@@ -1266,7 +1310,16 @@ void csGenmeshSkelAnimationControlFactory::UpdateParentBones ()
 		if (!bones[i]->GetParent ())
 			parent_bones.Push (i);
 	}
+}
 
+void csGenmeshSkelAnimationControlFactory::RegisterAUAnimation(csGenmeshSkelAnimationControl *anim)
+{
+	type->RegisterAUAnimation(anim);
+}
+
+void csGenmeshSkelAnimationControlFactory::UnregisterAUAnimation(csGenmeshSkelAnimationControl *anim)
+{
+	type->UnregisterAUAnimation(anim);
 }
 
 //-------------------------------------------------------------------------
@@ -1276,10 +1329,18 @@ csGenmeshSkelAnimationControlType::csGenmeshSkelAnimationControlType (
 {
 	SCF_CONSTRUCT_IBASE (pParent);
 	SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+	scfiEventHandler = 0;
 }
 
 csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 {
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef ();
+  }
 	SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
 	SCF_DESTRUCT_IBASE ();
 }
@@ -1287,6 +1348,11 @@ csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
 	csGenmeshSkelAnimationControlType::object_reg = object_reg;
+  scfiEventHandler = new EventHandler (this);
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (q != 0)
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
 	return true;
 }
 
@@ -1296,4 +1362,14 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
 	csGenmeshSkelAnimationControlFactory* ctrl = new csGenmeshSkelAnimationControlFactory
 		 (this, object_reg);
 	return csPtr<iGenMeshAnimationControlFactory> (ctrl);
+}
+
+bool csGenmeshSkelAnimationControlType::HandleEvent (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast and ev.Command.Code == cscmdPreProcess)
+  {
+      UpdateAUAnimations(vc->GetCurrentTicks());
+	  return true;
+  }
+  return false;
 }

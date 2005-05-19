@@ -22,10 +22,13 @@
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
+#include "imesh/genmesh.h"
 
 struct iRigidBody;
 struct iGenMeshSkeletonBone;
 struct iGenMeshSkeletonScript;
+struct iGenMeshSkeletonBoneUpdateCallback;
+struct iGenMeshSkeletonControlFactory;
 
 enum BoneTransformMode
 {
@@ -107,6 +110,41 @@ struct iGenMeshSkeletonControlState : public iBase
    * Get always_update value
    */
   virtual bool GetAlwaysUpdate() = 0;
+
+  /**
+   * Get factory
+   */
+  virtual iGenMeshSkeletonControlFactory *GetFactory() = 0;
+};
+
+SCF_VERSION  (iGenMeshSkeletonControlFactory, 0, 0, 1);
+
+struct iGenMeshSkeletonControlFactory: public iGenMeshAnimationControlFactory 
+{
+  /**
+   * Load animation script from file
+   */
+  virtual const char* LoadScriptFile(const char *filename) =0;
+  
+  /**
+   * Delete script by name
+   */
+  virtual void DeleteScript(const char *script_name) = 0;
+  
+  /**
+   * Delete all animation scripts
+   */
+  virtual void DeleteAllScripts() = 0;
+  
+  /**
+   * Set always update flag
+   */
+  virtual void SetAlwaysUpdate(bool always_update) = 0;
+  
+  /**
+   * Get always update flag
+   */
+  virtual bool GetAlwaysUpdate() = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonBone, 0, 0, 1);
@@ -127,6 +165,11 @@ struct iGenMeshSkeletonBone : public iBase
    * Get bone triansformation in local coordsys of parent.
    */
   virtual csReversibleTransform &GetTransform () = 0;
+
+  /**
+   * Set bone triansformation in local coordsys of parent.
+   */
+  virtual void SetTransform (const csReversibleTransform &transform) = 0;
 
   /**
    * Get bone triansformation in model coordsys.
@@ -182,6 +225,23 @@ struct iGenMeshSkeletonBone : public iBase
    * Get child bone by name.
    */
   virtual iGenMeshSkeletonBone *FindChild (const char *name) = 0;
+
+  /**
+   * Set bone callback fuction.
+   */
+  virtual void SetUpdateCallback (iGenMeshSkeletonBoneUpdateCallback *callback) = 0;
+
+  /**
+   * Get bone callback fuction.
+   */
+  virtual iGenMeshSkeletonBoneUpdateCallback *GetUpdateCallback () = 0;
+};
+
+SCF_VERSION  (iGenMeshSkeletonBoneUpdateCallback, 0, 0, 1);
+
+struct iGenMeshSkeletonBoneUpdateCallback : public iBase
+{
+	virtual void UpdateTransform(iGenMeshSkeletonBone *bone, const csReversibleTransform & transform) = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonScript, 0, 0, 1);

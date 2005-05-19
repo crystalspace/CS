@@ -15,6 +15,25 @@ chronological order.
 	- res added a small blurb to simple* about the csApplicationRunner<>
 	  purpose and updated the simple1 and simpmap tutorials in the manual 
 	  to use it, too.
+	- Erroroman improoved genmesh skeleton animation plugin:
+	    -"always update" flag of animation by default is false.
+	    - Added iGenMeshSkeletonControlFactory that inherits 
+	      iGenMeshAnimationControlFactory.
+	    - iGenMeshSkeletonControlFactory allows loading animation
+	      scripts from file and deleting already loaded scripts (not
+	      ready atm :| ).
+	    - Added missing SetTransform function to iGenMeshSkeletonBone.
+	    - Added small hacky tric to genmesh.cpp to force skeleton
+	      creating even object is not visible.
+	    - Improoved skeleton updating if mesh is not visible and
+	      "always update" flag is true.
+	    - Added iGenMeshSkeletonBoneUpdateCallback struct that can be 
+	      user defined to every iGenMeshSkeletonBone. By default
+	      it just applies new transform to the bone. Callback is
+	      usable for example to move bone collider.
+	    - Removed event handling from iGenMeshSkeletonControlState.
+	    - Added event handling to csGenmeshSkelAnimationControlType where
+	      it updates all "alwas update" animations.
 	- Wouter made static string in bitmasktostring use the CS static
 	  variable macros.
 	- Wouter made xwindow plugin properly cleanup the windows on restart.

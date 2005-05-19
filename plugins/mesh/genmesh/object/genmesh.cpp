@@ -238,7 +238,7 @@ const csVector2* csGenmeshMeshObject::AnimControlGetTexels ()
 	factory->scfiObjectModel.GetShapeNumber ());
 }
 
-const csVector3* csGenmeshMeshObject::AnimControlGetNormals ()
+const csVector3* csGenmeshMeshObject::AnimControlGetTexels ()
 {
   return anim_ctrl->UpdateNormals (vc->GetCurrentTicks (),
   	factory->GetNormals (),
@@ -264,6 +264,10 @@ void csGenmeshMeshObject::SetAnimationControl (
     anim_ctrl_texels = ac->AnimatesTexels ();
     anim_ctrl_normals = ac->AnimatesNormals ();
     anim_ctrl_colors = ac->AnimatesColors ();
+    //a hacky tric to force animation stuff creating
+    ac->AnimControlGetVertices ();
+    ac->AnimControlGetTexels ();
+    ac->AnimControlGetTexels ();
   }
   else
   {
