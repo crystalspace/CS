@@ -17,6 +17,7 @@ chronological order.
 	  to use it, too.
 	- Wouter made static string in bitmasktostring use the CS static
 	  variable macros.
+	- Wouter made xwindow plugin properly cleanup the windows on restart.
 18-May-2005
 	- Peter Amstutz changed iProgressMeter::Step() so that it takes an
 	  unsigned int parameter indicating the number of steps to advance

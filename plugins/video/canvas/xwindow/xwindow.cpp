@@ -413,6 +413,7 @@ void csXWindow::Close ()
     XDestroyWindow (dpy, wm_win);
     wm_win = 0;
   }
+  XSync (dpy, true);
 }
 
 void csXWindow::SetTitle (const char* title)
