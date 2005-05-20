@@ -94,8 +94,9 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int jn, int x, int y, uint32 axesChanged,
-		  int jButton, int jModifiers) : attributes (53)
+csEvent::csEvent (csTicks iTime, int eType, int jn, int x, int y, 
+		  uint32 axesChanged, int jButton, int jModifiers) : 
+  attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
@@ -113,8 +114,9 @@ csEvent::csEvent (csTicks iTime, int eType, int jn, int x, int y, uint32 axesCha
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int jn, const int *axes, uint8 numAxes,
-		  uint32 axesChanged, int jButton, int jModifiers) : attributes (53)
+csEvent::csEvent (csTicks iTime, int eType, int jn, const int *axes, 
+		  uint8 numAxes, uint32 axesChanged, int jButton, 
+		  int jModifiers) : attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
@@ -122,7 +124,8 @@ csEvent::csEvent (csTicks iTime, int eType, int jn, const int *axes, uint8 numAx
   Category = SubCategory = Flags = 0;
 
   Add("jsNumber", jn);
-  Add("jsAxes", (void *) axes, numAxes * sizeof(int)); /* copies array for us */
+  Add("jsAxes", (void *) axes, numAxes * sizeof(int)); 
+    /* copies array for us */
   Add("jsNumAxes", numAxes);
   Add("jsAxesChanged", axesChanged);
   Add("jsButton", jButton);

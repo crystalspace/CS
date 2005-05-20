@@ -44,6 +44,9 @@ chronological order.
 	  (&e)" in the Win32Assistant and the csSoundRenderDS3D classes. He
 	  corrected also a simple spelling error in 
 	  csGenmeshSkelAnimationControlType.
+	- res fixed a VC8 warning caused by CS_IMPLEMENT_STATIC_CLASSVAR_REF.
+	- res adjusted the recently changes event-related headers and sources 
+	  to the 80 chars per line limit CS mandates.
 19-May-2005
 	- Wouter Wijngaards changed the csfgen font information print 
 	  to %d for the Underline position integer.

@@ -94,8 +94,8 @@ void csInputDriver::Post(iEvent* e)
 
 bool csInputDriver::HandleEvent(iEvent& e)
 {
-  const bool focusChanged = (e.Type == csevBroadcast &&
-			     csCommandEventHelper::GetCode(&e) == cscmdFocusChanged);
+  const bool focusChanged = ((e.Type == csevBroadcast)
+    && (csCommandEventHelper::GetCode(&e) == cscmdFocusChanged));
   if (focusChanged) 
   {
     if (!csCommandEventHelper::GetInfo(&e)) // Application lost focus.
@@ -392,7 +392,8 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
   ev.AttachNew (new csEvent ());
   ev->Type = csevKeyboard;
   ev->Category = ev->SubCategory = ev->Flags = 0;
-  ev->Add ("keyEventType", (uint8)(iDown ? csKeyEventTypeDown : csKeyEventTypeUp));
+  ev->Add ("keyEventType", 
+    (uint8)(iDown ? csKeyEventTypeDown : csKeyEventTypeUp));
   ev->Add ("keyCodeRaw", (uint32)codeRaw);
   ev->Add ("keyCodeCooked", (uint32)codeCooked);
   ev->Add ("keyModifiers", &modifiersState, sizeof (modifiersState));
@@ -626,7 +627,8 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
 /**
  * Try to post a new mouse button event.
  * 
- * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
+ *   support to fix.
  */
 void csMouseDriver::DoButton (int button, bool down, int x, int y)
 {
@@ -676,7 +678,8 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
 /**
  * Try to post a new mouse motion event.
  * 
- * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
+ *   support to fix.
  */
 void csMouseDriver::DoMotion (int x, int y)
 {
@@ -750,7 +753,8 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 /**
  * Try to post a new joystick button event.
  * 
- * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
+ *  support to fix.
  */
 void csJoystickDriver::DoButton (int number, int button, bool down,
 				 const int *axes, uint8 numAxes)
@@ -780,7 +784,8 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
 /**
  * Try to post a new joystick motion event.
  * 
- * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
+ *  support to fix.
  */
 void csJoystickDriver::DoMotion (int number, const int *axes, uint8 numAxes)
 {

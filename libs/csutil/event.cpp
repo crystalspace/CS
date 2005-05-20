@@ -68,7 +68,8 @@ csKeyEventType csKeyEventHelper::GetEventType (const iEvent* event)
 bool csKeyEventHelper::GetAutoRepeat (const iEvent* event)
 {
   bool autoRep;
-  if (event->Retrieve ("keyAutoRepeat", autoRep) != csEventErrNone) return false;
+  if (event->Retrieve ("keyAutoRepeat", autoRep) != csEventErrNone) 
+    return false;
   return autoRep;
 }
 				    
@@ -80,7 +81,8 @@ csKeyCharType csKeyEventHelper::GetCharacterType (const iEvent* event)
   return (csKeyCharType)type;
 }
 
-bool csKeyEventHelper::GetEventData (const iEvent* event, csKeyEventData& data)
+bool csKeyEventHelper::GetEventData (const iEvent* event, 
+				      csKeyEventData& data)
 {
   if (!CS_IS_KEYBOARD_EVENT (*event)) return false;
 
@@ -135,7 +137,8 @@ int csMouseEventHelper::GetButton(const iEvent *event)
   return res;
 }
 
-bool csMouseEventHelper::GetEventData (const iEvent* event, csMouseEventData& data)
+bool csMouseEventHelper::GetEventData (const iEvent* event, 
+					csMouseEventData& data)
 {
   if (!CS_IS_MOUSE_EVENT (*event)) return false;
   
@@ -182,7 +185,8 @@ uint8 csJoystickEventHelper::GetNumAxes(const iEvent *event)
   return res;
 }
 
-bool csJoystickEventHelper::GetEventData (const iEvent* event, csJoystickEventData& data)
+bool csJoystickEventHelper::GetEventData (const iEvent* event, 
+					   csJoystickEventData& data)
 {
   if (!CS_IS_JOYSTICK_EVENT (*event)) return false;
   
@@ -215,7 +219,8 @@ intptr_t csCommandEventHelper::GetInfo(const iEvent* event)
   return res;
 }
 
-bool csCommandEventHelper::GetEventData(const iEvent* event, csCommandEventData& data)
+bool csCommandEventHelper::GetEventData(const iEvent* event, 
+					 csCommandEventData& data)
 {
   if (!CS_IS_COMMAND_EVENT (*event)) return false;
 

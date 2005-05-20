@@ -545,12 +545,12 @@ static void Class ## _ ## getterFunc ## _kill ();              \
 static void Class ## _ ## getterFunc ## _kill_array ();        \
 void Class ## _ ## getterFunc ## _kill ()                      \
 {                                                              \
-  (void) Class ## _ ## getterFunc ## _kill_array;              \
+  (void) &Class ## _ ## getterFunc ## _kill_array;              \
   delete &Class::getterFunc ();                                \
 }                                                              \
 void Class ## _ ## getterFunc ## _kill_array ()                \
 {                                                              \
-  (void) Class ## _ ## getterFunc ## _kill;                    \
+  (void) &Class ## _ ## getterFunc ## _kill;                    \
   delete [] &Class::getterFunc ();                             \
 }                                                              \
 }                                                              \

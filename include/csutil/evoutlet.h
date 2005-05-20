@@ -69,7 +69,8 @@ public:
   /// Put a mouse event into event queue.
   virtual void Mouse (int iButton, bool iDown, int x, int y);
   /// Put a joystick event into event queue.
-  virtual void Joystick (int iNumber, int iButton, bool iDown, const int *axes, uint8 numAxes);
+  virtual void Joystick (int iNumber, int iButton, bool iDown, 
+    const int *axes, uint8 numAxes);
   /// Put a broadcast event into event queue.
   virtual void Broadcast (int iCode, intptr_t iInfo);
   /// Broadcast a event to all plugins

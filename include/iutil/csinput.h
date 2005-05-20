@@ -106,8 +106,12 @@ SCF_VERSION(iKeyboardDriver, 0, 0, 2);
  *   <li>CS_QUERY_REGISTRY()
  *   </ul>
  * 
- * \todo Need a simple way to query all currently-set modifiers for event construction.
- * \see csMouseDriver::DoButton() \see csMouseDriver::DoMotion() \see csJoystickDriver::DoButton() \see csJoystickDriver::DoMotion() 
+ * \todo Need a simple way to query all currently-set modifiers for event 
+ *   construction.
+ * \see csMouseDriver::DoButton() 
+ * \see csMouseDriver::DoMotion() 
+ * \see csJoystickDriver::DoButton() 
+ * \see csJoystickDriver::DoMotion() 
  */
 struct iKeyboardDriver : public iBase
 {
@@ -254,7 +258,8 @@ struct iJoystickDriver : public iBase
    * Call this to add a 'button down/up' event to queue.  Joystick
    * numbers start at 1.  Button numbers start at 1.
    */
-  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes) = 0;
+  virtual void DoButton (int number, int button, bool down, 
+    const int *axes, uint8 numAxes) = 0;
   /// Call this to add a 'moved' event to queue for joystick 'number'.
   virtual void DoMotion (int number, const int *axes, uint8 nunmAxes) = 0;
 };

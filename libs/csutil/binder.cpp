@@ -57,9 +57,9 @@ bool csInputBinder::HandleEvent (iEvent &ev)
     case csevMouseUp:
     case csevJoystickUp:
     {
-      bool down = (ev.Type == csevMouseDown) || (ev.Type == csevJoystickDown) ||
-	((ev.Type == csevKeyboard) && 
-	(csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
+      bool down = (ev.Type == csevMouseDown) || (ev.Type == csevJoystickDown) 
+	|| ((ev.Type == csevKeyboard) 
+	    && (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
 
       BtnCmd *bind = btnHash.Get
         (csInputDefinition (& ev, CSMASK_ALLMODIFIERS), 0);
@@ -82,7 +82,9 @@ bool csInputBinder::HandleEvent (iEvent &ev)
         AxisCmd *bind = axisHash.Get
           (csInputDefinition (& ev, axis), 0);
 
-        if (bind) bind->val = axis ? csMouseEventHelper::GetY(&ev) : csMouseEventHelper::GetX(&ev);
+        if (bind) bind->val = 
+	  axis ? csMouseEventHelper::GetY(&ev) : 
+	    csMouseEventHelper::GetX(&ev);
       }
 
       return true;

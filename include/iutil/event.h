@@ -510,7 +510,8 @@ struct iEventOutlet : public iBase
    * Otherwise an joystick up/down event is generated. iButton can be from
    * 1 to CS_MAX_JOYSTICK_BUTTONS (or 0 for a joystick move event).
    */
-  virtual void Joystick(int iNumber, int iButton, bool iDown, const int *axes, uint8 numAxes) = 0;
+  virtual void Joystick(int iNumber, int iButton, bool iDown, 
+    const int *axes, uint8 numAxes) = 0;
 
   /**
    * Put a broadcast event into event queue.<p>

@@ -125,7 +125,8 @@ protected:
   struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
-    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+    virtual bool HandleEvent(iEvent& e) 
+    { return scfParent->HandleEvent(e); }
   } scfiEventHandler;
   friend struct eiEventHandler;
 public:
@@ -255,7 +256,8 @@ public:
   struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMouseDriver);
-    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+    virtual bool HandleEvent(iEvent& e) 
+    { return scfParent->HandleEvent(e); }
   } scfiEventHandler;
   friend struct eiEventHandler;
 };
@@ -293,11 +295,15 @@ public:
   virtual void Reset ();
 
   /// Query last joystick X position
-  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (int number) const { return Last [number - 1][0]; }
+  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (int number) const 
+  { return Last [number - 1][0]; }
   /// Query last joystick Y position
-  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (int number) const { return Last [number - 1][1]; }
-  CS_PURE_METHOD virtual const int *GetLast (int number) const { return Last [number - 1]; }
-  CS_PURE_METHOD virtual int GetLast (int number, uint8 axis) const { return Last [number - 1][axis - 1]; }
+  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (int number) const 
+  { return Last [number - 1][1]; }
+  CS_PURE_METHOD virtual const int *GetLast (int number) const 
+  { return Last [number - 1]; }
+  CS_PURE_METHOD virtual int GetLast (int number, uint8 axis) const 
+  { return Last [number - 1][axis - 1]; }
   /// Query the last known joystick button state
   CS_PURE_METHOD virtual bool GetLastButton (int number, int button) const
   {
@@ -307,7 +313,8 @@ public:
   }
 
   /// Call this to add a 'joystick button down/up' event to queue
-  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes);
+  virtual void DoButton (int number, int button, bool down, 
+    const int *axes, uint8 numAxes);
   /// Call this to add a 'joystick moved' event to queue
   virtual void DoMotion (int number, const int *axes, uint8 numAxes);
 
@@ -319,7 +326,8 @@ public:
   struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);
-    virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+    virtual bool HandleEvent(iEvent& e) 
+    { return scfParent->HandleEvent(e); }
   } scfiEventHandler;
   friend struct eiEventHandler;
 };

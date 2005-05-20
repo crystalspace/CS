@@ -180,10 +180,12 @@ public:
   csEvent (csTicks, int type, int x, int y, int button, int modifiers);
 
   /// Create a joystick event object (old interface)
-  csEvent (csTicks, int type, int n, int x, int y, uint32 axesChanged, int button, int modifiers);
+  csEvent (csTicks, int type, int n, int x, int y, uint32 axesChanged, 
+    int button, int modifiers);
 
   /// Create a joystick event object
-  csEvent (csTicks, int type, int n, const int *axes, uint8 numAxes, uint32 axesChanged, int button, int modifiers);
+  csEvent (csTicks, int type, int n, const int *axes, uint8 numAxes, 
+    uint32 axesChanged, int button, int modifiers);
 
   /// Create a command event object
   csEvent (csTicks, int type, int code, intptr_t info = 0);

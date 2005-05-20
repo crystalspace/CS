@@ -62,7 +62,8 @@ public:
    * keyboard modifiers struct.
    * \sa CSMASK_ALT etc.
    */
-  CS_CONST_METHOD static uint32 GetModifiersBits (const csKeyModifiers& modifiers);
+  CS_CONST_METHOD static uint32 GetModifiersBits (
+    const csKeyModifiers& modifiers);
   /**
    * Get a bitmask corresponding to the pressed modifier keys from the event.
    * \sa CSMASK_ALT etc.
@@ -94,11 +95,19 @@ public:
   /// retrieve button code
   CS_PURE_METHOD static int GetButton(const iEvent *event);
   /// retrieve modifier flags
-  CS_PURE_METHOD static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) { return csKeyEventHelper::GetModifiers(event, modifiers); }
+  CS_PURE_METHOD static void GetModifiers(const iEvent *event, 
+    csKeyModifiers& modifiers) 
+  { return csKeyEventHelper::GetModifiers(event, modifiers); }
   /// retrieve modifiers bitmask
-  CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) { csKeyModifiers modifiers; csKeyEventHelper::GetModifiers(event, modifiers); return csKeyEventHelper::GetModifiersBits(modifiers); }
+  CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) 
+  { 
+    csKeyModifiers modifiers; 
+    csKeyEventHelper::GetModifiers(event, modifiers); 
+    return csKeyEventHelper::GetModifiersBits(modifiers); 
+  }
   /// retrieve event dataa
-  CS_PURE_METHOD static bool GetEventData (const iEvent* event, csMouseEventData& data);
+  CS_PURE_METHOD static bool GetEventData (const iEvent* event, 
+    csMouseEventData& data);
 };
 
 /** @} */
@@ -114,9 +123,11 @@ public:
   /// retrieve joystick number (1, 2, ...)
   CS_PURE_METHOD static int GetNumber(const iEvent *event);
   /// retrieve axis 0 value
-  CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetX(const iEvent *event) { return csJoystickEventHelper::GetAxis(event, 1); }
+  CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetX(const iEvent *event) 
+  { return csJoystickEventHelper::GetAxis(event, 1); }
   /// retrieve axis 1 value
-  CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetY(const iEvent *event) { return csJoystickEventHelper::GetAxis(event, 2); }
+  CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetY(const iEvent *event) 
+  { return csJoystickEventHelper::GetAxis(event, 2); }
   /// retrieve any axis (basis 1) value
   CS_PURE_METHOD static int GetAxis(const iEvent *event, int);
   /// retrieve number of axes
@@ -124,9 +135,15 @@ public:
   /// retrieve button number
   CS_PURE_METHOD static int GetButton(const iEvent *event);
   /// retrieve modifier flags
-  static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) { return csKeyEventHelper::GetModifiers(event, modifiers); }
+  static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) 
+  { return csKeyEventHelper::GetModifiers(event, modifiers); }
   /// retrieve modifiers bitmask
-  CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) { csKeyModifiers modifiers; csKeyEventHelper::GetModifiers(event, modifiers); return csKeyEventHelper::GetModifiersBits(modifiers); }
+  CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) 
+  { 
+    csKeyModifiers modifiers; 
+    csKeyEventHelper::GetModifiers(event, modifiers); 
+    return csKeyEventHelper::GetModifiersBits(modifiers); 
+  }
   /// retrieve event dataa
   static bool GetEventData (const iEvent* event, csJoystickEventData& data);
 };
