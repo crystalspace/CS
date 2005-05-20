@@ -285,6 +285,8 @@ bool csShaderProgram::RetrieveParamValue (ProgramParam& param,
       case csShaderVariable::MATRIX:
 	param.type = ParamMatrix;
 	break;
+      default:
+	param.type = ParamInvalid;
     }
   }
 
