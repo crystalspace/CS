@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/event.h"
 #include "csutil/cscolor.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
@@ -306,7 +307,7 @@ void csODEParticlePhysics::Execute (float stepsize)
 
 bool csODEParticlePhysics::HandleEvent (iEvent &event)
 {
-  if (event.Type != csevBroadcast || event.Command.Code != cscmdPreProcess)
+  if (event.Type != csevBroadcast || csCommandEventHelper::GetCode(&event) != cscmdPreProcess)
   {
     return false;
   }

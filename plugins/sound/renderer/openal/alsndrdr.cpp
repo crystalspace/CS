@@ -20,6 +20,7 @@
 #include "csutil/sysfunc.h"
 
 #include "csutil/scf.h"
+#include "csutil/event.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -367,7 +368,7 @@ bool csSoundRenderOpenAL::HandleEvent (iEvent &e)
 {
   if (e.Type == csevCommand || e.Type == csevBroadcast)
   {
-    switch (e.Command.Code)
+    switch (csCommandEventHelper::GetCode(&e))
     {
     case cscmdPreProcess:
       if (!BackgroundProcessing)

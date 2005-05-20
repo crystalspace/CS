@@ -22,6 +22,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "iutil/vfs.h"
@@ -169,12 +170,12 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     FinishFrame ();
     return true;
@@ -194,15 +195,17 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if ((ev.Type == csevMouseMove))
   {
-    csPrintf("Mouse move to %d %d\n", ev.Mouse.x, ev.Mouse.y);
+    csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetX(&ev));
   }
   else if ((ev.Type == csevMouseDown))
   {
-    csPrintf("Mouse button %d down at %d %d\n", ev.Mouse.Button, ev.Mouse.x, ev.Mouse.y);
+    csPrintf("Mouse button %d down at %d %d\n",
+      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetX(&ev));
   }
   else if ((ev.Type == csevMouseUp))
   {
-    csPrintf("Mouse button %d up at %d %d\n", ev.Mouse.Button, ev.Mouse.x, ev.Mouse.y);
+    csPrintf("Mouse button %d up at %d %d\n",
+      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetX(&ev));
   }
 
   return false;

@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/event.h"
 #include "cstool/collider.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
@@ -455,7 +456,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
 bool csODEDynamics::HandleEvent (iEvent& Event)
 {
-  if (Event.Type == csevBroadcast && Event.Command.Code == cscmdPreProcess)
+  if (Event.Type == csevBroadcast && csCommandEventHelper::GetCode(&Event) == cscmdPreProcess)
   {
     float stepsize = steptime;
     float elapsed_time = ((float)clock->GetElapsedTicks ())/1000.0;
