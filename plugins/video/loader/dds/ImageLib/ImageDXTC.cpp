@@ -269,6 +269,9 @@ void ImageDXTC::ToImage32(Image32 *pDest)
 	case DC_DXT3:
 		DXT3to32(pDest);
 		break;
+	/* DXT5 is not supported for decoding. */
+	default:
+		break;
 	}
 }
 
