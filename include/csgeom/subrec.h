@@ -29,9 +29,9 @@
 
 #include "csextern.h"
 
+#include "csutil/array.h"
+#include "csutil/blockallocator.h"
 #include "csgeom/csrect.h"
-
-class csSubRect;
 
 /**
  * A class managing allocations of sub-rectangles. i.e. this class represents
@@ -40,16 +40,92 @@ class csSubRect;
  */
 class CS_CRYSTALSPACE_EXPORT csSubRectangles
 {
-  friend class csSubRect;
+public:
+  /**
+  * Sub-rectangle
+  */
+  class SubRect
+  {
+  protected:
+    friend class csSubRectangles;
+    typedef csBlockAllocator<SubRect> SubRectAlloc;
+    friend class SubRectAlloc;
+
+    enum SplitType
+    {
+      SPLIT_UNSPLIT,
+      SPLIT_H,
+      SPLIT_V
+    };
+    enum AllocPos
+    {
+      ALLOC_INVALID = -1,
+      ALLOC_RIGHT,
+      ALLOC_BELOW,
+      ALLOC_NEW
+    };
+    struct AllocInfo
+    {
+      SubRect* node;
+      int d;
+      AllocPos allocPos;
+      bool res;
+      
+      AllocInfo() : node(0), d(0x7fffffff), allocPos(ALLOC_INVALID), 
+	res(false) {};
+    };
+
+    csRect rect;
+    csRect allocedRect;
+    int splitPos;
+    SplitType splitType;
+
+    csSubRectangles* superrect;
+    SubRect* parent;
+    SubRect* children[2];
+
+    SubRect ();
+
+    /// searches for the "ideal" position of a rectangle
+    void TestAlloc (int w, int h, AllocInfo& ai);
+    /// Do the actual allocation.
+    SubRect* Alloc (int w, int h, const AllocInfo& ai, csRect& r);
+    /// De-allocate
+    void Reclaim ();
+    /// Test whether both children are empty.
+    void TestCollapse ();
+
+    /// Decide whether a H or V split is better.
+    /// The better split is the one where the bigger chunk results.
+    void DecideBestSplit (const csRect& rect, int splitX, int splitY,
+      SubRect::SplitType& splitType);
+  };
+
 protected:
   /// Dimensions of this region.
   csRect region;
-  /// First empty region.
-  csSubRect* root;
+  /// Root of the region tree
+  SubRect* root;
 
-  csSubRect* AllocSubrect ();
+  SubRect::SubRectAlloc alloc;
+  inline SubRect* AllocSubrect ()
+  { return alloc.Alloc(); }
+  void FreeSubrect (SubRect* sr);
+
+  /// Leaves of the region tree
+  csArray<SubRect*> leaves;
+  void AddLeaf (SubRect* sr)
+  {
+    leaves.InsertSorted (sr);
+  }
+  void RemoveLeaf (SubRect* sr)
+  {
+    size_t index = leaves.FindSortedKey (
+      csArrayCmp<SubRect*, SubRect*> (sr));
+    leaves.DeleteIndex (index);
+  }
   
-  void Grow (csSubRect* sr, int ow, int oh, int nw, int nh);
+  void Grow (SubRect* sr, int ow, int oh, int nw, int nh);
 public:
   /// Allocate a new empty region with the given size.
   csSubRectangles (const csRect& region);
@@ -68,13 +144,13 @@ public:
   /**
    * Allocate a new rectangle. Returns 0 if there is no room
    */
-  csSubRect* Alloc (int w, int h, csRect& rect);
+  SubRect* Alloc (int w, int h, csRect& rect);
 
   /**
    * Reclaim a subrectangle, meaning, the space occupied by the subrect can be
    * reused by subsequent Alloc() calls.
    */
-  void Reclaim (csSubRect* subrect);
+  void Reclaim (SubRect* subrect);
 
   /**
    * Increase the size of the region.
@@ -87,6 +163,8 @@ public:
    */
   void Dump ();
 };
+
+typedef csSubRectangles::SubRect csSubRect;
 
 /** @} */
 

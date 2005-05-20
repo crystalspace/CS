@@ -7,6 +7,9 @@
         <name>crystalspace.documentsystem.multiplexer</name>
         <implementation>csDocumentSystemMultiplexer</implementation>
         <description>Document system multiplexer</description>
+        <requires>
+          <class>crystalspace.documentsystem.</class>
+        </requires>
       </class>
     </classes>
   </scf>

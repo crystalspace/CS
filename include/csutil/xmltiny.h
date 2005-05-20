@@ -22,9 +22,6 @@
 #include "csextern.h"
 #include "iutil/document.h"
 
-struct csTinyXmlNode;
-class TiDocumentNode;
-
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */

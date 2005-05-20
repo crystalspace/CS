@@ -61,76 +61,9 @@
     rect is actually requested, the allocation request can be satisfied.
  */
 
-/**
- * Sub-rectangle
- */
-class csSubRect
-{
-public:
-  enum SplitType
-  {
-    SPLIT_UNSPLIT,
-    SPLIT_H,
-    SPLIT_V
-  };
-  enum AllocPos
-  {
-    ALLOC_INVALID = -1,
-    ALLOC_RIGHT,
-    ALLOC_BELOW,
-    ALLOC_NEW
-  };
-  struct AllocInfo
-  {
-    csSubRect* node;
-    int d;
-    AllocPos allocPos;
-    bool res;
-    
-    AllocInfo() : node(0), d(0x7fffffff), allocPos(ALLOC_INVALID), 
-      res(false) {};
-  };
-
-  csRect rect;
-  csRect allocedRect;
-  int splitPos;
-  SplitType splitType;
-
-  csSubRectangles* superrect;
-  csSubRect* parent;
-  csSubRect* children[2];
-
-  csSubRect ();
-  ~csSubRect ();
-
-  /// searches for the "ideal" position of a rectangle
-  void TestAlloc (int w, int h, AllocInfo& ai);
-  /// Do the actual allocation.
-  csSubRect* Alloc (int w, int h, const AllocInfo& ai, csRect& r);
-  /// De-allocate
-  void Reclaim ();
-  /// Test whether both children are empty.
-  void TestCollapse ();
-
-  /// Decide whether a H or V split is better.
-  /// The better split is the one where the bigger chunk results.
-  void DecideBestSplit (const csRect& rect, int splitX, int splitY,
-    csSubRect::SplitType& splitType);
-};
-
 // --------------------------------------------------------------------------
 
-class csSubRectAlloc : public csBlockAllocator<csSubRect>
-{
-public:
-  csSubRectAlloc () : csBlockAllocator<csSubRect> (2000) { }
-};
-
-CS_IMPLEMENT_STATIC_VAR (GetSubRecAlloc, csSubRectAlloc, ());
-
-// --------------------------------------------------------------------------
-
-csSubRect::csSubRect ()
+csSubRectangles::SubRect::SubRect ()
 {
   splitType = SPLIT_UNSPLIT;
   splitPos = 0;
@@ -139,14 +72,7 @@ csSubRect::csSubRect ()
   parent = 0;
 }
 
-csSubRect::~csSubRect ()
-{
-  csSubRectAlloc* alloc = GetSubRecAlloc ();
-  alloc->Free (children[0]);
-  alloc->Free (children[1]);
-}
-
-void csSubRect::TestAlloc (int w, int h, AllocInfo& ai)
+void csSubRectangles::SubRect::TestAlloc (int w, int h, AllocInfo& ai)
 {
   int rW = rect.Width ();
   if (w > rW) return;
@@ -155,125 +81,98 @@ void csSubRect::TestAlloc (int w, int h, AllocInfo& ai)
 
   SplitType st = splitType;
 
-  if (st == SPLIT_UNSPLIT)
+  CS_ASSERT (splitType == SPLIT_UNSPLIT);
+  // leaf is not split yet.
+  int d = 0x7fffffff;
+
+  if (allocedRect.IsEmpty ())
   {
-    // leaf is not split yet.
-    int d = 0x7fffffff;
+    // empty leaf.
+    int dw = rW - w;
+    int dh = rH - h;
 
-    if (allocedRect.IsEmpty ())
+    if (dw < dh)
     {
-      // empty leaf.
-      int dw = rW - w;
-      int dh = rH - h;
-
-      if (dw < dh)
-      {
-	ai.d = dw;
-      }
-      else
-      {
-	ai.d = dh;
-      }
-      ai.allocPos = ALLOC_NEW;
-      ai.node = this;
-      ai.res = true;
+      ai.d = dw;
     }
     else
     {
-      // a part of the leaf is already allocated.
-      int arW = allocedRect.Width ();
-      int arH = allocedRect.Height ();
-
-      int dw = rW - arW;
-      int dh = rH - arH;
-
-      // Test whether a good position is below the 
-      // already allocated rect.
-      if (dh >= h)
-      {
-	if (((d = (arW - w)) >= 0))
-	{
-	  // below
-	  if (d < ai.d)
-	  {
-	    ai.d = d;
-	    ai.allocPos = ALLOC_BELOW;
-	    ai.node = this;
-	    ai.res = true;
-	  }
-	}
-	else
-	{
-	  d = (dh - h);
-	  // below
-	  if (d < ai.d)
-	  {
-	    ai.d = d;
-	    ai.allocPos = ALLOC_BELOW;
-	    ai.node = this;
-	    ai.res = true;
-	  }
-	}
-      }
-      // Test whether a good position is to right of the 
-      // already allocated rect.
-      if ((d != 0) && (dw >= w))
-      {
-	if (((d = (arH - h)) >= 0))
-	{
-	  // right
-	  if (d < ai.d)
-	  {
-	    ai.d = d;
-	    ai.allocPos = ALLOC_RIGHT;
-	    ai.node = this;
-	    ai.res = true;
-	  }
-	}
-	else
-	{
-	  d = (dw - w);
-	  // right
-	  if (d < ai.d)
-	  {
-	    ai.d = d;
-	    ai.allocPos = ALLOC_RIGHT;
-	    ai.node = this;
-	    ai.res = true;
-	  }
-	}
-      }
+      ai.d = dh;
     }
+    ai.allocPos = ALLOC_NEW;
+    ai.node = this;
+    ai.res = true;
   }
   else
   {
-    // The node itself is "full". check children.
-    bool c1, c2;
-    int sp = splitPos;
-    if (st == SPLIT_H)
-    {
-      c1 = (h <= sp);
-      c2 = (h <= (rH - sp));
-    }
-    else
-    {
-      c1 = (w <= sp);
-      c2 = (w <= (rW - sp));
-    }
+    // a part of the leaf is already allocated.
+    int arW = allocedRect.Width ();
+    int arH = allocedRect.Height ();
 
-    if ((children[0] != 0) && c1)
+    int dw = rW - arW;
+    int dh = rH - arH;
+
+    // Test whether a good position is below the 
+    // already allocated rect.
+    if (dh >= h)
     {
-      children[0]->TestAlloc (w, h, ai);
+      if (((d = (arW - w)) >= 0))
+      {
+	// below
+	if (d < ai.d)
+	{
+	  ai.d = d;
+	  ai.allocPos = ALLOC_BELOW;
+	  ai.node = this;
+	  ai.res = true;
+	}
+      }
+      else
+      {
+	d = (dh - h);
+	// below
+	if (d < ai.d)
+	{
+	  ai.d = d;
+	  ai.allocPos = ALLOC_BELOW;
+	  ai.node = this;
+	  ai.res = true;
+	}
+      }
     }
-    if ((ai.d != 0) && (children[1] != 0) && c2)
+    // Test whether a good position is to right of the 
+    // already allocated rect.
+    if ((d != 0) && (dw >= w))
     {
-      children[1]->TestAlloc (w, h, ai);
+      if (((d = (arH - h)) >= 0))
+      {
+	// right
+	if (d < ai.d)
+	{
+	  ai.d = d;
+	  ai.allocPos = ALLOC_RIGHT;
+	  ai.node = this;
+	  ai.res = true;
+	}
+      }
+      else
+      {
+	d = (dw - w);
+	// right
+	if (d < ai.d)
+	{
+	  ai.d = d;
+	  ai.allocPos = ALLOC_RIGHT;
+	  ai.node = this;
+	  ai.res = true;
+	}
+      }
     }
   }
 }
 
-void csSubRect::DecideBestSplit (const csRect& rect, int splitX, int splitY,
-				  csSubRect::SplitType& splitType)
+void csSubRectangles::SubRect::DecideBestSplit (const csRect& rect, int splitX, int splitY,
+				  csSubRectangles::SubRect::SplitType& splitType)
 {
   int rW = rect.Width ();
   int rH = rect.Height ();
@@ -299,7 +198,7 @@ void csSubRect::DecideBestSplit (const csRect& rect, int splitX, int splitY,
   }
 }
 
-csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
+csSubRectangles::SubRect* csSubRectangles::SubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
 {
   CS_ASSERT (splitType == SPLIT_UNSPLIT);
 
@@ -334,7 +233,8 @@ csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
   }
   if (splitType != SPLIT_UNSPLIT)
   {
-    csSubRect* ret = 0;
+    superrect->RemoveLeaf (this);
+    csSubRectangles::SubRect* ret = 0;
 
     int splitX, splitY;
     splitX = allocedRect.xmax;
@@ -361,21 +261,24 @@ csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
       if (ai.allocPos == ALLOC_RIGHT)
       {
 	children[0]->allocedRect = allocedRect;
+	superrect->AddLeaf (children[0]);
       }
       else
       {
-	csSubRect* subChild0 = superrect->AllocSubrect ();
+	csSubRectangles::SubRect* subChild0 = superrect->AllocSubrect ();
 	subChild0->parent = children[0];
 	subChild0->superrect = superrect;
 	subChild0->rect.Set (rect.xmin, rect.ymin, splitX, allocedRect.ymax);
 	subChild0->allocedRect = allocedRect;
+	superrect->AddLeaf (subChild0);
 
-	csSubRect* subChild1 = superrect->AllocSubrect ();
+	csSubRectangles::SubRect* subChild1 = superrect->AllocSubrect ();
 	subChild1->parent = children[0];
 	subChild1->superrect = superrect;
 	subChild1->rect.Set (rect.xmin, allocedRect.ymax, splitX, rect.ymax);
 	subChild1->allocedRect = r;
 	ret = subChild1;
+	superrect->AddLeaf (subChild1);
 
 	children[0]->splitType = SPLIT_H;
 	children[0]->splitPos = allocedRect.Height ();
@@ -394,6 +297,7 @@ csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
 	children[1]->allocedRect = r;
 	ret = children[1];
       }
+      superrect->AddLeaf (children[1]);
     }
     else
     {
@@ -407,21 +311,24 @@ csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
       if (ai.allocPos == ALLOC_BELOW)
       {
 	children[0]->allocedRect = allocedRect;
+	superrect->AddLeaf (children[0]);
       }
       else
       {
-	csSubRect* subChild0 = superrect->AllocSubrect ();
+	csSubRectangles::SubRect* subChild0 = superrect->AllocSubrect ();
 	subChild0->parent = children[0];
 	subChild0->superrect = superrect;
 	subChild0->rect.Set (rect.xmin, rect.ymin, allocedRect.xmax, splitY);
 	subChild0->allocedRect = allocedRect;
+	superrect->AddLeaf (subChild0);
 
-	csSubRect* subChild1 = superrect->AllocSubrect ();
+	csSubRectangles::SubRect* subChild1 = superrect->AllocSubrect ();
 	subChild1->parent = children[0];
 	subChild1->superrect = superrect;
 	subChild1->rect.Set (allocedRect.xmax, rect.ymin, rect.xmax, splitY);
 	subChild1->allocedRect = r;
 	ret = subChild1;
+	superrect->AddLeaf (subChild1);
 
 	children[0]->splitType = SPLIT_V;
 	children[0]->splitPos = allocedRect.Width ();
@@ -440,6 +347,7 @@ csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
 	children[1]->allocedRect = r;
 	ret = children[1];
       }
+      superrect->AddLeaf (children[1]);
     }
     CS_ASSERT (ret != 0);
     return ret;
@@ -447,7 +355,7 @@ csSubRect* csSubRect::Alloc (int w, int h, const AllocInfo& ai, csRect& r)
   return 0;
 }
 
-void csSubRect::Reclaim ()
+void csSubRectangles::SubRect::Reclaim ()
 {
   // @@@ This could be improved.
   if (splitType == SPLIT_UNSPLIT)
@@ -462,7 +370,7 @@ void csSubRect::Reclaim ()
   }
 }
 
-void csSubRect::TestCollapse ()
+void csSubRectangles::SubRect::TestCollapse ()
 {
   // If both children are "empty space" we can revert the status
   // of this sub-rectangle to "unsplit" and free the children.
@@ -471,16 +379,19 @@ void csSubRect::TestCollapse ()
   {
     splitType = SPLIT_UNSPLIT;
     allocedRect.MakeEmpty ();
-    csSubRectAlloc* alloc = GetSubRecAlloc ();
-    alloc->Free (children[0]); children[0] = 0;
-    alloc->Free (children[1]); children[1] = 0;
+    superrect->RemoveLeaf (children[0]);
+    superrect->RemoveLeaf (children[1]);
+    superrect->FreeSubrect (children[0]); children[0] = 0;
+    superrect->FreeSubrect (children[1]); children[1] = 0;
+    superrect->AddLeaf (this);
     if (parent != 0) parent->TestCollapse ();
   }
 }
 
 // --------------------------------------------------------------------------
 
-csSubRectangles::csSubRectangles (const csRect &region)
+csSubRectangles::csSubRectangles (const csRect &region) : 
+  alloc (4096 / sizeof(SubRect))
 {
   csSubRectangles::region = region;
   root = 0;
@@ -489,51 +400,60 @@ csSubRectangles::csSubRectangles (const csRect &region)
 
 csSubRectangles::~csSubRectangles ()
 {
-  GetSubRecAlloc ()->Free (root);
-  GetSubRecAlloc ()->Compact ();
+  // No need to free the rects, the block allocator will take care
 }
 
-csSubRect* csSubRectangles::AllocSubrect ()
+void csSubRectangles::FreeSubrect (SubRect* sr)
 {
-  return GetSubRecAlloc ()->Alloc ();
+  if (sr == 0) return;
+  FreeSubrect (sr->children[0]);
+  FreeSubrect (sr->children[1]);
+  alloc.Free (sr);
 }
 
 void csSubRectangles::Clear ()
 {
-  GetSubRecAlloc ()->Free (root);
+  alloc.Free (root);
+  leaves.DeleteAll();
 
-  root = GetSubRecAlloc ()->Alloc ();
+  root = alloc.Alloc ();
   root->rect = region;
   root->superrect = this;
+  leaves.Push (root);
 }
 
-csSubRect* csSubRectangles::Alloc (int w, int h, csRect &rect)
+csSubRectangles::SubRect* csSubRectangles::Alloc (int w, int h, csRect &rect)
 {
-  csSubRect::AllocInfo ai;
+  csSubRectangles::SubRect::AllocInfo ai;
 
-  root->TestAlloc (w, h, ai);
+  for (size_t i = 0; i < leaves.Length(); i++)
+  {
+    leaves[i]->TestAlloc (w, h, ai);
+    if (ai.res && (ai.d == 0)) break;
+  }
 
   if (ai.res)
   {
-    return ai.node->Alloc (w, h, ai, rect);
+    csSubRectangles::SubRect* sr = ai.node->Alloc (w, h, ai, rect);
+    return sr;
   }
 
   return 0;
 }
 
-void csSubRectangles::Reclaim (csSubRect* subrect)
+void csSubRectangles::Reclaim (csSubRectangles::SubRect* subrect)
 {
   if (subrect) subrect->Reclaim ();
 }
 
-void csSubRectangles::Grow (csSubRect* sr, int ow, int oh, int nw, int nh)
+void csSubRectangles::Grow (csSubRectangles::SubRect* sr, int ow, int oh, int nw, int nh)
 {
   if (sr == 0) return;
 
   if (sr->rect.xmax == ow) sr->rect.xmax = nw;
   if (sr->rect.ymax == oh) sr->rect.ymax = nh;
 
-  if (sr->splitType != csSubRect::SPLIT_UNSPLIT)
+  if (sr->splitType != csSubRectangles::SubRect::SPLIT_UNSPLIT)
   {
     Grow (sr->children[0], ow, oh, nw, nh);
     Grow (sr->children[1], ow, oh, nw, nh);
@@ -640,12 +560,12 @@ void csSubRectangles::Dump ()
   memset (data3, 0, w * h);
 
   int c = 0;
-  csArray<csSubRect*> nodes;
+  csArray<csSubRectangles::SubRect*> nodes;
   nodes.Push (root);
   
   while (nodes.Length ())
   {
-    csSubRect* node = nodes[0];
+    csSubRectangles::SubRect* node = nodes[0];
     nodes.DeleteIndex (0);
 
     FillImgRect (data, c + 1, w, h, node->rect);
