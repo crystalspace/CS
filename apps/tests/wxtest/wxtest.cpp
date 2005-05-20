@@ -195,17 +195,17 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if ((ev.Type == csevMouseMove))
   {
-    csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetX(&ev));
+    csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
   else if ((ev.Type == csevMouseDown))
   {
     csPrintf("Mouse button %d down at %d %d\n",
-      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetX(&ev));
+      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
   else if ((ev.Type == csevMouseUp))
   {
     csPrintf("Mouse button %d up at %d %d\n",
-      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetX(&ev));
+      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
 
   return false;
