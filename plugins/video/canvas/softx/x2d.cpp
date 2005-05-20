@@ -23,6 +23,7 @@
 #include "x2d.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
+#include "csutil/event.h"
 #include "iutil/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
@@ -929,8 +930,8 @@ void csGraphics2DXLib::AllowResize (bool iAllow)
 bool csGraphics2DXLib::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevBroadcast)
-   && (Event.Command.Code == cscmdCommandLineHelp)
-   && object_reg)
+      && (csCommandEventHelper::GetCode(&Event) == cscmdCommandLineHelp)
+      && object_reg)
   {
     csPrintf ("Options for X-Windows 2D graphics driver:\n");
     csPrintf ("  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");

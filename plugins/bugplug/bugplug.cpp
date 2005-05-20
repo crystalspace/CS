@@ -687,10 +687,10 @@ bool csBugPlug::EatMouse (iEvent& event)
 
   bool down = (event.Type == csevMouseDown);
   bool up = (event.Type == csevMouseUp);
-  int button = event.Mouse.Button;
+  int button = csMouseEventHelper::GetButton(&event);
 
-  mouse_x = event.Mouse.x;
-  mouse_y = event.Mouse.y;
+  mouse_x = csMouseEventHelper::GetX(&event);
+  mouse_y = csMouseEventHelper::GetY(&event);
 
   if (down)
   {
@@ -2492,19 +2492,19 @@ bool csBugPlug::HandleEvent (iEvent& event)
   }
   else if (event.Type == csevBroadcast)
   {
-    if (event.Command.Code == cscmdPreProcess)
+    if (csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
     {
       return HandleStartFrame (event);
     }
-    if (event.Command.Code == cscmdPostProcess)
+    if (csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
     {
       return HandleEndFrame (event);
     }
-    if (event.Command.Code == cscmdSystemOpen)
+    if (csCommandEventHelper::GetCode(&event) == cscmdSystemOpen)
     {
       return HandleSystemOpen (&event);
     }
-    if (event.Command.Code == cscmdSystemClose)
+    if (csCommandEventHelper::GetCode(&event) == cscmdSystemClose)
     {
       return HandleSystemClose (&event);
     }

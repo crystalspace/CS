@@ -32,6 +32,16 @@
  * \addtogroup event_handling
  * @{ */
 
+/// Maximal number of mouse buttons supported
+#define CS_MAX_MOUSE_BUTTONS	10
+/// Maximal number of joysticks supported
+#define CS_MAX_JOYSTICK_COUNT	16
+/// Maximal number of joystick buttons supported
+#define CS_MAX_JOYSTICK_BUTTONS	10
+/// Maximal number of joystick axes supported
+#define CS_MAX_JOYSTICK_AXES    8
+/* Architecturally, AXES can go as high as 32 (limited by the uint32 change mask). */
+
 struct iEventHandler;
 struct iEvent;
 
@@ -150,8 +160,14 @@ enum csMouseButton
   csmbExtra2 = 7
 };
 
-/// Mouse event data in iEvent.
-struct csEventMouseData
+/**
+ * Structure that collects the data a mouse event carries.
+ * The event it self doesn't transfer the data in this structure; it is merely 
+ * meant to pass around mouse event data in a compact way within client code
+ * without having to pass around the event itself. 
+ * @sa csMouseEventHelper
+ */
+struct csMouseEventData
 {
   /// Mouse x
   int x;
@@ -166,23 +182,35 @@ struct csEventMouseData
   int Modifiers;
 };
 
-/// Joystick event data in iEvent.
-struct csEventJoystickData
+/**
+ * Structure that collects the data a joystick event carries.
+ * The event it self doesn't transfer the data in this structure; it is merely 
+ * meant to pass around joystick event data in a compact way within client code
+ * without having to pass around the event itself. 
+ * @sa csJoystickEventHelper
+ */
+struct csJoystickEventData
 {
-  /// Joystick number (1, 2, ...)	
+  /// Joystick number (1, 2, ...)       
   int number;
-  /// Joystick x
-  int x;
-  /// Joystick y
-  int y;
+  /// Joystick axis values
+  int axes[CS_MAX_JOYSTICK_AXES];
+  /// Axes count
+  uint8 numAxes;
   /// Joystick button number
   int Button;
   /// Control key state
   int Modifiers;
 };
 
-/// Command event data in iEvent.
-struct csEventCommandData
+/**
+ * Structure that collects the data a command event carries.
+ * The event it self doesn't transfer the data in this structure; it is merely 
+ * meant to pass around command event data in a compact way within client code
+ * without having to pass around the event itself. 
+ * @sa csCommandEventHelper
+ */
+struct csCommandEventData
 {
   /** Command code. @see csCommandEventCode for common codes. */
   uint Code;
@@ -272,15 +300,6 @@ struct iEvent : public iBase
   uint8 Flags;			
   /// Time when the event occured
   csTicks Time;			
-  union
-  {
-    /// Mouse data of event
-    csEventMouseData Mouse;
-    /// Joystick data of event
-    csEventJoystickData Joystick;
-    /// Command data of event
-    csEventCommandData Command;
-  };
 
   //@{
   /**
@@ -487,10 +506,11 @@ struct iEventOutlet : public iBase
    * Put a joystick event into event queue.<p>
    * iNumber is joystick number (from 0 to CS_MAX_JOYSTICK_COUNT-1).<p>
    * If iButton == 0, this is a joystick move event and iDown is ignored.
+   * numAxes can be from 1 to CS_MAX_JOYSTICK_AXES.
    * Otherwise an joystick up/down event is generated. iButton can be from
    * 1 to CS_MAX_JOYSTICK_BUTTONS (or 0 for a joystick move event).
    */
-  virtual void Joystick(int iNumber, int iButton, bool iDown, int x,int y) = 0;
+  virtual void Joystick(int iNumber, int iButton, bool iDown, const int *axes, uint8 numAxes) = 0;
 
   /**
    * Put a broadcast event into event queue.<p>

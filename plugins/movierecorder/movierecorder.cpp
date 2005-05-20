@@ -253,11 +253,11 @@ bool csMovieRecorder::HandleEvent (iEvent &event)
   }
   else if (event.Type == csevBroadcast)
   {
-    if (event.Command.Code == cscmdPreProcess)
+    if (csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
     {
       return HandleStartFrame (event);
     }
-    if (event.Command.Code == cscmdPostProcess)
+    if (csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
     {
       return HandleEndFrame (event);
     }

@@ -99,9 +99,9 @@ void Simple::SetupFrame ()
     if (joy->GetLastButton (1,2))
       c->Move (CS_VEC_BACKWARD * 4 * speed);   
     c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT,
-      ((joy->GetLastX (0)) / 32767.0) * speed);
+      ((joy->GetLast (1,1)) / 32767.0) * speed);
     c->GetTransform ().RotateThis (CS_VEC_TILT_UP, 
-      ((joy->GetLastY (0)) / 32767.0) * speed);
+      ((joy->GetLast (1,2)) / 32767.0) * speed);
     if (joy && (joy->GetLastButton (1,4))) 
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
@@ -125,12 +125,12 @@ void Simple::FinishFrame ()
 bool Simple::HandleEvent (iEvent& ev)
 {
   
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     simple->FinishFrame ();
     return true;

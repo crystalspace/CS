@@ -113,12 +113,12 @@ void Cleanup ()
 
 static bool DemoEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     System->FinishFrame ();
     return true;
@@ -1268,16 +1268,16 @@ bool Demo::DemoHandleEvent (iEvent &Event)
   {
     if (do_demo == 0)
     {
-      selected_demo = (Event.Mouse.y - first_y) / 10;
+      selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
       if ((selected_demo != (size_t)-1) && selected_demo < demos.Length ())
         do_demo = 1;
     }
     else if (do_demo < 3)
     {
     }
-    else if (Event.Mouse.Button == 1)
+    else if (csMouseEventHelper::GetButton(&Event) == 1)
     {
-      csVector2 p (Event.Mouse.x, myG2D->GetHeight ()-Event.Mouse.y);
+      csVector2 p (csMouseEventHelper::GetX(&Event), myG2D->GetHeight ()-csMouseEventHelper::GetY(&Event));
       csVector3 v;
       view->GetCamera ()->InvPerspective (p, 1, v);
       csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
@@ -1297,7 +1297,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       }
       else if (map_enabled == MAP_EDIT)
       {
-        p.y = Event.Mouse.y;
+        p.y = csMouseEventHelper::GetY(&Event);
 	int dim = myG2D->GetHeight ()-10;
 	float dx = (map_br.x-map_tl.x) / 2.0f;
 	float dy = (map_br.y-map_tl.y) / 2.0f;
@@ -1314,7 +1314,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
   {
     if (do_demo == 0)
     {
-      selected_demo = (Event.Mouse.y - first_y) / 10;
+      selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
       if (!((selected_demo != (size_t)-1) && selected_demo < demos.Length ()))
         selected_demo = (size_t)-1;
     }

@@ -23,6 +23,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csutil/util.h"
+#include "csutil/event.h"
 #include "csgeom/quaterni.h"
 #include "iutil/objreg.h"
 #include "iutil/document.h"
@@ -1366,7 +1367,7 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
 
 bool csGenmeshSkelAnimationControlType::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast and ev.Command.Code == cscmdPreProcess)
+  if (ev.Type == csevBroadcast and csCommandEventHelper::GetCode(&ev) == cscmdPreProcess)
   {
       UpdateAUAnimations(vc->GetCurrentTicks());
 	  return true;

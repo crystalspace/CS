@@ -23,6 +23,7 @@
 #include "csgfx/memimage.h"
 #include "cstool/proctex.h"
 #include "csutil/hash.h"
+#include "csutil/event.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
@@ -87,7 +88,7 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
   csSet<csPtrKey<csProcTexture> > keep_tex;
-  if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
+  if (event.Type == csevBroadcast && csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
   {
     {
       csSet<csPtrKey<csProcTexture> >::GlobalIterator it = textures.GetIterator();

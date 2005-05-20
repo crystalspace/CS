@@ -33,6 +33,7 @@
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
 #include "csutil/xmltiny.h"
+#include "csutil/event.h"
 #include "iengine/portal.h"
 #include "iengine/rendersteps/igeneric.h"
 #include "iengine/rendersteps/irenderstep.h"
@@ -956,7 +957,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 {
   if (Event.Type == csevBroadcast)
   {
-    switch (Event.Command.Code)
+    switch (csCommandEventHelper::GetCode(&Event))
     {
       case cscmdSystemOpen:
         {
@@ -1066,7 +1067,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 
       case cscmdContextResize:
         {
-          if (((iGraphics2D *)Event.Command.Info) == G2D)
+          if (((iGraphics2D *)csCommandEventHelper::GetInfo(&Event)) == G2D)
             resize = true;
           return false;
         }

@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "xwindow.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
@@ -491,7 +492,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
   bool resize = false;
 
   if ((Event.Type == csevBroadcast)
-   && (Event.Command.Code == cscmdCommandLineHelp))
+      && (csCommandEventHelper::GetCode(&Event) == cscmdCommandLineHelp))
   {
     csPrintf ("Options for X-Window Plugin:\n");
     csPrintf ("  -[no]sysmouse      use/don't use system mouse cursor "

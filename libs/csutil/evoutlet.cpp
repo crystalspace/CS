@@ -105,17 +105,17 @@ void csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
 }
 
 void csEventOutlet::Joystick (int iNumber, int iButton,
-  bool iDown, int x, int y)
+			      bool iDown, const int *axes, uint8 numAxes)
 {
   if (EnableMask & CSEVTYPE_Joystick)
   {
-    iJoystickDriver* j = GetJoystickDriver();
+    iJoystickDriver *j = GetJoystickDriver();
     if (j != 0)
     {
       if (iButton == 0)
-        j->DoMotion (iNumber, x, y);
+	j->DoMotion (iNumber, axes, numAxes);
       else
-        j->DoButton (iNumber, iButton, iDown, x, y);
+	j->DoButton (iNumber, iButton, iDown, axes, numAxes);
     }
   }
 }

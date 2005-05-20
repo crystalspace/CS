@@ -634,7 +634,8 @@ void WalkTest::MouseClick1Handler(iEvent &Event)
 void WalkTest::MouseClick2Handler(iEvent &Event)
 {
   csVector3 v;
-  csVector2 p (Event.Mouse.x, FRAME_HEIGHT-Event.Mouse.y);
+  csVector2 p (csMouseEventHelper::GetX(&Event), 
+	       FRAME_HEIGHT-csMouseEventHelper::GetY(&Event));
 
   view->GetCamera ()->InvPerspective (p, 1, v);
   csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
@@ -671,8 +672,8 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   }
 
   extern csVector2 coord_check_vector;
-  coord_check_vector.x = Event.Mouse.x;
-  coord_check_vector.y = FRAME_HEIGHT-Event.Mouse.y;
+  coord_check_vector.x = csMouseEventHelper::GetX(&Event);
+  coord_check_vector.y = FRAME_HEIGHT-csMouseEventHelper::GetY(&Event);
   extern bool check_light;
   extern void select_object (iRenderView* rview, int type, void* entity);
   check_light = true;
@@ -686,8 +687,8 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
   csVector2   screenPoint;
   iMeshWrapper *closestMesh;
 
-  screenPoint.x = Event.Mouse.x;
-  screenPoint.y = Event.Mouse.y;
+  screenPoint.x = csMouseEventHelper::GetX(&Event);
+  screenPoint.y = csMouseEventHelper::GetY(&Event);
   closestMesh = FindNextClosestMesh (0, view->GetCamera(), &screenPoint);
   if (closestMesh)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -704,7 +705,7 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
   {
     case csevBroadcast:
     {
-      if (Event.Command.Code == cscmdCanvasHidden)
+      if (csCommandEventHelper::GetCode(&Event) == cscmdCanvasHidden)
       {
 	canvas_exposed = false;
       #ifdef CS_DEBUG
@@ -712,7 +713,7 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       #endif
 	break;
       }
-      else if (Event.Command.Code == cscmdCanvasExposed)
+      else if (csCommandEventHelper::GetCode(&Event) == cscmdCanvasExposed)
       {
 	canvas_exposed = true;
       #ifdef CS_DEBUG
@@ -720,7 +721,7 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       #endif
 	break;
       }
-      else if (Event.Command.Code == cscmdContextResize)
+      else if (csCommandEventHelper::GetCode(&Event) == cscmdContextResize)
       {
 	Sys->FrameWidth = Sys->myG2D->GetWidth();
 	Sys->FrameHeight = Sys->myG2D->GetHeight();
@@ -733,13 +734,14 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       break;
     case csevMouseDown:
       {
-      if (Event.Mouse.Button == 1)
-        MouseClick1Handler(Event);
-      else if (Event.Mouse.Button == 2)
-        MouseClick2Handler(Event);
-      else if (Event.Mouse.Button == 3)
-        MouseClick3Handler(Event);
-      break;
+	switch(csMouseEventHelper::GetButton(&Event)) {
+	case 1:
+	  MouseClick1Handler(Event); break;
+	case 2:
+	  MouseClick2Handler(Event); break;
+	case 3:
+	  MouseClick3Handler(Event); break;
+	}
       }
 
     case csevMouseMove:
@@ -749,8 +751,8 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
         if (do_freelook)
         {
           int last_x, last_y;
-          last_x = Event.Mouse.x;
-          last_y = Event.Mouse.y;
+          last_x = csMouseEventHelper::GetX(&Event);
+          last_y = csMouseEventHelper::GetY(&Event);
 
           myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
           if (!first_time)
@@ -767,7 +769,7 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       }
       break;
     case csevMouseUp:
-      if (Event.Mouse.Button == 1)
+      if (csMouseEventHelper::GetButton(&Event) == 1)
       {
         move_forward = false;
 	step (0, 0);

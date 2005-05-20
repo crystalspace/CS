@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
@@ -51,7 +52,7 @@ public:
   bool ShouldShutdown() const { return shutdown; }
   virtual bool HandleEvent(iEvent& e)
   {
-    if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
+    if (e.Type == csevBroadcast && csCommandEventHelper::GetCode(&e) == cscmdQuit)
     {
       shutdown = true;
       return true;

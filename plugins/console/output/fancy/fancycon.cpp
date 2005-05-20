@@ -33,6 +33,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
+#include "csutil/event.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
@@ -140,7 +141,7 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
   switch (Event.Type)
   {
     case csevBroadcast:
-      switch (Event.Command.Code)
+      switch (csCommandEventHelper::GetCode(&Event))
       {
         case cscmdSystemOpen:
           system_ready = true;

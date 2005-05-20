@@ -532,7 +532,7 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
   switch (Event.Type)
   {
     case csevBroadcast:
-      switch (Event.Command.Code)
+      switch (csCommandEventHelper::GetCode(&Event))
       {
         case cscmdSystemOpen:
           if (myG2D)
@@ -1654,12 +1654,12 @@ void G2DTestSystemDriver::BlitTest ()
 
 static bool G2DEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     Sys->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     Sys->FinishFrame ();
     return true;

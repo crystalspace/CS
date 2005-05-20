@@ -19,6 +19,7 @@
 
 #include <cssysdef.h>
 #include <csutil/csbaseeventh.h>
+#include <csutil/event.h>
 
 SCF_IMPLEMENT_IBASE (csBaseEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
@@ -102,7 +103,7 @@ DefaultTrigger ( OnCommand );
 
 bool csBaseEventHandler::OnBroadcast (iEvent &event)
 {
-  switch (event.Command.Code)
+  switch (csCommandEventHelper::GetCode(&event))
   {
   case cscmdPreProcess:
     PreProcessFrame ();

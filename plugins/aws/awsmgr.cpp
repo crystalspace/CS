@@ -1002,7 +1002,7 @@ bool awsManager::HandleEvent (iEvent &Event)
       //  it or a child of it.  If not return out.
       if (modal_dialog)
       {
-        iAwsComponent *comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+        iAwsComponent *comp = ComponentAt(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));
 
         while (comp)
         {
@@ -1022,7 +1022,7 @@ bool awsManager::HandleEvent (iEvent &Event)
           return true;
 
       // Find out which component contains the pointer.
-      iAwsComponent* comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+      iAwsComponent* comp = ComponentAt(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));
 
       // if the mouse is still captured just stop
       if (mouse_captured && mouse_focus)
@@ -1168,7 +1168,7 @@ bool awsManager::HandleEvent (iEvent &Event)
     break;
 
   case csevBroadcast:
-    if (Event.Command.Code == cscmdPreProcess)
+    if (csCommandEventHelper::GetCode(&Event) == cscmdPreProcess)
     {
       DeleteMarkedComponentsRecursively(top);
       DispatchEventRecursively(top, Event);

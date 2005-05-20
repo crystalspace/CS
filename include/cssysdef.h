@@ -684,6 +684,37 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #endif
 
+/**\def CS_CONST_METHOD
+ * Use the CS_CONST_METHOD macro in front of method declarations to
+ * indicate that they are "constant", i.e., they only look at the
+ * values of their parameters and have no side effects.  This allows 
+ * the compiler to perform certain optimizations, e.g., eliminating
+ * repeated calls with the same arguments.  This is a very strong
+ * assertion; if any argument is a pointer, you probably want to use
+ * \see CS_PURE_METHOD instead.  
+ *
+ * \todo Is there an MSVC equivalent for gcc's __attribute__((const))?
+ */
+#ifndef CS_CONST_METHOD
+#define CS_CONST_METHOD
+#endif
+
+/**\def CS_PURE_METHOD
+ * Use the CS_PURE_METHOD macro in front of method declarations to
+ * indicate that they are "pure", i.e., they look at their arguments
+ * and at global memory but do not have any side effects.  
+ * Basically, if the function doesn't change the values of
+ * any non-local variables and doesn't perform any output or other
+ * tampering with the envrionment, it is "pure".  This allows the
+ * compiler to perform certain optimizations, e.g., eliminating
+ * repeated calls with the same arguments.
+ *
+ * \todo Is there an MSVC equivalent for gcc's __attribute__((pure)) ?
+ */
+#ifndef CS_PURE_METHOD
+#define CS_PURE_METHOD
+#endif
+
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
 #if !defined (CS_LITTLE_ENDIAN) && !defined (CS_BIG_ENDIAN)
 #  error No CS_XXX_ENDIAN macro defined in your OS-specific csosdefs.h!

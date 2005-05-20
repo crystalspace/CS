@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/timer.h"
+#include "csutil/event.h"
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
 #include "iutil/eventh.h"
@@ -106,7 +107,7 @@ csEventTimer::~csEventTimer ()
 bool csEventTimer::HandleEvent (iEvent& event)
 {
   if (event.Type != csevBroadcast
-   || event.Command.Code != cscmdFinalProcess)
+      || csCommandEventHelper::GetCode(&event) != cscmdFinalProcess)
     return false;
 
   csTicks elapsed = vc->GetElapsedTicks ();

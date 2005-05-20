@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include <string.h>
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "sequence.h"
 #include "csutil/scf.h"
 #include "iutil/objreg.h"
@@ -236,7 +237,7 @@ bool csSequenceManager::HandleEvent (iEvent &event)
   // Sequence manager must be final because engine sequence manager
   // must come first. @@@ HACKY
   if (event.Type != csevBroadcast
-   || event.Command.Code != cscmdFinalProcess)
+      || csCommandEventHelper::GetCode(&event) != cscmdFinalProcess)
     return false;
 
   if (!suspended)

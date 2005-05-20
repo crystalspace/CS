@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "iutil/plugin.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
@@ -396,7 +397,7 @@ void csSoundRenderSoftware::MixingFunction()
 bool csSoundRenderSoftware::HandleEvent (iEvent &e)
 {
   if (e.Type == csevCommand || e.Type == csevBroadcast) {
-    switch (e.Command.Code) {
+    switch (csCommandEventHelper::GetCode(&e)) {
     case cscmdPreProcess:
       Update();
       break;

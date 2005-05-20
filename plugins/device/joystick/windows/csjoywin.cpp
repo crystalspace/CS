@@ -103,16 +103,17 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
         if (jd.state[nstate].rgbButtons[btn] != 
 	  jd.state[last_state].rgbButtons[btn]) 
 	{
-          EventOutlet->Joystick(jd.number, btn + 1, 
-	    jd.state[nstate].rgbButtons[btn] != 0,
-            jd.state[nstate].lX, jd.state[nstate].lY);
+	  int axdata[2] = { jd.state[nstate].lX, jd.state[nstat].lY };
+          EventOutlet->Joystick (jd.number, btn + 1, 
+				 jd.state[nstate].rgbButtons[btn] != 0,
+				 axdata, 2);
         }
       }    
       if ((jd.state[nstate].lX != jd.state[last_state].lX) ||
         (jd.state[nstate].lY != jd.state[last_state].lY))
       {
-        EventOutlet->Joystick (jd.number, 0, 0, jd.state[nstate].lX,
-	jd.state[nstate].lY);
+	int axdata[2] = { jd.state[nstate].lX, jd.state[nstate].lY };
+        EventOutlet->Joystick (jd.number, 0, 0, axdata, 2);
       }
       jd.nstate=last_state;
     }

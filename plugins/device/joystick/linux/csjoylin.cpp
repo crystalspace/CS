@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2002 by Norman Kramer
+    Multi-axis support (C) 2005 Adam D. Bradley <artdodge@cs.bu.edu>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,6 +24,7 @@
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
 #include "csutil/array.h"
+#include "iutil/csinput.h" /* for JS max/mins */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -77,6 +79,7 @@ bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)
   return Init ();
 }
 
+#define CS_MAX_LINUX_JOYSTICK_AXES CS_MAX_JOYSTICK_AXES
 bool csLinuxJoystick::HandleEvent (iEvent &)
 {
   struct js_event js;
@@ -86,17 +89,22 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
     joydata& jd = joystick[i];
     while (read (jd.fd, &js, sizeof(js)) == sizeof(js)) 
     {
+      int axisread[CS_MAX_LINUX_JOYSTICK_AXES];
+      for (int iter=0 ; 
+	   iter<MIN(jd.nAxes,CS_MAX_LINUX_JOYSTICK_AXES) ; 
+	   iter++)
+	axisread[iter] = jd.axis[iter]; /* "int16" to "int" */
       switch (js.type & ~JS_EVENT_INIT) 
       {
       case JS_EVENT_BUTTON:
         jd.button[js.number] = js.value;
         EventOutlet->Joystick (jd.number, js.number + 1, js.value,
-          jd.axis[0], jd.nAxes > 1 ? jd.axis[1] : 0);
+			       axisread, jd.nAxes);
         break;
       case JS_EVENT_AXIS:
         jd.axis[js.number] = js.value;
-        EventOutlet->Joystick (jd.number, 0, 0, jd.axis[0],
-         (jd.nAxes > 1 ? jd.axis[1] : 0));
+        EventOutlet->Joystick (jd.number, 0, 0, 
+			       axisread, jd.nAxes);
         break;
       }
     }
@@ -125,6 +133,9 @@ bool csLinuxJoystick::Init ()
     int const fd = open (it->GetStr (), O_RDONLY);
     if (fd >= 0) 
     {
+      Report (CS_REPORTER_SEVERITY_DEBUG,
+	      "Opened joystick device %s as fd#%d\n",
+	      it->GetStr(), fd);
       nJoy++;
       fds.Push(fd);
     }

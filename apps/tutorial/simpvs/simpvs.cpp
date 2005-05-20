@@ -71,12 +71,12 @@ void Simple::FinishFrame ()
 bool Simple::HandleEvent (iEvent& ev)
 {
   bool res = false;
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     SetupFrame ();
     res = true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     FinishFrame ();
     res = true;
@@ -91,7 +91,7 @@ bool Simple::HandleEvent (iEvent& ev)
     res = true;
   }
 
-  if (((ev.Type != csevBroadcast) || (ev.Command.Code != cscmdQuit)) && vidprefs)
+  if (((ev.Type != csevBroadcast) || (csCommandEventHelper::GetCode(&ev) != cscmdQuit)) && vidprefs)
   {
     if (vidprefs->HandleEvent (ev))
     {

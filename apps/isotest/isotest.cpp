@@ -128,12 +128,12 @@ void IsoTest::FinishFrame ()
 
 bool IsoTest::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     isotest->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     isotest->FinishFrame ();
     return true;

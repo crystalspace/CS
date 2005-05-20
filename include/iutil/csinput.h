@@ -37,13 +37,6 @@
 #include "iutil/event.h"
 #include "csutil/csunicode.h"
 
-/// Maximal number of mouse buttons supported
-#define CS_MAX_MOUSE_BUTTONS	10
-/// Maximal number of joysticks supported
-#define CS_MAX_JOYSTICK_COUNT	16
-/// Maximal number of joystick buttons supported
-#define CS_MAX_JOYSTICK_BUTTONS	10
-
 /**
  * Results for attempts to process a character key.
  */
@@ -112,6 +105,9 @@ SCF_VERSION(iKeyboardDriver, 0, 0, 2);
  *   <ul>
  *   <li>CS_QUERY_REGISTRY()
  *   </ul>
+ * 
+ * \todo Need a simple way to query all currently-set modifiers for event construction.
+ * \see csMouseDriver::DoButton() \see csMouseDriver::DoMotion() \see csJoystickDriver::DoButton() \see csJoystickDriver::DoMotion() 
  */
 struct iKeyboardDriver : public iBase
 {
@@ -138,12 +134,12 @@ struct iKeyboardDriver : public iBase
    * Query the state of a key. All key codes are supported. Returns true if
    * the key is pressed, false if not.
    */
-  virtual bool GetKeyState (utf32_char codeRaw) = 0;
+  virtual bool GetKeyState (utf32_char codeRaw) const = 0;
 
   /**
    * Get the current state of the modifiers.
    */
-  virtual uint32 GetModifierState (utf32_char codeRaw) = 0;
+  virtual uint32 GetModifierState (utf32_char codeRaw) const = 0;
 
   /**
    * Return an instance of the keyboard composer.
@@ -195,11 +191,11 @@ struct iMouseDriver : public iBase
   virtual void Reset () = 0;
 
   /// Query last mouse X position
-  virtual int GetLastX () = 0;
+  virtual int GetLastX () const = 0;
   /// Query last mouse Y position
-  virtual int GetLastY () = 0;
+  virtual int GetLastY () const = 0;
   /// Query the last known mouse button state. Button numbers start at 1.
-  virtual bool GetLastButton (int button) = 0;
+  virtual bool GetLastButton (int button) const = 0;
 
   /**
    * Call this to add a 'mouse button down/up' event to queue. Button numbers
@@ -240,22 +236,27 @@ struct iJoystickDriver : public iBase
   virtual void Reset () = 0;
 
   /// Query last X position of joystick 'number'.
-  virtual int GetLastX (int number) = 0;
+  CS_DEPRECATED_METHOD virtual int GetLastX (int number) const = 0;
   /// Query last Y position of joystick 'number'.
-  virtual int GetLastY (int number) = 0;
+  CS_DEPRECATED_METHOD virtual int GetLastY (int number) const = 0;
+  /// Query last position on all axes of joystick 'number'.
+  virtual const int *GetLast (int number) const = 0;
+  /// Query last position on 'axis' of joystick 'number'.
+  virtual int GetLast (int number, uint8 axis) const = 0;
+
   /**
    * Query the last known button state of joystick 'number'.  Joystick numbers
    * start at 1.  Button numbers start at 1.
    */
-  virtual bool GetLastButton (int number, int button) = 0;
+  virtual bool GetLastButton (int number, int button) const = 0;
 
   /**
    * Call this to add a 'button down/up' event to queue.  Joystick
    * numbers start at 1.  Button numbers start at 1.
    */
-  virtual void DoButton (int number, int button, bool down, int x, int y) = 0;
+  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes) = 0;
   /// Call this to add a 'moved' event to queue for joystick 'number'.
-  virtual void DoMotion (int number, int x, int y) = 0;
+  virtual void DoMotion (int number, const int *axes, uint8 nunmAxes) = 0;
 };
 
 /** @} */

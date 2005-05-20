@@ -29,6 +29,7 @@
 #include "ivaria/bugplug.h"
 #include "cstool/initapp.h"
 #include "csutil/scfstrset.h"
+#include "csutil/event.h"
 #include "csgfx/memimage.h"
 #include "csgfx/csimgvec.h" 
 #include "csgeom/plane3.h"
@@ -154,7 +155,7 @@ bool csNullGraphics3D::HandleEvent (iEvent& e)
 {
   if (e.Type == csevBroadcast)
   {
-    switch (e.Command.Code)
+    switch (csCommandEventHelper::GetCode(&e))
     {
       case cscmdSystemOpen:
         Open ();

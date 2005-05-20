@@ -203,9 +203,9 @@ void csWaterDemo::FinishFrame ()
 
 bool csWaterDemo::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFocusChanged)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFocusChanged)
   {
-    hasfocus = (bool)ev.Command.Info;
+    hasfocus = (bool)csCommandEventHelper::GetInfo(&ev);
     if (hasfocus)
     {
       int w = r3d->GetDriver2D ()->GetWidth()/2;
@@ -218,12 +218,12 @@ bool csWaterDemo::HandleEvent (iEvent& ev)
       r3d->GetDriver2D()->SetMouseCursor (csmcArrow);
     }
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     waterdemo->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     waterdemo->FinishFrame ();
     return true;

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/ref.h"
 #include "csutil/cscolor.h"
+#include "csutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -139,7 +140,7 @@ void csParticlesPhysicsSimple::Stop (iParticlesObjectState *particles)
 
 bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 {
-  if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
+  if (event.Type == csevBroadcast && csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
   {
     csTicks elapsed = vclock->GetElapsedTicks ();
     int updates = (elapsed + leftover_time) / 20;

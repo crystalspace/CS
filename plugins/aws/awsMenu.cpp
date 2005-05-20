@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "awsMenu.h"
 #include "csutil/util.h"
+#include "csutil/event.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -616,7 +617,7 @@ bool awsMenu::HandleEvent (iEvent &Event)
   case csevMouseDown:
   case csevMouseEnter:
   case csevMouseExit:
-    mouse_pos.Set (Event.Mouse.x, Event.Mouse.y);
+    mouse_pos.Set (csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));
     break;
   }
   return awsControlBar::HandleEvent (Event);

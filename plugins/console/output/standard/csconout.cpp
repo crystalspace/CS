@@ -32,6 +32,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "csutil/csevent.h"
+#include "csutil/event.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 #include "iutil/eventq.h"
@@ -676,7 +677,7 @@ bool csConsoleOutput::HandleEvent (iEvent &Event)
   switch (Event.Type)
   {
     case csevBroadcast:
-      switch (Event.Command.Code)
+      switch (csCommandEventHelper::GetCode(&Event))
       {
         case cscmdSystemOpen:
           system_ready = true;

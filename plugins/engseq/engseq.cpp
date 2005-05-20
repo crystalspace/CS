@@ -27,6 +27,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/randomgen.h"
 #include "csutil/weakref.h"
+#include "csutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -1913,7 +1914,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
   // Engine sequence manager must be post because frame must
   // be rendered and this must be fired BEFORE sequence manager. @@@ HACKY
   if (event.Type == csevBroadcast
-	&& event.Command.Code == cscmdPostProcess)
+      && csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
   {
     global_framenr++;
 
@@ -1938,8 +1939,8 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
   }
   else if (event.Type == csevMouseDown)
   {
-    int mouse_x = event.Mouse.x;
-    int mouse_y = event.Mouse.y;
+    int mouse_x = csMouseEventHelper::GetX(&event);
+    int mouse_y = csMouseEventHelper::GetY(&event);
     if (camera != 0 && mesh_triggers.Length () > 0)
     {
       csVector3 v;

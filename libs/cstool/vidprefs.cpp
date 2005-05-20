@@ -21,6 +21,7 @@
 #include "cstool/initapp.h"
 #include "csutil/objreg.h"
 #include "csutil/csevent.h"
+#include "csutil/event.h"
 
 #include "iaws/aws.h"
 #include "iaws/awscnvs.h"
@@ -130,7 +131,7 @@ bool csVideoPreferences::SetupWindow ()
 bool csVideoPreferences::HandleEvent (iEvent& ev)
 {
   if (exit_loop) return true;
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return true;
     //g2d->Clear (0);
@@ -138,7 +139,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
     aws->Print (g3d, 64);
     return false;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     g3d->FinishDraw ();
     g3d->Print (0);

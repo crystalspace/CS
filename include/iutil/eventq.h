@@ -82,11 +82,11 @@ struct iEventQueue : public iBase
    * will be called in just before Process() iterates over the event queue, 
    * and then it will be called with 3 different csevBroadcast events after 
    * has been dispatched the last event. In this case, the listener will be 
-   * sent an csevBroadcast event with the Event.Command.Code equal to 
+   * sent an csevBroadcast event with the Event.Retrieve("cmdCode") equal to 
    * cscmdPreProcess before events dispatching, and after events dispatching
    * the listener will receive three csevBroadcast events, in 3 successive 
    * phases, following this ordering: the first broadcasted event has the 
-   * Event.Command.Code equal to cscmdProcess, then the second broadcasted 
+   * Event.Retrieve("cmdCode") equal to cscmdProcess, then the second broadcasted 
    * event has a value of cscmdPostProcess and finally the last event 
    * broadcasted has the cscmdFinalProcess value .
    */

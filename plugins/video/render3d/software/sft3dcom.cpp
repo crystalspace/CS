@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "csqint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -349,7 +350,7 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
 bool csSoftwareGraphics3DCommon::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
-    switch (Event.Command.Code)
+    switch (csCommandEventHelper::GetCode(&Event))
     {
       case cscmdSystemOpen:
       {

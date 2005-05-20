@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -331,7 +332,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
 {
   if (event.Type == csevBroadcast)
   {
-    if (event.Command.Code == cscmdPostProcess)
+    if (csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
     {
       csScopedMutexLock lock (mutex);
       size_t l = messages.Length ();

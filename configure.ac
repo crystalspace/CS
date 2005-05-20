@@ -2202,6 +2202,40 @@ AS_IF([test "$cs_cv_prog_cxx_declare_deprecated" != no],
 
 
 #------------------------------------------------------------------------------
+# Check availability of "__attribute__((const))" for functions/methods
+#------------------------------------------------------------------------------
+m4_define([cs_declare_const], [__attribute__((const))])
+AC_CACHE_CHECK([how to declare const functions],
+    [cs_cv_prog_cxx_declare_const],
+    [CS_BUILD_IFELSE(
+	[AC_LANG_PROGRAM([cs_declare_const void f();], [])], [], [C++],
+	[cs_cv_prog_cxx_declare_const="cs_declare_const"],
+	[cs_cv_prog_cxx_declare_const='no'], [], [], [], [],
+	[const])])
+AS_IF([test "$cs_cv_prog_cxx_declare_const" != no],
+    [CS_HEADER_PROPERTY([CS_CONST_METHOD],
+	[$cs_cv_prog_cxx_declare_const])])
+
+
+
+#------------------------------------------------------------------------------
+# Check availability of "__attribute__((pure))" for functions/methods
+#------------------------------------------------------------------------------
+m4_define([cs_declare_pure], [__attribute__((pure))])
+AC_CACHE_CHECK([how to declare pure functions],
+    [cs_cv_prog_cxx_declare_pure],
+    [CS_BUILD_IFELSE(
+	[AC_LANG_PROGRAM([cs_declare_pure void f();], [])], [], [C++],
+	[cs_cv_prog_cxx_declare_pure="cs_declare_const"],
+	[cs_cv_prog_cxx_declare_pure='no'], [], [], [], [],
+	[pure])])
+AS_IF([test "$cs_cv_prog_cxx_declare_pure" != no],
+    [CS_HEADER_PROPERTY([CS_PURE_METHOD],
+	[$cs_cv_prog_cxx_declare_pure])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if C++ compiler understands new C++ `explicit' and 'typename' keywords.
 #------------------------------------------------------------------------------
 AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],

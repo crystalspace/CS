@@ -63,7 +63,7 @@ typedef enum _csEventType
   /// A joystick button has been released
   csevJoystickUp,		
   /**
-   * Somebody(-thing) sent a command. @see csEventCommandData
+   * Somebody(-thing) sent a command. @see csCommandEventData
    */
   csevCommand,			
   /// Somebody(-thing) sent a broadcast command
@@ -106,12 +106,12 @@ typedef enum _csKeyEventType
  * events via iEventQueue::RegisterListener(plugin, CSMASK_Nothing) this has a
  * special meaning: the plugin will be called at the start of every frame and
  * at the end of every frame with an csevBroadcast event with the
- * Event.Command.Code equal to either cscmdPreProcess or cscmdPostProcess.
+ * Event.Retrieve("cmdCode") equal to either cscmdPreProcess or cscmdPostProcess.
  */
 #define CSMASK_Nothing		(1 << csevNothing)
 /**
  * The plugin will be called at the start of every frame and at the
- * end of every frame with an csevBroadcast event with the Event.Command.Code
+ * end of every frame with an csevBroadcast event with the Event.Retrieve("cmdCode")
  * equal to cscmdPreProcess, csProcess, cscmdPostProcess, or cscmdFinalProcess.
  */
 #define CSMASK_FrameProcess	CSMASK_Nothing
@@ -150,6 +150,8 @@ typedef enum _csKeyEventType
   (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
 
 // Some handy macros
+/// Check if a event is a command event
+#define CS_IS_COMMAND_EVENT(e)  ((1 << (e).Type) & CSMASK_Command)
 /// Check if a event is a keyboard event
 #define CS_IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & CSMASK_Keyboard)
 /// Check if a event is a mouse event
@@ -600,27 +602,27 @@ typedef enum _csCommandEventCode
 
   /**
    * Broadcasted before cscmdProcess -- on every frame --
-   * as Event.Command.Code of a broadcast event.  Use the event mask
+   * as Event.Retrieve("cmdCode") of a broadcast event.  Use the event mask
    * CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdPreProcess,
 
   /**
-   * Broadcasted every frame as Event.Command.Code of a broadcast event.
+   * Broadcasted every frame as Event.Retrieve("cmdCode") of a broadcast event.
    * Use the event mask CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdProcess,
 
   /**
    * Broadcasted after cscmdProcess -- on every frame --
-   * as Event.Command.Code of a broadcast event.  Use the event mask
+   * as Event.Retrieve("cmdCode") of a broadcast event.  Use the event mask
    * CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdPostProcess,
 
   /**
    * Broadcasted after cscmdPostProcess -- on every frame --
-   * as Event.Command.Code of a broadcast event.  Use the event mask
+   * as Event.Retrieve("cmdCode") of a broadcast event.  Use the event mask
    * CSMASK_FrameProcess to receive this pseudo-event.
    */
   cscmdFinalProcess,

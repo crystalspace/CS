@@ -35,6 +35,7 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
+#include "csutil/event.h"
 
 #include "cstool/bitmasktostr.h"
 #include "cstool/fogmath.h"
@@ -2967,7 +2968,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 bool csGLGraphics3D::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
-    switch (Event.Command.Code)
+    switch (csCommandEventHelper::GetCode(&Event))
     {
       case cscmdSystemOpen:
         Open ();

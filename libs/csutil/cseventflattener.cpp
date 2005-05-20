@@ -48,8 +48,8 @@ csEventFlattenerError csEventFlattener::FlattenSize (iEvent* event, size_t& size
 {
   // Start count with the initial header
   // Version(4) + packet length(8) + Type(1) + Cat(1) + SubCat(1) 
-  //    + Flags(1) + Time(4) + Joystick(5*4)
-  size = 40;
+  //    + Flags(1) + Time(4)
+  size = 20;
 
   csRef<iEventAttributeIterator> iter (event->GetAttributeIterator ());
 
@@ -188,18 +188,6 @@ csEventFlattenerError csEventFlattener::Flatten (iEvent* event,
   b.Write((char *)&event->Flags, sizeof(uint8));         // iEvent.Flags
   ui32 = csConvertEndian((uint32)event->Time);
   b.Write((char *)&ui32, sizeof(uint32));       // iEvent.Time
-
-  // The largest struct in the union is Joystick, so we take that..
-  i32 = csConvertEndian((int32)event->Joystick.number);
-  b.Write((char *)&i32, sizeof(int32));
-  i32 = csConvertEndian((int32)event->Joystick.x);
-  b.Write((char *)&i32, sizeof(int32));
-  i32 = csConvertEndian((int32)event->Joystick.y);
-  b.Write((char *)&i32, sizeof(int32));
-  i32 = csConvertEndian((int32)event->Joystick.Button);
-  b.Write((char *)&i32, sizeof(int32));
-  i32 = csConvertEndian((int32)event->Joystick.Modifiers);
-  b.Write((char *)&i32, sizeof(int32));
 
   csRef<iEventAttributeIterator> iter (event->GetAttributeIterator ());
 
@@ -432,18 +420,6 @@ csEventFlattenerError csEventFlattener::Unflatten (iEvent* event,
   b.Read((char *)&event->Flags, sizeof(uint8));         // iEvent.Flags
   b.Read((char *)&ui32, sizeof(uint32));         // iEvent.Time
   event->Time = csConvertEndian(ui32);
-
-  // The largest struct in the union is Joystick, so we take that..
-  b.Read((char *)&i32, sizeof(int32));
-  event->Joystick.number = csConvertEndian(i32);
-  b.Read((char *)&i32, sizeof(int32));
-  event->Joystick.x = csConvertEndian(i32);
-  b.Read((char *)&i32, sizeof(int32));
-  event->Joystick.y = csConvertEndian(i32);
-  b.Read((char *)&i32, sizeof(int32));
-  event->Joystick.Button = csConvertEndian(i32);
-  b.Read((char *)&i32, sizeof(int32));
-  event->Joystick.Modifiers = csConvertEndian(i32);
 
   while (b.GetPos() < size)
   {

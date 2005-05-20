@@ -24,6 +24,7 @@
 #include "csgeom/vector4.h"
 #include "cstypes.h"
 #include "csutil/objreg.h"
+#include "csutil/event.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "iengine/engine.h"
@@ -213,7 +214,7 @@ bool csShaderManager::HandleEvent(iEvent& event)
 {
   if (event.Type == csevBroadcast)
   {
-    switch(event.Command.Code)
+    switch(csCommandEventHelper::GetCode(&event))
     {
       case cscmdPreProcess:
         UpdateStandardVariables();

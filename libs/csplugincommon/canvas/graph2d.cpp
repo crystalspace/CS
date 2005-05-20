@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/event.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include "csplugincommon/canvas/graph2d.h"
@@ -283,7 +284,7 @@ csGraphics2D::~csGraphics2D ()
 bool csGraphics2D::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
-    switch (Event.Command.Code)
+    switch (csCommandEventHelper::GetCode(&Event))
     {
       case cscmdSystemOpen:
       {

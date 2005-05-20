@@ -82,7 +82,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
         AxisCmd *bind = axisHash.Get
           (csInputDefinition (& ev, axis), 0);
 
-        if (bind) bind->val = axis ? ev.Mouse.y : ev.Mouse.x;
+        if (bind) bind->val = axis ? csMouseEventHelper::GetY(&ev) : csMouseEventHelper::GetX(&ev);
       }
 
       return true;

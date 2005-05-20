@@ -29,6 +29,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "csutil/csevent.h"
+#include "csutil/event.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -565,7 +566,7 @@ bool csSimpleConsole::HandleEvent (iEvent &Event)
   switch (Event.Type)
   {
     case csevBroadcast:
-      switch (Event.Command.Code)
+      switch (csCommandEventHelper::GetCode(&Event))
       {
         case cscmdSystemOpen:
           SystemReady = true;

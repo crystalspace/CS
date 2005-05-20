@@ -24,6 +24,7 @@
 #include "csutil/csevent.h"
 #include "csutil/csinput.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
@@ -94,12 +95,12 @@ void csInputDriver::Post(iEvent* e)
 bool csInputDriver::HandleEvent(iEvent& e)
 {
   const bool focusChanged = (e.Type == csevBroadcast &&
-    e.Command.Code == cscmdFocusChanged);
+			     csCommandEventHelper::GetCode(&e) == cscmdFocusChanged);
   if (focusChanged) 
   {
-    if (!e.Command.Info) // Application lost focus.
+    if (!csCommandEventHelper::GetInfo(&e)) // Application lost focus.
       LostFocus();
-    if (e.Command.Info) // Application gained focus.
+    if (csCommandEventHelper::GetInfo(&e)) // Application gained focus.
       GainFocus();
   }
   return focusChanged;
@@ -534,7 +535,7 @@ void csKeyboardDriver::SetKeyState (utf32_char codeRaw, bool iDown,
     keyStates.PutUnique (codeRaw, iDown);
 }
 
-bool csKeyboardDriver::GetKeyState (utf32_char codeRaw)
+bool csKeyboardDriver::GetKeyState (utf32_char codeRaw) const
 {
   if (CSKEY_IS_MODIFIER (codeRaw) && 
     (CSKEY_MODIFIER_NUM(codeRaw) == csKeyModifierNumAny))
@@ -545,7 +546,7 @@ bool csKeyboardDriver::GetKeyState (utf32_char codeRaw)
     return keyStates.Get (codeRaw, false);
 }
 
-uint32 csKeyboardDriver::GetModifierState (utf32_char codeRaw)
+uint32 csKeyboardDriver::GetModifierState (utf32_char codeRaw) const
 {
   if (CSKEY_IS_MODIFIER (codeRaw))
   {
@@ -622,6 +623,11 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
   return Keyboard;
 }
 
+/**
+ * Try to post a new mouse button event.
+ * 
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ */
 void csMouseDriver::DoButton (int button, bool down, int x, int y)
 {
   if (x != LastX || y != LastY)
@@ -667,6 +673,11 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
   }
 }
 
+/**
+ * Try to post a new mouse motion event.
+ * 
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ */
 void csMouseDriver::DoMotion (int x, int y)
 {
   if (x != LastX || y != LastY)
@@ -708,9 +719,11 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   Listener = &scfiEventHandler;
   StartListening();
-  memset (&Button, 0, sizeof (Button));
-  memset (&LastX, 0, sizeof (LastX));
-  memset (&LastY, 0, sizeof (LastY));
+  for (int iter=0 ; iter<CS_MAX_JOYSTICK_COUNT ; iter++) {
+    memset (Button[iter], 0, sizeof(int) * CS_MAX_JOYSTICK_BUTTONS);
+    memset (Last[iter], 0, sizeof(int) * CS_MAX_JOYSTICK_AXES);
+  }
+  memset (Axes, 0, sizeof(Axes));
 }
 
 csJoystickDriver::~csJoystickDriver ()
@@ -724,7 +737,7 @@ void csJoystickDriver::Reset ()
   for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
     for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
-        DoButton (i + 1, j + 1, false, LastX [i], LastY [i]);
+        DoButton (i + 1, j + 1, false, Last [i], Axes [i]);
 }
 
 iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
@@ -734,14 +747,19 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
   return Keyboard;
 }
 
+/**
+ * Try to post a new joystick button event.
+ * 
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ */
 void csJoystickDriver::DoButton (int number, int button, bool down,
-  int x, int y)
+				 const int *axes, uint8 numAxes)
 {
   if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
 
-  if (x != LastX [number - 1] || y != LastY [number - 1])
-    DoMotion (number, x, y);
+  if (memcmp(Last[number - 1], axes, numAxes * sizeof(int))!=0)
+    DoMotion(number, axes, numAxes);
 
   if (button <= 0 || button > CS_MAX_JOYSTICK_BUTTONS)
     return;
@@ -754,28 +772,38 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
   Button [number - 1][button - 1] = down;
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent (csGetTicks (),
-    down ? csevJoystickDown : csevJoystickUp, number, x, y, button, smask));
+			     down ? csevJoystickDown : csevJoystickUp, number, 
+			     axes, numAxes, 0, button, smask));
   Post(ev);
-
 }
 
-void csJoystickDriver::DoMotion (int number, int x, int y)
+/**
+ * Try to post a new joystick motion event.
+ * 
+ * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver support to fix.
+ */
+void csJoystickDriver::DoMotion (int number, const int *axes, uint8 numAxes)
 {
+  uint32 cflags = 0;
   if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
 
-  if (x != LastX [number - 1] || y != LastY [number - 1])
-  {
-    iKeyboardDriver* k = GetKeyboardDriver();
-    int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-              | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
-              | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
-    LastX [number - 1] = x;
-    LastY [number - 1] = y;
+  for (int iter=0 ; iter<numAxes ; iter++)
+    if (Last[number - 1][iter] != axes[iter])
+      cflags |= (1 << iter);
 
-    csRef<iEvent> ev;
-    ev.AttachNew (new csEvent(csGetTicks(), csevJoystickMove, 
-      number, x, y, 0, smask));
-    Post(ev);
-  }
+  if (cflags==0)
+    return; /* no change to report */
+
+  iKeyboardDriver* k = GetKeyboardDriver();
+  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+    | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
+    | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
+  memcpy(Last [number - 1], axes, numAxes * sizeof(int));
+  Axes [number - 1] = numAxes;
+
+  csRef<iEvent> ev;
+  ev.AttachNew (new csEvent(csGetTicks(), csevJoystickMove, 
+			    number, axes, numAxes, cflags, 0, smask));
+  Post(ev);
 }

@@ -27,6 +27,7 @@
 #include "awslayot.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
+#include "csutil/event.h"
 #include "iaws/awsdefs.h"
 #include "ivideo/graph2d.h"
 #include "csutil/event.h"
@@ -451,8 +452,9 @@ bool awsComponent::HandleEvent (iEvent &Event)
   case csevMouseMove:
     {
       SAVE_COMP(self)
-      bool r = self->OnMouseMove (Event.Mouse.Button,
-        Event.Mouse.x, Event.Mouse.y);
+      bool r = self->OnMouseMove (csMouseEventHelper::GetButton(&Event),
+				  csMouseEventHelper::GetX(&Event),
+				  csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
     }
@@ -460,8 +462,9 @@ bool awsComponent::HandleEvent (iEvent &Event)
   case csevMouseUp:
     {
       SAVE_COMP(self)
-      bool r = self->OnMouseUp (Event.Mouse.Button, Event.Mouse.x,
-        Event.Mouse.y);
+      bool r = self->OnMouseUp (csMouseEventHelper::GetButton(&Event), 
+				csMouseEventHelper::GetX(&Event),
+				csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
     }
@@ -469,8 +472,9 @@ bool awsComponent::HandleEvent (iEvent &Event)
   case csevMouseDown:
     {
       SAVE_COMP(self)
-      bool r = self->OnMouseDown (Event.Mouse.Button, Event.Mouse.x,
-        Event.Mouse.y);
+      bool r = self->OnMouseDown (csMouseEventHelper::GetButton(&Event), 
+				  csMouseEventHelper::GetX(&Event),
+				  csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
     }
@@ -478,8 +482,9 @@ bool awsComponent::HandleEvent (iEvent &Event)
   case csevMouseClick:
     {
       SAVE_COMP(self)
-      bool r = self->OnMouseClick (Event.Mouse.Button, Event.Mouse.x,
-        Event.Mouse.y);
+      bool r = self->OnMouseClick (csMouseEventHelper::GetButton(&Event), 
+				   csMouseEventHelper::GetX(&Event),
+				   csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
     }

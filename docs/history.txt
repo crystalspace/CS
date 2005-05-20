@@ -14,6 +14,19 @@ chronological order.
 	  All these functions are variants of LoadMapFile, LoadLibraryFile,
 	  and the old Load that worked on a filename. These versions work
 	  on a document node however.
+        - Adam Bradley changed Mouse, Joystick, and Command events over 
+	  to the "property bag" idiom.
+	    - CVS was tagged with PRE_EVENT_UNION_REMOVAL before the change.
+	    - This change breaks the Python binding.
+	    - Added csMouseEventHelper, csJoystickEventHelper, and 
+	      csCommandEventHelper classes, and converted all apps and 
+	      plugins to use them.
+	- Adam added event support for for more than 2 joystick axes.
+	- Adam added Linux support for more than 2 joystick axes.
+	- Adam added CS_CONST_METHOD and CS_PURE_METHOD macros to wrap
+	  gcc __attribute__((const)) and __attribute__((pure)).
+	- Adam added CS_CONST_METHOD, CS_PURE_METHOD, and const types
+	  to lots of input helper and state-querying functions.
 19-May-2005
 	- Wouter Wijngaards changed the csfgen font information print 
 	  to %d for the Underline position integer.

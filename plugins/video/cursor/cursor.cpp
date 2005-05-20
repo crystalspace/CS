@@ -22,6 +22,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
+#include "csutil/event.h"
 #include "csgfx/memimage.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
@@ -205,7 +206,7 @@ bool csCursor::HandleEvent (iEvent &ev)
 
   if (!useOS)
   {
-    if (ev.Type == csevBroadcast && ev.Command.Code == cscmdPostProcess)
+    if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdPostProcess)
     {
       CursorInfo* ci = cursors.Get (current.GetData(), 0);
       if (!ci)

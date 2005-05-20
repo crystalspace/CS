@@ -218,32 +218,36 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
 {
   switch (ev->Type)
   {
-    case csevKeyboard:
+  case csevKeyboard:
     containedType = csevKeyboard;
     keyboard.code = keyboard.isCooked ? csKeyEventHelper::GetCookedCode (ev)
 				      : csKeyEventHelper::GetRawCode (ev);
     csKeyEventHelper::GetModifiers (ev, modifiers);
     break;
 
-    case csevMouseUp:
-    case csevMouseDown:
+  case csevMouseUp:
+  case csevMouseDown:
     containedType = csevMouseDown;
-    mouseButton = ev->Mouse.Button;
-    csKeyEventHelper::GetModifiers ((uint32) ev->Mouse.Modifiers, modifiers);
+    ev->Retrieve("mButton", mouseButton);
+    uint32 mModifiers;
+    ev->Retrieve("keyModifiers", mModifiers);
+    csKeyEventHelper::GetModifiers (mModifiers, modifiers);
     break;
 
-    case csevJoystickUp:
-    case csevJoystickDown:
+  case csevJoystickUp:
+  case csevJoystickDown:
     containedType = csevJoystickDown;
-    joystickButton = ev->Joystick.Button;
-    csKeyEventHelper::GetModifiers ((uint32) ev->Joystick.Modifiers, modifiers);
+    ev->Retrieve("jsButton", joystickButton);
+    uint32 jModifiers;
+    ev->Retrieve("keyModifiers", jModifiers);
+    csKeyEventHelper::GetModifiers (jModifiers, modifiers);
     break;
 
-    case csevMouseMove:
+  case csevMouseMove:
     containedType = csevMouseMove;
     break;
 
-    case csevJoystickMove:
+  case csevJoystickMove:
     containedType = csevJoystickMove;
     break;
   }

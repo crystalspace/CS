@@ -2,6 +2,7 @@
     Event system related helpers
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2005 by Adam D. Bradley <artdodge@cs.bu.edu>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -111,4 +112,114 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
   }
 
   return res;
+}
+
+int csMouseEventHelper::GetX(const iEvent *event)
+{
+  int res = 0;
+  event->Retrieve("mX", res);
+  return res;
+}
+
+int csMouseEventHelper::GetY(const iEvent *event)
+{
+  int res = 0;
+  event->Retrieve("mY", res);
+  return res;
+}
+
+int csMouseEventHelper::GetButton(const iEvent *event)
+{
+  int res = 0;
+  event->Retrieve("mButton", res);
+  return res;
+}
+
+bool csMouseEventHelper::GetEventData (const iEvent* event, csMouseEventData& data)
+{
+  if (!CS_IS_MOUSE_EVENT (*event)) return false;
+  
+  CS_ASSERT(event->Retrieve("mX", data.x) == csEventErrNone);
+  CS_ASSERT(event->Retrieve("mY", data.y) == csEventErrNone);
+  CS_ASSERT(event->Retrieve("mButton", data.Button) == csEventErrNone);
+  CS_ASSERT(event->Retrieve("keyModifiers", data.Modifiers) == csEventErrNone);
+  return true;
+}
+
+int csJoystickEventHelper::GetNumber(const iEvent *event)
+{
+  int res = 0;
+  event->Retrieve("jsNumber", res);
+  return res;
+}
+
+int csJoystickEventHelper::GetAxis(const iEvent *event, int axis)
+{
+  const void *_xs; size_t _xs_sz;
+  int axs;
+  if (event->Retrieve("jsAxes", _xs, _xs_sz) != csEventErrNone)
+    return 0;
+  if (event->Retrieve("jsNumAxes", axs) != csEventErrNone)
+    return 0;
+  const int *axdata = (int *) _xs;
+  if ((axis > 0) && (axis <= axs))
+    return axdata[axis - 1];
+  else
+    return 0;
+}
+
+int csJoystickEventHelper::GetButton(const iEvent *event)
+{
+  int res = 0;
+  event->Retrieve("jsButton", res);
+  return res;
+}
+
+uint8 csJoystickEventHelper::GetNumAxes(const iEvent *event)
+{
+  uint8 res = 0;
+  event->Retrieve("jsNumAxes", res);
+  return res;
+}
+
+bool csJoystickEventHelper::GetEventData (const iEvent* event, csJoystickEventData& data)
+{
+  if (!CS_IS_JOYSTICK_EVENT (*event)) return false;
+  
+  data.number = GetNumber(event);
+  const void *_ax; size_t _ax_sz;
+  CS_ASSERT(event->Retrieve("jsAxes", _ax, _ax_sz) == csEventErrNone);
+  CS_ASSERT(event->Retrieve("jsNumAxes", data.numAxes) == csEventErrNone);
+  for (int iter=0 ; iter<CS_MAX_JOYSTICK_AXES ; iter++) {
+    if (iter<data.numAxes)
+      data.axes[iter] = ((int *)_ax)[iter];
+    else
+      data.axes[iter] = 0;
+  }
+  CS_ASSERT(event->Retrieve("jsButton", data.Button) == csEventErrNone);
+  CS_ASSERT(event->Retrieve("keyModifiers", data.Modifiers) == csEventErrNone);
+  return true;
+}
+
+uint csCommandEventHelper::GetCode(const iEvent* event)
+{
+  uint res = 0;
+  event->Retrieve("cmdCode", res);
+  return res;
+}
+
+intptr_t csCommandEventHelper::GetInfo(const iEvent* event)
+{
+  intptr_t res = 0;
+  event->Retrieve("cmdInfo", res);
+  return res;
+}
+
+bool csCommandEventHelper::GetEventData(const iEvent* event, csCommandEventData& data)
+{
+  if (!CS_IS_COMMAND_EVENT (*event)) return false;
+
+  CS_ASSERT(event->Retrieve("cmdCode", data.Code) == csEventErrNone);
+  CS_ASSERT(event->Retrieve("cmdInfo", data.Info) == csEventErrNone);
+  return true;
 }

@@ -20,6 +20,7 @@
 #include "awstimer.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
+#include "csutil/event.h"
 
 SCF_IMPLEMENT_IBASE_EXT(awsTimer)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
@@ -72,7 +73,7 @@ bool awsTimer::SetTimer (csTicks nTicks)
 
 bool awsTimer::HandleEvent (iEvent &Event)
 {
-  if (Event.Type == csevBroadcast && Event.Command.Code == cscmdPreProcess)
+  if (Event.Type == csevBroadcast && csCommandEventHelper::GetCode(&Event) == cscmdPreProcess)
   {
     csTicks now = vc->GetCurrentTicks ();
     csTicks delta = now - start;

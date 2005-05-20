@@ -85,26 +85,48 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
-  Mouse.x = mx;
-  Mouse.y = my;
-  Mouse.Button = mButton;
-  Mouse.Modifiers = mModifiers;
+
+  Add("mX", mx);
+  Add("mY", my);
+  Add("mButton", mButton);
+  Add("keyModifiers", mModifiers);
 
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
+csEvent::csEvent (csTicks iTime, int eType, int jn, int x, int y, uint32 axesChanged,
 		  int jButton, int jModifiers) : attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
-  Joystick.number = jn;
-  Joystick.x = jx;
-  Joystick.y = jy;
-  Joystick.Button = jButton;
-  Joystick.Modifiers = jModifiers;
+
+  int axes[2] = { x, y };
+  Add("jsNumber", jn);
+  Add("jsAxes", (void *) axes, 2 * sizeof(int)); /* copies array for us */
+  Add("jsNumAxes", 2);
+  Add("jsAxesChanged", axesChanged);
+  Add("jsButton", jButton);
+  Add("keyModifiers", jModifiers);
+
+  count = 0;
+}
+
+csEvent::csEvent (csTicks iTime, int eType, int jn, const int *axes, uint8 numAxes,
+		  uint32 axesChanged, int jButton, int jModifiers) : attributes (53)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  Time = iTime;
+  Type = eType;
+  Category = SubCategory = Flags = 0;
+
+  Add("jsNumber", jn);
+  Add("jsAxes", (void *) axes, numAxes * sizeof(int)); /* copies array for us */
+  Add("jsNumAxes", numAxes);
+  Add("jsAxesChanged", axesChanged);
+  Add("jsButton", jButton);
+  Add("keyModifiers", jModifiers);
 
   count = 0;
 }
@@ -116,8 +138,8 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, intptr_t cInfo) :
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
-  Command.Code = cCode;
-  Command.Info = cInfo;
+  Add("cmdCode", cCode);
+  Add("cmdInfo", cInfo);
   if (eType == csevBroadcast)
     Flags = CSEF_BROADCAST;
 
@@ -135,27 +157,6 @@ csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
   Flags = e.Flags;
   Time = e.Time;
   attributes = e.attributes;
-
-  if ((Type & CSMASK_Mouse) != 0)
-  {
-    Mouse.x = e.Mouse.x;
-    Mouse.y = e.Mouse.y;
-    Mouse.Button = e.Mouse.Button;
-    Mouse.Modifiers = e.Mouse.Modifiers;
-  }
-  else if ((Type & CSMASK_Joystick) != 0)
-  {
-    Joystick.number = e.Joystick.number;
-    Joystick.x = e.Joystick.x;
-    Joystick.y = e.Joystick.y;
-    Joystick.Button = e.Joystick.Button;
-    Joystick.Modifiers = e.Joystick.Modifiers;
-  }
-  else
-  {
-    Command.Code = e.Command.Code;
-    Command.Info = e.Command.Info;
-  }
 }
 
 csEvent::~csEvent ()
@@ -525,8 +526,6 @@ void csPoolEvent::DecRef()
     Flags = 0;
     Time = 0;
     SubCategory = 0;
-    Command.Code = 0;
-    Command.Info = 0;
   }
   else
   {

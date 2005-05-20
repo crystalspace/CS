@@ -158,7 +158,7 @@ public:
    * Query the state of a key. All key codes are supported. Returns true if
    * the key is pressed, false if not.
    */
-  virtual bool GetKeyState (utf32_char codeRaw);
+  CS_PURE_METHOD virtual bool GetKeyState (utf32_char codeRaw) const;
 
   /**
    * Query the state of a modifier key.
@@ -178,7 +178,7 @@ public:
    * \param codeRaw Raw code of the modifier key.
    * \return Bit mask with the pressed modifiers.
    */
-  virtual uint32 GetModifierState (utf32_char codeRaw);
+  CS_PURE_METHOD virtual uint32 GetModifierState (utf32_char codeRaw) const;
 
   virtual csPtr<iKeyComposer> CreateKeyComposer ();
 
@@ -232,14 +232,14 @@ public:
   virtual void Reset ();
 
   /// Query last mouse X position
-  virtual int GetLastX () { return LastX; }
+  CS_PURE_METHOD virtual int GetLastX () const { return LastX; }
   /// Query last mouse Y position
-  virtual int GetLastY () { return LastY; }
+  CS_PURE_METHOD virtual int GetLastY () const { return LastY; }
   /// Query the last known mouse button state
-  virtual bool GetLastButton (int button)
+  CS_PURE_METHOD virtual bool GetLastButton (int button) const
   {
-    return (button > 0 && button <= CS_MAX_MOUSE_BUTTONS) ?
-      Button [button - 1] : false;
+    return (((button > 0) && (button <= CS_MAX_MOUSE_BUTTONS))) ?
+	    Button [button - 1] : false;
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
@@ -276,7 +276,8 @@ protected:
   /// Joystick button states
   bool Button [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_BUTTONS];
   /// Joystick axis positions
-  int LastX [CS_MAX_JOYSTICK_COUNT], LastY [CS_MAX_JOYSTICK_COUNT];
+  int Last [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_AXES];
+  uint8 Axes [CS_MAX_JOYSTICK_COUNT];
   /// Get the generic keyboard driver (for checking modifier states).
   iKeyboardDriver* GetKeyboardDriver();
 
@@ -292,11 +293,13 @@ public:
   virtual void Reset ();
 
   /// Query last joystick X position
-  virtual int GetLastX (int number) { return LastX [number - 1]; }
+  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (int number) const { return Last [number - 1][0]; }
   /// Query last joystick Y position
-  virtual int GetLastY (int number) { return LastY [number - 1]; }
+  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (int number) const { return Last [number - 1][1]; }
+  CS_PURE_METHOD virtual const int *GetLast (int number) const { return Last [number - 1]; }
+  CS_PURE_METHOD virtual int GetLast (int number, uint8 axis) const { return Last [number - 1][axis - 1]; }
   /// Query the last known joystick button state
-  virtual bool GetLastButton (int number, int button)
+  CS_PURE_METHOD virtual bool GetLastButton (int number, int button) const
   {
     return (number > 0 && number <= CS_MAX_JOYSTICK_COUNT
          && button > 0 && button <= CS_MAX_JOYSTICK_BUTTONS) ?
@@ -304,9 +307,9 @@ public:
   }
 
   /// Call this to add a 'joystick button down/up' event to queue
-  virtual void DoButton (int number, int button, bool down, int x, int y);
+  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes);
   /// Call this to add a 'joystick moved' event to queue
-  virtual void DoMotion (int number, int x, int y);
+  virtual void DoMotion (int number, const int *axes, uint8 numAxes);
 
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
