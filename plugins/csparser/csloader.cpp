@@ -623,10 +623,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
 {
   result = 0;
 
-  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes));
-
-  csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
+  csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 
   if (!buf)
   {
@@ -638,76 +635,12 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
 
   csRef<iDocument> doc;
   bool er = LoadStructuredDoc (fname, buf, doc);
-
   if (!er) return false;
+
   if (doc)
   {
     csRef<iDocumentNode> node = doc->GetRoot ();
-    csRef<iDocumentNode> meshfactnode = node->GetNode ("meshfact");
-    if (meshfactnode)
-    {
-      const char* meshfactname = meshfactnode->GetAttributeValue ("name");
-      if (ldr_context->CheckDupes () && meshfactname)
-      {
-	iMeshFactoryWrapper* t = Engine->FindMeshFactory (meshfactname);
-	if (t) { result = t; return true; }
-      }
-
-      csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
-        meshfactname);
-      if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode))
-      {
-        AddToRegion (ldr_context, t->QueryObject ());
-	result = t;
-	return true;
-      }
-      else
-      {
-        // Error is already reported.
-        Engine->GetMeshFactories ()->Remove (t);
-	result = 0;
-        return false;
-      }
-    }
-
-    csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
-    if (meshobjnode)
-    {
-      const char* meshobjname = meshobjnode->GetAttributeValue ("name");
-      if (ldr_context->CheckDupes () && meshobjname)
-      {
-	iMeshWrapper* t = Engine->FindMeshObject (meshobjname);
-	if (t) { result = t; return true; }
-      }
-      csRef<iMeshWrapper> t = Engine->CreateMeshWrapper (meshobjname);
-      if (LoadMeshObject (ldr_context, t, 0, meshobjnode))
-      {
-        AddToRegion (ldr_context, t->QueryObject ());
-	result = t;
-	return true;
-      }
-      else
-      {
-        // Error is already reported.
-	Engine->GetMeshes ()->Remove (t);
-	result = 0;
-	return false;
-      }
-    }
-
-    csRef<iDocumentNode> worldnode = node->GetNode ("world");
-    if (worldnode)
-    {
-      result = Engine;
-      return LoadMap (ldr_context, doc->GetRoot ());
-    }
-
-    csRef<iDocumentNode> libnode = node->GetNode ("library");
-    if (libnode)
-    {
-      result = 0;
-      return LoadLibrary (ldr_context, doc->GetRoot ());
-    }
+    return Load (node, result, region, curRegOnly, checkDupes);
   }
   else
   {
@@ -715,10 +648,84 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
       "File does not appear to be correct XML file (%s)!", fname);
     return false;
   }
+}
+
+bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
+  	bool curRegOnly, bool checkDupes)
+{
+  result = 0;
+
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes));
+
+  csRef<iDocumentNode> meshfactnode = node->GetNode ("meshfact");
+  if (meshfactnode)
+  {
+    const char* meshfactname = meshfactnode->GetAttributeValue ("name");
+    if (ldr_context->CheckDupes () && meshfactname)
+    {
+      iMeshFactoryWrapper* t = Engine->FindMeshFactory (meshfactname);
+      if (t) { result = t; return true; }
+    }
+
+    csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+        meshfactname);
+    if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode))
+    {
+      AddToRegion (ldr_context, t->QueryObject ());
+      result = t;
+      return true;
+    }
+    else
+    {
+      // Error is already reported.
+      Engine->GetMeshFactories ()->Remove (t);
+      result = 0;
+      return false;
+    }
+  }
+
+  csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
+  if (meshobjnode)
+  {
+    const char* meshobjname = meshobjnode->GetAttributeValue ("name");
+    if (ldr_context->CheckDupes () && meshobjname)
+    {
+      iMeshWrapper* t = Engine->FindMeshObject (meshobjname);
+      if (t) { result = t; return true; }
+    }
+    csRef<iMeshWrapper> t = Engine->CreateMeshWrapper (meshobjname);
+    if (LoadMeshObject (ldr_context, t, 0, meshobjnode))
+    {
+      AddToRegion (ldr_context, t->QueryObject ());
+      result = t;
+      return true;
+    }
+    else
+    {
+      // Error is already reported.
+      Engine->GetMeshes ()->Remove (t);
+      result = 0;
+      return false;
+    }
+  }
+
+  csRef<iDocumentNode> worldnode = node->GetNode ("world");
+  if (worldnode)
+  {
+    result = Engine;
+    return LoadMap (ldr_context, worldnode);
+  }
+
+  csRef<iDocumentNode> libnode = node->GetNode ("library");
+  if (libnode)
+  {
+    result = 0;
+    return LoadLibrary (ldr_context, libnode);
+  }
 
   ReportError ("crystalspace.maploader.parse",
-      "File doesn't seem to be a world, library, meshfact, or meshobj file (%s)!",
-      	fname);
+    "File doesn't seem to be a world, library, meshfact, or meshobj file!");
 
   return false;
 }
@@ -726,11 +733,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   iRegion* region, bool curRegOnly, bool checkdupes)
 {
-  if (clearEngine) Engine->DeleteAll ();
-  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, curRegOnly, this, checkdupes));
-
-  csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
+  csRef<iFile> buf = VFS->Open (file, VFS_FILE_READ);
 
   if (!buf)
   {
@@ -740,16 +743,21 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
     return false;
   }
 
-  if (clearEngine)
-    Engine->ResetWorldSpecificSettings();
-
   csRef<iDocument> doc;
   bool er = LoadStructuredDoc (file, buf, doc);
-
   if (!er) return false;
+
   if (doc)
   {
-    if (!LoadMap (ldr_context, doc->GetRoot ())) return false;
+    csRef<iDocumentNode> world_node = doc->GetRoot ()->GetNode ("world");
+    if (!world_node)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.expectedworld",
+        world_node, "Expected 'world' token!");
+      return false;
+    }
+    return LoadMap (world_node, clearEngine, region, curRegOnly, checkdupes);
   }
   else
   {
@@ -761,12 +769,26 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   return true;
 }
 
+bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
+  iRegion* region, bool curRegOnly, bool checkdupes)
+{
+  if (clearEngine)
+  {
+    Engine->DeleteAll ();
+    Engine->ResetWorldSpecificSettings();
+  }
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkdupes));
+
+  return LoadMap (ldr_context, world_node);
+}
+
 //---------------------------------------------------------------------------
 
 bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
 	bool curRegOnly, bool checkDupes)
 {
-  csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
+  csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 
   if (!buf)
   {
@@ -784,7 +806,15 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
   if (!er) return false;
   if (doc)
   {
-    return LoadLibrary (ldr_context, doc->GetRoot ());
+    csRef<iDocumentNode> lib_node = doc->GetRoot ()->GetNode ("library");
+    if (!lib_node)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.expectedlib",
+        lib_node, "Expected 'library' token!");
+      return false;
+    }
+    return LoadLibrary (ldr_context, lib_node);
   }
   else
   {
@@ -792,6 +822,15 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
       "File does not appear to be a structure map library (%s)!", fname);
     return false;
   }
+}
+
+bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
+	bool curRegOnly, bool checkDupes)
+{
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes));
+
+  return LoadLibrary (ldr_context, lib_node);
 }
 
 //---------------------------------------------------------------------------
@@ -1012,13 +1051,13 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
 //--- Parsing of Engine Objects ---------------------------------------------
 
-bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
+bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
 {
   if (!Engine)
   {
     SyntaxService->ReportError (
 		"crystalspace.maploader.parse",
-		node, "The engine plugin is missing!");
+		worldnode, "The engine plugin is missing!");
     return false;
   }
 
@@ -1028,140 +1067,130 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
   csRef<iDocumentNode> sequences;
   csRef<iDocumentNode> triggers;
 
-  csRef<iDocumentNode> worldnode = node->GetNode ("world");
-  if (worldnode)
+  csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
+  while (it->HasNext ())
   {
-    csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
-    while (it->HasNext ())
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
     {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
-      {
-        case XMLTOKEN_SETTINGS:
-	  if (!LoadSettings (child))
-	    return false;
-	  break;
-        case XMLTOKEN_RENDERPRIORITIES:
-	  Engine->ClearRenderPriorities ();
-	  if (!LoadRenderPriorities (child))
-	    return false;
-	  break;
-        case XMLTOKEN_ADDON:
-	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
-	    return false;
-      	  break;
-        case XMLTOKEN_META:
-	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
-	    return false;
-      	  break;
-        case XMLTOKEN_MESHFACT:
-          {
-	    const char* name = child->GetAttributeValue ("name");
-	    if (ldr_context->CheckDupes () && name)
-	    {
-	      iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
-	      if (t) break;
-	    }
-            csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
-	    if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child))
-	    {
-	      // Error is already reported.
-	      return false;
-	    }
-	    else
-	    {
-	      AddToRegion (ldr_context, t->QueryObject ());
-	    }
-          }
-	  break;
-        case XMLTOKEN_REGION:
-	  SyntaxService->ReportError (
-		"crystalspace.maploader.parse.region",
-		node, "<region> is no longer supported!");
-	  break;
-        case XMLTOKEN_SECTOR:
-          if (!ParseSector (ldr_context, child))
-	    return false;
-          break;
-        case XMLTOKEN_COLLECTION:
-          if (!ParseCollection (ldr_context, child))
-	    return false;
-          break;
-	case XMLTOKEN_SEQUENCES:
-	  // Defer sequence parsing to later.
-	  sequences = child;
-	  break;
-	case XMLTOKEN_TRIGGERS:
-	  // Defer trigger parsing to later.
-	  triggers = child;
-	  break;
-	case XMLTOKEN_PLUGINS:
-	  if (!LoadPlugins (child))
-	    return false;
-	  break;
-        case XMLTOKEN_TEXTURES:
-          if (!ParseTextureList (ldr_context, child))
-            return false;
-          break;
-        case XMLTOKEN_MATERIALS:
-          if (!ParseMaterialList (ldr_context, child))
-            return false;
-          break;
-	case  XMLTOKEN_VARIABLES:
-	  if (!ParseVariableList (ldr_context, child))
-	    return false;
-	  break;
-        case XMLTOKEN_SOUNDS:
-          if (!LoadSounds (child))
-            return false;
-          break;
-        case XMLTOKEN_LIBRARY:
-	{
-	  if (!LoadLibraryFromNode (ldr_context, child))
-	    return false;
-	  break;
-	}
-        case XMLTOKEN_START:
+      case XMLTOKEN_SETTINGS:
+	if (!LoadSettings (child))
+	  return false;
+	break;
+      case XMLTOKEN_RENDERPRIORITIES:
+	Engine->ClearRenderPriorities ();
+	if (!LoadRenderPriorities (child))
+	  return false;
+	break;
+      case XMLTOKEN_ADDON:
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
+	  return false;
+      	break;
+      case XMLTOKEN_META:
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
+	  return false;
+      	break;
+      case XMLTOKEN_MESHFACT:
         {
 	  const char* name = child->GetAttributeValue ("name");
-	  iCameraPosition* campos = Engine->GetCameraPositions ()->
-	  	NewCameraPosition (name ? name : "Start");
-	  AddToRegion (ldr_context, campos->QueryObject ());
-	  if (!ParseStart (child, campos))
-	    return false;
-          break;
-        }
-        case XMLTOKEN_KEY:
+	  if (ldr_context->CheckDupes () && name)
 	  {
-            iKeyValuePair* kvp = 0;
-            SyntaxService->ParseKey (child, kvp);
-            if (kvp)
-            {
-              Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
-	      kvp->DecRef ();
-            } else
-	      return false;
+	    iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
+	    if (t) break;
 	  }
-          break;
-        case XMLTOKEN_SHADERS:
-	  shader_given = true;
-          ParseShaderList (ldr_context, child);
-          break;
-	default:
-	  SyntaxService->ReportBadToken (child);
+          csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
+	  if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child))
+	  {
+	    // Error is already reported.
+	    return false;
+	  }
+	  else
+	  {
+	    AddToRegion (ldr_context, t->QueryObject ());
+	  }
+        }
+	break;
+      case XMLTOKEN_REGION:
+	SyntaxService->ReportError (
+		"crystalspace.maploader.parse.region",
+		worldnode, "<region> is no longer supported!");
+	break;
+      case XMLTOKEN_SECTOR:
+        if (!ParseSector (ldr_context, child))
 	  return false;
+        break;
+      case XMLTOKEN_COLLECTION:
+        if (!ParseCollection (ldr_context, child))
+	  return false;
+        break;
+      case XMLTOKEN_SEQUENCES:
+	// Defer sequence parsing to later.
+	sequences = child;
+	break;
+      case XMLTOKEN_TRIGGERS:
+	// Defer trigger parsing to later.
+	triggers = child;
+	break;
+      case XMLTOKEN_PLUGINS:
+	if (!LoadPlugins (child))
+	  return false;
+	break;
+      case XMLTOKEN_TEXTURES:
+        if (!ParseTextureList (ldr_context, child))
+          return false;
+        break;
+      case XMLTOKEN_MATERIALS:
+        if (!ParseMaterialList (ldr_context, child))
+          return false;
+        break;
+      case  XMLTOKEN_VARIABLES:
+	if (!ParseVariableList (ldr_context, child))
+	  return false;
+	break;
+      case XMLTOKEN_SOUNDS:
+        if (!LoadSounds (child))
+          return false;
+        break;
+      case XMLTOKEN_LIBRARY:
+      {
+	if (!LoadLibraryFromNode (ldr_context, child))
+	  return false;
+	break;
       }
+      case XMLTOKEN_START:
+      {
+	const char* name = child->GetAttributeValue ("name");
+	iCameraPosition* campos = Engine->GetCameraPositions ()->
+	  	NewCameraPosition (name ? name : "Start");
+	AddToRegion (ldr_context, campos->QueryObject ());
+	if (!ParseStart (child, campos))
+	  return false;
+        break;
+      }
+      case XMLTOKEN_KEY:
+      {
+        iKeyValuePair* kvp = 0;
+        SyntaxService->ParseKey (child, kvp);
+        if (kvp)
+        {
+          Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
+	  kvp->DecRef ();
+        }
+	else
+	  return false;
+        break;
+      }
+      case XMLTOKEN_SHADERS:
+	shader_given = true;
+        ParseShaderList (ldr_context, child);
+        break;
+      default:
+	SyntaxService->ReportBadToken (child);
+	return false;
     }
-  }
-  else
-  {
-    SyntaxService->ReportError (
-      "crystalspace.maploader.parse.expectedworld",
-      node, "Expected 'world' token!");
-    return false;
   }
 
   // Sequences and triggers are parsed at the end because
@@ -1219,136 +1248,125 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
   return true;
 }
 
-bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
+bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode)
 {
   if (!Engine)
   {
     SyntaxService->ReportError (
 	  "crystalspace.maploader.parse.noengine",
-	  node, "No engine present while in LoadLibrary!");
+	  libnode, "No engine present while in LoadLibrary!");
     return false;
   }
  
   csRef<iDocumentNode> sequences;
   csRef<iDocumentNode> triggers;
 
-  csRef<iDocumentNode> libnode = node->GetNode ("library");
-  if (libnode)
+  csRef<iDocumentNodeIterator> it = libnode->GetNodes ();
+  while (it->HasNext ())
   {
-    csRef<iDocumentNodeIterator> it = libnode->GetNodes ();
-    while (it->HasNext ())
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
     {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
+      case XMLTOKEN_LIBRARY:
       {
-        case XMLTOKEN_LIBRARY:
-	{
-	  if (!LoadLibraryFromNode (ldr_context, child))
+	if (!LoadLibraryFromNode (ldr_context, child))
+	  return false;
+	break;
+      }
+      case XMLTOKEN_ADDON:
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
+	  return false;
+      	break;
+      case XMLTOKEN_META:
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
+	  return false;
+      	break;
+      case XMLTOKEN_SEQUENCES:
+	// Defer sequence parsing to later.
+	sequences = child;
+	break;
+      case XMLTOKEN_TRIGGERS:
+	// Defer trigger parsing to later.
+	triggers = child;
+	break;
+      case XMLTOKEN_TEXTURES:
+        // Append textures to engine.
+        if (!ParseTextureList (ldr_context, child))
+          return false;
+        break;
+      case XMLTOKEN_MATERIALS:
+        if (!ParseMaterialList (ldr_context, child))
+          return false;
+        break;
+      case XMLTOKEN_SHADERS:
+        if (!ParseShaderList (ldr_context, child))
+	  return false;
+        break;
+      case  XMLTOKEN_VARIABLES:
+	if (!ParseVariableList (ldr_context, child))
+	  return false;
+	break;
+      case XMLTOKEN_SOUNDS:
+        if (!LoadSounds (child))
+          return false;
+        break;
+      case XMLTOKEN_MESHREF:
+        {
+          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child);
+          if (!mesh)
+	  {
+	    // Error is already reported.
 	    return false;
-	  break;
-	}
-        case XMLTOKEN_ADDON:
-	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
-	    return false;
-      	  break;
-        case XMLTOKEN_META:
-	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
-	    return false;
-      	  break;
-	case XMLTOKEN_SEQUENCES:
-	  // Defer sequence parsing to later.
-	  sequences = child;
-	  break;
-	case XMLTOKEN_TRIGGERS:
-	  // Defer trigger parsing to later.
-	  triggers = child;
-	  break;
-        case XMLTOKEN_TEXTURES:
-          // Append textures to engine.
-          if (!ParseTextureList (ldr_context, child))
-            return false;
-          break;
-        case XMLTOKEN_MATERIALS:
-          if (!ParseMaterialList (ldr_context, child))
-            return false;
-          break;
-        case XMLTOKEN_SHADERS:
-          if (!ParseShaderList (ldr_context, child))
-	    return false;
-          break;
-	case  XMLTOKEN_VARIABLES:
-	  if (!ParseVariableList (ldr_context, child))
-	    return false;
-	  break;
-        case XMLTOKEN_SOUNDS:
-          if (!LoadSounds (child))
-            return false;
-          break;
-        case XMLTOKEN_MESHREF:
-          {
-            iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child);
-            if (!mesh)
-	    {
-	      // Error is already reported.
-	      return false;
-	    }
-	    mesh->QueryObject ()->SetName (child->GetAttributeValue ("name"));
-	    Engine->AddMeshAndChildren (mesh);
-	    //mesh->DecRef ();
-          }
-          break;
-        case XMLTOKEN_MESHOBJ:
-          {
-	    csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
+	  }
+	  mesh->QueryObject ()->SetName (child->GetAttributeValue ("name"));
+	  Engine->AddMeshAndChildren (mesh);
+	  //mesh->DecRef ();
+        }
+        break;
+      case XMLTOKEN_MESHOBJ:
+        {
+	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 			    child->GetAttributeValue ("name"));
-            if (!LoadMeshObject (ldr_context, mesh, 0, child))
+          if (!LoadMeshObject (ldr_context, mesh, 0, child))
+	  {
+	    // Error is already reported.
+	    return false;
+	  }
+	  else
+	  {
+	    AddToRegion (ldr_context, mesh->QueryObject ());
+	  }
+        }
+        break;
+      case XMLTOKEN_MESHFACT:
+        {
+          csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+	    child->GetAttributeValue ("name"));
+	  if (t)
+	  {
+	    if (!LoadMeshObjectFactory (ldr_context, t, 0, child))
 	    {
 	      // Error is already reported.
 	      return false;
 	    }
 	    else
 	    {
-	      AddToRegion (ldr_context, mesh->QueryObject ());
-	    }
-          }
-          break;
-        case XMLTOKEN_MESHFACT:
-          {
-            csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
-			    child->GetAttributeValue ("name"));
-	    if (t)
-	    {
-	      if (!LoadMeshObjectFactory (ldr_context, t, 0, child))
-	      {
-	        // Error is already reported.
-		return false;
-	      }
-	      else
-	      {
-	        AddToRegion (ldr_context, t->QueryObject ());
-	      }
+	      AddToRegion (ldr_context, t->QueryObject ());
 	    }
 	  }
-	  break;
-        case XMLTOKEN_PLUGINS:
-	  if (!LoadPlugins (child))
-	    return false;
-          break;
-	default:
-	  SyntaxService->ReportBadToken (child);
-          return false;
-      }
+	}
+	break;
+      case XMLTOKEN_PLUGINS:
+	if (!LoadPlugins (child))
+	  return false;
+        break;
+      default:
+	SyntaxService->ReportBadToken (child);
+        return false;
     }
-  }
-  else
-  {
-    SyntaxService->ReportError (
-      "crystalspace.maploader.parse.expectedlib",
-      node, "Expected 'library' token!");
-    return false;
   }
 
   // Sequences and triggers are parsed at the end because

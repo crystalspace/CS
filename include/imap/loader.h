@@ -39,6 +39,7 @@ struct iSoundHandle;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
+struct iDocumentNode;
 
 SCF_VERSION (iLoaderStatus, 0, 1, 0);
 
@@ -146,8 +147,34 @@ struct iLoader : public iBase
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
 	bool checkDupes = false) = 0;
+
+  /**
+   * Load a map from the given 'world' node. If 'clearEngine' is true then
+   * the current contents of the engine will be deleted before loading.
+   * If 'region' is not 0 then portals will only connect to the
+   * sectors in that region, things will only use thing templates
+   * defined in that region and meshes will only use mesh factories
+   * defined in that region. If the region is not 0 and curRegOnly is true
+   * then objects (materials, factories, ...) will only be found in the
+   * given region.
+   * <p>
+   * If you use 'checkDupes' == true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legal for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   */
+  virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
+	iRegion* region = 0, bool curRegOnly = true,
+	bool checkDupes = false) = 0;
+
   /// Load library from a VFS file
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
+  	bool curRegOnly = true, bool checkDupes = false) = 0;
+
+  /// Load library from a 'library' node.
+  virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false) = 0;
 
   /// Load a Mesh Object Factory from the map file.
@@ -182,6 +209,31 @@ struct iLoader : public iBase
    * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
+  	bool curRegOnly = true, bool checkDupes = false) = 0;
+
+  /**
+   * Load a node. This is a smart function that will try to recognize
+   * what kind of node it is. It recognizes the following types of
+   * nodes:
+   * <ul>
+   * <li>'world' node: in that case 'result' will be set to the engine.
+   * <li>'library' node: 'result' will be 0.
+   * <li>'meshfact' node: 'result' will be the mesh factory wrapper.
+   * <li>'meshobj' node: 'result' will be the mesh wrapper.
+   * </ul>
+   * Returns false on failure.
+   * <br>
+   * Note! In case a world node is loaded this function will NOT
+   * clear the engine!
+   * <br>
+   * Note! In case a mesh factory or mesh object is loaded this function
+   * will not actually do anything checkDupes is true and the mesh or
+   * factory is already in memory (with that name). This function will
+   * still return true in that case and set 'result' to the correct object.
+   * <br>
+   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   */
+  virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false) = 0;
 };
 
