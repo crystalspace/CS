@@ -1367,7 +1367,7 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
 
 bool csGenmeshSkelAnimationControlType::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast and csCommandEventHelper::GetCode(&ev) == cscmdPreProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdPreProcess)
   {
       UpdateAUAnimations(vc->GetCurrentTicks());
 	  return true;

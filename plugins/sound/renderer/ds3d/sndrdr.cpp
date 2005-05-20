@@ -21,9 +21,10 @@
 #include "cssysdef.h"
 #include "csplugincommon/directx/guids.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
+#include "csutil/scf.h"
 #include <stdio.h>
 
-#include "csutil/scf.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -379,7 +380,7 @@ bool csSoundRenderDS3D::HandleEvent (iEvent &e)
 {
   if (e.Type == csevCommand || e.Type == csevBroadcast)
   {
-    switch (e.Command.Code)
+    switch (csCommandEventHelper::GetCode (&e))
     {
     case cscmdPreProcess:
       if (!BackgroundProcessing)

@@ -21,6 +21,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/win32/win32.h"
+#include "csutil/event.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -586,7 +587,7 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   if (e.Type != csevBroadcast)
     return false;
 
-  if (e.Command.Code == cscmdPreProcess)
+  if (csCommandEventHelper::GetCode (&e) == cscmdPreProcess)
   {
     if(use_own_message_loop)
     {
@@ -609,14 +610,14 @@ bool Win32Assistant::HandleEvent (iEvent& e)
     }
     return true;
   }
-  else if (e.Command.Code == cscmdSystemOpen)
+  else if (csCommandEventHelper::GetCode (&e) == cscmdSystemOpen)
   {
     return true;
   }
-  else if (e.Command.Code == cscmdSystemClose)
+  else if (csCommandEventHelper::GetCode (&e) == cscmdSystemClose)
   {
   } 
-  else if (e.Command.Code == cscmdCommandLineHelp)
+  else if (csCommandEventHelper::GetCode (&e) == cscmdCommandLineHelp)
   {
 
    #ifdef CS_DEBUG 

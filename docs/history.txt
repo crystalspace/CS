@@ -40,6 +40,10 @@ chronological order.
 	  "System.Plugins.iDocumentSystem.N" are properly loaded.
 	- res changed the AWS Jamfile to also define YY_NEVER_INTERACTIVE for
 	  the AWS parsers for non-MSVC platforms.
+	- Luca replaced some "event.Command.Code" with "csCommandEventHelper
+	  (&e)" in the Win32Assistant and the csSoundRenderDS3D classes. He
+	  corrected also a simple spelling error in 
+	  csGenmeshSkelAnimationControlType.
 19-May-2005
 	- Wouter Wijngaards changed the csfgen font information print 
 	  to %d for the Underline position integer.

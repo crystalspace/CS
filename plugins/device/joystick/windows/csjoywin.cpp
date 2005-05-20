@@ -103,7 +103,7 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
         if (jd.state[nstate].rgbButtons[btn] != 
 	  jd.state[last_state].rgbButtons[btn]) 
 	{
-	  int axdata[2] = { jd.state[nstate].lX, jd.state[nstat].lY };
+	  int axdata[2] = { jd.state[nstate].lX, jd.state[nstate].lY };
           EventOutlet->Joystick (jd.number, btn + 1, 
 				 jd.state[nstate].rgbButtons[btn] != 0,
 				 axdata, 2);
