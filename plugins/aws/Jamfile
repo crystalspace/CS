@@ -70,5 +70,7 @@ if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
   C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
 }
+C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] += 
+  [ FDefines YY_NEVER_INTERACTIVE ] ;
 
 MsvcDefine aws : YY_NEVER_INTERACTIVE ;

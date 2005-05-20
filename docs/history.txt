@@ -38,6 +38,8 @@ chronological order.
 	- res fixed the dsplex plugin metadata to contain a 
 	  "crystalspace.documentsystem." dependency so plugins tagged with
 	  "System.Plugins.iDocumentSystem.N" are properly loaded.
+	- res changed the AWS Jamfile to also define YY_NEVER_INTERACTIVE for
+	  the AWS parsers for non-MSVC platforms.
 19-May-2005
 	- Wouter Wijngaards changed the csfgen font information print 
 	  to %d for the Underline position integer.
