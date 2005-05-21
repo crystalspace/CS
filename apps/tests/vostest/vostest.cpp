@@ -138,12 +138,14 @@ void Vostest::FinishFrame ()
 
 bool Vostest::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast &&
+    csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     vostest->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast &&
+    csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     vostest->FinishFrame ();
     return true;

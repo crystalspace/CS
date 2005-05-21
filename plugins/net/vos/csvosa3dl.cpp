@@ -22,6 +22,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/event.h"
 #include "csvosa3dl.h"
 #include "vossector.h"
 #include "vosobject3d.h"
@@ -206,7 +207,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
 
 bool csVosA3DL::HandleEvent (iEvent &ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == csevBroadcast &&
+    csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     for(unsigned int n = mainThreadTasks.size(); n > 0; n--)
     {

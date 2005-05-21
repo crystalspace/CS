@@ -13,6 +13,7 @@ chronological order.
 	- Wouter fixed a warning about a printf format in blockallocator.h.
 	- Wouter updated the cspython plugin with new csCommandEventHelper.
 	- Wouter updated the cspace.i for EventHelpers.
+	- Vincent Knecht fixed vostest and csvosa3dl.cpp for EventHelpers.
 20-May-2005
 	- Jorrit added three new functions to iLoader:
 		- LoadMap
