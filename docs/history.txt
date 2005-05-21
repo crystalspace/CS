@@ -10,6 +10,7 @@ chronological order.
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused
 	  variable from subrec2.cpp.
+	- Wouter fixed a warning about a printf format in blockallocator.h.
 20-May-2005
 	- Jorrit added three new functions to iLoader:
 		- LoadMap

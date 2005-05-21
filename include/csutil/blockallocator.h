@@ -310,7 +310,7 @@ public:
   {
     if (insideDisposeAll)
     {
-        csPrintfErr("ERROR: csBlockAllocator(%p) tried to allocate memory while inside DisposeAll()", this);
+      csPrintfErr("ERROR: csBlockAllocator(%p) tried to allocate memory while inside DisposeAll()", (void*)this);
       CS_ASSERT(false);
     }
 
