@@ -193,7 +193,8 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
       coincidentally be alloced at the same spot.
     */
     trackedRefs.DeleteAll (object);
-    riAlloc.Free (object);
+    RefInfo* ref = trackedRefs.Get (object, 0);
+    riAlloc.Free (ref);
   }
 }
 

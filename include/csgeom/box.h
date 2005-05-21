@@ -127,7 +127,7 @@ public:
   /// Get the 2d vector of maximum (x, y) values
   const csVector2& Max () const { return maxbox; }
   /// Compute area of box
-  float Area () const { return (MaxX()-MinX())*(MaxY()-MinY())); }
+  float Area () const { return (MaxX()-MinX())*(MaxY()-MinY()); }
 
   /**
    * Return every corner of this bounding box from 0
