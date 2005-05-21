@@ -15,6 +15,8 @@ chronological order.
 	- Wouter updated the cspace.i for EventHelpers.
 	- Vincent Knecht fixed vostest and csvosa3dl.cpp for EventHelpers.
 	- Wouter made an untested fix to vossector.cpp to help Vincent.
+	- Adam Bradley let doxygen know about the CS_PURE_METHOD and
+	  CS_CONST_METHOD macros
 20-May-2005
 	- Jorrit added three new functions to iLoader:
 		- LoadMap
