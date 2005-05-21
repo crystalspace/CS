@@ -7537,7 +7537,9 @@ package cspace::iLoader;
 *LoadSound = *cspacec::iLoader_LoadSound;
 *ThreadedLoadMapFile = *cspacec::iLoader_ThreadedLoadMapFile;
 *LoadMapFile = *cspacec::iLoader_LoadMapFile;
+*LoadMap = *cspacec::iLoader_LoadMap;
 *LoadLibraryFile = *cspacec::iLoader_LoadLibraryFile;
+*LoadLibrary = *cspacec::iLoader_LoadLibrary;
 *LoadMeshObjectFactory = *cspacec::iLoader_LoadMeshObjectFactory;
 *LoadMeshObject = *cspacec::iLoader_LoadMeshObject;
 *Load = *cspacec::iLoader_Load;
@@ -8405,23 +8407,23 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csEventMouseData ##############
+############# Class : cspace::csMouseEventData ##############
 
-package cspace::csEventMouseData;
+package cspace::csMouseEventData;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_x_get = *cspacec::csEventMouseData_x_get;
-*swig_x_set = *cspacec::csEventMouseData_x_set;
-*swig_y_get = *cspacec::csEventMouseData_y_get;
-*swig_y_set = *cspacec::csEventMouseData_y_set;
-*swig_Button_get = *cspacec::csEventMouseData_Button_get;
-*swig_Button_set = *cspacec::csEventMouseData_Button_set;
-*swig_Modifiers_get = *cspacec::csEventMouseData_Modifiers_get;
-*swig_Modifiers_set = *cspacec::csEventMouseData_Modifiers_set;
+*swig_x_get = *cspacec::csMouseEventData_x_get;
+*swig_x_set = *cspacec::csMouseEventData_x_set;
+*swig_y_get = *cspacec::csMouseEventData_y_get;
+*swig_y_set = *cspacec::csMouseEventData_y_set;
+*swig_Button_get = *cspacec::csMouseEventData_Button_get;
+*swig_Button_set = *cspacec::csMouseEventData_Button_set;
+*swig_Modifiers_get = *cspacec::csMouseEventData_Modifiers_get;
+*swig_Modifiers_set = *cspacec::csMouseEventData_Modifiers_set;
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csEventMouseData(@_);
+    my $self = cspacec::new_csMouseEventData(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -8431,7 +8433,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csEventMouseData($self);
+        cspacec::delete_csMouseEventData($self);
         delete $OWNER{$self};
     }
 }
@@ -8449,25 +8451,25 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csEventJoystickData ##############
+############# Class : cspace::csJoystickEventData ##############
 
-package cspace::csEventJoystickData;
+package cspace::csJoystickEventData;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_number_get = *cspacec::csEventJoystickData_number_get;
-*swig_number_set = *cspacec::csEventJoystickData_number_set;
-*swig_x_get = *cspacec::csEventJoystickData_x_get;
-*swig_x_set = *cspacec::csEventJoystickData_x_set;
-*swig_y_get = *cspacec::csEventJoystickData_y_get;
-*swig_y_set = *cspacec::csEventJoystickData_y_set;
-*swig_Button_get = *cspacec::csEventJoystickData_Button_get;
-*swig_Button_set = *cspacec::csEventJoystickData_Button_set;
-*swig_Modifiers_get = *cspacec::csEventJoystickData_Modifiers_get;
-*swig_Modifiers_set = *cspacec::csEventJoystickData_Modifiers_set;
+*swig_number_get = *cspacec::csJoystickEventData_number_get;
+*swig_number_set = *cspacec::csJoystickEventData_number_set;
+*swig_axes_get = *cspacec::csJoystickEventData_axes_get;
+*swig_axes_set = *cspacec::csJoystickEventData_axes_set;
+*swig_numAxes_get = *cspacec::csJoystickEventData_numAxes_get;
+*swig_numAxes_set = *cspacec::csJoystickEventData_numAxes_set;
+*swig_Button_get = *cspacec::csJoystickEventData_Button_get;
+*swig_Button_set = *cspacec::csJoystickEventData_Button_set;
+*swig_Modifiers_get = *cspacec::csJoystickEventData_Modifiers_get;
+*swig_Modifiers_set = *cspacec::csJoystickEventData_Modifiers_set;
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csEventJoystickData(@_);
+    my $self = cspacec::new_csJoystickEventData(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -8477,7 +8479,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csEventJoystickData($self);
+        cspacec::delete_csJoystickEventData($self);
         delete $OWNER{$self};
     }
 }
@@ -8495,19 +8497,19 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csEventCommandData ##############
+############# Class : cspace::csCommandEventData ##############
 
-package cspace::csEventCommandData;
+package cspace::csCommandEventData;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_Code_get = *cspacec::csEventCommandData_Code_get;
-*swig_Code_set = *cspacec::csEventCommandData_Code_set;
-*swig_Info_get = *cspacec::csEventCommandData_Info_get;
-*swig_Info_set = *cspacec::csEventCommandData_Info_set;
+*swig_Code_get = *cspacec::csCommandEventData_Code_get;
+*swig_Code_set = *cspacec::csCommandEventData_Code_set;
+*swig_Info_get = *cspacec::csCommandEventData_Info_get;
+*swig_Info_set = *cspacec::csCommandEventData_Info_set;
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csEventCommandData(@_);
+    my $self = cspacec::new_csCommandEventData(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -8517,7 +8519,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csEventCommandData($self);
+        cspacec::delete_csCommandEventData($self);
         delete $OWNER{$self};
     }
 }
@@ -8739,6 +8741,130 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csKeyEventHelper($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csMouseEventHelper ##############
+
+package cspace::csMouseEventHelper;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetX = *cspacec::csMouseEventHelper_GetX;
+*GetY = *cspacec::csMouseEventHelper_GetY;
+*GetButton = *cspacec::csMouseEventHelper_GetButton;
+*GetModifiers = *cspacec::csMouseEventHelper_GetModifiers;
+*GetEventData = *cspacec::csMouseEventHelper_GetEventData;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csMouseEventHelper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csMouseEventHelper($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csJoystickEventHelper ##############
+
+package cspace::csJoystickEventHelper;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetNumber = *cspacec::csJoystickEventHelper_GetNumber;
+*GetX = *cspacec::csJoystickEventHelper_GetX;
+*GetY = *cspacec::csJoystickEventHelper_GetY;
+*GetAxis = *cspacec::csJoystickEventHelper_GetAxis;
+*GetNumAxes = *cspacec::csJoystickEventHelper_GetNumAxes;
+*GetButton = *cspacec::csJoystickEventHelper_GetButton;
+*GetModifiers = *cspacec::csJoystickEventHelper_GetModifiers;
+*GetEventData = *cspacec::csJoystickEventHelper_GetEventData;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csJoystickEventHelper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csJoystickEventHelper($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csCommandEventHelper ##############
+
+package cspace::csCommandEventHelper;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetCode = *cspacec::csCommandEventHelper_GetCode;
+*GetInfo = *cspacec::csCommandEventHelper_GetInfo;
+*GetEventData = *cspacec::csCommandEventHelper_GetEventData;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csCommandEventHelper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csCommandEventHelper($self);
         delete $OWNER{$self};
     }
 }
@@ -9057,6 +9183,7 @@ package cspace::iJoystickDriver;
 *Reset = *cspacec::iJoystickDriver_Reset;
 *GetLastX = *cspacec::iJoystickDriver_GetLastX;
 *GetLastY = *cspacec::iJoystickDriver_GetLastY;
+*GetLast = *cspacec::iJoystickDriver_GetLast;
 *GetLastButton = *cspacec::iJoystickDriver_GetLastButton;
 *DoButton = *cspacec::iJoystickDriver_DoButton;
 *DoMotion = *cspacec::iJoystickDriver_DoMotion;
@@ -13060,6 +13187,10 @@ sub VFS_STATUS_NOSPACE () { $cspacec::VFS_STATUS_NOSPACE }
 sub VFS_STATUS_RESOURCES () { $cspacec::VFS_STATUS_RESOURCES }
 sub VFS_STATUS_ACCESSDENIED () { $cspacec::VFS_STATUS_ACCESSDENIED }
 sub VFS_STATUS_IOERROR () { $cspacec::VFS_STATUS_IOERROR }
+sub CS_MAX_MOUSE_BUTTONS () { $cspacec::CS_MAX_MOUSE_BUTTONS }
+sub CS_MAX_JOYSTICK_COUNT () { $cspacec::CS_MAX_JOYSTICK_COUNT }
+sub CS_MAX_JOYSTICK_BUTTONS () { $cspacec::CS_MAX_JOYSTICK_BUTTONS }
+sub CS_MAX_JOYSTICK_AXES () { $cspacec::CS_MAX_JOYSTICK_AXES }
 sub csmbLeft () { $cspacec::csmbLeft }
 sub csmbRight () { $cspacec::csmbRight }
 sub csmbMiddle () { $cspacec::csmbMiddle }
@@ -13170,9 +13301,6 @@ sub cscmdPostProcess () { $cspacec::cscmdPostProcess }
 sub cscmdFinalProcess () { $cspacec::cscmdFinalProcess }
 sub cscmdCanvasHidden () { $cspacec::cscmdCanvasHidden }
 sub cscmdCanvasExposed () { $cspacec::cscmdCanvasExposed }
-sub CS_MAX_MOUSE_BUTTONS () { $cspacec::CS_MAX_MOUSE_BUTTONS }
-sub CS_MAX_JOYSTICK_COUNT () { $cspacec::CS_MAX_JOYSTICK_COUNT }
-sub CS_MAX_JOYSTICK_BUTTONS () { $cspacec::CS_MAX_JOYSTICK_BUTTONS }
 sub csComposeNoChar () { $cspacec::csComposeNoChar }
 sub csComposeNormalChar () { $cspacec::csComposeNormalChar }
 sub csComposeComposedChar () { $cspacec::csComposeComposedChar }
