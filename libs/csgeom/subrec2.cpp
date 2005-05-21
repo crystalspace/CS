@@ -79,8 +79,6 @@ void csSubRectangles::SubRect::TestAlloc (int w, int h, AllocInfo& ai)
   int rH = rect.Height ();
   if (h > rH) return;
 
-  SplitType st = splitType;
-
   CS_ASSERT (splitType == SPLIT_UNSPLIT);
   // leaf is not split yet.
   int d = 0x7fffffff;
