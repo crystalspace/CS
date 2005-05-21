@@ -49,7 +49,7 @@ public:
   protected:
     friend class csSubRectangles;
     typedef csBlockAllocator<SubRect> SubRectAlloc;
-    friend class SubRectAlloc;
+    friend class csBlockAllocator<SubRect>; // SubRectAlloc
 
     enum SplitType
     {

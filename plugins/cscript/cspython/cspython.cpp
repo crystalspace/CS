@@ -26,6 +26,7 @@
 #include "csutil/util.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
+#include "csutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
@@ -142,7 +143,8 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
 bool csPython::HandleEvent(iEvent& e)
 {
   bool handled = false;
-  if (e.Type == csevBroadcast && e.Command.Code == cscmdCommandLineHelp)
+  if (e.Type == csevBroadcast && 
+    csCommandEventHelper::GetCode(&e) == cscmdCommandLineHelp)
   {
 #undef indent
 #define indent "                     "

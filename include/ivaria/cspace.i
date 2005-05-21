@@ -959,6 +959,8 @@ TYPEMAP_OUT_csWrapPtr
 %rename(RetrieveVoidPtr) iEvent::Retrieve(const char*, void**, size_t&) const;
 #pragma SWIG nowarn=312; // nested union not supported
 
+%ignore csJoystickEventHelper::GetX;
+%ignore csJoystickEventHelper::GetY;
 %include "iutil/event.h"
 %include "csutil/event.h"
 
@@ -1157,19 +1159,32 @@ APPLY_FOR_EACH_INTERFACE
 // iutil/event.h
 %extend iEvent
 {
-  const csEventMouseData Mouse;
-  const csEventJoystickData Joystick;
-  const csEventCommandData Command;
+  const csMouseEventData Mouse;
+  const csJoystickEventData Joystick;
+  const csCommandEventData Command;
 }
 
 // iutil/event.h
 %{
-  csEventMouseData * iEvent_Mouse_get (iEvent * event)
-    { return &event->Mouse; }
-  csEventJoystickData * iEvent_Joystick_get (iEvent * event)
-    { return &event->Joystick; }
-  csEventCommandData * iEvent_Command_get (iEvent * event)
-    { return &event->Command; }
+  /// note that these values are only valid until the next call.
+  csMouseEventData * iEvent_Mouse_get (iEvent * event)
+  { 
+    static csMouseEventData p; 
+    CS_ASSERT(csMouseEventHelper::GetEventData(event, p));
+    return &p; 
+  }
+  csJoystickEventData * iEvent_Joystick_get (iEvent * event)
+  { 
+    static csJoystickEventData p; 
+    CS_ASSERT(csJoystickEventHelper::GetEventData(event, p));
+    return &p; 
+  }
+  csCommandEventData * iEvent_Command_get (iEvent * event)
+  { 
+    static csCommandEventData p; 
+    CS_ASSERT(csCommandEventHelper::GetEventData(event, p));
+    return &p; 
+  }
 %}
 
 // iutil/evdefs.h
