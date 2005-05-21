@@ -14,6 +14,7 @@ chronological order.
 	- Wouter updated the cspython plugin with new csCommandEventHelper.
 	- Wouter updated the cspace.i for EventHelpers.
 	- Vincent Knecht fixed vostest and csvosa3dl.cpp for EventHelpers.
+	- Wouter made an untested fix to vossector.cpp to help Vincent.
 20-May-2005
 	- Jorrit added three new functions to iLoader:
 		- LoadMap

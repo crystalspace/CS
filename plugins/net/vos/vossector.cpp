@@ -218,7 +218,7 @@ public:
       vosa3dl->mainThreadTasks.push(new ProgressTask(meter, task, total));
     }
 
-  virtual void notifyProgress(unsigned int progress)
+  virtual void notifyProgress(int progress, int /*total*/)
     {
       //printf("foo progress %i!\n", progress);
       vosa3dl->mainThreadTasks.push(new ProgressTask(meter, progress - prevProg));
