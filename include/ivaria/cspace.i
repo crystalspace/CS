@@ -102,6 +102,8 @@
 #define CS_LEAKGUARD_DECLARE(m)
 #define CS_DEPRECATED_METHOD
 #define CS_DEPRECATED_TYPE
+#define CS_PURE_METHOD
+#define CS_CONST_METHOD
 
 /* For debugging: If you need to debug the build commands for the scripting
  * modules, or if you need to debug or test certain small portions of the
