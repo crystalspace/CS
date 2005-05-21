@@ -39,26 +39,6 @@ csRefTracker::csRefTracker () : riAlloc(1000)
 
 csRefTracker::~csRefTracker ()
 {
-  {
-    csScopedMutexLock lock (mutex);
-
-    csHash<RefInfo*, void*>::GlobalIterator it (
-      trackedRefs.GetIterator ());
-
-    while (it.HasNext ())
-    {
-      RefInfo* info = it.Next ();
-      riAlloc.Free (info);
-    }
-
-    for (size_t i = 0; i < oldData.Length(); i++)
-    {
-      const OldRefInfo& oldInfo = oldData[i];
-
-      riAlloc.Free (oldInfo.ri);
-    }
-  }
-
   csMutex* tehMutex = mutex;
   mutex = 0; 
     // Set mutex to 0 as mutex DecRef() will cause RefTracker call
@@ -209,16 +189,11 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
   if (refCount == 0)
   {
     /*
-      Move the tracked object to the "old data". A new one might just 
+      Ditch tracked object as a new one might just 
       coincidentally be alloced at the same spot.
     */
-    RefInfo* oldRef = trackedRefs.Get (object, 0);
-    if (oldRef)
-    {
-      OldRefInfo oldInfo = {object, oldRef};
-      oldData.Push (oldInfo);
-      trackedRefs.DeleteAll (object);
-    }
+    trackedRefs.DeleteAll (object);
+    riAlloc.Free (object);
   }
 }
 

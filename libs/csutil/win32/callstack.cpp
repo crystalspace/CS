@@ -125,6 +125,15 @@ struct SymCallbackInfo
   uint8* paramOffset;
 };
 
+/* @@@ Can't use CS_IMPLEMENT_STATIC_VAR as it's needed beyond the call to
+ * CS_STATIC_VARIABLE_CLEANUP */
+static csBlockAllocator<cswinCallStack> csAlloc ((32*1024) / sizeof(cswinCallStack));
+
+void cswinCallStack::Free()
+{
+  csAlloc.Free (this);
+}
+
 csStringSet cswinCallStack::strings;
 
 BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
@@ -597,7 +606,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
 
   int count = 0;
   csDirtyAccessArray<cswinCallStack::StackEntry> entries;
-  cswinCallStack* stack = new cswinCallStack;
+  cswinCallStack* stack = csAlloc.Alloc();
   while (DbgHelp::StackWalk64 (machineType, hProc,
     hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 
     DbgHelp::SymGetModuleBase64, 0))

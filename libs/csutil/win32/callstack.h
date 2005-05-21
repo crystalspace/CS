@@ -58,6 +58,8 @@ public:
   cswinCallStack() : csCallStack(), entries(0) {}
   virtual ~cswinCallStack() { delete[] entries; }
 
+  virtual void Free();
+
   virtual size_t GetEntryCount ();
   virtual bool GetFunctionName (size_t num, csString& str);
   virtual bool GetLineNumber (size_t num, csString& str);

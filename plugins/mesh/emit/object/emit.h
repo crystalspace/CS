@@ -540,23 +540,23 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csEmitMeshObjectFactory);
     virtual csRef<iEmitFixed> CreateFixed ()
-    { return new csEmitFixed (scfParent); }
+    { return new csEmitFixed (0); }
     virtual csRef<iEmitBox> CreateBox ()
-    { return new csEmitBox (scfParent); }
+    { return new csEmitBox (0); }
     virtual csRef<iEmitSphere> CreateSphere ()
-    { return new csEmitSphere (scfParent); }
+    { return new csEmitSphere (0); }
     virtual csRef<iEmitCone> CreateCone ()
-    { return new csEmitCone (scfParent); }
+    { return new csEmitCone (0); }
     virtual csRef<iEmitMix> CreateMix ()
-    { return new csEmitMix (scfParent); }
+    { return new csEmitMix (0); }
     virtual csRef<iEmitLine> CreateLine ()
-    { return new csEmitLine (scfParent); }
+    { return new csEmitLine (0); }
     virtual csRef<iEmitCylinder> CreateCylinder ()
-    { return new csEmitCylinder (scfParent); }
+    { return new csEmitCylinder (0); }
     virtual csRef<iEmitSphereTangent> CreateSphereTangent ()
-    { return new csEmitSphereTangent (scfParent); }
+    { return new csEmitSphereTangent (0); }
     virtual csRef<iEmitCylinderTangent> CreateCylinderTangent ()
-    { return new csEmitCylinderTangent (scfParent); }
+    { return new csEmitCylinderTangent (0); }
   } scfiEmitFactoryState;
   friend class EmitFactoryState;
 };

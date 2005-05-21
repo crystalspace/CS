@@ -285,8 +285,8 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
     }
     if ((pos = fontName.FindFirst ('@')) != (size_t)-1)
     {
-      fontName.SubString (fontScale, 0, pos);
-      fontName.DeleteAt (0, pos);
+      fontName.SubString (fontScale, pos + 1, fontName.Length() - pos - 1);
+      fontName.DeleteAt (pos, fontName.Length() - pos);
     }
 
     float scale;

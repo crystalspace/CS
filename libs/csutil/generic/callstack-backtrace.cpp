@@ -37,7 +37,9 @@ public:
     traceData = backtrace_symbols (data, count);
     traceCount = count;
   }
-
+  
+  virtual void Free() { delete this; }
+  
   virtual size_t GetEntryCount ()
   {
     return (traceData != 0) ? traceCount : 0;

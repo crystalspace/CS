@@ -37,7 +37,7 @@ class CS_CRYSTALSPACE_EXPORT csCallStack
 protected:
   virtual ~csCallStack() {}
 public:
-  virtual void Free() { delete this; }
+  virtual void Free() = 0;
   
   virtual size_t GetEntryCount () = 0;
   virtual bool GetFunctionName (size_t num, csString& str) = 0;

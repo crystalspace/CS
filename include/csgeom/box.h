@@ -126,6 +126,8 @@ public:
   const csVector2& Min () const { return minbox; }
   /// Get the 2d vector of maximum (x, y) values
   const csVector2& Max () const { return maxbox; }
+  /// Compute area of box
+  float Area () const { return (MaxX()-MinX())*(MaxY()-MinY())); }
 
   /**
    * Return every corner of this bounding box from 0
@@ -607,6 +609,9 @@ public:
   const csVector3& Min () const { return minbox; }
   /// Get the 3d vector of maximum (x, y, z) values
   const csVector3& Max () const { return maxbox; }
+  /// Compute volume of box
+  float Volume () const
+  { return (MaxX()-MinX())*(MaxY()-MinY())*(MaxZ()-MinZ()); }
 
   /**
    * Return every corner of this bounding box from 0

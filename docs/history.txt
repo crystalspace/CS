@@ -17,6 +17,16 @@ chronological order.
 	- Wouter made an untested fix to vossector.cpp to help Vincent.
 	- Adam Bradley let doxygen know about the CS_PURE_METHOD and
 	  CS_CONST_METHOD macros
+	- res fixed the font plexer to correctly parse font list entries with 
+	  scaling.
+	- res added csBox2::Area() and csBox3::Volume().
+	- res fixed a leak in the emit mesh object.
+	- res changed the win callstack creator to use a block allocator for
+	  call stack objects.
+	- res changed the ref tracker to throw away info for objects where the
+	  refcount became 0.
+	- res create EPS versions of the lately updated screen shots in the
+	  KDevelop & MSVC tutorials.
 20-May-2005
 	- Jorrit added three new functions to iLoader:
 		- LoadMap
