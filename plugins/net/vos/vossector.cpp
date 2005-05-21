@@ -64,6 +64,72 @@ void SetAmbientTask::doTask()
   engine->SetAmbientLight(csColor(.2, .2, .2));
 }
 
+
+class ProgressTask : public VUtil::Task
+{
+private:
+  csRef<iProgressMeter> meter;
+  std::string action;
+  unsigned int step;
+  unsigned int total;
+
+public:
+  ProgressTask(iProgressMeter* m, const std::string& a, unsigned int t)
+    : meter(m), action(a), total(t)
+    {
+    }
+
+  ProgressTask(iProgressMeter* m, unsigned int s)
+    : meter(m), step(s)
+    {
+    }
+
+  virtual void doTask()
+    {
+      if (action != "") {
+        meter->SetProgressDescription("crystalspace.network.vos.a3dl.progress", action.c_str());
+        meter->SetTotal(total);
+        meter->SetGranularity(1);
+      }
+      else
+      {
+        meter->Step(step);
+      }
+    }
+};
+
+/// Task for calling back to the status bar///
+class SimpleProgress : public VOS::ProgressMeterCallback
+{
+private:
+  csRef<iProgressMeter> meter;
+  csVosA3DL* vosa3dl;
+  unsigned int prevProg;
+
+public:
+  SimpleProgress(iProgressMeter* m, csVosA3DL* v)
+    : meter(m), vosa3dl(v), prevProg(0)
+    {
+    }
+
+  virtual ~SimpleProgress() { }
+
+  virtual void notifyTaskStart(const std::string& task, unsigned int total)
+    {
+      //printf("foo start!\n");
+      prevProg = 0;
+      vosa3dl->mainThreadTasks.push(new ProgressTask(meter, task, total));
+    }
+
+  virtual void notifyProgress(unsigned int progress)
+    {
+      //printf("foo progress %i!\n", progress);
+      vosa3dl->mainThreadTasks.push(new ProgressTask(meter, progress - prevProg));
+      prevProg = progress;
+    }
+};
+
+
 /// Task for setting up the object from within a non-CS thread///
 class SetupObjectTask : public Task
 {
@@ -100,15 +166,18 @@ public:
   csVosA3DL* vosa3dl;
   vRef<csMetaObject3D> obj3d;
   csRef<csVosSector> sector;
+  csRef<iProgressMeter> meter;
   bool toRemove;
 
-  LoadObjectTask(csVosA3DL* va, csMetaObject3D *o, csVosSector* vs, bool rem);
+  LoadObjectTask(csVosA3DL* va, csMetaObject3D *o, csVosSector* vs,
+                 bool rem, iProgressMeter* meter = 0);
   virtual ~LoadObjectTask();
   virtual void doTask();
 };
 
-LoadObjectTask::LoadObjectTask (csVosA3DL *va, csMetaObject3D *o, csVosSector *vs, bool rem)
-    : vosa3dl(va), obj3d(o, true), sector(vs), toRemove (rem)
+LoadObjectTask::LoadObjectTask (csVosA3DL *va, csMetaObject3D *o, csVosSector *vs,
+                                bool rem, iProgressMeter* m)
+  : vosa3dl(va), obj3d(o, true), sector(vs), meter(m), toRemove (rem)
 {
 }
 
@@ -163,68 +232,13 @@ void LoadObjectTask::doTask()
       TaskQueue::defaultTQ().addTask(new SetupObjectTask(vosa3dl, obj3d, sector));
     }
   }
+
+  if (meter.IsValid())
+  {
+    vosa3dl->mainThreadTasks.push(new ProgressTask(meter, 1));
+  }
 }
 
-class ProgressTask : public VUtil::Task
-{
-private:
-  iProgressMeter* meter;
-  std::string action;
-  unsigned int step;
-  unsigned int total;
-
-public:
-  ProgressTask(iProgressMeter* m, const std::string& a, unsigned int t)
-    : meter(m), action(a), total(t)
-    {
-    }
-
-  ProgressTask(iProgressMeter* m, unsigned int s)
-    : meter(m), step(s)
-    {
-    }
-
-  virtual void doTask()
-    {
-      if (action != "") {
-        meter->SetProgressDescription("crystalspace.network.vos.a3dl.progress", action.c_str());
-        meter->SetTotal(total);
-        meter->SetGranularity(1);
-      }
-      else
-      {
-        meter->Step(step);
-      }
-    }
-};
-
-class SimpleProgress : public VOS::ProgressMeterCallback
-{
-private:
-  iProgressMeter* meter;
-  csVosA3DL* vosa3dl;
-  unsigned int prevProg;
-
-public:
-  SimpleProgress(iProgressMeter* m, csVosA3DL* v)
-    : meter(m), vosa3dl(v), prevProg(0)
-    {
-    }
-
-  virtual void notifyTaskStart(const std::string& task, unsigned int total)
-    {
-      //printf("foo start!\n");
-      prevProg = 0;
-      vosa3dl->mainThreadTasks.push(new ProgressTask(meter, task, total));
-    }
-
-  virtual void notifyProgress(int progress, int /*total*/)
-    {
-      //printf("foo progress %i!\n", progress);
-      vosa3dl->mainThreadTasks.push(new ProgressTask(meter, progress - prevProg));
-      prevProg = progress;
-    }
-};
 
 /// Task for setting up the object from within a non-CS thread///
 class LoadSectorTask : public Task
@@ -232,7 +246,7 @@ class LoadSectorTask : public Task
 public:
   csVosA3DL* vosa3dl;
   csRef<csVosSector> sector;
-  iProgressMeter* meter;
+  csRef<iProgressMeter> meter;
 
   LoadSectorTask(csVosA3DL* va, csVosSector* vs, iProgressMeter* meter);
   virtual ~LoadSectorTask();
@@ -291,7 +305,7 @@ void LoadSectorTask::doTask()
   SimpleProgress* sp = 0;
   if (meter != 0) sp = new SimpleProgress(meter, vosa3dl);
 
-    rs->search(sector->GetVobject(), "sector", 0,
+  rs->search(sector->GetVobject(), "sector", 0,
                        "rule sector\n"
                        "do acquire and parent-listen and children-listen to this object\n"
                        "select children with type a3dl:object3D* or with type a3dl:light* or with type a3dl:viewpoint* and apply rule 3Dobject\n"
@@ -321,12 +335,22 @@ void LoadSectorTask::doTask()
                        "\n"
                        "rule extrap-property\n"
                        "do acquire and parent-listen and extrap-property-listen to this object\n",
-
-               sp);
+             sp);
 
     if (sp) delete sp;
 
-  LOG("csVosSector", 2, "Search completed");
+    LOG("csVosSector", 2, "Search completed");
+  }
+
+  if (meter)
+  {
+    unsigned int tot = 0;
+
+    for(ChildListIterator cli = sector->GetVobject()->getChildren(); cli.hasMore(); cli++) {
+      if ((meta_cast<A3DL::Object3D>((*cli)->getChild())).isValid()) tot++;
+    }
+
+    vosa3dl->mainThreadTasks.push(new ProgressTask(meter, "Initializing 3D scene", tot));
   }
 
   sector->GetVobject()->addChildListener (sector);
@@ -371,8 +395,11 @@ void csVosSector::removeObject3D (iVosObject3D *obj)
 
 void csVosSector::Load(iProgressMeter* progress)
 {
+  meter = progress;
+  vosa3dl->setProgressMeter(progress);
+
   if(! didLoad) {
-  didLoad = true;
+    didLoad = true;
     waitingForChildren = sectorvobj->numChildren();
     TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this, progress));
   }
@@ -391,10 +418,12 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
       {
         //obj3d->Setup(vosa3dl, this);
         vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d, this,
-                              false));
-    if (obj3d->getTypes().hasItem ("a3dl:object3D.polygonmesh")
-      && obj3d->getTypes().hasItem ("a3dl:static"))
-      vosa3dl->incrementRelightCounter();
+                                                          false, meter));
+        if (obj3d->getTypes().hasItem ("a3dl:object3D.polygonmesh")
+            && obj3d->getTypes().hasItem ("a3dl:static"))
+        {
+          vosa3dl->incrementRelightCounter();
+        }
       }
       else
       {
@@ -402,14 +431,14 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
         if(light.isValid())
         {
           light->Setup(vosa3dl, this);
-      vosa3dl->incrementRelightCounter();
+          vosa3dl->incrementRelightCounter();
         }
       }
   }
   catch(std::runtime_error e)
   {
     LOG("csVosSector", 2, "caught runtime error setting up "
-      << event.getChild()->getURLstr() << ": " << e.what());
+        << event.getChild()->getURLstr() << ": " << e.what());
   }
 
   LOG("csVosSector", 3, "leaving notifyChildInserted " << waitingForChildren);

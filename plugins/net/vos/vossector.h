@@ -41,6 +41,7 @@ private:
   csRef<iEngine> engine;
   csRef<iSector> sector;
   csVosA3DL* vosa3dl;
+  csRef<iProgressMeter> meter;
   VUtil::vRef<csMetaSector> sectorvobj;
 
   csSet < csPtrKey<iVosObject3D> > loadedObjects;

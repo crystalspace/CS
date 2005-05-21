@@ -58,6 +58,7 @@ class csVosA3DL : public iComponent, public iEventHandler,
 private:
   csRef<iEventQueue> eventq;
   csRef<iDynamicSystem> dynsys;
+  csRef<iProgressMeter> progress;
 
   iObjectRegistry *objreg;
 
@@ -89,6 +90,8 @@ public:
   }
 
   virtual VUtil::vRef<VOS::Vobject> GetVobject();
+
+  void setProgressMeter(iProgressMeter* meter);
 
   void incrementRelightCounter();
   void decrementRelightCounter();

@@ -60,14 +60,15 @@ class RelightTask : public Task
 {
 public:
   csVosA3DL* vosa3dl;
+  csRef<iProgressMeter> meter;
 
-  RelightTask(csVosA3DL* va);
+  RelightTask(csVosA3DL* va, iProgressMeter* m = 0);
   virtual ~RelightTask() { }
   virtual void doTask();
 };
 
-RelightTask::RelightTask(csVosA3DL* va)
-  : vosa3dl(va)
+RelightTask::RelightTask(csVosA3DL* va, iProgressMeter* m)
+  : vosa3dl(va), meter(m)
 {
 }
 
@@ -77,7 +78,7 @@ void RelightTask::doTask()
   csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
 
   LOG ("RelightTask", 2, "Performing relight");
-  engine->ForceRelight();
+  engine->ForceRelight(0, meter);
   LOG ("RelightTask", 2, "Done");
 }
 
@@ -210,7 +211,9 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
   if (ev.Type == csevBroadcast &&
     csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
-    for(unsigned int n = mainThreadTasks.size(); n > 0; n--)
+    double start = getRealTime();
+
+    for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.5); n--)
     {
       LOG("csVosA3DL", 3, "starting main thread task");
       Task* t = mainThreadTasks.pop();
@@ -228,6 +231,11 @@ vRef<Vobject> csVosA3DL::GetVobject()
   return localsite;
 }
 
+void csVosA3DL::setProgressMeter(iProgressMeter* pm)
+{
+  progress = pm;
+}
+
 void csVosA3DL::incrementRelightCounter()
 {
   boost::mutex::scoped_lock lk (relightCounterMutex);
@@ -240,7 +248,7 @@ void csVosA3DL::decrementRelightCounter()
   boost::mutex::scoped_lock lk (relightCounterMutex);
   if (--relightCounter == 0)
   {
-  mainThreadTasks.push(new RelightTask (this));
+    mainThreadTasks.push(new RelightTask (this, progress));
   }
   LOG ("csVosA3DL", 3, "relight counter decremented to " << relightCounter);
 }
