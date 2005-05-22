@@ -142,10 +142,15 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
 {
   if (!CS_IS_MOUSE_EVENT (*event)) return false;
   
-  CS_ASSERT(event->Retrieve("mX", data.x) == csEventErrNone);
-  CS_ASSERT(event->Retrieve("mY", data.y) == csEventErrNone);
-  CS_ASSERT(event->Retrieve("mButton", data.Button) == csEventErrNone);
-  CS_ASSERT(event->Retrieve("keyModifiers", data.Modifiers) == csEventErrNone);
+  bool ok = true;
+  ok = event->Retrieve("mX", data.x);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("mY", data.y);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("mButton", data.Button);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("keyModifiers", data.Modifiers);
+  CS_ASSERT(ok == csEventErrNone);
   return true;
 }
 
@@ -191,17 +196,22 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   if (!CS_IS_JOYSTICK_EVENT (*event)) return false;
   
   data.number = GetNumber(event);
-  const void *_ax; size_t _ax_sz;
-  CS_ASSERT(event->Retrieve("jsAxes", _ax, _ax_sz) == csEventErrNone);
-  CS_ASSERT(event->Retrieve("jsNumAxes", data.numAxes) == csEventErrNone);
+  const void *_ax = 0; size_t _ax_sz = 0;
+  bool ok = true;
+  ok = event->Retrieve("jsAxes", _ax, _ax_sz);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("jsNumAxes", data.numAxes);
+  CS_ASSERT(ok == csEventErrNone);
   for (int iter=0 ; iter<CS_MAX_JOYSTICK_AXES ; iter++) {
     if (iter<data.numAxes)
       data.axes[iter] = ((int *)_ax)[iter];
     else
       data.axes[iter] = 0;
   }
-  CS_ASSERT(event->Retrieve("jsButton", data.Button) == csEventErrNone);
-  CS_ASSERT(event->Retrieve("keyModifiers", data.Modifiers) == csEventErrNone);
+  ok = event->Retrieve("jsButton", data.Button);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("keyModifiers", data.Modifiers);
+  CS_ASSERT(ok == csEventErrNone);
   return true;
 }
 
@@ -224,7 +234,10 @@ bool csCommandEventHelper::GetEventData(const iEvent* event,
 {
   if (!CS_IS_COMMAND_EVENT (*event)) return false;
 
-  CS_ASSERT(event->Retrieve("cmdCode", data.Code) == csEventErrNone);
-  CS_ASSERT(event->Retrieve("cmdInfo", data.Info) == csEventErrNone);
+  bool ok = true;
+  ok = event->Retrieve("cmdCode", data.Code);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("cmdInfo", data.Info);
+  CS_ASSERT(ok == csEventErrNone);
   return true;
 }

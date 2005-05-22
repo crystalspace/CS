@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-May-2005
+	- Wouter Wijngaards changed the event.cpp CS_ASSERT lines, they
+	  contained vital functionality. ASSERT content is gone in optimize 
+	  mode. The vital functionality was taken out of the ASSERT, keeping
+	  the check inside the ASSERT statement.
 21-May-2005
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused
