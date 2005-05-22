@@ -1170,19 +1170,19 @@ APPLY_FOR_EACH_INTERFACE
   csMouseEventData * iEvent_Mouse_get (iEvent * event)
   { 
     static csMouseEventData p; 
-    CS_ASSERT(csMouseEventHelper::GetEventData(event, p));
+    if(!csMouseEventHelper::GetEventData(event, p)) return 0;
     return &p; 
   }
   csJoystickEventData * iEvent_Joystick_get (iEvent * event)
   { 
     static csJoystickEventData p; 
-    CS_ASSERT(csJoystickEventHelper::GetEventData(event, p));
+    if(!csJoystickEventHelper::GetEventData(event, p)) return 0;
     return &p; 
   }
   csCommandEventData * iEvent_Command_get (iEvent * event)
   { 
     static csCommandEventData p; 
-    CS_ASSERT(csCommandEventHelper::GetEventData(event, p));
+    if(!csCommandEventHelper::GetEventData(event, p)) return 0;
     return &p; 
   }
 %}

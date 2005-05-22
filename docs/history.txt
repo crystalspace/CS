@@ -11,6 +11,7 @@ chronological order.
 	  contained vital functionality. ASSERT content is gone in optimize 
 	  mode. The vital functionality was taken out of the ASSERT, keeping
 	  the check inside the ASSERT statement.
+	- Wouter fixed another bad use of ASSERT in cspace.i.
 21-May-2005
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused
