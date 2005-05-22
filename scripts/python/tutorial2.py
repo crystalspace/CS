@@ -198,10 +198,10 @@ def EventHandler(ev):
             if q:
                 q.GetEventOutlet().Broadcast(cscmdQuit)
                 return 1
-        elif ev.Type == csevBroadcast and ev.Command.Code == cscmdProcess:
+        elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
             app.SetupFrame()
             return 1
-        elif ev.Type == csevBroadcast and ev.Command.Code == cscmdFinalProcess:
+        elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
             app.FinishFrame()
             return 1
     except:

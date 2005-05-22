@@ -91,19 +91,19 @@ def HandleEvent (ev):
     return 0
 
 def EventHandler (ev):
-    if ev.Type == csevBroadcast and ev.Command.Code == cscmdProcess:
+    if ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
         try:
             SetupFrame()
         except:
             traceback.print_exc()
         return 1
-    elif ev.Type == csevBroadcast and ev.Command.Code == cscmdFinalProcess:
+    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
         try:
             FinishFrame()
         except:
             traceback.print_exc()
         return 1
-    elif ev.Type == csevBroadcast and ev.Command.Code == cscmdCommandLineHelp:
+    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdCommandLineHelp:
         print 'No help today...'
         return 1
     else:
@@ -147,7 +147,7 @@ plugin_requests = [
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER, 
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN("crystalspace.collisiondetection.rapid", iCollideSystem),
+    CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode", iCollideSystem),
 ]
 if not csInitializer.RequestPlugins(object_reg, plugin_requests):
     Report(CS_REPORTER_SEVERITY_ERROR, "Plugin requests failed!")

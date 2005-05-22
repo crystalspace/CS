@@ -100,19 +100,19 @@ def HandleEvent (ev):
 def EventHandler (ev):
     if DEBUG: print 'EventHandler called'
     if DEBUG: print '   ev=%s' % ev
-    if ev.Type == csevBroadcast and ev.Command.Code == cscmdProcess:
+    if ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
         try:
             SetupFrame()
         except:
             traceback.print_exc()
         return 1
-    elif ev.Type == csevBroadcast and ev.Command.Code == cscmdFinalProcess:
+    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
         try:
             FinishFrame()
         except:
             traceback.print_exc()
         return 1
-    elif ev.Type == csevBroadcast and ev.Command.Code == cscmdCommandLineHelp:
+    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdCommandLineHelp:
         print 'No help today...'
         return 1
     else:

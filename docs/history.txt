@@ -19,6 +19,8 @@ chronological order.
 	  document.
 	- res moved csFogRamp into a class "csFogMath" and also added methods
 	  to compute opacities for certain distances and vice versa.
+        - Vincent Knecht updated the python tutorials for EventHelpers.
+          Also changed pysimpcd.py to use opcode plugin instead of rapid.
 21-May-2005
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused
