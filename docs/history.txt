@@ -13,6 +13,10 @@ chronological order.
 	  the check inside the ASSERT statement.
 	- Wouter fixed another bad use of ASSERT in cspace.i.
 	- res made some OS/X compile fixes.
+	- res fixed a VC compile error reported by Chris Kings-Lynne.
+	- res changed the document system multiplexer to pick a system that
+	  actually supports changing when CreateRoot() is called on a plexed
+	  document.
 21-May-2005
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused

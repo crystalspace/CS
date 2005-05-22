@@ -21,4 +21,4 @@
 #include "cstool/bitmasktostr.h"
 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(csBitmaskToString, scratch, GetScratch, 
-  csString, );
+  csString, ());

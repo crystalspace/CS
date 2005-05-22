@@ -62,30 +62,23 @@ csRef<iDocumentNode> csPlexDocument::CreateRoot ()
 {
   csRef<iDocumentSystem> wrappedDS;
   if (!wrappedDS)
-  {
     wrappedDS = plexer->defaultDocSys;
-  }
-  if (!wrappedDS && (plexer->orderedlist.Length() > 0))
-  {
-    wrappedDS = plexer->orderedlist[0];
-  }
+  size_t pluginnum = 0;
   if (!wrappedDS)
-  {
-    if (plexer->autolist.Length() > 0)
-    {
-      wrappedDS = plexer->autolist[0];
-    }
-    else
-    {
-      size_t pi = 0;
-      wrappedDS = plexer->LoadNextPlugin (pi);
-    }
-  }
+    wrappedDS = plexer->LoadNextPlugin (pluginnum++);
   if (!wrappedDS)
-  {
     return 0;
+  wrappedDoc = wrappedDS->CreateDocument ();
+  while (wrappedDoc->Changeable() == CS_CHANGEABLE_NEVER)
+  {
+    wrappedDS = plexer->LoadNextPlugin (pluginnum++);
+    if (!wrappedDS)
+    {
+      wrappedDoc = 0;
+      return 0;
+    }
+    wrappedDoc = wrappedDS->CreateDocument ();
   }
-  wrappedDoc = wrappedDS->CreateDocument();
   return wrappedDoc->CreateRoot();
 }
 
@@ -376,5 +369,3 @@ void csDocumentSystemMultiplexer::RewardPlugin (size_t num)
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csDocumentSystemMultiplexer)
-
-
