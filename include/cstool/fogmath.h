@@ -23,14 +23,32 @@
  * Fog math utilities.
  */
 
-/**
- * Calculates fog density for a certain depth in the range [0..1]
- */
-inline float csFogRamp (float depth)
+/// Fog math utilities.
+class csFogMath
 {
-  return 1.0 - exp (-depth*7);
-  //return depth;
-}
+public:
+  /**
+   * Calculates fog density for a certain depth in the range [0..1]
+   */
+  static inline float Ramp (float depth)
+  {
+    return 1.0 - exp (-depth*7);
+    //return depth;
+  }
+  /// Compute fog opacity at a given distance.
+  /* @@@ NOTE: Basically the same computation that's done when using fog
+   * texgen from the glfixed VP - means, keep this function in sync! */
+  static inline float OpacityAtDistance (float density, float dist)
+  {
+    return Ramp (density*(dist-0.1f));
+  }
+  /// Inverse of OpacityAtDistance
+  static inline float DistanceForOpacity (float density, float opacity)
+  {
+    return -(log(-opacity+1.0f)/(density * 7.0f)) + 0.1f;
+  }
+};
+
 
 #endif // __CS_CSTOOL_FOGMATH_H__
 

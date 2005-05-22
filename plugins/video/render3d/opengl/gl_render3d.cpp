@@ -998,19 +998,25 @@ bool csGLGraphics3D::Open ()
   #define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
   #define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
 
-  unsigned char *transientfogdata = new unsigned char[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4];
+  unsigned char *transientfogdata = 
+    new unsigned char[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4];
   memset(transientfogdata, 255, CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4);
   for (unsigned int fogindex1 = 0; fogindex1 < CS_FOGTABLE_SIZE; fogindex1++)
   {
     for (unsigned int fogindex2 = 0; fogindex2 < CS_FOGTABLE_SIZE; fogindex2++)
     {
-      unsigned char fogalpha1 = (unsigned char)(255 * csFogRamp((float)fogindex1 / CS_FOGTABLE_SIZE));
+      unsigned char fogalpha1 = 
+        (unsigned char)(255.0f * csFogMath::Ramp (
+          (float)fogindex1 / CS_FOGTABLE_SIZE));
       if (fogindex1 == (CS_FOGTABLE_SIZE - 1))
         fogalpha1 = 255;
-      unsigned char fogalpha2 = (unsigned char)(255 * csFogRamp((float)fogindex2 / CS_FOGTABLE_SIZE));
+      unsigned char fogalpha2 = 
+        (unsigned char)(255.0f * csFogMath::Ramp (
+          (float)fogindex2 / CS_FOGTABLE_SIZE));
       if (fogindex2 == (CS_FOGTABLE_SIZE - 1))
         fogalpha2 = 255;
-      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE) * 4 + 3] = MIN(fogalpha1, fogalpha2);
+      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE) * 4 + 3] = 
+        MIN(fogalpha1, fogalpha2);
     }
   }
 
@@ -1019,6 +1025,7 @@ bool csGLGraphics3D::Open ()
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
   csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
     img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+  fogtex->SetTextureClass ("lookup");
 
   csRef<csShaderVariable> fogvar = csPtr<csShaderVariable> (
   	new csShaderVariable (strings->Request ("standardtex fog")));

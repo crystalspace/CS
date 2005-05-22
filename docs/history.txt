@@ -17,6 +17,8 @@ chronological order.
 	- res changed the document system multiplexer to pick a system that
 	  actually supports changing when CreateRoot() is called on a plexed
 	  document.
+	- res moved csFogRamp into a class "csFogMath" and also added methods
+	  to compute opacities for certain distances and vice versa.
 21-May-2005
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused
