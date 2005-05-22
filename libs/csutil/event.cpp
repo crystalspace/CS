@@ -142,7 +142,7 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
 {
   if (!CS_IS_MOUSE_EVENT (*event)) return false;
   
-  bool ok = true;
+  csEventError ok = csEventErrNone;
   ok = event->Retrieve("mX", data.x);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("mY", data.y);
@@ -197,7 +197,7 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   
   data.number = GetNumber(event);
   const void *_ax = 0; size_t _ax_sz = 0;
-  bool ok = true;
+  csEventError ok = csEventErrNone;
   ok = event->Retrieve("jsAxes", _ax, _ax_sz);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("jsNumAxes", data.numAxes);
@@ -234,7 +234,7 @@ bool csCommandEventHelper::GetEventData(const iEvent* event,
 {
   if (!CS_IS_COMMAND_EVENT (*event)) return false;
 
-  bool ok = true;
+  csEventError ok = csEventErrNone;
   ok = event->Retrieve("cmdCode", data.Code);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("cmdInfo", data.Info);
