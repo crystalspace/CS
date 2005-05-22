@@ -224,7 +224,7 @@ uint csCommandEventHelper::GetCode(const iEvent* event)
 
 intptr_t csCommandEventHelper::GetInfo(const iEvent* event)
 {
-  intptr_t res = 0;
+  int64 res = 0;
   event->Retrieve("cmdInfo", res);
   return res;
 }
@@ -237,7 +237,9 @@ bool csCommandEventHelper::GetEventData(const iEvent* event,
   csEventError ok = csEventErrNone;
   ok = event->Retrieve("cmdCode", data.Code);
   CS_ASSERT(ok == csEventErrNone);
-  ok = event->Retrieve("cmdInfo", data.Info);
+  int64 ipt;
+  ok = event->Retrieve("cmdInfo", ipt);
+  data.Info = ipt;
   CS_ASSERT(ok == csEventErrNone);
   return true;
 }

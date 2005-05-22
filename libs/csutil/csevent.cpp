@@ -142,7 +142,7 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, intptr_t cInfo) :
   Type = eType;
   Category = SubCategory = Flags = 0;
   Add("cmdCode", cCode);
-  Add("cmdInfo", cInfo);
+  Add("cmdInfo", (int64)cInfo);
   if (eType == csevBroadcast)
     Flags = CSEF_BROADCAST;
 

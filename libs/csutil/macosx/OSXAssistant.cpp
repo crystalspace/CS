@@ -302,7 +302,7 @@ uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
 //=============================================================================
 bool OSXAssistant::eiEventHandler::HandleEvent(iEvent& e)
 {
-  if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
+  if (e.Type == csevBroadcast && csCommandEventHelper::GetCode(&e) == cscmdQuit)
     scfParent->should_shutdown = true;
   return false;
 }

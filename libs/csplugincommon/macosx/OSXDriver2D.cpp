@@ -151,13 +151,14 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
 
     if (ev.Type == csevBroadcast)
     {
-        if (ev.Command.Code == cscmdFocusChanged)
+        if (csCommandEventHelper::GetCode(&ev) == cscmdFocusChanged)
         {
             bool shouldPause = !assistant->always_runs();
-            OSXDelegate2D_focusChanged(delegate, ev.Command.Info, shouldPause);
+            OSXDelegate2D_focusChanged(delegate, 
+	      csCommandEventHelper::GetInfo (&ev), shouldPause);
             handled = true;
         }
-        if (ev.Command.Code == cscmdCommandLineHelp)
+        if (csCommandEventHelper::GetCode(&ev) == cscmdCommandLineHelp)
         {
             csPrintf("Options for MacOS X 2D graphics drivers:\n"
              "  -screen=<num>      Screen number to display on (default=0)\n");

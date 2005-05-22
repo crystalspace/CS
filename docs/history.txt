@@ -12,6 +12,7 @@ chronological order.
 	  mode. The vital functionality was taken out of the ASSERT, keeping
 	  the check inside the ASSERT statement.
 	- Wouter fixed another bad use of ASSERT in cspace.i.
+	- res made some OS/X compile fixes.
 21-May-2005
 	- Wouter Wijngaards fixed a warning message in subrec.h, a typedef
 	  does not work well in a friend declaration. And removed unused
