@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-May-2005
+	- Marten added a csForEach which mimics std::for_each.
+	- Marten augumented csVector3 to give faster component lookup 
+	  (operator []) when possible.
+	- Marten added some initial parts of the new lighter. It still does
+	  not do anything.
+	- Marten augumented csBlockAllocator to utilize a policy-like scheme
+	  to determin allocation of blocks.
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment

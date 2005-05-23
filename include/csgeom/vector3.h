@@ -41,12 +41,31 @@
 class CS_CRYSTALSPACE_EXPORT csVector3
 {
 public:
+
+#ifdef __STRICT_ANSI__
   /// The X component of the vector
   float x;
   /// The Y component of the vector
   float y;
   /// The Z component of the vector
   float z;
+#else
+  union
+  {
+    struct 
+    {
+      /// The X component of the vector
+      float x;
+      /// The Y component of the vector
+      float y;
+      /// The Z component of the vector
+      float z;
+    };
+    /// All components
+    float m[3];
+  };
+#endif
+  
   
   /**
    * Make a new vector. The vector is not
@@ -179,10 +198,18 @@ public:
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f; }
 
   /// Returns n-th component of the vector.
+#ifdef __STRICT_ANSI__
   inline float operator[] (int n) const { return !n?x:n&1?y:z; }
+#else
+  inline float operator[] (int n) const { return m[n]; }
+#endif
 
   /// Returns n-th component of the vector.
+#ifdef __STRICT_ANSI__
   inline float & operator[] (int n) { return !n?x:n&1?y:z; }
+#else
+  inline float & operator[] (int n) { return m[n]; }
+#endif
 
   /// Add another vector to this vector.
   inline csVector3& operator+= (const csVector3& v)

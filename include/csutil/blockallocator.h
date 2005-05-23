@@ -40,6 +40,110 @@
 #endif
 
 /**
+ * This class implements the normal per block allocating policy.
+ * It have no per block overhead.
+ */
+class csBlockAllocatorNormalBlockPolicy
+{
+public:
+  /**
+   * Allocate a raw block of given size. 
+   */
+  static inline uint8* AllocBlock (size_t blocksize) 
+  {
+    return (uint8*)malloc(blocksize);
+  }
+
+  /**
+   * Free a block.
+   * Does not do any checkint that the block pointer is valid.
+   */
+  static inline void FreeBlock(uint8* p)
+  {
+    free (p);
+  }
+};
+
+/**
+ * This class implements a per block allocating policy which aligns first
+ * element on given byte boundary.
+ * It have a per block overhead of 4+(alignment) bytes.
+ */
+template <size_t A = 1>
+class csBlockAllocatorAlignPolicy
+{
+public:
+  /**
+  * Allocate a raw block of given size. 
+  */
+  static inline uint8* AllocBlock (size_t blocksize) 
+  {
+    uint8* block;
+    uintptr_t blockPtr;
+    block = (uint8*)malloc(blocksize+A+sizeof(void*));
+    
+    uint8* origblock = block;
+    blockPtr = (uintptr_t) block;
+
+    //align
+    blockPtr += (A-1);
+    blockPtr &= ~(A-1);
+
+    //store original pointer at block-4
+    uintptr_t* ptr = (uintptr_t*)blockPtr; 
+    ptr--;
+    *ptr = (uintptr_t)origblock;
+    
+    return (uint8*)blockPtr;
+  }
+
+  /**
+  * Free a block.
+  * Does not do any checkint that the block pointer is valid.
+  */
+  static inline void FreeBlock(uint8* p)
+  {
+    uint8* realp = (uint8*)*(((uintptr_t*)p)-1);
+    free (realp);
+  }
+};
+
+#ifdef CS_MEMORY_TRACKER
+/**
+ * This class implements block allocating policy for memory tracking builds.
+ * It have an overhead of eigth bytes per block overhead.
+ */
+class csBlockAllocatorMTBlockPolicy
+{
+public:
+  /**
+  * Allocate a raw block of given size. 
+  */
+  static inline uint8* AllocBlock (size_t blocksize) const
+  {
+    char buf[255];
+    sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
+    int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
+    *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
+    *ptr++ = blocksize;
+    return (uint8*)ptr;
+  }
+
+  /**
+  * Free a block.
+  * Does not do any checkint that the block pointer is valid.
+  */
+  static inline void FreeBlock(uint8* p) const
+  {
+    int32* ptr = ((int32*)p)-2;
+    mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
+    free (ptr);
+  }
+};
+#endif
+
+
+/**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has no memory overhead per
  * allocation (unless the objects are smaller than sizeof(void*) bytes) and is
@@ -59,7 +163,14 @@
  * \sa csArray
  * \sa csMemoryPool
  */
-template <class T>
+template <class T,
+          class BlockPolicy = 
+#ifdef CS_MEMORY_TRACKER
+                              csBlockAllocatorMTBlockPolicy
+#else
+                              csBlockAllocatorNormalBlockPolicy
+#endif
+>
 class csBlockAllocator
 {
 protected: // 'protected' allows access by test-suite.
@@ -115,16 +226,8 @@ protected: // 'protected' allows access by test-suite.
   uint8* AllocBlock() const
   {
     uint8* block;
-#ifdef CS_MEMORY_TRACKER
-    char buf[255];
-    sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
-    int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
-    *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
-    *ptr++ = blocksize;
-    block = (uint8*)ptr;
-#else
-    block = (uint8*)malloc(blocksize);
-#endif
+    
+    block = BlockPolicy::AllocBlock (blocksize);
 
     // Build the free-node chain (all nodes are free in the new block).
     FreeNode* nextfree = 0;
@@ -144,13 +247,7 @@ protected: // 'protected' allows access by test-suite.
    */
   void FreeBlock(uint8* p) const
   {
-#ifdef CS_MEMORY_TRACKER
-    int32* ptr = ((int32*)p)-2;
-    mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
-    free (ptr);
-#else
-    free (p);
-#endif
+    BlockPolicy::FreeBlock (p);
   }
 
   /**

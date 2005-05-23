@@ -601,10 +601,10 @@ public:
   float MaxZ () const { return maxbox.z; }
   /// Get Min component for 0 (x), 1 (y), or 2 (z).
   float Min (int idx) const
-  { return idx == 1 ? minbox.y : idx == 0 ? minbox.x : minbox.z; }
+  { return minbox[idx]; }
   /// Get Max component for 0 (x), 1 (y), or 2 (z).
   float Max (int idx) const
-  { return idx == 1 ? maxbox.y : idx == 0 ? maxbox.x : maxbox.z; }
+  { return maxbox[idx]; }
   /// Get the 3d vector of minimum (x, y, z) values
   const csVector3& Min () const { return minbox; }
   /// Get the 3d vector of maximum (x, y, z) values
@@ -661,6 +661,11 @@ public:
    * Set the size of the box but keep the center intact.
    */
   void SetSize (const csVector3& s);
+
+  /**
+   * Get the size of the box 
+   */
+  csVector3 GetSize () const { return (maxbox-minbox); }
 
   /**
    * Get a side of this box as a 2D box.
