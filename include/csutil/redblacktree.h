@@ -577,7 +577,7 @@ public:
   {
     csRedBlackTreePayload<K, T>* payload = Find (key);
     if (payload == 0) return false;
-    return tree.Delete (*payload);
+    return supahclass::Delete (*payload);
   }
   //@{
   /**
@@ -625,7 +625,8 @@ public:
   template <typename CB>
   void TraverseInOrder (CB& callback) const
   {
-    supahclass::TraverseInOrder (TraverseCB<CB> (callback));
+    TraverseCB<CB> traverser (callback);
+    supahclass::TraverseInOrder (traverser);
   }
   //@}
 };

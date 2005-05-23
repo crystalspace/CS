@@ -454,7 +454,8 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
   }
   g3d->SetWorldToCamera (camt);
   g3d->SetZMode (CS_ZBUF_MESH);
-  buckets.TraverseInOrder (TraverseShaderBuckets (*this, g3d, stacks));
+  TraverseShaderBuckets traverser (*this, g3d, stacks);
+  buckets.TraverseInOrder (traverser);
 
   shadervars.Pop ();
 
