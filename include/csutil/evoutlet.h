@@ -66,8 +66,11 @@ public:
   virtual void Post (iEvent*);
   /// Put a keyboard event into event queue.
   virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown);
-  /// Put a mouse event into event queue.
+  /// Put a mouse event into event queue (old interface)
   virtual void Mouse (int iButton, bool iDown, int x, int y);
+  /// Put a mouse event into event queue (new interface)
+  virtual void Mouse (int iNumber, int iButton, bool iDown, 
+		      const int *axes, uint8 numAxes);
   /// Put a joystick event into event queue.
   virtual void Joystick (int iNumber, int iButton, bool iDown, 
     const int *axes, uint8 numAxes);

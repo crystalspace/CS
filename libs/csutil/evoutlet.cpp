@@ -91,15 +91,21 @@ void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
 
 void csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
 {
+  int axes[2] = { x, y };
+  Mouse(1, iButton, iDown, axes, 2);
+}
+
+void csEventOutlet::Mouse (int iNumber, int iButton, bool iDown, const int *axes, uint8 numAxes)
+{
   if (EnableMask & CSEVTYPE_Mouse)
   {
     iMouseDriver* m = GetMouseDriver();
     if (m != 0)
     {
       if (iButton == 0)
-        m->DoMotion (x, y);
+        m->DoMotion (iNumber, axes, numAxes);
       else
-        m->DoButton (iButton, iDown, x, y);
+        m->DoButton (iNumber, iButton, iDown, axes, numAxes);
     }
   }
 }

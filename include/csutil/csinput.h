@@ -202,15 +202,16 @@ private:
 
 protected:
   /// Last "mouse down" event time
-  csTicks LastClickTime;
+  csTicks LastClickTime[CS_MAX_MOUSE_COUNT];
   /// Last "mouse down" event button
-  int LastClickButton;
+  int LastClickButton[CS_MAX_MOUSE_COUNT];
   /// Last "mouse down" event position
-  int LastClickX, LastClickY;
-  /// Last mouse position
-  int LastX, LastY;
+  int LastClick [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
+  /// Last mouse positions
+  int Last [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
+  uint8 Axes [CS_MAX_MOUSE_COUNT];
   /// Mouse buttons state
-  bool Button [CS_MAX_MOUSE_BUTTONS];
+  bool Button [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_BUTTONS];
   /// Mouse double click max interval in 1/1000 seconds
   csTicks DoubleClickTime;
   /// Mouse double click max distance
@@ -232,22 +233,40 @@ public:
   /// Call to release all mouse buttons.
   virtual void Reset ();
 
-  /// Query last mouse X position
-  CS_PURE_METHOD virtual int GetLastX () const { return LastX; }
-  /// Query last mouse Y position
-  CS_PURE_METHOD virtual int GetLastY () const { return LastY; }
+  /// Query last mouse X position for mouse #1
+  CS_PURE_METHOD virtual int GetLastX () const { return GetLastX(1); }
+  /// Query last mouse Y position for mouse #1
+  CS_PURE_METHOD virtual int GetLastY () const { return GetLastY(1); }
+  /// Query last mouse X position for mouse #n (1, 2, ...)
+  CS_PURE_METHOD virtual int GetLastX (int n) const { return Last[n - 1][0]; }
+  /// Query last mouse Y position for mouse #n (1, 2, ...)
+  CS_PURE_METHOD virtual int GetLastY (int n) const { return Last[n - 1][1]; }
+  /// Query last mouse position on axis ax (1, 2, ...) for mouse n (1, 2, ...)
+  CS_PURE_METHOD virtual int GetLast (int n, uint8 axis) const { return Last[n - 1][axis - 1]; }
+  /// Query last mouse axis array for mouse n (1, 2, ...)
+  CS_PURE_METHOD virtual const int *GetLast (int n) const { return Last [n - 1]; }
+  /// Query the last known mouse button state for mouse #1
+  CS_PURE_METHOD virtual bool GetLastButton (int button) const { return GetLastButton(1, button); }
   /// Query the last known mouse button state
-  CS_PURE_METHOD virtual bool GetLastButton (int button) const
+  CS_PURE_METHOD virtual bool GetLastButton (int number, int button) const
   {
-    return (((button > 0) && (button <= CS_MAX_MOUSE_BUTTONS))) ?
-	    Button [button - 1] : false;
+    return (number > 0 && number <= CS_MAX_MOUSE_COUNT
+	    && button > 0 && button <= CS_MAX_MOUSE_BUTTONS) ?
+	    Button [number - 1][button - 1] : false;
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
-  virtual void DoButton (int button, bool down, int x, int y);
+  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes);
+  virtual void DoButton (int button, bool down, const int *axes, uint8 numAxes) 
+  { DoButton (1, button, down, axes, numAxes); }
+  virtual void DoButton (int button, bool down, int x, int y)
+  { int axes[2] = {x, y}; DoButton (1, button, down, axes, 2); }
   /// Call this to add a 'mouse moved' event to queue
-  virtual void DoMotion (int x, int y);
-
+  virtual void DoMotion (int number, const int *axes, uint8 numAxes);
+  virtual void DoMotion (const int *axes, uint8 numAxes) 
+  { DoMotion (1, axes, numAxes); }
+  virtual void DoMotion (int x, int y)
+  { int axes[2] = {x, y}; DoMotion (1, axes, 2); }
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { }

@@ -32,6 +32,10 @@
  * \addtogroup event_handling
  * @{ */
 
+/// Maximal number of mice supported
+#define CS_MAX_MOUSE_COUNT      4
+/// Maximal number of mouse axes supported
+#define CS_MAX_MOUSE_AXES       8
 /// Maximal number of mouse buttons supported
 #define CS_MAX_MOUSE_BUTTONS	10
 /// Maximal number of joysticks supported

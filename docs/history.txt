@@ -13,6 +13,16 @@ chronological order.
 	  work-in-progress.
 	- res applied a patch from groton to fix a couple of issues with AWS
 	  that cropped up lately plus a few fixes from res himself.
+	- Adam Bradley added generic event support for up to
+	  CS_MAX_MOUSE_COUNT simultaneous mice, each with up to
+	  CS_MAX_MOUSE_AXES axes (scroll wheel, etc).
+	  - Existing interfaces still work; they assume the caller is
+	    interested in Mouse #1.
+	  - This is pure infrastructure; none of the mouse drivers
+	    have been updated to watch multiple mice, or to send 
+	    information for more than 2 axes.
+	- Adam fixed an initialization bug in the Joystick driver that
+	  could have overwritten a large region of memory with '\0's.
 22-May-2005
 	- Wouter Wijngaards changed the event.cpp CS_ASSERT lines, they
 	  contained vital functionality. ASSERT content is gone in optimize 

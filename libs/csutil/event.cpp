@@ -116,21 +116,29 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
   return res;
 }
 
-int csMouseEventHelper::GetX(const iEvent *event)
+int csMouseEventHelper::GetNumber (const iEvent *event)
 {
   int res = 0;
-  event->Retrieve("mX", res);
+  event->Retrieve("mNumber", res);
   return res;
 }
 
-int csMouseEventHelper::GetY(const iEvent *event)
+int csMouseEventHelper::GetAxis (const iEvent *event, int axis)
 {
-  int res = 0;
-  event->Retrieve("mY", res);
-  return res;
+  const void *_xs; size_t _xs_sz;
+  int axs;
+  if (event->Retrieve("mAxes", _xs, _xs_sz) != csEventErrNone)
+    return 0;
+  if (event->Retrieve("mNumAxes", axs) != csEventErrNone)
+    return 0;
+  const int *axdata = (int *) _xs;
+  if ((axis > 0) && (axis <= axs))
+    return axdata[axis - 1];
+  else
+    return 0;
 }
 
-int csMouseEventHelper::GetButton(const iEvent *event)
+int csMouseEventHelper::GetButton (const iEvent *event)
 {
   int res = 0;
   event->Retrieve("mButton", res);

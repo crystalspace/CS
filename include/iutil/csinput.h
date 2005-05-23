@@ -194,19 +194,28 @@ struct iMouseDriver : public iBase
    */
   virtual void Reset () = 0;
 
-  /// Query last mouse X position
+  /// Query last mouse X position for mouse number (1, 2, ...)
+  virtual int GetLastX (int number) const = 0;
   virtual int GetLastX () const = 0;
   /// Query last mouse Y position
+  virtual int GetLastY (int number) const = 0;
   virtual int GetLastY () const = 0;
+  /// Query last mouse position for mouse n on axis a
+  virtual int GetLast (int n, uint8 a) const = 0;
+  /// Query last mouse position for mouse n
+  virtual const int *GetLast (int n) const = 0;
   /// Query the last known mouse button state. Button numbers start at 1.
+  virtual bool GetLastButton (int number, int button) const = 0;
   virtual bool GetLastButton (int button) const = 0;
 
   /**
    * Call this to add a 'mouse button down/up' event to queue. Button numbers
    * start at one.
    */
+  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes) = 0;
   virtual void DoButton (int button, bool down, int x, int y) = 0;
   /// Call this to add a 'mouse moved' event to queue
+  virtual void DoMotion (int number, const int *axes, uint8 numAxes) = 0;
   virtual void DoMotion (int x, int y) = 0;
 };
 

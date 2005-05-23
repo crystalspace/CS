@@ -591,9 +591,11 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   Listener = &scfiEventHandler;
   StartListening();
-
-  LastX = LastY = 0;
-  memset (&Button, 0, sizeof (Button));
+  for (int iter=0 ; iter<CS_MAX_MOUSE_COUNT ; iter++) {
+    memset (Button[iter], 0, sizeof(bool) * CS_MAX_MOUSE_BUTTONS);
+    memset (Last[iter], 0, sizeof(int) * CS_MAX_MOUSE_AXES);
+  }
+  memset (Axes, 0, sizeof(Axes));
   Reset();
 
   csConfigAccess cfg;
@@ -611,10 +613,12 @@ csMouseDriver::~csMouseDriver ()
 
 void csMouseDriver::Reset ()
 {
-  for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
-    if (Button[i])
-      DoButton (i + 1, false, LastX, LastY);
-  LastClickButton = -1;
+  for (int i = 0; i < CS_MAX_MOUSE_COUNT; i++) {
+    for (int j = 0; j < CS_MAX_MOUSE_BUTTONS; j++)
+      if (Button [i][j])
+	DoButton (i + 1, j + 1, false, Last[i], Axes[i]);
+    LastClickButton[i] = -1;
+  }
 }
 
 iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
@@ -630,10 +634,13 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *   support to fix.
  */
-void csMouseDriver::DoButton (int button, bool down, int x, int y)
+void csMouseDriver::DoButton (int number, int button, bool down, const int *axes, uint8 numAxes)
 {
-  if (x != LastX || y != LastY)
-    DoMotion (x, y);
+  if (number <= 0 || number > CS_MAX_MOUSE_COUNT)
+    return;
+
+  if (memcmp(Last[number - 1], axes, numAxes * sizeof(int))!=0)
+    DoMotion (number, axes, numAxes);
 
   if (button <= 0 || button > CS_MAX_MOUSE_BUTTONS)
     return;
@@ -643,35 +650,38 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
             | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
             | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
 
-  Button [button - 1] = down;
+  Button [number - 1][button - 1] = down;
 
-  csTicks evtime = csGetTicks ();
-  
   csRef<iEvent> ev;
-  ev.AttachNew (new csEvent (evtime, down ? csevMouseDown : csevMouseUp, 
-    x, y, button, smask));
+  csTicks evtime = csGetTicks();
+  ev.AttachNew (new csEvent (evtime,
+			     down ? csevMouseDown : csevMouseUp, 
+			     number, axes, numAxes, 0, 
+			     button, smask));
   Post(ev);
 
-  if ((button == LastClickButton)
-   && (evtime - LastClickTime <= DoubleClickTime)
-   && (unsigned (ABS (x - LastClickX)) <= DoubleClickDist)
-   && (unsigned (ABS (y - LastClickY)) <= DoubleClickDist))
-  {
+  if ((button == LastClickButton[number - 1])
+      && (evtime - LastClickTime[number - 1] <= DoubleClickTime)) {
+    for (int iter=0 ; iter<Axes[number - 1] ; iter++)
+      if (unsigned (ABS (axes[iter] - LastClick[number - 1][iter])) > DoubleClickDist)
+	goto mousedown;
     csRef<iEvent> ev;
     ev.AttachNew (new csEvent (evtime,
-      down ? csevMouseDoubleClick : csevMouseClick, x, y, button, smask));
+			       down ? csevMouseDoubleClick : csevMouseClick, 
+			       number, axes, numAxes, 0, button, smask));
     Post (ev);
     // Don't allow for sequential double click events
     if (down)
-      LastClickButton = -1;
+      LastClickButton [number - 1] = -1;
   }
   else if (down)
   {
+  mousedown:
     // Remember the coordinates/button/position of last mousedown event
-    LastClickButton = button;
-    LastClickTime = evtime;
-    LastClickX = x;
-    LastClickY = y;
+    LastClickButton[number - 1] = button;
+    LastClickTime[number - 1] = evtime;
+    for (int iter=0; iter<Axes[number - 1]; iter++)
+      LastClick[number - 1][iter] = axes[iter];
   }
 }
 
@@ -681,21 +691,30 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *   support to fix.
  */
-void csMouseDriver::DoMotion (int x, int y)
+void csMouseDriver::DoMotion (int number, const int *axes, uint8 numAxes)
 {
-  if (x != LastX || y != LastY)
-  {
-    iKeyboardDriver* k = GetKeyboardDriver();
-    int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
-              | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
-              | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
-    LastX = x;
-    LastY = y;
-    csRef<iEvent> event;
-    event.AttachNew (new csEvent (csGetTicks (), 
-      csevMouseMove, x, y, 0, smask));
-    Post (event);
-  }
+  uint32 cflags = 0;
+  if (number <= 0 || number > CS_MAX_MOUSE_COUNT)
+    return;
+
+  for (int iter=0; iter<numAxes ; iter++)
+    if (Last [number - 1][iter] != axes[iter])
+      cflags |= (1 << iter);
+
+  if (cflags==0)
+    return; /* no change to report */
+
+  iKeyboardDriver* k = GetKeyboardDriver();
+  int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+    | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
+    | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
+  memcpy(Last [number - 1], axes, numAxes * sizeof(int));
+  Axes [number - 1] = numAxes;
+
+  csRef<iEvent> ev;
+  ev.AttachNew (new csEvent (csGetTicks (), csevMouseMove, 
+			     number, axes, numAxes, cflags, 0, smask));
+  Post (ev);
 }
 
 void csMouseDriver::SetDoubleClickTime (int iTime, size_t iDist)
@@ -723,7 +742,7 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
   Listener = &scfiEventHandler;
   StartListening();
   for (int iter=0 ; iter<CS_MAX_JOYSTICK_COUNT ; iter++) {
-    memset (Button[iter], 0, sizeof(int) * CS_MAX_JOYSTICK_BUTTONS);
+    memset (Button[iter], 0, sizeof(bool) * CS_MAX_JOYSTICK_BUTTONS);
     memset (Last[iter], 0, sizeof(int) * CS_MAX_JOYSTICK_AXES);
   }
   memset (Axes, 0, sizeof(Axes));
@@ -774,6 +793,7 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
             | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
   Button [number - 1][button - 1] = down;
+
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent (csGetTicks (),
 			     down ? csevJoystickDown : csevJoystickUp, number, 

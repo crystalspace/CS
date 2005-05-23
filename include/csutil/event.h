@@ -88,10 +88,18 @@ public:
 class CS_CRYSTALSPACE_EXPORT csMouseEventHelper
 {
 public:
-  /// retrieve X value
-  CS_PURE_METHOD static int GetX(const iEvent *event);
-  /// retrieve Y value
-  CS_PURE_METHOD static int GetY(const iEvent *event);
+  /// retrieve mouse number (1, 2, ...)
+  CS_PURE_METHOD static int GetNumber(const iEvent *event);
+  /// retrieve X value of mouse #1
+  CS_PURE_METHOD static int GetX(const iEvent *event)
+  { return csMouseEventHelper::GetAxis(event, 1); }
+  /// retrieve Y value of mouse #1
+  CS_PURE_METHOD static int GetY(const iEvent *event)
+  { return csMouseEventHelper::GetAxis(event, 2); }
+  /// retrieve any axis (basis 1) value
+  CS_PURE_METHOD static int GetAxis(const iEvent *event, int axis);
+  /// retrieve number of axes
+  CS_PURE_METHOD static int GetNumAxes(const iEvent *event);
   /// retrieve button code
   CS_PURE_METHOD static int GetButton(const iEvent *event);
   /// retrieve modifier flags
