@@ -47,13 +47,13 @@ private:
   int alpha_level;
 
   /// Text of this component, editable.
-  iString *text;
+  csRef<iString> text;//??
 
   /// Text that's not allowed to add.
-  iString *disallow;
+  csRef<iString> disallow;//??
 
   /// Character to replace text with.
-  iString *maskchar;
+  csRef<iString> maskchar;//??
 
   /// Position of first character we display.
   //int start;

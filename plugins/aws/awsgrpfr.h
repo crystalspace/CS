@@ -25,7 +25,7 @@ class awsGroupFrame : public awsPanel
 {
 private:
   /// Caption text for this component.
-  iString *caption;
+  csRef<iString> caption;
 public:
   awsGroupFrame ();
   virtual ~awsGroupFrame ();

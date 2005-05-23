@@ -28,7 +28,6 @@ awsTab::awsTab ()
   : is_active (false),
     is_first (false),
     is_top (true),
-    caption (0),
     captured (false),
     icon_align (0),
     alpha_level (92),
@@ -50,16 +49,19 @@ bool awsTab::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // Global get.
   pm->GetInt (settings, "Alpha", alpha_level); // Local overrides, if present.
   pm->GetInt (settings, "IconAlign", icon_align);
+  caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
 
-  iString *tn = 0;
+  csRef<iString> tn;
+  tn.AttachNew (new scfString (""));
   tex[0] = pm->GetTexture ("Texture");
-  pm->GetString (settings, "Image", tn);
-  if (tn) tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
+  if (pm->GetString (settings, "Image", tn))
+    tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
 
-  iString *in = 0;
-  pm->GetString (settings, "Icon", in);
-  if (in) tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
+  csRef<iString> in;
+  in.AttachNew (new scfString (""));
+  if (pm->GetString (settings, "Icon", in))
+    tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
 
   return true;
 }
@@ -207,10 +209,10 @@ bool awsTab::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    if (caption) caption->DecRef ();
+    //??if (caption) caption->DecRef ();
 
     if (s && s->Length ())
-      (caption = s)->IncRef ();
+      (caption = s);//??->IncRef ();
     else
       caption = 0;
     Invalidate ();
@@ -467,12 +469,12 @@ csRect awsTabCtrl::getInsets ()
 
 iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
 {
+  csRef<iString> theCap;
+  theCap.AttachNew (new scfString (""));
   if (!caption || !caption->GetData ())
-  {
-    csString theCap ("Tab ");
-    theCap += (uint)vTabs.Length () + 1;
-    caption = new scfString ((const char*)theCap);
-  }
+    theCap->Format ("Tab%d", (uint)vTabs.Length () + 1);
+  else
+    theCap = caption;
 
   // Create a button.
   awsTab *btn = new awsTab;
@@ -480,13 +482,13 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
   // Initialize and setup the button.
   awsKeyFactory btninfo(WindowManager());
 
-  btninfo.Initialize (caption->GetData (), "Tab");
+  btninfo.Initialize (theCap->GetData (), "Tab");
   btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (),
     Frame ().Height ()));
 
   btn->SetParent (this);
   btn->Setup (WindowManager (), btninfo.GetThisNode ());
-  btn->SetProperty ("Caption", (intptr_t)caption);
+  btn->SetProperty ("Caption", (intptr_t)(iString*)theCap);
   btn->SetProperty ("User Param", user_param);
 
   // Resize button.
@@ -518,7 +520,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
   DoLayout ();
 
   btn->Invalidate ();
-  caption->DecRef ();
+  //??caption->DecRef ();
   return (iAwsSource*)btn;
 }
 

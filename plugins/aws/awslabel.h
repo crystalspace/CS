@@ -34,7 +34,7 @@ private:
   int alignment;
 
   /// Caption text for this component.
-  iString *caption;
+  csRef<iString> caption;
 public:
   awsLabel ();
   virtual ~awsLabel ();

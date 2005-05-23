@@ -32,13 +32,13 @@ private:
   int chart_options;
 
   /// Caption text for this component
-  iString *caption;
+  csRef<iString> caption;
 
   /// Text for "Y" legend.
-  iString *yText;
+  csRef<iString> yText;
 
   /// Text for "X" legend.
-  iString *xText;
+  csRef<iString> xText;
 
   /// Each item has a value and label.
   struct BarItem

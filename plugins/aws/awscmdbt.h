@@ -50,7 +50,7 @@ protected:
   bool stretched;
   
   /// Caption text for this component.
-  iString *caption;
+  csRef<iString> caption;
 
   void ClearGroup ();
 public:

@@ -53,7 +53,7 @@ class awsPopupMenu;
 class awsMenuEntry : public awsPanel
 {
 private:
-  iString* caption;
+  csRef<iString> caption;
   awsPopupMenu* popup;
   bool selected;
   bool mouse_down;

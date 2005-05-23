@@ -46,7 +46,7 @@ private:
   int alignment;
 
   /// Caption text for this component.
-  iString *caption;
+  csRef<iString> caption;
 protected:
   /// Broadcasts the clear event to peers.
   void ClearGroup ();

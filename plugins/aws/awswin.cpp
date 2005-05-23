@@ -87,8 +87,6 @@ awsWindow::awsWindow () :
 awsWindow::~awsWindow ()
 {
   delete sink;
-  if (title)
-    title->DecRef();
 }
 
 bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
@@ -105,13 +103,10 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   if(style == fsBitmap)
     frame_options = 0;
 
+  title.AttachNew (new scfString (""));
   pm->GetInt (settings, "Options", frame_options);
   pm->GetString (settings, "Title", title);
  
-  // We have to incref this or else if our title is changed we release the copy
-  // in the prefmanager!
-  if (title)
-    title->IncRef();
   pm->LookupIntKey ("TitleBarHeight", title_bar_height);
 
   unsigned char red, green, blue;
@@ -293,8 +288,7 @@ bool awsWindow::SetProperty (const char *name, intptr_t parm)
     iString *t = (iString *) (parm);
     if (t)
     {
-      title->DecRef ();
-      title = new scfString (t->GetData ());
+      title->Replace (t);
       Invalidate ();
     }
     return true;

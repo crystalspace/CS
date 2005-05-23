@@ -33,8 +33,7 @@ awsCmdButton::awsCmdButton ()
     is_switch (false),
     was_down (false),
     icon_align (0),
-    stretched (false),
-    caption (0)
+    stretched (false)
 {
   tex[0] = tex[1] = tex[2] = 0;
   style = fsNormal;
@@ -42,10 +41,6 @@ awsCmdButton::awsCmdButton ()
 
 awsCmdButton::~awsCmdButton ()
 {
-  if (caption != 0)
-  {
-    caption->DecRef();
-  }
 }
 
 const char *awsCmdButton::Type ()
@@ -61,7 +56,8 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // The command button can use "Image" rather than "BitmapOverlay" to
   // setup its overlay image therefore we create a BitmapOverlay key
   // from the Image key for back compatibility.
-  iString *tn = 0;
+  csRef<iString> tn;
+  tn.AttachNew (new scfString (""));
   if (!pm->GetString (settings, "BitmapOverlay", tn) &&
     pm->GetString (settings, "Image", tn))
   {
@@ -75,24 +71,23 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->GetInt (settings, "Toggle", switch_style);
   pm->GetInt (settings, "IconAlign", icon_align);
+  caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
-
-  if (caption != 0)
-  {
-    caption->IncRef();
-  }
 
   is_switch = switch_style;
 
   if (style == fsNormal || style == fsToolbar)
   {
-    iString *in = 0;
-    pm->GetString (settings, "Icon", in);
-    if (in) tex[0] = pm->GetTexture (in->GetData (), in->GetData ());
+    csRef<iString> in;
+    in.AttachNew (new scfString (""));
+    if (pm->GetString (settings, "Icon", in))
+      tex[0] = pm->GetTexture (in->GetData (), in->GetData ());
   }
   else if (style == fsBitmap)
   {
-    iString *tn1 = 0, *tn2 = 0, *tn3 = 0;
+    csRef<iString> tn1 = csPtr<iString> (new scfString ());
+    csRef<iString> tn2 = csPtr<iString> (new scfString ());
+    csRef<iString> tn3 = csPtr<iString> (new scfString ());
 
     int stretch;
     pm->GetString (settings, "BitmapNormal", tn1);
@@ -154,20 +149,24 @@ bool awsCmdButton::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
+#if 0
     if (s && s->Length ())
     {
-      if (caption) caption->DecRef ();
+      //??if (caption) caption->DecRef ();
       caption = s;
-      caption->IncRef ();
+      //caption->IncRef ();
       Invalidate ();
     }
     else
     {
-      if (caption)
-        caption->DecRef ();
+      /*if (caption)
+        caption->DecRef ();*/
 
       caption = 0;
     }
+#endif
+    caption->Replace (s);
+    Invalidate();
     return true;
   }
   else if (strcmp ("Image", name) == 0)

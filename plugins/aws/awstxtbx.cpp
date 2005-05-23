@@ -53,9 +53,6 @@ awsTextBox::awsTextBox () :
   bkg(0),
   frame_style(0),
   alpha_level(92),
-  text(0),
-  disallow(0),
-  maskchar(0),
   strStart(0),
   strCursor(0),
   blink_timer(0),
@@ -118,8 +115,11 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Alpha", alpha_level); // local overrides, if present.
   pm->GetInt (settings, "Masked", should_mask);
+  text.AttachNew (new scfString (""));//??
   pm->GetString (settings, "Text", text);
+  disallow.AttachNew (new scfString (""));//??
   pm->GetString (settings, "Disallow", disallow);
+  maskchar.AttachNew (new scfString (""));//??
   pm->GetString (settings, "MaskChar", maskchar);
 
   int _focusable = 0;
@@ -198,9 +198,9 @@ bool awsTextBox::SetProperty (const char *name, intptr_t parm)
 
     if (s)
     {
-      if (text) text->DecRef ();
+      //??if (text) text->DecRef ();
       text = s;
-      text->IncRef ();
+      //??text->IncRef ();
       Invalidate ();
       strStart = 0;
       strCursor = 0;
@@ -214,9 +214,9 @@ bool awsTextBox::SetProperty (const char *name, intptr_t parm)
 
     if (s)
     {
-      if (disallow) disallow->DecRef ();
+      //??if (disallow) disallow->DecRef ();
       disallow = s;
-      disallow->IncRef ();
+      //??disallow->IncRef ();
     }
 
     return true;

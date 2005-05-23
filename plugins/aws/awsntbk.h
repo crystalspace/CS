@@ -43,7 +43,7 @@ protected:
   bool is_top;
 
   /// Caption.
-  iString *caption;
+  csRef<iString> caption;
 
   /// Is the mouse currently held doen?
   bool captured;
@@ -286,8 +286,8 @@ protected:
   iTextureHandle *tex;
 
   /// Caption we show in the tab button.
-  iString *caption;
-  iString *icon;
+  csRef<iString> caption;
+  csRef<iString> icon;
   int iconalign;
 public:
   awsNotebookPage ();

@@ -43,7 +43,7 @@ protected:
   bool is_top;
 
   /// Caption.
-  iString *caption;
+  csRef<iString> caption;
 
   /// Is the mouse currently held doen .
   bool captured;

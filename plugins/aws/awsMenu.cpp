@@ -30,7 +30,7 @@ const int awsMenuEntry::signalClicked = 1;
 const int awsMenuEntry::signalSelected = 2;
 
 awsMenuEntry::awsMenuEntry ()
-  : caption (0),
+  : /*caption (0),*/
     popup (0),
     selected (false),
     mouse_down (false),
@@ -46,7 +46,7 @@ awsMenuEntry::awsMenuEntry ()
 
 awsMenuEntry::~awsMenuEntry () 
 {
-  if (caption) caption->DecRef ();
+  //??if (caption) caption->DecRef ();
   if (popup) popup->DecRef ();
   if (image) image->DecRef ();
   if (sub_menu_image) sub_menu_image->DecRef ();
@@ -58,11 +58,12 @@ bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
+  caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
   
-  iString* image_name = 0;
-  pm->GetString (settings, "Image", image_name);
-  if (image_name)
+  csRef<iString> image_name = 0;
+  image_name.AttachNew (new scfString (""));
+  if (pm->GetString (settings, "Image", image_name))
     image = pm->GetTexture (image_name->GetData (), image_name->GetData ());
 
   pm->LookupIntKey ("MenuItemImageWidth", image_width);
@@ -70,12 +71,12 @@ bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->LookupIntKey ("MenuItemImageHeigth", image_width);
   pm->GetInt (settings, "ImageHeight", image_width);
 
-  image_name = 0;
-  pm->LookupStringKey ("MenuItemSubMenuImage", image_name);
-  if (image_name)
+  iString* image_name2 = 0;//??
+  if (pm->LookupStringKey ("MenuItemSubMenuImage", image_name2))
+  //??if (image_name)
   {
-    sub_menu_image = pm->GetTexture (image_name->GetData (),
-      image_name->GetData ());
+    sub_menu_image = pm->GetTexture (image_name2->GetData (),
+      image_name2->GetData ());
     
     if (sub_menu_image)
     {
@@ -149,15 +150,15 @@ bool awsMenuEntry::SetProperty (const char *name, intptr_t parm)
     
     if (s && s->Length ())
     {
-      if (caption) caption->DecRef ();
+      //??if (caption) caption->DecRef ();
       caption = s;
-      caption->IncRef (); 
+      //??caption->IncRef (); 
       SizeToFit ();
       Invalidate ();
     }
     else
     {
-      if (caption) caption->DecRef ();
+      //??if (caption) caption->DecRef ();
       caption = 0;
     }
     return true;

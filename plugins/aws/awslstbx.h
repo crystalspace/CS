@@ -132,7 +132,7 @@ struct awsListColumn
   iTextureHandle *bkg;
 
   /// The caption of the header, if it has one.
-  iString *caption;
+  csRef<iString> caption;
 
   /// Alignment.
   int align;

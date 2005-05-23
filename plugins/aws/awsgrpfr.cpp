@@ -80,14 +80,14 @@ bool awsGroupFrame::SetProperty (const char *name, intptr_t parm)
 
     if (s && s->Length ())
     {
-      if (caption) caption->DecRef ();
+      //??if (caption) caption->DecRef ();
       caption = s;
-      caption->IncRef ();
+      //??caption->IncRef ();
       Invalidate ();
     }
     else
     {
-      if (caption) caption->DecRef ();
+      //??if (caption) caption->DecRef ();
       caption = 0;
     }
     return true;

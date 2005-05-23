@@ -53,7 +53,7 @@ private:
   int title_offset;
 
   /// The title.
-  iString *title;
+  csRef<iString> title;
 
   /// The title bar text color.
   int title_text_color;

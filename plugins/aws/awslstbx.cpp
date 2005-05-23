@@ -164,7 +164,6 @@ const char *awsListBox::Type ()
 
 bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
-  iString *tn1 = 0, *tn2 = 0;
   char buf[64];
   int i;
   int sb_h, sb_w;
@@ -198,6 +197,8 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   tree_grpe = pm->GetTexture ("TreeGrpUnmarked");
   tree_grpf = pm->GetTexture ("TreeGrpMarked");
 
+  csRef<iString> tn1 (csPtr<iString> (new scfString ()));
+  csRef<iString> tn2 (csPtr<iString> (new scfString ()));
   pm->GetString (settings, "Background", tn1);
   pm->GetString (settings, "Highlight", tn2);
 
@@ -206,10 +207,10 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   rows.SetSortCol (sortcol);
 
-  if (tn1)
+  if (!tn1->IsEmpty())
     bkg = pm->GetTexture (tn1->GetData (), tn1->GetData ());
 
-  if (tn2) highlight = pm->GetTexture (tn2->GetData (), tn2->GetData ());
+  if (!tn2->IsEmpty()) highlight = pm->GetTexture (tn2->GetData (), tn2->GetData ());
 
   // Make sure we have at least one column
   ncolumns = (ncolumns < 1 ? 1 : ncolumns);
@@ -222,20 +223,21 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   for (i = 0; i < ncolumns; ++i)
   {
     cs_snprintf (buf, 64, "Column%dImg", i);
-    pm->GetString (settings, buf, tn1);
+    if (!pm->GetString (settings, buf, tn1)) tn1->Clear();
     cs_snprintf (buf, 64, "Column%dBkg", i);
-    pm->GetString (settings, buf, tn2);
+    if (!pm->GetString (settings, buf, tn2)) tn2->Clear();
     cs_snprintf (buf, 64, "Column%dCaption", i);
+    columns[i].caption.AttachNew (new scfString (""));
     pm->GetString (settings, buf, columns[i].caption);
     cs_snprintf (buf, 64, "Column%dWidth", i);
     pm->GetInt (settings, buf, columns[i].width);
     cs_snprintf (buf, 64, "Column%dAlign", i);
     pm->GetInt (settings, buf, columns[i].align);
 
-    if (tn1)
+    if (!tn1->IsEmpty())
       columns[i].image = pm->GetTexture (tn1->GetData (), tn1->GetData ());
 
-    if (tn2)
+    if (!tn2->IsEmpty())
       columns[i].bkg = pm->GetTexture (tn2->GetData (), tn2->GetData ());
   }
 

@@ -246,8 +246,8 @@ iAwsComponent *awsNotebookFactory::Create ()
 
 awsNotebookPage::awsNotebookPage ():
   tex(0),
-  caption (0),
-  icon (0),
+  /*caption (0),
+  icon (0),//??*/
   iconalign(0)
 {
   SetFlag (AWSF_CMP_ALWAYSERASE);
@@ -255,7 +255,7 @@ awsNotebookPage::awsNotebookPage ():
 
 awsNotebookPage::~awsNotebookPage ()
 {
-  if (caption) caption->DecRef ();
+  //??if (caption) caption->DecRef ();
 }
 
 bool awsNotebookPage::Setup (iAws *_wmgr, iAwsComponentNode *settings)
@@ -265,7 +265,9 @@ bool awsNotebookPage::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
   tex = pm->GetTexture ("Texture");
+  caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
+  icon.AttachNew (new scfString (""));
   pm->GetString (settings, "Icon", icon);
   pm->GetInt (settings, "IconAlign", iconalign);
 
@@ -316,10 +318,10 @@ bool awsNotebookPage::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    if (caption) caption->DecRef ();
+    //??if (caption) caption->DecRef ();
 
     if (s && s->Length ())
-      (caption = s)->IncRef ();
+      caption = s;//??)->IncRef ();
     else
       caption = 0;
     Invalidate ();
@@ -331,10 +333,10 @@ bool awsNotebookPage::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    if (icon) icon->DecRef ();
+    //??if (icon) icon->DecRef ();
 
     if (s && s->Length ())
-      (icon = s)->IncRef ();
+      icon = s;//??)->IncRef ();
     else
       icon = 0;
 
@@ -376,7 +378,7 @@ awsNotebookButton::awsNotebookButton ():
   is_active(false),
   is_first(false),
   is_top(true),
-  caption (0),
+//??  caption (0),
   captured(false),
   icon_align(0),
   alpha_level(92)
@@ -397,18 +399,20 @@ bool awsNotebookButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
   pm->GetInt (settings, "Alpha", alpha_level); // local overrides, if present.
   pm->GetInt (settings, "IconAlign", icon_align);
+  caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
 
-  iString *tn = 0;
-
   tex[0] = pm->GetTexture ("Texture");
-  pm->GetString (settings, "Image", tn);
+  csRef<iString> tn;//??
+  tn.AttachNew (new scfString (""));
+  if (pm->GetString (settings, "Image", tn))
+    tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
 
-  if (tn) tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
-
-  iString *in = 0;
-  pm->GetString (settings, "Icon", in);
-  if (in) tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
+  
+  csRef<iString> in;//??
+  in.AttachNew (new scfString (""));
+  if (pm->GetString (settings, "Icon", in))
+    tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
 
   return true;
 }
@@ -568,10 +572,10 @@ bool awsNotebookButton::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    if (caption) caption->DecRef ();
+    //??if (caption) caption->DecRef ();
 
     if (s && s->Length ())
-      (caption = s)->IncRef ();
+      caption = s;//??)->IncRef ();
     else
       caption = 0;
     Invalidate ();
