@@ -112,14 +112,14 @@ void csVosObject3D::Execute(iMeshWrapper *, csOrthoTransform &t)
   this->Execute(t);
 }
 
-void csVosObject3D::Execute(csOrthoTransform &)
+void csVosObject3D::Execute(csOrthoTransform & t)
 {
   LOG ("csVosObject3D", 3, "Received Execute callback 1 arg");
-  csVector3 pos = collider->GetPosition();
+  //csVector3 pos = collider->GetPosition();
   //csVector3 vel = collider->GetLinearVelocity();
   //csVector3 acc = collider->GetForce();
 
-  object3d->setPosition (pos.x, pos.y, pos.z);
+  object3d->setPosition(t.GetOrigin().x, t.GetOrigin().y, t.GetOrigin().z);
 }
 
 /// Construct an object3d
@@ -465,7 +465,7 @@ void csMetaObject3D::changePosition (const csVector3 &pos)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
 
-  LOG("vosobject3d", 3, "changePosition: " << getURLstr() <<
+  LOG("vosobject3d", 2, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
   if (mw.IsValid())
   {
@@ -475,7 +475,14 @@ void csMetaObject3D::changePosition (const csVector3 &pos)
 
   if (csvobj3d->GetCollider().IsValid())
   {
-  csvobj3d->GetCollider()->SetPosition(pos);
+    if (csvobj3d->GetCollider()->GetPosition() != pos)
+    {
+      LOG("vosobject3d", 2, "changing collider position to " << getURLstr() <<
+          " to " << pos.x << " " << pos.y << " " << pos.z);
+
+      csvobj3d->GetCollider()->SetPosition(pos);
+      csvobj3d->GetCollider()->SetLinearVelocity(csVector3(0));
+    }
   }
 }
 

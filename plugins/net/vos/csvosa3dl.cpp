@@ -23,6 +23,9 @@
 
 #include "cssysdef.h"
 #include "csutil/event.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/ode.h"
+
 #include "csvosa3dl.h"
 #include "vossector.h"
 #include "vosobject3d.h"
@@ -189,19 +192,26 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   //localsite->addSiteExtension(new LocalSocketSiteExtension());
   localsite->addSiteExtension(new LocalVipSiteExtension());
 
-/*
-  csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (objreg, iDynamics);
+  clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
+
+  csRef<iDynamics> dynamics;
+#if 0 // dynamics isn't ready yet
+  CS_QUERY_REGISTRY_PLUGIN(dynamics, objreg,
+                           "crystalspace.dynamics.ode",
+                           iDynamics);
+#endif
+
   if (dynamics)
   {
     LOG("csVosA3DL", 2, "Initializing dynamics system");
     dynsys = dynamics->CreateSystem();
+    dynsys->SetGravity (csVector3 (0, .1, 0));
   }
   else
   {
-*/
     LOG("csVosA3DL", 2, "Not using dynamics system");
     dynsys = NULL;
- // }
+  }
 
   return true;
 }
@@ -221,7 +231,44 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
       delete t;
       LOG("csVosA3DL", 3, "completed main thread task");
     }
+
+
+    if (dynsys) {
+      //LOG("csVosA3DL", 2, "Stepping dynamic system");
+
+      // First get elapsed time from the virtual clock.
+      csTicks elapsed_time = clock->GetElapsedTicks ();
+      const float speed = elapsed_time / 1000.0;
+
+      // Take small steps.
+      const float maxStep = 0.01f;
+      float ta = 0;
+      float tb = speed;
+      int maxSteps=4;
+      while (ta < speed && maxSteps)
+      {
+        if (tb - ta > maxStep) tb = ta + maxStep;
+
+        dynsys->Step (tb - ta);
+        ta = tb;
+        tb = speed;
+
+        maxSteps--;
+      }
+    }
+
+    start = getRealTime();
+
+    for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.5); n--)
+    {
+      LOG("csVosA3DL", 3, "starting main thread task");
+      Task* t = mainThreadTasks.pop();
+      t->doTask();
+      delete t;
+      LOG("csVosA3DL", 3, "completed main thread task");
+    }
   }
+
   return false;
 }
 

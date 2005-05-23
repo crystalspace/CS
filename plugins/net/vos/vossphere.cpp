@@ -89,7 +89,8 @@ void ConstructSphereTask::doTask()
 
     if (dynsys)
     {
-/*      csRef<iRigidBody> collider = dynsys->CreateBody ();
+#if 0
+      csRef<iRigidBody> collider = dynsys->CreateBody ();
       collider->SetProperties (1, csVector3 (0), csMatrix3 ());
       collider->SetPosition (csVector3(0, 0, 0));
       collider->AttachMesh (meshwrapper);
@@ -101,7 +102,10 @@ void ConstructSphereTask::doTask()
       collider->AttachColliderBox (size, t, 0, 1, 0);
       //if(isRemote()) collider->MakeStatic();
       cube->GetCSinterface()->SetCollider (collider);
-  */  }
+
+      collider->MakeStatic();
+#endif
+    }
 
     sphere->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }

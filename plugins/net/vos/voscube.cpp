@@ -88,6 +88,7 @@ void ConstructCubeTask::doTask()
 
     if (dynsys)
     {
+#if 0
       csRef<iRigidBody> collider = dynsys->CreateBody ();
       collider->SetProperties (1, csVector3 (0), csMatrix3 ());
       collider->SetPosition (csVector3(0, 0, 0));
@@ -100,9 +101,12 @@ void ConstructCubeTask::doTask()
       collider->AttachColliderBox (size, t, 0, 1, 0);
 
       if (cube->isLocal())
-    collider->SetMoveCallback (cube->GetCSinterface());
+        collider->SetMoveCallback (cube->GetCSinterface());
 
-    cube->GetCSinterface()->SetCollider (collider);
+      cube->GetCSinterface()->SetCollider (collider);
+
+      collider->MakeStatic();
+#endif
     }
 
     cube->GetCSinterface()->SetMeshWrapper(meshwrapper);

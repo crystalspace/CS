@@ -32,6 +32,7 @@
 #include "csutil/databuf.h"
 #include "igeom/objmodel.h"
 #include "iutil/plugin.h"
+#include "ivaria/dynamics.h"
 
 #include "csvosa3dl.h"
 #include "vosmodel.h"
@@ -82,18 +83,21 @@ public:
   iObjectRegistry *object_reg;
   vRef<csMetaModel> model;
   csRef<iSector> sector;
+  csRef<iDynamicSystem> dynsys;
 
   ConstructModelTask(iObjectRegistry *objreg,
                      csMetaModel* m,
-                     iSector *s);
+                     iSector *s,
+                     iDynamicSystem* d);
   virtual ~ConstructModelTask();
   virtual void doTask();
 };
 
 ConstructModelTask::ConstructModelTask (iObjectRegistry *objreg,
                                         csMetaModel* m,
-                                        iSector *s)
-  : object_reg(objreg), model(m, true), sector(s)
+                                        iSector *s,
+                                        iDynamicSystem* d)
+  : object_reg(objreg), model(m, true), sector(s), dynsys(d)
 {
 }
 
@@ -222,6 +226,35 @@ void ConstructModelTask::doTask()
 
   NormalizeModel (meshwrapper, true, true, model->getModelDatatype());
 
+
+  if (dynsys)
+  {
+    csRef<iRigidBody> collider = dynsys->CreateBody ();
+    collider->SetProperties (1, csVector3 (0), csMatrix3 ());
+    collider->SetPosition (csVector3(0, 0, 0));
+    collider->AttachMesh (meshwrapper);
+
+
+    const csMatrix3 tm;
+    const csVector3 tv (0);
+    csOrthoTransform t (tm, tv);
+
+    //csBox3 b;
+    //meshwrapper->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox(b);
+
+    collider->AttachColliderBox (csVector3(1, 1, 1), t, 0, 1, 0);
+    //collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
+    //collider->AttachColliderSphere (1, csVector3(0, 0, 0),
+    //1, 1, 0);
+
+    //if (model->isLocal())
+    //collider->SetMoveCallback (model->GetCSinterface());
+
+    model->GetCSinterface()->SetCollider (collider);
+
+    //collider->MakeStatic();
+  }
+
   model->GetCSinterface()->SetMeshWrapper(meshwrapper);
 
   if(model->getAction() != "") {
@@ -295,7 +328,8 @@ void csMetaModel::notifyChildInserted(VobjectEvent& e)
     htvalid = false;
     // Create task
     vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
-                                                          this, sector->GetSector()));
+                                                          this, sector->GetSector(),
+                                                          vosa3dl->GetDynSys()));
     vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sector));
   }
 }
@@ -348,7 +382,8 @@ void csMetaModel::notifyPropertyChange(const PropertyEvent& event)
     htvalid = false;
     // Create task
     vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
-                                                          this, sector->GetSector()));
+                                                          this, sector->GetSector(),
+                                                          vosa3dl->GetDynSys()));
     vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sector));
   }
 }

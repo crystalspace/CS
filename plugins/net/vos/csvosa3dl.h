@@ -41,6 +41,7 @@
 #include "iutil/eventh.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "iutil/virtclk.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/reporter.h"
 
@@ -59,6 +60,7 @@ private:
   csRef<iEventQueue> eventq;
   csRef<iDynamicSystem> dynsys;
   csRef<iProgressMeter> progress;
+  csRef<iVirtualClock> clock;
 
   iObjectRegistry *objreg;
 

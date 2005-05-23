@@ -180,26 +180,6 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
     //if(portals.size()) meshwrapper->SetRenderPriority(
     //  engine->GetRenderPriority("portal"));
 
-    // Set up dynamics for mesh
-    LOG("ConstructPolygonMeshTask", 3, "setting up dynamics");
-    if (dynsys)
-    {
-      csRef<iRigidBody> collider = dynsys->CreateBody ();
-      collider->SetProperties (1, csVector3 (0), csMatrix3 ());
-      collider->SetPosition (csVector3(0, 0, 0));
-      collider->AttachMesh (meshwrapper);
-
-      const csMatrix3 tm;
-      const csVector3 tv (0);
-      csOrthoTransform t (tm, tv);
-      collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
-
-      if (polygonmesh->isLocal())
-    collider->SetMoveCallback (polygonmesh->GetCSinterface());
-
-      polygonmesh->GetCSinterface()->SetCollider (collider);
-    }
-
     LOG("ConstructPolygonMeshTask", 3, "done with " << name);
 
     polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
@@ -288,8 +268,6 @@ void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
     /* Do we need to call engine->ForceRelight() now? XXX */
     gm->SetShadowReceiving(false);
     gm->SetShadowCasting(false);
-
-    // TODO: Set up dynamics for genmesh
 
     polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
 }
@@ -537,6 +515,34 @@ void ConstructPolygonMeshTask::doTask()
   else
   {
     doGenmesh(engine);
+  }
+
+  // Set up dynamics for mesh
+  if (dynsys)
+  {
+    LOG("ConstructPolygonMeshTask", 2, "setting up dynamics");
+
+    csRef<iRigidBody> collider = dynsys->CreateBody ();
+    collider->SetProperties (1, csVector3 (0), csMatrix3 ());
+    collider->SetPosition (csVector3(0, 0, 0));
+    collider->AttachMesh (polygonmesh->GetCSinterface()->GetMeshWrapper());
+
+    const csMatrix3 tm;
+    const csVector3 tv (0);
+    csOrthoTransform t (tm, tv);
+    collider->AttachColliderMesh (polygonmesh->GetCSinterface()->GetMeshWrapper(),
+                                  t, 0, 1, 0);
+
+    if (polygonmesh->isLocal())
+    {
+      //collider->SetMoveCallback (polygonmesh->GetCSinterface());
+    }
+
+    polygonmesh->GetCSinterface()->SetCollider (collider);
+
+    collider->MakeStatic();
+
+    LOG("ConstructPolygonMeshTask", 2, "did set up dynamics");
   }
 
   if(chainedtask) {
