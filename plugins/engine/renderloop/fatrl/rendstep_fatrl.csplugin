@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- rendstep_fatrl.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.renderloop.step.fatloop</name>
+        <implementation>csFatLoopLoader</implementation>
+        <description>Fat render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.fatloop.type</name>
+        <implementation>csFatLoopType</implementation>
+        <description>Fat render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

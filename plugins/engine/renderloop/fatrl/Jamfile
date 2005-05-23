@@ -1,0 +1,6 @@
+SubDir TOP plugins engine renderloop fatrl ;
+
+Description rendstep_fatrl : "fat render loop" ;
+Plugin rendstep_fatrl : [ Wildcard *.cpp *.h ] ;
+LinkWith rendstep_fatrl : crystalspace ;
+CompileGroups rendstep_fatrl : renderall ;

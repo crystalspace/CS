@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-May-2005
+	- res added an implementation of red-black-trees, csRedBlackTree.
+	- res started working on the new "fat" renderloop. Can at the moment
+	  just render very simple levels (notably, no portals). Still heavy
+	  work-in-progress.
 22-May-2005
 	- Wouter Wijngaards changed the event.cpp CS_ASSERT lines, they
 	  contained vital functionality. ASSERT content is gone in optimize 

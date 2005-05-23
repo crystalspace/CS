@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<params>
+  <name>std_rloop_fattest</name>
+  <steps>
+    <step plugin="crystalspace.renderloop.step.fatloop">
+      <shadertype>ambient</shadertype>
+      <defaultshader name="std_lighting" />
+    </step>
+  </steps>
+</params>

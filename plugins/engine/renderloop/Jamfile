@@ -1,5 +1,6 @@
 SubDir TOP plugins engine renderloop ;
 
+SubInclude TOP plugins engine renderloop fatrl ;
 SubInclude TOP plugins engine renderloop loader ;
 SubInclude TOP plugins engine renderloop stdsteps ;
 SubInclude TOP plugins engine renderloop shadow ;

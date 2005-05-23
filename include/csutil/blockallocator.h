@@ -339,6 +339,8 @@ public:
       freenode = f;
     }
   }
+  /// Query number of elements per block.
+  size_t GetBlockElements() const { return size; }
 };
 
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
