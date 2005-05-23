@@ -38,6 +38,8 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csFatLoopType);
 SCF_IMPLEMENT_FACTORY(csFatLoopLoader);
 
+static const char* MessageID = "rystalspace.renderloop.step.fatloop";
+
 //---------------------------------------------------------------------------
 
 csFatLoopType::csFatLoopType (iBase* p) : csBaseRenderStepType (p)
@@ -60,9 +62,6 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
                                      iLoaderContext* ldr_context,
                                      iBase* context)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
-
   csRef<csFatLoopStep> step;
   step.AttachNew (new csFatLoopStep (object_reg));
 
@@ -89,7 +88,7 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  step->SetZOffset (result);
 	}
-	break;*/
+	break;
       case XMLTOKEN_SHADERTYPE:
 	step->shadertype = strings->Request (child->GetContentsValue ());
 	break;
@@ -98,9 +97,17 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
 	  step->defShader = synldr->ParseShaderRef (child);
 	}
 	break;
-      /*case XMLTOKEN_NODEFAULTTRIGGER:
+      case XMLTOKEN_NODEFAULTTRIGGER:
 	step->AddDisableDefaultTriggerType (child->GetContentsValue ());
 	break;*/
+      case XMLTOKEN_PASS:
+        {
+          RenderPass pass;
+          if (!ParsePass (child, pass))
+            return 0;
+          step->AddPass (pass);
+        }
+        break;
       default:
 	{
 	  synldr->ReportBadToken (child);
@@ -112,6 +119,43 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
   //step->shadertype = strings->Request (type);
   //step->defShader = synldr->ParseShaderRef (child);
   return csPtr<iBase> (step);
+}
+
+bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
+{
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.shared.stringset", iStringSet);
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    csStringID id = tokens.Request (child->GetValue ());
+    switch (id)
+    {
+      case XMLTOKEN_SHADERTYPE:
+	pass.shadertype = strings->Request (child->GetContentsValue ());
+	break;
+      case XMLTOKEN_DEFAULTSHADER:
+        pass.defShader = synldr->ParseShaderRef (child);
+	break;
+      default:
+	{
+	  synldr->ReportBadToken (child);
+	}
+	return false;
+    }
+  }
+
+  if (pass.shadertype == csInvalidStringID)
+  {
+    synldr->ReportError (MessageID, 
+      node, "No 'shadertype' specified in pass");
+    return false;
+  }
+
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -145,7 +189,7 @@ SCF_IMPLEMENT_IBASE_END;
 csStringID csFatLoopStep::string_object2world = (csStringID)-1;
 
 csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
-  visible_meshes_index(0)
+  buckets(2, 2), passes(2, 2)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->object_reg = object_reg;
@@ -355,15 +399,11 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
   size_t num = meshlist->SortMeshLists (rview);
-  visible_meshes.SetLength (visible_meshes_index+num);
+  visible_meshes.SetLength (num);
   imeshes_scratch.SetLength (num);
-  mesh_svc.SetLength (visible_meshes_index+num);
-  csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ()
-  	+ visible_meshes_index;
-  iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ()
-  	+ visible_meshes_index;
-  size_t prev_visible_meshes_index = visible_meshes_index;
-  visible_meshes_index += num;
+  mesh_svc.SetLength (num);
+  csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ();
+  iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ();
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
   for (size_t i = 0; i < num; i++)
     sameShaderMeshSvcs[i] = imeshes_scratch[i]->GetSVContext();
@@ -378,89 +418,74 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
   buckets.Empty();
   for (size_t n = 0; n < num; n++)
   {
-#if 0
-    csRenderMesh* mesh = sameShaderMeshes[n];
-
-    if (!mesh->portal) 
-    {
-#ifdef CS_DEBUG
-      if (!mesh->material)
-      {
-	csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material!\n",
-	  mesh->db_mesh_name);
-	exit (-1);
-      }
-#endif
-      iMaterial* hdl = mesh->material->GetMaterial ();
-#ifdef CS_DEBUG
-      if (!hdl)
-      {
-        csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material!\n",
-	  mesh->db_mesh_name);
-	exit (-1);
-      }
-#endif
-      iShader* meshShader = hdl->GetShader (shadertype);
-      if (meshShader == 0) 
-      {
-	/*bool doDefault = true;
-	for (size_t i = 0; i < disableDefaultTypes.Length(); i++)
-	{
-	  if (hdl->GetShader (disableDefaultTypes[i]) != 0)
-	  {
-	    doDefault = false;
-	    break;
-	  }
-	}
-	if (doDefault)*/ meshShader = defShader;
-      }
-      size_t newTicket = meshShader ? ticketHelper.GetTicket (
-	mesh->material->GetMaterial (), meshShader, 
-	sameShaderMeshSvcs[n], mesh) : (size_t)~0;
-      g3d->SetWorldToCamera (camt);
-      RenderMeshes (g3d, meshShader, newTicket, sameShaderMeshSvcs + n, 
-	sameShaderMeshes + n, 1, stacks);
-    }
-#endif
     csRenderMesh* mesh = sameShaderMeshes[n];
     if (mesh->portal) continue;
+
     iMeshWrapper* mw = imeshes_scratch[n];
     long prio = mw->GetRenderPriority();
-    ShaderTicketKey key;
-    key.prio = prio;
-    if (ph.IsPrioSpecial (prio))
+
+    uint32 classes = Classify (mesh);
+    int c = 0;
+    while (classes != 0)
     {
-      key.shader = 0; key.ticket = (size_t)~0;
+      do
+      {
+        ShaderTicketKey key;
+        key.prio = prio;
+        if (ph.IsPrioSpecial (prio))
+        {
+          key.shader = 0; key.ticket = (size_t)~0;
+        }
+        else
+        {
+          iMaterial* hdl = mesh->material->GetMaterial ();
+          iShader* sortBy = hdl->GetShader (passes[c].shadertype);
+          if (sortBy == 0) sortBy = passes[c].defShader;
+          if (sortBy == 0) 
+          {
+            break; // @@@ Perhaps an Assert? Or some Error?
+          }
+          key.shader = sortBy;
+          key.ticket = ticketHelper.GetTicket (
+            mesh->material->GetMaterial (), sortBy, 
+            sameShaderMeshSvcs[n], mesh);
+        }
+
+        if (classes & 1)
+        {
+          MeshBucket* bucket = buckets.GetExtend(c).GetElementPointer (key);
+          if (bucket == 0)
+          {
+            bucket = buckets[c].Put (key, MeshBucket());
+          }
+          bucket->rendermeshes.Push (mesh);
+          bucket->wrappers.Push (mw);
+          bucket->contexts.Push (sameShaderMeshSvcs[n]);
+        }
+      }
+      while (0);
+      c++;
+      classes >>= 1;
     }
-    else
-    {
-      iMaterial* hdl = mesh->material->GetMaterial ();
-      iShader* sortBy = hdl->GetShader (shadertype);
-      if (sortBy == 0) sortBy = defShader;
-      if (sortBy == 0) continue; // @@@ Perhaps an Assert? Or some Error?
-      key.shader = sortBy;
-      key.ticket = ticketHelper.GetTicket (
-        mesh->material->GetMaterial (), sortBy, 
-        sameShaderMeshSvcs[n], mesh);
-    }
-    MeshBucket* bucket = buckets.GetElementPointer (key);
-    if (bucket == 0)
-    {
-      bucket = buckets.Put (key, MeshBucket());
-    }
-    bucket->rendermeshes.Push (mesh);
-    bucket->wrappers.Push (mw);
-    bucket->contexts.Push (sameShaderMeshSvcs[n]);
   }
+
   g3d->SetWorldToCamera (camt);
-  g3d->SetZMode (CS_ZBUF_MESH);
-  TraverseShaderBuckets traverser (*this, g3d, stacks);
-  buckets.TraverseInOrder (traverser);
+  for (size_t b = 0; b < buckets.Length(); b++)
+  {
+    g3d->SetZMode (CS_ZBUF_MESH);
+    TraverseShaderBuckets traverser (*this, g3d, stacks, passes[b]);
+    buckets[b].TraverseInOrder (traverser);
+  }
 
   shadervars.Pop ();
-
-  visible_meshes_index = prev_visible_meshes_index;
 }
+
+uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
+{
+  return 1;
+}
+
+//---------------------------------------------------------------------------
 
 void csFatLoopStep::TraverseShaderBuckets::Process (const ShaderTicketKey& key,
   csFatLoopStep::MeshBucket &bucket)
@@ -475,8 +500,8 @@ void csFatLoopStep::TraverseShaderBuckets::Process (const ShaderTicketKey& key,
     if (key.shader == 0)
     {
       iMaterial* hdl = bucket.rendermeshes[i]->material->GetMaterial ();
-      meshShader = hdl->GetShader (step.shadertype);
-      if (meshShader == 0) meshShader = step.defShader;
+      meshShader = hdl->GetShader (pass.shadertype);
+      if (meshShader == 0) meshShader = pass.defShader;
     }
     size_t newTicket = (key.ticket != (size_t)~0) ? key.ticket :
       (meshShader ? ticketHelper.GetTicket (

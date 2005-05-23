@@ -14,6 +14,12 @@ chronological order.
 	  not do anything.
 	- Marten augumented csBlockAllocator to utilize a policy-like scheme
 	  to determin allocation of blocks.
+	- res made Marten's bit haxx0ry in kdtree.h a bit safer by not using
+	  the MSB of a pointer for a flag, but instead bit 3.
+	- res did some work on the fat loop. Now has the beginnings of an 
+	  equivalent of multi-renderstep support.
+	- res added an entry to the driver DB to disable automatic mipmap
+	  generation for Intel graphics.
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment

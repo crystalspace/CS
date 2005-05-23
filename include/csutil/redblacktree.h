@@ -64,7 +64,7 @@ protected:
     void SetColor (NodeColor color)
     { parent = (Node*)(((uintptr_t)parent & (uintptr_t)~1) | (uint)color); }
   };
-  csBlockAllocator<Node> nodeAlloc;
+  csBlockAllocator<Node, csBlockAllocatorAlignPolicy<2> > nodeAlloc;
   
   Node* root;
   

@@ -65,7 +65,7 @@ union csKDTreeNode
     * Combined flag, dimension and pointer
     *  Bit 0..1         Split dimension (0=x, 1=y, 2=z)
     *  Bit 2..length-1  Offset to first child
-    *  Bit length       Flag indicating node/inner leaf (node=0,inner=1)
+    *  Bit 3            Flag indicating node/inner leaf (node=0,inner=1)
     */
     uintptr_t flagDimensionAndOffset;
 
@@ -79,24 +79,22 @@ union csKDTreeNode
 // Helper functions to get and set data in the kdtree-node
 struct csKDTreeNodeH
 {
-  static const int HigestBit = (1 << (sizeof(uintptr_t)*8-1));
-
   static void SetFlag (csKDTreeNode *node, bool inner=false)
   {
     if (inner)
-      node->flagAndOffset |= HigestBit;
+      node->flagAndOffset |= 0x4;
     else
-      node->flagAndOffset &= !HigestBit;
+      node->flagAndOffset &= ~0x4;
   }
 
   static bool GetFlag (const csKDTreeNode *node)
   {
-    return node->flagAndOffset & HigestBit;
+    return node->flagAndOffset & 0x4;
   }
 
   static void SetDimension (csKDTreeNode *node, uint dim)
   {
-    node->flagAndOffset = (node->flagAndOffset & !0x3) & dim;
+    node->flagAndOffset = (node->flagAndOffset & ~0x3) | dim;
   }
 
   static uint GetDimension (const csKDTreeNode *node)
@@ -106,17 +104,12 @@ struct csKDTreeNodeH
 
   static void SetPointer (csKDTreeNode *node, uintptr_t ptr)
   {
-    node->flagAndOffset = (HigestBit & node->flagAndOffset) & ptr;
+    node->flagAndOffset = (node->flagAndOffset & 0x7) | ptr;
   }
 
-  static uintptr_t GetPointerInner (const csKDTreeNode *node)
+  static uintptr_t GetPointer (const csKDTreeNode *node)
   {
-    return (node->flagAndOffset & !(HigestBit & 0x3));
-  }
-
-  static uintptr_t GetPointerLeaf (const csKDTreeNode *node)
-  {
-    return (node->flagAndOffset & !HigestBit);
+    return (node->flagAndOffset & ~0x7);
   }
 };
 

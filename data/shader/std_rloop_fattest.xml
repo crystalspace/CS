@@ -3,8 +3,13 @@
   <name>std_rloop_fattest</name>
   <steps>
     <step plugin="crystalspace.renderloop.step.fatloop">
-      <shadertype>ambient</shadertype>
-      <defaultshader name="std_lighting" />
+      <pass>
+	<shadertype>ambient</shadertype>
+      </pass>
+      <!--pass>
+	<shadertype>ambient</shadertype>
+	<defaultshader name="std_lighting" />
+      </pass-->
     </step>
   </steps>
 </params>

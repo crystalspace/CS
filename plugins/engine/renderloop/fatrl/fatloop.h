@@ -39,12 +39,21 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
+struct RenderPass
+{
+  csStringID shadertype;
+  csRef<iShader> defShader;
+
+  RenderPass() : shadertype (csInvalidStringID) {}
+};
+
 class csFatLoopLoader : public csBaseRenderStepLoader
 {
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/fatrl/fatloop.tok"
 #include "cstool/tokenlist.h"
 
+  bool ParsePass (iDocumentNode* node, RenderPass& pass);
 public:
   csFatLoopLoader (iBase* p);
 
@@ -72,14 +81,6 @@ struct ShaderTicketKey
   long prio;
   iShader* shader;
   size_t ticket;
-
-  /*bool operator < (const ShaderTicketKey& other) const
-  {
-    return (prio < other.prio)
-      || ((prio == other.prio) && (shader < other.shader)) 
-      || ((prio == other.prio) && (shader == other.shader) 
-        && (ticket < other.ticket));
-  }*/
 };
 
 CS_SPECIALIZE_TEMPLATE
@@ -98,9 +99,6 @@ public:
       d = (r1.ticket < r2.ticket) ? -1 : ((r1.ticket > r2.ticket) ? 1 : 0);
     }
     return d;
-    /*if (r1 < r2) return -1;
-    else if (r2 < r1) return 1;
-    else return 0;*/
   }
 };
 
@@ -115,7 +113,6 @@ class csFatLoopStep : public iRenderStep
   csDirtyAccessArray<csRenderMesh*> visible_meshes;
   csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
   csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
-  size_t visible_meshes_index;	// First free index in the visible meshes.
 
   csArray<csShaderVariableContext> shadervars;
   csWeakRef<iShaderManager> shaderManager;
@@ -133,29 +130,37 @@ class csFatLoopStep : public iRenderStep
     //MeshBucket() : timestamp(~0) {}
   };
   typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
-  SortedBuckets buckets;
+  csArray<SortedBuckets> buckets;
   class TraverseShaderBuckets
   {
     csFatLoopStep& step;
     iGraphics3D* g3d;
     csShaderVarStack &stacks;
+    const RenderPass& pass;
   public:
     TraverseShaderBuckets (csFatLoopStep& step, iGraphics3D* g3d,
-      csShaderVarStack &stacks) : step(step), g3d(g3d), stacks(stacks) {}
+      csShaderVarStack &stacks, const RenderPass& pass) : step(step), 
+      g3d(g3d), stacks(stacks), pass(pass) {}
     void Process (const ShaderTicketKey& key, MeshBucket& bucket);
   };
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
     size_t ticket, iShaderVariableContext** meshContext, 
     csRenderMesh** meshes, size_t num, csShaderVarStack &stacks);
+
+  csArray<RenderPass> passes;
+  uint32 Classify (csRenderMesh* mesh);
 public:
-  csStringID shadertype;
-  csRef<iShader> defShader;
+  //csStringID shadertype;
+  //csRef<iShader> defShader;
 
   SCF_DECLARE_IBASE;
 
   csFatLoopStep (iObjectRegistry* object_reg);
   virtual ~csFatLoopStep ();
+
+  bool AddPass (const RenderPass& pass)
+  { if (passes.Length() >= 32) return false; passes.Push (pass); return true; }
 
   virtual void Perform (iRenderView* rview, iSector* sector,
     csShaderVarStack &stacks);
