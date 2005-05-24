@@ -29,6 +29,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <linux/joystick.h>
 
@@ -123,6 +125,7 @@ bool csLinuxJoystick::Init ()
   config.AddConfig (object_reg, CS_LINUX_JOYSTICK_CFG);
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));
   csArray<int> fds;
+  csArray<dev_t> devids;
 
   nJoy=0;
   bHooked = false;
@@ -130,14 +133,32 @@ bool csLinuxJoystick::Init ()
 
   while (it->Next ())
   {
-    int const fd = open (it->GetStr (), O_RDONLY);
+    int fd = open (it->GetStr (), O_RDONLY);
     if (fd >= 0) 
     {
       Report (CS_REPORTER_SEVERITY_DEBUG,
 	      "Opened joystick device %s as fd#%d\n",
 	      it->GetStr(), fd);
-      nJoy++;
-      fds.Push(fd);
+      struct stat st;
+      fstat(fd, &st);
+
+      /* check devids for a dup st.st_dev */
+      for (csArray<dev_t>::Iterator i = devids.GetIterator() ; i.HasNext() ; ) {
+	if (i.Next() == st.st_dev) {
+	  close(fd);
+	  fd = -1;
+	  break;
+	}
+      }
+      if (fd == -1) {
+	Report (CS_REPORTER_SEVERITY_WARNING,
+		"Found duplicate joystick device %s\n", 
+		it->GetStr());
+      } else {
+	nJoy++;
+	fds.Push((const int) fd);
+	devids.Push(st.st_dev);
+      }
     }
     else if (verbose || errno != ENOENT)
     {

@@ -20,6 +20,9 @@ chronological order.
 	  equivalent of multi-renderstep support.
 	- res added an entry to the driver DB to disable automatic mipmap
 	  generation for Intel graphics.
+	- Adam Bradley added a test to the Linux joystick driver to suppress
+	  multiple registry of single devices with multiple filenames 
+	  (e.g., /dev/js0 and /dev/input/js0 on a devfs-enabled system).
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment
