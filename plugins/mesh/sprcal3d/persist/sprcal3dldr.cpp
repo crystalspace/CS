@@ -65,7 +65,11 @@ enum
   XMLTOKEN_MORPHANIMATION,
   XMLTOKEN_OPTIONS,
   XMLTOKEN_HARDTRANSFORM,
-  XMLTOKEN_SOCKET
+  XMLTOKEN_SOCKET,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_ANIMCYCLE,
+  XMLTOKEN_IDLEANIM,
+  XMLTOKEN_IDLE
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
@@ -731,19 +735,14 @@ csSpriteCal3DLoader::~csSpriteCal3DLoader ()
 
 bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
 {
-#if 0
-  csSprite3DLoader::object_reg = object_reg;
+  csSpriteCal3DLoader::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
-  xmltokens.Register ("action", XMLTOKEN_ACTION);
-  xmltokens.Register ("basecolor", XMLTOKEN_BASECOLOR);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register ("tween", XMLTOKEN_TWEEN);
-#endif
+  xmltokens.Register ("animcycle", XMLTOKEN_ANIMCYCLE);
+  xmltokens.Register ("idleanim", XMLTOKEN_IDLEANIM);
+  xmltokens.Register ("idle", XMLTOKEN_IDLE);
 
   return true;
 }
@@ -751,9 +750,8 @@ bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 					 iLoaderContext* ldr_context, iBase*)
 {
-#if 0
   csRef<iMeshObject> mesh;
-  csRef<iSprite3DState> spr3dLook;
+  csRef<iSpriteCal3DState> sprCal3dLook;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -771,116 +769,71 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 	if (!fact)
 	{
 	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.parse.unknownfactory",
+	    "crystalspace.spritecal3dloader.parse.unknownfactory",
 	    child, "Couldn't find factory '%s'!", factname);
 	  return 0;
 	}
 	mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
+	sprCal3dLook = SCF_QUERY_INTERFACE (mesh, iSpriteCal3DState);
       }
       break;
-    case XMLTOKEN_ACTION:
-      if (!spr3dLook)
+    case XMLTOKEN_ANIMCYCLE:
+      if (!sprCal3dLook)
       {
 	synldr->ReportError (
-	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
 	  child,
-	  "No Factory! Please define 'factory' before 'applymotion'!");
+	  "No Factory! Please define 'factory' before 'animcycle'!");
 	return 0;
       }
-      spr3dLook->SetAction (child->GetContentsValue ());
-      break;
-    case XMLTOKEN_BASECOLOR:
-      if (!spr3dLook)
+      if (sprCal3dLook->FindAnim(child->GetContentsValue ()) != -1)
       {
-	synldr->ReportError (
-	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
-	  child,
-	  "No Factory! Please define 'factory' before 'applymotion'!");
-	return 0;
+         sprCal3dLook->SetAnimCycle (child->GetContentsValue (),1.0);
       }
       else
       {
-	csColor col;
-	if (!synldr->ParseColor (child, col))
-	  return 0;
-	spr3dLook->SetBaseColor (col);
+	synldr->ReportError (
+	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
+	  child,
+	  "Anim cycle not found!!!");
+	  // Non fatal error?
       }
+	 
       break;
-    case XMLTOKEN_LIGHTING:
-      if (!spr3dLook)
+    case XMLTOKEN_IDLEANIM:
+      if (!sprCal3dLook)
       {
 	synldr->ReportError (
-	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
 	  child,
-	  "No Factory! Please define 'factory' before 'applymotion'!");
+	  "No Factory! Please define 'factory' before 'idleanim'!");
 	return 0;
+      }
+      if (sprCal3dLook->FindAnim(child->GetContentsValue ()) != -1)
+      {
+      	sprCal3dLook->SetDefaultIdleAnim (child->GetContentsValue ());
       }
       else
       {
-	bool do_lighting;
-	if (!synldr->ParseBool (child, do_lighting, true))
-	  return 0;
-	spr3dLook->SetLighting (do_lighting);
+	synldr->ReportError (
+	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
+	  child,
+	  "Anim cycle not found!!!");
+	  // Non fatal error?
       }
       break;
-    case XMLTOKEN_MATERIAL:
-      if (!spr3dLook)
+    case XMLTOKEN_IDLE:
+      if (!sprCal3dLook)
       {
 	synldr->ReportError (
-	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
 	  child,
-	  "No Factory! Please define 'factory' before 'applymotion'!");
+	  "No Factory! Please define 'factory' before 'idle'!");
 	return 0;
       }
-      else
-      {
-	const char* matname = child->GetContentsValue ();
-	iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	if (!mat)
-	{
-	  synldr->ReportError (
-	    "crystalspace.sprite3dloader.parse.unknownmaterial",
-	    child, "Couldn't find material '%s'!", matname);
-	  return 0;
-	}
-	spr3dLook->SetMaterialWrapper (mat);
-      }
+      sprCal3dLook->SetVelocity(0);
       break;
-    case XMLTOKEN_MIXMODE:
-      if (!spr3dLook)
-      {
-	synldr->ReportError (
-	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
-	  child,
-	  "No Factory! Please define 'factory' before 'applymotion'!");
-	return 0;
-      }
-      else
-      {
-	uint mm;
-	if (!synldr->ParseMixmode (child, mm))
-	  return 0;
-	spr3dLook->SetMixMode (mm);
-      }
-      break;
-    case XMLTOKEN_TWEEN:
-      if (!spr3dLook)
-      {
-	synldr->ReportError (
-	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
-	  child,
-	  "No Factory! Please define 'factory' before 'applymotion'!");
-	return 0;
-      }
-      else
-      {
-	bool do_tween;
-	if (!synldr->ParseBool (child, do_tween, true))
-	  return 0;
-	spr3dLook->EnableTweening (do_tween);
-      }
-      break;
+
     default:
       synldr->ReportBadToken (child);
       return 0;
@@ -888,8 +841,6 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
   }
 
   return csPtr<iBase> (mesh);
-#endif
-  return 0;
 }
 
 //---------------------------------------------------------------------------

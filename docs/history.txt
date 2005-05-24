@@ -28,6 +28,26 @@ chronological order.
 	- Eric Sunshine worked around Swig/Java complaint about multiple
 	  inheritance in <csgeom/path.h>. (Java does not support multiple
 	  inheritance.)
+	- Eric Sunshine fixed some warnings and made other minor adjustments
+	  to recent changes.
+	- Eric sunshine applied a patch from Pablo <caedes@sindominio.net>
+	  which fleshes out the skeleton sprcal3dldr. Here are his notes:
+	    The format I implemented is very straight-forward:
+	      <meshobj name="uruk">
+	        <plugin>crystalspace.mesh.loader.sprite.cal3d</plugin>
+		  <params>
+		    <factory>orc</factory>
+		    <animcycle>TestAndadef</animcycle>
+		    <idleanim>TestAndadef</idleanim>
+		    <idle/>
+		  </params>
+		   ...
+		</plugin>
+	      </meshobj>
+	    'animcycle' serves for setting an animation in cycle.
+	    'idleanim' for defining the idle animation.
+	    'idle' sets the cal3d object as 0 velocity (so the idle animation
+	    activates).
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment
