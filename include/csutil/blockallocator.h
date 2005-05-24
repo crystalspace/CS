@@ -41,7 +41,7 @@
 
 /**
  * This class implements the normal per block allocating policy.
- * It have no per block overhead.
+ * It has no per-block overhead.
  */
 class csBlockAllocatorNormalBlockPolicy
 {
@@ -56,7 +56,7 @@ public:
 
   /**
    * Free a block.
-   * Does not do any checkint that the block pointer is valid.
+   * \remarks Does not check that the block pointer is valid.
    */
   static inline void FreeBlock(uint8* p)
   {
@@ -65,31 +65,31 @@ public:
 };
 
 /**
- * This class implements a per block allocating policy which aligns first
- * element on given byte boundary.
- * It have a per block overhead of 4+(alignment) bytes.
+ * This class implements a per-block allocating policy which aligns the first
+ * element on given byte boundary.  It has a per-block overhead of
+ * `sizeof(void*)+alignment' bytes.
  */
 template <size_t A = 1>
 class csBlockAllocatorAlignPolicy
 {
 public:
   /**
-  * Allocate a raw block of given size. 
-  */
-  static inline uint8* AllocBlock (size_t blocksize) 
+   * Allocate a raw block of given size. 
+   */
+  static inline uint8* AllocBlock(size_t blocksize) 
   {
     uint8* block;
     uintptr_t blockPtr;
-    block = (uint8*)malloc(blocksize+A+sizeof(void*));
+    block = (uint8*)malloc(blocksize + A + sizeof(void*));
     
     uint8* origblock = block;
-    blockPtr = (uintptr_t) block;
+    blockPtr = (uintptr_t)block;
 
-    //align
-    blockPtr += (A-1);
-    blockPtr &= ~(A-1);
+    // Align.
+    blockPtr += (A - 1);
+    blockPtr &= ~(A - 1);
 
-    //store original pointer at block-4
+    // Store original pointer at block-sizeof(void*).
     uintptr_t* ptr = (uintptr_t*)blockPtr; 
     ptr--;
     *ptr = (uintptr_t)origblock;
@@ -98,27 +98,28 @@ public:
   }
 
   /**
-  * Free a block.
-  * Does not do any checkint that the block pointer is valid.
-  */
+   * Free a block.
+   * \remarks Does not check that the block pointer is valid.
+   */
   static inline void FreeBlock(uint8* p)
   {
     uint8* realp = (uint8*)*(((uintptr_t*)p)-1);
-    free (realp);
+    free(realp);
   }
 };
 
 #ifdef CS_MEMORY_TRACKER
 /**
- * This class implements block allocating policy for memory tracking builds.
- * It have an overhead of eigth bytes per block overhead.
+ * This class implements block allocating policy for memory-tracking builds
+ * (when CS_MEMORY_TRACKER is defined).  It has a per-block overhead of eigtht
+ * bytes.
  */
 class csBlockAllocatorMTBlockPolicy
 {
 public:
   /**
-  * Allocate a raw block of given size. 
-  */
+   * Allocate a raw block of given size. 
+   */
   static inline uint8* AllocBlock (size_t blocksize) const
   {
     char buf[255];
@@ -130,9 +131,9 @@ public:
   }
 
   /**
-  * Free a block.
-  * Does not do any checkint that the block pointer is valid.
-  */
+   * Free a block.
+   * \remarks Does not check that the block pointer is valid.
+   */
   static inline void FreeBlock(uint8* p) const
   {
     int32* ptr = ((int32*)p)-2;
@@ -141,7 +142,6 @@ public:
   }
 };
 #endif
-
 
 /**
  * This class implements a memory allocator which can efficiently allocate
@@ -163,14 +163,11 @@ public:
  * \sa csArray
  * \sa csMemoryPool
  */
-template <class T,
-          class BlockPolicy = 
 #ifdef CS_MEMORY_TRACKER
-                              csBlockAllocatorMTBlockPolicy
+template <class T, class BlockPolicy = csBlockAllocatorMTBlockPolicy>
 #else
-                              csBlockAllocatorNormalBlockPolicy
+template <class T, class BlockPolicy = csBlockAllocatorNormalBlockPolicy>
 #endif
->
 class csBlockAllocator
 {
 protected: // 'protected' allows access by test-suite.
@@ -225,9 +222,7 @@ protected: // 'protected' allows access by test-suite.
    */
   uint8* AllocBlock() const
   {
-    uint8* block;
-    
-    block = BlockPolicy::AllocBlock (blocksize);
+    uint8* block = BlockPolicy::AllocBlock(blocksize);
 
     // Build the free-node chain (all nodes are free in the new block).
     FreeNode* nextfree = 0;
@@ -247,7 +242,7 @@ protected: // 'protected' allows access by test-suite.
    */
   void FreeBlock(uint8* p) const
   {
-    BlockPolicy::FreeBlock (p);
+    BlockPolicy::FreeBlock(p);
   }
 
   /**
