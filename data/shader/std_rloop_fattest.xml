@@ -6,10 +6,10 @@
       <pass>
 	<shadertype>ambient</shadertype>
       </pass>
-      <!--pass>
-	<shadertype>ambient</shadertype>
+      <pass>
+	<shadertype>diffuse</shadertype>
 	<defaultshader name="std_lighting" />
-      </pass-->
+      </pass>
     </step>
   </steps>
 </params>

@@ -117,6 +117,7 @@ class csFatLoopStep : public iRenderStep
   csArray<csShaderVariableContext> shadervars;
   csWeakRef<iShaderManager> shaderManager;
   csRef<iEngine> engine;
+  csWeakRef<iShader> nullShader;
 
   static csStringID string_object2world;
 

@@ -3,6 +3,7 @@
     <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.8, 0.8, 0.8</shadervar>
   </shadervars>
 
+<?if vars."splat alpha map".texture ?>
   <technique priority="300"> 
     <tag>linear_fog</tag>
     <tag>terrain_splatting</tag>
@@ -104,4 +105,8 @@
   <!-- Some HW doesn't even handle the linear fog correctly at all. 
        Effectively disable splatting there. (controlled through linear_fog
        tag.) -->
+       
+<?else?>
+  <fallbackshader name="std_lighting" />
+<?endif?>
 </shader>

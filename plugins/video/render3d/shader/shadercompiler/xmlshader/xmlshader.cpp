@@ -1485,8 +1485,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	{
 	  if (compiler->do_verbose)
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s': Technique with priority %u succeeds!",
-	      GetName(), tk.priority);
+	      "Shader '%s'<%zu>: Technique with priority %u succeeds!",
+	      GetName(), vi, tk.priority);
 	  var.tech = tech;
 	  break;
 	}
@@ -1495,8 +1495,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	  if (compiler->do_verbose)
 	  {
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s': Technique with priority %u fails. Reason: %s.",
-	      GetName(), tk.priority, tech->GetFailReason());
+	      "Shader '%s'<%zu>: Technique with priority %u fails. Reason: %s.",
+	      GetName(), vi, tk.priority, tech->GetFailReason());
 	  }
 	  delete tech;
 	}
@@ -1511,8 +1511,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	  if (compiler->do_verbose)
 	  {
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "No technique validated for shader '%s': using fallback", 
-	      GetName());
+	      "No technique validated for shader '%s'<%zu>: using fallback", 
+	      GetName(), vi);
 	  }
 	  size_t vc = resolver->GetVariantCount();
 	  if (vc == 0) vc = 1;
@@ -1521,7 +1521,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	}
 	else
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	    "No technique validated for shader '%s'", GetName());
+	    "No technique validated for shader '%s'<%zu>", GetName(), vi);
       }
     }
     else

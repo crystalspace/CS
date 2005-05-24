@@ -83,7 +83,7 @@ public:
     block = (uint8*)malloc(blocksize + A + sizeof(void*));
     
     uint8* origblock = block;
-    blockPtr = (uintptr_t)block;
+    blockPtr = (uintptr_t)block + sizeof(void*);
 
     // Align.
     blockPtr += (A - 1);

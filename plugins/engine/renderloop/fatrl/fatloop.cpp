@@ -195,6 +195,7 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   this->object_reg = object_reg;
 
   shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  nullShader = shaderManager->GetShader ("*null");
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -441,7 +442,7 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
           iMaterial* hdl = mesh->material->GetMaterial ();
           iShader* sortBy = hdl->GetShader (passes[c].shadertype);
           if (sortBy == 0) sortBy = passes[c].defShader;
-          if (sortBy == 0) 
+          if ((sortBy == 0) || (sortBy == nullShader))
           {
             break; // @@@ Perhaps an Assert? Or some Error?
           }
@@ -482,7 +483,8 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
 
 uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
 {
-  return 1;
+  // @@@ Not very distinguishing atm ... we'll see if it's really needed.
+  return (1 << passes.Length())-1;
 }
 
 //---------------------------------------------------------------------------
@@ -510,7 +512,7 @@ void csFatLoopStep::TraverseShaderBuckets::Process (const ShaderTicketKey& key,
     if ((meshShader != lastShader) || (newTicket != lastTicket))
     {
       // @@@ Need error reporter
-      if (lastShader != 0)
+      if ((lastShader != 0) && (lastShader != step.nullShader))
       {
         //g3d->SetWorldToCamera (camt);
         step.RenderMeshes (g3d, lastShader, lastTicket, 
@@ -522,7 +524,7 @@ void csFatLoopStep::TraverseShaderBuckets::Process (const ShaderTicketKey& key,
       lastTicket = newTicket;
     }
   }
-  if (lastShader != 0)
+  if ((lastShader != 0) && (lastShader != step.nullShader))
   {
     //g3d->SetWorldToCamera (camt);
     step.RenderMeshes (g3d, lastShader, lastTicket, 

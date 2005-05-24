@@ -55,6 +55,14 @@ chronological order.
 	  animation
 	- Adam added the axesChanged bitmask to csJoystickEventData
 	- Adam added many-axes support to csMouseEventData
+	- res did a bit more work on the fat rl.
+	- res changed xmlshader to also report the variation number when 
+	  reporting the technique used for a shader.
+	- res added a built-in shader "*null" to the shader manager which can
+	  be used, as the name suggests, when nothing is to be drawn. (Don't
+	  laugh, it has its uses.)
+	- res fixed a bug in the aligned block allocator policy where the
+	  original address was stored outside the allocated block.
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment

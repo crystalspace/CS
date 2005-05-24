@@ -44,7 +44,9 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/texture.h"
+
 #include "shadermgr.h"
+#include "nullshader.h"
 
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
@@ -121,6 +123,13 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     objectreg, "crystalspace.shared.stringset", iStringSet);
+
+  {
+    csRef<csNullShader> nullShader;
+    nullShader.AttachNew (new csNullShader ());
+    nullShader->SetName ("*null");
+    RegisterShader (nullShader);
+  }
 
   csRef<iStringArray> classlist =
     iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler.");
