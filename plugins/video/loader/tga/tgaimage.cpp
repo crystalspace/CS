@@ -235,60 +235,59 @@ csRef<iImageFileLoader> ImageTgaFile::InitLoader (csRef<iDataBuffer> source)
   return loader;
 }
 
-void ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
+bool ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
 {
-  memcpy (tgaP, iBuffer, sizeof (TGAheader));
-  iBuffer += sizeof (TGAheader);
+  if (!GetBytes (iBuffer, (uint8*)tgaP, sizeof (TGAheader))) return false;
 
   if (tgaP->IDLength != 0)
     iBuffer += tgaP->IDLength;
+  return (iBuffer <= bufferEnd);
 }
 
-void ImageTgaFile::TgaLoader::get_map_entry (uint8*& iBuffer, 
+bool ImageTgaFile::TgaLoader::get_map_entry (uint8*& iBuffer, 
 					     csRGBpixel* Value, int Size, 
 					     bool alpha)
 {
-  unsigned char j, k;
+  uint8 bytes[4];
   uint l;
 
   /* Read appropriate number of bytes, break into rgb & put in map. */
   switch (Size)
   {
     case 8:				/* Grey scale, read and triplicate. */
-      Value->red = Value->green = Value->blue = *iBuffer++;
+      if (!GetBytes (iBuffer, bytes, 1)) return false;
+      Value->red = Value->green = Value->blue = bytes[0];
       break;
 
     case 16:				/* 5 bits each of red green and blue. */
     case 15:				/* Watch for byte order. */
-      j = *iBuffer++;
-      k = *iBuffer++;
-      l = ((unsigned int) k << 8)  + j;
-      Value->red = (k & 0x7C) << 1;
+      if (!GetBytes (iBuffer, bytes, 2)) return false;
+      l = ((unsigned int) bytes[1] << 8) + bytes[0];
+      Value->red = (bytes[1] & 0x7C) << 1;
       Value->red |= Value->red >> 5;
-      Value->green = ((k & 0x03) << 6) | ((j & 0xE0) >> 2);
+      Value->green = ((bytes[1] & 0x03) << 6) | ((bytes[0] & 0xE0) >> 2);
       Value->green |= Value->green >> 5;
-      Value->blue = (j & 0x1F) << 3;
+      Value->blue = (bytes[0] & 0x1F) << 3;
       Value->blue |= Value->blue >> 5;
       break;
 
     case 32:
     case 24:				/* 8 bits each of blue green and red. */
-      Value->blue = *iBuffer++;
-      Value->green = *iBuffer++;
-      Value->red = *iBuffer++;
-      if (Size == 32)
-        if (alpha)
-          Value->alpha = *iBuffer++;	/* Read alpha byte */
-        else
-          iBuffer++;
+      if (!GetBytes (iBuffer, bytes, (Size == 32) ? 4 : 3)) return false;
+      Value->blue = bytes[0];
+      Value->green = bytes[1];
+      Value->red = bytes[2];
+      if ((Size == 32) && alpha)
+          Value->alpha = bytes[3];	/* Read alpha byte */
       break;
 
     default:
-      return;
+      return false;
   }
+  return true;
 }
 
-void ImageTgaFile::TgaLoader::get_current_pixel (uint8*& iBuffer, int Size, 
+bool ImageTgaFile::TgaLoader::get_current_pixel (uint8*& iBuffer, int Size, 
 						 bool alpha)
 {
   /* Check if run length encoded. */
@@ -296,8 +295,9 @@ void ImageTgaFile::TgaLoader::get_current_pixel (uint8*& iBuffer, int Size,
   {
     if (RLE_count == 0)
     { /* Have to restart run. */
-      unsigned char i;
+      uint8 i;
       i = *iBuffer++;
+      if (!GetBytes (iBuffer, &i, 1)) return false;
       RLE_flag = (i & 0x80);
       if (RLE_flag == 0)
         /* Stream of unencoded pixels. */
@@ -313,56 +313,55 @@ void ImageTgaFile::TgaLoader::get_current_pixel (uint8*& iBuffer, int Size,
       --RLE_count;
       if (RLE_flag != 0)
       /* Replicated pixels. */
-        return;
+        return true;
     }
   }
 
-  uint8 j, k;
+  uint8 bytes[4];
   /* Read appropriate number of bytes, break into RGB. */
   switch (Size)
   {
     case 8:				/* Grey scale, read and triplicate. */
-      currentPixel.Red = currentPixel.Grn = currentPixel.Blu = currentPixel.l = *iBuffer++;
+      if (!GetBytes (iBuffer, bytes, 1)) return false;
+      currentPixel.Red = currentPixel.Grn = currentPixel.Blu = currentPixel.l = bytes[0];
       currentPixel.Alpha = 0xff;
       break;
 
     case 16:				/* 5 bits each of red green and blue. */
     case 15:				/* Watch byte order. */
-      j = *iBuffer++;
-      k = *iBuffer++;
-      currentPixel.l = ((unsigned int) k << 8)  + j;
-      currentPixel.Red = (k & 0x7C) << 1;
+      if (!GetBytes (iBuffer, bytes, 2)) return false;
+      currentPixel.l = ((unsigned int) bytes[1] << 8) + bytes[0];
+      currentPixel.Red = (bytes[1] & 0x7C) << 1;
       currentPixel.Red |= currentPixel.Red >> 5;
-      currentPixel.Grn = ((k & 0x03) << 6) | ((j & 0xE0) >> 2);
+      currentPixel.Grn = ((bytes[1] & 0x03) << 6) | ((bytes[0] & 0xE0) >> 2);
       currentPixel.Grn |= currentPixel.Grn >> 5;
-      currentPixel.Blu = (j & 0x1F) << 3;
+      currentPixel.Blu = (bytes[0] & 0x1F) << 3;
       currentPixel.Blu |= currentPixel.Blu >> 5;
       currentPixel.Alpha = 0xff;
       break;
 
     case 32:
     case 24:			/* 8 bits each of blue green and red. */
-      currentPixel.Blu = *iBuffer++;
-      currentPixel.Grn = *iBuffer++;
-      currentPixel.Red = *iBuffer++;
+      if (!GetBytes (iBuffer, bytes, (Size == 32) ? 4 : 3)) return false;
+      currentPixel.Blu = bytes[0];
+      currentPixel.Grn = bytes[1];
+      currentPixel.Red = bytes[2];
       currentPixel.Alpha = 0xff;
-      if (Size == 32)
-        if (alpha)
-          currentPixel.Alpha = *iBuffer++;	/* Read alpha byte */
-        else
-          iBuffer++;
+      if ((Size == 32) && alpha)
+        currentPixel.Alpha = bytes[3];	/* Read alpha byte */
       currentPixel.l = 0;
       break;
 
     default:
-      return;
+      return false;
   }
+  return true;
 }
 
-void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest, 
+bool ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest, 
 					 int Size, bool alpha)
 {
-  get_current_pixel (iBuffer, Size, alpha);
+  if (!get_current_pixel (iBuffer, Size, alpha)) return false;
 
   if (mapped)
     *dest = colorMap[currentPixel.l];
@@ -373,17 +372,19 @@ void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest,
     dest->blue = currentPixel.Blu; 
     dest->alpha = currentPixel.Alpha;
   }
+  return true;
 }
 
-void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, uint8* dest, 
+bool ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, uint8* dest, 
 					 int Size, bool alpha)
 {
-  get_current_pixel (iBuffer, Size, alpha);
+  if (!get_current_pixel (iBuffer, Size, alpha)) return false;
 
   if (tga_head.PixelSize <= 8)
     *dest = currentPixel.l << indexShift;
   else
     *dest = currentPixel.l >> indexShift;
+  return true;
 }
 
 ImageTgaFile::TgaLoader::~TgaLoader()
@@ -395,7 +396,8 @@ bool ImageTgaFile::TgaLoader::InitOk()
 {
   int NewFormat;
   iBuffer = dataSource->GetUint8();
-  readtga (iBuffer, &tga_head);
+  bufferEnd = iBuffer + dataSource->GetSize();
+  if (!readtga (iBuffer, &tga_head)) return false;
 
   switch (tga_head.ImgType)
   {
@@ -467,8 +469,10 @@ bool ImageTgaFile::TgaLoader::LoadData ()
     if (tga_head.CoMapType != 0)
     {
       for (uint i = colorMapOffs; i < colorMapOffs + colorMapSize; ++i)
+      {
 	get_map_entry (iBuffer, colorMap + i, tga_head.CoSize,
 	  Format & CS_IMGFMT_ALPHA);
+      }
     }
     else
     {
@@ -511,14 +515,30 @@ bool ImageTgaFile::TgaLoader::LoadData ()
     if (dataType == rdtIndexed)
     {
       for (int col = 0; col < Width; ++col)
-	get_pixel (iBuffer, indexData + (realrow * Width + col),
-	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
+      {
+	if (!get_pixel (iBuffer, indexData + (realrow * Width + col),
+	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA))
+        {
+          // Can't read pixel.... file is probably damaged.
+          // Use obnoxious pattern for replacement.
+          int v = ((realrow >> 1) & 1) ^ ((col >> 1) & 1);
+          *(indexData + (realrow * Width + col)) = v * 255;
+        }
+      }
     }
     else
     {
       for (int col = 0; col < Width; ++col)
-	get_pixel (iBuffer, rgbaData + (realrow * Width + col),
-	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
+      {
+	if (!get_pixel (iBuffer, rgbaData + (realrow * Width + col),
+	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA))
+        {
+          // Can't read pixel.... file is probably damaged.
+          // Use obnoxious pattern for replacement.
+          int v = ((realrow >> 1) & 1) ^ ((col >> 1) & 1);
+          (rgbaData + (realrow * Width + col))->Set (255*v, 255*(1-v), 255);
+        }
+      }
     }
     if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Four)
       truerow += 4;

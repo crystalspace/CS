@@ -48,6 +48,9 @@ chronological order.
 	    'idleanim' for defining the idle animation.
 	    'idle' sets the cal3d object as 0 velocity (so the idle animation
 	    activates).
+	- res fixed the TGA loader to better handle truncated source data;
+	  previously, it would read beyond the end of the buffer, possibly
+	  leading to crashes.
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment

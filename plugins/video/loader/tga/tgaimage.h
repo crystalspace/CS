@@ -107,6 +107,7 @@ private:
 
     csRef<iDataBuffer> dataSource;
     uint8* iBuffer;
+    uint8* bufferEnd;
     TGAheader tga_head;
     bool mapped, rlencoded;
     int RLE_count, RLE_flag;
@@ -115,11 +116,19 @@ private:
     uint colorMapSize;
     uint indexShift;
 
-    void readtga (uint8*& ptr, struct TGAheader* tgaP);
-    void get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha);
-    void get_current_pixel (uint8*& ptr, int Size, bool alpha);
-    void get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
-    void get_pixel (uint8*& ptr, uint8* dest, int Size, bool alpha);
+    bool readtga (uint8*& ptr, struct TGAheader* tgaP);
+    bool get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha);
+    bool get_current_pixel (uint8*& ptr, int Size, bool alpha);
+    bool get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
+    bool get_pixel (uint8*& ptr, uint8* dest, int Size, bool alpha);
+    bool GetBytes (uint8*& ptr, uint8* dest, size_t n)
+    {
+      uint8* newEnd = ptr+n;
+      if (newEnd > bufferEnd) return false;
+      memcpy (dest, ptr, n);
+      ptr = newEnd;
+      return true;
+    }
   public:
     TgaLoader (int Format, iDataBuffer* source) 
       : csCommonImageFileLoader (Format), dataSource (source), 
