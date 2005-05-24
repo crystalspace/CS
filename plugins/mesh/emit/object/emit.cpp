@@ -88,10 +88,6 @@ struct csEmitCompPart
   iParticle* part;
 };
 
-/// growing drawing sort array
-typedef csDirtyAccessArray<csEmitCompPart> csCompPartArray;
-CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,())
-
 csEmitFixed::csEmitFixed(iBase *parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
