@@ -666,12 +666,6 @@ package cspace::csVector3;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_x_get = *cspacec::csVector3_x_get;
-*swig_x_set = *cspacec::csVector3_x_set;
-*swig_y_get = *cspacec::csVector3_y_get;
-*swig_y_set = *cspacec::csVector3_y_set;
-*swig_z_get = *cspacec::csVector3_z_get;
-*swig_z_set = *cspacec::csVector3_z_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csVector3(@_);
@@ -2422,6 +2416,7 @@ package cspace::csBox3;
 *GetCenter = *cspacec::csBox3_GetCenter;
 *SetCenter = *cspacec::csBox3_SetCenter;
 *SetSize = *cspacec::csBox3_SetSize;
+*GetSize = *cspacec::csBox3_GetSize;
 *GetSide = *cspacec::csBox3_GetSide;
 *GetAxisPlane = *cspacec::csBox3_GetAxisPlane;
 *GetVisibleSides = *cspacec::csBox3_GetVisibleSides;
@@ -8766,8 +8761,11 @@ package cspace::csMouseEventHelper;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*GetNumber = *cspacec::csMouseEventHelper_GetNumber;
 *GetX = *cspacec::csMouseEventHelper_GetX;
 *GetY = *cspacec::csMouseEventHelper_GetY;
+*GetAxis = *cspacec::csMouseEventHelper_GetAxis;
+*GetNumAxes = *cspacec::csMouseEventHelper_GetNumAxes;
 *GetButton = *cspacec::csMouseEventHelper_GetButton;
 *GetModifiers = *cspacec::csMouseEventHelper_GetModifiers;
 *GetEventData = *cspacec::csMouseEventHelper_GetEventData;
@@ -9146,6 +9144,7 @@ package cspace::iMouseDriver;
 *Reset = *cspacec::iMouseDriver_Reset;
 *GetLastX = *cspacec::iMouseDriver_GetLastX;
 *GetLastY = *cspacec::iMouseDriver_GetLastY;
+*GetLast = *cspacec::iMouseDriver_GetLast;
 *GetLastButton = *cspacec::iMouseDriver_GetLastButton;
 *DoButton = *cspacec::iMouseDriver_DoButton;
 *DoMotion = *cspacec::iMouseDriver_DoMotion;
@@ -13187,6 +13186,8 @@ sub VFS_STATUS_NOSPACE () { $cspacec::VFS_STATUS_NOSPACE }
 sub VFS_STATUS_RESOURCES () { $cspacec::VFS_STATUS_RESOURCES }
 sub VFS_STATUS_ACCESSDENIED () { $cspacec::VFS_STATUS_ACCESSDENIED }
 sub VFS_STATUS_IOERROR () { $cspacec::VFS_STATUS_IOERROR }
+sub CS_MAX_MOUSE_COUNT () { $cspacec::CS_MAX_MOUSE_COUNT }
+sub CS_MAX_MOUSE_AXES () { $cspacec::CS_MAX_MOUSE_AXES }
 sub CS_MAX_MOUSE_BUTTONS () { $cspacec::CS_MAX_MOUSE_BUTTONS }
 sub CS_MAX_JOYSTICK_COUNT () { $cspacec::CS_MAX_JOYSTICK_COUNT }
 sub CS_MAX_JOYSTICK_BUTTONS () { $cspacec::CS_MAX_JOYSTICK_BUTTONS }
