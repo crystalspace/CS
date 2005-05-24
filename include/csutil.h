@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/algorithms.h"
 #include "csutil/ansicolor.h"
 #include "csutil/ansiparse.h"
 #include "csutil/array.h"
@@ -85,6 +86,7 @@
 #include "csutil/profile.h"
 #include "csutil/radixsort.h"
 #include "csutil/randomgen.h"
+#include "csutil/redblacktree.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/refcount.h"
