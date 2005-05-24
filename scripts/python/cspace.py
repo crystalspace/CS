@@ -496,15 +496,6 @@ class csVector3(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csVector3, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csVector3 instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["x"] = _cspace.csVector3_x_set
-    __swig_getmethods__["x"] = _cspace.csVector3_x_get
-    if _newclass:x = property(_cspace.csVector3_x_get, _cspace.csVector3_x_set)
-    __swig_setmethods__["y"] = _cspace.csVector3_y_set
-    __swig_getmethods__["y"] = _cspace.csVector3_y_get
-    if _newclass:y = property(_cspace.csVector3_y_get, _cspace.csVector3_y_set)
-    __swig_setmethods__["z"] = _cspace.csVector3_z_set
-    __swig_getmethods__["z"] = _cspace.csVector3_z_get
-    if _newclass:z = property(_cspace.csVector3_z_get, _cspace.csVector3_z_set)
     def __init__(self, *args):
         _swig_setattr(self, csVector3, 'this', _cspace.new_csVector3(*args))
         _swig_setattr(self, csVector3, 'thisown', 1)
@@ -2132,6 +2123,7 @@ class csBox3(_object):
     def GetCenter(*args): return _cspace.csBox3_GetCenter(*args)
     def SetCenter(*args): return _cspace.csBox3_SetCenter(*args)
     def SetSize(*args): return _cspace.csBox3_SetSize(*args)
+    def GetSize(*args): return _cspace.csBox3_GetSize(*args)
     def GetSide(*args): return _cspace.csBox3_GetSide(*args)
     def GetAxisPlane(*args): return _cspace.csBox3_GetAxisPlane(*args)
     def GetVisibleSides(*args): return _cspace.csBox3_GetVisibleSides(*args)
@@ -7380,6 +7372,8 @@ _cspace.iVirtualClock_swigregister(iVirtualClockPtr)
 
 iVirtualClock_scfGetVersion = _cspace.iVirtualClock_scfGetVersion
 
+CS_MAX_MOUSE_COUNT = _cspace.CS_MAX_MOUSE_COUNT
+CS_MAX_MOUSE_AXES = _cspace.CS_MAX_MOUSE_AXES
 CS_MAX_MOUSE_BUTTONS = _cspace.CS_MAX_MOUSE_BUTTONS
 CS_MAX_JOYSTICK_COUNT = _cspace.CS_MAX_JOYSTICK_COUNT
 CS_MAX_JOYSTICK_BUTTONS = _cspace.CS_MAX_JOYSTICK_BUTTONS
@@ -7796,10 +7790,16 @@ class csMouseEventHelper(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csMouseEventHelper, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csMouseEventHelper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_getmethods__["GetNumber"] = lambda x: _cspace.csMouseEventHelper_GetNumber
+    if _newclass:GetNumber = staticmethod(_cspace.csMouseEventHelper_GetNumber)
     __swig_getmethods__["GetX"] = lambda x: _cspace.csMouseEventHelper_GetX
     if _newclass:GetX = staticmethod(_cspace.csMouseEventHelper_GetX)
     __swig_getmethods__["GetY"] = lambda x: _cspace.csMouseEventHelper_GetY
     if _newclass:GetY = staticmethod(_cspace.csMouseEventHelper_GetY)
+    __swig_getmethods__["GetAxis"] = lambda x: _cspace.csMouseEventHelper_GetAxis
+    if _newclass:GetAxis = staticmethod(_cspace.csMouseEventHelper_GetAxis)
+    __swig_getmethods__["GetNumAxes"] = lambda x: _cspace.csMouseEventHelper_GetNumAxes
+    if _newclass:GetNumAxes = staticmethod(_cspace.csMouseEventHelper_GetNumAxes)
     __swig_getmethods__["GetButton"] = lambda x: _cspace.csMouseEventHelper_GetButton
     if _newclass:GetButton = staticmethod(_cspace.csMouseEventHelper_GetButton)
     __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csMouseEventHelper_GetModifiers
@@ -7822,9 +7822,15 @@ class csMouseEventHelperPtr(csMouseEventHelper):
         _swig_setattr(self, csMouseEventHelper,self.__class__,csMouseEventHelper)
 _cspace.csMouseEventHelper_swigregister(csMouseEventHelperPtr)
 
+csMouseEventHelper_GetNumber = _cspace.csMouseEventHelper_GetNumber
+
 csMouseEventHelper_GetX = _cspace.csMouseEventHelper_GetX
 
 csMouseEventHelper_GetY = _cspace.csMouseEventHelper_GetY
+
+csMouseEventHelper_GetAxis = _cspace.csMouseEventHelper_GetAxis
+
+csMouseEventHelper_GetNumAxes = _cspace.csMouseEventHelper_GetNumAxes
 
 csMouseEventHelper_GetButton = _cspace.csMouseEventHelper_GetButton
 
@@ -8230,6 +8236,7 @@ class iMouseDriver(iBase):
     def Reset(*args): return _cspace.iMouseDriver_Reset(*args)
     def GetLastX(*args): return _cspace.iMouseDriver_GetLastX(*args)
     def GetLastY(*args): return _cspace.iMouseDriver_GetLastY(*args)
+    def GetLast(*args): return _cspace.iMouseDriver_GetLast(*args)
     def GetLastButton(*args): return _cspace.iMouseDriver_GetLastButton(*args)
     def DoButton(*args): return _cspace.iMouseDriver_DoButton(*args)
     def DoMotion(*args): return _cspace.iMouseDriver_DoMotion(*args)
