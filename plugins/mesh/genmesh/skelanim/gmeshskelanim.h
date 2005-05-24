@@ -120,6 +120,7 @@ public:
 
 	void UpdateRotation();
 	void UpdatePosition();
+	void UpdateTranslation();
 	void FireCallback() 
 		{ if (cb) cb->UpdateTransform(this, next_transform); }
 
@@ -179,6 +180,7 @@ enum sac_opcode
 	AC_DELAY,
 	AC_REPEAT,
 	AC_MOVE,
+	AC_TRANSLATE,
 	AC_ROT
 };
 
@@ -283,6 +285,7 @@ struct sac_move_execution
 	csSkelBone* bone;
 	bone_transform_data* bone_position;
 	csTicks final;
+	csTicks current;
 	csVector3 delta_per_tick;
 	csVector3 final_position;
 };
@@ -304,6 +307,8 @@ private:
 	float morph_factor;
 	float time_factor;
 
+	// Current translate operations.
+	csArray<sac_move_execution> translates;
 	// Current movement operations.
 	csArray<sac_move_execution> moves;
 	// Current rotate operations.
@@ -316,6 +321,7 @@ private:
 
 	TransformHash rotations;
 	TransformHash positions;
+	TransformHash translations;
 
 	void release_tranform_data(TransformHash&);
 
@@ -330,6 +336,8 @@ public:
 	bone_transform_data *GetBonePosition(csSkelBone *bone);
 	TransformHash& GetPositions() { return positions; };
 
+	bone_transform_data *GetBoneTranslation(csSkelBone *bone);
+	TransformHash& GetTranslations() { return translations; };
 	//------------------------------------------
 
 	csSkelAnimControlRunnable (csSkelAnimControlScript* script,

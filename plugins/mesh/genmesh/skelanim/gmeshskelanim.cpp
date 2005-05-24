@@ -232,6 +232,44 @@ void csSkelBone::UpdatePosition()
 	}
 }
 
+void csSkelBone::UpdateTranslation()
+{
+	float final_trans_x = 0;
+	float final_trans_y = 0;
+	float final_trans_z = 0;
+	float script_factors_total = 0;
+	bool updated = false;
+
+	for (size_t i = 0; i < anim_control->GetRunningScripts ().Length (); i++)
+	{
+		csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get(i);
+		csSkelAnimControlRunnable::TransformHash& translations = script->GetTranslations ();
+		bone_transform_data *b_trans = translations.Get(this, 0);
+		if (b_trans)
+		{
+			updated = true;
+			final_trans_x += b_trans->x*script->GetFactor();
+			final_trans_y += b_trans->y*script->GetFactor();
+			final_trans_z += b_trans->z*script->GetFactor();
+			script_factors_total += script->GetFactor();
+		}
+	}
+
+	if (updated)
+	{
+		if (script_factors_total)
+		{
+			final_trans_x /= script_factors_total;
+			final_trans_y /= script_factors_total;
+			final_trans_z /= script_factors_total;
+		}
+		
+		csVector3 current_pos = next_transform.GetOrigin ();
+		next_transform.SetOrigin (current_pos + csVector3(final_trans_x, final_trans_y, final_trans_z));
+	}
+}
+
+
 float csSkelBone::GetAxisAngle (int axis)
 {
 	return rot.data[axis];
@@ -369,6 +407,7 @@ csSkelAnimControlRunnable::~csSkelAnimControlRunnable ()
 {
 	release_tranform_data(positions);
 	release_tranform_data(rotations);
+	release_tranform_data(translations);
 	SCF_DESTRUCT_IBASE ();
 }
 
@@ -406,6 +445,20 @@ bone_transform_data *csSkelAnimControlRunnable::GetBonePosition(csSkelBone *bone
 	return b_pos;
 }
 
+bone_transform_data *csSkelAnimControlRunnable::GetBoneTranslation(csSkelBone *bone)
+{
+	bone_transform_data *b_trans = translations.Get(bone, 0);
+	if (!b_trans) 
+	{
+		b_trans = new bone_transform_data ();
+		b_trans->x = 0;
+		b_trans->y = 0;
+		b_trans->z = 0;
+		translations.Put (bone, b_trans);
+	}	
+	return b_trans;
+}
+
 bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 {
 	csRefArray<csSkelBone>& bones = anim_control->GetBones ();
@@ -437,6 +490,32 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 			m.bone_position->y = m.final_position.y;
 			m.bone_position->z = m.final_position.z;
 			moves.DeleteIndexFast (i);
+		}
+		mod = true;
+	}
+	//-------
+	// Perform all running translates.
+	//-------
+	i = translates.Length ();
+	while (i > 0)
+	{
+		i--;
+		sac_move_execution& m = translates[i];
+		if (current < m.final)
+		{
+			csVector3 current_trans = (float) (current - m.current)*m.delta_per_tick;
+			m.bone_position->x = current_trans.x;
+			m.bone_position->y = current_trans.y;
+			m.bone_position->z = current_trans.z;
+			m.current = current;
+		}
+		else
+		{
+			csVector3 current_trans = (float) (m.final - m.current)*m.delta_per_tick;
+			m.bone_position->x = current_trans.x;
+			m.bone_position->y = current_trans.y;
+			m.bone_position->z = current_trans.z;
+			translates.DeleteIndexFast (i);
 		}
 		mod = true;
 	}
@@ -555,6 +634,37 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 					}
 				}
 				break;
+			case AC_TRANSLATE:
+				if (bones[inst.movement.bone_id]->GetMode () != BM_NONE)
+				{
+					if (!inst.movement.duration)
+					{
+						bone_transform_data *bone_pos = GetBonePosition(bones[inst.movement.bone_id]);
+						bone_pos->x = inst.movement.posx;
+						bone_pos->y = inst.movement.posy;
+						bone_pos->z = inst.movement.posz;
+					}
+					else
+					{
+						sac_move_execution m;
+						csTicks duration = (csTicks) ( (float)inst.movement.duration*time_factor);
+						m.current = delay.final;
+						m.final = delay.final + duration;
+						m.bone = bones[inst.movement.bone_id];
+						m.final_position.x = inst.movement.posx;
+						m.final_position.y = inst.movement.posy;
+						m.final_position.z = inst.movement.posz;
+
+						m.bone_position = GetBoneTranslation(m.bone);
+						m.bone_position->x = 0;
+						m.bone_position->y = 0;
+						m.bone_position->z = 0;
+
+						m.delta_per_tick = m.final_position/ (float)duration;
+						translates.Push (m);
+					}
+				}
+				break;
 		}
 	}
 	return mod;
@@ -645,6 +755,7 @@ void csGenmeshSkelAnimationControl::UpdateAnimation (csTicks current)
 		{
 			bones[i]->UpdateRotation();
 			bones[i]->UpdatePosition();
+			bones[i]->UpdateTranslation();
 			bones[i]->FireCallback();
 		}
 
@@ -1173,6 +1284,21 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 					size_t bone_id = FindBoneIndex (bonename);
 					if (bone_id == (size_t)~0) return "Can't find bone for <move>!";
 					sac_instruction& instr = ad.script->AddInstruction (AC_MOVE);
+					instr.movement.bone_id = bone_id;
+					instr.movement.duration = child->GetAttributeValueAsInt ("duration");
+					instr.movement.posx = child->GetAttributeValueAsFloat ("x");
+					instr.movement.posy = child->GetAttributeValueAsFloat ("y");
+					instr.movement.posz = child->GetAttributeValueAsFloat ("z");
+					animates_vertices = true;
+				}
+				break;
+			case XMLTOKEN_TRANSLATE:
+				{
+					const char* bonename = child->GetAttributeValue ("bone");
+					if (!bonename) return "Missing bone name for <translate>!";
+					size_t bone_id = FindBoneIndex (bonename);
+					if (bone_id == (size_t)~0) return "Can't find bone for <translate>!";
+					sac_instruction& instr = ad.script->AddInstruction (AC_TRANSLATE);
 					instr.movement.bone_id = bone_id;
 					instr.movement.duration = child->GetAttributeValueAsInt ("duration");
 					instr.movement.posx = child->GetAttributeValueAsFloat ("x");
