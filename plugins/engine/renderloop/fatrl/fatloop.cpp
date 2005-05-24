@@ -38,7 +38,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csFatLoopType);
 SCF_IMPLEMENT_FACTORY(csFatLoopLoader);
 
-static const char* MessageID = "rystalspace.renderloop.step.fatloop";
+static const char* MessageID = "crystalspace.renderloop.step.fatloop";
 
 //---------------------------------------------------------------------------
 
