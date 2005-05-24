@@ -143,18 +143,20 @@ bool csLinuxJoystick::Init ()
       fstat(fd, &st);
 
       /* check devids for a dup st.st_dev */
-      for (csArray<dev_t>::Iterator i = devids.GetIterator() ; i.HasNext() ; ) {
-	if (i.Next() == st.st_dev) {
+      for (csArray<dev_t>::Iterator i = devids.GetIterator(); i.HasNext(); )
+      {
+	if (i.Next() == st.st_dev)
+	{
 	  close(fd);
 	  fd = -1;
+	  if (verbose)
+	    Report (CS_REPORTER_SEVERITY_WARNING,
+		    "Found duplicate joystick device %s\n", it->GetStr());
 	  break;
 	}
       }
-      if (fd == -1) {
-	Report (CS_REPORTER_SEVERITY_WARNING,
-		"Found duplicate joystick device %s\n", 
-		it->GetStr());
-      } else {
+      if (fd != -1)
+      {
 	nJoy++;
 	fds.Push((const int) fd);
 	devids.Push(st.st_dev);
