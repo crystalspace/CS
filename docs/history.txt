@@ -23,6 +23,8 @@ chronological order.
 	- Adam Bradley added a test to the Linux joystick driver to suppress
 	  multiple registry of single devices with multiple filenames 
 	  (e.g., /dev/js0 and /dev/input/js0 on a devfs-enabled system).
+	- Adam fixed csMouseEventHelper breakage introduced by the
+	  transition to many-axis mouse attributes.
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment

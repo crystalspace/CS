@@ -151,10 +151,8 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
   if (!CS_IS_MOUSE_EVENT (*event)) return false;
   
   csEventError ok = csEventErrNone;
-  ok = event->Retrieve("mX", data.x);
-  CS_ASSERT(ok == csEventErrNone);
-  ok = event->Retrieve("mY", data.y);
-  CS_ASSERT(ok == csEventErrNone);
+  data.x = csMouseEventHelper::GetAxis (event, 0);
+  data.y = csMouseEventHelper::GetAxis (event, 1);
   ok = event->Retrieve("mButton", data.Button);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("keyModifiers", data.Modifiers);
