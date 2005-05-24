@@ -25,6 +25,9 @@ chronological order.
 	  (e.g., /dev/js0 and /dev/input/js0 on a devfs-enabled system).
 	- Adam fixed csMouseEventHelper breakage introduced by the
 	  transition to many-axis mouse attributes.
+	- Eric Sunshine worked around Swig/Java complaint about multiple
+	  inheritance in <csgeom/path.h>. (Java does not support multiple
+	  inheritance.)
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment

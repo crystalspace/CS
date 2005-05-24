@@ -868,6 +868,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "igeom/objmodel.h"
 %include "igeom/path.h"
 %include "igeom/polymesh.h"
+
+%ignore csPath::PathEmbed;
 %include "csgeom/path.h"
 %include "csgeom/polymesh.h"
 %include "csgeom/spline.h"

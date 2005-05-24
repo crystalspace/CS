@@ -39,7 +39,7 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class CS_CRYSTALSPACE_EXPORT csPath : public csCatmullRomSpline, public iPath
+class CS_CRYSTALSPACE_EXPORT csPath : public csCatmullRomSpline
 {
 private:
   void SetVectorAsDimensionValues (int dim, csVector3* v)
@@ -70,10 +70,15 @@ public:
   csPath (int p) : csCatmullRomSpline (9, p)
   {
     SCF_CONSTRUCT_IBASE (0);
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPath);
   }
 
   /// Destroy the path.
-  virtual ~csPath () { SCF_DESTRUCT_IBASE(); }
+  virtual ~csPath ()
+  {
+    SCF_DESTRUCT_EMBEDDED_IBASE (scfiPath);
+    SCF_DESTRUCT_IBASE();
+  }
 
   /// Get the number of vector points in this spline
   int Length ()
@@ -177,6 +182,41 @@ public:
     pos.y = GetInterpolatedDimension (7);
     pos.z = GetInterpolatedDimension (8);
   }
+
+#ifndef SWIG
+  struct PathEmbed : public iPath
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csPath);
+    virtual int Length () { return scfParent->Length(); }
+    virtual void CalculateAtTime (float t) { scfParent->CalculateAtTime(t); }
+    virtual int GetCurrentIndex () { return scfParent->GetCurrentIndex(); }
+    virtual void SetPositionVectors (csVector3* v)
+    { scfParent->SetPositionVectors(v); }
+    virtual void SetUpVectors (csVector3* v) { scfParent->SetUpVectors(v); }
+    virtual void SetForwardVectors (csVector3* v)
+    { scfParent->SetForwardVectors(v); }
+    virtual void SetPositionVector (int idx, const csVector3& v)
+    { scfParent->SetPositionVector(idx,v); }
+    virtual void SetUpVector (int idx, const csVector3& v)
+    { scfParent->SetUpVector(idx,v); }
+    virtual void SetForwardVector (int idx, const csVector3& v)
+    { scfParent->SetForwardVector(idx,v); }
+    virtual void GetPositionVector (int idx, csVector3& v)
+    { scfParent->GetPositionVector(idx,v); }
+    virtual void GetUpVector (int idx, csVector3& v)
+    { scfParent->GetUpVector(idx,v); }
+    virtual void GetForwardVector (int idx, csVector3& v)
+    { scfParent->GetForwardVector(idx,v); }
+    virtual float GetTime (int idx) { return scfParent->GetTime(idx); }
+    virtual void SetTime (int idx, float t) { scfParent->SetTime(idx,t); }
+    virtual void GetInterpolatedPosition (csVector3& pos)
+    { scfParent->GetInterpolatedPosition(pos); }
+    virtual void GetInterpolatedUp (csVector3& pos)
+    { scfParent->GetInterpolatedUp(pos); }
+    virtual void GetInterpolatedForward (csVector3& pos)
+    { scfParent->GetInterpolatedForward(pos); }
+  } scfiPath;
+#endif // SWIG
 };
 
 /** @} */
