@@ -7,13 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 24-May-2005
-	- Marten added a csForEach which mimics std::for_each.
+	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 
-	  (operator []) when possible.
-	- Marten added some initial parts of the new lighter. It still does
+	  (operator[]) when possible.
+	- Marten added some initial parts of the new map lighter. It still does
 	  not do anything.
-	- Marten augumented csBlockAllocator to utilize a policy-like scheme
-	  to determin allocation of blocks.
+	- Marten augumented csBlockAllocator<> to utilize a policy-like scheme
+	  to determine allocation of blocks.
 	- res made Marten's bit haxx0ry in kdtree.h a bit safer by not using
 	  the MSB of a pointer for a flag, but instead bit 3.
 	- res did some work on the fat loop. Now has the beginnings of an 
@@ -38,11 +38,11 @@ chronological order.
 	- Adam Bradley added generic event support for up to
 	  CS_MAX_MOUSE_COUNT simultaneous mice, each with up to
 	  CS_MAX_MOUSE_AXES axes (scroll wheel, etc).
-	  - Existing interfaces still work; they assume the caller is
-	    interested in Mouse #1.
-	  - This is pure infrastructure; none of the mouse drivers
-	    have been updated to watch multiple mice, or to send 
-	    information for more than 2 axes.
+	    - Existing interfaces still work; they assume the caller is
+	      interested in Mouse #1.
+	    - This is pure infrastructure; none of the mouse drivers have been
+	      updated to watch multiple mice, or to send information for more
+	      than 2 axes.
 	- Adam fixed an initialization bug in the Joystick driver that
 	  could have overwritten a large region of memory with '\0's.
 22-May-2005
@@ -83,10 +83,10 @@ chronological order.
 	  KDevelop & MSVC tutorials.
 20-May-2005
 	- Jorrit added three new functions to iLoader:
-		- LoadMap
-		- LoadLibrary
-		- Load
-	  All these functions are variants of LoadMapFile, LoadLibraryFile,
+	    LoadMap()
+	    LoadLibrary()
+	    Load()
+	  All these functions are variants of LoadMapFile(), LoadLibraryFile(),
 	  and the old Load that worked on a filename. These versions work
 	  on a document node however.
         - Adam Bradley changed Mouse, Joystick, and Command events over 
