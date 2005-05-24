@@ -42,35 +42,29 @@ class CS_CRYSTALSPACE_EXPORT csVector3
 {
 public:
 
-#ifdef __STRICT_ANSI__
-  /// The X component of the vector
-  float x;
-  /// The Y component of the vector
-  float y;
-  /// The Z component of the vector
-  float z;
-#else
+#ifndef __STRICT_ANSI__
   union
   {
     struct 
     {
+#endif
       /// The X component of the vector
       float x;
       /// The Y component of the vector
       float y;
       /// The Z component of the vector
       float z;
+#ifndef __STRICT_ANSI__
     };
     /// All components
     float m[3];
   };
 #endif
-  
-  
+
   /**
-   * Make a new vector. The vector is not
-   * initialized. This makes the code slightly faster as
-   * csVector3 objects are used a lot.
+   * Make a new vector.
+   * \warning The vector is not initialized. This makes the code slightly
+   *   faster as csVector3 objects are used a lot.
    */
   csVector3 () {}
 
