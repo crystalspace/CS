@@ -173,10 +173,14 @@ enum csMouseButton
  */
 struct csMouseEventData
 {
-  /// Mouse x
+  /// Mouse x (same as axes[0])
   int x;
-  /// Mouse y
+  /// Mouse y (same as axes[1])
   int y;
+  /// Mouse axis values
+  int axes[CS_MAX_MOUSE_AXES];
+  /// Mouse axis count
+  int numAxes;
   /**
    * Button number.
    * \sa csMouseButton
@@ -201,6 +205,8 @@ struct csJoystickEventData
   int axes[CS_MAX_JOYSTICK_AXES];
   /// Axes count
   uint8 numAxes;
+  /// Axes change mask
+  uint32 axesChanged;
   /// Joystick button number
   int Button;
   /// Control key state

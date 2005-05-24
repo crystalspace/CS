@@ -149,10 +149,21 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
 					csMouseEventData& data)
 {
   if (!CS_IS_MOUSE_EVENT (*event)) return false;
-  
+
+  const void *_ax = 0; size_t _ax_sz = 0;
   csEventError ok = csEventErrNone;
-  data.x = csMouseEventHelper::GetAxis (event, 0);
-  data.y = csMouseEventHelper::GetAxis (event, 1);
+  ok = event->Retrieve("mAxes", _ax, _ax_sz);
+  CS_ASSERT(ok == csEventErrNone);
+  ok = event->Retrieve("mNumAxes", data.numAxes);
+  CS_ASSERT(ok == csEventErrNone);
+  for (int iter=0 ; iter<CS_MAX_MOUSE_AXES ; iter++) {
+    if (iter<data.numAxes)
+      data.axes[iter] = ((int *)_ax)[iter];
+    else
+      data.axes[iter] = 0;
+  }
+  data.x = data.axes[0];
+  data.y = data.axes[1];
   ok = event->Retrieve("mButton", data.Button);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("keyModifiers", data.Modifiers);
@@ -201,9 +212,10 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
 {
   if (!CS_IS_JOYSTICK_EVENT (*event)) return false;
   
-  data.number = GetNumber(event);
   const void *_ax = 0; size_t _ax_sz = 0;
   csEventError ok = csEventErrNone;
+  ok = event->Retrieve("jsNumber", data.number);
+  CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("jsAxes", _ax, _ax_sz);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("jsNumAxes", data.numAxes);
@@ -214,6 +226,8 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
     else
       data.axes[iter] = 0;
   }
+  ok = event->Retrieve("jsAxesChanged", data.axesChanged);
+  CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("jsButton", data.Button);
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("keyModifiers", data.Modifiers);

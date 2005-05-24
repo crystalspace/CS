@@ -53,6 +53,8 @@ chronological order.
 	  leading to crashes.
 	- Erroroman added translation support for bones in gemesh skeletal 
 	  animation
+	- Adam added the axesChanged bitmask to csJoystickEventData
+	- Adam added many-axes support to csMouseEventData
 23-May-2005
 	- res added an implementation of red-black-trees, csRedBlackTree.
 	- res started working on the new "fat" renderloop. Can at the moment
