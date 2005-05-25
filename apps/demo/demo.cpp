@@ -649,7 +649,7 @@ void Demo::DrawEditInfo ()
       	tms-tms1); hh += fh;
     }
     GfxWrite (ww, hh, col_black, col_white, "Right Path Info:"); hh += fh;
-    if (map_selpoint < np->GetPointCount ()-1)
+    if (map_selpoint < np->Length ()-1)
     {
       csVector3 v1;
       np->GetPositionVector (map_selpoint+1, v1);
@@ -763,7 +763,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  // with the previous and next point.
 	  // Make the forward vector look along the path. i.e. let it look
 	  // to an average direction as specified by next and previous point.
-	  if (map_selpoint <= 0 || map_selpoint >= np->GetPointCount ()-1)
+	  if (map_selpoint <= 0 || map_selpoint >= np->Length ()-1)
 	  {
 	    ShowMessage ("The 'y' operation can't work on this point!\n");
 	  }
@@ -1038,8 +1038,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	      np->SetUpVector (map_selpoint, v);
 	      np->GetForwardVector (map_selpoint-1, v);
 	      np->SetForwardVector (map_selpoint, v);
-	      np->SetTimeValue (map_selpoint,
-	    	  np->GetTimeValue (map_selpoint-1));
+	      np->SetTime (map_selpoint, np->GetTime (map_selpoint-1));
 	    }
 	    else
 	    {
@@ -1053,9 +1052,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	      np->GetForwardVector (map_selpoint-1, v1);
 	      np->GetForwardVector (map_selpoint+1, v2);
 	      np->SetForwardVector (map_selpoint, (v1+v2)/2.);
-	      np->SetTimeValue (map_selpoint,
-	    	  (np->GetTimeValue (map_selpoint-1)+
-		   np->GetTimeValue (map_selpoint+1)) / 2.0f);
+	      np->SetTime (map_selpoint,
+	    	  (np->GetTime (map_selpoint-1)+
+		   np->GetTime (map_selpoint+1)) / 2.0f);
 	    }
 	  }
           break;
@@ -1081,7 +1080,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	      else dt /= 50.;
 	      t -= dt;
 	      if (t < t1) t = t1;
-	      np->SetTimeValue (map_selpoint, t);
+	      np->SetTime (map_selpoint, t);
 	    }
 	  }
 	  break;

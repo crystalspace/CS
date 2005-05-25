@@ -302,7 +302,7 @@ void PathTut::Animate (csTicks elapsedTime)
     // Update the Sprite Position.
     m_CurrentTime += elapsedTime;
     float time_val = (float)m_CurrentTime / (float)m_Duration;
-    m_Path->Calculate (time_val);
+    m_Path->CalculateAtTime (time_val);
     m_Path->GetInterpolatedPosition (pos);
     m_Path->GetInterpolatedForward (forward);
     m_Path->GetInterpolatedUp (up);
@@ -362,7 +362,7 @@ void PathTut::InitializePath ()
   time_vals[2] = 0.5;
   time_vals[3] = 0.75;
   time_vals[4] = 1.0;
-  m_Path->SetTimeValues (time_vals);
+  m_Path->SetTimes (time_vals);
 
   // Path Setup is complete now.
 }

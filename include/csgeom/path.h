@@ -39,25 +39,29 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class CS_CRYSTALSPACE_EXPORT csPath : public csCatmullRomSpline
+class CS_CRYSTALSPACE_EXPORT csPath : public iPath
 {
+protected:
+  csCatmullRomSpline spline;
+
 private:
   void SetVectorAsDimensionValues (int dim, csVector3* v)
   {
     int i;
+    int N = spline.GetPointCount();
     float* x, * y, * z;
-    x = new float [GetPointCount ()];
-    y = new float [GetPointCount ()];
-    z = new float [GetPointCount ()];
-    for (i = 0 ; i < GetPointCount () ; i++)
+    x = new float [N];
+    y = new float [N];
+    z = new float [N];
+    for (i = 0 ; i < N ; i++)
     {
       x[i] = v[i].x;
       y[i] = v[i].y;
       z[i] = v[i].z;
     }
-    SetDimensionValues (dim+0, x);
-    SetDimensionValues (dim+1, y);
-    SetDimensionValues (dim+2, z);
+    spline.SetDimensionValues (dim+0, x);
+    spline.SetDimensionValues (dim+1, y);
+    spline.SetDimensionValues (dim+2, z);
     delete[] x;
     delete[] y;
     delete[] z;
@@ -67,156 +71,207 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Create a path with p points.
-  csPath (int p) : csCatmullRomSpline (9, p)
+  csPath (int p) : spline (9, p)
   {
     SCF_CONSTRUCT_IBASE (0);
-    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPath);
   }
 
   /// Destroy the path.
   virtual ~csPath ()
   {
-    SCF_DESTRUCT_EMBEDDED_IBASE (scfiPath);
     SCF_DESTRUCT_IBASE();
   }
 
   /// Get the number of vector points in this spline
-  int Length ()
+  virtual int Length ()
   {
-    return GetPointCount();
+    return spline.GetPointCount();
   }
-  /// Calculate
-  void CalculateAtTime (float time)
+  /**
+   * Get the number of vector points in this spline.
+   * \deprecated Use Length() instead.
+   */
+  int GetPointCount()
   {
-    Calculate (time);
+    return Length();
   }
-  int GetCurrentIndex ()
+  /// Calculate internal values for this spline given some time value.
+  virtual void CalculateAtTime (float time)
   {
-    return csCatmullRomSpline::GetCurrentIndex();
+    spline.Calculate (time);
   }
-  float GetTime (int idx)
+  /**
+   * Calculate internal values for this spline given some time value.
+   * \deprecated Use CalculateAtTime() instead.
+   */
+  virtual void Calculate (float time)
   {
-    return GetTimeValue(idx);
+    CalculateAtTime(time);
   }
-  void SetTime (int idx, float t)
+  /// Get current index.
+  virtual int GetCurrentIndex ()
   {
-    SetTimeValue(idx,t);
+    return spline.GetCurrentIndex();
   }
-
+  /// Get one time point.
+  virtual float GetTime (int idx)
+  {
+    return spline.GetTimeValue(idx);
+  }
+  /**
+   * Get one time point.
+   * \deprecated Use GetTime() instead.
+   */
+  float GetTimeValue (int idx) const
+  {
+    return spline.GetTimeValue(idx);
+  }
+  /// Set one time point.
+  virtual void SetTime (int idx, float t)
+  {
+    spline.SetTimeValue(idx,t);
+  }
+  /**
+   * Set one time point.
+   * \deprecated Use SetTime() instead.
+   */
+  virtual void SetTimeValue (int idx, float t)
+  {
+    SetTime(idx, t);
+  }
+  /**
+   * Set the time values. 't' should point to an array containing
+   * 'num_points' values. These values typically start with 0 and end
+   * with 1. Other values are also possible the but the values should
+   * rise. The given array is copied.
+   */
+  void SetTimes (float const* t)
+  {
+    spline.SetTimeValues(t);
+  }
+  /**
+   * Set the time values.
+   * \deprecated Use SetTimes() instead.
+   */
+  void SetTimeValues (float const* t)
+  {
+    SetTimes(t);
+  }
+  /// Get the time values.
+  float const* GetTimes () const
+  {
+    return spline.GetTimeValues();
+  }
+  /**
+   * Get the time values.
+   * \deprecated Use GetTimes() instead.
+   */
+  float const* GetTimeValues () const
+  {
+    return GetTimes();
+  }
   /// Set the position vectors (first three dimensions of the cubic spline).
-  void SetPositionVectors (csVector3* v)
+  virtual void SetPositionVectors (csVector3* v)
   {
     SetVectorAsDimensionValues (0, v);
   }
   /// Set the up vectors (dimensions 3 to 5).
-  void SetUpVectors (csVector3* v)
+  virtual void SetUpVectors (csVector3* v)
   {
     SetVectorAsDimensionValues (3, v);
   }
   /// Set the forward vectors (dimensions 6 to 8).
-  void SetForwardVectors (csVector3* v)
+  virtual void SetForwardVectors (csVector3* v)
   {
     SetVectorAsDimensionValues (6, v);
   }
   /// Set one position vector.
-  void SetPositionVector (int idx, const csVector3& v)
+  virtual void SetPositionVector (int idx, const csVector3& v)
   {
-    SetDimensionValue (0, idx, v.x);
-    SetDimensionValue (1, idx, v.y);
-    SetDimensionValue (2, idx, v.z);
+    spline.SetDimensionValue (0, idx, v.x);
+    spline.SetDimensionValue (1, idx, v.y);
+    spline.SetDimensionValue (2, idx, v.z);
   }
   /// Set one up vector.
-  void SetUpVector (int idx, const csVector3& v)
+  virtual void SetUpVector (int idx, const csVector3& v)
   {
-    SetDimensionValue (3, idx, v.x);
-    SetDimensionValue (4, idx, v.y);
-    SetDimensionValue (5, idx, v.z);
+    spline.SetDimensionValue (3, idx, v.x);
+    spline.SetDimensionValue (4, idx, v.y);
+    spline.SetDimensionValue (5, idx, v.z);
   }
   /// Set one forward vector.
-  void SetForwardVector (int idx, const csVector3& v)
+  virtual void SetForwardVector (int idx, const csVector3& v)
   {
-    SetDimensionValue (6, idx, v.x);
-    SetDimensionValue (7, idx, v.y);
-    SetDimensionValue (8, idx, v.z);
+    spline.SetDimensionValue (6, idx, v.x);
+    spline.SetDimensionValue (7, idx, v.y);
+    spline.SetDimensionValue (8, idx, v.z);
   }
   /// Get one position vector.
-  void GetPositionVector (int idx, csVector3& v)
+  virtual void GetPositionVector (int idx, csVector3& v)
   {
-    v.x = GetDimensionValue (0, idx);
-    v.y = GetDimensionValue (1, idx);
-    v.z = GetDimensionValue (2, idx);
+    v.x = spline.GetDimensionValue (0, idx);
+    v.y = spline.GetDimensionValue (1, idx);
+    v.z = spline.GetDimensionValue (2, idx);
   }
   /// Get one up vector.
-  void GetUpVector (int idx, csVector3& v)
+  virtual void GetUpVector (int idx, csVector3& v)
   {
-    v.x = GetDimensionValue (3, idx);
-    v.y = GetDimensionValue (4, idx);
-    v.z = GetDimensionValue (5, idx);
+    v.x = spline.GetDimensionValue (3, idx);
+    v.y = spline.GetDimensionValue (4, idx);
+    v.z = spline.GetDimensionValue (5, idx);
   }
   /// Get one forward vector.
-  void GetForwardVector (int idx, csVector3& v)
+  virtual void GetForwardVector (int idx, csVector3& v)
   {
-    v.x = GetDimensionValue (6, idx);
-    v.y = GetDimensionValue (7, idx);
-    v.z = GetDimensionValue (8, idx);
+    v.x = spline.GetDimensionValue (6, idx);
+    v.y = spline.GetDimensionValue (7, idx);
+    v.z = spline.GetDimensionValue (8, idx);
   }
 
   /// Get the interpolated position.
-  void GetInterpolatedPosition (csVector3& pos)
+  virtual void GetInterpolatedPosition (csVector3& pos)
   {
-    pos.x = GetInterpolatedDimension (0);
-    pos.y = GetInterpolatedDimension (1);
-    pos.z = GetInterpolatedDimension (2);
+    pos.x = spline.GetInterpolatedDimension (0);
+    pos.y = spline.GetInterpolatedDimension (1);
+    pos.z = spline.GetInterpolatedDimension (2);
   }
   /// Get the interpolated up vector.
-  void GetInterpolatedUp (csVector3& pos)
+  virtual void GetInterpolatedUp (csVector3& pos)
   {
-    pos.x = GetInterpolatedDimension (3);
-    pos.y = GetInterpolatedDimension (4);
-    pos.z = GetInterpolatedDimension (5);
+    pos.x = spline.GetInterpolatedDimension (3);
+    pos.y = spline.GetInterpolatedDimension (4);
+    pos.z = spline.GetInterpolatedDimension (5);
   }
   /// Get the interpolated forward vector.
-  void GetInterpolatedForward (csVector3& pos)
+  virtual void GetInterpolatedForward (csVector3& pos)
   {
-    pos.x = GetInterpolatedDimension (6);
-    pos.y = GetInterpolatedDimension (7);
-    pos.z = GetInterpolatedDimension (8);
+    pos.x = spline.GetInterpolatedDimension (6);
+    pos.y = spline.GetInterpolatedDimension (7);
+    pos.z = spline.GetInterpolatedDimension (8);
   }
-
-#ifndef SWIG
-  struct PathEmbed : public iPath
+  /// Get the values for some dimension.
+  float const* GetDimensionValues (int dim) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csPath);
-    virtual int Length () { return scfParent->Length(); }
-    virtual void CalculateAtTime (float t) { scfParent->CalculateAtTime(t); }
-    virtual int GetCurrentIndex () { return scfParent->GetCurrentIndex(); }
-    virtual void SetPositionVectors (csVector3* v)
-    { scfParent->SetPositionVectors(v); }
-    virtual void SetUpVectors (csVector3* v) { scfParent->SetUpVectors(v); }
-    virtual void SetForwardVectors (csVector3* v)
-    { scfParent->SetForwardVectors(v); }
-    virtual void SetPositionVector (int idx, const csVector3& v)
-    { scfParent->SetPositionVector(idx,v); }
-    virtual void SetUpVector (int idx, const csVector3& v)
-    { scfParent->SetUpVector(idx,v); }
-    virtual void SetForwardVector (int idx, const csVector3& v)
-    { scfParent->SetForwardVector(idx,v); }
-    virtual void GetPositionVector (int idx, csVector3& v)
-    { scfParent->GetPositionVector(idx,v); }
-    virtual void GetUpVector (int idx, csVector3& v)
-    { scfParent->GetUpVector(idx,v); }
-    virtual void GetForwardVector (int idx, csVector3& v)
-    { scfParent->GetForwardVector(idx,v); }
-    virtual float GetTime (int idx) { return scfParent->GetTime(idx); }
-    virtual void SetTime (int idx, float t) { scfParent->SetTime(idx,t); }
-    virtual void GetInterpolatedPosition (csVector3& pos)
-    { scfParent->GetInterpolatedPosition(pos); }
-    virtual void GetInterpolatedUp (csVector3& pos)
-    { scfParent->GetInterpolatedUp(pos); }
-    virtual void GetInterpolatedForward (csVector3& pos)
-    { scfParent->GetInterpolatedForward(pos); }
-  } scfiPath;
-#endif // SWIG
+    return spline.GetDimensionValues(dim);
+  }
+  /// Get the value for some dimension.
+  float GetDimensionValue (int dim, int idx) const
+  {
+    return spline.GetDimensionValue(dim, idx);
+  }
+  /**
+   * Insert a point after some index. If index == -1 add a point before all
+   * others.
+   */
+  void InsertPoint (int idx)
+  {
+    spline.InsertPoint(idx);
+  }
+  /// Remove a point at the index.
+  void RemovePoint (int idx)
+  {
+    spline.RemovePoint(idx);
+  }
 };
 
 /** @} */

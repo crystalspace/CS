@@ -391,7 +391,7 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
   fy = np->GetDimensionValues (7);
   fz = np->GetDimensionValues (8);
   int j;
-  for (j = 0 ; j < np->GetPointCount () ; j++)
+  for (j = 0 ; j < np->Length () ; j++)
   {
     int col = demo->col_red;
     if (hi && selpoint == j) col = demo->col_green;
