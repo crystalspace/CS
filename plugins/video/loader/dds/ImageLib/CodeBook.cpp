@@ -402,7 +402,7 @@ cbVector	V;
 void ImgCodeBook::FromImageUnique(Image32 *pImg, Color* pForceColor)
 {
 long		Size;
-Color		*pPix, *pDest;
+Color		*pPix, *pDest = 0;
 long		x, y;
 long		Width, Height;
 cbVector	V, f;

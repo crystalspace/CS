@@ -29,7 +29,9 @@ typedef uint8 BYTE;
 typedef uint16 WORD;
 typedef uint32 DWORD;
 typedef bool BOOL;
+#undef TRUE
 #define TRUE true
+#undef FALSE
 #define FALSE false
 #endif
 

@@ -145,6 +145,13 @@ int csMouseEventHelper::GetButton (const iEvent *event)
   return res;
 }
 
+int csMouseEventHelper::GetNumAxes(const iEvent *event)
+{
+  int res = 0;
+  event->Retrieve("mNumAxes", res);
+  return res;
+}
+
 bool csMouseEventHelper::GetEventData (const iEvent* event, 
 					csMouseEventData& data)
 {
