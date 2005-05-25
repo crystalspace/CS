@@ -79,6 +79,19 @@ struct iMaterial;
  * This texture will not be filtered, even if texture filtering is available.
  */
 #define CS_TEXTURE_NOFILTER		0x00000020
+/**
+ * Store texture as non-power-of-two sized (NPOTS) if possible.
+ * \remarks On a lot of hardware, support for NPOTS-texture is rather limited;
+ *  for example, commonly only clamped and textures without mipmaps are 
+ *  supported, hence a texture will may be considered for NPOTS use if the 
+ *  CS_TEXTURE_CLAMP and CS_TEXTURE_NOMIPMAPS flags are also set.
+ *  Some hardware may not support NPOTS textures at all. It is at the 
+ *  discretion of the renderer to decide whether a texture really becomes
+ *  NPOTS or not. This flag serves merely as an expression of a wish that
+ *  a texture should be NPOTS if possible. This flag will be set on a texture
+ *  if that is the case or not otherwise.
+ */
+#define CS_TEXTURE_NPOTS		0x00000040
 /** @} */
 
 SCF_VERSION (iRendererLightmap, 1, 1, 0);

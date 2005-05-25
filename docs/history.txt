@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-May-2005
+	- res added (limited) support for non-power-of-two-sized textures.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 

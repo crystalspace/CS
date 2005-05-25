@@ -9730,6 +9730,33 @@ typedef GLvoid (csAPIENTRY* csGLGENERATEMIPMAPEXT) (GLenum target);
 typedef GLvoid (csAPIENTRY* csGLSTRINGMARKERGREMEDY) (GLsizei len, const GLvoid* string);
 
 /** @} */
+/**\name GL_EXT_texture_rectangle constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt</a>.
+ * @{ */
+#ifndef GL_TEXTURE_RECTANGLE_EXT
+#define GL_TEXTURE_RECTANGLE_EXT                                     0x84F5
+#endif
+
+#ifndef GL_TEXTURE_BINDING_RECTANGLE_EXT
+#define GL_TEXTURE_BINDING_RECTANGLE_EXT                             0x84F6
+#endif
+
+#ifndef GL_PROXY_TEXTURE_RECTANGLE_EXT
+#define GL_PROXY_TEXTURE_RECTANGLE_EXT                               0x84F7
+#endif
+
+#ifndef GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT
+#define GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT                            0x84F8
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_texture_rectangle functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -14599,6 +14626,11 @@ public:
 
 
   /** @} */
+  /**\name GL_EXT_texture_rectangle functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -15088,6 +15120,9 @@ public:
   /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/GREMEDY/string_marker.txt">GL_GREMEDY_string_marker</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_GREMEDY_string_marker(). */
   bool CS_GL_GREMEDY_string_marker;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt">GL_EXT_texture_rectangle</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_texture_rectangle(). */
+  bool CS_GL_EXT_texture_rectangle;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -15251,6 +15286,7 @@ protected:
   bool tested_CS_GL_EXT_framebuffer_object;
   bool tested_CS_GL_EXT_pixel_buffer_object;
   bool tested_CS_GL_GREMEDY_string_marker;
+  bool tested_CS_GL_EXT_texture_rectangle;
 
 };
 
@@ -20936,6 +20972,35 @@ public:
       EXTMGR_FUNC_INIT(glStringMarkerGREMEDY, GLSTRINGMARKERGREMEDY);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_GREMEDY_string_marker)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_rectangle.txt">GL_EXT_texture_rectangle</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_texture_rectangle. */
+  void InitGL_EXT_texture_rectangle ()
+  {
+    if (tested_CS_GL_EXT_texture_rectangle) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_texture_rectangle = true;
+    const char* ext = "GL_EXT_texture_rectangle";
+
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_texture_rectangle = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_texture_rectangle;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_texture_rectangle)
     }
     else
     {

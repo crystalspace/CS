@@ -57,7 +57,7 @@ csTextureHandle::csTextureHandle (csTextureManager* texman, iImage* Image,
 
   image = Image;
   DG_LINK (this, image);
-  flags = Flags;
+  flags = Flags & ~CS_TEXTURE_NPOTS;
 
   tex [0] = tex [1] = tex [2] = tex [3] = 0;
 

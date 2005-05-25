@@ -92,7 +92,14 @@ struct iTextureHandle : public iBase
 
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
-  enum { CS_TEX_IMG_1D = 0, CS_TEX_IMG_2D, CS_TEX_IMG_3D, CS_TEX_IMG_CUBEMAP };
+  enum 
+  { 
+    CS_TEX_IMG_1D = 0, 
+    CS_TEX_IMG_2D, 
+    CS_TEX_IMG_3D, 
+    CS_TEX_IMG_CUBEMAP,
+    CS_TEX_IMG_RECT
+  };
   /**
    * Texture Depth Indices are used for Cubemap interface
    */
@@ -123,7 +130,7 @@ struct iTextureHandle : public iBase
 
   /**
    * Get the texture target. Note the texture target is determined by the 
-   * image from which the texture was created.
+   * image from which the texture was created and possibly the texture flags.
    */
   virtual int GetTextureTarget () const = 0;
 

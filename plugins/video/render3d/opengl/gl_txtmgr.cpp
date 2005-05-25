@@ -85,7 +85,23 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
   Handle = 0;
   textureClass = txtmgr->GetTextureClassID ("default");
 
+  const uint npotsNeededFlags = (CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
+  if (flags & CS_TEXTURE_NPOTS)
+  {
+    if ((!G3D->ext->CS_GL_ARB_texture_rectangle
+      && !G3D->ext->CS_GL_EXT_texture_rectangle
+      && !G3D->ext->CS_GL_NV_texture_rectangle
+      && !((flags & npotsNeededFlags) != npotsNeededFlags))
+      || (image->GetImageType() != csimg2D)
+      || (csIsPowerOf2 (image->GetWidth()) && csIsPowerOf2 (image->GetHeight())))
+    {
+      flags &= ~CS_TEXTURE_NPOTS;
+    }
+    else
+      target = CS_TEX_IMG_RECT;
+  }
   texFlags.Set (flagsPublicMask, flags);
+
   transp_color.red = transp_color.green = transp_color.blue = 0;
   if (image->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
@@ -389,6 +405,14 @@ void csGLTextureHandle::AdjustSizePo2 ()
   orig_height = image->GetHeight();
   orig_d = image->GetDepth();
 
+  if (texFlags.Check (CS_TEXTURE_NPOTS)) 
+  {
+    actual_width = MIN(orig_width, G3D->maxNpotsTexSize);
+    actual_height = MIN(orig_height, G3D->maxNpotsTexSize);
+    actual_d = MIN(orig_d, G3D->maxNpotsTexSize);
+    return;
+  }
+
   int newwidth, newheight, newd;
 
   ComputeNewPo2ImageSize (orig_width, orig_height, orig_d, newwidth, newheight,
@@ -648,6 +672,19 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 {
   // @@@ Keycolor not yet supported here!
   
+  GLenum textarget;
+  switch (target)
+  {
+    case CS_TEX_IMG_2D:
+      textarget = GL_TEXTURE_2D;
+      break;
+    case CS_TEX_IMG_RECT:
+      textarget = GL_TEXTURE_RECTANGLE_ARB;
+      break;
+    default:
+      return;
+  }
+
   // Activate the texture.
   Precache ();
   G3D->ActivateTexture (this);
@@ -664,7 +701,7 @@ void csGLTextureHandle::Blit (int x, int y, int width,
     if (!isWholeImage)
     {
       uint8* pixels = new uint8[actual_width * actual_height * 4];
-      glGetTexImage (GL_TEXTURE_2D, 0, textureFormat, GL_UNSIGNED_BYTE, 
+      glGetTexImage (textarget, 0, textureFormat, GL_UNSIGNED_BYTE, 
 	pixels);
 
       if (!IsWasRenderTarget())
@@ -673,7 +710,7 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 	SetupAutoMipping();
       }
 
-      glTexImage2D (GL_TEXTURE_2D, 0, textureFormat, actual_width, 
+      glTexImage2D (textarget, 0, textureFormat, actual_width, 
 	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, pixels);
       delete[] pixels;
     }
@@ -685,13 +722,13 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 	SetupAutoMipping();
       }
 
-      glTexImage2D (GL_TEXTURE_2D, 0, textureFormat, actual_width, 
+      glTexImage2D (textarget, 0, textureFormat, actual_width, 
 	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, data);
       return;
     }
   }
   // Do the copy.
-  glTexSubImage2D (GL_TEXTURE_2D, 0, x, y, 
+  glTexSubImage2D (textarget, 0, x, y, 
       width, height,
       textureFormat, GL_UNSIGNED_BYTE, data);
   //SetNeedMips (true);
@@ -864,6 +901,41 @@ void csGLTextureHandle::Load ()
       }
     }
   }
+  else if (target == CS_TEX_IMG_RECT)
+  {
+    G3D->statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, wrapMode);
+
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, magFilter);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
+      (texFlags.Check (CS_TEXTURE_NOMIPMAPS)) ? magFilter : minFilter);
+
+    if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+    {
+      glTexParameterf (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+        txtmgr->texture_filter_anisotropy);
+    }
+
+    size_t i;
+    for (i = 0; i < uploadData->Length(); i++)
+    {
+      const csGLUploadData& uploadData = this->uploadData->Get (i);
+      if (uploadData.compressed)
+      {
+	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_RECTANGLE_ARB, 
+          uploadData.mip, uploadData.targetFormat, uploadData.w, uploadData.h, 
+	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
+      }
+      else
+      {
+	glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, uploadData.mip, 
+	  uploadData.targetFormat, 
+	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat, 
+	  uploadData.sourceType, uploadData.image_data);
+      }
+    }
+  }
   delete uploadData; uploadData = 0;
 }
 
@@ -878,6 +950,8 @@ void csGLTextureHandle::Unload ()
     csGLTextureManager::UnsetTexture (GL_TEXTURE_3D, Handle);
   else if (target == CS_TEX_IMG_CUBEMAP)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_CUBE_MAP, Handle);
+  else if (target == CS_TEX_IMG_RECT)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
   glDeleteTextures (1, &Handle);
   Handle = 0;
 }

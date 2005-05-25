@@ -6391,4 +6391,10 @@
       <arg name="string" type="GLvoid" const="true" pointer="true" />
     </function>
   </extension>
+  <extension name="GL_EXT_texture_rectangle" type="GL">
+    <token name="GL_TEXTURE_RECTANGLE_EXT" value="0x84F5" />
+    <token name="GL_TEXTURE_BINDING_RECTANGLE_EXT" value="0x84F6" />
+    <token name="GL_PROXY_TEXTURE_RECTANGLE_EXT" value="0x84F7" />
+    <token name="GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT" value="0x84F8" />
+  </extension>
 </extensionlist>

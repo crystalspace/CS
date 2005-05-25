@@ -231,6 +231,7 @@ private:
 
   bool verbose;
   csGraphics3DCaps rendercaps;
+  GLint maxNpotsTexSize;
 
   csRef<iStringSet> strings;
 
@@ -382,6 +383,10 @@ private:
  */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
   GLuint texunittarget[16]; // @@@ Hardcoded max number of units
+  csRef<csGLTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  csArray<csRef<iRenderBuffer> > npotsFixupScrap;
+
+  csRef<iRenderBuffer> DoNPOTSFixup (iRenderBuffer* buffer, int unit);
 
   // Draw a 2D polygon (screen space coordinates) with correct Z information
   // given the plane. This function will not set up any texture mapping,

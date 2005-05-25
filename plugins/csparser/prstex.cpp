@@ -235,6 +235,17 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_DITHER);
 	}
         break;
+      case XMLTOKEN_NPOTS:
+	{
+	  bool npots;
+	  if (!SyntaxService->ParseBool (child, npots, true))
+	    goto error;
+          if (npots)
+	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NPOTS);
+          else
+	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NPOTS);
+	}
+        break;
       case XMLTOKEN_KEEPIMAGE:
         {
 	  if (!SyntaxService->ParseBool (child, keep_image, true))

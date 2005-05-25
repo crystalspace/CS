@@ -381,6 +381,7 @@ public:
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
+  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_RECTANGLE_ARB)
   DECLARE_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
   DECLARE_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
   DECLARE_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
@@ -465,6 +466,12 @@ public:
         enabled_GL_TEXTURE_3D[i] = glIsEnabled (GL_TEXTURE_3D);
         enabled_GL_TEXTURE_CUBE_MAP[i] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
         enabled_GL_TEXTURE_COORD_ARRAY[i] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
+	if (extmgr->CS_GL_ARB_texture_rectangle
+	  || extmgr->CS_GL_EXT_texture_rectangle
+	  || extmgr->CS_GL_NV_texture_rectangle)
+	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = glIsEnabled (GL_TEXTURE_RECTANGLE_ARB);
+	else
+	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = false;
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[i]);
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[i]);
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[i]);
@@ -478,6 +485,12 @@ public:
       enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
       enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
       enabled_GL_TEXTURE_COORD_ARRAY[0] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
+	if (extmgr->CS_GL_ARB_texture_rectangle
+	  || extmgr->CS_GL_EXT_texture_rectangle
+	  || extmgr->CS_GL_NV_texture_rectangle)
+	  enabled_GL_TEXTURE_RECTANGLE_ARB[0] = glIsEnabled (GL_TEXTURE_RECTANGLE_ARB);
+	else
+	  enabled_GL_TEXTURE_RECTANGLE_ARB[0] = false;
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[0]);
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[0]);
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[0]);
@@ -489,6 +502,7 @@ public:
         enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
         enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
         enabled_GL_TEXTURE_COORD_ARRAY[i] = enabled_GL_TEXTURE_COORD_ARRAY[0];
+	enabled_GL_TEXTURE_RECTANGLE_ARB[i] = enabled_GL_TEXTURE_RECTANGLE_ARB[0];
       }
     }
     enabled_GL_SCISSOR_TEST = glIsEnabled (GL_SCISSOR_TEST);
@@ -565,6 +579,7 @@ public:
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
+  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_RECTANGLE_ARB)
   IMPLEMENT_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
   IMPLEMENT_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
   IMPLEMENT_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)

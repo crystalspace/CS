@@ -39,6 +39,7 @@
 
 #include "cstool/bitmasktostr.h"
 #include "cstool/fogmath.h"
+#include "cstool/rbuflock.h"
 
 #include "igeom/clip2d.h"
 
@@ -800,28 +801,19 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
   ext->InitGL_EXT_texture_lod_bias ();
-  ext->InitGL_EXT_stencil_wrap ();
-  ext->InitGL_EXT_stencil_two_side ();
+  //ext->InitGL_EXT_stencil_wrap ();
+  //ext->InitGL_EXT_stencil_two_side ();
   ext->InitGL_ARB_point_parameters ();
   ext->InitGL_ARB_point_sprite ();
   ext->InitGL_EXT_framebuffer_object ();
-  /*
-    Check whether to init NVidia-only exts.
-    Note: NV extensions supported by multiple vendors
-     should always be inited.
-   */
-  if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
+  ext->InitGL_ARB_texture_rectangle ();
+  if (!ext->CS_GL_ARB_texture_rectangle)
   {
+    ext->InitGL_EXT_texture_rectangle();
+    if (!ext->CS_GL_EXT_texture_rectangle)
+      ext->InitGL_NV_texture_rectangle();
   }
-  /*
-    Check whether to init ATI-only exts.
-    Note: ATI extensions supported by multiple vendors
-     should always be inited.
-   */
-  if (config->GetBool ("Video.OpenGL.UseATIExt", true))
-  {
-    ext->InitGL_ATI_separate_stencil ();
-  }
+  //ext->InitGL_ATI_separate_stencil ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
@@ -849,6 +841,12 @@ bool csGLGraphics3D::Open ()
       "Maximum texture size is %dx%d", mts, mts);
   rendercaps.maxTexHeight = mts;
   rendercaps.maxTexWidth = mts;
+  if (ext->CS_GL_ARB_texture_rectangle
+    || ext->CS_GL_EXT_texture_rectangle
+    || ext->CS_GL_NV_texture_rectangle)
+  {
+    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, &maxNpotsTexSize);
+  }
 
   rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters &&
     ext->CS_GL_ARB_point_sprite;
@@ -1369,9 +1367,11 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
     statecache->Disable_GL_COLOR_ARRAY ();
   }
 
+  csRef<iRenderBuffer> bufferKeeper;
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
   if (buffer)
   {
+    if (needNPOTSfixup[0].IsValid()) buffer = bufferKeeper = DoNPOTSFixup (buffer, 0);
     AssignSpecBuffer (CS_VATTRIB_TEXCOORD0, buffer);
     GLenum compType;
     data = 
@@ -1404,6 +1404,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
       buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
       if (buffer)
       {
+        if (needNPOTSfixup[i].IsValid()) buffer = bufferKeeper = DoNPOTSFixup (buffer, i);
         AssignSpecBuffer (CS_VATTRIB_TEXCOORD0+i, buffer);
 	GLenum compType;
 	data = 
@@ -1440,7 +1441,20 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     if (CS_VATTRIB_IS_GENERIC (att)) 
       AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
     else 
-      AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
+    {
+      bool assigned = false;
+      if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+      {
+        unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
+        if (needNPOTSfixup[unit].IsValid())
+        {
+          AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 
+            buffer = DoNPOTSFixup (buffer, unit));
+          assigned = true;
+        }
+      }
+      if (!assigned) AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
+    }
 
     GLenum compType;
     void *data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
@@ -1518,6 +1532,14 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       iRenderBuffer *b = spec_renderBuffers[i];
       if (b) RenderRelease (b);// b->RenderRelease ();
+      if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
+      {
+        if (needNPOTSfixup[i-CS_VATTRIB_TEXCOORD0].IsValid())
+        {
+          npotsFixupScrap.Push (b);
+          needNPOTSfixup[i-CS_VATTRIB_TEXCOORD0] = 0;
+        }
+      }
       spec_renderBuffers[i] = 0;
     }
     for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
@@ -1532,22 +1554,6 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     for (i = 0; i < count; i++)
     {
       csVertexAttrib att = attribs[i];
-      if (CS_VATTRIB_IS_GENERIC (att))
-      {
-        if (gen_renderBuffers[att]) 
-        {
-          RenderRelease (gen_renderBuffers[att]);
-          gen_renderBuffers[att] = 0;
-        }
-      }
-      else
-      {
-        if (spec_renderBuffers[att]) 
-        {
-          RenderRelease (spec_renderBuffers[att]);
-          spec_renderBuffers[att] = 0;
-        }
-      }
       switch (att)
       {
       case CS_VATTRIB_POSITION:
@@ -1569,6 +1575,11 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
             statecache->SetActiveTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+          if (needNPOTSfixup[unit].IsValid())
+          {
+            npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
+            needNPOTSfixup[unit] = 0;
+          }
         }
         else if (CS_VATTRIB_IS_GENERIC(att) && ext->glDisableVertexAttribArrayARB)
         {
@@ -1578,6 +1589,22 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
         {
           //none, assert...
           CS_ASSERT_MSG("Unknown vertex attribute", 0);
+        }
+      }
+      if (CS_VATTRIB_IS_GENERIC (att))
+      {
+        if (gen_renderBuffers[att]) 
+        {
+          RenderRelease (gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST]);
+          gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST] = 0;
+        }
+      }
+      else
+      {
+        if (spec_renderBuffers[att]) 
+        {
+          RenderRelease (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
+          spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST] = 0;
         }
       }
     }
@@ -1614,12 +1641,39 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       statecache->Enable_GL_TEXTURE_CUBE_MAP ();
       statecache->SetTexture (GL_TEXTURE_CUBE_MAP, texHandle);
       break;
+    case iTextureHandle::CS_TEX_IMG_RECT:
+      statecache->Enable_GL_TEXTURE_RECTANGLE_ARB( );
+      statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, texHandle);
+      break;
     default:
       DeactivateTexture (unit);
       return false;
   }
   /*texunitenabled[unit] = true;
   texunittarget[unit] = gltxthandle->target;*/
+  bool doNPOTS = (gltxthandle->target == iTextureHandle::CS_TEX_IMG_RECT);
+  if (doNPOTS && (unit < 8))
+  {
+    csRef<iRenderBuffer> buffer;
+    csVertexAttrib attr;
+    if ((spec_renderBuffers[CS_VATTRIB_TEXCOORD0 + unit - 
+      CS_VATTRIB_SPECIFIC_FIRST] != 0))// @@@ Max 8 TEXCOORD buffers here
+    {
+      buffer = spec_renderBuffers[
+        CS_VATTRIB_TEXCOORD0 + unit - CS_VATTRIB_SPECIFIC_FIRST];
+      attr = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0 + unit);
+      DeactivateBuffers (&attr, 1);
+    }
+    needNPOTSfixup[unit] = gltxthandle;
+    if (buffer.IsValid())
+    {
+      // ActivateBuffers ensures fixup
+      iRenderBuffer* bufPtr = buffer;
+      ActivateBuffers (&attr, &bufPtr, 1);
+    }
+  }
+  else
+    needNPOTSfixup[unit] = 0;
   return true;
 }
 
@@ -1654,6 +1708,8 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
+  statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
+  needNPOTSfixup[unit] = 0;
 
   texunitenabled[unit] = false;
 }
@@ -2010,10 +2066,17 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // convert texture coords given above to normalized (0-1.0) texture
   // coordinates
   float ntx1,nty1,ntx2,nty2;
-  ntx1 = ((float)tx            ) / bitmapwidth;
-  ntx2 = ((float)tx + (float)tw) / bitmapwidth;
-  nty1 = ((float)ty            ) / bitmapheight;
-  nty2 = ((float)ty + (float)th) / bitmapheight;
+  ntx1 = ((float)tx            );
+  ntx2 = ((float)tx + (float)tw);
+  nty1 = ((float)ty            );
+  nty2 = ((float)ty + (float)th);
+  if (txt_mm->target != iTextureHandle::CS_TEX_IMG_RECT)
+  {
+    ntx1 /= bitmapwidth;
+    ntx2 /= bitmapwidth;
+    nty1 /= bitmapheight;
+    nty2 /= bitmapheight;
+  }
 
   // draw the bitmap
   glBegin (GL_QUADS);
@@ -2225,6 +2288,87 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
     else
       buffer->Release();
   }
+}
+
+template<typename T>
+static void DoFixup (iRenderBuffer* src, T* dest, 
+                     size_t elems, size_t comps, const int scales[])
+{
+  T* srcPtr = (T*)src->Lock (CS_BUF_LOCK_READ);
+  size_t srcStride = src->GetElementDistance();
+  for (size_t e = 0; e < elems; e++)
+  {
+    T* s = (T*)((uint8*)srcPtr + e * srcStride);
+    for (size_t c = 0; c < comps; c++)
+    {
+      *dest++ = (*s) * scales[c];
+    }
+  }
+  src->Release();
+}
+
+csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int unit)
+{
+  csRef<iRenderBuffer> scrapBuf;
+  if (npotsFixupScrap.Length() > 0) scrapBuf = npotsFixupScrap.Pop();
+  if (!scrapBuf.IsValid()
+    || (scrapBuf->GetElementCount() < buffer->GetElementCount())
+    || (scrapBuf->GetComponentCount() != buffer->GetComponentCount())
+    || (scrapBuf->GetComponentType() != buffer->GetComponentType()))
+  {
+    scrapBuf = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
+      CS_BUF_STREAM, buffer->GetComponentType(), buffer->GetComponentCount());
+  }
+
+  const int componentScale[] = {
+    needNPOTSfixup[unit]->actual_width, 
+    needNPOTSfixup[unit]->actual_height,
+    1, 1};
+
+  switch (scrapBuf->GetComponentType())
+  {
+    case CS_BUFCOMP_BYTE:
+      DoFixup (buffer, csRenderBufferLock<char> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_UNSIGNED_BYTE:
+      DoFixup (buffer, csRenderBufferLock<unsigned char> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_SHORT:
+      DoFixup (buffer, csRenderBufferLock<short> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_UNSIGNED_SHORT:
+      DoFixup (buffer, csRenderBufferLock<unsigned short> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_INT:
+      DoFixup (buffer, csRenderBufferLock<int> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_UNSIGNED_INT:
+      DoFixup (buffer, csRenderBufferLock<unsigned int> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_FLOAT:
+      DoFixup (buffer, csRenderBufferLock<float> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+    case CS_BUFCOMP_DOUBLE:
+      DoFixup (buffer, csRenderBufferLock<double> (scrapBuf).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale);
+      break;
+  }
+  return scrapBuf;
 }
 
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
