@@ -2367,6 +2367,9 @@ csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int un
         buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
+    default:
+      CS_ASSERT(false); // Should never happen.
+      break;
   }
   return scrapBuf;
 }
