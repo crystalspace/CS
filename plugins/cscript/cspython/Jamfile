@@ -52,6 +52,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     }
   }
   Clean cspythonclean : $(cspacepy) ;
+  Depends clean : cspythonclean ;
 
   rule InstallCSPythonPY
   {
