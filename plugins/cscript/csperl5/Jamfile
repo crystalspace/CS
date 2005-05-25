@@ -79,6 +79,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     Depends $(pmfile) : $(frozenpm) ;
   }
   Clean csperl5clean : $(pmfile) ;
+  Depends clean : csperl5clean ;
 
   rule InstallCSPerl5PM
   {
