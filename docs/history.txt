@@ -15,6 +15,8 @@ chronological order.
 	- Eric Sunshine added missing csMouseEventHelper::GetNumAxes()
 	  implementation.
 	- Eric Sunshine fixed DDS image loader so that it compiles on MacOS/X.
+	- Eric Sunshine added some missing dependencies on the 'clean' target
+	  in the scripting Jamfiles.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 
