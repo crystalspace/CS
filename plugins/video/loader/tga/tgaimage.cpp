@@ -296,7 +296,6 @@ bool ImageTgaFile::TgaLoader::get_current_pixel (uint8*& iBuffer, int Size,
     if (RLE_count == 0)
     { /* Have to restart run. */
       uint8 i;
-      i = *iBuffer++;
       if (!GetBytes (iBuffer, &i, 1)) return false;
       RLE_flag = (i & 0x80);
       if (RLE_flag == 0)
