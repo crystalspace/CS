@@ -3974,7 +3974,7 @@ sub ACQUIRE {
 ############# Class : cspace::csPath ##############
 
 package cspace::csPath;
-@ISA = qw( cspace cspace::csCatmullRomSpline cspace::iPath );
+@ISA = qw( cspace cspace::csCatmullRomSpline );
 %OWNER = ();
 %ITERATORS = ();
 *swig_scfRefCount_get = *cspacec::csPath_scfRefCount_get;
@@ -8414,6 +8414,10 @@ package cspace::csMouseEventData;
 *swig_x_set = *cspacec::csMouseEventData_x_set;
 *swig_y_get = *cspacec::csMouseEventData_y_get;
 *swig_y_set = *cspacec::csMouseEventData_y_set;
+*swig_axes_get = *cspacec::csMouseEventData_axes_get;
+*swig_axes_set = *cspacec::csMouseEventData_axes_set;
+*swig_numAxes_get = *cspacec::csMouseEventData_numAxes_get;
+*swig_numAxes_set = *cspacec::csMouseEventData_numAxes_set;
 *swig_Button_get = *cspacec::csMouseEventData_Button_get;
 *swig_Button_set = *cspacec::csMouseEventData_Button_set;
 *swig_Modifiers_get = *cspacec::csMouseEventData_Modifiers_get;
@@ -8460,6 +8464,8 @@ package cspace::csJoystickEventData;
 *swig_axes_set = *cspacec::csJoystickEventData_axes_set;
 *swig_numAxes_get = *cspacec::csJoystickEventData_numAxes_get;
 *swig_numAxes_set = *cspacec::csJoystickEventData_numAxes_set;
+*swig_axesChanged_get = *cspacec::csJoystickEventData_axesChanged_get;
+*swig_axesChanged_set = *cspacec::csJoystickEventData_axesChanged_set;
 *swig_Button_get = *cspacec::csJoystickEventData_Button_get;
 *swig_Button_set = *cspacec::csJoystickEventData_Button_set;
 *swig_Modifiers_get = *cspacec::csJoystickEventData_Modifiers_get;
