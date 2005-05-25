@@ -1041,6 +1041,8 @@ discovered later.
 
 @subheading @code{iEvent} Changes
 
+@subsubheading Property Bags
+
 The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and exhibits
 different return value semantics. Rather than returning a mere boolean result,
 it now returns one of the @samp{csEventError} enumeration constants.  Of
@@ -1068,6 +1070,47 @@ if (ev->Retrieve(@dots{}) == csEventErrNone)
   @dots{}
 @}
 @end example
+
+@subsubheading Mouse, Joystick, and Command event properties
+
+The @samp{union} containing the @samp{Mouse}, @samp{Joystick}, and @samp{Command}
+structures has been removed; all event attributes are now stored and accessed
+using the @code{Add()} and @code{Retrieve()} mechanisms.  To ease access to
+event data, use the static methods of the @samp{csMouseEventHelper}, 
+@samp{csJoystickEventHelper}, and @samp{csCommandEventHelper} classes.  
+For example, code such as the following:
+
+@example
+iEvent* ev = @dots{};
+let X = ev->Mouse.X;
+@end example
+
+@noindent
+should be changed to:
+
+@example
+iEvent* ev = @dots{};
+let X = csMouseEventHelper::GetX(ev);
+@end example
+
+@noindent
+See the @sc{api} documentation for details.
+
+@subsubheading Multiple mice
+
+There is now support for handling input from more than one mouse.
+You can retrieve the identity (basis 1) of the mouse producing a 
+mouse event with @code{csMouseEventHelper::GetNumber()}.
+
+@subsubheading Joystick and Mouse axes
+
+Joysticks can now have up to @samp{CS_MAX_JOYSTICK_AXES} axes,
+and mice can have up to @samp{CS_MAX_MOUSE_AXES}.  Their values should
+be accessed using the @code{csJoystickEventHelper::GetAxis()}
+and @code{csMouseEventHelper::GetAxis()} functions, respectively,
+where both devices and axes are enumerated basis 1.
+Each helper class also has @code{GetX()} and @code{GetY()} methods
+available; for joystick events, these are deprecated.
 
 @subheading Old Renderer Architecture Removal
 

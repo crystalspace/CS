@@ -22,6 +22,7 @@ chronological order.
 	  csutil/macosx and csplugincommon/macosx which caused linking to fail
 	  on account of undefined symbols on Tiger with gcc4. Thanks to Andreas
 	  Grosam <agrosam@onlinehome.de> for researching this.
+	- Adam Bradley documented event system changes in apimod100.txi
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 
