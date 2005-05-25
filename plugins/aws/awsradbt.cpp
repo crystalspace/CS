@@ -56,7 +56,7 @@ bool awsRadButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->GetInt (settings, "Alpha", alpha_level);
   pm->GetInt (settings, "Align", alignment);
-  caption.AttachNew (new scfString ());//??
+  caption.AttachNew (new scfString ());
   pm->GetString (settings, "Caption", caption);
 
   tex[0] = pm->GetTexture ("RadioButtonUp");
@@ -108,14 +108,11 @@ bool awsRadButton::SetProperty (const char *name, intptr_t parm)
 
     if (s && s->Length ())
     {
-      //??if (caption) caption->DecRef ();
       caption = s;
-      //??caption->IncRef ();
       Invalidate ();
     }
     else
     {
-      //??if (caption) caption->DecRef ();
       caption = 0;
     }
 

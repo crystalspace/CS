@@ -209,10 +209,8 @@ bool awsTab::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    //??if (caption) caption->DecRef ();
-
     if (s && s->Length ())
-      (caption = s);//??->IncRef ();
+      (caption = s);
     else
       caption = 0;
     Invalidate ();
@@ -520,7 +518,6 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
   DoLayout ();
 
   btn->Invalidate ();
-  //??caption->DecRef ();
   return (iAwsSource*)btn;
 }
 

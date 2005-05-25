@@ -149,19 +149,16 @@ bool awsCmdButton::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
+    //TODO Investigatre if calling Invalidate () always (also
+    //when the the string is 0 does not harm. luca
 #if 0
     if (s && s->Length ())
     {
-      //??if (caption) caption->DecRef ();
       caption = s;
-      //caption->IncRef ();
       Invalidate ();
     }
     else
     {
-      /*if (caption)
-        caption->DecRef ();*/
-
       caption = 0;
     }
 #endif

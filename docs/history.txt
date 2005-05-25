@@ -23,6 +23,8 @@ chronological order.
 	  on account of undefined symbols on Tiger with gcc4. Thanks to Andreas
 	  Grosam <agrosam@onlinehome.de> for researching this.
 	- Adam Bradley documented event system changes in apimod100.txi
+	- Luca removed his useless comments in the latest patch for AWS 
+	  (committed in his behald by res).
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 

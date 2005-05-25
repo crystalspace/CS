@@ -246,8 +246,6 @@ iAwsComponent *awsNotebookFactory::Create ()
 
 awsNotebookPage::awsNotebookPage ():
   tex(0),
-  /*caption (0),
-  icon (0),//??*/
   iconalign(0)
 {
   SetFlag (AWSF_CMP_ALWAYSERASE);
@@ -318,10 +316,8 @@ bool awsNotebookPage::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    //??if (caption) caption->DecRef ();
-
     if (s && s->Length ())
-      caption = s;//??)->IncRef ();
+      caption = s;
     else
       caption = 0;
     Invalidate ();
@@ -333,10 +329,8 @@ bool awsNotebookPage::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    //??if (icon) icon->DecRef ();
-
     if (s && s->Length ())
-      icon = s;//??)->IncRef ();
+      icon = s;
     else
       icon = 0;
 
@@ -378,7 +372,6 @@ awsNotebookButton::awsNotebookButton ():
   is_active(false),
   is_first(false),
   is_top(true),
-//??  caption (0),
   captured(false),
   icon_align(0),
   alpha_level(92)
@@ -403,13 +396,12 @@ bool awsNotebookButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetString (settings, "Caption", caption);
 
   tex[0] = pm->GetTexture ("Texture");
-  csRef<iString> tn;//??
+  csRef<iString> tn;
   tn.AttachNew (new scfString (""));
   if (pm->GetString (settings, "Image", tn))
     tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
 
-  
-  csRef<iString> in;//??
+  csRef<iString> in;
   in.AttachNew (new scfString (""));
   if (pm->GetString (settings, "Icon", in))
     tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
@@ -572,10 +564,8 @@ bool awsNotebookButton::SetProperty (const char *name, intptr_t parm)
   {
     iString *s = (iString *) (parm);
 
-    //??if (caption) caption->DecRef ();
-
     if (s && s->Length ())
-      caption = s;//??)->IncRef ();
+      caption = s;
     else
       caption = 0;
     Invalidate ();

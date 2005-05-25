@@ -49,7 +49,7 @@ bool awsLabel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  caption.AttachNew (new scfString (""));//??
+  caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
   pm->GetInt (settings, "Align", alignment);
 
@@ -88,14 +88,11 @@ bool awsLabel::SetProperty (const char *name, intptr_t parm)
 
     if (s && s->Length ())
     {
-      //??if (caption) caption->DecRef ();
       caption = s;
-      //??caption->IncRef ();
       Invalidate ();
     }
     else
     {
-      //??if (caption) caption->DecRef ();
       caption = 0;
     }
 

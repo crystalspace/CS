@@ -54,9 +54,6 @@ static void DriveTimer (intptr_t, iAwsSource *source)
 awsBarChart::awsBarChart ()
   :  inner_frame_style (fsNone),
      chart_options (0),
-     /*caption (0),
-     yText (0),
-     xText (0),//??*/
      items (0),
      count_items (0),
      items_buffer_size (0),
@@ -163,14 +160,11 @@ bool awsBarChart::SetProperty (const char *name, intptr_t parm)
 
     if (s && s->Length ())
     {
-      //??if (caption) caption->DecRef ();
       caption = s;
-      //??caption->IncRef ();
       Invalidate ();
     }
     else
     {
-      //??if (caption) caption->DecRef ();
       caption = 0;
     }
     return true;

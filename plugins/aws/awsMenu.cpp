@@ -46,7 +46,6 @@ awsMenuEntry::awsMenuEntry ()
 
 awsMenuEntry::~awsMenuEntry () 
 {
-  //??if (caption) caption->DecRef ();
   if (popup) popup->DecRef ();
   if (image) image->DecRef ();
   if (sub_menu_image) sub_menu_image->DecRef ();
@@ -71,9 +70,8 @@ bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->LookupIntKey ("MenuItemImageHeigth", image_width);
   pm->GetInt (settings, "ImageHeight", image_width);
 
-  iString* image_name2 = 0;//??
+  iString* image_name2 = 0;
   if (pm->LookupStringKey ("MenuItemSubMenuImage", image_name2))
-  //??if (image_name)
   {
     sub_menu_image = pm->GetTexture (image_name2->GetData (),
       image_name2->GetData ());
@@ -150,15 +148,12 @@ bool awsMenuEntry::SetProperty (const char *name, intptr_t parm)
     
     if (s && s->Length ())
     {
-      //??if (caption) caption->DecRef ();
       caption = s;
-      //??caption->IncRef (); 
       SizeToFit ();
       Invalidate ();
     }
     else
     {
-      //??if (caption) caption->DecRef ();
       caption = 0;
     }
     return true;
