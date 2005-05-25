@@ -2301,7 +2301,7 @@ static void DoFixup (iRenderBuffer* src, T* dest,
     T* s = (T*)((uint8*)srcPtr + e * srcStride);
     for (size_t c = 0; c < comps; c++)
     {
-      *dest++ = (*s) * scales[c];
+      *dest++ = (*s++) * scales[c];
     }
   }
   src->Release();
