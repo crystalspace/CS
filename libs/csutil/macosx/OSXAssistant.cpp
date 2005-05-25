@@ -22,6 +22,7 @@
 #include "OSXAssistant.h"
 #include "OSXDelegate.h"
 #include "csutil/cfgacc.h"
+#include "csutil/event.h"
 #include "csutil/sysfunc.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"

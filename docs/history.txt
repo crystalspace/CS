@@ -8,6 +8,8 @@ chronological order.
 
 25-May-2005
 	- res added (limited) support for non-power-of-two-sized textures.
+	- Eric Sunshine fixed a compilation error in OSXAssistant.cpp from
+	  recent event-related changes.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 
