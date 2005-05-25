@@ -3499,12 +3499,12 @@ _cspace.iPolygonMesh_swigregister(iPolygonMeshPtr)
 
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
 
-class csPath(csCatmullRomSpline,iPath):
+class csPath(csCatmullRomSpline):
     __swig_setmethods__ = {}
-    for _s in [csCatmullRomSpline,iPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    for _s in [csCatmullRomSpline]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPath, name, value)
     __swig_getmethods__ = {}
-    for _s in [csCatmullRomSpline,iPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    for _s in [csCatmullRomSpline]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csPath instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -7465,6 +7465,12 @@ class csMouseEventData(_object):
     __swig_setmethods__["y"] = _cspace.csMouseEventData_y_set
     __swig_getmethods__["y"] = _cspace.csMouseEventData_y_get
     if _newclass:y = property(_cspace.csMouseEventData_y_get, _cspace.csMouseEventData_y_set)
+    __swig_setmethods__["axes"] = _cspace.csMouseEventData_axes_set
+    __swig_getmethods__["axes"] = _cspace.csMouseEventData_axes_get
+    if _newclass:axes = property(_cspace.csMouseEventData_axes_get, _cspace.csMouseEventData_axes_set)
+    __swig_setmethods__["numAxes"] = _cspace.csMouseEventData_numAxes_set
+    __swig_getmethods__["numAxes"] = _cspace.csMouseEventData_numAxes_get
+    if _newclass:numAxes = property(_cspace.csMouseEventData_numAxes_get, _cspace.csMouseEventData_numAxes_set)
     __swig_setmethods__["Button"] = _cspace.csMouseEventData_Button_set
     __swig_getmethods__["Button"] = _cspace.csMouseEventData_Button_get
     if _newclass:Button = property(_cspace.csMouseEventData_Button_get, _cspace.csMouseEventData_Button_set)
@@ -7503,6 +7509,9 @@ class csJoystickEventData(_object):
     __swig_setmethods__["numAxes"] = _cspace.csJoystickEventData_numAxes_set
     __swig_getmethods__["numAxes"] = _cspace.csJoystickEventData_numAxes_get
     if _newclass:numAxes = property(_cspace.csJoystickEventData_numAxes_get, _cspace.csJoystickEventData_numAxes_set)
+    __swig_setmethods__["axesChanged"] = _cspace.csJoystickEventData_axesChanged_set
+    __swig_getmethods__["axesChanged"] = _cspace.csJoystickEventData_axesChanged_get
+    if _newclass:axesChanged = property(_cspace.csJoystickEventData_axesChanged_get, _cspace.csJoystickEventData_axesChanged_set)
     __swig_setmethods__["Button"] = _cspace.csJoystickEventData_Button_set
     __swig_getmethods__["Button"] = _cspace.csJoystickEventData_Button_get
     if _newclass:Button = property(_cspace.csJoystickEventData_Button_get, _cspace.csJoystickEventData_Button_set)
