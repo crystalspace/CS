@@ -136,7 +136,7 @@ protected:
 
 #else // __cplusplus
 
-#define DRV2D_FUNC(ret, func) __private_extern__ inline ret OSXDriver2D_##func
+#define DRV2D_FUNC(ret, func) __private_extern__ ret OSXDriver2D_##func
 
 typedef void *OSXDriver2D;
 typedef void *OSXEventHandle;

@@ -17,6 +17,11 @@ chronological order.
 	- Eric Sunshine fixed DDS image loader so that it compiles on MacOS/X.
 	- Eric Sunshine added some missing dependencies on the 'clean' target
 	  in the scripting Jamfiles.
+	- Eric Sunshine fixed problem caused by spurious use of 'inline' on
+	  some C functions wrapping Objective-C for access by C++ in
+	  csutil/macosx and csplugincommon/macosx which caused linking to fail
+	  on account of undefined symbols on Tiger with gcc4. Thanks to Andreas
+	  Grosam <agrosam@onlinehome.de> for researching this.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 

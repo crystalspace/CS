@@ -389,7 +389,7 @@
 
 
 // C API to DriverDelegate class
-#define DEL2D_FUNC(ret, func) __private_extern__ ret inline OSXDelegate2D_##func
+#define DEL2D_FUNC(ret, func) __private_extern__ ret OSXDelegate2D_##func
 
 typedef void *OSXDelegate2DHandle;
 typedef void *OSXDriver2DHandle;
