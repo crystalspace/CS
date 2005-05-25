@@ -167,6 +167,8 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false),
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
+
+  memset (npotsStatus, 0, sizeof (npotsStatus));
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -1304,125 +1306,29 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
 {
   if (!holder) return false;
 
-  iRenderBuffer *buffer = 0;
-  void *data = 0;
+  BufferChange queueEntry;
 
-  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
-  if (buffer) 
-  {
-    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer (CS_VATTRIB_POSITION, buffer);
-    GLenum compType;
-    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
-      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
-    if (data != (void*)-1) 
-    {
-      statecache->SetVertexPointer (buffer->GetComponentCount (),
-        compType, (GLsizei)buffer->GetStride (), data);
-      statecache->Enable_GL_VERTEX_ARRAY ();
-    }
-  }
-  else
-  {
-    statecache->Disable_GL_VERTEX_ARRAY ();
-  }
-
-  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_NORMAL]);
-  if (buffer) 
-  {
-    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer (CS_VATTRIB_NORMAL, buffer);
-    GLenum compType;
-    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
-      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
-    if (data != (void*)-1) 
-    {
-      statecache->SetNormalPointer (compType, 
-        (GLsizei)buffer->GetStride(), data);
-      statecache->Enable_GL_NORMAL_ARRAY ();
-    }
-  }
-  else
-  {
-    statecache->Disable_GL_NORMAL_ARRAY ();
-  }
+  queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
+  queueEntry.attrib = CS_VATTRIB_POSITION;
+  changeQueue.Push (queueEntry);
   
-  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_COLOR]);
-  if (buffer)
+  queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_NORMAL]);
+  queueEntry.attrib = CS_VATTRIB_NORMAL;
+  changeQueue.Push (queueEntry);
+  
+  queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_COLOR]);
+  queueEntry.attrib = CS_VATTRIB_COLOR;
+  changeQueue.Push (queueEntry);
+  
+  queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
+  queueEntry.attrib = CS_VATTRIB_POSITION;
+  changeQueue.Push (queueEntry);
+  
+  for (int i = 0; i < 8; i++)
   {
-    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    AssignSpecBuffer (CS_VATTRIB_COLOR, buffer);
-    GLenum compType;
-    data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
-      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
-    if (data != (void*)-1) 
-    {
-      statecache->SetColorPointer (buffer->GetComponentCount(),
-        compType, (GLsizei)buffer->GetStride (), data);
-      statecache->Enable_GL_COLOR_ARRAY ();
-    }
-  }
-  else
-  {
-    statecache->Disable_GL_COLOR_ARRAY ();
-  }
-
-  csRef<iRenderBuffer> bufferKeeper;
-  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
-  if (buffer)
-  {
-    if (needNPOTSfixup[0].IsValid()) buffer = bufferKeeper = DoNPOTSFixup (buffer, 0);
-    AssignSpecBuffer (CS_VATTRIB_TEXCOORD0, buffer);
-    GLenum compType;
-    data = 
-      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
-    if (data != (void*)-1)
-    {
-      if (ext->CS_GL_ARB_multitexture)
-      {
-        statecache->SetActiveTU (0);
-      }
-      statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-        compType, (GLsizei)buffer->GetStride (), data);
-      statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
-    }
-  }
-  else
-  {
-    if (ext->CS_GL_ARB_multitexture)
-    {
-      statecache->SetActiveTU (0);
-    }
-    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-  }
-
-  if (ext->CS_GL_ARB_multitexture)
-  {
-    unsigned int i;
-    for (i = 1; i < 8; i++)
-    {
-      buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
-      if (buffer)
-      {
-        if (needNPOTSfixup[i].IsValid()) buffer = bufferKeeper = DoNPOTSFixup (buffer, i);
-        AssignSpecBuffer (CS_VATTRIB_TEXCOORD0+i, buffer);
-	GLenum compType;
-	data = 
-	  RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
-        if (data != (void*)-1)
-        {
-          statecache->SetActiveTU (i);
-          statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-            compType, (GLsizei)buffer->GetStride (), data);
-          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
-        }
-      }
-      else
-      {
-        statecache->SetActiveTU (i);
-        statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-      }
-    }
+    queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
+    queueEntry.attrib = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0+i);
+    changeQueue.Push (queueEntry);
   }
   return true;
 }
@@ -1436,74 +1342,10 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     iRenderBuffer *buffer = buffers[i];
     if (!buffer) continue;
 
-    //csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
-    
-    if (CS_VATTRIB_IS_GENERIC (att)) 
-      AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
-    else 
-    {
-      bool assigned = false;
-      if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
-      {
-        unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
-        if (needNPOTSfixup[unit].IsValid())
-        {
-          AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 
-            buffer = DoNPOTSFixup (buffer, unit));
-          assigned = true;
-        }
-      }
-      if (!assigned) AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
-    }
-
-    GLenum compType;
-    void *data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
-      RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
-
-    if (data == (void*)-1) return false;
-
-    switch (att)
-    {
-    case CS_VATTRIB_POSITION:
-      statecache->Enable_GL_VERTEX_ARRAY ();
-      statecache->SetVertexPointer (buffer->GetComponentCount (),
-        compType, (GLsizei)buffer->GetStride (), data);
-      break;
-    case CS_VATTRIB_NORMAL:
-      statecache->Enable_GL_NORMAL_ARRAY ();
-      statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
-	data);
-      break;
-    case CS_VATTRIB_COLOR:
-      statecache->Enable_GL_COLOR_ARRAY ();
-      statecache->SetColorPointer (buffer->GetComponentCount (),
-        compType, (GLsizei)buffer->GetStride (), data);
-      break;
-    default:
-      if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
-      {
-        //texcoord
-        unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
-        if (ext->CS_GL_ARB_multitexture)
-        {
-          statecache->SetActiveTU (unit);
-        } 
-        statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
-        statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data);
-      }
-      else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
-      {
-        ext->glEnableVertexAttribArrayARB (att);
-        ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
-          compType, false, (GLsizei)buffer->GetStride (), data);
-      }
-      else
-      {
-        //none, assert...
-        CS_ASSERT_MSG("Unknown vertex attribute", 0);
-      }
-    }
+    BufferChange queueEntry;
+    queueEntry.buffer = buffer;
+    queueEntry.attrib = att;
+    changeQueue.Push (queueEntry);
   }
   return true;
 }
@@ -1534,10 +1376,10 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       if (b) RenderRelease (b);// b->RenderRelease ();
       if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
       {
-        if (needNPOTSfixup[i-CS_VATTRIB_TEXCOORD0].IsValid())
+        if (npotsStatus[i-CS_VATTRIB_TEXCOORD0])
         {
           npotsFixupScrap.Push (b);
-          needNPOTSfixup[i-CS_VATTRIB_TEXCOORD0] = 0;
+          npotsStatus[i-CS_VATTRIB_TEXCOORD0] = false;
         }
       }
       spec_renderBuffers[i] = 0;
@@ -1548,65 +1390,17 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       if (b) RenderRelease (b);// b->RenderRelease ();
       gen_renderBuffers[i] = 0;
     }
+    changeQueue.Empty();
   }
   else
   {
     for (i = 0; i < count; i++)
     {
       csVertexAttrib att = attribs[i];
-      switch (att)
-      {
-      case CS_VATTRIB_POSITION:
-        statecache->Disable_GL_VERTEX_ARRAY ();
-        break;
-      case CS_VATTRIB_NORMAL:
-        statecache->Disable_GL_NORMAL_ARRAY ();
-        break;
-      case CS_VATTRIB_COLOR:
-        statecache->Disable_GL_COLOR_ARRAY ();
-        break;
-      default:
-        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
-        {
-          //texcoord
-          unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
-          if (ext->CS_GL_ARB_multitexture)
-          {
-            statecache->SetActiveTU (unit);
-          }
-          statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-          if (needNPOTSfixup[unit].IsValid())
-          {
-            npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-            needNPOTSfixup[unit] = 0;
-          }
-        }
-        else if (CS_VATTRIB_IS_GENERIC(att) && ext->glDisableVertexAttribArrayARB)
-        {
-          ext->glDisableVertexAttribArrayARB (att);
-        }
-        else
-        {
-          //none, assert...
-          CS_ASSERT_MSG("Unknown vertex attribute", 0);
-        }
-      }
-      if (CS_VATTRIB_IS_GENERIC (att))
-      {
-        if (gen_renderBuffers[att]) 
-        {
-          RenderRelease (gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST]);
-          gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST] = 0;
-        }
-      }
-      else
-      {
-        if (spec_renderBuffers[att]) 
-        {
-          RenderRelease (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-          spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST] = 0;
-        }
-      }
+      BufferChange queueEntry;
+      queueEntry.buffer = 0;
+      queueEntry.attrib = att;
+      changeQueue.Push (queueEntry);
     }
   }
 }
@@ -1642,7 +1436,7 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       statecache->SetTexture (GL_TEXTURE_CUBE_MAP, texHandle);
       break;
     case iTextureHandle::CS_TEX_IMG_RECT:
-      statecache->Enable_GL_TEXTURE_RECTANGLE_ARB( );
+      statecache->Enable_GL_TEXTURE_RECTANGLE_ARB ();
       statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, texHandle);
       break;
     default:
@@ -1653,25 +1447,7 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   texunittarget[unit] = gltxthandle->target;*/
   bool doNPOTS = (gltxthandle->target == iTextureHandle::CS_TEX_IMG_RECT);
   if (doNPOTS && (unit < 8))
-  {
-    csRef<iRenderBuffer> buffer;
-    csVertexAttrib attr;
-    if ((spec_renderBuffers[CS_VATTRIB_TEXCOORD0 + unit - 
-      CS_VATTRIB_SPECIFIC_FIRST] != 0))// @@@ Max 8 TEXCOORD buffers here
-    {
-      buffer = spec_renderBuffers[
-        CS_VATTRIB_TEXCOORD0 + unit - CS_VATTRIB_SPECIFIC_FIRST];
-      attr = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0 + unit);
-      DeactivateBuffers (&attr, 1);
-    }
     needNPOTSfixup[unit] = gltxthandle;
-    if (buffer.IsValid())
-    {
-      // ActivateBuffers ensures fixup
-      iRenderBuffer* bufPtr = buffer;
-      ActivateBuffers (&attr, &bufPtr, 1);
-    }
-  }
   else
     needNPOTSfixup[unit] = 0;
   return true;
@@ -1802,7 +1578,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   glPushMatrix ();
   glMultMatrixf (matrix);
 
-    
+  if ((needColorFixup = ((modes.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)))
+    alphaScale = (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+  ApplyBufferChanges();
+
   iRenderBuffer* iIndexbuf = (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
   
   if (!iIndexbuf)
@@ -2290,10 +2069,162 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
   }
 }
 
-template<typename T>
-static void DoFixup (iRenderBuffer* src, T* dest, 
-                     size_t elems, size_t comps, const int scales[])
+void csGLGraphics3D::ApplyBufferChanges()
 {
+  for (size_t i = 0; i < changeQueue.Length(); i++)
+  {
+    const BufferChange& changeEntry = changeQueue[i];
+    csVertexAttrib att = changeEntry.attrib;
+
+    if (changeEntry.buffer.IsValid())
+    {
+      iRenderBuffer *buffer = changeEntry.buffer;
+      csRef<iRenderBuffer> bufferRef;
+
+      if (needColorFixup && (att == CS_VATTRIB_COLOR))
+      {
+        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
+        buffer = DoColorFixup (buffer);
+      }
+
+      if (CS_VATTRIB_IS_GENERIC (att)) 
+        AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
+      else 
+      {
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+          unsigned int unit = att - CS_VATTRIB_TEXCOORD0;
+          if (npotsStatus[unit])
+          {
+            npotsFixupScrap.Push (spec_renderBuffers[att-CS_VATTRIB_SPECIFIC_FIRST]);
+            AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
+            npotsStatus[unit] = false;
+          }
+          if (needNPOTSfixup[unit].IsValid())
+          {
+            buffer = bufferRef = DoNPOTSFixup (buffer, unit);
+            npotsStatus[unit] = true;
+          }
+        }
+        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
+      }
+
+      GLenum compType;
+      void *data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+        RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
+
+      if (data == (void*)-1) continue;
+
+      switch (att)
+      {
+      case CS_VATTRIB_POSITION:
+        statecache->Enable_GL_VERTEX_ARRAY ();
+        statecache->SetVertexPointer (buffer->GetComponentCount (),
+          compType, (GLsizei)buffer->GetStride (), data);
+        break;
+      case CS_VATTRIB_NORMAL:
+        statecache->Enable_GL_NORMAL_ARRAY ();
+        statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
+	  data);
+        break;
+      case CS_VATTRIB_COLOR:
+        statecache->Enable_GL_COLOR_ARRAY ();
+        statecache->SetColorPointer (buffer->GetComponentCount (),
+          compType, (GLsizei)buffer->GetStride (), data);
+        break;
+      default:
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+          //texcoord
+          unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
+          if (ext->CS_GL_ARB_multitexture)
+          {
+            statecache->SetActiveTU (unit);
+          } 
+          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+          statecache->SetTexCoordPointer (buffer->GetComponentCount (),
+            compType, (GLsizei)buffer->GetStride (), data);
+        }
+        else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
+        {
+          ext->glEnableVertexAttribArrayARB (att);
+          ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
+            compType, false, (GLsizei)buffer->GetStride (), data);
+        }
+        else
+        {
+          //none, assert...
+          CS_ASSERT_MSG("Unknown vertex attribute", 0);
+        }
+      }
+    }
+    else
+    {
+      switch (att)
+      {
+      case CS_VATTRIB_POSITION:
+        statecache->Disable_GL_VERTEX_ARRAY ();
+        break;
+      case CS_VATTRIB_NORMAL:
+        statecache->Disable_GL_NORMAL_ARRAY ();
+        break;
+      case CS_VATTRIB_COLOR:
+        statecache->Disable_GL_COLOR_ARRAY ();
+        break;
+      default:
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+          //texcoord
+          unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
+          if (ext->CS_GL_ARB_multitexture)
+          {
+            statecache->SetActiveTU (unit);
+          }
+          statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+          if (npotsStatus[unit])
+          {
+            npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
+            npotsStatus[unit] = false;
+          }
+        }
+        else if (CS_VATTRIB_IS_GENERIC(att) && ext->glDisableVertexAttribArrayARB)
+        {
+          ext->glDisableVertexAttribArrayARB (att);
+        }
+        else
+        {
+          //none, assert...
+          CS_ASSERT_MSG("Unknown vertex attribute", 0);
+        }
+      }
+      if (CS_VATTRIB_IS_GENERIC (att))
+      {
+        if (gen_renderBuffers[att]) 
+        {
+          RenderRelease (gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST]);
+          gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST] = 0;
+        }
+      }
+      else
+      {
+        if (spec_renderBuffers[att]) 
+        {
+          RenderRelease (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
+          spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST] = 0;
+        }
+      }
+    }
+  }
+  changeQueue.Empty();
+}
+
+template<typename T, typename T2>
+static void DoFixup (iRenderBuffer* src, T* dest, size_t elems, 
+                     size_t srcComps, const T2 scales[], 
+                     size_t comps = (size_t)~0, const T* defaultComps = 0)
+{
+  //if (dest == (void*)-1) return;
+  if (comps == (size_t)~0) comps = srcComps;
   T* srcPtr = (T*)src->Lock (CS_BUF_LOCK_READ);
   size_t srcStride = src->GetElementDistance();
   for (size_t e = 0; e < elems; e++)
@@ -2301,7 +2232,7 @@ static void DoFixup (iRenderBuffer* src, T* dest,
     T* s = (T*)((uint8*)srcPtr + e * srcStride);
     for (size_t c = 0; c < comps; c++)
     {
-      *dest++ = (*s++) * scales[c];
+      *dest++ = ((c < srcComps) ? (*s++) : defaultComps[c]) * scales[c];
     }
   }
   src->Release();
@@ -2372,6 +2303,75 @@ csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int un
       break;
   }
   return scrapBuf;
+}
+
+csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
+{
+  if (!colorScrap.IsValid()
+    || (colorScrap->GetElementCount() < buffer->GetElementCount())
+    || (colorScrap->GetComponentType() != buffer->GetComponentType()))
+  {
+    colorScrap = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
+      CS_BUF_STREAM, buffer->GetComponentType(), 4);
+  }
+
+  const float componentScale[] = {1.0f, 1.0f, 1.0f, alphaScale};
+  const char defComponentsB[] = {0, 0, 0, 0x7f};
+  const unsigned char defComponentsUB[] = {0, 0, 0, 0xff};
+  const short defComponentsS[] = {0, 0, 0, 0x7fff};
+  const unsigned short defComponentsUS[] = {0, 0, 0, 0xffff};
+  const int defComponentsI[] = {0, 0, 0, 0x7fffffff};
+  const unsigned int defComponentsUI[] = {0, 0, 0, 0xffffffff};
+  const float defComponentsF[] = {0.0f, 0.0f, 0.0f, 1.0f};
+  const double defComponentsD[] = {0.0, 0.0, 0.0, 1.0};
+
+  switch (colorScrap->GetComponentType())
+  {
+    case CS_BUFCOMP_BYTE:
+      DoFixup (buffer, csRenderBufferLock<char> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsB);
+      break;
+    case CS_BUFCOMP_UNSIGNED_BYTE:
+      DoFixup (buffer, csRenderBufferLock<unsigned char> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsUB);
+      break;
+    case CS_BUFCOMP_SHORT:
+      DoFixup (buffer, csRenderBufferLock<short> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsS);
+      break;
+    case CS_BUFCOMP_UNSIGNED_SHORT:
+      DoFixup (buffer, csRenderBufferLock<unsigned short> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsUS);
+      break;
+    case CS_BUFCOMP_INT:
+      DoFixup (buffer, csRenderBufferLock<int> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsI);
+      break;
+    case CS_BUFCOMP_UNSIGNED_INT:
+      DoFixup (buffer, csRenderBufferLock<unsigned int> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsUI);
+      break;
+    case CS_BUFCOMP_FLOAT:
+      DoFixup (buffer, csRenderBufferLock<float> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsF);
+      break;
+    case CS_BUFCOMP_DOUBLE:
+      DoFixup (buffer, csRenderBufferLock<double> (colorScrap).Lock(),
+        buffer->GetElementCount(), buffer->GetComponentCount(),
+        componentScale, 4, defComponentsD);
+      break;
+    default:
+      CS_ASSERT(false); // Should never happen.
+      break;
+  }
+  return colorScrap;
 }
 
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,

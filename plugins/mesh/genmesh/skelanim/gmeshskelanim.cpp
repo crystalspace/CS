@@ -1047,7 +1047,7 @@ void csGenmeshSkelAnimationControl::SetAlwaysUpdate(bool always_update)
 csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 	csGenmeshSkelAnimationControlType* type, iObjectRegistry* object_reg)
 {
-	SCF_CONSTRUCT_IBASE (0);
+	SCF_CONSTRUCT_IBASE (type);
 	csGenmeshSkelAnimationControlFactory::type = type;
 	csGenmeshSkelAnimationControlFactory::object_reg = object_reg;
 	InitTokenTable (xmltokens);

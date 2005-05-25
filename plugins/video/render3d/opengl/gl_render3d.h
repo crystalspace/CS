@@ -384,9 +384,32 @@ private:
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
   GLuint texunittarget[16]; // @@@ Hardcoded max number of units
   csRef<csGLTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  /// Array of buffers used for NPOTS texture coord fixup
   csArray<csRef<iRenderBuffer> > npotsFixupScrap;
+  /// Whether an NPOTS scrap is attached to a TC bufer
+  bool npotsStatus[16];
+  /// Whether the alpha channel of the color buffer should be scaled.
+  bool needColorFixup;
+  /// Amount to scale alpha channel of color buffer
+  float alphaScale;
+  /// Scrap buffer used for color fixups
+  csRef<iRenderBuffer> colorScrap;
+  //@{
+  /**
+   * Changes to buffer bindings are not immediate but queued and set from 
+   * within DrawMesh().
+   */
+  struct BufferChange
+  {
+    csVertexAttrib attrib;
+    csRef<iRenderBuffer> buffer;
+  };
+  csArray<BufferChange> changeQueue;
+  void ApplyBufferChanges();
+  //@}
 
   csRef<iRenderBuffer> DoNPOTSFixup (iRenderBuffer* buffer, int unit);
+  csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
 
   // Draw a 2D polygon (screen space coordinates) with correct Z information
   // given the plane. This function will not set up any texture mapping,

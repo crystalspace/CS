@@ -25,6 +25,15 @@ chronological order.
 	- Adam Bradley documented event system changes in apimod100.txi
 	- Luca removed his useless comments in the latest patch for AWS 
 	  (committed in his behald by res).
+	- res fixed some object lifetime issues in the gmeshskelanim plugin
+	  that lead to a crash at cleanup.
+	- res changed the GL renderer buffer bindings to be queued and applied
+	  from DrawMesh().
+	- res fixed NPOTS texture coordinate fixups being wrongfully applied.
+	- res added support for the ALPHA mixmode to the GL renderer; in case
+	  this mixmode is used, a new color buffer will be created that 
+	  contains the data of the original buffer, but with the alpha channel
+	  modulated to the value from the mixmode.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 

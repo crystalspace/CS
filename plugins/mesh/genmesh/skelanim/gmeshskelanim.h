@@ -363,7 +363,7 @@ private:
 	iObjectRegistry* object_reg;
 	//csRef<iVirtualClock> virt_clk;
 
-	csGenmeshSkelAnimationControlFactory* factory;
+	csRef<csGenmeshSkelAnimationControlFactory> factory;
 
 	csRefArray<csSkelAnimControlRunnable> running_scripts;
 
@@ -449,7 +449,10 @@ public:
 	virtual void SetAlwaysUpdate(bool always_update);
 	virtual bool GetAlwaysUpdate() { return always_update; }
 	virtual iGenMeshSkeletonControlFactory *GetFactory() 
-		{ return (iGenMeshSkeletonControlFactory *)factory; };
+	{ 
+          return (iGenMeshSkeletonControlFactory *)
+            (csGenmeshSkelAnimationControlFactory*)factory; 
+        }
 };
 
 /**
@@ -545,7 +548,7 @@ class csGenmeshSkelAnimationControlType : public iGenMeshAnimationControlType
 private:
 	iObjectRegistry* object_reg;
 	csRef<iVirtualClock> vc;
-	csRefArray<csGenmeshSkelAnimationControl> always_update_animations;
+	csArray<csGenmeshSkelAnimationControl*> always_update_animations;
 
 	void UpdateAUAnimations(csTicks current_ticks)
 	{
