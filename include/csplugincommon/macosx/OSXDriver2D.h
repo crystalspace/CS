@@ -65,7 +65,7 @@ public:
   virtual bool HandleEvent(iEvent &ev);
 
   // Dispatch an event to the assistant
-  inline void DispatchEvent(OSXEvent ev, OSXView view);
+  void DispatchEvent(OSXEvent ev, OSXView view);
 
   // Show/Hide the mouse
   virtual void HideMouse();
