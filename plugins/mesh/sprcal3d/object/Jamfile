@@ -1,10 +1,10 @@
 SubDir TOP plugins mesh sprcal3d object ;
 
-if $(CAL3D.AVAILABLE) = "yes"
+if $(CAL3D.AVAILABLE) = "yes" && $(STL.AVAILABLE) = yes
 {
 Description sprcal3d : "Cal3D Sprite mesh object plugin" ;
 Plugin sprcal3d : [ Wildcard *.cpp *.h ] ;
 LinkWith sprcal3d : crystalspace ;
-ExternalLibs sprcal3d : CAL3D ;
+ExternalLibs sprcal3d : CAL3D STL ;
 CompileGroups sprcal3d : meshes ;
 }

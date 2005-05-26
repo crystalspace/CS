@@ -1,5 +1,8 @@
 SubDir TOP apps tests awstest ;
 
-Description awstest : "Alternate Windowing System test" ;
-Application awstest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith awstest : crystalspace ;
+if $(STL.AVAILABLE) = yes
+{
+  Description awstest : "Alternate Windowing System test" ;
+  Application awstest : [ Wildcard *.cpp *.h ] : noinstall ;
+  LinkWith awstest : crystalspace ;
+}

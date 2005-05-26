@@ -1,5 +1,8 @@
 SubDir TOP plugins aws ;
 
+if $(STL.AVAILABLE) = yes
+{
+
 FILES = [ Wildcard *.cpp *.h *.hpp ] ;
 
 if ! [ Property build : projgen ]
@@ -63,6 +66,7 @@ if ! [ Property build : projgen ]
 Description aws : "Alternate Windowing System plugin" ;
 Plugin aws : $(FILES) ;
 LinkWith aws : crystalspace ;
+ExternalLibs aws : STL ;
 
 if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 {
@@ -74,3 +78,5 @@ C++FLAGS on [ DoObjectGrist skinlex$(SUFOBJ) skinpars$(SUFOBJ) ] +=
   [ FDefines YY_NEVER_INTERACTIVE ] ;
 
 MsvcDefine aws : YY_NEVER_INTERACTIVE ;
+
+}

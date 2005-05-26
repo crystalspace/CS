@@ -33,6 +33,20 @@ chronological order.
 	    error: '<anonymous enum>' is/uses anonymous type
 	    error: trying to instantiate
 	      'template<class T> Foo& operator<<(Foo&, const T&)'
+	- Eric Sunshine added a check for the C++ Standard Template Library
+	  (STL) to configure.ac. The few modules (VOS, AWS, sprcal3d) which
+	  rely upon STL are now built only if available.
+	- Eric Sunshine worked around an obscure bug in gcc 3.4.x where
+	  -fvisibility-inlines-hidden on AMD64 in combination with STL and
+	  gcc's -fPIC and -shared flags (which are used to build plugin
+	  modules) causes the linker to fail with a bogus error stating that
+	  std::basic_string<> can not be used when making a shared object. The
+	  configure script now checks for this bug and suppresses
+	  -fvisibility-inlines-hidden if present. References:
+	    http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
+	    http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
+	    http://www.nedprod.com/programs/gccvisibility.html
+	    http://bugs.gentoo.org/show_bug.cgi?id=78720
 25-May-2005
 	- res added (limited) support for non-power-of-two-sized textures.
 	- Eric Sunshine fixed a compilation error in OSXAssistant.cpp from

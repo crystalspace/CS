@@ -1,6 +1,6 @@
 SubDir TOP plugins net vos ;
 
-if $(VOS.AVAILABLE) = "yes"
+if $(VOS.AVAILABLE) = "yes" && $(STL.AVAILABLE) = yes
 {
 Description csvosa3dl : "Virtual Object System abstract 3D layer" ;
 
@@ -10,5 +10,5 @@ CFlags csvosa3dl :
   [ FDefines _REENTRANT ] $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 LinkWith csvosa3dl : crystalspace ;
 
-ExternalLibs csvosa3dl : VOS  ;
+ExternalLibs csvosa3dl : VOS STL ;
 }

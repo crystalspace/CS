@@ -533,6 +533,20 @@ CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 
 
 #------------------------------------------------------------------------------
+# Check if STL is available. Although STL is not used heavily in Crystal Space,
+# a few plugin modules take advantage of it, so they need to know if it is
+# available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for STL], [cs_cv_libstl],
+    [AC_LANG_PROGRAM(
+	[[#include <map>
+	#include <string>]],
+	[[std::map<std::string,int> m; m.begin();]])],
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libstl], [STL])])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to enable and disable compilation warnings, and how to promote
 # diagnostics from warning to error status.
 #------------------------------------------------------------------------------
@@ -759,11 +773,46 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 
 #------------------------------------------------------------------------------
 # Check if "hidden" visibilty for inline functions is supported.
+#
+# IMPLEMENTATION NOTES
+#
+# There is an obscure bug in gcc 3.4.x where -fvisibility-inlines-hidden on
+# AMD64 in combination with STL and gcc's -fPIC and -shared flags (which are
+# used to build plugin modules) causes the linker to fail with a bogus error
+# stating that std::basic_string<> can not be used when making a shared
+# object. We test for this anomaly and avoid -fvisibility-inlines-hidden if
+# present. References:
+#
+#     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
+#     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
+#     http://www.nedprod.com/programs/gccvisibility.html
+#     http://bugs.gentoo.org/show_bug.cgi?id=78720
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([if -fvisibility-inlines-hidden is accepted],
+CS_CHECK_BUILD_FLAGS([if -fvisibility-inlines-hidden is accepted],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
-    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],
-    [C++], [COMPILER.C++FLAGS.optimize], [+])
+    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
+
+AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden" && \
+    test $cs_cv_libstl = yes],
+    [AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
+	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
+	[CS_BUILD_IFELSE(
+	    [AC_LANG_PROGRAM(
+		[[#include <string>]],
+		[std::string s; s = "";])],
+	    [CS_CREATE_TUPLE([$cs_cv_prog_cxx_visibility_inlines_hidden \
+		$cs_cv_prog_cxx_pic], [$cs_cv_prog_link_shared])],
+	    [C++],
+	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no],
+	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+	    [$cs_cv_libstl_cflags],
+	    [$cs_cv_libstl_lflags],
+	    [$cs_cv_libstl_libs])])],
+    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
+
+AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.optimize],
+	[$cs_cv_prog_cxx_visibility_inlines_hidden], [+])])
 
 
 

@@ -1,6 +1,6 @@
 SubDir TOP apps tests vostest ;
 
-if $(VOS.AVAILABLE) = "yes"
+if $(VOS.AVAILABLE) = "yes" && $(STL.AVAILABLE) = yes
 {
 Description vostest : "VOS support test" ;
 Application vostest : [ Wildcard *.cpp *.h ] : noinstall ;
