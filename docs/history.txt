@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-May-2005
+	- Jorrit did a small optimization to bruteblock.
+	- Jorrit fixed a bug in the OpenGL renderer introduced by Anders
+	  on 17-Jul-2004. For some strange reason he set the number of
+	  triangles to 0 before calling SetupClipper. The effect was that
+	  the clipper was no longer able to decide on stencil based on
+	  the number of triangles.
+	- Jorrit started work on a new <noclip/> option for meshes
+	  (CS_ENTITY_NOCLIP in iMeshWrapper). The idea is that you can set
+	  this on big meshes that are supposed to be rendered only once
+	  even if visible from different portals. It doesn't currently work
+	  properly yet though. Work in Progress.
+	- res fixed csParticleSystem to properly handle alpha of individual
+	  particles.
 25-May-2005
 	- res added (limited) support for non-power-of-two-sized textures.
 	- Eric Sunshine fixed a compilation error in OSXAssistant.cpp from
@@ -34,17 +48,6 @@ chronological order.
 	  this mixmode is used, a new color buffer will be created that 
 	  contains the data of the original buffer, but with the alpha channel
 	  modulated to the value from the mixmode.
-	- Jorrit did a small optimization to bruteblock.
-	- Jorrit fixed a bug in the OpenGL renderer introduced by Anders
-	  on 17-Jul-2004. For some strange reason he set the number of
-	  triangles to 0 before calling SetupClipper. The effect was that
-	  the clipper was no longer able to decide on stencil based on
-	  the number of triangles.
-	- Jorrit started work on a new <noclip/> option for meshes
-	  (CS_ENTITY_NOCLIP in iMeshWrapper). The idea is that you can set
-	  this on big meshes that are supposed to be rendered only once
-	  even if visible from different portals. It doesn't currently work
-	  properly yet though. Work in Progress.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 

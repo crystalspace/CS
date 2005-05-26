@@ -338,7 +338,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     frameData.texel_buffer = csRenderBuffer::CreateRenderBuffer (
       VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 2);
     frameData.color_buffer = csRenderBuffer::CreateRenderBuffer (
-      VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+      VertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
 
     frameData.bufferHolder.AttachNew (new csRenderBufferHolder);
     frameData.bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
@@ -355,7 +355,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   //csVector3* vt = vertices;
   //csVector2* txt = texels;
   size_t p = 0;
-  csRenderBufferLock<csColor> c (frameData.color_buffer);
+  csRenderBufferLock<csVector4> c (frameData.color_buffer);
   csRenderBufferLock<csVector3> vt (frameData.vertex_buffer);
   csRenderBufferLock<csVector2> txt (frameData.texel_buffer);
   for (i = 0 ; i < sprite2ds.Length () ; i++)
@@ -363,12 +363,17 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     csColoredVertices& sprvt = sprite2ds[i]->GetVertices ();
     // transform to eye coordinates
     csVector3 pos = trans.Other2This (particles[i]->GetPosition ());
+    float alpha = 1.0f;
+    uint mixmode = sprite2ds[i]->GetMixMode ();
+    if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+      alpha = (mixmode & CS_FX_MASK_ALPHA) / 255.0f;
 
     size_t j;
     for (j = 0 ; j < part_sides ; j++)
     {
       vt[p] = pos + csVector3 (sprvt[j].pos.x, sprvt[j].pos.y, 0); 
-      c[p] = sprvt[j].color;
+      c[p].Set (sprvt[j].color.red, sprvt[j].color.green, sprvt[j].color.blue, 
+        alpha);
       txt[p].Set (sprvt[j].u, sprvt[j].v);
       p++;
     }
@@ -390,7 +395,10 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->buffers = frameData.bufferHolder;
 
   // Prepare for rendering.
-  rm->mixmode = sprite2ds[0]->GetMixMode ();
+  uint mixmode = sprite2ds[0]->GetMixMode ();
+  if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+    mixmode = (mixmode & ~CS_FX_MASK_ALPHA) | 0xff;
+  rm->mixmode = mixmode;
   rm->clip_portal = ClipPortal;
   rm->clip_plane = ClipPlane;
   rm->clip_z_plane = ClipZ;
