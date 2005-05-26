@@ -843,6 +843,22 @@ public:
   bool operator != (const char* Str) const
   { return !Compare (Str); }
 
+  /** 
+   * Shift operator.  
+   * For example: 
+   * \code
+   * s << "Hi " << name << ", see " << foo;
+   * \endcode
+   */
+  template <typename T>
+  csStringBase &operator << (T const& v)
+  { return Append (v); }
+
+  // Specialization which prevents gcc from barfing on strings allocated via
+  // CS_ALLOC_STACK_ARRAY().
+  csStringBase &operator << (char const* v)
+  { return Append(v); }
+
   /**
    * Convert this string to lower-case.
    * \return Reference to itself.
@@ -884,22 +900,6 @@ inline csStringBase operator + (const csStringBase& iStr1, const char* iStr2)
 {
   return iStr1.Clone ().Append (iStr2);
 }
-
-/** 
- * Shift operator.  
- * For example: 
- * \code
- * s << "Hi " << name << "; see " << foo;
- * \endcode
- */
-template <typename T>
-inline csStringBase &operator <<(csStringBase &s, T const& v)
-{ return s.Append (v); }
-
-// Specialization which prevents gcc from barfing on strings allocated via
-// CS_ALLOC_STACK_ARRAY().
-inline csStringBase &operator <<(csStringBase &s, char const* v)
-{ return s.Append(v); }
 
 /**
  * Subclass of csStringBase that contains an internal buffer which is faster

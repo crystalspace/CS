@@ -20,6 +20,19 @@ chronological order.
 	  properly yet though. Work in Progress.
 	- res fixed csParticleSystem to properly handle alpha of individual
 	  particles.
+	- Eric Sunshine worked around problem where gcc4 was incorrectly
+	  attempting to instantiate a `template<T> operator<<(csStringBase,T)'
+	  function when determining a compile-time constant. The problem is
+	  illustrated in the following test case provided by Andreas Grosam
+	  <agrosam@onlinehome.de>, who also researched the issue:
+	    template <typename T>
+	    inline Foo& operator<< (Foo& s, T const& v) { return s; }
+	    enum { kA = 1 };
+	    enum { kB = 1 << kA };
+	  When compiled with gcc4, the following diagnostic is emitted:
+	    error: '<anonymous enum>' is/uses anonymous type
+	    error: trying to instantiate
+	      'template<class T> Foo& operator<<(Foo&, const T&)'
 25-May-2005
 	- res added (limited) support for non-power-of-two-sized textures.
 	- Eric Sunshine fixed a compilation error in OSXAssistant.cpp from
