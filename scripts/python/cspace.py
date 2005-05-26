@@ -3499,12 +3499,12 @@ _cspace.iPolygonMesh_swigregister(iPolygonMeshPtr)
 
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
 
-class csPath(csCatmullRomSpline):
+class csPath(iPath):
     __swig_setmethods__ = {}
-    for _s in [csCatmullRomSpline]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    for _s in [iPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPath, name, value)
     __swig_getmethods__ = {}
-    for _s in [csCatmullRomSpline]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    for _s in [iPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csPath instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -3533,10 +3533,18 @@ class csPath(csCatmullRomSpline):
         except: pass
 
     def Length(*args): return _cspace.csPath_Length(*args)
+    def GetPointCount(*args): return _cspace.csPath_GetPointCount(*args)
     def CalculateAtTime(*args): return _cspace.csPath_CalculateAtTime(*args)
+    def Calculate(*args): return _cspace.csPath_Calculate(*args)
     def GetCurrentIndex(*args): return _cspace.csPath_GetCurrentIndex(*args)
     def GetTime(*args): return _cspace.csPath_GetTime(*args)
+    def GetTimeValue(*args): return _cspace.csPath_GetTimeValue(*args)
     def SetTime(*args): return _cspace.csPath_SetTime(*args)
+    def SetTimeValue(*args): return _cspace.csPath_SetTimeValue(*args)
+    def SetTimes(*args): return _cspace.csPath_SetTimes(*args)
+    def SetTimeValues(*args): return _cspace.csPath_SetTimeValues(*args)
+    def GetTimes(*args): return _cspace.csPath_GetTimes(*args)
+    def GetTimeValues(*args): return _cspace.csPath_GetTimeValues(*args)
     def SetPositionVectors(*args): return _cspace.csPath_SetPositionVectors(*args)
     def SetUpVectors(*args): return _cspace.csPath_SetUpVectors(*args)
     def SetForwardVectors(*args): return _cspace.csPath_SetForwardVectors(*args)
@@ -3549,6 +3557,10 @@ class csPath(csCatmullRomSpline):
     def GetInterpolatedPosition(*args): return _cspace.csPath_GetInterpolatedPosition(*args)
     def GetInterpolatedUp(*args): return _cspace.csPath_GetInterpolatedUp(*args)
     def GetInterpolatedForward(*args): return _cspace.csPath_GetInterpolatedForward(*args)
+    def GetDimensionValues(*args): return _cspace.csPath_GetDimensionValues(*args)
+    def GetDimensionValue(*args): return _cspace.csPath_GetDimensionValue(*args)
+    def InsertPoint(*args): return _cspace.csPath_InsertPoint(*args)
+    def RemovePoint(*args): return _cspace.csPath_RemovePoint(*args)
 
 class csPathPtr(csPath):
     def __init__(self, this):
@@ -9839,6 +9851,7 @@ class iTextureHandle(iBase):
     CS_TEX_IMG_2D = _cspace.iTextureHandle_CS_TEX_IMG_2D
     CS_TEX_IMG_3D = _cspace.iTextureHandle_CS_TEX_IMG_3D
     CS_TEX_IMG_CUBEMAP = _cspace.iTextureHandle_CS_TEX_IMG_CUBEMAP
+    CS_TEX_IMG_RECT = _cspace.iTextureHandle_CS_TEX_IMG_RECT
     CS_TEXTURE_CUBE_POS_X = _cspace.iTextureHandle_CS_TEXTURE_CUBE_POS_X
     CS_TEXTURE_CUBE_NEG_X = _cspace.iTextureHandle_CS_TEXTURE_CUBE_NEG_X
     CS_TEXTURE_CUBE_POS_Y = _cspace.iTextureHandle_CS_TEXTURE_CUBE_POS_Y
@@ -9884,6 +9897,7 @@ CS_TEXTURE_DITHER = _cspace.CS_TEXTURE_DITHER
 CS_TEXTURE_NOMIPMAPS = _cspace.CS_TEXTURE_NOMIPMAPS
 CS_TEXTURE_CLAMP = _cspace.CS_TEXTURE_CLAMP
 CS_TEXTURE_NOFILTER = _cspace.CS_TEXTURE_NOFILTER
+CS_TEXTURE_NPOTS = _cspace.CS_TEXTURE_NPOTS
 class iRendererLightmap(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
