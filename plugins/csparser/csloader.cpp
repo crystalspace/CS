@@ -2454,6 +2454,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
       break;
+    case XMLTOKEN_NOCLIP:
+      TEST_MISSING_MESH
+      if (recursive)
+        mesh->SetFlagsRecursive (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
+      else
+        mesh->GetFlags ().Set (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
+      break;
     case XMLTOKEN_NOHITBEAM:
       TEST_MISSING_MESH
       if (recursive)

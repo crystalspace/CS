@@ -733,12 +733,10 @@ void csPortalContainer::DrawOnePortal (
   g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
       camera_plane, use_float_portal);
 
-  // Draw through the portal. If this fails we draw the original polygon
-  // instead. Drawing through a portal can fail because we have reached
+  // Draw through the portal. This can fail.
+  // Drawing through a portal can fail because we have reached
   // the maximum number that a sector is drawn (for mirrors).
-  if (po->Draw (poly, movtrans, rview, keep_plane))
-  {
-  }
+  po->Draw (poly, movtrans, rview, keep_plane);
 
   if (is_this_fog && fog_shader)
   {

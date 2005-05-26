@@ -91,6 +91,9 @@ class csRenderContext
   friend class csRenderView;
 
 public:
+  /// A pointer back to the previous render context.
+  csRenderContext* previous;
+
   /// The current camera.
   iCamera* icamera;
   /// The 2D polygon describing how everything drawn inside should be clipped.

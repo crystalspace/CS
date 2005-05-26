@@ -449,8 +449,7 @@ bool csPortal::Draw (
   // When going through a portal we first remember the old clipper
   // and clip plane (if any). Then we set a new one. Later we restore.
   iGraphics3D *G3D = rview->GetGraphics3D ();
-  iClipper2D *old_clipper = G3D->GetClipper ();
-  if (old_clipper) old_clipper->IncRef ();
+  csRef<iClipper2D> old_clipper = G3D->GetClipper ();
 
   int old_cliptype = G3D->GetClipType ();
   G3D->SetClipper (
@@ -481,11 +480,10 @@ bool csPortal::Draw (
   else
     sector->Draw (rview);
 
-  csrview->RestoreRenderContext (old_ctxt);
+  csrview->RestoreRenderContext ();
 
   // Now restore our G3D clipper and plane.
   G3D->SetClipper (old_clipper, old_cliptype);
-  if (old_clipper) old_clipper->DecRef ();
   if (old_do_near_plane)
     G3D->SetNearPlane (old_near_plane);
   else

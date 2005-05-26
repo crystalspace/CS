@@ -100,8 +100,12 @@ public:
 
   /// Setup the clip planes for the current context and camera (in world space).
   void SetupClipPlanes ();
+
   /// Get the current render context.
   csRenderContext* GetCsRenderContext () const { return ctxt; }
+  /// Set the current render context (only for temporary override).
+  void SetCsRenderContext (csRenderContext* c) { ctxt = c; }
+
   /**
    * Create a new render context. This is typically used
    * when going through a portal. Note that you should remember
@@ -115,7 +119,7 @@ public:
    * render context. This function will take care of properly cleaning
    * up the current render context.
    */
-  void RestoreRenderContext (csRenderContext* original);
+  void RestoreRenderContext ();
 
   /**
    * Create a new camera in the current render context. This function

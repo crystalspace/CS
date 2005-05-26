@@ -19,6 +19,7 @@
 #include "csqsqrt.h"
 #include "csgeom/sphere.h"
 #include "igeom/objmodel.h"
+#include "igeom/clip2d.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshlod.h"
@@ -195,6 +196,9 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   relevant_lights_valid = false;
   relevant_lights_max = 8;
   relevant_lights_flags.SetAll (CS_LIGHTINGUPDATE_SORTRELEVANCE);
+
+  last_camera = 0;
+  last_frame_number = 0;
 }
 
 void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
@@ -252,7 +256,8 @@ void csMeshWrapper::AddToSectorPortalLists ()
     csMeshWrapper* prev = this;
     csMeshWrapper* m = csParent;
     while (m) { prev = m; m = m->GetCsParent (); }
-    const iSectorList *sectors = (prev->GetCsMovable ()).csMovable::GetSectors ();
+    const iSectorList *sectors = (prev->GetCsMovable ())
+    	.csMovable::GetSectors ();
     for (i = 0; i < sectors->GetCount (); i++)
     {
       iSector *ss = sectors->Get (i);
@@ -276,7 +281,8 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
     }
     else
     {
-      const iSectorList *sectors = (prev->GetCsMovable ()).csMovable::GetSectors ();
+      const iSectorList *sectors = (prev->GetCsMovable ())
+      	.csMovable::GetSectors ();
       for (i = 0; i < sectors->GetCount (); i++)
       {
         iSector *ss = sectors->Get (i);
@@ -535,47 +541,73 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   {
     i--;
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview)) return 0;
-  }
-
-  /*draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
-  if (draw_test)
-  {
-    csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
-    if (lt != 0)
+    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview))
     {
-      if (lt != last_anim_time)
-      {
-        meshobj->NextFrame (lt,movable.GetPosition ());
-        last_anim_time = lt;
-      }
-    }*/
-
-    csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
-    meshobj->NextFrame (lt,movable.GetPosition ());
-    
-    csMeshWrapper *meshwrap = this;
-    last_anim_time = lt;
-    csMeshWrapper* lastparent = meshwrap;
-    csMeshWrapper* parent = csParent;
-    while (parent != 0)
-    {
-      parent->GetMeshObject()->PositionChild (lastparent->GetMeshObject(), lt);
-      lastparent = parent;
-      parent = parent->csParent;
+      n = 0;
+      return 0;
     }
-    
-    return meshobj->GetRenderMeshes (n, rview, mov, frustum_mask);
-/*  }
-  return 0;*/
-
-  /*
-  for (i = 0; i < children.GetCount (); i++)
-  {
-    iMeshWrapper *spr = children.Get (i);
-    spr->DrawZ (rview);
   }
-  */
+
+  // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
+  // we will only render the object once in a give frame/camera combination.
+  // So if multiple portals arrive in a sector containing this object the
+  // object will be rendered at the first portal and not clipped to that
+  // portal (as is usually the case).
+  csRenderContext* old_ctxt = 0;
+  iClipper2D* old_clipper = 0;
+  int old_cliptype = 0;
+
+  if (flags.Check (CS_ENTITY_NOCLIP))
+  {
+    csRenderView* csrview = (csRenderView*)rview;
+    csRenderContext* ctxt = csrview->GetCsRenderContext ();
+
+    if (last_frame_number == rview->GetCurrentFrameNumber () &&
+    	last_camera == ctxt->icamera)
+    {
+      n = 0;
+      return 0;
+    }
+    last_camera = ctxt->icamera;
+    last_frame_number = rview->GetCurrentFrameNumber ();
+    old_ctxt = ctxt;
+    // Go back to top-level context.
+    while (ctxt->previous) ctxt = ctxt->previous;
+    csrview->SetCsRenderContext (ctxt);
+
+    iGraphics3D *G3D = rview->GetGraphics3D ();
+    old_clipper = G3D->GetClipper ();
+    old_cliptype = G3D->GetClipType ();
+    G3D->SetClipper (
+      rview->GetClipper (),
+      csrview->IsClipperRequired ()
+      	? CS_CLIPPER_REQUIRED : CS_CLIPPER_OPTIONAL);
+  }
+
+  csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+  meshobj->NextFrame (lt, movable.GetPosition ());
+    
+  csMeshWrapper *meshwrap = this;
+  last_anim_time = lt;
+  csMeshWrapper* lastparent = meshwrap;
+  csMeshWrapper* parent = csParent;
+  while (parent != 0)
+  {
+    parent->GetMeshObject()->PositionChild (lastparent->GetMeshObject(), lt);
+    lastparent = parent;
+    parent = parent->csParent;
+  }
+    
+  csRenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, mov,
+  	old_ctxt != 0 ? 0 : frustum_mask);
+  if (old_ctxt)
+  {
+    csRenderView* csrview = (csRenderView*)rview;
+    csrview->SetCsRenderContext (old_ctxt);
+    iGraphics3D *G3D = rview->GetGraphics3D ();
+    G3D->SetClipper (old_clipper, old_cliptype);
+  }
+  return rmeshes;
 }
 
 void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)

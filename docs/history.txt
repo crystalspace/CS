@@ -34,6 +34,17 @@ chronological order.
 	  this mixmode is used, a new color buffer will be created that 
 	  contains the data of the original buffer, but with the alpha channel
 	  modulated to the value from the mixmode.
+	- Jorrit did a small optimization to bruteblock.
+	- Jorrit fixed a bug in the OpenGL renderer introduced by Anders
+	  on 17-Jul-2004. For some strange reason he set the number of
+	  triangles to 0 before calling SetupClipper. The effect was that
+	  the clipper was no longer able to decide on stencil based on
+	  the number of triangles.
+	- Jorrit started work on a new <noclip/> option for meshes
+	  (CS_ENTITY_NOCLIP in iMeshWrapper). The idea is that you can set
+	  this on big meshes that are supposed to be rendered only once
+	  even if visible from different portals. It doesn't currently work
+	  properly yet though. Work in Progress.
 24-May-2005
 	- Marten added a csForEach() which mimics std::for_each().
 	- Marten augumented csVector3 to give faster component lookup 

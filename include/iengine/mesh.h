@@ -109,6 +109,17 @@ class csFlags;
  */
 #define CS_ENTITY_NOHITBEAM 64
 
+/**
+ * If CS_ENTITY_NOCLIP is set then this entity will be drawn fully
+ * (unclipped to portal frustum) and only once for every frame/camera
+ * combination. This is useful in a scenario where you have an indoor
+ * sector with lots of portals to an outdoor sector. In the outdoor sector
+ * there is a complex terrain mesh object and you really only want to render
+ * that once with full screen and not many times clipped to individual
+ * portals.
+ */
+#define CS_ENTITY_NOCLIP 128
+
 /** @} */
 
 /** \name SetLightingUpdate flags
@@ -392,6 +403,7 @@ struct iMeshWrapper : public iBase
    *     CS_ENTITY_NOHITBEAM are set.
    * <li>#CS_ENTITY_NOSHADOWS: cast no shadows.
    * <li>#CS_ENTITY_NOLIGHTING: do not light this object.
+   * <li>#CS_ENTITY_NOCLIP: do not clip this object.
    * </ul>
    */
   virtual csFlags& GetFlags () = 0;

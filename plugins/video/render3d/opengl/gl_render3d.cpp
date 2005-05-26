@@ -1561,7 +1561,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   SetupProjection ();
 
-  int num_tri = 0;
+  int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
 
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
@@ -1582,8 +1582,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     alphaScale = (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
   ApplyBufferChanges();
 
-  iRenderBuffer* iIndexbuf = (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
-  
+  iRenderBuffer* iIndexbuf = (modes.buffers
+  	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
+	: 0);
+
   if (!iIndexbuf)
   {
     CS_ASSERT (string_indices<(csStringID)stacks.Length ()
@@ -1706,7 +1708,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
     case CS_SHADOW_VOLUME_USE:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      statecache->SetStencilFunc (GL_EQUAL, clip_value, stencil_shadow_mask | clip_mask);
+      statecache->SetStencilFunc (GL_EQUAL, clip_value, stencil_shadow_mask
+      	| clip_mask);
       break;
     default:
       if (clip_mask)

@@ -121,7 +121,7 @@ public:
   void Merge ();
 
   /// Checks if something needs to be merged or split
-  void CalcLOD (iRenderView *rview);
+  void CalcLOD ();
 
   /// Returns true if this node is a leaf
   bool IsLeaf ()  const

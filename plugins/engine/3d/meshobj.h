@@ -212,6 +212,7 @@ protected:
 
   csShaderVariableContext svcontext;
   csRef<iShaderVariableContext> factorySVC;
+
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
@@ -279,6 +280,12 @@ private:
   bool relevant_lights_valid;
   size_t relevant_lights_max;
   csFlags relevant_lights_flags;
+
+  // In case the mesh has CS_ENTITY_NOCLIP set then this will
+  // contain the value of the last frame number and camera pointer.
+  // This is used to detect if we can skip rendering the mesh.
+  iCamera* last_camera;
+  uint last_frame_number;
 
 public:
   CS_LEAKGUARD_DECLARE (csMeshWrapper);

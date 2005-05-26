@@ -397,11 +397,10 @@ void csTerrBlock::Merge ()
   children[3] = 0;
 }
 
-void csTerrBlock::CalcLOD (iRenderView *rview)
+void csTerrBlock::CalcLOD ()
 {
   int res = terr->GetBlockResolution ();
 
-  //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
   csVector3 cam = terr->tr_o2c.GetOrigin ();
   csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
   /*csVector3 radii = (bbox.Max ()-bbox.Min ())*0.5;
@@ -427,7 +426,7 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
   }
   if (!IsLeaf ())
     for (int i=0; i<4; i++)
-      children[i]->CalcLOD (rview);
+      children[i]->CalcLOD ();
 }
 
 void csTerrBlock::UpdateBlockColors ()
@@ -561,7 +560,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
 
   int clip_portal, clip_plane, clip_z_plane;
   if (!rview->ClipBBox (terr->planes, frustum_mask,
-    bbox, clip_portal, clip_plane, clip_z_plane))
+      bbox, clip_portal, clip_plane, clip_z_plane))
     return;
 
   csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
@@ -1985,7 +1984,7 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
 
   UpdateColors ();
 
-  rootblock->CalcLOD (rview);
+  rootblock->CalcLOD ();
 
   bool rmCreated;
   returnMeshes = &returnMeshesHolder.GetUnusedData (rmCreated, 

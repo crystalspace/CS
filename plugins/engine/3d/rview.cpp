@@ -59,10 +59,7 @@ csRenderView::csRenderView (iCamera *c) :
 }
 
 csRenderView::csRenderView (
-  iCamera *c,
-  iClipper2D *v,
-  iGraphics3D *ig3d,
-  iGraphics2D *ig2d) :
+  iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2D *ig2d) :
     engine(0),
     g3d(ig3d),
     g2d(ig2d),
@@ -468,13 +465,14 @@ bool csRenderView::ClipBBox (
 
 void csRenderView::CreateRenderContext ()
 {
-  csRenderContext *old_ctxt = ctxt;
+  csRenderContext* old_ctxt = ctxt;
 
   // @@@ Use a pool for render contexts?
   // A pool would work very well here since the number of render contexts
   // is limited by recursion depth.
   ctxt = new csRenderContext ();
   *ctxt = *old_ctxt;
+  ctxt->previous = old_ctxt;
   if (ctxt->icamera) ctxt->icamera->IncRef ();
   if (ctxt->iview) ctxt->iview->IncRef ();
   // The camera transform id is copied from the old
@@ -484,10 +482,10 @@ void csRenderView::CreateRenderContext ()
   ctxt->context_id = context_id;
 }
 
-void csRenderView::RestoreRenderContext (csRenderContext *original)
+void csRenderView::RestoreRenderContext ()
 {
-  csRenderContext *old_ctxt = ctxt;
-  ctxt = original;
+  csRenderContext* old_ctxt = ctxt;
+  ctxt = ctxt->previous;
 
   if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
   if (old_ctxt->iview) old_ctxt->iview->DecRef ();
