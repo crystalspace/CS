@@ -173,7 +173,7 @@ rule LinkStaticPlugins
   ExtraObjects $(target) : $(staticobject) : inheritcflags ;
 }
 
-##  StaticPluginLibrary name
+##  StaticPluginLibrary name [: rejects]
 ##    Create a library that monolithically contains statically linkable 
 ##    versions of all plugins, and also provides a target to install this
 ##    library ("install_staticplugins") as well as resources to facilitate the
@@ -186,10 +186,22 @@ rule LinkStaticPlugins
 rule StaticPluginLibrary
 {
   local name = $(<) ;
+  local rejects = $(>) ;
   local t ;
+
+  local targets = $(STATICPLUGINS.SUBTARGETS) ;
+  if $(rejects)
+  {
+    targets = [ Filter $(targets) : $(rejects) ] ;
+  }
+  local objects ;
+  for t in $(targets)
+  {
+    objects += $(STATICPLUGINS.OBJECTS.$(t)) ;
+  }
+  
   # Set up library
-  Library $(name) : $(STATICPLUGINS.OBJECTS) : 
-    noinstall notest independent nohelp ;
+  Library $(name) : $(objects) : noinstall notest independent nohelp ;
   SEARCH on $(name) += $(LOCATE_TARGET) ;
   MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
   CFlags $(name) : 
@@ -198,7 +210,7 @@ rule StaticPluginLibrary
   
   # Copy a variety of flags
   local o ;
-  for o in $(STATICPLUGINS.OBJECTS)
+  for o in $(objects)
   {
     local sourceobj = $(STATICPLUGINS.OBJECTS.$(o)) ;
     if $(sourceobj)
@@ -211,7 +223,7 @@ rule StaticPluginLibrary
   # Write out needed CFLAGS, LFLAGS
   STATICPLUGINS.DEPENDENCIES = $(name).jam ;
   MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(LOCATE.OBJECTS)/libs ;
-  for t in $(STATICPLUGINS.SUBTARGETS)
+  for t in $(targets)
   {
     WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;
   }
@@ -230,7 +242,7 @@ rule StaticPluginLibrary
   
   # Collect library dependencies. The idea is to built all libs needed by the
   # static plugins when "jam staticplugins" is invoked.
-  for t in $(STATICPLUGINS.SUBTARGETS)
+  for t in $(targets)
   {
     local deplibs ;
     if $($(t).NEEDLIBS)

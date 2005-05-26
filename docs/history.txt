@@ -47,6 +47,10 @@ chronological order.
 	    http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
 	    http://www.nedprod.com/programs/gccvisibility.html
 	    http://bugs.gentoo.org/show_bug.cgi?id=78720
+	- res added the STL to the msvcgen Jamconfig.
+	- res augmented the StaticPluginLibrary with the ability to exclude
+	  certain plugins.
+	- res excluded the wxgl plugin from the MSVC static plugins library.
 25-May-2005
 	- res added (limited) support for non-power-of-two-sized textures.
 	- Eric Sunshine fixed a compilation error in OSXAssistant.cpp from

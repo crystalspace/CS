@@ -954,7 +954,8 @@ rule Plugin
   MsvcProject $(<) : plugin : $(<:S=.dll) : $(>) ;
   CompileGroups $(<) : all plugins ;
 
-  STATICPLUGINS.SOURCE += $(>:R=$(SEARCH_SOURCE)) ;
+  STATICPLUGINS.SOURCES.$(<) += $(>:R=$(SEARCH_SOURCE)) ;
+  STATICPLUGINS.SUBTARGETS += $(<) ;
 
   # Generate static variant of plugin
   #  Static registry
@@ -965,8 +966,7 @@ rule Plugin
   GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
   Always $(staticreg_out) ;
   Depends msvcgen : $(staticreg_out) ;
-  STATICPLUGINS.SOURCE += $(outdir)/$(staticreg_out) ;
-  STATICPLUGINS.SUBTARGETS += $(<) ;
+  STATICPLUGINS.SOURCE.$(<) += $(outdir)/$(staticreg_out) ;
 }
 
 rule Library
@@ -980,10 +980,23 @@ rule Library
 rule StaticPluginLibrary
 {
   local name = $(<) ;
+  local rejects = $(>) ;
   local t ;
+
+  local targets = $(STATICPLUGINS.SUBTARGETS) ;
+  if $(rejects)
+  {
+    targets = [ Filter $(targets) : $(rejects) ] ;
+  }
+  local sources ;
+  for t in $(targets)
+  {
+    sources += $(STATICPLUGINS.SOURCES.$(t)) ;
+  }
+
   $(name)_STATIC = "yes" ;
   # Set up library
-  Library $(name) : $(STATICPLUGINS.SOURCE) ;
+  Library $(name) : $(sources) ;
   MsvcDefine $(name) : CS_STATIC_LINKED ;
   _MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
 
@@ -992,7 +1005,7 @@ rule StaticPluginLibrary
   STATICPLUGINS.DEPENDENCIES = $(name)_msvc.jam ;
   MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(outdir) ;
   SEARCH on $(STATICPLUGINS.DEPENDENCIES) = $(outdir) ;
-  for t in $(STATICPLUGINS.SUBTARGETS)
+  for t in $(targets)
   {
     NotFile $(t) ;
     WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;

@@ -63,7 +63,6 @@ rule Plugin
   if ! $(NO_STATIC_LINKING)
   {
     SubVariant static ;
-    local statictarget = $(<)_static ;
     local staticreginfoobject = [ BuildStaticRegFile $(<) : $(statictarget) ] ;
 
     # Add objects to the list of candidates for potential inclusion in a
@@ -87,10 +86,9 @@ rule Plugin
     }
 
     MakeLocate $(staticobjects) : $(LOCATE_TARGET) ;
-    STATICPLUGINS.OBJECTS += $(staticreginfoobject) ;
-    STATICPLUGINS.OBJECTS += $(staticobjects) ;
+    STATICPLUGINS.OBJECTS.$(<) += $(staticreginfoobject) ;
+    STATICPLUGINS.OBJECTS.$(<)  += $(staticobjects) ;
     STATICPLUGINS.SUBTARGETS += $(<) ;
-    STATICPLUGINS.OBJECTS.$(<) += $(staticobjects) ;
     
     SubVariant ;
   }
