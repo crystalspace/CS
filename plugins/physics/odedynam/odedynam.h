@@ -739,10 +739,21 @@ struct csStrictODEJoint
   dJointID jointID;
   csRef<iRigidBody> body[2];
   dBodyID bodyID[2];
+  dJointFeedback *feedback;
+
+  csStrictODEJoint () {feedback = NULL;};
   void Attach (iRigidBody *body1, iRigidBody *body2);
   csRef<iRigidBody> GetAttachedBody (int body);
   void SetParam (int joint_type, int param, int axis, float value);
   float GetParam (int joint_type, int param, int axis);
+  csVector3 GetFeedbackForce1 ();
+  csVector3 GetFeedbackTorque1 ();
+  csVector3 GetFeedbackForce2 ();
+  csVector3 GetFeedbackTorque2 ();
+
+private:
+
+  void CreateFeedback ();
 
 };
 
@@ -757,7 +768,7 @@ struct ODESliderJoint : public csStrictODEJoint, iODESliderJoint
   ODESliderJoint (dWorldID w_id);
   virtual ~ODESliderJoint ();
 
-    void SetLoStop (float value, int axis) 
+  void SetLoStop (float value, int axis) 
   {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis, value);};
   void SetHiStop (float value, int axis)
   {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis, value);};
@@ -807,6 +818,10 @@ struct ODESliderJoint : public csStrictODEJoint, iODESliderJoint
   csVector3 GetSliderAxis ();
   float GetSliderPosition () {return dJointGetSliderPosition (jointID);};
   float GetSliderPositionRate () {return dJointGetSliderPositionRate (jointID);};
+  csVector3 GetFeedbackForce1 () {return csStrictODEJoint::GetFeedbackForce1 ();};
+  csVector3 GetFeedbackTorque1 () {return csStrictODEJoint::GetFeedbackForce2 ();};
+  csVector3 GetFeedbackForce2 () {return csStrictODEJoint::GetFeedbackTorque1 ();};
+  csVector3 GetFeedbackTorque2 () {return csStrictODEJoint::GetFeedbackTorque2 ();};
 
   void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
   csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
@@ -826,6 +841,10 @@ struct ODEUniversalJoint : public csStrictODEJoint, iODEUniversalJoint
   csVector3 GetUniversalAnchor2 ();
   csVector3 GetUniversalAxis1 ();
   csVector3 GetUniversalAxis2 ();
+  csVector3 GetFeedbackForce1 () {return csStrictODEJoint::GetFeedbackForce1 ();};
+  csVector3 GetFeedbackTorque1 () {return csStrictODEJoint::GetFeedbackForce2 ();};
+  csVector3 GetFeedbackForce2 () {return csStrictODEJoint::GetFeedbackTorque1 ();};
+  csVector3 GetFeedbackTorque2 () {return csStrictODEJoint::GetFeedbackTorque2 ();};
 
   void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
   csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
@@ -841,6 +860,10 @@ struct ODEBallJoint : public csStrictODEJoint, iODEBallJoint
   csVector3 GetBallAnchor1 ();
   csVector3 GetBallAnchor2 ();
   csVector3 GetAnchorError ();
+  csVector3 GetFeedbackForce1 () {return csStrictODEJoint::GetFeedbackForce1 ();};
+  csVector3 GetFeedbackTorque1 () {return csStrictODEJoint::GetFeedbackForce2 ();};
+  csVector3 GetFeedbackForce2 () {return csStrictODEJoint::GetFeedbackTorque1 ();};
+  csVector3 GetFeedbackTorque2 () {return csStrictODEJoint::GetFeedbackTorque2 ();};
 
   virtual ~ODEBallJoint ();
 
@@ -915,6 +938,10 @@ struct ODEAMotorJoint : public csStrictODEJoint, iODEAMotorJoint
   void SetAMotorAngle (int axis_num, float angle) {dJointSetAMotorAngle (jointID, axis_num, angle);};
   float GetAMotorAngle (int axis_num) {return dJointGetAMotorAngle (jointID, axis_num);};
   float GetAMotorAngleRate (int axis_num) {return dJointGetAMotorAngle (jointID, axis_num);};
+  csVector3 GetFeedbackForce1 () {return csStrictODEJoint::GetFeedbackForce1 ();};
+  csVector3 GetFeedbackTorque1 () {return csStrictODEJoint::GetFeedbackForce2 ();};
+  csVector3 GetFeedbackForce2 () {return csStrictODEJoint::GetFeedbackTorque1 ();};
+  csVector3 GetFeedbackTorque2 () {return csStrictODEJoint::GetFeedbackTorque2 ();};
 
   void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
   csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};
@@ -982,6 +1009,10 @@ struct ODEHingeJoint : public csStrictODEJoint, iODEHingeJoint
   float GetHingeAngle () {return dJointGetHingeAngle (jointID);};
   float GetHingeAngleRate () {return dJointGetHingeAngleRate (jointID);};
   csVector3 GetAnchorError ();
+  csVector3 GetFeedbackForce1 () {return csStrictODEJoint::GetFeedbackForce1 ();};
+  csVector3 GetFeedbackTorque1 () {return csStrictODEJoint::GetFeedbackForce2 ();};
+  csVector3 GetFeedbackForce2 () {return csStrictODEJoint::GetFeedbackTorque1 ();};
+  csVector3 GetFeedbackTorque2 () {return csStrictODEJoint::GetFeedbackTorque2 ();};
 
   void Attach (iRigidBody *body1, iRigidBody *body2) {csStrictODEJoint::Attach (body1, body2);};
   csRef<iRigidBody> GetAttachedBody (int body) {return csStrictODEJoint::GetAttachedBody (body);};

@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 26-May-2005
+	- Piotr Obrzut added getters for joint feedback information to 
+	  strict ode joints.	
 	- Jorrit did a small optimization to bruteblock.
 	- Jorrit fixed a bug in the OpenGL renderer introduced by Anders
 	  on 17-Jul-2004. For some strange reason he set the number of

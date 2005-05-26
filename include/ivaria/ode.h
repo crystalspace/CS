@@ -474,6 +474,18 @@ struct iODEGeneralJointState : public iBase
   /// Get an attached body (valid values for body are 0 and 1)
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
 
+  /// Get force that joint applies to body 1
+  virtual csVector3 GetFeedbackForce1 () = 0;
+
+  /// Get torque that joint applies to body 1
+  virtual csVector3 GetFeedbackTorque1 () = 0;
+
+  /// Get force that joint applies to body 2
+  virtual csVector3 GetFeedbackForce2 () = 0;
+
+  /// Get torque that joint applies to body 2
+  virtual csVector3 GetFeedbackTorque2 () = 0;
+
 };
 
 SCF_VERSION (iODESliderJoint, 0, 0, 1);
@@ -547,6 +559,19 @@ struct iODEUniversalJoint : public iBase
 
   /// Get an attached body (valid values for body are 0 and 1)
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+
+    /// Get force that joint applies to body 1
+  virtual csVector3 GetFeedbackForce1 () = 0;
+
+  /// Get torque that joint applies to body 1
+  virtual csVector3 GetFeedbackTorque1 () = 0;
+
+  /// Get force that joint applies to body 2
+  virtual csVector3 GetFeedbackForce2 () = 0;
+
+  /// Get torque that joint applies to body 2
+  virtual csVector3 GetFeedbackTorque2 () = 0;
+
 };
 
 enum ODEAMotorMode
@@ -756,6 +781,18 @@ struct iODEBallJoint : public iBase
   
   /// Get an attached body (valid values for body are 0 and 1)
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+
+  /// Get force that joint applies to body 1
+  virtual csVector3 GetFeedbackForce1 () = 0;
+
+  /// Get torque that joint applies to body 1
+  virtual csVector3 GetFeedbackTorque1 () = 0;
+
+  /// Get force that joint applies to body 2
+  virtual csVector3 GetFeedbackForce2 () = 0;
+
+  /// Get torque that joint applies to body 2
+  virtual csVector3 GetFeedbackTorque2 () = 0;
 };
 
 

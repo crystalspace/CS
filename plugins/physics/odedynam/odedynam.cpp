@@ -1678,6 +1678,54 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
       return 0.0; 
   }
 }
+
+void csStrictODEJoint::CreateFeedback ()
+{
+    feedback = new dJointFeedback ();
+
+    feedback->f1[0] = 0;
+    feedback->f1[1] = 0;
+    feedback->f1[2] = 0;
+
+    feedback->f2[0] = 0;
+    feedback->f2[1] = 0;
+    feedback->f2[2] = 0;
+
+    feedback->t1[0] = 0;
+    feedback->t1[1] = 0;
+    feedback->t1[2] = 0;
+
+    feedback->t2[0] = 0;
+    feedback->t2[1] = 0;
+    feedback->t2[2] = 0;
+
+    dJointSetFeedback (jointID, feedback);
+}
+
+csVector3 csStrictODEJoint::GetFeedbackForce1 ()
+{
+  if (feedback == NULL) CreateFeedback ();
+  return csVector3(feedback->f1[0], feedback->f1[1], feedback->f1[2]);
+}
+
+csVector3 csStrictODEJoint::GetFeedbackTorque1 ()
+{
+  if (feedback == NULL) CreateFeedback ();
+  return csVector3(feedback->f2[0], feedback->f2[1], feedback->f2[2]);
+}
+
+csVector3 csStrictODEJoint::GetFeedbackForce2 ()
+{
+  if (feedback == NULL) CreateFeedback ();
+  return csVector3(feedback->t1[0], feedback->t1[1], feedback->t1[2]);
+}
+
+csVector3 csStrictODEJoint::GetFeedbackTorque2 ()
+{
+  if (feedback == NULL) CreateFeedback ();
+  return csVector3(feedback->t2[0], feedback->t2[1], feedback->t2[2]);
+}
+
 //-------------------------------------------------------------------------------
 ODESliderJoint::ODESliderJoint (dWorldID w_id)
 {
