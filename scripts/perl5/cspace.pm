@@ -3974,7 +3974,7 @@ sub ACQUIRE {
 ############# Class : cspace::csPath ##############
 
 package cspace::csPath;
-@ISA = qw( cspace cspace::csCatmullRomSpline );
+@ISA = qw( cspace cspace::iPath );
 %OWNER = ();
 %ITERATORS = ();
 *swig_scfRefCount_get = *cspacec::csPath_scfRefCount_get;
@@ -4008,10 +4008,18 @@ sub DESTROY {
 }
 
 *Length = *cspacec::csPath_Length;
+*GetPointCount = *cspacec::csPath_GetPointCount;
 *CalculateAtTime = *cspacec::csPath_CalculateAtTime;
+*Calculate = *cspacec::csPath_Calculate;
 *GetCurrentIndex = *cspacec::csPath_GetCurrentIndex;
 *GetTime = *cspacec::csPath_GetTime;
+*GetTimeValue = *cspacec::csPath_GetTimeValue;
 *SetTime = *cspacec::csPath_SetTime;
+*SetTimeValue = *cspacec::csPath_SetTimeValue;
+*SetTimes = *cspacec::csPath_SetTimes;
+*SetTimeValues = *cspacec::csPath_SetTimeValues;
+*GetTimes = *cspacec::csPath_GetTimes;
+*GetTimeValues = *cspacec::csPath_GetTimeValues;
 *SetPositionVectors = *cspacec::csPath_SetPositionVectors;
 *SetUpVectors = *cspacec::csPath_SetUpVectors;
 *SetForwardVectors = *cspacec::csPath_SetForwardVectors;
@@ -4024,6 +4032,10 @@ sub DESTROY {
 *GetInterpolatedPosition = *cspacec::csPath_GetInterpolatedPosition;
 *GetInterpolatedUp = *cspacec::csPath_GetInterpolatedUp;
 *GetInterpolatedForward = *cspacec::csPath_GetInterpolatedForward;
+*GetDimensionValues = *cspacec::csPath_GetDimensionValues;
+*GetDimensionValue = *cspacec::csPath_GetDimensionValue;
+*InsertPoint = *cspacec::csPath_InsertPoint;
+*RemovePoint = *cspacec::csPath_RemovePoint;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -10834,6 +10846,7 @@ package cspace::iTextureHandle;
 *CS_TEX_IMG_2D = *cspacec::iTextureHandle_CS_TEX_IMG_2D;
 *CS_TEX_IMG_3D = *cspacec::iTextureHandle_CS_TEX_IMG_3D;
 *CS_TEX_IMG_CUBEMAP = *cspacec::iTextureHandle_CS_TEX_IMG_CUBEMAP;
+*CS_TEX_IMG_RECT = *cspacec::iTextureHandle_CS_TEX_IMG_RECT;
 *CS_TEXTURE_CUBE_POS_X = *cspacec::iTextureHandle_CS_TEXTURE_CUBE_POS_X;
 *CS_TEXTURE_CUBE_NEG_X = *cspacec::iTextureHandle_CS_TEXTURE_CUBE_NEG_X;
 *CS_TEXTURE_CUBE_POS_Y = *cspacec::iTextureHandle_CS_TEXTURE_CUBE_POS_Y;
@@ -13457,6 +13470,7 @@ sub CS_TEXTURE_DITHER () { $cspacec::CS_TEXTURE_DITHER }
 sub CS_TEXTURE_NOMIPMAPS () { $cspacec::CS_TEXTURE_NOMIPMAPS }
 sub CS_TEXTURE_CLAMP () { $cspacec::CS_TEXTURE_CLAMP }
 sub CS_TEXTURE_NOFILTER () { $cspacec::CS_TEXTURE_NOFILTER }
+sub CS_TEXTURE_NPOTS () { $cspacec::CS_TEXTURE_NPOTS }
 sub CS_DEFMAT_DIFFUSE () { $cspacec::CS_DEFMAT_DIFFUSE }
 sub CS_DEFMAT_AMBIENT () { $cspacec::CS_DEFMAT_AMBIENT }
 sub CS_DEFMAT_REFLECTION () { $cspacec::CS_DEFMAT_REFLECTION }
