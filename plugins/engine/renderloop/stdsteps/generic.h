@@ -75,6 +75,12 @@ public:
   virtual csPtr<iRenderStep> Create ();
 };
 
+struct meshInfo
+{
+  iShaderVariableContext* svc;
+  bool noclip;	// From iMeshWrapper CS_ENTITY_NOCLIP.
+};
+
 class csGenericRenderStep : public iRenderStep, 
 			    public iGenericRenderStep,
 			    public iLightRenderStep
@@ -99,7 +105,7 @@ private:
   // level are removed again.
   csDirtyAccessArray<csRenderMesh*> visible_meshes;
   csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
-  csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
+  csDirtyAccessArray<meshInfo> mesh_info;
   size_t visible_meshes_index;	// First free index in the visible meshes.
 
   /* @@@ Ugly. */
@@ -139,9 +145,10 @@ public:
   virtual void AddDisableDefaultTriggerType (const char* type);
   virtual void RemoveDisableDefaultTriggerType (const char* type);
 
-  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
-    size_t ticket, iShaderVariableContext** meshContext, 
-    csRenderMesh** meshes, size_t num, csShaderVarStack &stacks);
+  inline void RenderMeshes (iRenderView* rview,
+  	iGraphics3D* g3d, iShader* shader,
+	size_t ticket, meshInfo* meshContext,
+	csRenderMesh** meshes, size_t num, csShaderVarStack &stacks);
 
   /// Enables/disables z offset and z mode as needed
   inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);

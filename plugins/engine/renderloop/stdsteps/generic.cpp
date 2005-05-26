@@ -22,6 +22,7 @@
 
 #include "cstool/fogmath.h"
 #include "iutil/document.h"
+#include "igeom/clip2d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
@@ -187,9 +188,9 @@ csGenericRenderStep::~csGenericRenderStep ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
+void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
                                         iShader* shader, size_t ticket,
-					iShaderVariableContext** meshContexts,
+					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
                                         csShaderVarStack& stacks)
@@ -206,6 +207,10 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 
   iMaterial *material = 0;
   iShaderVariableContext* lastMeshContext = 0;
+
+  bool noclip = false;
+  csRef<iClipper2D> old_clipper;
+  int old_cliptype;
   
   size_t numPasses = shader->GetNumberOfPasses (ticket);
   for (size_t p = 0; p < numPasses; p++)
@@ -216,7 +221,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
-      iShaderVariableContext* meshContext = meshContexts[j];
+      iShaderVariableContext* meshContext = meshContexts[j].svc;
       if (meshContext->IsEmpty())
 	meshContext = 0;
       if ((!portalTraversal) && mesh->portal != 0) continue;
@@ -244,6 +249,26 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       
       csRenderMeshModes modes (*mesh);
       shader->SetupPass (ticket, mesh, modes, stacks);
+
+      if (meshContexts[j].noclip && !noclip)
+      {
+        // This mesh doesn't want clipping and the clip was not
+	// already disabled.
+	noclip = true;
+	// First search for the top level clipper.
+	csRenderContext* ctxt = rview->GetRenderContext ();
+	while (ctxt->previous) ctxt = ctxt->previous;
+	old_clipper = g3d->GetClipper ();
+	old_cliptype = g3d->GetClipType ();
+	g3d->SetClipper (ctxt->iview, ctxt->do_clip_frustum ?
+		CS_CLIPPER_REQUIRED : CS_CLIPPER_OPTIONAL);
+      }
+      else if (!meshContexts[j].noclip && noclip)
+      {
+        // Restore clipper.
+	g3d->SetClipper (old_clipper, old_cliptype);
+	old_clipper = 0;
+      }
       g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass (ticket);
 
@@ -252,6 +277,12 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       shadervars.Top ().PopVariables (stacks);
     }
     shader->DeactivatePass (ticket);
+  }
+
+  // Restore clipper if needed.
+  if (noclip)
+  {
+    g3d->SetClipper (old_clipper, old_cliptype);
   }
 
   if (lastMeshContext) lastMeshContext->PopVariables (stacks);
@@ -384,16 +415,20 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   size_t num = meshlist->SortMeshLists (rview);
   visible_meshes.SetLength (visible_meshes_index+num);
   imeshes_scratch.SetLength (num);
-  mesh_svc.SetLength (visible_meshes_index+num);
+  mesh_info.SetLength (visible_meshes_index+num);
   csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ()
   	+ visible_meshes_index;
-  iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ()
+  meshInfo* sameShaderMeshInfo = mesh_info.GetArray ()
   	+ visible_meshes_index;
   size_t prev_visible_meshes_index = visible_meshes_index;
   visible_meshes_index += num;
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
   for (size_t i = 0; i < num; i++)
-    sameShaderMeshSvcs[i] = imeshes_scratch[i]->GetSVContext();
+  {
+    sameShaderMeshInfo[i].svc = imeshes_scratch[i]->GetSVContext();
+    sameShaderMeshInfo[i].noclip = imeshes_scratch[i]->GetFlags ().Check (
+    	CS_ENTITY_NOCLIP);
+  }
  
   size_t lastidx = 0;
   size_t numSSM = 0;
@@ -450,8 +485,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         if (shader != 0)
 	{
           g3d->SetWorldToCamera (camt);
-	  RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx,
-	    sameShaderMeshes+lastidx, numSSM, stacks);
+	  RenderMeshes (rview, g3d, shader, currentTicket,
+	  	sameShaderMeshInfo + lastidx,
+		sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
 	}
         numSSM = 0;
@@ -470,7 +506,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       // the sameShaderMeshes pointer because it may now point
       // to an invalid area.
       sameShaderMeshes = visible_meshes.GetArray () + prev_visible_meshes_index;
-      sameShaderMeshSvcs = mesh_svc.GetArray () + prev_visible_meshes_index;
+      sameShaderMeshInfo = mesh_info.GetArray () + prev_visible_meshes_index;
     }
     else 
     {
@@ -507,15 +543,16 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
       size_t newTicket = meshShader ? ticketHelper.GetTicket (
 	mesh->material->GetMaterial (), meshShader, 
-	sameShaderMeshSvcs[n], mesh) : (size_t)~0;
+	sameShaderMeshInfo[n].svc, mesh) : (size_t)~0;
       if ((meshShader != shader) || (newTicket != currentTicket))
       {
         // @@@ Need error reporter
         if (shader != 0)
 	{
           g3d->SetWorldToCamera (camt);
-          RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx, 
-	    sameShaderMeshes + lastidx, numSSM, stacks);
+          RenderMeshes (rview, g3d, shader, currentTicket,
+	  	sameShaderMeshInfo + lastidx, 
+		sameShaderMeshes + lastidx, numSSM, stacks);
 	}
 	lastidx = n;
         shader = meshShader;
@@ -532,7 +569,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (shader != 0)
     {
       g3d->SetWorldToCamera (camt);
-      RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx,
+      RenderMeshes (rview, g3d, shader, currentTicket,
+      	sameShaderMeshInfo + lastidx,
         sameShaderMeshes + lastidx, numSSM, stacks);
     }
   }

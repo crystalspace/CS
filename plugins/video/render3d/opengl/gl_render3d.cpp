@@ -600,6 +600,8 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
       cache_clip_z_plane == clip_z_plane)
   {
     SetCorrectStencilState ();
+  for (int i = 0 ; i < maxClipPlanes; i++)
+    glDisable ((GLenum)(GL_CLIP_PLANE0+i));
     return;
   }
   cache_clip_portal = clip_portal;

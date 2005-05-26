@@ -554,8 +554,6 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   // object will be rendered at the first portal and not clipped to that
   // portal (as is usually the case).
   csRenderContext* old_ctxt = 0;
-  iClipper2D* old_clipper = 0;
-  int old_cliptype = 0;
 
   if (flags.Check (CS_ENTITY_NOCLIP))
   {
@@ -574,14 +572,6 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     // Go back to top-level context.
     while (ctxt->previous) ctxt = ctxt->previous;
     csrview->SetCsRenderContext (ctxt);
-
-    iGraphics3D *G3D = rview->GetGraphics3D ();
-    old_clipper = G3D->GetClipper ();
-    old_cliptype = G3D->GetClipType ();
-    G3D->SetClipper (
-      rview->GetClipper (),
-      csrview->IsClipperRequired ()
-      	? CS_CLIPPER_REQUIRED : CS_CLIPPER_OPTIONAL);
   }
 
   csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
@@ -604,8 +594,6 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   {
     csRenderView* csrview = (csRenderView*)rview;
     csrview->SetCsRenderContext (old_ctxt);
-    iGraphics3D *G3D = rview->GetGraphics3D ();
-    G3D->SetClipper (old_clipper, old_cliptype);
   }
   return rmeshes;
 }

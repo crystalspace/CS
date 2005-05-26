@@ -53,6 +53,7 @@ chronological order.
 	- res augmented the StaticPluginLibrary with the ability to exclude
 	  certain plugins.
 	- res excluded the wxgl plugin from the MSVC static plugins library.
+	- Jorrit fixed the <noclip/> option so that it really works now.
 25-May-2005
 	- res added (limited) support for non-power-of-two-sized textures.
 	- Eric Sunshine fixed a compilation error in OSXAssistant.cpp from
