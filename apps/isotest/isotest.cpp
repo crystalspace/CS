@@ -64,10 +64,10 @@ IsoTest::IsoTest (iObjectRegistry* object_reg)
   IsoTest::object_reg = object_reg;
 
   current_view = 0;
-  views[0].camera_offset.Set (-4, 4, -4);
-  views[1].camera_offset.Set (-9, 9, -9);
-  views[2].camera_offset.Set (4, 4, -4);
-  views[3].camera_offset.Set (0, 4, -4);
+  views[0].SetOrigOffset (csVector3 (-4, 4, -4));
+  views[1].SetOrigOffset (csVector3 (-9, 9, -9));
+  views[2].SetOrigOffset (csVector3 (4, 4, -4));
+  views[3].SetOrigOffset (csVector3 (0, 4, -4));
 }
 
 IsoTest::~IsoTest ()
@@ -82,15 +82,30 @@ void IsoTest::SetupFrame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 90);
 
-  iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    actor->GetMovable ()->MovePosition (csVector3 (speed, 0, 0));
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    actor->GetMovable ()->MovePosition (csVector3 (-speed, 0, 0));
-  if (kbd->GetKeyState (CSKEY_UP))
-    actor->GetMovable ()->MovePosition (csVector3 (0, 0, speed));
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    actor->GetMovable ()->MovePosition (csVector3 (0, 0, -speed));
+  if (kbd->GetModifierState (CSKEY_SHIFT_LEFT) 
+    || kbd->GetModifierState (CSKEY_SHIFT_RIGHT))
+  {
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      views[current_view].angle += speed*15.f;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      views[current_view].angle -= speed*15.f;
+    if (kbd->GetKeyState (CSKEY_UP))
+      views[current_view].distance -= 0.25f*speed;
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      views[current_view].distance += 0.25f*speed;
+    SetupIsoView(views[current_view]);
+  }
+  else
+  {
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      actor->GetMovable ()->MovePosition (csVector3 (speed, 0, 0));
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      actor->GetMovable ()->MovePosition (csVector3 (-speed, 0, 0));
+    if (kbd->GetKeyState (CSKEY_UP))
+      actor->GetMovable ()->MovePosition (csVector3 (0, 0, speed));
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      actor->GetMovable ()->MovePosition (csVector3 (0, 0, -speed));
+  }
 
   // Make sure actor is constant distance above plane.
   csVector3 actor_pos = actor->GetMovable ()->GetPosition ();
@@ -107,20 +122,7 @@ void IsoTest::SetupFrame ()
   // Move the light.
   actor_light->SetCenter (actor_pos+csVector3 (0, 2, 0));
 
-  // Let the camera look at the actor.
-  // so the camera is set to look at 'actor_pos'
-  int isofactor = 50; // 98.3% isometric (=GetFovAngle()/180.0)
-  csOrthoTransform& cam_trans = c->GetTransform ();
-  cam_trans.SetOrigin (actor_pos + 
-    float(isofactor)*views[current_view].camera_offset);
-  cam_trans.LookAt (actor_pos-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
-  // due to moving the camera so far away, depth buffer accuracy is
-  // impaired, repair that by using smaller coordinate system
-  csOrthoTransform repair_trans = c->GetTransform();
-  repair_trans.SetT2O( repair_trans.GetT2O() / float(isofactor*isofactor) );
-  c->SetTransform(repair_trans);
-  // set fov more isometric, could be done in initialisation once.
-  c->SetFOV(g3d->GetHeight()*isofactor, g3d->GetWidth());
+  CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos); 
   
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -128,6 +130,23 @@ void IsoTest::SetupFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+
+  int txtw=0, txth=0;
+  font->GetMaxSize(txtw, txth);
+  if(txth == -1) txth = 20;
+  int white = g3d->GetDriver2D ()->FindRGB (255, 255, 255);
+  int ypos = g3d->GetDriver2D ()->GetHeight () - txth*3 - 1;
+  g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
+    "Isometric demo keys (esc to exit):");
+  ypos += txth;
+  g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
+    "   arrow keys: move around");
+  ypos += txth;
+  g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
+    "   shift+arrow keys: rotate/zoom camera");
 }
 
 void IsoTest::FinishFrame ()
@@ -167,6 +186,39 @@ bool IsoTest::HandleEvent (iEvent& ev)
   }
 
   return false;
+}
+
+void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
+    const csVector3& lookat)
+{
+  // Let the camera look at the actor.
+  // so the camera is set to look at 'actor_pos'
+  int isofactor = 50; // 98.3% isometric (=GetFovAngle()/180.0)
+
+  // set center and lookat
+  csOrthoTransform& cam_trans = cam->GetTransform ();
+  cam_trans.SetOrigin (lookat + float(isofactor)*isoview.camera_offset);
+  cam_trans.LookAt (lookat-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
+  // set fov more isometric, could be done in initialisation once.
+  cam->SetFOV (g3d->GetHeight()*isofactor, g3d->GetWidth());
+
+  // due to moving the camera so far away, depth buffer accuracy is
+  // impaired, repair that by using smaller coordinate system
+  csOrthoTransform repair_trans = cam->GetTransform();
+  repair_trans.SetT2O (repair_trans.GetT2O()/repair_trans.GetOrigin().Norm());
+  cam->SetTransform (repair_trans);
+}
+
+void IsoTest::SetupIsoView(IsoView& isoview)
+{
+  // clamp
+  if(isoview.angle < 0.f) isoview.angle += 360.f;
+  if(isoview.angle > 360.f) isoview.angle -= 360.f;
+  if(isoview.distance < 0.05f) isoview.distance = 0.05f;
+  if(views[current_view].distance > 10.f) isoview.distance = 10.f;
+  // setup
+  csYRotMatrix3 r(isoview.angle * PI / 180.0);
+  isoview.camera_offset = (r*isoview.original_offset)*isoview.distance;
 }
 
 bool IsoTest::IsoTestEventHandler (iEvent& ev)
@@ -302,6 +354,13 @@ bool IsoTest::Initialize ()
   	CS_REQUEST_VFS,
 	CS_REQUEST_OPENGL3D,
 	CS_REQUEST_ENGINE,
+	CS_REQUEST_PLUGIN("crystalspace.font.server.multiplexer", iFontServer),
+	"crystalspace.font.server.freetype2", "iFontServer.1", 
+	  scfInterface<iFontServer>::GetID(), 
+	  scfInterface<iFontServer>::GetVersion(),
+	"crystalspace.font.server.default", "iFontServer.2", 
+	  scfInterface<iFontServer>::GetID(), 
+	  scfInterface<iFontServer>::GetVersion(),
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
@@ -389,6 +448,11 @@ bool IsoTest::Initialize ()
   view = csPtr<iView> (new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  font = g3d->GetDriver2D ()->GetFontServer()->LoadFont
+    ("/fonts/ttf/Vera.ttf", 10);
+  if(!font) // fallback
+    font = g3d->GetDriver2D ()->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   if (!LoadMap ()) return false;
   if (!CreateActor ()) return false;

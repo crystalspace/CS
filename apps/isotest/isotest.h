@@ -34,10 +34,29 @@ struct iSector;
 struct iView;
 struct iMeshWrapper;
 struct iLight;
+struct iCamera;
+struct iFont;
 
+/**
+ * Capture an isometric camera viewpoint.
+ * After changing angle or distance, call SetupIsoView() on it.
+ * Every frame the camera moves or changes angle or distance call
+ *   CameraIsoLookat with the view as argument.
+ */
 struct IsoView
 {
+  /// offset to apply to the camera.
   csVector3 camera_offset;
+  /// original camera offset.
+  csVector3 original_offset;
+  /// angle of rotation, in degrees, 0.0 is the original rotation.
+  float angle;
+  /// distance from the lookat spot. 1.0 is original distance.
+  float distance;
+
+  /// initialize with original offset of camera from the spot you look at.
+  void SetOrigOffset(const csVector3& v) 
+  { camera_offset = original_offset = v; angle = 0.f; distance = 1.f; }
 };
 
 class IsoTest
@@ -54,6 +73,7 @@ private:
   csRef<iMeshWrapper> actor;
   iMeshWrapper* plane;
   csRef<iLight> actor_light;
+  csRef<iFont> font;
 
   int current_view;
   IsoView views[4];
@@ -65,6 +85,12 @@ private:
 
   bool CreateActor ();
   bool LoadMap ();
+
+  /// make the camera look at given position using isometric viewpoint.
+  void CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview, 
+    const csVector3& lookat);
+  /// setup an isometric view to be ready for display, call after rotating
+  void SetupIsoView(IsoView& isoview);
 
 public:
   IsoTest (iObjectRegistry* object_reg);

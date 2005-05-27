@@ -42,6 +42,8 @@ chronological order.
 	  just uses resources.
 	- res made the parallax shader fall back to the default "light_bumpmap"
 	  shader.
+	- Wouter changed the isotest demo to display a helpful text and
+	  you can rotate and zoom the camera when holding the shift key.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	
