@@ -30,6 +30,10 @@ chronological order.
 	- Wouter Wijngaards made the isometric test application camera more
 	  isometric. It is now 98% isometric, where it was 41% isometric
 	  before. Any more is hard due to the accuracy of float numbers.
+	- res committed a patch from Jason G <jgmath2000@gmail.com> restoring
+	  support for "-infinite" levels in walktest.
+	- res fixed msvcgen to properly include the static plugin registration
+	  files in the Big Static Plugins Lib.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

@@ -171,8 +171,8 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
 void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
 	int z2, bool create_portal1)
 {
-  //InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
-  //InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
+  InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
+  InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
   char* p1, * p2;
   if (x1 == x2)
     if (y1 == y2)
@@ -184,11 +184,38 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
   else
     if (x1 < x2) { p1 = "e"; p2 = "w"; }
     else { p1 = "w"; p2 = "e"; }
-  //@@@@@@@@@
-  //iPolygon3DStatic* po1 = s1->walls_fact_state->GetPolygon (p1);
-  //iPolygon3DStatic* po2 = s2->walls_fact_state->GetPolygon (p2);
-  //if (create_portal1) po1->CreatePortal (s2->sector);
-  //po2->CreatePortal (s1->sector);
+
+  int po1 = s1->walls_fact_state->FindPolygonByName (p1);
+  int tmpCount = s1->walls_fact_state->GetPolygonVertexCount(po1);
+  csVector3 *vertices = new csVector3[tmpCount];
+  for(int a=0;a<tmpCount;a++)
+  {
+    vertices[a] = s1->walls_fact_state->GetPolygonVertex(po1,a);
+  }
+  iPortal* portalBack;
+  csRef<iMeshWrapper> portalMeshBack = Sys->Engine->CreatePortal (
+    "new_portal_back", s1->sector, csVector3 (0),
+    s2->sector, vertices, tmpCount, portalBack);
+  delete[] vertices;
+
+  int po2 = s2->walls_fact_state->FindPolygonByName (p2);
+  tmpCount = s2->walls_fact_state->GetPolygonVertexCount(po2);
+  csVector3 *vertices = new csVector3[tmpCount];
+  for(int a=0;a<tmpCount;a++)
+  {
+    vertices[a] = s2->walls_fact_state->GetPolygonVertex(po2,a);
+  }
+  iPortal* portalBack2;
+  csRef<iMeshWrapper> portalMeshBack2 = Sys->Engine->CreatePortal (
+    "new_portal_back2", s2->sector, csVector3 (0),
+    s1->sector, vertices, tmpCount, portalBack2);
+  portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);
+  portalBack->GetFlags ().Set (CS_PORTAL_CLIPDEST);
+  portalBack2->GetFlags ().Set (CS_PORTAL_ZFILL);
+  portalBack2->GetFlags ().Set (CS_PORTAL_CLIPDEST);
+  s1->walls_fact_state->RemovePolygon(po1);
+  s2->walls_fact_state->RemovePolygon(po2);
+  delete[] vertices;
 }
 
 SCF_IMPLEMENT_IBASE (InfPortalCS)

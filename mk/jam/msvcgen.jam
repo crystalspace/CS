@@ -966,7 +966,7 @@ rule Plugin
   GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
   Always $(staticreg_out) ;
   Depends msvcgen : $(staticreg_out) ;
-  STATICPLUGINS.SOURCE.$(<) += $(outdir)/$(staticreg_out) ;
+  STATICPLUGINS.SOURCES.$(<) += $(outdir)/$(staticreg_out) ;
 }
 
 rule Library
