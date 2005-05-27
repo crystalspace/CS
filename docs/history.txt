@@ -12,6 +12,8 @@ chronological order.
 	  texture stayed bound and was used subsequently, leading to wrong
 	  graphics.
 	- res removed the superfluous csRenderMesh::lastFrame.
+	- Eric Sunshine eliminated some compilation warnings and errors
+	  reported by MSVC6.
 	- Wouter fixed breakage introduced by Eric Sunshine, the friend
 	  declarations he added for MSVC6 need the a class key, according
 	  to gcc343 on linux. It is treated as an error by gcc, reports:
