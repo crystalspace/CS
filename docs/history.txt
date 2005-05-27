@@ -27,6 +27,9 @@ chronological order.
 	- res changed the transparent background detection in the GL font cache
 	  to not only work in 1 out of 16777216 cases. Makes text writing a
 	  bit more efficient for text with transparent background.
+	- Wouter Wijngaards made the isometric test application camera more
+	  isometric. It is now 98% isometric, where it was 41% isometric
+	  before. Any more is hard due to the accuracy of float numbers.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

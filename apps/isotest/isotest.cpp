@@ -108,10 +108,20 @@ void IsoTest::SetupFrame ()
   actor_light->SetCenter (actor_pos+csVector3 (0, 2, 0));
 
   // Let the camera look at the actor.
+  // so the camera is set to look at 'actor_pos'
+  int isofactor = 50; // 98.3% isometric (=GetFovAngle()/180.0)
   csOrthoTransform& cam_trans = c->GetTransform ();
-  cam_trans.SetOrigin (actor_pos + views[current_view].camera_offset);
+  cam_trans.SetOrigin (actor_pos + 
+    float(isofactor)*views[current_view].camera_offset);
   cam_trans.LookAt (actor_pos-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
-
+  // due to moving the camera so far away, depth buffer accuracy is
+  // impaired, repair that by using smaller coordinate system
+  csOrthoTransform repair_trans = c->GetTransform();
+  repair_trans.SetT2O( repair_trans.GetT2O() / float(isofactor*isofactor) );
+  c->SetTransform(repair_trans);
+  // set fov more isometric, could be done in initialisation once.
+  c->SetFOV(g3d->GetHeight()*isofactor, g3d->GetWidth());
+  
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
