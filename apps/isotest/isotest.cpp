@@ -193,7 +193,9 @@ void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
 {
   // Let the camera look at the actor.
   // so the camera is set to look at 'actor_pos'
-  int isofactor = 50; // 98.3% isometric (=GetFovAngle()/180.0)
+  //int isofactor = 50; // 98.3% isometric (=GetFovAngle()/180.0)
+  //int isofactor = 100; // 99.2% isometric (=GetFovAngle()/180.0)
+  int isofactor = 200; // 99.6% isometric (=GetFovAngle()/180.0)
 
   // set center and lookat
   csOrthoTransform& cam_trans = cam->GetTransform ();
@@ -201,6 +203,7 @@ void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
   cam_trans.LookAt (lookat-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
   // set fov more isometric, could be done in initialisation once.
   cam->SetFOV (g3d->GetHeight()*isofactor, g3d->GetWidth());
+  printf("%g %g\n", cam->GetFOVAngle(), cam->GetFOVAngle()/180.0);
 
   // due to moving the camera so far away, depth buffer accuracy is
   // impaired, repair that by using smaller coordinate system
