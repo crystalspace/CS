@@ -44,6 +44,19 @@ chronological order.
 	  shader.
 	- Wouter changed the isotest demo to display a helpful text and
 	  you can rotate and zoom the camera when holding the shift key.
+	- Eric Sunshine added new CS_SYMBOL_QUALIFIER() macro (qualify.m4)
+	  which checks if at least one item from a list of qualifiers can be
+	  applied to a symbol (i.e. variable or function). Employed this new
+	  macro to fold out a bunch of nearly identical (yet less functional)
+	  code from the __attribute__((visibility)),
+	  __attribute__((deprecated)), __attribute__((const)), and
+	  __attribute__((pure)) tests in configure.ac.
+	- Eric Sunshine generalized the symbol "visibility", and function
+	  "const" and "pure" tests in configure.ac so that they are no longer
+	  specific to gcc.
+	- Eric Sunshine changed treatement of visibility tests in configure.ac,
+	  at the request of Andreas Grosam <agrosam@onlinehome.de>, so that
+	  they apply to all build modes rather than only optimize mode.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

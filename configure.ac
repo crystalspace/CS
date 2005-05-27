@@ -721,7 +721,7 @@ CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
 # to plugin modules.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
-    [CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
+    [CS_CREATE_TUPLE([],[-Wl,-soname,foobar])], [C++],
     [CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
 
 
@@ -742,7 +742,7 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 # JNI glue functions in csjava.dll.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
-    [CS_CREATE_TUPLE([-Wl,--kill-at])], [C++],
+    [CS_CREATE_TUPLE([],[-Wl,--kill-at])], [C++],
     [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])])
 
 
@@ -788,7 +788,7 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #     http://www.nedprod.com/programs/gccvisibility.html
 #     http://bugs.gentoo.org/show_bug.cgi?id=78720
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([if -fvisibility-inlines-hidden is accepted],
+CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
 
@@ -811,43 +811,29 @@ AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden" && \
     [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
 
 AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.optimize],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
 	[$cs_cv_prog_cxx_visibility_inlines_hidden], [+])])
 
 
 
 #------------------------------------------------------------------------------
-# Check if setting a default symbol visibility is supported.
+# Check how to set default symbol visibility, and how to override the setting
+# in code.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([if -fvisibility=hidden is accepted],
-    [cs_cv_prog_cxx_visibility_hidden], [],
-    [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++],
-    [cs_cv_prog_cxx_have_visibility_hidden='yes'],
-    [cs_cv_prog_cxx_have_visibility_hidden='no'])
+CS_CHECK_BUILD_FLAGS([for symbol visibility flag],
+    [cs_cv_prog_cxx_visibility_hidden],
+    [CS_CREATE_TUPLE([-fvisibility=hidden])], [C++])
 
+CS_SYMBOL_QUALIFIER([how to declare default visibility],
+    [cs_cv_prog_cxx_declare_visible_def],
+    [__attribute__((visibility("default")))], [], [C++])
 
-
-#------------------------------------------------------------------------------
-# Check if GCC style visibility attributes are available.
-#------------------------------------------------------------------------------
-m4_define([cs_declare_attr_visibility_default], 
-    [__attribute__((visibility("default")))])
-AC_CACHE_CHECK([if GCC supports visibility attribute],
-    [cs_cv_prog_cxx_visibility_attribute],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([cs_declare_attr_visibility_default void f();], [])], 
-	[], [C++], 
-	[cs_cv_prog_cxx_visibility_attribute='yes'],
-	[cs_cv_prog_cxx_visibility_attribute='no'], [], [], [], [],
-	[visibility])])
-
-# Both -fvisibility=hidden and the visibility attribute is available, only 
-# then enable their use.
-AS_IF([test "$cs_cv_prog_cxx_visibility_attribute" != no],
-    [AS_IF([test "$cs_cv_prog_cxx_have_visibility_hidden" != no],
-	[CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.optimize], 
-	[-fvisibility=hidden], [+])
-	CS_HEADER_PROPERTY([CS_HAVE_GCC_VISIBILITY])])])
+AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no && \
+    test -n "$cs_cv_prog_cxx_visibility_hidden"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], 
+	[$cs_cv_prog_cxx_visibility_hidden], [+])
+    CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
+	[$cs_cv_prog_cxx_declare_visible_def])])
 
 
 
@@ -2231,18 +2217,11 @@ AS_IF([test $cs_cv_sys_socket = yes],
 
 
 #------------------------------------------------------------------------------
-# Check how to ask compiler to declare deprecated functions and types about
-# which it should emit diagnostics.
+# Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
-m4_define([cs_declare_deprecated], [__attribute__((deprecated))])
-AC_CACHE_CHECK([how to declare deprecations],
+CS_SYMBOL_QUALIFIER([how to declare deprecations],
     [cs_cv_prog_cxx_declare_deprecated],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([cs_declare_deprecated void f();], [])], [], [C++],
-	[cs_cv_prog_cxx_declare_deprecated="cs_declare_deprecated"],
-	[cs_cv_prog_cxx_declare_deprecated='no'], [], [], [], [],
-	[deprecated])])
-AS_IF([test "$cs_cv_prog_cxx_declare_deprecated" != no],
+    [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_DEPRECATED_METHOD],
 	[$cs_cv_prog_cxx_declare_deprecated])
     CS_HEADER_PROPERTY([CS_DEPRECATED_TYPE],
@@ -2251,34 +2230,24 @@ AS_IF([test "$cs_cv_prog_cxx_declare_deprecated" != no],
 
 
 #------------------------------------------------------------------------------
-# Check availability of "__attribute__((const))" for functions/methods
+# Check how to declare functions and types perfectly constant (not affected by
+# any global state and always returning the same value for the same input).
 #------------------------------------------------------------------------------
-m4_define([cs_declare_const], [__attribute__((const))])
-AC_CACHE_CHECK([how to declare const functions],
+CS_SYMBOL_QUALIFIER([how to declare const functions],
     [cs_cv_prog_cxx_declare_const],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([cs_declare_const void f();], [])], [], [C++],
-	[cs_cv_prog_cxx_declare_const="cs_declare_const"],
-	[cs_cv_prog_cxx_declare_const='no'], [], [], [], [],
-	[const])])
-AS_IF([test "$cs_cv_prog_cxx_declare_const" != no],
+    [__attribute__((const))], [], [C++],
     [CS_HEADER_PROPERTY([CS_CONST_METHOD],
 	[$cs_cv_prog_cxx_declare_const])])
 
 
 
 #------------------------------------------------------------------------------
-# Check availability of "__attribute__((pure))" for functions/methods
+# Check how to declare functions and types pure (not affected by any global
+# state).
 #------------------------------------------------------------------------------
-m4_define([cs_declare_pure], [__attribute__((pure))])
-AC_CACHE_CHECK([how to declare pure functions],
+CS_SYMBOL_QUALIFIER([how to declare pure functions],
     [cs_cv_prog_cxx_declare_pure],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([cs_declare_pure void f();], [])], [], [C++],
-	[cs_cv_prog_cxx_declare_pure="cs_declare_const"],
-	[cs_cv_prog_cxx_declare_pure='no'], [], [], [], [],
-	[pure])])
-AS_IF([test "$cs_cv_prog_cxx_declare_pure" != no],
+    [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
 	[$cs_cv_prog_cxx_declare_pure])])
 

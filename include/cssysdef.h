@@ -40,8 +40,8 @@
 
 // Defaults for platforms that do not define their own.
 #ifndef CS_EXPORT_SYM_DLL
-#  ifdef CS_HAVE_GCC_VISIBILITY
-#    define CS_EXPORT_SYM_DLL  __attribute__ ((visibility ("default")))
+#  ifdef CS_VISIBILITY_DEFAULT
+#    define CS_EXPORT_SYM_DLL CS_VISIBILITY_DEFAULT
 #  else
 #    define CS_EXPORT_SYM_DLL
 #  endif
@@ -50,8 +50,8 @@
 #  define CS_IMPORT_SYM_DLL extern
 #endif
 #ifndef CS_EXPORT_SYM
-#  if defined(CS_HAVE_GCC_VISIBILITY) && defined(CS_BUILD_SHARED_LIBS)
-#    define CS_EXPORT_SYM  __attribute__ ((visibility ("default")))
+#  if defined(CS_VISIBILITY_DEFAULT) && defined(CS_BUILD_SHARED_LIBS)
+#    define CS_EXPORT_SYM CS_VISIBILITY_DEFAULT
 #  else
 #    define CS_EXPORT_SYM
 #  endif
