@@ -549,6 +549,7 @@ bool ImageTgaFile::TgaLoader::LoadData ()
       truerow = ++baserow;
   }
 
+  dataSource = 0;
   return true;
 }
 

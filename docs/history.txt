@@ -37,6 +37,9 @@ chronological order.
 	- Anders updated parallaxtest and its shaders to show off specular 
 	  (with glossmap in normalmap alpha).
 	- Wouter added bumpmapping, specular shaders to the isotest level.
+	- res changed the PNG, TGA and JPG loaders to release the data source
+	  once they're finished with loading - it isn't needed any more and
+	  just uses resources.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

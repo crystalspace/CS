@@ -611,6 +611,7 @@ bool ImageJpgFile::JpegLoader::LoadData ()
    */
 
   /* And we're done! */
+  dataSource = 0;
   return true;
 }
 

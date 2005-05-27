@@ -665,6 +665,7 @@ nomem2:
   // Free the row pointers array that is not needed anymore
   delete [] row_pointers;
 
+  dataSource = 0;
   return true;
 }
 
