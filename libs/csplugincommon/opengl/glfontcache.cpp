@@ -535,6 +535,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 {
   if (!text || !*text) return;
 
+  bool backgroundTransparent = false;
   int bgTrans;
   {
     GLubyte oR, oG, oB, oA;
@@ -542,7 +543,10 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     bgTrans = G2D->FindRGB (oR, oG, oB, 0);
     G2D->DecomposeColor (bg, oR, oG, oB, oA);
     if (oA == 0)
+    {
       bg = bgTrans;
+      backgroundTransparent = true;
+    }
   }
   BeginText();
 
@@ -559,7 +563,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 
   size_t textLen = strlen ((char*)text);
 
-  if (bg != -1)
+  if (!backgroundTransparent)
   {
     texcoords.GetExtend (numFloats + textLen * 16);
     verts2d.GetExtend (numFloats + textLen * 16);
@@ -638,7 +642,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     y2 = y1 - cacheData->bmetrics.height;
 
     bool needBgJob = false;
-    if (bg != -1)
+    if (!backgroundTransparent)
     {
       float bx1 = x2;
       float bx2 = x2; //x2;
@@ -751,7 +755,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   }
 
   // "Trailing" background
-  if ((bg != -1) & (advance > 0))
+  if ((!backgroundTransparent) & (advance > 0))
   {
     float bx1 = x2;
     float bx2 = bx1 + (float)advance;
@@ -778,7 +782,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     bgVertOffset += 8;
   }
 
-  if (bg != -1)
+  if (!backgroundTransparent)
   {
     // Make sure the next data added to the cached comes in after the
     // BG stuff

@@ -24,6 +24,9 @@ chronological order.
 	  uninitialised.
 	- Jorrit added a version of iEngine->GetNearbyMeshes() that uses
 	  a box instead of a sphere.
+	- res changed the transparent background detection in the GL font cache
+	  to not only work in 1 out of 16777216 cases. Makes text writing a
+	  bit more efficient for text with transparent background.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	
