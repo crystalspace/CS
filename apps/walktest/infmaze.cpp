@@ -200,7 +200,7 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
 
   int po2 = s2->walls_fact_state->FindPolygonByName (p2);
   tmpCount = s2->walls_fact_state->GetPolygonVertexCount(po2);
-  csVector3 *vertices = new csVector3[tmpCount];
+  vertices = new csVector3[tmpCount];
   for(int a=0;a<tmpCount;a++)
   {
     vertices[a] = s2->walls_fact_state->GetPolygonVertex(po2,a);
