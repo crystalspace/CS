@@ -74,6 +74,7 @@ public:
       AllocInfo() : node(0), d(0x7fffffff), allocPos(ALLOC_INVALID), 
 	res(false) {};
     };
+    friend struct AllocInfo; // Give MSVC6 access to ALLOC_INVALID.
 
     csRect rect;
     csRect allocedRect;
@@ -100,6 +101,7 @@ public:
     void DecideBestSplit (const csRect& rect, int splitX, int splitY,
       SubRect::SplitType& splitType);
   };
+  friend SubRect; // Give MSVC6 access to enclosing protected scope.
 
 protected:
   /// Dimensions of this region.
