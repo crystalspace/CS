@@ -210,7 +210,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 
   bool noclip = false;
   csRef<iClipper2D> old_clipper;
-  int old_cliptype;
+  int old_cliptype = g3d->GetClipType ();
   
   size_t numPasses = shader->GetNumberOfPasses (ticket);
   for (size_t p = 0; p < numPasses; p++)

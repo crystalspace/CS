@@ -12,6 +12,14 @@ chronological order.
 	  texture stayed bound and was used subsequently, leading to wrong
 	  graphics.
 	- res removed the superfluous csRenderMesh::lastFrame.
+	- Wouter fixed breakage introduced by Eric Sunshine, the friend
+	  declarations he added for MSVC6 need the a class key, according
+	  to gcc343 on linux. It is treated as an error by gcc, reports:
+	  error: a class-key must be used when declaring a friend.
+	  Added the 'class' keyword to fix the problem on linux.
+	- Wouter initialised old_cliptype in the function 
+	  csGenericRenderStep::RenderMeshes(), so it would not be used
+	  uninitialised.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

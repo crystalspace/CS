@@ -101,7 +101,7 @@ public:
     void DecideBestSplit (const csRect& rect, int splitX, int splitY,
       SubRect::SplitType& splitType);
   };
-  friend SubRect; // Give MSVC6 access to enclosing protected scope.
+  friend class SubRect; // Give MSVC6 access to enclosing protected scope.
 
 protected:
   /// Dimensions of this region.

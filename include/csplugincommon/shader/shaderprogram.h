@@ -80,7 +80,7 @@ protected:
     ProgramParam(const csVector4& def) : valid (false), 
       vectorValue (def), name(csInvalidStringID), type(ParamInvalid) { }
   };
-  friend ProgramParam; // Give MSVC6 access to ParamInvalid.
+  friend class ProgramParam; // Give MSVC6 access to ParamInvalid.
   void ResolveParamStatic (ProgramParam& param,
     csArray<iShaderVariableContext*> &staticContexts);
   bool ParseProgramParam (iDocumentNode* node,
