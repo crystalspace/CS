@@ -36,6 +36,7 @@ chronological order.
 	  files in the Big Static Plugins Lib.
 	- Anders updated parallaxtest and its shaders to show off specular 
 	  (with glossmap in normalmap alpha).
+	- Wouter added bumpmapping, specular shaders to the isotest level.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

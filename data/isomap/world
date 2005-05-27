@@ -20,8 +20,19 @@
     <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
   </plugins>
   <textures>
-    <texture name="marble_09_bs___128.jp">
-      <file>/lib/stdtex/marble_09_bs___128.jpg</file>
+    <texture name="floortexture">
+      <!--<file>/lib/stdtex/marble_09_bs___128.jpg</file>-->
+      <!--<file>/lib/std/stone4.gif</file>-->
+      <!--<file>/lev/terrain/grass.png</file>-->
+      <file>/lib/stdtex/blobby.jpg</file>
+    </texture>
+    <texture name="shinynormal">
+      <file>/lib/stdtex/blobbyDOT3.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name="floornormal">
+      <file>/lib/stdtex/oldmetalDOT3.png</file>
+      <class>normalmap</class>
     </texture>
     <texture name="andrew_marble4.jpg">
       <file>/lib/stdtex/andrew_marble4.jpg</file>
@@ -31,6 +42,10 @@
     </texture>
     <texture name="bricks.jpg">
       <file>/lib/stdtex/bricks.jpg</file>
+    </texture>
+    <texture name="bricksDOT3.png">
+      <file>/lib/stdtex/stone2DOT3.png</file>
+      <class>normalmap</class>
     </texture>
     <texture name="abstract_a032.jpg">
       <file>/lib/stdtex/abstract_a032.jpg</file>
@@ -69,12 +84,15 @@
   <shaders>
 	<shader><file>/shader/ambient.xml</file></shader>
 	<shader><file>/shader/light.xml</file></shader>
+	<shader><file>/shader/light_bumpmap.xml</file></shader>
+	<shader><file>/shader/parallax/parallax.xml</file></shader>
   </shaders>
   <materials>
-    <material name="marble_09_bs___128.jp">
-      <texture>marble_09_bs___128.jp</texture>
+    <material name="floormaterial">
+      <texture>floortexture</texture>
       <shader type="ambient">ambient</shader>
-      <shader type="diffuse">light</shader>
+      <shadervar name="tex normal" type="texture">floornormal</shadervar>
+      <shader type="diffuse">light_bumpmap</shader>
     </material>
     <material name="andrew_marble4.jpg">
       <texture>andrew_marble4.jpg</texture>
@@ -89,7 +107,9 @@
     <material name="bricks.jpg">
       <texture>bricks.jpg</texture>
       <shader type="ambient">ambient</shader>
-      <shader type="diffuse">light</shader>
+      <shadervar name="tex normal" type="texture">bricksDOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">64,64</shadervar>
+      <shader type="diffuse">light_bumpmap</shader>
     </material>
     <material name="abstract_a032.jpg">
       <texture>abstract_a032.jpg</texture>
@@ -113,8 +133,11 @@
     </material>
     <material name="marble_04_ebps_128.jp">
       <texture>marble_04_ebps_128.jp</texture>
+      <shadervar name="specular" type="vector4">1.6, 1.8, 2, 1</shadervar>
+      <shadervar name="tex normal" type="texture">shinynormal</shadervar>
+      <shadervar name="tex height" type="texture">shinynormal</shadervar>
       <shader type="ambient">ambient</shader>
-      <shader type="diffuse">light</shader>
+      <shader type="diffuse">parallax</shader>
     </material>
     <material name="marble_08_ao___128.jp">
       <texture>marble_08_ao___128.jp</texture>
@@ -19481,7 +19504,7 @@
       <plugin>genmesh</plugin>
       <params>
         <factory>Plane</factory>
-        <material>marble_09_bs___128.jp</material>
+        <material>floormaterial</material>
       </params>
       <zuse/>
       <move>
