@@ -34,6 +34,8 @@ chronological order.
 	  support for "-infinite" levels in walktest.
 	- res fixed msvcgen to properly include the static plugin registration
 	  files in the Big Static Plugins Lib.
+	- Anders updated parallaxtest and its shaders to show off specular 
+	  (with glossmap in normalmap alpha).
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

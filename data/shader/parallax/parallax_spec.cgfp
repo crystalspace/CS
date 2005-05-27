@@ -33,9 +33,10 @@ float4 main (vertex2fragment IN,
 	float3 normBumpNormal = normalize(bumpNormal.xyz);
 		
 	float bump = dot(normLight, normBumpNormal);
+	float spec = pow(dot(normalize(normEye + normLight), normBumpNormal), 32) * (bumpNormal.w+1)/2;
 	float4 outCol = saturate(lightcolor*bump.xxxx);
 	
-	return selfOcclusion*saturate(outCol*diffuseCol);
+	return selfOcclusion*saturate(outCol*diffuseCol + spec*lightcolor*specular);
 		
 }
 

@@ -12,7 +12,11 @@
       <texture destination="unit 0" name="tex normal" />
       <texture destination="unit 1" name="tex diffuse" />
       <texture destination="unit 2" name="tex height" />
-      <fp plugin="glcg" file="/shader/parallax/parallax.cgfp" />
+      <?if vars."specular" ?>
+        <fp plugin="glcg" file="/shader/parallax/parallax_spec.cgfp" />
+      <?else?>
+        <fp plugin="glcg" file="/shader/parallax/parallax.cgfp" />
+      <?endif?>
     </pass>
   </technique>
   <technique priority="100">

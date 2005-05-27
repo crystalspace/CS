@@ -58,7 +58,7 @@
 			<file>box.jpg</file>
 		</texture>
 		<texture name="boxn.jpg">
-			<file>boxn.jpg</file>
+			<file>boxn.png</file>
 			<class>normalmap</class>
 		</texture>
 		<texture name="boxh.jpg">
@@ -79,6 +79,14 @@
 			<texture>box.jpg</texture>
 			<shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
 			<shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+			<shader type="light">parallax</shader>
+			<shader type="diffuse">ambient</shader>
+		</material>
+		<material name="box_spec.jpg">
+			<texture>box.jpg</texture>
+			<shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
+			<shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+			<shadervar name="specular" type="vector4">0.6, 0.8, 1, 1</shadervar>
 			<shader type="light">parallax</shader>
 			<shader type="diffuse">ambient</shader>
 		</material>
@@ -263,12 +271,101 @@
 			</params>
 			<zuse />
 			<move>
-				 <v x="3.79896" y="0.0553295" z="0.0295588" />
+				 <v x="3.79896" y="0.0553295" z="-2.0295588" />
+			</move>
+		</meshobj>
+		<meshobj name="Cube.002">
+			<plugin>thing</plugin>
+			<params>
+				<v x="0.493757" y="-0.493757" z="0.493757" />
+				<v x="0.493757" y="-0.493757" z="-0.493757" />
+				<v x="-0.493757" y="-0.493757" z="-0.493757" />
+				<v x="-0.493757" y="-0.493757" z="0.493757" />
+				<v x="0.493757" y="0.493757" z="0.493757" />
+				<v x="0.493757" y="0.493757" z="-0.493757" />
+				<v x="-0.493757" y="0.493757" z="-0.493757" />
+				<v x="-0.493757" y="0.493757" z="0.493757" />
+				<p name="1">
+					<v>3</v>
+					<v>2</v>
+					<v>1</v>
+					<v>0</v>
+					<material>box_spec.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="2">
+					<v>5</v>
+					<v>6</v>
+					<v>7</v>
+					<v>4</v>
+					<material>box_spec.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="3">
+					<v>1</v>
+					<v>5</v>
+					<v>4</v>
+					<v>0</v>
+					<material>box_spec.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="4">
+					<v>2</v>
+					<v>6</v>
+					<v>5</v>
+					<v>1</v>
+					<material>box_spec.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="5">
+					<v>3</v>
+					<v>7</v>
+					<v>6</v>
+					<v>2</v>
+					<material>box_spec.jpg</material>
+					<texmap>
+						<uv idx="0" u=".5" v=".5" />
+						<uv idx="1" u=".5" v="0" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="6">
+					<v>7</v>
+					<v>3</v>
+					<v>0</v>
+					<v>4</v>
+					<material>box_spec.jpg</material>
+					<texmap>
+						<uv idx="0" u=".5" v="0" />
+						<uv idx="1" u=".5" v=".5" />
+						<uv idx="2" u="0" v=".5" />
+					</texmap>
+				</p>
+			</params>
+			<zuse />
+			<move>
+				 <v x="3.79896" y="0.0553295" z="2.0295588" />
 			</move>
 		</meshobj>
 		<light name="Lamp">
 			<center x="-.05294" y="0" z="0" />
-			<color red="0.9" green="0.9" blue="1.1" />
+			<color red="0.9" green="0.9" blue="1.0" />
 			
 			<attenuation c="0" l="0" q="0.1"/>
 		</light>
@@ -277,21 +374,34 @@
         <sequence name="rotateCube">
 	    <rotate mesh="Cube.001" duration="2000">
 	      <rotx>1.8</rotx>
-	       <v x="3.79896" y="0.0553295" z="0.0295588" />
+	       <v x="3.79896" y="0.0553295" z="-2.0295588" />
 	    </rotate>
 	    <delay time="2000" />
 	    <rotate mesh="Cube.001" duration="2000">
 	      <roty>1.4</roty>
-	       <v x="3.79896" y="0.0553295" z="0.0295588" />
+	       <v x="3.79896" y="0.0553295" z="-2.0295588" />
 	    </rotate>
 	    <delay time="2000" />
 	    <enable trigger="rotateCube" />
         </sequence>
-    </sequences>
+
+        <sequence name="moveCube">
+	    <move mesh="Cube.002" duration="2000"  x="-6" y="0" z="0" />
+	    <delay time="2000" />
+	    <move mesh="Cube.002" duration="2000"  x="6" y="0" z="0" />
+	    <delay time="2000" />
+	    <enable trigger="moveCube" />
+        </sequence>
+
+  </sequences>
     <triggers>
         <trigger name="rotateCube">
           <sectorvis sector="Scene" />
           <fire delay="20" sequence="rotateCube" />
+    	</trigger>
+        <trigger name="moveCube">
+          <sectorvis sector="Scene" />
+          <fire delay="20" sequence="moveCube" />
     	</trigger>
     </triggers>
 </world>
