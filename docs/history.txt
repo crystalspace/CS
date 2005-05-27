@@ -22,6 +22,8 @@ chronological order.
 	- Wouter initialised old_cliptype in the function 
 	  csGenericRenderStep::RenderMeshes(), so it would not be used
 	  uninitialised.
+	- Jorrit added a version of iEngine->GetNearbyMeshes() that uses
+	  a box instead of a sphere.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	

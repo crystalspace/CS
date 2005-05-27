@@ -1004,6 +1004,16 @@ struct iEngine : public iBase
 
   /**
    * This routine returns an iterator to iterate over
+   * all meshes that are in a box.
+   * If crossPortals is true it will search through
+   * portals. Otherwise it will limit the search to the sector passed in.
+   * Portal visibility is tested with the center of the box.
+   */
+  virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
+    const csBox3& box, bool crossPortals = true ) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine assumes full 360 degree visibility.
    * You can use #SCF_QUERY_INTERFACE to get any interface from the

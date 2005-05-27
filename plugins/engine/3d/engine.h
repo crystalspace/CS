@@ -479,6 +479,13 @@ private:
     csArray<iSector*>& visited_sectors, bool crossPortals = true);
 
   /**
+   * Get a list of all meshes in the given box.
+   */
+  void GetNearbyMeshList (iSector* sector,
+    const csBox3& box, csArray<iMeshWrapper*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals = true);
+
+  /**
    * Get a list of all meshes in the given sphere.
    */
   void GetNearbyMeshList (iSector* sector,
@@ -781,6 +788,8 @@ public:
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csFrustum& frustum);
 
+  virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
+    const csBox3& box, bool crossPortals = true);
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true);
   virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,

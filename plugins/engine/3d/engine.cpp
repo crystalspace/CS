@@ -2731,6 +2731,97 @@ void csEngine::GetNearbyMeshList (iSector* sector,
   }
 }
 
+void csEngine::GetNearbyMeshList (iSector* sector,
+    const csBox3& box, csArray<iMeshWrapper*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals)
+{
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  csRef<iVisibilityObjectIterator> visit = culler->VisTest (box);
+  csVector3 pos = box.GetCenter ();
+
+  //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
+  while (visit->HasNext ())
+  {
+    iVisibilityObject* vo = visit->Next ();
+    iMeshWrapper* imw = vo->GetMeshWrapper ();
+    if (imw)
+    {
+      list.Push (imw); 
+      if (crossPortals && imw->GetPortalContainer ())
+      {
+        iPortalContainer* portals = imw->GetPortalContainer ();
+        int pc = portals->GetPortalCount ();
+        int j;
+        for (j = 0 ; j < pc ; j++)
+        {
+          iPortal* portal = portals->GetPortal (j);
+	  const csVector3* world_vertices = portal->GetWorldVertices ();
+          const csPlane3& wor_plane = portal->GetWorldPlane ();
+          // Can we see the portal?
+          if (wor_plane.Classify (pos) < -0.001)
+          {
+	    // @@@ Consider having a simpler version that looks
+	    // at center of portal instead of trying to calculate distance
+	    // to portal polygon?
+            csVector3 poly[100];	//@@@ HARDCODE
+            int k;
+	    int* idx = portal->GetVertexIndices ();
+            for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
+            {
+              poly[k] = world_vertices[idx[k]];
+            }
+            //@@@float sqdist_portal = csSquaredDist::PointPoly (
+                  //@@@pos, poly, portal->GetVertexIndicesCount (),
+                  //@@@wor_plane);
+            //@@@if (sqdist_portal <= radius * radius)
+            {
+              // Also handle objects in the destination sector unless
+              // it is a warping sector.
+              portal->CompleteSector (0);
+              if (sector != portal->GetSector () && portal->GetSector ())
+              {
+                size_t l;
+                bool already_visited = false;
+                for (l = 0 ; l < visited_sectors.Length () ; l++)
+                {
+                  if (visited_sectors[l] == portal->GetSector ())
+                  {
+                    already_visited = true;
+                    break;
+                  }
+                }
+                if (!already_visited)
+                {
+                  visited_sectors.Push (portal->GetSector ());
+		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+		  {
+		    csReversibleTransform warp_wor;
+		    portal->ObjectToWorld (
+		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
+		    csVector3 tpos = warp_wor.Other2This (pos);
+		    csBox3 tbox = box;
+		    tbox.SetCenter (tpos);
+                    GetNearbyMeshList (portal->GetSector (), tbox,
+		    	list, visited_sectors);
+		  }
+		  else
+		  {
+                    GetNearbyMeshList (portal->GetSector (), box,
+		    	list, visited_sectors);
+		  }
+		  // Uncommenting the below causes too many objects to be
+		  // returned in some cases.
+		  //visited_sectors.Pop ();
+                }
+              }
+            }
+          }
+	}
+      }
+    }
+  }
+}
+
 csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   iSector *sector,
   const csVector3 &pos,
@@ -2741,6 +2832,19 @@ csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   csArray<iSector*> visited_sectors;
   visited_sectors.Push (sector);
   GetNearbyMeshList (sector, pos, radius, *list, visited_sectors, crossPortals);
+  csMeshListIt *it = new csMeshListIt (list);
+  return csPtr<iMeshWrapperIterator> (it);
+}
+
+csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
+  iSector *sector,
+  const csBox3& box,
+  bool crossPortals)
+{
+  csArray<iMeshWrapper*>* list = new csArray<iMeshWrapper*>;
+  csArray<iSector*> visited_sectors;
+  visited_sectors.Push (sector);
+  GetNearbyMeshList (sector, box, *list, visited_sectors, crossPortals);
   csMeshListIt *it = new csMeshListIt (list);
   return csPtr<iMeshWrapperIterator> (it);
 }
