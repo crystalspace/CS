@@ -158,7 +158,6 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
   {
     portal = 0;
     geometryInstance = 0;
-    lastFrame = (uint)~0;
   }
 
   ~csRenderMesh () {}
@@ -175,12 +174,6 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
 
   /// @@@ Document me.
   csRef<iShaderVariableContext> variablecontext;
-
-  /**
-   * Number of the frame this rendermesh was used in last. Can be used
-   * to determine whether a rendermesh is currently in use.
-   */
-  uint lastFrame;
 
   /// Worldspace origin of the mesh
   csVector3 worldspace_origin;

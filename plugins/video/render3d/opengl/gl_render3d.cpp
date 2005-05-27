@@ -1843,7 +1843,6 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   else
     SetMixMode (CS_FX_COPY);
 
-  statecache->Enable_GL_TEXTURE_2D ();
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
   ActivateTexture (hTex);
 
@@ -1890,6 +1889,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 
   // Restore.
   SetZModeInternal (current_zmode);
+  DeactivateTexture ();
 }
 
 void csGLGraphics3D::SetShadowState (int state)

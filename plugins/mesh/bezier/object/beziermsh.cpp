@@ -890,7 +890,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
-    rm->lastFrame = currentFrame;
     rm->object2world = movtrans;
 
     c = curves.Get (i);

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-May-2005
+	- res fixed csGLGraphics3D::DrawPixmap() to also deactivate the
+	  texture. When an NPOTS texture was used it could happen that this 
+	  texture stayed bound and was used subsequently, leading to wrong
+	  graphics.
+	- res removed the superfluous csRenderMesh::lastFrame.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
 	  strict ode joints.	
