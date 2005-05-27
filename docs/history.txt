@@ -15,7 +15,7 @@ chronological order.
 	- Eric Sunshine eliminated some compilation warnings and errors
 	  reported by MSVC6.
 	- Wouter fixed breakage introduced by Eric Sunshine, the friend
-	  declarations he added for MSVC6 need the a class key, according
+	  declarations he added for MSVC6 need a class key, according
 	  to gcc343 on linux. It is treated as an error by gcc, reports:
 	  error: a class-key must be used when declaring a friend.
 	  Added the 'class' keyword to fix the problem on linux.
