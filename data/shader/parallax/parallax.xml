@@ -9,9 +9,9 @@
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
       <vp plugin="glcg" file="/shader/parallax/parallax.cgvp" />
-      <texture destination="unit 0" name="tex normal" />
-      <texture destination="unit 1" name="tex diffuse" />
-      <texture destination="unit 2" name="tex height" />
+      <texture destination="TexNormal" name="tex normal" />
+      <texture destination="TexDiffuse" name="tex diffuse" />
+      <texture destination="TexHeight" name="tex height" />
       <?if vars."specular" ?>
         <fp plugin="glcg" file="/shader/parallax/parallax_spec.cgfp" />
       <?else?>
@@ -34,4 +34,6 @@
       <fp plugin="glarb" file="/shader/parallax/parallax.afp" />
     </pass>
   </technique>
+  
+  <fallbackshader name="light_bumpmap" file="/shader/light_bumpmap.xml" />
 </shader>

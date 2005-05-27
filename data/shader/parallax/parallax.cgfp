@@ -36,7 +36,6 @@ float4 main (vertex2fragment IN,
 	float4 outCol = saturate(lightcolor*bump.xxxx);
 	
 	return selfOcclusion*saturate(outCol*diffuseCol);
-		
 }
 
 ]]>
