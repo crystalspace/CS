@@ -203,7 +203,6 @@ void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
   cam_trans.LookAt (lookat-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
   // set fov more isometric, could be done in initialisation once.
   cam->SetFOV (g3d->GetHeight()*isofactor, g3d->GetWidth());
-  printf("%g %g\n", cam->GetFOVAngle(), cam->GetFOVAngle()/180.0);
 
   // due to moving the camera so far away, depth buffer accuracy is
   // impaired, repair that by using smaller coordinate system
