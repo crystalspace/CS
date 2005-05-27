@@ -64,10 +64,10 @@ IsoTest::IsoTest (iObjectRegistry* object_reg)
   IsoTest::object_reg = object_reg;
 
   current_view = 0;
-  views[0].SetOrigOffset (csVector3 (-4, 4, -4));
-  views[1].SetOrigOffset (csVector3 (-9, 9, -9));
-  views[2].SetOrigOffset (csVector3 (4, 4, -4));
-  views[3].SetOrigOffset (csVector3 (0, 4, -4));
+  views[0].SetOrigOffset (csVector3 (-4, 4, -4)); // true isometric perspective.
+  views[1].SetOrigOffset (csVector3 (-9, 9, -9)); // zoomed out.
+  views[2].SetOrigOffset (csVector3 (4, 3, -4)); // diablo style perspective.
+  views[3].SetOrigOffset (csVector3 (0, 4, -4)); // zelda style perspective.
 }
 
 IsoTest::~IsoTest ()
@@ -134,11 +134,12 @@ void IsoTest::SetupFrame ()
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
+  // display a helpful little text.
   int txtw=0, txth=0;
   font->GetMaxSize(txtw, txth);
   if(txth == -1) txth = 20;
   int white = g3d->GetDriver2D ()->FindRGB (255, 255, 255);
-  int ypos = g3d->GetDriver2D ()->GetHeight () - txth*3 - 1;
+  int ypos = g3d->GetDriver2D ()->GetHeight () - txth*4 - 1;
   g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
     "Isometric demo keys (esc to exit):");
   ypos += txth;
@@ -147,6 +148,9 @@ void IsoTest::SetupFrame ()
   ypos += txth;
   g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
     "   shift+arrow keys: rotate/zoom camera");
+  ypos += txth;
+  g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
+    "   tab key: cycle through camera presets");
 }
 
 void IsoTest::FinishFrame ()
