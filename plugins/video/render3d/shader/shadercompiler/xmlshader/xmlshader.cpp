@@ -465,9 +465,10 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iShaderTUResolver* tuResolve
     plg = CS_LOAD_PLUGIN(plugin_mgr, plugin, iShaderProgramPlugin);
     if (!plg)
     {
-      parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-	"Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
-	plugin, node->GetValue (), parent->GetName ());
+      if (parent->compiler->do_verbose)
+        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
+	  plugin, node->GetValue (), parent->GetName ());
       delete[] plugin;
       return 0;
     }
