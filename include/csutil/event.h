@@ -105,7 +105,7 @@ public:
   /// retrieve modifier flags
   CS_PURE_METHOD static void GetModifiers(const iEvent *event, 
     csKeyModifiers& modifiers) 
-  { return csKeyEventHelper::GetModifiers(event, modifiers); }
+  { csKeyEventHelper::GetModifiers(event, modifiers); }
   /// retrieve modifiers bitmask
   CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) 
   { 
@@ -144,7 +144,7 @@ public:
   CS_PURE_METHOD static int GetButton(const iEvent *event);
   /// retrieve modifier flags
   static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) 
-  { return csKeyEventHelper::GetModifiers(event, modifiers); }
+  { csKeyEventHelper::GetModifiers(event, modifiers); }
   /// retrieve modifiers bitmask
   CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) 
   { 
