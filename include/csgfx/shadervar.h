@@ -389,6 +389,7 @@ public:
     {
       return &array->Get (element);
     }
+    return 0;
   }
 };
 
