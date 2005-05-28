@@ -73,21 +73,21 @@ CS_CRYSTALSPACE_EXPORT void csfxFadeToColor (iGraphics3D *g3d, float fadevalue,
 
 /**
  * Make the screen look like an old fashioned green-only monitor.
- * fadevalue 0: no fading, fadevalue 1: only green is visible.
+ * fadevalue 0: no fading, fadevalue 1: only green tints are visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxGreenScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Similar to csfxGreenScreen, but makes the screen show only red.
- * fadevalue 0: no fading, fadevalue 1: only green is visible.
+ * fadevalue 0: no fading, fadevalue 1: only red tints are visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxRedScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Similar to csfxGreenScreen, but makes the screen show only blue
- * fadevalue 0: no fading, fadevalue 1: only green is visible.
+ * fadevalue 0: no fading, fadevalue 1: only blue tints are visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
 CS_CRYSTALSPACE_EXPORT void csfxBlueScreen (iGraphics3D *g3d, float fadevalue);
@@ -105,23 +105,28 @@ CS_CRYSTALSPACE_EXPORT void csfxWhiteOut (iGraphics3D *g3d, float fadevalue);
  * also other mixmodes can be used.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-CS_CRYSTALSPACE_EXPORT void csfxShadeVert (iGraphics3D *g3d, const csColor& topcolor,
-  const csColor& bottomcolor, uint mixmode = CS_FX_COPY);
+CS_CRYSTALSPACE_EXPORT void csfxShadeVert (iGraphics3D *g3d, 
+  const csColor& topcolor, const csColor& bottomcolor, 
+  uint mixmode = CS_FX_COPY);
 
 
 /**
  * Do a fullscreen drawpolygonFX draw, used by some other routines.
+ * With tex NULL it draws solid colour. pass colours between 0 and 1.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
+ * fa at 1 is solid colour.
  */
-CS_CRYSTALSPACE_EXPORT void csfxScreenDPFX (iGraphics3D *g3d, iTextureHandle *tex, 
-  uint mixmode, uint8 r, uint8 g, uint8 b);
+CS_CRYSTALSPACE_EXPORT void csfxScreenDPFX (iGraphics3D *g3d, 
+  iTextureHandle *tex, uint mixmode, float r, float g, float b, float a);
 
 /**
- * Do a drapolygonFX draw, but only part of the screen is covered.
+ * Do a drawpolygonFX draw, but only part of the screen is covered.
+ * With tex NULL it draws solid colour. pass colours between 0 and 1.
  * Rest the same as the fullscreen version.
+ * fa at 1 is solid colour.
  */
-CS_CRYSTALSPACE_EXPORT void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, 
-  int w, int h, iTextureHandle *tex, uint mixmode, uint8 r, uint8 g, uint8 b);
+CS_CRYSTALSPACE_EXPORT void csfxScreenDPFXPartial(iGraphics3D *g3d, 
+  int x, int y, int w, int h, iTextureHandle *tex, uint mixmode, 
+  float r, float g, float b, float a);
 
 #endif // __CS_CSFXSCR_H__
-

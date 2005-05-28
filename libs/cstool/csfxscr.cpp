@@ -59,61 +59,54 @@ void csfxInterference(iGraphics2D *g2d, float amount, float anim, float length)
 
 void csfxFadeToColor(iGraphics3D *g3d, float fadevalue, const csColor& color)
 {
-  uint8 red = int (255*color.red);
-  uint8 green = int (255*color.green);
-  uint8 blue = int (255*color.blue);
   float fade = 1.0 - fadevalue;
-  csfxScreenDPFX(g3d, 0, CS_FX_SETALPHA(fade), red, green, blue);
+  csfxScreenDPFX(g3d, 0, CS_FX_COPY, color.red, color.green, color.blue, fade);
 }
 
 void csfxFadeOut(iGraphics3D *g3d, float fadevalue)
 {
-  uint8 multval = 255 - int(255.*fadevalue);
-  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, multval);
+  float multval = 1.f - fadevalue;
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, multval, 1.0f);
 }
 
 void csfxFadeTo(iGraphics3D *g3d, iTextureHandle *tex, float fadevalue)
 {
   float fade = 1.0f - fadevalue;
-  csfxScreenDPFX(g3d, tex, CS_FX_SETALPHA(fade), 255, 255, 255);
+  csfxScreenDPFX(g3d, tex, CS_FX_SETALPHA(fade), 1.f, 1.f, 1.f, 1.f);
 }
 
 void csfxGreenScreen(iGraphics3D *g3d, float fadevalue)
 {
-  uint8 multval = 255 - int(255.*fadevalue);
-  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, 255, multval);
+  float multval = 1.0f - fadevalue;
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, 1.0f, multval, 1.0f);
 }
 
 void csfxRedScreen(iGraphics3D *g3d, float fadevalue)
 {
-  uint8 multval = 255 - int(255.*fadevalue);
-  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, 255, multval, multval);
+  float multval = 1.0f - fadevalue;
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, 1.0f, multval, multval, 1.0f);
 }
 
 void csfxBlueScreen(iGraphics3D *g3d, float fadevalue)
 {
-  uint8 multval = 255 - int(255.*fadevalue);
-  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, 255);
+  float multval = 1.0f - fadevalue;
+  csfxScreenDPFX(g3d, 0, CS_FX_MULTIPLY, multval, multval, 1.0f, 1.0f);
 }
-
 
 void csfxWhiteOut(iGraphics3D *g3d, float fadevalue)
 {
-  uint8 multval = int(255.*fadevalue);
-  csfxScreenDPFX(g3d, 0, CS_FX_ADD, multval, multval, multval);
+  csfxScreenDPFX(g3d, 0, CS_FX_ADD, fadevalue, fadevalue, fadevalue, 1.0f);
 }
 
 void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   const csColor& bottomcolor, uint mixmode)
 {
-  float hw = float (g3d->GetWidth () / 2);
-  float hh = float (g3d->GetHeight () / 2);
-  float asp = hw / hh;
-
-  float sx = -asp;
-  float sy = -1.0f;
-  float smx = asp;
-  float smy = 1.0f;
+  float sx = 0;
+  float sy = 0;
+  float sw = g3d->GetWidth ();
+  float sh = g3d->GetHeight ();
+  float smx = sx + sw;
+  float smy = sy + sh;
 
   csSimpleRenderMesh mesh;
   static uint indices[4] = {0, 1, 2, 3};
@@ -141,47 +134,41 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   else
     mesh.mixmode = mixmode;
 
-  verts[0].Set (sx, sy, 2.0f);
+  verts[0].Set (sx, sy, 0.0f);
   texels[0].Set (0.0f, 1.0f);
   colors[0].Set (topcolor.red, topcolor.green, topcolor.blue, fa);
   
-  verts[1].Set (sx, smy, 2.0f);
+  verts[1].Set (smx, sy, 0.0f);
   texels[1].Set (0.0f, 0.0f);
-  colors[1].Set (bottomcolor.red, bottomcolor.green, bottomcolor.blue, 
-    fa);
+  colors[1].Set (topcolor.red, topcolor.green, topcolor.blue, fa);
 
-  verts[2].Set (smx, smy, 2.0f);
+  verts[2].Set (smx, smy, 0.0f);
   texels[2].Set (1.0f, 0.0f);
-  colors[2].Set (bottomcolor.red, bottomcolor.green, bottomcolor.blue, 
-    fa);
+  colors[2].Set (bottomcolor.red, bottomcolor.green, bottomcolor.blue, fa);
 
-  verts[3].Set (smx, sy, 2.0f);
+  verts[3].Set (sx, smy, 0.0f);
   texels[3].Set (1.0f, 1.0f);
-  colors[3].Set (topcolor.red, topcolor.green, topcolor.blue, fa);
+  colors[3].Set (bottomcolor.red, bottomcolor.green, bottomcolor.blue, fa);
 
-  g3d->DrawSimpleMesh (mesh);
+  g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 }
 
 
 void csfxScreenDPFX(iGraphics3D *g3d, iTextureHandle *tex, uint mixmode,
-  uint8 r, uint8 g, uint8 b)
+  float r, float g, float b, float a)
 {
   csfxScreenDPFXPartial (g3d, 0, 0, g3d->GetWidth (), g3d->GetHeight (),
-    tex, mixmode, r, g, b);
+    tex, mixmode, r, g, b, a);
 }
 
 void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
-  iTextureHandle *tex, uint mixmode, uint8 r, uint8 g, uint8 b)
+  iTextureHandle *tex, uint mixmode, float fr, float fg, float fb, float fa)
 {
   csSimpleRenderMesh mesh;
   static uint indices[4] = {0, 1, 2, 3};
   csVector3 verts[4];
   csVector2 texels[4];
   csVector4 colors[4];
-  float fr = float (r) / 255.0f;
-  float fg = float (g) / 255.0f;
-  float fb = float (b) / 255.0f;
-  float fa = 1.0f;
 
   mesh.meshtype = CS_MESHTYPE_QUADS;
   mesh.indexCount = 4;
@@ -196,6 +183,12 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   {
     fa = float (mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     mesh.mixmode = CS_FX_COPY;
+    mesh.alphaType.autoAlphaMode = false;
+    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
+  }
+  else if(fa < 1.0f)
+  {
+    mesh.mixmode = mixmode;
     mesh.alphaType.autoAlphaMode = false;
     mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
   }
