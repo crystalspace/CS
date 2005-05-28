@@ -24,7 +24,7 @@
 
 csShaderVariable::csShaderVariable (csStringID name) :
   csRefCount (), VectorValue (0), MatrixValuePtr(0), TransformPtr (0), 
-  Name (name)
+  Name (name), array(0)
 {
 }
 
@@ -40,6 +40,10 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
       break;
     case TRANSFORM:
       SetValue (*copyFrom.TransformPtr);
+      break;
+    case ARRAY:
+      array = new csArray<csShaderVariable>;
+      *array = *copyFrom.array;
       break;
     default:
       {

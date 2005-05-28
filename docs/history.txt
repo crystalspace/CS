@@ -24,6 +24,8 @@ chronological order.
 	  make it possible to map shader variables of typ MATRIX and TRANSFORM
 	  to ARB_vertex_program and ARB_fragment_program shaders. 
 	- Wouter fixed multiple definition of csAlignedMalloc on linux.
+	- Anders added array support to shader variables. No way to map 
+	  them to programs yet though.
 27-May-2005
 	- res fixed csGLGraphics3D::DrawPixmap() to also deactivate the
 	  texture. When an NPOTS texture was used it could happen that this 

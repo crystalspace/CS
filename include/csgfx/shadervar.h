@@ -88,7 +88,9 @@ public:
     /// Matrix
     MATRIX,
     /// Transform
-    TRANSFORM
+    TRANSFORM,
+    /// Array
+    ARRAY
   };
 
   //CS_LEAKGUARD_DECLARE (csShaderVariable);
@@ -107,6 +109,8 @@ private:
 
   csRef<iShaderVariableAccessor> accessor;
 
+  csArray<csShaderVariable> *array;
+
   csStringID Name;
 public:
 
@@ -118,6 +122,7 @@ public:
   {
     delete MatrixValuePtr;
     delete TransformPtr;
+    delete array;
   }
 
   csShaderVariable& operator= (const csShaderVariable& copyFrom);
@@ -352,6 +357,38 @@ public:
       TransformPtr = new csReversibleTransform (value);
     }
     return true;
+  }
+
+  /// Set the number of elements in an array variable
+  void SetArraySize (size_t size)
+  {
+    if (array == 0)
+    {
+      array = new csArray<csShaderVariable>;
+    }
+    array->SetSize (size, csShaderVariable (csInvalidStringID));
+  }
+
+  /// Get the number of elements in an array variable
+  size_t GetArraySize ()
+  {
+    if (array == 0)
+      return 0;
+    else
+      return array->Length ();
+  }
+
+  /**
+   * Get a specific element in an array variable
+   * Do not hold on to this for long, since it might change if
+   * the array size changes.
+   */
+  csShaderVariable *GetArrayElement (size_t element)
+  {
+    if (array != 0 && element>0 && element<array->Length ())
+    {
+      return &array->Get (element);
+    }
   }
 };
 
