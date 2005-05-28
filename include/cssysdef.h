@@ -170,7 +170,7 @@ struct csMemMapInfo
 
 // Handle platforms with no native aligned malloc
 #ifndef CS_HAVE_CSALIGNED_MALLOC
-void* csAlignedMalloc (size_t size, size_t align)
+static inline void* csAlignedMalloc (size_t size, size_t align)
 {
   void *mallocPtr = malloc(size + align + sizeof(void*));
   size_t ptrInt = (size_t)mallocPtr;
@@ -181,7 +181,7 @@ void* csAlignedMalloc (size_t size, size_t align)
   return (void*)ptrInt;
 }
 
-void csAlignedFree (void* ptr)
+static inline void csAlignedFree (void* ptr)
 {
   free(*(((void**)ptr) - 1));
 }
