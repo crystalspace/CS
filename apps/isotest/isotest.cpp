@@ -128,6 +128,15 @@ void IsoTest::SetupFrame ()
       facing = 180.f;
     }
 
+    if(kbd->GetKeyState (CSKEY_DOWN) && kbd->GetKeyState (CSKEY_LEFT))
+      facing = 135;
+    if(kbd->GetKeyState (CSKEY_DOWN) && kbd->GetKeyState (CSKEY_RIGHT))
+      facing = 225;
+    if(kbd->GetKeyState (CSKEY_UP) && kbd->GetKeyState (CSKEY_LEFT))
+      facing = 45;
+    if(kbd->GetKeyState (CSKEY_UP) && kbd->GetKeyState (CSKEY_RIGHT))
+      facing = 315;
+
     if(moved)
     {
       csYRotMatrix3 r(facing*PI/180.0);
