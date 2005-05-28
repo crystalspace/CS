@@ -66,6 +66,7 @@
 #include "gl_r2t_ext_fb_o.h"
 
 #include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glhelper.h"
 
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csplugincommon/render3d/normalizationcube.h"
@@ -1514,32 +1515,6 @@ GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint start,
   glDrawElements (mode, count, type, indices);
 }
 
-static void makeGLMatrix (const csReversibleTransform& t, float matrix[16])
-{
-  const csMatrix3 &orientation = t.GetO2T();
-  const csVector3 &translation = t.GetO2TTranslation();
-
-  matrix[0] = orientation.m11;
-  matrix[1] = orientation.m12;
-  matrix[2] = orientation.m13;
-  matrix[3] = 0.0f;
-
-  matrix[4] = orientation.m21;
-  matrix[5] = orientation.m22;
-  matrix[6] = orientation.m23;
-  matrix[7] = 0.0f;
-
-  matrix[8] = orientation.m31;
-  matrix[9] = orientation.m32;
-  matrix[10] = orientation.m33;
-  matrix[11] = 0.0f;
-
-  matrix[12] = translation.x;
-  matrix[13] = translation.y;
-  matrix[14] = translation.z;
-  matrix[15] = 1.0f;
-}
-
 void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 {
   world2camera = w2c;
@@ -1547,7 +1522,7 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 
   shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
 
-  makeGLMatrix (world2camera.GetInverse (), m);
+  makeGLMatrix (world2camera, m);
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (m);
 }
@@ -2781,7 +2756,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       camtrans.SetO2TTranslation (csVector3 (
       vwf / 2.0f, vhf / 2.0f, -aspect));
     }
-    SetWorldToCamera (camtrans);
+    SetWorldToCamera (camtrans.GetInverse ());
   }
   
   rmesh.object2world = mesh.object2world;

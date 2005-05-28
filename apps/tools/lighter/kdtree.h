@@ -39,39 +39,39 @@ class csMeshPatch;
 union csKDTreeNode
 {
   /**
-  * KDTree node for a leaf (child having primitives) 
-  */
+   * KDTree node for a leaf (child having primitives) 
+   */
   struct
   {
     /**
-    * Combined flag, dimension and pointer
-    *  Bit 0..1         Split dimension (0=x, 1=y, 2=z)
-    *  Bit 2..length    Pointer to list of primitives
-    */
+     * Combined flag, dimension and pointer
+     *  Bit 2            Flag indicating node/inner leaf (node=0,inner=1) 
+     *  Bit 3..length    Pointer to list of primitives
+     */
     uintptr_t flagAndOffset;
 
     /**
-    * Number of primitives in node 
-    */
+     * Number of primitives in node 
+     */
     size_t numberOfPrimitives;
   };
 
   /**
-  * KDTree node for a inner node
-  */
+   * KDTree node for a inner node
+   */
   struct
   {
     /**
-    * Combined flag, dimension and pointer
-    *  Bit 0..1         Split dimension (0=x, 1=y, 2=z)
-    *  Bit 2..length-1  Offset to first child
-    *  Bit 3            Flag indicating node/inner leaf (node=0,inner=1)
-    */
+     * Combined flag, dimension and pointer
+     *  Bit 0..1         Split dimension (0=x, 1=y, 2=z)
+     *  Bit 2            Flag indicating node/inner leaf (node=0,inner=1)
+     *  Bit 3..length-1  Offset to first child
+     */
     uintptr_t flagDimensionAndOffset;
 
     /**
-    * Split amount 
-    */
+     * Split amount 
+     */
     float splitLocation;
   };
 };
@@ -127,7 +127,7 @@ public:
 
   /// Build our optimized tree from a "build tree"
   void BuildTree (csKDBuildTree *buildTree);
-private:
+
   /// Transfer one node from the build tree to the real one
   void TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *tonode);
 

@@ -21,7 +21,7 @@ float4 main (vertex2fragment IN,
 {
 	float3 normEye = normalize(IN.EyeVec.xyz);
 	float3 normLight = normalize(IN.LightDir.xyz);
-	float selfOcclusion = min(max(0, normLight.z*5), 1);
+	float selfOcclusion = saturate(normLight.z*5);
 	
 	float4 height = 0.04 * tex2D(TexHeight, IN.TexCoord) - 0.02;
 	float2 newTexcoord = (height * normEye).xy + IN.TexCoord;

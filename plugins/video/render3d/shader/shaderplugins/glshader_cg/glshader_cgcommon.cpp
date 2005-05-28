@@ -28,6 +28,7 @@
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+#include "csplugincommon/opengl/glhelper.h"
 #include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
@@ -123,6 +124,28 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
 		cgGLSetParameter4f(param, v4.x, v4.y, v4.z, v4.w);
 	    }
 	    break;
+          case csShaderVariable::MATRIX:
+	    {
+	      csMatrix3 m;
+	      if(lvar->GetValue(m))
+              {
+                float matrix[16];
+                makeGLMatrix (m, matrix);
+		cgGLSetParameter4fv(param, matrix);
+              }
+	    }
+	    break;
+          case csShaderVariable::TRANSFORM:
+	    {
+	      csReversibleTransform t;
+	      if(lvar->GetValue(t))
+              {
+                float matrix[16];
+                makeGLMatrix (t, matrix);
+		cgGLSetParameter4fv(param, matrix);
+              }
+	    }
+	    break;
 	  default:
 	    break;
 	}
@@ -130,6 +153,7 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
       else
       {
 	const csVector4& v = mapping.mappingParam.vectorValue;
+        float matrix[16];
 	switch (mapping.mappingParam.type)
 	{
 	  case ParamFloat:
@@ -145,7 +169,12 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
 	    cgGLSetParameter4f (param, v.x, v.y, v.z, v.w);
 	    break;
 	  case ParamMatrix:
-	    CS_ASSERT_MSG("FIXME: matrix param support", false);
+            makeGLMatrix (mapping.mappingParam.matrixValue, matrix);
+	    cgGLSetParameter4fv (param, matrix);
+	    break;
+	  case ParamTransform:
+            makeGLMatrix (mapping.mappingParam.transformValue, matrix);
+	    cgGLSetParameter4fv (param, matrix);
 	    break;
 	  default:
 	    break;

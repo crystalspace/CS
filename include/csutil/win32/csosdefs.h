@@ -590,6 +590,14 @@ CS_EXPORTED_FUNCTION const char* plugin_compiler()                     \
 
 #endif // CS_STATIC_LINKED
 
+// Check for support of native aligned allocation
+#ifdef CS_COMPILER_MSVC
+  // MSVC have builtin support, use it
+  #define csAlignedMalloc(size, align) _aligned_malloc(size, align)
+  #define csAlignedFree(ptr) _aligned_free(ptr)
+  #define CS_HAVE_CSALIGNED_MALLOC
+#endif
+
 #include "sanity.inc"
 
 #endif // __CS_CSOSDEFS_H__

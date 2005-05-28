@@ -242,6 +242,26 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 	  return false;
       }
       break;
+    case ParamTransform:
+      {
+        csRef<iDocumentNode> matrix_node = node->GetNode ("matrix");
+        if (matrix_node)
+        {
+          csMatrix3 m;
+          if (!synsrv->ParseMatrix (matrix_node, m))
+            return false;
+          param.transformValue.SetT2O (m);
+        }
+        csRef<iDocumentNode> vector_node = node->GetNode ("v");
+        if (vector_node)
+        {
+          csVector3 v;
+          if (!synsrv->ParseVector (vector_node, v))
+            return false;
+          param.transformValue.SetOrigin (v);
+        }
+      }
+      break;
   }
 
   param.valid = true;
@@ -264,6 +284,8 @@ bool csShaderProgram::RetrieveParamValue (ProgramParam& param,
     const csShaderVariable::VariableType varType = var->GetType();
     if (varType == csShaderVariable::MATRIX)
       var->GetValue (param.matrixValue);
+    else if (varType == csShaderVariable::TRANSFORM)
+      var->GetValue (param.transformValue);
     else
       var->GetValue (param.vectorValue);
     switch (varType)
@@ -284,6 +306,9 @@ bool csShaderProgram::RetrieveParamValue (ProgramParam& param,
 	break;
       case csShaderVariable::MATRIX:
 	param.type = ParamMatrix;
+	break;
+      case csShaderVariable::TRANSFORM:
+	param.type = ParamTransform;
 	break;
       default:
 	param.type = ParamInvalid;

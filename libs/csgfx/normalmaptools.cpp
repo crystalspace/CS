@@ -59,27 +59,27 @@ void csNormalMappingTools::CalculateTangents (size_t numTriangles,
     const csVector2& w2 = texcoords[i2];
     const csVector2& w3 = texcoords[i3];
     
-    float x1 = v2.x - v1.x;
-    float x2 = v3.x - v1.x;
-    float y1 = v2.y - v1.y;
-    float y2 = v3.y - v1.y;
-    float z1 = v2.z - v1.z;
-    float z2 = v3.z - v1.z;
+    const float x1 = v2.x - v1.x;
+    const float x2 = v3.x - v1.x;
+    const float y1 = v2.y - v1.y;
+    const float y2 = v3.y - v1.y;
+    const float z1 = v2.z - v1.z;
+    const float z2 = v3.z - v1.z;
     
-    float s1 = w2.x - w1.x;
-    float s2 = w3.x - w1.x;
-    float t1 = w2.y - w1.y;
-    float t2 = w3.y - w1.y;
+    const float s1 = w2.x - w1.x;
+    const float s2 = w3.x - w1.x;
+    const float t1 = w2.y - w1.y;
+    const float t2 = w3.y - w1.y;
     
-    float div = s1 * t2 - s2 * t1;
+    
+    const float div = s1 * t2 - s2 * t1;
     float r = 1.0f;
     if(fabs(div) > SMALL_EPSILON)
       r = 1.0f / div;
     csVector3 sdir ((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, 
       (t2 * z1 - t1 * z2) * r);
-    csVector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, 
+    const csVector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, 
       (s1 * z2 - s2 * z1) * r);
-    
     outTangents[i1] += sdir;
     outTangents[i2] += sdir;
     outTangents[i3] += sdir;

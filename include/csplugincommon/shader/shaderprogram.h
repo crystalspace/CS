@@ -64,13 +64,15 @@ protected:
     ParamVector2    = 0x02,
     ParamVector3    = 0x04,
     ParamVector4    = 0x08,
-    ParamMatrix	    = 0x10
+    ParamMatrix	    = 0x10,
+    ParamTransform  = 0x20
   };
   struct ProgramParam
   {
     bool valid;
     csVector4 vectorValue;
     csMatrix3 matrixValue;
+    csReversibleTransform transformValue;
     csStringID name;
     csRef<csShaderVariable> var;
     ProgramParamType type;

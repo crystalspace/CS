@@ -29,6 +29,7 @@ csKDBuildTree::csKDBuildTree ()
 
 csKDBuildTree::~csKDBuildTree ()
 {
+  //@@TODO : Add deallocation here
 }
 
 /**
@@ -283,7 +284,12 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
     csKDTreeNode *right = nodeAllocator.Alloc ();
 
     // Better check?
-    CS_ASSERT (right == (left+1));
+    if (right != (left+1))
+    {
+      //different blocks, try again ;)
+      left = nodeAllocator.Alloc ();
+      right = nodeAllocator.Alloc ();
+    }
 
     csKDTreeNodeH::SetPointer (toNode, (uintptr_t)left);
     TransferNode (fromNode->left, left);
@@ -308,8 +314,10 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
     }
 
     // Allocate a list of pointers..
-    csMeshPatchAccStruct **primlist = new csMeshPatchAccStruct* [toNode->numberOfPrimitives];
+    csMeshPatchAccStruct **primlist = (csMeshPatchAccStruct**)csAlignedMalloc 
+      (sizeof (csMeshPatchAccStruct*) * toNode->numberOfPrimitives, 8);
 
+    csKDTreeNodeH::SetPointer (toNode, (uintptr_t)primlist);
     // And transfer all prims
     for (i = 0, j = 0; i<fromNode->patches.Length (); i++)
     {

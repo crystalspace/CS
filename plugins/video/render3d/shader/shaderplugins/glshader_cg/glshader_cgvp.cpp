@@ -279,7 +279,7 @@ bool csShaderGLCGVP::Compile (csArray<iShaderVariableContext*> &staticContexts)
 	      else							    \
 	      {								    \
 		paramName.Format ("p%lu[%d]", resIdx, nrows);		    \
-		semantic.Format ("program.local[%lu..%lu]", resIdx,	    \
+		semantic.Format ("{ program.local[%lu..%lu] }", resIdx,	    \
 		  resIdx + nrows-1);					    \
 		for (int r = 0; r < nrows; r++)				    \
 		{							    \

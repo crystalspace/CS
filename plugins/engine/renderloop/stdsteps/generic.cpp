@@ -484,7 +484,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       {
         if (shader != 0)
 	{
-          g3d->SetWorldToCamera (camt);
+          g3d->SetWorldToCamera (camt.GetInverse ());
 	  RenderMeshes (rview, g3d, shader, currentTicket,
 	  	sameShaderMeshInfo + lastidx,
 		sameShaderMeshes+lastidx, numSSM, stacks);
@@ -549,7 +549,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         // @@@ Need error reporter
         if (shader != 0)
 	{
-          g3d->SetWorldToCamera (camt);
+          g3d->SetWorldToCamera (camt.GetInverse ());
           RenderMeshes (rview, g3d, shader, currentTicket,
 	  	sameShaderMeshInfo + lastidx, 
 		sameShaderMeshes + lastidx, numSSM, stacks);
@@ -568,7 +568,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     // @@@ Need error reporter
     if (shader != 0)
     {
-      g3d->SetWorldToCamera (camt);
+      g3d->SetWorldToCamera (camt.GetInverse ());
       RenderMeshes (rview, g3d, shader, currentTicket,
       	sameShaderMeshInfo + lastidx,
         sameShaderMeshes + lastidx, numSSM, stacks);

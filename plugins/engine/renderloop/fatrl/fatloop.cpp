@@ -470,7 +470,7 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
     }
   }
 
-  g3d->SetWorldToCamera (camt);
+  g3d->SetWorldToCamera (camt.GetInverse ());
   for (size_t b = 0; b < buckets.Length(); b++)
   {
     g3d->SetZMode (CS_ZBUF_MESH);

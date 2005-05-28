@@ -78,23 +78,7 @@ public:
    */
   static inline uint8* AllocBlock(size_t blocksize) 
   {
-    uint8* block;
-    uintptr_t blockPtr;
-    block = (uint8*)malloc(blocksize + A + sizeof(void*));
-    
-    uint8* origblock = block;
-    blockPtr = (uintptr_t)block + sizeof(void*);
-
-    // Align.
-    blockPtr += (A - 1);
-    blockPtr &= ~(A - 1);
-
-    // Store original pointer at block-sizeof(void*).
-    uintptr_t* ptr = (uintptr_t*)blockPtr; 
-    ptr--;
-    *ptr = (uintptr_t)origblock;
-    
-    return (uint8*)blockPtr;
+    return (uint8*)csAlignedMalloc (blocksize, A);
   }
 
   /**
@@ -103,8 +87,7 @@ public:
    */
   static inline void FreeBlock(uint8* p)
   {
-    uint8* realp = (uint8*)*(((uintptr_t*)p)-1);
-    free(realp);
+    csAlignedFree (p);
   }
 };
 

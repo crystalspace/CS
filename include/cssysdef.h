@@ -168,6 +168,25 @@ struct csMemMapInfo
 
 #endif // CS_HAVE_POSIX_MMAP
 
+// Handle platforms with no native aligned malloc
+#ifndef CS_HAVE_CSALIGNED_MALLOC
+void* csAlignedMalloc (size_t size, size_t align)
+{
+  void *mallocPtr = malloc(size + align + sizeof(void*));
+  size_t ptrInt = (size_t)mallocPtr;
+
+  ptrInt = (ptrInt + align + sizeof(void*)) / align * align;
+  *(((void**)ptrInt) - 1) = mallocPtr;
+
+  return (void*)ptrInt;
+}
+
+void csAlignedFree (void* ptr)
+{
+  free(*(((void**)ptr) - 1));
+}
+#endif
+
 /**
  * The CS_HEADER_GLOBAL() macro composes a pathname from two components and
  * wraps the path in `<' and `>'.  This macro is useful in cases where one does

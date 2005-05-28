@@ -618,7 +618,7 @@ void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2
 
   stacks.Empty ();
   shmgr->PushVariables (stacks);
-  g3d->SetWorldToCamera (camera->GetTransform ());
+  g3d->SetWorldToCamera (camera->GetTransform ().GetInverse ());
   shader->SetupPass (shaderTicket, &rmesh, rmesh, stacks);
 
   switch (method)

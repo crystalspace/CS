@@ -483,7 +483,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.object2world = mesh->GetMovable()->GetFullTransform ();
 
   csRenderMeshModes modes (rmesh);
-  g3d->SetWorldToCamera (camera->GetTransform ());
+  g3d->SetWorldToCamera (camera->GetTransform ().GetInverse ());
   // probably shouldn't need to check this in general
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
