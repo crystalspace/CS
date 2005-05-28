@@ -37,8 +37,8 @@
     <texture name="andrew_marble4.jpg">
       <file>/lib/stdtex/andrew_marble4.jpg</file>
     </texture>
-    <texture name="marble_13_is___128.jp">
-      <file>/lib/stdtex/marble_13_is___128.jpg</file>
+    <texture name="spun_brass.jp">
+      <file>/lib/stdtex/spun_brass.jpg</file>
     </texture>
     <texture name="bricks.jpg">
       <file>/lib/stdtex/bricks.jpg</file>
@@ -99,8 +99,8 @@
       <shader type="ambient">ambient</shader>
       <shader type="diffuse">light</shader>
     </material>
-    <material name="marble_13_is___128.jp">
-      <texture>marble_13_is___128.jp</texture>
+    <material name="spun_brass.jp">
+      <texture>spun_brass.jp</texture>
       <shader type="ambient">ambient</shader>
       <shader type="diffuse">light</shader>
     </material>
@@ -19427,7 +19427,7 @@
       <plugin>genmesh</plugin>
       <params>
         <factory>Cylinder.005</factory>
-        <material>marble_13_is___128.jp</material>
+        <material>spun_brass.jp</material>
       </params>
       <zuse/>
       <move>
@@ -19526,7 +19526,7 @@
       <plugin>genmesh</plugin>
       <params>
         <factory>Suzanne.001</factory>
-        <material>marble_13_is___128.jp</material>
+        <material>spun_brass.jp</material>
       </params>
       <zuse/>
       <move>

@@ -2985,8 +2985,13 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
   /// The inverse width and height of the halo
   float inv_W = Wfact / w, inv_H = Hfact / h;
-  float aspect = (float)G3D->GetWidth() / G3D->GetAspect();
+  // the screen setup does not seem to be like in DrawPixmap,
+  // so vx, vy (nice DrawPixmap coords) need to be transformed.
+  // magic constant .86 that make halos align properly, with this formula.
+  float aspectw = .86* (float)G3D->GetWidth() / G3D->GetAspect();
+  float aspecth = .86* (float)G3D->GetHeight() / G3D->GetAspect(); 
   float hw = (float)G3D->GetWidth() * 0.5f;
+  float hh = (float)G3D->GetHeight() * 0.5f;
 
   int oldTU = G3D->statecache->GetActiveTU ();
   if (G3D->ext->CS_GL_ARB_multitexture)
@@ -3020,7 +3025,8 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   {
     float vx = iVertices [i].x, vy = iVertices [i].y;
     glTexCoord2f ((vx - x) * inv_W, (vy - y) * inv_H);
-    glVertex3f ((vx - hw) * aspect + hw, sheight - vy, -14.0f);
+    glVertex3f ((vx - hw) * aspectw + hw, 
+      (sheight - vy - hh)*aspecth + hh, -14.0f);
   }
   glEnd ();
 

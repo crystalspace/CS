@@ -77,6 +77,8 @@ private:
 
   int current_view;
   IsoView views[4];
+  /// is the main actor walking
+  bool actor_is_walking;
 
   static bool IsoTestEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);

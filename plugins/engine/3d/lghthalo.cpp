@@ -199,8 +199,15 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
 
     if (Engine->top_clipper->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
     {
-      float zv = Engine->G3D->GetZBuffValue (csQround (v.x), csQround (v.y));
-      return v.z <= zv;
+      csVector3 isect;
+      int polyidx = 0;
+      if(camera->GetSector ()->HitBeamPortals (
+	camera->GetTransform().GetOrigin(),
+	Light->GetCenter(), isect, &polyidx))
+	  return false; // hit a mesh
+      if(polyidx != -1) // double check on the above if
+	return false; // hit a polygon
+      return true;
     }
   }
 

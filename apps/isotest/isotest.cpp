@@ -51,6 +51,8 @@
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+#include "imesh/genmesh.h"
+#include "imesh/gmeshskel.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -68,6 +70,8 @@ IsoTest::IsoTest (iObjectRegistry* object_reg)
   views[1].SetOrigOffset (csVector3 (-9, 9, -9)); // zoomed out.
   views[2].SetOrigOffset (csVector3 (4, 3, -4)); // diablo style perspective.
   views[3].SetOrigOffset (csVector3 (0, 4, -4)); // zelda style perspective.
+
+  actor_is_walking = false;
 }
 
 IsoTest::~IsoTest ()
@@ -97,14 +101,55 @@ void IsoTest::SetupFrame ()
   }
   else
   {
+    float facing = 0.f; // in degrees
+    bool moved = false;
     if (kbd->GetKeyState (CSKEY_RIGHT))
+    {
+      moved = true;
       actor->GetMovable ()->MovePosition (csVector3 (speed, 0, 0));
+      facing = 270.f;
+    }
     if (kbd->GetKeyState (CSKEY_LEFT))
+    {
+      moved = true;
       actor->GetMovable ()->MovePosition (csVector3 (-speed, 0, 0));
+      facing = 90.f;
+    }
     if (kbd->GetKeyState (CSKEY_UP))
+    {
+      moved = true;
       actor->GetMovable ()->MovePosition (csVector3 (0, 0, speed));
+      facing = 0.f;
+    }
     if (kbd->GetKeyState (CSKEY_DOWN))
+    {
+      moved = true;
       actor->GetMovable ()->MovePosition (csVector3 (0, 0, -speed));
+      facing = 180.f;
+    }
+
+    if(moved)
+    {
+      csYRotMatrix3 r(facing*PI/180.0);
+      actor->GetMovable ()->SetTransform(r);
+    }
+    // update animation state
+    csRef<iGeneralMeshState> spstate (
+      SCF_QUERY_INTERFACE (actor->GetMeshObject (), iGeneralMeshState));
+    csRef<iGenMeshSkeletonControlState> animcontrol (
+      SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
+      iGenMeshSkeletonControlState));
+    if(actor_is_walking && !moved)
+    {
+      animcontrol->StopAll();
+      animcontrol->Execute("idle");
+    }
+    if(!actor_is_walking && moved)
+    {
+      animcontrol->StopAll();
+      animcontrol->Execute("walk");
+    }
+    actor_is_walking = moved;
   }
 
   // Make sure actor is constant distance above plane.
@@ -120,7 +165,7 @@ void IsoTest::SetupFrame ()
   actor->GetMovable ()->UpdateMove ();
 
   // Move the light.
-  actor_light->SetCenter (actor_pos+csVector3 (0, 2, 0));
+  actor_light->SetCenter (actor_pos+csVector3 (0, 2, -1));
 
   CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos); 
   
@@ -134,11 +179,17 @@ void IsoTest::SetupFrame ()
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
+  csVector2 lpos(0,0);
+  view->GetCamera()->Perspective(
+    view->GetCamera()->GetTransform ().Other2This(csVector3 (-4.7, 1.0, 5.5)),
+    lpos);
   // display a helpful little text.
   int txtw=0, txth=0;
   font->GetMaxSize(txtw, txth);
   if(txth == -1) txth = 20;
   int white = g3d->GetDriver2D ()->FindRGB (255, 255, 255);
+  g3d->GetDriver2D ()->DrawBox((int)lpos.x-2,
+    g3d->GetDriver2D ()->GetHeight()-(int)lpos.y-2,4,4,white);
   int ypos = g3d->GetDriver2D ()->GetHeight () - txth*4 - 1;
   g3d->GetDriver2D ()->Write (font, 1, ypos, white, -1, 
     "Isometric demo keys (esc to exit):");
@@ -281,6 +332,11 @@ bool IsoTest::LoadMap ()
     csColor (1, 1, 1));
   ll->Add (actor_light);
 
+  csRef<iLight> statuelight = engine->CreateLight ("statuelight",
+    csVector3 (-4.7, 1.0, 5.5), 4, csColor(1.2,0.2,0.2));
+  statuelight->CreateNovaHalo (1278, 15, 0.3);
+  ll->Add (statuelight);
+
   plane = engine->FindMeshObject ("Plane");
 
   return true;
@@ -290,8 +346,8 @@ bool IsoTest::CreateActor ()
 {
   // Load a texture for our sprite.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
-  iTextureWrapper* txt = loader->LoadTexture ("spark",
-    "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, false, false);
+  iTextureWrapper* txt = loader->LoadTexture ("vedette_fashion",
+    "/lib/std/ugly_woman.jpg", CS_TEXTURE_3D, txtmgr, false, false);
   if (txt == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -320,14 +376,14 @@ bool IsoTest::CreateActor ()
         "Couldn't find shaders!");
     return false;
   }
-  csRef<iMaterial> spark_material = engine->CreateBaseMaterial (txt);
-  spark_material->SetShader (strings->Request ("ambient"), ambient_shader);
-  spark_material->SetShader (strings->Request ("diffuse"), light_shader);
-  engine->GetMaterialList ()->NewMaterial (spark_material, "spark");
+  csRef<iMaterial> fash_material = engine->CreateBaseMaterial (txt);
+  fash_material->SetShader (strings->Request ("ambient"), ambient_shader);
+  fash_material->SetShader (strings->Request ("diffuse"), light_shader);
+  engine->GetMaterialList ()->NewMaterial (fash_material, "vedette_fashion");
 
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact (
-    loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
+    loader->LoadMeshObjectFactory ("/lev/isomap/vedette.spr"));
   if (imeshfact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -335,16 +391,20 @@ bool IsoTest::CreateActor ()
         "Error loading mesh object factory!");
     return false;
   }
-  csMatrix3 m; m.Identity (); m *= .50;
+  csMatrix3 m; m.Identity (); m *= 1.10; // scaling factor
   imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0)));
 
   // Create the sprite and add it to the engine.
   actor = engine->CreateMeshWrapper (
     imeshfact, "MySprite", room, csVector3 (-3, 2, 3));
   actor->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> spstate (
-    SCF_QUERY_INTERFACE (actor->GetMeshObject (), iSprite3DState));
-  spstate->SetAction ("default");
+  csRef<iGeneralMeshState> spstate (
+    SCF_QUERY_INTERFACE (actor->GetMeshObject (), iGeneralMeshState));
+  csRef<iGenMeshSkeletonControlState> animcontrol (
+    SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
+    iGenMeshSkeletonControlState));
+  animcontrol->StopAll();
+  animcontrol->Execute("idle");
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you
