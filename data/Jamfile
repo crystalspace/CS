@@ -22,8 +22,9 @@ maps =
   terrainf ;
 for map in $(maps)
 {
-    local files = [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds world ] ;
-    InstallData $(files) : data maps $(map) ;
+  local files =
+    [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds *.spr world ] ;
+  InstallData $(files) : data maps $(map) ;
 }
 
 SubInclude TOP data aws ;
