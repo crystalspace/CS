@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-May-2005
+	- Wouter Wijngaards protected a division against zero divide in
+	  csNormalMappingTools::CalculateTangents ().
 27-May-2005
 	- res fixed csGLGraphics3D::DrawPixmap() to also deactivate the
 	  texture. When an NPOTS texture was used it could happen that this 
