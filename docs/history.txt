@@ -61,16 +61,16 @@ chronological order.
 	  at the request of Andreas Grosam <agrosam@onlinehome.de>, so that
 	  they apply to all build modes rather than only optimize mode.
 	- Wouter changed
-	    . the isotest demo to display a helpful text and you can rotate 
+	    - The isotest demo to display a helpful text and you can rotate 
 	      and zoom the camera when holding the shift key.
-	    . changed isotest demo further, adding main character that walks 
+	    - Changed isotest demo further, adding main character that walks 
 	      around when moving instead of the ugly box.
-	    . worked on Halo code, the visibility determination is not done 
+	    - Worked on Halo code, the visibility determination is not done 
 	      using the Zbuffer value, which stalls the opengl pipeline, and 
 	      seems to produce erratic results on some systems. It now uses
 	      HitBeamPortals () to determine if a point is unobscured.
-	    . csOpenGLHalo::Draw now respects the fov also for y values.
-	    . Fixed an existing bug with halos, they would be drawn off
+	    - csOpenGLHalo::Draw now respects the fov also for y values.
+	    - Fixed an existing bug with halos, they would be drawn off
 	      center. Now shifted correct by trial and error.
 26-May-2005
 	- Piotr Obrzut added getters for joint feedback information to 
