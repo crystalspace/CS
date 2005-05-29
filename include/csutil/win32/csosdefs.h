@@ -336,7 +336,17 @@ struct csMemMapInfo
 #endif
 
 #if defined (CS_COMPILER_MSVC)
-#  define strtoll	_strtoi64
+#  if defined(_MSC_VER) && (_MSC_VER < 1300)
+#    include <assert.h>
+static inline longlong strtoll(char const* s, char** sN, int base)
+{
+  assert(sN == 0);
+  assert(base == 10);
+  return _atoi64(s);
+}
+#  else
+#   define strtoll _strtoi64
+#  endif
 #endif
 
 // Maximal path length

@@ -141,17 +141,27 @@ namespace autom
 		/** Copies all of the parameters from the given function into this function. */
 		void copyParms(const function &func)
 		{
+#if defined(CS_COMPILER_MSVC) && defined(_MSC_VER) && (_MSC_VER < 1300)
+			// The old MSVC6 STL map<> lacks the ability to insert()
+			// ranges from any type of iterator (it can only insert
+			// a range of raw map<>::value_type pointers). Further,
+			// the one-at-a-time insert() wants non-const iterator.
+			function& f = const_cast<function&>(func);
+			parm_map_type::iterator b = f.parms.begin();
+			parm_map_type::iterator e = f.parms.end();
+			for ( ; b != e; ++b)
+				parms.insert(b, *b);
+#else
 			parms.insert(func.parms.begin(), func.parms.end());
+#endif
 		}
 		
 		/** Clones this function and sets the parent. */
 		function *clone(function *parent)
 		{
 			function *cl = new function(*this);	
-			
 			cl->setParent(parent);
-			cl->parms.insert(parms.begin(), parms.end());
-			
+			cl->copyParms(*this);			
 			return cl;
 		}
 				

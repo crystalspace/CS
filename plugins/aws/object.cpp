@@ -1,10 +1,10 @@
-
 #include "cssysdef.h"
 #include "registrar.h"
 #include "csutil/snprintf.h"
 #include <cstdlib>
 #include <cstdio>
 #include <ctype.h>
+#include <stdlib.h>
 
 namespace autom
 {
@@ -38,20 +38,20 @@ string::toString()
 integer 
 string::toInt()
 {
-	return integer(std::strtol(value.c_str(), 0, 10));
+	return integer(strtol(value.c_str(), 0, 10));
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
 string::toFloat()
 {
-	return floating(std::strtod(value.c_str(), 0));	
+	return floating(strtod(value.c_str(), 0));	
 }
 
 bool
 string::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 {
-	value.clear();
+	value = "";
 	
 	if (pos==end || *pos != '"') return false;
 	
@@ -181,7 +181,7 @@ floating::parseObject(std::string::iterator &pos, const std::string::iterator &e
 		return false;	
 	}
 	
-	value = std::strtod(temp.c_str(), 0);
+	value = strtod(temp.c_str(), 0);
 	
 	return true;
 }
@@ -324,7 +324,7 @@ reference::reprObject()
 bool
 reference::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 {
-	value.clear();
+	value = "";
 	
 	if (pos==end || *pos != '$') return false;
 		
