@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-May-2005
+	- res changed the material map texture created by the terrain mesh to
+	  use clamping to prevent wraparounds near the border of the mesh.
+	- res made the shader program parameter parser also accept "transform"
+	  parameters (previously a bit of code was missing).
 28-May-2005
 	- Wouter Wijngaards protected a division against zero divide in
 	  csNormalMappingTools::CalculateTangents ().

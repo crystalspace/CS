@@ -125,6 +125,10 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   {
     paramType = ParamMatrix;
   }
+  else if (strcmp (type, "transform") == 0)
+  {
+    paramType = ParamTransform;
+  }
   else if ((strcmp (type, "expression") == 0) || (strcmp (type, "expr") == 0))
   {
     csRef<csShaderVariable> var;

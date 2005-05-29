@@ -1782,7 +1782,8 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
       }
     }
 
-    csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, CS_TEXTURE_2D);
+    csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
+      CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
       new csShaderVariable (strings->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);

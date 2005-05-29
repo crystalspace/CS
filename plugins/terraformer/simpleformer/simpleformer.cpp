@@ -737,19 +737,19 @@ void csSimpleSampler::CacheTexCoords ()
 
   // Iterate through the samplepoints in the region
   // Sample texture coordinates as x/z positions in heightmap space
-  const float startx = minCorner.x / (float)terraFormer->width;
+  const float startx = minCorner.x / (float)(terraFormer->width);
   csVector2 texCoord;
-  texCoord.y = minCorner.z / (float)terraFormer->height;
+  texCoord.y = minCorner.z / (float)(terraFormer->height);
   const csVector2 tcStep (
-    sampleDistanceHeight.x / (float)terraFormer->width, 
-    sampleDistanceHeight.z / (float)terraFormer->height);
+    sampleDistanceHeight.x / (float)(terraFormer->width), 
+    sampleDistanceHeight.z / (float)(terraFormer->height));
   for (unsigned int i = 0; i<resolution; ++i)
   {
     texCoord.x = startx; 
     for (unsigned int j = 0; j<resolution; ++j)
     {
       // Just assign the texture coordinate
-      texCoords[idx++].Set (texCoord.x, -texCoord.y); //= texCoord;
+      texCoords[idx++].Set (texCoord.x, 1.0f-texCoord.y); //= texCoord;
       texCoord.x += tcStep.x;
     }
     texCoord.y += tcStep.y;
