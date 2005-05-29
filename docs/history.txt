@@ -14,6 +14,7 @@ chronological order.
 	- Eric Sunshine fixed AWS to build cleanly with MSVC6.  Problems
 	  included incompatibilities with MSVC6's very old STL and std::
 	  namespace.
+	- Wouter fixed shadervar constructor ordering and inited all vars.
 28-May-2005
 	- Wouter Wijngaards protected a division against zero divide in
 	  csNormalMappingTools::CalculateTangents ().

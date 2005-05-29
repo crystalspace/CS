@@ -23,8 +23,8 @@
 //CS_LEAKGUARD_IMPLEMENT (csShaderVariable);
 
 csShaderVariable::csShaderVariable (csStringID name) :
-  csRefCount (), VectorValue (0), MatrixValuePtr(0), TransformPtr (0), 
-  Name (name), array(0)
+  csRefCount (), VectorValue (0), Int(0), MatrixValuePtr(0), 
+  TransformPtr (0), array(0), Name (name)
 {
 }
 
