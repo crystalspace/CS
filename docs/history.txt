@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-May-2005
+	- Eric Sunshine fixed csutil/win32/csosdefs.h so that it is more
+	  discerning when setting up csAlignedMalloc()/csAlignedFree() in order
+	  to support MSVC6 which does not feature
+	  _aligned_malloc()/_aligned_free().
+	- Eric Sunshine eliminated compilation warnings reported by MSVC6 in
+	  walktest/infmaze.cpp.
 29-May-2005
 	- res changed the material map texture created by the terrain mesh to
 	  use clamping to prevent wraparounds near the border of the mesh.

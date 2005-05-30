@@ -171,6 +171,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
 void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
 	int z2, bool create_portal1)
 {
+  int a;
   InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));
   InfRoomData* s2 = (InfRoomData*)(infinite_world->Get (x2, y2, z2));
   char* p1, * p2;
@@ -188,7 +189,7 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
   int po1 = s1->walls_fact_state->FindPolygonByName (p1);
   int tmpCount = s1->walls_fact_state->GetPolygonVertexCount(po1);
   csVector3 *vertices = new csVector3[tmpCount];
-  for(int a=0;a<tmpCount;a++)
+  for(a=0;a<tmpCount;a++)
   {
     vertices[a] = s1->walls_fact_state->GetPolygonVertex(po1,a);
   }
@@ -201,7 +202,7 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
   int po2 = s2->walls_fact_state->FindPolygonByName (p2);
   tmpCount = s2->walls_fact_state->GetPolygonVertexCount(po2);
   vertices = new csVector3[tmpCount];
-  for(int a=0;a<tmpCount;a++)
+  for(a=0;a<tmpCount;a++)
   {
     vertices[a] = s2->walls_fact_state->GetPolygonVertex(po2,a);
   }

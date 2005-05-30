@@ -42,7 +42,8 @@
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4251)   /* class needs to have dll-interface to be 
 				   * used by clients */
-  #pragma warning(disable:4275)   // non-DLL-interface used as base for DLL-interface
+  #pragma warning(disable:4275)   /* non-DLL-interface used as base for
+                                   * DLL-interface */
   #pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  /* 'variable' : conversion from 'type' to 
 				   * 'type' of greater size */
@@ -263,18 +264,23 @@
     #include <crtdbg.h>
 
     #if defined(CS_EXTENSIVE_MEMDEBUG)
-      #define malloc(size) 	_malloc_dbg ((size), _NORMAL_BLOCK, __FILE__, __LINE__)
-      #define free(ptr) 		_free_dbg ((ptr), _NORMAL_BLOCK)
-      #define realloc(ptr, size) 	_realloc_dbg ((ptr), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
-      #define calloc(num, size)	_calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+      #define malloc(size) \
+        _malloc_dbg ((size), _NORMAL_BLOCK, __FILE__, __LINE__)
+      #define free(ptr) _free_dbg ((ptr), _NORMAL_BLOCK)
+      #define realloc(ptr, size) \
+        _realloc_dbg ((ptr), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+      #define calloc(num, size)	\
+        _calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
 
       // heap consistency check is on by default, leave it
       #define CS_WIN32_MSVC_DEBUG_GOOP \
-        _CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF)
+        _CrtSetDbgFlag ( \
+	  _CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF)
     #else
       // turn heap consistency check off
       #define CS_WIN32_MSVC_DEBUG_GOOP \
-        _CrtSetDbgFlag ((_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF) | \
+        _CrtSetDbgFlag ( \
+	  (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF) | \
 	  _CRTDBG_LEAK_CHECK_DF)
     #endif
   #endif
@@ -601,8 +607,7 @@ CS_EXPORTED_FUNCTION const char* plugin_compiler()                     \
 #endif // CS_STATIC_LINKED
 
 // Check for support of native aligned allocation
-#ifdef CS_COMPILER_MSVC
-  // MSVC have builtin support, use it
+#if defined(CS_COMPILER_MSVC) && defined(_MSC_VER) && (_MSC_VER >= 1300)
   #define csAlignedMalloc(size, align) _aligned_malloc(size, align)
   #define csAlignedFree(ptr) _aligned_free(ptr)
   #define CS_HAVE_CSALIGNED_MALLOC
