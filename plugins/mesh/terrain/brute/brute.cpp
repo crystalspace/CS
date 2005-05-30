@@ -576,6 +576,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
+  bool isMirrored = rview->GetCamera()->IsMirrored();
 
   for (int i=0; i<=(baseonly?0:(int)terr->palette.Length ()); ++i)
   {
@@ -603,6 +604,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     }
     rm->object2world = o2wt;
     rm->worldspace_origin = wo;
+    rm->do_mirror = isMirrored;
     terr->returnMeshes->Push (rm);
   }
 }
