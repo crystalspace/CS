@@ -157,3 +157,10 @@ void csGLRender2TextureFramebuf::SetClipRect (const csRect& clipRect)
   glScissor (clipRect.xmin, txt_h - clipRect.ymax, clipRect.Width(),
     clipRect.Height());
 }
+
+void csGLRender2TextureFramebuf::SetupClipPortalDrawing ()
+{
+  G3D->statecache->SetMatrixMode (GL_MODELVIEW);
+  glScalef (1, -1, 1);
+  G3D->statecache->SetCullFace (GL_BACK);
+}

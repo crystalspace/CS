@@ -2470,7 +2470,11 @@ void csGLGraphics3D::SetupClipPortals ()
   statecache->SetColorMask (false, false, false, false);
   GLenum oldcullface;
   statecache->GetCullFace (oldcullface);
-  statecache->SetCullFace (GL_FRONT);
+  if (render_target)
+    r2tbackend->SetupClipPortalDrawing ();
+  else
+    statecache->SetCullFace (GL_FRONT);
+    
   bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->SetShadeModel (GL_FLAT);
@@ -2488,6 +2492,7 @@ void csGLGraphics3D::SetupClipPortals ()
   // First clear the z-buffer here.
   SetZModeInternal (CS_ZBUF_FILLONLY);
 
+  OutputMarkerString (__FUNCTION__, __FILE__, __LINE__, "Portal clipper");
   glBegin (GL_QUADS);
   glVertex3f (-1.0f, 1.0f, -1.0f);
   glVertex3f (1.0f, 1.0f, -1.0f);

@@ -50,6 +50,7 @@ public:
   virtual void SetupProjection ();
   virtual void FinishDraw ();
   virtual void SetClipRect (const csRect& clipRect);
+  virtual void SetupClipPortalDrawing ();
 };
 
 #endif // __CS_GL_R2T_FRAMEBUF_H__

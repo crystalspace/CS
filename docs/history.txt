@@ -13,6 +13,8 @@ chronological order.
 	  _aligned_malloc()/_aligned_free().
 	- Eric Sunshine eliminated compilation warnings reported by MSVC6 in
 	  walktest/infmaze.cpp.
+	- Anders fixed a problem where render to texture and floating portals 
+	  wouldn't get along.
 29-May-2005
 	- res changed the material map texture created by the terrain mesh to
 	  use clamping to prevent wraparounds near the border of the mesh.

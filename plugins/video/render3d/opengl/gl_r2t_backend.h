@@ -40,6 +40,7 @@ public:
   virtual void SetupProjection () = 0;
   virtual void FinishDraw () = 0;
   virtual void SetClipRect (const csRect& clipRect) = 0;
+  virtual void SetupClipPortalDrawing () = 0;
 };
 
 #endif // __CS_GL_R2T_BACKEND_H__
