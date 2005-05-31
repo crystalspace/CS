@@ -19,6 +19,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csgeom/vector3.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -73,113 +74,189 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
                                      const csShaderVarStack &stacks)
 {
   size_t i;
+  csRef<csShaderVariable> var;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
+    
+    var = csGetShaderVariableFromStack (stacks, mapping.name);
+    if (!var.IsValid ())
+      var = mapping.mappingParam.var;
 
-    if (RetrieveParamValue (mapping.mappingParam, stacks))
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      continue;
+
+    CGparameter param = (CGparameter)mapping.userVal;
+    
+    switch (var->GetType ())
     {
-      CGparameter param = (CGparameter)mapping.userVal;
+    case csShaderVariable::INT:
+    case csShaderVariable::FLOAT:
+      {
+        float f;
+        if (var->GetValue (f))
+          cgGLSetParameter1f (param, f);
+      }
+      break;
+    case csShaderVariable::VECTOR2:
+      {
+        csVector2 v;
+        if (var->GetValue (v))
+          cgGLSetParameter2f (param, v.x, v.y);
+      }
+      break;
+    case csShaderVariable::COLOR:
+    case csShaderVariable::VECTOR3:
+      {
+        csVector3 v;
+        if (var->GetValue (v))
+          cgGLSetParameter3f (param, v.x, v.y, v.z);
+      }
+      break;
+    case csShaderVariable::VECTOR4:
+      {
+        csVector4 v;
+        if (var->GetValue (v))
+          cgGLSetParameter4f (param, v.x, v.y, v.z, v.w);
+      }
+      break;
+    case csShaderVariable::MATRIX:
+      {
+        csMatrix3 m;
+        if (var->GetValue (m))
+        {
+          float matrix[16];
+          makeGLMatrix (m, matrix);
+          cgGLSetMatrixParameterfc (param, matrix);
+        }
+      }
+      break;
+    case csShaderVariable::TRANSFORM:
+      {
+        csReversibleTransform t;
+        if (var->GetValue (t))
+        {
+          float matrix[16];
+          makeGLMatrix (t, matrix);
+          cgGLSetMatrixParameterfc (param, matrix);
+        }
+      }
+      break;
+    case csShaderVariable::ARRAY:
+      {
+        //Array..
+        if (cgGetParameterType (param) != CG_ARRAY)
+          break;
 
-      if (mapping.mappingParam.var.IsValid())
-      {
-	csShaderVariable* lvar = mapping.mappingParam.var;
-	switch (lvar->GetType())
-	{
-	  case csShaderVariable::INT:
-	    {
-	      int intval;
-	      if(lvar->GetValue(intval))
-		cgGLSetParameter1f (param, (float)intval);
-	    }
-	    break;
-	  case csShaderVariable::FLOAT:
-	    {
-	      float fval;
-	      if(lvar->GetValue(fval))
-		cgGLSetParameter1f (param, fval);
-	    }
-	    break;
-	  case csShaderVariable::VECTOR2:
-	    {
-	      csVector2 v2;
-	      if(lvar->GetValue(v2))
-		cgGLSetParameter2f(param, v2.x, v2.y);
-	    }
-	    break;    
-	  case csShaderVariable::COLOR:
-	  case csShaderVariable::VECTOR3:
-	    {
-	      csVector3 v3;
-	      if(lvar->GetValue(v3))
-		cgGLSetParameter3f(param, v3.x, v3.y, v3.z);
-	    }
-	    break;
-	  case csShaderVariable::VECTOR4:
-	    {
-	      csVector4 v4;
-	      if(lvar->GetValue(v4))
-		cgGLSetParameter4f(param, v4.x, v4.y, v4.z, v4.w);
-	    }
-	    break;
-          case csShaderVariable::MATRIX:
-	    {
-	      csMatrix3 m;
-	      if(lvar->GetValue(m))
+        if (var->GetArraySize () == 0) 
+          break;
+
+        uint numElements = csMin ((uint)cgGetArraySize (param, 0), 
+                                  (uint)var->GetArraySize ());
+
+        if (numElements == 0) 
+          break;
+
+        // Do type-specific packing depending on first var
+        const csShaderVariable *cvar = var->GetArrayElement (0);
+        
+        CS_ALLOC_STACK_ARRAY (float, tmpArr, numElements * 16);
+        uint idx = 0;
+
+        switch (cvar->GetType ())
+        {
+        case csShaderVariable::INT:
+        case csShaderVariable::FLOAT:
+          {
+            float f;
+            for (idx = 0; idx < numElements; i++)
+            {
+              if (var->GetArrayElement (i)->GetValue (f))
+                tmpArr[idx] = f;
+            }
+            cgGLSetParameterArray1f (param, 0, numElements, tmpArr);
+          }
+          break;
+        case csShaderVariable::VECTOR2:
+          {
+            csVector2 v;
+            for (idx = 0; idx < numElements; i++)
+            {
+              if (var->GetArrayElement (i)->GetValue (v))
               {
-                float matrix[16];
-                makeGLMatrix (m, matrix);
-		cgGLSetParameter4fv(param, matrix);
+                tmpArr[2*idx+0] = v.x;
+                tmpArr[2*idx+1] = v.y;
               }
-	    }
-	    break;
-          case csShaderVariable::TRANSFORM:
-	    {
-	      csReversibleTransform t;
-	      if(lvar->GetValue(t))
+            }
+            cgGLSetParameterArray2f (param, 0, numElements, tmpArr);
+          }
+          break;
+        case csShaderVariable::COLOR:
+        case csShaderVariable::VECTOR3:
+          {
+            csVector3 v;
+            for (idx = 0; idx < numElements; i++)
+            {
+              if (var->GetArrayElement (i)->GetValue (v))
               {
-                float matrix[16];
-                makeGLMatrix (t, matrix);
-		cgGLSetParameter4fv(param, matrix);
+                tmpArr[3*idx+0] = v.x;
+                tmpArr[3*idx+1] = v.y;
+                tmpArr[3*idx+2] = v.z;
               }
-	    }
-	    break;
-	  default:
-	    break;
-	}
+            }
+            cgGLSetParameterArray3f (param, 0, numElements, tmpArr);
+          }
+          break;
+        case csShaderVariable::VECTOR4:
+          {
+            csVector4 v;
+            for (idx = 0; idx < numElements; i++)
+            {
+              if (var->GetArrayElement (i)->GetValue (v))
+              {
+                tmpArr[4*idx+0] = v.x;
+                tmpArr[4*idx+1] = v.y;
+                tmpArr[4*idx+2] = v.z;
+                tmpArr[4*idx+3] = v.w;
+              }
+            }
+            cgGLSetParameterArray4f (param, 0, numElements, tmpArr);
+          }
+          break;
+        case csShaderVariable::MATRIX:
+          {
+            csMatrix3 m;
+            for (idx = 0; idx < numElements; i++)
+            {
+              if (var->GetArrayElement (i)->GetValue (m))
+              {
+                makeGLMatrix (m, &tmpArr[16*idx]);
+              }
+            }
+            cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+          }
+          break;
+        case csShaderVariable::TRANSFORM:
+          {
+            csReversibleTransform t;
+            for (idx = 0; idx < numElements; i++)
+            {
+              if (var->GetArrayElement (i)->GetValue (t))
+              {
+                makeGLMatrix (t, &tmpArr[16*idx]);
+              }
+            }
+            cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+          }
+          break;
+        }
+        break;
       }
-      else
-      {
-	const csVector4& v = mapping.mappingParam.vectorValue;
-        float matrix[16];
-	switch (mapping.mappingParam.type)
-	{
-	  case ParamFloat:
-	    cgGLSetParameter1f (param, v.x);
-	    break;
-	  case ParamVector2:
-	    cgGLSetParameter2f (param, v.x, v.y);
-	    break;
-	  case ParamVector3:
-	    cgGLSetParameter3f (param, v.x, v.y, v.z);
-	    break;
-	  case ParamVector4:
-	    cgGLSetParameter4f (param, v.x, v.y, v.z, v.w);
-	    break;
-	  case ParamMatrix:
-            makeGLMatrix (mapping.mappingParam.matrixValue, matrix);
-	    cgGLSetParameter4fv (param, matrix);
-	    break;
-	  case ParamTransform:
-            makeGLMatrix (mapping.mappingParam.transformValue, matrix);
-	    cgGLSetParameter4fv (param, matrix);
-	    break;
-	  default:
-	    break;
-	}
-      }
+    default:
+      break;
     }
   }
 }
@@ -189,10 +266,9 @@ void csShaderGLCGCommon::ResetState()
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type, csArray<iShaderVariableContext*> &staticContexts)
+  CGGLenum type)
 {
-  csShaderVariable *var;
-  size_t i, j;
+  size_t i;
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
@@ -205,7 +281,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   if (shaderPlug->doVerbose)
   {
     shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Cg program '%s': using profile %s", description, 
+      "Cg program '%s': using profile %s", description.GetData (), 
       cgGetProfileString (profile));
   }
 
@@ -227,36 +303,14 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     // Get the Cg parameter
     CGparameter param = cgGetNamedParameter (program, 
       variablemap[i].destination);
-    // Check if it's found, and just skip it if not.
-    if (!param)
-    {
-      i++;
-      continue;
-    }
 
-    if (!cgIsParameterReferenced (param))
+    if (!param || 
+        !(cgIsParameterReferenced (param) && cgGetParameterType (param) != CG_ARRAY))
     {
       variablemap.DeleteIndex (i);
       continue;
     }
     variablemap[i].userVal = (intptr_t)param;
-
-    // Check if we've got it locally
-    var = svcontext.GetVariable(variablemap[i].name);
-    if (!var)
-    {
-      // If not, check the static contexts
-      for (j=0;j<staticContexts.Length();j++)
-      {
-        var = staticContexts[j]->GetVariable (variablemap[i].name);
-        if (var) break;
-      }
-    }
-    if (var)
-    {
-      // We found it, so we add it as a static mapping
-      variablemap[i].mappingParam.var = var; // statlink = var;
-    }
     i++;
   }
 

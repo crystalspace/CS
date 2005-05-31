@@ -193,13 +193,6 @@ public:
   void PushVariables (csShaderVarStack &stacks) const
   { svcontext.PushVariables (stacks); }
 
-  /**
-  * Pop the variables of this context off the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PopVariables (csShaderVarStack &stacks) const
-  { svcontext.PopVariables (stacks); }
-
   bool IsEmpty () const 
   { return svcontext.IsEmpty(); }
 };

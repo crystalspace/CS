@@ -81,7 +81,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     }
 
     csReversibleTransform object2world;
-    stacks[shaderPlugin->string_object2world].Top()->GetValue (object2world);
+    csGetShaderVariableFromStack (stacks, shaderPlugin->string_object2world)->GetValue (object2world);
 
     iLight* light = 0;
     size_t elementCount = vbuf->GetElementCount ();
@@ -142,7 +142,7 @@ void csVProcStandardProgram::ResetState ()
 {
 }
 
-bool csVProcStandardProgram::Compile (csArray<iShaderVariableContext*> &staticContexts)
+bool csVProcStandardProgram::Compile ()
 {
   return true;
 }

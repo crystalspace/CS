@@ -133,6 +133,9 @@ private:
     GLenum operandP, GLenum combineP, GLenum scaleP);
 
   void BuildTokenHash();
+
+  inline csVector4 csGLShaderFFP::GetParamVal (const csShaderVarStack &stacks,
+    const ProgramParam &param);
 public:
   CS_LEAKGUARD_DECLARE (csGLShaderFFP);
 
@@ -166,7 +169,7 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile (csArray<iShaderVariableContext*> &staticContexts);
+  virtual bool Compile ();
 
   virtual int ResolveTextureBinding (const char* binding)
   { return layerNames.Get (binding, -1); }

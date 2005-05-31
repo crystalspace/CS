@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/floatrand.h"
 #include "csplugincommon/particlesys/particle.h"
 #include "imesh/fountain.h"
 #include "iutil/eventh.h"
@@ -50,6 +51,7 @@ protected:
   float speed, opening, azimuth, elevation, fall_time;
   float time_left; // from previous update
   int next_oldest;
+  csRandomFloatGen rnd;
 
   int FindOldest();
   void RestartParticle (int index, float pre_move);

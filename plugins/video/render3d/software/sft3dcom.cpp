@@ -4439,15 +4439,13 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    if (mesh.alphaType.autoModeTexture != csInvalidStringID
-        && mesh.alphaType.autoModeTexture < (csStringID)stacks.Length ()
-        && stacks[mesh.alphaType.autoModeTexture].Length () > 0)
-    {
-      csShaderVariable* texVar = 
-        stacks[mesh.alphaType.autoModeTexture].Top ();
-      if (texVar)
-	texVar->GetValue (tex);
-    }
+
+    csShaderVariable* texVar =
+      csGetShaderVariableFromStack (stacks, mesh.alphaType.autoModeTexture);
+
+    if (texVar)
+      texVar->GetValue (tex);
+
     if (tex == 0)
       tex = mesh.texture;
     if (tex != 0)
@@ -4466,7 +4464,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 
 void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
-    const csArray< csArray<csShaderVariable*> > &stacks)
+    const csArray<csShaderVariable*> &stacks)
 {
 
   /*
@@ -4480,9 +4478,8 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   
   if (!indexbuf)
   {  
-    CS_ASSERT (string_indices<(csStringID)stacks.Length ()
-        && stacks[string_indices].Length () > 0);
-    csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    CS_ASSERT (indexBufSV != 0);
     
     indexBufSV->GetValue (indexbuf);
   }
@@ -4490,10 +4487,8 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)indexbuf;
 
-  CS_ASSERT_MSG ("'tex diffuse' SV does not exist.",
-    string_texture_diffuse < (csStringID)stacks.Length ()
-      && stacks[string_texture_diffuse].Length () > 0);
-  csShaderVariable* texDiffuseSV = stacks[string_texture_diffuse].Top ();
+  csShaderVariable* texDiffuseSV = csGetShaderVariableFromStack (stacks, string_texture_diffuse);
+  CS_ASSERT_MSG ("'tex diffuse' SV does not exist.", texDiffuseSV != 0);
   iTextureWrapper* texw = 0;
   texDiffuseSV->GetValue (texw);
   texw->Visit ();
@@ -4501,11 +4496,10 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   texDiffuseSV->GetValue (texh);
   CS_ASSERT_MSG ("A material has no diffuse texture attached.", texh);
   
-
+  csShaderVariable* texLightmapSV = csGetShaderVariableFromStack (stacks, string_texture_lightmap);
   CS_ASSERT_MSG ("'tex lightmap' SV does not exist.",
-    string_texture_lightmap < (csStringID)stacks.Length ()
-      && stacks[string_texture_lightmap].Length () > 0);
-  csShaderVariable* texLightmapSV = stacks[string_texture_lightmap].Top ();
+    texLightmapSV != 0);
+
   iTextureHandle* lmh = 0;
   texLightmapSV->GetValue (lmh);
   //if (!lmh) return; // @@@ FIXME
@@ -4638,7 +4632,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
 
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
-    const csArray< csArray<csShaderVariable*> > &stacks)
+    const csArray<csShaderVariable*> &stacks)
 {
   if (mesh->meshtype == CS_MESHTYPE_POLYGON)
   {
@@ -4661,9 +4655,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   if (!indexbuf)
   {
-    CS_ASSERT (string_indices<(csStringID)stacks.Length ()
-        && stacks[string_indices].Length () > 0);
-    csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    CS_ASSERT (indexBufSV != 0);
     indexBufSV->GetValue (indexbuf);
   }
   CS_ASSERT(indexbuf);
@@ -4857,10 +4850,9 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   // Fill flat color if renderer decide to paint it flat-shaded
   {
-    if (string_material_flatcolor<(csStringID)stacks.Length ()
-	&& stacks[string_material_flatcolor].Length () > 0)
+    csShaderVariable* flatcolSV = csGetShaderVariableFromStack (stacks, string_material_flatcolor);
+    if (flatcolSV)
     {
-      csShaderVariable* flatcolSV = stacks[string_material_flatcolor].Top ();
       csRGBpixel flatcol;
       flatcolSV->GetValue (flatcol);
       poly.flat_color_r = flatcol.red;

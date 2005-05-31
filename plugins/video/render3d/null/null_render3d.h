@@ -145,7 +145,7 @@ public:
   void SetTextureState (int* units, iTextureHandle** textures, int count);
   void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csArray< csArray<csShaderVariable*> > &stacks);
+    const csArray<csShaderVariable*> &stacks);
   void SetWriteMask (bool red, bool green, bool blue, bool alpha);
   void GetWriteMask (bool& red, bool& green, bool& blue, bool& alpha) const;
   void SetZMode (csZBufMode mode) { zmode = mode; }

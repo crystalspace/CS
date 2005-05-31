@@ -45,7 +45,7 @@ public:
   { seed = new_seed; }
 
   /// Get a floating-point random number in range 0 <= num < 1.
-  float Get()
+  inline float Get()
   {
     unsigned int const b = 1664525;
     unsigned int const c = 1013904223;
@@ -55,20 +55,20 @@ public:
   }
 
   /// Get a floating point random number in range 0 <= num < \c max.
-  float Get(float max)
+  inline float Get(float max)
   {
     return max * Get();
   }
 
   /// Get a floating point random number in range \c min <= num < \c max.
-  float Get(float min, float max)
+  inline float Get(float min, float max)
   {
     float const w = max - min;
     return min + w * Get();
   }
 
   /// Get a random angle in range 0 <= num < 2*PI radians.
-  float GetAngle()
+  inline float GetAngle()
   {
     return TWO_PI * Get();
   }

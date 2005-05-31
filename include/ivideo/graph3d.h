@@ -635,7 +635,7 @@ struct iGraphics3D : public iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const csCoreRenderMesh* mymesh,
                          const csRenderMeshModes& modes,
-                         const csArray< csArray<csShaderVariable*> > &stacks) = 0;
+                         const csArray<csShaderVariable*> &stacks) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up

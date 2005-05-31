@@ -1529,7 +1529,7 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csArray< csArray<csShaderVariable*> > &stacks)
+    const csArray<csShaderVariable*> &stacks)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -1565,9 +1565,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   if (!iIndexbuf)
   {
-    CS_ASSERT (string_indices<(csStringID)stacks.Length ()
-      && stacks[string_indices].Length () > 0);
-    csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    CS_ASSERT (indexBufSV);
     indexBufSV->GetValue (iIndexbuf);
     CS_ASSERT(iIndexbuf);
   }
@@ -1606,14 +1605,12 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
         break;
       }
       float radius, scale;
-      CS_ASSERT (string_point_radius<(csStringID)stacks.Length ()
-          && stacks[string_point_radius].Length () > 0);
-      csShaderVariable* radiusSV = stacks[string_point_radius].Top ();
+      csShaderVariable* radiusSV = csGetShaderVariableFromStack (stacks, string_point_radius);
+      CS_ASSERT (radiusSV);
       radiusSV->GetValue (radius);
 
-      CS_ASSERT (string_point_scale < (csStringID)stacks.Length ()
-          && stacks[string_point_scale].Length () > 0);
-      csShaderVariable* scaleSV = stacks[string_point_scale].Top ();
+      csShaderVariable* scaleSV = csGetShaderVariableFromStack (stacks, string_point_scale);
+      CS_ASSERT (scaleSV);
       scaleSV->GetValue (scale);
 
       glPointSize (1.0f);
@@ -2776,15 +2773,11 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    if (mesh.alphaType.autoModeTexture != csInvalidStringID
-        && mesh.alphaType.autoModeTexture < (csStringID)stacks.Length ()
-        && stacks[mesh.alphaType.autoModeTexture].Length () > 0)
-    {
-      csShaderVariable* texVar = 
-        stacks[mesh.alphaType.autoModeTexture].Top ();
-      if (texVar)
-	texVar->GetValue (tex);
-    }
+    csShaderVariable *texVar = csGetShaderVariableFromStack (stacks, 
+      mesh.alphaType.autoModeTexture);
+    if (texVar)
+      texVar->GetValue (tex);
+
     if (tex == 0)
       tex = mesh.texture;
     if (tex != 0)

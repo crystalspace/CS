@@ -96,7 +96,7 @@ bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csSoftShader_FP::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csSoftShader_FP::Compile()
 {
   // @@@ FIXME: Implement this.
   return true;

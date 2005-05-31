@@ -75,7 +75,7 @@ struct iShaderProgram : public iBase
     csArray<csShaderVarMapping>& mappings) = 0;
 
   /// Compile a program
-  virtual bool Compile (csArray<iShaderVariableContext*> &staticDomains) = 0;
+  virtual bool Compile () = 0;
 };
 
 SCF_VERSION(iShaderProgramPlugin,0,1,0);

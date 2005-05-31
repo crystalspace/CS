@@ -59,8 +59,7 @@ protected:
 
   char* debugFN;
 
-  bool DefaultLoadProgram (const char* programStr, CGGLenum type,
-    csArray<iShaderVariableContext*> &staticContexts);
+  bool DefaultLoadProgram (const char* programStr, CGGLenum type);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char ** GetProfileCompilerArgs (CGprofile profile) 

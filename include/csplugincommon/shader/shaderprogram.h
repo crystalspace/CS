@@ -40,8 +40,13 @@
 
 struct iDataBuffer;
 
+/**
+ * Baseclass for iShaderProgram plugins.
+ * Provides basic services such as holding and of parameter mapping
+ * information, basic program data and data dumping.
+ */
 class CS_CRYSTALSPACE_EXPORT csShaderProgram : public iShaderProgram,
-						 public iShaderTUResolver
+                                               public iShaderTUResolver
 {
 protected:
   csStringHash commonTokens;
@@ -57,6 +62,9 @@ protected:
   csRef<iSyntaxService> synsrv;
   csRef<iStringSet> strings;
 
+  /**
+   * Expected/accepted types for a program parameter 
+   */
   enum ProgramParamType
   {
     ParamInvalid    = 0,
@@ -65,31 +73,33 @@ protected:
     ParamVector3    = 0x04,
     ParamVector4    = 0x08,
     ParamMatrix	    = 0x10,
-    ParamTransform  = 0x20
+    ParamTransform  = 0x20,
+    ParamArray      = 0x40,
+    ParamShaderExp  = 0x80
   };
+
+  /**
+   * Program parameter, either a SV reference or a const value 
+   */
   struct ProgramParam
   {
     bool valid;
-    csVector4 vectorValue;
-    csMatrix3 matrixValue;
-    csReversibleTransform transformValue;
+    
+    // Name of SV to use (if any)
     csStringID name;
+    // Reference to const value shadervar
     csRef<csShaderVariable> var;
-    ProgramParamType type;
 
-    ProgramParam() : valid (false), vectorValue (0.0f), 
-      name(csInvalidStringID), type(ParamInvalid) { }
-    ProgramParam(const csVector4& def) : valid (false), 
-      vectorValue (def), name(csInvalidStringID), type(ParamInvalid) { }
+    ProgramParam() : valid (false), name(csInvalidStringID) { }
   };
-  friend struct ProgramParam; // Give MSVC6 access to ParamInvalid.
-  void ResolveParamStatic (ProgramParam& param,
-    csArray<iShaderVariableContext*> &staticContexts);
+
+  /// Parse program parameter node
   bool ParseProgramParam (iDocumentNode* node,
     ProgramParam& param, uint types = ~0);
-  bool RetrieveParamValue (ProgramParam& param, 
-    const csShaderVarStack& stacks);
 
+  /**
+   * Holder of variable mapping 
+   */
   struct VariableMapEntry : public csShaderVarMapping
   {
     ProgramParam mappingParam;
@@ -110,25 +120,39 @@ protected:
       mappingParam.valid = true;
     }
   };
+  // Variable mappings
   csArray<VariableMapEntry> variablemap;
 
-  char* description;
+  /// Program description
+  csString description;
+
+  /// iDocumentNode the program is loaded from
   csRef<iDocumentNode> programNode;
+  /// File the program is loaded from (if any)
   csRef<iFile> programFile;
+
+  /// Filename of program
   csString programFileName;
+  
   /**
    * Whether the shader program should report additional information during
    * runtime.
    */
   bool doVerbose;
 
+  /// Program-local sv-context
   csShaderVariableContext svcontext;
 
+  /// Parse common properties and variablemapping
   bool ParseCommon (iDocumentNode* child);
+  /// Get the program node
   iDocumentNode* GetProgramNode ();
+  /// Get the raw program data
   csPtr<iDataBuffer> GetProgramData ();
-  void ResolveStaticVars (csArray<iShaderVariableContext*> &staticContexts);
+
+  /// Dump all program info to output
   void DumpProgramInfo (csString& output);
+  /// Dump variable mapping
   void DumpVariableMappings (csString& output);
 public:
   SCF_DECLARE_IBASE;

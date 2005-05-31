@@ -447,20 +447,6 @@ public:
     GetUsedSVContext().PushVariables (stacks); 
   }
 
-  /**
-   * Pop the variables of this context off the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PopVariables (csShaderVarStack &stacks) const
-  { 
-    if (useFallbackContext)
-    {
-      fallbackShader->PopVariables (stacks);
-      return;
-    }
-    GetUsedSVContext().PopVariables (stacks); 
-  }
-
   bool IsEmpty() const
   {
     if (useFallbackContext)

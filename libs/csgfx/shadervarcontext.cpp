@@ -81,18 +81,6 @@ void csShaderVariableContext::PushVariables
     csStringID name = variables[i]->GetName ();
     if (stacks.Length () <= (size_t)name)
       stacks.SetLength (name+1);
-    stacks[name].Push (variables[i]);
-  }
-}
-
-void csShaderVariableContext::PopVariables 
-  (csShaderVarStack &stacks) const
-{
-  for (size_t i=0; i<variables.Length (); ++i)
-  {
-    csStringID name = variables[i]->GetName ();
-    if ((stacks.Length () > (size_t)name) && // @@@ Why is this needed?
-      (stacks[name].Length () > 0))
-      stacks[name].Pop ();
+    stacks[name] = variables[i];
   }
 }

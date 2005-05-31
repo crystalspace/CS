@@ -254,38 +254,31 @@ public:
     if (mesh->variablecontext.IsValid () 
       && !mesh->variablecontext->IsEmpty())
     {
+      stacks.Empty ();
+      shadervars[shadervars_idx].PushVariables (stacks);
+      if (meshContext)
+        meshContext->PushVariables (stacks);
       shader->PushVariables (stacks);
       material->PushVariables (stacks);
-      if (meshContext) meshContext->PushVariables (stacks);
-      mesh->variablecontext->PushVariables (stacks);
-      shadervars[shadervars_idx].PushVariables (stacks);
 
       csRenderMeshModes modes (*mesh);
       size_t retTicket = shader->GetTicket (modes, stacks);
 
-      shadervars[shadervars_idx].PopVariables (stacks);
-      mesh->variablecontext->PopVariables (stacks);
-      if (meshContext) meshContext->PopVariables (stacks);
-      material->PopVariables (stacks);
-      shader->PopVariables (stacks);
       return retTicket;
     }
     else
     {
       if (matShadMeshTicket == (size_t)~0)
       {
-	shader->PushVariables (stacks);
-	material->PushVariables (stacks);
-	if (meshContext) meshContext->PushVariables (stacks);
-	shadervars[shadervars_idx].PushVariables (stacks);
+        stacks.Empty ();
+        shadervars[shadervars_idx].PushVariables (stacks);
+        if (meshContext)
+          meshContext->PushVariables (stacks);
+        shader->PushVariables (stacks);
+        material->PushVariables (stacks);
 
 	csRenderMeshModes modes (*mesh);
 	matShadMeshTicket = shader->GetTicket (modes, stacks);
-
-	shadervars[shadervars_idx].PopVariables (stacks);
-	if (meshContext) meshContext->PopVariables (stacks);
-	material->PopVariables (stacks);
-	shader->PopVariables (stacks);
       }
       return matShadMeshTicket;
     }
@@ -328,45 +321,23 @@ void csFatLoopStep::RenderMeshes (iGraphics3D* g3d,
 
       svO2W->SetValue (mesh->object2world);
 
-      if ((mesh->material->GetMaterial () != material)
-	|| (meshContext != lastMeshContext))
-      {
-	if (lastMeshContext) meshContext->PopVariables (stacks);
-        if (material != 0)
-        {
-          material->PopVariables (stacks);
-          shader->PopVariables (stacks);
-        }
-        material = mesh->material->GetMaterial ();
-	lastMeshContext = meshContext;
-        shader->PushVariables (stacks);
-        material->PushVariables (stacks);
-	if (meshContext) meshContext->PushVariables (stacks);
-      }
+      stacks.Empty ();
+      shaderManager->PushVariables (stacks);
       shadervars.Top ().PushVariables (stacks);
+      if (meshContext)
+        meshContext->PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
+      shader->PushVariables (stacks);
+      material->PushVariables (stacks);
       
       csRenderMeshModes modes (*mesh);
       shader->SetupPass (ticket, mesh, modes, stacks);
       g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass (ticket);
-
-      if (mesh->variablecontext)
-        mesh->variablecontext->PopVariables (stacks);
-      shadervars.Top ().PopVariables (stacks);
     }
     shader->DeactivatePass (ticket);
   }
-
-  if (lastMeshContext) lastMeshContext->PopVariables (stacks);
-  if (material != 0)
-  {
-    material->PopVariables (stacks);
-    shader->PopVariables (stacks);
-  }
-
-  shaderManager->PopVariables (stacks);
 }
 
 class PriorityHelper

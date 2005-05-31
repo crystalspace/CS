@@ -81,7 +81,6 @@ private:
   csArray<nv_texture_shader_stage> texture_shader_stages;
 
   void ActivateTextureShaders ();
-  csVector4 GetConstantRegisterValue (int reg);
 
   bool GetTextureShaderInstructions (
     const csArray<csPSProgramInstruction> &instrs);

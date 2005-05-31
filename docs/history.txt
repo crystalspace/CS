@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-May-2005
+	- Marten made a few fixes to the shader system:
+	    - Removed the static variable context from csXMLShader::Compile
+	      and child methods.
+	    - Made some changes to the variable mapping holder to use less
+	      memory.
+	    - Rewrote Cg plugin to (once again) use Cg calls for parameter
+	      setting and not using the ARB_vertex_program routing.
+	    - Rewrote shader variable handing in Cg and ARB_*_p plugins to
+	      properly support matrix, transform and array datatypes.
+	    - Added matrix and transform types to SV and shader parameter loader.
+	    - Changed the SV stack to be a SV list.
+	- Marten changed the renderloop to follow the SV context order
+	  shadermanager (global) - renderloop - sector - light - mesh - shader - 
+	  material ( - shaderprogram).
+	- Marten changed fountain meshobject to use csRandomFloatGen which
+	  hopefully is faster than normal rand().
+	- Marten fixed a few compile warnings in isotest.cpp.
+	- Marten fixed environment reflective cubemap support.
 30-May-2005
 	- Eric Sunshine fixed csutil/win32/csosdefs.h so that it is more
 	  discerning when setting up csAlignedMalloc()/csAlignedFree() in order

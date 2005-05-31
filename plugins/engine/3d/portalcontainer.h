@@ -137,6 +137,7 @@ private:
 
   csRef<iShaderManager> shader_man;
   csRef<iShader> fog_shader;
+  csStringID fogplane_name, fogdensity_name, fogcolor_name;
 
   // World space data. movable_nr is used to detect if it needs to be
   // recalculated.

@@ -76,6 +76,7 @@ csFountainMeshObject::csFountainMeshObject (iEngine* engine,
   elevation = 1;
   SetCount (50);
   SetDropSize (0.1f, 0.1f);
+  rnd.Initialize ();
 }
 
 csFountainMeshObject::~csFountainMeshObject()
@@ -91,10 +92,10 @@ void csFountainMeshObject::RestartParticle (int index, float pre_move)
   csVector3 dest; // destination spot of particle (for speed at start)
   dest.Set(speed, 0.0f, 0.0f);
   // now make it shoot to a circle in the x direction
-  float rotz_open = 2.0 * opening * (rand() / (1.0+RAND_MAX)) - opening;
+  float rotz_open = 2.0 * opening * (rnd.Get ()) - opening;
   csZRotMatrix3 openrot(rotz_open);
   dest = openrot * dest;
-  float rot_around = TWO_PI * (rand() / (1.0+RAND_MAX));
+  float rot_around = rnd.GetAngle ();
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
   // now dest point to somewhere in a circular cur of a sphere around the

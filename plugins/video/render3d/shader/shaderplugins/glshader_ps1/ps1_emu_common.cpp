@@ -75,10 +75,8 @@ bool csShaderGLPS1_Common::Load (iShaderTUResolver*, const char* program,
 }
 
 
-bool csShaderGLPS1_Common::Compile (
-	csArray<iShaderVariableContext*> &staticContexts)
+bool csShaderGLPS1_Common::Compile ()
 {
-  ResolveStaticVars (staticContexts);
   
   for (size_t i = 0; i < variablemap.Length (); i++)
   {

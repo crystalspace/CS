@@ -97,7 +97,7 @@ bool csSoftShader_VP::Load (iShaderTUResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csSoftShader_VP::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csSoftShader_VP::Compile()
 {
   // @@@ FIXME: Implement me.
   return true;

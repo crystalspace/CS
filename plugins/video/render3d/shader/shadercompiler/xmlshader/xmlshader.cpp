@@ -489,10 +489,7 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iShaderTUResolver* tuResolve
   if (!program->Load (tuResolve, programNode))
     return 0;
 
-  csArray<iShaderVariableContext*> staticContexts;
-  staticContexts.Push (&pass->svcontext);
-  staticContexts.Push (&svcontext);
-  if (!program->Compile (staticContexts))
+  if (!program->Compile ())
     return 0;
 
   return csPtr<iShaderProgram> (program);
@@ -680,8 +677,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     else if (thispass->custommapping_id[i] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
-      if (stacks[thispass->custommapping_id[i]].Length () > 0)
-        var = stacks[thispass->custommapping_id[i]].Top ();
+      var = csGetShaderVariableFromStack (stacks, thispass->custommapping_id[i]);
       if (var)
         var->GetValue(last_buffers[i]);
       else
@@ -714,8 +710,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     else if (thispass->textureID[j] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
-      if (stacks[thispass->textureID[j]].Length () > 0)
-        var = stacks[thispass->textureID[j]].Top ();
+      var = csGetShaderVariableFromStack (stacks, thispass->textureID[j]);
       if (var)
       {
         iTextureWrapper* wrap;
@@ -747,8 +742,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       if (thispass->alphaMode.autoModeTexture < (csStringID)stacks.Length ())
       {
         csShaderVariable* var = 0;
-        if (stacks[thispass->alphaMode.autoModeTexture].Length ()>0)
-          var = stacks[thispass->alphaMode.autoModeTexture].Top ();
+        var = csGetShaderVariableFromStack (stacks, thispass->alphaMode.autoModeTexture);
         if (var)
           var->GetValue (tex);
       }
@@ -1388,15 +1382,11 @@ public:
   }
   virtual ~SVCWrapper ()
   {
-    wrappedSVC.PopVariables (svStack);
     SCF_DESTRUCT_IBASE();
   }
-
   virtual void AddVariable (csShaderVariable *variable)
   {
-    wrappedSVC.PopVariables (svStack);
     wrappedSVC.AddVariable (variable);
-    wrappedSVC.PushVariables (svStack);
   }
   virtual csShaderVariable* GetVariable (csStringID name) const
   { return wrappedSVC.GetVariable (name); }
@@ -1404,8 +1394,6 @@ public:
   { return wrappedSVC.GetShaderVariables (); }
   virtual void PushVariables (csShaderVarStack &stacks) const
   { wrappedSVC.PushVariables (stacks); }
-  virtual void PopVariables (csShaderVarStack &stacks) const
-  { wrappedSVC.PopVariables (stacks); }
   virtual bool IsEmpty() const
   { return wrappedSVC.IsEmpty(); }
 };

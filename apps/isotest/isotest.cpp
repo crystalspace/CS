@@ -190,7 +190,7 @@ void IsoTest::SetupFrame ()
 
   csVector2 lpos(0,0);
   view->GetCamera()->Perspective(
-    view->GetCamera()->GetTransform ().Other2This(csVector3 (-4.7, 1.0, 5.5)),
+    view->GetCamera()->GetTransform ().Other2This(csVector3 (-4.7f, 1.0f, 5.5f)),
     lpos);
   // display a helpful little text.
   int txtw=0, txth=0;
@@ -342,8 +342,8 @@ bool IsoTest::LoadMap ()
   ll->Add (actor_light);
 
   csRef<iLight> statuelight = engine->CreateLight ("statuelight",
-    csVector3 (-4.7, 1.0, 5.5), 4, csColor(1.2,0.2,0.2));
-  statuelight->CreateNovaHalo (1278, 15, 0.3);
+    csVector3 (-4.7f, 1.0f, 5.5f), 4, csColor(1.2f,0.2f,0.2f));
+  statuelight->CreateNovaHalo (1278, 15, 0.3f);
   ll->Add (statuelight);
 
   plane = engine->FindMeshObject ("Plane");
@@ -400,7 +400,7 @@ bool IsoTest::CreateActor ()
         "Error loading mesh object factory!");
     return false;
   }
-  csMatrix3 m; m.Identity (); m *= 1.10; // scaling factor
+  csMatrix3 m; m.Identity (); m *= 1.10f; // scaling factor
   imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0)));
 
   // Create the sprite and add it to the engine.

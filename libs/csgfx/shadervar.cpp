@@ -42,7 +42,7 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
       SetValue (*copyFrom.TransformPtr);
       break;
     case ARRAY:
-      array = new csArray<csShaderVariable>;
+      array = new csRefArray<csShaderVariable>;
       *array = *copyFrom.array;
       break;
     default:

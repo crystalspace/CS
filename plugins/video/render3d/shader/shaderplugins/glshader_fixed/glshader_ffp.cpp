@@ -510,7 +510,7 @@ bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF,
   return false;
 }
 
-bool csGLShaderFFP::Compile (csArray<iShaderVariableContext*> &staticContexts)
+bool csGLShaderFFP::Compile ()
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -552,10 +552,6 @@ bool csGLShaderFFP::Compile (csArray<iShaderVariableContext*> &staticContexts)
       return false;
   }
 
-  ResolveParamStatic (fog.density, staticContexts);
-  ResolveParamStatic (fog.start, staticContexts);
-  ResolveParamStatic (fog.end, staticContexts);
-  ResolveParamStatic (fog.color, staticContexts);
 
   validProgram = true;
 
@@ -628,37 +624,52 @@ void csGLShaderFFP::Deactivate()
   }
 }
 
+inline csVector4 csGLShaderFFP::GetParamVal (const csShaderVarStack &stacks,
+                                             const ProgramParam &param)
+{
+  csRef<csShaderVariable> var;
+
+  var = csGetShaderVariableFromStack (stacks, param.name);
+  if (!var.IsValid ())
+    var = param.var;
+
+  // If var is null now we have no const nor any passed value, ignore it
+  if (!var.IsValid ())
+    return csVector4 (0.0f,0.0f,0.0f);
+
+  csVector4 v;
+  var->GetValue (v);
+  return v;
+}
+
 void csGLShaderFFP::SetupState (const csRenderMesh *mesh, 
                                 csRenderMeshModes& modes,
                                 const csShaderVarStack &stacks)
 {
   if (fog.mode != FogOff)
   {
-    RetrieveParamValue (fog.density, stacks);
-    RetrieveParamValue (fog.start, stacks);
-    RetrieveParamValue (fog.end, stacks);
-    RetrieveParamValue (fog.color, stacks);
-    glFogfv (GL_FOG_COLOR, (float*)&fog.color.vectorValue);
+    csVector4 fc = GetParamVal (stacks, fog.color);
+    glFogfv (GL_FOG_COLOR, (float*)&fc.x);
 
     switch (fog.mode)
     {
       case FogLinear:
 	{
 	  glFogi (GL_FOG_MODE, GL_LINEAR);
-	  glFogf (GL_FOG_START, fog.start.vectorValue.x);
-	  glFogf (GL_FOG_END, fog.end.vectorValue.x);
+	  glFogf (GL_FOG_START, GetParamVal (stacks, fog.start).x);
+	  glFogf (GL_FOG_END, GetParamVal (stacks, fog.end).x);
 	}
 	break;
       case FogExp:
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP);
-	  glFogf (GL_FOG_DENSITY, fog.density.vectorValue.x);
+	  glFogf (GL_FOG_DENSITY, GetParamVal (stacks, fog.density).x);
 	}
 	break;
       case FogExp2:
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP2);
-	  glFogf (GL_FOG_DENSITY, fog.density.vectorValue.x);
+	  glFogf (GL_FOG_DENSITY, GetParamVal (stacks, fog.density).x);
 	}
 	break;
       default:

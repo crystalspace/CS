@@ -71,7 +71,7 @@ public:
     csArray<csShaderVarMapping> &mappings);
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
+  virtual bool Compile();
 };
 
 #endif //__GLSHADER_PS1_COMMON_H__

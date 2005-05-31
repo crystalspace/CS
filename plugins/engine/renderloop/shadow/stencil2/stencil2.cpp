@@ -638,7 +638,6 @@ void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2
   }
 
   shader->TeardownPass (shaderTicket);
-  shmgr->PopVariables (stacks);
 }
 
 void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,

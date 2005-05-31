@@ -517,8 +517,6 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
       g3d->DrawMesh (&rmesh, rmesh, stacks);
     }
     shader->TeardownPass (shaderTicket);
-    rmesh.variablecontext->PopVariables (stacks);
-    shmgr->PopVariables (stacks);
   }
 }
 

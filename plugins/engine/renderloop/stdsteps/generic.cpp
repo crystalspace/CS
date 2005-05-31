@@ -203,7 +203,6 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
   }
   csRef<csShaderVariable> svO2W = 
     shadervars.Top ().GetVariable(string_object2world);
-  shaderManager->PushVariables (stacks);
 
   iMaterial *material = 0;
   iShaderVariableContext* lastMeshContext = 0;
@@ -228,25 +227,18 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 
       svO2W->SetValue (mesh->object2world);
 
-      if ((mesh->material->GetMaterial () != material)
-	|| (meshContext != lastMeshContext))
-      {
-	if (lastMeshContext) meshContext->PopVariables (stacks);
-        if (material != 0)
-        {
-          material->PopVariables (stacks);
-          shader->PopVariables (stacks);
-        }
-        material = mesh->material->GetMaterial ();
-	lastMeshContext = meshContext;
-        shader->PushVariables (stacks);
-        material->PushVariables (stacks);
-	if (meshContext) meshContext->PushVariables (stacks);
-      }
+      stacks.Empty ();
+      shaderManager->PushVariables (stacks);
       shadervars.Top ().PushVariables (stacks);
+      if (meshContext)
+        meshContext->PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
-      
+      shader->PushVariables (stacks);
+      material = mesh->material->GetMaterial ();
+      if (material)
+        material->PushVariables (stacks);
+
       csRenderMeshModes modes (*mesh);
       shader->SetupPass (ticket, mesh, modes, stacks);
 
@@ -269,12 +261,12 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 	g3d->SetClipper (old_clipper, old_cliptype);
 	old_clipper = 0;
       }
+      
+
       g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass (ticket);
 
-      if (mesh->variablecontext)
-        mesh->variablecontext->PopVariables (stacks);
-      shadervars.Top ().PopVariables (stacks);
+      
     }
     shader->DeactivatePass (ticket);
   }
@@ -285,14 +277,6 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
     g3d->SetClipper (old_clipper, old_cliptype);
   }
 
-  if (lastMeshContext) lastMeshContext->PopVariables (stacks);
-  if (material != 0)
-  {
-    material->PopVariables (stacks);
-    shader->PopVariables (stacks);
-  }
-
-  shaderManager->PopVariables (stacks);
 }
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
@@ -367,38 +351,35 @@ public:
     if (mesh->variablecontext.IsValid () 
       && !mesh->variablecontext->IsEmpty())
     {
+      stacks.Empty ();
+      shadervars[shadervars_idx].PushVariables (stacks);
+      if (meshContext)
+        meshContext->PushVariables (stacks);
+      if (mesh->variablecontext)
+        mesh->variablecontext->PushVariables (stacks);
       shader->PushVariables (stacks);
       material->PushVariables (stacks);
-      if (meshContext) meshContext->PushVariables (stacks);
-      mesh->variablecontext->PushVariables (stacks);
-      shadervars[shadervars_idx].PushVariables (stacks);
 
       csRenderMeshModes modes (*mesh);
       size_t retTicket = shader->GetTicket (modes, stacks);
 
-      shadervars[shadervars_idx].PopVariables (stacks);
-      mesh->variablecontext->PopVariables (stacks);
-      if (meshContext) meshContext->PopVariables (stacks);
-      material->PopVariables (stacks);
-      shader->PopVariables (stacks);
       return retTicket;
     }
     else
     {
       if (matShadMeshTicket == (size_t)~0)
       {
-	shader->PushVariables (stacks);
-	material->PushVariables (stacks);
-	if (meshContext) meshContext->PushVariables (stacks);
-	shadervars[shadervars_idx].PushVariables (stacks);
+        stacks.Empty ();
+        shadervars[shadervars_idx].PushVariables (stacks);
+        if (meshContext)
+          meshContext->PushVariables (stacks);
+        if (mesh->variablecontext)
+          mesh->variablecontext->PushVariables (stacks);
+        shader->PushVariables (stacks);
+        material->PushVariables (stacks);
 
 	csRenderMeshModes modes (*mesh);
 	matShadMeshTicket = shader->GetTicket (modes, stacks);
-
-	shadervars[shadervars_idx].PopVariables (stacks);
-	if (meshContext) meshContext->PopVariables (stacks);
-	material->PopVariables (stacks);
-	shader->PopVariables (stacks);
       }
       return matShadMeshTicket;
     }
@@ -496,9 +477,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       if (portalTraversal)
       {
         ToggleStepSettings (g3d, false);
-        shadervars.Top ().PushVariables (stacks);
+        stacks.Empty ();
         mesh->portal->Draw (rview);
-        shadervars.Top ().PopVariables (stacks);
       }
 
       // Portal traversal can relocate the visible_meshes

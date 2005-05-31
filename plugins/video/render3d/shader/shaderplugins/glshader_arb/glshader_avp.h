@@ -88,7 +88,7 @@ public:
     csArray<csShaderVarMapping> &mappings);
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+  virtual bool Compile();
 };
 
 

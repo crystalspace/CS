@@ -102,14 +102,14 @@ private:
   csRef<iTextureWrapper> TextureWrapValue;
   csRef<iRenderBuffer> RenderBuffer;
   csVector4 VectorValue;
-  
+
   int Int;
   csMatrix3* MatrixValuePtr;
   csReversibleTransform* TransformPtr;
 
   csRef<iShaderVariableAccessor> accessor;
 
-  csArray<csShaderVariable> *array;
+  csRefArray<csShaderVariable> *array;
 
   csStringID Name;
 public:
@@ -364,9 +364,9 @@ public:
   {
     if (array == 0)
     {
-      array = new csArray<csShaderVariable>;
+      array = new csRefArray<csShaderVariable>;
     }
-    array->SetSize (size, csShaderVariable (csInvalidStringID));
+    array->SetSize (size);
   }
 
   /// Get the number of elements in an array variable
@@ -387,9 +387,17 @@ public:
   {
     if (array != 0 && element>0 && element<array->Length ())
     {
-      return &array->Get (element);
+      return array->Get (element);
     }
     return 0;
+  }
+
+  /**
+   * Set a specific element in an array variable
+   */
+  void SetArrayElement (size_t element, csShaderVariable *variable)
+  {
+    array->Put (element, variable);
   }
 };
 

@@ -63,12 +63,6 @@ public:
   virtual void PushVariables 
     (csShaderVarStack &stacks) const;
 
-  /**
-  * Pop the variables of this context off the variable stacks
-  * supplied in the "stacks" argument
-  */
-  virtual void PopVariables (csShaderVarStack &stacks) const;
-
   virtual bool IsEmpty() const { return variables.Length() == 0; }
 };
 

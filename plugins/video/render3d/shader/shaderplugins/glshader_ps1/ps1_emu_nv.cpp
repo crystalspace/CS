@@ -60,25 +60,36 @@ void csShaderGLPS1_NV::SetupState (const csRenderMesh *mesh,
   // set variables
   for (int i = 0; i < MAX_CONST_REGS; i++)
   {
-    if (RetrieveParamValue (constantRegs[i], stacks))
+    csRef<csShaderVariable> var;
+
+    var = csGetShaderVariableFromStack (stacks, constantRegs[i].name);
+    if (!var.IsValid ())
+      var = constantRegs[i].var;
+
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      continue;
+
+    csVector4 vectorVal;
+    var->GetValue (vectorVal);
+
+    const float* vptr = &vectorVal.x;
+    for(size_t j = 0; j < constant_pairs.Length (); j++)
     {
-      const float* vptr = &constantRegs[i].vectorValue.x;
-      for(size_t j = 0; j < constant_pairs.Length (); j++)
+      nv_constant_pair &pair = constant_pairs.Get (j);
+      if (pair.first == i)
       {
-        nv_constant_pair &pair = constant_pairs.Get (j);
-        if (pair.first == i)
-        {
-          ext->glCombinerStageParameterfvNV (
-            GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR0_NV,
-            vptr);
-        }
-        else if (pair.second == i)
-        {
-          ext->glCombinerStageParameterfvNV (
-            GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR1_NV,
-            vptr);
-        }
+        ext->glCombinerStageParameterfvNV (
+          GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR0_NV,
+          vptr);
       }
+      else if (pair.second == i)
+      {
+        ext->glCombinerStageParameterfvNV (
+          GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR1_NV,
+          vptr);
+      }
+  
     }
   }
 
@@ -184,7 +195,14 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
         break;
       case CS_PS_INS_TEXM3X3SPEC:
       {
-        csVector4 eye = GetConstantRegisterValue(shader.param);
+        csRef<csShaderVariable> var;
+        var = constantRegs[i].var;
+
+        // If var is null now we have no const nor any passed value, ignore it
+        csVector4 eye (0.0f,0.0f,0.0f,1.0f);
+        if (!var.IsValid ())
+          var->GetValue (eye);
+
         glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
           GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV);
         glTexEnvfv(GL_TEXTURE_SHADER_NV, GL_CONST_EYE_NV, &eye.x);
@@ -276,22 +294,6 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
   }
 
   return true;
-}
-
-csVector4 csShaderGLPS1_NV::GetConstantRegisterValue (int reg)
-{
-  if (constantRegs[reg].valid && (constantRegs[reg].var 
-    || (constantRegs[reg].name != csInvalidStringID)))
-  {
-    if (constantRegs[reg].var)
-    {
-      csVector4 v;
-      constantRegs[reg].var->GetValue (v);
-      return v;
-    }
-    return constantRegs[reg].vectorValue;
-  }
-  return csVector4 (0.0f,0.0f,0.0f,0.0f);
 }
 
 bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
@@ -586,7 +588,8 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   {
     const csPSConstant& constant = constants.Get (i);
 
-    constantRegs[constant.reg].vectorValue = constant.value;
+    constantRegs[constant.reg].var.AttachNew (new csShaderVariable (csInvalidStringID));
+    constantRegs[constant.reg].var->SetValue (constant.value);
     constantRegs[constant.reg].valid = true;
   }
 

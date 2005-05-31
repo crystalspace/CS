@@ -51,10 +51,23 @@ struct csRenderMesh;
 
 /**
  * A "shader variable stack".
- * Stores a stack(the inner array) for each shader variable, indexed by 
- * it's name. The outer array is the array of stacks.
+ * Stores a list of shader variables, indexed by it's name.
  */
-typedef csArray< csArray<csShaderVariable*> > csShaderVarStack;
+typedef csArray<csShaderVariable*> csShaderVarStack;
+
+/**
+ * Helper function to retrieve a single value from a shader variable stack.
+ */
+static inline csShaderVariable* csGetShaderVariableFromStack 
+  (const csShaderVarStack& stack, const csStringID &name)
+{
+  if ((name != csInvalidStringID) &&
+      (name < (csStringID)stack.Length ()))
+  {
+    return stack[name];
+  }
+  return 0;
+}
 
 SCF_VERSION (iShaderVariableContext, 0, 0, 1);
 
@@ -89,16 +102,10 @@ struct iShaderVariableContext : public iBase
   virtual const csRefArray<csShaderVariable>& GetShaderVariables () const = 0;
 
   /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
   virtual void PushVariables (csShaderVarStack &stacks) const = 0;
-
-  /**
-  * Pop the variables of this context off the variable stacks
-  * supplied in the "stacks" argument
-  */
-  virtual void PopVariables (csShaderVarStack &stacks) const = 0;
 
   /// Determine whether this SV context contains any variables at all.
   virtual bool IsEmpty () const = 0;

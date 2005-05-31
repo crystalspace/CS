@@ -69,20 +69,8 @@ public:
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();
-
-  /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate();
-
-  /// Setup states needed for proper operation of the shader
-  virtual void SetupState (const csRenderMesh* mesh,
-    csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
-
-  /// Reset states to original
-  virtual void ResetState ();
-
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+  virtual bool Compile();
 };
 
 

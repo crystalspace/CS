@@ -65,145 +65,147 @@ void csShaderGLAVP::SetupState (const csRenderMesh *mesh,
 {
   size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;
+  csRef<csShaderVariable> var;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
-    if (RetrieveParamValue (mapping.mappingParam, stacks))
+
+    var = csGetShaderVariableFromStack (stacks, mapping.name);
+    if (!var.IsValid ())
+      var = mapping.mappingParam.var;
+
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      continue;
+
+    switch (var->GetType ())
     {
-      if (mapping.mappingParam.var.IsValid())
+    case csShaderVariable::INT:
+    case csShaderVariable::FLOAT:
+    case csShaderVariable::VECTOR2:
+    case csShaderVariable::COLOR:
+    case csShaderVariable::VECTOR3:
+    case csShaderVariable::VECTOR4:
       {
-	csShaderVariable* lvar = mapping.mappingParam.var;
-	switch (lvar->GetType())
-	{
-	  case csShaderVariable::INT:
-	    {
-	      int intval;
-	      if(lvar->GetValue(intval))
-		ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, (float*)intval);
-	    }
-	    break;
-	  case csShaderVariable::FLOAT:
-	    {
-	      float fval;
-	      if(lvar->GetValue(fval))
-		ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &fval);
-	    }
-	    break;
-	  case csShaderVariable::VECTOR2:
-	    {
-	      csVector2 v2;
-	      if(lvar->GetValue(v2))
-		ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &v2.x);
-	    }
-	    break;    
-	  case csShaderVariable::COLOR:
-	  case csShaderVariable::VECTOR3:
-	    {
-	      csVector3 v3;
-	      if(lvar->GetValue(v3))
-		ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &v3.x);
-	    }
-	    break;
-	  case csShaderVariable::VECTOR4:
-	    {
-	      csVector4 v4;
-	      if(lvar->GetValue(v4))
-		ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &v4.x);
-	    }
-	    break;
-          case csShaderVariable::MATRIX:
-	    {
-	      csMatrix3 m;
-	      if(lvar->GetValue(m))
+        csVector4 v;
+        if (var->GetValue (v))
+          ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &v.x);
+      }
+      break;    
+    case csShaderVariable::MATRIX:
+      {
+        csMatrix3 m;
+        if(var->GetValue(m))
+        {
+          float matrix[16];
+          makeGLMatrix (m, matrix);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
+        }
+      }
+      break;
+    case csShaderVariable::TRANSFORM:
+      {
+        csReversibleTransform t;
+        if(var->GetValue(t))
+        {
+          float matrix[16];
+          makeGLMatrix (t, matrix);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
+          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+            mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
+        }
+      }
+      break;
+    case csShaderVariable::ARRAY:
+      {
+        csRef<csShaderVariable> cvar;
+        if (var->GetArraySize () == 0) break;
+
+        cvar = var->GetArrayElement (0);
+
+        switch (cvar->GetType ())
+        {
+        case csShaderVariable::INT:
+        case csShaderVariable::FLOAT:
+        case csShaderVariable::VECTOR2:
+        case csShaderVariable::COLOR:
+        case csShaderVariable::VECTOR3:
+        case csShaderVariable::VECTOR4:
+          {
+            csVector4 v;
+            for (uint i = 0; i < var->GetArraySize (); i++)
+            {
+              cvar = var->GetArrayElement (i);
+              if (cvar->GetValue (v))
+                ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal+i, &v.x);
+            }
+          }
+          break;    
+        case csShaderVariable::MATRIX:
+          {
+            csMatrix3 m;
+            for (uint i = 0; i< var->GetArraySize (); i++)
+            {
+              cvar = var->GetArrayElement (i);
+              if(cvar->GetValue(m))
               {
                 float matrix[16];
                 makeGLMatrix (m, matrix);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
+                  mapping.userVal+i*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
+                  mapping.userVal+i*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
+                  mapping.userVal+i*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
+                  mapping.userVal+i*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
               }
-	    }
-	    break;
-          case csShaderVariable::TRANSFORM:
-	    {
-	      csReversibleTransform t;
-	      if(lvar->GetValue(t))
+            }
+          }
+          break;
+        case csShaderVariable::TRANSFORM:
+          {
+            csReversibleTransform t;
+            for (uint i = 0; i< var->GetArraySize (); i++)
+            {
+              cvar = var->GetArrayElement (i);
+              if(cvar->GetValue(t))
               {
                 float matrix[16];
                 makeGLMatrix (t, matrix);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
+                  mapping.userVal+i*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
+                  mapping.userVal+i*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
+                  mapping.userVal+i*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
+                  mapping.userVal+i*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
               }
-	    }
-	    break;
-	  default:
-	    break;
-	}
+            }
+          }
+          break;
+        default:
+          break;
+        }
       }
-      else
-      {
-	const csVector4& v = mapping.mappingParam.vectorValue;
-	switch (mapping.mappingParam.type)
-	{
-          case ParamFloat:
-	  case ParamVector2:
-	  case ParamVector3:
-	  case ParamVector4:
-            {
-              ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &v.x);
-            }
-	    break;
-	  case ParamMatrix:
-            {
-              float matrix[16];
-              makeGLMatrix (mapping.mappingParam.matrixValue, matrix);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
-              
-            }
-	    break;
-	  case ParamTransform:
-            {
-              float matrix[16];
-              makeGLMatrix (mapping.mappingParam.transformValue, matrix);
-              /*for (int j = 0; j < 4; j++)
-              {
-	        ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+j, &matrix[4*j]);
-              }*/
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
-              ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
-            }
-	    break;
-	  default:
-	    break;
-	}
-      }
+      break;
+    default:
+      break;
     }
   }
 }
@@ -328,11 +330,9 @@ bool csShaderGLAVP::Load (iShaderTUResolver*, const char* program,
   return true;
 }
 
-bool csShaderGLAVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csShaderGLAVP::Compile()
 {
   shaderPlug->Open ();
-
-  ResolveStaticVars (staticContexts);
 
   for (size_t i = 0; i < variablemap.Length ();)
   {

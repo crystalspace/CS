@@ -84,10 +84,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       int l = lights[i].lightnum;
       glEnable (GL_LIGHT0+l);
 
-      var = lights[i].positionVarRef;
-      if (!var && lights[i].positionvar < (csStringID)stacks.Length ()
-          && stacks[lights[i].positionvar].Length () > 0)
-        var = stacks[lights[i].positionvar].Top ();
+      var = csGetShaderVariableFromStack (stacks, lights[i].positionvar);
       if (var)
       {
         csVector4 v;
@@ -100,10 +97,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
       }
 
-      var = lights[i].diffuseVarRef;
-      if (!var && lights[i].diffusevar < (csStringID)stacks.Length ()
-          && stacks[lights[i].diffusevar].Length () > 0)
-        var = stacks[lights[i].diffusevar].Top ();
+      var = csGetShaderVariableFromStack (stacks, lights[i].diffusevar);
       if (var)
       {
         csVector4 v;
@@ -116,10 +110,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
       }
 
-      var = lights[i].specularVarRef;
-      if (!var && lights[i].specularvar < (csStringID)stacks.Length ()
-          && stacks[lights[i].diffusevar].Length () > 0)
-        var = stacks[lights[i].diffusevar].Top ();
+      var = csGetShaderVariableFromStack (stacks, lights[i].specularvar);
       if (var)
       {
         csVector4 v;
@@ -132,10 +123,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
       }
 
-      var = lights[i].attenuationVarRef;
-      if (!var && lights[i].attenuationvar < (csStringID)stacks.Length ()
-          && stacks[lights[i].attenuationvar].Length () > 0)
-        var = stacks[lights[i].attenuationvar].Top ();
+      var = csGetShaderVariableFromStack (stacks, lights[i].attenuationvar);
       if (var)
       {
         csVector4 v;
@@ -159,10 +147,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
 
-    var = ambientVarRef;
-    if (!var && ambientvar < (csStringID)stacks.Length ()
-        && stacks[ambientvar].Length () > 0)
-      var = stacks[ambientvar].Top ();
+
+    var = csGetShaderVariableFromStack (stacks, ambientvar);
     if (var)
       var->GetValue (v);
     else
@@ -179,7 +165,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     statecache->ActivateTU ();
     if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
-      csShaderVariable* sv = stacks[string_world2camera].Top ();
+
+      csShaderVariable* sv = csGetShaderVariableFromStack (stacks, string_world2camera);
       if (!sv) continue;
 
       //setup for environmental cubemapping
@@ -193,7 +180,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       
       csReversibleTransform t;
       sv->GetValue (t);
-      const csMatrix3 &orientation = t.GetO2T();
+      const csMatrix3 &orientation = t.GetT2O();
 
       float mAutoTextureMatrix[16];
       // Transpose 3x3 in order to invert matrix (rotation)
@@ -266,13 +253,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       csRef<csShaderVariable> planeVar;
       csRef<csShaderVariable> densityVar;
 
-      if (layers[i].fogplane < (csStringID)stacks.Length ()
-        && stacks[layers[i].fogplane].Length () > 0)
-        planeVar = stacks[layers[i].fogplane].Top ();
-
-      if (layers[i].fogdensity < (csStringID)stacks.Length ()
-        && stacks[layers[i].fogdensity].Length () > 0)
-        densityVar = stacks[layers[i].fogdensity].Top ();
+      planeVar = csGetShaderVariableFromStack (stacks, layers[i].fogplane);
+      densityVar = csGetShaderVariableFromStack (stacks, layers[i].fogdensity);
 
       if (planeVar && densityVar)
       {
@@ -365,32 +347,43 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       {
 	TexMatrixOp& op = layers[i].texMatrixOps[j];
 
-	RetrieveParamValue (op.param, stacks);
+        csRef<csShaderVariable> var;
+
+        var = csGetShaderVariableFromStack (stacks, op.param.name);
+        if (!var.IsValid ())
+          var = op.param.var;
+
+        // If var is null now we have no const nor any passed value, ignore it
+        if (!var.IsValid ())
+          continue;
+
+        csVector4 vectorVal;
+        var->GetValue (vectorVal);
 
 	switch (op.type)
 	{
 	  case TexMatrixScale:
 	    {
-	      glScalef (op.param.vectorValue.x, op.param.vectorValue.y, 
-		op.param.vectorValue.z);
+	      glScalef (vectorVal.x, vectorVal.y, vectorVal.z);
 	    }
 	    break;
 	  case TexMatrixRotate:
 	    {
-	      glRotatef (op.param.vectorValue.x, 1.0f, 0.0f, 0.0f);
-	      glRotatef (op.param.vectorValue.y, 0.0f, 1.0f, 0.0f);
-	      glRotatef (op.param.vectorValue.z, 0.0f, 0.0f, 1.0f);
+	      glRotatef (vectorVal.x, 1.0f, 0.0f, 0.0f);
+	      glRotatef (vectorVal.y, 0.0f, 1.0f, 0.0f);
+	      glRotatef (vectorVal.z, 0.0f, 0.0f, 1.0f);
 	    }
 	    break;
 	  case TexMatrixTranslate:
 	    {
-	      glTranslatef (op.param.vectorValue.x, op.param.vectorValue.y, 
-		op.param.vectorValue.z);
+	      glTranslatef (vectorVal.x, vectorVal.y, vectorVal.z);
 	    }
 	    break;
 	  case TexMatrixMatrix:
 	    {
-	      const csMatrix3& m = op.param.matrixValue;
+	      //const csMatrix3& m = op.param.matrixValue;
+              csMatrix3 m;
+              var->GetValue (m);
 
 	      float matrix[16];
 	      matrix[0] = m.m11; 
@@ -419,21 +412,27 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
     if (layers[i].constcolor.valid)
     {
-      RetrieveParamValue (layers[i].constcolor, stacks);
+      csRef<csShaderVariable> var;
+
+      var = csGetShaderVariableFromStack (stacks, layers[i].constcolor.name);
+      if (!var.IsValid ())
+        var = layers[i].constcolor.var;
+
+      if (!var.IsValid ())
+        continue;
+
+      csVector4 vectorVal;
+      var->GetValue (vectorVal);
+
       glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, 
-	&layers[i].constcolor.vectorValue.x);
+	&vectorVal.x);
     }
   }
 
   statecache->SetActiveTU (0);
   statecache->ActivateTU ();
 
-  var = primcolVarRef;
-  if (!var && primcolvar != csInvalidStringID &&
-      primcolvar < (csStringID)stacks.Length () && 
-      stacks[primcolvar].Length () > 0)
-    var = stacks[primcolvar].Top ();
-
+  var = csGetShaderVariableFromStack (stacks, primcolvar);
   if (var)
   {
     csVector4 col;
@@ -486,7 +485,7 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
   }
   if (!ParseProgramParam (node, op.param,
     matrix ? ParamMatrix : ParamFloat | ParamVector2 | ParamVector3 |
-    ParamVector4))
+    ParamVector4 | ParamShaderExp))
     return false;
 
   return true;
@@ -655,7 +654,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
             if (layers.Length ()<= (size_t)layer)
               layers.SetLength (layer+1);
 	    if (!ParseProgramParam (child, layers[layer].constcolor, ParamFloat | 
-	      ParamVector3 | ParamVector4))
+	      ParamVector3 | ParamVector4 | ParamShaderExp))
 	      return false;
           }
           break;
@@ -770,7 +769,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
   return true;
 }
 
-bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csGLShaderFVP::Compile()
 {
   shaderPlug->Open ();
 
@@ -780,55 +779,12 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
   g2d->PerformExtension ("getstatecache", &statecache);
 
-  size_t i, j;
+  size_t i;
 
   for (i=0; i<layers.Length (); i++)
     if ((layers[i].texgen == TEXGEN_REFLECT_CUBE) &&
       !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
       return false;
-
-  for (j=0; j<staticContexts.Length(); j++)
-  {
-    ambientVarRef = staticContexts[j]->GetVariable (ambientvar);
-    if (ambientVarRef) break;
-  }
-
-  for (i = 0; i < layers.Length (); i++)
-  {
-    ResolveParamStatic (layers[i].constcolor, staticContexts);
-  }
-
-  for (i = 0; i < lights.Length (); i++)
-  {
-    lights[i].positionVarRef = 0;
-    lights[i].diffuseVarRef = 0;
-    lights[i].specularVarRef = 0;
-    lights[i].attenuationVarRef = 0;
-    for (j=0; j<staticContexts.Length(); j++)
-    {
-      if (!lights[i].positionVarRef)
-        lights[i].positionVarRef = 
-          staticContexts[j]->GetVariable (lights[i].positionvar);
-      if (!lights[i].diffuseVarRef)
-        lights[i].diffuseVarRef = 
-          staticContexts[j]->GetVariable (lights[i].diffusevar);
-      if (!lights[i].specularVarRef)
-        lights[i].specularVarRef = 
-          staticContexts[j]->GetVariable (lights[i].specularvar);
-      if (!lights[i].attenuationVarRef)
-        lights[i].attenuationVarRef = 
-          staticContexts[j]->GetVariable (lights[i].attenuationvar);
-    }
-  }
-
-  primcolVarRef = 0;
-  if (primcolvar != csInvalidStringID)
-    for (j=0; j<staticContexts.Length(); j++)
-    {
-      if (!primcolVarRef)
-        primcolVarRef = 
-          staticContexts[j]->GetVariable (primcolvar);
-    }
 
   return true;
 }

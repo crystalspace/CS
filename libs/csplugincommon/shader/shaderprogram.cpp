@@ -41,7 +41,6 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   SCF_CONSTRUCT_IBASE (0);
   InitCommonTokens (commonTokens);
 
-  description = 0;
   csShaderProgram::objectReg = objectReg;
   synsrv = CS_QUERY_REGISTRY (objectReg, iSyntaxService);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objectReg, 
@@ -57,24 +56,7 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
 
 csShaderProgram::~csShaderProgram ()
 {
-  delete[] description;
   SCF_DESTRUCT_IBASE();
-}
-  
-void csShaderProgram::ResolveParamStatic (ProgramParam& param,
-  csArray<iShaderVariableContext*> &staticContexts)
-{
-  if (param.name != csInvalidStringID)
-  {
-    for (size_t j=0; j < staticContexts.Length(); j++)
-    {
-      if (!param.var)
-      {
-	param.var = staticContexts[j]->GetVariable (param.name);
-	if (param.var) break;
-      }
-    }
-  }
 }
 
 bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
@@ -89,6 +71,11 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
       "No 'type' attribute");
     return false;
   }
+
+  // Var for static data
+  csRef<csShaderVariable> var;
+  var.AttachNew (new csShaderVariable (csInvalidStringID));
+
   ProgramParamType paramType = ParamInvalid;
   if (strcmp (type, "shadervar") == 0)
   {
@@ -131,14 +118,35 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   }
   else if ((strcmp (type, "expression") == 0) || (strcmp (type, "expr") == 0))
   {
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable (csInvalidStringID));
+    // Parse exp and save it
     csRef<iShaderVariableAccessor> acc = synsrv->ParseShaderVarExpr (node);
     var->SetType (csShaderVariable::VECTOR4);
     var->SetAccessor (acc);
     param.var = var;
     param.valid = true;
     return true;
+  }
+  else if (strcmp (type, "array") == 0)
+  {
+    csArray<ProgramParam> allParams;
+    ProgramParam tmpParam;
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      ParseProgramParam (child, tmpParam, types & 0x3F);
+      allParams.Push (tmpParam);
+    }
+
+    //Save the params
+    var->SetType (csShaderVariable::ARRAY);
+    var->SetArraySize (allParams.Length ());
+
+    for (uint i = 0; i < allParams.Length (); i++)
+    {
+      var->SetArrayElement (i, allParams[i].var);
+    }
+    paramType = ParamArray;
   }
   else 
   {
@@ -149,7 +157,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
     return false;
   }
 
-  if (!types & paramType)
+  if (!(types & paramType))
   {
     synsrv->Report ("crystalspace.graphics3d.shader.common",
       CS_REPORTER_SEVERITY_WARNING,
@@ -158,9 +166,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
     return false;
   }
 
-  param.type = paramType;
-
-  switch (paramType)
+  switch ((paramType & 0x3F))
   {
     case ParamInvalid:
       return false;
@@ -168,7 +174,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
     case ParamFloat:
       {
 	float x = node->GetContentsValueAsFloat ();
-	param.vectorValue.Set (x, x, x, x);
+	var->SetValue (x);
       }
       break;
     case ParamVector2:
@@ -191,7 +197,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 	    "Couldn't parse vector2 '%s'", value);
 	  return false;
 	}
-	param.vectorValue.Set (x, y, 0.0f, 1.0f);
+	var->SetValue (csVector2 (x,y));
       }
       break;
     case ParamVector3:
@@ -214,7 +220,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 	    "Couldn't parse vector3 '%s'", value);
 	  return false;
 	}
-	param.vectorValue.Set (x, y, z, 1.0f);
+	var->SetValue (csVector3 (x,y,z));
       }
       break;
     case ParamVector4:
@@ -237,24 +243,27 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 	    "Couldn't parse vector4 '%s'", value);
 	  return false;
 	}
-	param.vectorValue.Set (x, y, z, w);
+	var->SetValue (csVector4 (x,y,z,w));
       }
       break;
     case ParamMatrix:
       {
-	if (!synsrv->ParseMatrix (node, param.matrixValue))
+        csMatrix3 matrix;
+	if (!synsrv->ParseMatrix (node, matrix))
 	  return false;
+        var->SetValue (matrix);
       }
       break;
     case ParamTransform:
       {
+        csReversibleTransform t;
         csRef<iDocumentNode> matrix_node = node->GetNode ("matrix");
         if (matrix_node)
         {
           csMatrix3 m;
           if (!synsrv->ParseMatrix (matrix_node, m))
             return false;
-          param.transformValue.SetT2O (m);
+          t.SetT2O (m);
         }
         csRef<iDocumentNode> vector_node = node->GetNode ("v");
         if (vector_node)
@@ -262,64 +271,16 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
           csVector3 v;
           if (!synsrv->ParseVector (vector_node, v))
             return false;
-          param.transformValue.SetOrigin (v);
+          t.SetOrigin (v);
         }
+        var->SetValue (t);
       }
       break;
   }
-
+  
+  param.var = var;
   param.valid = true;
   return true;
-}
-
-bool csShaderProgram::RetrieveParamValue (ProgramParam& param, 
-  const csShaderVarStack& stacks)
-{
-  if (!param.valid) return false;
-  csRef<csShaderVariable> var = param.var;
-  if (!var && (param.name != csInvalidStringID) &&
-      param.name < (csStringID)stacks.Length () && 
-      stacks[param.name].Length () > 0)
-  {
-    var = stacks[param.name].Top ();
-  }
-  if (var)
-  {
-    const csShaderVariable::VariableType varType = var->GetType();
-    if (varType == csShaderVariable::MATRIX)
-      var->GetValue (param.matrixValue);
-    else if (varType == csShaderVariable::TRANSFORM)
-      var->GetValue (param.transformValue);
-    else
-      var->GetValue (param.vectorValue);
-    switch (varType)
-    {
-      case csShaderVariable::INT:
-      case csShaderVariable::FLOAT:
-	param.type = ParamFloat;
-	break;
-      case csShaderVariable::VECTOR2:
-	param.type = ParamVector2;
-	break;    
-      case csShaderVariable::COLOR:
-      case csShaderVariable::VECTOR3:
-	param.type = ParamVector3;
-	break;
-      case csShaderVariable::VECTOR4:
-	param.type = ParamVector4;
-	break;
-      case csShaderVariable::MATRIX:
-	param.type = ParamMatrix;
-	break;
-      case csShaderVariable::TRANSFORM:
-	param.type = ParamTransform;
-	break;
-      default:
-	param.type = ParamInvalid;
-    }
-  }
-
-  return ((var != 0) || (param.name == csInvalidStringID));
 }
 
 bool csShaderProgram::ParseCommon (iDocumentNode* child)
@@ -330,6 +291,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
   {
     case XMLTOKEN_VARIABLEMAP:
       {
+        //@@ REWRITE
 	const char* destname = child->GetAttributeValue ("destination");
 	if (!destname)
 	{
@@ -382,8 +344,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
       break;
 
     case XMLTOKEN_DESCRIPTION:
-      delete[] description;
-      description = csStrNew (child->GetContentsValue());
+      description = child->GetContentsValue();
       break;
     case XMLTOKEN_SHADERVAR:
       {
@@ -461,37 +422,10 @@ csPtr<iDataBuffer> csShaderProgram::GetProgramData ()
   return 0;
 }
 
-void csShaderProgram::ResolveStaticVars (
-  csArray<iShaderVariableContext*> &staticContexts)
-{
-  csShaderVariable *var;
-
-  for (size_t i = 0; i < variablemap.Length (); i++)
-  {
-    // Check if we've got it locally
-    var = svcontext.GetVariable(variablemap[i].name);
-    if (!var)
-    {
-      // If not, check the static contexts
-      for (size_t j = 0; j < staticContexts.Length(); j++)
-      {
-	var = staticContexts[j]->GetVariable (variablemap[i].name);
-	if (var) break;
-      }
-    }
-    if (var)
-    {
-      // We found it, so we add it as a static mapping
-      //variablemap[i].statlink = var;
-      variablemap[i].mappingParam.var = var;
-    }
-  }
-}
-
 void csShaderProgram::DumpProgramInfo (csString& output)
 {
   output << "Program description: " << 
-    (description ? description : "<none>") << "\n";
+    (description.Length () ? description.GetData () : "<none>") << "\n";
   output << "Program file name: " << programFileName << "\n";
 }
 

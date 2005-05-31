@@ -54,7 +54,11 @@ public:
     TexMatrixOpType type;
     ProgramParam param;
 
-    TexMatrixOp (float def) : param (def) { }
+    TexMatrixOp (float def)
+    { 
+      param.var.AttachNew (new csShaderVariable (csInvalidStringID));
+      param.var->SetValue (def);
+    }
   };
 private:
   csStringHash tokens;
@@ -75,10 +79,10 @@ private:
       specularvar = csInvalidStringID; 
       attenuationvar = csInvalidStringID;
     }
-    csStringID positionvar;     csRef<csShaderVariable> positionVarRef;
-    csStringID diffusevar;      csRef<csShaderVariable> diffuseVarRef;
-    csStringID specularvar;     csRef<csShaderVariable> specularVarRef;
-    csStringID attenuationvar;  csRef<csShaderVariable> attenuationVarRef;
+    csStringID positionvar;
+    csStringID diffusevar;
+    csStringID specularvar;
+    csStringID attenuationvar;
     int lightnum;
   };
 
@@ -86,7 +90,6 @@ private:
 
   csStringID ambientvar;
   csStringID string_world2camera;
-  csRef<csShaderVariable> ambientVarRef;
   csArray<lightingentry> lights;
   bool do_lighting;
 
@@ -105,7 +108,6 @@ private:
   csArray<layerentry> layers;
 
   csStringID primcolvar;
-  csRef<csShaderVariable> primcolVarRef;
 
   bool validProgram;
 
@@ -146,7 +148,7 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+  virtual bool Compile();
 };
 
 

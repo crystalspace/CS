@@ -129,6 +129,9 @@ csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_r
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
+  fogplane_name = strings->Request ("fogplane");
+  fogdensity_name = strings->Request ("fog density");
+  fogcolor_name = strings->Request ("fog color");
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -756,12 +759,33 @@ void csPortalContainer::DrawOnePortal (
     mesh.shader = fog_shader;
     // @@@ Hackish...
     csShaderVariableContext varContext;
-    csShaderVarStack &stacks = shader_man->GetShaderVariableStack ();
-    for (size_t i=0; i<stacks.Length (); i++)
+    csRefArray<csShaderVariable> globVars = shader_man->GetShaderVariables ();
+    for (uint i = 0; i < globVars.Length (); i++)
     {
-      if (stacks[i].Length ()>0)
-        varContext.AddVariable (stacks[i].Top ());
+      varContext.AddVariable (globVars[i]);
     }
+    csVector4 fogPlane;
+    iPortal *lastPortal = rview->GetLastPortal();
+    if(lastPortal)
+    {
+      csPlane3 plane;
+      lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);
+      fogPlane = plane.norm;
+      fogPlane.w = plane.DD;
+    }
+    else
+    {
+      fogPlane = csVector4(0.0,0.0,1.0,0.0);
+    }
+    varContext.GetVariableAdd (fogplane_name)->SetValue (fogPlane);
+
+    iSector *sector = rview->GetThisSector();
+    varContext.GetVariableAdd (fogdensity_name)->SetValue (sector->GetFog()->density);
+    varContext.GetVariableAdd (fogcolor_name)->SetValue (csVector3 (sector->GetFog()->red,
+      sector->GetFog()->green,
+      sector->GetFog()->blue));
+
+
     mesh.dynDomain = &varContext;
     // @@@ Could be used for z-fill and stuff, while we're at it?
     mesh.z_buf_mode = CS_ZBUF_TEST;
