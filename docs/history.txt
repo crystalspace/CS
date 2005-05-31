@@ -25,6 +25,10 @@ chronological order.
 	  hopefully is faster than normal rand().
 	- Marten fixed a few compile warnings in isotest.cpp.
 	- Marten fixed environment reflective cubemap support.
+	- res added some initial portal support for the fat rl. It is still
+	  copy'n'pasty, clumsy, ugly. Don't look at it! Your eyes will bleed!
+	  You can't un-see it!
+	- res removed the superfluous csPortalContainer::DrawTest() method.
 30-May-2005
 	- Eric Sunshine fixed csutil/win32/csosdefs.h so that it is more
 	  discerning when setting up csAlignedMalloc()/csAlignedFree() in order

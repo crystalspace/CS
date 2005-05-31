@@ -262,6 +262,26 @@ struct iRenderView : public iBase
    * Get the number of the current frame.
    */
   virtual uint GetCurrentFrameNumber () const = 0;
+
+  
+  // @@@ ADDED B/C OF FATLOOP PORTAL HACKING
+  // @@@ REMOVE AGAIN ASAP
+  virtual void CreateRenderContext () = 0;
+  virtual int GetRenderRecursionLevel () const = 0;
+  virtual void SetRenderRecursionLevel (int rec) = 0;
+  virtual void SetClipper (iClipper2D* clip) = 0;
+  virtual void ResetFogInfo () = 0;
+  virtual void SetPreviousSector (iSector* s) = 0;
+  virtual void SetClipPlane (const csPlane3& p) = 0;
+  virtual bool GetClipPlane (csPlane3& pl) const = 0;
+  virtual const csPlane3& GetClipPlane () const = 0;
+  virtual csPlane3& GetClipPlane () = 0;
+  virtual void UseClipPlane (bool u) = 0;
+  virtual void UseClipFrustum (bool u) = 0;
+  virtual void SetLastPortal (iPortal* por) = 0;
+  virtual bool IsClipperRequired () const = 0;
+  virtual iCamera* CreateNewCamera () = 0;
+  virtual void RestoreRenderContext () = 0;
 };
 
 /** @} */

@@ -197,6 +197,7 @@ public:
   	const csReversibleTransform& movtrans);
   /// Transform from world to camera space.
   void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
+  bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
   SCF_DECLARE_IBASE_EXT (csMeshObject);
 
@@ -224,10 +225,6 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
-  	uint32 frustum_mask);
-  virtual bool Draw (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode);
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamOutline (const csVector3& start,

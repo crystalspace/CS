@@ -110,9 +110,10 @@ class csFatLoopStep : public iRenderStep
   // the visible meshes from every recursion level appended. At
   // exit of this step the visible meshes from the current recursion
   // level are removed again.
-  csDirtyAccessArray<csRenderMesh*> visible_meshes;
-  csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
-  csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
+  //csDirtyAccessArray<csRenderMesh*> visible_meshes;
+  //csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
+  //csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
+  csSet<csPtrKey<iSector> > sectorSet; // @@@ Hack.
 
   csArray<csShaderVariableContext> shadervars;
   csWeakRef<iShaderManager> shaderManager;
@@ -131,7 +132,23 @@ class csFatLoopStep : public iRenderStep
     //MeshBucket() : timestamp(~0) {}
   };
   typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
-  csArray<SortedBuckets> buckets;
+  struct RenderNode
+  {
+    enum Type { Container, Portal, Meshes };
+    Type nodeType;
+    csArray<SortedBuckets> buckets;
+
+    iPortal* portal;
+    csPoly2D poly;
+    csReversibleTransform movtrans;
+    csPlane3 camera_plane;
+
+    csArray<RenderNode*> containedNodes;
+
+    RenderNode() : buckets(2, 2) {}
+  };
+  csBlockAllocator<RenderNode> renderNodeAlloc;
+  //csArray<SortedBuckets> buckets;
   class TraverseShaderBuckets
   {
     csFatLoopStep& step;
@@ -151,6 +168,27 @@ class csFatLoopStep : public iRenderStep
 
   csArray<RenderPass> passes;
   uint32 Classify (csRenderMesh* mesh);
+
+  void BuildNodeGraph (RenderNode* node, iRenderView* rview, 
+    iSector* sector, csShaderVarStack &stacks);
+  void BuildPortalNodes (RenderNode* node, iMeshWrapper* meshwrapper, 
+    iPortalContainer* portals, iRenderView* rview, csShaderVarStack &stacks);
+  void ProcessNode (iRenderView* rview, RenderNode* node,
+    csShaderVarStack &stacks);
+  void RenderPortal (RenderNode* node, iRenderView* rview,
+    csShaderVarStack &stacks);
+
+  // Camera space data.
+  csDirtyAccessArray<csVector3> camera_vertices;
+  csArray<csPlane3> camera_planes;
+  void DoPortal (RenderNode* node, iPortal* portal, const csPoly2D& poly,
+    const csReversibleTransform& movtrans, const csPlane3& camera_plane, 
+    iRenderView* rview, csShaderVarStack &stacks);
+  bool ClipToPlane (iPortal* portal, csPlane3 *portal_plane, 
+    const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
+  bool DoPerspective (csVector3 *source, int num_verts, csPoly2D *dest, 
+    bool mirror, int fov, float shift_x, float shift_y, 
+    const csPlane3& plane_cam);
 public:
   //csStringID shadertype;
   //csRef<iShader> defShader;

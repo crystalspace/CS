@@ -22,13 +22,15 @@
 
 /**\file
  */
+
+#include "csutil/scf.h"
+
 /**
  * \addtogroup engine3d
  * @{ */
 
-#include "csutil/scf.h"
-
 struct iPortal;
+struct iRenderView;
 
 SCF_VERSION (iPortalContainer, 0, 0, 1);
 

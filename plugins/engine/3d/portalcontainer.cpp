@@ -851,15 +851,6 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
       clip_plane, clip_z_plane);
 }
 
-bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*,
-	uint32)
-{
-  CS_ASSERT_MSG("Cannot remove this", 0);
-  csReversibleTransform tr_o2c;
-  csVector3 camera_origin;
-  return ExtraVisTest (rview, tr_o2c, camera_origin);
-}
-
 bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode /*zbufMode*/)
 {
