@@ -252,6 +252,8 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
             cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
           }
           break;
+	default:
+	  break;
         }
         break;
       }

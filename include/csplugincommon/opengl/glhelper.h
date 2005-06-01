@@ -20,7 +20,8 @@
 #ifndef __CS_CSPLUGINCOMMON_OPENGL_GLHELPER_H__
 #define __CS_CSPLUGINCOMMON_OPENGL_GLHELPER_H__
 
-static void makeGLMatrix (const csReversibleTransform& t, float matrix[16])
+static inline void makeGLMatrix (const csReversibleTransform& t, 
+  float matrix[16])
 {
   const csMatrix3 &orientation = t.GetO2T();
   const csVector3 &translation = t.GetO2TTranslation();
@@ -46,7 +47,7 @@ static void makeGLMatrix (const csReversibleTransform& t, float matrix[16])
   matrix[15] = 1.0f;
 }
 
-static void makeGLMatrix (const csMatrix3& m, float matrix[16])
+static inline void makeGLMatrix (const csMatrix3& m, float matrix[16])
 {
   matrix[0] = m.m11;
   matrix[1] = m.m12;

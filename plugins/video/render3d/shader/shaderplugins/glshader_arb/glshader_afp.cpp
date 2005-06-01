@@ -269,7 +269,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
       *(end-1) = 0;
 
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Couldn't load fragment program \"%s\"", description);
+      "Couldn't load fragment program \"%s\"", description.GetDataSafe ());
     Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
     Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
       programErrorString);
@@ -280,8 +280,8 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
     if (doVerbose && (programErrorString != 0) && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Warning for fragment program \"%s\": '%s'", description, 
-	programErrorString);
+	"Warning for fragment program \"%s\": '%s'", 
+	description.GetDataSafe (), programErrorString);
     }
   }
 

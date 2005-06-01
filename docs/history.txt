@@ -36,6 +36,7 @@ chronological order.
 	  I work around this problem temporarily by changing IsRelevant()
 	  so that it always returns true. That will slow down static lightmap
 	  calculation when portals are concerned but at least it is correct.
+	- Wouter fixed some compile warnings.
 31-May-2005
 	- Marten made a few fixes to the shader system:
 	    - Removed the static variable context from csXMLShader::Compile

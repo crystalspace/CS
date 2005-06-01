@@ -123,8 +123,6 @@ void csShaderGLPS1_NV::ResetState ()
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
-  csGLExtensionManager *ext = shaderPlug->ext;
-
   size_t i;
   for(i = 0; i < 4; i++)
   {

@@ -272,7 +272,7 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
       *(end-1) = 0;
 
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Couldn't load vertex program \"%s\"", description);
+      "Couldn't load vertex program \"%s\"", description.GetDataSafe ());
     Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
     Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
       programErrorString);
@@ -284,7 +284,7 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
       && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Warning for vertex program \"%s\": '%s'", description, 
+	"Warning for vertex program \"%s\": '%s'", description.GetDataSafe (), 
 	programErrorString);
     }
   }
