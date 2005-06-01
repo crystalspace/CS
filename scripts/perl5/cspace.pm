@@ -69,6 +69,7 @@ package cspace;
 *csSleep = *cspacec::csSleep;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
+*csGetShaderVariableFromStack = *cspacec::csGetShaderVariableFromStack;
 *csfxInterference = *cspacec::csfxInterference;
 *csfxFadeOut = *cspacec::csfxFadeOut;
 *csfxFadeTo = *cspacec::csfxFadeTo;
@@ -10584,7 +10585,6 @@ package cspace::iShaderVariableContext;
 *GetVariableAdd = *cspacec::iShaderVariableContext_GetVariableAdd;
 *GetShaderVariables = *cspacec::iShaderVariableContext_GetShaderVariables;
 *PushVariables = *cspacec::iShaderVariableContext_PushVariables;
-*PopVariables = *cspacec::iShaderVariableContext_PopVariables;
 *IsEmpty = *cspacec::iShaderVariableContext_IsEmpty;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
