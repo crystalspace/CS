@@ -24,6 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 
 class csGLExtensionManager;
+class csGLStateCache;
 
 class csGLShader_PS1 : public iShaderProgramPlugin
 {
@@ -34,7 +35,10 @@ private:
   void Report (int severity, const char* msg, ...);
 public:
   csGLExtensionManager* ext;
+  csGLStateCache* stateCache;
   iObjectRegistry* object_reg;
+  bool useLists;
+  bool doVerbose;
 
   SCF_DECLARE_IBASE;
   

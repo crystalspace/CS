@@ -185,6 +185,13 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   
   if(line.Length() < 1) return true; // Ignore blank lines
 
+  // Ignore pairing modifier
+  if (line.GetAt (0) == '+')
+  {
+    line.DeleteAt (0);
+    line.Trim ();
+  }
+
   csString istr;
   line.SubString (istr, 0, line.FindFirst (' '));
   istr.Upcase();
@@ -198,13 +205,6 @@ bool csPixelShaderParser::GetInstruction (const char *str,
       inst.instruction = (csPixelShaderInstruction)inst_id;
       return true;
     }
-  }
-
-  // Ignore pairing modifier
-  if (istr.GetAt (0) == '+')
-  {
-    istr.DeleteAt (0);
-    istr.Trim ();
   }
 
   if(!strcmp(istr, "DEF"))

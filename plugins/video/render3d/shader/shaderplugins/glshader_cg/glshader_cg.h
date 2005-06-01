@@ -49,11 +49,10 @@ public:
   static iObjectRegistry* object_reg;
   static CGcontext context;
   csRef<iShaderProgramPlugin> psplg;
-  csRef<iShaderProgramPlugin> arbplg;
+  CGprofile psProfile;
   csGLExtensionManager* ext;
   bool debugDump;
   char* dumpDir;
-  bool doNVVPrealign;
   bool doVerbose;
 
   SCF_DECLARE_IBASE;

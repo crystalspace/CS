@@ -185,25 +185,25 @@ csGLGraphics3D::~csGLGraphics3D()
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
-					 const char* file,
+					 const wchar_t* file,
 					 int line, const char* message)
 {
   if (ext && ext->CS_GL_GREMEDY_string_marker)
   {
     csStringFast<256> marker;
-    marker.Format ("[%s %s():%d] %s", file, function, line, message);
+    marker.Format ("[%ls %s():%d] %s", file, function, line, message);
     ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
   }
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
-					 const char* file,
+					 const wchar_t* file,
 					 int line, MakeAString& message)
 {
   if (ext && ext->CS_GL_GREMEDY_string_marker)
   {
     csStringFast<256> marker;
-    marker.Format ("[%s %s():%d] %s", file, function, line, 
+    marker.Format ("[%ls %s():%d] %s", file, function, line, 
       message.GetStr());
     ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
   }
@@ -1534,6 +1534,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
 
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
+
   SwapIfNeeded();
 
   SetupProjection ();
@@ -1735,13 +1737,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	(modes.z_buf_mode != CS_ZBUF_MESH2));
         SetZModeInternal ((current_zmode == CS_ZBUF_MESH2) ? 
 	  GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode);
-/*      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
+      /*if (current_zmode == CS_ZBUF_MESH2)
       {
-        SetZMode (mymesh->z_buf_mode, true);
-      } else {
-        // Should do some real reporting here. :)
-        csPrintf ("Bwaaaah! Meshes can't have zmesh zmode. You deserve some spanking!\n");
-        return;
+        glPolygonOffset (0.15f, 6.0f); 
+        statecache->Enable_GL_POLYGON_OFFSET_FILL ();
       }*/
     }
 
@@ -1765,6 +1764,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   statecache->SetCullFace (cullFace);
+  //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
@@ -2048,6 +2048,8 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 
 void csGLGraphics3D::ApplyBufferChanges()
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+
   for (size_t i = 0; i < changeQueue.Length(); i++)
   {
     const BufferChange& changeEntry = changeQueue[i];
@@ -2489,7 +2491,6 @@ void csGLGraphics3D::SetupClipPortals ()
   // First clear the z-buffer here.
   SetZModeInternal (CS_ZBUF_FILLONLY);
 
-  OutputMarkerString (__FUNCTION__, __FILE__, __LINE__, "Portal clipper");
   glBegin (GL_QUADS);
   glVertex3f (-1.0f, 1.0f, -1.0f);
   glVertex3f (1.0f, 1.0f, -1.0f);

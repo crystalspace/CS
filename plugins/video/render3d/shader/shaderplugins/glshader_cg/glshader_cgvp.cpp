@@ -34,32 +34,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
-void csShaderGLCGVP::Activate()
-{
-  csShaderGLCGCommon::Activate();
-
-  if (cgTrackMatrices)
-  {
-    for (size_t i = 0; i < cgMatrixTrackers.Length(); ++i)
-    {
-      const CGMatrixTrackerEntry& mt = cgMatrixTrackers[i];
-
-      cgGLSetStateMatrixParameter(mt.cgParameter, mt.cgMatrix, 
-	mt.cgTransform);
-    }
-  }
-  if (nvTrackMatrices)
-  {
-    for (size_t i = 0; i < nvMatrixTrackers.Length(); ++i)
-    {
-      const NVMatrixTrackerEntry& mt = nvMatrixTrackers[i];
-
-      shaderPlug->ext->glTrackMatrixNV (GL_VERTEX_PROGRAM_NV,
-	mt.nvParameter, mt.nvMatrix, mt.nvTransform);
-    }
-  }
-}
-
 bool csShaderGLCGVP::Compile ()
 {
   csRef<iDataBuffer> programBuffer = GetProgramData();
@@ -67,20 +41,6 @@ bool csShaderGLCGVP::Compile ()
     return false;
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
-
-  CGprofile progProf = CG_PROFILE_UNKNOWN;
-
-  // @@@ Hack: Make sure ARB_v_p is used
-  if (cg_profile != 0)
-    progProf = cgGetProfile (cg_profile);
-
-  if(progProf == CG_PROFILE_UNKNOWN)
-    progProf = cgGLGetLatestProfile (CG_GL_VERTEX);
-  if (progProf < CG_PROFILE_ARBVP1)
-  {
-    delete[] cg_profile;
-    cg_profile = csStrNew ("arbvp1");
-  }
 
   if (!DefaultLoadProgram (programStr, CG_GL_VERTEX))
     return false;

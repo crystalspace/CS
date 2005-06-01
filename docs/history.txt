@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-June-2005
+	- res made the following changes:
+	    - Made the OpenGL DrawMesh() emit a string marker with the mesh
+	      being drawn.
+	    - Fixed parsing of the pairing modifier in the PS plugin; lines
+	      like "+ mov ..." (notice the space after '+') were not handled
+	      correctly.
+	    - Added a config option to disable the creation of display lists
+	      for NV pixel shader support. Useful for debugging.
+	    - Fixed handling of source register component replication for NV
+	      pixel shader support.
+	    - Changed the NV pixel shader final combiner to something 
+	      apparently more working.
+	    - Made a bunch of PS1 plugin output to be verbose-only and turned
+	      some errors to warnings.
+	    - Augmented the Cg plugin to also support PS routing on NV 
+	      hardware. Useful for testing.
+	    - Removed some code from the Cg VP class which wasn't needed since 
+	      rewriting isn't done any more.
 31-May-2005
 	- Marten made a few fixes to the shader system:
 	    - Removed the static variable context from csXMLShader::Compile

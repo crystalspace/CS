@@ -91,7 +91,7 @@ bool csShaderGLCGFP::Compile ()
   if (shaderPlug->psplg)
   {
     program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-      programStr, CG_PROFILE_PS_1_3, entrypoint ? entrypoint : "main", 0);
+      programStr, shaderPlug->psProfile, entrypoint ? entrypoint : "main", 0);
 
     if (!program)
       return false;
@@ -127,7 +127,10 @@ bool csShaderGLCGFP::Compile ()
     if (pswrap->Load (0, cgGetProgramString (program, CG_COMPILED_PROGRAM), 
       mappings))
     {
-      return pswrap->Compile ();
+      bool ret = pswrap->Compile ();
+      if (shaderPlug->debugDump)
+        DoDebugDump();
+      return ret;
     }
     else
     {

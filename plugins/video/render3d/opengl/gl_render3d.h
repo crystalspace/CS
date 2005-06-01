@@ -124,12 +124,14 @@ public:
 };
 
 #ifdef CS_DEBUG
+#define TO_WIDE_(x)   L ## x
+#define TO_WIDE(x)    TO_WIDE_(x)
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
   { MakeAString mas fmtParam; csGLGraphics3D::OutputMarkerString (          \
-    CS_FUNCTION_NAME, __FILE__, __LINE__, mas); }
+    CS_FUNCTION_NAME, TO_WIDE(__FILE__), __LINE__, mas); }
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER				    \
-  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, __FILE__, __LINE__, \
-    "")
+  csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, TO_WIDE(__FILE__),  \
+  __LINE__, "")
 #else
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)
 #define GLRENDER3D_OUTPUT_LOCATION_MARKER
@@ -431,9 +433,9 @@ public:
   virtual ~csGLGraphics3D ();
 
   iStringSet* GetStrings () { return strings; }
-  static void OutputMarkerString (const char* function, const char* file,
+  static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, const char* message);
-  static void OutputMarkerString (const char* function, const char* file,
+  static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
 
   ////////////////////////////////////////////////////////////////////

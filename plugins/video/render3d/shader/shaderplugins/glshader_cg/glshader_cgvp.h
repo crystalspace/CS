@@ -40,35 +40,12 @@
 
 class csShaderGLCGVP : public csShaderGLCGCommon
 {
-private:
-  struct CGMatrixTrackerEntry
-  {
-    CGGLenum cgMatrix;
-    CGGLenum cgTransform;
-    CGparameter cgParameter;
-  };
-
-  struct NVMatrixTrackerEntry
-  {
-    GLenum nvMatrix;
-    GLenum nvTransform;
-    GLuint nvParameter;
-  };
-
-  bool cgTrackMatrices;
-  csArray<CGMatrixTrackerEntry> cgMatrixTrackers;
-  bool nvTrackMatrices;
-  csArray<NVMatrixTrackerEntry> nvMatrixTrackers;
-  csRef<iShaderProgram> override;
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGVP);
 
   csShaderGLCGVP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug, "cgvp"), cgTrackMatrices(false), 
-    nvTrackMatrices(false) { }
+    csShaderGLCGCommon (shaderPlug, "cgvp") { }
 
-  /// Sets this program to be the one used when rendering
-  virtual void Activate ();
   /// Compile a program
   virtual bool Compile();
 };

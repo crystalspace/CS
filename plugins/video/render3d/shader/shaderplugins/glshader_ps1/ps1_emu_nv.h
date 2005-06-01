@@ -79,13 +79,15 @@ private:
     bool signed_scale;
   };
   csArray<nv_texture_shader_stage> texture_shader_stages;
+  csArray<nv_combiner_stage> stages;
+  int num_combiners;
 
   void ActivateTextureShaders ();
+  bool ActivateRegisterCombiners ();
 
   bool GetTextureShaderInstructions (
     const csArray<csPSProgramInstruction> &instrs);
   bool GetNVInstructions (csPixelShaderParser& parser,
-    csArray<nv_combiner_stage> &stages,
     const csArray<csPSProgramInstruction> &instrs);
   GLenum GetTexTarget();
 public:

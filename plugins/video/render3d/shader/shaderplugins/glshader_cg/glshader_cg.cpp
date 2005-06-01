@@ -167,9 +167,10 @@ bool csGLShader_CG::Open()
   if (config->KeyExists ("Video.OpenGL.Shader.Cg.PSRouting"))
   {
     route = config->GetBool ("Video.OpenGL.Shader.Cg.PSRouting");
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Routing Cg fragment programs to Pixel Shader plugin %s (forced).", 
-      route ? "ON" : "OFF");
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "Routing Cg fragment programs to Pixel Shader plugin %s (forced).", 
+        route ? "ON" : "OFF");
   }
   else
   {
@@ -180,9 +181,10 @@ bool csGLShader_CG::Open()
     // we default to routing Cg fragment programs to the Pixel Shader plugin
     route = !ext->CS_GL_ARB_fragment_program && 
             ext->CS_GL_ATI_fragment_shader;
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Routing Cg fragment programs to Pixel Shader plugin %s (default).", 
-      route ? "ON" : "OFF");
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "Routing Cg fragment programs to Pixel Shader plugin %s (default).", 
+        route ? "ON" : "OFF");
   }
   ext->InitGL_ARB_vertex_program ();
 
@@ -203,24 +205,50 @@ bool csGLShader_CG::Open()
         "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
       if (!psplg)
       {
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
-          "routing unavailable.");
+        if (doVerbose)
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
+            "routing unavailable.");
       }
     }
   }
-
-  arbplg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
-    "crystalspace.graphics3d.shader.glarb", iShaderProgramPlugin);
-  if(!arbplg)
+  // Check which FP profile to use...
+  if (psplg)
   {
-    arbplg = CS_LOAD_PLUGIN(plugin_mgr, 
-      "crystalspace.graphics3d.shader.glarb", iShaderProgramPlugin);
-    if (!arbplg)
+    ext->InitGL_ATI_fragment_shader ();
+    ext->InitGL_NV_texture_shader ();
+    ext->InitGL_NV_texture_shader2 ();
+    if (ext->CS_GL_ATI_fragment_shader)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-	"Could not find crystalspace.graphics3d.shader.glarb. ARB Cg profile "
-	"support unavailable.");
+      psProfile = CG_PROFILE_PS_1_3;
+    }
+    else if (ext->CS_GL_NV_texture_shader && ext->CS_GL_NV_texture_shader2)
+    {
+      // @@@ Is that logic correct?
+      ext->InitGL_NV_register_combiners2 ();
+      if (ext->CS_GL_NV_register_combiners2)
+      {
+        ext->InitGL_NV_texture_shader3 ();
+        if (ext->CS_GL_NV_texture_shader3)
+        {
+          psProfile = CG_PROFILE_PS_1_3;
+        }
+        else
+        {
+          psProfile = CG_PROFILE_PS_1_2;
+        }
+      }
+      else
+      {
+        psProfile = CG_PROFILE_PS_1_1;
+      }
+    }
+    else
+    {
+      if (doVerbose)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "Cg to PS routing disabled due lack of hardware support.");
+      psplg = 0;
     }
   }
 

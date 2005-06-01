@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
@@ -104,39 +105,43 @@ void csGLShader_PS1::Open()
   if (!ext) return;
 
   csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
-  {
-    ext->InitGL_NV_register_combiners ();
-    ext->InitGL_NV_register_combiners2 ();
-    ext->InitGL_NV_texture_shader ();
-    ext->InitGL_NV_texture_shader2 ();
-    ext->InitGL_NV_texture_shader3 ();
-  }
-  if (config->GetBool ("Video.OpenGL.UseATIExt", true))
-  {
-    ext->InitGL_ATI_fragment_shader ();
-  }
-  
-  if(ext->CS_GL_ATI_fragment_shader)
-  {
-    Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	"ATI Fragment Shader Extension Supported");
-  }
+  ext->InitGL_NV_register_combiners ();
+  ext->InitGL_NV_register_combiners2 ();
+  ext->InitGL_NV_texture_shader ();
+  ext->InitGL_NV_texture_shader2 ();
+  ext->InitGL_NV_texture_shader3 ();
   if(ext->CS_GL_NV_texture_shader)
   {
-    Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	"nVidia Texture Shader Extension Supported");
+    if (doVerbose)
+      Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	  "nVidia Texture Shader Extension Supported");
   }
   if(ext->CS_GL_NV_register_combiners)
   {
-    Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	"nVidia Register Combiners Extension Supported");
+    if (doVerbose)
+    {
+      Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	  "nVidia Register Combiners Extension Supported");
 
-    GLint num_combiners;
-    glGetIntegerv(GL_MAX_GENERAL_COMBINERS_NV, &num_combiners);
-    Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	"Max General Combiners: %d", num_combiners);
+      GLint num_combiners;
+      glGetIntegerv(GL_MAX_GENERAL_COMBINERS_NV, &num_combiners);
+      Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	  "Max General Combiners: %d", num_combiners);
+    }
   }
+
+  ext->InitGL_ATI_fragment_shader ();
+  if(ext->CS_GL_ATI_fragment_shader)
+  {
+    if (doVerbose)
+      Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	  "ATI Fragment Shader Extension Supported");
+  }
+
+  useLists = config->GetBool ("Video.OpenGL.Shader.PS1.UseDisplayLists", true);
+  if (doVerbose)
+    Report(CS_REPORTER_SEVERITY_NOTIFY,
+      "Display list usage %s", useLists ? "enabled" : "disabled");
 
   isOpen = true;
 }
@@ -148,18 +153,26 @@ bool csGLShader_PS1::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
-	iShaderRenderInterface);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-	  f->QueryClassID ()) == 0)
+    f->QueryClassID ()) == 0)
     enable = true;
   else
     return false;
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   if(!ext) return false;
+  r->GetDriver2D()->PerformExtension ("getstatecache", &stateCache);
+  if(!stateCache) return false;
+
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    doVerbose = verbosemgr->Enabled ("renderer.shader");
+  else
+    doVerbose = false;
+
   return true;
 }
 

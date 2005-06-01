@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
@@ -40,7 +41,10 @@ void csShaderGLPS1_NV::Activate ()
 
   glEnable (GL_REGISTER_COMBINERS_NV);
   glEnable (GL_PER_STAGE_CONSTANTS_NV);
-  glCallList (program_num);
+  if (shaderPlug->useLists)
+    glCallList (program_num);
+  else
+    ActivateRegisterCombiners();
 }
 
 void csShaderGLPS1_NV::Deactivate()
@@ -95,7 +99,22 @@ void csShaderGLPS1_NV::SetupState (const csRenderMesh *mesh,
 
   // Has to go here at least the first time so that we can find
   // the correct texture targets
-  ActivateTextureShaders ();
+  if (shaderPlug->useLists)
+  {
+    if (tex_program_num != (GLuint)~0)
+    {
+      glCallList(tex_program_num);
+    }
+    else
+    {
+      tex_program_num = program_num + 1;
+      glNewList (tex_program_num, GL_COMPILE);
+      ActivateTextureShaders ();
+      glEndList();
+    }
+  }
+  else
+    ActivateTextureShaders ();
 }
 
 void csShaderGLPS1_NV::ResetState ()
@@ -104,21 +123,12 @@ void csShaderGLPS1_NV::ResetState ()
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
-  if (tex_program_num != (GLuint)~0)
-  {
-    glCallList(tex_program_num);
-    return;
-  }
-
-  tex_program_num = program_num + 1;
-  glNewList (tex_program_num, GL_COMPILE);
-
   csGLExtensionManager *ext = shaderPlug->ext;
 
   size_t i;
   for(i = 0; i < 4; i++)
   {
-    ext->glActiveTextureARB (GL_TEXTURE0_ARB + (int)i);
+    shaderPlug->stateCache->SetActiveTU ((int)i);
     glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
       GL_NONE);
   }
@@ -128,7 +138,7 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
   {
     const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
 
-    ext->glActiveTextureARB (GL_TEXTURE0_ARB + shader.stage);
+    shaderPlug->stateCache->SetActiveTU (shader.stage);
 
     switch(shader.instruction)
     {
@@ -240,8 +250,78 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
         break;
     }
   }
+}
 
-  glEndList();
+bool csShaderGLPS1_NV::ActivateRegisterCombiners ()
+{
+  csGLExtensionManager *ext = shaderPlug->ext;
+
+  ext->glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV,
+    num_combiners);
+
+  GLenum glstage = GL_COMBINER0_NV;
+
+  for(size_t i = 0; i < stages.Length (); i++)
+  {
+    const nv_combiner_stage &stage = stages.Get (i);
+    for(size_t j = 0; j < stage.inputs.Length(); j++)
+    {
+      const nv_input &input = stage.inputs.Get (j);
+      ext->glCombinerInputNV (glstage, input.portion, input.variable,
+        input.input, input.mapping, input.component);
+      if(glGetError() == GL_INVALID_OPERATION)
+      {
+        if (shaderPlug->doVerbose)
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "glCombinerInputNV #%zu returned GL_INVALID_OPERATION on stage %zu!",
+            j, i);
+        return false;
+      }
+    }
+    ext->glCombinerOutputNV (glstage, stage.output.portion,
+      stage.output.abOutput, stage.output.cdOutput, stage.output.sumOutput,
+      stage.output.scale, stage.output.bias, stage.output.abDotProduct,
+      stage.output.cdDotProduct, stage.output.muxSum);
+    if(glGetError() == GL_INVALID_OPERATION)
+    {
+      if (shaderPlug->doVerbose)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "glCombinerOutputNV returned GL_INVALID_OPERATION on stage %zu!",
+          i);
+      return false;
+    }
+    if(i+1 < stages.Length ())
+    {
+      nv_combiner_stage &next = stages.Get (i+1);
+      /* If there is any difference in outputs, or it's not
+       * using the alpha channel, increment the register
+       * combiner stage */
+      if(!(next.output.abOutput == stage.output.abOutput
+        && next.output.cdOutput == stage.output.cdOutput
+        && next.output.sumOutput == stage.output.sumOutput
+        && next.output.portion == GL_ALPHA))
+      {
+        glstage ++;
+      }
+    }
+  }
+
+  ext->glFinalCombinerInputNV (GL_VARIABLE_A_NV, GL_ZERO,
+    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+  ext->glFinalCombinerInputNV (GL_VARIABLE_B_NV, GL_ZERO,
+    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+  ext->glFinalCombinerInputNV (GL_VARIABLE_C_NV, GL_ZERO,
+    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+  ext->glFinalCombinerInputNV (GL_VARIABLE_D_NV, GL_SPARE0_NV,
+    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+  ext->glFinalCombinerInputNV (GL_VARIABLE_E_NV, GL_ZERO,
+    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+  ext->glFinalCombinerInputNV (GL_VARIABLE_F_NV, GL_ZERO,
+    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
+  ext->glFinalCombinerInputNV (GL_VARIABLE_G_NV, GL_SPARE0_NV,
+    GL_UNSIGNED_IDENTITY_NV, GL_ALPHA);
+
+  return true;
 }
 
 GLenum csShaderGLPS1_NV::GetTexTarget()
@@ -297,7 +377,6 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
 }
 
 bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
-					  csArray<nv_combiner_stage> &stages,
 					  const csArray<csPSProgramInstruction> &instrs)
 {
   for(size_t i = 0; i < instrs.Length (); i++)
@@ -340,11 +419,14 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
     else if(inst.inst_mods & CS_PS_IMOD_D2) scale = GL_SCALE_BY_ONE_HALF_NV;
     else if(inst.inst_mods)
     {
-      csString instrStr;
-      parser.GetInstructionString (inst, instrStr);
-      Report(CS_REPORTER_SEVERITY_WARNING,
-        "Register Combiners doesn't support one or more modifiers for '%s' (%zu).",
-	instrStr.GetData(), i);
+      if (shaderPlug->doVerbose)
+      {
+        csString instrStr;
+        parser.GetInstructionString (inst, instrStr);
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "Register Combiners doesn't support one or more modifiers for '%s' (%zu).",
+	  instrStr.GetData(), i);
+      }
       return false;
     }
 
@@ -404,7 +486,8 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
       // Get the src register modifiers
       if(j>0)
       {
-        switch(inst.src_reg_mods[j-1])
+        switch(inst.src_reg_mods[j-1] & 
+          (CS_PS_RMOD_BIAS | CS_PS_RMOD_INVERT | CS_PS_RMOD_NEGATE | CS_PS_RMOD_SCALE))
         {
           case (CS_PS_RMOD_NEGATE | CS_PS_RMOD_BIAS):
             mapping[j-1] = GL_HALF_BIAS_NEGATE_NV;
@@ -419,8 +502,9 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
             mapping[j-1] = GL_EXPAND_NEGATE_NV;
             break;
           case CS_PS_RMOD_SCALE:
-            Report(CS_REPORTER_SEVERITY_ERROR,
-              "Register Combiners doesn't support the _x2 register modifier.");
+            if (shaderPlug->doVerbose)
+              Report (CS_REPORTER_SEVERITY_WARNING,
+                "Register Combiners doesn't support the _x2 register modifier.");
             return false;
           case CS_PS_RMOD_NEGATE:
             mapping[j-1] = GL_SIGNED_NEGATE_NV;
@@ -434,6 +518,34 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
           default:
             mapping[j-1] = GL_SIGNED_IDENTITY_NV;
             break;
+        }
+        uint rep = inst.src_reg_mods[j-1] & 
+          (CS_PS_RMOD_REP_RED | CS_PS_RMOD_REP_GREEN | CS_PS_RMOD_REP_BLUE 
+            | CS_PS_RMOD_REP_ALPHA);
+        if ((rep == 0) || 
+          (rep == (CS_PS_RMOD_REP_RED | CS_PS_RMOD_REP_GREEN | CS_PS_RMOD_REP_BLUE)))
+        {
+          component[j-1] = GL_RGB;
+        }
+        else if (rep == CS_PS_RMOD_REP_BLUE)
+        {
+          component[j-1] = GL_BLUE;
+        }
+        else if (rep == CS_PS_RMOD_REP_ALPHA)
+        {
+          component[j-1] = GL_ALPHA;
+        }
+        else
+        {
+          if (shaderPlug->doVerbose)
+          {
+            csString instrStr;
+            parser.GetInstructionString (inst, instrStr);
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              "Unsupported replication modfiers '%s' for '%s' (%zu).",
+              csBitmaskToString::GetStr (rep, srcRegisterMods), 
+              instrStr.GetData(), i);
+          }
         }
       }
     }
@@ -477,12 +589,14 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
           combiner.output.sumOutput = dest;
           break;
         case CS_PS_INS_BEM:
-          Report(CS_REPORTER_SEVERITY_WARNING,
-            "NV_register_combiners does not support the 'bem' instruction");
+          if (shaderPlug->doVerbose)
+            Report(CS_REPORTER_SEVERITY_WARNING,
+              "NV_register_combiners does not support the 'bem' instruction");
 	  return false;
         case CS_PS_INS_CMP:
-          Report(CS_REPORTER_SEVERITY_WARNING,
-            "NV_register_combiners does not support the 'cmp' instruction");
+          if (shaderPlug->doVerbose)
+            Report(CS_REPORTER_SEVERITY_WARNING,
+              "NV_register_combiners does not support the 'cmp' instruction");
 	  return false;
         case CS_PS_INS_CND:
           combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
@@ -505,9 +619,10 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
           combiner.output.abDotProduct = GL_TRUE;
           break;
         case CS_PS_INS_DP4:
-          Report(CS_REPORTER_SEVERITY_WARNING,
-            "NV_register_combiners does not support four component dot \
-            products.");
+          if (shaderPlug->doVerbose)
+            Report(CS_REPORTER_SEVERITY_WARNING,
+              "NV_register_combiners does not support four component dot \
+              products.");
           return false;
         case CS_PS_INS_LRP:
           combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
@@ -596,24 +711,14 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   const csArray<csPSProgramInstruction> &instrs =
     parser.GetParsedInstructionList ();
 
-  csArray<nv_combiner_stage> stages;
-
   // Get all requested texture shader functions first
   if(!GetTextureShaderInstructions(instrs)) return false;
 
   // Then translate PS instructions into NV_register_combiners info
-  if(!GetNVInstructions (parser, stages, instrs)) return false;
+  if(!GetNVInstructions (parser, instrs)) return false;
 
   if(stages.Length () < 1) return false;
 
-  program_num = glGenLists (2);
-  if(program_num < 1) return false;
-
-  csGLExtensionManager *ext = shaderPlug->ext;
-
-  glNewList(program_num, GL_COMPILE);
-
-  int num_combiners = 1;
   int prev_combiner = 0;
   for(i = 0; i < stages.Length (); i++)
   {
@@ -643,58 +748,28 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
     }
   }
 
-  ext->glCombinerParameteriNV (GL_NUM_GENERAL_COMBINERS_NV,
-    num_combiners);
-
-  GLenum glstage = GL_COMBINER0_NV;
-
-  for(i = 0; i < stages.Length (); i++)
+  bool ret = true;
+  if (shaderPlug->useLists)
   {
-    const nv_combiner_stage &stage = stages.Get (i);
-    for(size_t j = 0; j < stage.inputs.Length(); j++)
-    {
-      const nv_input &input = stage.inputs.Get (j);
-      ext->glCombinerInputNV (glstage, input.portion, input.variable,
-        input.input, input.mapping, input.component);
-      if(glGetError() == GL_INVALID_OPERATION)
-      {
-        Report(CS_REPORTER_SEVERITY_ERROR,
-          "glCombinerInputNV #%zu returned GL_INVALID_OPERATION on stage %zu!",
-          j, i);
-        return false;
-      }
-    }
-    ext->glCombinerOutputNV (glstage, stage.output.portion,
-      stage.output.abOutput, stage.output.cdOutput, stage.output.sumOutput,
-      stage.output.scale, stage.output.bias, stage.output.abDotProduct,
-      stage.output.cdDotProduct, stage.output.muxSum);
-    if(glGetError() == GL_INVALID_OPERATION)
-    {
-      Report(CS_REPORTER_SEVERITY_ERROR,
-        "glCombinerOutputNV returned GL_INVALID_OPERATION on stage %zu!",
-        i);
-      return false;
-    }
-    if(i+1 < stages.Length ())
-    {
-      nv_combiner_stage &next = stages.Get (i+1);
-      /* If there is any difference in outputs, or it's not
-       * using the alpha channel, increment the register
-       * combiner stage */
-      if(!(next.output.abOutput == stage.output.abOutput
-        && next.output.cdOutput == stage.output.cdOutput
-        && next.output.sumOutput == stage.output.sumOutput
-        && next.output.portion == GL_ALPHA))
-      {
-        glstage ++;
-      }
-    }
+    program_num = glGenLists (2);
+    if(program_num < 1) return false;
+
+    glNewList (program_num, GL_COMPILE);
+    ret = ActivateRegisterCombiners();
+    glEndList();
+  }
+  else
+  {
+    glEnable (GL_TEXTURE_SHADER_NV);
+    glEnable (GL_REGISTER_COMBINERS_NV);
+    glEnable (GL_PER_STAGE_CONSTANTS_NV);
+
+    ret = ActivateRegisterCombiners();
+
+    glDisable (GL_PER_STAGE_CONSTANTS_NV);
+    glDisable (GL_REGISTER_COMBINERS_NV);
+    glDisable (GL_TEXTURE_SHADER_NV);
   }
 
-  ext->glFinalCombinerInputNV (GL_VARIABLE_B_NV, GL_SPARE0_NV,
-    GL_UNSIGNED_IDENTITY_NV, GL_RGB);
-
-  glEndList();
-
-  return true;
+  return ret;
 }
