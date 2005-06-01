@@ -6,7 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-1-June-2005
+1-Jun-2005
 	- res made the following changes:
 	    - Made the OpenGL DrawMesh() emit a string marker with the mesh
 	      being drawn.
@@ -25,6 +25,17 @@ chronological order.
 	      hardware. Useful for testing.
 	    - Removed some code from the Cg VP class which wasn't needed since 
 	      rewriting isn't done any more.
+	- Jorrit fixed a very old bug in the lighting routines. Basically
+	  shadow casting through portals didn't work. i.e. if you had an
+	  object in front of a portal then the shadow of that object would
+	  stop at the portal boundary. The shadow casted by the portal
+	  outline itself did work though. The problem was fixed with a
+	  workaround. Apparently nothing is calling MarkRelevant() on each
+	  shadow anymore. This means that when a portal is traversed for
+	  lighting all shadows are considered irrelevant and are dropped.
+	  I work around this problem temporarily by changing IsRelevant()
+	  so that it always returns true. That will slow down static lightmap
+	  calculation when portals are concerned but at least it is correct.
 31-May-2005
 	- Marten made a few fixes to the shader system:
 	    - Removed the static variable context from csXMLShader::Compile
@@ -35,11 +46,12 @@ chronological order.
 	      setting and not using the ARB_vertex_program routing.
 	    - Rewrote shader variable handing in Cg and ARB_*_p plugins to
 	      properly support matrix, transform and array datatypes.
-	    - Added matrix and transform types to SV and shader parameter loader.
+	    - Added matrix and transform types to SV and shader parameter
+	      loader.
 	    - Changed the SV stack to be a SV list.
 	- Marten changed the renderloop to follow the SV context order
-	  shadermanager (global) - renderloop - sector - light - mesh - shader - 
-	  material ( - shaderprogram).
+	  shadermanager (global) - renderloop - sector - light - mesh -
+	  shader - material ( - shaderprogram).
 	- Marten changed fountain meshobject to use csRandomFloatGen which
 	  hopefully is faster than normal rand().
 	- Marten fixed a few compile warnings in isotest.cpp.

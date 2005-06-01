@@ -68,7 +68,10 @@ public:
   /// Mark shadow as relevant or not.
   void MarkRelevant (bool rel = true) { relevant = rel; }
   /// Is shadow relevant?
-  bool IsRelevant () { return relevant; }
+  // @@@ Temporary problem: nothing is calling MarkRelevant() which
+  // means that shadow casting through portals doesn't work. That's
+  // why we return true here to fix that.
+  bool IsRelevant () { return true; /*@@@ relevant; */ }
 };
 
 class csShadowBlockList;
@@ -106,7 +109,7 @@ public:
   /// Get the user data for the last shadow.
   virtual void* GetUserData () { return cur_shad->GetUserData (); }
   /// Return if the last shadow is relevant or not.
-  virtual bool IsRelevant () { return cur_shad->IsRelevant (); }
+  virtual bool IsRelevant () { return true; /*cur_shad->IsRelevant ();*/ }
   /// Mark the last shadow as relevant.
   virtual void MarkRelevant (bool rel) { cur_shad->MarkRelevant (rel); }
   /// Reset the iterator to start again from initial setup.
