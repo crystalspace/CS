@@ -9619,6 +9619,8 @@ _cspace.iHalo_swigregister(iHaloPtr)
 
 iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
+
+csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
 class iShaderVariableContext(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9634,7 +9636,6 @@ class iShaderVariableContext(iBase):
     def GetVariableAdd(*args): return _cspace.iShaderVariableContext_GetVariableAdd(*args)
     def GetShaderVariables(*args): return _cspace.iShaderVariableContext_GetShaderVariables(*args)
     def PushVariables(*args): return _cspace.iShaderVariableContext_PushVariables(*args)
-    def PopVariables(*args): return _cspace.iShaderVariableContext_PopVariables(*args)
     def IsEmpty(*args): return _cspace.iShaderVariableContext_IsEmpty(*args)
     def __del__(self, destroy=_cspace.delete_iShaderVariableContext):
         try:
