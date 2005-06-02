@@ -71,7 +71,7 @@ static inline float csQsqrt(float x)
     
     y0 = y0 * (1.5f - x0 * y0 * y0);
     y0 = (y0 * (1.5f - x0 * y0 * y0)) * x;
-  };
+  }
     
   return y0;
 }
