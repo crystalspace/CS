@@ -1184,11 +1184,13 @@ Nag to Jorrit about this feature if you want it.");
 
       case XMLTOKEN_MIXMODE:
         CHECK_TOPLEVEL("mixmode");
-        CHECK_OBJECTONLY("mixmode");
         {
 	  if (synldr->ParseMixmode (child, mixmode))
 	  {
-            info.thing_state->SetMixMode (mixmode);
+	    if (info.load_factory)
+              info.thing_fact_state->SetMixMode (mixmode);
+	    else
+              info.thing_state->SetMixMode (mixmode);
 	  }
 	}
         break;

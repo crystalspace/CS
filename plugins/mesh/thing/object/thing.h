@@ -194,6 +194,9 @@ public:
   bool IsObjBboxValid() { return internalFlags.Check (8); }
   void SetObjBboxValid (bool b) { internalFlags.SetBool (8, b); }
 
+  // Mixmode for rendering.
+  uint mixmode;
+
   /// Number of vertices
   int num_vertices;
   /// Maximal number of vertices
@@ -507,6 +510,15 @@ public:
 
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer);
+
+  virtual void SetMixMode (uint mode)
+  {
+    mixmode = mode;
+  }
+  virtual uint GetMixMode () const
+  {
+    return mixmode;
+  }
 
   //-------------------- iMeshObjectFactory interface implementation ----------
 

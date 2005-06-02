@@ -181,7 +181,7 @@ struct iPolygonHandle : public iBase
 };
 
 
-SCF_VERSION (iThingFactoryState, 0, 2, 0);
+SCF_VERSION (iThingFactoryState, 0, 2, 1);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -659,6 +659,11 @@ struct iThingFactoryState : public iBase
 
   virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
     iRenderBuffer* buffer) = 0;
+
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
 };
 
 SCF_VERSION (iThingState, 0, 7, 0);

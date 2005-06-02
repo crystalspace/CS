@@ -216,6 +216,8 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   logparent = 0;
   thingmesh_type = thing_type;
 
+  mixmode = (uint)~0;	// Just a marker meaning not set.
+
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);
 
   if ((texLightmapName == csInvalidStringID))
@@ -994,6 +996,8 @@ void csThingStatic::HardTransform (const csReversibleTransform &t)
 csPtr<iMeshObject> csThingStatic::NewInstance ()
 {
   csThing *thing = new csThing ((iBase*)(iThingFactoryState*)this, this);
+  if (mixmode != (uint)~0)
+    thing->SetMixMode (mixmode);
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
 
