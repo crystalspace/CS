@@ -646,8 +646,8 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
   {
     ReportError ("crystalspace.maploader.parse",
       "File does not appear to be correct XML file (%s)!", fname);
-    return false;
   }
+  return false;
 }
 
 bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
@@ -820,8 +820,8 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
   {
     ReportError ("crystalspace.maploader.parse.plugin",
       "File does not appear to be a structure map library (%s)!", fname);
-    return false;
   }
+  return false;
 }
 
 bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
