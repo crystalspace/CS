@@ -6482,6 +6482,8 @@ class iThingFactoryState(iBase):
     def GetCosinusFactor(*args): return _cspace.iThingFactoryState_GetCosinusFactor(*args)
     def SetCosinusFactor(*args): return _cspace.iThingFactoryState_SetCosinusFactor(*args)
     def AddPolygonRenderBuffer(*args): return _cspace.iThingFactoryState_AddPolygonRenderBuffer(*args)
+    def SetMixMode(*args): return _cspace.iThingFactoryState_SetMixMode(*args)
+    def GetMixMode(*args): return _cspace.iThingFactoryState_GetMixMode(*args)
     def __del__(self, destroy=_cspace.delete_iThingFactoryState):
         try:
             if self.thisown: destroy(self)
