@@ -123,10 +123,8 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
     return csPtr<iBase> (tw);
   }
-  else
-  {
-    return 0;
-  }
+
+  return 0;
 }
 
 void csAnimateProctexLoader::Report (int severity, iDocumentNode* node,

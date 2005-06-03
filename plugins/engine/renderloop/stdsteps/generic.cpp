@@ -205,7 +205,6 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
     shadervars.Top ().GetVariable(string_object2world);
 
   iMaterial *material = 0;
-  iShaderVariableContext* lastMeshContext = 0;
 
   bool noclip = false;
   csRef<iClipper2D> old_clipper;

@@ -12,6 +12,8 @@ chronological order.
 	  this time in plugins/video/canvas/macosx, which caused linking to
 	  fail on account of undefined symbols on Tiger with gcc4.  Earlier
 	  related fixes were made on 25-May-2005.
+	- res fixed some gcc4 warnings reported by Terry Richards.
+	- res updated the cs-win32libs URL in the manual.
 2-Jun-2005
 	- Jorrit reports: today I found out that there was a bug in blend2cs
 	  which incorrectly put the mixmode flag with the thing mesh factory

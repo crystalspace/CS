@@ -257,7 +257,6 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
         lv->ctxt = fv->CopyFrustumContext ();
       }
     }
-    return false;
   }
   else
   {
@@ -316,6 +315,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     cw->DecRef ();
     return true;
   }
+  return false;
 }
 
 void InfiniteMaze::create_loose_portal (int x1, int y1, int z1,

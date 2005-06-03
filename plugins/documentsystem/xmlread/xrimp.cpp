@@ -218,6 +218,8 @@ csRef<iDocumentNode> csXmlReadNode::GetParent ()
     child = csPtr<iDocumentNode> (doc->Alloc (node->Parent (), false));
     return child;
   }
+  
+  return 0;
 }
 
 csDocumentNodeType csXmlReadNode::GetType ()

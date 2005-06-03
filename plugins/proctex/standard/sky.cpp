@@ -67,10 +67,8 @@ csPtr<iTextureWrapper> csPtSkyFactory::Generate ()
     csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
     return csPtr<iTextureWrapper> (tw);
   }
-  else
-  {
-    return 0;
-  }
+
+  return 0;
 }
 
 //---------------------------------------------------------------------------
