@@ -1,4 +1,4 @@
- /*
+/*
     Copyright (C) 1998-2005 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
