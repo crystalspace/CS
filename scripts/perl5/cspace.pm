@@ -7321,6 +7321,8 @@ package cspace::iThingFactoryState;
 *GetCosinusFactor = *cspacec::iThingFactoryState_GetCosinusFactor;
 *SetCosinusFactor = *cspacec::iThingFactoryState_SetCosinusFactor;
 *AddPolygonRenderBuffer = *cspacec::iThingFactoryState_AddPolygonRenderBuffer;
+*SetMixMode = *cspacec::iThingFactoryState_SetMixMode;
+*GetMixMode = *cspacec::iThingFactoryState_GetMixMode;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
