@@ -121,7 +121,7 @@ NSOpenGLContext *context;
 
 
 // C API to OSXDelegate2D class (OpenGL category)
-#define DEL2D_FUNC(ret, func) __private_extern__ inline ret OSXDelegate2D_##func
+#define DEL2D_FUNC(ret, func) __private_extern__ ret OSXDelegate2D_##func
 
 typedef void *OSXDelegate2DHandle;
 

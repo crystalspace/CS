@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Jun-2005
+	- Eric Sunshine fixed some more problems caused by spurious use of
+	  'inline' on some C functions wrapping Objective-C for access by C++,
+	  this time in plugins/video/canvas/macosx, which caused linking to
+	  fail on account of undefined symbols on Tiger with gcc4.  Earlier
+	  related fixes were made on 25-May-2005.
 2-Jun-2005
 	- Jorrit reports: today I found out that there was a bug in blend2cs
 	  which incorrectly put the mixmode flag with the thing mesh factory
