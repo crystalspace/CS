@@ -219,7 +219,7 @@ bool csRaytracer::IntersectTriangles (const csKDTreeNode* node, const csRay &ray
                                       csHitPoint &hit, bool earlyExit)
 {
   //assume valid input
-  uint nIdx, nMax;
+  size_t nIdx, nMax;
   nMax = node->numberOfPrimitives;
   bool haveHit = false;
   csMeshPatchAccStruct **primList = (csMeshPatchAccStruct**)csKDTreeNodeH::GetPointer (node);
