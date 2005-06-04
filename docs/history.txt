@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jun-2005
+	- Eric Sunshine worked around problem where Apple/Tiger's gcc4 rejects
+	  -fvisibility-inlines-hidden in Objective-C++ mode. (This fix is
+	  somewhat hacky. A cleaner solution will involve having the configure
+	  script differentiate between the C++ and Objective-C++ compilers when
+	  checking for accepted options.)
 3-Jun-2005
 	- Eric Sunshine fixed some more problems caused by spurious use of
 	  'inline' on some C functions wrapping Objective-C for access by C++,

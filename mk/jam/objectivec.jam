@@ -61,8 +61,14 @@ rule ObjC++
 {
   Depends $(<) : $(>) ;
   
-  C++FLAGS on $(<) += $(C++FLAGS) $(SUBDIRC++FLAGS) ;
-  OBJC++FLAGS on $(<) += $(OBJC++FLAGS) ;
+  # Ugly hack: Apple's gcc4 does not accept -fvisibility-inlines-hidden in
+  # Objective-C++ mode. Ideally, this issue should be resolved by the
+  # configure script, but it does not currently distinguish between flags
+  # intended for the C++ compiler and those intended for the Objective-C++
+  # compiler.
+  local rejects = -fvisibility-inlines-hidden ;
+  C++FLAGS on $(<) += [ Filter $(C++FLAGS) $(SUBDIRC++FLAGS) : $(rejects) ] ;
+  OBJC++FLAGS on $(<) += [ Filter $(OBJC++FLAGS) : $(rejects) ] ;
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
