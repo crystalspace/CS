@@ -194,10 +194,8 @@ SCF_IMPLEMENT_IBASE(csFatLoopStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStep);
 SCF_IMPLEMENT_IBASE_END;
 
-csStringID csFatLoopStep::string_object2world = (csStringID)-1;
-
 csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
-  /*buckets(2, 2), */passes(2, 2)
+  /*buckets(2, 2), */passes(2, 2), meshNodeFact(object_reg) 
 {
   SCF_CONSTRUCT_IBASE(0);
   this->object_reg = object_reg;
@@ -205,147 +203,11 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   nullShader = shaderManager->GetShader ("*null");
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
-  string_object2world = strings->Request ("object2world transform");
 }
 
 csFatLoopStep::~csFatLoopStep ()
 {
   SCF_DESTRUCT_IBASE();
-}
-
-class ShaderTicketHelper
-{
-private:
-  csShaderVarStack& stacks;
-  const csArray<csShaderVariableContext>& shadervars;
-  size_t shadervars_idx;
-  //csShaderVariableContext& shadervars;
-
-  iMaterial* lastMat;
-  iShader* lastShader;
-  iShaderVariableContext* lastMeshContext;
-  size_t matShadMeshTicket;
-
-  void Reset ()
-  {
-    matShadMeshTicket = (size_t)~0;
-  }
-
-public:
-  ShaderTicketHelper (csShaderVarStack& Stacks,
-    const csArray<csShaderVariableContext>& sv,
-    size_t sv_idx) :
-    	stacks (Stacks), 
-    	shadervars (sv),
-	shadervars_idx (sv_idx)
-  {
-    lastMat = 0;
-    lastShader = 0;
-    lastMeshContext = 0;
-    Reset ();
-  }
-
-  size_t GetTicket (iMaterial* material, iShader* shader, 
-    iShaderVariableContext* meshContext, csRenderMesh* mesh)
-  {
-    if ((material != lastMat) || (shader != lastShader)
-      || (meshContext != lastMeshContext))
-    {
-      Reset ();
-      lastMat = material;
-      lastShader = shader;
-      lastMeshContext = meshContext;
-    }
-    if (mesh->variablecontext.IsValid () 
-      && !mesh->variablecontext->IsEmpty())
-    {
-      stacks.Empty ();
-      shadervars[shadervars_idx].PushVariables (stacks);
-      if (meshContext)
-        meshContext->PushVariables (stacks);
-      shader->PushVariables (stacks);
-      material->PushVariables (stacks);
-
-      csRenderMeshModes modes (*mesh);
-      size_t retTicket = shader->GetTicket (modes, stacks);
-
-      return retTicket;
-    }
-    else
-    {
-      if (matShadMeshTicket == (size_t)~0)
-      {
-        stacks.Empty ();
-        shadervars[shadervars_idx].PushVariables (stacks);
-        if (meshContext)
-          meshContext->PushVariables (stacks);
-        shader->PushVariables (stacks);
-        material->PushVariables (stacks);
-
-	csRenderMeshModes modes (*mesh);
-	matShadMeshTicket = shader->GetTicket (modes, stacks);
-      }
-      return matShadMeshTicket;
-    }
-  }
-};
-
-void csFatLoopStep::RenderMeshes (iGraphics3D* g3d,
-				  iShader* shader, size_t ticket,
-				  iShaderVariableContext** meshContexts,
-				  csRenderMesh** meshes, 
-				  size_t num,
-				  csShaderVarStack& stacks)
-{
-  if (num == 0) return;
-  //ToggleStepSettings (g3d, true);
-  if (!shaderManager)
-  {
-    shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  }
-  csRef<csShaderVariable> svO2W = 
-    shadervars.Top ().GetVariable(string_object2world);
-  shaderManager->PushVariables (stacks);
-
-  iMaterial *material = 0;
-  iShaderVariableContext* lastMeshContext = 0;
-  
-  size_t numPasses = shader->GetNumberOfPasses (ticket);
-  for (size_t p = 0; p < numPasses; p++)
-  {
-    shader->ActivatePass (ticket, p);
-
-    size_t j;
-    for (j = 0; j < num; j++)
-    {
-      csRenderMesh* mesh = meshes[j];
-      iShaderVariableContext* meshContext = meshContexts[j];
-      if (meshContext->IsEmpty())
-	meshContext = 0;
-      //if ((!portalTraversal) && mesh->portal != 0) continue;
-
-      svO2W->SetValue (mesh->object2world);
-
-      stacks.Empty ();
-      shaderManager->PushVariables (stacks);
-      shadervars.Top ().PushVariables (stacks);
-      if (meshContext)
-        meshContext->PushVariables (stacks);
-      if (mesh->variablecontext)
-        mesh->variablecontext->PushVariables (stacks);
-      shader->PushVariables (stacks);
-      material->PushVariables (stacks);
-      
-      csRenderMeshModes modes (*mesh);
-      shader->SetupPass (ticket, mesh, modes, stacks);
-      g3d->DrawMesh (mesh, modes, stacks);
-      shader->TeardownPass (ticket);
-    }
-    shader->DeactivatePass (ticket);
-  }
 }
 
 class PriorityHelper
@@ -377,16 +239,11 @@ void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
 {
   sectorSet.Empty();
 
-  shadervars.Push (csShaderVariableContext ());
-  shadervars.Top ().GetVariableAdd (string_object2world);
-
   RenderNode* node = renderNodeAlloc.Alloc();
   node->nodeType = RenderNode::Container;
   BuildNodeGraph (node, rview, sector, stacks);
   ProcessNode (rview, node, stacks);
   renderNodeAlloc.Empty();
-
-  shadervars.Pop ();
 }
 
 uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
@@ -398,54 +255,49 @@ uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
 void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview, 
                                     iSector* sector, csShaderVarStack &stacks)
 {
-  //RenderNode* superNode = renderNodeAlloc.Alloc();
-  //superNode->nodeType = RenderNode::Container;
   if (!sector) return;
   if (sectorSet.In (sector)) return;
   sectorSet.Add (sector);
 
   RenderNode* newNode = renderNodeAlloc.Alloc();
-  newNode->nodeType = RenderNode::Meshes;
+  newNode->nodeType = RenderNode::Container;
   node->containedNodes.Push (newNode);
 
+  csArray<csMeshRenderNode*> meshNodes;
+  for (size_t p = 0; p < passes.Length(); p++)
+  {
+    meshNodes.Push (meshNodeFact.CreateMeshNode (passes[p].shadertype, 
+      passes[p].defShader));
+    RenderNode* newNode = renderNodeAlloc.Alloc();
+    newNode->renderNode = meshNodes[p];
+    node->containedNodes.Push (newNode);
+  }
+
+  // This is a growing array of visible meshes. It will contain
+  // the visible meshes from every recursion level appended. At
+  // exit of this step the visible meshes from the current recursion
+  // level are removed again.
   csDirtyAccessArray<csRenderMesh*> visible_meshes;
   csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
-  csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
   size_t num = meshlist->SortMeshLists (rview);
   visible_meshes.SetLength (num);
   imeshes_scratch.SetLength (num);
-  mesh_svc.SetLength (num);
   csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ();
-  iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ();
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
-  for (size_t i = 0; i < num; i++)
-    sameShaderMeshSvcs[i] = imeshes_scratch[i]->GetSVContext();
-
-  csArray<SortedBuckets>& buckets = newNode->buckets;
-
-  //shadervars.Push (csShaderVariableContext ());
-  //shadervars.Top ().GetVariableAdd (string_object2world);
-
-  ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.Length ()-1);
-  const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
   PriorityHelper ph (engine);
-  buckets.Empty();
   for (size_t n = 0; n < num; n++)
   {
     csRenderMesh* mesh = sameShaderMeshes[n];
     if (mesh->portal) 
     {
-      /*RenderNode* portalNode = renderNodeAlloc.Alloc();
-      portalNode->nodeType = RenderNode::Portal;
-      portalNode->portal = mesh->portal;*/
-      BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview, stacks);
+      /*BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview, stacks);
 
       RenderNode* newNode = renderNodeAlloc.Alloc();
       newNode->nodeType = RenderNode::Meshes;
-      node->containedNodes.Push (newNode);
+      node->containedNodes.Push (newNode);*/
       continue;
     }
 
@@ -456,49 +308,14 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     int c = 0;
     while (classes != 0)
     {
-      do
+      if (classes & 1)
       {
-        ShaderTicketKey key;
-        key.prio = prio;
-        if (ph.IsPrioSpecial (prio))
-        {
-          key.shader = 0; key.ticket = (size_t)~0;
-        }
-        else
-        {
-          iMaterial* hdl = mesh->material->GetMaterial ();
-          iShader* sortBy = hdl->GetShader (passes[c].shadertype);
-          if (sortBy == 0) sortBy = passes[c].defShader;
-          if ((sortBy == 0) || (sortBy == nullShader))
-          {
-            break; // @@@ Perhaps an Assert? Or some Error?
-          }
-          key.shader = sortBy;
-          key.ticket = ticketHelper.GetTicket (
-            mesh->material->GetMaterial (), sortBy, 
-            sameShaderMeshSvcs[n], mesh);
-        }
-
-        if (classes & 1)
-        {
-          MeshBucket* bucket = buckets.GetExtend(c).GetElementPointer (key);
-          if (bucket == 0)
-          {
-            bucket = buckets[c].Put (key, MeshBucket());
-          }
-          bucket->rendermeshes.Push (mesh);
-          bucket->wrappers.Push (mw);
-          bucket->contexts.Push (sameShaderMeshSvcs[n]);
-        }
+        meshNodes[c]->AddMesh (mesh, mw, prio, ph.IsPrioSpecial (prio));
       }
-      while (0);
       c++;
       classes >>= 1;
     }
   }
-  //shadervars.Pop ();
-
-  //return superNode;
 }
 
 static void Perspective (const csVector3& v, csVector2& p, int
@@ -1048,6 +865,12 @@ bool csFatLoopStep::DoPerspective (csVector3 *source, int num_verts,
 void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node,
                                  csShaderVarStack &stacks)
 {
+  if (node->renderNode)
+  {
+    node->renderNode->Process (rview);
+    return;
+  }
+
   switch (node->nodeType)
   {
     case RenderNode::Container:
@@ -1055,19 +878,6 @@ void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node,
         for (size_t i = 0; i < node->containedNodes.Length(); i++)
         {
           ProcessNode (rview, node->containedNodes[i], stacks);
-        }
-      }
-      break;
-    case RenderNode::Meshes:
-      {
-        iGraphics3D* g3d = rview->GetGraphics3D();
-        const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
-        g3d->SetWorldToCamera (camt.GetInverse ());
-        for (size_t b = 0; b < node->buckets.Length(); b++)
-        {
-          g3d->SetZMode (CS_ZBUF_MESH);
-          TraverseShaderBuckets traverser (*this, g3d, stacks, passes[b]);
-          node->buckets[b].TraverseInOrder (traverser);
         }
       }
       break;
@@ -1300,49 +1110,3 @@ void csFatLoopStep::RenderPortal (RenderNode* node, iRenderView* rview,
 */
 }
 
-//---------------------------------------------------------------------------
-
-void csFatLoopStep::TraverseShaderBuckets::Process (const ShaderTicketKey& key,
-  csFatLoopStep::MeshBucket &bucket)
-{
-  ShaderTicketHelper ticketHelper (stacks, step.shadervars, step.shadervars.Length ()-1);
-  size_t startMesh = 0;
-  iShader* lastShader = 0;
-  size_t lastTicket = ~0;
-  iShader* meshShader = key.shader;
-  for (size_t i = 0; i < bucket.rendermeshes.Length(); i++)
-  {
-    if (key.shader == 0)
-    {
-      iMaterial* hdl = bucket.rendermeshes[i]->material->GetMaterial ();
-      meshShader = hdl->GetShader (pass.shadertype);
-      if (meshShader == 0) meshShader = pass.defShader;
-    }
-    size_t newTicket = (key.ticket != (size_t)~0) ? key.ticket :
-      (meshShader ? ticketHelper.GetTicket (
-      bucket.rendermeshes[i]->material->GetMaterial (), meshShader, 
-      bucket.contexts[i], bucket.rendermeshes[i]) : (size_t)~0);
-    if ((meshShader != lastShader) || (newTicket != lastTicket))
-    {
-      // @@@ Need error reporter
-      if ((lastShader != 0) && (lastShader != step.nullShader))
-      {
-        //g3d->SetWorldToCamera (camt);
-        step.RenderMeshes (g3d, lastShader, lastTicket, 
-          bucket.contexts.GetArray() + startMesh, 
-          bucket.rendermeshes.GetArray() + startMesh, i - startMesh, stacks);
-      }
-      startMesh = i;
-      lastShader = meshShader;
-      lastTicket = newTicket;
-    }
-  }
-  if ((lastShader != 0) && (lastShader != step.nullShader))
-  {
-    //g3d->SetWorldToCamera (camt);
-    step.RenderMeshes (g3d, lastShader, lastTicket, 
-      bucket.contexts.GetArray() + startMesh, 
-      bucket.rendermeshes.GetArray() + startMesh, 
-      bucket.rendermeshes.Length() - startMesh, stacks);
-  }
-}

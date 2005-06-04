@@ -31,6 +31,9 @@
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 
+#include "rendernode.h"
+#include "meshnode.h"
+
 class csFatLoopType : public csBaseRenderStepType
 {
 public:
@@ -76,98 +79,40 @@ public:
   virtual csPtr<iRenderStep> Create ();
 };
 
-struct ShaderTicketKey
-{
-  long prio;
-  iShader* shader;
-  size_t ticket;
-};
-
-CS_SPECIALIZE_TEMPLATE
-class csComparator<ShaderTicketKey, ShaderTicketKey>
-{
-public:
-  static int Compare(ShaderTicketKey const &r1, ShaderTicketKey const &r2)
-  {
-    int d = r1.prio - r2.prio;
-    if (d == 0)
-    {
-      d = (r1.shader < r2.shader) ? -1 : ((r1.shader > r2.shader) ? 1 : 0);
-    }
-    if (d == 0)
-    {
-      d = (r1.ticket < r2.ticket) ? -1 : ((r1.ticket > r2.ticket) ? 1 : 0);
-    }
-    return d;
-  }
-};
-
 class csFatLoopStep : public iRenderStep
 {
   iObjectRegistry* object_reg;
 
-  // This is a growing array of visible meshes. It will contain
-  // the visible meshes from every recursion level appended. At
-  // exit of this step the visible meshes from the current recursion
-  // level are removed again.
-  //csDirtyAccessArray<csRenderMesh*> visible_meshes;
-  //csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
-  //csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
   csSet<csPtrKey<iSector> > sectorSet; // @@@ Hack.
 
-  csArray<csShaderVariableContext> shadervars;
   csWeakRef<iShaderManager> shaderManager;
   csRef<iEngine> engine;
   csWeakRef<iShader> nullShader;
 
-  static csStringID string_object2world;
-
-  struct MeshBucket
-  {
-    //uint timestamp;
-    csDirtyAccessArray<csRenderMesh*> rendermeshes;
-    csDirtyAccessArray<iMeshWrapper*> wrappers;
-    csDirtyAccessArray<iShaderVariableContext*> contexts;
-
-    //MeshBucket() : timestamp(~0) {}
-  };
-  typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
   struct RenderNode
   {
-    enum Type { Container, Portal, Meshes };
+    enum Type { Container, Portal };
     Type nodeType;
-    csArray<SortedBuckets> buckets;
 
     iPortal* portal;
     csPoly2D poly;
     csReversibleTransform movtrans;
     csPlane3 camera_plane;
 
+    csRenderNode* renderNode;
+    iRenderView* rview;
+
     csArray<RenderNode*> containedNodes;
 
-    RenderNode() : buckets(2, 2) {}
+    RenderNode() : renderNode(0), rview(0) {}
+    ~RenderNode() { if (renderNode) renderNode->Free(); }
   };
   csBlockAllocator<RenderNode> renderNodeAlloc;
-  //csArray<SortedBuckets> buckets;
-  class TraverseShaderBuckets
-  {
-    csFatLoopStep& step;
-    iGraphics3D* g3d;
-    csShaderVarStack &stacks;
-    const RenderPass& pass;
-  public:
-    TraverseShaderBuckets (csFatLoopStep& step, iGraphics3D* g3d,
-      csShaderVarStack &stacks, const RenderPass& pass) : step(step), 
-      g3d(g3d), stacks(stacks), pass(pass) {}
-    void Process (const ShaderTicketKey& key, MeshBucket& bucket);
-  };
-
-  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
-    size_t ticket, iShaderVariableContext** meshContext, 
-    csRenderMesh** meshes, size_t num, csShaderVarStack &stacks);
 
   csArray<RenderPass> passes;
   uint32 Classify (csRenderMesh* mesh);
+
+  csMeshRenderNodeFactory meshNodeFact;
 
   void BuildNodeGraph (RenderNode* node, iRenderView* rview, 
     iSector* sector, csShaderVarStack &stacks);
@@ -190,9 +135,6 @@ class csFatLoopStep : public iRenderStep
     bool mirror, int fov, float shift_x, float shift_y, 
     const csPlane3& plane_cam);
 public:
-  //csStringID shadertype;
-  //csRef<iShader> defShader;
-
   SCF_DECLARE_IBASE;
 
   csFatLoopStep (iObjectRegistry* object_reg);
