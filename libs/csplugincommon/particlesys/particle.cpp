@@ -219,7 +219,7 @@ void csNewParticleSystem::SetupObject ()
         TriangleCount*3, CS_BUF_DYNAMIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, VertexCount - 1);
 
-    lastDataUpdateFrame = ~0;
+    lastDataUpdateFrame = (uint)~0;
   }
 }
 

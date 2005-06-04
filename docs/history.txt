@@ -12,6 +12,9 @@ chronological order.
 	  somewhat hacky. A cleaner solution will involve having the configure
 	  script differentiate between the C++ and Objective-C++ compilers when
 	  checking for accepted options.)
+	- Eric Sunshine fixed a few compilation warnings reported by gcc4 on
+	  Apple/Tiger (though quite a lot still remain for when more time is
+	  available).
 3-Jun-2005
 	- Eric Sunshine fixed some more problems caused by spurious use of
 	  'inline' on some C functions wrapping Objective-C for access by C++,
