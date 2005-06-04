@@ -138,7 +138,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     else
     {
       GLenum textarget = tex_mm->GetGLTextureTarget();
-      if ((textarget != GL_TEXTURE_2D) || (textarget != GL_TEXTURE_RECTANGLE_ARB))
+      if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
         return;
       // Texture was not used as a render target before.
       // Make some necessary adjustments.

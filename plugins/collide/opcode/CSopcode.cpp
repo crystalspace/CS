@@ -56,8 +56,8 @@ void Opcode_Log (const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
-  csReportV (0, CS_REPORTER_SEVERITY_NOTIFY, // @@@ use a real object_reg
-    "crystalspace.collisiondetection.opcode", msg, args);
+  csOPCODECollideSystem::OpcodeReportV (CS_REPORTER_SEVERITY_NOTIFY, 
+    msg, args);
   va_end (args);
 }
 
@@ -67,10 +67,19 @@ bool Opcode_Err (const char* msg, ...)
   va_start (args, msg);
   // Although it's called "..._Err", Opcode also reports less-than-fatal
   // messages through it
-  csReportV (0, CS_REPORTER_SEVERITY_WARNING, // @@@ use a real object_reg
-    "crystalspace.collisiondetection.opcode", msg, args);
+  csOPCODECollideSystem::OpcodeReportV (CS_REPORTER_SEVERITY_WARNING, 
+    msg, args);
   va_end (args);
   return false;
+}
+
+iObjectRegistry* csOPCODECollideSystem::rep_object_reg = 0;
+
+void csOPCODECollideSystem::OpcodeReportV (int severity, const char* message, 
+                                           va_list args)
+{
+  csReportV (rep_object_reg,
+    severity, "crystalspace.collisiondetection.opcode", message, args);
 }
 
 csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
@@ -90,18 +99,20 @@ csOPCODECollideSystem::~csOPCODECollideSystem ()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
+  rep_object_reg = 0;
 }
 
 bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)
 {
   object_reg = iobject_reg;
+  rep_object_reg = object_reg;
   return true;
 }
 
 csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
 {
   csOPCODECollider* col = new csOPCODECollider (mesh);
-  // here we must store the caches ¿and the trees?
+  // here we must store the caches (and the trees)?
   return csPtr<iCollider> (col);
 }
 
@@ -188,6 +199,7 @@ bool csOPCODECollideSystem::CollideRay (
 	const csVector3& start, const csVector3& end)
 {
   if (!collider) return false;
+  
   csOPCODECollider* col = (csOPCODECollider*) collider;
   ColCache.Model0 = col->m_pCollisionModel;
 
@@ -344,24 +356,3 @@ bool csOPCODECollideSystem::GetOneHitOnly ()
 {
   return TreeCollider.FirstContactEnabled ();
 }
-
-/**
-* Test if an object can move to a new position. The new position
-* vector will be modified to reflect the maximum new position that the
-* object could move to without colliding with something. This function
-* will return:
-* <ul>
-* <li>-1 if the object could not move at all (i.e. stuck at start position).
-* <li>0 if the object could not move fully to the desired position.
-* <li>1 if the object can move unhindered to the end position.
-* </ul>
-* <p>
-* This function will reset the collision pair array. If there was a
-* collision along the way the array will contain the information for
-* the first collision preventing movement.
-* <p>
-* The given transform should be the transform of the object corresponding
-* with the old position. 'colliders' and 'transforms' should be arrays
-* with 'num_colliders' elements for all the objects that we should
-* test against.
-*/

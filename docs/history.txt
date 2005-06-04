@@ -18,6 +18,9 @@ chronological order.
 	- res started to make the fat rl more modular.
 	- res added some support for rendering to NPOTS textures. Still 
 	  untested tho.
+	- res made the Opcode plugin properly use a reporter from the object
+	  registry to report Opcode issues.
+	- res fixed some botched logic from the NPOTS changes above.
 3-Jun-2005
 	- Eric Sunshine fixed some more problems caused by spurious use of
 	  'inline' on some C functions wrapping Objective-C for access by C++,

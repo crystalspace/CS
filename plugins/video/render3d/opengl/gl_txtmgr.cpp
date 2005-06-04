@@ -101,7 +101,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
       // And for POTS textures it's just not needed.
       && (!csIsPowerOf2 (image->GetWidth()) 
         || !csIsPowerOf2 (image->GetHeight()));
-    if (npotsValid)
+    if (!npotsValid)
     {
       flags &= ~CS_TEXTURE_NPOTS;
     }
@@ -681,7 +681,7 @@ void csGLTextureHandle::Blit (int x, int y, int width,
   // @@@ Keycolor not yet supported here!
   
   GLenum textarget = GetGLTextureTarget();
-  if ((textarget != GL_TEXTURE_2D) || (textarget != GL_TEXTURE_RECTANGLE_ARB))
+  if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
     return;
 
   // Activate the texture.
@@ -740,9 +740,9 @@ void csGLTextureHandle::SetupAutoMipping()
     /*&& (!G3D->ext->CS_GL_EXT_framebuffer_object)*/)
   {
     if (G3D->ext->CS_GL_SGIS_generate_mipmap)
-      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+      glTexParameteri (GetGLTextureTarget(), GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     else
-      glTexParameteri  (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      glTexParameteri  (GetGLTextureTarget(), GL_TEXTURE_MIN_FILTER,
 	txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
 }

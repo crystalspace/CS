@@ -55,6 +55,10 @@ public:
   csArray<csIntersectingTriangle> intersecting_triangles;
   iObjectRegistry *object_reg;
  
+  static iObjectRegistry* rep_object_reg;
+  static void OpcodeReportV (int severity, const char* message, 
+    va_list args);
+
   SCF_DECLARE_IBASE;
 
   csOPCODECollideSystem (iBase* parent);
