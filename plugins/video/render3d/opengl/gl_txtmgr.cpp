@@ -88,12 +88,20 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
   const uint npotsNeededFlags = (CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
   if (flags & CS_TEXTURE_NPOTS)
   {
-    if ((!G3D->ext->CS_GL_ARB_texture_rectangle
-      && !G3D->ext->CS_GL_EXT_texture_rectangle
-      && !G3D->ext->CS_GL_NV_texture_rectangle
-      && !((flags & npotsNeededFlags) != npotsNeededFlags))
-      || (image->GetImageType() != csimg2D)
-      || (csIsPowerOf2 (image->GetWidth()) && csIsPowerOf2 (image->GetHeight())))
+    // For NPOTS we need...
+    bool npotsValid = (
+      // The extension
+      (G3D->ext->CS_GL_ARB_texture_rectangle
+      || G3D->ext->CS_GL_EXT_texture_rectangle
+      || G3D->ext->CS_GL_NV_texture_rectangle)
+      // Certain additional texture flags
+      && ((flags & npotsNeededFlags) == npotsNeededFlags))
+      // A 2D image
+      && (image->GetImageType() == csimg2D)
+      // And for POTS textures it's just not needed.
+      && (!csIsPowerOf2 (image->GetWidth()) 
+        || !csIsPowerOf2 (image->GetHeight()));
+    if (npotsValid)
     {
       flags &= ~CS_TEXTURE_NPOTS;
     }
@@ -672,18 +680,9 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 {
   // @@@ Keycolor not yet supported here!
   
-  GLenum textarget;
-  switch (target)
-  {
-    case CS_TEX_IMG_2D:
-      textarget = GL_TEXTURE_2D;
-      break;
-    case CS_TEX_IMG_RECT:
-      textarget = GL_TEXTURE_RECTANGLE_ARB;
-      break;
-    default:
-      return;
-  }
+  GLenum textarget = GetGLTextureTarget();
+  if ((textarget != GL_TEXTURE_2D) || (textarget != GL_TEXTURE_RECTANGLE_ARB))
+    return;
 
   // Activate the texture.
   Precache ();
@@ -989,6 +988,25 @@ GLuint csGLTextureHandle::GetHandle ()
     SetNeedMips (false);
   }
   return Handle;
+}
+
+GLenum csGLTextureHandle::GetGLTextureTarget() const
+{
+  switch (target)
+  {
+    case CS_TEX_IMG_1D:
+      return GL_TEXTURE_1D;
+    case CS_TEX_IMG_2D:
+      return GL_TEXTURE_2D;
+    case CS_TEX_IMG_3D:
+      return GL_TEXTURE_3D;
+    case CS_TEX_IMG_CUBEMAP:
+      return GL_TEXTURE_CUBE_MAP;
+    case CS_TEX_IMG_RECT:
+      return GL_TEXTURE_RECTANGLE_ARB;
+    default:
+      return 0;
+  }
 }
 
 void csGLTextureHandle::CheckAlpha (int w, int h, int d, csRGBpixel *src, 

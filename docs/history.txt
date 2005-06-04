@@ -16,6 +16,8 @@ chronological order.
 	  Apple/Tiger (though quite a lot still remain for when more time is
 	  available).
 	- res started to make the fat rl more modular.
+	- res added some support for rendering to NPOTS textures. Still 
+	  untested tho.
 3-Jun-2005
 	- Eric Sunshine fixed some more problems caused by spurious use of
 	  'inline' on some C functions wrapping Objective-C for access by C++,

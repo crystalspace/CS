@@ -137,6 +137,9 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     }
     else
     {
+      GLenum textarget = tex_mm->GetGLTextureTarget();
+      if ((textarget != GL_TEXTURE_2D) || (textarget != GL_TEXTURE_RECTANGLE_ARB))
+        return;
       // Texture was not used as a render target before.
       // Make some necessary adjustments.
       if (!tex_mm->IsWasRenderTarget())
@@ -145,7 +148,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 	tex_mm->SetWasRenderTarget (true);
 	tex_mm->texFormat = iTextureHandle::RGBA8888;
       }
-      glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
+      glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
       tex_mm->SetNeedMips (true);
     }
   }

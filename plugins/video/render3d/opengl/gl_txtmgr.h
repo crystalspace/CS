@@ -21,8 +21,6 @@
 #ifndef __CS_GL_NEWTXTMGR_H__
 #define __CS_GL_NEWTXTMGR_H__
 
-#define CS_MATERIAL_MAX_TEXTURE_LAYERS 4
-
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -288,6 +286,12 @@ public:
   void UpdateTexture ();
 
   GLuint GetHandle ();
+
+  /**
+   * Return the texture target for this texture (e.g. GL_TEXTURE_2D)
+   * \remark Returns GL_TEXTURE_CUBE_MAP for cubemaps.
+   */
+  GLenum GetGLTextureTarget() const;
 };
 
 class csGLSuperLightmap;
