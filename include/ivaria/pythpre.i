@@ -117,11 +117,16 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
   }
 %enddef
 
+#if (SWIG_VERSION >= 0x010324)
+%{ static csWrapPtr iBase__DynamicCast(iBase *, const char *); %}
+#else
+%{ csWrapPtr iBase__DynamicCast(iBase *, const char *); %}
+#endif
+
 %{
 PyObject *
 _csWrapPtr_to_Python (const csWrapPtr & wp)
 {
-  csWrapPtr iBase__DynamicCast(iBase *, const char *);
   if (!wp.VoidPtr && !wp.Ref.IsValid())
   {
     Py_INCREF(Py_None);

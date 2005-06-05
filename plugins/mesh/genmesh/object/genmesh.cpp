@@ -769,7 +769,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
 
   bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
-  csShadowArray* shadowArr;
+  csShadowArray* shadowArr = 0;
   if (pseudoDyn)
   {
     shadowArr = new csShadowArray ();

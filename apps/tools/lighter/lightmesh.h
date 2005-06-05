@@ -223,7 +223,7 @@ public:
   const csColor& GetColor (uint i) const { return parentFace->colorList[colorIndex[i]];}
   
   // Helper to set vertex indices
-  void SetVertexIdx (uint i1, uint i2, uint i3, uint i4 = ~0)
+  void SetVertexIdx (uint i1, uint i2, uint i3, uint i4 = (uint)~0)
   {
     vertexIndex[0] = i1; vertexIndex[1] = i2; vertexIndex[2] = i3;
     vertexIndex[3] = i4;

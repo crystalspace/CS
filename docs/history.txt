@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Jun-2005
+	- Eric Sunshine fixed a bunch of compilation issues reported by
+	  Apple/Tiger's gcc4.
+	- Eric Sunshine fixed Swig 1.3.24 issue on Apple/Tiger which resulted
+	  in linker complaining that iBase__DynamicCast was undefined.
 4-Jun-2005
 	- Eric Sunshine worked around problem where Apple/Tiger's gcc4 rejects
 	  -fvisibility-inlines-hidden in Objective-C++ mode. (This fix is

@@ -893,9 +893,9 @@ void csFatLoopStep::RenderPortal (RenderNode* node, iRenderView* rview,
                                   csShaderVarStack &stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D ();
-  csPlane3& keep_plane = node->camera_plane;
+  /*csPlane3& keep_plane = node->camera_plane;
   float keep_camera_z = 0;	// Also keep z-coordinate of vertex 0.
-  /*if (is_this_fog || po->flags.Check (CS_PORTAL_ZFILL))
+  if (is_this_fog || po->flags.Check (CS_PORTAL_ZFILL))
   {
     keep_camera_z = camera_vertices[po->GetVertexIndices ()[0]].z;
   }*/

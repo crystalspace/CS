@@ -70,6 +70,7 @@ private:
     csVector3 a, b;
     csVector3 norm;
     int ind_a, ind_b;
+    EdgeInfo() : a(0), b(0), norm(0), ind_a(0), ind_b(0) {}
   };
 
   int vertex_count, triangle_count;

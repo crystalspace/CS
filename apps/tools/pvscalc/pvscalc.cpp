@@ -594,7 +594,7 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   csVector3 bbox_size = bbox.Max () - bbox.Min ();
   if (minsize_only || boxlist.Length () <= 10)
   {
-    float where0, where1, where2;
+    float where0 = 0, where1 = 0, where2 = 0;
     float q0 = bbox_size.x > minsize.x
     	? FindBestSplitLocation (bbox.MinX (), bbox.MaxX (),
 		where0, axis_polylist[CS_AXIS_X])
@@ -630,7 +630,7 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   }
   else
   {
-    float where0, where1, where2;
+    float where0 = 0, where1 = 0, where2 = 0;
     float q0 = FindBestSplitLocation (CS_AXIS_X, where0, bbox,
     	axis_polylist[CS_AXIS_X], boxlist);
     float q1 = FindBestSplitLocation (CS_AXIS_Y, where1, bbox,

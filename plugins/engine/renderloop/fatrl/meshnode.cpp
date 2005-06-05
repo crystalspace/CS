@@ -154,7 +154,7 @@ void csMeshRenderNode::TraverseShaderBuckets::Process (
 {
   size_t startMesh = 0;
   iShader* lastShader = 0;
-  size_t lastTicket = ~0;
+  size_t lastTicket = (size_t)~0;
   iShader* meshShader = key.shader;
   for (size_t i = 0; i < bucket.rendermeshes.Length(); i++)
   {
