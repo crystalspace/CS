@@ -88,32 +88,32 @@ public:
 class CS_CRYSTALSPACE_EXPORT csMouseEventHelper
 {
 public:
-  /// retrieve mouse number (1, 2, ...)
-  CS_PURE_METHOD static int GetNumber(const iEvent *event);
-  /// retrieve X value of mouse #1
+  /// Retrieve mouse number (1, 2, ...)
+  CS_PURE_METHOD static uint GetNumber(const iEvent *event);
+  /// Retrieve X value of mouse #1
   CS_PURE_METHOD static int GetX(const iEvent *event)
   { return csMouseEventHelper::GetAxis(event, 1); }
-  /// retrieve Y value of mouse #1
+  /// Retrieve Y value of mouse #1
   CS_PURE_METHOD static int GetY(const iEvent *event)
   { return csMouseEventHelper::GetAxis(event, 2); }
-  /// retrieve any axis (basis 1) value
-  CS_PURE_METHOD static int GetAxis(const iEvent *event, int axis);
-  /// retrieve number of axes
-  CS_PURE_METHOD static int GetNumAxes(const iEvent *event);
-  /// retrieve button code
-  CS_PURE_METHOD static int GetButton(const iEvent *event);
-  /// retrieve modifier flags
+  /// Retrieve any axis (basis 1) value
+  CS_PURE_METHOD static int GetAxis(const iEvent *event, uint axis);
+  /// Retrieve number of axes
+  CS_PURE_METHOD static uint GetNumAxes(const iEvent *event);
+  /// Retrieve button code
+  CS_PURE_METHOD static uint GetButton(const iEvent *event);
+  /// Retrieve modifier flags
   CS_PURE_METHOD static void GetModifiers(const iEvent *event, 
     csKeyModifiers& modifiers) 
   { csKeyEventHelper::GetModifiers(event, modifiers); }
-  /// retrieve modifiers bitmask
+  /// Retrieve modifiers bitmask
   CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) 
   { 
     csKeyModifiers modifiers; 
     csKeyEventHelper::GetModifiers(event, modifiers); 
     return csKeyEventHelper::GetModifiersBits(modifiers); 
   }
-  /// retrieve event dataa
+  /// Retrieve event data
   CS_PURE_METHOD static bool GetEventData (const iEvent* event, 
     csMouseEventData& data);
 };
@@ -128,31 +128,31 @@ public:
 class CS_CRYSTALSPACE_EXPORT csJoystickEventHelper
 {
 public:
-  /// retrieve joystick number (1, 2, ...)
-  CS_PURE_METHOD static int GetNumber(const iEvent *event);
-  /// retrieve axis 0 value
+  /// Retrieve joystick number (1, 2, ...)
+  CS_PURE_METHOD static uint GetNumber(const iEvent *event);
+  /// Retrieve axis 0 value
   CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetX(const iEvent *event) 
   { return csJoystickEventHelper::GetAxis(event, 1); }
-  /// retrieve axis 1 value
+  /// Retrieve axis 1 value
   CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetY(const iEvent *event) 
   { return csJoystickEventHelper::GetAxis(event, 2); }
-  /// retrieve any axis (basis 1) value
-  CS_PURE_METHOD static int GetAxis(const iEvent *event, int);
-  /// retrieve number of axes
-  CS_PURE_METHOD static uint8 GetNumAxes(const iEvent *);
-  /// retrieve button number
-  CS_PURE_METHOD static int GetButton(const iEvent *event);
-  /// retrieve modifier flags
+  /// Retrieve any axis (basis 1) value
+  CS_PURE_METHOD static int GetAxis(const iEvent *event, uint);
+  /// Retrieve number of axes
+  CS_PURE_METHOD static uint GetNumAxes(const iEvent *);
+  /// Retrieve button number
+  CS_PURE_METHOD static uint GetButton(const iEvent *event);
+  /// Retrieve modifier flags
   static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) 
   { csKeyEventHelper::GetModifiers(event, modifiers); }
-  /// retrieve modifiers bitmask
+  /// Retrieve modifiers bitmask
   CS_PURE_METHOD static uint32 GetModifiers(const iEvent *event) 
   { 
     csKeyModifiers modifiers; 
     csKeyEventHelper::GetModifiers(event, modifiers); 
     return csKeyEventHelper::GetModifiersBits(modifiers); 
   }
-  /// retrieve event dataa
+  /// Retrieve event data
   static bool GetEventData (const iEvent* event, csJoystickEventData& data);
 };
 
@@ -166,11 +166,11 @@ public:
 class CS_CRYSTALSPACE_EXPORT csCommandEventHelper
 {
 public:
-  /// retrieve command code
+  /// Retrieve command code
   CS_PURE_METHOD static uint GetCode(const iEvent *event);
-  /// retrieve command info
+  /// Retrieve command info
   CS_PURE_METHOD static intptr_t GetInfo(const iEvent *event);
-  /// retrieve event dataa
+  /// Retrieve event data
   static bool GetEventData (const iEvent* event, csCommandEventData& data);
 };
 

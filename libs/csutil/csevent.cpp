@@ -79,25 +79,25 @@ csEvent::csEvent ()
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
-		  int mButton, int mModifiers) : attributes (53)
+		  uint mButton, uint32 mModifiers) : attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
 
-  Add("mNumber", 1);
-  int axes[2] = { mx, my };
-  Add("mAxes", (void *) axes, 2 * sizeof(int)); /* copies array for us */
-  Add("mNumAxes", 2);
-  Add("mButton", mButton);
-  Add("keyModifiers", mModifiers);
+  Add("mNumber", (uint8)1);
+  int32 axes[2] = { mx, my };
+  Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
+  Add("mNumAxes", (uint8)2);
+  Add("mButton", (uint8)mButton);
+  Add("keyModifiers", (uint32)mModifiers);
 
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int n, int x, int y, 
-		  uint32 axesChanged, int button, int modifiers) : 
+csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y, 
+		  uint32 axesChanged, uint button, uint32 modifiers) : 
   attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -105,32 +105,35 @@ csEvent::csEvent (csTicks iTime, int eType, int n, int x, int y,
   Type = eType;
   Category = SubCategory = Flags = 0;
 
-  int axes[2] = { x, y };
+  int32 axes[2] = { x, y };
 
   CS_ASSERT((eType >= csevJoystickMove && eType <= csevJoystickUp) ||
 	    (eType >= csevMouseMove && eType <= csevMouseDoubleClick));
 
-  if (eType >= csevJoystickMove && eType <= csevJoystickUp) {
-    Add("jsNumber", n);
-    Add("jsAxes", (void *) axes, 2 * sizeof(int)); /* copies array for us */
-    Add("jsNumAxes", 2);
+  if (eType >= csevJoystickMove && eType <= csevJoystickUp) 
+  {
+    Add("jsNumber", (uint8)n);
+    Add("jsAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
+    Add("jsNumAxes", (uint8)2);
     Add("jsAxesChanged", axesChanged);
-    Add("jsButton", button);
-  } else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) {
-    Add("mNumber", n);
-    Add("mAxes", (void *) axes, 2 * sizeof(int)); /* copies array for us */
-    Add("mNumAxes", 2);
+    Add("jsButton", (uint8)button);
+  } 
+  else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) 
+  {
+    Add("mNumber", (uint8)n);
+    Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
+    Add("mNumAxes", (uint8)2);
     Add("mAxesChanged", axesChanged);
-    Add("mButton", button);
+    Add("mButton", (uint8)button);
   }
   Add("keyModifiers", modifiers);
 
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int n, const int *axes, 
-		  uint8 numAxes, uint32 axesChanged, int button, 
-		  int modifiers) : attributes (53)
+csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes, 
+		  uint8 numAxes, uint32 axesChanged, uint8 button, 
+		  uint32 modifiers) : attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
 
@@ -141,34 +144,37 @@ csEvent::csEvent (csTicks iTime, int eType, int n, const int *axes,
   CS_ASSERT((eType >= csevJoystickMove && eType <= csevJoystickUp) ||
 	    (eType >= csevMouseMove && eType <= csevMouseDoubleClick));
 
-  if (eType >= csevJoystickMove && eType <= csevJoystickUp) {
-    Add("jsNumber", n);
-    Add("jsAxes", (void *) axes, numAxes * sizeof(int)); 
+  if (eType >= csevJoystickMove && eType <= csevJoystickUp) 
+  {
+    Add("jsNumber", (uint8)n);
+    Add("jsAxes", (void *) axes, numAxes * sizeof(int32)); 
     /* copies array for us */
-    Add("jsNumAxes", numAxes);
+    Add("jsNumAxes", (uint8)numAxes);
     Add("jsAxesChanged", axesChanged);
-    Add("jsButton", button);
-  } else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) {
-    Add("mNumber", n);
-    Add("mAxes", (void *) axes, numAxes * sizeof(int));
+    Add("jsButton", (uint8)button);
+  } 
+  else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) 
+  {
+    Add("mNumber", (uint8)n);
+    Add("mAxes", (void *) axes, numAxes * sizeof(int32));
     /* copies array for us */
-    Add("mNumAxes", numAxes);
+    Add("mNumAxes", (uint8)numAxes);
     Add("mAxesChanged", axesChanged);
-    Add("mButton", button);
+    Add("mButton", (uint8)button);
   }
   Add("keyModifiers", modifiers);
 
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int cCode, intptr_t cInfo) :
+csEvent::csEvent (csTicks iTime, int eType, uint cCode, intptr_t cInfo) :
   attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
-  Add("cmdCode", cCode);
+  Add("cmdCode", (uint32)cCode);
   Add("cmdInfo", (int64)cInfo);
   if (eType == csevBroadcast)
     Flags = CSEF_BROADCAST;

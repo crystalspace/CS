@@ -76,7 +76,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
 
     case csevMouseMove:
     {
-      for (int axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
+      for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
       {
         AxisCmd *bind = axisHash.Get
           (csInputDefinition (& ev, axis), 0);
@@ -90,7 +90,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
 
     case csevJoystickMove:
     {
-      for (int axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
+      for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
       {
         AxisCmd *bind = axisHash.Get
           (csInputDefinition (& ev, axis), 0);

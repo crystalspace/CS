@@ -18,6 +18,9 @@ chronological order.
 	  compiler to configure.ac.
 	- Eric Sunshine fixed bug in apps/tutorial/phystut/Jamfile where it
 	  lacked an ExternalLibs invocation for ODE.
+	- res added some explicit types at some places where event property bag
+	  functions are used for mouse/joystick events to pacify pickier gccs.
+	  Also changed some ints to uints where appropriate.
 4-Jun-2005
 	- Eric Sunshine worked around problem where Apple/Tiger's gcc4 rejects
 	  -fvisibility-inlines-hidden in Objective-C++ mode. (This fix is

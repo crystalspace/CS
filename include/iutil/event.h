@@ -178,16 +178,16 @@ struct csMouseEventData
   /// Mouse y (same as axes[1])
   int y;
   /// Mouse axis values
-  int axes[CS_MAX_MOUSE_AXES];
+  int32 axes[CS_MAX_MOUSE_AXES];
   /// Mouse axis count
-  int numAxes;
+  uint numAxes;
   /**
    * Button number.
    * \sa csMouseButton
    */
-  int Button;
+  uint Button;
   /// Control key state
-  int Modifiers;
+  uint32 Modifiers;
 };
 
 /**
@@ -200,17 +200,17 @@ struct csMouseEventData
 struct csJoystickEventData
 {
   /// Joystick number (1, 2, ...)       
-  int number;
+  uint number;
   /// Joystick axis values
-  int axes[CS_MAX_JOYSTICK_AXES];
+  int32 axes[CS_MAX_JOYSTICK_AXES];
   /// Axes count
-  uint8 numAxes;
+  uint numAxes;
   /// Axes change mask
   uint32 axesChanged;
   /// Joystick button number
-  int Button;
+  uint Button;
   /// Control key state
-  int Modifiers;
+  uint32 Modifiers;
 };
 
 /**

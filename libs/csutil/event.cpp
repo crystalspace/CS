@@ -116,38 +116,40 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
   return res;
 }
 
-int csMouseEventHelper::GetNumber (const iEvent *event)
+//---------------------------------------------------------------------------
+
+uint csMouseEventHelper::GetNumber (const iEvent *event)
 {
-  int res = 0;
+  uint8 res = 0;
   event->Retrieve("mNumber", res);
   return res;
 }
 
-int csMouseEventHelper::GetAxis (const iEvent *event, int axis)
+int csMouseEventHelper::GetAxis (const iEvent *event, uint axis)
 {
   const void *_xs; size_t _xs_sz;
-  int axs;
+  uint8 axs;
   if (event->Retrieve("mAxes", _xs, _xs_sz) != csEventErrNone)
     return 0;
   if (event->Retrieve("mNumAxes", axs) != csEventErrNone)
     return 0;
-  const int *axdata = (int *) _xs;
+  const int32 *axdata = (int32 *) _xs;
   if ((axis > 0) && (axis <= axs))
     return axdata[axis - 1];
   else
     return 0;
 }
 
-int csMouseEventHelper::GetButton (const iEvent *event)
+uint csMouseEventHelper::GetButton (const iEvent *event)
 {
-  int res = 0;
+  uint8 res = 0;
   event->Retrieve("mButton", res);
   return res;
 }
 
-int csMouseEventHelper::GetNumAxes(const iEvent *event)
+uint csMouseEventHelper::GetNumAxes(const iEvent *event)
 {
-  int res = 0;
+  uint8 res = 0;
   event->Retrieve("mNumAxes", res);
   return res;
 }
@@ -158,37 +160,42 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
   if (!CS_IS_MOUSE_EVENT (*event)) return false;
 
   const void *_ax = 0; size_t _ax_sz = 0;
+  uint8 ui8;
   csEventError ok = csEventErrNone;
   ok = event->Retrieve("mAxes", _ax, _ax_sz);
   CS_ASSERT(ok == csEventErrNone);
-  ok = event->Retrieve("mNumAxes", data.numAxes);
+  ok = event->Retrieve("mNumAxes", ui8);
   CS_ASSERT(ok == csEventErrNone);
-  for (int iter=0 ; iter<CS_MAX_MOUSE_AXES ; iter++) {
+  data.numAxes = ui8;
+  for (uint iter=0 ; iter<CS_MAX_MOUSE_AXES ; iter++) {
     if (iter<data.numAxes)
-      data.axes[iter] = ((int *)_ax)[iter];
+      data.axes[iter] = ((int32*)_ax)[iter];
     else
       data.axes[iter] = 0;
   }
   data.x = data.axes[0];
   data.y = data.axes[1];
-  ok = event->Retrieve("mButton", data.Button);
+  ok = event->Retrieve("mButton", ui8);
   CS_ASSERT(ok == csEventErrNone);
+  data.Button = ui8;
   ok = event->Retrieve("keyModifiers", data.Modifiers);
   CS_ASSERT(ok == csEventErrNone);
   return true;
 }
 
-int csJoystickEventHelper::GetNumber(const iEvent *event)
+//---------------------------------------------------------------------------
+
+uint csJoystickEventHelper::GetNumber(const iEvent *event)
 {
-  int res = 0;
+  uint8 res = 0;
   event->Retrieve("jsNumber", res);
   return res;
 }
 
-int csJoystickEventHelper::GetAxis(const iEvent *event, int axis)
+int csJoystickEventHelper::GetAxis(const iEvent *event, uint axis)
 {
   const void *_xs; size_t _xs_sz;
-  int axs;
+  uint8 axs;
   if (event->Retrieve("jsAxes", _xs, _xs_sz) != csEventErrNone)
     return 0;
   if (event->Retrieve("jsNumAxes", axs) != csEventErrNone)
@@ -200,14 +207,14 @@ int csJoystickEventHelper::GetAxis(const iEvent *event, int axis)
     return 0;
 }
 
-int csJoystickEventHelper::GetButton(const iEvent *event)
+uint csJoystickEventHelper::GetButton(const iEvent *event)
 {
-  int res = 0;
+  uint8 res = 0;
   event->Retrieve("jsButton", res);
   return res;
 }
 
-uint8 csJoystickEventHelper::GetNumAxes(const iEvent *event)
+uint csJoystickEventHelper::GetNumAxes(const iEvent *event)
 {
   uint8 res = 0;
   event->Retrieve("jsNumAxes", res);
@@ -220,31 +227,37 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   if (!CS_IS_JOYSTICK_EVENT (*event)) return false;
   
   const void *_ax = 0; size_t _ax_sz = 0;
+  uint8 ui8;
   csEventError ok = csEventErrNone;
-  ok = event->Retrieve("jsNumber", data.number);
+  ok = event->Retrieve("jsNumber", ui8);
+  data.number = ui8;
   CS_ASSERT(ok == csEventErrNone);
   ok = event->Retrieve("jsAxes", _ax, _ax_sz);
   CS_ASSERT(ok == csEventErrNone);
-  ok = event->Retrieve("jsNumAxes", data.numAxes);
+  ok = event->Retrieve("jsNumAxes", ui8);
+  data.numAxes = ui8;
   CS_ASSERT(ok == csEventErrNone);
-  for (int iter=0 ; iter<CS_MAX_JOYSTICK_AXES ; iter++) {
+  for (uint iter=0 ; iter<CS_MAX_JOYSTICK_AXES ; iter++) {
     if (iter<data.numAxes)
-      data.axes[iter] = ((int *)_ax)[iter];
+      data.axes[iter] = ((int32 *)_ax)[iter];
     else
       data.axes[iter] = 0;
   }
   ok = event->Retrieve("jsAxesChanged", data.axesChanged);
   CS_ASSERT(ok == csEventErrNone);
-  ok = event->Retrieve("jsButton", data.Button);
+  ok = event->Retrieve("jsButton", ui8);
   CS_ASSERT(ok == csEventErrNone);
+  data.Button = ui8;
   ok = event->Retrieve("keyModifiers", data.Modifiers);
   CS_ASSERT(ok == csEventErrNone);
   return true;
 }
 
+//---------------------------------------------------------------------------
+
 uint csCommandEventHelper::GetCode(const iEvent* event)
 {
-  uint res = 0;
+  uint32 res = 0;
   event->Retrieve("cmdCode", res);
   return res;
 }
@@ -262,8 +275,10 @@ bool csCommandEventHelper::GetEventData(const iEvent* event,
   if (!CS_IS_COMMAND_EVENT (*event)) return false;
 
   csEventError ok = csEventErrNone;
-  ok = event->Retrieve("cmdCode", data.Code);
+  uint32 ui32;
+  ok = event->Retrieve("cmdCode", ui32);
   CS_ASSERT(ok == csEventErrNone);
+  data.Code = ui32;
   int64 ipt;
   ok = event->Retrieve("cmdInfo", ipt);
   data.Info = ipt;
