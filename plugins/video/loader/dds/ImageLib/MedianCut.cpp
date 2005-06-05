@@ -46,7 +46,7 @@ void MedianCut::ResetTree(void)
 
 	for(int i=0; i<PoolUsed; i++)
 	{
-		TreePool[i].SplitAxis = -1;
+		TreePool[i].SplitAxis = (char)-1;
 		TreePool[i].pLessEqual = NULL;
 		TreePool[i].pGreater = NULL;
 	}
@@ -197,7 +197,7 @@ long i, Diff, BestIndex = 0, BestDiff = 0x7fffffff;
 
 TreeNode::TreeNode()
 {
-	SplitAxis = -1;
+	SplitAxis = (char)-1;
 	pLessEqual = pGreater = NULL;
 }
 
