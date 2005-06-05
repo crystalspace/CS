@@ -373,6 +373,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
 
   oper_arg tmp;
   tmp.type = TYPE_INVALID;
+  tmp.vec4.Set(0.0f);
   accstack.SetLength(MAX(acc_top, accstack_max) + 1, tmp);
 
   destruct_cons(head);

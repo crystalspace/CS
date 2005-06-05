@@ -49,7 +49,7 @@ public:
    */
   csRenderBufferLock (iRenderBuffer* buf, 
     csRenderBufferLockType lock = CS_BUF_LOCK_NORMAL) : buffer(buf),
-    lockType(lock), isLocked(false), bufOfs(buf->GetOffset()),
+    lockType(lock), isLocked(false), lockBuf(0), bufOfs(buf->GetOffset()),
     bufStride(buf->GetElementDistance())
   {
   }
