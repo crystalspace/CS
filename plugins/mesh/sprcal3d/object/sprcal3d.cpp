@@ -1744,7 +1744,7 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
 
       csRef<iRenderBufferAccessor> accessor (
 	csPtr<iRenderBufferAccessor> (new BaseAccessor (this, (int)m, (int)s)));
-      rm.buffers->SetAccessor (accessor, CS_BUFFER_ALL_MASK);
+      rm.buffers->SetAccessor (accessor, (uint32)CS_BUFFER_ALL_MASK);
 
       allRenderMeshes.Push (&rm);
     }
