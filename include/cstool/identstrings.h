@@ -88,7 +88,7 @@ public:
  * \endcode
  */
 #define CS_IDENT_STRING_LIST(ListName)					\
-  static csIdentStrings::csIdentString ListName##_strings[] = {
+  static const csIdentStrings::csIdentString ListName##_strings[] = {
 /**
  * Entry in the identifier list.
  * \remark The identifiers <b>*must*</b> be sorted in increasing order.

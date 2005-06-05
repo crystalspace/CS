@@ -510,7 +510,7 @@ struct iEventOutlet : public iBase
    * respective location. iButton can be in the range from 1 to
    * CS_MAX_MOUSE_BUTTONS (or 0 for mouse move event).
    */
-  virtual void Mouse (int iButton, bool iDown, int x, int y) = 0;
+  virtual void Mouse (uint iButton, bool iDown, int x, int y) = 0;
 
   /**
    * Put a joystick event into event queue.<p>
@@ -520,8 +520,8 @@ struct iEventOutlet : public iBase
    * Otherwise an joystick up/down event is generated. iButton can be from
    * 1 to CS_MAX_JOYSTICK_BUTTONS (or 0 for a joystick move event).
    */
-  virtual void Joystick(int iNumber, int iButton, bool iDown, 
-    const int *axes, uint8 numAxes) = 0;
+  virtual void Joystick(uint iNumber, uint iButton, bool iDown, 
+    const int32 *axes, uint numAxes) = 0;
 
   /**
    * Put a broadcast event into event queue.<p>
@@ -532,7 +532,7 @@ struct iEventOutlet : public iBase
    * has been closed (cscmdContextClose), to finish the application
    * immediately (cscmdQuit) and so on.
    */
-  virtual void Broadcast (int iCode, intptr_t iInfo = 0) = 0;
+  virtual void Broadcast (uint iCode, intptr_t iInfo = 0) = 0;
 
   /**
    * This is a special routine which is called for example when the
@@ -549,7 +549,7 @@ struct iEventOutlet : public iBase
    * chance to process any events only after it will be resumed (which
    * is kind of too late to process this kind of events).
    */
-  virtual void ImmediateBroadcast (int iCode, intptr_t iInfo) = 0;
+  virtual void ImmediateBroadcast (uint iCode, intptr_t iInfo) = 0;
 };
 
 SCF_VERSION (iEventCord, 0, 0, 3);

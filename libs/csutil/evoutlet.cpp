@@ -89,13 +89,14 @@ void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
   }
 }
 
-void csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
+void csEventOutlet::Mouse (uint iButton, bool iDown, int x, int y)
 {
-  int axes[2] = { x, y };
+  int32 axes[2] = { x, y };
   Mouse(1, iButton, iDown, axes, 2);
 }
 
-void csEventOutlet::Mouse (int iNumber, int iButton, bool iDown, const int *axes, uint8 numAxes)
+void csEventOutlet::Mouse (uint iNumber, uint iButton, bool iDown, const int32 *axes, 
+                           uint numAxes)
 {
   if (EnableMask & CSEVTYPE_Mouse)
   {
@@ -110,8 +111,8 @@ void csEventOutlet::Mouse (int iNumber, int iButton, bool iDown, const int *axes
   }
 }
 
-void csEventOutlet::Joystick (int iNumber, int iButton,
-			      bool iDown, const int *axes, uint8 numAxes)
+void csEventOutlet::Joystick (uint iNumber, uint iButton,
+			      bool iDown, const int32 *axes, uint numAxes)
 {
   if (EnableMask & CSEVTYPE_Joystick)
   {
@@ -126,13 +127,13 @@ void csEventOutlet::Joystick (int iNumber, int iButton,
   }
 }
 
-void csEventOutlet::Broadcast (int iCode, intptr_t iInfo)
+void csEventOutlet::Broadcast (uint iCode, intptr_t iInfo)
 {
   Queue->Post (csRef<iEvent> (csPtr<iEvent>
     (new csEvent (csGetTicks (), csevBroadcast, iCode, iInfo))));
 }
 
-void csEventOutlet::ImmediateBroadcast (int iCode, intptr_t iInfo)
+void csEventOutlet::ImmediateBroadcast (uint iCode, intptr_t iInfo)
 {
   csEvent Event (csGetTicks (), csevBroadcast, iCode, iInfo);
   Queue->Dispatch (Event);

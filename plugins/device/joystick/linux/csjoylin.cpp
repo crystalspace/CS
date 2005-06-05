@@ -91,7 +91,7 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
     joydata& jd = joystick[i];
     while (read (jd.fd, &js, sizeof(js)) == sizeof(js)) 
     {
-      int axisread[CS_MAX_LINUX_JOYSTICK_AXES];
+      int32 axisread[CS_MAX_LINUX_JOYSTICK_AXES];
       for (int iter=0 ; 
 	   iter<MIN(jd.nAxes,CS_MAX_LINUX_JOYSTICK_AXES) ; 
 	   iter++)

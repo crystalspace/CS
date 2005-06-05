@@ -170,7 +170,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
 
 const char* csRenderBuffer::GetDescrFromBufferName (csRenderBufferName bufferName)
 {
-  static const char* bufferDescr[CS_BUFFER_COUNT] = {
+  static const char* const bufferDescr[CS_BUFFER_COUNT] = {
     "index", "position", "normal", "primary color", "lit color", 
     "texture coordinate 0", "texture coordinate 1", 
     "texture coordinate 2", "texture coordinate 3", 

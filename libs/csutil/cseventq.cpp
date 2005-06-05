@@ -208,8 +208,8 @@ void csEventQueue::EndLoop ()
 void csEventQueue::Notify (unsigned int pseudo_event)
 {
   csRef<iEvent> e(CreateEvent(csevBroadcast));
-  e->Add("cmdCode", pseudo_event);
-  e->Add("cmdInfo", 0);
+  e->Add("cmdCode", (uint32)pseudo_event);
+  e->Add("cmdInfo", (uint32)0);
 
   StartLoop ();
   for (size_t i = Listeners.Length(); i > 0; i--)

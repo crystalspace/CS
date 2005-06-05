@@ -412,8 +412,8 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   CS_ASSERT (EventQueue != 0);
   csRef<iEvent> e(EventQueue->CreateEvent(csevBroadcast));
-  e->Add("cmdCode", cscmdSystemOpen);
-  e->Add("cmdInfo", 0);
+  e->Add("cmdCode", (uint32)cscmdSystemOpen);
+  e->Add("cmdInfo", (uint32)0);
   EventQueue->Dispatch(*e);
 
   return true;
@@ -426,8 +426,8 @@ void csInitializer::CloseApplication (iObjectRegistry* r)
   if (EventQueue)
   {
     csRef<iEvent> e(EventQueue->CreateEvent(csevBroadcast));
-    e->Add("cmdCode", cscmdSystemClose);
-    e->Add("cmdInfo", 0);
+    e->Add("cmdCode", (uint32)cscmdSystemClose);
+    e->Add("cmdInfo", (uint32)0);
     EventQueue->Dispatch(*e);
   }
 }

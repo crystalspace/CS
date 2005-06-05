@@ -62,7 +62,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
 	    && (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
 
       BtnCmd *bind = btnHash.Get
-        (csInputDefinition (& ev, CSMASK_ALLMODIFIERS), 0);
+        (csInputDefinition (& ev, CSMASK_ALLMODIFIERS, false), 0);
       if (! bind) return false;
 
       if (bind->toggle)
@@ -79,7 +79,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
       for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
       {
         AxisCmd *bind = axisHash.Get
-          (csInputDefinition (& ev, axis), 0);
+          (csInputDefinition (& ev, (uint8)axis), 0);
 
         if (bind) bind->val = 
 	  csMouseEventHelper::GetAxis(&ev, axis);
@@ -93,7 +93,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
       for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
       {
         AxisCmd *bind = axisHash.Get
-          (csInputDefinition (& ev, axis), 0);
+          (csInputDefinition (& ev, (uint8)axis), 0);
 
         if (bind) bind->val = 
 	  csJoystickEventHelper::GetAxis(&ev, axis);

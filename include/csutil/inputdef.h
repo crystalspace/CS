@@ -90,7 +90,7 @@ public:
    * \param event The event to analyse for input data.
    * \param axis Events include all axes, so choose: 0 = x, 1 = y.
    */
-  csInputDefinition (iEvent *event, int axis);
+  csInputDefinition (iEvent *event, uint8 axis);
 
   /**
    * Construct an input description from a string.

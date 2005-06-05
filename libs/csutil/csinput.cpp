@@ -617,7 +617,7 @@ void csMouseDriver::Reset ()
     for (int j = 0; j < CS_MAX_MOUSE_BUTTONS; j++)
       if (Button [i][j])
 	DoButton (i + 1, j + 1, false, Last[i], Axes[i]);
-    LastClickButton[i] = -1;
+    LastClickButton[i] = (uint)-1;
   }
 }
 
@@ -634,7 +634,8 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *   support to fix.
  */
-void csMouseDriver::DoButton (int number, int button, bool down, const int *axes, uint8 numAxes)
+void csMouseDriver::DoButton (uint number, uint button, bool down, 
+                              const int32 *axes, uint numAxes)
 {
   if (number <= 0 || number > CS_MAX_MOUSE_COUNT)
     return;
@@ -662,7 +663,7 @@ void csMouseDriver::DoButton (int number, int button, bool down, const int *axes
 
   if ((button == LastClickButton[number - 1])
       && (evtime - LastClickTime[number - 1] <= DoubleClickTime)) {
-    for (int iter=0 ; iter<Axes[number - 1] ; iter++)
+    for (uint iter=0 ; iter<Axes[number - 1] ; iter++)
       if (unsigned (ABS (axes[iter] - LastClick[number - 1][iter])) > DoubleClickDist)
 	goto mousedown;
     csRef<iEvent> ev;
@@ -672,7 +673,7 @@ void csMouseDriver::DoButton (int number, int button, bool down, const int *axes
     Post (ev);
     // Don't allow for sequential double click events
     if (down)
-      LastClickButton [number - 1] = -1;
+      LastClickButton [number - 1] = (uint)-1;
   }
   else if (down)
   {
@@ -680,7 +681,7 @@ void csMouseDriver::DoButton (int number, int button, bool down, const int *axes
     // Remember the coordinates/button/position of last mousedown event
     LastClickButton[number - 1] = button;
     LastClickTime[number - 1] = evtime;
-    for (int iter=0; iter<Axes[number - 1]; iter++)
+    for (uint iter=0; iter<Axes[number - 1]; iter++)
       LastClick[number - 1][iter] = axes[iter];
   }
 }
@@ -691,13 +692,13 @@ void csMouseDriver::DoButton (int number, int button, bool down, const int *axes
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *   support to fix.
  */
-void csMouseDriver::DoMotion (int number, const int *axes, uint8 numAxes)
+void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 {
   uint32 cflags = 0;
   if (number <= 0 || number > CS_MAX_MOUSE_COUNT)
     return;
 
-  for (int iter=0; iter<numAxes ; iter++)
+  for (uint iter=0; iter<numAxes ; iter++)
     if (Last [number - 1][iter] != axes[iter])
       cflags |= (1 << iter);
 
@@ -775,8 +776,8 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *  support to fix.
  */
-void csJoystickDriver::DoButton (int number, int button, bool down,
-				 const int *axes, uint8 numAxes)
+void csJoystickDriver::DoButton (uint number, uint button, bool down,
+				 const int32 *axes, uint numAxes)
 {
   if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
@@ -807,13 +808,13 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *  support to fix.
  */
-void csJoystickDriver::DoMotion (int number, const int *axes, uint8 numAxes)
+void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 {
   uint32 cflags = 0;
   if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
 
-  for (int iter=0 ; iter<numAxes ; iter++)
+  for (uint iter=0 ; iter<numAxes ; iter++)
     if (Last[number - 1][iter] != axes[iter])
       cflags |= (1 << iter);
 

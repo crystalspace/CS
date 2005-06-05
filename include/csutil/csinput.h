@@ -204,12 +204,12 @@ protected:
   /// Last "mouse down" event time
   csTicks LastClickTime[CS_MAX_MOUSE_COUNT];
   /// Last "mouse down" event button
-  int LastClickButton[CS_MAX_MOUSE_COUNT];
+  uint LastClickButton[CS_MAX_MOUSE_COUNT];
   /// Last "mouse down" event position
   int LastClick [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
   /// Last mouse positions
-  int Last [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
-  uint8 Axes [CS_MAX_MOUSE_COUNT];
+  int32 Last [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
+  uint Axes [CS_MAX_MOUSE_COUNT];
   /// Mouse buttons state
   bool Button [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_BUTTONS];
   /// Mouse double click max interval in 1/1000 seconds
@@ -233,22 +233,18 @@ public:
   /// Call to release all mouse buttons.
   virtual void Reset ();
 
-  /// Query last mouse X position for mouse #1
-  CS_PURE_METHOD virtual int GetLastX () const { return GetLastX(1); }
-  /// Query last mouse Y position for mouse #1
-  CS_PURE_METHOD virtual int GetLastY () const { return GetLastY(1); }
   /// Query last mouse X position for mouse #n (1, 2, ...)
-  CS_PURE_METHOD virtual int GetLastX (int n) const { return Last[n - 1][0]; }
+  CS_PURE_METHOD virtual int GetLastX (uint n) const { return Last[n - 1][0]; }
   /// Query last mouse Y position for mouse #n (1, 2, ...)
-  CS_PURE_METHOD virtual int GetLastY (int n) const { return Last[n - 1][1]; }
+  CS_PURE_METHOD virtual int GetLastY (uint n) const { return Last[n - 1][1]; }
   /// Query last mouse position on axis ax (1, 2, ...) for mouse n (1, 2, ...)
-  CS_PURE_METHOD virtual int GetLast (int n, uint8 axis) const { return Last[n - 1][axis - 1]; }
+  CS_PURE_METHOD virtual int GetLast (uint n, uint axis) const { return Last[n - 1][axis - 1]; }
   /// Query last mouse axis array for mouse n (1, 2, ...)
-  CS_PURE_METHOD virtual const int *GetLast (int n) const { return Last [n - 1]; }
+  CS_PURE_METHOD virtual const int32 *GetLast (uint n) const { return Last [n - 1]; }
   /// Query the last known mouse button state for mouse #1
-  CS_PURE_METHOD virtual bool GetLastButton (int button) const { return GetLastButton(1, button); }
+  CS_PURE_METHOD virtual bool GetLastButton (uint button) const { return GetLastButton(1, button); }
   /// Query the last known mouse button state
-  CS_PURE_METHOD virtual bool GetLastButton (int number, int button) const
+  CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
   {
     return (number > 0 && number <= CS_MAX_MOUSE_COUNT
 	    && button > 0 && button <= CS_MAX_MOUSE_BUTTONS) ?
@@ -256,17 +252,17 @@ public:
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
-  virtual void DoButton (int number, int button, bool down, const int *axes, uint8 numAxes);
-  virtual void DoButton (int button, bool down, const int *axes, uint8 numAxes) 
+  virtual void DoButton (uint number, uint button, bool down, const int32 *axes, uint numAxes);
+  virtual void DoButton (uint button, bool down, const int32 *axes, uint numAxes) 
   { DoButton (1, button, down, axes, numAxes); }
-  virtual void DoButton (int button, bool down, int x, int y)
-  { int axes[2] = {x, y}; DoButton (1, button, down, axes, 2); }
+  virtual void DoButton (uint button, bool down, int x, int y)
+  { int32 axes[2] = {x, y}; DoButton (1, button, down, axes, 2); }
   /// Call this to add a 'mouse moved' event to queue
-  virtual void DoMotion (int number, const int *axes, uint8 numAxes);
-  virtual void DoMotion (const int *axes, uint8 numAxes) 
+  virtual void DoMotion (uint number, const int32 *axes, uint numAxes);
+  virtual void DoMotion (const int32 *axes, uint numAxes) 
   { DoMotion (1, axes, numAxes); }
   virtual void DoMotion (int x, int y)
-  { int axes[2] = {x, y}; DoMotion (1, axes, 2); }
+  { int32 axes[2] = {x, y}; DoMotion (1, axes, 2); }
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { }
@@ -297,8 +293,8 @@ protected:
   /// Joystick button states
   bool Button [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_BUTTONS];
   /// Joystick axis positions
-  int Last [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_AXES];
-  uint8 Axes [CS_MAX_JOYSTICK_COUNT];
+  int32 Last [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_AXES];
+  uint Axes [CS_MAX_JOYSTICK_COUNT];
   /// Get the generic keyboard driver (for checking modifier states).
   iKeyboardDriver* GetKeyboardDriver();
 
@@ -314,17 +310,17 @@ public:
   virtual void Reset ();
 
   /// Query last joystick X position
-  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (int number) const 
+  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (uint number) const 
   { return Last [number - 1][0]; }
   /// Query last joystick Y position
-  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (int number) const 
+  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (uint number) const 
   { return Last [number - 1][1]; }
-  CS_PURE_METHOD virtual const int *GetLast (int number) const 
+  CS_PURE_METHOD virtual const int32 *GetLast (uint number) const 
   { return Last [number - 1]; }
-  CS_PURE_METHOD virtual int GetLast (int number, uint8 axis) const 
+  CS_PURE_METHOD virtual int GetLast (uint number, uint axis) const 
   { return Last [number - 1][axis - 1]; }
   /// Query the last known joystick button state
-  CS_PURE_METHOD virtual bool GetLastButton (int number, int button) const
+  CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
   {
     return (number > 0 && number <= CS_MAX_JOYSTICK_COUNT
          && button > 0 && button <= CS_MAX_JOYSTICK_BUTTONS) ?
@@ -332,10 +328,10 @@ public:
   }
 
   /// Call this to add a 'joystick button down/up' event to queue
-  virtual void DoButton (int number, int button, bool down, 
-    const int *axes, uint8 numAxes);
+  virtual void DoButton (uint number, uint button, bool down, 
+    const int32 *axes, uint numAxes);
   /// Call this to add a 'joystick moved' event to queue
-  virtual void DoMotion (int number, const int *axes, uint8 numAxes);
+  virtual void DoMotion (uint number, const int32 *axes, uint numAxes);
 
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }

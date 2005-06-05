@@ -207,7 +207,7 @@ csInputDefinition::csInputDefinition (iEvent* ev, uint32 mods, bool cook)
   InitializeFromEvent (ev);
 }
 
-csInputDefinition::csInputDefinition (iEvent* ev, int axis)
+csInputDefinition::csInputDefinition (iEvent* ev, uint8 axis)
 {
   Initialize (0, false);
   mouseAxis = axis;
@@ -216,6 +216,7 @@ csInputDefinition::csInputDefinition (iEvent* ev, int axis)
 
 void csInputDefinition::InitializeFromEvent (iEvent *ev)
 {
+  uint8 ui8;
   switch (ev->Type)
   {
   case csevKeyboard:
@@ -228,7 +229,8 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
   case csevMouseUp:
   case csevMouseDown:
     containedType = csevMouseDown;
-    ev->Retrieve("mButton", mouseButton);
+    ev->Retrieve("mButton", ui8);
+    mouseButton = ui8;
     uint32 mModifiers;
     ev->Retrieve("keyModifiers", mModifiers);
     csKeyEventHelper::GetModifiers (mModifiers, modifiers);
@@ -237,7 +239,8 @@ void csInputDefinition::InitializeFromEvent (iEvent *ev)
   case csevJoystickUp:
   case csevJoystickDown:
     containedType = csevJoystickDown;
-    ev->Retrieve("jsButton", joystickButton);
+    ev->Retrieve("jsButton", ui8);
+    joystickButton = ui8;
     uint32 jModifiers;
     ev->Retrieve("keyModifiers", jModifiers);
     csKeyEventHelper::GetModifiers (jModifiers, modifiers);
