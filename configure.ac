@@ -109,6 +109,9 @@ CS_EMIT_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])
 CS_CHECK_PROGS([MAKEINFO], [makeinfo])
 CS_EMIT_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])
 
+CS_CHECK_TOOLS([HHC], [hhc])
+CS_EMIT_BUILD_PROPERTY([CMD.HHC], [$HHC])
+
 CS_CHECK_PROGS([INSTALL], [install])
 CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
@@ -1445,7 +1448,7 @@ CS_CHECK_LIB3DS_PREPARE
 CS_CHECK_LIB_WITH([3ds],
     [AC_LANG_PROGRAM([[#include <lib3ds/file.h>]],[lib3ds_file_new();])],
     [$srcdir/libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs],
-    [lib3ds-120])
+    [lib3ds, lib3ds-120])
 
 AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
