@@ -11,6 +11,11 @@ chronological order.
 	  Apple/Tiger's gcc4.
 	- Eric Sunshine fixed Swig 1.3.24 issue on Apple/Tiger which resulted
 	  in linker complaining that iBase__DynamicCast was undefined.
+	- Eric Sunshine augmented the 3DS check in configure.ac so that it also
+	  looks for the utility `lib3ds-config', since this is the name of the
+	  script installed by the lib3ds build process.
+	- Eric Sunshine added check for `hhc.exe', the Microsoft HTML Help
+	  compiler to configure.ac.
 4-Jun-2005
 	- Eric Sunshine worked around problem where Apple/Tiger's gcc4 rejects
 	  -fvisibility-inlines-hidden in Objective-C++ mode. (This fix is
