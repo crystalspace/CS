@@ -5,4 +5,5 @@ if $(ODE.AVAILABLE) = "yes"
   Description phystut : "physics tutorial" ;
   Application phystut : [ Wildcard *.cpp *.h ] : noinstall ;
   LinkWith phystut : crystalspace ;
+  ExternalLibs phystut : ODE ;
 }

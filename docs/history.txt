@@ -16,6 +16,8 @@ chronological order.
 	  script installed by the lib3ds build process.
 	- Eric Sunshine added check for `hhc.exe', the Microsoft HTML Help
 	  compiler to configure.ac.
+	- Eric Sunshine fixed bug in apps/tutorial/phystut/Jamfile where it
+	  lacked an ExternalLibs invocation for ODE.
 4-Jun-2005
 	- Eric Sunshine worked around problem where Apple/Tiger's gcc4 rejects
 	  -fvisibility-inlines-hidden in Objective-C++ mode. (This fix is
