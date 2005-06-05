@@ -21,6 +21,10 @@ chronological order.
 	- res added some explicit types at some places where event property bag
 	  functions are used for mouse/joystick events to pacify pickier gccs.
 	  Also changed some ints to uints where appropriate.
+	- Anders added a vertex program rewriter for Cg, since removing the 
+	  old one caused Cg VPs to break on ATI drivers. The new one is much 
+	  simpler than the old one though. Arrays may still be borked, 
+	  so that needs investigation.
 4-Jun-2005
 	- Eric Sunshine worked around problem where Apple/Tiger's gcc4 rejects
 	  -fvisibility-inlines-hidden in Objective-C++ mode. (This fix is

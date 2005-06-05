@@ -268,7 +268,7 @@ void csShaderGLCGCommon::ResetState()
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type)
+  CGGLenum type, bool compiled)
 {
   size_t i;
 
@@ -287,8 +287,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
       cgGetProfileString (profile));
   }
 
-  program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-    programStr, profile, entrypoint ? entrypoint : "main", 
+  program = cgCreateProgram (shaderPlug->context, 
+    compiled ? CG_OBJECT : CG_SOURCE, programStr, 
+    profile, entrypoint ? entrypoint : "main", 
     GetProfileCompilerArgs (profile));
 
   if (!program)
