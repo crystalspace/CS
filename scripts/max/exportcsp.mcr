@@ -45,7 +45,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 	checkbox chkTerrain "Export as Terrain Level" pos:[22,372] width:168 height:26
 	on Test1 open do
 	(
-	   version = 47 as String
+	   version = 48 as String
 	   lblVersion.text = "V."+version
 	
 		-- get room name from custom property
@@ -195,13 +195,18 @@ rollout Test1 "Export Level to CS" width:226 height:450
 	
 		  for m in sceneMaterials do
 		  (
-		    format "m: % \n" m
 		    -- handle Standardmaterials
 			if ((classOf m)==Standardmaterial) then (
 				-- if material not written, add it
 				image = getMatFilename m
 				if (findItem materialsWrittenToWorld image==0 and image!="MATERIALNOTDEFINED") then (
-					format "    <texture name=\"%\"> <file>%</file></texture>\n" image image to:outFile
+				format "m: % \n" m
+					-- handles trasparent materials
+					if (m.mapEnables[7]) then
+						format "    <texture name=\"%\"> <file>%</file><alpha><binary/></alpha></texture>\n" image image to:outFile
+					else 
+						format "    <texture name=\"%\"> <file>%</file></texture>\n" image image to:outFile
+
 					append materialsWrittenToWorld image
 				)
 			)
@@ -211,7 +216,11 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				for subm in m do (
 					image = getMatFilename subm
 					if (findItem materialsWrittenToWorld image==0 and image!="MATERIALNOTDEFINED") then (
-						format "    <texture name=\"%\"> <file>%</file></texture>\n" image image to:outFile
+						format "m: % subm: % \n" m subm
+						if (subm.mapEnables[7]) then
+							format "    <texture name=\"%\"> <file>%</file><alpha><binary/></alpha></texture>\n" image image to:outFile
+						else 
+							format "    <texture name=\"%\"> <file>%</file></texture>\n" image image to:outFile
 						append materialsWrittenToWorld image
 					)
 				)
@@ -434,16 +443,30 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					startaccel = substring startaccel 1 ((startaccel.count)-1)
 					startaccarray = tokenize startaccel ","
 					attractor = getUserProp obj "ATTRACTOR"
-					-- search attractor position using attractor name found in ATTRACTOR entry
-					attractorobj=null
-					for attract in allObjects do if (attract.name==attractor) then attractorobj=attract
-					if (attractorobj==null) then ( format "NO OBJECT FOUND AS ATTRACTOR OF %" obj.name )
-					xattractorobj = (attractorobj.pos.x * xscale) + xrelocate
-					yattractorobj = (attractorobj.pos.y * yscale) + yrelocate
-					zattractorobj = (attractorobj.pos.z * zscale) + zrelocate
-					typeattractor = getUserProp attractorobj "TYPE"
-		
-					attractorforce = getUserProp obj "ATTRACTORFORCE"
+					if (attractor!=undefined) then (
+						-- search attractor position using attractor name found in ATTRACTOR entry
+						attractorobj= getNodeByName attractor
+								--OLD: for attract in allObjects do if (attract.name==attractor) then attractorobj=attract
+						if (attractorobj==null) then ( format "NO OBJECT FOUND AS ATTRACTOR OF %" obj.name )
+						xattractorobj = (attractorobj.pos.x * xscale) + xrelocate
+						yattractorobj = (attractorobj.pos.y * yscale) + yrelocate
+						zattractorobj = (attractorobj.pos.z * zscale) + zrelocate
+						typeattractor = getUserProp attractorobj "TYPE"
+						attractorforce = getUserProp obj "ATTRACTORFORCE"
+					)
+	
+					-- fieldspeed
+					fieldspeed = getUserProp obj "FIELDSPEED"
+					format "fieldspeed: % \n" fieldspeed
+					if (fieldspeed!=undefined) then (
+						index = findString fieldspeed "("
+						fieldspeedtype = lowercase (substring fieldspeed 1 (index-1))
+						format "fieldspeedtype: % \n" fieldspeedtype
+						fieldspeed = substring fieldspeed (index+1) -1
+						fieldspeed = substring fieldspeed 1 ((fieldspeed.count)-1)
+						fieldspeedarray = tokenize fieldspeed ","
+					)
+
 					aging0 = getUserProp obj "AGING0"
 					if (aging0!=undefined) then
 						aging0 = tokenize aging0 ","
@@ -464,7 +487,17 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					format "      <priority>alpha</priority>\n" to:outFile
 					format "      <plugin>emit</plugin>\n" to:outFile
 					format "      <ztest />\n" to:outFile
-					format "      <move> <v x=\"0\" y=\"0\" z=\"0\" /> </move>\n" to:outFile
+
+					if (attractor!=undefined) then (
+						movexpart = 0; moveypart = 0; movezpart = 0
+						startposxpart = xpart; startposypart = ypart ; startposzpart = zpart
+					) else (
+						movexpart = xpart; moveypart = ypart ; movezpart = zpart
+						startposxpart = 0; startposypart = 0 ; startposzpart = 0
+					)
+
+					format "      <move> <v x=\"%\" y=\"%\" z=\"%\" /> </move>\n" movexpart movezpart moveypart to:outFile
+
 					format "      <params>\n" to:outFile
 					format "	    <factory>emitFact</factory> \n" to:outFile
 					if (mixmode == undefined) then
@@ -479,7 +512,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					format "	    <number>%</number> \n" number to:outFile
 					if (regparticle==undefined) then
 					(
-						format "	    <rectparticles width=\"%\" height=\"%\" /> \n" rectparticle2[1] rectparticle2[2] to:outFile
+						format "	    <rectparticles w=\"%\" h=\"%\" /> \n" rectparticle2[1] rectparticle2[2] to:outFile
 					) else (
 						format "	    <regularparticles sides=\"%\" radius=\"%\" /> \n" regparticle2[1] regparticle2[2] to:outFile
 					)
@@ -489,9 +522,9 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					if (startpostype=="emitsphere") then (
 						--pscaled = (startposarray[1]  * xscale) + xrelocate
 						--qscaled = (startposarray[2]  * yscale) + yrelocate
-						format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" p=\"%\" q=\"%\" /></startpos>\n" startpostype xpart zpart ypart startposarray[1] startposarray[2] to:outFile
+						format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" p=\"%\" q=\"%\" /></startpos>\n" startpostype startposxpart startposzpart startposypart startposarray[1] startposarray[2] to:outFile
 					) else if (startpostype=="emitfixed") then
-						format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" /></startpos>\n" startpostype xpart zpart ypart to:outFile
+						format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" /></startpos>\n" startpostype startposxpart startposzpart startposypart to:outFile
 					else if (startpostype=="emitbox") then
 					(
 						format "	    <startpos><%><min x=\"%\" y=\"%\" z=\"%\" /> \n" startpostype startposarray[1] startposarray[2] startposarray[3] to:outFile
@@ -506,8 +539,21 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					) else if (startspeedtype=="emitfixed") then
 						format "	    <startspeed><% x=\"%\" y=\"%\" z=\"%\" /> </startspeed>\n" startspeedtype startspeedarray[1] startspeedarray[2] startspeedarray[3] to:outFile
 					format "	    <startaccel><% x=\"%\" y=\"%\" z=\"%\" /></startaccel>\n" startacctype startaccarray[1] startaccarray[2] startaccarray[3] to:outFile
-					format "	    <attractor> <emitfixed x=\"%\" y=\"%\" z=\"%\" /> </attractor>\n" xattractorobj zattractorobj yattractorobj to:outFile
-					format "	    <attractorforce>%</attractorforce>\n" attractorforce to:outFile
+
+					-- ATTRACTOR
+					if (attractor!=undefined) then (
+						format "	    <attractor> <emitfixed x=\"%\" y=\"%\" z=\"%\" /> </attractor>\n" xattractorobj zattractorobj yattractorobj to:outFile
+						format "	    <attractorforce>%</attractorforce>\n" attractorforce to:outFile
+					)
+
+					-- FIELDSPEED
+                	if (fieldspeedtype=="emitcylindertangent") then
+					(
+						format "        <fieldspeed><% p=\"%\" q=\"%\">\n" fieldspeedtype fieldspeedarray[1] fieldspeedarray[2] to:outFile
+						format "        <min x=\"%\" y=\"%\" z=\"%\" /><max x=\"%\" y=\"%\" z=\"%\" /> \n" fieldspeedarray[3] fieldspeedarray[4] fieldspeedarray[5] fieldspeedarray[6] fieldspeedarray[7] fieldspeedarray[8] to:outFile
+						format "        </emitcylindertangent></fieldspeed>\n" to:outFile
+					)
+
 					if (aging0!=undefined) then
 					(
 						format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging0[1] aging0[2] aging0[3] aging0[4] to:outFile
@@ -591,106 +637,120 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		fn OutputPortal obj debug outFile =
 		(
 			format "    <portal name=\"%\">\n" obj.name to:outFile
-			
+
 			-- all portals as autoresolve
 			format "    <autoresolve />\n" to:outFile
 
 			-- check if poly is valid: for now should be 2 faces MAX!
 			faces = getNumFaces obj
-			if (faces!=2) then (
-				message = "ERROR: Portals with more than 2 triangles are not yet supported!"
+			vertsProp = getUserProp obj "VERTS"
+			if (faces!=2 and vertsProp==undefined) then (
+				message = "ERROR: If you want to add a portals with more than 2 triangles add a property called VERTS with list of verts clockwise."
 				messageBox message
 				return 1
 			)
-	
-			-- checks if model has left-oriented system or not
-			face = getface obj 1
-			v1= getvert obj face[1]
-			v2 = getvert obj face[2]
-			v3 = getvert obj face[3]
-			
-			vect1 = v1-v2
-			vect2 = v3-v2
-			normal1 = cross vect1 vect2
-			facenorm = normal1/(length normal1)
-			maxnorm = getfacenormal obj 1
-			flipModel = false
-	
-			dotProd = dot facenorm maxnorm
-			if (dotProd>0) then (
-				flipModel = true
-			)
-	
-			-- get faces verts
-		    vertsFace1=getface obj 1
-			vertsFace2=getface obj 2
-	
-			-- trasform to array (needed for findItem func)
-			verts1 = #()
-			verts2 = #()
-			for h=1 to 3 do append verts1 vertsFace1[h]
-			for h=1 to 3 do append verts2 vertsFace2[h]
 
-	
 			verts = #()
-			additionalVertex = 0
-			oppositeVertex = 0
-	
-			if (debug) then format "Vertex of first face: %\n" verts1
-	
-			-- search non-common vertex on face2
-			for h=1 to 3 do
-			(
-				if (findItem verts1 verts2[h]==0) then
-					additionalVertex = h
-			)
-			if (debug) then format "Additional vertex: % " verts2[additionalVertex]
-	
-			-- search opposite vertex
-			for h=1 to 3 do
-			(
-				if (findItem verts2 verts1[h]==0) then
-					oppositeVertex = h
-			)
-			if (debug) then format "Opposite vertex: % " verts1[oppositeVertex]
-	
-			-- list vertexes in right order for resulting polygon
-			commonV = false
-			addedAdd = false
-			addedOpp = false
-			for h=1 to 3 do
-			(
-				 -- check next vertex
-				 if (h!=3 and h!=oppositeVertex) then (
-				    nextV = verts1[h+1]
-					-- first common vertex
-				 	if (nextV != verts1[oppositeVertex]) then (
-						append verts verts1[h]
-						append verts verts2[additionalVertex]
-	
-						addedAdd = true
-	
-						continue
-					)
-				 )
-				
-				-- add vertex
-				append verts verts1[h]
-	
-				if (h==3 and (not addedAdd) ) then (
-					append verts verts2[additionalVertex]	
+			-- manage polygon portals
+			if (faces!=2) then (
+				toks = tokenize vertsProp ","
+				for elem in toks do (
+					vertPoly = getvert obj (elem as Integer)
+					append verts (elem as Integer)
+					format "extracted %: % \n" elem vertPoly
 				)
-			)
-	
-			-- clock-wise vertexes listing for CS
-			if (not flipModel) then (
-				tmpVert = verts[2]
-				verts[2] = verts[4]
-				verts[4] = tmpVert
-			)
-	
+
+			-- manage 2 faces portals
+			) else (
+
+				-- checks if model has left-oriented system or not
+				face = getface obj 1
+				v1= getvert obj face[1]
+				v2 = getvert obj face[2]
+				v3 = getvert obj face[3]
+				
+				vect1 = v1-v2
+				vect2 = v3-v2
+				normal1 = cross vect1 vect2
+				facenorm = normal1/(length normal1)
+				maxnorm = getfacenormal obj 1
+				flipModel = false
+		
+				dotProd = dot facenorm maxnorm
+				if (dotProd>0) then (
+					flipModel = true
+				)
+		
+				-- get faces verts
+			    vertsFace1=getface obj 1
+				vertsFace2=getface obj 2
+		
+				-- trasform to array (needed for findItem func)
+				verts1 = #()
+				verts2 = #()
+				for h=1 to 3 do append verts1 vertsFace1[h]
+				for h=1 to 3 do append verts2 vertsFace2[h]
+
+				additionalVertex = 0
+				oppositeVertex = 0
+		
+				if (debug) then format "Vertex of first face: %\n" verts1
+		
+				-- search non-common vertex on face2
+				for h=1 to 3 do
+				(
+					if (findItem verts1 verts2[h]==0) then
+						additionalVertex = h
+				)
+				if (debug) then format "Additional vertex: % " verts2[additionalVertex]
+		
+				-- search opposite vertex
+				for h=1 to 3 do
+				(
+					if (findItem verts2 verts1[h]==0) then
+						oppositeVertex = h
+				)
+				if (debug) then format "Opposite vertex: % " verts1[oppositeVertex]
+		
+				-- list vertexes in right order for resulting polygon
+				commonV = false
+				addedAdd = false
+				addedOpp = false
+				for h=1 to 3 do
+				(
+					 -- check next vertex
+					 if (h!=3 and h!=oppositeVertex) then (
+					    nextV = verts1[h+1]
+						-- first common vertex
+					 	if (nextV != verts1[oppositeVertex]) then (
+							append verts verts1[h]
+							append verts verts2[additionalVertex]
+		
+							addedAdd = true
+		
+							continue
+						)
+					 )
+					
+					-- add vertex
+					append verts verts1[h]
+		
+					if (h==3 and (not addedAdd) ) then (
+						append verts verts2[additionalVertex]	
+					)
+				)
+		
+				-- clock-wise vertexes listing for CS
+				if (not flipModel) then (
+					tmpVert = verts[2]
+					verts[2] = verts[4]
+					verts[4] = tmpVert
+				)
+
+			) -- end if 2 faces
+
 			-- export in XZY format
-			for v in verts do 
+			for v in verts do
 			(
 				currVert = getVert obj v
 				--scale
@@ -699,7 +759,6 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				scaledz = (currVert.z * zscale) + zrelocate
 				format "      <v x=\"%\" y=\"%\" z=\"%\" /> \n" scaledx scaledz scaledy to:outFile
 				--format "      <v x=\"%\" y=\"%\" z=\"%\" /> \n" currVert.x currVert.z currVert.y to:outFile
-	
 			)
 	
 			-- search displacement target
@@ -1228,6 +1287,9 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		-- ////////////////////////
 	
 		-- output file
+		destDir = getFilenamePath edt3.text
+		format "makedir % \n" destDir
+		makeDir destDir	-- If output folder does not exist...
 		outFile = createFile filename
 	
 		-- write header
@@ -1608,7 +1670,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						-- check if object is a multiple transparent object (like trees)
 						transpmulti = getUserProp obj "TRANSPMULTIPLE"
 						if (transpmulti=="yes") then (
-	 					  format "      <back2front />\n" to:outFile
+	 					  --format "      <back2front />\n" to:outFile  NO MORE USED!
 						)
 
 						-- check for no shadow setting
@@ -1653,7 +1715,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					trasp = getUserProp obj "TRASPARENT"
 					if (trasp=="yes") then (
 					  format "found thingmesh factory as trasparent %\n" obj.name
-					  istrasparent=true
+					  -- istrasparent=true NO MORE USED!!
 					)
 	
 					-- no shadow not supported on meshfact
@@ -1991,18 +2053,20 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					if (lodlow!=undefined) then
 						format "      <factory>%</factory>\n" toks[3] to:outFile
 
+
+            -- NO MORE USED!!!
 					-- if factory is transparent
-					trasp = getUserProp genFactObj "TRASPARENT"
-					if (trasp=="yes") then (
-						format "      <priority>alpha</priority><ztest />\n" to:outFile
-					)
+					--trasp = getUserProp genFactObj "TRASPARENT"
+					--if (trasp=="yes") then (
+					--	format "      <priority>alpha</priority><ztest />\n" to:outFile
+					--)
 
 					-- if factory is multiple transparent
-					transpmulti = getUserProp genFactObj "TRANSPMULTIPLE"
-					if (transpmulti=="yes") then (
-					  format "      <priority>alpha</priority>\n" to:outFile
- 					  format "      <ztest />\n" to:outFile
-					)
+					--transpmulti = getUserProp genFactObj "TRANSPMULTIPLE"
+					--if (transpmulti=="yes") then (
+					--  format "      <priority>alpha</priority>\n" to:outFile
+ 					--  format "      <ztest />\n" to:outFile
+					--)
 
 					-- meshref doesn't have <params> tag
 					if (lodlow==undefined) then (
@@ -2114,11 +2178,12 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						return 1
 					)
 	
+			-- NO MORE USED!!
 					-- if factory is trasparent
-					trasp = getUserProp genFactObj "TRASPARENT"
-					if (trasp=="yes") then (
-						format "      <priority>alpha</priority><ztest />\n" to:outFile
-					)
+					--trasp = getUserProp genFactObj "TRASPARENT"
+					--if (trasp=="yes") then (
+					--	format "      <priority>alpha</priority><ztest />\n" to:outFile
+					--)
 	
 					format "      <params><factory>%</factory>\n" toks[3] to:outFile
 		
@@ -2307,14 +2372,16 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		
 				istrasparent=false
 
-					-- handles transparent objects
-				if (findString obj.name "_t_" !=undefined) then (
-				  format "      <priority>alpha</priority>\n" to:outFile
-				  format "      <ztest />\n" to:outFile
-				  istrasparent=true
-				)
+		-- NO MORE USED!!!
+				-- handles transparent objects
+				--if (findString obj.name "_t_" !=undefined) then (
+				--  format "      <priority>alpha</priority>\n" to:outFile
+				--  format "      <ztest />\n" to:outFile
+				--  istrasparent=true
+				--)
+
 			    -- handles sky objects
-				else if (findString obj.name "_sky_" !=undefined) then (
+				if (findString obj.name "_sky_" !=undefined) then (
 				  format "      <priority>sky</priority>\n" to:outFile
 				  format "      <zuse />\n" to:outFile
 				)
@@ -2409,7 +2476,14 @@ rollout Test1 "Export Level to CS" width:226 height:450
 
 		 	-- get info on dynamic lights
 			maxframes = animationrange.end
-		
+
+			if (animationrange.end != 23f and animationrange.end != 47f) then
+			(
+				message = "You have to set the animation length to 24 frames (sun only) or to 48 (sun/rain). \n Each frame is 1 hour of the day."
+				if (queryBox (message + " \n \nClick Yes for 24 frames (sun only) \nClick No to keep the current number of frames and exit") == true)
+				then ( animationRange = interval 0 23 ) else return 1
+			)
+
 			if (animationrange.end != 23f and animationrange.end != 47f) then
 			(
 				message = "You have to set the animation length to 24 frames (sun only) or to 48 (sun/rain). \n Each frame is 1 hour of the day."
@@ -2509,7 +2583,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		
 				multiplier = ll.multiplier
 		
-				if (ll.useNearAtten==false and ll.useFarAtten==false) then
+				if (ll.useFarAtten==false) then
 					format "    <attenuation>none</attenuation>\n" to:outFile
 		
 				xlight = (ll.pos.x * xscale) + xrelocate

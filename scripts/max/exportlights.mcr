@@ -31,18 +31,38 @@ rollout Test1 "Export Lights" width:222 height:142
 	label lbl1 "Export Lights To:" pos:[21,7] width:142 height:20
 	button btn2 "Export!" pos:[37,110] width:152 height:24
 
-	label lbl6 "Scale:" pos:[58,72] width:40 height:20
-	editText edtScale "" pos:[101,67] width:63 height:27
-
 	on Test1 open do
 	(
 	   edt3.text = "D:\\Luca\\lights124.xml"
-	   edtScale.text = "0.01"	
 	)
 
 	on btn2 pressed do
 	(
-	
+
+		-- functions declaration
+		global tokenize
+
+		-- Tokenize utility function
+		fn tokenize instring sep = 
+		(
+		   outarray = #()
+		   temp=copy instring
+		   i = 1
+		   while (true) do (
+		   	index = findstring temp sep
+			if (index==undefined) then
+			(
+				outarray[i]=temp
+				exit
+			) else (
+				outarray[i] = substring temp 1 (index-1)
+				temp = substring temp (index+1) -1
+			)
+			i = i +1
+		   )
+		   outarray
+		)
+
 		-- ////////////////////////
 		-- Variables used in the program
 		-- ////////////////////////
@@ -89,15 +109,6 @@ rollout Test1 "Export Lights" width:222 height:142
 		-- Define verbose output (that takes more space and memory)
 		verboseMode = true
 	
-		-- parameters for scaling and relocation
-		global xscale = edtScale.text as Float
-		global yscale = edtScale.text as Float
-		global zscale = edtScale.text as Float
-	
-		xrelocate = 0
-		yrelocate = 0
-		zrelocate = 0
-	
 		-- this indicates if only differences must be printed.
 		optimized = false
 
@@ -111,8 +122,17 @@ rollout Test1 "Export Lights" width:222 height:142
 
 		-- retrieve all lights objects
 		lightsFound = #()
-		for obj in objects do 
+		hasMoreSectors = "false"
+		sectors= #();
+		format "total objects % \n" objects.count
+		for i=1 to objects.count do 
 		(
+		    obj=objects[i];
+			if (findString obj.name "_sect_" !=undefined) then (
+				hasMoreSectors = "true"
+				toks = tokenize obj.name "_"
+				append sectors toks[3]
+			)
 			-- skip everything that is not a light
 			if ( (classOf obj) != Omnilight) then (
 				continue
@@ -120,7 +140,8 @@ rollout Test1 "Export Lights" width:222 height:142
 			append lightsFound obj
 		)
 		
-		format "lightsFound: %" lightsFound 
+		format "lightsFound: % \n" lightsFound 
+		format "sectors: % \n" sectors 
 
 
 		-- get lights information
@@ -140,7 +161,7 @@ rollout Test1 "Export Lights" width:222 height:142
 			fLights = #()
 			for ll in lightsFound do
 			(
-				format "Lights % \n" lcount
+				--format "Lights % \n" lcount
 				-- convert lights from 0-255 to 0-1
 				llred = ((ll.rgb.r)/255) * ll.multiplier
 				llgreen = ((ll.rgb.g)/255) * ll.multiplier
@@ -148,10 +169,17 @@ rollout Test1 "Export Lights" width:222 height:142
 
 				if (fcount!=1) then
 				(
-					--format "Comparing % with % \n" lightColors[fcount-1][lcount] #(llred,llgreen,llblue)
-					prevColor = lightColors[fcount-1][lcount]
-					if ( prevColor[1] != llred or prevColor[2] != llgreen or prevColor[3] != llblue) then
-						lightInfo[lcount] = "dynamic"
+					-- check autodynamic setting
+					autodyn = getUserProp ll "AUTODYNAMIC"
+					if (autodyn=="yes") then
+						lightInfo[lcount] = "autodynamic"
+					-- check if light is dynamic
+				    else (
+						--format "Comparing % with % \n" lightColors[fcount-1][lcount] #(llred,llgreen,llblue)
+						prevColor = lightColors[fcount-1][lcount]
+						if ( prevColor[1] != llred or prevColor[2] != llgreen or prevColor[3] != llblue) then
+							lightInfo[lcount] = "dynamic"
+					)
 				)
 				insertItem #(llred,llgreen,llblue) fLights lcount
 
@@ -160,6 +188,8 @@ rollout Test1 "Export Lights" width:222 height:142
 			insertItem fLights lightColors fcount
 			fcount = fcount + 1
 		)
+		
+		format "lightInfo: % \n" lightInfo
 
 		-- reset slider time (used mainly to avoid problem in getting last frame data)
 		slidertime=0
@@ -175,20 +205,27 @@ rollout Test1 "Export Lights" width:222 height:142
 				lcount = 1
 				for ll in lightsFound do
 				(
-					-- if light is dynamic
+
 					if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then
 					(
+						fullname = name + ll.parent.name
 						-- if light changed
 						prevColor = lightColors[fcount-1][lcount]
 						colors = lightColors[fcount][lcount]
 						if ( prevColor[1] != colors[1] or prevColor[2] != colors[2] or prevColor[3] != colors[3]) then
 						(
 							-- pseudo-dynamic ambient light
-							if (ll.name=="ambient") then
-								format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] to:outFile
+							if (ll.name=="ambient") then (
+								-- support for multi sectors
+								if (hasMoreSectors=="true") then (
+									for sec in sectors do (
+										format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) sec colors[1] colors[2] colors[3] to:outFile
+									)
+								) else
+									format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] to:outFile
 							-- pseudo-dynamic light
-							else
-								format " <color value=\"%\" object=\"%%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) ll.name roomname colors[1] colors[2] colors[3] to:outFile
+							) else
+								format " <color value=\"%\" object=\"%%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) fullname roomname colors[1] colors[2] colors[3] to:outFile
 						)
 					)
 					lcount = lcount + 1
@@ -197,6 +234,9 @@ rollout Test1 "Export Lights" width:222 height:142
 			)
 
 		) else (
+
+			-- intensity factor for autodynamic lights
+			intensityfactor = #(0,0,0,0,0,0.3,0.4,0.6,0.8,0.8,0.8,0.8,1,1,1,1,0.8,0.8,0.8,0.8,0.6,0.4,0.3,0)
 
 			-- cycle on all frames of the animation
 			fcount = 1
@@ -208,23 +248,59 @@ rollout Test1 "Export Lights" width:222 height:142
 				(
 					colors = lightColors[fcount][lcount]
 					rainColors = #()
+					--format "colors: %\n" colors
+					
+					-- for multiple sectors
+					if ( obj.parent!=undefined and (classOf obj.parent)==Dummy and (findString obj.parent.name "_sect_" !=undefined) ) then (
+						toks = tokenize obj.parent.name "_"
+						roomname = toks[3]
+					)
 
+					-- if light is autodynamic
+					if (lightInfo.count>=lcount and lightInfo[lcount]=="autodynamic") then
+					(
+						-- calculate colors
+						colors[1]=colors[1]*intensityfactor[fcount]
+						colors[2]=colors[2]*intensityfactor[fcount]
+						colors[3]=colors[3]*intensityfactor[fcount]
+						rainColors[1]=colors[1]*intensityfactor[fcount]*0.8
+						rainColors[2]=colors[2]*intensityfactor[fcount]*0.8
+						rainColors[3]=colors[3]*intensityfactor[fcount]*0.8
+
+						-- pseudo-dynamic ambient light
+						if (obj.name=="ambient") then (
+							-- support for multi sectors
+							if (hasMoreSectors=="true") then (
+								for sec in sectors do (
+									format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) sec colors[1] colors[2] colors[3] to:outFile
+								)
+							) else
+								format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
+						-- pseudo-dynamic light
+						) else
+							format " <color value=\"%\" object=\"%%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) obj.name roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
+
+					)
 					-- if light is dynamic
-					if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then
+					else if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then
 					(
 						-- get rain values
 						if (maxframes == 47f ) then
-						(
 							rainColors = lightColors[fcount+24][lcount]
-						) else
-						(
-							rainColors = lightColors[fcount][lcount]
-						)
-						-- pseudo-dynamic ambient light
-						if (obj.name=="ambient") then
-							format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
-						-- pseudo-dynamic light
 						else
+							rainColors = lightColors[fcount][lcount]
+
+						-- pseudo-dynamic ambient light
+						if (obj.name=="ambient") then (
+							-- support for multi sectors
+							if (hasMoreSectors=="true") then (
+								for sec in sectors do (
+									format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) sec colors[1] colors[2] colors[3] to:outFile
+								)
+							) else
+								format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
+						-- pseudo-dynamic light
+						) else
 							format " <color value=\"%\" object=\"%%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) obj.name roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
 					)
 					lcount = lcount + 1

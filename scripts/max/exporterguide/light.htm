@@ -29,11 +29,13 @@
   The maximum range of the light is defined by the value of "Far Attenuation 
   End" in Attenuation menu. This is considered also if you no attenuation 
   is used (see below).</p>
-<p><b>No Attenuation:</b><br>
-  If in section "Near Attenuation" the checkbox "Use" is NOT 
-  checked and in section "Far Attenuation" the checkbox "Use" 
+<p><b>Attenuation:</b><br>
+  "Near Attenuation" IS NEVER used, the exporter simply ignore the setting.<br>
+  If in section "Far Attenuation" the checkbox "Use" 
   is NOT checked, then the light will be defined in PlaneShift with parameter 
   "No Attenuation", so light will be costant up to the maximum radius.<br>
+  If you want attenuation to be used, then check the "Far Attenuation" box, and insert the radius value in "End" field. Leave Start at "0".
+  
 </p>
 <p><b>Dynamic Lights:</b><br>
   Lights can have a dynamically changing color. If this is the case, read the 

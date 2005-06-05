@@ -26,12 +26,36 @@ count = 0;
 
 tot = objects.count
 longmessage = ""
+longmessage1 = ""
 message = ""
 unweld = false
 
 for i = 1 to tot do
 (
 	obj = objects[i]
+
+	-- exclude non exported objects
+	if ((classOf obj)==Dummy) then
+	(
+		format "discard Dummy % \n" obj.name
+		continue
+	)
+
+	-- Meshes of wrong types
+	if ((classOf obj)==Box or (classOf obj)==Torus or (classOf obj)==Editable_poly or (classOf obj)==PolyMesh or (classOf obj)==PolyMeshObject) then
+	(
+		class = (classOf obj) as String
+		if (deleteFaces==false) then
+		(
+			message2 = "Object " + obj.name + " is a "+class+", convert it to editable mesh\n"
+			messageBox message2
+		) else (
+			converttomesh obj
+			message2 = "Object " + obj.name + " WAS "+class+", converted to editable mesh\n"
+			messageBox message2
+		)
+	)
+
 	if ((classOf obj)!=Editable_mesh) then
 	(
 		format "discard %" obj.name
@@ -53,6 +77,27 @@ for i = 1 to tot do
 		face = getface obj i
 		if (face==undefined) then
 			continue;
+
+
+		matID = getFaceMatID obj i
+	    if (obj.mat==undefined) then
+			longmessage1 = longmessage1 + "UNDEFINED MATERIAL for object %\n" obj.name
+		else (
+		    if ((classOf obj.mat)==Standardmaterial) then
+			(
+				if (obj.mat==undefined) then
+				(
+					longmessage1 = longmessage1 + "OBJECT " +obj.name+ " has an UNDEFINED material on face " + (i as String) +"\n"
+					continue
+				)
+			) else (
+				if (obj.mat[matID]==undefined) then
+				(
+					longmessage1 = longmessage1 + "   OBJECT " +obj.name+ " has an UNDEFINED material on face " + (i as String) +"\n"
+					continue
+				)
+			)
+		)
 
 		v1 = getvert obj face[1]
 		v2 = getvert obj face[2]
@@ -134,5 +179,5 @@ if (deleteFaces) then
 else
 	message = "Total bad polygons found: " + cs
 
-message = message + "\n" + (longmessage as String)
+message = message + "\n" + (longmessage1 as String) + (longmessage as String)
 messageBox message

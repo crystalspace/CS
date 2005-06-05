@@ -14,15 +14,13 @@
     <td>options</td>
     <td>defaults</td>
   </tr>
-  <tr>
+  <tr> 
     <td><b>Player Barrier</b></td>
     <td>If you need one object to be invisible and to block players (they can't 
       pass through it), then define the object as a &quot;player barrier&quot;.</td>
-    <td>
-      <ul>
+    <td> <ul>
         <li> PLAYERBARRIER=yes</li>
-      </ul>
-    </td>
+      </ul></td>
     <td>NO</td>
   </tr>
   <tr> 
@@ -32,65 +30,42 @@
       Default is no smooth. You can activate that with: 
       <p></p>
       <ul>
-      </ul>
-    </td>
-    <td> 
-      <li> SMOOTH=yes</li>
-    </td>
+      </ul></td>
+    <td> <li> SMOOTH=yes</li></td>
     <td>NO</td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>No Shadows</b>: 
-    </td>
+    <td> <p><b>No Shadows</b>: </td>
     <td>Sprites don't cast shadow. Static objects normally cast shadows. You can 
       disable shadows on static objects using that setting. Default is casting 
-      shadows.<br>
-      <p></p>
+      shadows.<br> <p></p>
       <ul>
-      </ul>
-    </td>
-    <td> 
-      <li>NOSHADOWS=yes </li>
-    </td>
+      </ul></td>
+    <td> <li>NOSHADOWS=yes </li></td>
     <td>YES</td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>Lighting</b>: 
-    </td>
+    <td> <p><b>Lighting</b>: </td>
     <td>Static objects are normally lit by the surrounding lights. You can disable 
       this and have the object shine by himself. Default is to be affected by 
-      external lighting.<br>
-      <p></p>
+      external lighting.<br> <p></p>
       <ul>
-      </ul>
-    </td>
-    <td> 
-      <li>LIGHTING=no </li>
-    </td>
+      </ul></td>
+    <td> <li>LIGHTING=no </li></td>
     <td>YES</td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>Collision Detection</b>: 
-    </td>
+    <td> <p><b>Collision Detection</b>: </td>
     <td> Normally you can't pass through objects, they will collide with other 
       objects and stop them. You can disable collision detection so you can move 
-      through it. Default is collision detection yes.<br>
-      <p></p>
+      through it. Default is collision detection yes.<br> <p></p>
       <ul>
-      </ul>
-    </td>
-    <td> 
-      <li>COLLDET=no</li>
-    </td>
+      </ul></td>
+    <td> <li>COLLDET=no</li></td>
     <td>YES</td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>Invisible faces:</b> 
-    </td>
+    <td> <p><b>Invisible faces:</b> </td>
     <td> You can set some faces to be invisible in CS. Imagine you have a box, 
       but you want 1 face to be invisible. You can surely remove that face, but 
       it seems that Dynavis works better if you keep that face and set it as invisible. 
@@ -99,81 +74,44 @@
       (this IS case-sensitive) and assign it to the faces you want to be invisible. 
     </td>
     <td>Those faces will be flagged as LIGHTING=no and INVISIBLE=yes. 
-      <p></p>
-    </td>
+      <p></p></td>
     <td>NA</td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>Transparency:</b> 
-    </td>
-    <td> 
-      <p>WARNING 1: All polygons of the object should have alpha texture, you 
-        cannot have one object with one alpha texture and another non-alpha texture.</p>
-      <p>WARNING 2: if the object is a genmesh or thingmesh, then you should not 
-        name it _f_t_ or _g_t_ because that's not supported. Name it _f_ or _g_ 
-        as usual and then add a property TRASPARENT on it.</p>
-      <p>If an object has a transparent texture, CS must be aware of that. To 
-        give this information to CS you have to name all transparent objects with 
-        a "_t_" prefix. Example: _t_glass01. This is the name of Max object. There 
-        is no problem in setting a different name for the texture. </p>
-      <p></p>
-    </td>
-    <td> 
-      <p>Only for <b>thingmesh</b> and <b>genmesh</b>:<br>
-        TRASPARENT=yes<br>
-        For normal objects use name.</p>
-    </td>
+    <td> <p><b>Transparency:</b> </td>
+    <td> <p>If an object has a transparent texture you need no special flag on 
+        the object itself. You have to set the texture as transparent. To do that, 
+        open the material editor, pick your material and select the &quot;Opacity&quot; 
+        checkbox. It's not needed that you also add a texture for it.</p>
+      <p></p></td>
+    <td> <p>Set on texture and not on object.</p></td>
     <td>NO</td>
   </tr>
   <tr> 
-    <td><b>Transparency, Multiple:</b></td>
-    <td>If the object is made of many plane, some of which can be seen as overlapping 
-      by the player (like two parallel planes one after the other). Used for trees 
-      for example. Remember that <b>triangles</b> cannot intersect, if you need 
-      a intersecting planes, just split the plane into triangles along the intersections.</td>
-    <td>Only for <b>genmesh</b>:<br>
-      TRANSPMULTIPLE=yes</td>
-    <td>NO</td>
-  </tr>
-  <tr> 
-    <td> 
-      <p><b>Sky:</b> 
-    </td>
+    <td> <p><b>Sky:</b> </td>
     <td> Sky objects must have a different rendering priority in CS, to set an 
       object as a sky object (like the bounding box of your level) name it with 
       prefix "_sky_". Example: _sky_box01. 
-      <p></p>
-    </td>
+      <p></p></td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>Disable Culing</b>: 
-    </td>
+    <td> <p><b>Disable Culing</b>: </td>
     <td> If you set this property to off the object will not be considered for 
       visibility culling purposes. Default is on. 
       <p></p>
       <ul>
-      </ul>
-    </td>
-    <td> 
-      <li>VISCULL=no</li>
-    </td>
+      </ul></td>
+    <td> <li>VISCULL=no</li></td>
     <td>YES</td>
   </tr>
   <tr> 
-    <td> 
-      <p><b>Only for Culling:</b> 
-    </td>
+    <td> <p><b>Only for Culling:</b> </td>
     <td> If you set this property the object will be used only for culling purposes, 
       so the object will be invisible. 
       <p></p>
       <ul>
-      </ul>
-    </td>
-    <td> 
-      <li>CULLERONLY=yes</li>
-    </td>
+      </ul></td>
+    <td> <li>CULLERONLY=yes</li></td>
     <td>NO</td>
   </tr>
 </table>
