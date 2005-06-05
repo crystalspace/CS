@@ -162,6 +162,8 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
 
         // Do type-specific packing depending on first var
         const csShaderVariable *cvar = var->GetArrayElement (0);
+        if (cvar == 0)
+          break;
         
         CS_ALLOC_STACK_ARRAY (float, tmpArr, numElements * 16);
         uint idx = 0;
@@ -172,9 +174,11 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
         case csShaderVariable::FLOAT:
           {
             float f;
-            for (idx = 0; idx < numElements; i++)
+            for (idx = 0; idx < numElements; idx++)
             {
-              if (var->GetArrayElement (i)->GetValue (f))
+              csShaderVariable *element =
+                var->GetArrayElement (idx);
+              if (element != 0 && element->GetValue (f))
                 tmpArr[idx] = f;
             }
             cgGLSetParameterArray1f (param, 0, numElements, tmpArr);
@@ -183,9 +187,11 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
         case csShaderVariable::VECTOR2:
           {
             csVector2 v;
-            for (idx = 0; idx < numElements; i++)
+            for (idx = 0; idx < numElements; idx++)
             {
-              if (var->GetArrayElement (i)->GetValue (v))
+              csShaderVariable *element =
+                var->GetArrayElement (idx);
+              if (element != 0 && element->GetValue (v))
               {
                 tmpArr[2*idx+0] = v.x;
                 tmpArr[2*idx+1] = v.y;
@@ -198,9 +204,11 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
         case csShaderVariable::VECTOR3:
           {
             csVector3 v;
-            for (idx = 0; idx < numElements; i++)
+            for (idx = 0; idx < numElements; idx++)
             {
-              if (var->GetArrayElement (i)->GetValue (v))
+              csShaderVariable *element =
+                var->GetArrayElement (idx);
+              if (element != 0 && element->GetValue (v))
               {
                 tmpArr[3*idx+0] = v.x;
                 tmpArr[3*idx+1] = v.y;
@@ -213,9 +221,11 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
         case csShaderVariable::VECTOR4:
           {
             csVector4 v;
-            for (idx = 0; idx < numElements; i++)
+            for (idx = 0; idx < numElements; idx++)
             {
-              if (var->GetArrayElement (i)->GetValue (v))
+              csShaderVariable *element =
+                var->GetArrayElement (idx);
+              if (element != 0 && element->GetValue (v))
               {
                 tmpArr[4*idx+0] = v.x;
                 tmpArr[4*idx+1] = v.y;
@@ -229,9 +239,11 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
         case csShaderVariable::MATRIX:
           {
             csMatrix3 m;
-            for (idx = 0; idx < numElements; i++)
+            for (idx = 0; idx < numElements; idx++)
             {
-              if (var->GetArrayElement (i)->GetValue (m))
+              csShaderVariable *element =
+                var->GetArrayElement (idx);
+              if (element != 0 && element->GetValue (m))
               {
                 makeGLMatrix (m, &tmpArr[16*idx]);
               }
@@ -242,9 +254,11 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
         case csShaderVariable::TRANSFORM:
           {
             csReversibleTransform t;
-            for (idx = 0; idx < numElements; i++)
+            for (idx = 0; idx < numElements; idx++)
             {
-              if (var->GetArrayElement (i)->GetValue (t))
+              csShaderVariable *element =
+                var->GetArrayElement (idx);
+              if (element != 0 && element->GetValue (t))
               {
                 makeGLMatrix (t, &tmpArr[16*idx]);
               }
@@ -307,8 +321,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     CGparameter param = cgGetNamedParameter (program, 
       variablemap[i].destination);
 
+    CGtype type = cgGetParameterType (param);
     if (!param || 
-        !(cgIsParameterReferenced (param) && cgGetParameterType (param) != CG_ARRAY))
+        (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
     {
       variablemap.DeleteIndex (i);
       continue;

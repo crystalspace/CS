@@ -831,6 +831,33 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 	var.SetAccessor (acc);
       }
       break;
+    case XMLTOKEN_ARRAY:
+      {
+        csRef<iDocumentNodeIterator> varNodes = node->GetNodes ("shadervar");
+
+        int varCount = 0;
+        while (varNodes->HasNext ()) 
+        {
+          varCount++;
+          varNodes->Next ();
+        }
+
+        var.SetType (csShaderVariable::ARRAY);
+        var.SetArraySize (varCount);
+
+        varCount = 0;
+        varNodes = node->GetNodes ("shadervar");
+        while (varNodes->HasNext ()) 
+        {
+          csRef<iDocumentNode> varNode = varNodes->Next ();
+          csRef<csShaderVariable> elementVar = 
+            csPtr<csShaderVariable> (new csShaderVariable (csInvalidStringID));
+          var.SetArrayElement (varCount, elementVar);
+          ParseShaderVar (varNode, *elementVar);
+          varCount++;
+        }
+      }
+      break;
     default:
       Report (
         "crystalspace.syntax.shadervariable",

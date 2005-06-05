@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jun-2005
+	- Anders fixed several bugs in array SV handling, and added loader
+	  functionality for array SVs. Pseudo-syntax is:
+	  <sv type="array"><sv .../><sv .../> ... </sv>
 5-Jun-2005
 	- Eric Sunshine fixed a bunch of compilation issues reported by
 	  Apple/Tiger's gcc4.

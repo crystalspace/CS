@@ -147,32 +147,32 @@ void csShaderGLAVP::SetupState (const csRenderMesh *mesh,
         case csShaderVariable::VECTOR4:
           {
             csVector4 v;
-            for (uint i = 0; i < var->GetArraySize (); i++)
+            for (uint idx = 0; idx < var->GetArraySize (); idx++)
             {
-              cvar = var->GetArrayElement (i);
+              cvar = var->GetArrayElement (idx);
               if (cvar->GetValue (v))
-                ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal+i, &v.x);
+                ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal+idx, &v.x);
             }
           }
           break;    
         case csShaderVariable::MATRIX:
           {
             csMatrix3 m;
-            for (uint i = 0; i< var->GetArraySize (); i++)
+            for (uint idx = 0; idx< var->GetArraySize (); idx++)
             {
-              cvar = var->GetArrayElement (i);
+              cvar = var->GetArrayElement (idx);
               if(cvar->GetValue(m))
               {
                 float matrix[16];
                 makeGLMatrix (m, matrix);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
+                  mapping.userVal+idx*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
+                  mapping.userVal+idx*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
+                  mapping.userVal+idx*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
+                  mapping.userVal+idx*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
               }
             }
           }
@@ -180,21 +180,21 @@ void csShaderGLAVP::SetupState (const csRenderMesh *mesh,
         case csShaderVariable::TRANSFORM:
           {
             csReversibleTransform t;
-            for (uint i = 0; i< var->GetArraySize (); i++)
+            for (uint idx = 0; idx< var->GetArraySize (); idx++)
             {
-              cvar = var->GetArrayElement (i);
+              cvar = var->GetArrayElement (idx);
               if(cvar->GetValue(t))
               {
                 float matrix[16];
                 makeGLMatrix (t, matrix);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
+                  mapping.userVal+idx*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
+                  mapping.userVal+idx*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
+                  mapping.userVal+idx*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
                 ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
-                  mapping.userVal+i*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
+                  mapping.userVal+idx*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
               }
             }
           }
@@ -254,18 +254,30 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
   glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
   if(errorpos != -1)
   {
+    int realErrorPos = 0;
+    while (errorpos > 0)
+    {
+      if (programstring[realErrorPos] == '#')
+      {
+        while (programstring[realErrorPos] != '\n')
+          realErrorPos++;
+      }
+      errorpos--;
+      realErrorPos++;
+    }
+
     CS_ALLOC_STACK_ARRAY (char, errorStart, strlen (programstring) + 1);
     strcpy (errorStart, programstring);
 
-    char* start = errorStart + errorpos;
-    while (start > errorStart)
+    char* start = errorStart + realErrorPos;
+    /*while (start > errorStart)
     {
       if (*(start - 1) == '\n')
       {
 	break;
       }
       start--;
-    }
+    }*/
 
     char* end = strchr (start, '\n');
     if (end)

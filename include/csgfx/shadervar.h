@@ -385,7 +385,7 @@ public:
    */
   csShaderVariable *GetArrayElement (size_t element)
   {
-    if (array != 0 && element>0 && element<array->Length ())
+    if (array != 0 && element>=0 && element<array->Length ())
     {
       return array->Get (element);
     }
