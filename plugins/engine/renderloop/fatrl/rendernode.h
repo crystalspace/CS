@@ -20,13 +20,16 @@
 #ifndef __CS_RENDERNODE_H__
 #define __CS_RENDERNODE_H__
 
+#include "iengine/rview.h"
+
 class csRenderNode
 {
 protected:
   virtual ~csRenderNode() {}
 public:
   virtual void Free() { delete this; }
-  virtual void Process (iRenderView* rview) = 0;
+  virtual bool Preprocess (iRenderView* rview) = 0;
+  virtual void Postprocess (iRenderView* rview) = 0;
 };
 
 #endif // __CS_RENDERNODE_H__

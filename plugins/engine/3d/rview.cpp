@@ -73,7 +73,6 @@ csRenderView::csRenderView (
   ctxt->iview = v;
   if (v)
   {
-    v->IncRef ();
     UpdateFrustum ();
   }
 
@@ -82,19 +81,12 @@ csRenderView::csRenderView (
 
 csRenderView::~csRenderView ()
 {
-  if (ctxt)
-  {
-    if (ctxt->icamera) ctxt->icamera->DecRef ();
-    if (ctxt->iview) ctxt->iview->DecRef ();
-    delete ctxt;
-  }
+  delete ctxt;
   SCF_DESTRUCT_IBASE ();
 }
 
 void csRenderView::SetCamera (iCamera *icam)
 {
-  icam->IncRef ();
-  if (ctxt->icamera) ctxt->icamera->DecRef ();
   ctxt->icamera = icam;
 }
 
@@ -105,8 +97,6 @@ void csRenderView::SetOriginalCamera (iCamera *icam)
 
 void csRenderView::SetClipper (iClipper2D *view)
 {
-  view->IncRef ();
-  if (ctxt->iview) ctxt->iview->DecRef ();
   ctxt->iview = view;
   UpdateFrustum ();
 }
@@ -473,8 +463,6 @@ void csRenderView::CreateRenderContext ()
   ctxt = new csRenderContext ();
   *ctxt = *old_ctxt;
   ctxt->previous = old_ctxt;
-  if (ctxt->icamera) ctxt->icamera->IncRef ();
-  if (ctxt->iview) ctxt->iview->IncRef ();
   // The camera transform id is copied from the old
   // context. Only when we do space warping on the camera
   // do we have to change it (CreateNewCamera() function).
@@ -487,16 +475,14 @@ void csRenderView::RestoreRenderContext ()
   csRenderContext* old_ctxt = ctxt;
   ctxt = ctxt->previous;
 
-  if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
-  if (old_ctxt->iview) old_ctxt->iview->DecRef ();
   delete old_ctxt;
 }
 
 iCamera *csRenderView::CreateNewCamera ()
 {
   // A pool for cameras?
-  iCamera *newcam = ctxt->icamera->Clone ();
-  ctxt->icamera->DecRef ();
+  csRef<iCamera> newcam;
+  newcam.AttachNew (ctxt->icamera->Clone ());
   ctxt->icamera = newcam;
   return ctxt->icamera;
 }

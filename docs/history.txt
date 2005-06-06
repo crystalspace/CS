@@ -36,6 +36,9 @@ chronological order.
 	  x, y, and z relative direction. One usage is the ability to export
 	  nodes for a spline path where you can encode the forward and up
 	  vectors that way.
+	- res did more fat rl modularization work.
+	- res changed some csRenderContext members to use csRef<> instead of
+	  plain pointers.
 5-Jun-2005
 	- Eric Sunshine fixed a bunch of compilation issues reported by
 	  Apple/Tiger's gcc4.

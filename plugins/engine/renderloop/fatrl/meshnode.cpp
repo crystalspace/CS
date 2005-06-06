@@ -137,7 +137,7 @@ void csMeshRenderNode::AddMesh (csRenderMesh* rm, iMeshWrapper* mw,
   bucket->stacks.Push (stacks);
 }
 
-void csMeshRenderNode::Process (iRenderView* rview)
+bool csMeshRenderNode::Preprocess (iRenderView* rview)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
@@ -145,6 +145,8 @@ void csMeshRenderNode::Process (iRenderView* rview)
   g3d->SetZMode (CS_ZBUF_MESH);
   TraverseShaderBuckets traverser (*this, g3d);
   buckets.TraverseInOrder (traverser);
+
+  return true;
 }
 
 //---------------------------------------------------------------------------

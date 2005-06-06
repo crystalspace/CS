@@ -95,9 +95,9 @@ public:
   csRenderContext* previous;
 
   /// The current camera.
-  iCamera* icamera;
+  csRef<iCamera> icamera;
   /// The 2D polygon describing how everything drawn inside should be clipped.
-  iClipper2D* iview;
+  csRef<iClipper2D> iview;
   ///// The frustum corresponding with iview.
   csPlane3 frustum[5];
 

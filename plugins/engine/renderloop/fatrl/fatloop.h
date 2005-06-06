@@ -33,6 +33,7 @@
 
 #include "rendernode.h"
 #include "meshnode.h"
+#include "portalnode.h"
 
 class csFatLoopType : public csBaseRenderStepType
 {
@@ -91,14 +92,6 @@ class csFatLoopStep : public iRenderStep
 
   struct RenderNode
   {
-    enum Type { Container, Portal };
-    Type nodeType;
-
-    iPortal* portal;
-    csPoly2D poly;
-    csReversibleTransform movtrans;
-    csPlane3 camera_plane;
-
     csRenderNode* renderNode;
     iRenderView* rview;
 
@@ -113,6 +106,7 @@ class csFatLoopStep : public iRenderStep
   uint32 Classify (csRenderMesh* mesh);
 
   csMeshRenderNodeFactory meshNodeFact;
+  csPortalRenderNodeFactory portalNodeFact;
 
   void BuildNodeGraph (RenderNode* node, iRenderView* rview, 
     iSector* sector, csShaderVarStack &stacks);
@@ -120,20 +114,6 @@ class csFatLoopStep : public iRenderStep
     iPortalContainer* portals, iRenderView* rview, csShaderVarStack &stacks);
   void ProcessNode (iRenderView* rview, RenderNode* node,
     csShaderVarStack &stacks);
-  void RenderPortal (RenderNode* node, iRenderView* rview,
-    csShaderVarStack &stacks);
-
-  // Camera space data.
-  csDirtyAccessArray<csVector3> camera_vertices;
-  csArray<csPlane3> camera_planes;
-  void DoPortal (RenderNode* node, iPortal* portal, const csPoly2D& poly,
-    const csReversibleTransform& movtrans, const csPlane3& camera_plane, 
-    iRenderView* rview, csShaderVarStack &stacks);
-  bool ClipToPlane (iPortal* portal, csPlane3 *portal_plane, 
-    const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
-  bool DoPerspective (csVector3 *source, int num_verts, csPoly2D *dest, 
-    bool mirror, int fov, float shift_x, float shift_y, 
-    const csPlane3& plane_cam);
 public:
   SCF_DECLARE_IBASE;
 

@@ -98,7 +98,8 @@ class csMeshRenderNode : public csRenderNode
 public:
   void AddMesh (csRenderMesh* rm, iMeshWrapper* mw, long prio, bool keepOrder);
 
-  virtual void Process (iRenderView* rview);
+  virtual bool Preprocess (iRenderView* rview);
+  virtual void Postprocess (iRenderView* rview) {}
 };
 
 class csMeshRenderNodeFactory
