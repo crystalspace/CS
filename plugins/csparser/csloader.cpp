@@ -4355,7 +4355,7 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
   	node->GetAttributeValue ("name")));
   pNode->SetSector (sec);
 
-  csVector3 pos;
+  csVector3 pos, v;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -4391,6 +4391,21 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
       case XMLTOKEN_POSITION:
 	if (!SyntaxService->ParseVector (child, pos))
 	  return 0;
+        break;
+      case XMLTOKEN_XVECTOR:
+	if (!SyntaxService->ParseVector (child, v))
+	  return 0;
+	pNode->SetXVector (v);
+        break;
+      case XMLTOKEN_YVECTOR:
+	if (!SyntaxService->ParseVector (child, v))
+	  return 0;
+	pNode->SetYVector (v);
+        break;
+      case XMLTOKEN_ZVECTOR:
+	if (!SyntaxService->ParseVector (child, v))
+	  return 0;
+	pNode->SetZVector (v);
         break;
       default:
 	SyntaxService->ReportBadToken (child);

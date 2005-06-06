@@ -45,14 +45,24 @@ public:
   SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iMapNode --------------------------
   virtual iObject *QueryObject() { return (csObject*)this; }
-  virtual void SetPosition (const csVector3& pos);
-  virtual const csVector3& GetPosition () const;
+  virtual void SetPosition (const csVector3& pos) { position = pos; }
+  virtual const csVector3& GetPosition () const { return position; }
+  virtual void SetXVector (const csVector3& vec) { xvector = vec; }
+  virtual const csVector3& GetXVector () const { return xvector; }
+  virtual void SetYVector (const csVector3& vec) { yvector = vec; }
+  virtual const csVector3& GetYVector () const { return yvector; }
+  virtual void SetZVector (const csVector3& vec) { zvector = vec; }
+  virtual const csVector3& GetZVector () const { return zvector; }
+
   virtual void SetSector (iSector *sec);
-  virtual iSector *GetSector () const;
+  virtual iSector *GetSector () const { return sector; }
 
 private:
-  iSector *m_pSector;
-  csVector3 m_Position;
+  iSector *sector;
+  csVector3 position;
+  csVector3 xvector;
+  csVector3 yvector;
+  csVector3 zvector;
 };
 
 /**

@@ -28,7 +28,12 @@ SCF_IMPLEMENT_IBASE_EXT (csMapNode)
   SCF_IMPLEMENTS_INTERFACE (iMapNode)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-csMapNode::csMapNode (const char* Name) : m_pSector(0), m_Position(0, 0, 0)
+csMapNode::csMapNode (const char* Name) :
+	sector (0),
+	position (0, 0, 0),
+	xvector (1, 0, 0),
+	yvector (0, 1, 0),
+	zvector (0, 0, 1)
 {
   SetName (Name);
 }
@@ -37,26 +42,11 @@ csMapNode::~csMapNode ()
 {
 }
 
-void csMapNode::SetPosition (const csVector3& pos)
-{
-  m_Position = pos;
-}
-
-const csVector3& csMapNode::GetPosition () const
-{
-  return m_Position;
-}
-
-iSector *csMapNode::GetSector () const
-{
-  return m_pSector;
-}
-
 void csMapNode::SetSector (iSector *pSector)
 {
-  if (m_pSector) m_pSector->QueryObject ()->ObjRemove (this);
-  m_pSector = pSector;
-  if (m_pSector) m_pSector->QueryObject ()->ObjAdd (this);
+  if (sector) sector->QueryObject ()->ObjRemove (this);
+  sector = pSector;
+  if (sector) sector->QueryObject ()->ObjAdd (this);
 }
 
 iMapNode* csMapNode::GetNode (iSector *pSector, const char* name,

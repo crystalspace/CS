@@ -52,6 +52,19 @@ struct iMapNode : public iBase
   /// Get the position of the node
   virtual const csVector3& GetPosition () const = 0;
 
+  /// Set the x vector of the node
+  virtual void SetXVector (const csVector3& vec) = 0;
+  /// Get the x vector of the node
+  virtual const csVector3& GetXVector () const = 0;
+  /// Set the y vector of the node
+  virtual void SetYVector (const csVector3& vec) = 0;
+  /// Get the y vector of the node
+  virtual const csVector3& GetYVector () const = 0;
+  /// Set the z vector of the node
+  virtual void SetZVector (const csVector3& vec) = 0;
+  /// Get the z vector of the node
+  virtual const csVector3& GetZVector () const = 0;
+
   /// Set the sector of the node
   virtual void SetSector (iSector *pSector) = 0;
   /// Get the sector of the node

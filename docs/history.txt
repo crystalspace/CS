@@ -30,6 +30,12 @@ chronological order.
 	- Eric Sunshine fixed bug in the Texi2HTML rule in docs.jam where it
 	  failed to respect its `outfile' argument (i.e. it omitted texi2html's
 	  -top-file= option).
+	- Jorrit added support for x, y, and z relative vector to the node
+	  object (iMapNode). This can be used together with map editors
+	  (like blender) to export not only a position in a sector but also
+	  x, y, and z relative direction. One usage is the ability to export
+	  nodes for a spline path where you can encode the forward and up
+	  vectors that way.
 5-Jun-2005
 	- Eric Sunshine fixed a bunch of compilation issues reported by
 	  Apple/Tiger's gcc4.
