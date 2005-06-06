@@ -32,7 +32,7 @@ use HTMLEntities;
 # the index needs some special treatment
 #
 sub doctoc_index {
-  (my $docroot, my $srcfile, my $TOCFILE) = @_;
+  my ($docroot, $docindex, $srcfile, $TOCFILE) = @_;
   my %indexfiles;
   my %letterindexed;
 
@@ -44,7 +44,7 @@ sub doctoc_index {
         print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$3">
-<param name="Local" value="$docroot\\$1#$2">
+<param name="Local" value="$1#$2">
 </OBJECT>
 EOTOCENTRY
         $indexfiles{$1} = 1;
@@ -75,7 +75,7 @@ EOTOCENTRY
     close($INDEXFILE);
   }
 
-  open(my $HHKFILE, ">manualindex.hhk");
+  open(my $HHKFILE, ">$docindex");
   print $HHKFILE <<EOHHKHEAD;
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
@@ -99,7 +99,7 @@ EOHHKENTRY
   print $HHKFILE <<EOHHKENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$ititle">
-<param name="Local" value="$docroot\\$ilink">
+<param name="Local" value="$ilink">
 </OBJECT>
 EOHHKENTRY
     }
@@ -118,7 +118,7 @@ EOHHKEND
 # parse a section
 #
 sub doctoc_section {
-  (my $docroot, my $srcfile, my $TOCFILE) = @_;
+  my ($docroot, $docindex, $srcfile, $TOCFILE) = @_;
 
   open(my $INDEXFILE, "<$docroot/$srcfile");
   while (<$INDEXFILE>) {
@@ -131,18 +131,18 @@ sub doctoc_section {
       print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$sectitle">
-<param name="Local" value="$docroot\\$seclink">
+<param name="Local" value="$seclink">
 </OBJECT>
 EOTOCENTRY
       if ($sectitle eq "Index") {
         print $TOCFILE "<UL>";
         (my $indexfile) = ($seclink =~ /(.*)\#.*/);
-        doctoc_index($docroot, $indexfile, $TOCFILE);
+        doctoc_index($docroot, $docindex, $indexfile, $TOCFILE);
         print $TOCFILE "<\/UL>\n";
       }
       elsif ($seclink =~ /(.*)\#(.*)/) {
         print $TOCFILE "<UL>";
-        doctoc_section($docroot, $1, $TOCFILE);
+        doctoc_section($docroot, $docindex, $1, $TOCFILE);
         print $TOCFILE "<\/UL>\n";
       }
     }
@@ -154,9 +154,9 @@ EOTOCENTRY
 # create csdocs TOC.
 #
 sub doctoc {
-  my $docroot = shift @_;
+  my ($docroot, $doctoc, $docindex) = @_;
 
-  open(my $TOCFILE, ">manualtoc.hhc");
+  open(my $TOCFILE, ">$doctoc");
 
   print $TOCFILE <<EOTOCHEAD;
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
@@ -170,20 +170,20 @@ sub doctoc {
 <UL>
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="Crystal Space Documentation">
-<param name="Local" value="$docroot\\index.html">
+<param name="Local" value="index.html">
 </OBJECT>
 <UL>
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="Table of contents">
-<param name="Local" value="$docroot\\cs_toc.html">
+<param name="Local" value="cs_toc.html">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="About this document">
-<param name="Local" value="$docroot\\cs_abt.html">
+<param name="Local" value="cs_abt.html">
 </OBJECT>
 EOTOCHEAD
 
-  doctoc_section($docroot, "cs_ovr.html", $TOCFILE);
+  doctoc_section($docroot, $docindex, "cs_ovr.html", $TOCFILE);
 
   print $TOCFILE <<EOTOCEND;
 </UL>
@@ -208,7 +208,7 @@ sub api_compound_list {
       print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$ctitle">
-<param name="Local" value="$apiroot\\$clink">
+<param name="Local" value="$clink">
 </OBJECT>
 EOTOCENTRY
     }
@@ -229,7 +229,7 @@ sub api_compound_members {
       print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$2">
-<param name="Local" value="$apiroot\\$srcfile#$1">
+<param name="Local" value="$srcfile#$1">
 </OBJECT>
 EOTOCENTRY
     }
@@ -249,7 +249,7 @@ sub api_file_list {
       print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$1">
-<param name="Local" value="$apiroot\\$2">
+<param name="Local" value="$2">
 </OBJECT>
 EOTOCENTRY
       $_ = $3;
@@ -262,8 +262,8 @@ EOTOCENTRY
 # create csapi TOC.
 #
 sub apitoc {
-  my $apiroot = shift @_;
-  open(my $TOCFILE, ">apitoc.hhc");
+  my ($apiroot, $apitoc, $apiindex) = @_;
+  open(my $TOCFILE, ">$apitoc");
 
   print $TOCFILE <<EOTOCHEAD;
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
@@ -277,18 +277,18 @@ sub apitoc {
 <UL>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Main Page">
-  <param name="Local" value="$apiroot\\index.html">
+  <param name="Local" value="index.html">
   </OBJECT>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Class Hierarchy">
-  <param name="Local" value="$apiroot\\hierarchy.html">
+  <param name="Local" value="hierarchy.html">
   </OBJECT>
 EOTOCHEAD
 
   print $TOCFILE <<EOTOCHEAD;
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Compound List">
-  <param name="Local" value="$apiroot\\annotated.html">
+  <param name="Local" value="annotated.html">
   </OBJECT>
   <UL>
 EOTOCHEAD
@@ -299,7 +299,7 @@ EOTOCHEAD
 </UL>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Compound Members">
-  <param name="Local" value="$apiroot\\functions.html">
+  <param name="Local" value="functions.html">
   </OBJECT>
   <UL>
 EOTOCHEAD
@@ -310,7 +310,7 @@ EOTOCHEAD
 </UL>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Files">
-  <param name="Local" value="$apiroot\\files.html">
+  <param name="Local" value="files.html">
   </OBJECT>
   <UL>
 EOTOCHEAD
@@ -327,10 +327,10 @@ EOTOCEND
 }
 
 if ($ARGV[0] eq "manual") {
-  doctoc($ARGV[1]);
+  doctoc($ARGV[1], $ARGV[2], $ARGV[3]);
 }
 elsif ($ARGV[0] eq "api") {
-  apitoc($ARGV[1]);
+  apitoc($ARGV[1], $ARGV[2], $ARGV[3]);
 }
 else {
   die "Unrecognized documentation selector: \"$ARGV[0]\"\n" .

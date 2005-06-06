@@ -5,7 +5,7 @@ Compatibility=1.1 or later
 Compiled file=csmanual.chm
 Contents file=manualtoc.hhc
 Default Window=main
-Default topic=html\manual\index.html
+Default topic=index.html
 Display compile progress=Yes
 Full-text search=Yes
 Index file=manualindex.hhk
@@ -13,7 +13,7 @@ Language=0x409 English (United States)
 Title=Crystal Space Documentation
 
 [WINDOWS]
-main=,"manualtoc.hhc","manualindex.hhk","html\manual\index.html","html\manual\index.html","javascript:window.open('http://www.crystalspace3d.org/'); history.go(-1);","CS Homepage",,,0x22520,,0x4304e,,,,,,,,0
+main=,"manualtoc.hhc","manualindex.hhk","index.html","index.html","javascript:window.open('http://www.crystalspace3d.org/'); history.go(-1);","CS Homepage",,,0x22520,,0x4304e,,,,,,,,0
 
 
 [INFOTYPES]

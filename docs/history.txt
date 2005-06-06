@@ -10,6 +10,26 @@ chronological order.
 	- Anders fixed several bugs in array SV handling, and added loader
 	  functionality for array SVs. Pseudo-syntax is:
 	  <sv type="array"><sv .../><sv .../> ... </sv>
+	- Eric Sunshine added `manualchm' Jam target to the build system which
+	  converts the Crystal Space user manual to CHM (Microsoft's compressed
+	  HTML help) format.  For this to work, you will need to have Perl
+	  installed (www.activestate.com) and Microsoft's HTML Help
+	  Workshop. Although CHM generation relies upon Microsoft's hhc.exe
+	  (HTML Help Compiler), it is possible to create CHM format
+	  documentation on Linux by running hhc.exe under Wine. The file
+	  CS/docs/support/winhelp/README.txt contains instructions explaining
+	  how to configure both Windows and Linux installations for CHM
+	  generation.
+	- Eric Sunshine fixed gristing problem in _Texinfo rule in docs.jam
+	  which caused generated files to end up in an incorrect location if an
+	  attempt was made by two different targets to convert the same Texinfo
+	  sources to the same format.
+	- Eric Sunshine augmented the various documentation generation rules in
+	  docs.jam so that they return the gristed top-level output file as a
+	  convenience to callers.
+	- Eric Sunshine fixed bug in the Texi2HTML rule in docs.jam where it
+	  failed to respect its `outfile' argument (i.e. it omitted texi2html's
+	  -top-file= option).
 5-Jun-2005
 	- Eric Sunshine fixed a bunch of compilation issues reported by
 	  Apple/Tiger's gcc4.
