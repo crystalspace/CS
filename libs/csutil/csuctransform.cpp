@@ -32,7 +32,8 @@
 
 static size_t ApplyMapping (const UCMapEntry* map, const size_t mapSize,
 			    const utf16_char* mapAux, const utf32_char ch, 
-			    utf32_char* dest, size_t destSize)
+			    utf32_char* dest, size_t destSize, 
+                            bool simpleMapping)
 {
   size_t bufRemaining = destSize;
   size_t encodedLen = 0;
@@ -45,27 +46,39 @@ static size_t ApplyMapping (const UCMapEntry* map, const size_t mapSize,
     const UCMapEntry& entry = map[m];
     if (entry.mapFrom == ch)
     {
+      utf32_char toChar = entry.mapTo & 0x1fffff;
       // Found it...
-      if ((entry.mapTo & 0xff000000) == 0)
+      if ((entry.mapTo & (1 << 31)) == 0)
       {
 	// Simple mapping
-	_OUTPUT_CHAR(dest, entry.mapTo);
+	_OUTPUT_CHAR(dest, toChar);
       }
       else
       {
 	// Complex mapping (multiple chars)
-	size_t auxLen = entry.mapTo >> 24;
-	size_t auxOffs = entry.mapTo & 0xffffff;
+	size_t auxLen = (entry.mapTo >> 21) & 0x1ff;
+	size_t auxOffs = toChar;
+        size_t simpleLen = ((entry.mapTo >> 30) & 1) + 1;
 	utf32_char outCh;
 	// Decode from the auxilary data.
-	while (auxLen > 0)
-	{
-	  int n = csUnicodeTransform::UTF16Decode (mapAux + auxOffs, 
-	    CS_UC_MAX_UTF16_ENCODED, outCh);
+        if (simpleMapping)
+        {
+	  csUnicodeTransform::UTF16Decode (mapAux + auxOffs, 
+	    simpleLen, outCh);
 	  _OUTPUT_CHAR(dest, outCh);
-	  auxLen -= n;
-	  auxOffs += n;
-	}
+        }
+        else
+        {
+          auxOffs += simpleLen;
+	  while (auxLen > 0)
+	  {
+	    int n = csUnicodeTransform::UTF16Decode (mapAux + auxOffs, 
+	      auxLen, outCh);
+	    _OUTPUT_CHAR(dest, outCh);
+	    auxLen -= n;
+	    auxOffs += n;
+	  }
+        }
       }
       return encodedLen;
     }
@@ -80,22 +93,22 @@ static size_t ApplyMapping (const UCMapEntry* map, const size_t mapSize,
 }
 
 size_t csUnicodeTransform::MapToUpper (const utf32_char ch, utf32_char* dest, 
-				       size_t destSize)
+				       size_t destSize, uint flags)
 {
   return ApplyMapping (mapUpper, sizeof (mapUpper) / sizeof (UCMapEntry),
-    mapUpper_aux, ch, dest, destSize);
+    mapUpper_aux, ch, dest, destSize, flags & csUcMapSimple);
 }
 
 size_t csUnicodeTransform::MapToLower (const utf32_char ch, utf32_char* dest, 
-				       size_t destSize)
+				       size_t destSize, uint flags)
 {
   return ApplyMapping (mapLower, sizeof (mapLower) / sizeof (UCMapEntry),
-    mapLower_aux, ch, dest, destSize);
+    mapLower_aux, ch, dest, destSize, flags & csUcMapSimple);
 }
 
 size_t csUnicodeTransform::MapToFold (const utf32_char ch, utf32_char* dest, 
-				      size_t destSize)
+				      size_t destSize, uint flags)
 {
   return ApplyMapping (mapFold, sizeof (mapFold) / sizeof (UCMapEntry),
-    mapFold_aux, ch, dest, destSize);
+    mapFold_aux, ch, dest, destSize, flags & csUcMapSimple);
 }

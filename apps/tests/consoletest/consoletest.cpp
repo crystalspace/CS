@@ -19,11 +19,55 @@
 
 #include "cssysdef.h"
 #include "csutil/ansicolor.h"
+#include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
 
 #include "teststrings.h"
 
 CS_IMPLEMENT_PLATFORM_APPLICATION
+
+/* The csUnicodeTransform::MapToSomething are somewhat spammy, so they are
+ * disabled by default. Uncomment to enable. */
+//#define TEST_UNICODE_MAPPINGS
+
+#ifdef TEST_UNICODE_MAPPINGS
+typedef size_t (*MappingFn)(const utf32_char ch, utf32_char* dest, 
+                            size_t destSize, uint flags);
+
+static csString MapString (const char* in, MappingFn mappingFn)
+{
+  csString res;
+  size_t len = strlen (in);
+  while (*in != 0)
+  {
+    utf32_char ch;
+    size_t n = csUnicodeTransform::UTF8Decode ((utf8_char*)in, len, ch);
+    len -= n;
+    in += n;
+
+    utf32_char mapped[CS_UC_MAX_MAPPED];
+    n = mappingFn (ch, mapped, sizeof(mapped) / sizeof(utf32_char), 0);
+    for (size_t p = 0; p < n; p++)
+    {
+      utf8_char enc[CS_UC_MAX_UTF8_ENCODED];
+      size_t m = csUnicodeTransform::EncodeUTF8 (mapped[p], enc, 
+        sizeof(enc) / sizeof(utf8_char));
+      res.Append ((char*)enc, m);
+    }
+  }
+  return res;
+}
+#endif // TEST_UNICODE_MAPPINGS
+
+static void TestMapping (const char* str)
+{
+#ifdef TEST_UNICODE_MAPPINGS
+  csPrintf (" Upper:    %s\n Lower:    %s\n Fold:     %s\n",
+    MapString (str, &csUnicodeTransform::MapToUpper).GetData(),
+    MapString (str, &csUnicodeTransform::MapToLower).GetData(),
+    MapString (str, &csUnicodeTransform::MapToFold).GetData());
+#endif // TEST_UNICODE_MAPPINGS
+}
 
 /*---------------------------------------------------------------------*
  * Main function
@@ -35,6 +79,7 @@ int main (int argc, char* argv[])
     while (*qbf != 0)
     {
       csPrintf ("%-10s %s\n", qbf[1], qbf[0]);
+      TestMapping (qbf[0]);
       qbf += 2;
     }
   }
@@ -44,6 +89,7 @@ int main (int argc, char* argv[])
     while (*iceg != 0)
     {
       csPrintf ("%-10s %s\n", iceg[1], iceg[0]);
+      TestMapping (iceg[0]);
       iceg += 2;
     }
   }

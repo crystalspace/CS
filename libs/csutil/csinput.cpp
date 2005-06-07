@@ -25,6 +25,7 @@
 #include "csutil/csinput.h"
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/csuctransform.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
@@ -37,10 +38,10 @@ static char ShiftedKey [128-32] =
 {
 ' ', '!', '"', '#', '$', '%', '&', '"', '(', ')', '*', '+', '<', '_', '>', '?',
 ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':', '<', '+', '>', '?',
-'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '^', '_',
-'~', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~', 127
+'@',  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
+ -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, '{', '|', '}', '^', '_',
+'~',  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
+ -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, '{', '|', '}', '~',  -1
 };
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
@@ -435,10 +436,14 @@ void csKeyboardDriver::SynthesizeCooked (utf32_char codeRaw,
     }
     else if (modifiers.modifiers[csKeyModifierTypeShift] != 0)
     {
-      if ((codeRaw >= 32) && (codeRaw <= 127))
-	codeCooked = ShiftedKey [codeRaw - 32];
+      char newCode;
+      if ((codeRaw < 32) || (codeRaw > 127)
+        || ((newCode = ShiftedKey [codeRaw - 32]) == -1))
+      {
+        csUnicodeTransform::MapToUpper (codeRaw, &codeCooked, 1, csUcMapSimple);
+      }
       else
-	codeCooked = 0;
+        codeCooked = newCode;
     }
     else
       codeCooked = 0;

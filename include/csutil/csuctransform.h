@@ -39,7 +39,20 @@
  * this long
  */
 #define CS_UC_MAX_MAPPED		3
- 
+
+/**
+ * Flags influencing the behaviour of MapToUpper, MapToLower and MapToFold
+ */
+enum
+{
+  /**
+   * Force 'simple' mappings, that is, at most one character is returned.
+   * The default 'complex' mappings can return more than one character in
+   * some cases.
+   */
+  csUcMapSimple = (1 << 0)
+};
+
 /**
  * Contains functions to convert between several UTF encodings.
  */
@@ -938,20 +951,20 @@ public:
    * \return Number of characters the complete mapping result would require.
    */
   static size_t MapToUpper (const utf32_char ch, utf32_char* dest, 
-    size_t destSize);
+    size_t destSize, uint flags = 0);
   /**
    * Map a character to its lower case equivalent(s).
    * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t)
    */
   static size_t MapToLower (const utf32_char ch, utf32_char* dest, 
-    size_t destSize);
+    size_t destSize, uint flags = 0);
   /**
    * Map a character to its fold equivalent(s).
    * Fold mapping is useful for binary comparison of two Unicode strings.
    * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t)
    */
   static size_t MapToFold (const utf32_char ch, utf32_char* dest, 
-    size_t destSize);
+    size_t destSize, uint flags = 0);
   /** @} */
 };
 

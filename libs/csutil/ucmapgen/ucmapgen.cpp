@@ -27,33 +27,63 @@
 #include "csutil/stringreader.h"
 #include "csutil/sysfunc.h"
 
+CS_IMPLEMENT_APPLICATION
+
 struct CharMap
 {
   struct CharMapping
   {
     utf32_char from;
-    csArray<utf32_char> to;
+    utf32_char simpleTo;
+    csArray<utf32_char> complexTo;
+
+    CharMapping() : simpleTo(0) {}
   };
   csArray<CharMapping> mappings;
 
   static int MappingCompare (const CharMapping& m1, const CharMapping& m2)
   {
-    return m1.from - m2.from;
+    if (m1.from < m2.from)
+      return -1;
+    else if (m1.from > m2.from)
+      return 1;
+    else
+      return 0;
   }
 
   void Insert (utf32_char code, utf32_char mapTo)
   {
-    CharMapping mapping;
-    mapping.from = code;
-    mapping.to.Push (mapTo);
-    mappings.InsertSorted (mapping, &MappingCompare);
+    CharMapping newMapping;
+    newMapping.from = code;
+    size_t index = mappings.FindSortedKey (csArrayCmp<CharMapping, CharMapping> (
+      newMapping, MappingCompare));
+    if (index != csArrayItemNotFound)
+    {
+      CharMapping& mapping = mappings[index];
+      mapping.simpleTo = mapTo;
+    }
+    else
+    {
+      newMapping.simpleTo = mapTo;
+      mappings.InsertSorted (newMapping, &MappingCompare);
+    }
   }
   void Insert (utf32_char code, const csArray<utf32_char>& mapTo)
   {
-    CharMapping mapping;
-    mapping.from = code;
-    mapping.to = mapTo;
-    mappings.InsertSorted (mapping, &MappingCompare);
+    CharMapping newMapping;
+    newMapping.from = code;
+    size_t index = mappings.FindSortedKey (csArrayCmp<CharMapping, CharMapping> (
+      newMapping, MappingCompare));
+    if (index != csArrayItemNotFound)
+    {
+      CharMapping& mapping = mappings[index];
+      mapping.complexTo = mapTo;
+    }
+    else
+    {
+      newMapping.complexTo = mapTo;
+      mappings.InsertSorted (newMapping, &MappingCompare);
+    }
   }
 };
 typedef csArray<const char*> UniDBEntry;
@@ -83,23 +113,33 @@ void WriteMapToFile (FILE* file, const CharMap& map, const char* varPref)
   for (size_t i = 0; i < map.mappings.Length(); i++)
   {
     const CharMap::CharMapping curMapping = map.mappings[i];
-    if (curMapping.to.Length() == 1)
+    uint outGlyph;
+    if (curMapping.complexTo.Length() > 0)
     {
-      csFPrintf (file, "  {0x%.4" PRIx32 ", 0x%.4" PRIx32 "},\n",
-	curMapping.from, curMapping.to[0]);
-    }
-    else
-    {
-      uint toVal = (curMapping.to.Length() << 24) | auxdata.Length();
-      csFPrintf (file, "  {0x%.4" PRIx32 ", 0x%.4x},\n", curMapping.from, toVal);
-      for (size_t j = 0; j < curMapping.to.Length(); j++)
+      outGlyph = (uint)auxdata.Length() | (1 << 31);
+
+      utf16_char toEnc[CS_UC_MAX_UTF16_ENCODED];
+      int n = csUnicodeTransform::EncodeUTF16 (
+        (curMapping.simpleTo != 0) ? curMapping.simpleTo : curMapping.from, 
+        toEnc, sizeof (toEnc) / sizeof (utf16_char));
+      for (int k = 0; k < n; k++) auxdata.Push (toEnc[k]);
+
+      outGlyph |= ((n-1) << 30);
+
+      size_t simpLen = 0;
+      for (size_t j = 0; j < curMapping.complexTo.Length(); j++)
       {
-	utf16_char toEnc[CS_UC_MAX_UTF16_ENCODED];
-	int n = csUnicodeTransform::EncodeUTF16 (curMapping.to[j], toEnc,
+	n = csUnicodeTransform::EncodeUTF16 (curMapping.complexTo[j], toEnc,
 	  sizeof (toEnc) / sizeof (utf16_char));
 	for (int k = 0; k < n; k++) auxdata.Push (toEnc[k]);
+        simpLen += n;
       }
+      outGlyph |= (simpLen << 21);
     }
+    else
+      outGlyph = curMapping.simpleTo;
+    csFPrintf (file, "  {0x%.4" PRIx32 ", 0x%.4x},\n", 
+      curMapping.from, outGlyph);
   }
   csFPrintf (file, "};\n");
   csFPrintf (file, "static const utf16_char %s_aux[] = {\n", varPref);
@@ -115,7 +155,7 @@ void WriteMapToFile (FILE* file, const CharMap& map, const char* varPref)
   csFPrintf (file, "};\n");
 }
 
-int main (int argc, const char* const argv[])
+int main (int argc, char* argv[])
 {
   csPhysicalFile unicodeData ("UnicodeData.txt", "rb");
   if (unicodeData.GetStatus() != VFS_STATUS_OK)
@@ -193,7 +233,12 @@ int main (int argc, const char* const argv[])
 	  curPos++;
 	}
 	if ((mapTo.Length() > 1) || (mapTo[0] != charCode))
-	  lowercaseMap.Insert (charCode, mapTo);
+        {
+          if (mapTo.Length() > 1)
+	    lowercaseMap.Insert (charCode, mapTo);
+          else
+	    lowercaseMap.Insert (charCode, mapTo[0]);
+        }
       }
       mapTo.Empty();
       {
@@ -208,7 +253,12 @@ int main (int argc, const char* const argv[])
 	  curPos++;
 	}
 	if ((mapTo.Length() > 1) || (mapTo[0] != charCode))
-	  uppercaseMap.Insert (charCode, mapTo);
+        {
+          if (mapTo.Length() > 1)
+	    uppercaseMap.Insert (charCode, mapTo);
+          else
+	    uppercaseMap.Insert (charCode, mapTo[0]);
+        }
       }
     }
   }
@@ -223,7 +273,7 @@ int main (int argc, const char* const argv[])
     {
       if ((line.Length() == 0) || (line.GetAt(0) == '#')) continue;
       ParseEntry (line, entry);
-      if ((entry[1][0] == 'T') || (entry[1][0] == 'S')) continue;
+      if (entry[1][0] == 'T') continue;
       int charCode;
       sscanf (entry[0], "%x", &charCode);
       mapTo.Empty();
@@ -238,7 +288,10 @@ int main (int argc, const char* const argv[])
 	  if (curPos == 0) break;
 	  curPos++;
 	}
-	foldMap.Insert (charCode, mapTo);
+        if (entry[1][0] == 'F')
+	  foldMap.Insert (charCode, mapTo);
+        else
+	  foldMap.Insert (charCode, mapTo[0]);
       }
     }
   }

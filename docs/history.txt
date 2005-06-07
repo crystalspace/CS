@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Jun-2005
+	- res added support for "simple mappings" to the 
+	  csUnicodeTransform::MapToSomething() methods. "Simple mappings"
+	  always return at most 1 character.
+	- res made csKeyboardDriver::SynthesizeCooked() use 
+	  csUnicodeTransform::MapToUpper().
 6-Jun-2005
 	- Anders fixed several bugs in array SV handling, and added loader
 	  functionality for array SVs. Pseudo-syntax is:
