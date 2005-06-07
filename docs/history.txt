@@ -20,6 +20,15 @@ chronological order.
 	  a level I'm making from 15->80 fps with a very small pseudo
 	  dynamic light that is animation and a huge mesh that surrounds
 	  it but is not affected by it).
+	- Christopher added four files into the AWS plugin.  Currently they
+	  are unused. Added new preferences storage functions, and an XML-based 
+	  translator.  The XML translator constructs a tree of registries that 
+	  contain only settings pertinent to the node the settings reside in.
+
+	  This system is very similar to the one AWS currently uses, except that 
+	  it has the element.attribute naming system and it parses XML instead of 
+	  AWS's custom definitions file.
+	  
 6-Jun-2005
 	- Anders fixed several bugs in array SV handling, and added loader
 	  functionality for array SVs. Pseudo-syntax is:
