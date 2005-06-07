@@ -1,0 +1,57 @@
+<!-- AWS Test file -->
+
+<skin name="Normal Windows"> 
+  <!-- this defines the appeareance of aws components -->
+  
+  <Texture value="/aws/texture.png" />
+  
+  <HighlightColor		r="230" g="230"	b="230" />
+  <ShadowColor			r="60"  g="60"	b="60" />
+  <FillColor			r="200" g="200"	b="200" />
+  <TextDisabledColor	r="128" g="128"	b="0" />
+  <TextForeColor		r="0"   g="0"	b="0" />
+  <TextBackColor        r="255" g="255"	b="255" />
+  <ButtonTextColor		r="0"   g="0"	b="192" />
+  <ChartBarColor		r="255" g="0"	b="0" />
+  <ActiveTitleBarColor1 r="0"   g="0"	b="128" />
+  <ActiveTitleBarColor2 r="200" g="200"	b="255" />
+  
+  <OverlayTextureAlpha	value="128" />
+  <ScrollBarHeight		value="16" />
+  <ScrollBarWidth		value="16" />
+  
+  <WindowMin>"/aws/minimize.png"</WindowMin>
+  <WindowZoom>"/aws/zoom.png"</WindowZoom>
+  <WindowClose>"/aws/close.png"</WindowClose>
+  
+  <WindowMinAt	 left="36" top="5" right="50" bot="19" />
+  <WindowZoomAt	 left="22" top="5" right="36" bot="19" />
+  <WindowCloseAt left="5"  top="5" right="19" bot="19" />
+  
+  <CheckBoxUp>"/aws/chkup.png"</CheckBoxUp>
+  <CheckBoxDn>"/aws/chkdn.png"</CheckBoxDn>
+  <CheckBoxOn>"/aws/chkon.png"</CheckBoxOn>
+  <CheckBoxOff>"/aws/chkoff.png"</CheckBoxOff>
+  <RadioButtonUp>"/aws/radup.png"</RadioButtonUp>
+  <RadioButtonDn>"/aws/raddn.png"</RadioButtonDn>
+  <RadioButtonOn>"/aws/radon.png"</RadioButtonOn>
+  <RadioButtonOff>"/aws/radoff.png"</RadioButtonOff>
+  <TreeCollapsed>"/aws/treecol.png"</TreeCollapsed>
+  <TreeExpanded>"/aws/treeexp.png"</TreeExpanded>  
+  <TreeVertLine>"/aws/treevl.png"</TreeVertLine>  
+  <TreeHorzLine>"/aws/treehl.png"</TreeHorzLine>  
+  <TreeChkUnmarked>"/aws/treechke.png"</TreeChkUnmarked>  
+  <TreeChkMarked>"/aws/treechkf.png"</TreeChkMarked>  
+  <TreeGrpUnmarked>"/aws/treegrpe.png"</TreeGrpUnmarked>  
+  <TreeGrpMarked>"/aws/treegrpf.png"</TreeGrpMarked>  
+  <ScrollBarUp>"/aws/sbup.png"</ScrollBarUp>  
+  <ScrollBarDn>"/aws/sbdn.png"</ScrollBarDn>
+  <ScrollBarRt>"/aws/sbrt.png"</ScrollBarRt>
+  <ScrollBarLt>"/aws/sblt.png"</ScrollBarLt>
+</skin>
+
+<window name="Another">
+  <Frame left="100" top="100" right="600" bot="440" />
+  <Style>wfsNormal<Style>
+  <Title>"A window with lots of stuff"</Title>  
+</window>
