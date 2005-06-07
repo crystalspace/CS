@@ -2,7 +2,6 @@
 #define __AWS_REGISTRY_H__
 
 #include <map>
-#include <string>
 #include "object.h"
 
 /** Namespace which includes aws specific code. */
@@ -17,11 +16,14 @@ namespace aws
 		/** The registry. */
 		value_type reg;
 
-		/** The type for the list of child registries that we may use. */
+		/** The type for the list of registries in the child category map. */
 		typedef std::vector< csRef<registry> > child_list_type;
 
+		/** The type for the list of child registries that we may use. */
+		typedef std::map< std::string, child_list_type> child_map_type;
+
 		/** The list of children. */
-		child_list_type children;
+		child_map_type children;
 
 		/** The parent, if there is one. */
 		csRef<registry> parent;
@@ -39,8 +41,11 @@ namespace aws
 		/** Sets the parent of this registry. */
 		void setParent(csRef<registry> _parent) { parent=_parent; }
 		
-		/** Adds a child registry. */
-		void addChild(csRef<registry> _child) { children.push_back(_child); }
+		/** Adds a child registry under a certain category.  We can lookup children given those categories. */
+		void addChild(const std::string &category, csRef<registry> _child);
+
+		/** Finds the child registry with the given name in the given category. */
+		csRef<registry> findChild(const std::string &category, const std::string &name);
 		
 		/** Finds a named value and returns a keeper to it. */
 		bool findValue(const std::string &name, autom::keeper &k);

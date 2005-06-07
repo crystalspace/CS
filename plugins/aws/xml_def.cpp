@@ -20,19 +20,20 @@ defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 		std::string name(child->GetValue());
 
 		if (name == "component" ||
-			name == "window")
+			name == "window"    ||
+			name == "skin")
 		{
 			csRef< iDocumentNodeIterator> new_pos = child->GetNodes();
 			registry *child_reg = new registry(child->GetAttributeValue("name"));
-
-			reg->addChild(child_reg);
+			
+			// Add the child.  The category of the child allows us to find certain kinds of registries more easily.
+			reg->addChild(name, child_reg);
 			child_reg->setParent(reg);
 
 			ParseNode(child_reg, new_pos);
 		}
 		else
-		{
-			
+		{			
 			csRef< iDocumentAttributeIterator > attr_pos = child->GetAttributes();
 
 			// Loop over all of the attributes in the element and add them as keys into the map.
