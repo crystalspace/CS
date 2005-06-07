@@ -236,7 +236,7 @@ static bool CanCastShadow (
 }
 
 
-void csPolyTexture::FillLightMap (
+bool csPolyTexture::FillLightMap (
   iFrustumView *lview,
   csLightingPolyTexQueue* lptq,
   bool vis,
@@ -246,7 +246,7 @@ void csPolyTexture::FillLightMap (
   const csPlane3& subpoly_plane,
   csPolygon3DStatic* spoly)
 {
-  if (!lm) return ;
+  if (!lm) return false;
 
   int j;
 
@@ -273,7 +273,7 @@ void csPolyTexture::FillLightMap (
     lptq->AddPolyTexture (this, subpoly);
   }
 
-  if (shadow_bitmap->IsFullyShadowed ()) return ;
+  if (shadow_bitmap->IsFullyShadowed ()) return false;
 
   // Room for our shadow in lightmap space.
   csVector2 s2d[MAX_OUTPUT_VERTICES];
@@ -283,9 +283,12 @@ void csPolyTexture::FillLightMap (
     // If completely shadowed due to external causes (i.e. c-buffer)
     // then we just fill it as entirely shadowed.
     shadow_bitmap->RenderTotal (1);
+    return false;
   }
   else
   {
+    bool affect = true;
+  
     // We will now start rendering an optional light frustum and several
     // shadow frustums on our shadow bitmap. But first we will create a
     // clipping polygon on our polygon which is guaranteed to be larger
@@ -446,11 +449,12 @@ void csPolyTexture::FillLightMap (
         }
 
         shadow_bitmap->RenderPolygon (s2d, nv, 1);
-        if (shadow_bitmap->IsFullyShadowed ()) break;
+        if (shadow_bitmap->IsFullyShadowed ()) { affect = false; break; }
       }
     }
 
     shadow_it->DecRef ();
+    return affect;
   }
 }
 

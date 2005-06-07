@@ -1343,7 +1343,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   return true;
 }
 
-void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
+bool csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
     iMovable* movable, const csPlane3& world_plane,
     csPolygon3DStatic* spoly)
 {
@@ -1351,7 +1351,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, world_plane)) return ;
+  if (!csMath3::Visible (center, world_plane)) return false;
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.
@@ -1360,7 +1360,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
   if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
-    return ;
+    return false;
 
   csRef<csFrustum> new_light_frustum;
 
@@ -1384,7 +1384,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   new_light_frustum = light_frustum->Intersect (poly, num_vertices);
 
   // Check if light frustum intersects with the polygon
-  if (!new_light_frustum) return ;
+  if (!new_light_frustum) return false;
 
   // There is an intersection of the current light frustum with the polygon.
   // This means that the polygon is hit by the light.
@@ -1403,13 +1403,13 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
       poly_plane,
       dist_to_plane * dist_to_plane);
 
-  if (min_sqdist >= lview->GetSquaredRadius ()) return;
+  if (min_sqdist >= lview->GetSquaredRadius ()) return false;
 
   // Update the lightmap.
-  FillLightMapDynamic (lview, new_light_frustum);
+  return FillLightMapDynamic (lview, new_light_frustum);
 }
 
-void csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
+bool csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
 	csFrustum* light_frustum)
 {
   csFrustumContext *ctxt = lview->GetFrustumContext ();
@@ -1435,9 +1435,10 @@ void csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
     mi = ctxt->IsMirrored () ? lp->GetVertexCount () - i - 1 : i;
     lp->GetVertex (i) = light_frustum->GetVertex (mi);
   }
+  return true;
 }
 
-void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
+bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   iMovable* movable,
   csLightingPolyTexQueue* lptq, bool vis,
   const csMatrix3& m_world2tex,
@@ -1456,7 +1457,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
     if (do_smooth)
       maybeItsVisible = true;
     else
-      return;
+      return false;
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.
@@ -1466,7 +1467,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // then we have a trivial case (no hit).
   if ((!do_smooth && dist_to_plane < SMALL_EPSILON)
     || dist_to_plane >= lview->GetRadius ())
-    return ;
+    return false;
 
   // In the following algorithm we ignore the light frustum and only
   // apply shadows on the lightmap.
@@ -1487,9 +1488,8 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
   // Update the lightmap given light and shadow frustums in lview.
   if (txt_info.lm)
-    txt_info.FillLightMap (lview, lptq, vis, this,
+    return txt_info.FillLightMap (lview, lptq, vis, this,
     	m_world2tex, v_world2tex, world_plane, spoly);
-
-  if (maybeItsVisible)
-    return;
+  else
+    return false;
 }

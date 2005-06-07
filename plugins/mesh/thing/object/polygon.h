@@ -652,8 +652,10 @@ public:
    * do nothing.
    * The "frustum" parameter defines the original light frustum (not the
    * one bounded by this polygon as given by "lview").
+   * This function returns true if the light actually affected the
+   * polygon. False otherwise.
    */
-  void FillLightMapDynamic (iFrustumView* lview, csFrustum* frustum);
+  bool FillLightMapDynamic (iFrustumView* lview, csFrustum* frustum);
 
   /**
    * Check all shadow frustums and mark all relevant ones. A shadow
@@ -673,8 +675,10 @@ public:
    * Check visibility of this polygon with the given csFrustumView
    * and update the light patches if needed.
    * This version is for dynamic lighting.
+   * This function returns true if the light actually affected the
+   * polygon. False otherwise.
    */
-  void CalculateLightingDynamic (iFrustumView* lview, iMovable* movable,
+  bool CalculateLightingDynamic (iFrustumView* lview, iMovable* movable,
   	const csPlane3& world_plane, csPolygon3DStatic* spoly);
 
   /**
@@ -683,8 +687,10 @@ public:
    * If 'vis' == false this means that the lighting system already discovered
    * that the polygon is totally shadowed.
    * This version is for static lighting.
+   * This function returns true if the light actually affected the
+   * polygon. False otherwise.
    */
-  void CalculateLightingStatic (iFrustumView* lview, iMovable* movable,
+  bool CalculateLightingStatic (iFrustumView* lview, iMovable* movable,
   	csLightingPolyTexQueue* lptq, bool vis,
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,

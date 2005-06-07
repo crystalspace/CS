@@ -297,8 +297,10 @@ public:
    * 'vis' will be false if the polygon is totally shadowed. In this
    * case we should use 'subpoly' to see where the shadow must go and
    * not the base polygon which this csPolyTexture points too.
+   * This function returns true if the light actually affected the
+   * polygon. False otherwise.
    */
-  void FillLightMap (iFrustumView* lview, csLightingPolyTexQueue* lptq,
+  bool FillLightMap (iFrustumView* lview, csLightingPolyTexQueue* lptq,
   	bool vis, csPolygon3D* subpoly,
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,

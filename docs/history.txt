@@ -12,6 +12,14 @@ chronological order.
 	  always return at most 1 character.
 	- res made csKeyboardDriver::SynthesizeCooked() use 
 	  csUnicodeTransform::MapToUpper().
+	- Jorrit did an optimization to the thing mesh with regards to
+	  lighting. With both dynamic and pseudo-dynamic lighting it will
+	  now detect if the light actually affects any of the polygons. If
+	  not then the light will not be added as relevant for the thing.
+	  In some situations this can give a huge performance boost (in
+	  a level I'm making from 15->80 fps with a very small pseudo
+	  dynamic light that is animation and a huge mesh that surrounds
+	  it but is not affected by it).
 6-Jun-2005
 	- Anders fixed several bugs in array SV handling, and added loader
 	  functionality for array SVs. Pseudo-syntax is:

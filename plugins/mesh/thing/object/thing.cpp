@@ -2320,15 +2320,18 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
       lpi->AttachUserdata (lptq);
     }
   }
-  lpi->GetLight ()->AddAffectedLightingInfo (&scfiLightingInfo);
 
+  bool affect = false;
   for (i = 0; i < polygons.Length (); i++)
   {
     csPolygon3D* poly = GetPolygon3D ((int)i);
     csPolygon3DStatic* spoly = static_data->GetPolygon3DStatic ((int)i);
     const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck ((int)i);
     if (dyn)
-      poly->CalculateLightingDynamic (lview, movable, world_plane, spoly);
+    {
+      if (poly->CalculateLightingDynamic (lview, movable, world_plane, spoly))
+        affect = true;
+    }
     else
     {
       if (ident)
@@ -2346,10 +2349,13 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
         lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
 		o2c, m_world2tex, v_world2tex);
       }
-      poly->CalculateLightingStatic (lview, movable, lptq, true,
-      	m_world2tex, v_world2tex, world_plane, spoly);
+      if (poly->CalculateLightingStatic (lview, movable, lptq, true,
+      		m_world2tex, v_world2tex, world_plane, spoly))
+	affect = true;
     }
   }
+  if (affect)
+    lpi->GetLight ()->AddAffectedLightingInfo (&scfiLightingInfo);
 }
 
 void csThing::InitializeDefault (bool clear)
