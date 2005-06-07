@@ -57,7 +57,14 @@ namespace aws
     {
       reg.insert(std::make_pair (name, k));
     }
+
+    /** Clears out this registry. */
+    void clear()
+    {
+      reg.clear();
+    }
   };
+
 
 } // end namespace
 
