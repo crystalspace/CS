@@ -3,7 +3,7 @@
 <skin name="Normal Windows"> 
   <!-- this defines the appeareance of aws components -->
   
-  <Texture value="/aws/texture.png" />
+  <Texture>"/aws/texture.png"</Texture>
   
   <HighlightColor		r="230" g="230"	b="230" />
   <ShadowColor			r="60"  g="60"	b="60" />
