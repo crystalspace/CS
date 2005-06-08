@@ -15,6 +15,8 @@ chronological order.
 	  works similarly as CollideRay() except that it collides with a finite
 	  segment instead of an infinite ray. Extended OPCODE to support
 	  this new function.
+	- res worked around a problem where ATI drivers crash when a generic
+	  compressed format is used for a RECT texture.
 7-Jun-2005
 	- res added support for "simple mappings" to the 
 	  csUnicodeTransform::MapToSomething() methods. "Simple mappings"

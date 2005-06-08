@@ -445,8 +445,15 @@ void csGLTextureHandle::CreateMipMaps()
    * checked against the target format of the first mip.
    */
   bool compressedTarget;
-  GLenum targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
-    textureSettings->formatRGBA : textureSettings->formatRGB;
+  GLenum targetFormat; 
+  if (target == iTextureHandle::CS_TEX_IMG_RECT)
+    /* @@@ Hack: ATI drivers can't grok compressed formats for RECT textures,
+     * so force an uncompressed format. */
+    targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
+      GL_RGBA : GL_RGB;
+  else
+    targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
+      textureSettings->formatRGBA : textureSettings->formatRGB;
   targetFormat = DetermineTargetFormat (targetFormat, 
     !textureSettings->forceDecompress, image->GetRawFormat(), 
     compressedTarget);
