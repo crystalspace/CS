@@ -99,11 +99,8 @@ bool csGraphics2DWX::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  csConfigAccess config(object_reg, "/config/opengl.cfg");
-
   // The texture manager only needs to know this:
   pfmt.PalEntries = 0;
-
 
   // Create the event outlet
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));

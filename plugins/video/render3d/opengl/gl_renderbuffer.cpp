@@ -75,12 +75,10 @@ static csString ByteFormat (size_t n)
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
 					    csGLStateCache *state,
                                             iObjectRegistry* p)
-  : ext (ext), statecache (state), object_reg (p),
+  : ext (ext), statecache (state), config(p), object_reg (p),
     verbose (false), superVerbose (false)
 {
   SCF_CONSTRUCT_IBASE(0);
-  
-  config.AddConfig(p, "/config/r3dopengl.cfg");
   
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (p, iVerbosityManager));

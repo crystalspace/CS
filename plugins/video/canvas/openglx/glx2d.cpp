@@ -81,8 +81,6 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  csConfigAccess config(object_reg, "/config/opengl.cfg");
-
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", 0)))

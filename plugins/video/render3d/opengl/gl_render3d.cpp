@@ -3076,6 +3076,9 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
 
+  /* Note: r3dopengl.cfg is also added by the canvases. This is done because
+   * either the canvas ot the renderer may be loaded before the other, but
+   * both need settings from this file. */
   config.AddConfig(object_reg, "/config/r3dopengl.cfg");
 
   const char *driver = cmdline->GetOption ("canvas");

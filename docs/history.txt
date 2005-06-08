@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jun-2005
+	- res moved all OpenGL-relevant config keys, for both canvases and
+	  renderers, into r3dopengl.cfg. Also removed opengl.cfg.
+	- res fixed the Win32 GL canvas to not throw away the result of the WGL
+	  pixel format determination. Makes multisampling work again.
 7-Jun-2005
 	- res added support for "simple mappings" to the 
 	  csUnicodeTransform::MapToSomething() methods. "Simple mappings"

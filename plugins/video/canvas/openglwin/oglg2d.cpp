@@ -539,7 +539,7 @@ bool csGraphics2DOpenGL::Open ()
     }
   }
   if (doWGLcheck)
-    FindPixelFormatWGL (picker);
+    pixelFormat = FindPixelFormatWGL (picker);
 
   m_bActivated = true;
 

@@ -57,6 +57,11 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
+  /* Note: r3dopengl.cfg is also added by the renderer. This is done because
+   * either the canvas ot the renderer may be loaded before the other, but
+   * both need settings from this file. */
+  config.AddConfig (object_reg, "/config/r3dopengl.cfg");
+
   // We don't really care about pixel format, except for ScreenShot()
   // and OpenGL software proctexes
 #if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)

@@ -1135,9 +1135,6 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.TextureDownsample", 0);
   texture_filter_anisotropy = config->GetFloat
     ("Video.OpenGL.TextureFilterAnisotropy", 1.0);	
-  int texture_bits = config->GetInt
-    ("Video.OpenGL.TextureBits", 32);
-  if (!texture_bits) texture_bits = pfmt.PixelBytes*8;
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
