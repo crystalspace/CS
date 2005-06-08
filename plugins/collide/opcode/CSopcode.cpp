@@ -29,6 +29,7 @@
 
 #include "cssysdef.h"
 #include "CSopcode.h"
+#include "csqsqrt.h"
 #include "igeom/polymesh.h"
 #include "csgeom/transfrm.h"
 #include "csutil/scfstr.h"
@@ -194,9 +195,9 @@ static void ray_cb (const CollisionFace& hit, void* user_data)
   collision_faces->Push (hit.mFaceID);
 }
 
-bool csOPCODECollideSystem::CollideRay (
+bool csOPCODECollideSystem::CollideRaySegment (
   	iCollider* collider, const csReversibleTransform* trans,
-	const csVector3& start, const csVector3& end)
+	const csVector3& start, const csVector3& end, bool use_ray)
 {
   if (!collider) return false;
   
@@ -233,6 +234,8 @@ bool csOPCODECollideSystem::CollideRay (
   RayCol.SetUserData ((void*)&collision_faces);
   intersecting_triangles.SetLength (0);
   collision_faces.SetLength (0);
+  if (use_ray) RayCol.SetMaxDist ();
+  else RayCol.SetMaxDist (csQsqrt (csSquaredDist::PointPoint (start, end)));
   bool isOk = RayCol.Collide (ray, *ColCache.Model0, &col->transform);
   if (isOk)
   {

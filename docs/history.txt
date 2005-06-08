@@ -11,6 +11,10 @@ chronological order.
 	  renderers, into r3dopengl.cfg. Also removed opengl.cfg.
 	- res fixed the Win32 GL canvas to not throw away the result of the WGL
 	  pixel format determination. Makes multisampling work again.
+	- Jorrit added a new iCollideSystem->CollideSegment() routine which
+	  works similarly as CollideRay() except that it collides with a finite
+	  segment instead of an infinite ray. Extended OPCODE to support
+	  this new function.
 7-Jun-2005
 	- res added support for "simple mappings" to the 
 	  csUnicodeTransform::MapToSomething() methods. "Simple mappings"

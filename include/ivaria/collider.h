@@ -167,6 +167,22 @@ struct iCollideSystem : public iBase
 	const csVector3& start, const csVector3& end) = 0;
 
   /**
+   * Collide a collider with a world space segment. This will not
+   * return collisions with triangles behind the end of the segment.
+   * \param collider is the collider to test with.
+   * \param trans is the transform for the object represented by the
+   * collider. If the collider belongs to a mesh object then you can get
+   * the transform by calling mesh->GetMovable()->GetFullTransform().
+   * \param start is the start of the ray.
+   * \param end is the end of the ray.
+   * \return true if there was a collision. The array with intersecting
+   * triangles will be updated (see GetIntersectingTriangles()).
+   */
+  virtual bool CollideSegment (
+  	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end) = 0;
+
+  /**
    * Get the array of intersection points as returned by CollideRay().
    * Note that the coordinates in the array of triangles is in object
    * space of the collider object and not world space!

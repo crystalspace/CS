@@ -78,9 +78,21 @@ public:
   	iCollider* collider1, const csReversibleTransform* trans1,
   	iCollider* collider2, const csReversibleTransform* trans2);
 
+  bool CollideRaySegment (
+  	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
   virtual bool CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,
-	const csVector3& start, const csVector3& end);
+	const csVector3& start, const csVector3& end)
+  {
+    return CollideRaySegment (collider, trans, start, end, true);
+  }
+  virtual bool CollideSegment (
+  	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end)
+  {
+    return CollideRaySegment (collider, trans, start, end, false);
+  }
   virtual const csArray<csIntersectingTriangle>& GetIntersectingTriangles ()
   	const
   {
