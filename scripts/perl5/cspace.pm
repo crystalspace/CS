@@ -11967,6 +11967,7 @@ package cspace::iCollideSystem;
 *GetCollisionPairCount = *cspacec::iCollideSystem_GetCollisionPairCount;
 *ResetCollisionPairs = *cspacec::iCollideSystem_ResetCollisionPairs;
 *CollideRay = *cspacec::iCollideSystem_CollideRay;
+*CollideSegment = *cspacec::iCollideSystem_CollideSegment;
 *GetIntersectingTriangles = *cspacec::iCollideSystem_GetIntersectingTriangles;
 *SetOneHitOnly = *cspacec::iCollideSystem_SetOneHitOnly;
 *GetOneHitOnly = *cspacec::iCollideSystem_GetOneHitOnly;
