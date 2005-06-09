@@ -330,6 +330,7 @@ static void Perspective (const csVector3& v, csVector2& p, int
   p.y = v.y * iz + shift_y;
 }
 
+#if 0
 static void AddPerspective (csPoly2D* dest, const csVector3 &v,
 	int aspect, float shift_x, float shift_y)
 {
@@ -337,6 +338,7 @@ static void AddPerspective (csPoly2D* dest, const csVector3 &v,
   Perspective (v, p, aspect, shift_x, shift_y);
   dest->AddVertex (p);
 }
+#endif
 
 void csFatLoopStep::BuildPortalNodes (RenderNode* node, 
   iMeshWrapper* meshwrapper, iPortalContainer* portals, iRenderView* rview, 
