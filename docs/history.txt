@@ -12,6 +12,8 @@ chronological order.
 	- Eric Sunshine fixed problem with recent csVector3 optimization which
 	  prevented scripting languages from having access to the x, y, and z
 	  members (a limitation of Swig).
+	- res refined the RECT texture crash workaround by having it controlled
+	  by the driver database.
 8-Jun-2005
 	- res moved all OpenGL-relevant config keys, for both canvases and
 	  renderers, into r3dopengl.cfg. Also removed opengl.cfg.

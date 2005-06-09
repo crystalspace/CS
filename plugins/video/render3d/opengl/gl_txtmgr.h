@@ -431,7 +431,13 @@ public:
   int texture_downsample;
   /// texture filtering anisotropy
   float texture_filter_anisotropy;
+  /// Whether bilinear filtering should be used (0 = no, 1 = yes, 2 = trilinear)
   int rstate_bilinearmap;
+  /**
+   * Whether to prevent uploading of NPOTS textures to a generic compressed 
+   * format (causes crashes on some drivers).
+   */
+  bool disableRECTTextureCompression;
 
   csStringID nameDiffuseTexture;
 

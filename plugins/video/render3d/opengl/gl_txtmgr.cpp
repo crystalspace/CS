@@ -446,9 +446,10 @@ void csGLTextureHandle::CreateMipMaps()
    */
   bool compressedTarget;
   GLenum targetFormat; 
-  if (target == iTextureHandle::CS_TEX_IMG_RECT)
-    /* @@@ Hack: ATI drivers can't grok compressed formats for RECT textures,
-     * so force an uncompressed format. */
+  if ((target == iTextureHandle::CS_TEX_IMG_RECT)
+    && (txtmgr->disableRECTTextureCompression))
+    /* @@@ Hack: Some ATI drivers can't grok generic compressed formats for 
+     * RECT textures, so force an uncompressed format in this case. */
     targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
       GL_RGBA : GL_RGB;
   else
@@ -1141,7 +1142,9 @@ void csGLTextureManager::read_config (iConfigFile *config)
   texture_downsample = config->GetInt
     ("Video.OpenGL.TextureDownsample", 0);
   texture_filter_anisotropy = config->GetFloat
-    ("Video.OpenGL.TextureFilterAnisotropy", 1.0);	
+    ("Video.OpenGL.TextureFilterAnisotropy", 1.0);
+  disableRECTTextureCompression = config->GetBool
+    ("Vide.OpenGL.DisableRECTTextureCompression", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");

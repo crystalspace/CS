@@ -183,6 +183,13 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="noCompressionForRECTTextures">
+      <Video>
+	<OpenGL>
+	  <DisableRECTTextureCompression>none</DisableRECTTextureCompression>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -294,6 +301,14 @@
       </conditions>
       <applicable>
 	<usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+    <rule description="ATI: Can't handle compressed formats for RECT textures">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>noCompressionForRECTTextures</usecfg>
       </applicable>
     </rule>
     <!--
