@@ -496,6 +496,15 @@ class csVector3(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csVector3, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csVector3 instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["x"] = _cspace.csVector3_x_set
+    __swig_getmethods__["x"] = _cspace.csVector3_x_get
+    if _newclass:x = property(_cspace.csVector3_x_get, _cspace.csVector3_x_set)
+    __swig_setmethods__["y"] = _cspace.csVector3_y_set
+    __swig_getmethods__["y"] = _cspace.csVector3_y_get
+    if _newclass:y = property(_cspace.csVector3_y_get, _cspace.csVector3_y_set)
+    __swig_setmethods__["z"] = _cspace.csVector3_z_set
+    __swig_getmethods__["z"] = _cspace.csVector3_z_get
+    if _newclass:z = property(_cspace.csVector3_z_get, _cspace.csVector3_z_set)
     def __init__(self, *args):
         _swig_setattr(self, csVector3, 'this', _cspace.new_csVector3(*args))
         _swig_setattr(self, csVector3, 'thisown', 1)

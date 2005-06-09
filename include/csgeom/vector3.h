@@ -42,7 +42,7 @@ class CS_CRYSTALSPACE_EXPORT csVector3
 {
 public:
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) && !defined(SWIG)
   union
   {
     struct 
@@ -54,7 +54,7 @@ public:
       float y;
       /// The Z component of the vector
       float z;
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) && !defined(SWIG)
     };
     /// All components
     float m[3];

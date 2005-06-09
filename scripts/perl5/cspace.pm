@@ -667,6 +667,12 @@ package cspace::csVector3;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*swig_x_get = *cspacec::csVector3_x_get;
+*swig_x_set = *cspacec::csVector3_x_set;
+*swig_y_get = *cspacec::csVector3_y_get;
+*swig_y_set = *cspacec::csVector3_y_set;
+*swig_z_get = *cspacec::csVector3_z_get;
+*swig_z_set = *cspacec::csVector3_z_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csVector3(@_);
@@ -9710,7 +9716,7 @@ package cspace::iDataBuffer;
 %ITERATORS = ();
 *GetSize = *cspacec::iDataBuffer_GetSize;
 *GetData = *cspacec::iDataBuffer_GetData;
-*__ref__ = *cspacec::iDataBuffer___ref__;
+*__mult__ = *cspacec::iDataBuffer___mult__;
 *GetUint8 = *cspacec::iDataBuffer_GetUint8;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
