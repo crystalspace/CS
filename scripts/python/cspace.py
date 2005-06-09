@@ -10866,6 +10866,7 @@ class iCollideSystem(iBase):
     def GetCollisionPairCount(*args): return _cspace.iCollideSystem_GetCollisionPairCount(*args)
     def ResetCollisionPairs(*args): return _cspace.iCollideSystem_ResetCollisionPairs(*args)
     def CollideRay(*args): return _cspace.iCollideSystem_CollideRay(*args)
+    def CollideSegment(*args): return _cspace.iCollideSystem_CollideSegment(*args)
     def GetIntersectingTriangles(*args): return _cspace.iCollideSystem_GetIntersectingTriangles(*args)
     def SetOneHitOnly(*args): return _cspace.iCollideSystem_SetOneHitOnly(*args)
     def GetOneHitOnly(*args): return _cspace.iCollideSystem_GetOneHitOnly(*args)
