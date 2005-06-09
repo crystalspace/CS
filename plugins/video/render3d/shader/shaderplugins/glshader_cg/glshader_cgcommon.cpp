@@ -90,189 +90,192 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
       continue;
 
     CGparameter param = (CGparameter)mapping.userVal;
+    CGtype paramType = cgGetParameterType (param);
     
-    switch (var->GetType ())
+    switch (paramType)
     {
-    case csShaderVariable::INT:
-    case csShaderVariable::FLOAT:
-      {
-        float f;
-        if (var->GetValue (f))
-          cgGLSetParameter1f (param, f);
-      }
-      break;
-    case csShaderVariable::VECTOR2:
-      {
-        csVector2 v;
-        if (var->GetValue (v))
-          cgGLSetParameter2f (param, v.x, v.y);
-      }
-      break;
-    case csShaderVariable::COLOR:
-    case csShaderVariable::VECTOR3:
-      {
-        csVector3 v;
-        if (var->GetValue (v))
-          cgGLSetParameter3f (param, v.x, v.y, v.z);
-      }
-      break;
-    case csShaderVariable::VECTOR4:
-      {
-        csVector4 v;
-        if (var->GetValue (v))
-          cgGLSetParameter4f (param, v.x, v.y, v.z, v.w);
-      }
-      break;
-    case csShaderVariable::MATRIX:
-      {
-        csMatrix3 m;
-        if (var->GetValue (m))
+      case CG_FLOAT:
         {
-          float matrix[16];
-          makeGLMatrix (m, matrix);
-          cgGLSetMatrixParameterfc (param, matrix);
+          float f;
+          if (var->GetValue (f))
+            cgGLSetParameter1f (param, f);
         }
-      }
-      break;
-    case csShaderVariable::TRANSFORM:
-      {
-        csReversibleTransform t;
-        if (var->GetValue (t))
+      case CG_FLOAT2:
         {
-          float matrix[16];
-          makeGLMatrix (t, matrix);
-          cgGLSetMatrixParameterfc (param, matrix);
-        }
-      }
-      break;
-    case csShaderVariable::ARRAY:
-      {
-        //Array..
-        if (cgGetParameterType (param) != CG_ARRAY)
-          break;
-
-        if (var->GetArraySize () == 0) 
-          break;
-
-        uint numElements = csMin ((uint)cgGetArraySize (param, 0), 
-                                  (uint)var->GetArraySize ());
-
-        if (numElements == 0) 
-          break;
-
-        // Do type-specific packing depending on first var
-        const csShaderVariable *cvar = var->GetArrayElement (0);
-        if (cvar == 0)
-          break;
-        
-        CS_ALLOC_STACK_ARRAY (float, tmpArr, numElements * 16);
-        uint idx = 0;
-
-        switch (cvar->GetType ())
-        {
-        case csShaderVariable::INT:
-        case csShaderVariable::FLOAT:
-          {
-            float f;
-            for (idx = 0; idx < numElements; idx++)
-            {
-              csShaderVariable *element =
-                var->GetArrayElement (idx);
-              if (element != 0 && element->GetValue (f))
-                tmpArr[idx] = f;
-            }
-            cgGLSetParameterArray1f (param, 0, numElements, tmpArr);
-          }
-          break;
-        case csShaderVariable::VECTOR2:
-          {
-            csVector2 v;
-            for (idx = 0; idx < numElements; idx++)
-            {
-              csShaderVariable *element =
-                var->GetArrayElement (idx);
-              if (element != 0 && element->GetValue (v))
-              {
-                tmpArr[2*idx+0] = v.x;
-                tmpArr[2*idx+1] = v.y;
-              }
-            }
-            cgGLSetParameterArray2f (param, 0, numElements, tmpArr);
-          }
-          break;
-        case csShaderVariable::COLOR:
-        case csShaderVariable::VECTOR3:
-          {
-            csVector3 v;
-            for (idx = 0; idx < numElements; idx++)
-            {
-              csShaderVariable *element =
-                var->GetArrayElement (idx);
-              if (element != 0 && element->GetValue (v))
-              {
-                tmpArr[3*idx+0] = v.x;
-                tmpArr[3*idx+1] = v.y;
-                tmpArr[3*idx+2] = v.z;
-              }
-            }
-            cgGLSetParameterArray3f (param, 0, numElements, tmpArr);
-          }
-          break;
-        case csShaderVariable::VECTOR4:
-          {
-            csVector4 v;
-            for (idx = 0; idx < numElements; idx++)
-            {
-              csShaderVariable *element =
-                var->GetArrayElement (idx);
-              if (element != 0 && element->GetValue (v))
-              {
-                tmpArr[4*idx+0] = v.x;
-                tmpArr[4*idx+1] = v.y;
-                tmpArr[4*idx+2] = v.z;
-                tmpArr[4*idx+3] = v.w;
-              }
-            }
-            cgGLSetParameterArray4f (param, 0, numElements, tmpArr);
-          }
-          break;
-        case csShaderVariable::MATRIX:
-          {
-            csMatrix3 m;
-            for (idx = 0; idx < numElements; idx++)
-            {
-              csShaderVariable *element =
-                var->GetArrayElement (idx);
-              if (element != 0 && element->GetValue (m))
-              {
-                makeGLMatrix (m, &tmpArr[16*idx]);
-              }
-            }
-            cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
-          }
-          break;
-        case csShaderVariable::TRANSFORM:
-          {
-            csReversibleTransform t;
-            for (idx = 0; idx < numElements; idx++)
-            {
-              csShaderVariable *element =
-                var->GetArrayElement (idx);
-              if (element != 0 && element->GetValue (t))
-              {
-                makeGLMatrix (t, &tmpArr[16*idx]);
-              }
-            }
-            cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
-          }
-          break;
-	default:
-	  break;
+          csVector2 v;
+          if (var->GetValue (v))
+            cgGLSetParameter2f (param, v.x, v.y);
         }
         break;
-      }
-    default:
-      break;
+      case CG_FLOAT3:
+        {
+          csVector3 v;
+          if (var->GetValue (v))
+            cgGLSetParameter3f (param, v.x, v.y, v.z);
+        }
+        break;
+      case CG_FLOAT4:
+        {
+          csVector4 v;
+          if (var->GetValue (v))
+            cgGLSetParameter4f (param, v.x, v.y, v.z, v.w);
+        }
+        break;
+      case CG_FLOAT4x4:
+        {
+          if (var->GetType () == csShaderVariable::MATRIX)
+          {
+            csMatrix3 m;
+            if (var->GetValue (m))
+            {
+              float matrix[16];
+              makeGLMatrix (m, matrix);
+              cgGLSetMatrixParameterfc (param, matrix);
+            }
+          }
+          else if (var->GetType () == csShaderVariable::TRANSFORM)
+          {
+            csReversibleTransform t;
+            if (var->GetValue (t))
+            {
+              float matrix[16];
+              makeGLMatrix (t, matrix);
+              cgGLSetMatrixParameterfc (param, matrix);
+            }
+          }
+          else
+          {
+            CS_ASSERT_MSG("Can't convert all SV contents to FLOAT4x4 (yet)", false);
+          }
+        }
+        break;
+      case CG_ARRAY:
+        {
+          CGtype innerType = cgGetArrayType (param);
+          if (var->GetArraySize () == 0) 
+            break;
+
+          uint numElements = csMin ((uint)cgGetArraySize (param, 0), 
+                                    (uint)var->GetArraySize ());
+
+          if (numElements == 0) 
+            break;
+
+          const csShaderVariable *cvar = var->GetArrayElement (0);
+          if (cvar == 0)
+            break;
+          
+          CS_ALLOC_STACK_ARRAY (float, tmpArr, numElements * 16);
+          uint idx = 0;
+
+          switch (innerType)
+          {
+            case CG_FLOAT:
+              {
+                float f;
+                for (idx = 0; idx < numElements; idx++)
+                {
+                  csShaderVariable *element =
+                    var->GetArrayElement (idx);
+                  if (element != 0 && element->GetValue (f))
+                    tmpArr[idx] = f;
+                }
+                cgGLSetParameterArray1f (param, 0, numElements, tmpArr);
+              }
+              break;
+            case CG_FLOAT2:
+              {
+                csVector2 v;
+                for (idx = 0; idx < numElements; idx++)
+                {
+                  csShaderVariable *element =
+                    var->GetArrayElement (idx);
+                  if (element != 0 && element->GetValue (v))
+                  {
+                    tmpArr[2*idx+0] = v.x;
+                    tmpArr[2*idx+1] = v.y;
+                  }
+                }
+                cgGLSetParameterArray2f (param, 0, numElements, tmpArr);
+              }
+              break;
+            case CG_FLOAT3:
+              {
+                csVector3 v;
+                for (idx = 0; idx < numElements; idx++)
+                {
+                  csShaderVariable *element =
+                    var->GetArrayElement (idx);
+                  if (element != 0 && element->GetValue (v))
+                  {
+                    tmpArr[3*idx+0] = v.x;
+                    tmpArr[3*idx+1] = v.y;
+                    tmpArr[3*idx+2] = v.z;
+                  }
+                }
+                cgGLSetParameterArray3f (param, 0, numElements, tmpArr);
+              }
+              break;
+            case CG_FLOAT4:
+              {
+                csVector4 v;
+                for (idx = 0; idx < numElements; idx++)
+                {
+                  csShaderVariable *element =
+                    var->GetArrayElement (idx);
+                  if (element != 0 && element->GetValue (v))
+                  {
+                    tmpArr[4*idx+0] = v.x;
+                    tmpArr[4*idx+1] = v.y;
+                    tmpArr[4*idx+2] = v.z;
+                    tmpArr[4*idx+3] = v.w;
+                  }
+                }
+                cgGLSetParameterArray4f (param, 0, numElements, tmpArr);
+              }
+              break;
+            case CG_FLOAT4x4:
+              {
+                if (var->GetType () == csShaderVariable::MATRIX)
+                {
+                  csMatrix3 m;
+                  for (idx = 0; idx < numElements; idx++)
+                  {
+                    csShaderVariable *element =
+                      var->GetArrayElement (idx);
+                    if (element != 0 && element->GetValue (m))
+                    {
+                      makeGLMatrix (m, &tmpArr[16*idx]);
+                    }
+                  }
+                  cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+                }
+                else if (var->GetType () == csShaderVariable::TRANSFORM)
+                {
+                  csReversibleTransform t;
+                  for (idx = 0; idx < numElements; idx++)
+                  {
+                    csShaderVariable *element =
+                      var->GetArrayElement (idx);
+                    if (element != 0 && element->GetValue (t))
+                    {
+                      makeGLMatrix (t, &tmpArr[16*idx]);
+                    }
+                  }
+                  cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+                }
+                else
+                {
+                  CS_ASSERT_MSG("Can't convert all SV contents to FLOAT4x4 (yet)", false);
+                }
+              }
+              break;
+            default:
+              CS_ASSERT_MSG("Don't support CG param type (yet)", false);
+          }
+        }
+      default:
+        CS_ASSERT_MSG("Don't support CG param type (yet)", false);
     }
   }
 }
@@ -396,6 +399,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
   output << "\n";
 
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
   if (!debugFN)
   {
     static int programCounter = 0;
@@ -403,10 +407,11 @@ void csShaderGLCGCommon::DoDebugDump ()
     filename << shaderPlug->dumpDir << (programCounter++) << programType << 
       ".txt";
     debugFN = csStrNew (filename);
+    vfs->DeleteFile (debugFN);
   }
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
-  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length()))
+  csRef<iFile> debugFile = vfs->Open (debugFN, VFS_FILE_APPEND);
+  if (!debugFile)
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
@@ -414,6 +419,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   }
   else
   {
+    debugFile->Write (output.GetData(), output.Length());
     csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
       "crystalspace.graphics3d.shader.glcg",
       "Dumped Cg program info to '%s'", debugFN);

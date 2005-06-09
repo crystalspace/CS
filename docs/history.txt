@@ -14,6 +14,12 @@ chronological order.
 	  members (a limitation of Swig).
 	- res refined the RECT texture crash workaround by having it controlled
 	  by the driver database.
+	- res changed the parameter passing to Cg from using the data type of 
+	  the SV to the parameter type reported by Cg. Apparently, Cg is rather
+	  strict and doesn't accept when e.g. a float3 value is set to a 
+	  float4 parameter (setting the param has no effect). So querying the
+	  datatype Cg wants and using that gives a bit more tolerance against
+	  type lapses.
 8-Jun-2005
 	- res moved all OpenGL-relevant config keys, for both canvases and
 	  renderers, into r3dopengl.cfg. Also removed opengl.cfg.
