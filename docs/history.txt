@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Jun-2005
+	- Jorrit fixed the new CollideSegment() so that it really works
+	  now.
 	- Eric Sunshine fixed problem with recent csVector3 optimization which
 	  prevented scripting languages from having access to the x, y, and z
 	  members (a limitation of Swig).

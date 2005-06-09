@@ -189,10 +189,13 @@ bool csOPCODECollideSystem::Collide (
   }
 }
 
+static float max_dist;
+
 static void ray_cb (const CollisionFace& hit, void* user_data)
 {
   csArray<int>* collision_faces = (csArray<int>*)user_data;
-  collision_faces->Push (hit.mFaceID);
+  if (hit.mDistance <= max_dist)
+    collision_faces->Push (hit.mFaceID);
 }
 
 bool csOPCODECollideSystem::CollideRaySegment (
@@ -234,8 +237,16 @@ bool csOPCODECollideSystem::CollideRaySegment (
   RayCol.SetUserData ((void*)&collision_faces);
   intersecting_triangles.SetLength (0);
   collision_faces.SetLength (0);
-  if (use_ray) RayCol.SetMaxDist ();
-  else RayCol.SetMaxDist (csQsqrt (csSquaredDist::PointPoint (start, end)));
+  if (use_ray)
+  {
+    max_dist = MAX_FLOAT;
+    RayCol.SetMaxDist ();
+  }
+  else
+  {
+    max_dist = csQsqrt (csSquaredDist::PointPoint (start, end));
+    RayCol.SetMaxDist (max_dist);
+  }
   bool isOk = RayCol.Collide (ray, *ColCache.Model0, &col->transform);
   if (isOk)
   {
@@ -247,6 +258,7 @@ bool csOPCODECollideSystem::CollideRaySegment (
       if (!vertholder) return true;
       udword* indexholder = col->indexholder;
       if (!indexholder) return true;
+      if (collision_faces.Length () == 0) return false;
       Point* c;
       size_t i;
       for (i = 0 ; i < collision_faces.Length () ; i++)
