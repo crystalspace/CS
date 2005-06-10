@@ -186,7 +186,7 @@
     <config name="noCompressionForRECTTextures">
       <Video>
 	<OpenGL>
-	  <DisableRECTTextureCompression>none</DisableRECTTextureCompression>
+	  <DisableRECTTextureCompression>yes</DisableRECTTextureCompression>
 	</OpenGL>
       </Video>
     </config>
