@@ -51,7 +51,7 @@ void litLightMapMapper::InitializeMapping (const csArray<csVector3>& poly,
   size_t i;
   for (i = 1 ; i < poly.Length () ; i++)
   {
-    csVector2 uv;
+    csVector2 uv(0,0);
     PolyToLM (poly[i], uv);
     if (uv.x < min_uv.x) uv.x = min_uv.x;
     if (uv.y < min_uv.y) uv.y = min_uv.y;
@@ -86,4 +86,3 @@ void litLightMapMapper::LMToPoly (const csVector2& vlm, csVector3& vpoly)
 {
   // @@@ TODO
 }
-
