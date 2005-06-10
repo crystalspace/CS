@@ -9716,7 +9716,7 @@ package cspace::iDataBuffer;
 %ITERATORS = ();
 *GetSize = *cspacec::iDataBuffer_GetSize;
 *GetData = *cspacec::iDataBuffer_GetData;
-*__mult__ = *cspacec::iDataBuffer___mult__;
+*__ref__ = *cspacec::iDataBuffer___ref__;
 *GetUint8 = *cspacec::iDataBuffer_GetUint8;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
