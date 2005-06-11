@@ -470,18 +470,18 @@ struct iODEGeneralJointState : public iBase
    * it will have no effect on the simulation.
    */
   virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
-
+ 
   /// Get an attached body (valid values for body are 0 and 1)
-  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0; 
 
-  /// Get force that joint applies to body 1
+  /// Get force that joint applies to body 1 
   virtual csVector3 GetFeedbackForce1 () = 0;
 
   /// Get torque that joint applies to body 1
   virtual csVector3 GetFeedbackTorque1 () = 0;
-
+ 
   /// Get force that joint applies to body 2
-  virtual csVector3 GetFeedbackForce2 () = 0;
+  virtual csVector3 GetFeedbackForce2 () = 0; 
 
   /// Get torque that joint applies to body 2
   virtual csVector3 GetFeedbackTorque2 () = 0;
@@ -517,7 +517,7 @@ SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
  * perpendicular. In other words, rotation of the two bodies about the 
  * direction perpendicular to the two axes will be equal.
  */
-struct iODEUniversalJoint : public iBase 
+struct iODEUniversalJoint : public iODEGeneralJointState
 {
   ///Set universal anchor.
   virtual void SetUniversalAnchor (float x, float y, float z) = 0;
@@ -547,30 +547,6 @@ struct iODEUniversalJoint : public iBase
 
   ///Get universal axis on body 2.
   virtual csVector3 GetUniversalAxis2 () = 0;
-
-  /**
-   * Attach the joint to some new bodies. If the joint is already attached, it 
-   * will be detached from the old bodies first. To attach this joint to only 
-   * one body, set body1 or body2 to zero - a zero body refers to the static 
-   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
-   * it will have no effect on the simulation.
-   */
-  virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
-
-  /// Get an attached body (valid values for body are 0 and 1)
-  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
-
-    /// Get force that joint applies to body 1
-  virtual csVector3 GetFeedbackForce1 () = 0;
-
-  /// Get torque that joint applies to body 1
-  virtual csVector3 GetFeedbackTorque1 () = 0;
-
-  /// Get force that joint applies to body 2
-  virtual csVector3 GetFeedbackForce2 () = 0;
-
-  /// Get torque that joint applies to body 2
-  virtual csVector3 GetFeedbackTorque2 () = 0;
 
 };
 

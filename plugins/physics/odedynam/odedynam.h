@@ -834,6 +834,52 @@ struct ODEUniversalJoint : public csStrictODEJoint, iODEUniversalJoint
   ODEUniversalJoint (dWorldID w_id);
   virtual ~ODEUniversalJoint ();
 
+  void SetLoStop (float value, int axis) 
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamLoStop, axis, value);};
+  void SetHiStop (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamHiStop, axis, value);};
+  void SetVel (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamVel, axis, value);};
+  void SetFMax (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamFMax, axis, value);};
+  void SetFudgeFactor (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamFudgeFactor, axis, value);};
+  void SetBounce (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamBounce, axis, value);};
+  void SetCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamCFM, axis, value);};
+  void SetStopERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamStopERP, axis, value);};
+  void SetStopCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamStopCFM, axis, value);};
+  void SetSuspensionERP (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamSuspensionERP, axis, value);};
+  void SetSuspensionCFM (float value, int axis)
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamSuspensionCFM, axis, value);};
+
+  float GetLoStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamLoStop, axis);};
+  float GetHiStop (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamHiStop, axis);};
+  float GetVel (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamVel, axis);};
+  float GetFMax (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamFMax, axis);};
+  float GetFudgeFactor (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamFudgeFactor, axis);};
+  float GetBounce (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamBounce, axis);};
+  float GetCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamCFM, axis);};
+  float GetStopERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamStopERP, axis);};
+  float GetStopCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamStopCFM, axis);};
+  float GetSuspensionERP (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamSuspensionERP, axis);};
+  virtual float GetSuspensionCFM (int axis)
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_UNIVERSAL, dParamSuspensionCFM, axis);};
+
   void SetUniversalAnchor (float x, float y, float z) {dJointSetUniversalAnchor (jointID, x, y, z);};
   void SetUniversalAxis1 (float x, float y, float z) {dJointSetUniversalAxis1 (jointID, x, y, z);};
   void SetUniversalAxis2 (float x, float y, float z) {dJointSetUniversalAxis2 (jointID, x, y, z);};
