@@ -37,8 +37,14 @@ csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   (texman = txtmgr)->IncRef ();
 
   prepared = true;
+  orig_w = this->image->GetWidth();
+  orig_h = this->image->GetHeight();
+  orig_d = this->image->GetDepth();
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
+  w = this->image->GetWidth();
+  h = this->image->GetHeight();
+  d = this->image->GetDepth();
   FreeImage(); // Bye bye. Don't need you any more
 }
 

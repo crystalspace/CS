@@ -6,7 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
+12-Jun-2005
+	- res fixed the null renderer to report correct texture dimensions.
 11-Jun-2005
 	- Piotr Obrzut added motor/stops functions to ODEUniversalJoint.
 10-Jun-2005

@@ -65,6 +65,9 @@ protected:
   /// Create a new texture object
   csTexture *NewTexture (iImage *Image, bool ismipmap);
 
+  int w, h, d;
+  int orig_w, orig_h, orig_d;
+
 public:
   /// Create the mipmapped texture object
   csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
@@ -81,10 +84,12 @@ public:
 
   csAlphaMode::AlphaType GetAlphaType () { return csAlphaMode::alphaNone; }
 
+  bool GetRendererDimensions (int &mw, int &mh)
+  { mw = w; mh = h; return true; }
   bool GetRendererDimensions (int &mw, int &mh, int &md)
-  { md = 0; return csTextureHandle::GetRendererDimensions (mw, mh); }
+  { mw = w; mh = h; md = d; return true; }
   void GetOriginalDimensions (int& mw, int& mh, int& md)
-  { GetRendererDimensions (mw, mh, md); }
+  { mw = orig_w; mh = orig_h; md = orig_d; }
   void SetTextureTarget (int target) { }
   int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
   const char* GetImageName () const { return imageName; }
