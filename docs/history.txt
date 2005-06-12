@@ -14,6 +14,7 @@ chronological order.
 	- res made csShaderVariableContext::PushVariables() fill the new 
 	  entries in the enlarged 'stacks' array with 0s. Previously, the
 	  new entries could contain invalid data.
+	- res added some csInputBinder documentation.
 11-Jun-2005
 	- Piotr Obrzut added motor/stops functions to ODEUniversalJoint.
 10-Jun-2005

@@ -30,7 +30,24 @@
 
 /**
  * Use this class to bind input events (keypress, button press, mouse move,
- * etc.) to commands (shoot, jump, walk, etc.)
+ * etc.) to commands which are represented by an unsigned integer. It is
+ * up to the application to specify the meaning of a command value.
+ * <p>
+ * Example:
+ * \code
+ * enum MyCommand = { Walk, Shoot, Jump, LookX, LookY };
+ * ...
+ * csRef<iInputBinder> binder = ...;
+ * binder->BindButton (csInputDefinition ("ctrl"), Shoot);
+ * binder->BindAxis (csInputDefinition ("mousex"), LookX);
+ * ...
+ * if (binder->Button (Shoot))
+ *   ...
+ * else
+ * {
+ *   DoSomething (binder->Axis (LookX), binder->Axis (LookY));
+ * }
+ * \endcode
  */
 class CS_CRYSTALSPACE_EXPORT csInputBinder : public iInputBinder
 {

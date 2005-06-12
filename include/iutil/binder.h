@@ -28,13 +28,35 @@ class csInputDefinition;
 
 SCF_VERSION (iInputBinder, 0, 1, 0);
 
-/// SCF interface for csInputBinder.
+/**
+ * SCF interface for csInputBinder,
+ * used to bind input events (keypress, button press, mouse move,
+ * etc.) to commands which are represented by an unsigned integer. It is
+ * up to the application to specify the meaning of a command value.
+ * <p>
+ * Example:
+ * \code
+ * enum MyCommand = { Walk, Shoot, Jump, LookX, LookY };
+ * ...
+ * csRef<iInputBinder> binder = ...;
+ * binder->BindButton (csInputDefinition ("ctrl"), Shoot);
+ * binder->BindAxis (csInputDefinition ("mousex"), LookX);
+ * ...
+ * if (binder->Button (Shoot))
+ *   ...
+ * else
+ * {
+ *   DoSomething (binder->Axis (LookX), binder->Axis (LookY));
+ * }
+ * \endcode
+ */
 struct iInputBinder : public iBase
 {
   /**
    * Get a pointer to the embedded iEventHander.
-   * \remarks This class can be registered with the event queue:
+   * \remarks This class has to be registered with the event queue:
    *   EventQueue->RegisterListener(InputBinder->QueryHandler (), CSMASK_Input);
+   *   to get working Axis() and Button() methods.
    */
   virtual iEventHandler* QueryHandler () = 0;
 
