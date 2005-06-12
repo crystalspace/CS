@@ -492,6 +492,8 @@ public:
   }
   /// Delete all the keys. (Idiomatic alias for DeleteAll().)
   void Empty() { DeleteAll(); }
+  /// Returns whether this tree has no nodes.
+  bool IsEmpty() const { return (root == 0); }
 
   //@{
   /// Traverse tree.
@@ -619,6 +621,8 @@ public:
   void DeleteAll() { supahclass::Empty(); }
   /// Delete all the keys. (Idiomatic alias for DeleteAll().)
   void Empty() { DeleteAll(); }
+  /// Returns whether this map has no nodes.
+  bool IsEmpty() const { return supahclass::IsEmpty(); }
 
   //@{
   /// Traverse tree.

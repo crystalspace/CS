@@ -864,4 +864,14 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  define CS_FUNCTION_NAME		"<?\?\?>"
 #endif
 
+#define CS_STRING_TO_WIDE_(x)   L ## x
+/**\def CS_STRING_TO_WIDE
+ * Convert a string to a wide string. Also works in macros.
+ * \code
+ * void bar (const wchar_t* baz);
+ * #define FOO(x)	bar (CS_STRING_TO_WIDE (#x));
+ * \endcode
+ */
+#define CS_STRING_TO_WIDE(x)    CS_STRING_TO_WIDE_(x)
+
 #endif // __CS_CSSYSDEF_H__

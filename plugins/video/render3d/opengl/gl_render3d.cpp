@@ -2545,12 +2545,11 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     csBox2 scissorbox;
     scissorbox.AddBoundingVertex (clippoly[0]);
     for (i=1; i<clipper->GetVertexCount (); i++)
-      scissorbox.AddBoundingVertexSmart (csVector2 (clippoly[i].x,
-	/*(float)viewheight - */clippoly[i].y));
+      scissorbox.AddBoundingVertexSmart (csVector2 (clippoly[i].x, 
+        clippoly[i].y));
     csBox2 scissorClip;
-    // Correct for differences in 2D and 3D coord systems.
-    scissorClip.Set (old2dClip.xmin, /*viewheight - */old2dClip.ymin,
-      old2dClip.xmax, /*viewheight - */old2dClip.ymax);
+    scissorClip.Set (old2dClip.xmin, old2dClip.ymin,
+      old2dClip.xmax, old2dClip.ymax);
     scissorbox *= csBox2 (scissorClip);
     if (scissorbox.Empty())
     {

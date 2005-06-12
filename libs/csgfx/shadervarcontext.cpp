@@ -80,7 +80,7 @@ void csShaderVariableContext::PushVariables
   {
     csStringID name = variables[i]->GetName ();
     if (stacks.Length () <= (size_t)name)
-      stacks.SetLength (name+1);
+      stacks.SetLength (name+1, 0);
     stacks[name] = variables[i];
   }
 }
