@@ -211,8 +211,8 @@ public:
 
   /// Parse in the XML in the context of a symbol table.
   bool Parse(iDocumentNode *, iShaderVariableContext *);
-  /// Evaluate this expression into a variable.
   /**
+   * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
   bool Evaluate(csShaderVariable *);

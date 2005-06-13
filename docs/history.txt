@@ -10,6 +10,7 @@ chronological order.
 	- res fixed cut-and-paste errors in the ARB fragment program code
 	  (where GL_VERTEX_PROGRAM_ARB instead do GL_FRAGMENT_PROGRAM_ARB was
 	  used).
+	- res made some miscellaneous documentation fixes.
 12-Jun-2005
 	- res fixed the null renderer to report correct texture dimensions.
 	- res added the CS_STRING_TO_WIDE macro. Useful when the value of a 

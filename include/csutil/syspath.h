@@ -127,6 +127,7 @@ public:
   size_t AddUnique (const char* path, bool scanRecursive = false, 
     const char* type = 0, bool overrideRecursive = true);
   /**
+   * Add a path, but only if it isn't in the list already.
    * \copydoc AddUnique(const char*, bool, const char*, bool)
    * \remark Saves full native paths and uses csExpandPath() for this.
    */
@@ -142,11 +143,14 @@ public:
    */
   size_t AddUnique (const Entry& path, bool overrideRecursive = true);
   /**
+   * Add a path, but only if it isn't in the list already.
    * \copydoc AddUnique(const Entry&, bool)
    * \remark Saves full native paths and uses csExpandPath() for this.
    */
   size_t AddUniqueExpanded (const Entry& path, bool overrideRecursive = true);
-  /// Add another path list.
+  /** 
+   * Add entries of another path list that aren't already in this list.
+   */
   void AddUnique (const csPathsList& list, bool overrideRecursive = true)
   {
     for (size_t i = 0; i < list.Length(); i++)
@@ -155,6 +159,7 @@ public:
     }
   }
   /**
+   * Add a path, but only if it isn't in the list already.
    * \copydoc AddUnique(const csPathsList&, bool)
    * \remark Saves full native paths and uses csExpandPath() for this.
    */

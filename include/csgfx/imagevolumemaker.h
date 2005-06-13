@@ -39,17 +39,33 @@
 class CS_CRYSTALSPACE_EXPORT csImageVolumeMaker : public csImageBase
 {
 protected:
+  /**
+   * Whether the name was manually overridden (in this case it is not updated
+   * when the contained images are changed).
+   */
   bool manualName;
+  /**
+   * Array of images that were added, but not yet processed into the image
+   * data.
+   */
   csRefArray<iImage> pendingImages;
+  /// Width of the image
   int Width;
+  /// Height of the image
   int Height;
+  /// Depth of the image
   int Depth;
+  /// Format of the image
   int Format;
 
+  /// Image data
   void* data;
+  /// Image palette
   csRGBpixel* palette;
+  /// Image alpha
   uint8* alpha;
 
+  /// Convert all added images to the right format and update \a data.
   void AppendPending ();
 public:
   SCF_DECLARE_IBASE;

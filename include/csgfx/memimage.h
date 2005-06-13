@@ -67,6 +67,7 @@ protected:
   csRGBpixel keycolour;
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
+  /// Type of the contained images.
   csImageType imageType;
   /// Mip map images.
   /* @@@ This is not csRefArray<iImage> as this does not return csRef<iImage>&

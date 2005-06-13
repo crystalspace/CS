@@ -34,13 +34,15 @@
 
 /**
  * Base class for iImage implementations. Cannot be instantiated itself.
- * \remark SCF_CONSTRUCT_IBASE()/SCF_DESTRUCT_IBASE() invokation has to
- *  be done by descendants!
+ * \remark SCF_CONSTRUCT_IBASE() / SCF_DESTRUCT_IBASE() invocation has to
+ *  be done by descending classes!
  */
 class csImageBase : public iImage
 {
 protected:
+  /// Name of the image file.
   char* fName;
+  /// Create new instance.
   csImageBase() : fName(0) { }
 public:
   virtual ~csImageBase() { delete[] fName; }

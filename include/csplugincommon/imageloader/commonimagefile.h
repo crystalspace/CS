@@ -86,16 +86,27 @@ struct iImageFileLoader : public iBase
 class CS_CRYSTALSPACE_EXPORT csCommonImageFileLoader : public iImageFileLoader
 {
 protected:
+  /// Format of the image
   int Format;
+  /// Buffer with raw data.
   csRef<iDataBuffer> rawData;
+  /// The type of image data this loader provides.
   csLoaderDataType dataType;
+  /// Pointer to RGBA data (if dataType == rdtRGBpixel)
   csRGBpixel* rgbaData;
+  /// Pointer to indexed data (if dataType == rdtIndexed)
   uint8* indexData;
+  /// Palette for indexed colors.
   csRGBpixel* palette;
+  /// Number of entries in the palette
   size_t paletteCount;
+  /// Alpha data for indexed images.
   uint8* alpha;
+  /// Whether the image has a keycolor.
   bool hasKeycolor;
+  /// Keycolor.
   csRGBcolor keycolor;
+  /// Image dimensions.
   int Width, Height;
 public:
   SCF_DECLARE_IBASE;
@@ -131,10 +142,13 @@ protected:
   class CS_CRYSTALSPACE_EXPORT LoaderJob : public iJob
   {
   public:
+    /// The actual image loader.
     csRef<iImageFileLoader> currentLoader;
+    /// Result of the iImageFileLoader->LoadData() call.
     bool loadResult;
     SCF_DECLARE_IBASE;
 
+    /// Create new instance with a given image loader.
     LoaderJob (iImageFileLoader* loader);
     virtual ~LoaderJob();
 
@@ -142,7 +156,9 @@ protected:
   };
 
 #ifdef THREADED_LOADING
+  /// Reference to the job for loading this image.
   csRef<LoaderJob> loadJob;
+  /// Reference to job queue.
   csRef<iJobQueue> jobQueue;
 #else
   csRef<iImageFileLoader> currentLoader;
@@ -196,6 +212,10 @@ protected:
     r = keycolour.red; g = keycolour.green; b = keycolour.blue; 
   }
 
+  /**
+   * Convert an image loader data type into a raw data description (if 
+   * supported).
+   */
   static const char* DataTypeString (csLoaderDataType dataType);
   virtual const char* GetRawFormat() const;
   virtual csRef<iDataBuffer> GetRawData() const;

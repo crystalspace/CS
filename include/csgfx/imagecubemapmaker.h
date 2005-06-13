@@ -39,10 +39,17 @@
 class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker : public csImageBase
 {
 protected:
+  /// The cube face images
   csRef<iImage> cubeImages[6];
+  /**
+   * Whether the name was manually overridden (in this case it is not updated
+   * when the contained images are changed).
+   */
   bool manualName;
 
+  /// Ensure that the image at \a index is valid.
   void CheckImage (int index);
+  /// Update the image name from the contained images.
   void UpdateName ();
 public:
   SCF_DECLARE_IBASE;
@@ -53,7 +60,7 @@ public:
   /// Create a new map and copy the faces from \a source.
   csImageCubeMapMaker (iImage* source);
   /**
-   * Create a new map from separately specified the Positive X, Positive Y ... 
+   * Create a new map from separately specified Positive X, Positive Y etc. 
    * images.
    */
   csImageCubeMapMaker (iImage* posX, iImage* negX, iImage* posY, 
