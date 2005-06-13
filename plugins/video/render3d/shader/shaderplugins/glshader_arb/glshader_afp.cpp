@@ -90,7 +90,7 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
       {
         csVector4 v;
         if (var->GetValue (v))
-          ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal, &v.x);
+          ext->glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, mapping.userVal, &v.x);
       }
       break;    
     case csShaderVariable::MATRIX:
@@ -100,13 +100,13 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
         {
           float matrix[16];
           makeGLMatrix (m, matrix);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
         }
       }
@@ -118,13 +118,13 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
         {
           float matrix[16];
           makeGLMatrix (t, matrix);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal, matrix[0], matrix[4], matrix[8], matrix[12]);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal+1, matrix[1], matrix[5], matrix[9], matrix[13]);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal+2, matrix[2], matrix[6], matrix[10], matrix[14]);
-          ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
             mapping.userVal+3, matrix[3], matrix[7], matrix[11], matrix[15]);
         }
       }
@@ -150,7 +150,7 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
             {
               cvar = var->GetArrayElement (i);
               if (cvar->GetValue (v))
-                ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, mapping.userVal+i, &v.x);
+                ext->glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, mapping.userVal+i, &v.x);
             }
           }
           break;    
@@ -164,13 +164,13 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
               {
                 float matrix[16];
                 makeGLMatrix (m, matrix);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
               }
             }
@@ -186,13 +186,13 @@ void csShaderGLAFP::SetupState (const csRenderMesh *mesh,
               {
                 float matrix[16];
                 makeGLMatrix (t, matrix);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+0, matrix[0], matrix[4], matrix[8], matrix[12]);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+1, matrix[1], matrix[5], matrix[9], matrix[13]);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+2, matrix[2], matrix[6], matrix[10], matrix[14]);
-                ext->glProgramLocalParameter4fARB (GL_VERTEX_PROGRAM_ARB,
+                ext->glProgramLocalParameter4fARB (GL_FRAGMENT_PROGRAM_ARB,
                   mapping.userVal+i*4+3, matrix[3], matrix[7], matrix[11], matrix[15]);
               }
             }

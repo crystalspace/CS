@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jun-2005
+	- res fixed cut-and-paste errors in the ARB fragment program code
+	  (where GL_VERTEX_PROGRAM_ARB instead do GL_FRAGMENT_PROGRAM_ARB was
+	  used).
 12-Jun-2005
 	- res fixed the null renderer to report correct texture dimensions.
 	- res added the CS_STRING_TO_WIDE macro. Useful when the value of a 
