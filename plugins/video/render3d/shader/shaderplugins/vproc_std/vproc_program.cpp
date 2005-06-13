@@ -196,7 +196,6 @@ bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, iDocumentNode* 
           {
           case XMLTOKEN_PROGRAM:
           case XMLTOKEN_VARIABLEMAP:
-          case XMLTOKEN_SHADERVAR:
             // Don't want those
             synsrv->ReportBadToken (child);
             return false;

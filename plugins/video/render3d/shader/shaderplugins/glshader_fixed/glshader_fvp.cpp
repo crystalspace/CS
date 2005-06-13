@@ -747,7 +747,6 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    {
 	      case XMLTOKEN_PROGRAM:
 	      case XMLTOKEN_VARIABLEMAP:
-	      case XMLTOKEN_SHADERVAR:
 		// Don't want those
 		synsrv->ReportBadToken (child);
 		return false;

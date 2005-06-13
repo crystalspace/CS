@@ -140,9 +140,6 @@ protected:
    */
   bool doVerbose;
 
-  /// Program-local sv-context
-  csShaderVariableContext svcontext;
-
   /// Parse common properties and variablemapping
   bool ParseCommon (iDocumentNode* child);
   /// Get the program node

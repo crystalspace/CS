@@ -346,26 +346,6 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
     case XMLTOKEN_DESCRIPTION:
       description = child->GetContentsValue();
       break;
-    case XMLTOKEN_SHADERVAR:
-      {
-        const char* varname = child->GetAttributeValue ("name");
-	if (!varname)
-	{
-	  synsrv->Report ("crystalspace.graphics3d.shader.common",
-	    CS_REPORTER_SEVERITY_WARNING, child,
-	    "<shadervar> without name");
-	  return false;
-	}
-	csRef<csShaderVariable> var;
-	var.AttachNew (new csShaderVariable (strings->Request (varname)));
-
-        if (!synsrv->ParseShaderVar (child, *var))
-        {
-	  return false;
-        }
-	svcontext.AddVariable (var);
-      }
-      break;
     default:
       synsrv->ReportBadToken (child);
       return false;

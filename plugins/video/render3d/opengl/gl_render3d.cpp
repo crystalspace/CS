@@ -2766,6 +2766,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
+  if (mesh.shader != 0) mesh.shader->PushVariables (stacks);
   if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stacks);
 
   if (mesh.alphaType.autoAlphaMode)

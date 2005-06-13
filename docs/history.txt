@@ -11,6 +11,12 @@ chronological order.
 	  (where GL_VERTEX_PROGRAM_ARB instead do GL_FRAGMENT_PROGRAM_ARB was
 	  used).
 	- res made some miscellaneous documentation fixes.
+	- res fixed some issues reported by Bedrich Zaba <frogbride@seznam.cz>:
+	    - GL DrawSimpleMesh() didn't use the shadervars from the shader.
+	    - Shadervars specified in shader programs were not used. "Fixed" it
+	      by removing support for SVs in programs. This functionality can
+	      be achieved by other means (either by specifying SVs in the 
+	      shader itself or, for constant values, using variable mappings).
 12-Jun-2005
 	- res fixed the null renderer to report correct texture dimensions.
 	- res added the CS_STRING_TO_WIDE macro. Useful when the value of a 
