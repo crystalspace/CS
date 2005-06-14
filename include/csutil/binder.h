@@ -99,8 +99,10 @@ public:
   virtual int Axis (unsigned cmd);
   virtual bool Button (unsigned cmd);
 
-  virtual void BindAxis (const csInputDefinition &, unsigned cmd, int sens);
-  virtual void BindButton (const csInputDefinition &, unsigned cmd, bool tgl);
+  virtual void BindButton (csInputDefinition const& def, unsigned int cmd,
+    bool toggle = false);
+  virtual void BindAxis (csInputDefinition const& def, unsigned int cmd,
+    int sensitivity = 1);
 
   virtual bool UnbindAxis (unsigned cmd);
   virtual bool UnbindButton (unsigned cmd);
