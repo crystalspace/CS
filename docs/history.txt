@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Jun-2005
+	- res augmented DrawSimpleMesh() to not require an index array; if it
+	  is omitted, an array that simply contains vertexCount indices with
+	  values 0 to vertexCount-1 is used.
 13-Jun-2005
 	- res fixed cut-and-paste errors in the ARB fragment program code
 	  (where GL_VERTEX_PROGRAM_ARB instead do GL_FRAGMENT_PROGRAM_ARB was

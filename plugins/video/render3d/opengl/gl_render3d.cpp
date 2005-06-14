@@ -2628,12 +2628,13 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     G2D->PerformExtension ("glflushtext");
   }
 
-  if (scrapIndicesSize < mesh.indexCount)
+  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
+  if (scrapIndicesSize < indexCount)
   {
-    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (mesh.indexCount,
+    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
       CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT,
       0, mesh.vertexCount - 1);
-    scrapIndicesSize = mesh.indexCount;
+    scrapIndicesSize = indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
   {
@@ -2653,15 +2654,17 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   sv = scrapContext.GetVariableAdd (string_indices);
   if (mesh.indices)
   {
-    scrapIndices->CopyInto (mesh.indices, mesh.indexCount);
-    sv->SetValue (scrapIndices);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+    scrapIndices->CopyInto (mesh.indices, indexCount);
   }
   else
   {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, 0);
-    sv->SetValue (0);
+    csRenderBufferLock<uint> indexLock (scrapIndices);
+    for (uint i = 0; i < mesh.vertexCount; i++)
+      indexLock[i] = i;
   }
+  sv->SetValue (scrapIndices);
+  scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+
   sv = scrapContext.GetVariableAdd (string_vertices);
   if (mesh.vertices)
   {
@@ -2731,7 +2734,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.do_mirror = false;
   rmesh.meshtype = mesh.meshtype;
   rmesh.indexstart = 0;
-  rmesh.indexend = mesh.indexCount;
+  rmesh.indexend = indexCount;
   rmesh.variablecontext = &scrapContext;
   rmesh.buffers = scrapBufferHolder;
 

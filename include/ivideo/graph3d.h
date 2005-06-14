@@ -470,9 +470,15 @@ struct csSimpleRenderMesh
   /// Type of the geometry to draw.
   csRenderMeshType meshtype;
 
-  /// Number of vertex indices
+  /// (optional) Number of vertex indices
   uint indexCount;
-  /// Vertex indices
+  /** 
+   * (optional) Vertex indices.
+   * If this field is 0, \a vertexCount indices are generated with the values
+   * 0 to \a vertexCount -1. \a indexCount is ignored in that case.
+   * In other words, not specifying indices assumes all vertices are in order
+   * and only used once.
+   */
   const uint* indices;
 
   /// Number of vertices
@@ -517,8 +523,9 @@ struct csSimpleRenderMesh
    */
   csReversibleTransform object2world;
 
-  csSimpleRenderMesh () : texcoords(0), colors(0), texture (0), shader (0), 
-    dynDomain (0), z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY)
+  csSimpleRenderMesh () : indexCount(0), indices(0), texcoords(0), colors(0), 
+    texture (0), shader (0), dynDomain (0), z_buf_mode (CS_ZBUF_NONE), 
+    mixmode (CS_FX_COPY)
   {  
     alphaType.autoAlphaMode = true;
     alphaType.autoModeTexture = csInvalidStringID;

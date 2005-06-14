@@ -109,15 +109,12 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   float smy = sy + sh;
 
   csSimpleRenderMesh mesh;
-  static uint indices[4] = {0, 1, 2, 3};
   csVector3 verts[4];
   csVector2 texels[4];
   csVector4 colors[4];
   float fa = 1.0f;
 
   mesh.meshtype = CS_MESHTYPE_QUADS;
-  mesh.indexCount = 4;
-  mesh.indices = indices;
   mesh.vertexCount = 4;
   mesh.vertices = verts;
   mesh.texcoords = texels;
@@ -165,14 +162,11 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   iTextureHandle *tex, uint mixmode, float fr, float fg, float fb, float fa)
 {
   csSimpleRenderMesh mesh;
-  static uint indices[4] = {0, 1, 2, 3};
   csVector3 verts[4];
   csVector2 texels[4];
   csVector4 colors[4];
 
   mesh.meshtype = CS_MESHTYPE_QUADS;
-  mesh.indexCount = 4;
-  mesh.indices = indices;
   mesh.vertexCount = 4;
   mesh.vertices = verts;
   mesh.texcoords = texels;

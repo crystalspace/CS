@@ -28,6 +28,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/plane3.h"
+#include "cstool/rbuflock.h"
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
@@ -4326,11 +4327,12 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   csRef<csRenderBufferHolder> scrapBufferHolder;
   scrapBufferHolder.AttachNew (new csRenderBufferHolder);
 
-  if (scrapIndicesSize < mesh.indexCount)
+  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
+  if (scrapIndicesSize < indexCount)
   {
-    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (mesh.indexCount,
+    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
       CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, 0);
-    scrapIndicesSize = mesh.indexCount;
+    scrapIndicesSize = indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
   {
@@ -4352,13 +4354,16 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   if (mesh.indices)
   {
     scrapIndices->CopyInto (mesh.indices, mesh.indexCount);
-    sv->SetValue (scrapIndices);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
   }
   else
   {
-    sv->SetValue (0);
+    csRenderBufferLock<uint> indexLock (scrapIndices);
+    for (uint i = 0; i < mesh.vertexCount; i++)
+      indexLock[i] = i;
   }
+  sv->SetValue (scrapIndices);
+  scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+
   sv = scrapContext.GetVariableAdd (strings->Request ("vertices"));
   if (mesh.vertices)
   {
@@ -4407,7 +4412,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   rmesh.do_mirror = false;
   rmesh.meshtype = mesh.meshtype;
   rmesh.indexstart = 0;
-  rmesh.indexend = mesh.indexCount;
+  rmesh.indexend = indexCount;
   rmesh.variablecontext = &scrapContext;
   rmesh.buffers = scrapBufferHolder;
 
