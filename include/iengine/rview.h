@@ -263,7 +263,20 @@ struct iRenderView : public iBase
    */
   virtual uint GetCurrentFrameNumber () const = 0;
 
+  /**
+   * Check if the given bounding sphere (in camera and world space coordinates)
+   * is visibile in this render view. If the sphere is visible this
+   * function will also initialize the clip_plane, clip_z_plane, and
+   * clip_portal fields which can be used for DrawTriangleMesh or
+   * DrawPolygonMesh.
+   */
+  virtual bool ClipBSphere (
+	const csSphere &cam_sphere,
+	const csSphere &world_sphere,
+	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
   
+
+
   // @@@ ADDED B/C OF FATLOOP PORTAL HACKING
   // @@@ REMOVE AGAIN ASAP
   virtual void CreateRenderContext () = 0;
@@ -282,6 +295,8 @@ struct iRenderView : public iBase
   virtual bool IsClipperRequired () const = 0;
   virtual iCamera* CreateNewCamera () = 0;
   virtual void RestoreRenderContext () = 0;
+  virtual void SetThisSector (iSector* s) = 0;
+  virtual void SetupClipPlanes () = 0;
 };
 
 /** @} */

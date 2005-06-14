@@ -108,6 +108,8 @@ class csFatLoopStep : public iRenderStep
   csMeshRenderNodeFactory meshNodeFact;
   csPortalRenderNodeFactory portalNodeFact;
 
+  void CleanEmptyMeshNodes (RenderNode* node, 
+    const csArray<csMeshRenderNode*>& meshNodes);
   void BuildNodeGraph (RenderNode* node, iRenderView* rview, 
     iSector* sector, csShaderVarStack &stacks);
   void BuildPortalNodes (RenderNode* node, iMeshWrapper* meshwrapper, 

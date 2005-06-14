@@ -10,6 +10,8 @@ chronological order.
 	- res augmented DrawSimpleMesh() to not require an index array; if it
 	  is omitted, an array that simply contains vertexCount indices with
 	  values 0 to vertexCount-1 is used.
+	- res further worked on the fat rl portal support. flarge now works to
+	  some extent.
 13-Jun-2005
 	- res fixed cut-and-paste errors in the ARB fragment program code
 	  (where GL_VERTEX_PROGRAM_ARB instead do GL_FRAGMENT_PROGRAM_ARB was

@@ -97,6 +97,7 @@ class csMeshRenderNode : public csRenderNode
     iShader* defShader);
 public:
   void AddMesh (csRenderMesh* rm, iMeshWrapper* mw, long prio, bool keepOrder);
+  bool HasMeshes () const { return !buckets.IsEmpty(); }
 
   virtual bool Preprocess (iRenderView* rview);
   virtual void Postprocess (iRenderView* rview) {}

@@ -48,6 +48,9 @@ class csPortalRenderNode : public csRenderNode
 public:
   virtual bool Preprocess (iRenderView* rview);
   virtual void Postprocess (iRenderView* rview);
+
+  bool PreMeshCollect (iRenderView* rview);
+  void PostMeshCollect (iRenderView* rview);
 };
 
 class csPortalRenderNodeFactory
@@ -64,7 +67,7 @@ public:
   csPortalRenderNodeFactory (iObjectRegistry* object_reg);
 
   csPortalRenderNode* CreatePortalNode (iPortal* portal, iRenderView* rview,
-    const csReversibleTransform& movtrans);
+    const csReversibleTransform& movtrans, bool doClip);
 };
 
 #endif // __CS_PORTALNODE_H__

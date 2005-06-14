@@ -28,6 +28,7 @@
 
 #include "csextern.h"
 #include "csgeom/vector3.h"
+#include "csutil/csstring.h"
 
 /**
  * A plane in 3D space.
@@ -190,6 +191,9 @@ public:
    * is set to true then the positive side will be used instead.
    */
   bool ClipPolygon (csVector3*& pverts, int& num_verts, bool reversed = false);
+
+  /// Return a textual representation of the plane in the form "aa,bb,cc,dd".
+  csString Description() const;
 };
 
 /** @} */

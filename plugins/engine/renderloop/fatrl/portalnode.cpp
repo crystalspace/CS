@@ -27,6 +27,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polyclip.h"
 #include "csutil/flags.h"
+#include "csutil/sysfunc.h"
 
 #include "portalnode.h"
 
@@ -51,20 +52,38 @@ csPortalRenderNode::csPortalRenderNode (iPortal* portal, iRenderView* rview,
 {
 }
 
+#if 0
+/* Helper macro to see why a portal doesn't get rendered:
+ * if 'cond' is true, outputs the condition in question and returns 
+ * 'retVal'. */
+#define PORTAL_CHECK(portal, cond, retVal)				    \
+  if (cond)								    \
+  {									    \
+    csPrintf ("portal '%s': %s (%ls:%d)\n", portal->GetName(), #cond,	    \
+      CS_STRING_TO_WIDE (__FILE__), __LINE__);				    \
+    return retVal;							    \
+  }
+#else
+#define PORTAL_CHECK(portal, cond, retVal)				    \
+  if (cond)								    \
+    return retVal;
+#endif
+
 bool csPortalRenderNode::Preprocess (iRenderView* rview)
 {
-  if (!portal->CompleteSector (rview)) return false;
+  //if (!portal->CompleteSector (rview)) return false;
+
+  iSector* sector = portal->GetSector();// rview->GetThisSector();
+  PORTAL_CHECK(portal, 
+    sector->GetRecLevel () >= portal->GetMaximumSectorVisit(), 
+    false);
+
+  PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
   bool use_float_portal = portal->GetFlags().Check (CS_PORTAL_FLOAT);
   g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
     camera_plane, use_float_portal);
-
-  iSector* sector = rview->GetThisSector();
-  if (sector->GetRecLevel () >= portal->GetMaximumSectorVisit())
-    return false;
-
-  if (!poly.GetVertexCount ()) return false;
 
   csRenderContext *old_ctxt = rview->GetRenderContext ();
   iCamera *icam = old_ctxt->icamera;
@@ -76,8 +95,9 @@ bool csPortalRenderNode::Preprocess (iRenderView* rview)
   rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
   rview->SetClipper (new_view);
   rview->ResetFogInfo ();
-  rview->SetLastPortal ((iPortal*)this);
+  rview->SetLastPortal (portal);
   rview->SetPreviousSector (rview->GetThisSector ());
+  rview->SetThisSector (sector);
   rview->SetClipPlane (camera_plane);
   rview->GetClipPlane ().Invert ();
   if (portal->GetFlags().Check (CS_PORTAL_CLIPDEST))
@@ -136,6 +156,54 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
   old_clipper = 0;
 }
 
+bool csPortalRenderNode::PreMeshCollect (iRenderView* rview)
+{
+  iSector* sector = portal->GetSector();// rview->GetThisSector();
+  PORTAL_CHECK(portal, 
+    sector->GetRecLevel () >= portal->GetMaximumSectorVisit(), 
+    false);
+
+  PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
+
+  csRenderContext *old_ctxt = rview->GetRenderContext ();
+  iCamera *icam = old_ctxt->icamera;
+  csRef<csPolygonClipper> new_view;
+  new_view.AttachNew (new csPolygonClipper ((csPoly2D*)&poly, 
+    icam->IsMirrored (), true));
+
+  rview->CreateRenderContext ();
+  rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
+  rview->SetClipper (new_view);
+  rview->ResetFogInfo ();
+  rview->SetLastPortal (portal);
+  rview->SetPreviousSector (rview->GetThisSector ());
+  rview->SetThisSector (sector);
+  rview->SetClipPlane (camera_plane);
+  rview->GetClipPlane ().Invert ();
+  if (portal->GetFlags().Check (CS_PORTAL_CLIPDEST))
+  {
+    rview->UseClipPlane (true);
+    rview->UseClipFrustum (true);
+  }
+
+  if (portal->GetFlags().Check (CS_PORTAL_WARP))
+  {
+    iCamera *inewcam = rview->CreateNewCamera ();
+
+    bool mirror = inewcam->IsMirrored ();
+    csReversibleTransform warp_wor;
+    portal->ObjectToWorld (movtrans, warp_wor);
+    portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
+    inewcam->SetMirrored (mirror);
+  }
+  return true;
+}
+
+void csPortalRenderNode::PostMeshCollect (iRenderView* rview)
+{
+  rview->RestoreRenderContext ();
+}
+
 //---------------------------------------------------------------------------
 
 csPortalRenderNodeFactory::csPortalRenderNodeFactory (
@@ -144,9 +212,10 @@ csPortalRenderNodeFactory::csPortalRenderNodeFactory (
 }
 
 csPortalRenderNode* csPortalRenderNodeFactory::CreatePortalNode (iPortal* portal, 
-                                                                 iRenderView* rview,
-                                                                 const csReversibleTransform& movtrans)
+  iRenderView* rview, const csReversibleTransform& movtrans, bool doClip)
 {
+  PORTAL_CHECK(portal, !portal->CompleteSector (rview), 0);
+
   csDirtyAccessArray<csVector3> camera_vertices;
   csPoly2D poly;
   csPlane3 camera_plane;
@@ -175,32 +244,34 @@ csPortalRenderNode* csPortalRenderNodeFactory::CreatePortalNode (iPortal* portal
   const csVector3* world_vertices = portal->GetWorldVertices();
   int i;
   for (i = 0 ; i < num_vertices; i++)
+  {
     camera_vertices[i] = camtrans.Other2This (world_vertices[vertexIndices[i]]);
+  }
 
   csVector3& cam_vec = camera_vertices[0];
   camtrans.Other2This (portal->GetWorldPlane (), cam_vec, camera_plane);
   camera_plane.Normalize ();
 
-  if (/*clip_plane || clip_portal || clip_z_plane || */do_portal_plane || farplane)
+  if (doClip || do_portal_plane || farplane)
   {
     csVector3 *verts;
     int num_verts;
-    if (ClipToPlane (portal, do_portal_plane ? &rcontext->clip_plane : 0, 
-      camtrans.GetOrigin (), verts, num_verts, camera_vertices.GetArray()))
-    {
-      // The far plane is defined negative. So if the portal is entirely
-      // in front of the far plane it is not visible. Otherwise we will render
-      // it.
-      if (!farplane ||
-        csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
-      {
-	csPoly2D clip;
-	if (DoPerspective (verts, num_verts, &clip, mirrored, fov,
-	      shift_x, shift_y, camera_plane) &&
-	    clip.ClipAgainst (rview->GetClipper ()))
-          return 0;
-      }
-    }
+    PORTAL_CHECK(portal,
+      !(ClipToPlane (portal, do_portal_plane ? &rcontext->clip_plane : 0, 
+      camtrans.GetOrigin (), verts, num_verts, camera_vertices.GetArray())),
+      0);
+    // The far plane is defined negative. So if the portal is entirely
+    // in front of the far plane it is not visible. Otherwise we will render
+    // it.
+    PORTAL_CHECK(portal,
+      !(!farplane ||
+      csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT),
+      0);
+    PORTAL_CHECK(portal,
+      !(DoPerspective (verts, num_verts, &poly, mirrored, fov,
+	  shift_x, shift_y, camera_plane) &&
+	  poly.ClipAgainst (rview->GetClipper ())),
+      0);
   }
   else
   {
@@ -238,30 +309,29 @@ bool csPortalRenderNodeFactory::ClipToPlane (
   // vertices has been done earlier).
   // If there are no visible vertices this polygon need not be drawn.
   cnt_vis = 0;
-  int* vt = portal->GetVertexIndices ();
   num_vertices = portal->GetVertexIndicesCount();
   for (i = 0; i < num_vertices; i++)
-    if (camera_vertices[vt[i]].z >= 0)
+    if (camera_vertices[i].z >= 0)
     {
       cnt_vis++;
       break;
     }
 
-  if (cnt_vis == 0) return false;
+  PORTAL_CHECK(portal, cnt_vis == 0, false);
 
   // Perform backface culling.
   // Note! The plane normal needs to be correctly calculated for this
   // to work!
   const csPlane3 &wplane = portal->GetWorldPlane ();
   float cl = wplane.Classify (v_w2c);
-  if (cl > 0) return false;
+  PORTAL_CHECK(portal, cl > 0, false);
 
   // If there is no portal polygon then everything is ok.
   if (!portal_plane)
   {
     // Copy the vertices to verts.
     for (i = 0; i < num_vertices; i++)
-      verts[i] = camera_vertices[vt[i]];
+      verts[i] = camera_vertices[i];
     pverts = verts;
     num_verts = num_vertices;
     return true;
@@ -275,14 +345,14 @@ bool csPortalRenderNodeFactory::ClipToPlane (
   cnt_vis = 0;
   for (i = 0; i < num_vertices; i++)
   {
-    vis[i] = portal_plane->Classify (camera_vertices[vt[i]]) <= EPSILON;
+    vis[i] = portal_plane->Classify (camera_vertices[i]) <= EPSILON;
     if (vis[i]) cnt_vis++;
   }
 
-  if (cnt_vis == 0) return false; // Polygon is not visible.
+  PORTAL_CHECK(portal, cnt_vis == 0, false); // Polygon is not visible.
 
   // Copy the vertices to verts.
-  for (i = 0; i < num_vertices; i++) verts[i] = camera_vertices[vt[i]];
+  for (i = 0; i < num_vertices; i++) verts[i] = camera_vertices[i];
   pverts = verts;
 
   // If all vertices are visible then everything is ok.
@@ -304,19 +374,19 @@ bool csPortalRenderNodeFactory::ClipToPlane (
     if (!z1s && zs)
     {
       csIntersect3::SegmentPlane (
-          camera_vertices[vt[i1]],
-          camera_vertices[vt[i]],
+          camera_vertices[i1],
+          camera_vertices[i],
           *portal_plane,
           verts[num_verts],
           r);
       num_verts++;
-      verts[num_verts++] = camera_vertices[vt[i]];
+      verts[num_verts++] = camera_vertices[i];
     }
     else if (z1s && !zs)
     {
       csIntersect3::SegmentPlane (
-          camera_vertices[vt[i1]],
-          camera_vertices[vt[i]],
+          camera_vertices[i1],
+          camera_vertices[i],
           *portal_plane,
           verts[num_verts],
           r);
@@ -324,7 +394,7 @@ bool csPortalRenderNodeFactory::ClipToPlane (
     }
     else if (z1s && zs)
     {
-      verts[num_verts++] = camera_vertices[vt[i]];
+      verts[num_verts++] = camera_vertices[i];
     }
 
     z1s = zs;

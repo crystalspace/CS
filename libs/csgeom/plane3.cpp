@@ -136,4 +136,11 @@ bool csPlane3::ClipPolygon (
   return true;
 }
 
+csString csPlane3::Description() const
+{
+  csString s;
+  s.Format("%g,%g,%g,%g", norm.x, norm.y, norm.z, DD);
+  return s;
+}
+
 //---------------------------------------------------------------------------

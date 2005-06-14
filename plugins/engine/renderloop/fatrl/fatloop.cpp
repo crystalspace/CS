@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csqsqrt.h"
 
 #include "iengine/camera.h"
 #include "iengine/material.h"
@@ -252,12 +253,35 @@ uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
   return (1 << passes.Length())-1;
 }
 
+void csFatLoopStep::CleanEmptyMeshNodes (RenderNode* node, 
+  const csArray<csMeshRenderNode*>& meshNodes)
+{
+  size_t nodeContainedIdx = node->containedNodes.Length() - meshNodes.Length();
+  size_t meshNodeIdx = 0;
+  while (nodeContainedIdx < node->containedNodes.Length())
+  {
+    if (meshNodes[meshNodeIdx]->HasMeshes())
+      nodeContainedIdx++;
+    else
+    {
+      renderNodeAlloc.Free (node->containedNodes[nodeContainedIdx]);
+      node->containedNodes.DeleteIndex (nodeContainedIdx);
+    }
+    meshNodeIdx++;
+  }
+}
+
 void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview, 
                                     iSector* sector, csShaderVarStack &stacks)
 {
   if (!sector) return;
-  if (sectorSet.In (sector)) return;
+  //if (sectorSet.In (sector)) return;
   sectorSet.Add (sector);
+  iSector* oldSector = rview->GetPreviousSector();
+  rview->SetupClipPlanes ();
+  rview->SetThisSector (sector);
+  sector->IncRecLevel();
+  sector->PrepareDraw (rview);
 
   RenderNode* newNode = renderNodeAlloc.Alloc();
   node->containedNodes.Push (newNode);
@@ -292,6 +316,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     csRenderMesh* mesh = sameShaderMeshes[n];
     if (mesh->portal) 
     {
+      CleanEmptyMeshNodes (node, meshNodes);
       BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview, stacks);
 
       for (size_t p = 0; p < passes.Length(); p++)
@@ -320,45 +345,72 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
       classes >>= 1;
     }
   }
+  CleanEmptyMeshNodes (node, meshNodes);
+  rview->SetThisSector (oldSector);
+  sector->DecRecLevel();
 }
-
-static void Perspective (const csVector3& v, csVector2& p, int
-	aspect, float shift_x, float shift_y)
-{
-  float iz = aspect / v.z;
-  p.x = v.x * iz + shift_x;
-  p.y = v.y * iz + shift_y;
-}
-
-#if 0
-static void AddPerspective (csPoly2D* dest, const csVector3 &v,
-	int aspect, float shift_x, float shift_y)
-{
-  csVector2 p;
-  Perspective (v, p, aspect, shift_x, shift_y);
-  dest->AddVertex (p);
-}
-#endif
 
 void csFatLoopStep::BuildPortalNodes (RenderNode* node, 
   iMeshWrapper* meshwrapper, iPortalContainer* portals, iRenderView* rview, 
   csShaderVarStack &stacks)
 {
-  const csReversibleTransform& movtrans = 
-    meshwrapper->GetMovable()->GetFullTransform ();
+  int clip_plane, clip_portal, clip_z_plane;
 
+  iCamera* camera = rview->GetCamera ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  iMovable* movable = meshwrapper->GetMovable();
+  const csReversibleTransform& movtrans = movable->GetFullTransform ();
+
+  /*if (movable_nr != cmovable->GetUpdateNumber ())
+  {
+    portals->ObjectToWorld (cmovable, movtrans);
+  }*/
+
+  csSphere sphere, world_sphere;
+  csBox3 object_bbox;
+  meshwrapper->GetWorldBoundingBox (object_bbox);
+  float max_object_radius = csQsqrt (csSquaredDist::PointPoint (
+  	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
+  sphere.SetCenter (object_bbox.GetCenter ());
+  sphere.SetRadius (max_object_radius);
+
+  csReversibleTransform tr_o2c = camtrans;
+  if (!meshwrapper->GetMovable()->IsFullTransformIdentity())
+  {
+    tr_o2c /= movtrans;
+    world_sphere = movtrans.This2Other (sphere);
+  }
+  else
+  {
+    world_sphere = sphere;
+  }
+  csSphere cam_sphere = tr_o2c.Other2This (sphere);
+  csVector3 camera_origin = cam_sphere.GetCenter ();
+
+  if (!rview->ClipBSphere (cam_sphere, world_sphere, clip_portal,
+      clip_plane, clip_z_plane)) return;
+
+  bool doClip = clip_plane || clip_portal || clip_z_plane;
   for (int i = 0 ; i < portals->GetPortalCount(); i++)
   {
     iPortal* portal = portals->GetPortal (i);
     csPortalRenderNode* portalNode = 
-      portalNodeFact.CreatePortalNode (portal, rview, movtrans);
+      portalNodeFact.CreatePortalNode (portal, rview, movtrans, doClip);
     if (portalNode == 0) continue;
 
     RenderNode* newNode = renderNodeAlloc.Alloc();
     newNode->renderNode = portalNode;
-    node->containedNodes.Push (newNode);
 
-    BuildNodeGraph (node, rview, portal->GetSector(), stacks);
+    if (portalNode->PreMeshCollect (rview))
+    {
+      BuildNodeGraph (newNode, rview, portal->GetSector(), stacks);
+      portalNode->PostMeshCollect (rview);
+    }
+
+    if (newNode->containedNodes.Length() == 0)
+      renderNodeAlloc.Free (newNode);
+    else
+      node->containedNodes.Push (newNode);
   }
 }
 
@@ -373,6 +425,5 @@ void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node,
     }
     if (node->renderNode) node->renderNode->Postprocess (rview);
   }
-  return;
 }
 
