@@ -1044,6 +1044,7 @@ class csPlane3(_object):
     def Normalize(*args): return _cspace.csPlane3_Normalize(*args)
     def FindPoint(*args): return _cspace.csPlane3_FindPoint(*args)
     def ClipPolygon(*args): return _cspace.csPlane3_ClipPolygon(*args)
+    def Description(*args): return _cspace.csPlane3_Description(*args)
     def __imul__(*args): return _cspace.csPlane3___imul__(*args)
     def __idiv__(*args): return _cspace.csPlane3___idiv__(*args)
     def __div__(*args): return _cspace.csPlane3___div__(*args)
