@@ -229,10 +229,10 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       stacks.Empty ();
       shaderManager->PushVariables (stacks);
       shadervars.Top ().PushVariables (stacks);
-      if (meshContext)
-        meshContext->PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
+      if (meshContext)
+        meshContext->PushVariables (stacks);
       shader->PushVariables (stacks);
       material = mesh->material->GetMaterial ();
       if (material)
@@ -261,10 +261,8 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 	old_clipper = 0;
       }
       
-
       g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass (ticket);
-
       
     }
     shader->DeactivatePass (ticket);
@@ -352,10 +350,10 @@ public:
     {
       stacks.Empty ();
       shadervars[shadervars_idx].PushVariables (stacks);
-      if (meshContext)
-        meshContext->PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
+      if (meshContext)
+        meshContext->PushVariables (stacks);
       shader->PushVariables (stacks);
       material->PushVariables (stacks);
 
@@ -370,10 +368,10 @@ public:
       {
         stacks.Empty ();
         shadervars[shadervars_idx].PushVariables (stacks);
-        if (meshContext)
-          meshContext->PushVariables (stacks);
         if (mesh->variablecontext)
           mesh->variablecontext->PushVariables (stacks);
+        if (meshContext)
+          meshContext->PushVariables (stacks);
         shader->PushVariables (stacks);
         material->PushVariables (stacks);
 
