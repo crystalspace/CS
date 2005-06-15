@@ -1346,6 +1346,7 @@ sub new {
 *Normalize = *cspacec::csPlane3_Normalize;
 *FindPoint = *cspacec::csPlane3_FindPoint;
 *ClipPolygon = *cspacec::csPlane3_ClipPolygon;
+*Description = *cspacec::csPlane3_Description;
 *__mult_ass__ = *cspacec::csPlane3___mult_ass__;
 *__divide_ass__ = *cspacec::csPlane3___divide_ass__;
 *__div__ = *cspacec::csPlane3___div__;
