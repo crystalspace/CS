@@ -689,7 +689,7 @@ public:
   bool IsEmpty () const 
   {
     return svcontext.IsEmpty() 
-      || (factorySVC.IsValid() && factorySVC->IsEmpty());
+      && (!factorySVC.IsValid() || factorySVC->IsEmpty());
   }
 
   //--------------------- iMeshWrapper implementation --------------------//

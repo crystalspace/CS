@@ -9,6 +9,8 @@ chronological order.
 15-Jun-2005
 	- res changed the SV context precedence slightly so that user-defined
 	  mesh shader vars override SVs provided by the mesh plugin. 
+	- res fixed the logic to determine whether a mesh wrapper SV context
+	  is empty.
 14-Jun-2005
 	- res augmented DrawSimpleMesh() to not require an index array; if it
 	  is omitted, an array that simply contains vertexCount indices with
