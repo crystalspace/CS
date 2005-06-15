@@ -150,16 +150,18 @@ typedef enum _csKeyEventType
   (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
 
 // Some handy macros
+/// Check if a event is a broadcast event
+#define CS_IS_BROADCAST_EVENT(e) ((1 << (e).Type) & CSMASK_Broadcast)
 /// Check if a event is a command event
-#define CS_IS_COMMAND_EVENT(e)  ((1 << (e).Type) & CSMASK_Command)
+#define CS_IS_COMMAND_EVENT(e)   ((1 << (e).Type) & CSMASK_Command)
 /// Check if a event is a keyboard event
-#define CS_IS_KEYBOARD_EVENT(e)	((1 << (e).Type) & CSMASK_Keyboard)
+#define CS_IS_KEYBOARD_EVENT(e)	 ((1 << (e).Type) & CSMASK_Keyboard)
 /// Check if a event is a mouse event
-#define CS_IS_MOUSE_EVENT(e)	((1 << (e).Type) & CSMASK_Mouse)
+#define CS_IS_MOUSE_EVENT(e)	 ((1 << (e).Type) & CSMASK_Mouse)
 /// Check if a event is a joystick event
-#define CS_IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & CSMASK_Joystick)
+#define CS_IS_JOYSTICK_EVENT(e)	 ((1 << (e).Type) & CSMASK_Joystick)
 /// Check if a event is any input event
-#define CS_IS_INPUT_EVENT(e)	((1 << (e).Type) & CSMASK_Input)
+#define CS_IS_INPUT_EVENT(e)	 ((1 << (e).Type) & CSMASK_Input)
 /** @} */
 
 /** \name Event flags masks

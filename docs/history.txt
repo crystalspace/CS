@@ -11,6 +11,9 @@ chronological order.
 	  mesh shader vars override SVs provided by the mesh plugin. 
 	- res fixed the logic to determine whether a mesh wrapper SV context
 	  is empty.
+	- Jorrit added CS_IS_BROADCAST_EVENT and used that define to change
+	  csKeyEventHelper::GetEventData() so that it now also works for
+	  broadcast events.
 14-Jun-2005
 	- res augmented DrawSimpleMesh() to not require an index array; if it
 	  is omitted, an array that simply contains vertexCount indices with

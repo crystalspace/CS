@@ -84,7 +84,9 @@ csKeyCharType csKeyEventHelper::GetCharacterType (const iEvent* event)
 bool csKeyEventHelper::GetEventData (const iEvent* event, 
 				      csKeyEventData& data)
 {
-  if (!CS_IS_KEYBOARD_EVENT (*event)) return false;
+  if (!CS_IS_KEYBOARD_EVENT (*event) &&
+  	!CS_IS_BROADCAST_EVENT (*event))
+    return false;
 
   data.autoRepeat = GetAutoRepeat (event);
   data.charType = GetCharacterType (event);
