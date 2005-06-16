@@ -944,7 +944,7 @@ LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
     // when the MB is first activated we change the button text
   case HCBT_ACTIVATE:
     {
-      // The MBs we request always have just ibe button (OK)
+      // The MBs we request always have just one button (OK)
       HWND Button = FindWindowEx ((HWND)wParam, 0, "Button", 0);
       if (Button)
       {

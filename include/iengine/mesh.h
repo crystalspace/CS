@@ -405,13 +405,31 @@ struct iMeshWrapper : public iBase
    * <li>#CS_ENTITY_NOLIGHTING: do not light this object.
    * <li>#CS_ENTITY_NOCLIP: do not clip this object.
    * </ul>
+   * \remarks Despite the name, this method does not only provide read access
+   *   to the mesh flags, as the returned reference to a csFlags object also 
+   *   provides write access.
    */
   virtual csFlags& GetFlags () = 0;
 
   /**
    * Set some flags with the given mask for this mesh and all children.
+   * \param mask The bits to modify; only those bits are affected.
+   * \param flags The values the bits specified in \a mask are set to.
+   * <p>
+   * Enabling flags:
+   * \code
+   * csRef<iMeshWrapper> someWrapper = ...;
+   * someWrapper->SetFlags (CS_ENTITY_INVISIBLE | CS_ENTITY_NOCLIP);
+   * \endcode
+   * <p>
+   * Disabling flags:
+   * \code
+   * csRef<iMeshWrapper> someWrapper = ...;
+   * someWrapper->SetFlags (CS_ENTITY_INVISIBLE | CS_ENTITY_NOCLIP, 0);
+   * \endcode
+   * \remarks To set flags non-recursive, use GetFlags().Set().
    */
-  virtual void SetFlagsRecursive (uint32 mask, uint32 flags) = 0;
+  virtual void SetFlagsRecursive (uint32 mask, uint32 flags = ~0) = 0;
 
   /**
    * Set the Z-buf drawing mode to use for this object.

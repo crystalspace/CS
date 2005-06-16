@@ -425,6 +425,17 @@ void csGLGraphics3D::SetupStencil ()
 
   if (clipper)
   {
+    csBitArray clipPlanes (maxClipPlanes);
+    int p;
+    for (p = 0; p < maxClipPlanes; p++)
+    {
+      if (glIsEnabled (GL_CLIP_PLANE0+p))
+      {
+	clipPlanes.Set (p);
+	glDisable (GL_CLIP_PLANE0+p);
+      }
+    }
+
     statecache->SetMatrixMode (GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
@@ -484,17 +495,22 @@ void csGLGraphics3D::SetupStencil ()
     glPopMatrix ();
     if (oldz) statecache->Enable_GL_DEPTH_TEST ();
     if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
+    for (p = 0; p < maxClipPlanes; p++)
+    {
+      if (clipPlanes.IsBitSet (p))
+        glEnable (GL_CLIP_PLANE0+p);
+    }
   }
 }
 
 int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
-                                   bool add_near_clip,
-                                   bool add_z_clip)
+				     bool add_near_clip,
+				     bool add_z_clip)
 {
-  if (!(add_clipper || add_near_clip || add_z_clip)) return 0;
-
   GLRENDER3D_OUTPUT_STRING_MARKER(("(%d, %d, %d)", (int)add_clipper, 
     (int)add_near_clip, (int)add_z_clip));
+
+  if (!(add_clipper || add_near_clip || add_z_clip)) return 0;
 
   statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
@@ -558,10 +574,13 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
 }
 
 void csGLGraphics3D::SetupClipper (int clip_portal,
-                                 int clip_plane,
-                                 int clip_z_plane,
-				 int tri_count)
+				   int clip_plane,
+				   int clip_z_plane,
+				   int tri_count)
 {
+  GLRENDER3D_OUTPUT_STRING_MARKER(("(%d, %d, %d, %d)", 
+    clip_portal, clip_plane, clip_z_plane, tri_count));
+
   // @@@@ RETHINK!!! THIS IS A HUGE PERFORMANCE BOOST. BUT???
   clip_z_plane = CS_CLIP_NOT;
 
@@ -601,8 +620,6 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
       cache_clip_z_plane == clip_z_plane)
   {
     SetCorrectStencilState ();
-  for (int i = 0 ; i < maxClipPlanes; i++)
-    glDisable ((GLenum)(GL_CLIP_PLANE0+i));
     return;
   }
   cache_clip_portal = clip_portal;

@@ -45,6 +45,8 @@ class csPortalRenderNode : public csRenderNode
 
   csPortalRenderNode (iPortal* portal, iRenderView* rview,
     const csReversibleTransform& movtrans);
+  void PrepareView (iRenderView* rview, iSector* sector);
+  void DoWarp (iRenderView* rview);
 public:
   virtual bool Preprocess (iRenderView* rview);
   virtual void Postprocess (iRenderView* rview);

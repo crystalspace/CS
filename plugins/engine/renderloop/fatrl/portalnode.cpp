@@ -69,22 +69,8 @@ csPortalRenderNode::csPortalRenderNode (iPortal* portal, iRenderView* rview,
     return retVal;
 #endif
 
-bool csPortalRenderNode::Preprocess (iRenderView* rview)
+void csPortalRenderNode::PrepareView (iRenderView* rview, iSector* sector)
 {
-  //if (!portal->CompleteSector (rview)) return false;
-
-  iSector* sector = portal->GetSector();// rview->GetThisSector();
-  PORTAL_CHECK(portal, 
-    sector->GetRecLevel () >= portal->GetMaximumSectorVisit(), 
-    false);
-
-  PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
-
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-  bool use_float_portal = portal->GetFlags().Check (CS_PORTAL_FLOAT);
-  g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
-    camera_plane, use_float_portal);
-
   csRenderContext *old_ctxt = rview->GetRenderContext ();
   iCamera *icam = old_ctxt->icamera;
   csRef<csPolygonClipper> new_view;
@@ -105,6 +91,40 @@ bool csPortalRenderNode::Preprocess (iRenderView* rview)
     rview->UseClipPlane (true);
     rview->UseClipFrustum (true);
   }
+}
+
+void csPortalRenderNode::DoWarp (iRenderView* rview)
+{
+  if (portal->GetFlags().Check (CS_PORTAL_WARP))
+  {
+    iCamera *inewcam = rview->CreateNewCamera ();
+
+    bool mirror = inewcam->IsMirrored ();
+    csReversibleTransform warp_wor;
+    portal->ObjectToWorld (movtrans, warp_wor);
+    portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
+    inewcam->SetMirrored (mirror);
+  }
+}
+
+bool csPortalRenderNode::Preprocess (iRenderView* rview)
+{
+  //if (!portal->CompleteSector (rview)) return false;
+
+  iSector* sector = portal->GetSector();// rview->GetThisSector();
+  PORTAL_CHECK(portal, 
+    sector->GetRecLevel () >= portal->GetMaximumSectorVisit(), 
+    false);
+
+  PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
+
+  iGraphics3D* g3d = rview->GetGraphics3D ();
+  bool use_float_portal = portal->GetFlags().Check (CS_PORTAL_FLOAT);
+  g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
+    camera_plane, use_float_portal);
+
+  PrepareView (rview, sector);
+
   // When going through a portal we first remember the old clipper
   // and clip plane (if any). Then we set a new one. Later we restore.
   old_clipper = g3d->GetClipper ();
@@ -123,16 +143,7 @@ bool csPortalRenderNode::Preprocess (iRenderView* rview)
   else
     g3d->ResetNearPlane ();
 
-  if (portal->GetFlags().Check (CS_PORTAL_WARP))
-  {
-    iCamera *inewcam = rview->CreateNewCamera ();
-
-    bool mirror = inewcam->IsMirrored ();
-    csReversibleTransform warp_wor;
-    portal->ObjectToWorld (movtrans, warp_wor);
-    portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
-    inewcam->SetMirrored (mirror);
-  }
+  DoWarp (rview);
 
   return true;
 }
@@ -165,37 +176,9 @@ bool csPortalRenderNode::PreMeshCollect (iRenderView* rview)
 
   PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
 
-  csRenderContext *old_ctxt = rview->GetRenderContext ();
-  iCamera *icam = old_ctxt->icamera;
-  csRef<csPolygonClipper> new_view;
-  new_view.AttachNew (new csPolygonClipper ((csPoly2D*)&poly, 
-    icam->IsMirrored (), true));
+  PrepareView (rview, sector);
+  DoWarp (rview);
 
-  rview->CreateRenderContext ();
-  rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
-  rview->SetClipper (new_view);
-  rview->ResetFogInfo ();
-  rview->SetLastPortal (portal);
-  rview->SetPreviousSector (rview->GetThisSector ());
-  rview->SetThisSector (sector);
-  rview->SetClipPlane (camera_plane);
-  rview->GetClipPlane ().Invert ();
-  if (portal->GetFlags().Check (CS_PORTAL_CLIPDEST))
-  {
-    rview->UseClipPlane (true);
-    rview->UseClipFrustum (true);
-  }
-
-  if (portal->GetFlags().Check (CS_PORTAL_WARP))
-  {
-    iCamera *inewcam = rview->CreateNewCamera ();
-
-    bool mirror = inewcam->IsMirrored ();
-    csReversibleTransform warp_wor;
-    portal->ObjectToWorld (movtrans, warp_wor);
-    portal->WarpSpace (warp_wor, inewcam->GetTransform (), mirror);
-    inewcam->SetMirrored (mirror);
-  }
   return true;
 }
 

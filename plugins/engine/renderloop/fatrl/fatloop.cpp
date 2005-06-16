@@ -239,11 +239,9 @@ public:
 void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
                              csShaderVarStack &stacks)
 {
-  sectorSet.Empty();
-
   RenderNode* node = renderNodeAlloc.Alloc();
-  BuildNodeGraph (node, rview, sector, stacks);
-  ProcessNode (rview, node, stacks);
+  BuildNodeGraph (node, rview, sector);
+  ProcessNode (rview, node);
   renderNodeAlloc.Empty();
 }
 
@@ -272,11 +270,10 @@ void csFatLoopStep::CleanEmptyMeshNodes (RenderNode* node,
 }
 
 void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview, 
-                                    iSector* sector, csShaderVarStack &stacks)
+                                    iSector* sector)
 {
   if (!sector) return;
-  //if (sectorSet.In (sector)) return;
-  sectorSet.Add (sector);
+
   iSector* oldSector = rview->GetPreviousSector();
   rview->SetupClipPlanes ();
   rview->SetThisSector (sector);
@@ -317,7 +314,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     if (mesh->portal) 
     {
       CleanEmptyMeshNodes (node, meshNodes);
-      BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview, stacks);
+      BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview);
 
       for (size_t p = 0; p < passes.Length(); p++)
       {
@@ -351,15 +348,14 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 }
 
 void csFatLoopStep::BuildPortalNodes (RenderNode* node, 
-  iMeshWrapper* meshwrapper, iPortalContainer* portals, iRenderView* rview, 
-  csShaderVarStack &stacks)
+  iMeshWrapper* meshwrapper, iPortalContainer* portals, iRenderView* rview)
 {
   int clip_plane, clip_portal, clip_z_plane;
 
   iCamera* camera = rview->GetCamera ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
   iMovable* movable = meshwrapper->GetMovable();
-  const csReversibleTransform& movtrans = movable->GetFullTransform ();
+  const csReversibleTransform movtrans = movable->GetFullTransform ();
 
   /*if (movable_nr != cmovable->GetUpdateNumber ())
   {
@@ -403,7 +399,7 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
 
     if (portalNode->PreMeshCollect (rview))
     {
-      BuildNodeGraph (newNode, rview, portal->GetSector(), stacks);
+      BuildNodeGraph (newNode, rview, portal->GetSector());
       portalNode->PostMeshCollect (rview);
     }
 
@@ -414,14 +410,13 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
   }
 }
 
-void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node,
-                                 csShaderVarStack &stacks)
+void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node)
 {
   if ((!node->renderNode) || node->renderNode->Preprocess (rview))
   {
     for (size_t i = 0; i < node->containedNodes.Length(); i++)
     {
-      ProcessNode (rview, node->containedNodes[i], stacks);
+      ProcessNode (rview, node->containedNodes[i]);
     }
     if (node->renderNode) node->renderNode->Postprocess (rview);
   }

@@ -84,8 +84,6 @@ class csFatLoopStep : public iRenderStep
 {
   iObjectRegistry* object_reg;
 
-  csSet<csPtrKey<iSector> > sectorSet; // @@@ Hack.
-
   csWeakRef<iShaderManager> shaderManager;
   csRef<iEngine> engine;
   csWeakRef<iShader> nullShader;
@@ -111,11 +109,10 @@ class csFatLoopStep : public iRenderStep
   void CleanEmptyMeshNodes (RenderNode* node, 
     const csArray<csMeshRenderNode*>& meshNodes);
   void BuildNodeGraph (RenderNode* node, iRenderView* rview, 
-    iSector* sector, csShaderVarStack &stacks);
+    iSector* sector);
   void BuildPortalNodes (RenderNode* node, iMeshWrapper* meshwrapper, 
-    iPortalContainer* portals, iRenderView* rview, csShaderVarStack &stacks);
-  void ProcessNode (iRenderView* rview, RenderNode* node,
-    csShaderVarStack &stacks);
+    iPortalContainer* portals, iRenderView* rview);
+  void ProcessNode (iRenderView* rview, RenderNode* node);
 public:
   SCF_DECLARE_IBASE;
 

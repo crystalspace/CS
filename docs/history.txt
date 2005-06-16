@@ -11,6 +11,20 @@ chronological order.
 	  added a bit more code to demonstrate how to move objects.
 	- Eric Sunshine fixed bug in csApplicationFramework where `restartFlag'
 	  instance variable was not being initialized.
+	- res changed csFlags::Set() to apply the mask to the 'value'parameter, 
+	  too. Previously, e.g. specifying a value of ~0 as the value would 
+	  set all bits, not just those in 'mask', as the documentation stated.
+	- res gave the 'value' parameter of iMeshWrapper->SetFlagsRecursive()
+	  a default value of ~0. This way all bits in specified in 'mask'
+	  will be set (which mirrors the behaviour of the two csFlags::Set()
+	  overloads). Also added a bit of documenation.
+	- res fixed a typo in win32.cpp.
+	- res made csGLGraphics3D::SetupStencil() disable clip planes before
+	  drawing the stencil stuff. This has the same effect as Jorrit's 
+	  earlier fix in some cases, which however, as clip planes were 
+	  disabled all the time the clipping didn't change, caused clipping 
+	  issues in other places.
+	- res fixed warping portals in the fat rl.
 15-Jun-2005
 	- res changed the SV context precedence slightly so that user-defined
 	  mesh shader vars override SVs provided by the mesh plugin. 

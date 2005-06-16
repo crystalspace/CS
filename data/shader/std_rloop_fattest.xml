@@ -7,7 +7,7 @@
 	<shadertype>ambient</shadertype>
       </pass>
       <pass>
-	<shadertype>diffuse</shadertype>
+	<shadertype>standard</shadertype>
 	<defaultshader name="std_lighting" />
       </pass>
     </step>

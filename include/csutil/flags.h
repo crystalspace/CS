@@ -67,7 +67,7 @@ public:
    * but only the flags you specify in the mask will be affected.
    */
   void Set (uint32 mask, uint32 value)
-  { flags = (flags & ~mask) | value; }
+  { flags = (flags & ~mask) | (value & mask); }
 
   /**
    * Set all flags with the given value.

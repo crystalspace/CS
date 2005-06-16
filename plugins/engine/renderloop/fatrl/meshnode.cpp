@@ -79,13 +79,12 @@ void csMeshRenderNode::FillStacks (csShaderVarStack& stacks,
     svc = 0;
 
   stacks.Empty();
-
   factory->shaderManager->PushVariables (stacks);
   shadervars.PushVariables (stacks);
-  if (svc)
-    svc->PushVariables (stacks);
   if (rm->variablecontext)
     rm->variablecontext->PushVariables (stacks);
+  if (svc)
+    svc->PushVariables (stacks);
   shader->PushVariables (stacks);
   hdl->PushVariables (stacks);
 }
@@ -161,7 +160,7 @@ void csMeshRenderNode::TraverseShaderBuckets::Process (
   for (size_t i = 0; i < bucket.rendermeshes.Length(); i++)
   {
     size_t newTicket = (key.ticket != (size_t)~0) ? key.ticket :
-      node.GetTicket (*(bucket.stacks.GetArray() + startMesh), 
+      node.GetTicket (*(bucket.stacks.GetArray() + i), 
         bucket.rendermeshes[i], meshShader);
     if ((meshShader != lastShader) || (newTicket != lastTicket))
     {

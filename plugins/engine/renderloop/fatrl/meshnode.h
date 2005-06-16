@@ -71,7 +71,6 @@ class csMeshRenderNode : public csRenderNode
   typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
   SortedBuckets buckets;
   csShaderVariableContext shadervars;
-  csShaderVarStack stacks;
   class TraverseShaderBuckets
   {
     csMeshRenderNode& node;
