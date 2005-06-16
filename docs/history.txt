@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Jun-2005
+	- Jorrit fixed SimpleRoom.java so that it works again. Also
+	  added a bit more code to demonstrate how to move objects.
 15-Jun-2005
 	- res changed the SV context precedence slightly so that user-defined
 	  mesh shader vars override SVs provided by the mesh plugin. 

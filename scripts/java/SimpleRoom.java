@@ -20,6 +20,61 @@
 import org.crystalspace3d.*;
 import java.util.Vector;
 
+class GlobRefs
+{
+    public iGraphics3D g3d;
+    public iKeyboardDriver kbd;
+    public iVirtualClock vc;
+    public iLoader loader;
+    public iEngine engine;
+    private static GlobRefs instance = null;
+
+    public static GlobRefs Get()
+    {
+        if (instance == null)
+	{
+	    instance = new GlobRefs();
+	}
+	return instance;
+    }
+
+    private GlobRefs()
+    {
+        iObjectRegistry objreg = CS.getTheObjectRegistry();
+        g3d = (iGraphics3D) CS.CS_QUERY_REGISTRY(objreg, iGraphics3D.class);
+	vc = (iVirtualClock) CS.CS_QUERY_REGISTRY(objreg, iVirtualClock.class);
+        kbd = (iKeyboardDriver) CS.CS_QUERY_REGISTRY(objreg,
+		iKeyboardDriver.class);
+        loader = (iLoader) CS.CS_QUERY_REGISTRY(objreg, iLoader.class);
+        engine = (iEngine) CS.CS_QUERY_REGISTRY(objreg, iEngine.class);
+    }
+};
+
+class MovingObject
+{
+    private iMeshWrapper sprite;
+
+    public MovingObject(iSector room, csVector3 pos)
+    {
+    	GlobRefs r = GlobRefs.Get();
+	iTextureManager txtmgr = r.g3d.GetTextureManager();
+	iTextureWrapper txt = r.loader.LoadTexture("spark",
+		"/lib/std/spark.png", CS.CS_TEXTURE_3D, txtmgr, true, true);
+        iMeshFactoryWrapper imeshfact = r.loader.LoadMeshObjectFactory(
+		"/lib/std/sprite1");
+        sprite = r.engine.CreateMeshWrapper(imeshfact,
+		"MySprite", room, pos);
+        sprite.GetMovable().UpdateMove();
+	sprite.SetZBufMode(CS.CS_ZBUF_USE);
+	sprite.SetRenderPriority(r.engine.GetObjectRenderPriority());
+    }
+
+    public iMovable GetMovable()
+    {
+        return sprite.GetMovable();
+    }
+};
+
 class EventHandler extends csJEventHandler
 {
     protected iGraphics3D myG3D;
@@ -29,10 +84,10 @@ class EventHandler extends csJEventHandler
 
     public EventHandler (csView v)
     {
-        iObjectRegistry object_reg = getTheObjectRegistry();
-        myG3D = (iGraphics3D) CS_QUERY_REGISTRY(object_reg, iGraphics3D.class);
-	vc = (iVirtualClock) CS_QUERY_REGISTRY(object_reg, iVirtualClock.class);
-        kbd = (iKeyboardDriver) CS_QUERY_REGISTRY(object_reg, iKeyboardDriver.class);
+    	GlobRefs r = GlobRefs.Get();
+        myG3D = r.g3d;
+	vc = r.vc;
+        kbd = r.kbd;
         view = v;
     }
 
@@ -54,6 +109,14 @@ class EventHandler extends csJEventHandler
             view.GetCamera().Move(CS.CS_VEC_FORWARD.multiply(4 * speed), true);
         if (kbd.GetKeyState(CSKEY_DOWN))
             view.GetCamera().Move(CS.CS_VEC_BACKWARD.multiply(4 * speed), true);
+
+	// Move our object.
+	iMovable movable = SimpleRoom.moving_object.GetMovable();
+	csVector3 pos = movable.GetTransform().GetOrigin();
+	pos.setY ((float) (1 + (float) (current_time % 5000) / 2000.0));
+	movable.GetTransform().SetOrigin(pos);
+	movable.UpdateMove();
+
         // Tell 3D driver we're going to display 3D things.
         myG3D.BeginDraw(CSDRAW_3DGRAPHICS);
         view.Draw();
@@ -72,16 +135,19 @@ class EventHandler extends csJEventHandler
             (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC))
         {
             // escape key to quit
-            iEventQueue q = (iEventQueue) CS_QUERY_REGISTRY(getTheObjectRegistry(), iEventQueue.class);
+            iEventQueue q = (iEventQueue) CS_QUERY_REGISTRY(
+	    	getTheObjectRegistry(), iEventQueue.class);
             if (q != null)
             {
                 q.GetEventOutlet().Broadcast(cscmdQuit);
                 return true;
             }
         }
-        if (ev.getType() == csevBroadcast && ev.getCommand().getCode() == cscmdProcess)
+        if (ev.getType() == csevBroadcast
+		&& csCommandEventHelper.GetCode(ev) == cscmdProcess)
             SetupFrame();
-        if (ev.getType() == csevBroadcast && ev.getCommand().getCode() == cscmdFinalProcess)
+        if (ev.getType() == csevBroadcast
+		&& csCommandEventHelper.GetCode(ev) == cscmdFinalProcess)
             FinishFrame();
         return true;
     }
@@ -90,6 +156,7 @@ class EventHandler extends csJEventHandler
 class SimpleRoom extends CS
 {
     protected static csView view;
+    public static MovingObject moving_object;
 
     public static void CreateRoom ()
     {
@@ -97,14 +164,17 @@ class SimpleRoom extends CS
         System.out.println("getting engine");
 	iEngine engine = (iEngine) CS_QUERY_REGISTRY(object_reg, iEngine.class);
         System.out.println("getting clock");
-	iVirtualClock vc = (iVirtualClock) CS_QUERY_REGISTRY(object_reg, iVirtualClock.class);
+	iVirtualClock vc = (iVirtualClock) CS_QUERY_REGISTRY(
+		object_reg, iVirtualClock.class);
         System.out.println("getting loader");
 	iLoader loader = (iLoader) CS_QUERY_REGISTRY(object_reg, iLoader.class);
         System.out.println("getting keyboard driver");
-        iKeyboardDriver kbd = (iKeyboardDriver) CS_QUERY_REGISTRY(object_reg, iKeyboardDriver.class);
+        iKeyboardDriver kbd = (iKeyboardDriver) CS_QUERY_REGISTRY(
+		object_reg, iKeyboardDriver.class);
         System.out.println("getting texture");
 	String matname = "mystone";
-	loader.LoadTexture(matname, "/lib/stdtex/bricks.jpg", CS_TEXTURE_3D, null, false, true);
+	loader.LoadTexture(matname, "/lib/stdtex/bricks.jpg",
+		CS_TEXTURE_3D, null, false, true);
         engine.SetLightingCacheMode(0);
         engine.CreateSector("room");
         System.out.println("getting room sectors");
@@ -112,7 +182,8 @@ class SimpleRoom extends CS
         System.out.println("getting walls mesh");
 	iMeshWrapper walls = engine.CreateSectorWallsMesh(room, "walls");
         System.out.println("getting thingstate");
-	iThingState thingstate = (iThingState) SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState.class);
+	iThingState thingstate = (iThingState) SCF_QUERY_INTERFACE(
+		walls.GetMeshObject(), iThingState.class);
         System.out.println("getting naterial");
 	iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
 	
@@ -126,18 +197,26 @@ class SimpleRoom extends CS
 	fact.SetPolygonTextureMapping(CS_POLYRANGE_LAST, 3);
 	fact.SetPolygonMaterial(CS_POLYRANGE_LAST, material);
 
-        iLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f, new csColor(1, 0, 0),
+        iLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f,
+		new csColor(1, 0, 0),
 		CS_LIGHT_DYNAMICTYPE_STATIC);
         room.GetLights().Add(light);
 
         engine.Prepare(null);
 
-        iGraphics3D myG3D = (iGraphics3D) CS_QUERY_REGISTRY(getTheObjectRegistry(), iGraphics3D.class);
+        iGraphics3D myG3D = (iGraphics3D) CS_QUERY_REGISTRY(
+		getTheObjectRegistry(), iGraphics3D.class);
         view = new csView(engine, myG3D);
         view.GetCamera().SetSector(room);
         view.GetCamera().GetTransform().SetOrigin(new csVector3(0, 2, 0));
         iGraphics2D g2d = myG3D.GetDriver2D();
         view.SetRectangle(2, 2, g2d.GetWidth() - 4, g2d.GetHeight() - 4);
+    }
+
+    public static void CreateObjects()
+    {
+        moving_object = new MovingObject(view.GetCamera().GetSector(),
+		new csVector3(1,2,3));
     }
 
     public static void main (String args[])
@@ -159,7 +238,7 @@ class SimpleRoom extends CS
 		plugins.addElement(new csPluginRequest(
                   "crystalspace.graphics3d.opengl", "iGraphics3D"));
 		plugins.addElement(new csPluginRequest(
-                  "crystalspace.graphic.image.io.multiplex", "iImageIO"));
+                  "crystalspace.graphic.image.io.multiplexer", "iImageIO"));
 		plugins.addElement(new csPluginRequest(
                   "crystalspace.font.server.default", "iFontServer"));
 		plugins.addElement(new csPluginRequest(
@@ -178,9 +257,13 @@ class SimpleRoom extends CS
 	    int mask = (CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast);
 	    CreateRoom();
 
+	    System.out.println("Creating the objects...");
+	    CreateObjects();
+
 	    System.out.println("Setting up event handlers...");
 	    EventHandler eventHandler = new EventHandler(view);
-	    result = csInitializer._SetupEventHandler(object_reg, eventHandler, mask);
+	    result = csInitializer._SetupEventHandler(object_reg,
+	    	eventHandler, mask);
 	    System.out.println("Event handler added");
 
 	    System.out.println("Starting the main runloop...");
@@ -189,6 +272,7 @@ class SimpleRoom extends CS
 	catch(Exception e)
 	{
 	    System.out.println("Errr something went wrong. We caught an exception: " + e);
+	    e.printStackTrace();
 	}
     }
 };
