@@ -9,6 +9,8 @@ chronological order.
 16-Jun-2005
 	- Jorrit fixed SimpleRoom.java so that it works again. Also
 	  added a bit more code to demonstrate how to move objects.
+	- Eric Sunshine fixed bug in csApplicationFramework where `restartFlag'
+	  instance variable was not being initialized.
 15-Jun-2005
 	- res changed the SV context precedence slightly so that user-defined
 	  mesh shader vars override SVs provided by the mesh plugin. 

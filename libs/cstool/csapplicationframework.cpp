@@ -32,7 +32,7 @@ const char* csApplicationFramework::m_FoundationStringName =
   "crystalspace.libcsappframe";
 
 
-csApplicationFramework::csApplicationFramework ()
+csApplicationFramework::csApplicationFramework () : restartFlag(false)
 {
   // It is a fatal error to have more than one csApplicationFramework
   // derived class in an application.
