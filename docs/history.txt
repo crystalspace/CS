@@ -23,6 +23,11 @@ chronological order.
 	- Jorrit implemented local dynamic ambient in sprcal3d.
 	- Jorrit implemented local dynamic ambient in bruteblock.
 	- Jorrit fixed a note with iEngine->CreateTexture().
+	- res removed the CS_FX_ALPHA check hack(s) from csfxscr.cpp since
+	  they aren't needed any more.
+	- res fixed the CS_FX_ALPHA support in the GL renderer for the fact
+	  that the "alpha" option actually contains transparency information
+	  (as opposed to the usual meaning of 'alpha' as opacity).
 16-Jun-2005
 	- Jorrit fixed SimpleRoom.java so that it works again. Also
 	  added a bit more code to demonstrate how to move objects.

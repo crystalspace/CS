@@ -120,16 +120,7 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   mesh.texcoords = texels;
   mesh.colors = colors;
   mesh.texture = 0;
-  // @@@ Bit of a hack
-  if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-  {
-    fa = float (mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-    mesh.mixmode = CS_FX_COPY;
-    mesh.alphaType.autoAlphaMode = false;
-    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
-  }
-  else
-    mesh.mixmode = mixmode;
+  mesh.mixmode = mixmode;
 
   verts[0].Set (sx, sy, 0.0f);
   texels[0].Set (0.0f, 1.0f);
@@ -172,22 +163,12 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   mesh.texcoords = texels;
   mesh.colors = colors;
   mesh.texture = tex;
-  // @@@ Bit of a hack
-  if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+  if(fa < 1.0f)
   {
-    fa = float (mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-    mesh.mixmode = CS_FX_COPY;
     mesh.alphaType.autoAlphaMode = false;
     mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
   }
-  else if(fa < 1.0f)
-  {
-    mesh.mixmode = mixmode;
-    mesh.alphaType.autoAlphaMode = false;
-    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
-  }
-  else
-    mesh.mixmode = mixmode;
+  mesh.mixmode = mixmode;
 
   verts[0].Set (x, y, 0);
   texels[0].Set (0.0f, 0.0f);

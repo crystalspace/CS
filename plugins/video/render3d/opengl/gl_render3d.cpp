@@ -1575,7 +1575,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   glMultMatrixf (matrix);
 
   if ((needColorFixup = ((modes.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)))
-    alphaScale = (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+    alphaScale = 1.0f - (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
   ApplyBufferChanges();
 
   iRenderBuffer* iIndexbuf = (modes.buffers
@@ -1763,7 +1763,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
     float alpha = 1.0f;
     if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-      alpha = (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+      alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
     glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
       (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
