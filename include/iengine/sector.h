@@ -159,11 +159,20 @@ struct iSector : public iBase
   /// Version of ShineLights() which only affects one mesh object.
   virtual void ShineLights (iMeshWrapper*) = 0;
 
-  /// Sets dynamic ambient light for all things in the sector
-  virtual void SetDynamicAmbientLight(const csColor& color) = 0;
+  /**
+   * Sets dynamic ambient light this sector. This works in addition
+   * to the dynamic light you can specify for every object.
+   */
+  virtual void SetDynamicAmbientLight (const csColor& color) = 0;
 
   /// Get the last set dynamic ambient light for this sector.
-  virtual csColor GetDynamicAmbientLight() const = 0;
+  virtual csColor GetDynamicAmbientLight () const = 0;
+
+  /**
+   * Get the version number of the dynamic ambient color. This
+   * number is increased whenever dynamic ambient changes.
+   */
+  virtual uint GetDynamicAmbientVersion () const = 0;
 
   /**
    * Calculate the bounding box of all objects in this sector.

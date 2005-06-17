@@ -995,46 +995,6 @@ void csSpriteCal3DMeshObject::SetUserData(void *data)
   calModel.setUserData(data);
 }
 
-void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
-					      iMovable* movable)
-{
-  CalRenderer *pCalRenderer;
-  pCalRenderer = calModel.getRenderer();
-  
-  // begin the rendering loop
-  if(!pCalRenderer->beginRendering())
-  {
-    return;
-  }
-  
-  int meshCount;
-  meshCount = pCalRenderer->getMeshCount();
-  
-  // loop through all meshes of the model
-  int meshId;
-  for(meshId = 0; meshId < meshCount; meshId++)
-  {
-    // get the number of submeshes
-    int submeshCount;
-    submeshCount = pCalRenderer->getSubmeshCount(meshId);
-    
-    // loop through all submeshes of the mesh
-    int submeshId;
-    for(submeshId = 0; submeshId < submeshCount; submeshId++)
-    {
-      // select mesh and submesh for further data access
-      if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
-      {
-        UpdateLightingSubmesh (lights, movable, pCalRenderer,
-            meshId, submeshId);
-      }
-    }
-  }
-  
-  pCalRenderer->endRendering();
-}
-
-
 void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
 	const csArray<iLight*>& lights, 
 	iMovable* movable,
@@ -1047,6 +1007,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
   int i;
 
   // get the transformed normals of the submesh
+  // @@@ BAD BAD!!!
   static float localNormals[60000];
   float *meshNormals;
   if (!have_normals)
@@ -1135,6 +1096,7 @@ void csSpriteCal3DMeshObject::InitSubmeshLighting (int mesh, int submesh,
   {
     ((csSpriteCal3DMeshObjectFactory*)factory)->engine->GetAmbientLight (col);
     //    col += color;  // no inherent color in cal3d sprites
+    col += dynamic_ambient;
     iSector* sect = movable->GetSectors ()->Get (0);
     if (sect)
       col += sect->GetDynamicAmbientLight ();
@@ -1142,48 +1104,10 @@ void csSpriteCal3DMeshObject::InitSubmeshLighting (int mesh, int submesh,
   else
   {
     //    col = color;
+    col = dynamic_ambient;
   }
   for (int i = 0 ; i < vertCount ; i++)
     colors[i] = col;
-}
-
-void csSpriteCal3DMeshObject::UpdateLighting (iMovable* movable, 
-					      CalRenderer *pCalRenderer)
-{
-  if (!lighting_dirty)
-    return;
-  
-  int meshCount;
-  meshCount = pCalRenderer->getMeshCount();
-  
-  if (factory->light_mgr)
-  {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
-      ->GetRelevantLights (logparent, -1, false);
-    
-    // loop through all meshes of the model 
-    int meshId;
-    for(meshId = 0; meshId < meshCount; meshId++)
-    {
-      // get the number of submeshes
-      int submeshCount;
-      submeshCount = pCalRenderer->getSubmeshCount(meshId);
-      
-      // loop through all submeshes of the mesh
-      int submeshId;
-      for(submeshId = 0; submeshId < submeshCount; submeshId++)
-      {
-        // select mesh and submesh for further data access
-        if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
-        {
-            UpdateLightingSubmesh (relevant_lights,
-              movable, pCalRenderer, meshId, submeshId);
-        }
-      }
-    }
-  }
-  
-  lighting_dirty = false;
 }
 
 void csSpriteCal3DMeshObject::SetupObjectSubmesh(int index)

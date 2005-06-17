@@ -90,13 +90,13 @@ bool csPolyTexture::RecalculateDynamicLights (
 	const csVector3& v_world2tex,
 	csPolygon3D* polygon,
 	const csPlane3& polygon_world_plane,
+	const csColor& amb,
 	csLightingScratchBuffer& finalLM)
 {
   if (!lm) return false;
 
   // first combine the static and pseudo-dynamic lights
   csThing* thing = polygon->GetParent ();
-  csColor amb = thing->GetDynamicAmbientLight();
 
   if (!lm->UpdateRealLightMap (amb.red, amb.green, amb.blue,
       thing->GetLightVersion () != light_version, finalLM))

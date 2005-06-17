@@ -147,6 +147,7 @@ private:
    * ambient color.
    */
   csColor dynamic_ambient_color;
+  uint dynamic_ambient_version;
 
   /// Engine handle.
   csEngine* engine;
@@ -546,6 +547,8 @@ public:
       { scfParent->SetDynamicAmbientLight(color); }
     virtual csColor GetDynamicAmbientLight() const
       { return scfParent->dynamic_ambient_color; }
+    virtual uint GetDynamicAmbientVersion() const
+      { return scfParent->dynamic_ambient_version; }
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
     virtual bool HasFog () const

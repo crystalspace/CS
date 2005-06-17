@@ -93,7 +93,8 @@ csCurveTesselated::~csCurveTesselated ()
   delete[] Triangles;
 }
 
-void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
+void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap,
+	const csColor& amb)
 {
   if (!LightMap)
   {
@@ -115,21 +116,21 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
     cx = csQint (ControlPoints[ct.a].x * (lm_width - 1));
     cy = csQint (ControlPoints[ct.a].y * (lm_height - 1));
     lm_idx = cy * lm_width + cx;
-    Colors[ct.a].red = ((float)map[lm_idx].red) / 256.0f;
-    Colors[ct.a].green = ((float)map[lm_idx].green) / 256.0f;
-    Colors[ct.a].blue = ((float)map[lm_idx].blue) / 256.0f;
+    Colors[ct.a].red = ((float)map[lm_idx].red) / 256.0f + amb.red;
+    Colors[ct.a].green = ((float)map[lm_idx].green) / 256.0f + amb.green;
+    Colors[ct.a].blue = ((float)map[lm_idx].blue) / 256.0f + amb.blue;
     cx = csQint (ControlPoints[ct.b].x * (lm_width - 1));
     cy = csQint (ControlPoints[ct.b].y * (lm_height - 1));
     lm_idx = cy * lm_width + cx;
-    Colors[ct.b].red = ((float)map[lm_idx].red) / 256.0f;
-    Colors[ct.b].green = ((float)map[lm_idx].green) / 256.0f;
-    Colors[ct.b].blue = ((float)map[lm_idx].blue) / 256.0f;
+    Colors[ct.b].red = ((float)map[lm_idx].red) / 256.0f + amb.red;
+    Colors[ct.b].green = ((float)map[lm_idx].green) / 256.0f + amb.green;
+    Colors[ct.b].blue = ((float)map[lm_idx].blue) / 256.0f + amb.blue;
     cx = csQint (ControlPoints[ct.c].x * (lm_width - 1));
     cy = csQint (ControlPoints[ct.c].y * (lm_height - 1));
     lm_idx = cy * lm_width + cx;
-    Colors[ct.c].red = ((float)map[lm_idx].red) / 256.0f;
-    Colors[ct.c].green = ((float)map[lm_idx].green) / 256.0f;
-    Colors[ct.c].blue = ((float)map[lm_idx].blue) / 256.0f;
+    Colors[ct.c].red = ((float)map[lm_idx].red) / 256.0f + amb.red;
+    Colors[ct.c].green = ((float)map[lm_idx].green) / 256.0f + amb.green;
+    Colors[ct.c].blue = ((float)map[lm_idx].blue) / 256.0f + amb.blue;
   }
 
   ColorsValid = true;

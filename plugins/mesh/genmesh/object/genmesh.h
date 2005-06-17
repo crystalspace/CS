@@ -138,9 +138,15 @@ private:
   csColor* lit_mesh_colors;
   int num_lit_mesh_colors;	// Should be equal to factory number.
   csColor* static_mesh_colors;
+
   /// Dynamic ambient light assigned to this genmesh.
   csColor dynamic_ambient;
-  uint32 ambient_version;
+  /**
+   * Global sector wide dynamic ambient version. Unrelated to dynamic_ambient 
+   * above!
+   */
+  uint32 dynamic_ambient_version;
+
   csHash<csShadowArray*, csPtrKey<iLight> > pseudoDynInfo;
 
   // If we are using the iLightingInfo lighting system then this
@@ -261,7 +267,6 @@ public:
   {
     dynamic_ambient = color;
     lighting_dirty = true;
-    ambient_version++;
   }
 
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,

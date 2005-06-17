@@ -1599,7 +1599,8 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   wor_verts = 0;
 
-  dynamic_ambient.Set (0,0,0);
+  dynamic_ambient.Set (0, 0, 0);
+  dynamic_ambient_version = 0;
   light_version = 1;
 
   mixmode = CS_FX_COPY;
@@ -2506,6 +2507,7 @@ void csThing::PrepareForUse ()
   PreparePolygonBuffer ();
   PrepareLMs ();
 
+  WorUpdate ();
   UpdateDirtyLMs ();
 
   bool meshesCreated;
@@ -2702,9 +2704,21 @@ void csThing::ClearLMs ()
 
 void csThing::UpdateDirtyLMs ()
 {
+  csColor amb = dynamic_ambient;
+  if (cached_movable)
+  {
+    // First check if dynamic ambient has changed.
+    iSector* s = cached_movable->GetSectors ()->Get (0);
+    amb += s->GetDynamicAmbientLight ();
+    if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
+    {
+      dynamic_ambient_version = s->GetDynamicAmbientVersion ();
+      MarkLightmapsDirty ();
+    }
+  }
+
   if (!IsLmDirty()) return;
 
-  WorUpdate ();
   bool ident;
   csReversibleTransform o2c;
   if (!cached_movable || cached_movable->IsFullTransformIdentity ())
@@ -2749,7 +2763,7 @@ void csThing::UpdateDirtyLMs ()
 		poly.GetPolyIdx ());
 	csLightingScratchBuffer& scratch = static_data->thing_type->lightingScratch;
         if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, &poly,
-		world_plane, scratch))
+		world_plane, amb, scratch))
         {
 	  litPolys[i]->lightmaps[j]->SetData (
 	    /*lmi->GetLightMap ()->GetMapData ()*/scratch.GetArray ());

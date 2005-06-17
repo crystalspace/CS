@@ -214,6 +214,8 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   current_visnr = 1;
   cosinus_factor = -1;
 
+  dynamic_ambient_version = 0;
+
   csRef<iStringSet> strings;
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
     "crystalspace.shared.stringset", iStringSet);
@@ -874,6 +876,15 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     listCreated, currentFrame);
   meshes.SetLength (GetCurveCount(), 0);
 
+  csColor ambient = dynamic_ambient;
+  iSector* s = movable->GetSectors ()->Get (0);
+  ambient += s->GetDynamicAmbientLight ();
+  bool update_ambient = false;
+  if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
+  {
+    update_ambient = true;
+    dynamic_ambient_version = s->GetDynamicAmbientVersion ();
+  }
   csCurve *c;
   for (i = 0; i < GetCurveCount (); i++)
   {
@@ -908,14 +919,13 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 
     // If the lightmap was updated or the new tesselation doesn't yet
     // have a valid colors table we need to update colors here.
-    if (updated_lm || !tess->AreColorsValid ())
-      tess->UpdateColors (c->LightMap);
+    if (update_ambient || updated_lm || !tess->AreColorsValid ())
+      tess->UpdateColors (c->LightMap, ambient);
 
     c->GetMaterial ()->Visit ();
 
     bool gouraud = !!c->LightMap;
     rm->mixmode = CS_FX_COPY | (gouraud ? 0 : CS_FX_FLAT);
-
     
     csRenderBufferHolder* holder = rm->buffers;
     /* @@@ TODO: use an SV accessor for geometry delivery */

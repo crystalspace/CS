@@ -734,8 +734,6 @@ private:
     iMovable* movable);
   void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable*, 
     CalRenderer*, int mesh, int submesh, float* have_normals=0);
-  void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
-  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
 public:
   float updateanim_sqdistance1;

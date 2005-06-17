@@ -304,8 +304,14 @@ private:
   /// Last movable number that was used for the bounding box in world space.
   long wor_bbox_movablenr;
 
-  /// Dynamic ambient light assigned to this thing.
+  /// Local dynamic ambient light assigned to this thing.
   csColor dynamic_ambient;
+  /**
+   * Global sector wide dynamic ambient version. Unrelated to dynamic_ambient 
+   * above!
+   */
+  uint dynamic_ambient_version;
+
   /**
    * Version number for dynamic/pseudo-dynamic light changes
    * and also for ambient.
@@ -586,14 +592,13 @@ public:
   /// Sets dynamic ambient light for this thing
   void SetDynamicAmbientLight(const csColor& color)
   {
-      dynamic_ambient = color;
-      light_version++;
-      MarkLightmapsDirty ();
+    dynamic_ambient = color;
+    MarkLightmapsDirty ();
   }
   /// Gets dynamic ambient light for this thing
   const csColor& GetDynamicAmbientLight()
   {
-      return dynamic_ambient;
+    return dynamic_ambient;
   }
 
   /// Get light version.

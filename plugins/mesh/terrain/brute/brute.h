@@ -328,11 +328,18 @@ private:
   uint colorVersion;
   uint last_colorVersion;
   csColor dynamic_ambient;
+
+  /**
+   * Global sector wide dynamic ambient version. Unrelated to dynamic_ambient 
+   * above!
+   */
+  uint dynamic_ambient_version;
+
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
   csSet<csPtrKey<iLight> > affecting_lights;
   csHash<csShadowArray*, csPtrKey<iLight> > pseudoDynInfo;
-  void UpdateColors ();
+  void UpdateColors (iMovable* movable);
   //=============
 
 public:

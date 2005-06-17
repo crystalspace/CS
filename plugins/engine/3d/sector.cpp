@@ -122,7 +122,8 @@ csSector::csSector (csEngine *engine) : csObject()
   csSector::engine = engine;
   fog.enabled = false;
   draw_busy = 0;
-  dynamic_ambient_color.Set(0,0,0);
+  dynamic_ambient_color.Set (0,0,0);
+  dynamic_ambient_version = (uint)~0;
   meshes.SetSector (this);
   //portal_containers.SetSector (this);
   lights.SetSector (this);
@@ -873,15 +874,8 @@ void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
 
 void csSector::SetDynamicAmbientLight (const csColor& color)
 {
-  iMeshList* ml = GetMeshes ();
   dynamic_ambient_color = color;
-  for (int i = 0 ; i < ml->GetCount () ; i++)
-  {
-    iMeshWrapper* mesh = ml->Get (i);
-    iLightingInfo* li = mesh->GetLightingInfo ();
-    if (li)
-      li->SetDynamicAmbientLight (color);
-  }
+  dynamic_ambient_version++;
 }
 
 void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const

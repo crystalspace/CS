@@ -149,7 +149,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   shadow_caps = false;
 
   dynamic_ambient.Set (0,0,0);
-  ambient_version = 0;
+  dynamic_ambient_version = 0;
 
   anim_ctrl_verts = false;
   anim_ctrl_texels = false;
@@ -902,6 +902,13 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
 
   if (do_manual_colors) return;
 
+  iSector* sect = movable->GetSectors ()->Get (0);
+  if (dynamic_ambient_version != sect->GetDynamicAmbientVersion ())
+  {
+    dynamic_ambient_version = sect->GetDynamicAmbientVersion ();
+    lighting_dirty = true;
+  }
+
   if (!lighting_dirty) return;
   lighting_dirty = false;
 
@@ -913,15 +920,11 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     memcpy (colors, static_mesh_colors,
       num_lit_mesh_colors * sizeof (csColor));
 
-    iSector* sect = movable->GetSectors ()->Get (0);
-    if (sect)
-    {
-      csColor col;
-      col = sect->GetDynamicAmbientLight ();
-      if (col.red > EPSILON || col.green > EPSILON || col.blue > EPSILON)
-        for (i = 0 ; i < factory->GetVertexCount () ; i++)
-	  colors[i] += col;
-    }
+    csColor col (dynamic_ambient);
+    if (sect) col += sect->GetDynamicAmbientLight ();
+    if (col.red > EPSILON || col.green > EPSILON || col.blue > EPSILON)
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+	colors[i] += col;
   }
   else
   {
@@ -931,7 +934,6 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     {
       factory->engine->GetAmbientLight (col);
       col += base_color;
-      iSector* sect = movable->GetSectors ()->Get (0);
       if (sect)
 	col += sect->GetDynamicAmbientLight ();
     }
@@ -939,6 +941,7 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     {
       col = base_color;
     }
+    col += dynamic_ambient;
     for (i = 0 ; i < factory->GetVertexCount () ; i++)
       colors[i] = col;
   }
@@ -999,6 +1002,7 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   {
     col = base_color;
   }
+  col += dynamic_ambient;
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i] = col;
 

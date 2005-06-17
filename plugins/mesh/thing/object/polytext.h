@@ -373,6 +373,7 @@ public:
 	const csVector3& v_world2tex,
 	csPolygon3D* polygon,
 	const csPlane3& polygon_world_plane,
+	const csColor& dynambient,
 	csLightingScratchBuffer& finalLM);
 
   /// Query the size of one light cell

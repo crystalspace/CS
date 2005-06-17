@@ -99,7 +99,7 @@ public:
    * a lightmap. This should be called whenever the lightmap
    * changes and the curve needs to be rendered.
    */
-  void UpdateColors (csCurveLightMap* lightmap);
+  void UpdateColors (csCurveLightMap* lightmap, const csColor& dynambient);
 };
 
 /**

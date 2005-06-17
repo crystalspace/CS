@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jun-2005
+	- Jorrit seperated per-sector dynamic ambient from per-object
+	  dynamic ambient. Previously if you called
+	  sector->SetDynamicAmbientLight() then it would loop over all
+	  mesh objects and call SetDynamicAmbientLight() on each mesh object.
+	  This is not efficient. Instead the mesh object itself goes to look
+	  at the current ambient level of the sector and keeps a counter
+	  to check if the ambient level changed. In addition the
+	  SetDynamicAmbientLight() in mesh object is reused for mesh object
+	  local dynamic ambient that is added to the sector dynamic ambient.
+	- Jorrit fixed the bezier curve so that it honors dynamic ambient.
+	- Jorrit fixed genmesh so that it honors dynamic ambient.
+	- Jorrit cleaned up two big unused UpdateLighting() routines in
+	  sprcal3d.
+	- Jorrit implemented local dynamic ambient in sprcal3d.
+	- Jorrit implemented local dynamic ambient in bruteblock.
 16-Jun-2005
 	- Jorrit fixed SimpleRoom.java so that it works again. Also
 	  added a bit more code to demonstrate how to move objects.
