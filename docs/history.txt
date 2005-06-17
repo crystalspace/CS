@@ -22,6 +22,7 @@ chronological order.
 	  sprcal3d.
 	- Jorrit implemented local dynamic ambient in sprcal3d.
 	- Jorrit implemented local dynamic ambient in bruteblock.
+	- Jorrit fixed a note with iEngine->CreateTexture().
 16-Jun-2005
 	- Jorrit fixed SimpleRoom.java so that it works again. Also
 	  added a bit more code to demonstrate how to move objects.

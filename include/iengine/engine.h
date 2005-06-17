@@ -342,9 +342,9 @@ struct iEngine : public iBase
    * <li>CS_TEXTURE_DITHER texture will be dithered before use
    * <li>CS_TEXTURE_NOMIPMAPS texture will not be mipmapped before use
    * </ul>
-   * \note You will need to call iTextureWrapper::Register() and 
-   * iTextureWrapper::GetTextureHandler()->Prepare() on you new texture
-   * if you load the texture after iEngine::Prepare() has been called.
+   * \note You will need to call iTextureWrapper::Register()
+   * on you new texture if you load the texture after iEngine::Prepare()
+   * has been called.
    */
   virtual iTextureWrapper* CreateTexture (const char *name,
   	const char *fileName, csColor *transp, int flags) = 0;
@@ -357,7 +357,7 @@ struct iEngine : public iBase
    * \param transp pixels in the image with this key color will be considered
    * transparent instead of being drawn
    * \param flags see CreateTexture()
-   * \see CreateTexture() note about registering/preparing textures.
+   * \see CreateTexture() note about registering textures.
    */
   virtual iTextureWrapper* CreateBlackTexture (const char *name,
 	int w, int h, csColor *transp, int flags) = 0;
