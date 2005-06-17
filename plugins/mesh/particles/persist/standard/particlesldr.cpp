@@ -38,41 +38,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-enum
-{
-  XMLTOKEN_FACTORY = 1,
-  XMLTOKEN_MATERIAL,
-  XMLTOKEN_COLOR,
-  XMLTOKEN_EMITTER,
-  XMLTOKEN_INNER_RADIUS,
-  XMLTOKEN_OUTER_RADIUS,
-  XMLTOKEN_SIZE,
-  XMLTOKEN_TIME,
-  XMLTOKEN_FORCE,
-  XMLTOKEN_AMOUNT,
-  XMLTOKEN_RANGE,
-  XMLTOKEN_FALLOFF,
-  XMLTOKEN_DIRECTION,
-  XMLTOKEN_CONE_RADIUS,
-  XMLTOKEN_CONE_FALLOFF,
-  XMLTOKEN_DIFFUSION,
-  XMLTOKEN_GRAVITY,
-  XMLTOKEN_TIME_TO_LIVE,
-  XMLTOKEN_TIME_VARIATION,
-  XMLTOKEN_INITIAL_PARTICLES,
-  XMLTOKEN_PARTICLES_PER_SECOND,
-  XMLTOKEN_COLOR_METHOD,
-  XMLTOKEN_GRADIENT,
-  XMLTOKEN_RADIUS,
-  XMLTOKEN_DAMPENER,
-  XMLTOKEN_MASS,
-  XMLTOKEN_MASSVARIATION,
-  XMLTOKEN_AUTOSTART,
-  XMLTOKEN_TRANSFORM_MODE,
-  XMLTOKEN_BASE_HEAT,
-  XMLTOKEN_PHYSICS_PLUGIN
-};
-
 SCF_IMPLEMENT_IBASE (csParticlesFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -88,6 +53,8 @@ csParticlesFactoryLoader::csParticlesFactoryLoader (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+
+  InitTokenTable (xmltokens);
 }
 
 csParticlesFactoryLoader::~csParticlesFactoryLoader ()
@@ -100,36 +67,6 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("emitter", XMLTOKEN_EMITTER);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("innerradius", XMLTOKEN_INNER_RADIUS);
-  xmltokens.Register ("outerradius", XMLTOKEN_OUTER_RADIUS);
-  xmltokens.Register ("size", XMLTOKEN_SIZE);
-  xmltokens.Register ("time", XMLTOKEN_TIME);
-  xmltokens.Register ("force", XMLTOKEN_FORCE);
-  xmltokens.Register ("amount", XMLTOKEN_AMOUNT);
-  xmltokens.Register ("range", XMLTOKEN_RANGE);
-  xmltokens.Register ("falloff", XMLTOKEN_FALLOFF);
-  xmltokens.Register ("direction", XMLTOKEN_DIRECTION);
-  xmltokens.Register ("coneradius", XMLTOKEN_CONE_RADIUS);
-  xmltokens.Register ("conefalloff", XMLTOKEN_CONE_FALLOFF);
-  xmltokens.Register ("diffusion", XMLTOKEN_DIFFUSION);
-  xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
-  xmltokens.Register ("ttl", XMLTOKEN_TIME_TO_LIVE);
-  xmltokens.Register ("timevariation", XMLTOKEN_TIME_VARIATION);
-  xmltokens.Register ("initial", XMLTOKEN_INITIAL_PARTICLES);
-  xmltokens.Register ("pps", XMLTOKEN_PARTICLES_PER_SECOND);
-  xmltokens.Register ("colormethod", XMLTOKEN_COLOR_METHOD);
-  xmltokens.Register ("gradient", XMLTOKEN_GRADIENT);
-  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
-  xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
-  xmltokens.Register ("mass", XMLTOKEN_MASS);
-  xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
-  xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
-  xmltokens.Register ("transformmode", XMLTOKEN_TRANSFORM_MODE);
-  xmltokens.Register ("temp", XMLTOKEN_BASE_HEAT);
-  xmltokens.Register ("physicsplugin", XMLTOKEN_PHYSICS_PLUGIN);
   return true;
 }
 
@@ -207,16 +144,16 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         state->SetGravity (gravity);
         break;
       }
-      case XMLTOKEN_TIME_TO_LIVE:
+      case XMLTOKEN_TTL:
         state->SetTimeToLive (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_TIME_VARIATION:
+      case XMLTOKEN_TIMEVARIATION:
         state->SetTimeVariation (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_INITIAL_PARTICLES:
+      case XMLTOKEN_INITIAL:
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
         break;
-      case XMLTOKEN_PARTICLES_PER_SECOND:
+      case XMLTOKEN_PPS:
         state->SetParticlesPerSecond (child->GetContentsValueAsInt ());
         break;
       case XMLTOKEN_RADIUS:
@@ -240,7 +177,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         }
         break;
       }
-      case XMLTOKEN_TRANSFORM_MODE:
+      case XMLTOKEN_TRANSFORMMODE:
       {
         const char *mode = child->GetContentsValue ();
         if(!strcmp(mode, "no")) state->SetTransformMode (false);
@@ -252,13 +189,13 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         }
         break;
       }
-      case XMLTOKEN_PHYSICS_PLUGIN:
+      case XMLTOKEN_PHYSICSPLUGIN:
         state->SetPhysicsPlugin (child->GetContentsValue ());
         break;
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_COLOR_METHOD:
+      case XMLTOKEN_COLORMETHOD:
       {
         const char *str = child->GetAttributeValue ("type");
         if (!str)
@@ -295,6 +232,12 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         }
         break;
       }
+      case XMLTOKEN_MIXMODE:
+	{
+	  uint mixmode;
+	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
+	  state->SetMixMode (mixmode);
+	}
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
@@ -325,10 +268,10 @@ bool csParticlesFactoryLoader::ParseEmitter (iDocumentNode *node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_OUTER_RADIUS:
+      case XMLTOKEN_OUTERRADIUS:
         x_size = child->GetContentsValueAsFloat ();
         break;
-      case XMLTOKEN_INNER_RADIUS:
+      case XMLTOKEN_INNERRADIUS:
         y_size = child->GetContentsValueAsFloat ();
         break;
       case XMLTOKEN_SIZE:
@@ -430,10 +373,10 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
         synldr->ParseVector (child, direction);
         direction.Normalize ();
         break;
-      case XMLTOKEN_CONE_RADIUS:
+      case XMLTOKEN_CONERADIUS:
         radius = child->GetContentsValueAsFloat ();
         break;
-      case XMLTOKEN_CONE_FALLOFF:
+      case XMLTOKEN_CONEFALLOFF:
       {
         const char *str = child->GetContentsValue ();
         if (!str)
@@ -604,7 +547,7 @@ bool csParticlesFactoryLoader::ParseColorHeat (iDocumentNode *node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_BASE_HEAT:
+      case XMLTOKEN_TEMP:
       {
         float base_heat = child->GetContentsValueAsFloat ();
         state->SetHeatColorMethod ((int)base_heat);
@@ -941,6 +884,8 @@ csParticlesObjectLoader::csParticlesObjectLoader (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+
+  InitTokenTable (xmltokens);
 }
 
 csParticlesObjectLoader::~csParticlesObjectLoader ()
@@ -953,34 +898,6 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
-  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("emitter", XMLTOKEN_EMITTER);
-  xmltokens.Register ("innerradius", XMLTOKEN_INNER_RADIUS);
-  xmltokens.Register ("outerradius", XMLTOKEN_OUTER_RADIUS);
-  xmltokens.Register ("size", XMLTOKEN_SIZE);
-  xmltokens.Register ("time", XMLTOKEN_TIME);
-  xmltokens.Register ("force", XMLTOKEN_FORCE);
-  xmltokens.Register ("amount", XMLTOKEN_AMOUNT);
-  xmltokens.Register ("range", XMLTOKEN_RANGE);
-  xmltokens.Register ("falloff", XMLTOKEN_FALLOFF);
-  xmltokens.Register ("direction", XMLTOKEN_DIRECTION);
-  xmltokens.Register ("coneradius", XMLTOKEN_CONE_RADIUS);
-  xmltokens.Register ("conefalloff", XMLTOKEN_CONE_FALLOFF);
-  xmltokens.Register ("diffusion", XMLTOKEN_DIFFUSION);
-  xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
-  xmltokens.Register ("ttl", XMLTOKEN_TIME_TO_LIVE);
-  xmltokens.Register ("timevariation", XMLTOKEN_TIME_VARIATION);
-  xmltokens.Register ("colormethod", XMLTOKEN_COLOR_METHOD);
-  xmltokens.Register ("gradient", XMLTOKEN_GRADIENT);
-  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
-  xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
-  xmltokens.Register ("mass", XMLTOKEN_MASS);
-  xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
-  xmltokens.Register ("transformmode", XMLTOKEN_TRANSFORM_MODE);
-  xmltokens.Register ("temp", XMLTOKEN_BASE_HEAT);
-  xmltokens.Register ("physicsplugin", XMLTOKEN_PHYSICS_PLUGIN);
   return true;
 }
 
@@ -1054,16 +971,16 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         state->SetGravity (gravity);
         break;
       }
-      case XMLTOKEN_TIME_TO_LIVE:
+      case XMLTOKEN_TTL:
         state->SetTimeToLive (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_TIME_VARIATION:
+      case XMLTOKEN_TIMEVARIATION:
         state->SetTimeVariation (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_INITIAL_PARTICLES:
+      case XMLTOKEN_INITIAL:
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
         break;
-      case XMLTOKEN_PARTICLES_PER_SECOND:
+      case XMLTOKEN_PPS:
         state->SetParticlesPerSecond (child->GetContentsValueAsInt ());
         break;
       case XMLTOKEN_RADIUS:
@@ -1075,7 +992,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MASSVARIATION:
         state->SetMassVariation (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_TRANSFORM_MODE:
+      case XMLTOKEN_TRANSFORMMODE:
       {
         const char *mode = child->GetContentsValue ();
         if(!strcmp(mode, "no")) state->SetTransformMode (false);
@@ -1087,13 +1004,13 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         }
         break;
       }
-      case XMLTOKEN_PHYSICS_PLUGIN:
+      case XMLTOKEN_PHYSICSPLUGIN:
         state->ChangePhysicsPlugin (child->GetContentsValue ());
         break;
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_COLOR_METHOD:
+      case XMLTOKEN_COLORMETHOD:
       {
         const char *str = child->GetAttributeValue ("type");
         if (!str)
@@ -1130,6 +1047,12 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         }
         break;
       }
+      case XMLTOKEN_MIXMODE:
+	{
+	  uint mixmode;
+	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
+	  state->SetMixMode (mixmode);
+	}
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
@@ -1161,10 +1084,10 @@ bool csParticlesObjectLoader::ParseEmitter (iDocumentNode *node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_OUTER_RADIUS:
+      case XMLTOKEN_OUTERRADIUS:
         x_size = child->GetContentsValueAsFloat ();
         break;
-      case XMLTOKEN_INNER_RADIUS:
+      case XMLTOKEN_INNERRADIUS:
         y_size = child->GetContentsValueAsFloat ();
         break;
       case XMLTOKEN_SIZE:
@@ -1267,10 +1190,10 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
         synldr->ParseVector (child, direction);
         direction.Normalize ();
         break;
-      case XMLTOKEN_CONE_RADIUS:
+      case XMLTOKEN_CONERADIUS:
         radius = child->GetContentsValueAsFloat ();
         break;
-      case XMLTOKEN_CONE_FALLOFF:
+      case XMLTOKEN_CONEFALLOFF:
       {
         const char *str = child->GetContentsValue ();
         if (!str)
@@ -1442,7 +1365,7 @@ bool csParticlesObjectLoader::ParseColorHeat (iDocumentNode *node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_BASE_HEAT:
+      case XMLTOKEN_TEMP:
       {
         float base_heat = child->GetContentsValueAsFloat ();
         state->SetHeatColorMethod ((int)base_heat);

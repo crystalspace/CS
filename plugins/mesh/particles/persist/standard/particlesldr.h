@@ -38,7 +38,10 @@ private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/particles/persist/standard/particlesldr.tok"
+#include "cstool/tokenlist.h"
 
 public:
   SCF_DECLARE_IBASE;
@@ -131,7 +134,10 @@ private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/particles/persist/standard/particlesldr.tok"
+#include "cstool/tokenlist.h"
 
 public:
   SCF_DECLARE_IBASE;

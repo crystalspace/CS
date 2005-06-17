@@ -130,6 +130,8 @@ private:
   csRef<iParticlesColorCallback> color_callback;
   csFlags flags;
 
+  uint mixmode;
+
 public:
   CS_LEAKGUARD_DECLARE (csParticlesFactory);
 
@@ -328,6 +330,10 @@ public:
   { return transform_mode; }
   void SetPhysicsPlugin (const char *plugin)
   { physics_plugin = plugin; }
+  void SetMixMode (uint mode)
+  { mixmode = mode; }
+  uint GetMixMode () const
+  { return mixmode; }
 
   struct eiParticlesFactoryState : public iParticlesFactoryState
   {
@@ -459,6 +465,10 @@ public:
     { return scfParent->GetMassVariation (); }
     virtual void SetPhysicsPlugin (const char *plugin)
     { scfParent->SetPhysicsPlugin (plugin); }
+    virtual void SetMixMode (uint mode)
+    { scfParent->SetMixMode (mode); }
+    virtual uint GetMixMode () const
+    { return scfParent->GetMixMode(); }
   } scfiParticlesFactoryState;
   friend struct eiParticlesFactoryState;
 };
@@ -567,6 +577,8 @@ private:
   float radius;
 
   csFlags flags;
+
+  uint mixmode;
 
 public:
   CS_LEAKGUARD_DECLARE (csParticlesObject);
@@ -823,6 +835,10 @@ public:
   void Stop ();
   bool IsRunning ()
   { return running; }
+  void SetMixMode (uint mode)
+  { mixmode = mode; }
+  uint GetMixMode () const
+  { return mixmode; }
 
   virtual void PositionChild (iMeshObject* child,csTicks current_time) {}
 
@@ -964,7 +980,10 @@ public:
     { scfParent->Stop (); }
     virtual bool IsRunning ()
     { return scfParent->IsRunning (); }
-   
+    virtual void SetMixMode (uint mode)
+    { scfParent->SetMixMode (mode); }
+    virtual uint GetMixMode () const
+    { return scfParent->GetMixMode(); }
   } scfiParticlesObjectState;
   friend struct eiParticlesObjectState;
 

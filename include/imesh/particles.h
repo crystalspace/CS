@@ -300,7 +300,7 @@ struct iParticlesStateBase : public iBase
 };
 
 
-SCF_VERSION (iParticlesObjectState, 1, 0, 0);
+SCF_VERSION (iParticlesObjectState, 1, 0, 1);
 
 /**
  * Particles state object.
@@ -334,9 +334,14 @@ struct iParticlesObjectState : public iParticlesStateBase
 
   /// Returns true if this particle simulation is running
   virtual bool IsRunning () = 0;
+
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
 };
 
-SCF_VERSION (iParticlesFactoryState, 1, 0, 0);
+SCF_VERSION (iParticlesFactoryState, 1, 0, 1);
 
 /**
  * Particles factory state.
@@ -354,6 +359,11 @@ struct iParticlesFactoryState : public iParticlesStateBase
    * (Defaults to 'crystalspace.particles.physics.simple')
    */
   virtual void SetPhysicsPlugin (const char *plugin) = 0;
+
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
 };
 
 

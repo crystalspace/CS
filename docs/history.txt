@@ -28,6 +28,7 @@ chronological order.
 	- res fixed the CS_FX_ALPHA support in the GL renderer for the fact
 	  that the "alpha" option actually contains transparency information
 	  (as opposed to the usual meaning of 'alpha' as opacity).
+	- res added support for user-defined mixmodes to the particles plugin.
 16-Jun-2005
 	- Jorrit fixed SimpleRoom.java so that it works again. Also
 	  added a bit more code to demonstrate how to move objects.

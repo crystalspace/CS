@@ -138,6 +138,8 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   color_method = CS_PART_COLOR_CONSTANT;
   constant_color = csColor4 (1.0f, 1.0f, 1.0f, 1.0f);
+
+  mixmode = CS_FX_COPY;
 }
 
 csParticlesFactory::~csParticlesFactory ()
@@ -258,6 +260,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   LoadPhysicsPlugin (p->physics_plugin);
 
+  mixmode = p->mixmode;
+
   if(autostart) Start();
 }
 
@@ -355,6 +359,7 @@ csPtr<iMeshObject> csParticlesObject::Clone ()
   new_obj->radius = radius;
 
   new_obj->flags = flags;
+  new_obj->mixmode = mixmode;
   
   return csPtr<iMeshObject> (new_obj);
 }
@@ -610,8 +615,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   if (!mesh)
     mesh = new csRenderMesh;
 
-  mesh->z_buf_mode = CS_ZBUF_USE;
-  mesh->mixmode = CS_FX_ALPHA;
+  mesh->mixmode = mixmode;
   mesh->clip_plane = clip_plane;
   mesh->clip_portal = clip_portal;
   mesh->clip_z_plane = clip_z_plane;
