@@ -190,6 +190,17 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="disableNPOTS">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_texture_rectangle>no</GL_ARB_texture_rectangle>
+	    <GL_EXT_texture_rectangle>no</GL_EXT_texture_rectangle>
+	    <GL_NV_texture_rectangle>no</GL_NV_texture_rectangle>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -309,6 +320,14 @@
       </conditions>
       <applicable>
 	<usecfg>noCompressionForRECTTextures</usecfg>
+      </applicable>
+    </rule>
+    <rule description="ATI: NPOTS support apparently sucks">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>disableNPOTS</usecfg>
       </applicable>
     </rule>
     <!--

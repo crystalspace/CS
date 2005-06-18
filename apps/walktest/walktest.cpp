@@ -920,7 +920,6 @@ void WalkTest::Inititalize2DTextures ()
 
 void WalkTest::Create2DSprites ()
 {
-  int w, h;
   iTextureWrapper *texh;
   iTextureHandle* phTex;
 
@@ -931,8 +930,7 @@ void WalkTest::Create2DSprites ()
     phTex = texh->GetTextureHandle();
     if (phTex)
     {
-      phTex->GetRendererDimensions (w, h);
-      cslogo = new csSimplePixmap (phTex, 0, 0, w, h);
+      cslogo = new csSimplePixmap (phTex);
     }
   }
 }

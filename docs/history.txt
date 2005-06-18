@@ -10,6 +10,14 @@ chronological order.
 	- Jorrit added csColor4 support to genmesh (pretty much untested).
 	  That means that mixmode alpha should now work again and it should
 	  now also be possible to set alpha per vertex.
+	- res disabled NPOTS textures for ATI hardware, as, at the moment,
+	  support for it seems to be suboptimal there. (Actually, we should 
+	  collect some information on how well NPOTS textures work on various 
+	  ATI hardware versions... based off the little information I got it
+	  seems that NPOTS isn't that great on any ATI.)
+	- res fixed the walktest logo pixmap creation to not set the renderer
+	  dimensions (as really the original dimensions are wanted for 
+	  coordinate computations etc.)
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called
