@@ -4636,6 +4636,7 @@ package cspace::iSector;
 *ShineLights = *cspacec::iSector_ShineLights;
 *SetDynamicAmbientLight = *cspacec::iSector_SetDynamicAmbientLight;
 *GetDynamicAmbientLight = *cspacec::iSector_GetDynamicAmbientLight;
+*GetDynamicAmbientVersion = *cspacec::iSector_GetDynamicAmbientVersion;
 *CalculateSectorBBox = *cspacec::iSector_CalculateSectorBBox;
 *SetVisibilityCullerPlugin = *cspacec::iSector_SetVisibilityCullerPlugin;
 *GetVisibilityCuller = *cspacec::iSector_GetVisibilityCuller;
