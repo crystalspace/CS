@@ -370,14 +370,14 @@ private:
 	int num_animated_verts;
 	csVector3* animated_verts;
 	csVector3* transformed_verts;
-	csColor* animated_colors;
+	csColor4* animated_colors;
 
 	csTicks last_update_time;
 	uint32 last_version_id;
 
 	// Work tables.
 	static csArray<csReversibleTransform> bone_transforms;
-	static csArray<csColor> bone_colors;
+	static csArray<csColor4> bone_colors;
 	csRefArray<csSkelBone> bones;
 	csArray<size_t> parent_bones;
 
@@ -430,8 +430,8 @@ public:
 		const csVector2* texels, int num_texels, uint32 version_id);
 	virtual const csVector3* UpdateNormals (csTicks current,
 		const csVector3* normals, int num_normals, uint32 version_id);
-	virtual const csColor* UpdateColors (csTicks current,
-		const csColor* colors, int num_colors, uint32 version_id);
+	virtual const csColor4* UpdateColors (csTicks current,
+		const csColor4* colors, int num_colors, uint32 version_id);
 
 	// --- For iGenMeshSkeletonControlState
 	virtual int GetBonesCount () { return (int)bones.Length (); }

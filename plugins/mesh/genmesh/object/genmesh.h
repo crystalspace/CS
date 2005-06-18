@@ -49,6 +49,7 @@
 
 class csBSPTree;
 class csColor;
+class csColor4;
 class csGenmeshMeshObject;
 class csGenmeshMeshObjectFactory;
 class csGenmeshMeshObjectType;
@@ -127,7 +128,7 @@ private:
   iMeshObjectDrawCallback* vis_cb;
   bool do_lighting;
   bool do_manual_colors;
-  csColor base_color;
+  csColor4 base_color;
   float current_lod;
   uint32 current_features;
   csFlags flags;
@@ -135,9 +136,9 @@ private:
   bool do_shadows;
   bool do_shadow_rec;
 
-  csColor* lit_mesh_colors;
+  csColor4* lit_mesh_colors;
   int num_lit_mesh_colors;	// Should be equal to factory number.
-  csColor* static_mesh_colors;
+  csColor4* static_mesh_colors;
 
   /// Dynamic ambient light assigned to this genmesh.
   csColor dynamic_ambient;
@@ -221,7 +222,14 @@ public:
   void AddSubMesh (unsigned int *triangles,
     int tricount, iMaterialWrapper *material);
 
-  void SetMixMode (uint mode) { MixMode = mode; }
+  void SetMixMode (uint mode)
+  {
+    MixMode = mode;
+    if (MixMode & CS_FX_ALPHA)
+      base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
+    else
+      base_color.alpha = 1.0;
+  }
   uint GetMixMode () const { return MixMode; }
   void SetLighting (bool l) { do_lighting = l; }
   bool IsLighting () const { return do_lighting; }
@@ -241,7 +249,7 @@ public:
   const csVector3* AnimControlGetVertices ();
   const csVector2* AnimControlGetTexels ();
   const csVector3* AnimControlGetNormals ();
-  const csColor* AnimControlGetColors (csColor* source);
+  const csColor4* AnimControlGetColors (csColor4* source);
   bool anim_ctrl_verts;
   bool anim_ctrl_texels;
   bool anim_ctrl_normals;
@@ -317,7 +325,9 @@ public:
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col)
   {
-    base_color = col;
+    base_color.Set (col);
+    if (MixMode & CS_FX_ALPHA)
+      base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
     initialized = false;
     return true;
   }
@@ -544,7 +554,7 @@ private:
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csVector3* mesh_normals;
-  csColor* mesh_colors;
+  csColor4* mesh_colors;
   int num_mesh_vertices;
   csVector3* mesh_tri_normals;
 
@@ -662,7 +672,7 @@ public:
     SetupFactory ();
     return mesh_normals;
   }
-  csColor* GetColors ()
+  csColor4* GetColors ()
   {
     SetupFactory ();
     return mesh_colors;
@@ -864,7 +874,7 @@ public:
     {
       return scfParent->GetTriangles ();
     }
-    virtual csColor* GetColors ()
+    virtual csColor4* GetColors ()
     {
       return scfParent->GetColors ();
     }

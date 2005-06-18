@@ -283,14 +283,14 @@ private:
 
   int num_animated_verts;
   csVector3* animated_verts;
-  csColor* animated_colors;
+  csColor4* animated_colors;
 
   csTicks last_update_time;
   uint32 last_version_id;
 
   // Work tables.
   static csArray<csReversibleTransform> group_transforms;
-  static csArray<csColor> group_colors;
+  static csArray<csColor4> group_colors;
 
   // Copied from the factory.
   bool animates_vertices;
@@ -331,8 +331,8 @@ public:
   	const csVector2* texels, int num_texels, uint32 version_id);
   virtual const csVector3* UpdateNormals (csTicks current,
   	const csVector3* normals, int num_normals, uint32 version_id);
-  virtual const csColor* UpdateColors (csTicks current,
-  	const csColor* colors, int num_colors, uint32 version_id);
+  virtual const csColor4* UpdateColors (csTicks current,
+  	const csColor4* colors, int num_colors, uint32 version_id);
 
   // --- For iGenMeshAnimationControlState ---------------------------
   virtual bool Execute (const char* scriptname);

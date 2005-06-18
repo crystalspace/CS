@@ -299,7 +299,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	  ac_color_execution m;
 	  m.final = current + inst.color.duration;
 	  m.group = groups[inst.color.group_id];
-	  csColor current_col = m.group->GetColor ();
+	  csColor4 current_col = m.group->GetColor ();
 	  m.final_color.Set (inst.color.red, inst.color.green,
 	  	inst.color.blue);
 	  if (inst.color.duration == 0)
@@ -424,13 +424,13 @@ void csGenmeshAnimationControl::UpdateArrays (int num_verts)
     delete[] animated_verts;
     animated_verts = new csVector3[num_verts];
     delete[] animated_colors;
-    animated_colors = new csColor[num_verts];
+    animated_colors = new csColor4[num_verts];
     last_version_id = (uint32)~0;
   }
 }
 
 csArray<csReversibleTransform> csGenmeshAnimationControl::group_transforms;
-csArray<csColor> csGenmeshAnimationControl::group_colors;
+csArray<csColor4> csGenmeshAnimationControl::group_colors;
 
 const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
 	const csVector3* verts, int num_verts, uint32 version_id)
@@ -511,8 +511,8 @@ const csVector3* csGenmeshAnimationControl::UpdateNormals (csTicks current,
   return normals;
 }
 
-const csColor* csGenmeshAnimationControl::UpdateColors (csTicks current,
-	const csColor* colors, int num_colors, uint32 version_id)
+const csColor4* csGenmeshAnimationControl::UpdateColors (csTicks current,
+	const csColor4* colors, int num_colors, uint32 version_id)
 {
   if (!animates_colors) return colors;
 
@@ -550,18 +550,18 @@ const csColor* csGenmeshAnimationControl::UpdateColors (csTicks current,
 	}
         else if (vtgr.Length () == 1)
 	{
-	  csColor& color = group_colors[vtgr[0].idx];
+	  csColor4& color = group_colors[vtgr[0].idx];
 	  animated_colors[i] = color * colors[i];
 	}
 	else
 	{
-	  csColor& color = group_colors[vtgr[0].idx];
+	  csColor4& color = group_colors[vtgr[0].idx];
 	  float total_weight = vtgr[0].weight;
-	  csColor orig = vtgr[0].weight * color * colors[i];
+	  csColor4 orig = vtgr[0].weight * color * colors[i];
 	  size_t j;
 	  for (j = 1 ; j < vtgr.Length () ; j++)
 	  {
-	    csColor& color2 = group_colors[vtgr[j].idx];
+	    csColor4& color2 = group_colors[vtgr[j].idx];
 	    total_weight += vtgr[j].weight;
 	    orig += vtgr[j].weight * color2 * colors[i];
 	  }

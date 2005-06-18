@@ -246,7 +246,7 @@ const csVector3* csGenmeshMeshObject::AnimControlGetNormals ()
 	factory->scfiObjectModel.GetShapeNumber ());
 }
 
-const csColor* csGenmeshMeshObject::AnimControlGetColors (csColor* source)
+const csColor4* csGenmeshMeshObject::AnimControlGetColors (csColor4* source)
 {
   return anim_ctrl->UpdateColors (vc->GetCurrentTicks (),
   	source,
@@ -300,9 +300,9 @@ void csGenmeshMeshObject::CheckLitColors ()
 
     num_lit_mesh_colors = factory->GetVertexCount ();
     delete[] lit_mesh_colors;
-    lit_mesh_colors = new csColor [num_lit_mesh_colors];
+    lit_mesh_colors = new csColor4 [num_lit_mesh_colors];
     delete[] static_mesh_colors;
-    static_mesh_colors = new csColor [num_lit_mesh_colors];
+    static_mesh_colors = new csColor4 [num_lit_mesh_colors];
   }
 }
 
@@ -323,7 +323,7 @@ void csGenmeshMeshObject::InitializeDefault (bool clear)
     for (i = 0 ; i < num_lit_mesh_colors ; i++)
     {
       lit_mesh_colors[i].Set (0, 0, 0);
-      static_mesh_colors[i] = amb;
+      static_mesh_colors[i].Set (amb);
     }
   }
   lighting_dirty = true;
@@ -427,7 +427,7 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
       int v;
       for (v = 0; v < num_lit_mesh_colors; v++)
       {
-	csColor& c = static_mesh_colors[v];
+	csColor4& c = static_mesh_colors[v];
 	uint8 b;
 	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
 	c.red = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
@@ -485,7 +485,7 @@ bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
   mf.Write (CachedLightingMagic, CachedLightingMagicSize - 1);
   for (int v = 0; v < num_lit_mesh_colors; v++)
   {
-    const csColor& c = static_mesh_colors[v];
+    const csColor4& c = static_mesh_colors[v];
     int i; uint8 b;
 
     i = csQint (c.red * (float)CS_NORMAL_LIGHT_LEVEL);
@@ -688,11 +688,11 @@ void csGenmeshMeshObject::SetupObject ()
     if (!do_manual_colors)
     {
       num_lit_mesh_colors = factory->GetVertexCount ();
-      lit_mesh_colors = new csColor [num_lit_mesh_colors];
+      lit_mesh_colors = new csColor4 [num_lit_mesh_colors];
       int i;
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
         lit_mesh_colors[i].Set (0.2f, 0.2f, 0.2f);  // @@@ ???
-      static_mesh_colors = new csColor [num_lit_mesh_colors];
+      static_mesh_colors = new csColor4 [num_lit_mesh_colors];
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
         static_mesh_colors[i] = base_color;	// Initialize to base color.
     }
@@ -763,7 +763,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
 
   csVector3* normals = factory->GetNormals ();
   csVector3* vertices = factory->GetVertices ();
-  csColor* colors = static_mesh_colors;
+  csColor4* colors = static_mesh_colors;
   // Compute light position in object coordinates
   csVector3 wor_light_pos = li->GetCenter ();
   csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
@@ -859,7 +859,7 @@ void csGenmeshMeshObject::UpdateLightingOne (
   const csReversibleTransform& trans, iLight* li)
 {
   csVector3* normals = factory->GetNormals ();
-  csColor* colors = lit_mesh_colors;
+  csColor4* colors = lit_mesh_colors;
   // Compute light position in object coordinates
   csVector3 wor_light_pos = li->GetCenter ();
   csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
@@ -913,12 +913,12 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
   lighting_dirty = false;
 
   int i;
-  csColor* colors = lit_mesh_colors;
+  csColor4* colors = lit_mesh_colors;
 
   if (do_shadow_rec)
   {
     memcpy (colors, static_mesh_colors,
-      num_lit_mesh_colors * sizeof (csColor));
+      num_lit_mesh_colors * sizeof (csColor4));
 
     csColor col (dynamic_ambient);
     if (sect) col += sect->GetDynamicAmbientLight ();
@@ -943,7 +943,7 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     }
     col += dynamic_ambient;
     for (i = 0 ; i < factory->GetVertexCount () ; i++)
-      colors[i] = col;
+      colors[i].Set (col);
   }
 
   csReversibleTransform trans = movable->GetFullTransform ();
@@ -986,7 +986,7 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   if (do_shadow_rec) return;
 
   int i, l;
-  csColor* colors = lit_mesh_colors;
+  csColor4* colors = lit_mesh_colors;
 
   // Set all colors to ambient light.
   csColor col;
@@ -1370,7 +1370,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!do_manual_colors)
       {
         if (!color_buffer ||
-          (color_buffer->GetSize() != (sizeof (csColor) * 
+          (color_buffer->GetSize() != (sizeof (csColor4) * 
           num_lit_mesh_colors)))
         {
           // Recreate the render buffer only if the new data cannot fit inside
@@ -1378,10 +1378,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
           color_buffer = csRenderBuffer::CreateRenderBuffer (
             num_lit_mesh_colors, 
             do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 3, false);
+            CS_BUFCOMP_FLOAT, 4, false);
         }
         mesh_colors_dirty_flag = false;
-        const csColor* mesh_colors = 0;
+        const csColor4* mesh_colors = 0;
         if (anim_ctrl_colors)
           mesh_colors = AnimControlGetColors (
           do_lighting ? lit_mesh_colors : static_mesh_colors);
@@ -1392,17 +1392,17 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       else
       {
         if (!color_buffer || 
-          (color_buffer->GetSize() != (sizeof (csColor) * 
+          (color_buffer->GetSize() != (sizeof (csColor4) * 
           factory->GetVertexCount())))
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
           color_buffer = csRenderBuffer::CreateRenderBuffer (
             factory->GetVertexCount(), CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 3, false);
+            CS_BUFCOMP_FLOAT, 4, false);
         }
         mesh_colors_dirty_flag = false;
-        const csColor* mesh_colors = 0;
+        const csColor4* mesh_colors = 0;
         if (anim_ctrl_colors)
           mesh_colors = AnimControlGetColors (factory->GetColors ());
         else
@@ -1760,7 +1760,7 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   mesh_normals = new csVector3 [num_mesh_vertices];
   memset (mesh_normals, 0, sizeof (csVector3)*num_mesh_vertices);
   mesh_vertices = new csVector3 [num_mesh_vertices];
-  mesh_colors = new csColor [num_mesh_vertices];
+  mesh_colors = new csColor4 [num_mesh_vertices];
   mesh_texels = new csVector2 [num_mesh_vertices];
 
   vertex_buffer = 0;

@@ -359,7 +359,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_COLOR:
         {
-	  csColor* co = state->GetColors ();
+	  csColor4* co = state->GetColors ();
 	  if (num_col >= state->GetVertexCount ())
 	  {
 	    synldr->ReportError (
@@ -367,11 +367,16 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 		    child, "Too many colors for a general mesh factory!");
 	    return 0;
 	  }
-	  float r, g, b;
+	  float r, g, b, alpha;
 	  r = child->GetAttributeValueAsFloat ("red");
 	  g = child->GetAttributeValueAsFloat ("green");
 	  b = child->GetAttributeValueAsFloat ("blue");
-	  co[num_col].Set (r, g, b);
+	  csRef<iDocumentAttribute> attr_alpha = child->GetAttribute ("alpha");
+	  if (attr_alpha)
+	    alpha = child->GetAttributeValueAsFloat ("alpha");
+	  else
+	    alpha = 1.0f;
+	  co[num_col].Set (r, g, b, alpha);
 	  num_col++;
 	}
 	break;
@@ -523,7 +528,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
         csRef<iDocumentNode> colorNode = 
           paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         colorNode->SetValue("color");
-        csColor color = gfact->GetColors()[i];
+        csColor4 color = gfact->GetColors()[i];
         synldr->WriteColor(colorNode, &color);
       }
     }

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jun-2005
+	- Jorrit added csColor4 support to genmesh (pretty much untested).
+	  That means that mixmode alpha should now work again and it should
+	  now also be possible to set alpha per vertex.
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called

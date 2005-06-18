@@ -25,6 +25,7 @@
 class csVector3;
 class csVector2;
 class csColor;
+class csColor4;
 class csBox3;
 struct csTriangle;
 
@@ -217,7 +218,7 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
    * number of vertices set. Note that modifying the colors will not do
    * a lot if manual colors is not enabled (SetManualColors).
    */
-  virtual csColor* GetColors () = 0;
+  virtual csColor4* GetColors () = 0;
 
   /**
    * After making a significant change to the vertices or triangles you
@@ -349,8 +350,8 @@ struct iGenMeshAnimationControl : public iBase
    * calculation by caching the animated version of the array and returning
    * that one.
    */
-  virtual const csColor* UpdateColors (csTicks current,
-  	const csColor* colors, int num_colors, uint32 version_id) = 0;
+  virtual const csColor4* UpdateColors (csTicks current,
+  	const csColor4* colors, int num_colors, uint32 version_id) = 0;
 };
 
 SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
