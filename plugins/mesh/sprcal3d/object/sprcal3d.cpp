@@ -804,6 +804,8 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   default_idle_anim = -1;
   last_locked_anim = -1;
 
+  dynamic_ambient.Set (0, 0, 0);
+
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
   updateanim_skip1 = 5;		// Skip every 5 frames.

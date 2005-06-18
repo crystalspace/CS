@@ -24,6 +24,7 @@ chronological order.
 	- res removed the CS_FX_ALPHA hacks from genmesh and spr3d since they
 	  aren't needed any more.
 	- res added csVector4::Description().
+	- Jorrit fixed an initialization bug in sprcal3d with dynamic_ambient.
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called
