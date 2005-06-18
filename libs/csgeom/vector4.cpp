@@ -25,6 +25,14 @@
 #include "csgeom/vector4.h"
 
 //---------------------------------------------------------------------------
+
+csString csVector4::Description() const
+{
+  csString s;
+  s.Format("%g,%g,%g,%g", x, y, z, w);
+  return s;
+}
+
 float csVector4::Norm () const
 {
   return csQsqrt (x * x + y * y + z * z + w * w);

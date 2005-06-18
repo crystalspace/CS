@@ -21,6 +21,9 @@ chronological order.
 	- res added support for a "hidden" feature on ATI drivers were NPOTS
 	  2D textures can be used (which is also a bit better than RECT on ATI
 	  hardware). Still disabled though.
+	- res removed the CS_FX_ALPHA hacks from genmesh and spr3d since they
+	  aren't needed any more.
+	- res added csVector4::Description().
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called

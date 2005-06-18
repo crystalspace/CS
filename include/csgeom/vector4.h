@@ -261,6 +261,9 @@ public:
   /// Convert from a three-component vector. w is set to 1.
   csVector4 (const csVector3 &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
 
+  /// Return a textual representation of the vector in the form "x,y,z,w".
+  csString Description() const;
+    
   /// Add two vectors.
   inline friend csVector4 operator+ (const csVector4& v1, const csVector4& v2)
   { return csVector4(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z, v1.w+v2.w); }

@@ -1376,10 +1376,6 @@ public:
   void SetMixMode (uint mode)
   {
     MixMode = mode;
-    if (MixMode & CS_FX_ALPHA)
-      base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
-    else
-      base_color.alpha = 1.0;
   }
 
 
@@ -1409,8 +1405,6 @@ public:
   void SetBaseColor (const csColor& col)
   {
     base_color.Set (col);
-    if (MixMode & CS_FX_ALPHA)
-      base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
     ResetVertexColors ();
   }
 
