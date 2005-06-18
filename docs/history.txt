@@ -18,6 +18,9 @@ chronological order.
 	- res fixed the walktest logo pixmap creation to not set the renderer
 	  dimensions (as really the original dimensions are wanted for 
 	  coordinate computations etc.)
+	- res added support for a "hidden" feature on ATI drivers were NPOTS
+	  2D textures can be used (which is also a bit better than RECT on ATI
+	  hardware). Still disabled though.
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called

@@ -438,6 +438,13 @@ public:
    * format (causes crashes on some drivers).
    */
   bool disableRECTTextureCompression;
+  /**
+   * Whether to enable uploading of NPOTS textures as 2D textures.
+   * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
+   * specify NPOTS textures as 2D textures. (Normally they would have to be 
+   * POTS.) 
+   */
+  bool enableNonPowerOfTwo2DTextures;
 
   csStringID nameDiffuseTexture;
 

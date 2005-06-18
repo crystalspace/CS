@@ -190,7 +190,7 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="disableNPOTS">
+    <config name="disableRECTTextures">
       <Video>
 	<OpenGL>
 	  <UseExtension>
@@ -198,6 +198,13 @@
 	    <GL_EXT_texture_rectangle>no</GL_EXT_texture_rectangle>
 	    <GL_NV_texture_rectangle>no</GL_NV_texture_rectangle>
 	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="hiddenNPOTS">
+      <Video>
+	<OpenGL>
+	  <EnableNonPowerOfTwo2DTextures>yes</EnableNonPowerOfTwo2DTextures>
 	</OpenGL>
       </Video>
     </config>
@@ -213,6 +220,7 @@
       <notapplicable>
       </notapplicable>
     </rule -->
+    
     <rule description="Broken stencil support">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
@@ -223,6 +231,7 @@
 	<usecfg>brokenstencil</usecfg>
       </applicable>
     </rule>
+    
     <rule description="Disable VBO for Linux ATI drivers 3.2.8">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
@@ -233,6 +242,7 @@
 	<usecfg>novbo</usecfg>
       </applicable>
     </rule>
+    
     <rule description="Work around broken ATI point sprites">
       <conditions>
 	<!-- Point sprite activation messes up all other geometry -->
@@ -242,6 +252,7 @@
 	<usecfg>noaps</usecfg>
       </applicable>
     </rule>
+    
     <rule description="Work around 3dfx Voodoo shortcomings">
       <conditions>
 	<regexp string="vendor" pattern="^3dfx" />
@@ -250,6 +261,7 @@
 	<usecfg>3dfxhacks</usecfg>
       </applicable>
     </rule>
+    
     <rule description="GeForce FX 5xxx: Slow VBO">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5..." />
@@ -259,6 +271,7 @@
 	<usecfg>novbo</usecfg>
       </applicable>
     </rule>
+    
     <rule description="GeForce FX 5xxx: Broken 'Inverted fog'">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5..." />
@@ -268,6 +281,7 @@
 	<usecfg>noinvertedfog</usecfg>
       </applicable>
     </rule>
+    
     <rule description="NVidia: borked WGL_ARB_pixel_format" phase="preinit">
       <!-- 
         'phase="preinit"' means this rule is only considered during 
@@ -282,6 +296,7 @@
 	<usecfg>pixelformatbroken</usecfg>
       </applicable>
     </rule>
+    
     <rule description="Intel: Extreme Buggy Graphics">
       <conditions>
 	<regexp string="vendor" pattern="^Intel" />
@@ -295,6 +310,7 @@
 	<usecfg>disableMipmapGeneration</usecfg>
       </applicable>
     </rule>
+    
     <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
@@ -306,6 +322,7 @@
 	     setting it's made here, too -->
       </applicable>
     </rule>
+    
     <rule description="Mesa DRI Radeon: No proper texture compression support">
       <conditions>
 	<regexp string="renderer" pattern="^Mesa DRI Radeon 2002" />
@@ -314,6 +331,7 @@
 	<usecfg>disableTC</usecfg>
       </applicable>
     </rule>
+    
     <rule description="ATI: Can't handle compressed formats for RECT textures">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
@@ -322,14 +340,31 @@
 	<usecfg>noCompressionForRECTTextures</usecfg>
       </applicable>
     </rule>
-    <rule description="ATI: NPOTS support apparently sucks">
+    
+    <rule description="ATI: RECT texture extension support apparently sucks">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
       </conditions>
       <applicable>
-	<usecfg>disableNPOTS</usecfg>
+	<usecfg>disableRECTTextures</usecfg>
       </applicable>
     </rule>
+    
+    <!--
+    <rule description="ATI: Enable hidden 2D texture NPOTS support">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<match fulfill="one">
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).." />
+	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X..." />
+	</match>
+      </conditions>
+      <applicable>
+	<usecfg>hiddenNPOTS</usecfg>
+      </applicable>
+    </rule>
+    -->
+    
     <!--
     <rule description="Software GL tweaks">
       <conditions fulfill="one">

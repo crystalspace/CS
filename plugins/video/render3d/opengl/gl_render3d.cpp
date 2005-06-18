@@ -863,6 +863,7 @@ bool csGLGraphics3D::Open ()
       "Maximum texture size is %dx%d", mts, mts);
   rendercaps.maxTexHeight = mts;
   rendercaps.maxTexWidth = mts;
+  maxNpotsTexSize = mts;
   if (ext->CS_GL_ARB_texture_rectangle
     || ext->CS_GL_EXT_texture_rectangle
     || ext->CS_GL_NV_texture_rectangle)

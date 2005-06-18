@@ -93,19 +93,17 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
       // The extension
       (G3D->ext->CS_GL_ARB_texture_rectangle
       || G3D->ext->CS_GL_EXT_texture_rectangle
-      || G3D->ext->CS_GL_NV_texture_rectangle)
+      || G3D->ext->CS_GL_NV_texture_rectangle
+      || txtmgr->enableNonPowerOfTwo2DTextures)
       // Certain additional texture flags
       && ((flags & npotsNeededFlags) == npotsNeededFlags))
       // A 2D image
-      && (image->GetImageType() == csimg2D)
-      // And for POTS textures it's just not needed.
-      && (!csIsPowerOf2 (image->GetWidth()) 
-        || !csIsPowerOf2 (image->GetHeight()));
+      && (image->GetImageType() == csimg2D);
     if (!npotsValid)
     {
       flags &= ~CS_TEXTURE_NPOTS;
     }
-    else
+    else if (!txtmgr->enableNonPowerOfTwo2DTextures)
       target = CS_TEX_IMG_RECT;
   }
   texFlags.Set (flagsPublicMask, flags);
@@ -1144,7 +1142,9 @@ void csGLTextureManager::read_config (iConfigFile *config)
   texture_filter_anisotropy = config->GetFloat
     ("Video.OpenGL.TextureFilterAnisotropy", 1.0);
   disableRECTTextureCompression = config->GetBool
-    ("Vide.OpenGL.DisableRECTTextureCompression", false);
+    ("Video.OpenGL.DisableRECTTextureCompression", false);
+  enableNonPowerOfTwo2DTextures = config->GetBool
+    ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
