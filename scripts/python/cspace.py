@@ -4090,6 +4090,7 @@ class iSector(iBase):
     def ShineLights(*args): return _cspace.iSector_ShineLights(*args)
     def SetDynamicAmbientLight(*args): return _cspace.iSector_SetDynamicAmbientLight(*args)
     def GetDynamicAmbientLight(*args): return _cspace.iSector_GetDynamicAmbientLight(*args)
+    def GetDynamicAmbientVersion(*args): return _cspace.iSector_GetDynamicAmbientVersion(*args)
     def CalculateSectorBBox(*args): return _cspace.iSector_CalculateSectorBBox(*args)
     def SetVisibilityCullerPlugin(*args): return _cspace.iSector_SetVisibilityCullerPlugin(*args)
     def GetVisibilityCuller(*args): return _cspace.iSector_GetVisibilityCuller(*args)
