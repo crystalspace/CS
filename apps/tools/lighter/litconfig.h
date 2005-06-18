@@ -28,8 +28,7 @@
 class litConfig
 {
 public:
-  csRef<litObjectSelect> casters_selector;
-  csRef<litObjectSelect> receivers_selector;
+  csRef<litObjectSelect> mesh_selector;
   csRef<litObjectSelect> lights_selector;
   csRef<litObjectSelect> sectors_selector;
   csRef<litObjectSelect> portals_selector;

@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "ivaria/pmeter.h"
 #include "litconfig.h"
+#include "geometryextract.h"
 
 struct iEngine;
 struct iLoader;
@@ -34,6 +35,7 @@ struct iObjectRegistry;
 struct iVirtualClock;
 struct iEvent;
 struct iSector;
+struct csScene;
 
 /**
  * Combined graphical and text progress meter.
@@ -126,6 +128,12 @@ public:
   /// Configuration.
   litConfig litconfig;
 
+  /// The different extractors
+  csRefArray<csGeometryExtractor> geometryExtractors;
+
+  /// The main scene pointer
+  csScene *scene;
+
   /**
    * Set the current VFS dir to the given map_dir.
    * This routine tries to be smart about mounting the dir.
@@ -141,7 +149,7 @@ public:
   /**
    * Scan this mesh.
    */
-  bool ScanMesh (iMeshWrapper* mesh);
+  bool ScanMesh (iMeshWrapper* mesh, iSector* sector);
 
   /**
    * Scan this sector for objects, lights, portals, ...

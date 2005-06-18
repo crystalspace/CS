@@ -22,8 +22,10 @@
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 #include "iengine/engine.h"
+#include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "iengine/light.h"
+#include "imesh/genmesh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/natwin.h"
@@ -45,6 +47,10 @@
 #include "lighter.h"
 #include "litparsecfg.h"
 #include "litobjsel.h"
+
+#include "lightmesh.h"
+#include "geometryextract.h"
+#include "scene.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -258,22 +264,48 @@ bool Lighter::LoadMaps ()
   return true;
 }
 
-bool Lighter::ScanMesh (iMeshWrapper* mesh)
+bool Lighter::ScanMesh (iMeshWrapper* mesh, iSector *sector)
 {
-  if (litconfig.receivers_selector->SelectObject (mesh->QueryObject ()))
-  {
-    csPrintf ("  Shadow receiver '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
-  }
-  if (litconfig.casters_selector->SelectObject (mesh->QueryObject ()))
-  {
-    csPrintf ("  Shadow caster '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
-  }
+  bool include = litconfig.mesh_selector->SelectObject (mesh->QueryObject ());
+  iMeshObject *obj = mesh->GetMeshObject ();
+
   int i;
+
+  if ( obj && include)
+  {
+    csRef<csLightingMesh> lightmesh;
+    lightmesh.AttachNew (new csLightingMesh);
+    
+    bool extracted = false;
+    // Try the different extractors until one works
+    for (i = 0; i < (int)geometryExtractors.Length (); i++)
+    {
+      if (geometryExtractors[i]->ExtractGeometry (mesh, lightmesh))
+      {
+        extracted = true;
+        break;
+      }
+    }
+    if (extracted)
+    {
+      //@@ Maybe some checking?
+      lightmesh->sectorName = sector->QueryObject ()->GetName ();
+      lightmesh->meshName = mesh->QueryObject ()->GetName ();
+      scene->AddObject (lightmesh, sector);
+    }
+    else
+    {
+//      Report ("Couldn't extract mesh '%s'!", mesh->QueryObject ()->GetName ());
+//      return false;
+    }
+  }
+
+  
   iMeshList* ml = mesh->GetChildren ();
   for (i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* m = ml->Get (i);
-    if (!ScanMesh (m))
+    if (!ScanMesh (m, sector))
       return false;
   }
   return true;
@@ -283,11 +315,12 @@ bool Lighter::ScanSector (iSector* sector)
 {
   csPrintf ("Processing sector '%s'\n", sector->QueryObject ()->GetName ()); fflush (stdout);
   int i;
+
   iMeshList* ml = sector->GetMeshes ();
   for (i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* m = ml->Get (i);
-    if (!ScanMesh (m))
+    if (!ScanMesh (m, sector))
       return false;
   }
   iLightList* ll = sector->GetLights ();
@@ -305,6 +338,8 @@ bool Lighter::ScanSector (iSector* sector)
 
 bool Lighter::ScanWorld ()
 {
+  scene = new csScene;
+
   int i;
   iSectorList* sl = engine->GetSectors ();
   for (i = 0 ; i < sl->GetCount () ; i++)
@@ -420,10 +455,12 @@ bool Lighter::Initialize ()
     litconfig.sectors_selector.AttachNew (new litObjectSelectAll ());
   if (litconfig.lights_selector == 0)
     litconfig.lights_selector.AttachNew (new litObjectSelectAll ());
-  if (litconfig.casters_selector == 0)
-    litconfig.casters_selector.AttachNew (new litObjectSelectAll ());
-  if (litconfig.receivers_selector == 0)
-    litconfig.receivers_selector.AttachNew (new litObjectSelectAll ());
+  if (litconfig.mesh_selector == 0)
+    litconfig.mesh_selector.AttachNew (new litObjectSelectAll ());
+
+  // Setup the geometry extractors
+  geometryExtractors.Push (new csGenmeshGeometryExtractor);
+  geometryExtractors.Push (new csThingGeometryExtractor);
 
   if (!LoadMaps ())
     return false;

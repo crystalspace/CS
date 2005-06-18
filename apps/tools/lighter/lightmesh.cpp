@@ -255,14 +255,14 @@ void csMeshPatch::ConstructAccelerationStruct ()
   {
     accStruct = new csMeshPatchAccStruct[2]; 
     csSetupAccStruct (accStruct[0], 
-      parentFace->vertexList[vertexIndex[0]],
-      parentFace->vertexList[vertexIndex[1]],
-      parentFace->vertexList[vertexIndex[2]],
+      parentFace->mesh->vertexList[vertexIndex[0]],
+      parentFace->mesh->vertexList[vertexIndex[1]],
+      parentFace->mesh->vertexList[vertexIndex[2]],
       parentFace->geoNormal);
     csSetupAccStruct (accStruct[1], 
-      parentFace->vertexList[vertexIndex[0]],
-      parentFace->vertexList[vertexIndex[2]],
-      parentFace->vertexList[vertexIndex[3]],
+      parentFace->mesh->vertexList[vertexIndex[0]],
+      parentFace->mesh->vertexList[vertexIndex[2]],
+      parentFace->mesh->vertexList[vertexIndex[3]],
       parentFace->geoNormal);
   }
   else
@@ -270,9 +270,9 @@ void csMeshPatch::ConstructAccelerationStruct ()
     //IsTriangle()
     accStruct = new csMeshPatchAccStruct[1];
     csSetupAccStruct (accStruct[0], 
-      parentFace->vertexList[vertexIndex[0]],
-      parentFace->vertexList[vertexIndex[1]],
-      parentFace->vertexList[vertexIndex[2]],
+      parentFace->mesh->vertexList[vertexIndex[0]],
+      parentFace->mesh->vertexList[vertexIndex[1]],
+      parentFace->mesh->vertexList[vertexIndex[2]],
       parentFace->geoNormal);
   }
 }

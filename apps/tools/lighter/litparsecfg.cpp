@@ -179,14 +179,9 @@ bool litConfigParser::ParseLighter (iDocumentNode* lighter_node,
 		litconfig.lights_selector))
 	  return false;
         break;
-      case XMLTOKEN_SELECT_CASTERS:
+      case XMLTOKEN_SELECT_MESHES:
         if (!ParseObjectSelect (FindChildNode (child),
-		litconfig.casters_selector))
-	  return false;
-        break;
-      case XMLTOKEN_SELECT_RECEIVERS:
-        if (!ParseObjectSelect (FindChildNode (child),
-		litconfig.receivers_selector))
+		litconfig.mesh_selector))
 	  return false;
         break;
       default:

@@ -44,9 +44,9 @@ public:
     csForEach (mesh->faces.GetIterator (), *this); 
   }
 
-  void operator () (csMeshFace **face)
+  void operator () (csMeshFace *face)
   {
-    csForEach ((*face)->patches.GetIterator (), *this); 
+    csForEach (face->patches.GetIterator (), *this); 
   }
 
   void operator () (csMeshPatch *patch)
@@ -80,11 +80,11 @@ struct BBComputer
     csForEach ((mesh->faces).GetIterator (), *this); 
   }
 
-  void operator() (csMeshFace **face)
+  void operator() (csMeshFace *face)
   {
-    csArray<csVector3> &vertexList = (*face)->vertexList;
+    csArray<csVector3> &vertexList = (face)->mesh->vertexList;
   
-    for (uint i = 0; i < (*face)->orignalVertexCount; i++)
+    for (uint i = 0; i < (face)->mesh->orignalVertexCount; i++)
     {
       boundingBox.AddBoundingVertex (vertexList[i]);
     }

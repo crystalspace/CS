@@ -26,26 +26,28 @@
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/parray.h"
+#include "csutil/refcount.h"
 
 class csMeshFace;
+struct iExtractorInformation;
 
-struct csLightingMesh
+struct csLightingMesh : public csRefCount
 {
-public:
+  csLightingMesh ()
+    : extractorInfo (0)
+  {
+  }
   // Identification of the real mesh
   csString sectorName; 
   csString meshName;
   csString meshMD5;
 
   // The faces that makes up the mesh
-  csPDelArray<csMeshFace*> faces;
-};
+  csPDelArray<csMeshFace> faces;
 
-class csMeshPatch;
-class csMeshFace
-{
-public:
-  //Properties
+  /// Extractor/saver specific information
+  iExtractorInformation *extractorInfo;
+
   //Vertex positions
   csArray<csVector3> vertexList;
   //Vertex colors (for shared colors)
@@ -53,7 +55,13 @@ public:
 
   // Initial amount of vertices
   uint orignalVertexCount; 
+};
 
+class csMeshPatch;
+class csMeshFace
+{
+public:
+  //Properties
   //Geometric normal
   csVector3 geoNormal;
 
@@ -63,19 +71,22 @@ public:
   //Toplevel patches for this face
   csArray<csMeshPatch*> patches;
 
+  //Mesh
+  csLightingMesh* mesh;
+
   //Methods
   //Add new vertex, return index to the newly added one
   uint AddVertex (const csVector3 &vertex)
   {
-    vertexList.Push (vertex);
-    return (uint)(vertexList.Length ()-1);
+    mesh->vertexList.Push (vertex);
+    return (uint)(mesh->vertexList.Length ()-1);
   }
 
   //Add new shared color, return index to the newly added one
   uint AddColor (const csColor &color)
   {
-    colorList.Push (color);
-    return (uint)(colorList.Length ()-1);
+    mesh->colorList.Push (color);
+    return (uint)(mesh->colorList.Length ()-1);
   }
 };
 
@@ -218,9 +229,9 @@ public:
   const csVector3& GetGeoNormal () const { return parentFace->geoNormal; }
 
   // Helper to get vertex by index
-  const csVector3& GetVertex (uint i) const { return parentFace->vertexList[vertexIndex[i]];}
+  const csVector3& GetVertex (uint i) const { return parentFace->mesh->vertexList[vertexIndex[i]];}
   // Helper to get color by index
-  const csColor& GetColor (uint i) const { return parentFace->colorList[colorIndex[i]];}
+  const csColor& GetColor (uint i) const { return parentFace->mesh->colorList[colorIndex[i]];}
   
   // Helper to set vertex indices
   void SetVertexIdx (uint i1, uint i2, uint i3, uint i4 = (uint)~0)
