@@ -21,8 +21,10 @@
 #define __CS_PORTALNODE_H__
 
 #include "iutil/objreg.h"
+#include "ivideo/shader/shader.h"
 
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/weakref.h"
 
 #include "rendernode.h"
 
@@ -31,6 +33,8 @@ class csPortalRenderNodeFactory;
 class csPortalRenderNode : public csRenderNode
 {
   friend class csPortalRenderNodeFactory;
+
+  csPortalRenderNodeFactory* factory;
 
   csDirtyAccessArray<csVector3> camera_vertices;
   csPoly2D poly;
@@ -43,10 +47,18 @@ class csPortalRenderNode : public csRenderNode
   bool old_do_near_plane;
   csRef<iClipper2D> old_clipper;
 
+  float oldFogDensity;
+  csVector3 oldFogColor;
+  csVector4 oldFogPlane;
+
+  csShaderVariableContext& shadervars;
+
   csPortalRenderNode (iPortal* portal, iRenderView* rview,
-    const csReversibleTransform& movtrans);
+    const csReversibleTransform& movtrans, csPortalRenderNodeFactory* factory, 
+    csShaderVariableContext& shadervars);
   void PrepareView (iRenderView* rview, iSector* sector);
   void DoWarp (iRenderView* rview);
+  void UnprepareView ();
 public:
   virtual bool Preprocess (iRenderView* rview);
   virtual void Postprocess (iRenderView* rview);
@@ -59,6 +71,10 @@ class csPortalRenderNodeFactory
 {
   friend class csPortalRenderNode;
 
+  csWeakRef<iShaderManager> shaderManager;
+  csWeakRef<iShader> fog_shader;
+  csStringID fogplane_name, fogdensity_name, fogcolor_name;
+
   bool ClipToPlane (iPortal* portal, csPlane3 *portal_plane, 
     const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts,
     const csVector3* camera_vertices);
@@ -69,7 +85,8 @@ public:
   csPortalRenderNodeFactory (iObjectRegistry* object_reg);
 
   csPortalRenderNode* CreatePortalNode (iPortal* portal, iRenderView* rview,
-    const csReversibleTransform& movtrans, bool doClip);
+    const csReversibleTransform& movtrans, bool doClip, 
+    csShaderVariableContext& shadervars);
 };
 
 #endif // __CS_PORTALNODE_H__

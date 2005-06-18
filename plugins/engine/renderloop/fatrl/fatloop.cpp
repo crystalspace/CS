@@ -205,6 +205,12 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   nullShader = shaderManager->GetShader ("*null");
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  fogplane_name = strings->Request ("fogplane");
+  fogdensity_name = strings->Request ("fog density");
+  fogcolor_name = strings->Request ("fog color");
 }
 
 csFatLoopStep::~csFatLoopStep ()
@@ -251,6 +257,17 @@ uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
   return (1 << passes.Length())-1;
 }
 
+void csFatLoopStep::SetupFog (RenderNode* node)
+{
+  csRef<csShaderVariable> sv;
+  sv = shadervars.GetVariableAdd (fogdensity_name);
+  sv->SetValue (node->fog.density);
+  sv = shadervars.GetVariableAdd (fogcolor_name);
+  sv->SetValue (node->fog.color);
+  sv = shadervars.GetVariableAdd (fogplane_name);
+  sv->SetValue (node->fog.plane);
+}
+
 void csFatLoopStep::CleanEmptyMeshNodes (RenderNode* node, 
   const csArray<csMeshRenderNode*>& meshNodes)
 {
@@ -274,7 +291,6 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 {
   if (!sector) return;
 
-  iSector* oldSector = rview->GetPreviousSector();
   rview->SetupClipPlanes ();
   rview->SetThisSector (sector);
   sector->IncRecLevel();
@@ -283,13 +299,40 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
   RenderNode* newNode = renderNodeAlloc.Alloc();
   node->containedNodes.Push (newNode);
 
+  if (sector->HasFog())
+  {
+    csFog* fog = sector->GetFog();
+    node->fog.density = fog->density;
+    node->fog.color.Set (fog->red, fog->green, fog->blue);
+
+    //construct a cameraplane
+    iPortal *lastPortal = rview->GetLastPortal();
+    if(lastPortal)
+    {
+      csPlane3 plane;
+      lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);
+      node->fog.plane = plane.norm;
+      node->fog.plane.w = plane.DD;
+    }
+    else
+    {
+      node->fog.plane.Set (0.0,0.0,1.0,0.0);
+    }
+  }
+  else
+  {
+    node->fog.density = 0;
+  }
+  SetupFog (node);
+
   csArray<csMeshRenderNode*> meshNodes;
   for (size_t p = 0; p < passes.Length(); p++)
   {
     meshNodes.Push (meshNodeFact.CreateMeshNode (passes[p].shadertype, 
-      passes[p].defShader));
+      passes[p].defShader, shadervars));
     RenderNode* newNode = renderNodeAlloc.Alloc();
     newNode->renderNode = meshNodes[p];
+    newNode->fog = node->fog;
     node->containedNodes.Push (newNode);
   }
 
@@ -315,13 +358,15 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     {
       CleanEmptyMeshNodes (node, meshNodes);
       BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview);
+      SetupFog (node);
 
       for (size_t p = 0; p < passes.Length(); p++)
       {
         meshNodes[p] = meshNodeFact.CreateMeshNode (passes[p].shadertype, 
-          passes[p].defShader);
+          passes[p].defShader, shadervars);
         RenderNode* newNode = renderNodeAlloc.Alloc();
         newNode->renderNode = meshNodes[p];
+	newNode->fog = node->fog;
         node->containedNodes.Push (newNode);
       }
       continue;
@@ -343,7 +388,6 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     }
   }
   CleanEmptyMeshNodes (node, meshNodes);
-  rview->SetThisSector (oldSector);
   sector->DecRecLevel();
 }
 
@@ -356,11 +400,6 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
   const csReversibleTransform& camtrans = camera->GetTransform ();
   iMovable* movable = meshwrapper->GetMovable();
   const csReversibleTransform movtrans = movable->GetFullTransform ();
-
-  /*if (movable_nr != cmovable->GetUpdateNumber ())
-  {
-    portals->ObjectToWorld (cmovable, movtrans);
-  }*/
 
   csSphere sphere, world_sphere;
   csBox3 object_bbox;
@@ -391,7 +430,8 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
   {
     iPortal* portal = portals->GetPortal (i);
     csPortalRenderNode* portalNode = 
-      portalNodeFact.CreatePortalNode (portal, rview, movtrans, doClip);
+      portalNodeFact.CreatePortalNode (portal, rview, movtrans, doClip, 
+      shadervars);
     if (portalNode == 0) continue;
 
     RenderNode* newNode = renderNodeAlloc.Alloc();
@@ -412,11 +452,13 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
 
 void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node)
 {
+  SetupFog (node);
   if ((!node->renderNode) || node->renderNode->Preprocess (rview))
   {
     for (size_t i = 0; i < node->containedNodes.Length(); i++)
     {
       ProcessNode (rview, node->containedNodes[i]);
+      SetupFog (node);
     }
     if (node->renderNode) node->renderNode->Postprocess (rview);
   }

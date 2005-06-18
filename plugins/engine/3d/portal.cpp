@@ -86,6 +86,11 @@ int csPortal::GetVertexIndicesCount () const
   return (int)vertex_indices.Length ();
 }
 
+size_t csPortal::GetVerticesCount () const
+{ 
+  return parent->GetVertices ()->Length(); 
+}
+
 bool csPortal::CompleteSector (iBase *context)
 {
   if (sector)

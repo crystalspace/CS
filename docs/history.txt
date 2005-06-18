@@ -25,6 +25,7 @@ chronological order.
 	  aren't needed any more.
 	- res added csVector4::Description().
 	- Jorrit fixed an initialization bug in sprcal3d with dynamic_ambient.
+	- res added fog support to the fat rl.
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called

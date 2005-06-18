@@ -33,8 +33,10 @@
 
 csMeshRenderNode::csMeshRenderNode (csMeshRenderNodeFactory* factory, 
                                     csStringID shaderType,
-                                    iShader* defShader) : 
-  factory(factory), shaderType(shaderType), defShader(defShader)
+                                    iShader* defShader, 
+				    csShaderVariableContext& shadervars) : 
+  shadervars(shadervars), factory(factory), shaderType(shaderType), 
+  defShader(defShader)
 {
   shadervars.GetVariableAdd (factory->string_object2world);
 }
@@ -202,7 +204,8 @@ csMeshRenderNodeFactory::csMeshRenderNodeFactory (iObjectRegistry* object_reg)
 }
 
 csMeshRenderNode* csMeshRenderNodeFactory::CreateMeshNode (
-  csStringID shaderType, iShader* defShader)
+  csStringID shaderType, iShader* defShader, 
+  csShaderVariableContext& shadervars)
 {
-  return new csMeshRenderNode (this, shaderType, defShader);
+  return new csMeshRenderNode (this, shaderType, defShader, shadervars);
 }

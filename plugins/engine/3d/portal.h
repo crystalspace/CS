@@ -147,6 +147,7 @@ public:
   virtual const csVector3* GetWorldVertices ();
   virtual int* GetVertexIndices () const;
   virtual int GetVertexIndicesCount () const;
+  virtual size_t GetVerticesCount () const;
 
   /// Set the maximum sector visit.
   virtual void SetMaximumSectorVisit (int msv)

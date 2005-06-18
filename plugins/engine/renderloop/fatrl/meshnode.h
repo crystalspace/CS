@@ -70,7 +70,7 @@ class csMeshRenderNode : public csRenderNode
   };
   typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
   SortedBuckets buckets;
-  csShaderVariableContext shadervars;
+  csShaderVariableContext& shadervars;
   class TraverseShaderBuckets
   {
     csMeshRenderNode& node;
@@ -93,7 +93,7 @@ class csMeshRenderNode : public csRenderNode
   csStringID shaderType;
   csRef<iShader> defShader;
   csMeshRenderNode (csMeshRenderNodeFactory* factory, csStringID shaderType,
-    iShader* defShader);
+    iShader* defShader, csShaderVariableContext& shadervars);
 public:
   void AddMesh (csRenderMesh* rm, iMeshWrapper* mw, long prio, bool keepOrder);
   bool HasMeshes () const { return !buckets.IsEmpty(); }
@@ -114,7 +114,8 @@ class csMeshRenderNodeFactory
 public:
   csMeshRenderNodeFactory (iObjectRegistry* object_reg);
 
-  csMeshRenderNode* CreateMeshNode (csStringID shaderType, iShader* defShader);
+  csMeshRenderNode* CreateMeshNode (csStringID shaderType, iShader* defShader, 
+    csShaderVariableContext& shadervars);
 };
 
 #endif // __CS_MESHNODE_H__

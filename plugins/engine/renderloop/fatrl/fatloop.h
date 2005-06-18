@@ -93,6 +93,14 @@ class csFatLoopStep : public iRenderStep
     csRenderNode* renderNode;
     iRenderView* rview;
 
+    struct FogInfo
+    {
+      float density;
+      csVector3 color;
+      csVector4 plane;
+    };
+    FogInfo fog;
+
     csArray<RenderNode*> containedNodes;
 
     RenderNode() : renderNode(0), rview(0) {}
@@ -103,8 +111,12 @@ class csFatLoopStep : public iRenderStep
   csArray<RenderPass> passes;
   uint32 Classify (csRenderMesh* mesh);
 
+  csShaderVariableContext shadervars;
   csMeshRenderNodeFactory meshNodeFact;
   csPortalRenderNodeFactory portalNodeFact;
+  csStringID fogplane_name, fogdensity_name, fogcolor_name;
+
+  void SetupFog (RenderNode* node);
 
   void CleanEmptyMeshNodes (RenderNode* node, 
     const csArray<csMeshRenderNode*>& meshNodes);

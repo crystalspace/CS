@@ -359,6 +359,11 @@ struct iPortal : public iBase
 	const csVector3& start, const csVector3& end,
   	csVector3& isect, int* polygon_idx) = 0;
 
+  /**
+   * Get number of vertices in the array returned by GetVertices().
+   */
+  virtual size_t GetVerticesCount () const = 0;
+
 };
 
 /** @} */

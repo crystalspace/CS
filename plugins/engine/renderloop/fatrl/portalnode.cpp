@@ -28,6 +28,7 @@
 #include "csgeom/polyclip.h"
 #include "csutil/flags.h"
 #include "csutil/sysfunc.h"
+#include "csgfx/shadervarcontext.h"
 
 #include "portalnode.h"
 
@@ -48,7 +49,9 @@ static void AddPerspective (csPoly2D* dest, const csVector3 &v,
 }
 
 csPortalRenderNode::csPortalRenderNode (iPortal* portal, iRenderView* rview,
-  const csReversibleTransform& movtrans) : portal(portal), movtrans(movtrans)
+  const csReversibleTransform& movtrans, csPortalRenderNodeFactory* factory, 
+  csShaderVariableContext& shadervars) : 
+  factory(factory), portal(portal), movtrans(movtrans), shadervars(shadervars)
 {
 }
 
@@ -91,6 +94,10 @@ void csPortalRenderNode::PrepareView (iRenderView* rview, iSector* sector)
     rview->UseClipPlane (true);
     rview->UseClipFrustum (true);
   }
+}
+
+void csPortalRenderNode::UnprepareView ()
+{
 }
 
 void csPortalRenderNode::DoWarp (iRenderView* rview)
@@ -161,10 +168,69 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
   else
     g3d->ResetNearPlane ();
 
+  iSector* sector = rview->GetThisSector();
+  // is_this_fog is true if this sector is fogged.
+  bool is_this_fog = sector && sector->HasFog ();
+  if (is_this_fog && factory->fog_shader)
+  {
+    csSimpleRenderMesh mesh;
+    mesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+    mesh.indexCount = (uint)portal->GetVertexIndicesCount();
+    // @@@ Weirdo overloads approaching, captain!
+    mesh.indices = (const uint*)portal->GetVertexIndices ();
+    mesh.vertexCount = (uint)portal->GetVerticesCount();
+    mesh.vertices = portal->GetVertices();
+    mesh.texcoords = 0;
+    mesh.texture = 0;
+    mesh.colors = 0;
+    //mesh.object2camera = rview->GetCamera ()->GetTransform ();
+    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
+    mesh.alphaType.autoAlphaMode = false;
+    mesh.shader = factory->fog_shader;
+    // @@@ Hackish...
+    csShaderVariableContext varContext;
+    csRefArray<csShaderVariable> globVars = 
+      factory->shaderManager->GetShaderVariables ();
+    for (uint i = 0; i < globVars.Length (); i++)
+    {
+      varContext.AddVariable (globVars[i]);
+    }
+    csVector4 fogPlane;
+    iPortal *lastPortal = rview->GetLastPortal();
+    if(lastPortal)
+    {
+      csPlane3 plane;
+      lastPortal->ComputeCameraPlane (rview->GetCamera()->GetTransform(), plane);
+      fogPlane = plane.norm;
+      fogPlane.w = plane.DD;
+    }
+    else
+    {
+      fogPlane = csVector4(0.0,0.0,1.0,0.0);
+    }
+    varContext.GetVariableAdd (factory->fogplane_name)->SetValue (fogPlane);
+
+    //iSector *sector = rview->GetThisSector();
+    csFog* fog = sector->GetFog();
+    varContext.GetVariableAdd (factory->fogdensity_name)->SetValue (
+      fog->density);
+    varContext.GetVariableAdd (factory->fogcolor_name)->SetValue (
+      csVector3 (fog->red, fog->green, fog->blue));
+
+
+    mesh.dynDomain = &varContext;
+    // @@@ Could be used for z-fill and stuff, while we're at it?
+    mesh.z_buf_mode = CS_ZBUF_TEST;
+    g3d->DrawSimpleMesh (mesh);
+  }
+
   bool use_zfill_portal = portal->GetFlags().Check (CS_PORTAL_ZFILL);
   g3d->ClosePortal (use_zfill_portal);
 
   old_clipper = 0;
+
+  UnprepareView ();
+
 }
 
 bool csPortalRenderNode::PreMeshCollect (iRenderView* rview)
@@ -185,6 +251,7 @@ bool csPortalRenderNode::PreMeshCollect (iRenderView* rview)
 void csPortalRenderNode::PostMeshCollect (iRenderView* rview)
 {
   rview->RestoreRenderContext ();
+  UnprepareView ();
 }
 
 //---------------------------------------------------------------------------
@@ -192,10 +259,19 @@ void csPortalRenderNode::PostMeshCollect (iRenderView* rview)
 csPortalRenderNodeFactory::csPortalRenderNodeFactory (
   iObjectRegistry* object_reg)
 {
+  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  fog_shader = shaderManager->GetShader ("std_lighting_portal");
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  fogplane_name = strings->Request ("fogplane");
+  fogdensity_name = strings->Request ("fog density");
+  fogcolor_name = strings->Request ("fog color");
 }
 
 csPortalRenderNode* csPortalRenderNodeFactory::CreatePortalNode (iPortal* portal, 
-  iRenderView* rview, const csReversibleTransform& movtrans, bool doClip)
+  iRenderView* rview, const csReversibleTransform& movtrans, bool doClip, 
+  csShaderVariableContext& shadervars)
 {
   PORTAL_CHECK(portal, !portal->CompleteSector (rview), 0);
 
@@ -263,7 +339,8 @@ csPortalRenderNode* csPortalRenderNodeFactory::CreatePortalNode (iPortal* portal
       AddPerspective (&poly, camera_vertices[j], fov, shift_x, shift_y);
   }
 
-  csPortalRenderNode* newNode = new csPortalRenderNode (portal, rview, movtrans);
+  csPortalRenderNode* newNode = new csPortalRenderNode (portal, rview, 
+    movtrans, this, shadervars);
   newNode->camera_plane = camera_plane;
   newNode->camera_vertices = camera_vertices;
   newNode->poly = poly;
