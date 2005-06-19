@@ -5288,6 +5288,7 @@ class iPortal(iBase):
     def CompleteSector(*args): return _cspace.iPortal_CompleteSector(*args)
     def CheckFrustum(*args): return _cspace.iPortal_CheckFrustum(*args)
     def HitBeamPortals(*args): return _cspace.iPortal_HitBeamPortals(*args)
+    def GetVerticesCount(*args): return _cspace.iPortal_GetVerticesCount(*args)
     def __del__(self, destroy=_cspace.delete_iPortal):
         try:
             if self.thisown: destroy(self)
