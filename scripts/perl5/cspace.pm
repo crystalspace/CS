@@ -5976,6 +5976,7 @@ package cspace::iPortal;
 *CompleteSector = *cspacec::iPortal_CompleteSector;
 *CheckFrustum = *cspacec::iPortal_CheckFrustum;
 *HitBeamPortals = *cspacec::iPortal_HitBeamPortals;
+*GetVerticesCount = *cspacec::iPortal_GetVerticesCount;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
