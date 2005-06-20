@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jun-2005
+	- res changed TinyXML to write a text node out as CDATA when the value
+	  contains CRs or LFs.
+	- res cleaned up the shader conditional code a bit and also made the
+	  various debug dump options toggleable through the configuration.
+	- res made the Cg VP support save a program loading.
 18-Jun-2005
 	- Jorrit added csColor4 support to genmesh (pretty much untested).
 	  That means that mixmode alpha should now work again and it should

@@ -43,7 +43,7 @@ bool csShaderGLCGVP::Compile ()
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX))
+  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, false, false))
     return false;
 
   csString compiledProgram = cgGetProgramString (program, 

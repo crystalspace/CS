@@ -703,9 +703,19 @@ void TiXmlText::SetValue (const char * name)
 
 void TiXmlText::Print( iString* cfile, int /*depth*/ ) const
 {
-  TiXmlString buffer;
-  PutString( value, &buffer );
-  StrPrintf ( cfile, "%s", buffer.c_str() );
+  bool printCData = 
+    (strchr (value, '\r') != 0) || (strchr (value, '\n') != 0);
+
+  if (printCData)
+  {
+    StrPrintf ( cfile, "<![CDATA[%s]]>", value );
+  }
+  else
+  {
+    TiXmlString buffer;
+    PutString( value, &buffer );
+    StrPrintf ( cfile, "%s", buffer.c_str() );
+  }
 }
 
 

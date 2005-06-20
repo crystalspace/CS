@@ -229,7 +229,7 @@ class csShaderConditionResolver : public iConditionResolver
   
   void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
     csConditionNode* trueNode, csConditionNode* falseNode);
-  void DumpConditionNode (csRealConditionNode* node, int level);
+  void DumpConditionNode (csString& out, csRealConditionNode* node, int level);
   size_t GetVariant (csRealConditionNode* node);
 public:
   csShaderConditionResolver (csXMLShaderCompiler* compiler);
@@ -248,7 +248,7 @@ public:
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
-  void DumpConditionTree ();
+  void DumpConditionTree (csString& out);
 };
 
 class csXMLShader : public iShader, public csObject
@@ -258,6 +258,7 @@ class csXMLShader : public iShader, public csObject
   csRef<iDocumentNode> shaderSource;
   char* vfsStartDir;
   int forcepriority;
+  csHash<csRef<iDocumentNode>, csString> programSources;
 
   // struct to hold all techniques, until we decide which to use
   struct TechniqueKeeper
@@ -514,6 +515,8 @@ public:
   bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
 public:
   bool do_verbose;
+  bool doDumpXML;
+  bool doDumpConds;
   /// XML Token and management
   csStringHash xmltokens;
 

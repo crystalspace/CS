@@ -25,6 +25,7 @@
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
+#include "csutil/cfgacc.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstrset.h"
@@ -1016,45 +1017,45 @@ size_t csShaderConditionResolver::GetVariant ()
   }
 }
 
-void csShaderConditionResolver::DumpConditionTree ()
+void csShaderConditionResolver::DumpConditionTree (csString& out)
 {
   if (rootNode == 0)
     return;
 
   CS_ASSERT (rootNode->nodes.Length () == 1);
-  DumpConditionNode (rootNode->nodes[0], 0);
+  DumpConditionNode (out, rootNode->nodes[0], 0);
 }
 
-static void Indent (int n)
+static void Indent (csString& out, int n)
 {
-  for (int i = 0; i < n; i++)
-    csPrintf (" ");
+  out.PadRight (out.Length() + n, ' ');
 }
 
-void csShaderConditionResolver::DumpConditionNode (csRealConditionNode* node, 
+void csShaderConditionResolver::DumpConditionNode (csString& out,
+						   csRealConditionNode* node, 
 						   int level)
 {
   if (node == 0)
   {
-    Indent (level);
-    csPrintf ("<none>\n");
+    Indent (out, level);
+    out.Append ("<none>\n");
   }
   else
   {
-    Indent (level);
+    Indent (out, level);
     if (node->variant != csArrayItemNotFound)
     {
-      csPrintf ("variant: %zu\n", node->variant);
+      out.AppendFmt ("variant: %zu\n", node->variant);
     }
     else
     {
-      csPrintf ("condition: %zu\n", node->condition);
-      Indent (level);
-      csPrintf ("True node: ");
-      DumpConditionNode (node->trueNode, level + 1);
-      Indent (level);
-      csPrintf ("False node: ");
-      DumpConditionNode (node->falseNode, level + 1);
+      out.AppendFmt ("condition: %zu\n", node->condition);
+      Indent (out, level);
+      out.Append ("True node: ");
+      DumpConditionNode (out, node->trueNode, level + 1);
+      Indent (out, level);
+      out.Append ("False node: ");
+      DumpConditionNode (out, node->falseNode, level + 1);
     }
   }
 }
@@ -1117,6 +1118,10 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   else
     do_verbose = false;
     
+  csConfigAccess config (object_reg);
+  doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
+  doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");
+
   return true;
 }
 
@@ -1266,8 +1271,6 @@ SCF_IMPLEMENT_IBASE_EXT(csXMLShader)
   SCF_IMPLEMENTS_INTERFACE(iShader)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-//#define DUMP_SHADER_COND_TREE
-
 csXMLShader::csXMLShader (csXMLShaderCompiler* compiler, 
 			  iDocumentNode* source,
 			  int forcepriority)
@@ -1286,12 +1289,19 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 
   resolver = new csShaderConditionResolver (compiler);
   csRef<iDocumentNode> wrappedNode;
-  wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-    resolver));
-#ifdef DUMP_SHADER_COND_TREE
-  csPrintf ("Condition tree for %s: ", source->GetAttributeValue ("name"));
-  resolver->DumpConditionTree ();
-#endif
+  if (compiler->doDumpConds)
+  {
+    csString tree;
+    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
+      resolver, &tree));
+    resolver->DumpConditionTree (tree);
+    csString filename;
+    filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
+    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length());
+  }
+  else
+    wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
+      resolver, 0));
   shaderSource = wrappedNode;
   vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
 
@@ -1411,9 +1421,6 @@ void csXMLShader::ParseGlobalSVs ()
   resolver->SetEvalParams (0, 0);
 }
 
-//#define DUMP_SHADER_VARIANTS
-
-#ifdef DUMP_SHADER_VARIANTS
 static void CloneNode (iDocumentNode* from, iDocumentNode* to)
 {
   to->SetValue (from->GetValue ());
@@ -1432,14 +1439,13 @@ static void CloneNode (iDocumentNode* from, iDocumentNode* to)
     to->SetAttribute (attr->GetName (), attr->GetValue ());
   }
 }
-#endif
 
 size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
 			       const csShaderVarStack& stacks)
 {
   resolver->ResetEvaluationCache();
   resolver->SetEvalParams (&modes, &stacks);
-  size_t vi = resolver->GetVariant (/*modes, stacks*/);
+  size_t vi = resolver->GetVariant ();
 
   if (vi != csArrayItemNotFound)
   {
@@ -1447,16 +1453,15 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 
     if (!var.prepared)
     {
-#ifdef DUMP_SHADER_VARIANTS
+      if (compiler->doDumpXML)
       {
 	csRef<iDocumentSystem> docsys;
 	docsys.AttachNew (new csTinyDocumentSystem);
 	csRef<iDocument> newdoc = docsys->CreateDocument();
 	CloneNode (shaderSource, newdoc->CreateRoot());
-	newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%p_%zu.xml",
-	  this, vi));
+	newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu.xml",
+	  GetName(), vi));
       }
-#endif
 
       // So external files are found correctly
       compiler->vfs->PushDir ();
@@ -1583,8 +1588,46 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
       "Unable to parse shader program file '%s': %s", filename, err);
     return 0;
   }
+
+  csString dumpFN;
+  if (compiler->doDumpConds || compiler->doDumpXML)
+  {
+    csString filenameClean (filename);
+    for (size_t p = 0; p < filenameClean.Length(); p++)
+    {
+      if (!isalnum (filenameClean[p])) filenameClean[p] = '_';
+    }
+    dumpFN.Format ("%s_%s.xml",
+      GetName(), filenameClean.GetData());
+  }
+
   csRef<iDocumentNode> programNode;
-  programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
-    programDoc->GetRoot (), resolver));
+  if (compiler->doDumpConds)
+  {
+    csString tree;
+    programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
+      programDoc->GetRoot (), resolver, &tree));
+    resolver->DumpConditionTree (tree);
+    compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s.txt",
+      dumpFN.GetData()), tree.GetData(), tree.Length());
+  }
+  else
+    programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
+      programDoc->GetRoot (), resolver, 0));
+
+  if (compiler->doDumpXML)
+  {
+    csRef<iDocumentSystem> docsys;
+    docsys.AttachNew (new csTinyDocumentSystem);
+    csRef<iDocument> newdoc = docsys->CreateDocument();
+    CloneNode (programNode, newdoc->CreateRoot());
+    csString filenameClean (filename);
+    for (size_t p = 0; p < filenameClean.Length(); p++)
+    {
+      if (!isalnum (filenameClean[p])) filenameClean[p] = '_';
+    }
+    newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s.xml",
+      dumpFN.GetData()));
+  }
   return programNode;
 }

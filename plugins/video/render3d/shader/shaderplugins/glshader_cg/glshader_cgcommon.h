@@ -59,7 +59,8 @@ protected:
 
   char* debugFN;
 
-  bool DefaultLoadProgram (const char* programStr, CGGLenum type, bool compiled = false);
+  bool DefaultLoadProgram (const char* programStr, CGGLenum type, 
+    bool compiled = false, bool doLoad = true);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char ** GetProfileCompilerArgs (CGprofile profile) 

@@ -134,11 +134,18 @@ class csWrappedDocumentNode : public iDocumentNode
   friend class WrapperWalker;
 
   struct NodeProcessingState;
+  void ParseCondition (WrapperStackEntry& newWrapper, const char* cond,
+    size_t condLen, iDocumentNode* node);
+  void CreateElseWrapper (NodeProcessingState* state, 
+    WrapperStackEntry& elseWrapper);
+  void ProcessInclude (const csString& filename, NodeProcessingState* state, 
+    iDocumentNode* node);
+
   void ProcessSingleWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode ();
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
-
+  
   static void AppendNodeText (WrapperWalker& walker, csString& text);
 
   csWrappedDocumentNode (iDocumentNode* wrappedNode,
@@ -321,11 +328,22 @@ class csWrappedDocumentNodeFactory
   iObjectRegistry* objreg;
   csTextNodeWrapper::Pool textNodePool;
   csWrappedDocumentNodeIterator::Pool iterPool;
+
+  csStringHash pitokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadercompiler/xmlshader/docwrap.tok"
+#define CS_TOKEN_LIST_TOKEN_PREFIX PITOKEN_
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+#undef CS_TOKEN_LIST_TOKEN_PREFIX
+
+  csString* currentOut;
+  void DumpCondition (size_t id, const char* condStr, size_t condLen);
 public:
   csWrappedDocumentNodeFactory (iObjectRegistry* objreg);
 
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
-    iConditionResolver* resolver);
+    iConditionResolver* resolver, csString* dumpOut);
 };
 
 #endif // __DOCWRAP_H__

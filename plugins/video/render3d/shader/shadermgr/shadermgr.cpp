@@ -131,6 +131,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     RegisterShader (nullShader);
   }
 
+  config.AddConfig (objectreg, "/config/shadermgr.cfg");
+
   csRef<iStringArray> classlist =
     iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler.");
   size_t const nmatches = classlist.IsValid() ? classlist->Length() : 0;
@@ -157,8 +159,6 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     Report (CS_REPORTER_SEVERITY_WARNING, "No shader plugins found!");
   }
   
-  config.AddConfig (objectreg, "/config/shadermgr.cfg");
-
   csString cfgKey;
   const csString keyPrefix ("Video.ShaderManager.Tags.");
   csSet<csStrKey> knownKeys;

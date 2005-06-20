@@ -285,7 +285,7 @@ void csShaderGLCGCommon::ResetState()
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type, bool compiled)
+  CGGLenum type, bool compiled, bool doLoad)
 {
   size_t i;
 
@@ -312,10 +312,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   if (!program)
     return false;
 
-  cgGLLoadProgram (program);
-
   if (shaderPlug->debugDump)
     DoDebugDump();
+
+  if (doLoad) cgGLLoadProgram (program);
 
   i = 0;
   while (i < variablemap.Length ())
