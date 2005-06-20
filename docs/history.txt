@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Jun-2005
+	- mdmkolbe fixed segfaults on exit under Cygwin due to static local
+	  variables in functions.
 	- res changed TinyXML to write a text node out as CDATA when the value
 	  contains CRs or LFs.
 	- res cleaned up the shader conditional code a bit and also made the
@@ -34,8 +36,6 @@ chronological order.
 	- res added fog support to the fat rl.
 	- Marten added some more features to the new lighter. Still not close
 	  to functional.
-	- mdmkolbe fixed segfaults on exit under Cygwin due to static local
-	  variables in functions.
 17-Jun-2005
 	- Jorrit seperated per-sector dynamic ambient from per-object
 	  dynamic ambient. Previously if you called
