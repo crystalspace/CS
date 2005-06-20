@@ -466,13 +466,16 @@ csEventError csKeyboardDriver::SynthesizeCooked (iEvent *ev)
   return csEventErrNone;
 }
 
+// This really should be inside csKeyboardDriver::GetKeycodeString, but Cygwin
+// crashes on exit if functions have local static variables with complex types
+static csString genName;
+
 const char* csKeyboardDriver::GetKeycodeString (utf32_char code)
 {
 #ifdef CS_KEY_DEBUG_ENABLE
   const char* str = KeyCodeNames.StringForIdent (code);
   if (str != 0) return str;
 
-  static csString genName;
   genName.Format ("[%" PRIu32 "]", code);
   return genName;
 #endif

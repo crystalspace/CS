@@ -181,6 +181,10 @@ struct LightHeader
   int32 dyn_cnt;             // Number of dynamic maps
 };
 
+// This really should be inside csCurveLightMap::ReadFromCache, but Cygwin
+// crashes on exit if functions have local static variables with complex types
+static csString error_buf;
+
 const char* csCurveLightMap::ReadFromCache (
   iFile* file,
   int w,
@@ -224,7 +228,6 @@ const char* csCurveLightMap::ReadFromCache (
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  static csString error_buf;
   error_buf.Empty();
   if (strncmp (ps.header, pswanted.header, 4) != 0)
     error_buf.Format ("Cached lightmap header doesn't match!");

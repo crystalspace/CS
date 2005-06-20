@@ -828,13 +828,18 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
   return false;
 }
 
+#ifdef CS_KEY_DEBUG_ENABLE
+// This really should be inside csWin32KeyboardDriver, but Cygwin
+// crashes on exit if functions have local static variables with complex types
+static csString genName;
+#endif
+
 const char* csWin32KeyboardDriver::GetVKName (LONG vKey)
 {
 #ifdef CS_KEY_DEBUG_ENABLE
   const char* vkName = Win32VKeyNames.StringForIdent (vKey);
   if (vkName != 0) return vkName;
 
-  static csString genName;
   if (((vKey >= 'A') && (vKey <= 'Z')) || ((vKey >= '0') && (vKey <= '9')))
   {
     genName = (char)vKey;

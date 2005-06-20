@@ -74,6 +74,11 @@ public:
   }
 };
 
+// This really should be inside litObjectSelectByNameRE::IsValid and
+// listObjectSelectByKeyValueRE:IsValid, but Cygwin
+// crashes on exit if functions have local static variables with complex types
+static csString error_string;
+
 /**
  * Select an object based on regexp on name.
  */
@@ -89,7 +94,6 @@ public:
   {
     csRegExpMatchError rc = matcher.Match ("");
     if (rc == csrxNoError || rc == csrxNoMatch) return 0;
-    static csString error_string;
     error_string.Format ("Regexp error %d", (int)rc);
     return error_string;
   }
@@ -210,7 +214,6 @@ public:
   {
     csRegExpMatchError rc = matcher.Match ("");
     if (rc == csrxNoError || rc == csrxNoMatch) return 0;
-    static csString error_string;
     error_string.Format ("Regexp error %d", (int)rc);
     return error_string;
   }
