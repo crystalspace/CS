@@ -45,7 +45,7 @@
 	<!--
 	  Certain HW does not like the "inverted fog" trick above and does
 	  not display any fog at all. In this case, the driver DB should 
-	  disable 'inverted_fog' tagged tehcniques, so the one below is used.
+	  disable 'inverted_fog' tagged techniques, so the one below is used.
 	 -->
 	<arbvp>
 	  <variablemap variable="texture lod distance" destination="register 0"/>
