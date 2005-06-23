@@ -33,16 +33,19 @@
 #include "cskey_identstrs.h"
 #endif
 
+#undef NOP
+#define NOP ((char)-1)
 // This array defines first 32..128 character codes with SHIFT key applied
 static char ShiftedKey [128-32] =
 {
 ' ', '!', '"', '#', '$', '%', '&', '"', '(', ')', '*', '+', '<', '_', '>', '?',
 ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', ':', ':', '<', '+', '>', '?',
-'@',  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
- -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, '{', '|', '}', '^', '_',
-'~',  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
- -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, '{', '|', '}', '~',  -1
+'@', NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP,
+NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, '{', '|', '}', '^', '_',
+'~', NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP,
+NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, '{', '|', '}', '~', NOP
 };
+#undef NOP
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
 
@@ -158,7 +161,8 @@ const utf32_char latinLetters[] = {
 const int numLetters = sizeof (latinLetters) / sizeof (utf32_char);
 
 /// A combination is not available.
-#define NOPE	  (utf32_char)-1
+#undef NOPE
+#define NOPE ((utf32_char)-1)
 
 /*
   All combinations of marks and letters we support.
@@ -438,9 +442,9 @@ void csKeyboardDriver::SynthesizeCooked (utf32_char codeRaw,
     {
       char newCode;
       if ((codeRaw < 32) || (codeRaw > 127)
-        || ((newCode = ShiftedKey [codeRaw - 32]) == -1))
+        || ((newCode = ShiftedKey [codeRaw - 32]) == (char)-1))
       {
-        csUnicodeTransform::MapToUpper (codeRaw, &codeCooked, 1, csUcMapSimple);
+        csUnicodeTransform::MapToUpper(codeRaw, &codeCooked, 1, csUcMapSimple);
       }
       else
         codeCooked = newCode;
@@ -672,7 +676,8 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
   if ((button == LastClickButton[number - 1])
       && (evtime - LastClickTime[number - 1] <= DoubleClickTime)) {
     for (uint iter=0 ; iter<Axes[number - 1] ; iter++)
-      if (unsigned (ABS (axes[iter] - LastClick[number - 1][iter])) > DoubleClickDist)
+      if (unsigned (ABS (axes[iter] - LastClick[number - 1][iter])) >
+	  DoubleClickDist)
 	goto mousedown;
     csRef<iEvent> ev;
     ev.AttachNew (new csEvent (evtime,
