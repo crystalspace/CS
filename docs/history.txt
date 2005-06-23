@@ -66,9 +66,9 @@ chronological order.
 	  added a bit more code to demonstrate how to move objects.
 	- Eric Sunshine fixed bug in csApplicationFramework where `restartFlag'
 	  instance variable was not being initialized.
-	- res changed csFlags::Set() to apply the mask to the 'value'parameter, 
-	  too. Previously, e.g. specifying a value of ~0 as the value would 
-	  set all bits, not just those in 'mask', as the documentation stated.
+	- res changed csFlags::Set() to apply the mask to the 'value'parameter,
+	  too. Previously, e.g. specifying a value of ~0 as the value would set
+	  all bits, not just those in 'mask', as the documentation stated.
 	- res gave the 'value' parameter of iMeshWrapper->SetFlagsRecursive()
 	  a default value of ~0. This way all bits in specified in 'mask'
 	  will be set (which mirrors the behaviour of the two csFlags::Set()
@@ -3722,14 +3722,14 @@ chronological order.
 	  a line 'if (mdl2spr_imageio == 0)' with mdl2spr_imageio a
 	  csRef<iImageIO>. The compiler complained about this line with
 	  the following error:
-		apps/import/md22spr/m2s_mdl.cpp:340: ambiguous overload for
-			`csRef<iImageIO>& == int' operator
-		apps/import/md22spr/m2s_mdl.cpp:340: candidates are:
-			operator==(iImageIO*, iImageIO*) <built-in>
-		include/csutil/ref.h:295: bool operator==(const csRef<iImage>&,
-			iImage*)
-		include/csutil/ref.h:285: bool operator==(const csRef<iImage>&, 
-			const csRef<iImage>&)
+	    apps/import/md22spr/m2s_mdl.cpp:340: ambiguous overload for
+		    `csRef<iImageIO>& == int' operator
+	    apps/import/md22spr/m2s_mdl.cpp:340: candidates are:
+		    operator==(iImageIO*, iImageIO*) <built-in>
+	    include/csutil/ref.h:295: bool operator==(const csRef<iImage>&,
+		    iImage*)
+	    include/csutil/ref.h:285: bool operator==(const csRef<iImage>&, 
+		    const csRef<iImage>&)
 	  If I change that line to 'if (!mdl2spr_imageio.IsValid())' then
 	  the compiler is happy. The really weird thing is that there
 	  is another 'if (mdl2spr_imageio == 0)' line a few lines below
