@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 23-Jun-2005
+	- Piotr Obrzut applied fixed fix for get/set transform methods applied 
+	  before by Erroroman
 	- Eric Sunshine eliminated several compilation warnings.
 20-Jun-2005
 	- mdmkolbe fixed segfaults on exit under Cygwin due to static local
