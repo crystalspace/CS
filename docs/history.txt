@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jun-2005
+	- Jorrit did a big optimization to genmesh objects that don't use
+	  localshadows (i.e. meshes that calculate vertex lighting). These
+	  meshes used to calculate lighting again and again every frame
+	  even if the lighting conditions didn't change. This is now fixed
+	  so that lighting is only recalculated if needed. This optimization
+	  is even more worthwhile when you are using submeshes in genmesh
+	  because then this lighting would have been recomputed every
+	  frame for every submesh (and it would calculate the entire mesh
+	  for every submesh anyway).
 23-Jun-2005
 	- Piotr Obrzut applied fixed fix for get/set transform methods applied 
 	  before by Erroroman

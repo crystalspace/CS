@@ -985,6 +985,16 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   if (do_manual_colors) return;
   if (do_shadow_rec) return;
 
+  if (!lighting_dirty)
+  {
+    iSector* sect = movable->GetSectors ()->Get (0);
+    if (dynamic_ambient_version == sect->GetDynamicAmbientVersion ())
+      return;
+    dynamic_ambient_version = sect->GetDynamicAmbientVersion ();
+  }
+
+  lighting_dirty = false;
+
   int i, l;
   csColor4* colors = lit_mesh_colors;
 
@@ -1008,6 +1018,7 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 
   if (!do_lighting) return;
     // @@@ it is not efficient to do this all the time.
+
 
   // Do the lighting.
   csReversibleTransform trans = movable->GetFullTransform ();
