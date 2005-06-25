@@ -709,7 +709,7 @@ public:
   }
   virtual void SetWorldToCamera (const csReversibleTransform& w2c)
   {
-    this->w2c = w2c;
+    this->w2c = w2c.GetInverse ();
     shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
   }
   /// Set optional clipper.

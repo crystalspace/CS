@@ -4527,7 +4527,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   poly.mixmode = modes.mixmode;
   z_buf_mode = modes.z_buf_mode;
 
-  csReversibleTransform object2camera = w2c * mesh->object2world;
+  csReversibleTransform object2camera = w2c / mesh->object2world;
 
   for (i = 0; i < polyRender->polys.Length (); i++)
   {
@@ -4669,7 +4669,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
   indexbuf->Release ();
 
-  csReversibleTransform object2camera = w2c * mesh->object2world;
+  csReversibleTransform object2camera = w2c / mesh->object2world;
 
   //do_lighting = false;
   bool lazyclip = false;

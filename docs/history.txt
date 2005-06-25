@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Jun-2005
+	- Marten fixed a transformation bug in software renderer. The direction
+	  / names of transforms needs to be checked at some point (they are 
+	  probably not correct).
 24-Jun-2005
 	- Jorrit did a big optimization to genmesh objects that don't use
 	  localshadows (i.e. meshes that calculate vertex lighting). These
