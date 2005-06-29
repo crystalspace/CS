@@ -1,12 +1,24 @@
---- texi2html.pl.org	Tue Apr 26 16:02:52 2005
-+++ texi2html.pl	Tue Apr 26 16:00:12 2005
+--- texi2html.pl	Wed Jun 29 10:48:57 2005
++++ CrystalSpace/CS/docs/support/texi2html.pl	Wed Jun 29 10:51:58 2005
 @@ -1,4 +1,4 @@
 -#! @PERL@
 +#! /usr/bin/perl
  'di ';
  'ig 00 ';
  #+##############################################################################
-@@ -55,7 +55,7 @@
+@@ -32,8 +32,11 @@
+ use strict;
+ # used in case of tests, to revert to "C" locale.
+ use POSIX qw(setlocale LC_ALL LC_CTYPE);
++# used to obtain the name of the current working directory
++use Cwd;
+ # used to find a relative path back to the current working directory
+ use File::Spec;
++
+ #
+ # According to
+ # larry.jones@sdrc.com (Larry Jones)
+@@ -55,7 +58,7 @@
  #--##############################################################################
  
  # CVS version:
@@ -15,7 +27,7 @@
  
  # Homepage:
  my $T2H_HOMEPAGE = "http://texi2html.cvshome.org/";
-@@ -71,7 +71,7 @@
+@@ -71,7 +74,7 @@
  EOT
  
  # Version: set in configure.in
@@ -24,7 +36,43 @@
  my $THISPROG = "texi2html $THISVERSION"; # program name and version
  
  # set by configure, prefix for the sysconfdir and so on
-@@ -4415,12 +4415,18 @@
+@@ -2360,17 +2363,6 @@
+ # file name buisness
+ #
+ 
+-# this is directly pasted over from latex2html
+-sub getcwd
+-{
+-    local($_) = `pwd`;
+-
+-    die "'pwd' failed (out of memory?)\n"
+-        unless length;
+-    chop;
+-    $_;
+-}
+-
+ 
+ my $docu_dir;            # directory of the document
+ my $docu_name;           # basename of the document
+@@ -2500,7 +2492,7 @@
+ my $path_to_working_dir = $docu_rdir;
+ if ($docu_rdir ne '')
+ {
+-    my $cwd = getcwd;
++    my $cwd = cwd;
+     my $docu_path = $docu_rdir;
+     $docu_path = $cwd . '/' . $docu_path unless ($docu_path =~ /^\//);
+     my @result = ();
+@@ -3037,7 +3029,7 @@
+     }
+     else
+     {
+-        if (main::getcwd() =~ /\./)
++        if (cwd() =~ /\./)
+         {
+             warn "$ERROR Warning l2h: current dir contains a dot. Use /tmp as l2h_tmp dir \n";
+             $dotbug = 1;
+@@ -4415,12 +4407,18 @@
                  {
                      $section->{'number'} = $number;
                  }    
