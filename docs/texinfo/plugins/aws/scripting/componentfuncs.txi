@@ -5,7 +5,7 @@
 All components inherit the following scripting capabilities.
 
 @multitable @columnfractions .25 .40 .35
-@headitem Name @tab Example @tab Description
+@item @emph{Name} @tab @emph{Example} @tab @emph{Description}
 
 @item @code{Hide@@Widget}
 @tab  @code{:Hide@@Widget()}

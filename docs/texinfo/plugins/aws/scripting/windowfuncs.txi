@@ -3,7 +3,7 @@
 @subsection Automation Objects Available for Windows
 
 @multitable @columnfractions .25 .40 .35
-@headitem Name @tab Example @tab Description
+@item @emph{Name} @tab @emph{Example} @tab @emph{Description}
 
 @item @code{Dummy@@Window}
 @tab  @code{:Dummy@@Window()}
