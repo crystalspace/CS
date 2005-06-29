@@ -60,7 +60,11 @@ protected:
     void SetParent(Node* p)
     { parent = (Node*)(((uintptr_t)p & (uintptr_t)~1) | (uint)GetColor()); }
     NodeColor GetColor() const
-    { return (NodeColor)((uintptr_t)parent & 1); }
+    { // Expression split over two statements to pacify some broken gcc's which
+      // barf saying "can't convert Node* to NodeColor".
+      uintptr_t const v = ((uintptr_t)parent & 1); 
+      return (NodeColor)v;
+    }
     void SetColor (NodeColor color)
     { parent = (Node*)(((uintptr_t)parent & (uintptr_t)~1) | (uint)color); }
   };
