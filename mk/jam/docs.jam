@@ -500,9 +500,16 @@ rule _Dvi
   return $(outfile) ;
 }
 
+# Unfortunately, `makeinfo' 4.3, which ships with MSYS, does not respect the
+# search path (-I) for @image{} directives, so we need to `cd' into the source
+# directory to work around this shortcoming.  With modern versions of
+# `makeinfo', we could instead just use `-I$(SRCDIR)' instead of the pwd/cd
+# goop.
 actions RunMakeInfo
 {
-  $(CMD.MAKEINFO) $(OPTIONS) $(FLAGS.MAKEINFO) --output=$(<) "-I$(SRCDIR)" $(>)
+  dir=`pwd` ; \
+  cd $(>:D) ; \
+  $(CMD.MAKEINFO) $(OPTIONS) $(FLAGS.MAKEINFO) --output="${dir}/$(<)" $(>:B)
 }
 
 actions RunTexi2HTML

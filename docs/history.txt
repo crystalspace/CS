@@ -16,6 +16,9 @@ chronological order.
 	- Eric Sunshine worked around bug in some version of gcc where it
 	  complained about one-liner expression in csRedBlackTree::GetColor(),
 	  saying that it could not convert Node* to NodeColor.
+	- Eric Sunshine modified (hacked) the RunMakeInfo action in docs.jam to
+	  work with `makeinfo' 4.2 which ships with MSYS and which does not
+	  respect -I (search path) for @image{} directives.
 25-Jun-2005
 	- Marten fixed a transformation bug in software renderer. The direction
 	  / names of transforms needs to be checked at some point (they are 
