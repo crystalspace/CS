@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jun-2005
+	- Eric Sunshine applied a patch to texi2html.pl which allows it to work
+	  on Windows by avoding dependence upon the Unix-specific external
+	  `pwd' command.
+	  https://texi2html.cvshome.org/servlets/ReadMsg?list=dev&msgNo=538
+	- Eric Sunshine fixed a few problems afflicting `jam manualinfo' on
+	  Windows on account of the somewhat old MSYS `makeinfo'.
 25-Jun-2005
 	- Marten fixed a transformation bug in software renderer. The direction
 	  / names of transforms needs to be checked at some point (they are 
