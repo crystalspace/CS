@@ -1,7 +1,7 @@
 #ifndef __AWS_MANAGER_H__
 #define __AWS_MANAGER_H__
 
-#include "iaws/aws.h"
+#include "iaws/aws2.h"
 #include "preferences.h"
 #include "csgeom/csrectrg.h"
 #include "iutil/comp.h"
