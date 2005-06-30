@@ -28,7 +28,7 @@
   struct iPen
   {
     /** Sets the current color. */
-    virtual void setColor(int32 r, int32 g, int32 b, int32 a);
+    virtual void setColor(int32 r, int32 g, int32 b, int32 a)=0;
 
     /** Draws a single line. */
     virtual void line(int32 x1, int32 y1, int32 x2, int32 y2)=0;
