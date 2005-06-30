@@ -481,12 +481,6 @@ public:
     return capacity;
   }
 
-  /// Gets the raw array of elements.  Guaranteed to be safe until the next access to this object. */
-  T* Raw()
-  {
-    return root;
-  }
-
   /**
    * Transfer the entire contents of one array to the other. The end
    * result will be that this array will be completely empty and the
