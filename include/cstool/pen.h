@@ -22,6 +22,7 @@
 #include "ivideo/graph3d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/vector4.h"
+#include "csutil/garray.h"
 
   /** A pen is used to draw vector shapes. */
   struct iPen
@@ -60,13 +61,13 @@
     csVector3Array va;
 
     /** The list of indices we use. */
-    csArray< uint > ia;
+    csDirtyAccessArray< uint > ia;
 
     /** The color we use. */
     csVector4 color;
 
     /** The color array generated for verts as we render. */
-    csArray< csVector4 > colors;
+    csDirtyAccessArray< csVector4 > colors;
 
   protected:
     /** Initializes our working objects. */

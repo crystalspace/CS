@@ -54,10 +54,10 @@ void csPen::setupMesh()
   mesh.vertices =    va.GetVertices();
   mesh.vertexCount = static_cast<uint>(va.GetVertexCount());
 
-  mesh.indices = ia.Raw();
+  mesh.indices = ia.GetArray();
   mesh.indexCount = static_cast<uint>(ia.Length());
 
-  mesh.colors = colors.Raw();
+  mesh.colors = colors.GetArray();
   //mesh.colorCount = static_cast<uint>(colors.Length());  
 }
 
