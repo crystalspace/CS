@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- aws2.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.window.alternatemanager2</name>
+        <implementation>awsManager</implementation>
+        <description>Crystal Space alternate window manager version 2.0.alpha</description>
+      </class>      
+    </classes>
+  </scf>
+</plugin>

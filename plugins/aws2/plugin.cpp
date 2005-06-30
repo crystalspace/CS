@@ -1,0 +1,9 @@
+#include "cssysdef.h"
+#include "manager.h"
+
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_IBASE (awsManager)
+  SCF_IMPLEMENTS_INTERFACE (iAws)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENT_IBASE_END
