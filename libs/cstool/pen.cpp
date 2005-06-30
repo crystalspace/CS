@@ -22,11 +22,13 @@ void csPen::start()
 {
   va.MakeEmpty();
   ia.SetLength(0);  
+  colors.SetLength(0);
 }
 
 void csPen::vert(float x, float y)
 {
   ia.Push((uint)va.AddVertexSmart(x,y,0));
+  colors.Push(color);
 }
 
 void csPen::setupMesh()
@@ -37,8 +39,8 @@ void csPen::setupMesh()
   mesh.indices = ia.Raw();
   mesh.indexCount = static_cast<uint>(ia.Length());
 
-  mesh.colors = &color;
-  //mesh.colorCount = 1;  
+  mesh.colors = colors.Raw();
+  //mesh.colorCount = static_cast<uint>(colors.Length());  
 }
 
 void csPen::drawMesh(csRenderMeshType mesh_type)

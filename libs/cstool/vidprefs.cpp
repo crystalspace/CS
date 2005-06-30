@@ -24,7 +24,7 @@
 #include "csutil/event.h"
 
 #include "iaws/aws.h"
-#include "iaws/awscnvs.h"
+//#include "iaws/awscnvs.h"
 #include "iutil/plugin.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

@@ -47,6 +47,9 @@
     /** The color we use. */
     csVector4 color;
 
+    /** The color array generated for verts as we render. */
+    csArray< csVector4 > colors;
+
   protected:
     /** Initializes our working objects. */
     void start();
