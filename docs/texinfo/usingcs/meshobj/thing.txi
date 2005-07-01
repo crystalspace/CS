@@ -21,9 +21,7 @@ geometry of a sector so that it represents a closed space. Things are not
 very dynamic in nature (although you can have things that move) so they
 are most often used for static geometry.
 
-Things support polygons. Things also support portals which means that they can
-be used to define transition polygons between adjacent or non-adjacent
-sectors.
+Things support general polygons (as opposed to only supporting triangles).
 
 There is also a howto on creating things (@pxref{HOWTO Create Thing}).
 
@@ -169,11 +167,6 @@ This keyword can be used to define additional texture mapping parameters.
 Should this polygon use lighting or not. By default this is enabled. If
 disabled the texture on this polygon will be rendered using original colors
 (i.e. full-bright texture).
-@item <portal><sector>sectorName</sector></portal>
-If you use this keyword then this polygon is a portal to the given sector.
-@item <warp> @dots{} FIXME: still existing ?
-This keyword can be used to define additional parameters for the portal.
-More on this later.
 @item shading(shadingParm) FIXME: still existing ?
 This describes the kind of shading to use for this polygon. Possible values
 are: @samp{none}, @samp{flat}, @samp{gouraud}, or @samp{lightmap}. Default
@@ -204,10 +197,7 @@ When using @samp{uv} you can use this command to give colors (r,g,b) for
 every vertex.
 @item colldet(boolean)
 Enable/disable collision detection for this polygon. By default a normal
-polygon will have collision detection enabled. If the polygon has a portal
-then collision detection will be disabled unless the portal is a mirror in
-which case it will be enabled again. But using @samp{colldet} allows you to
-override all this.
+polygon will have collision detection enabled.
 @item viscull(boolean)
 Enable/disable visibility culling for this polygon. By default a normal
 polygon will have visibility culling enabled. If the polygon has alpha
@@ -265,64 +255,5 @@ u,v shift value.
 @item <plane>planeName</plane>
 Use the given texture mapping plane instead of all the above.
 See how to define planes later.
-@end table
-
-The @samp{warp} keyword as used in a polygon has the following keywords:
-
-@table @code
-@item <matrix> @dots{}
-The matrix to use for space warping the portal.
-@item <v x="" y="" z="" />
-The vector to use for space warping before the matrix is applied.
-@item <w x="" y="" z="" />
-The vector to use for space warping after the matrix is applied. If not
-given this is the same as @samp{v}.
-@item <mirror />
-Short-hand to generate a mirror portal. This will automatically calculate
-@samp{matrix}, @samp{v}, and @samp{w}.
-@item <static /> FIXME: does it still exist ?
-When this item is given the portal destination will be static. This means
-that the portal will point to the same location even if the portal polygon
-moves. Otherwise the portal destination will move accordingly.
-@item <zfill />
-Set this option on a portal that floats in the middle of a room. It will
-make sure that the Z-buffer is filled AFTER rendering all objects seen
-through the portal.
-@item <clip />
-Set this option on a portal that points to the middle of a room. It will
-make sure that all geometry in the destination sector is correctly clipped
-to the portal so that it is not rendered in this sector.
-@end table
-
-@subsubheading Plane Add-on Loader
-
-The thing loader plugin also supports an additional plugin which can load
-plane definitions. A plane definition is used for texture mapping. It is
-an optional (but very useful) feature which allows you to define texture
-mapping planes for polygons that share the same texture mapping.
-
-The following keywords are supported by the plane loader:
-
-@table @code
-@item <orig x="" y="" z="" />
-The origin for texture mapping (3D coord).
-@item <first x="" y="" z="" />
-The u-axis coordinate for texture mapping (3D coord).
-@item <second x="" y="" z="" />
-The v-axis coordinate for texture mapping (3D coord).
-@item <firstlen>scale</firstlen>
-Scale along the u-axis.
-@item <secondlen>scale</secondlen>
-Scale along the v-axis.
-@item <uvec x="" y="" z="" />
-Similar to @samp{first} with @samp{firstlen} set to length
-of vector (@samp{first}-@samp{orig}).
-@item <vvec x="" y="" z="" />
-Similar to @samp{second} with @samp{secondlen} set to length
-of vector (@samp{second}-@samp{orig}).
-@item <matrix> @dots{}
-Most general way to describe texture mapping using the transformation matrix.
-@item <v x="" y="" z="" />
-Most general way to describe texture mapping using the transformation vector.
 @end table
 

@@ -22,6 +22,8 @@ chronological order.
 	    - Moved some other stuff around.
 	- Jorrit moved a few howtos to more appropriate places in the
 	  documentation.
+	- Jorrit fixed the thing mesh object explanation. Things don't support
+	  portals anymore.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.
