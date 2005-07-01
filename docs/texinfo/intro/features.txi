@@ -59,10 +59,10 @@ calculation of color gradients, simple bumpmapping, etc.
 2D and 3D polygons
 
 @item
-Shared Class Facility @sc{scf}.  @xref{SCF}. @xref{Tutorial Introduction}.
+Shared Class Facility @sc{scf}.  @xref{SCF}. @xref{The Basics}.
 
 @item
-Smart Pointers. @xref{HOWTO Smart Pointers}.
+Smart Pointers. @xref{Smart Pointers}.
 
 @item
 Flexible plug-in system. @xref{SCF}. @xref{HOWTO Create Your Own Plugin}.
@@ -74,7 +74,7 @@ Virtual file system and transparent support for @sc{zip} files. @xref{VFS}.
 Configuration files. @xref{Configuration File}.
 
 @item
-Command-line parsing. @xref{Tutorial Introduction}.
+Command-line parsing. @xref{The Basics}. @xref{Configuration File}.
 
 @item
 Event system.
@@ -109,7 +109,7 @@ Crystal Space native windowing system(s). @xref{AWS}.
 2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory)
 
 @item
-3D renderers (OpenGL, software, null). @xref{Graphics Drivers}.
+3D renderers (OpenGL, software, null). @xref{3D Renderer}.
 
 @item
 Playing @sc{avi} streams (DivX 4, OpenDivX) on a texture.
@@ -174,7 +174,7 @@ Pull-down console that you can integrate in your own games.
 
 @item
 Collision detection (using @sc{opcode}).
-@xref{HOWTO Collision Detection}.
+@xref{Basic Collision Detection}.
 
 @item
 Powerful sequence manager to control movement, animation and other

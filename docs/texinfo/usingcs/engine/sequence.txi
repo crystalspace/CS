@@ -1,0 +1,443 @@
+@c -*-texinfo-*-
+@node Sequence Manager, , Level of Detail, csEngine
+@subsection Sequence Manager
+@cindex Sequence Manager
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 16 August 2003.}
+
+When you define geometry in a map file this usually define a static
+representation of the world. Using the sequence manager it is possible
+to define specific events that trigger on certain conditions. Using these
+events (sequences) you can move or animate objects, control lights, fog,
+@dots{}.
+
+The sequence manager is actually divided in two plugins. First there is
+the basic sequence manager itself. This is nothing more then a schedular
+that can schedule certain actions that should happen at certain times.
+Applications can use this sequence manager for their own purposes if they
+want.
+
+On top of the sequence manager there runs the engine sequence manager. This
+plugin predefines several operations and triggers which make it a lot easier
+to do engine related things like moving objects, controlling lights, @dots{}.
+We will discuss mainly the engine sequence manager in this section.
+
+A sequence represents a small script with commands that operate on objects
+in the world. A trigger represents a series of conditions which will cause
+the sequence to be executed. The important thing of the sequence manager
+is that it is very time based. Operations don't all execute at once but
+at specific times relative to the start of the sequence. Note that all times
+in the sequence manager are specified in milli-seconds.
+
+@subsubheading Basic Example
+
+The easiest way to explain the engine sequence manager is to look at a simple
+example as how it can be used from a map file:
+
+@example
+<world>
+  @dots{}
+  <sector name="hall">
+    <light name="roomlight">
+      <center x="10" y="4" z="10" />
+      <radius>20</radius>
+      <color red="0" green="0" blue="0" />
+      <dynamic />
+    </light>
+    @dots{}
+  </sector>
+  @dots{}
+  <sequences>
+
+    <sequence name="turn_on_light">
+      <setlight light="roomlight" red="1" green="1" blue="1" />
+      <delay time="50" />
+      <setlight light="roomlight" red="0" green="0" blue="0" />
+      <delay time="80" />
+      <setlight light="roomlight" red="1" green="1" blue="1" />
+    </sequence>
+
+  </sequences>
+
+  <triggers>
+
+    <trigger name="trig_turn_on_light">
+      <sectorvis sector="hall">
+        <sphere x="10" y="4" z="10" radius="5" />
+      </sectorvis>
+      <fire delay="0" sequence="turn_on_light" />
+    </trigger>
+
+  </triggers>
+</world>
+@end example
+
+This is a simple example where we turn on a light as soon as we are
+in a certain radius of the light. Let's explain how it works. First we
+define a sequence which is called @samp{turn_on_light}. This sequence
+has three @samp{setlight} operations and two delays. Internally this is
+compiled to something which looks like this:
+
+@example
+time 0ms: setlight 'roomlight',1,1,1
+time 50ms: setlight 'roomlight',0,0,0
+time 130ms: setlight 'roomlight',1,1,1
+@end example
+
+Basically there are three operations here and the delays are only used to
+indicate when these operations are executed relative to the start of the
+entire sequence. So for example, if the sequence is fired at time 10050 then
+immediatelly at that point the first operation is executed. 50 milliseconds
+later the second operation is executed and finally, 130 milliseconds later
+the last operation is exexuted.
+
+There are a few important observations to be made about this. First, as soon
+as a sequence is executed or fired ALL operations in that sequence will
+execute at the correct relative time no matter what happens otherwise. This
+also means that if you fire another sequence then that sequence will also get
+fired at the same time and depending on the relative timing of the operations
+some of those operations might happen at the same time.
+
+Also note that there are operations that themselves have a duration. For
+example, there is a @samp{fadelight} operation which fades a light to some
+color. It has a @samp{duration} parameter. But this duration does NOT influence
+the relative timing in the sequence itself. So for example if you have this:
+
+@example
+<fadelight light="somelight" red="0" green="0" blue="0"
+    duration="1000" />
+<fadelight light="somelight" red="1" green="1" blue="1"
+    duration="1000" />
+@end example
+
+Then this will execute two fade operations on the same light at exactly
+the same time which is probably not what you want. This example is probably
+better written as:
+
+@example
+<fadelight light="somelight" red="0" green="0" blue="0"
+    duration="1000" />
+<delay time="1000" />
+<fadelight light="somelight" red="1" green="1" blue="1"
+    duration="1000" />
+@end example
+
+This will place the two operations at a time distance of 1000 milliseconds.
+
+The reason that using @samp{duration} does not automatically advance the
+internal relative time is that it is sometimes useful to start several
+fade operations (or other operations that have a duration) at the same time.
+For example, two fade operations on two different lights.
+
+A sequence as such is not useful. It needs to be fired at some point.
+You can fire sequences manually from code or you can define a trigger
+to fire the sequence if a certain condition is true. In this case we
+have a trigger which is called @samp{trig_turn_on_light}. This trigger
+will fire if the sector @samp{hall} is visible and the camera is in the
+sphere defined by the center @samp{10,4,10} and radius @samp{5}. As soon
+as this condition is valid the @samp{turn_on_light} sequence will be
+fired immediatelly. Note that this automatically implies that the trigger
+is disabled. This is to prevent the sequence from being fired several times
+while the trigger condition remains valid. If you want a trigger that keeps
+firing you have to re-enable it in the sequence.
+
+@subsubheading Second Example
+
+@example
+<sequences>
+    <sequence name="animlight">
+        <fadelight light="l1" red="0" green="0" blue="0"
+            duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="1" green="1" blue="1"
+            duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="1" green="0" blue="0"
+            duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="0" green="1" blue="0"
+            duration="1000" />
+        <delay time="1000" />
+        <fadelight light="l1" red="0" green="0" blue="1"
+            duration="1000" />
+        <delay time="1000" />
+        <enable trigger="animlight" />
+    </sequence>
+</sequences>
+<triggers>
+    <trigger name="animlight">
+        <sectorvis sector="large" />
+        <fire sequence="animlight" />
+    </trigger>
+</triggers>
+@end example
+
+In this example there is a trigger called @samp{animlight} that fires as
+soon as the sector named @samp{large} is visible. Here is what happens
+as soon as the condition of the trigger (in this case @samp{sectorvis})
+is true:
+
+@enumerate 0
+@item
+First the firing of the trigger will cause the trigger itself to be
+disabled. This is to avoid the trigger firing again next frame.
+@item
+Then the @samp{animlight} sequence will be executed. What this basically
+means is that all operations of that sequence are scheduled in the engine
+sequence manager at the appropriate times relative to the current time.
+The @samp{delay} operation in the sequence is responsible for tagging
+every operation with the specified time. So in this particular example six
+operations will be scheduled: five @samp{fadelight} operations (of which
+one is scheduled to execute immediatelly) and one @samp{enable} operation.
+@item
+The first operation that is executed is @samp{fadelight}. This operation
+will fade the light color of the light named @samp{l1} from whatever
+color it has now to black. @samp{l1} must be a pseudo-dynamic light for
+this to work.
+@item
+One second later (due to the @samp{delay}) the second @samp{fadelight}
+gets executed. And so on.
+@item
+Finally the @samp{enable} operation will execute which means that the
+@samp{animlight} trigger is enabled again. If the @samp{large} sector
+is still visible this will cause the trigger to fire immediatelly again.
+@end enumerate
+
+It is important to note that the @samp{duration} parameter that is given
+in some of the operations does NOT imply that the next operation will
+execute after that operation has finished. The @samp{duration} parameter
+has no effect on the internal relative time that is maintained for the
+sequence operations. To influence that you must use @samp{delay}.
+
+@subsubheading Last Example: Using Parameters
+
+If you want to use the same sequence for different lights you can
+use parameters like in the following example:
+
+@example
+<sequences>
+    <sequence name="animlight">
+        <args>
+            <arg name="l" />
+            <arg name="trig" />
+        </args>
+        <fadelight light_par="l" red="0" green="0" blue="0"
+	    duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="1" green="1" blue="1"
+	    duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="1" green="0" blue="0"
+	    duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="0" green="1" blue="0"
+	    duration="1000" />
+        <delay time="1000" />
+        <fadelight light_par="l" red="0" green="0" blue="1"
+	    duration="1000" />
+        <delay time="1000" />
+        <enable trigger_par="trig" />
+    </sequence>
+</sequences>
+<triggers>
+    <trigger name="animlight_l1">
+        <sectorvis sector="large" />
+        <fire sequence="animlight">
+            <light name="l" light="l1" />
+            <light name="trig" light="animlight_l1" />
+        </fire>
+    </trigger>
+    <trigger name="animlight_l2">
+        <sectorvis sector="large" />
+        <fire sequence="animlight">
+            <light name="l" light="l2" />
+            <light name="trig" light="animlight_l2" />
+        </fire>
+    </trigger>
+</triggers>
+@end example
+
+Here you see how the same sequence (@samp{animlight}) is used by
+two different triggers for two different lights. It is not only the
+light that has to be given as a parameter but also the trigger that
+needs to be enabled again. That's why two parameters are used.
+
+A lot more is possible here. I will give a short summary of all commands
+(that are not operations) that are supported in sequences here:
+
+@table @code
+@item args
+Use this to enumerate all arguments to this sequence. You
+only have to specify the name of the arguments here.
+
+@item delay
+Increase the relative time for following operations. The
+relative time starts at 0 in the beginning of the sequence. Using @samp{delay}
+you can increase relative time. If you don't use @samp{delay} between two
+consecutive operations then they will execute at the same time. You can
+use @samp{delay} with the @samp{time} parameter in which case a constant
+amount will be added. Or you can use @samp{delay} with the @samp{min} and
+@samp{max} parameters in which case a random amount between the two given
+values will be added. This amount is truely random in the sense that it will
+be reevaluated every time the sequence fires.
+
+@end table
+
+@subsubheading Supported Operations
+
+Here is a list of all operations that you can use in a sequence. Note that
+every operation is tagged with a relative time (relative to the start
+of the sequence). If you want to use a parameter for an operation that
+uses an argument to the sequence then you have to add @samp{_par} to the
+parameter name like this: @samp{light_par}.
+
+@table @code
+@item run
+This operation will run the given sequence. Parameter is
+@samp{sequence}.
+
+@item move
+Move the specified object from the current position to the
+specified position in the given time (duration). Parameters are
+@samp{mesh}, @samp{duration}, @samp{x}, @samp{y}, and @samp{z}.
+
+@item rotate
+Rotate the specified object from the current orientation
+to the new orientation in the given time (duration). Parameters are
+@samp{mesh} and @samp{duration}. As children you can specify rotation
+matrix and vector using @samp{rotx}, @samp{roty}, @samp{rotz}, and
+@samp{v}.
+
+@item material
+Change the material on some object. Parameters are
+@samp{mesh}, @samp{material}, and optionally a @samp{polygon} parameter
+if you only want to change the material for one polygon.
+
+@item fadecolor
+Fade the color of a mesh from the current value to the
+new value. This only works on some types of meshes. Parameters are
+@samp{mesh}, @samp{red}, @samp{green}, @samp{blue}, and @samp{duration}.
+
+@item setcolor
+Set the color of a mesh. This only works on some types of
+meshes. Parameters are @samp{mesh}, @samp{red}, @samp{green}, and @samp{blue}.
+
+@item fadelight
+Fade the color of a light from the current value to the
+new value. Parameters are
+@samp{light}, @samp{red}, @samp{green}, @samp{blue}, and @samp{duration}.
+
+@item setlight
+Set the color of a light.
+Parameters are @samp{light}, @samp{red}, @samp{green}, and @samp{blue}.
+
+@item fadeambient
+Fade the color of a dynamic ambient from the current value
+to the new value. Parameters are
+@samp{sector}, @samp{red}, @samp{green}, @samp{blue}, and @samp{duration}.
+
+@item setambient
+Set the color of dynamic ambient.
+Parameters are @samp{sector}, @samp{red}, @samp{green}, and @samp{blue}.
+
+@item fadefog
+Fade the color and density of fog from the current value
+to the new value. Parameters are
+@samp{sector}, @samp{red}, @samp{green}, @samp{blue}, @samp{density},
+and @samp{duration}.
+
+@item setfog
+Set the color and density of fog.
+Parameters are @samp{sector}, @samp{red}, @samp{green}, @samp{blue},
+and @samp{density}.
+
+@item enable
+Enable the given trigger. Parameter is @samp{trigger}.
+
+@item disable
+Disable the given trigger. Parameter is @samp{trigger}.
+
+@item check
+Enable checking of trigger state every @samp{delay} milliseconds
+(or disable if 0). Use this in combination with @samp{test} below. Parameters
+are @samp{trigger} and @samp{delay}.
+
+@item test
+Test the stated of the given trigger and execute the right
+sequence depending on the result. For this to work you should use @samp{check}
+to enable testing of the trigger at regular times. Parameters are
+@samp{trigger}, @samp{truesequence}, and @samp{falsesequence}. Both
+@samp{truesequence} and @samp{falsesequence} are optional. Warning! This
+operation does not cause the current sequence to stop. All operations that
+follow this test operation will still execute at their dedicated times
+regardless of the outcome of this test!
+
+@item setvar
+Set a shared variable to some value. The only required parameter is @samp{var}
+which is the name of the variable you want to set. Then there are various
+other parameters that you can use to set the variable:
+@itemize
+@item
+@samp{value}: set the variable to the given floating point value.
+@item
+@samp{add}: add the given floating point value to the variable.
+@item
+@samp{value_var}: set the variable to the value in the given other variable.
+The other variable doesn't have to be a float.
+@item
+@samp{add_var}: add the other variable to this variable.
+@item
+@samp{x}, @samp{y}, @samp{z}: set the variable to the given vector.
+@item
+@samp{red}, @samp{green}, @samp{blue}: set the variable to the given color.
+@end itemize
+
+@end table
+
+@subsubheading Supported Conditions
+
+Here is a list of all conditions that are supported in a trigger:
+
+@table @code
+@item onclick
+True when the given mesh is clicked on. Parameter is
+@samp{mesh}.
+
+@item lightvalue
+True when the given light has a color which satisfies
+some condition. Parameters are @samp{light}, @samp{operator}, @samp{red},
+@samp{green}, and @samp{blue}. @samp{operator} can be @samp{less}
+or @samp{greater}.
+
+@item manual
+For manual trigger (from application code). No parameters.
+
+@item sectorvis
+True when the sector is visible. Parameter is @samp{sector}.
+There are also some optional children that this trigger supports:
+@itemize
+@item
+@samp{insideonly}: only trigger when camera is inside the sector as opposed
+to the sector being visible.
+@item
+@samp{box}: only trigger if camera is in box. This has two children:
+a @samp{min} and a @samp{max} vector.
+@item
+@samp{sphere}: only trigger if camera is in the sphere. Parameters are
+@samp{x}, @samp{y}, @samp{z}, and @samp{radius}.
+@end itemize
+
+@item fire
+This is not a trigger. It just indicates the sequence
+that will be executed when the trigger is valid. Parameters are @samp{sequence}
+and @samp{delay} (optional). In addition you can also specify parameters
+for the called sequence.
+
+@item disable
+Normally a trigger is enabled by default. With this keyword
+you can disable the trigger initially and let some other sequence (or the
+application) enable the trigger.
+
+@end table

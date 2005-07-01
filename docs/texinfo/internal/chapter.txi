@@ -1,4 +1,4 @@
-@node Internals, Contributing, Plug-In Drivers, Top
+@node Internals, Contributing, Working with Engine Content, Top
 @chapter Internal Project Structure
 @cindex Internal Structure
 
@@ -10,7 +10,9 @@ merely curious about the internal workings of the project.
 @menu
 * Platform Details:: Platform-Specific Details
 * Threads in CS:: Threads in Crystal Space
+* Engine Internal Workings:: The Engine Internals Explained
 @end menu
 
 @importss{internal,platform,details.txi}
 @imports{internal,threads.txi}
+@imports{internal,engine.txi}

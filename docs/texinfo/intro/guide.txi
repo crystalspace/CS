@@ -13,7 +13,7 @@ One of the most useful sections for creating your own project is of
 course the tutorial section (@pxref{Tutorials}). Here you will find
 tutorials which can help you to write your own Crystal Space game along
 with the very important introductory tutorial
-(@pxref{Tutorial Introduction}). You should certainly read this if you want to
+(@pxref{The Basics}). You should certainly read this if you want to
 have a good idea on some of the basic concepts of Crystal Space.
 
 Additionally, the tutorial section contains the @sc{howto} section
@@ -26,7 +26,7 @@ explain how you can set up your own application outside of the Crystal Space
 application tree, one for Unix or Unix-like environments (such as Msys/Mingw or
 Cygwin) and another for Microsoft Visual C++.
 
-The section of the manual that talks about the engine (@pxref{csEngine})
+The section of the manual that talks about the engine (@pxref{Engine})
 is very important. If you want to know how the 3D engine works
 internally (which is important if you want to build your own 3D worlds)
 then you should read the section explaining the world components
@@ -35,7 +35,7 @@ then you should read the section explaining the world components
 priorities (@pxref{HOWTO Render Priorities}) which should assist greatly
 in that area. 
 
-The section about the Map File Parser (@pxref{csParser}) is useful if
+The section about the Map File Parser (@pxref{Map Loader}) is useful if
 you want to create your map files manually.
 
 Reading the mesh object section (@pxref{MeshObject}) is also recommended.

@@ -1,0 +1,49 @@
+@c -*-texinfo-*-
+@node HOWTO Mesh LightAnim, HOWTO Mesh Movement, HOWTO, HOWTO
+@subsection Mesh Lighting and Animation
+@cindex mesh lighting
+@cindex mesh animation
+@cindex @code{iMeshWrapper}
+
+This section describes how to do animation for meshes and how they can
+get lit by surrounding lights.
+
+@subsubheading Animating Meshes
+
+Not all meshes support animation. All particle systems and 3D sprites
+have animation.
+
+The engine is smart enough to only animate mesh objects that are actually
+visible on screen.
+
+@subsubheading Lighting Meshes
+
+Almost all meshes support lighting. Mesh things are treated
+specially as they have support for lightmaps and dynamic lighting using
+dynamic lightmaps. So this discussion is not for them. But for all other
+meshes the system below applies. Note that for many meshes lighting can
+be disabled (usually by calling @code{SetLighting(false)} on the
+state of the mesh object).
+
+Note that objects that don't use lightmaps are normally updated automatically
+whenever needed. The engine will track when lights are added, removed, or
+changed (i.e. moving or color change), and the engine will track when the
+object itself moves. There is one case where this can fail and that's when
+a light affects an object indirectly through some portal and the object
+containing the portal changes (i.e. moves or otherwise). In this case the
+engine will not notice the lighting change on the mesh. If you suffer from
+this rare case then you can force the set of lights to be recalculated
+all the time (when the object is visible) by using
+@code{iMeshWrapper::SetLightingUpdate()} and setting the
+@code{CS_LIGHTINGUPDATE_ALWAYSUPDATE} flag. Note that using the same function
+you can also control the maximum number of lights that can affect your
+mesh (default is 8).
+
+@subsubheading Mesh Include Files
+
+The include files useful for this section are:
+
+@example
+#include <iengine/mesh.h>
+#include <iengine/engine.h>
+@end example

@@ -1,0 +1,122 @@
+@c -*-texinfo-*-
+@node Rendering Loop, Dynamic Worlds, Visibility Culling, Engine
+@subsection Rendering Loop
+@cindex Rendering Loop
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+Here is a short run-through of the main rendering loop.  This document is not an
+explanation of portal technology.  It just explains how the main rendering
+loop in Crystal Space works so that you can have a quick idea of where you
+have to go to see a particular part of the algorithm work.  This is a rather
+technical document and not intended for people who are only interested in
+using Crystal Space in their own projects.  It is intended for people who want
+to know how Crystal Space works internally.
+
+To understand this you should know how portals are used in Crystal Space.  You
+should also read the tutorial (@pxref{Tutorial Simple}) as this explains the
+basics for using Crystal Space.  This document is based upon the
+@file{simple} application (@file{CS/apps/tutorial/simple1/}) because this
+discussion looks a lot like a tutorial.
+
+First we start in @file{apps/tutorial/simple1/simple1.cpp}.  In the
+@code{main()} function we initialize our engine.  This is an instance of the
+plugin @samp{iEngine} which actually represents the engine.  I will not
+explain how all the initialization works.  This is explained in the tutorial.
+But I will go straight to @code{iEngine::Draw()} which is called indirectly
+from within @code{Simple::NextFrame()}.  It is called indirectly because first
+we call @code{iView::Draw()} which then calls @code{iEngine::Draw()}.
+
+@subsubheading World Rendering (@code{iEngine::Draw()})
+
+The method @code{iEngine::Draw()} is located in
+@file{CS/plugins/engine/3d/engine.cpp}.
+
+@code{iEngine::Draw()} first sets up the initial @samp{iRenderView}
+structure.  This structure is defined in
+@file{CS/include/iengine/rview.h} and is the main structure which is
+used throughout the entire rendering process.  It collects all data that
+is required for rendering the recursive portal structure.
+
+Basically, it contains the following information:
+
+@table @code
+@item view
+This is the current clipper.  A clipper is a 2D polygon which defines what is
+visible.  Every object is clipped to the view first.  Every time we go through
+a portal the view is modified.
+
+@item g3d
+@itemx g2d
+These are pointers to our 3D and 2D graphics subsystems.
+
+@item clip_plane
+This is a special plane.  If @samp{do_clip_plane} is used then we clip all
+geometry in 3D to @samp{clip_plane}.  This is normally not used except in
+special cases where we have portals that arrive in the middle of a sector.  In
+that case the portal will be used as an extra clipping plane because we don't
+want to render everything that is behind the arrival plane of the portal.
+@end table
+
+Another important thing is that @samp{iRenderView} is actually a subclass of
+@samp{iCamera} (@file{CS/include/iengine/camera.h}) so all camera
+functionality is present as well.
+
+To set up the initial @samp{iRenderView} structure @code{iEngine::Draw()}
+creates a new instance based upon the given camera.
+
+After this @code{iEngine::Draw()} gets the current sector from the camera and
+calls @code{iSector::Draw()} (@file{CS/plugins/engine/3d/sector.cpp}).  This
+will essentially draw the whole screen as discussed below.
+
+After doing this (now that the screen is fully updated) we optionally draw
+halos.  Halos are drawn on top of everything else since they are an effect in
+the eyes.
+
+@subsubheading Sector Rendering (@code{iSector::Draw()})
+
+This method @code{iSector::Draw()} is located in
+@file{CS/plugins/engine/3d/sector.cpp}.
+
+@code{iSector::Draw()} is responsible for rendering everything in the current
+sector. Before it does that it will ask the current visibility culler
+(@samp{frustvis} or @samp{dynavis}) what objects are likely to be visible
+or not. It will then render all visible objects sorted by render priority
+(@pxref{HOWTO Render Priorities}) and using the z-buffer mode that is
+associated with every object. It is up to the map designer to make sure
+that the objects in their render priority and z-buffer mode will actually
+cause the sector to be rendered ok.
+
+Every object that is rendered will get the current camera transformation
+so it can correctly transform its coordinates from world to camera space:
+(0,0,0) is the camera pointer, (1,0,0) is one to the right, (0,1,0) is one
+unit above the camera, and (0,0,1) is one unit in front of the camera.
+
+Every object also gets the current movable (@code{iMovable}) which indicates
+where the object currently is in the world. The transform created from
+the camera and the movable can be used to transform from object space
+to camera space. Note that some objects leave this transformation up to
+the 3D renderer which is good because that means hardware accelerated
+transforms can be used.
+
+Every mesh object is responsible for drawing itself (@pxref{MeshObject}).
+The engine decides when to render an object, the object decides on how
+to render itself. Finally the 3D renderer will process the actual rendering
+operations done by the mesh object.
+
+The @samp{thing} mesh object type supports portals. When such a thing containing
+a portal is rendered the destination sector will be rendered recursively.
+This means that rendering of the current sector will be temporarily
+suspended while first the destination sector through that portal is rendered.
+Going through a portal results in the current @samp{iRenderView}
+instance to get a new clipper (a smaller clipper usually). Objects can use
+that clipper to decide if they want to be rendered or not. In some special
+cases a portal can also transform space (like a mirror). In that case the
+world@result{}camera transformation will also be modified in the current
+@code{iRenderView}.
+
+When a sector has finished rendering we conclude by optionally fogging the
+current sector if this is needed.
+

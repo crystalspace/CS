@@ -1,0 +1,18 @@
+@c -*-texinfo-*-
+@node Tutorials, SCF Chapter, Plug-In Overview, Using Crystal Space
+@section Tutorials
+@cindex Tutorials
+
+This chapter contains various tutorial to help you quickly familiarize
+yourself with the various aspects of the Crystal Space development
+environment.
+
+@menu
+* Tutorial Simple:: Simple Tutorial 1
+* Tutorial Simple 2:: Simple Tutorial 2: Sprites
+* Tutorial Simple Map:: Simple Tutorial 3: Map Loading
+@end menu
+
+@importss{usingcs,tutorials,simple.txi}
+@importss{usingcs,tutorials,simple2.txi}
+@importss{usingcs,tutorials,simpmap.txi}

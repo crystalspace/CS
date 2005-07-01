@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Jul-2005
+	- Jorrit did the first phase of the new documentation. All documentation
+	  has been moved to a new location. Note that there is no new
+	  documentation yet. Everything is still there. Just at other
+	  spots.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.
@@ -15,7 +20,6 @@ chronological order.
           resolution issues.
         - Christopher added a Raw() getter to csArray in order to get a raw
           buffer which can be passed to the renderer.
-
 29-Jun-2005
 	- Eric Sunshine applied a patch to texi2html.pl which allows it to work
 	  on Windows by avoding dependence upon the Unix-specific external

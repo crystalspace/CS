@@ -1,0 +1,85 @@
+@node Config System, Config Graphics, Specific Options, Specific Options
+@subsubsection System Configuration
+@cindex Configuration, System
+
+This section describes how the base system can be configured via a
+configuration file.  The default values are stored in
+@file{CS/data/config/system.cfg}, except the list of default @sc{scf} classes
+to instantiate, for which no default exists.  Typically, the list of default
+requested classes will appear in an application's own configuration file.
+
+@subsubheading List of @sc{scf} Classes
+
+The most important part of the system configuration is the list of @sc{scf}
+classes to instantiate by default.  A class is instantiated with the following
+line:
+
+@example
+System.Plugins.InterfaceName = ClassName
+@end example
+
+@samp{System.Plugins.} is obligatory and tells the system to instantiate the
+class at startup.  The @samp{InterfaceName} specifies the name of the abstract
+@sc{scf} interface which this module is expected to implement.  For example the
+interface name @samp{iGraphics3D} means that this plug-in is used for 3D
+rendering.  Note that it is not possible to load more than one module with the
+same functionality identifier.
+
+Finally, @samp{ClassName} determines which @sc{scf} class to instantiate.  The
+class you mention here must be designed for the purpose for which you try to
+use it.  In other words, it must implement the interface specified with
+@samp{InterfaceName} (it may also implement additional interfaces).  For
+example, if you load a sound driver with the @samp{iGraphics3D}, the
+application will not be able to instantiate the driver because it does not
+implement that interface.
+
+Note that some modules depend on others. If module A depends on module B,
+then you must first load B, then A. If you don't do this then module A will
+usually fail to initialize.
+
+Here is an example of a line from the configuration file:
+
+@example
+System.Plugins.iGraphics3D = crystalspace.graphics3d.opengl
+@end example
+
+This line instantiates the @sc{scf} class @samp{crystalspace.graphics3d.opengl}
+(the OpenGL graphics driver) which implements the abstract @samp{iGraphics3D}
+interface, and makes the instantiated object available via shared object
+registry.
+
+The interface name mentioned above is exactly the name of the C++ abstract
+interface which modules implement.  Some of the common ones which you will see
+or use in configuration files are listed below.
+
+@table @code
+@item iVFS
+The virtual file system.  Presently, there is only one @sc{vfs} implementation,
+and it is named @samp{crystalspace.kernel.vfs}.
+
+@item iGraphics3D
+A 3D renderer.  Some possible values include
+
+@table @code
+@item crystalspace.graphics3d.software
+Uses the platform-specific 2D canvas to perform 3D graphics operations.
+
+@item crystalspace.graphics3d.software.offscreen
+This is a variant of the software renderer that renders to a buffer in memory,
+not to the screen.
+
+@item crystalspace.graphics3d.opengl
+Uses OpenGL for 3D output, and by this takes advantage of hardware
+acceleration. Requires installed OpenGL run-time libraries.
+@end table
+@end table
+
+@subsubheading Other Low-Level Configuration Options
+
+Apart from the list of plug-in modules, the following keys are recognized:
+
+@table @code
+@item System.UserConfig = true
+Specifies whether or not user-specific configuration information should be
+used and maintained. @xref{Config PerUser}.
+@end table

@@ -1,0 +1,162 @@
+@c -*-texinfo-*-
+@node HOWTO CS Project, HOWTO Creating External MSVC 6 Application, Making Own Projects, Making Own Projects
+@subsection Creating an External Crystal Space Application
+@cindex External Crystal Space Application
+
+This section describes how to use the Crystal Space development kit for your
+own application.  Two methods are described: (1) using the Crystal Space
+Jam-based build system, (2) using a traditional Makefile-based build system.
+
+@subsubheading External Application Requirements
+
+For these techniques to work you need to have a sufficiently Unix-like
+environment.  The environments provided by Linux, MacOS/X, Msys/Mingw, and
+Cygwin are all acceptable.
+
+If you installed Crystal Space in a non-standard location, then you probably
+will also need to set the @samp{CRYSTAL} environment variable to point at the
+the location where the @sc{sdk} was installed.  For instance, if you specified
+@samp{--prefix=/site/sdk} when configuring Crystal Space, then you will need to
+set @samp{CRYSTAL} to @file{/site/sdk}.  Using the Bourne shell or compatible
+(such as Bash), for instance, you can do this with the following commands:
+
+@example
+CRYSTAL=/site/sdk
+export CRYSTAL
+@end example
+
+From a C-shell or compatible (such as T-csh), you can use:
+
+@example
+setenv CRYSTAL /site/sdk
+@end example
+
+@subsubheading The @file{cs-config} Script
+@cindex @file{cs-config}
+
+When you build and install Crystal Space, a script named @file{cs-config} is
+installed along with the rest of the package.  This script provides access to
+bits of information which can be fed to the development tools in order to
+incorporate Crystal Space into your project.  For instance, if you invoke
+@file{cs-config} with the @samp{--cxxflags} argument, it will return Crystal
+Space-specific C++ compiler switches with which you should invoke the C++
+compiler.  Likewise, the @samp{--libs} argument will return the Crystal
+Space-specific linker switches and libraries with which you should link your
+program.
+
+For best results, be sure that the installation location of @file{cs-config} is
+mentioned by your @samp{PATH} environment variable. The default location,
+@file{/usr/local/bin}, normally is mentioned by @samp{PATH}, so you likely will
+not have to do anything special to make @file{cs-config} available.
+
+@subsubheading Jamtemplate
+@cindex Jamtemplate
+
+The Jamtemplate utility sets up a skeleton project on your behalf which is
+based upon Autoconf and the Jam build system featured in Crystal Space.  By
+utilizing these tools, your project gets many advanced build features for free.
+For instance, on MacOS/X, it will correctly create the Cocoa wrapper
+(@file{.app}) for an application; on some platforms it knows how to embed
+plugin meta-information directly into the plugin module; and understands many
+of the familiar build targets, such as @samp{all}, @samp{clean},
+@samp{distclean}, @samp{install}, etc.  The Jam system knows how to
+build applications, plugin modules, and libraries on all platforms supported by
+Crystal Space.  The generated project skeleton even features support for
+generating Microsoft Visual C++ project files for your application
+automatically (via the @samp{jam msvcgen} target).
+
+Jamtemplate is quite easy to use.  After setting up your @samp{CRYSTAL}
+environment variable, go to the directory under which you would like to create
+the new project, run the @samp{createproject.sh} script, and follow the
+instructions which it presents.  If you have installed the Crystal Space
+@sc{sdk} (via @samp{make install} or @samp{jam install}), then the script will
+reside at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/build/jamtemplate/createproject.sh}
+
+@noindent
+where @code{$@{prefix@}} is the package installation location (typically,
+@file{/usr/local}). Alternately, you may run the script directly from the
+Crystal Space source tree, where it resides at:
+
+@noindent
+@code{CS/scripts/jamtemplate/createproject.sh}
+
+@subsubheading Makefile
+@cindex Makefile
+
+If you prefer to have your project utilize a traditional Makefile, rather than
+being based upon the Crystal Space Jam build system, then follow these
+intructions.  Note, however, that the skeleton Makefile-based build system
+created by these instructions is bare-bones; it does not feature the fancy
+bells and whistles available with the Jam build system.
+
+To begin, locate the files @file{Makefile.template} and @file{appwrap.sh}.  If
+you have installed the Crystal Space @sc{sdk} (via @samp{make install} or
+@samp{jam install}), then thes files will reside at:
+
+@noindent
+@code{$@{prefix@}/share/build/maketemplate/Makefile.template}@*
+@code{$@{prefix@}/share/build/maketemplate/appwrap.sh}
+
+@noindent
+where @code{$@{prefix@}} is the package installation location (typically,
+@file{/usr/local}). Alternately, you may access the files directly from the
+Crystal Space source tree, where they resides at:
+
+@noindent
+@code{CS/scripts/maketemplate/Makefile.template}@*
+@code{CS/scripts/maketemplate/appwrap.sh}
+
+@noindent
+Copy these files to the directory where your project is located and rename
+@file{Makefile.template} to @file{Makefile}.  The @file{appwrap.sh} script
+creates Cocoa application wrappers on MacOS/X.  You may omit this file if you
+do not plan to support MacOS/X.
+
+You need to edit @file{Makefile} for your own project.  This template makefile
+is capable of building an executable program or a plugin module.  It is
+recommended that you change at least the following variables:
+
+@itemize
+@item
+@samp{TARGET_TYPE} should be set to either @samp{exe} or @samp{plugin},
+depending upon whether your project is an executable program or a plugin
+module.
+
+@item
+@samp{TARGET_NAME} should be the base name of your executable or plugin module.
+The file extension (@file{.exe}, @file{.dll}, @file{.so}, etc.) is appended
+automatically, so do not add the suffix yourself.
+
+@item
+@samp{SRC} should list all the source files in your project which comprise the
+program or plugin module.
+
+@item
+@samp{LINKFLAGS} should be modified to list all the Crystal Space libraries
+that you want to use.  Typically, you need only the @samp{crystalspace}
+library, though plugin modules which want to inherit some common functionality
+from pre-written classes might also need to link with
+@samp{crystalspace_directx}, @samp{crystalspace_macosx}, 
+@samp{crystalspace_opengl}, and/or @samp{crystalspace_windows}.
+
+@item
+@samp{VERSION} should indicate your product's version number (for example,
+1.0).
+
+@item
+@samp{RELEASE_DATE} should indicate the date of your product's release.
+@end itemize
+
+The following targets are supported by this makefile:
+
+@itemize
+@item
+@samp{all}: Builds the application or plugin module.
+@item
+@samp{clean}: Removes object files and other detritus.
+@item
+@samp{depend}: Calculates dependency information.
+@end itemize

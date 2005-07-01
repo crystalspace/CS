@@ -1,0 +1,350 @@
+@c -*-texinfo-*-
+@node Tutorial Simple Map, , Tutorial Simple 2, Tutorials
+@subsection Simple Tutorial 3: Map Loading
+@cindex Tutorial, Simple
+@cindex Simple Tutorial
+
+This tutorial continues on tutorial one. Here we will learn how to
+load a map from a file instead of creating the geometry
+programmatically.
+
+@menu
+* Simple Base Code:: Minimal Base Code
+* Simple Loading The Map:: Loading The Map
+* Simple Locating the Camera:: Locating the Camera
+@end menu
+
+@node Simple Base Code, Simple Loading The Map, Tutorial Simple Map, Tutorial Simple Map
+@subsubsection Minimal Base Code
+
+To start, we first take the code of tutorial one
+and remove the code that creates geometry and initializes
+the default camera position. In addition we add a new @code{LoadMap()}
+function. This results in the following for @file{simpmap.h}:
+
+@example
+#ifndef __SIMPMAP_H__
+#define __SIMPMAP_H__
+
+#include <crystalspace.h>
+
+class Simple
+  : public csApplicationFramework, public csBaseEventHandler
+@{
+private:
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
+  csRef<iView> view;
+  iSector* room;
+  csVector3 pos;
+  float rotX, rotY;
+ 
+  bool OnKeyboard (iEvent&);
+  void ProcessFrame ();
+  void FinishFrame ();
+  bool LoadMap ();
+
+public:
+  Simple (iObjectRegistry* object_reg);
+  ~Simple ();
+
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+  bool Application ();
+@};
+
+#endif // __SIMPMAP_H__
+@end example
+
+Similarly, for @file{simpmap.cpp}:
+
+@example
+#include "simpmap.h"
+
+CS_IMPLEMENT_APPLICATION
+
+Simple::Simple (iObjectRegistry* object_reg)
+@{
+  SetApplicationName ("CrystalSpace.SimpleMap");
+@}
+
+Simple::~Simple ()
+@{
+@}
+
+void Simple::ProcessFrame ()
+@{
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+
+  iCamera* c = view->GetCamera();
+
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  @{
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  @}
+  else
+  @{
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis and up and downarrows cause the camera to
+    // go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  @}
+
+  // We now assign a new rotation transformation to the camera.
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
+
+  // Tell 3D driver we're going to display 3D things.
+  if (!g3d->BeginDraw(
+    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+    return;
+
+  // Tell the camera to render into the frame buffer.
+  view->Draw ();
+@}
+
+void Simple::FinishFrame ()
+@{
+  g3d->FinishDraw ();
+  g3d->Print (0);
+@}
+
+bool Simple::OnKeyboard(iEvent& ev)
+@{
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  @{
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    @{
+      csRef<iEventQueue> q = 
+        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+    @}
+  @}
+  return false;
+@}
+
+bool Simple::Initialize ()
+@{
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  if (!RegisterQueue(GetObjectRegistry()))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+@}
+
+bool Simple::Application()
+@{
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  view = csPtr<iView> (new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  Run();
+
+  return true;
+@}
+
+/*---------------*
+ * Main function
+ *---------------*/
+int main (int argc, char* argv[])
+@{
+  return csApplicationRunner<Simple>::Run (argc, argv);
+@}
+@end example
+
+One important note in the code above: we removed the following line:
+
+@example
+engine->SetLightingCacheMode (0);
+@end example
+
+That's because, when we are loading from map file, we actually want
+the lighting information to be read from the cache (if present).
+We do so because relighting a map can be a time-consuming process.
+
+@node Simple Loading The Map, Simple Locating the Camera, Simple Base Code, Tutorial Simple Map
+@subsubsection Loading The Map
+@cindex loading a map
+@cindex vfs
+@cindex mount point
+
+Here we add the code to load a map. In this example we will load the
+@samp{flarge} map which is included with Crystal Space.
+
+In the second tutorial we already mentioned @sc{vfs} (@pxref{VFS}). This
+is important in this case too since we are going to load the map from
+the virtual filesystem. To do this we first add the new @code{LoadMap()}
+routine right before the @code{Initialize()} function:
+
+@example
+bool Simple::LoadMap ()
+@{
+  // Set VFS current directory to the level we want to load.
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  VFS->ChDir ("/lev/flarge");
+  // Load the level file which is called 'world'.
+  if (!loader->LoadMapFile ("world"))
+    ReportError("Error couldn't load level!");
+
+  engine->Prepare ();
+
+  return true;
+@}
+@end example
+
+This code first uses @code{iVFS::ChDir()} to set the current
+directory in the virtual file system to @file{/lev/flarge}. In the
+case of @samp{flarge} this @dfn{mount point} exists already in the
+configuration file @file{vfs.cfg}. If this is not the case for your own levels,
+you can either modify @file{vfs.cfg}, provide your own @file{vfs.cfg}, or
+else call @code{iVFS::Mount()}
+to map a physical file path (can be a @sc{zip} archive file as well)
+to a virtual directory.
+
+The call to @code{iLoader::LoadMapFile()} will take the given filename
+(in this case @file{world}) and open it from the current @sc{vfs}
+directory. Then, it will parse that file and create the geometry which
+is specified there.
+
+If loading is successful, then you must call @code{iEngine::Prepare()} to
+make sure that all lightmaps are correctly loaded from the cache
+and other necessary setup work is done (i.e. textures are registered
+and so on).
+
+Additionally, change the last part of @code{Application()} to this:
+
+@example
+bool Simple::Application ()
+@{
+  @dots{}
+
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  if (!LoadMap ()) return false;
+
+  @dots{}
+@}
+@end example
+
+So, first we create our view but haven't set the current sector.
+Instead, we will have @code{LoadMap()} do that based upon the loaded map,
+as shown below.
+
+@node Simple Locating the Camera, , Simple Loading The Map, Tutorial Simple Map
+@subsubsection Locating the Camera
+
+@samp{flarge} contains a number of sectors and various objects, and those
+are now all loaded in memory. However, this is not enough. We also have
+to set the camera to some sector and position in that world. In the
+previous tutorials we simply used the sector that we just created
+and a fixed position in that sector. (Keep in mind that in Crystal
+Space a position in space is always defined as a sector in combination
+with a position.) When loading a map we can't work that way because
+we don't know which sectors are in the map (unless we make an application
+that can only read one map file, but that's not very flexible) and we
+also don't know where we can safely put our camera. In the map files
+it is possible to specify one or more starting positions. We will
+query the engine for such a starting position and initialize our
+view (camera) to that. This happens with the following code which you should
+add after @code{engine->Prepare()} in @code{LoadMap()}:
+
+@example
+  @dots{}
+
+  // Find the starting position in this level.
+  csVector3 pos (0, 0, 0);
+  if (engine->GetCameraPositions ()->GetCount () > 0)
+  @{
+    // There is a valid starting position defined in the level file.
+    iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
+    room = engine->GetSectors ()->FindByName (campos->GetSector ());
+    pos = campos->GetPosition ();
+  @}
+  else
+  @{
+    // We didn't find a valid starting position. So we default
+    // to going to room called 'room' at position (0,0,0).
+    room = engine->GetSectors ()->FindByName ("room");
+  @}
+  if (!room)
+    ReportError("Can't find a valid starting position!");
+
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+
+  return true;
+@}
+@end example
+
+First, we see how many camera positions there were defined in the
+map by using @code{iEngine::GetCameraPositionCount()}. If there are none,
+then the map didn't define a starting position. In that case we will
+assume there is a sector called 'room' and we will start the camera
+at (0,0,0) in that sector. But otherwise we will use the first
+starting position defined in the map.
+
+This is all. After adding this code this application will now load
+the @samp{flarge} map and display it so you can explore this map.

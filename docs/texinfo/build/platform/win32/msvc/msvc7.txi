@@ -169,9 +169,8 @@ The workspace uses a prefix system for naming contained projects:
 @end itemize
 
 The @emph{Libraries} are C++ libraries that you can link into your own
-programs.  Some of these libraries are part of the core of Crystal Space.  You
-can find more information about this in @ref{Facilities}.  Their output are
-@file{.lib} files.
+programs.  Some of these libraries are part of the core of Crystal Space.
+Their output are @file{.lib} files.
 
 The @emph{Plugins} are also programming libraries, but they use a special
 mechanism called @sc{scf} as their interface to your program.  This separates
@@ -179,7 +178,7 @@ their interface from the internals of the library and thus allows dynamic
 linking.  In fact, some of the @emph{Libraries} also use @sc{scf}.  The rule
 for the @sc{msvc} workspace is simple: The @emph{Plugins} are projects that
 build a dynamic library (@file{.dll}).  You can find more information in the
-section of this manual dealing with plug-in modules.  @xref{Plug-In Drivers}.
+section of this manual dealing with plug-in modules.  @xref{SCF Chapter}.
 
 The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.exe} files.

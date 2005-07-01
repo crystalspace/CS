@@ -1,0 +1,81 @@
+@c -*-texinfo-*-
+@node HOWTO Recording Movies, , HOWTO Use custom font, HOWTO
+@subsection Recording Movies
+@cindex movie, video, recording, movierecorder
+
+This section describes how to use the in-game movie recorder.
+
+@subsubheading What is the Movie Recorder Used For?
+
+The movie recorder plugin lets you record a Crystal Space application's video
+output quickly into a NuppelVideo file.  NuppelVideo is a format designed for
+fast recording rather than efficient storage, so typically you would reencode
+the resulting video in DivX or a similar format.
+
+The plugin keeps Crystal Space's virtual clock in sync with the movie's frame
+rate, so you can render very complex scenes slower than real-time and play them
+back later full speed.
+
+Currently this plugin does not handle audio or formats other than NuppelVideo,
+but both of these are planned for the future.
+
+@subsubheading Preparing Up the Movie Recorder
+
+The movie recorder plugin (probably @file{movierecorder.so} or
+@file{movierecorder.dll}) should be compiled as part of a full Crystal Space
+build.
+
+You can also use the movie recorder with an existing binary without any
+recompilation.  Just place the movie recorder plugin in the application's
+library directory.
+
+Like the BugPlug plugin, the movie recorder can be loaded and manipulated
+explicitly by an application or it can be loaded transparently into any
+application automatically.  To load it transparently for all applications, you
+add a setting to your user-specific, application-neutral configuration
+(@pxref{Config Domains}).  To do this, in the @samp{CrystalSpace.Global}
+configuration domain, give the setting @samp{System.Plugins.iMovieRecorder} the
+value @samp{crystalspace.utilities.movierecorder}.  To find out how to do this
+for your particular platform, see the platform-specific intructions for
+manipulating configuration information (@pxref{Config PerUser}).  The movie
+recorder plugin should now load automatically when your application
+initializes.  Last, but not least, you can use the command line argument
+@samp{--plugin=crystalspace.utilities.movierecorder} to enable the recorder on
+a per-application basis.
+
+@subsubheading Using the Movie Recorder
+
+Like the BugPlug plugin's screenshot facility, the movie recorder creates a new
+numbered file when you press the recording hotkey.  By default, this key is
+@kbd{@key{ALT}-r}.  If you can see notice messages overlaid on your application
+or in the terminal you are running it from, you should see a ``Video recorder
+started'' message indicating the name of the file being recorded to.  Press the
+record hotkey again to stop the recording.
+
+During recording, you can use the pause hotkey to temporarily suspend
+recording.  By default this is @kbd{@key{ALT}-p}.  Press it again to resume
+recording to the same file.
+
+@subsubheading Processing the Resulting Movies
+
+You can view the resulting NuppelVideo files using @dfn{mplayer}, an open
+source and cross-platform media player.  For re-distribution, you should use a
+format with a better compression ratio, like DivX.  mplayer's counterpart,
+@dfn{mencoder}, handles this task nicely:
+
+@example
+mencoder crystal000.nuv -o my_movie.avi -ovc lavc \
+    -lavcopts vcodec=mpeg4:vbitrate=1600
+@end example
+
+@noindent
+This creates an @sc{avi} file using FFmpeg's @dfn{mpeg4} codec.  See mencoder's
+manpage for more information.
+
+@subsubheading Configuring the Movie Recorder
+
+The movie recorder reads its configuration from
+@file{data/config/movierecorder.cfg} if it exists.  This lets you change the
+recording and pause hotkeys, the filenames, and compression settings.  See the
+comments in the default @file{movierecorder.cfg} for a description of each
+item.

@@ -1,0 +1,286 @@
+@c -*-texinfo-*-
+@node Portal Engine, Lighting, World Components, Engine
+@subsection Portal Engine
+@cindex Portal Engine
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+The world in Crystal Space is defined with @dfn{Sectors}. A sector is
+an area of space that itself does not represent geometry but can
+contain objects that represent geometry. In this discussion we will limit
+ourselves to mesh objects of the @dfn{Thing} type since things implement
+@dfn{portals}.
+
+A sector is in principle an infinite area of space. But usually the
+sector has logical bounds which are made from some mesh object. In this
+discussion we will use the thing mesh object to make sector boundaries.
+
+You can define multiple sectors and connect them together by using
+portals in one or more of the things.
+
+Assume that you want to define a large room with a pillar in the middle of the
+room.  You can do this two ways; either with four sectors, or with one sector.
+First let us define it with four sectors.
+
+@noindent
+As seen from above, the sectors would look something like this:
+
+@picturess{usingcs,engine,portal1}
+
+@noindent
+Sector S1 is composed of eight polygons (including the top and bottom polygon
+for its roof and floor, as well as the three polygons at the east side).  The
+two polygons adjacent to sectors S2 and S4 are portals to the respective
+sectors.  All the other polygons are texture mapped as normal.
+
+@noindent
+Sectors S2 and S4 have six polygons each.  Their west polygons are again
+portals to sector S1.  Their east polygons are portals to sector S3.
+
+@noindent
+Sector S3 is defined as is sector S1.
+
+Another way to define this room using just the same four sectors could be done
+as follows:
+
+@picturess{usingcs,engine,portal2}
+
+@noindent
+To the person standing in this room this makes no difference at all.
+
+There are many other ways to define this room using the four sectors.  One
+important thing to note is that four is the minimum number of Sectors that you
+need to define this room if you want to render the polygons using Z-fill
+mode (this means that the Z-buffer is updated but not tested). If you want
+to be able to render using Z-fill mode a sector has to be @dfn{convex}.
+
+An easier way to define this room is by using only one Sector and one Thing
+to define the pillar, as shown below.
+
+@picturess{usingcs,engine,thing}
+
+Again this makes no difference for the person standing in this room.  There
+is, however, a difference in performance.  If the pillar is very large and
+wide the first approach will probably be faster.  If the pillar is very thin
+it is more efficient to use only one sector with one thing.  The reason (as
+will be made clear later) is that the pillar Thing has to be rendered
+using Z-use mode (i.e. full use of the Z-buffer). In this scenario there
+is a lot more overdraw compared to the four sector approach (sidenote:
+on fast 3D cards this overdraw actually does not matter so this approach
+is now considered to be better in all cases).
+
+Using Things like this make it easier to define worlds. If they are small
+enough they will also enhance performance.
+
+With Sectors, Portals, and Things you can describe virtually any world that
+you want.  Note that all polygons of a Thing can be portals, even the floor
+and ceiling polygons.  In fact there is no special attribute for a floor or
+ceiling polygon.  All polygons are equivalent.
+
+@subsubheading Sectors
+@cindex Sectors
+@cindex visibility culler
+
+In this section I will describe Sectors a bit more thoroughly.  As stated
+before sectors represent infinite space. You can fill a sector with geometry
+by using mesh objects (@pxref{MeshObject}).
+
+With a sector there is always an associated visibility culler. Currently
+Crystal Space supports two cullers:
+@itemize
+@item
+@samp{frustvis}: This is the default visibility culler that is used if no
+other is specified. It only does frustum culling. It is the best culler to
+use for simple sectors that don't have a lot of objects or else for sectors
+that are big but where all objects are small. For such sectors it doesn't
+make much sense to try to do more complicated visibility culling so
+frustum cullling (testing if an object is visible in the current view)
+is more than enough.
+@item
+@samp{dynavis}: This is a more advanced visibility culler that does
+frustum culling in addition to trying to avoid rendering objects that
+are obscured by other objects (@pxref{Visibility Culling}). This culler
+is mainly useful when you have big complex sectors with lots of objects
+and when objects have a good chance of occluding (hiding) other objects.
+@end itemize
+
+@subsubheading Things
+@cindex Things
+
+A Thing is one of the basic building blocks to create geometry in
+Crystal Space. A Thing is made from convex polygons.
+
+Things (and other mesh objects for that matter) can be rendered using
+Z-fill or Z-use mode. With Z-fill the previous contents of the Z-buffer
+(where that Thing is rendered) is just overwritten. With Z-use the
+previous contents is checked in order to see if the Thing is in front
+or behind the polygons that are already on screen. If you have a convex
+object (like the outer polygons of a room) then you can use Z-fill because
+the polygons will not overlap. Things which are then inside those walls
+will need to use Z-use in order not to overwrite each other.
+
+Note that polygons have a visible side and an invisible side (backface
+culling).
+
+All polygons can be portals. Portals can point to another sector
+or to the same sector (in case of a mirror).
+
+@subsubheading Polygons
+@cindex Polygons
+
+Things are made of 3D polygons.  As mentioned before polygons must
+be convex.  The vertices of polygons are oriented clockwise.  This fact is
+used for backface culling; a polygon has only one visible side.
+
+Polygons are drawn with a texture.  How the texture is mapped on the polygon
+depends on a transformation matrix.  This is general enough so that you can
+translate, rotate, scale, and mirror the texture in every possible direction.
+The texture is tiled across the polygon surface.
+
+In a pre-computing stage three light-maps are created for every polygon (this
+is explained in more detail later).  Lighting is sampled in a grid which is 16
+by 16 texture pixels (or @dfn{texels}) in size, by default.  Bilinear
+interpolation is used by the texture caching machinery to make this lighting
+appear smooth.  The end result of this is a non-tiled lighted texture that is
+mapped across the polygon surface.
+
+A polygon can also be a Portal (see below).  Normally a portal polygon is not
+texture mapped unless the texture is semi-transparent.
+
+@subsubheading Portals
+@cindex Portals
+
+A Portal is a special kind of polygon.
+
+Instead of texture mapping a portal polygon, the renderer will recursively
+draw the sector that this portal points to.  After this, if the texture is
+semi-transparent, the texture will be mapped over the already rendered
+sector.
+
+Portals can also transform space.  This feature can be used to implement
+mirrors or reflecting surfaces.
+
+Note that when there is a portal from sector A to sector B you should probably
+also define a portal from sector B to sector A.  Adjacent polygons of
+different sectors are not shared so you need to set a portal on each of them.
+Otherwise you will have the effect that you can see from sector A to sector B
+but not the other way around.
+
+A special feature of portals is that you could (in theory) have a portal from
+sector A to sector B, but instead of going back to sector A from sector B you
+could set the portal to point at sector C which (in this example) would be a
+sector which has the same world space coordinates as sector A.  This is
+perfectly possible (although maybe not desirable) with Crystal Space.  An
+important result of this is that a given world space coordinate can belong to
+more than one sector!  A corollary of this is that you always need a current
+sector reference together with a world space coordinate to really know where
+you are.
+
+Portals in Crystal Space solve the problem of polygon sorting.  All polygons
+in the current sector are certainly visible (unless they are behind the view
+plane) and do not overlap, so they can just be drawn in any order without
+overdraw and without conflicts.  If a portal polygon is reached, all polygons
+in that other sector are behind all the polygons in the current sector.  In
+fact portals are an explicit form of @sc{bsp} tree.  The advantages of this
+approach are summarized below.
+
+@itemize @bullet
+@item
+Overdraw elimination comes for free with portals.
+
+@item
+Space warping can be used as described above.
+
+@item
+In theory it would be rather easy to make dynamic worlds.  Because the portals
+are explicit it is easy to define them so that certain sectors can move and
+transform in certain ways.
+Note that static lighting makes this a bit difficult in some cases.
+@end itemize
+
+One disadvantage a portal engine is that it can be more difficult to define
+worlds. If you want to be able to use @sc{zfill} mode you must make all
+sectors convex. If you don't care about that then you can use @sc{zuse} too.
+
+@subsubheading Rendering The World
+@cindex Rendering The World
+
+This section describes the various steps taken by the engine to actually
+render the world.  The camera and a view 2D polygon are given as parameters
+(the view polygon defines what is visible on the screen).
+
+Note that this discussion explains how thing polygons are rendered using
+the current implementation. As this implementation is not hardware friendly
+(i.e. it doesn't allow for hardware accelerated transforms) we will change
+this in the future. Note that some of the other objects (like genmesh,
+spr3d, @dots{}) correctly support hardware accelerated transforms already.
+
+Also note that most things now also render using a faster technique (fastmesh).
+
+@enumerate
+@item
+First the mesh objects of the current sector are transformed from world to
+camera space using the given camera (this means that all of the vertices are
+transformed).
+
+@item
+Then, for every polygon of the current mesh object do the following:
+
+@enumerate a
+@item
+Perform perspective correction (division by @samp{Z}) on all the vertices of
+the polygon.
+
+@item
+If all of the vertices are behind the viewplane (@samp{Z=EPSILON}) then the
+polygon is not visible and need not be drawn.
+
+@item
+Perform backface culling to see if the polygon can be visible.  Note that for
+the current sector all polygons are always visible but this step is important
+if drawing the sector behind a portal.
+
+@item
+If all of the vertices are in front of the viewplane then the polygon is
+completely visible.  Skip the following step.
+
+@item
+Otherwise clip the polygon against the viewplane.
+
+@item
+If the polygon is still visible after all these steps transform the texture
+mapping matrix from world@result{}texture to camera@result{}texture.  Also
+transform the plane normal of the polygon to camera space.
+
+@item
+Now clip the polygon against the view polygon.  The view polygon is a general
+2D polygon, not just a rectangle.
+
+@item
+If the resulting 2D polygon is not a portal it is just drawn on the screen.
+
+@item
+Otherwise this routine is recursively called again with the sector that the
+portal points to as the current sector and the resulting clipped 2D polygon as
+a new view polygon.  If the texture of the portal polygon is semi-transparent
+it is drawn over the resulting image.
+@end enumerate
+
+@end enumerate
+
+@noindent
+
+A consequence of this algorithm is that there is no overdraw when drawing the
+outer walls of a sector (if defined with @sc{zfill}). The 2D polygon clipping
+algorithm takes care of that.  One may think that this algorithm would be
+rather expensive but this does not seem to be the case.  So we eliminate
+overdraw when drawing all the sectors without having to resort to S-buffer or
+other similar techniques.
+
+There is overdraw when inner things are drawn (the ones using @sc{zuse}).
+This is difficult to avoid.  One could consider another clipping algorithm
+but this would result in concave polygons which our polygon drawer can not
+handle.
+

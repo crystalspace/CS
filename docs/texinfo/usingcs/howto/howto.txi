@@ -1,0 +1,39 @@
+@c -*-texinfo-*-
+@node HOWTO, , Making Own Projects, Using Crystal Space
+@section HOWTO
+@cindex Tutorial, HOWTO
+
+This is a list of @sc{howto}'s for Crystal Space.  They contain short questions
+with more or less short answers.  In every howto where it is relevant you can
+find a short subsection with all the include files you need to use the example
+code.
+
+@menu
+* HOWTO Mesh LightAnim:: Mesh Lighting and Animation
+* HOWTO Mesh Movement:: Mesh Movement
+* HOWTO Create Thing:: Creating a Thing Mesh
+* HOWTO Create Genmesh:: Creating a Genmesh Mesh
+* HOWTO Camera Movement:: Camera Movement
+* HOWTO Clicking on Objects:: Clicking on Objects
+* HOWTO Pseudo DynLight:: Pseudo-dynamic Lights
+* HOWTO Level Loading:: Loading a Level
+* HOWTO Pixmaps:: Loading Images for Pixmaps
+* HOWTO Render Priorities:: Render Priorities and Objects in Sectors
+* HOWTO Create Your Own Plugin:: Create Your Own Plugin
+* HOWTO Use custom font:: Using a Custom Font
+* HOWTO Recording Movies:: Recording Movies
+@end menu
+
+@importss{usingcs,howto,meshanim.txi}
+@importss{usingcs,howto,meshmove.txi}
+@importss{usingcs,howto,creatething.txi}
+@importss{usingcs,howto,creategenmesh.txi}
+@importss{usingcs,howto,cammove.txi}
+@importss{usingcs,howto,clickobj.txi}
+@importss{usingcs,howto,pseudolit.txi}
+@importss{usingcs,howto,levload.txi}
+@importss{usingcs,howto,pixmap.txi}
+@importss{usingcs,howto,rendpri.txi}
+@importss{usingcs,howto,plugin.txi}
+@importss{usingcs,howto,custfont.txi}
+@importss{usingcs,howto,movierec.txi}

@@ -1,0 +1,186 @@
+@c -*-texinfo-*-
+@node The Sprite Action Interface, Sequence Manager, Sprite Actions, Animation
+@subsection The Sprite Action Interface
+
+@emph{Written by Michael Voase,
+@email{mvoase@@midcoast.com.au}.}
+
+@subsubheading Interfacing with the Sprite
+
+To begin this section, I am assuming here that you are aware of how to obtain
+the various interfaces from the engine.  If not, read the documentation for
+@sc{scf}, the Shared Class Facility.  @xref{SCF}.  I will be using terminology
+and concepts which are explained in that section.  If you are only interested
+in writing map files for the engine then you can skip ahead to the next
+section.
+
+Secondly, I am also presuming that you have loaded your sprite into the engine,
+and have access to that sprite via the @samp{iEngine} interface.  That implies
+that you have written a basic Crystal Space application (or are hacking up an
+existing application), and can access your sprite mesh factory using calls
+similar to the following:
+
+@example
+iMeshFactoryWrapper *fwrap = Engine->FindMeshFactory("name");
+iMeshObjectFactory *fact = fwrap->GetMeshObjectFactory();
+
+iMeshWrapper *mwrap = Engine->FindMeshObject("name");
+iMeshObject *mesh = mwrap->GetMeshObject();
+@end example
+
+With the name being the name of your mesh factory or object, respectively.
+There are four main interfaces that we will be dealing with in this section,
+
+@itemize @bullet
+@item
+@code{iSpriteFrame} 
+@item
+@code{iSpriteAction} 
+@item
+@code{iSprite3DFactoryState} 
+@item
+@code{iSprite3DState}. 
+@end itemize
+
+The declarations for these interfaces can be found in 
+@file{CS/include/imesh/sprite3d.h}. The first two interfaces can be obtained
+by using the @code{FindFrame()} and @code{FindAction()} methods  in the 
+@samp{iSprite3dFactoryState} interface (described later).
+The third interface can be obtained by querying the @samp{iMeshObjectFactory}
+interface. The @samp{iSprite3DState} interface can be obtained from the
+@samp{iMeshObject} interface. The following is a summary of the methods in
+each interface and what they do. An example of obtaining the state interfaces
+is described below:
+
+@example
+csRef<iSprite3dFactoryState> fstat =
+  SCF_QUERY_INTERFACE(fact, iSprite3dFactoryState);
+csRef<iSprite3DState> stat =
+  SCF_QUERY_INTERFACE(mesh, iSprite3DState);
+@end example
+
+The @samp{mesh} and @samp{fact} variables are the ones mentioned earlier in
+this chapter.  The following is summary of the methods and interface that are
+useful to the sprite animator during production.  This summary does not fully
+document the @samp{iSprite3DState} or @samp{iSprite3DFactoryState} interfaces
+since they are adequately documented elsewhere.  Only methods which are
+relevant to frame animation are treated here.
+
+@subsubheading @code{iSpriteFrame}
+
+@noindent
+Current version: 0.0.2
+
+@table @code
+@item void SetName(char const*)
+Set the name of this frame.
+@item char const* GetName()
+Return the name of this frame
+@item int GetAnmIndex()
+Returns the index of the first vertex used in this frame.  The vertex list is
+stored in the sprite factory.
+@item int GetTexIndex()
+Returns the index to the first texel used in this frame.  The texel list is
+stored in the sprite factory.
+@end table
+
+@subsubheading @code{iSpriteAction}
+
+@noindent
+Current version: 0.0.1
+
+@table @code
+@item void SetName(char const*)
+Set the name of this action.
+@item char const* GetName() const
+Return the name of this action.
+@item int GetFrameCount()
+Get the total number of frames in this animation.
+@item iSpriteFrame* GetFrame(int)
+Returns frame specified by input argument.
+@item iSpriteFrame* GetNextFrame()
+Returns the next frame in the sequence.
+@item int GetFrameDelay(int)
+Returns the duration of frame specified by input argument.
+@item void AddFrame(iSpriteFrame* frame, int time)
+Adds the frame given by @samp{frame} to this action
+and set the duration to @samp{time} milliseconds. This method is used
+by the loader to add frames to an action. If you want to ``roll your own'',
+you will be using this interface to create your own actions. The frame
+must already be present in the frame list held by the sprite factory
+that this action came from.
+@end table
+
+@subsubheading @code{iSprite3DFactoryState}
+
+@noindent
+Current version: 0.0.2
+
+@table @code
+@item void AddVertices(int number)
+Adds @samp{number} vertices to @strong{all} frames
+in this sprite factory. The all is emphasized so that you are aware
+that the actual number of vertices created is @samp{number} multiplied
+by the number of frames. This is done to satisfy the requirement that
+all frames must be of an equal size.
+@item iSpriteFrame* AddFrame()
+Creates a new frame on the sprite frame list and
+returns a pointer to the newly created frame. The loader uses
+this method to load frames into a sprite. For each new frame
+added, an additional bank of vertices and texels is created for
+the new frame. Once you have this frame, you will then be using
+the @samp{iSpriteFrame} interface to operate on the frame.
+@item iSpriteFrame* FindFrame(const char* title)
+Finds the frame named @samp{title} in this sprite
+factory and returns a pointer the frame.
+@item int GetFrameCount()
+Returns the number of frames in this sprite factory.
+@item iSpriteFrame* GetFrame(int index) const
+Returns a pointer to frame @samp{index}. This
+frame is part of the list of frames stored in this sprite factory.
+@item iSpriteAction* AddAction()
+Create a new action and return a pointer to the action.
+Once you have obtained the action, you will then be using the 
+@samp{iSpriteAction} interface to modify this action.
+@item iSpriteAction* FindAction(const char* title) const
+Returns a pointer to the action named @samp{title}.
+@item iSpriteAction* GetFirstAction() const
+Returns a pointer to the first action in this sprite factory.
+@item int GetActionCount() const
+Returns the number of actions stored in this sprite factory.
+@item iSpriteAction* GetAction(int index) const
+Returns a pointer to action number @samp{index}
+@item void EnableTweening(bool flag)
+Enables or disables tweening on this sprite factory
+depending on @samp{flag}. 
+@item bool IsTweeningEnabled()
+Returns the current setting for tweening on this sprite factory.
+@end table
+
+@subsubheading @code{iSprite3DState}
+
+@noindent
+Current version: 0.0.4
+
+@table @code
+@item void SetFrame(int index)
+Sets this sprite to frame number @samp{index} in the
+action current applied to this sprite.
+@item int GetCurFrame() const
+Returns the index number of the current frame in the
+current action applied to this sprite.
+@item int GetFrameCount() const
+Returns the number of frames in the current action
+applied to this sprite.
+@item bool SetAction(const char *title)
+Set the current action of this sprite to the action
+named @samp{title}. Returns a flag indicating if the operation was
+successful or not.
+@item iSpriteAction* GetCurAction() const
+Returns a pointer to the current action applied to this sprite.
+@item EnableTweening(bool flag)
+Description: Enables or disables tweening on this sprite according
+to @samp{flag}.
+@item bool IsTweeningEnabled() const
+Returns a flag indicating if tweening is enabled for this sprite.
+@end table

@@ -1,0 +1,377 @@
+@c -*-texinfo-*-
+@node Map Creation, Simple Map Example, Working with Engine Content, Working with Engine Content
+@section How to Create Optimal Maps for Crystal Space
+@cindex Visibility Culling
+@cindex Culling, Visibility
+@cindex Map Creation
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@gmail.com}.}
+
+@emph{Note}: Creating optimal maps is not very easy as there are
+a lot of factors to consider. Crystal Space has a lot of tools to offer
+(like sectors, portals, visibility cullers, etc.) but using these tools
+effectively is an art. In this chapter we will not talk about how to create
+maps. For that you use external tools like Blender, Quark, or some other
+suitable tool.  This chapter focuses on how you should partition your map into
+sectors, the kind of mesh objects you should use, the visibility cullers, etc.
+
+For a good discussion about sectors and visibility cullers, see
+@ref{Visibility Culling}.
+
+@subsubheading Sectors and Portals
+@cindex portals
+@cindex sectors
+
+A sector is the basic building block in a map (@pxref{Visibility Culling}).
+When you create a map you should decide upon how to partition your map in
+sectors. The easiest solution is to use a single sector. In many cases that may
+even be acceptable. Here are some points to consider when deciding upon how to
+partition your map into sectors:
+
+@itemize @bullet
+@item
+Creating multiple sectors complicates map design a bit since you have to
+think about placing portals between the sectors. On the other hand it can
+ease map design since you can delegate map creation by assigning different
+portions of amap to other designers.
+
+@item
+It is easier to implement dynamic loading when you use more sectors since you
+can easily load/unload a sector.
+
+@item
+Portals help with visibility culling in two ways. When a portal is not visible
+the destination sector of that portal is ignored completely; the complexity
+of the portal's destination is totally ignored if the portal is not visible.
+Even if the portal is visible, the portal still restricts the view frustum (i.e.
+you can only see what is inside the portal's outline) and this will cause many
+objects to be culled away very easily.  Thus, one good reason to use more
+sectors is that doing so may improve visibility culling.  This works best if
+the portals are small (i.e. doorways or windows).
+
+@item
+Open space maps are hard to partition into sectors.  There is also little
+benefit in portal culling and dynamic loading with large open spaces.  So, in
+general, it is probably best to use a single sector for an outdoor world.
+
+@item
+The insides of buildings are best represented using seperate sectors. This
+makes it possible to design them seperately and it is also very good for
+the visibility culler. Doorways and windows make excellent portals.
+
+@item
+Whether or not you should further partition an indoor world into multiple
+sectors is hard to say and really depends on the complexity of the map.
+@end itemize
+
+@subsubheading Visibility Cullers
+
+Every sector has its own visibility culler.
+Crystal Space currently supports two kinds of visibility cullers:
+@dfn{Frustvis} and @dfn{Dynavis}. Dynavis attempts to work more
+on culling but it also has more overhead. So, you should use Frustvis in
+cases when you have the following kinds of maps:
+
+@itemize @bullet
+@item
+Simple sectors that only contain a few objects.
+
+@item
+Large sectors that are mostly open-space (i.e. for a space game).
+Dynavis works by finding which objects occlude (cover) other objects.
+In open space sectors this is rare so the extra work needed for this
+coverage test is usually wasted.
+
+@item
+Complex sectors that nevertheless do not have sufficient objects which
+can occlude other objects. This is on account of the same reason as described
+in the previous case.
+@end itemize
+
+On the other hand, if you have a complex map with lots of large objects then
+you should consider using Dynavis.  If you do decided to use
+Dynavis for a sector you should follow the following guidelines for that
+sector:
+
+@itemize @bullet
+@item
+Dynavis works best with closed and mostly convex large occluder objects
+that do not have a lot of polygons. For example, a big wall is usually a good
+occluder. However, it is possible that the wall is created using lots of
+detailed polygons. That does not make the wall a bad occluder but it increases
+the cost of using that wall as an occluder.  To help alleviate the cost, you
+should add a dummy polygon mesh (this is called an @samp{occlusion mesh}) to
+that object.  This occlusion mesh should have roughly the shape of the wall but
+it should only have a few polygons, which means that Dynavis can use it in a
+more efficient manner.  Below is an example on how to set an occlusion
+mesh in a map file.  Note that you should not replace the occlusion mesh if the
+base mesh is already good enough.
+
+@item
+If you have complex objects that have very little chance of occluding
+other objects (for example a star shaped object) then you should disable
+the visibility culling mesh (see below for example). This is called
+@dfn{disabling occlusion writing}. Dynavis will
+still cull the object away if needed but it will not use the object for
+culling other objects. This helps to improve performance of Dynavis.
+
+@item
+For culling objects Dynavis prefers small objects. Keep in mind that
+culling always happens on entire objects; that is, either the object is
+(partially) visible and it will be rendered completely or else the object is
+invisible.  So, a large object has less chance of being culled away since it
+needs to be covered entirely before it can be considered invisible.  Note that
+this guidelines conflicts with the next guideline, as well as with what OpenGL
+actually prefers.
+
+@item
+For occluding other objects Dynavis prefers large objects. Large
+objects are also prefered for other reasons (i.e. OpenGL is most efficient
+at rendering large objects; more on this later).
+
+@item
+There is a special optimization that follows from the previous two items.
+If you have a number of smaller objects that are themselves not very good
+occluders, but together they are very good (for example, a wall made
+out of seperate segments) then it would be best to disable occlusion writing
+for the individual wall segments and add a new null object with a single
+occlusion mesh that represents the entire wall.
+
+@item
+It is sometimes useful to add dummy occluders to help with occlusion.
+For example, if you have a large dungeon-like map then you can put
+large simple occluding objects in the @emph{void space} between the dungeon
+corridors (this is space where the camera should normally not be able
+to see).  When used properly, this optimization can provide a lot of gain for
+performance.  You can use standalone @dfn{polymesh} objects (see example
+below) to construct this, so you don't need to make a real mesh for it.
+This optimization can also be used when you have a complex multi-part
+object. You can then put a dummy occluder inside that object which will help
+with visibility culling.
+@end itemize
+
+Here is an example showing how you can replace the occlusion mesh of some mesh
+object in a map file:
+
+@example
+<meshobj name="complexWall">
+  <plugin>thing</plugin>
+  <params>
+    @dots{}
+  </params>
+  <polymesh>
+    <mesh>
+      <v x="-1" y="-1" z="-1" />
+      <v x="1" y="-1" z="-1" />
+      <v x="1" y="4" z="-1" />
+      <v x="-1" y="4" z="-1" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="0" v2="2" v3="3" />
+    </mesh>
+    <viscull />
+  </polymesh>
+</meshobj>
+@end example
+
+And this is an example of how you can disable the occlusion mesh for an object:
+
+@example
+<meshobj name="wallSegment">
+  <plugin>thing</plugin>
+  <params>
+    @dots{}
+  </params>
+  <polymesh>
+    <viscull />
+  </polymesh>
+</meshobj>
+@end example
+
+Here is a special note about closed versus non-closed objects in Dynavis.
+A closed object is an object that has no holes in it (i.e. a cube is a closed
+object). A cube with one of the six sides removed is not closed. When
+Dynavis writes an object to the occlusion buffer (coverage buffer)
+it will choose a technique based upon whether the object is closed or not.
+
+@itemize @bullet
+@item
+If the object is closed, then Dynavis will calculate the outline of
+the object and render that in the coverage buffer. Dynavis also has
+a depth buffer and, in this case, the maximum depth of the object will be
+used to update the depth buffer.
+
+@item
+If the object is not closed, then every individual polygon of the object
+is written separately to the coverage buffer. For depth, the maximum depth
+of every polygon will be used instead of the maximum depth of the entire
+object.
+@end itemize
+
+Here is an example which illustrates what this means in practice.  Assume you
+have a highly tesselated sphere (a sphere mesh that has a large number of
+triangles).  Also assume that there is another object inside the sphere.  If
+the first technique is used (closed object) then Dynavis will be most optimal
+for updating the coverage buffer since writing an outline is very cheap.  On
+the other hand it will not be able to cull away the object inside the sphere
+since the depth buffer is set too deep (i.e. the object in the sphere will be
+in front of the depth that is set in the depth buffer).
+
+On the other hand, if the second (non-closed) technique is used then
+Dynavis will need to use a lot of @sc{cpu} processing in order to update
+the coverage buffer but it will be able to cull away the object inside the
+sphere since the depth buffer will now contain accurate values per triangle.
+
+We have not done any performance tests to find out which is better. If you have
+a really complex object (highly tesselated sphere) then the first technique
+will probably be better since the cost of writing the object to the coverage
+buffer will probably be higher then the cost of rendering the object inside
+the sphere.  But we do not know where exactly the threshold is.
+
+@subsubheading Object Types
+
+Regardless of sector partitioning and visibility culling requirements, the
+choice of objects you use can also be important for performance. Crystal
+Space supports many mesh objects but the most important ones are:
+
+@itemize @bullet
+@item
+@code{thing}: A polygon mesh object that supports multiple
+materials and lightmapped, vertex based, or stencil based lighting. It is not
+easy to animate them internally so they are usually used for static
+objects. If you use lightmaps then these also will not be updated if the
+object moves, so that is another consideration. @samp{thing} objects are
+heavy-weight (use more memory than many other mesh types).  Their main
+advantage is that they support lightmaps which means that they can cast and
+receive shadows even if they only have a few polygons.  In contrast, an object
+that only supports vertex lighting can not have shadows on a single polygon or
+triangle (except if stencil-based lighting is used) (@pxref{MeshObject Thing}).
+
+@item
+@code{genmesh}: A triangle mesh object with a single
+material. It only supports vertex- or stencil-based lighting and it is also
+not designed for internal animation (although it is possible to do so).
+Genmeshes are very efficient with regards to memory usage and rendering speed
+(@pxref{MeshObject Genmesh}).
+
+@item
+@code{sprite3d}: Similar to a @samp{genmesh} except
+that it also supports frame-based animation
+(@pxref{MeshObject Spr3D}).
+
+@item
+@code{sprcal3d}: Similar to @samp{sprite3d} except
+that skeletal or bone based animation is supported.
+(@pxref{MeshObject SprCal3D}).
+@end itemize
+
+Here are some guidelines on using and choosing these meshes:
+
+@itemize @bullet
+@item
+For static geometry, @samp{thing} or @samp{genmesh} objects are ideal.
+@samp{genmesh} typically is used for high-detail objects that only need a
+single material (every triangle can use other parts of the texture) and where
+there is no need for detailed shadows on the individual triangles (usually a
+@samp{genmesh} object is either small or highly detailed so that shadows are
+accurately represented using vertex lighting only). @samp{thing} is used in
+case you want large objects that have little detail but require detailed
+lighting.
+
+@item
+If you plan on using stencil lighting only, then it is probably best to
+use mostly @samp{genmesh} objects.
+
+@item
+For moving objects you can also use @samp{thing} or @samp{genmesh} as long
+as there is no need to change the object's appearance (i.e. no internal
+animation is required). You have to be aware of lighting problems mentioned
+above, though.
+
+@item
+There are two flags that can also help performance considerably. If you have
+a mesh that will never move then you should use the @code{<staticpos>} flag
+on the mesh object in the map (or @samp{CS_MESH_STATICPOS} flag for
+@samp{iMeshObject}). This is a hint for the engine and the mesh object so that
+it may optimize performance based on the fact that the object will never
+move. The other flag is @code{<staticshape>}. This flag can be set on factories
+and mesh objects and indicates that the object will not animate (never changes
+shape). This corresponds with the @samp{CS_MESH_STATICSHAPE} and
+@samp{CS_FACTORY_STATICSHAPE} flags.
+
+@item
+Game actors and creatures should use @samp{sprite3d} or @samp{sprcal3d}.
+@end itemize
+
+One important note when using @samp{thing} meshes: it is @emph{very} important
+to try to use quads instead of triangles. This is because lightmaps are
+rectangular. If you have a wall made out of two triangles then you will have
+two full square lightmaps (one for every triangle) which is a waste given
+that half of these lightmaps will be unusued. If you use a single quad
+polygon for the wall then only one lightmap will be used. Lightmaps can be
+big so this really can make a huge difference on performance.
+
+@subsubheading Assisting the Renderer
+
+When considering on how to design your objects you should keep in mind
+what the renderer prefers. For the renderer a @dfn{mesh} is defined
+as a polygon or triangle mesh with a single material and/or shader. So, if
+you are using a @samp{thing} mesh that uses multiple materials then this is
+actually a set of different meshes for the renderer. To avoid confusion we
+will call the single-material mesh that the renderer uses a @dfn{render-mesh}.
+
+With OpenGL, and especially if you have a 3D card that supports the @sc{vbo}
+(Vertex Buffer Objects) extension, the renderer prefers render-meshes that have
+a lot of polygons. So, for the renderer it is better to use 10 render-meshes
+with 10000 polygons each, as opposed to 100 render-meshes with 1000 polygons
+each, even though the total number of polygons is the same.
+
+On the other hand, this requirement conflicts with some of the guidelines
+for the visibility culler. Getting an optimal setup depends on the minimum
+hardware you want to support. If you are writing a game for the future and
+decide to require @sc{vbo} support in the 3D hardware then you should use
+fewer but larger objects. For the current crop of 3D card, finding a good
+compromize is best.
+
+One other technique you can use to help increase the size of render-meshes
+is to try to fit several materials on one material. For example, if you have
+a house with three textures: wall, roof, and doorway then you can create
+a new texture that contains those three textures. The end result of this is
+that every house will be a single render-mesh instead of three which is
+more optimal for OpenGL. There are some disadvantages to this technique,
+however:
+
+@enumerate
+@item
+You have to be able to fit the smaller textures in the big texture without
+too much waste. Fitting four 64x64 textures in one 128x128 texture is easy
+but fitting three 64x64 textures in one 128x128 texture is going to waste
+some precious texture memory. Of course, you could try to use the
+remaining 64x64 space for textures on other objects.
+
+@item
+It is possible that you have to use lower quality textures since combining
+them on a bigger texture may otherwise overflow hardware limitations.
+
+@item
+It is harder for the artist to create models with this technique.
+
+@item
+This technique is not possible if you have a tiling texture; i.e. a wall
+texture that is repeated accross a large surface.
+@end enumerate
+
+@subsubheading Lighting Considerations
+
+When designing a map you also have to think about where to place lights.
+If you plan to use stencil-based lighting or hardware-based vertex lighting
+then you must be very careful to not exagerate the number of lights.
+Runtime performance with those two techniques depends on the number of lights
+and their influence radius. For this reason you are probably better off using
+lightmapped lighting in case you have a big map with a lot of lights.
+
+With lightmapped lighting there is no runtime cost associated with having
+multiple lights (there is a slight memory cost associated with having many
+pseudo-dynamic lightmaps). A higher number of lights simply means that
+recalculating lighting will take longer.

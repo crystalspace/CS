@@ -1,0 +1,25 @@
+@c -*-texinfo-*-
+@node Introduction, Sprite Actions, Sprite3D Animation, Animation
+@subsection Introduction
+
+@emph{Written by Michael Voase,
+@email{mvoase@@midcoast.com.au}.}
+
+Crystal Space provides two basic mechanisms for animating sprites. The first
+is frame based animation in which a mesh is defined in each frame and used
+in a loop. The second method is skeletal animation using the @sc{cal3d} library.
+
+For the purpose of this document I will describe frame based animation as an
+@dfn{action}.  This name is coined from the class the implements frame
+animations in the 3D sprite object @samp{csSpriteAction2} and has been
+traditionally referred to as an @samp{action} in the sprite loader plug in.
+
+This document presumes that you have an operational copy of Crystal Space.
+For details on obtaining and building Crystal Space please refer to the
+relevant sections on obtaining (@pxref{Where to Get}) and building
+(@pxref{Building}) Crystal Space.
+
+Lastly, actions are specific to sprite 3D. There is no exactly
+corresponding interface to thing or ball as yet, for example. So I am also
+presuming you have read to sections prior to this section about sprites, if
+not, then it would be a good idea to do so before delving into this section.

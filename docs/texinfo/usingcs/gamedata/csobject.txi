@@ -1,0 +1,45 @@
+@node csObject, User Objects, Game Data, Game Data
+@subsection csObject and iObject
+@cindex csObject
+@cindex iObject
+
+The @samp{csObject} class can be used to build object hierarchies. It supports
+building a simple tree structure. To use this functionality, you should derive
+your classes from @samp{csObject}. @samp{csObject} implements the
+@samp{iObject} interface and can store any number of @samp{iObject} children.
+Furthermore, every @samp{csObject} may have a name.
+
+All child objects are @code{IncRef()}'ed when added and @code{DecRef()}'ed when
+removed. An object also stores a pointer to its parent (which is not
+reference-counted to avoid circular references). Note that this pointer will
+always point to the last parent if the object is added to more than one
+parent. When the object is removed from a parent, the pointer is set to
+null, even if the object is still a child of another parent!
+
+Although the children of an object are only available as @samp{iObject}
+instances, you can use @code{SCF_QUERY_INTERFACE()} to query other interfaces
+from them.  Some convenience macros are also available:
+
+@table @code
+@item CS_GET_CHILD_OBJECT(object,Interface)
+Get the first child object that implements the given interface.
+
+@item CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)
+Get the first child object with the given name that implements the given
+interface. This will continue to search through the objects if an object
+with the right name but not the right interface was found, i.e. it handles
+multiple objects with the same name correctly.
+
+@item CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)
+Same as the above but stops at the first object with the given name, even if
+it does not implement the requested interface (in that case, @code{0} is
+returned). This is slightly faster.
+@end table
+
+Note that all these macros increase the reference count of the returned
+object by 1.
+
+Note that there are a few HOWTO's describing possible uses for the
+@samp{csObject} system (@pxref{User Objects} and
+@pxref{User Objects in Maps}).
+

@@ -299,8 +299,7 @@ order to coordinate your efforts with those of other people.
 @strong{Q}: How does Crystal Space work?
 
 @strong{A1} If you want to know how you can use CS, you can look at the
-chapters describing the libraries of which CS consists, @xref{Facilities}.  Or
-you can look at the plug-ins, @xref{Plug-In Drivers}.  If you want to know how
+@xref{Using Crystal Space}. If you want to know how
 it works internally, @xref{Internals}.
 
 @strong{A2}: Read any other documentation related to this project as mentioned
@@ -443,7 +442,7 @@ if (st)
 You can use the @samp{st} variable just like
 you would use the normal @code{iThingState} reference. The only difference
 with code that doesn't use smart pointers is that you don't have to take
-care of calling @code{DecRef}. @xref{HOWTO Smart Pointers}.
+care of calling @code{DecRef}. @xref{Smart Pointers}.
 
 @item
 @strong{Q}: My objects are rendered incorrectly.  It seems as if parts of it

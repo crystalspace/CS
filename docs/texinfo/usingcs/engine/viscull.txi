@@ -1,0 +1,223 @@
+@c -*-texinfo-*-
+@node Visibility Culling, Rendering Loop, Texture Mapping, Engine
+@subsection Visibility Culling In Detail
+@cindex Visibility Culling
+@cindex Culling, Visibility
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+@emph{Note}: This section describes in detail how visibility culling in
+Crystal Space works or will work in the not-to-distant future.
+Not all that is described in this document is actually implemented. It
+only represents of the ideal implementation which lives in my head right
+now and which I'm planning to implement in the near future. Parts of the
+system are implemented though.
+
+@menu
+* VIS sectors and portals:: Sectors and Portals
+* VIS cullers:: Visibility Cullers
+* VIS entities:: Entities
+* VIS sector structure:: Sector Structure
+* VIS visibility culling:: Visibility Culling
+* VIS view frustum culling:: View Frustum Culling
+* VIS portal/Sector visibility:: Portal/Sector Visibility
+* VIS Insector Vis:: In-sector Visibility
+@end menu
+
+@node VIS sectors and portals, VIS cullers, Visibility Culling, Visibility Culling
+@subsubsection Sectors and Portals
+@cindex portals
+@cindex sectors
+
+A sector is the basic building block in Crystal Space. A world will be made out
+of several sectors connected with portals (@pxref{Portal Engine}).
+Normally adjacent sectors can be connected with a straight portal but
+portals can also warp space so that you can connect any point in space to
+any other point in space. This effect can be used to create mirrors for
+example.
+
+This effect of portals makes them very powerful. It also means that
+you can have overlapping sectors and in general other weird portal
+constructs.
+
+Portals starting in arbitrary space (i.e. in the middle of
+a sector) are called floating portals. Some special care needs to be taken
+for those because we can't rely on the Z-buffer to be useful here. So this
+is a case where clipping to the 2D boundary of the portal must happen.
+
+Important for this discussion is the fact that we have two important
+areas where culling happens. We have in-sector visibility culling which
+is all visibility testing that ignores portal boundaries and we have
+portal/sector visibility which controls what you can see through a
+portal. Discussing both will be the main focus of this document later.
+
+@node VIS cullers, VIS entities, VIS sectors and portals, Visibility Culling
+@subsubsection Visibility Cullers
+@cindex frustvis
+@cindex dynavis
+
+With a sector there is always an associated visibility culler. Currently
+Crystal Space supports two cullers:
+@itemize
+@item
+@samp{frustvis}: This is the default visibility culler that is used if no
+other is specified. It only does frustum culling. It is the best culler to
+use for simple sectors that don't have a lot of objects or else for sectors
+that are big but where all objects are small. For such sectors it doesn't
+make much sense to try to do more complicated visibility culling so
+frustum cullling (testing if an object is visible in the current view)
+is more than enough.
+@item
+@samp{dynavis}: This is a more advanced visibility culler that does
+frustum culling in addition to trying to avoid rendering objects that
+are obscured by other objects. This culler
+is mainly useful when you have big complex sectors with lots of objects
+and when objects have a good chance of occluding (hiding) other objects.
+@end itemize
+
+This document will mainly discuss @samp{Dynavis}.
+
+@node VIS entities, VIS sector structure, VIS cullers, Visibility Culling
+@subsubsection Entities
+
+But first lets discuss the type of entities that Crystal Space supports.
+We already saw sectors above. These are the main containers for all
+the entities below.
+
+@subsubheading Sprites or Models
+@cindex Visibility of Sprites or Models
+@cindex Sprites, Visibility
+@cindex Models Visibility
+
+Crystal Space supports (among others) both 3D and 2D sprites. A 3D sprite
+is basically a set of triangles or a triangle mesh. I will not go into much
+more detail here because this document is related to visibility. A 2D sprite
+is a general polygon which always faces the camera. Both are considered
+detail objects (more on that later).
+
+@subsubheading Things
+@cindex Visibility of Things
+@cindex Things, Visibility
+
+Things are general objects used to define the basic geometry in a level.
+They can move and rotate but in general their most important use is to define
+level geometry (i.e. walls, floor, ceiling, a painting on the wall, a staircase,
+a chair, etc.). Small and detailed things will be tagged as detail
+objects. Polygons on things can also be portals to other areas.
+
+@subsubheading Curved Surfaces
+@cindex Visibility of Curved Surfaces
+@cindex Curved Surfaces, Visibility
+
+Curved surfaces are implemented in a separate mesh object. They are usually
+considered as detail objects.
+
+@subsubheading Terrain Surfaces
+@cindex Visibility of Terrain Surfaces
+@cindex Terrain Surfaces, Visibility
+
+A terrain surface is a large entity that can be in a sector.
+It is not a detail object (obviously). Handling of terrain and visibility
+is not ready yet. We need to do more work on this part. At this moment
+the terrain engine already has a visibility algorithm inside which is
+used for visibility culling of its own triangles but this algorithm should
+also be used to cull objects that are on the terrain.
+
+@node VIS sector structure, VIS visibility culling, VIS entities, Visibility Culling
+@subsubsection Sector Structure
+
+In this subsection we go deeper into the structure of a sector.
+A very common case to use sectors is to define a sector with one
+thing which is convex and makes up the outer hull of the sector. Sectors
+don't have to be defined like this but this is very common. You can then
+make a maze like structure with convex rooms connected to other convex
+rooms with portals. Non-convex attributes of the rooms can be added
+as separate detail objects.
+
+@node VIS visibility culling, VIS view frustum culling, VIS sector structure, Visibility Culling
+@subsubsection Visibility Culling
+
+Ok, here it comes. Given the above structure with sectors and entities
+we can define how we want to calculate optimal (or near optimal) visibility.
+
+When speaking about culling we are mainly speaking about three
+types of geometry:
+
+@itemize @bullet
+@item
+@emph{World Geometry}
+
+World geometry is the basic geometry that makes up the world.
+In general world geometry are big polygons that define large boundaries
+in some world or level. They usually represent walls, floors, and
+ceilings.
+
+@item
+@emph{Detail Objects}
+
+Detail objects are entities which are too detailed (i.e. too
+many small polygons or triangles) to be included in the processor
+intensive visibility calculations. So we mark them as detail and
+we process them on a higher level for visibility (mostly by treating
+their bounding box instead of the object itself). Curved surfaces,
+sprites, and some things are all detail objects.
+
+@item
+@emph{Culling Objects}
+
+Culling objects are invisible objects. Their only purpose is to cull
+geometry. So they are in fact the reverse of detail objects. In general
+culling objects should be large and have few polygons. These polygons
+will be included in visibility testing. You can add a culling object
+inside a detail object. The detail object will not participate in culling
+objects behind it (it will itself be culled by its bounding box however)
+but the culling object inside will take care of culling what is hidden
+by the detail object. Culling objects are only useful for detail objects
+that are sufficiently large and in sectors where there is a sufficient
+number of other entities (i.e. objects or portals) to be culled.
+A question here is whether or not it is possible (easy) to generate culling
+objects automatically from detail objects.
+@end itemize
+
+@node VIS view frustum culling, VIS portal/Sector visibility, VIS visibility culling, Visibility Culling
+@subsubsection View Frustum Culling
+@cindex View frustum
+
+View frustum culling is the most obvious type of culling.  Crystal Space does
+this for all objects.
+
+@node VIS portal/Sector visibility, VIS Insector Vis, VIS view frustum culling, Visibility Culling
+@subsubsection Portal/Sector Visibility
+
+Portal/sector visibility is based on 2D clipping. The 2D projected
+outline (in screen coordinates) of the last portal is used as a clipper
+for all geometry that can be seen through that portal.
+
+This approach obviously has some disadvantages. It means we have to
+transform all geometry to camera space and then to screen space. Given
+the current advances in hardware (i.e. hardware accelerated transforms)
+this is no longer a good thing to do. In the future it might be possible
+to change this system to 3D clipping. For now this is a fundamental change
+and we'll try to get around this limitation in other ways.
+
+Detail objects like 3D sprites are only clipped in total. i.e. the individual
+polygons are not clipped but either the object is visible or not. The
+Z-buffer takes care of the rest. To do this clipping we take the bounding
+box of the object and test if that bounding box is visible through the portal.
+
+@node VIS Insector Vis, , VIS portal/Sector visibility, Visibility Culling
+@subsubsection In-sector Visibility
+
+For in-sector visibility either @samp{frustvis} or @samp{dynavis} can
+be used. @samp{frustvis} only does frustum culling so we will discuss
+@samp{dynavis} here.
+
+Dynavis is roughly based on @samp{dPVS}
+(@url{http://www.hybrid.fi/dpvs_download.html}) but at this moment we
+are not that advanced yet :-) I recommend you read the reference document
+you can download from there. It is very interesting.
+
+(more documentation todo later).
+

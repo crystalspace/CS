@@ -1,0 +1,21 @@
+@c -*-texinfo-*-
+@node Game Data, Engine, VFS, Using Crystal Space
+@section Managing Game Specific Data
+@cindex game data
+@cindex csObject
+@cindex iObject
+
+When you make a game using Crystal Space chances are you will need to
+attach your own data to any object (unless you use a system like @sc{cel}
+which provides solutions for this already). The @samp{csObject} system in
+Crystal Space is designed to do this.
+
+@menu
+* csObject:: csObject and iObject
+* User Objects:: Attaching User Objects to CS Objects
+* User Objects in Maps:: Attaching User Objects to CS Objects in a map file
+@end menu
+
+@importss{usingcs,gamedata,csobject.txi}
+@importss{usingcs,gamedata,userobj.txi}
+@importss{usingcs,gamedata,mapuserobj.txi}

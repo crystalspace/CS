@@ -1,0 +1,1110 @@
+@node SCF, Smart Pointers, SCF Chapter, SCF Chapter
+@subsection Shared Class Facility (@sc{scf})
+@cindex @sc{scf}, Shared Class Facility
+@cindex Shared Class Facility (@sc{scf})
+
+@noindent
+@emph{Original @sc{scf} design and concept by Andrew Zabolotny, 1999.  This
+document and Crystal Space's particular @sc{scf} implementation were written,
+and are copyright @copyright{} 1999 by Andrew Zabolotny,
+@email{bit@@eltech.ru}.  @sc{scf} is distributed under the @sc{gnu} Library
+General Public License (@sc{lgpl}).  @xref{Licenses}.}
+
+@noindent
+@emph{Documentation revised significantly by Eric Sunshine,
+@email{sunshine@@sunshineco.com}.  Last updated September 24, 2003.}
+
+This library is intended for separating C++ class implementations from programs
+that use them.  This is achieved by separating class implementations into a
+separate module in the form of shared libraries, which are also called
+@dfn{plugin modules}.  Separating the implementation of a class from the
+program helps to address problems regarding shared library facility
+incompatibilities on different platforms.  It also makes it possible to use
+different mechanisms for @sc{scf}, for example inter-process communication
+(through pipes, shared memory, or whatever); communication through network or
+through a @sc{com} or @sc{corba} request broker; although currently only two
+minimal configurations supported: using shared libraries and using static
+linkage (for platforms that don't have shared library support).
+
+There is a @sc{howto} which explains how to create a plugin module from the
+ground up using @sc{scf} technology (@pxref{HOWTO Create Your Own Plugin}).
+The @sc{howto} provides a much more concise explanation about how to create and
+utilize a plugin than what you will find here, since this section is more
+interested in exposing @sc{scf} in gory detail.  There is also a @sc{howto}
+which explains how to make using @sc{scf} interfaces easier by using smart
+pointers (@pxref{Smart Pointers}).
+
+The @sc{scf} implementation is resides within the @file{CS/libs/csutil} module.
+
+@menu
+* SCF Explained:: How it Works
+* SCF Using:: Using @sc{scf}
+* SCF Multiple Interfaces:: Classes Implementing Multiple Interfaces
+* SCF Versions:: Interface Versions
+* SCF Client:: Client Side
+* SCF Meta Info:: Plugin Meta-Information
+* SCF Meta Info Embedding:: Meta-Information Embedding
+* SCF Plugin Discovery:: Plugin Discovery
+* SCF Example:: Example
+* SCF Advanced:: Advanced Techniques
+@end menu
+
+@node SCF Explained, SCF Using, SCF, SCF
+@subsubsection How it Works
+
+This section contains technical details about @sc{scf}. If you're not
+interested in details, you can skip directly to the next section which
+explains how @sc{scf} should be used from the end-user's point of view.
+
+@sc{scf} is somewhat similar to @sc{com}. This is because historically
+Crystal Space initially used @sc{com} for inter-module communication. Thanks
+to Dan Ogles for the initial implementation of a cross-platform @sc{com}
+library; his implementation was a good test-bed for this @sc{scf}
+implementation.
+
+The differences between @sc{com} and @sc{scf} are due to the increased need for
+an easier-to-use and more lightweight mechanism than @sc{com}.  The @sc{com}
+implementation caused some problems (because of historic bugs in @sc{egcs}
+1.1.x and incompatibilities with platforms to which Crystal Space has ported).
+Also it has some problems due to the native Windows types used in @sc{com};
+this experience was taken into account while developing @sc{scf}.
+
+The main paradigm of @sc{scf}, as in @sc{com}/@sc{corba}/Java/etc. is the
+@dfn{interface}.  You define an @emph{interface}, that is, a set of abstract
+methods that you want to access within some object.  @sc{scf} interfaces are
+plain C++ structs (or classes, it doesn't matter much except that if you're
+using classes to which you will have to add the @samp{public:} keyword).
+Theoretically, interfaces can contain member variables and inline methods
+(though not non-virtual methods or constructors), @emph{but} this practice is
+not encouraged because later someone may want to add a @sc{com}, @sc{corba},
+etc.  layer between the client and the actual object, and this will not be
+possible if the interfaces contains variables, inline methods, or non-virtual
+methods.  If you don't plan to use @sc{com} or @sc{corba} later, then you can
+use variables and inline functions as much as you like in your own code, but
+their use in Crystal Space code is highly discouraged.
+
+Here is an example of an interface in a file named @file{idog.h}:
+
+@example
+struct iDog
+@{
+  virtual bool IsAlive() = 0;
+  virtual char const* GetName() = 0;
+  virtual void SetName (char const*) = 0;
+  virtual void Shout(int Volume) = 0;
+  virtual void Run(int Speed, float Direction) = 0;
+  virtual bool GetChildren(iObjVector* oBrood) = 0;
+@};
+@end example
+
+Note the last method that gets a pointer of @samp{iObjVector} type.
+@samp{iObjVector} is yet another interface.  We could pass a pointer to a
+@samp{csObjVector} (the implementation of that interface) as well, but this
+will mean both modules (caller and callee) should have same idea about what a
+@samp{csObjVector} is, and if it happened that you compiled the shared library
+with a slightly different version of @samp{csObjVector} (that, say, had one
+member variable fewer) you will end up with a @sc{sigsegv} crash.  By instead
+specifying the abstract @samp{iObjVector}, there is no need to link the
+@samp{csObjVector} class into both the caller and the callee.
+
+Now let's write a particular @dfn{implementation} of the above interface.
+
+@example
+#include "idog.h"
+
+class MyDog : public iDog
+@{
+private:
+  // private member functions & variables @dots{}
+  char* Name;
+public:
+  virtual bool IsAlive();
+  virtual char const* GetName();
+  virtual void SetName(char const*);
+  virtual void Shout(int Volume);
+  virtual void Run(int Speed, float Direction);
+  virtual bool GetChildren(iObjVector* oBrood);
+  @r{@dots{} public member functions & variables @dots{}}
+@};
+
+bool MyDog::IsAlive()
+@{
+  return true;
+@};
+
+char const* MyDog::GetName()
+@{
+  return Name;
+@}
+
+void MyDog::SetName(char const* NewName)
+@{
+  if (Name != 0)
+    free (Name);
+  Name = strcpy (NewName);
+@}
+
+// And so on @dots{}
+@end example
+
+Now, we put the actual implementation into a separate module (i.e. into a
+shared library), and include within the client just the interface file
+@file{idog.h}. Since the client does not have any idea how we should build
+an object of the @samp{MyDog} class, we also provide a function that will
+return a newly-allocated object of that class. This is called the
+@dfn{class factory} (in fact, a class factory is a bit more than just this,
+but more about this later). Here is how to do it:
+
+@example
+static iDog* MyDog_Create()
+@{
+  return new MyDog();
+@}
+@end example
+
+Okay, we did it. Now back to the client. To work with an object that
+implements the @samp{iDog} interface we need to load the shared library, get
+a pointer to the @code{MyDog_Create()} function, call it and get a new
+@samp{MyDog} object. Further we work with this pointer as if it were pointing
+to an @samp{iDog} object:
+
+@example
+csLibraryHandle handle = csLoadLibrary("./libdog.so");
+iDog (*iDog_Create)() = csGetLibrarySymbol(handle, "MyDog_Create");
+iDog* dog = iDog_Create();
+printf("Doggy's name is %s\n", dog->GetName());
+dog->Shout(100);
+@dots{}
+@end example
+
+Of course, you don't have to do all this stuff manually with the @sc{scf}
+implementation. The @sc{scf} library provides a number of useful macros and
+functions which hide these ugly implementation details from end-user.
+
+@node SCF Using, SCF Multiple Interfaces, SCF Explained, SCF
+@subsubsection Using @sc{scf}
+
+The only include header file you need to include to utilize @sc{scf}
+functionality is @file{scf.h}.  It contains a number of macros and functions
+that you will need for easier use of @sc{scf}.
+
+Much basic functionality of @sc{scf} is provided by a central object.  It can
+be accessed as @samp{iSCF::SCF} and is of type @samp{iSCF*} (which is also a
+valid @sc{scf} interface).  This object is global and can be accessed from
+@emph{anywhere}, even from dynamic libraries (plugin modules).  It is used by
+several parts of @sc{scf}.  Note that this object is only available after
+calling @code{scfInitialize()}, the main initialization function of @sc{scf}.
+In typical use, howerver, you rarely need to interact directly with
+@samp{iSCF::SCF}.  Instead, you invoke several convenient @sc{scf} macros which
+interact with @samp{iSCF::SCF} on your behalf.
+
+All @sc{scf} classes should be derived from the basic interface @samp{iBase}.
+This interface declares the bare minimum set of methods which all @sc{scf}
+classes should provide:
+
+@table @code
+@item void IncRef()
+This function should be called each time you get a new reference to a object
+and store it for a long-time usage.  Rather than invoking this method manually,
+you can use a smart-pointer to automate reference counting
+(@pxref{Smart Pointers}).
+
+@item void DecRef()
+Call this function to decrement the object's reference count.  When the
+reference count reaches zero, the object is deleted automatically, provided
+that it is not an interface embedded within another object,
+@ref{SCF Embedded Interfaces}.  There should be one matching @code{DecRef()}
+for each @code{IncRef()} invocation.
+
+@item void AddRefOwner(iBase**)
+Call this function to set up a @dfn{weak reference} to the object .  A weak
+reference is one which is invalidated automatically when the referenced object
+is destroyed.  This is useful in cases when some object wants to hold a pointer
+to an @sc{scf} object without actually owning a reference to the @sc{scf}
+object.  Owning a reference prevents the @sc{scf} object from being destroyed,
+whereas holding a weak reference merely says that you are interested in this
+object as long as it is alive, but that you don't want to forcibly keep it
+alive.  The argument to this method is a pointer to a variable which can hold a
+pointer to an @sc{scf} object.  Rather than invoking this method manually, you
+typically would use a weak-reference template to automate the reference
+management (@file{CS/include/csutil/weakref.h}).
+
+@item void RemoveRefOwner(iBase**)
+Call this function to remove a weak reference to the object.
+
+@item iBase* QueryInterface(scfInterfaceID InterfaceID, int Version); This
+method will return a pointer to an interface or to an embedded interface,
+(@pxref{SCF Embedded Interfaces}).  The @emph{Interface ID} is synonymous to
+the name of the interface.  In previous versions of @sc{scf} this method used
+to accept a string containing the name of the interface.  This has been
+replaced by the @emph{ID} for performance reasons.  You can get the @sc{id} of
+an interface by invoking @code{iSCF::SCF->GetInterfaceID(name)}.
+@end table
+
+To simplify things even further, @file{scf.h} provides several macros that
+provide default declarations and default implementations of these
+methods.  The @samp{SCF_DECLARE_IBASE} macro will declare these methods
+within any class definition that is derived from @samp{iBase}.  The
+@code{SCF_IMPLEMENT_IBASE()} macro will add the default implementation of these
+methods to your module.  Finally, the @code{SCF_IMPLEMENT_FACTORY()} macro will
+implement the factory function for your class which returns new instances of
+the class to callers.
+
+Example:
+
+@example
+// Abstract interface file (itest.h)
+struct iTest : public iBase
+@{
+  @dots{}
+@};
+
+// Concrete implementation header (test.h)
+class Test : public iTest
+@{
+public:
+  SCF_DECLARE_IBASE;
+@};
+
+// Concrete implementation source (test.cpp)
+SCF_IMPLEMENT_FACTORY(Test)
+
+SCF_IMPLEMENT_IBASE(Test)
+@end example
+
+In reality, we need a few more macros because the @code{QueryInterface()}
+function is not static---it depends upon the interfaces implemented by given
+object.  In fact, @code{SCF_IMPLEMENT_IBASE()} defines @code{IncRef()},
+@code{DecRef()}, @code{AddRefOwner()}, @code{RemoveRefOwner()}, and the
+beginning of the @code{QueryInterface()} function, but not the end of that
+function (i.e. the closing brace).  That's because you have to use an
+additional macro called @code{SCF_IMPLEMENTS_INTERFACE()} which will add the
+code required to support all implemented interface inside
+@code{QueryInterface()}:
+
+@example
+SCF_IMPLEMENT_FACTORY(Test)
+
+SCF_IMPLEMENT_IBASE(Test)
+  SCF_IMPLEMENTS_INTERFACE(iTest)
+SCF_IMPLEMENT_IBASE_END
+@end example
+
+The @code{SCF_DECLARE_IBASE()} macro also defines a few member variables:
+@samp{scfRefCount}, @samp{scfWeakRefOwners}, and @samp{scfParent}.
+@samp{scfRefCount} is the accumulator for external references to this object
+and is used by @code{IncRef()} and @code{DecRef()} methods.
+@code{scfWeakRefOwners} maintains the list of weak reference owners, if any.
+The @samp{scfParent} variable points to the parent object, if any, and is also
+used by @code{IncRef()} and @code{DecRef()}.  Objects are chained together in a
+tree-like fashion, and an call to @code{IncRef()} will also call
+@code{scfParent->IncRef()}; same with @code{DecRef()}.  The root of the chain
+is the class factory, that is, an object that is used to create objects of a
+specific class.  The object tree looks like this:
+
+@example
+@r{ClassFactory}
+    @r{@result{} Object}
+        @r{@result{} Embedded interface}
+        @r{@result{} Embedded interface}
+            @r{@result{} Sub-embedded interface}
+@end example
+
+Thus, if we call the @code{IncRef()} method for @emph{Sub-embedded interface},
+we also will increment reference count for @emph{Object} and
+@emph{ClassFactory}.
+
+You also should call @code{SCF_CONSTRUCT_IBASE(@var{parent})} inside your class
+constructor, this macro will initialize @samp{scfRefCount} to zero and
+@samp{scfParent} to @var{parent}.  The constructor of many @sc{scf} classes
+should receive at least one argument of type @samp{iBase*}, which it should
+pass along to the @code{SCF_CONSTRUCT_IBASE()} macro.  It is also valid to
+specify @samp{NULL} as the parent if the instance should have no parent.
+Likewise, you should call @code{SCF_DESTRUCT_IBASE()} inside your class
+destructor.  This will reverse the initialization performed by the
+corresponding @code{SCF_CONSTRUCT_IBASE()} invocation.
+
+@node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
+@subsubsection Classes Implementing Multiple Interfaces
+
+Sometimes we will want one object to implement several interfaces.  For
+example, the 3D graphics driver could provide a basic @samp{iGraphics3D}
+interface and several additional optional interfaces such as @samp{iHalo},
+@samp{iBumpMap}, and so on.  There are two ways to do this:
+
+@itemize @bullet
+@item
+Via C++ multiple inheritance.
+
+@item
+Via object embedding, in which an object that implements another interface is
+embedded within the ``carrier'' object.
+@end itemize
+
+To simplify the following discussion we'll refer them as @dfn{multiple
+interface} and @dfn{embedded interface} schemes.
+
+@subsubheading Multiple Interfacing
+
+You can declare a class to inherit from several interfaces at once.  This is
+useful if all implemented interfaces will need to access often same member
+variables.  For example, both the @samp{iHalo} and @samp{iBumpMap}
+implementations will need to access many member variables from
+@samp{iGraphics3D} such as pixel format, screen dimensions and so on.  You
+declare such classes this way:
+
+@example
+class MyGraphics3D :
+    public iGraphics3D, public iHalo, public iBumpMap
+@{
+public:
+  @dots{}
+@};
+@end example
+
+When implementing the methods imposed by the @samp{iBase} interface you should
+use the @code{IMPLEMENT_INTERFACE()} macro once for each implemented
+interface:
+
+@example
+SCF_IMPLEMENT_IBASE(MyGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE(iHalo)
+  SCF_IMPLEMENTS_INTERFACE(iBumpMap)
+SCF_IMPLEMENT_IBASE_END
+@end example
+
+@anchor{SCF Embedded Interfaces}
+@subsubheading Embedded Interfaces
+
+Another way to implement several interfaces in one object is to embed an
+object that implements some interface into another object, known as the
+``carrier'' object.  This method is preferable when a secondary interface
+seldom needs access to the carrier object's members, since you will need to
+access them through the @samp{scfParent} pointer.  Here is an example:
+
+@example
+class MyGraphics3D : public iGraphics3D
+@{
+  // Declare the iHalo embedded interface.
+  class MyHalo : public iHalo
+  @{
+    SCF_DECLARE_EMBEDDED_IBASE(MyGraphics3D);
+    @dots{}
+  @} scfiHalo;
+  friend MyHalo;
+
+  // Declare the iBumpMap embedded interface.
+  class MyBumpMap : public iBumpMap
+  @{
+    SCF_DECLARE_EMBEDDED_IBASE(MyGraphics3D);
+    @dots{}
+  @} scfiBumpMap;
+  friend MyBumpMap
+
+public:
+  SCF_DECLARE_IBASE;
+  @dots{}
+@};
+@end example
+
+Note that you don't need to use special names for classes; use anything you
+want (that is, the @samp{My} prefix is not required; you could name the above
+class @samp{GraphixThreeDeeImplementation} if you like; this is true for
+embedded classes as well). But most @sc{scf} macros that have the word
+@samp{EMBEDDED} within their names expect embedded object names to follow the
+form @samp{scf@var{InterfaceName}}. For instance, @samp{scfiBase},
+@samp{scfiTest}, @samp{scfiGraphics3D}, and so on.
+
+When you declare the @samp{iBase} methods within an embedded class, you can
+use the @code{SCF_DECLARE_EMBEDDED_IBASE(@var{OuterClass})} macro instead of
+@samp{SCF_DECLARE_IBASE}. In this case the @samp{scfParent} member will be of
+type @code{@var{OuterClass}*} rather than of type @code{iBase*}; this will
+allow the member class to talk with its parent directly, thus allowing for
+direct member variables and functions access. In fact, the
+@samp{SCF_DECLARE_IBASE} macro uses @code{SCF_DECLARE_EMBEDDED_IBASE(iBase)}.
+@samp{SCF_DECLARE_EMBEDDED_IBASE} itself, and has another special
+characteristic: It does not use a reference count, as embedded interfaces may
+never delete themselves.  @code{IncRef()} and @code{DecRef()} of embedded
+objects simply call the corresponding function of their @samp{scfParent}, which
+is the object in which they are embedded.
+
+When using @code{SCF_DECLARE_EMBEDDED_IBASE()}, you should implement the
+methods with the @code{SCF_IMPLEMENT_EMBEDDED_IBASE()} macro instead of
+@code{SCF_IMPLEMENT_IBASE()}.
+
+@example
+SCF_IMPLEMENT_IBASE(MyGraphics3D)
+  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iHalo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iBumpMap)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (MyGraphics3D::MyHalo)
+  SCF_IMPLEMENTS_INTERFACE (iHalo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (MyGraphics3D::MyBumpMap)
+  SCF_IMPLEMENTS_INTERFACE (iBumpMap)
+SCF_IMPLEMENT_IBASE_END
+@end example
+
+And, finally, in the parent object's constructor you should initialize all
+embedded interface objects with the
+@code{SCF_CONSTRUCT_EMBEDDED_IBASE(@var{InterfaceName})} macro.  This will
+initialize @samp{scfRefCount} and @samp{scfParent} fields within
+@samp{scf@var{InterfaceName}} member variables to appropriate values (zero and
+@samp{this}).  Likewise, you should destroy embedded interfaces with the
+@code{SCF_DESTRUCT_EMBEDDED_IBASE()} macro.  Here is how to do it:
+
+@example
+MyGraphics3D::MyGraphics3D(iBase* iParent)
+@{
+  SCF_CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiHalo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiBumpMap);
+  @dots{}
+@}
+
+MyGraphics3D::~MyGraphics3D()
+@{
+  @dots{}
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiBumpMap);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiHalo);
+  SCF_DESTRUCT_IBASE();
+@}
+@end example
+
+You should not call @code{SCF_CONSTRUCT_IBASE()} within embedded object's
+constructor since all work needed to initialize @samp{iBase} fields is done in
+the carrier object's constructor.  Likewise, you should not call
+@code{SCF_DESTRUCT_IBASE()} within the embedded object's destructor.
+
+@node SCF Versions, SCF Client, SCF Multiple Interfaces, SCF
+@subsubsection Interface Versions
+
+Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared class
+could implement version 0.3.6 of given interface, and if client requests that
+interface of a version lower or equal than 0.3.6, a correct interface pointer
+is returned.  For this to work you need to define inside each interface header
+file a specialization of the @code{scfInterface<>} template class for each
+interface.  This specialization must provide the interface's version number as
+the result of its @code{GetVersion()} method.  To correctly support different
+versions of interfaces you should follow these guidelines:
+
+@itemize @bullet
+@item
+Do not insert new methods into existing interfaces.  Instead, you should
+append them after last defined method.
+
+@item
+If your change made the interface invalid for clients that expect older
+versions of interfaces (for example, you broke the previous rule), increase
+the major version number, and set minor and micro versions to zero.
+
+@item
+If your changes are relatively minor, but you do a major release, increase the
+minor version number and drop the micro version to zero.
+
+@item
+If you are in the development process, and did a minor change to the
+interface, increase the micro version.
+@end itemize
+
+The possible range for major and minor version numbers is 0..255, and the
+range for micro version number is 0..65535.
+
+When you query an interface, you should always tell it what interface version
+are you looking for.  If a module cannot provide an interface compatible with
+the requested version, then @code{QueryInterface()} will return @samp{NULL}
+(same as if interface wasn't available at all).  You can use
+@code{scfCompatibleVersion()} to check whether the requested version is
+compatible with interface version.  In fact, the
+@code{SCF_IMPLEMENTS_INTERFACE()} and
+@code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE()} macros employ this function
+automatically.
+
+Since specializing the @code{scfInterface<>} template for each interface is an
+onerous task, you can instead automate the task via use of the
+@code{SCF_VERSION()} macro.
+
+@example
+SCF_VERSION(iMyGraphics3D, 0, 0, 1);
+
+struct iMyGraphics3D : public iBase
+@{
+  @dots{}
+@};
+@end example
+
+If you are placing your interfaces in your project's own namespace, then you
+must invoke the @code{SCF_VERSION()} macro outside your namespace.  For
+instance:
+
+@example
+namespace MyProject
+@{
+  struct iMyGraphics3D : public iBase
+  @{
+    @dots{}
+  @};
+@}
+
+SCF_VERSION(MyProject::iMyGraphics3D, 0, 0, 1);
+@end example
+
+@node SCF Client, SCF Meta Info, SCF Versions, SCF
+@subsubsection Client Side
+
+Now let's explain how to use all this mess from client side.  First, we should
+be able to create objects that implement the interfaces we want.  For this, you
+should use the @code{SCF_CREATE_INSTANCE()} macro.  It receives two arguments:
+the name of external class, and the name of the interface it implements.  So,
+if we know class @samp{MyGraphics3D} implements the @samp{iGraphics3D}
+interface, we can write:
+
+@example
+csRef<iGraphics3D> G3D =
+  SCF_CREATE_INSTANCE("MyGraphics3D", iGraphics3D);
+if (!G3D)
+@{
+  fprintf(stderr,
+    "Failed to create an instance of iGraphics3D!\n");
+  abort();
+@}
+@end example
+
+Now you can use the object any way you like, just like standard C++:
+
+@example
+G3D->BeginDraw();
+G3D->DrawLine(@dots{});
+G3D->DrawPolygon(@dots{});
+G3D->EndDraw();
+@end example
+
+When you are done using the @samp{G3D} pointer (say, when program exits), the
+reference you own for the object should be released.  This happens
+automatically when the @code{csRef<>} goes out of scope.  If you are not using
+@code{csRef<>}, but are instead using a plain pointer, @samp{iGraphics3D*},
+then you must manually release the reference when you are done with it by
+calling @code{G3D->DecRef()}.  After this you can not use @samp{G3D} anymore;
+you should create another instance of @samp{iGraphics3D} if needed.
+
+To query an object to see if it implements an interface, you should use the
+@code{SCF_QUERY_INTERFACE()} macro. It also receives two arguments, first being
+the object you are querying for the embedded interface, and second being the
+name of the interface you desire. Example:
+
+@example
+csRef<iHalo> halo = SCF_QUERY_INTERFACE(G3D, iHalo);
+if (!halo)
+@{
+  fprintf(stderr,
+    "3D graphic driver doesn't support halos!\n");
+  return;
+@}
+@end example
+
+@node SCF Meta Info, SCF Meta Info Embedding, SCF Client, SCF
+@subsubsection Plugin Meta-Information
+
+It is possible and common to use @sc{scf} interfaces and objects directly via
+the C++ class names, via creation functions, or via facilities which return
+pointers to pure @sc{scf} interfaces.  However, when an external plugin modules
+publishes a class implementing an @sc{scf} interface, the client of that plugin
+can not access the object directly via C++.  This is where the @sc{scf}
+@dfn{class name} comes into play.  An @sc{scf} class name is an abitrary string
+assigned to the implementation.  The string is passed to
+@code{SCF_CREATE_INSTANCE()} in order to create an instance of the named
+object.  If necessary, @sc{scf} will load the plugin which implements the named
+object in order to satisfy the request.  The @sc{scf} class name can be
+anything you like, though it is often useful to impose a hierarchical
+interpretation on the name.  For instance,
+@samp{crystalspace.graphics3d.opengl}.
+
+The data which describes a plugin module, such as the @sc{scf} class names
+and C++ implementations which the plugin exports, is known as
+@dfn{meta-information}.  Each plugin has an associated meta-information
+resource which describes the plugin module.  This information can be accessed
+without even loading the plugin module.  At development time, the
+meta-information is maintained in an @sc{xml}-format text file which has
+the same name as the plugin module, but with extension @file{.csplugin}.  Here
+is a sample meta-information resource for a plugin named @file{myplugin}
+(@file{myplugin.so} on Unix, @file{myplugin.dll} on Windows):
+
+@example
+<?xml version="1.0"?>
+<!-- myplugin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>myproj.myplugin.foo1</name>
+        <implementation>MyClass1</implementation>
+        <description>My first custom foo class</description>
+      </class>
+      <class>
+        <name>myproj.myplugin.foo2</name>
+        <implementation>MyClass2</implementation>
+        <description>My second custom foo class</description>
+        <requires>
+          <class>myproj.myplugin.bar1</class>
+          <class>myproj.myplugin.bar2</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+@end example
+
+The top-level node of a meta-information file is named @code{<plugin>}.  All
+@sc{scf}-related information is contained within an @code{<scf>} child node.
+Plugin modules can export multiple named @sc{scf} classes.  Each exported class
+is represented by a @code{<class>} node within the @code{<classes>} group.  The
+@code{<name>} node of a @code{<class>} is the class' @sc{scf} name.  The
+@code{<implementation>} node references the C++ class which actually implements
+the named @sc{scf} class.  This is the same name that is privided as an
+argument to the @code{SCF_IMPLEMENT_FACTORY()} macro.  When an @sc{scf} class
+depends upon other @sc{scf} classes, the dependencies are indicated via the
+optional @code{<requires>} group, which contains one @code{<class>} node per
+dependency.
+
+The above example meta-information resource indicates that the plugin exports
+two C++ classes, @samp{MyClass1} and @samp{MyClass2} under the @sc{scf} class
+names @samp{myproj.myplugin.foo1} and @samp{myproj.myplugin.foo2},
+respectively.  Furthermore, the second exported class has a dependency upon two
+other @sc{scf} classes, @samp{myproj.myplugin.bar1} and
+@samp{myproj.myplugin.bar2}.  @sc{scf} will ensure that these other classes are
+loaded before it instantiates @samp{MyClass2}.
+
+Meta-information in the @file{.csplugin} file is extensible; it is not
+restricted to @sc{scf}-only usage.  Plugin authors can choose to publish
+supplementary information about plugins in addition to the @sc{scf} information
+already published.  As a hypothetical example, image loading plugins might
+desire to publish @dfn{image indentification} information which would allow the
+image loading multiplexor to selectively request image loading plugins
+@emph{on-demand}, rather than requesting all plugins unconditionally, even if
+they are not needed.  Here is a possible meta-information table for a @sc{png}
+image loader (with the @code{<scf>} node collapsed to @samp{@dots{}} for the
+sake of illustration):
+
+@example
+<?xml version="1.0"?>
+<!-- cspngimg.csplugin -->
+<plugin>
+  <scf>...</scf>
+  <imageloader>
+    <imagetype>
+      <class>crystalspace.graphic.image.io.png</class>
+      <identify>
+        <mimetype>image/png</mimetype>
+        <extension>png</extension>
+        <extension>PNG</extension>
+        <scan length="4" bytes="\0x89PNG"/>
+     </identify>
+    </imagetype>
+  </imageloader>
+</plugin>
+@end example
+
+In this example, the @sc{png} loader meta-information tells the multiplexor
+several different ways to identify a @sc{png} image:
+
+@itemize @bullet
+@item
+By checking @sc{mime} type, if available.
+@item
+By checking file extension, if available.
+@item
+By checking for the @dfn{magic} identification string @samp{\0x89PNG} in the
+raw image data.
+@end itemize
+
+@noindent
+If the multiplexor identifies the image as @sc{png}, only then will it actually
+request the @sc{png} loader plugin.
+
+@node SCF Meta Info Embedding, SCF Plugin Discovery, SCF Meta Info, SCF
+@subsubsection Meta-Information Embedding
+
+The Crystal Space @file{configure} script option
+@samp{--enable-meta-info-embedding} controls whether or not the build system
+embeds the plugin meta-information into plugin modules (if supported by the
+platform), and whether or not the plugin loader looks for embedded
+meta-information.  If this option is disabled, or if embedding is not supported
+by the platform, then the meta-information is laid down alongside the built
+plugin module (@file{.so} or @file{.dll}) in a text file with the same name as
+the plugin module, except with extension @file{.csplugin}.  The
+meta-information embedding option is enabled, by default.
+
+The platform-specific plugin loaders are capable of reading plugin
+meta-information when it is embedded and when it exists in a stand-alone
+@file{.csplugin} resource.  Even when configured for embedding, the plugin
+loaders will still be able to recognize and utilize external @file{.csplugin}
+resource.  This means that Crystal Space-based projects with unsophisticated
+build systems, which are incapable of embedding meta-information into the
+plugin module, can still create usable plugins by simply placing a copy of the
+@file{.csplugin} file alongside the plugin executable (@file{.so} or
+@file{.dll}).
+
+External projects which are based upon Crystal Space's Jam build system
+(@file{CS/mk/jam}) inherit, for free, the capability of embedding
+meta-information within plugin modules (if supported by the platform).  Simply
+grab the newer @file{.jam} files from @file{CS/mk/jam}, and add a few
+definitions to the project's @file{Jamconfig} file.  The exact set of
+definitions is platform-specific, so consult the appropriate Jam file
+(@file{unix.jam}, @file{win32.jam}, or @file{macosx.jam}) to determine
+precisely which which definitions are required.  Here is a list of definitions
+required at the time of writing:
+
+@table @asis
+@item Unix
+@code{EMBED_META = yes}@*
+@code{LIBBFD.AVAILABLE = yes}@*
+@code{OBJCOPY.AVAILABLE = yes}@*
+@code{CMD.OBJCOPY = objcopy}
+
+@item Windows
+@code{EMBED_META = yes}
+
+@item MacOS/X
+@code{EMBED_META = yes}
+@end table
+
+@node SCF Plugin Discovery, SCF Example, SCF Meta Info Embedding, SCF
+@subsubsection Plugin Discovery
+
+At program launch time, @sc{scf} discovers plugins automatically by searching a
+set of directories, and creates an internal database associating available
+@sc{scf} class names with the plugin modules which implement them.  The
+directories which @sc{scf} searches by default are:
+
+@itemize @bullet
+@item
+The application resource directory as returned by @code{csGetResourceDir()}.
+On most platforms, this is the same as the directory containing the
+application, however, on MacOS/X, it is the @file{Resources} directory within
+the Cocoa application wrapper.
+
+@item
+The directory containing the application (or containing the Cocoa application
+wrapper for MacOS/X) as returned by @code{csGetAppDir()}.
+
+@item
+The installed Crystal Space resource directories as returned by
+@code{csGetConfigPath()}.  This is often the value of the @samp{CRYSTAL}
+environment variable, or the @samp{CrystalSpaceRoot} default setting on MacOS/X
+(which is often stored within the @samp{NSGlobalDomain} domain).
+@end itemize
+
+If you would like @sc{scf} to scan additional directories, you can invoke
+either of these two functions:
+
+@itemize @bullet
+@item
+@code{scfInitialize (csPluginPaths const*)}
+@item
+@code{iSCF::ScanPluginsPath(char const*, bool, char const*)}
+@end itemize
+
+Finally, if need to manually register a single plugin module with @sc{scf} for
+which you know the native pathname (not a @sc{vfs} pathname), you can invoke
+@code{iSCF::RegisterPlugin()}.
+
+@node SCF Example, SCF Advanced, SCF Plugin Discovery, SCF
+@subsubsection Example
+
+Here is a complete working example. It implements a shared class that has a
+base and an embedded interface.
+
+These are the interface files for the @samp{iDog} interface (the base
+interface of our class) and the @samp{iName} interface (the interface
+embedded into our class).
+
+@noindent
+@emph{File}: @file{idog.h}
+
+@example
+#include "csutil/scf.h"
+
+// Version number of our interface.
+SCF_VERSION(iDog, 0, 0, 1)
+
+struct iDog : public iBase
+@{
+  virtual void Walk() = 0;
+  virtual void Shout(char const* Message) = 0;
+@};
+@end example
+
+@noindent
+@emph{File}: @file{iname.h}
+
+@example
+#include "csutil/scf.h"
+
+// Version number of our interface.
+SCF_VERSION(iName, 0, 0, 1);
+
+struct iName : public iBase
+@{
+  virtual char const* GetName() = 0;
+  virtual void SetName(char const*) = 0;
+@};
+@end example
+
+Now here is the implementation of a class for both of the mentioned
+interfaces:
+
+@noindent
+@emph{File}: @file{dog.cpp}
+
+@example
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "cssysdef.h"
+#include "idog.h"
+#include "iname.h"
+
+class csDog : public iDog
+@{
+  char* Name;
+
+  // Embedded interface.
+  class csName : public iName
+  @{
+  public:
+    SCF_DECLARE_EMBEDDED_IBASE(csDog);
+    virtual char const* GetName();
+    virtual void SetName(char const*);
+  @} scfiName;
+  friend class csName;
+
+public:
+  SCF_DECLARE_IBASE;
+  csDog(iBase* Parent);
+  virtual ~csDog();
+  virtual void Walk();
+  virtual void Shout(char const*);
+@};
+
+//---------- Implementation ---------
+
+SCF_IMPLEMENT_FACTORY(csDog)
+
+SCF_IMPLEMENT_IBASE(csDog)
+  SCF_IMPLEMENTS_INTERFACE(iDog)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iName)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE(csDog::csName)
+  SCF_IMPLEMENTS_INTERFACE(iName)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csDog::csDog(iBase* Parent)
+@{
+  SCF_CONSTRUCT_IBASE(Parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiName);
+  Name = strdup("<noname>");
+@}
+
+csDog::~csDog()
+@{
+  free(Name);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiName);
+  SCF_DESTRUCT_IBASE();
+@}
+
+void csDog::Walk()
+@{
+  printf("%s: I'm walking\n", Name);
+@}
+
+void csDog::Shout(char const* Message)
+@{
+  printf("I'm %s: shout, shout, %s\n", Name, Message);
+@}
+
+// iName interface for dog.
+
+char const* csDog::csName::GetName()
+@{
+  return scfParent->Name;
+@}
+
+void csDog::csName::SetName(char const* NewName)
+@{
+  if (scfParent->Name != 0)
+    free(scfParent->Name);
+  scfParent->Name = strdup(NewName != 0 ? NewName : "");
+@}
+
+@end example
+
+Since this is a plugin module, it requires a meta-information resource.
+Here is the meta-information for the example plugin:
+
+@noindent
+@emph{File}: @file{dog.csplugin}
+
+@example
+<?xml version="1.0"?>
+<!-- dog.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>dog</name>
+        <implementation>csDog</implementation>
+        <description>A rather unusual dog</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+@end example
+
+The above files should be built to get a plugin module named @file{dog.so}
+(Unix) or @file{dog.dll} (Windows).  The plugin module will export the
+@code{csDog_Create()} function which is implemented by the
+@code{SCF_IMPLEMENT_FACTORY()} macro, and it will publish the meta-information
+contained in @file{dog.csplugin}.
+
+Finally, here is the source code for a simple client application that uses the
+@samp{csDog} plugin.
+
+@noindent
+@emph{File}: @file{doggy.cpp}
+
+@example
+#include <stdio.h>
+
+#include "cssysdef.h"
+#include "csutil/scf.h"
+#include "csutil/cfgfile.h"
+#include "idog.h"
+#include "iname.h"
+
+static void test_dog()
+@{
+  csRef<iDog> dog = SCF_CREATE_INSTANCE("csDog", iDog);
+  if (!dog)
+    fprintf(stderr, "No csDog shared class!\n");
+  else
+  @{
+    csRef<iName> name = SCF_QUERY_INTERFACE(dog, iName);
+    if (!name)
+      fprintf(stderr,
+        "Dog does not support iName interface!\n");
+    else
+    @{
+      name->SetName("Droopy");
+      dog->Walk();
+      dog->Shout("hello!");
+      printf("Dog's name is %s\n", name->GetName());
+    @}
+  @}
+@}
+
+int main (int argc, char const* argv[])
+@{
+  scfInitialize(argc, argv);
+  test_dog();
+  iSCF::SCF->Finish();
+@}
+@end example
+
+@node SCF Advanced, , SCF Example, SCF
+@subsubsection Advanced Techniques
+
+The @sc{scf} library implements some things that you will need to know about
+to use some advanced techniques.  They are described in detail, below.
+
+@subsubheading Dynamic Class Registration
+
+You can register and deregister @sc{scf} classes at run time.  There are times
+when you would like to provide a named @sc{scf} class in your main application,
+rather than in a plugin module.  In this case, you will need to manually
+register the class with @sc{scf} since it will not be discovered by the
+automatic scan for plugins.  To do this, the following method is provided:
+
+@example
+bool iSCF::RegisterClass (
+  scfFactoryFunc,
+  char const* ClassName,
+  char const* Description,
+  char const* Dependencies,
+  char const* context);
+@end example
+
+Rather than having to remember to call this method from your code, you can
+automate the registration by instead using the
+@code{SCF_REGISTER_STATIC_CLASS()} macro, which takes the following arguments:
+
+@example
+SCF_REGISTER_STATIC_CLASS(
+  C++Class,
+  "scf.class.name",
+  "description",
+  "comma-separated dependency list" or NULL)
+@end example
+
+@noindent
+This macro should be used at the top-level of the source file, outside of
+any function.
+
+If a class resides in a plugin module which was not discovered by the startup
+scan, and if you do not elect to have @sc{scf} scan for the plugin with
+@code{iSCF::ScanPluginsPath()} or an additional call to @code{scfInitialize()},
+then you can manually tell @sc{scf} all about the class with the following
+method:
+
+@example
+bool iSCF:RegisterClass (
+  char const* ClassName,
+  char const* PluginPath,
+  char const* FactoryClass,
+  char const* Description,
+  char const* Dependencies,
+  char const* context);
+@end example
+
+You can deregister a registered class with the following function:
+
+@example
+bool iSCF::UnregisterClass(char const* ClassIName)
+@end example
+
+@subsubheading Non-Registered Classes
+
+Often, you do not need or want to register a class with the @sc{scf} kernel.
+That is, you create your objects manually, using @samp{new} or some other
+method and return them to callers of your functions as pure @sc{scf}
+interfaces.  This is a perfectly valid use of @sc{scf} classes, and is often
+employed.  It is common, for instance, for a named, published @sc{scf} class to
+vend unnamed classes to callers of its methods.  These classes are often helper
+classes.  In this case the unnamed object is not a part of the class registry.
+
+@subsubheading Non-Parented Classes
+
+Often, classes do not need to be parented.  This is frequently true of classes
+which are not named and part of the class registry, as noted above.  In this
+case your object is not a part of the class tree (see above) and thus does not
+have a parent.  To implement such a class, you have to pass @samp{NULL} to the
+@code{SCF_CONSTRUCT_IBASE()} macro in constructor.
+
+@example
+MyClass::MyClass()
+@{
+  SCF_CONSTRUCT_IBASE(0)
+  @dots{}
+@}
+
+MyClass::~MyClass()
+@{
+  @dots{}
+  SCF_DESTRUCT_IBASE()
+@}
+@end example

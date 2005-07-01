@@ -1,0 +1,250 @@
+@c -*-texinfo-*-
+@node Tutorial Simple 2, Tutorial Simple Map, Tutorial Simple, Tutorials
+@subsection Simple Tutorial 2: Sprites
+@cindex Tutorial, Simple, Sprite, VFS, Texture
+@cindex Simple Tutorial 2
+
+This tutorial continues on the Simple Tutorial (@pxref{Tutorial Simple}).
+In this tutorial we explain a bit about @sc{vfs}, texture management, and
+how you can add a simple sprite to the room.
+
+Crystal Space has the concept of mesh factories and meshes. A mesh is basically
+some kind of 3D object. Crystal Space supports several kinds of meshes. In
+the previous tutorial we used the thing mesh to create the geometry of
+our room. In this tutorial we will use the 3D sprite mesh. A mesh
+factory is like a blue-print for a mesh (or sprite). It defines how the mesh
+looks and how it animates. Before you can use a mesh you need to have a
+mesh factory. Once you have a mesh factory you can create multiple
+meshes from this.  @xref{MeshObject}.
+
+In this example we are going to load a mesh factory from disk.  If you have
+the standard Crystal Space distribution then you have the file
+@file{CS/data/standard.zip}.  In that archive file there is a file called
+@samp{sprite1} which contains the definition of our mesh factory.  If you
+would like to examine the raw sprite data, extract
+it (by using, for instance, the command @samp{unzip -x standard.zip sprite1})
+and look at how mesh factories for 3D sprites are defined (mesh
+factories for other types of meshes may appear different).
+
+But, how are we actually going to get that file out of that @sc{zip} archive
+from within the Simple application?  This is in fact very easy because Crystal
+Space supports the concept of @sc{vfs}.  Take a look at the @sc{vfs}
+documentation (@pxref{VFS}) to learn how it works.  Suffice it to say that
+@file{standard.zip} is an archive that is, by default, mounted onto the
+@sc{vfs} path @file{/lib/std}.  You can see all the mounted @sc{vfs} paths in
+the @file{CS/vfs.cfg} file (and you can add more).  So, this means that our
+sprite file can be found at the path @file{/lib/std/sprite1}.
+
+If you look at the @file{sprite1} file you can see that it refers to a material
+named @samp{spark}.  So, we'll have to load that material as well.  This can
+also be found in @file{standard.zip} at the path @file{/lib/std/spark.png}.
+
+@menu
+* Simple Loading Material:: Loading a Material in Memory
+* Simple Loading Mesh Factory:: Loading a Mesh Factory in Memory
+* Simple Creating Mesh:: Creating a Mesh from a Factory
+@end menu
+
+@node Simple Loading Material, Simple Loading Mesh Factory, Tutorial Simple 2, Tutorial Simple 2
+@subsubsection Loading a Material in Memory
+@cindex Tutorial Simple Loading Material
+@cindex Simple Loading Material, Tutorial
+
+To make this example a little more interesting the material is going to be
+loaded @emph{after} the other set-up of the texture manager has been performed.
+This is not really needed but it illustrates how a game might load materials
+dynamically after the application is already running.  So, first we edit
+@file{simple.h}:
+
+@example
+@dots{}
+class Simple
+@{
+private:
+  @dots{}
+  void CreateSprites ();
+  @dots{}
+@end example
+
+Then, we edit @file{simple.cpp} and add the following in
+@code{Simple::Application()} and @code{Simple::CreateSprites()}
+(before @samp{return true}):
+
+@example
+bool Simple::Application()
+@{
+  @dots{}
+  CreateSprites();
+  @dots{}
+  return true;
+@}
+
+@dots{}
+
+void Simple::CreateSprites()
+@{
+  // Load a texture for our sprite.
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  iTextureWrapper* txt = loader->LoadTexture ("spark",
+        "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+  if (txt == 0)
+    ReportError("Error loading texture!");
+@}
+@end example
+
+This code first loads a texture with
+@code{iLoader::LoadTexture()}.  The second argument is the file name for our
+texture (@sc{vfs} path) and the first argument is how that texture should be
+named in the engine.  In this case we use ``spark'' for that because that's
+how the @file{sprite1} definition wants it. The third parameter indicates
+for what we want to use this texture. In this case we want to use it to texture
+map a model for the 3D engine, so the texture must be prepared for 3D.
+The fourth parameter is the texture manager which will be used to register
+and prepare the texture and material. This is done automatically by
+this function because the fifth parameter is set to 'true'. In the previous
+tutorial we also used this function to load a texture but there we didn't
+specify the last three parameters. @samp{CS_TEXTURE_3D} is default so that
+doesn't have to be specified and because we were going to call
+@code{engine->Prepare()} later we also didn't specify the texture manager
+and the last boolean parameter because @code{Prepare()} automatically
+registers and prepares all textures and materials that are loaded.
+
+If loading succeeds this function will register our texture with the
+texture manager. As mentioned above this is needed because we are loading
+this texture @emph{after} @code{engine->Prepare()}. So, this is an easy way to
+dynamically add textures and materials even when the engine is already
+running. Note that if you plan to load many new textures and materials,
+it is more efficient to not let this function register automatically but
+instead register them manually and then call @code{txtmgr->PrepareTextures()}
+to prepare them all at once.
+
+Further note that when you load a texture like this, there will also be an
+associated material with the same name. The engine itself works with
+materials and doesn't directly use textures. The material in this case
+is simply a wrapper on top of the texture. But you could also add detail
+textures.
+
+@node Simple Loading Mesh Factory, Simple Creating Mesh, Simple Loading Material, Tutorial Simple 2
+@subsubsection Loading a Mesh Factory in Memory
+@cindex Tutorial Simple Loading Mesh Factory
+@cindex Simple Loading Mesh Factory, Tutorial
+
+Now that we have our material we can use it to load the mesh factory.
+Edit @file{simple.cpp} and add the following code in
+@code{Simple::CreateSprites()} (before @samp{return true} and after
+the code we just added to load the material):
+
+@example
+void Simple::CreateSprites ()
+@{
+  @dots{}
+  // Load a sprite template from disk.
+  csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
+        "/lib/std/sprite1"));
+  if (imeshfact == 0)
+    ReportError("Error loading mesh object factory!");
+@}
+@end example
+
+This example uses @code{iLoader::LoadMeshObjectFactory()} to load the
+mesh factory from the given location. The name of the mesh factory
+will be ``box'' as that is the name given in the file @file{sprite1} itself.
+
+This is all there is to it. After this call the mesh factory is loaded
+in the engine and can be used to create meshes. This is what we'll do
+in the next section.
+
+@node Simple Creating Mesh, , Simple Loading Mesh Factory, Tutorial Simple 2
+@subsubsection Creating a Mesh from a Factory
+@cindex Tutorial Simple Creating Mesh
+@cindex Simple Creating Mesh, Tutorial
+
+To create a mesh just add the following code in
+@code{Simple::CreateSprites()} (before @samp{return true} and after
+the code we just added to load the mesh factory):
+
+@example
+void Simple::CreateSprites ()
+@{
+  @dots{}
+
+  // Add the sprite to the engine.
+  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
+        imeshfact, "MySprite", room,
+        csVector3 (-3, 5, 3)));
+  csMatrix3 m; m.Identity ();
+  m *= 5.; // Don't do this scale in your own code! (see discussion)
+  sprite->GetMovable ()->SetTransform (m);
+  sprite->GetMovable ()->UpdateMove ();
+  csRef<iSprite3DState> spstate (
+    SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
+  spstate->SetAction ("default");
+  sprite->SetZBufMode (CS_ZBUF_USE);
+  sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
+@}
+@end example
+
+The easiest way to create a mesh is to use @code{engine->CreateMeshWrapper()}.
+This will take care of using the given mesh factory to create the mesh, give
+it a name, and correctly place it at the given position in the world.
+The name of a mesh can be useful for scripting so that a script can refer
+to objects with their names.
+
+Moving meshes (and things) is done through the @code{iMovable} interface to
+which you can get a reference by doing @code{sprite->GetMovable()}.  The calls
+to @code{SetTransform()} and @code{SetPosition()} set up a transformation
+matrix and vector to correctly place the mesh in the room.  In this
+particular case we use the identity matrix as a transform and scale it with
+five to make the sprite five times bigger.
+After doing movement (either updating the sectors or the position) you
+@emph{must} call @code{movable->UpdateMove()} to change internal data
+structures (i.e. the engine may use this to recalculate visibility
+information).
+
+@emph{WARNING}: The code above actually scaled the object by giving it
+a transformation matrix which is multiplied with 5. Don't do this in your
+own code. Many subsystems in Crystal Space (like the collision detection
+system, the visibility culling system and the lighting system) don't work
+properly with scaled objects. Instead scale your object using
+@code{HardTransform()}.
+
+If you read the mesh object documentation (see @pxref{MeshObject})
+carefully you will see that in order to control visual attributes
+of mesh objects you will have to get the @dfn{state} interface for
+either the object or the factory. In this example we query
+@samp{iSprite3DState} from the mesh in order to set the default action.
+An action is a set of frames and is used to control animation. In our
+simple example the sprite has only one frame so there is not much animation
+to see.
+
+The calls to @code{SetZBufMode()} and @code{SetRenderPriority()} are not
+strictly required since the values set here are default for meshes anyway.
+But the two lines serve as an example on how to set other values for these.
+@code{SetZBufMode()} sets the Z-buffer mode that the engine will use to
+render this object. With @samp{CS_ZBUF_USE} this means that the Z-buffer
+will be used fully. Other values are @samp{CS_ZBUF_FILL} (only fill the
+Z-buffer), @samp{CS_ZBUF_TEST} (only test the Z-buffer), or @samp{CS_ZBUF_NONE}
+(ignore the Z-buffer). @samp{CS_ZBUF_USE} is a good default for objects
+in a room. @samp{CS_ZBUF_FILL} is usually used for the outside walls of
+a sector.
+
+@code{SetRenderPriority()} controls when this object is rendered in this
+sector. By default there are four render priorities: @dfn{sky}, @dfn{wall},
+@dfn{object}, and @dfn{alpha}. Every object can be put in a render
+priority queue. Objects in lower render priorities will be rendered before
+objects in higher render priorities. In addition some render priority queues
+sort objects internally based on some other criteria. For example, the
+@samp{alpha} render priority will render all objects in that queue
+from back to front. You can create your own additional render queues if
+you want. The default render priority is @dfn{object} which you can
+get with the call @code{engine->GetObjectRenderPriority()}. Most objects
+with Z-buffer mode equal to @samp{CS_ZBUF_USE} are placed in the
+@samp{object} render priority queue.
+
+For more information on render priorities and Z-buffer mode you can look
+at the @sc{howto} on this subject (@pxref{HOWTO Render Priorities}).
+
+This concludes the second Simple tutorial.
+You can now go on to the next tutorial (@pxref{Tutorial Simple Map})) to learn
+how you can load a map from a file instead of creating your rooms
+programmatically.

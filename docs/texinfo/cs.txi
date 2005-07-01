@@ -97,14 +97,17 @@ technical information.
 This is edition @value{EDITION} of the Crystal Space manual for Crystal Space
 version @value{VERSION}, last updated @value{UPDATED}.
 
+Important Note! The documentation is currently being reorganized. All the sections
+marked @sc{old} are old chapters. They are still useful but they will disappear
+in the final documentation when the new chapters have all information from the old
+chapters.
+
 @menu
 * CS Introduction:: Introduction
 * Building:: Building and Installing
-* Options:: Configuring Crystal Space
-* Applications::
-* Tutorials:: Tutorials and HOWTO's
-* Facilities::
-* Plug-In Drivers:: Plug-In Modules and Drivers
+* Running The Demos::
+* Using Crystal Space::
+* Working with Engine Content::
 * Internals:: Internal Project Structure
 * Contributing:: Contributing to Crystal Space
 * Glossary::
@@ -119,11 +122,9 @@ version @value{VERSION}, last updated @value{UPDATED}.
 
 @imports{intro,chapter.txi}
 @imports{build,chapter.txi}
-@imports{options,chapter.txi}
-@imports{apps,chapter.txi}
-@imports{tutorial,chapter.txi}
-@imports{libs,chapter.txi}
-@imports{plugins,chapter.txi}
+@imports{running,chapter.txi}
+@imports{usingcs,chapter.txi}
+@imports{content,chapter.txi}
 @imports{internal,chapter.txi}
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}

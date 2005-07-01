@@ -1,0 +1,39 @@
+@c -*-texinfo-*-
+@node 3D Renderer, Collision Detection, MeshObject, Using Crystal Space
+@section The Rendering System
+@cindex rendering
+
+The graphics system consists of two or three drivers:
+
+@itemize @bullet
+@item
+2D Driver or Canvas
+
+This component manages the low-level access to the screen.  It supports
+primitive functions such as drawing pixels and lines, text output and direct
+access to the video memory.  There are several implementations of this
+component.  All are specific to some 3D Rasterizer (for example, the OpenGL 3D
+Rasterizer on Unix requires the OpenGL 2D XLib Driver).
+
+@emph{Note}: You need not load the 2D driver yourself.  It is loaded
+automatically by the according 3D driver.
+
+@item
+3D Rasterizer
+
+This component is required by the 3D Engine but is also useful standalone.
+This driver is used to draw 3d graphics and also 2D bitmaps on screen.  It
+automatically loads a 2D driver on startup.  There are currently several
+implementations of this component: Software, OpenGL, and Null (for applications
+that don't need 3D rendering but still want to use Crystal Space). Additionally
+there is also a new OpenGL renderer that is in development right now.
+
+@item
+Shader System
+
+Some of the renderers (currently the OpenGL renderer) also require an
+additional shader system. When this is present it is possible
+to make more advanced texture effects using shaders.
+@end itemize
+
+

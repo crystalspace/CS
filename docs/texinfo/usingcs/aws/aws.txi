@@ -1,0 +1,44 @@
+@c -*-texinfo-*-
+@node AWS, Making Own Projects, Scripting Languages, Using Crystal Space
+@section Alternate Windowing System (@sc{aws})
+@cindex @sc{aws}
+@cindex Alternate Windowing System
+
+@noindent
+@emph{Written by Christopher Nelson, @email{paradox@@bbhc.org}.
+Conversion to Texinfo by F. Richter, @email{resqu@@gmx.ch}.}
+
+The Alternate Windowing System is a plugin designed to replace
+the old monolithic (and retired) Crystal Space Windowing System (@sc{csws}). 
+It utilizes an region optimal frame-thrower and can draw to either the default 
+context, or to any user-supplied context (such as a procedural texture).
+@sc{aws} also supports a definition system and access to
+components via a @dfn{signal}/@dfn{slot} mechanism. All @sc{gui} aspects can be
+modified by the @sc{gui} designer in definition files without the
+need to recompile the base application. This allows game interfaces to be
+easily @dfn{skinned} by non-programmers.  For example code, see 
+@file{CS/apps/tutorial/awstut} and @file{CS/apps/tests/awstest}.
+
+@menu
+* AWS Quick Start:: Quick Start
+* AWS Signals:: Signals: Responding To User Input
+* AWS Custom Components:: Creating Custom @sc{aws} Components
+* AWS Trigger Reference:: @sc{aws} Standard Sink Trigger Reference
+* AWS Signals and Actions Reference:: @sc{aws} Standard Component Signal and Action Reference
+* AWS Architecture:: In-Depth Explanation of @sc{aws} Architecture
+* AWS QT Designer and AWS:: Using QT Designer To Create @sc{aws} Definition Files
+* AWS Automation:: @sc{aws} Automation: Properties and Scripting
+* AWS Component Scripting:: Automation Objects Available for Components
+* AWS Window Scripting:: Automation Objects Available for Windows
+@end menu
+
+@importss{usingcs,aws,quick.txi}
+@importss{usingcs,aws,signal.txi}
+@importss{usingcs,aws,owncomps.txi}
+@importss{usingcs,aws,trigref.txi}
+@importsss{usingcs,aws,saaref,saaref.txi}
+@importss{usingcs,aws,indepth.txi}
+@importss{usingcs,aws,qtaws.txi}
+@importss{usingcs,aws,automation.txi}
+@importsss{usingcs,aws,scripting,componentfuncs.txi}
+@importsss{usingcs,aws,scripting,windowfuncs.txi}

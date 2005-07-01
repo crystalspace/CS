@@ -1,0 +1,407 @@
+@c -*-texinfo-*-
+@node Cameras and Matrices, Space Warping, Lighting, Engine
+@subsection Cameras and Matrices
+@cindex Cameras
+@cindex Matrices
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+This section describes how a camera in a 3D engine can be represented by a 3x3
+matrix and a 3-element vector.  This is the method that is used in the Crystal
+Space engine but it is general enough that it can be used in other engines as
+well.
+
+@subsubheading Theory
+
+A way to look at the matrix and vector representation of a camera is by seeing
+the matrix as a 3 dimensional arrow pointing in some direction (the direction
+the camera is looking at) and the vector as the starting point (origin) of
+that arrow.
+
+What does this matrix do? It performs a linear transformation from 3D to 3D.
+With a 3x3 matrix you can represent every linear transformation from one 3D
+space to another 3D space.  The matrix that we use for a camera is just a
+linear transformation matrix that transforms coordinates represented in one
+coordinate system to another.  Let's assume that everything in the world is
+defined by using 3D vertices with an @math{x}, @math{y}, and @math{z}
+component.  So a vertex is defined by three numbers: @math{x}, @math{y}, and
+@math{z}.  These three numbers only have meaning when used relative to some
+origin.  A origin is defined by three axes (if it is a 3D origin that is).
+
+So our camera matrix transforms 3D vertices from world space to camera space.
+This means that a vertex with position (@math{x,y,z}) in the world (in world
+space) will get new coordinates (@math{x',y',z'}) in camera space.  The only
+reason that we want to apply this transformation is to make things easier for
+the rest of the 3D engine.  Because after this transformation we can program
+the rest of the engine as if every vertex is represented in camera space.  In
+other words; a vertex with coordinates (@math{0,0,5}) will be a vertex that
+lies just in front of the camera at distance 5.  A vertex with coordinates
+(@math{1,3,-5}) is behind the plane of the camera and can thus be easily
+discarded.  The test @math{Z < 0} is thus an easy test to see if a vertex will
+be visible or not.
+
+How does this transformation work? In fact it is just matrix algebra.  For
+example, if the camera matrix is represented by @math{M} and the camera
+position is represented by @math{P} then we can write the equation to
+transform from world space to camera space by using:
+
+@ifnottex
+@quotation
+@math{C = M * (W - P)}
+@end quotation
+@end ifnottex
+@tex
+$$C = M \times (W - P)$$
+@end tex
+
+@noindent
+@math{W} is a 3D vector describing the position of a vertex in world space
+coordinates.  @math{C} is a 3D vector describing the position of a vertex in
+camera space coordinates.
+
+This formula does the following.  First it translates the world space position
+so that the camera position is at (@math{0,0,0}).  This is done by @math{W -
+P}.  As you can see a vertex that would be on the same world space coordinates
+as the camera would be translated to (@math{0,0,0}).  The result of this
+calculation is another 3D vector.
+
+This vector is then multiplied by the camera matrix @math{M} to transform it
+to camera space.  You can visualize this by treating @math{M} as an arrow
+pointing in some direction and the vertex lying somewhere relative to that
+arrow.  By transforming with @math{M} (multiplying) we move the arrow until it
+points just the way we want it (with the Z-axis in front and so on).
+
+A matrix by vector multiplication is defined as follows:
+
+@ifnottex
+@example
+/ a b c \     / x \     / a * x + b * y + c * z \
+| d e f |  *  | y |  =  | d * x + e * y + f * z |
+\ g h i /     \ z /     \ g * x + h * y + i * z /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+a & b & c \cr
+d & e & f \cr
+g & h & i \cr
+}
+\times \pmatrix{x \cr y \cr z \cr} =
+\pmatrix{
+a \times x + b \times y + c \times z \cr
+d \times x + e \times y + f \times z \cr
+g \times x + h \times y + i \times z \cr
+}$$
+@end tex
+
+So for example, let's apply this formula in the initial configuration, with
+the camera pointing forwards in world space.  The camera matrix is then equal
+to:
+
+@ifnottex
+@example
+/ 1 0 0 \
+| 0 1 0 |
+\ 0 0 1 /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+1 & 0 & 0 \cr
+0 & 1 & 0 \cr
+0 & 0 & 1 \cr
+}$$
+@end tex
+
+@noindent
+And the vector is equal to:
+
+@ifnottex
+@example
+/ 0 \
+| 0 |
+\ 0 /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{0 \cr 0 \cr 0 \cr}$$
+@end tex
+
+Translation of a vertex in world space coordinates to camera space coordinates
+makes no changes since the camera is at the origin of the world.
+Transformation results in the previous formula being applied:
+
+@ifnottex
+@example
+/ 1 0 0 \     / x \     / 1 * x + 0 * y + 0 * z \
+| 0 1 0 |  *  | y |  =  | 0 * x + 1 * y + 0 * z |
+\ 0 0 1 /     \ z /     \ 0 * x + 0 * y + 1 * z /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+1 & 0 & 0 \cr
+0 & 1 & 0 \cr
+0 & 0 & 1 \cr
+}
+\times \pmatrix{x \cr y \cr z \cr} =
+\pmatrix{
+1 \times x + 0 \times y + 0 \times z \cr
+0 \times x + 1 \times y + 0 \times z \cr
+0 \times x + 0 \times y + 1 \times z \cr
+}$$
+@end tex
+
+@noindent
+So as you can see, this does not change the vertex at all.
+
+@subsubheading Practice
+
+Now that the theory behind camera mathematics has been described, it is time
+to see everything put into practice in order to actually move the camera.  All
+of the different kind of movements that the camera can do are also performed
+as transformations.
+
+For example, let's say that you want to move the camera forward a bit.  If you
+would represent this movement in camera space than you would say that the
+camera moves from (@math{0,0,0})---since the camera is at the origin in camera
+space--to (@math{0,0,d}) with @math{d} the distance that you want it to move.
+This is because we defined camera space so that @math{Z} is in front of you.
+
+But we want to know the position of the camera in world space.  In fact, what
+we want to do is to transform the camera space position (@math{0,0,d}) to
+world space.  This would then be the new position for the camera.
+
+So we need the inverse transformation.  To calculate the inverse
+transformation you need to calculate the inverse of the matrix @math{M}.
+Let's call this inverse @math{M'}.  From Matrix Algebra, we know that
+@ifnottex
+@math{M * M' = I}
+@end ifnottex
+@tex
+$M \times M' = I$
+@end tex
+(where @math{I} is the identity matrix).
+
+Calculation of the inverse of a matrix is a bit complicated.  For exact
+details, consult a Matrix Algebra textbook.  In practical terms, it is done by
+starting with the following formula which is our transformation from world to
+camera space equation:
+
+@ifnottex
+@quotation
+@math{C = M * (W - P)}
+@end quotation
+@end ifnottex
+@tex
+$$C = M \times (W - P)$$
+@end tex
+
+@noindent
+We would now like to calculate the new equation for the inverse
+transformation.  We already have @math{M'} (the inverse matrix).  Ok, let us
+multiply both sides of the equation by @math{M'}.  This gives:
+
+@ifnottex
+@quotation
+@math{M' * C = M' * M * (W - P)}
+@end quotation
+@end ifnottex
+@tex
+$$M' \times C = M' \times M \times (W - P)$$
+@end tex
+
+@noindent
+Since
+@ifnottex
+@math{M' * M = I},
+@end ifnottex
+@tex
+$M' \times M = I$,
+@end tex
+this results in:
+
+@ifnottex
+@quotation
+@math{M' * C = W - P}
+@end quotation
+@end ifnottex
+@tex
+$$M' \times C = W - P$$
+@end tex
+
+So the equation we are looking for is:
+
+@ifnottex
+@quotation
+@math{W = M' * C + P}
+@end quotation
+@end ifnottex
+@tex
+$$W = M' \times C + P$$
+@end tex
+
+So this is the equation that transforms camera space to world space.  Now we
+can use this to transform (@math{0,0,d}) to the new camera space coordinates.
+Other movements (like moving to the right (@math{d,0,0}), up (@math{0,d,0}),
+down (@math{0,-d,0}), and so on) are all performed in an equivalent manner.
+
+If you want to turn right then your position will not change but you will have
+to change the transformation matrix.  This works differently.  For example, to
+turn right you would want to rotate a certain angle around the Y-axis (since
+the Y-axis points upwards).  This rotation can be represented by the following
+matrix (known as a @dfn{rotation matrix}) which rotates about the Y-axis:
+
+@ifnottex
+@example
+/ cos(a)   0    -sin(a) \
+| 0        1    0       |
+\ sin(a)   0    cos(a)  /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+\cos(a) & 0 & -\sin(a) \cr
+0       & 1 &  0       \cr
+\sin(a) & 0 &  \cos(a) \cr
+}$$
+@end tex
+
+@noindent
+To see why this works, just try multiplying it by some vectors in 3D and see
+where they will transform too.
+
+How can we then use this matrix to turn our camera to the right? An important
+thing to realize is that transformations can be combined by multiplying the
+transformation matrices together.  For example, if we have our matrix @math{M}
+transforming from world to camera space and we would like to apply the Y-axis
+rotation on the camera then you can see this as a combination of first the
+transformation from world to camera space followed by the rotation along the
+Y-axis.  So instead of:
+
+@ifnottex
+@quotation
+@math{C = M * (W - P)}
+@end quotation
+@end ifnottex
+@tex
+$$C = M \times (W - P)$$
+@end tex
+
+@noindent
+We would want to use:
+
+@ifnottex
+@quotation
+@math{C = R * M * (W - P)}
+@end quotation
+@end ifnottex
+@tex
+$$C = R \times M \times (W - P)$$
+@end tex
+
+@noindent
+Where @math{R} is the rotation matrix.
+
+@ifnottex
+@math{R * M * (W - P)}
+@end ifnottex
+@tex
+$R \times M \times (W - P)$
+@end tex
+means to first apply transformation @math{M} on (@math{W - P}) and after that
+apply transformation @math{R} on the result.  Note that multiplication of
+matrices is not commutative.
+@ifnottex
+@math{R * M}
+@end ifnottex
+@tex
+$R \times M$
+@end tex
+is not guaranteed to be the same as
+@ifnottex
+@math{M * R}.
+@end ifnottex
+@tex
+$M \times R$.
+@end tex
+
+So, we can conclude from this that we just have to multiply the camera matrix
+by @math{R} to get the new camera matrix:
+
+@ifnottex
+@quotation
+@math{M' = R * M}
+@end quotation
+@end ifnottex
+@tex
+$$M' = R \times M$$
+@end tex
+
+Matrix multiplication works as follows:
+
+@ifnottex
+@example
+/ a b c \   / A B C \   / a*A+b*D+c*G a*B+b*E+c*H a*C+b*F+c*I \
+| d e f | * | D E F | = | d*A+e*D+f*G d*B+e*E+f*H d*C+e*F+f*I |
+\ g h i /   \ G H I /   \ g*A+h*D+i*G g*B+h*E+i*H g*C+h*F+i*I /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+a & b & c \cr
+d & e & f \cr
+g & h & i \cr
+} \times
+\pmatrix{
+A & B & C \cr
+D & E & F \cr
+G & H & I \cr
+} =
+\pmatrix{
+aA + bD + cG & aB + bE + cH & aC + bF + cI \cr
+dA + eD + fG & dB + eE + fH & dC + eF + fI \cr
+gA + hD + iG & gB + hE + iH & gC + hF + iI \cr
+}$$
+@end tex
+
+Rotation along the other axes works in a similar fashion.  Rotation along the
+X-axis is represented by:
+
+@ifnottex
+@example
+/ 1   0        0       \
+| 0   cos(a)   -sin(a) |
+\ 0   sin(a)   cos(a)  /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+1 & 0       &  0       \cr
+0 & \cos(a) & -\sin(a) \cr
+0 & \sin(a) &  \cos(a) \cr
+}$$
+@end tex
+
+@noindent
+Rotation along the Z-axis is represented by:
+
+@ifnottex
+@example
+/ cos(a)   -sin(a) 0  \
+| sin(a)   cos(a)  0  |
+\ 0        0       1  /
+@end example
+@end ifnottex
+@tex
+$$\pmatrix{
+\cos(a) & -\sin(a) & 0 \cr
+\sin(a) &  \cos(a) & 0 \cr
+0       &  0       & 1 \cr
+}$$
+@end tex
+
+With these formulas you should be able to do any movement of the camera that
+you want, including rotating the camera around the direction it is looking.

@@ -1,0 +1,118 @@
+@c -*-texinfo-*-
+@node Model Conversion, Map Loader, Animation, Using Crystal Space
+@section Importing Model Files
+@cindex Model Importing
+@cindex Importing Model Files
+
+Crystal Space is able to read other file formats than the native world files.
+For example, it is possible to read a file in the common @file{3ds} file
+format from @emph{3d Studio} and build mesh objects from it. This happens in
+two steps: First the file is read and the data is stored in a
+format-independent, meshobject-independent structure. Then this structure is
+used to build a mesh object. In this section, I will call this structure
+@sc{ids} (independent data structure). The details of the @sc{ids} are
+explained in the next section.
+
+Loading a file is done by the @emph{converter plugins}. There are different
+converters for different file formats, but @emph{not} for different types of
+mesh objects. This is not needed as the converters don't deal with mesh
+objects but only create the @sc{ids}. Converters can also provide file saving
+in their formats. Using this feature you can for example convert files of
+different formats into another format, such as to convert a @file{3ds} file
+into a @file{pov} file.
+
+After loading a model you will usually need to prepare the data a bit. This
+is needed because the @sc{ids} is not completely independent. In some cases
+this was not possible, while in others this makes things faster and more
+simple. However, Crystal Space provides functions to do this preparation for
+you. They are grouped together in a namespace wrapper called
+@code{csModelDataTools}. As an example, this includes a function to split
+objects using more than one material into objects that don't. 3d sprites in
+Crystal Space are limited to one material per sprite.
+
+Finally, you have to build a mesh object from the @sc{ids}. This is done using
+the so-called @emph{cross-builder plugin} (historical name, I don't know why
+the original author used it :-). I have not tried yet to find a nice and
+common-for-all-meshes interface, so currently the crossbuilder is simply a
+set of three functions: The first function builds a simple thing mesh from
+a single @sc{ids} sub-object, the second function does the same for sprites,
+and the third one creates a hierarchy of sprites from all objects in an
+@sc{ids}.
+
+@menu
+* Model Data Structure:: Common Model Data Structure (@code{iModelData})
+@end menu
+
+@node Model Data Structure, , Model Conversion, Model Conversion
+@subsection Common Model Data Structure (@code{iModelData})
+@cindex @code{iModelData}
+
+The @sc{ids} is built by a simple concept. All components implement
+@code{iObject}. Except a few cases, the structure is built using the
+@code{iObject} hierarchy. The following components are currently used:
+
+@table @dfn
+@item Scene
+This is the main object. It contains any number of @dfn{objects},
+@dfn{light sources}, @dfn{cameras}, @dfn{materials} and @dfn{textures}.
+
+@item Texture
+An image, which can be stored as an @code{iImage}, an @code{iTextureWrapper},
+or a filename.
+
+@item Material
+A material, which can be stored as an @code{iMaterial} or an
+@code{iMaterialWrapper}.
+
+@item Camera
+A camera that looks into the scene. It currently contains a position and
+up, front and right vectors.
+
+@item Light Source
+A light source, consisting of position, brightness and color.
+
+@item Vertex Frame
+This is a collection of any number of vertex positions, any number of normal
+vectors, of color values and of texture coordinates (also called
+@dfn{texels}).
+
+@item Polygon
+A list of quadruples of index values. Every entry in the list contains an
+index for a vertex table, an index for a normal table, one for a color table
+and one for a texel table. To produce meaningful output, a polygon has to be
+used together with a vertex frame object.
+
+@item Object
+This is what model importing is usually about. An object can be as much as
+a complete level or as few as one polygon. It is simply something that you
+can build a mesh object from. This means that it doesn't even have to use
+polygons (it could use curves instead). This object itself is hardly more
+than a node in the @code{iObject} hierarchy.
+
+Sub-objects are currently organized in a way that is closely related to the
+@emph{thing} and @emph{sprite} meshes used in CS: Every object contains a
+@dfn{Default Vertex Frame}, which is (of course) a vertex frame object. Also,
+an object contains any number of @dfn{polygon} objects. Take these together
+and you have the static shape of an object (and also the shape that is used
+when you build a thing mesh from it).
+
+@item Action
+For sprites, it is more difficult as you also want animation. An @sc{ids}
+object can also contain any number of @dfn{action} objects. An action is
+a list of frames and time values. Frames are also handled as generic @sc{ids}
+objects. However, they are special in the way that they are not contained in
+the action as @code{iObject} children but rather directly though the
+@code{iModelDataAction} interface. Currently the only types of frames that are
+allowed are vertex frames.
+
+Finally, the time value system has to be explained. Time values are stored in
+a rather unusual way: The time that is stored with each frame is the point
+in time when the frame ends. For example, if the first frame lasts 50 msec,
+then the time value stored with it is 50 msec. If the second frame lasts 30
+msec, its time value is 80 (50+30). The last time value is also the total
+length of one animation cycle. Note that for interpolated animation this
+produces another effect: At the point @emph{zero} in time, the frame to show
+is equal to the last stored frame. The animation then moves on to the first
+time value, shifting the frame to show over to the first stored frame.
+@end table
+

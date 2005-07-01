@@ -1,0 +1,38 @@
+@c -*-texinfo-*-
+@node AWS Signals and Actions Reference, AWS Architecture, AWS Trigger Reference, AWS
+@subsection @sc{aws} Standard Component Signal and Action Reference
+
+The following sections embody the reference manual for the signals, actions,
+properties, attributes, skin attributes, and input/output parameters of the
+standard @sc{aws} components.
+
+@menu
+* AWS All Components:: All Components
+* AWS Command Button:: Command Button
+* AWS Label:: Label
+* AWS Check Box:: Check Box
+* AWS Radio Button:: Radio Button
+* AWS Group Frame:: Group Frame
+* AWS List Box:: List Box
+* AWS Scrollbar:: Scrollbar
+* AWS Textbox:: Textbox
+* AWS Image View:: Image View
+* AWS Multiline Edit:: Multiline Edit
+* AWS Notebook:: Notebook
+* AWS Notebook Page:: Notebook Page
+* AWS Bar Chart:: Bar Chart
+@end menu
+
+@importsss{usingcs,aws,saaref,all.txi}
+@importsss{usingcs,aws,saaref,cmdbtn.txi}
+@importsss{usingcs,aws,saaref,label.txi}
+@importsss{usingcs,aws,saaref,checkbox.txi}
+@importsss{usingcs,aws,saaref,radiobtn.txi}
+@importsss{usingcs,aws,saaref,grpframe.txi}
+@importsss{usingcs,aws,saaref,listbox.txi}
+@importsss{usingcs,aws,saaref,scrolbar.txi}
+@importsss{usingcs,aws,saaref,textbox.txi}
+@importsss{usingcs,aws,saaref,imagview.txi}
+@importsss{usingcs,aws,saaref,mledit.txi}
+@importsss{usingcs,aws,saaref,notebook.txi}
+@importsss{usingcs,aws,saaref,barchart.txi}

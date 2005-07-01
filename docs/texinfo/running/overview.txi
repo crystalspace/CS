@@ -1,0 +1,102 @@
+@c -*-texinfo-*-
+@node Applications Overview, , Walktest, Running The Demos
+@section Quick Overview
+@cindex Applications, Quick Overview
+@cindex Applications, Overview
+@cindex Quick Overview, Applications
+@cindex Overview, Applications
+
+This section provides a quick overview of the various applications which are
+bundled with Crystal Space.  In some cases, more detailed information for a
+particular application may be found in subsequent sections.
+
+@table @code
+@cindex @file{3ds2lev}
+@cindex Applications, @file{3ds2lev}
+@item 3ds2lev
+A @sc{3ds} to Crystal Space map converter (work in progress!).
+
+@cindex @file{csdemo}
+@cindex Applications, @file{csdemo}
+@item csdemo
+A self-running space demo. It requires the @file{demodata.zip} file
+that you can get from:
+
+@noindent
+@ifnottex
+@url{http://www.crystalspace3d.org/support/release/cs098/maps/demodata.zip}
+@end ifnottex
+@iftex
+@code{http://www.crystalspace3d.org/support/release/cs098/maps/}@*
+@code{demodata.zip}
+@end iftex
+
+@cindex @file{csfedit}
+@cindex Applications, @file{csfedit}
+@item csfedit
+A simple GUI based font editor for Crystal Space.
+
+@cindex @file{csfgen}
+@cindex Applications, @file{csfgen}
+@item csfgen
+A @emph{TrueType} to Crystal Space font converter.
+
+@cindex @file{csvid}
+@cindex Applications, @file{csvid}
+@item csvid
+A test application for the Open DivX video plugin.
+
+@cindex @file{g2dtest}
+@cindex Applications, @file{g2dtest}
+@item g2dtest
+The Crystal Space canvas plugin test application.
+
+@cindex @file{gfxtest}
+@cindex Applications, @file{gfxtest}
+@item gfxtest
+The Crystal Space image manipulator.
+
+@cindex @file{isotest}
+@cindex Applications, @file{isotest}
+@item isotest
+An application demonstrating how you can use the 3D engine to simulate
+a semi-isometric view.
+
+@cindex @file{map2cs}
+@cindex Applications, @file{map2cs}
+@item map2cs
+A map converter which converts between Quake style @file{.map} format to the
+native Crystal Space map format. It is known to work with WorldCraft
+2.1 Beta and QuArK (Quake Army Knife). @xref{map2cs}.
+
+@cindex @file{mdl2spr}
+@cindex Applications, @file{mdl2spr}
+@item mdl2spr
+This application is a Quake @file{.mdl} and @file{.md2} model converter.  It
+converts model files into native Crystal Space sprites. @xref{mdl2spr}.
+
+@cindex @file{perftest}
+@cindex Applications, @file{perftest}
+@item perftest
+This is a tool to test graphics performance.
+
+@cindex @file{pysimp}
+@cindex Applications, @file{pysimp}
+@item pysimp
+An extremely simple example demonstrating use of the Python plug-in module.
+
+@cindex @file{vsh}
+@cindex Applications, @file{vsh}
+@item vsh
+This is the test application for the Virtual File System (@sc{vfs}).  It works
+very similar to the standard Unix shell programs.  @xref{VFS}.
+
+@cindex @file{walktest}
+@cindex Applications, @file{walktest}
+@item walktest
+The quintessential Crystal Space test program.  @file{walktest} is the test
+harness for most of the features which get added to the engine.  It is not
+necessarily a good programming example, but if you are interested in seeing
+an engine feature in action, this is probably the place to look.
+@xref{Walktest}.
+@end table

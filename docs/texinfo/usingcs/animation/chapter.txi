@@ -1,0 +1,22 @@
+@c -*-texinfo-*-
+@node Animation, Model Conversion, Collision Detection, Using Crystal Space
+@section Animating your Objects
+@cindex animation
+@cindex sequence manager
+@cindex particle systems
+@cindex cal3d
+
+Everything about animation.
+
+@menu
+* Sprite3D Animation::
+* Introduction::
+* Sprite Actions::
+* The Sprite Action Interface::
+* Sequence Manager::
+* ProcTextures:: Procedural Texture System
+@end menu
+
+@importsss{usingcs,animation,sprite3d,anim.txi}
+@importss{usingcs,animation,sequence.txi}
+@importss{usingcs,animation,proctex.txi}

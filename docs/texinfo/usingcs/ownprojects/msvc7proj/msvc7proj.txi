@@ -1,0 +1,439 @@
+@c -*-texinfo-*-
+@node HOWTO Creating External MSVC 7 Application, HOWTO Creating External Application Using KDevelop, HOWTO Creating External MSVC 6 Application, Making Own Projects
+@subsection Creating an External @sc{msvc} 7 Application
+
+@noindent
+@emph{Written by Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
+@noindent
+@emph{Last updated 2 June 2003.}
+
+This @sc{howto} is a step by step guide for creating a basic Crystal Space
+application with @sc{msvc} 7 @sc{.net} outside the Crystal Space source tree.
+
+@sc{important}: This tutorial assumes you have a basic familiarity with
+@sc{msvc} and it's inner workings. This tutorial also assumes you have a fully
+compiled (both release and debug) version of Crystal Space somewhere on your
+computer.
+
+@subsubheading Step 1 - Creating a basic project solution.
+
+Start @sc{msvc} 7 and from the @emph{File} menu click on @emph{File} then
+@emph{New} and once the sub menu of @emph{New} opens, click on
+@emph{Project}.  You will now be presented with a dialog box (see image
+below) for creating a new project.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap0}
+@end ifnotinfo
+
+Firstly we need to select the type of project we wish to create.  Crystal Space
+applications are Win32 applications and primarily work from a console base.
+This still allows the creation of @emph{Graphical User Interface} (@sc{gui})
+applications.  However, it also allows you to use the @emph{-console} command
+line switch and access more verbose runtime data normally only available with
+debug builds.  If you do wish to create standard win32 applications, you may do
+so.  However...  the @emph{-console} switch will not operate correctly in that
+type of application.
+
+In the @emph{Project Types:} window select @emph{Visual C++ projects}.  Next we
+move to the @emph{Templates:} window and choose the application type we wish to
+create.  As mentioned above Crystal Space applications are Win32 applications.
+So, search that window and select @emph{Win32 Project}.  Now enter the name of
+your application in the @emph{Name} text box.  In our example, the application
+will be named @file{simple1}.  Once done, click on the @emph{@sc{ok}} button.
+
+You will now be presented with another dialog box (see image below).
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap1}
+@end ifnotinfo
+
+We wish to specify some application settings.  So, click on hyperlink text
+@emph{Application Settings} below @emph{Overview} and you will be presented
+with what can be seen in the screenshot below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap2}
+@end ifnotinfo
+
+As discussed above, Crystal Space applications are primarily console based
+(though @sc{gui} are allowed) inorder to give us acces to the verbose
+diagnostic text via @emph{-console}.  Under @emph{Application type:}, select
+@emph{Console application}.  We are starting from a blank canvas. So, in the
+@emph{Additional options:} section, check the box @emph{Empty project}.  Once
+done, click on the @emph{Finish} button.
+
+You should now be in the @sc{msvc} 7 @sc{ide} (Intergrated Development
+Environment), with the @emph{simple1} project loaded.  Lets move on...
+
+@subsubheading Step 2 - Adding files/code to the project solution.
+
+Rather than create code for this tutorial and keeping inline with time honored
+tradition - We are now going to cheat and use existing Crystal Space code. :-)
+
+Firstly copy and paste the @file{simple1.cpp} and @file{simple1.h} from the
+Crystal Space code tree, into the newly created @file{simple1} project
+directory.  These files can be found here:
+
+@noindent
+@file{CS\apps\tutorial\simple1\}
+
+Once done, return to the @sc{msvc ide} and select the @emph{Solution Explorer}
+tab within the @emph{Solution Explorer} window.  See the image below to see the
+@emph{Solution Explorer} window from within the @sc{msvc IDE}.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap3}
+@end ifnotinfo
+
+To add file(s) to a project, select the appropriate folder in the
+@emph{Solution Explorer} window, be that @emph{Source Files} or
+@emph{Header Files} etc.  Right click on it to bring up the context menu and
+then hover over @emph{Add} until the sub menu appears and then click on
+@emph{Add Existing Item...}.  You will now be presented with the
+@emph{Add Existing Item} dialog box, which can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap4}
+@end ifnotinfo
+
+After selecting the desired file(s) you wish to add, click on the @emph{Open}
+button to finalize your choice(s) and be returned back to the @sc{msvc ide}.
+Repeat this process twice adding @file{simple1.cpp} to the @emph{Source Files}
+folder and @file{simple1.h} to the @emph{Header Files} folder. Once done you
+should have a @emph{Solution Explorer} window which looks like the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+@subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
+
+First thing we need todo is point MSVC to both Crystal Spaces @file{include}
+and both the release and debug build @file{libs} directories, so it may access
+them at compile/link time.  Select @emph{Tools} from the @emph{File menu} and
+then @emph{Options}@dots{} You will now be presented with the @emph{Options}
+dialog box, which can be seen below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap6}
+@end ifnotinfo
+
+Click @emph{Projects} folder of the @emph{Options} dialog.  Now click on
+@emph{VC++ Directories}.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap7}
+@end ifnotinfo
+
+Lets first add the path to the location of the Crystal Space @file{include}
+directory.  Select @emph{Include files} in the @emph{Show directories} for drop
+down menu.  Next click on the @emph{New Line} button (folder beneath the drop
+down menu).  Click the browse button (button with three dots) on the right hand
+side, enabling you to select the Crystal Space @emph{include} directory -
+wherever it is on your system.  See the image below for an example of it set.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap8}
+@end ifnotinfo
+
+To set the paths to the Crystal Space lib files, you must remember you need to
+add two---one pointing to the location where the release libs are and another
+to where the debug libs are located.  In the @emph{Show directories} for drop
+down menu, now select @emph{Library files}.  Follow the same browse and
+selection procedure as you used when adding the @file{include} path, adding the
+following paths - adjusting for where you have Crystal Space located on your
+system.
+
+@noindent
+@file{CS\out\release\libs\}@*
+@file{CS\out\debug\libs\}
+
+See image below for an example of these set.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap9}
+@end ifnotinfo
+
+Once done, click on the @emph{OK} button and return to the MSVC IDE.
+
+@subsubheading Step 4 - Setting Preprocessor Definitions in MSVC.
+
+Crystal Space essentially has three preprocessor definitions which MUST be set
+in-order to successfully compile and link your application.  They are
+@samp{CS_WIN32_CSCONFIG}, which is added whether the build is release or debug.
+@samp{__CRYSTAL_SPACE__}, which is also set whether the build is release or
+debug.  And finally @samp{CS_RELEASE} or @samp{CS_DEBUG}, which is added as you
+may guess @samp{CS_RELEASE} in the settings for release builds and
+@samp{CS_DEBUG} in the settings for debug builds.
+
+To set the preprocessor definitions for your project.  Select your project in
+the @emph{Workspace} window.  See area highlighted in blue in the image below.
+Now, from the @emph{Project} menu select @emph{Properties}.  Alternatively, you
+can right click on the highlighted area in the @emph{Workspace} and then click
+on @emph{Properties} - both ways work.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+Once you have clicked on @emph{Properties}.  You will then be presented with
+the @emph{Properties} dialog box, which can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap10}
+@end ifnotinfo
+
+Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
+definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
+build @samp{CS_WIN32_CSCONFIG}, @samp{__CRYSTAL_SPACE__} and @samp{CS_DEBUG},
+making sure to separate with semi-colons.  Alternatively, you can click the
+elipsis (@dots{}) button to pull up an easier view.  An example of the ones
+entered for a debug build can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap11}
+@end ifnotinfo
+
+Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
+definitions in the @emph{Preprocessor Definitions} text box i.e.  for a release
+build @samp{CS_WIN32_CSCONFIG}, @samp{__CRYSTAL_SPACE__} and @samp{CS_RELEASE},
+making sure to separate with semi-colons.  Alternatively, you can click the
+elipsis (@dots{}) button to pull up an easier view.  An example the ones
+entered for a release build can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap12}
+@end ifnotinfo
+
+Once done, click on the OK button and return to the MSVC IDE.
+
+@subsubheading Step 5 - Setting Run-Time Library Used with Crystal Space Applications.
+
+As in step 4 we need to change one or more project settings.  Select your
+project in the @emph{Workspace} window.  See area highlighted in blue in the
+image below.  Now, from the @emph{Project} menu select @emph{Properties}.
+Alternatively, you can right click on the highlighted area in the
+@emph{Workspace} and then click on @emph{Properties} - both ways work.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+Once you have clicked on @emph{Properties}, you will be presented with the
+@emph{Properties} dialog box once again.
+
+Open the C/C++ folder and select @emph{Code Generation}.  Crystal Space uses
+the Multithreaded DLL run-time internally, so to avoid conflict and errors
+applications should use the same.
+
+For debug builds you need to select @emph{Debug Multithreaded DLL} from the
+@emph{Runtime Library} drop down menu.  As can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap13}
+@end ifnotinfo
+
+For release builds you need to select @emph{Multithreaded DLL} from the
+@emph{Runtime Library} drop down menu.  As can be seen in the image below.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap14}
+@end ifnotinfo
+
+Once done, click on the @emph{OK} button and return to the MSVC IDE.
+
+@subsubheading Step 6 - Linking with the Crystal Space libraries.
+
+When compiling Crystal Space in release and debug mode, you will end up with
+the following static libs, some of which you may require at some point in your
+own applications if you use the functionality contained within a given library.
+
+@noindent
+Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
+
+@noindent
+@iftex
+@code{libcrystalspace_d.lib libcrystalspace_directx_d.lib}@*
+@code{libcrystalspace_opengl_d.lib libcrystalspace_windows_d.lib}
+@end iftex
+@ifnottex
+@code{libcrystalspace_d.lib libcrystalspace_directx_d.lib libcrystalspace_opengl_d.lib libcrystalspace_windows_d.lib}
+@end ifnottex
+
+@noindent
+Crystal Space release library names:
+
+@noindent
+@iftex
+@code{libcrystalspace.lib libcrystalspace_directx.lib}@*
+@code{libcrystalspace_opengl.lib libcrystalspace_windows.lib}
+@end iftex
+@ifnottex
+@code{libcrystalspace.lib libcrystalspaceirectx.lib libcrystalspace_opengl.lib libcrystalspace_windows.lib}
+@end ifnottex
+
+To add the necessary libraries to link our application.  As in step 4 we need
+to change one or more project settings.  Select your project in the
+@emph{Workspace} window.  See area highlighted in blue in the image below.
+Now, from the @emph{Project} menu select @emph{Properties}.  Alternatively, you
+can right click on the highlighted area in the @emph{Workspace} and then click
+on @emph{Properties} - both ways work.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
+
+For applications we need only link with the primary Crystal Space library.  The
+other libraries provide support for custom plugin modules. Open the
+@emph{Linker} folder and select @emph{Input}.  In the text box @emph{Additional
+Dependencies} add the Crystal Space libraries as named below into the box with
+those already there.
+
+@noindent
+Debug:
+
+@noindent
+@code{libcrystalspace_d.lib}
+
+@noindent
+See image below for example of debug build link settings.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap15}
+@end ifnotinfo
+
+@noindent
+Release:
+
+@noindent
+@code{libcrystalspace.lib}
+
+@noindent
+See image below for example of release build link settings.
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap16}
+@end ifnotinfo
+
+Finally, click on @emph{OK} to return to the MSVC IDE and then build the
+project.
+
+@subsubheading Commonly encountered problems.
+
+@itemize @bullet
+@item
+@strong{Q.} I get the following error:
+
+@example
+----------Configuration: simple1 - Win32 Release----------
+Compiling...
+simple1.cpp
+C:\CS\INCLUDE\csplatform.h(26) : fatal error C1083:
+  Cannot open include file: 'csconfig.h': No such file or directory
+Error executing cl.exe.
+
+simple1.exe - 1 error(s), 0 warning(s)
+@end example
+
+@strong{A.} Repeat @emph{Step 4} - You seem to have not set one or more of the
+preprocessor definitions correctly.
+
+@item
+@strong{Q.} I get the following link errors:
+
+@example
+----------Configuration: simple1 - Win32 Release----------
+Compiling...
+simple1.cpp
+Linking...
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: void __thiscall csReversibleTransform::RotateThis(
+    class csVector3 const &,float)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static struct iSCF *  iSCF::SCF"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: __thiscall csView::csView(
+    struct iEngine *,struct iGraphics3D *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csInitializer::OpenApplication(
+    struct iObjectRegistry *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static void __cdecl csCommandLineHelper::Help(
+    struct iObjectRegistry *,struct iCommandLineParser *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csCommandLineHelper::CheckHelp(
+    struct iObjectRegistry *,struct iCommandLineParser *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csInitializer::SetupEventHandler(
+    struct iObjectRegistry *,
+    bool (__cdecl*)(struct iEvent &),unsigned int)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static bool __cdecl csInitializer::RequestPlugins(
+  struct iObjectRegistry *,...)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "bool __cdecl csDefaultRunLoop(struct iObjectRegistry *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static void __cdecl csInitializer::DestroyApplication(
+    struct iObjectRegistry *)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "public: static struct iObjectRegistry * __cdec
+   csInitializer::CreateEnvironment(
+   int,char const * const * const)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "int __cdecl csPrintf(char const *,...)"
+simple1.obj : error LNK2001: unresolved external symbol
+  "int __cdecl csPrintfV(char const *,char *)"
+MSVCRT.lib(crtexe.obj) : error LNK2001:
+  unresolved external symbol _main
+Release/simple1.exe : fatal error LNK1120: 14 unresolved externals
+Error executing link.exe.
+
+simple1.exe - 15 error(s), 0 warning(s)
+@end example
+
+@strong{A.} This would indicate that you have forgotten to add the Crystal
+Space static libraries to link with.  Work through @emph{Step 6} again and
+re-check the settings you have entered.
+
+@item
+@strong{Q.} I get the following link errors:
+
+@example
+----------Configuration: simple1 - Win32 Release----------
+Compiling...
+simple1.cpp
+Linking...
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strchr already defined in LIBC.lib(strchr.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strstr already defined in LIBC.lib(strstr.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _tolower already defined in LIBC.lib(tolower.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strncpy already defined in LIBC.lib(strncpy.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _free already defined in LIBC.lib(free.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _memmove already defined in LIBC.lib(memmove.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _realloc already defined in LIBC.lib(realloc.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _malloc already defined in LIBC.lib(malloc.obj)
+MSVCRT.lib(MSVCRT.dll) : error LNK2005:
+  _strncmp already defined in LIBC.lib(strncmp.obj)
+LINK : warning LNK4098: defaultlib "MSVCRT" conflicts with use
+  of other libs; use /NODEFAULTLIB:library
+Release/simple1.exe : fatal error LNK1169: one or more multiply
+  defined symbols found
+Error executing link.exe.
+
+simple1.exe - 10 error(s), 1 warning(s)
+@end example
+
+@strong{A.} This or similar LNK2005 errors, tend to indicate that you have
+forgotten to set the correct run-time library in the project settings.  Work
+through @emph{Step 5} again and make sure you have your project set to
+@emph{Debug Multithreaded DLL} or @emph{Multithreaded DLL} for debug and
+release builds respectively.
+@end itemize

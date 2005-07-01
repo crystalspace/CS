@@ -1,0 +1,95 @@
+@c -*-texinfo-*-
+@node HOWTO Use custom font, HOWTO Recording Movies, HOWTO Create Your Own Plugin, HOWTO
+@subsection Using a Custom Font
+@cindex font, csf
+
+This section describes how to use a custom font within
+Crystal Space.
+
+Crystal Space has a plugin that specifies the font server to use.  The font
+server that almost all applications use is the font multiplexer, together with
+the FreeType2 and the default font server.  The @sc{scf} class names of these
+modules are:
+
+@itemize @bullet
+@item
+@code{crystalspace.font.server.multiplexer}
+@item
+@code{crystalspace.font.server.freetype2}
+@item
+@code{crystalspace.font.server.default}
+@end itemize
+
+The font multiplexer not only searches both the FreeType2 and default font
+server for a font, but also can search multiple fonts for a glyph.  This is
+especially important if you plan to internationalize your applications; it
+reduces the worry that a particular font supports the glyphs for a specific
+language.  (Crystal Space ships with the @sc{gnu} Unifont, which is used as a
+fallback, so it already pretty good support for internationalization
+out-of-the-box.)
+
+@subsubheading Standard Fonts
+
+Every font server is expected to return a font
+given the following strings:
+
+@itemize @bullet
+@item
+@code{CSFONT_LARGE "*large"}
+@item
+@code{CSFONT_ITALIC "*italic"}
+@item
+@code{CSFONT_COURIER "*courier"}
+@item
+@code{CSFONT_SMALL "*small"}
+@end itemize
+
+The default font server has these 4 fonts built in.  They are as
+follows:
+
+@itemize @bullet
+@item
+@code{CSFONT_LARGE police}
+@item
+@code{CSFONT_ITALIC italic}
+@item
+@code{CSFONT_COURIER courier}
+@item
+@code{CSFONT_SMALL tiny}
+@end itemize
+
+To use these fonts simply use the LoadFont method and
+pass the font desired.
+
+@example
+Font = G2D->GetFontServer()->LoadFont (CSFONT_LARGE);
+@end example
+
+@subsubheading Loadable Fonts
+
+The default font server will also look for a file in 
+the virtual file system with the name specified.  The
+file must be in the "csf" font format.  This format is
+pretty simple binary format that supports individual characters
+with different widths and optionally an alpha component
+to provide anti-aliasing.
+
+To specify an alternate font simply use the LoadFont method
+with the file name (and optionally a size) such as:
+
+@example
+Font = G2D->GetFontServer()->LoadFont ("/fonts/ttf/Vera.ttf", 12);
+@end example
+
+@subsubheading Creating New Loadable Fonts
+
+The easiest way to create a loadable font is to
+use the @file{csfgen} util that comes with CS. It converts 
+a True Type font to the @sc{csf} format.
+
+Once the @sc{csf} file is created it can be included
+in the application no matter what platforms are 
+targeted.  The base font does not have to be on
+that system.  This is useful if you do not want or can not
+distribute a font with your program and can not rely upon
+it already being present on the target machine.

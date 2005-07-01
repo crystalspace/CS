@@ -1,0 +1,25 @@
+@c -*-texinfo-*-
+@node Making Own Projects, HOWTO, AWS, Using Crystal Space
+@section Making Projects Using Crystal Space
+@cindex external projects
+
+Here you can find some useful information on how to make projects for Crystal
+Space with various development platforms.
+
+@menu
+* HOWTO CS Project:: Creating an External Crystal Space Application
+* HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
+* HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
+* HOWTO Creating External Application Using KDevelop:: Creating an External Application using KDevelop
+* HOWTO CS Project DevCPP:: Creating an External Crystal Space Application Using Dev-CPP
+* HOWTO Create RPM:: Creating Crystal Space @sc{rpm}'s
+* HOWTO Setting the CRYSTAL environment variable:: Setting the CRYSTAL environment variable
+@end menu
+
+@importss{usingcs,ownprojects,project.txi}
+@importsss{usingcs,ownprojects,msvc6proj,msvc6proj.txi}
+@importsss{usingcs,ownprojects,msvc7proj,msvc7proj.txi}
+@importsss{usingcs,ownprojects,kdevproj,kdevproj.txi}
+@importss{usingcs,ownprojects,devcppproj.txi}
+@importss{usingcs,ownprojects,rpm.txi}
+@importss{usingcs,ownprojects,envvar.txi}

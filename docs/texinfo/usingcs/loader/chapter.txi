@@ -1,0 +1,15 @@
+@c -*-texinfo-*-
+@node Map Loader, Sound Drivers, Model Conversion, Using Crystal Space
+@section Map Loader
+@cindex map loader
+
+This section will describe the map file parser. Currently
+there is only a section describing the format of the map files.
+
+@menu
+* XML File Format:: Format of Map File (@sc{xml})
+* Old Map File Format:: Old Format of Map File
+@end menu
+
+@importss{usingcs,loader,xmlfmt.txi}
+@importss{usingcs,loader,mapfmt.txi}

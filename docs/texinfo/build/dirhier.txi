@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Directory Hierarchy, Requirements, Building, Building
+@node Directory Hierarchy, Requirements, WinCVS Tutorial, Building
 @section Directory Hierarchy
 @cindex Directory Hierarchy
 @cindex Hierarchy, Directory
@@ -28,7 +28,7 @@ needed for building the project.
 
 @item CS/apps
 Contains the source code for applications which ship with Crystal Space.
-@xref{Applications}.
+@xref{Applications Overview}.
 
 @table @code
 @item CS/apps/tests

@@ -1,0 +1,20 @@
+@c -*-texinfo-*-
+@node SCF Chapter, Options, Tutorials, Using Crystal Space
+@section Plugins, Reference counting, Interfaces (SCF)
+@cindex SCF
+@cindex reference counting
+@cindex interface
+
+@sc{scf} is at the core of the Crystal Space framework. It manages reference
+counting, plugin management, and the notion of abstract interfacing. Since
+it is very crucial for everything inside Crystal Space it is important that at
+least understand the basics behind it and how you should properly use reference
+counting.
+
+@menu
+* SCF:: Shared Class Facility (@sc{scf})
+* Smart Pointers:: Correctly Using Smart Pointers
+@end menu
+
+@importss{usingcs,scf,scf.txi}
+@importss{usingcs,scf,smartptr.txi}

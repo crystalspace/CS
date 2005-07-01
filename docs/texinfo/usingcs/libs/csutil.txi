@@ -1,0 +1,100 @@
+@node csUtil, , csGeom, Libraries
+@subsection Utility Library (@code{csUtil})
+@cindex csUtil
+@cindex Module, csUtil
+@cindex Utility Module
+
+This utility library consists of many handy tools and classes which depend upon
+no other library within Crystal Space. All other plugins and libraries utilize
+the features provided by this library.  An important facility within this
+library is @sc{scf}, the Shared Class Facility, upon which all Crystal Space
+plugins are predicated.  @xref{SCF}.
+
+In addition to the many other useful classes, there are a number of handy
+array templates in this library.
+
+@itemize @bullet
+@item
+@code{csArray<T>},
+@item
+@code{csDirtyAccessArray<T>}
+@item
+@code{csRefArray<T>}
+@item
+@code{csRefArrayObject<T>}
+@item
+@code{csPDelArray<T>}
+@end itemize
+
+Also in @file{csutil} are the @file{.cfg} file reader and the random
+number generator.
+
+The other classes might or might not be useful, so if you need some very
+common functionality in your application, you should look in the @sc{api}
+reference to see if it is already implemented. The usage of these classes
+will not be explained further, as most functions are self-explanatory. The
+comments in the @sc{api} reference and the header files should also help.
+
+Exceptions should be made here for the @samp{csObject} class and for typed
+vectors. They will be explained in the next sections.
+
+@menu
+* Typed Arrays::
+@end menu
+
+@node Typed Arrays, , csUtil, csUtil
+@subsubsection Typed Arrays
+@cindex Typed Arrays
+
+Crystal Space currently has several styles of typed arrays.  These arrays grow
+as needed to accommodate additions and insertions.
+
+@itemize
+@item
+@code{csArray<T>}: This is a generic, all-purpose dynamic array class.  It is
+suitable for any C++ type, including basic types (such as @samp{int}) and
+user-defined types (such as objects).  This class guarantees proper
+construction and destruction of objects as they are added to, and removed from
+the array. The array types described below are all derived from
+@code{csArray<T>}. See @file{csutil/array.h}.
+
+@item
+@code{csDirtyAccessArray<T>}: Similar to @code{csArray<T>}, this array type can
+be used to store arbitrary objects. The difference is that this array allows
+access to the raw memory block, via @code{GetArray()}, in which the elements
+are stored, whereas @code{csArray<T>} keeps its internal state private.
+Accessing the raw memory containing the elements is considered dangerous and
+poor practice, so use of this class should be restricted and avoided.  Its main
+use is when you absolutely need access to the internal memory containing the
+array of items.  This can be useful, for instance, if you need to interface
+with some external @sc{api} (such as OpenGL) which does not understand
+@code{csArray<>}, and which expects a simple pointer to the array elements.
+See @file{csutil/dirtyaccessarray.h}.
+
+@item
+@code{csRefArray<T>}: This is the preferred way to store an array of pointers
+to reference-counted objects.  This array type automatically invokes each
+object's @code{IncRef()} method at insertion time, and @code{DecRef()} at
+removal time.  All @sc{scf} objects (@pxref{SCF}) support these methods, as do
+objects derived from @samp{csRefCount}.  Since @code{csRefArray<T>} is a
+templated class, it will also work with any other object which provides
+@code{IncRef()} and @code{DecRef()} methods.  See @file{csutil/refarr.h}.
+
+@item
+@code{csRefArrayObject<T>}: This is a variant of @code{csRefArray<T>} which can
+hold objects that have a method @code{QueryObject()} which returns something
+from which you can call @code{GetName()}.  In practice it means this is useful
+for all Crystal Space objects which implement @samp{iObject}.  In addition to
+the features of @code{csRefArray<T>} this class adds the ability to find
+elements by name.  See @file{csutil/nobjvec.h}.
+
+@item
+@code{csPDelArray<T>}: This is a convenience array class for pointers only.  It
+will invoke @samp{delete} for elements removed from the array. This is useful
+for cases when you need to store raw pointers to objects which have been
+allocated with @samp{new}, and don't want to worry about having to
+@samp{delete} the objects when removed from the array or when the array is
+destroyed. In other cases where you need to store raw object pointers but don't
+want them deleted upon removal from the array, just use the normal
+@code{csArray<T*>}. See @file{csutil/parray.h}.
+@end itemize

@@ -19,7 +19,7 @@ alleviate a potential source of resource leaks.  The companion template
 @code{csPtr<>} has also been added as a micro-optimization for certain cases
 when it is desirable to avoid reference count manipulation during assignment.
 See the smart pointer @sc{howto} for additional information,
-@ref{HOWTO Smart Pointers}.  Also see the @sc{api} documentation for
+@ref{Smart Pointers}.  Also see the @sc{api} documentation for
 @code{csRef<>} and @code{csPtr<>}.
 
 The Crystal Space @sc{api} has been largely updated to return @code{csRef<>}
@@ -28,7 +28,7 @@ caller of the function.  Client code which used to assign results of such
 function calls to a normal pointer and invoke @code{IncRef()} on that pointer
 should now instead simply assign the result to a @code{csRef<>}, and allow the
 reference count to be managed automatically.  See the smart pointer @sc{howto}
-for complete details.  @xref{HOWTO Smart Pointers}.
+for complete details.  @xref{Smart Pointers}.
 
 @subheading iPolygonMesh changes
 @cindex @code{iPolygonMesh}

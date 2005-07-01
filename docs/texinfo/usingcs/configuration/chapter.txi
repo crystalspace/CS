@@ -1,0 +1,44 @@
+@c -*-texinfo-*-
+@node Options, Libraries, SCF Chapter, Using Crystal Space
+@section Configuring Crystal Space
+@cindex Options
+@cindex configuration
+
+Crystal Space is a large project containing many applications and support
+modules.  Many of these facilities can be configured, adjusted, and
+manipulated in various ways to tailor their behavior.  This chapter discusses
+the various options available to you for tailoring Crystal Space's
+configuration.
+
+@menu
+* Common Command Line Options::
+* Configuration File::
+* Config Domains:: Configuration Domains
+* Specific Options::
+@end menu
+
+@importss{usingcs,configuration,cmdline.txi}
+@importss{usingcs,configuration,config.txi}
+@importss{usingcs,configuration,platform.txi}
+
+@node Specific Options, , Config Domains, Options
+@subsection Specific Options
+
+The following sections list options specific to various modules within the
+project.
+
+@menu
+* Config System:: System Configuration
+* Config Graphics:: Graphics Configuration
+* Config Engine:: Engine Configuration
+* Config Sound:: Sound Configuration
+* Config Console:: Console Configuration
+* Config Mouse:: Mouse Configuration
+@end menu
+
+@importsss{usingcs,configuration,config,system.txi}
+@importsss{usingcs,configuration,config,graphics.txi}
+@importsss{usingcs,configuration,config,engine.txi}
+@importsss{usingcs,configuration,config,sound.txi}
+@importsss{usingcs,configuration,config,console.txi}
+@importsss{usingcs,configuration,config,mouse.txi}

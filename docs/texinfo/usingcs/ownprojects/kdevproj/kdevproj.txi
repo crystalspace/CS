@@ -1,0 +1,361 @@
+@c -*-texinfo-*-
+@node HOWTO Creating External Application Using KDevelop, HOWTO CS Project DevCPP, HOWTO Creating External MSVC 7 Application, Making Own Projects
+@subsection Creating an External Application using KDevelop
+
+@emph{Written by Andreas Busch, @email{nobita@@t-online.de}.  Last updated
+1 April 2004.}
+
+This @sc{howto} is a step by step guide for creating a Crystal Space
+application using KDevelop as your integrated development environment outside
+the Crystal Space source tree.
+
+@subsubheading KDevelop External Step 1
+
+Open KDevelop and click on @emph{New} from the @emph{Project} menu.  The
+KDevelop Application Wizard offers you special settings for the creation of
+dedicated @sc{gnome} or @sc{kde}/Qt applications, but the selection
+@emph{Terminal-C++} is usually sufficient for creating a new Crystal Space
+project (i.e. using OpenGL).
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap0}
+@end ifnotinfo
+
+@subsubheading KDevelop External Step 2 
+
+In the @emph{Generate settings} dialog enter the @emph{Project name} as well as
+the @emph{Project directory} for your project files outside the Crystal Space
+tree.  When you mark the checkbox @emph{generate sources and headers} the Hello
+World @file{main.cpp} and @file{main.h} files are generated which can be used
+if you want to start from scratch.  If you want to import source files to start
+with, leave it unchecked.  The @emph{@sc{gnu}-Standard-Files} option copies the
+General Public License file @file{COPYING} a dummy @file{README} and
+@file{INSTALL} file into the project tree.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap1}
+@end ifnotinfo
+
+Click @emph{Next} and you will next be confronted with another dialog box.
+
+@subsubheading KDevelop External Step 3
+
+If you want @emph{Version Control Support} you can select @emph{@sc{cvs}} now
+and fill the required fields according to your @sc{cvs} environment, otherwise
+leave it set to @emph{@sc{none}}.
+
+The @emph{Next} two pages are header templates for header @file{.h} and source
+@file{.cpp} files.  Click @emph{Next} when you're done here.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap2}
+@end ifnotinfo
+
+Now an almost empty window appears and you should click on @emph{Create} to run
+an automake.  After that you can click on @emph{Exit} and do the relevant parts
+for using KDevelop with Crystal Space.
+
+@subsubheading KDevelop External Step 4
+
+Click on @emph{Options} in the @emph{Project} menu and select @emph{Compiler
+Options}.  @emph{Add} a new @emph{Configuration} and call it
+@emph{CrystalSpace}, then make sure to set the path back to the correct
+@emph{Build Directoy}.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap3}
+@end ifnotinfo
+
+@subsubheading KDevelop External Step 5
+
+When you installed Crystal Space, the script @file{cs-config} should have been
+placed in the @file{bin/} installation directory, and this directory should be
+mentioned by your @samp{PATH} environment variable,so that you can invoke
+@file{cs-config} as you would any other program simply by typing its name.  If
+you did not install Crystal Space, then you may want to copy @file{cs-config}
+into the top directory of your new project, or alter your @samp{PATH} variable
+so that it points at the directory containing @file{cs-config} (the Crystal
+Space build directory, for instance).  In the examples below which invoke
+@file{cs-config}, be sure to include the backticks in the fields
+@emph{@sc{cflags}} and @emph{@sc{cxxflags}} in the @emph{Flags and Warnings}
+tab for the @file{cs-config} script to be executed properly, otherwise you will
+get an error message that your C-compiler cannot create executables.  The
+@emph{@sc{cflags}} field should contain @samp{`./cs-config --cflags`}, and
+@emph{@sc{cxxflags}} should contain @samp{`./cs-config --cxxflags`}.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap4}
+@end ifnotinfo
+
+@subsubheading KDevelop External Step 6
+
+The same applies to the field @emph{Additional flags} in the @emph{Linker
+Flags} tab.  After @samp{`cs-config --libs`} you may add the Crystal Space
+primary library @file{crystalspace};
+thus, the entire content of the @emph{Additional flags} field might be
+@samp{`./cs-config --libs crystalspace`}.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap5}
+@end ifnotinfo
+
+@subsubheading KDevelop External Step 7
+
+Now over to the @emph{Linker Options}.  Include your additional libraries here
+as needed.  Many platforms will require @samp{-lpthread} in this field.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap6}
+@end ifnotinfo
+
+@subsubheading KDevelop External Step 8
+
+In the @emph{Make Options} dialog you need to set the include directory for
+Crystal Space.  Don't forget the backticks for automatic execution upon build.
+The @emph{additional options} field should contain
+@code{-I`./cs-config --includedir`}.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap7}
+@end ifnotinfo
+
+Click on @emph{@sc{ok}} and the configure will re-run.
+
+In the @emph{Compile Configuration} you can now change from @emph{(Default)} to
+@emph{CrystalSpace} to set your compiler options.  If you want to compile for
+different target platforms or optimized processor-types you can invoke
+@emph{Configure} in the @emph{Build} menu with different arguments.  For
+example, @samp{--host=i686-linux --build=i686-linux --target=i686-linux},
+instead of the @samp{i386-linux} default in KDevelop.  Of course, you can
+choose other platforms as well.
+@ifnotinfo
+
+@picturesss{tutorial,howto,kdevproj,snap8}
+@end ifnotinfo
+
+@subsubheading KDevelop External Step 9
+
+In the @emph{Project} menu you can now @emph{Add existing File(s)} to your
+project.  Select the @file{simple1.cpp} and @file{simple1.h} files from the
+Crystal Space code tree and add them to your project destination directory.
+You may want to uncheck the @code{insert templates} box to keep the files
+unmodified.
+
+These files can be found within the Crystal Space source code tree at the
+following location:
+
+@noindent
+@file{CS/apps/tutorial/simple1}
+
+Alternately, you can type in your own Crystal Space program, but for the sake
+of this tutorial, using the existing @file{simple1} application is easier.
+
+The resulting KDevelop project session file @file{kdevelopcs.kdevses} will look
+like this.  (You do not need to edit this file by hand; it is shown here for
+illustrative purposes only.)
+
+@example
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE KDevPrjSession>
+<KDevPrjSession>
+ <CompileConfigs>
+  <CrystalSpace>
+   <Architecture>i386</Architecture>
+   <Platform>linux</Platform>
+   <VPATHSubdir>/compile/kdevelopcs</VPATHSubdir>
+   <CFLAGS>`./cs-config --cflags`</CFLAGS>
+   <CPPFLAGS></CPPFLAGS>
+   <CXXFLAGS>-O0 -g3 -Wall</CXXFLAGS>
+   <AdditCXXFLAGS>`./cs-config --cxxflags`</AdditCXXFLAGS>
+   <LDFLAGS>`./cs-config --libs crystalspace`</LDFLAGS>
+   <ConfigureArgs>--build=i386-linux --host=i386-linux \
+    --target=i386-linux</ConfigureArgs>
+  </CrystalSpace>
+ </CompileConfigs>
+ <LastCompileConfig>CrystalSpace</LastCompileConfig>
+ <Mainframe MaximizeMode="1" />
+ <DocsAndViews NumberOfDocuments="1" >
+  <Doc0 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" \
+   CursorPosCol="0" FileName="/compile/kdevelopcs/kdevelopcs/main.cpp" >
+   <View0 Top="0" Width="406" Attach="1" Height="328" Left="0" \
+    Focus="1" Type="KWriteView" MinMaxMode="2" />
+  </Doc0>
+ </DocsAndViews>
+</KDevPrjSession>
+@end example
+
+The following is the content of the KDevelop project file
+@file{kdevelopcs.kdevprj}.  (Keep in mind that this file is created and updated
+automatically by KDevelop, so you do not need to manually change this file
+either.)
+
+@example
+[AUTHORS]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[COPYING]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[ChangeLog]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[Config for BinMakefileAm]
+bin_program=kdevelopcs
+cxxflags=-O0 -g3 -Wall
+ldadd=-lpthread
+ldflags=
+
+[General]
+AMChanged=false
+author=Some Body
+configure_args=
+email=some.body@@some.where
+execute_args=-video=opengl
+kdevprj_version=1.3
+lfv_open_groups=
+make_options=-j1 -I/usr/local/include/crystalspace
+makefiles=Makefile.am,kdevelopcs/Makefile.am, \
+kdevelopcs/docs/Makefile.am,kdevelopcs/docs/en/Makefile.am
+modifyMakefiles=true
+project_name=KDevelopCS
+project_type=normal_cpp
+sgml_file=/compile/kdevelopcs/kdevelopcs/docs/en/index.sgml
+short_info=
+sub_dir=kdevelopcs/
+version=0.1
+version_control=None
+
+[INSTALL]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[LFV Groups]
+GNU=AUTHORS,COPYING,ChangeLog,INSTALL,README,TODO,NEWS
+Headers=*.h,*.hh,*.hxx,*.hpp,*.H
+Others=*
+Sources=*.cpp,*.c,*.cc,*.C,*.cxx,*.ec,*.ecpp,*.lxx,*.l++,*.ll,*.l
+groups=Headers,Sources,GNU,Others
+
+[Makefile.am]
+files=kdevelopcs.kdevprj,admin,AUTHORS,COPYING,ChangeLog, \
+INSTALL,README,TODO,kdevelopcs.lsm
+sub_dirs=kdevelopcs
+type=normal
+
+[README]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[TODO]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[admin]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs.kdevprj]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs.lsm]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/Makefile.am]
+files=kdevelopcs/simple1.cpp,kdevelopcs/simple1.h
+sub_dirs=docs
+type=prog_main
+
+[kdevelopcs/docs/Makefile.am]
+sub_dirs=en
+type=normal
+
+[kdevelopcs/docs/en/Makefile.am]
+files=kdevelopcs/docs/en/index.html,kdevelopcs/docs/en/index-1.html, \
+ kdevelopcs/docs/en/index-2.html,kdevelopcs/docs/en/index-3.html, \
+ kdevelopcs/docs/en/index-4.html,kdevelopcs/docs/en/index-5.html, \
+ kdevelopcs/docs/en/index-6.html
+sub_dirs=
+type=normal
+
+[kdevelopcs/docs/en/index-1.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/docs/en/index-2.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/docs/en/index-3.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/docs/en/index-4.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/docs/en/index-5.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/docs/en/index-6.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/docs/en/index.html]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[kdevelopcs/simple1.cpp]
+dist=true
+install=false
+install_location=
+type=SOURCE
+
+[kdevelopcs/simple1.h]
+dist=true
+install=false
+install_location=
+type=HEADER
+@end example
+
+That is all there is to it.  Select @emph{Make} from the @emph{Build} menu, see
+your application correctly building, and do a test launch with @emph{Execute}
+or @emph{Execute with arguments} if you want to add @code{-video=opengl} for
+OpenGL rendering.

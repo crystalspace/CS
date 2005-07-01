@@ -1,0 +1,1015 @@
+@c -*-texinfo-*-
+@node Walktest, Applications Overview, Running The Demos, Running The Demos
+@section Walktest, the Basic Test Application
+@cindex Walktest
+@cindex Test Application
+@cindex @code{-relight}
+@cindex @file{/lev/flarge/world}
+
+This is the quintessential test application for the project, and the
+application most likely to be up-to-date any time a change is made to any part
+of the project.  Developers probably should not use this application as a guide
+for developing their own programs, as it is not the best example in clean
+coding.
+
+New features are most often tested using Walktest, and there are lot of
+debugging and other strange commands available.
+
+@menu
+* Walktest Getting Started:: Getting Started
+* Walktest Mouse Movement:: Mouse Movement
+* Walktest Command Line Options:: Command Line options
+* Walktest Console Commands:: Console Commands
+* Walktest Special Keys:: Special Keys
+* Walktest Configuration Files:: Configuration Files
+@end menu
+
+@node Walktest Getting Started, Walktest Mouse Movement, Walktest, Walktest
+@subsection Getting Started
+
+Walktest is probably the first program to run once you have compiled Crystal
+Space.  It takes a set of command line options, and the name of a map to open.
+By default, it will open the @file{/lev/flarge} directory.
+
+If this is the first time running Walktest (or any Crystal Space application),
+you will need to recalculate the light maps for the level.  The option
+@code{-relight} does this.  Also use this if you modify a map such that its
+geometry has changed.
+
+The other most useful options are @code{-help} to list available options, and
+@code{-video=software} or @code{-video=opengl} to change the renderer used.
+
+Once Walktest is running, you can move about the world using the mouse and
+arrow keys, similar to many First Person Shooter games.  The movement commands
+are detailed later.  @xref{Walktest Special Keys}.
+
+@node Walktest Mouse Movement, Walktest Command Line Options, Walktest Getting Started, Walktest
+@subsection Mouse Movement
+@cindex Mouse Movement
+@cindex Freelook
+@cindex Hit polygon
+@cindex Hit mesh
+
+The mouse is used for pointing at things, not movement, unless the ``freelook''
+option is set on.  In this case, moving the mouse steers the camera, and Button
+1 moves forward.
+
+@itemize @bullet
+@item
+Button 1 (normally the left one) is forward movement.
+
+@item
+Button 2 (the middle one if present) describes the nearest Mesh Object to where
+the cursor is.
+
+@item
+Button 3 (normally the right one) gives the Camera and World coordinates of
+where the mouse cursor is, and if a polygon is under the cursor, the name if
+any is given.
+@end itemize
+
+These actions can be changed. @xref{Walktest Configuration Files}.
+
+@node Walktest Command Line Options, Walktest Console Commands, Walktest Mouse Movement, Walktest
+@subsection Command Line options
+@cindex world file
+@cindex @file{flarge}
+@cindex Command line options
+
+Walktest takes the name of a map to load as a command line parameter.  If this
+is given as a full @sc{vfs} path, the map file called @file{world} in that
+directory is loaded.
+
+If there is no initial @file{/} character, @file{/lev/} is stuck on the front.
+If there is no map specified at all, @file{/lev/flarge} is assumed, so the
+default map is @file{/lev/flarge/world}.  (This is almost true---the default
+path is specified in @file{/data/config/walktest.cfg}).
+
+Many of these command line options are of specialised or limited use.
+
+@noindent
+Win32-specific options:
+
+@table @code
+@item -[no]console
+Create a debug console (default = yes).
+@end table
+
+@noindent
+Options for WalkTest:
+
+@table @code
+@item -exec=<script>
+Execute given script at startup.  In this case, the entire script is run.  If
+you run a script from within Walktest once it is running, the script is run one
+line per frame.
+
+By default, @file{/data/config/autoexec.cfg} is executed.  This defines key
+bindings which take effect when @emph{not} in console mode.
+@end table
+
+@table @code
+@item -[no]stats
+Statistics (default 'nostats').  This can also be enabled using a Console
+command.
+@item -[no]colldet
+Collision detection system (default 'colldet').
+@item -[no]logo
+Draw logo (default 'logo').  This controls display of the Crystal Space logo in
+the top right of the display.
+@item -regions
+Load every map in a separate region (default off).
+@item -dupes
+Check for duplicate objects in multiple maps (default off).
+@item -prepare
+After loading, pre-prepare all things (default off).
+@item -infinite
+Special infinite level generation (ignores map file!).
+@item -bots
+Allow random generation of bots.
+@end table
+
+@noindent
+Options for Crystal Space 3D Engine:
+
+@table @code
+@item -fov=<val>
+Field of Vision (0).
+@item -[no]rad
+Pseudo-radiosity system (no).  The entire Radiosity system is disabled
+currently, and will probably be replaced when the new renderer becomes the
+default.
+@item -reflect=<val>
+Max number of reflections for radiosity (2).
+@item -[no]relight
+Force/inhibit recalculation of lightmaps (no) This must be used the first time
+a map is run, and if there have been enough changes to the geometry to require
+all the lightmaps to be recalculated.  For a large map, this can take a long
+time.  The generated lightmaps are cached in the directory containing the
+@file{world} map, but the engine nolonger automatically regenerates them if
+they are missing.
+@item -lightqual=<val>
+Lighting quality (3).
+@item -[no]radstep
+Enable radiosity step-by-step (no).  The radiosity system is currently
+disabled.
+@end table
+
+@noindent
+Options for Win32 OpenGL 2D graphics driver for Crystal Space:
+
+@table @code
+@item -depth=<val>
+Display depth (16).
+@item -[no]fs
+Fullscreen if available (no).
+@item -mode=<val>
+Window size or resolution (640x480).
+@end table
+
+@noindent
+General options:
+
+@table @code
+@item -help
+Display a help message.
+@item -video=<s>
+The 3D rendering driver (opengl, software, @dots{}).
+@item -canvas=<s>
+The 2D canvas driver (asciiart, x2d, @dots{})
+@item -plugin=<s>
+Load this plugin after all others.
+@item -verbose
+Be more verbose; print better diagnostic messages.
+@end table
+
+@node Walktest Console Commands, Walktest Special Keys, Walktest Command Line Options, Walktest
+@subsection Console Commands
+@cindex Console Commands
+@cindex Boolean Commands
+@cindex Value Commands
+@cindex General Commands
+
+As soon as you run Walktest, you see the world that is loaded, and you can move
+about in it.  Pressing @key{Tab} replaces your view with a console into which
+you can type commands.  Pressing @key{Tab} again clears the console and returns
+you to the view of the map.
+
+To get a fairly current list of the commands, press @key{Tab} to get the
+console then type @kbd{help}.
+
+Many of the commands are used to show or set internal variables.  For example,
+@kbd{stats} will show whether the Statistics display is current enabled or not.
+Use @kbd{stats on} or @kbd{stats off} to change the state.  A command that
+accepts @kbd{on} or @kbd{off} also accepts @kbd{toggle} to change the current
+state.  This is useful when bound to a key, so that you don't have to have one
+key to turn a feature on and another to turn it off.
+
+Some of the commands are bound to single keypresses, so they can be invoked
+when not in console mode.  This is controlled by the
+@file{/data/config/autoexec.cfg} file, and is indicated alongside the
+description of the full command inside square brackets.
+
+@noindent
+Commands are of various types:
+ 
+@itemize @bullet
+@item
+General commands, DO something instead of changing a variable.  How the
+argument is interpreted depends on the command
+
+@item
+Boolean commands have either an on or off state.  When you just type the
+command without arguments it will show you the current state of the command (on
+or off).  To turn the state on just use: on, yes, true, or 1 as the first
+argument of the command.  To turn it off use: off, no, false, or 0.  To toggle
+a state use toggle.  Example: stats toggle to turn on and off the Statistics
+display.
+
+@item
+Value commands has some value associated with it.  Typing the command without
+arguments will show the current value.  Just type the value after the command
+to change it.  Using a `++' or `--' operator before the value will increase or
+decrease the value with the given amount.  Example (gamma command doesn't
+exist, this is only an example):
+
+@itemize @bullet
+@item @samp{gamma}: show current gamma value 
+@item @samp{gamma 1.5}: set gamma to 1.5 
+@item @samp{gamma ++0.05}: increase gamma with 0.05 
+@item @samp{gamma --0.05}: decrease gamma with 0.05 
+@end itemize
+@end itemize
+
+If there is a key name after the command name in square brackets, this is the
+default binding and the shortcut can be used when @emph{not} in console mode.
+
+The commands have been broken down into categories, but some commands defy
+categorisation.  If you can't find what you're looking for, keep looking!
+
+@menu
+* Walktest General:: General Commands
+* Walktest Movement:: Movement Commands
+* Walktest Special Effects:: Special Effects
+* Walktest Recording:: Recording and Playback Commands
+* Walktest Views:: Views Commands
+* Walktest Meshes:: Mesh Manipulation Commands
+* Walktest Lighting:: Lighting Commands
+* Walktest Statistics:: Statistics Commands
+* Walktest Debugging:: Debugging Commands
+@end menu
+
+@node Walktest General, Walktest Movement, Walktest Console Commands, Walktest Console Commands
+@subsubsection General Commands
+@cindex General Commands
+
+These are probably the most useful commands.  The others commands can be
+grouped into types or related commands.
+
+@table @code
+@item quit [@key{q}]
+Exit the program. 
+
+@item about
+Display the version string.
+
+@item bind key command
+Bind a key to a command.  The given key can be anything like @key{alt-c},
+@key{shift-pgdn}, @key{home}, @key{ctrl-space}, etc.  The command can be
+anything that you can execute in the console.  If you only give a key this
+command will show the current command that is bound to that key.  If you give
+no parameters then all current key-bindings will be listed.  Note that if you
+bind a key which has already been bound then the old key-binding will be
+removed.
+
+This command is used extensively in @file{/data/config/autoexec.cfg} to set up
+the key bindings for walktest.
+
+Note that pressing a key executes the command once only, unless the modifier
+``status'' is given.  For example, bind @key{left} rotate_left will execute
+only one rotate_left command when the left arrow is pressed, but bind
+@key{status-left} rotate_left will continue to rotate while the key is pressed.
+
+The modifiers are @key{status} (as described above), @key{shift}, @key{ctrl},
+@key{alt}.  The @key{shift} modifier must be used.  Bind @key{S} is not the
+same as bind-@key{shift-s}.
+
+The special key names are @key{left}, @key{up}, @key{down}, @key{right},
+@key{pgup}, @key{pgdn}, @key{enter}, @key{f1} to @key{f10}
+
+@item console [@key{Tab}]
+Toggle console visibility.  Not useful in itself, but bound to the @key{Tab}
+key.
+
+@item coordset sector,x,y,z
+Jump to location, specified as a sector name and X, Y, Z coordinates.
+
+@item coordshow Boolean [@key{Control C}]
+Enable/disable display of coordinate at runtime.  Note that enabling the
+coordinates display automatically disables the statistics display.
+
+@item coordsave [@key{Shift C}]
+Save the current sector and location in @sc{vfs} file @file{/tmp/walktest.cam}.
+
+@item coordload [@key{c}]
+Restore the saved position from @sc{vfs} file @file{/tmp/walktest.cam}.  Note
+that the position will always be restored but the orientation of the camera
+will only be restored if @samp{move3d} is set.
+
+@item exec name
+Run a script, one line per frame. The name must be a @sc{vfs} path.
+
+@item extension str
+Perform a Graphics extension command in the 2D canvas plugin.  This is
+plugin-dependant.  Currently the X11 port is the only port that has extensions
+(@samp{sim_pal}, @samp{sim_grey}, and @samp{sim_332}).  They are used when
+simulating 15/16-bit display mode on a 8-bit display
+
+@item s_fog r,g,b,density
+If no arguments are given this command will show the fog settings for the
+current sector.  Otherwise you can set the fog level for this sector.  Syntax
+is `s_fog r,g,b,density'.
+
+@item snd_play name
+Play named sound as @file{name.wav} as an ephemeral sound.
+
+@item snd_volume Value
+Change the master volume. Value between 0 and 1.
+
+@item help
+Usage message, listing these commands in a slightly more terse form.
+@end table
+
+@node Walktest Movement, Walktest Special Effects, Walktest General, Walktest Console Commands
+@subsubsection Movement Commands
+@cindex Movement Commands
+@cindex move_3d
+@cindex Quake-like
+@cindex Descent-like
+
+The actual code for movement is a maze of twisty little subroutines, all alike,
+and this is reflected in the commands available.
+
+@noindent
+There are several concepts in use in the movement commands.
+
+@itemize @bullet
+@item
+Movement in world coordinates.
+@item
+Movement relative to way the camera is facing.
+@item
+Movement relative to the camera's orientation, ie taking account of any
+rotation along the direction you are looking in.
+@item
+Acceleration and decceleration.
+@end itemize
+
+This has been implemented by having two modes - @samp{move_3d on} and
+@samp{move_3d off}.  This affects the @samp{strafe}, @samp{step}, @samp{rotate}
+and @samp{look} commands which invoke commands prefixed with @samp{imm_} when
+@samp{move_3d} is on.
+
+@samp{move_3d} is like Descent, as if you are piloting an air vehicle, and can
+yaw, pitch and roll.
+
+Without @samp{move_3d}, movement is like Quake, and you cannot tip your head
+left and right, only up and down.
+
+Acceleration and maximum speed are configured in the Configuration file, but
+only affect the step (move in direction of view) and strafe (move perpendicular
+to direction of view) commands, not the rotation commands.
+@xref{Walktest Configuration Files}.
+
+@table @code
+@item facenorth
+@itemx facesouth
+@itemx faceeast
+@itemx facewest
+@itemx facedown
+@itemx faceup
+Point in the specified absolute direction.  Useful if you get lost or if you
+are not pointing quite level, since Walktest has a movement bug which means if
+you are not facing horizontally, you tend to drift forwards or backwards.
+
+@item turn [@key{b}]
+Turn 180 from the direction you are facing.
+@end table
+
+The next section of commands work differently if @samp{move_3d} is on.
+@samp{move_3D} mode ignores gravity, and gives a full 3D capability, like
+Descent.  The gravity control can be switched off even if @samp{move_3d} is
+off.  It is of limited use, as these commands are not bound to individual keys
+normally, and you don't really want to keep typing them into the console.
+
+In 3D mode, they take a single step as described.  In normal mode, they take a
+parameter giving the distance to move.  Remember that @dfn{status} means this
+commands takes place as long as the keys are held down.
+
+@itemize @bullet
+@item @code{step_forward n} [@key{status-up}]
+@item @code{step_backward n} [@key{status-down}]
+@item @code{strafe_left n} [@key{status-alt-left}]
+@item @code{strafe_right n} [@key{status-alt-right}]
+@item @code{look_up n} [@key{status-pgup}]
+@item @code{look_down n} [@key{status-pgdn}]
+@item @code{rotate_left n} [@key{status-left}]
+@item @code{rotate_right n} [@key{status-right}]
+@item @code{jump} [@key{0}]
+@end itemize
+
+If @samp{do_gravity} is enabled (the default) and @samp{on_ground} is set, add
+@samp{cfg_jumpspeed} to upward (y) component.  In short, jump.  And you can't
+jump in midair to keep going upwards.
+
+@table @code
+@item move3d [@key{3}]
+Toggle between between pure 3D movement (Descent-like) and `comfortable'
+movement (Quake-like).  The latter is now default.  This basically affects the
+left and right arrow keys which now rotate the camera how you would expect it
+and also includes a gravity system.  When you enable 3D movement the gravity
+system is also disabled, and the left and right arrow keys are like banking a
+plane left or right.
+
+@item do_gravity boolean [@key{8}]
+Enable/disable gravity (enabled by default).  If you disable gravity, you can't
+jump.  You can use the @samp{i_up} or @samp{i_down} commands, but they are not
+bound to keys by default.
+@end table
+
+@noindent
+Movement
+
+@noindent
+These take a pair.  If first = 1, use Slow mode.  If second = 1, use Fast mode.
+Both may be true, in which case slow is assumed.  These commands are bound to
+movement keys.  The @key{Control} key sets the Slow flag, and
+@key{Control-Shift} sets the Fast flag.  There are key bindings for use with
+Slow and Fast, but not Normal speed.
+
+@itemize @bullet
+@item i_forward s f [@key{Control-UP}] 	
+@item i_backward s f [@key{Control-DOWN}]
+@item i_left s f [@key{Control-Alt-LEFT}]
+@item i_right s f [@key{Control-Alt-RIGHT}]
+@item i_up s f [@key{Control-Alt-UP}]
+@item i_down s f [@key{Control-Alt-DOWN}]
+@end itemize
+
+These four perform left or right rotation using either camera or world
+coordinates.
+
+@itemize @bullet
+@item  i_rotleftc [@key{Control-LEFT}]
+@item  i_rotleftw [@key{Control-Shift-Alt-LEFT}]
+@item  i_rotrightc [@key{Control-RIGHT}]
+@item  i_rotrightw [@key{Control-Shift-Alt-Right}]
+@end itemize
+
+These four perform rotation, left or right, around the X (horizontal) or Z
+(direction of view) axes.
+
+@itemize @bullet
+@item  i_rotleftx [@key{Control-PGDN}]
+@item  i_rotleftz [@key{Control-Alt-PGUP}]	
+@item  i_rotrightx [@key{Control-PGUP}]
+@item  i_rotrightz [@key{Control-Alt-PGDN}]
+@end itemize
+
+@table @code
+@item colldet boolean [@key{Shift-8}]
+Enable/disable collision detection.  This corresponds to the @samp{-colldet}
+and @samp{-nocolldet} command line options.
+
+@item freelook [@key{\}]
+If freelook is enabled the mouse moves the camera around like in Quake.  By
+default freelook is disabled, allowing you to move the mouse to point at
+things.
+
+@item inverse_mouse Boolean [@key{`}]
+This changes the up and down operation of the mouse, so the mouse acts like a
+joystick when in freelook mode.  Pull the mouse back to look up, push it
+forwards to look down.
+@end table
+
+@node Walktest Special Effects, Walktest Recording, Walktest Movement, Walktest Console Commands
+@subsubsection Special Effects
+@cindex Special Effects
+
+These commands exercise various features and are useful for gaining experience
+with what Crystal Space is capable of.
+
+They are listed alphabetically except where it makes more sense to group them
+together.
+
+@table @code
+@item addbot value
+Add a @dfn{bot} at specified distance.  This is a sprite that moves randomly
+through the map.
+
+@item delbot
+Delete the most recently added bot.
+
+@item explosion name
+Add a particle system simulating an explosion.  The parameter for this command
+is the texture to use for the particles.
+
+@item fire [@key{SPACE}]
+Fire a missile in the direction that you are looking.  The missile will explode
+when it hits a wall.  The missile is a moving light and a particle system.
+
+@item fountain name, num
+Add a particle system simulating a fountain.  The two parameter for this
+command are the texture to use for the particles and the number of particles.
+The default number of particles is 400.
+
+@item flame name, num
+Add a particle system simulating a fire.  The two parameter for this command
+are the texture to use for the particles and the number of particles.  The
+default number of particles is 200.
+
+@item lightning Boolean [@key{Control-L}]
+If this is set, simulated lightning will flash randomly.
+
+@item portal name
+Create a new region with the given name and load the same named level into that
+region.  Then create a portal on the spot you are standing to the start
+position of the new level and back.
+
+@item rain texture, num, speed
+@itemx frain texture, num, speed
+Add a particle system simulating rain.  The three parameter for this command
+are the texture to use for the particles (@file{raindrop.png} is good and is
+also the default), the number of particles and the speed (in meter per second).
+The default number of particles is 500 and the default speed is 2.  All
+parameters are optional.  Frain is as rain, but last parameter to
+@samp{add_particles_rain} is true, not false
+
+@item snow name, num, speed
+Add a particle system simulating snow.  The three parameter for this command
+are the texture to use for the particles (@file{snow.png} is good and is also
+the default), the number of particles and the speed (in meter per second).  The
+default number of particles is 500 and the default speed is 0.3.  All
+parameters are optional.
+
+@item spiral name
+Add a particle system simulating an spiral.  The parameter for this command is
+the texture to use for the particles.  Experimental.
+
+@item fs_inter amount,length [@key{F4}]
+Toggle a fullscreen interference mode.
+
+@item fs_fadeout [@key{F5}]
+Cause a full image fadout, to the colour specified by fs_fadecol.
+
+@item fs_fadecol r,g,b
+Set fadeout colour. Default is red.
+
+@item fs_fadetxt name [@key{F6}]
+Set fadeout texture to name of material, which must be one already loaded.
+(use @samp{spark} for a good example).
+
+@item fs_red
+@itemx fs_green
+@itemx fs_blue
+@itemx fs_whiteout
+Toggle a full image fadeout to red, green, blue or white.
+
+@item fs_shadevert tr,tb,tg,br,bb,bg
+Toggle a fullscreen shading effect which is added to the 3D view using
+add-blending-mode.  The parameters are (r,g,b) for the top and (r,g,b) for the
+bottom of the screen.  Default is red to blue.
+@end table
+
+@node Walktest Recording, Walktest Views, Walktest Special Effects, Walktest Console Commands
+@subsubsection Recording and Playback Commands
+@cindex Recording
+@cindex Playback
+
+This allows demos to be recorded.
+
+@table @code
+@item record
+Start/stop recording camera movement.  If you have a previous recording in
+memory then a the new camera movements will be appended.
+
+@item play
+Play current recording.  The play command also exists in other forms concerned
+with performance statistics, not a recording of motion.
+
+@item clrrec
+Clear current recording.
+
+@item saverec file
+Save recording as @file{/tmp/file.rec}, default @file{/tmp/record}.  It is
+only sensible play back a recording in the same or nearly identical map.
+
+@item loadrec file
+Load recording from @file{/tmp/file.rec}, default @file{/tmp/record}.
+
+@item recsubperf str - record subperformance
+Once a recording has begun this command is used to record the statistics of a
+subsection of the demo and is reported as such in the output @file{file.rps}
+when played back.  To finish the subsection call the command again without an
+argument.  @samp{recsubperf} stands for record subsection performance.
+@end table
+
+@node Walktest Views, Walktest Meshes, Walktest Recording, Walktest Console Commands
+@subsubsection Views Commands
+@cindex Views
+@cindex Split View
+
+It is possible to run in split-screen mode, as if it were a multiplayer game.
+
+@table @code
+@item fullscreen boolean [@key{Alt-Enter}]
+Set to fullscreen mode.  This only works with some renderers, as it performs an
+`extension' command.
+
+@item split_view [@key{Capital S}]
+Split to 2 views.  The screen is divided into a left and right half.  You can
+navigate independantly in both views.  The new view is located back at the map
+start point.
+
+@item unsplit_view [@key{Capital U}]
+Go back to single view.
+
+@item toggle_view [@key{Capital T}]
+Switch the active view, ie the one you can move in.
+@end table
+
+@node Walktest Meshes, Walktest Lighting, Walktest Views, Walktest Console Commands
+@subsubsection Mesh Manipulation Commands
+@cindex Mesh Commands
+@cindex Load Meshes
+@cindex Actions
+
+These commands allow meshes to be loaded interactively, instead of having to
+modifiy the world file.  This can also be used for rapid development of meshes,
+so that Walktest does not have be restarted each time you make a change to a
+mesh in an external modelling program.
+
+@table @code
+@item loadmesh file, factory, texture
+Loads a mesh from the @file{file} (@sc{vfs} path).  Give it the name
+@samp{factory} for use in addmesh.  The ``texture'' must already by loaded.
+
+@item addmesh factory, mesh, size
+Adds named mesh to world at current location using a ``factory'' specified by
+loadmesh.  The ``mesh'' parameter can be used later in delmesh.
+
+@item delmesh mesh
+Delete named mesh.
+
+@item listmeshes
+List loaded meshes, including ones from the loaded map.
+
+@item listactions name, action
+List available actions for this mesh.
+
+@item setaction meshname, action
+Starts named action.
+
+@item action [@key{a}]
+Activate the object that is right in front of you.  This command will use the
+WalkTest entity system.  Currently it only works for opening doors that use the
+@samp{cmd_door} key.
+@end table
+
+@node Walktest Lighting, Walktest Statistics, Walktest Meshes, Walktest Console Commands
+@subsubsection Lighting Commands
+@cindex Lighting Commands
+@cindex Dynamic Lights
+@cindex Pseudodynamic lights
+
+It is possible to add dynamic lights at your current location.  These have a
+serious degradation on frame rate, but can be fun to play with.
+
+@table @code
+@item addlight r,g,b,radius,shadows [@key{Shift-L} or @key{1}]
+Create dynamic light of specified colour at current location.  Shadows is 0 or
+1 to cast shadows.  Defaults are radius=6, colour =white.  If no parameters are
+given the light will also move up and down slightly and randomly change colour.
+The rgb components should be floating point numbers in the range 0.0 to 1.0,
+but this is not checked.
+
+@item dellight [@key{Shift-1}]
+Delete most recently added dynamic light.
+
+@item dellights [@key{Alt-1}]
+Delete all dynamic lights.
+
+@item clrlights
+Set all pseudo-dynamic lights to black.
+
+@item setlight r, g, b
+Sets the selected light to specified colour.  The selected light is the most
+recently added.
+@end table
+
+@node Walktest Statistics, Walktest Debugging, Walktest Lighting, Walktest Console Commands
+@subsubsection Statistics Commands
+@cindex Statistics
+@cindex RPS files
+@cindex Perftest
+
+These commands allow a better view of how good Crystal Space is at handling
+your world map, or to help in identifying areas of the world map that need to
+be simplified or improved.
+
+@table @code
+@item stats boolean
+Enable/disable statistics display.  Corresponds to
+@samp{-stats}/@samp{-nostats} commandline options and `Walktest.Settings.Stats'
+configuration option.  Note that enabling the statistics counter automatically
+disables the display of the coordinates.
+
+@item perftest value [@key{p}]
+Run a performance test, giving the result in Frames Per Second.  It calculates
+n frames, default 100.
+
+@item play filename
+If a filename is given, This outputs summary statistics for the demo played to
+@file{file.rps}.  The @file{.rps} extension stands for Recorded Performance
+Statistics Default @file{/tmp.rps}
+
+@item play res, x, filename 
+The @var{res} option stands for resolution and tells WalkTest to record
+statistics every x frames and output the summary to @file{file.rps}.
+
+@item play break, x
+The @var{break} option, when WalkTest is compiled in debug mode, will trip off
+a signal trap frame number x.  This is useful once you take note of the frame
+number of something interesting in an @file{.rps} file
+@end table
+
+@node Walktest Debugging, ,Walktest Statistics, Walktest Console Commands
+@subsubsection Debugging Commands
+@cindex Debugging Walktest
+
+These commands are primarily to aid in debugging the engine, and may or may not
+work, depending on the current state of the engine code.
+
+@table @code
+@item bugplug
+Load bugplug plugin.  This is documented elsewhere.
+
+@item cls
+Clear the text from the console.
+
+@item cmessage str
+Print a message to the console at @samp{NOTIFY} priority.  Useful in scripts.
+
+@item dmessage str
+Print a message to the console at @samp{DEBUG} priority. Useful in scripts.
+
+@item dnl
+Print a newline to the console at @samp{DEBUG} priority. Useful in scripts.
+
+@item db_boxshow boolean
+Sets or display @samp{do_show_debug_boxes}.
+
+@item db_boxcam1
+Set @samp{db_box1} to current position.
+
+@item db_boxcam2
+Set @samp{db_box2} to current position.
+
+@item db_boxsize1
+Set or show size of @samp{db_box1}.
+
+@item db_boxsize2
+Set or show size of @samp{db_box2}.
+
+@item db_frustrum [@key{=} - reset, @key{]} increment, @key{[} decrement]
+Set or show @samp{cgf_debug_check_frustrum}.
+
+@item db_maxpol Value
+Set/get the maximum number of polygons that is drawn every frame.  Normally
+this is set to a very high number so that this maximum is never reached
+(2000000000 polygons every frame should suit everyone's need for the near
+future :-) You can reduce this number for debugging purposes.  In combination
+with @samp{fclear} and binding keys to @samp{db_maxpol ++1} and @samp{db_maxpol
+--1} you can get the effect of drawing one polygon at a time.
+
+@item db_procpol Value
+Set/get the maximum number of polygons that is considered by the culling
+routines every frame.  Normally this is set to a very high number so that this
+maximum is never reached (2000000000 polygons every frame should suit
+everyone's need for the near future :-) You can reduce this number for
+debugging purposes.
+
+@item debug0, debug1, debug2
+These commands do not do anything, but serve as placeholders to put in your own
+debugging code.
+
+@item lod Value
+Change the global level-of-detail (@dfn{LOD}) setting for sprite.  1 is full
+detail, 0 is no detail at all (i.e. you will not see the sprite).  -1 is
+disabled.  Otherwise, any value between 0 and 1 is legal.  Default is 1.
+
+@item portals Boolean
+Enable/disable drawing through portals.  If this is off, a portal will just
+draw as the default texture on the polygon
+
+@item sprlight Boolean [@key{s}]
+Change quality setting of sprite lighting.  If yes every vertex will be lit
+according to the correct distance with the light.  If no then the distances for
+all vertices are calculated to the center of the sprite.  Default is `no'.
+
+@item hi Boolean
+This is intended to hilight the active polygon, but is currently disabled.
+
+@item zbuf Boolean
+For debugging.  When enabled this will show an alternate view where far away
+objects are rendered in another color.  In other words: it tests the Z buffer.
+It works best in 16-bit mode.
+
+@item palette Boolean
+This only has effect when a palette is used, not in a True Colour display.
+
+@item db_radstep [@key{Shift-R}]
+@itemx db_radhi [@key{Alt-R}]
+@itemx db_radtodo [@key{Control-R}]
+The Radiosity system is disabled and will probably remain that way until the
+new renderer is fully available.
+
+@item db_frustum Boolean
+Set or show debug check frustum value.
+
+@item farplane Value
+Set far plane distance, or 0 to disable Y.
+
+@item emode front2back|back2front|zbuffer [@key{d}, @key{Shift-D}, @key{Alt-D}]
+Sets the Engine render mode to one of the given values.
+
+@item p_alpha Value
+Change the alpha transparency for a selected portal.  You can select a portal
+by clicking on it (only if it already has alpha transparency) or else by using
+the @samp{hi} command.  Legal values for p_alpha are between 0 and 100.  This
+command is currently disabled.
+
+@item action
+Hit a polygon, list name.
+
+@item plugins
+List loaded plugins.
+
+@item conflist n
+List options for plugin @var{n}.
+
+@item confset n,s1,s2
+Set option s1 to s2 for plugin @var{n}.
+@end table
+
+@node Walktest Special Keys, Walktest Configuration Files, Walktest Console Commands, Walktest
+@subsection Special Keys
+@cindex Special Keys
+@cindex bind
+@cindex @file{autoexec.cfg}
+
+When not in console mode, you can perform various actions and commands using
+shortcut keys.  Most of these are for movement, the rest enable debugging
+commands.
+
+They are defined by the @file{/data/config/autoexec.cfg} file which is read in
+at start up time.  That is the best place to check exactly what is bound to
+what.
+
+@noindent
+Here is the current contents of the file, annotated:
+
+@example
+bind tab console toggle
+bind space fire
+bind ctrl-l lightning
+bind shift-a p_alpha ++1
+bind alt-a p_alpha --1
+    The p_alpha command is disabled.
+bind a action
+bind b turn
+bind shift-c coordsave
+bind c coordload
+bind ctrl-c coordshow toggle
+bind d emode front2back
+bind shift-d emode back2front
+bind alt-d emode zbuffer
+bind shift-e frustum toggle
+    This command does not exist.
+bind shift-l addlight 1,1,1,1000,1
+bind p perftest
+bind q quit
+bind shift-r db_radstep
+bind alt-r db_radhi
+bind ctrl-r db_radtodo
+    Radiosity is disabled.
+bind ctrl-t things toggle
+    The @code{things} commands has been removed.
+bind z cosfact ++.1
+bind shift-z cosfact --.1
+    These commands do not exist.
+bind shift-1 dellight
+bind 1 addlight
+bind alt-1 dellights
+bind 2 picklight
+bind shift-2 droplight
+bind f1 extension sim_pal
+bind f2 extension sim_grey
+bind f3 extension sim_332
+bind f4 fs_inter .01,100
+bind f5 fs_fadeout
+bind f6 fs_fadetxt spark
+bind \ freelook toggle
+bind ) db_octree 0
+bind _ db_octree --1
+bind + db_octree ++1
+    These commands do not exist.
+bind = db_frustum 0
+bind [ db_frustum --1
+bind ] db_frustum ++1
+bind status-alt-left strafe_left
+bind status-alt-right strafe_right
+bind status-left rotate_left
+bind status-shift-left rotate_left
+bind status-right rotate_right
+bind status-shift-right rotate_right
+bind status-up step_forward
+bind status-shift-up step_forward
+bind status-down step_backward
+bind status-shift-down step_backward
+bind status-pgup look_up
+bind status-pgdn look_down
+    The following section do NOT have the @key{status}
+    modifier set, so they do not run for as long as the key
+    is pressed.  The @key{Control} variants set the Slow
+    flag, and the @key{Control-Shift} variants set the fast
+    flag.
+bind ctrl-left i_rotleftc 1,0
+bind ctrl-right i_rotrightc 1,0
+bind ctrl-alt-left i_left 1,0
+bind ctrl-alt-right i_right 1,0
+bind ctrl-up i_forward 1,0
+bind ctrl-down i_backward 1,0
+bind ctrl-alt-up i_up 1,0
+bind ctrl-alt-down i_down 1,0
+bind ctrl-pgdn i_rotleftx 1,0
+bind ctrl-pgup i_rotrightx 1,0
+bind ctrl-alt-pgdn i_rotleftz 1,0
+bind ctrl-alt-pgup i_rotrightz 1,0
+bind ctrl-shift-left i_rotleftc 0,1
+bind ctrl-shift-right i_rotrightc 0,1
+bind ctrl-shift-alt-left i_left 0,1
+bind ctrl-shift-alt-right i_right 0,1
+bind ctrl-shift-up i_forward 0,1
+bind ctrl-shift-down i_backward 0,1
+bind ctrl-shift-alt-up i_up 0,1
+bind ctrl-shift-alt-down i_down 0,1
+bind ctrl-shift-pgdn i_rotleftx 0,1
+bind ctrl-shift-pgup i_rotrightx 0,1
+bind ctrl-shift-alt-pgdn i_rotleftz 0,1
+bind ctrl-shift-alt-pgup i_rotrightz 0,1
+bind ctrl-alt-up i_up 0,0
+bind ctrl-alt-down i_down 0,0
+bind ` inverse_mouse toggle
+bind status-0 jump
+bind 3 move3d toggle
+bind shift-8 colldet toggle
+bind 8 do_gravity toggle
+bind s sprlight toggle
+bind f9 addsprite bot,1
+    This command does not exist.
+bind f10 delsprite bot
+    This command does not exist.
+bind alt-enter fullscreen
+    This sends an Extension command to the current renderer,
+    so probably has no effect unless you are using the X11
+    plugin.
+bind ; trilinear on
+bind ' trilinear off
+    It looks as though the @code{trilinear} command has been
+    removed from the code.
+bind shift-s split_view
+bind shift-u unsplit_view
+bind shift-t toggle_view
+    View splitting and unsplitting
+@end example
+
+@node Walktest Configuration Files, , Walktest Special Keys, Walktest
+@subsection Configuration Files
+@cindex Configuration
+@cindex @file{walktest.cfg}
+
+Walktest has its own configuration file, @file{/data/config/walktest.cfg}.
+This can be used to set the default map directory, override other plugin
+defaults and also contains many settings for the Collision Detection to prevent
+the player from walking through things.
+
+In addition, Walktest reads the normal configuration files for each plugin.
+Probably the one of most interesting is the @sc{vfs} configuration file, at
+@file{/vfs.cfg}.  You will need to alter this if you want to load a map not
+otherwise known to @sc{vfs}, or add a @samp{VFS.Mount.lev} line to your own
+configuration file somewhere.
+
+Finally, Walktest reads @file{/data/config/autoexec.cfg}, which contains a
+series of Walktest commands.  Normally this only contains key binding commands,
+but can in principle contain any Walktest commands.

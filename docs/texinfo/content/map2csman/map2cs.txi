@@ -1,0 +1,33 @@
+@c -*-texinfo-*-
+@node map2cs, map2cs Tutorial, Simple Map Example, Working with Engine Content
+@section @code{map2cs} Manual (Quake Map Converter)
+@cindex @file{map2cs}
+@cindex Quake Map Converter (@file{map2cs})
+@cindex Conversion, Quake Map (@file{map2cs})
+@cindex Map Conversion (@file{map2cs})
+@cindex Applications, @file{map2cs}
+
+@noindent
+@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.  Last updated 19
+March 2000.}
+
+Currently, Crystal Space has reached a state where it can be very rewarding to
+create some maps for Crystal Space.  That's where @file{map2cs} comes in
+handy.  It allows you to convert maps created with mature Quake map building
+tools to Crystal Space's map format.
+
+People new to @file{map2cs} may be interested in the accompanying tutorial
+(@pxref{map2cs Tutorial}), and all users (new and old) may benefit from the
+accompanying reference information which follows.
+
+@menu
+* map2cs.cfg:: Reference for @file{map2cs.cfg}
+* map2cs Classnames and Keys:: Classnames and Keys
+* map2cs Invoking:: Invoking
+* map2cs.cfg Game-Specific Data:: Game-Specific Data
+@end menu
+
+@importss{content,map2csman,ref1.txi}
+@importss{content,map2csman,ref2.txi}
+@importss{content,map2csman,ref3.txi}
+@importss{content,map2csman,ref4.txi}

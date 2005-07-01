@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Building, Options, CS Introduction, Top
+@node Building, Running The Demos, CS Introduction, Top
 @chapter Building and Installing
 @cindex Building
 @cindex Installation
@@ -12,6 +12,7 @@ If you are eager to try out the package after building it successfully, then
 read the Quick Start section.  @xref{Quick Start}.
 
 @menu
+* WinCVS Tutorial::
 * Directory Hierarchy::
 * Requirements::
 * External Libraries::
@@ -20,6 +21,7 @@ read the Quick Start section.  @xref{Quick Start}.
 * Quick Start::
 @end menu
 
+@importss{build,wincvs,wincvs.txi}
 @imports{build,dirhier.txi}
 @imports{build,sysreq.txi}
 @imports{build,extlibs.txi}

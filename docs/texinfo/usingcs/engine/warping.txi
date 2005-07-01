@@ -1,0 +1,213 @@
+@c -*-texinfo-*-
+
+@c ----------------------------------------------------------------------------
+@c Define the mathematical macro @Nn{N,n} which places n as subscript to N.
+@c ----------------------------------------------------------------------------
+@ifnottex
+@macro Nn{N,n}
+@math{\N\\n\}
+@end macro
+@end ifnottex
+@iftex
+@macro Nn{N,n}
+@tex
+$\N\_{\n\}$%
+@end tex
+@end macro
+@end iftex
+
+@node Space Warping, Texture Mapping, Cameras and Matrices, Engine
+@subsection Space Warping
+@cindex Space Warping
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+A little explanation about space warping in Crystal Space and how the space
+warping matrix/vector work should be given.
+
+Crystal Space always works with 3x3 matrices and one 3-element vector to
+represent transformations.  Let's say that the camera is given as @Nn{M,c} and
+@Nn{V,c} (camera matrix and camera vector, respectively).
+
+When going through a warping portal (mirror for example) there is also a
+warping matrix and two vectors, @Nn{M,w}, @Nn{V,w1} and @Nn{V,w2}.  @Nn{V,w1}
+is the vector that is applied before @Nn{M,w} and @Nn{V,w2} is applied after
+@Nn{M,w}.  The warping transformation is a transformation in world space.  For
+example, if you have the following sector:
+
+@ifnottex
+@example
+       A
+  +---------+       z
+  |         |       ^
+  |         |       |
+D |    o    | B     o-->x
+  |         |
+  |         |
+  +---------+
+       C
+@end example
+@end ifnottex
+@tex
+\hbox{
+\vbox{
+\hbox to 3 cm{\hfil$A$\hfil}
+\hbox to 3 cm{\hfil
+\vbox to 1.5 cm{\vfil\hbox{$D$}\vfil}%
+\vbox{
+\hrule
+\hbox to 1.5 cm{%
+\vrule height 1.5 cm\hfil
+\vbox to 1.5 cm{\vfil\hbox{\hfil{}$o$\hfil}\vfil}%
+\hfil\vrule height 1.5 cm
+}
+\hrule
+}%
+\vbox to 1.5 cm{\vfil\hbox{$B$}\vfil}
+\hfil}
+\hbox to 3 cm{\hfil$C$\hfil}
+}\quad
+\vbox to 3 cm{
+\vfil
+\noindent$z$\hfill\break
+$\uparrow$\hfil\break
+$\bullet\rightarrow{}x$
+\vfil
+}
+}
+@end tex
+
+With point @math{o} at (0,0,0) and the @math{B} side a mirror.  Let's say that
+@math{B} is 2 units to the right of @math{o}.  The warping matrix/vector would
+then be:
+
+@ifnottex
+@example
+      /-1 0 0 \          / 2 \           / 2 \
+Mw =  | 0 1 0 |    Vw1 = | 0 |     Vw2 = | 0 |
+      \ 0 0 1 /          \ 0 /           \ 0 /
+@end example
+@end ifnottex
+@tex
+$$M_w = \pmatrix{
+\hfill -1 & 0 & 0 \cr
+\hfill  0 & 1 & 0 \cr
+\hfill  0 & 0 & 1 \cr
+}
+\qquad
+V_{w1} = \pmatrix{2 \cr 0 \cr 0 \cr}
+\qquad
+V_{w2} = \pmatrix{2 \cr 0 \cr 0 \cr}$$
+@end tex
+
+@noindent
+The mirror swaps along the X-axis.
+
+How is this transformation then used?
+
+To know how this works we should understand that
+@Nn{M,c} and @Nn{V,c}
+(the camera transformation) is a transformation from world space to camera
+space.  Since the warping transformation is in world space we first have to
+apply
+@ifnottex
+@math{Mw / Vw} before @math{Mc / Vc}.
+@end ifnottex
+@tex
+$M_w / V_w$ before $M_c / V_c$.
+@end tex
+
+So we want to make a new camera transformation matrix/vector that we are then
+going to use for the recursive rendering of the sector behind the mirror.
+Let's call this
+@ifnottex
+@math{Mc'} and @math{Vc'}.
+@end ifnottex
+@tex
+$M'_c$ and $V'_c$.
+@end tex
+
+The camera transformation is used like this in Crystal Space:
+
+@ifnottex
+@quotation
+@multitable @columnfractions .35 .65
+@item @math{C = Mc * (W - Vc)} @tab (Equation 1)
+@end multitable
+@end quotation
+@end ifnottex
+@tex
+$$C = M_c \times (W - V_c) \eqno (1)$$
+@end tex
+
+@noindent
+Where @math{C} is the camera space coordinates and @math{W} is the world space
+coordinates.
+
+But first we want to transform world space using the warping transformation:
+
+@ifnottex
+@quotation
+@multitable @columnfractions .35 .65
+@item @math{W' = Mw * (W - Vw1) + Vw2} @tab (Equation 2)
+@end multitable
+@end quotation
+@end ifnottex
+@tex
+$$W' = M_w \times (W - V_{w1}) + V_{w2} \eqno (2)$$
+@end tex
+
+It is important to realize that the
+@ifnottex
+@math{Mw / Vwn}
+@end ifnottex
+@tex
+$M_w / V_{wn}$
+@end tex
+transformation is used a little differently here.  The @Nn{V,w1} vector is
+used to translate to the warping polygon first and @Nn{V,w2} is used to go
+back when the matrix @Nn{M,w} has done its work.  This is just how Crystal
+Space does it.  One could use other matrices/vectors to express the warping
+transformations.
+
+Combining equations (1) and (2), but replacing @math{W} by @math{W'} in (1),
+gives:
+
+@ifnottex
+@quotation
+@math{C = Mc * (Mw * (W - Vw1) + Vw2 - Vc)}@*
+@math{C = Mc * Mw * ((W - Vw1) - 1 / Mw * (Vc - Vw2))}@*
+@math{C = Mc * Mw * (W - (Vw1 + 1 / Mw * (Vc - Vw2)))}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+C &= M_c \times (M_w \times (W - V_{w1}) + V_{w2} - V_c) \cr
+  &= M_c \times M_w \times ((W - V_{w1}) - 1 / M_w \times (V_c - V_{w2})) \cr
+  &= M_c \times M_w \times (W - (V_{w1} + 1 / M_w \times (V_c - V_{w2}))) \cr
+}$$
+@end tex
+
+@noindent
+And this is the new camera transformation:
+
+@ifnottex
+@quotation
+@math{Mc' = Mc * Mw}@*
+@math{Vc' = Vw1 + 1 / Mw * (Vc - Vw2)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+M'_c &= M_c \times M_w \cr
+V'_c &= V_{w1} + 1 / M_w \times (V_c - V_{w2}) \cr
+}$$
+@end tex
+
+In summary, the warping transformation works by first transforming world space
+to a new warped world space.  The new camera transformation is made by
+combining the warping transformation with the old camera transformation.
+
+@unmacro Nn
