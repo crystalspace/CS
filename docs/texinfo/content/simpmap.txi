@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Simple Map Example, map2cs, Map Creation, Working with Engine Content
+@node Simple Map Example, Blender, Map Creation, Working with Engine Content
 @section Simple Map Example
 @cindex @code{iImage}
 

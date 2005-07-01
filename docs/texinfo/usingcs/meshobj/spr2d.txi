@@ -11,7 +11,7 @@
 @cindex @code{iParticle}
 
 @emph{Written by Jorrit Tyberghein,
-(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+(@email{jorrit.tyberghein@@gmail.com}).}
 
 A 2D Sprite is basically a polygon that always faces the camera.  There are
 some special effects that you can do with this but it is really very simple

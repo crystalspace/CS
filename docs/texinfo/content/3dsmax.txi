@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node 3DSMax, map2cs, Blender, Working with Engine Content
+@section Making Levels and Models in 3DSMax
+@cindex 3DSMax
+
+3DSMax is a very powerful commercial 3D modeller which is supported very
+well by Crystal Space.
+
+@subheading Making Levels
+
+For making levels you can use the exporter that is included with Crystal
+Space. You can find it in @file{CS/scripts/max}. There is also a manual
+there which is located at @file{CS/scripts/max/exporterguide/index.html}.
+
+@subheading Making Models
+
+Models of type Cal3d (@pxref{MeshObject SprCal3D}) can be converted from
+3DSMax.
+

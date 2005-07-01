@@ -13,7 +13,7 @@
 @cindex @code{iSpriteAction}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 A 3D Sprite is a complex set of 3D triangles that supports animation through
 frames.

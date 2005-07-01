@@ -5,7 +5,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 Here is a short run-through of the main rendering loop.  This document is not an
 explanation of portal technology.  It just explains how the main rendering

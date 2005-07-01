@@ -10,7 +10,7 @@
 @cindex @code{iGeneralFactoryState}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 A Genmesh is a complex set of 3D triangles (just like a 3D sprite)
 that doesn't support any automatic animation (unlike a 3D sprite). In general

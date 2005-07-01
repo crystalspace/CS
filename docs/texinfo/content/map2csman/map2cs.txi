@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node map2cs, map2cs Tutorial, Simple Map Example, Working with Engine Content
+@node map2cs, map2cs Tutorial, 3DSMax, Working with Engine Content
 @section @code{map2cs} Manual (Quake Map Converter)
 @cindex @file{map2cs}
 @cindex Quake Map Converter (@file{map2cs})

@@ -10,7 +10,7 @@
 @cindex @code{iParticleState}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 Spiral is a particle system for a special spiral effect.  This is an
 experimental particle system which is currently not fully operational.  Also

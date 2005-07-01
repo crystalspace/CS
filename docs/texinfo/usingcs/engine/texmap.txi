@@ -31,7 +31,7 @@ $\N\_{\n\_\o\}$%
 @cindex Texture Mapping
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be} with additions by Samuel Humphreys.
+@email{jorrit.tyberghein@@gmail.com} with additions by Samuel Humphreys.
 Mathematical typesetting for
 @TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 

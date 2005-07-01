@@ -6,6 +6,8 @@
 @menu
 * Map Creation:: How to Create Optimal Maps for Crystal Space
 * Simple Map Example::
+* Blender:: Making Levels and Models in Blender
+* 3DSMax:: Making Levels and Models in 3DSMax
 * map2cs:: @code{map2cs} Manual (Quake Map Converter)
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * md32spr Tutorial:: @code{md32spr} Tutorial
@@ -15,6 +17,8 @@
 
 @imports{content,levbuilding.txi}
 @imports{content,simpmap.txi}
+@imports{content,blender.txi}
+@imports{content,3dsmax.txi}
 @importss{content,map2csman,map2cs.txi}
 @importss{content,map2cs,map2cs.txi}
 @imports{content,md32spr.txi}

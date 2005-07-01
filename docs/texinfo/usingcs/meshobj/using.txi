@@ -9,7 +9,7 @@
 @cindex @code{iMeshWrapper}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 This section explains how to use Mesh Objects in general.  It doesn't go into
 detail about the specific Mesh Object Types that Crystal Space supports.

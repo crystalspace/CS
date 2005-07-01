@@ -10,7 +10,7 @@
 @cindex @code{iTerrFuncState}
 
 @emph{Written by Jorrit Tyberghein,
-(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+(@email{jorrit.tyberghein@@gmail.com}).}
 
 @strong{DOCUMENTATION NOT UP-TO-DATE}
 

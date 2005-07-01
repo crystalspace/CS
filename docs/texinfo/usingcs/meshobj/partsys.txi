@@ -9,7 +9,7 @@
 @cindex @code{iParticleState}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 This section explains everything that is common to all particle systems.
 Go to the specific particle system section for more information about

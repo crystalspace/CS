@@ -7,7 +7,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 13 August 2003.}
+@email{jorrit.tyberghein@@gmail.com}. Last updated 13 August 2003.}
 
 In a 3D engine there are typically two major ways that can be used to
 optimize performance (aside from getting better hardware and making better

@@ -5,7 +5,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 The world in Crystal Space is defined with @dfn{Sectors}. A sector is
 an area of space that itself does not represent geometry but can

@@ -9,7 +9,7 @@
 @cindex @code{iTerrFuncState}
 
 @emph{Written by Jorrit Tyberghein,
-(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+(@email{jorrit.tyberghein@@gmail.com}).}
 
 This mesh object represents a landscape engine. It features four static
 @sc{lod} levels and dynamic lighting for one directional light. In future

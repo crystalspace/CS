@@ -1,11 +1,11 @@
 @c -*-texinfo-*-
-@node Sequence Manager, ProcTextures, The Sprite Action Interface, Animation
+@node Sequence Manager, ProcTextures, Sprite3D Animation, Animation
 @subsection Sequence Manager
 @cindex Sequence Manager
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 16 August 2003.}
+@email{jorrit.tyberghein@@gmail.com}. Last updated 16 August 2003.}
 
 When you define geometry in a map file this usually define a static
 representation of the world. Using the sequence manager it is possible

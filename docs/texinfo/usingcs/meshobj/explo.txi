@@ -10,7 +10,7 @@
 @cindex @code{iParticleState}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 Explosion is a particle system that emulates an explosion.  Also see the
 general particle system documentation which is valid for all particle systems.

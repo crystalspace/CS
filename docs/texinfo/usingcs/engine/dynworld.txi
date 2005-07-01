@@ -5,7 +5,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 28 September 1998.}
+@email{jorrit.tyberghein@@gmail.com}. Last updated 28 September 1998.}
 
 Normally the portal approach lends itself very well for dynamic worlds.
 However, the big problem is lighting.  Static lightmaps are very static (as

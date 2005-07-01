@@ -1,0 +1,42 @@
+@c -*-texinfo-*-
+@node Blender, 3DSMax, Simple Map Example, Working with Engine Content
+@section Making Levels and Models in Blender
+@cindex Blender
+@cindex blend2cs
+@cindex blender2crystal
+
+Blender is one of the most popular free 3D modellers available and it is
+supported very well by Crystal Space. You can find Blender here:
+
+@url{http://www.blender3d.org}
+
+@subheading Making Levels
+
+For making levels there are basically two ways. Either you can use the
+Blend2cs utility which is a standalone application that can convert a
+blender file to a Crystal Space world file. You can get it from:
+
+@itemize
+@item
+Official project site: @url{http://projects.blender.org/projects/blend2cs/}
+@item
+More recent windows compiled version: @url{ftp://sunsite.dk/projects/crystal/crystalcore/blend2cs.exe} and a readme for that at: @url{ftp://sunsite.dk/projects/crystal/crystalcore/README_blend2cs.txt}.
+@end itemize
+
+Another way is to use the blender2crystal exporter which can be integrated
+directly with Blender itself. Download and more information are available
+here:
+
+@url{http://b2cs.delcorp.org/index.php/Main_Page}
+
+@subheading Making Models
+
+Models of type Genmesh (@pxref{MeshObject Genmesh}) can also be converted
+directly with Blend2cs or blender2crystal. To do this you need to mark
+the object in Blender as a genmesh object (see manual on how to do that) and
+then export as a library. In Crystal Space you can directly load that library
+as a single model.
+
+Models of type Cal3d (@pxref{MeshObject SprCal3D}) can be converted from
+Blender using the Cal3d exporter that is included with Blender.
+

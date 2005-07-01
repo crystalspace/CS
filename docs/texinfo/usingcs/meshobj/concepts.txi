@@ -12,7 +12,7 @@
 @cindex csMeshWrapper
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 In this section a general overview is given of the mesh object plug-in
 system and several of the concepts are explained.

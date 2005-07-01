@@ -5,7 +5,7 @@
 @cindex Matrices
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@email{jorrit.tyberghein@@gmail.com}.  Mathematical typesetting for
 @TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
 This section describes how a camera in a 3D engine can be represented by a 3x3

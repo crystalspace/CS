@@ -6,7 +6,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 @emph{Note}: This section describes in detail how visibility culling in
 Crystal Space works or will work in the not-to-distant future.

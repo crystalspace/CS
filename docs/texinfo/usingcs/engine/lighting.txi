@@ -5,7 +5,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 Crystal Space supports three types of lighting: @dfn{static},
 @dfn{pseudo-dynamic} and @dfn{dynamic}.  They are different in the ways you

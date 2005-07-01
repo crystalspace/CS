@@ -13,7 +13,7 @@
 @cindex @code{iThingEnvironment}
 
 @emph{Written by Jorrit Tyberghein,
-(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
+(@email{jorrit.tyberghein@@gmail.com}).}
 
 This mesh object represents a 'thing' which is a very often used
 geometry object in Crystal Space. Things are often used to mark the bounding

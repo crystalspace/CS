@@ -21,7 +21,7 @@ $\N\_{\n\}$%
 @cindex Space Warping
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@email{jorrit.tyberghein@@gmail.com}.  Mathematical typesetting for
 @TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
 A little explanation about space warping in Crystal Space and how the space

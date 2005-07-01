@@ -9,7 +9,7 @@
 @cindex @code{iBallState}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 A ball is a ball shaped object made out of triangles. You can specify
 the detail (i.e. number of triangles used).

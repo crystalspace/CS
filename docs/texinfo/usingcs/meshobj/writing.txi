@@ -7,7 +7,7 @@
 @cindex @code{iMeshObjectType}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+@email{jorrit.tyberghein@@gmail.com}.}
 
 This section explains how you can write your own Mesh Object plug-in modules.
 

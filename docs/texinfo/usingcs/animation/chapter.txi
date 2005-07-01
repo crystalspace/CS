@@ -10,13 +10,10 @@ Everything about animation.
 
 @menu
 * Sprite3D Animation::
-* Introduction::
-* Sprite Actions::
-* The Sprite Action Interface::
 * Sequence Manager::
 * ProcTextures:: Procedural Texture System
 @end menu
 
-@importsss{usingcs,animation,sprite3d,anim.txi}
+@importss{usingcs,animation,sprite3danim.txi}
 @importss{usingcs,animation,sequence.txi}
 @importss{usingcs,animation,proctex.txi}

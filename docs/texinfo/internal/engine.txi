@@ -5,7 +5,7 @@
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 30 April 2004.}
+@email{jorrit.tyberghein@@gmail.com}. Last updated 30 April 2004.}
 
 This section explains, in some detail, how the engine works internally.
 This information is mainly for people who are interested in learning
