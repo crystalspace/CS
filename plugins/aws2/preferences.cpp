@@ -62,6 +62,4 @@ bool preferences::load(iObjectRegistry* objreg, const std::string& filename)
     return true;
 }
 
-
-
 }
