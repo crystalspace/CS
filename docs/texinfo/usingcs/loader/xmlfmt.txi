@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node XML File Format, Old Map File Format, Map Loader, Map Loader
+@node XML File Format, Old Map File Format, HOWTO Level Loading, Map Loader
 @subsection Format of Map File (@sc{xml})
 @cindex Format of Map File
 @cindex Map File Format

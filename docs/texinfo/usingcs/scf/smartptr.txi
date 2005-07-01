@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Smart Pointers, , SCF, SCF Chapter
+@node Smart Pointers, HOWTO Create Your Own Plugin, SCF, SCF Chapter
 @subsection Correctly Using Smart Pointers
 @cindex @code{csPtr}
 @cindex @code{csRef}

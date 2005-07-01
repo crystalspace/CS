@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node World Components, Portal Engine, Engine, Engine
+@node World Components, Portal Engine, HOWTO Render Priorities, Engine
 @subsection Components of a World
 @cindex World, Components
 

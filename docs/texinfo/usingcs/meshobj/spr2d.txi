@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Spr2D, MeshObject Spr3D, HOWTO Create Genmesh, MeshObject
+@node MeshObject Spr2D, MeshObject Spr3D, HOWTO Mesh Movement, MeshObject
 @subsection Sprite2D Mesh Object
 @cindex MeshObject
 @cindex 2D Sprite

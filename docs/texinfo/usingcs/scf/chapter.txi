@@ -14,7 +14,9 @@ counting.
 @menu
 * SCF:: Shared Class Facility (@sc{scf})
 * Smart Pointers:: Correctly Using Smart Pointers
+* HOWTO Create Your Own Plugin:: Create Your Own Plugin
 @end menu
 
 @importss{usingcs,scf,scf.txi}
 @importss{usingcs,scf,smartptr.txi}
+@importss{usingcs,scf,plugin.txi}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Use custom font, HOWTO Recording Movies, HOWTO Create Your Own Plugin, HOWTO
+@node HOWTO Use custom font, HOWTO Recording Movies, HOWTO Pixmaps, HOWTO
 @subsection Using a Custom Font
 @cindex font, csf
 

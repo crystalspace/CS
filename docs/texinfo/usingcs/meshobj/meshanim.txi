@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Mesh LightAnim, HOWTO Mesh Movement, HOWTO, HOWTO
+@node HOWTO Mesh LightAnim, HOWTO Mesh Movement, HOWTO Create Genmesh, MeshObject
 @subsection Mesh Lighting and Animation
 @cindex mesh lighting
 @cindex mesh animation

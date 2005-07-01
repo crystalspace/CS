@@ -28,6 +28,8 @@ Crystal Space supports.
 * Writing MeshObjects:: Writing Mesh Objects
 * HOWTO Create Thing:: Creating a Thing Mesh
 * HOWTO Create Genmesh:: Creating a Genmesh Mesh
+* HOWTO Mesh LightAnim:: Mesh Lighting and Animation
+* HOWTO Mesh Movement:: Mesh Movement
 * MeshObject Spr2D:: Sprite2D Mesh Object
 * MeshObject Spr3D:: Sprite3D Mesh Object
 * MeshObject SprCal3D:: SpriteCal3D Mesh Object
@@ -51,6 +53,8 @@ Crystal Space supports.
 @importss{usingcs,meshobj,writing.txi}
 @importss{usingcs,meshobj,creatething.txi}
 @importss{usingcs,meshobj,creategenmesh.txi}
+@importss{usingcs,meshobj,meshanim.txi}
+@importss{usingcs,meshobj,meshmove.txi}
 @importss{usingcs,meshobj,spr2d.txi}
 @importss{usingcs,meshobj,spr3d.txi}
 @importss{usingcs,meshobj,sprcal3d.txi}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Mesh Movement, HOWTO Camera Movement, HOWTO Mesh LightAnim, HOWTO
+@node HOWTO Mesh Movement, MeshObject Spr2D, HOWTO Mesh LightAnim, MeshObject
 @subsection Mesh Movement
 @cindex @code{iMovable}
 @cindex @code{iMeshWrapper}

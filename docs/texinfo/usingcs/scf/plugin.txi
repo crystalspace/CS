@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Create Your Own Plugin, HOWTO Use custom font, HOWTO Render Priorities, HOWTO
+@node HOWTO Create Your Own Plugin, , Smart Pointers, SCF Chapter
 @subsection Create Your Own Plugin
 
 @noindent

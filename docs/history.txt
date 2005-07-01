@@ -20,6 +20,8 @@ chronological order.
 	    - Added a new lighting section in usingcs and moved a few
 	      other documentation parts there.
 	    - Moved some other stuff around.
+	- Jorrit moved a few howtos to more appropriate places in the
+	  documentation.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.

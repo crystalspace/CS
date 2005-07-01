@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Clicking on Objects, HOWTO Level Loading, HOWTO Camera Movement, HOWTO
+@node HOWTO Clicking on Objects, HOWTO Pixmaps, HOWTO Camera Movement, HOWTO
 @subsection Clicking on Objects
 @cindex clicking on objects
 

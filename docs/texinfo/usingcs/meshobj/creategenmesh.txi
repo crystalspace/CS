@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Create Genmesh, MeshObject Spr2D, HOWTO Create Thing, MeshObject
+@node HOWTO Create Genmesh, HOWTO Mesh LightAnim, HOWTO Create Thing, MeshObject
 @subsection Creating a Genmesh Mesh
 @cindex @code{iGeneralFactoryState}
 @cindex @code{iGeneralMeshState}

@@ -6,6 +6,7 @@
 Everything about the 3D Engine. The core of Crystal Space.
 
 @menu
+* HOWTO Render Priorities:: Render Priorities and Objects in Sectors
 * World Components:: Components of a World
 * Portal Engine::
 * Cameras and Matrices::
@@ -16,6 +17,7 @@ Everything about the 3D Engine. The core of Crystal Space.
 * Level of Detail::
 @end menu
 
+@importss{usingcs,engine,rendpri.txi}
 @importss{usingcs,engine,worldcmp.txi}
 @importss{usingcs,engine,portals.txi}
 @importss{usingcs,engine,camera.txi}

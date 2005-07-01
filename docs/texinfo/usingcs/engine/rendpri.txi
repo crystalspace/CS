@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Render Priorities, HOWTO Create Your Own Plugin, HOWTO Pixmaps, HOWTO
+@node HOWTO Render Priorities, World Components, Engine, Engine
 @subsection Render Priorities and Objects in Sectors
 @cindex @code{iMeshWrapper}
 @cindex mesh objects

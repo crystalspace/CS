@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Camera Movement, HOWTO Clicking on Objects, HOWTO Mesh Movement, HOWTO
+@node HOWTO Camera Movement, HOWTO Clicking on Objects, HOWTO, HOWTO
 @subsection Camera Movement
 @cindex movement, camera
 @cindex moving, camera
