@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Use custom font, HOWTO Recording Movies, HOWTO Pixmaps, HOWTO
+@node HOWTO Use custom font, , 3D Renderer, 3D Renderer
 @subsection Using a Custom Font
 @cindex font, csf
 

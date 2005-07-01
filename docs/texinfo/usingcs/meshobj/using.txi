@@ -106,13 +106,15 @@ using the standard @sc{api} in the @samp{iEngine} interface.
 
 @subsubheading Using Directly From Code
 
-You can also create Mesh Objects directly from your application.  To do this,
-roughly, you have to perform the following steps:
+You can also create Mesh Objects directly from your application. The engine
+has a few conveniance functions you can use for that
+(@code{iEngine::CreateMeshwrapper()} and @code{iEngine::CreateMeshFactory()}).
+But here we show you the full way to create meshes from code:
 
 @itemize
 @item
-Load the Mesh Object Type with @code{CS_LOAD_PLUGIN()} (preferably after checking
-if it is already loaded, by calling @code{CS_QUERY_PLUGIN_CLASS()}).
+Load the Mesh Object Type with @code{CS_LOAD_PLUGIN()} (preferably after
+checking if it is already loaded, by calling @code{CS_QUERY_PLUGIN_CLASS()}).
 
 @item
 Create at least one Mesh Object Factory by calling @code{NewFactory()} on the

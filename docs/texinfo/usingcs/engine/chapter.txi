@@ -10,8 +10,8 @@ Everything about the 3D Engine. The core of Crystal Space.
 * World Components:: Components of a World
 * Portal Engine::
 * Cameras and Matrices::
+* HOWTO Camera Movement:: Camera Movement
 * Space Warping::
-* Texture Mapping::
 * Visibility Culling:: Visibility Culling In Detail
 * Dynamic Worlds::
 * Level of Detail::
@@ -21,8 +21,8 @@ Everything about the 3D Engine. The core of Crystal Space.
 @importss{usingcs,engine,worldcmp.txi}
 @importss{usingcs,engine,portals.txi}
 @importss{usingcs,engine,camera.txi}
+@importss{usingcs,engine,cammove.txi}
 @importss{usingcs,engine,warping.txi}
-@importss{usingcs,engine,texmap.txi}
 @importss{usingcs,engine,viscull.txi}
 @importss{usingcs,engine,dynworld.txi}
 @importss{usingcs,engine,lod.txi}

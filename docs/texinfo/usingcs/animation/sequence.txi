@@ -3,7 +3,7 @@
 @subsection Sequence Manager
 @cindex Sequence Manager
 @cindex sequences
-@cindex code{iSequenceWrapper}
+@cindex @code{iSequenceWrapper}
 
 @noindent
 @emph{Written by Jorrit Tyberghein,

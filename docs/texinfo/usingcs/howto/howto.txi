@@ -9,15 +9,11 @@ find a short subsection with all the include files you need to use the example
 code.
 
 @menu
-* HOWTO Camera Movement:: Camera Movement
 * HOWTO Clicking on Objects:: Clicking on Objects
 * HOWTO Pixmaps:: Loading Images for Pixmaps
-* HOWTO Use custom font:: Using a Custom Font
 * HOWTO Recording Movies:: Recording Movies
 @end menu
 
-@importss{usingcs,howto,cammove.txi}
 @importss{usingcs,howto,clickobj.txi}
 @importss{usingcs,howto,pixmap.txi}
-@importss{usingcs,howto,custfont.txi}
 @importss{usingcs,howto,movierec.txi}

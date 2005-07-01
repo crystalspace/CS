@@ -16,7 +16,7 @@ $\N\_{\n\}$%
 @end macro
 @end iftex
 
-@node Space Warping, Texture Mapping, Cameras and Matrices, Engine
+@node Space Warping, Visibility Culling, HOWTO Camera Movement, Engine
 @subsection Space Warping
 @cindex Space Warping
 @cindex portals

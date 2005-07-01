@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Camera Movement, HOWTO Clicking on Objects, HOWTO, HOWTO
+@node HOWTO Camera Movement, Space Warping, Cameras and Matrices, Engine
 @subsection Camera Movement
 @cindex movement, camera
 @cindex moving, camera

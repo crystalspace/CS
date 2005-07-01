@@ -10,7 +10,9 @@ Everything about materials.
 
 @menu
 * Alpha Textures:: Alpha in Textures
+* Texture Mapping::
 @end menu
 
 @importss{usingcs,materials,alpha.txi}
+@importss{usingcs,materials,texmap.txi}
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Recording Movies, , HOWTO Use custom font, HOWTO
+@node HOWTO Recording Movies, , HOWTO Pixmaps, HOWTO
 @subsection Recording Movies
 @cindex movie, video, recording, movierecorder
 

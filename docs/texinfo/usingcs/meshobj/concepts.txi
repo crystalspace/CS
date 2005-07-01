@@ -36,15 +36,6 @@ application writer to correctly set up the characteristics of all Mesh Objects
 that it uses.  These type specific interfaces are usually called
 @samp{iSomethingState} (replace @emph{Something} with the appropriate name).
 
-Some Mesh Objects also implement the @sc{scf} interface @samp{iPolygonMesh}
-which you can use for collision detection.  You can use
-@code{SCF_QUERY_INTERFACE()} to find out if some Mesh Object implements this
-interface.
-
-In addition to the interfaces above, Mesh Objects also sometimes implement
-@samp{iParticle}.  When they do so, they can be used as particles for one of
-the particle system Mesh Object plug-in modules.
-
 @subsubheading Mesh Object Factory
 
 A @dfn{Mesh Object Factory} is an object from which you can generate Mesh

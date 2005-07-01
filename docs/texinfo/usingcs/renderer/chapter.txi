@@ -38,4 +38,10 @@ additional shader system. When this is present it is possible
 to make more advanced texture effects using shaders.
 @end itemize
 
+@menu
+* HOWTO Use custom font:: Using a Custom Font
+@end menu
+
+@importss{usingcs,renderer,custfont.txi}
+
 

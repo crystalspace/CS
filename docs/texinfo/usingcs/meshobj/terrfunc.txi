@@ -11,7 +11,7 @@
 @emph{Written by Jorrit Tyberghein,
 (@email{jorrit.tyberghein@@gmail.com}).}
 
-THIS MANUAL SECTION IS HEAVILY OUTDATED!
+@strong{THIS MANUAL SECTION IS HEAVILY OUTDATED!}
 
 This mesh object represents a landscape engine. It features four static
 @sc{lod} levels and dynamic lighting for one directional light. In future
