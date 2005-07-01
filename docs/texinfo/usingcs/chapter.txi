@@ -24,7 +24,7 @@ own 3D applications.
 * Animation:: Animating your Objects
 * Model Conversion:: Importing Model Files
 * Map Loader::
-* Sound Drivers:: Sound System
+* Sound System::
 * Scripting Languages::
 * AWS:: Alternate Windowing System (@sc{aws})
 * Making Own Projects:: Making Projects Using Crystal Space
@@ -48,7 +48,7 @@ own 3D applications.
 @importss{usingcs,animation,chapter.txi}
 @imports{usingcs,model.txi}
 @importss{usingcs,loader,chapter.txi}
-@imports{usingcs,sound.txi}
+@importss{usingcs,sound,chapter.txi}
 @importss{usingcs,script,script.txi}
 @importss{usingcs,aws,aws.txi}
 @importss{usingcs,ownprojects,chapter.txi}

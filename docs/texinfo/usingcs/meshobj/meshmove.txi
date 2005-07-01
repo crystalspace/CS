@@ -119,6 +119,20 @@ from object to world space easier. @code{HardTransform()} is not a function
 of @samp{iMovable} but of @samp{iMeshWrapper} (which will in turn delegate
 this to the mesh object itself).
 
+@subsubheading Finding Mesh Movement Direction
+
+0,0,1 is the vector pointing forward in local object space for the mesh.
+Using the transform from the movable you can translate this to world space.
+With This2Other() you can transform the object space vector to world space. So:
+
+@example
+csVector3 v = mesh->GetMovable()->GetTransform()->This2Other (
+	csVector3 (0, 0, 1));
+@end example
+
+'v' will be the vector one unit in front of the mesh (in the direction the
+mesh is facing).
+
 @subsubheading Include Files
 
 The include files useful for this section are:

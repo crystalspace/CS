@@ -1,0 +1,71 @@
+@c -*-texinfo-*-
+@node Playing Sound, , Sound Drivers, Sound System
+@subsection Playing a Sound
+@cindex playing sound
+
+@subsubheading Playing a Sound Once
+
+You can create more than one source to have the same sound played multiple times at the same time. For instance if you have a shooting sound and you want your players to shoot at the same time and have the correct number of shooting sounds.
+
+@example
+#include "isound/handle.h"
+#include "isound/source.h"
+#include "isound/loader.h"
+#include "isound/source.h"
+#include "isound/renderer.h"
+#include "isound/wrapper.h"
+
+@dots{}
+
+if (!csInitializer::RequestPlugins(object_reg,
+@dots{}
+CS_REQUEST_PLUGIN("crystalspace.sound.render.software", iSoundRender),
+CS_REQUEST_PLUGIN("crystalspace.sound.loader.multiplexer", iSoundLoader),
+CS_REQUEST_END))
+@dots{}
+
+iSoundRender *sndrdr = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+if (sndrdr)
+@{
+  printf("iSoundRender loaded\n");
+  csRef<iSoundWrapper> w_boom = loader->LoadSound(<sound name>,<sound url>);
+  if (w_boom)
+  @{
+    csRef<iSoundSource> sndsrc = w_boom->GetSound()->CreateSource(
+    	SOUND3D_ABSOLUTE);
+    sndsrc->Play();
+  @}
+  else
+  @{
+    printf("ERROR: SoundWrapper empty. \n");
+  @}
+@}
+else
+@{
+  printf("Error: no iSoundRender plugin\n");
+@}
+@end example
+
+@subsubheading Looping Background Music
+
+Here is how you can play a looping sound:
+
+@example
+//Sound renderer
+csRef snd = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+if (snd)
+@{
+  // "song" is the handle, songname is a const char* to the filename.
+  csRef<iSoundWrapper> w = loader->LoadSound("song",songname);
+  if (w)
+  @{
+    // Declare 'music' as a csRef<iSoundSource> somewhere.
+    music = w->GetSound ()->Play (true);
+  @}
+  else
+  @{
+    printf("ERROR: Wrapper empty. \n");
+  @}
+@}
+@end example
+

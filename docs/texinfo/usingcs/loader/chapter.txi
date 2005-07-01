@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Map Loader, Sound Drivers, Model Conversion, Using Crystal Space
+@node Map Loader, Sound System, Model Conversion, Using Crystal Space
 @section Map Loader
 @cindex map loader
 

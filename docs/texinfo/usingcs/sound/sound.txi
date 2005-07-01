@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
-@node Sound Drivers, Scripting Languages, Map Loader, Using Crystal Space
-@section Sound System
-@cindex Sound System
+@node Sound Drivers, Playing Sound, Sound System, Sound System
+@subsection Sound Plugins
+@cindex Sound Plugins
 
 The sound system consists of three components.
 
@@ -41,7 +41,7 @@ MacOS/9 @file{.aiff}, 8- and 16-bit @sc{pcm}.
 The options for all sound modules must be set in the (virtual) file
 @file{/config/sound.cfg}.
 
-@subheading Sound Loader
+@subsubheading Sound Loader
 
 The sound loader plug-in is used to load sound files and create sound data
 objects (@code{iSoundData}) from it. A sound data object represents the sound
@@ -52,7 +52,7 @@ takes an object of @samp{csSoundFormat} type. This object tells the sound
 loader in what format (frequency, 8- or 16-bits, stereo or mono) the samples
 should be supplied. You can get this from the sound renderer.
 
-@subheading Sound Data
+@subsubheading Sound Data
 
 A sound data object can be either @dfn{static} or @dfn{streamed}. These are
 fundamentally different. The only reason why they use the same interface is
@@ -64,7 +64,7 @@ counter), but only one instance of a streamed sound. However, this does not
 mean that you can't create more than one sound source from a streamed sound.
 Read on!
 
-@subheading Sound Handle
+@subsubheading Sound Handle
 
 The next step towards playing the sound is to hand over the sound data to the
 sound renderer. After doing this you may not use the sound data itself
@@ -100,19 +100,19 @@ Create a sound source. A @dfn{sound source} is an instance of the sound.
 Control playback for streamed sounds.
 @end itemize
 
-@subheading Sound Source
+@subsubheading Sound Source
 
 The sound source is one instance of a sound. It controls position and velocity
 for 3d sounds. For static sounds it also controls playback position and
 activeness, while for streamed sounds it controls only activeness.
 
-@subheading The Sound Listener
+@subsubheading The Sound Listener
 
 The sound renderer uses one global listener object. It controls how you hear
 sounds. This includes your own position and velocity (only for 3D sounds),
 and environmental effects.  @@@@@@FIXME do env effects affect non-3D sounds?
 
-@subheading Sound System Example
+@subsubheading Sound System Example
 
 Here's an example on how to set up the sound system:
 
@@ -150,7 +150,7 @@ What about the guns? It's similar to the footsteps. A player can only fire
 one shot at a time, so you can create one source per player for the shooting
 sound.
 
-@subheading Advanced Sound Effects
+@subsubheading Advanced Sound Effects
 
 The environmental effects of the listener are not enough for you? You want to
 dynamically generate the sound? This is possible. You have to create your own

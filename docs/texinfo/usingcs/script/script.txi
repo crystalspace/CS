@@ -1,4 +1,4 @@
-@node Scripting Languages, AWS, Sound Drivers, Using Crystal Space
+@node Scripting Languages, AWS, Sound System, Using Crystal Space
 @section Scripting Languages
 @cindex Scripting
 @cindex Script

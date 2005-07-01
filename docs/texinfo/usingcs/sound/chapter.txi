@@ -1,0 +1,15 @@
+@c -*-texinfo-*-
+@node Sound System, Scripting Languages, Map Loader, Using Crystal Space
+@section Sound System
+@cindex sound
+
+Everything about collision detection and physics.
+
+@menu
+* Sound Drivers:: Sound Plugins
+* Playing Sound:: Playing a Sound
+@end menu
+
+@importss{usingcs,sound,sound.txi}
+@importss{usingcs,sound,play.txi}
+
