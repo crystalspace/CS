@@ -1,6 +1,7 @@
 SubDir TOP plugins ;
 
 SubInclude TOP plugins aws ;
+SubInclude TOP plugins aws2 ;
 SubInclude TOP plugins bugplug ;
 SubInclude TOP plugins collide ;
 SubInclude TOP plugins console ;
