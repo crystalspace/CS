@@ -2,6 +2,8 @@
 @node Portal Engine, Cameras and Matrices, World Components, Engine
 @subsection Portal Engine
 @cindex Portal Engine
+@cindex @code{iPortal}
+@cindex @code{iSector}
 
 @noindent
 @emph{Written by Jorrit Tyberghein,

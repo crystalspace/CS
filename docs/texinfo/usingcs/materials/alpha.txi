@@ -2,6 +2,7 @@
 @node Alpha Textures, , Materials, Materials
 @subsection Alpha in Textures
 @cindex alpha
+@cindex alpha textures
 @cindex keycolor
 
 Crystal Space supports the alpha channel that can be present in some image

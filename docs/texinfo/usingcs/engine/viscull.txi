@@ -3,6 +3,7 @@
 @subsection Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility
+@cindex @code{iVisibilityCuller}
 
 @noindent
 @emph{Written by Jorrit Tyberghein,

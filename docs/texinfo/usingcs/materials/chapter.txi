@@ -3,8 +3,8 @@
 @section Materials and Textures
 @cindex materials
 @cindex textures
-@cindex iMaterialWrapper
-@cindex iTextureWrapper
+@cindex @code{iMaterialWrapper}
+@cindex @code{iTextureWrapper}
 
 Everything about materials.
 

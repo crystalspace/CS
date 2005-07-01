@@ -19,6 +19,8 @@ $\N\_{\n\}$%
 @node Space Warping, Texture Mapping, Cameras and Matrices, Engine
 @subsection Space Warping
 @cindex Space Warping
+@cindex portals
+@cindex portal tricks
 
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@gmail.com}.  Mathematical typesetting for

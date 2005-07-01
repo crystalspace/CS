@@ -4,7 +4,6 @@
 @cindex animation
 @cindex sequence manager
 @cindex particle systems
-@cindex cal3d
 
 Everything about animation.
 

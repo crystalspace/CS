@@ -2,6 +2,8 @@
 @node ProcTextures, , Sequence Manager, Animation
 @subsection Procedural Texture System
 @cindex Procedural Texture System
+@cindex @code{SetRenderTarget}
+@cindex @code{csProcTexture}
 
 Crystal Space supports procedural textures. These are textures that you can
 change dynamically (at runtime) so that you get the appearance of an

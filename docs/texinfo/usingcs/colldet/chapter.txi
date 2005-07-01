@@ -2,10 +2,6 @@
 @node Collision Detection, Animation, 3D Renderer, Using Crystal Space
 @section Collision Detection and Physics
 @cindex collision detection
-@cindex CD
-@cindex OPCODE
-@cindex physics
-@cindex ODE
 
 Everything about collision detection and physics.
 

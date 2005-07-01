@@ -1,8 +1,9 @@
 @c -*-texinfo-*-
 @node Cameras and Matrices, Space Warping, Portal Engine, Engine
 @subsection Cameras and Matrices
-@cindex Cameras
-@cindex Matrices
+@cindex cameras
+@cindex matrices
+@cindex @code{csReversibleTransform}
 
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@gmail.com}.  Mathematical typesetting for
@@ -11,7 +12,8 @@
 This section describes how a camera in a 3D engine can be represented by a 3x3
 matrix and a 3-element vector.  This is the method that is used in the Crystal
 Space engine but it is general enough that it can be used in other engines as
-well.
+well. In Crystal Space a transform is represented by a
+@code{csReversibleTransform}.
 
 @subsubheading Theory
 

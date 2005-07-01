@@ -2,8 +2,8 @@
 @node Game Data, Engine, VFS, Using Crystal Space
 @section Managing Game Specific Data
 @cindex game data
-@cindex csObject
-@cindex iObject
+@cindex @code{csObject}
+@cindex @code{iObject}
 
 When you make a game using Crystal Space chances are you will need to
 attach your own data to any object (unless you use a system like @sc{cel}

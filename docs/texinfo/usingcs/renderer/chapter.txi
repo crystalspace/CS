@@ -2,6 +2,8 @@
 @node 3D Renderer, Collision Detection, Materials, Using Crystal Space
 @section The Rendering System
 @cindex rendering
+@cindex @code{iGraphics3D}
+@cindex @code{iGraphics2D}
 
 The graphics system consists of two or three drivers:
 

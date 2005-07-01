@@ -2,16 +2,15 @@
 @node MeshObject Concepts, Using MeshObject, MeshObject, MeshObject
 @subsection MeshObject Concepts
 @cindex MeshObject
-@cindex iConfig
-@cindex iParticle
-@cindex iPolygonMesh
-@cindex iMeshObject
-@cindex iMeshWrapper
-@cindex iMeshObjectFactory
-@cindex iMeshFactoryWrapper
-@cindex iMeshObjectType
-@cindex iLoaderPlugin
-@cindex csMeshWrapper
+@cindex @code{iConfig}
+@cindex @code{iParticle}
+@cindex @code{iPolygonMesh}
+@cindex @code{iMeshObject}
+@cindex @code{iMeshWrapper}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshFactoryWrapper}
+@cindex @code{iMeshObjectType}
+@cindex @code{iLoaderPlugin}
 
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@gmail.com}.}

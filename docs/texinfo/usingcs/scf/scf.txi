@@ -2,6 +2,7 @@
 @subsection Shared Class Facility (@sc{scf})
 @cindex @sc{scf}, Shared Class Facility
 @cindex Shared Class Facility (@sc{scf})
+@cindex @code{iSCF}
 
 @noindent
 @emph{Original @sc{scf} design and concept by Andrew Zabolotny, 1999.  This

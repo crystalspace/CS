@@ -2,6 +2,7 @@
 @node Lighting, HOWTO Pseudo DynLight, Lighting System, Lighting System
 @subsection Lighting
 @cindex Lighting
+@cindex @code{iLight}
 
 @noindent
 @emph{Written by Jorrit Tyberghein,

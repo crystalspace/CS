@@ -3,6 +3,9 @@
 @subsection Sprite3D Animation
 @cindex Animation
 @cindex Sprite3D
+@cindex sprite actions
+@cindex @code{iSprite3DState}
+@cindex @code{iSprite3DFactoryState}
 
 @emph{Written by Michael Voase,
 @email{mvoase@@midcoast.com.au}.}

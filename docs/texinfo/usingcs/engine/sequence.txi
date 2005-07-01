@@ -2,6 +2,7 @@
 @node Sequence Manager, , Level of Detail, csEngine
 @subsection Sequence Manager
 @cindex Sequence Manager
+@cindex @code{iSequenceWrapper}
 
 @noindent
 @emph{Written by Jorrit Tyberghein,

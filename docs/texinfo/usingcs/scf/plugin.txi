@@ -1,6 +1,7 @@
 @c -*-texinfo-*-
 @node HOWTO Create Your Own Plugin, , Smart Pointers, SCF Chapter
 @subsection Create Your Own Plugin
+@cindex plugin creation
 
 @noindent
 @emph{Written by Jorrit Tyberghein, @email{jorrit.tyberghein@@gmail.com} and

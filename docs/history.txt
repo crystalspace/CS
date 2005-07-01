@@ -27,6 +27,7 @@ chronological order.
 	- Jorrit fixed lots of outdated information in the docs.
 	- Jorrit added a new materials section and an explanation on alpha
 	  textures.
+	- Jorrit did some index related changes to the docs.
 	- res made the jamtemplate-generated application code use 
 	  csApplicationRunner<>.
 	- res fixed a compile problem and csRef<> deletion (don't do that!) in

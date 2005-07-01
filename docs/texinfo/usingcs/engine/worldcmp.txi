@@ -2,6 +2,7 @@
 @node World Components, Portal Engine, HOWTO Render Priorities, Engine
 @subsection Components of a World
 @cindex World, Components
+@cindex @code{iSector}
 
 This section describes the objects used to build a world.  This is useful to
 understand the format of the Crystal Space map file

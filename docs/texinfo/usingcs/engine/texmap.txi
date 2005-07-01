@@ -140,9 +140,9 @@ $$V_c = M_{wc} \times (V_w - V_{wc})$$
 @end enumerate
 
 Note, all three versions of a polygon are represented by the same
-@samp{csPolygon3D} object.  The change from object to world and world to
+polygon object.  The change from object to world and world to
 camera space happens inside the Vertex class that is referenced by
-@samp{csPolygon3D}.
+the polygon.
 
 Associated with every polygon there is also a plane normal or plane equation:
 

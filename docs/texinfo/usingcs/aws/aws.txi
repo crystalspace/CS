@@ -3,6 +3,7 @@
 @section Alternate Windowing System (@sc{aws})
 @cindex @sc{aws}
 @cindex Alternate Windowing System
+@cindex @code{iAWS}
 
 @noindent
 @emph{Written by Christopher Nelson, @email{paradox@@bbhc.org}.

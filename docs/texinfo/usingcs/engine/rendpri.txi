@@ -5,7 +5,6 @@
 @cindex mesh objects
 @cindex render priorities
 @cindex z-buffer mode
-@cindex @code{csSector}
 @cindex @code{iSector}
 @cindex @code{iMovable}
 

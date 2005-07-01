@@ -1,7 +1,10 @@
 @node csObject, User Objects, Game Data, Game Data
 @subsection csObject and iObject
-@cindex csObject
-@cindex iObject
+@cindex @code{csObject}
+@cindex @code{iObject}
+@cindex @code{CS_GET_CHILD_OBJECT}
+@cindex @code{CS_GET_NAMED_CHILD_OBJECT}
+@cindex @code{CS_GET_FIRST_NAMED_CHILD_OBJECT}
 
 The @samp{csObject} class can be used to build object hierarchies. It supports
 building a simple tree structure. To use this functionality, you should derive

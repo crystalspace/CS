@@ -4,9 +4,9 @@
 @cindex movement, camera
 @cindex moving, camera
 @cindex @code{LookAt}
-@cindex @samp{csOrthoTransform}
-@cindex @samp{csReversibleTransform}
-@cindex @samp{iCamera}
+@cindex @code{csOrthoTransform}
+@cindex @code{csReversibleTransform}
+@cindex @code{iCamera}
 @cindex world space
 @cindex camera space
 
