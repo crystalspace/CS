@@ -105,7 +105,7 @@ Things are general objects used to define the basic geometry in a level.
 They can move and rotate but in general their most important use is to define
 level geometry (i.e. walls, floor, ceiling, a painting on the wall, a staircase,
 a chair, etc.). Small and detailed things will be tagged as detail
-objects. Polygons on things can also be portals to other areas.
+objects.
 
 @subsubheading Curved Surfaces
 @cindex Visibility of Curved Surfaces

@@ -1,0 +1,16 @@
+@c -*-texinfo-*-
+@node Materials, 3D Renderer, Lighting System, Using Crystal Space
+@section Materials and Textures
+@cindex materials
+@cindex textures
+@cindex iMaterialWrapper
+@cindex iTextureWrapper
+
+Everything about materials.
+
+@menu
+* Alpha Textures:: Alpha in Textures
+@end menu
+
+@importss{usingcs,materials,alpha.txi}
+

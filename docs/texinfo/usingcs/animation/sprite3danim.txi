@@ -22,11 +22,12 @@ library).
 
 Crystal Space provides two basic mechanisms for animating sprites. The first
 is frame based animation in which a mesh is defined in each frame and used
-in a loop. The second method is skeletal animation using the @sc{cal3d} library.
+in a loop (@pxref{MeshObject Spr3D}). The second method is skeletal animation
+using the @sc{cal3d} library (@pxref{MeshObject SprCal3D}).
 
 For the purpose of this document I will describe frame based animation as an
 @dfn{action}.  This name is coined from the class the implements frame
-animations in the 3D sprite object @samp{csSpriteAction2} and has been
+animations in the 3D sprite object @samp{iSpriteAction} and has been
 traditionally referred to as an @samp{action} in the sprite loader plug in.
 
 This document presumes that you have an operational copy of Crystal Space.

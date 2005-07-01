@@ -252,8 +252,5 @@ Directly specify u,v mapping coordinates for three given vertices.
 @item uv_shift(ushift,vshift) FIXME: where is this now ?
 Given the mapping described above, further shift with the given
 u,v shift value.
-@item <plane>planeName</plane>
-Use the given texture mapping plane instead of all the above.
-See how to define planes later.
 @end table
 

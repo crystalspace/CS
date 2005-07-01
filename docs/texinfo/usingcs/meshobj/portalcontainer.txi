@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node MeshObject Portal Container, MeshObject Spr2D, HOWTO Mesh Movement, MeshObject
+@subsection Portal Container Mesh Object
+@cindex MeshObject
+@cindex Portal Container
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iPortalContainer}
+@cindex @code{iPortal}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@gmail.com}).}
+
+This is a special type of mesh object which basically represents a collection
+of portals.
+
+TODO
+

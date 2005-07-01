@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Lighting System, 3D Renderer, MeshObject, Using Crystal Space
+@node Lighting System, Materials, MeshObject, Using Crystal Space
 @section The Lighting System
 @cindex lighting
 

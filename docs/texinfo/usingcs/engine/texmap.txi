@@ -184,8 +184,8 @@ in camera space and not in world space).
 
 @subsubheading Texture
 
-There is also a texture associated with every polygon (unless it is a portal
-with no overlay).  The texture represents a 2-dimensional rectangular space
+There is also a texture associated with every polygon. 
+The texture represents a 2-dimensional rectangular space
 where (0,0) is one corner of the texture and (1,1) is the opposite corner.  If
 a texture is overlayed onto a rectangular polygon such that one corner is
 mapped onto (0,0) in texture space and the opposite corner is mapped onto

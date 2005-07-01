@@ -22,7 +22,7 @@ a lot of objects visible at the same time. Level of Detail is practically
 the only way to improve performance in situations where there is not much
 culling opportunity (like in a space game).
 
-Crystal Space currently supports two kinds of @sc{lod}:
+Crystal Space currently supports three kinds of @sc{lod}:
 
 @itemize
 @item
@@ -35,10 +35,11 @@ is also based on distance. The major difference is that this kind of @sc{lod}
 doesn't use discrete lod levels but instead allows the engine to select
 as many triangles from the original model as needed (while still preserving the
 original model as much as possible).
+@item
+Terrain @sc{lod}. The terrain engine has built-in @sc{lod}.
 @end itemize
 
 In future we will also support other kinds of @sc{lod} like imposters.
-Also some of the landscape engines support @sc{lod} internally.
 
 Also in future there will be a @sc{lod} manager. At this moment @sc{lod}
 is purely distance based but for a given distance the level of detail will

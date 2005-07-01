@@ -38,7 +38,4 @@ are @code{software}, @code{null}, etc.
 Use this option to recalculate all lightmaps after you changed lighting
 or geometry in a level that you're trying. If you don't do this you either
 get the old lightmaps or no lightmaps at all.
-
-@item @emph{@@@@@@FIXME}
-Document the remaining common command line options.
 @end table

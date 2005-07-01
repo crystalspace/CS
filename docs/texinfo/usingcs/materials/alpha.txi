@@ -1,0 +1,32 @@
+@c -*-texinfo-*-
+@node Alpha Textures, , Materials, Materials
+@subsection Alpha in Textures
+@cindex alpha
+@cindex keycolor
+
+Crystal Space supports the alpha channel that can be present in some image
+files (like @sc{png} and @sc{tga}).
+
+It is important to realize that when you use alpha on an object you must
+sort the object back to front. That basically means you'll most likely have
+to use the @samp{alpha} render priority (@pxref{HOWTO Render Priorities}) and
+also @samp{ztest} for the Z-buffer usage. Also in some cases you may need
+to set the @samp{back2front} flag if the object is a genmesh
+(@pxref{MeshObject Genmesh}).
+
+It is often hard to get things correct with such a setup so in many cases
+it is preferable to use @dfn{keycolor} instead of alpha. This is only possible
+if the alpha channel only contains 0% and 100% transparency values. The
+easiest way to do that is to mark the texture as follows in your world file:
+
+@example
+<texture name="transparent">
+    <file>mytexture.png</file>
+    <alpha><binary/></alpha>
+</texture>
+@end example
+
+If you do this then this texture can be used on objects as any other texture.
+So the object can simply use @samp{object} render priority and @samp{zuse}
+Z-buffer mode.
+

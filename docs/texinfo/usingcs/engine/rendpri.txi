@@ -9,18 +9,16 @@
 @cindex @code{iSector}
 @cindex @code{iMovable}
 
-Since 0.19 there are some extra concepts that can be used for organizing
-how objects in a sector have to be rendered. In this section the basic
+Renderpriorities give the map creator some extra control over when objects
+have to be rendered. In this section the basic
 rendering algorithm is explained. This is a more theoretical explanation.
 Later some examples are given of some commonly used configurations.
 
 @subsubheading Meshes and Sectors
 
-One of the most fundamental concepts in Crystal Space is a sector (class
-@code{csSector} or interface @code{iSector}). A sector is basically empty
-space which needs to be filled with geometry. In Crystal Space 0.18 or
-older a sector could also contain geometry (i.e. the sector walls) but
-since 0.19 this is no longer possible (nor needed).
+One of the most fundamental concepts in Crystal Space is a sector (interface
+@code{iSector}). A sector is basically empty
+space which needs to be filled with geometry.
 
 To put geometry in a sector you use one or more mesh objects
 (@pxref{MeshObject}).  Note that a mesh object can also be in several sectors
@@ -37,6 +35,8 @@ a limited set of render priority slots available. By default these are:
 @enumerate
 @item
 @samp{sky}
+@item
+@samp{portal}
 @item
 @samp{wall}
 @item
@@ -59,16 +59,20 @@ following construct:
     <level>1</level>
     <sort>NONE</sort>
   </priority>
-  <priority name="wall">
+  <priority name="portal">
     <level>2</level>
     <sort>NONE</sort>
   </priority>
-  <priority name="object">
+  <priority name="wall">
     <level>3</level>
     <sort>NONE</sort>
   </priority>
-  <priority name="alpha">
+  <priority name="object">
     <level>4</level>
+    <sort>NONE</sort>
+  </priority>
+  <priority name="alpha">
+    <level>5</level>
     <sort>BACK2FRONT</sort>
   </priority>
 </renderpriorities>
@@ -90,8 +94,6 @@ but in the future you will be able to choose from:
 @samp{BACK2FRONT}: back to front (as seen from camera)
 @item
 @samp{FRONT2BACK}: front to back
-@item
-@samp{MATERIAL}: sort on material (for more efficient rendering)
 @end itemize
 
 For the @samp{alpha} render priority (which is usually used by transparent
@@ -186,6 +188,8 @@ represents the sky. This can be a skybox, or a skydome, or something else.
 Usually these objects have @samp{ZNONE} or @samp{ZFILL} render mode. If
 you want to use @samp{ZNONE} you have to make sure that the Z-buffer
 is cleared every frame.
+@item
+@samp{portal}: Sometimes portals need to be put here.
 @item
 @samp{wall}: Sector walls are put in this queue. They are usually rendered
 using @samp{ZFILL}.

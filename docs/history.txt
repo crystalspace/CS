@@ -24,6 +24,9 @@ chronological order.
 	  documentation.
 	- Jorrit fixed the thing mesh object explanation. Things don't support
 	  portals anymore.
+	- Jorrit fixed lots of outdated information in the docs.
+	- Jorrit added a new materials section and an explanation on alpha
+	  textures.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node 3D Renderer, Collision Detection, Lighting System, Using Crystal Space
+@node 3D Renderer, Collision Detection, Materials, Using Crystal Space
 @section The Rendering System
 @cindex rendering
 

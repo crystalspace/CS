@@ -10,14 +10,11 @@ This section describes how to create a Genmesh mesh.
 @subsubheading What is Genmesh?
 
 A @samp{Genmesh} mesh object (@pxref{MeshObject Genmesh}) is a generic
-triangle mesh object that (currently) supports one material for the entire
-mesh. In contrast with 3D sprites (@pxref{MeshObject Spr3D}), genmeshes do not
-support animation (except that you can modify the vertices manually at
-runtime).
+triangle mesh object. Genmeshes also support animation
+(@pxref{GenMesh Animation}).
 
 Genmeshes are very useful for static or semi-static geometry (chests,
-doors, candles, swords, etc.) which do not need internal animation but which
-can sometimes require a lot of detail.
+doors, candles, swords, etc.) which can sometimes require a lot of detail.
 
 Genmeshes use vertex lighting (or stencil if you use a stencil lighting
 shader).

@@ -72,7 +72,7 @@ just linearly interpolate the lightmaps in between.
 @item
 Opening a Predefined Portal
 
-In future it will be possible to flag polygons as having a portal which is
+In future it will be possible to flag portals that are
 closed.  When you open this portal you'll have to recalculate all lighting
 that goes through the new portal.  If you know in advance that some polygon is
 going to be opened in the future you can already store a lot of helpful
@@ -134,8 +134,8 @@ to the sector that is behind that wall.  Aside from the portal and lighting
 problems there is an additional problem here.  The portal world does not in
 itself have spatial information like this.  It does @emph{not} know that there
 is a sector behind that polygon.  In fact there really is no concept of
-``behind a polygon'' unless the polygon happens to be a portal.  This would of
-course be a solution.  If you make breakable walls state-portals (portals
+``behind a polygon''.  This would of course be a solution.
+If you make breakable walls state-portals (portals
 which can be closed and opened on demand like explained earlier) then there is
 no problem.  But if you want to support this in general then we'll need to
 find a way to calculate spatial information like this.  Calculating this at

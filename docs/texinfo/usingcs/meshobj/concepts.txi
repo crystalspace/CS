@@ -6,7 +6,9 @@
 @cindex iParticle
 @cindex iPolygonMesh
 @cindex iMeshObject
+@cindex iMeshWrapper
 @cindex iMeshObjectFactory
+@cindex iMeshFactoryWrapper
 @cindex iMeshObjectType
 @cindex iLoaderPlugin
 @cindex csMeshWrapper
@@ -24,7 +26,9 @@ a 3D object that the engine can render.  Every mesh object knows how to render
 and light itself.  Mesh Objects don't control their own position in the engine
 though.  The engine is responsible for doing that.  Mesh Object implementations
 must implement the @sc{scf} interface @samp{iMeshObject}.  Every visible mesh
-object in the world will implement this interface.
+object in the world will implement this interface. Note that from the
+perspective of the engine you will always communicate with @samp{iMeshWrapper}
+instead of @samp{iMeshObject}.
 
 Mesh Objects often also implement one or more additional type specific
 interfaces to access the characteristics of that Mesh Object.  The engine
@@ -74,7 +78,9 @@ same characteristics.
 Which of the possibilities is selected by some Mesh Object type depends on the
 type.  You'll have to look it up in the respective documentation for that type.
 Mesh Object Factories implement the @sc{scf} interface
-@samp{iMeshObjectFactory}.
+@samp{iMeshObjectFactory}. Note that from the
+perspective of the engine you will always communicate with
+@samp{iMeshFactoryWrapper} instead of @samp{iMeshObjectFactory}.
 
 Mesh Object Factories often implement one or more additional type specific
 interfaces to access the characteristics of that Mesh Object Factory.  The

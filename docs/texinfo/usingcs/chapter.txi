@@ -18,6 +18,7 @@ own 3D applications.
 * Engine:: The 3D Engine
 * MeshObject:: Mesh Object Plug-In System
 * Lighting System:: The Lighting System
+* Materials:: Materials and Textures
 * 3D Renderer:: The Rendering System
 * Collision Detection:: Collision Detection and Physics
 * Animation:: Animating your Objects
@@ -41,6 +42,7 @@ own 3D applications.
 @importss{usingcs,engine,chapter.txi}
 @importss{usingcs,meshobj,chapter.txi}
 @importss{usingcs,lighting,chapter.txi}
+@importss{usingcs,materials,chapter.txi}
 @importss{usingcs,renderer,chapter.txi}
 @importss{usingcs,colldet,chapter.txi}
 @importss{usingcs,animation,chapter.txi}
