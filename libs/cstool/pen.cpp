@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cstool\pen.h"
+#include "cstool/pen.h"
 
 #include <math.h>
 #include <float.h>
