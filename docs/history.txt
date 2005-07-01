@@ -37,6 +37,8 @@ chronological order.
 	  Direct3d OpenGL).
 	- Jorrit did more documentation stuff. Added some information about how
 	  to play sounds and fixed a few things.
+	- res fixed the walktest Jamfile to generate a proper walkall compile
+	  group for VC6.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.

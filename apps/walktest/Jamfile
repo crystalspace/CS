@@ -16,8 +16,6 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
   CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
 }
 
-if [ Property build : projgen_version ] != 6
-{
 # List of plugins which should be go into walkall.
 WALKALL.PLUGINLIST =
   ball
@@ -125,6 +123,8 @@ for p in $(WALKALL.PLUGINLIST)
 }
 CompileGroups walktest : walkall ;
 
+if [ Property build : projgen_version ] != 6
+{
 # Plugins that are linked statically into walktest_static.
 WALKTEST_STATIC.PLUGINLIST =
   $(WALKALL.PLUGINLIST)
