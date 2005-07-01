@@ -38,6 +38,7 @@
 #include "cstool/mdldata.h"
 #include "cstool/mdltool.h"
 #include "cstool/meshobjtmpl.h"
+#include "cstool/pen.h"
 #include "cstool/proctex.h"
 #include "cstool/proctxtanim.h"
 #include "cstool/rbuflock.h"
