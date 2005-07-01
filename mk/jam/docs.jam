@@ -23,11 +23,13 @@
 # of appropriate tools. This simplifies client Jamfiles since the client does
 # not need to check for the presence of the various tools. These rules will be
 # re-defined later if the necessary tools are available.
-rule Texi2Info { }
-rule Texi2HTML { }
-rule Texi2DVI  { }
-rule Texi2PS   { }
-rule Texi2PDF  { }
+rule Texi2Info   { }
+rule Texi2HTML   { }
+rule Texi2DVI    { }
+rule Texi2PS     { }
+rule Texi2PDF    { }
+rule Doxygen     { }
+rule RepairNodes { }
 
 if $(PERL)
 {
@@ -222,6 +224,38 @@ rule Texi2PDF
   OPTIONS on $(pdffile) += $(FLAGS.TEXI2PDF) ;
   return pdffile ;
 }
+}
+}
+
+if $(PERL)
+{
+PATH.NODEFIX ?= [ ConcatDirs $(TOP) docs support nodefix.pl ] ;
+CMD.NODEFIX ?= $(PERL) $(PATH.NODEFIX) ;
+
+##  RepairNodes targetname : texifile [ : srcdir ]
+##    When 'targetname' is invoked, perform in-place repair of @node and @menu
+##    directives in 'texifile' so that they correctly reflect the documentation
+##    hierarchy defined by @chapter, @section, @subsection, etc. directives.
+##    'srcdir' is the directory containing 'texifile' as well as any files
+##    included via @include{} or @import{} directives. If 'srcdir' is omitted,
+##    then $(SUBDIR) is assumed.
+rule RepairNodes
+{
+  local target = $(1) ;
+  local texifile = $(2) ;
+  local srcdir = $(3) ;
+  if ! $(srcdir) { srcdir = $(SUBDIR) ; }
+
+  SEARCH on $(texifile) = $(srcdir) ;
+  TEXINFO.INCDIR on $(target) = $(srcdir) ;
+  Depends $(target) : $(texifile) ;
+  NotFile $(target) ;
+  Always $(target) ;
+}
+
+actions RepairNodes
+{
+  $(CMD.NODEFIX) --include-dir="$(TEXINFO.INCDIR)" "$(>)" ;
 }
 }
 

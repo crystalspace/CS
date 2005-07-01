@@ -7,9 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 1-Jul-2005
-	- Jorrit did the first phase of the new documentation. All documentation
-	  has been moved to a new location. Note that there is no new
-	  documentation yet. Everything is still there. Just at other
+	- Jorrit did the first phase of the new documentation. All
+	  documentation has been moved to a new location. Note that there is no
+	  new documentation yet. Everything is still there. Just at other
 	  spots.
 	- Jorrit did some extra documentation changes:
 	    - Changed structure of sprite3d animation chapter.
@@ -39,6 +39,8 @@ chronological order.
 	  to play sounds and fixed a few things.
 	- res fixed the walktest Jamfile to generate a proper walkall compile
 	  group for VC6.
+	- Eric Sunshine moved the RepairNodes rule from docs/texinfo/Jamfile to
+	  docs.jam so that it can be used by external projects.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.

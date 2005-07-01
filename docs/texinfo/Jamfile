@@ -4,6 +4,9 @@ SubDir TOP docs texinfo ;
 local alltexi = cs-unix.txi [ Filter [ Recurse : .txi ] :
   cs-unix.txi cs-dos.txi cs-mac.txi dosdef.txi macdef.txi unixdef.txi ] ;
 
+RepairNodes repairdoc : $(alltexi[1]) : ;
+Help repairdoc : "Repair Texinfo @node and @menu directives" ;
+
 Texi2Info manualinfo : $(alltexi) : info : info manual : crystalspace.info ;
 Help manualinfo : "Convert user manual to Info format" ;
 
@@ -68,27 +71,4 @@ if $(PERL) && $(CMD.HHC)
   CleanDir manualchmclean : $(outdir) ;
   Depends clean : manualchmclean ;
 }
-
-if $(PERL)
-{
-  NODEFIX ?= [ ConcatDirs $(TOP) docs support nodefix.pl ] ;
-
-  rule RepairNodes
-  {
-    Depends $(<) : $(>) ;
-    NotFile $(<) ;
-    Always $(<) ;
-    SEARCH on $(>) = $(3) ;
-    TEXINFO.INCDIR on $(<) = $(3) ;
-  }
-
-  actions RepairNodes
-  {
-    $(PERL) "$(NODEFIX)" --include-dir="$(TEXINFO.INCDIR)" "$(>)" ;
-  }
-
-  RepairNodes repairdoc : cs-unix.txi : $(SUBDIR) ;
-  Help repairdoc : "Repair Texinfo @node and @menu directives" ;
-}
-
 }
