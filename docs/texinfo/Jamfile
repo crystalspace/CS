@@ -4,7 +4,7 @@ SubDir TOP docs texinfo ;
 local alltexi = cs-unix.txi [ Filter [ Recurse : .txi ] :
   cs-unix.txi cs-dos.txi cs-mac.txi dosdef.txi macdef.txi unixdef.txi ] ;
 
-RepairNodes repairdoc : $(alltexi[1]) : ;
+RepairNodes repairdoc : $(alltexi[1]) ;
 Help repairdoc : "Repair Texinfo @node and @menu directives" ;
 
 Texi2Info manualinfo : $(alltexi) : info : info manual : crystalspace.info ;
