@@ -80,6 +80,7 @@ class csMeshRenderNode : public csRenderNode
       node(node), g3d(g3d) {}
     void Process (const ShaderTicketKey& key, MeshBucket& bucket);
   };
+  friend class TraverseShaderBuckets;
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
     size_t ticket, csRenderMesh** meshes, size_t num,

@@ -14,14 +14,16 @@ int main(int argc, char** argv)
 {
   csPrintf ("#PROJECTNAME# version #VERSION# by #AUTHOR#.\n");
 
-  // Create an application instance which will perform initialization and event
-  // handling for the entire game.
-  App#PROJECTNAMECAP# app;
-
-  // Start the application.  The underlying csApplicationFramework also
-  // performs some core initialization.  It will set up the configuration
-  // manager, event queue, object registry, and much more.  The object registry
-  // is very important, and it is stored in your main application class (again,
-  // by csApplicationFramework).
-  return app.Main (argc, argv);
+  /* Runs the application.  
+   *
+   * csApplicationRunner<> cares about creating an application instance 
+   * which will perform initialization and event handling for the entire game. 
+   *
+   * The underlying csApplicationFramework also performs some core 
+   * initialization.  It will set up the configuration manager, event queue, 
+   * object registry, and much more.  The object registry is very important, 
+   * and it is stored in your main application class (again, by 
+   * csApplicationFramework). 
+   */
+  return csApplicationRunner<App#PROJECTNAMECAP#>::Run (argc, argv);
 }

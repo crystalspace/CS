@@ -628,11 +628,6 @@ bool csGraphics2DOpenGL::Open ()
 
   hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
     (pfd.dwFlags & PFD_GENERIC_ACCELERATED);
-  if (!hardwareAccelerated)
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING,
-      "No hardware acceleration!");
-  }
 
   pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
   pfmt.RedBits = pfd.cRedBits;
@@ -656,6 +651,16 @@ bool csGraphics2DOpenGL::Open ()
   ShowWindow (m_hWnd, m_nCmdShow);
   SetForegroundWindow (m_hWnd);
   SetFocus (m_hWnd);
+  
+  /* Small hack to emit "no HW acceleration" message on both GDI Generic and
+   * sucky Direct3D default OpenGL */
+  hardwareAccelerated &= 
+    (strncmp ((char*)glGetString (GL_VENDOR), "Microsoft", 9) != 0);
+  if (!hardwareAccelerated)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "No hardware acceleration!");
+  }
 
   detector.DoDetection (m_hWnd, hDC);
   Report (CS_REPORTER_SEVERITY_NOTIFY,

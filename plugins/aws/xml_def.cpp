@@ -76,8 +76,8 @@ bool defFile::Parse(const std::string &txt, registry &reg)
     CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.documentsystem.xmltiny", 
     iDocumentSystem));*/
 
-  csRef<iDocumentSystem> xml = 
-    (csPtr<iDocumentSystem> (new csTinyDocumentSystem ()));;
+  csRef<iDocumentSystem> xml;
+  xml.AttachNew (new csTinyDocumentSystem ());;
   csRef<iDocument> doc = xml->CreateDocument ();
 
   doc->Parse(txt.c_str(), true);
@@ -86,9 +86,6 @@ bool defFile::Parse(const std::string &txt, registry &reg)
   csRef< iDocumentNodeIterator> pos = node->GetNodes();
 
   ParseNode(&reg, pos);
-
-  delete xml;
-  delete doc;
 
   return true;
 }
