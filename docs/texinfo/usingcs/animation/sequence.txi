@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Sequence Manager, ProcTextures, Sprite3D Animation, Animation
+@node Sequence Manager, ProcTextures, GenMesh Animation, Animation
 @subsection Sequence Manager
 @cindex Sequence Manager
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject, 3D Renderer, Engine, Using Crystal Space
+@node MeshObject, Lighting System, Engine, Using Crystal Space
 @section Mesh Object Plug-In System
 @cindex MeshObject Plug-In
 @cindex Plug-In, MeshObject
@@ -26,6 +26,8 @@ Crystal Space supports.
 * MeshObject Concepts::
 * Using MeshObject:: Using Mesh Objects
 * Writing MeshObjects:: Writing Mesh Objects
+* HOWTO Create Thing:: Creating a Thing Mesh
+* HOWTO Create Genmesh:: Creating a Genmesh Mesh
 * MeshObject Spr2D:: Sprite2D Mesh Object
 * MeshObject Spr3D:: Sprite3D Mesh Object
 * MeshObject SprCal3D:: SpriteCal3D Mesh Object
@@ -47,6 +49,8 @@ Crystal Space supports.
 @importss{usingcs,meshobj,concepts.txi}
 @importss{usingcs,meshobj,using.txi}
 @importss{usingcs,meshobj,writing.txi}
+@importss{usingcs,meshobj,creatething.txi}
+@importss{usingcs,meshobj,creategenmesh.txi}
 @importss{usingcs,meshobj,spr2d.txi}
 @importss{usingcs,meshobj,spr3d.txi}
 @importss{usingcs,meshobj,sprcal3d.txi}

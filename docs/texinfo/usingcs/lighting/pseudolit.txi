@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Pseudo DynLight, HOWTO Level Loading, HOWTO Clicking on Objects, HOWTO
+@node HOWTO Pseudo DynLight, , Lighting, Lighting System
 @subsection Pseudo-dynamic Lights
 @cindex pseudo-dynamic lights
 @cindex dynamic lights

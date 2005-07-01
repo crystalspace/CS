@@ -11,11 +11,8 @@ code.
 @menu
 * HOWTO Mesh LightAnim:: Mesh Lighting and Animation
 * HOWTO Mesh Movement:: Mesh Movement
-* HOWTO Create Thing:: Creating a Thing Mesh
-* HOWTO Create Genmesh:: Creating a Genmesh Mesh
 * HOWTO Camera Movement:: Camera Movement
 * HOWTO Clicking on Objects:: Clicking on Objects
-* HOWTO Pseudo DynLight:: Pseudo-dynamic Lights
 * HOWTO Level Loading:: Loading a Level
 * HOWTO Pixmaps:: Loading Images for Pixmaps
 * HOWTO Render Priorities:: Render Priorities and Objects in Sectors
@@ -26,11 +23,8 @@ code.
 
 @importss{usingcs,howto,meshanim.txi}
 @importss{usingcs,howto,meshmove.txi}
-@importss{usingcs,howto,creatething.txi}
-@importss{usingcs,howto,creategenmesh.txi}
 @importss{usingcs,howto,cammove.txi}
 @importss{usingcs,howto,clickobj.txi}
-@importss{usingcs,howto,pseudolit.txi}
 @importss{usingcs,howto,levload.txi}
 @importss{usingcs,howto,pixmap.txi}
 @importss{usingcs,howto,rendpri.txi}

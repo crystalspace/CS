@@ -11,8 +11,10 @@ merely curious about the internal workings of the project.
 * Platform Details:: Platform-Specific Details
 * Threads in CS:: Threads in Crystal Space
 * Engine Internal Workings:: The Engine Internals Explained
+* Rendering Loop::
 @end menu
 
 @importss{internal,platform,details.txi}
 @imports{internal,threads.txi}
 @imports{internal,engine.txi}
+@imports{internal,render.txi}

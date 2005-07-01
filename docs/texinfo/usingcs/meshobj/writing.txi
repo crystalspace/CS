@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Writing MeshObjects, MeshObject Spr2D, Using MeshObject, MeshObject
+@node Writing MeshObjects, HOWTO Create Thing, Using MeshObject, MeshObject
 @subsection Writing Mesh Objects
 @cindex MeshObject
 @cindex @code{iMeshObject}

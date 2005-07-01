@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Level Loading, HOWTO Pixmaps, HOWTO Pseudo DynLight, HOWTO
+@node HOWTO Level Loading, HOWTO Pixmaps, HOWTO Clicking on Objects, HOWTO
 @subsection Loading a Level
 @cindex @code{iLoader}
 @cindex loading level

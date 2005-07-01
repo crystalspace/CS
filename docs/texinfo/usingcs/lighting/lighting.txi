@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Lighting, Cameras and Matrices, Portal Engine, Engine
+@node Lighting, HOWTO Pseudo DynLight, Lighting System, Lighting System
 @subsection Lighting
 @cindex Lighting
 
@@ -73,13 +73,13 @@ grid has one lightmap position).  A consequence of this is that rotated
 textures can waste a lot of lightmap space.  For example, see the following
 polygon:
 
-@picturess{usingcs,engine,light1}
+@picturess{usingcs,lighting,light1}
 
 @noindent
 And assume that the texture is aligned horizontally.  Then we would need a
 lightmap of the following size:
 
-@picturess{usingcs,engine,light2}
+@picturess{usingcs,lighting,light2}
 
 @noindent
 Note also, that the texture in the texture cache will have that size.

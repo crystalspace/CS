@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Engine Internal Workings, , Threads in CS, Internals
+@node Engine Internal Workings, Rendering Loop, Threads in CS, Internals
 @section The Engine Internals Explained
 @cindex Engine Internals
 

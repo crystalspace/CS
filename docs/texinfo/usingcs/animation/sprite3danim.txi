@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Sprite3D Animation, Sequence Manager, Animation, Animation
+@node Sprite3D Animation, SpriteCal3D Animation, Animation, Animation
 @subsection Sprite3D Animation
 @cindex Animation
 @cindex Sprite3D

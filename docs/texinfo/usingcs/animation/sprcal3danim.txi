@@ -1,0 +1,8 @@
+@c -*-texinfo-*-
+@node SpriteCal3D Animation, GenMesh Animation, Sprite3D Animation, Animation
+@subsection SpriteCal3D Animation
+@cindex SpriteCal3D
+@cindex Cal3D
+
+TODO!
+

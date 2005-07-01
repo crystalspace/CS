@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Basic Collision Detection, , Collision Detection, Collision Detection
+@node Basic Collision Detection, Physics ODE, Collision Detection, Collision Detection
 @subsection Basic Collision Detection
 @cindex @code{csColliderWrapper}
 @cindex @code{iCollideSystem}

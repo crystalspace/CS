@@ -11,7 +11,9 @@ Everything about collision detection and physics.
 
 @menu
 * Basic Collision Detection::
+* Physics ODE:: Physics using ODE
 @end menu
 
 @importss{usingcs,colldet,basic.txi}
+@importss{usingcs,colldet,ode.txi}
 

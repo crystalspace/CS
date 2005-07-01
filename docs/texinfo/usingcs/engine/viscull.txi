@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Visibility Culling, Rendering Loop, Texture Mapping, Engine
+@node Visibility Culling, Dynamic Worlds, Texture Mapping, Engine
 @subsection Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility

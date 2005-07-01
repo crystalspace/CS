@@ -1,0 +1,29 @@
+@c -*-texinfo-*-
+@node Lighting System, 3D Renderer, MeshObject, Using Crystal Space
+@section The Lighting System
+@cindex lighting
+
+Crystal Space has a number of ways to light up a level. Here is a short summary:
+
+@itemize
+@item
+@dfn{Static lightmaps}: In this situation lighting is precalculated and cannot
+change at runtime. Pseudo-dynamic lights are possible. These can change
+color and intensity but not position. Dynamic lights are also possible
+but have low quality.
+@item
+@dfn{Stencil shadows}: Uses stencil hardware to calculate shadows. This
+requires no precalculation but tends to get rather slow with big levels
+and lots of lights.
+@item
+@dfn{Vertex lighting}: No shadows.
+@end itemize
+
+@menu
+* Lighting::
+* HOWTO Pseudo DynLight:: Pseudo-dynamic Lights
+@end menu
+
+@importss{usingcs,lighting,lighting.txi}
+@importss{usingcs,lighting,pseudolit.txi}
+

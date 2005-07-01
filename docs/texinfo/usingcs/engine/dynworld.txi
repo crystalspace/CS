@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Dynamic Worlds, Level of Detail, Rendering Loop, Engine
+@node Dynamic Worlds, Level of Detail, Visibility Culling, Engine
 @subsection Dynamic Worlds
 @cindex Dynamic Worlds
 
@@ -10,8 +10,12 @@
 Normally the portal approach lends itself very well for dynamic worlds.
 However, the big problem is lighting.  Static lightmaps are very static (as
 you can imagine) and are difficult to scale and recompute.  This severely
-restricts what you can do dynamically in general.  However, in many specific
-cases you can do a lot.  Following is a summary of these cases.
+restricts what you can do dynamically in general.  You can also use stencil
+shadows in which case there is no recalculation needed but the problem with
+stencil shadows is that they tend to get slower with big levels and lots
+of lights. Finally you can also use just regular vertex lighting with no
+shadows. The discussion below focusses on the situation where you want to use
+static lightmaps.
 
 First a small definition.  The @dfn{sector-lights} is the list of lights that
 affect some sector.  Every sector will have a sector-lights list containing

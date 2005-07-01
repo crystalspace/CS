@@ -14,7 +14,7 @@ The world is built up from the following objects:
 
 @itemize @bullet
 @item
-@dfn{Sectors}. For details, see the portal engine discussion
+@dfn{Sectors} (@code{iSector}). For details, see the portal engine discussion
 (@pxref{Portal Engine}). Basically sectors define an area
 that can contain several geometrical objects. As opposed to earlier
 versions of Crystal Space, a sector does not itself represent geometry.
@@ -23,7 +23,8 @@ Theoretically a sector is infinite although in practice it is usually
 logically bounded by sector walls or a sky object.
 
 @item
-@dfn{Mesh Objects}. See the mesh object section for more specific information
+@dfn{Mesh Objects} (@code{iMeshWrapper}, @code{iMeshObject}). See the mesh
+object section for more specific information
 about them (@pxref{MeshObject}). Mesh objects represent geometry in some
 sector. Everything you can see (walls, actors, particle systems, @dots{}) is
 represented by some kind of mesh object. This is a very important concept
@@ -34,38 +35,38 @@ parent. So when you move the parent the children will automatically move
 with the parent.
 
 @item
-@dfn{Mesh Object Factories}. Mesh object factories are objects that
+@dfn{Mesh Object Factories} (@code{iMeshFactoryWrapper},
+@code{iMeshObjectFactory}). Mesh object factories are objects that
 can be used to create mesh objects that inherit characteristics
 from their mesh factory. Basically a mesh object factory is like
 a blue-print for creating a mesh object. Mesh factories can also
 be hierarchical like mesh objects.
 
 @item
-@dfn{Portals}. Again see the portal discussion (@pxref{Portal Engine}) but
+@dfn{Portals} (@code{iPortal}, @code{iPortalContainer}). Again see the
+portal discussion (@pxref{Portal Engine}) but
 the idea is that sectors are normally totally independent areas
-unless you connect them through portals. Portals are currently implemented
-inside the @dfn{Thing Mesh Object}. There you can assign a portal to some
-sector to a single polygon.
+unless you connect them through portals.
 
 @item
-@dfn{Light Sources}.  There are different ways how light is applied to objects
-to increase performance.  @xref{Lighting}.
+@dfn{Light Sources} (@code{iLight}). There are different ways how light
+is applied to objects to increase performance.  @xref{Lighting}.
 
 @item
-@dfn{Collection Objects}.  These are simply groups of other objects. Do not
-confuse them with hierarchical objects.
+@dfn{Collection Objects} (@code{iCollection}). These are simply groups
+of other objects. Do not confuse them with hierarchical objects.
 
 @item
-@dfn{Regions}. A region is also a collection of objects but the purpose
-is different (as opposed to collections). A region can contain textures,
-materials, mesh objects, mesh factories, lights, collections, sectors,
+@dfn{Regions} (@code{iRegion}). A region is also a collection of objects but
+the purpose is different (as opposed to collections). A region can contain
+textures, materials, mesh objects, mesh factories, lights, collections, sectors,
 sequences, triggers, shared variables, @dots{}. Regions are useful when you
 want to load/unload big parts of a world dynamically. This can be used in
 cases where the world is too big to fit in memory and you want to use dynamic
 loading.
 
 @item
-@dfn{Key/value Pairs}. A key/value pair is a
+@dfn{Key/value Pairs} (@code{iKeyValuePair}). A key/value pair is a
 @{@var{key},@var{value}@} tuple describing some game specific concept.
 Key/value tuples are represented by a pair of strings. If you have
 built levels for Quake before, you are probably familiar with this concept
@@ -76,11 +77,13 @@ but your game can query it and perform the appropriate actions.
 In theory it is up to your program as to how these key-value tuples
 are interpreted.  However, Crystal Space has set some standards to make life
 easier for level designers and also to make levels as portable as possible
-between different Crystal Space games.  @xref{Keylist Standards}.
+between different Crystal Space games. Note that key value pairs actually
+allow multiple named values for a single key. @xref{Keylist Standards}.
 
 @item
-@dfn{Nodes}. A node represents a point in space. The engine itself will not
-use nodes but a game can use them to represent game specific data.
+@dfn{Nodes} (@code{iMapNode}). A node represents a point in space. The engine
+itself will not use nodes but a game can use them to represent game specific
+data.
 @end itemize
 
 The @dfn{Thing Mesh Object} is probably the most important mesh object
@@ -91,11 +94,6 @@ like. Here is a list of concepts that are related to @dfn{Things}:
 @item
 @dfn{Polygons}. @dfn{Things} are made from polygons. To define such an
 object you enumerate all polygons that make up the geometry of such thing.
-
-@item
-@dfn{Portals}. As mention above portals are a special case of
-polygons that point to some other sector (or sometimes the same
-sector in case of a mirror).
 
 @item
 @dfn{Texture Planes}. Polygons in a thing are texture mapped

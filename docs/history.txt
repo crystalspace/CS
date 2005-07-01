@@ -15,6 +15,11 @@ chronological order.
 	    - Changed structure of sprite3d animation chapter.
 	    - Replaced old email with jorrit.tyberghein@gmail.com
 	    - Added two sections about Blender and 3DSMax.
+	- Jorrit did some extra documentation changes:
+	    - Fixed a few outdated references.
+	    - Added a new lighting section in usingcs and moved a few
+	      other documentation parts there.
+	    - Moved some other stuff around.
 30-Jun-2005
         - Christopher added in the code that he's building back up for AWS2.
           Starting from the original AWS code, and breaking it in a big way.

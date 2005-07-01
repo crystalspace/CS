@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Cameras and Matrices, Space Warping, Lighting, Engine
+@node Cameras and Matrices, Space Warping, Portal Engine, Engine
 @subsection Cameras and Matrices
 @cindex Cameras
 @cindex Matrices

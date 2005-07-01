@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Portal Engine, Lighting, World Components, Engine
+@node Portal Engine, Cameras and Matrices, World Components, Engine
 @subsection Portal Engine
 @cindex Portal Engine
 
@@ -124,9 +124,6 @@ will need to use Z-use in order not to overwrite each other.
 Note that polygons have a visible side and an invisible side (backface
 culling).
 
-All polygons can be portals. Portals can point to another sector
-or to the same sector (in case of a mirror).
-
 @subsubheading Polygons
 @cindex Polygons
 
@@ -146,8 +143,12 @@ interpolation is used by the texture caching machinery to make this lighting
 appear smooth.  The end result of this is a non-tiled lighted texture that is
 mapped across the polygon surface.
 
-A polygon can also be a Portal (see below).  Normally a portal polygon is not
-texture mapped unless the texture is semi-transparent.
+@subsubheading Portal Containers
+@cindex Portal Container
+
+A special kind of object is the portal container. It also has polygons
+but every polygon is a portal to another sector (or the same sector in case of
+a mirror or other space warping transformation).
 
 @subsubheading Portals
 @cindex Portals

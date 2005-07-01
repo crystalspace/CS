@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node Rendering Loop, Dynamic Worlds, Visibility Culling, Engine
-@subsection Rendering Loop
+@node Rendering Loop, , Engine Internal Workings, Internals
+@section Rendering Loop
 @cindex Rendering Loop
 
 @noindent
@@ -29,7 +29,7 @@ But I will go straight to @code{iEngine::Draw()} which is called indirectly
 from within @code{Simple::NextFrame()}.  It is called indirectly because first
 we call @code{iView::Draw()} which then calls @code{iEngine::Draw()}.
 
-@subsubheading World Rendering (@code{iEngine::Draw()})
+@subheading World Rendering (@code{iEngine::Draw()})
 
 The method @code{iEngine::Draw()} is located in
 @file{CS/plugins/engine/3d/engine.cpp}.
@@ -75,7 +75,7 @@ After doing this (now that the screen is fully updated) we optionally draw
 halos.  Halos are drawn on top of everything else since they are an effect in
 the eyes.
 
-@subsubheading Sector Rendering (@code{iSector::Draw()})
+@subheading Sector Rendering (@code{iSector::Draw()})
 
 This method @code{iSector::Draw()} is located in
 @file{CS/plugins/engine/3d/sector.cpp}.
