@@ -58,7 +58,7 @@ struct iJobQueue : public iBase
   /**
    * Remove a job from the queue.
    * If the job is currently running and \a waitIfCurrent is true, wait until
-   * the jon has finished. This guarantees that the queue won't hold any 
+   * the job has finished. This guarantees that the queue won't hold any 
    * reference to the job object.
    */
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true) = 0;

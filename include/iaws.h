@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "iaws/aws.h"
-#include "iaws/aws2.h"
 #include "iaws/awscnvs.h"
 #include "iaws/awsdefs.h"
 #include "iaws/awsdock.h"

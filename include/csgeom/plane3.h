@@ -130,6 +130,15 @@ public:
   }
 
   /**
+   * Set one point ("origin") through which the plane goes.
+   * This is equal to setting DD = -N'*p where N' is the normal
+   */
+  void SetOrigin (const csVector3& p)
+  {
+    DD = -norm * p;
+  }
+
+  /**
    * Classify the given vector with regards to this plane. If the plane
    * is expressed as (N,D) with N the A,B,C components of the plane then
    * this will calculate and return N*pt+D. Note that in the Crystal Space

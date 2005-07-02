@@ -63,10 +63,16 @@ void csPathsListTest::testMultiply()
   csPathsList list2 (strings2);
   
   csPathsList list (list1 * list2);
-  CPPUNIT_ASSERT_EQUAL (list[0].path, csString ("foo/bar"));
+
+  csString catPath;
+  catPath = "foo"; catPath += CS_PATH_SEPARATOR; catPath += "bar";
+  csString sepPath;
+  sepPath = CS_PATH_SEPARATOR; sepPath += "bar";
+  
+  CPPUNIT_ASSERT_EQUAL (list[0].path, catPath);
   CPPUNIT_ASSERT_EQUAL (list[1].path, csString ("foo"));
-  CPPUNIT_ASSERT_EQUAL (list[2].path, csString ("/bar"));
-  CPPUNIT_ASSERT_EQUAL (list[3].path, csString ("/"));
+  CPPUNIT_ASSERT_EQUAL (list[2].path, sepPath);
+  CPPUNIT_ASSERT_EQUAL (list[3].path, csString (CS_PATH_SEPARATOR));
   CPPUNIT_ASSERT_EQUAL (list[4].path, csString ("bar"));
   CPPUNIT_ASSERT_EQUAL (list[5].path, csString (""));
 }

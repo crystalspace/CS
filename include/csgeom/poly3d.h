@@ -263,6 +263,12 @@ public:
    */
   int IsAxisAligned (float& where, float epsilon = SMALL_EPSILON) const;
 
+  /**
+   * Calculate the main axis of the normal.
+   * Returns one of the CS_AXIS_ constants;
+   */
+  int ComputeMainNormalAxis () const;
+
   /// Cut this polygon with a plane and only keep the front side.
   void CutToPlane (const csPlane3& split_plane);
 

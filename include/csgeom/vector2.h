@@ -44,7 +44,19 @@ public:
   csVector2 () {}
 
   /// Make a new vector and initialize with the given values.
-  csVector2 (float x, float y) { csVector2::x = x; csVector2::y = y; }
+  csVector2 (float v) 
+    : x (v), y (v)
+  {}
+
+  /// Make a new vector and initialize with the given values.
+  csVector2 (float x, float y) 
+    : x (x), y (y) 
+  { }
+
+  /// Copyconstructor
+  csVector2 (const csVector2& o) 
+    : x (o.x), y (o.y)
+  {}
 
   /// Return a textual representation of the vector in the form "x,y".
   csString Description() const;

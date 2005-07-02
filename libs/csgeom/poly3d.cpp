@@ -604,6 +604,27 @@ void csPoly3D::SplitWithPlaneZ (
   }
 }
 
+int csPoly3D::ComputeMainNormalAxis () const
+{
+  csVector3 absNormal = ComputeNormal ();
+  absNormal.x = fabsf (absNormal.x);
+  absNormal.y = fabsf (absNormal.y);
+  absNormal.z = fabsf (absNormal.z);
+
+  if (absNormal.x >= absNormal.y && absNormal.x >= absNormal.z)
+  {
+    return CS_AXIS_X;
+  }
+  else if (absNormal.y >= absNormal.x && absNormal.y >= absNormal.z)
+  {
+    return CS_AXIS_Y;
+  }
+  else
+  {
+    return CS_AXIS_Z;
+  }
+}
+
 //---------------------------------------------------------------------------
 size_t csVector3Array::AddVertexSmart (float x, float y, float z)
 {

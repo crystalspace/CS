@@ -1,178 +1,192 @@
 /*
-    Copyright (C) 2005 by Christopher Nelson
+  Copyright (C) 2005 by Christopher Nelson
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
 #include "cstool/pen.h"
 
-#include <math.h>
-#include <float.h>
 
-#ifndef M_PI
-#define M_PI   3.14159265358979323846f
-#endif
-
-csPen::csPen(iGraphics3D *_g3d):g3d(_g3d)
+csPen::csPen (iGraphics3D *_g3d) : g3d (_g3d)
 {
 
 }
 
-csPen::~csPen()
+csPen::~csPen ()
 {
 
 }
 
-void csPen::start()
+void csPen::Start ()
 {
-  va.MakeEmpty();
-  ia.SetLength(0);  
-  colors.SetLength(0);
+  va.MakeEmpty ();
+  ia.SetLength (0);  
+  colors.SetLength (0);
 }
 
-void csPen::vert(float x, float y)
+void csPen::AddVertex (float x, float y)
 {
   ia.Push((uint)va.AddVertexSmart(x,y,0));
   colors.Push(color);
 }
 
-void csPen::setupMesh()
+void csPen::SetupMesh ()
 {
-  mesh.vertices =    va.GetVertices();
-  mesh.vertexCount = static_cast<uint>(va.GetVertexCount());
+  mesh.vertices = va.GetVertices ();
+  mesh.vertexCount = (uint)va.GetVertexCount ();
 
-  mesh.indices = ia.GetArray();
-  mesh.indexCount = static_cast<uint>(ia.Length());
+  mesh.indices = ia.GetArray ();
+  mesh.indexCount = (uint)ia.Length ();
 
-  mesh.colors = colors.GetArray();
+  mesh.colors = colors.GetArray ();
   //mesh.colorCount = static_cast<uint>(colors.Length());  
 }
 
-void csPen::drawMesh(csRenderMeshType mesh_type)
+void csPen::DrawMesh (csRenderMeshType mesh_type)
 {
   mesh.meshtype = mesh_type;
-  g3d->DrawSimpleMesh(mesh, csSimpleMeshScreenspace);
+  g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 }
 
-void csPen::setColor(int32 r, int32 g, int32 b, int32 a)
+void csPen::SetColor (float r, float g, float b, float a)
 {
-  color.Set(r,g,b,a);
+  color.Set (r,g,b,a);
 }
 
 /** Draws a single line. */
-void csPen::line(int32 x1, int32 y1, int32 x2, int32 y2)
+void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
 {
-  start();
-  vert(x1,y1);
-  vert(x2,y2);
+  Start ();
+  AddVertex (x1,y1);
+  AddVertex (x2,y2);
 
-  setupMesh();
-  drawMesh(CS_MESHTYPE_LINES);
+  SetupMesh ();
+  DrawMesh (CS_MESHTYPE_LINES);
 }
 
 /** Draws a single point. */
-void csPen::point(int32 x1, int32 y1)
+void csPen::DrawPoint (uint x1, uint y1)
 {
-  start();
-  vert(x1,y1);
+  Start ();
+  AddVertex (x1,y1);
   
-  setupMesh(); 
-  drawMesh(CS_MESHTYPE_POINTS);
+  SetupMesh (); 
+  DrawMesh (CS_MESHTYPE_POINTS);
 }
 
 /** Draws a rectangle. */
-void csPen::rect(int32 x1, int32 y1, int32 x2, int32 y2, bool fill)
+void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool fill)
 {
-  start();
-  vert(x1, y1);
-  vert(x1, y2);
-  vert(x2, y2);
-  vert(x1, y2);
+  Start ();
+  AddVertex (x1, y1);
+  AddVertex (x1, y2);
+  AddVertex (x2, y2);
+  AddVertex (x1, y2);
 
-  setupMesh();
-  drawMesh(fill ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP);
+  SetupMesh ();
+  DrawMesh (fill ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP);
 }
 
 /** Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, and determines how
 * much of the corner is mitered off and beveled. */    
-void csPen::mitered_rect(int32 x1, int32 y1, int32 x2, int32 y2, float miter,  bool fill)
+void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
+                             float miter, bool fill)
 {
-  if (miter==0) { rect(x1,y1,x2,y2,fill); return; }
+  if (miter == 0.0f) 
+  { 
+    DrawRect (x1,y1,x2,y2,fill); 
+    return; 
+  }
 			
-  float width=x2-x1;
-  float height=y2-y1;
+  float width = x2-x1;
+  float height = y2-y1;
 
   float y_miter = (height*miter)*0.5;
   float x_miter = (width*miter)*0.5;
   		
-  start();
+  Start ();
 
-  vert(x1, y2-y_miter);
-  vert(x1, y1+y_miter);
-  vert(x1+x_miter, y1);
-  vert(x2-x_miter, y1);
-  vert(x2, y1+y_miter);
-  vert(x2, y2-y_miter);
-  vert(x2-x_miter, y2);
-  vert(x1+x_miter, y2);
+  AddVertex (x1, y2-y_miter);
+  AddVertex (x1, y1+y_miter);
+  AddVertex (x1+x_miter, y1);
+  AddVertex (x2-x_miter, y1);
+  AddVertex (x2, y1+y_miter);
+  AddVertex (x2, y2-y_miter);
+  AddVertex (x2-x_miter, y2);
+  AddVertex (x1+x_miter, y2);
 
-  setupMesh();
-  drawMesh(fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
+  SetupMesh ();
+  DrawMesh (fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
 }
 
 /** Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, and determines how
   * much of the corner is rounded off. */
-void csPen::rounded_rect(int32 x1, int32 y1, int32 x2, int32 y2, float roundness,  bool fill)
+void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
+                             float roundness, bool fill)
 {
-  if (roundness==0) { rect(x1,y1,x2,y2,fill); return; }
+  if (roundness == 0.0f) 
+  { 
+    DrawRect (x1,y1,x2,y2,fill); 
+    return; 
+  }
 			
-  float width=x2-x1;
-  float height=y2-y1;
+  float width = x2-x1;
+  float height = y2-y1;
 
   float y_round = (height*roundness)*0.5;
   float x_round = (width*roundness)*0.5;
   float   steps = roundness * 12;
-  float   delta = (M_PI/4.0)/steps;
+  float   delta = (PI/4.0)/steps;
 
-  start();
+  Start();
+
+  float angle;
   			
-  for(float angle=(M_PI/2.0)*3.0; angle>M_PI; angle-=delta)
-	  vert(x1+x_round+(cos(angle)*x_round), y2-y_round-(sin(angle)*y_round));
+  for(angle=(HALF_PI)*3.0f; angle>PI; angle-=delta)
+  {
+    AddVertex (x1+x_round+(cosf (angle)*x_round), y2-y_round-(sinf (angle)*y_round));
+  }
 	  
-  vert(x1, y2-y_round);
-  vert(x1, y1+y_round);
+  AddVertex (x1, y2-y_round);
+  AddVertex (x1, y1+y_round);
   
-  for(float angle=M_PI; angle>M_PI/2.0; angle-=delta)
-	  vert(x1+x_round+(cos(angle)*x_round), y1+y_round-(sin(angle)*y_round));				
+  for(angle=PI; angle>HALF_PI; angle-=delta)
+  {
+	  AddVertex (x1+x_round+(cosf (angle)*x_round), y1+y_round-(sinf (angle)*y_round));
+  }
   
-  vert(x1+x_round, y1);
-  vert(x2-x_round, y1);
+  AddVertex (x1+x_round, y1);
+  AddVertex (x2-x_round, y1);
   
-  for(float angle=M_PI/2.0; angle>0; angle-=delta)
-	  vert(x2-x_round+(cos(angle)*x_round), y1+y_round-(sin(angle)*y_round));
+  for(angle=HALF_PI; angle>0; angle-=delta)
+  {
+    AddVertex (x2-x_round+(cosf (angle)*x_round), y1+y_round-(sinf (angle)*y_round));
+  }
   
-  vert(x2, y1+y_round);
-  vert(x2, y2-y_round);
+  AddVertex (x2, y1+y_round);
+  AddVertex (x2, y2-y_round);
   
-  for(float angle=M_PI*2.0; angle>(M_PI/2.0)*3.0; angle-=delta)
-	  vert(x2-x_round+(cos(angle)*x_round), y2-y_round-(sin(angle)*y_round));
+  for(angle=TWO_PI; angle>HALF_PI*3.0; angle-=delta)
+  {
+    AddVertex (x2-x_round+(cosf (angle)*x_round), y2-y_round-(sinf (angle)*y_round));
+  }
   
-  vert(x2-x_round, y2);
-  vert(x1+x_round, y2);				
+  AddVertex (x2-x_round, y2);
+  AddVertex (x1+x_round, y2);				
 
-  setupMesh();
-  drawMesh(fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
+  SetupMesh ();
+  DrawMesh (fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
 }
