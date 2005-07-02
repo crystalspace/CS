@@ -354,7 +354,7 @@ void csMetaMaterial::notifyPropertyChange(const PropertyEvent& event)
   LOG("vosmaterial", 4, "property change!");
   try
   {
-    vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
+    vRef<ParentChildRelation> pcr = event.getProperty()->findParent(this);
     if(pcr->getContextualName() == "a3dl:color"
       || pcr->getContextualName() == "a3dl:texture")
     {

@@ -350,7 +350,7 @@ void csMetaModel::notifyPropertyChange(const PropertyEvent& event)
 
   try
   {
-    VUtil::vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
+    VUtil::vRef<ParentChildRelation> pcr = event.getProperty()->findParent(this);
     if(pcr->getContextualName() == "a3dl:model")
     {
       vRef<Property> property = getModelObj();

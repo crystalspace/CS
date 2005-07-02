@@ -426,7 +426,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
   {
     if (event.getEvent() != PropertyEvent::PropertyRead)
     {
-      vRef<ParentChildRelation> pcr = event.getProperty()->findParent (*this);
+      vRef<ParentChildRelation> pcr = event.getProperty()->findParent (this);
       LOG("vosobject3d", 5, "found parent");
 
       if (pcr->getContextualName() == "a3dl:position")

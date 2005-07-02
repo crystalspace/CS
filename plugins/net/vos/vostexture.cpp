@@ -266,7 +266,7 @@ void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)
 {
   try
   {
-    vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
+    vRef<ParentChildRelation> pcr = event.getProperty()->findParent(this);
     if(pcr->getContextualName() == "a3dl:image")
     {
       alreadyLoaded = false;
