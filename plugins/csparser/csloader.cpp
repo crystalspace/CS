@@ -31,6 +31,7 @@
 #include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
 #include "cstool/mdltool.h"
+#include "cstool/vfsdirchange.h"
 #include "csloader.h"
 
 #include "iutil/databuff.h"
@@ -572,14 +573,12 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
 {
   csRef<iDocument> doc;
   csString filename (fname);
+  csVfsDirectoryChanger dirChanger (VFS);
   size_t slashPos = filename.FindLast ('/');
-  bool vfsPop = false;
   if (slashPos != (size_t)-1)
   {
-    VFS->PushDir();
-    VFS->ChDir (filename.Slice (0, slashPos + 1));
+    dirChanger.ChangeTo (filename);
     filename.DeleteAt (0, slashPos + 1);
-    vfsPop = true;
   }
   bool er = LoadStructuredDoc (filename, buf, doc);
   csRef<iBase> ret;
@@ -606,7 +605,6 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
 	      "File does not appear to be a structured map file (%s)!", fname);
     }
   }
-  if (vfsPop) VFS->PopDir();
   return csPtr<iBase> (ret);
 }
 
@@ -5083,12 +5081,12 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   csRef<iDocumentNode> shaderNode;
   csRef<iDocumentNode> fileChild = node->GetNode ("file");
 
-  bool vfsPop = false;
   csRef<iVFS> vfs;
+  vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  csVfsDirectoryChanger dirChanger (vfs);
 
   if (fileChild)
   {
-    vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
     csString filename (fileChild->GetContentsValue ());
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
 
@@ -5113,13 +5111,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       return false;
     }
     shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
-    size_t slash = filename.FindLast ('/');
-    if (slash != (size_t)-1)
-    {
-      vfsPop = true;
-      vfs->PushDir();
-      vfs->ChDir (filename.Slice (0, slash+1));
-    }
+    dirChanger.ChangeTo (filename);
   }
   else
   {
@@ -5130,11 +5122,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   if (ldr_context->CheckDupes () && name)
   {
     iShader* m = shaderMgr->GetShader (name);
-    if (m) 
-    {
-      if (vfsPop && vfs) vfs->PopDir();
-      return true;
-    }
+    if (m) return true;
   }
 
   const char* type = shaderNode->GetAttributeValue ("compiler");
@@ -5145,13 +5133,10 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
       "'compiler' attribute is missing!");
 
-    if (vfsPop && vfs) vfs->PopDir();
-
     return false;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
   csRef<iShader> shader = shcom->CompileShader (shaderNode);
-  if (vfsPop && vfs) vfs->PopDir();
   if (shader)
   {
     shader->SetFileName(fileChild->GetContentsValue ());

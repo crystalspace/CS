@@ -36,6 +36,7 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shaderexpaccessor.h"
 #include "cstool/keyval.h"
+#include "cstool/vfsdirchange.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
@@ -1407,8 +1408,8 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
   const char* shaderFileName = node->GetAttributeValue ("file");
   if (shaderFileName != 0)
   {
-    bool vfsPop = false;
     csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csVfsDirectoryChanger dirChanger (vfs);
     csString filename (shaderFileName);
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
 
@@ -1434,13 +1435,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
     }
     csRef<iDocumentNode> shaderNode = 
       shaderDoc->GetRoot ()->GetNode ("shader");
-    size_t slash = filename.FindLast ('/');
-    if (slash != (size_t)-1)
-    {
-      vfsPop = true;
-      vfs->PushDir();
-      vfs->ChDir (filename.Slice (0, slash+1));
-    }
+    dirChanger.ChangeTo (filename);
 
     const char* type = shaderNode->GetAttributeValue ("compiler");
     if (type == 0)
@@ -1453,7 +1448,6 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
     }
     csRef<iShaderCompiler> shcom = shmgr->GetCompiler (type);
     shader = shcom->CompileShader (shaderNode);
-    if (vfsPop && vfs) vfs->PopDir();
     if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
     {
       shader->SetFileName (shaderFileName);

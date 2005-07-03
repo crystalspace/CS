@@ -31,6 +31,14 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
+SCF_IMPLEMENT_IBASE(awsManager)
+  SCF_IMPLEMENTS_INTERFACE(iAws)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE(awsManager::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE(iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 awsManager::awsManager(iBase *the_base)
 {

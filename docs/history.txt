@@ -5,10 +5,16 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
+
 3-Jul-2005
-	- Piotr Obrzut added pop dir on every return path in ParseShaderList in
-	csparser
+	- Piotr Obrzut added pop dir on every return path in ParseShaderList 
+	  in csparser
 	- Piotr Obrzut fixed error on reloading cal3d sprite in viewmesh
+	- res added csVfsDirectoryChanger, a helper to automatically restore
+	  the previous VFS working directory when changing it is required.
+	  Made it used by some code that did PushDir()/ChDir()/PopDir() 
+	  manually.
+	- res fixed some aws2 compile errors.
 2-Jul-2005
 	- Marten did a major cleanup of cstool/pen.h and pen.cpp.
 	- Marten removed aws2.h from the master headers for time being. It
