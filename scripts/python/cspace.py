@@ -1037,6 +1037,7 @@ class csPlane3(_object):
     def D(*args): return _cspace.csPlane3_D(*args)
     def GetNormal(*args): return _cspace.csPlane3_GetNormal(*args)
     def Set(*args): return _cspace.csPlane3_Set(*args)
+    def SetOrigin(*args): return _cspace.csPlane3_SetOrigin(*args)
     __swig_getmethods__["Classify"] = lambda x: _cspace.csPlane3_Classify
     if _newclass:Classify = staticmethod(_cspace.csPlane3_Classify)
     def Distance(*args): return _cspace.csPlane3_Distance(*args)
@@ -1574,6 +1575,7 @@ class csPoly3D(_object):
     def ClassifyZ(*args): return _cspace.csPoly3D_ClassifyZ(*args)
     def ClassifyAxis(*args): return _cspace.csPoly3D_ClassifyAxis(*args)
     def IsAxisAligned(*args): return _cspace.csPoly3D_IsAxisAligned(*args)
+    def ComputeMainNormalAxis(*args): return _cspace.csPoly3D_ComputeMainNormalAxis(*args)
     def CutToPlane(*args): return _cspace.csPoly3D_CutToPlane(*args)
     def SplitWithPlane(*args): return _cspace.csPoly3D_SplitWithPlane(*args)
     def SplitWithPlaneX(*args): return _cspace.csPoly3D_SplitWithPlaneX(*args)
