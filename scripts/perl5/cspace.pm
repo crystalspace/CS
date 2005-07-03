@@ -1340,6 +1340,7 @@ sub new {
 *D = *cspacec::csPlane3_D;
 *GetNormal = *cspacec::csPlane3_GetNormal;
 *Set = *cspacec::csPlane3_Set;
+*SetOrigin = *cspacec::csPlane3_SetOrigin;
 *Classify = *cspacec::csPlane3_Classify;
 *Distance = *cspacec::csPlane3_Distance;
 *Invert = *cspacec::csPlane3_Invert;
@@ -1802,6 +1803,7 @@ sub DESTROY {
 *ClassifyZ = *cspacec::csPoly3D_ClassifyZ;
 *ClassifyAxis = *cspacec::csPoly3D_ClassifyAxis;
 *IsAxisAligned = *cspacec::csPoly3D_IsAxisAligned;
+*ComputeMainNormalAxis = *cspacec::csPoly3D_ComputeMainNormalAxis;
 *CutToPlane = *cspacec::csPoly3D_CutToPlane;
 *SplitWithPlane = *cspacec::csPoly3D_SplitWithPlane;
 *SplitWithPlaneX = *cspacec::csPoly3D_SplitWithPlaneX;
