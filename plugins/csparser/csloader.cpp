@@ -5130,7 +5130,11 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   if (ldr_context->CheckDupes () && name)
   {
     iShader* m = shaderMgr->GetShader (name);
-    if (m) return true;
+    if (m) 
+    {
+      if (vfsPop && vfs) vfs->PopDir();
+      return true;
+    }
   }
 
   const char* type = shaderNode->GetAttributeValue ("compiler");
@@ -5140,6 +5144,9 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   {
     SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
       "'compiler' attribute is missing!");
+
+    if (vfsPop && vfs) vfs->PopDir();
+
     return false;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
