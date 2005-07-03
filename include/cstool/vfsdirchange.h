@@ -30,15 +30,18 @@
 class csVfsDirectoryChanger
 {
   csRef<iVFS> vfs;
-  bool vfsPop;
+  /**
+   * The number of directory changes/directory stack entries that need to be
+   * popped
+   */
+  uint popCount;
 public:
   /// Create instance
-  csVfsDirectoryChanger (iVFS* vfs) : vfs(vfs), vfsPop(false) { }
+  csVfsDirectoryChanger (iVFS* vfs) : vfs(vfs), popCount(0) { }
   /// Destroy instance. Restores the old directory if ChangeTo() was called.
   ~csVfsDirectoryChanger()
   {
-    if (vfsPop)
-      vfs->PopDir();
+    while (popCount--) vfs->PopDir();
   }
   /**
    * Change to the directory \a filename is in.
@@ -56,7 +59,7 @@ public:
       dir.Replace (filename, slash - filename);
       vfs->PushDir ();
       vfs->ChDir (dir);
-      vfsPop = true;
+      popCount++;
     }
   }
 };
