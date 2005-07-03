@@ -29,6 +29,7 @@
 
 #ifdef CS_HAVE_CAL3D
 #include <cal3d/animcallback.h>
+#include <cal3d/cal3d.h>
 #endif
 
 CS_IMPLEMENT_APPLICATION
@@ -539,9 +540,13 @@ void ViewMesh::LoadSprite (const char* path, const char* filename)
       {
         iMeshWrapper* meshWrapOld = 
           cal3dsprite->GetSocket(i)->GetMeshWrapper();
-        engine->RemoveObject(meshWrapOld);
-        engine->RemoveObject(meshWrapOld->GetFactory());
-        delete meshWrapOld;
+
+        if (meshWrapOld)
+        {
+          engine->RemoveObject(meshWrapOld);
+          engine->RemoveObject(meshWrapOld->GetFactory());
+          delete meshWrapOld; 
+        }
       }
     }
 #ifdef CS_HAVE_CAL3D
