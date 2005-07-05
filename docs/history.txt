@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Jul-2005
+	- Piotr Obrzut fixed creating/removing of *strict ode joints*
 	- Piotr Obrzut added creating function for ode slider joint in cs
 3-Jul-2005
 	- Piotr Obrzut added pop dir on every return path in ParseShaderList 

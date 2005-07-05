@@ -252,6 +252,7 @@ public:
 
 class csODEBodyGroup;
 class csODEJoint;
+class csStrictODEJoint;
 
 /**
  * This is the implementation for the dynamics core.
@@ -272,6 +273,7 @@ private:
   csRefArrayObject<iRigidBody> bodies;
   csRefArray<csODEBodyGroup> groups;
   csRefArray<csODEJoint> joints;
+  csRefArray<csStrictODEJoint> strict_joints;
 
   csGeomList geoms;
 
@@ -734,7 +736,7 @@ public:
 };
 
 
-struct csStrictODEJoint
+struct csStrictODEJoint : iBase
 {
   dJointID jointID;
   csRef<iRigidBody> body[2];
@@ -742,6 +744,8 @@ struct csStrictODEJoint
   dJointFeedback *feedback;
 
   csStrictODEJoint () {feedback = NULL;};
+  virtual ~csStrictODEJoint () {;};
+
   void Attach (iRigidBody *body1, iRigidBody *body2);
   csRef<iRigidBody> GetAttachedBody (int body);
   void SetParam (int joint_type, int param, int axis, float value);
@@ -758,7 +762,7 @@ private:
 };
 
 /**
-* This implements the ball joint.  It does this by strict copying
+* This implements the slider joint.  It does this by strict copying
 * ODEs interface. 
 */
 struct ODESliderJoint : public csStrictODEJoint, iODESliderJoint 

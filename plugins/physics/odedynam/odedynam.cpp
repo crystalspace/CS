@@ -568,53 +568,58 @@ csPtr<iJoint> csODEDynamicSystem::CreateJoint ()
 csPtr<iODEUniversalJoint> csODEDynamicSystem::CreateUniversalJoint ()
 {
   ODEUniversalJoint* joint = new ODEUniversalJoint (GetWorldID());
-  return  csPtr<iODEUniversalJoint> (joint);
+  strict_joints.Push (joint);
+  return joint;
 }
 
 csPtr<iODESliderJoint> csODEDynamicSystem::CreateSliderJoint ()
 {
   ODESliderJoint* joint = new ODESliderJoint (GetWorldID());
+  strict_joints.Push (joint);
   return  csPtr<iODESliderJoint> (joint);
 }
 
 csPtr<iODEHingeJoint> csODEDynamicSystem::CreateHingeJoint ()
 {
   ODEHingeJoint* joint = new ODEHingeJoint (GetWorldID());
+  strict_joints.Push (joint);
   return  csPtr<iODEHingeJoint> (joint);
 }
 
 csPtr<iODEAMotorJoint> csODEDynamicSystem::CreateAMotorJoint ()
 {
   ODEAMotorJoint* joint = new ODEAMotorJoint (GetWorldID());
+  strict_joints.Push (joint);
   return  csPtr<iODEAMotorJoint> (joint);
 }
 
 csPtr<iODEBallJoint> csODEDynamicSystem::CreateBallJoint ()
 {
   ODEBallJoint* joint = new ODEBallJoint (GetWorldID());
+  strict_joints.Push (joint);
   return  csPtr<iODEBallJoint> (joint);
 }
 
 void csODEDynamicSystem::RemoveJoint (iODEUniversalJoint *joint)
 {
-  delete joint; //FIXME: should it be here? (use joints vector?)
+  strict_joints.Delete ((ODEUniversalJoint*)joint);
 }
 
 void csODEDynamicSystem::RemoveJoint (iODEHingeJoint *joint)
 {
-  delete joint; //FIXME: should it be here? (use joints vector?)
+  strict_joints.Delete ((ODEHingeJoint*)joint);
 }
 void csODEDynamicSystem::RemoveJoint (iODEAMotorJoint *joint)
 {
-  delete joint; //FIXME: should it be here? (use joints vector?)
+  strict_joints.Delete ((ODEAMotorJoint*)joint);
 }
 void csODEDynamicSystem::RemoveJoint (iODEBallJoint *joint)
 {
-  delete joint; //FIXME: should it be here? (use joints vector?)
+  strict_joints.Delete ((ODEBallJoint*)joint);
 }
 void csODEDynamicSystem::RemoveJoint (iODESliderJoint *joint)
 {
-  delete joint; //FIXME: should it be here? (use joints vector?)
+  strict_joints.Delete ((ODESliderJoint*) joint);
 }
 void csODEDynamicSystem::RemoveJoint (iJoint *joint)
 {
