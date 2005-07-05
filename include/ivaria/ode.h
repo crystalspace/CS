@@ -242,6 +242,9 @@ struct iODEDynamicSystemState : public iBase
   /// Create a Universal joint and add it to he simulation
   virtual csPtr<iODEUniversalJoint> CreateUniversalJoint () = 0;
 
+  /// Create a Slider joint and add it to he simulation
+  virtual csPtr<iODESliderJoint> CreateSliderJoint () = 0;
+
   /// Remove a ball joint from the simulation
   virtual void RemoveJoint (iODEBallJoint* joint) = 0;
 
