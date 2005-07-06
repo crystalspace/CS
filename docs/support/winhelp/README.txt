@@ -13,9 +13,9 @@ o Perl (www.perl.org or www.activatestate.com)
 Generation
 ----------
 These instructions apply to Unix-like platforms or installations, such as
-Linux, Msys/Mingw on Windows, and Cygwin on Windows, which employ `make' or
+GNU/Linux, Msys/Mingw on Windows, and Cygwin on Windows, which employ `make' or
 `jam' when building Crystal Space.  Consult the "Preparing Windows" or
-"Preparing Linux" sections below to learn how to prepare your development
+"Preparing GNU/Linux" sections below to learn how to prepare your development
 environment for building CHM format documentation. Once the environment has
 been configured, follow these steps to actually generate the documentation:
 
@@ -58,11 +58,12 @@ compiler, and Perl.
    "checking for hhc..." and "checking for perl...", respectively.
 
 
-Preparing Linux
----------------
-It is possible to create Microsoft CHM format help files on Linux by running
-hhc.exe, the HTML Help Compiler, via Wine. The following instructions explain
-how to create a bare-minimum Wine installation capable of running hhc.exe.
+Preparing GNU/Linux
+-------------------
+It is possible to create Microsoft CHM format help files on GNU/Linux by
+running hhc.exe, the HTML Help Compiler, via Wine. The following instructions
+explain how to create a bare-minimum Wine installation capable of running
+hhc.exe.
 
  1. Install cabextract.
 
@@ -167,7 +168,7 @@ how to create a bare-minimum Wine installation capable of running hhc.exe.
 
 ---
 
-The very useful information in steps 7 through 10 of "Preparing Linux" was
+The very useful information in steps 7 through 10 of "Preparing GNU/Linux" was
 gleaned from the slightly outdated but still quite helpful page:
 
 http://htmlhelp.berlios.de/howto/mshh4wine.php

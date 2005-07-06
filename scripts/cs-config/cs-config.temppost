@@ -301,9 +301,9 @@ if test -n "$show_availlibs"; then
 	# we are filtering the list down to names which are valid under this
 	# installation's configuration. For instance, the client might request
 	# `csplugincommon_osx', and we do not want to emit an error when the
-	# request is made on Linux; we just want to return a usable subset of
-	# those requested. Other options, such as --cflags, --libs, etc., will
-	# emit an appropriate error for unknown library requests.
+	# request is made on GNU/Linux; we just want to return a usable subset
+	# of those requested. Other options, such as --cflags, --libs, etc.,
+	# will emit an appropriate error for unknown library requests.
 	for x in $raw_names; do
 	    for z in $liblist; do
 		if test "_$x" = "_$z"; then

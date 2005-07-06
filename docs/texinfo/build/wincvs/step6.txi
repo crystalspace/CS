@@ -10,7 +10,7 @@ From the WinCVS file menu click on @emph{Admin} then @emph{Login}.  The
 @file{OK} button without entering a password.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs06}
+@picturess{build,wincvs,wincvs06}
 
 @end ifnotinfo
 In the @emph{Output} window at the bottom of the WinCVS client should appear
@@ -32,21 +32,21 @@ In the edit field @emph{Enter the module name and path on the server}, enter
 the word @samp{crystal}.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs07}
+@picturess{build,wincvs,wincvs07}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Checkout options} and edit as shown
 in the screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs08}
+@picturess{build,wincvs,wincvs08}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Globals} and edit as shown in the
 screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs09}
+@picturess{build,wincvs,wincvs09}
 
 @end ifnotinfo
 Now just click on the @sc{ok} button and after several seconds you should begin
@@ -76,21 +76,21 @@ In the edit field @emph{Enter the module name and path on the server}, enter
 the word @samp{crystal}.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs07}
+@picturess{build,wincvs,wincvs07}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Checkout options} and edit as shown
 in the screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs08}
+@picturess{build,wincvs,wincvs08}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Globals} and edit as shown in the
 screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs09}
+@picturess{build,wincvs,wincvs09}
 
 @end ifnotinfo
 Now just click on the @sc{ok} button.

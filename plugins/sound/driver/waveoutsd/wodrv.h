@@ -42,7 +42,7 @@
  *  the driver is done with.  All we do here is put those into a queue to be refilled and handed back to the driver.
  *
  * Our own background thread sits in a loop with a sleep(0), waiting for free blocks to become available.  When they are it calls back into the renderer
- *  to have it fill them.  This seems somewhat backwards, having the driver call the renderer, but since the linux driver seems to work fine, and this
+ *  to have it fill them.  This seems somewhat backwards, having the driver call the renderer, but since the GNU/Linux driver seems to work fine, and this
  *  driver has always done things this way, it's the easiest way to approach this without creating new problems elsewhere.
  *
  * Note that this means the Software Renderer call path invoked from here should be thread safe (real mutexes should lock all the data that may be accessed

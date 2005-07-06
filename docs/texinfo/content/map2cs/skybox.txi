@@ -38,7 +38,7 @@ Set ``Image Size'' to 512x512 or 256x256.
 @end enumerate
 
 @ifnotinfo
-@picturess{tutorial,map2cs,terra1}
+@picturess{content,map2cs,terra1}
 
 @end ifnotinfo
 Now create six images and store them.  Use the following settings for these
@@ -110,5 +110,5 @@ This screenshot doesn't really do justice to the skybox effect, but it looks
 quite nice, never-the-less.  To really appreciate the effect you will need to
 move around a world in Crystal Space using a map enclosed within a skybox.
 
-@picturess{tutorial,map2cs,terra2}
+@picturess{content,map2cs,terra2}
 @end ifnotinfo

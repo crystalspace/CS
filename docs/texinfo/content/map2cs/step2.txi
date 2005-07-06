@@ -24,17 +24,17 @@ These following are the settings we use.
 @noindent
 The ``General'' settings tab.
 
-@picturess{tutorial,map2cs,wcconf1}
+@picturess{content,map2cs,wcconf1}
 
 @noindent
 The ``2D views'' settings tab.
 
-@picturess{tutorial,map2cs,wcconf2}
+@picturess{content,map2cs,wcconf2}
 
 @noindent
 The ``3D views'' settings tab.
 
-@picturess{tutorial,map2cs,wcconf3}
+@picturess{content,map2cs,wcconf3}
 
 @noindent
 The ``Textures'' settings tab.
@@ -42,7 +42,7 @@ The ``Textures'' settings tab.
 In the ``Texture Files'' list, add the @file{.wad} files which you will be
 using.  (For instance, @file{D:\Crystal\Wads\cstex_1.wad} from our example.)
 
-@picturess{tutorial,map2cs,wcconf4}
+@picturess{content,map2cs,wcconf4}
 
 @noindent
 The ``Game Configurations'' settings tab.  Fill in the fields based upon the
@@ -56,12 +56,12 @@ following table:
 @end multitable
 @end quotation
 
-@picturess{tutorial,map2cs,wcconf5}
+@picturess{content,map2cs,wcconf5}
 
 @noindent
 The ``Build Programs'' settings tab.
 
-@picturess{tutorial,map2cs,wcconf6}
+@picturess{content,map2cs,wcconf6}
 @end ifnotinfo
 
 @ifinfo

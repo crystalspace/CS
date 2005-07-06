@@ -141,8 +141,9 @@ public:
    * \return The new mutex.
    * \remarks On Windows, mutexes always exhibit recursive semantics, however,
    *   for best portability, you should still choose an appropriate value for
-   *   \a recursive.  On other platforms, such as Linux, non-recursive threads
-   *   may be the default since they are can be implemented more efficiently.
+   *   \a recursive.  On other platforms, such as @sc{gnu}/Linux, non-recursive
+   *   threads may be the default since they are can be implemented more
+   *   efficiently.
    */
   static csRef<csMutex> Create (bool recursive = false);
 

@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jul-2005
+	- Eric Sunshine updated numerous "Linux" references throughout the
+	  project to "GNU/Linux" in order to avoid perpetuating the myth that
+	  Linux somehow exists as a full operating environment without the aid
+	  of all the GNU-supplied utilities.
+	- Eric Sunshine fixed a bunch of image references (via @picture{}) in
+	  the Texinfo sources for the CS manual which broke when the
+	  documentation was reorganized on 1-Jul-2005.
 5-Jul-2005
 	- Piotr Obrzut fixed creating/removing of *strict ode joints*
 	- Piotr Obrzut added creating function for ode slider joint in cs

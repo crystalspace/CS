@@ -115,8 +115,8 @@ then @file{SimpleRoom.java} will reside at:
 If you did not install Crystal Space, then you can find it in the Crystal Space
 source tree at @file{CS/scripts/java/SimpleRoom.java}. To experiment with
 @file{SimpleRoom.java}, copy it to a convenient work directory, compile it with
-@samp{javac}, and run it with @samp{java}.  Here is a sample session on Linux
-illustrating the above instructions:
+@samp{javac}, and run it with @samp{java}.  Here is a sample session on
+@sc{gnu}/Linux illustrating the above instructions:
 
 @example
 % cd CS

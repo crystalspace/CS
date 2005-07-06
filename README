@@ -9,8 +9,8 @@ support (CG, vertex programs, fragment programs, etc.), mipmapping, portals,
 mirrors, alpha transparency, reflective surfaces, 3D sprites with skeletal
 animation, procedural textures, particle systems, volumetric fog, hierarchical
 transformations, physics, bindings for Java, Perl, and Python, and many
-additional features.  Crystal Space runs on Unix platforms (including
-GNU/Linux), Microsoft Windows, and MacOS/X.
+additional features.  Crystal Space runs on Microsoft Windows, MacOS/X, and
+Unix platforms (including GNU/Linux, BSD, Darwin, etc.).
 
 Crystal Space falls under the GNU Lesser General Public License (LGPL).  A copy
 of of the LGPL can be found in the file LICENSE alongside this README.  This

@@ -541,9 +541,10 @@ accurate @sc{rgb} light sourcing in the software renderer. (It is optional
 because it slows the texture cache.)  He also supplied a patch to fix the
 problem with the X11 driver where it would not start drawing until an expose
 event was generated.  He contributed the @file{lin_joy.cpp} file, which
-provided an example of how to use the joystick from within Linux. (This was
-never integrated into the project, however Norman Kraemer much later provided a
-Linux joystick plugin which is part of the project.)
+provided an example of how to use the joystick from within
+@sc{gnu}/Linux. (This was never integrated into the project, however Norman
+Kraemer much later provided a @sc{gnu}/Linux joystick plugin which is part of
+the project.)
 
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
@@ -559,9 +560,9 @@ George added an @sc{sdl} canvas plugin and reported some bugs.
 @item
 Gert Steenssens (@email{gsteenss@@eps.agfa.be})
 
-Gert wrote the Linux drivers for the sound system and also converted the
-@sc{svgalib} driver to @sc{com} (way back when @sc{com} was used in the
-project.  He also helped develop the Linux/Glide and OpenGL ports.
+Gert wrote the @sc{gnu}/Linux drivers for the sound system and also converted
+the @sc{svgalib} driver to @sc{com} (way back when @sc{com} was used in the
+project.  He also helped develop the @sc{gnu}/Linux-Glide and OpenGL ports.
 
 @item
 Greg Ewing (@email{greg@@cosc.canterbury.ac.nz})
@@ -849,9 +850,9 @@ extended standard font server for alpha maps.
 @item
 Micah Dowty (@email{micah@@navi.picogui.org})
 
-Micah fixed timer resolution in Linux. He also contributed the movie-recorder
-plugin, helped with the PicoGUI plugin, and designed and installed the nice
-Crystal Space logo which appears in Walktest.
+Micah fixed timer resolution in @sc{gnu}/Linux. He also contributed the
+movie-recorder plugin, helped with the PicoGUI plugin, and designed and
+installed the nice Crystal Space logo which appears in Walktest.
 
 @item
 Michael Dale Long (@email{mlong@@custom.net})
@@ -1114,8 +1115,8 @@ on Crystal Space and found and fixed many bugs thus reported.
 @item
 Rodolphe Ortalo (@email{ortalo@@laas.fr})
 
-Rodolphe patched the Glide driver to work on Linux.  He also provided output
-from Purify which helped track down some problems.
+Rodolphe patched the Glide driver to work on @sc{gnu}/Linux.  He also provided
+output from Purify which helped track down some problems.
 
 @item
 Roland Reckel (@email{luxx@@yahoo.com})
@@ -1199,7 +1200,7 @@ display support.
 Stephan Goetter (@email{sg17@@irz301.inf.tu-dresden.de})
 
 Stephan made a very early (but never completed) attempt to add shared-library
-creation support on Linux to the makefile system.
+creation support on @sc{gnu}/Linux to the makefile system.
 
 @item
 Steve Israelson (@email{pfhorte@@rogers.wave.ca})

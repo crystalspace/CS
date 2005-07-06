@@ -7,7 +7,7 @@ installation of the client you will be presented with the @emph{Tip of the Day}
 dialog box.  Just click on @emph{Close} for the time being.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs01}
+@picturess{build,wincvs,wincvs01}
 
 @end ifnotinfo
 You will now be presented with the WinCVS Preferences dialog box.  If it is not
@@ -16,7 +16,7 @@ the first time running the WinCVS client, then from the file menu click on
 @ifnotinfo
 The following dialog box will appear.
 
-@picturess{tutorial,wincvs,wincvs02}
+@picturess{build,wincvs,wincvs02}
 @end ifnotinfo
 
 @ifinfo
@@ -32,7 +32,7 @@ the following value:
 @ifnotinfo
 Now fill in this dialog box to match the screenshot below.
 
-@picturess{tutorial,wincvs,wincvs03}
+@picturess{build,wincvs,wincvs03}
 
 @end ifnotinfo
 @emph{Note}: Developers with @sc{cvs} write-access should replace
@@ -44,7 +44,7 @@ Next, click on the property sheet tab @emph{Globals} and edit to match the
 screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs04}
+@picturess{build,wincvs,wincvs04}
 
 @end ifnotinfo
 Next click on the WinCVS property sheet tab and you'll realize why earlier you
@@ -53,7 +53,7 @@ edit box, browse and point it to your home directory.  If you created your home
 directory on your @file{c:\} drive, it should look as the screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs05}
+@picturess{build,wincvs,wincvs05}
 
 @end ifnotinfo
 Now click on the @sc{ok} button to apply the changes made.

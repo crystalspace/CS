@@ -2,7 +2,7 @@
 	Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
 	Copyright (C) 1998, 1999 by Jorrit Tyberghein
 	Written by Nathaniel 'NooTe' Saint Martin
-      Linux sound driver by Gert Steenssens <gsteenss@eps.agfa.be>
+	GNU/Linux sound driver by Gert Steenssens <gsteenss@eps.agfa.be>
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Library General Public

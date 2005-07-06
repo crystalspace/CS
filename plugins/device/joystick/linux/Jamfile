@@ -2,7 +2,7 @@ SubDir TOP plugins device joystick linux ;
 
 if $(LINUXJOYSTICK.AVAILABLE) = "yes"
 {
-Description joylin : "Joystick plugin for Linux" ;
+Description joylin : "Joystick plugin for GNU/Linux" ;
 Plugin joylin : [ Wildcard *.cpp *.h ] ;
 LinkWith joylin : crystalspace ;
 ExternalLibs joylin : LINUXJOYSTICK ;

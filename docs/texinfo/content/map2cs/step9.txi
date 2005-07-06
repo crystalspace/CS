@@ -20,7 +20,7 @@ this with both rooms and the corridor.
 @ifnotinfo
 In the editor it should look like this:
 
-@picturess{tutorial,map2cs,wcmap2}
+@picturess{content,map2cs,wcmap2}
 
 @end ifnotinfo
 Now compile your map again.  At first, the result should look just the same.  
@@ -32,7 +32,7 @@ floor is split into many polygons.  which is completely unnecessary.
 @ifnotinfo
 You can see this here (look especially at the area of the table): 
 
-@picturess{tutorial,map2cs,csmap5a}
+@picturess{content,map2cs,csmap5a}
 
 @end ifnotinfo
 @file{map2cs} was created with this problem in mind, so you can avoid it 
@@ -45,5 +45,5 @@ other furniture are ``invisible'' to the algorithm that textures the walls.
 
 The much better result can be seen here:
 
-@picturess{tutorial,map2cs,csmap5b}
+@picturess{content,map2cs,csmap5b}
 @end ifnotinfo

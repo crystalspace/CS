@@ -23,7 +23,7 @@ Select the floor again.
 Press ``Browse'' from the texture bar.
 
 @ifnotinfo
-@picturess{tutorial,map2cs,wctex}
+@picturess{content,map2cs,wctex}
 
 @end ifnotinfo
 Select @samp{Floors_1_d2lb} for the floor.  (Double click the texture.)
@@ -31,7 +31,7 @@ Select @samp{Floors_1_d2lb} for the floor.  (Double click the texture.)
 Select ``Apply Current Texture'' from the toolbar.
 
 @ifnotinfo
-@picturess{tutorial,map2cs,wctexap}
+@picturess{content,map2cs,wctexap}
 
 @end ifnotinfo
 @ifinfo
@@ -40,7 +40,7 @@ The 3D view should now display a textured floor.
 @ifnotinfo
 The 3D view should now look something like this:
 
-@picturess{tutorial,map2cs,wctex2}
+@picturess{content,map2cs,wctex2}
 
 @end ifnotinfo
 Now let's select another texture for the walls.  Select @samp{misc_1_st} for
@@ -53,7 +53,7 @@ The 3D view should now display textured walls.
 @ifnotinfo
 The result should be similar to the following:
 
-@picturess{tutorial,map2cs,csmap2}
+@picturess{content,map2cs,csmap2}
 
 @end ifnotinfo
 You can see a sample map which reflects the steps we have taken up to this

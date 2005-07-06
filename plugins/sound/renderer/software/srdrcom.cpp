@@ -390,7 +390,7 @@ void csSoundRenderSoftware::MixingFunction()
 */
   mixing->Release();
 
-  // UnlockMemory blocks in the OSS driver for linux.  It should not be called with a lock held.
+  // UnlockMemory blocks in the OSS driver for GNU/Linux.  It should not be called with a lock held.
   SoundDriver->UnlockMemory();
 }
 

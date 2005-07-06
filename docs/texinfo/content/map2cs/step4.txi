@@ -17,7 +17,7 @@ Select the ``Block'' tool either by pressing @kbd{@key{SHIFT}-b} or selecting
 it from the toolbar.
 @ifnotinfo
 
-@picturess{tutorial,map2cs,wcblock}
+@picturess{content,map2cs,wcblock}
 @end ifnotinfo
 
 @item
@@ -40,7 +40,7 @@ Switch to the ``Selection'' tool either by pressing @kbd{@key{SHIFT}-s} or by
 selecting it from the toolbar.
 @ifnotinfo
 
-@picturess{tutorial,map2cs,wcsel}
+@picturess{content,map2cs,wcsel}
 @end ifnotinfo
 
 @item
@@ -56,14 +56,14 @@ Select the ``Entity'' tool.  (@kbd{@key{SHIFT}-e} or select it from the
 toolbar.)
 @ifnotinfo
 
-@picturess{tutorial,map2cs,wcentity}
+@picturess{content,map2cs,wcentity}
 @end ifnotinfo
 
 @item
 Select ``light'' in the dialog on the right side:
 @ifnotinfo
 
-@picturess{tutorial,map2cs,wclight}
+@picturess{content,map2cs,wclight}
 @end ifnotinfo
 
 @item
@@ -86,7 +86,7 @@ specify color and the last component specifies brightness / radius.  Normally
 a radius of 200 is okay.)
 @ifnotinfo
 
-@picturess{tutorial,map2cs,wclight2}
+@picturess{content,map2cs,wclight2}
 @end ifnotinfo
 
 @item
@@ -96,6 +96,6 @@ Now select ``info_player_start'' instead of ``light''.
 Place the new entity near the floor.  Now the result should appear as follows:
 @ifnotinfo
 
-@picturess{tutorial,map2cs,wcmap1}
+@picturess{content,map2cs,wcmap1}
 @end ifnotinfo
 @end enumerate

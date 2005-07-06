@@ -28,7 +28,7 @@ from 24 polygons (you could make the ends from 23 polygons, but that's not
 how artists do things :-).
 
 @ifnotinfo
-@picturess{plugins,engine,cylinder}
+@picturess{content,sprites,cylinder}
 
 @end ifnotinfo
 This sprite has 96 triangles.  If we treat each triangle as a separate
@@ -87,7 +87,7 @@ doubles the number of vertices.  Cutting one edge of the sides so it can be
 unwrapped adds two more vertices.
 
 @ifnotinfo
-@picturess{plugins,engine,skin}
+@picturess{content,sprites,skin}
 
 @end ifnotinfo
 Now we have 98 vertices instead of 48.  This is a big hit, but it may be
@@ -117,7 +117,7 @@ smooth---even the edges between the sides and the ends of the cylinder.
 With the ends separated, that edge is now sharply defined.
 
 @ifnotinfo
-@picturess{plugins,engine,unseamly}
+@picturess{content,sprites,unseamly}
 
 @end ifnotinfo
 Unfortunately, we have also split one edge of the cylinder's sides, which
@@ -139,7 +139,7 @@ from the sides but the sides would form a complete loop so that vertices we
 split for texturing would be blended for shading.
 
 @ifnotinfo
-@picturess{plugins,engine,split}
+@picturess{content,sprites,split}
 
 @end ifnotinfo
 

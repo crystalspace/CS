@@ -49,8 +49,9 @@ in the #PROJECTNAME#/msvc directory.
 2.1.2 Installing
 
  1. Build the project.
- 2. Ensure that you have write permissions to the install directories. On
-    Unix/Linux this usually means that you need to be the 'root' user.
+ 2. Ensure that you have write permissions to the install directories. On Unix
+    (GNU/Linux, MacOS/X, Darwin, BSD) this usually means that you need to be
+    the 'root' user.
  3. Run "jam install".
 
 2.2 Microsoft Visual-C++

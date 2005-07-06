@@ -15,10 +15,10 @@ At first look, map making can be pretty complicated, but if you follow this
 tutorial, you will soon walk around in your self-created world.
 
 We assume you follow this tutorial step by step.  We will explain things only
-once, so if you skipped some parts, you might need to go back to them later
-on.  We also assume you are using Windows. We don't have Linux or other
-systems installed, so you need to experiment a little yourself. If you found
-a solution for other systems or using other tools (like QuArK for example) we
+once, so if you skipped some parts, you might need to go back to them later on.
+We also assume you are using Windows. We don't have @sc{gnu}/Linux or other
+systems installed, so you need to experiment a little yourself. If you found a
+solution for other systems or using other tools (like QuArK for example) we
 would be happy to hear from you to expand this tutorial.
 
 @menu

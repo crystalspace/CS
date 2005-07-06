@@ -53,7 +53,7 @@ will now be presented with a dialog box (see image below) for creating a new
 project.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap0}
+@picturesss{usingcs,ownprojects,msvc6proj,snap0}
 @end ifnotinfo
 
 Firstly we select the type of application we wish to create. Crystal Space
@@ -75,7 +75,7 @@ a blank canvas, as all Crystal Space application are.  Thus we select
 @emph{An empty project}.  Once done, click on the @emph{Finish} button.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap1}
+@picturesss{usingcs,ownprojects,msvc6proj,snap1}
 @end ifnotinfo
 
 You should now be presented with a new dialog box (see image below).  This
@@ -84,7 +84,7 @@ workspace creation process.  Once checked and verified to be correct, click on
 the @emph{OK} button.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap2}
+@picturesss{usingcs,ownprojects,msvc6proj,snap2}
 @end ifnotinfo
 
 You should now be in the @sc{msvc} 6 @sc{ide} (Intergrated Development
@@ -118,7 +118,7 @@ within the @emph{Workspace} window.  See the image below to see the
 @emph{Workspace} window from within the @sc{msvc IDE}.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap3}
+@picturesss{usingcs,ownprojects,msvc6proj,snap3}
 @end ifnotinfo
 
 To add file(s) to a project workspace, select the appropriate folder in the
@@ -128,7 +128,7 @@ etc.  Right click on it to bring up the context menu and then click on
 Files into Project} dialog box, which can be seen below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap4}
+@picturesss{usingcs,ownprojects,msvc6proj,snap4}
 @end ifnotinfo
 
 After selecting the desired file(s) you wish to add, click on the @emph{OK}
@@ -138,7 +138,7 @@ folder and @file{simple1.h} to the @emph{Include Files} folder. Once done you
 should have a @emph{Workspace} window which looks like the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap5}
+@picturesss{usingcs,ownprojects,msvc6proj,snap5}
 @end ifnotinfo
 
 @subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
@@ -161,7 +161,7 @@ it may access them at compile/link time. Select @emph{Tools} from the
 @emph{Options} dialog box, which can be seen below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap6}
+@picturesss{usingcs,ownprojects,msvc6proj,snap6}
 @end ifnotinfo
 
 Click on @emph{Directories} tab of the @emph{Options} dialog. Lets first
@@ -174,7 +174,7 @@ right hand side, enabling you to and select the Crystal Space
 for an example of it set.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap7}
+@picturesss{usingcs,ownprojects,msvc6proj,snap7}
 @end ifnotinfo
 
 To set the paths to the Crystal Space lib files, you must remember you need to
@@ -192,7 +192,7 @@ system.
 See image below for an example of these set.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap8}
+@picturesss{usingcs,ownprojects,msvc6proj,snap8}
 @end ifnotinfo
 
 Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
@@ -225,14 +225,14 @@ Alternatively, you can right click on the highlighted area in the
 @emph{Workspace} and then click on @emph{Settings...} - both ways work.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap9}
+@picturesss{usingcs,ownprojects,msvc6proj,snap9}
 @end ifnotinfo
 
 Once you have clicked on @emph{Settings...}. You will then be presented with the
 @emph{Settings} dialog box, which can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap10}
+@picturesss{usingcs,ownprojects,msvc6proj,snap10}
 @end ifnotinfo
 
 Select the @emph{C/C++} tab and insert the appropriate definitions in the
@@ -242,7 +242,7 @@ Select the @emph{C/C++} tab and insert the appropriate definitions in the
 ones entered for a debug build can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap11}
+@picturesss{usingcs,ownprojects,msvc6proj,snap11}
 @end ifnotinfo
 
 Select the @emph{C/C++} tab and insert the appropriate definitions in the
@@ -252,7 +252,7 @@ Select the @emph{C/C++} tab and insert the appropriate definitions in the
 ones entered for a release build can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap12}
+@picturesss{usingcs,ownprojects,msvc6proj,snap12}
 @end ifnotinfo
 
 Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
@@ -277,7 +277,7 @@ Alternatively, you can right click on the highlighted area in the
 @emph{Workspace} and then click on @emph{Settings...} - both ways work.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap9}
+@picturesss{usingcs,ownprojects,msvc6proj,snap9}
 @end ifnotinfo
 
 Once you have clicked on @emph{Settings...}, you will be presented with the
@@ -291,14 +291,14 @@ For debug builds you need to select @emph{Debug Multithreaded DLL} from the
 @emph{Use run-time library} drop down menu. As can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap13}
+@picturesss{usingcs,ownprojects,msvc6proj,snap13}
 @end ifnotinfo
 
 For release builds you need to select @emph{Multithreaded DLL} from the
 @emph{Use run-time library} drop down menu. As can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap14}
+@picturesss{usingcs,ownprojects,msvc6proj,snap14}
 @end ifnotinfo
 
 Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
@@ -353,7 +353,7 @@ Alternatively, you can right click on the highlighted area in the
 @emph{Workspace} and then click on @emph{Settings...}--both ways work.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap9}
+@picturesss{usingcs,ownprojects,msvc6proj,snap9}
 @end ifnotinfo
 
 For applications we need only link with the primary Crystal Space library.  The
@@ -371,7 +371,7 @@ Debug:
 See image below for example of debug build link settings.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap15}
+@picturesss{usingcs,ownprojects,msvc6proj,snap15}
 @end ifnotinfo
 
 @noindent
@@ -384,7 +384,7 @@ Release:
 See image below for example of release build link settings.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc6proj,snap16}
+@picturesss{usingcs,ownprojects,msvc6proj,snap16}
 @end ifnotinfo
 
 Finally, click on @sc{ok} to return to the @sc{msvc ide} and then build the

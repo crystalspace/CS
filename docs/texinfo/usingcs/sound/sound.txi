@@ -10,7 +10,7 @@ The sound system consists of three components.
 System dependent sound drivers.  This driver is used to pass one audio stream
 to the sound hardware (it does not mix several streams), and is only used by
 the software sound renderer.  The other renderers do not need this driver.
-There are currently drivers for MacOS/9, @sc{oss} (Linux) and WaveOut
+There are currently drivers for MacOS/9, @sc{oss} (@sc{gnu}/Linux) and WaveOut
 (Windows).
 
 @emph{Note}: You need not load the sound driver yourself.  It is loaded

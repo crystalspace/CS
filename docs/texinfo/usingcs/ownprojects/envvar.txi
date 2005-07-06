@@ -44,7 +44,7 @@ Now hit the @emph{Ok} buttons until you are back at the @emph{Control Panel}.
 If you have any command lines sessions open you will need to close and restart
 them for the variable to take effect.  Rebooting should not be necessary.
 
-@subsubheading Unix/Linux
+@subsubheading Unix (@sc{gnu}/Linux, @sc{bsd}, Darwin, etc.)
 
 There are several ways of setting environment variables in Unix.  There are two
 common types of Unix shells, the Bourne shell (and its variants, such as Bash),
@@ -82,10 +82,10 @@ users can insert the @samp{setenv} command into the @file{.cshrc} file in their
 home directory (or, the file @file{.tcshrc} for Tcsh users).
 
 If you are modifying a global startup file, such as @file{/etc/profile}, be
-sure to read the comments in the since some configuration tools of Linux
-distributions override the settings.  In this case the distributions often
-created other files that are called automatically and are not touched by the
-configuration tools.
+sure to read the comments in the since some configuration tools of
+@sc{gnu}/Linux distributions override the settings.  In this case the
+distributions often created other files that are called automatically and are
+not touched by the configuration tools.
 
 @subsubheading MacOS/X
 

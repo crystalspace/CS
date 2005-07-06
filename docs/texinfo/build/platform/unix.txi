@@ -4,7 +4,7 @@
 @cindex Unix
 
 This section covers all of the Unix-style platforms supported by Crystal Space,
-including Linux, FreeBSD, NetBSD, Solaris, etc.
+including @sc{gnu}/Linux, FreeBSD, NetBSD, Solaris, etc.
 
 It is also possible to install Crystal Space using packaging systems,
 @xref{HOWTO Create RPM}.
@@ -79,8 +79,8 @@ jam all
 
 The build process will create an executable for each demonstration program or
 tool, and a dynamic-load-library for each plugin module (with extension
-@file{.so} on Linux and most Unix platforms).  Plugin modules include 3D
-renderers, 2D canvases, 3D engine, etc.
+@file{.so} on @sc{gnu}/Linux and most Unix platforms).  Plugin modules include
+3D renderers, 2D canvases, 3D engine, etc.
 
 Finally, if you want to utilize Crystal Space as a software development kit
 (@sc{sdk}), you can install it and then clean up the detritus of the build

@@ -23,7 +23,7 @@ Start @sc{msvc} 7 and from the @emph{File} menu click on @emph{File} then
 below) for creating a new project.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap0}
+@picturesss{usingcs,ownprojects,msvc7proj,snap0}
 @end ifnotinfo
 
 Firstly we need to select the type of project we wish to create.  Crystal Space
@@ -45,7 +45,7 @@ will be named @file{simple1}.  Once done, click on the @emph{@sc{ok}} button.
 You will now be presented with another dialog box (see image below).
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap1}
+@picturesss{usingcs,ownprojects,msvc7proj,snap1}
 @end ifnotinfo
 
 We wish to specify some application settings.  So, click on hyperlink text
@@ -53,7 +53,7 @@ We wish to specify some application settings.  So, click on hyperlink text
 with what can be seen in the screenshot below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap2}
+@picturesss{usingcs,ownprojects,msvc7proj,snap2}
 @end ifnotinfo
 
 As discussed above, Crystal Space applications are primarily console based
@@ -83,7 +83,7 @@ tab within the @emph{Solution Explorer} window.  See the image below to see the
 @emph{Solution Explorer} window from within the @sc{msvc IDE}.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap3}
+@picturesss{usingcs,ownprojects,msvc7proj,snap3}
 @end ifnotinfo
 
 To add file(s) to a project, select the appropriate folder in the
@@ -94,7 +94,7 @@ then hover over @emph{Add} until the sub menu appears and then click on
 @emph{Add Existing Item} dialog box, which can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap4}
+@picturesss{usingcs,ownprojects,msvc7proj,snap4}
 @end ifnotinfo
 
 After selecting the desired file(s) you wish to add, click on the @emph{Open}
@@ -104,7 +104,7 @@ folder and @file{simple1.h} to the @emph{Header Files} folder. Once done you
 should have a @emph{Solution Explorer} window which looks like the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap5}
+@picturesss{usingcs,ownprojects,msvc7proj,snap5}
 @end ifnotinfo
 
 @subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
@@ -116,14 +116,14 @@ then @emph{Options}@dots{} You will now be presented with the @emph{Options}
 dialog box, which can be seen below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap6}
+@picturesss{usingcs,ownprojects,msvc7proj,snap6}
 @end ifnotinfo
 
 Click @emph{Projects} folder of the @emph{Options} dialog.  Now click on
 @emph{VC++ Directories}.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap7}
+@picturesss{usingcs,ownprojects,msvc7proj,snap7}
 @end ifnotinfo
 
 Lets first add the path to the location of the Crystal Space @file{include}
@@ -134,7 +134,7 @@ side, enabling you to select the Crystal Space @emph{include} directory -
 wherever it is on your system.  See the image below for an example of it set.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap8}
+@picturesss{usingcs,ownprojects,msvc7proj,snap8}
 @end ifnotinfo
 
 To set the paths to the Crystal Space lib files, you must remember you need to
@@ -152,7 +152,7 @@ system.
 See image below for an example of these set.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap9}
+@picturesss{usingcs,ownprojects,msvc7proj,snap9}
 @end ifnotinfo
 
 Once done, click on the @emph{OK} button and return to the MSVC IDE.
@@ -174,14 +174,14 @@ can right click on the highlighted area in the @emph{Workspace} and then click
 on @emph{Properties} - both ways work.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap5}
+@picturesss{usingcs,ownprojects,msvc7proj,snap5}
 @end ifnotinfo
 
 Once you have clicked on @emph{Properties}.  You will then be presented with
 the @emph{Properties} dialog box, which can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap10}
+@picturesss{usingcs,ownprojects,msvc7proj,snap10}
 @end ifnotinfo
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
@@ -192,7 +192,7 @@ elipsis (@dots{}) button to pull up an easier view.  An example of the ones
 entered for a debug build can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap11}
+@picturesss{usingcs,ownprojects,msvc7proj,snap11}
 @end ifnotinfo
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
@@ -203,7 +203,7 @@ elipsis (@dots{}) button to pull up an easier view.  An example the ones
 entered for a release build can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap12}
+@picturesss{usingcs,ownprojects,msvc7proj,snap12}
 @end ifnotinfo
 
 Once done, click on the OK button and return to the MSVC IDE.
@@ -217,7 +217,7 @@ Alternatively, you can right click on the highlighted area in the
 @emph{Workspace} and then click on @emph{Properties} - both ways work.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap5}
+@picturesss{usingcs,ownprojects,msvc7proj,snap5}
 @end ifnotinfo
 
 Once you have clicked on @emph{Properties}, you will be presented with the
@@ -231,14 +231,14 @@ For debug builds you need to select @emph{Debug Multithreaded DLL} from the
 @emph{Runtime Library} drop down menu.  As can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap13}
+@picturesss{usingcs,ownprojects,msvc7proj,snap13}
 @end ifnotinfo
 
 For release builds you need to select @emph{Multithreaded DLL} from the
 @emph{Runtime Library} drop down menu.  As can be seen in the image below.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap14}
+@picturesss{usingcs,ownprojects,msvc7proj,snap14}
 @end ifnotinfo
 
 Once done, click on the @emph{OK} button and return to the MSVC IDE.
@@ -281,7 +281,7 @@ can right click on the highlighted area in the @emph{Workspace} and then click
 on @emph{Properties} - both ways work.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap5}
+@picturesss{usingcs,ownprojects,msvc7proj,snap5}
 @end ifnotinfo
 
 For applications we need only link with the primary Crystal Space library.  The
@@ -300,7 +300,7 @@ Debug:
 See image below for example of debug build link settings.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap15}
+@picturesss{usingcs,ownprojects,msvc7proj,snap15}
 @end ifnotinfo
 
 @noindent
@@ -313,7 +313,7 @@ Release:
 See image below for example of release build link settings.
 
 @ifnotinfo
-@picturesss{tutorial,howto,msvc7proj,snap16}
+@picturesss{usingcs,ownprojects,msvc7proj,snap16}
 @end ifnotinfo
 
 Finally, click on @emph{OK} to return to the MSVC IDE and then build the

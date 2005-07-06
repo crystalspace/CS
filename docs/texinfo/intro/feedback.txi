@@ -27,7 +27,7 @@ the time that you downloaded it. If you are using @sc{cvs} directly then
 state when it was that you last did an update.
 @item
 Operating System (Windows (@emph{95, 98/@sc{se}/@sc{me}, @sc{nt}4, 2000,
-@sc{xp}}), MacOS/X, Unix --- Linux, Free@sc{bsd}, etc.  --- @dots{}).
+@sc{xp}}), MacOS/X, Unix --- @sc{gnu}/Linux, Free@sc{bsd}, etc.  --- @dots{}).
 @item
 The compiler that you used (@sc{gcc}, Mingw, @sc{msvc}, @dots{}).
 @item

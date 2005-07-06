@@ -14,7 +14,7 @@ on @emph{Admin} then @emph{Login}.  The @emph{Password authentication} dialog
 prompt will appear, just click on @sc{ok}.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs06}
+@picturess{build,wincvs,wincvs06}
 
 @end ifnotinfo
 In the @emph{Output} window at the bottom of the WinCVS client should appear
@@ -33,28 +33,28 @@ directory and then click on @emph{Update selection} and the following dialog
 box will appear:
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs10}
+@picturess{build,wincvs,wincvs10}
 
 @end ifnotinfo
 On the @emph{Update settings} property sheet, edit as shown in the screenshot
 below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs11}
+@picturess{build,wincvs,wincvs11}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Sticky options} and edit as shown in
 the screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs12}
+@picturess{build,wincvs,wincvs12}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Globals} and edit as shown in the
 screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs13}
+@picturess{build,wincvs,wincvs13}
 
 @end ifnotinfo
 Now just click on the @sc{ok} button and after several seconds you should start
@@ -82,28 +82,28 @@ subdirectory @file{CS}.  Right click on that directory and then click on
 @emph{Update selection} and the following dialog box will appear:
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs10}
+@picturess{build,wincvs,wincvs10}
 
 @end ifnotinfo
 On the @emph{Update settings} property sheet, edit as shown in the screenshot
 below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs11}
+@picturess{build,wincvs,wincvs11}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Sticky options} and edit as shown in
 the screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs12}
+@picturess{build,wincvs,wincvs12}
 
 @end ifnotinfo
 Next click on the property sheet tab @file{Globals} and edit as shown in the
 screenshot below.
 
 @ifnotinfo
-@picturess{tutorial,wincvs,wincvs13}
+@picturess{build,wincvs,wincvs13}
 
 @end ifnotinfo
 Now just click on the @sc{ok}

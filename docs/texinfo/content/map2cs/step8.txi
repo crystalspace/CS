@@ -12,7 +12,7 @@ The result of this addition can be seen by examining @file{tut3.map}.
 @ifnotinfo
 This results in the following map.  (Available as @file{tut3.map}.)
 
-@picturess{tutorial,map2cs,csmap4}
+@picturess{content,map2cs,csmap4}
 @end ifnotinfo
 
 I will stop the general Worldcraft related stuff here.  There is still a lot

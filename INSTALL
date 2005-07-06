@@ -12,7 +12,7 @@ strongly recommended, however, that you consult the much more detailed build
 instructions in the manual, particularly if you are using Microsoft Windows.
 
 
-Unix-like Platforms (including MacOS/X and GNU/Linux)
+Unix-like Platforms (including MacOS/X, GNU/Linux, BSD, Darwin, etc.)
 ===================
 
 Crystal Space is built and installed in the same fashion as most other open

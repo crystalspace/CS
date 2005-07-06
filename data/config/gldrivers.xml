@@ -232,7 +232,7 @@
       </applicable>
     </rule>
     
-    <rule description="Disable VBO for Linux ATI drivers 3.2.8">
+    <rule description="Disable VBO for GNU/Linux ATI drivers 3.2.8">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="vendor" pattern="^ATI" />

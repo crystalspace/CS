@@ -1730,9 +1730,9 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 
 
 #------------------------------------------------------------------------------
-# Check if Linux joystick API is present.
+# Check if GNU/Linux joystick API is present.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
+CS_CHECK_BUILD([for GNU/Linux joystick API], [cs_cv_sys_linux_joystick],
     [AC_LANG_PROGRAM(
 	[[#include <fcntl.h>
 	#include <sys/ioctl.h>
@@ -1819,7 +1819,7 @@ AS_IF([test $cs_cv_header_soundcard_h = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for Advanced Linux Sound Architecture (ALSA)
+# Check for Advanced GNU/Linux Sound Architecture (ALSA)
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([asound],
     [AC_LANG_PROGRAM(

@@ -10,7 +10,7 @@ case WIN32 :				# Windows
   SubInclude TOP libs csutil win32 ;
 case MACOS_X :				# MacOS/X
   SubInclude TOP libs csutil macosx ;
-case * :				# Posix, Unix, Linux, etc.
+case * :				# Posix, Unix, GNU/Linux, etc.
   SubInclude TOP libs csutil unix ;
 }
 

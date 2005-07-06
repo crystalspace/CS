@@ -23,8 +23,8 @@ AC_PREREQ([2.56])
 # CS_CHECK_PTHREAD([REJECT-MASK])
 #	Check for pthread.  Also check if the pthread implementation supports
 #	the recursive and timed mutex extensions. (Timed mutexes are needed for
-#	the NPTL: New Posix Thread Library on Linux if the mutex is going to be
-#	used with any of the timed condition-wait functions.) The shell
+#	the NPTL: New Posix Thread Library on GNU/Linux if the mutex is going
+#	to be used with any of the timed condition-wait functions.) The shell
 #	variable cs_cv_sys_pthread is set to "yes" if pthread is available,
 #	else "no". If available, then the variables cs_cv_sys_pthread_cflags,
 #	cs_cv_sys_pthread_lflags, and cs_cv_sys_pthread_libs are set. (As a

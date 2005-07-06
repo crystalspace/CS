@@ -18,7 +18,7 @@ dedicated @sc{gnome} or @sc{kde}/Qt applications, but the selection
 project (i.e. using OpenGL).
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap0}
+@picturesss{usingcs,ownprojects,kdevproj,snap0}
 @end ifnotinfo
 
 @subsubheading KDevelop External Step 2 
@@ -33,7 +33,7 @@ General Public License file @file{COPYING} a dummy @file{README} and
 @file{INSTALL} file into the project tree.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap1}
+@picturesss{usingcs,ownprojects,kdevproj,snap1}
 @end ifnotinfo
 
 Click @emph{Next} and you will next be confronted with another dialog box.
@@ -48,7 +48,7 @@ The @emph{Next} two pages are header templates for header @file{.h} and source
 @file{.cpp} files.  Click @emph{Next} when you're done here.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap2}
+@picturesss{usingcs,ownprojects,kdevproj,snap2}
 @end ifnotinfo
 
 Now an almost empty window appears and you should click on @emph{Create} to run
@@ -63,7 +63,7 @@ Options}.  @emph{Add} a new @emph{Configuration} and call it
 @emph{Build Directoy}.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap3}
+@picturesss{usingcs,ownprojects,kdevproj,snap3}
 @end ifnotinfo
 
 @subsubheading KDevelop External Step 5
@@ -84,7 +84,7 @@ get an error message that your C-compiler cannot create executables.  The
 @emph{@sc{cxxflags}} should contain @samp{`./cs-config --cxxflags`}.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap4}
+@picturesss{usingcs,ownprojects,kdevproj,snap4}
 @end ifnotinfo
 
 @subsubheading KDevelop External Step 6
@@ -96,7 +96,7 @@ thus, the entire content of the @emph{Additional flags} field might be
 @samp{`./cs-config --libs crystalspace`}.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap5}
+@picturesss{usingcs,ownprojects,kdevproj,snap5}
 @end ifnotinfo
 
 @subsubheading KDevelop External Step 7
@@ -105,7 +105,7 @@ Now over to the @emph{Linker Options}.  Include your additional libraries here
 as needed.  Many platforms will require @samp{-lpthread} in this field.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap6}
+@picturesss{usingcs,ownprojects,kdevproj,snap6}
 @end ifnotinfo
 
 @subsubheading KDevelop External Step 8
@@ -116,7 +116,7 @@ The @emph{additional options} field should contain
 @code{-I`./cs-config --includedir`}.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap7}
+@picturesss{usingcs,ownprojects,kdevproj,snap7}
 @end ifnotinfo
 
 Click on @emph{@sc{ok}} and the configure will re-run.
@@ -130,7 +130,7 @@ instead of the @samp{i386-linux} default in KDevelop.  Of course, you can
 choose other platforms as well.
 @ifnotinfo
 
-@picturesss{tutorial,howto,kdevproj,snap8}
+@picturesss{usingcs,ownprojects,kdevproj,snap8}
 @end ifnotinfo
 
 @subsubheading KDevelop External Step 9

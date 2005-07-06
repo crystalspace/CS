@@ -20,7 +20,7 @@ system is listed here it does not necessarily mean that it is 100% supported:
 Windows (Windows 9x/@sc{nt}/@sc{me}/2000/@sc{xp})
 
 @item
-Unix (Linux, FreeBSD, etc.)
+Unix (@sc{gnu}/Linux, FreeBSD, etc.)
 
 @item
 MacOS/X

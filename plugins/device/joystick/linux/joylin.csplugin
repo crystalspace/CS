@@ -6,7 +6,7 @@
       <class>
         <name>crystalspace.device.joystick.linux</name>
         <implementation>csLinuxJoystick</implementation>
-        <description>Crystal Space Joystick plugin for Linux</description>
+        <description>Crystal Space Joystick plugin for GNU/Linux</description>
       </class>
     </classes>
   </scf>

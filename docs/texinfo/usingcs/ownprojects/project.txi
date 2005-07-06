@@ -10,8 +10,8 @@ Jam-based build system, (2) using a traditional Makefile-based build system.
 @subsubheading External Application Requirements
 
 For these techniques to work you need to have a sufficiently Unix-like
-environment.  The environments provided by Linux, MacOS/X, Msys/Mingw, and
-Cygwin are all acceptable.
+environment.  The environments provided by @sc{gnu}/Linux, MacOS/X, Msys/Mingw,
+and Cygwin are all acceptable.
 
 If you installed Crystal Space in a non-standard location, then you probably
 will also need to set the @samp{CRYSTAL} environment variable to point at the

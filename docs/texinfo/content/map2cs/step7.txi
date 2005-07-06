@@ -15,7 +15,7 @@ Now we form a corridor between the two rooms.  We duplicate another floor and
 ceiling, but we reduce the size, so it fits between the rooms.
 
 @ifnotinfo
-@picturess{tutorial,map2cs,wcstep7a}
+@picturess{content,map2cs,wcstep7a}
 
 @end ifnotinfo
 Now add the walls too.
@@ -32,9 +32,9 @@ and one on top.
 The result should look like this (using flat shading, so you can see the
 different blocks better):
 
-@picturess{tutorial,map2cs,wcstep7b}
+@picturess{content,map2cs,wcstep7b}
 
 In Crystal Space, it should look like this:
 
-@picturess{tutorial,map2cs,csmap3}
+@picturess{content,map2cs,csmap3}
 @end ifnotinfo

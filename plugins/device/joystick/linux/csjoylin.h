@@ -27,7 +27,7 @@
 
 /**
  * This plugin puts joystick events in the CS eventqueue.
- * Joystick data is gathered via the linux joystick api.
+ * Joystick data is gathered via the GNU/Linux joystick api.
  */
 class csLinuxJoystick : public iComponent
 {

@@ -13,7 +13,7 @@ up, and then it should display your new room in 3D.
 @ifnotinfo
 The image you see should look something like this:
 
-@picturess{tutorial,map2cs,csmap1}
+@picturess{content,map2cs,csmap1}
 
 @end ifnotinfo
 If the whole level is dark, then you either did not call the ``Properties''

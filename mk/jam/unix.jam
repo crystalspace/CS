@@ -1,5 +1,5 @@
 #============================================================================
-# Jam configuration and actions for Linux/Unix
+# Jam configuration and actions for Unix (GNU/Linux, BSD, Darwin, etc.)
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
 #
 #    This library is free software; you can redistribute it and/or modify it
