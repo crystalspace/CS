@@ -233,7 +233,7 @@ void csMetaCylinder::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
                                     mat, this, getURLstr(), sect->GetSector(),
                                     hub_vertices);
 
-  t->dynsys = vosa3dl->GetDynSys();
+  t->dynsys = sect->GetDynSys();
 
   vosa3dl->mainThreadTasks.push(t);
   LOG("csMetaCylinder", 3, "calling csMetaObject3D::setup");

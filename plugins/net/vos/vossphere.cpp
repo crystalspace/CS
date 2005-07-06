@@ -144,7 +144,7 @@ void csMetaSphere::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
                                     mat, this, getURLstr(), sect->GetSector(),
                                     rim_vertices);
 
-  t->dynsys = vosa3dl->GetDynSys();
+  t->dynsys = sect->GetDynSys();
 
   vosa3dl->mainThreadTasks.push(t);
   LOG("csMetaSphere", 3, "calling csMetaObject3D::setup");

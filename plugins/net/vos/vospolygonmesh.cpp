@@ -60,6 +60,7 @@ public:
   csRef<iDynamicSystem> dynsys;
   Task* chainedtask;
   csVosA3DL *vosa3dl;
+  csVector3 startingPos;
 
   std::vector<A3DL::PolygonMesh::Vertex> verts;
   std::vector<A3DL::PolygonMesh::Polygon> polys;
@@ -67,7 +68,7 @@ public:
   std::vector<A3DL::PolygonMesh::TextureSpace> texsp;
 
   ConstructPolygonMeshTask(iObjectRegistry *objreg,  csMetaPolygonMesh* c,
-                           std::string n, iSector *s);
+                           std::string n, iSector *s, const csVector3& pos);
   virtual ~ConstructPolygonMeshTask();
   virtual void doTask();
   void doStatic(iEngine* engine);
@@ -76,9 +77,12 @@ public:
 };
 
 ConstructPolygonMeshTask::ConstructPolygonMeshTask(iObjectRegistry *objreg,
-                            csMetaPolygonMesh* pm, std::string n, iSector *s)
+                                                   csMetaPolygonMesh* pm,
+                                                   std::string n,
+                                                   iSector *s,
+                                                   const csVector3& pos)
   : object_reg(objreg), polygonmesh(pm, true), name(n), sector(s),
-    isStatic(false), chainedtask(0)
+    isStatic(false), chainedtask(0), startingPos(pos)
 {
 }
 
@@ -153,7 +157,7 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
         << name << " in sector " << sector);
 
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
-      factory, name.c_str(), sector, csVector3(0, 0, 0));
+      factory, name.c_str(), sector, startingPos);
 
     if(materials.size())
     {
@@ -192,7 +196,7 @@ void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
     csRef<iMeshFactoryWrapper> factory = engine->CreateMeshFactory (
       "crystalspace.mesh.object.genmesh", "polygonmesh_factory");
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper(
-      factory, name.c_str(), sector);
+      factory, name.c_str(), sector, startingPos);
 
     if(materials.hasMore())
       meshwrapper->GetMeshObject()->SetMaterialWrapper(
@@ -518,31 +522,18 @@ void ConstructPolygonMeshTask::doTask()
   }
 
   // Set up dynamics for mesh
-  if (dynsys)
+  if (dynsys && !polygonmesh->GetCSinterface()->GetCollider())
   {
-    LOG("ConstructPolygonMeshTask", 2, "setting up dynamics");
-
     csRef<iRigidBody> collider = dynsys->CreateBody ();
-    collider->SetProperties (1, csVector3 (0), csMatrix3 ());
-    collider->SetPosition (csVector3(0, 0, 0));
-    collider->AttachMesh (polygonmesh->GetCSinterface()->GetMeshWrapper());
+    collider->SetPosition (startingPos);
+    collider->SetMoveCallback(polygonmesh->GetCSinterface());
+    collider->MakeStatic ();
 
-    const csMatrix3 tm;
-    const csVector3 tv (0);
-    csOrthoTransform t (tm, tv);
+    csOrthoTransform t;
     collider->AttachColliderMesh (polygonmesh->GetCSinterface()->GetMeshWrapper(),
-                                  t, 0, 1, 0);
-
-    if (polygonmesh->isLocal())
-    {
-      //collider->SetMoveCallback (polygonmesh->GetCSinterface());
-    }
+                                  t, 10, 1, 0);
 
     polygonmesh->GetCSinterface()->SetCollider (collider);
-
-    collider->MakeStatic();
-
-    LOG("ConstructPolygonMeshTask", 2, "did set up dynamics");
   }
 
   if(chainedtask) {
@@ -574,8 +565,12 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   this->vosa3dl = vosa3dl;
 
-  ConstructPolygonMeshTask* cpmt = new ConstructPolygonMeshTask(
-    vosa3dl->GetObjectRegistry(), this, getURLstr(), sect->GetSector());
+  double x, y, z;
+  getPosition(x, y, z);
+
+  ConstructPolygonMeshTask* cpmt =
+    new ConstructPolygonMeshTask(vosa3dl->GetObjectRegistry(), this, getURLstr(),
+                                 sect->GetSector(), csVector3(x, y, z));
 
   LOG("csMetaPolygonMesh", 3, "getting vertices");
 
@@ -628,7 +623,7 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   }
   LOG("csMetaPolygonMesh", 3, "is static " << cpmt->isStatic);
 
-  cpmt->dynsys = vosa3dl->GetDynSys();
+  cpmt->dynsys = sect->GetDynSys();
 
   cpmt->chainedtask = GetSetupTask(vosa3dl, sect);
 

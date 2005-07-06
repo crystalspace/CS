@@ -43,6 +43,7 @@ private:
   csVosA3DL* vosa3dl;
   csRef<iProgressMeter> meter;
   VUtil::vRef<csMetaSector> sectorvobj;
+  csRef<iDynamicSystem> dynsys;
 
   csSet < csPtrKey<iVosObject3D> > loadedObjects;
 
@@ -68,6 +69,8 @@ public:
 
   void addObject3D (iVosObject3D *obj);
   void removeObject3D (iVosObject3D *obj);
+
+  csRef<iDynamicSystem> GetDynSys() { return dynsys; }
 
   //void addLight (iVosLight *light);
   //void removeLight (iVosLight *light);

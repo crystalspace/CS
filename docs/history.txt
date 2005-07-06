@@ -11,6 +11,8 @@ chronological order.
 	- Piotr Obrzut added creating function for ode slider joint in cs
 	- Peter Amstutz added Get/SetContactMaxCorrectingVel() and 
 	  Get/SetContactSurfaceLayer() to iODEDynamicSystemState
+	- Peter Amstutz committed preliminary physics support in the
+	  csvosa3ld plugin (via the ODE plugin) (currently disabled)
 3-Jul-2005
 	- Piotr Obrzut added pop dir on every return path in ParseShaderList 
 	  in csparser

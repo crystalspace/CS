@@ -86,28 +86,23 @@ void ConstructCubeTask::doTask()
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
                     cube_factory, name.c_str(), sector, csVector3(0, 0, 0));
 
-    if (dynsys)
-    {
 #if 0
-      csRef<iRigidBody> collider = dynsys->CreateBody ();
-      collider->SetProperties (1, csVector3 (0), csMatrix3 ());
-      collider->SetPosition (csVector3(0, 0, 0));
-      collider->AttachMesh (meshwrapper);
+    if (dynsys && !cube->GetCSinterface()->GetCollider())
+    {
+      // Create a body and attach the mesh.
+      csRef<iRigidBody> rb = dynsys->CreateBody ();
+      rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+      rb->SetPosition (csVector3(0, 0, 0));
+      rb->AttachMesh (meshwrapper);
+      rb->SetMoveCallback(cube->GetCSinterface());
 
+      // of course this should use an actual collider box...
+      csOrthoTransform t;
+      rb->AttachColliderMesh(meshwrapper, t, 10, 1, 0);
 
-      const csMatrix3 tm;
-      const csVector3 tv (0);
-      csOrthoTransform t (tm, tv);
-      collider->AttachColliderBox (size, t, 0, 1, 0);
-
-      if (cube->isLocal())
-        collider->SetMoveCallback (cube->GetCSinterface());
-
-      cube->GetCSinterface()->SetCollider (collider);
-
-      collider->MakeStatic();
-#endif
+      cube->GetCSinterface()->SetCollider (rb);
     }
+#endif
 
     cube->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }
@@ -143,7 +138,7 @@ void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   ConstructCubeTask *t = new ConstructCubeTask(vosa3dl->GetObjectRegistry(),
                                     mat, this, getURLstr(), sect->GetSector());
 
-  t->dynsys = vosa3dl->GetDynSys();
+  t->dynsys = sect->GetDynSys();
   double x = 1, y = 1, z = 1;
   try
   {

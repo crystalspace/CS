@@ -119,7 +119,16 @@ void csVosObject3D::Execute(csOrthoTransform & t)
   //csVector3 vel = collider->GetLinearVelocity();
   //csVector3 acc = collider->GetForce();
 
-  object3d->setPosition(t.GetOrigin().x, t.GetOrigin().y, t.GetOrigin().z);
+  double x, y, z;
+
+  object3d->getPosition(x, y, z);
+
+  if ((csVector3(x, y, z) - t.GetOrigin()).Norm() > .0001)
+  {
+    //LOG("vosobject3d", 2, "changePosition " <<
+    //" to " << t.GetOrigin().x << " " << t.GetOrigin().y << " " << t.GetOrigin().z);
+    object3d->setPosition(t.GetOrigin().x, t.GetOrigin().y, t.GetOrigin().z);
+  }
 }
 
 /// Construct an object3d
@@ -191,12 +200,14 @@ class PositionTask : public Task
 {
   vRef<csMetaObject3D> obj;
   csVector3 pos;
+  bool setCollider;
 
 public:
-  PositionTask (csMetaObject3D *o, const csVector3 &p) : obj(o, true), pos(p) {}
+  PositionTask (csMetaObject3D *o, const csVector3 &p, bool c = false)
+    : obj(o, true), pos(p), setCollider(c) {}
   ~PositionTask () {}
 
-  void doTask() { obj->changePosition(pos); }
+  void doTask() { obj->changePosition(pos, setCollider); }
 };
 
 // Set orientation task
@@ -437,9 +448,11 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
             << "\", prop read is \""
             << event.getProperty()->read() << "\" and getPos() gave us "
             << x << " " << y << " " << z);
+
         vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3((float)x,
                                                                        (float)y,
-                                                                       (float)z)));
+                                                                       (float)z),
+                                                        event.getInitiator()->isRemote()));
       }
       else if (pcr->getContextualName() == "a3dl:orientation")
       {
@@ -461,11 +474,11 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
   {}
 }
 
-void csMetaObject3D::changePosition (const csVector3 &pos)
+void csMetaObject3D::changePosition (const csVector3 &pos, bool setCollider)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
 
-  LOG("vosobject3d", 2, "changePosition: " << getURLstr() <<
+  LOG("vosobject3d", 3, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
   if (mw.IsValid())
   {
@@ -473,16 +486,14 @@ void csMetaObject3D::changePosition (const csVector3 &pos)
     mw->GetMovable()->UpdateMove();
   }
 
-  if (csvobj3d->GetCollider().IsValid())
+  if (setCollider && csvobj3d->GetCollider().IsValid())
   {
-    if (csvobj3d->GetCollider()->GetPosition() != pos)
-    {
-      LOG("vosobject3d", 2, "changing collider position to " << getURLstr() <<
-          " to " << pos.x << " " << pos.y << " " << pos.z);
+    LOG("vosobject3d", 2, "changing collider position to " << getURLstr() <<
+        " to " << pos.x << " " << pos.y << " " << pos.z);
 
-      csvobj3d->GetCollider()->SetPosition(pos);
-      csvobj3d->GetCollider()->SetLinearVelocity(csVector3(0));
-    }
+    csvobj3d->GetCollider()->SetPosition(pos);
+    csvobj3d->GetCollider()->SetLinearVelocity(csVector3(0));
+    csvobj3d->GetCollider()->Enable();
   }
 }
 

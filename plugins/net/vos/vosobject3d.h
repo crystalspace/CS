@@ -109,7 +109,7 @@ public:
 
   // Call these from CS run loop.  Derived objects can override if they
   // do not correctly use movable interface
-  virtual void changePosition (const csVector3 &pos);
+  virtual void changePosition (const csVector3 &pos, bool setCollider);
   virtual void changeOrientation (const csMatrix3 &ori);
 
   virtual void changeMaterial (iMaterialWrapper* mat);

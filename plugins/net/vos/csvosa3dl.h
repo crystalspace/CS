@@ -58,9 +58,9 @@ class csVosA3DL : public iComponent, public iEventHandler,
 {
 private:
   csRef<iEventQueue> eventq;
-  csRef<iDynamicSystem> dynsys;
   csRef<iProgressMeter> progress;
   csRef<iVirtualClock> clock;
+  csRef<iDynamics> dynamics;
 
   iObjectRegistry *objreg;
 
@@ -86,9 +86,9 @@ public:
     return objreg;
   }
 
-  csRef<iDynamicSystem> GetDynSys ()
+  csRef<iDynamics> GetDynamics ()
   {
-    return dynsys;
+    return dynamics;
   }
 
   virtual VUtil::vRef<VOS::Vobject> GetVobject();

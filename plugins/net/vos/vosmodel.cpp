@@ -84,11 +84,13 @@ public:
   vRef<csMetaModel> model;
   csRef<iSector> sector;
   csRef<iDynamicSystem> dynsys;
+  csVector3 startingPos;
 
   ConstructModelTask(iObjectRegistry *objreg,
                      csMetaModel* m,
                      iSector *s,
-                     iDynamicSystem* d);
+                     iDynamicSystem* d,
+                     const csVector3& startingPos);
   virtual ~ConstructModelTask();
   virtual void doTask();
 };
@@ -96,8 +98,9 @@ public:
 ConstructModelTask::ConstructModelTask (iObjectRegistry *objreg,
                                         csMetaModel* m,
                                         iSector *s,
-                                        iDynamicSystem* d)
-  : object_reg(objreg), model(m, true), sector(s), dynsys(d)
+                                        iDynamicSystem* d,
+                                        const csVector3& p)
+  : object_reg(objreg), model(m, true), sector(s), dynsys(d), startingPos(p)
 {
 }
 
@@ -216,43 +219,30 @@ void ConstructModelTask::doTask()
   else factory->QueryObject()->SetName (model->getURLstr().c_str());
 
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
-    factory, model->getURLstr().c_str(), sector, csVector3(0, 0, 0));
+    factory, model->getURLstr().c_str(), sector, startingPos);
 
   csRef<iSprite3DFactoryState> fac3d = SCF_QUERY_INTERFACE(
     meshwrapper->GetMeshObject()->GetFactory(),
     iSprite3DFactoryState);
 
-  if(fac3d.IsValid()) fac3d->MergeNormals();
+  //if(fac3d.IsValid()) fac3d->MergeNormals();
 
   NormalizeModel (meshwrapper, true, true, model->getModelDatatype());
 
 
-  if (dynsys)
+  if (dynsys && !model->GetCSinterface()->GetCollider())
   {
-    csRef<iRigidBody> collider = dynsys->CreateBody ();
-    collider->SetProperties (1, csVector3 (0), csMatrix3 ());
-    collider->SetPosition (csVector3(0, 0, 0));
-    collider->AttachMesh (meshwrapper);
+    // Create a body and attach the mesh.
+    csRef<iRigidBody> rb = dynsys->CreateBody ();
+    rb->SetProperties (1, csVector3 (0), csMatrix3 ());
+    rb->SetPosition (startingPos);
+    rb->AttachMesh (meshwrapper);
+    rb->SetMoveCallback(model->GetCSinterface());
 
+    csOrthoTransform t;
+    rb->AttachColliderMesh(meshwrapper, t, 10, 1, 0);
 
-    const csMatrix3 tm;
-    const csVector3 tv (0);
-    csOrthoTransform t (tm, tv);
-
-    //csBox3 b;
-    //meshwrapper->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox(b);
-
-    collider->AttachColliderBox (csVector3(1, 1, 1), t, 0, 1, 0);
-    //collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
-    //collider->AttachColliderSphere (1, csVector3(0, 0, 0),
-    //1, 1, 0);
-
-    //if (model->isLocal())
-    //collider->SetMoveCallback (model->GetCSinterface());
-
-    model->GetCSinterface()->SetCollider (collider);
-
-    //collider->MakeStatic();
+    model->GetCSinterface()->SetCollider (rb);
   }
 
   model->GetCSinterface()->SetMeshWrapper(meshwrapper);
@@ -326,10 +316,15 @@ void csMetaModel::notifyChildInserted(VobjectEvent& e)
   {
     valid = true;
     htvalid = false;
+
+    double x, y, z;
+    getPosition(x, y, z);
+
     // Create task
     vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
                                                           this, sector->GetSector(),
-                                                          vosa3dl->GetDynSys()));
+                                                          sector->GetDynSys(),
+                                                          csVector3(x, y, z)));
     vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sector));
   }
 }
@@ -380,10 +375,15 @@ void csMetaModel::notifyPropertyChange(const PropertyEvent& event)
   {
     valid = true;
     htvalid = false;
+
+    double x, y, z;
+    getPosition(x, y, z);
+
     // Create task
     vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
                                                           this, sector->GetSector(),
-                                                          vosa3dl->GetDynSys()));
+                                                          sector->GetDynSys(),
+                                                          csVector3(x, y, z)));
     vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sector));
   }
 }

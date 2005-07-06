@@ -23,8 +23,10 @@
 
 #include "cssysdef.h"
 #include "csutil/event.h"
+#include "ivaria/collider.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
+#include "imap/loader.h"
 
 #include "csvosa3dl.h"
 #include "vossector.h"
@@ -194,23 +196,22 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
 
   clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
 
-  csRef<iDynamics> dynamics;
+  csRef<iCollideSystem> cdsys;
+  CS_QUERY_REGISTRY_PLUGIN (cdsys, objreg,
+                            "crystalspace.collisiondetection.opcode",
+                            iCollideSystem);
+
+
 #if 0 // dynamics isn't ready yet
   CS_QUERY_REGISTRY_PLUGIN(dynamics, objreg,
                            "crystalspace.dynamics.ode",
                            iDynamics);
 #endif
 
-  if (dynamics)
-  {
-    LOG("csVosA3DL", 2, "Initializing dynamics system");
-    dynsys = dynamics->CreateSystem();
-    dynsys->SetGravity (csVector3 (0, .1, 0));
-  }
-  else
+
+  if (!dynamics)
   {
     LOG("csVosA3DL", 2, "Not using dynamics system");
-    dynsys = NULL;
   }
 
   return true;
@@ -232,10 +233,7 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
       LOG("csVosA3DL", 3, "completed main thread task");
     }
 
-
-    if (dynsys) {
-      //LOG("csVosA3DL", 2, "Stepping dynamic system");
-
+    if (dynamics) {
       // First get elapsed time from the virtual clock.
       csTicks elapsed_time = clock->GetElapsedTicks ();
       const float speed = elapsed_time / 1000.0;
@@ -244,12 +242,13 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
       const float maxStep = 0.01f;
       float ta = 0;
       float tb = speed;
-      int maxSteps=4;
+      int maxSteps = 4;
+
       while (ta < speed && maxSteps)
       {
         if (tb - ta > maxStep) tb = ta + maxStep;
 
-        dynsys->Step (tb - ta);
+        dynamics->Step (tb - ta);
         ta = tb;
         tb = speed;
 
@@ -267,6 +266,8 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
       delete t;
       LOG("csVosA3DL", 3, "completed main thread task");
     }
+
+    return true;
   }
 
   return false;

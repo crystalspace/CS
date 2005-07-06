@@ -26,6 +26,7 @@
 #include "vosobject3d.h"
 #include "voslight.h"
 #include "iengine/movable.h"
+#include "ivaria/ode.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -264,6 +265,23 @@ LoadSectorTask::~LoadSectorTask ()
 
 void LoadSectorTask::doTask()
 {
+  if (vosa3dl->GetDynamics())
+  {
+    sector->dynsys = vosa3dl->GetDynamics()->CreateSystem();
+    sector->dynsys->SetGravity(csVector3(0, -9, 0));
+    sector->dynsys->SetRollingDampener(.995);
+    //sector->dynsys->SetLinearDampener(.995);
+    sector->dynsys->EnableAutoDisable (1);
+    sector->dynsys->SetAutoDisableParams(.1f, .1f, 6, 0.0f);
+
+    csRef<iODEDynamicSystemState> osys;
+    osys = SCF_QUERY_INTERFACE (sector->dynsys, iODEDynamicSystemState);
+    osys->SetContactMaxCorrectingVel (.1);
+    osys->SetContactSurfaceLayer (.0001);
+    //osys->EnableStepFast (1);
+    //osys->EnableQuickStep (1);
+  }
+
   LOG("csVosSector", 2, "Starting sector load");
 
   vRef<RemoteSearch> rs = meta_cast<RemoteSearch>(sector->GetVobject()->getSite());
