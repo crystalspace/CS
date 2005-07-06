@@ -92,22 +92,21 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     AC_REQUIRE([AC_PROG_CXX])
 
     # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If a MacOS/X-specific header is
-    # present, then assume MacOX/S; if not, assume Darwin.  If --with-x=yes was
-    # invoked, and the MacOS/X-specific header is also present, then assume
-    # that user wants to cross-build for Darwin even though build host is
-    # MacOS/X.  Implementation note: At least one MacOS/X user switches between
-    # gcc 2.95 and gcc 3.3 with a script which toggles the values of CC, CXX,
-    # and CPP.  Unfortunately, CPP was being set to run the preprocessor
-    # directly ("cpp", for instance) rather than running it via the compiler
-    # ("gcc -E", for instance).  The problem with running the preprocessor
-    # directly is that __APPLE__ and __GNUC__ are not defined, which causes the
-    # MacOS/X-specific header check to fail.  We avoid this problem by
-    # supplying a non-empty fourth argument to AC_CHECK_HEADER(), which causes
-    # it to test compile the header only (which is a more robust test), rather
-    # than also testing it via the preprocessor.
+    # a way to distinguish between the two.  If Carbon.h is present, then
+    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Carbon.h is present, then assume that user wants to cross-build for
+    # Darwin even though build host is MacOS/X.  Implementation note: At least
+    # one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a script
+    # which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP was
+    # being set to run the preprocessor directly ("cpp", for instance) rather
+    # than running it via the compiler ("gcc -E", for instance).  The problem
+    # with running the preprocessor directly is that __APPLE__ and __GNUC__ are
+    # not defined, which causes the Carbon.h check to fail.  We avoid this
+    # problem by supplying a non-empty fourth argument to AC_CHECK_HEADER(),
+    # which causes it to test compile the header only (which is a more robust
+    # test), rather than also testing it via the preprocessor.
 
-    AC_CHECK_HEADER([AppKit/AppKit.h],
+    AC_CHECK_HEADER([Carbon/Carbon.h],
 	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
 
     AS_IF([test $cs_host_macosx = yes],
