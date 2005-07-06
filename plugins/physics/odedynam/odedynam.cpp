@@ -209,31 +209,31 @@ iDynamicSystem *csODEDynamics::FindSystem (const char *name)
 void csODEDynamics::Step (float elapsed_time)
 {
   float stepsize;
-  if (process_events) 
+  if (process_events)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "csODEDynamics", 
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "csODEDynamics",
       "Step was called after event processing was enabled");
     return;
   }
-  if (rateenabled) 
+  if (rateenabled)
   {
-  	stepsize = steptime;
-	if (elapsed_time > limittime) elapsed_time = limittime;
-  } 
-  else 
+        stepsize = steptime;
+        if (elapsed_time > limittime) elapsed_time = limittime;
+  }
+  else
   {
-  	stepsize = elapsed_time;
+        stepsize = elapsed_time;
   }
   total_elapsed += elapsed_time;
 
   // TODO handle fractional total_remaining (interpolate render)
-  while (total_elapsed > stepsize) 
+  while (total_elapsed > stepsize)
   {
     total_elapsed -= stepsize;
     for (size_t i=0; i<systems.Length(); i++)
     {
       systems.Get (i)->Step (stepsize);
-      for (size_t j = 0; j < updates.Length(); j ++) 
+      for (size_t j = 0; j < updates.Length(); j ++)
       {
         updates[i]->Execute (stepsize);
       }
@@ -265,7 +265,7 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   }
 
   if ((!b1 || b1->IsStatic()) && (!b2 || b2->IsStatic())) return;
-  if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup()) 
+  if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup())
     return;
 
   dContact contact[512];
@@ -328,12 +328,12 @@ csReversibleTransform GetGeomTransform (dGeomID id)
 #define ODE_EXTERN  extern
 #endif
 /* defined in ode */
-ODE_EXTERN int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags, 
-				 dContactGeom *outcontacts, int skip);
-ODE_EXTERN int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags, 
-				       dContactGeom *outcontacts, int skip);
-ODE_EXTERN int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags, 
-				 dContactGeom *contact, int skip);
+ODE_EXTERN int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags,
+                                 dContactGeom *outcontacts, int skip);
+ODE_EXTERN int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags,
+                                       dContactGeom *outcontacts, int skip);
+ODE_EXTERN int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
+                                 dContactGeom *contact, int skip);
 
 typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 
@@ -359,18 +359,18 @@ void csODEDynamics::SetGlobalERP (float erp)
 {
   csODEDynamics::erp = erp;
 
-  for (size_t i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	   iODEDynamicSystemState);
-  	 sys->SetERP (erp);
+           iODEDynamicSystemState);
+         sys->SetERP (erp);
   }
 }
 
 void csODEDynamics::SetGlobalCFM (float cfm)
 {
   csODEDynamics::cfm = cfm;
-  for (size_t i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
       iODEDynamicSystemState);
@@ -383,11 +383,11 @@ void csODEDynamics::EnableStepFast (bool enable)
   stepfast = enable;
   quickstep = false;
 
-  for (size_t i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	   iODEDynamicSystemState);
-  	 sys->EnableStepFast (enable);
+           iODEDynamicSystemState);
+         sys->EnableStepFast (enable);
   }
 }
 
@@ -395,7 +395,7 @@ void csODEDynamics::SetStepFastIterations (int iter)
 {
   sfiter = iter;
 
-  for (size_t i = 0; i < systems.Length(); i ++) 
+  for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
       iODEDynamicSystemState);
@@ -411,8 +411,8 @@ void csODEDynamics::EnableQuickStep (bool enable)
   for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-	   iODEDynamicSystemState);
-  	 sys->EnableQuickStep (enable);
+           iODEDynamicSystemState);
+         sys->EnableQuickStep (enable);
   }
 }
 
@@ -434,7 +434,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
   {
     process_events = true;
 
-    if (!scfiEventHandler) 
+    if (!scfiEventHandler)
       scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
@@ -464,13 +464,13 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
     total_elapsed += elapsed_time;
 
     // TODO handle fractional total_remaining (interpolate render)
-    while (total_elapsed > stepsize) 
+    while (total_elapsed > stepsize)
     {
       total_elapsed -= stepsize;
       for (size_t i=0; i<systems.Length(); i++)
       {
         systems.Get (i)->Step (stepsize);
-        for (size_t j = 0; j < updates.Length(); j ++) 
+        for (size_t j = 0; j < updates.Length(); j ++)
         {
           updates[i]->Execute (stepsize);
         }
@@ -493,6 +493,7 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
   spaceID = dHashSpaceCreate (0);
   dWorldSetERP (worldID, erp);
   dWorldSetCFM (worldID, cfm);
+
   roll_damp = 1.0;
   lin_damp = 1.0;
   move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
@@ -642,22 +643,22 @@ void csODEDynamicSystem::Step (float elapsed_time)
 {
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
   float stepsize;
-  if (rateenabled) 
+  if (rateenabled)
   {
-  	stepsize = steptime;
-	if (elapsed_time > limittime) { elapsed_time = limittime; }
-  } 
-  else 
+        stepsize = steptime;
+        if (elapsed_time > limittime) { elapsed_time = limittime; }
+  }
+  else
   {
-  	stepsize = elapsed_time;
+        stepsize = elapsed_time;
   }
   total_elapsed += elapsed_time;
 
   // TODO handle fractional total_remaining (interpolate render)
-  while (total_elapsed > stepsize) 
+  while (total_elapsed > stepsize)
   {
     total_elapsed -= stepsize;
-    if (!stepfast) 
+    if (!stepfast)
     {
       if (!quickstep)
       {
@@ -667,12 +668,12 @@ void csODEDynamicSystem::Step (float elapsed_time)
       {
         dWorldQuickStep (worldID, stepsize);
       }
-    } 
-    else 
+    }
+    else
     {
       dWorldStepFast1 (worldID, stepsize, sfiter);
     }
-    for (size_t i = 0; i < bodies.Length(); i ++) 
+    for (size_t i = 0; i < bodies.Length(); i ++)
     {
         iRigidBody *b = bodies.Get(i);
         // only do this if the body is enabled
@@ -682,7 +683,7 @@ void csODEDynamicSystem::Step (float elapsed_time)
           b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
         }
     }
-    for (size_t j = 0; j < updates.Length(); j ++) 
+    for (size_t j = 0; j < updates.Length(); j ++)
     {
       updates[j]->Execute (stepsize);
     }
@@ -696,7 +697,7 @@ void csODEDynamicSystem::Step (float elapsed_time)
 }
 
 bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
-  	const csOrthoTransform& trans, float friction, float elasticity, float softness)
+        const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   // From Eroroman & Marc Rochel
   iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
@@ -741,7 +742,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32;
   mat[10] = trans.GetO2T().m33; mat[11] = 0;
   dGeomSetRotation (gid, mat);
-  
+
   float *f = new float[3];
   f[0] = friction;
   f[1] = elasticity;
@@ -753,9 +754,9 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 }
 
 bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
-  	const csOrthoTransform& trans, float friction, float elasticity, float softness)
+        const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  dGeomID id = dCreateCCylinder (spaceID, radius, length);  
+  dGeomID id = dCreateCCylinder (spaceID, radius, length);
 
   dMatrix3 mat;
   mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
@@ -776,7 +777,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 }
 
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
-  	const csOrthoTransform& trans, float friction, float elasticity, float softness)
+        const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   dGeomID id = dCreateBox (spaceID, size.x, size.y, size.z);
 
@@ -798,7 +799,7 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
   return true;
 }
 
-bool csODEDynamicSystem::AttachColliderSphere (float radius, 
+bool csODEDynamicSystem::AttachColliderSphere (float radius,
     const csVector3 &offset, float friction, float elasticity, float softness)
 {
   dGeomID id = dCreateSphere (spaceID, radius);
@@ -813,7 +814,7 @@ bool csODEDynamicSystem::AttachColliderSphere (float radius,
 
   return true;
 }
-bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane, 
+bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
     float friction, float elasticity, float softness)
 {
   dGeomID id = dCreatePlane (spaceID, -plane.A(), -plane.B(), -plane.C(), plane.D());
@@ -841,6 +842,27 @@ void csODEDynamicSystem::SetAutoDisableParams (float linear, float angular,
   if(steps!=0.0f) dWorldSetAutoDisableSteps (worldID, steps);
   if(time!=0.0f) dWorldSetAutoDisableTime (worldID, time);
 }
+
+void csODEDynamicSystem::SetContactMaxCorrectingVel (float v)
+{
+    dWorldSetContactMaxCorrectingVel (worldID, v);
+}
+
+float csODEDynamicSystem::GetContactMaxCorrectingVel ()
+{
+    return dWorldGetContactMaxCorrectingVel (worldID);
+}
+
+void csODEDynamicSystem::SetContactSurfaceLayer (float depth)
+{
+    dWorldSetContactSurfaceLayer(worldID, depth);
+}
+
+float csODEDynamicSystem::GetContactSurfaceLayer ()
+{
+    return dWorldGetContactSurfaceLayer(worldID);
+}
+
 
 csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 {
@@ -1206,7 +1228,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   dGeomID id = dCreatePlane (space, -plane.A(), -plane.B(), -plane.C(), plane.D());
 
   //causes non=placeable geom run-time error w/debug build of ode.
-  //dGeomSetBody (id, bodyID); 
+  //dGeomSetBody (id, bodyID);
 
   float *f = new float[3];
   f[0] = friction;
@@ -1456,7 +1478,7 @@ void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
     bodyID[0] = 0;
   }
   if (b2)
-  { 
+  {
     bodyID[1] = ((csODERigidBody *)(b2->QueryObject()))->GetID();
   }
   else
@@ -1476,7 +1498,7 @@ void  csStrictODEJoint::SetParam (int joint_type, int parameter, int axis, float
 {
   int param = parameter;
 
-  switch (axis) 
+  switch (axis)
   {
     case 1:
       switch (param)
@@ -1515,7 +1537,7 @@ void  csStrictODEJoint::SetParam (int joint_type, int parameter, int axis, float
         param = dParamSuspensionCFM2;
       break;
       }
-      break;    
+      break;
 
     case 2:
       switch (param)
@@ -1582,7 +1604,7 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
 {
   int param = parameter;
 
-  switch (axis) 
+  switch (axis)
   {
     case 1:
       switch (param)
@@ -1621,7 +1643,7 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
         param = dParamSuspensionCFM2;
       break;
       }
-      break;    
+      break;
 
     case 2:
       switch (param)
@@ -1680,7 +1702,7 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
       return dJointGetAMotorParam (jointID, param);
       break;
     default:
-      return 0.0; 
+      return 0.0;
   }
 }
 
@@ -1745,7 +1767,7 @@ ODESliderJoint::~ODESliderJoint ()
 csVector3 ODESliderJoint::GetSliderAxis ()
 {
   dVector3 pos;
-  dJointGetSliderAxis (jointID, pos);  
+  dJointGetSliderAxis (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 //-------------------------------------------------------------------------------
@@ -1762,25 +1784,25 @@ ODEUniversalJoint::~ODEUniversalJoint ()
 csVector3 ODEUniversalJoint::GetUniversalAnchor1 ()
 {
   dVector3 pos;
-  dJointGetUniversalAnchor (jointID, pos);  
+  dJointGetUniversalAnchor (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 csVector3 ODEUniversalJoint::GetUniversalAnchor2 ()
 {
   dVector3 pos;
-  dJointGetUniversalAnchor2 (jointID, pos);  
+  dJointGetUniversalAnchor2 (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 csVector3 ODEUniversalJoint::GetUniversalAxis1 ()
 {
   dVector3 pos;
-  dJointGetUniversalAxis1 (jointID, pos);  
+  dJointGetUniversalAxis1 (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 csVector3 ODEUniversalJoint::GetUniversalAxis2 ()
 {
   dVector3 pos;
-  dJointGetUniversalAxis2 (jointID, pos);  
+  dJointGetUniversalAxis2 (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 //-------------------------------------------------------------------------------
@@ -1801,7 +1823,7 @@ ODEAMotorJoint::~ODEAMotorJoint ()
 csVector3 ODEAMotorJoint::GetAMotorAxis (int axis_num)
 {
   dVector3 pos;
-  dJointGetAMotorAxis (jointID, axis_num, pos);  
+  dJointGetAMotorAxis (jointID, axis_num, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 
@@ -1832,7 +1854,7 @@ csVector3 ODEHingeJoint::GetHingeAnchor2 ()
   dJointGetHingeAnchor2 (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
-  
+
 csVector3 ODEHingeJoint::GetHingeAxis ()
 {
   dVector3 pos;
@@ -1845,7 +1867,7 @@ csVector3 ODEHingeJoint::GetAnchorError ()
   csVector3 pos1 = GetHingeAnchor1 ();
   csVector3 pos2 = GetHingeAnchor2 ();
 
-  csVector3 result =  pos1 - pos2; 
+  csVector3 result =  pos1 - pos2;
   if (result.x < 0) result.x = - result.x;
   if (result.y < 0) result.y = - result.y;
   if (result.z < 0) result.z = - result.z;
@@ -1887,7 +1909,7 @@ csVector3 ODEBallJoint::GetAnchorError ()
   pos1 = GetBallAnchor1 ();
   pos2 = GetBallAnchor2 ();
 
-  csVector3 result =  pos1 - pos2; 
+  csVector3 result =  pos1 - pos2;
   if (result.x < 0) result.x = - result.x;
   if (result.y < 0) result.y = - result.y;
   if (result.z < 0) result.z = - result.z;
@@ -1936,7 +1958,7 @@ void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
     bodyID[0] = 0;
   }
   if (b2)
-  { 
+  {
     bodyID[1] = ((csODERigidBody *)(b2->QueryObject()))->GetID();
   }
   else
@@ -2076,19 +2098,19 @@ void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
   }
 }
 
-void csODEJoint::SetBounce (const csVector3 & bounce) 
+void csODEJoint::SetBounce (const csVector3 & bounce)
 {
   stopBounce = bounce;
   ApplyJointProperty (dParamBounce, stopBounce);
 }
 
 
-// parameter: one of ODE joint parameters.  
+// parameter: one of ODE joint parameters.
 // values: up to three possible values for up to 3 possible axis
-// For slider joints, property must correspond to axis with 
+// For slider joints, property must correspond to axis with
 // translational constraint.  For hinges, the first element is used.
 // for 2 axis 'steering' type joints, the first 2 elements are used.
-// for ball and socket joints and angular motors, all three elements 
+// for ball and socket joints and angular motors, all three elements
 // are used (NYI).
 
 void csODEJoint::ApplyJointProperty (int parameter, csVector3 & values)
@@ -2100,15 +2122,15 @@ void csODEJoint::ApplyJointProperty (int parameter, csVector3 & values)
       dJointSetHingeParam (jointID, parameter, values.x);
       break;
     case dJointTypeSlider:
-      if (transConstraint[0])        
+      if (transConstraint[0])
         dJointSetSliderParam (jointID, parameter, values.x);
       else if (transConstraint[1])
         dJointSetSliderParam (jointID, parameter, values.y);
-      else 
+      else
         dJointSetSliderParam (jointID, parameter, values.z);
       break;
     case dJointTypeHinge2:
-        //looks like axis 2 is meant to be axle, 
+        //looks like axis 2 is meant to be axle,
         //axis 1 is steering, I may need to check that later though.
         dJointSetHinge2Param (jointID, parameter, values.x);
         dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
@@ -2336,8 +2358,8 @@ void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
 {
   // Dont do anything if nothing has changed
   if (mesh->GetMovable()->GetPosition() == t.GetOrigin() &&
-	  mesh->GetMovable()->GetTransform().GetT2O() == t.GetT2O())
-	return;
+          mesh->GetMovable()->GetTransform().GetT2O() == t.GetT2O())
+        return;
 
   // Update movable
   mesh->GetMovable ()->SetPosition (t.GetOrigin ());

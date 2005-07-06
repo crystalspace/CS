@@ -123,7 +123,7 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) && 
+  else if ((ev.Type == csevKeyboard) &&
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
   {
     if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
@@ -191,9 +191,9 @@ bool Simple::HandleEvent (iEvent& ev)
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
       if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
       return true;
-    } 
+    }
   }
-  else if ((ev.Type == csevKeyboard) && 
+  else if ((ev.Type == csevKeyboard) &&
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp) &&
     ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) ||
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
@@ -338,7 +338,7 @@ bool Simple::Initialize ()
         "Error getting Collision Detection System!");
     return false;
   };
-  
+
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
@@ -447,6 +447,11 @@ bool Simple::Initialize ()
   }
 
   dynSys->SetGravity (csVector3 (0,-7,0));
+  dynSys->SetRollingDampener(.995);
+
+  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+  osys->SetContactMaxCorrectingVel (.1);
+  osys->SetContactSurfaceLayer (.0001);
 
   CreateWalls (csVector3 (5));
 
@@ -523,7 +528,7 @@ iRigidBody* Simple::CreateMesh (void)
   csOrthoTransform t (tm, tv);
 
   rb->AttachColliderMesh (mesh, t, 10, 1, 0.8f);
-     
+
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
@@ -605,13 +610,13 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   rb->MakeStatic ();
 
   csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+        SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
 
   csOrthoTransform t;
 #if 0
   // Enabling this will work, however, mesh<->mesh collision
-  // requires a lot of hand tuning. When this is enabled, 
+  // requires a lot of hand tuning. When this is enabled,
   // mesh objects created with 'm' will either sink through
   // the floor, or stick in it.
 
@@ -619,10 +624,10 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   //  * Decrease the time step. 1/300th of a second minimum
   //  * Slow down objects
   //  * Play with softness, cfm, etc.
-  dynSys->AttachColliderMesh (walls, t,10,1);
+  dynSys->AttachColliderMesh (walls, t, 10, 1);
 #endif
 #if 0
-  // mesh <-> plane doesn't work yet, so we will use boxes for each 
+  // mesh <-> plane doesn't work yet, so we will use boxes for each
   // wall for now
   for(int i = 0; i < walls_state->GetPolygonCount(); i++)
   {
@@ -653,7 +658,7 @@ void Simple::Start ()
   csDefaultRunLoop (object_reg);
 }
 
-void Simple::WriteShadow (int x,int y,int fg,const char *str,...) 
+void Simple::WriteShadow (int x,int y,int fg,const char *str,...)
 {
   csString buf;
 
@@ -666,7 +671,7 @@ void Simple::WriteShadow (int x,int y,int fg,const char *str,...)
   Write (x, y, fg, -1, "%s", buf.GetData());
 }
 
-void Simple::Write(int x,int y,int fg,int bg,const char *str,...) 
+void Simple::Write(int x,int y,int fg,int bg,const char *str,...)
 {
   va_list arg;
   csString buf;

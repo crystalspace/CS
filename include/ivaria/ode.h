@@ -76,13 +76,13 @@ struct iODEDynamicState : public iBase
    * this means if you set the frame rate to (default) 50  The stepsize
    * passed into Step is treated as the elapsed time in seconds received
    * from the virtual clock GetElapsedTicks.
-   * The physics will iterate a number of steps at 1/50th 
+   * The physics will iterate a number of steps at 1/50th
    * of a second until enough time has passed to account for the time
    * Beware the default setting for frame limit is 10, which means
    * if the stepsize passed to Step is longer than 1/10 a second
    * the physics will stop iterating and slow down.  Never set this
    * parameter to 0 or else you could incur cycle of death where
-   * the number of physics steps increases the amount of elapsed 
+   * the number of physics steps increases the amount of elapsed
    * time between frames which increases the number of physics steps
    * toward infinity
    */
@@ -98,22 +98,22 @@ struct iODEDynamicState : public iBase
   virtual void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
   virtual void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
 
-  /** 
-   * This makes updates happen on the cscmdPreProcess 
+  /**
+   * This makes updates happen on the cscmdPreProcess
    * and invalidates calls to Step()
    * This should be used in conjuction with the FrameRate calls
    */
   virtual void EnableEventProcessing (bool enable) = 0;
   virtual bool EventProcessingEnabled () = 0;
 
-  /** 
+  /**
    * The following enables special robustness checks for fast
-   * moving objects to determine if they will tunneling and 
+   * moving objects to determine if they will tunneling and
    * adjusts the physics frame resolution (rate) to a double
    * for that step (possible doing this recursively down to
    * a potentially infinite resolution for a given step, depending
-   * on the speed of the objects being tested)  Only enable 
-   * this if you are experiencing tunneling problems and can't 
+   * on the speed of the objects being tested)  Only enable
+   * this if you are experiencing tunneling problems and can't
    * afford to increase the standard FrameRate in the settings
    * above
    */
@@ -122,7 +122,7 @@ struct iODEDynamicState : public iBase
 
 };
 
-SCF_VERSION (iODEDynamicSystemState, 0, 0, 1);
+SCF_VERSION (iODEDynamicSystemState, 0, 0, 2);
 
 struct iODEBallJoint;
 struct iODEHingeJoint;
@@ -145,7 +145,7 @@ struct iODEDynamicSystemState : public iBase
   virtual void SetERP (float erp) = 0;
   virtual float ERP () = 0;
 
-  /** 
+  /**
    * Sets ODE's Constraint Force Mixing (see ode docs for details)
    * Setting this in iODEDynamicState will set it for each System
    * Use this only if you want a specific system to behave differently
@@ -192,13 +192,13 @@ struct iODEDynamicSystemState : public iBase
    * this means if you set the frame rate to (default) 50  The stepsize
    * passed into Step is treated as the elapsed time in seconds received
    * from the virtual clock GetElapsedTicks.
-   * The physics will iterate a number of steps at 1/50th 
+   * The physics will iterate a number of steps at 1/50th
    * of a second until enough time has passed to account for the time
    * Beware the default setting for frame limit is 10, which means
    * if the stepsize passed to Step is longer than 1/10 a second
    * the physics will stop iterating and slow down.  Never set this
    * parameter to 0 or else you could incur cycle of death where
-   * the number of physics steps increases the amount of elapsed 
+   * the number of physics steps increases the amount of elapsed
    * time between frames which increases the number of physics steps
    * toward infinity
    */
@@ -214,14 +214,14 @@ struct iODEDynamicSystemState : public iBase
   virtual void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
   virtual void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
 
-  /** 
+  /**
    * The following enables special robustness checks for fast
-   * moving objects to determine if they will tunneling and 
+   * moving objects to determine if they will tunneling and
    * adjusts the physics frame resolution (rate) to a double
    * for that step (possible doing this recursively down to
    * a potentially infinite resolution for a given step, depending
-   * on the speed of the objects being tested)  Only enable 
-   * this if you are experiencing tunneling problems and can't 
+   * on the speed of the objects being tested)  Only enable
+   * this if you are experiencing tunneling problems and can't
    * afford to increase the standard FrameRate in the settings
    * above
    * Setting this in iODEDynamicState will set it for each System
@@ -232,7 +232,7 @@ struct iODEDynamicSystemState : public iBase
 
   /// Create a ball joint and add it to he simulation
   virtual csPtr<iODEBallJoint> CreateBallJoint () = 0;
-  
+
   /// Create a hinge joint and add it to he simulation
   virtual csPtr<iODEHingeJoint> CreateHingeJoint () = 0;
 
@@ -260,6 +260,40 @@ struct iODEDynamicSystemState : public iBase
   /// Remove a Slider joint from the simulation
   virtual void RemoveJoint (iODESliderJoint* joint) = 0;
 
+  /** Set the maximum correcting velocity that contacts are
+      allowed to generate. The default value is infinity (i.e. no
+      limit). Reducing this value can help prevent "popping" of deeply
+      embedded objects.
+      @param v velocity
+  */
+  virtual void SetContactMaxCorrectingVel (float v) = 0;
+
+  /** Get the maximum correcting velocity that contacts are
+      allowed to generate. The default value is infinity (i.e. no
+      limit). Reducing this value can help prevent "popping" of deeply
+      embedded objects.
+  */
+  virtual float GetContactMaxCorrectingVel () = 0;
+
+  /** Set the depth of the surface layer around all geometry
+      objects. Contacts are allowed to sink into the surface layer up
+      to the given depth before coming to rest. The default value is
+      zero. Increasing this to some small value (e.g. 0.001) can help
+      prevent jittering problems due to contacts being repeatedly made
+      and broken.
+      @param depth the distance two bodies are allowed to interpenetrate
+   */
+  virtual void SetContactSurfaceLayer (float depth) = 0;
+
+  /** Get the depth of the surface layer around all geometry
+      objects. Contacts are allowed to sink into the surface layer up
+      to the given depth before coming to rest. The default value is
+      zero. Increasing this to some small value (e.g. 0.001) can help
+      prevent jittering problems due to contacts being repeatedly made
+      and broken.
+      @return the distance two bodies are allowed to interpenetrate
+   */
+  virtual float GetContactSurfaceLayer () = 0;
 };
 
 /**
@@ -281,7 +315,7 @@ enum ODEJointType
 SCF_VERSION (iODEJointState, 0, 0, 2);
 
 /**
-* General joint state. Here 
+* General joint state. Here
 */
 struct iODEJointState : public iBase
 {
@@ -368,46 +402,46 @@ struct iODEJointState : public iBase
 };
 
 /**
- * General joint state. 
+ * General joint state.
  */
 struct iODEGeneralJointState : public iBase
 {
   /**
-   * Set low stop angle or position. For rotational joints, this 
-   * stop must be greater than - pi to be effective. 
+   * Set low stop angle or position. For rotational joints, this
+   * stop must be greater than - pi to be effective.
    */
   virtual void SetLoStop (float value, int axis) = 0;
-  
+
   /**
-   * Set high stop angle or position. For rotational joints, this stop must 
-   * be less than pi to be effective. If the high stop is less than the low 
+   * Set high stop angle or position. For rotational joints, this stop must
+   * be less than pi to be effective. If the high stop is less than the low
    * stop then both stops will be ineffective.
    */
   virtual void SetHiStop (float value, int axis) = 0;
 
   /// Set desired motor velocity (this will be an angular or linear velocity).
   virtual void SetVel (float value, int axis) = 0;
-  
+
   /**
-   * Set the maximum force or torque that the motor will use to achieve the desired 
-   * velocity. This must always be greater than or equal to zero. Setting this to zero 
+   * Set the maximum force or torque that the motor will use to achieve the desired
+   * velocity. This must always be greater than or equal to zero. Setting this to zero
    * turns off the motor.
    */
   virtual void SetFMax (float value, int axis) = 0;
-  
+
   /**
-   * Set the fudge factor. The current joint stop/motor implementation has a small 
-   * problem: when the joint is at one stop and the motor is set to move it away from 
-   * the stop, too much force may be applied for one time step, causing a ``jumping'' 
-   * motion. This fudge factor is used to scale this excess force. It should have a value 
-   * between zero and one (the default value). If the jumping motion is too visible in a 
-   * joint, the value can be reduced. Making this value too small can prevent the motor 
+   * Set the fudge factor. The current joint stop/motor implementation has a small
+   * problem: when the joint is at one stop and the motor is set to move it away from
+   * the stop, too much force may be applied for one time step, causing a ``jumping''
+   * motion. This fudge factor is used to scale this excess force. It should have a value
+   * between zero and one (the default value). If the jumping motion is too visible in a
+   * joint, the value can be reduced. Making this value too small can prevent the motor
    * from being able to move the joint away from a stop.
    */
   virtual void SetFudgeFactor (float value, int axis) = 0;
 
   /**
-   * Set the bouncyness of the stops. This is a restitution parameter in the range 0..1. 
+   * Set the bouncyness of the stops. This is a restitution parameter in the range 0..1.
    * 0 means the stops are not bouncy at all, 1 means maximum bouncyness.
    */
   virtual void SetBounce (float value, int axis) = 0;
@@ -419,20 +453,20 @@ struct iODEGeneralJointState : public iBase
   virtual void SetStopERP (float value, int axis) = 0;
 
   /**
-   * Set the constraint force mixing (CFM) value for joint used by the stops. 
-   * Together with the ERP value this can be used to get spongy or soft stops. 
-   * Note that this is intended for unpowered joints, it does not really work as expected 
+   * Set the constraint force mixing (CFM) value for joint used by the stops.
+   * Together with the ERP value this can be used to get spongy or soft stops.
+   * Note that this is intended for unpowered joints, it does not really work as expected
    * when a powered joint reaches its limit.
    */
   virtual void SetStopCFM (float value, int axis) = 0;
 
-  /// Set suspension error reduction parameter (ERP). 
+  /// Set suspension error reduction parameter (ERP).
   virtual void SetSuspensionERP (float value, int axis) = 0;
-  
+
   /// Set suspension constraint force mixing (CFM) value.
   virtual void SetSuspensionCFM (float value, int axis) = 0;
 
-  /// Get low stop angle or position.   
+  /// Get low stop angle or position.
   virtual float GetLoStop (int axis) = 0;
 
   /// Get high stop angle or position.
@@ -443,7 +477,7 @@ struct iODEGeneralJointState : public iBase
 
   /// Get the maximum force or torque that the motor will use to achieve the desired velocity.
   virtual float GetFMax (int axis) = 0;
-  
+
   ///Get the fudge factor.
   virtual float GetFudgeFactor (int axis) = 0;
 
@@ -456,35 +490,35 @@ struct iODEGeneralJointState : public iBase
   /// Get the error reduction parameter (ERP) used by the stops.
   virtual float GetStopERP (int axis) = 0;
 
-  /// Get the constraint force mixing (CFM) value for joint used by the stops. 
+  /// Get the constraint force mixing (CFM) value for joint used by the stops.
   virtual float GetStopCFM (int axis) = 0;
 
-  /// Get suspension error reduction parameter (ERP). 
+  /// Get suspension error reduction parameter (ERP).
   virtual float GetSuspensionERP (int axis) = 0;
 
   /// Get suspension constraint force mixing (CFM) value.
   virtual float GetSuspensionCFM (int axis) = 0;
 
   /**
-   * Attach the joint to some new bodies. If the joint is already attached, it 
-   * will be detached from the old bodies first. To attach this joint to only 
-   * one body, set body1 or body2 to zero - a zero body refers to the static 
-   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * Attach the joint to some new bodies. If the joint is already attached, it
+   * will be detached from the old bodies first. To attach this joint to only
+   * one body, set body1 or body2 to zero - a zero body refers to the static
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e.
    * it will have no effect on the simulation.
    */
   virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
- 
-  /// Get an attached body (valid values for body are 0 and 1)
-  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0; 
 
-  /// Get force that joint applies to body 1 
+  /// Get an attached body (valid values for body are 0 and 1)
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
+
+  /// Get force that joint applies to body 1
   virtual csVector3 GetFeedbackForce1 () = 0;
 
   /// Get torque that joint applies to body 1
   virtual csVector3 GetFeedbackTorque1 () = 0;
- 
+
   /// Get force that joint applies to body 2
-  virtual csVector3 GetFeedbackForce2 () = 0; 
+  virtual csVector3 GetFeedbackForce2 () = 0;
 
   /// Get torque that joint applies to body 2
   virtual csVector3 GetFeedbackTorque2 () = 0;
@@ -503,7 +537,7 @@ struct iODESliderJoint : public iODEGeneralJointState
 
   /**
    * Get the slider linear position (i.e. the slider's "extension").
-   * When the axis is set, the current position of the attached bodies 
+   * When the axis is set, the current position of the attached bodies
    * is examined and that position will be the zero position.
    */
   virtual float GetSliderPosition () = 0;
@@ -514,10 +548,10 @@ struct iODESliderJoint : public iODEGeneralJointState
 
 SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
 /**
- * A universal joint is like a ball and socket joint that constrains 
- * an extra degree of rotational freedom. Given axis 1 on body 1, and 
- * axis 2 on body 2 that is perpendicular to axis 1, it keeps them 
- * perpendicular. In other words, rotation of the two bodies about the 
+ * A universal joint is like a ball and socket joint that constrains
+ * an extra degree of rotational freedom. Given axis 1 on body 1, and
+ * axis 2 on body 2 that is perpendicular to axis 1, it keeps them
+ * perpendicular. In other words, rotation of the two bodies about the
  * direction perpendicular to the two axes will be equal.
  */
 struct iODEUniversalJoint : public iODEGeneralJointState
@@ -532,15 +566,15 @@ struct iODEUniversalJoint : public iODEGeneralJointState
   virtual void SetUniversalAxis2 (float x, float y, float z) = 0;
 
   /**
-   * Get the joint anchor point, in world coordinates. This returns 
-   * the point on body 1. If the joint is perfectly satisfied, this 
+   * Get the joint anchor point, in world coordinates. This returns
+   * the point on body 1. If the joint is perfectly satisfied, this
    * will be the same as the point on body 2.
    */
   virtual csVector3 GetUniversalAnchor1 () = 0;
 
   /**
-   * Get the joint anchor point, in world coordinates. This returns 
-   * the point on body 2. If the joint is perfectly satisfied, this 
+   * Get the joint anchor point, in world coordinates. This returns
+   * the point on body 2. If the joint is perfectly satisfied, this
    * will be the same as the point on body 1.
    */
   virtual csVector3 GetUniversalAnchor2 () = 0;
@@ -562,51 +596,51 @@ enum ODEAMotorMode
 SCF_VERSION (iODEAMotorJoint, 0, 0, 1);
 
 /**
- * ODE AMotor joint. An angular motor (AMotor) allows the relative 
- * angular velocities of two bodies to be controlled. The angular 
- * velocity can be controlled on up to three axes, allowing torque 
- * motors and stops to be set for rotation about those axes. This 
- * is mainly useful in conjunction with ball joints (which do not 
- * constrain the angular degrees of freedom at all), but it can be 
- * used in any situation where angular control is needed. To use an 
- * AMotor with a ball joint, simply attach it to the same two bodies 
- * that the ball joint is attached to.   
+ * ODE AMotor joint. An angular motor (AMotor) allows the relative
+ * angular velocities of two bodies to be controlled. The angular
+ * velocity can be controlled on up to three axes, allowing torque
+ * motors and stops to be set for rotation about those axes. This
+ * is mainly useful in conjunction with ball joints (which do not
+ * constrain the angular degrees of freedom at all), but it can be
+ * used in any situation where angular control is needed. To use an
+ * AMotor with a ball joint, simply attach it to the same two bodies
+ * that the ball joint is attached to.
  */
 struct iODEAMotorJoint : public iODEGeneralJointState
 {
 
   /**
-   * Set the angular motor mode. The mode parameter must be one of the 
-   * following constants: CS_ODE_AMOTOR_MODE_USER (The AMotor axes and 
-   * joint angle settings are entirely controlled by the user, this is 
-   * the default mode), CS_ODE_AMOTOR_MODE_EULER ( Euler angles are 
-   * automatically computed, when this mode is initially set the current 
-   * relative orientations of the bodies will correspond to all euler 
+   * Set the angular motor mode. The mode parameter must be one of the
+   * following constants: CS_ODE_AMOTOR_MODE_USER (The AMotor axes and
+   * joint angle settings are entirely controlled by the user, this is
+   * the default mode), CS_ODE_AMOTOR_MODE_EULER ( Euler angles are
+   * automatically computed, when this mode is initially set the current
+   * relative orientations of the bodies will correspond to all euler
    * angles at zero).
    */
   virtual void SetAMotorMode (ODEAMotorMode mode) = 0;
-  
+
   /**
-   * Get the angular motor mode. 
+   * Get the angular motor mode.
    */
   virtual ODEAMotorMode GetAMotorMode () = 0;
 
   /**
-   * Set the number of angular axes that will be controlled by the 
-   * AMotor. The argument num can range from 0 (which effectively 
-   * deactivates the joint) to 3. This is automatically set to 3 
-   * in CS_ODE_AMOTOR_MODE_EULER mode. 
+   * Set the number of angular axes that will be controlled by the
+   * AMotor. The argument num can range from 0 (which effectively
+   * deactivates the joint) to 3. This is automatically set to 3
+   * in CS_ODE_AMOTOR_MODE_EULER mode.
    */
   virtual void SetAMotorNumAxes (int axis_num) = 0;
-  
+
   /**
-   * Get the number of angular axes that will be controlled by the 
-   * AMotor. 
+   * Get the number of angular axes that will be controlled by the
+   * AMotor.
    */
   virtual int GetAMotorNumAxes () = 0;
 
   /**
-    Set AMotor axis. 
+    Set AMotor axis.
     /param axis_num - axis number
     /param rel_orient - ``relative orientation'' mode:
     0: The axis is anchored to the global frame.
@@ -615,19 +649,19 @@ struct iODEAMotorJoint : public iODEGeneralJointState
     /param x, y, z - axis
    */
   virtual void SetAMotorAxis (int axis_num, int rel_orient, float x, float y, float z) = 0;
-  
+
   /**
-    Set AMotor axis. 
+    Set AMotor axis.
     /param axis_num - axis number
     /param rel_orient - ``relative orientation'' mode:
     0: The axis is anchored to the global frame.
     1: The axis is anchored to the first body.
-    2: The axis is anchored to the second body. 
+    2: The axis is anchored to the second body.
    */
   virtual void SetAMotorAxis (int axis_num, int rel_orient, const csVector3 &axis) = 0;
 
   /**
-   * Get AMotor axis. 
+   * Get AMotor axis.
    */
   virtual csVector3 GetAMotorAxis (int axis_num) = 0;
 
@@ -635,39 +669,39 @@ struct iODEAMotorJoint : public iODEGeneralJointState
    * Get ``relative orientation'' mode:
    * 0: The axis is anchored to the global frame.
    * 1: The axis is anchored to the first body.
-   * 2: The axis is anchored to the second body. 
+   * 2: The axis is anchored to the second body.
    */
   virtual int GetAMotorAxisRelOrientation (int axis_num) = 0;
 
   /**
-   * Tell the AMotor what the current angle is along axis anum. This 
-   * function should only be called in CS_ODE_AMOTOR_MODE_USER mode, 
-   * because in this mode the AMotor has no other way of knowing the 
-   * joint angles. The angle information is needed if stops have been 
+   * Tell the AMotor what the current angle is along axis anum. This
+   * function should only be called in CS_ODE_AMOTOR_MODE_USER mode,
+   * because in this mode the AMotor has no other way of knowing the
+   * joint angles. The angle information is needed if stops have been
    * set along the axis, but it is not needed for axis motors.
    */
   virtual void SetAMotorAngle (int axis_num, float angle) = 0;
 
   /**
-   * Return the current angle for axis anum. In CS_ODE_AMOTOR_MODE_USER 
-   * mode this is simply the value that was set with SetAMotorAngle. In 
+   * Return the current angle for axis anum. In CS_ODE_AMOTOR_MODE_USER
+   * mode this is simply the value that was set with SetAMotorAngle. In
    * CS_ODE_AMOTOR_MODE_EULER mode this is the corresponding euler angle.
    */
   virtual float GetAMotorAngle (int axis_num) = 0;
 
   /**
-   * Return the current angle rate for axis anum. In CS_ODE_AMOTOR_MODE_USER 
-   * mode this is always zero, as not enough information is available. In 
+   * Return the current angle rate for axis anum. In CS_ODE_AMOTOR_MODE_USER
+   * mode this is always zero, as not enough information is available. In
    * CS_ODE_AMOTOR_MODE_EULER mode this is the corresponding euler angle rate.
    */
   virtual float GetAMotorAngleRate (int axis_num) = 0;
-  
+
 };
 
 SCF_VERSION (iODEHingeJoint, 0, 0, 1);
 
 /**
- * ODE hinge joint (contrainted translation and 1 free rotation axis).  
+ * ODE hinge joint (contrainted translation and 1 free rotation axis).
  */
 struct iODEHingeJoint : public iODEGeneralJointState
 {
@@ -678,32 +712,32 @@ struct iODEHingeJoint : public iODEGeneralJointState
   virtual void SetHingeAnchor (const csVector3 &pos) = 0;
 
   /**
-   * Sets free hinge axis. 
+   * Sets free hinge axis.
    */
   virtual void SetHingeAxis (const csVector3 &axis) = 0;
 
   /**
-   * Get the joint anchor point, in world coordinates. This returns the 
-   * point on body 1. 
+   * Get the joint anchor point, in world coordinates. This returns the
+   * point on body 1.
    */
   virtual csVector3 GetHingeAnchor1 () = 0;
 
   /**
-   * Get the joint anchor point, in world coordinates. This returns the 
-   * point on body 2. 
+   * Get the joint anchor point, in world coordinates. This returns the
+   * point on body 2.
    */
   virtual csVector3 GetHingeAnchor2 () = 0;
-  
+
   /**
-   * Get free hinge axis. 
+   * Get free hinge axis.
    */
   virtual csVector3 GetHingeAxis () = 0;
 
   /**
    * Get the hinge angle. The nagle is measured between the two bodies.
-   * The angle will be between -pi..pi. When the hinge anchor or axis 
-   * is set, the current position of the attached bodies is examined and 
-   * that position will be the zero angle. 
+   * The angle will be between -pi..pi. When the hinge anchor or axis
+   * is set, the current position of the attached bodies is examined and
+   * that position will be the zero angle.
    */
   virtual float GetHingeAngle () = 0;
 
@@ -713,7 +747,7 @@ struct iODEHingeJoint : public iODEGeneralJointState
   virtual float GetHingeAngleRate () = 0;
 
   /**
-   * This value will show you how far the joint has come apart. 
+   * This value will show you how far the joint has come apart.
    */
   virtual csVector3 GetAnchorError () = 0;
 
@@ -722,7 +756,7 @@ struct iODEHingeJoint : public iODEGeneralJointState
 SCF_VERSION (iODEBallJoint, 0, 0, 1);
 
 /**
- * ODE ball and socket joint (contrainted translation and free rotation).  
+ * ODE ball and socket joint (contrainted translation and free rotation).
  */
 struct iODEBallJoint : public iBase
 {
@@ -731,33 +765,33 @@ struct iODEBallJoint : public iBase
    * on each body together. Input specified in world coordinates.
    */
   virtual void SetBallAnchor (const csVector3 &pos) = 0;
-  
+
   /**
-   * Get the joint anchor point, in world coordinates. This returns 
-   * the point on body 1. 
+   * Get the joint anchor point, in world coordinates. This returns
+   * the point on body 1.
    */
   virtual csVector3 GetBallAnchor1 () = 0;
-  
+
   /**
-   * Get the joint anchor point, in world coordinates. This returns the 
-   * point on body 2. 
+   * Get the joint anchor point, in world coordinates. This returns the
+   * point on body 2.
    */
   virtual csVector3 GetBallAnchor2 () = 0;
-  
+
   /**
-   * This value will show you how far the joint has come apart. 
+   * This value will show you how far the joint has come apart.
    */
   virtual csVector3 GetAnchorError () = 0;
 
    /**
-   * Attach the joint to some new bodies. If the joint is already attached, it 
-   * will be detached from the old bodies first. To attach this joint to only 
-   * one body, set body1 or body2 to zero - a zero body refers to the static 
-   * environment. Setting both bodies to zero puts the joint into "limbo", i.e. 
+   * Attach the joint to some new bodies. If the joint is already attached, it
+   * will be detached from the old bodies first. To attach this joint to only
+   * one body, set body1 or body2 to zero - a zero body refers to the static
+   * environment. Setting both bodies to zero puts the joint into "limbo", i.e.
    * it will have no effect on the simulation.
    */
   virtual void Attach (iRigidBody *body1, iRigidBody *body2) = 0;
-  
+
   /// Get an attached body (valid values for body are 0 and 1)
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
 
