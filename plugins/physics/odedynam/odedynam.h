@@ -747,7 +747,7 @@ public:
 };
 
 
-struct csStrictODEJoint : iBase
+struct csStrictODEJoint : public iBase
 {
   dJointID jointID;
   csRef<iRigidBody> body[2];
