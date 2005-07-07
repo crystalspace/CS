@@ -47,11 +47,11 @@ pre-compiled form from the following location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/support/win32/cs-win32libs-0.99r0_011.exe}
+@uref{http://www.crystalspace3d.org/support/win32/cs-win32libs-0.99r0_012.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/support/win32/}@*
-@code{cs-win32libs-0.99r0_011.exe}
+@code{cs-win32libs-0.99r0_012.exe}
 @end iftex
 
 @subheading zlib

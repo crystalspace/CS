@@ -14,6 +14,8 @@ chronological order.
 	- Eric Sunshine fixed a bunch of image references (via @picture{}) in
 	  the Texinfo sources for the CS manual which broke when the
 	  documentation was reorganized on 1-Jul-2005.
+	- res updated the "external libs" manual page for the new cs-win32libs
+	  release.
 5-Jul-2005
 	- Piotr Obrzut fixed creating/removing of *strict ode joints*
 	- Piotr Obrzut added creating function for ode slider joint in cs
@@ -21,6 +23,7 @@ chronological order.
 	  Get/SetContactSurfaceLayer() to iODEDynamicSystemState
 	- Peter Amstutz committed preliminary physics support in the
 	  csvosa3ld plugin (via the ODE plugin) (currently disabled)
+	- res fixed an errorneous private inheritance in odedynam.
 3-Jul-2005
 	- Piotr Obrzut added pop dir on every return path in ParseShaderList 
 	  in csparser
