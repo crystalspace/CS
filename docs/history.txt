@@ -16,6 +16,7 @@ chronological order.
 	- res made the DDS loader check for the DDSCAPS2_VOLUME flag not only 
 	  when DDSCAPS_COMPLEX is set, as some files (as reported by Bedrich
 	  Zaba) have the former, but not the latter set.
+	- caedes added iCommandLineParser and iSoundListener to cspace.i
 6-Jul-2005
 	- Eric Sunshine updated numerous "Linux" references throughout the
 	  project to "GNU/Linux" in order to avoid perpetuating the myth that
