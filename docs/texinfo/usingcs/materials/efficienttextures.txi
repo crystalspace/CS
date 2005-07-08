@@ -1,0 +1,122 @@
+@c -*-texinfo-*-
+@node Efficient Textures, Texture Mapping, Materials, Materials
+@subsection Efficient Textures
+@cindex textures
+@cindex DDS
+
+This section contains information on how to create efficient textures and 
+explains how to control aspects of texture rendering, like the format they are 
+uploaded to the graphics hardware.
+
+@subsubsection Texture dimensions
+3D hardware (but also software) can render textures more efficiently if the 
+dimensions are powers of two (abbreviated as "PO2") (e.g. 256x256, 512x128...), 
+to the extent that hardware and graphics APIs (e.g. OpenGL) require textures 
+to have PO2 dimensions. So does CrystalSpace for all textures, 2D and 3D. 
+While you can feed non-PO2 textures into CS, they will be resized internally 
+to a PO2 size (e.g. 640x480 will become 512x512). The resizing isn't very good, 
+though: the texture will end up looking rather ugly when rendered.
+
+Although most modern hardware supports non-PO2 textures, there is still 
+hardware that doesn't, and non-PO2 textures have limitations (e.g. no 
+mipmapping, no wrapping around on edges) on all but high-end (as of time of
+this writing - e.g. NVidia GeForce 6800) hardware. 
+
+Bottom line: Use power-of-two sized textures.
+
+Another facet is what size actually to use; it all depends on the content, of 
+course. Some points to consider:
+@itemize
+@item The days were certain hardware was limited to 256x256 textures are long 
+gone; nowadays, the limit is 2048x2048 or 4096x4096. Texture compression also 
+allows for performant high-resolution textures; so use them.
+
+@item You can easily downsize a texture when you find it is too large in a case. 
+Upsizing a texture you find looks ugly or too blurry won't help - you cannot 
+get information that's just not there. Means, better start off with textures 
+too large than textures too small.
+
+@item The OpenGL renderer allows user-configurable use of lower-resolution 
+versions of textures through the @samp{Video.OpenGL.TextureDownsample} 
+configuration setting - so you don't need to worry that much about users with 
+low video memory as they can get a performance increase by changing this 
+setting to a value greater than 0.
+@end itemize
+
+@subsubsection Texture file format
+A texture has to be physically stored somewhere. CrystalSpace supports a 
+number of image formats to load textures from, common ones such as @sc{png}, 
+@sc{tga}, @sc{bmp}, @sc{jpg}, @sc{dds}, @sc{gif}, and less common to exotic 
+ones like @sc{mng} and @sc{jng}. 
+
+What format you want depends on considerations like whether you need an alpha 
+channel or not, can accept lossy compression, and the disk space taken up. 
+The color depth is pretty much unimportant, CS uses truecolor textures when 
+rendering with OpenGL, so at runtime e.g. using paletted textures gains you exactly 
+nothing over truecolor images.
+
+Alpha is supported by @sc{png}, @sc{tga}, @sc{bmp}, @sc{dds}, @sc{mng}, 
+@sc{jng}, the compression is lossless for @sc{png}, @sc{gif}, @sc{tga}, 
+@sc{bmp}, and can be lossless or lossy for @sc{mng} and @sc{dds}. @sc{mng} is
+a bit special as it is an animation format and hence is usually used if you 
+want animated textures.
+
+Commonly, @sc{png}, @sc{tga} are used for textures with alpha and JPG for 
+textures without. Those formats are commonly perceived as the best options,
+as they cover the commonly needed features and offer decent compression.
+However, the best format you can use is actually @sc{dds}.
+
+To determine why, take a look at what happens if e.g. a PNG texture is loaded 
+into CS:
+@itemize
+@item The texture is uncompressed.
+@item Mipmaps are created.
+@item The textures are uploaded to the hardware.
+@end itemize
+
+Unobviously, step 3 actually contains a recompression. That is due the fact 
+that CrystalSpace uses texture compression (which has a positive effect 
+performance-wise), but the texture data is sent to OpenGL in RGB(A) format, 
+which means that the driver needs to compress the texture - this costs some 
+time.
+
+@sc{dds} offers an advantage here, as, in @sc{dds} files, 
+@itemize
+@item image data can be stored in the same compression format(s) that hardware 
+nowaday uses (@sc{dxt1}, @sc{dxt3}, @sc{dxt5}) 
+@item the mipmaps of a texture can be stored. 
+@end itemize
+That means that the steps 1 and 2 above are basically not needed, and so is the 
+recompression in step 3, as the data that needs to be uploaded is precompressed. 
+Getting rid of all that processing greatly improves load time.
+
+Without alpha (@sc{dxt1} compression), 4 bits per pixel are needed, with 
+alpha (@sc{dxt3}, @sc{dxt5}), 8 bits per pixel are needed. That is before any 
+zip compression, though; the gross file size of a @sc{dds} file can rival 
+those of @sc{png} and @sc{jpg} files.
+
+@sc{dds} files can be created with e.g. a Photoshop plugin to export DDS files 
+which is available from NVidia 
+(@uref{http://developer.nvidia.com/object/nv_texture_tools.html}) or GIMP 
+@sc{DDS} plugins which are also available on the web 
+(@uref{http://nifelheim.dyndns.org/~cocidius/dds/}). Last but not least, CS'
+@sc{dds} plugin is also able to save @sc{dds} files, in conjunction with the
+@file{gfxtest} app you can have a simple @sc{dds} converter.
+
+@subsubsection Texture quality control
+As mentioned above, textures in CS are compressed before being uploaded to the 
+graphics hardware; while compressed textures are fast, they are sometimes 
+undesireable (e.g. for normal maps - see 
+@uref{http://developer.nvidia.com/object/bump_map_compression.html} for an 
+illustration of the problems). 
+
+CrystalSpace allows quality control here on a per-texture base thorugh 
+@dfn{texture classes}. Basically, a texture class is a collection of certain 
+settings that control how a texture is uploaded to the graphics hardware. 
+E.g. the @samp{lookup}, @samp{normalmap} and @samp{nocompress} cause textures 
+to be stored uncompressed on the hardware. 
+
+Additionally, texture classes also attach some "semantics" to textures - 
+useful for tools or humans that read the raw world file. The class of a 
+texture can be set by adding @code{<class>normalmap</class>} or similar 
+to the @code{<texture>} block.

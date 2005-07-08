@@ -10,6 +10,9 @@ chronological order.
 	- res added the "DejaVu" TrueType fonts. They're based upon the "Vera"
 	  family (and shares its liberal license), but features additional
 	  non-Latin glyphs.
+	- res added some more information to the "alpha" manual page.
+	- res adapted the "Efficient Textures" article from the community site
+	  for the manual.
 6-Jul-2005
 	- Eric Sunshine updated numerous "Linux" references throughout the
 	  project to "GNU/Linux" in order to avoid perpetuating the myth that

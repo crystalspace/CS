@@ -11,8 +11,10 @@ Everything about materials.
 @menu
 * Alpha Textures:: Alpha in Textures
 * Texture Mapping::
+* Efficient Textures::
 @end menu
 
 @importss{usingcs,materials,alpha.txi}
 @importss{usingcs,materials,texmap.txi}
+@importss{usingcs,materials,efficienttextures.txi}
 
