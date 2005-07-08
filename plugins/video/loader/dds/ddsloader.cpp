@@ -181,16 +181,13 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 
   bool cubeMap = false;
   bool volMap = false;
-  if (head.capabilities.caps1 & dds::DDSCAPS_COMPLEX)
-  {
-    if (head.capabilities.caps2 & dds::DDSCAPS2_CUBEMAP)
-      cubeMap = (head.capabilities.caps2 & (dds::DDSCAPS2_CUBEMAP_POSITIVEX
-	| dds::DDSCAPS2_CUBEMAP_NEGATIVEX | dds::DDSCAPS2_CUBEMAP_POSITIVEY
-	| dds::DDSCAPS2_CUBEMAP_NEGATIVEY | dds::DDSCAPS2_CUBEMAP_POSITIVEZ
-	| dds::DDSCAPS2_CUBEMAP_NEGATIVEZ));
-    else if (head.capabilities.caps2 & dds::DDSCAPS2_VOLUME)
-      volMap = true;
-  }
+  if (head.capabilities.caps2 & dds::DDSCAPS2_CUBEMAP)
+    cubeMap = (head.capabilities.caps2 & (dds::DDSCAPS2_CUBEMAP_POSITIVEX
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEX | dds::DDSCAPS2_CUBEMAP_POSITIVEY
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEY | dds::DDSCAPS2_CUBEMAP_POSITIVEZ
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEZ));
+  else if (head.capabilities.caps2 & dds::DDSCAPS2_VOLUME)
+    volMap = true;
 
   uint Depth = (head.flags & dds::DDSD_DEPTH) ? head.depth : 1;
   size_t imgOffset = sizeof (dds::Header);
