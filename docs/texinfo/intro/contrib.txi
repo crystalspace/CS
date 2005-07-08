@@ -925,7 +925,7 @@ convertors from Quake @file{.mdl} and Quake 2 @file{.md2} to Crystal Space (now
 combined into the single mdl2spr utility.
 
 @item
-Neil Mosafi (@email{nmosafi@@totalise.co.uk})
+Neil Mosafi (@email{nmosafi@@gmail.com})
 
 Neil contributed a custom cursor plugin which allows use of arbitary images
 (via @samp{iImage}) as mouse cursors. Neil also worked on the @sc{vos}
