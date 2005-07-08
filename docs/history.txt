@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jul-2005
+	- res added the "DejaVu" TrueType fonts. They're based upon the "Vera"
+	  family (and shares its liberal license), but features additional
+	  non-Latin glyphs.
 6-Jul-2005
 	- Eric Sunshine updated numerous "Linux" references throughout the
 	  project to "GNU/Linux" in order to avoid perpetuating the myth that

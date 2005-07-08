@@ -1043,8 +1043,8 @@ void G2DTestSystemDriver::DrawUnicodeTest2 ()
 
 void G2DTestSystemDriver::DrawFreetypeTest ()
 {
-  const char* fontFaces[] = {"VeraSans", "VeraSansBoldOblique", 
-    "VeraSansMono", "VeraSerif", 0};
+  const char* fontFaces[] = {"DejaVuSans", "DejaVuSansBoldOblique", 
+    "DejaVuSansMono", "DejaVuSerif", 0};
   const int fontSizes[] = {4, 8, 12, 24, 0};
 
   int w = myG2D->GetWidth ();
