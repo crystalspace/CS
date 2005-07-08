@@ -152,6 +152,7 @@
   INTERFACE_APPLY(iCacheManager)
   INTERFACE_APPLY(iCollider)
   INTERFACE_APPLY(iCollideSystem)
+  INTERFACE_APPLY(iCommandLineParser)
   INTERFACE_APPLY(iComponent)
   INTERFACE_APPLY(iConfigFile)
   INTERFACE_APPLY(iConfigIterator)
@@ -223,6 +224,7 @@
   INTERFACE_APPLY(iSoundWrapper)
   INTERFACE_APPLY(iSoundDriver)
   INTERFACE_APPLY(iSoundSource)
+  INTERFACE_APPLY(iSoundListener)
   INTERFACE_APPLY(iSprite2DState)
   INTERFACE_APPLY(iSprite3DState)
   INTERFACE_APPLY(iSpriteCal3DState)
@@ -526,6 +528,7 @@ TYPEMAP_OUT_csWrapPtr
 
 #ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
+%include "iutil/cmdline.h"
 
 %ignore operator* (const csColor &, float);
 %ignore operator* (float , const csColor &);
@@ -919,6 +922,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "isound/wrapper.h"
 %include "isound/driver.h"
 %include "isound/source.h"
+%include "isound/listener.h"
 
 %include "iutil/comp.h"
 %include "iutil/cache.h"
