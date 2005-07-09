@@ -26,7 +26,7 @@ $\N\_{\n\_\o\}$%
 @end macro
 @end iftex
 
-@node Texture Mapping, , Alpha Textures, Materials
+@node Texture Mapping, Efficient Textures, Alpha Textures, Materials
 @subsection Texture Mapping
 @cindex Texture Mapping
 

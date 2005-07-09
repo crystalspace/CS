@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Efficient Textures, Texture Mapping, Materials, Materials
+@node Efficient Textures, , Texture Mapping, Materials
 @subsection Efficient Textures
 @cindex textures
 @cindex DDS
