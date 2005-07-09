@@ -230,6 +230,45 @@ _cspace.iDebugHelper_swigregister(iDebugHelperPtr)
 
 iDebugHelper_scfGetVersion = _cspace.iDebugHelper_scfGetVersion
 
+class iCommandLineParser(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iCommandLineParser, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iCommandLineParser, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iCommandLineParser instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Initialize(*args): return _cspace.iCommandLineParser_Initialize(*args)
+    def Reset(*args): return _cspace.iCommandLineParser_Reset(*args)
+    def GetOption(*args): return _cspace.iCommandLineParser_GetOption(*args)
+    def GetName(*args): return _cspace.iCommandLineParser_GetName(*args)
+    def AddOption(*args): return _cspace.iCommandLineParser_AddOption(*args)
+    def AddName(*args): return _cspace.iCommandLineParser_AddName(*args)
+    def ReplaceOption(*args): return _cspace.iCommandLineParser_ReplaceOption(*args)
+    def ReplaceName(*args): return _cspace.iCommandLineParser_ReplaceName(*args)
+    def GetBoolOption(*args): return _cspace.iCommandLineParser_GetBoolOption(*args)
+    def GetResourceDir(*args): return _cspace.iCommandLineParser_GetResourceDir(*args)
+    def GetAppDir(*args): return _cspace.iCommandLineParser_GetAppDir(*args)
+    def GetAppPath(*args): return _cspace.iCommandLineParser_GetAppPath(*args)
+    def __del__(self, destroy=_cspace.delete_iCommandLineParser):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCommandLineParser_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iCommandLineParser_scfGetVersion)
+
+class iCommandLineParserPtr(iCommandLineParser):
+    def __init__(self, this):
+        _swig_setattr(self, iCommandLineParser, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iCommandLineParser, 'thisown', 0)
+        _swig_setattr(self, iCommandLineParser,self.__class__,iCommandLineParser)
+_cspace.iCommandLineParser_swigregister(iCommandLineParserPtr)
+
+iCommandLineParser_scfGetVersion = _cspace.iCommandLineParser_scfGetVersion
+
 class csColor(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColor, name, value)
@@ -7002,6 +7041,74 @@ class iSoundSourcePtr(iSoundSource):
 _cspace.iSoundSource_swigregister(iSoundSourcePtr)
 
 iSoundSource_scfGetVersion = _cspace.iSoundSource_scfGetVersion
+
+ENVIRONMENT_GENERIC = _cspace.ENVIRONMENT_GENERIC
+ENVIRONMENT_PADDEDCELL = _cspace.ENVIRONMENT_PADDEDCELL
+ENVIRONMENT_ROOM = _cspace.ENVIRONMENT_ROOM
+ENVIRONMENT_BATHROOM = _cspace.ENVIRONMENT_BATHROOM
+ENVIRONMENT_LIVINGROOM = _cspace.ENVIRONMENT_LIVINGROOM
+ENVIRONMENT_STONEROOM = _cspace.ENVIRONMENT_STONEROOM
+ENVIRONMENT_AUDITORIUM = _cspace.ENVIRONMENT_AUDITORIUM
+ENVIRONMENT_CONCERTHALL = _cspace.ENVIRONMENT_CONCERTHALL
+ENVIRONMENT_CAVE = _cspace.ENVIRONMENT_CAVE
+ENVIRONMENT_ARENA = _cspace.ENVIRONMENT_ARENA
+ENVIRONMENT_CARPETEDHALLWAY = _cspace.ENVIRONMENT_CARPETEDHALLWAY
+ENVIRONMENT_HALLWAY = _cspace.ENVIRONMENT_HALLWAY
+ENVIRONMENT_STONECORRIDOR = _cspace.ENVIRONMENT_STONECORRIDOR
+ENVIRONMENT_ALLEY = _cspace.ENVIRONMENT_ALLEY
+ENVIRONMENT_FOREST = _cspace.ENVIRONMENT_FOREST
+ENVIRONMENT_CITY = _cspace.ENVIRONMENT_CITY
+ENVIRONMENT_MOUNTAINS = _cspace.ENVIRONMENT_MOUNTAINS
+ENVIRONMENT_QUARRY = _cspace.ENVIRONMENT_QUARRY
+ENVIRONMENT_PLAIN = _cspace.ENVIRONMENT_PLAIN
+ENVIRONMENT_PARKINGLOT = _cspace.ENVIRONMENT_PARKINGLOT
+ENVIRONMENT_SEWERPIPE = _cspace.ENVIRONMENT_SEWERPIPE
+ENVIRONMENT_UNDERWATER = _cspace.ENVIRONMENT_UNDERWATER
+ENVIRONMENT_DRUGGED = _cspace.ENVIRONMENT_DRUGGED
+ENVIRONMENT_DIZZY = _cspace.ENVIRONMENT_DIZZY
+ENVIRONMENT_PSYCHOTIC = _cspace.ENVIRONMENT_PSYCHOTIC
+class iSoundListener(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundListener, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSoundListener, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSoundListener instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetDirection(*args): return _cspace.iSoundListener_SetDirection(*args)
+    def SetPosition(*args): return _cspace.iSoundListener_SetPosition(*args)
+    def SetVelocity(*args): return _cspace.iSoundListener_SetVelocity(*args)
+    def SetDistanceFactor(*args): return _cspace.iSoundListener_SetDistanceFactor(*args)
+    def SetRollOffFactor(*args): return _cspace.iSoundListener_SetRollOffFactor(*args)
+    def SetDopplerFactor(*args): return _cspace.iSoundListener_SetDopplerFactor(*args)
+    def SetHeadSize(*args): return _cspace.iSoundListener_SetHeadSize(*args)
+    def SetEnvironment(*args): return _cspace.iSoundListener_SetEnvironment(*args)
+    def GetDirection(*args): return _cspace.iSoundListener_GetDirection(*args)
+    def GetPosition(*args): return _cspace.iSoundListener_GetPosition(*args)
+    def GetVelocity(*args): return _cspace.iSoundListener_GetVelocity(*args)
+    def GetDistanceFactor(*args): return _cspace.iSoundListener_GetDistanceFactor(*args)
+    def GetRollOffFactor(*args): return _cspace.iSoundListener_GetRollOffFactor(*args)
+    def GetDopplerFactor(*args): return _cspace.iSoundListener_GetDopplerFactor(*args)
+    def GetHeadSize(*args): return _cspace.iSoundListener_GetHeadSize(*args)
+    def GetEnvironment(*args): return _cspace.iSoundListener_GetEnvironment(*args)
+    def __del__(self, destroy=_cspace.delete_iSoundListener):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSoundListener_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSoundListener_scfGetVersion)
+
+class iSoundListenerPtr(iSoundListener):
+    def __init__(self, this):
+        _swig_setattr(self, iSoundListener, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSoundListener, 'thisown', 0)
+        _swig_setattr(self, iSoundListener,self.__class__,iSoundListener)
+_cspace.iSoundListener_swigregister(iSoundListenerPtr)
+
+iSoundListener_scfGetVersion = _cspace.iSoundListener_scfGetVersion
 
 class iComponent(iBase):
     __swig_setmethods__ = {}
