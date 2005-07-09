@@ -26,7 +26,7 @@ Bottom line: Use power-of-two sized textures.
 
 Another facet is what size actually to use; it all depends on the content, of 
 course. Some points to consider:
-@itemize
+@itemize @bullet
 @item The days were certain hardware was limited to 256x256 textures are long 
 gone; nowadays, the limit is 2048x2048 or 4096x4096. Texture compression also 
 allows for performant high-resolution textures; so use them.
@@ -68,11 +68,11 @@ However, the best format you can use is actually @sc{dds}.
 
 To determine why, take a look at what happens if e.g. a PNG texture is loaded 
 into CS:
-@itemize
+@enumerate
 @item The texture is uncompressed.
 @item Mipmaps are created.
 @item The textures are uploaded to the hardware.
-@end itemize
+@end enumerate
 
 Unobviously, step 3 actually contains a recompression. That is due the fact 
 that CrystalSpace uses texture compression (which has a positive effect 
@@ -81,7 +81,7 @@ which means that the driver needs to compress the texture - this costs some
 time.
 
 @sc{dds} offers an advantage here, as, in @sc{dds} files, 
-@itemize
+@itemize @bullet
 @item image data can be stored in the same compression format(s) that hardware 
 nowaday uses (@sc{dxt1}, @sc{dxt3}, @sc{dxt5}) 
 @item the mipmaps of a texture can be stored. 
