@@ -331,6 +331,49 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iCommandLineParser ##############
+
+package cspace::iCommandLineParser;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Initialize = *cspacec::iCommandLineParser_Initialize;
+*Reset = *cspacec::iCommandLineParser_Reset;
+*GetOption = *cspacec::iCommandLineParser_GetOption;
+*GetName = *cspacec::iCommandLineParser_GetName;
+*AddOption = *cspacec::iCommandLineParser_AddOption;
+*AddName = *cspacec::iCommandLineParser_AddName;
+*ReplaceOption = *cspacec::iCommandLineParser_ReplaceOption;
+*ReplaceName = *cspacec::iCommandLineParser_ReplaceName;
+*GetBoolOption = *cspacec::iCommandLineParser_GetBoolOption;
+*GetResourceDir = *cspacec::iCommandLineParser_GetResourceDir;
+*GetAppDir = *cspacec::iCommandLineParser_GetAppDir;
+*GetAppPath = *cspacec::iCommandLineParser_GetAppPath;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCommandLineParser($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iCommandLineParser_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csColor ##############
 
 package cspace::csColor;
@@ -7913,6 +7956,53 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSoundListener ##############
+
+package cspace::iSoundListener;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetDirection = *cspacec::iSoundListener_SetDirection;
+*SetPosition = *cspacec::iSoundListener_SetPosition;
+*SetVelocity = *cspacec::iSoundListener_SetVelocity;
+*SetDistanceFactor = *cspacec::iSoundListener_SetDistanceFactor;
+*SetRollOffFactor = *cspacec::iSoundListener_SetRollOffFactor;
+*SetDopplerFactor = *cspacec::iSoundListener_SetDopplerFactor;
+*SetHeadSize = *cspacec::iSoundListener_SetHeadSize;
+*SetEnvironment = *cspacec::iSoundListener_SetEnvironment;
+*GetDirection = *cspacec::iSoundListener_GetDirection;
+*GetPosition = *cspacec::iSoundListener_GetPosition;
+*GetVelocity = *cspacec::iSoundListener_GetVelocity;
+*GetDistanceFactor = *cspacec::iSoundListener_GetDistanceFactor;
+*GetRollOffFactor = *cspacec::iSoundListener_GetRollOffFactor;
+*GetDopplerFactor = *cspacec::iSoundListener_GetDopplerFactor;
+*GetHeadSize = *cspacec::iSoundListener_GetHeadSize;
+*GetEnvironment = *cspacec::iSoundListener_GetEnvironment;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSoundListener($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSoundListener_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iComponent ##############
 
 package cspace::iComponent;
@@ -13206,6 +13296,31 @@ sub SOUND3D_DISABLE () { $cspacec::SOUND3D_DISABLE }
 sub SOUND3D_RELATIVE () { $cspacec::SOUND3D_RELATIVE }
 sub SOUND3D_ABSOLUTE () { $cspacec::SOUND3D_ABSOLUTE }
 sub SOUND_DISTANCE_INFINITE () { $cspacec::SOUND_DISTANCE_INFINITE }
+sub ENVIRONMENT_GENERIC () { $cspacec::ENVIRONMENT_GENERIC }
+sub ENVIRONMENT_PADDEDCELL () { $cspacec::ENVIRONMENT_PADDEDCELL }
+sub ENVIRONMENT_ROOM () { $cspacec::ENVIRONMENT_ROOM }
+sub ENVIRONMENT_BATHROOM () { $cspacec::ENVIRONMENT_BATHROOM }
+sub ENVIRONMENT_LIVINGROOM () { $cspacec::ENVIRONMENT_LIVINGROOM }
+sub ENVIRONMENT_STONEROOM () { $cspacec::ENVIRONMENT_STONEROOM }
+sub ENVIRONMENT_AUDITORIUM () { $cspacec::ENVIRONMENT_AUDITORIUM }
+sub ENVIRONMENT_CONCERTHALL () { $cspacec::ENVIRONMENT_CONCERTHALL }
+sub ENVIRONMENT_CAVE () { $cspacec::ENVIRONMENT_CAVE }
+sub ENVIRONMENT_ARENA () { $cspacec::ENVIRONMENT_ARENA }
+sub ENVIRONMENT_CARPETEDHALLWAY () { $cspacec::ENVIRONMENT_CARPETEDHALLWAY }
+sub ENVIRONMENT_HALLWAY () { $cspacec::ENVIRONMENT_HALLWAY }
+sub ENVIRONMENT_STONECORRIDOR () { $cspacec::ENVIRONMENT_STONECORRIDOR }
+sub ENVIRONMENT_ALLEY () { $cspacec::ENVIRONMENT_ALLEY }
+sub ENVIRONMENT_FOREST () { $cspacec::ENVIRONMENT_FOREST }
+sub ENVIRONMENT_CITY () { $cspacec::ENVIRONMENT_CITY }
+sub ENVIRONMENT_MOUNTAINS () { $cspacec::ENVIRONMENT_MOUNTAINS }
+sub ENVIRONMENT_QUARRY () { $cspacec::ENVIRONMENT_QUARRY }
+sub ENVIRONMENT_PLAIN () { $cspacec::ENVIRONMENT_PLAIN }
+sub ENVIRONMENT_PARKINGLOT () { $cspacec::ENVIRONMENT_PARKINGLOT }
+sub ENVIRONMENT_SEWERPIPE () { $cspacec::ENVIRONMENT_SEWERPIPE }
+sub ENVIRONMENT_UNDERWATER () { $cspacec::ENVIRONMENT_UNDERWATER }
+sub ENVIRONMENT_DRUGGED () { $cspacec::ENVIRONMENT_DRUGGED }
+sub ENVIRONMENT_DIZZY () { $cspacec::ENVIRONMENT_DIZZY }
+sub ENVIRONMENT_PSYCHOTIC () { $cspacec::ENVIRONMENT_PSYCHOTIC }
 sub VFS_PATH_DIVIDER () { $cspacec::VFS_PATH_DIVIDER }
 sub VFS_PATH_SEPARATOR () { $cspacec::VFS_PATH_SEPARATOR }
 sub VFS_MAX_PATH_LEN () { $cspacec::VFS_MAX_PATH_LEN }
