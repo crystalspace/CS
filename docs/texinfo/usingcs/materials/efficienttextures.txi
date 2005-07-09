@@ -98,7 +98,7 @@ those of @sc{png} and @sc{jpg} files.
 @sc{dds} files can be created with e.g. a Photoshop plugin to export DDS files 
 which is available from NVidia 
 (@uref{http://developer.nvidia.com/object/nv_texture_tools.html}) or GIMP 
-@sc{DDS} plugins which are also available on the web 
+@sc{dds} plugins which are also available on the web 
 (@uref{http://nifelheim.dyndns.org/~cocidius/dds/}). Last but not least, CS'
 @sc{dds} plugin is also able to save @sc{dds} files, in conjunction with the
 @file{gfxtest} app you can have a simple @sc{dds} converter.

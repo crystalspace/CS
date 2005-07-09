@@ -79,7 +79,7 @@
 @token{)}
 @end macro
 
-@node Old Map File Format, , XML File Format, Map Loader
+@node Old Map File Format, Binary XML, XML File Format, Map Loader
 @subsection Old Format of Map File
 @cindex Old Format of Map File
 @cindex Old Map File Format

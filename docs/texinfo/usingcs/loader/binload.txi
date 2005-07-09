@@ -1,0 +1,63 @@
+@c -*-texinfo-*-
+@node Binary XML, , Old Map File Format, Map Loader
+@subsection binary @sc{xml}
+@cindex @code{iDocumentSystem}
+@cindex @samp{docconv}
+@cindex @sc{xml}
+
+Crystal Space supports various @sc{xml} loading plugins. One of those plugins
+is the binary @sc{xml} plugin which encodes @sc{xml} in a binary format that
+is faster to load (but not necesarily smaller).
+
+@subsubheading Converting to and from Binary Format
+
+Using the @samp{docconv} utility you can convert between various document
+formats. To convert a document to binary you can use:
+
+@example
+docconv -outds=binary filename
+@end example
+
+@samp{filename} is either a @sc{vfs} path to a single file or else the
+name of a @sc{zip} archive. In that case the @file{world} file out of that
+archive will be converted.
+
+To convert a document from binary to ascii @sc{xml} you can use:
+
+@example
+docconv -outds=tinyxml filename
+@end example
+
+@subsubheading Making Crystal Space Support Binary
+
+Just add the following lines to your application configuration file:
+
+@example
+System.Plugins.iDocumentSystem = crystalspace.documentsystem.multiplexer
+System.Plugins.iDocumentSystem.1 = crystalspace.documentsystem.xmlread
+System.Plugins.iDocumentSystem.2 = crystalspace.documentsystem.binary
+@end example
+
+The first line means that the document system multiplexer is used when
+a document is read. This multiplexer makes sure that the correct reader
+for a format is used. The second line instructs the multiplexer to try
+to parse all documents with the XML reader first. (The xmlread plugin
+parses an XML file faster than the tinyxml plugin, however, only the
+latter one supports creation and modification of XML files - which usually
+isn't needed for map files and alike.)
+
+@subsubheading If you Parse Documents Manually
+
+If you read CS documents @emph{manually} somewhere in your app, you should
+use the following snippet to obtain a document system object:
+
+@example
+csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (object_reg,
+	iDocumentSystem)));
+if (xml == 0)
+  docsys.AttachNew (new csTinyDocumentSystem ());
+@end example
+
+This uses the document system specified in you app config, but if none was
+specified falls back to the TinyXML system.
+
