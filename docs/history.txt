@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jul-2005
+	- Peter Amstutz committed a fix to csQuaternion where initializing
+	  it with an identity matrix could cause a divide by zero
 9-Jul-2005
 	- Jorrit added a section about binary XML to the manual.
 8-Jul-2005
