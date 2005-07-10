@@ -74,17 +74,17 @@ csQuaternion csQuaternion::Slerp (
   float slerp) const
 {
   double omega, cosom, invsinom, scale0, scale1;
-
+  
   csQuaternion quato(quat2);
-
+  
   // decide if one of the quaternions is backwards
   double a = (x-quat2.x)*(x-quat2.x) + (y-quat2.y)*(y-quat2.y) + (z-quat2.z)*(z-quat2.z) + (r-quat2.r)*(r-quat2.r);
   double b = (x+quat2.x)*(x+quat2.x) + (y+quat2.y)*(y+quat2.y) + (z+quat2.z)*(z+quat2.z) + (r+quat2.r)*(r+quat2.r);
-  if (a > b)
+  if (a > b) 
   {
       quato.Negate();
   }
-
+  
   // Calculate dot between quats
   cosom = x * quato.x + y * quato.y + z * quato.z + r * quato.r;
 
@@ -136,21 +136,13 @@ csQuaternion::csQuaternion(const csMatrix3& mat)
     tr = mat.m11 + mat.m22 + mat.m33 + 1.0;
 
     // check the diagonal
-    if ((tr + SMALL_EPSILON) >= 4.0)
-    {
-        // it's the identity matrix, so set identity quaternion
-        r = x = y = z = 0;
-    }
-    else if (tr > 0.0)
-    {
+    if (tr > 0.0) {
         s = 0.5 / sqrt (tr);
         r = 0.25 / s;
         x = (mat.m32 - mat.m23) * s;
         y = (mat.m13 - mat.m31) * s;
         z = (mat.m21 - mat.m12) * s;
-    }
-    else
-    {
+    } else {
         // diagonal is negative
         i = 1;
         if (mat.m22 > mat.m11) i = 2;
@@ -169,8 +161,7 @@ csQuaternion::csQuaternion(const csMatrix3& mat)
             m33 = 10
             */
 
-        switch(i)
-        {
+        switch(i) {
         case 1:
             s = sqrt ((mat.m11 - (mat.m22 + mat.m33)) + 1.0);
 
@@ -232,10 +223,6 @@ void csQuaternion::GetAxisAngle(csVector3& axis, float& phi) const
     axis.y = y / ss;
     axis.z = z / ss;
 
-    if (x == y == z == 0)
-    {
-        axis.z = 1.0;
-    }
 }
 
 void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
