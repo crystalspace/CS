@@ -25,6 +25,7 @@
 #include "iutil/eventq.h"
 #include "iutil/comp.h"
 #include "csutil/cfgacc.h"
+#include "csutil/dirtyaccessarray.h"
 
 #define DIRECTINPUT_VERSION 0x0500
 // @@@ Should be able build on older SDKs as well
@@ -40,21 +41,29 @@
 class csWindowsJoystick : public iComponent
 {
 private:
+  struct joystate
+  {
+    DIJOYSTATE2 di;			// DInput state structure
+    csDirtyAccessArray<int32> axes;	// Axes in this state
+    joystate() { memset(&di, 0, sizeof(di)); }
+    joystate(joystate const& j) : axes(j.axes)
+    { memcpy(&di, &j.di, sizeof(di)); }
+  };
   struct joydata
   {
     int number;			 // joystick number; CS numbers are 1-based
     LPDIRECTINPUTDEVICE2 device; // DInput device
     int nButtons;		 // number of buttons
-    int nAxes;			 // number of axis
-    DIJOYSTATE2 state[2];	 // state of Joystick, last state
+    uint nAxes;			 // number of axis
+    joystate state[2];		 // joystick current & last state
     int nstate;			 // this is current state
-    joydata()
+    joydata() : number(0), device(0), nButtons(0), nAxes(0), nstate(0) {}
+    joydata(joydata const& j) : number(j.number), device(j.device),
+      nButtons(j.nButtons), nAxes(j.nAxes), nstate(j.nstate)
     {
-      device = 0;
-      nstate = 0;
-      memset (state, 0, sizeof (state));
+      for (int i = 0; i < 2; i++)
+        state[i] = j.state[i];
     }
-    ~joydata() {}
   };
 
  protected:
@@ -68,6 +77,7 @@ private:
   bool Init ();
   bool Close ();
   void Report (int severity, const char* msg, ...);
+  void LoadAxes(joystate&);
 
  public:
   SCF_DECLARE_IBASE;

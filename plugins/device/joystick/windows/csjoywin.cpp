@@ -17,18 +17,17 @@
 */
 
 #include "cssysdef.h"
-#include "csver.h"
-#include "ivaria/reporter.h"
-#include "csutil/util.h"
 #include "csutil/csstring.h"
+#include "csutil/event.h"
+#include "csutil/util.h"
+#include "csutil/win32/win32.h"
+#include "csutil/win32/wintools.h"
+#include "ivaria/reporter.h"
+
 #define INITGUID
 #include <windows.h>
-
 // using DirectInput -- included from csjoywin.h
 #include "csjoywin.h"
-
-#include "csutil/win32/wintools.h"
-#include "csutil/win32/win32.h"
 
 // no config yet
 // #define CS_WINDOWS_JOYSTICK_CFG "/config/joystick.cfg"
@@ -77,43 +76,60 @@ bool csWindowsJoystick::Initialize (iObjectRegistry* oreg)
   return Init ();
 }
 
-bool csWindowsJoystick::HandleEvent (iEvent &)
+void csWindowsJoystick::LoadAxes(joystate& j)
 {
-  HRESULT hr;
-  int nstate, last_state;
+  size_t const n = j.axes.Length();
+  if (n > 0) j.axes[0] = j.di.lX;
+  if (n > 1) j.axes[1] = j.di.lY;
+  if (n > 2) j.axes[2] = j.di.lZ;
+  if (n > 3) j.axes[3] = j.di.lRx;
+  if (n > 4) j.axes[4] = j.di.lRy;
+  if (n > 5) j.axes[5] = j.di.lRz;
+  if (n > 6) j.axes[6] = j.di.rglSlider[0];
+  if (n > 7) j.axes[7] = j.di.rglSlider[1];
+}
+
+bool csWindowsJoystick::HandleEvent (iEvent& ev)
+{
+  if (ev.Type != csevBroadcast ||
+      csCommandEventHelper::GetCode(&ev) != cscmdPreProcess)
+    return false;
+
   for (size_t i = 0; i < joystick.Length (); i++)
   {
     joydata& jd = joystick[i];
     jd.device->Poll ();
-    nstate = jd.nstate;
-    hr = jd.device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
-      (LPVOID)&jd.state[nstate]);
+    int nstate = jd.nstate;
+    HRESULT hr = jd.device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
+      (LPVOID)&jd.state[nstate].di);
     if (FAILED (hr))
     {
       jd.device->Acquire();  // try to reacquire
       // ... and try again
       hr = jd.device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
-	(LPVOID)&jd.state[nstate]);
+	(LPVOID)&jd.state[nstate].di);
     } 
     if (SUCCEEDED (hr))
     {
-      last_state=1-nstate;
+      LoadAxes(jd.state[nstate]);
+
+      int last_state=1-nstate;
       for (int btn = 0; btn < 128; btn++) 
       {
-        if (jd.state[nstate].rgbButtons[btn] != 
-	  jd.state[last_state].rgbButtons[btn]) 
-	{
-	  int32 axdata[2] = { jd.state[nstate].lX, jd.state[nstate].lY };
+        if (jd.state[nstate].di.rgbButtons[btn] != 
+	    jd.state[last_state].di.rgbButtons[btn]) 
           EventOutlet->Joystick (jd.number, btn + 1, 
-				 jd.state[nstate].rgbButtons[btn] != 0,
-				 axdata, 2);
-        }
+				 jd.state[nstate].di.rgbButtons[btn] != 0,
+				 jd.state[nstate].axes.GetArray(), jd.nAxes);
       }    
-      if ((jd.state[nstate].lX != jd.state[last_state].lX) ||
-        (jd.state[nstate].lY != jd.state[last_state].lY))
+      for (uint a = 0; a < jd.nAxes; a++)
       {
-	int32 axdata[2] = { jd.state[nstate].lX, jd.state[nstate].lY };
-        EventOutlet->Joystick (jd.number, 0, 0, axdata, 2);
+        if (jd.state[nstate].axes[a] != jd.state[last_state].axes[a])
+	{
+          EventOutlet->Joystick (jd.number, 0, 0,
+	    jd.state[nstate].axes.GetArray(), jd.nAxes);
+	  break;
+	}
       }
       jd.nstate=last_state;
     }
@@ -121,64 +137,71 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
   return false;
 }
 
-// DirectInputDeviceEnumerator Function
-
-BOOL CALLBACK DIEnumDevicesCallback(
-  LPCDIDEVICEINSTANCE lpddi,  
-  LPVOID pvRef)
+static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCE i, LPVOID p)
 {
-  csWindowsJoystick* po;
-  po = (csWindowsJoystick*) pvRef;
-  po->CreateDevice (lpddi);
+  // Configure to return data in the range (-32767..32767)
+  DIPROPRANGE diprg;
+  diprg.diph.dwSize = sizeof (diprg);
+  diprg.diph.dwHeaderSize = sizeof (diprg.diph);
+  diprg.diph.dwHow = DIPH_BYID;
+  diprg.diph.dwObj = i->dwType;
+  diprg.lMin = -32767;
+  diprg.lMax =  32767;
+
+  LPDIRECTINPUTDEVICE2 device = (LPDIRECTINPUTDEVICE2)p;
+  device->SetProperty (DIPROP_RANGE, &diprg.diph);
+
   return DIENUM_CONTINUE;
 }
 
 bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
 { 
-  DIDEVCAPS caps;
   LPDIRECTINPUTDEVICE device;
   lpdin->CreateDevice (pdidInstanc->guidInstance, &device, 0);
-  if (device) 
+  bool const ok = (device != 0);
+  if (ok) 
   {
-    joydata data;
-    data.number = (int)joystick.Length() + 1; // CS joystick numbers are 1-based.
+    LPDIRECTINPUTDEVICE2 device2 = (LPDIRECTINPUTDEVICE2)device;
+
+    DIDEVCAPS caps;
     caps.dwSize = sizeof (caps);
-    data.device = (LPDIRECTINPUTDEVICE2)device;
-    data.device->GetCapabilities (&caps);
-    data.nAxes = caps.dwAxes;
-    data.nButtons = caps.dwButtons;    
-    data.device->SetDataFormat (&c_dfDIJoystick2);
+    device2->GetCapabilities (&caps);
+    device2->SetDataFormat (&c_dfDIJoystick2);
 
-    // Configure to return data in the range (-32767..32767)
-    DIPROPRANGE diprg;
-    diprg.diph.dwSize = sizeof (diprg);
-    diprg.diph.dwHeaderSize = sizeof (diprg.diph);
-    diprg.diph.dwHow = DIPH_BYOFFSET;
-    diprg.lMin = -32767;
-    diprg.lMax = 32767;  
-
-    diprg.diph.dwObj = 0; // lX
-    data.device->SetProperty (DIPROP_RANGE, &diprg.diph);
-    diprg.diph.dwObj = 1 * sizeof(LONG); //lY
-    data.device->SetProperty (DIPROP_RANGE, &diprg.diph);
-
-    joystick.Push (data);
+    if (SUCCEEDED(device2->EnumObjects(axes_callback, (LPVOID)device2,
+      DIDFT_AXIS)))
+    {
+      joydata data;
+      data.number = (int)joystick.Length() + 1; // CS joystick numbers 1-based
+      data.device = device2;
+      data.nButtons = caps.dwButtons;    
+      data.nAxes = (uint)caps.dwAxes;
+      for (int i = 0; i < 2; i++)
+        data.state[i].axes.SetSize(data.nAxes);
+      joystick.Push (data);
+    }
   }
-  return true;
+  return ok;
+}
+
+static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
+{
+  csWindowsJoystick* po = (csWindowsJoystick*)pvRef;
+  po->CreateDevice (lpddi);
+  return DIENUM_CONTINUE;
 }
 
 bool csWindowsJoystick::Init ()
 {
-  csRef<iWin32Assistant> win32 = CS_QUERY_REGISTRY (object_reg, 
-    iWin32Assistant);
+  csRef<iWin32Assistant> win32 = CS_QUERY_REGISTRY(object_reg, iWin32Assistant);
   HRESULT hr = DirectInputCreate (win32->GetInstance (), DIRECTINPUT_VERSION, 
     &lpdin, NULL);
   if (SUCCEEDED (hr))
   {
     HWND window = win32->GetApplicationWindow ();
     // Only enum attached Joysticks, get Details of Devices
-    lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &DIEnumDevicesCallback,
-      (LPVOID)this,  DIEDFL_ATTACHEDONLY);
+    lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &dev_callback,
+      (LPVOID)this, DIEDFL_ATTACHEDONLY);
     size_t i;
     size_t const njoys = joystick.Length();
     for (i = 0; i < njoys; i++) 
@@ -224,7 +247,7 @@ bool csWindowsJoystick::Init ()
       eq = CS_QUERY_REGISTRY(object_reg, iEventQueue);
       if (eq)
       {
-	eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+	eq->RegisterListener (&scfiEventHandler, CSMASK_FrameProcess);
 	EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
       }
     }
@@ -239,7 +262,6 @@ bool csWindowsJoystick::Init ()
 
   return eq && EventOutlet;
 }
-
 
 bool csWindowsJoystick::Close ()
 {

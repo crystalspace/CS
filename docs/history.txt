@@ -8,7 +8,11 @@ chronological order.
 
 10-Jul-2005
 	- Peter Amstutz committed a fix to csQuaternion where initializing
-	  it with an identity matrix could cause a divide by zero
+	  it with an identity matrix could cause a divide by zero.
+	- Eric Sunshine augmented the Windows joystick driver so that it
+	  supports any number of axes rather than being hard-coded for only
+	  two.  Also fixed bug where it performed an excessive amount of work
+	  per poll.
 9-Jul-2005
 	- Jorrit added a section about binary XML to the manual.
 8-Jul-2005
