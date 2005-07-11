@@ -16,8 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 
-#ifndef __CS_IAWS_AWS_H__
-#define __CS_IAWS_AWS_H__
+#ifndef __AWS_INTERFACE_10_H__
+#define __AWS_INTERFACE_10_H__
+
+#ifdef __AWS_INTERFACE_20_H__
+# error "aws2.h included before aws.h.  You cannot mix and match the two versions!"
+#endif
+
+
 
 /**\file 
  * Advanced Windowing System
