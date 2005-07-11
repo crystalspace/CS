@@ -146,20 +146,18 @@ public:
    * Copy and return a portion of this string.  This version differs from Slice()
    * in that the 'start' parameter is counted from the END of the string rather than
    * the beginning. The substring runs from `start'
-   * for `len' characters.  If 'start' and 'len' are omitted, a copy of the whole
-   * string is returned.  If 'len' is omitted, a copy of the string containing
+   * for `len' characters. If 'len' is omitted, a copy of the string containing
    * all characters after (and including) start is returned.
    */
-  virtual csRef<iString> ReverseSlice (size_t start=0, size_t len=0) const;
+  virtual csRef<iString> ReverseSlice (size_t start, size_t len=0) const;
 
   /**
    * Copy a portion of this string.  The result is placed in 'sub'.  The
-   * substring is from 'start', of length 'len'. 
-   * If 'start' and 'len' are omitted, a copy of the whole string is returned.  
+   * substring is from 'start', of length 'len'.  
    * If 'len' is omitted, a copy of the string    
    * containing all characters after (and including) 'start' is returned.
    */
-  virtual void SubString (iString* sub, size_t start=0, size_t len=0) const;
+  virtual void SubString (iString* sub, size_t start, size_t len=0) const;
 
   /**
    * Copy a portion of this string.  This version differs from SubString()
