@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jul-2005
+        - Christopher Nelson made the following AWS modifications:
+           * Changed the header guard name, added some checks to the headers 
+           to make sure they're not accidentally BOTH being included.
+           * Made massive changes all over, replacing std::string in 
+           many cases with scfString.
+        - Christopher Nelson changed scfstring so that it has automatic 
+        variables for start and len, and added single character append functions.
+
 10-Jul-2005
 	- Peter Amstutz committed a fix to csQuaternion where initializing
 	  it with an identity matrix could cause a divide by zero.
