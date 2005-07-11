@@ -14,6 +14,9 @@ chronological order.
            many cases with scfString.
         - Christopher Nelson changed scfstring so that it has automatic 
         variables for start and len, and added single character append functions.
+        - Christopher also added ReverseSlice and ReverseSubString, which are just
+        like their non-reversed counterparts except that the offset for the start
+        parameter is counted from the end.
 
 10-Jul-2005
 	- Peter Amstutz committed a fix to csQuaternion where initializing
