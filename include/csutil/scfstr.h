@@ -131,17 +131,25 @@ public:
   /// Append a string to this one (possibly iCount characters from the string)
   virtual void Append (iString const* iStr, size_t iCount = (size_t)-1);
 
+  /// Append a single character to this string.
+  virtual void Append (char c);
+
   /**
    * Copy and return a portion of this string.  The substring runs from `start'
-   * for `len' characters.
+   * for `len' characters.  If 'start' and 'len' are omitted, a copy of the whole
+   * string is returned.  If 'len' is omitted, a copy of the string containing
+   * all characters after (and including) start is returned.
    */
-  virtual csRef<iString> Slice (size_t start, size_t len) const;
+  virtual csRef<iString> Slice (size_t start=0, size_t len=0) const;
 
   /**
    * Copy a portion of this string.  The result is placed in 'sub'.  The
-   * substring is from 'start', of length 'len'.
+   * substring is from 'start', of length 'len'. 
+   * If 'start' and 'len' are omitted, a copy of the whole string is returned.  
+   * If 'len' is omitted, a copy of the string    
+   * containing all characters after (and including) 'start' is returned.
    */
-  virtual void SubString (iString* sub, size_t start, size_t len) const;
+  virtual void SubString (iString* sub, size_t start=0, size_t len=0) const;
 
   /**
    * Find first character 'c' from position 'p'.
@@ -197,6 +205,9 @@ public:
 
   /// Append a null-terminated string to this string
   virtual void operator += (const char* iStr);
+
+  /// Append a single character to this string.
+  virtual void operator += (char c);
 
   /// Concatenate two strings and return a third one
   virtual csRef<iString> operator + (const iString &iStr) const;

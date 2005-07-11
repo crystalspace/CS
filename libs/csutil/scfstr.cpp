@@ -84,18 +84,37 @@ void scfString::Append (const char* iStr, size_t iCount)
 void scfString::Append (iString const* iStr, size_t iCount)
 { s.Append (iStr->GetData (), iCount); }
 
+void scfString::Append (char c)
+{
+  s.Append(c);
+}
+
 csRef<iString> scfString::Slice(size_t start, size_t len) const
 {
+  if (start==0 && len==0) return Clone();
+  if (len==0) len=Length()-start;
+
   csString const tmp(s.Slice(start, len));
   return csPtr<iString>(new scfString(tmp));
 }
 
 void scfString::SubString (iString* sub, size_t start, size_t len) const
 {
-  csString tmp;
-  s.SubString(tmp, start, len);
+  if (sub==0) return;
+
   sub->Truncate(0);
-  sub->Append(tmp.GetData(), tmp.Length());
+
+  if (start==0 && len==0)
+  { 
+    sub->Append(GetData(), Length());
+    return;
+  }
+
+  if (len==0) len=Length()-start;
+
+  csString tmp;
+  s.SubString(tmp, start, len);  
+  sub->Append(tmp.GetData(), tmp.Length());  
 }
 
 size_t scfString::FindFirst (const char c, size_t p) const
@@ -138,6 +157,9 @@ void scfString::operator += (const iString& iStr)
 
 void scfString::operator += (const char* iStr)
 { Append (iStr); }
+
+void scfString::operator += (char c)
+{ Append(c); }
 
 csRef<iString> scfString::operator + (const iString& iStr) const
 {
