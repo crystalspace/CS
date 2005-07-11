@@ -26,12 +26,16 @@
 
 namespace autom
 {
+
+  SCF_IMPLEMENT_IBASE(object)
+    SCF_IMPLEMENTS_INTERFACE(iObject)  
+  SCF_IMPLEMENT_IBASE_END
 	
 /////////////////////////////////// Object - Record Allocation with GC ///////////////////////////////////////
 
 object::object(TYPE _otype):otype(_otype) 
 {
-
+  
 }
 	
 
@@ -122,10 +126,10 @@ integer::toFloat()
 	return floating((float)value);	
 }
 
-std::string
+scfString
 integer::reprObject()
 {
-	return toString().Value();
+	return toString().Value().c_str();
 }
 
 bool
@@ -169,10 +173,10 @@ floating::toFloat()
 	return floating(value);	
 }
 
-std::string
+scfString
 floating::reprObject()
 {
-	return toString().Value();
+	return toString().Value().c_str();
 }
 
 bool
@@ -260,10 +264,10 @@ list::toFloat()
 	return floating(0.0);	
 }
 
-std::string
+scfString
 list::reprObject()
 {
-	return toString().Value();
+	return toString().Value().c_str();
 }
 
 bool
@@ -333,7 +337,7 @@ reference::toFloat()
 	return (*fn)[value]->toFloat();
 }
 
-std::string
+scfString
 reference::reprObject()
 {
 	return value;
@@ -375,10 +379,10 @@ nil::toFloat()
 	return floating(0.0);	
 }
 
-std::string
+scfString
 nil::reprObject()
 {
-	return std::string("nil");
+	return scfString("nil");
 }
 
 bool

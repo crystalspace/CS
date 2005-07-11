@@ -58,7 +58,7 @@ bool
 function::bind()
 {
 	// Look it up.
-	std::pair<bool, registrar::func_ptr> result = Registrar()->lookup(getName());
+  std::pair<bool, registrar::func_ptr> result = Registrar()->lookup(std::string(getName().GetData()));
 	
 	// If we found a function, great, otherwise we'll retry the bind next time we're called.
 	if (result.first==true)	
@@ -71,7 +71,7 @@ function::bind()
 }
 
 bool 
-function::addParm(const std::string &parm_name, std::string &_value)
+function::addParm(const scfString &parm_name, std::string &_value)
 {
 	std::string::iterator pos=_value.begin();
 	
@@ -83,7 +83,7 @@ function::addParm(const std::string &parm_name, std::string &_value)
 	return true;
 }
 
-std::string
+scfString
 function::reprObject()
 {
 	std::string rep;
@@ -113,7 +113,7 @@ function::reprObject()
 		if (rv.IsValid()) rep=rv->reprObject();							
 	}
 	
-	return rep;
+	return rep.c_str();
 }
 
 /** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
@@ -166,7 +166,7 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 	
 // 	out << "pass full name: '" << fname << "'\n";
 	
-	setName(fname);
+	setName(fname.c_str());
 	
 	// Stop here and bind to native code.
 	bind();
@@ -205,7 +205,7 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 		object *o = ParseParameter(pos, end, this);
 		
 		// Insert it into our parameter map.
-		if (o) parms.insert(std::make_pair(parm_name, o));		
+		if (o) parms.insert(std::make_pair(parm_name.c_str(), o));		
 		else
 		{
 // 			out << "failed function parse: " << fname << "->" << parm_name << " col: " << (int)(pos-start) << "\n";
@@ -226,14 +226,15 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 }
 
 function::rc_parm 
-function::operator[](const std::string &name)
+function::operator[](const scfString &name)
 {
 	
-	if (name[0]=='$' && parent)
+	if (name.GetAt(0)=='$' && parent)
 	{		
-			std::string temp(name);
-			
-			return (*parent)[temp.substr(1)];		
+			scfString temp;
+			name.SubString(&temp, 1);
+						
+			return (*parent)[temp];		
 	}
 	
 	parm_map_type::iterator pos = parms.find(name);

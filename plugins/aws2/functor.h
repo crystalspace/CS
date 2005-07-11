@@ -35,7 +35,7 @@ namespace autom
 		typedef keeper rc_parm;
 	
 		/** The map, uses the safe rc_parm. */
-		typedef std::map<std::string, rc_parm > parm_map_type;
+		typedef std::map<scfString, rc_parm > parm_map_type;
 		
 		/** Functor slot. */
 		struct slot
@@ -114,7 +114,7 @@ namespace autom
 		
 		function(const std::string &_name, bool _exec_on_represent=false):object(T_FUNCTION), rv(0), parent(0), repr_exec(_exec_on_represent)
 		{
-			setName(_name);	
+			setName(_name.c_str());	
 		}
 				
 		/** Copy constructor: does NOT copy the return value or the parameters! */
@@ -133,24 +133,24 @@ namespace autom
 		void setParent(function *_p) { parent = _p; }
 		
 		/** Adds the named parameter, compiling the value into a keila object. */
-		bool addParm(const std::string &parm_name, std::string &_value);
+		bool addParm(const scfString &parm_name, std::string &_value);
 		
 		/** Adds the named parameter, assume that it's a string. */
-		bool addStringParm(const std::string &parm_name, const std::string &_value)
+		bool addStringParm(const scfString &parm_name, const std::string &_value)
 		{
 			parms.insert(std::make_pair(parm_name, new string(_value)));	
 			return true;
 		}
 		
 		/** Adds the named parameter, assume that it's an integer. */
-		bool addIntParm(const std::string &parm_name, longlong _value)
+		bool addIntParm(const scfString &parm_name, longlong _value)
 		{
 			parms.insert(std::make_pair(parm_name, new integer(_value)));	
 			return true;
 		}
 		
 		/** Adds the named parameter, assume that it's a float. */
-		bool addFloatParm(const std::string &parm_name, double _value)
+		bool addFloatParm(const scfString &parm_name, double _value)
 		{
 			parms.insert(std::make_pair(parm_name, new floating(_value)));
 			return true;
@@ -193,7 +193,7 @@ namespace autom
 		virtual floating toFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual std::string reprObject();
+		virtual scfString reprObject();
 
 		/** Executes the function and returns the value the function returns (if any.) */
 		virtual rc_parm Execute()
@@ -207,7 +207,7 @@ namespace autom
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);					
 		
 		/** Returns the value of a parameter, uses scoped lookup. */
-		rc_parm operator[](const std::string &name);
+		rc_parm operator[](const scfString& name);
 		
 	};
 	

@@ -247,7 +247,7 @@ public:
 		func_parm name    = fn["name"],
 				  body    = fn["body"];		
 		
-		def_funcs[name->toString().Value()] = body;
+		def_funcs[name->toString().Value().c_str()] = body;
 				  		  
 		Registrar()->assign(name->toString().Value(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
 
