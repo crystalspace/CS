@@ -92,6 +92,11 @@ void scfString::Append (char c)
 csRef<iString> scfString::Slice(size_t start, size_t len) const
 {
   if (start==0 && len==0) return Clone();
+
+  // If the start is greater than the length, return an emtpy string.
+  if (start>Length()) return csPtr<iString>(new scfString());
+
+  // Otherwise adjust the length if needed.
   if (len==0) len=Length()-start;
 
   csString const tmp(s.Slice(start, len));
@@ -110,6 +115,10 @@ void scfString::SubString (iString* sub, size_t start, size_t len) const
     return;
   }
 
+  // If the start is greater than the length, abort the operation.
+  if (start>Length()) return;
+
+  // Otherwise adjust the length if needed.
   if (len==0) len=Length()-start;
 
   csString tmp;
