@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jul-2005
+	- Eric Sunshine fixed several compilation errors in the aws2 plugin.
 11-Jul-2005
         - Christopher Nelson made the following AWS modifications:
 	    - Changed the header guard name, added some checks to the headers
