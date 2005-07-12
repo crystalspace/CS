@@ -34,6 +34,10 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
     bool had_value=false;
 
     csRef<iDocumentNode> child = pos->Next ();
+
+    // Don't process comments.
+    if (child->GetType()==CS_NODE_COMMENT) continue;
+
     std::string name(child->GetValue());
 
     if ((name == "component") || (name == "window") || (name == "skin"))
@@ -59,34 +63,39 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 	csRef<iDocumentAttribute > attr = attr_pos->Next();
 	      
 	std::string a_name(attr->GetName());
+	std::string a_value(attr->GetValue());
 
 	/* If the name of the attribute is value, then the name of the key is 
 	 * the same as the name of the element, otherwise we use 
 	 * element_name.attribute_name as the key name. */
 	if (a_name=="value")			
-	{				
+	{
 	  reg->insert(child->GetValue(), 
-	    autom::keeper(new autom::string(attr->GetValue())));				
+	    autom::keeper(autom::Compile(a_value)));				
 	  had_value=true;
 	}
 	else
 	{
 	  a_name = name + "." + a_name;
 	  reg->insert(a_name, 
-	    autom::keeper(new autom::string(attr->GetValue())));				
+	    autom::keeper(autom::Compile(a_value)));				
 	}
       }
     }
 
     if (!had_value)
     {
-      std::string txt(child->GetContentsValue());		
-      reg->insert(name, autom::Compile(txt));
+      const char *_txt = child->GetContentsValue();
+      if (_txt)
+      {
+	std::string txt(_txt);		
+	reg->insert(name, autom::Compile(txt));
+      }
     }
   }
 }
 
-bool defFile::Parse(const std::string &txt, registry &reg)
+bool defFile::Parse(const scfString &txt, registry &reg)
 {
   /*csRef<iPluginManager> plugin_mgr =  CS_QUERY_REGISTRY (object_reg, 
     iPluginManager);	
@@ -98,7 +107,7 @@ bool defFile::Parse(const std::string &txt, registry &reg)
   xml.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
 
-  doc->Parse(txt.c_str(), true);
+  doc->Parse(txt.GetData(), true);
 
   csRef< iDocumentNode > node = doc->GetRoot();
   csRef< iDocumentNodeIterator> pos = node->GetNodes();

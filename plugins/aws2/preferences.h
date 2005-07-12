@@ -67,7 +67,7 @@ namespace aws
     virtual ~preferences() {}
 
     /** Loads an xml-based definitions file into this preferences object.  Multiple files may be loaded, one after the other.  The contents are essentially merged. */
-    bool load(iObjectRegistry* objreg, const std::string& filename);		
+    bool load(iObjectRegistry* objreg, const scfString& filename);		
 
     /** Clears all definitions for this preferences object. */
     void clear() { root.clear(); }

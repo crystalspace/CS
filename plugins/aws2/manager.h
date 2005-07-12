@@ -92,6 +92,9 @@ public:
   /** Setup the drawing targets. */
   virtual void SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d);
 
+  //////////////////////// Definition Files ////////////////////////
+
+  virtual bool Load(const scfString &_filename);
 
 public:
  //////////////////////// Event Handling ////////////////////////

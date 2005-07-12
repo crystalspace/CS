@@ -21,6 +21,7 @@
 
 #include "registry.h"
 #include "csutil/xmltiny.h"
+#include "csutil/scfstr.h"
 
 namespace aws
 {
@@ -35,7 +36,7 @@ namespace aws
     virtual ~defFile() {}
 
     /** Parses the given text into the given registry. */
-    virtual bool Parse (const std::string &txt, registry &reg);
+    virtual bool Parse (const scfString &txt, registry &reg);
   };
 
 }; // end namespace

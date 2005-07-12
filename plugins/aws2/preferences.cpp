@@ -31,9 +31,9 @@
 namespace aws
 {
 
-bool preferences::load(iObjectRegistry* objreg, const std::string& filename)
+bool preferences::load(iObjectRegistry* objreg, const scfString& filename)
 {
-	csPrintf("aws: Loading definitions file \"%s\"...\n", filename.c_str());
+	csPrintf("aws: Loading definitions file \"%s\"...\n", filename.GetData());
 
 	csRef<iVFS> vfs (CS_QUERY_REGISTRY (objreg, iVFS));
 
@@ -43,11 +43,11 @@ bool preferences::load(iObjectRegistry* objreg, const std::string& filename)
 		return false;
 	}
 
-	csRef<iFile> input = vfs->Open (filename.c_str(), VFS_FILE_READ);
+	csRef<iFile> input = vfs->Open (filename.GetData(), VFS_FILE_READ);
 
 	if (!input)
 	{
-		csPrintf("aws: Unable to open file \"%s\".\n", filename.c_str());
+		csPrintf("aws: Unable to open file \"%s\".\n", filename.GetData());
 		return false;
 	}
 

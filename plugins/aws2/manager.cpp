@@ -77,6 +77,8 @@ awsManager::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
 {
   g2d = _g2d;
   g3d = _g3d;
+
+  default_font = g2d->GetFontServer()->LoadFont (CSFONT_LARGE);
 }
 
 /*********************************************************************
@@ -109,4 +111,13 @@ void awsManager::Redraw()
 {
 
 
+}
+
+/*********************************************************************
+ ***************** Definition Files **********************************
+ ********************************************************************/
+
+bool awsManager::Load(const scfString &_filename)
+{
+  return prefs.load(object_reg, _filename);
 }
