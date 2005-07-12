@@ -209,9 +209,9 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   // Create our world.
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  if (!loader->LoadTexture ("stone", "/lib/stdtex/parket.jpg"))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading 'parket' texture!");
     exit (1);
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
@@ -221,22 +221,26 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   csRef<iThingState> ws =
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  walls_state->AddInsideBox (csVector3 (-12, 0, -12), csVector3 (12, 11, 12));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0));
+  light = engine->CreateLight (0, csVector3 (-10, 10.5, -10), 15,
+  	csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_STATIC);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1));
+  light = engine->CreateLight (0, csVector3 (10, 10.5,  10), 15,
+  	csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_STATIC);
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0));
+  light = engine->CreateLight (0, csVector3 (-10, 10.5, 10), 15,
+  	csColor (0, 1, 0), CS_LIGHT_DYNAMICTYPE_STATIC);
+  ll->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (10, 10.5, -10), 15,
+  	csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_STATIC);
   ll->Add (light);
 
   engine->Prepare ();
