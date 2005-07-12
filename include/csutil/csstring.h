@@ -142,8 +142,7 @@ public:
    * Append a signed character to this string.
    * \return Reference to itself.
    */
-  csStringBase& Append (char c)
-  { char s[2]; s[0] = c; s[1] = '\0'; return Append(s); }
+  csStringBase& Append (char c);
 
   /**
    * Append an unsigned character to this string.

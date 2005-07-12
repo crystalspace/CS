@@ -300,6 +300,20 @@ csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
+csStringBase& csStringBase::Append (char c)
+{ 
+	ExpandIfNeeded(Size+1);
+	
+	char *p = GetDataMutable();
+	CS_ASSERT(p!=0);
+
+	p[Size++]=c;
+	p[Size]='\0';
+
+	return *this;
+}
+
+
 void csStringBase::SubString (csStringBase& sub, size_t x, size_t len) const
 {
   CS_ASSERT(sub.GetData() != GetData()); // Check for same string
