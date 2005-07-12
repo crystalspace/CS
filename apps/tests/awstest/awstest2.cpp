@@ -20,11 +20,13 @@
 
 #include "awstest_config.h"
 
-#ifndef TEST_AWS2
+#ifdef TEST_AWS2
 
 #include "csutil/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csevent.h"
+#include "csutil/event.h"
+
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -61,20 +63,8 @@
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"
 
-#include "awstest.h"
-#include "awssktst.h"
+#include "awstest2.h"
 #include <stdio.h>
-
-#include "cuscomp.h"
-
-const int AWSTEST_MULTIPROC  = 0;
-const int AWSTEST_SINGLEPROC = 1;
-const int AWSTEST_SCREEN     = 2;
-
-const int AWSTEST_CANVAS=AWSTEST_SCREEN;
-// @@@@@ engine view as window background doesn't work with the proctex canvases
-// @@@@@ yes it does! it just doesn't update right.
-//-----------------------------------------------------------------------------
 
 #define  QUERY_REG(myPlug, iFace, errMsg) \
   myPlug = CS_QUERY_REGISTRY (object_reg, iFace); \
@@ -168,7 +158,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   QUERY_REG (myConsole, iConsoleOutput, "Couldn't load iConsoleOutput plugin!");
 
   // Load AWS
-  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS...");
+  Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS 2.0 ...");
   aws = CS_LOAD_PLUGIN(plugin_mgr,
   	"crystalspace.window.alternatemanager", iAws);
 
@@ -193,7 +183,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
-  if (nw) nw->SetTitle ("AWS Test Harness");
+  if (nw) nw->SetTitle ("AWS 2.0 Test Harness");
 
   if (!csInitializer::OpenApplication (object_reg))
   {
@@ -210,14 +200,14 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "The Alternate Window System Test Harness.");
+    "The Alternate Window System 2.0 Test Harness.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
+  /*Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
@@ -269,70 +259,10 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_black = myG2D->FindRGB (0, 0, 0);
   col_yellow = myG2D->FindRGB (255, 255, 0);
   col_cyan = myG2D->FindRGB (0, 255, 255);
-  col_green = myG2D->FindRGB (0, 255, 0);
+  col_green = myG2D->FindRGB (0, 255, 0);*/
 
-/*  if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
-  {
-    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, 0);
-    //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing w/o engine
-  }
-  else if (AWSTEST_CANVAS == AWSTEST_MULTIPROC)
-  {
-    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
-  }
-  else
-  {
-    awsCanvas = aws->CreateCustomCanvas(myG2D, myG3D);
-    aws->SetFlag(AWSF_AlwaysRedrawWindows);     // Only set for direct-drawing with engine
-  }*/
+ // Setup AWS specific stuff here.
 
-  aws->SetupCanvas(0, myG2D, myG3D);
-
-  // next, setup sinks before loading any preferences
-  awsTestSink *s = new awsTestSink();
-  iAwsSink *sink =aws->GetSinkMgr()->CreateSink((intptr_t)s);
-
-  s->SetSink(sink);
-  s->SetWindowManager(aws);
-
-  aws->GetSinkMgr()->RegisterSink("testButtonSink", sink);
-
-  // make the manager aware of our custom component
-  // the contructor automatically registers so we only need to create it
-  (void) new CustomComponentFactory(aws);
-
-  // now load preferences
-  if (!aws->GetPrefMgr()->Load("/aws/awstest.def"))
-      Report(CS_REPORTER_SEVERITY_ERROR, "couldn't load definition file!");
-  aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
-
-  csPrintf("aws-debug: Creating splash window...\n");
-  iAwsWindow *test = aws->CreateWindowFrom("Splash");
-  iAwsWindow *test2 = aws->CreateWindowFrom("Another");
-  iAwsWindow *test3 = aws->CreateWindowFrom("Engine View");
-  iAwsWindow *test4 = aws->CreateWindowFrom("Layout Test");
-  iAwsWindow *test5 = aws->CreateWindowFrom("Form1");
-
-  if(test3)
-  {
-    iAwsComponent* engine_view = test3->FindChild("Engine View");
-    if(engine_view)
-      engine_view->SetProperty("view", (intptr_t)(iView*)wview);
-  }
-
-  if (test)  test->Show();
-  if (test3) test3->Show();
-  if (test4) test4->Show();
-  if (test5) test5->Show();
-
-  if (test2) 
-  {
-	  test2->Show();
-	  test2->Execute(":MoveTo@Widget(x=500, y=0)");
-  }
-  //s->SetTestWin(test2);
-
-  /////////
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
@@ -375,19 +305,9 @@ awsTest::SetupFrame()
   message.Format ("awsTest(%d)", counter);
   myG2D->Write(font, 5, 5, col_green, -1, message);
 
-  aws->Redraw();
-  aws->Print(myG3D, 64);
-  /*if (AWSTEST_SINGLEPROCTEXCANVAS)
-  {
-    csRef<iTextureWrapper> tex (SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper));
-    if (tex)
-    {
-      myG3D->DrawPixmap(tex->GetTextureHandle(),
-                    0,0,512,512,
-                    0,0,512,512,
-                    0);
-    }
-  }*/
+  //aws->Redraw();
+  //aws->Print(myG3D, 64);
+
 }
 
 void
@@ -430,4 +350,4 @@ awsTest::Report (int severity, const char* msg, ...)
 }
 
 
-#endif // end only compile if NOT testing aws2.
+#endif // end only compile if testing aws2.

@@ -1,10 +1,18 @@
 #include "cssysdef.h"
+#include "awstest_config.h"
+
 #include "cstool/initapp.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
 #include "ivaria/reporter.h"
-#include "iaws/aws.h"
-#include "awstest.h"
+
+#ifdef TEST_AWS2
+ #include "iaws/aws2.h"
+ #include "awstest2.h"
+#else
+ #include "iaws/aws.h"
+ #include "awstest.h"
+#endif
 
 #include <stdio.h>
 
@@ -13,6 +21,7 @@ CS_IMPLEMENT_APPLICATION
 
 // The global system driver
 awsTest *System;
+
 
 
 int

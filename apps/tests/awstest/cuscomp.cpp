@@ -17,9 +17,14 @@
 */
 
 #include "cssysdef.h"
+#include "awstest_config.h"
+
+#ifndef TEST_AWS2
+
 #include "cuscomp.h"
 #include "iaws/aws.h"
 #include "ivideo/graph2d.h"
+
 
 SCF_IMPLEMENT_IBASE (CustomComponent)
   SCF_IMPLEMENTS_INTERFACE (iAwsComponent)
@@ -112,3 +117,5 @@ iAwsComponent* CustomComponentFactory::Create ()
 
   return my_comp;
 }
+
+#endif //end only compile if NOT testing aws2.

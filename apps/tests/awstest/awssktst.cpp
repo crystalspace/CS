@@ -1,4 +1,8 @@
 #include "cssysdef.h"
+#include "awstest_config.h"
+
+#ifndef TEST_AWS2
+
 #include "awssktst.h"
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
@@ -344,3 +348,4 @@ void awsTestSink::Login(intptr_t sk, iAwsSource *source)
   }
 }
 
+#endif // end only compile if NOT testing aws2
