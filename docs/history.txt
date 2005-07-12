@@ -8,16 +8,20 @@ chronological order.
 
 11-Jul-2005
         - Christopher Nelson made the following AWS modifications:
-           * Changed the header guard name, added some checks to the headers 
-           to make sure they're not accidentally BOTH being included.
-           * Made massive changes all over, replacing std::string in 
-           many cases with scfString.
-        - Christopher Nelson changed scfstring so that it has automatic 
-        variables for start and len, and added single character append functions.
-        - Christopher also added ReverseSlice and ReverseSubString, which are just
-        like their non-reversed counterparts except that the offset for the start
-        parameter is counted from the end.
-
+	    - Changed the header guard name, added some checks to the headers
+	      to make sure they're not accidentally BOTH being included.
+	    - Made massive changes all over, replacing std::string in many
+	      cases with scfString.
+        - Christopher Nelson changed scfString so that it has automatic
+	  variables for start and len, and added single character append
+	  functions.
+        - Christopher also added scfString::ReverseSlice() and
+	  ReverseSubString(), which are just like their non-reversed
+	  counterparts except that the offset for the start parameter is
+	  counted from the end.
+	- Eric Sunshine added missing forward declaration to cseventq.h which
+	  is now needed on account of (nasty) circular inclusion between
+	  cseventq.h and csevent.h. :-(
 10-Jul-2005
 	- Peter Amstutz committed a fix to csQuaternion where initializing
 	  it with an identity matrix could cause a divide by zero.

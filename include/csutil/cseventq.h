@@ -35,6 +35,7 @@
 #include "thread.h"
 #include "iutil/eventq.h"
 
+class csPoolEvent;
 struct iObjectRegistry;
 
 /**\internal
