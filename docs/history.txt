@@ -8,6 +8,13 @@ chronological order.
 
 12-Jul-2005
 	- Eric Sunshine fixed several compilation errors in the aws2 plugin.
+	- Christopher Nelson made many changes to AWS2, but since it's a
+	developing plugin he won't detail all of them here.  He will simply
+	not that AWS can now load XML definition files.  He also made 
+	changes to the awstest app to allow it to provide a testing 
+	framework for AWS2.
+	- Christopher Nelson "fixed" the API issue regarding len=0 and len=(size_t)-1;
+	
 11-Jul-2005
         - Christopher Nelson made the following AWS modifications:
 	    - Changed the header guard name, added some checks to the headers
