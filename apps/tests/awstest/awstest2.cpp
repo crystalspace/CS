@@ -228,19 +228,19 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (0, csVector3 (-10, 10.5, -10), 15,
-  	csColor (1, 0, 0), CS_LIGHT_DYNAMICTYPE_STATIC);
+  	csColor (1, 0, 0));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (10, 10.5,  10), 15,
-  	csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_STATIC);
+  	csColor (0, 0, 1));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (-10, 10.5, 10), 15,
-  	csColor (0, 1, 0), CS_LIGHT_DYNAMICTYPE_STATIC);
+  	csColor (0, 1, 0));
   ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (10, 10.5, -10), 15,
-  	csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_STATIC);
+  	csColor (1, 1, 1));
   ll->Add (light);
 
   engine->Prepare ();
@@ -266,7 +266,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_green = myG2D->FindRGB (0, 255, 0);
 
  // Setup AWS specific stuff here.
-
+ aws->Initialize(object_reg);
+ aws->SetDrawTarget(myG2D, myG3D);
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
@@ -306,12 +307,10 @@ awsTest::SetupFrame()
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
-  message.Format ("awsTest(%d)", counter);
+  message.Format ("awsTest2(%d)", counter);
   myG2D->Write(font, 5, 5, col_green, -1, message);
 
-  //aws->Redraw();
-  //aws->Print(myG3D, 64);
-
+  aws->Redraw();
 }
 
 void
