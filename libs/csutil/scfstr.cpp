@@ -91,13 +91,13 @@ void scfString::Append (char c)
 
 csRef<iString> scfString::Slice(size_t start, size_t len) const
 {
-  if (start==0 && len==0) return Clone();
+  if (start==0 && len==(size_t)-1) return Clone();
 
   // If the start is greater than the length, return an empty string.
   if (start>Length()) return csPtr<iString>(new scfString());
 
   // Otherwise adjust the length if needed.
-  if (len==0) len=Length()-start;
+  if (len==(size_t)-1) len=Length()-start;
 
   csString const tmp(s.Slice(start, len));
   return csPtr<iString>(new scfString(tmp));
@@ -111,14 +111,6 @@ csRef<iString> scfString::ReverseSlice(size_t start, size_t len) const
   return Slice(start, len);
 }
 
-void scfString::ReverseSubString (iString* sub, size_t start, size_t len) const
-{  
-  // Adjust the start to be an offset from the END.
-  start = Length()-start;
-
-  SubString(sub, start, len);
-}
-
 
 void scfString::SubString (iString* sub, size_t start, size_t len) const
 {
@@ -126,7 +118,7 @@ void scfString::SubString (iString* sub, size_t start, size_t len) const
 
   sub->Truncate(0);
 
-  if (start==0 && len==0)
+  if (start==0 && len==(size_t)-1)
   { 
     sub->Append(GetData(), Length());
     return;
@@ -136,11 +128,19 @@ void scfString::SubString (iString* sub, size_t start, size_t len) const
   if (start>Length()) return;
 
   // Otherwise adjust the length if needed.
-  if (len==0) len=Length()-start;
+  if (len==(size_t)-1) len=Length()-start;
 
   csString tmp;
   s.SubString(tmp, start, len);  
   sub->Append(tmp.GetData(), tmp.Length());  
+}
+
+void scfString::ReverseSubString (iString* sub, size_t start, size_t len) const
+{  
+  // Adjust the start to be an offset from the END.
+  start = Length()-start;
+
+  SubString(sub, start, len);
 }
 
 size_t scfString::FindFirst (const char c, size_t p) const
