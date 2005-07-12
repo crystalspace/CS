@@ -207,7 +207,7 @@ struct iString : public iBase
 
   /**
    * Copy a portion of this string.
-   * \param sub Strign which will receive the indicated substring copy.
+   * \param sub String which will receive the indicated substring copy.
    * \param start Start position of slice (zero-based).
    * \param len Number of characters in slice.
    * \remarks Use this method instead of Slice() for cases where you expect to

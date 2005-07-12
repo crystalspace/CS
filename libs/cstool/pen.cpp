@@ -18,9 +18,9 @@
 
 #include "cssysdef.h"
 #include "cstool/pen.h"
+#include "ivideo/fontserv.h"
 
-
-csPen::csPen (iGraphics3D *_g3d) : g3d (_g3d)
+csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d)
 {
 
 }
@@ -189,4 +189,60 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
+}
+
+void 
+csPen::Write(iFont *font, uint x1, uint y1, char *text)
+{
+  if (font==0) return;
+
+  g2d->Write(font, x1, y1, g2d->FindRGB(color[0], color[1], color[2], color[3]), -1, text);  
+}
+
+void 
+csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_align, uint v_align, char *text)
+{
+  if (font==0) return;
+
+  uint x, y;
+  int w, h;
+
+  // Get the maximum dimensions of the text.
+  font->GetDimensions(text, w, h);
+
+  // Figure out the correct starting point in the box for horizontal alignment.
+  switch(h_align)
+  {
+    case CS_PEN_TA_LEFT:
+    default:
+      x=x1;
+    break;
+
+    case CS_PEN_TA_RIGHT:
+      x=x2-w;
+    break;
+  
+    case CS_PEN_TA_CENTER:
+      x=((x2-x1)>>1) - (w>>1);
+    break;
+  }
+
+  // Figure out the correct starting point in the box for vertical alignment.
+  switch(v_align)
+  {
+    case CS_PEN_TA_TOP:
+    default:
+      y=y1;
+    break;
+
+    case CS_PEN_TA_BOT:
+      y=y2-h;
+    break;
+  
+    case CS_PEN_TA_CENTER:
+      y=((y2-y1)>>1) - (h>>1);
+    break;
+  }
+
+  Write(font, x, y, text);
 }

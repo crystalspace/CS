@@ -27,7 +27,7 @@ namespace autom
   class string;
   class integer;
   class floating;
-
+  
   /** Base class for all Keila objects. */
   struct iObject 
   {    
@@ -56,7 +56,10 @@ namespace autom
   };
 
 }; // end autom namespace
+
+
 SCF_VERSION(autom::iObject, 1, 0, 1);
+
 
 SCF_VERSION(iAwsWindow, 1, 0, 1);
 struct iAwsWindow : public iBase
@@ -74,6 +77,9 @@ struct iAws  : public iBase
 
   /// Setup the drawing targets.
   virtual void SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)=0;
+
+  /// Load a definition file.
+  virtual bool Load(const scfString &_filename)=0;
 
   /// Dispatches events to the proper components.
   virtual bool HandleEvent (iEvent &)=0;  

@@ -20,9 +20,13 @@
 #define __CS_CSTOOL_PEN_H__
 
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+
 #include "csgeom/poly3d.h"
 #include "csgeom/vector4.h"
 #include "csutil/dirtyaccessarray.h"
+
+enum CS_PEN_TEXT_ALIGN { CS_PEN_TA_TOP, CS_PEN_TA_BOT, CS_PEN_TA_LEFT, CS_PEN_TA_RIGHT, CS_PEN_TA_CENTER };
 
 /** 
  * A pen is used to draw vector shapes. 
@@ -62,13 +66,28 @@ struct iPen
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
     float roundness, bool fill = false) = 0;    
+
+  /**
+   * Writes text in the given font at the given location.
+   */
+  virtual void Write(iFont *font, uint x1, uint y1, char *text)=0;
+
+  /**
+   * Writes text in the given font, in the given box.  The alignment specified in h_align 
+   * and v_align determine how it should be aligned.  
+   */
+  virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
+    uint h_align, uint v_align, char *text)=0;
 };
 
 /** A pen specialized for CS. */
 class csPen : public iPen
 {
-  /** The context for drawing. */
+  /** The 3d context for drawing. */
   csRef<iGraphics3D> g3d;
+
+  /** The 2d context for drawing. */
+  csRef<iGraphics2D> g2d;
 
   /** The mesh that we reuse in developing the shapes we're making. */
   csSimpleRenderMesh mesh;
@@ -107,7 +126,7 @@ protected:
   void DrawMesh(csRenderMeshType mesh_type);
 
 public:
-  csPen(iGraphics3D *_g3d);
+  csPen(iGraphics2D *_g2d, iGraphics3D *_g3d);
   virtual ~csPen();
 
   /** 
@@ -143,6 +162,18 @@ public:
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
     float roundness, bool fill = false);
+
+  /**
+   * Writes text in the given font at the given location.
+   */
+  virtual void Write(iFont *font, uint x1, uint y1, char *text);
+
+  /**
+   * Writes text in the given font, in the given box.  The alignment specified in h_align 
+   * and v_align determine how it should be aligned.  
+   */
+  virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
+    uint h_align, uint v_align, char *text);
 };
 
 
