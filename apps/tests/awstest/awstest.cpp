@@ -429,5 +429,4 @@ awsTest::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-
 #endif // end only compile if NOT testing aws2.
