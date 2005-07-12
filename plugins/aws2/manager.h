@@ -21,9 +21,13 @@
 
 #include "iaws/aws2.h"
 #include "preferences.h"
+
 #include "csgeom/csrectrg.h"
+
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
+
+#include "ivideo/fontserv.h"
 
 /** The management object for AWS: creates windows, destroys windows, keeps track of all the windows, etc. */
 class awsManager : public iAws
@@ -33,6 +37,15 @@ class awsManager : public iAws
 
   /** Store the object registry so we can get at it later. */
   iObjectRegistry *object_reg;
+
+  /** The 2D graphics context. */
+  csRef<iGraphics2D> g2d;
+
+  /** The 3D graphics context. */
+  csRef<iGraphics3D> g3d;
+
+  /** Store a reference to the default font so that it's quick and easy. */  
+  csRef<iFont> default_font;
 
    /**
    * This is the dirty region.  All clean/dirty code now utilizes the
@@ -74,7 +87,10 @@ public:
   virtual ~awsManager();
 
   /** Initializes the manager. Must be called before anything else. */
-  bool Initialize (iObjectRegistry *_object_reg);
+  virtual bool Initialize (iObjectRegistry *_object_reg);
+
+  /** Setup the drawing targets. */
+  virtual void SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d);
 
 
 public:
@@ -82,6 +98,9 @@ public:
 
   /// Dispatches events to the proper components.
   virtual bool HandleEvent (iEvent &);
+
+  /// Redraws all the windows into the current graphics contexts.
+  virtual void Redraw();
 
   struct eiComponent : public iComponent
   {

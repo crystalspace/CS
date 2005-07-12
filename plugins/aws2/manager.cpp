@@ -68,8 +68,15 @@ bool
 awsManager::Initialize (iObjectRegistry *_object_reg)
 {
   object_reg = _object_reg;
-
+  
   return true;
+}
+
+void 
+awsManager::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
+{
+  g2d = _g2d;
+  g3d = _g3d;
 }
 
 /*********************************************************************
@@ -91,4 +98,15 @@ bool awsManager::HandleEvent (iEvent &Event)
   }
 
   return false;
+}
+
+/*********************************************************************
+ ***************** Redrawing *****************************************
+ ********************************************************************/
+
+
+void awsManager::Redraw()
+{
+
+
 }
