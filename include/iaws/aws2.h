@@ -17,18 +17,16 @@
 #include "csgeom/cspoint.h"
 #include "iutil/event.h"
 #include "iutil/string.h"
-
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
+struct iObjectRegistry;
 
 namespace autom
 {
   class string;
   class integer;
   class floating;
-
-  SCF_VERSION(iObject, 1, 0, 1);
 
   /** Base class for all Keila objects. */
   struct iObject 
@@ -58,7 +56,7 @@ namespace autom
   };
 
 }; // end autom namespace
-
+SCF_VERSION(autom::iObject, 1, 0, 1);
 
 SCF_VERSION(iAwsWindow, 1, 0, 1);
 struct iAwsWindow : public iBase
