@@ -160,7 +160,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   // Load AWS
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS 2.0 ...");
   aws = CS_LOAD_PLUGIN(plugin_mgr,
-  	"crystalspace.window.alternatemanager", iAws);
+  	"crystalspace.window.alternatemanager2", iAws);
 
   if (!aws)
   {
@@ -207,7 +207,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  /*Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
@@ -259,7 +259,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_black = myG2D->FindRGB (0, 0, 0);
   col_yellow = myG2D->FindRGB (255, 255, 0);
   col_cyan = myG2D->FindRGB (0, 255, 255);
-  col_green = myG2D->FindRGB (0, 255, 0);*/
+  col_green = myG2D->FindRGB (0, 255, 0);
 
  // Setup AWS specific stuff here.
 
