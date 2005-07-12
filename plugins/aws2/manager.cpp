@@ -31,6 +31,8 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
+SCF_IMPLEMENT_FACTORY(awsManager)
+
 SCF_IMPLEMENT_IBASE(awsManager)
   SCF_IMPLEMENTS_INTERFACE(iAws)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
