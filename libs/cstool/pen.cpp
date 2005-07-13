@@ -63,7 +63,10 @@ void csPen::DrawMesh (csRenderMeshType mesh_type)
 
 void csPen::SetColor (float r, float g, float b, float a)
 {
-  color.Set (r,g,b,a);
+  color.x=r*255;
+  color.y=g*255;
+  color.z=b*255;
+  color.w=a*255;
 }
 
 /** Draws a single line. */
@@ -196,7 +199,13 @@ csPen::Write(iFont *font, uint x1, uint y1, char *text)
 {
   if (font==0) return;
 
-  g2d->Write(font, x1, y1, g2d->FindRGB(color[0], color[1], color[2], color[3]), -1, text);  
+  int the_color = g2d->FindRGB(static_cast<int>(color.x), 
+		 	       static_cast<int>(color.y), 
+			       static_cast<int>(color.z),
+			       static_cast<int>(color.w));
+		
+
+  g2d->Write(font, x1, y1, the_color, -1, text);  
 }
 
 void 
@@ -223,7 +232,7 @@ csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_align,
     break;
   
     case CS_PEN_TA_CENTER:
-      x=((x2-x1)>>1) - (w>>1);
+      x=x1+((x2-x1)>>1) - (w>>1);
     break;
   }
 
@@ -240,7 +249,7 @@ csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_align,
     break;
   
     case CS_PEN_TA_CENTER:
-      y=((y2-y1)>>1) - (h>>1);
+      y=y1+((y2-y1)>>1) - (h>>1);
     break;
   }
 

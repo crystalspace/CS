@@ -19,14 +19,39 @@
 #ifndef __AWS_FRAME_H__
 #define __AWS_FRAME_H__
 
+#include "cstool/pen.h"
+#include "csgeom/matrix3.h"
+
+
 namespace aws
 {
 
   /** A frame presents different transformation methods for various vector operations.  It may also attempt to transform certain raster/blitting operations. */
   class frame
   {    
+    /// The pen that we use to draw with.
+    iPen *pen;
+
+    /// This is the transformation that we apply to each operation that occurs.
+    csMatrix3 m;
+
   public:
-      
+    frame();
+
+    /// Sets the current pen.
+    void SetPen(iPen *_pen);
+    
+    /// Clears all transformations applied to this frame.
+    void ClearTransforms();
+
+    /// Rotates the frame by the given amount (in radians).
+    void Rotate(float angle);
+
+    /// Translates the frame by the given amount.
+    void Translate(float x, float y);
+
+    // Scales the frame by the given amount.
+    void Scale(float x, float y);
 
   };
 
