@@ -269,6 +269,10 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
  aws->Initialize(object_reg);
  aws->SetDrawTarget(myG2D, myG3D);
 
+ // Load a definition file
+ if (aws->Load("/aws/awstest.xml.def")==false)
+    Report(CS_REPORTER_SEVERITY_ERROR, "Unable to load the XML definition file '/aws/awstest.xml.def'");  
+
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
   return true;
