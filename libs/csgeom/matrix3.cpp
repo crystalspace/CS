@@ -347,8 +347,8 @@ csXRotMatrix3::csXRotMatrix3 (float angle)
   m22 = (float)cos (angle);
   m23 = (float) -sin (angle);
   m31 = 0;
-  m32 = (float)sin (angle);
-  m33 = (float)cos (angle);
+  m32 = -m23;
+  m33 = m22;
 }
 
 csYRotMatrix3::csYRotMatrix3 (float angle)
@@ -359,9 +359,9 @@ csYRotMatrix3::csYRotMatrix3 (float angle)
   m21 = 0;
   m22 = 1;
   m23 = 0;
-  m31 = (float)sin (angle);
+  m31 = -m13;
   m32 = 0;
-  m33 = (float)cos (angle);
+  m33 = m11;
 }
 
 csZRotMatrix3::csZRotMatrix3 (float angle)
@@ -369,8 +369,8 @@ csZRotMatrix3::csZRotMatrix3 (float angle)
   m11 = (float)cos (angle);
   m12 = (float) -sin (angle);
   m13 = 0;
-  m21 = (float)sin (angle);
-  m22 = (float)cos (angle);
+  m21 = -m12;
+  m22 = m11;
   m23 = 0;
   m31 = 0;
   m32 = 0;
