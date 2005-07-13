@@ -113,8 +113,10 @@ void awsManager::Redraw()
   csPen pen(g2d, g3d);
   csReversibleTransform rt;
 
-  rt.Identity();
-  g3d->SetWorldToCamera(rt);  
+  /*rt.Identity();
+  g3d->SetWorldToCamera(rt);  */
+
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
 
@@ -124,10 +126,39 @@ void awsManager::Redraw()
   pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_RIGHT, CS_PEN_TA_TOP, "Test Boxed Text - Right, Top");
   pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_LEFT, CS_PEN_TA_BOT, "Test Boxed Text - Left, Bot");
   
-  pen.DrawPoint(0,0);
-  pen.DrawLine(0,0,500,500);
-  pen.DrawRect(0,0,500,500);
+  pen.DrawPoint(100,100);
+  pen.DrawLine(100,100,500,500);
+  pen.DrawRect(100,100,500,500, true);
   pen.DrawRoundedRect(0,0,500,500,0.5,false);
+
+  {
+    csSimpleRenderMesh mesh;
+    csVector3 verts[4];
+    csVector2 texels[4];
+    csVector4 colors[4];
+    float x=100, y=100;
+    float w=400, h=400;
+    float fr=0.5, fg=0.75, fb=1, fa=1;
+
+    mesh.meshtype = CS_MESHTYPE_QUADS;
+    mesh.vertexCount = 4;
+    mesh.vertices = verts;    
+    mesh.colors = colors;
+        
+    verts[0].Set (x, y, 0);
+    colors[0].Set (fr, fg, fb, fa);
+    
+    verts[1].Set (x + w, y, 0);    
+    colors[1].Set (fr, fg, fb, fa);
+
+    verts[2].Set (x + w, y + h, 0);    
+    colors[2].Set (fr, fg, fb, fa);
+
+    verts[3].Set (x, y + h, 0);
+    colors[3].Set (fr, fg, fb, fa);
+
+    g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
+  }
   
 
 }
