@@ -65,10 +65,10 @@ void csPen::DrawMesh (csRenderMeshType mesh_type)
 
 void csPen::SetColor (float r, float g, float b, float a)
 {
-  color.x=r*255;
-  color.y=g*255;
-  color.z=b*255;
-  color.w=a*255;
+  color.x=r;
+  color.y=g;
+  color.z=b;
+  color.w=a;
 }
 
 /** Draws a single line. */
@@ -201,10 +201,10 @@ csPen::Write(iFont *font, uint x1, uint y1, char *text)
 {
   if (font==0) return;
 
-  int the_color = g2d->FindRGB(static_cast<int>(color.x), 
-		 	       static_cast<int>(color.y), 
-			       static_cast<int>(color.z),
-			       static_cast<int>(color.w));
+  int the_color = g2d->FindRGB(static_cast<int>(color.x*255), 
+		 	       static_cast<int>(color.y*255), 
+			       static_cast<int>(color.z*255),
+			       static_cast<int>(color.w*255));
 		
 
   g2d->Write(font, x1, y1, the_color, -1, text);  
