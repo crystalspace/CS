@@ -111,13 +111,14 @@ bool awsManager::HandleEvent (iEvent &Event)
 void awsManager::Redraw()
 {
   csPen pen(g2d, g3d);
-  //csReversibleTransform rt;
-  //rt.Identity();
-  //g3d->SetWorldToCamera(rt);  
+  csReversibleTransform rt;
+
+  rt.Identity();
+  g3d->SetWorldToCamera(rt);  
 
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
 
-  pen.SetColor(0,0,0,1);
+  pen.SetColor(1,1,1,1);
 
   pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_CENTER, CS_PEN_TA_CENTER, "Test Boxed Text - Centered");
   pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_RIGHT, CS_PEN_TA_TOP, "Test Boxed Text - Right, Top");
@@ -125,6 +126,7 @@ void awsManager::Redraw()
   
   pen.DrawPoint(0,0);
   pen.DrawLine(0,0,500,500);
+  pen.DrawRect(0,0,500,500);
   pen.DrawRoundedRect(0,0,500,500,0.5,false);
   
 
