@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jul-2005
+	- Jorrit optimized csXRotMatrix3, csYRotMatrix3, and csZRotMatrix3
+	  by avoiding unneeded extra calls to cos and sin.
 12-Jul-2005
 	- Eric Sunshine fixed several compilation errors in the aws2 plugin.
 	- Christopher Nelson made many changes to AWS2, but since it's a
