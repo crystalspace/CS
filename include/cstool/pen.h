@@ -24,6 +24,9 @@
 
 #include "csgeom/poly3d.h"
 #include "csgeom/vector4.h"
+#include "csgeom/polyidx.h"
+#include "csgeom/poly3d.h"
+
 #include "csutil/dirtyaccessarray.h"
 
 enum CS_PEN_TEXT_ALIGN { CS_PEN_TA_TOP, CS_PEN_TA_BOT, CS_PEN_TA_LEFT, CS_PEN_TA_RIGHT, CS_PEN_TA_CENTER };
@@ -92,11 +95,11 @@ class csPen : public iPen
   /** The mesh that we reuse in developing the shapes we're making. */
   csSimpleRenderMesh mesh;
   
-  /** The list of vectors we're creating. */
-  csVector3Array va;
-
-  /** The list of indices we use. */
-  csDirtyAccessArray<uint> ia;
+  /** The polygon index that we're generating. */
+  csPolyIndexed poly_idx;
+  
+  /** The polygon that we're generating. */
+  csPoly3D poly;
 
   /** The color we use. */
   csVector4 color;

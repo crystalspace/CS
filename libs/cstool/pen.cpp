@@ -20,6 +20,7 @@
 #include "cstool/pen.h"
 #include "ivideo/fontserv.h"
 
+
 csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d)
 {
 
@@ -32,24 +33,25 @@ csPen::~csPen ()
 
 void csPen::Start ()
 {
-  va.MakeEmpty ();
-  ia.SetLength (0);  
+  poly.MakeEmpty();
+  poly_idx.MakeEmpty();
   colors.SetLength (0);
+  mesh.object2world.Identity();
 }
 
 void csPen::AddVertex (float x, float y)
 {
-  ia.Push((uint)va.AddVertexSmart(x,y,0));
+  poly_idx.AddVertex((int)poly.AddVertex(x,y,0));
   colors.Push(color);
 }
 
 void csPen::SetupMesh ()
 {
-  mesh.vertices = va.GetVertices ();
-  mesh.vertexCount = (uint)va.GetVertexCount ();
+  mesh.vertices = poly.GetVertices ();
+  mesh.vertexCount = (uint)poly.GetVertexCount ();
 
-  mesh.indices = ia.GetArray ();
-  mesh.indexCount = (uint)ia.Length ();
+  mesh.indices = (uint *)poly_idx.GetVertexIndices ();
+  mesh.indexCount = (uint)poly_idx.GetVertexCount ();
 
   mesh.colors = colors.GetArray ();
   //mesh.colorCount = static_cast<uint>(colors.Length());  
