@@ -74,17 +74,17 @@ csQuaternion csQuaternion::Slerp (
   float slerp) const
 {
   double omega, cosom, invsinom, scale0, scale1;
-  
+
   csQuaternion quato(quat2);
-  
+
   // decide if one of the quaternions is backwards
   double a = (x-quat2.x)*(x-quat2.x) + (y-quat2.y)*(y-quat2.y) + (z-quat2.z)*(z-quat2.z) + (r-quat2.r)*(r-quat2.r);
   double b = (x+quat2.x)*(x+quat2.x) + (y+quat2.y)*(y+quat2.y) + (z+quat2.z)*(z+quat2.z) + (r+quat2.r)*(r+quat2.r);
-  if (a > b) 
+  if (a > b)
   {
       quato.Negate();
   }
-  
+
   // Calculate dot between quats
   cosom = x * quato.x + y * quato.y + z * quato.z + r * quato.r;
 
@@ -219,10 +219,17 @@ void csQuaternion::GetAxisAngle(csVector3& axis, float& phi) const
 {
     phi = 2.0 * acos(r);
     float ss = sin(phi/2.0);
-    axis.x = x / ss;
-    axis.y = y / ss;
-    axis.z = z / ss;
-
+    if (ss != 0) {
+        axis.x = x / ss;
+        axis.y = y / ss;
+        axis.z = z / ss;
+    }
+    else
+    {
+        axis.x = 0;
+        axis.y = 0;
+        axis.z = 1;
+    }
 }
 
 void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
