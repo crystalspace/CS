@@ -22,6 +22,9 @@ chronological order.
 	  a great deal with stability.
 	- Jorrit documented the best way to do physics step simulation in the
 	  manual.
+        - res changed the framebuffer GL render-to-texture backend to draw
+          "persistent" render targets without filtering to fix smearing
+          occuring on some hardware.
 13-Jul-2005
 	- Jorrit optimized csXRotMatrix3, csYRotMatrix3, and csZRotMatrix3
 	  by avoiding unneeded extra calls to cos and sin.

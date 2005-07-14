@@ -81,6 +81,12 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     G3D->statecache->Disable_GL_BLEND ();
     G3D->SetZMode (CS_ZBUF_NONE);
 
+    GLint oldMagFilt, oldMinFilt;
+    glGetTexParameteriv (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, &oldMagFilt);
+    glGetTexParameteriv (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, &oldMinFilt);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
     glBegin (GL_QUADS);
     glTexCoord2f (0, 0); glVertex2i (0, txt_h);
     glTexCoord2f (0, 1); glVertex2i (0, 0);
@@ -88,6 +94,8 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     glTexCoord2f (1, 0); glVertex2i (txt_w, txt_h);
     glEnd ();
     rt_onscreen = true;
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, oldMagFilt);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, oldMinFilt);
   }
   G3D->statecache->SetCullFace (GL_BACK);
 }
