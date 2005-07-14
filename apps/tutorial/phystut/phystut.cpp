@@ -31,6 +31,7 @@ Simple::Simple (iObjectRegistry* object_reg)
   objcnt=0;
   solver=0;
   disable=false;
+  remaining_delta=0;
 }
 
 Simple::~Simple ()
@@ -64,28 +65,25 @@ void Simple::SetupFrame ()
   }
 
 
-  // Take small steps.
-  const float maxStep = 0.01f;
-  float ta = 0;
-  float tb = speed;
-  int maxSteps=4;
-  while (ta < speed && maxSteps)
+  // For ODE it is recommended that all steps are done with the
+  // same size. So we always will call dynamics->Step(delta) with
+  // the constant delta. However, sometimes our elapsed time
+  // is not divisible by delta and in that case we have a small
+  // time (smaller then delta) left-over. We can't afford to drop
+  // that because then speed of physics simulation would differ
+  // depending on framerate. So we will put that remainder in
+  // remaining_delta and use that here too.
+  const float delta = 0.01f;
+  float et = remaining_delta + speed;
+  while (et >= delta)
   {
-    if (tb - ta > maxStep)
-      tb = ta + maxStep;
-
-    dyn->Step (tb - ta);
-    ta = tb;
-    tb = speed;
-
-    view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
-    //avatarbody->SetTransform(view->GetCamera()->GetTransform());
-
-    maxSteps--;
+    dyn->Step (delta);
+    et -= delta;
   }
-//  dyn->Step(maxStep);
+  remaining_delta = et;
 
-  view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
+  view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()
+  	->GetTransform().GetOrigin());
   //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
 
   // Tell 3D driver we're going to display 3D things.
@@ -97,12 +95,17 @@ void Simple::SetupFrame ()
 
   // Write FPS and other info..
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  if( speed != 0.0f) WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
+  if( speed != 0.0f)
+    WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
   WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
-  if(solver==0) WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
-  else if(solver==1) WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
-  else if(solver==2) WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
-  if(disable) WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
+  if(solver==0)
+    WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
+  else if(solver==1)
+    WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
+  else if(solver==2)
+    WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+  if(disable)
+    WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
 
 void Simple::FinishFrame ()
@@ -113,12 +116,14 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Type == csevBroadcast
+  	&& csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast
+  	&& csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     simple->FinishFrame ();
     return true;
@@ -166,22 +171,24 @@ bool Simple::HandleEvent (iEvent& ev)
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
     { // Toggle stepfast.
-      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+      	dynSys, iODEDynamicSystemState);
       osys->EnableStepFast (0);
       solver=0;
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
     { // Toggle stepfast.
-      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+      	dynSys, iODEDynamicSystemState);
       osys->EnableStepFast (1);
       solver=1;
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
     { // Toggle quickstep.
-      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
-      //iODEDynamicSystemState osys=(iODEDynamicSystemState*)dynSys->QueryObject();
+      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+      	dynSys, iODEDynamicSystemState);
       osys->EnableQuickStep (1);
       solver=2;
       return true;
@@ -329,7 +336,8 @@ bool Simple::Initialize ()
     return false;
   };
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager);
   cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.opcode" , iCollideSystem);
   if (!cdsys)
   {
@@ -449,7 +457,8 @@ bool Simple::Initialize ()
   dynSys->SetGravity (csVector3 (0,-7,0));
   dynSys->SetRollingDampener(.995);
 
-  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys, iODEDynamicSystemState);
+  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys,
+  	iODEDynamicSystemState);
   osys->SetContactMaxCorrectingVel (.1);
   osys->SetContactSurfaceLayer (.0001);
 

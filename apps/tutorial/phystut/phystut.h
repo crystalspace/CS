@@ -39,6 +39,7 @@ private:
   int objcnt;
   int solver;
   bool disable;
+  float remaining_delta;
 
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;

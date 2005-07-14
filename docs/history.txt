@@ -10,6 +10,16 @@ chronological order.
 	- Jorrit added a small section about how to draw text to the
 	  documentation.
 	- Piotr Obrzut fixed a bug in stops/motors methods in ODESliderJoint
+	- Jorrit did a big stability fix to the phystut app. Apparently
+	  ODE doesn't like it if it is called with variable steps. The phystut
+	  app normally calls ode->Step(delta) with delta constant. However
+	  there is always a remaining part of the elapsed time that was also
+	  done. This could cause instability. To fix this, instead of doing
+	  the remaining part immediatelly we store it in a class variable
+	  and add it to the elapsed time the next frame. That way we are sure
+	  that we always do steps that are exactly 'delta' big but our physics
+	  simulation speed is still independent from the framerate. This helps
+	  a great deal with stability.
 13-Jul-2005
 	- Jorrit optimized csXRotMatrix3, csYRotMatrix3, and csZRotMatrix3
 	  by avoiding unneeded extra calls to cos and sin.
