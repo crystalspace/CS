@@ -98,10 +98,13 @@ void csPen::DrawPoint (uint x1, uint y1)
 void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool fill)
 {
   Start ();
+
   AddVertex (x1, y1);
-  AddVertex (x1, y2);
+  AddVertex (x2, y1);
   AddVertex (x2, y2);
   AddVertex (x1, y2);
+
+  if (!fill) AddVertex (x1, y1);
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP);
@@ -129,33 +132,18 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
   		
   Start ();
 
-  if (fill)
-  {
-    AddVertex(center_x, center_y);
+  if (fill)AddVertex(center_x, center_y);
 
-    AddVertex (x1, y2-y_miter);
-    AddVertex (x1, y1+y_miter);
-    AddVertex (x1+x_miter, y1);
-    AddVertex (x2-x_miter, y1);
-    AddVertex (x2, y1+y_miter);
-    AddVertex (x2, y2-y_miter);
-    AddVertex (x2-x_miter, y2);
-    AddVertex (x1+x_miter, y2);
-    AddVertex (x1, y2-y_miter);
+  AddVertex (x1, y2-y_miter);
+  AddVertex (x1, y1+y_miter);  
+  AddVertex (x1+x_miter, y1);
+  AddVertex (x2-x_miter, y1);  
+  AddVertex (x2, y1+y_miter);
+  AddVertex (x2, y2-y_miter);
+  AddVertex (x2-x_miter, y2);
+  AddVertex (x1+x_miter, y2);
+  AddVertex (x1, y2-y_miter);
 
-  }
-  else
-  {    
-    AddVertex (x1, y2-y_miter);
-    AddVertex (x1, y1+y_miter);  
-    AddVertex (x1+x_miter, y1);
-    AddVertex (x2-x_miter, y1);  
-    AddVertex (x2, y1+y_miter);
-    AddVertex (x2, y2-y_miter);
-    AddVertex (x2-x_miter, y2);
-    AddVertex (x1+x_miter, y2);
-    AddVertex (x1, y2-y_miter);
-  }
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN: CS_MESHTYPE_LINESTRIP);
@@ -174,6 +162,9 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
 			
   float width = x2-x1;
   float height = y2-y1;
+  
+  float center_x = x1+(width/2);
+  float center_y = y1+(height/2);
 
   float y_round = (height*roundness)*0.5;
   float x_round = (width*roundness)*0.5;
@@ -183,6 +174,8 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   Start();
 
   float angle;
+
+  if (fill)AddVertex(center_x, center_y);
   			
   for(angle=(HALF_PI)*3.0f; angle>PI; angle-=delta)
   {
@@ -217,7 +210,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   AddVertex (x1+x_round, y2);				
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
+  DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
 }
 
 void 
