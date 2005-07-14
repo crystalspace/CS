@@ -55,6 +55,8 @@ void csPen::SetupMesh ()
 
   mesh.colors = colors.GetArray ();
   //mesh.colorCount = static_cast<uint>(colors.Length());  
+
+  mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;  
 }
 
 void csPen::DrawMesh (csRenderMeshType mesh_type)
@@ -119,22 +121,44 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
   float width = x2-x1;
   float height = y2-y1;
 
+  float center_x = x1+(width/2);
+  float center_y = y1+(height/2);
+
   float y_miter = (height*miter)*0.5;
   float x_miter = (width*miter)*0.5;
   		
   Start ();
 
-  AddVertex (x1, y2-y_miter);
-  AddVertex (x1, y1+y_miter);
-  AddVertex (x1+x_miter, y1);
-  AddVertex (x2-x_miter, y1);
-  AddVertex (x2, y1+y_miter);
-  AddVertex (x2, y2-y_miter);
-  AddVertex (x2-x_miter, y2);
-  AddVertex (x1+x_miter, y2);
+  if (fill)
+  {
+    AddVertex(center_x, center_y);
+
+    AddVertex (x1, y2-y_miter);
+    AddVertex (x1, y1+y_miter);
+    AddVertex (x1+x_miter, y1);
+    AddVertex (x2-x_miter, y1);
+    AddVertex (x2, y1+y_miter);
+    AddVertex (x2, y2-y_miter);
+    AddVertex (x2-x_miter, y2);
+    AddVertex (x1+x_miter, y2);
+    AddVertex (x1, y2-y_miter);
+
+  }
+  else
+  {    
+    AddVertex (x1, y2-y_miter);
+    AddVertex (x1, y1+y_miter);  
+    AddVertex (x1+x_miter, y1);
+    AddVertex (x2-x_miter, y1);  
+    AddVertex (x2, y1+y_miter);
+    AddVertex (x2, y2-y_miter);
+    AddVertex (x2-x_miter, y2);
+    AddVertex (x1+x_miter, y2);
+    AddVertex (x1, y2-y_miter);
+  }
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_POLYGON : CS_MESHTYPE_LINESTRIP);
+  DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN: CS_MESHTYPE_LINESTRIP);
 }
 
 /** Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, and determines how
