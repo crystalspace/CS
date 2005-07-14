@@ -1,0 +1,35 @@
+@c -*-texinfo-*-
+@node HOWTO Draw Text, , HOWTO Use custom font, 3D Renderer
+@subsection Drawing Text
+@cindex font
+@cindex drawing text
+
+This section describes how to draw text.
+
+@subsubheading Loading a Font
+
+Before you can use text you need a font first. Typically you load a font
+in an initialization routine. Here is an example:
+
+@example
+iGraphics2D* g2d = @dots{};
+iFontServer* fontserver = g2d->GetFontServer ();
+iFont* font = fontserver->LoadFont (CSFONT_COURIER);
+@end example
+
+@xref{HOWTO Use custom font} for more information on what fonts are
+possible.
+
+@subsubheading Actually Drawing the Text
+
+To draw the text you must first make sure you are in 2D mode. Here is
+how it would work (this code could be put after the call to let the engine
+draw (@code{view->Draw()}):
+
+@example
+g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+int fg = g2d->FindRGB (255, 0, 0);  // Red.
+int bg = -1;   // Transparent.
+g2d->Write (font, x, y, fg, bg, "This is text");
+@end example
+

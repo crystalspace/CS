@@ -40,8 +40,10 @@ to make more advanced texture effects using shaders.
 
 @menu
 * HOWTO Use custom font:: Using a Custom Font
+* HOWTO Draw Text:: Drawing Text
 @end menu
 
 @importss{usingcs,renderer,custfont.txi}
+@importss{usingcs,renderer,drawtext.txi}
 
 
