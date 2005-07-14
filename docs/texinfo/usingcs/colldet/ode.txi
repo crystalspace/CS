@@ -4,5 +4,53 @@
 @cindex physics
 @cindex @sc{ode}
 
-TODO
+The @samp{odedynam} plugin implements physics for Crystal Space using
+the @sc{ode} library.
+
+@subsubheading Doing the Timed Physics Simulation
+
+To make sure the physics simulation proceeds correctly in time you must
+tell @sc{ode} how much time has elapsed since previous frame so that
+it can calculate the collisions and physical interactions that happened
+during that time. The @code{iDynamics->Step()} function is responsable for
+that. As a parameter it has a delta which is a floating point number that
+represents the number of seconds to calculate. You should not make this
+number too big because that will make the calculations less accurate. A
+good number for accurate calculation is around @samp{0.01}. @samp{0.02}
+is also good and makes calculations a bit faster. However, what should you
+do if the elapsed number of seconds is bigger then that number? In that
+case you should divide the elapsed time with the delta and perform that
+number of steps one by one. It is also very important to make sure that
+the delta you pass to the @code{Step()} function is constant. If this
+number is variable then @sc{ode} will not behave well and you get stability
+errors. Here below I present a possible code snipped that will ensure
+that the delta is constant and also makes sure that no time is lost so
+that the speed of physics simulation is constant even with variable
+framerate:
+
+@example
+csRef<iVirtualClock> vc = @dots{};
+csRef<iDynamics> dynamics = @dots{};
+float delta = 0.01f;
+float remaining_seconds = 0.0f;
+@dots{}
+void ProcessPhysicsEveryFrame ()
+@{
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  float seconds = float (elapsed_time) / 1000.0f;
+  seconds += remaining_seconds;
+  while (seconds >= delta)
+  @{
+    ProcessForces (delta);
+    dynamics->Step (delta);
+    seconds -= delta;
+  @}
+  remaining_seconds = seconds;
+@}
+@end example
+
+This snippet of code will make sure that @code{Step} is only called with
+a constant delta. If there is a small time left after the loop (less then
+delta) then that will be remembered (in @samp{remaining_seconds}) for the next
+frame.
 

@@ -20,6 +20,8 @@ chronological order.
 	  that we always do steps that are exactly 'delta' big but our physics
 	  simulation speed is still independent from the framerate. This helps
 	  a great deal with stability.
+	- Jorrit documented the best way to do physics step simulation in the
+	  manual.
 13-Jul-2005
 	- Jorrit optimized csXRotMatrix3, csYRotMatrix3, and csZRotMatrix3
 	  by avoiding unneeded extra calls to cos and sin.
