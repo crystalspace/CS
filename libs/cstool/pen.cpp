@@ -79,6 +79,8 @@ csPen::Translate(const csVector3 &t)
 
   tr.Translate(t);
   mesh.object2world*=tr;
+
+  tt+=t;
 }
 
 void 
@@ -238,9 +240,12 @@ csPen::Write(iFont *font, uint x1, uint y1, char *text)
 		 	       static_cast<int>(color.y*255), 
 			       static_cast<int>(color.z*255),
 			       static_cast<int>(color.w*255));
-		
 
-  g2d->Write(font, x1, y1, the_color, -1, text);  
+  csVector3 pos(x1,y1,0);
+
+  pos += tt;
+
+  g2d->Write(font, pos.x, pos.y, the_color, -1, text);  
 }
 
 void 

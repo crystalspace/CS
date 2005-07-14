@@ -115,6 +115,9 @@ class csPen : public iPen
   /** The color we use. */
   csVector4 color;
 
+  /** The translation we keep for text. */
+  csVector3 tt;
+
   /** The color array generated for verts as we render. */
   csDirtyAccessArray<csVector4> colors;
 
