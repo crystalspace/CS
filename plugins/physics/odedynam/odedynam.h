@@ -784,50 +784,50 @@ struct ODESliderJoint : public csStrictODEJoint, iODESliderJoint
   virtual ~ODESliderJoint ();
 
   void SetLoStop (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamLoStop, axis, value);};
   void SetHiStop (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamHiStop, axis, value);};
   void SetVel (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamVel, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamVel, axis, value);};
   void SetFMax (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFMax, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamFMax, axis, value);};
   void SetFudgeFactor (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFudgeFactor, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamFudgeFactor, axis, value);};
   void SetBounce (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamBounce, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamBounce, axis, value);};
   void SetCFM (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamCFM, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamCFM, axis, value);};
   void SetStopERP (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopERP, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamStopERP, axis, value);};
   void SetStopCFM (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopCFM, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamStopCFM, axis, value);};
   void SetSuspensionERP (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionERP, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamSuspensionERP, axis, value);};
   void SetSuspensionCFM (float value, int axis)
-  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis, value);};
+  {csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamSuspensionCFM, axis, value);};
 
   float GetLoStop (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamLoStop, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamLoStop, axis);};
   float GetHiStop (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamHiStop, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamHiStop, axis);};
   float GetVel (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamVel, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamVel, axis);};
   float GetFMax (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFMax, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamFMax, axis);};
   float GetFudgeFactor (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamFudgeFactor, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamFudgeFactor, axis);};
   float GetBounce (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamBounce, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamBounce, axis);};
   float GetCFM (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamCFM, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamCFM, axis);};
   float GetStopERP (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopERP, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamStopERP, axis);};
   float GetStopCFM (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamStopCFM, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamStopCFM, axis);};
   float GetSuspensionERP (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionERP, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamSuspensionERP, axis);};
   virtual float GetSuspensionCFM (int axis)
-  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis);};
+  {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_SLIDER, dParamSuspensionCFM, axis);};
 
   void SetSliderAxis (float x, float y, float z) {dJointSetSliderAxis (jointID, x, y, z);};
   csVector3 GetSliderAxis ();

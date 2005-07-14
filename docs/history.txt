@@ -9,6 +9,7 @@ chronological order.
 14-Jul-2005
 	- Jorrit added a small section about how to draw text to the
 	  documentation.
+	- Piotr Obrzut fixed a bug in stops/motors methods in ODESliderJoint
 13-Jul-2005
 	- Jorrit optimized csXRotMatrix3, csYRotMatrix3, and csZRotMatrix3
 	  by avoiding unneeded extra calls to cos and sin.
