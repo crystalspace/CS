@@ -23,7 +23,7 @@
 
 csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d)
 {
-
+  mesh.object2world.Identity();
 }
 
 csPen::~csPen ()
@@ -35,8 +35,7 @@ void csPen::Start ()
 {
   poly.MakeEmpty();
   poly_idx.MakeEmpty();
-  colors.SetLength (0);
-  mesh.object2world.Identity();
+  colors.SetLength (0);  
 }
 
 void csPen::AddVertex (float x, float y)
@@ -72,6 +71,23 @@ void csPen::SetColor (float r, float g, float b, float a)
   color.z=b;
   color.w=a;
 }
+
+void 
+csPen::Translate(const csVector3 &t)
+{
+  csTransform tr;
+
+  tr.Translate(t);
+  mesh.object2world*=tr;
+}
+
+void 
+csPen::Rotate(const csMatrix3 &m)
+{
+  csTransform tr(m, csVector3(0));
+  mesh.object2world*=tr;
+}
+
 
 /** Draws a single line. */
 void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)

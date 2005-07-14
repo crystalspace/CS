@@ -110,21 +110,29 @@ bool awsManager::HandleEvent (iEvent &Event)
 
 void awsManager::Redraw()
 {
+  static float angle=0.0;
+  if (angle>6.28318531) angle=0;
+
   csPen pen(g2d, g3d);
-  csReversibleTransform rt;
+  csVector3 tv(-250,-250,0);  
+  csZRotMatrix3 rm(angle);
 
-  /*rt.Identity();
-  g3d->SetWorldToCamera(rt);  */
+  angle+=0.001;
+  
+  pen.Translate(tv);
+  pen.Rotate(rm);
 
+  tv.Set(350,350,0);
+  pen.Translate(tv);  
+  
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
 
   pen.SetColor(0.25,0.25,0.25,1);
-  pen.DrawRoundedRect(100,100,500,500,0.5,true);  
+  pen.DrawRoundedRect(0,0,500,500,0.5,true); 
   pen.SetColor(0.5,0.5,0.5,1);
-  pen.DrawRect(150,150,450,450, true);
+  pen.DrawRect(50,50,450,450, true);  
   pen.SetColor(0.75,0.75,0.75,1);
-  pen.DrawMiteredRect(200,200,400,400,0.5,true);
-  
+  pen.DrawMiteredRect(100,100,400,400,0.5,true);  
   
   pen.SetColor(1,1,1,1);
 
@@ -132,11 +140,11 @@ void awsManager::Redraw()
   pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_RIGHT, CS_PEN_TA_TOP, "Test Boxed Text - Right, Top");
   pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_LEFT, CS_PEN_TA_BOT, "Test Boxed Text - Left, Bot");
   
-  pen.DrawPoint(100,100);
-  pen.DrawLine(100,100,500,500);
-  pen.DrawRect(150,150,450,450, false);
-  pen.DrawMiteredRect(200,200,400,400,0.5,false);
-  pen.DrawRoundedRect(100,100,500,500,0.5,false);
+  pen.DrawPoint(0,0);
+  pen.DrawRoundedRect(0,0,500,500,0.5,false); 
+  pen.DrawRect(50,50,450,450, false);  
+  pen.DrawMiteredRect(100,100,400,400,0.5,false);  
+  
   
 }
 

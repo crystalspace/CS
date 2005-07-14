@@ -26,6 +26,7 @@
 #include "csgeom/vector4.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/transfrm.h"
 
 #include "csutil/dirtyaccessarray.h"
 
@@ -40,6 +41,16 @@ struct iPen
    * Sets the current color. 
    */
   virtual void SetColor (float r, float g, float b, float a) = 0;
+
+  /** 
+   * Translates by the given vector
+   */
+  virtual void Translate(const csVector3 &t)=0;
+
+  /**
+   * Rotates by the given matrix.
+   */
+  virtual void Rotate(const csMatrix3 &m)=0;
 
   /** 
    * Draws a single line. 
@@ -136,6 +147,16 @@ public:
    * Sets the current color. 
    */
   virtual void SetColor (float r, float g, float b, float a);
+
+  /** 
+   * Translates by the given vector
+   */
+  virtual void Translate(const csVector3 &t);
+
+  /**
+   * Rotates by the given matrix.
+   */
+  virtual void Rotate(const csMatrix3 &m);
 
   /** 
    * Draws a single line. 
