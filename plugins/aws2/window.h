@@ -12,10 +12,6 @@ namespace aws
 
     /// The template name of the window (the definition template that it was taken from.)
     scfString template_name;
-
-    /////////////// Properties /////////////
-    autom::string title;
-
     
   public:
     window();

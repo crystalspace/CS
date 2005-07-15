@@ -38,7 +38,10 @@ namespace aws
 
   public:
     // Empty constructor
-    property():readable(true), writeable(true) {}
+    property():value(autom::Nil()), readable(true), writeable(true) {}
+
+    /// Initialize an empty property.
+    property(bool _readable, bool _writeable):value(autom::Nil()), readable(_readable), writeable(_writeable) {}
 
     /// Initialize a property.
     property(const autom::keeper &_value, bool _readable, bool _writeable):value(_value), readable(_readable), writeable(_writeable) {}

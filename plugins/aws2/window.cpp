@@ -18,7 +18,7 @@ namespace aws
   {  
     widget::SetupAutomation(object_name);
   
-    prop_bag.CreateProperty("Title", property(autom::keeper(&title), true, true));
+    prop_bag.CreateProperty("Title", property(true, true));
   }
 
 }
