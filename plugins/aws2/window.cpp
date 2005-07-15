@@ -4,15 +4,21 @@
 
 namespace aws
 {
-
-  void window::setup_automation()
+  window::window()
   {
     scfString oname("win.");
 
     oname+=template_name+".";
     oname+=name;
 
-    //autom::Registrar()->assign("SetProperty@win.", std::make_pair(this, (autom::function::slot_mem_ptr)&int_builtin::bits));
+    SetupAutomation(oname);
+  }
+
+  void window::SetupAutomation(const scfString &object_name)
+  {  
+    widget::SetupAutomation(object_name);
+
+
   }
 
 }

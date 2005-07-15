@@ -77,7 +77,7 @@ namespace aws
     bool allow_automation_create;
 
   public:
-    property_bag():allow_automation_create(true) {};
+    property_bag():allow_automation_create(true) { };
     ~property_bag() {};
     
     /// Creates a new property mapping with the given property. Returns true on sucess, false on failure.
@@ -105,7 +105,7 @@ namespace aws
     autom::func_parm _create(autom::function &fn);
 
     /// Initializes the automation functions above with the registry.  'oname' must be the name of the object we're registering as.
-    void setup_automation(const scfString &oname);
+    void SetupAutomation(const scfString &oname);
   };
 }
 

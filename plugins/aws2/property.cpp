@@ -59,11 +59,11 @@ namespace aws
       }
       else
       {
-        return autom::func_parm(new autom::integer(0));	
+	return autom::func_parm(autom::Nil());	
       }
     }
 
-    void property_bag::setup_automation(const scfString &oname)
+    void property_bag::SetupAutomation(const scfString &oname)
     {
       // This creates object names like this:
       //
