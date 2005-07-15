@@ -20,6 +20,7 @@
 #define __AWS_FRAME_H__
 
 #include "cstool/pen.h"
+#include "csgeom/csrect.h"
 
 
 
@@ -28,30 +29,35 @@ namespace aws
 
   /** A frame presents different transformation methods for various vector operations.  It may also attempt to transform certain raster/blitting operations. */
   class frame
-  {    
-    /// The pen that we use to draw with.
-    iPen *pen;
-
-    /// This is the transformation that we apply to each operation that occurs.
-    csMatrix3 m;
+  {     
+    /// The box that we can draw in. This defines the "frame."
+    csRect bounds;
+ 
+    /// The parent bounding box.
+    frame *parent;
 
   public:
     frame();
+    virtual ~frame();
 
-    /// Sets the current pen.
-    void SetPen(iPen *_pen);
-    
-    /// Clears all transformations applied to this frame.
-    void ClearTransforms();
+    /// Accessor for the frame's bounds.
+    const csRect& Bounds() { return bounds; }
 
-    /// Rotates the frame by the given amount (in radians).
-    void Rotate(float angle);
+    /// Gets the screen absolute x and y coordinates of this frame. The 'x' and 'y' variables should be initialized to zero before the call.
+    void GetScreenPos(float &x, float &y);
 
-    /// Translates the frame by the given amount.
-    void Translate(float x, float y);
+    /// This function prepares the coordinate system for drawing, then calls the OnDraw method.
+    void Draw(iPen *pen);
 
-    // Scales the frame by the given amount.
-    void Scale(float x, float y);
+    /** Makes transforming a shape very easy.  It first rotates the object around it's axis by the
+     * number of radians specified in 'angle'.  Next, it translates the object to the position specified
+     * by 'x' and 'y'.  Note that this position is relative to the frame that this object lives in. 'box'
+     * is the bounding box for the object. Note that Transform CLEARS the current transform, and sets it
+     * to the transform you specify here. */
+    void Transform(iPen *pen, float angle, float x, float y, const csRect &box);
+
+    /** Override this function in the widget in order to draw it.  The drawing space is 0,0 to bounds.width, bounds.height. */     
+    virtual void OnDraw(iPen *pen) {}
 
   };
 

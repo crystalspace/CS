@@ -22,7 +22,7 @@
 namespace aws
 {
 
-void registry::addChild (const std::string &category, csRef<registry> _child) 
+void registry::addChild (const scfString &category, csRef<registry> _child) 
 { 
   child_map_type::iterator pos = children.find(category);
 
@@ -32,8 +32,8 @@ void registry::addChild (const std::string &category, csRef<registry> _child)
   pos->second.push_back(_child);		
 }
 
-csRef<registry> registry::findChild (const std::string &category, 
-				     const std::string &name)
+csRef<registry> registry::findChild (const scfString &category, 
+				     const scfString &name)
 {
   csRef<registry> reg, empty;
 
@@ -54,7 +54,7 @@ csRef<registry> registry::findChild (const std::string &category,
 }
 
 
-bool registry::findValue (const std::string &name, autom::keeper &k)
+bool registry::findValue (const scfString &name, autom::keeper &k)
 {
   value_type::iterator pos = reg.find (name);
 

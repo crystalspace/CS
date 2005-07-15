@@ -38,7 +38,7 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
     // Don't process comments.
     if (child->GetType()==CS_NODE_COMMENT) continue;
 
-    std::string name(child->GetValue());
+    scfString name(child->GetValue());
 
     if ((name == "component") || (name == "window") || (name == "skin"))
     {
@@ -62,7 +62,7 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
       {
 	csRef<iDocumentAttribute > attr = attr_pos->Next();
 	      
-	std::string a_name(attr->GetName());
+	scfString a_name(attr->GetName());
 	std::string a_value(attr->GetValue());
 
 	/* If the name of the attribute is value, then the name of the key is 
@@ -76,8 +76,12 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 	}
 	else
 	{
-	  a_name = name + "." + a_name;
-	  reg->insert(a_name, 
+	  scfString tmp = name;
+
+	  tmp+=".";
+	  tmp+=a_name;
+	  
+	  reg->insert(tmp, 
 	    autom::keeper(autom::Compile(a_value)));				
 	}
       }

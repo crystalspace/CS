@@ -249,7 +249,7 @@ public:
 		
 		def_funcs[name->toString().Value().c_str()] = body;
 				  		  
-		Registrar()->assign(name->toString().Value(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
+		Registrar()->assign(name->toString().Value().c_str(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
 
 		return func_parm(Nil());
 	}

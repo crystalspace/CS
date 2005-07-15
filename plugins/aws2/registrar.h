@@ -36,33 +36,18 @@ namespace autom
 			
 		/** The type for function pointers. */
 		typedef std::pair<function::slot_ptr, function::slot_mem_ptr> func_ptr;
-				
-		/** The type for container pointers. */
-		typedef container * cont_ptr;
+
+		/** The type for mapping functions to names. */
+		typedef std::map <scfString, func_ptr> func_map_type;
+			
 		
-	private:
-		/** A container holds both functions and other containers. */
-		struct container
-		{
-			/** The type for mapping functions to names. */
-			typedef std::map <std::string, func_ptr> func_map_type;
-			
-			/** The type for mapping containers to names. */
-			typedef std::map <std::string, cont_ptr> cont_map_type;
-			
-			/** The map of names to functions. */
-			func_map_type func_map;
-			
-			/** The map of names to containers. */
-			cont_map_type cont_map;			
-		};
-		
-		/** The root container is called the lobby. */
-		cont_ptr lobby;		
+	private:		
+		/** The container is called the lobby. */
+		func_map_type lobby;		
 		
 	public:
 	
-		registrar():lobby(new container()) 
+		registrar():lobby() 
 		{
 		}
 		
@@ -73,34 +58,12 @@ namespace autom
 		/** Performs lookup on the function.  All lookups start from the lobby and work deeper. 
 		 * The function returns a pair: result, pointer.  If result is true, the pointer is valid,
 		 * otherwise the pointer is invalid. */
-		std::pair<bool, func_ptr> lookup(const std::string& name)
-		{			
-			std::vector<std::string> parts;
+		std::pair<bool, func_ptr> lookup(const scfString& name)
+		{	
+		   func_map_type::iterator func = lobby.find(name);
 			
-			cont_ptr cont=lobby;
-			
-			if (std::split(const_cast<std::string&>(name), '@', parts)>1)
-			{
-				std::vector<std::string> cont_names;
-				
-				if (std::split(parts[1], '.', cont_names))
-				{					
-					// Find the container, but do not create it. It MUST exist.
-					for(std::vector<std::string>::iterator pos=cont_names.begin(); pos!=cont_names.end(); ++pos)				
-					{
-						container::cont_map_type::iterator tmp = cont->cont_map.find(*pos);
-						
-						if (tmp!=cont->cont_map.end()) cont=tmp->second;
-						else return std::make_pair(false, func_ptr(0,0));
-					}
-				}					
-				
-			}			
-			
-			container::func_map_type::iterator func=cont->func_map.find(parts[0]);
-			
-			if (func!=cont->func_map.end()) return std::make_pair(true, func->second);
-			else return std::make_pair(false, func_ptr(0,0));			
+		   if (func!=lobby.end()) return std::make_pair(true, func->second);
+		   else return std::make_pair(false, func_ptr(0,0));			
 		}
 		
 		/** Register a function name with a function object.  It will create all the needed containers
@@ -110,7 +73,7 @@ namespace autom
 		 *
 		 *  Would create containers user, profile, and usage; and then create size inside the usage container. 
 		 */
-		void assign(const std::string &name, func_ptr func);
+		void assign(const scfString &name, func_ptr func);
 	};
 	
 	

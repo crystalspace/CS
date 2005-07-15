@@ -23,7 +23,7 @@ namespace autom
 {
 
 static registrar *_reg_object=0;
-static nil	   	  _global_nil_object;
+static nil	  _global_nil_object;
 
 extern void install_builtin();
 
@@ -46,35 +46,9 @@ Nil()
 }
 
 void 
-registrar::assign(const std::string &name, func_ptr func)
+registrar::assign(const scfString &name, func_ptr func)
 {
-	std::vector<std::string> parts;
-	
-	cont_ptr cont=lobby;			
-	
-	if (std::split(const_cast<std::string&>(name), '@', parts)>1)
-	{
-		std::vector<std::string> cont_names;
-		
-		if (std::split(parts[1], '.', cont_names))
-		{																	
-			// Find the container - creating it if necessary.							
-			for(std::vector<std::string>::iterator pos=cont_names.begin(); pos!=cont_names.end(); ++pos)				
-			{		
-				container::cont_map_type::iterator name_pos = cont->cont_map.find(*pos);
-
-				if (name_pos==cont->cont_map.end())											 
-				  name_pos = (cont->cont_map.insert(std::make_pair(*pos, new container()))).first;									
-				
-				cont = name_pos->second;							
-			}				
-
-		}	
-		
-	}	
-	
-	// Assign the function name
-	cont->func_map[parts[0]] = func;							
+  lobby[name]=func;	
 }						
 
 

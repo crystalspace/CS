@@ -58,7 +58,7 @@ bool
 function::bind()
 {
 	// Look it up.
-  std::pair<bool, registrar::func_ptr> result = Registrar()->lookup(std::string(getName().GetData()));
+  std::pair<bool, registrar::func_ptr> result = Registrar()->lookup(getName());
 	
 	// If we found a function, great, otherwise we'll retry the bind next time we're called.
 	if (result.first==true)	

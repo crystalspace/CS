@@ -115,12 +115,12 @@ void awsManager::Redraw()
 
   csPen pen(g2d, g3d);
   csVector3 tv(-250,-250,0);  
-  csZRotMatrix3 rm(angle);
-
-  angle+=0.001;
   
-  pen.Translate(tv);
-  pen.Rotate(rm);
+  angle+=0.001F;
+  
+  //pen.Translate(tv);  
+  pen.SetOrigin(tv);
+  pen.Rotate(angle);  
 
   tv.Set(350,350,0);
   pen.Translate(tv);  
@@ -133,17 +133,20 @@ void awsManager::Redraw()
   pen.DrawRect(50,50,450,450, true);  
   pen.SetColor(0.75,0.75,0.75,1);
   pen.DrawMiteredRect(100,100,400,400,0.5,true);  
+  pen.SetColor(0.85,0.85,0.85,1);
+  pen.DrawArc(150,150,350,350,0.14F,2.23F,true); 
   
   pen.SetColor(1,1,1,1);
 
-  pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_CENTER, CS_PEN_TA_CENTER, "Test Boxed Text - Centered");
-  pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_RIGHT, CS_PEN_TA_TOP, "Test Boxed Text - Right, Top");
-  pen.WriteBoxed(default_font, 100,100,500,500, CS_PEN_TA_LEFT, CS_PEN_TA_BOT, "Test Boxed Text - Left, Bot");
+  pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_CENTER, CS_PEN_TA_CENTER, "Test Boxed Text - Centered");
+  pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_RIGHT, CS_PEN_TA_TOP, "Test Boxed Text - Right, Top");
+  pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_LEFT, CS_PEN_TA_BOT, "Test Boxed Text - Left, Bot");
   
   pen.DrawPoint(0,0);
   pen.DrawRoundedRect(0,0,500,500,0.5,false); 
   pen.DrawRect(50,50,450,450, false);  
   pen.DrawMiteredRect(100,100,400,400,0.5,false);  
+  pen.DrawArc(150,150,350,350,0.14F,2.23F,false); 
   
   
 }

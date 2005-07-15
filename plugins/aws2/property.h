@@ -19,467 +19,94 @@
 #ifndef _AWS_PROPERTY_H__
 #define _AWS_PROPERTY_H__
 
-
 #include "registrar.h"
-#include "sigslot.h"
-#include "csgeom/csrect.h"
+
+#include "csutil/scfstr.h"
 #include "csutil/snprintf.h"
-#include "csutil/scanstr.h"
 #include <map>
 
-class awsPropertyBase;
-
-/** A bag of properties.  This lets us search for them.  The actual properties are automatically registered when they're created. */
-class awsPropertyBag
+namespace aws
 {
-	typedef std::map<std::string, awsPropertyBase *> property_map;
+  /** A property is a value which is maintained by some object.  That property can be read or written by
+   * external agents ONLY if the requisite permissions are available. */
+  class property
+  {
+    autom::keeper value;
 
-	/** The map of properties. */
-	property_map props;
+    bool readable;
+    bool writeable;
 
-public:
-	awsPropertyBag() {}
-	~awsPropertyBag() {}
+  public:
+    // Empty constructor
+    property():readable(true), writeable(true) {}
 
-	/** Registers a given property. */
-	void Register(const std::string &name, awsPropertyBase *p)
-	{
-		props.insert(std::make_pair(name, p));
-	}
+    /// Initialize a property.
+    property(const autom::keeper &_value, bool _readable, bool _writeable):value(_value), readable(_readable), writeable(_writeable) {}
 
-	/** Unregisters a property. */
-	void Unregister(const std::string &name)
-	{
-		props.erase(name);
-	}
+    /// Copy property
+    property(const property &p):value(p.value), readable(p.readable), writeable(p.writeable) {}
 
-	/** Finds the pointer to some property. It returns a raw pointer because it is not expected that
-	 * you will ever create properties on new.  */
-	awsPropertyBase *Find(const std::string &name)
-	{
-		property_map::iterator pos = props.find(name);
+    ~property() {}
 
-		if (pos==props.end()) return 0;
-		else return pos->second;
-	}
-};
+    /// Sets the value of the property. Returns true on sucess, false on failure.
+    bool Set(autom::keeper new_value)
+    {
+      if (writeable) { value=new_value; return true; }
 
-class awsPropertyBase
-{
-protected:
-	/** True if it is possible to read this property. */
-	bool readable;
+      return false;
+    }
 
-	/** True if it is possible to write this property. */
-	bool writeable;
+    /// Gets the value of the property.  Returns true on sucess, false on failure.
+    bool Get(autom::keeper &_value)
+    {
+      if (readable) { _value=value; return true; }
+      return false;
+    }
+  };
 
-	/** The name of the proeprty. */
-	std::string name;
+  /** Maintains a "bag" of properties.  These can be set through the automation interface, or through the native accessors. */
+  class property_bag : public autom::function::slot
+  {
+    /// The type of the property map.
+    typedef std::map<scfString, property> property_map;
 
-public:
-	awsPropertyBase(bool _writeable=true, bool _readable=true):readable(_readable), writeable(_writeable) {}
+    /// The map of names to properties.
+    property_map props;
 
-	virtual ~awsPropertyBase()
-	{	
-	}
+    /// True if automation is allowed to create new properties in this bag.
+    bool allow_automation_create;
 
-	/** This signal is fired whenever the property is changed. */
-	autom::signal2<const std::string &, awsPropertyBase *> Changed;
+  public:
+    property_bag():allow_automation_create(true) {};
+    ~property_bag() {};
+    
+    /// Creates a new property mapping with the given property. Returns true on sucess, false on failure.
+    bool CreateProperty(const scfString &name,  const property& p);
 
-	/** This signal is fired whenever the property is being bound.  Occurs BEFORE the binding is registered. */
-	autom::signal3<const std::string &, const std::string &, awsPropertyBase *> Binding;
+    /// Gets the value of the named property. Returns true on sucess, false on failure.
+    bool Set(const scfString &name, const autom::keeper &value);
 
-	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
-	virtual bool Set(autom::keeper &_value)=0;
+    /// Gets the value of the named property.  Returns true on sucess, false on failure.
+    bool Get(const scfString &name, autom::keeper &value);
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)=0;
+    /// Determines whether or not automation calls can create new properties.
+    void SetAllowAutomationCreate(bool value) { allow_automation_create=value; }
 
-	/** Binds this property to the property bag. */
-	virtual void Bind(const std::string &_name, awsPropertyBag &bag)
-	{	
-		Binding(name, _name, this);
+  public:
+    //////////////////// Automation ///////////////////////////
 
-		bag.Unregister(name);
+    /// Performs SetProperty via automation
+    autom::func_parm _set(autom::function &fn);
 
-		name=_name;
-		bag.Register(_name, this);
-	}
-};
+    /// Performs GetProperty via automation
+    autom::func_parm _get(autom::function &fn);
 
+    /// Performs CreateProperty via automation, NOTE: this will fail if allow_automation_create is set to false!
+    autom::func_parm _create(autom::function &fn);
 
-/** A property is intended to be a class member.  You should never create a property via new.  It maintains a value of some type, either string, int, float, or list. */
-class awsProperty : virtual public awsPropertyBase
-{
-	/** This is the value of the property. */
-	autom::keeper value;		
-	
-public:
-	/** Creates a new property, registers it with a bag, and optionally sets it's access. */
-	awsProperty(bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable)
-	{	
-	}
-
-	virtual ~awsProperty() 
-	{
-	}
-
-	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable) 
-		{ 
-			value=_value; 
-			Changed(name, this);
-			return true; 
-		}
-		else return false;
-	}
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-		if (readable)
-		{
-			_value=value;
-			return true;
-		}
-		else return false;
-	}	
-};
-
-/**  A bound property.  This property is bound to some csRect. */
-class awsRectProperty : virtual public awsPropertyBase
-{
-	/** The rect we store. */
-	csRect &value;
-
-public:
-	awsRectProperty(csRect &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
-
-	virtual ~awsRectProperty()
-	{
-	}
-
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			std::string s(_value->toString().Value());
-			if (csScanStr(s.c_str(), "(%d, %d)-(%d, %d)", &value.xmin, &value.ymin, &value.xmax, &value.ymax)!=-1) 
-			{
-				Changed(name, this);
-				return true;
-			}
-			else return false;
-		}
-		else return false;
-	}
-
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const csRect &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
-            return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-		char buf[128];
-
-        if (readable)
-		{
-			cs_snprintf(buf, sizeof(buf), "(%d, %d)-(%d, %d)", value.xmin, value.ymin, value.xmax, value.ymax);
-			
-			_value.AttachNew(new autom::string(buf));
-
-			return true;
-		}       
-		else return false;
-	}
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(csRect &_value)
-	{
-		if (readable)
-		{
-			value = _value;
-            return true;
-		}
-		else return false;		
-	}
-
-};
-
-/**  A bound property.  This property is bound to some int. */
-class awsIntProperty : virtual public awsPropertyBase
-{
-	/** The int we store. */
-	int &value;
-
-public:
-	awsIntProperty(int &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
-
-	virtual ~awsIntProperty()
-	{
-	}
-
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = (int)_value->toInt().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
-
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const int &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
-            return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-        if (readable)
-		{			
-			_value.AttachNew(new autom::integer(value));
-			return true;
-		}       
-		else return false;
-	}
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(int &_value)
-	{
-		if (readable)
-		{
-			value = _value;
-            return true;
-		}
-		else return false;		
-	}
-
-};
-
-/**  A bound property.  This property is bound to some float. */
-class awsFloatProperty : virtual public awsPropertyBase
-{
-	/** The float we store. */
-	float &value;
-
-public:
-	awsFloatProperty(float &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
-
-	virtual ~awsFloatProperty()
-	{
-	}
-
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = (float)_value->toFloat().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
-
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const float &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
-            return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-        if (readable)
-		{			
-			_value.AttachNew(new autom::floating(value));
-			return true;
-		}       
-		else return false;
-	}
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(float &_value)
-	{
-		if (readable)
-		{
-			value = _value;
-            return true;
-		}
-		else return false;		
-	}
-
-};
-
-/**  A bound property.  This property is bound to some bool. */
-class awsBoolProperty : virtual public awsPropertyBase
-{
-	/** The bool we store. */
-	bool &value;
-
-public:
-	awsBoolProperty(bool &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
-
-	virtual ~awsBoolProperty()
-	{
-	}
-
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a bool, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = (bool)_value->toInt().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
-
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const bool &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
-            return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-        if (readable)
-		{			
-			_value.AttachNew(new autom::integer(value));
-			return true;
-		}       
-		else return false;
-	}
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(bool &_value)
-	{
-		if (readable)
-		{
-			value = _value;
-            return true;
-		}
-		else return false;		
-	}
-
-};
-
-/**  A bound property.  This property is bound to some std::string. */
-class awsStringProperty : virtual public awsPropertyBase
-{
-	/** The std::string we store. */
-	std::string &value;
-
-public:
-	awsStringProperty(std::string &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
-
-	virtual ~awsStringProperty()
-	{
-	}
-
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a std::string, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = _value->toString().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
-
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const std::string &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
-            return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-        if (readable)
-		{			
-			_value.AttachNew(new autom::string(value));
-			return true;
-		}       
-		else return false;
-	}
-
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(std::string &_value)
-	{
-		if (readable)
-		{
-			value = _value;
-            return true;
-		}
-		else return false;		
-	}
-
-};
+    /// Initializes the automation functions above with the registry.  'oname' must be the name of the object we're registering as.
+    void setup_automation(const scfString &oname);
+  };
+}
 
 #endif
