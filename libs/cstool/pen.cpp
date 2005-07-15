@@ -72,6 +72,24 @@ void csPen::SetColor (float r, float g, float b, float a)
   color.w=a;
 }
 
+void csPen::ClearTransform()
+{
+  mesh.object2world.Identity();
+}
+
+void csPen::PushTransform()
+{
+  transforms.Push(mesh.object2world);
+}
+
+void csPen::PopTransform()
+{
+  ClearTransform();
+
+  mesh.object2world*=transforms.Top();
+  transforms.Pop();
+}
+
 void 
 csPen::Translate(const csVector3 &t)
 {

@@ -42,6 +42,21 @@ struct iPen
    */
   virtual void SetColor (float r, float g, float b, float a) = 0;
 
+  /**    
+   * Clears the current transform, resets to identity.
+   */
+  virtual void ClearTransform()=0;
+
+  /** 
+   * Pushes the current transform onto the stack. *
+   */
+  virtual void PushTransform()=0;
+
+  /**
+   * Pops the transform stack. The top of the stack becomes the current transform. 
+   */
+  virtual void PopTransform()=0;
+
   /** 
    * Translates by the given vector
    */
@@ -129,6 +144,9 @@ class csPen : public iPen
   /** The color array generated for verts as we render. */
   csDirtyAccessArray<csVector4> colors;
 
+  /** The array that stores the transformation stack. */
+  csArray<csReversibleTransform> transforms;
+
 protected:
   /** 
    * Initializes our working objects. 
@@ -158,6 +176,21 @@ public:
    * Sets the current color. 
    */
   virtual void SetColor (float r, float g, float b, float a);
+
+  /**    
+   * Clears the current transform, resets to identity.
+   */
+  virtual void ClearTransform();
+
+  /** 
+   * Pushes the current transform onto the stack. *
+   */
+  virtual void PushTransform();
+
+  /**
+   * Pops the transform stack. The top of the stack becomes the current transform. 
+   */
+  virtual void PopTransform();
 
   /** 
    * Translates by the given vector
