@@ -3117,8 +3117,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   if (!fact) return 0;
 
   // don't pass the name to avoid a second search
-  csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, 0));
-  if (fwrap && name) fwrap->QueryObject ()->SetName (name);
+  csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, name));
   return csPtr<iMeshFactoryWrapper> (fwrap);
 }
 

@@ -148,7 +148,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   csRef<iTextureWrapper> tex;
   csRef<iLoaderPlugin> plugin;
 
-  char filename[256] = "";
+  csString filename;
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;
@@ -210,7 +210,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	      child, "Expected VFS filename for 'file'!");
 	    goto error;
 	  }
-          strcpy (filename, fname);
+          filename = fname;
 	}
         break;
       case XMLTOKEN_MIPMAP:
@@ -323,16 +323,16 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   }
 
   // @@@ some more comments
-  if ((!type || (*type == 0)) && (filename[0] == 0))
+  if ((!type || (*type == 0)) && filename.IsEmpty ())
   {
-    strcpy (filename, txtname);
+    filename = txtname;
   }
 
   iTextureManager* tm;
   tm = G3D ? G3D->GetTextureManager() : 0;
   int Format;
   Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
-  if (filename && (filename[0] != 0))
+  if (!filename.IsEmpty ())
   {
     csRef<iImage> image = LoadImage (filename, Format);
     context.SetImage (image);
