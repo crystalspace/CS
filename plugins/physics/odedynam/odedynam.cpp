@@ -1595,6 +1595,9 @@ void  csStrictODEJoint::SetParam (int joint_type, int parameter, int axis, float
     case CS_ODE_JOINT_TYPE_AMOTOR:
       dJointSetAMotorParam (jointID, param, value);
       break;
+    case CS_ODE_JOINT_TYPE_UNIVERSAL:
+      dJointSetUniversalParam (jointID, param, value);
+      break;
     default:
       ; // do nothing
   }
@@ -1700,6 +1703,9 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
       break;
     case CS_ODE_JOINT_TYPE_AMOTOR:
       return dJointGetAMotorParam (jointID, param);
+      break;
+    case CS_ODE_JOINT_TYPE_UNIVERSAL:
+      return dJointGetUniversalParam (jointID, param);
       break;
     default:
       return 0.0;
