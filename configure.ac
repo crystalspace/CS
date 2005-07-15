@@ -172,25 +172,7 @@ CS_CHECK_PROGS([MAKE], [gnumake gmake make])
 # users.  It saves users the bother of having to install these packages
 # manually one at a time.
 #------------------------------------------------------------------------------
-CS_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
-AS_IF([test $ac_compiler_gnu = yes],
-    [cs_cv_cslibs_compiler="--compiler gcc-`$CXX -dumpversion`"])
-AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
-    [AS_IF([test -n "$CSLIBS_CONFIG"],
-	[cs_cv_cslibs=yes
-	cs_cv_cslibs_cflags=CS_RUN_PATH_NORMALIZE(
-	    [$CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler])
-	cs_cv_cslibs_lflags=CS_RUN_PATH_NORMALIZE(
-	    [$CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler])
-	cs_cv_cslibs_binpath=CS_RUN_PATH_NORMALIZE(
-	    [$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])],
-	[cs_cv_cslibs=no])])
-AS_IF([test $cs_cv_cslibs = yes],
-    [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
-    CPPFLAGS="$CPPFLAGS $cs_cv_cslibs_cflags"
-    LDFLAGS="$LDFLAGS $cs_cv_cslibs_lflags"
-    PATH="$cs_cv_cslibs_binpath$PATH_SEPARATOR$PATH"])
-
+CS_CHECK_CSWIN32LIBS
 
 
 #------------------------------------------------------------------------------
