@@ -55,7 +55,10 @@ namespace aws
 	scfString name = fn["name"]->toString().Value().c_str();
 	autom::keeper value = fn["value"];
 
-	return autom::func_parm(new autom::integer(Set(name, value)));
+	bool readable = fn["readable"]->toInt().Value();
+	bool writeable = fn["writeable"]->toInt().Value();
+
+	return autom::func_parm(new autom::integer(CreateProperty(name, property(value, readable, writeable))));
       }
       else
       {
