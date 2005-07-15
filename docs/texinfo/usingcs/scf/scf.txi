@@ -830,7 +830,7 @@ embedded into our class).
 #include "csutil/scf.h"
 
 // Version number of our interface.
-SCF_VERSION(iDog, 0, 0, 1)
+SCF_VERSION(iDog, 0, 0, 1);
 
 struct iDog : public iBase
 @{
