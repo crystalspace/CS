@@ -242,14 +242,20 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   float width = x2-x1;
   float height = y2-y1;
 
+  if (width==0 || height==0) return;
+
   float x_radius = width/2;
   float y_radius = height/2;
   
   float center_x = x1+(x_radius);
   float center_y = y1+(y_radius);
-
+  
   // This is a totally made-up metric.  The idea is to make the circle or arc smoother as it gets larger by increasing the number of steps to take.  
-  float steps = (width*height) / 10;
+  float steps = (width*height) * 0.01;
+
+  // Make sure that the number of steps we take is never below 1. (This will cause an inversion and the number of steps we take will grow vastly.)
+  while(steps<1) steps*=10;
+
   float delta = (end_angle-start_angle) / steps;
   float angle;
 
