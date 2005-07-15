@@ -79,7 +79,15 @@ struct iPen
    * and determines how much of the corner is rounded off. 
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-    float roundness, bool fill = false) = 0;    
+    float roundness, bool fill = false) = 0; 
+
+  /** 
+   * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
+   * The arc will be made to fit in the given box.  If you want a circular arc, make sure the box is
+   * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
+   * angle.
+   */
+  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool fill=false) = 0;
 
   /**
    * Writes text in the given font at the given location.
@@ -189,6 +197,14 @@ public:
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
     float roundness, bool fill = false);
+
+  /** 
+   * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
+   * The arc will be made to fit in the given box.  If you want a circular arc, make sure the box is
+   * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
+   * angle.
+   */
+  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool fill=false);
 
   /**
    * Writes text in the given font at the given location.

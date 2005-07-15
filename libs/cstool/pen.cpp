@@ -231,6 +231,41 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
 }
 
+/** 
+   * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
+   * The arc will be made to fit in the given box.  If you want a circular arc, make sure the box is
+   * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
+   * angle.
+   */
+void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool fill)
+{
+  float width = x2-x1;
+  float height = y2-y1;
+
+  float x_radius = width/2;
+  float y_radius = height/2;
+  
+  float center_x = x1+(x_radius);
+  float center_y = y1+(y_radius);
+
+  // This is a totally made-up metric.  The idea is to make the circle or arc smoother as it gets larger by increasing the number of steps to take.  
+  float steps = (width*height) / 10;
+  float delta = (end_angle-start_angle) / steps;
+  float angle;
+
+  Start();
+  
+  if (fill)AddVertex(center_x, center_y);
+
+  for(angle=start_angle; angle<=end_angle; angle+=delta)
+  {
+    AddVertex(center_x+(cos(angle)*x_radius), center_y+(sin(angle)*y_radius));
+  }
+
+  SetupMesh ();
+  DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
+}
+
 void 
 csPen::Write(iFont *font, uint x1, uint y1, char *text)
 {

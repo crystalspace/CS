@@ -268,6 +268,7 @@ public:
   csZScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) {}
 };
 
+
 /** @} */
 
 #endif // __CS_MATRIX3_H__
