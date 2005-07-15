@@ -11,12 +11,10 @@ namespace aws
 {
   class widget : public autom::function::slot
   {    
+  protected:
     /// The property bag.  This maintains a list of all of our properties.
     property_bag prop_bag;
-
-    /////////////// Properties /////////////
-    autom::string title;
-
+    
     
   public:
     

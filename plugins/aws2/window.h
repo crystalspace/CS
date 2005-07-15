@@ -13,9 +13,6 @@ namespace aws
     /// The template name of the window (the definition template that it was taken from.)
     scfString template_name;
 
-    /// The property bag.  This maintains a list of all of our properties.
-    property_bag prop_bag;
-
     /////////////// Properties /////////////
     autom::string title;
 

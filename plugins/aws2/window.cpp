@@ -17,8 +17,8 @@ namespace aws
   void window::SetupAutomation(const scfString &object_name)
   {  
     widget::SetupAutomation(object_name);
-
-
+  
+    prop_bag.CreateProperty("Title", property(autom::keeper(&title), true, true));
   }
 
 }
