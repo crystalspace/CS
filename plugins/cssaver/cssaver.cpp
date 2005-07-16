@@ -850,9 +850,9 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
 
     //Add the transformation tags
     csVector3 moveVect =
-      -meshwrapper->GetMovable()->GetTransform().GetT2OTranslation();
+      meshwrapper->GetMovable()->GetTransform().GetO2TTranslation();
     csMatrix3 moveMatrix =
-      meshwrapper->GetMovable()->GetTransform().GetT2O();
+      meshwrapper->GetMovable()->GetTransform().GetO2T();
     if (moveVect != 0 || !moveMatrix.IsIdentity())
     {
       //Add the move tag

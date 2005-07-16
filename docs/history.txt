@@ -9,6 +9,8 @@ chronological order.
 16-Jul-2005
 	- Eric Sunshine upgraded the MSVC project files to use wxWidgets 2.6.1
 	  rather than 2.4.2.
+	- res fixed the sector mesh transformation saving in cssaver as 
+	  reported by Spin.
 15-Jul-2005
 	- res separated the cs-win32libs detection into its own .m4 file for
 	  easier reuse in external projects.
