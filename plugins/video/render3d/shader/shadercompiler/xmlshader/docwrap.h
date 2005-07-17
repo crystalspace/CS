@@ -32,6 +32,8 @@
 #include "iutil/objreg.h"
 
 class csWrappedDocumentNodeIterator;
+struct WrapperStackEntry;
+
 
 typedef size_t csConditionID;
 const csConditionID csCondAlwaysFalse = (csConditionID)~0;
