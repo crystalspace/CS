@@ -139,7 +139,7 @@ public:
    */
   bool Delete (const T& object)
   {
-    return map.Delete (object, object);
+    return map.Delete (object, true);
   }
 
   /// Get the number of elements in the set.

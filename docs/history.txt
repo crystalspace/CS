@@ -9,6 +9,8 @@ chronological order.
 17-Jul-2005
 	- Eric Sunshine added forward declaration of struct WrapperStackEntry
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.
+	- Jorrit fixed a bug (as directed by res2k) in csSet.Delete() which
+	  would fail for deleting the 0 element.
 16-Jul-2005
 	- Eric Sunshine upgraded the MSVC project files to use wxWidgets 2.6.1
 	  rather than 2.4.2.
