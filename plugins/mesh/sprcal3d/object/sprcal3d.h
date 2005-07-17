@@ -45,7 +45,6 @@
 #include "imesh/object.h"
 #include "imesh/spritecal3d.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
@@ -1243,17 +1242,6 @@ public:
 
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
-
-  //------------------- iConfig interface implementation ---------------------
-  struct csSpriteCal3DConfig : public iConfig
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option)
-    { return false; }
-    virtual bool SetOption (int id, csVariant* value) { return false; }
-    virtual bool GetOption (int id, csVariant* value) { return false; }
-  } scfiConfig;
-  friend struct csSpriteCal3DConfig;
 
   //--------------------- iComponent interface implementation ----------------
   struct eiComponent : public iComponent

@@ -22,6 +22,9 @@ chronological order.
 	  of scfString, mostly because csString has operator<, but scfString
 	  doesn't. Also, scfString is mostly a wrapper around csString, so the
 	  latter is a bit more lightweight.
+	- res renamed the 'iConfig' interface to the more appropriate 
+	  'iPluginConfig'.
+	- res fixed some float truncation warnings on VC in phystut.
 16-Jul-2005
 	- Eric Sunshine upgraded the MSVC project files to use wxWidgets 2.6.1
 	  rather than 2.4.2.

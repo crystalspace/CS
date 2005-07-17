@@ -21,7 +21,7 @@
 #include "plugins/engine/3d/sector.h"
 
 SCF_IMPLEMENT_EMBEDDED_IBASE(csEngineConfig)
-  SCF_IMPLEMENTS_INTERFACE(iConfig)
+  SCF_IMPLEMENTS_INTERFACE(iPluginConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 static const csOptionDescription

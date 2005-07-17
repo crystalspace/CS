@@ -46,9 +46,9 @@
 #include "imesh/object.h"
 #include "imesh/thing.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
 #include "iutil/dbghelp.h"
 #include "iutil/eventh.h"
+#include "iutil/pluginconfig.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/txtmgr.h"
 #include "lghtmap.h"
@@ -1242,13 +1242,13 @@ public:
   } scfiComponent;
 
   /// iConfig implementation.
-  struct eiConfig : public iConfig
+  struct eiPluginConfig : public iPluginConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
+  } scfiPluginConfig;
 
   /// iDebugHelper implementation
   struct eiDebugHelper : public iDebugHelper

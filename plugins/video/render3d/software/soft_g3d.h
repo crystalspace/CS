@@ -20,9 +20,9 @@
 #ifndef __CS_SOFT_RENDER3D_H__
 #define __CS_SOFT_RENDER3D_H__
 
-#include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/pluginconfig.h"
 #include "sft3dcom.h"
 
 /// Software 3D renderer
@@ -39,13 +39,13 @@ public:
   /// Open a canvas.
   virtual bool Open ();
 
-  struct eiSoftConfig : public iConfig
+  struct eiSoftConfig : public iPluginConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSoftwareGraphics3D);
     virtual bool GetOptionDescription (int idx, csOptionDescription*);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
+  } scfiPluginConfig;
   friend struct eiSoftConfig;
 };
 

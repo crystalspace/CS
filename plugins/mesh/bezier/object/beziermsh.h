@@ -43,7 +43,7 @@
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
+#include "iutil/pluginconfig.h"
 #include "clightmap.h"
 
 class csBezierMesh;
@@ -902,13 +902,13 @@ public:
   } scfiComponent;
 
   /// iConfig implementation.
-  struct eiConfig : public iConfig
+  struct eiPluginConfig : public iPluginConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBezierMeshObjectType);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
+  } scfiPluginConfig;
 };
 
 #endif // __CS_BEZIERMESH_H__

@@ -31,8 +31,8 @@
 #include "ivideo/natwin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
 #include "iutil/dbghelp.h"
+#include "iutil/pluginconfig.h"
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 
@@ -421,13 +421,13 @@ protected:
   // of csGraphics2D.
   virtual void SetTitle (const char* title);
 
-  struct CanvasConfig : public iConfig
+  struct CanvasConfig : public iPluginConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
     virtual bool GetOptionDescription (int idx, csOptionDescription*);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
+  } scfiPluginConfig;
   friend struct CanvasConfig;
 
   struct NativeWindowManager : public iNativeWindowManager

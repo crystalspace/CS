@@ -24,12 +24,12 @@
 #include "csutil/snprintf.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
-#include "iutil/config.h"
 #include "iutil/eventq.h"
 #include "iutil/plugin.h"
+#include "iutil/pluginconfig.h"
 
 
-void csCommandLineHelper::Help (iConfig* config)
+void csCommandLineHelper::Help (iPluginConfig* config)
 {
   int i;
   for (i = 0 ; ; i++)
@@ -97,7 +97,7 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
   while (it->HasNext ())
   {
     iBase* plug = it->Next ();
-    csRef<iConfig> config (SCF_QUERY_INTERFACE (plug, iConfig));
+    csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plug, iPluginConfig));
     if (config)
     {
       csRef<iFactory> fact (SCF_QUERY_INTERFACE (plug, iFactory));

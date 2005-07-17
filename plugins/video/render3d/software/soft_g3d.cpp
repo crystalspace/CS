@@ -35,17 +35,17 @@ SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 
 
 SCF_IMPLEMENT_IBASE_EXT (csSoftwareGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginConfig)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareGraphics3D::eiSoftConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfig)
+  SCF_IMPLEMENTS_INTERFACE (iPluginConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
   : csSoftwareGraphics3DCommon (iParent)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   is_for_procedural_textures = false;
   csScan_Initialize ();
 }
@@ -53,7 +53,7 @@ csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
 csSoftwareGraphics3D::~csSoftwareGraphics3D ()
 {
   csScan_Finalize ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
 }
 
 bool csSoftwareGraphics3D::Initialize (iObjectRegistry *object_reg)

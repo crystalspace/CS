@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IUTIL_CONFIG_H__
-#define __CS_IUTIL_CONFIG_H__
+#ifndef __CS_IUTIL_PLUGINCONFIG_H__
+#define __CS_IUTIL_PLUGINCONFIG_H__
 
 /**\file
  */
@@ -132,14 +132,14 @@ struct csOptionDescription
   /// Description ID.
   int id;
   /// Short name of this option.
-  char* name;		
+  const char* name;		
   /// Description for this option.
-  char* description;	
+  const char* description;	
   /// Type to use for this option.
   csVariantType type;	
 };
 
-SCF_VERSION (iConfig, 1, 0, 0);
+SCF_VERSION (iPluginConfig, 1, 0, 0);
 
 /**
  * Interface to a configurator object. If a SCF module
@@ -160,7 +160,7 @@ SCF_VERSION (iConfig, 1, 0, 0);
  *   <li>csPluginManager
  *   </ul>
  */
-struct iConfig : public iBase
+struct iPluginConfig : public iBase
 {
   /// Get option description; return FALSE if there is no such option
   virtual bool GetOptionDescription (int idx, csOptionDescription *option) = 0;
@@ -171,4 +171,4 @@ struct iConfig : public iBase
 };
 /** @} */
 
-#endif // __CS_IUTIL_CONFIG_H__
+#endif // __CS_IUTIL_PLUGINCONFIG_H__

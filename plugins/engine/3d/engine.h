@@ -36,9 +36,9 @@
 #include "igraphic/imageio.h"
 #include "iutil/cache.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
 #include "iutil/dbghelp.h"
 #include "iutil/eventh.h"
+#include "iutil/pluginconfig.h"
 #include "iutil/string.h"
 #include "iutil/strset.h"
 #include "iutil/vfs.h"
@@ -206,7 +206,7 @@ public:
  * which csEngine inherits from).  Making csEngineConfig stand-alone works
  * around the problem.
  */
-struct csEngineConfig : public iConfig
+struct csEngineConfig : public iPluginConfig
 {
   SCF_DECLARE_EMBEDDED_IBASE (csEngine);
   virtual bool GetOptionDescription (int idx, csOptionDescription *option);
@@ -1066,7 +1066,7 @@ public:
 
   //--------------------- iConfig interface implementation -------------------
 
-  csEngineConfig scfiConfig;
+  csEngineConfig scfiPluginConfig;
 
   //----------------Begin-Multi-Context-Support-------------------------------
 

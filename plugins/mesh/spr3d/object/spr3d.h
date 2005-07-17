@@ -40,9 +40,9 @@
 #include "iengine/lod.h"
 #include "iengine/sharevar.h"
 #include "iengine/lightmgr.h"
-#include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/pluginconfig.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
@@ -2009,13 +2009,13 @@ public:
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   //------------------- iConfig interface implementation -------------------
-  struct csSprite3DConfig : public iConfig
+  struct csSprite3DConfig : public iPluginConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
-  } scfiConfig;
+  } scfiPluginConfig;
   friend struct csSprite3DConfig;
 
   //--------------------- iComponent interface implementation

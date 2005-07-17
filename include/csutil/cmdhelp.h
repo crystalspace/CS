@@ -27,7 +27,7 @@
 
 struct iObjectRegistry;
 struct iCommandLineParser;
-struct iConfig;
+struct iPluginConfig;
 
 /**
  * This class can be used to help parsing the commandline. One of the
@@ -39,7 +39,7 @@ struct iConfig;
 class CS_CRYSTALSPACE_EXPORT csCommandLineHelper
 {
 private:
-  static void Help (iConfig* config);
+  static void Help (iPluginConfig* config);
 
 public:
   /**

@@ -30,7 +30,6 @@
 #include "imesh/haze.h"
 #include "imesh/particle.h"
 #include "ivideo/graph3d.h"
-#include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 

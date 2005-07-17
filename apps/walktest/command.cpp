@@ -39,7 +39,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
+#include "iutil/pluginconfig.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/camera.h"

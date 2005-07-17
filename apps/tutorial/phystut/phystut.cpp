@@ -455,12 +455,12 @@ bool Simple::Initialize ()
   }
 
   dynSys->SetGravity (csVector3 (0,-7,0));
-  dynSys->SetRollingDampener(.995);
+  dynSys->SetRollingDampener(.995f);
 
   csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys,
   	iODEDynamicSystemState);
-  osys->SetContactMaxCorrectingVel (.1);
-  osys->SetContactSurfaceLayer (.0001);
+  osys->SetContactMaxCorrectingVel (.1f);
+  osys->SetContactSurfaceLayer (.0001f);
 
   CreateWalls (csVector3 (5));
 

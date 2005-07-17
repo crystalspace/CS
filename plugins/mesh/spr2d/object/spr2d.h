@@ -34,9 +34,9 @@
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"
 #include "ivideo/graph3d.h"
-#include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/pluginconfig.h"
 #include "iengine/lightmgr.h"
 #include "spr2duv.h"
 

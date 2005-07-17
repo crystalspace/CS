@@ -1172,15 +1172,15 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE(csBezierMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPluginConfig)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMeshObjectType::eiComponent)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMeshObjectType::eiConfig)
-  SCF_IMPLEMENTS_INTERFACE(iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMeshObjectType::eiPluginConfig)
+  SCF_IMPLEMENTS_INTERFACE(iPluginConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBezierMeshObjectType)
@@ -1191,7 +1191,7 @@ csBezierMeshObjectType::csBezierMeshObjectType (
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   lightpatch_pool = 0;
   do_verbose = false;
 }
@@ -1201,7 +1201,7 @@ csBezierMeshObjectType::~csBezierMeshObjectType ()
   delete lightpatch_pool;
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -1347,7 +1347,7 @@ const int NUM_OPTIONS =
     sizeof (config_options[0])
   );
 
-bool csBezierMeshObjectType::eiConfig::SetOption (int id, csVariant *value)
+bool csBezierMeshObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -1361,7 +1361,7 @@ bool csBezierMeshObjectType::eiConfig::SetOption (int id, csVariant *value)
   return true;
 }
 
-bool csBezierMeshObjectType::eiConfig::GetOption (int id, csVariant *value)
+bool csBezierMeshObjectType::eiPluginConfig::GetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -1372,7 +1372,7 @@ bool csBezierMeshObjectType::eiConfig::GetOption (int id, csVariant *value)
   return true;
 }
 
-bool csBezierMeshObjectType::eiConfig::GetOptionDescription (
+bool csBezierMeshObjectType::eiPluginConfig::GetOptionDescription (
   int idx,
   csOptionDescription *option)
 {

@@ -2788,7 +2788,7 @@ SCF_IMPLEMENT_IBASE(csThingObjectType)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingEnvironment)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPluginConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
@@ -2800,8 +2800,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiThingEnvironment)
   SCF_IMPLEMENTS_INTERFACE(iThingEnvironment)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiConfig)
-  SCF_IMPLEMENTS_INTERFACE(iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiPluginConfig)
+  SCF_IMPLEMENTS_INTERFACE(iPluginConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiDebugHelper)
@@ -2821,7 +2821,7 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   lightpatch_pool = 0;
   blk_polidx5 = 0;
@@ -2840,7 +2840,7 @@ csThingObjectType::~csThingObjectType ()
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   SCF_DESTRUCT_IBASE ();
 }
@@ -2985,7 +2985,7 @@ const int NUM_OPTIONS =
     sizeof (config_options[0])
   );
 
-bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
+bool csThingObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -3010,7 +3010,7 @@ bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
   return true;
 }
 
-bool csThingObjectType::eiConfig::GetOption (int id, csVariant *value)
+bool csThingObjectType::eiPluginConfig::GetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -3023,7 +3023,7 @@ bool csThingObjectType::eiConfig::GetOption (int id, csVariant *value)
   return true;
 }
 
-bool csThingObjectType::eiConfig::GetOptionDescription (
+bool csThingObjectType::eiPluginConfig::GetOptionDescription (
   int idx,
   csOptionDescription *option)
 {

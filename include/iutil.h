@@ -24,7 +24,6 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
-#include "iutil/config.h"
 #include "iutil/csinput.h"
 #include "iutil/databuff.h"
 #include "iutil/dbghelp.h"

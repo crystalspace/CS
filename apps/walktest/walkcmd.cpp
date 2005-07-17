@@ -48,8 +48,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
+#include "iutil/pluginconfig.h"
 #include "iutil/vfs.h"
-#include "iutil/config.h"
 #include "iengine/light.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
@@ -517,7 +517,7 @@ void list_meshes (void)
 
 void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
-  csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
+  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -568,7 +568,7 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 
 void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
+  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -590,7 +590,7 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
+  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -1256,7 +1256,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Bad value for plugin (see 'plugins' command)!");
       else
       {
-        csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
+        csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
 	if (!config)
 	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  	"No config interface for this plugin.");

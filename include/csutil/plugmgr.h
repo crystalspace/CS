@@ -23,8 +23,8 @@
 #include "scf.h"
 #include "scopedmutexlock.h"
 #include "parray.h"
-#include "iutil/config.h"
 #include "iutil/plugin.h"
+#include "iutil/pluginconfig.h"
 
 struct iComponent;
 struct iObjectRegistry;
@@ -79,20 +79,18 @@ private:
     csVariantType Type;
     int ID;
     bool Value;				// If Type is CSVAR_BOOL
-    iConfig *Config;
+    csRef<iPluginConfig> Config;
 
     csPluginOption (const char *iName, csVariantType iType, int iID,
-      bool iValue, iConfig* iConfig)
+      bool iValue, iPluginConfig* iConfig)
     {
       Name = csStrNew (iName);
       Type = iType;
       ID = iID;
       Value = iValue;
-      (Config = iConfig)->IncRef ();
     }
     virtual ~csPluginOption ()
     {
-      Config->DecRef ();
       delete [] Name;
     }
   };
