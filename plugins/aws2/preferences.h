@@ -73,7 +73,7 @@ namespace aws
     void clear() { root.clear(); }
 
     /** Finds a registry in the given category. If the reference is invalid, then the given registry doesn't exist. */
-    csRef< registry > findReg(const scfString &category, const scfString &name)
+    csRef< registry > findReg(const csString &category, const csString &name)
     {
       return root.findChild(category, name);			
     }

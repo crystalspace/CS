@@ -19,6 +19,9 @@
 #include "cssysdef.h"
 #include "registrar.h"
 
+namespace aws
+{
+
 namespace autom
 {
 
@@ -46,7 +49,7 @@ Nil()
 }
 
 void 
-registrar::assign(const scfString &name, func_ptr func)
+registrar::assign(const csString &name, func_ptr func)
 {
   lobby[name]=func;	
 }						
@@ -193,4 +196,6 @@ Compile(std::string &str)
 	return keeper(o);
 }
 
-}
+} // namespace autom
+
+} // namespace aws

@@ -81,7 +81,7 @@
 #include <set>
 #include <list>
 
-namespace autom 
+namespace awsAutom
 {
 #if defined(SIGSLOT_PURE_ISO) || (!defined(WIN32) && !defined(__GNUG__) && !defined(SIGSLOT_USE_POSIX_THREADS))
 #	define _SIGSLOT_SINGLE_THREADED
@@ -2520,7 +2520,7 @@ namespace autom
 		}
 	};
 
-}; // namespace filter
+}; // namespace awsAutom
 
 #endif // SIGSLOT_H__
 

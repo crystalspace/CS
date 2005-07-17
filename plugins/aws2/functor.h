@@ -22,9 +22,12 @@
 #include "object.h"
 #include <map>
 
+namespace aws
+{
+
 namespace autom
-{		
-		
+{
+
 	/** This is an executable function for Keila.  All actual execution is done in native code since Keila 
 	 * doesn't really have a sort of mainline bytecode context at the moment.  It may eventually if that
 	 * proves useful. */
@@ -35,7 +38,7 @@ namespace autom
 		typedef keeper rc_parm;
 	
 		/** The map, uses the safe rc_parm. */
-		typedef std::map<scfString, rc_parm > parm_map_type;
+		typedef std::map<csString, rc_parm > parm_map_type;
 		
 		/** Functor slot. */
 		struct slot
@@ -114,7 +117,8 @@ namespace autom
 		
 		function(const std::string &_name, bool _exec_on_represent=false):object(T_FUNCTION), rv(0), parent(0), repr_exec(_exec_on_represent)
 		{
-			setName(_name.c_str());	
+		  scfString s (_name.c_str());
+		  SetName (&s);	
 		}
 				
 		/** Copy constructor: does NOT copy the return value or the parameters! */
@@ -184,16 +188,16 @@ namespace autom
 		}
 				
 		/** Converts the object into a string object, if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject();
+		virtual csRef<iString> ReprObject();
 
 		/** Executes the function and returns the value the function returns (if any.) */
 		virtual rc_parm Execute()
@@ -207,7 +211,7 @@ namespace autom
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);					
 		
 		/** Returns the value of a parameter, uses scoped lookup. */
-		rc_parm operator[](const scfString& name);
+		rc_parm operator[](const csString& name);
 		
 	};
 	
@@ -215,6 +219,8 @@ namespace autom
 	typedef function::slot	  func_slot;
 	typedef function::parm_map_type func_parm_map;
 	
-} // end namespace
+} // namespace autom
+
+} // namespace aws
 
 #endif

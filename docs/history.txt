@@ -11,6 +11,17 @@ chronological order.
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.
 	- Jorrit fixed a bug (as directed by res2k) in csSet.Delete() which
 	  would fail for deleting the 0 element.
+	- res made the 'length' parameters of csString::SubString() and Slice()
+	  optional (symmetrical to the recent scfString changes).
+	- res moved the AWS2 'autom' namespace into a namespace 'aws'.
+	- res changed the AWS2 aws::autom::iObject interface to better conform
+	  to interface guidelines. Particularly, the method names have been
+	  changed to CS style, and strings are passed as iString pointers/refs
+	  (since the interface will be used in cross-plugin scenarios).
+	- res changed internal strings in AWS2 to be stores as csString instead
+	  of scfString, mostly because csString has operator<, but scfString
+	  doesn't. Also, scfString is mostly a wrapper around csString, so the
+	  latter is a bit more lightweight.
 16-Jul-2005
 	- Eric Sunshine upgraded the MSVC project files to use wxWidgets 2.6.1
 	  rather than 2.4.2.

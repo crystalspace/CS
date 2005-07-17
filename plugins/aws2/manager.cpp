@@ -119,8 +119,8 @@ void awsManager::Redraw()
   angle+=0.001F;
   
   //pen.Translate(tv);  
-  pen.SetOrigin(tv);
-  pen.Rotate(angle);  
+  //FIXME pen.SetOrigin(tv);
+  //FIXME pen.Rotate(angle);  
 
   tv.Set(350,350,0);
   pen.Translate(tv);  
@@ -133,7 +133,7 @@ void awsManager::Redraw()
   pen.DrawRect(50,50,450,450, true);  
   pen.SetColor(0.75,0.75,0.75,1);
   pen.DrawMiteredRect(100,100,400,400,0.5,true);  
-  pen.SetColor(0.85,0.85,0.85,1);
+  pen.SetColor(0.85f,0.85f,0.85f,1);
   pen.DrawArc(150,150,350,350,0.14F,2.23F,true); 
   
   pen.SetColor(1,1,1,1);

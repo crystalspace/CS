@@ -445,7 +445,7 @@ public:
    * \param len Number of characters in slice.
    * \return The indicated string slice.
    */
-  csStringBase Slice (size_t start, size_t len) const;
+  csStringBase Slice (size_t start, size_t len = (size_t)-1) const;
 
   /**
    * Copy a portion of this string.
@@ -457,7 +457,8 @@ public:
    *   of allocation of a new string object for each operation.  Simply re-use
    *   'sub' for each operation.
    */
-  void SubString (csStringBase& sub, size_t start, size_t len) const;
+  void SubString (csStringBase& sub, size_t start, 
+    size_t len = (size_t)-1) const;
 
   /**
    * Find the first occurrence of a character in the string.

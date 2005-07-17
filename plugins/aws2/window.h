@@ -8,10 +8,10 @@ namespace aws
   class window : public widget
   {
     /// The name of the window.
-    scfString name;
+    csString name;
 
     /// The template name of the window (the definition template that it was taken from.)
-    scfString template_name;
+    csString template_name;
     
   public:
     window();
@@ -19,7 +19,7 @@ namespace aws
  
   protected:
     /// Sets up whatever automation is necessary.
-    virtual void SetupAutomation(const scfString &object_name);
+    virtual void SetupAutomation(const csString &object_name);
   };
 }
 

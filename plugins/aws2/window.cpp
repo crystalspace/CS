@@ -6,7 +6,7 @@ namespace aws
 {
   window::window()
   {
-    scfString oname("win.");
+    csString oname("win.");
 
     oname+=template_name+".";
     oname+=name;
@@ -14,7 +14,7 @@ namespace aws
     SetupAutomation(oname);
   }
 
-  void window::SetupAutomation(const scfString &object_name)
+  void window::SetupAutomation(const csString &object_name)
   {  
     widget::SetupAutomation(object_name);
   

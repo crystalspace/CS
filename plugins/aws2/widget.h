@@ -20,7 +20,7 @@ namespace aws
     
   protected:
      /// Sets up whatever automation is necessary.
-     virtual void SetupAutomation(const scfString &object_name);
+     virtual void SetupAutomation(const csString &object_name);
   };
 }
 

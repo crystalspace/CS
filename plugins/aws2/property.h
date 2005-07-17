@@ -71,7 +71,7 @@ namespace aws
   class property_bag : public autom::function::slot
   {
     /// The type of the property map.
-    typedef std::map<scfString, property> property_map;
+    typedef std::map<csString, property> property_map;
 
     /// The map of names to properties.
     property_map props;
@@ -84,13 +84,13 @@ namespace aws
     ~property_bag() {};
     
     /// Creates a new property mapping with the given property. Returns true on sucess, false on failure.
-    bool CreateProperty(const scfString &name,  const property& p);
+    bool CreateProperty(const csString &name,  const property& p);
 
     /// Gets the value of the named property. Returns true on sucess, false on failure.
-    bool Set(const scfString &name, const autom::keeper &value);
+    bool Set(const csString &name, const autom::keeper &value);
 
     /// Gets the value of the named property.  Returns true on sucess, false on failure.
-    bool Get(const scfString &name, autom::keeper &value);
+    bool Get(const csString &name, autom::keeper &value);
 
     /// Determines whether or not automation calls can create new properties.
     void SetAllowAutomationCreate(bool value) { allow_automation_create=value; }
@@ -108,7 +108,7 @@ namespace aws
     autom::func_parm _create(autom::function &fn);
 
     /// Initializes the automation functions above with the registry.  'oname' must be the name of the object we're registering as.
-    void SetupAutomation(const scfString &oname);
+    void SetupAutomation(const csString &oname);
   };
 }
 

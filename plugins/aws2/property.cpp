@@ -4,14 +4,14 @@
 namespace aws
 {
     /// Creates a new property mapping with the given property. Returns true on sucess, false on failure.
-    bool property_bag::CreateProperty(const scfString &name,  const property& p)
+    bool property_bag::CreateProperty(const csString &name,  const property& p)
     {
       	props[name]=p;
 	return true;     
     }
 
     /// Gets the value of the named property. Returns true on sucess, false on failure.
-    bool property_bag::Set(const scfString &name, const autom::keeper &value)
+    bool property_bag::Set(const csString &name, const autom::keeper &value)
     {
       property_map::iterator pos = props.find(name);
 
@@ -20,7 +20,7 @@ namespace aws
     }
 
     /// Gets the value of the named property.  Returns true on sucess, false on failure.
-    bool property_bag::Get(const scfString &name, autom::keeper &value)
+    bool property_bag::Get(const csString &name, autom::keeper &value)
     {
       property_map::iterator pos = props.find(name);
 
@@ -34,7 +34,7 @@ namespace aws
 
     autom::func_parm property_bag::_set(autom::function &fn)
     {
-      scfString name = fn["name"]->toString().Value().c_str();
+      csString name = fn["name"]->ToString().Value().c_str();
       autom::keeper value = fn["value"];
 
       return autom::func_parm(new autom::integer(Set(name, value)));
@@ -42,7 +42,7 @@ namespace aws
 
     autom::func_parm property_bag::_get(autom::function &fn)
     {
-      scfString name = fn["name"]->toString().Value().c_str();
+      csString name = fn["name"]->ToString().Value().c_str();
       autom::keeper value = fn["value"];
 
       return autom::func_parm(new autom::integer(Get(name, value)));
@@ -52,13 +52,14 @@ namespace aws
     {
       if (allow_automation_create)
       {
-	scfString name = fn["name"]->toString().Value().c_str();
+	csString name = fn["name"]->ToString().Value().c_str();
 	autom::keeper value = fn["value"];
 
-	bool readable = fn["readable"]->toInt().Value();
-	bool writeable = fn["writeable"]->toInt().Value();
+	bool readable = fn["readable"]->ToInt().Value();
+	bool writeable = fn["writeable"]->ToInt().Value();
 
-	return autom::func_parm(new autom::integer(CreateProperty(name, property(value, readable, writeable))));
+	return autom::func_parm(new autom::integer (
+	  CreateProperty(name, property(value, readable, writeable))));
       }
       else
       {
@@ -66,15 +67,15 @@ namespace aws
       }
     }
 
-    void property_bag::SetupAutomation(const scfString &oname)
+    void property_bag::SetupAutomation(const csString &oname)
     {
       // This creates object names like this:
       //
       //  :Set@win.toolbox.1.prop(name="frame", value=100)
       //
       //
-      scfString _name = oname + ".prop";
-      scfString fname;
+      csString _name = oname + ".prop";
+      csString fname;
 
       fname = "Set@"; fname += _name;	 AUTOM_REGISTER(fname, this, &property_bag::_set);
       fname = "Get@"; fname += _name;	 AUTOM_REGISTER(fname, this, &property_bag::_get);

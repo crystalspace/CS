@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+namespace aws
+{
+
 namespace autom
 {
 	class object;
@@ -42,7 +45,7 @@ namespace autom
 	class object : virtual public iObject
 	{	
 	private:
-		scfString name;		
+		csString name;		
 		TYPE otype;
 		
 	public:
@@ -57,22 +60,23 @@ namespace autom
 		virtual TYPE ObjectType() { return otype; }
 		
 		/** Sets the name of the object. */
-		virtual void setName(const scfString &_name) { name=_name; }
+		virtual void SetName(iString* _name) { name=*_name; }
 		
 		/** Gets the name of the object. */
-		virtual const scfString& getName() { return name; }
+		virtual csRef<iString> GetName() 
+		{ return csPtr<iString> (new scfString (name)); }
 		
 		/** Converts the object into a string object if possible. */
-		virtual string toString()=0;
+		virtual string ToString()=0;
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt()=0;
+		virtual integer ToInt()=0;
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat()=0;	
+		virtual floating ToFloat()=0;	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject()=0;
+		virtual csRef<iString> ReprObject()=0;
 		
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end)=0;
@@ -93,7 +97,7 @@ namespace autom
 		
 		explicit string(object& o):object(o, T_STRING) 
 		{
-			string s = o.toString();
+			string s = o.ToString();
 			value = s.value;				
 		}
 		
@@ -119,18 +123,18 @@ namespace autom
 		}
 		
 		/** Converts the object into a string object if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject()
+		virtual csRef<iString> ReprObject()
 		{
-			return scfString(QuotedValue().c_str());	
+			return csPtr<iString> (new scfString(QuotedValue().c_str()));	
 		}		
 		
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
@@ -160,21 +164,21 @@ namespace autom
 		
 		explicit integer(object& o):object(o, T_INT)
 		{
-			integer i = o.toInt();
+			integer i = o.ToInt();
 			value=i.value;	
 		}
 		
 		/** Converts the object into a string object if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject();
+		virtual csRef<iString> ReprObject();
 		
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);
@@ -247,22 +251,22 @@ namespace autom
 		
 		explicit floating(object& o):object(o)
 		{
-			floating f = o.toFloat();
+			floating f = o.ToFloat();
 			
 			value=f.value;			
 		}
 		
 		/** Converts the object into a string object if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an floating object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject();		
+		virtual csRef<iString> ReprObject();		
 		
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);
@@ -320,16 +324,16 @@ namespace autom
 		list_type &Value() { return value; }
 				
 		/** Converts the object into a string object if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject();
+		virtual csRef<iString> ReprObject();
 				
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);
@@ -360,7 +364,7 @@ namespace autom
 	/** Encapsulates a string object. */
 	class reference : public object
 	{
-		scfString value;
+		csString value;
 		function *fn;
 		
 	public:	
@@ -372,19 +376,19 @@ namespace autom
 		void setParent(function *_fn) { fn=_fn; }					
 		
 		/** Returns a string containing the contents of this reference object. */
-		const scfString& Value() { return value; }
+		const csString& Value() { return value; }
 				
 		/** Converts the object into a string object if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject();
+		virtual csRef<iString> ReprObject();
 				
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);								
@@ -401,16 +405,16 @@ namespace autom
 		nil(const nil& s):object(s, T_NIL) {}		
 						
 		/** Converts the object into a string object if possible. */
-		virtual string toString();
+		virtual string ToString();
 		
 		/** Converts the object into an integer object, if possible. */
-		virtual integer toInt();
+		virtual integer ToInt();
 		
 		/** Converts the object into a float object, if possible. */
-		virtual floating toFloat();	
+		virtual floating ToFloat();	
 		
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
-		virtual scfString reprObject();
+		virtual csRef<iString> ReprObject();
 				
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);				
@@ -424,6 +428,8 @@ namespace autom
 	
 	
 	
-} // end namespace
+} // namespace autom
+
+} // namespace aws
 
 #endif

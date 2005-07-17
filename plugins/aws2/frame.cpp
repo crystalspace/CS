@@ -17,8 +17,8 @@ namespace aws
   void frame::Transform(iPen *pen, float angle, float x, float y, const csRect &box)
   {
     pen->ClearTransform();
-    pen->SetOrigin(csVector3(box.Width()*-0.5, box.Height()*-0.5, 0));
-    pen->Rotate(angle);
+    //FIXME pen->SetOrigin(csVector3(box.Width()*-0.5, box.Height()*-0.5, 0));
+    //FIXME pen->Rotate(angle);
 
     // Adjust the translation x and y to get the absolute translation.
     GetScreenPos(x,y);

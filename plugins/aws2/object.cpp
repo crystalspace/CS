@@ -24,6 +24,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+namespace aws
+{
+
 namespace autom
 {
 
@@ -51,21 +54,21 @@ object::~object()
 
 /** Converts the object into a string object if possible. */
 string 
-string::toString()
+string::ToString()
 {
 	return string(value);	
 }
 
 /** Converts the object into an integer object, if possible. */
 integer 
-string::toInt()
+string::ToInt()
 {
 	return integer(strtol(value.c_str(), 0, 10));
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-string::toFloat()
+string::ToFloat()
 {
 	return floating(strtod(value.c_str(), 0));	
 }
@@ -105,7 +108,7 @@ string::parseObject(std::string::iterator &pos, const std::string::iterator &end
 
 /** Converts the object into a string object if possible. */
 string 
-integer::toString()
+integer::ToString()
 {
 	char buf[128]={0};
 		
@@ -114,22 +117,22 @@ integer::toString()
 
 /** Converts the object into an integer object, if possible. */
 integer 
-integer::toInt()
+integer::ToInt()
 {
 	return integer(value);	
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-integer::toFloat()
+integer::ToFloat()
 {
 	return floating((float)value);	
 }
 
-scfString
-integer::reprObject()
+csRef<iString>
+integer::ReprObject()
 {
-	return toString().Value().c_str();
+	return csPtr<iString> (new scfString (ToString().Value().c_str()));
 }
 
 bool
@@ -151,32 +154,32 @@ integer::parseObject(std::string::iterator &pos, const std::string::iterator &en
 
 /** Converts the object into a string object if possible. */
 string 
-floating::toString()
+floating::ToString()
 {
-	char buf[256];
-	cs_snprintf(buf, sizeof(buf), "%g", value);
-	
-	return string(std::string(buf));
+  csString buf;
+  buf.Format ("%g", value);
+  
+  return string(std::string(buf));
 }
 
 /** Converts the object into an integer object, if possible. */
 integer 
-floating::toInt()
+floating::ToInt()
 {
 	return integer((int)value);	
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-floating::toFloat()
+floating::ToFloat()
 {
 	return floating(value);	
 }
 
-scfString
-floating::reprObject()
+csRef<iString>
+floating::ReprObject()
 {
-	return toString().Value().c_str();
+	return csPtr<iString> (new scfString (ToString().Value().c_str()));
 }
 
 bool
@@ -219,7 +222,7 @@ list::list(std::string &s):object(T_LIST)
 
 /** Converts the object into a string object if possible. */
 string 
-list::toString()
+list::ToString()
 {
 	std::string temp;
 	
@@ -233,12 +236,12 @@ list::toString()
 		{
 			case object::T_STRING:
 			{				
-				temp+=(k->toString().QuotedValue());				
+				temp+=(k->ToString().QuotedValue());				
 			} break;
 			
 			default:
 			{				
-				temp+=(k->toString().Value());
+				temp+=(k->ToString().Value());
 			}
 		}
 		
@@ -252,22 +255,22 @@ list::toString()
 
 /** Converts the object into an integer object, if possible. */
 integer 
-list::toInt()
+list::ToInt()
 {
 	return integer(0);	
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-list::toFloat()
+list::ToFloat()
 {
 	return floating(0.0);	
 }
 
-scfString
-list::reprObject()
+csRef<iString>
+list::ReprObject()
 {
-	return toString().Value().c_str();
+	return csPtr<iString> (new scfString (ToString().Value().c_str()));
 }
 
 bool
@@ -289,7 +292,7 @@ list::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 		if (k.IsValid())
 		{	
 			value.push_back(k);
-			(void)k->toInt(); /// Why is this necessary?  I don't know.  I wish it wasn't.  It's definitely wierd.
+			(void)k->ToInt(); /// Why is this necessary?  I don't know.  I wish it wasn't.  It's definitely wierd.
 		}				
 		else
 			value.push_back(keeper(Nil()));
@@ -318,29 +321,29 @@ list::at(size_t index)
 
 /** Converts the object into a reference object if possible. */
 string
-reference::toString()
+reference::ToString()
 {
-	return (*fn)[value]->toString();
+	return (*fn)[value]->ToString();
 }
 
 /** Converts the object into an integer object, if possible. */
 integer 
-reference::toInt()
+reference::ToInt()
 {
-	return (*fn)[value]->toInt();
+	return (*fn)[value]->ToInt();
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-reference::toFloat()
+reference::ToFloat()
 {
-	return (*fn)[value]->toFloat();
+	return (*fn)[value]->ToFloat();
 }
 
-scfString
-reference::reprObject()
+csRef<iString>
+reference::ReprObject()
 {
-	return value;
+	return csPtr<iString> (new scfString (value));
 }
 
 bool
@@ -360,29 +363,29 @@ reference::parseObject(std::string::iterator &pos, const std::string::iterator &
 
 /** Converts the object into a string object if possible. */
 string 
-nil::toString()
+nil::ToString()
 {
 	return string();
 }
 
 /** Converts the object into an integer object, if possible. */
 integer 
-nil::toInt()
+nil::ToInt()
 {
 	return integer(0);	
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-nil::toFloat()
+nil::ToFloat()
 {
 	return floating(0.0);	
 }
 
-scfString
-nil::reprObject()
+csRef<iString>
+nil::ReprObject()
 {
-	return scfString("nil");
+	return csPtr<iString> (new scfString ("nil"));
 }
 
 bool
@@ -399,4 +402,6 @@ nil::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 }
 
 	
-} //end namespace
+} // namespace autom
+
+} // namespace aws

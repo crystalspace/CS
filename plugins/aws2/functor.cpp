@@ -20,36 +20,39 @@
 #include "registrar.h"
 #include <ctype.h>
 
+namespace aws
+{
+
 namespace autom
 {
 
 /** Converts the object into a string object, if possible. */
 string 
-function::toString()
+function::ToString()
 {	
 	if (Called.Valid() || (bind())) rv=Called(*this);
 	
-	if (rv.IsValid()) return rv->toString();
+	if (rv.IsValid()) return rv->ToString();
  	else return string(); 		
 }
 
 /** Converts the object into an integer object, if possible. */
 integer 
-function::toInt()
+function::ToInt()
 {
 	if (Called.Valid() || (bind())) rv=Called(*this);
 	
- 	if (rv.IsValid()) return rv->toInt();
+ 	if (rv.IsValid()) return rv->ToInt();
  	else return integer(); 	
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
-function::toFloat()
+function::ToFloat()
 {
 	if (Called.Valid() || (bind())) rv=Called(*this);
 	
-	if (rv.IsValid()) return rv->toFloat();
+	if (rv.IsValid()) return rv->ToFloat();
  	else return floating(); 		
 }
 
@@ -57,8 +60,9 @@ function::toFloat()
 bool
 function::bind()
 {
-	// Look it up.
-  std::pair<bool, registrar::func_ptr> result = Registrar()->lookup(getName());
+  // Look it up.
+  csString s (GetName()->GetData());
+  std::pair<bool, registrar::func_ptr> result = Registrar()->lookup (s);
 	
 	// If we found a function, great, otherwise we'll retry the bind next time we're called.
 	if (result.first==true)	
@@ -83,15 +87,15 @@ function::addParm(const scfString &parm_name, std::string &_value)
 	return true;
 }
 
-scfString
-function::reprObject()
+csRef<iString>
+function::ReprObject()
 {
 	std::string rep;
 	
 	if (repr_exec==false)
 	{		
 		rep+=(':');
-		rep+=(getName());
+		rep+=(GetName()->GetData());
 	 	rep+=('(');
 		
 		parm_map_type::iterator pos=parms.begin();
@@ -100,7 +104,7 @@ function::reprObject()
 		{
 			rep+=(pos->first);
 			rep+=('=');
-			rep+=(pos->second->reprObject());
+			rep+=(pos->second->ReprObject()->GetData());
 			rep+=(',');	
 		}	
 		
@@ -110,10 +114,10 @@ function::reprObject()
 	{
 		if (Called.Valid() || (bind())) rv=Called(*this);
 		
-		if (rv.IsValid()) rep=rv->reprObject();							
+		if (rv.IsValid()) rep=rv->ReprObject()->GetData();
 	}
 	
-	return rep.c_str();
+	return csPtr<iString> (new scfString (rep.c_str()));
 }
 
 /** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
@@ -166,7 +170,10 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 	
 // 	out << "pass full name: '" << fname << "'\n";
 	
-	setName(fname.c_str());
+	{
+	  scfString s (fname.c_str());
+	  SetName (&s);
+	}
 	
 	// Stop here and bind to native code.
 	bind();
@@ -226,13 +233,13 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 }
 
 function::rc_parm 
-function::operator[](const scfString &name)
+function::operator[](const csString &name)
 {
 	
 	if (name.GetAt(0)=='$' && parent)
 	{		
-			scfString temp;
-			name.SubString(&temp, 1);
+			csString temp;
+			name.SubString(temp, 1);
 						
 			return (*parent)[temp];		
 	}
@@ -246,4 +253,6 @@ function::operator[](const scfString &name)
 	return pos->second;
 }
 	
-} //end namespace
+} // namespace autom
+
+} // namespace aws

@@ -22,6 +22,9 @@
 
 struct iObjectRegistry;
 
+namespace aws
+{
+
 namespace autom
 {
   class string;
@@ -34,31 +37,32 @@ namespace autom
       enum TYPE { T_STRING, T_INT, T_FLOAT, T_LIST, T_MAP, T_FUNCTION, T_REFERENCE, T_BLOB, T_NIL };
 
       /** Returns the type of the object, a member of the object::TYPE enumeration. */
-      virtual TYPE ObjectType()=0;
+      virtual TYPE ObjectType() = 0;
       
       /** Sets the name of the object. */
-      virtual void setName(const scfString &_name)=0;
+      virtual void SetName(iString* _name) = 0;
       
       /** Gets the name of the object. */
-      virtual const scfString& getName()=0;
+      virtual csRef<iString> GetName() = 0;
       
       /** Converts the object into a string object if possible. */
-      virtual string toString()=0;
+      virtual string ToString() = 0;
       
       /** Converts the object into an integer object, if possible. */
-      virtual integer toInt()=0;
+      virtual integer ToInt() = 0;
       
       /** Converts the object into a float object, if possible. */
-      virtual floating toFloat()=0;	
+      virtual floating ToFloat() = 0;	
       
       /** Converts the object into the text representation of it. This is the inverse of parsing. */
-      virtual scfString reprObject()=0;      
+      virtual csRef<iString> ReprObject() = 0;      
   };
 
-}; // end autom namespace
+}; // namespace autom
 
+}; // namespace aws
 
-SCF_VERSION(autom::iObject, 1, 0, 1);
+SCF_VERSION(aws::autom::iObject, 1, 0, 1);
 
 
 SCF_VERSION(iAwsWindow, 1, 0, 1);

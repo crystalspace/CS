@@ -38,7 +38,7 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
     // Don't process comments.
     if (child->GetType()==CS_NODE_COMMENT) continue;
 
-    scfString name(child->GetValue());
+    csString name(child->GetValue());
 
     if ((name == "component") || (name == "window") || (name == "skin"))
     {
@@ -76,7 +76,7 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 	}
 	else
 	{
-	  scfString tmp = name;
+	  csString tmp = name;
 
 	  tmp+=".";
 	  tmp+=a_name;

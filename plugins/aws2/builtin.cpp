@@ -21,6 +21,9 @@
 #include "cssysdef.h"
 #include "registrar.h"
 
+namespace aws
+{
+
 namespace autom
 {
 
@@ -40,7 +43,7 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		return func_parm(new integer(left->toInt() + right->toInt()));
+		return func_parm(new integer(left->ToInt() + right->ToInt()));
 	}
 	
 	func_parm sub(function &fn)
@@ -48,7 +51,7 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		return func_parm(new integer(left->toInt() - right->toInt()));
+		return func_parm(new integer(left->ToInt() - right->ToInt()));
 	}
 	
 	func_parm mul(function &fn)
@@ -56,7 +59,7 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		return func_parm(new integer(left->toInt() * right->toInt()));
+		return func_parm(new integer(left->ToInt() * right->ToInt()));
 	}
 	
 	func_parm div(function &fn)
@@ -64,7 +67,7 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		return func_parm(new integer(left->toInt() / right->toInt()));
+		return func_parm(new integer(left->ToInt() / right->ToInt()));
 	}
 	
 	func_parm mod(function &fn)
@@ -72,7 +75,7 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		return func_parm(new integer(left->toInt() % right->toInt()));
+		return func_parm(new integer(left->ToInt() % right->ToInt()));
 	}
 	
 	
@@ -81,7 +84,7 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		return func_parm(new integer(left->toInt() == right->toInt()));
+		return func_parm(new integer(left->ToInt() == right->ToInt()));
 	}
 	
 	func_parm min(function &fn)
@@ -89,8 +92,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 						
-		longlong l = left->toInt().Value();
-		longlong r = right->toInt().Value();
+		longlong l = left->ToInt().Value();
+		longlong r = right->ToInt().Value();
 											
 		return func_parm(new integer((l < r ? l : r)));
 
@@ -101,8 +104,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		longlong l = left->toInt().Value();
-		longlong r = right->toInt().Value();
+		longlong l = left->ToInt().Value();
+		longlong r = right->ToInt().Value();
 											
 		return func_parm(new integer((l > r ? l : r)));
 
@@ -113,8 +116,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		longlong l = left->toInt().Value();
-		longlong r = right->toInt().Value();
+		longlong l = left->ToInt().Value();
+		longlong r = right->ToInt().Value();
 											
 		return func_parm(new integer(l < r));
 
@@ -125,8 +128,8 @@ public:
 		func_parm left  = fn["l"],
 				  right = fn["r"];
 										
-		longlong l = left->toInt().Value();
-		longlong r = right->toInt().Value();
+		longlong l = left->ToInt().Value();
+		longlong r = right->ToInt().Value();
 											
 		return func_parm(new integer(l < r));
 
@@ -179,7 +182,7 @@ public:
 		{
 			object *o = ln;
 			list *l = CS_STATIC_CAST(list*,o);
-			return func_parm(l->at(index->toInt().Value()));
+			return func_parm(l->at(index->ToInt().Value()));
 		}		
 	}
 	
@@ -226,7 +229,7 @@ public:
 				  _true  = fn["true"],
 				  _false = fn["false"];
 				  
-		if (test->toInt().Value()) return _true;	
+		if (test->ToInt().Value()) return _true;	
 		else return _false;		
 	}
 	
@@ -236,7 +239,7 @@ public:
 				  action  = fn["do"];
 				  
 				  
-		if (test->toInt().Value()) return action;	
+		if (test->ToInt().Value()) return action;	
 		else return func_parm(Nil());		
 	}
 	
@@ -247,9 +250,9 @@ public:
 		func_parm name    = fn["name"],
 				  body    = fn["body"];		
 		
-		def_funcs[name->toString().Value().c_str()] = body;
+		def_funcs[name->ToString().Value().c_str()] = body;
 				  		  
-		Registrar()->assign(name->toString().Value().c_str(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
+		Registrar()->assign(name->ToString().Value().c_str(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
 
 		return func_parm(Nil());
 	}
@@ -258,7 +261,8 @@ public:
 	 * redirect the call to the appropriate handler. */
 	func_parm def_exec_(function &fn)
 	{
-		func_parm body = def_funcs[fn.getName()];		
+		csRef<iString> fnName = fn.GetName();
+		func_parm body = def_funcs[fnName->GetData()];
 
 		if (body->ObjectType() == object::T_FUNCTION)
 		{
@@ -294,4 +298,6 @@ install_builtin()
 	lobby_b->setup();	
 }
 
-} // end namespace
+} // namespace autom
+
+} // namespace aws
