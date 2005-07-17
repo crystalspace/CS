@@ -1795,3 +1795,9 @@ and any composite types which provide these operators. Pointers (other than
 @samp{void*} for which exists a specialization) as hash keys are a special 
 case: to use a pointer of type @samp{Foo*} as a hash key, employ 
 @samp{csPtrKey<Foo>} as the key type in the hash declaration. 
+
+@subheading @code{iConfig} Renamed
+
+The @code{iConfig} interface has been renamed to the more fitting 
+@code{iPluginConfig}, and the containing header from @file{iutil/config.h} to
+@code{iutil/pluginconfig.h}. Other changes have not been made.
