@@ -28,6 +28,8 @@
 #include "refarr.h"
 #include "array.h"
 
+class csConfigManagerIterator;
+
 /**
  * A configuration manager makes a number of individual iConfigFile objects
  * appear to be a single configuration object.  See the description of the
