@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 #include <stddef.h>
+#include "csutil/csevent.h"
 #include "csutil/cseventq.h"
 #include "iutil/eventh.h"
 #include "csutil/sysfunc.h"

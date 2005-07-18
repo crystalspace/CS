@@ -304,7 +304,7 @@ csPen::Write(iFont *font, uint x1, uint y1, char *text)
 
   pos += tt;
 
-  g2d->Write(font, pos.x, pos.y, the_color, -1, text);  
+  g2d->Write(font, (int)pos.x, (int)pos.y, the_color, -1, text);  
 }
 
 void 

@@ -35,7 +35,6 @@
 
 class csEvent;
 class csEventAttributeIterator;
-class csEventQueue;
 
 SCF_VERSION (csEvent, 0, 0, 1);
 

@@ -26,7 +26,6 @@
  */
 
 #include "csextern.h"
-#include "csevent.h"
 #include "csevcord.h"
 #include "evoutlet.h"
 #include "array.h"
