@@ -224,7 +224,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       x1, y1, z1,
       len1,
       A, B, C);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -240,7 +240,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       v_orig, v1,
       len1, v2,
       len2);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -254,7 +254,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       v_orig,
       v_u,
       v_v);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -269,7 +269,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       polygon_data.tmapping->GetO2T (),
       polygon_data.tmapping->GetO2TTranslation (),
       o, u, v);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -285,7 +285,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       xu, yu, zu,
       xv, yv, zv,
       xw, yw, zw);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -294,7 +294,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
 {
   polygon_data.tmapping->SetO2T (tx_matrix),
   polygon_data.tmapping->SetO2TTranslation (tx_vector),
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
@@ -312,7 +312,7 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
   if (enable && polygon_data.tmapping != 0) return;
   if (!enable && polygon_data.tmapping == 0) return;
 
-  if (thing_static) thing_static->scfiObjectModel.ShapeChanged ();
+  if (thing_static) thing_static->ShapeChanged ();
   if (enable)
   {
     polygon_data.tmapping = thing_static->thing_type
@@ -478,7 +478,7 @@ void csPolygon3DStatic::ComputeNormal ()
 
   // By default the world space normal is equal to the object space normal.
   polygon_data.plane_obj.Set (A, B, C, D);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
 }
 
 void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
@@ -486,7 +486,7 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   csPlane3 new_plane;
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
   SetObjectPlane (new_plane);
-  thing_static->scfiObjectModel.ShapeChanged ();
+  thing_static->ShapeChanged ();
   if (polygon_data.tmapping)
   {
     polygon_data.tmapping->GetO2T () *= t.GetO2T ();
@@ -1065,7 +1065,7 @@ csPolygon3D::~csPolygon3D ()
       iLight* dl = lightpatches->GetLight ();
       if (dl)
         dl->RemoveAffectedLightingInfo (
-		&(thing->scfiLightingInfo));
+		(iLightingInfo*)thing);
       thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }

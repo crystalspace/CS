@@ -169,7 +169,8 @@ private:
 /**
  * The static data for a thing.
  */
-class csThingStatic : public iThingFactoryState, public iMeshObjectFactory
+class csThingStatic : public iThingFactoryState, public iMeshObjectFactory,
+	public csObjectModel
 {
 public:
   CS_LEAKGUARD_DECLARE (csThingStatic);
@@ -345,7 +346,7 @@ public:
    */
   uint32 GetStaticDataNumber () const
   {
-    return scfiObjectModel.GetShapeNumber ();
+    return GetShapeNumber ();
   }
 
   /// Get the specified polygon from this set.
@@ -539,28 +540,19 @@ public:
   PolyMeshHelper scfiPolygonMeshLOD;
 
   //-------------------- iObjectModel implementation --------------------------
-  class ObjectModel : public csObjectModel
+  virtual void GetObjectBoundingBox (csBox3& bbox)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThingStatic);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
+    GetBoundingBox (bbox);
+  }
+  virtual void SetObjectBoundingBox (const csBox3& bbox)
+  {
+    SetBoundingBox (bbox);
+  }
 
   void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials, uint mixmode);
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return (iObjectModel*)this; }
 };
 
 /**
@@ -578,7 +570,8 @@ public:
  * walls of a sector. In another kind the polygons are
  * oriented such that they are visible from the outside.
  */
-class csThing : public iBase
+class csThing : public iMeshObject, public iShadowReceiver,
+	public iLightingInfo, public iShadowCaster
 {
   friend class PolyMeshHelper;
   friend class csPolygon3D;
@@ -837,7 +830,7 @@ public:
   void ReplaceMaterial (iMaterialWrapper* oldmat, iMaterialWrapper* newmat);
   void ClearReplacedMaterials ();
 
-  void InvalidateMaterialHandles ();
+  virtual void InvalidateMaterialHandles ();
 
   void PrepareForUse ();
 
@@ -862,23 +855,23 @@ public:
   /**
    * Init the lightmaps for all polygons in this thing.
    */
-  void InitializeDefault (bool clear);
+  virtual void InitializeDefault (bool clear);
 
   /**
    * Read the lightmaps from the cache.
    */
-  bool ReadFromCache (iCacheManager* cache_mgr);
+  virtual bool ReadFromCache (iCacheManager* cache_mgr);
 
   /**
    * Cache the lightmaps for all polygons in this thing.
    */
-  bool WriteToCache (iCacheManager* cache_mgr);
+  virtual bool WriteToCache (iCacheManager* cache_mgr);
 
   /**
    * Prepare the lightmaps for all polys so that they are suitable
    * for the 3D rasterizer.
    */
-  void PrepareLighting ();
+  virtual void PrepareLighting ();
 
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
@@ -891,25 +884,25 @@ public:
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.
    */
-  void CastShadows (iFrustumView* lview, iMovable* movable);
+  virtual void CastShadows (iMovable* movable, iFrustumView* lview);
 
   /**
    * Append a list of shadow frustums which extend from
    * this thing. The origin is the position of the light.
    */
-  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin);
 
   /**
    * Test a beam with this thing.
    */
-  bool HitBeamOutline (const csVector3& start, const csVector3& end,
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 
   /**
    * Test a beam with this thing.
    */
-  bool HitBeamObject (const csVector3& start, const csVector3& end,
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   //----------------------------------------------------------------------
@@ -920,7 +913,8 @@ public:
    * Do a hardtransform. This will make a clone of the factory
    * to avoid other meshes using this factory to be hard transformed too.
    */
-  void HardTransform (const csReversibleTransform& t);
+  virtual void HardTransform (const csReversibleTransform& t);
+  virtual bool SupportsHardTransform () const { return true; }
 
   /**
    * Control how this thing will be moved.
@@ -933,13 +927,13 @@ public:
   int GetMovingOption () const { return cfg_moving; }
 
   /// Sets dynamic ambient light for this thing
-  void SetDynamicAmbientLight (const csColor& color)
+  virtual void SetDynamicAmbientLight (const csColor& color)
   {
     dynamic_ambient = color;
     MarkLightmapsDirty ();
   }
   /// Gets dynamic ambient light for this thing
-  const csColor& GetDynamicAmbientLight ()
+  virtual const csColor& GetDynamicAmbientLight ()
   {
     return dynamic_ambient;
   }
@@ -948,8 +942,8 @@ public:
   uint32 GetLightVersion() const
   { return light_version; }
 
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
+  virtual void LightChanged (iLight* light);
+  virtual void LightDisconnect (iLight* light);
 
   void SetMixMode (uint mode)
   {
@@ -1022,37 +1016,29 @@ public:
   } scfiThingState;
   friend struct ThingState;
 
-  //------------------------- iLightingInfo interface -------------------------
-  /// iLightingInfo implementation.
-  struct LightingInfo : public iLightingInfo
+  //-------------------- iMeshObject interface implementation ----------
+  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
+    iMovable* movable, uint32 frustum_mask);
+
+  virtual iMeshObjectFactory* GetFactory () const;
+  virtual csFlags& GetFlags () { return flags; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  { return 0; }
+  virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+  { }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iObjectModel* GetObjectModel ()
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void InitializeDefault (bool clear)
-    {
-      scfParent->InitializeDefault (clear);
-    }
-    virtual bool ReadFromCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->ReadFromCache (cache_mgr);
-    }
-    virtual bool WriteToCache (iCacheManager* cache_mgr)
-    {
-      return scfParent->WriteToCache (cache_mgr);
-    }
-    virtual void PrepareLighting ()
-    {
-      scfParent->PrepareLighting ();
-    }
-    virtual void SetDynamicAmbientLight (const csColor& color)
-    { scfParent->SetDynamicAmbientLight (color); }
-    virtual const csColor& GetDynamicAmbientLight ()
-    { return scfParent->GetDynamicAmbientLight (); }
-    virtual void LightChanged (iLight* light)
-    { scfParent->LightChanged (light); }
-    virtual void LightDisconnect (iLight* light)
-    { scfParent->LightDisconnect (light); }
-  } scfiLightingInfo;
-  friend struct LightingInfo;
+    return static_data->GetObjectModel ();
+  }
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   //-------------------- iPolygonMesh interface implementation ----------------
   PolyMeshHelper scfiPolygonMesh;
@@ -1060,86 +1046,6 @@ public:
   PolyMeshHelper scfiPolygonMeshCD;
   //-------------------- Lower detail iPolygonMesh implementation -------------
   PolyMeshHelper scfiPolygonMeshLOD;
-
-  //-------------------- iShadowCaster interface implementation ---------------
-  struct ShadowCaster : public iShadowCaster
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-    	const csVector3& origin)
-    {
-      scfParent->AppendShadows (movable, shadows, origin);
-    }
-  } scfiShadowCaster;
-  friend struct ShadowCaster;
-
-  //-------------------- iShadowReceiver interface implementation ----------
-  struct ShadowReceiver : public iShadowReceiver
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
-    {
-      scfParent->CastShadows (fview, movable);
-    }
-  } scfiShadowReceiver;
-  friend struct ShadowReceiver;
-
-  csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
-    iMovable* movable, uint32 frustum_mask);
-
-  //-------------------- iMeshObject interface implementation ----------
-  struct MeshObject : public iMeshObject
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual iMeshObjectFactory* GetFactory () const;
-    virtual csFlags& GetFlags () { return scfParent->flags; }
-    virtual csPtr<iMeshObject> Clone () { return 0; }
-    virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
-      iMovable* movable, uint32 frustum_mask)
-    {
-      return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask);
-    }
-    virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
-    virtual iMeshObjectDrawCallback* GetVisibleCallback () const
-    { return 0; }
-    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
-    { }
-    virtual void HardTransform (const csReversibleTransform& t)
-    {
-      scfParent->HardTransform (t);
-    }
-    virtual bool SupportsHardTransform () const { return true; }
-    virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
-      csVector3& isect, float* pr)
-    {
-      return scfParent->HitBeamOutline (start, end, isect, pr);
-    }
-    virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0)
-    {
-      return scfParent->HitBeamObject (start, end, isect, pr, polygon_idx);
-    }
-    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
-    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
-    virtual iObjectModel* GetObjectModel ()
-    {
-      return scfParent->static_data->GetObjectModel ();
-    }
-    virtual bool SetColor (const csColor&) { return false; }
-    virtual bool GetColor (csColor&) const { return false; }
-    virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
-    virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
-    virtual void InvalidateMaterialHandles ()
-    {
-      scfParent->InvalidateMaterialHandles ();
-    }
-    /**
-     * see imesh/object.h for specification. The default implementation
-     * does nothing.
-     */
-    virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
-  } scfiMeshObject;
-  friend struct MeshObject;
 };
 
 struct intar2 { int ar[2]; };

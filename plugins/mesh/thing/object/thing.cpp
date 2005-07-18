@@ -144,31 +144,15 @@ SCF_IMPLEMENT_IBASE_END
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csThing)
+  SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
+  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
+  SCF_IMPLEMENTS_INTERFACE(iMeshObject)
+  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
   SCF_IMPLEMENTS_INTERFACE(iThingState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
-  SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowCaster)
-  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowReceiver)
-  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::MeshObject)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -179,12 +163,8 @@ int csThing:: last_thing_id = 0;
 SCF_IMPLEMENT_IBASE(csThingStatic)
   SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csStringID csThingStatic::texLightmapName = csInvalidStringID;
 
@@ -196,17 +176,16 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 	scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
 
   scfiPolygonMesh.SetThing (this);
   scfiPolygonMeshCD.SetThing (this);
   scfiPolygonMeshLOD.SetThing (this);
-  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMeshCD);
-  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
-  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+  SetPolygonMeshBase (&scfiPolygonMesh);
+  SetPolygonMeshColldet (&scfiPolygonMeshCD);
+  SetPolygonMeshViscull (&scfiPolygonMeshLOD);
+  SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
   max_vertices = num_vertices = 0;
   obj_verts = 0;
@@ -233,7 +212,6 @@ csThingStatic::~csThingStatic ()
 
   UnprepareLMLayout ();
 
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -694,7 +672,7 @@ int csThingStatic::AddVertex (float x, float y, float z)
 
   obj_verts[num_vertices].Set (x, y, z);
   num_vertices++;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
   return num_vertices - 1;
 }
 
@@ -702,7 +680,7 @@ void csThingStatic::SetVertex (int idx, const csVector3 &vt)
 {
   CS_ASSERT (idx >= 0 && idx < num_vertices);
   obj_verts[idx] = vt;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csThingStatic::DeleteVertex (int idx)
@@ -711,7 +689,7 @@ void csThingStatic::DeleteVertex (int idx)
 
   int copysize = sizeof (csVector3) * (num_vertices - idx - 1);
   memmove (obj_verts + idx, obj_verts + idx + 1, copysize);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csThingStatic::DeleteVertices (int from, int to)
@@ -735,7 +713,7 @@ void csThingStatic::DeleteVertices (int from, int to)
     num_vertices -= rangelen;
   }
 
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csThingStatic::CompressVertices ()
@@ -762,7 +740,7 @@ void csThingStatic::CompressVertices ()
   }
 
   delete[] vt;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csThingStatic::RemoveUnusedVertices ()
@@ -831,7 +809,7 @@ void csThingStatic::RemoveUnusedVertices ()
   delete[] used;
 
   SetObjBboxValid (false);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 struct PolygonsForVertex
@@ -872,7 +850,7 @@ int csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
   spoly->SetParent (this);
   spoly->EnableTextureMapping (true);
   int idx = (int)static_polygons.Push (spoly);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
   UnprepareLMLayout ();
   return idx;
 }
@@ -881,14 +859,14 @@ void csThingStatic::RemovePolygon (int idx)
 {
   static_polygons.FreeItem (static_polygons.Get (idx));
   static_polygons.DeleteIndex (idx);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
   UnprepareLMLayout ();
 }
 
 void csThingStatic::RemovePolygons ()
 {
   static_polygons.FreeAll ();
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
   UnprepareLMLayout ();
 }
 
@@ -932,7 +910,7 @@ csPtr<csThingStatic> csThingStatic::CloneStatic ()
   clone->obj_radius = obj_radius;
   clone->max_obj_radius = max_obj_radius;
   clone->SetPrepared (IsPrepared());
-  clone->scfiObjectModel.SetShapeNumber (scfiObjectModel.GetShapeNumber ());
+  clone->SetShapeNumber (GetShapeNumber ());
   clone->cosinus_factor = cosinus_factor;
 
   clone->num_vertices = num_vertices;
@@ -990,7 +968,7 @@ void csThingStatic::HardTransform (const csReversibleTransform &t)
     p->HardTransform (t);
   }
 
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 csPtr<iMeshObject> csThingStatic::NewInstance ()
@@ -998,14 +976,14 @@ csPtr<iMeshObject> csThingStatic::NewInstance ()
   csThing *thing = new csThing ((iBase*)(iThingFactoryState*)this, this);
   if (mixmode != (uint)~0)
     thing->SetMixMode (mixmode);
-  return csPtr<iMeshObject> (&thing->scfiMeshObject);
+  return csPtr<iMeshObject> ((iMeshObject*)thing);
 }
 
 void csThingStatic::SetBoundingBox (const csBox3 &box)
 {
   SetObjBboxValid (true);
   obj_bbox = box;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csThingStatic::GetBoundingBox (csBox3 &box)
@@ -1577,11 +1555,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   DG_TYPE (this, "csThing");
 
   csThing::static_data = static_data;
@@ -1631,11 +1604,6 @@ csThing::~csThing ()
   delete[] polygon_world_planes;
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -1842,9 +1810,9 @@ void csThing::Prepare ()
 
   if (IsPrepared())
   {
-    if (static_data_nr != static_data->scfiObjectModel.GetShapeNumber ())
+    if (static_data_nr != static_data->GetShapeNumber ())
     {
-      static_data_nr = static_data->scfiObjectModel.GetShapeNumber ();
+      static_data_nr = static_data->GetShapeNumber ();
 
       if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
       {
@@ -1875,7 +1843,7 @@ void csThing::Prepare ()
 
   SetPrepared (true);
 
-  static_data_nr = static_data->scfiObjectModel.GetShapeNumber ();
+  static_data_nr = static_data->GetShapeNumber ();
 
   if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
   {
@@ -1972,7 +1940,7 @@ csPtr<iPolygonHandle> csThing::CreatePolygonHandle (int polygon_idx)
 	(iThingFactoryState*)(csThingStatic*)static_data,
 	(iMeshObjectFactory*)(csThingStatic*)static_data,
 	&scfiThingState,
-	&scfiMeshObject,
+	(iMeshObject*)this,
 	polygon_idx));
 }
 
@@ -2002,7 +1970,7 @@ void csThing::InvalidateThing ()
   static_data->SetObjBboxValid (false);
 
   delete [] static_data->obj_normals; static_data->obj_normals = 0;
-  static_data->scfiObjectModel.ShapeChanged ();
+  static_data->ShapeChanged ();
 }
 
 iPolygonMesh* csThing::GetWriteObject ()
@@ -2280,7 +2248,7 @@ void PolyMeshHelper::ForceCleanup ()
 
 //----------------------------------------------------------------------
 
-void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
+void csThing::CastShadows (iMovable* movable, iFrustumView *lview)
 {
   Prepare ();
   //@@@ Ok?
@@ -2356,7 +2324,7 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     }
   }
   if (affect)
-    lpi->GetLight ()->AddAffectedLightingInfo (&scfiLightingInfo);
+    lpi->GetLight ()->AddAffectedLightingInfo ((iLightingInfo*)this);
 }
 
 void csThing::InitializeDefault (bool clear)
@@ -2777,9 +2745,9 @@ void csThing::UpdateDirtyLMs ()
 
 //---------------------------------------------------------------------------
 
-iMeshObjectFactory *csThing::MeshObject::GetFactory () const
+iMeshObjectFactory *csThing::GetFactory () const
 {
-  return (iMeshObjectFactory*)(scfParent->GetStaticData ());
+  return (iMeshObjectFactory*)static_data;
 }
 
 //---------------------------------------------------------------------------

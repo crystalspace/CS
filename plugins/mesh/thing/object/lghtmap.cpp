@@ -356,7 +356,7 @@ const char* csLightMap::ReadFromCache (
   }
 
   iLightingInfo* li;
-  li = &(parent->scfiLightingInfo);
+  li = (iLightingInfo*)parent;
 
   for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
