@@ -30,7 +30,7 @@ class csEngine;
 /**
  * A camera positioned in the 3D world.
  */
-class csCamera : public csOrthoTransform, public iBase
+class csCamera : public csOrthoTransform, public iCamera
 {
 private:
   /// The sector the camera is in.
@@ -80,6 +80,9 @@ private:
    */
   static long cur_cameranr;
 
+  ///
+  void Correct (int n, float* vals[]);
+
 public:
   ///
   csCamera ();
@@ -96,7 +99,7 @@ public:
    * changes. This number can be used to cache camera vertex arrays, for
    * example.
    */
-  long GetCameraNumber () const
+  virtual long GetCameraNumber () const
   {
     return cameranr;
   }
@@ -124,27 +127,27 @@ public:
     ComputeAngle (width);
   }
   /// Get the FOV for this camera
-  int GetFOV () const { return aspect; }
+  virtual int GetFOV () const { return aspect; }
   /// Get the inverse FOV for this camera.
-  float GetInvFOV () const { return inv_aspect; }
+  virtual float GetInvFOV () const { return inv_aspect; }
 
   /// Set the FOV in angles (degrees).
-  void SetFOVAngle (float a, int width);
+  virtual void SetFOVAngle (float a, int width);
   /// Get the FOV in angles (degrees).
-  float GetFOVAngle () const
+  virtual float GetFOVAngle () const
   {
     return fov_angle;
   }
 
   /// Get the X shift value.
-  float GetShiftX () const { return shift_x; }
+  virtual float GetShiftX () const { return shift_x; }
   /// Get the Y shift value.
-  float GetShiftY () const { return shift_y; }
+  virtual float GetShiftY () const { return shift_y; }
 
   /// Set farplane, everything behind this will be cut
-  void SetFarPlane (const csPlane3* farplane);
+  virtual void SetFarPlane (csPlane3* farplane);
   /// Get the Farplane
-  csPlane3* GetFarPlane () const { return fp; }
+  virtual csPlane3* GetFarPlane () const { return fp; }
 
   /**
    * Set the sector that the camera resides in.
@@ -314,7 +317,7 @@ public:
   void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; }
 
   /// Calculate perspective corrected point for this camera.
-  void Perspective (const csVector3& v, csVector2& p) const
+  virtual void Perspective (const csVector3& v, csVector2& p) const
   {
     float iz = aspect / v.z;
     p.x = v.x * iz + shift_x;
@@ -322,19 +325,19 @@ public:
   }
 
   /// Calculate inverse perspective corrected point for this camera.
-  void InvPerspective (const csVector2& p, float z, csVector3& v) const
+  virtual void InvPerspective (const csVector2& p, float z, csVector3& v) const
   {
     v.z = z;
     v.x = (p.x - shift_x) * z * inv_aspect;
     v.y = (p.y - shift_y) * z * inv_aspect;
   }
 
-  void AddCameraSectorListener (iCameraSectorListener* listener)
+  virtual void AddCameraSectorListener (iCameraSectorListener* listener)
   {
     listeners.Push (listener);
   }
 
-  void RemoveCameraSectorListener (iCameraSectorListener* listener)
+  virtual void RemoveCameraSectorListener (iCameraSectorListener* listener)
   {
     listeners.Delete (listener);
   }
@@ -343,109 +346,27 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  //------------------------ iCamera implementation ------------------------
-  /// iCamera implementation
-  struct Camera : public iCamera
+  virtual iCamera* Clone () const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csCamera);
-
-    virtual iCamera *Clone () const
-    { return &(new csCamera (*scfParent))->scfiCamera; }
-
-    virtual int GetFOV () const
-    { return scfParent->GetFOV (); }
-    virtual float GetInvFOV () const
-    { return scfParent->GetInvFOV (); }
-    virtual float GetFOVAngle () const
-    { return scfParent->GetFOVAngle (); }
-    virtual void SetFOV (int a, int width)
-    { scfParent->SetFOV (a, width); }
-    virtual void SetFOVAngle (float a, int width)
-    { scfParent->SetFOVAngle (a, width); }
-
-    virtual float GetShiftX () const
-    { return scfParent->GetShiftX (); }
-    virtual float GetShiftY () const
-    { return scfParent->GetShiftY (); }
-    virtual void SetPerspectiveCenter (float x, float y)
-    { scfParent->SetPerspectiveCenter (x, y); }
-
-    virtual csOrthoTransform& GetTransform ()
-    { return *(csOrthoTransform*)scfParent; }
-    virtual const csOrthoTransform& GetTransform () const
-    { return *(csOrthoTransform*)scfParent; }
-    virtual void SetTransform (const csOrthoTransform& tr)
-    {
-      *(csOrthoTransform*)scfParent = tr;
-      scfParent->cameranr = scfParent->cur_cameranr++;
-    }
-    virtual void MoveWorld (const csVector3& v, bool cd = true)
-    { scfParent->MoveWorld (v, cd); }
-    virtual void Move (const csVector3& v, bool cd = true)
-    { scfParent->Move (v, cd); }
-    virtual void MoveWorldUnrestricted (const csVector3& v)
-    { scfParent->MoveWorldUnrestricted (v); }
-    virtual void MoveUnrestricted (const csVector3& v)
-    { scfParent->MoveUnrestricted (v); }
-
-    virtual iSector* GetSector () const { return scfParent->GetSector(); }
-    virtual void SetSector (iSector *s) { scfParent->SetSector (s); }
-
-    virtual void Correct (int n)
-    {
-      scfParent->Correct (n);
-    }
-    virtual bool IsMirrored () const
-    {
-      return scfParent->IsMirrored ();
-    }
-    virtual void SetMirrored (bool m)
-    {
-      scfParent->SetMirrored (m);
-    }
-    virtual csPlane3* GetFarPlane () const
-    {
-      return scfParent->GetFarPlane ();
-    }
-    virtual void SetFarPlane (csPlane3* fp)
-    {
-      scfParent->SetFarPlane (fp);
-    }
-    virtual long GetCameraNumber () const
-    {
-      return scfParent->GetCameraNumber ();
-    }
-    virtual void Perspective (const csVector3& v, csVector2& p) const
-    {
-      scfParent->Perspective (v, p);
-    }
-    virtual void InvPerspective (const csVector2& p, float z,
-    	csVector3& v) const
-    {
-      scfParent->InvPerspective (p, z, v);
-    }
-    virtual void OnlyPortals (bool hop)
-    {
-      scfParent->only_portals = hop;
-    }
-    virtual bool GetOnlyPortals ()
-    {
-      return scfParent->only_portals;
-    }
-    virtual void AddCameraSectorListener (iCameraSectorListener* listener)
-    {
-      scfParent->AddCameraSectorListener (listener);
-    }
-    virtual void RemoveCameraSectorListener (iCameraSectorListener* listener)
-    {
-      scfParent->RemoveCameraSectorListener (listener);
-    }
-  } scfiCamera;
-  friend struct Camera;
-
-private:
-  ///
-  void Correct (int n, float* vals[]);
+    return (iCamera*)new csCamera (*this);
+  }
+  virtual void OnlyPortals (bool hop)
+  {
+    only_portals = hop;
+  }
+  virtual bool GetOnlyPortals ()
+  {
+    return only_portals;
+  }
+  virtual csOrthoTransform& GetTransform ()
+  { return *(csOrthoTransform*)this; }
+  virtual const csOrthoTransform& GetTransform () const
+  { return *(csOrthoTransform*)this; }
+  virtual void SetTransform (const csOrthoTransform& tr)
+  {
+    *(csOrthoTransform*)this = tr;
+    cameranr = cur_cameranr++;
+  }
 };
 
 #endif // __CS_CAMERA_H__

@@ -24,13 +24,8 @@
 #include "plugins/engine/3d/engine.h"
 
 SCF_IMPLEMENT_IBASE(csCamera)
-  SCF_IMPLEMENTS_INTERFACE(iBase)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCamera)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCamera::Camera)
   SCF_IMPLEMENTS_INTERFACE(iCamera)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 int csCamera:: default_aspect = 0;
 float csCamera:: default_inv_aspect = 0;
@@ -41,7 +36,6 @@ csCamera::csCamera () :
   csOrthoTransform()
 {
   SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   mirror = false;
   sector = 0;
   aspect = default_aspect;
@@ -65,13 +59,11 @@ csCamera::csCamera (csCamera *c) :
   }
 
   SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
 }
 
 csCamera::csCamera (const csCamera &c) :
-  csOrthoTransform(),
-  iBase()
+  csOrthoTransform()
 {
   *this = c;
   if (fp)
@@ -81,14 +73,12 @@ csCamera::csCamera (const csCamera &c) :
   }
 
   SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
 }
 
 csCamera::~csCamera ()
 {
   delete fp;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCamera);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -96,10 +86,10 @@ void csCamera::FireCameraSectorListeners (iSector* sector)
 {
   size_t i;
   for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->NewSector (&scfiCamera, sector);
+    listeners[i]->NewSector ((iCamera*)this, sector);
 }
 
-void csCamera::SetFarPlane (const csPlane3 *farplane)
+void csCamera::SetFarPlane (csPlane3 *farplane)
 {
   delete fp;
   if (farplane)

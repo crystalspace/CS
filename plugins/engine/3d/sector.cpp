@@ -67,7 +67,7 @@ void csSectorLightList::PrepareLight (iLight* item)
 {
   csLightList::PrepareLight (item);
   ((csLight::Light*)item)->GetPrivateObject ()
-  	->SetSector (&(sector->scfiSector));
+  	->SetSector ((iSector*)sector);
 
   const csVector3& center = item->GetCenter ();
   float radius = item->GetCutoffDistance ();
@@ -107,17 +107,12 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csSector)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSector)
+  SCF_IMPLEMENTS_INTERFACE(iSector)
   SCF_IMPLEMENTS_INTERFACE (csSector);
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
-  SCF_IMPLEMENTS_INTERFACE(iSector)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSector::csSector (csEngine *engine) : csObject()
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
   fog.enabled = false;
@@ -134,7 +129,6 @@ csSector::csSector (csEngine *engine) : csObject()
 csSector::~csSector ()
 {
   lights.RemoveAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSector);
 }
 
 void csSector::UnlinkObjects ()
@@ -144,14 +138,14 @@ void csSector::UnlinkObjects ()
   {
     iMeshWrapper* m = meshes.Get (i);
     iSectorList* sl = m->GetMovable ()->GetSectors ();
-    sl->Remove (&scfiSector);
+    sl->Remove ((iSector*)this);
     m->GetMovable ()->UpdateMove ();
   }
   for (i = 0; i < lights.GetCount (); i++)
   {
     iLight* l = lights.Get (i);
     iSectorList* sl = l->GetMovable ()->GetSectors ();
-    sl->Remove (&scfiSector);
+    sl->Remove ((iSector*)this);
     l->GetMovable ()->UpdateMove ();
   }
 }
@@ -160,8 +154,7 @@ void csSector::UnlinkObjects ()
 
 void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
 {
-  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	->GetCsMeshWrapper ();
+  csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
   csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
@@ -170,7 +163,7 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
 
   if (cmesh->GetStaticLODMesh ()) return;
   int i;
-  const csMeshMeshList& ml = cmesh->GetChildren ();
+  const csMeshMeshList& ml = cmesh->GetCsChildren ();
   for (i = 0 ; i < ml.GetCount () ; i++)
   {
     iMeshWrapper* child = ml.Get (i);
@@ -180,8 +173,7 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
 
 void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
 {
-  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	->GetCsMeshWrapper ();
+  csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
   csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
@@ -242,7 +234,7 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 
 //----------------------------------------------------------------------
 
-bool csSector::UseCullerPlugin (const char *plugname,
+bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)
 {
   culler = 0;
@@ -283,7 +275,7 @@ bool csSector::UseCullerPlugin (const char *plugname,
 
 iVisibilityCuller* csSector::GetVisibilityCuller ()
 {
-  if (!culler) UseCullerPlugin ("crystalspace.culling.frustvis");
+  if (!culler) SetVisibilityCullerPlugin ("crystalspace.culling.frustvis");
   CS_ASSERT (culler != 0);
   return culler;
 }
@@ -313,11 +305,10 @@ public:
 
   void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask)
   {
-    csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	  ->GetCsMeshWrapper ();
+    csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
     ObjectVisible (cmesh, frustum_mask);
     int i;
-    const csMeshMeshList& children = cmesh->GetChildren ();
+    const csMeshMeshList& children = cmesh->GetCsChildren ();
     for (i = 0 ; i < children.GetCount () ; i++)
     {
       iMeshWrapper* child = children.Get (i);
@@ -349,8 +340,9 @@ public:
 #endif
     if (num > 0)
     {
-      privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
-	cmesh->GetZBufMode (), &cmesh->scfiMeshWrapper);
+      privMeshlist->AddRenderMeshes (meshes, num,
+      	cmesh->csMeshWrapper::GetRenderPriority (),
+	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
     }
   }
 
@@ -360,8 +352,7 @@ public:
     if (privMeshlist == 0)
       return;
 
-    csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	->GetCsMeshWrapper ();
+    csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
     ObjectVisible (cmesh, frustum_mask);
   }
 
@@ -601,7 +592,7 @@ iSector *csSector::FollowSegment (
         if (!po->GetSector ())
         {
           new_position = isect;
-          return &scfiSector;
+          return (iSector*)this;
         }
 
         if (po->GetFlags ().Check (CS_PORTAL_WARP))
@@ -625,7 +616,7 @@ iSector *csSector::FollowSegment (
       new_position = isect;
     }
   }
-  return &scfiSector;
+  return (iSector*)this;
 }
 
 void csSector::PrepareDraw (iRenderView *rview)
@@ -637,14 +628,14 @@ void csSector::PrepareDraw (iRenderView *rview)
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
   csRenderView* csrview = (csRenderView*)rview;
-  csrview->SetThisSector (&scfiSector);
+  csrview->SetThisSector ((iSector*)this);
 
   size_t i = sector_cb_vector.Length ();
   while (i > 0)
   {
     i--;
     iSectorCallback* cb = sector_cb_vector.Get (i);
-    cb->Traverse (&scfiSector, rview);
+    cb->Traverse ((iSector*)this, rview);
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
@@ -790,7 +781,7 @@ void csSector::Draw (iRenderView *rview)
 {
   iRenderLoop* rl = renderloop;
   if (!rl) rl = engine->GetCurrentDefaultRenderloop ();
-  rl->Draw (rview, (iSector*)&scfiSector);
+  rl->Draw (rview, (iSector*)this);
 }
 
 void csSector::AddSectorMeshCallback (iSectorMeshCallback* cb)
@@ -809,7 +800,7 @@ void csSector::FireNewMesh (iMeshWrapper* mesh)
   while (i > 0)
   {
     i--;
-    sector_mesh_cb_vector[i]->NewMesh (&scfiSector, mesh);
+    sector_mesh_cb_vector[i]->NewMesh ((iSector*)this, mesh);
   }
 }
 
@@ -819,7 +810,7 @@ void csSector::FireRemoveMesh (iMeshWrapper* mesh)
   while (i > 0)
   {
     i--;
-    sector_mesh_cb_vector[i]->RemoveMesh (&scfiSector, mesh);
+    sector_mesh_cb_vector[i]->RemoveMesh ((iSector*)this, mesh);
   }
 }
 
@@ -829,7 +820,7 @@ void csSector::CheckFrustum (iFrustumView *lview)
   while (i >= 0)
   {
     iSectorCallback* cb = sector_cb_vector.Get (i);
-    cb->Traverse (&scfiSector, lview);
+    cb->Traverse ((iSector*)this, lview);
     i--;
   }
 
@@ -848,7 +839,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   draw_busy--;
 }
 
-void csSector::ShineLights (csProgressPulse *pulse)
+void csSector::ShineLightsInt (csProgressPulse *pulse)
 {
   int i;
   for (i = 0; i < lights.GetCount (); i++)
@@ -860,7 +851,7 @@ void csSector::ShineLights (csProgressPulse *pulse)
   }
 }
 
-void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
+void csSector::ShineLightsInt (iMeshWrapper *mesh, csProgressPulse *pulse)
 {
   int i;
   for (i = 0; i < lights.GetCount (); i++)
@@ -895,41 +886,6 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
       bbox += b;
     }
   }
-}
-
-//---------------------------------------------------------------------------
-iMeshWrapper *csSector::eiSector::HitBeamPortals (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  int* polygon_idx)
-{
-  return scfParent->HitBeamPortals (start, end, isect, polygon_idx);
-}
-
-iMeshWrapper *csSector::eiSector::HitBeam (
-  const csVector3 &start, const csVector3 &end,
-  csVector3 &isect,
-  int *polygonPtr,
-  bool accurate)
-{
-  return scfParent->HitBeam (
-      start, end, isect,
-      polygonPtr, accurate);
-}
-
-iSector *csSector::eiSector::FollowSegment (
-  csReversibleTransform &t,
-  csVector3 &new_position,
-  bool &mirror,
-  bool only_portals)
-{
-  iSector *s = scfParent->FollowSegment (
-      t,
-      new_position,
-      mirror,
-      only_portals);
-  return s;
 }
 
 //---------------------------------------------------------------------------

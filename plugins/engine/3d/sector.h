@@ -100,7 +100,7 @@ SCF_VERSION (csSector, 0, 0, 2);
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.
  */
-class csSector : public csObject
+class csSector : public csObject, public iSector
 {
 private:
   /**
@@ -186,6 +186,10 @@ private:
   csArray<visibleMeshCacheHolder> visibleMeshCache;
   csPDelArray<csRenderMeshList> usedMeshLists;
 
+  // @@@ This is only there to pacify gcc so it doesn't give a warning
+  // about csSector only defining a private destructor and no friends.
+  // So here we have a friend.
+  friend struct visibleMeshCacheHolder;
 
 private:
   /**
@@ -233,9 +237,9 @@ public:
   csSector (csEngine*);
 
   /// Set the renderloop for this sector.
-  void SetRenderLoop (iRenderLoop* rl) { renderloop = rl; }
+  virtual void SetRenderLoop (iRenderLoop* rl) { renderloop = rl; }
   /// Get the renderloop for this sector (or 0 in case of default).
-  iRenderLoop* GetRenderLoop () { return renderloop; }
+  virtual iRenderLoop* GetRenderLoop () { return renderloop; }
 
   /**
    * Unlink all meshes from this sector. WARNING! This function may
@@ -243,14 +247,14 @@ public:
    * call it from the csSector destructor! It should only be called
    * from csSectorList::FreeSector()!.
    */
-  void UnlinkObjects ();
+  virtual void UnlinkObjects ();
 
   //----------------------------------------------------------------------
   // Mesh manipulation functions
   //----------------------------------------------------------------------
 
-  iMeshList* GetMeshes ()
-    { return &meshes; }
+  virtual iMeshList* GetMeshes ()
+  { return &meshes; }
 
   /// Get render queues (for rendering priorities).
   csRenderQueueSet& GetRenderQueues () { return RenderQueues; }
@@ -296,34 +300,34 @@ public:
   /**
    * Get the list of lights in this sector.
    */
-  iLightList* GetLights ()
-    { return &lights; }
+  virtual iLightList* GetLights ()
+  { return &lights; }
 
   //----------------------------------------------------------------------
   // Callbacks
   //----------------------------------------------------------------------
-  void SetSectorCallback (iSectorCallback* cb)
+  virtual void SetSectorCallback (iSectorCallback* cb)
   {
     sector_cb_vector.Push (cb);
   }
 
-  void RemoveSectorCallback (iSectorCallback* cb)
+  virtual void RemoveSectorCallback (iSectorCallback* cb)
   {
     sector_cb_vector.Delete (cb);
   }
 
-  int GetSectorCallbackCount () const
+  virtual int GetSectorCallbackCount () const
   {
     return (int)sector_cb_vector.Length ();
   }
 
-  iSectorCallback* GetSectorCallback (int idx) const
+  virtual iSectorCallback* GetSectorCallback (int idx) const
   {
     return sector_cb_vector.Get (idx);
   }
 
-  void AddSectorMeshCallback (iSectorMeshCallback* cb);
-  void RemoveSectorMeshCallback (iSectorMeshCallback* cb);
+  virtual void AddSectorMeshCallback (iSectorMeshCallback* cb);
+  virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb);
   void FireNewMesh (iMeshWrapper* mesh);
   void FireRemoveMesh (iMeshWrapper* mesh);
 
@@ -332,17 +336,10 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Use the given plugin as a visibility culler (should implement
-   * iVisibilityCuller). Returns false if the culler could not be
-   * loaded for some reason.
-   */
-  bool UseCullerPlugin (const char* plugname, iDocumentNode* culler_params = 0);
-
-  /**
    * Get the visibility culler that is used for this sector.
    * 0 if none.
    */
-  iVisibilityCuller* GetVisibilityCuller ();
+  virtual iVisibilityCuller* GetVisibilityCuller ();
 
   /**
    * Get a set of visible meshes for given camera. These will be cached for
@@ -350,7 +347,7 @@ public:
    * be reculled. The returned pointer is valid as long as the sector exsist
    * (the sector will delete it)
    */
-  csRenderMeshList* GetVisibleMeshes (iRenderView *);
+  virtual csRenderMeshList* GetVisibleMeshes (iRenderView *);
 
   //----------------------------------------------------------------------
   // Drawing
@@ -359,12 +356,12 @@ public:
   /**
    * Prepare this sector for drawing.
    */
-  void PrepareDraw (iRenderView* rview);
+  virtual void PrepareDraw (iRenderView* rview);
 
   /**
    * Draw the sector in the given view and with the given transformation.
    */
-  void Draw (iRenderView* rview);
+  virtual void Draw (iRenderView* rview);
 
   //----------------------------------------------------------------------
   // Utility Functions
@@ -377,8 +374,8 @@ public:
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned.
    */
-  iMeshWrapper* HitBeamPortals (const csVector3& start, const csVector3& end,
-    csVector3& isect, int* polygon_idx);
+  virtual iMeshWrapper* HitBeamPortals (const csVector3& start,
+    const csVector3& end, csVector3& isect, int* polygon_idx);
 
   /**
    * Follow a beam from start to end and return the first object
@@ -386,7 +383,7 @@ public:
    * filled with the polygon index that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
-  iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
+  virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
     csVector3& intersect, int* polygonPtr, bool accurate = false);
 
   /**
@@ -401,7 +398,7 @@ public:
    * Check visibility in a frustum way for all things and polygons in
    * this sector and possibly traverse through portals to other sectors.
    */
-  void CheckFrustum (iFrustumView* lview);
+  virtual void CheckFrustum (iFrustumView* lview);
 
   /**
    * Follow a segment starting at this sector. If the segment intersects
@@ -421,8 +418,8 @@ public:
    * is a lot faster but it does mean that you need to use another
    * collision detection system to test with walls.
    */
-  iSector* FollowSegment (csReversibleTransform& t, csVector3& new_position,
-                          bool& mirror, bool only_portals = false);
+  virtual iSector* FollowSegment (csReversibleTransform& t,
+  	csVector3& new_position, bool& mirror, bool only_portals = false);
 
   /**
    * Intersect world-space segment with polygons of this sector. Return
@@ -447,7 +444,7 @@ public:
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const;
+  virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const;
 
   //------------------------------------------------
   // Everything for setting up the lighting system.
@@ -462,13 +459,13 @@ public:
    * center of the light and use that to light all polygons that
    * are hit by the frustum.
    */
-  void ShineLights (csProgressPulse* = 0);
+  void ShineLightsInt (csProgressPulse* = 0);
 
   /// Version of shine_lights() which only affects one mesh object.
-  void ShineLights (iMeshWrapper*, csProgressPulse* = 0);
+  void ShineLightsInt (iMeshWrapper*, csProgressPulse* = 0);
 
   /// Sets dynamic ambient light for all things in the sector
-  void SetDynamicAmbientLight(const csColor& color);
+  virtual void SetDynamicAmbientLight(const csColor& color);
 
   /// Get the kdtree for the light list.
   csKDTree* GetLightKDTree () const { return lights.GetLightKDTree (); }
@@ -481,13 +478,15 @@ public:
   csEngine* GetEngine () const { return engine; }
 
   /// Return true if this has fog.
-  bool HasFog () const { return fog.enabled; }
+  virtual bool HasFog () const { return fog.enabled; }
 
   /// Return fog structure.
-  csFog& GetFog () { return fog; }
+  csFog& GetCsFog () { return fog; }
+  /// Return fog structure.
+  virtual csFog* GetFog () const { return (csFog*)&fog; }
 
   /// Convenience function to set fog to some setting.
-  void SetFog (float density, const csColor& color)
+  virtual void SetFog (float density, const csColor& color)
   {
     fog.enabled = true;
     fog.density = density;
@@ -497,133 +496,38 @@ public:
   }
 
   /// Disable fog.
-  void DisableFog () { fog.enabled = false; }
+  virtual void DisableFog () { fog.enabled = false; }
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------------------------------------------------------------
   // Portal stuff.
   //----------------------------------------------------------------------
-  const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
+  virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
   { return portal_meshes; }
-  void RegisterPortalMesh (iMeshWrapper* mesh);
-  void UnregisterPortalMesh (iMeshWrapper* mesh);
+  virtual void RegisterPortalMesh (iMeshWrapper* mesh);
+  virtual void UnregisterPortalMesh (iMeshWrapper* mesh);
 
   //------------------------- iSector interface -------------------------------
-  struct eiSector : public iSector
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSector);
 
-    csSector *GetPrivateObject ()
-      { return (csSector*)scfParent; }
-    virtual iObject *QueryObject()
-      { return scfParent; }
-    virtual void SetRenderLoop (iRenderLoop* rl)
-      { scfParent->SetRenderLoop (rl); }
-    virtual iRenderLoop* GetRenderLoop ()
-      { return scfParent->GetRenderLoop (); }
-    virtual int GetRecLevel () const
-      { return scfParent->draw_busy; }
-    virtual void IncRecLevel ()
-      { scfParent->draw_busy++; }
-    virtual void DecRecLevel ()
-      { scfParent->draw_busy--; }
-    virtual bool SetVisibilityCullerPlugin (const char* name,
-    	iDocumentNode* culler_params = 0)
-    {
-      return scfParent->UseCullerPlugin (name, culler_params);
-    }
-    virtual iVisibilityCuller* GetVisibilityCuller ()
-      { return scfParent->GetVisibilityCuller (); }
-    virtual iMeshList* GetMeshes ()
-      { return scfParent->GetMeshes (); }
-    virtual iLightList* GetLights ()
-      { return scfParent->GetLights (); }
-    virtual void ShineLights ()
-      { scfParent->ShineLights (); }
-    virtual void ShineLights (iMeshWrapper* mesh)
-      { scfParent->ShineLights (mesh); }
-    virtual void SetDynamicAmbientLight(const csColor& color)
-      { scfParent->SetDynamicAmbientLight(color); }
-    virtual csColor GetDynamicAmbientLight() const
-      { return scfParent->dynamic_ambient_color; }
-    virtual uint GetDynamicAmbientVersion() const
-      { return scfParent->dynamic_ambient_version; }
-    virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
-      { scfParent->CalculateSectorBBox (bbox, do_meshes); }
-    virtual bool HasFog () const
-      { return scfParent->HasFog (); }
-    virtual csFog *GetFog () const
-      { return &scfParent->fog; }
-    virtual void SetFog (float density, const csColor& color)
-      { scfParent->SetFog (density, color); }
-    virtual void DisableFog ()
-      { scfParent->DisableFog (); }
-    virtual iMeshWrapper* HitBeamPortals (const csVector3& start,
-    	const csVector3& end, csVector3& isect, int* polygon_idx);
-    virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-      csVector3& intersect, int* polygonPtr, bool accurate = false);
-    virtual iSector* FollowSegment (csReversibleTransform& t,
-      csVector3& new_position, bool& mirror, bool only_portals = false);
-    virtual void Draw (iRenderView* rview)
-      { scfParent->Draw (rview); }
-    virtual void PrepareDraw (iRenderView* rview)
-    { scfParent->PrepareDraw (rview); }
-    virtual csRenderMeshList* GetVisibleMeshes (iRenderView *rview)
-    { return scfParent->GetVisibleMeshes (rview); }
-    virtual void SetSectorCallback (iSectorCallback* cb)
-    {
-      scfParent->SetSectorCallback (cb);
-    }
-    virtual void RemoveSectorCallback (iSectorCallback* cb)
-    {
-      scfParent->RemoveSectorCallback (cb);
-    }
-    virtual int GetSectorCallbackCount () const
-    {
-      return scfParent->GetSectorCallbackCount ();
-    }
-    virtual iSectorCallback* GetSectorCallback (int idx) const
-    {
-      return scfParent->GetSectorCallback (idx);
-    }
-
-    virtual void AddSectorMeshCallback (iSectorMeshCallback* cb)
-    {
-      scfParent->AddSectorMeshCallback (cb);
-    }
-    virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb)
-    {
-      scfParent->RemoveSectorMeshCallback (cb);
-    }
-
-    virtual void CheckFrustum (iFrustumView* lview)
-    {
-      scfParent->CheckFrustum (lview);
-    }
-
-    virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
-    {
-      return scfParent->GetPortalMeshes ();
-    }
-    virtual void RegisterPortalMesh (iMeshWrapper* mesh)
-    {
-      scfParent->RegisterPortalMesh (mesh);
-    }
-    virtual void UnregisterPortalMesh (iMeshWrapper* mesh)
-    {
-      scfParent->UnregisterPortalMesh (mesh);
-    }
-    virtual void UnlinkObjects ()
-    {
-      scfParent->UnlinkObjects ();
-    }
-    csSector* GetCsSector ()
-    {
-      return scfParent;
-    }
-  } scfiSector;
-  friend struct eiSector;
+  virtual iObject *QueryObject()
+  { return this; }
+  virtual int GetRecLevel () const
+  { return draw_busy; }
+  virtual void IncRecLevel ()
+  { draw_busy++; }
+  virtual void DecRecLevel ()
+  { draw_busy--; }
+  virtual bool SetVisibilityCullerPlugin (const char* name,
+    	iDocumentNode* culler_params = 0);
+  virtual void ShineLights ()
+  { ShineLightsInt ((csProgressPulse*)0); }
+  virtual void ShineLights (iMeshWrapper* mesh)
+  { ShineLightsInt (mesh, (csProgressPulse*)0); }
+  virtual csColor GetDynamicAmbientLight() const
+  { return dynamic_ambient_color; }
+  virtual uint GetDynamicAmbientVersion() const
+  { return dynamic_ambient_version; }
 };
 
 /// List of 3D engine sectors.

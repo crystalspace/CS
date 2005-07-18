@@ -2446,8 +2446,7 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = ((csSector::eiSector*)sector)->GetPrivateObject ()
-  	->GetLightKDTree ();
+  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
   csVector3 position = pos;
   kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
 
@@ -2492,8 +2491,7 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = ((csSector::eiSector*)sector)->GetPrivateObject ()
-  	->GetLightKDTree ();
+  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
   csBox3 bbox = box;
   kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
 
@@ -3001,7 +2999,7 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
 
 iSector *csEngine::CreateSector (const char *name)
 {
-  iSector *sector = &(new csSector (this))->scfiSector;
+  iSector *sector = (iSector*)(new csSector (this));
   sector->QueryObject ()->SetName (name);
   sectors.Add (sector);
   sector->DecRef ();
@@ -3074,7 +3072,7 @@ iRegionList *csEngine::GetRegions ()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  return csPtr<iCamera> (&(new csCamera ())->scfiCamera);
+  return csPtr<iCamera> ((iCamera*)(new csCamera ()));
 }
 
 csPtr<iLight> csEngine::CreateLight (
@@ -3370,7 +3368,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   csMeshWrapper *meshwrap = new csMeshWrapper (0);
   if (name) meshwrap->SetName (name);
 
-  iMeshWrapper *imw = &(meshwrap->scfiMeshWrapper);
+  iMeshWrapper *imw = (iMeshWrapper*)meshwrap;
   GetMeshes ()->Add (imw);
   imw->DecRef (); // the ref is now stored in the MeshList
   if (sector)
@@ -3400,8 +3398,7 @@ csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
   csPortalContainer* pc = new csPortalContainer (this, object_reg);
   csRef<iMeshWrapper> mesh = CreateMeshWrapper ((iMeshObject*)pc,
   	name, sector, pos);
-  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)(iMeshWrapper*)mesh)
-  	->GetCsMeshWrapper ();
+  csMeshWrapper* cmesh = (csMeshWrapper*)(iMeshWrapper*)mesh;
   if (GetPortalRenderPriority () != 0)
     cmesh->SetRenderPriority (GetPortalRenderPriority ());
   pc->SetMeshWrapper (cmesh);
@@ -3497,7 +3494,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
 {
   csMeshWrapper *meshwrap = new csMeshWrapper (0, mesh);
   if (name) meshwrap->SetName (name);
-  GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
+  GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
   if (sector)
   {
     (meshwrap->GetCsMovable ()).csMovable::SetSector (sector);
@@ -3505,16 +3502,16 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     (meshwrap->GetCsMovable ()).csMovable::UpdateMove ();
   }
 
-  mesh->SetLogicalParent (&(meshwrap->scfiMeshWrapper));
-  return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
+  mesh->SetLogicalParent ((iMeshWrapper*)meshwrap);
+  return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
 }
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
 {
   csMeshWrapper *meshwrap = new csMeshWrapper (0);
   if (name) meshwrap->SetName (name);
-  GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
-  return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
+  GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
+  return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
 }
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (

@@ -64,7 +64,7 @@ public:
   virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin)
   {
-    const csMeshMeshList& c = static_lod_mesh->GetChildren ();
+    const csMeshMeshList& c = static_lod_mesh->GetCsChildren ();
     int cnt = c.GetCount ();
     int i = cnt-1;
     while (i >= 0)
@@ -108,7 +108,7 @@ public:
 
   virtual void CastShadows (iMovable* movable, iFrustumView* fview)
   {
-    const csMeshMeshList& c = static_lod_mesh->GetChildren ();
+    const csMeshMeshList& c = static_lod_mesh->GetCsChildren ();
     int cnt = c.GetCount ();
     int i;
     for (i = 0 ; i < cnt ; i++)
@@ -130,26 +130,16 @@ SCF_IMPLEMENT_IBASE_END
 // ---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE_EXT(csMeshWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iImposter)
+  SCF_IMPLEMENTS_INTERFACE(iMeshWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iImposter)
   SCF_IMPLEMENTS_INTERFACE(csMeshWrapper)
   SCF_IMPLEMENTS_INTERFACE(iVisibilityObject)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iMeshWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshImposter)
-  SCF_IMPLEMENTS_INTERFACE(iImposter)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
     csObject ()
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiImposter);
   DG_TYPE (this, "csMeshWrapper");
 
   movable.scfParent = (iBase*)(csObject*)this;
@@ -159,7 +149,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   Parent = theParent;
   if (Parent)
   {
-    csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
+    csParent = (csMeshWrapper*)Parent;
     movable.SetParent (Parent->GetMovable ());
   }
   else
@@ -205,7 +195,7 @@ void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
 {
   Parent = newParent;
   if (Parent)
-    csParent = ((csMeshWrapper::MeshWrapper*)Parent)->scfParent;
+    csParent = (csMeshWrapper*)Parent;
   else
     csParent = 0;
 }
@@ -261,7 +251,7 @@ void csMeshWrapper::AddToSectorPortalLists ()
     for (i = 0; i < sectors->GetCount (); i++)
     {
       iSector *ss = sectors->Get (i);
-      if (ss) ss->RegisterPortalMesh (&scfiMeshWrapper);
+      if (ss) ss->RegisterPortalMesh ((iMeshWrapper*)this);
     }
   }
 }
@@ -277,7 +267,7 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
 
     if (sector)
     {
-      sector->UnregisterPortalMesh (&scfiMeshWrapper);
+      sector->UnregisterPortalMesh ((iMeshWrapper*)this);
     }
     else
     {
@@ -286,7 +276,7 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
       for (i = 0; i < sectors->GetCount (); i++)
       {
         iSector *ss = sectors->Get (i);
-        if (ss) ss->UnregisterPortalMesh (&scfiMeshWrapper);
+        if (ss) ss->UnregisterPortalMesh ((iMeshWrapper*)this);
       }
     }
   }
@@ -319,8 +309,6 @@ csMeshWrapper::~csMeshWrapper ()
 {
   delete imposter_mesh;
   ClearFromSectorPortalLists ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiImposter);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -346,19 +334,19 @@ void csMeshWrapper::MoveToSector (iSector *s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  if (!Parent) s->GetMeshes ()->Add (&scfiMeshWrapper);
+  if (!Parent) s->GetMeshes ()->Add ((iMeshWrapper*)this);
   // If we are a portal container then we have to register ourselves
   // to the sector.
-  if (portal_container) s->RegisterPortalMesh (&scfiMeshWrapper);
+  if (portal_container) s->RegisterPortalMesh ((iMeshWrapper*)this);
 
   // Fire the new mesh callbacks in the sector.
-  ((csSector::eiSector*)s)->GetPrivateObject ()->FireNewMesh (&scfiMeshWrapper);
+  ((csSector*)s)->FireNewMesh ((iMeshWrapper*)this);
 
   int i;
   for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper* spr = children.Get (i);
-    csMeshWrapper* cspr = ((csMeshWrapper::MeshWrapper*)spr)->scfParent;
+    csMeshWrapper* cspr = (csMeshWrapper*)spr;
     // If we have children then we call MoveToSector() on them so that
     // any potential portal_containers among them will also register
     // themselves to the sector.
@@ -370,15 +358,14 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
 {
   // Fire the remove mesh callbacks in the sector.
   if (sector)
-    ((csSector::eiSector*)sector)->GetPrivateObject ()->FireRemoveMesh (
-  	&scfiMeshWrapper);
+    ((csSector*)sector)->FireRemoveMesh ((iMeshWrapper*)this);
 
   ClearFromSectorPortalLists (sector);
   int i;
   for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper* spr = children.Get (i);
-    csMeshWrapper* cspr = ((csMeshWrapper::MeshWrapper*)spr)->scfParent;
+    csMeshWrapper* cspr = (csMeshWrapper*)spr;
     // If we have children then we call RemoveFromSectors() on them so that
     // any potential portal_containers among them will also unregister
     // themselves from the sector.
@@ -389,7 +376,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
 
   if (sector)
   {
-    sector->GetMeshes ()->Remove (&scfiMeshWrapper);
+    sector->GetMeshes ()->Remove ((iMeshWrapper*)this);
   }
   else
   {
@@ -398,7 +385,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
     {
       iSector *ss = sectors->Get (i);
       if (ss)
-        ss->GetMeshes ()->Remove (&scfiMeshWrapper);
+        ss->GetMeshes ()->Remove ((iMeshWrapper*)this);
     }
   }
 }
@@ -406,7 +393,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
 void csMeshWrapper::SetFlagsRecursive (uint32 mask, uint32 value)
 {
   flags.Set (mask, value);
-  const iMeshList* ml = &GetChildren ();
+  const iMeshList* ml = GetChildren ();
   if (!ml) return;
   int i;
   for (i = 0 ; i < ml->GetCount () ; i++)
@@ -416,7 +403,7 @@ void csMeshWrapper::SetFlagsRecursive (uint32 mask, uint32 value)
 void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
 {
   SetZBufMode (mode);
-  const iMeshList* ml = &GetChildren ();
+  const iMeshList* ml = GetChildren ();
   if (!ml) return;
   int i;
   for (i = 0 ; i < ml->GetCount () ; i++)
@@ -426,7 +413,7 @@ void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
 void csMeshWrapper::SetRenderPriorityRecursive (long rp)
 {
   SetRenderPriority (rp);
-  const iMeshList* ml = &GetChildren ();
+  const iMeshList* ml = GetChildren ();
   if (!ml) return;
   int i;
   for (i = 0 ; i < ml->GetCount () ; i++)
@@ -444,8 +431,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
   for (i = 0; i < sectors->GetCount (); i++)
   {
     iSector *ss = sectors->Get (i);
-    if (ss) ((csSector::eiSector*)ss)->GetPrivateObject ()
-    	->RelinkMesh (&scfiMeshWrapper);
+    if (ss) ((csSector*)ss)->RelinkMesh ((iMeshWrapper*)this);
   }
 }
 
@@ -541,7 +527,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   {
     i--;
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview))
+    if (!cb->BeforeDrawing ((iMeshWrapper*)this, rview))
     {
       n = 0;
       return 0;
@@ -694,7 +680,7 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
 {
   CS_ASSERT_MSG("Cannot remove this", 0);
-  iMeshWrapper *meshwrap = &scfiMeshWrapper;
+  iMeshWrapper *meshwrap = (iMeshWrapper*)this;
 
   int i;
   // Callback are traversed in reverse order so that they can safely
@@ -874,14 +860,6 @@ void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
   }
 }
 
-float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (
-  iCamera *camera,
-  csBox2 &sbox,
-  csBox3 &cbox)
-{
-  return scfParent->GetScreenBoundingBox (camera, sbox, cbox);
-}
-
 float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 {
   iCamera* camera = rview->GetCamera ();
@@ -1039,7 +1017,7 @@ void csMeshWrapper::GetTransformedBoundingBox (
 }
 
 float csMeshWrapper::GetScreenBoundingBox (
-  const iCamera *camera,
+  iCamera *camera,
   csBox2 &sbox,
   csBox3 &cbox)
 {
@@ -1156,7 +1134,7 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
 {
   csRef<iMeshObject> basemesh = meshFact->NewInstance ();
-  iMeshWrapper *mesh = &(new csMeshWrapper (0, basemesh))->scfiMeshWrapper;
+  iMeshWrapper *mesh = (iMeshWrapper*)(new csMeshWrapper (0, basemesh));
   basemesh->SetLogicalParent (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
@@ -1368,7 +1346,7 @@ void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
   csMeshList::PrepareMesh (child);
 
   // Unlink the mesh from the engine or another parent.
-  csMeshWrapper* cchild = ((csMeshWrapper::MeshWrapper*)child)->scfParent;
+  csMeshWrapper* cchild = (csMeshWrapper*)child;
   // Make sure that if this child is a portal container that we first
   // uregister it from any sectors it may be in.
   cchild->ClearFromSectorPortalLists ();
@@ -1381,20 +1359,19 @@ void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
   /* csSector->PrepareMesh tells the culler about the mesh
      (since removing the mesh above also removes it from the culler...) */
   // First we find the top-level parent.
-  iMeshWrapper* toplevel = &(mesh->scfiMeshWrapper);
+  iMeshWrapper* toplevel = (iMeshWrapper*)mesh;
   while (toplevel->GetParentContainer ())
     toplevel = toplevel->GetParentContainer ();
   iMovable* mov = toplevel->GetMovable ();
   iSectorList* sl = mov->GetSectors ();
   for (int i = 0 ; i < sl->GetCount() ; i++)
   {
-    csSector* sector = ((csSector::eiSector*)(sl->Get (i)))
-    	->GetPrivateObject ();
+    csSector* sector = (csSector*)(sl->Get (i));
     sector->UnprepareMesh (child);
     sector->PrepareMesh (child);
   }
 
-  child->SetParentContainer (&mesh->scfiMeshWrapper);
+  child->SetParentContainer ((iMeshWrapper*)mesh);
   (cchild->GetCsMovable ()).csMovable::SetParent (&mesh->GetCsMovable ());
   // Readd our child to sectors if it happens to be a portal container.
   cchild->AddToSectorPortalLists ();
@@ -1404,7 +1381,7 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 {
   CS_ASSERT (mesh != 0);
 
-  csMeshWrapper* citem = ((csMeshWrapper::MeshWrapper*)item)->scfParent;
+  csMeshWrapper* citem = (csMeshWrapper*)item;
   // Make sure that if this child is a portal container that we first
   // uregister it from any sectors it may be in.
   citem->ClearFromSectorPortalLists ();
@@ -1412,7 +1389,7 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
   for (int i = 0 ; i < mesh->GetCsMovable().GetSectors()->GetCount() ; i++)
   {
     iSector* isector = (mesh->GetCsMovable ()).csMovable::GetSectors ()->Get (i);
-    csSector* sector = ((csSector::eiSector*)isector)->GetPrivateObject ();
+    csSector* sector = (csSector*)isector;
     sector->UnprepareMesh (item);
   }
 

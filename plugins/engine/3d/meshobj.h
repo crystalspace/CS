@@ -150,7 +150,8 @@ SCF_VERSION (csMeshWrapper, 0, 0, 1);
  * The holder class for all implementations of iMeshObject.
  */
 class csMeshWrapper : public csObject, public iVisibilityObject, 
-		      public iShaderVariableContext
+		      public iShaderVariableContext, public iMeshWrapper,
+		      public iImposter
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -342,25 +343,26 @@ public:
   csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj = 0);
 
   /// Set the mesh factory.
-  void SetFactory (iMeshFactoryWrapper* factory)
+  virtual void SetFactory (iMeshFactoryWrapper* factory)
   {
     csMeshWrapper::factory = factory;
     factorySVC = factory ? factory->GetSVContext() : 0;
   }
   /// Get the mesh factory.
-  iMeshFactoryWrapper* GetFactory () const
+  virtual iMeshFactoryWrapper* GetFactory () const
   {
     return factory;
   }
 
   /// Set the mesh object.
-  void SetMeshObject (iMeshObject* meshobj);
+  virtual void SetMeshObject (iMeshObject* meshobj);
   /// Get the mesh object.
-  iMeshObject* GetMeshObject () const { return meshobj; }
+  virtual iMeshObject* GetMeshObject () const { return meshobj; }
 
-  iPortalContainer* GetPortalContainer () const { return portal_container; }
-  iShadowReceiver* GetShadowReceiver ();
-  iShadowCaster* GetShadowCaster ();
+  virtual iPortalContainer* GetPortalContainer () const
+  { return portal_container; }
+  virtual iShadowReceiver* GetShadowReceiver ();
+  virtual iShadowCaster* GetShadowCaster ();
 
   /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
@@ -371,7 +373,7 @@ public:
   // For iVisibilityObject:
   virtual iMeshWrapper* GetMeshWrapper () const
   {
-    return (iMeshWrapper*)&scfiMeshWrapper;
+    return (iMeshWrapper*)this;
   }
 
   // For iVisibilityObject:
@@ -393,9 +395,9 @@ public:
   }
 
   /// Set parent container for this object.
-  void SetParentContainer (iMeshWrapper* newParent);
+  virtual void SetParentContainer (iMeshWrapper* newParent);
   /// Get parent container for this object.
-  iMeshWrapper* GetParentContainer () const { return Parent; }
+  virtual iMeshWrapper* GetParentContainer () { return Parent; }
 
   /// Mark this object as visible (for iVisibilityObject).
   virtual void SetVisibilityNumber (uint32 vis)
@@ -412,23 +414,23 @@ public:
   virtual uint32 GetVisibilityNumber () const { return visnr; }
 
   /// Set the render priority for this object.
-  void SetRenderPriority (long rp);
+  virtual void SetRenderPriority (long rp);
   /// Set the render priority for this object and children.
-  void SetRenderPriorityRecursive (long rp);
+  virtual void SetRenderPriorityRecursive (long rp);
   /// Get the render priority for this object.
-  long GetRenderPriority () const
+  virtual long GetRenderPriority () const
   {
     return render_priority;
   }
 
   /// Set the Z-buf drawing mode to use for this object.
-  void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
+  virtual void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
   void SetZBufModeRecursive (csZBufMode mode);
   /// Get the Z-buf drawing mode.
-  csZBufMode GetZBufMode () const { return zbufMode; }
+  virtual csZBufMode GetZBufMode () const { return zbufMode; }
 
   /// Set flags for mesh and children.
-  void SetFlagsRecursive (uint32 mask, uint32 value);
+  virtual void SetFlagsRecursive (uint32 mask, uint32 value);
 
   /**
    * Set a callback which is called just before the object is drawn.
@@ -438,12 +440,12 @@ public:
    * if there is a likely probability that the object is visible (i.e.
    * it is in the same sector as the camera for example).
    */
-  void SetDrawCallback (iMeshDrawCallback* cb)
+  virtual void SetDrawCallback (iMeshDrawCallback* cb)
   {
     draw_cb_vector.Push (cb);
   }
 
-  void RemoveDrawCallback (iMeshDrawCallback* cb)
+  virtual void RemoveDrawCallback (iMeshDrawCallback* cb)
   {
     draw_cb_vector.Delete (cb);
   }
@@ -453,12 +455,12 @@ public:
     return (int)draw_cb_vector.Length ();
   }
 
-  iMeshDrawCallback* GetDrawCallback (int idx) const
+  virtual iMeshDrawCallback* GetDrawCallback (int idx) const
   {
     return draw_cb_vector.Get (idx);
   }
 
-  void SetLightingUpdate (int flags, int num_lights);
+  virtual void SetLightingUpdate (int flags, int num_lights);
 
   /**
    * Get the array of relevant lights for this object.
@@ -477,11 +479,11 @@ public:
   void Draw (iRenderView* rview, uint32 frustum_mask);
 
   // Static LOD methods.
-  iLODControl* CreateStaticLOD ();
-  void DestroyStaticLOD ();
-  iLODControl* GetStaticLOD ();
-  void RemoveMeshFromStaticLOD (iMeshWrapper* mesh);
-  void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh);
+  virtual iLODControl* CreateStaticLOD ();
+  virtual void DestroyStaticLOD ();
+  virtual iLODControl* GetStaticLOD ();
+  virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh);
+  virtual void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh);
   csStaticLODMesh* GetStaticLODMesh () const { return static_lod; }
   /// Return true if there is a parent mesh that has static lod.
   bool SomeParentHasStaticLOD () const;
@@ -493,18 +495,18 @@ public:
   csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
   	iMovable* movable, uint32 frustum_mask);
   /// This pass sets up the shadow stencil buffer
-  void DrawShadow (iRenderView* rview, iLight* light);
+  virtual void DrawShadow (iRenderView* rview, iLight* light);
   /// This pass draws the diffuse lit mesh
-  void DrawLight (iRenderView* rview, iLight* light);
+  virtual void DrawLight (iRenderView* rview, iLight* light);
   ///Enable/disable hardware based shadows alltogheter
-  void CastHardwareShadow (bool castShadow);
+  virtual void CastHardwareShadow (bool castShadow);
   /// Sets so that the meshobject is rendered after all fancy HW-shadow-stuff
-  void SetDrawAfterShadow (bool drawAfter);
+  virtual void SetDrawAfterShadow (bool drawAfter);
   /// Get if the meshobject is rendered after all fancy HW-shadow-stuff
-  bool GetDrawAfterShadow ();
+  virtual bool GetDrawAfterShadow ();
 
   /// Get the children of this mesh object.
-  const csMeshMeshList& GetChildren () const { return children; }
+  const csMeshMeshList& GetCsChildren () const { return children; }
 
   /**
    * Do a hard transform of this object.
@@ -515,18 +517,18 @@ public:
    * of mesh objects will not change the orientation of the object but
    * only the position.
    */
-  void HardTransform (const csReversibleTransform& t);
+  virtual void HardTransform (const csReversibleTransform& t);
 
   //---------- iImposter Functions -----------------//
 
   /// Set true if this Mesh should use Impostering.
-  void SetImposterActive (bool flag);
+  virtual void SetImposterActive (bool flag);
 
   /**
    * Determine if this mesh is using Impostering
    * (not if Imposter is being drawn, but simply considered).
    */
-  bool GetImposterActive () const { return imposter_active; }
+  virtual bool GetImposterActive () const { return imposter_active; }
 
   /**
    * Minimum Imposter Distance is the distance from camera 
@@ -534,7 +536,7 @@ public:
    * ptr here because value is a shared variable 
    * which can be changed at runtime for many objects.
    */
-  void SetMinDistance (iSharedVariable* dist)
+  virtual void SetMinDistance (iSharedVariable* dist)
   { min_imposter_distance = dist; }
 
   /** 
@@ -544,7 +546,7 @@ public:
    * Angle greater than this triggers a re-render of
    * the imposter.
    */
-  void SetRotationTolerance (iSharedVariable* angle)
+  virtual void SetRotationTolerance (iSharedVariable* angle)
   { imposter_rotation_tolerance = angle; }
 
   /**
@@ -552,7 +554,7 @@ public:
    * for use by main render process later, relative to
    * the specified Point Of View.
    */
-  void CreateImposter (csReversibleTransform& /*pov*/)
+  virtual void CreateImposter (csReversibleTransform& /*pov*/)
   { /* implement later */ }
 
   /**
@@ -561,7 +563,7 @@ public:
   bool DrawImposter (iRenderView *rview);
 
   /// Determine if imposter or true rendering will be used.
-  bool WouldUseImposter (csReversibleTransform& /*pov*/)
+  virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
   { /* implement later */ return false; }
 
   /// This is the function to check distances.  Fn above may not be needed.
@@ -576,32 +578,32 @@ public:
   //---------- Bounding volume and beam functions -----------------//
 
   /// Get the radius of this mesh and all its children.
-  void GetRadius (csVector3& rad, csVector3& cent) const;
+  virtual void GetRadius (csVector3& rad, csVector3& cent) const;
 
   /**
    * Check if this object is hit by this object space vector.
    * BBox version.
    */
-  int HitBeamBBox (const csVector3& start, const csVector3& end,
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
          csVector3& isect, float* pr);
 
   /**
    * Check if this object is hit by this object space vector.
    * Outline version.
    */
-  bool HitBeamOutline (const csVector3& start, const csVector3& end,
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
          csVector3& isect, float* pr);
   /**
    * Check if this object is hit by this object space vector.
    * Return the collision point in object space coordinates.
    */
-  bool HitBeamObject (const csVector3& start, const csVector3& end,
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
   /**
    * Check if this object is hit by this world space vector.
    * Return the collision point in world space coordinates.
    */
-  bool HitBeam (const csVector3& start, const csVector3& end,
+  virtual bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 
   /**
@@ -621,21 +623,21 @@ public:
    * If the mesh is already in several sectors those additional sectors
    * will be ignored and only the first one will be used for this routine.
    */
-  void PlaceMesh ();
+  virtual void PlaceMesh ();
 
   /**
    * Get the bounding box of this object in world space.
    * This routine will cache the bounding box and only recalculate it
    * if the movable changes.
    */
-  void GetWorldBoundingBox (csBox3& cbox);
+  virtual void GetWorldBoundingBox (csBox3& cbox);
 
   /**
    * Get the bounding box of this object after applying a transformation to it.
    * This is really a very inaccurate function as it will take the bounding
    * box of the object in object space and then transform this bounding box.
    */
-  void GetTransformedBoundingBox (const csReversibleTransform& trans,
+  virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox);
 
   /**
@@ -643,7 +645,7 @@ public:
    * Returns -1 if object behind the camera or else the distance between
    * the camera and the furthest point of the 3D box.
    */
-  float GetScreenBoundingBox (const iCamera *camera, csBox2& sbox,
+  virtual float GetScreenBoundingBox (iCamera *camera, csBox2& sbox,
   	csBox3& cbox);
 
   csMeshWrapper* GetCsParent () const
@@ -693,226 +695,28 @@ public:
   }
 
   //--------------------- iMeshWrapper implementation --------------------//
-  struct MeshWrapper : public iMeshWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
-    virtual iObject *QueryObject ()
-    {
-      return scfParent;
-    }
-    virtual iMeshObject* GetMeshObject () const
-    {
-      return scfParent->GetMeshObject ();
-    }
-    virtual void SetMeshObject (iMeshObject* m)
-    {
-      scfParent->SetMeshObject (m);
-    }
-    virtual iPortalContainer* GetPortalContainer () const
-    {
-      return scfParent->GetPortalContainer ();
-    }
-    virtual iLightingInfo* GetLightingInfo () const
-    {
-      return scfParent->light_info;
-    }
-    virtual iShadowReceiver* GetShadowReceiver ()
-    {
-      return scfParent->GetShadowReceiver ();
-    }
-    virtual iShadowCaster* GetShadowCaster ()
-    {
-      return scfParent->GetShadowCaster ();
-    }
-    virtual uint GetVisibilityNumber () const
-    {
-      return scfParent->GetVisibilityNumber ();
-    }
-    virtual iMeshFactoryWrapper* GetFactory () const
-    {
-      return scfParent->GetFactory ();
-    }
-    virtual void SetFactory (iMeshFactoryWrapper* m)
-    {
-      scfParent->SetFactory (m);
-    }
-    virtual iMovable* GetMovable () const
-    {
-      return &(scfParent->movable);
-    }
-    virtual void PlaceMesh ()
-    {
-      scfParent->PlaceMesh ();
-    }
-    virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
-          csVector3& isect, float* pr)
-    {
-      return scfParent->HitBeamBBox (start, end, isect, pr);
-    }
-    virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
-          csVector3& isect, float* pr)
-    {
-      return scfParent->HitBeamOutline (start, end, isect, pr);
-    }
-    virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0)
-    {
-      return scfParent->HitBeamObject (start, end, isect, pr, polygon_idx);
-    }
-    virtual bool HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr)
-    {
-      return scfParent->HitBeam (start, end, isect, pr);
-    }
-    virtual void SetDrawCallback (iMeshDrawCallback* cb)
-    {
-      scfParent->SetDrawCallback (cb);
-    }
-    virtual void RemoveDrawCallback (iMeshDrawCallback* cb)
-    {
-      scfParent->RemoveDrawCallback (cb);
-    }
-    virtual int GetDrawCallbackCount () const
-    {
-      return scfParent->GetDrawCallbackCount ();
-    }
-    virtual iMeshDrawCallback* GetDrawCallback (int idx) const
-    {
-      return scfParent->GetDrawCallback (idx);
-    }
-    virtual void SetRenderPriority (long rp)
-    {
-      scfParent->SetRenderPriority (rp);
-    }
-    virtual void SetRenderPriorityRecursive (long rp)
-    {
-      scfParent->SetRenderPriorityRecursive (rp);
-    }
-    virtual long GetRenderPriority () const
-    {
-      return scfParent->GetRenderPriority ();
-    }
-    virtual csFlags& GetFlags ()
-    {
-      return scfParent->flags;
-    }
-    virtual void SetFlagsRecursive (uint32 mask, uint32 value)
-    {
-      scfParent->SetFlagsRecursive (mask, value);
-    }
-    virtual void SetZBufMode (csZBufMode mode)
-    {
-      scfParent->SetZBufMode (mode);
-    }
-    virtual void SetZBufModeRecursive (csZBufMode mode)
-    {
-      scfParent->SetZBufModeRecursive (mode);
-    }
-    virtual csZBufMode GetZBufMode () const
-    {
-      return scfParent->GetZBufMode ();
-    }
-    virtual void HardTransform (const csReversibleTransform& t)
-    {
-      scfParent->HardTransform (t);
-    }
-    virtual void GetWorldBoundingBox (csBox3& cbox)
-    {
-      scfParent->GetWorldBoundingBox (cbox);
-    }
-    virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
-  	csBox3& cbox)
-    {
-      scfParent->GetTransformedBoundingBox (trans, cbox);
-    }
-    virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
-  	csBox3& cbox);
-    virtual iMeshList* GetChildren ()
-    {
-      return &scfParent->children;
-    }
-    virtual iMeshWrapper* GetParentContainer ()
-    {
-      return scfParent->GetParentContainer ();
-    }
-    virtual void SetParentContainer (iMeshWrapper* p)
-    {
-      scfParent->SetParentContainer (p);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3 &cent) const
-    {
-      scfParent->GetRadius (rad,cent);
-    }
-    virtual iLODControl* CreateStaticLOD ()
-    {
-      return scfParent->CreateStaticLOD ();
-    }
-    virtual void DestroyStaticLOD ()
-    {
-      scfParent->DestroyStaticLOD ();
-    }
-    virtual iLODControl* GetStaticLOD ()
-    {
-      return scfParent->GetStaticLOD ();
-    }
-    virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
-    {
-      scfParent->RemoveMeshFromStaticLOD (mesh);
-    }
-    virtual void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
-    {
-      scfParent->AddMeshToStaticLOD (lod, mesh);
-    }
-    virtual void DrawShadow (iRenderView* rview, iLight* light)
-    {
-      scfParent->DrawShadow (rview, light);
-    }
-    virtual void DrawLight (iRenderView* rview, iLight* light)
-    {
-      scfParent->DrawLight (rview, light);
-    }
-    virtual void CastHardwareShadow (bool castShadow) 
-    {
-      scfParent->CastHardwareShadow (castShadow);
-    }
-    virtual void SetDrawAfterShadow (bool drawAfter)
-    {
-      scfParent->SetDrawAfterShadow (drawAfter);
-    }
-    virtual bool GetDrawAfterShadow ()
-    {
-      return scfParent->GetDrawAfterShadow ();
-    }
-    virtual void SetLightingUpdate (int flags, int num_lights)
-    {
-      scfParent->SetLightingUpdate (flags, num_lights);
-    }
-    csMeshWrapper* GetCsMeshWrapper () const
-    { 
-      return (csMeshWrapper*)scfParent;
-    }
-    virtual iShaderVariableContext* GetSVContext()
-    { return CS_STATIC_CAST(iShaderVariableContext*, scfParent); }
-  } scfiMeshWrapper;
-  friend struct MeshWrapper;
 
-  //-------------------- iImposter interface implementation ----------
-  struct MeshImposter : public iImposter
+  virtual iObject *QueryObject ()
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
-    virtual void SetImposterActive (bool flag)
-    { scfParent->SetImposterActive(flag); }
-    virtual bool GetImposterActive () const
-    { return scfParent->GetImposterActive(); }
-    virtual void SetMinDistance (iSharedVariable* dist)
-    { scfParent->SetMinDistance (dist); }
-    virtual void SetRotationTolerance (iSharedVariable* angle)
-    { scfParent->SetRotationTolerance (angle); }
-    virtual void CreateImposter (csReversibleTransform& pov)
-    { scfParent->CreateImposter (pov); }
-    virtual bool WouldUseImposter (csReversibleTransform& pov) const 
-    { return scfParent->WouldUseImposter (pov); }
-  } scfiImposter;
+    return this;
+  }
+  virtual iLightingInfo* GetLightingInfo () const
+  {
+    return light_info;
+  }
+  virtual csFlags& GetFlags ()
+  {
+    return flags;
+  }
+  virtual iMeshList* GetChildren ()
+  {
+    return &children;
+  }
+
+  virtual iShaderVariableContext* GetSVContext()
+  {
+    return (iShaderVariableContext*)this;
+  }
 };
 
 SCF_VERSION (csMeshFactoryWrapper, 0, 0, 3);

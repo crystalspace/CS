@@ -41,7 +41,7 @@ const csArray<iLight*>& csLightManager::GetRelevantLights (iBase* logObject,
 {
   iMeshWrapper* mw = (iMeshWrapper*)logObject;
   if (!mw) return nolights;
-  csMeshWrapper* cmw = ((csMeshWrapper::MeshWrapper*)mw)->GetCsMeshWrapper ();
+  csMeshWrapper* cmw = (csMeshWrapper*)mw;
   return cmw->GetRelevantLights (maxLights, desireSorting);
 }
 

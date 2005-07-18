@@ -42,7 +42,7 @@ void csRenderQueueSet::ClearVisible ()
 
 void csRenderQueueSet::AddVisible (csMeshWrapper *mesh, uint32 frustum_mask)
 {
-  long pri = mesh->GetRenderPriority ();
+  long pri = mesh->csMeshWrapper::GetRenderPriority ();
 
   // look if the desired priority queue exists, and possibly
   // extend the list of visible.
