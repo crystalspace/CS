@@ -12,6 +12,9 @@
 namespace ImageLib 
 {
 
+class Image8;
+class Image32;
+
 inline long FtoL(float f)
 {
 /*
