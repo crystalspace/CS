@@ -12,6 +12,7 @@ chronological order.
 	- Eric Sunshine performed some minor textual cleanup of the AWS2
 	  sources: added copyright notices, added missing end-of-file
 	  line-terminators, removed errant semi-colons.
+	- Eric Sunshine fixed various gcc4-related build problems.
 17-Jul-2005
 	- Eric Sunshine added forward declaration of struct WrapperStackEntry
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.
@@ -43,7 +44,7 @@ chronological order.
 	  It would set the name directly on the iObject AFTER adding the
 	  factory to the list. This caused the hashmap in the factory list
 	  to be invalid for this entry. So FindByName() wouldn't work.
-	- Piotr Obrzut fixed his shameless error (he forgot about setting stops 
+	- Piotr Obrzut fixed his shameless error (he forgot about setting stops
 	  and motors for universal joint)
 14-Jul-2005
 	- Jorrit added a small section about how to draw text to the
