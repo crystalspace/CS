@@ -8,15 +8,15 @@
   <HighlightColor		r="230" g="230"	b="230" />
   <ShadowColor			r="60"  g="60"	b="60" />
   <FillColor			r="200" g="200"	b="200" />
-  <TextDisabledColor	r="128" g="128"	b="0" />
+  <TextDisabledColor		r="128" g="128"	b="0" />
   <TextForeColor		r="0"   g="0"	b="0" />
-  <TextBackColor        r="255" g="255"	b="255" />
+  <TextBackColor		r="255" g="255"	b="255" />
   <ButtonTextColor		r="0"   g="0"	b="192" />
   <ChartBarColor		r="255" g="0"	b="0" />
   <ActiveTitleBarColor1 r="0"   g="0"	b="128" />
   <ActiveTitleBarColor2 r="200" g="200"	b="255" />
   
-  <OverlayTextureAlpha	value="128" />
+  <OverlayTextureAlpha		value="128" />
   <ScrollBarHeight		value="16" />
   <ScrollBarWidth		value="16" />
   

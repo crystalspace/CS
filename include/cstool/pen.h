@@ -58,14 +58,19 @@ struct iPen
   virtual void PopTransform()=0;
 
   /** 
+   * Sets the origin of the coordinate system. 
+   */
+  virtual void SetOrigin(const csVector3 &o)=0;
+
+  /** 
    * Translates by the given vector
    */
   virtual void Translate(const csVector3 &t)=0;
 
   /**
-   * Rotates by the given matrix.
+   * Rotates by the given angle.
    */
-  virtual void Rotate(const csMatrix3 &m)=0;
+  virtual void Rotate(const float &a)=0;
 
   /** 
    * Draws a single line. 
@@ -193,6 +198,11 @@ public:
   virtual void PopTransform();
 
   /** 
+   * Sets the origin of the coordinate system. 
+   */
+  virtual void SetOrigin(const csVector3 &o);
+
+  /** 
    * Translates by the given vector
    */
   virtual void Translate(const csVector3 &t);
@@ -200,7 +210,7 @@ public:
   /**
    * Rotates by the given matrix.
    */
-  virtual void Rotate(const csMatrix3 &m);
+  virtual void Rotate(const float &a);
 
   /** 
    * Draws a single line. 

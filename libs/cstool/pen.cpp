@@ -90,6 +90,11 @@ void csPen::PopTransform()
   transforms.Pop();
 }
 
+void csPen::SetOrigin(const csVector3 &o)
+{
+  mesh.object2world.SetOrigin(o);
+}
+
 void 
 csPen::Translate(const csVector3 &t)
 {
@@ -102,9 +107,10 @@ csPen::Translate(const csVector3 &t)
 }
 
 void 
-csPen::Rotate(const csMatrix3 &m)
+csPen::Rotate(const float &a)
 {
-  csTransform tr(m, csVector3(0));
+  csZRotMatrix3 rm(a);
+  csTransform tr(rm, csVector3(0));
   mesh.object2world*=tr;
 }
 
