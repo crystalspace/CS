@@ -82,12 +82,13 @@ private:
     csRef<iPluginConfig> Config;
 
     csPluginOption (const char *iName, csVariantType iType, int iID,
-      bool iValue, iPluginConfig* iConfig)
+      bool iValue, iPluginConfig* cfg)
     {
       Name = csStrNew (iName);
       Type = iType;
       ID = iID;
       Value = iValue;
+      Config = cfg;
     }
     virtual ~csPluginOption ()
     {

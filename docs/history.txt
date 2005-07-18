@@ -13,6 +13,8 @@ chronological order.
 	  sources: added copyright notices, added missing end-of-file
 	  line-terminators, removed errant semi-colons.
 	- Eric Sunshine fixed various gcc4-related build problems.
+	- Jorrit fixed a bug in the plugin manager that was recently
+	  introduced in the rename of iConfig to iPluginConfig.
 17-Jul-2005
 	- Eric Sunshine added forward declaration of struct WrapperStackEntry
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.
