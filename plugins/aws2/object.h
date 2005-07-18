@@ -421,13 +421,6 @@ namespace autom
 						
 	};	
 		
-	
-	
-		
-	
-	
-	
-	
 } // namespace autom
 
 } // namespace aws

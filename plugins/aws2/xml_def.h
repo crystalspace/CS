@@ -39,6 +39,6 @@ namespace aws
     virtual bool Parse (const scfString &txt, registry &reg);
   };
 
-}; // end namespace
+} // end namespace
 
 #endif

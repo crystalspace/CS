@@ -61,7 +61,6 @@ namespace aws
 
   };
 
-
-};
+}
 
 #endif

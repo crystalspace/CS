@@ -9,6 +9,9 @@ chronological order.
 18-Jul-2005
 	- Eric Sunshine resolved circular inclusion of event headers. Also
 	  fixed a few other compilation errors and warnings.
+	- Eric Sunshine performed some minor textual cleanup of the AWS2
+	  sources: added copyright notices, added missing end-of-file
+	  line-terminators, removed errant semi-colons.
 17-Jul-2005
 	- Eric Sunshine added forward declaration of struct WrapperStackEntry
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.

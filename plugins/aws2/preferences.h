@@ -100,6 +100,6 @@ namespace aws
   }
  };
 
-}; // end namespace
+} // end namespace
 
 #endif

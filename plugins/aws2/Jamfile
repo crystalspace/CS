@@ -2,13 +2,8 @@ SubDir TOP plugins aws2 ;
 
 if $(STL.AVAILABLE) = yes
 {
-
-FILES = [ Wildcard *.cpp *.h *.hpp ] ;
-
 Description aws2 : "Alternate Windowing System version 2 plugin" ;
-Plugin aws2 : $(FILES) ;
+Plugin aws2 : [ Wildcard *.cpp *.h ] ;
 LinkWith aws2 : crystalspace ;
 ExternalLibs aws2 : STL ;
-
-
 }
