@@ -552,8 +552,6 @@ int csStencil2ShadowStep::CalculateShadowMethod(iRenderView *rview, csVector3 &l
 
   csVector3 light_dir = camera_pos - light_pos;
 
-  oclusion_pyramid.Push(csPlane3(light_dir, -(light_dir*light_pos)));
-
   csVector3 forward_view_vector = 
     t.Other2ThisRelative(rview->GetCamera()->GetTransform().This2OtherRelative(csVector3(0, 0, 1)));
 
@@ -566,6 +564,8 @@ int csStencil2ShadowStep::CalculateShadowMethod(iRenderView *rview, csVector3 &l
       oclusion_pyramid[i].Invert();
     }
   }
+
+  oclusion_pyramid.Push(csPlane3(light_dir, -(light_dir*light_pos)));
 
   for (i = 0; i < oclusion_pyramid.Length(); i++) 
   {

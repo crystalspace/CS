@@ -30,11 +30,17 @@ struct iGenMeshSkeletonScript;
 struct iGenMeshSkeletonBoneUpdateCallback;
 struct iGenMeshSkeletonControlFactory;
 
-enum BoneTransformMode
+enum csBoneTransformMode
 {
 	BM_SCRIPT = 0,
 	BM_PHYSICS,
 	BM_NONE
+};
+
+enum csAULevel
+{
+	AUL_BONES = 0,
+	AUL_VERTICES
 };
 
 SCF_VERSION  (iGenMeshSkeletonControlState, 0, 0, 1);
@@ -55,6 +61,7 @@ struct iGenMeshSkeletonControlState : public iBase
   /**
    * Get bone by id.
    */
+  virtual iGenMeshSkeletonBone *GetRootBone () = 0;
   virtual iGenMeshSkeletonBone *GetBone (int i) = 0;
 
   /**
@@ -100,21 +107,19 @@ struct iGenMeshSkeletonControlState : public iBase
   virtual void Stop (iGenMeshSkeletonScript *script) = 0;
 
   /**
-   * If always_update is false, then animation will 
-   * be updated only if object is visible.
-   * By default always_update flag is true.
-   */
-  virtual void SetAlwaysUpdate(bool always_update) = 0;
-
-  /**
-   * Get always_update value
-   */
-  virtual bool GetAlwaysUpdate() = 0;
-
-  /**
    * Get factory
    */
   virtual iGenMeshSkeletonControlFactory *GetFactory() = 0;
+
+  /**
+   * Get animated vertices 
+   */
+  virtual csVector3 *GetAnimatedVertices() = 0;
+
+  /**
+   * Get animated vertices count
+   */
+  virtual int GetAnimatedVerticesCount() = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonControlFactory, 0, 0, 1);
@@ -135,16 +140,6 @@ struct iGenMeshSkeletonControlFactory: public iGenMeshAnimationControlFactory
    * Delete all animation scripts
    */
   virtual void DeleteAllScripts() = 0;
-  
-  /**
-   * Set always update flag
-   */
-  virtual void SetAlwaysUpdate(bool always_update) = 0;
-  
-  /**
-   * Get always update flag
-   */
-  virtual bool GetAlwaysUpdate() = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonBone, 0, 0, 1);
@@ -194,17 +189,17 @@ struct iGenMeshSkeletonBone : public iBase
    * BM_NONE - free bone transform
    * default is BM_SCRIPT
    */
-  virtual void SetMode (BoneTransformMode mode) = 0;
+  virtual void SetMode (csBoneTransformMode mode) = 0;
 
   /**
    * Get bone transform mode.
    */
-  virtual BoneTransformMode GetMode () = 0;
+  virtual csBoneTransformMode GetMode () = 0;
 
   /**
    * Attach rigid body to bone.
    */
-  virtual void SetRigidBody (iRigidBody *r_body) = 0;
+  virtual void SetRigidBody (iRigidBody *r_body, csReversibleTransform & offset_transform) = 0;
 
   /**
    * Get attached rigid body.

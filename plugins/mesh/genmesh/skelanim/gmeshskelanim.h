@@ -38,12 +38,17 @@
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "ivaria/dynamics.h"
+#include "csutil/flags.h"
 
 class csGenmeshSkelAnimationControl;
 class csGenmeshSkelAnimationControlFactory;
 class csGenmeshSkelAnimationControlType;
 class csSkelAnimControlRunnable;
 struct iEvent;
+
+#define SKEL_ANIMATION_ALWAYS_UPDATE 			0x00000001
+#define SKEL_ANIMATION_ALWAYS_UPDATE_BONES 		0x00000002
+#define SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES 	0x00000004
 
 /**
  * Vertex information for a bone.
@@ -81,9 +86,10 @@ private:
 	csReversibleTransform next_transform;
 	csReversibleTransform transform;
 	csReversibleTransform full_transform;
+	csReversibleTransform offset_body_transform;
 	csRef<iGenMeshSkeletonBoneUpdateCallback> cb;
 
-	BoneTransformMode bone_mode;
+	csBoneTransformMode bone_mode;
 	iRigidBody *rigid_body;
 
 	csGenmeshSkelAnimationControl *anim_control;
@@ -104,6 +110,7 @@ private:
 	} rot;
 
 public:
+	csReversibleTransform & GetOffsetTransform() { return offset_body_transform; }
 	csQuaternion & GetQuaternion () { return rot.quat; };
 	void CopyFrom (csSkelBone *other);
 	void AddVertex (int idx, float weight, float col_weight);
@@ -113,14 +120,13 @@ public:
 
 	void SetParent (csSkelBone* p) { parent = p; }
 	void UpdateBones ();
-	void UpdateBones (iRigidBody* parent_body);
+	void UpdateBones (csSkelBone* parent_bone);
 
 	void SetAxisAngle (int axis, float angle);
 	float GetAxisAngle (int axis);
 
 	void UpdateRotation();
 	void UpdatePosition();
-	void UpdateTranslation();
 	void FireCallback() 
 		{ if (cb) cb->UpdateTransform(this, next_transform); }
 
@@ -137,9 +143,13 @@ public:
 	virtual csReversibleTransform &GetFullTransform () { return full_transform; }
 	virtual iGenMeshSkeletonBone* GetParent () { return parent; }
 	virtual void GetSkinBox (csBox3 &box, csVector3 &center);
-	virtual void SetMode (BoneTransformMode mode) { bone_mode = mode; }
-	virtual BoneTransformMode GetMode () { return bone_mode; }
-	virtual void SetRigidBody (iRigidBody *r_body) { rigid_body = r_body; }
+	virtual void SetMode (csBoneTransformMode mode) { bone_mode = mode; }
+	virtual csBoneTransformMode GetMode () { return bone_mode; }
+	virtual void SetRigidBody (iRigidBody *r_body, csReversibleTransform & offset_transform) 
+	{
+		rigid_body = r_body;
+		offset_body_transform = offset_transform;
+	}
 	virtual iRigidBody *GetRigidBody () { return rigid_body; }
 	virtual int GetChildrenCount () { return (int)bones.Length () ;}
 	virtual iGenMeshSkeletonBone *GetChild (int i) { return bones[i]; }
@@ -170,17 +180,21 @@ public:
 	}
 };
 
+/**
+ * Transform modes for every bone
+ */
+enum sac_transform_mode
+{
+	AC_TRANSFORM_ABSOLUTE,
+	AC_TRANSFORM_RELATIVE
+};
 
 /**
  * Possible opcodes for instructions in a script.
  */
 enum sac_opcode
 {
-	AC_STOP,
-	AC_DELAY,
-	AC_REPEAT,
 	AC_MOVE,
-	AC_TRANSLATE,
 	AC_ROT
 };
 
@@ -191,12 +205,12 @@ enum sac_opcode
 struct sac_instruction
 {
 	sac_opcode opcode;
+	sac_transform_mode tr_mode;
 	union
 	{
 		struct
 		{
 			size_t bone_id;
-			csTicks duration;
 			float posx;
 			float posy;
 			float posz;
@@ -204,18 +218,25 @@ struct sac_instruction
 		struct
 		{
 			size_t bone_id;
-			csTicks duration;
 			float angle;
 			float quat_x;
 			float quat_y;
 			float quat_z;
 			float quat_r;
 		} rotate;
-		struct
-		{
-			csTicks time;
-		} delay;
 	};
+};
+
+
+/**
+ * Key frame data
+ */
+struct sac_frame
+{
+	csArray<sac_instruction> instructions;
+	csTicks duration;
+	int repeat_times;
+	bool active;
 };
 
 /**
@@ -228,12 +249,16 @@ private:
 	char* name;
 	csArray<sac_instruction> instructions;
 	csTicks time;
+	csArray<sac_frame> frames;
+	bool loop;
+	int loop_times;
 public:
 
 	csSkelAnimControlScript (const char* name);
 	~csSkelAnimControlScript () { delete[] name; }
 
-	sac_instruction& AddInstruction (sac_opcode opcode);
+	sac_instruction& AddInstruction (sac_frame &frame, sac_opcode opcode);
+	sac_frame& AddFrame (csTicks duration);
 	const sac_instruction& GetInstruction (size_t idx) const
 	{
 		return instructions[idx];
@@ -243,9 +268,18 @@ public:
 		return instructions;
 	}
 
-	const char* GetName () const { return name; }
+	csArray<sac_frame>& GetFrames ()
+	{
+		return frames;
+	}
 
+	const char* GetName () const { return name; }
 	csTicks& GetTime () { return time; }
+	void SetLoop (bool loop) { csSkelAnimControlScript::loop = loop; }
+	bool GetLoop () { return loop; }
+	void SetLoopTimes (bool loop_times) 
+		{ csSkelAnimControlScript::loop_times = loop_times; }
+	int GetLoopTimes () { return loop_times; }
 };
 
 struct bone_transform_data
@@ -270,10 +304,9 @@ struct sac_rotate_execution
 {
 	csSkelBone* bone;
 	bone_transform_data* bone_rotation;
-	csTicks final;
-	csTicks duration;
-	bool flag;
-	csQuaternion quat, current_quat;
+	csQuaternion quat;
+	csQuaternion curr_quat;
+	csTicks elapsed_ticks;
 };
 
 /**
@@ -284,10 +317,9 @@ struct sac_move_execution
 {
 	csSkelBone* bone;
 	bone_transform_data* bone_position;
-	csTicks final;
-	csTicks current;
 	csVector3 delta_per_tick;
 	csVector3 final_position;
+	csTicks elapsed_ticks;
 };
 
 /**
@@ -304,31 +336,41 @@ private:
 	csSkelAnimControlScript* script;
 	csGenmeshSkelAnimationControl* anim_control;
 	size_t current_instruction;
+	size_t current_frame;
 	float morph_factor;
 	float time_factor;
+	csQuaternion zero_quat;
 
-	// Current translate operations.
-	csArray<sac_move_execution> translates;
-	// Current movement operations.
-	csArray<sac_move_execution> moves;
-	// Current rotate operations.
-	csArray<sac_rotate_execution> rotates;
-	// Current delay operation.
+	csArray<sac_move_execution> relative_moves;
+	csArray<sac_move_execution> absolute_moves;
+	csArray<sac_rotate_execution> absolute_rotates;
+	csArray<sac_rotate_execution> relative_rotates;
+
 	struct del
 	{
+		csTicks current;
 		csTicks final;
+		csTicks diff;
 	} delay;
+
+	bool parse_key_frame;
+	bool parse_again;
+
+	csTicks current_ticks;
 
 	TransformHash rotations;
 	TransformHash positions;
-	TransformHash translations;
 
 	void release_tranform_data(TransformHash&);
+	
+	void ParseFrame(const sac_frame & frame);
+	sac_frame & NextFrame();
 
 public:
 	// Return true if one of the bone transforms was actually modified.
 	// 'stop' will be set to true if the runnable needs to end.
-	bool Do (csTicks current, bool& stop);
+	
+	bool Do (csTicks elapsed, bool& stop, csTicks & left);
 
 	bone_transform_data *GetBoneRotation(csSkelBone *bone);
 	TransformHash& GetRotations() { return rotations; };
@@ -336,8 +378,6 @@ public:
 	bone_transform_data *GetBonePosition(csSkelBone *bone);
 	TransformHash& GetPositions() { return positions; };
 
-	bone_transform_data *GetBoneTranslation(csSkelBone *bone);
-	TransformHash& GetTranslations() { return translations; };
 	//------------------------------------------
 
 	csSkelAnimControlRunnable (csSkelAnimControlScript* script,
@@ -355,13 +395,13 @@ public:
 /**
  * Genmesh animation control.
  */
+
 class csGenmeshSkelAnimationControl :
 	public iGenMeshAnimationControl,
 	public iGenMeshSkeletonControlState
 {
 private:
 	iObjectRegistry* object_reg;
-	//csRef<iVirtualClock> virt_clk;
 
 	csRef<csGenmeshSkelAnimationControlFactory> factory;
 
@@ -374,6 +414,7 @@ private:
 
 	csTicks last_update_time;
 	uint32 last_version_id;
+	csTicks elapsed;
 
 	// Work tables.
 	static csArray<csReversibleTransform> bone_transforms;
@@ -392,8 +433,11 @@ private:
 	bool dirty_texels;
 	bool dirty_colors;
 	bool dirty_normals;
+	
+	bool bones_updated;
+	bool vertices_updated;
 
-	bool always_update;
+	bool force_bone_update;
 
 	// Update the arrays to have correct size. If a realloc was
 	// needed then last_version_id will be forced to ~0.
@@ -404,9 +448,14 @@ private:
 	//void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
 	bool vertices_mapped;
 	void TransformVerticesToBones (const csVector3* verts, int num_verts);
+	void UpdateAnimatedVertices (csTicks current, const csVector3* verts, int num_verts);
+	void UpdateBones ();
 
 public:
-	void UpdateAnimation (csTicks current);
+	//void SetAlwaysUpdate(bool always_update_flag);
+	//csFlags & GetAUFlags() { return aul_flags; }
+	
+	bool UpdateAnimation (csTicks current);
 
 	csRefArray<csSkelBone>& GetBones () { return bones; }
 	csArray<size_t>& GetParentBones () { return parent_bones; }
@@ -435,6 +484,7 @@ public:
 
 	// --- For iGenMeshSkeletonControlState
 	virtual int GetBonesCount () { return (int)bones.Length (); }
+	virtual iGenMeshSkeletonBone *GetRootBone () { return bones[parent_bones[0]]; };
 	virtual iGenMeshSkeletonBone *GetBone (int i) { return bones[i]; }
 	virtual iGenMeshSkeletonBone *FindBone (const char *name);
 
@@ -445,14 +495,18 @@ public:
 	virtual void StopAll ();
 	virtual void Stop (const char* scriptname);
 	virtual void Stop (iGenMeshSkeletonScript *script);
-
-	virtual void SetAlwaysUpdate(bool always_update);
-	virtual bool GetAlwaysUpdate() { return always_update; }
 	virtual iGenMeshSkeletonControlFactory *GetFactory() 
 	{ 
           return (iGenMeshSkeletonControlFactory *)
             (csGenmeshSkelAnimationControlFactory*)factory; 
         }
+	
+	virtual int GetAnimatedVerticesCount()
+	{ return num_animated_verts; }
+
+	virtual csVector3 *GetAnimatedVertices()
+	{ return animated_verts; }
+
 };
 
 /**
@@ -464,7 +518,6 @@ private:
 	csGenmeshSkelAnimationControlType* type;
 	iObjectRegistry* object_reg;
 
-	//csStringArray autorun_scripts;
 	csStringArray autorun_scripts;
 
 	csRefArray<csSkelBone> bones;
@@ -481,7 +534,7 @@ private:
 	// This flag is set to true if there are hierarchical bones.
 	bool has_hierarchical_bones;
 
-	bool always_update;
+	csFlags flags;
 
 	// This is a table that contains a mapping for every vertex to the bones
 	// that contain that vertex.
@@ -492,11 +545,19 @@ private:
 	const char* ParseScript (iDocumentNode* node);
 
 	csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
+#if defined(CS_PLATFORM_WIN32)
+#define CS_TOKEN_ITEM_FILE "d:/projects/deus_irae/plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
+#else
+#define CS_TOKEN_ITEM_FILE "/root/Projects/deus_irae/plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
+#endif
 #include "cstool/tokenlist.h"
 	csString error_buf;
 
 public:
+
+	//csAnimationUpdateLevel & GetAULevel() { return always_update_level; }
+	const csFlags & GetFlags() {return flags; }
+
 	void RegisterAUAnimation(csGenmeshSkelAnimationControl *anim);
 	void UnregisterAUAnimation(csGenmeshSkelAnimationControl *anim);
 	/// Constructor.
@@ -534,10 +595,6 @@ public:
 	virtual const char* LoadScriptFile(const char *filename);
 	virtual void DeleteScript(const char *script_name);
 	virtual void DeleteAllScripts();
-	virtual void SetAlwaysUpdate(bool always_update)
-		{ csGenmeshSkelAnimationControlFactory::always_update = always_update; }
-	virtual bool GetAlwaysUpdate()
-		{ return always_update; }
 };
 
 /**
