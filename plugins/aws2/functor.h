@@ -87,7 +87,7 @@ namespace autom
 				}
 				else
 				{ 					
-					return rc_parm((object *)new string(std::string("Keila: error: unbound function!")));
+					return rc_parm((object *)new string("Keila: error: unbound function!"));
 				}
 			}
 		};	
@@ -140,7 +140,7 @@ namespace autom
 		bool addParm(const scfString &parm_name, std::string &_value);
 		
 		/** Adds the named parameter, assume that it's a string. */
-		bool addStringParm(const scfString &parm_name, const std::string &_value)
+		bool addStringParm(const scfString &parm_name, const csString &_value)
 		{
 			parms.insert(std::make_pair(parm_name, new string(_value)));	
 			return true;

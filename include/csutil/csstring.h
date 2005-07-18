@@ -214,6 +214,15 @@ public:
     GrowBy (DEFAULT_GROW_BY)
   { Append (src); }
 
+   /**
+   * Create a csStringBase object from a C string, given the length.
+   * \remarks The newly constructed string will represent a null-pointer if and
+   *   only if the input argument is a null-pointer.
+   */
+  csStringBase (const char* src, size_t _length) : Data (0), Size (0), MaxSize (0),
+    GrowBy (DEFAULT_GROW_BY)
+  { Append (src, _length); }
+
   /// Create a csStringBase object from a single signed character.
   csStringBase (char c) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY)
@@ -974,6 +983,13 @@ public:
    */
   csStringFast (const char* src) : csStringBase(), miniused(0)
   { Append (src); }
+  /**
+   * Create a csStringFast object from a C string, given the length.
+   */
+  csStringFast (const char* src, size_t _length) : csStringBase(), miniused(0)
+  { Append (src, _length); }
+
+  
   /// Create a csStringFast object from a single signed character.
   csStringFast (char c) : csStringBase(), miniused(0)
   { Append (c); }
@@ -1047,6 +1063,7 @@ public:
   csStringFast (size_t Length) : csStringBase(Length) { }
   csStringFast (const csStringBase& copy) : csStringBase (copy) { }
   csStringFast (const char* src) : csStringBase(src) { }
+  csStringFast (const char* src, size_t _length) : csStringBase(src, _length) { }
   csStringFast (char c) : csStringBase(c) { }
   csStringFast (unsigned char c) : csStringBase(c) { }
   const csStringFast& operator = (const csStringBase& copy)
@@ -1116,6 +1133,8 @@ public:
   /** @} */
   /// Create a csString object from a null-terminated C string.
   csString (const char* src) : csStringFast<> (src) { }
+  /// Create a csString object from a C string, given the length.
+  csString (const char* src, size_t _length) : csStringFast<> (src, _length) { }
   /// Create a csString object from a single signed character.
   csString (char c) : csStringFast<> (c) { }
   /// Create a csString object from a single unsigned character.

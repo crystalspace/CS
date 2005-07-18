@@ -63,14 +63,14 @@ string::ToString()
 integer 
 string::ToInt()
 {
-	return integer(strtol(value.c_str(), 0, 10));
+	return integer(strtol(value.GetData(), 0, 10));
 }
 
 /** Converts the object into a float object, if possible. */
 floating 
 string::ToFloat()
 {
-	return floating(strtod(value.c_str(), 0));	
+	return floating(strtod(value.GetData(), 0));	
 }
 
 bool
@@ -112,7 +112,7 @@ integer::ToString()
 {
 	char buf[128]={0};
 		
-	return string(std::string(buf, cs_snprintf(buf, sizeof(buf), "%lld", value)));
+	return string(csString(buf, cs_snprintf(buf, sizeof(buf), "%lld", value)));
 }
 
 /** Converts the object into an integer object, if possible. */
@@ -132,7 +132,7 @@ integer::ToFloat()
 csRef<iString>
 integer::ReprObject()
 {
-	return csPtr<iString> (new scfString (ToString().Value().c_str()));
+	return csPtr<iString> (new scfString (ToString().Value()));
 }
 
 bool
@@ -159,7 +159,7 @@ floating::ToString()
   csString buf;
   buf.Format ("%g", value);
   
-  return string(std::string(buf));
+  return string(buf);
 }
 
 /** Converts the object into an integer object, if possible. */
@@ -179,7 +179,7 @@ floating::ToFloat()
 csRef<iString>
 floating::ReprObject()
 {
-	return csPtr<iString> (new scfString (ToString().Value().c_str()));
+	return csPtr<iString> (new scfString (ToString().Value()));
 }
 
 bool
@@ -250,7 +250,7 @@ list::ToString()
 	
 	temp+=(']');
 	
-	return string(temp);
+	return string(temp.c_str());
 }
 
 /** Converts the object into an integer object, if possible. */
@@ -270,7 +270,7 @@ list::ToFloat()
 csRef<iString>
 list::ReprObject()
 {
-	return csPtr<iString> (new scfString (ToString().Value().c_str()));
+	return csPtr<iString> (new scfString (ToString().Value()));
 }
 
 bool

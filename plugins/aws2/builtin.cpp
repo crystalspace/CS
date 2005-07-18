@@ -250,9 +250,9 @@ public:
 		func_parm name    = fn["name"],
 				  body    = fn["body"];		
 		
-		def_funcs[name->ToString().Value().c_str()] = body;
+		def_funcs[name->ToString().Value()] = body;
 				  		  
-		Registrar()->assign(name->ToString().Value().c_str(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
+		Registrar()->assign(name->ToString().Value(), std::make_pair(this, (function::slot_mem_ptr)&lobby_builtin::def_exec_));
 
 		return func_parm(Nil());
 	}

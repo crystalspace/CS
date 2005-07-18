@@ -85,7 +85,7 @@ namespace autom
 	/** Encapsulates a string object. */
 	class string : public object
 	{
-		std::string value;
+		csString value;
 		
 	public:	
 		string():object(T_STRING) {}
@@ -93,7 +93,9 @@ namespace autom
 		
 		string(const string& s):object(s, T_STRING), value(s.value) {}		
 				
-		string(const std::string &s):object(T_STRING), value(s) {}
+		string(const csString &s):object(T_STRING), value(s) {}
+
+		string(const char *s):object(T_STRING), value(s) {}
 		
 		explicit string(object& o):object(o, T_STRING) 
 		{
@@ -102,24 +104,24 @@ namespace autom
 		}
 		
 		/** Returns a string containing the contents of this string object. */
-		const std::string& Value() { return value; }
+		const csString& Value() { return value; }
 		
 		/** Returns a quoted string, with all double quotes properly escaped. */
-		std::string QuotedValue() 
+		csString QuotedValue() 
 		{
-			std::string temp;
+		  std::string temp, _value(value.GetData());
 			
-			temp+='"';
-			for(std::string::iterator it=value.begin(); it!=value.end(); ++it)
-			{
-				if (*it=='"') temp+='\\';
-				
-				temp+=(*it);	
-			}	
-			
-			temp+='"';
-			
-			return temp;
+		  temp+='"';
+		  for(std::string::iterator it=_value.begin(); it!=_value.end(); ++it)
+		  {
+			  if (*it=='"') temp+='\\';
+			  
+			  temp+=(*it);	
+		  }	
+		  
+		  temp+='"';
+		  
+		  return csString(temp.c_str());
 		}
 		
 		/** Converts the object into a string object if possible. */
@@ -134,7 +136,7 @@ namespace autom
 		/** Converts the object into the text representation of it. This is the inverse of parsing. */
 		virtual csRef<iString> ReprObject()
 		{
-			return csPtr<iString> (new scfString(QuotedValue().c_str()));	
+			return csPtr<iString> (new scfString(QuotedValue()));	
 		}		
 		
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
@@ -143,7 +145,8 @@ namespace autom
 		/** Concatenates the strings. */
 		string operator+(const string& o)
 		{
-			return string(value + o.value);	
+			csString tmp(value + o.value);
+			return string(tmp);	
 		}				
 	};
 	

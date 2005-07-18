@@ -52,7 +52,7 @@ namespace aws
 
     autom::func_parm property_bag::_set(autom::function &fn)
     {
-      csString name = fn["name"]->ToString().Value().c_str();
+      csString name = fn["name"]->ToString().Value();
       autom::keeper value = fn["value"];
 
       return autom::func_parm(new autom::integer(Set(name, value)));
@@ -60,7 +60,7 @@ namespace aws
 
     autom::func_parm property_bag::_get(autom::function &fn)
     {
-      csString name = fn["name"]->ToString().Value().c_str();
+      csString name = fn["name"]->ToString().Value();
       autom::keeper value = fn["value"];
 
       return autom::func_parm(new autom::integer(Get(name, value)));
@@ -70,7 +70,7 @@ namespace aws
     {
       if (allow_automation_create)
       {
-	csString name = fn["name"]->ToString().Value().c_str();
+	csString name = fn["name"]->ToString().Value();
 	autom::keeper value = fn["value"];
 
 	bool readable = fn["readable"]->ToInt().Value();
