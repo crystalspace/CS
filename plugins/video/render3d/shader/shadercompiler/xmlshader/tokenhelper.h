@@ -20,8 +20,8 @@
 #ifndef __TOKENHELPER_H__
 #define __TOKENHELPER_H__
 
-static bool TokenEquals (const char* token, size_t tokenLen, 
-  const char* cmp)
+static inline
+bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
 {
   return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
 }
