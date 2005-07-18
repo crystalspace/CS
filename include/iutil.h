@@ -37,6 +37,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/pluginconfig.h"
 #include "iutil/reftrack.h"
 #include "iutil/string.h"
 #include "iutil/stringarray.h"
