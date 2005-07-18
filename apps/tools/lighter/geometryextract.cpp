@@ -106,7 +106,7 @@ bool csThingGeometryExtractor::ExtractGeometry (iMeshWrapper *csmesh, csLighting
   lightmesh->colorList.SetLength (numVerts, csColor (0,0,0));
   lightmesh->orignalVertexCount = numVerts;
 
-  for (i = 0; i < factState->GetPolygonCount (); i++)
+  for (i = 0; i < (uint)factState->GetPolygonCount (); i++)
   {
     uint polyVertCount = factState->GetPolygonVertexCount (i);
     int *idxList = factState->GetPolygonVertexIndices (i);
