@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 #include "iutil/strset.h"
+#include "glshader_ps1.h"
 
 class csShaderGLPS1_Common : public csShaderProgram
 {

@@ -29,10 +29,14 @@
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
-#include "glshader_ps1.h"
+
+#define CS_PS1_INSTR_TABLE
+#include "ps1_instr.h"
+
 #include "ps1_emu_nv.h"
 #include "ps1_emu_common.h"
 #include "ps1_parser.h"
+#include "glshader_ps1.h"
 
 void csShaderGLPS1_NV::Activate ()
 {

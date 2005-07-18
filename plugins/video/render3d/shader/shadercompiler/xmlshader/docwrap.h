@@ -48,6 +48,8 @@ class csWrappedDocumentNodeFactory;
  */
 struct iConditionResolver
 {
+  virtual ~iConditionResolver() {}
+
   /**
    * Parse a condition and return it's ID. 
    */
