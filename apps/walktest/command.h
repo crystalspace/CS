@@ -57,7 +57,7 @@ private:
 
 public:
   /// Destructor.
-  virtual csCommandProcessor() {}
+  virtual ~csCommandProcessor() {}
 
   /// Call this first.
   static void Initialize (iEngine* engine, iCamera* camera, iGraphics3D* g3d,
