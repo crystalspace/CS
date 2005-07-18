@@ -387,7 +387,6 @@ csSkelAnimControlRunnable::csSkelAnimControlRunnable (csSkelAnimControlScript* s
   time_factor = 1;
   current_ticks = 0;
   parse_key_frame = true;
-  parse_again = true;
   zero_quat.SetWithEuler(csVector3(0));
 }
 

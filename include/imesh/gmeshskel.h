@@ -61,7 +61,6 @@ struct iGenMeshSkeletonControlState : public iBase
   /**
    * Get bone by id.
    */
-  virtual iGenMeshSkeletonBone *GetRootBone () = 0;
   virtual iGenMeshSkeletonBone *GetBone (int i) = 0;
 
   /**

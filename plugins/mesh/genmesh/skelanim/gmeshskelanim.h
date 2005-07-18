@@ -354,7 +354,6 @@ private:
 	} delay;
 
 	bool parse_key_frame;
-	bool parse_again;
 
 	csTicks current_ticks;
 
@@ -484,7 +483,6 @@ public:
 
 	// --- For iGenMeshSkeletonControlState
 	virtual int GetBonesCount () { return (int)bones.Length (); }
-	virtual iGenMeshSkeletonBone *GetRootBone () { return bones[parent_bones[0]]; };
 	virtual iGenMeshSkeletonBone *GetBone (int i) { return bones[i]; }
 	virtual iGenMeshSkeletonBone *FindBone (const char *name);
 
@@ -545,11 +543,7 @@ private:
 	const char* ParseScript (iDocumentNode* node);
 
 	csStringHash xmltokens;
-#if defined(CS_PLATFORM_WIN32)
-#define CS_TOKEN_ITEM_FILE "d:/projects/deus_irae/plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
-#else
-#define CS_TOKEN_ITEM_FILE "/root/Projects/deus_irae/plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
-#endif
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/skelanim/gmeshskelanim.tok"
 #include "cstool/tokenlist.h"
 	csString error_buf;
 
