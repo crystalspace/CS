@@ -26,6 +26,28 @@ chronological order.
 	  std::string to csString.
 	- Christopher also added a constructor to csString (and it's parents) allowing it
 	  to construct from a C-string and length, instead of just a string.
+	- Erroroman made many fixes in genmesh skeletal animation plugin:
+	    - time operations and delays are fixed.
+	    - "translate" tag is removed from animation script.
+	    - added attribute "type" which can be "rel" or "abs" for 
+	      absolute or relative transforms. If "type" is not defined 
+	      transformation is absolute.
+	    - added tag "loop" for animation script and attribute "times". 
+	      If "times" is defined animation will stop after repeating 
+	      defined times.
+	    - added attribute "duration" in "frame" tag.
+	    - added "repeat" attribute in "frame" tag. It defines how many
+	      times frame exists in loop animation.
+	    - added "always update" tag in the script definition.
+	    - added "bones" and "vertices" tag in always update definition. 
+          These tags defines how animation updates if mesh is not visible.
+	    - adopted all animations to the new syntax.
+	    - added offset transform in bone->SetRigidBody. It defines how 
+	      bone is transformed to the rigid body - this helps for accurate 
+	      ragdoll physics.
+	    - added function GetAnimatedVertices and GetAnimatedVerticesCount
+	      in the animation control interface.
+	- Erroroman fixed error in stencil2 plugin where it used wrong clipping plane.
 17-Jul-2005
 	- Eric Sunshine added forward declaration of struct WrapperStackEntry
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.
