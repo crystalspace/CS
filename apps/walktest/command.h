@@ -56,6 +56,9 @@ private:
   static csRef<iFile> script;
 
 public:
+  /// Destructor.
+  virtual csCommandProcessor() {}
+
   /// Call this first.
   static void Initialize (iEngine* engine, iCamera* camera, iGraphics3D* g3d,
     iConsoleOutput* console, iObjectRegistry* objreg);
