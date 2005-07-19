@@ -251,12 +251,6 @@ struct iMeshWrapper : public iBase
    */
   virtual iShadowCaster* GetShadowCaster () = 0;
 
-  /**
-   * Optimization to avoid having to do SCF_QUERY_INTERFACE for
-   * iVisibilityObject.
-   */
-  virtual uint GetVisibilityNumber () const = 0;
-
   /// Get the parent factory.
   virtual iMeshFactoryWrapper *GetFactory () const = 0;
   /// Set the parent factory (this only sets a pointer).

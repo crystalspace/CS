@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jul-2005
+	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 18-Jul-2005
 	- Eric Sunshine resolved circular inclusion of event headers. Also
 	  fixed a few other compilation errors and warnings.
@@ -22,10 +24,11 @@ chronological order.
 	    - csSector
 	- Jorrit converted most of csThing so that it no longer uses
 	  embedded interfaces.
-	- Christopher finished some changes in AWS2 regarding the conversion from
-	  std::string to csString.
-	- Christopher also added a constructor to csString (and it's parents) allowing it
-	  to construct from a C-string and length, instead of just a string.
+	- Christopher finished some changes in AWS2 regarding the conversion
+	  from std::string to csString.
+	- Christopher also added a constructor to csString (and it's parents)
+	  allowing it to construct from a C-string and length, instead of just
+	  a string.
 	- Erroroman made many fixes in genmesh skeletal animation plugin:
 	    - time operations and delays are fixed.
 	    - "translate" tag is removed from animation script.
@@ -47,7 +50,8 @@ chronological order.
 	      ragdoll physics.
 	    - added function GetAnimatedVertices and GetAnimatedVerticesCount
 	      in the animation control interface.
-	- Erroroman fixed error in stencil2 plugin where it used wrong clipping plane.
+	- Erroroman fixed error in stencil2 plugin where it used wrong
+	  clipping plane.
 17-Jul-2005
 	- Eric Sunshine added forward declaration of struct WrapperStackEntry
 	  to xmlcompiler/docwrap.h in order to pacify gcc4.

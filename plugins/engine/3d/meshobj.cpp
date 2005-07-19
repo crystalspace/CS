@@ -143,7 +143,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   DG_TYPE (this, "csMeshWrapper");
 
   movable.scfParent = (iBase*)(csObject*)this;
-  visnr = 0;
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
   Parent = theParent;

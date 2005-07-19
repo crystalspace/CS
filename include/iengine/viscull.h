@@ -266,19 +266,6 @@ struct iVisibilityObject : public iBase
   virtual iMeshWrapper* GetMeshWrapper () const = 0;
 
   /**
-   * Set the visibility number for this object. A visibility culler
-   * will set the visibility number of an object equal to the current
-   * visibility culler number if the object is visible.
-   */
-  virtual void SetVisibilityNumber (uint32 visnr) = 0;
-  /**
-   * Get the visibility number. You can compare this with
-   * iVisibilityCuller->GetCurrentVisibilityNumber(). If equal then
-   * this object is visible.
-   */
-  virtual uint32 GetVisibilityNumber () const = 0;
-
-  /**
    * Get the object model corresponding with this object.
    */
   virtual iObjectModel* GetObjectModel () = 0;

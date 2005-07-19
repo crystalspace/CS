@@ -171,11 +171,6 @@ protected:
   long wor_bbox_movablenr;
 
   /**
-   * Current visibility number used by the visibility culler.
-   */
-  uint32 visnr;
-
-  /**
    * Position in the world.
    */
   csMovable movable;
@@ -398,20 +393,6 @@ public:
   virtual void SetParentContainer (iMeshWrapper* newParent);
   /// Get parent container for this object.
   virtual iMeshWrapper* GetParentContainer () { return Parent; }
-
-  /// Mark this object as visible (for iVisibilityObject).
-  virtual void SetVisibilityNumber (uint32 vis)
-  {
-    visnr = vis;
-    //if (Parent)
-    //{
-      //((csMeshWrapper::MeshWrapper*)Parent)->scfParent
-      	//->SetVisibilityNumber (vis);
-    //}
-  }
-
-  /// Return if this object is visible (for iVisibilityObject). 
-  virtual uint32 GetVisibilityNumber () const { return visnr; }
 
   /// Set the render priority for this object.
   virtual void SetRenderPriority (long rp);
