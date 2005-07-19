@@ -520,6 +520,10 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   }
 
   // used in hardware accel drivers
+  // We do a small correction of max_u/max_v in case they happen to be equal
+  // to min_u/min_v so that the GL renderer no longer crashes.
+  if (max_u == min_u) max_u = min_u + .1;
+  if (max_v == min_v) max_v = min_v + .1;
   polygon_data.tmapping->SetTextureBox (min_u, min_v, max_u, max_v);
 
   int ww, hh;

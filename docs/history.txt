@@ -8,6 +8,9 @@ chronological order.
 
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
+	- Jorrit fixed the thing plugin so that it does a small correction
+	  on lightmap coordinates for impossibly thin polygons. That prevents
+	  the GL renderer from crashing on those.
 18-Jul-2005
 	- Eric Sunshine resolved circular inclusion of event headers. Also
 	  fixed a few other compilation errors and warnings.
