@@ -2,6 +2,8 @@
 @node Basic Collision Detection, Physics ODE, Collision Detection, Collision Detection
 @subsection Basic Collision Detection
 @cindex @code{csColliderWrapper}
+@cindex @code{csColliderHelper}
+@cindex @code{csColliderActor}
 @cindex @code{iCollideSystem}
 @cindex @code{iCollider}
 @cindex @code{iPolygonMesh}
@@ -21,7 +23,25 @@ This is an interface which is implemented by some collision detection plugin.
 At this moment we have an implementation using the @sc{opcode} collision
 detection system.
 
-To load a collision detection system you can use the following code:
+The easiest way to load a collision detection system is to add a line to
+your call to @code{RequestPlugins}:
+
+@example
+if (!csInitializer::RequestPlugins (object_reg,
+    CS_REQUEST_VFS,
+    @dots{},
+    CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode",
+		iCollideSystem),
+    @dots{},
+    CS_REQUEST_END))
+@{
+  @dots{}
+@}
+csRef<iCollideSystem> cd_sys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
+@end example
+
+You can also load the collision detection plugin later with the following
+code:
 
 @example
 csRef<iPluginManager> plugmgr =
@@ -41,6 +61,14 @@ if (!cd_sys)
 @}
 @end example
 
+In addition to that you might also want to register the collision detection
+system to the object registry so that other modules can find it
+(@code{RequestPlugins} does this automatically):
+
+@example
+object_reg->Register (cd_sys, "iCollideSystem");
+@end example
+
 This is a very general example.  It will first get the preferred collision
 detection plugin from the configuration file.  If the configuration file does
 not specify it then it will use @samp{crystalspace.collisiondetection.opcode}
@@ -48,15 +76,43 @@ which is the one we have at the moment.  If you do not want to let the users
 choose another plugin then you can also hard-code the string.  The
 @samp{cd_sys} should be stored somewhere central (i.e. your application class).
 
-@subsubheading Initializing Geometry
+@subsubheading Initializing Geometry from the Mesh: The Easy Way
 
 Before you can use the collision detection system you have to make
 instances of @samp{iCollider}. Only the collide system can do that. To
 create an @samp{iCollider} you have to give an instance of @samp{iPolygonMesh}.
 Several meshes in Crystal Space implement @samp{iPolygonMesh}. If you have
 special geometry on your own you can make your own classes to implement
-@samp{iPolygonMesh}. Here is some code on how to initialize the collider for a
-mesh:
+@samp{iPolygonMesh}. The easiest way to initialize a collider for a model
+is to use this code:
+
+@example
+iMeshWrapper* mesh = @dots{};
+csColliderWrapper* wrapper = csColliderHelper::InitializeCollisionWrapper (
+	cd_sys, mesh);
+@end example
+
+This code will create a collider (@code{iCollider}) for the geometry in the
+mesh. In addition to that it will also create an instance of
+@code{csColliderWrapper} (see @file{cstool/collider.h}). This is a class
+that helps to keep track of your collider. The @code{csColliderWrapper} will
+be attached to the mesh. So if you later have a pointer to the mesh you can
+get the pointer to the collider wrapper by doing:
+
+@example
+iMeshWrapper* mesh = @dots{};
+csColliderWrapper* wrapper = csColliderWrapper::GetColliderWrapper (
+	mesh->QueryObject ());
+@end example
+
+The nice thing about @code{InitializeCollisionWrapper} is that it takes
+care of hierarchical meshes and knows how to take advantage of the polygon
+mesh information in the factory (possibly sharing colliders between mesh
+object instances that use the same factory).
+
+@subsubheading Initializing Geometry from the Mesh: The Hard Way
+
+The most primitive code to initialize a collider for a mesh is here:
 
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
@@ -75,22 +131,14 @@ csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @}
 @end example
 
-After that you need to store the returned collider somewhere so you
-can easily retrieve it later when you want to do the collision detection.
-Usually in a game you have entity classes which will have a pointer to the
-mesh. In that case you can easily store the collider in that entity class.
+This code can be useful if you have a simple case and you can easily
+store the collider somewhere in your game logic. In most cases you should
+probably use @code{InitializeCollisionWrapper}.
 
-However, you can also use the @samp{iObject} system to attach your collider
-to the mesh itself. An easy way to do this is to use the
-@samp{csColliderWrapper} class that you can find in @file{cstool/collider.h}.
-@samp{csColliderWrapper} is a subclass of @samp{csObject} which
-means that you can attach this object to any other @samp{csObject}.
-@samp{csColliderWrapper} additionally holds a pointer to an @samp{iCollider}.
-This means that you can create a @samp{csColliderWrapper} to hold your
-@samp{iCollider} for some mesh object and then you can attach
-that @samp{csColliderWrapper} to the mesh object itself. To do this
-use the following code instead of the @code{InitCollider()} routine
-above:
+@subsubheading Initializing Geometry from the Mesh: The Intermediate Way
+
+Another way to initialize a collider uses @code{csColliderWrapper} but
+without @code{csColliderHelper}:
 
 @example
 bool MyGame::InitCollider (iMeshWrapper* mesh)
@@ -99,7 +147,9 @@ bool MyGame::InitCollider (iMeshWrapper* mesh)
     mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   if (polmesh)
   @{
-    new csColliderWrapper(mesh->QueryObject(), cd_sys, polmesh);
+    csColliderWrapper* wrapper = new csColliderWrapper(
+    	mesh->QueryObject(), cd_sys, polmesh);
+    wrapper->DecRef ();
     return true;
   @}
   else
@@ -112,26 +162,62 @@ bool MyGame::InitCollider (iMeshWrapper* mesh)
 This example creates a new instance of @samp{csColliderWrapper} which
 is automatically stored with the @samp{iObject} that belongs
 with the given mesh. So there is no need to store it otherwise. Later
-on you can retrieve the collider for some mesh by doing:
+on you can retrieve the collider for some mesh by using
+@code{csColliderWrapper::GetColliderWrapper()} again. This is more basic
+then using @code{InitializeCollisionWrapper()} as it doesn't take care
+of hierarchical meshes and also doesn't use the factory geometry if
+present.
 
-The function @code{csColliderHelper::InitializeCollisionWrapper()}
-does this work for you and also takes care of a lot of finer details
-that are ignored in the example above (like improved memory usage and
-performance by sharing the colliders if a factory mesh is used). In addition
-@code{csColliderHelper::InitializeCollisionWrappers()}
-initializes all collider wrappers for all objects in the engine.
+@subsubheading Initializing Geometry from a Box
+
+The collision detection system in Crystal Space cannot currently calculate
+correct collisions with objects that animate (like sprites and cal3d sprites
+(@pxref{MeshObject Spr3D}, @pxref{MeshObject SprCal3D}). In case of
+cal3d sprites it is simply not supported and for normal sprites it will take
+only the first animation frame of the default action. So most of the times it
+is better to use a box for collision detection instead of the actual model.
+The easiest way to do that is with this code:
 
 @example
-csColliderWrapper* colwrap = 
-  csColliderWrapper::GetColliderWrapper(mesh->QueryObject());
-iCollider* collider = colwrap->GetCollider();
+iMeshWrapper* mesh = @dots{};
+csBox3 box (-.1, 0, -.1, .1, 1.7, .1);
+csPolygonMeshBox* pmbox = new csPolygonMeshBox (box);
+csColliderWrapper* wrapper = new csColliderWrapper (
+	mesh->QueryObject (), cs_sys, pmbox);
+pmbox->DecRef ();
+wrapper->DecRef ();
 @end example
+
+We have to express the box in local object space for the mesh. In the example
+above we assume that the origin of the mesh is at the bottom center. So we
+create a box that is .2 units wide and deep and 1.7 units high.
+
+The fact that the collider wrapper was created from a box instead of the
+usual mesh geometry makes no difference for the collision detection system.
+
+@subsubheading Initializing Geometry for the Entire Level
+
+The easiest way to initialize colliders for the entire level at once is
+to use the @code{csColliderHelper::InitializeCollisionWrappers()} function
+immediatelly after loading a map:
+
+@example
+if (!loader->LoadMapFile ("world"))
+@{
+  @dots{}
+@}
+csColliderHelper::InitializeCollisionWrappers (cd_sys, engine);
+@end example
+
+This will call @code{csColliderHelper::InitializeCollisionWrapper()} for
+every loaded mesh. You can also restrict the above code to one region.
 
 @subsubheading The Player Collider
 
 Depending on the game your player might have a representation of
 geometry or not. If it doesn't you will have to make your own version
-of @samp{iPolygonMesh} to create a collider for the player. Even if
+of @samp{iPolygonMesh} to create a collider for the player (possibly
+using @code{csPolygonMeshBox} as explained above). Even if
 your player has geometry (i.e. a 3D sprite) it is sometimes still preferable
 to create your own special geometry for the player. The reason is
 gravity. When you would just use one collider for the player you can have
@@ -146,14 +232,15 @@ to go over small height elevations, the player collider should float slightly
 above the ground.
 
 The best way to make the gravity collider is to make your own implementation
-of @samp{iPolygonMesh}. This is very efficient. To keep the returned
-collider I recommend storing them somewhere in the player class or else the
-main game class.
+of @samp{iPolygonMesh} using @code{csPolygonMeshBox}. This is very efficient.
+To keep the returned collider I recommend storing them somewhere in the player
+class or else use @code{csColliderWrapper} as explained above.
 
 @subsubheading Doing Collision Detection
 
 When everything is set up it is time to do collision detection. To test
-for collisions you use the @code{Collide()} function in @samp{iCollideSystem}.
+for collisions you use the @code{Collide()} function in @samp{iCollideSystem}
+or @code{Collide()} in @code{csColliderWrapper}.
 This will test the collisions between two colliders. The result of this
 will be true or false and in addition the collide system will keep a list
 of all triangle pairs for the hits. Those triangle pairs can be used to
@@ -169,61 +256,45 @@ moves.
 collision detection! Otherwise the internal table of collision pairs will grow
 forever.
 
-@subsubheading Sliding Along Walls
+@subsubheading Gravity and Sliding Along Walls
 
-@noindent
-(@emph{Note: This section is in beta status.})
+Doing collision detection right is a hard problem. To help with this
+there is a @code{csColliderActor} class that you can use. It handles
+gravity and sliding with walls. To use it you must make sure that all
+world geometry has a collider (using
+@code{csColliderHelper::InitializeCollisionWrappers()} for example).
 
-For detecting collision between a mesh and the static world, it is better
-to use the @code{CollidePath()} method of @samp{iCollideSystem}. Its use
-is similar to @code{Collide()} but it takes arrays of @samp{iCollider}
-and @samp{csReversibleTransform} instances. It also takes a @samp{csVector3}
-(passed by reference). This is the translation vector of the movement
-that the mesh wants to take (@code{CollidePath()} is called before the
-movement occurs). The interface is detailed further in the public @sc{api}
-docs.
-
-The translation vector is modified to reflect the distance that the mesh
-was able to move before it collided with the world. So you should move
-the mesh that far, and subtract the new vector from the original vector,
-to get the distance still to go. We will call this @samp{V}.
-
-Use @code{GetCollisionPairs} to get the triangle that was collided with.
-It is described by the points @samp{a2}, @samp{b2}, @samp{c2} in the
-@samp{csCollisionPair} structure. Then use those points to create a
-@samp{csPlane3}. We will call this @samp{P}.
-
-We want to give our vector a new direction so that it is on @samp{P}.
-The cross-product (@samp{V % P.Normal()}) of the two will give a vector
-which is on the plane, but perpendicular to the vector that we want.
-Taking the cross-product again (now @samp{(V % P.Normal()) % P.Normal()})
-will give the vector we want.
-
-Now we try to move the mesh along this new vector. Hopefully, there will be
-no collision this time, but if there is we must do the whole thing over
-again. Example:
+At initialization time you use the following code to create the
+collider actor:
 
 @example
-void Player::Move (csVector3 move)
-@{
-  csVector3 old (move);
-  while (collsys->CollidePath (player_collider, player_transform,
-         move, world_colliders, world_transforms) != 1)
-  @{
-    player_transform->Translate (move);
-    csCollisionPair *pair = collsys->GetCollisionPairs ();
-    csPlane3 wall (pair->a2, pair->b2, pair->c2);
-    csVector3 newmove (old - move);
-    old = move; move = newmove;
-    move %= wall.Normal();
-    move %= wall.Normal();
-  @}
-  player_transform->Translate (move);
-@}
+csColliderActor collider_actor;
+iMeshWrapper* mesh = @dots{};
+@dots{}
+collider_actor.SetCollideSystem (cdsys);
+collider_actor.SetEngine (engine);
+collider_actor.InitializeColliders (mesh,
+  	csVector3 (0.2, 0.1, 0.2),
+	csVector3 (0.2, 0.3, 0.2),
+	csVector3 (0, -.2, 0));
 @end example
 
-This example is limited in that it will run into an infinite loop if the
-player walks into a corner, but it serves as an example.
+Then when you want to move the model (for example this is typically
+done in @code{SetupFrame()}) you can do this:
+
+@example
+csTicks elapsed_time = vc->GetElapsedTicks ();
+collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f, obj_move,
+	angularVelocity);
+@end example
+
+@samp{obj_move} is a relative movement vector in object space. For
+example, to move the object forward you can use @code{csVector3(0,0,1)}.
+@samp{angularVelocity} is a rotation vector for the model. Typically this
+is something like @code{csVector3(0,1,0)} or the 0 vector if you don't want
+to rotate.
+
+@samp{csColliderActor} has a function to change gravity.
 
 @subsubheading Limitation of @sc{opcode}
 
@@ -232,7 +303,7 @@ has one important limitation. It assumes that the transform from object
 to world space will not change the size of the object; i.e. you cannot scale
 the object using the object to world transformation (which is kept in the
 @samp{iMovable}) and expect collision detection to be ok. The only way
-aroud this limitation is to use @code{HardTransform()} to transform
+around this limitation is to use @code{HardTransform()} to transform
 the object space vertices itself. But this can of course not be used
 dynamically as you would have to recalculate the collider every time
 the object changes.

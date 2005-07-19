@@ -11,6 +11,9 @@ chronological order.
 	- Jorrit fixed the thing plugin so that it does a small correction
 	  on lightmap coordinates for impossibly thin polygons. That prevents
 	  the GL renderer from crashing on those.
+	- Jorrit added a new csColliderActor class. This class handles
+	  basic actor collision detection with gravity and sliding with
+	  walls. Using it is very easy (and documented in the manual).
 18-Jul-2005
 	- Eric Sunshine resolved circular inclusion of event headers. Also
 	  fixed a few other compilation errors and warnings.

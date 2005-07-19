@@ -23,11 +23,13 @@
 
 #include "csutil/csobject.h"
 #include "csutil/leakguard.h"
+#include "csutil/array.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 
 class csReversibleTransform;
+class csCollisionPair;
 struct csIntersectingTriangle;
 struct iPolygonMesh;
 struct iCollideSystem;
@@ -36,6 +38,7 @@ struct iObject;
 struct iEngine;
 struct iRegion;
 struct iMeshWrapper;
+struct iMovable;
 struct iSector;
 
 /* The 'class csColliderWrapper' is here to work around a VC7.0 issue. It 
@@ -268,6 +271,117 @@ public:
 	csIntersectingTriangle& closest_tri,
 	csVector3& closest_isect,
 	iMeshWrapper** closest_mesh = 0);
+};
+
+/**
+ * With csColliderActor you can more easily manage collision detection of
+ * a player or character model with gravity handling.
+ */
+class CS_CRYSTALSPACE_EXPORT csColliderActor
+{
+private:
+  bool revertMove;
+  bool onground;
+  csArray<csCollisionPair> our_cd_contact;
+  float gravity;
+  iMeshWrapper* mesh;
+  iMovable* movable;
+  iCollideSystem* cdsys;
+  iEngine* engine;
+  csVector3 velWorld;
+
+  csRef<iCollider> topCollider;
+  csRef<iCollider> bottomCollider;
+  csBox3 boundingBox;
+  csVector3 shift;
+  csVector3 topSize;
+  csVector3 bottomSize;
+  csVector3 intervalSize;
+
+  int CollisionDetect (
+	iCollider *collider,
+	iSector* sector,
+	csReversibleTransform* transform,
+	csReversibleTransform* old_transform);
+  int CollisionDetectIterative (
+	iCollider *collider,
+	iSector* sector,
+	csReversibleTransform* transform,
+	csReversibleTransform* old_transform, csVector3& maxmove);
+  bool MoveV (float delta, const csVector3& velBody);
+  bool RotateV (float delta, const csVector3& angularVelocity);
+
+public:
+  /// Construct.
+  csColliderActor ();
+
+  /// Set the collision detection system.
+  void SetCollideSystem (iCollideSystem* cdsys)
+  {
+    csColliderActor::cdsys = cdsys;
+  }
+
+  /// Set the engine.
+  void SetEngine (iEngine* engine)
+  {
+    csColliderActor::engine = engine;
+  }
+
+  /**
+   * Initialize the colliders.
+   * \param mesh is the mesh.
+   * \param legs is the size of the leg collider.
+   * \param body is the size of the body collider.
+   * \param shift is a shift added to the colliders. Normally the
+   * origin is assumed to be at the bottom of the model. With this
+   * shift you can adjust that.
+   */
+  void InitializeColliders (iMeshWrapper* mesh, const csVector3& legs,
+  	const csVector3& body, const csVector3& shift);
+
+  /**
+   * Set gravity. Default 19.2.
+   */
+  void SetGravity (float g) { gravity = g; }
+
+  /**
+   * Get gravity.
+   */
+  float GetGravity () const { return gravity; }
+
+  /**
+   * Check if we are on the ground.
+   */
+  bool IsOnGround () const { return onground; }
+
+  /**
+   * Check if we should revert a move (revert rotation).
+   */
+  bool CheckRevertMove () const { return revertMove; }
+
+  /**
+   * Move the model.
+   * \param delta is the number of seconds (floating point) elapsed
+   * time. Typically this is the elapsed time from the virtual clock
+   * divided by 1000.0f.
+   * \param speed is the desired movement speed. This can be 1.0f for
+   * default speed.
+   * \param velBody is the relative movement vector in object space
+   * of the model (i.e. 0,0,1 will move the model forward).
+   * \param angularVelocity is the velocity of rotation.
+   */
+  bool Move (float delta, float speed, const csVector3& velBody,
+  	const csVector3& angularVelocity);
+
+  /**
+   * This is used by Move() but you can also call it manually.
+   * It will adjust the new position to match with collision
+   * detection.
+   */
+  bool AdjustForCollisions (const csVector3& oldpos,
+	csVector3& newpos,
+	const csVector3& vel,
+	float delta);
 };
 
 #endif // __CS_COLLIDER_H__
