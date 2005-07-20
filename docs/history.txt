@@ -18,6 +18,10 @@ chronological order.
 	  arguments getting shadowed.
 	- Jorrit fixed a bug in csColliderActor. It was ignoring speed.
 	- Jorrit made csColliderActor a bit more robust.
+	- Jorrit changed simpmap so that it uses csColliderActor.
+	- Jorrit fixed csColliderActor so that it works better for camera
+	  (supports tilting up/down of camera and also rotation around
+	  z vector).
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction

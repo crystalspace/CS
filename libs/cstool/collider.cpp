@@ -482,6 +482,9 @@ csColliderActor::csColliderActor ()
   mesh = 0;
   camera = 0;
   movable = 0;
+
+  // Only used in case a camera is used.
+  rotZ = rotX = rotY = 0;
 }
 
 void csColliderActor::InitializeColliders (
@@ -548,7 +551,7 @@ void csColliderActor::InitializeColliders (iCamera* camera,
   InitializeColliders (legs, body, shift);
 }
 
-
+#if 0
 // Small helper function that returns the angle when given an x and y
 // coordinate.
 static float GetAngle (float x, float y)
@@ -570,6 +573,7 @@ static float Matrix2YRot (const csMatrix3& mat)
 
   return GetAngle (vec.z, vec.x);
 }
+#endif
 
 static inline bool FindIntersection (const csCollisionPair& cd,
     			   csVector3 line[2])
@@ -974,7 +978,6 @@ bool csColliderActor::RotateV (float delta,
   if (angularVelocity < SMALL_EPSILON)
     return false;
 
-  //delta *= speed;
   csVector3 angle = angularVelocity * delta;
 #if 0
   if (angleToReachFlag)
@@ -993,11 +996,25 @@ bool csColliderActor::RotateV (float delta,
   }
 #endif
 
-  csYRotMatrix3 rotMat(angle.y);
   if (movable)
+  {
+    csYRotMatrix3 rotMat (angle.y);
     movable->Transform (rotMat);
+  }
   else
-    camera->GetTransform ().SetT2O (rotMat * camera->GetTransform ().GetT2O ());
+  {
+    rotX += angle.x;
+    rotY += angle.y;
+    rotZ += angle.z;
+    csMatrix3 rot;
+    if (fabs (rotX) < SMALL_EPSILON && fabs (rotZ) < SMALL_EPSILON)
+      rot = csYRotMatrix3 (rotY);
+    else
+      rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY)
+    	* csZRotMatrix3 (rotZ);
+    csOrthoTransform ot (rot, camera->GetTransform().GetOrigin ());
+    camera->SetTransform (ot);
+  }
   return true;
 }
 
@@ -1132,8 +1149,8 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
     fulltransf = movable->GetFullTransform ();
   else
     fulltransf = camera->GetTransform ();
-  const csMatrix3& transf = fulltransf.GetT2O ();
-  float yrot = Matrix2YRot (transf);
+  //const csMatrix3& transf = fulltransf.GetT2O ();
+  //float yrot = Matrix2YRot (transf);
 
   // Calculate the total velocity (body and world) in OBJECT space.
   csVector3 bodyVel (fulltransf.Other2ThisRelative (velWorld) + velBody);
@@ -1162,7 +1179,7 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
     else
     {
       rc |= RotateV (local_max_interval * speed, angularVelocity);
-      yrot = Matrix2YRot (transf);
+      //yrot = Matrix2YRot (transf);
     }
 
     if (!rc) return rc;

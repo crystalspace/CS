@@ -34,7 +34,6 @@
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-
   /// A pointer to the 3D engine.
   csRef<iEngine> engine;
 
@@ -50,17 +49,17 @@ private:
   /// A pointer to the virtual clock.
   csRef<iVirtualClock> vc;
 
+  /// A pointer to the collision detection system.
+  csRef<iCollideSystem> cdsys;
+
   /// A pointer to the view which contains the camera.
   csRef<iView> view;
 
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
-  /// Position of camera in map.
-  csVector3 pos;
-
-  /// Current camera orientation.
-  float rotX, rotY;
+  /// Our collider used for gravity and CD.
+  csColliderActor collider_actor;
 
   /**
    * Handle keyboard events - ie key presses and releases.

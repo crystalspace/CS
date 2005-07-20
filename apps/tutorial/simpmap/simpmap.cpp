@@ -35,10 +35,9 @@ void Simple::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
-  iCamera* c = view->GetCamera();
+  csVector3 obj_move (0);
+  csVector3 obj_rotate (0);
 
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
@@ -46,13 +45,13 @@ void Simple::ProcessFrame ()
     // the camera to strafe up, down, left or right from it's
     // current position.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      c->Move (CS_VEC_RIGHT * 4 * speed);
+      obj_move = CS_VEC_RIGHT * 3.0f;
     if (kbd->GetKeyState (CSKEY_LEFT))
-      c->Move (CS_VEC_LEFT * 4 * speed);
+      obj_move = CS_VEC_LEFT * 3.0f;
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_UP * 4 * speed);
+      obj_move = CS_VEC_UP * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_DOWN * 4 * speed);
+      obj_move = CS_VEC_DOWN * 3.0f;
   }
   else
   {
@@ -61,30 +60,21 @@ void Simple::ProcessFrame ()
     // _camera's_ X axis (more on this in a second) and up and down
     // arrows cause the camera to go forwards and backwards.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      rotY += speed;
+      obj_rotate.Set (0, 1, 0);
     if (kbd->GetKeyState (CSKEY_LEFT))
-      rotY -= speed;
+      obj_rotate.Set (0, -1, 0);
     if (kbd->GetKeyState (CSKEY_PGUP))
-      rotX += speed;
+      obj_rotate.Set (1, 0, 0);
     if (kbd->GetKeyState (CSKEY_PGDN))
-      rotX -= speed;
+      obj_rotate.Set (-1, 0, 0);
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * 4 * speed);
+      obj_move = CS_VEC_FORWARD * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * 4 * speed);
+      obj_move = CS_VEC_BACKWARD * 3.0f;
   }
 
-  // We now assign a new rotation transformation to the camera.  You
-  // can think of the rotation this way: starting from the zero
-  // position, you first rotate "rotY" radians on your Y axis to get
-  // the first rotation.  From there you rotate "rotX" radians on the
-  // your X axis to get the final rotation.  We multiply the
-  // individual rotations on each axis together to get a single
-  // rotation matrix.  The rotations are applied in right to left
-  // order .
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  c->SetTransform (ot);
+  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
+    	obj_move, obj_rotate);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -140,6 +130,8 @@ bool Simple::OnInitialize(int argc, char* argv[])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode",
+		iCollideSystem),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
@@ -160,27 +152,30 @@ bool Simple::Application()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
-  if (!OpenApplication(GetObjectRegistry()))
-    return ReportError("Error opening system!");
+  if (!OpenApplication (GetObjectRegistry()))
+    return ReportError ("Error opening system!");
 
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
   // The virtual clock.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
-  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+  g3d = CS_QUERY_REGISTRY (GetObjectRegistry(), iGraphics3D);
+  if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
-  if (!engine) return ReportError("Failed to locate 3D engine!");
+  engine = CS_QUERY_REGISTRY (GetObjectRegistry(), iEngine);
+  if (!engine) return ReportError ("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
-  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+  vc = CS_QUERY_REGISTRY (GetObjectRegistry(), iVirtualClock);
+  if (!vc) return ReportError ("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
-  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+  kbd = CS_QUERY_REGISTRY (GetObjectRegistry(), iKeyboardDriver);
+  if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
-  if (!loader) return ReportError("Failed to locate Loader!");
+  loader = CS_QUERY_REGISTRY (GetObjectRegistry(), iLoader);
+  if (!loader) return ReportError ("Failed to locate Loader!");
+
+  cdsys = CS_QUERY_REGISTRY (GetObjectRegistry(), iCollideSystem);
+  if (!cdsys) return ReportError ("Failed to locate CD system!");
 
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
@@ -191,34 +186,15 @@ bool Simple::Application()
   // Here we load our world from a map file.
   if (!LoadMap ()) return false;
 
+  // Initialize collision objects for all loaded objects.
+  csColliderHelper::InitializeCollisionWrappers (cdsys, engine);
+
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
   engine->Prepare ();
 
-  // these are used store the current orientation of the camera
-  rotY = rotX = 0;
-
-  // Now we need to position the camera in our world.
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (pos);
-
-  // This calls the default runloop. This will basically just keep
-  // broadcasting process events to keep the game going.
-  Run();
-
-  return true;
-}
-
-bool Simple::LoadMap ()
-{
-  // Set VFS current directory to the level we want to load.
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
-  VFS->ChDir ("/lev/partsys");
-  // Load the level file which is called 'world'.
-  if (!loader->LoadMapFile ("world"))
-    ReportError("Error couldn't load level!");
-
   // Find the starting position in this level.
+  csVector3 pos (0);
   if (engine->GetCameraPositions ()->GetCount () > 0)
   {
     // There is a valid starting position defined in the level file.
@@ -235,6 +211,35 @@ bool Simple::LoadMap ()
   }
   if (!room)
     ReportError("Can't find a valid starting position!");
+
+  // Now we need to position the camera in our world.
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+
+  // Initialize our collider actor.
+  collider_actor.SetCollideSystem (cdsys);
+  collider_actor.SetEngine (engine);
+  csVector3 legs (1, .3, 1);
+  csVector3 body (1, 1.2, 1);
+  csVector3 shift (0, -1, 0);
+  collider_actor.InitializeColliders (view->GetCamera (),
+  	legs, body, shift);
+
+  // This calls the default runloop. This will basically just keep
+  // broadcasting process events to keep the game going.
+  Run ();
+
+  return true;
+}
+
+bool Simple::LoadMap ()
+{
+  // Set VFS current directory to the level we want to load.
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  VFS->ChDir ("/lev/partsys");
+  // Load the level file which is called 'world'.
+  if (!loader->LoadMapFile ("world"))
+    ReportError("Error couldn't load level!");
 
   return true;
 }

@@ -292,6 +292,9 @@ private:
   iEngine* engine;
   csVector3 velWorld;
 
+  // For rotation.
+  float rotX, rotY, rotZ;
+
   csRef<iCollider> topCollider;
   csRef<iCollider> bottomCollider;
   csBox3 boundingBox;
