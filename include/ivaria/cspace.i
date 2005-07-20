@@ -770,6 +770,9 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csPoly2D::GetVertices (); // Non-const.
 %include "csgeom/poly2d.h"
 
+// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+// to use an alternate way for those functions
+%feature("compactdefaultargs") csIntersect3::BoxSegment;
 %include "csgeom/math3d.h"
 
 %ignore csPoly3D::operator[];
@@ -832,6 +835,9 @@ TYPEMAP_OUT_csWrapPtr
 %rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*,
   iEventHandler *, unsigned int);
 %typemap(default) const char * configName { $1 = 0; }
+// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+// to use an alternate way for that function
+%feature("compactdefaultargs") csInitializer::SetupConfigManager;
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
 %ignore csArray<csPluginRequest>::Capacity;
@@ -886,9 +892,15 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/campos.h"
 %include "iengine/texture.h"
 %include "iengine/material.h"
+// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+// to use an alternate way for that function
+%feature("compactdefaultargs") HitBeamObject;
 %include "iengine/mesh.h"
 %include "iengine/movable.h"
 %include "iengine/region.h"
+// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+// to use an alternate way for that function
+%feature("compactdefaultargs") IntersectSegment;
 %include "iengine/viscull.h"
 %include "iengine/portal.h"
 %include "iengine/portalcontainer.h"
@@ -907,6 +919,9 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/sprite3d.h"
 %include "imesh/spritecal3d.h"
 %include "imesh/mdlconv.h"
+// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+// to use an alternate way for that function
+%feature("compactdefaultargs") HitBeamObject;
 %include "imesh/object.h"
 %include "imesh/ball.h"
 %include "imesh/thing.h"

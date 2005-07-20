@@ -14,6 +14,8 @@ chronological order.
 	  about having to call Move() every frame.
 	- Jorrit added the ability to csColliderActor to use a camera instead
 	  of a mesh.
+	- mdmkolbe fixed SWIG warnings related to functions with default
+	  arguments getting shadowed.
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction
