@@ -5411,7 +5411,6 @@ package cspace::iMeshWrapper;
 *GetLightingInfo = *cspacec::iMeshWrapper_GetLightingInfo;
 *GetShadowReceiver = *cspacec::iMeshWrapper_GetShadowReceiver;
 *GetShadowCaster = *cspacec::iMeshWrapper_GetShadowCaster;
-*GetVisibilityNumber = *cspacec::iMeshWrapper_GetVisibilityNumber;
 *GetFactory = *cspacec::iMeshWrapper_GetFactory;
 *SetFactory = *cspacec::iMeshWrapper_SetFactory;
 *SetLightingUpdate = *cspacec::iMeshWrapper_SetLightingUpdate;
@@ -5919,8 +5918,6 @@ package cspace::iVisibilityObject;
 %ITERATORS = ();
 *GetMovable = *cspacec::iVisibilityObject_GetMovable;
 *GetMeshWrapper = *cspacec::iVisibilityObject_GetMeshWrapper;
-*SetVisibilityNumber = *cspacec::iVisibilityObject_SetVisibilityNumber;
-*GetVisibilityNumber = *cspacec::iVisibilityObject_GetVisibilityNumber;
 *GetObjectModel = *cspacec::iVisibilityObject_GetObjectModel;
 *GetCullerFlags = *cspacec::iVisibilityObject_GetCullerFlags;
 sub DESTROY {
@@ -13066,6 +13063,51 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_csColliderHelper($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csColliderActor ##############
+
+package cspace::csColliderActor;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csColliderActor(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*SetCollideSystem = *cspacec::csColliderActor_SetCollideSystem;
+*SetEngine = *cspacec::csColliderActor_SetEngine;
+*InitializeColliders = *cspacec::csColliderActor_InitializeColliders;
+*SetGravity = *cspacec::csColliderActor_SetGravity;
+*GetGravity = *cspacec::csColliderActor_GetGravity;
+*IsOnGround = *cspacec::csColliderActor_IsOnGround;
+*CheckRevertMove = *cspacec::csColliderActor_CheckRevertMove;
+*Move = *cspacec::csColliderActor_Move;
+*AdjustForCollisions = *cspacec::csColliderActor_AdjustForCollisions;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csColliderActor($self);
         delete $OWNER{$self};
     }
 }
