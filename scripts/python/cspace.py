@@ -4788,7 +4788,6 @@ class iMeshWrapper(iBase):
     def GetLightingInfo(*args): return _cspace.iMeshWrapper_GetLightingInfo(*args)
     def GetShadowReceiver(*args): return _cspace.iMeshWrapper_GetShadowReceiver(*args)
     def GetShadowCaster(*args): return _cspace.iMeshWrapper_GetShadowCaster(*args)
-    def GetVisibilityNumber(*args): return _cspace.iMeshWrapper_GetVisibilityNumber(*args)
     def GetFactory(*args): return _cspace.iMeshWrapper_GetFactory(*args)
     def SetFactory(*args): return _cspace.iMeshWrapper_SetFactory(*args)
     def SetLightingUpdate(*args): return _cspace.iMeshWrapper_SetLightingUpdate(*args)
@@ -5232,8 +5231,6 @@ class iVisibilityObject(iBase):
         return "<%s.%s; proxy of C++ iVisibilityObject instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def GetMovable(*args): return _cspace.iVisibilityObject_GetMovable(*args)
     def GetMeshWrapper(*args): return _cspace.iVisibilityObject_GetMeshWrapper(*args)
-    def SetVisibilityNumber(*args): return _cspace.iVisibilityObject_SetVisibilityNumber(*args)
-    def GetVisibilityNumber(*args): return _cspace.iVisibilityObject_GetVisibilityNumber(*args)
     def GetObjectModel(*args): return _cspace.iVisibilityObject_GetObjectModel(*args)
     def GetCullerFlags(*args): return _cspace.iVisibilityObject_GetCullerFlags(*args)
     def __del__(self, destroy=_cspace.delete_iVisibilityObject):
@@ -11884,6 +11881,38 @@ csColliderHelper_CollideArray = _cspace.csColliderHelper_CollideArray
 csColliderHelper_CollidePath = _cspace.csColliderHelper_CollidePath
 
 csColliderHelper_TraceBeam = _cspace.csColliderHelper_TraceBeam
+
+class csColliderActor(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderActor, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csColliderActor, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csColliderActor instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csColliderActor, 'this', _cspace.new_csColliderActor(*args))
+        _swig_setattr(self, csColliderActor, 'thisown', 1)
+    def SetCollideSystem(*args): return _cspace.csColliderActor_SetCollideSystem(*args)
+    def SetEngine(*args): return _cspace.csColliderActor_SetEngine(*args)
+    def InitializeColliders(*args): return _cspace.csColliderActor_InitializeColliders(*args)
+    def SetGravity(*args): return _cspace.csColliderActor_SetGravity(*args)
+    def GetGravity(*args): return _cspace.csColliderActor_GetGravity(*args)
+    def IsOnGround(*args): return _cspace.csColliderActor_IsOnGround(*args)
+    def CheckRevertMove(*args): return _cspace.csColliderActor_CheckRevertMove(*args)
+    def Move(*args): return _cspace.csColliderActor_Move(*args)
+    def AdjustForCollisions(*args): return _cspace.csColliderActor_AdjustForCollisions(*args)
+    def __del__(self, destroy=_cspace.delete_csColliderActor):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csColliderActorPtr(csColliderActor):
+    def __init__(self, this):
+        _swig_setattr(self, csColliderActor, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csColliderActor, 'thisown', 0)
+        _swig_setattr(self, csColliderActor,self.__class__,csColliderActor)
+_cspace.csColliderActor_swigregister(csColliderActorPtr)
 
 
 csfxInterference = _cspace.csfxInterference
