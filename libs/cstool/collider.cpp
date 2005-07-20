@@ -835,7 +835,9 @@ bool csColliderActor::AdjustForCollisions (
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
-    csVector3 vec = obstacle.Normal().Unit();
+    float norm = obstacle.Normal ().Norm ();
+    if (fabs (norm) < SMALL_EPSILON) continue;
+    csVector3 vec = obstacle.Normal() / norm;
 
     if (vec * localvel > 0) continue;
 
@@ -1101,6 +1103,23 @@ bool csColliderActor::MoveV (float delta,
 
 #define MAX_CD_INTERVAL 1
 #define MIN_CD_INTERVAL 0.01
+#define MAX_CD_ITERATIONS 20
+
+static float ComputerLocalMaxInterval (
+	const csVector3& bodyVel,
+	const csVector3& intervalSize)
+{
+  float local_max_interval =
+    MAX (MIN (MIN ((fabs (bodyVel.y) < SMALL_EPSILON)
+  	? MAX_CD_INTERVAL
+	: fabs (intervalSize.y/bodyVel.y), (fabs (bodyVel.x) < SMALL_EPSILON)
+		? MAX_CD_INTERVAL
+		: fabs (intervalSize.x/bodyVel.x)),
+			(fabs (bodyVel.z) < SMALL_EPSILON)
+			? MAX_CD_INTERVAL
+			: fabs (intervalSize.z/bodyVel.z)), MIN_CD_INTERVAL);
+  return local_max_interval;
+}
 
 bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 	const csVector3& angularVelocity)
@@ -1119,22 +1138,18 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
   // Calculate the total velocity (body and world) in OBJECT space.
   csVector3 bodyVel (fulltransf.Other2ThisRelative (velWorld) + velBody);
 
-  float local_max_interval =
-    MAX (MIN (MIN ((bodyVel.y==0.0f)
-  	? MAX_CD_INTERVAL
-	: ABS (intervalSize.y/bodyVel.y), (bodyVel.x==0.0f)
-		? MAX_CD_INTERVAL
-		: ABS (intervalSize.x/bodyVel.x)), (bodyVel.z==0.0f)
-			? MAX_CD_INTERVAL
-			: ABS (intervalSize.z/bodyVel.z)), MIN_CD_INTERVAL);
+  float local_max_interval = ComputerLocalMaxInterval (bodyVel, intervalSize);
 
   // Compensate for speed
   local_max_interval /= speed;
   // Err on the side of safety
   local_max_interval -= 0.005f;
 
-  while (delta > local_max_interval)
+  int maxiter = MAX_CD_ITERATIONS;
+
+  while (delta > local_max_interval && maxiter > 0)
   {
+    maxiter--;
     rc |= MoveV (local_max_interval * speed, velBody);
 
     if (revertMove)
@@ -1150,20 +1165,14 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
       yrot = Matrix2YRot (transf);
     }
 
-    if (!rc)
-      return rc;
+    if (!rc) return rc;
 
     // The velocity may have changed by now
     bodyVel = fulltransf.Other2ThisRelative(velWorld) + velBody;
 
     delta -= local_max_interval;
-    local_max_interval = MAX (MIN (MIN ((bodyVel.y==0.0f)
-      	? MAX_CD_INTERVAL
-	: ABS (intervalSize.y/bodyVel.y), (bodyVel.x==0.0f)
-		? MAX_CD_INTERVAL
-		: ABS (intervalSize.x/bodyVel.x)), (bodyVel.z==0.0f)
-			? MAX_CD_INTERVAL
-			: ABS (intervalSize.z/bodyVel.z)), MIN_CD_INTERVAL);
+    local_max_interval = ComputerLocalMaxInterval (bodyVel, intervalSize);
+
     // Compensate for speed
     local_max_interval /= speed;
     // Err on the side of safety
