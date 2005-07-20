@@ -26,6 +26,7 @@
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
+#include "iengine/camera.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/portal.h"
 #include "imesh/object.h"
@@ -479,14 +480,13 @@ csColliderActor::csColliderActor ()
   engine = 0;
   cdsys = 0;
   mesh = 0;
+  camera = 0;
   movable = 0;
 }
 
-void csColliderActor::InitializeColliders (iMeshWrapper* mesh,
+void csColliderActor::InitializeColliders (
 	const csVector3& legs, const csVector3& body, const csVector3& shift)
 {
-  csColliderActor::mesh = mesh;
-  movable = mesh->GetMovable ();
   csColliderActor::shift = shift;
   bottomSize = legs;
   topSize = body;
@@ -528,6 +528,24 @@ void csColliderActor::InitializeColliders (iMeshWrapper* mesh,
   csColliderActor::shift.x = -shift.x;
   csColliderActor::shift.y = -shift.y;
   csColliderActor::shift.z = -shift.z;
+}
+
+void csColliderActor::InitializeColliders (iMeshWrapper* mesh,
+	const csVector3& legs, const csVector3& body, const csVector3& shift)
+{
+  csColliderActor::mesh = mesh;
+  camera = 0;
+  movable = mesh->GetMovable ();
+  InitializeColliders (legs, body, shift);
+}
+
+void csColliderActor::InitializeColliders (iCamera* camera,
+	const csVector3& legs, const csVector3& body, const csVector3& shift)
+{
+  mesh = 0;
+  movable = 0;
+  csColliderActor::camera = camera;
+  InitializeColliders (legs, body, shift);
 }
 
 
@@ -781,12 +799,14 @@ bool csColliderActor::AdjustForCollisions (
 {
   revertMove = false;
 
-  if (movable->GetSectors()->GetCount() == 0)
+  if (movable && movable->GetSectors()->GetCount() == 0)
     return true;
 
   int hits;
   size_t i;
-  iSector* current_sector = movable->GetSectors ()->Get (0);
+  iSector* current_sector;
+  if (movable) current_sector = movable->GetSectors ()->Get (0);
+  else current_sector = camera->GetSector ();
 
   csMatrix3 id;
   csOrthoTransform transform_oldpos (id, oldpos);
@@ -972,7 +992,10 @@ bool csColliderActor::RotateV (float delta,
 #endif
 
   csYRotMatrix3 rotMat(angle.y);
-  movable->Transform (rotMat);
+  if (movable)
+    movable->Transform (rotMat);
+  else
+    camera->GetTransform ().SetT2O (rotMat * camera->GetTransform ().GetT2O ());
   return true;
 }
 
@@ -989,7 +1012,11 @@ bool csColliderActor::MoveV (float delta,
 
   // To test collision detection we use absolute position and transformation
   // (this is relevant if we are anchored). Later on we will correct that.
-  csReversibleTransform fulltransf = movable->GetFullTransform ();
+  csReversibleTransform fulltransf;
+  if (movable)
+    fulltransf = movable->GetFullTransform ();
+  else
+    fulltransf = camera->GetTransform ();
   mat = fulltransf.GetT2O ();
 
   csVector3 worldVel (fulltransf.This2OtherRelative (velBody) + velWorld);
@@ -1000,12 +1027,15 @@ bool csColliderActor::MoveV (float delta,
   if (!AdjustForCollisions (oldpos, newpos, worldVel,
     	delta))
     return false;                   // We haven't moved so return early
-
   
   bool mirror = false;
 
   // Update position to account for portals
-  iSector* new_sector = movable->GetSectors ()->Get (0);
+  iSector* new_sector;
+  if (movable)
+    new_sector = movable->GetSectors ()->Get (0);
+  else
+    new_sector = camera->GetSector ();
   iSector* old_sector = new_sector;
 
   // @@@ Jorrit: had to do this add!
@@ -1020,9 +1050,14 @@ bool csColliderActor::MoveV (float delta,
       newpos, mirror, true);
   newpos.y -= height5;
   if (new_sector != old_sector)
-    movable->SetSector (new_sector);
+  {
+    if (movable)
+      movable->SetSector (new_sector);
+    else
+      camera->SetSector (new_sector);
+  }
 
-  if(!onground)
+  if (!onground)
   {
     // gravity! move down!
     velWorld.y  -= gravity * delta;
@@ -1050,9 +1085,16 @@ bool csColliderActor::MoveV (float delta,
     }
   }
 
-  movable->GetTransform ().SetOrigin (newpos);
-  mesh->PlaceMesh ();
-  movable->UpdateMove ();
+  if (movable)
+  {
+    movable->GetTransform ().SetOrigin (newpos);
+    mesh->PlaceMesh ();
+    movable->UpdateMove ();
+  }
+  else
+  {
+    camera->GetTransform ().SetOrigin (newpos);
+  }
 
   return true;
 }
@@ -1066,12 +1108,16 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
   //float local_max_interval;
   bool rc = false;
 
-  csReversibleTransform fulltransf = movable->GetFullTransform ();
+  csReversibleTransform fulltransf;
+  if (movable)
+    fulltransf = movable->GetFullTransform ();
+  else
+    fulltransf = camera->GetTransform ();
   const csMatrix3& transf = fulltransf.GetT2O ();
   float yrot = Matrix2YRot (transf);
 
   // Calculate the total velocity (body and world) in OBJECT space.
-  csVector3 bodyVel(fulltransf.Other2ThisRelative (velWorld) + velBody);
+  csVector3 bodyVel (fulltransf.Other2ThisRelative (velWorld) + velBody);
 
   float local_max_interval =
     MAX (MIN (MIN ((bodyVel.y==0.0f)

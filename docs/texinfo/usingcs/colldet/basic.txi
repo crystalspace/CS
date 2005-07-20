@@ -294,6 +294,14 @@ example, to move the object forward you can use @code{csVector3(0,0,1)}.
 is something like @code{csVector3(0,1,0)} or the 0 vector if you don't want
 to rotate.
 
+Note! Even if the user didn't press any key it is important to keep
+calling the Move() function every frame. The reason for that is so that
+gravity can work. You should just call it with a 0 vector for movement
+and rotation.
+
+Note that @code{csColliderActor} can also work with a camera instead of
+a mesh.
+
 @samp{csColliderActor} has a function to change gravity.
 
 @subsubheading Limitation of @sc{opcode}

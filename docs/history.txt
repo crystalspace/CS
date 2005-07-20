@@ -10,6 +10,10 @@ chronological order.
 	- Jorrit made csColliderActor more robust by checking if the other
 	  mesh has a collider.
 	- Jorrit added SetOnGround() method to csColliderActor.
+	- Jorrit added a small note to the csColliderActor documentation
+	  about having to call Move() every frame.
+	- Jorrit added the ability to csColliderActor to use a camera instead
+	  of a mesh.
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction

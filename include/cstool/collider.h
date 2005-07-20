@@ -40,6 +40,7 @@ struct iRegion;
 struct iMeshWrapper;
 struct iMovable;
 struct iSector;
+struct iCamera;
 
 /* The 'class csColliderWrapper' is here to work around a VC7.0 issue. It 
  * seems that, depending on whether VC7.0 sees a compound declared as
@@ -285,6 +286,7 @@ private:
   csArray<csCollisionPair> our_cd_contact;
   float gravity;
   iMeshWrapper* mesh;
+  iCamera* camera;
   iMovable* movable;
   iCollideSystem* cdsys;
   iEngine* engine;
@@ -355,6 +357,8 @@ private:
 	csReversibleTransform* old_transform, csVector3& maxmove);
   bool MoveV (float delta, const csVector3& velBody);
   bool RotateV (float delta, const csVector3& angularVelocity);
+  void InitializeColliders (const csVector3& legs,
+  	const csVector3& body, const csVector3& shift);
 
 public:
   /// Construct.
@@ -382,6 +386,20 @@ public:
    * shift you can adjust that.
    */
   void InitializeColliders (iMeshWrapper* mesh, const csVector3& legs,
+  	const csVector3& body, const csVector3& shift);
+
+  /**
+   * Initialize the colliders. This version is used if you have a first
+   * person view and want collision detection to move the camera instead
+   * of a mesh.
+   * \param camera is the camera.
+   * \param legs is the size of the leg collider.
+   * \param body is the size of the body collider.
+   * \param shift is a shift added to the colliders. Normally the
+   * origin is assumed to be at the bottom of the model. With this
+   * shift you can adjust that.
+   */
+  void InitializeColliders (iCamera* camera, const csVector3& legs,
   	const csVector3& body, const csVector3& shift);
 
   /**
