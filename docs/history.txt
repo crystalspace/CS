@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jul-2005
+	- Jorrit made csColliderActor more robust by checking if the other
+	  mesh has a collider.
+	- Jorrit added SetOnGround() method to csColliderActor.
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction

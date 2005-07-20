@@ -298,11 +298,56 @@ private:
   csVector3 bottomSize;
   csVector3 intervalSize;
 
+  /**
+   * Performs the collision detection for the provided csColliderWrapper vs
+   * all nearby objects.
+   * <p>
+   * @param cw  	Pointer to a csColliderWrapper that is to be tested for
+   *			collisions with nearby objects
+   * @param sect	Pointer to the iSector interface of the sector that
+   *			this Wrapper is currently in.
+   * @param cdt		Pointer to a reversible transform of the "new"
+   *			position of the object to test.
+   * @param cdstart	Pointer to a reversible transform of the original
+   *			position of the object to test (before any movements).
+   *<p>
+   * This function gets all nearby objects, crossing sector bounds. It compares
+   * for collisions. If a collision is found, it follows a line segment from
+   * the "old" position of the Mesh (described by cdstart) to the position of
+   * one end of a line segment describing the collision. If this results in
+   * crossing into the same sector that the mesh we collided with is in, then
+   * the collision is valid.
+   * <p>
+   * This catches the case where a peice of world geometry extends into
+   * coordinates of another sector, but does not actually exist in that sector.
+   */
   int CollisionDetect (
 	iCollider *collider,
 	iSector* sector,
 	csReversibleTransform* transform,
 	csReversibleTransform* old_transform);
+
+  /**
+   * Performs the collision detection for the provided csColliderWrapper vs
+   * all nearby objects and gives the furthest point that will not collide.
+   * <p>
+   * @param cw  	Pointer to a csColliderWrapper that is to be tested for
+   *			collisions with nearby objects
+   * @param sect	Pointer to the iSector interface of the sector that
+   *			this Wrapper is currently in.
+   * @param cdt		Pointer to a reversible transform of the "new"
+   *			position of the object to test.
+   * @param cdstart	Pointer to a reversible transform of the original
+   *			position of the object to test (before any movements).
+   * @param maxmove	A vector that holds the maximum point to which the
+   *			object can move.
+   *
+   *<p>
+   * This function calls CollisionDetect each time splitting the range
+   * between the 'new' position and the original position of the object and
+   * testing the point in the middle. This finds the point of first contact to
+   * an accuracy of EPSILON and then sets maxmove to a point before it.
+   */
   int CollisionDetectIterative (
 	iCollider *collider,
 	iSector* sector,
@@ -353,6 +398,11 @@ public:
    * Check if we are on the ground.
    */
   bool IsOnGround () const { return onground; }
+
+  /**
+   * Set the onground status.
+   */
+  void SetOnGround (bool og) { onground = og; }
 
   /**
    * Check if we should revert a move (revert rotation).

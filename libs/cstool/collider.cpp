@@ -607,7 +607,7 @@ int csColliderActor::CollisionDetect (
   {
     iMeshWrapper* meshWrapper = objectIter->Next ();
 
-    iMovable* meshMovable = meshWrapper->GetMovable();
+    iMovable* meshMovable = meshWrapper->GetMovable ();
     // Avoid hitting the mesh from this entity itself.
     if (meshWrapper != mesh)
     {
@@ -615,8 +615,9 @@ int csColliderActor::CollisionDetect (
       csReversibleTransform tr = meshMovable->GetFullTransform ();
       csColliderWrapper* otherwrap = csColliderWrapper::GetColliderWrapper (
       	meshWrapper->QueryObject ());
+      if (!otherwrap) continue;
       iCollider* othercollider = otherwrap->GetCollider ();
-      if(!(othercollider && cdsys->Collide (collider,
+      if (!(othercollider && cdsys->Collide (collider,
           transform, othercollider, &tr)))
         continue;
 
@@ -657,7 +658,7 @@ int csColliderActor::CollisionDetect (
           temppair.b2 = tr.This2Other (CD_contact[j].b2);
           temppair.c2 = tr.This2Other (CD_contact[j].c2);
         }
-        if(checkSectors)
+        if (checkSectors)
         {
           FindIntersection (temppair, line);
           // Collided at this line segment. Pick a point in the middle of
@@ -712,10 +713,10 @@ int csColliderActor::CollisionDetectIterative (
   // The maximum position it's possible for the player to move to
   // If we collide at the start point or don't collide at the end point
   // then there is no need for recursion.
-  int hits = CollisionDetect(collider, sector, transform, old_transform);
+  int hits = CollisionDetect (collider, sector, transform, old_transform);
   if (hits == 0)
   {
-    maxmove = transform->GetOrigin();
+    maxmove = transform->GetOrigin ();
     return hits;
   }
 
@@ -723,7 +724,7 @@ int csColliderActor::CollisionDetectIterative (
   our_cd_contact.Empty ();
 
   maxmove = old_transform->GetOrigin();
-  hits = CollisionDetect(collider, sector, old_transform, old_transform);
+  hits = CollisionDetect (collider, sector, old_transform, old_transform);
   if (hits > 0)
     return hits;
 
@@ -738,14 +739,14 @@ int csColliderActor::CollisionDetectIterative (
 
   //cdsys->SetOneHitOnly(true);
   // Repeatedly split the range with which to test the collision against
-  while((upper - lower).SquaredNorm() > EPSILON)
+  while ((upper - lower).SquaredNorm() > EPSILON)
   {
     // Test in the middle between upper and lower bounds
     csOrthoTransform current (id, lower + (upper - lower)/2);
     cdsys->ResetCollisionPairs ();
     our_cd_contact.Empty ();
 
-    hits = CollisionDetect(collider, sector, &current, old_transform);
+    hits = CollisionDetect (collider, sector, &current, old_transform);
     
     // Adjust bounds
     if (hits > 0)
