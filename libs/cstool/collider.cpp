@@ -1135,7 +1135,7 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 
   while (delta > local_max_interval)
   {
-    rc |= MoveV (local_max_interval, velBody);
+    rc |= MoveV (local_max_interval * speed, velBody);
 
     if (revertMove)
     {
@@ -1146,7 +1146,7 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
     }
     else
     {
-      rc |= RotateV (local_max_interval, angularVelocity);
+      rc |= RotateV (local_max_interval * speed, angularVelocity);
       yrot = Matrix2YRot (transf);
     }
 
@@ -1172,8 +1172,8 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 
   if (delta)
   {
-    rc |= MoveV (delta, velBody);
-    rc |= RotateV (delta, angularVelocity);
+    rc |= MoveV (delta * speed, velBody);
+    rc |= RotateV (delta * speed, angularVelocity);
   }
 
   return rc;

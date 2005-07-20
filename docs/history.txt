@@ -16,6 +16,7 @@ chronological order.
 	  of a mesh.
 	- mdmkolbe fixed SWIG warnings related to functions with default
 	  arguments getting shadowed.
+	- Jorrit fixed a bug in csColliderActor. It was ignoring speed.
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction
