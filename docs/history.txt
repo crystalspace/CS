@@ -22,6 +22,7 @@ chronological order.
 	- Jorrit fixed csColliderActor so that it works better for camera
 	  (supports tilting up/down of camera and also rotation around
 	  z vector).
+	- mdmkolbe put an #ifdef guard around a MSVC only #pragma
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction

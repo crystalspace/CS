@@ -101,10 +101,10 @@
 			#define inline_ inline
 		#endif
 
-	// Down the hatch
-	#pragma inline_depth( 255 )
 
 	#ifdef COMPILER_VISUAL_CPP
+		// Down the hatch
+		#pragma inline_depth( 255 )
 		#pragma intrinsic(labs)
 	#endif
 
