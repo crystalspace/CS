@@ -116,7 +116,7 @@ public:
 
   /// Constructor
   csShaderVariable (csStringID name);
-  csShaderVariable (const csShaderVariable& other)
+  csShaderVariable (const csShaderVariable& other) : csRefCount()
   { *this = other; }
   virtual ~csShaderVariable ()
   {

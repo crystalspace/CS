@@ -23,6 +23,8 @@ chronological order.
 	  (supports tilting up/down of camera and also rotation around
 	  z vector).
 	- mdmkolbe put an #ifdef guard around a MSVC only #pragma
+	- Eric Sunshine eliminated compilation warning in csShaderVariable
+	  copy constructor.
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction
