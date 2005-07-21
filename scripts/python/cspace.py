@@ -11898,6 +11898,7 @@ class csColliderActor(_object):
     def SetGravity(*args): return _cspace.csColliderActor_SetGravity(*args)
     def GetGravity(*args): return _cspace.csColliderActor_GetGravity(*args)
     def IsOnGround(*args): return _cspace.csColliderActor_IsOnGround(*args)
+    def SetOnGround(*args): return _cspace.csColliderActor_SetOnGround(*args)
     def CheckRevertMove(*args): return _cspace.csColliderActor_CheckRevertMove(*args)
     def Move(*args): return _cspace.csColliderActor_Move(*args)
     def AdjustForCollisions(*args): return _cspace.csColliderActor_AdjustForCollisions(*args)
