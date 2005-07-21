@@ -180,7 +180,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   if(comment != (size_t)-1 && line.GetAt (comment + 1) == '/')
     line.Truncate (comment);
   comment = line.FindFirst (';');
-  if(comment == (size_t)-1) line.Truncate (comment);
+  if (comment != (size_t)-1) line.Truncate (comment);
   line.Trim ();
   
   if(line.Length() < 1) return true; // Ignore blank lines
