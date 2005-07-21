@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Jul-2005
+	- mdmkolbe fixed a few more warnings in gcc with the '-W -Wall' flags
 20-Jul-2005
 	- Jorrit made csColliderActor more robust by checking if the other
 	  mesh has a collider.

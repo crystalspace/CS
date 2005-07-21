@@ -448,7 +448,7 @@ ccHashNode::ccHashNode()
 	Hash = 0;
 }
 
-ccHashNode::ccHashNode( ccHashNode& hashnode )
+ccHashNode::ccHashNode( ccHashNode& hashnode ) : ImageLib::ccMinNode()
 {
 	Name = NULL;
 	myPtr = NULL;

@@ -177,11 +177,10 @@ static void ClearSystemPalette ()
     WORD Version;
     WORD nEntries;
     PALETTEENTRY aEntries[256];
-  } Palette =
-  {
-    0x300,
-      256
-  };
+  } Palette;
+
+  Palette.Version = 0x300;
+  Palette.nEntries = 256;
 
   int c;
   for (c = 0; c < 256; c++)
@@ -211,11 +210,10 @@ static void CreateIdentityPalette (csRGBpixel *p)
     WORD Version;
     WORD nEntries;
     PALETTEENTRY aEntries[256];
-  } Palette =
-  {
-    0x300,
-      256
-  };
+  } Palette;
+
+  Palette.Version = 0x300;
+  Palette.nEntries = 256;
 
   if (hWndPalette)
     DeleteObject (hWndPalette);

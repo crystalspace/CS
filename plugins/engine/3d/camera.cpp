@@ -63,7 +63,7 @@ csCamera::csCamera (csCamera *c) :
 }
 
 csCamera::csCamera (const csCamera &c) :
-  csOrthoTransform()
+  csOrthoTransform(), iCamera()
 {
   *this = c;
   if (fp)
