@@ -63,10 +63,8 @@ protected:
       mlEvent *ev = new mlEvent;
       ev->inputDef = e;
       ev->ring = ring;
-      if (InsertSorted (ev, Compare) >= 0)
-        return true;
-      delete ev;
-      return false;
+      InsertSorted (ev, Compare);
+      return true;
     }
   };
 

@@ -157,7 +157,7 @@ csRef<iImage> csImageCubeMapMaker::GetSubImage (uint num)
 {
   if (num == 0)
     return this;
-  else if ((num > 0) && (num < NUM_FACES))
+  else if (num < NUM_FACES)
   {
     CheckImage (num);
     return cubeImages[num];
@@ -168,7 +168,7 @@ csRef<iImage> csImageCubeMapMaker::GetSubImage (uint num)
 
 void csImageCubeMapMaker::SetSubImage (uint num, iImage* image)
 {
-  if ((num >= 0) && (num < NUM_FACES))
+  if (num < NUM_FACES)
   {
     cubeImages[num] = image;
     if (!manualName) UpdateName();

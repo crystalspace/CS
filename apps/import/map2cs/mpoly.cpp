@@ -242,7 +242,6 @@ void CMapPolygon::Clear()
 bool CMapPolygon::IsEmpty()
 {
   assert(m_Vertices.Length() == m_Planes.Length());
-  assert(m_Vertices.Length() >= 0);
 
   return m_Vertices.Length() == 0;
 }

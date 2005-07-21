@@ -119,9 +119,9 @@ bool csCommandLineParser::ReplaceOption (
 
 bool csCommandLineParser::ReplaceName (const char *iValue, size_t iIndex)
 {
-  if ((iIndex >= 0) && (iIndex < Names.Length ()))
+  if (iIndex < Names.Length ())
   {
-    Names.Put (iIndex, (char*)iValue);
+    Names.Put (iIndex, iValue);
     return true;
   }
   else
@@ -136,7 +136,7 @@ const char *csCommandLineParser::GetOption(const char *iName, size_t iIndex) con
 
 const char *csCommandLineParser::GetName (size_t iIndex) const
 {
-  if ((iIndex >= 0) && (iIndex < Names.Length ()))
+  if (iIndex < Names.Length ())
     return Names[iIndex];
   return 0;
 }

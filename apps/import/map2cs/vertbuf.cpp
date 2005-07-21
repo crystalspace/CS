@@ -41,7 +41,7 @@ CVertexBuffer::~CVertexBuffer()
 void CVertexBuffer::AddVertex(CdVector3 Vertex)
 {
   //Check if the vertex is already stored in the Buffer
-  if (GetIndex(Vertex)>=0) return;
+  if (GetIndex(Vertex) != (size_t)-1) return;
 
   //It's a new Vertex:
   m_Vertices.Push(new CdVector3(Vertex));

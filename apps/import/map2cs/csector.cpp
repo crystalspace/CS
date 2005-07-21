@@ -197,7 +197,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
  	  CMapPolygon*   pPolygon = pPortal->GetPolygon(j);
  	  
  	  CVertexBuffer Vb;
- 	  for (size_t l = pPolygon->GetVertexCount() - 1 ; l >= 0; l-- ) 
+ 	  for (size_t l = pPolygon->GetVertexCount() - 1; l != (size_t)-1; l--) 
 	  {
  	    Vb.AddVertex(pPolygon->GetVertex(l));
  	  }

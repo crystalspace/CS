@@ -940,7 +940,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     //Because for a sector we draw the _inside_ of the brush, we spit out the
     //vertices in reverse order, so they will have proper orientation for
     //backface culling in the engine.
-    for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
+    for (l=pPolygon->GetVertexCount()-1; l!=(size_t)-1; l--)
     {
       CreateNode (poly, "v", (int)Vb.GetIndex(pPolygon->GetVertex(l)));
     }

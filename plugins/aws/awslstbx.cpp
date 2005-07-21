@@ -377,18 +377,18 @@ void awsListBox::MapVisibleItems (
 static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 {
   v->sortcol = v->local_sortcol;
-  int i = (int)v->FindKey (v->KeyCmp(text));
+  int key = v->FindKey (v->KeyCmp(text));
 
-  if (i>=0)
+  if (key>=0)
   {
-    if (with_delete) v->DeleteIndex (i);
+    if (with_delete) v->DeleteIndex (key);
 
-    return i;
+    return key;
   }
   else
   {
-    size_t j;
-    for (i = 0; i < (int)v->Length (); ++i)
+    int j;
+    for (size_t i = 0; i < v->Length (); ++i)
     {
       awsListRow *r = (awsListRow *) ((*v)[i]);
       if (r->children &&
@@ -396,7 +396,7 @@ static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
       {
         if (with_delete) r->children->DeleteIndex (j);
 
-        return (int)j;
+        return j;
       }
     }
   }

@@ -109,6 +109,7 @@ static struct
   1/500.0f,
   false,
   false,
+  false,
   0,
   false
 };
