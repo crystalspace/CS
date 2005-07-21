@@ -25,6 +25,7 @@ chronological order.
 	- mdmkolbe put an #ifdef guard around a MSVC only #pragma
 	- Eric Sunshine eliminated compilation warning in csShaderVariable
 	  copy constructor.
+	- mdmkolbe fixed several warnings in gcc with the '-W -Wall' flags
 19-Jul-2005
 	- Jorrit removed the unused GetVisibilityNumber/SetVisibilityNumber.
 	- Jorrit fixed the thing plugin so that it does a small correction

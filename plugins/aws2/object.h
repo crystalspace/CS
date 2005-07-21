@@ -91,7 +91,7 @@ namespace autom
 		string():object(T_STRING) {}
 		virtual ~string() {}
 		
-		string(const string& s):object(s, T_STRING), value(s.value) {}		
+		string(const string& s):iObject(), object(s, T_STRING), value(s.value) {}		
 				
 		string(const csString &s):object(T_STRING), value(s) {}
 
@@ -159,7 +159,7 @@ namespace autom
 		integer():object(T_INT) {}
 		
 		/** Copy constructor. */
-		integer(const integer& i):object(i, T_INT), value(i.value) {}
+		integer(const integer& i):iObject(), object(i, T_INT), value(i.value) {}
 		
 		integer(longlong i):object(T_INT), value(i) {}
 		
@@ -246,7 +246,7 @@ namespace autom
 		floating():object(T_FLOAT) {}
 		
 		/** Copy constructor. */
-		floating(const floating& i):object(i, T_FLOAT), value(i.value) {}
+		floating(const floating& i):iObject(), object(i, T_FLOAT), value(i.value) {}
 		
 		floating(double i):object(T_FLOAT), value(i) {}
 		
@@ -315,7 +315,7 @@ namespace autom
 		virtual ~list() {}
 		
 		/** Copy constructor. */
-		list(const list& s):object(s, T_LIST)
+		list(const list& s):iObject(), object(s, T_LIST)
 		{			
 			value.insert(value.end(), s.value.begin(), s.value.end());	
 		}		
@@ -374,7 +374,7 @@ namespace autom
 		reference():object(T_REFERENCE), fn(0) {}
 		virtual ~reference() {}
 		
-		reference(const reference& s):object(s, T_REFERENCE), value(s.value), fn(s.fn) {}	
+		reference(const reference& s):iObject(), object(s, T_REFERENCE), value(s.value), fn(s.fn) {}	
 		
 		void setParent(function *_fn) { fn=_fn; }					
 		
@@ -405,7 +405,7 @@ namespace autom
 		virtual ~nil() {}
 		
 		/** Copy constructor. */
-		nil(const nil& s):object(s, T_NIL) {}		
+		nil(const nil& s):iObject(), object(s, T_NIL) {}		
 						
 		/** Converts the object into a string object if possible. */
 		virtual string ToString();

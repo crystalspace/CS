@@ -234,11 +234,13 @@ protected: // 'protected' allows access by test-suite.
   void DestroyObject(T* p, bool warn = false) const
   {
     p->~T();
-#ifdef CS_DEBUG
     if (warn)
+    {
+#ifdef CS_DEBUG
       csPrintfErr("NOTIFY: csBlockAllocator(%p) destroying potentially leaked "
                   "object at %p.\n", this, p);
 #endif
+    }
 #ifdef CS_BLOCKALLOC_DEBUG
     memset (p, 0xfb, elsize);
 #endif

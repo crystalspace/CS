@@ -122,7 +122,7 @@ namespace autom
 		}
 				
 		/** Copy constructor: does NOT copy the return value or the parameters! */
-		function(const function& func):object(T_FUNCTION), rv(0), parent(0), repr_exec(func.repr_exec), Called(func.Called) {}
+		function(const function& func):iObject(), object(T_FUNCTION), rv(0), parent(0), repr_exec(func.repr_exec), Called(func.Called) {}
 		
 		/** Signal fired when function is called. */
 		signal Called;

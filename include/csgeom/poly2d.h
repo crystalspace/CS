@@ -84,7 +84,7 @@ public:
    */
   csVector2* GetVertex (size_t i)
   {
-    if (i<0 || i>=num_vertices) return 0;
+    if (i>=num_vertices) return 0;
     return &vertices[i];
   }
 
@@ -93,7 +93,7 @@ public:
    */
   csVector2& operator[] (size_t i)
   {
-    CS_ASSERT (i >= 0 && i < num_vertices);
+    CS_ASSERT (i < num_vertices);
     return vertices[i];
   }
 
@@ -102,7 +102,7 @@ public:
    */
   const csVector2& operator[] (size_t i) const
   {
-    CS_ASSERT (i >= 0 && i < num_vertices);
+    CS_ASSERT (i < num_vertices);
     return vertices[i];
   }
 

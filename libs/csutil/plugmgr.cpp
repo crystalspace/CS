@@ -331,8 +331,6 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
   csScopedMutexLock lock (mutex);
   size_t idx = Plugins.FindKey (
     csArrayCmp<csPlugin*,iComponent*>(obj, csPluginsVector::CompareAddress));
-  if (idx < 0)
-    return false;
 
   csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (obj, iPluginConfig));
   if (config)

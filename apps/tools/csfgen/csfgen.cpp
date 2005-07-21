@@ -508,8 +508,7 @@ int main (int argc, char* argv[])
         return -1;
       case 'f':
         opt.first = atoi (optarg);
-        if ((opt.first < 0)
-         || (opt.first > 1114111))
+        if (opt.first > 1114111)
         {
           csFPrintf (stderr, "ERROR: first glyph should be 0..1114111\n");
           return -2;

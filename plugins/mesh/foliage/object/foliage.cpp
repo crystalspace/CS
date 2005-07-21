@@ -118,7 +118,7 @@ csPtr<iFoliageGeometry> csFoliageObject::CreateGeometryLOD (size_t fromslot,
 
 iFoliageGeometry* csFoliageObject::GetGeometry (size_t lodslot)
 {
-  if (lodslot < 0 || lodslot >= geometry.Length ()) return 0;
+  if (lodslot >= geometry.Length ()) return 0;
   return geometry[lodslot];
 }
 

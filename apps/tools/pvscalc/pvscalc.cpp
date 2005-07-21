@@ -423,8 +423,13 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     }
     else
     {
+      float abs_diff;
+      if (left > right)
+        abs_diff = left - right;
+      else
+        abs_diff = right - left;
       float qual_cut = 1.0 - (float (cut) * inv_num_objects);
-      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      float qual_balance = 1.0 - (abs_diff * inv_num_objects);
       qual = 6.0 * qual_cut + qual_balance;
     }
     if (qual > best_qual)
@@ -496,8 +501,13 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_xY)) &&
       	csPoly2D_In (slice, box_slice.GetCorner (CS_BOX_CORNER_XY));
 
+      float abs_diff;
+      if (left > right)
+        abs_diff = left - right;
+      else
+        abs_diff = right - left;
       float qual_cut = 1.0 - (float ((int)cut) * inv_num_objects);
-      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      float qual_balance = 1.0 - (abs_diff * inv_num_objects);
       // Bonus for using axis plane.
       qual = 0.6 + (6.0 * qual_cut + qual_balance);
       if (solid)
@@ -569,8 +579,13 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     }
     else
     {
+      float abs_diff;
+      if (left > right)
+        abs_diff = left - right;
+      else
+        abs_diff = right - left;
       float qual_cut = 1.0 - (float (cut) * inv_num_objects);
-      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      float qual_balance = 1.0 - (abs_diff * inv_num_objects);
       qual = 6.0 * qual_cut + qual_balance;
     }
     if (qual > best_qual)

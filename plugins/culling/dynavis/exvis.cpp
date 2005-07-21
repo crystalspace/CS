@@ -139,8 +139,10 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, size_t num_verts,
       if (sy <= fyL)
       {
         scanL1 = scanL2;
-	if (--scanL2 < 0)
+	if (scanL2 == 0)
 	  scanL2 = num_verts - 1;
+	else
+	  scanL2 = scanL2 - 1;
 
         leave = false;
         fyL = csQround (tr_verts [scanL2].y);

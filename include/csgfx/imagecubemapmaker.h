@@ -39,8 +39,9 @@
 class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker : public csImageBase
 {
 protected:
+  static const int NUM_FACES = 6;
   /// The cube face images
-  csRef<iImage> cubeImages[6];
+  csRef<iImage> cubeImages[NUM_FACES];
   /**
    * Whether the name was manually overridden (in this case it is not updated
    * when the contained images are changed).
@@ -95,7 +96,7 @@ public:
   virtual const char* GetRawFormat() const;
   virtual csRef<iDataBuffer> GetRawData() const;
   virtual csImageType GetImageType() const { return csimgCube; }
-  virtual uint HasSubImages() const { return 5; }
+  virtual uint HasSubImages() const { return NUM_FACES - 1; }
   virtual csRef<iImage> GetSubImage (uint num);
   
   /// Set a specific face.
@@ -107,7 +108,7 @@ public:
    * the internal face reference is 0 or not.
    */
   bool SubImageSet (uint num) 
-  { return ((num >= 0) && (num <= 5) && (cubeImages[num].IsValid())); }
+  { return ((num < NUM_FACES) && (cubeImages[num].IsValid())); }
 };
 
 /** @} */
