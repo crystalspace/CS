@@ -404,9 +404,9 @@ bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv,
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_FACENORMAL"))
   {
-    size_t n = in.ReadTextInt ();
-    if (n>=conv->Polygons.Length ()) return false;
-    conv->CurrentPolygon = conv->Polygons.Get (n);
+    int const n = in.ReadTextInt ();
+    if (n < 0 || n >= conv->Polygons.Length ()) return false;
+    conv->CurrentPolygon = conv->Polygons.Get ((size_t)n);
     conv->CurrentVertex = 0;
     return true;
   }
