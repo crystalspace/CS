@@ -13098,6 +13098,7 @@ sub new {
 *SetGravity = *cspacec::csColliderActor_SetGravity;
 *GetGravity = *cspacec::csColliderActor_GetGravity;
 *IsOnGround = *cspacec::csColliderActor_IsOnGround;
+*SetOnGround = *cspacec::csColliderActor_SetOnGround;
 *CheckRevertMove = *cspacec::csColliderActor_CheckRevertMove;
 *Move = *cspacec::csColliderActor_Move;
 *AdjustForCollisions = *cspacec::csColliderActor_AdjustForCollisions;
