@@ -10,6 +10,7 @@ Everything about animation.
 @menu
 * Sprite3D Animation::
 * SpriteCal3D Animation::
+* Socket Animation::
 * GenMesh Animation::
 * Sequence Manager::
 * ProcTextures:: Procedural Texture System
@@ -17,6 +18,7 @@ Everything about animation.
 
 @importss{usingcs,animation,sprite3danim.txi}
 @importss{usingcs,animation,sprcal3danim.txi}
+@importss{usingcs,animation,sockets.txi}
 @importss{usingcs,animation,genmeshanim.txi}
 @importss{usingcs,animation,sequence.txi}
 @importss{usingcs,animation,proctex.txi}

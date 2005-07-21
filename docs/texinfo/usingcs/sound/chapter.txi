@@ -3,7 +3,7 @@
 @section Sound System
 @cindex sound
 
-Everything about collision detection and physics.
+Everything about sound.
 
 @menu
 * Sound Drivers:: Sound Plugins

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node GenMesh Animation, Sequence Manager, SpriteCal3D Animation, Animation
+@node GenMesh Animation, Sequence Manager, Socket Animation, Animation
 @subsection GenMesh Animation
 @cindex GenMesh
 

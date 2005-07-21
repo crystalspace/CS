@@ -8,6 +8,8 @@ chronological order.
 
 21-Jul-2005
 	- mdmkolbe fixed a few more warnings in gcc with the '-W -Wall' flags
+	- Jorrit added a section to the docs about sprite sockets. Also did
+	  a small correction to the sound section.
 20-Jul-2005
 	- Jorrit made csColliderActor more robust by checking if the other
 	  mesh has a collider.

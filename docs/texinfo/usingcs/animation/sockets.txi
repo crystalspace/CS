@@ -1,0 +1,103 @@
+@c -*-texinfo-*-
+@node Socket Animation, GenMesh Animation, SpriteCal3D Animation, Animation
+@subsection Socket Animation
+@cindex SpriteCal3D
+@cindex Sprite3D
+@cindex Sockets
+
+When you have an animated actor you often want that actor to hold something
+in its hands. Or put a helmet on its head. For this purpose Crystal Space
+has the concept of @dfn{sockets}. Basically a socket is a triangle of the
+mesh on which you can attach other meshes. So when the triangle moves (because
+the model animates) the other mesh (like a weapon) will move with it.
+At this moment both 3D sprites (@pxref{MeshObject Spr3D}, and Cal3D sprites
+(@pxref{MeshObject SprCal3D}) support this feature.
+
+@subsubheading Defining the Socket
+
+To define the socket you can specify it in the mesh factory file of the model.
+For Cal3D models this happens with something like this:
+
+@example
+<meshfact name="model">
+  @dots{}
+  <params>
+    @dots{}
+    <socket name="lefthand" tri="3" mesh="0" submesh="1" />
+    <socket name="righthand" tri="5" mesh="0" submesh="2" />
+  </params>
+</meshfact>
+@end example
+
+Basically you have to find out the mesh, submesh, and triangle that specifies
+the place where you want to attach things. In the example above we created
+two sockets, one for the left hand and one for the right hand.
+
+For Spr3D models you have to do it like this:
+
+@example
+<meshfact name="model">
+  @dots{}
+  <params>
+    @dots{}
+    <socket name="lefthand" tri="3" />
+    <socket name="righthand" tri="5" />
+  </params>
+</meshfact>
+@end example
+
+So it is the same but Spr3D doesn't have the concept of meshes and submeshes.
+
+@subsubheading Attaching a Mesh to a Socket
+
+With this function you can attach a mesh to a socket for a Cal3D model:
+
+@example
+bool AttachMesh (iMeshWrapper* actorMesh, const char* socketName,
+	const char* objectFactoryName)
+@{
+  csRef<iSpriteCal3DState> cal3dstate = SCF_QUERY_INTERFACE (
+  	actorMesh->GetMeshObject (), iSpriteCal3DState);
+  if (!cal3dstate) return false;
+  iSpriteCal3DSocket* socket = cal3dstate->FindSocket (socketName);
+  if (!socket) return false;
+  iMeshFactoryWrapper* objectFactory = engine->GetMeshFactories ()
+  	->FindByName (objectFactoryName);
+  if (!objectFactory) return false;
+  csRef<iMeshWrapper> object = engine->CreateMeshWrapper (objectFactory,
+  	objectFactoryName);
+  actorMesh->GetChildren ()->Add (object);
+  socket->SetMeshWrapper (object);
+  // Set a relative transform to correct the orientation of the object
+  // relative to the socket orientation.
+  csTransform trans = @dots{};
+  socket->SetTransform (trans);
+  return true;
+@}
+@end example
+
+For Spr3D it is exactly the same except that you have to use
+@code{iSpriteSocket} instead of @code{iSpriteCal3DSocket} and you can't
+currently change the relative transform.
+
+@subsubheading Detaching a Mesh from a Socket
+
+To remove a mesh from a socket you can do this:
+
+@example
+bool DetachMesh (iMeshWrapper* actorMesh, const char* socketName)
+@{
+  csRef<iSpriteCal3DState> cal3dstate = SCF_QUERY_INTERFACE (
+  	actorMesh->GetMeshObject (), iSpriteCal3DState);
+  if (!cal3dstate) return false;
+  iSpriteCal3DSocket* socket = cal3dstate->FindSocket (socketName);
+  if (!socket) return false;
+  iMeshWrapper* object = socket->GetMeshWrapper ();
+  if (!object) return false;
+  actorMesh->GetChildren ()->Remove (object);
+  socket->SetMeshWrapper (0);
+  engine->RemoveObject (object);
+  return true;
+@}
+@end example
+
