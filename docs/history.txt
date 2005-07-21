@@ -15,6 +15,10 @@ chronological order.
 	- Eric Sunshine fixed broken initialization loop in
 	  CreateIdentityPalette() in the Windows OpenGL canvas. Reported by
 	  Michael D. Adams.
+	- Marten added a system for handling of official enhancement proposals
+	  within CS. System called CSEP, derived from Pythons PEP. 
+	  Supportfiles to convert the text source to html as well as a few
+	  initial CSEPs have been added.
 20-Jul-2005
 	- Jorrit made csColliderActor more robust by checking if the other
 	  mesh has a collider.
