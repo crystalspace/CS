@@ -10,6 +10,8 @@ chronological order.
 	- mdmkolbe fixed a few more warnings in gcc with the '-W -Wall' flags
 	- Jorrit added a section to the docs about sprite sockets. Also did
 	  a small correction to the sound section.
+	- Eric Sunshine fixed several logic flaws introduced by the recent
+	  `-W -Wall' changes.
 20-Jul-2005
 	- Jorrit made csColliderActor more robust by checking if the other
 	  mesh has a collider.
