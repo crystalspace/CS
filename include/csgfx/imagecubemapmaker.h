@@ -39,7 +39,7 @@
 class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker : public csImageBase
 {
 protected:
-  enum { NUM_FACES = 6; };
+  enum { NUM_FACES = 6 };
   /// The cube face images
   csRef<iImage> cubeImages[NUM_FACES];
   /**
