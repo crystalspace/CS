@@ -165,6 +165,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
+#define CS_WIN_PALETTE_SIZE 256
 
 ///// Windowed-mode palette stuff //////
 
@@ -176,14 +177,14 @@ static void ClearSystemPalette ()
   {
     WORD Version;
     WORD nEntries;
-    PALETTEENTRY aEntries[256];
+    PALETTEENTRY aEntries[CS_WIN_PALETTE_SIZE];
   } Palette;
 
   Palette.Version = 0x300;
-  Palette.nEntries = 256;
+  Palette.nEntries = CS_WIN_PALETTE_SIZE;
 
   int c;
-  for (c = 0; c < 256; c++)
+  for (c = 0; c < CS_WIN_PALETTE_SIZE; c++)
   {
     Palette.aEntries[c].peRed = 0;
     Palette.aEntries[c].peGreen = 0;
@@ -209,11 +210,11 @@ static void CreateIdentityPalette (csRGBpixel *p)
   {
     WORD Version;
     WORD nEntries;
-    PALETTEENTRY aEntries[256];
+    PALETTEENTRY aEntries[CS_WIN_PALETTE_SIZE];
   } Palette;
 
   Palette.Version = 0x300;
-  Palette.nEntries = 256;
+  Palette.nEntries = CS_WIN_PALETTE_SIZE;
 
   if (hWndPalette)
     DeleteObject (hWndPalette);
@@ -222,7 +223,7 @@ static void CreateIdentityPalette (csRGBpixel *p)
   Palette.aEntries[0].peFlags = 0;
 
   int i;
-  for (i = 1; i < 255; i++)
+  for (i = 1; i < CS_WIN_PALETTE_SIZE; i++)
   {
     Palette.aEntries[i].peRed = p[i].red;
     Palette.aEntries[i].peGreen = p[i].green;
@@ -283,7 +284,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 
   if (Depth == 8)
   {
-    pfmt.PalEntries = 256;
+    pfmt.PalEntries = CS_WIN_PALETTE_SIZE;
     pfmt.PixelBytes = 1;
   }
 

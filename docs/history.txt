@@ -12,6 +12,9 @@ chronological order.
 	  a small correction to the sound section.
 	- Eric Sunshine fixed several logic flaws introduced by the recent
 	  `-W -Wall' changes.
+	- Eric Sunshine fixed broken initialization loop in
+	  CreateIdentityPalette() in the Windows OpenGL canvas. Reported by
+	  Michael D. Adams.
 20-Jul-2005
 	- Jorrit made csColliderActor more robust by checking if the other
 	  mesh has a collider.
