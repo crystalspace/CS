@@ -14,13 +14,13 @@ Abstract
 The SCF [1]_ system in CS was designed a few years back to provide a 
 lightweight component system resembling the COM system. Due to compiler
 limitations at the time of writing and the will of those developers who 
-wrote it, it is in large based on macros to help the end-developer utilize 
+wrote it, it is largely based on macros to help the end-developer utilize 
 it. 
 
 Today many find this design both hard to understand and non-modern. 
 This CSEP proposes an implementation of SCF based on the support modern
 compilers have for templates. 
-It does maintain source compatibility with the current implementation.
+It does this, while maintaining source compatibility with the current implementation.
 
 If you feel that you know the current SCF system and the motives behind it
 you can skip some/large parts of the first sections.
@@ -29,21 +29,20 @@ Motivation
 ==========
 The main motivation for a change this big is ease of use and understanding. 
 While the macro-system hides a lot of the implementational details from
-both the developer implementing new classes and end-developers using them 
+both the developer implementing new classes and end-developers using them,
 they also introduce new problems.
 
 The macros build up new classes, template specializations and function 
 implementations at compile time in the preprocessor. While this works well
 it results in sometimes very complicated error messages, as the preprocessor
-does no error checking, and makes the code hard to trace in a source-
-following debugger like MSVC as it shows the macro instead of the code it 
-generates.
+does no error checking, and makes the code hard to trace in a source-following
+debugger like MSVC as it shows the macro instead of the code it generates.
 
-The solution which earlier has been discussed to this problem is to rewrite
+The solution to this problem which has been discussed before is to rewrite
 the system to instead use class templates. There have been a few proposals 
-to the cs-main mailing list over a period of time but none of these proposals
-have reached any result which has been generally accepted. This proposal 
-tries to combine ideas with these with solutions tha makes sure that:
+to the cs-main mailing list over a period of time, but none of these proposals
+have reached any generally accepted result. This proposal 
+tries to combine ideas with these with solutions that make sure that:
 
 - Source compatibility is maintained. Old code on both creator and user 
   side should work.
@@ -119,14 +118,14 @@ methods to the interface, ``const char * GetInterfaceName ()`` and ``int GetInte
 Implementational classes
 ------------------------
 Today the major SCF macro-goop is when a class implements one or several SCF interfaces.
-By instead of the macros have a templated base-class with template mixins you can provide
+Instead of the macros, by having a templated base-class with template mixins you can provide
 the same functionality while having a simpler syntax.
 
 
 Class implementing a single interface
 '''''''''''''''''''''''''''''''''''''
-The simplest example is an implementational class implementing a single SCF interface.
-Using the new syntax a class implementing iFoo above would be written:
+The simplest example is an implementation class implementing a single SCF interface.
+Using the new syntax, a class implementing iFoo above would be written:
 
 ::
 
@@ -215,37 +214,35 @@ Rationale
 
 General design
 --------------
-The whole design of a new SCF system needs to be compatible which puts some
+The whole design of a new SCF system needs to be compatible. This puts some
 restrictions on what it can do. The identified restrictions are:
 
 - iBase interface must still contain the same methods. Something to consider
   for the future is to remove the static QueryInterfaceSafe and only have it 
-  as a free function. This to make iBase truly an ABC [2]_.
+  as a free function. This is to make iBase truly an ABC [2]_.
   
-- The reference counting semantics can not change. It still needs to be
+- The reference counting semantics cannot change. It still needs to be
   internal and use intrusive reference counting.
   
-- The change to classes using SCF and providing SCF interfaces should be as
+- The changes to classes using SCF and providing SCF interfaces should be as
   small as possible. It should be possible to continue to use the old macros
-  without that breaking anything.
+  without breaking anything.
   
-Apart from these compatibility imposed restrictions we've imposed these 
+Apart from these compatibility imposed restrictions, we've imposed these 
 restrictions ourselves on the design, as we believe these makes the system
 more usable:
 
 - It should be possible to declare interfaces and implementation classes in
   namespaces. This leads to a secondary requirement that an interface or
-  implementation class can not need a template specialization as template
+  implementation class should not need a template specialization as template
   specialization needs to be in the same namespace as the original template.
 
 - The implementation should not use RTTI as it is problematic over module
   boundaries.
-  
-- 
 
 Templated free functions
 ------------------------
-Templated free functions are used instead of macros as thee former are type-
+Templated free functions are used instead of macros as the former are type-
 safe and is what is recommended by the C++ standard [3]_. The technical reason
 to have them is merly convenience and compatibility. The functionality they
 provide exists within iBase and iSCF.
@@ -260,7 +257,7 @@ interfaces. For compatibility reasons this class is used in two ways:
    template specialization of the class is declared. This introduces the 
    limitation that old-style interfaces cannot be declared in namespaces.
 
-2. New-style interfaces. New-style interfaces should work well togheter
+2. New-style interfaces. New-style interfaces should work well together
    with namespaces which means the specialization-technique isn't useable.
    Instead the non-specialized version of scfInterfaceTrait<Class> is used 
    and gets information from two static methods in Class named GetInterfaceName 
@@ -271,8 +268,8 @@ scfImplementation and scfImplementationN template class
 -------------------------------------------------------
 scfImplementation and it's derived class scfImplementationN are the classes
 providing the main functionality for handling reference counting and querying
-interfaces. It is split up to one part for class specific code, 
-scfImplementation, and one which also depends on the number of interfaces 
+interfaces. It is split up into one part for class specific code, 
+scfImplementation, and one part which also depends on the number of interfaces 
 in use.
 
 The scfImplementationN (N=1->10) classes needs to be explicitly declared
