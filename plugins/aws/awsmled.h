@@ -63,8 +63,10 @@ protected:
       mlEvent *ev = new mlEvent;
       ev->inputDef = e;
       ev->ring = ring;
-      InsertSorted (ev, Compare);
-      return true;
+      if (InsertSorted (ev, Compare) != csArrayItemNotFound)
+	return true;
+      delete ev;
+      return false;
     }
   };
 
