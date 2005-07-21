@@ -97,7 +97,7 @@ static struct
 } opt =
 {
   false,
-  true,
+  false,
   false,
   false,
   0, 0,
