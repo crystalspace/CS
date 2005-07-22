@@ -407,10 +407,10 @@ Provides ways to get information about an interface:
         return Interface::InterfaceTrait::GetVersion();
       }
 
-      static scfInterfaceTraitID GetID()
+      static scfInterfaceID GetID()
       {
         scfInterfaceID& ID = GetMyID();
-        if (ID == (scfInterfaceTraitID)(-1))
+        if (ID == (scfInterfaceID)(-1))
         {
           ID = iSCF::SCF->GetInterfaceID(GetName ());
           csStaticVarCleanup (CleanupID);
@@ -566,7 +566,7 @@ almost the same
           return static_cast<I1*>(scfObject);
         }
         ...
-        if (iInterfaceID == scfInterfaceTrait2<IN>::GetID () &&
+        if (iInterfaceID == scfInterfaceTrait<IN>::GetID () &&
             scfCompatibleVersion (iVersion, scfInterfaceTrait2<IN>::GetInterfaceVersion ()))
         {
           scfObject->IncRef();
