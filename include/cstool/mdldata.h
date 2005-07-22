@@ -59,11 +59,11 @@
  * whereever an object should be embedded instead of an interface.
  */
 #define CS_IMPLEMENT_EMBEDDED_OBJECT(Class)				\
-  SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
-  SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
-  SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT (Class);			\
-  SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER (Class);			\
-  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF (Class)				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF (Class)				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT (Class)			\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER (Class)				\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY (Class)				\
     void *o = __scf_superclass__::QueryInterface (iInterfaceID, iVersion); \
     if (o) return o;							\
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END

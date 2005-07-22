@@ -185,7 +185,7 @@ csBinaryDocAttribute::csBinaryDocAttribute ()
 
   vstr = 0;
   vsptr = 0;
-};
+}
 
 csBinaryDocAttribute::~csBinaryDocAttribute ()
 {

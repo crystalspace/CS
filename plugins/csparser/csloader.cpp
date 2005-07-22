@@ -106,7 +106,7 @@ csLoaderStatus::~csLoaderStatus ()
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 StdLoaderContext::StdLoaderContext (iEngine* Engine,
 	iRegion* region, bool curRegOnly, csLoader* loader,
@@ -304,7 +304,7 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
 
 SCF_IMPLEMENT_IBASE(ThreadedLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
 	iRegion* region, bool curRegOnly, csLoader* loader,
@@ -955,13 +955,13 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 SCF_IMPLEMENT_IBASE(csLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoader);
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_FACTORY(csLoader);
+SCF_IMPLEMENT_FACTORY(csLoader)
 
 CS_IMPLEMENT_PLUGIN
 

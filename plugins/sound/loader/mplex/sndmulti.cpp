@@ -64,13 +64,13 @@ public:
   } scfiComponent;
 };
 
-SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
+SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer)
 
 
 SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoaderMultiplexer::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)

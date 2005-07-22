@@ -94,7 +94,7 @@ public:
   }
 };
 
-CS_IMPLEMENT_STATIC_VAR (GetVertexArrayAlloc, csVertexArrayAlloc, ());
+CS_IMPLEMENT_STATIC_VAR (GetVertexArrayAlloc, csVertexArrayAlloc, ())
 
 
 // OpenStep compiler generates corrupt assembly output (with unresolveable

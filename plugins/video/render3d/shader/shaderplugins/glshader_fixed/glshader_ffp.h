@@ -134,7 +134,7 @@ private:
 
   void BuildTokenHash();
 
-  inline csVector4 csGLShaderFFP::GetParamVal (const csShaderVarStack &stacks,
+  inline csVector4 GetParamVal (const csShaderVarStack &stacks,
     const ProgramParam &param);
 public:
   CS_LEAKGUARD_DECLARE (csGLShaderFFP);

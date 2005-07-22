@@ -50,7 +50,7 @@
   { name = val; }
 
 #define CS_IMPLEMENT_OBJECT_INTERFACE(clname)				\
-  CS_IMPLEMENT_EMBEDDED_OBJECT (clname::Embedded_csObject);		\
+  CS_IMPLEMENT_EMBEDDED_OBJECT (clname::Embedded_csObject)		\
   iObject* clname::QueryObject ()					\
   { return &scfiObject; }
 
@@ -63,7 +63,7 @@ SCF_IMPLEMENT_IBASE (csModelDataTexture)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture)
 
 csModelDataTexture::csModelDataTexture ()
 {
@@ -90,8 +90,8 @@ const char *csModelDataTexture::GetFileName () const
   return FileName;
 }
 
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataTexture, iImage*, Image);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataTexture, iTextureWrapper*, TextureWrapper);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataTexture, iImage*, Image)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataTexture, iTextureWrapper*, TextureWrapper)
 
 void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
 {
@@ -126,7 +126,7 @@ SCF_IMPLEMENT_IBASE (csModelDataMaterial)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial)
 
 csModelDataMaterial::csModelDataMaterial ()
 {
@@ -140,8 +140,8 @@ csModelDataMaterial::~csModelDataMaterial ()
   SCF_DESTRUCT_IBASE ();
 }
 
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterial*, BaseMaterial);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterial*, BaseMaterial)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper)
 
 void csModelDataMaterial::Register (iMaterialList *ml)
 {
@@ -164,16 +164,16 @@ SCF_IMPLEMENT_IBASE (csModelDataVertices)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataVertices);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataVertices)
 
 CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
-	const csVector3 &, Vertex, Vertices);
+	const csVector3 &, Vertex, Vertices)
 CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
-	const csVector3 &, Normal, Normals);
+	const csVector3 &, Normal, Normals)
 CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
-	const csColor &, Color, Colors);
+	const csColor &, Color, Colors)
 CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
-	const csVector2 &, Texel, Texels);
+	const csVector2 &, Texel, Texels)
 
 csModelDataVertices::csModelDataVertices ()
 {
@@ -271,7 +271,7 @@ SCF_IMPLEMENT_IBASE (csModelDataAction)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataAction);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataAction)
 
 csModelDataAction::csModelDataAction ()
 {
@@ -349,7 +349,7 @@ SCF_IMPLEMENT_IBASE (csModelDataPolygon)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataPolygon);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataPolygon)
 
 csModelDataPolygon::csModelDataPolygon ()
 {
@@ -388,11 +388,11 @@ void csModelDataPolygon::DeleteVertex (size_t n)
   Texels.DeleteIndex (n);
 }
 
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataPolygon, iModelDataMaterial*, Material);
-CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Vertex, Vertices);
-CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Normal, Normals);
-CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Color, Colors);
-CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataPolygon, iModelDataMaterial*, Material)
+CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Vertex, Vertices)
+CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Normal, Normals)
+CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Color, Colors)
+CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels)
 
 iModelDataPolygon *csModelDataPolygon::Clone () const
 {
@@ -411,10 +411,10 @@ SCF_IMPLEMENT_IBASE (csModelDataObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataObject);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataObject)
 
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataObject,
-	iModelDataVertices *, DefaultVertices);
+	iModelDataVertices *, DefaultVertices)
 
 csModelDataObject::csModelDataObject ()
 {
@@ -435,12 +435,12 @@ SCF_IMPLEMENT_IBASE (csModelDataCamera)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataCamera);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataCamera)
 
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, Position);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, UpVector);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, FrontVector);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, RightVector);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, Position)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, UpVector)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, FrontVector)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, RightVector)
 
 csModelDataCamera::csModelDataCamera ()
 {
@@ -502,11 +502,11 @@ SCF_IMPLEMENT_IBASE (csModelDataLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataLight);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataLight)
 
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, float, Radius);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csColor &, Color);
-CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csVector3 &, Position);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, float, Radius)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csColor &, Color)
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csVector3 &, Position)
 
 csModelDataLight::csModelDataLight ()
 {
@@ -536,7 +536,7 @@ SCF_IMPLEMENT_IBASE (csModelData)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelData);
+CS_IMPLEMENT_OBJECT_INTERFACE (csModelData)
 
 csModelData::csModelData ()
 {

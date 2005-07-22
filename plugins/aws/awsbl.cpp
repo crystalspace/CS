@@ -33,7 +33,7 @@ awsBorderLayout::awsBorderLayout (
   // Get gap settings.
   pm->GetInt (settings, "VerticalGap", vGap);
   pm->GetInt (settings, "HorizontalGap", hGap);
-};
+}
 
 csRect awsBorderLayout::AddComponent (
   iAwsComponent *cmp,

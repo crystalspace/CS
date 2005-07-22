@@ -48,7 +48,7 @@ csTicks csGetTicks ()
   //accuracy instead of very rough ticks. This routine will also provide
   //correct wrap around at the end of "long"
 #if defined(__CYGWIN32__)
-#	define __int64 long long
+#      define __int64 long long
 #endif
 
   static __int64 Freq      = 0;

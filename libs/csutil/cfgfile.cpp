@@ -241,7 +241,7 @@ private:
 
 SCF_IMPLEMENT_IBASE(csConfigIterator);
   SCF_IMPLEMENTS_INTERFACE(iConfigIterator);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
 {
@@ -352,7 +352,7 @@ const char *csConfigIterator::GetComment() const
 
 SCF_IMPLEMENT_IBASE(csConfigFile);
   SCF_IMPLEMENTS_INTERFACE(iConfigFile);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 void csConfigFile::InitializeObject ()
 {

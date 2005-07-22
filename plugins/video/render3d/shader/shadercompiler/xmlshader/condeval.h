@@ -59,7 +59,7 @@ enum OperandType
   operandSVValueInt,
   operandSVValueFloat,
   operandSVValueTexture,
-  operandSVValueBuffer,
+  operandSVValueBuffer
 };
 /// An actual operand.
 struct CondOperand

@@ -58,7 +58,7 @@
 // depend on any specific XML parser.
 #include "csutil/xmltiny.h"
 
-CS_IMPLEMENT_PLUGIN;
+CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csTextSyntaxService)
   SCF_IMPLEMENTS_INTERFACE (iSyntaxService)
@@ -74,7 +74,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTextSyntaxService::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_FACTORY (csTextSyntaxService);
+SCF_IMPLEMENT_FACTORY (csTextSyntaxService)
 
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
 {
@@ -1204,7 +1204,7 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
   return true;
 }
 
-CS_IMPLEMENT_STATIC_VAR (GetBufferParseError, csString, ());
+CS_IMPLEMENT_STATIC_VAR (GetBufferParseError, csString, ())
 
 struct vgInt
 {

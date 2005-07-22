@@ -184,14 +184,14 @@ public:
 
 SCF_IMPLEMENT_IBASE(csConfigManagerIterator);
   SCF_IMPLEMENTS_INTERFACE(iConfigIterator);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 /* config manager object */
 
 SCF_IMPLEMENT_IBASE(csConfigManager);
   SCF_IMPLEMENTS_INTERFACE(iConfigManager);
   SCF_IMPLEMENTS_INTERFACE(iConfigFile);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
 {

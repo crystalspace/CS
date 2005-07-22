@@ -21,7 +21,7 @@
 
 SCF_IMPLEMENT_IBASE(csSoundListener);
   SCF_IMPLEMENTS_INTERFACE(iSoundListener);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csSoundListener::csSoundListener()
 {

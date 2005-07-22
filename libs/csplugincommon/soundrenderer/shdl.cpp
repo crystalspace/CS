@@ -23,7 +23,7 @@
 
 SCF_IMPLEMENT_IBASE(csSoundHandle);
   SCF_IMPLEMENTS_INTERFACE(iSoundHandle);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csSoundHandle::csSoundHandle(iSoundData* s)
 {

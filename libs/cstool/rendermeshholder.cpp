@@ -29,7 +29,7 @@ struct RenderMeshBlockAlloc : public csBlockAllocator<csRenderMesh>
 public:
   RenderMeshBlockAlloc () : csBlockAllocator<csRenderMesh> (100) {}
 };
-CS_IMPLEMENT_STATIC_VAR (GetRMAlloc, RenderMeshBlockAlloc, ());
+CS_IMPLEMENT_STATIC_VAR (GetRMAlloc, RenderMeshBlockAlloc, ())
 
 csRenderMeshHolder::csRenderMeshPtr::csRenderMeshPtr()
 {

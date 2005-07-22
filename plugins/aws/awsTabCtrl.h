@@ -89,7 +89,7 @@ public:
     iconLeft = 0,
     iconRight = 1,
     iconTop = 2,
-    iconBottom = 3,
+    iconBottom = 3
   };
 };
 

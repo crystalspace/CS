@@ -508,7 +508,7 @@ SCF_IMPLEMENT_IBASE (csSCF);
       SCF_IMPLEMENTS_INTERFACE_COMMON (iRefTracker, refTracker); 
     }
 #endif
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
 			    const char* context)

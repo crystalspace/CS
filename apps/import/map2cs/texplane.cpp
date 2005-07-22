@@ -302,7 +302,7 @@ void CMapTexturedPlane::CalcTextureAxis(CdVector3& no,
   yv.x=baseaxis[bestaxis*3+2].x;
   yv.y=baseaxis[bestaxis*3+2].y;
   yv.z=baseaxis[bestaxis*3+2].z;
-};
+}
 
 void CMapTexturedPlane::ProjectPoint(CdVector3& ProjectedPoint,
                                      const CdVector3& OriginalPoint,

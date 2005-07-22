@@ -402,13 +402,13 @@ public:
   DECLARE_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
   
   DECLARE_CACHED_PARAMETER_4 (glVertexPointer, VertexPointer, GLint, vsize,
-    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer);
+    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer)
   DECLARE_CACHED_PARAMETER_3 (glNormalPointer, NormalPointer, GLenum, ntype,
-    GLsizei, nstride, GLvoid*, npointer);
+    GLsizei, nstride, GLvoid*, npointer)
   DECLARE_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
-    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer);
+    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer)
   DECLARE_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
-    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer);
+    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer)
   
   csGLStateCacheContext (csGLExtensionManager* extmgr)
   {

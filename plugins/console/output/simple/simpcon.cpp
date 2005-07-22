@@ -292,7 +292,7 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
     LineMessageNumber++;
 }
 
-CS_IMPLEMENT_STATIC_VAR(GetTextBuf, csString, ());
+CS_IMPLEMENT_STATIC_VAR(GetTextBuf, csString, ())
 
 void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 {

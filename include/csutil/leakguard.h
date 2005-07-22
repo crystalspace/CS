@@ -54,7 +54,8 @@ csLeakGuardInstance leakguardinstance
 #else
 #define CS_LEAKGUARD_DECLARE(m) \
   struct csLeakGuard /* ignored; pacify -ansi -pedantic */
-#define CS_LEAKGUARD_IMPLEMENT(m)
+#define CS_LEAKGUARD_IMPLEMENT(m) \
+  struct csLeakGuard /* ignored; pacify -ansi -pedantic */
 #endif
 
 #endif // __CS_LEAKGUARD_H__

@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csFuncTexLoader);
 SCF_IMPLEMENT_IBASE(csFuncTexLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csFuncTexLoader::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
@@ -54,7 +54,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY(csFuncTexLoader);
+SCF_IMPLEMENT_FACTORY(csFuncTexLoader)
 
 //---------------------------------------------------------------------------
 

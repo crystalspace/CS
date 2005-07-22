@@ -39,8 +39,8 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSType);
-SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader);
+SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSType)
+SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader)
 
 //---------------------------------------------------------------------------
 
@@ -200,7 +200,7 @@ bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
 
 SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStepFactory);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csFullScreenQuadRenderStepFactory::csFullScreenQuadRenderStepFactory (
   iObjectRegistry* object_reg)
@@ -224,7 +224,7 @@ csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
 
 SCF_IMPLEMENT_IBASE(csFullScreenQuadRenderStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   iObjectRegistry* object_reg)

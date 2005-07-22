@@ -128,6 +128,6 @@ public:
   virtual bool IsAnimated ();
 };
 
-}; // namespace JngLoader
+} // namespace JngLoader
 
 #endif // __CS_JNG_H__

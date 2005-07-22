@@ -2313,7 +2313,7 @@ public:
 
 SCF_IMPLEMENT_IBASE(csLightArray)
   SCF_IMPLEMENTS_INTERFACE(iBase)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 static int compare_light (const void *p1, const void *p2)
 {
@@ -3186,7 +3186,7 @@ public:
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 EngineLoaderContext::EngineLoaderContext (iEngine* Engine,
 	iRegion* region, bool curRegOnly)

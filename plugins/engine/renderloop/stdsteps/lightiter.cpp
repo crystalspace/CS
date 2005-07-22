@@ -112,7 +112,7 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
 
 SCF_IMPLEMENT_IBASE(csLightIterRenderStepFactory);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLightIterRenderStepFactory::csLightIterRenderStepFactory (
   iObjectRegistry* object_reg)
@@ -138,7 +138,7 @@ SCF_IMPLEMENT_IBASE(csLightIterRenderStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer);
   SCF_IMPLEMENTS_INTERFACE(iLightIterRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLightIterRenderStep::csLightIterRenderStep (
   iObjectRegistry* object_reg)
@@ -391,7 +391,7 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
 SCF_IMPLEMENT_IBASE(csLightIterRenderStep::LightSVAccessor)
   SCF_IMPLEMENTS_INTERFACE(iLightCallback)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,
   csLightIterRenderStep* parent)

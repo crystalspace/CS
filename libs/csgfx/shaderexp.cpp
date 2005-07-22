@@ -87,7 +87,7 @@ enum
   // Internal ops
   OP_INT_SELT12,
   OP_INT_SELT34,
-  OP_INT_LOAD,
+  OP_INT_LOAD
 };
   
 enum 
@@ -107,7 +107,7 @@ enum
   TYPE_CONS,
 
   // Special internal types
-  TYPE_ACCUM,
+  TYPE_ACCUM
 };
 
 struct cons 

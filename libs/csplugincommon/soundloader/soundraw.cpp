@@ -21,7 +21,7 @@
 
 SCF_IMPLEMENT_IBASE(csSoundDataRaw);
   SCF_IMPLEMENTS_INTERFACE(iSoundData);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csSoundDataRaw::csSoundDataRaw(iBase *p, void *d, long n, csSoundFormat f)
 {

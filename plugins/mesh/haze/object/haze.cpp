@@ -577,9 +577,9 @@ float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
 
 
 
-CS_IMPLEMENT_STATIC_VAR(GetTempVertices, csDirtyAccessArray<csVector3>, ());
-CS_IMPLEMENT_STATIC_VAR(GetTempTexels, csDirtyAccessArray<csVector2>, ());
-CS_IMPLEMENT_STATIC_VAR(GetTempIndices, csDirtyAccessArray<uint>, ());
+CS_IMPLEMENT_STATIC_VAR(GetTempVertices, csDirtyAccessArray<csVector3>, ())
+CS_IMPLEMENT_STATIC_VAR(GetTempTexels, csDirtyAccessArray<csVector2>, ())
+CS_IMPLEMENT_STATIC_VAR(GetTempIndices, csDirtyAccessArray<uint>, ())
 
 void csHazeMeshObject::GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d, 
 					 int num_sides, csVector3* scrpts, 

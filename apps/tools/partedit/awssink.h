@@ -589,7 +589,7 @@ private:
   static void FillSectionList(intptr_t sk, iAwsSource *source);
 
   /// Static callback to handle selection/state changes in the section list box
-  static void PartEditSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source);
+  static void SectionListSelectionChanged(intptr_t sk, iAwsSource *source);
 
 
 

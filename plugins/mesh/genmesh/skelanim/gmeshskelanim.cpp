@@ -82,7 +82,7 @@ csSkelBone::csSkelBone (csGenmeshSkelAnimationControl *animation_control)
   anim_control = animation_control;
   bone_mode = BM_SCRIPT;
   cb = csPtr<iGenMeshSkeletonBoneUpdateCallback>(new csSkelBoneDefaultUpdateCallback());
-};
+}
 
 csSkelBone::~csSkelBone ()
 {

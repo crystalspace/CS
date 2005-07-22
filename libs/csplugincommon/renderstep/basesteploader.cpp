@@ -29,7 +29,7 @@ CS_LEAKGUARD_IMPLEMENT (csBaseRenderStepLoader);
 SCF_IMPLEMENT_IBASE (csBaseRenderStepLoader);
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin);
   SCF_IMPLEMENTS_INTERFACE (iComponent);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csBaseRenderStepLoader::csBaseRenderStepLoader (iBase *p)
 {

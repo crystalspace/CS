@@ -26,7 +26,7 @@
 
 SCF_IMPLEMENT_IBASE(csSoundListenerOpenAL)
 	SCF_IMPLEMENTS_INTERFACE(iSoundListener)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csSoundListenerOpenAL::csSoundListenerOpenAL(csSoundRenderOpenAL *p) 
 {

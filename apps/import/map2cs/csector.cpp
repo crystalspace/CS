@@ -73,7 +73,7 @@ bool isMdlFile(const char* csmodelfile)
   if(!strcmp(extension,"mDl")) return true;
   if(!strcmp(extension,"Mdl")) return true;
   return false;
-};
+}
 
 //Auxiliar Function to contruct the Factory name of a cs_model
 char* GetFactoryName(const char * csmodelfile)

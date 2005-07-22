@@ -26,7 +26,7 @@
 
 SCF_IMPLEMENT_IBASE(csSoundSourceOpenAL)
   SCF_IMPLEMENTS_INTERFACE(iSoundSource)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 
 csSoundSourceOpenAL::csSoundSourceOpenAL(csSoundRenderOpenAL *rdr, 

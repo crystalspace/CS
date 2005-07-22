@@ -72,12 +72,12 @@ bool csDataStream::name (type &var)			\
   return (Read (&var, sizeof(type)) == sizeof(type));	\
 }
 
-IMPLEMENT_READ_INT (ReadInt8, int8);
-IMPLEMENT_READ_INT (ReadUInt8, uint8);
-IMPLEMENT_READ_INT (ReadInt16, int16);
-IMPLEMENT_READ_INT (ReadUInt16, uint16);
-IMPLEMENT_READ_INT (ReadInt32, int32);
-IMPLEMENT_READ_INT (ReadUInt32, uint32);
+IMPLEMENT_READ_INT (ReadInt8, int8)
+IMPLEMENT_READ_INT (ReadUInt8, uint8)
+IMPLEMENT_READ_INT (ReadInt16, int16)
+IMPLEMENT_READ_INT (ReadUInt16, uint16)
+IMPLEMENT_READ_INT (ReadInt32, int32)
+IMPLEMENT_READ_INT (ReadUInt32, uint32)
 
 int csDataStream::GetChar ()
 {

@@ -58,9 +58,9 @@ namespace autom
       virtual csRef<iString> ReprObject() = 0;      
   };
 
-}; // namespace autom
+} // namespace autom
 
-}; // namespace aws
+} // namespace aws
 
 SCF_VERSION(aws::autom::iObject, 1, 0, 1);
 

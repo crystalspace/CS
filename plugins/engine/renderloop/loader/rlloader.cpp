@@ -38,11 +38,11 @@ CS_LEAKGUARD_IMPLEMENT (csRenderLoopLoader);
 SCF_IMPLEMENT_IBASE(csRenderLoopLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
   SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY(csRenderLoopLoader);
+SCF_IMPLEMENT_FACTORY(csRenderLoopLoader)
 
 
 //---------------------------------------------------------------------------

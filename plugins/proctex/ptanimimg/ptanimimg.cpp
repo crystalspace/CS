@@ -39,11 +39,11 @@
 SCF_IMPLEMENT_IBASE(csAnimateProctexLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
   SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader);
+SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader)
 
 
 //----------------------------------------------------------------------------

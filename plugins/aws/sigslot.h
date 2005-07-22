@@ -2530,7 +2530,7 @@ namespace autom
 		}
 	};
 
-}; // namespace filter
+} // namespace filter
 
 #endif // SIGSLOT_H__
 

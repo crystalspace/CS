@@ -67,7 +67,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csJNGImageIO::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_FACTORY (csJNGImageIO);
+SCF_IMPLEMENT_FACTORY (csJNGImageIO)
 
 
 #define JNG_MIME "image/x-jng" 
@@ -954,4 +954,4 @@ bool ImageJngFile::IsAnimated ()
    */
 }
 
-}; // namespace JngLoader
+} // namespace JngLoader

@@ -814,7 +814,7 @@ void csStencil2ShadowStep::ShadowDrawVisCallback::ObjectVisible (
 
 SCF_IMPLEMENT_IBASE (csStencil2ShadowFactory);
 SCF_IMPLEMENTS_INTERFACE (iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csStencil2ShadowFactory::csStencil2ShadowFactory (iObjectRegistry* object_reg,
                                                   csStencil2ShadowType* type)
@@ -838,7 +838,7 @@ csPtr<iRenderStep> csStencil2ShadowFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_FACTORY(csStencil2ShadowType);
+SCF_IMPLEMENT_FACTORY(csStencil2ShadowType)
 
 csStencil2ShadowType::csStencil2ShadowType (iBase *p) : csBaseRenderStepType (p)
 {
@@ -921,7 +921,7 @@ iShader* csStencil2ShadowType::GetShadow ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_FACTORY(csStencil2ShadowLoader);
+SCF_IMPLEMENT_FACTORY(csStencil2ShadowLoader)
 
 csStencil2ShadowLoader::csStencil2ShadowLoader (iBase *p) 
 : csBaseRenderStepLoader (p)

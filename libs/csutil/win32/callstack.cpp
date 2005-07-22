@@ -536,7 +536,7 @@ csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip)
   HANDLE hProc = symInit.GetSymProcessHandle ();
   HANDLE hThread = GetCurrentThread ();
   return CreateCallStack (hProc, hThread, context, skip + 3); 
-};
+}
 
 typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
 

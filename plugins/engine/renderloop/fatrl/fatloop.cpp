@@ -44,8 +44,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY(csFatLoopType);
-SCF_IMPLEMENT_FACTORY(csFatLoopLoader);
+SCF_IMPLEMENT_FACTORY(csFatLoopType)
+SCF_IMPLEMENT_FACTORY(csFatLoopLoader)
 
 static const char* MessageID = "crystalspace.renderloop.step.fatloop";
 
@@ -171,7 +171,7 @@ bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
 
 SCF_IMPLEMENT_IBASE(csFatLoopFactory);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csFatLoopFactory::csFatLoopFactory (iObjectRegistry* object_reg)
 {
@@ -193,7 +193,7 @@ csPtr<iRenderStep> csFatLoopFactory::Create ()
 
 SCF_IMPLEMENT_IBASE(csFatLoopStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   /*buckets(2, 2), */passes(2, 2), meshNodeFact(object_reg), 

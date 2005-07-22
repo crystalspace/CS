@@ -35,8 +35,8 @@
 
 #include "target.h"
 
-SCF_IMPLEMENT_FACTORY(csTargetRSType);
-SCF_IMPLEMENT_FACTORY(csTargetRSLoader);
+SCF_IMPLEMENT_FACTORY(csTargetRSType)
+SCF_IMPLEMENT_FACTORY(csTargetRSLoader)
 
 //---------------------------------------------------------------------------
 
@@ -143,7 +143,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
 
 SCF_IMPLEMENT_IBASE(csTargetRenderStepFactory);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTargetRenderStepFactory::csTargetRenderStepFactory (
   iObjectRegistry* object_reg)
@@ -168,7 +168,7 @@ csPtr<iRenderStep> csTargetRenderStepFactory::Create ()
 SCF_IMPLEMENT_IBASE(csTargetRenderStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStep);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTargetRenderStep::csTargetRenderStep (
   iObjectRegistry* object_reg)

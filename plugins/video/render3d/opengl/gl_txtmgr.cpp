@@ -54,7 +54,7 @@ public:
   csRLMAlloc () : csBlockAllocator<csGLRendererLightmap> (512) { }
 };
 
-CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ());
+CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ())
 
 //---------------------------------------------------------------------------
 

@@ -152,7 +152,7 @@ private:
   int clip_portal, clip_plane, clip_z_plane;
 
   // Drawing stuff...
-  bool csPortalContainer::ClipToPlane (int portal_idx, csPlane3 *portal_plane,
+  bool ClipToPlane (int portal_idx, csPlane3 *portal_plane,
 	const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
   bool DoPerspective (csVector3 *source, int num_verts,
 	csPoly2D *dest, bool mirror, int fov,

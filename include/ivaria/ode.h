@@ -590,7 +590,7 @@ struct iODEUniversalJoint : public iODEGeneralJointState
 enum ODEAMotorMode
 {
   CS_ODE_AMOTOR_MODE_USER = dAMotorUser,
-  CS_ODE_AMOTOR_MODE_EULER = dAMotorEuler,
+  CS_ODE_AMOTOR_MODE_EULER = dAMotorEuler
 };
 
 SCF_VERSION (iODEAMotorJoint, 0, 0, 1);

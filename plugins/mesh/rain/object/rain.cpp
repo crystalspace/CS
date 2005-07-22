@@ -152,8 +152,8 @@ bool csRainMeshObject::GetCollisionDetection () const
   return false;
 }
 
-CS_DECLARE_SIMPLE_MESH_FACTORY (csRainFactory, csRainMeshObject);
-CS_DECLARE_SIMPLE_MESH_PLUGIN (csRainPlugin, csRainFactory);
+CS_DECLARE_SIMPLE_MESH_FACTORY (csRainFactory, csRainMeshObject)
+CS_DECLARE_SIMPLE_MESH_PLUGIN (csRainPlugin, csRainFactory)
 
 SCF_IMPLEMENT_FACTORY (csRainPlugin)
 

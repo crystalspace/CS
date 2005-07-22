@@ -89,17 +89,17 @@ bool csBaseEventHandler::HandleEvent (iEvent &event)
     return false;\
   }
 
-DefaultTrigger ( OnUnhandledEvent );
-DefaultTrigger ( OnKeyboard );
-DefaultTrigger ( OnMouseMove );
-DefaultTrigger ( OnMouseDown );
-DefaultTrigger ( OnMouseUp );
-DefaultTrigger ( OnMouseClick );
-DefaultTrigger ( OnMouseDoubleClick );
-DefaultTrigger ( OnJoystickMove );
-DefaultTrigger ( OnJoystickDown );
-DefaultTrigger ( OnJoystickUp );
-DefaultTrigger ( OnCommand );
+DefaultTrigger ( OnUnhandledEvent )
+DefaultTrigger ( OnKeyboard )
+DefaultTrigger ( OnMouseMove )
+DefaultTrigger ( OnMouseDown )
+DefaultTrigger ( OnMouseUp )
+DefaultTrigger ( OnMouseClick )
+DefaultTrigger ( OnMouseDoubleClick )
+DefaultTrigger ( OnJoystickMove )
+DefaultTrigger ( OnJoystickDown )
+DefaultTrigger ( OnJoystickUp )
+DefaultTrigger ( OnCommand )
 
 bool csBaseEventHandler::OnBroadcast (iEvent &event)
 {

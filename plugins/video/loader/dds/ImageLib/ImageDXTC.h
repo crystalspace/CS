@@ -19,7 +19,7 @@ typedef enum
 	DC_None,
 	DC_DXT1,
 	DC_DXT3,
-	DC_DXT5,
+	DC_DXT5
 } DXTCMethod;
 
 

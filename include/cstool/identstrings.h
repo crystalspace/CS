@@ -105,7 +105,7 @@ public:
 #define CS_IDENT_STRING_LIST_END(ListName)				\
     {0, 0}								\
   };									\
-  CS_IMPLEMENT_STATIC_VAR(Get##ListName##Scratch, csString, ());	\
+  CS_IMPLEMENT_STATIC_VAR(Get##ListName##Scratch, csString, ())		\
   static csIdentStrings ListName (ListName##_strings, 			\
     Get##ListName##Scratch(),						\
     (sizeof (ListName##_strings) / sizeof (csIdentStrings::csIdentString)) - 1);

@@ -67,7 +67,7 @@ public:
      * Put the component on the left side of its display area, 
      * centered vertically.
      */
-    GBS_WEST = 4,
+    GBS_WEST = 4
   };
 public:
   /// Constructor, clears all components to 0.

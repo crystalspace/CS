@@ -94,9 +94,9 @@ public:
   typedef csPrintfFormatter<csStringFmtWriter, csFmtDefaultReader<utf8_char> > 
     Formatter;
   typedef csFmtDefaultReader<utf8_char> Reader;
-  CS_DECLARE_STATIC_CLASSVAR(scratch, GetScratch, csString);
-  CS_DECLARE_STATIC_CLASSVAR(reader, GetReader, char);
-  CS_DECLARE_STATIC_CLASSVAR(formatter, GetFormatter, char);
+  CS_DECLARE_STATIC_CLASSVAR(scratch, GetScratch, csString)
+  CS_DECLARE_STATIC_CLASSVAR(reader, GetReader, char)
+  CS_DECLARE_STATIC_CLASSVAR(formatter, GetFormatter, char)
 
   MakeAString (const char* fmt, ...)
   {

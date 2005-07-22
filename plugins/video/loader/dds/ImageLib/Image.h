@@ -32,7 +32,7 @@ long R;
 typedef enum
 {
 	Type_8Bit,
-	Type_32Bit,
+	Type_32Bit
 } ImageType;
 
 typedef enum
@@ -42,13 +42,13 @@ typedef enum
 	AT_Constant,		// Single, constant non-0xff value used 
 	AT_ConstantBinary,	// 0x00 / 0x??
 	AT_DualConstant,	// 0x?? / 0x?? - Two constants
-	AT_Modulated,		// Multiple values used
+	AT_Modulated		// Multiple values used
 } AlphaType;
 
 typedef enum
 {
 	QM_Lloyd = 1,
-	QM_MedianCut = 2,
+	QM_MedianCut = 2
 } QuantMethodType;
 
 

@@ -40,8 +40,8 @@
 
 #include "generic.h"
 
-SCF_IMPLEMENT_FACTORY(csGenericRSType);
-SCF_IMPLEMENT_FACTORY(csGenericRSLoader);
+SCF_IMPLEMENT_FACTORY(csGenericRSType)
+SCF_IMPLEMENT_FACTORY(csGenericRSLoader)
 
 //---------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 
 SCF_IMPLEMENT_IBASE(csGenericRenderStepFactory);
   SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csGenericRenderStepFactory::csGenericRenderStepFactory (
   iObjectRegistry* object_reg)

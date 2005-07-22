@@ -73,7 +73,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterMultiplexer::Component)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
+SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer)
 
 
 CS_IMPLEMENT_PLUGIN

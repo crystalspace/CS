@@ -24,7 +24,7 @@
 SCF_IMPLEMENT_IBASE (csBaseRenderStepType)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
   SCF_IMPLEMENTS_INTERFACE (iRenderStepType)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 csBaseRenderStepType:: csBaseRenderStepType (iBase *p)
 {

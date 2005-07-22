@@ -167,8 +167,8 @@ void csFountainMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-CS_DECLARE_SIMPLE_MESH_FACTORY (csFountainFactory, csFountainMeshObject);
-CS_DECLARE_SIMPLE_MESH_PLUGIN (csFountainMeshObjectType, csFountainFactory);
+CS_DECLARE_SIMPLE_MESH_FACTORY (csFountainFactory, csFountainMeshObject)
+CS_DECLARE_SIMPLE_MESH_PLUGIN (csFountainMeshObjectType, csFountainFactory)
 
 SCF_IMPLEMENT_FACTORY (csFountainMeshObjectType)
 

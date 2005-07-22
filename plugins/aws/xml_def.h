@@ -20,6 +20,6 @@ namespace aws
     virtual bool Parse (const std::string &txt, registry &reg);
   };
 
-}; // end namespace
+} // end namespace
 
 #endif

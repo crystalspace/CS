@@ -108,7 +108,7 @@ enum csPSRegisterType
   CS_PS_REG_CONSTANT,
   CS_PS_REG_TEMP,
   CS_PS_REG_COLOR,
-  CS_PS_REG_NONE = ~0,
+  CS_PS_REG_NONE = ~0
 };
 
 extern const char* GetInstructionName (int instrID);
