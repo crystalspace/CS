@@ -100,6 +100,16 @@ struct iSyntaxService : public iBase
     else
       return true;
   }
+
+  /**
+   * Parse a plane description. Returns true if successful.
+   */
+  virtual bool ParsePlane (iDocumentNode* node, csPlane3 &p) = 0;
+
+  /**
+   * Write a plane description. Returns true if successful.
+   */
+  virtual bool WritePlane (iDocumentNode* node, csPlane3 &p) = 0;
   
   /**
    * Parse a matrix description. Returns true if successful.

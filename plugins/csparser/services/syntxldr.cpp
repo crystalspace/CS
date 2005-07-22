@@ -137,7 +137,60 @@ bool csTextSyntaxService::WriteBool (iDocumentNode* node, const char* name,
     return false;
   }
 }
+bool csTextSyntaxService::ParsePlane (iDocumentNode* node, csPlane3 &p)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+    case XMLTOKEN_A: p.A () = child->GetContentsValueAsFloat (); break;
+    case XMLTOKEN_B: p.B () = child->GetContentsValueAsFloat (); break;
+    case XMLTOKEN_C: p.C () = child->GetContentsValueAsFloat (); break;
+    case XMLTOKEN_D: p.D () = child->GetContentsValueAsFloat (); break;
+    case XMLTOKEN_THREEPOINTS:
+      {
+        csVector3 v1;
+        ParseVector (child->GetNode ("v1"), v1);
+        
+        csVector3 v2;
+        ParseVector (child->GetNode ("v2"), v2);
+        
+        csVector3 v3;
+        ParseVector (child->GetNode ("v3"), v3);
 
+        p.Set (v1, v2, v3);
+      }
+    break;
+    default: break;
+    }
+  }
+  return true;
+}
+bool csTextSyntaxService::WritePlane (iDocumentNode* node, csPlane3 &p)
+{
+  csRef<iDocumentNode> ANode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  ANode->SetValue("A");
+  ANode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(p.A ());
+
+  csRef<iDocumentNode> BNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  BNode->SetValue("B");
+  BNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(p.B ());
+
+  csRef<iDocumentNode> CNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  CNode->SetValue("C");
+  CNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(p.C ());
+
+  csRef<iDocumentNode> DNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  DNode->SetValue("D");
+  DNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(p.D ());
+
+  return true;
+}
 bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();

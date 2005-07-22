@@ -55,6 +55,7 @@ enum
   XMLTOKEN_COLLIDERCYLINDER,
   XMLTOKEN_LENGTH,
   XMLTOKEN_COLLIDERBOX,
+  XMLTOKEN_COLLIDERPLANE,
   XMLTOKEN_MOVE,
   XMLTOKEN_ROTATE,
   XMLTOKEN_JOINT,
@@ -116,6 +117,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("collidersphere", XMLTOKEN_COLLIDERSPHERE);
   xmltokens.Register ("collidercylinder", XMLTOKEN_COLLIDERCYLINDER);
   xmltokens.Register ("colliderbox", XMLTOKEN_COLLIDERBOX);
+  xmltokens.Register ("colliderplane", XMLTOKEN_COLLIDERPLANE);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("length", XMLTOKEN_LENGTH);
   xmltokens.Register ("move", XMLTOKEN_MOVE);
@@ -220,6 +222,9 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
       case XMLTOKEN_COLLIDERSPHERE:
 	    if (!ParseSystemColliderSphere (child, system)) return false;
 		break;
+      case XMLTOKEN_COLLIDERPLANE:
+        if (!ParseSystemColliderPlane (child, system)) return false;
+    break;
       case XMLTOKEN_COLLIDERCYLINDER:
 	    if (!ParseSystemColliderCylinder (child, system)) return false;
 		break;
@@ -365,6 +370,12 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
         body->AttachColliderCylinder (l, r, t, f, d, e, s);
         break;
       }
+      case XMLTOKEN_COLLIDERPLANE:
+      {
+          csPlane3 plane;
+          synldr->ParsePlane (node, plane); 
+          body->AttachColliderPlane (plane, f, d, e, s);
+      }
       case XMLTOKEN_COLLIDERBOX:
       {
         csVector3 v;
@@ -407,6 +418,17 @@ bool csPhysicsLoader::ParseSystemColliderMesh (
       node, "Unable to find collider mesh in engine");
     return false;
   }
+  return true;
+}
+  
+bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node, iDynamicSystem* system)
+{
+  float f = node->GetAttributeValueAsFloat ("friction");
+  float e = node->GetAttributeValueAsFloat ("elasticity");
+  float s = node->GetAttributeValueAsFloat ("softness");
+  csPlane3 plane;
+  synldr->ParsePlane (node, plane); 
+  system->AttachColliderPlane (plane, f, e, s);
   return true;
 }
 

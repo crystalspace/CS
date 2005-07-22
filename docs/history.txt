@@ -10,6 +10,7 @@ chronological order.
 	- mdmkolbe removed extraneous semicolens, commas, and qualifiers
 	  found with '-ansi -pedantic'
 	- mdmkolbe replaced some instances of __int64 with int64.
+	- Piotr Obrzut added plane collider parsing to csPhysicsLoader
 21-Jul-2005
 	- mdmkolbe fixed a few more warnings in gcc with the '-W -Wall' flags
 	- Jorrit added a section to the docs about sprite sockets. Also did

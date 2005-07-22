@@ -60,6 +60,8 @@ public:
   virtual bool ParseSystemColliderCylinder (iDocumentNode *node, iDynamicSystem* system);
   /// Parse an anonymous box collider in the system
   virtual bool ParseSystemColliderBox (iDocumentNode *node, iDynamicSystem* system);
+  /// Parse an anonymous plane collider in the system
+  virtual bool ParseSystemColliderPlane (iDocumentNode *node, iDynamicSystem* system);
   /// Parse the joint specific sub section
   virtual bool ParseJoint (iDocumentNode *node, iJoint* joint, iDynamicSystem* system);
   /// Parse a transform
