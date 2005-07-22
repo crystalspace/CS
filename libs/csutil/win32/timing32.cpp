@@ -47,12 +47,8 @@ csTicks csGetTicks ()
   //03/20/1999 Thomas Hieber: completely redone to get true Millisecond
   //accuracy instead of very rough ticks. This routine will also provide
   //correct wrap around at the end of "long"
-#if defined(__CYGWIN32__)
-#      define __int64 long long
-#endif
-
-  static __int64 Freq      = 0;
-  static __int64 FirstCount = 0;
+  static int64 Freq      = 0;
+  static int64 FirstCount = 0;
 
   //Freq was set to -1, if the current Hardware does not support
   //high resolution timers. We will use GetTickCount instead then.
@@ -76,7 +72,7 @@ csTicks csGetTicks ()
   }
 
   //retrieve current count
-  __int64 Count = 0;
+  int64 Count = 0;
   QueryPerformanceCounter((LARGE_INTEGER*)&Count);
 
   return 1000*(Count-FirstCount)/Freq;
