@@ -45,12 +45,12 @@
 */
 typedef	union mmx_t {
 	mmx_t () {}
-	mmx_t (long long v)
+	mmx_t (longlong v)
 	  : q(v)
 	{}
   
-	long long		q;	/* Quadword (64-bit) value */
-	unsigned long long	uq;	/* Unsigned Quadword */
+	longlong		q;	/* Quadword (64-bit) value */
+	ulonglong		uq;	/* Unsigned Quadword */
 	int			d[2];	/* 2 Doubleword (32-bit) values */
 	unsigned int		ud[2];	/* 2 Unsigned Doubleword */
 	short			w[4];	/* 4 Word (16-bit) values */
