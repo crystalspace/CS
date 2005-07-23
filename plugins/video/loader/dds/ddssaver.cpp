@@ -79,12 +79,12 @@ bool csDDSSaver::FmtDXT::Save (csMemFile& out, iImage* image)
   csRGBpixel* pix = (csRGBpixel*)image->GetImageData();
   while (pixNum-- > 0)
   {
-    p->r = pix->red;
-    p->g = pix->green;
-    p->b = pix->blue;
+    p->c.r = pix->red;
+    p->c.g = pix->green;
+    p->c.b = pix->blue;
     // ImageLib also considers the alpha when compressing for DXT1,
     // so pull it up to get a solid image.
-    p->a = (method == ImageLib::DC_DXT1) ? 255 : pix->alpha;
+    p->c.a = (method == ImageLib::DC_DXT1) ? 255 : pix->alpha;
     p++; pix++;
   }
 

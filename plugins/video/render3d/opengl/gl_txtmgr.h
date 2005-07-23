@@ -54,23 +54,23 @@ struct csGLUploadData
   int w, h, d;
   csRef<iBase> dataRef;
   GLenum targetFormat;
-  bool compressed;
+  bool isCompressed;
   union
   {
     struct 
     {
-      GLenum sourceFormat;
-      GLenum sourceType;
-    };
+      GLenum format;
+      GLenum type;
+    } source;
     struct
     {
-      size_t compressedSize;
-    };
+      size_t size;
+    } compressed;
   };
   int mip;
   int imageNum;
 
-  csGLUploadData() : image_data(0), compressed(false) {}
+  csGLUploadData() : image_data(0), isCompressed(false) {}
 };
 
 struct csGLTextureClassSettings;

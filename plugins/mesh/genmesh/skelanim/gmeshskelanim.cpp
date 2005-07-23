@@ -78,7 +78,7 @@ csSkelBone::csSkelBone (csGenmeshSkelAnimationControl *animation_control)
   SCF_CONSTRUCT_IBASE (0); 
   parent = 0;
   rigid_body = 0;
-  rot.x = rot.y = rot.z = 0;
+  rot.axis.x = rot.axis.y = rot.axis.z = 0;
   anim_control = animation_control;
   bone_mode = BM_SCRIPT;
   cb = csPtr<iGenMeshSkeletonBoneUpdateCallback>(new csSkelBoneDefaultUpdateCallback());
@@ -107,18 +107,18 @@ void csSkelBone::SetAxisAngle (int axis, float angle)
   switch (axis)
   {
     case 0: 
-      rot.x = angle;
+      rot.axis.x = angle;
       break;
     case 1:
-      rot.y = angle;
+      rot.axis.y = angle;
       break;
     case 2:
-      rot.z = angle;
+      rot.axis.z = angle;
       break;
   }
-  transform.SetO2T (csXRotMatrix3(rot.x)*
-          csYRotMatrix3(rot.y)*
-          csZRotMatrix3(rot.z));
+  transform.SetO2T (csXRotMatrix3(rot.axis.x)*
+          csYRotMatrix3(rot.axis.y)*
+          csZRotMatrix3(rot.axis.z));
 }
 
 void csSkelBone::UpdateRotation()
@@ -208,9 +208,9 @@ void csSkelBone::UpdatePosition()
     if (b_pos)
     {
 		updated = true;
-		final_pos_x += b_pos->x*script->GetFactor();
-		final_pos_y += b_pos->y*script->GetFactor();
-		final_pos_z += b_pos->z*script->GetFactor();
+		final_pos_x += b_pos->axis.x*script->GetFactor();
+		final_pos_y += b_pos->axis.y*script->GetFactor();
+		final_pos_z += b_pos->axis.z*script->GetFactor();
 		script_factors_total += script->GetFactor();
     }
   }
@@ -422,9 +422,9 @@ bone_transform_data *csSkelAnimControlRunnable::GetBonePosition(csSkelBone *bone
   if (!b_pos) 
   {
     b_pos = new bone_transform_data ();
-    b_pos->x = bone->GetTransform().GetOrigin().x;
-    b_pos->y = bone->GetTransform().GetOrigin().y;
-    b_pos->z = bone->GetTransform().GetOrigin().z;
+    b_pos->axis.x = bone->GetTransform().GetOrigin().x;
+    b_pos->axis.y = bone->GetTransform().GetOrigin().y;
+    b_pos->axis.z = bone->GetTransform().GetOrigin().z;
     positions.Put (bone, b_pos);
   }
   return b_pos;
@@ -467,15 +467,15 @@ bool csSkelAnimControlRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
 		{
 			csVector3 current_pos = 
 				m.final_position - ((float) (delay.final - delay.current))*m.delta_per_tick;
-			m.bone_position->x = current_pos.x;
-			m.bone_position->y = current_pos.y;
-			m.bone_position->z = current_pos.z;
+			m.bone_position->axis.x = current_pos.x;
+			m.bone_position->axis.y = current_pos.y;
+			m.bone_position->axis.z = current_pos.z;
 		}
 		else
 		{
-			m.bone_position->x = m.final_position.x;
-			m.bone_position->y = m.final_position.y;
-			m.bone_position->z = m.final_position.z;
+			m.bone_position->axis.x = m.final_position.x;
+			m.bone_position->axis.y = m.final_position.y;
+			m.bone_position->axis.z = m.final_position.z;
 			absolute_moves.DeleteIndexFast (i);
 		}
 		mod = true;
@@ -489,17 +489,17 @@ bool csSkelAnimControlRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
 		if (delay.current <  delay.final)
 		{
 			csVector3 current_pos = (float)(delay.current - m.elapsed_ticks)*m.delta_per_tick;
-			m.bone_position->x += current_pos.x;
-			m.bone_position->y += current_pos.y;
-			m.bone_position->z += current_pos.z;
+			m.bone_position->axis.x += current_pos.x;
+			m.bone_position->axis.y += current_pos.y;
+			m.bone_position->axis.z += current_pos.z;
 			m.elapsed_ticks = delay.current;
 		}
 		else
 		{
 			csVector3 current_pos = (float)(delay.final - m.elapsed_ticks)*m.delta_per_tick;
-			m.bone_position->x += current_pos.x;
-			m.bone_position->y += current_pos.y;
-			m.bone_position->z += current_pos.z;
+			m.bone_position->axis.x += current_pos.x;
+			m.bone_position->axis.y += current_pos.y;
+			m.bone_position->axis.z += current_pos.z;
 			relative_moves.DeleteIndexFast (i);
 		}
 		mod = true;
@@ -625,14 +625,14 @@ void csSkelAnimControlRunnable::ParseFrame(const sac_frame & frame)
 						switch (inst.tr_mode)
 						{
 							case AC_TRANSFORM_ABSOLUTE:
-								bone_pos->x = inst.movement.posx;
-								bone_pos->y = inst.movement.posy;
-								bone_pos->z = inst.movement.posz;
+								bone_pos->axis.x = inst.movement.posx;
+								bone_pos->axis.y = inst.movement.posy;
+								bone_pos->axis.z = inst.movement.posz;
 							break;
 							case AC_TRANSFORM_RELATIVE:
-								bone_pos->x += inst.movement.posx;
-								bone_pos->y += inst.movement.posy;
-								bone_pos->z += inst.movement.posz;
+								bone_pos->axis.x += inst.movement.posx;
+								bone_pos->axis.y += inst.movement.posy;
+								bone_pos->axis.z += inst.movement.posz;
 							break;
 						}
 					}
@@ -651,7 +651,7 @@ void csSkelAnimControlRunnable::ParseFrame(const sac_frame & frame)
 							case AC_TRANSFORM_ABSOLUTE:
 							{
 								csVector3 current_position = 
-									csVector3 (m.bone_position->x, m.bone_position->y, m.bone_position->z);
+									csVector3 (m.bone_position->axis.x, m.bone_position->axis.y, m.bone_position->axis.z);
 								csVector3 delta = m.final_position - current_position;
 								m.delta_per_tick = delta/(float)(delay.final);
 								absolute_moves.Push (m);
@@ -1447,7 +1447,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 								csYRotMatrix3(child->GetAttributeValueAsFloat ("y"))*
 								csZRotMatrix3(child->GetAttributeValueAsFloat ("z"));
 							q = csQuaternion(m);
-							csPrintf("%s x %.3f y %.3f z %.3f r %.3f\n\n", bones[bone_id]->GetName(), q.x, q.y, q.z, q.r);
+							csPrintf("%s x %.3f y %.3f z %.3f r %.3f\n\n", bones[bone_id]->GetName(), q.axis.x, q.axis.y, q.axis.z, q.r);
 							instr.rotate.quat_x = q.x;
 							instr.rotate.quat_y = q.y;
 							instr.rotate.quat_z = q.z;

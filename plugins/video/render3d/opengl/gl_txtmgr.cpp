@@ -601,35 +601,35 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
     if (strcmp (rawFormat, "r8g8b8") == 0)
     {
       uploadData.image_data = imageRaw->GetUint8();
-      uploadData.sourceFormat = GL_RGB;
-      uploadData.sourceType = GL_UNSIGNED_BYTE;
+      uploadData.source.format = GL_RGB;
+      uploadData.source.type = GL_UNSIGNED_BYTE;
     }
     else if (G3D->ext->CS_GL_version_1_2
       && (strcmp (rawFormat, "b8g8r8") == 0))
     {
       uploadData.image_data = imageRaw->GetUint8();
-      uploadData.sourceFormat = GL_BGR;
-      uploadData.sourceType = GL_UNSIGNED_BYTE;
+      uploadData.source.format = GL_BGR;
+      uploadData.source.type = GL_UNSIGNED_BYTE;
     }
     else if (G3D->ext->CS_GL_version_1_2
       && (strcmp (rawFormat, "r5g6b5") == 0))
     {
       uploadData.image_data = imageRaw->GetUint8();
-      uploadData.sourceFormat = GL_RGB;
-      uploadData.sourceType = GL_UNSIGNED_SHORT_5_6_5;
+      uploadData.source.format = GL_RGB;
+      uploadData.source.type = GL_UNSIGNED_SHORT_5_6_5;
     }
     else if (G3D->ext->CS_GL_version_1_2
       && (strcmp (rawFormat, "b8g8r8a8") == 0))
     {
       uploadData.image_data = imageRaw->GetUint8();
-      uploadData.sourceFormat = GL_BGRA;
-      uploadData.sourceType = GL_UNSIGNED_BYTE;
+      uploadData.source.format = GL_BGRA;
+      uploadData.source.type = GL_UNSIGNED_BYTE;
     }
     else if (strcmp (rawFormat, "l8") == 0)
     {
       uploadData.image_data = imageRaw->GetUint8();
-      uploadData.sourceFormat = GL_LUMINANCE;
-      uploadData.sourceType = GL_UNSIGNED_BYTE;
+      uploadData.source.format = GL_LUMINANCE;
+      uploadData.source.type = GL_UNSIGNED_BYTE;
       targetFormat = GL_LUMINANCE;
     }
     else 
@@ -642,8 +642,8 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
 	&& isCompressedTarget)
       {
 	uploadData.image_data = imageRaw->GetUint8();
-	uploadData.compressed = true;
-	uploadData.compressedSize = imageRaw->GetSize();
+	uploadData.isCompressed = true;
+	uploadData.compressed.size = imageRaw->GetSize();
       }
     }
   }
@@ -667,8 +667,8 @@ bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat,
       uploadData.dataRef = newDataBuf;
     }
     //uploadData->size = n * 4;
-    uploadData.sourceFormat = GL_RGBA;
-    uploadData.sourceType = GL_UNSIGNED_BYTE;
+    uploadData.source.format = GL_RGBA;
+    uploadData.source.type = GL_UNSIGNED_BYTE;
   }
   uploadData.targetFormat = targetFormat;
   uploadData.w = Image->GetWidth();
@@ -806,18 +806,18 @@ void csGLTextureHandle::Load ()
     for (i = 0; i < uploadData->Length(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.compressed)
+      if (uploadData.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
+	  0, (GLsizei)uploadData.compressed.size, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_2D, uploadData.mip, 
 	  uploadData.targetFormat, 
-	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat, 
-	  uploadData.sourceType, uploadData.image_data);
+	  uploadData.w, uploadData.h, 0, uploadData.source.format, 
+	  uploadData.source.type, uploadData.image_data);
       }
     }
   }
@@ -844,18 +844,18 @@ void csGLTextureHandle::Load ()
     for (i = 0; i < uploadData->Length(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.compressed)
+      if (uploadData.isCompressed)
       {
 	G3D->ext->glCompressedTexImage3DARB (GL_TEXTURE_3D, uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  uploadData.d, 0, (GLsizei)uploadData.compressedSize, 
+	  uploadData.d, 0, (GLsizei)uploadData.compressed.size, 
 	  uploadData.image_data);
       }
       else
       {
 	G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, uploadData.d,
-	  0, uploadData.sourceFormat, uploadData.sourceType, 
+	  0, uploadData.source.format, uploadData.source.type, 
 	  uploadData.image_data);
       }
     }
@@ -888,20 +888,20 @@ void csGLTextureHandle::Load ()
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
-      if (uploadData.compressed)
+      if (uploadData.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
 	  uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
+	  0, (GLsizei)uploadData.compressed.size, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
 	  uploadData.mip, uploadData.targetFormat, 
 	  uploadData.w, uploadData.h,
-	  0, uploadData.sourceFormat, uploadData.sourceType,	
+	  0, uploadData.source.format, uploadData.source.type,	
 	  uploadData.image_data);
       }
     }
@@ -926,18 +926,18 @@ void csGLTextureHandle::Load ()
     for (i = 0; i < uploadData->Length(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.compressed)
+      if (uploadData.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_RECTANGLE_ARB, 
           uploadData.mip, uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
+	  0, (GLsizei)uploadData.compressed.size, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, uploadData.mip, 
 	  uploadData.targetFormat, 
-	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat, 
-	  uploadData.sourceType, uploadData.image_data);
+	  uploadData.w, uploadData.h, 0, uploadData.source.format, 
+	  uploadData.source.type, uploadData.image_data);
       }
     }
   }

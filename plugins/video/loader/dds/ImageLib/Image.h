@@ -57,10 +57,11 @@ class Color
 public:
 	Color() {;}
 	Color(DWORD c) : Col(c) {;}
-	Color(BYTE R, BYTE G, BYTE B, BYTE A) : a(A), r(R), g(G), b(B) {;}
+	Color(BYTE R, BYTE G, BYTE B, BYTE A)
+	{ c.a = A; c.r = R; c.g = G; c.b = B; }
 
 	union {
-		struct { BYTE a, r, g, b; };
+		struct { BYTE a, r, g, b; } c;
 		DWORD	Col;
 	};
 };

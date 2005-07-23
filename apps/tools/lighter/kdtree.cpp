@@ -277,7 +277,7 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
     // inner node (no patches in node)
     csKDTreeNodeH::SetFlag (toNode, true);
     csKDTreeNodeH::SetDimension (toNode, fromNode->splitDimension);
-    toNode->splitLocation = fromNode->splitLocation;
+    toNode->inner.splitLocation = fromNode->splitLocation;
     
     // Allocate children
     csKDTreeNode *left = nodeAllocator.Alloc ();
@@ -300,7 +300,7 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
     // node with primitives
     csKDTreeNodeH::SetFlag (toNode, false);
     
-    toNode->numberOfPrimitives = 0;
+    toNode->leaf.numberOfPrimitives = 0;
     
     fromNode->patches.Sort ();
 
@@ -308,14 +308,14 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
     for (i = 0; i<fromNode->patches.Length (); i++)
     {
       fromNode->patches[i]->ConstructAccelerationStruct ();
-      toNode->numberOfPrimitives++;
+      toNode->leaf.numberOfPrimitives++;
       if (fromNode->patches[i]->IsQuad ()) 
-        toNode->numberOfPrimitives++;
+        toNode->leaf.numberOfPrimitives++;
     }
 
     // Allocate a list of pointers..
     csMeshPatchAccStruct **primlist = (csMeshPatchAccStruct**)csAlignedMalloc 
-      (sizeof (csMeshPatchAccStruct*) * toNode->numberOfPrimitives, 8);
+      (sizeof (csMeshPatchAccStruct*) * toNode->leaf.numberOfPrimitives, 8);
 
     csKDTreeNodeH::SetPointer (toNode, (uintptr_t)primlist);
     // And transfer all prims

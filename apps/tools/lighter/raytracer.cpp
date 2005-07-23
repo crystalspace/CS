@@ -62,7 +62,7 @@ bool csRaytracer::TraceAnyHit (const csRay &ray, csHitPoint &hit)
     {
       //traverse until we hit a leafnode
       uint splitDim = csKDTreeNodeH::GetDimension (node);
-      t = (node->splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
+      t = (node->inner.splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
 
       if (t <= mint)
       {
@@ -126,7 +126,7 @@ bool csRaytracer::TraceClosestHit (const csRay &ray, csHitPoint &hit)
     {
       //traverse until we hit a leafnode
       uint splitDim = csKDTreeNodeH::GetDimension (node);
-      t = (node->splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
+      t = (node->inner.splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
 
       if (t <= mint)
       {
@@ -220,7 +220,7 @@ bool csRaytracer::IntersectTriangles (const csKDTreeNode* node, const csRay &ray
 {
   //assume valid input
   size_t nIdx, nMax;
-  nMax = node->numberOfPrimitives;
+  nMax = node->leaf.numberOfPrimitives;
   bool haveHit = false;
   csMeshPatchAccStruct **primList = (csMeshPatchAccStruct**)csKDTreeNodeH::GetPointer (node);
 

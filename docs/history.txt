@@ -15,6 +15,7 @@ chronological order.
 	  and 'unsigned long long' with 'ulonglong'.
 	- res removed or conditionalized some superfluous configure check 
 	  (e.g. we don't use GLU or GLUT, no point to check ALSA on Win32, ...)
+	- mdmkolbe fixed non-ISO complient anonymous structs.
 21-Jul-2005
 	- mdmkolbe fixed a few more warnings in gcc with the '-W -Wall' flags
 	- Jorrit added a section to the docs about sprite sockets. Also did

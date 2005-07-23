@@ -105,7 +105,7 @@ private:
 				float x;
 				float y;
 				float z;
-			};
+			} axis;
 		};
 	} rot;
 
@@ -293,7 +293,7 @@ struct bone_transform_data
 			float x;
 			float y;
 			float z;
-		};
+		} axis;
 	};
 };
 

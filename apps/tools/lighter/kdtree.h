@@ -54,7 +54,7 @@ union csKDTreeNode
      * Number of primitives in node 
      */
     size_t numberOfPrimitives;
-  };
+  } leaf;
 
   /**
    * KDTree node for a inner node
@@ -73,7 +73,7 @@ union csKDTreeNode
      * Split amount 
      */
     float splitLocation;
-  };
+  } inner;
 };
 
 // Helper functions to get and set data in the kdtree-node
@@ -82,34 +82,34 @@ struct csKDTreeNodeH
   static void SetFlag (csKDTreeNode *node, bool inner=false)
   {
     if (inner)
-      node->flagAndOffset |= 0x4;
+      node->leaf.flagAndOffset |= 0x4;
     else
-      node->flagAndOffset &= ~0x4;
+      node->leaf.flagAndOffset &= ~0x4;
   }
 
   static bool GetFlag (const csKDTreeNode *node)
   {
-    return node->flagAndOffset & 0x4;
+    return node->leaf.flagAndOffset & 0x4;
   }
 
   static void SetDimension (csKDTreeNode *node, uint dim)
   {
-    node->flagAndOffset = (node->flagAndOffset & ~0x3) | dim;
+    node->leaf.flagAndOffset = (node->leaf.flagAndOffset & ~0x3) | dim;
   }
 
   static uint GetDimension (const csKDTreeNode *node)
   {
-    return (node->flagAndOffset & 0x3);
+    return (node->leaf.flagAndOffset & 0x3);
   }
 
   static void SetPointer (csKDTreeNode *node, uintptr_t ptr)
   {
-    node->flagAndOffset = (node->flagAndOffset & 0x7) | ptr;
+    node->leaf.flagAndOffset = (node->leaf.flagAndOffset & 0x7) | ptr;
   }
 
   static uintptr_t GetPointer (const csKDTreeNode *node)
   {
-    return (node->flagAndOffset & ~0x7);
+    return (node->leaf.flagAndOffset & ~0x7);
   }
 };
 

@@ -124,10 +124,10 @@ static Color Col565To32(WORD Col)
 {
 Color c;
 
-	c.a = 0xff;
-	c.r = (BYTE)( (long)(Col >> 11) * 255 / 31 );
-	c.g = (BYTE)( (long)((Col >> 5) & 0x3f) * 255 / 63 );
-	c.b = (BYTE)( (long)(Col & 0x1f) * 255 / 31 );
+	c.c.a = 0xff;
+	c.c.r = (BYTE)( (long)(Col >> 11) * 255 / 31 );
+	c.c.g = (BYTE)( (long)((Col >> 5) & 0x3f) * 255 / 63 );
+	c.c.b = (BYTE)( (long)(Col & 0x1f) * 255 / 31 );
 	return c;
 }
 
@@ -143,21 +143,21 @@ long r, g, b, xx, yy;
 		Col[1] = Col565To32(pSrc[1]);
 		pSrc += 2;
 
-		r = (Col[0].r * 2 + Col[1].r) / 3;
-		g = (Col[0].g * 2 + Col[1].g) / 3;
-		b = (Col[0].b * 2 + Col[1].b) / 3;
-		Col[2].a = 0xff;
-		Col[2].r = (BYTE)r;
-		Col[2].g = (BYTE)g;
-		Col[2].b = (BYTE)b;
+		r = (Col[0].c.r * 2 + Col[1].c.r) / 3;
+		g = (Col[0].c.g * 2 + Col[1].c.g) / 3;
+		b = (Col[0].c.b * 2 + Col[1].c.b) / 3;
+		Col[2].c.a = 0xff;
+		Col[2].c.r = (BYTE)r;
+		Col[2].c.g = (BYTE)g;
+		Col[2].c.b = (BYTE)b;
 
-		r = (Col[1].r * 2 + Col[0].r) / 3;
-		g = (Col[1].g * 2 + Col[0].g) / 3;
-		b = (Col[1].b * 2 + Col[0].b) / 3;
-		Col[3].a = 0xff;
-		Col[3].r = (BYTE)r;
-		Col[3].g = (BYTE)g;
-		Col[3].b = (BYTE)b;
+		r = (Col[1].c.r * 2 + Col[0].c.r) / 3;
+		g = (Col[1].c.g * 2 + Col[0].c.g) / 3;
+		b = (Col[1].c.b * 2 + Col[0].c.b) / 3;
+		Col[3].c.a = 0xff;
+		Col[3].c.r = (BYTE)r;
+		Col[3].c.g = (BYTE)g;
+		Col[3].c.b = (BYTE)b;
 
 		int Shift = 0;
 		for(yy=0; yy<4; yy++)
@@ -176,13 +176,13 @@ long r, g, b, xx, yy;
 		Col[1] = Col565To32(pSrc[1]);
 		pSrc += 2;
 
-		r = (Col[0].r + Col[1].r) / 2;
-		g = (Col[0].g + Col[1].g) / 2;
-		b = (Col[0].b + Col[1].b) / 2;
-		Col[2].a = 0xff;
-		Col[2].r = (BYTE)r;
-		Col[2].g = (BYTE)g;
-		Col[2].b = (BYTE)b;
+		r = (Col[0].c.r + Col[1].c.r) / 2;
+		g = (Col[0].c.g + Col[1].c.g) / 2;
+		b = (Col[0].c.b + Col[1].c.b) / 2;
+		Col[2].c.a = 0xff;
+		Col[2].c.r = (BYTE)r;
+		Col[2].c.g = (BYTE)g;
+		Col[2].c.b = (BYTE)b;
 		Col[3].Col = 0;
 
 		int Shift = 0;
@@ -205,7 +205,7 @@ long xx, yy;
 	for(yy=0; yy<4; yy++)
 	{
 		for(xx=0; xx<4; xx++)
-			pDest[xx].a = ((pSrc[yy] >> (xx * 4)) & 0x0f) << 4;
+			pDest[xx].c.a = ((pSrc[yy] >> (xx * 4)) & 0x0f) << 4;
 		pDest += Pitch;
 	}
 }
@@ -278,7 +278,7 @@ void ImageDXTC::ToImage32(Image32 *pDest)
 
 inline WORD Make565(Color Col)
 {
-	return ((WORD)(Col.r >> 3) << 11) | ((WORD)(Col.g >> 2) << 5) | ((WORD)(Col.b >> 3));
+	return ((WORD)(Col.c.r >> 3) << 11) | ((WORD)(Col.c.g >> 2) << 5) | ((WORD)(Col.c.b >> 3));
 }
 
 // Lookups for which vectors in the DXTn block format map to which vectors in
@@ -338,11 +338,11 @@ Color*		allocSource = 0;
 				for(xx=0; xx<maxXX; xx++)
 				{
 					C.Col = pSrcPix[xx].Col & Mask1565;
-					if(C.a == 0x00)
+					if(C.c.a == 0x00)
 						AlphaCount++;
 					else
 					{
-						C.a = 0x00;
+						C.c.a = 0x00;
 						cb[yy*4 + xx] = *(cbVector *)&C;
 						cb2.AddVector( *(cbVector *)&C );
 					}
@@ -661,7 +661,7 @@ WORD Index;
 		Shift = (y&1) * 8;
 		for(x=0; x<4; x++)
 		{
-			if((pSrc[x].a & 0x80) == 0)
+			if((pSrc[x].c.a & 0x80) == 0)
 				Index = 3;
 			else
 				Index = 1;
@@ -730,7 +730,7 @@ WORD Index, Col1, Col2;
 		Shift = (y&1) * 8;
 		for(x=0; x<4; x++)
 		{
-			if((pSrc[x].a & 0x80) == 0)
+			if((pSrc[x].c.a & 0x80) == 0)
 				Index = 3;
 			else
 			{
@@ -840,7 +840,7 @@ Color C, C2;
 		for(x=0; x<4; x++)
 		{
 			C = pSrc[x];
-			C.a = 0;
+			C.c.a = 0;
 			Index = ColorBits3[ cb.FindVectorSlow( *((cbVector *)(&C)) ) ];
 
 			pDest[0] |= Index << Shift;
@@ -886,7 +886,7 @@ Color C, C2;
 		Shift = (y&1) * 8;
 		for(x=0; x<4; x++)
 		{
-			if(pSrc[x].a == 0)
+			if(pSrc[x].c.a == 0)
 				Index = 3;
 			else
 				Index = ColorBits3[ cb.FindVectorSlow( *((cbVector *)(pSrc+x)) ) ];
@@ -910,7 +910,7 @@ WORD Alpha;
 		for(x=0; x<4; x++)
 		{
 			Shift = x*4;
-			Alpha |= (pSrc[x].a >> 4) << Shift;
+			Alpha |= (pSrc[x].c.a >> 4) << Shift;
 		}
 		pDest[y] = Alpha;
 		pSrc += XSize;
@@ -919,7 +919,7 @@ WORD Alpha;
 
 void ImageDXTC::Emit1AlphaBlock (WORD *pDest, Color c)
 {
-  pDest[0] = c.a * 0x101;
+  pDest[0] = c.c.a * 0x101;
   pDest[1] = 0;
   pDest[2] = 0;
   pDest[3] = 0;
@@ -928,14 +928,14 @@ void ImageDXTC::Emit1AlphaBlock (WORD *pDest, Color c)
 void ImageDXTC::Emit2AlphaBlock (WORD *pDest, Color c, Color c2, Color *pSrc)
 {
   uint v1, v2;
-  if (c.a > c2.a)
+  if (c.c.a > c2.c.a)
   {
-    pDest[0] = c.a | (c2.a << 8);
+    pDest[0] = c.c.a | (c2.c.a << 8);
     v1 = 0x0; v2 = 0x1;
   }
   else
   {
-    pDest[0] = c2.a | (c.a << 8);
+    pDest[0] = c2.c.a | (c.c.a << 8);
     v1 = 0x1; v2 = 0x0;
   }
   uint alpha[2];
@@ -947,7 +947,7 @@ void ImageDXTC::Emit2AlphaBlock (WORD *pDest, Color c, Color c2, Color *pSrc)
     {
       for (int x = 0; x < 4; x++)
       {
-	if (pSrc[x].a == c.a)
+	if (pSrc[x].c.a == c.c.a)
 	  alpha[i] |= v1 << shift;
 	else
 	  alpha[i] |= v2 << shift;
@@ -968,11 +968,11 @@ void ImageDXTC::EmitMultiAlphaBlock8 (WORD *pDest, CodeBook &cb, Color *pSrc)
   C = *((Color *)&cb[0]);
   C2 = *((Color *)&cb[1]);
 
-  if(C.a > C2.a)
+  if(C.c.a > C2.c.a)
   {
-    pDest[0] = C.a | (C2.a << 8);
+    pDest[0] = C.c.a | (C2.c.a << 8);
   }
-  else if (C.a < C2.a)
+  else if (C.c.a < C2.c.a)
   {
     *((Color *)&cb[0]) = C2;
     *((Color *)&cb[1]) = C;
@@ -992,12 +992,12 @@ void ImageDXTC::EmitMultiAlphaBlock8 (WORD *pDest, CodeBook &cb, Color *pSrc)
     C = *((Color *)&cb[0]);
     C2 = *((Color *)&cb[1]);
 
-    pDest[0] = C.a | (C2.a << 8);
+    pDest[0] = C.c.a | (C2.c.a << 8);
   }
   else
   {
     // Both colors are equal - Emit the block and return
-    pDest[0] = C.a * 0x101;
+    pDest[0] = C.c.a * 0x101;
     pDest[1] = pDest[2] = pDest[3] = 0;
     return;
   }
@@ -1034,11 +1034,11 @@ void ImageDXTC::EmitMultiAlphaBlock6 (WORD *pDest, CodeBook &cb, Color *pSrc)
   C = *((Color *)&cb[0]);
   C2 = *((Color *)&cb[1]);
 
-  if(C.a < C2.a)
+  if(C.c.a < C2.c.a)
   {
-    pDest[0] = C.a | (C2.a << 8);
+    pDest[0] = C.c.a | (C2.c.a << 8);
   }
-  else if (C.a > C2.a)
+  else if (C.c.a > C2.c.a)
   {
     *((Color *)&cb[0]) = C2;
     *((Color *)&cb[1]) = C;
@@ -1054,12 +1054,12 @@ void ImageDXTC::EmitMultiAlphaBlock6 (WORD *pDest, CodeBook &cb, Color *pSrc)
     C = *((Color *)&cb[0]);
     C2 = *((Color *)&cb[1]);
 
-    pDest[0] = C.a | (C2.a << 8);
+    pDest[0] = C.c.a | (C2.c.a << 8);
   }
   else
   {
     // Both colors are equal - Emit the block and return
-    pDest[0] = C.a * 0x101;
+    pDest[0] = C.c.a * 0x101;
     pDest[1] = pDest[2] = pDest[3] = 0;
     return;
   }

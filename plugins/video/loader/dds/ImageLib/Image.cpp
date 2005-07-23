@@ -133,16 +133,16 @@ $Loop:
 			Result += TempResult;
 			*/
 
-			double Val = (long)c1.a - (long)c2.a;
+			double Val = (long)c1.c.a - (long)c2.c.a;
 			Result += (Val * Val);
 
-			Val = (long)c1.r - (long)c2.r;
+			Val = (long)c1.c.r - (long)c2.c.r;
 			Result += (Val * Val);
 
-			Val = (long)c1.g - (long)c2.g;
+			Val = (long)c1.c.g - (long)c2.c.g;
 			Result += (Val * Val);
 
-			Val = (long)c1.b - (long)c2.b;
+			Val = (long)c1.c.b - (long)c2.c.b;
 			Result += (Val * Val);
 		}
 	}
@@ -177,16 +177,16 @@ $Loop:
 			c1 = pPal1[pSrc1[i]];
 			c2 = pSrc2[i];
 
-			double Val = (long)c1.a - (long)c2.a;
+			double Val = (long)c1.c.a - (long)c2.c.a;
 			Result += (Val * Val);
 
-			Val = (long)c1.r - (long)c2.r;
+			Val = (long)c1.c.r - (long)c2.c.r;
 			Result += (Val * Val);
 
-			Val = (long)c1.g - (long)c2.g;
+			Val = (long)c1.c.g - (long)c2.c.g;
 			Result += (Val * Val);
 
-			Val = (long)c1.b - (long)c2.b;
+			Val = (long)c1.c.b - (long)c2.c.b;
 			Result += (Val * Val);
 			/*
 			__asm {
@@ -239,7 +239,7 @@ Color	*pPix;
 	{
 		pPix = ((Image8 *)this)->GetPalette();
 		for(x=0; x<((Image8 *)this)->GetNumColors(); x++)
-			Usage[pPix[x].a]++;
+			Usage[pPix[x].c.a]++;
 	}
 	else if(GetType() == Type_32Bit)
 	{
@@ -247,7 +247,7 @@ Color	*pPix;
 		for(y=0; y<YSize; y++)
 		{
 			for(x=0; x<XSize; x++)
-				Usage[pPix[x].a]++;
+				Usage[pPix[x].c.a]++;
 
 			pPix += XSize;
 		}
@@ -276,9 +276,9 @@ Color	*pPix;
 			if(pAlpha1)
 			{
 				if(GetType() == Type_32Bit)
-					*pAlpha1 = ((Image32 *)this)->GetPixels()[0].a;
+					*pAlpha1 = ((Image32 *)this)->GetPixels()[0].c.a;
 				else if(GetType() == Type_8Bit)
-					*pAlpha1 = ((Image8 *)this)->GetPalette()[0].a;
+					*pAlpha1 = ((Image8 *)this)->GetPalette()[0].c.a;
 			}
 			return AT_Constant;
 		}
@@ -332,7 +332,7 @@ unsigned char NewAlpha[256];
 	{
 		pPix = ((Image8 *)this)->GetPalette();
 		for(x=0; x<((Image8 *)this)->GetNumColors(); x++)
-			pPix[x].a = NewAlpha[ pPix[x].a ];
+			pPix[x].c.a = NewAlpha[ pPix[x].c.a ];
 	}
 	else if(GetType() == Type_32Bit)
 	{
@@ -340,7 +340,7 @@ unsigned char NewAlpha[256];
 		for(y=0; y<YSize; y++)
 		{
 			for(x=0; x<XSize; x++)
-				pPix[x].a = NewAlpha[ pPix[x].a ];
+				pPix[x].c.a = NewAlpha[ pPix[x].c.a ];
 
 			pPix += XSize;
 		}
@@ -715,9 +715,9 @@ long	r, g, b, s, Count;
 	{
 		for(x=0; x<XMinus1; x++)
 		{
-			r = abs((long)pPix[x].r - (long)pPix[x+XPlus1].r);
-			g = abs((long)pPix[x].g - (long)pPix[x+XPlus1].g);
-			b = abs((long)pPix[x].b - (long)pPix[x+XPlus1].b);
+			r = abs((long)pPix[x].c.r - (long)pPix[x+XPlus1].c.r);
+			g = abs((long)pPix[x].c.g - (long)pPix[x+XPlus1].c.g);
+			b = abs((long)pPix[x].c.b - (long)pPix[x+XPlus1].c.b);
 
 			s = r+g+b;
 			if(s)
@@ -802,10 +802,10 @@ Color *pSrc;
 	{
 		for(x=0; x<XSize; x++)
 		{
-			r = pSrc[x].r;
-			g = pSrc[x].g;
-			b = pSrc[x].b;
-			a = pSrc[x].a;
+			r = pSrc[x].c.r;
+			g = pSrc[x].c.g;
+			b = pSrc[x].c.b;
+			a = pSrc[x].c.a;
 			pDest[x].r = r << 4;
 			pDest[x].g = g << 4;
 			pDest[x].b = b << 4;
@@ -923,10 +923,10 @@ Color *pSrc;
 	{
 		for(x=0; x<XSize; x++)
 		{
-			pSrc[x].r = Clamp(pDest[x].r >> 4) & ~rMask;
-			pSrc[x].g = Clamp(pDest[x].g >> 4) & ~gMask;
-			pSrc[x].b = Clamp(pDest[x].b >> 4) & ~bMask;
-			pSrc[x].a = Clamp(pDest[x].a >> 4) & ~aMask;
+			pSrc[x].c.r = Clamp(pDest[x].r >> 4) & ~rMask;
+			pSrc[x].c.g = Clamp(pDest[x].g >> 4) & ~gMask;
+			pSrc[x].c.b = Clamp(pDest[x].b >> 4) & ~bMask;
+			pSrc[x].c.a = Clamp(pDest[x].a >> 4) & ~aMask;
 		}
 		pSrc += XSize;
 		pDest += XSize;
@@ -957,10 +957,10 @@ BYTE *pDest;
 	{
 		for(x=0; x<XSize; x++)
 		{
-			r = pSrc[x].r;
-			g = pSrc[x].g;
-			b = pSrc[x].b;
-			a = pSrc[x].a;
+			r = pSrc[x].c.r;
+			g = pSrc[x].c.g;
+			b = pSrc[x].c.b;
+			a = pSrc[x].c.a;
 			pTemp[x].r = r << 4;
 			pTemp[x].g = g << 4;
 			pTemp[x].b = b << 4;
@@ -1136,15 +1136,15 @@ long	r, g, b, a;
 	{
 		for(x=0; x<NewX; x++)
 		{
-			r = (long)pSrcPix[0].r + (long)pSrcPix[1].r + (long)pSrcPix[XSize].r + (long)pSrcPix[XSize+1].r;
-			g = (long)pSrcPix[0].g + (long)pSrcPix[1].g + (long)pSrcPix[XSize].g + (long)pSrcPix[XSize+1].g;
-			b = (long)pSrcPix[0].b + (long)pSrcPix[1].b + (long)pSrcPix[XSize].b + (long)pSrcPix[XSize+1].b;
-			a = (long)pSrcPix[0].a + (long)pSrcPix[1].a + (long)pSrcPix[XSize].a + (long)pSrcPix[XSize+1].a;
+			r = (long)pSrcPix[0].c.r + (long)pSrcPix[1].c.r + (long)pSrcPix[XSize].c.r + (long)pSrcPix[XSize+1].c.r;
+			g = (long)pSrcPix[0].c.g + (long)pSrcPix[1].c.g + (long)pSrcPix[XSize].c.g + (long)pSrcPix[XSize+1].c.g;
+			b = (long)pSrcPix[0].c.b + (long)pSrcPix[1].c.b + (long)pSrcPix[XSize].c.b + (long)pSrcPix[XSize+1].c.b;
+			a = (long)pSrcPix[0].c.a + (long)pSrcPix[1].c.a + (long)pSrcPix[XSize].c.a + (long)pSrcPix[XSize+1].c.a;
 
-			pDestPix[x].r = (unsigned char)((r+3) >> 2);
-			pDestPix[x].g = (unsigned char)((g+3) >> 2);
-			pDestPix[x].b = (unsigned char)((b+3) >> 2);
-			pDestPix[x].a = (unsigned char)((a+3) >> 2);
+			pDestPix[x].c.r = (unsigned char)((r+3) >> 2);
+			pDestPix[x].c.g = (unsigned char)((g+3) >> 2);
+			pDestPix[x].c.b = (unsigned char)((b+3) >> 2);
+			pDestPix[x].c.a = (unsigned char)((a+3) >> 2);
 
 			pSrcPix += 2;
 		}
@@ -1173,15 +1173,15 @@ long	r, g, b, a;
 	{
 		for(x=0; x<NewX; x++)
 		{
-			r = (long)pSrcPix[0].r + (long)pSrcPix[1].r;
-			g = (long)pSrcPix[0].g + (long)pSrcPix[1].g;
-			b = (long)pSrcPix[0].b + (long)pSrcPix[1].b;
-			a = (long)pSrcPix[0].a + (long)pSrcPix[1].a;
+			r = (long)pSrcPix[0].c.r + (long)pSrcPix[1].c.r;
+			g = (long)pSrcPix[0].c.g + (long)pSrcPix[1].c.g;
+			b = (long)pSrcPix[0].c.b + (long)pSrcPix[1].c.b;
+			a = (long)pSrcPix[0].c.a + (long)pSrcPix[1].c.a;
 
-			pDestPix[x].r = (unsigned char)((r+1) >> 1);
-			pDestPix[x].g = (unsigned char)((g+1) >> 1);
-			pDestPix[x].b = (unsigned char)((b+1) >> 1);
-			pDestPix[x].a = (unsigned char)((a+1) >> 1);
+			pDestPix[x].c.r = (unsigned char)((r+1) >> 1);
+			pDestPix[x].c.g = (unsigned char)((g+1) >> 1);
+			pDestPix[x].c.b = (unsigned char)((b+1) >> 1);
+			pDestPix[x].c.a = (unsigned char)((a+1) >> 1);
 
 			pSrcPix += 2;
 		}
@@ -1209,15 +1209,15 @@ long	r, g, b, a;
 	{
 		for(x=0; x<XSize; x++)
 		{
-			r = (long)pSrcPix[0].r + (long)pSrcPix[XSize].r;
-			g = (long)pSrcPix[0].g + (long)pSrcPix[XSize].g;
-			b = (long)pSrcPix[0].b + (long)pSrcPix[XSize].b;
-			a = (long)pSrcPix[0].a + (long)pSrcPix[XSize].a;
+			r = (long)pSrcPix[0].c.r + (long)pSrcPix[XSize].c.r;
+			g = (long)pSrcPix[0].c.g + (long)pSrcPix[XSize].c.g;
+			b = (long)pSrcPix[0].c.b + (long)pSrcPix[XSize].c.b;
+			a = (long)pSrcPix[0].c.a + (long)pSrcPix[XSize].c.a;
 
-			pDestPix[x].r = (unsigned char)((r+1) >> 1);
-			pDestPix[x].g = (unsigned char)((g+1) >> 1);
-			pDestPix[x].b = (unsigned char)((b+1) >> 1);
-			pDestPix[x].a = (unsigned char)((a+1) >> 1);
+			pDestPix[x].c.r = (unsigned char)((r+1) >> 1);
+			pDestPix[x].c.g = (unsigned char)((g+1) >> 1);
+			pDestPix[x].c.b = (unsigned char)((b+1) >> 1);
+			pDestPix[x].c.a = (unsigned char)((a+1) >> 1);
 
 			pSrcPix++;
 		}
@@ -1260,15 +1260,15 @@ Color *pPix, *pDest;
 			Scale = XPos - (float)xs;
 			if((Scale > 0.001f) && ((xs+1) < XSize))
 			{
-				a = (float)pPix[xs].a * (1.0f-Scale) + (float)pPix[xs+1].a * Scale;
-				r = (float)pPix[xs].r * (1.0f-Scale) + (float)pPix[xs+1].r * Scale;
-				g = (float)pPix[xs].g * (1.0f-Scale) + (float)pPix[xs+1].g * Scale;
-				b = (float)pPix[xs].b * (1.0f-Scale) + (float)pPix[xs+1].b * Scale;
+				a = (float)pPix[xs].c.a * (1.0f-Scale) + (float)pPix[xs+1].c.a * Scale;
+				r = (float)pPix[xs].c.r * (1.0f-Scale) + (float)pPix[xs+1].c.r * Scale;
+				g = (float)pPix[xs].c.g * (1.0f-Scale) + (float)pPix[xs+1].c.g * Scale;
+				b = (float)pPix[xs].c.b * (1.0f-Scale) + (float)pPix[xs+1].c.b * Scale;
 
-				pDest[x].a = (BYTE)FtoL(a);
-				pDest[x].r = (BYTE)FtoL(r);
-				pDest[x].g = (BYTE)FtoL(g);
-				pDest[x].b = (BYTE)FtoL(b);
+				pDest[x].c.a = (BYTE)FtoL(a);
+				pDest[x].c.r = (BYTE)FtoL(r);
+				pDest[x].c.g = (BYTE)FtoL(g);
+				pDest[x].c.b = (BYTE)FtoL(b);
 			}
 			else
 				pDest[x] = pPix[xs];
@@ -1306,29 +1306,29 @@ Color *pPix, *pDest;
 			xs = (long)XStart;
 			Scale = 1.0f - (XStart - (float)xs);
 
-			a = (float)(pPix[xs].a) * Scale;
-			r = (float)(pPix[xs].r) * Scale;
-			g = (float)(pPix[xs].g) * Scale;
-			b = (float)(pPix[xs].b) * Scale;
+			a = (float)(pPix[xs].c.a) * Scale;
+			r = (float)(pPix[xs].c.r) * Scale;
+			g = (float)(pPix[xs].c.g) * Scale;
+			b = (float)(pPix[xs].c.b) * Scale;
 			xs++;
 
 			xe = (long)XEnd;
 			while(xs < xe)
 			{
-				a += (float)pPix[xs].a;
-				r += (float)pPix[xs].r;
-				g += (float)pPix[xs].g;
-				b += (float)pPix[xs].b;
+				a += (float)pPix[xs].c.a;
+				r += (float)pPix[xs].c.r;
+				g += (float)pPix[xs].c.g;
+				b += (float)pPix[xs].c.b;
 				xs++;
 			}
 
 			Scale = XEnd - (float)xe;
 			if(Scale > 0.001f)
 			{
-				a += (float)(pPix[xs].a) * Scale;
-				r += (float)(pPix[xs].r) * Scale;
-				g += (float)(pPix[xs].g) * Scale;
-				b += (float)(pPix[xs].b) * Scale;
+				a += (float)(pPix[xs].c.a) * Scale;
+				r += (float)(pPix[xs].c.r) * Scale;
+				g += (float)(pPix[xs].c.g) * Scale;
+				b += (float)(pPix[xs].c.b) * Scale;
 			}
 
 			a *= InvXStep;
@@ -1336,10 +1336,10 @@ Color *pPix, *pDest;
 			g *= InvXStep;
 			b *= InvXStep;
 
-			pDest[x].a = (BYTE)FtoL(a);
-			pDest[x].r = (BYTE)FtoL(r);
-			pDest[x].g = (BYTE)FtoL(g);
-			pDest[x].b = (BYTE)FtoL(b);
+			pDest[x].c.a = (BYTE)FtoL(a);
+			pDest[x].c.r = (BYTE)FtoL(r);
+			pDest[x].c.g = (BYTE)FtoL(g);
+			pDest[x].c.b = (BYTE)FtoL(b);
 
 			XStart += XStep;
 			XEnd += XStep;
@@ -1383,15 +1383,15 @@ Color *pPix, *pPix2, *pDest;
 		{
 			for(x=0; x<XSize; x++)
 			{
-				a = (float)pPix[x].a * (1.0f-Scale) + (float)pPix2[x].a * Scale;
-				r = (float)pPix[x].r * (1.0f-Scale) + (float)pPix2[x].r * Scale;
-				g = (float)pPix[x].g * (1.0f-Scale) + (float)pPix2[x].g * Scale;
-				b = (float)pPix[x].b * (1.0f-Scale) + (float)pPix2[x].b * Scale;
+				a = (float)pPix[x].c.a * (1.0f-Scale) + (float)pPix2[x].c.a * Scale;
+				r = (float)pPix[x].c.r * (1.0f-Scale) + (float)pPix2[x].c.r * Scale;
+				g = (float)pPix[x].c.g * (1.0f-Scale) + (float)pPix2[x].c.g * Scale;
+				b = (float)pPix[x].c.b * (1.0f-Scale) + (float)pPix2[x].c.b * Scale;
 
-				pDest[x].a = (BYTE)FtoL(a);
-				pDest[x].r = (BYTE)FtoL(r);
-				pDest[x].g = (BYTE)FtoL(g);
-				pDest[x].b = (BYTE)FtoL(b);
+				pDest[x].c.a = (BYTE)FtoL(a);
+				pDest[x].c.r = (BYTE)FtoL(r);
+				pDest[x].c.g = (BYTE)FtoL(g);
+				pDest[x].c.b = (BYTE)FtoL(b);
 			}
 		}
 		else
@@ -1428,10 +1428,10 @@ Color *pPix, *pPixStart, *pDest;
 			pPix = pPixStart + x;
 			Scale = 1.0f - (YStart - (float)ys);
 
-			a = (float)(pPix->a) * Scale;
-			r = (float)(pPix->r) * Scale;
-			g = (float)(pPix->g) * Scale;
-			b = (float)(pPix->b) * Scale;
+			a = (float)(pPix->c.a) * Scale;
+			r = (float)(pPix->c.r) * Scale;
+			g = (float)(pPix->c.g) * Scale;
+			b = (float)(pPix->c.b) * Scale;
 
 			ys++;
 			pPix += XSize;
@@ -1439,10 +1439,10 @@ Color *pPix, *pPixStart, *pDest;
 			ye = (long)YEnd;
 			while(ys < ye)
 			{
-				a += (float)pPix->a;
-				r += (float)pPix->r;
-				g += (float)pPix->g;
-				b += (float)pPix->b;
+				a += (float)pPix->c.a;
+				r += (float)pPix->c.r;
+				g += (float)pPix->c.g;
+				b += (float)pPix->c.b;
 
 				ys++;
 				pPix += XSize;
@@ -1451,10 +1451,10 @@ Color *pPix, *pPixStart, *pDest;
 			Scale = YEnd - (float)ye;
 			if(Scale > 0.001f)
 			{
-				a += (float)(pPix->a) * Scale;
-				r += (float)(pPix->r) * Scale;
-				g += (float)(pPix->g) * Scale;
-				b += (float)(pPix->b) * Scale;
+				a += (float)(pPix->c.a) * Scale;
+				r += (float)(pPix->c.r) * Scale;
+				g += (float)(pPix->c.g) * Scale;
+				b += (float)(pPix->c.b) * Scale;
 			}
 
 			a *= InvYStep;
@@ -1462,10 +1462,10 @@ Color *pPix, *pPixStart, *pDest;
 			g *= InvYStep;
 			b *= InvYStep;
 
-			pDest[x].a = (BYTE)FtoL(a);
-			pDest[x].r = (BYTE)FtoL(r);
-			pDest[x].g = (BYTE)FtoL(g);
-			pDest[x].b = (BYTE)FtoL(b);
+			pDest[x].c.a = (BYTE)FtoL(a);
+			pDest[x].c.r = (BYTE)FtoL(r);
+			pDest[x].c.g = (BYTE)FtoL(g);
+			pDest[x].c.b = (BYTE)FtoL(b);
 		}
 
 		pDest += XSize;
