@@ -1095,8 +1095,7 @@ AS_IF([test "$no_x" != yes],
 #
 # Many OpenGL libraries on Unix already contain GLX, so there is no separate
 # GLX library, thus we first check for GLX using the discovered OpenGL library
-# before attempting to locate a separate GLX-specific library.  The same logic
-# is also applied to GLU and GLUT checks.
+# before attempting to locate a separate GLX-specific library.  
 #
 # On MacOS/X, some users have XFree86 installed which creates a link from
 # /usr/include/GL to /usr/X11R6/include/GL.  We want to ignore this directory
@@ -1169,24 +1168,16 @@ AC_ARG_WITH([mesa], [AC_HELP_STRING([--with-mesa],
 
 AS_IF([test $with_mesa != no],
     [cs_mesa_gl=CS_CREATE_TUPLE([],[],[-lMesaGL])
-    cs_mesa_glu=CS_CREATE_TUPLE([],[],[-lMesaGLU])
     cs_mesa_glx=CS_CREATE_TUPLE([],[],[-lMesaGLX])])
 
 # MacOS/X or Darwin?
 AS_IF([test "x$cs_host_macosx" = "xyes"],
     [cs_osx_gl=CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],
-	[-framework OpenGL])
-    cs_osx_glu=CS_CREATE_TUPLE([-DCS_GLU_PATH=OpenGL],[],[-framework OpenGL])
-    cs_osx_glut=CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT])])
+	[-framework OpenGL])])
 
 # Windows?
-case $host_os in
-    mingw*|cygwin*)
-	cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])
-	cs_win32_glu=CS_CREATE_TUPLE([],[],[-lglu32])
-	cs_win32_glut=CS_CREATE_TUPLE([],[],[-lglut32])
-    ;;
-esac
+AS_IF([test $cs_host_family = windows],
+    [cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])])
 
 # Check for OpenGL.
 CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
@@ -1208,54 +1199,30 @@ AS_IF([test $cs_cv_libgl = yes],
 	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
-    # Check for GLU.
-    CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
-	[AC_LANG_PROGRAM(
-	    [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
-	[$cs_osx_glu \
-	CS_CREATE_TUPLE() \
-	$cs_win32_glu \
-	CS_CREATE_TUPLE([],[],[-lGLU]) \
-	CS_CREATE_TUPLE([],[],[-lglu]) \
-	$cs_mesa_glu], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
-	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
-
-    # Check for GLUT.
-    CS_CHECK_BUILD([for GLUT], [cs_cv_libglut],
-	[AC_LANG_PROGRAM(
-	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
-	[$cs_osx_glut \
-	CS_CREATE_TUPLE() \
-	$cs_win32_glut \
-	CS_CREATE_TUPLE([],[],[-lGLUT]) \
-	CS_CREATE_TUPLE([],[],[-lglut])], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
-	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
-
     # Check for GLX.
-    CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
-	[AC_LANG_PROGRAM([[#include <GL/glx.h>]], [glXWaitGL()])],
-	[CS_CREATE_TUPLE() \
-	CS_CREATE_TUPLE([],[],[-lGLX]) \
-	CS_CREATE_TUPLE([],[],[-lglx]) \
-	$cs_mesa_glx], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
-	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
-
-    # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-    # present.
-    AS_IF([test $cs_cv_libglx = yes],
-	[CS_CHECK_BUILD([for GLX extensions], [cs_cv_libglx_extensions],
-	    [AC_LANG_PROGRAM(
-		[[#define GLX_GLXEXT_PROTOTYPES
-		#include <GL/glx.h>]],
-		[glXGetProcAddressARB(0)])],
-	    [CS_CREATE_TUPLE(
-		[$cs_cv_libglx_cflags],
-		[$cs_cv_libglx_lflags],
-		[$cs_cv_libglx_libs])],
-	    [], [], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])])])
+    AS_IF([test "$no_x" != yes],
+	[CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
+	    [AC_LANG_PROGRAM([[#include <GL/glx.h>]], [glXWaitGL()])],
+	    [CS_CREATE_TUPLE() \
+	    CS_CREATE_TUPLE([],[],[-lGLX]) \
+	    CS_CREATE_TUPLE([],[],[-lglx]) \
+	    $cs_mesa_glx], [],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
+	    [$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
+    
+	# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
+	# present.
+	AS_IF([test $cs_cv_libglx = yes],
+	    [CS_CHECK_BUILD([for GLX extensions], [cs_cv_libglx_extensions],
+		[AC_LANG_PROGRAM(
+		    [[#define GLX_GLXEXT_PROTOTYPES
+		    #include <GL/glx.h>]],
+		    [glXGetProcAddressARB(0)])],
+		[CS_CREATE_TUPLE(
+		    [$cs_cv_libglx_cflags],
+		    [$cs_cv_libglx_lflags],
+		    [$cs_cv_libglx_libs])],
+		[], [], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])])])])
 
 
 
@@ -1265,35 +1232,37 @@ AS_IF([test $cs_cv_libgl = yes],
 # must take this into account.  With Cygwin, we must check for the DirectX
 # headers in /usr/include/directx.
 #------------------------------------------------------------------------------
-AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
-    [AC_LANG_PROGRAM(
-	[[#if !HAVE_TYPE_INT32
-	typedef long int32;
-	#endif
-	#include <windows.h>
-	#include <ddraw.h>
-	#include <dsound.h>
-	#include <dinput.h>]],
-	[DirectDrawCreate(0,0,0); 
-	 DirectSoundCreate(0,0,0); 
-	 DirectInputCreate(0,0,0,0)])],
-    [CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
-    CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw -ldsound -ldinput])], 
-    [], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx], [DIRECTX])])
+AS_IF([test $cs_host_family = windows],
+    [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
+    CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
+	[AC_LANG_PROGRAM(
+	    [[#if !HAVE_TYPE_INT32
+	    typedef long int32;
+	    #endif
+	    #include <windows.h>
+	    #include <ddraw.h>
+	    #include <dsound.h>
+	    #include <dinput.h>]],
+	    [DirectDrawCreate(0,0,0); 
+	     DirectSoundCreate(0,0,0); 
+	     DirectInputCreate(0,0,0,0)])],
+	[CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
+	CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw -ldsound -ldinput])], 
+	[], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx], [DIRECTX])])])    
 
 
 
 #------------------------------------------------------------------------------
 # Check for the Windows Multimedia library, used by the 'sndwaveout' plugin.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for waveout], [cs_cv_libwaveout],
-    [AC_LANG_PROGRAM(
-	[[#include <windows.h>
-	#include <mmsystem.h>]],
-	[waveOutOpen(0, 0, 0, 0, 0, 0)])],
-    [CS_CREATE_TUPLE([],[],[-lwinmm])], 
-    [], [CS_EMIT_BUILD_RESULT([cs_cv_libwaveout], [WAVEOUT])])
+AS_IF([test $cs_host_family = windows],
+    [CS_CHECK_BUILD([for waveout], [cs_cv_libwaveout],
+	[AC_LANG_PROGRAM(
+	    [[#include <windows.h>
+	    #include <mmsystem.h>]],
+	    [waveOutOpen(0, 0, 0, 0, 0, 0)])],
+	[CS_CREATE_TUPLE([],[],[-lwinmm])], 
+	[], [CS_EMIT_BUILD_RESULT([cs_cv_libwaveout], [WAVEOUT])])])
 
 
 
@@ -1714,33 +1683,31 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for GNU/Linux joystick API], [cs_cv_sys_linux_joystick],
-    [AC_LANG_PROGRAM(
-	[[#include <fcntl.h>
-	#include <sys/ioctl.h>
-	#include <linux/joystick.h>]],
-	[unsigned char axes;
-	unsigned char buttons;
-	int version;
-	char name[[[128]]];
-	int fd;
-	struct js_event js;
-	(void)js;
-	ioctl(fd, JSIOCGVERSION, &version);
-	ioctl(fd, JSIOCGAXES, &axes);
-	ioctl(fd, JSIOCGBUTTONS, &buttons);
-	ioctl(fd, JSIOCGNAME(128), name);])],
-    [], [],
-    [CS_EMIT_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])])
+AS_IF([test $cs_host_family != windows],
+    [CS_CHECK_BUILD([for GNU/Linux joystick API], [cs_cv_sys_linux_joystick],
+	[AC_LANG_PROGRAM(
+	    [[#include <fcntl.h>
+	    #include <sys/ioctl.h>
+	    #include <linux/joystick.h>]],
+	    [unsigned char axes;
+	    unsigned char buttons;
+	    int version;
+	    char name[[[128]]];
+	    int fd;
+	    struct js_event js;
+	    (void)js;
+	    ioctl(fd, JSIOCGVERSION, &version);
+	    ioctl(fd, JSIOCGAXES, &axes);
+	    ioctl(fd, JSIOCGBUTTONS, &buttons);
+	    ioctl(fd, JSIOCGNAME(128), name);])],
+	[], [],
+	[CS_EMIT_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])])])
 
 
 
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
 #------------------------------------------------------------------------------
-CS_CHECK_PROGS([CGC], [cgc])
-CS_EMIT_BUILD_PROPERTY([CGC], [$CGC])
-
 AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
@@ -1772,9 +1739,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
 		[CGprogram p; cgGLBindProgram(p)])],
 	    [], [],
 	    [CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
-	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
-	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
-	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
+	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags],
+	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags],
+	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs  ],
 	    [cggl, cgGL, CGGL, Cg, cg, CG])])])
 
 CS_CHECK_LIBCG
@@ -1784,30 +1751,32 @@ CS_CHECK_LIBCG
 #------------------------------------------------------------------------------
 # Check for OpenSoundSystem (OSS).
 #------------------------------------------------------------------------------
-AC_CHECK_HEADER([soundcard.h],
-    [CS_HEADER_PROPERTY([CS_HAVE_SOUNDCARD_H])
-    cs_cv_header_soundcard_h=yes],
-    [AC_CHECK_HEADER([sys/soundcard.h],
-	[CS_HEADER_PROPERTY([CS_HAVE_SYS_SOUNDCARD_H])
+AS_IF([test $cs_host_family != windows],
+    [AC_CHECK_HEADER([soundcard.h],
+	[CS_HEADER_PROPERTY([CS_HAVE_SOUNDCARD_H])
 	cs_cv_header_soundcard_h=yes],
-	[AC_CHECK_HEADER([machine/soundcard.h],
-	      [CS_HEADER_PROPERTY([CS_HAVE_MACHINE_SOUNDCARD_H])
-	      cs_cv_header_soundcard_h=yes],
-	      [cs_cv_header_soundcard_h=no])])])
-
-AS_IF([test $cs_cv_header_soundcard_h = yes],
-    [CS_EMIT_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])
+	[AC_CHECK_HEADER([sys/soundcard.h],
+	    [CS_HEADER_PROPERTY([CS_HAVE_SYS_SOUNDCARD_H])
+	    cs_cv_header_soundcard_h=yes],
+	    [AC_CHECK_HEADER([machine/soundcard.h],
+		  [CS_HEADER_PROPERTY([CS_HAVE_MACHINE_SOUNDCARD_H])
+		  cs_cv_header_soundcard_h=yes],
+		  [cs_cv_header_soundcard_h=no])])])]
+    
+    [AS_IF([test $cs_cv_header_soundcard_h = yes],
+	[CS_EMIT_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])])
 
 
 
 #------------------------------------------------------------------------------
 # Check for Advanced GNU/Linux Sound Architecture (ALSA)
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([asound],
-    [AC_LANG_PROGRAM(
-	[[#include <alsa/asoundlib.h>]],
-	[snd_pcm_hw_params_t* p; snd_pcm_hw_params_alloca(&p);])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libasound], [ALSA])])
+AS_IF([test $cs_host_family != windows],
+    [CS_CHECK_LIB_WITH([asound],
+	[AC_LANG_PROGRAM(
+	    [[#include <alsa/asoundlib.h>]],
+	    [snd_pcm_hw_params_t* p; snd_pcm_hw_params_alloca(&p);])],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libasound], [ALSA])])])
 
 
 

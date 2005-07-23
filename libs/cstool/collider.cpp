@@ -474,7 +474,7 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 csColliderActor::csColliderActor ()
 {
   revertMove = false;
-  gravity = 19.2;
+  gravity = 19.2f;
   onground = false;
   velWorld.Set (0, 0, 0);
   engine = 0;

@@ -55,7 +55,7 @@ tries to combine ideas with these with solutions that make sure that:
 
 - The system should be easier to understand, use and debug than the current system.
 
-The author believe that this proposal will meet all those points.
+The authors believe that this proposal will meet all those points.
 
 
 Technical specification

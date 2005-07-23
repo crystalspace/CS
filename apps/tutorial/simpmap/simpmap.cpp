@@ -219,7 +219,7 @@ bool Simple::Application()
   // Initialize our collider actor.
   collider_actor.SetCollideSystem (cdsys);
   collider_actor.SetEngine (engine);
-  csVector3 legs (1, .3, 1);
+  csVector3 legs (1.0f, .3f, 1.0f);
   csVector3 body (1, 1.2, 1);
   csVector3 shift (0, -1, 0);
   collider_actor.InitializeColliders (view->GetCamera (),
