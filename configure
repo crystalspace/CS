@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES FLEX BISON DOXYGEN TEXI2DVI TEXI2PDF DVIPS DVIPDF MAKEINFO HHC ac_ct_HHC INSTALL SWIG LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM CXXCPP EGREP PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS PKG_CONFIG ac_ct_PKG_CONFIG CONFIG_XXF86VM ac_ct_CONFIG_XXF86VM CONFIG_XAW ac_ct_CONFIG_XAW CONFIG_Z ac_ct_CONFIG_Z CONFIG_ZLIB ac_ct_CONFIG_ZLIB CONFIG_PNG ac_ct_CONFIG_PNG CONFIG_LIBPNG ac_ct_CONFIG_LIBPNG CONFIG_JPEG ac_ct_CONFIG_JPEG CONFIG_LIBJPEG ac_ct_CONFIG_LIBJPEG CONFIG_LCMS ac_ct_CONFIG_LCMS CONFIG_MNG ac_ct_CONFIG_MNG CONFIG_LIBMNG ac_ct_CONFIG_LIBMNG CONFIG_MIKMOD ac_ct_CONFIG_MIKMOD CONFIG_OGG ac_ct_CONFIG_OGG CONFIG_VORBIS ac_ct_CONFIG_VORBIS CONFIG_VORBISFILE ac_ct_CONFIG_VORBISFILE CONFIG_3DS ac_ct_CONFIG_3DS CONFIG_LIB3DS ac_ct_CONFIG_LIB3DS CONFIG_LIB3DS_120 ac_ct_CONFIG_LIB3DS_120 CONFIG_ODE ac_ct_CONFIG_ODE CONFIG_FREETYPE2 ac_ct_CONFIG_FREETYPE2 CONFIG_FREETYPE ac_ct_CONFIG_FREETYPE CONFIG_CAL3D ac_ct_CONFIG_CAL3D CONFIG_SDL ac_ct_CONFIG_SDL CONFIG_METAOBJECT_A3DL ac_ct_CONFIG_METAOBJECT_A3DL CONFIG_LIBMETAOBJECT_A3DL ac_ct_CONFIG_LIBMETAOBJECT_A3DL CONFIG_METAOBJECT_MISC ac_ct_CONFIG_METAOBJECT_MISC CONFIG_LIBMETAOBJECT_MISC ac_ct_CONFIG_LIBMETAOBJECT_MISC CONFIG_WX ac_ct_CONFIG_WX CGC CONFIG_CG ac_ct_CONFIG_CG CONFIG_CGGL ac_ct_CONFIG_CGGL CONFIG_ASOUND ac_ct_CONFIG_ASOUND CONFIG_AA ac_ct_CONFIG_AA CONFIG_AALIB ac_ct_CONFIG_AALIB CONFIG_CACA ac_ct_CONFIG_CACA CONFIG_LIBCACA ac_ct_CONFIG_LIBCACA TTREE CONFIG_CPPUNIT ac_ct_CONFIG_CPPUNIT OBJCOPY ac_ct_OBJCOPY CONFIG_BFD ac_ct_CONFIG_BFD LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES FLEX BISON DOXYGEN TEXI2DVI TEXI2PDF DVIPS DVIPDF MAKEINFO HHC ac_ct_HHC INSTALL SWIG LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM CXXCPP EGREP PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS PKG_CONFIG ac_ct_PKG_CONFIG CONFIG_XXF86VM ac_ct_CONFIG_XXF86VM CONFIG_XAW ac_ct_CONFIG_XAW CONFIG_Z ac_ct_CONFIG_Z CONFIG_ZLIB ac_ct_CONFIG_ZLIB CONFIG_PNG ac_ct_CONFIG_PNG CONFIG_LIBPNG ac_ct_CONFIG_LIBPNG CONFIG_JPEG ac_ct_CONFIG_JPEG CONFIG_LIBJPEG ac_ct_CONFIG_LIBJPEG CONFIG_LCMS ac_ct_CONFIG_LCMS CONFIG_MNG ac_ct_CONFIG_MNG CONFIG_LIBMNG ac_ct_CONFIG_LIBMNG CONFIG_MIKMOD ac_ct_CONFIG_MIKMOD CONFIG_OGG ac_ct_CONFIG_OGG CONFIG_VORBIS ac_ct_CONFIG_VORBIS CONFIG_VORBISFILE ac_ct_CONFIG_VORBISFILE CONFIG_3DS ac_ct_CONFIG_3DS CONFIG_LIB3DS ac_ct_CONFIG_LIB3DS CONFIG_LIB3DS_120 ac_ct_CONFIG_LIB3DS_120 CONFIG_ODE ac_ct_CONFIG_ODE CONFIG_FREETYPE2 ac_ct_CONFIG_FREETYPE2 CONFIG_FREETYPE ac_ct_CONFIG_FREETYPE CONFIG_CAL3D ac_ct_CONFIG_CAL3D CONFIG_SDL ac_ct_CONFIG_SDL CONFIG_METAOBJECT_A3DL ac_ct_CONFIG_METAOBJECT_A3DL CONFIG_LIBMETAOBJECT_A3DL ac_ct_CONFIG_LIBMETAOBJECT_A3DL CONFIG_METAOBJECT_MISC ac_ct_CONFIG_METAOBJECT_MISC CONFIG_LIBMETAOBJECT_MISC ac_ct_CONFIG_LIBMETAOBJECT_MISC CONFIG_WX ac_ct_CONFIG_WX CONFIG_CG ac_ct_CONFIG_CG CONFIG_CGGL ac_ct_CONFIG_CGGL CONFIG_ASOUND ac_ct_CONFIG_ASOUND CONFIG_AA ac_ct_CONFIG_AA CONFIG_AALIB ac_ct_CONFIG_AALIB CONFIG_CACA ac_ct_CONFIG_CACA CONFIG_LIBCACA ac_ct_CONFIG_LIBCACA TTREE CONFIG_CPPUNIT ac_ct_CONFIG_CPPUNIT OBJCOPY ac_ct_OBJCOPY CONFIG_BFD ac_ct_CONFIG_BFD LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -21590,8 +21590,7 @@ fi
 #
 # Many OpenGL libraries on Unix already contain GLX, so there is no separate
 # GLX library, thus we first check for GLX using the discovered OpenGL library
-# before attempting to locate a separate GLX-specific library.  The same logic
-# is also applied to GLU and GLUT checks.
+# before attempting to locate a separate GLX-specific library.
 #
 # On MacOS/X, some users have XFree86 installed which creates a link from
 # /usr/include/GL to /usr/X11R6/include/GL.  We want to ignore this directory
@@ -21779,7 +21778,6 @@ fi;
 
 if test $with_mesa != no; then
   cs_mesa_gl=`echo @@@-lMesaGL | sed 'y% %#%'`
-    cs_mesa_glu=`echo @@@-lMesaGLU | sed 'y% %#%'`
     cs_mesa_glx=`echo @@@-lMesaGLX | sed 'y% %#%'`
 fi
 
@@ -21787,19 +21785,14 @@ fi
 # MacOS/X or Darwin?
 if test "x$cs_host_macosx" = "xyes"; then
   cs_osx_gl=`echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
-    cs_osx_glu=`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
-    cs_osx_glut=`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'`
 fi
 
 
 # Windows?
-case $host_os in
-    mingw*|cygwin*)
-	cs_win32_gl=`echo @@@-lopengl32 | sed 'y% %#%'`
-	cs_win32_glu=`echo @@@-lglu32 | sed 'y% %#%'`
-	cs_win32_glut=`echo @@@-lglut32 | sed 'y% %#%'`
-    ;;
-esac
+if test $cs_host_family = windows; then
+  cs_win32_gl=`echo @@@-lopengl32 | sed 'y% %#%'`
+fi
+
 
 # Check for OpenGL.
 if test "" != yes; then
@@ -22528,766 +22521,9 @@ else
 fi
 
 
-    # Check for GLU.
-    if test "" != yes; then
-  echo "$as_me:$LINENO: checking for GLU" >&5
-echo $ECHO_N "checking for GLU... $ECHO_C" >&6
-if test "${cs_cv_libglu+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-
-    for cs_build_item in $cs_osx_glu \
-	`echo @@@ | sed 'y% %#%'` \
-	$cs_win32_glu \
-	`echo @@@-lGLU | sed 'y% %#%'` \
-	`echo @@@-lglu | sed 'y% %#%'` \
-	$cs_mesa_glu
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_GLU_PATH
-    #include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
-    #else
-    #include <GL/glu.h>
-    #endif
-int
-main ()
-{
-gluNewQuadric()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-	if test $cs_build_ok = yes; then
-  break
-fi
-
-    done
-
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libglu=yes
-		cs_cv_libglu_cflags=$cs_build_cflags
-		cs_cv_libglu_lflags=$cs_build_lflags
-		cs_cv_libglu_libs=$cs_build_libs
-else
-  cs_cv_libglu=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_libglu" >&5
-echo "${ECHO_T}$cs_cv_libglu" >&6
-else
-  echo "$as_me:$LINENO: checking for GLU" >&5
-echo $ECHO_N "checking for GLU... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-
-    for cs_build_item in $cs_osx_glu \
-	`echo @@@ | sed 'y% %#%'` \
-	$cs_win32_glu \
-	`echo @@@-lGLU | sed 'y% %#%'` \
-	`echo @@@-lglu | sed 'y% %#%'` \
-	$cs_mesa_glu
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_GLU_PATH
-    #include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
-    #else
-    #include <GL/glu.h>
-    #endif
-int
-main ()
-{
-gluNewQuadric()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-	if test $cs_build_ok = yes; then
-  break
-fi
-
-    done
-
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libglu=yes
-		cs_cv_libglu_cflags=$cs_build_cflags
-		cs_cv_libglu_lflags=$cs_build_lflags
-		cs_cv_libglu_libs=$cs_build_libs
-else
-  cs_cv_libglu=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_libglu" >&5
-echo "${ECHO_T}$cs_cv_libglu" >&6
-fi
-
-    if test $cs_cv_libglu = yes; then
-  if test "$cs_cv_libglu" = yes; then
-  cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libglu_cflags"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libglu_lflags $cs_cv_libglu_libs"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-else
-  cs_cv_libglu_cflags=''
-	cs_cv_libglu_lflags=''
-	cs_cv_libglu_libs=''
-
-fi
-
-
-    # Check for GLUT.
-    if test "" != yes; then
-  echo "$as_me:$LINENO: checking for GLUT" >&5
-echo $ECHO_N "checking for GLUT... $ECHO_C" >&6
-if test "${cs_cv_libglut+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-
-    for cs_build_item in $cs_osx_glut \
-	`echo @@@ | sed 'y% %#%'` \
-	$cs_win32_glut \
-	`echo @@@-lGLUT | sed 'y% %#%'` \
-	`echo @@@-lglut | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_GLUT_PATH
-    #include CS_HEADER_GLOBAL(CS_GLUT_PATH,glut.h)
-    #else
-    #include <GL/glut.h>
-    #endif
-int
-main ()
-{
-glutSwapBuffers
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-	if test $cs_build_ok = yes; then
-  break
-fi
-
-    done
-
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libglut=yes
-		cs_cv_libglut_cflags=$cs_build_cflags
-		cs_cv_libglut_lflags=$cs_build_lflags
-		cs_cv_libglut_libs=$cs_build_libs
-else
-  cs_cv_libglut=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_libglut" >&5
-echo "${ECHO_T}$cs_cv_libglut" >&6
-else
-  echo "$as_me:$LINENO: checking for GLUT" >&5
-echo $ECHO_N "checking for GLUT... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-
-    for cs_build_item in $cs_osx_glut \
-	`echo @@@ | sed 'y% %#%'` \
-	$cs_win32_glut \
-	`echo @@@-lGLUT | sed 'y% %#%'` \
-	`echo @@@-lglut | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_GLUT_PATH
-    #include CS_HEADER_GLOBAL(CS_GLUT_PATH,glut.h)
-    #else
-    #include <GL/glut.h>
-    #endif
-int
-main ()
-{
-glutSwapBuffers
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-	if test $cs_build_ok = yes; then
-  break
-fi
-
-    done
-
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libglut=yes
-		cs_cv_libglut_cflags=$cs_build_cflags
-		cs_cv_libglut_lflags=$cs_build_lflags
-		cs_cv_libglut_libs=$cs_build_libs
-else
-  cs_cv_libglut=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_libglut" >&5
-echo "${ECHO_T}$cs_cv_libglut" >&6
-fi
-
-    if test $cs_cv_libglut = yes; then
-  if test "$cs_cv_libglut" = yes; then
-  cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLUT.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libglut_cflags"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLUT.CFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libglut_lflags $cs_cv_libglut_libs"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLUT.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-else
-  cs_cv_libglut_cflags=''
-	cs_cv_libglut_lflags=''
-	cs_cv_libglut_libs=''
-
-fi
-
-
     # Check for GLX.
-    if test "" != yes; then
+    if test "$no_x" != yes; then
+  if test "" != yes; then
   echo "$as_me:$LINENO: checking for GLX" >&5
 echo $ECHO_N "checking for GLX... $ECHO_C" >&6
 if test "${cs_cv_libglx+set}" = set; then
@@ -23306,9 +22542,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	`echo @@@-lGLX | sed 'y% %#%'` \
-	`echo @@@-lglx | sed 'y% %#%'` \
-	$cs_mesa_glx
+	    `echo @@@-lGLX | sed 'y% %#%'` \
+	    `echo @@@-lglx | sed 'y% %#%'` \
+	    $cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -23460,9 +22696,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	`echo @@@-lGLX | sed 'y% %#%'` \
-	`echo @@@-lglx | sed 'y% %#%'` \
-	$cs_mesa_glx
+	    `echo @@@-lGLX | sed 'y% %#%'` \
+	    `echo @@@-lglx | sed 'y% %#%'` \
+	    $cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -23632,9 +22868,9 @@ else
 fi
 
 
-    # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-    # present.
-    if test $cs_cv_libglx = yes; then
+	# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
+	# present.
+	if test $cs_cv_libglx = yes; then
   if test "" != yes; then
   echo "$as_me:$LINENO: checking for GLX extensions" >&5
 echo $ECHO_N "checking for GLX extensions... $ECHO_C" >&6
@@ -23719,7 +22955,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #define GLX_GLXEXT_PROTOTYPES
-		#include <GL/glx.h>
+		    #include <GL/glx.h>
 int
 main ()
 {
@@ -23871,7 +23107,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #define GLX_GLXEXT_PROTOTYPES
-		#include <GL/glx.h>
+		    #include <GL/glx.h>
 int
 main ()
 {
@@ -23957,6 +23193,8 @@ fi
 
 fi
 
+fi
+
 
 
 
@@ -23966,7 +23204,8 @@ fi
 # must take this into account.  With Cygwin, we must check for the DirectX
 # headers in /usr/include/directx.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking for int32" >&5
+if test $cs_host_family = windows; then
+  echo "$as_me:$LINENO: checking for int32" >&5
 echo $ECHO_N "checking for int32... $ECHO_C" >&6
 if test "${ac_cv_type_int32+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -24029,7 +23268,7 @@ _ACEOF
 
 fi
 
-if test "" != yes; then
+    if test "" != yes; then
   echo "$as_me:$LINENO: checking for DirectX" >&5
 echo $ECHO_N "checking for DirectX... $ECHO_C" >&6
 if test "${cs_cv_libdirectx+set}" = set; then
@@ -24048,7 +23287,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-    `echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -24114,18 +23353,18 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #if !HAVE_TYPE_INT32
-	typedef long int32;
-	#endif
-	#include <windows.h>
-	#include <ddraw.h>
-	#include <dsound.h>
-	#include <dinput.h>
+	    typedef long int32;
+	    #endif
+	    #include <windows.h>
+	    #include <ddraw.h>
+	    #include <dsound.h>
+	    #include <dinput.h>
 int
 main ()
 {
 DirectDrawCreate(0,0,0);
-	 DirectSoundCreate(0,0,0);
-	 DirectInputCreate(0,0,0,0)
+	     DirectSoundCreate(0,0,0);
+	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
 }
@@ -24208,7 +23447,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
-    `echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -24274,18 +23513,18 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #if !HAVE_TYPE_INT32
-	typedef long int32;
-	#endif
-	#include <windows.h>
-	#include <ddraw.h>
-	#include <dsound.h>
-	#include <dinput.h>
+	    typedef long int32;
+	    #endif
+	    #include <windows.h>
+	    #include <ddraw.h>
+	    #include <dsound.h>
+	    #include <dinput.h>
 int
 main ()
 {
 DirectDrawCreate(0,0,0);
-	 DirectSoundCreate(0,0,0);
-	 DirectInputCreate(0,0,0,0)
+	     DirectSoundCreate(0,0,0);
+	     DirectInputCreate(0,0,0,0)
   ;
   return 0;
 }
@@ -24385,13 +23624,16 @@ else
 
 fi
 
+fi
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for the Windows Multimedia library, used by the 'sndwaveout' plugin.
 #------------------------------------------------------------------------------
-if test "" != yes; then
+if test $cs_host_family = windows; then
+  if test "" != yes; then
   echo "$as_me:$LINENO: checking for waveout" >&5
 echo $ECHO_N "checking for waveout... $ECHO_C" >&6
 if test "${cs_cv_libwaveout+set}" = set; then
@@ -24475,7 +23717,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <windows.h>
-	#include <mmsystem.h>
+	    #include <mmsystem.h>
 int
 main ()
 {
@@ -24627,7 +23869,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <windows.h>
-	#include <mmsystem.h>
+	    #include <mmsystem.h>
 int
 main ()
 {
@@ -24728,6 +23970,8 @@ else
   cs_cv_libwaveout_cflags=''
 	cs_cv_libwaveout_lflags=''
 	cs_cv_libwaveout_libs=''
+
+fi
 
 fi
 
@@ -44479,7 +43723,8 @@ fi
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
 #------------------------------------------------------------------------------
-if test "" != yes; then
+if test $cs_host_family != windows; then
+  if test "" != yes; then
   echo "$as_me:$LINENO: checking for GNU/Linux joystick API" >&5
 echo $ECHO_N "checking for GNU/Linux joystick API... $ECHO_C" >&6
 if test "${cs_cv_sys_linux_joystick+set}" = set; then
@@ -44563,22 +43808,22 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <fcntl.h>
-	#include <sys/ioctl.h>
-	#include <linux/joystick.h>
+	    #include <sys/ioctl.h>
+	    #include <linux/joystick.h>
 int
 main ()
 {
 unsigned char axes;
-	unsigned char buttons;
-	int version;
-	char name[128];
-	int fd;
-	struct js_event js;
-	(void)js;
-	ioctl(fd, JSIOCGVERSION, &version);
-	ioctl(fd, JSIOCGAXES, &axes);
-	ioctl(fd, JSIOCGBUTTONS, &buttons);
-	ioctl(fd, JSIOCGNAME(128), name);
+	    unsigned char buttons;
+	    int version;
+	    char name[128];
+	    int fd;
+	    struct js_event js;
+	    (void)js;
+	    ioctl(fd, JSIOCGVERSION, &version);
+	    ioctl(fd, JSIOCGAXES, &axes);
+	    ioctl(fd, JSIOCGBUTTONS, &buttons);
+	    ioctl(fd, JSIOCGNAME(128), name);
   ;
   return 0;
 }
@@ -44726,22 +43971,22 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <fcntl.h>
-	#include <sys/ioctl.h>
-	#include <linux/joystick.h>
+	    #include <sys/ioctl.h>
+	    #include <linux/joystick.h>
 int
 main ()
 {
 unsigned char axes;
-	unsigned char buttons;
-	int version;
-	char name[128];
-	int fd;
-	struct js_event js;
-	(void)js;
-	ioctl(fd, JSIOCGVERSION, &version);
-	ioctl(fd, JSIOCGAXES, &axes);
-	ioctl(fd, JSIOCGBUTTONS, &buttons);
-	ioctl(fd, JSIOCGNAME(128), name);
+	    unsigned char buttons;
+	    int version;
+	    char name[128];
+	    int fd;
+	    struct js_event js;
+	    (void)js;
+	    ioctl(fd, JSIOCGVERSION, &version);
+	    ioctl(fd, JSIOCGAXES, &axes);
+	    ioctl(fd, JSIOCGBUTTONS, &buttons);
+	    ioctl(fd, JSIOCGNAME(128), name);
   ;
   return 0;
 }
@@ -44824,67 +44069,14 @@ else
 
 fi
 
+fi
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
 #------------------------------------------------------------------------------
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in cgc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_CGC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$CGC"; then
-  ac_cv_prog_CGC="$CGC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CGC="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-CGC=$ac_cv_prog_CGC
-if test -n "$CGC"; then
-  echo "$as_me:$LINENO: result: $CGC" >&5
-echo "${ECHO_T}$CGC" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$CGC" && break
-done
-
-cs_build_prop_val="$CGC"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CGC ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
 
 
 
@@ -49466,9 +48658,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -49533,9 +48725,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libCgGL=yes
 		cs_cv_libCgGL_cflags=$cs_build_cflags
 		cs_cv_libCgGL_lflags=$cs_build_lflags
@@ -49618,9 +48810,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -49685,9 +48877,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libCgGL=yes
 		cs_cv_libCgGL_cflags=$cs_build_cflags
 		cs_cv_libCgGL_lflags=$cs_build_lflags
@@ -49750,7 +48942,8 @@ fi
 #------------------------------------------------------------------------------
 # Check for OpenSoundSystem (OSS).
 #------------------------------------------------------------------------------
-if test "${ac_cv_header_soundcard_h+set}" = set; then
+if test $cs_host_family != windows; then
+  if test "${ac_cv_header_soundcard_h+set}" = set; then
   echo "$as_me:$LINENO: checking for soundcard.h" >&5
 echo $ECHO_N "checking for soundcard.h... $ECHO_C" >&6
 if test "${ac_cv_header_soundcard_h+set}" = set; then
@@ -49890,7 +49083,7 @@ fi
 if test $ac_cv_header_soundcard_h = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE_SOUNDCARD_H
 "
-    cs_cv_header_soundcard_h=yes
+	cs_cv_header_soundcard_h=yes
 else
   if test "${ac_cv_header_sys_soundcard_h+set}" = set; then
   echo "$as_me:$LINENO: checking for sys/soundcard.h" >&5
@@ -50032,7 +49225,7 @@ fi
 if test $ac_cv_header_sys_soundcard_h = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE_SYS_SOUNDCARD_H
 "
-	cs_cv_header_soundcard_h=yes
+	    cs_cv_header_soundcard_h=yes
 else
   if test "${ac_cv_header_machine_soundcard_h+set}" = set; then
   echo "$as_me:$LINENO: checking for machine/soundcard.h" >&5
@@ -50174,7 +49367,7 @@ fi
 if test $ac_cv_header_machine_soundcard_h = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE_MACHINE_SOUNDCARD_H
 "
-	      cs_cv_header_soundcard_h=yes
+		  cs_cv_header_soundcard_h=yes
 else
   cs_cv_header_soundcard_h=no
 fi
@@ -50187,12 +49380,14 @@ fi
 
 
 
-if test $cs_cv_header_soundcard_h = yes; then
+    if test $cs_cv_header_soundcard_h = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
+fi
+
 fi
 
 fi
@@ -50203,6 +49398,7 @@ fi
 #------------------------------------------------------------------------------
 # Check for Advanced GNU/Linux Sound Architecture (ALSA)
 #------------------------------------------------------------------------------
+if test $cs_host_family != windows; then
 
 # Check whether --with-asound or --without-asound was given.
 if test "${with_asound+set}" = set; then
@@ -50966,6 +50162,8 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}ALSA.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
+fi
+
 fi
 
 fi
@@ -65088,7 +64286,6 @@ s,@CONFIG_LIBMETAOBJECT_MISC@,$CONFIG_LIBMETAOBJECT_MISC,;t t
 s,@ac_ct_CONFIG_LIBMETAOBJECT_MISC@,$ac_ct_CONFIG_LIBMETAOBJECT_MISC,;t t
 s,@CONFIG_WX@,$CONFIG_WX,;t t
 s,@ac_ct_CONFIG_WX@,$ac_ct_CONFIG_WX,;t t
-s,@CGC@,$CGC,;t t
 s,@CONFIG_CG@,$CONFIG_CG,;t t
 s,@ac_ct_CONFIG_CG@,$ac_ct_CONFIG_CG,;t t
 s,@CONFIG_CGGL@,$CONFIG_CGGL,;t t
