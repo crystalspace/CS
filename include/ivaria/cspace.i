@@ -887,15 +887,32 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/engine.h"
 
 %ignore iCamera::GetTransform (); // Non-const.
+%ignore iCamera::Perspective (const csVector3&, csVector2&) const;
+%ignore iCamera::InvPerspective (const csVector2&, float, csVector3&) const;
 %include "iengine/camera.h"
 
 %include "iengine/campos.h"
 %include "iengine/texture.h"
 %include "iengine/material.h"
+
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it
 // to use an alternate way for that function
 %feature("compactdefaultargs") HitBeamObject;
+%ignore iMeshWrapper::HitBeamBBox (const csVector3&, const csVector3&,
+  csVector3&, float*);
+%ignore iMeshWrapper::HitBeamOutline (const csVector3&, const csVector3&,
+  csVector3&, float*);
+%ignore iMeshWrapper::HitBeam (const csVector3&, const csVector3&,
+  csVector3&, float*);
+%ignore iMeshWrapper::HitBeam (const csVector3&, const csVector3&,
+  csVector3&, float*);
+%ignore iMeshWrapper::GetRadius (csVector3&, csVector3&) const;
+%ignore iMeshWrapper::GetWorldBoundingBox (csBox3&) const;
+%ignore iMeshWrapper::GetTransformedBoundingBox (
+  const csReversibleTransform&, csBox3&);
+%ignore iMeshWrapper::GetScreenBoundingBox (iCamera*, csBox2&, csBox3&);
 %include "iengine/mesh.h"
+
 %include "iengine/movable.h"
 %include "iengine/region.h"
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it

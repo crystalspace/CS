@@ -26,6 +26,9 @@ chronological order.
 	  Many (but not all) of the old versions have been marked as
 	  deprecated.
 	- Jorrit clarified a few api docs.
+	- Eric Sunshine added %ignore directives to cspace.i for the older
+	  methods HitBeamBBox(), GetRadius(), Perspective(), etc., which were
+	  not scripting language-friendly.
 23-Jul-2005
 	- mdmkolbe added a default radix of 10 to csPrintFormatter::OutputUint.
 	- mdmkolbe changed csPrintFormatter::Format to call OutputUint instead
