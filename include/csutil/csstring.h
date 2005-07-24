@@ -627,7 +627,7 @@ public:
    * \remarks The comparison is case-insensitive.
    */
   bool CompareNoCase (const char* iStr) const
-  { return (csStrNCaseCmp (GetDataSafe(), iStr, Size) == 0); }
+  { return (csStrCaseCmp (GetDataSafe(), iStr) == 0); }
 
   /**
    * Check if this string starts with another one.
