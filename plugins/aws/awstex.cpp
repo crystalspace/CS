@@ -137,7 +137,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
 
     if (DEBUG_GETTEX)
       csPrintf ("aws-debug: (%s) texture is: %p\n", __FILE__,
-      	(iTextureHandle*)(awstxt->tex));
+      	(void*)awstxt->tex);
 
     if (awstxt && id == awstxt->id)
     {

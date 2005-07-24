@@ -547,12 +547,12 @@ bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name,
   if (!node) return false;
 
   if (DEBUG_KEYS)
-    csPrintf ("aws-debug: Getting \"%s\" from %p\n", name, node);
+    csPrintf ("aws-debug: Getting \"%s\" from %p\n", name, (void*)node);
 
   iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
   if (DEBUG_KEYS)
-    csPrintf ("aws-debug: Node retrieved: %p [%s]\n", node, name);
+    csPrintf ("aws-debug: Node retrieved: %p [%s]\n", (void*)node, name);
 
   if (k)
   {

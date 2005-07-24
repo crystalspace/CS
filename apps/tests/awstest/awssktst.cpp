@@ -293,7 +293,7 @@ void awsTestSink::FillListBox(intptr_t sk, iAwsSource *source)
 
 void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
 {
-  csPrintf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", source, (void*)sink, source->GetComponent());
+  csPrintf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", (void*)source, (void*)sink, (void*)source->GetComponent());
 
   namec++;
   if (namec > 8) namec=0;
@@ -304,13 +304,13 @@ void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
 
 void awsTestSink::BlueClicked(intptr_t sink, iAwsSource *source)
 {
-  csPrintf("awstest: blue button clicked, source: %p, owner: %p\n", source, (void*)sink);
+  csPrintf("awstest: blue button clicked, source: %p, owner: %p\n", (void*)source, (void*)sink);
 }
 
 
 void awsTestSink::GreenClicked(intptr_t sink, iAwsSource *source)
 {
-  csPrintf("awstest: green button clicked, source: %p, owner: %p\n", source, (void*)sink);
+  csPrintf("awstest: green button clicked, source: %p, owner: %p\n", (void*)source, (void*)sink);
 }
 
 void awsTestSink::SetPass(intptr_t sk, iAwsSource *source)
