@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jul-2005
+	- mdmkolbe added a default radix of 10 to csPrintFormatter::OutputUint.
+	- mdmkolbe changed csPrintFormatter::Format to call OutputUint instead
+	  of OutputInt for size_t arguments.
 22-Jul-2005
 	- mdmkolbe removed extraneous semicolens, commas, and qualifiers
 	  found with '-ansi -pedantic'

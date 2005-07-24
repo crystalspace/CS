@@ -868,7 +868,7 @@ class csPrintfFormatter
   /// Output an unsigned integer.
   template<class T>
   void OutputUint (Twriter& writer, const FormatSpec& currentFormat,
-    T value, uint radix, const char* prefix = 0)
+    T value, uint radix = 10, const char* prefix = 0)
   {
     const utf32_char letterFirst = currentFormat.uppercase ? 'A' : 'a';
     const size_t scratchOffs = scratch.Length();
@@ -1239,7 +1239,7 @@ public:
 	      case typeSizeT:
 		{
 		  size_t v = param.vSzT;
-		  OutputInt (writer, currentFormat, v);
+		  OutputUint (writer, currentFormat, v);
 		}
 		break;
 	      default:
