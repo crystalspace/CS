@@ -762,6 +762,15 @@ void csMeshWrapper::SetImposterActive (bool flag)
   }
 }
 
+csHitBeamResult csMeshWrapper::HitBeamOutline (
+  const csVector3 &start,
+  const csVector3 &end)
+{
+  csHitBeamResult rc;
+  rc.hit = meshobj->HitBeamOutline (start, end, rc.isect, &rc.r);
+  return rc;
+}
+
 bool csMeshWrapper::HitBeamOutline (
   const csVector3 &start,
   const csVector3 &end,
@@ -771,6 +780,16 @@ bool csMeshWrapper::HitBeamOutline (
   return meshobj->HitBeamOutline (start, end, isect, pr);
 }
 
+csHitBeamResult csMeshWrapper::HitBeamObject (
+  const csVector3 &start,
+  const csVector3 &end)
+{
+  csHitBeamResult rc;
+  rc.hit = meshobj->HitBeamObject (start, end, rc.isect, &rc.r,
+  	&rc.polygon_idx);
+  return rc;
+}
+
 bool csMeshWrapper::HitBeamObject (
   const csVector3 &start,
   const csVector3 &end,
@@ -778,6 +797,15 @@ bool csMeshWrapper::HitBeamObject (
   float *pr, int* polygon_idx)
 {
   return meshobj->HitBeamObject (start, end, isect, pr, polygon_idx);
+}
+
+csHitBeamResult csMeshWrapper::HitBeam (
+  const csVector3 &start,
+  const csVector3 &end)
+{
+  csHitBeamResult rc;
+  rc.hit = HitBeam (start, end, rc.isect, &rc.r);
+  return rc;
 }
 
 bool csMeshWrapper::HitBeam (
@@ -824,6 +852,13 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
     iMeshWrapper *spr = children.Get (i);
     spr->HardTransform (t);
   }
+}
+
+csEllipsoid csMeshWrapper::GetRadius () const
+{
+  csEllipsoid e;
+  GetRadius (e.GetRadius (), e.GetCenter ());
+  return e;
 }
 
 void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
@@ -956,6 +991,19 @@ void csMeshWrapper::PlaceMesh ()
   }
 }
 
+csHitBeamResult csMeshWrapper::HitBeamBBox (
+  const csVector3 &start,
+  const csVector3 &end)
+{
+  csHitBeamResult rc;
+  csBox3 b;
+  GetObjectModel ()->GetObjectBoundingBox (b);
+
+  csSegment3 seg (start, end);
+  rc.facehit = csIntersect3::BoxSegment (b, seg, rc.isect, &rc.r);
+  return rc;
+}
+
 int csMeshWrapper::HitBeamBBox (
   const csVector3 &start,
   const csVector3 &end,
@@ -969,7 +1017,7 @@ int csMeshWrapper::HitBeamBBox (
   return csIntersect3::BoxSegment (b, seg, isect, pr);
 }
 
-void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
+const csBox3& csMeshWrapper::GetWorldBoundingBox ()
 {
   if (wor_bbox_movablenr != movable.GetUpdateNumber ())
   {
@@ -995,15 +1043,18 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
       wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
     }
   }
-
-  cbox = wor_bbox;
+  return wor_bbox;
 }
 
-void csMeshWrapper::GetTransformedBoundingBox (
-  const csReversibleTransform &trans,
-  csBox3 &cbox)
+void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 {
-  csBox3 box;
+  cbox = GetWorldBoundingBox ();
+}
+
+csBox3 csMeshWrapper::GetTransformedBoundingBox (
+  const csReversibleTransform &trans)
+{
+  csBox3 cbox, box;
   GetObjectModel ()->GetObjectBoundingBox (box);
   cbox.StartBoundingBox (trans * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
@@ -1013,6 +1064,21 @@ void csMeshWrapper::GetTransformedBoundingBox (
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
+  return cbox;
+}
+
+void csMeshWrapper::GetTransformedBoundingBox (
+  const csReversibleTransform &trans,
+  csBox3 &cbox)
+{
+  cbox = GetTransformedBoundingBox (trans);
+}
+
+csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
+{
+  csScreenBoxResult rc;
+  rc.distance = GetScreenBoundingBox (camera, rc.sbox, rc.cbox);
+  return rc;
 }
 
 float csMeshWrapper::GetScreenBoundingBox (

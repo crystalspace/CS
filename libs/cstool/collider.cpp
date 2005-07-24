@@ -307,6 +307,16 @@ int csColliderHelper::CollidePath (
   }
 }
 
+csTraceBeamResult csColliderHelper::TraceBeam (iCollideSystem* cdsys,
+	iSector* sector, const csVector3& start, const csVector3& end,
+	bool traverse_portals)
+{
+  csTraceBeamResult rc;
+  rc.sqdistance = TraceBeam (cdsys, sector, start, end, traverse_portals,
+  	rc.closest_tri, rc.closest_isect, &rc.closest_mesh);
+  return rc;
+}
+
 float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	const csVector3& start, const csVector3& end,
 	bool traverse_portals,

@@ -83,6 +83,47 @@ public:
   }
 };
 
+/**
+ * This class represents an ellipsoid.
+ */
+class CS_CRYSTALSPACE_EXPORT csEllipsoid
+{
+private:
+  csVector3 center;
+  csVector3 radius;
+
+public:
+  /// Create a new empty ellipsoid at (0,0,0).
+  csEllipsoid ()
+  {
+    center.Set (0, 0, 0);
+    radius.Set (0, 0, 0);
+  }
+
+  /// Create a new ellipsoid.
+  csEllipsoid (const csVector3& center, const csVector3& radius)
+  {
+    csEllipsoid::center = center;
+    csEllipsoid::radius = radius;
+  }
+
+  /// Copy Constructor.
+  csEllipsoid (const csEllipsoid& s) { center = s.center; radius = s.radius; }
+
+  /// Get the center of this ellipsoid.
+  csVector3& GetCenter () { return center; }
+  /// Get the center of this ellipsoid.
+  const csVector3& GetCenter () const { return center; }
+  /// Set the center of this ellipsoid.
+  void SetCenter (const csVector3& c) { center = c; }
+  /// Get the radius of this ellipsoid.
+  csVector3& GetRadius () { return radius; }
+  /// Get the radius of this ellipsoid.
+  const csVector3& GetRadius () const { return radius; }
+  /// Set the radius of this ellipsoid.
+  void SetRadius (const csVector3& r) { radius = r; }
+};
+
 /** @} */
 
 #endif // __CS_SPHERE_H__

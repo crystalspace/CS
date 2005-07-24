@@ -27,6 +27,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
+#include "ivaria/collider.h"
 
 class csReversibleTransform;
 class csCollisionPair;
@@ -145,6 +146,33 @@ public:
 };
 
 /**
+ * Return structure for the csColliderHelper::TraceBeam() method.
+ */
+struct CS_CRYSTALSPACE_EXPORT csTraceBeamResult
+{
+  /// Closest triangle from the model.
+  /**
+   * closest_tri will be set to the closest triangle that is hit. The
+   * triangle will be specified in world space.
+   */
+  csIntersectingTriangle closest_tri;
+  /**
+   * closest_isect will be set to the closest intersection point (in
+   * world space).
+   */
+  csVector3 closest_isect;
+  /**
+   * closest_mesh will be set to the closest mesh that is hit.
+   */
+  iMeshWrapper* closest_mesh;
+  /**
+   * The squared distance between 'start' and the closest hit
+   * or else a negative number if there was no hit.
+   */
+  float sqdistance;
+};
+
+/**
  * This is a class containing a few static member functions to help
  * work with csColliderWrapper and collision detection in general.
  */
@@ -244,7 +272,6 @@ public:
 	iCollider** colliders,
 	csReversibleTransform** transforms);
 
-
   /**
    * Trace a beam from 'start' to 'end' and return the first hit.
    * This function will use CollideRay() from the collision detection system
@@ -272,6 +299,26 @@ public:
 	csIntersectingTriangle& closest_tri,
 	csVector3& closest_isect,
 	iMeshWrapper** closest_mesh = 0);
+
+  /**
+   * Trace a beam from 'start' to 'end' and return the first hit.
+   * This function will use CollideRay() from the collision detection system
+   * and is pretty fast. Note that only OPCODE plugin currently supports
+   * this! A special note about portals! Portal traversal will NOT be used
+   * on portals that have a collider! The idea there is that the portal itself
+   * is a surface that cannot be penetrated.
+   * \param cdsys is the collider system.
+   * \param sector is the starting sector for the beam.
+   * \param start is the start of the beam.
+   * \param end is the end of the beam.
+   * \param traverse_portals set to true in case you want the beam to
+   * traverse portals.
+   * \return a result instance of csTraceBeamResult.
+   * \sa csTraceBeamResult
+   */
+  static csTraceBeamResult TraceBeam (iCollideSystem* cdsys, iSector* sector,
+	const csVector3& start, const csVector3& end,
+	bool traverse_portals);
 };
 
 /**

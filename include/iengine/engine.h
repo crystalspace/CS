@@ -613,19 +613,19 @@ struct iEngine : public iBase
    * \param w lightmap width 
    * \param h lightmap height
    */
-  virtual void SetMaxLightmapSize(int w, int h) = 0;
+  virtual void SetMaxLightmapSize (int w, int h) = 0;
 
   /** Retrieve maximum lightmap size.
    * \param w lightmap width
    * \param h lightmap height
   */
-  virtual void GetMaxLightmapSize(int& w, int& h) = 0;
+  virtual void GetMaxLightmapSize (int& w, int& h) = 0;
 
   /** Retrieve default maximum lightmap size.  
    * \param w lightmap width
    * \param h lightmap height
   */
-  virtual void GetDefaultMaxLightmapSize(int& w, int& h) = 0;
+  virtual void GetDefaultMaxLightmapSize (int& w, int& h) = 0;
 
   /// Get the maximum aspect ratio for lightmaps.
   virtual int GetMaxLightmapAspectRatio () const = 0;
@@ -1076,7 +1076,14 @@ struct iEngine : public iBase
    * done then the engine will use its own cache manager based on VFS.
    * This will do an incref on the given cache manager and a decref
    * on the old one. The engine will release the cache manager at
-   * destruction time.
+   * destruction time. To set the cache manager to the default VFS
+   * based cache manager for the current VFS directory you can use the
+   * following code:
+   * \code
+   * vfs->ChDir (...);
+   * engine->SetCacheManager (0);	// Clear it.
+   * engine->GetCacheManager ();	// Force a regeneration.
+   * \endcode
    */
   virtual void SetCacheManager (iCacheManager* cache_mgr) = 0;
 

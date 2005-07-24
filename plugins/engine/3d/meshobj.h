@@ -558,34 +558,25 @@ public:
 
   //---------- Bounding volume and beam functions -----------------//
 
-  /// Get the radius of this mesh and all its children.
   virtual void GetRadius (csVector3& rad, csVector3& cent) const;
+  virtual csEllipsoid GetRadius () const;
 
-  /**
-   * Check if this object is hit by this object space vector.
-   * BBox version.
-   */
   virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
          csVector3& isect, float* pr);
-
-  /**
-   * Check if this object is hit by this object space vector.
-   * Outline version.
-   */
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
          csVector3& isect, float* pr);
-  /**
-   * Check if this object is hit by this object space vector.
-   * Return the collision point in object space coordinates.
-   */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-  /**
-   * Check if this object is hit by this world space vector.
-   * Return the collision point in world space coordinates.
-   */
   virtual bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
+  virtual csHitBeamResult HitBeamBBox (const csVector3& start,
+  	const csVector3& end);
+  virtual csHitBeamResult HitBeamOutline (const csVector3& start,
+  	const csVector3& end);
+  virtual csHitBeamResult HitBeamObject (const csVector3& start,
+  	const csVector3& end);
+  virtual csHitBeamResult HitBeam (const csVector3& start,
+  	const csVector3& end);
 
   /**
    * Calculate the squared distance between the camera and the object.
@@ -606,28 +597,14 @@ public:
    */
   virtual void PlaceMesh ();
 
-  /**
-   * Get the bounding box of this object in world space.
-   * This routine will cache the bounding box and only recalculate it
-   * if the movable changes.
-   */
   virtual void GetWorldBoundingBox (csBox3& cbox);
-
-  /**
-   * Get the bounding box of this object after applying a transformation to it.
-   * This is really a very inaccurate function as it will take the bounding
-   * box of the object in object space and then transform this bounding box.
-   */
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox);
-
-  /**
-   * Get a very inaccurate bounding box of the object in screen space.
-   * Returns -1 if object behind the camera or else the distance between
-   * the camera and the furthest point of the 3D box.
-   */
   virtual float GetScreenBoundingBox (iCamera *camera, csBox2& sbox,
   	csBox3& cbox);
+  virtual const csBox3& GetWorldBoundingBox ();
+  virtual csBox3 GetTransformedBoundingBox (const csReversibleTransform& trans);
+  virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
 
   csMeshWrapper* GetCsParent () const
   { 

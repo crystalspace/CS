@@ -231,11 +231,22 @@ struct iCamera : public iBase
    */
   virtual long GetCameraNumber () const = 0;
 
-  /// Calculate perspective corrected point for this camera.
-  virtual void Perspective (const csVector3& v, csVector2& p) const = 0;
-  /// Calculate inverse perspective corrected point for this camera.
-  virtual void InvPerspective (const csVector2& p, float z,
+  /**
+   * Calculate perspective corrected point for this camera.
+   * \deprecated Use Perspective() instead.
+   */
+  CS_DEPRECATED_METHOD virtual void Perspective (const csVector3& v,
+  	csVector2& p) const = 0;
+  /**
+   * Calculate inverse perspective corrected point for this camera.
+   * \deprecated Use Perspective() instead.
+   */
+  CS_DEPRECATED_METHOD virtual void InvPerspective (const csVector2& p, float z,
   	csVector3& v) const = 0;
+  /// Calculate perspective corrected point for this camera.
+  virtual csVector2 Perspective (const csVector3& v) const = 0;
+  /// Calculate inverse perspective corrected point for this camera.
+  virtual csVector3 InvPerspective (const csVector2& p, float z) const = 0;
 
   /**
    * If the hit-only-portals flag is true then only portals will be

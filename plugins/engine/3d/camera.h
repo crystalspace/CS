@@ -332,6 +332,26 @@ public:
     v.y = (p.y - shift_y) * z * inv_aspect;
   }
 
+  /// Calculate perspective corrected point for this camera.
+  virtual csVector2 Perspective (const csVector3& v) const
+  {
+    csVector2 p;
+    float iz = aspect / v.z;
+    p.x = v.x * iz + shift_x;
+    p.y = v.y * iz + shift_y;
+    return p;
+  }
+
+  /// Calculate inverse perspective corrected point for this camera.
+  virtual csVector3 InvPerspective (const csVector2& p, float z) const
+  {
+    csVector3 v;
+    v.z = z;
+    v.x = (p.x - shift_x) * z * inv_aspect;
+    v.y = (p.y - shift_y) * z * inv_aspect;
+    return v;
+  }
+
   virtual void AddCameraSectorListener (iCameraSectorListener* listener)
   {
     listeners.Push (listener);

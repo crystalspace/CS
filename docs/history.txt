@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jul-2005
+	- Jorrit added a csEllipsoid class which is a variant of
+	  csSphere that has a vector as a radius.
+	- Jorrit added new versions of the following functions so that they
+	  return their result with 'return' instead of a reference parameter.
+	  This is a lot easier to use in scripting languages like Java:
+	      - csColliderHelper::TraceBeam (returns csTraceBeamResult)
+	      - iCamera->Perspective
+	      - iCamera->InvPerspective
+	      - iMeshWrapper->HitBeamBBox (returns csHitBeamResult)
+	      - iMeshWrapper->HitBeamOutline (returns csHitBeamResult)
+	      - iMeshWrapper->HitBeamObject (returns csHitBeamResult)
+	      - iMeshWrapper->HitBeam (returns csHitBeamResult)
+	      - iMeshWrapper->GetRadius (returns csEllipsoid)
+	      - iMeshWrapper->GetWorldBoundingBox
+	      - iMeshWrapper->GetTransformedBoundingBox
+	      - iMeshWrapper->GetScreenBoundingBox (returns csScreenBoxResult)
+	  Many (but not all) of the old versions have been marked as
+	  deprecated.
+	- Jorrit clarified a few api docs.
 23-Jul-2005
 	- mdmkolbe added a default radix of 10 to csPrintFormatter::OutputUint.
 	- mdmkolbe changed csPrintFormatter::Format to call OutputUint instead
