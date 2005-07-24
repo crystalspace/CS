@@ -1100,8 +1100,11 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csutil/csobject.h"
 
-%include "cstool/csview.h"
+%ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
+  const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
+  csVector3&, iMeshWrapper**);
 %include "cstool/collider.h"
+%include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 
 %ignore csPixmap;
