@@ -29,6 +29,8 @@ chronological order.
 	- Eric Sunshine added %ignore directives to cspace.i for the older
 	  methods HitBeamBBox(), GetRadius(), Perspective(), etc., which were
 	  not scripting language-friendly.
+	- Vincent Knecht added the "DejaVu" TrueType fonts to the list of
+	  files to be installed. Also modified vfs.cfg.template accordingly.
 23-Jul-2005
 	- mdmkolbe added a default radix of 10 to csPrintFormatter::OutputUint.
 	- mdmkolbe changed csPrintFormatter::Format to call OutputUint instead

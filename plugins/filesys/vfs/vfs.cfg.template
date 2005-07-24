@@ -24,7 +24,7 @@ VFS.Mount.shader = $(CS_DATADIR)$/shader$/
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library
-VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-vera.zip
+VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-dejavu.zip, $(CS_DATADIR)$/ttf-vera.zip
 
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
 VFS.Mount.lev/pvstest  = $(CS_MAPDIR)$/pvstest$/
