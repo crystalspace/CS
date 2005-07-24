@@ -31,6 +31,10 @@ chronological order.
 	  not scripting language-friendly.
 	- Vincent Knecht added the "DejaVu" TrueType fonts to the list of
 	  files to be installed. Also modified vfs.cfg.template accordingly.
+	- res added a 0 check to csMeshFactoryList::FindByName() to avoid a 
+	  crash when a 0 mesh name is passed.
+	- res fixed invalid usage of csStrNCaseCmp() in 
+	  csString::CompareNoCase (const char* iStr).
 23-Jul-2005
 	- mdmkolbe added a default radix of 10 to csPrintFormatter::OutputUint.
 	- mdmkolbe changed csPrintFormatter::Format to call OutputUint instead
