@@ -1527,6 +1527,7 @@ int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
 {
+  if (!Name) return 0;
   return factories_hash.Get (Name, 0);
 }
 
