@@ -239,7 +239,7 @@ struct iCamera : public iBase
   	csVector2& p) const = 0;
   /**
    * Calculate inverse perspective corrected point for this camera.
-   * \deprecated Use InvPerspective(const csVector2&) instead.
+   * \deprecated Use InvPerspective(const csVector2&, float) instead.
    */
   CS_DEPRECATED_METHOD virtual void InvPerspective (const csVector2& p, float z,
   	csVector3& v) const = 0;
