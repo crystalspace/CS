@@ -135,12 +135,20 @@ typedef int64_t int64;
 // all else fails, then we fake up these types on our own.
 #include <stddef.h>
 #if !defined(CS_HAVE_INTPTR_T) && !defined(_INTPTR_T_DEFINED)
+
+#if CS_PROCESSOR_SIZE == 64
+typedef int64 intptr_t;
+typedef uint64 uintptr_t;
+typedef int64 ptrdiff_t;
+#else
 /// Integer at least as wide as a pointer
 typedef int intptr_t;
 /// Unsigned integer at least as wide as a pointer
 typedef unsigned int uintptr_t;
 /// Difference of 2 pointers
 typedef int ptrdiff_t;
+#endif
+
 #define _INTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED
 #define _PTRDIFF_T_DEFINED

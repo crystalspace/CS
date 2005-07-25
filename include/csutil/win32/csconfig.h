@@ -83,7 +83,15 @@
 #  define CS_PROCESSOR_SIZE 32
 #endif
 
-#define CS_LONG_SIZE 8
+#define CS_LONG_SIZE 4
+
+// MSVC int64 format specifiers, to be used with native formatting functions
+#if defined(CS_COMPILER_MSVC)
+#define PRId64 "I64d"
+#define PRIx64 "I64x"
+#define PRIu64 "I64u"
+#define PRIX64 "I64X"
+#endif
 
 //#define CS_REF_TRACKER
 //#define CS_MEMORY_TRACKER

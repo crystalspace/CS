@@ -181,6 +181,40 @@
   #ifndef PRIX64
     #define PRIX64 __CS_PRI64_PREFIX "X"
   #endif
+  
+  #if CS_PROCESSOR_SIZE == 64
+    #ifndef PRIuPTR
+      #define PRIuPTR  PRIu64
+    #endif
+
+    #ifndef PRIxPTR
+      #define PRIxPTR  PRIx64
+    #endif
+    
+    #ifndef PRIdPTR
+      #define PRIdPTR  PRId64
+    #endif
+    
+    #ifndef PRIXPTR
+      #define PRIXPTR  PRIX64
+    #endif
+  #else
+    #ifndef PRIuPTR
+      #define PRIuPTR  PRIu32
+    #endif
+
+    #ifndef PRIxPTR
+      #define PRIxPTR  PRIx32
+    #endif
+    
+    #ifndef PRIdPTR
+      #define PRIdPTR  PRId32
+    #endif
+    
+    #ifndef PRIXPTR
+      #define PRIXPTR  PRIX32
+    #endif
+  #endif
 #endif
 
 // Platforms with compilers which understand the new C++ keyword `explicit'

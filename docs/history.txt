@@ -11,6 +11,12 @@ chronological order.
 	- mdmkolbe added CS_PRIn64 macros for passing to csPrintf et al, and
 	  fixed the PRIn64 macros to be more correct.  Places that needed
 	  to be using CS_PRIn64 were changed to use it.
+	- res fixed the CS_LONG_SIZE to 4 for MSVC.
+	- res added MSVC-specific PRIn64 macros (which employ the I64 format
+	  modifier as used by the VC runtime).
+	- res changed the provided (u)intptr_t type to be dependent on the 
+	  processor size (ie is 64 bit wide on 64 bit machines).
+	- res added provision of PRInPTR macros to csdef.h.
 24-Jul-2005
 	- Jorrit added a csEllipsoid class which is a variant of
 	  csSphere that has a vector as a radius.
