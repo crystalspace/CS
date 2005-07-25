@@ -1007,6 +1007,33 @@ class csSpherePtr(csSphere):
         _swig_setattr(self, csSphere,self.__class__,csSphere)
 _cspace.csSphere_swigregister(csSpherePtr)
 
+class csEllipsoid(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csEllipsoid, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csEllipsoid, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csEllipsoid instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csEllipsoid, 'this', _cspace.new_csEllipsoid(*args))
+        _swig_setattr(self, csEllipsoid, 'thisown', 1)
+    def GetCenter(*args): return _cspace.csEllipsoid_GetCenter(*args)
+    def SetCenter(*args): return _cspace.csEllipsoid_SetCenter(*args)
+    def GetRadius(*args): return _cspace.csEllipsoid_GetRadius(*args)
+    def SetRadius(*args): return _cspace.csEllipsoid_SetRadius(*args)
+    def __del__(self, destroy=_cspace.delete_csEllipsoid):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csEllipsoidPtr(csEllipsoid):
+    def __init__(self, this):
+        _swig_setattr(self, csEllipsoid, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csEllipsoid, 'thisown', 0)
+        _swig_setattr(self, csEllipsoid,self.__class__,csEllipsoid)
+_cspace.csEllipsoid_swigregister(csEllipsoidPtr)
+
 CS_POLY_IN = _cspace.CS_POLY_IN
 CS_POLY_ON = _cspace.CS_POLY_ON
 CS_POLY_OUT = _cspace.CS_POLY_OUT
@@ -4770,6 +4797,76 @@ class iMeshDrawCallbackPtr(iMeshDrawCallback):
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshDrawCallback, 'thisown', 0)
         _swig_setattr(self, iMeshDrawCallback,self.__class__,iMeshDrawCallback)
 _cspace.iMeshDrawCallback_swigregister(iMeshDrawCallbackPtr)
+
+class csHitBeamResult(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csHitBeamResult, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csHitBeamResult, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csHitBeamResult instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["isect"] = _cspace.csHitBeamResult_isect_set
+    __swig_getmethods__["isect"] = _cspace.csHitBeamResult_isect_get
+    if _newclass:isect = property(_cspace.csHitBeamResult_isect_get, _cspace.csHitBeamResult_isect_set)
+    __swig_setmethods__["r"] = _cspace.csHitBeamResult_r_set
+    __swig_getmethods__["r"] = _cspace.csHitBeamResult_r_get
+    if _newclass:r = property(_cspace.csHitBeamResult_r_get, _cspace.csHitBeamResult_r_set)
+    __swig_setmethods__["polygon_idx"] = _cspace.csHitBeamResult_polygon_idx_set
+    __swig_getmethods__["polygon_idx"] = _cspace.csHitBeamResult_polygon_idx_get
+    if _newclass:polygon_idx = property(_cspace.csHitBeamResult_polygon_idx_get, _cspace.csHitBeamResult_polygon_idx_set)
+    __swig_setmethods__["facehit"] = _cspace.csHitBeamResult_facehit_set
+    __swig_getmethods__["facehit"] = _cspace.csHitBeamResult_facehit_get
+    if _newclass:facehit = property(_cspace.csHitBeamResult_facehit_get, _cspace.csHitBeamResult_facehit_set)
+    __swig_setmethods__["hit"] = _cspace.csHitBeamResult_hit_set
+    __swig_getmethods__["hit"] = _cspace.csHitBeamResult_hit_get
+    if _newclass:hit = property(_cspace.csHitBeamResult_hit_get, _cspace.csHitBeamResult_hit_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csHitBeamResult, 'this', _cspace.new_csHitBeamResult(*args))
+        _swig_setattr(self, csHitBeamResult, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csHitBeamResult):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csHitBeamResultPtr(csHitBeamResult):
+    def __init__(self, this):
+        _swig_setattr(self, csHitBeamResult, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csHitBeamResult, 'thisown', 0)
+        _swig_setattr(self, csHitBeamResult,self.__class__,csHitBeamResult)
+_cspace.csHitBeamResult_swigregister(csHitBeamResultPtr)
+
+class csScreenBoxResult(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csScreenBoxResult, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csScreenBoxResult, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csScreenBoxResult instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["sbox"] = _cspace.csScreenBoxResult_sbox_set
+    __swig_getmethods__["sbox"] = _cspace.csScreenBoxResult_sbox_get
+    if _newclass:sbox = property(_cspace.csScreenBoxResult_sbox_get, _cspace.csScreenBoxResult_sbox_set)
+    __swig_setmethods__["cbox"] = _cspace.csScreenBoxResult_cbox_set
+    __swig_getmethods__["cbox"] = _cspace.csScreenBoxResult_cbox_get
+    if _newclass:cbox = property(_cspace.csScreenBoxResult_cbox_get, _cspace.csScreenBoxResult_cbox_set)
+    __swig_setmethods__["distance"] = _cspace.csScreenBoxResult_distance_set
+    __swig_getmethods__["distance"] = _cspace.csScreenBoxResult_distance_get
+    if _newclass:distance = property(_cspace.csScreenBoxResult_distance_get, _cspace.csScreenBoxResult_distance_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csScreenBoxResult, 'this', _cspace.new_csScreenBoxResult(*args))
+        _swig_setattr(self, csScreenBoxResult, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csScreenBoxResult):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csScreenBoxResultPtr(csScreenBoxResult):
+    def __init__(self, this):
+        _swig_setattr(self, csScreenBoxResult, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csScreenBoxResult, 'thisown', 0)
+        _swig_setattr(self, csScreenBoxResult,self.__class__,csScreenBoxResult)
+_cspace.csScreenBoxResult_swigregister(csScreenBoxResultPtr)
 
 class iMeshWrapper(iBase):
     __swig_setmethods__ = {}
@@ -11746,61 +11843,6 @@ class csObjectPtr(csObject):
         _swig_setattr(self, csObject,self.__class__,csObject)
 _cspace.csObject_swigregister(csObjectPtr)
 
-class csView(iView):
-    __swig_setmethods__ = {}
-    for _s in [iView]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csView, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iView]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, csView, name)
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ csView instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def __init__(self, *args):
-        _swig_setattr(self, csView, 'this', _cspace.new_csView(*args))
-        _swig_setattr(self, csView, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csView):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-    def GetEngine(*args): return _cspace.csView_GetEngine(*args)
-    def SetEngine(*args): return _cspace.csView_SetEngine(*args)
-    def GetCamera(*args): return _cspace.csView_GetCamera(*args)
-    def SetCamera(*args): return _cspace.csView_SetCamera(*args)
-    def GetContext(*args): return _cspace.csView_GetContext(*args)
-    def SetContext(*args): return _cspace.csView_SetContext(*args)
-    def SetRectangle(*args): return _cspace.csView_SetRectangle(*args)
-    def ClearView(*args): return _cspace.csView_ClearView(*args)
-    def AddViewVertex(*args): return _cspace.csView_AddViewVertex(*args)
-    def RestrictClipperToScreen(*args): return _cspace.csView_RestrictClipperToScreen(*args)
-    def SetAutoResize(*args): return _cspace.csView_SetAutoResize(*args)
-    def UpdateClipper(*args): return _cspace.csView_UpdateClipper(*args)
-    def GetClipper(*args): return _cspace.csView_GetClipper(*args)
-    def Draw(*args): return _cspace.csView_Draw(*args)
-    __swig_setmethods__["scfRefCount"] = _cspace.csView_scfRefCount_set
-    __swig_getmethods__["scfRefCount"] = _cspace.csView_scfRefCount_get
-    if _newclass:scfRefCount = property(_cspace.csView_scfRefCount_get, _cspace.csView_scfRefCount_set)
-    __swig_setmethods__["scfWeakRefOwners"] = _cspace.csView_scfWeakRefOwners_set
-    __swig_getmethods__["scfWeakRefOwners"] = _cspace.csView_scfWeakRefOwners_get
-    if _newclass:scfWeakRefOwners = property(_cspace.csView_scfWeakRefOwners_get, _cspace.csView_scfWeakRefOwners_set)
-    def scfRemoveRefOwners(*args): return _cspace.csView_scfRemoveRefOwners(*args)
-    __swig_setmethods__["scfParent"] = _cspace.csView_scfParent_set
-    __swig_getmethods__["scfParent"] = _cspace.csView_scfParent_get
-    if _newclass:scfParent = property(_cspace.csView_scfParent_get, _cspace.csView_scfParent_set)
-    def IncRef(*args): return _cspace.csView_IncRef(*args)
-    def DecRef(*args): return _cspace.csView_DecRef(*args)
-    def GetRefCount(*args): return _cspace.csView_GetRefCount(*args)
-    def AddRefOwner(*args): return _cspace.csView_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cspace.csView_RemoveRefOwner(*args)
-    def QueryInterface(*args): return _cspace.csView_QueryInterface(*args)
-
-class csViewPtr(csView):
-    def __init__(self, this):
-        _swig_setattr(self, csView, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csView, 'thisown', 0)
-        _swig_setattr(self, csView,self.__class__,csView)
-_cspace.csView_swigregister(csViewPtr)
-
 class csColliderWrapper(csObject):
     __swig_setmethods__ = {}
     for _s in [csObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -11838,6 +11880,41 @@ class csColliderWrapperPtr(csColliderWrapper):
 _cspace.csColliderWrapper_swigregister(csColliderWrapperPtr)
 
 csColliderWrapper_GetColliderWrapper = _cspace.csColliderWrapper_GetColliderWrapper
+
+class csTraceBeamResult(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTraceBeamResult, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTraceBeamResult, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csTraceBeamResult instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["closest_tri"] = _cspace.csTraceBeamResult_closest_tri_set
+    __swig_getmethods__["closest_tri"] = _cspace.csTraceBeamResult_closest_tri_get
+    if _newclass:closest_tri = property(_cspace.csTraceBeamResult_closest_tri_get, _cspace.csTraceBeamResult_closest_tri_set)
+    __swig_setmethods__["closest_isect"] = _cspace.csTraceBeamResult_closest_isect_set
+    __swig_getmethods__["closest_isect"] = _cspace.csTraceBeamResult_closest_isect_get
+    if _newclass:closest_isect = property(_cspace.csTraceBeamResult_closest_isect_get, _cspace.csTraceBeamResult_closest_isect_set)
+    __swig_setmethods__["closest_mesh"] = _cspace.csTraceBeamResult_closest_mesh_set
+    __swig_getmethods__["closest_mesh"] = _cspace.csTraceBeamResult_closest_mesh_get
+    if _newclass:closest_mesh = property(_cspace.csTraceBeamResult_closest_mesh_get, _cspace.csTraceBeamResult_closest_mesh_set)
+    __swig_setmethods__["sqdistance"] = _cspace.csTraceBeamResult_sqdistance_set
+    __swig_getmethods__["sqdistance"] = _cspace.csTraceBeamResult_sqdistance_get
+    if _newclass:sqdistance = property(_cspace.csTraceBeamResult_sqdistance_get, _cspace.csTraceBeamResult_sqdistance_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csTraceBeamResult, 'this', _cspace.new_csTraceBeamResult(*args))
+        _swig_setattr(self, csTraceBeamResult, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csTraceBeamResult):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csTraceBeamResultPtr(csTraceBeamResult):
+    def __init__(self, this):
+        _swig_setattr(self, csTraceBeamResult, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csTraceBeamResult, 'thisown', 0)
+        _swig_setattr(self, csTraceBeamResult,self.__class__,csTraceBeamResult)
+_cspace.csTraceBeamResult_swigregister(csTraceBeamResultPtr)
 
 class csColliderHelper(_object):
     __swig_setmethods__ = {}
@@ -11914,6 +11991,61 @@ class csColliderActorPtr(csColliderActor):
         if not hasattr(self,"thisown"): _swig_setattr(self, csColliderActor, 'thisown', 0)
         _swig_setattr(self, csColliderActor,self.__class__,csColliderActor)
 _cspace.csColliderActor_swigregister(csColliderActorPtr)
+
+class csView(iView):
+    __swig_setmethods__ = {}
+    for _s in [iView]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csView, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iView]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csView, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csView instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csView, 'this', _cspace.new_csView(*args))
+        _swig_setattr(self, csView, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csView):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    def GetEngine(*args): return _cspace.csView_GetEngine(*args)
+    def SetEngine(*args): return _cspace.csView_SetEngine(*args)
+    def GetCamera(*args): return _cspace.csView_GetCamera(*args)
+    def SetCamera(*args): return _cspace.csView_SetCamera(*args)
+    def GetContext(*args): return _cspace.csView_GetContext(*args)
+    def SetContext(*args): return _cspace.csView_SetContext(*args)
+    def SetRectangle(*args): return _cspace.csView_SetRectangle(*args)
+    def ClearView(*args): return _cspace.csView_ClearView(*args)
+    def AddViewVertex(*args): return _cspace.csView_AddViewVertex(*args)
+    def RestrictClipperToScreen(*args): return _cspace.csView_RestrictClipperToScreen(*args)
+    def SetAutoResize(*args): return _cspace.csView_SetAutoResize(*args)
+    def UpdateClipper(*args): return _cspace.csView_UpdateClipper(*args)
+    def GetClipper(*args): return _cspace.csView_GetClipper(*args)
+    def Draw(*args): return _cspace.csView_Draw(*args)
+    __swig_setmethods__["scfRefCount"] = _cspace.csView_scfRefCount_set
+    __swig_getmethods__["scfRefCount"] = _cspace.csView_scfRefCount_get
+    if _newclass:scfRefCount = property(_cspace.csView_scfRefCount_get, _cspace.csView_scfRefCount_set)
+    __swig_setmethods__["scfWeakRefOwners"] = _cspace.csView_scfWeakRefOwners_set
+    __swig_getmethods__["scfWeakRefOwners"] = _cspace.csView_scfWeakRefOwners_get
+    if _newclass:scfWeakRefOwners = property(_cspace.csView_scfWeakRefOwners_get, _cspace.csView_scfWeakRefOwners_set)
+    def scfRemoveRefOwners(*args): return _cspace.csView_scfRemoveRefOwners(*args)
+    __swig_setmethods__["scfParent"] = _cspace.csView_scfParent_set
+    __swig_getmethods__["scfParent"] = _cspace.csView_scfParent_get
+    if _newclass:scfParent = property(_cspace.csView_scfParent_get, _cspace.csView_scfParent_set)
+    def IncRef(*args): return _cspace.csView_IncRef(*args)
+    def DecRef(*args): return _cspace.csView_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csView_GetRefCount(*args)
+    def AddRefOwner(*args): return _cspace.csView_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.csView_RemoveRefOwner(*args)
+    def QueryInterface(*args): return _cspace.csView_QueryInterface(*args)
+
+class csViewPtr(csView):
+    def __init__(self, this):
+        _swig_setattr(self, csView, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csView, 'thisown', 0)
+        _swig_setattr(self, csView,self.__class__,csView)
+_cspace.csView_swigregister(csViewPtr)
 
 
 csfxInterference = _cspace.csfxInterference
