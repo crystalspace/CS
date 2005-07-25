@@ -324,8 +324,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     CGparameter param = cgGetNamedParameter (program, 
       variablemap[i].destination);
 
-    CGtype type = cgGetParameterType (param);
-    if (!param || 
+    if (!param ||
         (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
     {
       variablemap.DeleteIndex (i);
