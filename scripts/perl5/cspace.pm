@@ -1309,6 +1309,46 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csEllipsoid ##############
+
+package cspace::csEllipsoid;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csEllipsoid(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetCenter = *cspacec::csEllipsoid_GetCenter;
+*SetCenter = *cspacec::csEllipsoid_SetCenter;
+*GetRadius = *cspacec::csEllipsoid_GetRadius;
+*SetRadius = *cspacec::csEllipsoid_SetRadius;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csEllipsoid($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPlane2 ##############
 
 package cspace::csPlane2;
@@ -5381,6 +5421,94 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iMeshDrawCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csHitBeamResult ##############
+
+package cspace::csHitBeamResult;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_isect_get = *cspacec::csHitBeamResult_isect_get;
+*swig_isect_set = *cspacec::csHitBeamResult_isect_set;
+*swig_r_get = *cspacec::csHitBeamResult_r_get;
+*swig_r_set = *cspacec::csHitBeamResult_r_set;
+*swig_polygon_idx_get = *cspacec::csHitBeamResult_polygon_idx_get;
+*swig_polygon_idx_set = *cspacec::csHitBeamResult_polygon_idx_set;
+*swig_facehit_get = *cspacec::csHitBeamResult_facehit_get;
+*swig_facehit_set = *cspacec::csHitBeamResult_facehit_set;
+*swig_hit_get = *cspacec::csHitBeamResult_hit_get;
+*swig_hit_set = *cspacec::csHitBeamResult_hit_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csHitBeamResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csHitBeamResult($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csScreenBoxResult ##############
+
+package cspace::csScreenBoxResult;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_sbox_get = *cspacec::csScreenBoxResult_sbox_get;
+*swig_sbox_set = *cspacec::csScreenBoxResult_sbox_set;
+*swig_cbox_get = *cspacec::csScreenBoxResult_cbox_get;
+*swig_cbox_set = *cspacec::csScreenBoxResult_cbox_set;
+*swig_distance_get = *cspacec::csScreenBoxResult_distance_get;
+*swig_distance_set = *cspacec::csScreenBoxResult_distance_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csScreenBoxResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csScreenBoxResult($self);
         delete $OWNER{$self};
     }
 }
@@ -12930,69 +13058,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csView ##############
-
-package cspace::csView;
-@ISA = qw( cspace cspace::iView );
-%OWNER = ();
-%ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csView(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csView($self);
-        delete $OWNER{$self};
-    }
-}
-
-*GetEngine = *cspacec::csView_GetEngine;
-*SetEngine = *cspacec::csView_SetEngine;
-*GetCamera = *cspacec::csView_GetCamera;
-*SetCamera = *cspacec::csView_SetCamera;
-*GetContext = *cspacec::csView_GetContext;
-*SetContext = *cspacec::csView_SetContext;
-*SetRectangle = *cspacec::csView_SetRectangle;
-*ClearView = *cspacec::csView_ClearView;
-*AddViewVertex = *cspacec::csView_AddViewVertex;
-*RestrictClipperToScreen = *cspacec::csView_RestrictClipperToScreen;
-*SetAutoResize = *cspacec::csView_SetAutoResize;
-*UpdateClipper = *cspacec::csView_UpdateClipper;
-*GetClipper = *cspacec::csView_GetClipper;
-*Draw = *cspacec::csView_Draw;
-*swig_scfRefCount_get = *cspacec::csView_scfRefCount_get;
-*swig_scfRefCount_set = *cspacec::csView_scfRefCount_set;
-*swig_scfWeakRefOwners_get = *cspacec::csView_scfWeakRefOwners_get;
-*swig_scfWeakRefOwners_set = *cspacec::csView_scfWeakRefOwners_set;
-*scfRemoveRefOwners = *cspacec::csView_scfRemoveRefOwners;
-*swig_scfParent_get = *cspacec::csView_scfParent_get;
-*swig_scfParent_set = *cspacec::csView_scfParent_set;
-*IncRef = *cspacec::csView_IncRef;
-*DecRef = *cspacec::csView_DecRef;
-*GetRefCount = *cspacec::csView_GetRefCount;
-*AddRefOwner = *cspacec::csView_AddRefOwner;
-*RemoveRefOwner = *cspacec::csView_RemoveRefOwner;
-*QueryInterface = *cspacec::csView_QueryInterface;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::csColliderWrapper ##############
 
 package cspace::csColliderWrapper;
@@ -13026,6 +13091,50 @@ sub DESTROY {
 *AddRefOwner = *cspacec::csColliderWrapper_AddRefOwner;
 *RemoveRefOwner = *cspacec::csColliderWrapper_RemoveRefOwner;
 *QueryInterface = *cspacec::csColliderWrapper_QueryInterface;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csTraceBeamResult ##############
+
+package cspace::csTraceBeamResult;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_closest_tri_get = *cspacec::csTraceBeamResult_closest_tri_get;
+*swig_closest_tri_set = *cspacec::csTraceBeamResult_closest_tri_set;
+*swig_closest_isect_get = *cspacec::csTraceBeamResult_closest_isect_get;
+*swig_closest_isect_set = *cspacec::csTraceBeamResult_closest_isect_set;
+*swig_closest_mesh_get = *cspacec::csTraceBeamResult_closest_mesh_get;
+*swig_closest_mesh_set = *cspacec::csTraceBeamResult_closest_mesh_set;
+*swig_sqdistance_get = *cspacec::csTraceBeamResult_sqdistance_get;
+*swig_sqdistance_set = *cspacec::csTraceBeamResult_sqdistance_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csTraceBeamResult(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csTraceBeamResult($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13113,6 +13222,69 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csView ##############
+
+package cspace::csView;
+@ISA = qw( cspace cspace::iView );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csView(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csView($self);
+        delete $OWNER{$self};
+    }
+}
+
+*GetEngine = *cspacec::csView_GetEngine;
+*SetEngine = *cspacec::csView_SetEngine;
+*GetCamera = *cspacec::csView_GetCamera;
+*SetCamera = *cspacec::csView_SetCamera;
+*GetContext = *cspacec::csView_GetContext;
+*SetContext = *cspacec::csView_SetContext;
+*SetRectangle = *cspacec::csView_SetRectangle;
+*ClearView = *cspacec::csView_ClearView;
+*AddViewVertex = *cspacec::csView_AddViewVertex;
+*RestrictClipperToScreen = *cspacec::csView_RestrictClipperToScreen;
+*SetAutoResize = *cspacec::csView_SetAutoResize;
+*UpdateClipper = *cspacec::csView_UpdateClipper;
+*GetClipper = *cspacec::csView_GetClipper;
+*Draw = *cspacec::csView_Draw;
+*swig_scfRefCount_get = *cspacec::csView_scfRefCount_get;
+*swig_scfRefCount_set = *cspacec::csView_scfRefCount_set;
+*swig_scfWeakRefOwners_get = *cspacec::csView_scfWeakRefOwners_get;
+*swig_scfWeakRefOwners_set = *cspacec::csView_scfWeakRefOwners_set;
+*scfRemoveRefOwners = *cspacec::csView_scfRemoveRefOwners;
+*swig_scfParent_get = *cspacec::csView_scfParent_get;
+*swig_scfParent_set = *cspacec::csView_scfParent_set;
+*IncRef = *cspacec::csView_IncRef;
+*DecRef = *cspacec::csView_DecRef;
+*GetRefCount = *cspacec::csView_GetRefCount;
+*AddRefOwner = *cspacec::csView_AddRefOwner;
+*RemoveRefOwner = *cspacec::csView_RemoveRefOwner;
+*QueryInterface = *cspacec::csView_QueryInterface;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
