@@ -250,7 +250,7 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%s)%s+0x%llx", // Avoid Mingw/gcc borked PRIx64.
+    str.Format ("[%p] (%s)%s+0x%" CS_PRIx64,
       (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
       symbolInfo->Name, displace);
@@ -294,8 +294,8 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
     str << strings.Request (param->name);
     str << " = ";
     csString tmp;
-    longlong data = param->value;
-    tmp.Format ("%lld(0x%llx)", data, data);
+    uintptr_t data = param->value;
+    tmp.Format ("%" PRIuPTR "(0x%" PRIxPTR ")", data, data);
     str << tmp;
     param++;
   }

@@ -83,6 +83,8 @@
 #  define CS_PROCESSOR_SIZE 32
 #endif
 
+#define CS_LONG_SIZE 8
+
 //#define CS_REF_TRACKER
 //#define CS_MEMORY_TRACKER
 

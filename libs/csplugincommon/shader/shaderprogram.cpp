@@ -418,8 +418,7 @@ void csShaderProgram::DumpVariableMappings (csString& output)
     output << strings->Request (vme.name);
     output << '(' << vme.name << ") -> ";
     output << vme.destination << ' ';
-    output.AppendFmt ("%jx", (intmax_t)vme.userVal);
-    output << ' ';
+    output << vme.userVal << ' ';
     output << '\n'; 
   }
 }

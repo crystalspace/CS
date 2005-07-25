@@ -8,6 +8,9 @@ chronological order.
 
 25-Jul-2005
 	- mdmkolbe removed an unused local variable.
+	- mdmkolbe added CS_PRIn64 macros for passing to csPrintf et al, and
+	  fixed the PRIn64 macros to be more correct.  Places that needed
+	  to be using CS_PRIn64 were changed to use it.
 24-Jul-2005
 	- Jorrit added a csEllipsoid class which is a variant of
 	  csSphere that has a vector as a radius.

@@ -27,15 +27,6 @@
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
 
-// Ugly work-around for Mingw/gcc borked PRId64.
-#ifndef __CS_PRI64_PREFIX
-#if CS_PROCESSOR_SIZE == 64
-#define __CS_PRI64_PREFIX "l"
-#else
-#define __CS_PRI64_PREFIX "ll"
-#endif
-#endif
-
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csEvent)
@@ -498,12 +489,12 @@ bool csEvent::Print (int level)
     {
 
       IndentLevel(level);
-      csPrintf(" Value: %" __CS_PRI64_PREFIX "d\n", object->intVal);
+      csPrintf(" Value: %" CS_PRId64 "\n", object->intVal);
     }
     else if (object->type == csEventAttrUInt)
     {
       IndentLevel(level);
-      csPrintf(" Value: %" __CS_PRI64_PREFIX "u\n", object->intVal);
+      csPrintf(" Value: %" CS_PRIu64 "\n", object->intVal);
     }
     else if (object->type == csEventAttrFloat)
     {

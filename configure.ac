@@ -2035,6 +2035,14 @@ CS_CHECK_BUILD([for PRIx99 macros], [cs_cv_c_format_macros],
 
 
 #------------------------------------------------------------------------------
+# Check the size of long.  Needed by the PRIx99 macros provided by CS
+#------------------------------------------------------------------------------
+AC_CHECK_SIZEOF([long])
+CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
+
+
+
+#------------------------------------------------------------------------------
 # Check if the types wchar_t and wint_t are available; also determine the size
 # of wchar_t.  These types might be built-in, or they might come from the
 # wchar.h or wctype.h header files.  Also determine availability of wcslen(),
