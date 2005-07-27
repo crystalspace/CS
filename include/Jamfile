@@ -35,6 +35,8 @@ CS_MASTER_HEADER_REJECTS =
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs csgeom cspoint.h      ]
+  [ ConcatDirs csgeom fastsqrt.h     ]
   [ ConcatDirs csgeom subrec2.h      ]
   [ ConcatDirs csutil garray.h       ]
   [ ConcatDirs csutil hashhandlers.h ]

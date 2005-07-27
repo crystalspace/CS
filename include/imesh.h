@@ -48,7 +48,6 @@
 #include "imesh/spritecal3d.h"
 #include "imesh/stars.h"
 #include "imesh/terrain.h"
-#include "imesh/terrfunc.h"
 #include "imesh/thing.h"
 #endif /* __IMESH_H__ */
 
