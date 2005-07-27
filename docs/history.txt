@@ -16,6 +16,9 @@ chronological order.
 	- Marten deprecated csPoint and FastSqrt. Use csVector2 resp sqrtf
 	  instead.
 	- Marten removed some left-overs from terrfunc (since long removed).
+	- res added some partial iDocument* implementations with commonly 
+	  duplicated code to facilitate creation of new iDocument* 
+	  implementations.
 25-Jul-2005
 	- mdmkolbe removed an unused local variable.
 	- mdmkolbe added CS_PRIn64 macros for passing to csPrintf et al, and

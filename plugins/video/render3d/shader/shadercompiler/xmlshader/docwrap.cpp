@@ -673,24 +673,6 @@ const char* csWrappedDocumentNode::GetContentsValue ()
   return 0;
 }
 
-int csWrappedDocumentNode::GetContentsValueAsInt ()
-{
-  const char* v = GetContentsValue ();
-  if (!v) return 0;
-  int val = 0;
-  sscanf (v, "%d", &val);
-  return val;
-}
-
-float csWrappedDocumentNode::GetContentsValueAsFloat ()
-{
-  const char* v = GetContentsValue ();
-  if (!v) return 0;
-  float val = 0.0;
-  sscanf (v, "%f", &val);
-  return val;
-}
-
 csRef<iDocumentAttributeIterator> csWrappedDocumentNode::GetAttributes ()
 {
   return wrappedNode->GetAttributes ();
@@ -794,38 +776,6 @@ iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
   iDocumentNode* ret = next;
   SeekNext();
   return ret;
-}
-
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csEmptyDocumentNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csEmptyDocumentNodeIterator::csEmptyDocumentNodeIterator ()
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
-
-csEmptyDocumentNodeIterator::~csEmptyDocumentNodeIterator ()
-{
-  SCF_DESTRUCT_IBASE();
-}
-
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csEmptyDocumentAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csEmptyDocumentAttributeIterator::csEmptyDocumentAttributeIterator ()
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
-
-csEmptyDocumentAttributeIterator::~csEmptyDocumentAttributeIterator ()
-{
-  SCF_DESTRUCT_IBASE();
 }
 
 //---------------------------------------------------------------------------

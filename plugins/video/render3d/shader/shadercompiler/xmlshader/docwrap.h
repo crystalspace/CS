@@ -21,14 +21,16 @@
 #define __DOCWRAP_H__
 
 #include "csutil/csstring.h"
-#include "csutil/strhash.h"
+#include "csutil/documentcommon.h"
 #include "csutil/leakguard.h"
 #include "csutil/parray.h"
 #include "csutil/pooledscfclass.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/strhash.h"
 #include "csutil/weakref.h"
+
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
@@ -73,7 +75,7 @@ struct iConditionResolver
 /**
  * Wrapper around a document node, supporting conditionals.
  */
-class csWrappedDocumentNode : public iDocumentNode
+class csWrappedDocumentNode : public csDocumentNodeReadOnly
 {
   friend class csWrappedDocumentNodeIterator;
   friend struct WrapperStackEntry;
@@ -183,9 +185,6 @@ public:
   { return wrappedNode->GetType(); }
   virtual bool Equals (iDocumentNode* other);
   virtual const char* GetValue ();
-  virtual void SetValue (const char* value) {}
-  virtual void SetValueAsInt (int value) {}
-  virtual void SetValueAsFloat (float value) {}
 
   virtual csRef<iDocumentNode> GetParent ()
   { return (iDocumentNode*)parent; }
@@ -193,16 +192,7 @@ public:
   virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
   virtual csRef<iDocumentNode> GetNode (const char* value);
 
-  virtual void RemoveNode (const csRef<iDocumentNode>& child) {}
-  virtual void RemoveNodes () {}
-
-  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before)
-  { return 0; }
-
   virtual const char* GetContentsValue ();
-  virtual int GetContentsValueAsInt ();
-  virtual float GetContentsValueAsFloat ();
 
   virtual csRef<iDocumentAttributeIterator> GetAttributes ();
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
@@ -211,42 +201,9 @@ public:
   virtual float GetAttributeValueAsFloat (const char* name);
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
-
-  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) {}
-  virtual void RemoveAttributes () {}
-
-  virtual void SetAttribute (const char* name, const char* value) {}
-  virtual void SetAttributeAsInt (const char* name, int value) {}
-  virtual void SetAttributeAsFloat (const char* name, float value) {}
 };
 
-class csEmptyDocumentNodeIterator : public iDocumentNodeIterator
-{
-public:
-  SCF_DECLARE_IBASE;
-  CS_LEAKGUARD_DECLARE(csEmptyDocumentNodeIterator);
-
-  csEmptyDocumentNodeIterator ();
-  virtual ~csEmptyDocumentNodeIterator ();
-
-  virtual bool HasNext () { return false; }
-  virtual csRef<iDocumentNode> Next () { return 0; }
-};
-
-class csEmptyDocumentAttributeIterator : public iDocumentAttributeIterator
-{
-public:
-  SCF_DECLARE_IBASE;
-  CS_LEAKGUARD_DECLARE(csEmptyDocumentAttributeIterator);
-
-  csEmptyDocumentAttributeIterator ();
-  virtual ~csEmptyDocumentAttributeIterator ();
-
-  virtual bool HasNext () { return false; }
-  virtual csRef<iDocumentAttribute> Next () { return 0; }
-};
-
-class csTextNodeWrapper : public iDocumentNode
+class csTextNodeWrapper : public csDocumentNodeReadOnly
 {
   char* nodeText;
   csRef<iDocumentNode> realMe;
@@ -264,58 +221,12 @@ public:
 
   virtual const char* GetValue ()
   { return nodeText; }
-  virtual void SetValue (const char* value) {}
-  virtual void SetValueAsInt (int value) {}
-  virtual void SetValueAsFloat (float value) {}
 
   virtual csRef<iDocumentNode> GetParent ()
   { return realMe->GetParent (); }
 
-  virtual csRef<iDocumentNodeIterator> GetNodes ()
-  { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
-  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value)
-  { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
-  virtual csRef<iDocumentNode> GetNode (const char* value)
-  { return 0; }
-
-  virtual void RemoveNode (const csRef<iDocumentNode>& child) {}
-  virtual void RemoveNodes () {}
-
-  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before = 0)
-  { return 0; }
-
   virtual const char* GetContentsValue ()
   { return 0; }
-  virtual int GetContentsValueAsInt ()
-  { return 0; }
-  virtual float GetContentsValueAsFloat ()
-  { return 0.0f; }
-
-  virtual csRef<iDocumentAttributeIterator> GetAttributes ()
-  { 
-    return csPtr<iDocumentAttributeIterator> 
-      (new csEmptyDocumentAttributeIterator); 
-  }
-
-  virtual csRef<iDocumentAttribute> GetAttribute (const char* name)
-  { return 0; }
-  virtual const char* GetAttributeValue (const char* name)
-  { return 0; }
-  virtual int GetAttributeValueAsInt (const char* name)
-  { return 0; }
-  virtual float GetAttributeValueAsFloat (const char* name)
-  { return 0.0f; }
-  virtual bool GetAttributeValueAsBool (const char* name,
-  	bool defaultvalue=false)
-  { return defaultvalue; }
-
-  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) {}
-  virtual void RemoveAttributes () {}
-
-  virtual void SetAttribute (const char* name, const char* value) {}
-  virtual void SetAttributeAsInt (const char* name, int value) {}
-  virtual void SetAttributeAsFloat (const char* name, float value) {}
 };
 
 class csWrappedDocumentNodeIterator : public iDocumentNodeIterator
