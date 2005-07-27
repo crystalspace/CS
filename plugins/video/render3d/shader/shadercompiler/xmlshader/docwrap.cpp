@@ -48,13 +48,16 @@ csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shar
   csWrappedDocumentNode::resolver = resolver;
   CS_ASSERT (resolver);
   csWrappedDocumentNode::shared = shared;
+  globalState.AttachNew (new GlobalProcessingState);
 
   ProcessWrappedNode ();
 }
 
 csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrappedNode,
 					      csWrappedDocumentNode* parent,
-					      csWrappedDocumentNodeFactory* shared)
+					      csWrappedDocumentNodeFactory* shared, 
+					      GlobalProcessingState* globalState) :
+  globalState (globalState)
 {
   SCF_CONSTRUCT_IBASE(0);
 
@@ -125,6 +128,12 @@ struct csWrappedDocumentNode::NodeProcessingState
 {
   csArray<WrapperStackEntry> wrapperStack;
   WrapperStackEntry currentWrapper;
+  csRef<iDocumentNodeIterator> iter;
+
+  Template* templ;
+  uint templNestCount;
+
+  NodeProcessingState() : templ(0) {}
 };
 
 static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_ERROR;
@@ -201,9 +210,105 @@ void csWrappedDocumentNode::ProcessInclude (const csString& filename,
   }
 }
 
+void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode, 
+					     NodeProcessingState* state)
+{
+  Template& templNodes = *(state->templ);
+  csRef<iDocumentNode> node = templNode;
+  bool handled = false;
+  if (node->GetType() == CS_NODE_UNKNOWN)
+  {
+    csString replaceScratch;
+    const char* nodeValue = ReplaceEntities (node->GetValue(),
+      replaceScratch);
+    if ((nodeValue != 0) && (*nodeValue == '?') && 
+      (*(nodeValue + strlen (nodeValue) - 1) == '?'))
+    {
+      const char* valStart = nodeValue + 1;
+
+      while (*valStart == ' ') valStart++;
+      CS_ASSERT (*valStart != 0);
+      size_t valLen = strlen (valStart) - 1;
+      if (valLen != 0)
+      {
+	while (*(valStart + valLen - 1) == ' ') valLen--;
+	const char* space = strchr (valStart, ' ');
+	/* The rightmost spaces were skipped and don't interest us
+	    any more. */
+	if (space >= valStart + valLen) space = 0;
+	size_t cmdLen;
+	if (space != 0)
+	{
+	  cmdLen = space - valStart;
+	}
+	else
+	{
+	  cmdLen = valLen;
+	}
+	csString tokenStr; tokenStr.Replace (valStart, cmdLen);
+	csStringID tokenID = shared->pitokens.Request (tokenStr);
+	switch (tokenID)
+	{
+	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
+	    state->templNestCount--;
+	    if (state->templNestCount != 0)
+	      templNodes.Push (node);
+	    break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
+	    state->templNestCount++;
+	    // Fall through
+	  default:
+	    templNodes.Push (node);
+	    break;
+	}
+      }
+    }
+  }
+  else
+    templNodes.Push (node);
+
+  if (state->templNestCount == 0)
+  {
+    state->templ = 0;
+  }
+}
+
+bool csWrappedDocumentNode::InvokeTemplate (const char* name, 
+					    iDocumentNode* node,
+					    NodeProcessingState* state)
+
+{
+  csRefArray<iDocumentNode>* templNodes = 
+    globalState->templates.GetElementPointer (name);
+  if (!templNodes) return false;
+
+  for (size_t i = 0; i < templNodes->Length(); i++)
+  {
+    ProcessSingleWrappedNode (state, templNodes->Get (i));
+  }
+  ValidateTemplateEnd (node, state);
+  return true;
+}
+
+void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node, 
+						 NodeProcessingState* state)
+{
+  if ((state->templ != 0) && (state->templNestCount != 0))
+  {
+    Report (syntaxErrorSeverity, node,
+      "'template' without 'endtemplate'");
+  }
+}
+
 void csWrappedDocumentNode::ProcessSingleWrappedNode (
   NodeProcessingState* state, iDocumentNode* node)
 {
+  if (state->templ != 0)
+  {
+    ProcessTemplate (node, state);
+    return;
+  }
+
   csArray<WrapperStackEntry>& wrapperStack = state->wrapperStack;
   WrapperStackEntry& currentWrapper = state->currentWrapper;
   bool handled = false;
@@ -216,6 +321,17 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       (*(nodeValue + strlen (nodeValue) - 1) == '?'))
     {
       const char* valStart = nodeValue + 1;
+      if ((*valStart == '!') || (*valStart == '#'))
+      {
+	/* Discard PIs beginning with ! and #. This allows comments, e.g.
+	 * <?! some comment ?>
+	 * The difference to XML comments is that the PI comments do not
+	 * appear in the final document after processing, hence are useful
+	 * if some PIs themselves are to be commented, but it is undesireable
+	 * to have an XML comment in the result. */
+	return;
+      }
+
       while (*valStart == ' ') valStart++;
       CS_ASSERT (*valStart != 0);
       size_t valLen = strlen (valStart) - 1;
@@ -373,8 +489,51 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	    }
 	    break;
-	  default:
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
 	    {
+	      bool okay = true;
+	      csString templateName;
+	      templateName.Replace (space + 1, valLen - cmdLen - 1);
+	      templateName.RTrim();
+	      size_t templateEnd = templateName.FindFirst (' ');
+	      if (okay && (templateEnd != (size_t)-1))
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "Extra 'template' parameters");
+		okay = false;
+	      }
+	      if (okay && templateName.IsEmpty())
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "'template' without name");
+		okay = false;
+	      }
+	      if (okay 
+		&& (shared->pitokens.Request (templateName) != csInvalidStringID))
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "Reserved template name '%s'", templateName.GetData());
+		okay = false;
+	      }
+	      if (okay)
+	      {
+		/*ProcessTemplate (templateName, node, state);*/
+		globalState->templates.PutUnique (templateName, Template ());
+		state->templ = globalState->templates.GetElementPointer (templateName);
+		state->templNestCount = 1;
+	      }
+	    }
+	    break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
+	    {
+	      Report (syntaxErrorSeverity, node,
+		"'endtemplate' without 'template'");
+	    }
+	    break;
+	  default:
+	    if (!InvokeTemplate (tokenStr, node, state))
+	    {
+	      // @@@ Check for template of name
 	      Report (syntaxErrorSeverity, node,
 		"Unknown command '%s'", tokenStr.GetData());
 	    }
@@ -388,7 +547,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
   {
     WrappedChild* newWrapper = new WrappedChild;
     newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
-      this, shared));
+      this, shared, globalState));
     currentWrapper.child->childrenWrappers.Push (newWrapper);
   }
 }
@@ -399,12 +558,13 @@ void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state,
   if ((wrappedNode->GetType() == CS_NODE_ELEMENT)
     || (wrappedNode->GetType () == CS_NODE_DOCUMENT))
   {
-    csRef<iDocumentNodeIterator> iter = wrappedNode->GetNodes ();
-    while (iter->HasNext ())
+    state->iter = wrappedNode->GetNodes ();
+    while (state->iter->HasNext ())
     {
-      csRef<iDocumentNode> node = iter->Next();
+      csRef<iDocumentNode> node = state->iter->Next();
       ProcessSingleWrappedNode (state, node);
     }
+    ValidateTemplateEnd (wrappedNode, state);
   }
 }
 

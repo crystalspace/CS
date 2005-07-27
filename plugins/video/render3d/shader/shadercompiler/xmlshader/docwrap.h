@@ -144,6 +144,12 @@ class csWrappedDocumentNode : public iDocumentNode
     WrapperStackEntry& elseWrapper);
   void ProcessInclude (const csString& filename, NodeProcessingState* state, 
     iDocumentNode* node);
+  void ProcessTemplate (iDocumentNode* templNode, 
+    NodeProcessingState* state);
+  bool InvokeTemplate (const char* name, iDocumentNode* node, 
+    NodeProcessingState* state);
+  void ValidateTemplateEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
 
   void ProcessSingleWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
@@ -152,9 +158,17 @@ class csWrappedDocumentNode : public iDocumentNode
   
   static void AppendNodeText (WrapperWalker& walker, csString& text);
 
+  typedef csRefArray<iDocumentNode> Template;
+  struct GlobalProcessingState : public csRefCount
+  {
+    csHash<Template, csString> templates;
+  };
+  csRef<GlobalProcessingState> globalState;
+
   csWrappedDocumentNode (iDocumentNode* wrappedNode,
     csWrappedDocumentNode* parent,
-    csWrappedDocumentNodeFactory* shared);
+    csWrappedDocumentNodeFactory* shared, 
+    GlobalProcessingState* globalState);
   csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
     iDocumentNode* wrappedNode,
     iConditionResolver* resolver);

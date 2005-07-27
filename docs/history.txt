@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Jul-2005
+	- res added support for "templates" to the XML shader conditions.
+	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"
+	  blocks and later invoke them with "<?SomeTemplate?>", which is 
+	  replaced by the document nodes that appear in the earlier definition.
 25-Jul-2005
 	- mdmkolbe removed an unused local variable.
 	- mdmkolbe added CS_PRIn64 macros for passing to csPrintf et al, and
