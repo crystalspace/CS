@@ -252,7 +252,7 @@ skin_item:
 	| TOKEN_ATTR ':' exp
 		{ $$ = new awsIntKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')'
-		{ $$ = new awsPointKey((iAws*)windowmgr, $1, csPoint($4, $6)); free($1); }
+		{ $$ = new awsPointKey((iAws*)windowmgr, $1, csVector2($4, $6)); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
 		{ $$ = new awsRectKey((iAws*)windowmgr, $1, csRect($4, $6, $10, $12)); free($1); }
 ;

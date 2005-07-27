@@ -17,6 +17,7 @@
 */
 
 #include <stdarg.h>
+#include <ctype.h>
 #include "cssysdef.h"
 
 #include "csgeom/box.h"

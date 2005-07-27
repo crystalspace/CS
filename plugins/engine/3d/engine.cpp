@@ -17,7 +17,6 @@
 */
 #include "cssysdef.h"
 
-#include "csgeom/fastsqrt.h"
 #include "csgeom/kdtree.h"
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
@@ -850,7 +849,6 @@ csEngine::csEngine (iBase *iParent) :
   materials = new csMaterialList ();
   shared_variables = new csSharedVariableList();
 
-  BuildSqrtTable ();
   resize = false;
 
   renderLoopManager = 0;

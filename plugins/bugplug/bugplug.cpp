@@ -21,6 +21,7 @@
 #include "csver.h"
 
 #include <string.h>
+#include <ctype.h>
 
 #include "csgeom/box.h"
 #include "csgeom/plane3.h"

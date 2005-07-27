@@ -17,17 +17,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
 #include "cssysdef.h"
+
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
 #include "csutil/memfile.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
+
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "iutil/vfs.h"
+
 #include "bindoc.h"
 
 // =================================================

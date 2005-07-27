@@ -656,9 +656,9 @@ bool awsMenu::OnMouseExit ()
   // If the mouse attempts to leave the border of the popup we
   // capture it unless it is entering another popup or one of our
   // children or if let_mouse_exit is set.
-  if (!IsOverChildMenu (mouse_pos.x, mouse_pos.y) &&
-    !IsOverParentMenu (mouse_pos.x, mouse_pos.y) &&
-    !Frame ().Contains (mouse_pos.x, mouse_pos.y) &&
+  if (!IsOverChildMenu ((int)mouse_pos.x, (int)mouse_pos.y) &&
+    !IsOverParentMenu ((int)mouse_pos.x, (int)mouse_pos.y) &&
+    !Frame ().Contains ((int)mouse_pos.x, (int)mouse_pos.y) &&
     ShouldTrackMouse ())
   {
     WindowManager ()->CaptureMouse (this);
