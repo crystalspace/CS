@@ -17,28 +17,29 @@
 */
 
 #include "cssysdef.h"
-#include "walktest.h"
-#include "infmaze.h"
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csgeom/frustum.h"
-#include "igeom/objmodel.h"
-#include "igeom/polymesh.h"
-#include "csgeom/polymesh.h"
-#include "ivaria/view.h"
-#include "imesh/thing.h"
-#include "imesh/terrfunc.h"
+
 #include "csgeom/csrect.h"
-#include "cstool/keyval.h"
+#include "csgeom/frustum.h"
+#include "csgeom/polymesh.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
-#include "ivaria/collider.h"
+#include "cstool/keyval.h"
+#include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
-#include "iengine/camera.h"
+#include "igeom/objmodel.h"
+#include "igeom/polymesh.h"
 #include "imesh/object.h"
+#include "imesh/thing.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "ivaria/collider.h"
+#include "ivaria/view.h"
+
+#include "walktest.h"
+#include "infmaze.h"
 
 extern WalkTest *Sys;
 
@@ -175,18 +176,6 @@ int CollisionDetect (iEngine* Engine, iCollider *c, iSector* sp,
   return hit;
 }
 
-SCF_VERSION (TerrainInfo, 0, 0, 1);
-struct TerrainInfo : public csObject
-{
-  iTerrFuncState* terrfunc;
-  iMovable* movable;
-  SCF_DECLARE_IBASE_EXT (csObject);
-};
-
-SCF_IMPLEMENT_IBASE_EXT (TerrainInfo)
-  SCF_IMPLEMENTS_INTERFACE (TerrainInfo)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 {
   pos=Sys->view->GetCamera ()->GetTransform ().GetOrigin ();
@@ -202,50 +191,6 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
   num_our_cd = 0;
   Sys->collide_system->SetOneHitOnly (false);
   int hits = 0;
-
-  // Check to see if there are any terrains, if so test against those.
-  // This routine will automatically adjust the transform to the highest
-  // terrain at this point.
-
-  // @@@@@@ The following code supports only one terrain in a sector!
-  int k;
-  for ( k = 0; k < num_sectors ; k++)
-  {
-    iMeshList* ml = n[k]->GetMeshes ();
-    if (ml->GetCount () > 0)
-    {
-      csRef<TerrainInfo> ti (CS_GET_CHILD_OBJECT (n[k]->QueryObject (),
-						      TerrainInfo));
-      if (ti)
-      {
-        if (ti->terrfunc)
-	{
-	  hits += ti->terrfunc->CollisionDetect (&test);
-	}
-      }
-      else
-      {
-	ti = csPtr<TerrainInfo> (new TerrainInfo ());
-	ti->terrfunc = 0;	// No terrain found yet.
-	ti->movable = 0;
-        int i;
-        for (i = 0 ; i < ml->GetCount () ; i++)
-        {
-	  iMeshWrapper* terrain = ml->Get (i);
-	  csRef<iTerrFuncState> state (SCF_QUERY_INTERFACE (terrain
-		  ->GetMeshObject (), iTerrFuncState));
-	  if (state)
-	  {
-	    hits += state->CollisionDetect (&test);
-	    ti->terrfunc = state;
-	    break;
-	  }
-        }
-	csRef<iObject> iobj (SCF_QUERY_INTERFACE (ti, iObject));
-	n[k]->QueryObject ()->ObjAdd (iobj);
-      }
-    }
-  }
 
   // If there were hits with the terrain we update our new position
   // here. Side note: this could moved outside the loop above because

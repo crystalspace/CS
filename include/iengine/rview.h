@@ -26,25 +26,24 @@
  * @{ */
  
 #include "csutil/scf.h"
+
 #include "csgeom/plane3.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/box.h"
-#include "iengine/engine.h"
 
-#include "ivideo/graph3d.h"
-
-struct csFog;
-struct iEngine;
+struct iCamera;
 struct iClipper2D;
+struct iEngine;
 struct iGraphics2D;
 struct iGraphics3D;
-struct iCamera;
-struct iSector;
 struct iPortal;
+struct iSector;
+
+struct csFog;
+
+class csBox3;
 class csRenderView;
 class csReversibleTransform;
-class csVector3;
 class csSphere;
+class csVector3;
 
 /**
  * Information for vertex based fog. There is an instance of this

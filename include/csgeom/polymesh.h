@@ -22,10 +22,15 @@
 
 #include "csextern.h"
 
-#include "igeom/polymesh.h"
-#include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "csgeom/tri.h"
+#include "csgeom/vector3.h"
+#include "csutil/flags.h"
+
+#include "igeom/polymesh.h"
+
+struct csTriangle;
+
 
 /**
  * \addtogroup geom_utils

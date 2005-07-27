@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 class csColor;
+class csVector3;
 
 SCF_VERSION (iSpiralState, 0, 0, 2);
 

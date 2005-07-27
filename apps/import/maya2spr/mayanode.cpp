@@ -24,6 +24,7 @@
 #include "mayanode.h"
 #include "binarytree.h"
 
+#include "csgeom/tri.h"
 
 void DAGNode::PrintStats(FILE *s,int level) 
 {

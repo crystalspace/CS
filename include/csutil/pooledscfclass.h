@@ -28,7 +28,7 @@
  * \addtogroup scf
  * @{ */
 
-#include "scf.h"
+#include "csutil/scf.h"
 
 // hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)

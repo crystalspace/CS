@@ -21,14 +21,13 @@
 
 #include "csextern.h"
 
-#include "csutil/scf.h"
-#include "csutil/cscolor.h"
 #include "csgeom/vector2.h"
-#include "csgfx/rgbpixel.h"
+#include "csutil/cscolor.h"
+#include "csutil/scf.h"
 
 struct iImage;
-class csGenerateImageValue;
-class csGenerateImageTexture;
+
+class csRGBpixel;
 
 /**
  * A base class which represents a value that can be computed

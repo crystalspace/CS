@@ -23,6 +23,8 @@
 
 #include "isound/source.h"
 
+#include "csgeom/vector3.h"
+
 struct iSoundData;
 class csSoundRenderDS3D;
 class csSoundHandleDS3D;

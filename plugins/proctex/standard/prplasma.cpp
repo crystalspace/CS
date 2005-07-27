@@ -18,12 +18,14 @@
 */
 
 #include "cssysdef.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
+
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 #include "iutil/objreg.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 #include "prplasma.h"
 

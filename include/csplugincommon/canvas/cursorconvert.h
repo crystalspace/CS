@@ -28,11 +28,15 @@
  */
 
 #include "csextern.h"
-#include "csgfx/rgbpixel.h"
-#include "csgfx/quantize.h"
+//#include "csgfx/rgbpixel.h"
+//#include "csgfx/quantize.h"
 
 struct iImage;
+
+class csColorQuantizer;
 class csImageMemory;
+class csRGBcolor;
+class csRGBpixel;
 
 /**
  * Helper class to convert images into data formats suitable for

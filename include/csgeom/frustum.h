@@ -28,26 +28,37 @@
 #include "csextern.h"
 
 #include "cstypes.h"
-#include "csutil/ref.h"
 #include "csgeom/vector3.h"
 
-class csTransform;
 class csPlane3;
+template<class T>
+class csPtr;
+class csTransform;
 
 /** \name Polygon-to-Frustum relations
  * Return values for csFrustum::Classify. The routine makes a difference
  * whenever a polygon is fully outside the frustum, fully inside, fully
  * covers the frustum or is partly inside, partly outside.
  * @{ */
-/// The polygon is fully outside frustum
-#define CS_FRUST_OUTSIDE  0
-/// The polygon is fully inside frustum
-#define CS_FRUST_INSIDE   1
-/// The polygon fully covers the frustum
-#define CS_FRUST_COVERED  2
-/// The polygon is partially inside frustum
-#define CS_FRUST_PARTIAL  3
+enum
+{
+  /// The polygon is fully outside frustum
+  CS_FRUST_OUTSIDE = 0,
+  /// The polygon is fully inside frustum
+  CS_FRUST_INSIDE = 1,
+  /// The polygon fully covers the frustum
+  CS_FRUST_COVERED = 2,
+  /// The polygon is partially inside frustum
+  CS_FRUST_PARTIAL = 3
+};
 /** @} */
+
+enum csClipType
+{
+  CS_CLIPINFO_ORIGINAL = 0,
+  CS_CLIPINFO_ONEDGE = 1,
+  CS_CLIPINFO_INSIDE = 2
+};
 
 /**
  * Structure for use with ClipToPlane. This structure
@@ -57,10 +68,8 @@ class csPlane3;
  */
 struct CS_CRYSTALSPACE_EXPORT csClipInfo
 {
-# define CS_CLIPINFO_ORIGINAL 0
-# define CS_CLIPINFO_ONEDGE 1
-# define CS_CLIPINFO_INSIDE 2
-  int type; // One of CS_CLIPINFO_???
+
+  csClipType type; // One of CS_CLIPINFO_???
   union
   {
     struct { int idx; } original;
@@ -73,7 +82,7 @@ struct CS_CRYSTALSPACE_EXPORT csClipInfo
   ~csClipInfo () { Clear (); }
 
   /// Copy the information from another clipinfo instance to this one.
-  void Copy (csClipInfo& other)
+  inline void Copy (csClipInfo& other)
   {
     if (&other == this) return;
     Clear ();
@@ -93,7 +102,7 @@ struct CS_CRYSTALSPACE_EXPORT csClipInfo
   }
 
   /// Move the information from another clipinfo instance to this one.
-  void Move (csClipInfo& other)
+  inline void Move (csClipInfo& other)
   {
     if (&other == this) return;
     Clear ();
@@ -107,7 +116,7 @@ struct CS_CRYSTALSPACE_EXPORT csClipInfo
     other.type = CS_CLIPINFO_ORIGINAL;
   }
 
-  void Dump (int indent)
+  inline void Dump (int indent)
   {
     char ind[255];
     int i;
@@ -217,23 +226,23 @@ public:
   virtual ~csFrustum ();
 
   /// Set the origin of this frustum.
-  void SetOrigin (const csVector3& o) { origin = o; }
+  inline void SetOrigin (const csVector3& o) { origin = o; }
 
   /// Get the origin of this frustum.
-  csVector3& GetOrigin () { return origin; }
+  inline csVector3& GetOrigin () { return origin; }
 
   /// Get the origin of this frustum.
-  const csVector3& GetOrigin () const { return origin; }
+  inline const csVector3& GetOrigin () const { return origin; }
 
   /**
    * Enable/disable mirroring.
    * If mirroring is enabled this means that the frustum polygon
    * is given in anti-clockwise order.
    */
-  void SetMirrored (bool m) { mirrored = m; }
+  inline void SetMirrored (bool m) { mirrored = m; }
 
   /// Is this frustum mirrored?
-  bool IsMirrored () const { return mirrored; }
+  inline bool IsMirrored () const { return mirrored; }
 
   /**
    * Set the back plane of this frustum.
@@ -246,7 +255,7 @@ public:
   /**
    * Get the back plane.
    */
-  csPlane3* GetBackPlane () { return backplane; }
+  inline csPlane3* GetBackPlane () { return backplane; }
 
   /**
    * Remove the back plane of this frustum.
@@ -261,12 +270,12 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetVertexCount () { return num_vertices; }
+  inline int GetVertexCount () { return num_vertices; }
 
   /**
    * Get a vertex.
    */
-  csVector3& GetVertex (int idx)
+  inline csVector3& GetVertex (int idx)
   {
     CS_ASSERT (idx >= 0 && idx < num_vertices);
     return vertices[idx];
@@ -275,7 +284,7 @@ public:
   /**
    * Get the array of vertices.
    */
-  csVector3* GetVertices () { return vertices; }
+  inline csVector3* GetVertices () { return vertices; }
 
   /**
    * Apply a transformation to this frustum.
@@ -422,16 +431,16 @@ public:
     const csPlane3& plane, const csVector3& point);
 
   /// Return true if frustum is empty.
-  bool IsEmpty () const { return !wide && vertices == 0; }
+  inline bool IsEmpty () const { return !wide && vertices == 0; }
 
   /// Return true if frustum is infinite.
-  bool IsInfinite () const { return wide && vertices == 0 && backplane == 0; }
+  inline bool IsInfinite () const { return wide && vertices == 0 && backplane == 0; }
 
   /**
    * Return true if frustum is infinitely wide but it can still have a
    * back plane.
    */
-  bool IsWide () const { return wide && vertices == 0; }
+  inline bool IsWide () const { return wide && vertices == 0; }
 
   /**
    * Make the frustum infinite (i.e. clear the polygon and
@@ -445,11 +454,11 @@ public:
   void MakeEmpty ();
 
   /// Increment reference counter
-  void IncRef () { ref_count++; }
+  inline void IncRef () { ref_count++; }
   /// Decrement reference counter
-  void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
+  inline void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
   /// Get reference count
-  int GetRefCount () { return ref_count; }
+  inline int GetRefCount () { return ref_count; }
 };
 
 /** @} */

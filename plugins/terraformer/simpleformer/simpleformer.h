@@ -20,10 +20,10 @@
 #ifndef __CS_SIMPLEFORMER_H__
 #define __CS_SIMPLEFORMER_H__
 
+#include "csgeom/box.h"
 #include "csgeom/vector3.h"
 
 #include "iutil/comp.h"
-
 #include "ivaria/simpleformer.h"
 #include "ivaria/terraform.h"
 

@@ -19,10 +19,15 @@
 
 #include "cssysdef.h"
 #include "csqint.h"
-#include "sft3dcom.h"
+
+#include "csutil/cscolor.h"
+
+#include "ivideo/polyrender.h"
+
 #include "scan.h"
-#include "tcache.h"
+#include "sft3dcom.h"
 #include "soft_txt.h"
+#include "tcache.h"
 #include "sttest.h"
 
 /// The only instance of this structure lives here

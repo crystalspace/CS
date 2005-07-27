@@ -33,7 +33,7 @@
 #include "csutil/refarr.h"
 #include "csutil/stringarray.h"
 #include "csgeom/csrect.h"
-#include "csgeom/cspoint.h"
+#include "csgeom/vector2.h"
 #include "iutil/event.h"
 #include "iutil/string.h"
 
@@ -197,7 +197,7 @@ SCF_VERSION(iAwsPointKey, 0, 0, 1);
 struct iAwsPointKey : public iAwsKey
 {
   /// Gets the value of this key as a point
-  virtual csPoint Value () const = 0;
+  virtual csVector2 Value () const = 0;
 };
 
 SCF_VERSION(iAwsConnectionKey, 0, 0, 1);
@@ -508,10 +508,10 @@ public:
   	unsigned char &green, unsigned char &blue)=0;
 
   /// Lookup the value of a point key by name (from the skin def)
-  virtual bool LookupPointKey(const char* name, csPoint &point)=0;
+  virtual bool LookupPointKey(const char* name, csVector2 &point)=0;
 
   /// Lookup the value of a point key by id (from the skin def)
-  virtual bool LookupPointKey(unsigned long id, csPoint &point)=0;
+  virtual bool LookupPointKey(unsigned long id, csVector2 &point)=0;
 
   /// Get the an integer from a given component node
   virtual bool GetInt(iAwsComponentNode *node, const char* name, int &val)=0;
@@ -1191,7 +1191,7 @@ struct iAwsKeyFactory : public iBase
    virtual void AddRGBKey (const char* name, unsigned char r,
    	unsigned char g, unsigned char b)=0;
    /// Add a point key
-   virtual void AddPointKey (const char* name, csPoint v)=0;
+   virtual void AddPointKey (const char* name, csVector2 v)=0;
    /// Add a connection key
    virtual void AddConnectionKey (const char* name, iAwsSink *s,
    	unsigned long t, unsigned long sig)=0;

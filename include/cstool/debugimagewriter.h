@@ -27,6 +27,7 @@
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
 #include "igraphic/imageio.h"
+#include "iutil/databuff.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 

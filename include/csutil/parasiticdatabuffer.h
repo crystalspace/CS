@@ -25,7 +25,7 @@
 #define __CS_CSUTIL_PARASITICDATABUFFER_H__
 
 #include "csextern.h"
-#include "pooledscfclass.h"
+#include "csutil/pooledscfclass.h"
 #include "iutil/databuff.h"
 
 class csParasiticDataBufferBase : public iDataBuffer

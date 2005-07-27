@@ -25,7 +25,6 @@
  */
 
 #include "csutil/ref.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 
 /**

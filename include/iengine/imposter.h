@@ -26,8 +26,10 @@
  * \addtogroup engine3d
  * @{ */
 
-#include <iengine/sharevar.h>
 #include "csutil/scf.h"
+
+struct iSharedVariable;
+class csReversibleTransform;
 
 SCF_VERSION (iImposter, 0, 0, 2);
 

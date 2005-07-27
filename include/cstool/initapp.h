@@ -27,9 +27,8 @@
  * \addtogroup appframe
  * @{ */
 
-#include <stdarg.h>
 #include "csextern.h"
-#include "cstypes.h"
+
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 #include "csutil/scf.h"

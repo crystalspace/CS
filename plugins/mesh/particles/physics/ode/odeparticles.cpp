@@ -17,12 +17,15 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/event.h"
+
+#include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
+#include "csutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
+
 #include "odeparticles.h"
 
 CS_IMPLEMENT_PLUGIN

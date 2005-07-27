@@ -17,14 +17,16 @@
 */
 
 #include "cssysdef.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
-#include "imesh/mdlconv.h"
+
+#include "csgeom/vector2.h"
 #include "cstool/mdldata.h"
-#include "csutil/datastrm.h"
 #include "csutil/csstring.h"
+#include "csutil/datastrm.h"
 #include "csutil/nobjvec.h"
+#include "imesh/mdlconv.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
 #include "csutil/dirtyaccessarray.h"
 
 // all int's in an MDL file are little endian

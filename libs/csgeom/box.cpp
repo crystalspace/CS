@@ -18,11 +18,11 @@
 */
 
 #include "cssysdef.h"
-#include <math.h>
+
 #include "csgeom/box.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/poly2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/transfrm.h"
 
 //---------------------------------------------------------------------------
 csBox2::bEdge csBox2::edges[8] =

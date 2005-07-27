@@ -22,23 +22,25 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "csplugincommon/soundrenderer/slstn.h"
+#include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
-#include "iutil/plugin.h"
+
+#include "isound/data.h"
+#include "isound/driver.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isound/driver.h"
-#include "isound/data.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 
 #include "srdrcom.h"
-#include "csplugincommon/soundrenderer/slstn.h"
 #include "srdrsrc.h"
 #include "sndhdl.h"
 

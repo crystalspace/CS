@@ -19,7 +19,12 @@
 #include "pvscalc.h"
 
 #include "csgeom/chainhull2d.h"
+#include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
 #include "csgeom/pmtools.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/poly3d.h"
+#include "csutil/stringarray.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
@@ -27,6 +32,8 @@
 #include "igeom/objmodel.h"
 #include "imesh/object.h"
 #include "iutil/cmdline.h"
+#include "iutil/document.h"
+#include "iutil/object.h"
 #include "ivaria/pvstree.h"
 
 CS_IMPLEMENT_APPLICATION

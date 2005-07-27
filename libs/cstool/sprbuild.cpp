@@ -17,15 +17,19 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/objiter.h"
-#include "csutil/csstring.h"
-#include "csutil/array.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/databuf.h"
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
 #include "cstool/sprbuild.h"
 #include "cstool/mdltool.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/databuf.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/objiter.h"
+
 #include "imesh/mdldata.h"
 #include "imesh/sprite3d.h"
+#include "ivideo/graph3d.h"
 
 typedef csArray<iModelDataVertices*> csModelFrameVector;
 

@@ -19,19 +19,20 @@
 #ifndef __XMLSHADER_H__
 #define __XMLSHADER_H__
 
+#include "csgfx/shadervarcontext.h"
+#include "csplugincommon/shader/shaderplugin.h"
 #include "csutil/array.h"
 #include "csutil/bitarray.h"
 #include "csutil/csobject.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
-#include "ivideo/material.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
 #include "iutil/document.h"
-#include "iutil/strset.h"
 #include "iutil/objreg.h"
-#include "csplugincommon/shader/shaderplugin.h"
+#include "iutil/strset.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/shader/shader.h"
 
 #include "expparser.h"
 #include "docwrap.h"

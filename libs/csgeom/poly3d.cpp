@@ -17,8 +17,10 @@
 */
 #include "cssysdef.h"
 #include "csqsqrt.h"
-#include "csgeom/poly3d.h"
+#include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/vector3.h"
 
 csPoly3D::csPoly3D (size_t start_size)
 {

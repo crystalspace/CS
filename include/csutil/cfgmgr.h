@@ -24,9 +24,10 @@
  */
 
 #include "csextern.h"
+#include "csutil/array.h"
+#include "csutil/refarr.h"
 #include "iutil/cfgmgr.h"
-#include "refarr.h"
-#include "array.h"
+
 
 class csConfigManagerIterator;
 

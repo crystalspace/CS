@@ -19,10 +19,12 @@
 #ifndef __CS_PHYSFILE_H__
 #define __CS_PHYSFILE_H__
 
-#include "csextern.h"
-#include "iutil/vfs.h"
-#include "csstring.h"
 #include <stdio.h>
+
+#include "csextern.h"
+#include "csutil/csstring.h"
+
+#include "iutil/vfs.h"
 
 /**
  * An implementation of the abstract iFile interface for real files within

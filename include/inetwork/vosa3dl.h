@@ -21,12 +21,13 @@
 #define __CS_INETWORK_VOSA3DL_H__
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "iengine/mesh.h"
-#include "iengine/sector.h"
-#include "ivaria/dynamics.h"
-#include "ivaria/pmeter.h"
-#include "csutil/hash.h"
+
+#include "csutil/set.h"
+
+struct iMeshWrapper;
+struct iProgressMeter;
+struct iRigidBody;
+struct iSector;
 
 /** @file
     This defines the plugin interface for the Crystal Space

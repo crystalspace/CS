@@ -26,19 +26,12 @@
  * \addtogroup geom_utils
  * @{ */
 
-// These are also defined in plane2.h
-#ifndef __CS_POLY_MACROS__
-#define __CS_POLY_MACROS__
-#define CS_POLY_IN 1
-#define CS_POLY_ON 0
-#define CS_POLY_OUT -1
-#endif
 
 #include "csextern.h"
 
-#include "csgeom/vector2.h"
 #include "csgeom/plane2.h"
 #include "csgeom/segment.h"
+#include "csgeom/vector2.h"
 
 class csBox2;
 class csPoly2D;

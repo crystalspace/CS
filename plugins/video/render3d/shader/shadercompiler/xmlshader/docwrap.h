@@ -21,6 +21,7 @@
 #define __DOCWRAP_H__
 
 #include "csutil/csstring.h"
+#include "csutil/strhash.h"
 #include "csutil/leakguard.h"
 #include "csutil/parray.h"
 #include "csutil/pooledscfclass.h"

@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/tcovbuf.h"
 #include "cstool/csapplicationframework.h"

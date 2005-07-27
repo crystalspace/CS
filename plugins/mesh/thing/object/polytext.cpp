@@ -17,27 +17,32 @@
 */
 #include "cssysdef.h"
 #include <math.h>
+
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csgeom/polyclip.h"
-#include "csgeom/polyaa.h"
-#include "csgeom/poly3d.h"
+
+#include "csutil/debug.h"
 #include "csgeom/frustum.h"
 #include "csgeom/math.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/polyaa.h"
+#include "csgeom/polyclip.h"
+
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iengine/material.h"
+#include "iengine/movable.h"
+#include "iengine/shadows.h"
+#include "iengine/texture.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/texture.h"
+
 #include "thing.h"
 #include "polytext.h"
 #include "polygon.h"
 #include "lppool.h"
 #include "lghtmap.h"
-#include "iengine/texture.h"
-#include "iengine/material.h"
-#include "iengine/shadows.h"
-#include "iengine/light.h"
-#include "iengine/movable.h"
-#include "csutil/debug.h"
-#include "ivideo/texture.h"
-#include "ivideo/material.h"
-#include "ivideo/graph3d.h"
 
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;

@@ -28,23 +28,14 @@
  * \addtogroup gfx3d
  * @{ */
 
-#include "csutil/strset.h"
-#include "csutil/ref.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
+
 #include "ivideo/graph3d.h"
-#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "csgfx/shadervarcontext.h"
 
-class csVector3;
-class csVector2;
-class csColor;
-class csReversibleTransform;
-struct iTextureHandle;
 struct iMaterialWrapper;
-struct iMeshFactory;
 struct iPortalContainer;
-struct iRenderBuffer;
-
 
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use

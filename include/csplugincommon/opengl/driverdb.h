@@ -22,6 +22,8 @@
 
 #include "csextern_gl.h"
 #include "csutil/leakguard.h"
+#include "csutil/refarr.h"
+#include "csutil/strhash.h"
 
 struct iConfigDocument;
 class csGraphics2DGLCommon;

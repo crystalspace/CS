@@ -25,7 +25,7 @@
  */
 
 #include "graph2d.h"
-#include "draw_text.h"
+#include "csplugincommon/canvas/draw_text.h"
 
 /**
  * \addtogroup plugincommon

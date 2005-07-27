@@ -21,9 +21,11 @@
 #ifndef __CS_SOUNDBUFFERSOFTWARE_H__
 #define __CS_SOUNDBUFFERSOFTWARE_H__
 
-#include "isound/source.h"
+#include "csgeom/vector3.h"
 #include "csutil/thread.h"
-#include "csutil/scopedmutexlock.h"
+
+#include "isound/source.h"
+
 
 class csSoundRenderSoftware;
 class csSoundHandleSoftware;

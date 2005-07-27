@@ -17,16 +17,18 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/flags.h"
-#include "csutil/array.h"
+
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "cstool/enginetools.h"
-#include "iengine/sector.h"
-#include "iengine/portal.h"
-#include "iengine/portalcontainer.h"
+#include "csutil/flags.h"
+#include "csutil/set.h"
+
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
+#include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
+#include "iengine/sector.h"
 
 float csEngineTools::FindShortestDistance (
   	const csVector3& source, iSector* sourceSector,

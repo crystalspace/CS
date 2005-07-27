@@ -20,11 +20,10 @@
 #define __CS_IMESH_LGHTNG_H__
 
 #include "csutil/scf.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/cscolor.h"
-#include "csgeom/vector2.h"
 
 struct iMaterialWrapper;
+
+class csVector3;
 
 SCF_VERSION (iLightningFactoryState, 0, 0, 1);
 

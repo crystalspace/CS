@@ -20,6 +20,9 @@
 #ifndef __CS_POLYAA_H__
 #define __CS_POLYAA_H__
 
+
+#include "csextern.h"
+
 #include "csgeom/csrect.h"
 
 /**\file 
@@ -27,8 +30,6 @@
 /**
  * \addtogroup geom_utils
  * @{ */
-
-#include "csextern.h"
 
 class csVector2;
 

@@ -24,12 +24,10 @@
 
 #include "csextern.h"
 
-#include "csutil/ref.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/refarr.h"
-#include "csutil/objreg.h"
-#include "ivideo/rndbuf.h"
-#include "iutil/strset.h"
+#include "csutil/scf.h"
+#include "csutil/strset.h"
+
+struct iRenderBuffer;
 
 SCF_VERSION(iUserRenderBufferIterator, 0, 0, 1);
 

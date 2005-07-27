@@ -21,7 +21,6 @@
 #define __CS_CSPPULSE_H__
 
 #include "csextern.h"
-#include "cstypes.h"
 
 struct iConsoleOutput;
 

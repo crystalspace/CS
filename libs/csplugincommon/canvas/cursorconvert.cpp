@@ -19,11 +19,11 @@
 
 #include "cssysdef.h"
 
-#include "igraphic/imageio.h"
 #include "csgfx/memimage.h"
-#include "cstool/debugimagewriter.h"
-
+#include "csgfx/quantize.h"
 #include "csplugincommon/canvas/cursorconvert.h"
+#include "cstool/debugimagewriter.h"
+#include "igraphic/imageio.h"
 
 #define DEBUG_WRITE_IMAGES
 

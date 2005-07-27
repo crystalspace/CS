@@ -16,68 +16,73 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "csqint.h"
+#include "csqsqrt.h"
+#include "csver.h"
 
 #include <string.h>
 
-#include "csutil/sysfunc.h"
-#include "csutil/csuctransform.h"
-#include "csutil/regexp.h"
-#include "csutil/profile.h"
-#include "csver.h"
-#include "csutil/scf.h"
-#include "csutil/scanstr.h"
-#include "csutil/cscolor.h"
-#include "csutil/debug.h"
-#include "csutil/snprintf.h"
-#include "csutil/event.h"
+#include "csgeom/box.h"
+#include "csgeom/plane3.h"
+#include "csgeom/tri.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
-#include "csgeom/plane3.h"
-#include "csgeom/box.h"
-#include "bugplug.h"
-#include "spider.h"
-#include "shadow.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
-#include "iutil/string.h"
-#include "iutil/event.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
-#include "iutil/dbghelp.h"
-#include "iutil/virtclk.h"
-#include "iutil/memdebug.h"
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/material.h"
-#include "ivaria/conout.h"
-#include "ivaria/reporter.h"
-#include "ivaria/collider.h"
-#include "iutil/object.h"
-#include "imesh/object.h"
-#include "imesh/terrfunc.h"
-#include "imesh/thing.h"
-#include "imesh/genmesh.h"
+#include "cstool/collider.h"
+#include "cstool/csview.h"
+#include "csutil/cscolor.h"
+#include "csutil/csuctransform.h"
+#include "csutil/debug.h"
+#include "csutil/event.h"
+#include "csutil/flags.h"
+#include "csutil/profile.h"
+#include "csutil/regexp.h"
+#include "csutil/scanstr.h"
+#include "csutil/scf.h"
+#include "csutil/snprintf.h"
+#include "csutil/sysfunc.h"
+#include "iengine/camera.h"
 #include "iengine/engine.h"
-#include "iengine/sector.h"
-#include "iengine/viscull.h"
+#include "iengine/light.h"
+#include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/camera.h"
-#include "iengine/light.h"
 #include "iengine/region.h"
-#include "iengine/material.h"
 #include "iengine/rview.h"
-#include "cstool/csview.h"
-#include "cstool/collider.h"
+#include "iengine/sector.h"
+#include "iengine/viscull.h"
+#include "igeom/polymesh.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
 #include "imap/saver.h"
-#include "csqint.h"
-#include "csqsqrt.h"
+#include "imesh/genmesh.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
+#include "iutil/comp.h"
+#include "iutil/databuff.h"
+#include "iutil/dbghelp.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/memdebug.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/string.h"
+#include "iutil/vfs.h"
+#include "iutil/virtclk.h"
+#include "ivaria/collider.h"
+#include "ivaria/conout.h"
+#include "ivaria/reporter.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/txtmgr.h"
+
+#include "bugplug.h"
+#include "shadow.h"
+#include "spider.h"
+
 
 CS_IMPLEMENT_PLUGIN
 
@@ -1145,46 +1150,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_TERRVIS:
-        if (Engine)
-	{
-	  int enable_disable = -1;
-	  int i, j;
-	  for (i = 0 ; i < Engine->GetSectors ()->GetCount () ; i++)
-	  {
-	    iSector* sector = Engine->GetSectors ()->Get (i);
-	    iMeshList* ml = sector->GetMeshes ();
-	    for (j = 0 ; j < ml->GetCount () ; j++)
-	    {
-	      iMeshWrapper* terr = ml->Get (j);
-	      csRef<iTerrFuncState> st (
-	      	SCF_QUERY_INTERFACE (terr->GetMeshObject (),
-	      	iTerrFuncState));
-	      if (st)
-	      {
-	        if (enable_disable == -1)
-		{
-		  enable_disable = (int) (!st->IsVisTestingEnabled ());
-		}
-		st->SetVisTesting ((bool) enable_disable);
-	      }
-	    }
-	  }
-	  if (enable_disable == -1)
-	  {
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "BugPlug found no terrains to work with!");
-	  }
-	  else
-	  {
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "BugPlug %s terrain visibility checking!",
-	      enable_disable ? "enabled" : "disabled");
-	  }
-	}
-	else
 	{
 	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    	"BugPlug has no engine to work on!");
+	    	"BugPlug Terrain Visualization not implemented!");
 	}
         break;
       case DEBUGCMD_MESHBASEMESH:

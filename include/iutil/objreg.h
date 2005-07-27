@@ -27,7 +27,6 @@
  * @{ */
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
 
 #define CS_QUERY_REGISTRY_TAG(Reg, Tag)       \
   csPtr<iBase> ((iBase*) (CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag)))

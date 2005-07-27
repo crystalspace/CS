@@ -19,17 +19,20 @@
 */
 
 #include "cssysdef.h"
-#include "csplugincommon/directx/guids.h"
-#include "csutil/sysfunc.h"
-#include "csutil/scf.h"
 
 #include <dsound.h>
+
+#include "csgeom/vector3.h"
+#include "csplugincommon/directx/guids.h"
+#include "csutil/scf.h"
+#include "csutil/sysfunc.h"
+
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #include "sndrdr.h"
 #include "sndsrc.h"
 #include "sndhdl.h"
-#include "iutil/objreg.h"
-#include "ivaria/reporter.h"
 
 SCF_IMPLEMENT_FACTORY(csSoundSourceDS3D)
 

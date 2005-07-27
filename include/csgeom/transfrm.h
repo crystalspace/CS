@@ -28,9 +28,12 @@
 
 #include "csextern.h"
 
+
 #include "csgeom/matrix3.h"
-#include "csgeom/plane3.h"
-#include "csgeom/sphere.h"
+#include "csgeom/vector3.h"
+
+class csPlane3;
+class csSphere;
 
 class csReversibleTransform;
 
@@ -70,7 +73,7 @@ public:
   /**
    * Reset this transform to the identity transform.
    */
-  void Identity ()
+  inline void Identity ()
   {
     SetO2TTranslation (csVector3 (0));
     SetO2T (csMatrix3 ());
@@ -80,7 +83,7 @@ public:
    * Returns true if this transform is an identity transform.
    * This tests all fields so don't call this before every operation.
    */
-  bool IsIdentity () const
+  inline bool IsIdentity () const
   {
     if (ABS (v_o2t.x) >= SMALL_EPSILON) return false;
     if (ABS (v_o2t.y) >= SMALL_EPSILON) return false;
@@ -157,7 +160,7 @@ public:
    * Use the origin of 'other' space. This will calculate and return
    * M*v (so the translation or V of this transform is ignored).
    */
-  csVector3 Other2ThisRelative (const csVector3& v) const
+  inline csVector3 Other2ThisRelative (const csVector3& v) const
   { return m_o2t * v; }
 
   /**
@@ -381,7 +384,7 @@ public:
    * This is the basic inverse transform operation and it corresponds
    * with the calculation of V+Minv*v (with Minv the inverse of M).
    */
-  csVector3 This2Other (const csVector3& v) const
+  inline csVector3 This2Other (const csVector3& v) const
   { return v_o2t + m_t2o * v; }
 
   /**

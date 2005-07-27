@@ -22,13 +22,13 @@
 #include "csutil/scf.h"
 #include "ivideo/graph3d.h"
 
+struct iBugPlug;
+struct iMeshObject;
+
 class csBox3;
+class csReversibleTransform;
 class csVector2;
 class csVector3;
-class csReversibleTransform;
-struct iMeshObject;
-struct iBugPlug;
-struct iGraphics3D;
 
 SCF_VERSION (iBugPlugRenderObject, 0, 0, 1);
 

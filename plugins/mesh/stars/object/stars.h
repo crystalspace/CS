@@ -23,7 +23,9 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csutil/refarr.h"
+
 #include "imesh/object.h"
 #include "imesh/stars.h"
 #include "ivideo/graph3d.h"

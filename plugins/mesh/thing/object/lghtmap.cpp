@@ -16,15 +16,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "csqint.h"
+
 #include "csutil/csendian.h"
+#include "csutil/debug.h"
+#include "csutil/memfile.h"
+#include "csutil/util.h"
+
+#include "iengine/engine.h"
+#include "iutil/cache.h"
+#include "iutil/vfs.h"
+
 #include "lghtmap.h"
 #include "polygon.h"
 #include "thing.h"
-#include "csutil/util.h"
-#include "csutil/debug.h"
-#include "csutil/memfile.h"
-#include "iutil/vfs.h"
-#include "iutil/cache.h"
 
 #define LMMAGIC	    "LM04" // must be 4 chars!
 

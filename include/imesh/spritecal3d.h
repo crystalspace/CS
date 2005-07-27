@@ -20,20 +20,18 @@
 #define __CS_IMESH_SPRITECAL3D_H__
 
 #include "csutil/scf.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/cscolor.h"
-#include "ivideo/graph3d.h"
 
-class csColor;
-class csRandomGen;
-class csString;
 struct iMaterialWrapper;
 struct iMeshObject;
 struct iMeshWrapper;
 struct iMeshObjectFactory;
 struct iRenderView;
-struct iRenderView;
 struct iVFS;
+
+class csColor;
+class csRandomGen;
+class csReversibleTransform;
+class csString;
 
 class CalModel;
 class CalCoreModel;

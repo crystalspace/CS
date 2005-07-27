@@ -19,8 +19,10 @@
 #include "cssysdef.h"
 #include "csutil/csmmap.h"
 #include "csutil/mmapio.h"
-#include "iutil/vfs.h"
 #include "csutil/ref.h"
+
+#include "iutil/databuff.h"
+#include "iutil/vfs.h"
 
 #ifdef CS_HAVE_MEMORY_MAPPED_IO
 bool csMemoryMapFile(csMemMapInfo*, char const* filename);

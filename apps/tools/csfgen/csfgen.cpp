@@ -26,6 +26,7 @@
 #include "csutil/memfile.h"
 #include "csutil/util.h"
 #include "iutil/comp.h"
+#include "iutil/databuff.h"
 #include "iutil/eventh.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"

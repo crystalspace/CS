@@ -30,8 +30,8 @@
 // templates.  See: http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html
 //-----------------------------------------------------------------------------
 
-#include "ref.h"
-#include "array.h"
+#include "csutil/array.h"
+#include "csutil/ref.h"
 
 #ifdef CS_REF_TRACKER
  #include <typeinfo>

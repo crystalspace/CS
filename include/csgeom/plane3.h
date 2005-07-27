@@ -27,8 +27,10 @@
  * @{ */
 
 #include "csextern.h"
+
 #include "csgeom/vector3.h"
-#include "csutil/csstring.h"
+
+class csString;
 
 /**
  * A plane in 3D space.
@@ -124,7 +126,7 @@ public:
    * is expressed as (N,D) with N the A,B,C components of the plane then
    * this will initialize the plane to (v2%v3,0).
    */
-  void Set (const csVector3& v2, const csVector3& v3)
+  inline void Set (const csVector3& v2, const csVector3& v3)
   {
     norm = v2 % v3; DD = 0;
   }
@@ -133,7 +135,7 @@ public:
    * Set one point ("origin") through which the plane goes.
    * This is equal to setting DD = -N'*p where N' is the normal
    */
-  void SetOrigin (const csVector3& p)
+  inline void SetOrigin (const csVector3& p)
   {
     DD = -norm * p;
   }
@@ -173,12 +175,12 @@ public:
    * Reverses the direction of the plane while maintianing the plane itself.
    * This will basically reverse the result of Classify().
    */
-  void Invert () { norm = -norm;  DD = -DD; }
+  inline void Invert () { norm = -norm;  DD = -DD; }
 
   /**
    * Normalizes the plane equation so that 'norm' is a unit vector.
    */
-  void Normalize ()
+  inline void Normalize ()
   {
     float f = norm.Norm ();
     if (f) { norm /= f;  DD /= f; }

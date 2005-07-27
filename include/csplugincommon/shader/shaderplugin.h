@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
-#include "csgfx/shadervar.h"
+
 #include "ivideo/shader/shader.h"
 
 struct csShaderVarMapping

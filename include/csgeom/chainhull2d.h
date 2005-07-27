@@ -31,8 +31,8 @@
 #define __CS_CHAINHULL2D_H__
 
 #include "csextern.h"
-#include "csgeom/math2d.h"
-#include "csgeom/vector2.h"
+
+class csVector2;
 
 /**
  * This is Andrew's monotone chain 2D convex hull algorithm.

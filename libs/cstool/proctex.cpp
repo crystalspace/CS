@@ -28,6 +28,7 @@
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "igraphic/image.h"
+#include "itexture/itexfact.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -39,9 +40,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
-
 //---------------------------------------------------------------------------
-
 /**
  * Event handler that takes care of updating all procedural
  * textures that were visible last frame.

@@ -17,14 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "imgplex.h"
+
+#include "csutil/util.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "csutil/util.h"
+#include "igraphic/image.h"
+
+#include "imgplex.h"
 
 #define IMGPLEX_CLASSNAME "crystalspace.graphic.image.io.multiplexer"
 

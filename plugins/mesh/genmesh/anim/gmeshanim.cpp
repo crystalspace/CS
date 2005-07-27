@@ -19,9 +19,9 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csutil/util.h"
-#include "iutil/objreg.h"
 #include "iutil/document.h"
 #include "iutil/eventq.h"
+#include "iutil/objreg.h"
 #include "iutil/evdefs.h"
 #include "gmeshanim.h"
 

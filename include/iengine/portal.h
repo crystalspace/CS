@@ -27,10 +27,22 @@
 
 #include "csutil/scf.h"
 
-class csReversibleTransform;
+class csFlags;
+class csMatrix3;
 class csPlane3;
+class csReversibleTransform;
+class csTransform;
+class csVector3;
+
+struct iFrustumView;
 struct iMeshWrapper;
 struct iMovable;
+struct iObject;
+struct iPortal;
+struct iSector;
+struct iTextureHandle;
+
+
 
 /**
  * If this flag is set then this portal will clip all geometry in
@@ -102,15 +114,6 @@ struct iMovable;
  */
 #define CS_PORTAL_VISCULL 0x00000100
 
-class csTransform;
-class csMatrix3;
-class csVector3;
-class csFlags;
-struct iTextureHandle;
-struct iSector;
-struct iPortal;
-struct iFrustumView;
-struct iObject;
 
 SCF_VERSION (iPortalCallback, 0, 0, 1);
 

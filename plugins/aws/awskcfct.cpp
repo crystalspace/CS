@@ -119,7 +119,7 @@ void awsKeyFactory::AddRGBKey (
   }
 }
 
-void awsKeyFactory::AddPointKey (const char* name, csPoint v)
+void awsKeyFactory::AddPointKey (const char* name, csVector2 v)
 {
   if (base)
   {

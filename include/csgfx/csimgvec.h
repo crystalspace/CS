@@ -22,8 +22,9 @@
 #include "csextern.h"
 
 #include "csutil/scf.h"
-#include "csutil/refarr.h"
 #include "csutil/leakguard.h"
+#include "csutil/refarr.h"
+
 #include "igraphic/image.h"
 #include "igraphic/imgvec.h"
 

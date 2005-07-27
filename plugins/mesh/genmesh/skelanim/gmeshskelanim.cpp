@@ -21,17 +21,19 @@
 */
 
 #include "cssysdef.h"
+
 #include "csgeom/math3d.h"
-#include "csutil/util.h"
-#include "csutil/event.h"
 #include "csgeom/quaterni.h"
-#include "iutil/objreg.h"
+#include "csutil/event.h"
+#include "csutil/util.h"
+#include "imap/services.h"
 #include "iutil/document.h"
-#include "iutil/eventq.h"
-#include "iutil/event.h"
 #include "iutil/evdefs.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+
 #include "gmeshskelanim.h"
-#include <imap/services.h>
 
 CS_IMPLEMENT_PLUGIN
 

@@ -19,7 +19,6 @@
 #ifndef __CS_IVARIA_PMETER_H__
 #define __CS_IVARIA_PMETER_H__
 
-#include <stdarg.h>
 #include "csutil/scf.h"
 
 SCF_VERSION (iProgressMeter, 0, 1, 0);

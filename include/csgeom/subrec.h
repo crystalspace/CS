@@ -29,9 +29,10 @@
 
 #include "csextern.h"
 
+#include "csgeom/csrect.h"
+
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
-#include "csgeom/csrect.h"
 
 /**
  * A class managing allocations of sub-rectangles. i.e. this class represents
@@ -116,7 +117,7 @@ protected:
 
   /// Leaves of the region tree
   csArray<SubRect*> leaves;
-  void AddLeaf (SubRect* sr)
+  inline void AddLeaf (SubRect* sr)
   {
     leaves.InsertSorted (sr);
   }

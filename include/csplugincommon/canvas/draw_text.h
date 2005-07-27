@@ -24,9 +24,9 @@
  * Software text writing.
  */
 
-#include "csutil/csuctransform.h"
-#include "draw_common.h"
+#include "csplugincommon/canvas/draw_common.h"
 #include "csplugincommon/canvas/softfontcache.h"
+#include "csutil/csuctransform.h"
 
 /**
  * \addtogroup plugincommon

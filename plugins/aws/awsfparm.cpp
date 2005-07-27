@@ -138,7 +138,7 @@ void awsParmList::AddRect (const char *name, csRect *value)
   parms.Push (pi);
 }
 
-void awsParmList::AddPoint (const char *name, csPoint *value)
+void awsParmList::AddPoint (const char *name, csVector2 *value)
 {
   parmItem *pi = new parmItem;
 
@@ -255,7 +255,7 @@ bool awsParmList::GetRect (const char *name, csRect **value) const
   return false;
 }
 
-bool awsParmList::GetPoint (const char *name, csPoint **value) const
+bool awsParmList::GetPoint (const char *name, csVector2 **value) const
 {
   parmItem *pi = FindParm (name, FLOAT);
 

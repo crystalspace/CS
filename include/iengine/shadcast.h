@@ -28,13 +28,11 @@
  
 #include "csutil/scf.h"
 
-struct iShadowCaster;
-struct iShadowReceiver;
-struct iShadowBlock;
-struct iShadowBlockList;
-struct iMovable;
 struct iFrustumView;
-class csBox3;
+struct iMovable;
+struct iShadowBlockList;
+
+class csVector3;
 
 SCF_VERSION (iShadowCaster, 0, 0, 3);
 

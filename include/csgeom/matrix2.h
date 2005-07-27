@@ -20,6 +20,8 @@
 #ifndef __CS_MATRIX2_H__
 #define __CS_MATRIX2_H__
 
+#include "csextern.h"
+
 #include "csgeom/vector2.h"
 
 /**\file 
@@ -27,8 +29,6 @@
 /**
  * \addtogroup geom_utils
  * @{ */
-
-#include "csextern.h"
 
 /**
  * A 2x2 matrix.

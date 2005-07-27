@@ -19,28 +19,26 @@
 #ifndef __CS_PARTICLES_H__
 #define __CS_PARTICLES_H__
 
+#include "csgeom/objmodel.h"
+#include "csgeom/transfrm.h"
+#include "csgfx/shadervar.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/flags.h"
+#include "csutil/leakguard.h"
 #include "csutil/ref.h"
 #include "csutil/weakref.h"
-#include "csutil/leakguard.h"
-
-#include "csgeom/objmodel.h"
-#include "csgeom/transfrm.h"
 
 #include "iengine/material.h"
-
 #include "imesh/object.h"
 #include "imesh/particles.h"
-
 #include "iutil/comp.h"
-
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 
-#include "csgfx/shadervar.h"
-#include "csgfx/shadervarcontext.h"
+
 
 /**
  * Particles type, instantiates factories which create meshes

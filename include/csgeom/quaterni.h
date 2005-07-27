@@ -26,10 +26,11 @@
  * @{ */
 
 #include "csextern.h"
-
-#include "csgeom/math3d.h"
-#include "csgeom/matrix3.h"
 #include "csqsqrt.h"
+
+#include "csgeom/vector3.h"
+
+class csMatrix3;
 
 /**
  * Class for a quaternion.

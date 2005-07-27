@@ -20,7 +20,6 @@
 #define __CS_ISOUND_LOADER_H__
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
 
 struct iSoundData;
 struct csSoundFormat;

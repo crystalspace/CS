@@ -20,25 +20,28 @@
 #define __CS_IMESH_SPRITE3D_H__
 
 #include "csutil/scf.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/cscolor.h"
-#include "ivideo/graph3d.h"
 
-class csColor;
 struct iMaterialWrapper;
 struct iMeshObject;
-struct iMeshWrapper;
 struct iMeshObjectFactory;
+struct iMeshWrapper;
 struct iRenderView;
-struct iRenderView;
+
+class csColor;
+class csVector2;
+class csVector3;
+struct csTriangle;
 
 /**
  * Macros for the csSprite3D lighting levels.
  */
-#define CS_SPR_LIGHTING_HQ 0
-#define CS_SPR_LIGHTING_LQ 1
-#define CS_SPR_LIGHTING_FAST 2
-#define CS_SPR_LIGHTING_RANDOM 3
+enum
+{
+  CS_SPR_LIGHTING_HQ = 0,
+  CS_SPR_LIGHTING_LQ = 1,
+  CS_SPR_LIGHTING_FAST = 2,
+  CS_SPR_LIGHTING_RANDOM = 3
+};
 
 /**
  * Use the global value for determining which lighting level is used by the

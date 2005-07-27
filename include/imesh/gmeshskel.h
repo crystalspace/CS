@@ -20,8 +20,7 @@
 #define __CS_IMESH_GMESHSKEL_H__
 
 #include "csutil/scf.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/box.h"
+
 #include "imesh/genmesh.h"
 
 struct iRigidBody;
@@ -30,17 +29,21 @@ struct iGenMeshSkeletonScript;
 struct iGenMeshSkeletonBoneUpdateCallback;
 struct iGenMeshSkeletonControlFactory;
 
+class csReversibleTransform;
+class csVector2;
+class csVector3;
+
 enum csBoneTransformMode
 {
-	BM_SCRIPT = 0,
-	BM_PHYSICS,
-	BM_NONE
+  BM_SCRIPT = 0,
+  BM_PHYSICS,
+  BM_NONE
 };
 
 enum csAULevel
 {
-	AUL_BONES = 0,
-	AUL_VERTICES
+  AUL_BONES = 0,
+  AUL_VERTICES
 };
 
 SCF_VERSION  (iGenMeshSkeletonControlState, 0, 0, 1);

@@ -19,20 +19,21 @@
 #ifndef __CS_IMESH_MDLDATA_H__
 #define __CS_IMESH_MDLDATA_H__
 
-#include "csgeom/vector2.h"
-#include "csgeom/vector3.h"
-#include "csutil/cscolor.h"
 #include "csutil/scf.h"
 
-struct iObject;
 struct iImage;
-struct iTextureWrapper;
-struct iTextureList;
+struct iImageIO;
 struct iMaterial;
 struct iMaterialList;
 struct iMaterialWrapper;
+struct iObject;
+struct iTextureList;
+struct iTextureWrapper;
 struct iVFS;
-struct iImageIO;
+
+class csColor;
+class csVector2;
+class csVector3;
 
 SCF_VERSION (iModelDataTexture, 0, 0, 1);
 

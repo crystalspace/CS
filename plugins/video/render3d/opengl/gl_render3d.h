@@ -31,7 +31,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
-
+#include "csgfx/shadervarcontext.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
@@ -42,20 +42,21 @@
 #include "csutil/scfstrset.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
-#include "iutil/strset.h"
-#include "csgfx/shadervarcontext.h"
 
 #include "iutil/comp.h"
+#include "iutil/dbghelp.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "iutil/strset.h"
+#include "ivaria/bugplug.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/rndbuf.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "ivaria/bugplug.h"
 
 #include "csplugincommon/opengl/glstates.h"
+
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
 

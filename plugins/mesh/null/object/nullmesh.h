@@ -19,15 +19,16 @@
 #ifndef __CS_NULLMESH_H__
 #define __CS_NULLMESH_H__
 
-#include "csgeom/vector3.h"
-#include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csutil/refarr.h"
-#include "imesh/object.h"
 #include "imesh/nullmesh.h"
-#include "iutil/eventh.h"
+#include "imesh/object.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "ivideo/graph3d.h"
 
 struct iMaterialWrapper;

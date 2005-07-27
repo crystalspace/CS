@@ -330,18 +330,6 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
     move->UpdateMove ();
   }
-  // Move the directional light if any.
-  if (anim_dirlight)
-  {
-    csRef<iTerrFuncState> state (SCF_QUERY_INTERFACE (
-    	anim_dirlight->GetMeshObject (),
-	iTerrFuncState));
-    csVector3 pos = state->GetDirLightPosition ();
-    csColor col = state->GetDirLightColor ();
-    csYRotMatrix3 mat (.05 * TWO_PI * (float)elapsed_time/1000.);
-    pos = mat * pos;
-    state->SetDirLight (pos, col);
-  }
 
   // Update all busy entities.
   // We first push all entities in a vector so that NextFrame() can safely

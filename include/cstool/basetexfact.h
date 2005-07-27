@@ -27,8 +27,9 @@
 #include "csextern.h"
 
 #include "csutil/scf.h"
-#include "iutil/objreg.h"
 #include "itexture/itexfact.h"
+
+struct iObjectRegistry;
 
 /**
  * Base class for texture factories, with support for common parameters.

@@ -32,9 +32,10 @@
  * @{ */
 
 #include "csextern.h"
-#include "syspath.h"
-#include "ref.h"
-#include "refarr.h"
+
+#include "csutil/ref.h"
+#include "csutil/stringarray.h"
+
 #include "iutil/string.h"
 
 typedef void* csLibraryHandle;

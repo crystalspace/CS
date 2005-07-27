@@ -26,12 +26,11 @@
 /**\addtogroup vfs
  * @{ */
 #include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "iutil/databuff.h"
-#include "iutil/stringarray.h"
-#include "csutil/stringarray.h"
 
 struct iConfigFile;
+struct iDataBuffer;
+
+class csStringArray;
 
 /**
  * File time structure - used to query and set

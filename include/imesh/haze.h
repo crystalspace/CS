@@ -20,11 +20,11 @@
 #define __CS_IMESH_HAZE_H__
 
 #include "csutil/scf.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/cscolor.h"
-#include "csgeom/vector2.h"
 
 struct iMaterialWrapper;
+
+class csVector2;
+class csVector3;
 
 SCF_VERSION (iHazeHull, 0, 0, 1);
 

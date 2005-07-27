@@ -30,6 +30,7 @@
 #include "csutil/hash.h"
 #include "csutil/weakref.h"
 #include "cstool/cspixmap.h"
+#include "csgeom/vector2.h"
 
 struct iObjectRegistry;
 struct iEventQueue;
@@ -52,7 +53,7 @@ private:
   {
     csPixmap *pixmap;
     csRef<iImage> image;
-    csPoint hotspot;
+    csVector2 hotspot;
     uint8 transparency;
     csRGBcolor keycolor, fg, bg;
     bool hasKeyColor;
@@ -110,10 +111,10 @@ public:
 
   /// Adds or replaces a cursor based on the name
   virtual void SetCursor (const char *name, iImage *image, csRGBcolor* key,
-			  csPoint hotspot, uint8 transparency,
+			  csVector2 hotspot, uint8 transparency,
                           csRGBcolor fg, csRGBcolor bg);
   /// Sets the hotspot (center) of a cursor
-  virtual void SetHotSpot (const char *name, csPoint hotspot);
+  virtual void SetHotSpot (const char *name, csVector2 hotspot);
   /// Sets transparency transparency of cursor
   virtual void SetTransparency (const char *name, uint8 transparency);
   /// Set the key colour of a cursor
@@ -127,7 +128,7 @@ public:
   /// Get cursor image of the specified cursor
   virtual csRef<iImage> GetCursorImage (const char *name) const;
   /// Get the hotspot (center) of the specified cursor on the pixmap.
-  virtual csPoint GetHotSpot (const char *name) const;
+  virtual csVector2 GetHotSpot (const char *name) const;
   /// Get the transparency transparency of the specified cursor.  
   virtual uint8 GetTransparency (const char *name) const;
   /// Get key colour of the specified cursor.

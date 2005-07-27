@@ -65,7 +65,7 @@
 #define __CS_CSMD5_H__
 
 #include "csextern.h"
-#include "csstring.h"
+#include "csutil/csstring.h"
 
 /**
  * This is an encapsulation of a C-implementation of MD5 digest algorithm by

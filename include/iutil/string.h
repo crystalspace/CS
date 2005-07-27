@@ -25,9 +25,7 @@
  */
 /**\addtogroup util
  * @{ */
-#include <stdarg.h>
 #include "csutil/scf.h"
-#include "csutil/ref.h"
 
 SCF_VERSION (iString, 0, 2, 1);
 

@@ -20,8 +20,9 @@
 #define __CS_IMAP_SAVER_H__
 
 #include "csutil/scf.h"
-#include "iutil/string.h"
-#include "iutil/document.h"
+
+struct iDocumentNode;
+struct iString;
 
 SCF_VERSION (iSaver, 0, 0, 3);
 

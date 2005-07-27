@@ -23,9 +23,9 @@
 #include "csextern.h"
 
 #include "csutil/ref.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/texture.h"
-#include "iengine/texture.h"
+
+struct iGraphics3D;
+struct iTextureHandle;
 
 /// alignment settings for drawing pixmaps
 #define PIXMAP_TOP      0

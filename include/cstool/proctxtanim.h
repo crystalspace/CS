@@ -20,13 +20,10 @@
 #ifndef __CS_PROCTXTANIM_H__
 #define __CS_PROCTXTANIM_H__
 
-#include "csutil/scf.h"
-#include "iutil/comp.h"
-#include "iutil/plugin.h"
-#include "imap/reader.h"
-#include "igraphic/image.h"
-#include "igraphic/animimg.h"
 #include "cstool/proctex.h"
+#include "csutil/scf.h"
+
+#include "igraphic/animimg.h"
 
 /**
  * A procedural texture for animated images.

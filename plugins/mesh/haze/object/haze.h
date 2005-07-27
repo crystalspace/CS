@@ -19,19 +19,20 @@
 #ifndef __CS_HAZE_H__
 #define __CS_HAZE_H__
 
-#include "csgeom/vector3.h"
-#include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
+#include "cstool/rendermeshholder.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
-#include "cstool/rendermeshholder.h"
-#include "imesh/object.h"
 #include "imesh/haze.h"
+#include "imesh/object.h"
 #include "imesh/particle.h"
-#include "ivideo/graph3d.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "ivideo/graph3d.h"
 
 struct iMaterialWrapper;
 struct iCamera;

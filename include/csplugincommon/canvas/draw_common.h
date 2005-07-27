@@ -24,7 +24,7 @@
  * Common software canvas drawing tools.
  */
 
-#include "graph2d.h"
+#include "csplugincommon/canvas/graph2d.h"
 
 /**
  * \addtogroup plugincommon

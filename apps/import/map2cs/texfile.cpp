@@ -20,14 +20,17 @@
 */
 
 #include "cssysdef.h"
+
+#include "csutil/databuf.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/vfs.h"
+
 #include "mapstd.h"
 #include "texfile.h"
 #include "zipfile.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "igraphic/imageio.h"
-#include "iutil/vfs.h"
-#include "csutil/databuf.h"
 
 static const char* InvisibleTextures[] =
 {

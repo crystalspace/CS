@@ -20,24 +20,24 @@
 #ifndef __CS_PLANE2_H__
 #define __CS_PLANE2_H__
 
+
+#include "csextern.h"
+
+#include "csgeom/segment.h"
+#include "csgeom/vector2.h"
+
 /**\file 
  */
 /**
  * \addtogroup geom_utils
  * @{ */
 
-// These are also defined in math2d.h
-#ifndef __CS_POLY_MACROS__
-#define __CS_POLY_MACROS__
-#define CS_POLY_IN 1
-#define CS_POLY_ON 0
-#define CS_POLY_OUT -1
-#endif
-
-#include "csextern.h"
-
-#include "csgeom/vector2.h"
-#include "csgeom/segment.h"
+enum 
+{
+  CS_POLY_IN = 1,
+  CS_POLY_ON = 0,
+  CS_POLY_OUT = -1
+};
 
 /**
  * A plane in 2D space.
@@ -140,10 +140,10 @@ public:
   }
 
   /// Reverses the direction of the plane while maintianing the plane itself.
-  void Invert () { norm = -norm;  CC = -CC; }
+  inline void Invert () { norm = -norm;  CC = -CC; }
 
   /// Normalizes the plane equation so that 'norm' is a unit vector.
-  void Normalize ()
+  inline void Normalize ()
   {
     float f = norm.Norm ();
     if (f) { norm /= f;  CC /= f; }

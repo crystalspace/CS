@@ -16,20 +16,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+
 #include "csgeom/frustum.h"
+#include "csgeom/plane3.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
+#include "iengine/camera.h"
+#include "iengine/fview.h"
+#include "iengine/light.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/shadows.h"
+#include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "plugins/engine/3d/portal.h"
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/rview.h"
-#include "iengine/texture.h"
-#include "iengine/rview.h"
-#include "iengine/fview.h"
-#include "iengine/camera.h"
-#include "iengine/shadows.h"
-#include "iengine/light.h"
-#include "iengine/movable.h"
 
 typedef csDirtyAccessArray<csVector3> portal_VectorArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, portal_VectorArray,())

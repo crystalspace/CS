@@ -29,58 +29,57 @@
  * @{ */
  
 #include "csutil/scf.h"
+
 #include "csgeom/vector3.h"
+
 #include "iengine/light.h"
 
-class csEngine;
-class csVector3;
-class csFrustum;
-class csMatrix3;
-class csColor;
 class csBox3;
+class csColor;
+class csFrustum;
 
-struct iSector;
-struct iFrustumView;
-struct iSectorIterator;
-struct iObjectIterator;
-struct iLight;
-struct iLightIterator;
-struct iSprite;
-struct iMeshWrapperIterator;
-struct iMeshObject;
-struct iMeshObjectFactory;
-struct iMeshWrapper;
-struct iMeshFactoryWrapper;
-struct iMeshObjectType;
-struct iMaterial;
-struct iMaterialWrapper;
-struct iMaterialList;
-struct iTextureWrapper;
-struct iTextureHandle;
-struct iTextureList;
+
+struct iCacheManager;
+struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
-struct iRegion;
-struct iPortal;
-struct iGraphics3D;
 struct iClipper2D;
-struct iObject;
-struct iObjectWatcher;
 struct iCollection;
 struct iCollectionList;
 struct iDataBuffer;
-struct iCamera;
-struct iRenderView;
-struct iSectorList;
-struct iMeshList;
-struct iMeshFactoryList;
-struct iProgressMeter;
-struct iRegionList;
+struct iFrustumView;
+struct iLight;
+struct iLightIterator;
 struct iLoaderContext;
-struct iCacheManager;
-struct iSharedVariableList;
-struct iRenderLoopManager;
+struct iMaterial;
+struct iMaterialList;
+struct iMaterialWrapper;
+struct iMeshFactoryList;
+struct iMeshFactoryWrapper;
+struct iMeshList;
+struct iMeshObject;
+struct iMeshObjectFactory;
+struct iMeshObjectType;
+struct iMeshWrapper;
+struct iMeshWrapperIterator;
+struct iObject;
+struct iObjectIterator;
+struct iObjectWatcher;
+struct iPortal;
+struct iProgressMeter;
+struct iRegion;
+struct iRegionList;
 struct iRenderLoop;
+struct iRenderLoopManager;
+struct iRenderView;
+struct iSector;
+struct iSectorIterator;
+struct iSectorList;
+struct iSharedVariableList;
+struct iTextureHandle;
+struct iTextureList;
+struct iTextureWrapper;
+
 struct iEngine;
 
 /** \name SetLightingCacheMode() settings

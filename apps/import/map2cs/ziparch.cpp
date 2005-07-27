@@ -20,13 +20,15 @@
 */
 
 #include "cssysdef.h"
-#include "mapstd.h"
-#include "ziparch.h"
-#include "texfile.h"
-#include "zipfile.h"
 
+#include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "csutil/databuf.h"
+
+#include "mapstd.h"
+#include "texfile.h"
+#include "ziparch.h"
+#include "zipfile.h"
 
 CZipArchive::CZipArchive()
 {

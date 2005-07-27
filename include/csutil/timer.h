@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "csextern.h"
-#include "array.h"
+#include "csutil/array.h"
 #include "iutil/timer.h"
 
 struct iEvent;

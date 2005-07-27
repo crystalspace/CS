@@ -20,6 +20,10 @@
 #define __CS_SLSTN_H__
 
 #include "csextern.h"
+
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
+
 #include "isound/listener.h"
 
 class CS_CRYSTALSPACE_EXPORT csSoundListener : public iSoundListener

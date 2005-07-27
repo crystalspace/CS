@@ -25,12 +25,14 @@
  * \addtogroup engine3d
  * @{ */
 
-#include "cstypes.h"
 #include "csutil/scf.h"
-#include "csutil/cscolor.h"
-#include "csgeom/vector3.h"
 
+
+struct iObject;
 struct iSharedVariableListener;
+
+class csColor;
+class csVector3;
 
 SCF_VERSION (iSharedVariable, 0, 1, 0);
 

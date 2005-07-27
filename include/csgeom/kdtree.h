@@ -22,11 +22,11 @@
 #include "csextern.h"
 
 #include "csgeom/box.h"
-#include "csgeom/vector2.h"
-#include "csgeom/math2d.h"
-#include "csutil/scfstr.h"
-#include "csutil/ref.h"
+
 #include "csutil/blockallocator.h"
+#include "csutil/ref.h"
+#include "csutil/scfstr.h"
+
 #include "iutil/dbghelp.h"
 
 struct iGraphics3D;
@@ -100,18 +100,21 @@ public:
   /**
    * Get the bounding box of this object.
    */
-  const csBox3& GetBBox () const { return bbox; }
+  inline const csBox3& GetBBox () const { return bbox; }
 
   /**
    * Get the pointer to the black box object.
    */
-  void* GetObject () const { return object; }
+  inline void* GetObject () const { return object; }
 };
 
-#define CS_KDTREE_AXISINVALID -1
-#define CS_KDTREE_AXISX 0
-#define CS_KDTREE_AXISY 1
-#define CS_KDTREE_AXISZ 2
+enum
+{
+  CS_KDTREE_AXISINVALID = -1,
+  CS_KDTREE_AXISX = 0,
+  CS_KDTREE_AXISY = 1,
+  CS_KDTREE_AXISZ = 2
+};
 
 /**
  * A KD-tree.
@@ -242,7 +245,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Get the user object attached to this node.
-  iBase* GetUserObject () const { return userobject; }
+  inline iBase* GetUserObject () const { return userobject; }
 
   /**
    * Set the user object for this node. Can be 0 to clear
@@ -326,17 +329,17 @@ public:
   /**
    * Get child one.
    */
-  csKDTree* GetChild1 () const { return child1; }
+  inline csKDTree* GetChild1 () const { return child1; }
 
   /**
    * Get child two.
    */
-  csKDTree* GetChild2 () const { return child2; }
+  inline csKDTree* GetChild2 () const { return child2; }
 
   /**
    * Return the number of objects in this node.
    */
-  int GetObjectCount () const { return num_objects; }
+  inline int GetObjectCount () const { return num_objects; }
 
   /**
    * Get the estimated total number of objects in this node and
@@ -344,18 +347,18 @@ public:
    * constantly but it should give a rough idea about the complexity
    * of this node.
    */
-  int GetEstimatedObjectCount () { return estimate_total_objects; }
+  inline int GetEstimatedObjectCount () { return estimate_total_objects; }
 
   /**
    * Return the array of objects in this node.
    */
-  csKDTreeChild** GetObjects () const { return objects; }
+  inline csKDTreeChild** GetObjects () const { return objects; }
 
   /**
    * Return the bounding box of the node itself (does not always contain
    * all children since children are not split by the tree).
    */
-  const csBox3& GetNodeBBox () const { return node_bbox; }
+  inline const csBox3& GetNodeBBox () const { return node_bbox; }
 
   // Debugging functions.
   bool Debug_CheckTree (csString& str);

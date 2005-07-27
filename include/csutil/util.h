@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include "csextern.h"
-#include "csunicode.h"
+#include "csutil/csunicode.h"
 
 /**\file
  */

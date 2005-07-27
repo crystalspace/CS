@@ -32,6 +32,7 @@
 #include "iutil/vfs.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
+#include "ivideo/texture.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -169,7 +170,7 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
       // Hotspot
       sscanf (ini->GetStr (csString(prefix).Append(name).Append(".hotspot"),
         "0,0"), "%d,%d", &x, &y);
-      csPoint hotspot (x, y);
+      csVector2 hotspot (x, y);
 
       // Alpha
       uint8 transparency =
@@ -332,7 +333,7 @@ bool csCursor::SwitchCursor (const char *name)
 
 // Uses a hash map to store named cursors
 void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
-                          csPoint hotspot, uint8 transparency, 
+                          csVector2 hotspot, uint8 transparency, 
                           csRGBcolor fg, csRGBcolor bg)
 {
   // Set up structure
@@ -372,7 +373,7 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
   cursors.Put (name, ci);
 }
 
-void csCursor::SetHotSpot (const char *name, csPoint hotspot)
+void csCursor::SetHotSpot (const char *name, csVector2 hotspot)
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
@@ -424,12 +425,12 @@ csRef<iImage> csCursor::GetCursorImage (const char *name) const
   return 0;
 }
 
-csPoint csCursor::GetHotSpot (const char *name) const
+csVector2 csCursor::GetHotSpot (const char *name) const
 {
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->hotspot;
 
-  return csPoint (0,0);
+  return csVector2 (0,0);
 }
 
 uint8 csCursor::GetTransparency (const char *name) const

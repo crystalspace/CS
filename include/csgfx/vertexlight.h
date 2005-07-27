@@ -19,15 +19,15 @@
 #ifndef __CS_CSGFX_VERTEXLIGHT_H__
 #define __CS_CSGFX_VERTEXLIGHT_H__
 
+#include "csqsqrt.h"
 #include "csgeom/math.h"
 #include "csgeom/vector3.h"
-#include "csutil/cscolor.h"
-#include "csqsqrt.h"
-
-#include "iengine/movable.h"
-#include "iengine/light.h"
-
 #include "csgfx/vertexlistwalker.h"
+#include "csutil/cscolor.h"
+
+#include "iengine/light.h"
+#include "iengine/movable.h"
+
 
 // Attenuation functors
 

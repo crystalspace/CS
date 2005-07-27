@@ -19,19 +19,21 @@
 #ifndef __CS_LGHTNG_H__
 #define __CS_LGHTNG_H__
 
-#include "csgeom/vector3.h"
-#include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
+#include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
-#include "csutil/refarr.h"
 #include "csutil/randomgen.h"
-#include "imesh/object.h"
-#include "imesh/lghtng.h"
-#include "imesh/particle.h"
+#include "csutil/refarr.h"
 #include "imesh/genmesh.h"
-#include "ivideo/graph3d.h"
-#include "iutil/eventh.h"
+#include "imesh/lghtng.h"
+#include "imesh/object.h"
+#include "imesh/particle.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "ivideo/graph3d.h"
+#include "csutil/flags.h"
 
 struct iMaterialWrapper;
 struct iCamera;

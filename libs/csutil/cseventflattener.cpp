@@ -20,11 +20,12 @@
 
 #include "cssysdef.h"
 #include "cstypes.h"
-#include "iutil/event.h"
+#include "csutil/csendian.h"
 #include "csutil/csevent.h"
+#include "csutil/cseventflattener.h"
 #include "csutil/memfile.h"
 
-#include "csutil/cseventflattener.h"
+#include "iutil/event.h"
 
 #define CS_CRYSTAL_PROTOCOL	  0x43533031
 

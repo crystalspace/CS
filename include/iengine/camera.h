@@ -27,7 +27,6 @@
  * @{ */
 
 #include "csutil/scf.h"
-#include "csgeom/transfrm.h"
 
 #define CS_VEC_FORWARD   csVector3(0,0,1)
 #define CS_VEC_BACKWARD  csVector3(0,0,-1)
@@ -43,11 +42,12 @@
 #define CS_VEC_TILT_UP    (-csVector3(1,0,0))
 #define CS_VEC_TILT_DOWN  (-csVector3(-1,0,0))
 
-class csCamera;
-class csVector3;
+class csOrthoTransform;
+class csPlane3;
 class csVector2;
+class csVector3;
+
 struct iSector;
-struct iMeshWrapper;
 struct iCamera;
 
 SCF_VERSION (iCameraSectorListener, 0, 0, 1);

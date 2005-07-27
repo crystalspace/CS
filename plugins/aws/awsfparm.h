@@ -19,7 +19,7 @@
 #ifndef __CS_AWS_FPARM_H__
 #define __CS_AWS_FPARM_H__
 
-#include "csgeom/cspoint.h"
+#include "csgeom/vector2.h"
 #include "csgeom/csrect.h"
 #include "csutil/parray.h"
 #include "csutil/scfstr.h"
@@ -60,7 +60,7 @@ public:
       iString *s;
       iStringArray *sv;
       csRect *r;
-      csPoint *p;
+      csVector2 *p;
       intptr_t v;
     } parm;
 
@@ -104,7 +104,7 @@ public:
   virtual void AddRect (const char *name, csRect *value);
 
   /// Adds a point to the parmeter list.
-  virtual void AddPoint (const char *name, csPoint *value);
+  virtual void AddPoint (const char *name, csVector2 *value);
 
   /**
    * Adds an opaque, undefined value to the parm list. This is stored as
@@ -172,7 +172,7 @@ public:
    * Returns the point named "name" in value. True if it was found,
    * otherwise false.
    */
-  virtual bool GetPoint (const char *name, csPoint **value) const;
+  virtual bool GetPoint (const char *name, csVector2 **value) const;
 
   /**
    * Returns the opaque value named "name" in value.  True if it was found,

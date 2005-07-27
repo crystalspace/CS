@@ -24,7 +24,9 @@
 #include "csutil/xmltiny.h"
 #include "csgfx/shaderexp.h"
 
+#include "imap/services.h"
 #include "iutil/verbositymanager.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/shaderprogram.h"

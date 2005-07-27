@@ -23,15 +23,18 @@
  */
 
 #include "csextern.h"
+
+#include "csgfx/shadervarcontext.h"
 #include "cstool/framedataholder.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/rendermeshholder.h"
-#include "imesh/partsys.h"
-#include "ivideo/rendermesh.h"
-#include "iengine/lightmgr.h"
-#include "csgfx/shadervarcontext.h"
+#include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
+
+#include "iengine/lightmgr.h"
+#include "imesh/partsys.h"
+#include "ivideo/rendermesh.h"
 
 /**\addtogroup plugincommon
  * @{ */

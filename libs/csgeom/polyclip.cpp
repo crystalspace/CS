@@ -19,9 +19,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csgeom/polyclip.h"
-#include "csgeom/poly2d.h"
 #include "csgeom/box.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/polyclip.h"
+#include "csgeom/polypool.h"
 
 //---------------------------------------------------------------------------
 CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool,

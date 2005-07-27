@@ -17,15 +17,15 @@
 */
 
 #include "cssysdef.h"
-#include "beziermsh.h"
+#include "csqint.h"
+#include "csqsqrt.h"
+
 #include "csgeom/frustum.h"
 #include "csgeom/math3d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
 #include "csgfx/renderbuffer.h"
-#include "csqint.h"
-#include "csqsqrt.h"
 #include "csutil/array.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
@@ -33,7 +33,6 @@
 #include "csutil/debug.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
-#include "curvebase.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/fview.h"
@@ -48,6 +47,7 @@
 #include "iengine/texture.h"
 #include "iutil/cache.h"
 #include "iutil/comp.h"
+#include "iutil/databuff.h"
 #include "iutil/eventh.h"
 #include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
@@ -56,7 +56,10 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+
 #include "lightpool.h"
+#include "curvebase.h"
+#include "beziermsh.h"
 
 CS_IMPLEMENT_PLUGIN
 

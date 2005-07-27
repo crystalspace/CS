@@ -18,11 +18,15 @@
 
 #include "cssysdef.h"
 #include "csqint.h"
+
 #include "csutil/util.h"
-#include "tcache.h"
-#include "soft_g3d.h"
-#include "soft_txt.h"
 #include "ivaria/reporter.h"
+#include "ivideo/polyrender.h"
+
+#include "soft_g3d.h"
+#include "tcache.h"
+#include "soft_txt.h"
+
 
 static int hash_table [384];
 

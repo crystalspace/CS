@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math3d.h"
 #include "csgeom/trimeshlod.h"
 
 //---------------------------------------------------------------------------

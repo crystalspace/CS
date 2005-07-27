@@ -20,8 +20,7 @@
 #ifndef __CS_IENGINE_RENDERSTEPS_IRENDERSTEP_H__
 #define __CS_IENGINE_RENDERSTEPS_IRENDERSTEP_H__
 
-#include "csgfx/shadervar.h"
-#include "csutil/refarr.h"
+#include "csutil/scf.h"
 #include "ivideo/shader/shader.h"
 
 /**\file

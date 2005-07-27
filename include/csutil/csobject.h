@@ -21,11 +21,11 @@
 #define __CS_CSOBJECT_H__
 
 #include "csextern.h"
-#include "cstypes.h"
-#include "util.h"
+
 #include "csutil/leakguard.h"
+#include "csutil/refarr.h"
+
 #include "iutil/object.h"
-#include "refarr.h"
 
 typedef csRefArray<iObject> csObjectContainer;
 

@@ -17,11 +17,14 @@
 */
 
 #include "cssysdef.h"
-#include "bot.h"
+
+#include "csgeom/transfrm.h"
 #include "iengine/engine.h"
-#include "iengine/movable.h"
 #include "iengine/light.h"
+#include "iengine/movable.h"
 #include "iengine/sector.h"
+
+#include "bot.h"
 
 Bot::Bot (iEngine *Engine, iMeshWrapper* botmesh)
 {

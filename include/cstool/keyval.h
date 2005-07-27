@@ -21,7 +21,6 @@
 
 #include "csextern.h"
 
-#include "csgeom/vector3.h"
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"

@@ -21,9 +21,6 @@
 #define __CS_INETWORK_VOSAPI_H__
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "iengine/mesh.h"
-#include "iengine/sector.h"
 
 #include <vos/vos/vos.hh>
 

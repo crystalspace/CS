@@ -17,16 +17,19 @@
 */
 
 #include "cssysdef.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
-#include "imesh/mdlconv.h"
-#include "cstool/mdldata.h"
-#include "csutil/datastrm.h"
-#include "csutil/databuf.h"
-#include "csutil/csstring.h"
-#include "csutil/objiter.h"
 #include <ctype.h>
+
+#include "csgeom/vector2.h"
+#include "cstool/mdldata.h"
+#include "csutil/csstring.h"
+#include "csutil/databuf.h"
+#include "csutil/datastrm.h"
+#include "csutil/objiter.h"
+#include "imesh/mdlconv.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
+
 
 class csModelConverterOBJ : public iModelConverter
 {

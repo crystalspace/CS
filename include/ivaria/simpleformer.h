@@ -19,10 +19,13 @@
 #ifndef __CS_IVARIA_SIMPLEFORMER_H__
 #define __CS_IVARIA_SIMPLEFORMER_H__
 
-#include "csgeom/vector3.h"
-#include "csutil/strhash.h"
+
+#include "csutil/scf.h"
+#include "csutil/strset.h"
 
 struct iImage;
+
+class csVector3;
 
 SCF_VERSION (iSimpleFormerState, 0, 0, 2);
 

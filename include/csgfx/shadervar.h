@@ -22,18 +22,19 @@
 
 #include "csextern.h"
 
-#include "csutil/refcount.h"
-#include "csutil/strhash.h"
+#include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/leakguard.h"
+#include "csutil/refarr.h"
+#include "csutil/refcount.h"
+#include "csutil/strset.h"
+
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
-#include "csutil/refarr.h"
-#include "csutil/leakguard.h"
 #include "ivideo/rndbuf.h"
-#include "csgeom/transfrm.h"
 
 struct iTextureHandle;
 struct iTextureWrapper;

@@ -26,11 +26,12 @@
 
 #include "csextern.h"
 
-#include "csutil/scf.h"
-#include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
+#include "csutil/scf.h"
 
 struct iObjectRegistry;
+
+class csShaderExpression;
 
 /**\addtogroup gfx
  * @{ 

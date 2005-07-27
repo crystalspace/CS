@@ -21,10 +21,8 @@
 #include "csgfx/rgbpixel.h"
 
 #include "igraphic/image.h"
-
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
-
 #include "ivaria/reporter.h"
 
 #include "simpleformer.h"

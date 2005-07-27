@@ -24,7 +24,7 @@
 #ifndef __CS_UTIL_HASHR_H__
 #define __CS_UTIL_HASHR_H__
 
-#include "hash.h"
+#include "csutil/hash.h"
  
 /**\addtogroup util_containers
  * @{ */

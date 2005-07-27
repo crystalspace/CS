@@ -27,8 +27,9 @@
  * @{ */
 
 #include "csutil/scf.h"
-#include "csgeom/vector2.h"
-#include "csgeom/box.h"
+
+class csBox2;
+class csVector2;
 
 /// Maximal number of vertices in output (clipped) polygons
 #define MAX_OUTPUT_VERTICES	64
@@ -41,13 +42,15 @@
  * polygon (thus it has not changed) and partially outside, partially inside 
  * (thus it was clipped).
  * @{ */
-
-/// The input polygon is completely outside of clipper polygon
-#define CS_CLIP_OUTSIDE		0
-/// The input polygon is completely inside (thus has not changed)
-#define CS_CLIP_INSIDE		1
-/// The input polygon was partially inside, partially outside
-#define CS_CLIP_CLIPPED		2
+enum
+{
+  /// The input polygon is completely outside of clipper polygon
+  CS_CLIP_OUTSIDE = 0,
+  /// The input polygon is completely inside (thus has not changed)
+  CS_CLIP_INSIDE = 1,
+  /// The input polygon was partially inside, partially outside
+  CS_CLIP_CLIPPED = 2
+};
 /** @} */
 
 /**
@@ -71,12 +74,15 @@ struct csVertexStatus
   float Pos;
 };
 
-/// The output vertex is one of the input vertices
-#define CS_VERTEX_ORIGINAL	0
-/// The output vertex is located on one of the edges of the original polygon
-#define CS_VERTEX_ONEDGE	1
-/// The output vertex is located somewhere inside the original polygon
-#define CS_VERTEX_INSIDE	2
+enum
+{
+  /// The output vertex is one of the input vertices
+  CS_VERTEX_ORIGINAL = 0,
+  /// The output vertex is located on one of the edges of the original polygon
+  CS_VERTEX_ONEDGE = 1,
+  /// The output vertex is located somewhere inside the original polygon
+  CS_VERTEX_INSIDE = 2
+};
 /** @} */
 
 

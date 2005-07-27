@@ -21,8 +21,8 @@
 #define __CS_IVARIA_SCRIPT_H__
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "iutil/string.h"
+
+struct iString;
 
 SCF_VERSION (iScriptObject, 0, 0, 1);
 

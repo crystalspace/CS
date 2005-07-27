@@ -24,9 +24,9 @@
  */
 
 #include "csextern.h"
-#include "array.h"
-#include "bitarray.h"
-#include "sysfunc.h"
+#include "csutil/array.h"
+#include "csutil/bitarray.h"
+#include "csutil/sysfunc.h"
 
 // hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)

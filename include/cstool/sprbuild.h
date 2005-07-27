@@ -22,6 +22,7 @@
 #include "csextern.h"
 
 #include "csutil/csstring.h"
+#include "csutil/ref.h"
 
 class csVector3;
 class csVector2;

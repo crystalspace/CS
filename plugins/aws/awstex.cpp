@@ -17,9 +17,14 @@
 */
 
 #include "cssysdef.h"
+#include <string.h>
+#include <stdio.h>
+
+
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/comp.h"
+#include "iutil/databuff.h"
 #include "iutil/eventh.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
@@ -27,9 +32,8 @@
 #include "ivaria/reporter.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+
 #include "awstex.h"
-#include <string.h>
-#include <stdio.h>
 
 const bool DEBUG_GETTEX = false;
 

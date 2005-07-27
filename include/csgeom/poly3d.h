@@ -27,16 +27,20 @@
 
 #include "csextern.h"
 
+#include "csgeom/plane3.h"
+#include "csgeom/vector3.h"
 #include "csutil/dirtyaccessarray.h"
-#include "csgeom/math3d.h"
-
-// Values returned by classify.
-#define CS_POL_SAME_PLANE 0
-#define CS_POL_FRONT 1
-#define CS_POL_BACK 2
-#define CS_POL_SPLIT_NEEDED 3
 
 class csPoly2D;
+
+// Values returned by classify.
+enum
+{
+  CS_POL_SAME_PLANE = 0,
+  CS_POL_FRONT = 1,
+  CS_POL_BACK = 2,
+  CS_POL_SPLIT_NEEDED = 3
+};
 
 /**
  * The following class represents a general 3D polygon.
@@ -67,22 +71,22 @@ public:
   /**
    * Get the number of vertices.
    */
-  size_t GetVertexCount () const { return vertices.Length (); }
+  inline size_t GetVertexCount () const { return vertices.Length (); }
 
   /**
    * Get the array with all vertices.
    */
-  const csVector3* GetVertices () const { return vertices.GetArray (); }
+  inline const csVector3* GetVertices () const { return vertices.GetArray (); }
 
   /**
    * Get the array with all vertices.
    */
-  csVector3* GetVertices () { return vertices.GetArray (); }
+  inline csVector3* GetVertices () { return vertices.GetArray (); }
 
   /**
    * Get the specified vertex.
    */
-  const csVector3* GetVertex (size_t i) const
+  inline const csVector3* GetVertex (size_t i) const
   {
     if (i >= vertices.Length ()) return 0;
     return &(vertices.GetArray ()[i]);
@@ -91,7 +95,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  csVector3& operator[] (size_t i)
+  inline csVector3& operator[] (size_t i)
   {
     return vertices[i];
   }
@@ -99,7 +103,7 @@ public:
   /**
    * Get the specified vertex.
    */
-  const csVector3& operator[] (size_t i) const
+  inline const csVector3& operator[] (size_t i) const
   {
     return vertices[i];
   }
@@ -107,15 +111,21 @@ public:
   /**
    * Get the first vertex.
    */
-  const csVector3* GetFirst () const
-  { if (vertices.Length ()<=0) return 0;  else return vertices.GetArray (); }
+  inline const csVector3* GetFirst () const
+  { 
+    if (vertices.Length ()<=0) return 0;  
+    else return vertices.GetArray ();
+  }
 
   /**
    * Get the last vertex.
    */
-  const csVector3* GetLast () const
-  { if (vertices.Length ()<=0) return 0; else return &(vertices.GetArray ())[
-    	vertices.Length ()-1]; }
+  inline const csVector3* GetLast () const
+  { 
+    if (vertices.Length ()<=0) return 0; 
+    else return 
+      &(vertices.GetArray ())[vertices.Length ()-1]; 
+  }
 
   /**
    * Test if this vector is inside the polygon.
@@ -135,7 +145,7 @@ public:
   /**
    * Set the number of vertices.
    */
-  void SetVertexCount (size_t n) 
+  inline void SetVertexCount (size_t n) 
   { 
     MakeRoom (n);
     vertices.SetLength (n); 
@@ -145,7 +155,7 @@ public:
    * Add a vertex (3D) to the polygon.
    * Return index of added vertex.
    */
-  size_t AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
+  inline size_t AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
 
   /**
    * Add a vertex (3D) to the polygon.
@@ -156,7 +166,7 @@ public:
   /**
    * Set all polygon vertices at once.  Copies the array.
    */
-  void SetVertices (csVector3 const* v, size_t num)
+  inline void SetVertices (csVector3 const* v, size_t num)
   {
     MakeRoom (num);
     memcpy (vertices.GetArray (), v, num * sizeof (csVector3));
@@ -199,7 +209,7 @@ public:
    * a projection. Plane_nr is 0 for the X plane, 1 for Y, and 2 for Z.
    * Or one of the CS_AXIX_ constants.
    */
-  bool ProjectAxisPlane (const csVector3& point, int plane_nr,
+  inline bool ProjectAxisPlane (const csVector3& point, int plane_nr,
 	float plane_pos, csPoly2D* poly2d) const
   {
     switch (plane_nr)
@@ -228,7 +238,7 @@ public:
    * poly is completely back of the given plane it returnes CS_POL_BACK.
    * Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
-  int Classify (const csPlane3& pl) const
+  inline int Classify (const csPlane3& pl) const
   {
     return Classify (pl, vertices.GetArray (), vertices.Length ());
   }
@@ -243,7 +253,7 @@ public:
   int ClassifyZ (float z) const;
 
   /// Same as Classify() but for a given axis plane.
-  int ClassifyAxis (int axis, float where) const
+  inline int ClassifyAxis (int axis, float where) const
   {
     switch (axis)
     {
@@ -295,7 +305,7 @@ public:
   static csVector3 ComputeNormal (int* poly, size_t num, csVector3* vertices);
 
   /// Compute the normal of this polygon.
-  csVector3 ComputeNormal () const
+  inline csVector3 ComputeNormal () const
   {
     return ComputeNormal (vertices.GetArray (), vertices.Length ());
   }
@@ -310,7 +320,7 @@ public:
   static csPlane3 ComputePlane (int* poly, size_t num, csVector3* vertices);
 
   /// Compute the plane of this polygon.
-  csPlane3 ComputePlane () const
+  inline csPlane3 ComputePlane () const
   {
     return ComputePlane (vertices.GetArray (), vertices.Length ());
   }
@@ -350,7 +360,7 @@ public:
    * Add a vertex but first check if it isn't already present
    * in the array. Return the index that the vertex was added too.
    */
-  size_t AddVertexSmart (const csVector3& v)
+  inline size_t AddVertexSmart (const csVector3& v)
   { return AddVertexSmart (v.x, v.y, v.z); }
 
   /**

@@ -29,6 +29,7 @@
 #include "cstool/userrndbuf.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/flags.h"
 #include "csutil/hash.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"

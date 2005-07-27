@@ -30,13 +30,13 @@
  * @{ */
 
 #include "csutil/scf.h"
+
 #include "iengine/rendersteps/icontainer.h"
 
 struct iCamera;
 struct iClipper2D;
 struct iSector;
 struct iRenderStep;
-//class csRenderView;
 struct iRenderView;
 
 /**

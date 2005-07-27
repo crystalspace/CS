@@ -21,7 +21,8 @@
 #define __CS_IGEOM_POLYMESH_H__
 
 #include "csutil/scf.h"
-#include "csutil/flags.h"
+
+class csFlags;
 
 /**
  * \addtogroup geom_utils
@@ -29,60 +30,61 @@
  
 /** \name Flags for iPolygonMesh
  * @{ */
+enum
+{
+  /**
+  * The object is closed, if set. 
+  * With closed we mean that if you run a beam of light through the object 
+  * (through any point outside the mesh to another point outside) it will always
+  * hit an even amount of faces (one going in, and one going out). If you don't
+  * set CLOSED or NOTCLOSED then the state is not known and the engine may test 
+  * it if it wants.
+  */
+  CS_POLYMESH_CLOSED = 1,
 
-/**
- * The object is closed, if set. 
- * With closed we mean that if you run a beam of light through the object 
- * (through any point outside the mesh to another point outside) it will always
- * hit an even amount of faces (one going in, and one going out). If you don't
- * set CLOSED or NOTCLOSED then the state is not known and the engine may test 
- * it if it wants.
- */
-#define CS_POLYMESH_CLOSED 1
+  /**
+  * The object is not closed, if set.
+  * This is the opposite of #CS_POLYMESH_CLOSED. Use this flag if you are
+  * absolutely certain that the object is not closed. The engine will not
+  * attempt to test if the object is really closed or not. If you don't
+  * set CLOSED or NOTCLOSED then the state is not known and the engine
+  * may test it if it wants.
+  */
+  CS_POLYMESH_NOTCLOSED = 2,
 
-/**
- * The object is not closed, if set.
- * This is the opposite of #CS_POLYMESH_CLOSED. Use this flag if you are
- * absolutely certain that the object is not closed. The engine will not
- * attempt to test if the object is really closed or not. If you don't
- * set CLOSED or NOTCLOSED then the state is not known and the engine
- * may test it if it wants.
- */
-#define CS_POLYMESH_NOTCLOSED 2
+  /**
+  * The object is convex, if set. 
+  * With convex we mean that if you run a beam of light through the object 
+  * (through any point outside the mesh to another point outside) it will always
+  * hit exactly two faces (one going in, and one going out). If you don't
+  * set CONVEX or NOTCONVEX then the state is not known and the engine may test 
+  * it if it wants.
+  */
+  CS_POLYMESH_CONVEX = 4,
 
-/**
- * The object is convex, if set. 
- * With convex we mean that if you run a beam of light through the object 
- * (through any point outside the mesh to another point outside) it will always
- * hit exactly two faces (one going in, and one going out). If you don't
- * set CONVEX or NOTCONVEX then the state is not known and the engine may test 
- * it if it wants.
- */
-#define CS_POLYMESH_CONVEX 4
+  /**
+  * The object is not convex, if set.
+  * This is the opposite of #CS_POLYMESH_CONVEX. Use this flag if you are
+  * absolutely certain that the object is not convex. The engine will not
+  * attempt to test if the object is really convex or not. If you don't
+  * set CONVEX or NOTCONVEX then the state is not known and the engine
+  * may test it if it wants.
+  */
+  CS_POLYMESH_NOTCONVEX = 8,
 
-/**
- * The object is not convex, if set.
- * This is the opposite of #CS_POLYMESH_CONVEX. Use this flag if you are
- * absolutely certain that the object is not convex. The engine will not
- * attempt to test if the object is really convex or not. If you don't
- * set CONVEX or NOTCONVEX then the state is not known and the engine
- * may test it if it wants.
- */
-#define CS_POLYMESH_NOTCONVEX 8
+  /**
+  * Set this flag if the polygon mesh is deformable.
+  */
+  CS_POLYMESH_DEFORMABLE = 16,
 
-/**
- * Set this flag if the polygon mesh is deformable.
- */
-#define CS_POLYMESH_DEFORMABLE 16
-
-/**
- * Set this flag if the native or desired format of the polygon mesh
- * is a triangle mesh. If this flag is set it means that GetTriangles()
- * is very cheap. The presence of this flag does not mean that GetPolygons()
- * will not work.
- */
-#define CS_POLYMESH_TRIANGLEMESH 32
-
+  /**
+  * Set this flag if the native or desired format of the polygon mesh
+  * is a triangle mesh. If this flag is set it means that GetTriangles()
+  * is very cheap. The presence of this flag does not mean that GetPolygons()
+  * will not work.
+  */
+  CS_POLYMESH_TRIANGLEMESH = 32
+};
 /** @} */
 
 /**

@@ -22,17 +22,20 @@
 #ifndef __CS_POLYCLIP_H__
 #define __CS_POLYCLIP_H__
 
+
+#include "csextern.h"
+
+#include "csgeom/box.h"
+
+#include "igeom/clip2d.h"
+
+class csPoly2DPool;
+
 /**\file 
  */
 /**
  * \addtogroup geom_utils
  * @{ */
-
-#include "csextern.h"
-
-#include "csgeom/math2d.h"
-#include "csgeom/polypool.h"
-#include "igeom/clip2d.h"
 
 /**
  * The csClipper class is an abstract parent to all 2D clipping objects.

@@ -18,29 +18,26 @@
 
 #include "cssysdef.h"
 
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
+#include "csqint.h"
+#include "csqsqrt.h"
 
+#include "csgeom/box.h"
+#include "csgfx/renderbuffer.h"
+#include "csutil/cscolor.h"
+#include "csutil/randomgen.h"
+#include "csutil/util.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-
 #include "imesh/particles.h"
-
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "ivaria/reporter.h"
 #include "ivideo/material.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 
-#include "ivaria/reporter.h"
-
-#include "csutil/randomgen.h"
-#include "csutil/util.h"
-
-#include "csgfx/renderbuffer.h"
-
-#include "csqsqrt.h"
-#include "csqint.h"
 
 #include "particles.h"
 #include <limits.h>

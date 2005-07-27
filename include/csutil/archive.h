@@ -24,11 +24,11 @@
  * ZIP archive support
  */
 
-#include <stdio.h>
 #include "csextern.h"
-#include "zip.h"
-#include "parray.h"
-#include "stringarray.h"
+
+#include "csutil/parray.h"
+#include "csutil/stringarray.h"
+#include "csutil/zip.h"
 
 struct csFileTime;
 

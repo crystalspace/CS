@@ -17,9 +17,12 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/scf.h"
+
 #include "csgfx/renderbuffer.h"
 #include "cstool/userrndbuf.h"
+#include "csutil/refarr.h"
+#include "csutil/scf.h"
+
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 

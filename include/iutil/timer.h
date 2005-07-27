@@ -20,8 +20,7 @@
 #define __CS_IUTIL_TIMER_H__
 
 #include "csutil/scf.h"
-#include <stdarg.h>
-#include <stdio.h>
+
 
 SCF_VERSION (iTimerEvent, 0, 0, 1);
 

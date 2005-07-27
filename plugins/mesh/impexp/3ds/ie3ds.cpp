@@ -23,15 +23,16 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/vector2.h"
+#include "cstool/mdldata.h"
 #include "csutil/csstring.h"
 #include "csutil/datastrm.h"
-#include "cstool/mdldata.h"
-#include "imesh/mdldata.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/databuff.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/parray.h"
+#include "imesh/mdldata.h"
+#include "iutil/comp.h"
+#include "iutil/databuff.h"
+#include "iutil/eventh.h"
 
 #include "ie3ds.h"
 #include <lib3ds/camera.h>

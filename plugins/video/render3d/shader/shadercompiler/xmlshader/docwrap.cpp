@@ -25,6 +25,7 @@
 #include "imap/services.h"
 #include "ivaria/reporter.h"
 #include "iutil/vfs.h"
+#include "iutil/document.h"
 
 #include "docwrap.h"
 #include "tokenhelper.h"

@@ -20,20 +20,22 @@
 
 #include "cssysdef.h"
 
-#include "iutil/document.h"
-#include "iutil/strset.h"
-#include "ivideo/rndbuf.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/rendermesh.h"
-#include "iengine/rview.h"
-#include "iengine/sector.h"
-#include "iengine/mesh.h"
-#include "iengine/material.h"
-#include "ivaria/reporter.h"
-#include "ivideo/material.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
+
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
+#include "iengine/rview.h"
+#include "iengine/sector.h"
+#include "iutil/document.h"
+#include "iutil/strset.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/rendermesh.h"
+#include "ivideo/rndbuf.h"
 
 #include "fullquad.h"
 

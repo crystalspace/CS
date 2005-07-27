@@ -22,6 +22,7 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/csevent.h"
 #include "csutil/snprintf.h"
+#include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"

@@ -24,7 +24,7 @@
  */
 
 #include "csextern.h"
-#include "array.h"
+#include "csutil/array.h"
 #include "iutil/cfgmgr.h"
 
 struct iConfigFile;

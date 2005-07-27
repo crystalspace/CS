@@ -19,13 +19,16 @@
 #ifndef __CS_SHADOW_H__
 #define __CS_SHADOW_H__
 
-#include "imesh/object.h"
 #include "csgeom/box.h"
+#include "csutil/flags.h"
 #include "igeom/objmodel.h"
+#include "imesh/object.h"
 
 struct iEngine;
 struct iMeshWrapper;
 struct iCamera;
+
+
 
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only

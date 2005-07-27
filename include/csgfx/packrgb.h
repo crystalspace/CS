@@ -28,9 +28,8 @@
 #include "csextern.h"
 
 #include "cstypes.h"
-#include "iutil/databuff.h"
-#include "csutil/databuf.h"
-#include "rgbpixel.h"
+#include "csgfx/rgbpixel.h"
+
 
 /**\addtogroup gfx
  * @{

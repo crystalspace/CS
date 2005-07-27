@@ -21,27 +21,28 @@
 
 #include "csextern.h"
 
+#include "csgeom/box.h"
 #include "csutil/csobject.h"
 #include "csutil/leakguard.h"
 #include "csutil/array.h"
-#include "csgeom/math3d.h"
-#include "csgeom/matrix3.h"
-#include "csgeom/vector3.h"
+
 #include "ivaria/collider.h"
 
-class csReversibleTransform;
-class csCollisionPair;
-struct csIntersectingTriangle;
-struct iPolygonMesh;
-struct iCollideSystem;
+struct iCamera;
 struct iCollider;
-struct iObject;
+struct iCollideSystem;
 struct iEngine;
-struct iRegion;
 struct iMeshWrapper;
 struct iMovable;
+struct iObject;
+struct iPolygonMesh;
+struct iRegion;
 struct iSector;
-struct iCamera;
+
+class csCollisionPair;
+class csReversibleTransform;
+
+struct csIntersectingTriangle;
 
 /* The 'class csColliderWrapper' is here to work around a VC7.0 issue. It 
  * seems that, depending on whether VC7.0 sees a compound declared as

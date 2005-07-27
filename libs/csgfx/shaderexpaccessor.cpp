@@ -19,10 +19,13 @@
 
 
 #include "cssysdef.h"
+
+#include "csgfx/shaderexp.h"
+#include "csgfx/shaderexpaccessor.h"
 #include "csutil/sysfunc.h"
+
 #include "ivaria/reporter.h"
 
-#include "csgfx/shaderexpaccessor.h"
 
 SCF_IMPLEMENT_IBASE(csShaderExpressionAccessor)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)

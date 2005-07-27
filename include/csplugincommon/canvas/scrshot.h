@@ -24,8 +24,10 @@
  */
 
 #include "csextern.h"
-#include "ivideo/graph2d.h"
+
 #include "csgfx/imagebase.h"
+
+struct iGraphics2D;
 
 /**
  * \addtogroup plugincommon

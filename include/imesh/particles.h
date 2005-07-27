@@ -19,6 +19,15 @@
 #ifndef __CS_IMESH_PARTICLES_H__
 #define __CS_IMESH_PARTICLES_H__
 
+#include "csutil/scf.h"
+
+#include "csgeom/vector3.h"
+#include "csgeom/vector4.h"
+#include "csutil/array.h"
+#include "csutil/cscolor.h"
+
+
+
 /**\file
  * Particle System Interface
  */
@@ -27,18 +36,11 @@
  * \addtogroup gfx3d
  * @{ */
 
-#include "csgeom/vector3.h"
-#include "csgeom/vector4.h"
-
-#include "csutil/array.h"
-#include "csutil/refarr.h"
-#include "csutil/scf.h"
-
-#include "iengine/material.h"
-
-#include "iengine/movable.h"
+struct iMaterialWrapper;
 
 class csColor;
+class csMatrix3;
+class csReversibleTransform;
 
 /// Particle force falloff type
 enum csParticleFalloffType

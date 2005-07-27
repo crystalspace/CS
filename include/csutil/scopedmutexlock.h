@@ -20,7 +20,7 @@
 #define __CSUTIL_SCOPEDMUTEX_H__
 
 #include "csextern.h"
-#include "thread.h"
+#include "csutil/thread.h"
 
 /**
  * This is a utility class for locking a Mutex. If A MutexLock class is

@@ -19,11 +19,13 @@
 #ifndef __CS_SHAREVAR_H__
 #define __CS_SHAREVAR_H__
 
-#include "csutil/nobjvec.h"
-#include "csutil/csstring.h"
+#include "csgeom/vector3.h"
+#include "csutil/cscolor.h"
 #include "csutil/csobject.h"
-#include "csutil/refarr.h"
+#include "csutil/csstring.h"
 #include "csutil/leakguard.h"
+#include "csutil/nobjvec.h"
+#include "csutil/refarr.h"
 #include "iengine/sharevar.h"
 
 

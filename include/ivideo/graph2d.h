@@ -28,19 +28,18 @@
  * \addtogroup gfx2d
  * @{ */
  
-#include <stdarg.h>
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
-#include "ivideo/texture.h"
-#include "iengine/texture.h"
 #include "ivideo/cursor.h"
 
-class csRect;
+
 struct iImage;
 struct iFontServer;
 struct iFont;
 struct iNativeWindow;
 struct iGraphics2D;
+
+class csRect;
 
 /// iGraphics2D::Write() flags.
 enum

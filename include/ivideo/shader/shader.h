@@ -25,29 +25,25 @@
  * Shader-related interfaces
  */
 
-#include "csgeom/vector4.h"
-#include "csutil/hash.h"
-#include "csutil/ref.h"
-#include "csutil/refarr.h"
 #include "csutil/scf.h"
-#include "csutil/set.h"
-#include "csutil/strhash.h"
-#include "ivideo/graph3d.h"
+
 #include "csgfx/shadervar.h"
 
-struct iString;
-struct iDataBuffer;
+#include "csutil/array.h"
+#include "csutil/refarr.h"
+#include "csutil/set.h"
+#include "csutil/strset.h"
+
 struct iDocumentNode;
-struct iMaterial;
 struct iLight;
 struct iObject;
 
-struct iShaderManager;
-struct iShaderRenderInterface;
+struct csRenderMesh;
+class csShaderVariable;
+
 struct iShader;
 struct iShaderCompiler;
-
-struct csRenderMesh;
+struct iShaderManager;
 
 /**
  * A "shader variable stack".

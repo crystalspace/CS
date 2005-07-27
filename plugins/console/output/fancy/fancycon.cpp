@@ -21,26 +21,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+
+#include "csgeom/csrect.h"
+#include "csutil/cfgacc.h"
+#include "csutil/csstring.h"
+#include "csutil/event.h"
 #include "csutil/sysfunc.h"
-#include "fancycon.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
+#include "iutil/comp.h"
+#include "iutil/databuff.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
-#include "iutil/vfs.h"
-#include "iutil/plugin.h"
-#include "csgeom/csrect.h"
-#include "csutil/csstring.h"
-#include "csutil/cfgacc.h"
-#include "csutil/event.h"
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/event.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
+#include "ivideo/txtmgr.h"
+
+#include "fancycon.h"
+
 
 CS_IMPLEMENT_PLUGIN
 

@@ -18,10 +18,10 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/memimage.h"
-#include "csutil/bitarray.h"
 
 #include "csgfx/bakekeycolor.h"
+#include "csgfx/memimage.h"
+#include "csutil/bitarray.h"
 
 #include <limits.h>
 

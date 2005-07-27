@@ -25,10 +25,10 @@
  */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csutil/csuctransform.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"
-#include "csgeom/math.h"
 
 // MinGW uses MS CRT, but it can't grok long double.  VC doesn't have long
 // double and CRT printf() doesn't know %Lf, %Lg, or %Le.

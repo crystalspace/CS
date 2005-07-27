@@ -21,10 +21,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "csutil/csendian.h"
 #include "csutil/archive.h"
+#include "csutil/csendian.h"
 #include "csutil/csstring.h"
-#include "csutil/hash.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"

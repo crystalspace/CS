@@ -28,16 +28,14 @@
  
 #include "csutil/scf.h"
 
-struct iSector;
-struct iSprite;
-struct iSpriteTemplate;
+struct iCameraPosition;
+struct iCollection;
+struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
-struct iTextureWrapper;
-struct iMaterialWrapper;
-struct iCameraPosition;
 struct iObject;
-struct iCollection;
+struct iSector;
+struct iTextureWrapper;
 
 SCF_VERSION (iRegion, 0, 1, 7);
 

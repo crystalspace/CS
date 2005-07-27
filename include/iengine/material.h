@@ -27,8 +27,8 @@
 /**
  * \addtogroup engine3d_textures
  * @{ */
- 
-class csMaterialWrapper;
+
+
 struct iMaterial;
 struct iTextureManager;
 struct iTextureWrapper;
@@ -117,7 +117,7 @@ struct iMaterialEngine : public iBase
   /**
    * Get a texture by name.
    */
-  virtual iTextureWrapper* GetTextureWrapper (csStringID name) = 0;
+    virtual iTextureWrapper* GetTextureWrapper (csStringID name) = 0;
 
   /**
    * Visit all textures.

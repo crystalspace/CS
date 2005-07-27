@@ -31,8 +31,8 @@
 //-----------------------------------------------------------------------------
 
 #include "csextern.h"
-#include "weakref.h"
-#include "array.h"
+#include "csutil/array.h"
+#include "csutil/weakref.h"
 
 /**
  * An array of weak references.

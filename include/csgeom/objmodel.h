@@ -29,9 +29,12 @@
  
 #include "csextern.h"
 
-#include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
 #include "csutil/refarr.h"
+
+#include "igeom/objmodel.h"
+#include "igeom/polymesh.h"
+
+
 
 /**
  * Helper class to make it easier to implement iObjectModel in mesh

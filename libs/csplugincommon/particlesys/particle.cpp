@@ -17,16 +17,21 @@
 */
 
 #include "cssysdef.h"
+
+#include "csgeom/tri.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/particlesys/particle.h"
 #include "cstool/rbuflock.h"
-#include "iengine/rview.h"
+
 #include "iengine/camera.h"
-#include "iengine/movable.h"
+#include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
 #include "ivideo/material.h"
 #include "iutil/objreg.h"
-#include "csqint.h"
 
 SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)

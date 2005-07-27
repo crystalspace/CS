@@ -28,12 +28,16 @@
 
 #include "csextern.h"
 #include "math3d_d.h"
-#include "csutil/csstring.h"
 
-#define CS_AXIS_NONE -1
-#define CS_AXIS_X 0
-#define CS_AXIS_Y 1
-#define CS_AXIS_Z 2
+class csString;
+
+enum
+{
+  CS_AXIS_NONE = -1,
+  CS_AXIS_X = 0,
+  CS_AXIS_Y = 1,
+  CS_AXIS_Z = 2
+};
 
 /**
  * A 3D vector.

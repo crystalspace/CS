@@ -18,17 +18,20 @@
 */
 
 #include "cssysdef.h"
+
 #include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+
 #include "glshader_arb.h"
 #include "glshader_afp.h"
 

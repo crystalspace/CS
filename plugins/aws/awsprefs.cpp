@@ -453,12 +453,12 @@ bool awsPrefManager::LookupRGBKey (
   return false;
 }
 
-bool awsPrefManager::LookupPointKey (const char *name, csPoint &val)
+bool awsPrefManager::LookupPointKey (const char *name, csVector2 &val)
 {
   return LookupPointKey (NameToId (name), val);
 }
 
-bool awsPrefManager::LookupPointKey (unsigned long id, csPoint &val)
+bool awsPrefManager::LookupPointKey (unsigned long id, csVector2 &val)
 {
   iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
 

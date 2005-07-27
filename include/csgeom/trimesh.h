@@ -22,7 +22,8 @@
 #include "csextern.h"
 
 #include "csgeom/tri.h"
-#include "csgeom/math3d.h"
+#include "csgeom/vector3.h"
+
 #include "csutil/array.h"
 #include "csutil/dirtyaccessarray.h"
 

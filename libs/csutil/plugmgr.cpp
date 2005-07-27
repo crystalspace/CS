@@ -20,9 +20,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "csutil/plugmgr.h"
-#include "csutil/util.h"
+
 #include "csutil/array.h"
+#include "csutil/plugmgr.h"
+#include "csutil/scopedmutexlock.h"
+#include "csutil/util.h"
+
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"

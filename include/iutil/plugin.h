@@ -29,9 +29,7 @@
 
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "iutil/objreg.h"
-#include "ivaria/reporter.h"
+
 
 struct iComponent;
 

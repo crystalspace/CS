@@ -20,7 +20,7 @@
 #define __CS_STRSET_H__
 
 #include "csextern.h"
-#include "strhash.h"
+#include "csutil/strhash.h"
 
 /**\file
  * String-to-ID hash table.

@@ -28,30 +28,21 @@
 
 #include "csextern.h"
 
+
+#ifdef CS_COMPILER_GCC
+  #warning csgeom/cspoint.h is deprecated; use csgeom/vector2.h instead
+#endif
+#ifdef CS_COMPILER_MSVC
+  #pragma message ("csgeom/cspoint.h is deprecated; use csgeom/vector2.h instead")
+#endif
+
+#include "csgeom/vector2.h"
+
 /**
  * A 2D point object
+ * Deprecated! Use csVector2 instead
  */
-struct csPoint
-{
-  /// The coordinates of the point
-  int x, y;
-
-  /// Constructor: initialize the object with zeros
-  csPoint ():x(0), y(0)
-  { }
-  /// Constructor: initialize the object with given values
-  csPoint (int iX, int iY):x(iX), y(iY)
-  { }
-  /// Constructor: initialize the object by copying
-  csPoint (const csPoint &v):x(v.x), y(v.y)
-  { }
-  /// Set the coordinates of this point
-  void Set (int iX, int iY)
-  { x = iX; y = iY; }
-  /// Set the coordinates of this point from another point
-  void Set (csPoint &v)
-  { x = v.x; y = v.y; }
-};
+typedef csVector2 csPoint;
 
 /** @} */
 

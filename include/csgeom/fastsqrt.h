@@ -28,10 +28,22 @@
 
 #include "csextern.h"
 
+
+#ifdef CS_COMPILER_GCC
+  #warning FastSqrt is deprecated. Use sqrtf instead.
+#endif
+#ifdef CS_COMPILER_MSVC
+  #pragma message ("FastSqrt is deprecated. Use sqrtf instead.")
+#endif
+
 /// declare table of square roots
-extern CS_CRYSTALSPACE_EXPORT void BuildSqrtTable ();
+CS_CRYSTALSPACE_EXPORT void BuildSqrtTable ()
+{}
 /// fast square root, looks up table build by BuildSqrtTable().
-extern CS_CRYSTALSPACE_EXPORT float FastSqrt (float n);
+CS_CRYSTALSPACE_EXPORT float FastSqrt (float n)
+{
+  return sqrtf(n);
+}
 
 /** @} */
 

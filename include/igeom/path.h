@@ -19,6 +19,8 @@
 #ifndef __CS_IPATH_H__
 #define __CS_IPATH_H__
 
+#include "csutil/scf.h"
+
 /**\file 
  */
 /**

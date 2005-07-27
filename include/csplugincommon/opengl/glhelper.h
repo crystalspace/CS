@@ -20,6 +20,10 @@
 #ifndef __CS_CSPLUGINCOMMON_OPENGL_GLHELPER_H__
 #define __CS_CSPLUGINCOMMON_OPENGL_GLHELPER_H__
 
+#include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
+
 static inline void makeGLMatrix (const csReversibleTransform& t, 
   float matrix[16])
 {

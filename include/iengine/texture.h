@@ -26,14 +26,12 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "cstypes.h"
 
-class csProcTexture;
 struct iImage;
+struct iObject;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
-struct iObject;
 
 SCF_VERSION (iTextureCallback, 0, 0, 1);
 

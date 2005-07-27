@@ -27,6 +27,7 @@
 #include "cstool/userrndbuf.h"
 
 class csGLGraphics3D;
+class csShaderVariableContext;
 
 class csGLPolygonRenderer : public iPolygonRenderer
 {

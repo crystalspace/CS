@@ -19,6 +19,8 @@
 #ifndef __CS_SNDSRCOPENAL_H__
 #define __CS_SNDSRCOPENAL_H__
 
+#include "csgeom/vector3.h"
+
 #include "isound/source.h"
 
 struct iSoundData;

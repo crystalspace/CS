@@ -24,10 +24,10 @@
  */
 
 #include "csextern.h"
+#include "csutil/parray.h"
+#include "csutil/stringarray.h"
+#include "csutil/util.h"
 #include "iutil/cmdline.h"
-#include "parray.h"
-#include "stringarray.h"
-#include "util.h"
 
 /// Representation of a commandline option.
 struct CS_CRYSTALSPACE_EXPORT csCommandLineOption

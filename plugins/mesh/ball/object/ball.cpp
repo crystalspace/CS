@@ -17,26 +17,30 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/renderbuffer.h"
-#include "csgeom/math3d.h"
+#include "csqsqrt.h"
+
 #include "csgeom/math.h"
+#include "csgeom/math3d.h"
+#include "csgeom/tri.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
-#include "iengine/movable.h"
-#include "iengine/rview.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/material.h"
-#include "iengine/material.h"
 #include "iengine/camera.h"
-#include "iengine/sector.h"
-#include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iengine/material.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/sector.h"
+#include "igeom/clip2d.h"
 #include "iutil/objreg.h"
+#include "iutil/strset.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+
+
 #include "ball.h"
 
-#include "csqsqrt.h"
-#include "iutil/strset.h"
 
 //#define BALL_DEBUG
 

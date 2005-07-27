@@ -31,7 +31,7 @@
 //-----------------------------------------------------------------------------
 
 #include "csextern.h"
-#include "array.h"
+#include "csutil/array.h"
 
 template <class T>
 class csPDelArrayElementHandler

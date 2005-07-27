@@ -27,12 +27,14 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "csgeom/frustum.h"
 
 struct iShadowBlock;
 struct iShadowBlockList;
-class csTransform;
+
+class csBox3;
+class csFrustum;
 class csPlane3;
+class csTransform;
 class csVector3;
 
 SCF_VERSION (iShadowIterator, 0, 0, 1);

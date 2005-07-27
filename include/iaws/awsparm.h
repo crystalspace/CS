@@ -20,7 +20,7 @@
 #define __CS_AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE_H__
 
 #include "csgeom/csrect.h"
-#include "csgeom/cspoint.h"
+#include "csgeom/vector2.h"
 #include "iutil/string.h"
 #include "iutil/stringarray.h"
 
@@ -48,7 +48,7 @@ struct iAwsParmList : public iBase
   /// Adds a rect to the parmeter list
   virtual void AddRect(const char *name, csRect *value) = 0;
   /// Adds a point to the parmeter list
-  virtual void AddPoint(const char *name, csPoint *value) = 0;
+  virtual void AddPoint(const char *name, csVector2 *value) = 0;
   /**
    * Adds an opaque, undefined value to the parm list. This is stored as a
    * (intptr_t), but should never be assumed to be anything at all, except some
@@ -109,7 +109,7 @@ struct iAwsParmList : public iBase
    * Returns the point named "name" in value.  True if it was found, otherwise
    * false.
    */
-  virtual bool GetPoint(const char *name, csPoint **value) const = 0;
+  virtual bool GetPoint(const char *name, csVector2 **value) const = 0;
   /**
    * Returns the opaque value named "name" in value.  True if it was found,
    * otherwise false.

@@ -24,7 +24,6 @@
   #pragma message ("csgeom/subrec2.h is deprecated; use csgeom/subrec.h instead")
 #endif
 
-#define csSubRect2		csSubRect
-#define csSubRectangles2	csSubRectangles
-
 #include "subrec.h"
+typedef csSubRect csSubRect2;
+typedef csSubRectangles csSubRectangles2;

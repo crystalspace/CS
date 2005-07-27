@@ -17,16 +17,18 @@
 */
 #include "cssysdef.h"
 #include "csqsqrt.h"
+#include "csqint.h"
+
 #include "csgeom/frustum.h"
-#include "plugins/engine/3d/light.h"
-#include "plugins/engine/3d/sector.h"
+#include "csutil/csendian.h"
+#include "csutil/csmd5.h"
+#include "csutil/debug.h"
+#include "csutil/memfile.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/halo.h"
+#include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
-#include "csutil/debug.h"
-#include "csutil/csmd5.h"
-#include "csutil/memfile.h"
-#include "csutil/csendian.h"
+#include "plugins/engine/3d/sector.h"
 
 int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;

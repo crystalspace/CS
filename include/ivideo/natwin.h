@@ -27,7 +27,6 @@
  * \addtogroup gfx2d
  * @{ */
  
-#include <stdarg.h>
 #include "csutil/scf.h"
 
 /**\name Alert types

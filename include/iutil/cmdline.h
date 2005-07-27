@@ -24,7 +24,7 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
-#include "csutil/csstring.h"
+
 
 SCF_VERSION (iCommandLineParser, 0, 0, 3);
 

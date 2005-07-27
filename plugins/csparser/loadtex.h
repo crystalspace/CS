@@ -21,8 +21,9 @@
 #define __CS_LOADTEX_H__
 
 #include "csutil/scf.h"
-#include "itexture/itexloaderctx.h"
 #include "igraphic/image.h"
+#include "itexture/itexloaderctx.h"
+#include "iutil/comp.h"
 
 #define PLUGIN_TEXTURELOADER_IMAGE    "crystalspace.texture.loader.image"
 #define PLUGIN_TEXTURELOADER_ANIMIMG  "crystalspace.texture.loader.animimg"

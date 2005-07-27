@@ -27,7 +27,8 @@
 
 #include "csextern.h"
 
-#include "csgeom/matrix3.h"
+class csMatrix3;
+class csVector3;
 
 /**
  * This is a static class which encapsulates a few functions

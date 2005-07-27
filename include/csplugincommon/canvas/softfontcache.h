@@ -25,7 +25,7 @@
  */
 
 #include "csextern.h"
-#include "fontcache.h"
+#include "csplugincommon/canvas/fontcache.h"
 
 /**
  * \addtogroup plugincommon

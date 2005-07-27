@@ -16,16 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "csqint.h"
+
+#include "csgeom/tri.h"
 #include "csutil/csendian.h"
-#include "clightmap.h"
-#include "beziermsh.h"
-#include "curvebase.h"
-#include "csutil/util.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
-#include "iutil/vfs.h"
-#include "iutil/cache.h"
+#include "csutil/util.h"
+#include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iutil/cache.h"
+#include "iutil/vfs.h"
+
+#include "beziermsh.h"
+#include "clightmap.h"
+#include "curvebase.h"
 
 #define LMMAGIC	    "LM04" // must be 4 chars!
 

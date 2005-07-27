@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 class csColor;
+class csVector3;
 
 SCF_VERSION (iEmitGen3D, 0, 0, 1);
 SCF_VERSION (iEmitFixed, 0, 0, 1);

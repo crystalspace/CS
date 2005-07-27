@@ -30,22 +30,30 @@
 #endif
 
 #include "csutil/scf.h"
+
+#include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
-#include "soft_txt.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/cfgacc.h"
-#include "scan.h"
-#include "ivideo/halo.h"
-#include "iutil/eventh.h"
+#include "csutil/cscolor.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "iutil/strset.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/halo.h"
 #include "ivideo/shader/shader.h"
-#include "csgfx/shadervarcontext.h"
+
+#include "scan.h"
+#include "soft_txt.h"
 
 class csSoftwareTextureCache;
 class csPolArrayVertexBufferManager;
+
 struct iConfigFile;
+struct iPolygonBuffer;
+
+struct csTriangle;
 
 // Maximum size of a single lightmap, in pixels
 #define MAX_LIGHTMAP_SIZE	1500000

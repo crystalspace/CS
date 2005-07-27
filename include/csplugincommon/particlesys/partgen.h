@@ -30,6 +30,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csutil/floatrand.h"
 #include "csutil/refarr.h"
 #include "iengine/lightmgr.h"

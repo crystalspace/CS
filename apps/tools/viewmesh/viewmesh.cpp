@@ -19,7 +19,10 @@
 
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
 #include "viewmesh.h"
+
+#include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
+#include "iutil/eventq.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)

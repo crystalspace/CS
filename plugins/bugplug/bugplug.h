@@ -19,40 +19,40 @@
 #ifndef __CS_BUGPLUG_H__
 #define __CS_BUGPLUG_H__
 
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/csinput.h"
+#include "csutil/cfgacc.h"
+#include "csutil/parray.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
-#include "csutil/parray.h"
-#include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
+#include "iutil/comp.h"
+#include "iutil/csinput.h"
+#include "iutil/eventh.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivaria/bugplug.h"
 
-struct iObjectRegistry;
-struct iVisibilityCuller;
-struct iThingFactoryState;
-struct iEngine;
-struct iGraphics3D;
-struct iGraphics2D;
-struct iTextureManager;
-struct iConsoleOutput;
-struct iVFS;
-struct iVirtualClock;
-struct iFile;
-struct iSector;
-struct iMeshWrapper;
-struct iMeshFactoryWrapper;
 struct iCamera;
+struct iConsoleOutput;
+struct iEngine;
+struct iFile;
+struct iFont;
+struct iGraphics2D;
+struct iGraphics3D;
+struct iMaterialWrapper;
+struct iMeshFactoryWrapper;
+struct iMeshWrapper;
+struct iObjectRegistry;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iMaterialWrapper;
 struct iRegion;
-struct iFont;
+struct iSector;
+struct iTextureManager;
+struct iThingFactoryState;
+struct iVFS;
+struct iVirtualClock;
+struct iVisibilityCuller;
 
 class csMatrix3;
 class csVector3;
@@ -61,6 +61,8 @@ class csPlane3;
 class csBox2;
 class csBox3;
 class csView;
+
+struct csTriangle;
 
 class csSpider;
 class csShadow;

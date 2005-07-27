@@ -22,8 +22,7 @@
 #include "csutil/scf.h"
 
 class csColor;
-struct iEngine;
-struct iSector;
+class csVector3;
 
 SCF_VERSION (iExplosionState, 0, 0, 2);
 

@@ -26,7 +26,6 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "csutil/array.h"
 
 struct iLight;
 

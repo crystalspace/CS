@@ -19,7 +19,7 @@
 #ifndef __CS_AWS_PREFS_H__
 #define __CS_AWS_PREFS_H__
 
-#include "csgeom/cspoint.h"
+#include "csgeom/vector2.h"
 #include "csgeom/csrect.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
@@ -284,15 +284,15 @@ class awsPointKey : public awsKey, public iAwsPointKey
 {
 private:
   /// The key's value.
-  csPoint val; 
+  csVector2 val; 
 public:
   SCF_DECLARE_IBASE_EXT (awsKey);
 
   /// Constructs an integer key with the given name.
-  awsPointKey(iAws* a, iString *name, csPoint v) : awsKey(a,name), val(v) {}
+  awsPointKey(iAws* a, iString *name, csVector2 v) : awsKey(a,name), val(v) {}
 
   /// Constructs an integer key with the given name.
-  awsPointKey(iAws* a, const char* name, csPoint v) : awsKey(a,name), val(v) {}
+  awsPointKey(iAws* a, const char* name, csVector2 v) : awsKey(a,name), val(v) {}
 
   /// Destructor does nothing.
   virtual ~awsPointKey () { }
@@ -304,7 +304,7 @@ public:
   virtual uint8 Type () const { return KEY_POINT; }
 
   /// Gets the value of this key as a rectangle.
-  csPoint Value () const { return val; }
+  csVector2 Value () const { return val; }
 };
 
 class awsConnectionKey : public awsKey, public iAwsConnectionKey
@@ -654,10 +654,10 @@ public:
     unsigned char &blue);
 
   /// Lookup the value of a point key by name (from the skin def).
-  virtual bool LookupPointKey (const char *name, csPoint &point);
+  virtual bool LookupPointKey (const char *name, csVector2 &point);
 
   /// Lookup the value of a point key by id (from the skin def).
-  virtual bool LookupPointKey (unsigned long id, csPoint &point);
+  virtual bool LookupPointKey (unsigned long id, csVector2 &point);
 
   /// Get the value of an integer from a given component node.
   virtual bool GetInt (iAwsComponentNode *node, const char *name, int &val);

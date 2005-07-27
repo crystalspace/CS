@@ -19,6 +19,9 @@
 #include "cssysdef.h"
 #include "cstool/meshobjtmpl.h"
 #include "csutil/ref.h"
+
+#include "iengine/engine.h"
+#include "iengine/mesh.h"
 #include "iutil/objreg.h"
 
 SCF_IMPLEMENT_IBASE (csMeshObject)

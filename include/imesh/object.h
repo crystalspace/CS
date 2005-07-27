@@ -20,23 +20,24 @@
 #define __CS_IMESH_OBJECT_H__
 
 #include "csutil/scf.h"
-#include "csgeom/box.h"
-#include "ivideo/graph3d.h"
-#include "igeom/polymesh.h"
-#include "csutil/flags.h"
 
+
+struct iLight;
+struct iMaterialWrapper;
 struct iMeshObject;
 struct iMeshObjectFactory;
 struct iMeshObjectType;
-struct iRenderView;
 struct iMovable;
-struct iLight;
 struct iObjectModel;
-struct iMaterialWrapper;
 struct iPortal;
+struct iRenderView;
+
 struct csRenderMesh;
+
 class csColor;
+class csFlags;
 class csReversibleTransform;
+class csVector3;
 
 /** \name Mesh object flags
  * @{ */

@@ -21,9 +21,11 @@
 #define __CS_CSEVCORD_H__
 
 #include "csextern.h"
-#include "scf.h"
+#include "csutil/scf.h"
 #include "iutil/event.h"
+
 struct iEventHandler;
+
 class csEventOutlet;
 
 /**

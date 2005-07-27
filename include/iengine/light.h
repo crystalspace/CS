@@ -27,19 +27,23 @@
  * @{ */
  
 #include "csutil/scf.h"
+
 #include "iengine/fview.h"
 
 class csColor;
 class csFlags;
+class csVector3;
+
 struct iLight;
-struct iSector;
+struct iLightingInfo;
+struct iMovable;
 struct iObject;
+struct iSector;
+
 struct iBaseHalo;
 struct iCrossHalo;
 struct iNovaHalo;
 struct iFlareHalo;
-struct iLightingInfo;
-struct iMovable;
 
 /** \name Light flags
  * @{ */

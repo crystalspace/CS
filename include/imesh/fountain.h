@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 class csColor;
+class csVector3;
 
 SCF_VERSION (iFountainState, 0, 0, 1);
 

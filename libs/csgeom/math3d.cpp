@@ -20,14 +20,17 @@
 #include "cssysdef.h"
 #include <math.h>
 #include <float.h>
-#include "csqint.h"
 #include "csqsqrt.h"
+
+#include "csgeom/box.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/plane2.h"
+#include "csgeom/plane3.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/segment.h"
-#include "csgeom/box.h"
+
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
 

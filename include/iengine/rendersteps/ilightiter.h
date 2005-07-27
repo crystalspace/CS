@@ -23,9 +23,15 @@
 
 #include "csutil/scf.h"
 
+#include "ivideo/shader/shader.h"
+
 /**\file
  * Generic render step.
  */
+
+struct iLight;
+struct iRenderView;
+struct iSector;
 
 /**\addtogroup engine3d_rloop
  * @{ */

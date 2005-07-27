@@ -60,15 +60,15 @@ public:
   csSphere (const csSphere& s) { center = s.center; radius = s.radius; }
 
   /// Get the center of this sphere.
-  csVector3& GetCenter () { return center; }
+  inline csVector3& GetCenter () { return center; }
   /// Get the center of this sphere.
-  const csVector3& GetCenter () const { return center; }
+  inline const csVector3& GetCenter () const { return center; }
   /// Set the center of this sphere.
-  void SetCenter (const csVector3& c) { center = c; }
+  inline void SetCenter (const csVector3& c) { center = c; }
   /// Get the radius of this sphere.
-  float GetRadius () const { return radius; }
+  inline float GetRadius () const { return radius; }
   /// Set the radius of this sphere.
-  void SetRadius (float r) { radius = r; }
+  inline void SetRadius (float r) { radius = r; }
 
   /// Calculate the union of this sphere and another.
   void Union (const csVector3& ocenter, float oradius);
@@ -111,17 +111,17 @@ public:
   csEllipsoid (const csEllipsoid& s) { center = s.center; radius = s.radius; }
 
   /// Get the center of this ellipsoid.
-  csVector3& GetCenter () { return center; }
+  inline csVector3& GetCenter () { return center; }
   /// Get the center of this ellipsoid.
-  const csVector3& GetCenter () const { return center; }
+  inline const csVector3& GetCenter () const { return center; }
   /// Set the center of this ellipsoid.
-  void SetCenter (const csVector3& c) { center = c; }
+  inline void SetCenter (const csVector3& c) { center = c; }
   /// Get the radius of this ellipsoid.
-  csVector3& GetRadius () { return radius; }
+  inline csVector3& GetRadius () { return radius; }
   /// Get the radius of this ellipsoid.
-  const csVector3& GetRadius () const { return radius; }
+  inline const csVector3& GetRadius () const { return radius; }
   /// Set the radius of this ellipsoid.
-  void SetRadius (const csVector3& r) { radius = r; }
+  inline void SetRadius (const csVector3& r) { radius = r; }
 };
 
 /** @} */

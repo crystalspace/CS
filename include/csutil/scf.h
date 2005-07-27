@@ -32,8 +32,8 @@
 
 class csPathsList;
 
-#include "ref.h"
-#include "array.h"
+#include "csutil/array.h"
+#include "csutil/ref.h"
 
 /**
  * Type of registered interface handle used by iBase::QueryInterface().

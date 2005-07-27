@@ -31,7 +31,9 @@
 
 struct iPolygonMesh;
 struct iObjectModel;
+
 class csBox3;
+class csVector3;
 
 SCF_VERSION (iObjectModelListener, 0, 0, 1);
 

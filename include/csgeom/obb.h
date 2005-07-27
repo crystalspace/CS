@@ -71,7 +71,7 @@ public:
 
   void AddBoundingVertex (const csVector3 &v);
   csVector3 GetCorner (int corner) const; 
-  const csMatrix3 &GetMatrix () const { return mMat; }
+  inline const csMatrix3 &GetMatrix () const { return mMat; }
 
   /**
    * Get the diameter of this OBB.
@@ -110,7 +110,7 @@ public:
   /**
    * Copy a normal OBB and freeze the corners.
    */
-  void Copy (const csOBB& obb)
+  inline void Copy (const csOBB& obb)
   {
     for (int i = 0 ; i < 8 ; i++)
     {
@@ -152,7 +152,7 @@ public:
   /**
    * Get one corner from the OBB.
    */
-  const csVector3& GetCorner (int corner) const
+  inline const csVector3& GetCorner (int corner) const
   {
     CS_ASSERT (corner >= 0 && corner < 8);
     return corners[corner];

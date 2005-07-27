@@ -20,6 +20,8 @@
 #include "csgfx/imagetools.h"
 #include "csplugincommon/canvas/scrshot.h"
 
+#include "ivideo/graph2d.h"
+
 SCF_IMPLEMENT_IBASE (csScreenShot)
   SCF_IMPLEMENTS_INTERFACE (iImage)
 SCF_IMPLEMENT_IBASE_END

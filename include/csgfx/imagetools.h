@@ -29,6 +29,7 @@
 #define __CS_CSGFX_IMAGETOOLS_H__
 
 #include "csextern.h"
+#include "csgfx/rgbpixel.h"
 #include "igraphic/image.h"
 
 /**

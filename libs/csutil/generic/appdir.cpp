@@ -19,8 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
-#include "csutil/util.h"
-#include <string.h>
+
 
 csString csInstallationPathsHelper::GetAppDir (const char* argv0)
 {

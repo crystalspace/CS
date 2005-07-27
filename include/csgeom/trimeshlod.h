@@ -21,7 +21,6 @@
 
 #include "csextern.h"
 
-#include "csgeom/math3d.h"
 #include "csgeom/trimesh.h"
 #include "csutil/list.h"
 

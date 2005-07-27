@@ -22,9 +22,10 @@
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
-#include "imagetools.h"
-#include "rgbpixel.h"
-#include "imagebase.h"
+
+#include "csgfx/imagebase.h"
+#include "csgfx/imagetools.h"
+#include "csgfx/rgbpixel.h"
 
 /**
  * Memory image.

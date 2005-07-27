@@ -20,16 +20,17 @@
 
 #include "cssysdef.h"
 
-#include "iutil/document.h"
-#include "ivideo/rndbuf.h"
 #include "iengine/camera.h"
+#include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iengine/texture.h"
-#include "iengine/mesh.h"
-#include "iengine/material.h"
+#include "iutil/document.h"
 #include "ivaria/reporter.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 

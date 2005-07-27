@@ -20,9 +20,9 @@
 #define __CS_PLUGMGR_H__
 
 #include "csextern.h"
-#include "scf.h"
-#include "scopedmutexlock.h"
-#include "parray.h"
+#include "csutil/parray.h"
+#include "csutil/scf.h"
+#include "csutil/thread.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
 

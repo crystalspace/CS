@@ -23,11 +23,10 @@
  */
 /**\addtogroup util
  * @{ */
-#include "cstypes.h"
-#include "iutil/string.h"
 #include "csutil/scf.h"
 
 struct iGraphics3D;
+struct iString;
 
 SCF_VERSION (iDebugHelper, 0, 0, 1);
 

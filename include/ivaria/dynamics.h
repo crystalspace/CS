@@ -21,22 +21,23 @@
 #define __CS_IVARIA_DYNAMICS_H__
 
 #include "csutil/scf.h"
-#include "csutil/ref.h"
 
-class csVector3;
-class csOrthoTransform;
-class csMatrix3;
-class csPlane3;
-struct iMeshWrapper;
 
-struct iObject;
-struct iDynamicSystem;
-struct iRigidBody;
 struct iBodyGroup;
-struct iDynamicsMoveCallback;
-struct iDynamicsCollisionCallback;
 struct iJoint;
+struct iMeshWrapper;
+struct iObject;
 struct iPolygonMesh;
+struct iRigidBody;
+
+class csMatrix3;
+class csOrthoTransform;
+class csPlane3;
+class csVector3;
+
+struct iDynamicsCollisionCallback;
+struct iDynamicsMoveCallback;
+struct iDynamicSystem;
 
 SCF_VERSION (iDynamics, 0, 0, 2);
 

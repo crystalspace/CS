@@ -22,11 +22,15 @@
 #include "csutil/scf.h"
 #include "csutil/array.h"
 
-class csColor;
-class csVector3;
-class csReversibleTransform;
-struct iRenderView;
 struct iLight;
+struct iMovable;
+struct iRenderView;
+
+class csColor;
+class csReversibleTransform;
+class csVector3;
+
+struct csRenderMesh;
 
 SCF_VERSION (iParticle, 0, 1, 0);
 

@@ -22,15 +22,18 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "cscaca.h"
+#include "csqint.h"
+
 #include "csgeom/csrect.h"
+#include "csgfx/rgbpixel.h"
 #include "csutil/cfgacc.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "csqint.h"
-#include "csgfx/rgbpixel.h"
+#include "ivaria/reporter.h"
+
+#include "cscaca.h"
 
 //-------------------------------------------------------- csGraphics2DCaca ---
 

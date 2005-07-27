@@ -18,30 +18,36 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
+
+
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/transfrm.h"
-#include "csutil/scanstr.h"
-#include "csutil/util.h"
-#include "imesh/object.h"
-#include "iengine/mesh.h"
-#include "iengine/engine.h"
-#include "iutil/plugin.h"
-#include "imesh/sprite3d.h"
-#include "ivideo/graph3d.h"
-#include "csqint.h"
-#include "iutil/vfs.h"
+#include "csgeom/tri.h"
+#include "csutil/cscolor.h"
 #include "csutil/csstring.h"
-#include "iutil/object.h"
+#include "csutil/scanstr.h"
+#include "csutil/sysfunc.h"
+#include "csutil/util.h"
+
+#include "iengine/engine.h"
 #include "iengine/material.h"
-#include "ivaria/reporter.h"
-#include "iutil/objreg.h"
-#include "iutil/eventh.h"
+#include "iengine/mesh.h"
+#include "imap/ldrctxt.h"
+#include "imesh/object.h"
+#include "imesh/sprite3d.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
-#include "imap/ldrctxt.h"
+#include "iutil/eventh.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+
+
 #include "spr3dldr.h"
 
 CS_IMPLEMENT_PLUGIN

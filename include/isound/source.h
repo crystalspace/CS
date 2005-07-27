@@ -22,7 +22,8 @@
 #define __CS_ISOUND_SOURCE_H__
 
 #include "csutil/scf.h"
-#include "csgeom/vector3.h"
+
+class csVector3;
 
 /// These flags define how the sound is played.
 #define SOUND_RESTART   1

@@ -19,16 +19,17 @@
 #ifndef __CS_CSTOOL_PEN_H__
 #define __CS_CSTOOL_PEN_H__
 
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-
 #include "csgeom/poly3d.h"
-#include "csgeom/vector4.h"
 #include "csgeom/polyidx.h"
-#include "csgeom/poly3d.h"
-#include "csgeom/transfrm.h"
-
+#include "csgeom/vector4.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/ref.h"
+
+#include "ivideo/graph3d.h"
+
+struct iFont;
+struct iGraphics2D;
+struct iGraphics3D;
 
 enum CS_PEN_TEXT_ALIGN { CS_PEN_TA_TOP, CS_PEN_TA_BOT, CS_PEN_TA_LEFT, CS_PEN_TA_RIGHT, CS_PEN_TA_CENTER };
 

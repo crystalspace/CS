@@ -22,7 +22,9 @@
 
 #include "csutil/scf.h"
 
+class csBox3;
 class csColor;
+class csVector3;
 
 SCF_VERSION (iFireState, 0, 0, 1);
 

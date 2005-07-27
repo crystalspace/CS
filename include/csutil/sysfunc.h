@@ -31,12 +31,12 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+
 #include "csextern.h"
-#include "ref.h"
-#include "csstring.h"
 #include "iutil/cfgfile.h"
 
 struct iObjectRegistry;
+class csString;
 
 /**
  * Implements a default run-loop for stand-alone applications.<p>

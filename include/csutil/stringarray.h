@@ -22,8 +22,8 @@
 
 #include <stdarg.h>
 #include "csextern.h"
-#include "array.h"
-#include "util.h"
+#include "csutil/array.h"
+#include "csutil/util.h"
 
 class csStringArrayElementHandler
 {

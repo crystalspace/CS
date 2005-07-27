@@ -26,20 +26,23 @@
 /**\addtogroup loadsave
  * @{ */
 #include "csutil/scf.h"
-#include "ivideo/txtmgr.h"
-#include "igraphic/image.h"
 
-struct iTextureHandle;
-struct iTextureWrapper;
+#include "igraphic/image.h"
+#include "ivideo/txtmgr.h"
+
+struct iDocumentNode;
+struct iImage;
 struct iMaterialWrapper;
-struct iSector;
-struct iRegion;
-struct iSoundData;
-struct iSoundHandle;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
+struct iRegion;
+struct iSector;
+struct iSoundData;
+struct iSoundHandle;
 struct iSoundWrapper;
-struct iDocumentNode;
+struct iTextureHandle;
+struct iTextureManager;
+struct iTextureWrapper;
 
 SCF_VERSION (iLoaderStatus, 0, 1, 0);
 

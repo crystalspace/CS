@@ -19,18 +19,16 @@
 #ifndef __CS_IMESH_TERRAIN_H__
 #define __CS_IMESH_TERRAIN_H__
 
-#include "csgeom/vector3.h"
-
-#include "csutil/array.h"
-#include "csutil/refarr.h"
 #include "csutil/scf.h"
 
-#include "ivaria/terraform.h"
-
-#include "iengine/material.h"
+#include "csutil/array.h"
 
 struct iImage;
+struct iMaterialWrapper;
 struct iMovable;
+struct iTerraFormer;
+
+class csBox2;
 class csTransform;
 
 SCF_VERSION (iTerrainObjectState, 0, 1, 0);

@@ -24,7 +24,7 @@
  * Software canvas line drawing.
  */
 
-#include "draw_common.h"
+#include "csplugincommon/canvas/draw_common.h"
 #include "csqint.h"
 
 /**

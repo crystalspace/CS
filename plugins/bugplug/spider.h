@@ -19,11 +19,12 @@
 #ifndef __CS_SPIDER_H__
 #define __CS_SPIDER_H__
 
-#include "imesh/object.h"
 #include "csgeom/box.h"
-#include "igeom/objmodel.h"
+#include "csutil/flags.h"
 #include "csutil/weakref.h"
 #include "iengine/camera.h"
+#include "igeom/objmodel.h"
+#include "imesh/object.h"
 
 struct iEngine;
 struct iCamera;

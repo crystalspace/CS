@@ -19,8 +19,8 @@
 #ifndef __CS_CSSYS_THREAD_H__
 #define __CS_CSSYS_THREAD_H__
 
-#include "ref.h"
-#include "refcount.h"
+#include "csutil/ref.h"
+#include "csutil/refcount.h"
 
 /// List of errorcodes for threads.
 enum

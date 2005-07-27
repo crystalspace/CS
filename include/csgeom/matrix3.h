@@ -68,34 +68,34 @@ public:
   explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }
 
   /// Get the first row of this matrix as a vector.
-  csVector3 Row1() const { return csVector3 (m11,m12,m13); }
+  inline csVector3 Row1() const { return csVector3 (m11,m12,m13); }
 
   /// Get the second row of this matrix as a vector.
-  csVector3 Row2() const { return csVector3 (m21,m22,m23); }
+  inline csVector3 Row2() const { return csVector3 (m21,m22,m23); }
 
   /// Get the third row of this matrix as a vector.
-  csVector3 Row3() const { return csVector3 (m31,m32,m33); }
+  inline csVector3 Row3() const { return csVector3 (m31,m32,m33); }
 
   /// Get the first column of this matrix as a vector.
-  csVector3 Col1() const { return csVector3 (m11,m21,m31); }
+  inline csVector3 Col1() const { return csVector3 (m11,m21,m31); }
 
   /// Get the second column of this matrix as a vector.
-  csVector3 Col2() const { return csVector3 (m12,m22,m32); }
+  inline csVector3 Col2() const { return csVector3 (m12,m22,m32); }
 
   /// Get the third column of this matrix as a vector.
-  csVector3 Col3() const { return csVector3 (m13,m23,m33); }
+  inline csVector3 Col3() const { return csVector3 (m13,m23,m33); }
 
   /// Set matrix values.
-  void Set (float o11, float o12, float o13,
-            float o21, float o22, float o23,
-            float o31, float o32, float o33)
+  inline void Set (float o11, float o12, float o13,
+                   float o21, float o22, float o23,
+                   float o31, float o32, float o33)
   {
     m11 = o11; m12 = o12; m13 = o13;
     m21 = o21; m22 = o22; m23 = o23;
     m31 = o31; m32 = o32; m33 = o33;
   }
 
-  void Set (csMatrix3 const &o)
+  inline void Set (csMatrix3 const &o)
   {
     m11 = o.m11; m12 = o.m12; m13 = o.m13;
     m21 = o.m21; m22 = o.m22; m23 = o.m23;
@@ -140,7 +140,7 @@ public:
   csMatrix3 GetTranspose () const;
 
   /// Return the inverse of this matrix.
-  csMatrix3 GetInverse () const
+  inline csMatrix3 GetInverse () const
   {
     csMatrix3 C(
              (m22*m33 - m23*m32), -(m12*m33 - m13*m32),  (m12*m23 - m13*m22),
@@ -152,7 +152,7 @@ public:
   }
 
   /// Invert this matrix.
-  void Invert() { *this = GetInverse (); }
+  inline void Invert() { *this = GetInverse (); }
 
   /// Compute the determinant of this matrix.
   float Determinant () const;

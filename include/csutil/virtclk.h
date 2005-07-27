@@ -20,7 +20,7 @@
 #define __CS_VIRTCLK_H__
 
 #include "csextern.h"
-#include "scf.h"
+#include "csutil/scf.h"
 #include "iutil/virtclk.h"
 
 /**

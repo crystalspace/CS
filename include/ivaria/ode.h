@@ -20,6 +20,8 @@
 #ifndef __CS_IVARIA_ODE_H__
 #define __CS_IVARIA_ODE_H__
 
+#include "csutil/scf.h"
+
 #define int8 ode_int8
 #define uint8 ode_uint8
 #define int32 ode_int32

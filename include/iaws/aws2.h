@@ -14,7 +14,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/scfstr.h"
 #include "csgeom/csrect.h"
-#include "csgeom/cspoint.h"
+#include "csgeom/vector2.h"
 #include "iutil/event.h"
 #include "iutil/string.h"
 #include "ivideo/graph2d.h"

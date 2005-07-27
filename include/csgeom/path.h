@@ -28,9 +28,10 @@
 
 #include "csextern.h"
 
-#include "csutil/scf.h"
 #include "csgeom/spline.h"
 #include "csgeom/vector3.h"
+#include "csutil/scf.h"
+
 #include "igeom/path.h"
 
 /**

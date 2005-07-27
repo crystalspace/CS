@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 
 #include "csextern.h"
-#include "refarr.h"
+#include "csutil/refarr.h"
 #include "iutil/object.h"
 
 /**\file 

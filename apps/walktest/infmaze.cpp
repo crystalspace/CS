@@ -17,17 +17,19 @@
 */
 
 #include "cssysdef.h"
+
 #include "cstool/collider.h"
+#include "csutil/flags.h"
 #include "csutil/sparse3d.h"
-#include "imesh/object.h"
-#include "imesh/lighting.h"
-#include "imesh/thing.h"
-#include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
-#include "iengine/sector.h"
 #include "iengine/movable.h"
+#include "iengine/sector.h"
+#include "igeom/objmodel.h"
+#include "igeom/polymesh.h"
+#include "imesh/lighting.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
 
 #include "infmaze.h"
 #include "walktest.h"

@@ -20,6 +20,8 @@
 #ifndef __CS_CSTOOL_IDENTSTRINGS_H__
 #define __CS_CSTOOL_IDENTSTRINGS_H__
 
+#include "csutil/csstring.h"
+
 /**\file
  * Set of helper macros to obtain the names of identifiers.
  */

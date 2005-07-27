@@ -19,7 +19,6 @@
 #ifndef __CS_IVARIA_REPORTER_H__
 #define __CS_IVARIA_REPORTER_H__
 
-#include <stdarg.h>
 #include "csutil/ansicolor.h"
 #include "csutil/scf.h"
 #include "csutil/sysfunc.h"

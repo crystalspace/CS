@@ -17,17 +17,20 @@
 */
 
 #include "cssysdef.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
-#include "imesh/mdlconv.h"
+
+#include "csgeom/vector2.h"
 #include "cstool/mdldata.h"
-#include "csutil/datastrm.h"
 #include "csutil/csendian.h"
 #include "csutil/csstring.h"
+#include "csutil/datastrm.h"
 #include "csutil/nobjvec.h"
 #include "csutil/parray.h"
 #include "csutil/util.h"
+#include "imesh/mdlconv.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
+
 #include <ctype.h>
 
 // upper bound onsize of biggest data element (vertex, polygon) in an MD2 file

@@ -21,9 +21,10 @@
 #define __CS_UTIL_EVOUTLET_H__
 
 #include "csextern.h"
-#include "csunicode.h"
+#include "csutil/csunicode.h"
 #include "iutil/event.h"
 #include "iutil/csinput.h"
+
 struct iObjectRegistry;
 class csEventQueue;
 

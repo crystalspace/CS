@@ -239,9 +239,9 @@ void awsGridBagLayout::removeConstraints (iAwsComponent *cmp)
   comptable.DeleteAll (cmp);
 }
 
-csPoint awsGridBagLayout::getLayoutOrigin ()
+csVector2 awsGridBagLayout::getLayoutOrigin ()
 {
-  csPoint origin (0, 0);
+  csVector2 origin (0, 0);
   if (layoutInfo != 0)
   {
     origin.x = layoutInfo->startx;
@@ -288,9 +288,9 @@ void awsGridBagLayout::getLayoutWeights (double **row, double **col)
   memcpy (*row, layoutInfo->weightY, layoutInfo->height * sizeof (double));
 }
 
-csPoint awsGridBagLayout::location (int x, int y)
+csVector2 awsGridBagLayout::location (int x, int y)
 {
-  csPoint loc (0, 0);
+  csVector2 loc (0, 0);
 
   if (layoutInfo == 0)
     return loc;

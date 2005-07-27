@@ -28,22 +28,16 @@
 
 #include "csextern.h"
 
-#include "csgeom/vector3.h"
-#include "csgeom/plane3.h"
-#include "csgeom/plane2.h"
-#include "csgeom/segment.h"
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
+#include "csgeom/plane3.h"
+#include "csgeom/segment.h"
+#include "csgeom/vector3.h"
+
 #include "iutil/dbghelp.h"
 
-class csDVector3;
+class csPlane2;
 class csPoly3D;
-class csBox3;
-
-inline float fSqr (float f)
-{
-  return f * f;
-}
 
 /**
  * Various assorted 3D mathematical functions.
@@ -232,7 +226,10 @@ class CS_CRYSTALSPACE_EXPORT csSquaredDist
 public:
   /// Returns the squared distance between two points.
   static float PointPoint (const csVector3& p1, const csVector3& p2)
-  { return fSqr (p1.x - p2.x) + fSqr (p1.y - p2.y) + fSqr (p1.z - p2.z); }
+  { 
+    csVector3 d = (p1-p2);
+    return d*d;
+  }
 
   /// Returns the squared distance between a point and a line.
   static float PointLine (const csVector3& p,

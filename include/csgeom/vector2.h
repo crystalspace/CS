@@ -20,14 +20,15 @@
 #ifndef __CS_VECTOR2_H__
 #define __CS_VECTOR2_H__
 
+#include "csextern.h"
+
 /**\file 
  */
 /**
  * \addtogroup geom_utils
  * @{ */
 
-#include "csextern.h"
-#include "csutil/csstring.h"
+class csString;
 
 /**
  * A 2D vector.
@@ -85,7 +86,7 @@ public:
   float Norm () const;
 
   /// Return the squared norm (magnitude) of this vector.
-  float SquaredNorm () const
+  inline float SquaredNorm () const
   { return x * x + y * y; }
 
   /// Rotate vector around the origin by a given angle in radians.
@@ -95,7 +96,7 @@ public:
    * Test if this point is left of the line through p0 and p1.
    * \return >0 if this point is left, 0 if on the line and <0 if right.
    */
-  float IsLeft (const csVector2& p0, const csVector2& p1)
+  inline float IsLeft (const csVector2& p0, const csVector2& p1)
   {
     return (p1.x - p0.x)*(y - p0.y) - (x - p0.x)*(p1.y - p0.y);
   }

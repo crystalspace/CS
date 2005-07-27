@@ -20,8 +20,9 @@
 #ifndef __CS_MOVABLE_H__
 #define __CS_MOVABLE_H__
 
-#include "csutil/refarr.h"
+#include "csgeom/transfrm.h"
 #include "csutil/nobjvec.h"
+#include "csutil/refarr.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 

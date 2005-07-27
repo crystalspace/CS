@@ -20,16 +20,15 @@
 #define __CS_IMESH_BEZIER_H__
 
 #include "csutil/scf.h"
-#include "csutil/flags.h"
 
 class csCurve;
+class csFlags;
+class csMatrix3;
 class csVector2;
 class csVector3;
-class csMatrix3;
-struct iSector;
-struct iCurve;
+
 struct iMaterialWrapper;
-struct iMovable;
+struct iObject;
 
 /**
  * This is the interface for a curve.

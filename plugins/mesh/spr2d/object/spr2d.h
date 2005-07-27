@@ -24,12 +24,15 @@
 #include "csgeom/objmodel.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
-#include "csutil/cscolor.h"
+
 #include "csutil/array.h"
+#include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csutil/refarr.h"
-#include "csutil/weakref.h"
 #include "csutil/leakguard.h"
+#include "csutil/weakref.h"
 #include "cstool/rendermeshholder.h"
+
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"

@@ -21,10 +21,12 @@
 
 #include "cssysdef.h"
 #include <stddef.h>
+#include "csutil/csevcord.h"
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
-#include "iutil/eventh.h"
+#include "csutil/evoutlet.h"
 #include "csutil/sysfunc.h"
+#include "iutil/eventh.h"
 
 SCF_IMPLEMENT_IBASE (csEventQueue)
   SCF_IMPLEMENTS_INTERFACE (iEventQueue)

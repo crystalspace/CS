@@ -23,27 +23,34 @@
  */
 /**\addtogroup loadsave
  * @{ */
+
 #include "csutil/scf.h"
-#include "csutil/ref.h"
-#include "csgfx/shadervar.h"
+
 #include "ivideo/graph3d.h"
 
-class csMatrix3;
-class csVector3;
-class csVector2;
-class csColor;
 class csBox3;
+class csColor;
+class csColor4;
 class csGradient;
+class csMatrix3;
+class csPlane3;
+class csShaderVariable;
+class csVector2;
+class csVector3;
+
 struct csAlphaMode;
-struct iEngine;
-struct iSector;
-struct iMaterialWrapper;
-struct iThingFactoryState;
-struct iLoaderContext;
+
 struct iDocumentNode;
+struct iKeyValuePair;
+struct iLoaderContext;
+struct iMaterialWrapper;
+struct iRenderBuffer;
+struct iSector;
+struct iShader;
+struct iShaderVariableAccessor;
 struct iString;
 struct iStringSet;
-struct iKeyValuePair;
+struct iThingFactoryState;
 
 /**\name Texture transformation description
  * @{ */

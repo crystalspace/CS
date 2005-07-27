@@ -22,18 +22,19 @@
 #define __CS_CSEVENT_H__
 
 #include "csextern.h"
+
+#include "csutil/hash.h"
+#include "csutil/strset.h"
+#include "csutil/weakref.h"
+
 #include "iutil/event.h"
-#include "hashr.h"
-#include "csendian.h"
-#include "weakref.h"
-#include "cseventq.h"
-#include "strset.h"
+
+class csEventQueue;
 
 /**\file
  * iEvent implementation
  */
 
-class csEvent;
 class csEventAttributeIterator;
 
 SCF_VERSION (csEvent, 0, 0, 1);

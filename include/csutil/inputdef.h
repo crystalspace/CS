@@ -26,11 +26,13 @@
  */
 
 #include "csextern.h"
+
+#include "csutil/csstring.h"
+#include "csutil/comparator.h"
+#include "csutil/hash.h"
+
 #include "iutil/evdefs.h"
 #include "iutil/event.h"
-#include "csstring.h"
-#include "comparator.h"
-#include "hash.h"
 
 struct iEvent;
 class csInputBinder;

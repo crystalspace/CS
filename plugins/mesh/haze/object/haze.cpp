@@ -17,24 +17,30 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/renderbuffer.h"
+#include "csqsqrt.h"
+
 #include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
+#include "csgfx/renderbuffer.h"
+#include "csgfx/shadervarcontext.h"
 #include "cstool/rbuflock.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/sysfunc.h"
-#include "iutil/objreg.h"
-#include "iengine/movable.h"
-#include "iengine/rview.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/material.h"
-#include "iengine/material.h"
 #include "iengine/camera.h"
-#include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iengine/material.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "igeom/clip2d.h"
+#include "iutil/objreg.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/rendermesh.h"
+
 #include "haze.h"
-#include "csqsqrt.h"
+
 
 CS_IMPLEMENT_PLUGIN
 

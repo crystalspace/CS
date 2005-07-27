@@ -28,7 +28,6 @@
 
 #include <math.h>
 #include "cstypes.h"
-#include "csqint.h"
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
 

@@ -24,7 +24,6 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
-#include "csutil/util.h"
 
 /// Types that can be contained within a variant.
 enum csVariantType

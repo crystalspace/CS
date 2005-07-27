@@ -20,8 +20,9 @@
 #define __CS_PLUGLDR_H__
 
 #include "csextern.h"
-#include "parray.h"
-#include "util.h"
+#include "csutil/parray.h"
+#include "csutil/ref.h"
+#include "csutil/scf.h"
 
 struct iObjectRegistry;
 

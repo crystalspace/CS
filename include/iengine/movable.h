@@ -26,12 +26,13 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "csgeom/transfrm.h"
 
-class csVector3;
 class csMatrix3;
-struct iSector;
+class csReversibleTransform;
+class csVector3;
+
 struct iMovable;
+struct iSector;
 struct iSectorList;
 
 SCF_VERSION (iMovableListener, 0, 0, 1);

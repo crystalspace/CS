@@ -19,13 +19,15 @@
 #ifndef __CS_IVIDEO_CUSTCURSOR_H__
 #define __CS_IVIDEO_CUSTCURSOR_H__
 
-#include "csgfx/rgbpixel.h"
 #include "csutil/scf.h"
-#include "csgeom/cspoint.h"
-#include "igraphic/image.h"
 
-struct iGraphics3D;
+#include "csgfx/rgbpixel.h"
+#include "csgeom/vector2.h"
+
 struct iConfigFile;
+struct iGraphics3D;
+struct iImage;
+
 
 /// The default custom cursor name
 #define CSCURSOR_Default "default"
@@ -60,12 +62,12 @@ struct iCursor : public iBase
    * transparent).
    */
   virtual void SetCursor (const char *name, iImage *image, 
-    csRGBcolor* keycolor = 0, csPoint hotspot = csPoint (0,0),
+    csRGBcolor* keycolor = 0, csVector2 hotspot = csVector2 (0,0),
     uint8 transparency = 0, csRGBcolor fg = csRGBcolor (255,255,255),
     csRGBcolor bg = csRGBcolor (0,0,0)) = 0;
       
   /// Sets the hotspot (center) of the specified cursor on the pixmap.
-  virtual void SetHotSpot (const char *name, csPoint hotspot) = 0;
+  virtual void SetHotSpot (const char *name, csVector2 hotspot) = 0;
 
   /**
    * Sets the transparency of the specified cursor.  The 'transparency'
@@ -96,7 +98,7 @@ struct iCursor : public iBase
    * Get the hotspot (center) of the specified cursor on the pixmap.
    * Returns default 0,0 if there is no cursor with this name
    */
-  virtual csPoint GetHotSpot (const char *name) const = 0;
+  virtual csVector2 GetHotSpot (const char *name) const = 0;
 
   /**
    * Get the transparency of the specified cursor.  Transparency can range from

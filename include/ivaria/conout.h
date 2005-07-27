@@ -20,9 +20,8 @@
 #ifndef __CS_IVARIA_CONOUT_H__
 #define __CS_IVARIA_CONOUT_H__
 
-#include <stdarg.h>
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "csutil/scf.h"
+
 
 class csRect;
 struct iConsoleOutput;

@@ -18,22 +18,27 @@
 */
 
 #include "cssysdef.h"
+
+#include "csqsqrt.h"
+#include "csgeom/math3d.h"
+#include "csgeom/polymesh.h"
+#include "csgeom/transfrm.h"
 #include "cstool/collider.h"
-#include "ivaria/collider.h"
+
+#include "iengine/camera.h"
 #include "iengine/engine.h"
-#include "iengine/region.h"
 #include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
+#include "iengine/region.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
-#include "iengine/movable.h"
-#include "iengine/camera.h"
-#include "iengine/portalcontainer.h"
-#include "iengine/portal.h"
-#include "imesh/object.h"
-#include "csgeom/polymesh.h"
-#include "igeom/polymesh.h"
+
 #include "igeom/objmodel.h"
-#include "csqsqrt.h"
+#include "igeom/polymesh.h"
+#include "imesh/object.h"
+#include "ivaria/collider.h"
 
 //----------------------------------------------------------------------
 

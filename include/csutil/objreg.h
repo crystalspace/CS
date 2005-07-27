@@ -19,14 +19,11 @@
 #ifndef __CS_OBJREG_H__
 #define __CS_OBJREG_H__
 
-#include <stdarg.h>
-#include <stdio.h>
 #include "csextern.h"
 #include "iutil/objreg.h"
-#include "scf.h"
-#include "array.h"
-#include "stringarray.h"
-#include "scopedmutexlock.h"
+#include "csutil/array.h"
+#include "csutil/stringarray.h"
+#include "csutil/thread.h"
 
 /**
  * This is an implementation of iObjectRegistry.

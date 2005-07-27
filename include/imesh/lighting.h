@@ -22,6 +22,9 @@
 #include "csutil/scf.h"
 
 struct iCacheManager;
+struct iLight;
+
+class csColor;
 
 SCF_VERSION (iLightingInfo, 0, 3, 0);
 

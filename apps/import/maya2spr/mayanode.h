@@ -22,11 +22,13 @@
 #ifndef MAYANODE_H
 #define MAYANODE_H
 
-#include <csutil/array.h>
-#include <csgeom/vector3.h>
-#include <ivideo/graph3d.h>
+#include "csutil/array.h"
+#include "csgeom/vector3.h"
+#include "ivideo/graph3d.h"
 
 #include "mayafile.h"
+
+struct csTriangle;
 
 struct DisplacementGroup
 {

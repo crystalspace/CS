@@ -28,11 +28,9 @@
  
 #include "csutil/scf.h"
 #include "csutil/strset.h"
-#include "csutil/strhash.h"
 
-#include "ivideo/rndbuf.h"
-#include "ivideo/rendermesh.h"
 #include "ivideo/shader/shader.h"
+
 
 /// Default material `diffuse' parameter
 #define CS_DEFMAT_DIFFUSE 0.7f
@@ -54,7 +52,6 @@
 
 struct iTextureHandle;
 struct csRGBpixel;
-struct csRGBcolor;
 
 SCF_VERSION (iMaterial, 0, 1, 0);
 

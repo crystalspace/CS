@@ -22,7 +22,10 @@
 
 #include "csutil/scf.h"
 
+struct iMaterialWrapper;
+
 class csColor;
+class csVector3;
 
 SCF_VERSION (iRainState, 0, 0, 1);
 

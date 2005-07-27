@@ -20,8 +20,8 @@
 #define __CS_STRHASH_H__
 
 #include "csextern.h"
-#include "hash.h"
-#include "mempool.h"
+#include "csutil/hash.h"
+#include "csutil/mempool.h"
 #include "iutil/strset.h"
 
 /**\file

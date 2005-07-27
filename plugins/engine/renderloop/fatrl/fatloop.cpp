@@ -20,7 +20,18 @@
 #include "cssysdef.h"
 #include "csqsqrt.h"
 
+#include "csgeom/math3d.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/polyclip.h"
+#include "csgeom/sphere.h"
+#include "csutil/bitarray.h"
+#include "csutil/flags.h"
+#include "csutil/sysfunc.h"
+#include "cstool/rendermeshlist.h"
+
 #include "iengine/camera.h"
+#include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
 #include "iengine/portal.h"
@@ -30,15 +41,6 @@
 #include "iutil/document.h"
 #include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
-
-#include "csgeom/math3d.h"
-#include "csgeom/poly2d.h"
-#include "csgeom/poly3d.h"
-#include "csgeom/polyclip.h"
-#include "csutil/bitarray.h"
-#include "csutil/flags.h"
-#include "csutil/sysfunc.h"
-#include "cstool/rendermeshlist.h"
 
 #include "fatloop.h"
 

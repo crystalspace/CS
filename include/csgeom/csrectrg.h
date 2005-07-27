@@ -97,9 +97,9 @@ public:
   void ClipTo(csRect &clip);
 
   /// Returns the number of rectangles in this region
-  int Count() const { return region_count; }
+  inline int Count() const { return region_count; }
   /// Returns the rect at a specific index
-  csRect& RectAt(int i) const {  return region[i]; }
+  inline csRect& RectAt(int i) const {  return region[i]; }
   /// Resets the region count to zero.
   void makeEmpty();
 };

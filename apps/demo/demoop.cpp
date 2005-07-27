@@ -17,25 +17,29 @@
 */
 
 #include "cssysdef.h"
+
+#include "csgeom/path.h"
+#include "cstool/csfxscr.h"
+#include "csutil/cscolor.h"
+#include "csutil/flags.h"
+
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/sector.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
+#include "ivaria/conout.h"
+#include "ivaria/reporter.h"
+#include "ivaria/view.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+
 #include "demo.h"
 #include "demoseq.h"
 #include "demoop.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
-#include "ivaria/conout.h"
-#include "ivaria/view.h"
-#include "iengine/engine.h"
-#include "iengine/sector.h"
-#include "iengine/light.h"
-#include "iengine/camera.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "imesh/object.h"
-#include "imesh/thing.h"
-#include "ivaria/reporter.h"
-#include "csutil/cscolor.h"
-#include "csgeom/path.h"
-#include "cstool/csfxscr.h"
 
 //-----------------------------------------------------------------------------
 

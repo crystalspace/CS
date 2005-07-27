@@ -27,33 +27,29 @@
  * \addtogroup engine3d
  * @{ */
 
-#include "cstypes.h"
 #include "csutil/scf.h"
-#include "csutil/hash.h"
 #include "csutil/set.h"
-#include "iutil/object.h"
 
-class csVector3;
-class csColor;
-class csBox3;
-class csReversibleTransform;
 struct iMeshWrapper;
 struct iMeshList;
 struct iLightList;
 struct iLight;
-struct iThing;
 struct iVisibilityCuller;
-struct iVisibilityObject;
+
 struct iObject;
 struct csFog;
-struct iGraphics3D;
+
 struct iRenderView;
 struct iRenderLoop;
 struct iFrustumView;
 struct iSector;
-struct iPortal;
 struct iDocumentNode;
+
+class csBox3;
+class csColor;
 class csRenderMeshList;
+class csReversibleTransform;
+class csVector3;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
 

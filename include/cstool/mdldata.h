@@ -21,10 +21,13 @@
 
 #include "csextern.h"
 
-#include "imesh/mdldata.h"
-#include "csutil/dirtyaccessarray.h"
+#include "csgeom/vector3.h"
+#include "csutil/cscolor.h"
 #include "csutil/csobject.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
+
+#include "imesh/mdldata.h"
 
 #define CS_DECLARE_ACCESSOR_METHODS(type,name)				\
   type Get##name () const;						\

@@ -24,9 +24,9 @@
  */
 
 #include "csextern.h"
+#include "csutil/array.h"
 #include "iutil/cfgfile.h"
 #include "iutil/vfs.h"
-#include "array.h"
 
 class csConfigNode;
 class csConfigIterator;

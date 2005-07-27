@@ -20,27 +20,40 @@
 #define __CS_CSGEOM_TCOVBUF_H__
 
 #include "csextern.h"
-#include "csgeom/math2d.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/vector2.h"
+
 #include "iutil/dbghelp.h"
 
-//#define SHIFT_TILECOL 5
-//#define SHIFT_TILEROW 6
+struct iGraphics2D;
+struct iGraphics3D;
+struct iBugPlug;
 
-#define SHIFT_TILECOL 6
-#define SHIFT_TILEROW 5
+class csBox2;
+class csReversibleTransform;
+class csString;
+class csVector2;
+class csVector3;
 
-#define NUM_TILECOL (1<<SHIFT_TILECOL)
-#define NUM_TILEROW (1<<SHIFT_TILEROW)
-#define NUM_DEPTHROW (NUM_TILEROW/8)
-#define NUM_DEPTHCOL (NUM_TILECOL/8)
-#define NUM_DEPTH (NUM_DEPTHROW * NUM_DEPTHCOL)
 
-#define TILECOL_EMPTY 0
-#define TILECOL_FULL ((uint32)~0)
+class csTiledCoverageBuffer;
 
-#define TEST_OCCLUDER_QUALITY 1
+
+enum
+{
+  SHIFT_TILECOL = 6,
+  SHIFT_TILEROW = 5,
+
+  NUM_TILECOL = (1<<SHIFT_TILECOL),
+  NUM_TILEROW = (1<<SHIFT_TILEROW),
+  NUM_DEPTHROW = (NUM_TILEROW/8),
+  NUM_DEPTHCOL = (NUM_TILECOL/8),
+  NUM_DEPTH = (NUM_DEPTHROW * NUM_DEPTHCOL),
+
+  TILECOL_EMPTY = 0,
+  TILECOL_FULL = ((uint32)~0),
+
+  TEST_OCCLUDER_QUALITY = 1,
+  TB_DUMMY = -1 //to force it to signed
+};
 
 typedef uint32 csTileCol;
 
@@ -74,17 +87,14 @@ struct csTestRectData
   int start_x, end_x;
 };
 
-struct iGraphics2D;
-struct iGraphics3D;
-struct iBugPlug;
-class csString;
-class csBox2;
-class csTiledCoverageBuffer;
 
 // Line operations in a tile.
-#define OP_LINE 1	// General line.
-#define OP_VLINE 2	// Vertical line.
-#define OP_FULLVLINE 3	// Full vertical line (from 0 to 63).
+enum
+{
+  OP_LINE = 1,	// General line.
+  OP_VLINE = 2,	// Vertical line.
+  OP_FULLVLINE = 3	// Full vertical line (from 0 to 63).
+};
 
 // A definition for a line operation.
 struct csLineOperation
@@ -181,7 +191,7 @@ public:
    * Mark the tile as empty but don't perform any other cleaning
    * operations. MakeEmpty() will do that.
    */
-  void MarkEmpty ()
+  inline void MarkEmpty ()
   {
     queue_tile_empty = true;
     tile_full = false;
@@ -195,7 +205,7 @@ public:
    * Really make the tile empty (as opposed to just marking it as
    * empty with queue_tile_empty).
    */
-  void MakeEmpty ()
+  inline void MakeEmpty ()
   {
     tile_full = false; queue_tile_empty = false;
     memset (coverage, 0, sizeof (csTileCol)*NUM_TILECOL);
@@ -210,7 +220,7 @@ public:
    * be correctly updated directly after calling this function. Don't call this
    * unless you know what you are doing!
    */
-  void MakeEmptyQuick ()
+  inline void MakeEmptyQuick ()
   {
     queue_tile_empty = false;
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
@@ -222,7 +232,7 @@ public:
   /**
    * Clear all operations.
    */
-  void ClearOperations ()
+  inline void ClearOperations ()
   {
     num_operations = 0;
   }
@@ -230,14 +240,14 @@ public:
   /**
    * Return true if tile is full.
    */
-  bool IsFull () const { return tile_full; }
+  inline bool IsFull () const { return tile_full; }
 
   /**
    * Return true if tile is surely empty.
    * This can return false even if tile is empty. So don't 100%
    * depend on this!
    */
-  bool IsEmpty () const { return queue_tile_empty; }
+  inline bool IsEmpty () const { return queue_tile_empty; }
 
   /**
    * Add a general line operation to the operations queue.
@@ -510,7 +520,7 @@ private:
   /**
    * Find a given tile.
    */
-  csCoverageTile* GetTile (int tx, int ty)
+  inline csCoverageTile* GetTile (int tx, int ty)
   {
     CS_ASSERT (tx >= 0);
     CS_ASSERT (ty >= 0 && ty < num_tile_rows);
@@ -520,7 +530,7 @@ private:
   /**
    * Mark a tile as dirty in dirty_left and dirty_right.
    */
-  void MarkTileDirty (int tx, int ty)
+  inline void MarkTileDirty (int tx, int ty)
   {
     CS_ASSERT (ty >= 0 && ty < num_tile_rows);
     if (tx < dirty_left[ty]) dirty_left[ty] = tx;

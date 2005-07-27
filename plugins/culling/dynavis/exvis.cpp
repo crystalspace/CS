@@ -16,19 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "csutil/scfstr.h"
-#include "iutil/string.h"
 #include "csqint.h"
 #include "csqsqrt.h"
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
-#include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/polyclip.h"
-#include "igeom/polymesh.h"
+#include "csgeom/transfrm.h"
+#include "csutil/scfstr.h"
+#include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
+#include "igeom/polymesh.h"
+#include "iutil/string.h"
+
 #include "exvis.h"
 
 //---------------------------------------------------------------------------

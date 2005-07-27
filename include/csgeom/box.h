@@ -28,19 +28,18 @@
  * @{ */
 
 #include "csextern.h"
-
 #include "cstypes.h"	// for bool
-#include "csrect.h"
-#include "vector2.h"
-#include "vector3.h"
-#include "segment.h"
+
+#include "csgeom/csrect.h"
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
+#include "csgeom/segment.h"
 
 #include "csutil/array.h"
-#include "csutil/csstring.h"
 
-class csPlane3;
-class csTransform;
 class csPoly2D;
+class csString;
+class csTransform;
 
 /**
  * The maximum value that a coordinate in the bounding box can use.
@@ -51,38 +50,44 @@ class csPoly2D;
 /**\name Corner indices
  * For csBox2::GetCorner().
  * @{ */
-/// min X, min Y
-#define CS_BOX_CORNER_xy 0
-/// min X, max Y
-#define CS_BOX_CORNER_xY 1
-/// max X, min Y
-#define CS_BOX_CORNER_Xy 2
-/// max X, max Y
-#define CS_BOX_CORNER_XY 3
-/// center
-#define CS_BOX_CENTER2 4
+enum 
+{
+  /// min X, min Y
+  CS_BOX_CORNER_xy = 0,
+  /// min X, max Y
+  CS_BOX_CORNER_xY = 1,
+  /// max X, min Y
+  CS_BOX_CORNER_Xy = 2,
+  /// max X, max Y
+  CS_BOX_CORNER_XY = 3,
+  /// center
+  CS_BOX_CENTER2 = 4
+};
 /** @} */
 
 /**
  * \name Indices of edges for csBox2.
  * Index e+1 is opposite edge of e (with e even).
  * @{ */
-/// from min X, min Y to max X, min Y
-#define CS_BOX_EDGE_xy_Xy 0
-/// from max X, min Y to min X, min Y
-#define CS_BOX_EDGE_Xy_xy 1
-/// from max X, min Y to max X, max Y
-#define CS_BOX_EDGE_Xy_XY 2
-/// from max X, max Y to max X, min Y
-#define CS_BOX_EDGE_XY_Xy 3
-/// from max X, max Y to min X, max Y
-#define CS_BOX_EDGE_XY_xY 4
-/// from min X, max Y to max X, max Y
-#define CS_BOX_EDGE_xY_XY 5
-/// from min X, max Y to min X, min Y
-#define CS_BOX_EDGE_xY_xy 6
-/// from min X, min Y to min X, max Y
-#define CS_BOX_EDGE_xy_xY 7
+enum 
+{
+  /// from min X, min Y to max X, min Y
+  CS_BOX_EDGE_xy_Xy = 0,
+  /// from max X, min Y to min X, min Y
+  CS_BOX_EDGE_Xy_xy = 1,
+  /// from max X, min Y to max X, max Y
+  CS_BOX_EDGE_Xy_XY = 2,
+  /// from max X, max Y to max X, min Y
+  CS_BOX_EDGE_XY_Xy = 3,
+  /// from max X, max Y to min X, max Y
+  CS_BOX_EDGE_XY_xY = 4,
+  /// from min X, max Y to max X, max Y
+  CS_BOX_EDGE_xY_XY = 5,
+  /// from min X, max Y to min X, min Y
+  CS_BOX_EDGE_xY_xy = 6,
+  /// from min X, min Y to min X, max Y
+  CS_BOX_EDGE_xy_xY = 7
+};
 /** @} */
 
 /**
@@ -111,23 +116,23 @@ protected:
 
 public:
   /// Get the minimum X value of the box
-  float MinX () const { return minbox.x; }
+  inline float MinX () const { return minbox.x; }
   /// Get the minimum Y value of the box
-  float MinY () const { return minbox.y; }
+  inline float MinY () const { return minbox.y; }
   /// Get the maximum X value of the box
-  float MaxX () const { return maxbox.x; }
+  inline float MaxX () const { return maxbox.x; }
   /// Get the maximum Y value of the box
-  float MaxY () const { return maxbox.y; }
+  inline float MaxY () const { return maxbox.y; }
   /// Get Min component for 0 (x) or 1 (y).
-  float Min (int idx) const { return idx ? minbox.y : minbox.x; }
+  inline float Min (int idx) const { return idx ? minbox.y : minbox.x; }
   /// Get Max component for 0 (x) or 1 (y).
-  float Max (int idx) const { return idx ? maxbox.y : maxbox.x; }
+  inline float Max (int idx) const { return idx ? maxbox.y : maxbox.x; }
   /// Get the 2d vector of minimum (x, y) values
-  const csVector2& Min () const { return minbox; }
+  inline const csVector2& Min () const { return minbox; }
   /// Get the 2d vector of maximum (x, y) values
-  const csVector2& Max () const { return maxbox; }
+  inline const csVector2& Max () const { return maxbox; }
   /// Compute area of box
-  float Area () const { return (MaxX()-MinX())*(MaxY()-MinY()); }
+  inline float Area () const { return (MaxX()-MinX())*(MaxY()-MinY()); }
 
   /**
    * Return every corner of this bounding box from 0
@@ -142,7 +147,7 @@ public:
   /**
    * Get the center of this box.
    */
-  csVector2 GetCenter () const { return (minbox+maxbox)/2; }
+  inline csVector2 GetCenter () const { return (minbox+maxbox)/2; }
 
   /**
    * Set the center of this box. This will not change the size
@@ -159,7 +164,7 @@ public:
    * Given an edge index (#CS_BOX_EDGE_xy_Xy etc.) return the two vertices
    * (index #CS_BOX_CORNER_xy etc.).
    */
-  void GetEdgeInfo (int edge, int& v1, int& v2) const
+  inline void GetEdgeInfo (int edge, int& v1, int& v2) const
   {
     v1 = edges[edge].v1;
     v2 = edges[edge].v2;
@@ -169,7 +174,7 @@ public:
    * Return every edge (segment) of this bounding box
    * from 0 to 7 (#CS_BOX_EDGE_xy_Xy etc.).
    */
-  csSegment2 GetEdge (int edge) const
+  inline csSegment2 GetEdge (int edge) const
   {
     return csSegment2 (GetCorner (edges[edge].v1), GetCorner (edges[edge].v2));
   }
@@ -178,7 +183,7 @@ public:
    * Return every edge (segment) of this bounding box
    * from 0 to 7 (#CS_BOX_EDGE_xy_Xy etc.).
    */
-  void GetEdge (int edge, csSegment2& e) const
+  inline void GetEdge (int edge, csSegment2& e) const
   {
     e.SetStart (GetCorner (edges[edge].v1));
     e.SetEnd (GetCorner (edges[edge].v2));
@@ -199,7 +204,7 @@ public:
    * fully contained in the polygon. But all other
    * cases are tested.
    */
-  static bool Intersect (const csVector2& minbox, const csVector2& maxbox,
+  static inline bool Intersect (const csVector2& minbox, const csVector2& maxbox,
     csVector2* poly, int num_poly)
   {
     return Intersect (minbox.x, minbox.y, maxbox.x, maxbox.y, poly, num_poly);
@@ -211,13 +216,13 @@ public:
    * fully contained in the polygon. But all other
    * cases are tested.
    */
-  bool Intersect (csVector2* poly, int num_poly) const
+  inline bool Intersect (csVector2* poly, int num_poly) const
   {
     return Intersect (minbox, maxbox, poly, num_poly);
   }
 
   /// Test if the given coordinate is in this box.
-  bool In (float x, float y) const
+  inline bool In (float x, float y) const
   {
     if (x < minbox.x || x > maxbox.x) return false;
     if (y < minbox.y || y > maxbox.y) return false;
@@ -225,13 +230,13 @@ public:
   }
 
   /// Test if the given coordinate is in this box.
-  bool In (const csVector2& v) const
+  inline bool In (const csVector2& v) const
   {
     return In (v.x, v.y);
   }
 
   /// Test if this box overlaps with the given box.
-  bool Overlap (const csBox2& box) const
+  inline bool Overlap (const csBox2& box) const
   {
     if (maxbox.x < box.minbox.x || minbox.x > box.maxbox.x) return false;
     if (maxbox.y < box.minbox.y || minbox.y > box.maxbox.y) return false;
@@ -239,14 +244,14 @@ public:
   }
 
   /// Test if this box contains the other box.
-  bool Contains (const csBox2& box) const
+  inline bool Contains (const csBox2& box) const
   {
     return (box.minbox.x >= minbox.x && box.maxbox.x <= maxbox.x) &&
            (box.minbox.y >= minbox.y && box.maxbox.y <= maxbox.y);
   }
 
   /// Test if this box is empty.
-  bool Empty () const
+  inline bool Empty () const
   {
     if (minbox.x > maxbox.x) return true;
     if (minbox.y > maxbox.y) return true;
@@ -267,35 +272,35 @@ public:
   float SquaredOriginMaxDist () const;
 
   /// Initialize this box to empty.
-  void StartBoundingBox ()
+  inline void StartBoundingBox ()
   {
     minbox.x =  CS_BOUNDINGBOX_MAXVALUE;  minbox.y =  CS_BOUNDINGBOX_MAXVALUE;
     maxbox.x = -CS_BOUNDINGBOX_MAXVALUE;  maxbox.y = -CS_BOUNDINGBOX_MAXVALUE;
   }
 
   /// Initialize this box to one vertex.
-  void StartBoundingBox (const csVector2& v)
+  inline void StartBoundingBox (const csVector2& v)
   {
     minbox = v;
     maxbox = v;
   }
 
   /// Same but given some coordinates.
-  void StartBoundingBox (float x, float y)
+  inline void StartBoundingBox (float x, float y)
   {
     minbox.x = maxbox.x = x;
     minbox.y = maxbox.y = y;
   }
 
   /// Add a new vertex and recalculate the bounding box.
-  void AddBoundingVertex (float x, float y)
+  inline void AddBoundingVertex (float x, float y)
   {
     if (x < minbox.x) minbox.x = x;  if (x > maxbox.x) maxbox.x = x;
     if (y < minbox.y) minbox.y = y;  if (y > maxbox.y) maxbox.y = y;
   }
 
   /// Add a new vertex and recalculate the bounding box.
-  void AddBoundingVertex (const csVector2& v)
+  inline void AddBoundingVertex (const csVector2& v)
   {
     AddBoundingVertex (v.x, v.y);
   }
@@ -305,7 +310,7 @@ public:
    * This version is a little more optimal. It assumes however
    * that at least one point has been added to the bounding box.
    */
-  void AddBoundingVertexSmart (float x, float y)
+  inline void AddBoundingVertexSmart (float x, float y)
   {
     if (x < minbox.x) minbox.x = x; else if (x > maxbox.x) maxbox.x = x;
     if (y < minbox.y) minbox.y = y; else if (y > maxbox.y) maxbox.y = y;
@@ -316,7 +321,7 @@ public:
    * This version is a little more optimal. It assumes however
    * that at least one point has been added to the bounding box.
    */
-  void AddBoundingVertexSmart (const csVector2& v)
+  inline void AddBoundingVertexSmart (const csVector2& v)
   {
     AddBoundingVertexSmart (v.x, v.y);
   }
@@ -325,7 +330,7 @@ public:
    * Add a new vertex and recalculate the bounding box.
    * Return true if the box was modified.
    */
-  bool AddBoundingVertexTest (float x, float y)
+  inline bool AddBoundingVertexTest (float x, float y)
   {
     bool rc = false;
     if (x < minbox.x) { minbox.x = x; rc = true; }
@@ -339,7 +344,7 @@ public:
    * Add a new vertex and recalculate the bounding box.
    * Return true if the box was modified.
    */
-  bool AddBoundingVertexTest (const csVector2& v)
+  inline bool AddBoundingVertexTest (const csVector2& v)
   {
     return AddBoundingVertexTest (v.x, v.y);
   }
@@ -350,7 +355,7 @@ public:
    * that at least one point has been added to the bounding box.
    * Return true if the box was modified.
    */
-  bool AddBoundingVertexSmartTest (float x, float y)
+  inline bool AddBoundingVertexSmartTest (float x, float y)
   {
     bool rc = false;
     if (x < minbox.x) { minbox.x = x; rc = true; }
@@ -366,17 +371,19 @@ public:
    * that at least one point has been added to the bounding box.
    * Return true if the box was modified.
    */
-  bool AddBoundingVertexSmartTest (const csVector2& v)
+  inline bool AddBoundingVertexSmartTest (const csVector2& v)
   {
     return AddBoundingVertexSmartTest (v.x, v.y);
   }
 
   /// Initialize this box to empty.
   csBox2 () : minbox (CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE),
-	     maxbox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE) {}
+	     maxbox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE) 
+  {}
 
   /// Initialize this box with one point.
-  csBox2 (const csVector2& v) : minbox (v.x, v.y), maxbox (v.x, v.y) {}
+  csBox2 (const csVector2& v) : minbox (v.x, v.y), maxbox (v.x, v.y) 
+  {}
 
   /// Initialize this box with the given values.
   csBox2 (float x1, float y1, float x2, float y2) :
@@ -388,28 +395,28 @@ public:
   { }
   
   /// Sets the bounds of the box with the given values.
-  void Set (const csVector2& bmin, const csVector2& bmax)
+  inline void Set (const csVector2& bmin, const csVector2& bmax)
   {
     minbox = bmin;
     maxbox = bmax;
   }
 
   /// Sets the bounds of the box with the given values.
-  void Set (float x1, float y1, float x2, float y2)
+  inline void Set (float x1, float y1, float x2, float y2)
   {
     if (x1>x2 || y1>y2) StartBoundingBox();
     else { minbox.x = x1;  minbox.y = y1;  maxbox.x = x2;  maxbox.y = y2; }
   }
 
   /// Set Min component for 0 (x) or 1 (y).
-  void SetMin (int idx, float val)
+  inline void SetMin (int idx, float val)
   {
     if (idx == 1) minbox.y = val;
     else minbox.x = val;
   }
 
   /// Set Max component for 0 (x) or 1 (y).
-  void SetMax (int idx, float val)
+  inline void SetMax (int idx, float val)
   {
     if (idx == 1) maxbox.y = val;
     else maxbox.x = val;
@@ -461,98 +468,107 @@ public:
  * \name Indices of corner vertices for csBox3.
  * Used by csBox3::GetCorner().
  * @{ */
-/// min X, min Y, min Z
-#define CS_BOX_CORNER_xyz 0
-/// min X, min Y, max Z
-#define CS_BOX_CORNER_xyZ 1
-/// min X, max Y, min Z
-#define CS_BOX_CORNER_xYz 2
-/// min X, max Y, max Z
-#define CS_BOX_CORNER_xYZ 3
-/// min X, min Y, min Z
-#define CS_BOX_CORNER_Xyz 4
-/// max X, min Y, max Z
-#define CS_BOX_CORNER_XyZ 5
-/// max X, max Y, min Z
-#define CS_BOX_CORNER_XYz 6
-/// max X, max Y, max Z
-#define CS_BOX_CORNER_XYZ 7
-/// center
-#define CS_BOX_CENTER3 8
+enum
+{
+  /// min X, min Y, min Z
+  CS_BOX_CORNER_xyz = 0,
+  /// min X, min Y, max Z
+  CS_BOX_CORNER_xyZ = 1,
+  /// min X, max Y, min Z
+  CS_BOX_CORNER_xYz = 2,
+  /// min X, max Y, max Z
+  CS_BOX_CORNER_xYZ = 3,
+  /// min X, min Y, min Z
+  CS_BOX_CORNER_Xyz = 4,
+  /// max X, min Y, max Z
+  CS_BOX_CORNER_XyZ = 5,
+  /// max X, max Y, min Z
+  CS_BOX_CORNER_XYz = 6,
+  /// max X, max Y, max Z
+  CS_BOX_CORNER_XYZ = 7,
+  /// center
+  CS_BOX_CENTER3 = 8
+};
 /** @} */
 
 /**
  * \name Indices of faces for csBox3.
  * Used by csBox3::GetSide().
  * @{ */
-/// min X
-#define CS_BOX_SIDE_x 0
-/// max X
-#define CS_BOX_SIDE_X 1
-/// min Y
-#define CS_BOX_SIDE_y 2
-/// max Y
-#define CS_BOX_SIDE_Y 3
-/// min Z
-#define CS_BOX_SIDE_z 4
-/// max Z
-#define CS_BOX_SIDE_Z 5
-/// inside
-#define CS_BOX_INSIDE 6
+enum
+{
+  /// min X
+  CS_BOX_SIDE_x = 0,
+  /// max X
+  CS_BOX_SIDE_X = 1,
+  /// min Y
+  CS_BOX_SIDE_y = 2,
+  /// max Y
+  CS_BOX_SIDE_Y = 3,
+  /// min Z
+  CS_BOX_SIDE_z = 4,
+  /// max Z
+  CS_BOX_SIDE_Z = 5,
+  /// inside
+  CS_BOX_INSIDE = 6
+};
 /** @} */
 
 /**
  * \name Indices of edges for csBox3.
  * Index e+1 is opposite edge of e (with e even).
  * @{ */
-/// from max X, min Y, min Z to min X, min Y, min Z
-#define CS_BOX_EDGE_Xyz_xyz 0
-/// from min X, min Y, min Z to max X, min Y, min Z
-#define CS_BOX_EDGE_xyz_Xyz 1
-/// from min X, min Y, min Z to min X, max Y, min Z
-#define CS_BOX_EDGE_xyz_xYz 2
-/// from min X, max Y, min Z to min X, min Y, min Z
-#define CS_BOX_EDGE_xYz_xyz 3
-/// from min X, max Y, min Z to max X, max Y, min Z
-#define CS_BOX_EDGE_xYz_XYz 4
-/// from max X, max Y, min Z to min X, max Y, min Z
-#define CS_BOX_EDGE_XYz_xYz 5
-/// from max X, max Y, min Z to max X, min Y, min Z
-#define CS_BOX_EDGE_XYz_Xyz 6
-/// from max X, min Y, min Z to max X, max Y, min Z
-#define CS_BOX_EDGE_Xyz_XYz 7
-/// from max X, min Y, min Z to max X, min Y, max Z
-#define CS_BOX_EDGE_Xyz_XyZ 8
-/// from max X, min Y, max Z to max X, min Y, min Z
-#define CS_BOX_EDGE_XyZ_Xyz 9
-/// from max X, min Y, max Z to max X, max Y, max Z
-#define CS_BOX_EDGE_XyZ_XYZ 10
-/// from max X, max Y, max Z to max X, min Y, max Z
-#define CS_BOX_EDGE_XYZ_XyZ 11
-/// from max X, max Y, max Z to max X, max Y, min Z
-#define CS_BOX_EDGE_XYZ_XYz 12
-/// from max X, max Y, min Z to max X, max Y, max Z
-#define CS_BOX_EDGE_XYz_XYZ 13
-/// from max X, max Y, max Z to min X, max Y, max Z
-#define CS_BOX_EDGE_XYZ_xYZ 14
-/// from min X, max Y, max Z to max X, max Y, max Z
-#define CS_BOX_EDGE_xYZ_XYZ 15
-/// from min X, max Y, max Z to min X, max Y, min Z
-#define CS_BOX_EDGE_xYZ_xYz 16
-/// from min X, max Y, min Z to min X, max Y, max Z
-#define CS_BOX_EDGE_xYz_xYZ 17
-/// from min X, max Y, max Z to min X, min Y, max Z
-#define CS_BOX_EDGE_xYZ_xyZ 18
-/// from min X, min Y, max Z to min X, max Y, max Z
-#define CS_BOX_EDGE_xyZ_xYZ 19
-/// from min X, min Y, max Z to min X, min Y, min Z
-#define CS_BOX_EDGE_xyZ_xyz 20
-/// from min X, min Y, min Z to min X, min Y, max Z
-#define CS_BOX_EDGE_xyz_xyZ 21
-/// from min X, min Y, max Z to max X, min Y, max Z
-#define CS_BOX_EDGE_xyZ_XyZ 22
-/// from max X, min Y, max Z to min X, min Y, max Z
-#define CS_BOX_EDGE_XyZ_xyZ 23
+enum
+{
+  /// from max X, min Y, min Z to min X, min Y, min Z
+  CS_BOX_EDGE_Xyz_xyz = 0,
+  /// from min X, min Y, min Z to max X, min Y, min Z
+  CS_BOX_EDGE_xyz_Xyz = 1,
+  /// from min X, min Y, min Z to min X, max Y, min Z
+  CS_BOX_EDGE_xyz_xYz = 2,
+  /// from min X, max Y, min Z to min X, min Y, min Z
+  CS_BOX_EDGE_xYz_xyz = 3,
+  /// from min X, max Y, min Z to max X, max Y, min Z
+  CS_BOX_EDGE_xYz_XYz = 4,
+  /// from max X, max Y, min Z to min X, max Y, min Z
+  CS_BOX_EDGE_XYz_xYz = 5,
+  /// from max X, max Y, min Z to max X, min Y, min Z
+  CS_BOX_EDGE_XYz_Xyz = 6,
+  /// from max X, min Y min Z to max X, max Y, min Z
+  CS_BOX_EDGE_Xyz_XYz = 7,
+  /// from max X, min Y, min Z to max X, min Y, max Z
+  CS_BOX_EDGE_Xyz_XyZ = 8,
+  /// from max X, min Y, max Z to max X, min Y, min Z
+  CS_BOX_EDGE_XyZ_Xyz = 9,
+  /// from max X, min Y, max Z to max X, max Y, max Z
+  CS_BOX_EDGE_XyZ_XYZ = 10,
+  /// from max X, max Y, max Z to max X, min Y, max Z
+  CS_BOX_EDGE_XYZ_XyZ = 11,
+  /// from max X, max Y, max Z to max X, max Y, min Z
+  CS_BOX_EDGE_XYZ_XYz = 12,
+  /// from max X, max Y, min Z to max X, max Y, max Z
+  CS_BOX_EDGE_XYz_XYZ = 13,
+  /// from max X, max Y, max Z to min X, max Y, max Z
+  CS_BOX_EDGE_XYZ_xYZ = 14,
+  /// from min X, max Y, max Z to max X, max Y, max Z
+  CS_BOX_EDGE_xYZ_XYZ = 15,
+  /// from min X, max Y, max Z to min X, max Y, min Z
+  CS_BOX_EDGE_xYZ_xYz = 16,
+  /// from min X, max Y, min Z to min X, max Y, max Z
+  CS_BOX_EDGE_xYz_xYZ = 17,
+  /// from min X, max Y, max Z to min X, min Y, max Z
+  CS_BOX_EDGE_xYZ_xyZ = 18,
+  /// from min X, min Y, max Z to min X, max Y, max Z
+  CS_BOX_EDGE_xyZ_xYZ = 19,
+  /// from min X, min Y, max Z to min X, min Y, min Z
+  CS_BOX_EDGE_xyZ_xyz = 20,
+  /// from min X, min Y, min Z to min X, min Y, max Z
+  CS_BOX_EDGE_xyz_xyZ = 21,
+  /// from min X, min Y, max Z to max X, min Y, max Z
+  CS_BOX_EDGE_xyZ_XyZ = 22,
+  /// from max X, min Y, max Z to min X, min Y, max Z
+  CS_BOX_EDGE_XyZ_xyZ = 23
+};
 /** @} */
 
 /**
@@ -588,29 +604,29 @@ protected:
   static bFace faces[6];
 public:
   /// Get the minimum X value of the box
-  float MinX () const { return minbox.x; }
+  inline float MinX () const { return minbox.x; }
   /// Get the minimum Y value of the box
-  float MinY () const { return minbox.y; }
+  inline float MinY () const { return minbox.y; }
   /// Get the minimum Z value of the box
-  float MinZ () const { return minbox.z; }
+  inline float MinZ () const { return minbox.z; }
   /// Get the maximum X value of the box
-  float MaxX () const { return maxbox.x; }
+  inline float MaxX () const { return maxbox.x; }
   /// Get the maximum Y value of the box
-  float MaxY () const { return maxbox.y; }
+  inline float MaxY () const { return maxbox.y; }
   /// Get the maximum Z value of the box
-  float MaxZ () const { return maxbox.z; }
+  inline float MaxZ () const { return maxbox.z; }
   /// Get Min component for 0 (x), 1 (y), or 2 (z).
-  float Min (int idx) const
+  inline float Min (int idx) const
   { return minbox[idx]; }
   /// Get Max component for 0 (x), 1 (y), or 2 (z).
-  float Max (int idx) const
+  inline float Max (int idx) const
   { return maxbox[idx]; }
   /// Get the 3d vector of minimum (x, y, z) values
-  const csVector3& Min () const { return minbox; }
+  inline const csVector3& Min () const { return minbox; }
   /// Get the 3d vector of maximum (x, y, z) values
-  const csVector3& Max () const { return maxbox; }
+  inline const csVector3& Max () const { return maxbox; }
   /// Compute volume of box
-  float Volume () const
+  inline float Volume () const
   { return (MaxX()-MinX())*(MaxY()-MinY())*(MaxZ()-MinZ()); }
 
   /**
@@ -629,7 +645,7 @@ public:
    * (index #CS_BOX_CORNER_xyz, etc.) and left/right faces
    * (#CS_BOX_SIDE_x, etc.).
    */
-  void GetEdgeInfo (int edge, int& v1, int& v2, int& fleft, int& fright) const
+  inline void GetEdgeInfo (int edge, int& v1, int& v2, int& fleft, int& fright) const
   {
     v1 = edges[edge].v1;
     v2 = edges[edge].v2;
@@ -641,7 +657,7 @@ public:
    * Given a face index (#CS_BOX_SIDE_x etc.) return the four edges oriented
    * clockwise around this face (#CS_BOX_EDGE_Xyz_xyz etc.).
    */
-  uint8* GetFaceEdges (int face) const
+  inline uint8* GetFaceEdges (int face) const
   {
     return faces[face];
   }
@@ -649,7 +665,7 @@ public:
   /**
    * Get the center of this box.
    */
-  csVector3 GetCenter () const { return (minbox+maxbox)/2; }
+  inline csVector3 GetCenter () const { return (minbox+maxbox)/2; }
 
   /**
    * Set the center of this box. This will not change the size
@@ -665,7 +681,7 @@ public:
   /**
    * Get the size of the box 
    */
-  csVector3 GetSize () const { return (maxbox-minbox); }
+  inline csVector3 GetSize () const { return (maxbox-minbox); }
 
   /**
    * Get a side of this box as a 2D box.
@@ -691,7 +707,7 @@ public:
    * Static function to get the 'other' side (i.e. CS_BOX_SIDE_X
    * to CS_BOX_SIDE_x, ...).
    */
-  static int OtherSide (int side)
+  static inline int OtherSide (int side)
   {
     return side ^ 1;
   }
@@ -701,7 +717,7 @@ public:
    * from 0 to 23 (use one of the #CS_BOX_EDGE_Xyz_xyz etc. indices).
    * The returned edge is undefined for any other index.
    */
-  csSegment3 GetEdge (int edge) const
+  inline csSegment3 GetEdge (int edge) const
   {
     return csSegment3 (GetCorner (edges[edge].v1), GetCorner (edges[edge].v2));
   }
@@ -711,14 +727,14 @@ public:
    * from 0 to 23 (use one of the #CS_BOX_EDGE_Xyz_xyz etc. indices).
    * The returned edge is undefined for any other index.
    */
-  void GetEdge (int edge, csSegment3& e) const
+  inline void GetEdge (int edge, csSegment3& e) const
   {
     e.SetStart (GetCorner (edges[edge].v1));
     e.SetEnd (GetCorner (edges[edge].v2));
   }
 
   /// Test if the given coordinate is in this box.
-  bool In (float x, float y, float z) const
+  inline bool In (float x, float y, float z) const
   {
     if (x < minbox.x || x > maxbox.x) return false;
     if (y < minbox.y || y > maxbox.y) return false;
@@ -727,13 +743,13 @@ public:
   }
 
   /// Test if the given coordinate is in this box.
-  bool In (const csVector3& v) const
+  inline bool In (const csVector3& v) const
   {
     return In (v.x, v.y, v.z);
   }
 
   /// Test if this box overlaps with the given box.
-  bool Overlap (const csBox3& box) const
+  inline bool Overlap (const csBox3& box) const
   {
     if (maxbox.x < box.minbox.x || minbox.x > box.maxbox.x) return false;
     if (maxbox.y < box.minbox.y || minbox.y > box.maxbox.y) return false;
@@ -742,7 +758,7 @@ public:
   }
 
   /// Test if this box contains the other box.
-  bool Contains (const csBox3& box) const
+  inline bool Contains (const csBox3& box) const
   {
     return (box.minbox.x >= minbox.x && box.maxbox.x <= maxbox.x) &&
            (box.minbox.y >= minbox.y && box.maxbox.y <= maxbox.y) &&
@@ -750,7 +766,7 @@ public:
   }
 
   /// Test if this box is empty.
-  bool Empty () const
+  inline bool Empty () const
   {
     if (minbox.x > maxbox.x) return true;
     if (minbox.y > maxbox.y) return true;
@@ -759,7 +775,7 @@ public:
   }
 
   /// Initialize this box to empty.
-  void StartBoundingBox ()
+  inline void StartBoundingBox ()
   {
     minbox.x =  CS_BOUNDINGBOX_MAXVALUE;
     minbox.y =  CS_BOUNDINGBOX_MAXVALUE;
@@ -770,13 +786,13 @@ public:
   }
 
   /// Initialize this box to one vertex.
-  void StartBoundingBox (const csVector3& v)
+  inline void StartBoundingBox (const csVector3& v)
   {
     minbox = v; maxbox = v;
   }
 
   /// Add a new vertex and recalculate the bounding box.
-  void AddBoundingVertex (float x, float y, float z)
+  inline void AddBoundingVertex (float x, float y, float z)
   {
     if (x < minbox.x) minbox.x = x; if (x > maxbox.x) maxbox.x = x;
     if (y < minbox.y) minbox.y = y; if (y > maxbox.y) maxbox.y = y;
@@ -784,7 +800,7 @@ public:
   }
 
   /// Add a new vertex and recalculate the bounding box.
-  void AddBoundingVertex (const csVector3& v)
+  inline void AddBoundingVertex (const csVector3& v)
   {
     AddBoundingVertex (v.x, v.y, v.z);
   }
@@ -794,7 +810,7 @@ public:
    * This version is a little more optimal. It assumes however
    * that at least one point has been added to the bounding box.
    */
-  void AddBoundingVertexSmart (float x, float y, float z)
+  inline void AddBoundingVertexSmart (float x, float y, float z)
   {
     if (x < minbox.x) minbox.x = x; else if (x > maxbox.x) maxbox.x = x;
     if (y < minbox.y) minbox.y = y; else if (y > maxbox.y) maxbox.y = y;
@@ -806,7 +822,7 @@ public:
    * This version is a little more optimal. It assumes however
    * that at least one point has been added to the bounding box.
    */
-  void AddBoundingVertexSmart (const csVector3& v)
+  inline void AddBoundingVertexSmart (const csVector3& v)
   {
     AddBoundingVertexSmart (v.x, v.y, v.z);
   }
@@ -815,7 +831,7 @@ public:
    * Add a new vertex and recalculate the bounding box.
    * Returns true if box was modified.
    */
-  bool AddBoundingVertexTest (float x, float y, float z)
+  inline bool AddBoundingVertexTest (float x, float y, float z)
   {
     bool rc = false;
     if (x < minbox.x) { minbox.x = x; rc = true; }
@@ -831,7 +847,7 @@ public:
    * Add a new vertex and recalculate the bounding box.
    * Returns true if box was modified.
    */
-  bool AddBoundingVertexTest (const csVector3& v)
+  inline bool AddBoundingVertexTest (const csVector3& v)
   {
     return AddBoundingVertexTest (v.x, v.y, v.z);
   }
@@ -842,7 +858,7 @@ public:
    * that at least one point has been added to the bounding box.
    * Returns true if box was modified.
    */
-  bool AddBoundingVertexSmartTest (float x, float y, float z)
+  inline bool AddBoundingVertexSmartTest (float x, float y, float z)
   {
     bool rc = false;
     if (x < minbox.x) { minbox.x = x; rc = true; }
@@ -860,7 +876,7 @@ public:
    * that at least one point has been added to the bounding box.
    * Returns true if box was modified.
    */
-  bool AddBoundingVertexSmartTest (const csVector3& v)
+  inline bool AddBoundingVertexSmartTest (const csVector3& v)
   {
     return AddBoundingVertexSmartTest (v.x, v.y, v.z);
   }
@@ -875,7 +891,8 @@ public:
 	    -CS_BOUNDINGBOX_MAXVALUE) {}
 
   /// Initialize this box with one point.
-  csBox3 (const csVector3& v) : minbox (v), maxbox (v) { }
+  csBox3 (const csVector3& v) : minbox (v), maxbox (v) 
+  { }
 
   /// Initialize this box with two points.
   csBox3 (const csVector3& v1, const csVector3& v2) :
@@ -888,14 +905,14 @@ public:
   { if (Empty ()) StartBoundingBox (); }
 
   /// Sets the bounds of the box with the given values.
-  void Set (const csVector3& bmin, const csVector3& bmax)
+  inline void Set (const csVector3& bmin, const csVector3& bmax)
   {
     minbox = bmin;
     maxbox = bmax;
   }
 
   /// Sets the bounds of the box with the given values.
-  void Set (float x1, float y1, float z1, float x2, float y2, float z2)
+  inline void Set (float x1, float y1, float z1, float x2, float y2, float z2)
   {
     if (x1>x2 || y1>y2 || z1>z2) StartBoundingBox();
     else
@@ -906,7 +923,7 @@ public:
   }
 
   /// Set Min component for 0 (x), 1 (y), or 2 (z).
-  void SetMin (int idx, float val)
+  inline void SetMin (int idx, float val)
   {
     if (idx == 1) minbox.y = val;
     else if (idx == 0) minbox.x = val;
@@ -914,7 +931,7 @@ public:
   }
 
   /// Set Max component for 0 (x), 1 (y), or 2 (z).
-  void SetMax (int idx, float val)
+  inline void SetMax (int idx, float val)
   {
     if (idx == 1) maxbox.y = val;
     else if (idx == 0) maxbox.x = val;
@@ -930,7 +947,7 @@ public:
   /**
    * Split this box along an axis and construct two new boxes.
    */
-  void Split (int axis, float where, csBox3& bl, csBox3& br) const
+  inline void Split (int axis, float where, csBox3& bl, csBox3& br) const
   {
     switch (axis)
     {
@@ -961,7 +978,7 @@ public:
    * Returns > 0 if box is completely in right half.
    * Returns 0 if box is intersected.
    */
-  int TestSplit (int axis, float where) const
+  inline int TestSplit (int axis, float where) const
   {
     if (maxbox[axis] < where) return -1;
     if (minbox[axis] > where) return 1;

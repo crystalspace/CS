@@ -21,8 +21,9 @@
 
 #include "csutil/scf.h"
 
-class csVector3;
+class csBox3;
 class csColor;
+class csVector3;
 
 SCF_VERSION (iStarsState, 0, 0, 2);
 

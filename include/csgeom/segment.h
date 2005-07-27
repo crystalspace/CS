@@ -50,26 +50,26 @@ public:
   ~csSegment2 () { }
 
   /// Set segment to given values.
-  void Set (const csVector2& s, const csVector2& e)
+  inline void Set (const csVector2& s, const csVector2& e)
   { start = s; end = e; }
 
   /// Set the start of the segment.
-  void SetStart (const csVector2& s) { start = s; }
+  inline void SetStart (const csVector2& s) { start = s; }
 
   /// Set the end of the segment.
-  void SetEnd (const csVector2& e) { end = e; }
+  inline void SetEnd (const csVector2& e) { end = e; }
 
   /// Get the start of the segment.
-  const csVector2& Start () const { return start; }
+  inline const csVector2& Start () const { return start; }
 
   /// Get the end of the segment.
-  const csVector2& End () const { return end; }
+  inline const csVector2& End () const { return end; }
 
   /// Get the start of the segment.
-  csVector2& Start () { return start; }
+  inline csVector2& Start () { return start; }
 
   /// Get the end of the segment.
-  csVector2& End () { return end; }
+  inline csVector2& End () { return end; }
 };
 
 /**
@@ -90,26 +90,26 @@ public:
   csSegment3 () { }
 
   /// Set segment to given values.
-  void Set (const csVector3& s, const csVector3& e)
+  inline void Set (const csVector3& s, const csVector3& e)
   { start = s; end = e; }
 
   /// Set the start of the segment.
-  void SetStart (const csVector3& s) { start = s; }
+  inline void SetStart (const csVector3& s) { start = s; }
 
   /// Set the end of the segment.
-  void SetEnd (const csVector3& e) { end = e; }
+  inline void SetEnd (const csVector3& e) { end = e; }
 
   /// Get the start of the segment.
-  const csVector3& Start () const { return start; }
+  inline const csVector3& Start () const { return start; }
 
   /// Get the end of the segment.
-  const csVector3& End () const { return end; }
+  inline const csVector3& End () const { return end; }
 
   /// Get the start of the segment.
-  csVector3& Start () { return start; }
+  inline csVector3& Start () { return start; }
 
   /// Get the end of the segment.
-  csVector3& End () { return end; }
+  inline csVector3& End () { return end; }
 };
 
 /** @} */

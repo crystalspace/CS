@@ -25,9 +25,9 @@
  */
 
 #include "csextern.h"
+#include "csutil/fifo.h"
+#include "csutil/thread.h"
 #include "iutil/job.h"
-#include "fifo.h"
-#include "thread.h"
 
 /**
  * iJobQueue implementation that lets the jobs run in a thread.

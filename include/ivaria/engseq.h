@@ -24,30 +24,34 @@
 /**\file
  */
 
+
+struct iCamera;
+struct iLight;
+struct iMeshWrapper;
+struct iObject;
+struct iSector;
+struct iSharedVariable;
+
+class csBox3;
+class csColor;
+class csSphere;
+class csVector3;
+
 struct iSequence;
 struct iSequenceManager;
 struct iSequenceTrigger;
 struct iSequenceWrapper;
-struct iMaterialWrapper;
-struct iSector;
-struct iMeshWrapper;
-struct iObject;
-struct iLight;
-struct iCamera;
-class csColor;
-class csReversibleTransform;
-class csVector3;
-class csBox3;
-class csSphere;
-struct iSharedVariable;
 
 //@{
 /**
  * Operations for AddConditionLightChange().
  */
-#define CS_SEQUENCE_LIGHTCHANGE_NONE 0
-#define CS_SEQUENCE_LIGHTCHANGE_LESS 1
-#define CS_SEQUENCE_LIGHTCHANGE_GREATER 2
+enum
+{
+  CS_SEQUENCE_LIGHTCHANGE_NONE = 0,
+  CS_SEQUENCE_LIGHTCHANGE_LESS = 1,
+  CS_SEQUENCE_LIGHTCHANGE_GREATER = 2
+};
 //@}
 
 SCF_VERSION (iParameterESM, 0, 0, 1);

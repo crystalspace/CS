@@ -19,9 +19,14 @@
 */
 
 #include "cssysdef.h"
-#include "ivaria/reporter.h"
+
+#include "csgeom/vector3.h"
+#include "csutil/scopedmutexlock.h"
+
 #include "isound/listener.h"
+#include "ivaria/reporter.h"
 #include "isound/data.h"
+
 #include "srdrsrc.h"
 #include "srdrcom.h"
 #include "sndhdl.h"

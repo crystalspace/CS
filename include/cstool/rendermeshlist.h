@@ -21,18 +21,18 @@
 
 #include "csextern.h"
 
-#include "csutil/array.h"
+#include "csgeom/vector3.h"
 #include "csutil/parray.h"
-#include "csutil/ref.h"
-#include "csgeom/box.h"
-#include "csgeom/sphere.h"
+
 #include "ivideo/graph3d.h"
 
 struct iEngine;
-struct iObjectRegistry;
-struct csRenderMesh;
 struct iMeshWrapper;
+struct iObjectRegistry;
 struct iRenderView;
+
+struct csRenderMesh;
+
 
 /**
  * This class is used when we need to store, sort and then render a list of

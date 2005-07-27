@@ -26,16 +26,17 @@
  */
 
 #include "csextern.h"
-#include "csevcord.h"
-#include "evoutlet.h"
-#include "array.h"
-#include "ref.h"
-#include "refarr.h"
-#include "thread.h"
+
+#include "csutil/array.h"
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
+#include "csutil/thread.h"
 #include "iutil/eventq.h"
 
-class csPoolEvent;
 struct iObjectRegistry;
+
+class csEventCord;
+class csPoolEvent;
 
 /**\internal
  * Default event queue size: the queue will automatically grow

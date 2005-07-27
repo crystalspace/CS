@@ -26,29 +26,34 @@
  * @{ */
 
 #include "csutil/scf.h"
+
 #include "csgeom/box.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "csgeom/vector3.h"
+
 #include "ivideo/graph3d.h"
 
-struct iMeshObject;
 struct iCamera;
-struct iMeshObjectFactory;
-struct iMeshWrapper;
-struct iMeshList;
+struct iLightingInfo;
+struct iLODControl;
 struct iMeshFactoryList;
 struct iMeshFactoryWrapper;
-struct iRenderView;
+struct iMeshList;
+struct iMeshObject;
+struct iMeshObjectFactory;
+struct iMeshWrapper;
 struct iMovable;
-struct iLODControl;
-struct iLight;
-struct iLightingInfo;
-struct iShadowReceiver;
-struct iShadowCaster;
 struct iObject;
 struct iPortalContainer;
+struct iRenderView;
+struct iShaderVariableContext;
+struct iShadowCaster;
+struct iShadowReceiver;
+
 struct csRenderMesh;
+
+class csEllipsoid;
 class csFlags;
+class csReversibleTransform;
 
 /** \name Meshwrapper flags
  * @{ */
@@ -656,26 +661,9 @@ struct iMeshWrapper : public iBase
   virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh) = 0;
 
   /**
-   * Draws the shadow buffer pass.  This sets of the stencil for the lights
-   */
-  virtual void DrawShadow (iRenderView* rview, iLight *light) = 0;
-  /**
-   * Draws the diffuse light mesh object
-   */
-  virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
-
-  /**
    * Enable/disable hardware based shadows alltogheter
    */ 
   virtual void CastHardwareShadow (bool castShadow) = 0;
-  /**
-   * Sets so that the meshobject is rendered after all fancy HW-shadow-stuff
-   */
-  virtual void SetDrawAfterShadow (bool drawAfter) = 0;
-  /** 
-   * Get if the meshobject is rendered after all fancy HW-shadow-stuff
-   */
-  virtual bool GetDrawAfterShadow () = 0;
   
   /**
    * Get the shader variable context of the mesh object.

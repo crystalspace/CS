@@ -29,9 +29,13 @@
 #include "imesh/protomesh.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
+#include "csutil/flags.h"
+#include "csutil/cscolor.h"
+
+struct iObjectRegistry;
 
 class csProtoMeshObjectFactory;
-struct iObjectRegistry;
+class csShaderVariableContext;
 
 #define PROTO_TRIS 12
 #define PROTO_VERTS 8

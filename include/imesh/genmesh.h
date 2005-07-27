@@ -20,19 +20,19 @@
 #define __CS_IMESH_GENMESH_H__
 
 #include "csutil/scf.h"
-#include "ivideo/rndbuf.h"
 
-class csVector3;
-class csVector2;
-class csColor;
-class csColor4;
-class csBox3;
-struct csTriangle;
-
-struct iMaterialWrapper;
+struct iDocumentNode;
 struct iGenMeshAnimationControl;
 struct iGenMeshAnimationControlFactory;
-struct iDocumentNode;
+struct iMaterialWrapper;
+struct iRenderBuffer;
+
+class csBox3;
+class csColor;
+class csColor4;
+struct csTriangle;
+class csVector2;
+class csVector3;
 
 SCF_VERSION (iGeneralMeshCommonState, 0, 0, 3);
 

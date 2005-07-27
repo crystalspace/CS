@@ -21,11 +21,11 @@
 #define __CS_CSVIEW_H__
 
 #include "csextern.h"
-#include "igeom/clip2d.h"
+
 #include "ivaria/view.h"
 
-class csPoly2D;
 class csBox2;
+class csPoly2D;
 
 /**
  * The csView class encapsulates the top-level Crystal Space

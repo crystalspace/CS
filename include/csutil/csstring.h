@@ -23,11 +23,9 @@
  * String utility class
  */
 
-#include <stdarg.h>
-#include <ctype.h>
 #include "csextern.h"
-#include "snprintf.h"
-#include "util.h"
+#include "csutil/snprintf.h"
+#include "csutil/util.h"
 
 /**
  * This is a string class with a range of useful operators and type-safe
@@ -148,8 +146,8 @@ public:
    * Append an unsigned character to this string.
    * \return Reference to itself.
    */
-  csStringBase& Append (unsigned char c)
-  { return Append(char(c)); }
+  /*csStringBase& Append (unsigned char c)
+  { return Append(char(c)); }*/
 
   /// Append a boolean (as a number -- 1 or 0) to this string.
   csStringBase& Append (bool b) { return Append (b ? "1" : "0"); }

@@ -29,6 +29,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/chainhull2d.h"
+#include "csgeom/vector2.h"
 
 static int compare_points_on_xy (void const* p1, void const* p2)
 {

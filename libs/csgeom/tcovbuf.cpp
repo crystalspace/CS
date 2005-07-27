@@ -44,7 +44,7 @@ void csCoverageTile::MakePrecalcTables ()
 {
   if (precalc_init) return;
   precalc_init = true;
-  int i, j;
+  unsigned int i, j;
   for (i = 0 ; i < NUM_TILEROW ; i++)
   {
     precalc_start_lines[i] = TILECOL_EMPTY;

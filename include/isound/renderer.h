@@ -21,7 +21,7 @@
 #ifndef __CS_ISOUND_RENDERER_H__
 #define __CS_ISOUND_RENDERER_H__
 
-#include "isound/source.h"
+#include "csutil/scf.h"
 
 struct iSoundListener;
 struct iSoundData;

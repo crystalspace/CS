@@ -19,18 +19,20 @@
 
 #include "cssysdef.h"
 #include <ctype.h>
+
 #include "cstool/initapp.h"
 #include "csutil/ansicolor.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
 #include "csutil/ref.h"
-#include "csutil/util.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 
 #define VFS_CONFIG_FILE	"vfs.cfg"

@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+
+#include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"
 
 #define EULERTOQUATCONST      0.0174532925199 // PI*1/(360/2)

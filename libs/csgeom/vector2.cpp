@@ -21,6 +21,7 @@
 #include <math.h>
 #include "csqsqrt.h"
 #include "csgeom/vector2.h"
+#include "csutil/csstring.h"
 
 csString csVector2::Description() const
 {

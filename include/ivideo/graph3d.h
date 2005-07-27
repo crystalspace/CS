@@ -29,45 +29,36 @@
  * \addtogroup gfx3d
  * @{ */
  
-#include "csutil/refarr.h"
 #include "csutil/scf.h"
-#include "csgeom/plane3.h"
-#include "csgeom/vector2.h"
+
 #include "csgeom/transfrm.h"
-#include "csgeom/tri.h"
-#include "csutil/cscolor.h"
+#include "csutil/strset.h"
+
 #include "ivideo/rndbuf.h"
-#include "ivideo/polyrender.h"
+
+struct iClipper2D;
+struct iGraphics2D;
+struct iHalo;
+struct iPolygonRenderer;
+struct iRenderBuffer;
+struct iRendererLightmap;
+struct iShader;
+struct iShaderVariableContext;
+struct iTextureHandle;
+struct iTextureManager;
+
+class csRect;
+class csPlane3;
+class csShaderVariable;
+class csVector2;
+class csVector3;
+class csVector4;
+
 
 struct csCoreRenderMesh;
 struct csRenderMeshModes;
-class csMatrix3;
-class csVector4;
-class csVector3;
-class csVector2;
-class csPlane3;
-class csRect;
-class csReversibleTransform;
-class csShaderVariable;
-
-struct iGraphics2D;
-struct iPolygonBuffer;
-struct iPolygonRenderer;
-struct iTextureManager;
-struct iTextureHandle;
-struct iMaterial;
-struct iClipper2D;
-struct iHalo;
-struct iRendererLightmap;
-struct csRGBpixel;
-struct csPixelFormat;
-struct csPolyTextureMapping;
-struct iRenderBuffer;
-struct iRenderBufferManager;
-struct iLightingManager;
-struct iShader;
-struct iShaderVariableContext;
 struct csRenderBufferHolder;
+
 
 /**\name iGraphics3D::BeginDraw() flags
  * @{ */

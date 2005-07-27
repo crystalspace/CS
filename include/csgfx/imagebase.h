@@ -29,8 +29,11 @@
 #define __CS_CSGFX_IMAGEBASE_H__
 
 #include "csextern.h"
-#include "csutil/util.h"
+
+#include "csutil/databuf.h"
+
 #include "igraphic/image.h"
+
 
 /**
  * Base class for iImage implementations. Cannot be instantiated itself.

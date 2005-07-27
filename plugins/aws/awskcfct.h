@@ -78,7 +78,7 @@ public:
     unsigned char b);
 
   /// Add a point key.
-  virtual void AddPointKey (const char* name, csPoint v);
+  virtual void AddPointKey (const char* name, csVector2 v);
 
   /// Add a connection node.
   virtual void AddConnectionNode (iAwsConnectionNodeFactory *node);

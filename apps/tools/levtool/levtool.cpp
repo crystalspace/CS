@@ -17,9 +17,8 @@
 */
 
 #include <stdarg.h>
-
 #include "cssysdef.h"
-#include "levtool.h"
+
 #include "csgeom/math3d.h"
 #include "csgeom/plane3.h"
 #include "csutil/util.h"
@@ -32,6 +31,9 @@
 #include "iutil/document.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
+#include "iutil/databuff.h"
+
+#include "levtool.h"
 
 //-----------------------------------------------------------------------------
 

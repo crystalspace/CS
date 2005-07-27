@@ -29,10 +29,11 @@
 
 #include <iutil/event.h>
 #include <iutil/eventh.h>
-#include <iutil/eventq.h>
-#include <iutil/objreg.h>
 
 #include <limits.h>
+
+struct iEventQueue;
+struct iObjectRegistry;
 
 // Max event type (in event type enumeration) that will be handled.
 #define _CSBASEEVENT_MAXARRAYINDEX csevFrameStart

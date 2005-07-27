@@ -28,19 +28,19 @@
  
 #include "csutil/scf.h"
 
-struct iRenderView;
-struct iFrustumView;
-struct iVisibilityObject;
-struct iMovable;
-struct iShadowReceiver;
-struct iMeshWrapper;
-struct iPolygonMesh;
-struct iObjectModel;
 struct iDocumentNode;
-class csVector3;
+struct iFrustumView;
+struct iMeshWrapper;
+struct iMovable;
+struct iObjectModel;
+struct iRenderView;
+struct iVisibilityObject;
+
 class csBox3;
-class csSphere;
 class csFlags;
+class csPlane3;
+class csSphere;
+class csVector3;
 
 SCF_VERSION (iVisibilityObjectIterator, 0, 1, 0);
 

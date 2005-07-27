@@ -18,6 +18,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
+
 #include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csutil/objreg.h"
@@ -30,6 +31,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+#include "iutil/databuff.h"
+
 #include "glshader_cgvp.h"
 #include "glshader_cg.h"
 

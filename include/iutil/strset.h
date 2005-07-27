@@ -24,8 +24,9 @@
  */
 /**\addtogroup util
  * @{ */
-#include <stdarg.h>
 #include "csutil/scf.h"
+
+#include "iutil/strset.h"
 
 /**
  * An identifier for a string. This identifier is equivalent to the contents

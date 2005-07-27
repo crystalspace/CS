@@ -20,10 +20,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "csutil/util.h"
+
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
+#include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 
 class csObjectRegistryIterator : public iObjectRegistryIterator
 {

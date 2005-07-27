@@ -1386,7 +1386,7 @@ yyreduce:
 
   case 34:
 
-    { yyval.key = new awsPointKey((iAws*)windowmgr, yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-6].str); ;}
+    { yyval.key = new awsPointKey((iAws*)windowmgr, yyvsp[-6].str, csVector2(yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-6].str); ;}
     break;
 
   case 35:

@@ -19,6 +19,14 @@
 #ifndef __CS_PMTOOLS_H__
 #define __CS_PMTOOLS_H__
 
+
+#include "csextern.h"
+
+#include "csgeom/polymesh.h"
+#include "csutil/array.h"
+
+struct csTriangle;
+
 /**\file 
  */
 /**
@@ -29,10 +37,6 @@ class csVector3;
 class csPlane3;
 struct iPolygonMesh;
 
-#include "csextern.h"
-
-#include "csutil/array.h"
-#include "csgeom/polymesh.h"
 
 /**
  * A definition of one edge.

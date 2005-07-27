@@ -19,16 +19,17 @@
 #ifndef __CS_POLY2D_H__
 #define __CS_POLY2D_H__
 
+#include "csextern.h"
+
+#include "csgeom/vector2.h"
 /**\file 
  */
 /**
  * \addtogroup geom_utils
  * @{ */
 
-#include "csextern.h"
-
-#include "csgeom/math2d.h"
-#include "csgeom/box.h"
+class csBox2;
+class csPlane2;
 
 struct iClipper2D;
 

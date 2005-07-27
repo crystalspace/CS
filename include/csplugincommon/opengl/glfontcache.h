@@ -24,7 +24,7 @@
 #include "csgeom/subrec.h"
 #include "csgeom/vector2.h"
 #include "csutil/dirtyaccessarray.h"
-
+#include "csutil/refarr.h"
 #include "csplugincommon/canvas/fontcache.h"
 
 class csGLStateCache;

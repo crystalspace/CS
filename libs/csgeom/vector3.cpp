@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include <math.h>
 #include <float.h>
-#include "csqint.h"
 #include "csqsqrt.h"
 #include "csgeom/vector3.h"
+#include "csutil/csstring.h"
 
 csString csVector3::Description() const
 {

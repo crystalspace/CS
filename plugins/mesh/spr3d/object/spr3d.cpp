@@ -17,33 +17,40 @@
 */
 
 #include "cssysdef.h"
+#include "csqsqrt.h"
+
 #include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
-#include "spr3d.h"
+
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/randomgen.h"
-#include "ivideo/graph3d.h"
-#include "iengine/camera.h"
-#include "iengine/rview.h"
-#include "iengine/movable.h"
-#include "iengine/light.h"
-#include "iengine/engine.h"
-#include "iengine/sector.h"
-#include "ivaria/reporter.h"
-#include "iutil/objreg.h"
-#include "iutil/cache.h"
-#include "iutil/object.h"
-#include "iutil/vfs.h"
-#include "iutil/cmdline.h"
-#include "csutil/memfile.h"
-#include "csutil/csmd5.h"
-#include "iengine/mesh.h"
-#include "csutil/csendian.h"
 #include "cstool/rbuflock.h"
-#include "csqsqrt.h"
+#include "csutil/csendian.h"
+#include "csutil/csmd5.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/memfile.h"
+#include "csutil/randomgen.h"
+
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/sector.h"
+#include "iutil/cache.h"
+#include "iutil/cmdline.h"
+#include "iutil/databuff.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+
+
+#include "spr3d.h"
+
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 

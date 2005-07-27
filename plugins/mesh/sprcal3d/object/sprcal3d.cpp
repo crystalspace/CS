@@ -17,33 +17,40 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-#include "csgfx/renderbuffer.h"
-#include "csutil/sysfunc.h"
-#include "sprcal3d.h"
+#include "csqsqrt.h"
+
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/sphere.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/randomgen.h"
+#include "csgfx/renderbuffer.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/cfgacc.h"
+#include "csutil/csendian.h"
+#include "csutil/csmd5.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/memfile.h"
+#include "csutil/randomgen.h"
+#include "csutil/sysfunc.h"
+
 #include "ivideo/graph3d.h"
 #include "iengine/camera.h"
-#include "iengine/rview.h"
-#include "iengine/movable.h"
-#include "iengine/light.h"
 #include "iengine/engine.h"
-#include "iengine/sector.h"
-#include "ivaria/reporter.h"
-#include "iutil/objreg.h"
-#include "iutil/cache.h"
-#include "iutil/object.h"
-#include "iutil/vfs.h"
-#include "csutil/memfile.h"
-#include "csutil/csmd5.h"
+#include "iengine/light.h"
 #include "iengine/mesh.h"
-#include "csutil/csendian.h"
-#include "csqsqrt.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/sector.h"
+#include "iutil/cache.h"
+#include "iutil/databuff.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/vfs.h"
+
+#include "ivaria/reporter.h"
+
+
+#include "sprcal3d.h"
 
 // STL include required by cal3d
 #include <string>

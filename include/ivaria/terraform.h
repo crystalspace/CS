@@ -19,17 +19,15 @@
 #ifndef __CS_IVARIA_TERRAFORM_H__
 #define __CS_IVARIA_TERRAFORM_H__
 
-#include "csgeom/box.h"
-#include "csgeom/vector2.h"
-#include "csgeom/vector3.h"
-
-#include "csutil/array.h"
-#include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/strset.h"
 
-#include "iengine/material.h"
-
+struct iMaterialWrapper;
 struct iTerraSampler;
+
+class csBox2;
+class csVector2;
+class csVector3;
 
 SCF_VERSION (iTerraFormer, 0, 0, 1);
 

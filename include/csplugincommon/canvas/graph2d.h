@@ -24,19 +24,19 @@
  */
 
 #include "csextern.h"
+
+#include "csutil/cfgacc.h"
 #include "csutil/scf.h"
 #include "csutil/weakref.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/natwin.h"
-#include "iutil/eventh.h"
+
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
-#include "iutil/pluginconfig.h"
-#include "csutil/cfgacc.h"
+#include "iutil/eventh.h"
 #include "iutil/plugin.h"
-
-#include "fontcache.h"
+#include "iutil/pluginconfig.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 
 /**
  * \addtogroup plugincommon
@@ -44,6 +44,8 @@
 
 struct iObjectRegistry;
 struct iPluginManager;
+
+class csFontCache;
 
 /**
  * This is the base class for 2D canvases. Plugins should derive their 

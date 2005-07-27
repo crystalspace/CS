@@ -29,8 +29,11 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
+#include "csutil/flags.h"
+#include "csutil/hash.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
+#include "csutil/strhash.h"
 #include "csutil/stringarray.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshskel.h"
@@ -38,7 +41,6 @@
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
 #include "ivaria/dynamics.h"
-#include "csutil/flags.h"
 
 class csGenmeshSkelAnimationControl;
 class csGenmeshSkelAnimationControlFactory;

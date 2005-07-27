@@ -20,6 +20,8 @@
 #ifndef __CS_IVIDEO_LIGHTING_H__
 #define __CS_IVIDEO_LIGHTING_H__
 
+#include "csutil/scf.h"
+
 struct iLightingManager : public iBase
 {
 };

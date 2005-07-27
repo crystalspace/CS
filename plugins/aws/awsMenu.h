@@ -157,7 +157,7 @@ protected:
   awsMenu* parent_menu;
 
   /// The current position of the mouse.
-  csPoint mouse_pos;
+  csVector2 mouse_pos;
 
   /// A slots and sink for receiving events.
   awsSlot slot_select, slot_close;

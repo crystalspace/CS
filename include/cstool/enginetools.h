@@ -20,9 +20,11 @@
 
 #include "csextern.h"
 
-#include "csgeom/vector3.h"
+#include "csutil/array.h"
 
 struct iSector;
+
+class csVector3;
 
 /**
  * This is a class with static helper functions for working on engine

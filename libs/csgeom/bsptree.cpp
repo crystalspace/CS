@@ -16,12 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "csqint.h"
-#include "csqsqrt.h"
+
+#include "csgeom/bsptree.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tri.h"
-#include "csgeom/bsptree.h"
+#include "csutil/set.h"
 
 //---------------------------------------------------------------------------
 

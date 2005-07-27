@@ -20,10 +20,11 @@
 #ifndef __CS_IUTIL_EVENT_H__
 #define __CS_IUTIL_EVENT_H__
 
-#include "iutil/evdefs.h"
-#include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/csunicode.h"
+
+#include "iutil/evdefs.h"
+
 
 /**\file
  * Event system related interfaces

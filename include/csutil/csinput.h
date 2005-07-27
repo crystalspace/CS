@@ -27,9 +27,11 @@
  */
 
 #include "csextern.h"
-#include "scf.h"
-#include "array.h"
-#include "hash.h"
+
+#include "csutil/array.h"
+#include "csutil/hash.h"
+#include "csutil/scf.h"
+
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

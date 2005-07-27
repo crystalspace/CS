@@ -18,10 +18,14 @@
 
 #include "cssysdef.h"
 
-#include "ivideo/rendermesh.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/vertexlight.h"
 #include "csgfx/shadervar.h"
+
+#include "imap/services.h"
+#include "iutil/document.h"
+#include "ivideo/rendermesh.h"
+
 #include "vproc_program.h"
 
 CS_LEAKGUARD_IMPLEMENT (csVProcStandardProgram);

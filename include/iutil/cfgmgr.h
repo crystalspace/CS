@@ -24,7 +24,10 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
+
 #include "iutil/cfgfile.h"
+
+struct iVFS;
 
 SCF_VERSION(iConfigManager, 0, 0, 3);
 

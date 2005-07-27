@@ -19,7 +19,7 @@
 #ifndef __CS_UTIL_SET_H__
 #define __CS_UTIL_SET_H__
 
-#include "hash.h"
+#include "csutil/hash.h"
 
 /**\file
  * A basic set for objects.

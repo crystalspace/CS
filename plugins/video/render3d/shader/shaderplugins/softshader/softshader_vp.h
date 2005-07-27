@@ -20,10 +20,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __SOFTSHADER_VP_H__
 #define __SOFTSHADER_VP_H__
 
-#include "ivideo/shader/shader.h"
-#include "csutil/strhash.h"
 #include "csgfx/shadervarcontext.h"
 #include "csplugincommon/shader/shaderplugin.h"
+#include "csutil/strhash.h"
+#include "ivideo/shader/shader.h"
+
+struct iDataBuffer;
 
 class csSoftShader_VP : public iShaderProgram
 {

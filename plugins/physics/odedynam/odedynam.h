@@ -29,6 +29,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
 

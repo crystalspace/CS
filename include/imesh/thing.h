@@ -20,23 +20,19 @@
 #define __CS_IMESH_THING_H__
 
 #include "csutil/scf.h"
-#include "csutil/flags.h"
 
-class csVector2;
-class csVector3;
-class csMatrix3;
-class csPlane3;
-struct iSector;
-struct iGraphics3D;
-struct iFrustumView;
 struct iMaterialWrapper;
-struct iMaterialList;
-struct iMovable;
 struct iMeshObject;
 struct iMeshObjectFactory;
+struct iRenderBuffer;
 struct iThingState;
 struct iThingFactoryState;
-struct iRenderBuffer;
+
+class csFlags;
+class csMatrix3;
+class csPlane3;
+class csVector2;
+class csVector3;
 
 /**
  * A range structure for specifing polygon ranges.

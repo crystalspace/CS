@@ -28,12 +28,10 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "csgeom/plane3.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/plane3.h"
 #include "csgeom/vector3.h"
 
-class csVector3;
-class csMatrix3;
 struct csRenderMesh;
 struct iUserRenderBufferIterator;
 

@@ -19,13 +19,16 @@
 
 #include "cssysdef.h"
 
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
-#include "iutil/document.h"
-#include "iutil/objreg.h"
 #include "cstool/proctxtanim.h"
 
+#include "iutil/document.h"
+#include "iutil/objreg.h"
+#include "igraphic/animimg.h"
+#include "igraphic/image.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 //----------------------------------------------------------------------------
 
 csProcAnimated::csProcAnimated (iImage* img) : csProcTexture (0, img)

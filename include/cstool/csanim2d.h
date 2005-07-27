@@ -22,11 +22,13 @@
 
 #include "csextern.h"
 
+#include "cstool/cspixmap.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
-#include "cstool/cspixmap.h"
 
 struct iGraphics3D;
+struct iTextureHandle;
+
 class csPixmap;
 class csAnimatedPixmap;
 

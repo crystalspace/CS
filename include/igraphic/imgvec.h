@@ -23,13 +23,12 @@
 /**\file
  * Image List 
  */
- 
 
-#include "csutil/ref.h"
+#include "csutil/scf.h"
+
 struct iImage;
 
 SCF_VERSION (iImageVector, 0, 2, 0);
-
 struct iImageVector : public iBase
 {
   /**

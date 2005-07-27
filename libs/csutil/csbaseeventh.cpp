@@ -17,9 +17,12 @@
 */
 
 
-#include <cssysdef.h>
-#include <csutil/csbaseeventh.h>
-#include <csutil/event.h>
+#include "cssysdef.h"
+#include "csutil/csbaseeventh.h"
+#include "csutil/event.h"
+#include "csutil/objreg.h"
+
+#include "iutil/eventq.h"
 
 SCF_IMPLEMENT_IBASE (csBaseEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)

@@ -20,7 +20,8 @@
 #ifndef __CS_IENGINE_RENDERSTEPS_IGENERIC_H__
 #define __CS_IENGINE_RENDERSTEPS_IGENERIC_H__
 
-#include "iutil/strset.h"
+#include "csutil/scf.h"
+
 #include "ivideo/graph3d.h"
 
 /**\file

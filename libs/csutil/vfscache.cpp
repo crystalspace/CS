@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
+#include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"

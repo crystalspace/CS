@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cstool/pen.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
 
 
 csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d)

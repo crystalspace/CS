@@ -19,28 +19,33 @@
 #ifndef __CS_CURVE_H__
 #define __CS_CURVE_H__
 
-#include "csutil/scf.h"
-#include "csgeom/math3d.h"
-#include "csgeom/math2d.h"
 #include "csgeom/box.h"
+#include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
+#include "csgeom/tri.h"
+#include "csutil/csobject.h"
+#include "csutil/scf.h"
+#include "iengine/material.h"
+#include "imesh/bezier.h"
+#include "ivideo/graph3d.h"
+
 #include "bezier2.h"
 #include "clightmap.h"
-#include "csutil/csobject.h"
-#include "imesh/bezier.h"
-#include "iengine/material.h"
-#include "ivideo/graph3d.h"
 
 
 class csBezierMesh;
 class csBezierMeshObjectType;
 class csCurveTemplate;
 class csBezierLightPatch;
-struct iFrustumView;
+
 struct csCoverageMatrix;
-struct iMaterialHandle;
-struct iMaterialWrapper;
+struct csTriangle;
+
 struct iCacheManager;
 struct iCamera;
+struct iFrustumView;
+struct iMaterialHandle;
+struct iMaterialWrapper;
 
 /**
  * Tesselated curve. This is basically a list of triangles.

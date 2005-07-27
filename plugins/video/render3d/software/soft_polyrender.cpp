@@ -18,8 +18,10 @@
 */
 
 #include "cssysdef.h"
+
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 
 #include "soft_polyrender.h"

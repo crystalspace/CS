@@ -19,16 +19,18 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math3d.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/polyclip.h"
+#include "csgfx/shadervarcontext.h"
+#include "csutil/flags.h"
+#include "csutil/sysfunc.h"
+
 #include "iengine/camera.h"
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-#include "csgeom/poly2d.h"
-#include "csgeom/poly3d.h"
-#include "csgeom/polyclip.h"
-#include "csutil/flags.h"
-#include "csutil/sysfunc.h"
-#include "csgfx/shadervarcontext.h"
 
 #include "portalnode.h"
 

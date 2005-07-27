@@ -20,8 +20,8 @@
 #define __CS_IMESH_MDLCONV_H__
 
 #include "csutil/scf.h"
-#include "iutil/databuff.h"
 
+struct iDataBuffer;
 struct iModelData;
 
 /**

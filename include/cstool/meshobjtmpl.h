@@ -21,12 +21,16 @@
 
 #include "csextern.h"
 
-#include "csutil/refarr.h"
-#include "iengine/material.h"
-#include "iengine/engine.h"
-#include "iengine/mesh.h"
-#include "imesh/object.h"
+#include "csgeom/box.h"
 #include "csgeom/objmodel.h"
+#include "csutil/flags.h"
+#include "csutil/refarr.h"
+
+#include "imesh/object.h"
+#include "iutil/comp.h"
+
+struct iEngine;
+
 
 /// Declare a simple mesh factory class
 #define CS_DECLARE_SIMPLE_MESH_FACTORY(name,meshclass)                      \

@@ -17,14 +17,18 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/ref.h"
+
+#include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
-#include "iutil/objreg.h"
+#include "csutil/ref.h"
+#include "imesh/particles.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
-#include "imesh/particles.h"
+#include "iutil/objreg.h"
+
 #include "simplephys.h"
 
 CS_IMPLEMENT_PLUGIN

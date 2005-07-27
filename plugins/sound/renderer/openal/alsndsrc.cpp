@@ -17,7 +17,10 @@
 */
 
 #include "cssysdef.h"
+
+#include "csgeom/vector3.h"
 #include "csutil/scf.h"
+
 #include "ivaria/reporter.h"
 
 #include "alsndrdr.h"

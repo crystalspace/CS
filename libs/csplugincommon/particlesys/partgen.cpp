@@ -17,29 +17,31 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #include "cssysdef.h"
+#include <math.h>
+
 #include "csgfx/renderbuffer.h"
+#include "csgeom/box.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
-#include "csgeom/box.h"
+#include "csgeom/tri.h"
+#include "csplugincommon/particlesys/partgen.h"
 #include "cstool/rbuflock.h"
+
 #include "imesh/object.h"
-#include "iengine/mesh.h"
-#include "iengine/rview.h"
 #include "iengine/camera.h"
+#include "iengine/engine.h"
 #include "iengine/material.h"
-#include "iutil/plugin.h"
-#include "iutil/eventh.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "imesh/sprite2d.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/plugin.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
-#include "imesh/sprite2d.h"
-#include "iengine/movable.h"
 #include "ivideo/rendermesh.h"
-#include "csplugincommon/particlesys/partgen.h"
-#include <math.h>
-#include <stdlib.h>
 
 SCF_IMPLEMENT_IBASE (csParticleSystem)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)

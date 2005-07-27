@@ -26,11 +26,7 @@
 
 #include "csextern.h"
 
-#include "csutil/array.h"
-#include "csutil/blockallocator.h"
-#include "csutil/dirtyaccessarray.h"
-
-#include "framedataholder.h"
+#include "cstool/framedataholder.h"
 
 struct csRenderMesh;
 

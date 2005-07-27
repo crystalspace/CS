@@ -216,7 +216,7 @@ public:
    * call this method directly.
    * @return the origin of the cell in the top-left corner of the layout grid.
    */
-  csPoint getLayoutOrigin ();
+  csVector2 getLayoutOrigin ();
 
   /**
    * Determines column widths and row heights for the layout grid.
@@ -255,7 +255,7 @@ public:
    * @return an ordered pair of indexes that indicate which cell in the
    * layout grid contains the point (<i>x</i>,&nbsp;<i>y</i>).
    */
-  csPoint location (int x, int y);
+  csVector2 location (int x, int y);
 
   /**
    * Adds the specified component to the layout, using the specified

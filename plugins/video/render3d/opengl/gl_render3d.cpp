@@ -23,53 +23,46 @@
 
 #include "csqint.h"
 
-#include "csgfx/csimgvec.h"
-#include "csgfx/memimage.h"
-#include "csgfx/renderbuffer.h"
-
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
-
+#include "csgfx/csimgvec.h"
+#include "csgfx/memimage.h"
+#include "csgfx/renderbuffer.h"
+#include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glhelper.h"
+#include "csplugincommon/render3d/normalizationcube.h"
+#include "csplugincommon/render3d/txtmgr.h"
+#include "cstool/bitmasktostr.h"
+#include "cstool/fogmath.h"
+#include "cstool/rbuflock.h"
+#include "csutil/event.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
-#include "csutil/event.h"
-
-#include "cstool/bitmasktostr.h"
-#include "cstool/fogmath.h"
-#include "cstool/rbuflock.h"
 
 #include "igeom/clip2d.h"
-
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
-#include "iutil/plugin.h"
+#include "iutil/dbghelp.h"
 #include "iutil/eventq.h"
-
+#include "iutil/plugin.h"
 #include "ivaria/reporter.h"
-
-#include "ivideo/lighting.h"
-#include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/rendermesh.h"
 #include "ivideo/halo.h"
-
+#include "ivideo/lighting.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/txtmgr.h"
 
+#include "gl_polyrender.h"
+#include "gl_r2t_framebuf.h"
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 #include "gl_txtmgr.h"
-#include "gl_polyrender.h"
-#include "gl_r2t_framebuf.h"
 #include "gl_r2t_ext_fb_o.h"
 
-#include "csplugincommon/opengl/glextmanager.h"
-#include "csplugincommon/opengl/glhelper.h"
-
-#include "csplugincommon/render3d/txtmgr.h"
-#include "csplugincommon/render3d/normalizationcube.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 

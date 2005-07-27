@@ -17,12 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "plugins/engine/3d/material.h"
-#include "plugins/engine/3d/engine.h"
+#include "csqint.h"
+
 #include "csutil/debug.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
+#include "plugins/engine/3d/engine.h"
+#include "plugins/engine/3d/material.h"
 
 CS_LEAKGUARD_IMPLEMENT (csMaterial);
 CS_LEAKGUARD_IMPLEMENT (csMaterialWrapper);

@@ -17,7 +17,10 @@
 */
 
 #include "cssysdef.h"
+
 #include "cstool/cspixmap.h"
+
+#include "ivideo/texture.h"
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
 {

@@ -21,6 +21,8 @@
  * Token list helper macros.
  */
 
+#include "csutil/strhash.h"
+
 /**
  * \addtogroup util
  * @{ */

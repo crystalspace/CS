@@ -20,16 +20,17 @@
 #define __CS_BSPTREE_H__
 
 #include "csextern.h"
-#include "plane3.h"
+
+#include "csgeom/plane3.h"
 #include "csutil/array.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/hash.h"
 #include "csutil/blockallocator.h"
-#include "csutil/set.h"
+#include "csutil/dirtyaccessarray.h"
 
 struct iGraphics3D;
+
+template<class T>
+class csSet;
 struct csTriangle;
-class csBSPTree;
 
 /**
  * This BSP-tree is a binary tree that organizes a triangle mesh.

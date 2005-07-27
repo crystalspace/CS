@@ -20,8 +20,8 @@
 #ifndef __CS_UTIL_REDBLACKTREE_H__
 #define __CS_UTIL_REDBLACKTREE_H__
 
-#include "blockallocator.h"
-#include "comparator.h"
+#include "csutil/blockallocator.h"
+#include "csutil/comparator.h"
 
 /**\file
  * An implementation of red-black-trees.

@@ -22,19 +22,17 @@
 
 #include "csextern.h"
 
-#include <stdarg.h>
 #include "csutil/csobject.h"
+#include "csutil/ref.h"
 #include "itexture/iproctex.h"
 #include "iengine/texture.h"
-#include "iutil/eventh.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "itexture/itexfact.h"
-#include "csqint.h"
 
-struct iMaterialWrapper;
+
 struct iEngine;
-
+struct iEventHandler;
+struct iGraphics2D;
+struct iGraphics3D;
+struct iMaterialWrapper;
 struct iObjectRegistry;
 struct iTextureManager;
 struct iTextureWrapper;

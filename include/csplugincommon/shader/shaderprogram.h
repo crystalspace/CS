@@ -22,23 +22,18 @@
 
 #include "csextern.h"
 #include "csutil/array.h"
-#include "csutil/csstring.h"
 #include "csutil/ref.h"
 #include "csutil/strhash.h"
-#include "csgfx/shadervar.h"
-#include "csgfx/shadervarcontext.h"
 
 #include "csutil/leakguard.h"
-#include "iutil/databuff.h"
-#include "iutil/document.h"
-#include "iutil/objreg.h"
 #include "iutil/strset.h"
-#include "iutil/vfs.h"
-#include "imap/services.h"
 
-#include "shaderplugin.h"
+#include "csplugincommon/shader/shaderplugin.h"
 
 struct iDataBuffer;
+struct iFile;
+struct iSyntaxService;
+struct iObjectRegistry;
 
 /**
  * Baseclass for iShaderProgram plugins.

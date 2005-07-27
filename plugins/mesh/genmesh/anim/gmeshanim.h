@@ -19,13 +19,14 @@
 #ifndef __CS_GENMESHANIM_H__
 #define __CS_GENMESHANIM_H__
 
-#include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
 #include "csutil/array.h"
-#include "csutil/parray.h"
-#include "csutil/stringarray.h"
-#include "csutil/csstring.h"
 #include "csutil/cscolor.h"
+#include "csutil/csstring.h"
+#include "csutil/parray.h"
+#include "csutil/strhash.h"
+#include "csutil/stringarray.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "iutil/comp.h"

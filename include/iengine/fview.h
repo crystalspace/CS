@@ -25,18 +25,18 @@
  * \addtogroup engine3d_vis
  * @{ */
  
+#include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csgeom/plane3.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/box.h"
+
+#include "csgeom/frustum.h"
+
 #include "iengine/shadows.h"
+
 
 struct iFrustumView;
 struct iMeshWrapper;
 class csFrustum;
 class csFrustumContext;
-class csObject;
-class csOctreeNode;
 
 
 SCF_VERSION (iFrustumViewUserdata, 0, 0, 1);

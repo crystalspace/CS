@@ -19,22 +19,27 @@
 #ifndef __CS_FOLIAGEMESH_H__
 #define __CS_FOLIAGEMESH_H__
 
-#include "csgeom/vector3.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/vector3.h"
+#include "cstool/rendermeshholder.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
-#include "cstool/rendermeshholder.h"
-#include "igeom/objmodel.h"
-#include "iutil/comp.h"
-#include "imesh/foliage.h"
-#include "imesh/object.h"
-#include "ivideo/graph3d.h"
-#include "ivaria/terraform.h"
 #include "iengine/lod.h"
 #include "iengine/sharevar.h"
+#include "igeom/objmodel.h"
+#include "imesh/foliage.h"
+#include "imesh/object.h"
+#include "iutil/comp.h"
+#include "ivaria/terraform.h"
+#include "ivideo/graph3d.h"
+#include "csutil/flags.h"
 
 class csFoliageMeshObjectFactory;
+
+class csShaderVariableContext;
+
 struct iObjectRegistry;
+
 
 #define PROTO_TRIS 12
 #define PROTO_VERTS 8

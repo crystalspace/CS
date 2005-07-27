@@ -17,23 +17,23 @@
 */
 
 #include "cssysdef.h"
+
+#include "csutil/cscolor.h"
 #include "csutil/sysfunc.h"
 
+#include "iengine/material.h"
+#include "iengine/mesh.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
 #include "imap/loader.h"
-
-#include "iutil/plugin.h"
-#include "iutil/document.h"
-#include "iutil/objreg.h"
-#include "iutil/comp.h"
-#include "iutil/vfs.h"
-
-#include "iengine/mesh.h"
-#include "iengine/material.h"
-
 #include "imesh/object.h"
 #include "imesh/terrain.h"
+#include "iutil/comp.h"
+#include "iutil/document.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "ivaria/terraform.h"
 
 #include "terrainldr.h"
 

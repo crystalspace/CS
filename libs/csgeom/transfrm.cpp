@@ -19,9 +19,13 @@
 
 #include "cssysdef.h"
 #include <math.h>
-#include "csgeom/matrix3.h"
-#include "csgeom/transfrm.h"
 #include "csqsqrt.h"
+
+#include "csgeom/matrix3.h"
+#include "csgeom/plane3.h"
+#include "csgeom/sphere.h"
+#include "csgeom/transfrm.h"
+
 
 //---------------------------------------------------------------------------
 csTransform csTransform::GetReflect (const csPlane3 &pl)

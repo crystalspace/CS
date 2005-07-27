@@ -24,7 +24,7 @@
  * A FIFO.
  */
 
-#include "array.h"
+#include "csutil/array.h"
 
 /**
  * A FIFO implemented on top of csArray<>, but faster than using just
