@@ -11,6 +11,11 @@ chronological order.
 	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"
 	  blocks and later invoke them with "<?SomeTemplate?>", which is 
 	  replaced by the document nodes that appear in the earlier definition.
+	- Marten cleaned up some header-in-header includes. More work needed
+	  when someone have time.
+	- Marten deprecated csPoint and FastSqrt. Use csVector2 resp sqrtf
+	  instead.
+	- Marten removed some left-overs from terrfunc (since long removed).
 25-Jul-2005
 	- mdmkolbe removed an unused local variable.
 	- mdmkolbe added CS_PRIn64 macros for passing to csPrintf et al, and
