@@ -24,6 +24,7 @@
 #include "csutil/scfstringarray.h"
 #include "csutil/physfile.h"
 #include "csutil/scfstr.h"
+#include "csutil/syspath.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
