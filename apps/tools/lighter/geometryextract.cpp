@@ -22,6 +22,7 @@
 
 #include "csgeom/poly3d.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
