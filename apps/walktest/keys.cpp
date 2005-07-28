@@ -296,28 +296,28 @@ void WalkTest::Rotate (float speed)
 
 #undef WLK_ACCELERATE
 #define WLK_ACCELERATE(c) \
-  if (velocity.##c < desired_velocity.##c) \
+  if (velocity. c < desired_velocity. c) \
   { \
-    velocity.##c += cfg_walk_accelerate * elapsed; \
-    if (velocity.##c > desired_velocity.##c) velocity.##c = desired_velocity.##c; \
+    velocity. c += cfg_walk_accelerate * elapsed; \
+    if (velocity. c > desired_velocity. c) velocity. c = desired_velocity. c; \
   } \
   else \
   { \
-    velocity.##c -= cfg_walk_accelerate * elapsed; \
-    if (velocity.##c < desired_velocity.##c) velocity.##c = desired_velocity.##c; \
+    velocity. c -= cfg_walk_accelerate * elapsed; \
+    if (velocity. c < desired_velocity. c) velocity. c = desired_velocity. c; \
   }
 
 #undef WLK_ROT_ACCELERATE
 #define WLK_ROT_ACCELERATE(c) \
-  if (angle_velocity.##c < desired_angle_velocity.##c) \
+  if (angle_velocity. c < desired_angle_velocity. c) \
   { \
-    angle_velocity.##c += cfg_rotate_accelerate * elapsed; \
-    if (angle_velocity.##c > desired_angle_velocity.##c) angle_velocity.##c = desired_angle_velocity.##c; \
+    angle_velocity. c += cfg_rotate_accelerate * elapsed; \
+    if (angle_velocity. c > desired_angle_velocity. c) angle_velocity. c = desired_angle_velocity. c; \
   } \
   else \
   { \
-    angle_velocity.##c -= cfg_rotate_accelerate * elapsed; \
-    if (angle_velocity.##c < desired_angle_velocity.##c) angle_velocity.##c = desired_angle_velocity.##c; \
+    angle_velocity. c -= cfg_rotate_accelerate * elapsed; \
+    if (angle_velocity. c < desired_angle_velocity. c) angle_velocity. c = desired_angle_velocity. c; \
   }
 
 void WalkTest::InterpolateMovement ()
