@@ -51,7 +51,6 @@ package cspace;
 *__mult_ass__ = *cspacec::__mult_ass__;
 *__divide_ass__ = *cspacec::__divide_ass__;
 *__div__ = *cspacec::__div__;
-*fSqr = *cspacec::fSqr;
 *__subtr__ = *cspacec::__subtr__;
 *__add__ = *cspacec::__add__;
 *__mult__ = *cspacec::__mult__;
@@ -2361,47 +2360,6 @@ sub DESTROY {
 }
 
 *Clone = *cspacec::csCatmullRomSpline_Clone;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csPoint ##############
-
-package cspace::csPoint;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_x_get = *cspacec::csPoint_x_get;
-*swig_x_set = *cspacec::csPoint_x_set;
-*swig_y_get = *cspacec::csPoint_y_get;
-*swig_y_set = *cspacec::csPoint_y_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPoint(@_);
-    bless $self, $pkg if defined($self);
-}
-
-*Set = *cspacec::csPoint_Set;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csPoint($self);
-        delete $OWNER{$self};
-    }
-}
-
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -5573,11 +5531,7 @@ package cspace::iMeshWrapper;
 *GetStaticLOD = *cspacec::iMeshWrapper_GetStaticLOD;
 *AddMeshToStaticLOD = *cspacec::iMeshWrapper_AddMeshToStaticLOD;
 *RemoveMeshFromStaticLOD = *cspacec::iMeshWrapper_RemoveMeshFromStaticLOD;
-*DrawShadow = *cspacec::iMeshWrapper_DrawShadow;
-*DrawLight = *cspacec::iMeshWrapper_DrawLight;
 *CastHardwareShadow = *cspacec::iMeshWrapper_CastHardwareShadow;
-*SetDrawAfterShadow = *cspacec::iMeshWrapper_SetDrawAfterShadow;
-*GetDrawAfterShadow = *cspacec::iMeshWrapper_GetDrawAfterShadow;
 *GetSVContext = *cspacec::iMeshWrapper_GetSVContext;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
