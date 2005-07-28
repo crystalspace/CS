@@ -114,6 +114,7 @@
 // Precompiled Header
 #include "Stdafx.h"
 
+using namespace cspluginOpcode;
 using namespace cspluginOpcode::Opcode;
 
 #include "OPC_RayAABBOverlap.h"
@@ -336,7 +337,7 @@ bool RayCollider::Collide(const Ray& world_ray, const Model& model, const Matrix
  *	\warning	SCALE NOT SUPPORTED. The matrix must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL RayCollider::InitQuery(const Ray& world_ray, const Matrix4x4* world, udword* face_id)
+bool RayCollider::InitQuery(const Ray& world_ray, const Matrix4x4* world, udword* face_id)
 {
 	// Reset stats & contact status
 	Collider::InitQuery();

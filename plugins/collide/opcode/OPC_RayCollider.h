@@ -215,11 +215,11 @@
 							void			_RayStab(const AABBQuantizedNoLeafNode* node);
 							void			_RayStab(const AABBTreeNode* node, Container& box_indices);
 			// Overlap tests
-		inline_				BOOL			RayAABBOverlap(const Point& center, const Point& extents);
-		inline_				BOOL			SegmentAABBOverlap(const Point& center, const Point& extents);
-		inline_				BOOL			RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
+		inline_				bool			RayAABBOverlap(const Point& center, const Point& extents);
+		inline_				bool			SegmentAABBOverlap(const Point& center, const Point& extents);
+		inline_				bool			RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
 			// Init methods
-							BOOL			InitQuery(const Ray& world_ray, const Matrix4x4* world=null, udword* face_id=null);
+							bool			InitQuery(const Ray& world_ray, const Matrix4x4* world=null, udword* face_id=null);
 	};
 
 #endif // __OPC_RAYCOLLIDER_H__

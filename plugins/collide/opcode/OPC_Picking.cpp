@@ -19,6 +19,7 @@
 // Precompiled Header
 #include "Stdafx.h"
 
+using namespace cspluginOpcode;
 using namespace cspluginOpcode::Opcode;
 
 #ifdef OPC_RAYHIT_CALLBACK

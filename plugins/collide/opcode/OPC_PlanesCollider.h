@@ -100,10 +100,10 @@
 							void			_CollideNoPrimitiveTest(const AABBQuantizedNode* node, udword clip_mask);
 							void			_CollideNoPrimitiveTest(const AABBQuantizedNoLeafNode* node, udword clip_mask);
 			// Overlap tests
-		inline_				BOOL			PlanesAABBOverlap(const Point& center, const Point& extents, udword& out_clip_mask, udword in_clip_mask);
-		inline_				BOOL			PlanesTriOverlap(udword in_clip_mask);
+		inline_				bool			PlanesAABBOverlap(const Point& center, const Point& extents, udword& out_clip_mask, udword in_clip_mask);
+		inline_				bool			PlanesTriOverlap(udword in_clip_mask);
 			// Init methods
-							BOOL			InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm=null);
+							bool			InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm=null);
 	};
 
 	class OPCODE_API HybridPlanesCollider : public PlanesCollider

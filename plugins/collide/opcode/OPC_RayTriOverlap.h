@@ -13,7 +13,7 @@
  *	\return		true on overlap. mStabbedFace is filled with relevant info.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ BOOL RayCollider::RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2)
+inline_ bool RayCollider::RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2)
 {
 	// Stats
 	mNbRayPrimTests++;

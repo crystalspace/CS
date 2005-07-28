@@ -30,6 +30,7 @@
 // Precompiled Header
 #include "Stdafx.h"
 
+using namespace cspluginOpcode;
 using namespace cspluginOpcode::Opcode;
 
 #include "OPC_PlanesAABBOverlap.h"
@@ -174,7 +175,7 @@ bool PlanesCollider::Collide(PlanesCache& cache, const Plane* planes, udword nb_
  *	\warning	SCALE NOT SUPPORTED. The matrix must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL PlanesCollider::InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm)
+bool PlanesCollider::InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm)
 {
 	// 1) Call the base method
 	VolumeCollider::InitQuery();
