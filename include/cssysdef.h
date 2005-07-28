@@ -89,7 +89,7 @@
  * \param var Name of the array to be allocated.
  * \param size Number of elements to be allocated.
  */
-#ifdef CS_COMPILER_GCC
+#if defined(CS_COMPILER_GCC) && !defined(__STRICT_ANSI__)
 // In GCC we are able to declare stack vars of dynamic size directly
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
      type var [size]
@@ -97,6 +97,9 @@
 #  include <malloc.h>
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
      type *var = (type *)alloca ((size) * sizeof (type))
+#  if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__)
+#    define alloca(x) __builtin_alloca(x)
+#  endif
 #endif
 
 /**\def CS_TEMP_DIR

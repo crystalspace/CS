@@ -8,6 +8,7 @@ chronological order.
 
 28-Jul-2005
 	- mdmkolbe fixed some more fallout from the include cleanup.
+	- mdmkolbe fixed some pedantic issues.
 27-Jul-2005
 	- res added support for "templates" to the XML shader conditions.
 	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"
