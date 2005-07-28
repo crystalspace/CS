@@ -100,8 +100,8 @@ public:
     }
   #else
     // Make -Wall happy
-    image = image;
-    filename = filename;
+    (void)image;
+    (void)filename;
   #endif
   }
 };
