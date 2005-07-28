@@ -2240,6 +2240,20 @@ bool csVFS::TryChDirAuto(char const* dir, char const* filename)
   return ok && ChDir(dir);
 }
 
+static bool IsZipFile (const char* path)
+{
+  FILE* f = fopen (path, "rb");
+  if (!f) return false;
+
+  char header[4];
+  bool ret = ((fread (header, sizeof(header), 1, f) == 1)
+    && (header[0] == 'P') && (header[1] == 'K')
+    && (header[2] ==   3) && (header[3] ==   4));
+  fclose (f);
+
+  return ret;
+}
+
 bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
 	const char* vfspath, const char* filename)
 {
@@ -2259,8 +2273,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   }
 
   // First check if it is a zip file.
-  size_t pathlen = strlen (path);
-  bool is_zip = pathlen >= 5 && !strcasecmp (path+pathlen-4, ".zip");
+  bool is_zip = IsZipFile (path);
   char* npath = TransformPath (path, !is_zip);
 
   // See if we have to generate a unique VFS name.

@@ -25,6 +25,8 @@ chronological order.
 	  target is set/cleared instead of BeginDraw()/FinishDraw(). This works
 	  around problems were the clipping rect was restored but the viewport
 	  was not yet, causing the clipping to be wrong.
+	- res changed csVFS::ChDirAuto() to check whether a file is a .zip by
+	  looking at ist content, not it's name.
 27-Jul-2005
 	- res added support for "templates" to the XML shader conditions.
 	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"
