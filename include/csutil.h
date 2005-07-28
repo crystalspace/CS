@@ -56,6 +56,7 @@
 #include "csutil/datastrm.h"
 #include "csutil/debug.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/documentcommon.h"
 #include "csutil/event.h"
 #include "csutil/evoutlet.h"
 #include "csutil/fifo.h"
