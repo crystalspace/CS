@@ -216,7 +216,6 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
 {
   Template& templNodes = *(state->templ);
   csRef<iDocumentNode> node = templNode;
-  bool handled = false;
   if (node->GetType() == CS_NODE_UNKNOWN)
   {
     csString replaceScratch;

@@ -171,7 +171,7 @@ bool csDocumentAttributeCommon::GetValueAsBool ()
 void csDocumentAttributeCommon::SetValueAsInt (int v)
 {
   csString s;
-  s.Format ("%g", v);
+  s.Format ("%d", v);
   SetValue (s);
 }
 
