@@ -79,11 +79,11 @@ public:
   /// Return empty iterator.
   virtual csRef<iDocumentNodeIterator> GetNodes ()
   { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
-  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value)
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* /*value*/)
   { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
   //@}
   /// Dummy implementation
-  virtual csRef<iDocumentNode> GetNode (const char* value)
+  virtual csRef<iDocumentNode> GetNode (const char* /*value*/)
   { return 0; }
 
   //@{
@@ -154,23 +154,23 @@ class CS_CRYSTALSPACE_EXPORT csDocumentNodeReadOnly :
 public:
   //@{
   /// Dummy implementation for nodes that cannot be changed
-  virtual void SetValue (const char* value) {}
-  virtual void SetValueAsInt (int value) {}
-  virtual void SetValueAsFloat (float value) {}
+  virtual void SetValue (const char* /*value*/) {}
+  virtual void SetValueAsInt (int /*value*/) {}
+  virtual void SetValueAsFloat (float /*value*/) {}
 
-  virtual void RemoveNode (const csRef<iDocumentNode>& child) {}
+  virtual void RemoveNode (const csRef<iDocumentNode>& /*child*/) {}
   virtual void RemoveNodes () {}
 
-  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
-  	iDocumentNode* before)
+  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType /*type*/,
+  	iDocumentNode* /*before*/)
   { return 0; }
 
-  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) {}
+  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& /*attr*/) {}
   virtual void RemoveAttributes () {}
 
-  virtual void SetAttribute (const char* name, const char* value) {}
-  virtual void SetAttributeAsInt (const char* name, int value) {}
-  virtual void SetAttributeAsFloat (const char* name, float value) {}
+  virtual void SetAttribute (const char* /*name*/, const char* /*value*/) {}
+  virtual void SetAttributeAsInt (const char* /*name*/, int /*value*/) {}
+  virtual void SetAttributeAsFloat (const char* /*name*/, float /*value*/) {}
   //@}
 };
 

@@ -169,7 +169,7 @@ public:
   virtual void FinishDraw ();
 
   /// (*) Flip video pages (or dump backbuffer into framebuffer).
-  virtual void Print (csRect const* area = 0) { }
+  virtual void Print (csRect const* /*area*/ = 0) { }
 
   /// Get active videopage number (starting from zero)
   virtual int GetPage ();
@@ -467,11 +467,11 @@ protected:
     { return 0; }
     virtual csPtr<iString> StateTest ()
     { return 0; }
-    virtual csTicks Benchmark (int num_iterations)
+    virtual csTicks Benchmark (int /*num_iterations*/)
     { return 0; }
     virtual csPtr<iString> Dump ()
     { return 0; }
-    virtual void Dump (iGraphics3D* g3d)
+    virtual void Dump (iGraphics3D* /*g3d*/)
     { }
     virtual bool DebugCommand (const char* cmd)
     { return scfParent->DebugCommand (cmd); }

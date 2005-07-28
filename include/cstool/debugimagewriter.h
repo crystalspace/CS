@@ -98,6 +98,10 @@ public:
       Report (CS_REPORTER_SEVERITY_ERROR, "Could not write to %s", 
 	finalFilename.GetData ());
     }
+  #else
+    // Make -Wall happy
+    image = image;
+    filename = filename;
   #endif
   }
 };

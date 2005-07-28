@@ -154,7 +154,7 @@ public:
   csShaderProgram (iObjectRegistry* objectReg);
   virtual ~csShaderProgram ();
 
-  virtual int ResolveTextureBinding (const char* binding)
+  virtual int ResolveTextureBinding (const char* /*binding*/)
   { return -1; }
 };
 

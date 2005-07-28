@@ -116,8 +116,8 @@ public:
   /// Create a new texture object (should be implemented by heirs)
   virtual csTexture* NewTexture (iImage *Image, bool ismipmap = false) = 0;
 
-  virtual void Blit (int x, int y, int width, int height,
-    unsigned char const* data, TextureBlitDataFormat) { }
+  virtual void Blit (int /*x*/, int /*y*/, int /*width*/, int /*height*/,
+    unsigned char const* /*data*/, TextureBlitDataFormat) { }
 
   ///--------------------- iTextureHandle implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -177,7 +177,7 @@ public:
 
   virtual csAlphaMode::AlphaType GetAlphaType () const
   { return csAlphaMode::alphaNone; }
-  virtual void SetAlphaType (csAlphaMode::AlphaType alphaType)
+  virtual void SetAlphaType (csAlphaMode::AlphaType /*alphaType*/)
   { }
 
   virtual void Precache () {}

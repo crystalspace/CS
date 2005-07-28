@@ -119,7 +119,7 @@ protected:
       *address = src;
     }
 
-    static void Destroy (PlaneGlyphs** address)
+    static void Destroy (PlaneGlyphs** /*address*/)
     {
     }
 

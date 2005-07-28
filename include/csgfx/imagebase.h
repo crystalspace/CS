@@ -74,7 +74,7 @@ public:
   CS_DEPRECATED_METHOD virtual bool HasKeycolor () const
   { return HasKeyColor(); }
 
-  virtual void GetKeyColor (int &r, int &g, int &b) const { }
+  virtual void GetKeyColor (int & /*r*/, int & /*g*/, int & /*b*/) const { }
   CS_DEPRECATED_METHOD virtual void GetKeycolor (int &r, int &g, int &b) const
   { GetKeyColor (r, g, b); }
 

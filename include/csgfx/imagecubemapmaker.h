@@ -88,7 +88,7 @@ public:
   virtual const uint8* GetAlpha ();
 
   virtual bool HasKeyColor () const { return false; }
-  virtual void GetKeyColor (int &r, int &g, int &b) const { }
+  virtual void GetKeyColor (int & /*r*/, int & /*g*/, int & /*b*/) const { }
 
   virtual uint HasMipmaps () const;
   virtual csRef<iImage> GetMipmap (uint num);

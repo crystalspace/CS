@@ -37,10 +37,10 @@
  */
 struct CS_CRYSTALSPACE_EXPORT csNoAttenuation
 {
-  csNoAttenuation (iLight *light)
+  csNoAttenuation (iLight * /*light*/)
   {}
 
-  CS_FORCEINLINE void operator() (float distance, float &dp) const
+  CS_FORCEINLINE void operator() (float /*distance*/, float & /*dp*/) const
   {}
 };
 
@@ -69,7 +69,7 @@ struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
  */
 struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
 {
-  csInverseAttenuation (iLight *light)
+  csInverseAttenuation (iLight * /*light*/)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -85,7 +85,7 @@ struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
  */
 struct CS_CRYSTALSPACE_EXPORT csRealisticAttenuation
 {
-  csRealisticAttenuation (iLight *light)
+  csRealisticAttenuation (iLight * /*light*/)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const

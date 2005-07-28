@@ -97,7 +97,7 @@ class csPixMixerNoop
 public:
   csPixMixerNoop (csGraphics2D* /*G2D*/, Tpixel /*color*/, uint8 /*alpha*/)
   { }
-  inline void Mix (Tpixel& dest)
+  inline void Mix (Tpixel& /*dest*/)
   { }
 };
 
