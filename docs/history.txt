@@ -20,6 +20,11 @@ chronological order.
 	  and disabling collision detection has also improved.
 	- mdmkolbe began implementing CSEP 10: Templated implementation of SCF.
 	- mdmkolbe fixed unused parameter warnings in the include directory.
+	- res changed the way the clipping rectangle is saved/restored in the
+	  framebuffer r2t support. It is now saved/restored when the render
+	  target is set/cleared instead of BeginDraw()/FinishDraw(). This works
+	  around problems were the clipping rect was restored but the viewport
+	  was not yet, causing the clipping to be wrong.
 27-Jul-2005
 	- res added support for "templates" to the XML shader conditions.
 	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"

@@ -32,8 +32,6 @@ protected:
   csRef<iTextureHandle> render_target;
   /// If true then the current render target has been put on screen.
   bool rt_onscreen;
-  /// If true then we have set the old clip rect.
-  bool rt_cliprectset;
   /// Old clip rect to restore after rendering on a proc texture.
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   /// Render target dimensions

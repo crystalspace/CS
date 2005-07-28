@@ -32,31 +32,31 @@ void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 {
   render_target = handle;
   rt_onscreen = !persistent;
-  rt_cliprectset = false;
 
   if (handle)
   {
     render_target->GetRendererDimensions (txt_w, txt_h);
     G3D->GetDriver2D()->PerformExtension ("vp_set", txt_w, txt_h);
-  }
-  else
-    G3D->GetDriver2D()->PerformExtension ("vp_reset");
-}
 
-void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
-{
-  GLRENDER3D_OUTPUT_STRING_MARKER((" "));
-  if (!rt_cliprectset)
-  {
     G3D->GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
       rt_old_maxx, rt_old_maxy);
     if ((rt_old_minx != 0) && (rt_old_miny != 0)
       && (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
     {
       G3D->GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
-      rt_cliprectset = true;
     }
   }
+  else
+  {
+    G3D->GetDriver2D()->PerformExtension ("vp_reset");
+    G3D->GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
+      rt_old_maxx, rt_old_maxy);
+  }
+}
+
+void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
+{
+  GLRENDER3D_OUTPUT_STRING_MARKER((" "));
 
   /* Note: the renderer relies on this function to setup
    * matrices etc. So be careful when changing stuff. */
@@ -109,12 +109,6 @@ void csGLRender2TextureFramebuf::SetupProjection ()
 void csGLRender2TextureFramebuf::FinishDraw ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-  if (rt_cliprectset)
-  {
-    rt_cliprectset = false;
-    G3D->GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
-      rt_old_maxx, rt_old_maxy);
-  }
 
   G3D->statecache->SetCullFace (GL_FRONT);
 
