@@ -1445,11 +1445,28 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "do_logo"))
     csCommandProcessor::change_boolean (arg, &Sys->do_logo, "do_logo");
   else if (!csStrCaseCmp (cmd, "do_gravity"))
-    csCommandProcessor::change_boolean (arg, &Sys->do_gravity, "do_gravity");
+  {
+    bool do_gravity = Sys->collider_actor.GetGravity () > 0.1;
+    csCommandProcessor::change_boolean (arg, &do_gravity, "do_gravity");
+    if (do_gravity)
+    {
+      Sys->collider_actor.SetGravity (9.806f);
+    }
+    else
+    {
+      Sys->collider_actor.SetGravity (0.0f);
+      Sys->desired_velocity.y = 0;
+      Sys->velocity.y = 0;
+    }
+  }
   else if (!csStrCaseCmp (cmd, "inverse_mouse"))
     csCommandProcessor::change_boolean (arg, &Sys->inverse_mouse, "inverse_mouse");
   else if (!csStrCaseCmp (cmd, "colldet"))
-    csCommandProcessor::change_boolean (arg, &Sys->do_cd, "colldet");
+  {
+    bool do_cd = Sys->collider_actor.HasCD ();
+    csCommandProcessor::change_boolean (arg, &do_cd, "colldet");
+    Sys->collider_actor.SetCD (do_cd);
+  }
   else if (!csStrCaseCmp (cmd, "zbuf"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!csStrCaseCmp (cmd, "db_boxshow"))
@@ -1737,54 +1754,53 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_left (0.1f, false, false); }
-    else Sys->strafe (-1*f,0);
+    else Sys->Strafe (-1*f);
   }
   else if (!csStrCaseCmp (cmd, "strafe_right"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_right (0.1f, false, false); }
-    else Sys->strafe (1*f,0);
+    else Sys->Strafe (1*f);
   }
   else if (!csStrCaseCmp (cmd, "step_forward"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_forward (0.1f, false, false); }
-    else Sys->step (1*f,0);
+    else Sys->Step (1*f);
   }
   else if (!csStrCaseCmp (cmd, "step_backward"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_backward (0.1f, false, false); }
-    else Sys->step (-1*f,0);
+    else Sys->Step (-1*f);
   }
   else if (!csStrCaseCmp (cmd, "rotate_left"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_left_camera (0.1f, false, false); }
-    else Sys->rotate (-1*f,0);
+    else Sys->Rotate (-1*f);
   }
   else if (!csStrCaseCmp (cmd, "rotate_right"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_right_camera (0.1f, false, false); }
-    else Sys->rotate (1*f,0);
+    else Sys->Rotate (1*f);
   }
   else if (!csStrCaseCmp (cmd, "look_up"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_right_xaxis (0.1f, false, false); }
-    else Sys->look (-1*f,0);
+    else Sys->Look (1*f);
   }
   else if (!csStrCaseCmp (cmd, "look_down"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d) { if (f) Sys->imm_rot_left_xaxis (0.1f, false, false); }
-    else Sys->look (1*f,0);
+    else Sys->Look (-1*f);
   }
   else if (!csStrCaseCmp (cmd, "jump"))
   {
-    if (Sys->do_gravity && Sys->on_ground)
-      Sys->velocity.y = Sys->cfg_jumpspeed;
+    Sys->Jump ();
   }
   else if (!csStrCaseCmp (cmd, "i_forward"))
   {

@@ -259,225 +259,147 @@ void free_keymap ()
 extern iCamera* c;
 extern WalkTest* Sys;
 
-void WalkTest::strafe (float speed,int keep_old)
+void WalkTest::Strafe (float speed)
 {
   if (move_3d) return;
-  static bool pressed = false;
-  static float strafe_speed = 0;
-  static long start_time = vc->GetCurrentTicks ();
-
-  long cur_time = vc->GetCurrentTicks ();
-  if (!keep_old)
-  {
-    bool new_pressed = ABS (speed) > 0.001;
-    if (new_pressed != pressed)
-    {
-      pressed = new_pressed;
-      strafe_speed = speed * cfg_walk_accelerate;
-      start_time = cur_time - 100;
-    }
-  }
-
-  while ((cur_time - start_time) >= 100)
-  {
-    if (pressed)
-    {
-      // accelerate
-      if (ABS (velocity.x) < cfg_walk_maxspeed * cfg_walk_maxspeed_multreal)
-        velocity.x += strafe_speed;
-    }
-    else
-    {
-      // brake!
-      if (velocity.x > cfg_walk_brake)
-        velocity.x -= cfg_walk_brake;
-      else if (velocity.x < -cfg_walk_brake)
-        velocity.x += cfg_walk_brake;
-      else
-        velocity.x = 0;
-    }
-    start_time += 100;
-  }
+  speed *= cfg_walk_maxspeed_multreal;
+  desired_velocity.x = 140.0f * speed * cfg_walk_maxspeed
+  	* cfg_walk_maxspeed_multreal;
 }
 
-void WalkTest::step (float speed,int keep_old)
+void WalkTest::Step (float speed)
 {
   if (move_3d) return;
-
-  static bool pressed = false;
-  static float step_speed = 0;
-  static long start_time = vc->GetCurrentTicks ();
-
-  long cur_time = vc->GetCurrentTicks ();
-  if (!keep_old)
-  {
-    bool new_pressed = ABS (speed) > 0.001;
-    if (new_pressed != pressed)
-    {
-      pressed = new_pressed;
-      step_speed = speed * cfg_walk_accelerate;
-      start_time = cur_time - 100;
-    }
-  }
-
-  float max_speed = cfg_walk_maxspeed * cfg_walk_maxspeed_multreal
-  	* (kbd->GetKeyState (CSKEY_SHIFT) ? 2 : 1);
-
-  while ((cur_time - start_time) >= 100)
-  {
-    if (pressed)
-    {
-      // accelerate
-      if (ABS (velocity.z) < max_speed)
-        velocity.z += step_speed;
-      else if (ABS (velocity.z) > max_speed)
-        velocity.z -= step_speed;
-    }
-    else
-    {
-      // brake!
-      if (velocity.z > cfg_walk_brake)
-        velocity.z -= cfg_walk_brake;
-      else if (velocity.z < -cfg_walk_brake)
-        velocity.z += cfg_walk_brake;
-      else
-        velocity.z = 0;
-    }
-    start_time += 100;
-  }
+  speed *= cfg_walk_maxspeed_multreal;
+  desired_velocity.z = 140.0f * speed * cfg_walk_maxspeed
+  	* cfg_walk_maxspeed_multreal;
 }
 
-void WalkTest::rotate (float speed,int keep_old)
+void WalkTest::Jump ()
+{
+  velocity.y = 110.0f * cfg_jumpspeed;
+  desired_velocity.y = 0.0f;
+}
+
+void WalkTest::Look (float speed)
 {
   if (move_3d) return;
-
-  static bool pressed = false;
-  static float angle_accel = 0;
-  static long start_time = vc->GetCurrentTicks ();
-
-  long cur_time = vc->GetCurrentTicks ();
-  if (!keep_old)
-  {
-    bool new_pressed = ABS (speed) > 0.001;
-    if (new_pressed != pressed)
-    {
-      pressed = new_pressed;
-      angle_accel = speed * cfg_rotate_accelerate;
-      start_time = cur_time - 100;
-    }
-  }
-
-  float max_speed = cfg_rotate_maxspeed * (kbd->GetKeyState (CSKEY_SHIFT) ? 2 : 1);
-
-  while ((cur_time - start_time) >= 100)
-  {
-    if (pressed)
-    {
-      // accelerate rotation
-      if (ABS (angle_velocity.y) < max_speed)
-        angle_velocity.y += angle_accel;
-      else if (ABS (angle_velocity.y) > max_speed)
-        angle_velocity.y -= angle_accel;
-    }
-    else
-    {
-      // brake!
-      if (angle_velocity.y > cfg_rotate_brake)
-        angle_velocity.y -= cfg_rotate_brake;
-      else if (angle_velocity.y < -cfg_rotate_brake)
-        angle_velocity.y += cfg_rotate_brake;
-      else
-        angle_velocity.y = 0;
-    }
-    start_time += 100;
-  }
+  desired_angle_velocity.x = 150.0f * speed * cfg_rotate_maxspeed;
 }
 
-void WalkTest::look (float speed,int keep_old)
+void WalkTest::Rotate (float speed)
 {
-  (void) speed; (void) keep_old;
   if (move_3d) return;
-  static float step_speed = 0;
-  if (!keep_old)
-    step_speed = speed*cfg_look_accelerate;
-  
-  //XXX: how to do this without angle?
-#if 0
-  if (ABS (angle.x+step_speed) <= (355.0/113.0/4))
-    angle.x += step_speed;
-#endif
-  RotateCam (-step_speed, 0);
+  desired_angle_velocity.y = 100.0f * speed * cfg_rotate_maxspeed
+  	* cfg_walk_maxspeed_multreal;
 }
 
-void WalkTest::RotateCam(float x, float y)
+#undef WLK_ACCELERATE
+#define WLK_ACCELERATE(c) \
+  if (velocity.##c < desired_velocity.##c) \
+  { \
+    velocity.##c += cfg_walk_accelerate * elapsed; \
+    if (velocity.##c > desired_velocity.##c) velocity.##c = desired_velocity.##c; \
+  } \
+  else \
+  { \
+    velocity.##c -= cfg_walk_accelerate * elapsed; \
+    if (velocity.##c < desired_velocity.##c) velocity.##c = desired_velocity.##c; \
+  }
+
+#undef WLK_ROT_ACCELERATE
+#define WLK_ROT_ACCELERATE(c) \
+  if (angle_velocity.##c < desired_angle_velocity.##c) \
+  { \
+    angle_velocity.##c += cfg_rotate_accelerate * elapsed; \
+    if (angle_velocity.##c > desired_angle_velocity.##c) angle_velocity.##c = desired_angle_velocity.##c; \
+  } \
+  else \
+  { \
+    angle_velocity.##c -= cfg_rotate_accelerate * elapsed; \
+    if (angle_velocity.##c < desired_angle_velocity.##c) angle_velocity.##c = desired_angle_velocity.##c; \
+  }
+
+void WalkTest::InterpolateMovement ()
 {
-  csMatrix3 mat = view->GetCamera ()->GetTransform ().GetO2T ();
-  if(x)
-    mat = csXRotMatrix3(x) * mat;
-  if(y)
-    mat *= csYRotMatrix3(y);
-  view->GetCamera ()->SetTransform ( csOrthoTransform 
-	  (mat, view->GetCamera ()->GetTransform ().GetOrigin ()));
+  float elapsed = vc->GetElapsedTicks () / 1000.0f;
+  elapsed *= 1700.0f;
+
+  WLK_ACCELERATE(x)
+  WLK_ACCELERATE(y)
+  WLK_ACCELERATE(z)
+
+  WLK_ROT_ACCELERATE(x)
+  WLK_ROT_ACCELERATE(y)
+  WLK_ROT_ACCELERATE(z)
+}
+
+void WalkTest::RotateCam (float x, float y)
+{
+  csVector3 rot = collider_actor.GetRotation ();
+  rot.x += x;
+  rot.y += y;
+  collider_actor.SetRotation (rot);
 }
 
 void WalkTest::imm_forward (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_FORWARD, do_cd);
+    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_FORWARD, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_FORWARD, do_cd);
+    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_FORWARD, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_FORWARD, do_cd);
+    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_FORWARD, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_backward (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed*.01*CS_VEC_BACKWARD, do_cd);
+    view->GetCamera ()->Move (speed*.01*CS_VEC_BACKWARD, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed*1.2*CS_VEC_BACKWARD, do_cd);
+    view->GetCamera ()->Move (speed*1.2*CS_VEC_BACKWARD, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed*.6*CS_VEC_BACKWARD, do_cd);
+    view->GetCamera ()->Move (speed*.6*CS_VEC_BACKWARD, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_left (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_LEFT, do_cd);
+    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_LEFT, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_LEFT, do_cd);
+    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_LEFT, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_LEFT, do_cd);
+    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_LEFT, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_right (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_RIGHT, do_cd);
+    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_RIGHT, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_RIGHT, do_cd);
+    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_RIGHT, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_RIGHT, do_cd);
+    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_RIGHT, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_up (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_UP, do_cd);
+    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_UP, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_UP, do_cd);
+    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_UP, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_UP, do_cd);
+    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_UP, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_down (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_DOWN, do_cd);
+    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_DOWN, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_DOWN, do_cd);
+    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_DOWN, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_DOWN, do_cd);
+    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_DOWN, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
@@ -772,7 +694,7 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       if (csMouseEventHelper::GetButton(&Event) == 1)
       {
         move_forward = false;
-	step (0, 0);
+	Step (0);
       }
       break;
   }

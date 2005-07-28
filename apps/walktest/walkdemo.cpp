@@ -95,7 +95,8 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
   	FindByName (matname);
   if (!mat)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Can't find material '%s' in memory!", matname);
     return;
   }
 

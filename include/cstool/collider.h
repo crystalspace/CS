@@ -331,6 +331,7 @@ class CS_CRYSTALSPACE_EXPORT csColliderActor
 private:
   bool revertMove;
   bool onground;
+  bool cd;
   csArray<csCollisionPair> our_cd_contact;
   float gravity;
   iMeshWrapper* mesh;
@@ -341,7 +342,7 @@ private:
   csVector3 velWorld;
 
   // For rotation.
-  float rotX, rotY, rotZ;
+  csVector3 rotation;
 
   csRef<iCollider> topCollider;
   csRef<iCollider> bottomCollider;
@@ -454,9 +455,13 @@ public:
   	const csVector3& body, const csVector3& shift);
 
   /**
-   * Set gravity. Default 19.2.
+   * Set gravity. Default 9.806.
    */
-  void SetGravity (float g) { gravity = g; }
+  void SetGravity (float g)
+  {
+    gravity = g;
+    velWorld.y = 0;
+  }
 
   /**
    * Get gravity.
@@ -472,6 +477,16 @@ public:
    * Set the onground status.
    */
   void SetOnGround (bool og) { onground = og; }
+
+  /**
+   * Return true if collision detection is enabled.
+   */
+  bool HasCD () const { return cd; }
+
+  /**
+   * Enable/disable collision detection (default enabled).
+   */
+  void SetCD (bool c) { cd = c; }
 
   /**
    * Check if we should revert a move (revert rotation).
@@ -491,6 +506,18 @@ public:
    */
   bool Move (float delta, float speed, const csVector3& velBody,
   	const csVector3& angularVelocity);
+
+  /**
+   * Get current rotation in angles around every axis.
+   * This is only used if a camera is used.
+   */
+  const csVector3& GetRotation () { return rotation; }
+
+  /**
+   * Set current rotation.
+   * This is only used if a camera is used.
+   */
+  void SetRotation (const csVector3& rot);
 
   /**
    * This is used by Move() but you can also call it manually.

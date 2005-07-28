@@ -171,21 +171,22 @@ public:
 
   /// Player position, orientation, and velocity
   csVector3 pos;
+  csVector3 desired_velocity;
   csVector3 velocity;
-
-  /// Camera angles. X and Y are user controllable, Z is not.
-  //csVector3 angle;
 
   /**
    * Angular velocity: angle_velocity.x is constantly added to angle.x
    * and so on.
    */
+  csVector3 desired_angle_velocity;
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
   csRef<iCollider> body;
   csRef<iCollider> legs;
   csVector3 body_radius, body_center, legs_radius, legs_center;
+
+  csColliderActor collider_actor;
 
   /// A list with all busy entities.
   csArray<csWalkEntity*> busy_entities;
@@ -302,7 +303,6 @@ public:
 
   /**
    * The main engine interface
-   * (when interface will be complete, csEngine will not be needed anymore)
    */
   csRef<iEngine> Engine;
   /// The level loader
@@ -347,9 +347,7 @@ public:
   bool do_show_palette;
   bool do_infinite;
   bool do_huge;
-  bool do_cd;
   bool do_freelook;
-  bool do_gravity;
   bool do_light_frust;
   bool do_logo;
   bool doSave;
@@ -506,14 +504,18 @@ public:
   /// Creates Colliders
   virtual void CreateColliders();
 
-  /// Gravity correct movement function: strafe().
-  void strafe(float speed,int keep_old);
-  /// Gravity correct movement function: step().
-  void step(float speed,int keep_old);
-  /// Gravity correct movement function: rotate().
-  void rotate(float speed,int keep_old);
-  /// Gravity correct movement function: look().
-  void look(float speed,int keep_old);
+  /// Gravity correct movement function.
+  void Strafe (float speed);
+  /// Gravity correct movement function.
+  void Step (float speed);
+  /// Gravity correct movement function.
+  void Rotate (float speed);
+  /// Gravity correct movement function.
+  void Look (float speed);
+  /// Jump
+  void Jump ();
+  /// Do the actual acceleration calculation.
+  void InterpolateMovement ();
 
   /// Immediate gravity incorrect movement functions.
   void imm_forward (float speed, bool slow, bool fast);

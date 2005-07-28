@@ -72,11 +72,9 @@ WalkTest::WalkTest () :
   do_show_z = false;
   do_show_palette = false;
   do_infinite = false;
-  do_cd = true;
   do_freelook = false;
   do_logo = true;
   player_spawned = false;
-  do_gravity = true;
   inverse_mouse = false;
   selected_light = 0;
   selected_polygon = 0;
@@ -97,7 +95,9 @@ WalkTest::WalkTest () :
   do_fs_fadeout = false;
 
   velocity.Set (0, 0, 0);
+  desired_velocity.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
+  desired_angle_velocity.Set (0, 0, 0);
 
   bgcolor_txtmap = 255;
   bgcolor_map = 0;
@@ -155,7 +155,8 @@ void WalkTest::Report (int severity, const char* msg, ...)
 void WalkTest::SetDefaults ()
 {
   csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
+  bool do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
+  collider_actor.SetCD (do_cd);
   do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
 
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
@@ -202,12 +203,12 @@ void WalkTest::SetDefaults ()
 
   if (cmdline->GetOption ("colldet"))
   {
-    do_cd = true;
+    collider_actor.SetCD (true);
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Enabled collision detection system.");
   }
   else if (cmdline->GetOption ("nocolldet"))
   {
-    do_cd = false;
+    collider_actor.SetCD (false);
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled collision detection system.");
   }
 
@@ -240,7 +241,7 @@ void WalkTest::Help ()
   csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
-  csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
+  csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   csPrintf ("  -regions           load every map in a separate region (default off)\n");
   csPrintf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
@@ -368,22 +369,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   }
   if (!myConsole || !myConsole->GetVisible ())
   {
-    int alt,shift,ctrl;
-    float speed = 1;
-
-    alt = kbd->GetKeyState (CSKEY_ALT);
-    ctrl = kbd->GetKeyState (CSKEY_CTRL);
-    shift = kbd->GetKeyState (CSKEY_SHIFT);
-    if (ctrl)
-      speed = .5;
-    if (shift)
-      speed = 2;
-
-    /// Act as usual...
-    strafe (0,1);
-    look (0,1);
-    step (0,1);
-    rotate (0,1);
+    InterpolateMovement ();
 
     if (mySound)
     {
@@ -405,7 +391,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   move_bots (elapsed_time);
 
   if (move_forward)
-    step (1, 0);
+    Step (1);
 }
 
 
@@ -764,63 +750,27 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 }
 
 int cnt = 1;
-csTicks time0 = (csTicks)-1;
 
 void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
 {
-  static csTicks prev_time = 0;
-  if (prev_time == 0) prev_time = csGetTicks () - 10;
-
-  // If the time interval is too big, limit to something reasonable
-  // This will help a little for software OpenGL :-)
-  elapsed_time = current_time - prev_time;
-  if (elapsed_time > 250)
-    prev_time = current_time - (elapsed_time = 250);
-
-  if (do_cd)
+  if (!player_spawned)
   {
-    extern void DoGravity (iEngine* engine, csVector3& pos, csVector3& vel);
-    if (!player_spawned)
-    {
-      CreateColliders ();
-      player_spawned=true;
-    }
-
-    for (; elapsed_time >= 10; elapsed_time -= 10, prev_time += 10)
-    {
-      if (move_3d)
-      {
-        // If we are moving in 3d then don't do any camera correction.
-      }
-      else
-      {
-	// Rotate Camera
-	RotateCam(angle_velocity.x, angle_velocity.y);
-      }
-
-      csVector3 vel = view->GetCamera ()->GetTransform ().GetT2O ()*velocity;
-
-      static bool check_once = false;
-      if (ABS (vel.x) < SMALL_EPSILON && ABS (vel.y)
-      	< SMALL_EPSILON && ABS (vel.z) < SMALL_EPSILON)
-      {
-        // If we don't move we don't have to do the collision detection tests.
-	// However, we need to do it once to make sure that we are standing
-	// on solid ground. So we first set 'check_once' to true to enable
-	// one more test.
-	if (check_once == false)
-	{
-	  check_once = true;
-	  DoGravity (Engine, pos, vel);
-	}
-      }
-      else
-      {
-        check_once = false;
-	DoGravity (Engine, pos, vel);
-      }
-    }
+    CreateColliders ();
+    player_spawned=true;
   }
+
+  int shift, ctrl;
+  float speed = 1;
+
+  ctrl = kbd->GetKeyState (CSKEY_CTRL);
+  shift = kbd->GetKeyState (CSKEY_SHIFT);
+  if (ctrl)
+    speed = .5;
+  if (shift)
+    speed = 2;
+
+  float delta = float (elapsed_time) / 1000.0f;
+  collider_actor.Move (delta, speed, velocity, angle_velocity);
 }
 
 void perf_test (int num)
@@ -849,7 +799,6 @@ void perf_test (int num)
     float (num) * 1000. / (float) (t2 - t1));
   fflush (stdout);
   cnt = 1;
-  time0 = (csTicks)-1;
   Sys->busy_perf_test = false;
 }
 
@@ -878,12 +827,9 @@ void WalkTest::EndEngine ()
 
 void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 {
-  if (do_cd)
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
-    csColliderHelper::InitializeCollisionWrappers (collide_system,
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
+  csColliderHelper::InitializeCollisionWrappers (collide_system,
     	engine, region);
-  }
 }
 
 void WalkTest::LoadLibraryData (iRegion* region)
@@ -1218,7 +1164,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     // though collision detection does not really make sense in this context.
     // Hopefully the movement system will be fixed some day so that the user
     // can move around even with collision detection disabled.
-    do_cd = true;
+    collider_actor.SetCD (true);
 
     // Load two textures that are used in the maze.
     if (!LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif"))

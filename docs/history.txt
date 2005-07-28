@@ -11,6 +11,13 @@ chronological order.
 	- mdmkolbe fixed some pedantic issues.
 	- Jorrit fixed a bug in libs/csutil/documentcommon.cpp. Was using
 	  %g for an int.
+	- Jorrit changed csColliderActor to have default 9.81 gravity.
+	- Jorrit added SetRotation/GetRotation to csColliderActor.
+	- Jorrit added SetCD/HasCD to csColliderActor.
+	- Jorrit changed walktest to use csColliderActor. This greatly
+	  improves readability of the movement system. In addition the
+	  handling of disabling gravity, fine tuned movement (ctrl key),
+	  and disabling collision detection has also improved.
 27-Jul-2005
 	- res added support for "templates" to the XML shader conditions.
 	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"

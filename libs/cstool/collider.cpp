@@ -489,8 +489,9 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 csColliderActor::csColliderActor ()
 {
   revertMove = false;
-  gravity = 19.2f;
+  gravity = 9.806f;
   onground = false;
+  cd = true;
   velWorld.Set (0, 0, 0);
   engine = 0;
   cdsys = 0;
@@ -499,7 +500,7 @@ csColliderActor::csColliderActor ()
   movable = 0;
 
   // Only used in case a camera is used.
-  rotZ = rotX = rotY = 0;
+  rotation.Set (0, 0, 0);
 }
 
 void csColliderActor::InitializeColliders (
@@ -844,8 +845,14 @@ bool csColliderActor::AdjustForCollisions (
 
   // Perform recursive collision testing to minimise hits and
   // find distance we can travel
-  hits = CollisionDetectIterative (topCollider, current_sector,
-    &transform_newpos, &transform_oldpos, maxmove);
+  if (cd)
+    hits = CollisionDetectIterative (topCollider, current_sector,
+      &transform_newpos, &transform_oldpos, maxmove);
+  else
+  {
+    hits = 0;
+    maxmove = transform_newpos.GetOrigin ();
+  }
 
   // localvel is smaller because we can partly move the object in that direction
   localvel -= maxmove - oldpos;
@@ -854,7 +861,10 @@ bool csColliderActor::AdjustForCollisions (
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
-    float norm = obstacle.Normal ().Norm ();
+    csVector3 normal = obstacle.Normal ();
+    if (fabs (normal.x) > .1 || fabs (normal.z) > .1)
+      continue;
+    float norm = normal.Norm ();
     if (fabs (norm) < SMALL_EPSILON) continue;
     csVector3 vec = obstacle.Normal() / norm;
 
@@ -874,8 +884,11 @@ bool csColliderActor::AdjustForCollisions (
 
   cdsys->ResetCollisionPairs ();	
 
-  hits = CollisionDetect (bottomCollider, current_sector,
-    &transform_newpos, &transform_oldpos);
+  if (cd)
+    hits = CollisionDetect (bottomCollider, current_sector,
+      &transform_newpos, &transform_oldpos);
+  else
+    hits = 0;
 
   bool stepDown;
 
@@ -894,8 +907,11 @@ bool csColliderActor::AdjustForCollisions (
 
     cdsys->ResetCollisionPairs ();	
 
-    hits = CollisionDetect (bottomCollider, current_sector,
-      &transform_newpos, &transform_oldpos);
+    if (cd)
+      hits = CollisionDetect (bottomCollider, current_sector,
+        &transform_newpos, &transform_oldpos);
+    else
+      hits = 0;
   }
 
   // Falling unless proven otherwise
@@ -916,7 +932,7 @@ bool csColliderActor::AdjustForCollisions (
       csVector3 n = -((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit ();
 
       // Is it a collision with a ground polygon?
-      //  (this tests for the angle between ground and collidet
+      //  (this tests for the angle between ground and colldet
       //  triangle)
       if (n.y < 0.7)
         continue;
@@ -946,8 +962,11 @@ bool csColliderActor::AdjustForCollisions (
 
       cdsys->ResetCollisionPairs ();	
 
-      hits = CollisionDetect (bottomCollider, current_sector,
-        &transform_newpos, &transform_oldpos);
+      if (cd)
+        hits = CollisionDetect (bottomCollider, current_sector,
+          &transform_newpos, &transform_oldpos);
+      else
+        hits = 0;
     }
   }
 
@@ -972,8 +991,12 @@ bool csColliderActor::AdjustForCollisions (
   if (onground)
     newpos.y -= 0.02f;
 
-  if (CollisionDetect (topCollider, current_sector,
-    &transform_newpos,&transform_oldpos) > 0)
+  if (cd)
+    hits = CollisionDetect (topCollider, current_sector,
+      &transform_newpos,&transform_oldpos);
+  else
+    cd = 0;
+  if (hits > 0)
   {
     // No move possible without a collision with the torso
     revertMove = true;
@@ -984,6 +1007,22 @@ bool csColliderActor::AdjustForCollisions (
   }
 
   return true;
+}
+
+void csColliderActor::SetRotation (const csVector3& rot)
+{
+  rotation = rot;
+  if (camera)
+  {
+    csMatrix3 rot;
+    if (fabs (rotation.x) < SMALL_EPSILON && fabs (rotation.z) < SMALL_EPSILON)
+      rot = csYRotMatrix3 (rotation.y);
+    else
+      rot = csXRotMatrix3 (rotation.x) * csYRotMatrix3 (rotation.y)
+    	* csZRotMatrix3 (rotation.z);
+    csOrthoTransform ot (rot, camera->GetTransform().GetOrigin ());
+    camera->SetTransform (ot);
+  }
 }
 
 bool csColliderActor::RotateV (float delta,
@@ -1018,17 +1057,7 @@ bool csColliderActor::RotateV (float delta,
   }
   else
   {
-    rotX += angle.x;
-    rotY += angle.y;
-    rotZ += angle.z;
-    csMatrix3 rot;
-    if (fabs (rotX) < SMALL_EPSILON && fabs (rotZ) < SMALL_EPSILON)
-      rot = csYRotMatrix3 (rotY);
-    else
-      rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY)
-    	* csZRotMatrix3 (rotZ);
-    csOrthoTransform ot (rot, camera->GetTransform().GetOrigin ());
-    camera->SetTransform (ot);
+    SetRotation (rotation + angle);
   }
   return true;
 }
@@ -1048,9 +1077,17 @@ bool csColliderActor::MoveV (float delta,
   // (this is relevant if we are anchored). Later on we will correct that.
   csReversibleTransform fulltransf;
   if (movable)
+  {
     fulltransf = movable->GetFullTransform ();
+  }
   else
-    fulltransf = camera->GetTransform ();
+  {
+    //fulltransf = camera->GetTransform ();
+    // For camera we ignore the x and z rotation when moving so here we
+    // construct a new transform containing only the y rotation.
+    fulltransf.SetO2T (csYRotMatrix3 (rotation.y));
+    fulltransf.SetOrigin (camera->GetTransform ().GetOrigin ());
+  }
   mat = fulltransf.GetT2O ();
 
   csVector3 worldVel (fulltransf.This2OtherRelative (velBody) + velWorld);
@@ -1058,8 +1095,7 @@ bool csColliderActor::MoveV (float delta,
   csVector3 newpos (worldVel*delta + oldpos);
 
   // Check for collisions and adjust position
-  if (!AdjustForCollisions (oldpos, newpos, worldVel,
-    	delta))
+  if (!AdjustForCollisions (oldpos, newpos, worldVel, delta))
     return false;                   // We haven't moved so return early
   
   bool mirror = false;
@@ -1137,7 +1173,7 @@ bool csColliderActor::MoveV (float delta,
 #define MIN_CD_INTERVAL 0.01
 #define MAX_CD_ITERATIONS 20
 
-static float ComputerLocalMaxInterval (
+static float ComputeLocalMaxInterval (
 	const csVector3& bodyVel,
 	const csVector3& intervalSize)
 {
@@ -1161,16 +1197,24 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 
   csReversibleTransform fulltransf;
   if (movable)
+  {
     fulltransf = movable->GetFullTransform ();
+  }
   else
-    fulltransf = camera->GetTransform ();
+  {
+    //fulltransf = camera->GetTransform ();
+    // For camera we ignore the x and z rotation when moving so here we
+    // construct a new transform containing only the y rotation.
+    fulltransf.SetO2T (csYRotMatrix3 (rotation.y));
+    fulltransf.SetOrigin (camera->GetTransform ().GetOrigin ());
+  }
   //const csMatrix3& transf = fulltransf.GetT2O ();
   //float yrot = Matrix2YRot (transf);
 
   // Calculate the total velocity (body and world) in OBJECT space.
   csVector3 bodyVel (fulltransf.Other2ThisRelative (velWorld) + velBody);
 
-  float local_max_interval = ComputerLocalMaxInterval (bodyVel, intervalSize);
+  float local_max_interval = ComputeLocalMaxInterval (bodyVel, intervalSize);
 
   // Compensate for speed
   local_max_interval /= speed;
@@ -1203,7 +1247,7 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
     bodyVel = fulltransf.Other2ThisRelative(velWorld) + velBody;
 
     delta -= local_max_interval;
-    local_max_interval = ComputerLocalMaxInterval (bodyVel, intervalSize);
+    local_max_interval = ComputeLocalMaxInterval (bodyVel, intervalSize);
 
     // Compensate for speed
     local_max_interval /= speed;
