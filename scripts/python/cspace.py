@@ -1310,8 +1310,6 @@ class csPoly2DFactoryPtr(csPoly2DFactory):
         _swig_setattr(self, csPoly2DFactory,self.__class__,csPoly2DFactory)
 _cspace.csPoly2DFactory_swigregister(csPoly2DFactoryPtr)
 
-
-fSqr = _cspace.fSqr
 class csMath3(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMath3, name, value)
@@ -2034,36 +2032,6 @@ class csCatmullRomSplinePtr(csCatmullRomSpline):
         if not hasattr(self,"thisown"): _swig_setattr(self, csCatmullRomSpline, 'thisown', 0)
         _swig_setattr(self, csCatmullRomSpline,self.__class__,csCatmullRomSpline)
 _cspace.csCatmullRomSpline_swigregister(csCatmullRomSplinePtr)
-
-class csPoint(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPoint, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPoint, name)
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ csPoint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["x"] = _cspace.csPoint_x_set
-    __swig_getmethods__["x"] = _cspace.csPoint_x_get
-    if _newclass:x = property(_cspace.csPoint_x_get, _cspace.csPoint_x_set)
-    __swig_setmethods__["y"] = _cspace.csPoint_y_set
-    __swig_getmethods__["y"] = _cspace.csPoint_y_get
-    if _newclass:y = property(_cspace.csPoint_y_get, _cspace.csPoint_y_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csPoint, 'this', _cspace.new_csPoint(*args))
-        _swig_setattr(self, csPoint, 'thisown', 1)
-    def Set(*args): return _cspace.csPoint_Set(*args)
-    def __del__(self, destroy=_cspace.delete_csPoint):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-
-class csPointPtr(csPoint):
-    def __init__(self, this):
-        _swig_setattr(self, csPoint, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csPoint, 'thisown', 0)
-        _swig_setattr(self, csPoint,self.__class__,csPoint)
-_cspace.csPoint_swigregister(csPointPtr)
 
 CS_BOUNDINGBOX_MAXVALUE = _cspace.CS_BOUNDINGBOX_MAXVALUE
 CS_BOX_CORNER_xy = _cspace.CS_BOX_CORNER_xy
@@ -4919,11 +4887,7 @@ class iMeshWrapper(iBase):
     def GetStaticLOD(*args): return _cspace.iMeshWrapper_GetStaticLOD(*args)
     def AddMeshToStaticLOD(*args): return _cspace.iMeshWrapper_AddMeshToStaticLOD(*args)
     def RemoveMeshFromStaticLOD(*args): return _cspace.iMeshWrapper_RemoveMeshFromStaticLOD(*args)
-    def DrawShadow(*args): return _cspace.iMeshWrapper_DrawShadow(*args)
-    def DrawLight(*args): return _cspace.iMeshWrapper_DrawLight(*args)
     def CastHardwareShadow(*args): return _cspace.iMeshWrapper_CastHardwareShadow(*args)
-    def SetDrawAfterShadow(*args): return _cspace.iMeshWrapper_SetDrawAfterShadow(*args)
-    def GetDrawAfterShadow(*args): return _cspace.iMeshWrapper_GetDrawAfterShadow(*args)
     def GetSVContext(*args): return _cspace.iMeshWrapper_GetSVContext(*args)
     def __del__(self, destroy=_cspace.delete_iMeshWrapper):
         try:
