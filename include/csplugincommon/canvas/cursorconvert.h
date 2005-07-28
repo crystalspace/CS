@@ -36,7 +36,7 @@ struct iImage;
 class csColorQuantizer;
 class csImageMemory;
 class csRGBcolor;
-class csRGBpixel;
+struct csRGBpixel;
 
 /**
  * Helper class to convert images into data formats suitable for

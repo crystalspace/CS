@@ -27,7 +27,7 @@
 
 struct iImage;
 
-class csRGBpixel;
+struct csRGBpixel;
 
 /**
  * A base class which represents a value that can be computed
