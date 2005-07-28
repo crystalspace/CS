@@ -21,8 +21,8 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+#include <ctype.h>
 #include "cssysdef.h"
-#include "movierecorder.h"
 #include "iutil/vfs.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
@@ -35,8 +35,11 @@
 #include "ivaria/reporter.h"
 #include "iengine/engine.h"
 #include "igraphic/image.h"
+
 #include "csutil/event.h"
 #include "csgfx/imagemanipulate.h"
+
+#include "movierecorder.h"
 
 CS_IMPLEMENT_PLUGIN
 

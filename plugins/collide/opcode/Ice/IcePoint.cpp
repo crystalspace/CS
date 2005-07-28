@@ -48,7 +48,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace IceMaths;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -133,7 +134,7 @@ void Point::SetNotUsed()
 	IR(z) = 0xffffffff;
 }
 
-BOOL Point::IsNotUsed()	const
+bool Point::IsNotUsed()	const
 {
 	if(IR(x)!=0xffffffff)	return FALSE;
 	if(IR(y)!=0xffffffff)	return FALSE;

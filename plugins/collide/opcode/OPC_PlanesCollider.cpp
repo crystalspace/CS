@@ -30,7 +30,7 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode::Opcode;
 
 #include "OPC_PlanesAABBOverlap.h"
 #include "OPC_PlanesTriOverlap.h"

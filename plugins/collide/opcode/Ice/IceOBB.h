@@ -154,7 +154,7 @@
 		 *	\return		TRUE if we're inside the other box
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				BOOL				IsInside(const OBB& box)	const;
+				bool				IsInside(const OBB& box)	const;
 
 		inline_	const Point&		GetCenter()		const	{ return mCenter;	}
 		inline_	const Point&		GetExtents()	const	{ return mExtents;	}

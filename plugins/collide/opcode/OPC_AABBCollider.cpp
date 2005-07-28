@@ -30,7 +30,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::Opcode;
 
 #include "OPC_BoxBoxOverlap.h"
 #include "OPC_TriBoxOverlap.h"
@@ -153,7 +154,7 @@ bool AABBCollider::Collide(AABBCache& cache, const CollisionAABB& box, const Mod
  *	\return		TRUE if we can return immediately
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL AABBCollider::InitQuery(AABBCache& cache, const CollisionAABB& box)
+bool AABBCollider::InitQuery(AABBCache& cache, const CollisionAABB& box)
 {
 	// 1) Call the base method
 	VolumeCollider::InitQuery();
@@ -285,7 +286,7 @@ bool AABBCollider::Collide(AABBCache& cache, const CollisionAABB& box, const AAB
  *	\return		true if the AABB contains the whole box
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ BOOL AABBCollider::AABBContainsBox(const Point& bc, const Point& be)
+inline_ bool AABBCollider::AABBContainsBox(const Point& bc, const Point& be)
 {
 	if(mMin.x > bc.x - be.x)	return FALSE;
 	if(mMin.y > bc.y - be.y)	return FALSE;

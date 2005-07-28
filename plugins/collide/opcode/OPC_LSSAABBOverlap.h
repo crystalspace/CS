@@ -511,7 +511,7 @@ inline_ float OPC_SegmentOBBSqrDist(const Segment& segment, const Point& c0, con
 	else				return OPC_PointAABBSqrDist(segment.mP0, c0, e0);
 }
 
-inline_ BOOL LSSCollider::LSSAABBOverlap(const Point& center, const Point& extents)
+inline_ bool LSSCollider::LSSAABBOverlap(const Point& center, const Point& extents)
 {
 	// Stats
 	mNbVolumeBVTests++;

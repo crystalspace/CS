@@ -32,7 +32,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::Opcode;
 
 	inline_ void FindRunningIndex(udword& index, float* array, udword* sorted, int last, float max)
 	{

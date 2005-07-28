@@ -668,7 +668,7 @@ static float OPC_SegmentTriangleSqrDist(const Segment& segment, const Point& p0,
     return fabsf(fSqrDist);
 }
 
-inline_ BOOL LSSCollider::LSSTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2)
+inline_ bool LSSCollider::LSSTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2)
 {
 	// Stats
 	mNbVolumePrimTests++;

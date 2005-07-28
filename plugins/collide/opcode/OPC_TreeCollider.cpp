@@ -31,7 +31,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::Opcode;
 
 #include "OPC_BoxBoxOverlap.h"
 #include "OPC_TriBoxOverlap.h"

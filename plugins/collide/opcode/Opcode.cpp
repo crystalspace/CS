@@ -35,7 +35,7 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-bool Opcode::InitOpcode()
+bool cspluginOpcode::Opcode::InitOpcode()
 {
 	Log("// Initializing OPCODE\n\n");
 //	LogAPIInfo();
@@ -43,7 +43,7 @@ bool Opcode::InitOpcode()
 }
 
 void ReleasePruningSorters();
-bool Opcode::CloseOpcode()
+bool cspluginOpcode::Opcode::CloseOpcode()
 {
 	Log("// Closing OPCODE\n\n");
 

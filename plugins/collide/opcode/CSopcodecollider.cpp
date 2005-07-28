@@ -39,7 +39,8 @@
 
 #include "OPC_TreeBuilders.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::Opcode;
 
 SCF_IMPLEMENT_IBASE (csOPCODECollider)
   SCF_IMPLEMENTS_INTERFACE (iCollider)
@@ -78,7 +79,7 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
   
   if (tri_count>=1)
   {
-    m_pCollisionModel = new Opcode::Model;
+    m_pCollisionModel = new cspluginOpcode::Opcode::Model;
     if (!m_pCollisionModel)
       return;
 

@@ -21,6 +21,7 @@
 
 #include "csqsqrt.h"
 #include "csgeom/math.h"
+#include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csutil/cscolor.h"

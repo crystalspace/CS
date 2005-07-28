@@ -68,7 +68,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::Opcode;
 
 //! Compilation flag:
 //! - true to fix quantized boxes (i.e. make sure they enclose the original ones)
@@ -394,7 +395,7 @@ bool AABBNoLeafTree::Refit(const MeshInterface* mesh_interface)
 		if(Current.HasPosLeaf())
 		{
 			mesh_interface->GetTriangle(VP, Current.GetPosPrimitive());
-			ComputeMinMax(Min, Max, VP);
+			::ComputeMinMax(Min, Max, VP);
 		}
 		else
 		{
@@ -406,7 +407,7 @@ bool AABBNoLeafTree::Refit(const MeshInterface* mesh_interface)
 		if(Current.HasNegLeaf())
 		{
 			mesh_interface->GetTriangle(VP, Current.GetNegPrimitive());
-			ComputeMinMax(Min_, Max_, VP);
+			::ComputeMinMax(Min_, Max_, VP);
 		}
 		else
 		{

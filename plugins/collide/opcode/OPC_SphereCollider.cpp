@@ -34,7 +34,7 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode::Opcode;
 
 #include "OPC_SphereAABBOverlap.h"
 #include "OPC_SphereTriOverlap.h"

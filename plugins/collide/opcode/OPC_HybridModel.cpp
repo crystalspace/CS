@@ -84,7 +84,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace Opcode;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::Opcode;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -379,7 +380,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, *T++);
-					ComputeMinMax(TmpMin, TmpMax, VP);
+					::ComputeMinMax(TmpMin, TmpMax, VP);
 					Min.Min(TmpMin);
 					Max.Max(TmpMax);
 				}
@@ -392,7 +393,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, BaseIndex++);
-					ComputeMinMax(TmpMin, TmpMax, VP);
+					::ComputeMinMax(TmpMin, TmpMax, VP);
 					Min.Min(TmpMin);
 					Max.Max(TmpMax);
 				}
@@ -424,7 +425,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, *T++);
-					ComputeMinMax(TmpMin, TmpMax, VP);
+					::ComputeMinMax(TmpMin, TmpMax, VP);
 					Min_.Min(TmpMin);
 					Max_.Max(TmpMax);
 				}
@@ -437,7 +438,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, BaseIndex++);
-					ComputeMinMax(TmpMin, TmpMax, VP);
+					::ComputeMinMax(TmpMin, TmpMax, VP);
 					Min_.Min(TmpMin);
 					Max_.Max(TmpMax);
 				}

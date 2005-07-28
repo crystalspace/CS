@@ -19,6 +19,9 @@ chronological order.
 	- res added some partial iDocument* implementations with commonly 
 	  duplicated code to facilitate creation of new iDocument* 
 	  implementations.
+	- res fixed some fallout from the include cleanup.
+	- res worked around namespace clashes of the Opcode in CS with the
+	  Opcode in ODE.
 25-Jul-2005
 	- mdmkolbe removed an unused local variable.
 	- mdmkolbe added CS_PRIn64 macros for passing to csPrintf et al, and

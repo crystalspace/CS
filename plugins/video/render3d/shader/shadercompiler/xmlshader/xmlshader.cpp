@@ -16,7 +16,9 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
 #include "cssysdef.h"
+
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
@@ -25,6 +27,7 @@
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
+
 #include "csutil/cfgacc.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"

@@ -24,7 +24,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace IceMaths;
+using namespace cspluginOpcode;
+using namespace cspluginOpcode::IceMaths;
 
 float Segment::SquareDistance(const Point& point, float* t)	const
 {
