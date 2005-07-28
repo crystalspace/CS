@@ -18,6 +18,7 @@ chronological order.
 	  improves readability of the movement system. In addition the
 	  handling of disabling gravity, fine tuned movement (ctrl key),
 	  and disabling collision detection has also improved.
+	- mdmkolbe began implementing CSEP 10: Templated implementation of SCF.
 27-Jul-2005
 	- res added support for "templates" to the XML shader conditions.
 	  You define them with "<?template SomeTemplate?> ... "<?endtemplate?>"

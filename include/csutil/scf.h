@@ -40,6 +40,11 @@ class csPathsList;
  */
 typedef unsigned long scfInterfaceID;
 
+/**
+ * Type of interface version used by iBase::QueryInterface().
+ */
+typedef int scfInterfaceVersion;
+
 /**\def SCF_TRACE(x)
  * Macro for typing debug strings: Add #define SCF_DEBUG at the top
  * of modules you want to track miscelaneous SCF activity and recompile.
@@ -70,6 +75,26 @@ typedef unsigned long scfInterfaceID;
   ((Major << 24) | (Minor << 16) | Micro)
 
 /**
+ * SCF_INTERFACE can be used to define an interface's version number;
+ * you should specify interface name and major, minor and micro version
+ * components. This way:
+ * <pre>
+ * struct iSomething : public iBase
+ * {
+ * public:
+ *   SCF_INTERFACE(iSomething, 0, 0, 1);
+ *   ...
+ * };
+ * </pre>
+ */
+#define SCF_INTERFACE(Name,Major,Minor,Micro)              \
+  struct InterfaceTraits {                                 \
+    static scfInterfaceVersion GetVersion()                \
+    { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); } \
+    static char const * GetName() { return #Name; }        \
+  }
+
+/**
  * This is the basic interface: all other interfaces should be
  * derived from this one, this will allow us to always use at least
  * some minimal functionality given any interface pointer.
@@ -83,6 +108,7 @@ struct iBase
   //// non-virtual destructor" warnings.
   //virtual ~iBase() {}
 public:
+  SCF_INTERFACE(iBase, 0, 1, 0);
   /// Increment the number of references to this object.
   virtual void IncRef () = 0;
   /// Decrement the reference count.
@@ -1138,6 +1164,8 @@ struct iSCF : public iBase
    */
   virtual bool RegisterPlugin (const char* path) = 0;
 };
+
+#include "scf_new.h"
 
 SCF_VERSION (iFactory, 0, 0, 2);
 SCF_VERSION (iBase, 0, 1, 0);
