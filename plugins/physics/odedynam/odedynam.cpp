@@ -1014,7 +1014,11 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dMass m, om;
   dMassSetZero (&m);
 
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
+  if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
+    return false;
+
   csTriangle *c_triangle;
   int tr_num;
   csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
@@ -1040,11 +1044,12 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 
-  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float), p->GetVertexCount(),
-      indeces, 3*tr_num, 3*sizeof(int));
+  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
+  	p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
 
   dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
-  dGeomSetPosition (gid, trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dGeomSetPosition (gid, trans.GetOrigin().x,
+  	trans.GetOrigin().y, trans.GetOrigin().z);
 
   dMatrix3 mat;
   mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12;
@@ -1061,11 +1066,13 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   // so we will just use the OBB
   csOBB b;
   b.FindOBB (p->GetVertices(), p->GetVertexCount());
-  dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
+  dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(),
+  	b.MaxZ()-b.MinZ());
 
-  mat[0] = b.GetMatrix().m11; mat[1] = b.GetMatrix().m12; mat[2] = b.GetMatrix().m13;
-  mat[3] = b.GetMatrix().m21; mat[4] = b.GetMatrix().m22; mat[5] = b.GetMatrix().m23;
-  mat[6] = b.GetMatrix().m31; mat[7] = b.GetMatrix().m32; mat[8] = b.GetMatrix().m33;
+  const csMatrix3& b_mat = b.GetMatrix ();
+  mat[0] = b_mat.m11; mat[1] = b_mat.m12; mat[2] = b_mat.m13;
+  mat[3] = b_mat.m21; mat[4] = b_mat.m22; mat[5] = b_mat.m23;
+  mat[6] = b_mat.m31; mat[7] = b_mat.m32; mat[8] = b_mat.m33;
   dMassRotate (&m, mat);
 
   dBodyGetMass (bodyID, &om);
@@ -1103,9 +1110,10 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   dMassSetCappedCylinder (&m, density, 3, radius, length);
 
   dMatrix3 mat;
-  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
-  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
-  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  const csMatrix3& tr_mat = trans.GetO2T ();
+  mat[0] = tr_mat.m11; mat[1] = tr_mat.m12; mat[2] = tr_mat.m13; mat[3] = 0;
+  mat[4] = tr_mat.m21; mat[5] = tr_mat.m22; mat[6] = tr_mat.m23; mat[7] = 0;
+  mat[8] = tr_mat.m31; mat[9] = tr_mat.m32; mat[10] = tr_mat.m33; mat[11] = 0;
   dGeomSetRotation (gid, mat);
   dMassRotate (&m, mat);
 
@@ -1152,9 +1160,10 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
   dMassSetBox (&m, density, size.x, size.y, size.z);
 
   dMatrix3 mat;
-  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
-  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
-  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  const csMatrix3& tr_mat = trans.GetO2T ();
+  mat[0] = tr_mat.m11; mat[1] = tr_mat.m12; mat[2] = tr_mat.m13; mat[3] = 0;
+  mat[4] = tr_mat.m21; mat[5] = tr_mat.m22; mat[6] = tr_mat.m23; mat[7] = 0;
+  mat[8] = tr_mat.m31; mat[9] = tr_mat.m32; mat[10] = tr_mat.m33; mat[11] = 0;
   dGeomSetRotation (gid, mat);
   dMassRotate (&m, mat);
 

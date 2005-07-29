@@ -9,6 +9,8 @@ chronological order.
 29-Jul-2005
 	- Jorrit fixed the light movable->MovePosition() so that it doesn't
 	  notify the light listeners anymore. This is done in UpdateMove().
+	- Jorrit fixed a problem in odedynam, AttachColliderMesh(). It would
+	  crash on empty meshes.
 28-Jul-2005
 	- mdmkolbe fixed some more fallout from the include cleanup.
 	- mdmkolbe fixed some pedantic issues.
