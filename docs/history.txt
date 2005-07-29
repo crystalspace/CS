@@ -12,6 +12,7 @@ chronological order.
 	- Jorrit fixed a problem in odedynam, AttachColliderMesh(). It would
 	  crash on empty meshes.
 	- res excluded csutil/scf_impl.h from the master headers.
+	- Eric Sunshine fixed cssysdef.h so that it again works on MacOS/X.
 28-Jul-2005
 	- mdmkolbe fixed some more fallout from the include cleanup.
 	- mdmkolbe fixed some pedantic issues.
