@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Jul-2005
+	- mdmkolbe added the csQueryRegistry family of helper functions and
+	  defined CS_QUERY_REGISTRY et al. in terms of them.
 29-Jul-2005
 	- Jorrit fixed the light movable->MovePosition() so that it doesn't
 	  notify the light listeners anymore. This is done in UpdateMove().

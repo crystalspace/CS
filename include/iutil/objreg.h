@@ -28,16 +28,6 @@
 
 #include "csutil/scf.h"
 
-#define CS_QUERY_REGISTRY_TAG(Reg, Tag)       \
-  csPtr<iBase> ((iBase*) (CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag)))
-#define CS_QUERY_REGISTRY(Reg,Interface)      \
-  csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (\
-    scfInterfaceTraits<Interface>::GetName (), \
-    scfInterfaceTraits<Interface>::GetID (), scfInterfaceTraits<Interface>::GetVersion ())))
-#define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface)  \
-  csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag,    \
-    scfInterfaceTraits<Interface>::GetID (), scfInterfaceTraits<Interface>::GetVersion ())))
-
 struct iObjectRegistryIterator;
 
 SCF_VERSION (iObjectRegistry, 0, 0, 4);
@@ -166,6 +156,36 @@ struct iObjectRegistryIterator : public iBase
 };
 
 /** @} */
+
+template<class Interface>
+inline csPtr<Interface> csQueryRegistry (iObjectRegistry *Reg)
+{ 
+  return scfQueryInterfaceSafe<Interface> (
+    Reg->Get (scfInterfaceTraits<Interface>::GetName (),
+              scfInterfaceTraits<Interface>::GetID (),
+              scfInterfaceTraits<Interface>::GetVersion ()));
+}  
+  
+inline csPtr<iBase> csQueryRegistryTag (iObjectRegistry *Reg, const char* Tag)
+{  
+  return csPtr<iBase> (Reg->Get (Tag));
+}  
+   
+template<class Interface>
+inline csPtr<Interface> csQueryRegistryTagInterface (
+  iObjectRegistry *Reg, const char* Tag)
+{  
+  return scfQueryInterfaceSafe<Interface> (
+    Reg->Get (Tag,
+              scfInterfaceTraits<Interface>::GetID (),
+              scfInterfaceTraits<Interface>::GetVersion ()));
+}  
+
+/// FOR COMPATABILITY!
+#define CS_QUERY_REGISTRY_TAG(Reg, Tag) (csQueryRegistryTag(Reg, Tag))
+#define CS_QUERY_REGISTRY(Reg,Interface) (csQueryRegistry<Interface>(Reg))
+#define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface) \
+  (csQueryRegistryTagInterface<Interface>(Reg, Tag))
 
 #endif // __CS_IUTIL_OBJREG_H__
 
