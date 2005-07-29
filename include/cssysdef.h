@@ -97,7 +97,7 @@
 #  include <malloc.h>
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
      type *var = (type *)alloca ((size) * sizeof (type))
-#  if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__)
+#  if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__) && !defined(alloca)
 #    define alloca(x) __builtin_alloca(x)
 #  endif
 #endif
