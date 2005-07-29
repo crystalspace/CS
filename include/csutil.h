@@ -95,7 +95,6 @@
 #include "csutil/regexp.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
-#include "csutil/scf_impl.h"
 #include "csutil/scf_new.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
