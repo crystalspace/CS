@@ -73,13 +73,22 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		$cs_cv_prog_cxx_ignore_long_double"
 
 	    # Depending upon platform and installation, link library might
-	    # reside in "${prefix}/lib", "get_python_lib()/config", or
-	    # "${prefix}/libs" on Windows.
-	    cs_cv_pybase_lflags=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
-		'import sys,distutils.sysconfig; \
-		print "-L" + distutils.sysconfig.get_python_lib(0,1) + \
-		    " -L"+distutils.sysconfig.get_python_lib(0,1)+"/config" + \
-		    " -L"+sys.prefix + "/lib" + " -L"+sys.prefix + "/libs"'])
+	    # reside in "get_python_lib()", "get_python_lib()/config",
+	    # "${prefix}/lib" (Unix), or "${prefix}/libs" (Windows).
+	    cs_cv_pybase_syslib=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
+		'import distutils.sysconfig; \
+		print distutils.sysconfig.get_python_lib(0,1)'])
+	    cs_cv_pybase_sysprefix=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
+		'import sys; print sys.prefix'])
+	    cs_cv_pybase_lflags=''
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+		[cs_cv_pybase_syslib])
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+		[cs_cv_pybase_syslib], [config])
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+		[cs_cv_pybase_sysprefix], [lib])
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+		[cs_cv_pybase_sysprefix], [libs])
 
 	    cs_cv_pybase_libs=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import distutils.sysconfig; \
@@ -128,6 +137,11 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		[$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])],
 	    [cs_cv_python=no])],
 	[cs_cv_python=no])])
+
+# _CS_CHECK_PYTHON_LIBDIR(LFLAGS-VAR, DIR-VAR, [SUBDIR])
+AC_DEFUN([_CS_CHECK_PYTHON_LIBDIR],
+    [AS_IF([test -d "$$2[]m4_ifval([$3],[/$3],[])"],
+	[$1="$$1 -L$$2[]m4_ifval([$3],[/$3],[])"])])
 
 
 

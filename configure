@@ -8076,21 +8076,41 @@ else
 		$cs_cv_prog_cxx_ignore_long_double"
 
 	    # Depending upon platform and installation, link library might
-	    # reside in "${prefix}/lib", "get_python_lib()/config", or
-	    # "${prefix}/libs" on Windows.
-	    cs_cv_pybase_lflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
-		'import sys,distutils.sysconfig; \\
-		print \"-L\" + distutils.sysconfig.get_python_lib(0,1) + \\
-		    \" -L\"+distutils.sysconfig.get_python_lib(0,1)+\"/config\" + \\
-		    \" -L\"+sys.prefix + \"/lib\" + \" -L\"+sys.prefix + \"/libs\"'") >&5
+	    # reside in "get_python_lib()", "get_python_lib()/config",
+	    # "${prefix}/lib" (Unix), or "${prefix}/libs" (Windows).
+	    cs_cv_pybase_syslib=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
+		'import distutils.sysconfig; \\
+		print distutils.sysconfig.get_python_lib(0,1)'") >&5
   ($PYTHON -c \
-		'import sys,distutils.sysconfig; \
-		print "-L" + distutils.sysconfig.get_python_lib(0,1) + \
-		    " -L"+distutils.sysconfig.get_python_lib(0,1)+"/config" + \
-		    " -L"+sys.prefix + "/lib" + " -L"+sys.prefix + "/libs"') 2>&5
+		'import distutils.sysconfig; \
+		print distutils.sysconfig.get_python_lib(0,1)') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_pybase_sysprefix=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
+		'import sys; print sys.prefix'") >&5
+  ($PYTHON -c \
+		'import sys; print sys.prefix') 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_pybase_lflags=''
+	    if test -d "$cs_cv_pybase_syslib"; then
+  cs_cv_pybase_lflags="$cs_cv_pybase_lflags -L$cs_cv_pybase_syslib"
+fi
+
+	    if test -d "$cs_cv_pybase_syslib/config"; then
+  cs_cv_pybase_lflags="$cs_cv_pybase_lflags -L$cs_cv_pybase_syslib/config"
+fi
+
+	    if test -d "$cs_cv_pybase_sysprefix/lib"; then
+  cs_cv_pybase_lflags="$cs_cv_pybase_lflags -L$cs_cv_pybase_sysprefix/lib"
+fi
+
+	    if test -d "$cs_cv_pybase_sysprefix/libs"; then
+  cs_cv_pybase_lflags="$cs_cv_pybase_lflags -L$cs_cv_pybase_sysprefix/libs"
+fi
+
 
 	    cs_cv_pybase_libs=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig; \\
