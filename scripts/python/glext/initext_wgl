@@ -9,9 +9,10 @@
     char cfgkey[%Cfglen% + %Namelen% + 1];
     sprintf (cfgkey, "%Cfgprefix%%%s", ext);
     
+    (void)hDC;      // avoid `unused variable' warning.
 %Extcheck%
     bool allclear, funcTest;
-    (void)funcTest; // shut up "variable unused" warnings
+    (void)funcTest; // avoid `unused variable' warning.
     bool init = CS_%Name%;
     allclear = true;
     if (init)
