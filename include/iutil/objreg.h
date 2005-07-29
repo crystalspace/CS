@@ -31,11 +31,12 @@
 #define CS_QUERY_REGISTRY_TAG(Reg, Tag)       \
   csPtr<iBase> ((iBase*) (CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag)))
 #define CS_QUERY_REGISTRY(Reg,Interface)      \
-  csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (#Interface, \
-    scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion())))
+  csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (\
+    scfInterfaceTraits<Interface>::GetName (), \
+    scfInterfaceTraits<Interface>::GetID (), scfInterfaceTraits<Interface>::GetVersion ())))
 #define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface)  \
   csPtr<Interface> ((Interface*)(CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag,    \
-    scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion())))
+    scfInterfaceTraits<Interface>::GetID (), scfInterfaceTraits<Interface>::GetVersion ())))
 
 struct iObjectRegistryIterator;
 

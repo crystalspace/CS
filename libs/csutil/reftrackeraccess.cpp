@@ -28,8 +28,8 @@
   {						    	\
     iRefTracker* refTracker = (iSCF::SCF) ?		\
       ((iRefTracker*)(iSCF::SCF)->QueryInterface (  	\
-      scfInterface<iRefTracker>::GetID (),	    	\
-      scfInterface<iRefTracker>::GetVersion())) : 0;    \
+      scfInterfaceTraits<iRefTracker>::GetID (),	    	\
+      scfInterfaceTraits<iRefTracker>::GetVersion())) : 0;    \
     if (refTracker)				    	\
     {						    	\
       refTracker-> method params;  			\

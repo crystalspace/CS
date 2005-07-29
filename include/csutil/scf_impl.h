@@ -24,6 +24,10 @@
  * SCF_IMPL_EXT is defined.
  */
 
+#ifndef SCF_IN_IMPLEMENTATION_H
+#error Don't include this file directly. Included from scf_implementation.h
+#endif
+
 #ifndef SCF_IMPL_EXT
 #  define SCF_IMPL_NAME SCF_IMPL_CAT(scfImplementation,SCF_IMPL_N)
 #  define SCF_IMPL_SUPER scfImplementation<Class>
@@ -155,7 +159,7 @@ public:
 
 protected:
 #ifndef SCF_IMPL_EXT
-  SCF_IMPL_NAME(Class *object, iBase *parent=NULL)
+  SCF_IMPL_NAME(Class *object, iBase *parent=0)
     : SCF_IMPL_SUPER(object, parent)
   {}
 #else /* SCF_IMPL_EXT */

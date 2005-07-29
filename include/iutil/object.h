@@ -34,7 +34,7 @@ struct iObjectIterator;
  */
 #define CS_GET_CHILD_OBJECT(object,Interface)			\
   csPtr<Interface> ((Interface*)(object)->GetChild(		\
-  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion()))
+  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion()))
 
 /**
  * You can use this macro to get a child object with the given name and
@@ -42,7 +42,7 @@ struct iObjectIterator;
  */
 #define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
   csPtr<Interface> ((Interface*)(object)->GetChild(			\
-  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion(), \
+  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion(), \
   name))
 
 /**

@@ -40,6 +40,7 @@
 				   * type, result still unsigned */
   #pragma warning(disable:4201)   // VC6: structure/ union without name.
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
+  #pragma warning(disable:4250)   // '...' inherits '..' via dominance
   #pragma warning(disable:4251)   /* class needs to have dll-interface to be 
 				   * used by clients */
   #pragma warning(disable:4275)   /* non-DLL-interface used as base for
@@ -50,6 +51,7 @@
   #pragma warning(disable:4345)   /* VC7.1: an object of POD type constructed 
 				   * with an initializer of the form () will 
 				   * be default-initialized */
+  #pragma warning(disable:4355)   // 'this' used in base member initializer list
   #pragma warning(disable:4390)   // Empty control statement
   #pragma warning(disable:4505)   /* 'function' : unreferenced local function 
 				   * has been removed */

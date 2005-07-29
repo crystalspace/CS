@@ -43,7 +43,8 @@ struct iComponent;
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
-  (ClassID, #Interface, scfInterface<Interface>::GetVersion())))
+  (ClassID, scfInterfaceTraits<Interface>::GetName(),                   \
+  scfInterfaceTraits<Interface>::GetVersion())))  
 
 /**
  * Tell plugin manager to load a plugin.
@@ -53,7 +54,8 @@ struct iComponent;
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
-  (ClassID, #Interface, scfInterface<Interface>::GetVersion())))
+  (ClassID, scfInterfaceTraits<Interface>::GetName(),                   \
+  scfInterfaceTraits<Interface>::GetVersion())))
 
 /**
  * Same as CS_LOAD_PLUGIN() but does nott bother asking for a interface.

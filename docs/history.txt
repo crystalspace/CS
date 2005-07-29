@@ -15,6 +15,9 @@ chronological order.
 	- Eric Sunshine fixed cssysdef.h so that it again works on MacOS/X.
 	- Eric Sunshine eliminated compilation warnings in the custom cursor
 	  plugin.
+	- Marten cleaned up the new scf implementation a bit. It is now split
+	  in several headers to later allow less header-in-header includes.
+	  Also using new macros for querying interface, and SCF_VERSION.
 28-Jul-2005
 	- mdmkolbe fixed some more fallout from the include cleanup.
 	- mdmkolbe fixed some pedantic issues.

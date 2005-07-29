@@ -54,8 +54,8 @@ public:
   /// Constructor.
   csTypedObjectIterator(iObject* parent)
   {
-    scf_id = scfInterface<T>::GetID();
-    scf_ver = scfInterface<T>::GetVersion();
+    scf_id = scfInterfaceTraits<T>::GetID();
+    scf_ver = scfInterfaceTraits<T>::GetVersion();
     iter = parent->GetIterator();
     FetchObject();
   }

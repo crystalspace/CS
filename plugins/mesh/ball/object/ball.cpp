@@ -55,7 +55,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
       iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
     if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
+      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
       csPrintf ("Deprecated feature use: iPolygonMesh queried from Ball "

@@ -188,7 +188,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
       iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
     if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
+      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
     {
       csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
 	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
@@ -981,7 +981,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
       iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
     if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion(iVersion, scfInterface<iPolygonMesh>::GetVersion()))
+      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
     {
 #ifdef CS_DEBUG
       csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "

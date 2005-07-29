@@ -34,6 +34,7 @@ namespace autom
   /** Base class for all Keila objects. */
   struct iObject 
   {    
+    SCF_INTERFACE(autom_iObject,0,0,1);
       enum TYPE { T_STRING, T_INT, T_FLOAT, T_LIST, T_MAP, T_FUNCTION, T_REFERENCE, T_BLOB, T_NIL };
 
       /** Returns the type of the object, a member of the object::TYPE enumeration. */
@@ -62,7 +63,7 @@ namespace autom
 
 } // namespace aws
 
-SCF_VERSION(aws::autom::iObject, 1, 0, 1);
+/*SCF_VERSION(aws::autom::iObject, 1, 0, 1);*/
 
 
 SCF_VERSION(iAwsWindow, 1, 0, 1);
