@@ -140,7 +140,6 @@ void csMovable::SetTransform (const csMatrix3 &matrix)
 void csMovable::MovePosition (const csVector3 &rel)
 {
   obj.Translate (rel);
-  if (lightobject) lightobject->OnSetPosition ();
 }
 
 void csMovable::Transform (const csMatrix3 &matrix)
