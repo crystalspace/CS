@@ -13162,8 +13162,12 @@ sub new {
 *GetGravity = *cspacec::csColliderActor_GetGravity;
 *IsOnGround = *cspacec::csColliderActor_IsOnGround;
 *SetOnGround = *cspacec::csColliderActor_SetOnGround;
+*HasCD = *cspacec::csColliderActor_HasCD;
+*SetCD = *cspacec::csColliderActor_SetCD;
 *CheckRevertMove = *cspacec::csColliderActor_CheckRevertMove;
 *Move = *cspacec::csColliderActor_Move;
+*GetRotation = *cspacec::csColliderActor_GetRotation;
+*SetRotation = *cspacec::csColliderActor_SetRotation;
 *AdjustForCollisions = *cspacec::csColliderActor_AdjustForCollisions;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
