@@ -404,6 +404,7 @@ void csSkelAnimControlRunnable::release_tranform_data(TransformHash& h)
   TransformHash::GlobalIterator it(h.GetIterator());
   while (it.HasNext())
     delete it.Next();
+  h.Empty();
 }
 
 bone_transform_data *csSkelAnimControlRunnable::GetBoneRotation(csSkelBone *bone)
