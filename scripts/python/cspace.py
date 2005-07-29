@@ -11940,8 +11940,12 @@ class csColliderActor(_object):
     def GetGravity(*args): return _cspace.csColliderActor_GetGravity(*args)
     def IsOnGround(*args): return _cspace.csColliderActor_IsOnGround(*args)
     def SetOnGround(*args): return _cspace.csColliderActor_SetOnGround(*args)
+    def HasCD(*args): return _cspace.csColliderActor_HasCD(*args)
+    def SetCD(*args): return _cspace.csColliderActor_SetCD(*args)
     def CheckRevertMove(*args): return _cspace.csColliderActor_CheckRevertMove(*args)
     def Move(*args): return _cspace.csColliderActor_Move(*args)
+    def GetRotation(*args): return _cspace.csColliderActor_GetRotation(*args)
+    def SetRotation(*args): return _cspace.csColliderActor_SetRotation(*args)
     def AdjustForCollisions(*args): return _cspace.csColliderActor_AdjustForCollisions(*args)
     def __del__(self, destroy=_cspace.delete_csColliderActor):
         try:
