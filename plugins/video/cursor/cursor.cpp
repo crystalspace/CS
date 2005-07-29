@@ -253,8 +253,8 @@ bool csCursor::HandleEvent (iEvent &ev)
       ci->pixmap->Advance (vc->GetElapsedTicks ());
       csRef<iMouseDriver> mouse = CS_QUERY_REGISTRY (reg, iMouseDriver);
 
-      ci->pixmap->Draw (g3d, mouse->GetLastX() - ci->hotspot.x, 
-                             mouse->GetLastY() - ci->hotspot.y,
+      ci->pixmap->Draw (g3d, (int)(mouse->GetLastX() - ci->hotspot.x),
+                             (int)(mouse->GetLastY() - ci->hotspot.y),
 			     ci->transparency);
       return false;
     }
@@ -315,7 +315,7 @@ bool csCursor::SwitchCursor (const char *name)
 
     // Attempt to use image to enable OS level cursor
     if (g2d->SetMouseCursor (ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
-      ci->hotspot.x, ci->hotspot.y, ci->fg, ci->bg))
+      (int)ci->hotspot.x, (int)ci->hotspot.y, ci->fg, ci->bg))
     {
       useOS = true;
       return true;
@@ -324,8 +324,9 @@ bool csCursor::SwitchCursor (const char *name)
   }
 
   // We already know which method to use if we're here
-  if (useOS) g2d->SetMouseCursor (ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
-    ci->hotspot.x, ci->hotspot.y, ci->fg, ci->bg);
+  if (useOS)
+    g2d->SetMouseCursor (ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
+      (int)ci->hotspot.x, (int)ci->hotspot.y, ci->fg, ci->bg);
 
   current = name;
   return true;

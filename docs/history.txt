@@ -13,6 +13,8 @@ chronological order.
 	  crash on empty meshes.
 	- res excluded csutil/scf_impl.h from the master headers.
 	- Eric Sunshine fixed cssysdef.h so that it again works on MacOS/X.
+	- Eric Sunshine eliminated compilation warnings in the custom cursor
+	  plugin.
 28-Jul-2005
 	- mdmkolbe fixed some more fallout from the include cleanup.
 	- mdmkolbe fixed some pedantic issues.
