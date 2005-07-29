@@ -618,11 +618,11 @@ public:
       glBindTexture (target, texture);
     }
   }
-  GLuint GetTexture (GLenum target)
+  GLuint GetTexture (GLenum /*target*/)
   {
     return currentContext->boundtexture[currentContext->currentUnit];
   }
-  GLuint GetTexture (GLenum target, int unit)
+  GLuint GetTexture (GLenum /*target*/, int unit)
   {
     return currentContext->boundtexture[unit];
   }
