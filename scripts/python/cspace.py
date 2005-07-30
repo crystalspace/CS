@@ -69,51 +69,11 @@ class csWrapPtrPtr(csWrapPtr):
 _cspace.csWrapPtr_swigregister(csWrapPtrPtr)
 
 CS_VOIDED_PTR = _cspace.CS_VOIDED_PTR
-class iBase(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iBase, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, iBase, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ iBase instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def IncRef(*args): return _cspace.iBase_IncRef(*args)
-    def DecRef(*args): return _cspace.iBase_DecRef(*args)
-    def GetRefCount(*args): return _cspace.iBase_GetRefCount(*args)
-    def QueryInterface(*args): return _cspace.iBase_QueryInterface(*args)
-    __swig_getmethods__["QueryInterfaceSafe"] = lambda x: _cspace.iBase_QueryInterfaceSafe
-    if _newclass:QueryInterfaceSafe = staticmethod(_cspace.iBase_QueryInterfaceSafe)
-    def AddRefOwner(*args): return _cspace.iBase_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cspace.iBase_RemoveRefOwner(*args)
-    def __del__(self, destroy=_cspace.delete_iBase):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBase_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iBase_scfGetVersion)
-    def _DynamicCast(*args): return _cspace.iBase__DynamicCast(*args)
-
-class iBasePtr(iBase):
-    def __init__(self, this):
-        _swig_setattr(self, iBase, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iBase, 'thisown', 0)
-        _swig_setattr(self, iBase,self.__class__,iBase)
-_cspace.iBase_swigregister(iBasePtr)
-cvar = _cspace.cvar
-csArrayItemNotFound = cvar.csArrayItemNotFound
-
-iBase_QueryInterfaceSafe = _cspace.iBase_QueryInterfaceSafe
-
-iBase_scfGetVersion = _cspace.iBase_scfGetVersion
-
 SCF_STATIC_CLASS_CONTEXT = _cspace.SCF_STATIC_CLASS_CONTEXT
-class iFactory(iBase):
+class iFactory(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFactory, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFactory, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -138,6 +98,8 @@ class iFactoryPtr(iFactory):
         if not hasattr(self,"thisown"): _swig_setattr(self, iFactory, 'thisown', 0)
         _swig_setattr(self, iFactory,self.__class__,iFactory)
 _cspace.iFactory_swigregister(iFactoryPtr)
+cvar = _cspace.cvar
+csArrayItemNotFound = cvar.csArrayItemNotFound
 
 iFactory_scfGetVersion = _cspace.iFactory_scfGetVersion
 
@@ -147,62 +109,15 @@ SCF_VERBOSE_PLUGIN_LOAD = _cspace.SCF_VERBOSE_PLUGIN_LOAD
 SCF_VERBOSE_PLUGIN_REGISTER = _cspace.SCF_VERBOSE_PLUGIN_REGISTER
 SCF_VERBOSE_CLASS_REGISTER = _cspace.SCF_VERBOSE_CLASS_REGISTER
 SCF_VERBOSE_ALL = _cspace.SCF_VERBOSE_ALL
-
-scfCompatibleVersion = _cspace.scfCompatibleVersion
-class iSCF(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSCF, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iSCF, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ iSCF instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def RegisterClasses(*args): return _cspace.iSCF_RegisterClasses(*args)
-    def ClassRegistered(*args): return _cspace.iSCF_ClassRegistered(*args)
-    def CreateInstance(*args): return _cspace.iSCF_CreateInstance(*args)
-    def GetClassDescription(*args): return _cspace.iSCF_GetClassDescription(*args)
-    def GetClassDependencies(*args): return _cspace.iSCF_GetClassDependencies(*args)
-    def GetPluginMetadata(*args): return _cspace.iSCF_GetPluginMetadata(*args)
-    def UnloadUnusedModules(*args): return _cspace.iSCF_UnloadUnusedModules(*args)
-    def RegisterClass(*args): return _cspace.iSCF_RegisterClass(*args)
-    def RegisterFactoryFunc(*args): return _cspace.iSCF_RegisterFactoryFunc(*args)
-    def UnregisterClass(*args): return _cspace.iSCF_UnregisterClass(*args)
-    def GetInterfaceName(*args): return _cspace.iSCF_GetInterfaceName(*args)
-    def GetInterfaceID(*args): return _cspace.iSCF_GetInterfaceID(*args)
-    def Finish(*args): return _cspace.iSCF_Finish(*args)
-    def QueryClassList(*args): return _cspace.iSCF_QueryClassList(*args)
-    def ScanPluginsPath(*args): return _cspace.iSCF_ScanPluginsPath(*args)
-    def RegisterPlugin(*args): return _cspace.iSCF_RegisterPlugin(*args)
-    def __del__(self, destroy=_cspace.delete_iSCF):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSCF_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iSCF_scfGetVersion)
-
-class iSCFPtr(iSCF):
-    def __init__(self, this):
-        _swig_setattr(self, iSCF, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iSCF, 'thisown', 0)
-        _swig_setattr(self, iSCF,self.__class__,iSCF)
-_cspace.iSCF_swigregister(iSCFPtr)
-
-iSCF_scfGetVersion = _cspace.iSCF_scfGetVersion
-
 CS_DBGHELP_UNITTEST = _cspace.CS_DBGHELP_UNITTEST
 CS_DBGHELP_BENCHMARK = _cspace.CS_DBGHELP_BENCHMARK
 CS_DBGHELP_TXTDUMP = _cspace.CS_DBGHELP_TXTDUMP
 CS_DBGHELP_GFXDUMP = _cspace.CS_DBGHELP_GFXDUMP
 CS_DBGHELP_STATETEST = _cspace.CS_DBGHELP_STATETEST
-class iDebugHelper(iBase):
+class iDebugHelper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDebugHelper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDebugHelper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -230,12 +145,10 @@ _cspace.iDebugHelper_swigregister(iDebugHelperPtr)
 
 iDebugHelper_scfGetVersion = _cspace.iDebugHelper_scfGetVersion
 
-class iCommandLineParser(iBase):
+class iCommandLineParser(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCommandLineParser, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCommandLineParser, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -413,12 +326,10 @@ class csStringSetPtr(csStringSet):
         _swig_setattr(self, csStringSet,self.__class__,csStringSet)
 _cspace.csStringSet_swigregister(csStringSetPtr)
 
-class iString(iBase):
+class iString(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iString, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iString, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -2559,12 +2470,10 @@ class csPluginRequestArrayPtr(csPluginRequestArray):
         _swig_setattr(self, csPluginRequestArray,self.__class__,csPluginRequestArray)
 _cspace.csPluginRequestArray_swigregister(csPluginRequestArrayPtr)
 
-class iAwsKey(iBase):
+class iAwsKey(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsKey, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsKey, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -2818,12 +2727,10 @@ class iAwsComponentNodePtr(iAwsComponentNode):
         _swig_setattr(self, iAwsComponentNode,self.__class__,iAwsComponentNode)
 _cspace.iAwsComponentNode_swigregister(iAwsComponentNodePtr)
 
-class iAws(iBase):
+class iAws(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAws, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAws, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -2888,12 +2795,10 @@ _cspace.iAws_swigregister(iAwsPtr)
 
 iAws_scfGetVersion = _cspace.iAws_scfGetVersion
 
-class iAwsPrefManager(iBase):
+class iAwsPrefManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsPrefManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsPrefManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -2949,12 +2854,10 @@ class iAwsPrefManagerPtr(iAwsPrefManager):
         _swig_setattr(self, iAwsPrefManager,self.__class__,iAwsPrefManager)
 _cspace.iAwsPrefManager_swigregister(iAwsPrefManagerPtr)
 
-class iAwsSinkManager(iBase):
+class iAwsSinkManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsSinkManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSinkManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -2978,12 +2881,10 @@ class iAwsSinkManagerPtr(iAwsSinkManager):
         _swig_setattr(self, iAwsSinkManager,self.__class__,iAwsSinkManager)
 _cspace.iAwsSinkManager_swigregister(iAwsSinkManagerPtr)
 
-class iAwsSink(iBase):
+class iAwsSink(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsSink, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSink, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3005,12 +2906,10 @@ class iAwsSinkPtr(iAwsSink):
         _swig_setattr(self, iAwsSink,self.__class__,iAwsSink)
 _cspace.iAwsSink_swigregister(iAwsSinkPtr)
 
-class iAwsSource(iBase):
+class iAwsSource(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsSource, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSource, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3032,12 +2931,10 @@ class iAwsSourcePtr(iAwsSource):
         _swig_setattr(self, iAwsSource,self.__class__,iAwsSource)
 _cspace.iAwsSource_swigregister(iAwsSourcePtr)
 
-class iAwsSlot(iBase):
+class iAwsSlot(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsSlot, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsSlot, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3058,12 +2955,10 @@ class iAwsSlotPtr(iAwsSlot):
         _swig_setattr(self, iAwsSlot,self.__class__,iAwsSlot)
 _cspace.iAwsSlot_swigregister(iAwsSlotPtr)
 
-class iAwsLayoutManager(iBase):
+class iAwsLayoutManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsLayoutManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsLayoutManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3203,12 +3098,10 @@ class iAwsComponentPtr(iAwsComponent):
         _swig_setattr(self, iAwsComponent,self.__class__,iAwsComponent)
 _cspace.iAwsComponent_swigregister(iAwsComponentPtr)
 
-class iAwsComponentFactory(iBase):
+class iAwsComponentFactory(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsComponentFactory, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsComponentFactory, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3229,12 +3122,10 @@ class iAwsComponentFactoryPtr(iAwsComponentFactory):
         _swig_setattr(self, iAwsComponentFactory,self.__class__,iAwsComponentFactory)
 _cspace.iAwsComponentFactory_swigregister(iAwsComponentFactoryPtr)
 
-class iAwsKeyFactory(iBase):
+class iAwsKeyFactory(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsKeyFactory, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsKeyFactory, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3263,12 +3154,10 @@ class iAwsKeyFactoryPtr(iAwsKeyFactory):
         _swig_setattr(self, iAwsKeyFactory,self.__class__,iAwsKeyFactory)
 _cspace.iAwsKeyFactory_swigregister(iAwsKeyFactoryPtr)
 
-class iAwsConnectionNodeFactory(iBase):
+class iAwsConnectionNodeFactory(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAwsConnectionNodeFactory, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAwsConnectionNodeFactory, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3328,12 +3217,10 @@ _cspace.csVertexStatus_swigregister(csVertexStatusPtr)
 CS_VERTEX_ORIGINAL = _cspace.CS_VERTEX_ORIGINAL
 CS_VERTEX_ONEDGE = _cspace.CS_VERTEX_ONEDGE
 CS_VERTEX_INSIDE = _cspace.CS_VERTEX_INSIDE
-class iClipper2D(iBase):
+class iClipper2D(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iClipper2D, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iClipper2D, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3360,12 +3247,10 @@ class iClipper2DPtr(iClipper2D):
         _swig_setattr(self, iClipper2D,self.__class__,iClipper2D)
 _cspace.iClipper2D_swigregister(iClipper2DPtr)
 
-class iObjectModelListener(iBase):
+class iObjectModelListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectModelListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectModelListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3388,12 +3273,10 @@ _cspace.iObjectModelListener_swigregister(iObjectModelListenerPtr)
 
 iObjectModelListener_scfGetVersion = _cspace.iObjectModelListener_scfGetVersion
 
-class iObjectModel(iBase):
+class iObjectModel(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectModel, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectModel, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3429,12 +3312,10 @@ _cspace.iObjectModel_swigregister(iObjectModelPtr)
 
 iObjectModel_scfGetVersion = _cspace.iObjectModel_scfGetVersion
 
-class iPath(iBase):
+class iPath(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPath, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPath, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3508,12 +3389,10 @@ class csMeshedPolygonPtr(csMeshedPolygon):
         _swig_setattr(self, csMeshedPolygon,self.__class__,csMeshedPolygon)
 _cspace.csMeshedPolygon_swigregister(csMeshedPolygonPtr)
 
-class iPolygonMesh(iBase):
+class iPolygonMesh(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPolygonMesh, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPolygonMesh, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3726,12 +3605,10 @@ class csPolygonMeshBoxPtr(csPolygonMeshBox):
         _swig_setattr(self, csPolygonMeshBox,self.__class__,csPolygonMeshBox)
 _cspace.csPolygonMeshBox_swigregister(csPolygonMeshBoxPtr)
 
-class iFrustumViewUserdata(iBase):
+class iFrustumViewUserdata(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFrustumViewUserdata, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFrustumViewUserdata, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3786,12 +3663,10 @@ class csFrustumContextPtr(csFrustumContext):
         _swig_setattr(self, csFrustumContext,self.__class__,csFrustumContext)
 _cspace.csFrustumContext_swigregister(csFrustumContextPtr)
 
-class iFrustumView(iBase):
+class iFrustumView(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFrustumView, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFrustumView, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3844,12 +3719,10 @@ CS_ATTN_CLQ = _cspace.CS_ATTN_CLQ
 CS_LIGHT_POINTLIGHT = _cspace.CS_LIGHT_POINTLIGHT
 CS_LIGHT_DIRECTIONAL = _cspace.CS_LIGHT_DIRECTIONAL
 CS_LIGHT_SPOTLIGHT = _cspace.CS_LIGHT_SPOTLIGHT
-class iLightCallback(iBase):
+class iLightCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLightCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3873,12 +3746,10 @@ class iLightCallbackPtr(iLightCallback):
         _swig_setattr(self, iLightCallback,self.__class__,iLightCallback)
 _cspace.iLightCallback_swigregister(iLightCallbackPtr)
 
-class iLight(iBase):
+class iLight(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLight, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLight, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3939,12 +3810,10 @@ _cspace.iLight_swigregister(iLightPtr)
 
 iLight_scfGetVersion = _cspace.iLight_scfGetVersion
 
-class iLightList(iBase):
+class iLightList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLightList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -3974,12 +3843,10 @@ _cspace.iLightList_swigregister(iLightListPtr)
 
 iLightList_scfGetVersion = _cspace.iLightList_scfGetVersion
 
-class iLightingProcessData(iBase):
+class iLightingProcessData(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLightingProcessData, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightingProcessData, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4028,12 +3895,10 @@ class iLightingProcessInfoPtr(iLightingProcessInfo):
         _swig_setattr(self, iLightingProcessInfo,self.__class__,iLightingProcessInfo)
 _cspace.iLightingProcessInfo_swigregister(iLightingProcessInfoPtr)
 
-class iLightIterator(iBase):
+class iLightIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLightIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLightIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4055,12 +3920,10 @@ class iLightIteratorPtr(iLightIterator):
         _swig_setattr(self, iLightIterator,self.__class__,iLightIterator)
 _cspace.iLightIterator_swigregister(iLightIteratorPtr)
 
-class iSectorCallback(iBase):
+class iSectorCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSectorCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4079,12 +3942,10 @@ class iSectorCallbackPtr(iSectorCallback):
         _swig_setattr(self, iSectorCallback,self.__class__,iSectorCallback)
 _cspace.iSectorCallback_swigregister(iSectorCallbackPtr)
 
-class iSectorMeshCallback(iBase):
+class iSectorMeshCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSectorMeshCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorMeshCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4104,12 +3965,10 @@ class iSectorMeshCallbackPtr(iSectorMeshCallback):
         _swig_setattr(self, iSectorMeshCallback,self.__class__,iSectorMeshCallback)
 _cspace.iSectorMeshCallback_swigregister(iSectorMeshCallbackPtr)
 
-class iSector(iBase):
+class iSector(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSector, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSector, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4167,12 +4026,10 @@ _cspace.iSector_swigregister(iSectorPtr)
 
 iSector_scfGetVersion = _cspace.iSector_scfGetVersion
 
-class iSectorList(iBase):
+class iSectorList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSectorList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4201,12 +4058,10 @@ _cspace.iSectorList_swigregister(iSectorListPtr)
 
 iSectorList_scfGetVersion = _cspace.iSectorList_scfGetVersion
 
-class iSectorIterator(iBase):
+class iSectorIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSectorIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSectorIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4234,12 +4089,10 @@ CS_ENGINE_CACHE_NOUPDATE = _cspace.CS_ENGINE_CACHE_NOUPDATE
 CS_RENDPRI_NONE = _cspace.CS_RENDPRI_NONE
 CS_RENDPRI_BACK2FRONT = _cspace.CS_RENDPRI_BACK2FRONT
 CS_RENDPRI_FRONT2BACK = _cspace.CS_RENDPRI_FRONT2BACK
-class iEngineSectorCallback(iBase):
+class iEngineSectorCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineSectorCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineSectorCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4259,12 +4112,10 @@ class iEngineSectorCallbackPtr(iEngineSectorCallback):
         _swig_setattr(self, iEngineSectorCallback,self.__class__,iEngineSectorCallback)
 _cspace.iEngineSectorCallback_swigregister(iEngineSectorCallbackPtr)
 
-class iEngine(iBase):
+class iEngine(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEngine, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngine, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4385,12 +4236,10 @@ _cspace.iEngine_swigregister(iEnginePtr)
 
 iEngine_scfGetVersion = _cspace.iEngine_scfGetVersion
 
-class iCameraSectorListener(iBase):
+class iCameraSectorListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCameraSectorListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCameraSectorListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4409,12 +4258,10 @@ class iCameraSectorListenerPtr(iCameraSectorListener):
         _swig_setattr(self, iCameraSectorListener,self.__class__,iCameraSectorListener)
 _cspace.iCameraSectorListener_swigregister(iCameraSectorListenerPtr)
 
-class iCamera(iBase):
+class iCamera(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCamera, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCamera, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4465,12 +4312,10 @@ _cspace.iCamera_swigregister(iCameraPtr)
 
 iCamera_scfGetVersion = _cspace.iCamera_scfGetVersion
 
-class iCameraPosition(iBase):
+class iCameraPosition(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCameraPosition, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCameraPosition, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4507,12 +4352,10 @@ _cspace.iCameraPosition_swigregister(iCameraPositionPtr)
 
 iCameraPosition_scfGetVersion = _cspace.iCameraPosition_scfGetVersion
 
-class iCameraPositionList(iBase):
+class iCameraPositionList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCameraPositionList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCameraPositionList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4538,12 +4381,10 @@ class iCameraPositionListPtr(iCameraPositionList):
         _swig_setattr(self, iCameraPositionList,self.__class__,iCameraPositionList)
 _cspace.iCameraPositionList_swigregister(iCameraPositionListPtr)
 
-class iTextureCallback(iBase):
+class iTextureCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4562,12 +4403,10 @@ class iTextureCallbackPtr(iTextureCallback):
         _swig_setattr(self, iTextureCallback,self.__class__,iTextureCallback)
 _cspace.iTextureCallback_swigregister(iTextureCallbackPtr)
 
-class iTextureWrapper(iBase):
+class iTextureWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureWrapper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4608,12 +4447,10 @@ _cspace.iTextureWrapper_swigregister(iTextureWrapperPtr)
 
 iTextureWrapper_scfGetVersion = _cspace.iTextureWrapper_scfGetVersion
 
-class iTextureList(iBase):
+class iTextureList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4643,12 +4480,10 @@ _cspace.iTextureList_swigregister(iTextureListPtr)
 
 iTextureList_scfGetVersion = _cspace.iTextureList_scfGetVersion
 
-class iMaterialWrapper(iBase):
+class iMaterialWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMaterialWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterialWrapper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4676,12 +4511,10 @@ _cspace.iMaterialWrapper_swigregister(iMaterialWrapperPtr)
 
 iMaterialWrapper_scfGetVersion = _cspace.iMaterialWrapper_scfGetVersion
 
-class iMaterialEngine(iBase):
+class iMaterialEngine(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMaterialEngine, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterialEngine, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4702,12 +4535,10 @@ class iMaterialEnginePtr(iMaterialEngine):
         _swig_setattr(self, iMaterialEngine,self.__class__,iMaterialEngine)
 _cspace.iMaterialEngine_swigregister(iMaterialEnginePtr)
 
-class iMaterialList(iBase):
+class iMaterialList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMaterialList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMaterialList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4742,12 +4573,10 @@ CS_ENTITY_NOHITBEAM = _cspace.CS_ENTITY_NOHITBEAM
 CS_ENTITY_NOCLIP = _cspace.CS_ENTITY_NOCLIP
 CS_LIGHTINGUPDATE_SORTRELEVANCE = _cspace.CS_LIGHTINGUPDATE_SORTRELEVANCE
 CS_LIGHTINGUPDATE_ALWAYSUPDATE = _cspace.CS_LIGHTINGUPDATE_ALWAYSUPDATE
-class iMeshDrawCallback(iBase):
+class iMeshDrawCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshDrawCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshDrawCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4836,12 +4665,10 @@ class csScreenBoxResultPtr(csScreenBoxResult):
         _swig_setattr(self, csScreenBoxResult,self.__class__,csScreenBoxResult)
 _cspace.csScreenBoxResult_swigregister(csScreenBoxResultPtr)
 
-class iMeshWrapper(iBase):
+class iMeshWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshWrapper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4906,12 +4733,10 @@ _cspace.iMeshWrapper_swigregister(iMeshWrapperPtr)
 
 iMeshWrapper_scfGetVersion = _cspace.iMeshWrapper_scfGetVersion
 
-class iMeshFactoryWrapper(iBase):
+class iMeshFactoryWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshFactoryWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshFactoryWrapper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4956,12 +4781,10 @@ _cspace.iMeshFactoryWrapper_swigregister(iMeshFactoryWrapperPtr)
 
 iMeshFactoryWrapper_scfGetVersion = _cspace.iMeshFactoryWrapper_scfGetVersion
 
-class iMeshList(iBase):
+class iMeshList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -4986,12 +4809,10 @@ class iMeshListPtr(iMeshList):
         _swig_setattr(self, iMeshList,self.__class__,iMeshList)
 _cspace.iMeshList_swigregister(iMeshListPtr)
 
-class iMeshFactoryList(iBase):
+class iMeshFactoryList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshFactoryList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshFactoryList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5016,12 +4837,10 @@ class iMeshFactoryListPtr(iMeshFactoryList):
         _swig_setattr(self, iMeshFactoryList,self.__class__,iMeshFactoryList)
 _cspace.iMeshFactoryList_swigregister(iMeshFactoryListPtr)
 
-class iMeshWrapperIterator(iBase):
+class iMeshWrapperIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshWrapperIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshWrapperIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5046,12 +4865,10 @@ _cspace.iMeshWrapperIterator_swigregister(iMeshWrapperIteratorPtr)
 
 iMeshWrapperIterator_scfGetVersion = _cspace.iMeshWrapperIterator_scfGetVersion
 
-class iMovableListener(iBase):
+class iMovableListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMovableListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMovableListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5075,12 +4892,10 @@ _cspace.iMovableListener_swigregister(iMovableListenerPtr)
 
 iMovableListener_scfGetVersion = _cspace.iMovableListener_scfGetVersion
 
-class iMovable(iBase):
+class iMovable(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMovable, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMovable, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5123,12 +4938,10 @@ _cspace.iMovable_swigregister(iMovablePtr)
 
 iMovable_scfGetVersion = _cspace.iMovable_scfGetVersion
 
-class iRegion(iBase):
+class iRegion(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iRegion, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRegion, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5162,12 +4975,10 @@ class iRegionPtr(iRegion):
         _swig_setattr(self, iRegion,self.__class__,iRegion)
 _cspace.iRegion_swigregister(iRegionPtr)
 
-class iRegionList(iBase):
+class iRegionList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iRegionList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRegionList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5192,12 +5003,10 @@ class iRegionListPtr(iRegionList):
         _swig_setattr(self, iRegionList,self.__class__,iRegionList)
 _cspace.iRegionList_swigregister(iRegionListPtr)
 
-class iVisibilityObjectIterator(iBase):
+class iVisibilityObjectIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iVisibilityObjectIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityObjectIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5218,12 +5027,10 @@ class iVisibilityObjectIteratorPtr(iVisibilityObjectIterator):
         _swig_setattr(self, iVisibilityObjectIterator,self.__class__,iVisibilityObjectIterator)
 _cspace.iVisibilityObjectIterator_swigregister(iVisibilityObjectIteratorPtr)
 
-class iVisibilityCullerListener(iBase):
+class iVisibilityCullerListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iVisibilityCullerListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityCullerListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5242,12 +5049,10 @@ class iVisibilityCullerListenerPtr(iVisibilityCullerListener):
         _swig_setattr(self, iVisibilityCullerListener,self.__class__,iVisibilityCullerListener)
 _cspace.iVisibilityCullerListener_swigregister(iVisibilityCullerListenerPtr)
 
-class iVisibilityCuller(iBase):
+class iVisibilityCuller(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iVisibilityCuller, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityCuller, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5280,12 +5085,10 @@ iVisibilityCuller_scfGetVersion = _cspace.iVisibilityCuller_scfGetVersion
 
 CS_CULLER_HINT_GOODOCCLUDER = _cspace.CS_CULLER_HINT_GOODOCCLUDER
 CS_CULLER_HINT_BADOCCLUDER = _cspace.CS_CULLER_HINT_BADOCCLUDER
-class iVisibilityObject(iBase):
+class iVisibilityObject(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iVisibilityObject, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVisibilityObject, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5316,12 +5119,10 @@ CS_PORTAL_STATICDEST = _cspace.CS_PORTAL_STATICDEST
 CS_PORTAL_FLOAT = _cspace.CS_PORTAL_FLOAT
 CS_PORTAL_COLLDET = _cspace.CS_PORTAL_COLLDET
 CS_PORTAL_VISCULL = _cspace.CS_PORTAL_VISCULL
-class iPortalCallback(iBase):
+class iPortalCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPortalCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPortalCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5340,12 +5141,10 @@ class iPortalCallbackPtr(iPortalCallback):
         _swig_setattr(self, iPortalCallback,self.__class__,iPortalCallback)
 _cspace.iPortalCallback_swigregister(iPortalCallbackPtr)
 
-class iPortal(iBase):
+class iPortal(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPortal, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPortal, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5405,12 +5204,10 @@ _cspace.iPortal_swigregister(iPortalPtr)
 
 iPortal_scfGetVersion = _cspace.iPortal_scfGetVersion
 
-class iPortalContainer(iBase):
+class iPortalContainer(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPortalContainer, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPortalContainer, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5437,12 +5234,10 @@ _cspace.iPortalContainer_swigregister(iPortalContainerPtr)
 
 iPortalContainer_scfGetVersion = _cspace.iPortalContainer_scfGetVersion
 
-class iGeneralMeshCommonState(iBase):
+class iGeneralMeshCommonState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGeneralMeshCommonState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGeneralMeshCommonState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5572,12 +5367,10 @@ _cspace.iGeneralFactoryState_swigregister(iGeneralFactoryStatePtr)
 
 iGeneralFactoryState_scfGetVersion = _cspace.iGeneralFactoryState_scfGetVersion
 
-class iGenMeshAnimationControl(iBase):
+class iGenMeshAnimationControl(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControl, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControl, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5603,12 +5396,10 @@ class iGenMeshAnimationControlPtr(iGenMeshAnimationControl):
         _swig_setattr(self, iGenMeshAnimationControl,self.__class__,iGenMeshAnimationControl)
 _cspace.iGenMeshAnimationControl_swigregister(iGenMeshAnimationControlPtr)
 
-class iGenMeshAnimationControlFactory(iBase):
+class iGenMeshAnimationControlFactory(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControlFactory, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlFactory, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5629,12 +5420,10 @@ class iGenMeshAnimationControlFactoryPtr(iGenMeshAnimationControlFactory):
         _swig_setattr(self, iGenMeshAnimationControlFactory,self.__class__,iGenMeshAnimationControlFactory)
 _cspace.iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactoryPtr)
 
-class iGenMeshAnimationControlType(iBase):
+class iGenMeshAnimationControlType(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControlType, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlType, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5691,12 +5480,10 @@ class csSprite2DVertexPtr(csSprite2DVertex):
         _swig_setattr(self, csSprite2DVertex,self.__class__,csSprite2DVertex)
 _cspace.csSprite2DVertex_swigregister(csSprite2DVertexPtr)
 
-class iSprite2DUVAnimationFrame(iBase):
+class iSprite2DUVAnimationFrame(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DUVAnimationFrame, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DUVAnimationFrame, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5723,12 +5510,10 @@ class iSprite2DUVAnimationFramePtr(iSprite2DUVAnimationFrame):
         _swig_setattr(self, iSprite2DUVAnimationFrame,self.__class__,iSprite2DUVAnimationFrame)
 _cspace.iSprite2DUVAnimationFrame_swigregister(iSprite2DUVAnimationFramePtr)
 
-class iSprite2DUVAnimation(iBase):
+class iSprite2DUVAnimation(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DUVAnimation, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DUVAnimation, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5753,12 +5538,10 @@ class iSprite2DUVAnimationPtr(iSprite2DUVAnimation):
         _swig_setattr(self, iSprite2DUVAnimation,self.__class__,iSprite2DUVAnimation)
 _cspace.iSprite2DUVAnimation_swigregister(iSprite2DUVAnimationPtr)
 
-class iSprite2DFactoryState(iBase):
+class iSprite2DFactoryState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite2DFactoryState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite2DFactoryState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5830,12 +5613,10 @@ CS_SPR_LIGHT_LOCAL = _cspace.CS_SPR_LIGHT_LOCAL
 CS_SPR_LOD_GLOBAL = _cspace.CS_SPR_LOD_GLOBAL
 CS_SPR_LOD_TEMPLATE = _cspace.CS_SPR_LOD_TEMPLATE
 CS_SPR_LOD_LOCAL = _cspace.CS_SPR_LOD_LOCAL
-class iSpriteFrame(iBase):
+class iSpriteFrame(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteFrame, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteFrame, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5857,12 +5638,10 @@ class iSpriteFramePtr(iSpriteFrame):
         _swig_setattr(self, iSpriteFrame,self.__class__,iSpriteFrame)
 _cspace.iSpriteFrame_swigregister(iSpriteFramePtr)
 
-class iSpriteAction(iBase):
+class iSpriteAction(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteAction, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteAction, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5888,12 +5667,10 @@ class iSpriteActionPtr(iSpriteAction):
         _swig_setattr(self, iSpriteAction,self.__class__,iSpriteAction)
 _cspace.iSpriteAction_swigregister(iSpriteActionPtr)
 
-class iSpriteSocket(iBase):
+class iSpriteSocket(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteSocket, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteSocket, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5917,12 +5694,10 @@ class iSpriteSocketPtr(iSpriteSocket):
         _swig_setattr(self, iSpriteSocket,self.__class__,iSpriteSocket)
 _cspace.iSpriteSocket_swigregister(iSpriteSocketPtr)
 
-class iSprite3DFactoryState(iBase):
+class iSprite3DFactoryState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite3DFactoryState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite3DFactoryState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -5986,12 +5761,10 @@ class iSprite3DFactoryStatePtr(iSprite3DFactoryState):
         _swig_setattr(self, iSprite3DFactoryState,self.__class__,iSprite3DFactoryState)
 _cspace.iSprite3DFactoryState_swigregister(iSprite3DFactoryStatePtr)
 
-class iSprite3DState(iBase):
+class iSprite3DState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSprite3DState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSprite3DState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6042,12 +5815,10 @@ _cspace.iSprite3DState_swigregister(iSprite3DStatePtr)
 
 iSprite3DState_scfGetVersion = _cspace.iSprite3DState_scfGetVersion
 
-class iSpriteCal3DSocket(iBase):
+class iSpriteCal3DSocket(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DSocket, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DSocket, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6084,12 +5855,10 @@ class iSpriteCal3DSocketPtr(iSpriteCal3DSocket):
         _swig_setattr(self, iSpriteCal3DSocket,self.__class__,iSpriteCal3DSocket)
 _cspace.iSpriteCal3DSocket_swigregister(iSpriteCal3DSocketPtr)
 
-class iSpriteCal3DFactoryState(iBase):
+class iSpriteCal3DFactoryState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DFactoryState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DFactoryState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6137,12 +5906,10 @@ class iSpriteCal3DFactoryStatePtr(iSpriteCal3DFactoryState):
         _swig_setattr(self, iSpriteCal3DFactoryState,self.__class__,iSpriteCal3DFactoryState)
 _cspace.iSpriteCal3DFactoryState_swigregister(iSpriteCal3DFactoryStatePtr)
 
-class iAnimTimeUpdateHandler(iBase):
+class iAnimTimeUpdateHandler(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iAnimTimeUpdateHandler, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iAnimTimeUpdateHandler, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6161,12 +5928,10 @@ class iAnimTimeUpdateHandlerPtr(iAnimTimeUpdateHandler):
         _swig_setattr(self, iAnimTimeUpdateHandler,self.__class__,iAnimTimeUpdateHandler)
 _cspace.iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandlerPtr)
 
-class iSpriteCal3DState(iBase):
+class iSpriteCal3DState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6255,12 +6020,10 @@ class csModelConverterFormatPtr(csModelConverterFormat):
         _swig_setattr(self, csModelConverterFormat,self.__class__,csModelConverterFormat)
 _cspace.csModelConverterFormat_swigregister(csModelConverterFormatPtr)
 
-class iModelConverter(iBase):
+class iModelConverter(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iModelConverter, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iModelConverter, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6289,12 +6052,10 @@ iModelConverter_scfGetVersion = _cspace.iModelConverter_scfGetVersion
 CS_MESH_STATICPOS = _cspace.CS_MESH_STATICPOS
 CS_MESH_STATICSHAPE = _cspace.CS_MESH_STATICSHAPE
 CS_FACTORY_STATICSHAPE = _cspace.CS_FACTORY_STATICSHAPE
-class iMeshObjectDrawCallback(iBase):
+class iMeshObjectDrawCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObjectDrawCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectDrawCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6313,12 +6074,10 @@ class iMeshObjectDrawCallbackPtr(iMeshObjectDrawCallback):
         _swig_setattr(self, iMeshObjectDrawCallback,self.__class__,iMeshObjectDrawCallback)
 _cspace.iMeshObjectDrawCallback_swigregister(iMeshObjectDrawCallbackPtr)
 
-class iMeshObject(iBase):
+class iMeshObject(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObject, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObject, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6360,12 +6119,10 @@ _cspace.iMeshObject_swigregister(iMeshObjectPtr)
 
 iMeshObject_scfGetVersion = _cspace.iMeshObject_scfGetVersion
 
-class iMeshObjectFactory(iBase):
+class iMeshObjectFactory(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObjectFactory, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectFactory, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6396,12 +6153,10 @@ _cspace.iMeshObjectFactory_swigregister(iMeshObjectFactoryPtr)
 
 iMeshObjectFactory_scfGetVersion = _cspace.iMeshObjectFactory_scfGetVersion
 
-class iMeshObjectType(iBase):
+class iMeshObjectType(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMeshObjectType, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMeshObjectType, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6424,12 +6179,10 @@ _cspace.iMeshObjectType_swigregister(iMeshObjectTypePtr)
 
 iMeshObjectType_scfGetVersion = _cspace.iMeshObjectType_scfGetVersion
 
-class iBallState(iBase):
+class iBallState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iBallState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iBallState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6511,12 +6264,10 @@ CS_POLYINDEX_LAST = _cspace.CS_POLYINDEX_LAST
 CS_THING_NOCOMPRESS = _cspace.CS_THING_NOCOMPRESS
 CS_THING_MOVE_NEVER = _cspace.CS_THING_MOVE_NEVER
 CS_THING_MOVE_OCCASIONAL = _cspace.CS_THING_MOVE_OCCASIONAL
-class iPolygonHandle(iBase):
+class iPolygonHandle(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPolygonHandle, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPolygonHandle, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6539,12 +6290,10 @@ class iPolygonHandlePtr(iPolygonHandle):
         _swig_setattr(self, iPolygonHandle,self.__class__,iPolygonHandle)
 _cspace.iPolygonHandle_swigregister(iPolygonHandlePtr)
 
-class iThingFactoryState(iBase):
+class iThingFactoryState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iThingFactoryState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iThingFactoryState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6608,12 +6357,10 @@ class iThingFactoryStatePtr(iThingFactoryState):
         _swig_setattr(self, iThingFactoryState,self.__class__,iThingFactoryState)
 _cspace.iThingFactoryState_swigregister(iThingFactoryStatePtr)
 
-class iThingState(iBase):
+class iThingState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iThingState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iThingState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6648,12 +6395,10 @@ _cspace.iThingState_swigregister(iThingStatePtr)
 
 iThingState_scfGetVersion = _cspace.iThingState_scfGetVersion
 
-class iThingEnvironment(iBase):
+class iThingEnvironment(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iThingEnvironment, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iThingEnvironment, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6675,12 +6420,10 @@ class iThingEnvironmentPtr(iThingEnvironment):
         _swig_setattr(self, iThingEnvironment,self.__class__,iThingEnvironment)
 _cspace.iThingEnvironment_swigregister(iThingEnvironmentPtr)
 
-class iTerrainObjectState(iBase):
+class iTerrainObjectState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainObjectState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerrainObjectState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6714,12 +6457,10 @@ _cspace.iTerrainObjectState_swigregister(iTerrainObjectStatePtr)
 
 iTerrainObjectState_scfGetVersion = _cspace.iTerrainObjectState_scfGetVersion
 
-class iTerrainFactoryState(iBase):
+class iTerrainFactoryState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactoryState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactoryState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6747,12 +6488,10 @@ _cspace.iTerrainFactoryState_swigregister(iTerrainFactoryStatePtr)
 
 iTerrainFactoryState_scfGetVersion = _cspace.iTerrainFactoryState_scfGetVersion
 
-class iLoaderStatus(iBase):
+class iLoaderStatus(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLoaderStatus, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLoaderStatus, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6772,12 +6511,10 @@ class iLoaderStatusPtr(iLoaderStatus):
         _swig_setattr(self, iLoaderStatus,self.__class__,iLoaderStatus)
 _cspace.iLoaderStatus_swigregister(iLoaderStatusPtr)
 
-class iLoader(iBase):
+class iLoader(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLoader, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLoader, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6811,12 +6548,10 @@ _cspace.iLoader_swigregister(iLoaderPtr)
 
 iLoader_scfGetVersion = _cspace.iLoader_scfGetVersion
 
-class iLoaderPlugin(iBase):
+class iLoaderPlugin(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iLoaderPlugin, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iLoaderPlugin, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6839,12 +6574,10 @@ _cspace.iLoaderPlugin_swigregister(iLoaderPluginPtr)
 
 iLoaderPlugin_scfGetVersion = _cspace.iLoaderPlugin_scfGetVersion
 
-class iBinaryLoaderPlugin(iBase):
+class iBinaryLoaderPlugin(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iBinaryLoaderPlugin, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iBinaryLoaderPlugin, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6867,12 +6600,10 @@ _cspace.iBinaryLoaderPlugin_swigregister(iBinaryLoaderPluginPtr)
 
 iBinaryLoaderPlugin_scfGetVersion = _cspace.iBinaryLoaderPlugin_scfGetVersion
 
-class iSaver(iBase):
+class iSaver(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSaver, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSaver, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6891,12 +6622,10 @@ class iSaverPtr(iSaver):
         _swig_setattr(self, iSaver,self.__class__,iSaver)
 _cspace.iSaver_swigregister(iSaverPtr)
 
-class iSoundHandle(iBase):
+class iSoundHandle(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundHandle, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundHandle, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6924,12 +6653,10 @@ _cspace.iSoundHandle_swigregister(iSoundHandlePtr)
 
 iSoundHandle_scfGetVersion = _cspace.iSoundHandle_scfGetVersion
 
-class iSoundLoader(iBase):
+class iSoundLoader(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundLoader, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundLoader, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6952,12 +6679,10 @@ _cspace.iSoundLoader_swigregister(iSoundLoaderPtr)
 
 iSoundLoader_scfGetVersion = _cspace.iSoundLoader_scfGetVersion
 
-class iSoundRender(iBase):
+class iSoundRender(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundRender, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundRender, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -6985,12 +6710,10 @@ _cspace.iSoundRender_swigregister(iSoundRenderPtr)
 
 iSoundRender_scfGetVersion = _cspace.iSoundRender_scfGetVersion
 
-class iSoundWrapper(iBase):
+class iSoundWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundWrapper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7014,12 +6737,10 @@ _cspace.iSoundWrapper_swigregister(iSoundWrapperPtr)
 
 iSoundWrapper_scfGetVersion = _cspace.iSoundWrapper_scfGetVersion
 
-class iSoundDriver(iBase):
+class iSoundDriver(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundDriver, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundDriver, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7057,12 +6778,10 @@ SOUND3D_DISABLE = _cspace.SOUND3D_DISABLE
 SOUND3D_RELATIVE = _cspace.SOUND3D_RELATIVE
 SOUND3D_ABSOLUTE = _cspace.SOUND3D_ABSOLUTE
 SOUND_DISTANCE_INFINITE = _cspace.SOUND_DISTANCE_INFINITE
-class iSoundSource(iBase):
+class iSoundSource(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundSource, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundSource, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7125,12 +6844,10 @@ ENVIRONMENT_UNDERWATER = _cspace.ENVIRONMENT_UNDERWATER
 ENVIRONMENT_DRUGGED = _cspace.ENVIRONMENT_DRUGGED
 ENVIRONMENT_DIZZY = _cspace.ENVIRONMENT_DIZZY
 ENVIRONMENT_PSYCHOTIC = _cspace.ENVIRONMENT_PSYCHOTIC
-class iSoundListener(iBase):
+class iSoundListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSoundListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSoundListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7168,12 +6885,10 @@ _cspace.iSoundListener_swigregister(iSoundListenerPtr)
 
 iSoundListener_scfGetVersion = _cspace.iSoundListener_scfGetVersion
 
-class iComponent(iBase):
+class iComponent(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iComponent, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iComponent, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7196,12 +6911,10 @@ _cspace.iComponent_swigregister(iComponentPtr)
 
 iComponent_scfGetVersion = _cspace.iComponent_scfGetVersion
 
-class iCacheManager(iBase):
+class iCacheManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCacheManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCacheManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7286,12 +6999,10 @@ VFS_STATUS_NOSPACE = _cspace.VFS_STATUS_NOSPACE
 VFS_STATUS_RESOURCES = _cspace.VFS_STATUS_RESOURCES
 VFS_STATUS_ACCESSDENIED = _cspace.VFS_STATUS_ACCESSDENIED
 VFS_STATUS_IOERROR = _cspace.VFS_STATUS_IOERROR
-class iFile(iBase):
+class iFile(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFile, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFile, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7323,12 +7034,10 @@ _cspace.iFile_swigregister(iFilePtr)
 
 iFile_scfGetVersion = _cspace.iFile_scfGetVersion
 
-class iVFS(iBase):
+class iVFS(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iVFS, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVFS, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7374,12 +7083,10 @@ _cspace.iVFS_swigregister(iVFSPtr)
 
 iVFS_scfGetVersion = _cspace.iVFS_scfGetVersion
 
-class iObject(iBase):
+class iObject(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iObject, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObject, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7413,12 +7120,10 @@ _cspace.iObject_swigregister(iObjectPtr)
 
 iObject_scfGetVersion = _cspace.iObject_scfGetVersion
 
-class iObjectIterator(iBase):
+class iObjectIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7441,12 +7146,10 @@ class iObjectIteratorPtr(iObjectIterator):
         _swig_setattr(self, iObjectIterator,self.__class__,iObjectIterator)
 _cspace.iObjectIterator_swigregister(iObjectIteratorPtr)
 
-class iStringSet(iBase):
+class iStringSet(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iStringSet, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStringSet, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7476,12 +7179,10 @@ csInvalidStringID = cvar.csInvalidStringID
 
 iStringSet_scfGetVersion = _cspace.iStringSet_scfGetVersion
 
-class iObjectRegistry(iBase):
+class iObjectRegistry(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectRegistry, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectRegistry, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7507,12 +7208,10 @@ _cspace.iObjectRegistry_swigregister(iObjectRegistryPtr)
 
 iObjectRegistry_scfGetVersion = _cspace.iObjectRegistry_scfGetVersion
 
-class iObjectRegistryIterator(iBase):
+class iObjectRegistryIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectRegistryIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iObjectRegistryIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7534,12 +7233,12 @@ class iObjectRegistryIteratorPtr(iObjectRegistryIterator):
         _swig_setattr(self, iObjectRegistryIterator,self.__class__,iObjectRegistryIterator)
 _cspace.iObjectRegistryIterator_swigregister(iObjectRegistryIteratorPtr)
 
-class iVirtualClock(iBase):
+
+csQueryRegistryTag = _cspace.csQueryRegistryTag
+class iVirtualClock(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iVirtualClock, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iVirtualClock, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7572,12 +7271,10 @@ CS_MAX_MOUSE_BUTTONS = _cspace.CS_MAX_MOUSE_BUTTONS
 CS_MAX_JOYSTICK_COUNT = _cspace.CS_MAX_JOYSTICK_COUNT
 CS_MAX_JOYSTICK_BUTTONS = _cspace.CS_MAX_JOYSTICK_BUTTONS
 CS_MAX_JOYSTICK_AXES = _cspace.CS_MAX_JOYSTICK_AXES
-class iEventAttributeIterator(iBase):
+class iEventAttributeIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEventAttributeIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventAttributeIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7774,12 +7471,10 @@ csEventAttrFloat = _cspace.csEventAttrFloat
 csEventAttrDatabuffer = _cspace.csEventAttrDatabuffer
 csEventAttrEvent = _cspace.csEventAttrEvent
 csEventAttriBase = _cspace.csEventAttriBase
-class iEvent(iBase):
+class iEvent(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEvent, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEvent, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7846,12 +7541,10 @@ _cspace.iEvent_swigregister(iEventPtr)
 
 iEvent_scfGetVersion = _cspace.iEvent_scfGetVersion
 
-class iEventPlug(iBase):
+class iEventPlug(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEventPlug, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventPlug, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7872,12 +7565,10 @@ class iEventPlugPtr(iEventPlug):
         _swig_setattr(self, iEventPlug,self.__class__,iEventPlug)
 _cspace.iEventPlug_swigregister(iEventPlugPtr)
 
-class iEventOutlet(iBase):
+class iEventOutlet(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEventOutlet, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventOutlet, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -7902,12 +7593,10 @@ class iEventOutletPtr(iEventOutlet):
         _swig_setattr(self, iEventOutlet,self.__class__,iEventOutlet)
 _cspace.iEventOutlet_swigregister(iEventOutletPtr)
 
-class iEventCord(iBase):
+class iEventCord(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEventCord, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventCord, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8235,12 +7924,10 @@ cscmdPostProcess = _cspace.cscmdPostProcess
 cscmdFinalProcess = _cspace.cscmdFinalProcess
 cscmdCanvasHidden = _cspace.cscmdCanvasHidden
 cscmdCanvasExposed = _cspace.cscmdCanvasExposed
-class iEventQueue(iBase):
+class iEventQueue(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEventQueue, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventQueue, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8276,12 +7963,10 @@ _cspace.iEventQueue_swigregister(iEventQueuePtr)
 
 iEventQueue_scfGetVersion = _cspace.iEventQueue_scfGetVersion
 
-class iEventHandler(iBase):
+class iEventHandler(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEventHandler, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEventHandler, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8304,12 +7989,10 @@ _cspace.iEventHandler_swigregister(iEventHandlerPtr)
 
 iEventHandler_scfGetVersion = _cspace.iEventHandler_scfGetVersion
 
-class iPluginIterator(iBase):
+class iPluginIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPluginIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPluginIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8329,12 +8012,10 @@ class iPluginIteratorPtr(iPluginIterator):
         _swig_setattr(self, iPluginIterator,self.__class__,iPluginIterator)
 _cspace.iPluginIterator_swigregister(iPluginIteratorPtr)
 
-class iPluginManager(iBase):
+class iPluginManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iPluginManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iPluginManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8367,12 +8048,10 @@ csComposeNoChar = _cspace.csComposeNoChar
 csComposeNormalChar = _cspace.csComposeNormalChar
 csComposeComposedChar = _cspace.csComposeComposedChar
 csComposeUncomposeable = _cspace.csComposeUncomposeable
-class iKeyComposer(iBase):
+class iKeyComposer(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iKeyComposer, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iKeyComposer, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8392,12 +8071,10 @@ class iKeyComposerPtr(iKeyComposer):
         _swig_setattr(self, iKeyComposer,self.__class__,iKeyComposer)
 _cspace.iKeyComposer_swigregister(iKeyComposerPtr)
 
-class iKeyboardDriver(iBase):
+class iKeyboardDriver(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iKeyboardDriver, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iKeyboardDriver, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8425,12 +8102,10 @@ _cspace.iKeyboardDriver_swigregister(iKeyboardDriverPtr)
 
 iKeyboardDriver_scfGetVersion = _cspace.iKeyboardDriver_scfGetVersion
 
-class iMouseDriver(iBase):
+class iMouseDriver(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iMouseDriver, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iMouseDriver, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8460,12 +8135,10 @@ _cspace.iMouseDriver_swigregister(iMouseDriverPtr)
 
 iMouseDriver_scfGetVersion = _cspace.iMouseDriver_scfGetVersion
 
-class iJoystickDriver(iBase):
+class iJoystickDriver(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iJoystickDriver, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iJoystickDriver, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8490,12 +8163,10 @@ class iJoystickDriverPtr(iJoystickDriver):
         _swig_setattr(self, iJoystickDriver,self.__class__,iJoystickDriver)
 _cspace.iJoystickDriver_swigregister(iJoystickDriverPtr)
 
-class iConfigFile(iBase):
+class iConfigFile(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iConfigFile, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConfigFile, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8539,12 +8210,10 @@ _cspace.iConfigFile_swigregister(iConfigFilePtr)
 
 iConfigFile_scfGetVersion = _cspace.iConfigFile_scfGetVersion
 
-class iConfigIterator(iBase):
+class iConfigIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iConfigIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConfigIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8625,12 +8294,10 @@ _cspace.iConfigManager_swigregister(iConfigManagerPtr)
 
 iConfigManager_scfGetVersion = _cspace.iConfigManager_scfGetVersion
 
-class iStringArray(iBase):
+class iStringArray(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iStringArray, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStringArray, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8676,12 +8343,10 @@ CS_NODE_DECLARATION = _cspace.CS_NODE_DECLARATION
 CS_CHANGEABLE_NEVER = _cspace.CS_CHANGEABLE_NEVER
 CS_CHANGEABLE_NEWROOT = _cspace.CS_CHANGEABLE_NEWROOT
 CS_CHANGEABLE_YES = _cspace.CS_CHANGEABLE_YES
-class iDocumentAttributeIterator(iBase):
+class iDocumentAttributeIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentAttributeIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentAttributeIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8701,12 +8366,10 @@ class iDocumentAttributeIteratorPtr(iDocumentAttributeIterator):
         _swig_setattr(self, iDocumentAttributeIterator,self.__class__,iDocumentAttributeIterator)
 _cspace.iDocumentAttributeIterator_swigregister(iDocumentAttributeIteratorPtr)
 
-class iDocumentAttribute(iBase):
+class iDocumentAttribute(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentAttribute, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentAttribute, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8733,12 +8396,10 @@ class iDocumentAttributePtr(iDocumentAttribute):
         _swig_setattr(self, iDocumentAttribute,self.__class__,iDocumentAttribute)
 _cspace.iDocumentAttribute_swigregister(iDocumentAttributePtr)
 
-class iDocumentNodeIterator(iBase):
+class iDocumentNodeIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentNodeIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentNodeIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8758,12 +8419,10 @@ class iDocumentNodeIteratorPtr(iDocumentNodeIterator):
         _swig_setattr(self, iDocumentNodeIterator,self.__class__,iDocumentNodeIterator)
 _cspace.iDocumentNodeIterator_swigregister(iDocumentNodeIteratorPtr)
 
-class iDocumentNode(iBase):
+class iDocumentNode(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentNode, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentNode, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8807,12 +8466,10 @@ class iDocumentNodePtr(iDocumentNode):
         _swig_setattr(self, iDocumentNode,self.__class__,iDocumentNode)
 _cspace.iDocumentNode_swigregister(iDocumentNodePtr)
 
-class iDocument(iBase):
+class iDocument(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDocument, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocument, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8840,12 +8497,10 @@ _cspace.iDocument_swigregister(iDocumentPtr)
 
 iDocument_scfGetVersion = _cspace.iDocument_scfGetVersion
 
-class iDocumentSystem(iBase):
+class iDocumentSystem(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentSystem, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDocumentSystem, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -8910,12 +8565,10 @@ class csTinyDocumentSystemPtr(csTinyDocumentSystem):
         _swig_setattr(self, csTinyDocumentSystem,self.__class__,csTinyDocumentSystem)
 _cspace.csTinyDocumentSystem_swigregister(csTinyDocumentSystemPtr)
 
-class iDataBuffer(iBase):
+class iDataBuffer(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDataBuffer, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDataBuffer, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9076,12 +8729,10 @@ class csImageAreaPtr(csImageArea):
         _swig_setattr(self, csImageArea,self.__class__,csImageArea)
 _cspace.csImageArea_swigregister(csImageAreaPtr)
 
-class iOffscreenCanvasCallback(iBase):
+class iOffscreenCanvasCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iOffscreenCanvasCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iOffscreenCanvasCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9101,12 +8752,10 @@ class iOffscreenCanvasCallbackPtr(iOffscreenCanvasCallback):
         _swig_setattr(self, iOffscreenCanvasCallback,self.__class__,iOffscreenCanvasCallback)
 _cspace.iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallbackPtr)
 
-class iGraphics2D(iBase):
+class iGraphics2D(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGraphics2D, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGraphics2D, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9470,12 +9119,10 @@ class csSimpleRenderMeshPtr(csSimpleRenderMesh):
         _swig_setattr(self, csSimpleRenderMesh,self.__class__,csSimpleRenderMesh)
 _cspace.csSimpleRenderMesh_swigregister(csSimpleRenderMeshPtr)
 
-class iGraphics3D(iBase):
+class iGraphics3D(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iGraphics3D, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iGraphics3D, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9560,12 +9207,10 @@ csmcWait = _cspace.csmcWait
 CS_ALERT_ERROR = _cspace.CS_ALERT_ERROR
 CS_ALERT_WARNING = _cspace.CS_ALERT_WARNING
 CS_ALERT_NOTE = _cspace.CS_ALERT_NOTE
-class iNativeWindowManager(iBase):
+class iNativeWindowManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindowManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindowManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9584,12 +9229,10 @@ class iNativeWindowManagerPtr(iNativeWindowManager):
         _swig_setattr(self, iNativeWindowManager,self.__class__,iNativeWindowManager)
 _cspace.iNativeWindowManager_swigregister(iNativeWindowManagerPtr)
 
-class iNativeWindow(iBase):
+class iNativeWindow(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindow, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindow, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9613,12 +9256,10 @@ CSFONT_ITALIC = _cspace.CSFONT_ITALIC
 CSFONT_COURIER = _cspace.CSFONT_COURIER
 CSFONT_SMALL = _cspace.CSFONT_SMALL
 CS_FONT_DEFAULT_GLYPH = _cspace.CS_FONT_DEFAULT_GLYPH
-class iFontDeleteNotify(iBase):
+class iFontDeleteNotify(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFontDeleteNotify, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFontDeleteNotify, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9698,12 +9339,10 @@ class csGlyphMetricsPtr(csGlyphMetrics):
         _swig_setattr(self, csGlyphMetrics,self.__class__,csGlyphMetrics)
 _cspace.csGlyphMetrics_swigregister(csGlyphMetricsPtr)
 
-class iFont(iBase):
+class iFont(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFont, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFont, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9740,12 +9379,10 @@ _cspace.iFont_swigregister(iFontPtr)
 
 iFont_scfGetVersion = _cspace.iFont_scfGetVersion
 
-class iFontServer(iBase):
+class iFontServer(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iFontServer, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iFontServer, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9768,12 +9405,10 @@ _cspace.iFontServer_swigregister(iFontServerPtr)
 
 iFontServer_scfGetVersion = _cspace.iFontServer_scfGetVersion
 
-class iHalo(iBase):
+class iHalo(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iHalo, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iHalo, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9802,12 +9437,10 @@ iHalo_scfGetVersion = _cspace.iHalo_scfGetVersion
 
 
 csGetShaderVariableFromStack = _cspace.csGetShaderVariableFromStack
-class iShaderVariableContext(iBase):
+class iShaderVariableContext(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVariableContext, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderVariableContext, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9877,12 +9510,10 @@ _cspace.iShaderManager_swigregister(iShaderManagerPtr)
 
 iShaderManager_scfGetVersion = _cspace.iShaderManager_scfGetVersion
 
-class iShaderRenderInterface(iBase):
+class iShaderRenderInterface(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderRenderInterface, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderRenderInterface, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9963,12 +9594,10 @@ class iShaderPtr(iShader):
         _swig_setattr(self, iShader,self.__class__,iShader)
 _cspace.iShader_swigregister(iShaderPtr)
 
-class iShaderPriorityList(iBase):
+class iShaderPriorityList(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderPriorityList, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderPriorityList, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -9988,12 +9617,10 @@ class iShaderPriorityListPtr(iShaderPriorityList):
         _swig_setattr(self, iShaderPriorityList,self.__class__,iShaderPriorityList)
 _cspace.iShaderPriorityList_swigregister(iShaderPriorityListPtr)
 
-class iShaderCompiler(iBase):
+class iShaderCompiler(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderCompiler, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderCompiler, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10016,12 +9643,10 @@ class iShaderCompilerPtr(iShaderCompiler):
         _swig_setattr(self, iShaderCompiler,self.__class__,iShaderCompiler)
 _cspace.iShaderCompiler_swigregister(iShaderCompilerPtr)
 
-class iTextureHandle(iBase):
+class iTextureHandle(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureHandle, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureHandle, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10081,12 +9706,10 @@ CS_TEXTURE_NOMIPMAPS = _cspace.CS_TEXTURE_NOMIPMAPS
 CS_TEXTURE_CLAMP = _cspace.CS_TEXTURE_CLAMP
 CS_TEXTURE_NOFILTER = _cspace.CS_TEXTURE_NOFILTER
 CS_TEXTURE_NPOTS = _cspace.CS_TEXTURE_NPOTS
-class iRendererLightmap(iBase):
+class iRendererLightmap(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iRendererLightmap, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRendererLightmap, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10107,12 +9730,10 @@ class iRendererLightmapPtr(iRendererLightmap):
         _swig_setattr(self, iRendererLightmap,self.__class__,iRendererLightmap)
 _cspace.iRendererLightmap_swigregister(iRendererLightmapPtr)
 
-class iSuperLightmap(iBase):
+class iSuperLightmap(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSuperLightmap, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSuperLightmap, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10133,12 +9754,10 @@ class iSuperLightmapPtr(iSuperLightmap):
         _swig_setattr(self, iSuperLightmap,self.__class__,iSuperLightmap)
 _cspace.iSuperLightmap_swigregister(iSuperLightmapPtr)
 
-class iTextureManager(iBase):
+class iTextureManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTextureManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10330,12 +9949,10 @@ class csAudioStreamDescriptionPtr(csAudioStreamDescription):
         _swig_setattr(self, csAudioStreamDescription,self.__class__,csAudioStreamDescription)
 _cspace.csAudioStreamDescription_swigregister(csAudioStreamDescriptionPtr)
 
-class iStreamIterator(iBase):
+class iStreamIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iStreamIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStreamIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10359,12 +9976,10 @@ _cspace.iStreamIterator_swigregister(iStreamIteratorPtr)
 
 iStreamIterator_scfGetVersion = _cspace.iStreamIterator_scfGetVersion
 
-class iStreamFormat(iBase):
+class iStreamFormat(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iStreamFormat, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStreamFormat, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10392,12 +10007,10 @@ _cspace.iStreamFormat_swigregister(iStreamFormatPtr)
 
 iStreamFormat_scfGetVersion = _cspace.iStreamFormat_scfGetVersion
 
-class iStream(iBase):
+class iStream(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iStream, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStream, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10537,12 +10150,10 @@ CS_IMGFMT_INVALID = _cspace.CS_IMGFMT_INVALID
 csimg2D = _cspace.csimg2D
 csimg3D = _cspace.csimg3D
 csimgCube = _cspace.csimgCube
-class iImage(iBase):
+class iImage(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iImage, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iImage, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10616,12 +10227,10 @@ class csImageIOFileFormatDescriptionPtr(csImageIOFileFormatDescription):
         _swig_setattr(self, csImageIOFileFormatDescription,self.__class__,csImageIOFileFormatDescription)
 _cspace.csImageIOFileFormatDescription_swigregister(csImageIOFileFormatDescriptionPtr)
 
-class iImageIO(iBase):
+class iImageIO(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iImageIO, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iImageIO, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10652,12 +10261,10 @@ CS_REPORTER_SEVERITY_ERROR = _cspace.CS_REPORTER_SEVERITY_ERROR
 CS_REPORTER_SEVERITY_WARNING = _cspace.CS_REPORTER_SEVERITY_WARNING
 CS_REPORTER_SEVERITY_NOTIFY = _cspace.CS_REPORTER_SEVERITY_NOTIFY
 CS_REPORTER_SEVERITY_DEBUG = _cspace.CS_REPORTER_SEVERITY_DEBUG
-class iReporterListener(iBase):
+class iReporterListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iReporterListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iReporterListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10680,12 +10287,10 @@ _cspace.iReporterListener_swigregister(iReporterListenerPtr)
 
 iReporterListener_scfGetVersion = _cspace.iReporterListener_scfGetVersion
 
-class iReporterIterator(iBase):
+class iReporterIterator(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iReporterIterator, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iReporterIterator, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10712,12 +10317,10 @@ _cspace.iReporterIterator_swigregister(iReporterIteratorPtr)
 
 iReporterIterator_scfGetVersion = _cspace.iReporterIterator_scfGetVersion
 
-class iReporter(iBase):
+class iReporter(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iReporter, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iReporter, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10784,12 +10387,10 @@ csConVeryBottom = _cspace.csConVeryBottom
 csConNoCursor = _cspace.csConNoCursor
 csConNormalCursor = _cspace.csConNormalCursor
 csConInsertCursor = _cspace.csConInsertCursor
-class iConsoleWatcher(iBase):
+class iConsoleWatcher(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleWatcher, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConsoleWatcher, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10808,12 +10409,10 @@ class iConsoleWatcherPtr(iConsoleWatcher):
         _swig_setattr(self, iConsoleWatcher,self.__class__,iConsoleWatcher)
 _cspace.iConsoleWatcher_swigregister(iConsoleWatcherPtr)
 
-class iConsoleOutput(iBase):
+class iConsoleOutput(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleOutput, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iConsoleOutput, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10852,12 +10451,10 @@ class iConsoleOutputPtr(iConsoleOutput):
         _swig_setattr(self, iConsoleOutput,self.__class__,iConsoleOutput)
 _cspace.iConsoleOutput_swigregister(iConsoleOutputPtr)
 
-class iStandardReporterListener(iBase):
+class iStandardReporterListener(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iStandardReporterListener, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iStandardReporterListener, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -10888,12 +10485,10 @@ _cspace.iStandardReporterListener_swigregister(iStandardReporterListenerPtr)
 
 iStandardReporterListener_scfGetVersion = _cspace.iStandardReporterListener_scfGetVersion
 
-class iView(iBase):
+class iView(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iView, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iView, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11002,12 +10597,10 @@ class csIntersectingTrianglePtr(csIntersectingTriangle):
         _swig_setattr(self, csIntersectingTriangle,self.__class__,csIntersectingTriangle)
 _cspace.csIntersectingTriangle_swigregister(csIntersectingTrianglePtr)
 
-class iCollider(iBase):
+class iCollider(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCollider, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCollider, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11029,12 +10622,10 @@ _cspace.iCollider_swigregister(iColliderPtr)
 
 iCollider_scfGetVersion = _cspace.iCollider_scfGetVersion
 
-class iCollideSystem(iBase):
+class iCollideSystem(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iCollideSystem, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iCollideSystem, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11074,12 +10665,10 @@ _cspace.iCollideSystem_swigregister(iCollideSystemPtr)
 
 iCollideSystem_scfGetVersion = _cspace.iCollideSystem_scfGetVersion
 
-class iDynamics(iBase):
+class iDynamics(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamics, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamics, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11105,12 +10694,10 @@ _cspace.iDynamics_swigregister(iDynamicsPtr)
 
 iDynamics_scfGetVersion = _cspace.iDynamics_scfGetVersion
 
-class iDynamicSystem(iBase):
+class iDynamicSystem(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicSystem, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicSystem, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11156,12 +10743,10 @@ _cspace.iDynamicSystem_swigregister(iDynamicSystemPtr)
 
 iDynamicSystem_scfGetVersion = _cspace.iDynamicSystem_scfGetVersion
 
-class iDynamicsMoveCallback(iBase):
+class iDynamicsMoveCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsMoveCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsMoveCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11180,12 +10765,10 @@ class iDynamicsMoveCallbackPtr(iDynamicsMoveCallback):
         _swig_setattr(self, iDynamicsMoveCallback,self.__class__,iDynamicsMoveCallback)
 _cspace.iDynamicsMoveCallback_swigregister(iDynamicsMoveCallbackPtr)
 
-class iDynamicsCollisionCallback(iBase):
+class iDynamicsCollisionCallback(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsCollisionCallback, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsCollisionCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11204,12 +10787,10 @@ class iDynamicsCollisionCallbackPtr(iDynamicsCollisionCallback):
         _swig_setattr(self, iDynamicsCollisionCallback,self.__class__,iDynamicsCollisionCallback)
 _cspace.iDynamicsCollisionCallback_swigregister(iDynamicsCollisionCallbackPtr)
 
-class iBodyGroup(iBase):
+class iBodyGroup(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iBodyGroup, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iBodyGroup, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11234,12 +10815,10 @@ _cspace.iBodyGroup_swigregister(iBodyGroupPtr)
 
 iBodyGroup_scfGetVersion = _cspace.iBodyGroup_scfGetVersion
 
-class iRigidBody(iBase):
+class iRigidBody(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iRigidBody, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iRigidBody, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11302,12 +10881,10 @@ class iRigidBodyPtr(iRigidBody):
         _swig_setattr(self, iRigidBody,self.__class__,iRigidBody)
 _cspace.iRigidBody_swigregister(iRigidBodyPtr)
 
-class iJoint(iBase):
+class iJoint(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iJoint, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iJoint, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11358,12 +10935,10 @@ iJoint_scfGetVersion = _cspace.iJoint_scfGetVersion
 CS_SEQUENCE_LIGHTCHANGE_NONE = _cspace.CS_SEQUENCE_LIGHTCHANGE_NONE
 CS_SEQUENCE_LIGHTCHANGE_LESS = _cspace.CS_SEQUENCE_LIGHTCHANGE_LESS
 CS_SEQUENCE_LIGHTCHANGE_GREATER = _cspace.CS_SEQUENCE_LIGHTCHANGE_GREATER
-class iParameterESM(iBase):
+class iParameterESM(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iParameterESM, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iParameterESM, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11383,12 +10958,10 @@ class iParameterESMPtr(iParameterESM):
         _swig_setattr(self, iParameterESM,self.__class__,iParameterESM)
 _cspace.iParameterESM_swigregister(iParameterESMPtr)
 
-class iEngineSequenceParameters(iBase):
+class iEngineSequenceParameters(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineSequenceParameters, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineSequenceParameters, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11413,12 +10986,10 @@ class iEngineSequenceParametersPtr(iEngineSequenceParameters):
         _swig_setattr(self, iEngineSequenceParameters,self.__class__,iEngineSequenceParameters)
 _cspace.iEngineSequenceParameters_swigregister(iEngineSequenceParametersPtr)
 
-class iSequenceWrapper(iBase):
+class iSequenceWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSequenceWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSequenceWrapper, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11458,12 +11029,10 @@ class iSequenceWrapperPtr(iSequenceWrapper):
         _swig_setattr(self, iSequenceWrapper,self.__class__,iSequenceWrapper)
 _cspace.iSequenceWrapper_swigregister(iSequenceWrapperPtr)
 
-class iSequenceTrigger(iBase):
+class iSequenceTrigger(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSequenceTrigger, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSequenceTrigger, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11498,12 +11067,10 @@ class iSequenceTriggerPtr(iSequenceTrigger):
         _swig_setattr(self, iSequenceTrigger,self.__class__,iSequenceTrigger)
 _cspace.iSequenceTrigger_swigregister(iSequenceTriggerPtr)
 
-class iSequenceTimedOperation(iBase):
+class iSequenceTimedOperation(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSequenceTimedOperation, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSequenceTimedOperation, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11522,12 +11089,10 @@ class iSequenceTimedOperationPtr(iSequenceTimedOperation):
         _swig_setattr(self, iSequenceTimedOperation,self.__class__,iSequenceTimedOperation)
 _cspace.iSequenceTimedOperation_swigregister(iSequenceTimedOperationPtr)
 
-class iEngineSequenceManager(iBase):
+class iEngineSequenceManager(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineSequenceManager, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iEngineSequenceManager, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11564,12 +11129,10 @@ class iEngineSequenceManagerPtr(iEngineSequenceManager):
         _swig_setattr(self, iEngineSequenceManager,self.__class__,iEngineSequenceManager)
 _cspace.iEngineSequenceManager_swigregister(iEngineSequenceManagerPtr)
 
-class iScriptObject(iBase):
+class iScriptObject(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iScriptObject, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iScriptObject, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11608,12 +11171,10 @@ _cspace.iScriptObject_swigregister(iScriptObjectPtr)
 
 iScriptObject_scfGetVersion = _cspace.iScriptObject_scfGetVersion
 
-class iScript(iBase):
+class iScript(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iScript, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iScript, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11654,12 +11215,10 @@ _cspace.iScript_swigregister(iScriptPtr)
 
 iScript_scfGetVersion = _cspace.iScript_scfGetVersion
 
-class iSimpleFormerState(iBase):
+class iSimpleFormerState(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSimpleFormerState, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSimpleFormerState, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11686,12 +11245,10 @@ _cspace.iSimpleFormerState_swigregister(iSimpleFormerStatePtr)
 
 iSimpleFormerState_scfGetVersion = _cspace.iSimpleFormerState_scfGetVersion
 
-class iTerraFormer(iBase):
+class iTerraFormer(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTerraFormer, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerraFormer, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
@@ -11718,12 +11275,10 @@ _cspace.iTerraFormer_swigregister(iTerraFormerPtr)
 
 iTerraFormer_scfGetVersion = _cspace.iTerraFormer_scfGetVersion
 
-class iTerraSampler(iBase):
+class iTerraSampler(_object):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iTerraSampler, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iTerraSampler, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
