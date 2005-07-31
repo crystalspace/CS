@@ -480,7 +480,7 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
 
 bool csXWindow::HandleEvent (iEvent &Event)
 {
-  static int buttonMapping[6] = {0, 1, 3, 2};
+  static int buttonMapping[] = {0, 1, 3, 2};
   const unsigned int buttonMapCount =
     sizeof (buttonMapping) / sizeof (buttonMapping[0]);
   XEvent event;
