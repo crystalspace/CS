@@ -67,7 +67,7 @@ SCF_VERSION (iTextureType, 0, 0, 1);
  * Texture type.
  * Interface used to create instances of iTextureFactory.
  */
-struct iTextureType : public iBase
+struct iTextureType : public virtual iBase
 {
   /**
    * Create a new instance of a texture factory.

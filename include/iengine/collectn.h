@@ -69,7 +69,6 @@ struct iCollection : public iBase
   virtual iObject* GetObject (int i) const = 0;
 };
 
-SCF_VERSION (iCollectionList, 0, 0, 1);
 /**
  * iCollection list.
  * <p>
@@ -83,8 +82,9 @@ SCF_VERSION (iCollectionList, 0, 0, 1);
  *   <li>Application uses them.
  *   </ul>
  */
-struct iCollectionList : public iBase
+struct iCollectionList : public virtual iBase
 {
+  SCF_INTERFACE(iCollectionList,2,0,0);
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name) = 0;
 

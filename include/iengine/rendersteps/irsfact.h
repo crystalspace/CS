@@ -51,7 +51,7 @@ SCF_VERSION (iRenderStepType, 0, 0, 1);
  * Render step type.
  * Interface used to create instances of iRenderStepFactory.
  */
-struct iRenderStepType : public iBase
+struct iRenderStepType : public virtual iBase
 {
   /**
    * Create a new instance of a render step factory.

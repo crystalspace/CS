@@ -27,7 +27,7 @@
 #include "iengine/rendersteps/irsfact.h"
 
 class CS_CRYSTALSPACE_EXPORT csBaseRenderStepType : public iComponent, 
-						       public iRenderStepType
+						    public iRenderStepType
 {
 protected:
   iObjectRegistry* object_reg;

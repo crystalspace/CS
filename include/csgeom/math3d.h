@@ -33,6 +33,8 @@
 #include "csgeom/plane3.h"
 #include "csgeom/segment.h"
 #include "csgeom/vector3.h"
+#include "csutil/ref.h"
+#include "csutil/scf.h"
 
 #include "iutil/dbghelp.h"
 

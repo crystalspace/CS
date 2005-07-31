@@ -110,7 +110,7 @@ public:
     const char* context = 0);
   virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass);
   virtual bool ClassRegistered (const char *iClassID);
-  virtual void *CreateInstance (const char *iClassID,
+  virtual iBase *CreateInstance (const char *iClassID,
     const char *iInterfaceID, int iVersion);
   virtual const char *GetClassDescription (const char *iClassID);
   virtual const char *GetClassDependencies (const char *iClassID);
@@ -291,7 +291,7 @@ public:
   // Free the factory object (but not objects created by this factory)
   virtual ~scfFactory ();
   // Create a insance of class this factory represents
-  virtual void *CreateInstance ();
+  virtual iBase *CreateInstance ();
   // Try to unload class module (i.e. shared module)
   virtual void TryUnload ();
   /// Query class description string
@@ -453,14 +453,14 @@ void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
   return 0;
 }
 
-void *scfFactory::CreateInstance ()
+iBase *scfFactory::CreateInstance ()
 {
   IncRef ();
   // If IncRef won't succeed, we'll have a zero reference counter
   if (!scfRefCount)
     return 0;
 
-  void *instance = CreateFunc(this);
+  iBase *instance = CreateFunc(this);
 
   // No matter whenever we succeeded or not, decrement the refcount
   DecRef ();
@@ -770,7 +770,7 @@ void csSCF::Finish ()
   delete this;
 }
 
-void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
+iBase *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
   int iVersion)
 {
   csScopedMutexLock lock (mutex);
@@ -784,11 +784,12 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
   size_t idx = ClassRegistry->FindClass(iClassID, true);
   void *instance = 0;
+  iBase *object = 0;
 
   if (idx != (size_t)-1)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
-    iBase *object = (iBase *)cf->CreateInstance ();
+    object = cf->CreateInstance ();
     if (object)
     {
       instance = object->QueryInterface(GetInterfaceID(iInterface), iVersion);
@@ -803,7 +804,7 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
   UnloadUnusedModules ();
 
-  return instance;
+  return object;
 }
 
 void csSCF::UnloadUnusedModules ()

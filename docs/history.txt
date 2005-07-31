@@ -6,11 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Jul-2005
+	- Peter Amstutz updated the csvosa3dl plugin to compile again
+	  with the recent changes made in SCF and CS headers
+	- Marten fixed a few bugs and compilation errors in the new SCF
+	  implementation.
+	- Marten rewrote the plugin loader and object registry to play nice
+	  with virtual and/or multiple inheritance.
+	- Marten converted csEngine, csLightIt and a few other classes to 
+	  use new style SCF implementation. Also converted a few interfaces
+	  to the new syntax.
+	- Marten made some general cleanup of iEngine and csEngine.
 30-Jul-2005
 	- mdmkolbe added the csQueryRegistry family of helper functions and
 	  defined CS_QUERY_REGISTRY et al. in terms of them.
-	- Peter Amstutz updated the csvosa3dl plugin to compile again
-	  with the recent changes made in SCF and CS headers
 29-Jul-2005
 	- Jorrit fixed the light movable->MovePosition() so that it doesn't
 	  notify the light listeners anymore. This is done in UpdateMove().

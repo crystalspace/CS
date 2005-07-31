@@ -70,9 +70,9 @@ typedef int scfInterfaceVersion;
 */
 #define SCF_INTERFACE(Name,Major,Minor,Micro)             \
 struct InterfaceTraits {                                  \
-  static inline scfInterfaceVersion GetVersion()          \
+  static CS_FORCEINLINE scfInterfaceVersion GetVersion()          \
   { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); }  \
-  static inline char const * GetName() { return #Name; }  \
+  static CS_FORCEINLINE char const * GetName() { return #Name; }  \
 }
 
 
@@ -87,7 +87,7 @@ struct InterfaceTraits {                                  \
  * are equal and required minor and micro version is less or equal than target
  * version minor and micro numbers, the versions are considered compatible.
  */
-static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
+static CS_FORCEINLINE bool scfCompatibleVersion (int iVersion, int iItfVersion)
 {
   return ((iVersion & 0xff000000) == (iItfVersion & 0xff000000))
     && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff));
@@ -116,7 +116,12 @@ public:
   virtual void DecRef () = 0;
   /// Get the ref count (only for debugging).
   virtual int GetRefCount () = 0;
-  /// Query a particular interface implemented by this object.
+  /**
+   * Query a particular interface implemented by this object. You are 
+   * _not_ allowed to cast this to anything but a pointer to this interface
+   * (not even iBase).
+   * Use scfQueryInterface<interface> instead of using this method directly.
+   */
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion) = 0;
   /// For weak references: add a reference owner.
   virtual void AddRefOwner (iBase** ref_owner) = 0;
@@ -125,7 +130,7 @@ public:
 };
 
 /// Type of factory function which creates an instance of an SCF class.
-typedef void* (*scfFactoryFunc)(iBase*);
+typedef iBase* (*scfFactoryFunc)(iBase*);
 
 /**
  * iSCF is the interface that allows using SCF functions from shared classes.
@@ -204,7 +209,7 @@ struct iSCF : public iBase
    * do QueryInterface() on received pointer (this will also increment the
    * reference counter).
    */
-  virtual void *CreateInstance (const char *iClassID,
+  virtual iBase *CreateInstance (const char *iClassID,
     const char *iInterface, int iVersion) = 0;
 
   /**
@@ -394,13 +399,13 @@ public:
   /**
    * Retrieve the interface's name as a string.
    */
-  static char const* GetName ()
+  static CS_FORCEINLINE char const* GetName ()
   { 
     return Interface::InterfaceTraits::GetName ();
   }
 private:
   // This idiom is a Meyers singleton
-  static scfInterfaceID& GetMyID ()
+  static CS_FORCEINLINE scfInterfaceID& GetMyID ()
   {
     static scfInterfaceID ID = (scfInterfaceID)-1;
     return ID;

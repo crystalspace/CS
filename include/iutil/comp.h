@@ -19,7 +19,7 @@
 #ifndef __CS_IUTIL_COMP_H__
 #define __CS_IUTIL_COMP_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 struct iObjectRegistry;
 
 /**\file
@@ -29,7 +29,7 @@ struct iObjectRegistry;
  * \addtogroup scf
  * @{ */
 
-SCF_VERSION (iComponent, 0, 0, 1);
+//SCF_VERSION (iComponent, 0, 0, 1);
 
 /**
  * This interface describes a generic component in Crystal Space.
@@ -47,9 +47,14 @@ SCF_VERSION (iComponent, 0, 0, 1);
  *   <li>csPluginManager
  *   </ul>
  */
-struct iComponent : public iBase
+struct iComponent : public virtual iBase
 {
-  /// Initialize the component, and return success status.
+  SCF_INTERFACE(iComponent,2,0,0);
+  /**
+   * Initialize the component. This is automatically called by system driver
+   * at startup so that plugin can do basic initialization stuff, register
+   * with the system driver and so on.
+   */
   virtual bool Initialize (iObjectRegistry*) = 0;
 };
 

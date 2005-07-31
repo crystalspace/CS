@@ -52,11 +52,11 @@ csMaterial::csMaterial (csEngine* engine)
   csMaterial::engine = engine;
 
 
-  nameDiffuseParam = engine->Strings->Request (CS_MATERIAL_VARNAME_DIFFUSE);
-  nameAmbientParam = engine->Strings->Request (CS_MATERIAL_VARNAME_AMBIENT);
-  nameReflectParam = engine->Strings->Request (CS_MATERIAL_VARNAME_REFLECTION);
-  nameFlatColorParam = engine->Strings->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
-  nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  nameDiffuseParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_DIFFUSE);
+  nameAmbientParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_AMBIENT);
+  nameReflectParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_REFLECTION);
+  nameFlatColorParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
+  nameDiffuseTexture = engine->globalStringSet->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
   SetTextureWrapper (0);
   // @@@ This will force the shader vars to be created...
@@ -75,11 +75,11 @@ csMaterial::csMaterial (csEngine* engine,
 
   csMaterial::engine = engine;
 
-  nameDiffuseParam = engine->Strings->Request (CS_MATERIAL_VARNAME_DIFFUSE);
-  nameAmbientParam = engine->Strings->Request (CS_MATERIAL_VARNAME_AMBIENT);
-  nameReflectParam = engine->Strings->Request (CS_MATERIAL_VARNAME_REFLECTION);
-  nameFlatColorParam = engine->Strings->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
-  nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  nameDiffuseParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_DIFFUSE);
+  nameAmbientParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_AMBIENT);
+  nameReflectParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_REFLECTION);
+  nameFlatColorParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
+  nameDiffuseTexture = engine->globalStringSet->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
 
   SetTextureWrapper (w);

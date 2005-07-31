@@ -237,7 +237,7 @@ public:
         prioSorted.SetLength (priority + 1);
       }
       prioSorted.Set (priority, 
-        engine->GetRenderPrioritySorting (priority) != CS_RENDPRI_NONE);
+        engine->GetRenderPrioritySorting (priority) != CS_RENDPRI_SORT_NONE);
       knownPrios.Set (priority);
     }
     return prioSorted.IsBitSet (priority);

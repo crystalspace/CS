@@ -565,13 +565,13 @@ bool csSaver::SaveRenderPriorities(iDocumentNode *parent)
       int sorttype = engine->GetRenderPrioritySorting(i);
       switch(sorttype)
       {
-        case CS_RENDPRI_NONE:
+        case CS_RENDPRI_SORT_NONE:
           sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("NONE");
           break;
-        case CS_RENDPRI_BACK2FRONT:
+        case CS_RENDPRI_SORT_BACK2FRONT:
           sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("BACK2FRONT");
           break;
-        case CS_RENDPRI_FRONT2BACK:
+        case CS_RENDPRI_SORT_FRONT2BACK:
           sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("FRONT2BACK");
           break;
 /*      case CS_RENDPRI_MATERIAL:

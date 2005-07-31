@@ -23,12 +23,11 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iGraphics3D;
 struct iString;
 
-SCF_VERSION (iDebugHelper, 0, 0, 1);
 
 /**\name iDebugHelper implementation support flags
  * @{ */
@@ -58,8 +57,9 @@ SCF_VERSION (iDebugHelper, 0, 0, 1);
  * Some object that wants to implement unit testing, debugging and/or
  * benchmarking can implement this interface.
  */
-struct iDebugHelper : public iBase
+struct iDebugHelper : public virtual iBase
 {
+  SCF_INTERFACE(iDebugHelper,2,0,0);
   /**
    * Return a bit field indicating what types of functions this specific
    * unit test implementation supports. This will return a combination of

@@ -426,7 +426,7 @@ SCF_VERSION (iDocumentSystem, 0, 0, 1);
  *   <li>CS_QUERY_REGISTRY()
  *   </ul>
  */
-struct iDocumentSystem : public iBase
+struct iDocumentSystem : public virtual iBase
 {
   /// Create a new empty document.
   virtual csRef<iDocument> CreateDocument () = 0;

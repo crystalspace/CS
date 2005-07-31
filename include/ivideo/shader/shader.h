@@ -298,7 +298,7 @@ SCF_VERSION (iShaderCompiler, 0,0,1);
  * compiled shader. The exact schema for input is specific to each shader-
  * compiler.
  */
-struct iShaderCompiler : iBase
+struct iShaderCompiler : public virtual iBase
 {
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;

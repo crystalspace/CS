@@ -31,7 +31,7 @@ SCF_VERSION (iPVSCuller, 0, 0, 1);
  * This interface is implemented by the PVS visibility culler.
  * It allows someone to access the PVS data for writing.
  */
-struct iPVSCuller : public iBase
+struct iPVSCuller : public virtual iBase
 {
   /**
    * Get PVS tree.

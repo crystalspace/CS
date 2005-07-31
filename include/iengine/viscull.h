@@ -103,7 +103,7 @@ SCF_VERSION (iVisibilityCuller, 0, 7, 0);
  *   <li>iEngine
  *   </ul>
  */
-struct iVisibilityCuller : public iBase
+struct iVisibilityCuller : public virtual iBase
 {
   /**
    * Setup all data for this visibility culler. This needs

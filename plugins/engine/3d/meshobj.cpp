@@ -156,7 +156,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
     csParent = 0;
   }
 
-  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
+  render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 
   last_anim_time = 0;
 
@@ -487,7 +487,7 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
       relevant_lights.SetLength (relevant_lights_max);
 
     iSector *sect = movable_sectors->Get (0);
-    int num_lights = csEngine::current_iengine->GetNearbyLights (
+    int num_lights = csEngine::currentEngine->GetNearbyLights (
         sect,
         box,
         relevant_lights.GetArray (),
@@ -559,7 +559,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (ctxt);
   }
 
-  csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+  csTicks lt = csEngine::currentEngine->GetLastAnimationTime ();
   meshobj->NextFrame (lt, movable.GetPosition ());
     
   csMeshWrapper *meshwrap = this;
@@ -694,7 +694,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
 
 /*  if (meshobj->DrawTest (rview, &movable.scfiMovable, frustum_mask))
   {
-    csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+    csTicks lt = csEngine::currentEngine->GetLastAnimationTime ();
     if (lt != 0)
     {
       if (lt != last_anim_time)
@@ -956,7 +956,7 @@ void csMeshWrapper::PlaceMesh ()
   max_radius = sphere.GetRadius ();
   float max_sq_radius = max_radius * max_radius;
 
-  csRef<iMeshWrapperIterator> it = csEngine::current_engine
+  csRef<iMeshWrapperIterator> it = csEngine::currentEngine
   	->GetNearbyMeshes (sector, sphere.GetCenter (), max_radius, true);
 
   int j;
@@ -1145,7 +1145,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
   children.SetMeshFactory (this);
 
   zbufMode = CS_ZBUF_USE;
-  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
+  render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
@@ -1155,7 +1155,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
   children.SetMeshFactory (this);
 
   zbufMode = CS_ZBUF_USE;
-  render_priority = csEngine::current_engine->GetObjectRenderPriority ();
+  render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -1419,7 +1419,7 @@ void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
   if (oldParent)
     oldParent->GetChildren ()->Remove (child);
   else
-    csEngine::current_engine->GetMeshes ()->Remove (child);
+    csEngine::currentEngine->GetMeshes ()->Remove (child);
 
   /* csSector->PrepareMesh tells the culler about the mesh
      (since removing the mesh above also removes it from the culler...) */

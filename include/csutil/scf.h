@@ -578,7 +578,7 @@ CS_STATIC_VARIABLE_CLEANUP						\
 CS_EXPORTED_FUNCTION 							\
 void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
 {									\
-  void *ret = new Class (iParent);					\
+  iBase *ret = new Class (iParent);					\
   SCF_TRACE (("  %p = new %s ()\n", ret, #Class));			\
   return ret;								\
 }
@@ -690,7 +690,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
 struct iFactory : public iBase
 {
   /// Create a instance of class this factory represents.
-  virtual void *CreateInstance () = 0;
+  virtual iBase *CreateInstance () = 0;
   /// Try to unload class module (i.e. shared module).
   virtual void TryUnload () = 0;
   /// Query class description string.
@@ -746,21 +746,7 @@ CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[]);
 
 //---------- IMPLEMENTATION OF HELPER FUNCTIONS
 
-/**
- * Handy function to create an instance of a shared class.
- */
-template<class Interface>
-inline csPtr<Interface> scfCreateInstance (char const * const ClassID)
-{
-  Interface *x = (Interface *)iSCF::SCF->CreateInstance (ClassID,
-    scfInterfaceTraits<Interface>::GetName (),
-    scfInterfaceTraits<Interface>::GetVersion ());
-  return csPtr<Interface>(x);
-}
 
-// Compatibility macro for scfCreateInstance function
-#define SCF_CREATE_INSTANCE(ClassID,Interface) \
-  scfCreateInstance<Interface> (ClassID)
 
 /**
  * Helper function around iBase::QueryInterface
@@ -795,6 +781,22 @@ inline csPtr<Interface> scfQueryInterfaceSafe (ClassPtr object)
 //Compatibility macro for scfQueryInterfaceSafe
 #define SCF_QUERY_INTERFACE_SAFE(Object,Interface) \
   scfQueryInterfaceSafe<Interface> (Object)
+
+/**
+ * Handy function to create an instance of a shared class.
+ */
+template<class Interface>
+inline csPtr<Interface> scfCreateInstance (char const * const ClassID)
+{
+  iBase *base = iSCF::SCF->CreateInstance (ClassID,
+    scfInterfaceTraits<Interface>::GetName (),
+    scfInterfaceTraits<Interface>::GetVersion ());
+  return scfQueryInterfaceSafe<Interface> (base);
+}
+
+// Compatibility macro for scfCreateInstance function
+#define SCF_CREATE_INSTANCE(ClassID,Interface) \
+  scfCreateInstance<Interface> (ClassID)
 
 // Give versions to above declared classes.
 SCF_VERSION (iFactory, 0, 0, 2);

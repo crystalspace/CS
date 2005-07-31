@@ -168,12 +168,12 @@ size_t csRenderMeshList::SortMeshLists (iRenderView* rview )
     if (0 == listEnt)
       continue;
 
-    if (listEnt->sortingOption == CS_RENDPRI_BACK2FRONT)
+    if (listEnt->sortingOption == CS_RENDPRI_SORT_BACK2FRONT)
     {
       sort_CameraPosition = rview->GetCamera ()->GetTransform ().GetOrigin ();
       listEnt->meshList.Sort (SortMeshBack2Front);
     }
-    else if (listEnt->sortingOption == CS_RENDPRI_FRONT2BACK)
+    else if (listEnt->sortingOption == CS_RENDPRI_SORT_FRONT2BACK)
     {
       sort_CameraPosition = rview->GetCamera ()->GetTransform ().GetOrigin ();
       listEnt->meshList.Sort (SortMeshFront2Back);

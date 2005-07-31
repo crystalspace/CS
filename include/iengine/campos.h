@@ -120,9 +120,6 @@ struct iCameraPosition : public iBase
   virtual csPlane3* GetFarPlane () const = 0;
 };
 
-
-SCF_VERSION (iCameraPositionList, 0, 0, 1);
-
 /**
  * A list of camera position objects.
  * <p>
@@ -136,8 +133,9 @@ SCF_VERSION (iCameraPositionList, 0, 0, 1);
  *   <li>Application uses them.
  *   </ul>
  */
-struct iCameraPositionList : public iBase
+struct iCameraPositionList : public virtual iBase
 {
+  SCF_INTERFACE(iCameraPositionList,2,0,0);
   /// Create a new empty camera position.
   virtual iCameraPosition* NewCameraPosition (const char* name) = 0;
 

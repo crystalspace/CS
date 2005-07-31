@@ -33,7 +33,7 @@ SCF_VERSION (iMovieRecorder, 0, 0, 1);
  * This allows changing or disabling the hotkey bindings, changing the
  * video parameters, and programmatically starting and stopping the recorder.
  */
-struct iMovieRecorder : public iBase
+struct iMovieRecorder : public virtual iBase
 {
   /// Start recording using the settings in the configuration system
   virtual void Start(void) = 0;

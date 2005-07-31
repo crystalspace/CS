@@ -195,9 +195,9 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
   {
     float iz = camera->GetFOV () / v.z;
     v.x = v.x * iz + camera->GetShiftX ();
-    v.y = Engine->frame_height - 1 - (v.y * iz + camera->GetShiftY ());
+    v.y = Engine->frameHeight - 1 - (v.y * iz + camera->GetShiftY ());
 
-    if (Engine->top_clipper->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
+    if (Engine->GetTopLevelClipper ()->GetClipper ()->IsInside (csVector2 (v.x, v.y)))
     {
       csVector3 isect;
       int polyidx = 0;
@@ -284,7 +284,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, iCamera* camera,
   };
 
   // Clip the halo against clipper
-  if (Engine->top_clipper->GetClipper ()->Clip (
+  if (Engine->GetTopLevelClipper ()->GetClipper ()->Clip (
   	HaloPoly, 4, HaloClip, HaloVCount))
   {
     xtl = HaloPoly[0].x;
@@ -380,13 +380,13 @@ void csLightFlareHalo::ProcessFlareComponent (
 
   if (!comp->image)
   {
-    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without material.");
+    csEngine::currentEngine->Warn ("INTERNAL ERROR: flare used without material.");
     return ;
   }
   iMaterial* mat = comp->image->GetMaterial ();
   if (!mat)
   {
-    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without valid material.");
+    csEngine::currentEngine->Warn ("INTERNAL ERROR: flare used without valid material.");
     return ;
   }
 

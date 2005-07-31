@@ -63,7 +63,7 @@ typedef csArray<csImageIOFileFormatDescription const*>
 /**
  * The iImageIO interface is used to save and load graphic files.
  */
-struct iImageIO : public iBase
+struct iImageIO : public virtual iBase
 {
   /// Description for a file format supported by an image loader.
   typedef csImageIOFileFormatDescription FileFormatDescription;

@@ -3727,22 +3727,22 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 	      "The <camera/> flag for render priorities is no longer needed");
 	}
 
-	int rendsort = CS_RENDPRI_NONE;
+	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE;
 	csRef<iDocumentNode> sortnode = child->GetNode ("sort");
 	if (sortnode)
 	{
 	  const char* sorting = sortnode->GetContentsValue ();
 	  if (!strcmp (sorting, "BACK2FRONT"))
 	  {
-	    rendsort = CS_RENDPRI_BACK2FRONT;
+	    rendsort = CS_RENDPRI_SORT_BACK2FRONT;
 	  }
 	  else if (!strcmp (sorting, "FRONT2BACK"))
 	  {
-	    rendsort = CS_RENDPRI_FRONT2BACK;
+	    rendsort = CS_RENDPRI_SORT_FRONT2BACK;
 	  }
 	  else if (!strcmp (sorting, "NONE"))
 	  {
-	    rendsort = CS_RENDPRI_NONE;
+	    rendsort = CS_RENDPRI_SORT_NONE;
 	  }
 	  else
 	  {

@@ -138,8 +138,7 @@ struct csOptionDescription
   csVariantType type;	
 };
 
-SCF_VERSION (iPluginConfig, 1, 0, 0);
-
+//SCF_VERSION (iPluginConfig, 1, 0, 0);
 /**
  * Interface to a configurator object. If a SCF module
  * has an object implementing this interface then this can
@@ -159,8 +158,9 @@ SCF_VERSION (iPluginConfig, 1, 0, 0);
  *   <li>csPluginManager
  *   </ul>
  */
-struct iPluginConfig : public iBase
+struct iPluginConfig : public virtual iBase
 {
+  SCF_INTERFACE(iPluginConfig,2,0,0);
   /// Get option description; return FALSE if there is no such option
   virtual bool GetOptionDescription (int idx, csOptionDescription *option) = 0;
   /// Set option

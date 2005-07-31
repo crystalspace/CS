@@ -108,9 +108,9 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
   static engine3d_comp_mesh_z &comp_mesh_z = *GetStaticComp_Mesh_Comp ();
   if (!visible[priority]) return ;
 
-  int rendsort = csEngine::current_engine->GetRenderPrioritySorting (
+  int rendsort = csEngine::currentEngine->GetRenderPrioritySorting (
       priority);
-  if (rendsort == CS_RENDPRI_NONE) return ;
+  if (rendsort == CS_RENDPRI_SORT_NONE) return ;
 
   csArrayMeshMask *v = visible[priority];
   if (v->Length () > comp_mesh_z.Length ())
@@ -130,7 +130,7 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
     if (!movable->IsFullTransformIdentity ())
       tr_o2c /= movable->GetFullTransform ();
     csVector3 tr_cent = tr_o2c.Other2This (cent);
-    comp_mesh_z[i].z = rendsort == CS_RENDPRI_FRONT2BACK
+    comp_mesh_z[i].z = rendsort == CS_RENDPRI_SORT_FRONT2BACK
     	? tr_cent.z
 	: -tr_cent.z;
     comp_mesh_z[i].mesh_with_mask = mesh_with_mask;

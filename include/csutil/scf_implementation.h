@@ -54,63 +54,63 @@ public:
   scfImplementation (Class *object, iBase *parent = 0) :
       scfObject (object), scfRefCount (1), scfParent (parent), 
         scfWeakRefOwners (NULL)
-      {
-        if (scfParent) scfParent->IncRef ();
-      }
+  {
+    if (scfParent) scfParent->IncRef ();
+  }
 
-      // Cleanup
-      virtual ~scfImplementation()
-      {
-        scfRemoveRefOwners ();
-      }
+  // Cleanup
+  virtual ~scfImplementation()
+  {
+    scfRemoveRefOwners ();
+  }
 
-      /**
-      * Decrease reference count, and when it runs out delete the object 
-      */
-      void DecRef ()
-      {
-        scfRefCount--;
-        if (scfRefCount == 0)
-        {
-          if (scfParent) scfParent->DecRef();
-          delete scfObject;
-        }
-      }
+  /**
+   * Decrease reference count, and when it runs out delete the object 
+   */
+  void DecRef ()
+  {
+    scfRefCount--;
+    if (scfRefCount == 0)
+    {
+      if (scfParent) scfParent->DecRef();
+      delete scfObject;
+    }
+  }
 
-      /**
-      * Increase reference count. 
-      */
-      void IncRef ()
-      {
-        scfRefCount++;
-      }
+  /**
+   * Increase reference count. 
+   */
+  void IncRef ()
+  {
+    scfRefCount++;
+  }
 
-      /**
-      * Get the reference count. Just for debugging. 
-      */
-      int GetRefCount ()
-      {
-        return scfRefCount;
-      }
+  /**
+   * Get the reference count. Just for debugging. 
+   */
+  int GetRefCount ()
+  {
+    return scfRefCount;
+  }
 
-      void AddRefOwner (iBase** ref_owner)
-      {
-        if (!this->scfWeakRefOwners)
-          scfWeakRefOwners = new csArray<iBase**> (0, 4);
-        scfWeakRefOwners->InsertSorted (ref_owner);
-      }
+  void AddRefOwner (iBase** ref_owner)
+  {
+    if (!this->scfWeakRefOwners)
+      scfWeakRefOwners = new csArray<iBase**> (0, 4);
+    scfWeakRefOwners->InsertSorted (ref_owner);
+  }
 
-      void RemoveRefOwner (iBase** ref_owner)
-      {
-        if (!scfWeakRefOwners)
-          return;
+  void RemoveRefOwner (iBase** ref_owner)
+  {
+    if (!scfWeakRefOwners)
+      return;
 
-        size_t index = scfWeakRefOwners->FindSortedKey (
-          csArrayCmp<iBase**, iBase**>(ref_owner));
+    size_t index = scfWeakRefOwners->FindSortedKey (
+      csArrayCmp<iBase**, iBase**>(ref_owner));
 
-        if (index != csArrayItemNotFound)
-          scfWeakRefOwners->DeleteIndex (index);
-      }
+    if (index != csArrayItemNotFound)
+      scfWeakRefOwners->DeleteIndex (index);
+  }
 
 protected:
   Class *scfObject;
@@ -137,7 +137,7 @@ protected:
   * Query this implementation for a specific interface 
   */
   void *QueryInterface (scfInterfaceID iInterfaceID,
-    scfInterfaceVersion iVersion)
+                        scfInterfaceVersion iVersion)
   {
     // Default, just check iBase.. all objects have iBase
     if (iInterfaceID == scfInterfaceTraits<iBase>::GetID () &&
@@ -159,7 +159,8 @@ protected:
   * of child-classes
   */
   template<class I>
-    inline void* GetInterface(scfInterfaceID iInterfaceID, scfInterfaceVersion iVersion)
+  CS_FORCEINLINE void* GetInterface(scfInterfaceID iInterfaceID, 
+                                    scfInterfaceVersion iVersion)
   {
     if (iInterfaceID == scfInterfaceTraits<I>::GetID () &&
       scfCompatibleVersion (iVersion, scfInterfaceTraits<I>::GetVersion ()))

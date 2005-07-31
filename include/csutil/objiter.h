@@ -30,13 +30,14 @@
 /**
  * Typed object iterator class.
  */
-template<typename T> class csTypedObjectIterator
+template<typename T> 
+class csTypedObjectIterator
 {
 protected:
   scfInterfaceID scf_id;
   int scf_ver;
   csRef<iObjectIterator> iter;
-  csRef<iBase> CurrentTypedObject;
+  csRef<T> CurrentTypedObject;
 
   void FetchObject()
   {
@@ -44,7 +45,7 @@ protected:
     while (iter->HasNext())
     {
       CurrentTypedObject =
-	csPtr<iBase>((iBase*)(iter->Next()->QueryInterface(scf_id, scf_ver)));
+	csPtr<T>((T*)(iter->Next()->QueryInterface(scf_id, scf_ver)));
       if (CurrentTypedObject.IsValid())
 	return;
     }
@@ -86,10 +87,10 @@ public:
     iObject* obj = iter->FindName(name);
     if (obj != 0)
       CurrentTypedObject.AttachNew(
-  	(iBase*)(obj->QueryInterface(scf_id, scf_ver)));
+  	(T*)(obj->QueryInterface(scf_id, scf_ver)));
     else
       CurrentTypedObject.Invalidate();
-    return (T*)(iBase*)CurrentTypedObject;
+    return (T*)CurrentTypedObject;
   }
 };
 

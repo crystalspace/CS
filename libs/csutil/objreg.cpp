@@ -235,7 +235,7 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
     if (t && !strcmp (tag, t))
     {
       iBase* b = registry[i - 1];
-      iBase* interf = (iBase*)(b->QueryInterface (id, version));
+      void* interf = b->QueryInterface (id, version);
       if (!interf)
       {
         csPrintf ("WARNING! Suspicious: object with tag '%s' does not implement "
@@ -243,7 +243,7 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
 	fflush (stdout);
 	return 0;
       }
-      return interf;
+      return b; //do not return interf.  
     }
   }
   return 0;
@@ -258,12 +258,12 @@ csPtr<iObjectRegistryIterator> csObjectRegistry::Get (
   for (i = registry.Length(); i > 0; i--)
   {
     iBase* b = registry[i - 1];
-    iBase* interf = (iBase*)(b->QueryInterface (id, version));
+    void* interf = b->QueryInterface (id, version);
     if (interf)
     {
       const char* t = tags[i - 1];
-      iterator->Add (interf, t);
-      interf->DecRef ();
+      iterator->Add (b, t);
+      b->DecRef ();
     }
   }
   return csPtr<iObjectRegistryIterator> (iterator);

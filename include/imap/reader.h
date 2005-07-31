@@ -33,7 +33,7 @@ SCF_VERSION (iLoaderPlugin, 0, 2, 1);
 /**
  * This is a plugin for the loader based on document tree.
  */
-struct iLoaderPlugin : public iBase
+struct iLoaderPlugin : public virtual iBase
 {
   /// Parse a given document node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,

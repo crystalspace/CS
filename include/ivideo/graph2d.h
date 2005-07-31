@@ -178,7 +178,7 @@ SCF_VERSION (iGraphics2D, 2, 6, 0);
  *   <li>3D renderers (iGraphics3D implementations)
  *   </ul>
  */
-struct iGraphics2D : public iBase
+struct iGraphics2D : public virtual iBase
 {
   /// Open the device.
   virtual bool Open () = 0;

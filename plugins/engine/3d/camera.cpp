@@ -41,8 +41,8 @@ csCamera::csCamera () :
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
   fov_angle = default_fov_angle;
-  shift_x = csEngine::frame_width / 2;
-  shift_y = csEngine::frame_height / 2;
+  shift_x = csEngine::frameWidth / 2;
+  shift_y = csEngine::frameHeight / 2;
   fp = 0;
   cameranr = cur_cameranr++;
   only_portals = true;

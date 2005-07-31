@@ -240,7 +240,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler = 0;
 
   // Load the culler plugin.
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (csEngine::object_reg,
+  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (csEngine::objectRegistry,
   	iPluginManager);
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
 
@@ -252,7 +252,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   const char* err = culler->ParseCullerParameters (culler_params);
   if (err)
   {
-    csEngine::current_engine->Error ("Error loading visibility culler: %s!",
+    csEngine::currentEngine->Error ("Error loading visibility culler: %s!",
     	err);
     return false;
   }
@@ -622,8 +622,8 @@ iSector *csSector::FollowSegment (
 void csSector::PrepareDraw (iRenderView *rview)
 {
 
-  if (csEngine::current_engine->bugplug)
-    csEngine::current_engine->bugplug->AddCounter ("Sector Count", 1);
+  if (csEngine::currentEngine->bugplug)
+    csEngine::currentEngine->bugplug->AddCounter ("Sector Count", 1);
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
@@ -934,7 +934,7 @@ int csSectorList::Add (iSector *obj)
 
 bool csSectorList::Remove (iSector *obj)
 {
-  csEngine::current_engine->FireRemoveSector (obj);
+  csEngine::currentEngine->FireRemoveSector (obj);
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)

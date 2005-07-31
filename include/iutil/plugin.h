@@ -34,37 +34,6 @@
 struct iComponent;
 
 /**
- * Find a plugin by its class ID. First the plugin with requested class
- * identifier is found, and after this it is queried for the respective
- * interface; if it does not implement the requested interface, 0 is returned.
- * \param Object An object that implements iPluginManager.
- * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
- * \param Interface Desired nterface name (ex. iGraphics2D, iVFS, etc.).
- */
-#define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
-  csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
-  (ClassID, scfInterfaceTraits<Interface>::GetName(),                   \
-  scfInterfaceTraits<Interface>::GetVersion())))  
-
-/**
- * Tell plugin manager to load a plugin.
- * \param Object An object that implements iPluginManager.
- * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
- * \param Interface Desired nterface name (ex. iGraphics2D, iVFS, etc.).
- */
-#define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
-  csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
-  (ClassID, scfInterfaceTraits<Interface>::GetName(),                   \
-  scfInterfaceTraits<Interface>::GetVersion())))
-
-/**
- * Same as CS_LOAD_PLUGIN() but does nott bother asking for a interface.
- * This is useful for unconditionally loading plugins.
- */
-#define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)				\
-  csPtr<iBase> ((Object)->LoadPlugin (ClassID, 0, 0))
-
-/**
  * Use this macro to query the object registry, loading a plugin if needed.  If
  * an object with a given interface exists in an object registry, get that
  * object from the registry. If the registry query fails, try to load a plugin
@@ -187,6 +156,75 @@ struct iPluginManager : public iBase
    */
   virtual void QueryOptions (iComponent* object) = 0;
 };
+
+
+/**
+ * Find a plugin by its class ID. First the plugin with requested class
+ * identifier is found, and after this it is queried for the respective
+ * interface; if it does not implement the requested interface, 0 is returned.
+ * \param mgr An object that implements iPluginManager.
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ * \param Interface Desired interface type (ex. iGraphics2D, iVFS, etc.).
+ */
+template<class Interface>
+inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
+                                            const char* ClassID)
+{
+  iBase* base (mgr->QueryPlugin (ClassID,
+    scfInterfaceTraits<Interface>::GetName(),
+    scfInterfaceTraits<Interface>::GetVersion()));
+
+  return scfQueryInterfaceSafe<Interface> (base);
+}
+
+/**
+ * Compatbility macro.
+ * \sa csQueryPluginClass<Interface> (Object, ClassID);
+ */
+#define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
+  csQueryPluginClass<Interface> (Object, ClassID)
+
+/**
+ * Tell plugin manager to load a plugin.
+ * \param mgr An object that implements iPluginManager.
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ * \param Interface Desired interface type (ex. iGraphics2D, iVFS, etc.).
+ */
+template<class Interface>
+inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
+                                      const char* ClassID)
+{
+  iBase* base (mgr->LoadPlugin (ClassID,
+    /*scfInterfaceTraits<Interface>::GetName()*/0,
+    /*scfInterfaceTraits<Interface>::GetVersion()*/0));
+
+  return scfQueryInterfaceSafe<Interface> (base);
+}
+
+/**
+ * Compatbility macro.
+ * \sa csLoadPlugin<Interface> (mgr, ClassID);
+ */
+#define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
+  csLoadPlugin<Interface> (Object, ClassID)
+
+/**
+ * Same as csLoadPlugin() but does not bother asking for a interface.
+ * This is useful for unconditionally loading plugins.
+ */
+inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
+                                        const char* ClassID)
+{
+  iBase* base (mgr->LoadPlugin (ClassID,0,0));
+  return csPtr<iBase> (base);
+}
+
+/**
+ * Compatbility macro.
+ * \sa csLoadPluginAlways (mgr, ClassID);
+ */
+#define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)				\
+  csLoadPluginAlways (Object, ClassID)
 
 /** @} */
 

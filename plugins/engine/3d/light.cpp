@@ -83,7 +83,7 @@ csLight::~csLight ()
   }
 
   if (flags.Check (CS_LIGHT_ACTIVEHALO))
-    csEngine::current_engine->RemoveHalo (this);
+    csEngine::currentEngine->RemoveHalo (this);
   delete halo;
   delete[] light_id;
 
@@ -357,7 +357,7 @@ void csLight::CalculateLighting ()
 
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
   {
-    csRef<iMeshWrapperIterator> it = csEngine::current_engine
+    csRef<iMeshWrapperIterator> it = csEngine::currentEngine
     	->GetNearbyMeshes (GetSector (), GetCenter (), GetCutoffDistance ());
     while (it->HasNext ())
     {

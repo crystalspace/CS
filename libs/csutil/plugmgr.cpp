@@ -225,12 +225,17 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
 
     if ((!init) || p->Initialize (object_reg))
     {
-      iBase *ret;
+      void *ret = 0;
       if (iInterface)
-        ret = (iBase *)p->QueryInterface (
+      {
+        ret = p->QueryInterface (
 	  iSCF::SCF->GetInterfaceID (iInterface), iVersion);
+      }
       else
-        (ret = p)->IncRef();
+      {
+        ret = p;
+        p->IncRef();
+      }
       if (ret)
       {
         if (!added_here)
@@ -242,7 +247,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
 	}
 
         if (init) QueryOptions (p);
-        return ret;
+        return p;
       }
       else
       {
@@ -304,16 +309,16 @@ iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
   csScopedMutexLock lock (mutex);
   for (size_t i = 0; i < Plugins.Length (); i++)
   {
-    iBase *ret =
-      (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
-    if (ret)
+    iBase *ret = Plugins.Get (i)->Plugin;
+    if (ret->QueryInterface (ifID, iVersion))
       return ret;
   }
   return 0;
 }
 
 iBase *csPluginManager::QueryPlugin (const char* classID,
-				    const char *iInterface, int iVersion)
+				     const char *iInterface, 
+                                     int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   csScopedMutexLock lock (mutex);
@@ -323,7 +328,9 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
     if (pl->ClassID)
       if (pl->ClassID == classID || !strcmp (pl->ClassID, classID))
       {
-	return (iBase*)Plugins.Get(i)->Plugin->QueryInterface(ifID,iVersion);
+        iBase *p = Plugins.Get(i)->Plugin;
+        if (p->QueryInterface(ifID,iVersion))
+          return p;
       }
   }
   return 0;

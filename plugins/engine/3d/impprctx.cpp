@@ -48,7 +48,7 @@ csImposterProcTex::csImposterProcTex (csImposterMesh *parent) : csProcTexture ()
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  csProcTexture::Initialize (csEngine::object_reg);
+  csProcTexture::Initialize (csEngine::objectRegistry);
 }
 
 csImposterProcTex::~csImposterProcTex ()

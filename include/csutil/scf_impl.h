@@ -25,7 +25,7 @@
  */
 
 #ifndef SCF_IN_IMPLEMENTATION_H
-#error Don't include this file directly. Included from scf_implementation.h
+#error Don not include this file directly. Included from scf_implementation.h
 #endif
 
 #ifndef SCF_IMPL_EXT
@@ -120,7 +120,7 @@ class SCF_IMPL_NAME :
   SCF_IMPL_INTERFACES
 {
 public:
-  void *QueryInterface(scfInterfaceID id, scfInterfaceVersion version)
+  inline void *QueryInterface(scfInterfaceID id, scfInterfaceVersion version)
   {
     void *x;
 #if SCF_IMPL_N >= 1
@@ -195,7 +195,7 @@ protected:
 
 private:
   template<class I>
-  inline void* GetInterface(scfInterfaceID id, scfInterfaceVersion version)
+  CS_FORCEINLINE void* GetInterface(scfInterfaceID id, scfInterfaceVersion version)
   {
     if (id == scfInterfaceTraits<I>::GetID() &&
         scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))

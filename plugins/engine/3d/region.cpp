@@ -58,8 +58,8 @@ csRegion::~csRegion ()
 void csRegion::DeleteAll ()
 {
   csRef<iObjectIterator> iter;
-  iEngineSequenceManager* engseq = csEngine::current_engine
-  	->FetchEngineSequenceManager ();
+  iEngineSequenceManager* engseq = csEngine::currentEngine
+    ->GetEngineSequenceManager (false);
 
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
@@ -223,7 +223,7 @@ void csRegion::DeleteAll ()
   }
 
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (
-  	csEngine::current_engine->object_reg, iShaderManager);
+  	csEngine::currentEngine->objectRegistry, iShaderManager);
   if (shmgr)
     for (i = 0; i < copy.Length (); i++)
     {
@@ -261,7 +261,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *o = copy[i];
-      csEngine::current_engine->ReportBug (
+      csEngine::currentEngine->ReportBug (
           "\
 There is still an object in the array after deleting region contents!\n\
 Object name is '%s'",
@@ -275,7 +275,7 @@ Object name is '%s'",
 bool csRegion::PrepareTextures ()
 {
   csRef<iObjectIterator> iter;
-  iTextureManager *txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
+  iTextureManager *txtmgr = csEngine::currentEngine->G3D->GetTextureManager ();
 
   // First register all textures to the texture manager.
   iter = GetIterator ();

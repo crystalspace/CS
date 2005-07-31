@@ -23,7 +23,7 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iObjectIterator;
 
@@ -51,12 +51,11 @@ struct iObjectIterator;
  */
 #define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
   csPtr<Interface> ((Interface*)(object)->GetChild(			\
-  scfInterface<Interface>::GetID(), scfInterface<Interface>::GetVersion(), \
+  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion(), \
   name, true))
 
 
-SCF_VERSION (iObject, 0, 3, 0);
-
+//SCF_VERSION (iObject, 0, 3, 0);
 /**
  * This interface is an SCF interface for encapsulating csObject.
  * <p>
@@ -75,8 +74,9 @@ SCF_VERSION (iObject, 0, 3, 0);
  *   <li>iObjectIterator::GetParentObj()
  *   </ul>
  */
-struct iObject : public iBase
+struct iObject : public virtual iBase
 {
+  SCF_INTERFACE(iObject,2,0,0);
   /// Set object name
   virtual void SetName (const char *iName) = 0;
 

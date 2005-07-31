@@ -24,6 +24,7 @@
 
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
+#include "csutil/scf.h"
 
 #include "iutil/object.h"
 

@@ -548,7 +548,7 @@ SCF_VERSION (iLightIterator, 0, 1, 0);
  *   <li>Application.
  *   </ul>
  */
-struct iLightIterator : public iBase
+struct iLightIterator : public virtual iBase
 {
   /// Return true if there are more elements.
   virtual bool HasNext () = 0;

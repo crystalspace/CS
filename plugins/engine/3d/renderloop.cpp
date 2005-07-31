@@ -60,7 +60,7 @@ csRenderLoop::~csRenderLoop ()
 void csRenderLoop::Draw (iRenderView *rview, iSector *s)
 {
   if (!shadermanager)
-    shadermanager = CS_QUERY_REGISTRY (engine->object_reg, iShaderManager);
+    shadermanager = CS_QUERY_REGISTRY (engine->objectRegistry, iShaderManager);
 
   if (s)
   {
@@ -180,7 +180,7 @@ bool csRenderLoopManager::Unregister (iRenderLoop* loop)
 csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
 {
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (engine->object_reg, iPluginManager));
+  	CS_QUERY_REGISTRY (engine->objectRegistry, iPluginManager));
 
   csRef<iLoaderPlugin> rlLoader =
     CS_LOAD_PLUGIN (plugin_mgr,
