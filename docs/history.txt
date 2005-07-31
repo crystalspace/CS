@@ -9,6 +9,8 @@ chronological order.
 30-Jul-2005
 	- mdmkolbe added the csQueryRegistry family of helper functions and
 	  defined CS_QUERY_REGISTRY et al. in terms of them.
+	- Peter Amstutz updated the csvosa3dl plugin to compile again
+	  with the recent changes made in SCF and CS headers
 29-Jul-2005
 	- Jorrit fixed the light movable->MovePosition() so that it doesn't
 	  notify the light listeners anymore. This is done in UpdateMove().
