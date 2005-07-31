@@ -39,6 +39,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix2.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/tri.h"
+#include "csutil/flags.h"
 
 #include "csvosa3dl.h"
 #include "vospolygonmesh.h"

@@ -27,6 +27,8 @@
 #include "voslight.h"
 #include "iengine/movable.h"
 #include "ivaria/ode.h"
+#include "csutil/cscolor.h"
+#include "ivaria/pmeter.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -268,8 +270,8 @@ void LoadSectorTask::doTask()
   if (vosa3dl->GetDynamics())
   {
     sector->dynsys = vosa3dl->GetDynamics()->CreateSystem();
-    sector->dynsys->SetGravity(csVector3(0, -9, 0));
-    sector->dynsys->SetRollingDampener(.995);
+    //sector->dynsys->SetGravity(csVector3(0, -9, 0));
+    //sector->dynsys->SetRollingDampener(.995);
     //sector->dynsys->SetLinearDampener(.995);
     sector->dynsys->EnableAutoDisable (1);
     sector->dynsys->SetAutoDisableParams(.1f, .1f, 6, 0.0f);

@@ -68,6 +68,7 @@ private:
 
   int relightCounter;
   boost::mutex relightCounterMutex;
+  float remaining_delta;
 
 public:
   SCF_DECLARE_IBASE;

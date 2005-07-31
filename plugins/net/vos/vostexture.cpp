@@ -29,6 +29,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "igraphic/imageio.h"
+#include "igraphic/image.h"
 #include "iutil/vfs.h"
 #include "csutil/databuf.h"
 

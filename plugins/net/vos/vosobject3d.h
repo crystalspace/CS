@@ -110,13 +110,19 @@ public:
   // Call these from CS run loop.  Derived objects can override if they
   // do not correctly use movable interface
   virtual void changePosition (const csVector3 &pos, bool setCollider);
-  virtual void changeOrientation (const csMatrix3 &ori);
+  virtual void changeOrientation (const csMatrix3 &ori, bool setCollider);
 
   virtual void changeMaterial (iMaterialWrapper* mat);
 
   // This is commented out because CS does not support dynamically changing
   // scaling of objects
   //virtual void changeScaling (const csMatrix3 &scaling)
+
+  virtual bool supportsPhysics();
+  virtual void applyForce(double x, double y, double z);
+  virtual void applyTorque(double x, double y, double z);
+  virtual void getLinearVelocity(double& x, double& y, double& z);
+  virtual void getAngularVelocity(double& x, double& y, double& z);
 };
 
 #endif

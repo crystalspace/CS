@@ -240,7 +240,15 @@ void ConstructModelTask::doTask()
     rb->SetMoveCallback(model->GetCSinterface());
 
     csOrthoTransform t;
-    rb->AttachColliderMesh(meshwrapper, t, 10, 1, 0);
+    //rb->AttachColliderMesh(meshwrapper, t, 10, 1, 0);
+    rb->AttachColliderMesh(meshwrapper, t, 0, 1, 0);
+
+    //csRef<iJoint> j = dynsys->CreateJoint ();
+    //j->Attach (rb, 0);
+    //j->SetTransConstraints (false, false, false);
+    //j->SetMinimumAngle (csVector3 (0, 0, 0));
+    //j->SetMaximumAngle (csVector3 (0, 0, 0));
+    //j->SetRotConstraints (true, true, true);
 
     model->GetCSinterface()->SetCollider (rb);
   }

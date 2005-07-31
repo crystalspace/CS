@@ -22,10 +22,12 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/scf.h"
 
 #include "iengine/mesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
+#include "csgeom/tri.h"
 
 #include "csvosa3dl.h"
 #include "voscone.h"

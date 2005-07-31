@@ -26,6 +26,7 @@
 #include "iengine/mesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
+#include "csgeom/tri.h"
 
 #include "csvosa3dl.h"
 #include "voscylinder.h"

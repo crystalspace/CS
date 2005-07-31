@@ -22,6 +22,8 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/scf.h"
+#include "csutil/cscolor.h"
 
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)

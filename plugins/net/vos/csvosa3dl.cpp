@@ -22,11 +22,13 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/scf.h"
 #include "csutil/event.h"
 #include "ivaria/collider.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
 #include "imap/loader.h"
+#include "ivaria/pmeter.h"
 
 #include "csvosa3dl.h"
 #include "vossector.h"
@@ -94,6 +96,7 @@ csVosA3DL::csVosA3DL (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   relightCounter = 0;
+  remaining_delta = 0;
 }
 
 csVosA3DL::~csVosA3DL()
@@ -202,7 +205,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                             iCollideSystem);
 
 
-#if 0 // dynamics isn't ready yet
+#if 1 // dynamics isn't ready yet
   CS_QUERY_REGISTRY_PLUGIN(dynamics, objreg,
                            "crystalspace.dynamics.ode",
                            iDynamics);
@@ -224,7 +227,9 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
   {
     double start = getRealTime();
 
-    for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.5); n--)
+    for(unsigned int n = mainThreadTasks.size();
+        n > 0 && getRealTime() < (start+.5);
+        n--)
     {
       LOG("csVosA3DL", 3, "starting main thread task");
       Task* t = mainThreadTasks.pop();
@@ -238,27 +243,29 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
       csTicks elapsed_time = clock->GetElapsedTicks ();
       const float speed = elapsed_time / 1000.0;
 
-      // Take small steps.
-      const float maxStep = 0.01f;
-      float ta = 0;
-      float tb = speed;
-      int maxSteps = 4;
+      LOG("csVosA3DL", 4, "elapsed time is " << elapsed_time << " " << speed);
 
-      while (ta < speed && maxSteps)
+      // For ODE it is recommended that all steps are done with the
+      // same size. So we always will call dynamics->Step(delta) with
+      // the constant delta. However, sometimes our elapsed time
+      // is not divisible by delta and in that case we have a small
+      // time (smaller then delta) left-over. We can't afford to drop
+      // that because then speed of physics simulation would differ
+      // depending on framerate. So we will put that remainder in
+      // remaining_delta and use that here too.
+      const float delta = 0.001f;
+      float et = remaining_delta + speed;
+      while (et >= delta)
       {
-        if (tb - ta > maxStep) tb = ta + maxStep;
-
-        dynamics->Step (tb - ta);
-        ta = tb;
-        tb = speed;
-
-        maxSteps--;
+        dynamics->Step (delta);
+        et -= delta;
       }
+      remaining_delta = et;
     }
 
     start = getRealTime();
 
-    for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.5); n--)
+    for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.2); n--)
     {
       LOG("csVosA3DL", 3, "starting main thread task");
       Task* t = mainThreadTasks.pop();

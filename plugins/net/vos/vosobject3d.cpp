@@ -114,20 +114,56 @@ void csVosObject3D::Execute(iMeshWrapper *, csOrthoTransform &t)
 
 void csVosObject3D::Execute(csOrthoTransform & t)
 {
+#if 0
   LOG ("csVosObject3D", 3, "Received Execute callback 1 arg");
-  //csVector3 pos = collider->GetPosition();
-  //csVector3 vel = collider->GetLinearVelocity();
-  //csVector3 acc = collider->GetForce();
+  csVector3 pos = collider->GetPosition();
+  csVector3 vel = collider->GetLinearVelocity();
+  csVector3 acc = collider->GetForce();
 
-  double x, y, z;
+  LOG("vosobject3d", 2, "pos is "
+      << pos.x << " " << pos.y << " " << pos.z);
+  LOG("vosobject3d", 2, "force is "
+      << acc.x << " " << acc.y << " " << acc.z);
+  LOG("vosobject3d", 2, "vel is "
+      << vel.x << " " << vel.y << " " << vel.z);
+#endif
 
-  object3d->getPosition(x, y, z);
+  try {
+    double x, y, z;
 
-  if ((csVector3(x, y, z) - t.GetOrigin()).Norm() > .0001)
+    object3d->getPosition(x, y, z);
+
+    if ((csVector3(x, y, z) - t.GetOrigin()).Norm() > .0001)
+    {
+      LOG("vosobject3d", 4, "changePosition " <<
+          " to " << t.GetOrigin().x << " " << t.GetOrigin().y << " " << t.GetOrigin().z);
+      object3d->setPosition(t.GetOrigin().x, t.GetOrigin().y, t.GetOrigin().z);
+
+      // XXX this is a horrible hack
+      //collider->SetOrientation(csMatrix3());
+
+      //double a, b, c, d;
+      //object3d->getOrientation(a, b, c, d);
+    }
+
+#if 1
+      csQuaternion q(collider->GetOrientation());
+      csVector3 axis;
+      float angle;
+
+      q.GetAxisAngle(axis, angle);
+
+      //LOG("vosobject3d", 2, "changeOrientation " <<
+      //" to " << axis.x << " " << axis.y << " " << axis.z << " " << angle);
+
+      if (axis.x == axis.x && axis.y == axis.y && axis.z == axis.z) {
+        object3d->setOrientation(axis.x, axis.y, axis.z, angle * 180.0 / M_PI);
+      }
+#endif
+  }
+  catch(std::runtime_error e)
   {
-    //LOG("vosobject3d", 2, "changePosition " <<
-    //" to " << t.GetOrigin().x << " " << t.GetOrigin().y << " " << t.GetOrigin().z);
-    object3d->setPosition(t.GetOrigin().x, t.GetOrigin().y, t.GetOrigin().z);
+    LOG("vosobject3d", 2, "caught exception " << e.what());
   }
 }
 
@@ -216,15 +252,15 @@ class OrientateTask : public Task
 {
   vRef<csMetaObject3D> obj;
   csMatrix3 ori;
+  bool setCollider;
 
 public:
-  OrientateTask (csMetaObject3D *o, const csMatrix3 &m)
-    : obj(o, true), ori(m) {}
+  OrientateTask (csMetaObject3D *o, const csMatrix3 &m, bool c = false)
+    : obj(o, true), ori(m), setCollider(c) {}
   ~OrientateTask () {}
 
-  void doTask() { obj->changeOrientation (ori); }
+  void doTask() { obj->changeOrientation (ori, setCollider); }
 };
-
 
 // Set material task
 
@@ -239,6 +275,51 @@ public:
   ~MaterialTask () {}
 
   void doTask() { obj->changeMaterial (material); }
+};
+
+// Apply force task
+
+class ApplyForceTask : public Task
+{
+  vRef<csMetaObject3D> obj;
+  csVector3 force;
+
+public:
+  ApplyForceTask (csMetaObject3D *o, const csVector3 &f)
+    : obj(o, true), force(f) {}
+  ~ApplyForceTask () {}
+
+  void doTask() {
+    LOG("vosobject3d", 3, "add force " << force.x << " " << force.y << " " << force.z);
+    csRef<iRigidBody> rb = obj->GetCSinterface()->GetCollider();
+    if (rb) {
+      obj->GetCSinterface()->GetCollider()->Enable();
+      obj->GetCSinterface()->GetCollider()->AddForce(force);
+    }
+  }
+};
+
+
+// Apply torque task
+
+class ApplyTorqueTask : public Task
+{
+  vRef<csMetaObject3D> obj;
+  csVector3 torque;
+
+public:
+  ApplyTorqueTask (csMetaObject3D *o, const csVector3 &t)
+    : obj(o, true), torque(t) {}
+  ~ApplyTorqueTask () {}
+
+  void doTask() {
+    //LOG("vosobject3d", 2, "add torque " << torque.x << " " << torque.y << " " << torque.z);
+    csRef<iRigidBody> rb = obj->GetCSinterface()->GetCollider();
+    if (rb) {
+      obj->GetCSinterface()->GetCollider()->Enable();
+      obj->GetCSinterface()->GetCollider()->AddTorque(torque);
+    }
+  }
 };
 
 
@@ -364,8 +445,8 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
 {
   LOG ("vosobject3d", 4, "notifyChildInserted " << event.getParent()->getURLstr()
        << " " << event.getContextualName());
-  if (event.getContextualName() == "a3dl:position" ||
-      event.getContextualName() == "a3dl:orientation")
+  if (event.getContextualName() == "a3dl:position"
+      || event.getContextualName() == "a3dl:orientation")
   {
     try
     {
@@ -466,7 +547,8 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 
         csQuaternion q;
         q.SetWithAxisAngle (csVector3((float)x, (float)y, (float)z), angle * M_PI/180.0);
-        vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q)));
+        vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q),
+                                                         event.getInitiator()->isRemote()));
       }
     }
   }
@@ -497,7 +579,7 @@ void csMetaObject3D::changePosition (const csVector3 &pos, bool setCollider)
   }
 }
 
-void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
+void csMetaObject3D::changeOrientation (const csMatrix3 &ori, bool setCollider)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
 
@@ -509,9 +591,11 @@ void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
     mw->GetMovable()->UpdateMove();
   }
 
-  if (csvobj3d->GetCollider().IsValid())
+  if (setCollider && csvobj3d->GetCollider().IsValid())
   {
     csvobj3d->GetCollider()->SetOrientation(ori);
+    csvobj3d->GetCollider()->SetAngularVelocity(csVector3(0));
+    csvobj3d->GetCollider()->Enable();
   }
 }
 
@@ -535,4 +619,65 @@ void csMetaObject3D::updateMaterial ()
 csRef<csVosObject3D> csMetaObject3D::GetCSinterface()
 {
   return csvobj3d;
+}
+
+bool csMetaObject3D::supportsPhysics()
+{
+  return csvobj3d->GetCollider().IsValid();
+}
+
+void csMetaObject3D::applyForce(double x, double y, double z)
+{
+  if (vosa3dl.IsValid()) {
+    CS_ASSERT(x == x);
+    vosa3dl->mainThreadTasks.push (new ApplyForceTask(this,
+                                                      csVector3((float)x,
+                                                                (float)y,
+                                                                (float)z)));
+  }
+}
+
+void csMetaObject3D::applyTorque(double x, double y, double z)
+{
+  if (vosa3dl.IsValid()) {
+    CS_ASSERT(x == x);
+    vosa3dl->mainThreadTasks.push (new ApplyTorqueTask(this,
+                                                       csVector3((float)x,
+                                                                 (float)y,
+                                                                 (float)z)));
+  }
+}
+
+void csMetaObject3D::getLinearVelocity(double& x, double& y, double& z)
+{
+  if (csvobj3d.IsValid()) {
+    csRef<iRigidBody> rb = csvobj3d->GetCollider();
+    if (rb) {
+      csVector3 v = rb->GetLinearVelocity();
+      x = v.x;
+      y = v.y;
+      z = v.z;
+    } else {
+      x = 0;
+      y = 0;
+      z = 0;
+    }
+  }
+}
+
+void csMetaObject3D::getAngularVelocity(double& x, double& y, double& z)
+{
+  if (csvobj3d.IsValid()) {
+    csRef<iRigidBody> rb = csvobj3d->GetCollider();
+    if (rb) {
+      csVector3 v = rb->GetAngularVelocity();
+      x = v.x;
+      y = v.y;
+      z = v.z;
+    } else {
+      x = 0;
+      y = 0;
+      z = 0;
+    }
+  }
 }
