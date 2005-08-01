@@ -96,6 +96,7 @@
 #define CS_GNUC_SCANF(format_idx, arg_idx)
 #define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
 #define CS_SPECIALIZE_TEMPLATE template<>
+#define CS_FORCEINLINE
 #define CS_EXPORT_SYM
 #define CS_IMPORT_SYM
 #define CS_CRYSTALSPACE_EXPORT
@@ -524,6 +525,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/array.h"
 
 %ignore scfInitialize;
+%include "csutil/scf_interface.h"
 %include "csutil/scf.h"
 
 #ifndef CS_MINI_SWIG
@@ -1117,7 +1119,7 @@ TYPEMAP_OUT_csWrapPtr
   %extend T
   {
     virtual ~T() { if (self) self->DecRef(); }
-    static int scfGetVersion() { return scfInterface<T>::GetVersion(); }
+    static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
   }
 %enddef
 
