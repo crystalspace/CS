@@ -73,7 +73,6 @@
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/objwatch.h"
 #include "plugins/engine/3d/portalcontainer.h"
-#include "plugins/engine/3d/radiosty.h"
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/texture.h"
