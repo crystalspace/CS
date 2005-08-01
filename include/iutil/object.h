@@ -24,6 +24,7 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf_interface.h"
+#include "csutil/ref.h"
 
 struct iObjectIterator;
 
