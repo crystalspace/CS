@@ -34,7 +34,7 @@
 #include "csgeom/segment.h"
 #include "csgeom/vector3.h"
 #include "csutil/ref.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/dbghelp.h"
 
@@ -654,13 +654,13 @@ public:
  * This is a class that does unit testing (and other debug stuff) for most
  * of csgeom classes.
  */
-class CS_CRYSTALSPACE_EXPORT csGeomDebugHelper : public iDebugHelper
+class CS_CRYSTALSPACE_EXPORT csGeomDebugHelper :
+  public scfImplementation1<csGeomDebugHelper, iDebugHelper>
 {
 public:
   csGeomDebugHelper ();
   virtual ~csGeomDebugHelper ();
 
-  SCF_DECLARE_IBASE;
   virtual int GetSupportedTests () const
   {
     return CS_DBGHELP_UNITTEST;

@@ -58,7 +58,8 @@ static bool contains_edge(csPolygonMeshEdge* edges, int num_edges,
 /**
  * A cube mesh for unit testing.
  */
-class csUnitCubeMesh : public iPolygonMesh
+class csUnitCubeMesh :
+  public scfImplementation<csUnitCubeMesh,iPolygonMesh>
 {
 private:
   csVector3 verts[8];
@@ -72,7 +73,6 @@ public:
   virtual ~csUnitCubeMesh();
 
   //---------- iPolygonMesh implementation ----------
-  SCF_DECLARE_IBASE;
   virtual int GetVertexCount() { return 8; }
   virtual csVector3* GetVertices() { return verts; }
   virtual int GetPolygonCount() { return 6; }
@@ -85,13 +85,9 @@ public:
   virtual uint32 GetChangeNumber() const { return 0; }
 };
 
-SCF_IMPLEMENT_IBASE(csUnitCubeMesh)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-csUnitCubeMesh::csUnitCubeMesh()
+csUnitCubeMesh::csUnitCubeMesh() :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csVector3 dim(1, 1, 1);
   csVector3 d = dim * .5;
   verts[0].Set(-d.x, -d.y, -d.z);
@@ -139,7 +135,6 @@ csUnitCubeMesh::csUnitCubeMesh()
 csUnitCubeMesh::~csUnitCubeMesh()
 {
   delete[] triangles;
-  SCF_DESTRUCT_IBASE();
 }
 
 /**

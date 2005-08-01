@@ -26,6 +26,7 @@
 #include "csutil/blockallocator.h"
 #include "csutil/ref.h"
 #include "csutil/scfstr.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/dbghelp.h"
 
@@ -132,7 +133,8 @@ enum
  * calculation only once. This is more efficient and it also generates
  * a better tree as more information is available then.
  */
-class CS_CRYSTALSPACE_EXPORT csKDTree : public iBase
+class CS_CRYSTALSPACE_EXPORT csKDTree :
+  public scfImplementation1<csKDTree, iDebugHelper>
 {
 private:
   static csBlockAllocator<csKDTree> tree_nodes;
@@ -241,8 +243,6 @@ public:
 
   /// Make the tree empty.
   void Clear ();
-
-  SCF_DECLARE_IBASE;
 
   /// Get the user object attached to this node.
   inline iBase* GetUserObject () const { return userobject; }
@@ -370,44 +370,40 @@ public:
   csPtr<iString> Debug_Statistics ();
   csTicks Debug_Benchmark (int num_iterations);
 
-  struct DebugHelper : public iDebugHelper
+  virtual int GetSupportedTests () const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csKDTree);
-    virtual int GetSupportedTests () const
-    {
-      return CS_DBGHELP_UNITTEST | CS_DBGHELP_STATETEST |
-      	CS_DBGHELP_TXTDUMP | CS_DBGHELP_BENCHMARK;
-    }
-    virtual csPtr<iString> UnitTest ()
-    {
-      return scfParent->Debug_UnitTest ();
-    }
-    virtual csPtr<iString> StateTest ()
-    {
-      scfString* rc = new scfString ();
-      if (!scfParent->Debug_CheckTree (rc->GetCsString ()))
-        return csPtr<iString> (rc);
-      delete rc;
-      return 0;
-    }
-    virtual csTicks Benchmark (int num_iterations)
-    {
-      return scfParent->Debug_Benchmark (num_iterations);
-    }
-    virtual csPtr<iString> Dump ()
-    {
-      scfString* rc = new scfString ();
-      scfParent->Debug_Dump (rc->GetCsString (), 0);
+    return CS_DBGHELP_UNITTEST | CS_DBGHELP_STATETEST |
+      CS_DBGHELP_TXTDUMP | CS_DBGHELP_BENCHMARK;
+  }
+
+  virtual csPtr<iString> UnitTest ()
+  {
+    return Debug_UnitTest ();
+  }
+
+  virtual csPtr<iString> StateTest ()
+  {
+    scfString* rc = new scfString ();
+    if (!Debug_CheckTree (rc->GetCsString ()))
       return csPtr<iString> (rc);
-    }
-    virtual void Dump (iGraphics3D* /*g3d*/)
-    {
-    }
-    virtual bool DebugCommand (const char*)
-    {
-      return false;
-    }
-  } scfiDebugHelper;
+    delete rc;
+    return 0;
+  }
+
+  virtual csTicks Benchmark (int num_iterations)
+  {
+    return Debug_Benchmark (num_iterations);
+  }
+
+  virtual csPtr<iString> Dump ()
+  {
+    scfString* rc = new scfString ();
+    Debug_Dump (rc->GetCsString (), 0);
+    return csPtr<iString> (rc);
+  }
+
+  virtual void Dump (iGraphics3D* /*g3d*/) { }
+  virtual bool DebugCommand (const char*) { return false; }
 };
 
 #endif // __CS_KDTREE_H__

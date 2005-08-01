@@ -83,9 +83,9 @@ void scfTest::tearDown()
 
 void scfTest::testScfInterface()
 {
-  int const v = scfInterface<iBaseTest>::GetVersion();
-  scfInterfaceID const i = scfInterface<iBaseTest>::GetID();
-  char const* n = scfInterface<iBaseTest>::GetName();
+  int const v = scfInterfaceTraits<iBaseTest>::GetVersion();
+  scfInterfaceID const i = scfInterfaceTraits<iBaseTest>::GetID();
+  char const* n = scfInterfaceTraits<iBaseTest>::GetName();
   char const* q = iSCF::SCF->GetInterfaceName(i);
   CPPUNIT_ASSERT_EQUAL(SCF_CONSTRUCT_VERSION(1,2,3), v);
   CPPUNIT_ASSERT_EQUAL(i, iSCF::SCF->GetInterfaceID("iBaseTest"));

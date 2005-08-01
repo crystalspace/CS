@@ -1292,19 +1292,9 @@ csPtr<iString> csCoverageTile::Debug_Dump_Cache ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTiledCoverageBuffer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTiledCoverageBuffer::DebugHelper)
-  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
+csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-
   tiles = 0;
   dirty_left = 0;
   dirty_right = 0;
@@ -1318,8 +1308,6 @@ csTiledCoverageBuffer::~csTiledCoverageBuffer ()
   delete[] tiles;
   delete[] dirty_left;
   delete[] dirty_right;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csTiledCoverageBuffer::Setup (int w, int h)

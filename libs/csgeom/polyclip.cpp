@@ -29,20 +29,12 @@ CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool,
 	(csPoly2DFactory::SharedFactory()))
 csPoly2DPool *csClipper::polypool = 0;
 
-SCF_IMPLEMENT_IBASE(csClipper)
-  SCF_IMPLEMENTS_INTERFACE(iClipper2D)
-SCF_IMPLEMENT_IBASE_END
-
-csClipper::csClipper ()
+csClipper::csClipper () : scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   polypool = GetPolyPool ();
 }
 
-csClipper::~csClipper ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
+csClipper::~csClipper () { } 
 
 csPoly2DPool *csClipper::GetSharedPool ()
 {

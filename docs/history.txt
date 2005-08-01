@@ -9,6 +9,7 @@ chronological order.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.
+	- mdmkolbe converted CS/libs/csgeom/ to the new SCF implementation.
 31-Jul-2005
 	- Peter Amstutz updated the csvosa3dl plugin to compile again
 	  with the recent changes made in SCF and CS headers

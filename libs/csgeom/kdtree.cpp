@@ -111,14 +111,6 @@ int csKDTreeChild::FindLeaf (csKDTree* leaf)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csKDTree)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csKDTree::DebugHelper)
-  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 uint32 csKDTree::global_timestamp = 1;
 
 #define KDTREE_MAX 100000.
@@ -126,11 +118,8 @@ uint32 csKDTree::global_timestamp = 1;
 csBlockAllocator<csKDTree> csKDTree::tree_nodes (1000);
 csBlockAllocator<csKDTreeChild> csKDTree::tree_children (1000);
 
-csKDTree::csKDTree ()
+csKDTree::csKDTree () : scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-
   child1 = 0;
   child2 = 0;
   objects = 0;
@@ -149,8 +138,6 @@ csKDTree::csKDTree ()
 csKDTree::~csKDTree ()
 {
   Clear ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csKDTree::SetUserObject (iBase* userobj)

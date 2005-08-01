@@ -27,7 +27,8 @@
  * \addtogroup geom_utils
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
+#include "csutil/ref.h"
 
 struct iPolygonMesh;
 struct iObjectModel;
@@ -35,19 +36,16 @@ struct iObjectModel;
 class csBox3;
 class csVector3;
 
-SCF_VERSION (iObjectModelListener, 0, 0, 1);
-
 /**
  * Implement this class if you're interested in hearing about
  * when the object model changes.
  */
-struct iObjectModelListener : public iBase
+struct iObjectModelListener : public virtual iBase
 {
+  SCF_INTERFACE(iObjectModelListener, 2, 0, 0);
   /// The object model has changed.
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
-
-SCF_VERSION (iObjectModel, 0, 4, 0);
 
 /**
  * This interface represents data related to some geometry in object
@@ -65,8 +63,9 @@ SCF_VERSION (iObjectModel, 0, 4, 0);
  *   <li>iMeshObjectFactory::GetObjectModel()
  *   </ul>
  */
-struct iObjectModel : public iBase
+struct iObjectModel : public virtual iBase
 {
+  SCF_INTERFACE(iObjectModel, 2, 0, 0);
   /**
    * Returns a number that will change whenever the shape of this object
    * changes. If that happens then the data in all the returned polygon

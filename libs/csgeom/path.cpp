@@ -19,8 +19,4 @@
 #include "cssysdef.h"
 #include "csgeom/path.h"
 
-SCF_IMPLEMENT_IBASE (csPath)
-  SCF_IMPLEMENTS_INTERFACE (iPath)
-SCF_IMPLEMENT_IBASE_END
-
 // Note: Rest of class is entirely in path.h

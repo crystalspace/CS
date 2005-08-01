@@ -22,19 +22,11 @@
 #include "csgeom/pmtools.h"
 
 
-SCF_IMPLEMENT_IBASE (csPolygonMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
 void csPolygonMesh::Triangulate ()
 {
   if (triangles) return;
   csPolygonMeshTools::Triangulate (this, triangles, triangle_count);
 }
-
-SCF_IMPLEMENT_IBASE (csPolygonMeshBox)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
 
 csTriangle* csPolygonMeshBox::GetTriangles ()
 {

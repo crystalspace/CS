@@ -29,6 +29,8 @@
 
 #include "igeom/clip2d.h"
 
+#include "csutil/scf_implementation.h"
+
 class csPoly2DPool;
 
 /**\file 
@@ -40,7 +42,8 @@ class csPoly2DPool;
 /**
  * The csClipper class is an abstract parent to all 2D clipping objects.
  */
-class CS_CRYSTALSPACE_EXPORT csClipper : public iClipper2D
+class CS_CRYSTALSPACE_EXPORT csClipper :
+  public scfImplementation1<csClipper,iClipper2D>
 {
 protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
@@ -65,8 +68,6 @@ public:
 
   /// most recent Clipresult
   uint8 LastClipResult () { return mrClipping; }
-
-  SCF_DECLARE_IBASE;
 };
 
 /**

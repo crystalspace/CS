@@ -19,7 +19,7 @@
 #ifndef __CS_IPATH_H__
 #define __CS_IPATH_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\file 
  */
@@ -29,16 +29,15 @@
 
 class csVector3;
 
-SCF_VERSION (iPath, 0, 0, 1);
-
 /**
  * A path in 3D.
  * An object or camera can use this object to trace a path in 3D.
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-struct iPath : public iBase
+struct iPath : public virtual iBase
 {
+  SCF_INTERFACE(iPath, 2, 0, 0);
   /**
    * Return the number of points defining the path.  Calling this
    * GetPointCount as in the real classes causes MANY ambiguous

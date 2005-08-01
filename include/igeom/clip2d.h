@@ -26,7 +26,7 @@
  * \addtogroup geom_utils
  * @{ */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 class csBox2;
 class csVector2;
@@ -86,13 +86,12 @@ enum
 /** @} */
 
 
-SCF_VERSION (iClipper2D, 0, 0, 4);
-
 /**
  * This interfaces represents a 2D clipper for polygons.
  */
-struct iClipper2D : public iBase
+struct iClipper2D : public virtual iBase
 {
+  SCF_INTERFACE(iClipper2D, 2, 0, 0);
   /**
    * Clip a set of 2D points and return in 'OutPolygon' which is expected
    * to contain space at least for #MAX_OUTPUT_VERTICES elements.

@@ -180,19 +180,20 @@ void csObjectRegistryTest::testGet()
   csRef<iString> cmp1, cmp2;
   cmp1.AttachNew(CS_STATIC_CAST(iString*,objreg->Get(
     "Test Object Registry one",
-    scfInterface<iString>::GetID(),
-    scfInterface<iString>::GetVersion())));
+    scfInterfaceTraits<iString>::GetID(),
+    scfInterfaceTraits<iString>::GetVersion())));
   cmp2.AttachNew(CS_STATIC_CAST(iString*,objreg->Get(
     "Test Object Registry two",
-    scfInterface<iString>::GetID(),
-    scfInterface<iString>::GetVersion())));
+    scfInterfaceTraits<iString>::GetID(),
+    scfInterfaceTraits<iString>::GetVersion())));
 
   CPPUNIT_ASSERT_EQUAL(if1, cmp1);
   CPPUNIT_ASSERT_EQUAL(if2, cmp2);
 
   // This should return v1's and v2's registered objects for a total of two
   CPPUNIT_ASSERT_EQUAL(4, countRegisteredObjects(
-    scfInterface<iString>::GetID(), scfInterface<iString>::GetVersion()));
+    scfInterfaceTraits<iString>::GetID(),
+    scfInterfaceTraits<iString>::GetVersion()));
 
   // Clean up
   objreg->Clear();

@@ -20,7 +20,7 @@
 #ifndef __CS_IGEOM_POLYMESH_H__
 #define __CS_IGEOM_POLYMESH_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 class csFlags;
 
@@ -101,8 +101,6 @@ struct csMeshedPolygon
 class csVector3;
 struct csTriangle;
 
-SCF_VERSION (iPolygonMesh, 0, 5, 0);
-
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
  * geometry information outside of the engine. One place where this will
@@ -137,8 +135,9 @@ SCF_VERSION (iPolygonMesh, 0, 5, 0);
  *   <li>Shadow stencil plugin
  *   </ul>
  */
-struct iPolygonMesh : public iBase
+struct iPolygonMesh : public virtual iBase
 {
+  SCF_INTERFACE(iPolygonMesh, 2, 0, 0);
   /// Get the number of vertices for this mesh.
   virtual int GetVertexCount () = 0;
   /// Get the pointer to the array of vertices.

@@ -30,7 +30,7 @@
 
 #include "csgeom/spline.h"
 #include "csgeom/vector3.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 #include "igeom/path.h"
 
@@ -40,7 +40,8 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class CS_CRYSTALSPACE_EXPORT csPath : public iPath
+class CS_CRYSTALSPACE_EXPORT csPath :
+  public scfImplementation1<csPath, iPath>
 {
 protected:
   csCatmullRomSpline spline;
@@ -69,19 +70,14 @@ private:
   }
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Create a path with p points.
-  csPath (int p) : spline (9, p)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
+  csPath (int p) : scfImplementationType(this), spline (9, p)
+  { }
 
   /// Destroy the path.
   virtual ~csPath ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
+  { }
 
   /// Get the number of vector points in this spline
   virtual int Length ()

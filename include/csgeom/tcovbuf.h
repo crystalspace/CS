@@ -21,7 +21,9 @@
 
 #include "csextern.h"
 
+#include "csutil/scf_implementation.h"
 #include "iutil/dbghelp.h"
+#include "csutil/ref.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
@@ -465,7 +467,8 @@ public:
  * In addition there is also a maximum depth value for every 8x8 pixels.
  * The screen buffer is divided into tiles of 64x32 or 32x64 pixels.
  */
-class CS_CRYSTALSPACE_EXPORT csTiledCoverageBuffer : public iBase
+class CS_CRYSTALSPACE_EXPORT csTiledCoverageBuffer :
+  public scfImplementation1<csTiledCoverageBuffer,iDebugHelper>
 {
 public:
   iBugPlug* bugplug;	// For debugging...
@@ -545,8 +548,6 @@ public:
 
   /// Setup coverage buffer for given size.
   void Setup (int w, int h);
-
-  SCF_DECLARE_IBASE;
 
   /// Initialize the coverage buffer to empty.
   void Initialize ();
@@ -693,41 +694,37 @@ public:
   void Debug_Dump (iGraphics3D* g3d, int zoom = 1);
   csPtr<iString> Debug_Dump ();
 
-  struct DebugHelper : public iDebugHelper
+  virtual int GetSupportedTests () const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csTiledCoverageBuffer);
-    virtual int GetSupportedTests () const
-    {
-      return CS_DBGHELP_UNITTEST |
-      	     CS_DBGHELP_BENCHMARK |
-	     CS_DBGHELP_GFXDUMP |
-	     CS_DBGHELP_TXTDUMP;
-    }
-    virtual csPtr<iString> UnitTest ()
-    {
-      return scfParent->Debug_UnitTest ();
-    }
-    virtual csPtr<iString> StateTest ()
-    {
-      return 0;
-    }
-    virtual csTicks Benchmark (int num_iterations)
-    {
-      return scfParent->Debug_Benchmark (num_iterations);
-    }
-    virtual csPtr<iString> Dump ()
-    {
-      return scfParent->Debug_Dump ();
-    }
-    virtual void Dump (iGraphics3D* g3d)
-    {
-      scfParent->Debug_Dump (g3d, 1);
-    }
-    virtual bool DebugCommand (const char*)
-    {
-      return false;
-    }
-  } scfiDebugHelper;
+    return CS_DBGHELP_UNITTEST |
+           CS_DBGHELP_BENCHMARK |
+           CS_DBGHELP_GFXDUMP |
+           CS_DBGHELP_TXTDUMP;
+  }
+  virtual csPtr<iString> UnitTest ()
+  {
+    return Debug_UnitTest ();
+  }
+  virtual csPtr<iString> StateTest ()
+  {
+    return 0;
+  }
+  virtual csTicks Benchmark (int num_iterations)
+  {
+    return Debug_Benchmark (num_iterations);
+  }
+  virtual csPtr<iString> Dump ()
+  {
+    return Debug_Dump ();
+  }
+  virtual void Dump (iGraphics3D* g3d)
+  {
+    Debug_Dump (g3d, 1);
+  }
+  virtual bool DebugCommand (const char*)
+  {
+    return false;
+  }
 };
 
 #endif // __CS_CSGEOM_TCOVBUF_H__

@@ -26,6 +26,7 @@
 #include "csgeom/tri.h"
 #include "csgeom/vector3.h"
 #include "csutil/flags.h"
+#include "csutil/scf_implementation.h"
 
 #include "igeom/polymesh.h"
 
@@ -41,7 +42,8 @@ struct csTriangle;
  * with vertices and polygons from another source. It will automatically
  * calculate the triangles if requested.
  */
-class CS_CRYSTALSPACE_EXPORT csPolygonMesh : public iPolygonMesh
+class CS_CRYSTALSPACE_EXPORT csPolygonMesh :
+  public scfImplementation1<csPolygonMesh,iPolygonMesh>
 {
 private:
   uint32 change_nr;
@@ -69,9 +71,8 @@ public:
   /**
    * Construct a polygon mesh.
    */
-  csPolygonMesh ()
+  csPolygonMesh () : scfImplementationType(this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     change_nr = 0;
     vt = 0;
     vt_count = 0;
@@ -91,7 +92,6 @@ public:
     if (delete_po) delete[] po;
     if (delete_po_indices) delete[] po_indices;
     delete[] triangles;
-    SCF_DESTRUCT_IBASE();
   }
 
   /**
@@ -184,8 +184,6 @@ public:
     change_nr++;
   }
 
-  SCF_DECLARE_IBASE;
-
   virtual int GetVertexCount () { return vt_count; }
   virtual csVector3* GetVertices () { return vt; }
   virtual int GetPolygonCount () { return po_count; }
@@ -209,7 +207,8 @@ public:
 /**
  * A convenience polygon mesh implementation that represents a cube.
  */
-class CS_CRYSTALSPACE_EXPORT csPolygonMeshBox : public iPolygonMesh
+class CS_CRYSTALSPACE_EXPORT csPolygonMeshBox :
+  public virtual scfImplementation1<csPolygonMeshBox,iPolygonMesh>
 {
 private:
   csVector3 vertices[8];
@@ -223,9 +222,8 @@ public:
   /**
    * Construct a cube polygon mesh.
    */
-  csPolygonMeshBox (const csBox3& box)
+  csPolygonMeshBox (const csBox3& box) : scfImplementationType(this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     change_nr = 0;
     int i;
     for (i = 0 ; i < 6 ; i++)
@@ -267,7 +265,6 @@ public:
   virtual ~csPolygonMeshBox ()
   {
     delete[] triangles;
-    SCF_DESTRUCT_IBASE();
   }
 
   /**
@@ -285,8 +282,6 @@ public:
     vertices[6] = box.GetCorner (6);
     vertices[7] = box.GetCorner (7);
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual int GetVertexCount () { return 8; }
   virtual csVector3* GetVertices () { return vertices; }

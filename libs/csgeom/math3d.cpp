@@ -1055,19 +1055,11 @@ bool csIntersect3::BoxPlaneInternal (const csVector3& normal,
 
 //-------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csGeomDebugHelper)
-  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-csGeomDebugHelper::csGeomDebugHelper ()
-{
-  SCF_CONSTRUCT_IBASE (0);
-}
+csGeomDebugHelper::csGeomDebugHelper () : scfImplementationType(this)
+{ }
 
 csGeomDebugHelper::~csGeomDebugHelper ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
+{ }
 
 #define GEO_ASSERT(test,msg) \
   if (!(test)) \
