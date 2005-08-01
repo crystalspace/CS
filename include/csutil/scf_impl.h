@@ -25,7 +25,7 @@
  */
 
 #ifndef SCF_IN_IMPLEMENTATION_H
-#error Don not include this file directly. Included from scf_implementation.h
+#error Do not include this file directly. Included from scf_implementation.h
 #endif
 
 #ifndef SCF_IMPL_EXT
