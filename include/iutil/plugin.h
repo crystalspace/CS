@@ -174,7 +174,15 @@ inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
     scfInterfaceTraits<Interface>::GetName(),
     scfInterfaceTraits<Interface>::GetVersion()));
 
-  return scfQueryInterfaceSafe<Interface> (base);
+  if (base == 0) return csPtr<Interface> (0);
+
+  Interface *x = (Interface*)base->QueryInterface (
+    scfInterfaceTraits<Interface>::GetID (),
+    scfInterfaceTraits<Interface>::GetVersion ());
+
+  if (x) base->DecRef (); //release our base interface
+
+  return csPtr<Interface> (x);
 }
 
 /**

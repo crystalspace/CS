@@ -30,6 +30,7 @@ chronological order.
 	  itself and could interfere when CS was embedded.
 	- Jorrit added support for overriding of mixmode in submeshes of
 	  genmesh. The loader also supports this now.
+	- Marten fixed some more leaks introduced by changes to plugin loader.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.
