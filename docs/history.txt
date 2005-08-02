@@ -12,6 +12,10 @@ chronological order.
 	  caused by the new template interface functions.
 	- Jorrit added functions to iLoader to load images and textures
 	  from a buffer (iDataBuffer) instead of a filename.
+	- Piotr Obrzut added interface which allows to operate on dynamics 
+	  system colliders more directly 
+	- Piotr Obrzut added method generating sphere for genmesh (copied 
+	  from ball mesh)
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.

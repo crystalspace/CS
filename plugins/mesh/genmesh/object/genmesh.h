@@ -681,6 +681,8 @@ public:
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
+  void GenerateSphere (const csSphere& sphere, int rim_vertices);
+  //void GeneratePlane (const csPlane3& plane);
   void SetBack2Front (bool b2f);
   bool IsBack2Front () const { return back2front; }
   void BuildBack2FrontTree ();
@@ -885,6 +887,14 @@ public:
     {
       scfParent->GenerateBox (box);
     }
+    virtual void GenerateSphere (const csSphere& sphere, int rim_vertices)
+    {
+      scfParent->GenerateSphere (sphere, rim_vertices);
+    }
+    //virtual void GeneratePlane (const csPlane3& plane)
+    //{
+    //  scfParent->GeneratePlane (plane);
+    //}
     virtual void SetBack2Front (bool b2f)
     {
       scfParent->SetBack2Front (b2f);

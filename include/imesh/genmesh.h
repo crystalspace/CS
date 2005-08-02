@@ -150,6 +150,7 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
 
 SCF_VERSION (iGeneralFactoryState, 0, 3, 0);
 
+struct csSphere;
 /**
  * This interface describes the API for the general mesh factory.
  * iGeneralFactoryState inherits from iGeneralMeshState. All methods
@@ -239,6 +240,15 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
    * and normals are not initialized here.
    */
   virtual void GenerateBox (const csBox3& box) = 0;
+
+  /**
+   * Automatically generate a sphere. This will set the apropriate number 
+   * of vertices and generate vertices, texels, normals, and triangles. The colors
+   * are not initialized here.
+   */
+  virtual void GenerateSphere (const csSphere& sphere, int rim_vertices) = 0;
+
+  //virtual void GeneratePlane (const csPlane3& plane) = 0;
 
   /**
    * Enable back to front rendering for the triangles of this genmesh.
@@ -356,6 +366,7 @@ struct iGenMeshAnimationControl : public iBase
 
 SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
 
+struct iDocumentNode;
 /**
  * This class is a factory for creating animation controls.
  * <p>

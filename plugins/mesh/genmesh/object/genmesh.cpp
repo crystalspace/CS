@@ -2023,6 +2023,196 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
   }
 }
 
+void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num)
+{
+  int num_vertices = 0;
+  int num_triangles = 0;
+  csVector3* vertices = new csVector3[10000];	// Temporary only
+  csVector2* uvverts = new csVector2[10000];
+  csTriangle* triangles = new csTriangle[10000];
+  float radius = 1.0f;
+
+  int prev_verticesT[60];
+  int prev_verticesB[60];
+  float u, v;
+  int i, j;
+
+  // Number of degrees between layers.
+  float radius_step = 180.0f / num;
+  float vert_radius = radius;
+
+  int num2 = num;
+
+  // Generate the first series of vertices (the outer circle).
+  // Calculate u,v for them.
+  for (j = 0; j < num2; j++)
+  {
+    float new_radius = radius;
+    float new_height = 0.0f;
+    float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
+    prev_verticesT[j] = num_vertices;
+    prev_verticesB[j] = num_vertices;
+    vertices[num_vertices].Set (new_radius * (float) cos (angle),
+      new_height, new_radius * (float) sin (angle));
+
+    u = (float) cos (angle) * 0.5f + 0.5f;
+    v = (float) sin (angle) * 0.5f + 0.5f;
+
+    uvverts[num_vertices].Set (u, v);
+    num_vertices++;
+  }
+
+  // Array with new vertex indices.
+  int new_verticesT[60];         // @@@ HARDCODED == BAD == EASY!
+  int new_verticesB[60];
+
+  // First create the layered triangle strips.
+  for (i = 1; i < (num / 2); i++)
+  {
+    //-----
+    // First create a new series of vertices.
+    //-----
+    // Angle from the center to the new circle of vertices.
+    float new_angle = i * radius_step * TWO_PI / 360.0f;
+    // Radius of the new circle of vertices.
+    float new_radius = radius * (float) cos (new_angle);
+    // Height of the new circle of vertices.
+    float new_height = vert_radius * (float) sin (new_angle);
+    // UV radius.
+    float uv_radius = (1.0f - 2.0f * (float) i / (float)num) * 0.5f;
+    for (j = 0; j < num2; j++)
+    {
+      float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
+
+      u = uv_radius * (float) cos (angle) + 0.5f;
+      v = uv_radius * (float) sin (angle) + 0.5f;
+
+      new_verticesT[j] = num_vertices;
+      vertices[num_vertices].Set (new_radius * (float) cos (angle),
+        new_height, new_radius * (float) sin (angle));
+      uvverts[num_vertices].Set (u, v);
+      num_vertices++;
+
+
+      new_verticesB[j] = num_vertices;
+      vertices[num_vertices].Set (new_radius * (float) cos (angle),
+        -new_height, new_radius * (float) sin (angle));
+
+      uvverts[num_vertices].Set (u, v);
+      num_vertices++;
+    }
+
+    //-----
+    // Now make the triangle strips.
+    //-----
+    for (j = 0; j < num; j++)
+    {
+      int j1num = (j+1)%num;
+      triangles[num_triangles].c = prev_verticesT[j];
+      triangles[num_triangles].b = new_verticesT[j1num];
+      triangles[num_triangles].a = new_verticesT[j];
+      num_triangles++;
+      triangles[num_triangles].c = prev_verticesT[j];
+      triangles[num_triangles].b = prev_verticesT[j1num];
+      triangles[num_triangles].a = new_verticesT[j1num];
+      num_triangles++;
+
+      triangles[num_triangles].a = prev_verticesB[j];
+      triangles[num_triangles].b = new_verticesB[j1num];
+      triangles[num_triangles].c = new_verticesB[j];
+      num_triangles++;
+      triangles[num_triangles].a = prev_verticesB[j];
+      triangles[num_triangles].b = prev_verticesB[j1num];
+      triangles[num_triangles].c = new_verticesB[j1num];
+      num_triangles++;
+
+    }
+
+    //-----
+    // Copy the new vertex array to prev_vertices.
+    //-----
+    for (j = 0 ; j < num2 ; j++)
+    {
+      prev_verticesT[j] = new_verticesT[j];
+      prev_verticesB[j] = new_verticesB[j];
+    }
+  }
+
+  // Create the top and bottom vertices.
+  int top_vertex = num_vertices;
+  vertices[num_vertices].Set (0.0f, vert_radius, 0.0f);
+  uvverts[num_vertices].Set (0.5f, 0.5f);
+  num_vertices++;
+  int bottom_vertex = 0;
+
+  bottom_vertex = num_vertices;
+  vertices[num_vertices].Set (0.0f, -vert_radius, 0.0f);
+  uvverts[num_vertices].Set (0.5f, 0.5f);
+  num_vertices++;
+
+
+  //-----
+  // Make the top triangle fan.
+  //-----
+  for (j = 0 ; j < num ; j++)
+  {
+    int j1num = (j+1)%num;
+    triangles[num_triangles].c = top_vertex;
+    triangles[num_triangles].b = prev_verticesT[j];
+    triangles[num_triangles].a = prev_verticesT[j1num];
+    num_triangles++;
+  }
+
+  //-----
+  // Make the bottom triangle fan.
+  //-----
+
+  for (j = 0 ; j < num ; j++)
+  {
+    int j1num = (j+1)%num;
+    triangles[num_triangles].a = bottom_vertex;
+    triangles[num_triangles].b = prev_verticesB[j];
+    triangles[num_triangles].c = prev_verticesB[j1num];
+    num_triangles++;
+  }
+
+  float sphere_radius = sphere.GetRadius ();
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    vertices[i].x *= sphere_radius;
+    vertices[i].y *= sphere_radius;
+    vertices[i].z *= sphere_radius;
+    vertices[i] += sphere.GetCenter ();
+  }
+
+  SetVertexCount (num_vertices);
+  csVector3* genmesh_vertices = GetVertices();
+  memcpy (genmesh_vertices, vertices, sizeof(csVector3)*num_vertices);
+
+  csVector2* genmesh_texels = GetTexels();
+  memcpy (genmesh_texels, uvverts, sizeof(csVector2)*num_vertices);
+
+  SetTriangleCount (num_triangles);
+  csTriangle* ball_triangles = GetTriangles();
+  memcpy (ball_triangles, triangles, sizeof(csTriangle)*num_triangles);
+
+  csVector3* normals = GetNormals();
+  for (int i = 0; i < num_vertices; i++)
+  {
+    normals[i] = genmesh_vertices[i];
+    normals[i].Normalize ();
+  }
+
+  Invalidate();
+
+  delete[] vertices;
+  delete[] uvverts;
+  delete[] triangles;
+}
+//void csGenmeshMeshObjectFactory::GeneratePlane (const csPlane3& plane)
+//{
+//
+//}
 void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
     SetVertexCount(24);
