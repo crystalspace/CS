@@ -200,7 +200,6 @@ private:
     if (id == scfInterfaceTraits<I>::GetID() &&
         scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
     {
-      csRefTrackerAccess::AddAlias (CS_STATIC_CAST(I*, this), this);
       this->scfObject->IncRef();
       return CS_STATIC_CAST(I*, this->scfObject);
     }

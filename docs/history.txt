@@ -21,6 +21,8 @@ chronological order.
 	  cubemap).
 	- Jorrit changed the teapot to use reflectsphere. Also moved the
 	  teapot to a more visible location.
+	- Marten cleaned up scf_implementation.h and removed the paritial
+	  connection to csRefTracker. It needs to be done properly.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.
