@@ -87,6 +87,10 @@ struct csGenmeshSubMesh
   csRenderMeshHolder rmHolder;
   csRef<csRenderBufferHolder> bufferHolder;
   int tricount;
+
+  // Override mixmode from parent.
+  bool override_mixmode;
+  uint MixMode;
 };
 
 /**
@@ -221,7 +225,7 @@ public:
 
   void ClearSubMeshes ();
   void AddSubMesh (unsigned int *triangles,
-    int tricount, iMaterialWrapper *material);
+    int tricount, iMaterialWrapper *material, bool do_mixmode, uint mixmode);
 
   void SetMixMode (uint mode)
   {
@@ -444,15 +448,20 @@ public:
     {
       return scfParent->GetAnimationControl ();
     }
-    void ClearSubMeshes ()
+    virtual void ClearSubMeshes ()
     {
       scfParent->ClearSubMeshes ();
     }
-    void AddSubMesh (unsigned int *triangles,
+    virtual void AddSubMesh (unsigned int *triangles,
       int tricount,
       iMaterialWrapper *material)
     {
-      scfParent->AddSubMesh (triangles, tricount, material);
+      scfParent->AddSubMesh (triangles, tricount, material, false, CS_FX_COPY);
+    }
+    virtual void AddSubMesh (unsigned int *triangles,
+      int tricount, iMaterialWrapper *material, uint mixmode)
+    {
+      scfParent->AddSubMesh (triangles, tricount, material, true, mixmode);
     }
     virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer)
     { return scfParent->AddRenderBuffer (name, buffer); }

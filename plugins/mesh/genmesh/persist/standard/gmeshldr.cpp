@@ -727,6 +727,8 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 
   csDirtyAccessArray<unsigned int> triangles;
   csRef<iMaterialWrapper> material;
+  bool do_mixmode = false;
+  uint mixmode = CS_FX_COPY;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -750,6 +752,11 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
         triangles.Push (tri);
         break;
       }
+    case XMLTOKEN_MIXMODE:
+      if (!synldr->ParseMixmode (child, mixmode))
+        return 0;
+      do_mixmode = true;
+      break;
     case XMLTOKEN_MATERIAL:
       {
         const char* matname = child->GetContentsValue ();
@@ -776,7 +783,12 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     return false;
   }
 
-  state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (), material);
+  if (do_mixmode)
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	material, mixmode);
+  else
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	material);
 
   return true;
 }

@@ -202,10 +202,14 @@ void csGenmeshMeshObject::ClearSubMeshes ()
 
 void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
                                       int tricount,
-                                      iMaterialWrapper *material)
+                                      iMaterialWrapper *material,
+				      bool do_mixmode,
+				      uint mixmode)
 {
   csGenmeshSubMesh *subMesh = new csGenmeshSubMesh();
   subMesh->material = material;
+  subMesh->override_mixmode = do_mixmode;
+  subMesh->MixMode = mixmode;
   subMesh->index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
     sizeof (unsigned int)*tricount*3,
     CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
@@ -1144,7 +1148,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->object2world = o2wt;
 
     renderMeshes[0] = meshPtr;
-  } else {
+  }
+  else
+  {
     renderMeshes.SetLength (subMeshes.Length ());
 
     for (size_t i = 0; i<subMeshes.Length (); ++i)
@@ -1163,7 +1169,10 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       csRenderMesh*& meshPtr = subMeshes[i]->rmHolder.GetUnusedMesh (rmCreated,
         rview->GetCurrentFrameNumber ());
 
-      meshPtr->mixmode = MixMode;
+      if (subMeshes[i]->override_mixmode)
+        meshPtr->mixmode = subMeshes[i]->MixMode;
+      else
+        meshPtr->mixmode = MixMode;
       meshPtr->clip_portal = clip_portal;
       meshPtr->clip_plane = clip_plane;
       meshPtr->clip_z_plane = clip_z_plane;

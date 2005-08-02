@@ -146,6 +146,20 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
   virtual void AddSubMesh (unsigned int *triangles,
     int tricount,
     iMaterialWrapper *material) = 0;
+
+  /**
+   * Add a submesh to this object. A submesh is a subset of the mesh triangles
+   * rendered with a certain material. When a mesh has one or more submeshes,
+   * only submeshes are drawn and not original geometry. That means submeshes
+   * should cover all original triangles to avoid holes in the mesh.
+   * triangles is an array of indices into the factory triangle list
+   * tricount is the number of triangles in "triangles"
+   * material is a material to assign to the mesh
+   * This version overrides the parent mixmode.
+   */
+  virtual void AddSubMesh (unsigned int *triangles,
+    int tricount,
+    iMaterialWrapper *material, uint mixmode) = 0;
 };
 
 SCF_VERSION (iGeneralFactoryState, 0, 3, 0);

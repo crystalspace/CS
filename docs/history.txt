@@ -28,6 +28,8 @@ chronological order.
 	- res removed the ASSERT, VERIFY_SUCCESS and VERIFY_FAILURE macros from
 	  the Win32 csosdefs.h. They were not used (except one place) in CS
 	  itself and could interfere when CS was embedded.
+	- Jorrit added support for overriding of mixmode in submeshes of
+	  genmesh. The loader also supports this now.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.
