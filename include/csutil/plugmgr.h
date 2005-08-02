@@ -114,9 +114,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Load a plugin and (optionally) initialize it.
-  virtual iBase *LoadPlugin (const char *iClassID,
-        const char *iInterface = 0, int iVersion = 0,
-	bool init = true);
+  virtual iBase *LoadPlugin (const char *iClassID, bool init = true);
 
   /**
    * Get first of the loaded plugins that supports given interface ID.

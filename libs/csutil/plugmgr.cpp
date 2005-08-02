@@ -42,7 +42,7 @@ csPluginManager::csPlugin::csPlugin (iComponent *obj, const char *classID)
 
 csPluginManager::csPlugin::~csPlugin ()
 {
-//csPrintf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
+  //csPrintf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
   delete [] ClassID;
   Plugin->DecRef ();
 }
@@ -179,17 +179,15 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
-iBase *csPluginManager::LoadPlugin (const char *classID,
-  const char *iInterface, int iVersion, bool init)
+iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
 {
   iComponent *p = 0;
-
   { 
     // The reference must be held beyond the scope of this block.
     csRef<iComponent> dummy (SCF_CREATE_INSTANCE (classID, iComponent));
     if (dummy) {
       p = dummy;
-      p->IncRef();
+      p->IncRef ();
     }
   }
   
@@ -225,18 +223,8 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
 
     if ((!init) || p->Initialize (object_reg))
     {
-      void *ret = 0;
-      if (iInterface)
-      {
-        ret = p->QueryInterface (
-	  iSCF::SCF->GetInterfaceID (iInterface), iVersion);
-      }
-      else
-      {
-        ret = p;
-        p->IncRef();
-      }
-      if (ret)
+      p->IncRef();
+      if (p)
       {
         if (!added_here)
 	{
@@ -355,7 +343,7 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
     }
   }
 
-  object_reg->Unregister ((iBase *)obj, 0);
+  object_reg->Unregister (obj, 0);
   return Plugins.DeleteIndex (idx);
 }
 

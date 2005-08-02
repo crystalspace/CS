@@ -74,6 +74,8 @@ class csPathsList;
 
 #ifdef CS_REF_TRACKER
  #include <typeinfo>
+ #include "iutil/string.h"
+ #include "iutil/databuff.h"
  #define CS_TYPENAME(x)		    typeid(x).name()
  /* @@@ HACK: Force an AddAlias() call for every contained interface
   * However, when iSCF::SCF == 0, don't call QI to prevent interface ID 
@@ -788,10 +790,16 @@ inline csPtr<Interface> scfQueryInterfaceSafe (ClassPtr object)
 template<class Interface>
 inline csPtr<Interface> scfCreateInstance (char const * const ClassID)
 {
-  iBase *base = iSCF::SCF->CreateInstance (ClassID,
-    scfInterfaceTraits<Interface>::GetName (),
+  iBase *base = iSCF::SCF->CreateInstance (ClassID);
+
+  if (base == 0) return csPtr<Interface> (0);
+
+  Interface *x = (Interface*)base->QueryInterface (
+    scfInterfaceTraits<Interface>::GetID (),
     scfInterfaceTraits<Interface>::GetVersion ());
-  return scfQueryInterfaceSafe<Interface> (base);
+
+  if (x) base->DecRef (); //release our base interface
+  return csPtr<Interface> (x);
 }
 
 // Compatibility macro for scfCreateInstance function

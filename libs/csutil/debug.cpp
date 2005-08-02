@@ -227,7 +227,7 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
   csRef<iBase> idg (CS_QUERY_REGISTRY_TAG (object_reg, "__Debug_Graph__"));
   if (!idg)
   {
-    idg = csPtr<iBase> ((iBase*)new csDebugGraph ());
+    idg = csPtr<iBase> (new csDebugGraph ());
     if (!object_reg->Register (idg, "__Debug_Graph__"))
     {
       // If registering fails this probably means we are in the destruction
@@ -235,6 +235,7 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
       return 0;
     }
   }
+  //@@FIX
   return (csDebugGraph*)(iBase*)idg;	// DecRef() but that's ok in this case.
 }
 

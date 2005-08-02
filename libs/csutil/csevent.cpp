@@ -274,7 +274,7 @@ bool csEvent::Add (const char *name, iEvent *v)
   if (v && CheckForLoops(v, this))
   {
     attribute* object = new attribute (csEventAttrEvent);
-    (object->ibaseVal = (iBase*)v)->IncRef();
+    (object->ibaseVal = v)->IncRef();
     attributes.Put (GetKeyID (name), object);
     count++;
     return true;

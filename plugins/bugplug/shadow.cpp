@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "shadow.h"
+#include "igeom/polymesh.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"

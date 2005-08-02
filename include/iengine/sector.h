@@ -87,8 +87,6 @@ struct iSectorMeshCallback : public iBase
   virtual void RemoveMesh (iSector* sector, iMeshWrapper* mesh) = 0;
 };
 
-SCF_VERSION (iSector, 0, 5, 5);
-
 /**
  * The iSector interface is used to work with "sectors". A "sector"
  * is an empty region of space that can contain other objects (mesh
@@ -116,10 +114,85 @@ SCF_VERSION (iSector, 0, 5, 5);
  *   <li>iEngine
  *   </ul>
  */
-struct iSector : public iBase
+struct iSector : public virtual iBase
 {
+  SCF_INTERFACE(iSector,2,0,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
+
+  // -- Mesh handling
+
+  /// Get the list of meshes in this sector.
+  virtual iMeshList* GetMeshes () = 0;
+
+  /**
+   * Get a set of visible meshes for given camera. These will be cached for
+   * a given frame and camera, but if the cached result isn't enough it will
+   * be reculled. The returned pointer is valid as long as the sector exsist
+   * (the sector will delete it)
+   */
+  virtual csRenderMeshList* GetVisibleMeshes (iRenderView *) = 0;
+
+  /**
+   * Get the set of meshes containing portals that leave from this sector.
+   * Note that portals are uni-directional. The portals represented
+   * by this list are portals that are on some mesh object that is
+   * actually located in this sector.
+   */
+  virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const = 0;
+  /**
+   * Register a mesh with a portal. @@@ TO BE REMOVED...
+   */
+  virtual void RegisterPortalMesh (iMeshWrapper* mesh) = 0;
+  /**
+   * Unregister a mesh with a portal. @@@ TO BE REMOVED...
+   */
+  virtual void UnregisterPortalMesh (iMeshWrapper* mesh) = 0;
+
+  /**
+   * Unlink all mesh objects from this sector. This will not remove
+   * the mesh objects but simply unlink them so that they are no longer
+   * part of this sector. This happens automatically when the sector
+   * is removed but you can force it by calling this function here.
+   */
+  virtual void UnlinkObjects () = 0;
+
+  /**
+   * Add a mesh callback. This will call IncRef() on the callback
+   * So make sure you call DecRef() to release your own reference.
+   */
+  virtual void AddSectorMeshCallback (iSectorMeshCallback* cb) = 0;
+
+  /**
+   * Remove a mesh callback.
+   */
+  virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb) = 0;
+
+  // -- Drawing related
+  
+  /// Draw the sector with the given render view
+  virtual void Draw (iRenderView* rview) = 0;
+
+  /**
+   * Prepare the sector to draw.
+   * Must be called before any rendermesh is requested.
+   */
+  virtual void PrepareDraw (iRenderView* rview) = 0;
+
+  /**
+   * Get the current draw recursion level.
+   */
+  virtual int GetRecLevel () const = 0;
+
+  /**
+   * Add one draw recursion level.
+   */
+  virtual void IncRecLevel () = 0;
+
+  /**
+   * Remove one draw recursion level.
+   */
+  virtual void DecRecLevel () = 0;
 
   /**
    * Set the renderloop to use for this sector. If this is not set then
@@ -134,6 +207,8 @@ struct iSector : public iBase
    */
   virtual iRenderLoop* GetRenderLoop () = 0;
 
+  // -- Fog handling
+
   /// Has this sector fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled)
@@ -143,8 +218,8 @@ struct iSector : public iBase
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
 
-  /// Get the list of meshes in this sector.
-  virtual iMeshList* GetMeshes () = 0;
+  // -- Light handling
+
   /**
    * Get the list of static and pseudo-dynamic lights in this sector.
    */
@@ -169,6 +244,8 @@ struct iSector : public iBase
    * number is increased whenever dynamic ambient changes.
    */
   virtual uint GetDynamicAmbientVersion () const = 0;
+
+  // -- Visculling
 
   /**
    * Calculate the bounding box of all objects in this sector.
@@ -195,20 +272,12 @@ struct iSector : public iBase
   virtual iVisibilityCuller* GetVisibilityCuller () = 0;
 
   /**
-   * Get the current draw recursion level.
+   * Check visibility in a frustum way for all things and polygons in
+   * this sector and possibly traverse through portals to other sectors.
    */
-  virtual int GetRecLevel () const = 0;
+  virtual void CheckFrustum (iFrustumView* lview) = 0;
 
-  /**
-   * Add one draw recursion level.
-   */
-  virtual void IncRecLevel () = 0;
-
-  /**
-   * Remove one draw recursion level.
-   */
-  virtual void DecRecLevel () = 0;
-
+  
   /**
    * Follow a beam from start to end and return the first polygon that
    * is hit. This function correctly traverse portals and space warping
@@ -251,22 +320,7 @@ struct iSector : public iBase
   virtual iSector* FollowSegment (csReversibleTransform& t,
     csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
 
-  /// Draw the sector with the given render view
-  virtual void Draw (iRenderView* rview) = 0;
-
-  /**
-   * Prepare the sector to draw.
-   * Must be called before any rendermesh is requested.
-   */
-  virtual void PrepareDraw (iRenderView* rview) = 0;
-
-  /**
-   * Get a set of visible meshes for given camera. These will be cached for
-   * a given frame and camera, but if the cached result isn't enough it will
-   * be reculled. The returned pointer is valid as long as the sector exsist
-   * (the sector will delete it)
-   */
-  virtual csRenderMeshList* GetVisibleMeshes (iRenderView *) = 0;
+  // -- Various  
 
   /**
    * Set the sector callback. This will call IncRef() on the callback
@@ -284,44 +338,6 @@ struct iSector : public iBase
 
   /// Get the specified sector callback.
   virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
-
-  /**
-   * Add a mesh callback. This will call IncRef() on the callback
-   * So make sure you call DecRef() to release your own reference.
-   */
-  virtual void AddSectorMeshCallback (iSectorMeshCallback* cb) = 0;
-
-  /**
-   * Remove a mesh callback.
-   */
-  virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb) = 0;
-
-  /// Used for portal traversal.
-  virtual void CheckFrustum (iFrustumView* lview) = 0;
-
-  /**
-   * Get the set of meshes containing portals that leave from this sector.
-   * Note that portals are uni-directional. The portals represented
-   * by this list are portals that are on some mesh object that is
-   * actually located in this sector.
-   */
-  virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const = 0;
-  /**
-   * Register a mesh with a portal. @@@ TO BE REMOVED...
-   */
-  virtual void RegisterPortalMesh (iMeshWrapper* mesh) = 0;
-  /**
-   * Unregister a mesh with a portal. @@@ TO BE REMOVED...
-   */
-  virtual void UnregisterPortalMesh (iMeshWrapper* mesh) = 0;
-
-  /**
-   * Unlink all mesh objects from this sector. This will not remove
-   * the mesh objects but simply unlink them so that they are no longer
-   * part of this sector. This happens automatically when the sector
-   * is removed but you can force it by calling this function here.
-   */
-  virtual void UnlinkObjects () = 0;
 };
 
 

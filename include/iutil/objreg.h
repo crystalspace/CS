@@ -160,10 +160,18 @@ struct iObjectRegistryIterator : public iBase
 template<class Interface>
 inline csPtr<Interface> csQueryRegistry (iObjectRegistry *Reg)
 { 
-  return scfQueryInterfaceSafe<Interface> (
-    Reg->Get (scfInterfaceTraits<Interface>::GetName (),
+  iBase *base = Reg->Get (scfInterfaceTraits<Interface>::GetName (),
               scfInterfaceTraits<Interface>::GetID (),
-              scfInterfaceTraits<Interface>::GetVersion ()));
+              scfInterfaceTraits<Interface>::GetVersion ());
+
+  if (base == 0) return csPtr<Interface> (0);
+
+  Interface *x = (Interface*)base->QueryInterface (
+    scfInterfaceTraits<Interface>::GetID (),
+    scfInterfaceTraits<Interface>::GetVersion ());
+
+  if (x) base->DecRef (); //release our base interface
+  return csPtr<Interface> (x);
 }  
   
 inline csPtr<iBase> csQueryRegistryTag (iObjectRegistry *Reg, const char* Tag)
@@ -175,10 +183,18 @@ template<class Interface>
 inline csPtr<Interface> csQueryRegistryTagInterface (
   iObjectRegistry *Reg, const char* Tag)
 {  
-  return scfQueryInterfaceSafe<Interface> (
-    Reg->Get (Tag,
+  iBase *base = Reg->Get (Tag,
               scfInterfaceTraits<Interface>::GetID (),
-              scfInterfaceTraits<Interface>::GetVersion ()));
+              scfInterfaceTraits<Interface>::GetVersion ());
+
+  if (base == 0) return csPtr<Interface> (0);
+
+  Interface *x = (Interface*)base->QueryInterface (
+    scfInterfaceTraits<Interface>::GetID (),
+    scfInterfaceTraits<Interface>::GetVersion ());
+
+  if (x) base->DecRef (); //release our base interface
+  return csPtr<Interface> (x);
 }  
 
 /// FOR COMPATABILITY!

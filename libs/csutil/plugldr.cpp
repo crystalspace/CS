@@ -353,7 +353,7 @@ bool csPluginLoader::LoadPlugins ()
     r->plugin = 0;
     if (VFS && r->Tag && strcmp (r->Tag, "iVFS") == 0)
       continue;
-    r->plugin.AttachNew(plugin_mgr->LoadPlugin (r->ClassID, 0, 0, true));
+    r->plugin.AttachNew(plugin_mgr->LoadPlugin (r->ClassID, true));
     if (r->plugin)
     {
       if (!object_reg->Register (r->plugin, r->Tag))

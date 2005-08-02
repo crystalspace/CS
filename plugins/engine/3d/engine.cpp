@@ -1308,21 +1308,17 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     int ambient_red;
     int ambient_green;
     int ambient_blue;
-    int reflect;
-    int radiosity;
     float cosinus_factor;
     int lightmap_size;
   };
 
   PrecalcInfo current;
   memset (&current, 0, sizeof (current));
-  current.lm_version = 2;
+  current.lm_version = 3;
   current.normal_light_level = CS_NORMAL_LIGHT_LEVEL;
   current.ambient_red = csLight::ambient_red;
   current.ambient_green = csLight::ambient_green;
   current.ambient_blue = csLight::ambient_blue;
-  current.reflect = csSector::cfg_reflections;
-  current.radiosity = (int)csSector::do_radiosity;
   current.cosinus_factor = 0;	//@@@
   current.lightmap_size = 0;	//@@@
 
@@ -1382,14 +1378,12 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   {
     csString data;
     data.Format (
-      "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\nAMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nCOSINUS_FACTOR=%g\nLIGHTMAP_SIZE=%d\n",
+      "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\nAMBIENT_BLUE=%d\nCOSINUS_FACTOR=%g\nLIGHTMAP_SIZE=%d\n",
       current.lm_version,
       current.normal_light_level,
       current.ambient_red,
       current.ambient_green,
       current.ambient_blue,
-      current.reflect,
-      current.radiosity,
       current.cosinus_factor,
       current.lightmap_size);
     if (lightmapCacheMode & CS_ENGINE_CACHE_WRITE)
@@ -1421,13 +1415,6 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   if (do_relight)
   {
     Report ("Recalculation of lightmaps forced.");
-  }
-  else
-  {
-    // If no recalculation is forced we set these variables to default to
-    // make sure that we don't do too many unneeded calculations.
-    csSector::do_radiosity = false;
-    csSector::cfg_reflections = 1;
   }
 
   csRef<iLightIterator> lit = GetLightIterator (region);
@@ -1531,30 +1518,6 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     stop = csGetTicks ();
     Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
   }
-
-#if 0
-  // TOTALLY DISABLED FOR NOW
-  // Render radiosity
-  if (use_new_radiosity && do_relight)
-  {
-    start = csGetTicks ();
-
-    csRadiosity *rad = new csRadiosity (this, meter);
-    if (do_rad_debug)
-    {
-      rad_debug = rad;
-    }
-    else
-    {
-      rad->DoRadiosity ();
-      delete rad;
-    }
-
-    stop = csGetTicks ();
-    if (do_relight)
-      Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
-  }
-#endif
 
   if (do_relight && (lightmapCacheMode & CS_ENGINE_CACHE_WRITE))
   {
@@ -2085,10 +2048,6 @@ void csEngine::ReadConfig (iConfigFile *Config)
   csLight::ambient_red = defaultAmbientRed;
   csLight::ambient_green = defaultAmbientGreen;
   csLight::ambient_blue = defaultAmbientBlue;
-
-  csSector::cfg_reflections = Config->GetInt (
-      "Engine.Lighting.Reflections",
-      csSector::cfg_reflections);
 
   defaultClearZBuf = 
     Config->GetBool ("Engine.ClearZBuffer", defaultClearZBuf);
@@ -3614,10 +3573,8 @@ static const csOptionDescription
   config_options[] =
 {
   { 0, "fov", "Field of Vision", CSVAR_LONG },
-  { 1, "rad", "Pseudo-radiosity system", CSVAR_BOOL },
-  { 2, "reflect", "Max number of reflections for radiosity", CSVAR_LONG },
-  { 3, "relight", "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
-  { 4, "renderloop", "Override the default render loop", CSVAR_STRING },
+  { 1, "relight", "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
+  { 2, "renderloop", "Override the default render loop", CSVAR_STRING },
 };
 const int NUM_OPTIONS =
 (
@@ -3634,16 +3591,10 @@ bool csEngine::SetOption (int id, csVariant *value)
       csCamera::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
-      csSector::do_radiosity = value->GetBool ();
-      break;
-    case 2:
-      csSector::cfg_reflections = value->GetLong ();
-      break;
-    case 3:
       if (value->GetBool ()) csEngine::lightmapCacheMode = CS_ENGINE_CACHE_WRITE;
       else                   csEngine::lightmapCacheMode = CS_ENGINE_CACHE_READ;
       break;
-    case 4:
+    case 2:
       LoadDefaultRenderLoop (value->GetString ());
     default:
       return false;
@@ -3657,10 +3608,8 @@ bool csEngine::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:   value->SetLong (csCamera::GetDefaultFOV ()); break;
-    case 1:   value->SetBool (csSector::do_radiosity); break;
-    case 2:   value->SetLong (csSector::cfg_reflections); break;
-    case 3:   value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE); break;
-    case 4:   value->SetString (""); break; // @@@
+    case 1:   value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE); break;
+    case 2:   value->SetString (""); break; // @@@
     default:  return false;
   }
 

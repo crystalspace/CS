@@ -110,8 +110,7 @@ public:
     const char* context = 0);
   virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass);
   virtual bool ClassRegistered (const char *iClassID);
-  virtual iBase *CreateInstance (const char *iClassID,
-    const char *iInterfaceID, int iVersion);
+  virtual iBase *CreateInstance (const char *iClassID);
   virtual const char *GetClassDescription (const char *iClassID);
   virtual const char *GetClassDependencies (const char *iClassID);
   virtual csRef<iDocument> GetPluginMetadata (char const *iClassID);
@@ -770,8 +769,7 @@ void csSCF::Finish ()
   delete this;
 }
 
-iBase *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
-  int iVersion)
+iBase *csSCF::CreateInstance (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
 
@@ -790,16 +788,12 @@ iBase *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
     object = cf->CreateInstance ();
-    if (object)
-    {
-      instance = object->QueryInterface(GetInterfaceID(iInterface), iVersion);
-      object->DecRef ();
 
-      if (!instance)
-	csPrintfErr("SCF_WARNING: factory returned a null instance for %s\n"
-	  "\tif error messages are not self explanatory, recompile CS with "
-	  "CS_DEBUG\n", iClassID);
-    }
+    if (!object)
+      csPrintfErr("SCF_WARNING: factory returned a null instance for %s\n"
+        "\tif error messages are not self explanatory, recompile CS with "
+        "CS_DEBUG\n", iClassID);
+ 
   } /* endif */
 
   UnloadUnusedModules ();

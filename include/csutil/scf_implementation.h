@@ -40,6 +40,22 @@
  * \addtogroup scf
  * @{ */
 
+#ifndef CS_TYPENAME
+  #ifdef CS_REF_TRACKER  
+    #include <typeinfo>
+    #define CS_TYPENAME(x)		    typeid(x).name()
+    /* @@@ HACK: Force an AddAlias() call for every contained interface
+    * However, when iSCF::SCF == 0, don't call QI to prevent interface ID 
+    * resolution (which will fail).
+    */
+    #define SCF_INIT_TRACKER_ALIASES    \
+    if (iSCF::SCF != 0) QueryInterface ((scfInterfaceID)-1, -1);
+  #else
+    #define CS_TYPENAME(x)		    0
+    #define SCF_INIT_TRACKER_ALIASES
+  #endif
+#endif
+
 /**
 *  
 */
@@ -55,12 +71,16 @@ public:
       scfObject (object), scfRefCount (1), scfParent (parent), 
         scfWeakRefOwners (NULL)
   {
+    csRefTrackerAccess::TrackConstruction (this);
+    csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
+    SCF_INIT_TRACKER_ALIASES;
     if (scfParent) scfParent->IncRef ();
   }
 
   // Cleanup
   virtual ~scfImplementation()
   {
+    csRefTrackerAccess::TrackDestruction (this, scfRefCount);
     scfRemoveRefOwners ();
   }
 
@@ -69,9 +89,11 @@ public:
    */
   void DecRef ()
   {
+    csRefTrackerAccess::TrackDecRef (this, scfRefCount);
     scfRefCount--;
     if (scfRefCount == 0)
     {
+      scfRemoveRefOwners ();
       if (scfParent) scfParent->DecRef();
       delete scfObject;
     }
@@ -82,6 +104,7 @@ public:
    */
   void IncRef ()
   {
+    csRefTrackerAccess::TrackIncRef (this, scfRefCount);
     scfRefCount++;
   }
 

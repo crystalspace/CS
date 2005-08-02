@@ -202,15 +202,10 @@ struct iSCF : public iBase
    * between these error conditions, you can check whenever such a class exists
    * using scfClassRegistered() function.
    * <p>
-   * If you specify 0 as iInterfaceID, you'll receive a pointer to the basic
-   * interface, no matter what it is.  <b>The reference count will be zero thus
-   * you should increment it yourself if you use this approach.</b> You can
-   * treat the pointer returned just as an iBase*, not more.  If you need more,
-   * do QueryInterface() on received pointer (this will also increment the
-   * reference counter).
+   * The returned pointer will be to a iBase, and thus you need to use
+   * scfQueryInterface if you want to get a specific interface.
    */
-  virtual iBase *CreateInstance (const char *iClassID,
-    const char *iInterface, int iVersion) = 0;
+  virtual iBase *CreateInstance (const char *iClassID) = 0;
 
   /**
    * Query the description of a class.

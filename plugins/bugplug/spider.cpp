@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "spider.h"
+#include "igeom/polymesh.h"
 #include "iengine/rview.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"

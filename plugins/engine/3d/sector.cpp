@@ -43,13 +43,6 @@
 #include "plugins/engine/3d/material.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
-
-// Configuration variable: number of allowed reflections for static lighting.
-int csSector:: cfg_reflections = 1;
-
-// Option variable: do pseudo radiosity?
-bool csSector:: do_radiosity = false;
-
 //---------------------------------------------------------------------------
 csSectorLightList::csSectorLightList ()
 {
@@ -106,23 +99,20 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csSector)
-  SCF_IMPLEMENTS_INTERFACE(iSector)
-  SCF_IMPLEMENTS_INTERFACE (csSector);
-SCF_IMPLEMENT_IBASE_EXT_END
 
-csSector::csSector (csEngine *engine) : csObject()
+csSector::csSector (csEngine *engine) :
+  scfImplementationType (this)
 {
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
   fog.enabled = false;
-  draw_busy = 0;
-  dynamic_ambient_color.Set (0,0,0);
-  dynamic_ambient_version = (uint)~0;
+  drawBusy = 0;
+  dynamicAmbientLightColor.Set (0,0,0);
+  dynamicAmbientLightVersion = (uint)~0;
   meshes.SetSector (this);
   //portal_containers.SetSector (this);
   lights.SetSector (this);
-  current_visnr = 0;
+  currentVisibilityNumber = 0;
   renderloop = 0;
 }
 
@@ -191,7 +181,7 @@ void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
 void csSector::PrepareMesh (iMeshWrapper *mesh)
 {
   bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
-  if (do_camera) camera_meshes.Push (mesh);
+  if (do_camera) cameraMeshes.Push (mesh);
 
   if (culler) RegisterMeshToCuller (mesh);
   int i;
@@ -205,7 +195,7 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
-  camera_meshes.Delete (mesh);
+  cameraMeshes.Delete (mesh);
 
   if (culler) UnregisterMeshToCuller (mesh);
   int i;
@@ -219,9 +209,9 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
 {
-  camera_meshes.Delete (mesh);
+  cameraMeshes.Delete (mesh);
   bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
-  if (do_camera) camera_meshes.Push (mesh);
+  if (do_camera) cameraMeshes.Push (mesh);
 
   int i;
   iMeshList* ml = mesh->GetChildren ();
@@ -374,7 +364,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   // This is used for csMeshObject::IsChildVisible to determine
   // when to update its cache. Should be changed to something more
   // sensible. @@@ What about engine frame number?
-  current_visnr++;
+  currentVisibilityNumber++;
 
 /*  if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
       rview->GetCamera () != cachedCamera )
@@ -450,11 +440,11 @@ iMeshWrapper* csSector::HitBeamPortals (
       iPortal* po = portals->GetPortal (p);
       if (po)
       {
-	draw_busy++;
+	drawBusy++;
 	csVector3 new_start = isect;
 	mesh = po->HitBeamPortals (mesh->GetMovable ()->GetFullTransform (),
 		      new_start, end, isect, &p);
-	draw_busy--;
+	drawBusy--;
       }
     }
   }
@@ -630,16 +620,16 @@ void csSector::PrepareDraw (iRenderView *rview)
   csRenderView* csrview = (csRenderView*)rview;
   csrview->SetThisSector ((iSector*)this);
 
-  size_t i = sector_cb_vector.Length ();
+  size_t i = sectorCallbackList.Length ();
   while (i > 0)
   {
     i--;
-    iSectorCallback* cb = sector_cb_vector.Get (i);
+    iSectorCallback* cb = sectorCallbackList.Get (i);
     cb->Traverse ((iSector*)this, rview);
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
-  const csArray<iMeshWrapper*>& cm = camera_meshes;
+  const csArray<iMeshWrapper*>& cm = cameraMeshes;
   for (i = 0 ; i < cm.Length () ; i++)
   {
     iMeshWrapper* m = cm.Get (i);
@@ -786,40 +776,40 @@ void csSector::Draw (iRenderView *rview)
 
 void csSector::AddSectorMeshCallback (iSectorMeshCallback* cb)
 {
-  sector_mesh_cb_vector.Push (cb);
+  sectorMeshCallbackList.Push (cb);
 }
 
 void csSector::RemoveSectorMeshCallback (iSectorMeshCallback* cb)
 {
-  sector_mesh_cb_vector.Delete (cb);
+  sectorMeshCallbackList.Delete (cb);
 }
 
 void csSector::FireNewMesh (iMeshWrapper* mesh)
 {
-  size_t i = sector_mesh_cb_vector.Length ();
+  size_t i = sectorMeshCallbackList.Length ();
   while (i > 0)
   {
     i--;
-    sector_mesh_cb_vector[i]->NewMesh ((iSector*)this, mesh);
+    sectorMeshCallbackList[i]->NewMesh ((iSector*)this, mesh);
   }
 }
 
 void csSector::FireRemoveMesh (iMeshWrapper* mesh)
 {
-  size_t i = sector_mesh_cb_vector.Length ();
+  size_t i = sectorMeshCallbackList.Length ();
   while (i > 0)
   {
     i--;
-    sector_mesh_cb_vector[i]->RemoveMesh ((iSector*)this, mesh);
+    sectorMeshCallbackList[i]->RemoveMesh ((iSector*)this, mesh);
   }
 }
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
-  int i = (int)sector_cb_vector.Length ()-1;
+  int i = (int)sectorCallbackList.Length ()-1;
   while (i >= 0)
   {
-    iSectorCallback* cb = sector_cb_vector.Get (i);
+    iSectorCallback* cb = sectorCallbackList.Get (i);
     cb->Traverse ((iSector*)this, lview);
     i--;
   }
@@ -829,14 +819,14 @@ void csSector::CheckFrustum (iFrustumView *lview)
 
 void csSector::RealCheckFrustum (iFrustumView *lview)
 {
-  if (draw_busy > cfg_reflections) return ;
-  draw_busy++;
+  if (drawBusy > 1) return ;
+  drawBusy++;
 
   // Make sure we have a culler.
   GetVisibilityCuller ();
   culler->CastShadows (lview);
 
-  draw_busy--;
+  drawBusy--;
 }
 
 void csSector::ShineLightsInt (csProgressPulse *pulse)
@@ -865,8 +855,8 @@ void csSector::ShineLightsInt (iMeshWrapper *mesh, csProgressPulse *pulse)
 
 void csSector::SetDynamicAmbientLight (const csColor& color)
 {
-  dynamic_ambient_color = color;
-  dynamic_ambient_version++;
+  dynamicAmbientLightColor = color;
+  dynamicAmbientLightVersion++;
 }
 
 void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
@@ -892,12 +882,12 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
 
 void csSector::RegisterPortalMesh (iMeshWrapper* mesh)
 {
-  portal_meshes.Add (mesh);
+  portalMeshes.Add (mesh);
 }
 
 void csSector::UnregisterPortalMesh (iMeshWrapper* mesh)
 {
-  portal_meshes.Delete (mesh);
+  portalMeshes.Delete (mesh);
 }
 
 //---------------------------------------------------------------------------

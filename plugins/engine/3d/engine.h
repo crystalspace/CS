@@ -88,24 +88,6 @@ struct iRegion;
 class csLightIt : public scfImplementation1<csLightIt,
                                             iLightIterator>
 {
-private:
-  // The engine for this iterator.
-  csEngine* engine;
-  // The region we are iterating in (optional).
-  iRegion* region;
-  // Current sector index.
-  int sectorIndex;
-  // Current light index.
-  int lightIndex;
-  // Get current light.
-  iLight* currentLight;
-
-  // Go to next sector. Return false if finished.
-  bool NextSector ();
-
-  /// Get light from iterator. Return 0 at end.
-  iLight* FetchNext ();
-
 public:
   /// Construct an iterator and initialize to start.
   csLightIt (csEngine*, iRegion* region = 0);
@@ -123,6 +105,23 @@ public:
 
   /// Get the sector for the last fetched light.
   virtual iSector* GetLastSector ();
+private:
+  // The engine for this iterator.
+  csEngine* engine;
+  // The region we are iterating in (optional).
+  iRegion* region;
+  // Current sector index.
+  int sectorIndex;
+  // Current light index.
+  int lightIndex;
+  // Get current light.
+  iLight* currentLight;
+
+  // Go to next sector. Return false if finished.
+  bool NextSector ();
+
+  /// Get light from iterator. Return 0 at end.
+  iLight* FetchNext ();
 };
 
 /**
@@ -209,7 +208,7 @@ class csEngine : public scfImplementationExt5<csEngine,
 
 public:
 
-  //-- Constructir & destructor
+  //-- Constructor & destructor
 
   /**
    * Initialize an empty engine.  The only thing that is valid just after

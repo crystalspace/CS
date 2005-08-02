@@ -23,10 +23,13 @@
 #include "csgeom/sphere.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
+#include "csutil/scf.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/region.h"
+#include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "imap/ldrctxt.h"
 #include "imesh/object.h"
@@ -139,10 +142,10 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	value = ldr_context->FindMeshObject (parname);
         break;
       case PARTYPE_MATERIAL:
-	value = (iBase*)Engine->FindMaterial (parname);
+	value = Engine->FindMaterial (parname);
         break;
       case PARTYPE_SECTOR:
-	value = (iBase*)ldr_context->FindSector (parname);
+	value = ldr_context->FindSector (parname);
         break;
       case PARTYPE_TRIGGER:
 	value = FindTrigger (GetEngineSequenceManager (), parname);

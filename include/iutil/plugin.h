@@ -121,7 +121,7 @@ struct iPluginManager : public iBase
    * will be called.
    */
   virtual iBase *LoadPlugin (const char *classID,
-    const char *iInterface = 0, int iVersion = 0, bool init = true) = 0;
+    bool init = true) = 0;
 
   /**
    * Get first of the loaded plugins that supports given interface ID.
@@ -194,11 +194,17 @@ template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
                                       const char* ClassID)
 {
-  iBase* base (mgr->LoadPlugin (ClassID,
-    /*scfInterfaceTraits<Interface>::GetName()*/0,
-    /*scfInterfaceTraits<Interface>::GetVersion()*/0));
+  iBase* base (mgr->LoadPlugin (ClassID));
 
-  return scfQueryInterfaceSafe<Interface> (base);
+  if (base == 0) return csPtr<Interface> (0);
+
+  Interface *x = (Interface*)base->QueryInterface (
+    scfInterfaceTraits<Interface>::GetID (),
+    scfInterfaceTraits<Interface>::GetVersion ());
+
+  if (x) base->DecRef (); //release our base interface
+
+  return csPtr<Interface> (x);
 }
 
 /**
@@ -215,7 +221,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
                                         const char* ClassID)
 {
-  iBase* base (mgr->LoadPlugin (ClassID,0,0));
+  iBase* base (mgr->LoadPlugin (ClassID));
   return csPtr<iBase> (base);
 }
 
