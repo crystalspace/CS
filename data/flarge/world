@@ -9913,6 +9913,16 @@
         </meshobj>
     </sector>
     <sector name="large">
+	<meshobj name="teapot1">
+	    <plugin>mesh</plugin>
+	    <params>
+		<factory>Teapot</factory>
+		<localshadows />
+	    </params>
+	    <move>
+		<v x="-15" y="-1" z="13" />
+	    </move>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <params>
@@ -16269,16 +16279,6 @@
         </meshobj>
     </sector>
     <sector name="corridor">
-	<meshobj name="teapot1">
-	    <plugin>mesh</plugin>
-	    <params>
-		<factory>Teapot</factory>
-		<localshadows />
-	    </params>
-	    <move>
-		<v x="-15" y="3" z="23" />
-	    </move>
-	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -30898,6 +30898,14 @@
             <delay time="1000" />
             <enable trigger="rot_cubard" />
         </sequence>
+        <sequence name="rot_teapot1">
+            <rotate mesh="teapot1" duration="1000">
+                <roty>1</roty>
+		<v x="-15" y="-1" z="13" />
+            </rotate>
+            <delay time="1000" />
+            <enable trigger="rot_teapot1" />
+        </sequence>
         <sequence name="rot_transpBall">
             <rotate mesh="transpBall" duration="1000">
                 <roty>3</roty>
@@ -31122,6 +31130,10 @@
         <trigger name="rot_cubard">
             <sectorvis sector="large" />
             <fire sequence="rot_cubard" />
+        </trigger>
+        <trigger name="rot_teapot1">
+            <sectorvis sector="large" />
+            <fire sequence="rot_teapot1" />
         </trigger>
         <trigger name="rot_transpBall">
             <sectorvis sector="large" />

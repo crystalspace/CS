@@ -16,6 +16,11 @@ chronological order.
 	  system colliders more directly 
 	- Piotr Obrzut added method generating sphere for genmesh (copied 
 	  from ball mesh)
+	- Jorrit added a new data/shader/reflectsphere.xml shader which is
+	  like reflect.xml but instead it uses spherical mapping (not
+	  cubemap).
+	- Jorrit changed the teapot to use reflectsphere. Also moved the
+	  teapot to a more visible location.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.
