@@ -23,6 +23,11 @@ chronological order.
 	  teapot to a more visible location.
 	- Marten cleaned up scf_implementation.h and removed the paritial
 	  connection to csRefTracker. It needs to be done properly.
+	- res fixed a size_t vs int warning in AWS.
+	- res renamed the DEBUG_BREAK macro to CS_DEBUG_BREAK.
+	- res removed the ASSERT, VERIFY_SUCCESS and VERIFY_FAILURE macros from
+	  the Win32 csosdefs.h. They were not used (except one place) in CS
+	  itself and could interfere when CS was embedded.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.

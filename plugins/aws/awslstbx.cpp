@@ -377,13 +377,13 @@ void awsListBox::MapVisibleItems (
 static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 {
   v->sortcol = v->local_sortcol;
-  int key = v->FindKey (v->KeyCmp(text));
+  size_t key = v->FindKey (v->KeyCmp(text));
 
-  if (key>=0)
+  if (key != csArrayItemNotFound)
   {
     if (with_delete) v->DeleteIndex (key);
 
-    return key;
+    return (int)key;
   }
   else
   {

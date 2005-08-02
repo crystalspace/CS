@@ -630,15 +630,17 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #endif
 
 #ifdef CS_DEBUG
-#  if !defined (DEBUG_BREAK)
-#    if defined (CS_PROCESSOR_X86)
+#  if !defined (CS_DEBUG_BREAK)
+#    if defined (CS_PLATFORM_WIN32)
+#      define CS_DEBUG_BREAK ::DebugBreak()
+#    elif defined (CS_PROCESSOR_X86)
 #      if defined (CS_COMPILER_GCC)
-#        define DEBUG_BREAK asm ("int $3")
+#        define CS_DEBUG_BREAK asm ("int $3")
 #      else
-#        define DEBUG_BREAK _asm int 3
+#        define CS_DEBUG_BREAK _asm int 3
 #      endif
 #    else
-#      define DEBUG_BREAK { static int x = 0; x /= x; }
+#      define CS_DEBUG_BREAK { static int x = 0; x /= x; }
 #    endif
 #  endif
 #  if !defined (CS_ASSERT)
@@ -651,7 +653,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
          { \
            fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n", \
              int(__LINE__), #x); \
-           DEBUG_BREAK; \
+           CS_DEBUG_BREAK; \
          }
 #    endif
 #  endif
@@ -659,8 +661,8 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #      define CS_ASSERT_MSG(msg,x) CS_ASSERT(((msg) && (x)))
 #  endif
 #else
-#  undef  DEBUG_BREAK
-#  define DEBUG_BREAK
+#  undef  CS_DEBUG_BREAK
+#  define CS_DEBUG_BREAK
 #  undef  CS_ASSERT
 #  define CS_ASSERT(x)
 #  undef  CS_ASSERT_MSG

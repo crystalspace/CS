@@ -252,16 +252,10 @@
 
 #if defined(_DEBUG) || defined(CS_DEBUG)
   #include <assert.h>
-  #define ASSERT(expression) assert(expression)
-  #define VERIFY_SUCCESS(expression) assert(SUCCEEDED(expression))
-  #define VERIFY_RESULT(expression, result) assert(expression == result)
   #ifndef CS_DEBUG
     #define CS_DEBUG
   #endif
 
-  #undef  DEBUG_BREAK
-  #define DEBUG_BREAK ::DebugBreak()
-  
   #if defined(CS_COMPILER_MSVC) 
     #include <crtdbg.h>
 
@@ -287,10 +281,6 @@
     #endif
   #endif
 
-#else
-  #define ASSERT(expression)
-  #define VERIFY_SUCCESS(expression) expression
-  #define VERIFY_RESULT(expression, result) expression
 #endif
 
 #ifdef CS_WIN32_MSVC_DEBUG_GOOP

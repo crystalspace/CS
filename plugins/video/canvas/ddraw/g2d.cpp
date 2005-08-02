@@ -165,7 +165,7 @@ bool csGraphics2DDDraw3::Open ()
       m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
       m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
   }
-  ASSERT (m_hWnd);
+  CS_ASSERT (m_hWnd);
 
   SetTitle (win_title);
 

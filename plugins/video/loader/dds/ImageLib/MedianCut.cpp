@@ -226,7 +226,7 @@ VectPtr	*pList;
 		for(i=0; i<CodeSize; i++)
 			Diff[i] = 0;
 		//__asm int 3;
-		DEBUG_BREAK;
+		CS_DEBUG_BREAK;
 	}
 }
 
