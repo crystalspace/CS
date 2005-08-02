@@ -6,13 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Aug-2005
+	- Marten converted csSector to new SCF implementation.
+	- Marten fixed some issues in the plugin loader and object registry
+	  caused by the new template interface functions.
+	- Jorrit added functions to iLoader to load images and textures
+	  from a buffer (iDataBuffer) instead of a filename.
 1-Aug-2005
 	- Jorrit added a missing include to ref.h.
 	- mdmkolbe fixed some Swig issues with the new SCF, but more remain.
 	- mdmkolbe converted CS/libs/csgeom/ to the new SCF implementation.
-	- Marten converted csSector to new SCF implementation.
-	- Marten fixed some issues in the plugin loader and object registry
-	  caused by the new template interface functions.
 31-Jul-2005
 	- Peter Amstutz updated the csvosa3dl plugin to compile again
 	  with the recent changes made in SCF and CS headers

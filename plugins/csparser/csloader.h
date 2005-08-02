@@ -502,6 +502,8 @@ private:
   	const char* description, ...)
 	CS_GNUC_PRINTF(4,5);
 
+  csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format);
+
 public:
   /********** iLoader implementation **********/
   SCF_DECLARE_IBASE;
@@ -536,9 +538,19 @@ public:
   // initialize the plug-in
   virtual bool Initialize(iObjectRegistry *object_reg);
 
+  virtual csPtr<iImage> LoadImage (iDataBuffer* buf, int Format);
+  virtual csPtr<iTextureHandle> LoadTexture (iDataBuffer* buf,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+	csRef<iImage>* img=0);
+  virtual iTextureWrapper* LoadTexture (const char *name,
+  	iDataBuffer* buf,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+	bool reg = false, bool create_material = true);
+
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
-	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0, csRef<iImage>* img=0);
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+	csRef<iImage>* img=0);
   virtual iTextureWrapper* LoadTexture (const char *name,
   	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,

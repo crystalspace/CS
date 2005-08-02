@@ -46,7 +46,8 @@
 #include "csloader.h"
 #include "loadtex.h"
 
-csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
+csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, const char* fname,
+	int Format)
 {
   if (!ImageLoader)
      return 0;
@@ -61,12 +62,11 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
       Format = CS_IMGFMT_TRUECOLOR;
   }
 
-  csRef<iDataBuffer> buf (VFS->ReadFile (fname, false));
   if (!buf || !buf->GetSize ())
   {
     ReportWarning (
 	"crystalspace.maploader.parse.image",
-    	"Could not open image file '%s' on VFS!", fname);
+    	"Could not open image file '%s' on VFS!", fname ? fname : "<unknown>");
     return 0;
   }
 
@@ -77,14 +77,103 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
     ReportWarning (
 	"crystalspace.maploader.parse.image",
 	"Could not load image '%s'. Unknown format!",
-	fname);
+	fname ? fname : "<unknown>");
     return 0;
   }
-  
-  csRef<iDataBuffer> xname (VFS->ExpandPath (fname));
-  image->SetName (**xname);
+
+  if (fname)
+  {
+    csRef<iDataBuffer> xname = VFS->ExpandPath (fname);
+    image->SetName (**xname);
+  }
 
   return csPtr<iImage> (image);
+}
+
+csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, int Format)
+{
+  return LoadImage (buf, 0, Format);
+}
+
+csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf, int Flags,
+	iTextureManager *tm, csRef<iImage>* img)
+{
+  if (!tm && G3D)
+  {
+    tm = G3D->GetTextureManager();
+  }
+  int Format;
+  if (tm)
+    Format = tm->GetTextureFormat ();
+  else
+    Format = CS_IMGFMT_TRUECOLOR;
+
+  csRef<iImage> Image = LoadImage (buf, Format);
+  if (!Image)
+  {
+    ReportWarning (
+	"crystalspace.maploader.parse.texture",
+	"Couldn't load image. Using checkerboard instead!");
+    Image = csCreateXORPatternImage (32, 32, 5);
+    if (!Image)
+      return 0;
+  }
+
+  if(img) *img=Image;
+
+  if (!tm)
+    return 0;
+  
+  csRef<iTextureHandle> TexHandle = tm->RegisterTexture (Image, Flags);
+  if (!TexHandle)
+  {
+    ReportError (
+	"crystalspace.maploader.parse.texture",
+	"Cannot create texture!");
+    return 0;
+  }
+
+  return csPtr<iTextureHandle> (TexHandle);
+}
+
+iTextureWrapper* csLoader::LoadTexture (const char *name,
+	iDataBuffer* buf, int Flags, iTextureManager *tm, bool reg,
+	bool create_material)
+{
+  if (!Engine)
+    return 0;
+
+  csRef<iImage> img;
+  csRef<iTextureHandle> TexHandle = LoadTexture (buf, Flags, tm, &img);
+  if (!TexHandle)
+    return 0;
+
+  iTextureWrapper *TexWrapper =
+	Engine->GetTextureList ()->NewTexture(TexHandle);
+  TexWrapper->QueryObject ()->SetName (name);
+  TexWrapper->SetImageFile(img);
+
+  iMaterialWrapper* matwrap = 0;
+  if (create_material)
+  {
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
+    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
+  }
+
+  if (reg && tm)
+  {
+    // If we already have a texture handle then we don't register again.
+    if (!TexWrapper->GetTextureHandle ())
+      TexWrapper->Register (tm);
+  }
+
+  return TexWrapper;
+}
+
+csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
+{
+  csRef<iDataBuffer> buf = VFS->ReadFile (fname, false);
+  return LoadImage (buf, fname, Format);
 }
 
 csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,

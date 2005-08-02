@@ -97,6 +97,42 @@ struct iLoader : public iBase
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = false, bool create_material = true) = 0;
 
+  /**
+   * Load an image file. The image will be loaded in the format requested by
+   * the engine. If no engine exists, the format is taken from the video
+   * renderer. If no video renderer exists, this function fails. You may also
+   * request an alternate format to override the above sequence.
+   * This version reads the image from a data buffer.
+   */
+  virtual csPtr<iImage> LoadImage (iDataBuffer* buf,
+    int Format = CS_IMGFMT_INVALID) = 0;
+  /**
+   * Load an image as with LoadImage() and create a texture handle from it.
+   * The 'Flags' parameter accepts the flags described in ivideo/txtmgr.h.
+   * The texture manager determines the format, so choosing an alternate format
+   * doesn't make sense here. Instead you may choose an alternate texture
+   * manager.
+   * This version reads the image from a data buffer.
+   */
+  virtual csPtr<iTextureHandle> LoadTexture (iDataBuffer* buf,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+	csRef<iImage>* image=0) = 0;
+  /**
+   * Load a texture as with LoadTexture() above and register it with the
+   * engine. 'Name' is the name that the engine will use for the wrapper.
+   * If 'create_material' is true then this function also creates a
+   * material for the texture.<br>
+   * If 'register' is true then the texture and material will be registered
+   * to the texture manager. Set 'register' to false if you plan on calling
+   * 'engine->Prepare()' later as that function will take care of registering
+   * too.
+   * This version reads the image from a data buffer.
+   */
+  virtual iTextureWrapper* LoadTexture (const char *Name,
+  	iDataBuffer* buf,
+	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
+	bool reg = false, bool create_material = true) = 0;
+
   /// Load a sound file and return an iSoundData object
   virtual csPtr<iSoundData> LoadSoundData (const char *fname) = 0;
   /// Load a sound file and register the sound
