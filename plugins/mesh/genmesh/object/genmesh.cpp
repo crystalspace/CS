@@ -25,6 +25,7 @@
 #include "csgeom/frustum.h"
 #include "csgeom/math.h"
 #include "csgeom/math3d.h"
+#include "csgeom/sphere.h"
 #include "csgeom/trimesh.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
