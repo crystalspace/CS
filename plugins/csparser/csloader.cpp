@@ -2723,16 +2723,6 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	mesh->GetMovable ()->UpdateMove ();
       }
       break;
-    case XMLTOKEN_CASTHWSHADOW:
-      TEST_MISSING_MESH 
-      else
-      {
-        if (strcasecmp (child->GetAttributeValue ("enable"), "true") == 0)
-          mesh->CastHardwareShadow (true);
-        else if (strcasecmp (child->GetAttributeValue ("enable"), "false") == 0)
-          mesh->CastHardwareShadow (false);
-      }
-      break;
     case XMLTOKEN_BOX:
       TEST_MISSING_MESH
       else
@@ -2747,7 +2737,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-	csRef<iShaderVariableContext> svc = SCF_QUERY_INTERFACE (mesh, iShaderVariableContext);
+	csRef<iShaderVariableContext> svc = SCF_QUERY_INTERFACE (mesh,
+		iShaderVariableContext);
 	CS_ASSERT (svc.IsValid());
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");

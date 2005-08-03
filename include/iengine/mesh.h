@@ -661,11 +661,6 @@ struct iMeshWrapper : public iBase
   virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh) = 0;
 
   /**
-   * Enable/disable hardware based shadows alltogheter
-   */ 
-  virtual void CastHardwareShadow (bool castShadow) = 0;
-  
-  /**
    * Get the shader variable context of the mesh object.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;

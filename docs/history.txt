@@ -9,6 +9,9 @@ chronological order.
 3-Aug-2005
 	- Peter Amstutz added support for csColliderActor to the csvosa3dl
 	  plugin
+	- Jorrit removed a few unneeded things from csMeshWrapper (like
+	  the unused flag to cast hardware shadows and the old renderer
+	  functions to draw meshes).
 2-Aug-2005
 	- Marten converted csSector to new SCF implementation.
 	- Marten fixed some issues in the plugin loader and object registry

@@ -420,11 +420,14 @@ void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
   csOBBLine3 l2;
   tree->Diameter (l2, eps);
   csVector3 dir2;
-  if (ABS (l2.Length()) < 0.0001) {
+  if (ABS (l2.Length()) < 0.0001)
+  {
     dir2 = l2.Direction();
     dir2 = dir2 - dir1 * (dir1 * dir2);
     dir2.Normalize();
-  } else {
+  }
+  else
+  {
     dir2 = l2.Direction();
   }
   delete tree;

@@ -320,8 +320,7 @@ public:
     }
 
     int num;
-    csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
-      &(cmesh->GetCsMovable ()), frustum_mask);
+    csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
     CS_ASSERT(!((num != 0) && (meshes == 0)));
 #ifdef CS_DEBUG
     int i;

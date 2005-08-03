@@ -322,12 +322,6 @@ protected:
   void UpdateMove ();
 
   /**
-   * This function determines whether to draw the imposter
-   * or the true mesh and calls the appropriate function.
-   */
-  void DrawInt (iRenderView* rview, uint32 frustum_mask);
-
-  /**
    * Destructor.  This is private in order to force clients to use DecRef()
    * for object destruction.
    */
@@ -474,17 +468,7 @@ public:
    * then it can be drawn fully here.
    */
   csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
-  	iMovable* movable, uint32 frustum_mask);
-  /// This pass sets up the shadow stencil buffer
-  virtual void DrawShadow (iRenderView* rview, iLight* light);
-  /// This pass draws the diffuse lit mesh
-  virtual void DrawLight (iRenderView* rview, iLight* light);
-  ///Enable/disable hardware based shadows alltogheter
-  virtual void CastHardwareShadow (bool castShadow);
-  /// Sets so that the meshobject is rendered after all fancy HW-shadow-stuff
-  virtual void SetDrawAfterShadow (bool drawAfter);
-  /// Get if the meshobject is rendered after all fancy HW-shadow-stuff
-  virtual bool GetDrawAfterShadow ();
+  	uint32 frustum_mask);
 
   /// Get the children of this mesh object.
   const csMeshMeshList& GetCsChildren () const { return children; }
@@ -550,12 +534,6 @@ public:
   /// This is the function to check distances.  Fn above may not be needed.
   bool CheckImposterRelevant (iRenderView *rview);
   
-  /**
-   * Draw this mesh object given a camera transformation, non-impostered.
-   * If needed the skeleton state will first be updated.
-   */
-  void DrawIntFull (iRenderView* rview, uint32 frustum_mask);
-
   //---------- Bounding volume and beam functions -----------------//
 
   virtual void GetRadius (csVector3& rad, csVector3& cent) const;

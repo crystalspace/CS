@@ -509,16 +509,13 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
   return relevant_lights;
 }
 
-void csMeshWrapper::Draw (iRenderView *rview, uint32 frustum_mask)
-{
-  if (flags.Check (CS_ENTITY_INVISIBLEMESH)) return;
-  DrawInt (rview, frustum_mask);
-}
-
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
-                                               iMovable* mov,
 					       uint32 frustum_mask)
 {
+  //if (imposter_active && CheckImposterRelevant (rview))
+    //if (DrawImposter (rview))
+      //return;
+
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
   size_t i = draw_cb_vector.Length ();
@@ -572,8 +569,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     lastparent = parent;
     parent = parent->csParent;
   }
-    
-  csRenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, mov,
+
+  csRenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
   	old_ctxt != 0 ? 0 : frustum_mask);
   if (old_ctxt)
   {
@@ -581,37 +578,6 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
-}
-
-void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
-{
-  /*
-  if (cast_hardware_shadow)
-    meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode, light);
-  */
-}
-
-void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
-{
-  /*
-  if (draw_test) 
-    meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode, light);
-  */
-}
-
-void csMeshWrapper::CastHardwareShadow (bool castShadow)
-{
-  cast_hardware_shadow = castShadow;
-}
-
-void csMeshWrapper::SetDrawAfterShadow (bool drawAfter)
-{
-  draw_after_fancy_stuff = drawAfter;
-}
-
-bool csMeshWrapper::GetDrawAfterShadow ()
-{
-  return draw_after_fancy_stuff;
 }
 
 //----- Static LOD ----------------------------------------------------------
@@ -660,74 +626,11 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-void csMeshWrapper::DrawInt (iRenderView *rview, uint32 frustum_mask)
-{
-  if (imposter_active && CheckImposterRelevant (rview))
-    if (DrawImposter (rview))
-      return;
-
-  DrawIntFull (rview, frustum_mask);
-}
-
 bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 {
   float wor_sq_dist = GetSquaredDistance (rview);
   float dist = min_imposter_distance->Get ();
   return (wor_sq_dist > dist*dist);
-}
-
-void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
-{
-  CS_ASSERT_MSG("Cannot remove this", 0);
-  iMeshWrapper *meshwrap = (iMeshWrapper*)this;
-
-  int i;
-  // Callback are traversed in reverse order so that they can safely
-  // delete themselves.
-  i = (int)draw_cb_vector.Length ()-1;
-  while (i >= 0)
-  {
-    iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (meshwrap, rview)) return ;
-    i--;
-  }
-
-/*  if (meshobj->DrawTest (rview, &movable.scfiMovable, frustum_mask))
-  {
-    csTicks lt = csEngine::currentEngine->GetLastAnimationTime ();
-    if (lt != 0)
-    {
-      if (lt != last_anim_time)
-      {
-	meshobj->NextFrame (lt, movable.GetPosition ());
-	last_anim_time = lt;
-        iMeshWrapper* lastparent = meshwrap;
-	iMeshWrapper* parent = GetParentContainer();
-	while(parent != 0)
-	{
-	  parent->GetMeshObject()->PositionChild(lastparent->GetMeshObject(),lt);
-	  lastparent = parent;
-	  parent = parent->GetParentContainer();
-	}
-      }
-    }
-
-    //meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
-  }*/
-
-#if 0
-  if (static_lod)
-  {
-    // If we have static lod we only draw the children for the right LOD level.
-    float distance = csQsqrt (GetSquaredDistance (rview));
-    float lod = static_lod->GetLODValue (distance);
-    csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
-    for (i = 0 ; i < meshes.Length () ; i++)
-    {
-      meshes[i]->Draw (rview);
-    }
-  }
-#endif
 }
 
 bool csMeshWrapper::DrawImposter (iRenderView *rview)
