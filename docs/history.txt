@@ -12,6 +12,16 @@ chronological order.
 	- Jorrit removed a few unneeded things from csMeshWrapper (like
 	  the unused flag to cast hardware shadows and the old renderer
 	  functions to draw meshes).
+	- Eric Sunshine chnaged the check for buggy -finline-visibility-hidden
+	  in configure.ac so that it merely disables the option entirely for
+	  AMD64 since the old test (checking for link error when manipulating a
+	  std::basic_string<>) apparently did not catch every buggy
+	  installation. For now, this option is disabled for every gcc version
+	  on AMD64. If we later find out that it only impacts certain versions,
+	  such as 3.4.x and 4.0.x, then we can tighten the heuristic to disable
+	  it for only those versions. Alterately, if we can find a reliable way
+	  of testing (something along the lines of std::basic_string<>), then
+	  we can instead apply that approach.
 2-Aug-2005
 	- Marten converted csSector to new SCF implementation.
 	- Marten fixed some issues in the plugin loader and object registry

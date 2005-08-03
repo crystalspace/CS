@@ -761,12 +761,18 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #
 # IMPLEMENTATION NOTES
 #
-# There is an obscure bug in gcc 3.4.x where -fvisibility-inlines-hidden on
-# AMD64 in combination with STL and gcc's -fPIC and -shared flags (which are
-# used to build plugin modules) causes the linker to fail with a bogus error
-# stating that std::basic_string<> can not be used when making a shared
-# object. We test for this anomaly and avoid -fvisibility-inlines-hidden if
-# present. References:
+# There is an obscure bug in gcc 3.4.x and 4.0.x where
+# -fvisibility-inlines-hidden on AMD64 in combination with -fPIC and -shared
+# flags causes the linker to fail with a bogus error stating that the target
+# library needs to be built with -fPIC even when it has been built using that
+# option. On such installations, if Crystal Space is built with
+# -fvisibility-inlines-hidden, then clients liking against Crystal Space
+# experience this bogus error.  Normally, we would test for this anomaly by
+# manipulating a std::basic_string<> in a test program, and avoid
+# -fvisibility-inlines-hidden if the test program fails to link, however,
+# practical experience has shown that this test is not 100% reliable for all
+# such installations. Instead, for simplicity, we disable this flag presently
+# for all versions of gcc on AMD64.  References:
 #
 #     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
@@ -777,22 +783,12 @@ CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
 
-AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden" && \
-    test $cs_cv_libstl = yes],
+AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
     [AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
-	[CS_BUILD_IFELSE(
-	    [AC_LANG_PROGRAM(
-		[[#include <string>]],
-		[std::string s; s = "";])],
-	    [CS_CREATE_TUPLE([$cs_cv_prog_cxx_visibility_inlines_hidden \
-		$cs_cv_prog_cxx_pic], [$cs_cv_prog_link_shared])],
-	    [C++],
-	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no],
+	[AS_IF([test $host_cpu = x86_64 && test $ac_compiler_gnu = yes],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
-	    [$cs_cv_libstl_cflags],
-	    [$cs_cv_libstl_lflags],
-	    [$cs_cv_libstl_libs])])],
+	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
     [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
 
 AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
