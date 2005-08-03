@@ -9918,6 +9918,7 @@
 	    <params>
 		<factory>Teapot</factory>
 		<localshadows />
+		<mixmode><add/></mixmode>
 	    </params>
 	    <move>
 		<v x="-15" y="-1" z="13" />
