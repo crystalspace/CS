@@ -1129,6 +1129,8 @@ void csGLGraphics3D::Close ()
 
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
+  (void)drawflagNames; // Pacify compiler when CS_DEBUG not defined.
+                       // Avoids `symbols defined but not used' warning.
   GLRENDER3D_OUTPUT_STRING_MARKER(("drawflags = %s", 
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
 
