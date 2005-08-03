@@ -284,6 +284,9 @@ void LoadSectorTask::doTask()
     //osys->EnableQuickStep (1);
   }
 
+  CS_QUERY_REGISTRY_PLUGIN(sector->colsys, sector->objreg, "crystalspace.collisiondetection.opcode",
+                           iCollideSystem);
+
   LOG("csVosSector", 2, "Starting sector load");
 
   vRef<RemoteSearch> rs = meta_cast<RemoteSearch>(sector->GetVobject()->getSite());

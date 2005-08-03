@@ -63,6 +63,7 @@ public:
   Task* chainedtask;
   csVosA3DL *vosa3dl;
   csVector3 startingPos;
+  bool dbl;
 
   std::vector<A3DL::PolygonMesh::Vertex> verts;
   std::vector<A3DL::PolygonMesh::Polygon> polys;
@@ -70,7 +71,8 @@ public:
   std::vector<A3DL::PolygonMesh::TextureSpace> texsp;
 
   ConstructPolygonMeshTask(iObjectRegistry *objreg,  csMetaPolygonMesh* c,
-                           std::string n, iSector *s, const csVector3& pos);
+                           std::string n, iSector *s, const csVector3& pos,
+                           bool doubleSided);
   virtual ~ConstructPolygonMeshTask();
   virtual void doTask();
   void doStatic(iEngine* engine);
@@ -82,9 +84,10 @@ ConstructPolygonMeshTask::ConstructPolygonMeshTask(iObjectRegistry *objreg,
                                                    csMetaPolygonMesh* pm,
                                                    std::string n,
                                                    iSector *s,
-                                                   const csVector3& pos)
+                                                   const csVector3& pos,
+                                                   bool ds)
   : object_reg(objreg), polygonmesh(pm, true), name(n), sector(s),
-    isStatic(false), chainedtask(0), startingPos(pos)
+    isStatic(false), chainedtask(0), startingPos(pos), dbl(ds)
 {
 }
 
@@ -136,7 +139,9 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
         std::string coords;
         for(size_t c = 0; c < polys[i].size(); c++) {
             if(c != 0) coords += ", ";
-            coords += polys[i][c];
+            char num[16];
+            snprintf(num, sizeof(num), "%i", (int)polys[i][c]);
+            coords += num;
         }
         LOG("ConstructPolygonMeshTask", 2, "Discarded polygon "
                      << i << " with three colinear or coincident vertices: ("
@@ -227,8 +232,6 @@ void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
     }
     // XXX check this property below and save it in the task structure above
     // so we can do this check
-    //bool dbl = getDoubleSided();
-    bool dbl = false;
     if(dbl) num *= 2;
     genmesh->SetTriangleCount(num);
     csTriangle* triangles = genmesh->GetTriangles();
@@ -566,13 +569,19 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   else alreadyLoaded = true;
 
   this->vosa3dl = vosa3dl;
+  sector = sect;
 
   double x, y, z;
   getPosition(x, y, z);
 
+  bool dbl = false;
+  try {
+    dbl = getDoubleSided();
+  } catch(NoSuchObjectError) { }
+
   ConstructPolygonMeshTask* cpmt =
     new ConstructPolygonMeshTask(vosa3dl->GetObjectRegistry(), this, getURLstr(),
-                                 sect->GetSector(), csVector3(x, y, z));
+                                 sect->GetSector(), csVector3(x, y, z), dbl);
 
   LOG("csMetaPolygonMesh", 3, "getting vertices");
 

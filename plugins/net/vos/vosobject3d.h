@@ -31,6 +31,7 @@
 #include "iengine/mesh.h"
 #include "csutil/csobject.h"
 #include "ivaria/dynamics.h"
+#include "cstool/collider.h"
 
 #include "csvosa3dl.h"
 #include "vossector.h"
@@ -79,6 +80,8 @@ protected:
   csRef<csVosSector> sector;
   VUtil::vRef<csMetaMaterial> metamaterial;
   bool htvalid;
+  csColliderActor collider_actor;
+  bool setupCA;
 
 public:
   csMetaObject3D(VOS::VobjectBase* superobject);
@@ -123,6 +126,11 @@ public:
   virtual void applyTorque(double x, double y, double z);
   virtual void getLinearVelocity(double& x, double& y, double& z);
   virtual void getAngularVelocity(double& x, double& y, double& z);
+
+  virtual void moveTo(double x, double y, double z, double timestep);
+
+  void doMoveTo(const csVector3& vec, float timestep);
+  void setupCollider();
 };
 
 #endif

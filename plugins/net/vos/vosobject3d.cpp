@@ -29,6 +29,8 @@
 #include "csgeom/vector3.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"
+#include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 
 #include "vosobject3d.h"
 #include <vos/metaobjects/a3dl/a3dl.hh>
@@ -227,6 +229,8 @@ void ConstructObject3DTask::doTask()
     csRef<iThingState> thingstate = SCF_QUERY_INTERFACE(
                              mw->GetMeshObject(), iThingState);
     if (thingstate.IsValid()) thingstate->Unprepare();
+
+    obj->setupCollider();
   }
 }
 
@@ -328,7 +332,8 @@ public:
 csMetaObject3D::csMetaObject3D(VobjectBase* superobject)
     : A3DL::Object3D(superobject),
       alreadyLoaded(false),
-      htvalid(false)
+      htvalid(false),
+      setupCA(false)
 {
   csvobj3d = new csVosObject3D(this, superobject);
   csvobj3d->IncRef();
@@ -681,3 +686,61 @@ void csMetaObject3D::getAngularVelocity(double& x, double& y, double& z)
     }
   }
 }
+
+// Set position task
+
+class MoveToTask : public Task
+{
+  vRef<csMetaObject3D> obj;
+  csVector3 pos;
+  float timestep;
+
+public:
+  MoveToTask (csMetaObject3D *o, const csVector3 &p, float _timestep)
+    : obj(o, true), pos(p), timestep(_timestep) {}
+  ~MoveToTask () {}
+
+  void doTask() { obj->doMoveTo(pos, timestep); }
+};
+
+void csMetaObject3D::doMoveTo(const csVector3& vec, float timestep)
+{
+  collider_actor.Move(timestep, 1.0, vec, csVector3());
+  csVector3 pos = csvobj3d->GetMeshWrapper()->GetMovable()->GetPosition();
+  setPosition(pos.x, pos.y, pos.z);
+}
+
+void csMetaObject3D::moveTo(double x, double y, double z, double timestep)
+{
+  if (setupCA) {
+    //LOG("object3d", 1, "vec is " << x << " " << y << " " << z << " ts is " << timestep);
+    vosa3dl->mainThreadTasks.push (new MoveToTask(this,
+                                                  csVector3((float)x,
+                                                            (float)y,
+                                                            (float)z),
+                                                  timestep));
+  }
+}
+
+void csMetaObject3D::setupCollider()
+{
+  csRef<iEngine> engine = CS_QUERY_REGISTRY(vosa3dl->GetObjectRegistry(), iEngine);
+  collider_actor.SetEngine(engine);
+  collider_actor.SetCollideSystem(sector->GetCollideSystem());
+
+  csRef<iPolygonMesh> pm = SCF_QUERY_INTERFACE(
+    csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet(),
+    iPolygonMesh);
+
+  (new csColliderWrapper(csvobj3d->GetMeshWrapper()->QueryObject(),
+                         sector->GetCollideSystem(), pm))->DecRef();
+
+  csVector3 bbox = csvobj3d->GetMeshWrapper()->GetWorldBoundingBox().GetSize();
+  collider_actor.InitializeColliders(csvobj3d->GetMeshWrapper(), csVector3(bbox.x, bbox.y/2, bbox.z),
+                                     csVector3(bbox.x, bbox.y/2, bbox.z), csVector3(0, -bbox.y/2, 0));
+  collider_actor.SetGravity(1);
+
+  setupCA = true;
+}
+
+

@@ -4,7 +4,7 @@
     This file is part of Crystal Space Virtual Object System Abstract
     3D Layer plugin (csvosa3dl).
 
-    Copyright (C) 2004 Peter Amstutz
+    Copyright (C) 2004-2005 Peter Amstutz
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -205,7 +205,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                             iCollideSystem);
 
 
-#if 1 // dynamics isn't ready yet
+#if 0 // dynamics isn't ready yet
   CS_QUERY_REGISTRY_PLUGIN(dynamics, objreg,
                            "crystalspace.dynamics.ode",
                            iDynamics);

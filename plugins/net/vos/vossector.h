@@ -27,6 +27,7 @@
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
+#include "ivaria/collider.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -44,6 +45,7 @@ private:
   csRef<iProgressMeter> meter;
   VUtil::vRef<csMetaSector> sectorvobj;
   csRef<iDynamicSystem> dynsys;
+  csRef<iCollideSystem> colsys;
 
   csSet < csPtrKey<iVosObject3D> > loadedObjects;
 
@@ -71,6 +73,8 @@ public:
   void removeObject3D (iVosObject3D *obj);
 
   csRef<iDynamicSystem> GetDynSys() { return dynsys; }
+
+  csRef<iCollideSystem> GetCollideSystem() { return colsys; }
 
   //void addLight (iVosLight *light);
   //void removeLight (iVosLight *light);
