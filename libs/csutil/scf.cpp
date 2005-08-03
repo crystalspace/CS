@@ -781,7 +781,6 @@ iBase *csSCF::CreateInstance (const char *iClassID)
   }
 
   size_t idx = ClassRegistry->FindClass(iClassID, true);
-  void *instance = 0;
   iBase *object = 0;
 
   if (idx != (size_t)-1)
