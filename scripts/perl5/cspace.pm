@@ -4617,13 +4617,25 @@ package cspace::iSector;
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iSector_QueryObject;
+*GetMeshes = *cspacec::iSector_GetMeshes;
+*GetVisibleMeshes = *cspacec::iSector_GetVisibleMeshes;
+*GetPortalMeshes = *cspacec::iSector_GetPortalMeshes;
+*RegisterPortalMesh = *cspacec::iSector_RegisterPortalMesh;
+*UnregisterPortalMesh = *cspacec::iSector_UnregisterPortalMesh;
+*UnlinkObjects = *cspacec::iSector_UnlinkObjects;
+*AddSectorMeshCallback = *cspacec::iSector_AddSectorMeshCallback;
+*RemoveSectorMeshCallback = *cspacec::iSector_RemoveSectorMeshCallback;
+*Draw = *cspacec::iSector_Draw;
+*PrepareDraw = *cspacec::iSector_PrepareDraw;
+*GetRecLevel = *cspacec::iSector_GetRecLevel;
+*IncRecLevel = *cspacec::iSector_IncRecLevel;
+*DecRecLevel = *cspacec::iSector_DecRecLevel;
 *SetRenderLoop = *cspacec::iSector_SetRenderLoop;
 *GetRenderLoop = *cspacec::iSector_GetRenderLoop;
 *HasFog = *cspacec::iSector_HasFog;
 *GetFog = *cspacec::iSector_GetFog;
 *SetFog = *cspacec::iSector_SetFog;
 *DisableFog = *cspacec::iSector_DisableFog;
-*GetMeshes = *cspacec::iSector_GetMeshes;
 *GetLights = *cspacec::iSector_GetLights;
 *ShineLights = *cspacec::iSector_ShineLights;
 *SetDynamicAmbientLight = *cspacec::iSector_SetDynamicAmbientLight;
@@ -4632,26 +4644,14 @@ package cspace::iSector;
 *CalculateSectorBBox = *cspacec::iSector_CalculateSectorBBox;
 *SetVisibilityCullerPlugin = *cspacec::iSector_SetVisibilityCullerPlugin;
 *GetVisibilityCuller = *cspacec::iSector_GetVisibilityCuller;
-*GetRecLevel = *cspacec::iSector_GetRecLevel;
-*IncRecLevel = *cspacec::iSector_IncRecLevel;
-*DecRecLevel = *cspacec::iSector_DecRecLevel;
+*CheckFrustum = *cspacec::iSector_CheckFrustum;
 *HitBeamPortals = *cspacec::iSector_HitBeamPortals;
 *HitBeam = *cspacec::iSector_HitBeam;
 *FollowSegment = *cspacec::iSector_FollowSegment;
-*Draw = *cspacec::iSector_Draw;
-*PrepareDraw = *cspacec::iSector_PrepareDraw;
-*GetVisibleMeshes = *cspacec::iSector_GetVisibleMeshes;
 *SetSectorCallback = *cspacec::iSector_SetSectorCallback;
 *RemoveSectorCallback = *cspacec::iSector_RemoveSectorCallback;
 *GetSectorCallbackCount = *cspacec::iSector_GetSectorCallbackCount;
 *GetSectorCallback = *cspacec::iSector_GetSectorCallback;
-*AddSectorMeshCallback = *cspacec::iSector_AddSectorMeshCallback;
-*RemoveSectorMeshCallback = *cspacec::iSector_RemoveSectorMeshCallback;
-*CheckFrustum = *cspacec::iSector_CheckFrustum;
-*GetPortalMeshes = *cspacec::iSector_GetPortalMeshes;
-*RegisterPortalMesh = *cspacec::iSector_RegisterPortalMesh;
-*UnregisterPortalMesh = *cspacec::iSector_UnregisterPortalMesh;
-*UnlinkObjects = *cspacec::iSector_UnlinkObjects;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6205,6 +6205,7 @@ package cspace::iGeneralFactoryState;
 *Invalidate = *cspacec::iGeneralFactoryState_Invalidate;
 *CalculateNormals = *cspacec::iGeneralFactoryState_CalculateNormals;
 *GenerateBox = *cspacec::iGeneralFactoryState_GenerateBox;
+*GenerateSphere = *cspacec::iGeneralFactoryState_GenerateSphere;
 *SetBack2Front = *cspacec::iGeneralFactoryState_SetBack2Front;
 *IsAutoNormals = *cspacec::iGeneralFactoryState_IsAutoNormals;
 *IsBack2Front = *cspacec::iGeneralFactoryState_IsBack2Front;
@@ -12181,6 +12182,8 @@ package cspace::iDynamicSystem;
 *CreateBody = *cspacec::iDynamicSystem_CreateBody;
 *RemoveBody = *cspacec::iDynamicSystem_RemoveBody;
 *FindBody = *cspacec::iDynamicSystem_FindBody;
+*GetBody = *cspacec::iDynamicSystem_GetBody;
+*GetBodysCount = *cspacec::iDynamicSystem_GetBodysCount;
 *CreateGroup = *cspacec::iDynamicSystem_CreateGroup;
 *RemoveGroup = *cspacec::iDynamicSystem_RemoveGroup;
 *CreateJoint = *cspacec::iDynamicSystem_CreateJoint;
@@ -12191,6 +12194,12 @@ package cspace::iDynamicSystem;
 *AttachColliderBox = *cspacec::iDynamicSystem_AttachColliderBox;
 *AttachColliderSphere = *cspacec::iDynamicSystem_AttachColliderSphere;
 *AttachColliderPlane = *cspacec::iDynamicSystem_AttachColliderPlane;
+*DestroyColliders = *cspacec::iDynamicSystem_DestroyColliders;
+*DestroyCollider = *cspacec::iDynamicSystem_DestroyCollider;
+*AttachCollider = *cspacec::iDynamicSystem_AttachCollider;
+*CreateCollider = *cspacec::iDynamicSystem_CreateCollider;
+*GetCollider = *cspacec::iDynamicSystem_GetCollider;
+*GetColliderCount = *cspacec::iDynamicSystem_GetColliderCount;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12331,6 +12340,9 @@ package cspace::iRigidBody;
 *AttachColliderBox = *cspacec::iRigidBody_AttachColliderBox;
 *AttachColliderSphere = *cspacec::iRigidBody_AttachColliderSphere;
 *AttachColliderPlane = *cspacec::iRigidBody_AttachColliderPlane;
+*AttachCollider = *cspacec::iRigidBody_AttachCollider;
+*DestroyColliders = *cspacec::iRigidBody_DestroyColliders;
+*DestroyCollider = *cspacec::iRigidBody_DestroyCollider;
 *SetPosition = *cspacec::iRigidBody_SetPosition;
 *GetPosition = *cspacec::iRigidBody_GetPosition;
 *SetOrientation = *cspacec::iRigidBody_SetOrientation;
@@ -12363,6 +12375,8 @@ package cspace::iRigidBody;
 *SetCollisionCallback = *cspacec::iRigidBody_SetCollisionCallback;
 *Collision = *cspacec::iRigidBody_Collision;
 *Update = *cspacec::iRigidBody_Update;
+*GetCollider = *cspacec::iRigidBody_GetCollider;
+*GetColliderCount = *cspacec::iRigidBody_GetColliderCount;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12370,6 +12384,53 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iRigidBody($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iDynamicsSystemCollider ##############
+
+package cspace::iDynamicsSystemCollider;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*CreateSphereGeometry = *cspacec::iDynamicsSystemCollider_CreateSphereGeometry;
+*CreatePlaneGeometry = *cspacec::iDynamicsSystemCollider_CreatePlaneGeometry;
+*CreateMeshGeometry = *cspacec::iDynamicsSystemCollider_CreateMeshGeometry;
+*CreateBoxGeometry = *cspacec::iDynamicsSystemCollider_CreateBoxGeometry;
+*CreateCCylinderGeometry = *cspacec::iDynamicsSystemCollider_CreateCCylinderGeometry;
+*SetFriction = *cspacec::iDynamicsSystemCollider_SetFriction;
+*SetSoftness = *cspacec::iDynamicsSystemCollider_SetSoftness;
+*SetDensity = *cspacec::iDynamicsSystemCollider_SetDensity;
+*SetElasticity = *cspacec::iDynamicsSystemCollider_SetElasticity;
+*GetFriction = *cspacec::iDynamicsSystemCollider_GetFriction;
+*GetSoftness = *cspacec::iDynamicsSystemCollider_GetSoftness;
+*GetDensity = *cspacec::iDynamicsSystemCollider_GetDensity;
+*GetElasticity = *cspacec::iDynamicsSystemCollider_GetElasticity;
+*FillWithColliderGeometry = *cspacec::iDynamicsSystemCollider_FillWithColliderGeometry;
+*GetGeometryType = *cspacec::iDynamicsSystemCollider_GetGeometryType;
+*GetTransform = *cspacec::iDynamicsSystemCollider_GetTransform;
+*SetTransform = *cspacec::iDynamicsSystemCollider_SetTransform;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDynamicsSystemCollider($self);
         delete $OWNER{$self};
     }
 }
@@ -13769,6 +13830,11 @@ sub csConVeryBottom () { $cspacec::csConVeryBottom }
 sub csConNoCursor () { $cspacec::csConNoCursor }
 sub csConNormalCursor () { $cspacec::csConNormalCursor }
 sub csConInsertCursor () { $cspacec::csConInsertCursor }
+sub BOX_COLLIDER_GEOMETRY () { $cspacec::BOX_COLLIDER_GEOMETRY }
+sub PLANE_COLLIDER_GEOMETRY () { $cspacec::PLANE_COLLIDER_GEOMETRY }
+sub TRIMESH_COLLIDER_GEOMETRY () { $cspacec::TRIMESH_COLLIDER_GEOMETRY }
+sub CYLINDER_COLLIDER_GEOMETRY () { $cspacec::CYLINDER_COLLIDER_GEOMETRY }
+sub SPHERE_COLLIDER_GEOMETRY () { $cspacec::SPHERE_COLLIDER_GEOMETRY }
 sub CS_SEQUENCE_LIGHTCHANGE_NONE () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_NONE }
 sub CS_SEQUENCE_LIGHTCHANGE_LESS () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_LESS }
 sub CS_SEQUENCE_LIGHTCHANGE_GREATER () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_GREATER }
