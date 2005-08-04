@@ -5480,7 +5480,6 @@ package cspace::iMeshWrapper;
 *GetStaticLOD = *cspacec::iMeshWrapper_GetStaticLOD;
 *AddMeshToStaticLOD = *cspacec::iMeshWrapper_AddMeshToStaticLOD;
 *RemoveMeshFromStaticLOD = *cspacec::iMeshWrapper_RemoveMeshFromStaticLOD;
-*CastHardwareShadow = *cspacec::iMeshWrapper_CastHardwareShadow;
 *GetSVContext = *cspacec::iMeshWrapper_GetSVContext;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
