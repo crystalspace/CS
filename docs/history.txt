@@ -24,6 +24,8 @@ chronological order.
 	  we can instead apply that approach.
 	- Peter Amstutz applied fixes to iXWindow, iWxWindow and the VOS
 	  interfaces to compile with the new SCF implementation
+	- Peter Amstutz fixed csThing so that it invalidates the bounding
+	  box when HardTransform() is called
 2-Aug-2005
 	- Marten converted csSector to new SCF implementation.
 	- Marten fixed some issues in the plugin loader and object registry
