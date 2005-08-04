@@ -4811,7 +4811,6 @@ class iMeshWrapper(iBase):
     def GetStaticLOD(*args): return _cspace.iMeshWrapper_GetStaticLOD(*args)
     def AddMeshToStaticLOD(*args): return _cspace.iMeshWrapper_AddMeshToStaticLOD(*args)
     def RemoveMeshFromStaticLOD(*args): return _cspace.iMeshWrapper_RemoveMeshFromStaticLOD(*args)
-    def CastHardwareShadow(*args): return _cspace.iMeshWrapper_CastHardwareShadow(*args)
     def GetSVContext(*args): return _cspace.iMeshWrapper_GetSVContext(*args)
     def __del__(self, destroy=_cspace.delete_iMeshWrapper):
         try:
