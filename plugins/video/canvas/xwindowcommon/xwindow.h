@@ -36,7 +36,7 @@ struct iImage;
 SCF_VERSION (iXWindow, 1, 0, 0);
 
 /// Document me! @@@
-struct iXWindow : public iBase
+struct iXWindow : public virtual iBase
 {
   // These should be inherited from csNativeWindow
   virtual bool Open () = 0;
@@ -64,16 +64,16 @@ struct iXWindow : public iBase
   // Should be in the window manager...
   virtual bool SetMousePosition (int x, int y) = 0;
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
-  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
                                int hotspot_x, int hotspot_y,
                                csRGBcolor fg, csRGBcolor bg) = 0;
   /**
-   * Show a message box. 
-   * \return Whether the message was actually shown. If 'false', the 
+   * Show a message box.
+   * \return Whether the message was actually shown. If 'false', the
    * caller should display the message in an alternate way.
    */
   virtual bool AlertV (int type, const char* title, const char* okMsg,
-  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
+        const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
 };
 
 #endif // __CS_IVIDEO_XWINDOW_H__
