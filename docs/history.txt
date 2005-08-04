@@ -22,6 +22,8 @@ chronological order.
 	  it for only those versions. Alterately, if we can find a reliable way
 	  of testing (something along the lines of std::basic_string<>), then
 	  we can instead apply that approach.
+	- Peter Amstutz applied fixes to iXWindow, iWxWindow and the VOS
+	  interfaces to compile with the new SCF implementation
 2-Aug-2005
 	- Marten converted csSector to new SCF implementation.
 	- Marten fixed some issues in the plugin loader and object registry
