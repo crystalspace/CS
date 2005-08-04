@@ -59,7 +59,7 @@ SCF_VERSION (iVosObject3D, 0, 1, 1);
     interface.  Obviously that will change as the iVosSector interface
     is fleshed out (or an alternate interface is introduced instead of this...).
 */
-struct iVosObject3D : public iBase
+struct iVosObject3D : public virtual iBase
 {
   /** Get the iMeshWrapper for this Object3D. */
   virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
@@ -80,7 +80,7 @@ SCF_VERSION (iVosSector, 0, 3, 0);
 
 /** This interface bridges between a VOS sector and a Crystal Space
     sector. */
-struct iVosSector : public iBase
+struct iVosSector : public virtual iBase
 {
   /** Begin loading this sector in the background.  Network activity
       occurs in another thread, so this method returns immediately.
@@ -121,7 +121,7 @@ SCF_VERSION (iVosA3DL, 0, 1, 1);
     @endcode
 
  */
-struct iVosA3DL : public iBase
+struct iVosA3DL : public virtual iBase
 {
   /** Get a VOS sector given a VOS URL (such as
       "vop://interreality.org/world") for a sector object.  Doesn't
