@@ -578,7 +578,7 @@ CS_STATIC_VARIABLE_CLEANUP						\
  */
 #define SCF_IMPLEMENT_FACTORY_CREATE(Class)				\
 CS_EXPORTED_FUNCTION 							\
-void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
+iBase* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
 {									\
   iBase *ret = new Class (iParent);					\
   SCF_TRACE (("  %p = new %s ()\n", ret, #Class));			\
@@ -607,7 +607,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
  * into the program
  */
 #define SCF_REGISTER_STATIC_CLASS(Class,Ident,Desc,Dep)			\
-  CS_EXPORTED_FUNCTION void* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
+  CS_EXPORTED_FUNCTION iBase* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
   class Class##_StaticInit__						\
   {									\
   public:								\
@@ -640,7 +640,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
  * automatic registration.
  */
 #define SCF_DEFINE_FACTORY_FUNC_REGISTRATION(Class)			\
-  CS_EXPORTED_FUNCTION void* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
+  CS_EXPORTED_FUNCTION iBase* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
   class Class##_StaticInit						\
   {									\
   public:								\
