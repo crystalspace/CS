@@ -1421,8 +1421,7 @@ AS_IF([test $cs_cv_libode = yes],
     [CS_CHECK_BUILD([if libode is sufficiently recent], [cs_cv_libode_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <ode/ode.h>]],
-	    [dWorldID w = dWorldCreate();
-	    dWorldQuickStep(w,0.0f);])],
+	    [dGeomTriMeshGetTriangleCount(0);])],
 	[], [C++], [], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
 	[cs_cv_libode_recent=no])
