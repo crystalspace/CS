@@ -35028,8 +35028,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-dWorldID w = dWorldCreate();
-	    dWorldQuickStep(w,0.0f);
+dGeomTriMeshGetTriangleCount(0);
   ;
   return 0;
 }
@@ -35180,8 +35179,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-dWorldID w = dWorldCreate();
-	    dWorldQuickStep(w,0.0f);
+dGeomTriMeshGetTriangleCount(0);
   ;
   return 0;
 }
