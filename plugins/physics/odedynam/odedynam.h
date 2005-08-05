@@ -275,7 +275,8 @@ private:
   csRefArray<csODEBodyGroup> groups;
   csRefArray<csODEJoint> joints;
   csRefArray<csStrictODEJoint> strict_joints;
-  csRefArray<iDynamicsSystemCollider> colliders; //here are all colliders not attached to bodies
+
+  csGeomList geoms;
 
   bool rateenabled;
   float steptime, limittime;
@@ -322,10 +323,6 @@ public:
     { scfParent->RemoveBody (body); }
     iRigidBody *FindBody (const char *name)
     { return scfParent->FindBody (name); }
-    iRigidBody *GetBody (unsigned int index)
-    {return scfParent->GetBody (index);}
-    int GetBodysCount ()
-    {return scfParent->GetBodysCount ();}
     csPtr<iBodyGroup> CreateGroup ()
     { return scfParent->CreateGroup (); }
     void RemoveGroup (iBodyGroup *group)
@@ -336,33 +333,21 @@ public:
     { scfParent->RemoveJoint (joint); }
     iDynamicsMoveCallback* GetDefaultMoveCallback ()
     { return scfParent->GetDefaultMoveCallback (); }
-    bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans,
+        bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans,
             float friction, float elasticity, float softness)
-    { return scfParent->AttachColliderMesh (mesh, trans, friction, elasticity, softness); }
-    bool AttachColliderCylinder (float length, float radius,
+        { return scfParent->AttachColliderMesh (mesh, trans, friction, elasticity, softness); }
+        bool AttachColliderCylinder (float length, float radius,
             const csOrthoTransform& trans, float friction, float elasticity, float softness)
     { return scfParent->AttachColliderCylinder (length, radius, trans, friction, elasticity, softness); }
-    bool AttachColliderBox (const csVector3 &size, const csOrthoTransform&
+        bool AttachColliderBox (const csVector3 &size, const csOrthoTransform&
             trans, float friction, float elasticity, float softness)
     { return scfParent->AttachColliderBox (size, trans, friction, elasticity, softness); }
     bool AttachColliderSphere (float radius, const csVector3 &offset,
-      float friction, float elasticity, float softness)
+            float friction, float elasticity, float softness)
     { return scfParent->AttachColliderSphere (radius, offset, friction, elasticity, softness); }
     bool AttachColliderPlane (const csPlane3 &plane, float friction,
-      float elasticity, float softness)
+        float elasticity, float softness)
     { return scfParent->AttachColliderPlane (plane, friction, elasticity, softness); }
-    csRef<iDynamicsSystemCollider> GetCollider (unsigned int index)
-    {return scfParent->GetCollider (index);}
-    int GetColliderCount ()
-    {return scfParent->GetColliderCount ();}
-    csRef<iDynamicsSystemCollider> CreateCollider ()
-    {return scfParent->CreateCollider ();}
-    void DestroyColliders ()
-    {scfParent->DestroyColliders ();}
-    void DestroyCollider (iDynamicsSystemCollider* collider) 
-    {scfParent->DestroyCollider (collider);}
-    void AttachCollider (iDynamicsSystemCollider* collider)
-    {scfParent->AttachCollider (collider);}
   } scfiDynamicSystem;
   friend struct DynamicSystem;
 
@@ -499,8 +484,6 @@ public:
   virtual csPtr<iRigidBody> CreateBody ();
   virtual void RemoveBody (iRigidBody* body);
   virtual iRigidBody *FindBody (const char *name);
-  iRigidBody *GetBody (unsigned int index);
-  int GetBodysCount () {return (int)bodies.GetSize();};
 
   virtual csPtr<iBodyGroup> CreateGroup ();
   virtual void RemoveGroup (iBodyGroup *group);
@@ -531,12 +514,6 @@ public:
         float friction, float elasticity, float softness);
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float elasticity, float softness);
-  csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
-  int GetColliderCount () {return (int)colliders.GetSize ();};
-  csRef<iDynamicsSystemCollider> CreateCollider ();
-  void DestroyColliders () {colliders.DeleteAll ();};
-  void DestroyCollider (iDynamicsSystemCollider* collider) {colliders.Delete (collider);};
-  void AttachCollider (iDynamicsSystemCollider* collider);
 };
 
 class csODERigidBody;
@@ -563,60 +540,6 @@ public:
   bool BodyInGroup (iRigidBody *body);
 };
 
-class csODECollider : public iDynamicsSystemCollider
-{
-  csColliderGeometryType geom_type;
-  dGeomID geomID;
-  dGeomID transformID;
-  dSpaceID spaceID; 
-  float density;
-  csRef<iDynamicsCollisionCallback> coll_cb;
-  float surfacedata[3];
-
-public:
-
-  SCF_DECLARE_IBASE;
-
-  csODECollider ();
-  virtual ~csODECollider (); 
-  
-  bool CreateSphereGeometry (const csSphere& sphere);
-  bool CreatePlaneGeometry (const csPlane3& plane);
-  bool CreateMeshGeometry (iMeshWrapper *mesh);
-  bool CreateBoxGeometry (const csVector3& box_size);
-  bool CreateCCylinderGeometry (float length, float radius);
-
-  void SetCollisionCallback (iDynamicsCollisionCallback* cb) {coll_cb = cb;};
-  void SetFriction (float friction) {surfacedata[0] = friction;};
-  void SetSoftness (float softness) {surfacedata[1] = softness;};
-  void SetElasticity (float elasticity) {surfacedata[2] = elasticity;};
-  void SetDensity (float density) {csODECollider::density = density;}
-  
-  float GetFriction () {return surfacedata[0];};
-  float GetSoftness () {return surfacedata[1];};
-  float GetElasticity () {return surfacedata[2];};
-  float GetDensity () {return density;};
-
-  void FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact);
-
-  csOrthoTransform GetTransform ();
-  void SetTransform (const csOrthoTransform& trans);
-
-  csColliderGeometryType GetGeometryType () {return geom_type;};
-
-  void AttachBody (dBodyID bodyID);
-
-  void AddToSpace (dSpaceID spaceID);
-
-private:
-
-  inline void CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat);
-  inline void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat);
-  void MassCorrection ();
-  void ClearContents ();
-
-};
-
 /**
  * This is the implementation for a rigid body.
  * It keeps all properties for the body.
@@ -628,8 +551,8 @@ class csODERigidBody : public csObject
 private:
   dBodyID bodyID;
   dSpaceID groupID;
+  csGeomList geoms;
   dJointID statjoint;
-  csRefArray<iDynamicsSystemCollider> colliders;
 
   /* these must be ptrs to avoid circular referencing */
   iBodyGroup* collision_group;
@@ -640,7 +563,6 @@ private:
   csRef<iDynamicsCollisionCallback> coll_cb;
 
 public:
-
   SCF_DECLARE_IBASE_EXT (csObject);
 
   struct RigidBody : public iRigidBody
@@ -744,16 +666,6 @@ public:
     { scfParent->Collision (other); }
     void Update ()
     { scfParent->Update (); }
-    csRef<iDynamicsSystemCollider> GetCollider (unsigned int index)
-    {return scfParent->GetCollider (index);}
-    int GetColliderCount () 
-    {return scfParent->GetColliderCount ();}
-    void AttachCollider (iDynamicsSystemCollider* collider)
-    {scfParent->AttachCollider (collider);}
-    void DestroyColliders ()
-    {scfParent->DestroyColliders ();}
-    void DestroyCollider (iDynamicsSystemCollider* collider)
-    {scfParent->DestroyCollider (collider);}
   } scfiRigidBody;
   friend struct RigidBody;
 
@@ -788,9 +700,6 @@ public:
   /// ODE planes are globally transformed, immobile, infinitely dense
   bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float density, float elasticity, float softness);
-  void AttachCollider (iDynamicsSystemCollider* collider);
-  void DestroyColliders () {colliders.DeleteAll ();};
-  void DestroyCollider (iDynamicsSystemCollider* collider) {colliders.Delete (collider);};
 
   void SetPosition (const csVector3& trans);
   const csVector3 GetPosition () const;
@@ -836,9 +745,6 @@ public:
 
   void Collision (iRigidBody *other);
   void Update ();
-
-  csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
-  int GetColliderCount () {return (int)colliders.GetSize ();};
 };
 
 

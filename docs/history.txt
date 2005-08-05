@@ -8,6 +8,8 @@ chronological order.
 
 5-Aug-2005
 	- res made adjustments for the latest cs-win32libs.
+	- Jorrit reverted Piotr's changes to ODE physics plugin completely
+	  since they totally break it.
 4-Aug-2005
 	- Jorrit added support for genmesh/submeshes also to factories.
 	  The optional submeshes defined in the instance will override
