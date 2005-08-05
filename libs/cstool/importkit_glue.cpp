@@ -42,6 +42,8 @@
 #include "cstool/importkit.h"
 #include "importkit_glue.h"
 
+#include <ctype.h>
+
 namespace CrystalSpace
 {
   namespace ImportKitImpl 
