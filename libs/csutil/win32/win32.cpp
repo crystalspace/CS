@@ -768,10 +768,14 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
         iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
 	int wheelDelta = (short)HIWORD (wParam);
 	// @@@ Only emit events when WHEEL_DELTA wheel ticks accumulated?
+  POINT coords;
+  coords.x = short (LOWORD (lParam));
+  coords.y = short (HIWORD (lParam));
+  ScreenToClient(hWnd, &coords);
 	outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, true,
-	  short (LOWORD (lParam)), short (HIWORD (lParam)));
+	  coords.x, coords.y);
 	//outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, false,
-	  //short (LOWORD (lParam)), short (HIWORD (lParam))); 
+	  //coords.x, coords.y); 
       }
       return 0;
     }
