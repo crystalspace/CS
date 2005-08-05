@@ -11,6 +11,15 @@ chronological order.
 	- Jorrit reverted Piotr's changes to ODE physics plugin completely
 	  since they totally break it.
 	- Mark Sanders fixed a bug with mousewheel wich gave wrong coordinates.
+	- res added the "import kit", a wrapper around the loader and mesh
+	  factory interfaces to provide an interface for external applications
+	  to obtain CS mesh data without much interface juggling. Currently
+	  supports simple genmeshes, though support for Things is planned.
+	- res added a method to csVfsDirectoryChanger that just pushes the
+	  current directory (useful when some "custom" directory changing
+	  should be done).
+	- res deprecated csStrKey.
+	- res simplified some code in glwin32.
 4-Aug-2005
 	- Jorrit added support for genmesh/submeshes also to factories.
 	  The optional submeshes defined in the instance will override

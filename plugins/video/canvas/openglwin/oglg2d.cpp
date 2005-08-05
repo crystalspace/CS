@@ -506,8 +506,6 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 bool csGraphics2DOpenGL::Open ()
 {
   if (is_open) return true;
-  DWORD exStyle;
-  DWORD style;
 
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
@@ -542,43 +540,37 @@ bool csGraphics2DOpenGL::Open ()
 
   m_bActivated = true;
 
+  int wwidth = Width;
+  int wheight = Height;
+  DWORD exStyle = 0;
+  DWORD style = WS_POPUP | WS_SYSMENU;
+  int xpos = 0;
+  int ypos = 0;
   if (FullScreen)
   {
-    exStyle = 0;/*WS_EX_TOPMOST;*/
-    style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
-    if (cswinIsWinNT ())
-    {
-      m_hWnd = CreateWindowExW (exStyle, CS_WIN32_WINDOW_CLASS_NAMEW, 0, style, 0, 0, 
-	Width, Height, 0, 0, m_hInstance, 0);
-    }
-    else
-    {
-      m_hWnd = CreateWindowExA (exStyle, CS_WIN32_WINDOW_CLASS_NAME, 0, style, 0, 0, 
-	Width, Height, 0, 0, m_hInstance, 0);
-    }
+    /*exStyle |= WS_EX_TOPMOST;*/
   }
   else
   {
-    exStyle = 0;
-    style = WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
+    style |= WS_CAPTION | WS_MINIMIZEBOX;
     if (AllowResizing) 
-    {
       style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
-    }
-    int wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
-    int wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
-    if (cswinIsWinNT ())
-    {
-      m_hWnd = CreateWindowExW (exStyle, CS_WIN32_WINDOW_CLASS_NAMEW, 0, style,
-	(GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
-	wwidth, wheight, 0, 0, m_hInstance, 0 );
-    }
-    else
-    {
-      m_hWnd = CreateWindowExA (exStyle, CS_WIN32_WINDOW_CLASS_NAME, 0, style,
-	(GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2, (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
-	wwidth, wheight, 0, 0, m_hInstance, 0 );
-    }
+    
+    wwidth += 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
+    wheight += 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
+    xpos = (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2;
+    ypos = (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2;
+  }
+
+  if (cswinIsWinNT ())
+  {
+    m_hWnd = CreateWindowExW (exStyle, CS_WIN32_WINDOW_CLASS_NAMEW, 0, style, 
+      xpos, ypos, wwidth, wheight, 0, 0, m_hInstance, 0);
+  }
+  else
+  {
+    m_hWnd = CreateWindowExA (exStyle, CS_WIN32_WINDOW_CLASS_NAME, 0, style, 
+      xpos, ypos, wwidth, wheight, 0, 0, m_hInstance, 0);
   }
 
   if (!m_hWnd)
@@ -587,7 +579,7 @@ bool csGraphics2DOpenGL::Open ()
   SetTitle (win_title);
   
   // Subclass the window
-  if (cswinIsWinNT ())
+  if (IsWindowUnicode (m_hWnd))
   {
     m_OldWndProc = (WNDPROC)SetWindowLongPtrW (m_hWnd, GWL_WNDPROC, (LONG_PTR) WindowProc);
     SetWindowLongPtrW (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
@@ -902,14 +894,10 @@ void csGraphics2DOpenGL::SetTitle (const char* title)
   csGraphics2D::SetTitle (title);
   if (m_hWnd)
   {
-    if (cswinIsWinNT ())
-    {
+    if (IsWindowUnicode (m_hWnd))
       SetWindowTextW (m_hWnd, csCtoW (title));
-    }
     else
-    {
       SetWindowTextA (m_hWnd, cswinCtoA (title));
-    }
   }
 }
 

@@ -62,4 +62,15 @@ public:
       popCount++;
     }
   }
+  /**
+   * Just pushes the current directory, but doesn't change it in anyway - 
+   * useful when you want to call ChDir() or ChDirAuto() manually for some
+   * reason, but still want to have the current directory restored 
+   * automatically.
+   */
+  void PushDir ()
+  {
+    vfs->PushDir ();
+    popCount++;
+  }
 };

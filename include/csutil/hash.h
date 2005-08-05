@@ -197,6 +197,7 @@ public:
 /**
  * This is a simple helper class to make a copy of a const char*.
  * This can be used to have a hash that makes copies of the keys.
+ * \deprecated csString can also be used for hash keys.
  */
 class csStrKey
 {
