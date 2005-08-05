@@ -88,6 +88,44 @@ struct iGeneralMeshCommonState : public iBase
   virtual bool IsShadowReceiving () const = 0;
 
   /**
+   * Remove all submeshes added to this object
+   */
+  virtual void ClearSubMeshes () = 0;
+
+  /**
+   * Add a submesh to this object. A submesh is a subset of the mesh triangles
+   * rendered with a certain material. When a mesh has one or more submeshes,
+   * only submeshes are drawn and not original geometry. That means submeshes
+   * should cover all original triangles to avoid holes in the mesh.
+   * triangles is an array of indices into the factory triangle list
+   * tricount is the number of triangles in "triangles"
+   * material is a material to assign to the mesh
+   * Note! Submeshes added to an instance of a genmesh will override
+   * the submeshes from the factory (i.e. the submeshes of the factory will
+   * be completely ignored as soon as the instance has submeshes).
+   */
+  virtual void AddSubMesh (unsigned int *triangles,
+    int tricount,
+    iMaterialWrapper *material) = 0;
+
+  /**
+   * Add a submesh to this object. A submesh is a subset of the mesh triangles
+   * rendered with a certain material. When a mesh has one or more submeshes,
+   * only submeshes are drawn and not original geometry. That means submeshes
+   * should cover all original triangles to avoid holes in the mesh.
+   * triangles is an array of indices into the factory triangle list
+   * tricount is the number of triangles in "triangles"
+   * material is a material to assign to the mesh
+   * Note! Submeshes added to an instance of a genmesh will override
+   * the submeshes from the factory (i.e. the submeshes of the factory will
+   * be completely ignored as soon as the instance has submeshes).
+   * This version overrides the parent mixmode.
+   */
+  virtual void AddSubMesh (unsigned int *triangles,
+    int tricount,
+    iMaterialWrapper *material, uint mixmode) = 0;
+
+  /**
    * Adds an independently named render buffer.
    */
   virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer) = 0;
@@ -128,38 +166,6 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
    * Get the current animation control for this object.
    */
   virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
-
-  /**
-   * Remove all submeshes added to this object
-   */
-  virtual void ClearSubMeshes () = 0;
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   */
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material) = 0;
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * This version overrides the parent mixmode.
-   */
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material, uint mixmode) = 0;
 };
 
 SCF_VERSION (iGeneralFactoryState, 0, 3, 0);

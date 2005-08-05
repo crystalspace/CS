@@ -56,11 +56,15 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
 
+  /// Parse a submesh node
+  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
+    iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
+
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
-  bool ParseRenderBuffer(iDocumentNode *node, iGeneralFactoryState* state);
+  bool ParseRenderBuffer (iDocumentNode *node, iGeneralFactoryState* state);
 
   struct eiComponent : public iComponent
   {
@@ -130,10 +134,10 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
   /// Parse a render buffer node
-  bool ParseRenderBuffer(iDocumentNode *node, iGeneralMeshState* state, 
+  bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);
   /// Parse a submesh node
-  bool ParseSubMesh(iDocumentNode *node, iGeneralMeshState* state, 
+  bool ParseSubMesh (iDocumentNode *node, iGeneralMeshCommonState* state, 
     iGeneralFactoryState* factstate, iLoaderContext* ldr_context);
 
   struct eiComponent : public iComponent

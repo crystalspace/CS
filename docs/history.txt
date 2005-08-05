@@ -8,12 +8,19 @@ chronological order.
 
 5-Aug-2005
 	- res made adjustments for the latest cs-win32libs.
+4-Aug-2005
+	- Jorrit added support for genmesh/submeshes also to factories.
+	  The optional submeshes defined in the instance will override
+	  the submeshes from the factory (if present).
 3-Aug-2005
 	- Peter Amstutz added support for csColliderActor to the csvosa3dl
 	  plugin
 	- Jorrit removed a few unneeded things from csMeshWrapper (like
 	  the unused flag to cast hardware shadows and the old renderer
 	  functions to draw meshes).
+	- Jorrit changed reflect.xml and reflectsphere.xml so that they
+	  support objects with mixmode add/alpha/... Changed the teapot
+	  in flarge to use add mixmode.
 	- Eric Sunshine chnaged the check for buggy -finline-visibility-hidden
 	  in configure.ac so that it merely disables the option entirely for
 	  AMD64 since the old test (checking for link error when manipulating a

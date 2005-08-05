@@ -33,6 +33,7 @@
 #include "csutil/hash.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
+#include "csutil/parray.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
@@ -99,7 +100,6 @@ struct csGenmeshSubMesh
 class csGenmeshMeshObject : public iMeshObject
 {
 private:
-
   csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
@@ -119,7 +119,7 @@ private:
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 
-  csArray<csGenmeshSubMesh*> subMeshes;
+  csPDelArray<csGenmeshSubMesh> subMeshes;
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
 
   csUserRenderBufferManager userBuffers;
@@ -588,6 +588,8 @@ private:
   csUserRenderBufferManager userBuffers;
   csArray<csStringID> user_buffer_names;
 
+  csPDelArray<csGenmeshSubMesh> subMeshes;
+
   uint default_mixmode;
   bool default_lighting;
   csColor default_color;
@@ -646,6 +648,11 @@ public:
   csFlags flags;
 
   iEngine* engine;
+
+  const csPDelArray<csGenmeshSubMesh>& GetSubMeshes () const
+  {
+    return subMeshes;
+  }
 
   /// Constructor.
   csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
@@ -707,6 +714,10 @@ public:
   { return userBuffers; }
   iStringSet* GetStrings()
   { return strings; }
+
+  void ClearSubMeshes ();
+  void AddSubMesh (unsigned int *triangles,
+    int tricount, iMaterialWrapper *material, bool do_mixmode, uint mixmode);
 
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
@@ -929,6 +940,21 @@ public:
     { return scfParent->AddRenderBuffer (name, buffer); }
     virtual bool RemoveRenderBuffer (const char *name)
     { return scfParent->RemoveRenderBuffer (name); }
+    virtual void ClearSubMeshes ()
+    {
+      scfParent->ClearSubMeshes ();
+    }
+    virtual void AddSubMesh (unsigned int *triangles,
+      int tricount,
+      iMaterialWrapper *material)
+    {
+      scfParent->AddSubMesh (triangles, tricount, material, false, CS_FX_COPY);
+    }
+    virtual void AddSubMesh (unsigned int *triangles,
+      int tricount, iMaterialWrapper *material, uint mixmode)
+    {
+      scfParent->AddSubMesh (triangles, tricount, material, true, mixmode);
+    }
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
 

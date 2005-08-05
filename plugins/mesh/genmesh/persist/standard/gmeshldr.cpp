@@ -146,6 +146,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
   xmltokens.Register ("back2front", XMLTOKEN_BACK2FRONT);
   xmltokens.Register ("animcontrol", XMLTOKEN_ANIMCONTROL);
+  xmltokens.Register ("submesh", XMLTOKEN_SUBMESH);
 
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
@@ -153,6 +154,87 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
+  return true;
+}
+
+bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
+                                       iGeneralMeshCommonState* state, 
+                                       iGeneralFactoryState* factstate,
+                                       iLoaderContext* ldr_context)
+{
+  if(!node) return false;
+  if (!state)
+  {
+    synldr->ReportError ("crystalspace.genmeshloader.parse",
+      node, "Submesh must be specified _after_ factory tag.");
+    return false;
+  }
+
+  csDirtyAccessArray<unsigned int> triangles;
+  csRef<iMaterialWrapper> material;
+  bool do_mixmode = false;
+  uint mixmode = CS_FX_COPY;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+    case XMLTOKEN_T:
+      {
+        int tri = child->GetContentsValueAsInt ();
+        if (tri > factstate->GetTriangleCount ())
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.invalidindex",
+            child, "Invalid triangle index in genmesh submesh!");
+          return false;
+        }
+        triangles.Push (tri);
+        break;
+      }
+    case XMLTOKEN_MIXMODE:
+      if (!synldr->ParseMixmode (child, mixmode))
+        return 0;
+      do_mixmode = true;
+      break;
+    case XMLTOKEN_MATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        material = ldr_context->FindMaterial (matname);
+        if (!material.IsValid ())
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.unknownmaterial",
+            node, "Couldn't find material '%s'!", matname);
+          return false;
+        }
+        break;
+      }
+    default:
+      synldr->ReportBadToken (child);
+    }
+  }
+
+  if (!material.IsValid ())
+  {
+    synldr->ReportError (
+      "crystalspace.genmeshloader.parse.unknownmaterial",
+      node, "No material specified in genmesh submesh!");
+    return false;
+  }
+
+  if (do_mixmode)
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	material, mixmode);
+  else
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    	material);
+
   return true;
 }
 
@@ -445,6 +527,10 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  state->SetAnimationControlFactory (anim_ctrl_fact);
 	}
 	break;
+      case XMLTOKEN_SUBMESH:
+        ParseSubMesh (child, (iGeneralMeshCommonState*)state,
+		state, ldr_context);
+        break;
       default:
 	synldr->ReportBadToken (child);
 	return 0;
@@ -456,6 +542,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 
   return csPtr<iBase> (fact);
 }
+
 //---------------------------------------------------------------------------
 
 csGeneralFactorySaver::csGeneralFactorySaver (iBase* pParent)
@@ -713,7 +800,7 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
 }
 
 bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
-                                       iGeneralMeshState* state, 
+                                       iGeneralMeshCommonState* state, 
                                        iGeneralFactoryState* factstate,
                                        iLoaderContext* ldr_context)
 {
@@ -903,7 +990,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         ParseRenderBuffer (child, meshstate, factstate);
         break;
       case XMLTOKEN_SUBMESH:
-        ParseSubMesh (child, meshstate, factstate, ldr_context);
+        ParseSubMesh (child, (iGeneralMeshCommonState*)meshstate,
+		factstate, ldr_context);
         break;
       default:
         synldr->ReportBadToken (child);
