@@ -32,6 +32,7 @@
 #include "cstool/framedataholder.h"
 #include "cstool/gentrtex.h"
 #include "cstool/identstrings.h"
+#include "cstool/importkit.h"
 #include "cstool/initapp.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
