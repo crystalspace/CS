@@ -22,7 +22,6 @@
 
 #include "csgeom/obb.h"
 #include "csgeom/plane3.h"
-#include "csgeom/sphere.h"
 #include "csgeom/pmtools.h"
 #include "cstool/collider.h"
 #include "csutil/event.h"
@@ -30,7 +29,6 @@
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "imesh/object.h"
-#include "imesh/genmesh.h"
 #include "iutil/evdefs.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -39,7 +37,6 @@
 #include "iutil/virtclk.h"
 #include "ivaria/collider.h"
 #include "ivaria/reporter.h"
-#include "ivaria/dynamics.h"
 
 #include "odedynam.h"
 
@@ -83,10 +80,6 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE_EXT (csODERigidBody)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRigidBody)
 SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_IBASE (csODECollider)
-  SCF_IMPLEMENTS_INTERFACE (iDynamicsSystemCollider)
-SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODERigidBody::RigidBody)
   SCF_IMPLEMENTS_INTERFACE (iRigidBody)
@@ -520,11 +513,13 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
 
 csODEDynamicSystem::~csODEDynamicSystem ()
 {
+  // destroy all static collider geoms
+  DestroyGeoms (geoms);
+
   // must delete all these before deleting the actual world
   joints.DeleteAll ();
   groups.DeleteAll ();
   bodies.DeleteAll ();
-  colliders.DeleteAll ();
 
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
@@ -548,12 +543,7 @@ void csODEDynamicSystem::RemoveBody (iRigidBody* body)
 {
   bodies.Delete (body);
 }
-iRigidBody *csODEDynamicSystem::GetBody (unsigned int index)
-{
-  if ((unsigned)index < bodies.GetSize ())
-    return bodies[index];
-  else return NULL;
-}
+
 iRigidBody *csODEDynamicSystem::FindBody (const char *name)
 {
   return bodies.FindByName (name);
@@ -711,15 +701,56 @@ void csODEDynamicSystem::Step (float elapsed_time)
 bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
         const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->CreateMeshGeometry (mesh);
-  c->SetTransform (trans);
-  odec->AddToSpace (spaceID);
-  colliders.Push (c);
+  // From Eroroman & Marc Rochel
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  csTriangle *c_triangle;
+  int tr_num;
+  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
+
+  // Slight problem here is that we need to keep vertices and indices around
+  // since ODE only uses the pointers. I am not sure if ODE cleans them up
+  // on exit or not. If not, we need some way to keep track of all mesh colliders
+  // and clean them up on destruct.
+  float *vertices = new float[p->GetVertexCount()*3];
+  int *indeces = new int[tr_num*3];
+  csVector3 *c_vertex = p->GetVertices();
+  //csFPrintf(stderr, "vertex count: %d\n", p->GetVertexCount());
+  //csFPrintf(stderr, "triangles count: %d\n", tr_num);
+  int i=0, j=0;
+  for (i=0, j=0; i < p->GetVertexCount(); i++)
+  {
+    vertices[j++] = c_vertex[i].x;
+    vertices[j++] = c_vertex[i].y;
+    vertices[j++] = c_vertex[i].z;
+    //csFPrintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+  }
+  for (i=0, j=0; i < tr_num; i++)
+  {
+    indeces[j++] = c_triangle[i].a;
+    indeces[j++] = c_triangle[i].b;
+    indeces[j++] = c_triangle[i].c;
+    //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
+  }
+  dTriMeshDataID TriData = dGeomTriMeshDataCreate();
+  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
+      p->GetVertexCount(), indeces, tr_num*3, 3*sizeof(int));
+  dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
+  dGeomSetPosition (gid, trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12;
+  mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22;
+  mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32;
+  mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (gid, (void*)f);
+  geoms.Push(gid);
 
   return true;
 }
@@ -727,15 +758,22 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
         const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->CreateCCylinderGeometry (length, radius);
-  c->SetTransform (trans);
-  odec->AddToSpace (spaceID);
-  colliders.Push (c);
+  dGeomID id = dCreateCCylinder (spaceID, radius, length);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (id, mat);
+
+  dGeomSetPosition (id,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (id, (void*)f);
 
   return true;
 }
@@ -743,15 +781,22 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
         const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->CreateBoxGeometry (size);
-  c->SetTransform (trans);
-  odec->AddToSpace (spaceID);
-  colliders.Push (c);
+  dGeomID id = dCreateBox (spaceID, size.x, size.y, size.z);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (id, mat);
+
+  dGeomSetPosition (id,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (id, (void*)f);
 
   return true;
 }
@@ -759,50 +804,32 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
 bool csODEDynamicSystem::AttachColliderSphere (float radius,
     const csVector3 &offset, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->CreateSphereGeometry (csSphere (offset, radius));
-  odec->AddToSpace (spaceID);
-  colliders.Push (c);
+  dGeomID id = dCreateSphere (spaceID, radius);
+
+  dGeomSetPosition (id, offset.x, offset.y, offset.z);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (id, (void*)f);
 
   return true;
 }
 bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
     float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->CreatePlaneGeometry (plane);
-  odec->AddToSpace (spaceID);
-  colliders.Push (c);
+  dGeomID id = dCreatePlane (spaceID, -plane.A(), -plane.B(), -plane.C(), plane.D());
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (id, (void*)f);
 
   return true;
 }
-csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (unsigned int index)
-{
-  if (index < colliders.GetSize ())
-    return colliders[index];
-  else return NULL;
-}
-csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
-{
-  csODECollider *odec = new csODECollider ();
-  odec->AddToSpace (spaceID);
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  colliders.Push (c);
-  return c;
-}
-void csODEDynamicSystem::AttachCollider (iDynamicsSystemCollider* collider)
-{
-  ((csODECollider*)collider)->AddToSpace (spaceID);
-  colliders.Push (collider);
-}
+
 void csODEDynamicSystem::EnableAutoDisable (bool enable)
 {
   autodisable=enable;
@@ -872,350 +899,7 @@ bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
   return bodies.Find (body) != csArrayItemNotFound;
 }
 
-//--------------------------csODECollider-------------------------------------
-csODECollider::csODECollider ()
-{
-  surfacedata[0] = 0;
-  surfacedata[1] = 0;
-  surfacedata[2] = 0;
-  density = 0;
-  geomID = NULL;
-  spaceID = NULL;
-  coll_cb = 0;
-  transformID = dCreateGeomTransform (0);
-  dGeomTransformSetCleanup (transformID, 1);
-  geom_type = (csColliderGeometryType) 0;
-}
-
-csODECollider::~csODECollider ()
-{
-  ClearContents ();
-}
-
-void csODECollider::ClearContents ()
-{
-  dGeomDestroy (geomID);
-  dGeomDestroy (transformID);
-  surfacedata[0] = 0;
-  surfacedata[1] = 0;
-  surfacedata[2] = 0;
-  density = 0;
-  geomID = NULL;
-  spaceID = NULL;
-  coll_cb = 0;
-  transformID = dCreateGeomTransform (0);
-  dGeomTransformSetCleanup (transformID, 1);
-  geom_type = (csColliderGeometryType) 0;
-}
-
-void csODECollider::MassCorrection ()
-{
-  dMass m, om;
-  dMassSetZero (&m);
-  
-  switch (geom_type)
-  {
-  case BOX_COLLIDER_GEOMETRY:
-    {
-      dVector3 size;
-      dGeomBoxGetLengths (geomID, size);
-      dMassSetBox (&m, density, size[0], size[1], size[2]);
-    }
-    break;
-  case SPHERE_COLLIDER_GEOMETRY:
-    dMassSetSphere (&m, density, dGeomSphereGetRadius (geomID));
-    break;
-  case CYLINDER_COLLIDER_GEOMETRY:
-    {
-      dReal radius, length;
-      dGeomCCylinderGetParams (geomID, &radius, &length);
-      dMassSetCappedCylinder (&m, density, 3, radius, length);
-    }
-    break;
-  case TRIMESH_COLLIDER_GEOMETRY:
-    {
-      // ODE doesn't have any function to get the mass of arbitrary triangles
-      // so we will just use the OBB
-      int tri_count = dGeomTriMeshGetTriangleCount (geomID);
-      csOBB b;
-      for (int i = 0; i < tri_count; i++)
-      {
-        dVector3 v0, v1, v2;
-        dGeomTriMeshGetTriangle (geomID, i, &v0, &v1, &v2);
-        b.AddBoundingVertex (csVector3 (v0[0], v0[1], v0[2]));
-        b.AddBoundingVertex (csVector3 (v1[0], v1[1], v1[2]));
-        b.AddBoundingVertex (csVector3 (v2[0], v2[1], v2[2]));
-      }
-      dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
-    }
-  default:
-    break;
-  }
-
-  const dReal *pos = dGeomGetPosition (geomID);
-  dMassTranslate (&m, pos[0], pos[1], pos[2]);
-
-  dMassRotate (&m, dGeomGetRotation (geomID));
-
-  dBodyID bodyID = dGeomGetBody (transformID);
-  dBodyGetMass (bodyID, &om);
-  dMassAdd (&om, &m);
-  dBodySetMass (bodyID, &om);
-}
-void csODECollider::AttachBody (dBodyID bodyID)
-{
-  dGeomSetBody (transformID, bodyID);
-  if (geomID)
-  {
-    MassCorrection ();
-  }
-}
-bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
-{
-  if (geomID) ClearContents ();
-
-  geom_type = TRIMESH_COLLIDER_GEOMETRY;
-
-  // From Eroroman & Marc Rochel with modifications by Mike Handverger and Piotr Obrzut
-
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
-  
-  if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
-    return false;
-
-  csTriangle *c_triangle;
-  int tr_num;
-  // Slight problem here is that we need to keep vertices and indices around
-  // since ODE only uses the pointers. I am not sure if ODE cleans them up
-  // on exit or not. If not, we need some way to keep track of all mesh colliders
-  // and clean them up on destruct.
-  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
-  float *vertices = new float[p->GetVertexCount()*3];
-  int *indeces = new int[tr_num*3];
-  csVector3 *c_vertex = p->GetVertices();
-  //csFPrintf(stderr, "vertex count: %d\n", p->GetVertexCount());
-  //csFPrintf(stderr, "triangles count: %d\n", tr_num);
-  int i=0, j=0;
-  for (i=0, j=0; i < p->GetVertexCount(); i++)
-  {
-    vertices[j++] = c_vertex[i].x;
-    vertices[j++] = c_vertex[i].y;
-    vertices[j++] = c_vertex[i].z;
-    //csFPrintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
-  }
-  for (i=0, j=0; i < tr_num; i++)
-  {
-    indeces[j++] = c_triangle[i].c;
-    indeces[j++] = c_triangle[i].b;
-    indeces[j++] = c_triangle[i].a;
-    //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
-  }
-  dTriMeshDataID TriData = dGeomTriMeshDataCreate();
-
-  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
-    p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
-
-  geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
-
-  if (spaceID) AddToSpace (spaceID);
-
-  return true;
-}
-bool csODECollider::CreateCCylinderGeometry (float length, float radius)
-{
-  if (geomID) ClearContents ();
-
-  geom_type = CYLINDER_COLLIDER_GEOMETRY;
-
-  geomID = dCreateCCylinder (0, radius, length);
-  dGeomTransformSetGeom (transformID, geomID);
-
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
-  
-  dGeomSetData (geomID, (void*)surfacedata);
-
-  if (spaceID) AddToSpace (spaceID);
-
-  return true;
-}
-bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
-{
-  if (geomID) ClearContents ();
-
-  geom_type = PLANE_COLLIDER_GEOMETRY;
-  
-  geomID = dCreatePlane (0, -plane.A(), -plane.B(), -plane.C(), plane.D());
-
-  dGeomSetData (geomID, (void*)surfacedata);
-
-  if (spaceID) AddToSpace (spaceID);
-
-  return true;
-}
-bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
-{
-  if (geomID) ClearContents ();
-
-  geom_type = SPHERE_COLLIDER_GEOMETRY;
-
-  geomID = dCreateSphere (0, sphere.GetRadius ());
-  dGeomTransformSetGeom (transformID, geomID);
-  
-  csVector3 offset = sphere.GetCenter ();
-  dGeomSetPosition (transformID, offset.x, offset.y, offset.z);
-
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
-
-  dGeomSetData (geomID, (void*)surfacedata);
-
-  if (spaceID) AddToSpace (spaceID);
-
-  return true;
-}
-bool csODECollider::CreateBoxGeometry (const csVector3& size)
-{
-  if (geomID) ClearContents ();
-
-  geom_type = BOX_COLLIDER_GEOMETRY;
-
-  geomID = dCreateBox (0, size.x, size.y, size.z);
-
-  dGeomTransformSetGeom (transformID, geomID);
-
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
-
-  dGeomSetData (geomID, (void*)surfacedata);
-
-  if (spaceID) AddToSpace (spaceID);
-
-  return true;
-}
-
-void csODECollider::CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat)
-{  
-  odemat[0] = csmat.m11; odemat[1] = csmat.m21; odemat[2] = csmat.m31; odemat[3] = 0;
-  odemat[4] = csmat.m12; odemat[5] = csmat.m22; odemat[6] = csmat.m32; odemat[7] = 0;
-  odemat[8] = csmat.m13; odemat[9] = csmat.m23; odemat[10] = csmat.m33; odemat[11] = 0;
-}
-void csODECollider::ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
-{  
-  csmat.m11 = odemat[0]; csmat.m12 = odemat[4]; csmat.m13 = odemat[8];
-  csmat.m21 = odemat[1]; csmat.m22 = odemat[5]; csmat.m23 = odemat[9];
-  csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10];
-}
-void csODECollider::SetTransform (const csOrthoTransform& transform)
-{
-  // can't set plane's transform b/c it causes non placeable geom run-time 
-  // error w/debug build of ode
-  if (!geomID || geom_type == PLANE_COLLIDER_GEOMETRY) 
-    return;
-
-  csVector3 pos = transform.GetOrigin ();
-  dGeomSetPosition (geomID, pos.x, pos.y, pos.z);
-
-  dMatrix3 rot;
-  CS2ODEMatrix (transform.GetO2T (), rot);
-  dGeomSetRotation (geomID, rot);
-
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
-}
-csOrthoTransform csODECollider::GetTransform ()
-{
-  const dReal *tv = dGeomGetPosition (transformID);
-  csVector3 t_pos (tv[0], tv[1], tv[2]);
-
-  csMatrix3 t_rot;
-  ODE2CSMatrix (dGeomGetRotation (transformID), t_rot);
-
-  csOrthoTransform t_transf (t_rot, t_pos);
-
-  if (!geomID || geom_type == PLANE_COLLIDER_GEOMETRY)
-  {
-    return t_transf;
-  }
-
-  const dReal *gv = dGeomGetPosition (geomID);
-  csVector3 g_pos (gv[0], gv[1], gv[2]);
-
-  csMatrix3 g_rot;
-  ODE2CSMatrix (dGeomGetRotation (geomID), g_rot);
-
-  return t_transf * csOrthoTransform (g_rot, g_pos);
-}
-void csODECollider::AddTransformToSpace (dSpaceID spaceID)
-{
-  dSpaceID prev = dGeomGetSpace (transformID);
-  if (prev)dSpaceRemove (prev, transformID);
-  if (geomID) dSpaceAdd (spaceID, transformID); 
-}
-void csODECollider::AddToSpace (dSpaceID spaceID) 
-{
-  dSpaceID prev = dGeomGetSpace (geomID);
-  if (prev)dSpaceRemove (prev, geomID);
-  if (geomID) dSpaceAdd (spaceID, geomID); 
-  csODECollider::spaceID = spaceID;
-}
-void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact)
-{
-  switch (geom_type)
-  {
-  case BOX_COLLIDER_GEOMETRY:
-    {
-      dVector3 size;
-      dGeomBoxGetLengths (geomID, size);
-
-      csBox3 box (csVector3 (0));
-      box.SetSize (csVector3 (size[0], size[1], size[2]));
-      genmesh_fact->GenerateBox (box);
-      genmesh_fact->CalculateNormals (); 
-    }
-    break;
-  case SPHERE_COLLIDER_GEOMETRY:
-    {
-      csSphere sphere (csVector3 (0), dGeomSphereGetRadius (geomID));
-      genmesh_fact->GenerateSphere (sphere, 30);
-      genmesh_fact->CalculateNormals (); 
-    }
-  case PLANE_COLLIDER_GEOMETRY:
-    {
-      dVector4 plane;
-      dGeomPlaneGetParams (geomID, plane);
-#if 0
-      genmesh_fact->GeneratePlane (csPlane3 (-plane[0], -plane[1], -plane[2], plane[3]),
-        csBox3 (csVector3 (-CS_BOUNDINGBOX_MAXVALUE),csVector3 (CS_BOUNDINGBOX_MAXVALUE)));
-#endif
-    }
-    break;
-  case TRIMESH_COLLIDER_GEOMETRY:
-    {
-      int tri_count = dGeomTriMeshGetTriangleCount (geomID);
-      genmesh_fact->SetVertexCount (tri_count * 3);
-      genmesh_fact->SetTriangleCount (tri_count);
-      csVector3* vertices = genmesh_fact->GetVertices ();
-      csTriangle* triangles = genmesh_fact->GetTriangles ();
-      
-      for (int i = 0; i < tri_count; i++)
-      {
-        dVector3 v0, v1, v2;
-        dGeomTriMeshGetTriangle (geomID, i, &v0, &v1, &v2);
-        vertices[i*3] = csVector3 (v0[0], v0[1], v0[2]);
-        vertices[i*3+1] = csVector3 (v1[0], v1[1], v1[2]);
-        vertices[i*3+2] = csVector3 (v2[0], v2[1], v2[2]);
-        triangles[i].a = i*3; triangles[i].b = i*3+1; triangles[i].c = i*3+2; 
-      }
-      genmesh_fact->CalculateNormals ();
-    }
-    break;
-  default:
-    break;
-  }
-}
-//--------------------------csODERigidBody-------------------------------------
-csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
+csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : geoms (1,4)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRigidBody);
 
@@ -1234,11 +918,12 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 
 csODERigidBody::~csODERigidBody ()
 {
+  DestroyGeoms (geoms);
+
   if (move_cb) move_cb->DecRef ();
   if (coll_cb) coll_cb->DecRef ();
   dSpaceDestroy (groupID);
   dBodyDestroy (bodyID);
-  colliders.DeleteAll ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiRigidBody);
 }
@@ -1323,18 +1008,87 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
     const csOrthoTransform &trans, float friction, float density,
     float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->SetDensity (density);
-  c->CreateMeshGeometry (mesh);
-  c->SetTransform (trans);
-  odec->AttachBody (bodyID);
-  odec->AddTransformToSpace (groupID);
-  colliders.Push (c);
+  // From Eroroman & Marc Rochel with modifications by Mike Handverger
+
+  dSpaceID spaceID = dynsys->GetSpaceID();
+  dMass m, om;
+  dMassSetZero (&m);
+
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
+  if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
+    return false;
+
+  csTriangle *c_triangle;
+  int tr_num;
+  csPolygonMeshTools::Triangulate(p, c_triangle, tr_num);
+  float *vertices = new float[p->GetVertexCount()*3];
+  int *indeces = new int[tr_num*3];
+  csVector3 *c_vertex = p->GetVertices();
+  //csFPrintf(stderr, "vertex count: %d\n", p->GetVertexCount());
+  //csFPrintf(stderr, "triangles count: %d\n", tr_num);
+  int i=0, j=0;
+  for (i=0, j=0; i < p->GetVertexCount(); i++)
+  {
+    vertices[j++] = c_vertex[i].x;
+    vertices[j++] = c_vertex[i].y;
+    vertices[j++] = c_vertex[i].z;
+    //csFPrintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
+  }
+  for (i=0, j=0; i < tr_num; i++)
+  {
+    indeces[j++] = c_triangle[i].c;
+    indeces[j++] = c_triangle[i].b;
+    indeces[j++] = c_triangle[i].a;
+    //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
+  }
+  dTriMeshDataID TriData = dGeomTriMeshDataCreate();
+
+  dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
+  	p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
+
+  dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
+  dGeomSetPosition (gid, trans.GetOrigin().x,
+  	trans.GetOrigin().y, trans.GetOrigin().z);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12;
+  mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22;
+  mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32;
+  mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+
+  // set up mass
+
+  // ODE doesn'thave any function to get the mass of arbitrary triangles
+  // so we will just use the OBB
+  csOBB b;
+  b.FindOBB (p->GetVertices(), p->GetVertexCount());
+  dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(),
+  	b.MaxZ()-b.MinZ());
+
+  const csMatrix3& b_mat = b.GetMatrix ();
+  mat[0] = b_mat.m11; mat[1] = b_mat.m12; mat[2] = b_mat.m13;
+  mat[3] = b_mat.m21; mat[4] = b_mat.m22; mat[5] = b_mat.m23;
+  mat[6] = b_mat.m31; mat[7] = b_mat.m32; mat[8] = b_mat.m33;
+  dMassRotate (&m, mat);
+
+  dBodyGetMass (bodyID, &om);
+  dMassAdd (&om, &m);
+
+  dBodySetMass (bodyID, &om);
+
+  dGeomSetBody (gid, bodyID);
+  //dSpaceAdd (groupID, gid);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (gid, (void*)f);
+  geoms.Push(gid);
 
   return true;
 }
@@ -1343,37 +1097,98 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->SetDensity (density);
-  c->CreateCCylinderGeometry (length, radius);
-  c->SetTransform (trans);
-  odec->AttachBody (bodyID);
-  odec->AddTransformToSpace (groupID);
-  colliders.Push (c);
+  dMass m, om;
+  dMassSetZero (&m);
+
+  dGeomID id = dCreateGeomTransform (0);
+  dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
+
+  dGeomID gid = dCreateCCylinder (0, radius, length);
+  dGeomTransformSetGeom (id, gid);
+
+  dMassSetCappedCylinder (&m, density, 3, radius, length);
+
+  dMatrix3 mat;
+  const csMatrix3& tr_mat = trans.GetO2T ();
+  mat[0] = tr_mat.m11; mat[1] = tr_mat.m12; mat[2] = tr_mat.m13; mat[3] = 0;
+  mat[4] = tr_mat.m21; mat[5] = tr_mat.m22; mat[6] = tr_mat.m23; mat[7] = 0;
+  mat[8] = tr_mat.m31; mat[9] = tr_mat.m32; mat[10] = tr_mat.m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+  dMassRotate (&m, mat);
+
+  dGeomSetPosition (gid,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dMassTranslate (&m,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dBodyGetMass (bodyID, &om);
+  dMassAdd (&om, &m);
+
+  // Old correction of center of mass.
+  // Just stored in case it's actually needed.
+  /*dGeomSetPosition( gid, trans.GetOrigin().x-om.c[0], trans.GetOrigin().y-om.c[1], trans.GetOrigin().z-om.c[2] );
+  dMassTranslate (&om, -om.c[0], -om.c[1], -om.c[2]);*/
+
+  dBodySetMass (bodyID, &om);
+
+  dGeomSetBody (id, bodyID);
+  dSpaceAdd (groupID, id);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
+
 bool csODERigidBody::AttachColliderBox (const csVector3 &size,
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->SetDensity (density);
-  c->CreateBoxGeometry (size);
-  odec->AttachBody (bodyID);
-  c->SetTransform (trans);
-  odec->AddTransformToSpace (groupID);
-  colliders.Push (c);
+  dMass m, om;
+  dMassSetZero (&m);
+
+  dGeomID id = dCreateGeomTransform (0);
+  dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
+
+  dGeomID gid = dCreateBox (0, size.x, size.y, size.z);
+  dGeomTransformSetGeom (id, gid);
+
+  dMassSetBox (&m, density, size.x, size.y, size.z);
+
+  dMatrix3 mat;
+  const csMatrix3& tr_mat = trans.GetO2T ();
+  mat[0] = tr_mat.m11; mat[1] = tr_mat.m12; mat[2] = tr_mat.m13; mat[3] = 0;
+  mat[4] = tr_mat.m21; mat[5] = tr_mat.m22; mat[6] = tr_mat.m23; mat[7] = 0;
+  mat[8] = tr_mat.m31; mat[9] = tr_mat.m32; mat[10] = tr_mat.m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+  dMassRotate (&m, mat);
+
+  dGeomSetPosition (gid,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dMassTranslate (&m,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dBodyGetMass (bodyID, &om);
+  dMassAdd (&om, &m);
+
+  // Old correction of center of mass.
+  // Just stored in case it's actually needed.
+  /*dGeomSetPosition( gid, trans.GetOrigin().x-om.c[0], trans.GetOrigin().y-om.c[1], trans.GetOrigin().z-om.c[2] );
+  dMassTranslate (&om, -om.c[0], -om.c[1], -om.c[2]);*/
+
+  dBodySetMass (bodyID, &om);
+
+  dGeomSetBody (id, bodyID);
+  dSpaceAdd (groupID, id);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
@@ -1381,17 +1196,38 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
     float friction, float density, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->SetDensity (density);
-  c->CreateSphereGeometry (csSphere (offset, radius));
-  odec->AttachBody (bodyID);
-  odec->AddTransformToSpace (groupID);
-  colliders.Push (c);
+  dMass m, om;
+  dMassSetZero (&m);
+
+  dGeomID id = dCreateGeomTransform (0);
+  dGeomTransformSetCleanup (id, 1);
+  geoms.Push(id);
+
+  dGeomID gid = dCreateSphere (0, radius);
+  dGeomTransformSetGeom (id, gid);
+
+  dMassSetSphere (&m, density, radius);
+
+  dGeomSetPosition (gid, offset.x, offset.y, offset.z);
+  dMassTranslate (&m, offset.x, offset.y, offset.z);
+  dBodyGetMass (bodyID, &om);
+  dMassAdd (&om, &m);
+
+  // Old correction of center of mass.
+  // Just stored in case it's actually needed.
+  /*dGeomSetPosition( gid, offset.x-om.c[0], offset.y-om.c[1], offset.z-om.c[2] );
+  dMassTranslate (&om, -om.c[0], -om.c[1], -om.c[2]);*/
+
+  dBodySetMass (bodyID, &om);
+
+  dGeomSetBody (id, bodyID);
+  dSpaceAdd (groupID, id);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (gid, (void*)f);
 
   return true;
 }
@@ -1399,26 +1235,21 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
 bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   float friction, float density, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (); 
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  c->SetElasticity (elasticity);
-  c->SetFriction (friction);
-  c->SetSoftness (softness);
-  c->SetDensity (density);
-  c->CreatePlaneGeometry (plane);
-  colliders.Push (c);
-  //causes non placeable geom run-time error w/debug build of ode.
-  //odec->AttachBody (bodyID);   
-  odec->AddToSpace (dynsys->GetSpaceID());
+  dSpaceID space = dynsys->GetSpaceID();
+  dGeomID id = dCreatePlane (space, -plane.A(), -plane.B(), -plane.C(), plane.D());
+
+  //causes non=placeable geom run-time error w/debug build of ode.
+  //dGeomSetBody (id, bodyID);
+
+  float *f = new float[3];
+  f[0] = friction;
+  f[1] = elasticity;
+  f[2] = softness;
+  dGeomSetData (id, (void*)f);
 
   return true;
 }
-void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
-{
-  dynsys->DestroyCollider (collider);
-  ((csODECollider*) collider)->AttachBody (bodyID);
-  colliders.Push (collider);
-}
+
 void csODERigidBody::SetPosition (const csVector3& pos)
 {
   dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
@@ -1645,13 +1476,8 @@ void csODERigidBody::Update ()
     move_cb->Execute (trans);
   }
 }
-csRef<iDynamicsSystemCollider> csODERigidBody::GetCollider (unsigned int index)
-{
-  if (index < colliders.GetSize ())
-    return colliders[index];
-  else return NULL;
-}
-//--------------------------csStrictODEJoint-----------------------------------------------
+
+//-------------------------------------------------------------------------------
 void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 {
   if (b1)

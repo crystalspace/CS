@@ -21,23 +21,22 @@
 #define __CS_IVARIA_DYNAMICS_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
-
-struct iBodyGroup;
-struct iJoint;
-struct iMeshWrapper;
-struct iObject;
-struct iPolygonMesh;
-struct iRigidBody;
-
-class csMatrix3;
-class csOrthoTransform;
-class csPlane3;
 class csVector3;
+class csOrthoTransform;
+class csMatrix3;
+class csPlane3;
+struct iMeshWrapper;
 
-struct iDynamicsCollisionCallback;
-struct iDynamicsMoveCallback;
+struct iObject;
 struct iDynamicSystem;
+struct iRigidBody;
+struct iBodyGroup;
+struct iDynamicsMoveCallback;
+struct iDynamicsCollisionCallback;
+struct iJoint;
+struct iPolygonMesh;
 
 SCF_VERSION (iDynamics, 0, 0, 2);
 
@@ -74,8 +73,6 @@ struct iDynamics : public iBase
 };
 
 SCF_VERSION (iDynamicSystem, 0, 0, 2);
-
-struct iDynamicsSystemCollider;
 
 /**
  * This is the interface for the dynamics core.
@@ -135,12 +132,6 @@ struct iDynamicSystem : public iBase
 
   /// Finds a body within a system
   virtual iRigidBody *FindBody (const char *name) = 0;
-
-  /// Get Rigid Body by its index
-  virtual iRigidBody *GetBody (unsigned int index) = 0;
-
-  /// Get rigid bodys count
-  virtual int GetBodysCount () = 0;
 
   /// Create a body group.  Bodies in a group don't collide with each other
   virtual csPtr<iBodyGroup> CreateGroup () = 0;
@@ -240,28 +231,6 @@ struct iDynamicSystem : public iBase
    */
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float elasticity, float softness = 0.01f) = 0;
-
-  /// Destroy all static colliders
-  virtual void DestroyColliders () = 0;
-
-  /// Destroy static collider
-  virtual void DestroyCollider (iDynamicsSystemCollider* collider) = 0;
-
-  /// Attach collider to dynamic system 
-  virtual void AttachCollider (iDynamicsSystemCollider* collider) = 0;
-
-  /**
-   * Create static collider and put it into simulation. After collision it will remain 
-   * in the same place, but it will affect collided dynamic colliders (to make 
-   * it dynamic, just attach it to the rigid body).
-   */
-  virtual csRef<iDynamicsSystemCollider> CreateCollider () = 0;
-
-  /// Get static collider.
-  virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) = 0;
-
-  /// Get static colliders count.
-  virtual int GetColliderCount () = 0;
 };
 
 SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
@@ -478,20 +447,6 @@ struct iRigidBody : public iBase
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
     float density, float elasticity, float softness = 0.01f) = 0;
 
-  /** 
-   * Attach collider to rigid body. If you have set colliders transform before
-   * then it will be considered as relative to attached body (but still if you 
-   * will use colliders "GetTransform ()" it will be in the world coordinates.
-   * Colider become dynamic (which means that it will follow rigid body).
-   */
-  virtual void AttachCollider (iDynamicsSystemCollider* collider) = 0;
-
-  /// Destroy body colliders.
-  virtual void DestroyColliders () = 0;
-
-  /// Destroy body collider.
-  virtual void DestroyCollider (iDynamicsSystemCollider* collider) = 0;
-
   /// Set the position
   virtual void SetPosition (const csVector3& trans) = 0;
   /// Get the position
@@ -599,117 +554,6 @@ struct iRigidBody : public iBase
 
   /// Update transforms for mesh and/or bone
   virtual void Update () = 0;
-
-  /// Get body collider by its index
-  virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) = 0;
-
-  /// Get body colliders count 
-  virtual int GetColliderCount () = 0;
-};
-
-enum csColliderGeometryType
-{
-  BOX_COLLIDER_GEOMETRY = 1,
-  PLANE_COLLIDER_GEOMETRY,
-  TRIMESH_COLLIDER_GEOMETRY,
-  CYLINDER_COLLIDER_GEOMETRY,
-  SPHERE_COLLIDER_GEOMETRY
-};
-
-SCF_VERSION (iDynamicsSystemCollider, 0, 0, 1);
-
-struct iGeneralFactoryState;
-struct csBox3;
-struct csSphere;
-struct csReversibleTransform;
-
-/**
- * This is the interface for a dynamics system collider.
- * It keeps all properties that system uses for collision 
- * detection and after collision behaviour (like surface 
- * properties, collider geometry). It can be placed into 
- * dynamic system (then this will be "static" collider) or 
- * attached to body.
- * <p>
- * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDynamicSystem::CreateCollider()
- *   </ul>
- * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iDynamicSystem::FindBody()
- *   <li>iDynamicSystem::GetCollider()
- *   <li>iRigidBody::GetCollider()
- *   </ul>
- * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   <li>iRigidBody
- *   </ul>
- */
-struct iDynamicsSystemCollider : public iBase
-{
-  /// Create Collider Geometry with given sphere
-  virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
-
-  /// Create Collider Geometry with given plane
-  virtual bool CreatePlaneGeometry (const csPlane3& plane) = 0;
-
-  /// Create Collider Geometry with given mesh geometry
-  virtual bool CreateMeshGeometry (iMeshWrapper *mesh) = 0;
-
-  /// Create Collider Geometry with given box (given by its size)
-  virtual bool CreateBoxGeometry (const csVector3& box_size) = 0;
-
-  /// Create Collider Geometry with Cylinder (given by its length and radius)
-  virtual bool CreateCCylinderGeometry (float length, float radius) = 0;
-
-  //FIXME: This should be implememented, but it is not so obvious - it
-  //should be valid also for static colliders.
-  //virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
-
-  /// Set friction of collider surface
-  virtual void SetFriction (float friction) = 0;
-
-  /// Set softness of collider surface
-  virtual void SetSoftness (float softness) = 0;
-
-  /**
-   * Set body density. This could look strange that collider needs to know
-   * this parameter, but it is used for reseting mass of conected body  
-   * (it should depend on collider geometry)
-   */
-  virtual void SetDensity (float density) = 0;
-
-  /// Set softness of collider elasticity
-  virtual void SetElasticity (float elasticity) = 0;
-  
-  /// Get collider surface friction
-  virtual float GetFriction () = 0;
-
-  /// Get collider surface friction
-  virtual float GetSoftness () = 0;
-
-  /// Get bodys density
-  virtual float GetDensity () = 0;
-
-  /// Get collider surface elasticity
-  virtual float GetElasticity () = 0;
-
-  /// Fills given General Mesh factory with collider geometry 
-  virtual void FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact) = 0;
-
-  /// Get geometry type
-  virtual csColliderGeometryType GetGeometryType () = 0;
-
-  /// Get collider transform (it will be alwas in world cooridnates)
-  virtual csOrthoTransform GetTransform () = 0;
-
-  /**
-   * Set Collider transform. If this is "static" collider then given transform
-   * will be in world space, otherwise it will be in attached rigid body space.
-   */ 
-  virtual void SetTransform (const csOrthoTransform& trans) = 0;
 };
 
 SCF_VERSION (iJoint, 0, 0, 1);
