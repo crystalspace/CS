@@ -127,9 +127,13 @@ namespace CrystalSpace
       return container.models.Length() > 0;
     }
 
+#if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
+  #define getcwd  _getcwd
+#endif
+
     bool Glue::ChangeToCurrentNative (const char* nativeRoot)
     {
-      char* cwd = _getcwd (0, 0);
+      char* cwd = getcwd (0, 0);
       bool ret = false;
 
       csString path (nativeRoot);
