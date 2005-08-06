@@ -1184,8 +1184,10 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
     {
       dVector4 plane;
       dGeomPlaneGetParams (geomID, plane);
+#if 0
       genmesh_fact->GeneratePlane (csPlane3 (-plane[0], -plane[1], -plane[2], plane[3]),
         csBox3 (csVector3 (-CS_BOUNDINGBOX_MAXVALUE),csVector3 (CS_BOUNDINGBOX_MAXVALUE)));
+#endif
     }
     break;
   case TRIMESH_COLLIDER_GEOMETRY:

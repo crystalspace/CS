@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Aug-2005
+	- Jorrit fixed odedynam so it compiles.
 5-Aug-2005
 	- res made adjustments for the latest cs-win32libs.
 	- Jorrit reverted Piotr's changes to ODE physics plugin completely
