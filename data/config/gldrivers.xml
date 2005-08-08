@@ -349,6 +349,16 @@
 	<usecfg>disableRECTTextures</usecfg>
       </applicable>
     </rule>
+
+    <rule description="GeForce: RECT texture extension support apparently sucks">
+      <conditions fulfill="one">
+	<regexp	string="renderer" pattern="^GeForce.*MX" />
+	<regexp	string="renderer" pattern="^GeForce.*Go" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
     
     <!--
     <rule description="ATI: Enable hidden 2D texture NPOTS support">

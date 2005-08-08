@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Aug-2005
+	- Jorrit added a rule to disable texture_rectangle extensions on
+	  GF4Go/MX type cards.
 6-Aug-2005
 	- Jorrit fixed odedynam so it compiles.
 	- Jorrit again reverted Piotr's changes to odedynam. They cause
