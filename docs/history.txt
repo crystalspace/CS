@@ -11,6 +11,9 @@ chronological order.
 	  GF4Go/MX type cards.
 	- Andrew Dai made the collision response system in csColliderActor
 	  act correctly and fixed an occasional crash in AdjustForCollisions().
+	- Marten made a fix to SWIG interface files. Python bindings now works
+	  and the sample pyhton files in scripts\python works. Similar fixes
+	  are probably needed for java and perl.
 6-Aug-2005
 	- Jorrit fixed odedynam so it compiles.
 	- Jorrit again reverted Piotr's changes to odedynam. They cause

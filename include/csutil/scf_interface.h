@@ -87,10 +87,11 @@ struct InterfaceTraits {                                  \
  * are equal and required minor and micro version is less or equal than target
  * version minor and micro numbers, the versions are considered compatible.
  */
-static CS_FORCEINLINE bool scfCompatibleVersion (int iVersion, int iItfVersion)
+static CS_FORCEINLINE bool scfCompatibleVersion (
+  scfInterfaceVersion iVersion, scfInterfaceVersion iItfVersion)
 {
-  return ((iVersion & 0xff000000) == (iItfVersion & 0xff000000))
-    && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff));
+  return (((iVersion & 0xff000000) == (iItfVersion & 0xff000000))
+     && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff))) || iVersion == 0;
 }
 
 // -- The main two SCF interfaces, iBase and iSCF

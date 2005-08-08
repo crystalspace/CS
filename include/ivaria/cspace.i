@@ -1131,20 +1131,35 @@ APPLY_FOR_EACH_INTERFACE
 // "dynamic_cast<T*>(self)". For now, this is not necessary because
 // classic C casts are used all over the place in CS. Note that for
 // readability it might be better to use "static_cast<T*>(self)".
-%define CAST_FROM_BASE(T) else if (!strcmp(to_name, #T)) ptr = (void*)(T*)self;
+// %define CAST_FROM_BASE(T) else if (!strcmp(to_name, #T)) ptr = (void*)(T*)self;
+%define GET_VERSION_FROM_INTERFACE(T) 
+  else if (!strcmp(to_name, #T))
+  {
+    id = scfInterfaceTraits<T>::GetID ();
+    ver = scfInterfaceTraits<T>::GetVersion ();
+  }
 %enddef
 #undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) CAST_FROM_BASE(x)
+#define INTERFACE_APPLY(x) GET_VERSION_FROM_INTERFACE(x)
 
 // csutil/scf.h
 %extend iBase
 {
   csWrapPtr _DynamicCast (const char * to_name)
   {
-    void* ptr;
+    void* ptr = 0;
+    scfInterfaceID id = ~0;
+    scfInterfaceVersion ver=0;
     if (!to_name || !to_name[0] || !self) ptr = 0;
-    APPLY_FOR_EACH_INTERFACE
-    else ptr = 0;
+    
+    id = iSCF::SCF->GetInterfaceID (to_name);
+    
+    if (id != ~0u)
+    {
+      ptr = self->QueryInterface (id, ver);
+      if (ptr) self->DecRef(); //Account for the refcount made by QueryInterface
+    }
+    
     return csWrapPtr(to_name, ptr);
   }
 }

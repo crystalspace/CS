@@ -140,7 +140,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   if (wp.VoidPtr)
   {
     ptr = wp.VoidPtr;
-    ibase = (iBase *)SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);
+    ibase = (iBase *)SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);    
     // Assume that VoidPtrs have been IncRef()ed
   }
   else

@@ -96,8 +96,12 @@ csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
 csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
   int iface_ver)
 {
-  return csWrapPtr (iface, iBase::QueryInterfaceSafe(obj,
-    iSCF::SCF->GetInterfaceID (iface), iface_ver));
+  void *ptr = 0;
+  
+  if (obj)
+    ptr = obj->QueryInterface(iSCF::SCF->GetInterfaceID (iface), iface_ver);
+  
+  return csWrapPtr (iface, ptr);
 }
 
 csWrapPtr _CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
@@ -109,7 +113,14 @@ csWrapPtr _CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
 csWrapPtr _CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, obj->LoadPlugin (id, iface, iface_ver));
+  iBase* base (obj->LoadPlugin (id));
+
+  if (base == 0) return csWrapPtr (iface, (void*)0);
+
+  void *x = base->QueryInterface (iSCF::SCF->GetInterfaceID (iface), iface_ver);
+  if (x) base->DecRef (); //release our base interface
+
+  return csWrapPtr (iface, x);
 }
 
 csWrapPtr _CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
