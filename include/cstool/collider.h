@@ -352,6 +352,8 @@ private:
   csVector3 bottomSize;
   csVector3 intervalSize;
 
+  int revertCount;
+
   /**
    * Performs the collision detection for the provided csColliderWrapper vs
    * all nearby objects.

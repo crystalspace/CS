@@ -498,6 +498,7 @@ csColliderActor::csColliderActor ()
   mesh = 0;
   camera = 0;
   movable = 0;
+  revertCount = 0;
 
   // Only used in case a camera is used.
   rotation.Set (0, 0, 0);
@@ -856,24 +857,25 @@ bool csColliderActor::AdjustForCollisions (
 
   // localvel is smaller because we can partly move the object in that direction
   localvel -= maxmove - oldpos;
-
+  csVector3 vec(0);
   for (i = 0; i < our_cd_contact.Length () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
     csVector3 normal = obstacle.Normal ();
-    if (fabs (normal.x) > .1 || fabs (normal.z) > .1)
-      continue;
+
     float norm = normal.Norm ();
     if (fabs (norm) < SMALL_EPSILON) continue;
-    csVector3 vec = obstacle.Normal() / norm;
+    csVector3 unit = normal / norm;
 
-    if (vec * localvel > 0) continue;
+    if (unit * localvel > 0) continue;
+    vec += (-(localvel % unit) % unit).Unit();
 
-    localvel = -(localvel % vec) % vec;
   }
+  if(!vec.IsZero())
+    localvel = (localvel * vec.Unit()) * vec.Unit();
+  
   newpos = maxmove + localvel;
-
   transform_newpos = csOrthoTransform (csMatrix3(), newpos);
 
   // Part2: legs
@@ -920,8 +922,6 @@ bool csColliderActor::AdjustForCollisions (
   float maxJump = newpos.y + bottomSize.y;
   float max_y = -1e9;
 
-  int itercount = 0;
-
   // Keep moving the model up until it no longer collides
   while (hits > 0 && newpos.y < maxJump)
   {
@@ -929,7 +929,14 @@ bool csColliderActor::AdjustForCollisions (
     for (i = 0; i < our_cd_contact.Length (); i++ )
     {
       csCollisionPair cd = our_cd_contact[i];
-      csVector3 n = -((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit ();
+      csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
+      csVector3 normal = obstacle.Normal();
+      float norm = normal.Norm ();
+      if (fabs (norm) < SMALL_EPSILON) continue;
+
+      csVector3 n = normal / norm;
+
+      //csVector3 n = -((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit ();
 
       // Is it a collision with a ground polygon?
       //  (this tests for the angle between ground and colldet
@@ -954,8 +961,6 @@ bool csColliderActor::AdjustForCollisions (
     {
       // Temporarily lift the model up so that it passes the final check
       newpos.y = max_y + 0.01f;
-      if (itercount > 4)
-        newpos.y = maxJump;
       our_cd_contact.Empty ();
 
       transform_newpos = csOrthoTransform (csMatrix3(), newpos);
@@ -1000,12 +1005,16 @@ bool csColliderActor::AdjustForCollisions (
   {
     // No move possible without a collision with the torso
     revertMove = true;
+    if(vel.y < 0)// && fabs(vel.x) < 0.01 && fabs(vel.y) < 0.01)
+      revertCount++;
+    newpos = oldpos;
     // If we get 'stuck' on geometry then we should be on some kind of ground
-    if (fabs (vel.x) < 0.00001 && vel.y <= 0 && fabs (vel.z) < 0.00001)
+    if(revertCount > 5)
       onground = true;
     return false;
   }
 
+  revertCount = 0;
   return true;
 }
 

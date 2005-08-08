@@ -9,6 +9,8 @@ chronological order.
 8-Aug-2005
 	- Jorrit added a rule to disable texture_rectangle extensions on
 	  GF4Go/MX type cards.
+	- Andrew Dai made the collision response system in csColliderActor
+	  act correctly and fixed an occasional crash in AdjustForCollisions().
 6-Aug-2005
 	- Jorrit fixed odedynam so it compiles.
 	- Jorrit again reverted Piotr's changes to odedynam. They cause
