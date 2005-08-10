@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Aug-2005
+	- Jorrit fixed the java scripting module in a similar way as how
+	  the python module was fixed.
 8-Aug-2005
 	- Jorrit added a rule to disable texture_rectangle extensions on
 	  GF4Go/MX type cards.
