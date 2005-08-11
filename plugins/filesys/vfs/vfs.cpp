@@ -321,7 +321,7 @@ public:
   // Parse a directory link directive and fill RPathV
   bool AddRPath (const char *RealPath, csVFS *Parent);
   // Remove a real-world path
-  bool RemoveRPath (const char *RealPath);
+  bool RemoveRPath (const char *RealPath, csVFS *Parent);
   // Find all files in a subpath
   void FindFiles(const char *Suffix, const char *Mask, iStringArray *FileList);
   // Find a file and return the appropiate csFile object
@@ -1032,7 +1032,7 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
   return rc;
 }
 
-bool VfsNode::RemoveRPath (const char *RealPath)
+bool VfsNode::RemoveRPath (const char *RealPath, csVFS* Parent)
 {
   if (!RealPath)
   {
@@ -1040,10 +1040,10 @@ bool VfsNode::RemoveRPath (const char *RealPath)
     UPathV.DeleteAll ();
     return true;
   } /* endif */
-
+  csString const expanded_path = Expand(Parent, RealPath);
   size_t i;
   for (i = 0; i < RPathV.Length (); i++)
-    if (strcmp ((char *)RPathV.Get (i), RealPath) == 0)
+    if (strcmp ((char *)RPathV.Get (i), expanded_path) == 0)
     {
       RPathV.DeleteIndex (i);
       UPathV.DeleteIndex (i);
@@ -2091,7 +2091,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
    || suffix [0])
     return false;
 
-  if (!node->RemoveRPath (RealPath))
+  if (!node->RemoveRPath (RealPath, this))
     return false;
 
   if (node->RPathV.Length () == 0)

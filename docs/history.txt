@@ -8,6 +8,8 @@ chronological order.
 
 11-Aug-2005
 	- mdmkolbe cleaned up SWIG to be a bit more type-safe.
+	- dfryer changed VFS to expand paths when unmounting paths, instead of
+	  only when mounting.  This had caused some inconsistancy.
 10-Aug-2005
 	- Jorrit fixed the java scripting module in a similar way as how
 	  the python module was fixed.
