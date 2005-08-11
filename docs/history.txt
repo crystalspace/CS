@@ -13,7 +13,7 @@ chronological order.
 	- dfryer changed VFS to expand paths when unmounting paths, instead of
 	  only when mounting.  This had caused some inconsistancy.
 	- res changed the way static plugins are registered. Previous, they
-	  were registered with SCF upon module loading; hwoever, this has the
+	  were registered with SCF upon module loading; however, this has the
 	  problem that when SCF was shut down, the static plugins were
 	  unregistered, but there was no way to re-register them - restarting
 	  a statically linked binary was not possible. Now, the static plugin
