@@ -1131,6 +1131,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
 		int forcepriority)
 {
+  if (!templ) return 0;
+
   if (!ValidateTemplate (templ))
     return 0;
   

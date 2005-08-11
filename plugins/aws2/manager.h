@@ -30,7 +30,7 @@
 #include "ivideo/fontserv.h"
 
 /** The management object for AWS: creates windows, destroys windows, keeps track of all the windows, etc. */
-class awsManager : public iAws
+class awsManager2 : public iAws
 {
   /** Contains all loaded preferences, skins, etc. */
   aws::preferences prefs;
@@ -83,8 +83,8 @@ public:
 public:
   SCF_DECLARE_IBASE;
 
-  awsManager(iBase *the_base);
-  virtual ~awsManager();
+  awsManager2(iBase *the_base);
+  virtual ~awsManager2();
 
   /** Initializes the manager. Must be called before anything else. */
   virtual bool Initialize (iObjectRegistry *_object_reg);
@@ -107,7 +107,7 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(awsManager);
+    SCF_DECLARE_EMBEDDED_IBASE(awsManager2);
     virtual bool Initialize (iObjectRegistry *p)
     {
       return scfParent->Initialize (p);
@@ -117,10 +117,10 @@ public:
   struct EventHandler : public iEventHandler
   {
   private:
-    awsManager *parent;
+    awsManager2 *parent;
   public:
     SCF_DECLARE_IBASE;
-    EventHandler (awsManager * parent)
+    EventHandler (awsManager2 * parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;

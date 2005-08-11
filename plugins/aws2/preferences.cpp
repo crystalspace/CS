@@ -54,7 +54,7 @@ bool preferences::load(iObjectRegistry* objreg, const scfString& filename)
 	// Read the whole file.
 	csRef<iDataBuffer> buf = input->GetAllData();
 
-	defFile df;
+	aws2::defFile df;
 
 	// Parse the definition file into the root registry object.
 	df.Parse(buf->GetData(), root);

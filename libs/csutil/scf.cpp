@@ -616,6 +616,70 @@ void scfInitialize (int argc, const char* const argv[])
   }
 }
 
+struct scfStaticClass
+{
+  scfFactoryFunc func;
+  const char *iClassID;
+  const char *Description;
+  const char *Dependencies;
+};
+struct scfStaticFactoryFunc
+{
+  scfFactoryFunc func;
+  const char *FactClass;
+};
+
+/* Since the order of static symbol initialization is undeterminated,
+ * use this wrapper to instantiate a csArray<> when needed.
+ */
+template<typename T>
+class StaticArrayWrapper
+{
+public:
+  typedef csArray<T> ArrayType; 
+private:
+  ArrayType* array;
+  ArrayType& GetArray()
+  {
+    if (!array) array = new ArrayType;
+    return *array;
+  }
+public:
+  ~StaticArrayWrapper() { delete array; }
+  size_t Length() { return array ? array->Length() : 0; }
+  T& operator [] (size_t n) { return GetArray()[n]; }
+  size_t Push (T const& what) { return GetArray().Push (what); }
+};
+
+static StaticArrayWrapper<scfStaticClass> staticClasses;
+static StaticArrayWrapper<const char*> staticXml;
+static StaticArrayWrapper<scfStaticFactoryFunc> staticFactoryFuncs;
+
+void scfRegisterStaticClass (scfFactoryFunc func, const char *iClassID, 
+			     const char *Description, 
+			     const char *Dependencies)
+{
+  scfStaticClass c;
+  c.func = func;
+  c.iClassID = iClassID;
+  c.Description = Description;
+  c.Dependencies = Dependencies;
+  staticClasses.Push (c);
+}
+
+void scfRegisterStaticClasses (char const* xml)
+{
+  staticXml.Push (xml);
+}
+
+void scfRegisterStaticFactoryFunc (scfFactoryFunc func, const char *FactClass)
+{
+  scfStaticFactoryFunc ff;
+  ff.func = func;
+  ff.FactClass = FactClass;
+  staticFactoryFuncs.Push (ff);
+}
+
 csSCF::csSCF (unsigned int v) : verbose(v),
 #ifdef CS_REF_TRACKER
   refTracker(0), 
@@ -643,6 +707,23 @@ csSCF::csSCF (unsigned int v) : verbose(v),
   mutex = csMutex::Create (true);
 
   staticContextID = contexts.Request (SCF_STATIC_CLASS_CONTEXT);
+
+  size_t i;
+  for (i = 0; i < staticClasses.Length(); i++)
+  {
+    const scfStaticClass& c = staticClasses[i];
+    RegisterClass (c.func, c.iClassID, c.Description, c.Dependencies,
+      SCF_STATIC_CLASS_CONTEXT);
+  }
+  for (i = 0; i < staticXml.Length(); i++)
+  {
+    RegisterClasses (staticXml[i], SCF_STATIC_CLASS_CONTEXT);
+  }
+  for (i = 0; i < staticFactoryFuncs.Length(); i++)
+  {
+    const scfStaticFactoryFunc& ff = staticFactoryFuncs[i];
+    RegisterFactoryFunc (ff.func, ff.FactClass);
+  }
 }
 
 csSCF::~csSCF ()

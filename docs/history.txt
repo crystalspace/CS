@@ -12,6 +12,18 @@ chronological order.
 	  iObject* instead of void* in order to make the SWIG cleanup possible.
 	- dfryer changed VFS to expand paths when unmounting paths, instead of
 	  only when mounting.  This had caused some inconsistancy.
+	- res changed the way static plugins are registered. Previous, they
+	  were registered with SCF upon module loading; hwoever, this has the
+	  problem that when SCF was shut down, the static plugins were
+	  unregistered, but there was no way to re-register them - restarting
+	  a statically linked binary was not possible. Now, the static plugin
+	  registration information is stored upon startup and scanned every
+	  time SCF is initialized, allowing re-registration of them when SCF
+	  is restarted.
+	- res changed some symbol names in aws2 to prevent symbol name clashes
+	  when doing static linking.
+	- res made the engine more forgiving(ie not crashing) in case the 
+	  shader compiler plugin is not found.
 10-Aug-2005
 	- Jorrit fixed the java scripting module in a similar way as how
 	  the python module was fixed.

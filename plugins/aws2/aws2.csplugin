@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.window.alternatemanager2</name>
-        <implementation>awsManager</implementation>
+        <implementation>awsManager2</implementation>
         <description>Crystal Space alternate window manager version 2.0.alpha</description>
       </class>      
     </classes>

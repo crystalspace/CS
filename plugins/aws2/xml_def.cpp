@@ -23,7 +23,7 @@
 #include "iutil/document.h"
 
 
-namespace aws
+namespace aws2
 {
 
 void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)

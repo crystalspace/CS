@@ -874,41 +874,51 @@ bool csEngine::HandleEvent (iEvent &Event)
 	      objectRegistry->Register (shaderManager, "iShaderManager");
 	    }
 
-            // Load a default shader
-            csRef<iDocumentSystem> docsys (
-              CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
-            if (!docsys.IsValid())
-              docsys.AttachNew (new csTinyDocumentSystem ());
-            csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-
             csRef<iShaderCompiler> shcom (shaderManager->
               GetCompiler ("XMLShader"));
 
-	    VFS->PushDir();
-	    VFS->ChDir ("/shader/");
-	    char const* shaderPath = "std_lighting.xml";
-            csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-	    if (shaderFile.IsValid())
-	      shaderDoc->Parse (shaderFile, true);
+	    if (!shcom.IsValid())
+	    {
+	      Warn ("'XMLShader' shader compiler not available - "
+		"default shaders are unavailable.");
+	    }
 	    else
-	      Report("WARNING: Shader %s not available  Failure imminent!",
-	        shaderPath);
-            defaultShader = shcom->CompileShader (shaderDoc->GetRoot ()->
-              GetNode ("shader"));
-            shaderManager->RegisterShader (defaultShader);
+	    {
+	      // Load default shaders
+	      csRef<iDocumentSystem> docsys (
+		CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
+	      if (!docsys.IsValid())
+		docsys.AttachNew (new csTinyDocumentSystem ());
+	      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
 
-            shaderDoc = docsys->CreateDocument ();
-            shaderPath = "std_lighting_portal.xml";
-            shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-            if (shaderFile.IsValid())
-              shaderDoc->Parse (shaderFile, true);
-            else
-              Report("WARNING: Shader %s not available  Failure imminent!",
-              shaderPath);
-            csRef<iShader> portal_shader = shcom->CompileShader (shaderDoc->GetRoot ()->
-              GetNode ("shader"));
-            shaderManager->RegisterShader (portal_shader);
-	    VFS->PopDir();
+	      VFS->PushDir();
+	      VFS->ChDir ("/shader/");
+	      char const* shaderPath = "std_lighting.xml";
+	      csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
+	      if (shaderFile.IsValid())
+	      {
+		shaderDoc->Parse (shaderFile, true);
+		defaultShader = shcom->CompileShader (shaderDoc->GetRoot ()->
+		  GetNode ("shader"));
+		shaderManager->RegisterShader (defaultShader);
+	      }
+	      else
+		Warn ("Shader %s not available", shaderPath);
+
+	      shaderDoc = docsys->CreateDocument ();
+	      shaderPath = "std_lighting_portal.xml";
+	      shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
+	      if (shaderFile.IsValid())
+	      {
+		shaderDoc->Parse (shaderFile, true);
+		csRef<iShader> portal_shader = shcom->CompileShader (
+		  shaderDoc->GetRoot ()->GetNode ("shader"));
+		shaderManager->RegisterShader (portal_shader);
+	      }
+	      else
+		Warn ("Shader %s not available", shaderPath);
+	      VFS->PopDir();
+	    }
 
             csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
 	    // Now, try to load the user-specified default render loop.

@@ -23,7 +23,9 @@
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 
-namespace aws
+using namespace aws;
+
+namespace aws2
 {
   /** Parses a definition file. */
   class defFile

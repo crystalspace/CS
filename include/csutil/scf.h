@@ -613,10 +613,8 @@ iBase* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit__()						\
     {									\
-      scfInitialize(0);							\
-      iSCF::SCF->RegisterClass(						\
-        CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep,		\
-	SCF_STATIC_CLASS_CONTEXT);					\
+      scfRegisterStaticClass(						\
+        CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep);		\
     }									\
   } Class##_static_init__;
 
@@ -630,8 +628,7 @@ iBase* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Module##_StaticInit()						\
     {									\
-      scfInitialize(0);							\
-      iSCF::SCF->RegisterClasses(MetaInfo, SCF_STATIC_CLASS_CONTEXT);	\
+      scfRegisterStaticClasses (MetaInfo);				\
     }									\
   } Module##_static_init__;
 
@@ -646,8 +643,8 @@ iBase* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit()						\
     {									\
-      scfInitialize(0);							\
-      iSCF::SCF->RegisterFactoryFunc(CS_EXPORTED_NAME(Class,_Create),#Class); \
+      scfRegisterStaticFactoryFunc (CS_EXPORTED_NAME(Class,_Create),	\
+	#Class); 							\
     }									\
   };
 
@@ -745,7 +742,21 @@ CS_CRYSTALSPACE_EXPORT void scfInitialize(csPathsList const* pluginPaths,
  */
 CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[]);
 
-
+//@{
+/**
+ * Register a static class.
+ * This needs extra handling since they require automatic registration even
+ * when SCF is initialized after it was possibly shut down previously.
+ * The static class info is stored and read out later when SCF is initialized.
+ */
+CS_CRYSTALSPACE_EXPORT void scfRegisterStaticClass (scfFactoryFunc, 
+  const char *iClassID, const char *Description, 
+  const char *Dependencies = 0);
+CS_CRYSTALSPACE_EXPORT void scfRegisterStaticClasses (char const* xml);
+CS_CRYSTALSPACE_EXPORT void scfRegisterStaticFactoryFunc (scfFactoryFunc, 
+  const char *FactClass);
+//@}
+  
 //---------- IMPLEMENTATION OF HELPER FUNCTIONS
 
 

@@ -32,25 +32,25 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
-SCF_IMPLEMENT_FACTORY(awsManager)
+SCF_IMPLEMENT_FACTORY(awsManager2)
 
-SCF_IMPLEMENT_IBASE(awsManager)
+SCF_IMPLEMENT_IBASE(awsManager2)
   SCF_IMPLEMENTS_INTERFACE(iAws)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE(awsManager::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE(awsManager2::eiComponent)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-awsManager::awsManager(iBase *the_base)
+awsManager2::awsManager2(iBase *the_base)
 {
   SCF_CONSTRUCT_IBASE (the_base);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   scfiEventHandler = 0;
 }
 
-awsManager::~awsManager()
+awsManager2::~awsManager2()
 {
   if (scfiEventHandler)
   {
@@ -66,7 +66,7 @@ awsManager::~awsManager()
 }
 
 bool 
-awsManager::Initialize (iObjectRegistry *_object_reg)
+awsManager2::Initialize (iObjectRegistry *_object_reg)
 {
   object_reg = _object_reg;
   
@@ -74,7 +74,7 @@ awsManager::Initialize (iObjectRegistry *_object_reg)
 }
 
 void 
-awsManager::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
+awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
 {
   g2d = _g2d;
   g3d = _g3d;
@@ -86,7 +86,7 @@ awsManager::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
  ***************** Event Handling ************************************
  ********************************************************************/
 
-bool awsManager::HandleEvent (iEvent &Event)
+bool awsManager2::HandleEvent (iEvent &Event)
 {  
   // Find out what kind of event it is
   switch (Event.Type)
@@ -108,7 +108,7 @@ bool awsManager::HandleEvent (iEvent &Event)
  ********************************************************************/
 
 
-void awsManager::Redraw()
+void awsManager2::Redraw()
 {
   static float angle=0.0;
   if (angle>6.28318531) angle=0;
@@ -155,7 +155,7 @@ void awsManager::Redraw()
  ***************** Definition Files **********************************
  ********************************************************************/
 
-bool awsManager::Load(const scfString &_filename)
+bool awsManager2::Load(const scfString &_filename)
 {
   return prefs.load(object_reg, _filename);
 }
