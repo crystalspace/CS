@@ -24,6 +24,8 @@ chronological order.
 	  when doing static linking.
 	- res made the engine more forgiving(ie not crashing) in case the 
 	  shader compiler plugin is not found.
+	- mdmkolbe refactored some of the SWIG stuff.  The changes to the
+	  Java and Perl bindings were done blind and will need to be checked.
 10-Aug-2005
 	- Jorrit fixed the java scripting module in a similar way as how
 	  the python module was fixed.

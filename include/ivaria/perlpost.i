@@ -242,57 +242,44 @@
 
   csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface)
   {
-    csRef<iBase> b;
-    b.AttachNew(reg->Get
-      (iface, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
-    return csWrapPtr (iface, b);
+	return _CS_QUERY_REGISTRY (reg, iface, scfGetVersion(iface));
   }
   csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
     const char *tag, const char *iface)
   {
-    csRef<iBase> b;
-    b.AttachNew(reg->Get
-      (tag, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
-    return csWrapPtr (iface, b);
+    return _CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, iface, scfGetVersion(iface));
   }
   csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface)
   {
-    return csWrapPtr (iface, (iBase *) obj->QueryInterface
-      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
+    return _SCF_QUERY_INTERFACE (obj, iface, scfGetVersion(iface));
   }
   csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface)
   {
-    return csWrapPtr (iface, (iBase *) iBase::QueryInterfaceSafe
-      (obj, iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
+    return _SCF_QUERY_INTERFACE_SAFE (obj, iface, scfGetVersion(iface));
   }
   csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
     const char *iface)
   {
-    return csWrapPtr (iface, obj->QueryPlugin
-      (id, iface, scfGetVersion (iface)));
+    return _CS_QUERY_PLUGIN_CLASS (obj, id, iface, scfGetVersion(iface));
   }
   csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
     const char *iface)
   {
-    return csWrapPtr (iface, obj->LoadPlugin
-      (id, iface, scfGetVersion (iface)));
+    return _CS_LOAD_PLUGIN (obj, id, iface, scfGetVersion(iface));
   }
   csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface)
   {
-    return csWrapPtr (iface, (iBase *) obj->GetChild
-      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface)));
+    return _CS_GET_CHILD_OBJECT (obj, iface, scfGetVersion(iface));
   }
   csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
     const char *name)
   {
-    return csWrapPtr (iface, (iBase *) obj->GetChild
-      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface), name));
+    return _CS_GET_NAMED_CHILD_OBJECT (obj, iface, scfGetVersion(iface), name);
   }
   csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
     const char *name)
   {
-    return csWrapPtr (iface, (iBase *) obj->GetChild
-      (iSCF::SCF->GetInterfaceID (iface), scfGetVersion (iface), name, true));
+    return _CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, iface, scfGetVersion(iface), name);
   }
 %}
 
