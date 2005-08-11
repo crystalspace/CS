@@ -244,8 +244,7 @@
     {
       csString pT; pT << "cspace::" << $1.Type;
       iBase* ibase = rf;
-      ibase->IncRef ();
-      void* ptr = iBase__DynamicCast(ibase, $1.Type).VoidPtr;
+      void* ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
       SV* rv = sv_newmortal();
       SWIG_MakePtr(rv, ptr, SWIG_TypeQuery(pT.GetData()), 0);
       $result = rv;

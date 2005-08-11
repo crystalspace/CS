@@ -117,38 +117,18 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
   }
 %enddef
 
-#if (SWIG_VERSION >= 0x010324)
-%{ static csWrapPtr iBase__DynamicCast(iBase *, const char *); %}
-#else
-%{ csWrapPtr iBase__DynamicCast(iBase *, const char *); %}
-#endif
-
 %{
 PyObject *
 _csWrapPtr_to_Python (const csWrapPtr & wp)
 {
-  if (!wp.VoidPtr && !wp.Ref.IsValid())
+  if (!wp.Ref.IsValid())
   {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  PyObject * result;
-  CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
-  strcat(strcpy(type_name, wp.Type), " *");
-  iBase * ibase;
-  void * ptr;
-  if (wp.VoidPtr)
-  {
-    ptr = wp.VoidPtr;
-    ibase = (iBase *)SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);    
-    // Assume that VoidPtrs have been IncRef()ed
-  }
-  else
-  {
-    ibase = (iBase *)wp.Ref;
-    ibase->IncRef();
-    ptr = iBase__DynamicCast(ibase, wp.Type).VoidPtr;
-  }
+  iBase * ibase = (iBase *)wp.Ref;
+  void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
+  ibase->DecRef(); // Undo IncRef from QueryInterface
 
   // This is a bit tricky: We want the generated Python 'result' object
   // to own one reference to the wrapped object, so we want to call
@@ -166,8 +146,9 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   // Python side because this reference count manipulation is for our own
   // internal correctness.)
 
-  result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
-  //ibase->IncRef();
+  CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
+  strcat(strcpy(type_name, wp.Type), " *");
+  PyObject *result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
   PyObject * ibase_obj = SWIG_NewPointerObj(
     (void *) ibase, SWIG_TypeQuery(type_name), 1);
   PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");

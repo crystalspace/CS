@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Aug-2005
+	- mdmkolbe cleaned up SWIG to be a bit more type-safe.
 10-Aug-2005
 	- Jorrit fixed the java scripting module in a similar way as how
 	  the python module was fixed.

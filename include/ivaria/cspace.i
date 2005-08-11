@@ -412,18 +412,16 @@
   struct csWrapPtr
   {
     csRef<iBase> Ref;
-    void *VoidPtr;
     const char *Type;
-    csWrapPtr (const char *t, iBase *r)
-    : Ref (r), VoidPtr (0), Type (t) {}
-    csWrapPtr (const char *t, csPtr<iBase> r)
-    : Ref (r), VoidPtr (0), Type (t) {}
-    csWrapPtr (const char *t, csRef<iBase> r)
-    : Ref (r), VoidPtr (0), Type (t) {}
-    csWrapPtr (const char *t, void *p)
-    : VoidPtr (p), Type (t) {}
+    scfInterfaceVersion Version;
+    csWrapPtr (const char *t, scfInterfaceVersion v, iBase *r)
+    : Ref (r), Type (t), Version(v) {}
+    csWrapPtr (const char *t, scfInterfaceVersion v, csPtr<iBase> r)
+    : Ref (r), Type (t), Version(v) {}
+    csWrapPtr (const char *t, scfInterfaceVersion v, csRef<iBase> r)
+    : Ref (r), Type (t), Version(v) {}
     csWrapPtr (const csWrapPtr &p)
-    : Ref (p.Ref), VoidPtr (p.VoidPtr), Type (p.Type) {}
+    : Ref (p.Ref), Type (p.Type), Version(p.Version) {}
   };
 
 %}
@@ -1126,45 +1124,6 @@ TYPEMAP_OUT_csWrapPtr
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
 APPLY_FOR_EACH_INTERFACE
-
-// When time comes the classic cast "(T*)self" can be changed to
-// "dynamic_cast<T*>(self)". For now, this is not necessary because
-// classic C casts are used all over the place in CS. Note that for
-// readability it might be better to use "static_cast<T*>(self)".
-// %define CAST_FROM_BASE(T) else if (!strcmp(to_name, #T)) ptr = (void*)(T*)self;
-%define GET_VERSION_FROM_INTERFACE(T) 
-  else if (!strcmp(to_name, #T))
-  {
-    id = scfInterfaceTraits<T>::GetID ();
-    ver = scfInterfaceTraits<T>::GetVersion ();
-  }
-%enddef
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) GET_VERSION_FROM_INTERFACE(x)
-
-// csutil/scf.h
-%extend iBase
-{
-  csWrapPtr _DynamicCast (const char * to_name)
-  {
-    void* ptr = 0;
-    scfInterfaceID id = ~0;
-    scfInterfaceVersion ver=0;
-    if (!to_name || !to_name[0] || !self) ptr = 0;
-    
-    id = iSCF::SCF->GetInterfaceID (to_name);
-    
-    if (id != ~0u)
-    {
-      ptr = self->QueryInterface (id, ver);
-      if (ptr) self->DecRef(); //Account for the refcount made by QueryInterface
-    }
-    
-    return csWrapPtr(to_name, ptr);
-  }
-}
-
-#undef CAST_FROM_BASE
 
 #ifndef CS_MINI_SWIG
 // imesh/sprite2d.h

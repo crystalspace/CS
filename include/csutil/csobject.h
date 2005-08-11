@@ -102,12 +102,11 @@ public:
    * optionally pass a name to look for. If FirstName is true then the
    * method will stop at the first object with the requested name, even
    * if it did not implement the requested type. Note that the returned
-   * object may only be cast to the requested type, no other type, not
-   * even iObject! <p>
+   * object must still be queried for the requested type. <p>
    *
    * Note that the returned object will be IncRef'ed.
    */
-  virtual void* GetChild (int iInterfaceID, int iVersion,
+  virtual iObject* GetChild (int iInterfaceID, int iVersion,
     const char *Name = 0, bool FirstName = false) const;
 
   /// Return the first child object with the given name

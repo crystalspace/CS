@@ -194,12 +194,9 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
-    void * ptr = 0;
-    if ($1.VoidPtr)
-      ptr = $1.VoidPtr;
-    else
-      ptr = iBase__DynamicCast((iBase *)$1.Ref, $1.Type).VoidPtr;
-    //ref->IncRef();
+    iBase * ibase = (iBase *)$1.Ref;
+    void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
+    ibase->DecRef(); // Undo IncRef from QueryInterface
     if (ptr == 0)
       $result = 0;
     else

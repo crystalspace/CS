@@ -47,11 +47,11 @@ class csWrapPtr(_object):
     __swig_setmethods__["Ref"] = _cspace.csWrapPtr_Ref_set
     __swig_getmethods__["Ref"] = _cspace.csWrapPtr_Ref_get
     if _newclass:Ref = property(_cspace.csWrapPtr_Ref_get, _cspace.csWrapPtr_Ref_set)
-    __swig_setmethods__["VoidPtr"] = _cspace.csWrapPtr_VoidPtr_set
-    __swig_getmethods__["VoidPtr"] = _cspace.csWrapPtr_VoidPtr_get
-    if _newclass:VoidPtr = property(_cspace.csWrapPtr_VoidPtr_get, _cspace.csWrapPtr_VoidPtr_set)
     __swig_getmethods__["Type"] = _cspace.csWrapPtr_Type_get
     if _newclass:Type = property(_cspace.csWrapPtr_Type_get)
+    __swig_setmethods__["Version"] = _cspace.csWrapPtr_Version_set
+    __swig_getmethods__["Version"] = _cspace.csWrapPtr_Version_get
+    if _newclass:Version = property(_cspace.csWrapPtr_Version_get, _cspace.csWrapPtr_Version_set)
     def __init__(self, *args):
         _swig_setattr(self, csWrapPtr, 'this', _cspace.new_csWrapPtr(*args))
         _swig_setattr(self, csWrapPtr, 'thisown', 1)
@@ -92,7 +92,6 @@ class iBase(_object):
 
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBase_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iBase_scfGetVersion)
-    def _DynamicCast(*args): return _cspace.iBase__DynamicCast(*args)
 
 class iBasePtr(iBase):
     def __init__(self, this):

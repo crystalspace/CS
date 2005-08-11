@@ -108,7 +108,7 @@ csObject::csObject (iBase* pParent) : Children (0), Name (0)
   InitializeObject ();
 }
 
-csObject::csObject (csObject &o) : iObject(), Children (0), Name (0)
+csObject::csObject (csObject &o) : iBase(), iObject(), Children (0), Name (0)
 {
   SCF_CONSTRUCT_IBASE (0);
   InitializeObject ();
@@ -254,7 +254,7 @@ void csObject::ObjAddChildren (iObject *Parent)
   }
 }
 
-void* csObject::GetChild (int InterfaceID, int Version,
+iObject* csObject::GetChild (int InterfaceID, int Version,
 	const char *Name, bool fn) const
 {
   if (!Children)
@@ -262,8 +262,7 @@ void* csObject::GetChild (int InterfaceID, int Version,
 
   if (fn)
   {
-    iObject *obj = GetChild (Name);
-    return obj ? obj->QueryInterface (InterfaceID, Version) : 0;
+    return GetChild(Name);
   }
 
   size_t i;
@@ -276,8 +275,12 @@ void* csObject::GetChild (int InterfaceID, int Version,
       if (strcmp(OtherName, Name)) continue;
     }
 
-    void *obj = Children->Get (i)->QueryInterface (InterfaceID, Version);
-    if (obj) return obj;
+    iObject *child = Children->Get(i);
+    if (child->QueryInterface(InterfaceID, Version) != 0)
+    {
+      child->DecRef(); // Undo the IncRef from QueryInterface
+      return child;
+    }
   }
 
   return 0;

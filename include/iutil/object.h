@@ -33,27 +33,30 @@ struct iObjectIterator;
  * object will be IncRef'ed. This version requires a correctly set-up interface
  * ID variable.
  */
-#define CS_GET_CHILD_OBJECT(object,Interface)			\
-  csPtr<Interface> ((Interface*)(object)->GetChild(		\
-  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion()))
+#define CS_GET_CHILD_OBJECT(object,Interface)                        \
+  scfQueryInterfaceSafe<Interface>((object)->GetChild(               \
+    scfInterfaceTraits<Interface>::GetID(),                          \
+    scfInterfaceTraits<Interface>::GetVersion()))
 
 /**
  * You can use this macro to get a child object with the given name and
  * interface from a csObject. The returned object will be IncRef'ed.
  */
-#define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
-  csPtr<Interface> ((Interface*)(object)->GetChild(			\
-  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion(), \
-  name))
+#define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)             \
+  scfQueryInterfaceSafe<Interface>((object)->GetChild(               \
+    scfInterfaceTraits<Interface>::GetID(),                          \
+    scfInterfaceTraits<Interface>::GetVersion(),                     \
+    name))
 
 /**
  * This is the same as CS_GET_CHILD_OBJECT, but stops at the first object
  * with the given name, even if it does not implement the requested interface.
  */
-#define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
-  csPtr<Interface> ((Interface*)(object)->GetChild(			\
-  scfInterfaceTraits<Interface>::GetID(), scfInterfaceTraits<Interface>::GetVersion(), \
-  name, true))
+#define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)       \
+  scfQueryInterfaceSafe<Interface>((object)->GetChild(               \
+    scfInterfaceTraits<Interface>::GetID(),                          \
+    scfInterfaceTraits<Interface>::GetVersion(),                     \
+    name, true))
 
 
 //SCF_VERSION (iObject, 0, 3, 0);
@@ -113,16 +116,15 @@ struct iObject : public virtual iBase
    * optionally pass a name to look for. If FirstName is true then the
    * method will stop at the first object with the requested name, even
    * if it did not implement the requested type. Note that the returned
-   * object may only be cast to the requested type, no other type, not
-   * even iObject! <p>
+   * object must still be queried for the requested type. <p>
    *
    * Note that the returned object will be IncRef'ed.
    */
-  virtual void* GetChild (int iInterfaceID, int iVersion,
+  virtual iObject* GetChild (int iInterfaceID, int iVersion,
     const char *Name = 0, bool FirstName = false) const = 0;
 
   /// Return the first child object with the given name
-  virtual iObject *GetChild (const char *Name) const = 0;
+  virtual iObject* GetChild (const char *Name) const = 0;
 
   /**
    * Return an iterator for all child objects. Note that you should not
