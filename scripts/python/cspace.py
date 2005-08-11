@@ -11057,6 +11057,8 @@ class iDynamicSystem(iBase):
     def CreateBody(*args): return _cspace.iDynamicSystem_CreateBody(*args)
     def RemoveBody(*args): return _cspace.iDynamicSystem_RemoveBody(*args)
     def FindBody(*args): return _cspace.iDynamicSystem_FindBody(*args)
+    def GetBody(*args): return _cspace.iDynamicSystem_GetBody(*args)
+    def GetBodysCount(*args): return _cspace.iDynamicSystem_GetBodysCount(*args)
     def CreateGroup(*args): return _cspace.iDynamicSystem_CreateGroup(*args)
     def RemoveGroup(*args): return _cspace.iDynamicSystem_RemoveGroup(*args)
     def CreateJoint(*args): return _cspace.iDynamicSystem_CreateJoint(*args)
@@ -11067,6 +11069,12 @@ class iDynamicSystem(iBase):
     def AttachColliderBox(*args): return _cspace.iDynamicSystem_AttachColliderBox(*args)
     def AttachColliderSphere(*args): return _cspace.iDynamicSystem_AttachColliderSphere(*args)
     def AttachColliderPlane(*args): return _cspace.iDynamicSystem_AttachColliderPlane(*args)
+    def DestroyColliders(*args): return _cspace.iDynamicSystem_DestroyColliders(*args)
+    def DestroyCollider(*args): return _cspace.iDynamicSystem_DestroyCollider(*args)
+    def AttachCollider(*args): return _cspace.iDynamicSystem_AttachCollider(*args)
+    def CreateCollider(*args): return _cspace.iDynamicSystem_CreateCollider(*args)
+    def GetCollider(*args): return _cspace.iDynamicSystem_GetCollider(*args)
+    def GetColliderCount(*args): return _cspace.iDynamicSystem_GetColliderCount(*args)
     def __del__(self, destroy=_cspace.delete_iDynamicSystem):
         try:
             if self.thisown: destroy(self)
@@ -11185,6 +11193,9 @@ class iRigidBody(iBase):
     def AttachColliderBox(*args): return _cspace.iRigidBody_AttachColliderBox(*args)
     def AttachColliderSphere(*args): return _cspace.iRigidBody_AttachColliderSphere(*args)
     def AttachColliderPlane(*args): return _cspace.iRigidBody_AttachColliderPlane(*args)
+    def AttachCollider(*args): return _cspace.iRigidBody_AttachCollider(*args)
+    def DestroyColliders(*args): return _cspace.iRigidBody_DestroyColliders(*args)
+    def DestroyCollider(*args): return _cspace.iRigidBody_DestroyCollider(*args)
     def SetPosition(*args): return _cspace.iRigidBody_SetPosition(*args)
     def GetPosition(*args): return _cspace.iRigidBody_GetPosition(*args)
     def SetOrientation(*args): return _cspace.iRigidBody_SetOrientation(*args)
@@ -11217,6 +11228,8 @@ class iRigidBody(iBase):
     def SetCollisionCallback(*args): return _cspace.iRigidBody_SetCollisionCallback(*args)
     def Collision(*args): return _cspace.iRigidBody_Collision(*args)
     def Update(*args): return _cspace.iRigidBody_Update(*args)
+    def GetCollider(*args): return _cspace.iRigidBody_GetCollider(*args)
+    def GetColliderCount(*args): return _cspace.iRigidBody_GetColliderCount(*args)
     def __del__(self, destroy=_cspace.delete_iRigidBody):
         try:
             if self.thisown: destroy(self)
@@ -11229,6 +11242,51 @@ class iRigidBodyPtr(iRigidBody):
         if not hasattr(self,"thisown"): _swig_setattr(self, iRigidBody, 'thisown', 0)
         _swig_setattr(self, iRigidBody,self.__class__,iRigidBody)
 _cspace.iRigidBody_swigregister(iRigidBodyPtr)
+
+BOX_COLLIDER_GEOMETRY = _cspace.BOX_COLLIDER_GEOMETRY
+PLANE_COLLIDER_GEOMETRY = _cspace.PLANE_COLLIDER_GEOMETRY
+TRIMESH_COLLIDER_GEOMETRY = _cspace.TRIMESH_COLLIDER_GEOMETRY
+CYLINDER_COLLIDER_GEOMETRY = _cspace.CYLINDER_COLLIDER_GEOMETRY
+SPHERE_COLLIDER_GEOMETRY = _cspace.SPHERE_COLLIDER_GEOMETRY
+class iDynamicsSystemCollider(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsSystemCollider, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsSystemCollider, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iDynamicsSystemCollider instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def CreateSphereGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateSphereGeometry(*args)
+    def CreatePlaneGeometry(*args): return _cspace.iDynamicsSystemCollider_CreatePlaneGeometry(*args)
+    def CreateMeshGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateMeshGeometry(*args)
+    def CreateBoxGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateBoxGeometry(*args)
+    def CreateCCylinderGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateCCylinderGeometry(*args)
+    def SetFriction(*args): return _cspace.iDynamicsSystemCollider_SetFriction(*args)
+    def SetSoftness(*args): return _cspace.iDynamicsSystemCollider_SetSoftness(*args)
+    def SetDensity(*args): return _cspace.iDynamicsSystemCollider_SetDensity(*args)
+    def SetElasticity(*args): return _cspace.iDynamicsSystemCollider_SetElasticity(*args)
+    def GetFriction(*args): return _cspace.iDynamicsSystemCollider_GetFriction(*args)
+    def GetSoftness(*args): return _cspace.iDynamicsSystemCollider_GetSoftness(*args)
+    def GetDensity(*args): return _cspace.iDynamicsSystemCollider_GetDensity(*args)
+    def GetElasticity(*args): return _cspace.iDynamicsSystemCollider_GetElasticity(*args)
+    def FillWithColliderGeometry(*args): return _cspace.iDynamicsSystemCollider_FillWithColliderGeometry(*args)
+    def GetGeometryType(*args): return _cspace.iDynamicsSystemCollider_GetGeometryType(*args)
+    def GetTransform(*args): return _cspace.iDynamicsSystemCollider_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iDynamicsSystemCollider_SetTransform(*args)
+    def __del__(self, destroy=_cspace.delete_iDynamicsSystemCollider):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iDynamicsSystemColliderPtr(iDynamicsSystemCollider):
+    def __init__(self, this):
+        _swig_setattr(self, iDynamicsSystemCollider, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicsSystemCollider, 'thisown', 0)
+        _swig_setattr(self, iDynamicsSystemCollider,self.__class__,iDynamicsSystemCollider)
+_cspace.iDynamicsSystemCollider_swigregister(iDynamicsSystemColliderPtr)
 
 class iJoint(iBase):
     __swig_setmethods__ = {}
