@@ -8,6 +8,8 @@ chronological order.
 
 11-Aug-2005
 	- mdmkolbe cleaned up SWIG to be a bit more type-safe.
+	- mdmkolbe changed GetChild in iObject and csObject to return
+	  iObject* instead of void* in order to make the SWIG cleanup possible.
 	- dfryer changed VFS to expand paths when unmounting paths, instead of
 	  only when mounting.  This had caused some inconsistancy.
 10-Aug-2005
