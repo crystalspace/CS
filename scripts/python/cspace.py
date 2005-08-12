@@ -187,6 +187,10 @@ SCF_VERBOSE_PLUGIN_LOAD = _cspace.SCF_VERBOSE_PLUGIN_LOAD
 SCF_VERBOSE_PLUGIN_REGISTER = _cspace.SCF_VERBOSE_PLUGIN_REGISTER
 SCF_VERBOSE_CLASS_REGISTER = _cspace.SCF_VERBOSE_CLASS_REGISTER
 SCF_VERBOSE_ALL = _cspace.SCF_VERBOSE_ALL
+
+scfRegisterStaticClasses = _cspace.scfRegisterStaticClasses
+
+scfRegisterStaticFactoryFunc = _cspace.scfRegisterStaticFactoryFunc
 CS_DBGHELP_UNITTEST = _cspace.CS_DBGHELP_UNITTEST
 CS_DBGHELP_BENCHMARK = _cspace.CS_DBGHELP_BENCHMARK
 CS_DBGHELP_TXTDUMP = _cspace.CS_DBGHELP_TXTDUMP
@@ -222,6 +226,8 @@ class iDebugHelperPtr(iDebugHelper):
         if not hasattr(self,"thisown"): _swig_setattr(self, iDebugHelper, 'thisown', 0)
         _swig_setattr(self, iDebugHelper,self.__class__,iDebugHelper)
 _cspace.iDebugHelper_swigregister(iDebugHelperPtr)
+
+scfRegisterStaticClass = _cspace.scfRegisterStaticClass
 
 iDebugHelper_scfGetVersion = _cspace.iDebugHelper_scfGetVersion
 
@@ -12074,6 +12080,24 @@ CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
+
+_CS_QUERY_REGISTRY = _cspace._CS_QUERY_REGISTRY
+
+_CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace._CS_QUERY_REGISTRY_TAG_INTERFACE
+
+_SCF_QUERY_INTERFACE = _cspace._SCF_QUERY_INTERFACE
+
+_SCF_QUERY_INTERFACE_SAFE = _cspace._SCF_QUERY_INTERFACE_SAFE
+
+_CS_QUERY_PLUGIN_CLASS = _cspace._CS_QUERY_PLUGIN_CLASS
+
+_CS_LOAD_PLUGIN = _cspace._CS_LOAD_PLUGIN
+
+_CS_GET_CHILD_OBJECT = _cspace._CS_GET_CHILD_OBJECT
+
+_CS_GET_NAMED_CHILD_OBJECT = _cspace._CS_GET_NAMED_CHILD_OBJECT
+
+_CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace._CS_GET_FIRST_NAMED_CHILD_OBJECT
 CSMASK_Nothing = (1 << csevNothing)
 CSMASK_FrameProcess = CSMASK_Nothing
 CSMASK_Keyboard = (1 << csevKeyboard)
@@ -12187,24 +12211,6 @@ def _csInitializer_RequestPlugins (reg, plugins):
 csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
 
-
-_CS_QUERY_REGISTRY = _cspace._CS_QUERY_REGISTRY
-
-_CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace._CS_QUERY_REGISTRY_TAG_INTERFACE
-
-_SCF_QUERY_INTERFACE = _cspace._SCF_QUERY_INTERFACE
-
-_SCF_QUERY_INTERFACE_SAFE = _cspace._SCF_QUERY_INTERFACE_SAFE
-
-_CS_QUERY_PLUGIN_CLASS = _cspace._CS_QUERY_PLUGIN_CLASS
-
-_CS_LOAD_PLUGIN = _cspace._CS_LOAD_PLUGIN
-
-_CS_GET_CHILD_OBJECT = _cspace._CS_GET_CHILD_OBJECT
-
-_CS_GET_NAMED_CHILD_OBJECT = _cspace._CS_GET_NAMED_CHILD_OBJECT
-
-_CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace._CS_GET_FIRST_NAMED_CHILD_OBJECT
 csReport = csReporterHelper.Report
 
 def _GetIntfId (intf):
