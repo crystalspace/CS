@@ -46,6 +46,9 @@ sub this {
 package cspace;
 
 *scfCompatibleVersion = *cspacec::scfCompatibleVersion;
+*scfRegisterStaticClass = *cspacec::scfRegisterStaticClass;
+*scfRegisterStaticClasses = *cspacec::scfRegisterStaticClasses;
+*scfRegisterStaticFactoryFunc = *cspacec::scfRegisterStaticFactoryFunc;
 *__modulo__ = *cspacec::__modulo__;
 *__rshift__ = *cspacec::__rshift__;
 *__mult_ass__ = *cspacec::__mult_ass__;
@@ -90,6 +93,15 @@ package cspace;
 *CS_LOAD_PLUGIN_ALWAYS = *cspacec::CS_LOAD_PLUGIN_ALWAYS;
 *CS_FX_SETALPHA = *cspacec::CS_FX_SETALPHA;
 *CS_FX_SETALPHA_INT = *cspacec::CS_FX_SETALPHA_INT;
+*_CS_QUERY_REGISTRY = *cspacec::_CS_QUERY_REGISTRY;
+*_CS_QUERY_REGISTRY_TAG_INTERFACE = *cspacec::_CS_QUERY_REGISTRY_TAG_INTERFACE;
+*_SCF_QUERY_INTERFACE = *cspacec::_SCF_QUERY_INTERFACE;
+*_SCF_QUERY_INTERFACE_SAFE = *cspacec::_SCF_QUERY_INTERFACE_SAFE;
+*_CS_QUERY_PLUGIN_CLASS = *cspacec::_CS_QUERY_PLUGIN_CLASS;
+*_CS_LOAD_PLUGIN = *cspacec::_CS_LOAD_PLUGIN;
+*_CS_GET_CHILD_OBJECT = *cspacec::_CS_GET_CHILD_OBJECT;
+*_CS_GET_NAMED_CHILD_OBJECT = *cspacec::_CS_GET_NAMED_CHILD_OBJECT;
+*_CS_GET_FIRST_NAMED_CHILD_OBJECT = *cspacec::_CS_GET_FIRST_NAMED_CHILD_OBJECT;
 *AUTOLOAD = *cspacec::AUTOLOAD;
 *csInitializer_SetupEventHandler = *cspacec::csInitializer_SetupEventHandler;
 *csInitializer_RequestPlugins = *cspacec::csInitializer_RequestPlugins;
@@ -137,10 +149,10 @@ package cspace::csWrapPtr;
 %ITERATORS = ();
 *swig_Ref_get = *cspacec::csWrapPtr_Ref_get;
 *swig_Ref_set = *cspacec::csWrapPtr_Ref_set;
-*swig_VoidPtr_get = *cspacec::csWrapPtr_VoidPtr_get;
-*swig_VoidPtr_set = *cspacec::csWrapPtr_VoidPtr_set;
 *swig_Type_get = *cspacec::csWrapPtr_Type_get;
 *swig_Type_set = *cspacec::csWrapPtr_Type_set;
+*swig_Version_get = *cspacec::csWrapPtr_Version_get;
+*swig_Version_set = *cspacec::csWrapPtr_Version_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csWrapPtr(@_);
@@ -195,7 +207,6 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iBase_scfGetVersion;
-*_DynamicCast = *cspacec::iBase__DynamicCast;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
