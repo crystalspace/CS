@@ -63,15 +63,49 @@
 #undef CS_GET_NAMED_CHILD_OBJECT
 #undef CS_GET_FIRST_NAMED_CHILD_OBJECT
 
-%rename(SCF_QUERY_INTERFACE) _SCF_QUERY_INTERFACE;
-%rename(SCF_QUERY_INTERFACE_SAFE) _SCF_QUERY_INTERFACE_SAFE;
-%rename(CS_QUERY_REGISTRY) _CS_QUERY_REGISTRY;
-%rename(CS_QUERY_REGISTRY_TAG_INTERFACE) _CS_QUERY_REGISTRY_TAG_INTERFACE;
-%rename(CS_QUERY_PLUGIN_CLASS) _CS_QUERY_PLUGIN_CLASS;
-%rename(CS_LOAD_PLUGIN) _CS_LOAD_PLUGIN;
-%rename(CS_GET_CHILD_OBJECT) _CS_GET_CHILD_OBJECT;
-%rename(CS_GET_NAMED_CHILD_OBJECT) _CS_GET_NAMED_CHILD_OBJECT;
-%rename(CS_GET_FIRST_NAMED_CHILD_OBJECT) _CS_GET_FIRST_NAMED_CHILD_OBJECT;
+csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
+  int iface_ver)
+{
+  return _CS_QUERY_RESITRY (reg, iface, iface_ver);
+}
+csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
+  const char *tag, const char *iface, int iface_ver)
+{
+  return _CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, iface, iface_ver);
+}
+csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
+{
+  return _SCF_QUERY_INTERFACE (obj, iface, iface_ver);
+}
+csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
+  int iface_ver)
+{
+  return _SCF_QUERY_INTERFACE (obj, iface, iface_ver);
+}
+csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
+  const char *iface, int iface_ver)
+{
+  return _CS_QUERY_PLUGIN_CLASS (obj, id, iface, iface_ver);
+}
+csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
+  const char *iface, int iface_ver)
+{
+  return _CS_LOAD_PLUGIN (obj, id, iface, iface_ver);
+}
+csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
+{
+  return _CS_GET_CHILD_OBJECT (obj, iface, iface_ver);
+}
+csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
+  int iface_ver, const char *name)
+{
+  return _CS_GET_NAMED_CHILD_OBJECT (obj, iface, iface_ver, name);
+}
+csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
+  int iface_ver, const char *name)
+{
+  return _CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, iface, iface_ver, name);
+}
 
 #ifndef CS_MINI_SWIG
 %{
