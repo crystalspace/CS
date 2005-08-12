@@ -66,7 +66,7 @@
 csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
   int iface_ver)
 {
-  return _CS_QUERY_RESITRY (reg, iface, iface_ver);
+  return _CS_QUERY_REGISTRY (reg, iface, iface_ver);
 }
 csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
   const char *tag, const char *iface, int iface_ver)
