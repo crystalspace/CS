@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Aug-2005
+	- res added support for spr3d and Thing meshes to the importkit.
+	- res applied some compile fixes from mafm.
 11-Aug-2005
 	- mdmkolbe cleaned up SWIG to be a bit more type-safe.
 	- mdmkolbe changed GetChild in iObject and csObject to return

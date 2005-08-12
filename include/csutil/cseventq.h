@@ -36,6 +36,7 @@
 struct iObjectRegistry;
 
 class csEventCord;
+class csEventOutlet;
 class csPoolEvent;
 
 /**\internal

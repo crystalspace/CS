@@ -69,6 +69,7 @@ class csPolygon3D;
 class csRegion;
 class csRenderView;
 class csSector;
+class csSectorIt;
 class csSectorList;
 class csTextureList;
 struct iClipper2D;

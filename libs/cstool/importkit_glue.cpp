@@ -27,6 +27,8 @@
 #include "imap/loader.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
+#include "imesh/sprite3d.h"
+#include "imesh/thing.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
@@ -36,6 +38,7 @@
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 
+#include "csgeom/plane3.h"
 #include "csutil/xmltiny.h"
 #include "cstool/vfsdirchange.h"
 
@@ -205,6 +208,10 @@ namespace CrystalSpace
       if (!fact) return false;
       if (ProbeGMFactory (container, fact, obj->GetName()))
 	return true;
+      if (ProbeSpr3dFactory (container, fact, obj->GetName()))
+	return true;
+      if (ProbeThingFactory (container, fact, obj->GetName()))
+	return true;
       return false;
     }
 
@@ -243,6 +250,152 @@ namespace CrystalSpace
 	material2texture.Get (gmfact->GetMaterialWrapper(), (size_t)-1);
 
       newModel.meshes.Push (newMesh);
+      newModel.glueModel = model;
+      newModel.name = csStrNewW (name);
+      container.models.Push (newModel);
+      
+      return true;
+    }
+
+    bool Glue::ProbeSpr3dFactory (ImportKit::Container& container, 
+			       iMeshFactoryWrapper* fact, const char* name)
+    {
+      csRef<iSprite3DFactoryState> sprfact = 
+	scfQueryInterface<iSprite3DFactoryState> (fact->GetMeshObjectFactory());
+      if (!sprfact) return false;
+
+      GluedModel* model = glueModelPool.Alloc();
+      int vc = sprfact->GetVertexCount ();
+      model->allVertices.SetLength (vc);
+      memcpy (model->allVertices.GetArray(), sprfact->GetVertices (0),
+	sizeof (csVector3) * vc);
+      model->allTCs.SetLength (vc);
+      memcpy (model->allTCs.GetArray(), sprfact->GetTexels (0),
+	sizeof (csVector2) * vc);
+      model->allNormals.SetLength (vc);
+      memcpy (model->allNormals.GetArray(), sprfact->GetNormals (0),
+	sizeof (csVector3) * vc);
+      size_t tc = sprfact->GetTriangleCount();
+      model->tris.SetLength (tc);
+      memcpy (model->tris.GetArray(), sprfact->GetTriangles(),
+	sizeof(csTriangle) * tc);
+
+      ImportKit::Container::Model newModel;
+      ImportKit::Container::Model::Mesh newMesh;
+      newMesh.vertexCount = vc;
+      newMesh.verts = (float*)model->allVertices.GetArray();
+      newMesh.texcoords = (float*)model->allTCs.GetArray();
+      newMesh.normals = (float*)model->allNormals.GetArray();
+      newMesh.triCount = tc;
+      newMesh.tris = (uint*)model->tris.GetArray();
+      newMesh.material = 
+	material2texture.Get (sprfact->GetMaterialWrapper(), (size_t)-1);
+
+      newModel.meshes.Push (newMesh);
+      newModel.glueModel = model;
+      newModel.name = csStrNewW (name);
+      container.models.Push (newModel);
+      
+      return true;
+    }
+
+    bool Glue::ProbeThingFactory (ImportKit::Container& container, 
+			       iMeshFactoryWrapper* fact, const char* name)
+    {
+      csRef<iThingFactoryState> thingfact = 
+	scfQueryInterface<iThingFactoryState> (fact->GetMeshObjectFactory());
+      if (!thingfact ) return false;
+
+      csHash<GluedModel, size_t> models;
+      size_t totalVert = 0, totalTri = 0;
+
+      for (int i = 0; i < thingfact->GetPolygonCount(); i++)
+      {
+	size_t mat = 
+	  material2texture.Get (thingfact->GetPolygonMaterial (i), (size_t)-1);
+	GluedModel* model = models.GetElementPointer (mat);
+	if (!model)
+	{
+	  models.Put (mat, GluedModel ());
+	  model = models.GetElementPointer (mat);
+	}
+
+	csMatrix3 tm;
+	csVector3 tv;
+	thingfact->GetPolygonTextureMapping (i, tm, tv);
+	csTransform object2texture (tm, tv);
+
+	int pvc = thingfact->GetPolygonVertexCount (i);
+	uint vo = (uint)model->allVertices.Length();
+	for (int v = 0; v < pvc; v++)
+	{
+	  totalVert++;
+	  const csVector3& vertex = thingfact->GetPolygonVertex (i, v);
+	  model->allVertices.Push (vertex);
+	  csVector3 t = object2texture.Other2This (vertex);
+	  model->allTCs.Push (csVector2 (t.x, t.y));
+	  if (v >= 2)
+	  {
+	    totalTri++;
+	    csTriangle tri;
+	    tri.a = vo;
+	    tri.b = vo + v - 1;
+	    tri.c = vo + v;
+	    model->tris.Push (tri);
+	  }
+	  model->allNormals.Push (
+	    -thingfact->GetPolygonObjectPlane (i).Normal());
+	}
+      }
+
+      ImportKit::Container::Model newModel;
+      GluedModel* model = glueModelPool.Alloc();
+      model->allVertices.SetCapacity (totalVert);
+      model->allNormals.SetCapacity (totalVert);
+      model->allTCs.SetCapacity (totalVert);
+      model->tris.SetCapacity (totalTri);
+
+      csHash<GluedModel, size_t>::GlobalIterator it (models.GetIterator ());
+      while (it.HasNext())
+      {
+	size_t mat;
+	const GluedModel& partModel = it.Next (mat);
+	uint vo = (uint)model->allVertices.Length();
+	size_t vc = partModel.allVertices.Length();
+
+	model->allVertices.SetLength (vo + vc);
+	model->allNormals.SetLength (vo + vc);
+	model->allTCs.SetLength (vo + vc);
+	memcpy (model->allVertices.GetArray() + vo,
+	  partModel.allVertices.GetArray(), vc * sizeof(csVector3));
+	memcpy (model->allNormals.GetArray() + vo,
+	  partModel.allNormals.GetArray(), vc * sizeof(csVector3));
+	memcpy (model->allTCs.GetArray() + vo,
+	  partModel.allTCs.GetArray(), vc * sizeof(csVector2));
+
+	size_t to = model->tris.Length();
+	for (size_t t = 0; t < partModel.tris.Length(); t++)
+	{
+	  csTriangle tri;
+	  tri.a = partModel.tris[t].a + vo;
+	  tri.b = partModel.tris[t].b + vo;
+	  tri.c = partModel.tris[t].c + vo;
+	  model->tris.Push (tri);
+	}
+
+	ImportKit::Container::Model::Mesh newMesh;
+
+	newMesh.vertexCount = (uint)vc;
+	newMesh.verts = (float*)(model->allVertices.GetArray()+vo);
+	newMesh.texcoords = (float*)(model->allTCs.GetArray()+vo);
+	newMesh.normals = (float*)(model->allNormals.GetArray()+vo);
+	newMesh.triCount = model->tris.Length()+to;
+	newMesh.tris = (uint*)(model->tris.GetArray()+to);
+	newMesh.material = mat;
+
+	newModel.meshes.Push (newMesh);
+      }
+
       newModel.glueModel = model;
       newModel.name = csStrNewW (name);
       container.models.Push (newModel);

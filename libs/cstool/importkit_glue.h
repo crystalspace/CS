@@ -94,6 +94,12 @@ namespace CrystalSpace
       /// Check whether an engine object is a genmesh factory and handle if so
       bool ProbeGMFactory (ImportKit::Container& container, 
 	iMeshFactoryWrapper* fact, const char* name);
+      /// Check whether an engine object is a spr3d factory and handle if so
+      bool ProbeSpr3dFactory (ImportKit::Container& container, 
+	iMeshFactoryWrapper* fact, const char* name);
+      /// Check whether an engine object is a Thing factory and handle if so
+      bool ProbeThingFactory (ImportKit::Container& container, 
+	iMeshFactoryWrapper* fact, const char* name);
     public:
       Glue (iObjectRegistry* objectReg);
       ~Glue();
