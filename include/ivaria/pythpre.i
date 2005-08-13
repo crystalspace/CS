@@ -172,6 +172,17 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
 %enddef
 
+%typemap(in) (const char * iface, int iface_ver) (csString className)
+{
+  PyObject *pyname = PyObject_GetAttrString($input, "__name__");
+  className = csString(PyString_AsString(pyname));
+  Py_XDECREF(pyname);
+  $1 = (char*)className.GetData(); // SWIG declares $1 non-const for some reason
+  PyObject *pyver = PyObject_CallMethod($input, "scfGetVersion", NULL);
+  $2 = PyInt_AsLong(pyver);
+  Py_XDECREF(pyver);
+}
+
 %typemap(in) (int argc, char const * const argv[])
 {
   if (!PyList_Check($input))

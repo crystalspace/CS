@@ -77,48 +77,6 @@
 
 %pythoncode %{
 
-  def _GetIntfId (intf):
-    return cvar.iSCF_SCF.GetInterfaceID(intf.__name__)
-  def _GetIntfVersion (intf):
-    return eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
-
-  def CS_QUERY_REGISTRY (reg, intf):
-    return _CS_QUERY_REGISTRY (reg, intf.__name__, _GetIntfVersion(intf))
-
-  def CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf):
-    return _CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf.__name__,
-      _GetIntfVersion(intf))
-
-  def SCF_QUERY_INTERFACE (obj, intf):
-    return _SCF_QUERY_INTERFACE (obj, intf.__name__, _GetIntfVersion(intf))
-
-  def SCF_QUERY_INTERFACE_SAFE (obj, intf):
-    return _SCF_QUERY_INTERFACE_SAFE(obj, intf.__name__,
-      _GetIntfVersion(intf))
-
-  def CS_GET_CHILD_OBJECT (obj, intf):
-    return _CS_GET_CHILD_OBJECT(obj, intf.__name__, _GetIntfVersion(intf))
-
-  def CS_GET_NAMED_CHILD_OBJECT (obj, intf, name):
-    return _CS_GET_NAMED_CHILD_OBJECT(obj, intf.__name__,
-      _GetIntfVersion(intf), name)
-
-  def CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf, name):
-    return CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf.__name__,
-      _GetIntfVersion(intf), name)
-
-  def CS_QUERY_PLUGIN_CLASS (obj, class_id, intf):
-    return _CS_QUERY_PLUGIN_CLASS(obj, class_id, intf.__name__,
-      _GetIntfVersion(intf))
-
-  def CS_LOAD_PLUGIN (obj, class_id, intf):
-    return _CS_LOAD_PLUGIN(obj, class_id, intf.__name__,
-      _GetIntfVersion(intf))
-
-  def CS_REQUEST_PLUGIN (name, intf):
-    return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-      eval('%s_scfGetVersion()' % intf.__name__, locals(), globals()))
-
   def CS_REQUEST_VFS ():
     return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
 

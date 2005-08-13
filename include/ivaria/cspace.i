@@ -389,25 +389,15 @@
 
   // This pointer wrapper can be used to prevent code-bloat by macros
   // acting as template functions.  Examples are SCF_QUERY_INTERFACE()
-  // and CS_QUERY_REGISTRY(). Note that this works only if you're not
-  // using virtual inheritance.  Also note that CS should never need to
+  // and CS_QUERY_REGISTRY().  Also note that CS should never need to
   // use virtual inheritance as long as it has SCF.
   //
   // Ref - A managed reference to the iBase pointer of the wrapped
   //    interface.
-  // VoidPtr - A raw pointer to the address of the the specified SCF
-  //    interface after performing a dynamic cast from iBase. This
-  //    address may differ from the iBase address (as a result of normal
-  //    C++ casting behavior where objects and inheritence are
-  //    involved). This is the actual value which the higher-level
-  //    scripting objects wrap; they do not wrap the iBase pointer.  This
-  //    member is assigned only by very specialized functions which
-  //    already know, or which can compute, the raw interface address,
-  //    such as iBase::_DynamicCast(), and the various FOO_QUERY_BAR()
-  //    macros.
   // Type
   //    The SCF interface name which this pointer represents (for
   //    instance, "iEngine").
+  // Version - The version of the interface this pointer represents.
 
   struct csWrapPtr
   {
@@ -1372,22 +1362,36 @@ uint _CS_FX_SETALPHA_INT (uint);
 }
 #endif // CS_MINI_SWIG
 
+/****************************************************************************
+ * These functions are replacements for CS's macros of the same names.
+ * These functions can be wrapped by Swig but the macros can't.
+ ****************************************************************************/
 %inline %{
-csWrapPtr _CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
+#undef SCF_QUERY_INTERFACE
+#undef SCF_QUERY_INTERFACE_SAFE
+#undef CS_QUERY_REGISTRY
+#undef CS_QUERY_REGISTRY_TAG_INTERFACE
+#undef CS_QUERY_PLUGIN_CLASS
+#undef CS_LOAD_PLUGIN
+#undef CS_GET_CHILD_OBJECT
+#undef CS_GET_NAMED_CHILD_OBJECT
+#undef CS_GET_FIRST_NAMED_CHILD_OBJECT
+
+csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
   int iface_ver)
 {
   iBase *b = reg->Get(iface, iSCF::SCF->GetInterfaceID (iface), iface_ver);
   return csWrapPtr (iface, iface_ver, b);
 }
 
-csWrapPtr _CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
+csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
   const char *tag, const char *iface, int iface_ver)
 {
   iBase *b = reg->Get(tag, iSCF::SCF->GetInterfaceID (iface), iface_ver);
   return csWrapPtr (iface, iface_ver, b);
 }
 
-csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
+csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
 {
   // This call to QueryInterface ensures that IncRef is called and that
   // the object supports the interface.  However, for type safety and
@@ -1399,7 +1403,7 @@ csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
     return csWrapPtr (iface, iface_ver, 0);
 }
 
-csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
+csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
   int iface_ver)
 {
   if (!obj)
@@ -1415,38 +1419,37 @@ csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
     return csWrapPtr (iface, iface_ver, 0);
 }
 
-csWrapPtr _CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
+csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
   return csWrapPtr (iface, iface_ver, obj->QueryPlugin (id, iface, iface_ver));
 }
 
-csWrapPtr _CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
+csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
   return csWrapPtr (iface, iface_ver, obj->LoadPlugin(id));
 }
 
-csWrapPtr _CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
+csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
 {
   return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
     iface_ver));
 }
 
-csWrapPtr _CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
+csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
   return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
     iface_ver, name));
 }
 
-csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
+csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
   return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
     iface_ver, name, true));
 }
-
 %}
 
 #if defined(SWIGPYTHON)

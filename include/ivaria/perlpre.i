@@ -349,6 +349,48 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 %enddef
 
 /****************************************************************************
+ * Retrieve the version number of an interface which is provided as a string.
+ * Used by the typemap below.
+ ****************************************************************************/
+%{
+  int scfGetVersion (const char *iface)
+  {
+    dSP;
+    int ver;
+    int nresult;
+    csString var;
+    var << "cspace::" << iface << "::scfGetVersion";
+
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    PUTBACK;
+    nresult = call_pv(var.GetData(), G_SCALAR);
+    SPAGAIN;
+
+    if (nresult != 1)
+      croak("Expected exactly one result from scfGetVersion()\n");
+
+    ver = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ver;
+  }
+%}
+
+/****************************************************************************
+ * Typemaps to convert an interface and version from an interface name.
+ ****************************************************************************/
+%typemap(in) (const char * iface, int iface_ver)
+{
+  $1 = (char*)$input; // SWIG declares $1 non-const for some reason
+  $2 = scfGetVersion($input);
+}
+
+/****************************************************************************
  * Typemaps to convert an argc/argv pair to a Perl array.
  ****************************************************************************/
 %typemap(in) (int argc, char const* const argv[])

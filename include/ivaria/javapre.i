@@ -291,6 +291,24 @@ IEVENTOUTLET_JAVACODE
 %enddef
 ICONFIGMANAGER_JAVACODE
 
+// Should probably be rewritten using csString for className
+%typemap(in) (const char * iface, int iface_ver) (char className[1024])
+{
+    const char * s = jenv->GetStringUTFChars($input, 0);
+    const char * dot = strrchr(s, '.');
+    strcpy(className, "org/crystalspace3d/");
+    strcat(className, dot?dot+1:s);
+    $1 = className + sizeof("org/crystalspace3d/") - 1;
+    jenv->ReleaseStringUTFChars($input, s);
+    jclass cls = jenv->FindClass(className);
+    jmethodID mid = jenv->GetStaticMethodID(cls, "scfGetVersion", "()I");
+    $2 = jenv->CallStaticIntMethod(cls, mid);
+}
+%typemap(jni) (const char * iface, int iface_ver) "jstring"
+%typemap(jtype) (const char * iface, int iface_ver) "String"
+%typemap(jstype) (const char * iface, int iface_ver) "Class"
+%typemap(javain) (const char * iface, int iface_ver) "$javainput.getName()"
+
 // argc-argv handling
 %typemap(in) (int argc, char const * const argv[])
 {

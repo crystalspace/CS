@@ -9,6 +9,8 @@ chronological order.
 12-Aug-2005
 	- res added support for spr3d and Thing meshes to the importkit.
 	- res applied some compile fixes from mafm.
+	- mdmkolbe replaced yesterday's temporary SWIG workaround with a better
+	  solution.  Again the Java and Perl bindings were done blind.
 11-Aug-2005
 	- mdmkolbe cleaned up SWIG to be a bit more type-safe.
 	- mdmkolbe changed GetChild in iObject and csObject to return
@@ -29,7 +31,7 @@ chronological order.
 	  shader compiler plugin is not found.
 	- mdmkolbe refactored some of the SWIG stuff.  The changes to the
 	  Java and Perl bindings were done blind and will need to be checked.
-	- mdmkolbe added a temporary workaround  for %rename placement
+	- mdmkolbe added a temporary workaround for %rename placement
 	  issues in SWIG.
 10-Aug-2005
 	- Jorrit fixed the java scripting module in a similar way as how
