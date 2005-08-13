@@ -76,7 +76,7 @@ struct iVosObject3D : public virtual iBase
 
 
 
-SCF_VERSION (iVosSector, 0, 3, 0);
+SCF_VERSION (iVosSector, 0, 3, 1);
 
 /** This interface bridges between a VOS sector and a Crystal Space
     sector. */
@@ -99,6 +99,9 @@ struct iVosSector : public virtual iBase
    *  represent the list of objects in the A3DL sector
    */
   virtual const csSet< csPtrKey<iVosObject3D> > &GetObject3Ds() = 0;
+
+  /** Write out lightmap caches for any lightmapped objects in the sector. */
+  virtual void CacheLightmaps() = 0;
 };
 
 
