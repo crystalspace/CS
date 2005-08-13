@@ -35,8 +35,8 @@ const char* LightmapCache::GetCurrentScope () const
     return "";
 }
 
-bool LightmapCache::CacheData (const void* data, unsigned long size, const char* type,
-                               const char* scope, unsigned int id)
+bool LightmapCache::CacheData (const void* data, size_t size, const char* type,
+                               const char* scope, uint32 id)
 {
     LOG("lightmapcache", 3, "caching " << size << " bytes");
     property->replace(std::string((char*)data, size));

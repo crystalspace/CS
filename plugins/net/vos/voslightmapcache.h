@@ -24,8 +24,8 @@ public:
 
     virtual const char* GetCurrentScope () const;
 
-    virtual bool CacheData (const void* data, unsigned long size,
-                            const char* type, const char* scope, unsigned int id);
+    virtual bool CacheData (const void* data, size_t size,
+                            const char* type, const char* scope, uint32 id);
 
     virtual csPtr<iDataBuffer> ReadCache (
         const char* type, const char* scope, uint32 id);
