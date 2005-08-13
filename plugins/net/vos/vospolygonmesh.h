@@ -4,7 +4,7 @@
     This file is part of Crystal Space Virtual Object System Abstract
     3D Layer plugin (csvosa3dl).
 
-    Copyright (C) 2004 Peter Amstutz
+    Copyright (C) 2004-2005 Peter Amstutz
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -39,6 +39,8 @@ public:
 
   static VOS::MetaObject* new_csMetaPolygonMesh(VOS::VobjectBase* superobject,
     const std::string& type);
+
+  void WriteLightmapCache();
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
 };

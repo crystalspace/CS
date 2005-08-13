@@ -45,6 +45,7 @@
 #include "csvosa3dl.h"
 #include "vospolygonmesh.h"
 #include "vosmaterial.h"
+#include "voslightmapcache.h"
 
 using namespace VUtil;
 using namespace VOS;
@@ -64,6 +65,7 @@ public:
   csVosA3DL *vosa3dl;
   csVector3 startingPos;
   bool dbl;
+  LightmapCache* lmc;
 
   std::vector<A3DL::PolygonMesh::Vertex> verts;
   std::vector<A3DL::PolygonMesh::Polygon> polys;
@@ -87,7 +89,7 @@ ConstructPolygonMeshTask::ConstructPolygonMeshTask(iObjectRegistry *objreg,
                                                    const csVector3& pos,
                                                    bool ds)
   : object_reg(objreg), polygonmesh(pm, true), name(n), sector(s),
-    isStatic(false), chainedtask(0), startingPos(pos), dbl(ds)
+    isStatic(false), chainedtask(0), startingPos(pos), dbl(ds), lmc(0)
 {
 }
 
@@ -108,9 +110,12 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
     {
       thingfac->CreateVertex(csVector3(verts[i].x, verts[i].y, verts[i].z));
     }
-    std::vector<int> polymap(polys.size());
 
-    for(size_t i = 0; i < polys.size(); i++)
+    unsigned int numpolys = polys.size();
+
+    std::vector<int> polymap(numpolys);
+
+    for(size_t i = 0; i < numpolys; i++)
     {
       polymap[i] = thingfac->AddEmptyPolygon();
 
@@ -125,9 +130,9 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
         if(n > 2)
         {
           float a = csMath3::Direction3(
-      thingfac->GetPolygonVertex(polymap[i], n-2),
-                thingfac->GetPolygonVertex(polymap[i], n-1),
-                thingfac->GetPolygonVertex(polymap[i], n));
+            thingfac->GetPolygonVertex(polymap[i], n-2),
+            thingfac->GetPolygonVertex(polymap[i], n-1),
+            thingfac->GetPolygonVertex(polymap[i], n));
           if(ABS(a) < EPSILON) flat = true;
         }
       }
@@ -246,9 +251,9 @@ void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
         num++;
         if(dbl)
         {
-          triangles[num].a = polys[i][0];
-          triangles[num].b = polys[i][c];
-          triangles[num].c = polys[i][c-1];
+          triangles[num].a = polys[i][c];
+          triangles[num].b = polys[i][c-1];
+          triangles[num].c = polys[i][0];
           num++;
         }
       }
@@ -511,6 +516,23 @@ void ConstructPolygonMeshTask::doTexturing(std::vector<int>& polymap,
 
 }
 
+class ReadLightmapTask : public Task
+{
+public:
+  csMetaPolygonMesh* polygonmesh;
+  LightmapCache* lmc;
+
+  void doTask() {
+    if(lmc) {
+      csRef<iLightingInfo> li = SCF_QUERY_INTERFACE(polygonmesh->GetCSinterface()->GetMeshWrapper()->GetMeshObject(), iLightingInfo);
+      LOG("ConstructPolygonMeshTask", 2, "reading polygon mesh lightmap");
+      li->ReadFromCache(lmc);
+      li->PrepareLighting();
+      delete lmc;
+    }
+  }
+};
+
 void ConstructPolygonMeshTask::doTask()
 {
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -545,6 +567,15 @@ void ConstructPolygonMeshTask::doTask()
     chainedtask->doTask();
     delete chainedtask;
   }
+
+#if 0 // still some issues with this, will enable it later
+  if(lmc) {
+    ReadLightmapTask* rlt = new ReadLightmapTask;
+    rlt->polygonmesh = polygonmesh;
+    rlt->lmc = lmc;
+    vosa3dl->mainThreadTasks.push(rlt);
+  }
+#endif
 }
 
 /// csMetaPolygonMesh ///
@@ -563,6 +594,35 @@ MetaObject* csMetaPolygonMesh::new_csMetaPolygonMesh(VobjectBase* superobject,
     return new csMetaPolygonMesh(superobject);
 }
 
+void csMetaPolygonMesh::WriteLightmapCache()
+{
+    vRef<Property> p;
+    try {
+      p = getLightmapObj();
+    } catch(NoSuchObjectError) {
+        vRef<Site> site = getSite();
+        p = site->createVobject<Property>("a3dl:lightmap");
+        p->setDefaultPolicy("property:accept-all");
+        insertChild(-1, "a3dl:lightmap", p);
+    } catch(std::runtime_error e) {
+      LOG("vospolygonmesh", 2, "error writing lightmap cache: " << e.what());
+      return;
+    }
+
+    csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+    if(!mw) return;
+    csRef<iMeshObject> mo = mw->GetMeshObject();
+    if(!mo) return;
+
+    csRef<iLightingInfo> li = SCF_QUERY_INTERFACE(mo, iLightingInfo);
+
+    LOG("vospolygonmesh", 2, "writing lightmap cache for " << getURLstr());
+
+    LightmapCache lmc(p);
+    li->WriteToCache(&lmc);
+}
+
+
 void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
   if(alreadyLoaded) return;
@@ -571,77 +631,88 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   this->vosa3dl = vosa3dl;
   sector = sect;
 
-  double x, y, z;
-  getPosition(x, y, z);
-
-  bool dbl = false;
   try {
-    dbl = getDoubleSided();
-  } catch(NoSuchObjectError) { }
+    double x, y, z;
+    getPosition(x, y, z);
 
-  ConstructPolygonMeshTask* cpmt =
-    new ConstructPolygonMeshTask(vosa3dl->GetObjectRegistry(), this, getURLstr(),
-                                 sect->GetSector(), csVector3(x, y, z), dbl);
+    bool dbl = false;
+    try {
+      dbl = getDoubleSided();
+    } catch(NoSuchObjectError) { }
 
-  LOG("csMetaPolygonMesh", 3, "getting vertices");
+    ConstructPolygonMeshTask* cpmt =
+      new ConstructPolygonMeshTask(vosa3dl->GetObjectRegistry(), this, getURLstr(),
+                                   sect->GetSector(), csVector3(x, y, z), dbl);
 
-  getVertices(cpmt->verts);
-  getPolygons(cpmt->polys);
+    LOG("csMetaPolygonMesh", 3, "getting vertices");
 
-  try
-  {
-    LOG("csMetaPolygonMesh", 3, "getting texels");
-    getTexels(cpmt->texels);
-    LOG("csMetaPolygonMesh", 3, "got texels");
-  }
-  catch(NoSuchObjectError&)
-  {
-    LOG("csMetaPolygonMesh", 3, "getting texturespaces");
+    getVertices(cpmt->verts);
+    getPolygons(cpmt->polys);
+
     try
     {
-      getTextureSpaces(cpmt->texsp);
-    } catch(NoSuchObjectError&)
-    {
+      LOG("csMetaPolygonMesh", 3, "getting texels");
+      getTexels(cpmt->texels);
+      LOG("csMetaPolygonMesh", 3, "got texels");
     }
-    LOG("csMetaPolygonMesh", 3, "got texturespaces");
-  }
+    catch(NoSuchObjectError&)
+    {
+      LOG("csMetaPolygonMesh", 3, "getting texturespaces");
+      try
+      {
+        getTextureSpaces(cpmt->texsp);
+      } catch(NoSuchObjectError&)
+      {
+      }
+      LOG("csMetaPolygonMesh", 3, "got texturespaces");
+    }
 
-  LOG("csMetaPolygonMesh", 3, "getting materials");
+    LOG("csMetaPolygonMesh", 3, "getting materials");
 
-  cpmt->materials = getMaterials();
-  cpmt->portals = getPortals();
+    cpmt->materials = getMaterials();
+    cpmt->portals = getPortals();
 
-  for(; cpmt->materials.hasMore(); cpmt->materials++)
-  {
-    (meta_cast<csMetaMaterial>(*(cpmt->materials)))->Setup(vosa3dl);
-  }
-  cpmt->materials.reset();
+    for(; cpmt->materials.hasMore(); cpmt->materials++)
+    {
+      (meta_cast<csMetaMaterial>(*(cpmt->materials)))->Setup(vosa3dl);
+    }
+    cpmt->materials.reset();
 
 #if 0
-  for(; cpmt->portals.hasMore(); cpmt->portals++)
-  {
-    cpmt->portals.setup();
-  }
-  cpmt->portals.reset();
+    for(; cpmt->portals.hasMore(); cpmt->portals++)
+    {
+      cpmt->portals.setup();
+    }
+    cpmt->portals.reset();
 #endif
 
-  LOG("csMetaPolygonMesh", 3, "looking at types");
+    LOG("csMetaPolygonMesh", 3, "looking at types");
 
-  for(TypeSetIterator ti = getTypes(); ti.hasMore(); ti++)
-  {
-    LOG("csMetaPolygonMesh", 3, "has type " << *ti);
-    if(*ti == "a3dl:static") cpmt->isStatic = true;
+    for(TypeSetIterator ti = getTypes(); ti.hasMore(); ti++)
+    {
+      LOG("csMetaPolygonMesh", 3, "has type " << *ti);
+      if(*ti == "a3dl:static") cpmt->isStatic = true;
+    }
+    LOG("csMetaPolygonMesh", 3, "is static " << cpmt->isStatic);
+
+    try {
+      vRef<Property> prop = getLightmapObj();
+      if(prop.isValid()) cpmt->lmc = new LightmapCache(prop);
+    }
+    catch(NoSuchObjectError) { }
+
+    cpmt->dynsys = sect->GetDynSys();
+    cpmt->chainedtask = GetSetupTask(vosa3dl, sect);
+    cpmt->vosa3dl = vosa3dl;
+
+    vosa3dl->mainThreadTasks.push(cpmt);
+
+    addChildListener (this);
   }
-  LOG("csMetaPolygonMesh", 3, "is static " << cpmt->isStatic);
-
-  cpmt->dynsys = sect->GetDynSys();
-
-  cpmt->chainedtask = GetSetupTask(vosa3dl, sect);
-
-  cpmt->vosa3dl = vosa3dl;
-
-  vosa3dl->mainThreadTasks.push(cpmt);
-
-  addChildListener (this);
+  catch(std::runtime_error e)
+  {
+    LOG("csMetaPolygonMesh", 2, "Got error trying to load polygon mesh: "
+        << e.what());
+    vosa3dl->decrementRelightCounter();
+  }
 }
-

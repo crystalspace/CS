@@ -31,8 +31,9 @@
 #include "ivaria/pmeter.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
-
 #include <vos/metaobjects/misc/search.hh>
+
+#include "vospolygonmesh.h"
 
 using namespace VUtil;
 using namespace VOS;
@@ -369,7 +370,8 @@ void LoadSectorTask::doTask()
   {
     unsigned int tot = 0;
 
-    for(ChildListIterator cli = sector->GetVobject()->getChildren(); cli.hasMore(); cli++) {
+    for(ChildListIterator cli = sector->GetVobject()->getChildren(); cli.hasMore(); cli++)
+    {
       if ((meta_cast<A3DL::Object3D>((*cli)->getChild())).isValid()) tot++;
     }
 
@@ -508,6 +510,17 @@ vRef<VOS::Vobject> csVosSector::GetVobject()
   return sectorvobj;
 }
 
+void csVosSector::CacheLightmaps()
+{
+  for(ChildListIterator cli = sectorvobj->getChildren(); cli.hasMore(); cli++)
+  {
+    vRef<csMetaPolygonMesh> mpm = meta_cast<csMetaPolygonMesh>((*cli)->getChild());
+    if(mpm.isValid())
+    {
+      mpm->WriteLightmapCache();
+    }
+  }
+}
 
 /// csMetaSector ///
 

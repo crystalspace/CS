@@ -53,8 +53,10 @@
 # endif
 #endif
 
-class csVosA3DL : public iComponent, public iEventHandler,
-    public iVosA3DL, public iVosApi
+class csVosA3DL : public virtual iComponent,
+                  public virtual iEventHandler,
+                  public virtual iVosA3DL,
+                  public virtual iVosApi
 {
 private:
   csRef<iEventQueue> eventq;
