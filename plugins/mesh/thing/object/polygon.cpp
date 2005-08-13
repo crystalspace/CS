@@ -86,7 +86,7 @@ csPolygon3DStatic::csPolygon3DStatic ()
 
 csPolygon3DStatic::~csPolygon3DStatic ()
 {
-  SetNumVertices (0);	// Clear vertices.
+  SetNumVertices (0);   // Clear vertices.
   delete[] name;
 
   thing_static->thing_type->blk_texturemapping.Free (polygon_data.tmapping);
@@ -154,16 +154,16 @@ void csPolygon3DStatic::SetNumVertices (int count)
       case 2:
       case 3:
         t->blk_polidx3.Free ((intar3*)old_data);
-	break;
+        break;
       case 4: t->blk_polidx4.Free ((intar4*)old_data); break;
       case 5: t->blk_polidx5->Free ((intar5*)old_data); break;
       case 6: t->blk_polidx6->Free ((intar6*)old_data); break;
       default:
         if (old_count <= 20)
           t->blk_polidx20->Free ((intar20*)old_data);
-	else
+        else
           t->blk_polidx60->Free ((intar60*)old_data);
-	break;
+        break;
     }
   }
 }
@@ -177,7 +177,7 @@ csPolygon3DStatic* csPolygon3DStatic::Clone (csThingStatic* new_parent)
   clone->SetName (name);
   clone->SetNumVertices (polygon_data.num_vertices);
   memcpy (clone->polygon_data.vertices, polygon_data.vertices,
-  	sizeof (int) * polygon_data.num_vertices);
+        sizeof (int) * polygon_data.num_vertices);
 
   clone->polygon_data.plane_obj = polygon_data.plane_obj;
   if (polygon_data.tmapping)
@@ -319,7 +319,7 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
   if (enable)
   {
     polygon_data.tmapping = thing_static->thing_type
-    	->blk_texturemapping.Alloc ();
+        ->blk_texturemapping.Alloc ();
   }
   else
   {
@@ -494,7 +494,7 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   {
     polygon_data.tmapping->GetO2T () *= t.GetO2T ();
     polygon_data.tmapping->GetO2TTranslation () = t.This2Other (
-    	polygon_data.tmapping->GetO2TTranslation ());
+        polygon_data.tmapping->GetO2TTranslation ());
   }
 }
 
@@ -612,9 +612,9 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
   if (csThing::lightmap_enabled && flags.Check (CS_POLY_LIGHTING))
   {
     int lmw = csLightMap::CalcLightMapWidth (
-    	polygon_data.tmapping->GetLitOriginalWidth ());
+        polygon_data.tmapping->GetLitOriginalWidth ());
     int lmh = csLightMap::CalcLightMapHeight (
-    	polygon_data.tmapping->GetLitHeight ());
+        polygon_data.tmapping->GetLitHeight ());
     int max_lmw, max_lmh;
     thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
@@ -623,7 +623,7 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
       if (thing_logparent)
       {
         csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (thing_logparent,
-      	  iMeshWrapper);
+          iMeshWrapper);
         if (m) mname = m->QueryObject ()->GetName ();
         else mname = "<unknown>";
       }
@@ -1072,7 +1072,7 @@ csPolygon3D::~csPolygon3D ()
       iLight* dl = lightpatches->GetLight ();
       if (dl)
         dl->RemoveAffectedLightingInfo (
-		(iLightingInfo*)thing);
+                (iLightingInfo*)thing);
       thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
@@ -1099,7 +1099,7 @@ int csPolygon3D::GetPolyIdx () const
 csPolygon3DStatic* csPolygon3D::GetStaticPoly () const
 {
   return thing->GetStaticData ()->GetPolygon3DStatic (
-  	GetPolyIdx ());
+        GetPolyIdx ());
 }
 
 void csPolygon3D::SetParent (csThing *thing)
@@ -1129,7 +1129,7 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
       txt_info.SetLightMap (lm);
 
       lm->Alloc (spoly->polygon_data.tmapping->GetLitOriginalWidth (),
-      	spoly->polygon_data.tmapping->GetLitHeight ());
+        spoly->polygon_data.tmapping->GetLitHeight ());
       /*lm->InitColor (128, 128, 128);*/
     }
   }
@@ -1191,7 +1191,7 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
           spoly->polygon_data.tmapping->GetLitOriginalWidth (),
           spoly->polygon_data.tmapping->GetLitHeight (),
           this, spoly,
-	  thing->GetStaticData ()->thing_type->engine);
+          thing->GetStaticData ()->thing_type->engine);
   if (error != 0)
   {
     txt_info.InitLightMaps ();
@@ -1201,12 +1201,14 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
 
 bool csPolygon3D::WriteToCache (iFile* file, csPolygon3DStatic* spoly)
 {
-  if (txt_info.lm == 0) return true;
-  if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
-      & CS_ENGINE_CACHE_WRITE)
+  if (txt_info.lm == 0 || txt_info.lm->GetStaticMap () == 0) return true;
+  if ((thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
+       & CS_ENGINE_CACHE_WRITE))
+  {
     txt_info.lm->Cache (file, this,
-	spoly,
-    	thing->GetStaticData ()->thing_type->engine);
+        spoly,
+                        thing->GetStaticData ()->thing_type->engine);
+  }
   return true;
 }
 
@@ -1253,7 +1255,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
       if (sfp == 0)
       {
         shadow_it->MarkRelevant (true);
-	continue;
+        continue;
       }
       csPolygon3DStatic* sfp_static = sfp->GetStaticPoly ();
       int* sfp_vt_idx = sfp_static->GetVertexIndices ();
@@ -1280,13 +1282,13 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           {
             j1 = sfp_vt_cnt - 1;
 
-	    const csVector3& v_i1 = thing->Vwor (vt_idx[i1]);
-	    const csVector3& v_i = thing->Vwor (vt_idx[i]);
-	    const csVector3& sfp_v_j1 = sfp_thing->Vwor (sfp_vt_idx[j1]);
+            const csVector3& v_i1 = thing->Vwor (vt_idx[i1]);
+            const csVector3& v_i = thing->Vwor (vt_idx[i]);
+            const csVector3& sfp_v_j1 = sfp_thing->Vwor (sfp_vt_idx[j1]);
             float a1 = csMath3::Direction3 (v_i1, v_i, sfp_v_j1);
             for (j = 0 ; j < sfp_vt_cnt ; j++)
             {
-	      const csVector3& sfp_v_j = sfp_thing->Vwor (sfp_vt_idx[j]);
+              const csVector3& sfp_v_j = sfp_thing->Vwor (sfp_vt_idx[j]);
               float a = csMath3::Direction3 (v_i1, v_i, sfp_v_j);
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
               {
@@ -1323,23 +1325,23 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           shadow_it->MarkRelevant (false);
           break;
         case CS_FRUST_COVERED:
-	  {
-	    // To see if we really have a 'covered' case we first
-	    // test if the covering polygon isn't behind the first
-	    // polygon. To do that we take a ray from the center of
-	    // the light to the plane of the other polygon and see
-	    // if it intersects.
-	    csVector3 isect;
-	    float dist;
-	    const csPlane3& wor_plane = sfp->GetParent ()
-	    	->GetPolygonWorldPlaneNoCheck (sfp->GetPolyIdx ());
-	    if (!csIntersect3::SegmentPlane (center, thing->Vwor (vt_idx[0]), wor_plane,
-	      isect, dist))
-	    {
-	      shadow_it->MarkRelevant (false);
-	      break;
-	    }
-	  }
+          {
+            // To see if we really have a 'covered' case we first
+            // test if the covering polygon isn't behind the first
+            // polygon. To do that we take a ray from the center of
+            // the light to the plane of the other polygon and see
+            // if it intersects.
+            csVector3 isect;
+            float dist;
+            const csPlane3& wor_plane = sfp->GetParent ()
+                ->GetPolygonWorldPlaneNoCheck (sfp->GetPolyIdx ());
+            if (!csIntersect3::SegmentPlane (center, thing->Vwor (vt_idx[0]), wor_plane,
+              isect, dist))
+            {
+              shadow_it->MarkRelevant (false);
+              break;
+            }
+          }
           shadow_it->DecRef ();
           return false;
       }
@@ -1417,7 +1419,7 @@ bool csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
 }
 
 bool csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
-	csFrustum* light_frustum)
+        csFrustum* light_frustum)
 {
   csFrustumContext *ctxt = lview->GetFrustumContext ();
 
@@ -1496,7 +1498,7 @@ bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // Update the lightmap given light and shadow frustums in lview.
   if (txt_info.lm)
     return txt_info.FillLightMap (lview, lptq, vis, this,
-    	m_world2tex, v_world2tex, world_plane, spoly);
+        m_world2tex, v_world2tex, world_plane, spoly);
   else
     return false;
 }

@@ -2426,7 +2426,7 @@ void csThing::PrepareLighting ()
   {
     csPolygon3D& p = polygons.Get (i);
     csLightMap* lm = p.GetPolyTexture ()->GetLightMap ();
-    if (lm)
+    if (lm && lm->GetStaticMap ())
     {
       lm->CalcMaxStatic (
           int(ambient.red * 255.0f),
