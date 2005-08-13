@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Aug-2005
+	- Peter Amstutz applied a couple of fixes to csThing to prevent
+	  crashing when a lightmap is present but uninitialized 
+	  (which comes up when reading/writing lightmap caches)
 12-Aug-2005
 	- res added support for spr3d and Thing meshes to the importkit.
 	- res applied some compile fixes from mafm.
