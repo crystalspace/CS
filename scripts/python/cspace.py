@@ -12081,23 +12081,23 @@ CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
 
-_CS_QUERY_REGISTRY = _cspace._CS_QUERY_REGISTRY
+CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
 
-_CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace._CS_QUERY_REGISTRY_TAG_INTERFACE
+CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace.CS_QUERY_REGISTRY_TAG_INTERFACE
 
-_SCF_QUERY_INTERFACE = _cspace._SCF_QUERY_INTERFACE
+SCF_QUERY_INTERFACE = _cspace.SCF_QUERY_INTERFACE
 
-_SCF_QUERY_INTERFACE_SAFE = _cspace._SCF_QUERY_INTERFACE_SAFE
+SCF_QUERY_INTERFACE_SAFE = _cspace.SCF_QUERY_INTERFACE_SAFE
 
-_CS_QUERY_PLUGIN_CLASS = _cspace._CS_QUERY_PLUGIN_CLASS
+CS_QUERY_PLUGIN_CLASS = _cspace.CS_QUERY_PLUGIN_CLASS
 
-_CS_LOAD_PLUGIN = _cspace._CS_LOAD_PLUGIN
+CS_LOAD_PLUGIN = _cspace.CS_LOAD_PLUGIN
 
-_CS_GET_CHILD_OBJECT = _cspace._CS_GET_CHILD_OBJECT
+CS_GET_CHILD_OBJECT = _cspace.CS_GET_CHILD_OBJECT
 
-_CS_GET_NAMED_CHILD_OBJECT = _cspace._CS_GET_NAMED_CHILD_OBJECT
+CS_GET_NAMED_CHILD_OBJECT = _cspace.CS_GET_NAMED_CHILD_OBJECT
 
-_CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace._CS_GET_FIRST_NAMED_CHILD_OBJECT
+CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace.CS_GET_FIRST_NAMED_CHILD_OBJECT
 CSMASK_Nothing = (1 << csevNothing)
 CSMASK_FrameProcess = CSMASK_Nothing
 CSMASK_Keyboard = (1 << csevKeyboard)
@@ -12212,48 +12212,6 @@ csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
 
 csReport = csReporterHelper.Report
-
-def _GetIntfId (intf):
-  return cvar.iSCF_SCF.GetInterfaceID(intf.__name__)
-def _GetIntfVersion (intf):
-  return eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
-
-def CS_QUERY_REGISTRY (reg, intf):
-  return _CS_QUERY_REGISTRY (reg, intf.__name__, _GetIntfVersion(intf))
-
-def CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf):
-  return _CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf.__name__,
-    _GetIntfVersion(intf))
-
-def SCF_QUERY_INTERFACE (obj, intf):
-  return _SCF_QUERY_INTERFACE (obj, intf.__name__, _GetIntfVersion(intf))
-
-def SCF_QUERY_INTERFACE_SAFE (obj, intf):
-  return _SCF_QUERY_INTERFACE_SAFE(obj, intf.__name__,
-    _GetIntfVersion(intf))
-
-def CS_GET_CHILD_OBJECT (obj, intf):
-  return _CS_GET_CHILD_OBJECT(obj, intf.__name__, _GetIntfVersion(intf))
-
-def CS_GET_NAMED_CHILD_OBJECT (obj, intf, name):
-  return _CS_GET_NAMED_CHILD_OBJECT(obj, intf.__name__,
-    _GetIntfVersion(intf), name)
-
-def CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf, name):
-  return CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf.__name__,
-    _GetIntfVersion(intf), name)
-
-def CS_QUERY_PLUGIN_CLASS (obj, class_id, intf):
-  return _CS_QUERY_PLUGIN_CLASS(obj, class_id, intf.__name__,
-    _GetIntfVersion(intf))
-
-def CS_LOAD_PLUGIN (obj, class_id, intf):
-  return _CS_LOAD_PLUGIN(obj, class_id, intf.__name__,
-    _GetIntfVersion(intf))
-
-def CS_REQUEST_PLUGIN (name, intf):
-  return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-    eval('%s_scfGetVersion()' % intf.__name__, locals(), globals()))
 
 def CS_REQUEST_VFS ():
   return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
