@@ -175,12 +175,12 @@ void csLightIterRenderStep::Init ()
     csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
       object_reg, "crystalspace.shared.stringset", iStringSet);
 
-    csStringID posname = strings->Request ("STANDARD_LIGHT_0_POSITION");
-    csStringID poswname = strings->Request ("STANDARD_LIGHT_0_POSITION_WORLD");
-    csStringID difname = strings->Request ("STANDARD_LIGHT_0_DIFFUSE");
-    csStringID spcname = strings->Request ("STANDARD_LIGHT_0_SPECULAR");
-    csStringID attname = strings->Request ("STANDARD_LIGHT_0_ATTENUATION");
-    csStringID atxname = strings->Request ("STANDARD_LIGHT_0_ATTENUATIONTEX");
+    csStringID posname = strings->Request ("light 0 position");
+    csStringID poswname = strings->Request ("light 0 position world");
+    csStringID difname = strings->Request ("light 0 diffuse");
+    csStringID spcname = strings->Request ("light 0 specular");
+    csStringID attname = strings->Request ("light 0 attenuation");
+    csStringID atxname = strings->Request ("light 0 attenuationtex");
 
     shadermgr = CS_QUERY_REGISTRY (
     	object_reg, iShaderManager);

@@ -1,8 +1,8 @@
   <arbvp>
-  <variablemap variable="STANDARD_LIGHT_0_POSITION" destination="register 0"/>
-  <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="register 1"/>
-  <variablemap variable="STANDARD_LIGHT_0_SPECULAR" destination="register 2"/>
-  <variablemap variable="STANDARD_LIGHT_0_ATTENUATION" destination="register 3"/>
+  <variablemap variable="light 0 position" destination="register 0"/>
+  <variablemap variable="light 0 diffuse" destination="register 1"/>
+  <variablemap variable="light 0 specular" destination="register 2"/>
+  <variablemap variable="light 0 attenuation" destination="register 3"/>
   
   <variablemap variable="mat diffuse" destination="register 4"/>
   <variablemap variable="mat ambient" destination="register 5"/>

@@ -1,6 +1,6 @@
 <cgvp>
-<variablemap variable="STANDARD_LIGHT_0_POSITION" destination="LightPos" />
-<variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="LightColor" />
+<variablemap variable="light 0 position" destination="LightPos" />
+<variablemap variable="light 0 diffuse" destination="LightColor" />
 <program>
 <![CDATA[
 

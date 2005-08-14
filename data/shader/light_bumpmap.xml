@@ -1,5 +1,5 @@
 <shader compiler="xmlshader" name="light_bumpmap">
-  <technique priority="350">
+  <technique priority="350" lights="1">
     <pass>
       <mixmode>
         <srcalphaadd />
@@ -8,8 +8,8 @@
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
       <vp plugin="glarb" file="/shader/bump_ppl_diffuse_attn.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <texture destination="unit 2" name="standardtex normalization map" />
       <texture destination="unit 3" name="tex normal" />
       <texture destination="unit 4" name="tex diffuse" />
@@ -56,15 +56,15 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="300">
+  <technique priority="300" lights="1">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
       <mixmode>
         <copy />
       </mixmode>
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -116,15 +116,15 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="250">
+  <technique priority="250" lights="1">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
       <mixmode>
         <copy />
       </mixmode>
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -181,7 +181,7 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="200">
+  <technique priority="200" lights="1">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
       <mixmode>
@@ -189,8 +189,8 @@
       </mixmode>
       <buffer name="vertices" destination="attribute 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -240,15 +240,15 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="150">
+  <technique priority="150" lights="1">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
       <mixmode>
         <copy />
       </mixmode>
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -303,7 +303,7 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="100">
+  <technique priority="100" lights="1">
     <pass>
       <mixmode>
         <add />
@@ -322,7 +322,7 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="50">
+  <technique priority="50" lights="1">
     <pass>
       <mixmode>
         <add />

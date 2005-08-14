@@ -1,7 +1,7 @@
 <arbvp>
   <!-- This should be directional light from the sun -->
-  <variablemap variable="STANDARD_LIGHT_0_POSITION" destination="register 0" />
-  <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="register 1" />
+  <variablemap variable="light 0 position" destination="register 0" />
+  <variablemap variable="light 0 diffuse" destination="register 1" />
   <variablemap variable="beta' 1" destination="register 2" />
   <variablemap variable="beta' 2" destination="register 3" />
   <variablemap variable="beta1 + beta2" destination="register 4" />

@@ -1,11 +1,11 @@
 <shader compiler="xmlshader" name="light">
-  <technique priority="200">
+  <technique priority="200" lights="1">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
       <mixmode><copy /></mixmode>
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -55,15 +55,15 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="150">
+  <technique priority="150" lights="1">
     <pass>
       <writemask r="false" g="false" b="false" a="true" />
       <mixmode>
         <copy />
       </mixmode>
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
-      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -118,7 +118,7 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="100">
+  <technique priority="100" lights="1">
     <pass>
       <mixmode>
         <add />
@@ -137,7 +137,7 @@
       </fp>
     </pass>
   </technique>
-  <technique priority="50">
+  <technique priority="50" lights="1">
     <pass>
       <mixmode>
         <add />

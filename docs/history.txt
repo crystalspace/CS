@@ -15,6 +15,8 @@ chronological order.
 	  'code point' or 'code unit' instead of 'character' where appropriate.
 	- res fixed the csShaderVar copy ctor to properly set the pointer
 	  members to 0.
+	- res changed the names of the "STANDARD_LIGHT_0_FOO" shader variables
+	  to "light 0 foo".
 13-Aug-2005
 	- Peter Amstutz applied a couple of fixes to csThing to prevent
 	  crashing when a lightmap is present but uninitialized 

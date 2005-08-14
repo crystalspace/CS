@@ -1,6 +1,6 @@
 <arbvp>
-  <variablemap variable="STANDARD_LIGHT_0_POSITION" destination="register 0"/>
-  <variablemap variable="STANDARD_LIGHT_0_ATTENUATION" destination="register 1"/>
+  <variablemap variable="light 0 position" destination="register 0"/>
+  <variablemap variable="light 0 attenuation" destination="register 1"/>
   <program>
     <![CDATA[
       !!ARBvp1.0
