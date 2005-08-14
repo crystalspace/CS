@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Aug-2005
+	- mdmkolbe fixed a divide by zero error in the collider.
+	- mdmkolbe removed redundant statements in the python tutorial1.
 13-Aug-2005
 	- Peter Amstutz applied a couple of fixes to csThing to prevent
 	  crashing when a lightmap is present but uninitialized 

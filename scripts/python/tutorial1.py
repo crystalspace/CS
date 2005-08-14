@@ -44,14 +44,12 @@ def CreateRoom (matname):
     room = engine.GetSectors().FindByName("room")
     walls = engine.CreateSectorWallsMesh(room, "walls")
     if DEBUG: print 'walls=',walls
-    thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
     material=engine.GetMaterialList().FindByName(matname)
     thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
     walls_state = thingstate.GetFactory()
     walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-    thingstate.DecRef()
     if DEBUG: print 'Finished!'
 
 def SetupFrame ():

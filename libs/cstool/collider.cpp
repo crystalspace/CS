@@ -869,7 +869,10 @@ bool csColliderActor::AdjustForCollisions (
     csVector3 unit = normal / norm;
 
     if (unit * localvel > 0) continue;
-    vec += (-(localvel % unit) % unit).Unit();
+
+    csVector3 tmp = (-(localvel % unit) % unit);
+    if (tmp.Norm() < SMALL_EPSILON) continue;
+    vec += tmp.Unit();
 
   }
   if(!vec.IsZero())
