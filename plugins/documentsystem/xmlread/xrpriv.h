@@ -182,6 +182,7 @@ public:
   virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
   virtual csRef<iDocumentNode> GetNode (const char* value);
   virtual void RemoveNode (const csRef<iDocumentNode>&) { }
+  virtual void RemoveNodes (csRef<iDocumentNodeIterator> children) {}
   virtual void RemoveNodes () { }
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType,
   	iDocumentNode*) { return 0; }

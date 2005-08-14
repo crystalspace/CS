@@ -24,20 +24,20 @@
 // Helperstruct for kd traversal
 struct kdTraversalS
 {
-  csKDTreeNode *node;
+  litKDTreeNode *node;
   float tnear, tfar;
   
   kdTraversalS ()
   {
   }
 
-  kdTraversalS (csKDTreeNode *node, float tn, float tf)
+  kdTraversalS (litKDTreeNode *node, float tn, float tf)
     : node (node), tnear (tn), tfar (tf)
   {
   }
 };
 
-bool csRaytracer::TraceAnyHit (const csRay &ray, csHitPoint &hit)
+bool litRaytracer::TraceAnyHit (const litRay &ray, litHitPoint &hit)
 {
   // Must have a tree
   if (!tree) return false;
@@ -51,34 +51,35 @@ bool csRaytracer::TraceAnyHit (const csRay &ray, csHitPoint &hit)
   csArray<kdTraversalS> kdstack;
   kdstack.SetSize (64);
   float t;
-  csHitPoint hitpoint;
+  litHitPoint hitpoint;
   hitpoint.distance = maxt;
 
-  csKDTreeNode *node = tree->rootNode;
+  litKDTreeNode *node = tree->rootNode;
 
   while (1)
   {
-    while (csKDTreeNodeH::GetFlag (node))
+    while (litKDTreeNodeH::GetFlag (node))
     {
       //traverse until we hit a leafnode
-      uint splitDim = csKDTreeNodeH::GetDimension (node);
+      uint splitDim = litKDTreeNodeH::GetDimension (node);
       t = (node->inner.splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
+
 
       if (t <= mint)
       {
         // t <= mint <= maxt -> cull left and traverse right
-        node = ((csKDTreeNode*)csKDTreeNodeH::GetPointer (node))+1;
+        node = ((litKDTreeNode*)litKDTreeNodeH::GetPointer (node))+1;
       }
       else if (t >= maxt)
       {
         // mint <= maxt <= t -> cull right and traverse left
-        node = ((csKDTreeNode*)csKDTreeNodeH::GetPointer (node));
+        node = ((litKDTreeNode*)litKDTreeNodeH::GetPointer (node));
       }
       else
       {
         // mint < t < maxt -> traverse both left and right
-        kdstack.Push (kdTraversalS(((csKDTreeNode*)csKDTreeNodeH::GetPointer (node))+1, t, maxt));
-        node = ((csKDTreeNode*)csKDTreeNodeH::GetPointer (node));
+        kdstack.Push (kdTraversalS(((litKDTreeNode*)litKDTreeNodeH::GetPointer (node))+1, t, maxt));
+        node = ((litKDTreeNode*)litKDTreeNodeH::GetPointer (node));
         maxt = t;
       }
     }
@@ -101,7 +102,7 @@ bool csRaytracer::TraceAnyHit (const csRay &ray, csHitPoint &hit)
   return false;
 }
 
-bool csRaytracer::TraceClosestHit (const csRay &ray, csHitPoint &hit)
+bool litRaytracer::TraceClosestHit (const litRay &ray, litHitPoint &hit)
 {
   // Must have a tree
   if (!tree) return false;
@@ -115,34 +116,34 @@ bool csRaytracer::TraceClosestHit (const csRay &ray, csHitPoint &hit)
   csArray<kdTraversalS> kdstack;
   kdstack.SetSize (64);
   float t;
-  csHitPoint hitpoint;
+  litHitPoint hitpoint;
   hitpoint.distance = maxt;
 
-  csKDTreeNode *node = tree->rootNode;
+  litKDTreeNode *node = tree->rootNode;
 
   while (1)
   {
-    while (csKDTreeNodeH::GetFlag (node))
+    while (litKDTreeNodeH::GetFlag (node))
     {
       //traverse until we hit a leafnode
-      uint splitDim = csKDTreeNodeH::GetDimension (node);
+      uint splitDim = litKDTreeNodeH::GetDimension (node);
       t = (node->inner.splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
 
       if (t <= mint)
       {
         // t <= mint <= maxt -> cull left and traverse right
-        node = ((csKDTreeNode*)csKDTreeNodeH::GetPointer (node))+1;
+        node = ((litKDTreeNode*)litKDTreeNodeH::GetPointer (node))+1;
       }
       else if (t >= maxt)
       {
         // mint <= maxt <= t -> cull right and traverse left
-        node = ((csKDTreeNode*)csKDTreeNodeH::GetPointer (node));
+        node = ((litKDTreeNode*)litKDTreeNodeH::GetPointer (node));
       }
       else
       {
         // mint < t < maxt -> traverse both left and right
-        kdstack.Push (kdTraversalS(((csKDTreeNode*)csKDTreeNodeH::GetPointer (node))+1, t, maxt));
-        node = ((csKDTreeNode*)csKDTreeNodeH::GetPointer (node));
+        kdstack.Push (kdTraversalS(((litKDTreeNode*)litKDTreeNodeH::GetPointer (node))+1, t, maxt));
+        node = ((litKDTreeNode*)litKDTreeNodeH::GetPointer (node));
         maxt = t;
       }
     }
@@ -173,8 +174,8 @@ bool csRaytracer::TraceClosestHit (const csRay &ray, csHitPoint &hit)
 //@@TODO: Make this aligned
 static const uint mod5[] = {0,1,2,0,1};
 
-bool IntersectRayTriangle (const csMeshPatchAccStruct &tri, const csRay &ray,
-                           csHitPoint &hit)
+bool IntersectRayTriangle (const litMeshPatchAccStruct &tri, const litRay &ray,
+                           litHitPoint &hit)
 {
   const uint k = tri.k;
   const uint ku = mod5[tri.k+1];
@@ -208,21 +209,21 @@ bool IntersectRayTriangle (const csMeshPatchAccStruct &tri, const csRay &ray,
 
   // Ok, is a hit, store it
   hit.distance = f;
-  hit.tri = (csMeshPatchAccStruct*)&tri;
+  hit.tri = (litMeshPatchAccStruct*)&tri;
   hit.lambda = lambda;
   hit.mu = mu;
 
   return true;
 }
 
-bool csRaytracer::IntersectTriangles (const csKDTreeNode* node, const csRay &ray, 
-                                      csHitPoint &hit, bool earlyExit)
+bool litRaytracer::IntersectTriangles (const litKDTreeNode* node, const litRay &ray, 
+                                      litHitPoint &hit, bool earlyExit)
 {
   //assume valid input
   size_t nIdx, nMax;
   nMax = node->leaf.numberOfPrimitives;
   bool haveHit = false;
-  csMeshPatchAccStruct **primList = (csMeshPatchAccStruct**)csKDTreeNodeH::GetPointer (node);
+  litMeshPatchAccStruct **primList = (litMeshPatchAccStruct**)litKDTreeNodeH::GetPointer (node);
 
   for (nIdx = 0; nIdx < nMax; nIdx++)
   {

@@ -1172,6 +1172,18 @@ void csBinaryDocNode::RemoveNodes ()
   }
 }
 
+void csBinaryDocNode::RemoveNodes (csRef<iDocumentNodeIterator> children)
+{
+  if (nodeData->flags & BD_NODE_MODIFIED)
+  {
+    while (children->HasNext ())
+    {
+      csRef<iDocumentNode> n = children->Next ();
+      RemoveNode (n);
+    }
+  }
+}
+
 csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
       iDocumentNode* before)
 {

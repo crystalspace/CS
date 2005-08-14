@@ -17,6 +17,18 @@ chronological order.
 	  members to 0.
 	- res changed the names of the "STANDARD_LIGHT_0_FOO" shader variables
 	  to "light 0 foo".
+	- Marten commited recent work to the lighter. It is right now added
+	  as lighter2 but later it will replace the current ligter. Also
+	  applied older changes to old lighter.
+	- Marten added two helpers which operates on iDocument* structures
+	    - RemoveDuplicateChildren method which removes children of a given
+	      node which are considered to be duplicates.
+	    - FilterDocumentNodeIterator which works as a wrapper around a 
+	      iDocumentNodeIterator but filters the returned nodes.
+	  Both these work with a templated functor as argument to work out
+	  which nodes are to be removed/returned.
+	- Marten added a iDocumentNode::RemoveNodes (iDocumentNodeIterator*)
+	  which removes all child-nodes returned by a given iterator.
 13-Aug-2005
 	- Peter Amstutz applied a couple of fixes to csThing to prevent
 	  crashing when a lightmap is present but uninitialized 

@@ -271,6 +271,17 @@ void csTinyXmlNode::RemoveNode (const csRef<iDocumentNode>& child)
   	((csTinyXmlNode*)(iDocumentNode*)child)->GetTiNode ());
 }
 
+void csTinyXmlNode::RemoveNodes (csRef<iDocumentNodeIterator> children)
+{
+  if (!node_children) return;
+  while (children->HasNext ())
+  {
+    csRef<iDocumentNode> n = children->Next ();
+    csTinyXmlNode* tiNode = ((csTinyXmlNode*)(iDocumentNode*)n);
+    node_children->RemoveChild (tiNode->GetTiNode ());
+  }
+}
+
 void csTinyXmlNode::RemoveNodes ()
 {
   if (node_children) node_children->Clear ();

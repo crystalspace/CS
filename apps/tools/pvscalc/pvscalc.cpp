@@ -115,7 +115,7 @@ csPtr<iBase> PVSMetaLoader::Parse (iDocumentNode* node,
 
   parent->RegisterMetaInformation (sector, node);
   sector->IncRef ();
-  return csPtr<iBase> ((iBase*)sector);
+  return csPtr<iBase> (sector);
 }
 
 //-----------------------------------------------------------------------------
@@ -1844,7 +1844,7 @@ bool PVSCalc::OnInitialize (int argc, char* argv[])
     return ReportError ("Failed to set up event handler!");
 
   meta_loader.AttachNew (new PVSMetaLoader (this));
-  GetObjectRegistry ()->Register ((iBase*)meta_loader, "crystalspace.pvscalc");
+  GetObjectRegistry ()->Register (meta_loader, "crystalspace.pvscalc");
 
   return true;
 }
@@ -1853,7 +1853,7 @@ void PVSCalc::OnExit ()
 {
   if (meta_loader)
   {
-    GetObjectRegistry ()->Unregister ((iBase*)meta_loader,
+    GetObjectRegistry ()->Unregister (meta_loader,
       "crystalspace.pvscalc");
   }
 }

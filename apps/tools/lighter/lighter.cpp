@@ -274,24 +274,40 @@ bool Lighter::ScanMesh (iMeshWrapper* mesh, iSector *sector)
 
   if ( obj && include)
   {
-    csRef<csLightingMesh> lightmesh;
-    lightmesh.AttachNew (new csLightingMesh);
+    csRef<litLightingMesh> lightmesh;
     
     bool extracted = false;
-    // Try the different extractors until one works
-    for (i = 0; i < (int)geometryExtractors.Length (); i++)
+
+    // Check if we can find a factory
+    litLightingMeshFactory *fact = scene->meshFactories.Get (obj->GetFactory (), 0);
+    if (fact)
     {
-      if (geometryExtractors[i]->ExtractGeometry (mesh, lightmesh))
+      // Have a factory, use it
+      lightmesh = fact->CreateMesh (mesh);
+      extracted = true;
+    }
+    else
+    {
+      csRef<litLightingMeshFactory> fact;
+      fact.AttachNew (new litLightingMeshFactory);
+      // Try the different extractors until one works
+      for (i = 0; i < (int)geometryExtractors.Length (); i++)
       {
-        extracted = true;
-        break;
+        if (geometryExtractors[i]->ExtractGeometry (scene, obj->GetFactory (), fact))
+        {
+          scene->meshFactories.Put (obj->GetFactory (), fact);
+          lightmesh = fact->CreateMesh (mesh);
+          extracted = true;
+          break;
+        }
       }
     }
+
+    
     if (extracted)
     {
       //@@ Maybe some checking?
-      lightmesh->sectorName = sector->QueryObject ()->GetName ();
-      lightmesh->meshName = mesh->QueryObject ()->GetName ();
+      lightmesh->mo = obj;
       scene->AddObject (lightmesh, sector);
     }
     else
@@ -339,7 +355,7 @@ bool Lighter::ScanSector (iSector* sector)
 
 bool Lighter::ScanWorld ()
 {
-  scene = new csScene;
+  scene = new litScene;
 
   int i;
   iSectorList* sl = engine->GetSectors ();
@@ -460,8 +476,8 @@ bool Lighter::Initialize ()
     litconfig.mesh_selector.AttachNew (new litObjectSelectAll ());
 
   // Setup the geometry extractors
-  geometryExtractors.Push (new csGenmeshGeometryExtractor);
-  geometryExtractors.Push (new csThingGeometryExtractor);
+  geometryExtractors.Push (new litGenmeshGeometryExtractor);
+  geometryExtractors.Push (new litThingGeometryExtractor);
 
   if (!LoadMaps ())
     return false;
@@ -483,7 +499,7 @@ int main (int argc, char* argv[])
   srand (time (0));
 
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) exit (1);
+  if (!object_reg) return 1;
 
   // Create our main class.
   System = new Lighter (object_reg);

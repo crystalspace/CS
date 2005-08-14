@@ -169,9 +169,15 @@ public:
    */
   csRegExpMatcher (const char* pattern, bool extendedRE = false);
 
+  /// Copy constructor
+  csRegExpMatcher (const csRegExpMatcher& other);
+
   /// Destructor.
   ~csRegExpMatcher ();
   
+  /// Assignment operator
+  csRegExpMatcher& operator= (const csRegExpMatcher &other);
+
   /**
    * Match a string against the pattern.
    * \param string String against which to attempt match.

@@ -20,6 +20,8 @@
 #define __LIGHTMESH_H__
 
 #include "csgeom/math.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 
 #include "csutil/array.h"
@@ -27,23 +29,76 @@
 #include "csutil/csstring.h"
 #include "csutil/parray.h"
 #include "csutil/refcount.h"
+#include "csutil/ref.h"
 
-class csMeshFace;
+class litMeshFace;
+class litLightingMesh;
+
 struct iExtractorInformation;
+struct iMeshObject;
+struct iMeshObjectFactory;
+struct iMeshWrapper;
 
-struct csLightingMesh : public csRefCount
+/**
+ * Material used during light computation.
+ */
+class litLightingMaterial : public csRefCount
 {
-  csLightingMesh ()
-    : extractorInfo (0)
+public:
+};
+
+/**
+ * Factory for light meshes. Corresponds to CS mesh factories.
+ */
+class litLightingMeshFactory : public csRefCount
+{
+public:
+  litLightingMeshFactory ()
+    : moFact (0)
+  {
+  }
+
+  // Identification of CS mesh factory
+  iMeshObjectFactory *moFact;
+
+  // Original (untransformed) mesh information
+  csArray<csVector3> vertices;
+  
+  // Information needed to create a face..
+  struct litMeshFactoryFace
+  {
+    // Vertex indices
+    csArray<uint> indices;
+
+    // Lightmap texture mapping for this face
+    csArray<csVector2> textureCoordinates;
+
+    // Material
+    csRef<litLightingMaterial> material;
+  };
+
+  // Original set of faces
+  csArray<litMeshFactoryFace> faces;
+
+  // Create a new mesh from factory
+  csPtr<litLightingMesh> CreateMesh (iMeshWrapper *meshwrapper);
+};
+
+/**
+ * A single mesh used for light computation.
+ */
+class litLightingMesh : public csRefCount
+{
+public:
+  litLightingMesh ()
+    : mo (0), factory (0)
   {
   }
   // Identification of the real mesh
-  csString sectorName; 
-  csString meshName;
-  csString meshMD5;
+  iMeshObject *mo;
 
   // The faces that makes up the mesh
-  csPDelArray<csMeshFace> faces;
+  csPDelArray<litMeshFace> faces;
 
   /// Extractor/saver specific information
   iExtractorInformation *extractorInfo;
@@ -53,12 +108,15 @@ struct csLightingMesh : public csRefCount
   //Vertex colors (for shared colors)
   csArray<csColor> colorList;
 
-  // Initial amount of vertices
-  uint orignalVertexCount; 
+  //O2w-transform
+  csReversibleTransform transform;
+
+  // Factory the object is created from
+  litLightingMeshFactory *factory;
 };
 
-class csMeshPatch;
-class csMeshFace
+class litMeshPatch;
+class litMeshFace
 {
 public:
   //Properties
@@ -69,10 +127,13 @@ public:
   csColor emmitance;
 
   //Toplevel patches for this face
-  csArray<csMeshPatch*> patches;
+  csArray<litMeshPatch*> patches;
 
   //Mesh
-  csLightingMesh* mesh;
+  litLightingMesh* mesh;
+
+  //Material
+  litLightingMaterial *material;
 
   //Methods
   //Add new vertex, return index to the newly added one
@@ -99,7 +160,7 @@ public:
  * 
  * See [Wald04], page 97 for more information.
  */
-struct csMeshPatchAccStruct
+struct litMeshPatchAccStruct
 {
   //Half cacheline
   //Plane
@@ -122,13 +183,13 @@ struct csMeshPatchAccStruct
   float c_d;
 
   //pointer to patch
-  csMeshPatch *patch; //hope pointers are 32-bit, otherwise we are screwed.. ;)
+  litMeshPatch *patch; //hope pointers are 32-bit, otherwise we are screwed.. ;)
 };
 
 /**
- * Helperfunction to populate a csMeshPatchAccStruct 
+ * Helperfunction to populate a litMeshPatchAccStruct 
  */
-void csSetupAccStruct (csMeshPatchAccStruct &acc, const csVector3 &a, const csVector3 &b,
+void litSetupAccStruct (litMeshPatchAccStruct &acc, const csVector3 &a, const csVector3 &b,
                        const csVector3 &c, const csVector3 &normal);
 
 /**
@@ -172,17 +233,16 @@ void csSetupAccStruct (csMeshPatchAccStruct &acc, const csVector3 &a, const csVe
  *    1               2
  *            2
  */
-class csMeshPatch
+class litMeshPatch
 {
 public:
   //Properties
   // Indices to vertex and color info
   // vertexIndex[3] will be -1 for a triangle patch
   int vertexIndex[4];           //4*4=16 bytes
-  int colorIndex[4];            //4*4=16 bytes
 
   // Pointer to common info for all patches from a single polygon
-  csMeshFace *parentFace;       //4 bytes
+  litMeshFace *parentFace;       //4 bytes
 
   // Color of patch
   csColor color;                //24 bytes
@@ -191,13 +251,13 @@ public:
   float area;                   //4 bytes
 
   // Neighbour patches
-  csMeshPatch *neighbour[4];    //4*4=16 bytes
+  litMeshPatch *neighbour[4];    //4*4=16 bytes
 
   // Child patches
-  csMeshPatch *child[4];     //4*4=16 bytes
+  litMeshPatch *child[4];     //4*4=16 bytes
 
   // Parent patch
-  csMeshPatch *parent;          //4 bytes
+  litMeshPatch *parent;          //4 bytes
 
   // Centerpoint
   csVector3 center;             //24 bytes
@@ -205,7 +265,7 @@ public:
   //Acceleration structure used during raycasting for patches
   //If this is a quad, two acceleration structures after eachother
   //is used.
-  csMeshPatchAccStruct* accStruct;    //4 bytes
+  litMeshPatchAccStruct* accStruct;    //4 bytes
 
   /*TOTAL SIZE:                 //128 bytes.. 0 bytes free until we occupy
   more than 4 cachelines (4*32 = 128 bytes).*/
@@ -213,10 +273,10 @@ public:
   //Methods
 
   // Constructor
-  csMeshPatch ();
+  litMeshPatch ();
 
   // Destructor
-  ~csMeshPatch ();
+  ~litMeshPatch ();
 
   // Is patch a quad
   const bool IsQuad () const { return vertexIndex[3] >= 0; }
@@ -231,20 +291,13 @@ public:
   // Helper to get vertex by index
   const csVector3& GetVertex (uint i) const { return parentFace->mesh->vertexList[vertexIndex[i]];}
   // Helper to get color by index
-  const csColor& GetColor (uint i) const { return parentFace->mesh->colorList[colorIndex[i]];}
+  const csColor& GetColor (uint i) const { return parentFace->mesh->colorList[vertexIndex[i]];}
   
   // Helper to set vertex indices
   void SetVertexIdx (uint i1, uint i2, uint i3, uint i4 = (uint)~0)
   {
     vertexIndex[0] = i1; vertexIndex[1] = i2; vertexIndex[2] = i3;
     vertexIndex[3] = i4;
-  }
-
-  // Helper to set color indices
-  void SetColorIdx (uint i1, uint i2, uint i3, uint i4 = ~0)
-  {
-    colorIndex[0] = i1; colorIndex[1] = i2; colorIndex[2] = i3;
-    colorIndex[3] = i4;
   }
 
   // Setup neighbour connections for our children

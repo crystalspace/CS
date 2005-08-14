@@ -21,37 +21,44 @@
 
 #include "csutil/refcount.h"
 
-struct iMeshWrapper;
-struct csLightingMesh;
+struct iMeshObjectFactory;
+struct litLightingMeshFactory;
+class litScene;
 
 /**
  * Baseclass for geometry extractors 
  */
-class csGeometryExtractor : public csRefCount
+class litGeometryExtractor : public csRefCount
 {
 public:
   /**
    * Extract the geometry from csmesh and save it into lightmesh. 
    */
-  virtual bool ExtractGeometry (iMeshWrapper *csmesh, csLightingMesh *lightmesh);
+  virtual bool ExtractGeometry (litScene *scene,
+    iMeshObjectFactory *csfact, 
+    litLightingMeshFactory *lightmeshfact);
 };
 
-class csGenmeshGeometryExtractor : public csGeometryExtractor
+class litGenmeshGeometryExtractor : public litGeometryExtractor
 {
 public:
   /**
    * Extract the geometry from csmesh and save it into lightmesh. 
    */
-  virtual bool ExtractGeometry (iMeshWrapper *csmesh, csLightingMesh *lightmesh);
+  virtual bool ExtractGeometry (litScene *scene,
+    iMeshObjectFactory *csfact, 
+    litLightingMeshFactory *lightmeshfact);
 };
 
-class csThingGeometryExtractor : public csGeometryExtractor
+class litThingGeometryExtractor : public litGeometryExtractor
 {
 public:
   /**
   * Extract the geometry from csmesh and save it into lightmesh. 
   */
-  virtual bool ExtractGeometry (iMeshWrapper *csmesh, csLightingMesh *lightmesh);
+  virtual bool ExtractGeometry (litScene *scene,
+    iMeshObjectFactory *csfact, 
+    litLightingMeshFactory *lightmeshfact);
 };
 
 

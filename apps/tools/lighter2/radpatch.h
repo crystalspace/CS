@@ -1,6 +1,5 @@
 /*
-  Crystal Space General Algorithms
-  Copyright (C)2005 by Eric sunshine <sunshine@sunshineco.com>
+  Copyright (C) 2005 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,40 +16,22 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_ALGORITHMS_H__
-#define __CSUTIL_ALGORITHMS_H__
+#ifndef __RADPATCH_H__
+#define __RADPATCH_H__
 
-namespace CrystalSpace
+
+namespace lighter
 {
-  /**
-   * Iterate over all elements in the iterator and perform operation
-   * given by Func.
-   */
-  template <class T, class Fn>
-  inline Fn& ForEach (T it, Fn& Func)
+  class RadPatch
   {
-    while (it.HasNext ())
-    {
-      Func (it.Next ());
-    }
-    return Func;
-  }
-
-  template <class T1, class T2>
-  struct ConditionAdd
-  {
-    ConditionAdd (T1 op1, T2 op2)
-    { }
-
-    template<class T>
-    bool operator () (T obj)
-    {
-      return (op1 (obj) && op2 (obj));
-    }
-  private:
-    T1 op1;
-    T2 op2;
+  public:
+    float area;
+    csColor energy;
+    csPlane3 plane;
+    csVector3 center;
   };
+
+  typedef csArray<RadPatch> RadPatchArray;
 }
 
 #endif

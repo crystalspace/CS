@@ -22,16 +22,16 @@
 #include "csgeom/box.h"
 #include "csgeom/vector3.h"
 
-struct csMeshPatchAccStruct;
-class csKDTree;
-union csKDTreeNode;
+struct litMeshPatchAccStruct;
+class litKDTree;
+union litKDTreeNode;
 
 /**
  * A ray.
  * The ray is parameterized as O+t*D, t=[0, maxdist) with D being normalized
  * direction.
  */
-struct csRay
+struct litRay
 {
   /// Origin
   csVector3 origin;
@@ -42,7 +42,7 @@ struct csRay
   /// Maxlength
   float maxLength;
 
-  csRay ()
+  litRay ()
     : origin (0,0,0), direction (1,0,0), maxLength (FLT_MAX*0.9f)
   {
   }
@@ -116,10 +116,10 @@ struct csRay
  * A hitpoint
  * A hitpoint between a ray and a triangle
  */
-struct csHitPoint
+struct litHitPoint
 {
   /// Triangle which is hit
-  csMeshPatchAccStruct *tri;
+  litMeshPatchAccStruct *tri;
 
   /// Distance along ray for hitpoint
   float distance;
@@ -130,7 +130,7 @@ struct csHitPoint
   /// Second barycentric coordinate for hit
   float mu;
 
-  csHitPoint ()
+  litHitPoint ()
     : tri (0), distance (0), lambda (0), mu (0)
   {}
 };
@@ -138,10 +138,10 @@ struct csHitPoint
 /**
  * A triangle raytracer using KD-tree. 
  */
-class csRaytracer
+class litRaytracer
 {
 public:
-  csRaytracer (csKDTree *tree)
+  litRaytracer (litKDTree *tree)
     : tree (tree)
   {
   }
@@ -151,20 +151,20 @@ public:
    * This might not be the closest hit so it is faster but not suitable
    * for all kind of calculations.
    */
-  bool TraceAnyHit (const csRay &ray, csHitPoint &hit);
+  bool TraceAnyHit (const litRay &ray, litHitPoint &hit);
 
   /**
    * Raytrace for closest hit. 
    */
-  bool TraceClosestHit (const csRay &ray, csHitPoint &hit);
+  bool TraceClosestHit (const litRay &ray, litHitPoint &hit);
 
 protected:
   /// Traverse all triangles in a given node and do intersection against them
-  inline bool IntersectTriangles (const csKDTreeNode* node, const csRay &ray, 
-    csHitPoint &hit, bool earlyExit = false);
+  inline bool IntersectTriangles (const litKDTreeNode* node, const litRay &ray, 
+    litHitPoint &hit, bool earlyExit = false);
 
   /// Associated KD-tree
-  csKDTree *tree;
+  litKDTree *tree;
 };
 
 #endif

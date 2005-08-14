@@ -137,7 +137,7 @@ SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
  *   <li>iDocumentNode::GetNodes()
  *   </ul>
  */
-struct iDocumentNodeIterator : public iBase
+struct iDocumentNodeIterator : public virtual iBase
 {
   /// Are there more elements?
   virtual bool HasNext () = 0;
@@ -233,6 +233,8 @@ struct iDocumentNode : public iBase
 
   /// Remove a child.
   virtual void RemoveNode (const csRef<iDocumentNode>& child) = 0;
+  /// Remove all children returned by iterator
+  virtual void RemoveNodes (csRef<iDocumentNodeIterator> children) = 0;
   /// Remove all children.
   virtual void RemoveNodes () = 0;
 

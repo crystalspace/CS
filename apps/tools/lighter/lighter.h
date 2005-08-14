@@ -129,10 +129,10 @@ public:
   litConfig litconfig;
 
   /// The different extractors
-  csRefArray<csGeometryExtractor> geometryExtractors;
+  csRefArray<litGeometryExtractor> geometryExtractors;
 
   /// The main scene pointer
-  csScene *scene;
+  litScene *scene;
 
   /**
    * Set the current VFS dir to the given map_dir.

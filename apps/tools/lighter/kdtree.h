@@ -24,10 +24,10 @@
 #include "csutil/blockallocator.h"
 
 
-class csKDBuildTree;
-struct csKDBuildTreeNode;
-class csLightingMesh;
-class csMeshPatch;
+class litKDBuildTree;
+struct litKDBuildTreeNode;
+class litLightingMesh;
+class litMeshPatch;
 
 
 /**
@@ -36,7 +36,7 @@ class csMeshPatch;
  * and should therefor not be changed without performance taking into
  * concideration. See [Wald01], section 7.2.
  */
-union csKDTreeNode
+union litKDTreeNode
 {
   /**
    * KDTree node for a leaf (child having primitives) 
@@ -77,9 +77,9 @@ union csKDTreeNode
 };
 
 // Helper functions to get and set data in the kdtree-node
-struct csKDTreeNodeH
+struct litKDTreeNodeH
 {
-  static void SetFlag (csKDTreeNode *node, bool inner=false)
+  static void SetFlag (litKDTreeNode *node, bool inner=false)
   {
     if (inner)
       node->leaf.flagAndOffset |= 0x4;
@@ -87,27 +87,27 @@ struct csKDTreeNodeH
       node->leaf.flagAndOffset &= ~0x4;
   }
 
-  static bool GetFlag (const csKDTreeNode *node)
+  static bool GetFlag (const litKDTreeNode *node)
   {
     return node->leaf.flagAndOffset & 0x4;
   }
 
-  static void SetDimension (csKDTreeNode *node, uint dim)
+  static void SetDimension (litKDTreeNode *node, uint dim)
   {
     node->leaf.flagAndOffset = (node->leaf.flagAndOffset & ~0x3) | dim;
   }
 
-  static uint GetDimension (const csKDTreeNode *node)
+  static uint GetDimension (const litKDTreeNode *node)
   {
     return (node->leaf.flagAndOffset & 0x3);
   }
 
-  static void SetPointer (csKDTreeNode *node, uintptr_t ptr)
+  static void SetPointer (litKDTreeNode *node, uintptr_t ptr)
   {
     node->leaf.flagAndOffset = (node->leaf.flagAndOffset & 0x7) | ptr;
   }
 
-  static uintptr_t GetPointer (const csKDTreeNode *node)
+  static uintptr_t GetPointer (const litKDTreeNode *node)
   {
     return (node->leaf.flagAndOffset & ~0x7);
   }
@@ -116,26 +116,26 @@ struct csKDTreeNodeH
 /**
  * An optimized KD-tree for raytracing among triangles. 
  */
-class csKDTree
+class litKDTree
 {
 public:
   /// Constructor
-  csKDTree ();
+  litKDTree ();
 
   /// Destructor
-  ~csKDTree ();
+  ~litKDTree ();
 
   /// Build our optimized tree from a "build tree"
-  void BuildTree (csKDBuildTree *buildTree);
+  void BuildTree (litKDBuildTree *buildTree);
 
   /// Transfer one node from the build tree to the real one
-  void TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *tonode);
+  void TransferNode (litKDBuildTreeNode *fromNode, litKDTreeNode *tonode);
 
   /// Allocator for nodes.
-  csBlockAllocator<csKDTreeNode, csBlockAllocatorAlignPolicy<32> > nodeAllocator;
+  csBlockAllocator<litKDTreeNode, csBlockAllocatorAlignPolicy<32> > nodeAllocator;
 
   /// Pointer to root node
-  csKDTreeNode *rootNode;
+  litKDTreeNode *rootNode;
 
   /// Bounding box of entier tree
   csBox3 boundingBox;
@@ -227,10 +227,10 @@ struct SplitPositionFixer
 };
 
 /// A node in the build-tree
-struct csKDBuildTreeNode
+struct litKDBuildTreeNode
 {
   /// List of patches in this node.
-  csArray<csMeshPatch*> patches;
+  csArray<litMeshPatch*> patches;
 
   /// Split dimension
   uint splitDimension;
@@ -242,7 +242,7 @@ struct csKDBuildTreeNode
   csBox3 boundingBox;
 
   /// Child nodes
-  csKDBuildTreeNode *left, *right;
+  litKDBuildTreeNode *left, *right;
 
   void Subdivide (SplitPositionFixer *sphelper);
 };
@@ -250,22 +250,22 @@ struct csKDBuildTreeNode
 /**
  * KD-tree used to build the optimized tree 
  */
-class csKDBuildTree
+class litKDBuildTree
 {
 public:
   /// Constructor
-  csKDBuildTree ();
+  litKDBuildTree ();
 
   /// Destructor
-  ~csKDBuildTree ();
+  ~litKDBuildTree ();
 
   /// Build KD-tree from a list of objects
-  void BuildTree (const csArray<csLightingMesh*>& meshes);
+  void BuildTree (const csArray<litLightingMesh*>& meshes);
 
 private:
-  csKDBuildTreeNode* rootNode;
+  litKDBuildTreeNode* rootNode;
 
-  friend class csKDTree;
+  friend class litKDTree;
 };
 
 #endif

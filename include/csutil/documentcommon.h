@@ -159,6 +159,7 @@ public:
   virtual void SetValueAsFloat (float /*value*/) {}
 
   virtual void RemoveNode (const csRef<iDocumentNode>& /*child*/) {}
+  virtual void RemoveNodes (csRef<iDocumentNodeIterator> /*children*/) {}
   virtual void RemoveNodes () {}
 
   virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType /*type*/,

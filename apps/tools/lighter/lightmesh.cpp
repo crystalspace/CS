@@ -19,19 +19,24 @@
 #include "cssysdef.h"
 #include "lightmesh.h"
 
-csMeshPatch::csMeshPatch ()
+//cs includes
+#include "csgeom/poly3d.h"
+#include "csgeom/transfrm.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+
+litMeshPatch::litMeshPatch ()
   : parentFace (0), area (0.0f), accStruct (0)
 {
   for (uint i=0; i<4;i++)
   {
     vertexIndex[i] = -1;
-    colorIndex[i] = -1;
     neighbour[i] = 0;
     child[i] = 0;
   }
 }
 
-csMeshPatch::~csMeshPatch ()
+litMeshPatch::~litMeshPatch ()
 {
   FreeAccelerationStructs ();
   // Destroy children
@@ -50,7 +55,7 @@ static int quadChildDir2[] = {3, 0, 1, 2};
 static int triChildDir1[] = {0, 1, 2};
 static int triChildDir2[] = {1, 2, 0};
 
-void csMeshPatch::SetupNeighbours ()
+void litMeshPatch::SetupNeighbours ()
 {
   int i = 0;
   if (IsQuad ())
@@ -129,7 +134,7 @@ void csMeshPatch::SetupNeighbours ()
   }
 }
 
-void csMeshPatch::Subdivide ()
+void litMeshPatch::Subdivide ()
 {
   int i = 0;
   // If we have children, let them subdivide instead of us
@@ -144,13 +149,12 @@ void csMeshPatch::Subdivide ()
 
   //some holders
   int centerIdx, midPointIdx[4];
-  int centerCIdx, midPointCIdx[4];
   int oppdir, ch1, ch2;
 
   // Create the children
   for (i = 0; i < 4; i++)
   {
-    child[i] = new csMeshPatch;
+    child[i] = new litMeshPatch;
   }
 
 
@@ -159,7 +163,7 @@ void csMeshPatch::Subdivide ()
   {
     centerIdx = parentFace->AddVertex (center);
     csColor cntColor = GetColor (0) + GetColor (1) + GetColor (2) + GetColor (3);
-    centerCIdx = parentFace->AddColor (cntColor*0.25f);
+    parentFace->AddColor (cntColor*0.25f);
 
     //iterate over neighbours and see if we can get any midpoint 
     for (i = 0; i < 4; i++)
@@ -172,7 +176,6 @@ void csMeshPatch::Subdivide ()
         ch2 = quadChildDir2[oppdir];
 
         midPointIdx[i] = neighbour[i]->child[ch1]->vertexIndex[ch2];
-        midPointCIdx[i] = neighbour[i]->child[ch1]->colorIndex[ch2];
       } 
       else
       {
@@ -183,7 +186,7 @@ void csMeshPatch::Subdivide ()
 
         csColor cmid = (GetColor (quadChildDir1[i]) + 
                         GetColor (quadChildDir2[i])) / 2;
-        midPointCIdx[i] = parentFace->AddColor (cmid);
+        parentFace->AddColor (cmid);
       }
     }
 
@@ -192,11 +195,6 @@ void csMeshPatch::Subdivide ()
     child[1]->SetVertexIdx (midPointIdx[1], vertexIndex[1], midPointIdx[2], centerIdx);
     child[2]->SetVertexIdx (centerIdx, midPointIdx[2], vertexIndex[2], midPointIdx[3]);
     child[3]->SetVertexIdx (midPointIdx[0], centerIdx, midPointIdx[3], vertexIndex[3]);
-
-    child[0]->SetColorIdx (colorIndex[0], midPointCIdx[1], centerCIdx, midPointCIdx[0]);
-    child[1]->SetColorIdx (midPointCIdx[1], colorIndex[1], midPointCIdx[2], centerCIdx);
-    child[2]->SetColorIdx (centerCIdx, midPointCIdx[2], colorIndex[2], midPointCIdx[3]);
-    child[3]->SetColorIdx (midPointCIdx[0], centerCIdx, midPointCIdx[3], colorIndex[3]);
   }
   else
   {
@@ -209,7 +207,6 @@ void csMeshPatch::Subdivide ()
         ch2 = triChildDir2[i];
 
         midPointIdx[i] = neighbour[i]->child[ch1]->vertexIndex[ch2];
-        midPointCIdx[i] = neighbour[i]->child[ch1]->colorIndex[ch2];
       }
       else
       {
@@ -220,7 +217,7 @@ void csMeshPatch::Subdivide ()
 
         csColor cmid = (GetColor (triChildDir1[i]) + 
                         GetColor (triChildDir2[i])) / 2;
-        midPointCIdx[i] = parentFace->AddColor (cmid);
+        parentFace->AddColor (cmid);
       }
     }
 
@@ -246,20 +243,20 @@ void csMeshPatch::Subdivide ()
   }
 }
 
-void csMeshPatch::ConstructAccelerationStruct ()
+void litMeshPatch::ConstructAccelerationStruct ()
 {
   //First make sure there is no old struct
   if (accStruct) return;
 
   if (IsQuad ())
   {
-    accStruct = new csMeshPatchAccStruct[2]; 
-    csSetupAccStruct (accStruct[0], 
+    accStruct = new litMeshPatchAccStruct[2]; 
+    litSetupAccStruct (accStruct[0], 
       parentFace->mesh->vertexList[vertexIndex[0]],
       parentFace->mesh->vertexList[vertexIndex[1]],
       parentFace->mesh->vertexList[vertexIndex[2]],
       parentFace->geoNormal);
-    csSetupAccStruct (accStruct[1], 
+    litSetupAccStruct (accStruct[1], 
       parentFace->mesh->vertexList[vertexIndex[0]],
       parentFace->mesh->vertexList[vertexIndex[2]],
       parentFace->mesh->vertexList[vertexIndex[3]],
@@ -268,8 +265,8 @@ void csMeshPatch::ConstructAccelerationStruct ()
   else
   {
     //IsTriangle()
-    accStruct = new csMeshPatchAccStruct[1];
-    csSetupAccStruct (accStruct[0], 
+    accStruct = new litMeshPatchAccStruct[1];
+    litSetupAccStruct (accStruct[0], 
       parentFace->mesh->vertexList[vertexIndex[0]],
       parentFace->mesh->vertexList[vertexIndex[1]],
       parentFace->mesh->vertexList[vertexIndex[2]],
@@ -277,13 +274,13 @@ void csMeshPatch::ConstructAccelerationStruct ()
   }
 }
 
-void csMeshPatch::FreeAccelerationStructs ()
+void litMeshPatch::FreeAccelerationStructs ()
 {
   delete [] accStruct;
   accStruct = 0;
 }
 
-void csSetupAccStruct (csMeshPatchAccStruct &acc, const csVector3 &A, 
+void litSetupAccStruct (litMeshPatchAccStruct &acc, const csVector3 &A, 
                        const csVector3 &B, const csVector3 &C, const csVector3 &normal)
 {
   int k = 0; //normal maxdirection
@@ -325,3 +322,80 @@ void csSetupAccStruct (csMeshPatchAccStruct &acc, const csVector3 &A,
   acc.b_nv = -c[v] * tmp;
   acc.b_d = (c[v] * A[u] - c[u] * A[v]) * tmp;
 }
+
+csPtr<litLightingMesh> litLightingMeshFactory::CreateMesh (iMeshWrapper *meshwrapper)
+{
+  litLightingMesh *newmesh = new litLightingMesh;
+
+  newmesh->factory = this;
+
+  // Get the movable so we can transform the mesh
+  iMovable *movable = meshwrapper->GetMovable ();
+  csReversibleTransform fullTransform = movable->GetFullTransform ();
+
+  newmesh->transform = fullTransform;
+
+  uint i;
+  // Transform vertices to world space
+  for (i = 0; i < vertices.Length (); i++)
+  {
+    newmesh->vertexList.Push (fullTransform.This2Other (vertices[i]));
+  }
+  newmesh->colorList.SetLength (vertices.Length (), csColor (0,0,0));
+
+  // Copy over all faces
+  for (i = 0; i < faces.Length (); i++)
+  {
+    litMeshFace *newface = new litMeshFace;
+    newmesh->faces.Push (newface);
+    newface->mesh = newmesh;
+    newface->material = faces[i].material;
+    
+    litMeshPatch *patch = new litMeshPatch;
+    patch->parentFace = newface;
+    newface->patches.Push (patch);
+
+    csVector3 geoNormal;
+    uint faceVertCount = faces[i].indices.Length ();
+    csArray<uint> &idxList = faces[i].indices;
+
+    if (faceVertCount == 3)
+    {
+      patch->SetVertexIdx (idxList[0], idxList[1], idxList[2]);
+      geoNormal = (patch->GetVertex (1) - patch->GetVertex (0)) % (patch->GetVertex (2) - patch->GetVertex (0));
+      patch->area = 0.5f * geoNormal.Norm ();
+    }
+    else if (faceVertCount == 4)
+    {
+      patch->SetVertexIdx (idxList[0], idxList[1], idxList[2], idxList[3]);
+      geoNormal = (patch->GetVertex (1) - patch->GetVertex (0)) % (patch->GetVertex (2) - patch->GetVertex (0));
+
+      csPoly3D p;
+      p.AddVertex (patch->GetVertex (0));p.AddVertex (patch->GetVertex (1));
+      p.AddVertex (patch->GetVertex (2));p.AddVertex (patch->GetVertex (3));
+      patch->area = p.GetArea ();
+    }
+    else
+    {
+      // Triangulate.. unfortunatly we need to triangulate to triangles :/
+      patch->SetVertexIdx (idxList[0], idxList[1], idxList[2]);      
+      geoNormal = (patch->GetVertex (1) - patch->GetVertex (0)) % (patch->GetVertex (2) - patch->GetVertex (0));
+      patch->area = 0.5f * geoNormal.Norm ();
+
+      for (uint j = 1; j < faceVertCount-2; j++)
+      {
+        litMeshPatch *patch = new litMeshPatch;
+        patch->parentFace = newface;
+        newface->patches.Push (patch);
+        patch->SetVertexIdx (idxList[0], idxList[j+1], idxList[j+2]);
+        geoNormal = (patch->GetVertex (1) - patch->GetVertex (0)) % (patch->GetVertex (2) - patch->GetVertex (0));
+        patch->area = 0.5f * geoNormal.Norm ();
+      }
+    }
+
+    newface->geoNormal = geoNormal.Unit ();
+  }
+
+  return newmesh;
+}
+

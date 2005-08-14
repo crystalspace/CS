@@ -25,14 +25,23 @@
 #include "lightmesh.h"
 #include "kdtree.h"
 
+struct iSector;
+struct iMeshObjectFactory;
+struct iMaterial;
+
+
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<iSector*> : public csHashComputerIntegral<iSector*> {};
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<iMeshObjectFactory*> : public csHashComputerIntegral<iMeshObjectFactory*> {};
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<iMaterial*> : public csHashComputerIntegral<iMaterial*> {};
 
 /**
  * Topmost scene for lighting.
- * A scene consists of one or several CS worlds which should be lit togheter.
+ * A scene consists of one or several CS worlds which should be lit together.
  */
-struct csScene 
+struct litScene 
 {
   /**
    * Information about a single CS sector 
@@ -40,16 +49,23 @@ struct csScene
   struct SectorInformation
   {
     iSector *sector;
-    csRefArray<csLightingMesh> meshes;
-    csKDTree *kdtree;
+    csRefArray<litLightingMesh> meshes;
+    litKDTree *kdtree;
   };
 
+  // All sectors in scene
   csHash<SectorInformation*, iSector*> sectors;
+
+  // All mesh factories in scene
+  csHash<csRef<litLightingMeshFactory>, iMeshObjectFactory*> meshFactories;
+
+  // All materials in the scene
+  csHash<csRef<litLightingMaterial>, iMaterial*> materials;
 
   /**
    * Add an object to the scene, in correct sector 
    */
-  void AddObject (csLightingMesh *object, iSector *sector)
+  void AddObject (litLightingMesh *object, iSector *sector)
   {
     SectorInformation *sinf = sectors.Get (sector, 0);
     if (sinf == 0)

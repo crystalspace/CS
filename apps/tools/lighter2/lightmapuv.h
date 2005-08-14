@@ -1,6 +1,5 @@
 /*
-  Crystal Space General Algorithms
-  Copyright (C)2005 by Eric sunshine <sunshine@sunshineco.com>
+  Copyright (C) 2005 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,40 +16,34 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_ALGORITHMS_H__
-#define __CSUTIL_ALGORITHMS_H__
+#ifndef __LIGHTMAPUV_H__
+#define __LIGHTMAPUV_H__
 
-namespace CrystalSpace
+#include "radprimitive.h"
+#include "lightmap.h"
+
+namespace lighter
 {
-  /**
-   * Iterate over all elements in the iterator and perform operation
-   * given by Func.
-   */
-  template <class T, class Fn>
-  inline Fn& ForEach (T it, Fn& Func)
+  
+  class LightmapUVLayouter 
   {
-    while (it.HasNext ())
-    {
-      Func (it.Next ());
-    }
-    return Func;
-  }
-
-  template <class T1, class T2>
-  struct ConditionAdd
-  {
-    ConditionAdd (T1 op1, T2 op2)
-    { }
-
-    template<class T>
-    bool operator () (T obj)
-    {
-      return (op1 (obj) && op2 (obj));
-    }
-  private:
-    T1 op1;
-    T2 op2;
+  public:
+    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+      LightmapPtrDelArray& lightmaps) = 0;
   };
+
+  class SimpleUVLayouter : public LightmapUVLayouter
+  {
+  public:
+    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+      LightmapPtrDelArray& lightmaps);
+
+  protected:
+    bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v,
+      csRect &lightmapArea,  int &lightmapID);
+  };
+
 }
 
 #endif
+

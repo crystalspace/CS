@@ -77,6 +77,13 @@ csRegExpMatcher::csRegExpMatcher (const char* pattern, bool extendedRE) :
   csRegExpMatcher::extendedRE = extendedRE;
 }
 
+csRegExpMatcher::csRegExpMatcher (const csRegExpMatcher& other) :
+  regex (0)
+{
+  pattern = csStrNew (other.pattern);
+  extendedRE = other.extendedRE;
+}
+
 csRegExpMatcher::~csRegExpMatcher ()
 {
   if (regex)
@@ -85,6 +92,22 @@ csRegExpMatcher::~csRegExpMatcher ()
     delete (regex_t*)regex;
   }
   delete[] pattern;
+}
+
+csRegExpMatcher& csRegExpMatcher::operator= (const csRegExpMatcher &other)
+{
+  if (regex)
+  {
+    regfree ((regex_t*)regex);
+    delete (regex_t*)regex;
+    regex = 0;
+  }
+  delete[] pattern;
+  
+  pattern = csStrNew (other.pattern);
+  extendedRE = other.extendedRE;
+
+  return *this;
 }
 
 csRegExpMatchError csRegExpMatcher::Match (const char* string, int flags)

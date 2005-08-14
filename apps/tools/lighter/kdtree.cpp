@@ -22,12 +22,14 @@
 
 #include "csutil/algorithms.h"
 
+using namespace CrystalSpace;
+
 //--- BUILD TREE ---
-csKDBuildTree::csKDBuildTree ()
+litKDBuildTree::litKDBuildTree ()
 {
 }
 
-csKDBuildTree::~csKDBuildTree ()
+litKDBuildTree::~litKDBuildTree ()
 {
   //@@TODO : Add deallocation here
 }
@@ -39,17 +41,17 @@ csKDBuildTree::~csKDBuildTree ()
 class PatchCollector
 {
 public:
-  void operator () (csLightingMesh *mesh)
+  void operator () (litLightingMesh *mesh)
   {
-    csForEach (mesh->faces.GetIterator (), *this); 
+    ForEach (mesh->faces.GetIterator (), *this); 
   }
 
-  void operator () (csMeshFace *face)
+  void operator () (litMeshFace *face)
   {
-    csForEach (face->patches.GetIterator (), *this); 
+    ForEach (face->patches.GetIterator (), *this); 
   }
 
-  void operator () (csMeshPatch *patch)
+  void operator () (litMeshPatch *patch)
   {
     if (patch->HasChildren ())
     {
@@ -62,12 +64,12 @@ public:
       patches.Push (patch);
   }
 
-  PatchCollector (csArray<csMeshPatch*> patches)
+  PatchCollector (csArray<litMeshPatch*> patches)
     : patches (patches)
   {}
 
 private:
-  csArray<csMeshPatch*> &patches;
+  csArray<litMeshPatch*> &patches;
 };
 
 /**
@@ -75,16 +77,16 @@ private:
  */
 struct BBComputer
 {
-  void operator () (csLightingMesh *mesh)
+  void operator () (litLightingMesh *mesh)
   {
-    csForEach ((mesh->faces).GetIterator (), *this); 
+    ForEach ((mesh->faces).GetIterator (), *this); 
   }
 
-  void operator() (csMeshFace *face)
+  void operator() (litMeshFace *face)
   {
     csArray<csVector3> &vertexList = (face)->mesh->vertexList;
   
-    for (uint i = 0; i < (face)->mesh->orignalVertexCount; i++)
+    for (uint i = 0; i < (face)->mesh->vertexList.Length (); i++)
     {
       boundingBox.AddBoundingVertex (vertexList[i]);
     }
@@ -93,19 +95,19 @@ struct BBComputer
   csBox3 boundingBox;
 };
 
-void csKDBuildTree::BuildTree (const csArray<csLightingMesh*>& meshes)
+void litKDBuildTree::BuildTree (const csArray<litLightingMesh*>& meshes)
 {
   // Collect all toplevel patches
-  csArray<csMeshPatch*> patches;
+  csArray<litMeshPatch*> patches;
     
-  csForEach (meshes.GetIterator (), PatchCollector (patches));
+  ForEach (meshes.GetIterator (), PatchCollector (patches));
 
   //Compute boundaries
   BBComputer bbc;
-  csForEach (meshes.GetIterator (), bbc);
+  ForEach (meshes.GetIterator (), bbc);
 
   //Setup first node
-  rootNode = new csKDBuildTreeNode;
+  rootNode = new litKDBuildTreeNode;
 
   rootNode->boundingBox = bbc.boundingBox;
   rootNode->patches = patches;
@@ -124,7 +126,7 @@ struct CollectSplitpositions
   {
   }
 
-  void operator() (csMeshPatch *patch)
+  void operator() (litMeshPatch *patch)
   {
     float a, b;
     patch->GetExtent (axis, a, b);
@@ -136,7 +138,7 @@ struct CollectSplitpositions
   SplitPositionFixer *sphelper;
 };
 
-void csKDBuildTreeNode::Subdivide (SplitPositionFixer *sphelper)
+void litKDBuildTreeNode::Subdivide (SplitPositionFixer *sphelper)
 {
   // Work out subdivision axis
   csVector3 bbsize = boundingBox.GetSize ();
@@ -152,7 +154,7 @@ void csKDBuildTreeNode::Subdivide (SplitPositionFixer *sphelper)
   sphelper->Reset ();
 
   CollectSplitpositions collector (splitDimension, sphelper);
-  csForEach (patches.GetIterator (), collector);
+  ForEach (patches.GetIterator (), collector);
 
   csBox3 leftBox = boundingBox;
   csBox3 rightBox = boundingBox;
@@ -214,8 +216,8 @@ void csKDBuildTreeNode::Subdivide (SplitPositionFixer *sphelper)
   splitLocation = bestSplit;
 
   // Now divide nodes between left and right
-  csKDBuildTreeNode *leftNode = new csKDBuildTreeNode;
-  csKDBuildTreeNode *rightNode = new csKDBuildTreeNode;
+  litKDBuildTreeNode *leftNode = new litKDBuildTreeNode;
+  litKDBuildTreeNode *rightNode = new litKDBuildTreeNode;
   leftNode->boundingBox = boundingBox;
   rightNode->boundingBox = boundingBox;
 
@@ -241,15 +243,15 @@ void csKDBuildTreeNode::Subdivide (SplitPositionFixer *sphelper)
 }
 
 /// Optimized kd-tree
-csKDTree::csKDTree ()
+litKDTree::litKDTree ()
 {
 }
 
-csKDTree::~csKDTree ()
+litKDTree::~litKDTree ()
 {
 }
 
-void csKDTree::BuildTree (csKDBuildTree *buildTree)
+void litKDTree::BuildTree (litKDBuildTree *buildTree)
 {
   // Tree without a root is no good
   if (!buildTree || !buildTree->rootNode) return;
@@ -267,7 +269,7 @@ void csKDTree::BuildTree (csKDBuildTree *buildTree)
   TransferNode (buildTree->rootNode, rootNode);
 }
 
-void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
+void litKDTree::TransferNode (litKDBuildTreeNode *fromNode, litKDTreeNode *toNode)
 {
   if (!fromNode || !toNode) return;
 
@@ -275,13 +277,13 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
   if (fromNode->left)
   {
     // inner node (no patches in node)
-    csKDTreeNodeH::SetFlag (toNode, true);
-    csKDTreeNodeH::SetDimension (toNode, fromNode->splitDimension);
+    litKDTreeNodeH::SetFlag (toNode, true);
+    litKDTreeNodeH::SetDimension (toNode, fromNode->splitDimension);
     toNode->inner.splitLocation = fromNode->splitLocation;
-    
+
     // Allocate children
-    csKDTreeNode *left = nodeAllocator.Alloc ();
-    csKDTreeNode *right = nodeAllocator.Alloc ();
+    litKDTreeNode *left = nodeAllocator.Alloc ();
+    litKDTreeNode *right = nodeAllocator.Alloc ();
 
     // Better check?
     if (right != (left+1))
@@ -291,14 +293,14 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
       right = nodeAllocator.Alloc ();
     }
 
-    csKDTreeNodeH::SetPointer (toNode, (uintptr_t)left);
+    litKDTreeNodeH::SetPointer (toNode, (uintptr_t)left);
     TransferNode (fromNode->left, left);
     TransferNode (fromNode->right, right);
   }
   else
   {
     // node with primitives
-    csKDTreeNodeH::SetFlag (toNode, false);
+    litKDTreeNodeH::SetFlag (toNode, false);
     
     toNode->leaf.numberOfPrimitives = 0;
     
@@ -314,10 +316,10 @@ void csKDTree::TransferNode (csKDBuildTreeNode *fromNode, csKDTreeNode *toNode)
     }
 
     // Allocate a list of pointers..
-    csMeshPatchAccStruct **primlist = (csMeshPatchAccStruct**)csAlignedMalloc 
-      (sizeof (csMeshPatchAccStruct*) * toNode->leaf.numberOfPrimitives, 8);
+    litMeshPatchAccStruct **primlist = (litMeshPatchAccStruct**)csAlignedMalloc 
+      (sizeof (litMeshPatchAccStruct*) * toNode->leaf.numberOfPrimitives, 8);
 
-    csKDTreeNodeH::SetPointer (toNode, (uintptr_t)primlist);
+    litKDTreeNodeH::SetPointer (toNode, (uintptr_t)primlist);
     // And transfer all prims
     for (i = 0, j = 0; i<fromNode->patches.Length (); i++)
     {
