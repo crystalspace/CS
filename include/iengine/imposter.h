@@ -73,4 +73,6 @@ struct iImposter : public iBase
   virtual bool WouldUseImposter (csReversibleTransform& pov) const = 0;
 };
 
+/** @} */
+
 #endif // __CS_IENGINE_IMPOSTER_H__

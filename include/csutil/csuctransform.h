@@ -28,15 +28,24 @@
 /**\addtogroup util
  * @{ */
 
-/// An Unicode character encoded as UTF8 is at max encoded to this length
-#define CS_UC_MAX_UTF8_ENCODED		6
-/// An Unicode character encoded as UTF16 is at max encoded to this length
+/**
+ * An Unicode code point as UTF8 is at maximum encoded to this number of code 
+ * units.
+ */
+#define CS_UC_MAX_UTF8_ENCODED		4  /* 6 to encode 32 bit */
+/**
+ * An Unicode code point as UTF16 is at maximum encoded to this number of code 
+ * units.
+ */
 #define CS_UC_MAX_UTF16_ENCODED		2
-/// An Unicode character encoded as UTF32 is at max encoded to this length
+/**
+ * An Unicode code point as UTF32 is at maximum encoded to this number of code 
+ * units.
+ */
 #define CS_UC_MAX_UTF32_ENCODED		1
 /**
- * A mapping (uppercase, lowercase, fold) for a Unicode character is at max
- * this long
+ * A complex mapping (uppercase, lowercase, fold) for a Unicode code point 
+ * expands to at maximum this number of code points 
  */
 #define CS_UC_MAX_MAPPED		3
 
@@ -46,9 +55,9 @@
 enum
 {
   /**
-   * Force 'simple' mappings, that is, at most one character is returned.
-   * The default 'complex' mappings can return more than one character in
-   * some cases.
+   * Force 'simple' mappings, that is, at most one code point is returned.
+   * The default 'complex' mappings can return more than one code point in
+   * some cases. \sa #CS_UC_MAX_MAPPED
    */
   csUcMapSimple = (1 << 0)
 };
@@ -85,10 +94,10 @@ public:
   /**\name UTF Decoders
    * @{ */
   /**
-   * Decode an Unicode character encoded in UTF-8.
-   * \param str Pointer to the encoded character.
-   * \param strlen Number of chars in the string.
-   * \param ch Decoded character.
+   * Decode an Unicode code point encoded in UTF-8.
+   * \param str Pointer to the encoded code point.
+   * \param strlen Number of code units in the source string.
+   * \param ch Decoded code point.
    * \param isValid When an error occured during decoding, \p ch contains the
    *  replacement character (#CS_UC_CHAR_REPLACER). In this case, the bool
    *  pointed to by \p isValid will be set to false. The parameter can be 0,
@@ -97,8 +106,8 @@ public:
    * \param returnNonChar Whether decoded non-character or high and low 
    *  surrogates are returned as such. Normally, those code points are replaced
    *  with #CS_UC_CHAR_REPLACER to signal an invalid encoded code point.
-   * \return The number of characters in str that have to be skipped to 
-   *  retrieve the next encoding character.
+   * \return The number of code units in \a str that have to be skipped to 
+   *  retrieve the next encoded code point.
    */
   inline static int UTF8Decode (const utf8_char* str, size_t strlen, 
     utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
@@ -188,7 +197,7 @@ public:
   }
   
   /**
-   * Decode an Unicode character encoded in UTF-16.
+   * Decode an Unicode code point encoded in UTF-16.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int UTF16Decode (const utf16_char* str, size_t strlen, 
@@ -231,7 +240,7 @@ public:
   }
   
   /**
-   * Decode an Unicode character encoded in UTF-32.
+   * Decode an Unicode code point encoded in UTF-32.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int UTF32Decode (const utf32_char* str, size_t strlen, 
@@ -251,7 +260,7 @@ public:
   }
 
   /**
-   * Decode an Unicode character encoded in UTF-8.
+   * Decode an Unicode code point encoded in UTF-8.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int Decode (const utf8_char* str, size_t strlen, 
@@ -260,7 +269,7 @@ public:
     return UTF8Decode (str, strlen, ch, isValid, returnNonChar);
   }
   /**
-   * Decode an Unicode character encoded in UTF-16.
+   * Decode an Unicode code point encoded in UTF-16.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int Decode (const utf16_char* str, size_t strlen, 
@@ -269,7 +278,7 @@ public:
     return UTF16Decode (str, strlen, ch, isValid, returnNonChar);
   }
   /**
-   * Decode an Unicode character encoded in UTF-32.
+   * Decode an Unicode code point encoded in UTF-32.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int Decode (const utf32_char* str, size_t strlen, 
@@ -296,17 +305,17 @@ public:
 #define OUTPUT_CHAR(chr) _OUTPUT_CHAR(buf, chr)
   
   /**
-   * Encode an Unicode character to UTF-8.
-   * \param ch Character to encode.
-   * \param buf Pointer to the buffer receiving the encoded character.
-   * \param bufsize Number of chars in the buffer.
+   * Encode an Unicode code point to UTF-8.
+   * \param ch Code point to encode.
+   * \param buf Pointer to the buffer receiving the encoded code point.
+   * \param bufsize Number of code units that fit in \a buf.
    * \param allowNonchars Whether non-character or high and low surrogates
    *  are encoded. Normally, those code points are rejected to prevent the
    *  generation of invalid encoded strings.
-   * \return The number of characters needed to encode \p ch.
+   * \return The number of code units needed to encode \p ch.
    * \remark The buffer will be filled up as much as possible.
-   *  Check the returned value whether the encoded character fit into the
-   *  buffer.
+   *  Check the returned value whether the encoded code point completely fit 
+   *  into the buffer.
    */
   inline static int EncodeUTF8 (const utf32_char ch, utf8_char* buf, 
     size_t bufsize, bool allowNonchars = false)
@@ -362,7 +371,7 @@ public:
   }
     
   /**
-   * Encode an Unicode character to UTF-16.
+   * Encode an Unicode code point to UTF-16.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
@@ -393,7 +402,7 @@ public:
   }
 
   /**
-   * Encode an Unicode character to UTF-32.
+   * Encode an Unicode code point to UTF-32.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
@@ -411,7 +420,7 @@ public:
   }
 
   /**
-   * Encode an Unicode character to UTF-8.
+   * Encode an Unicode code point to UTF-8.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int Encode (const utf32_char ch, utf8_char* buf, 
@@ -420,7 +429,7 @@ public:
     return EncodeUTF8 (ch, buf, bufsize, allowNonchars);
   }
   /**
-   * Encode an Unicode character to UTF-16.
+   * Encode an Unicode code point to UTF-16.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int Encode (const utf32_char ch, utf16_char* buf, 
@@ -429,7 +438,7 @@ public:
     return EncodeUTF16 (ch, buf, bufsize, allowNonchars);
   }
   /**
-   * Encode an Unicode character to UTF-32.
+   * Encode an Unicode code point to UTF-32.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int Encode (const utf32_char ch, utf32_char* buf, 
@@ -498,16 +507,16 @@ public:
   /**
    * Convert UTF-8 to UTF-16.
    * \param dest Destination buffer.
-   * \param destSize Number of characters the destination buffer can hold.
+   * \param destSize Number of code units the destination buffer can hold.
    * \param source Source buffer.
-   * \param srcSize Number of characters contained in the source buffer.
+   * \param srcSize Number of code units contained in the source buffer.
    *   If this is -1, the length will be determined automatically.
-   * \return Number of characters in the complete converted string, including 
+   * \return Number of code units in the complete converted string, including 
    *  null terminator.
    * \remark If the complete converted string wouldn't fit the destination 
    *  buffer, it is truncated. However, it'll also be null-terminated. Hence,
    *  if it has a size of 1, you get an empty string.
-   *  The returned value is the number of characters needed for the *whole* 
+   *  The returned value is the number of code units needed for the *whole* 
    *  converted string.
    */
   UCTF_CONVERTER (UTF8to16, utf8_char, UTF8Decode, utf16_char, EncodeUTF16);
@@ -713,7 +722,7 @@ public:
   /* @@@ For VC6, utf16_char == wchar_t, complains below. (Can be avoided on 
    * VC7 with "Builtin wchar_t" - but disabled for CS.) */
   /**
-   * Decode an Unicode character encoded from wchar_t.
+   * Decode an Unicode code point from wchar_t.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
   inline static int Decode (const wchar_t* str, size_t strlen, 
@@ -722,7 +731,7 @@ public:
     return UTF16Decode ((utf16_char*)str, strlen, ch, isValid, returnNonChar);
   }
   /**
-   * Encode an Unicode character to wchar_t.
+   * Encode an Unicode code point to wchar_t.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
   inline static int Encode (const utf32_char ch, wchar_t* buf, 
@@ -809,14 +818,14 @@ public:
   #error Odd-sized, unsupported wchar_t!
 #endif
 
-  /**\name Helpers to skip encoded chars in different UTF encodings
+  /**\name Helpers to skip encoded code units in different UTF encodings
    * @{ */
    
   /**
-   * Determine how many characters in an UTF-8 buffer need to be skipped to 
+   * Determine how many code units in an UTF-8 buffer need to be skipped to 
    * get to the next encoded char.
-   * \param str Pointer to buffer with encoded character.
-   * \param maxSkip The number of characters to skip at max. Usually, this is
+   * \param str Pointer to buffer with encoded code point.
+   * \param maxSkip The number of code units to skip at max. Usually, this is
    *  the number of chars from \a str to the end of the buffer.
    * \return Number of chars to skip in the buffer. Returns 0 if \p maxSkip is
    *  0.
@@ -853,11 +862,11 @@ public:
   }
   
   /**
-   * Determine how many characters in an UTF-8 buffer need to skipped back to
-   * get to the start of the previous encoded character.
-   * \param str Pointer to the encoded character after the character that is
+   * Determine how many code units in an UTF-8 buffer need to skipped back to
+   * get to the start of the previous encoded code point.
+   * \param str Pointer to the encoded code point after the code point that is
    *  actually to be skipped back.
-   * \param maxRew The number of characters to go back at max. Typically, this 
+   * \param maxRew The number of code units to go back at max. Typically, this 
    *  is the number of chars from \a str to the start of the buffer.
    * \return Number of chars to skip back in the buffer. Returns 0 if 
    *  \p maxRew is 0.
@@ -885,7 +894,7 @@ public:
   }
   
   /**
-   * Determine how many characters in an UTF-16 buffer need to be skipped to 
+   * Determine how many code units in an UTF-16 buffer need to be skipped to 
    * get to the next encoded char.
    * \copydoc UTF8Skip(const utf8_char*,size_t)
    */
@@ -898,8 +907,8 @@ public:
   }
   
   /**
-   * Determine how many characters in an UTF-16 buffer need to skipped back to
-   * get to the start of the previous encoded character.
+   * Determine how many code units in an UTF-16 buffer need to skipped back to
+   * get to the start of the previous encoded code point.
    * \copydoc UTF8Rewind(const utf8_char*,size_t)
    */
   inline static int UTF16Rewind (const utf16_char* str, size_t maxRew)
@@ -919,7 +928,7 @@ public:
   }
   
   /**
-   * Determine how many characters in an UTF-32 buffer need to be skipped to 
+   * Determine how many code units in an UTF-32 buffer need to be skipped to 
    * get to the next encoded char.
    * \copydoc UTF8Skip(const utf8_char*,size_t)
    */
@@ -929,8 +938,8 @@ public:
   }
 
   /**
-   * Determine how many characters in an UTF-32 buffer need to skipped back to
-   * get to the start of the previous encoded character.
+   * Determine how many code units in an UTF-32 buffer need to skipped back to
+   * get to the start of the previous encoded code point.
    * \copydoc UTF8Rewind(const utf8_char*,size_t)
    */
   inline static int UTF32Rewind (const utf32_char* str, size_t maxRew)
@@ -940,28 +949,30 @@ public:
   }
   /** @} */
 
-  /**\name Character mappings
+  /**\name Code point mappings
    * @{ */
    
   /**
-   * Map a character to its upper case equivalent(s).
-   * \param ch Char to be mapped.
+   * Map a code point to its upper case equivalent(s).
+   * \param ch Code point to be mapped.
    * \param dest Destination buffer.
-   * \param destSize Number of characters the destination buffer can hold.
-   * \return Number of characters the complete mapping result would require.
+   * \param destSize Number of code units the destination buffer can hold.
+   * \param flags Flags to control the result of the mapping. Currently 
+   *   supported is csUcMapSimple.
+   * \return Number of code units the complete mapping result would require.
    */
   static size_t MapToUpper (const utf32_char ch, utf32_char* dest, 
     size_t destSize, uint flags = 0);
   /**
-   * Map a character to its lower case equivalent(s).
-   * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t)
+   * Map a code point to its lower case equivalent(s).
+   * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t, uint)
    */
   static size_t MapToLower (const utf32_char ch, utf32_char* dest, 
     size_t destSize, uint flags = 0);
   /**
-   * Map a character to its fold equivalent(s).
+   * Map a code point to its fold equivalent(s).
    * Fold mapping is useful for binary comparison of two Unicode strings.
-   * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t)
+   * \copydoc MapToUpper(const utf32_char, utf32_char*, size_t, uint)
    */
   static size_t MapToFold (const utf32_char ch, utf32_char* dest, 
     size_t destSize, uint flags = 0);

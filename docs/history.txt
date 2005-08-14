@@ -9,6 +9,12 @@ chronological order.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.
+	- res fixed a couple of doxygen warnings.
+	- res added a "local" flag to csGetPlatformConfigPath.
+	- res changed clarified the csUnicodeTransform docs a bit by using
+	  'code point' or 'code unit' instead of 'character' where appropriate.
+	- res fixed the csShaderVar copy ctor to properly set the pointer
+	  members to 0.
 13-Aug-2005
 	- Peter Amstutz applied a couple of fixes to csThing to prevent
 	  crashing when a lightmap is present but uninitialized 

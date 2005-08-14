@@ -72,13 +72,14 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
   return new csConfigFile (path);
 }
 
-csString csGetPlatformConfigPath (const char* key)
+csString csGetPlatformConfigPath (const char* key, bool local)
 {
   char appDataPath [MAX_PATH + 1];
   csString path;
   
   // Try to retrieve "Application Data" directory
-  if (!GetShellFolderPath (CSIDL_APPDATA, appDataPath))
+  if (!GetShellFolderPath (local ? CSIDL_LOCAL_APPDATA : CSIDL_APPDATA, 
+    appDataPath))
   {
     // Fall back to My Documents
     if (!GetShellFolderPath (CSIDL_PERSONAL, appDataPath))

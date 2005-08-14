@@ -100,7 +100,7 @@ struct iStringSet : public iBase
 
   /**
    * Remove a string with the specified ID.
-   * \return True if a matching string was in thet set; else false.
+   * \return True if a matching string was in the set; else false.
    */
   virtual bool Delete(csStringID) = 0;
 

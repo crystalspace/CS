@@ -26,7 +26,7 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 
-csString csGetPlatformConfigPath (const char* key)
+csString csGetPlatformConfigPath (const char* key, bool /*local*/)
 {
   csString dir;
   

@@ -79,4 +79,6 @@ public:
     csRGBpixel* transp = 0);
 };
 
+/** @} */
+
 #endif // __CS_CSGFX_IMAGEMANIPULATE_H__

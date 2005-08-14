@@ -276,7 +276,7 @@ struct iLoader : public iBase
   	bool curRegOnly = true, bool checkDupes = false) = 0;
 };
 
-/** } */
+/** @} */
 
 #endif // __CS_IMAP_PARSER_H__
 

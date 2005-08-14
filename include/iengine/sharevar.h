@@ -137,4 +137,6 @@ struct iSharedVariableList : public iBase
   virtual csPtr<iSharedVariable> New() const = 0;
 };
 
+/** @} */
+
 #endif // __CS_IENGINE_SHAREVAR_H__

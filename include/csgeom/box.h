@@ -691,7 +691,8 @@ public:
 
   /**
    * Get axis aligned plane information from a side of this box.
-   * Side is one of #CS_BOX_SIDE_x. Axis will be one of #CS_AXIS_X.
+   * Side is one of #CS_BOX_SIDE_x. Axis will be one of CS_AXIS_X, CS_AXIS_Y
+   * or CS_AXIS_Z.
    */
   void GetAxisPlane (int side, int& axis, float& where) const;
 
@@ -704,8 +705,8 @@ public:
   int GetVisibleSides (const csVector3& pos, int* visible_sides) const;
 
   /**
-   * Static function to get the 'other' side (i.e. CS_BOX_SIDE_X
-   * to CS_BOX_SIDE_x, ...).
+   * Static function to get the 'other' side (i.e. #CS_BOX_SIDE_X
+   * to #CS_BOX_SIDE_x, ...).
    */
   static inline int OtherSide (int side)
   {

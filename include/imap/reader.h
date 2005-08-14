@@ -52,7 +52,7 @@ struct iBinaryLoaderPlugin : public iBase
   	iBase* context) = 0;
 };
 
-/** } */
+/** @} */
 
 #endif // __CS_IMAP_LOADER_H__
 

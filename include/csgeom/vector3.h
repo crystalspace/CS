@@ -31,12 +31,22 @@
 
 class csString;
 
+/**
+ * Constants for axes. Can also be used as indices to csVector2::operator[], 
+ * csVector3::operator[] and csVector4::operator[] for more readability.
+ */
 enum
 {
+  /// Invalid axis
   CS_AXIS_NONE = -1,
+  /// X axis
   CS_AXIS_X = 0,
+  /// Y axis
   CS_AXIS_Y = 1,
-  CS_AXIS_Z = 2
+  /// Z axis
+  CS_AXIS_Z = 2,
+  /// W axis
+  CS_AXIS_W = 3
 };
 
 /**

@@ -47,7 +47,7 @@ class csPathsList;
 //-- Helper macros
 
 /**\def SCF_TRACE(x)
- * Macro for typing debug strings: Add #define SCF_DEBUG at the top
+ * Macro for typing debug strings: Add \#define SCF_DEBUG at the top
  * of modules you want to track miscelaneous SCF activity and recompile.
  */
 #ifdef SCF_DEBUG

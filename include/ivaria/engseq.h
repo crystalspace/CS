@@ -570,8 +570,8 @@ struct iSequenceTrigger : public iBase
    * a certain value or lighter than a certain value, or
    * whenever a light changes.
    * \param whichlight represents the light on which we will test.
-   * \param oper is one of #CS_SEQUENCE_LIGHTCHANGE_NONE,
-   * #CS_SEQUENCE_LIGHTCHANGE_LESS, or #CS_SEQUENCE_LIGHTCHANGE_GREATER
+   * \param oper is one of CS_SEQUENCE_LIGHTCHANGE_NONE,
+   * CS_SEQUENCE_LIGHTCHANGE_LESS, or CS_SEQUENCE_LIGHTCHANGE_GREATER
    * depending on the test you want to use.
    * \param color is the color to compare with.
    */
@@ -700,7 +700,7 @@ SCF_VERSION (iEngineSequenceManager, 0, 0, 3);
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
- *   <li>Engine Sequence Manager plugin (crystalsapce.utilities.sequence.engine)
+ *   <li>Engine Sequence Manager plugin (crystalspace.utilities.sequence.engine)
  *   </ul>
  * Main ways to get pointers to this interface:
  *   <ul>

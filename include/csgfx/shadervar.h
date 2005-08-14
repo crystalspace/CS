@@ -117,8 +117,8 @@ public:
 
   /// Constructor
   csShaderVariable (csStringID name);
-  csShaderVariable (const csShaderVariable& other) : csRefCount()
-  { *this = other; }
+  csShaderVariable (const csShaderVariable& other) : csRefCount(),
+    MatrixValuePtr(0), TransformPtr (0), array(0) { *this = other; }
   virtual ~csShaderVariable ()
   {
     delete MatrixValuePtr;

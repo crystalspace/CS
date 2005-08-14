@@ -32,8 +32,8 @@
  * \remarks This class provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the class and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate 
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 class CS_CRYSTALSPACE_EXPORT cswinCallStackHelper
 {

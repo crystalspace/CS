@@ -56,6 +56,8 @@ struct iBinarySaverPlugin : public iBase
   virtual bool WriteDown (iBase* obj, iFile *file) = 0;
 };
 
+/** @} */
+
 #endif // __CS_IMAP_WRITER_H__
 
 

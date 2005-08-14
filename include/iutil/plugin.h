@@ -162,9 +162,9 @@ struct iPluginManager : public iBase
  * Find a plugin by its class ID. First the plugin with requested class
  * identifier is found, and after this it is queried for the respective
  * interface; if it does not implement the requested interface, 0 is returned.
+ * \a Interface: Desired interface type (ex. iGraphics2D, iVFS, etc.).
  * \param mgr An object that implements iPluginManager.
  * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
- * \param Interface Desired interface type (ex. iGraphics2D, iVFS, etc.).
  */
 template<class Interface>
 inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
@@ -194,9 +194,9 @@ inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
 
 /**
  * Tell plugin manager to load a plugin.
+ * \a Interface: Desired interface type (ex. iGraphics2D, iVFS, etc.).
  * \param mgr An object that implements iPluginManager.
  * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
- * \param Interface Desired interface type (ex. iGraphics2D, iVFS, etc.).
  */
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,

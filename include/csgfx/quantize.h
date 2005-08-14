@@ -67,7 +67,7 @@ struct csColorBox;
  * case for big endian machines for the INDEX_B macro (see below). With
  * big-endian machines the B component starts at bit 8, thus the right
  * shift counter becomes negative. Probably the best solution is to add
- * and #if B_BIT + 8 - HIST_B_BITS - HIST_G_BITS - HIST_R_BITS < 0.
+ * an \#if B_BIT + 8 - HIST_B_BITS - HIST_G_BITS - HIST_R_BITS < 0.
  * 
  * <b>Quantizing</b><br>
  * The following routines can be used to split the quantization process

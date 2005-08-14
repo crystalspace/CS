@@ -48,4 +48,6 @@ public:
     csVector3* outTangents, csVector3* outBitangents);
 };
 
+/** @} */
+
 #endif // __CS_CSGFX_NORMALMAPTOOLS_H__

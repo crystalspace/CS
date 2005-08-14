@@ -35,8 +35,8 @@
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate 
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 static inline wchar_t* cswinAnsiToWide (const char* ansi, 
 					 UINT codePage = CP_ACP)
@@ -59,8 +59,8 @@ static inline wchar_t* cswinAnsiToWide (const char* ansi,
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate '
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 static inline char* cswinWideToAnsi (const wchar_t* wide, 
 				     UINT codePage = CP_ACP)
@@ -87,8 +87,8 @@ static inline char* cswinWideToAnsi (const wchar_t* wide,
  * \remarks This class provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the class and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate '
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 struct CS_CRYSTALSPACE_EXPORT cswinWtoA
 {
@@ -112,8 +112,8 @@ public:
  * \remarks This class provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the class and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate '
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 struct CS_CRYSTALSPACE_EXPORT cswinCtoA
 {
@@ -141,8 +141,8 @@ public:
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate '
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 extern CS_CRYSTALSPACE_EXPORT char* cswinGetErrorMessage (HRESULT code);
 /**
@@ -152,8 +152,8 @@ extern CS_CRYSTALSPACE_EXPORT char* cswinGetErrorMessage (HRESULT code);
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate '
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 extern CS_CRYSTALSPACE_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
 
@@ -178,8 +178,8 @@ enum cswinWindowsVersion
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
- *  #endif' statements.
+ *  header file should be surrounded by appropriate '
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 extern CS_CRYSTALSPACE_EXPORT bool cswinIsWinNT (cswinWindowsVersion* version = 0);
 

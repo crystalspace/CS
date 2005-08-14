@@ -25,7 +25,7 @@
 #undef CSDEF_FRIEND
 
 /** \file
-  This file should be #included before any other Crystal Space header files. It
+  This file should be \#included before any other Crystal Space header files. It
   sets up a compilation environment which smooths over differences between
   platforms, allowing the same code to compile cleanly over a variety of
   operating systems and build tools. It also provides a number of utility
@@ -202,7 +202,7 @@ static inline void csAlignedFree (void* ptr)
  * given the value `OpenGL'.  To actually include an OpenGL header, such as
  * gl.h, the following code would be used:
  * <pre>
- * #include CS_HEADER_GLOBAL(GLPATH,gl.h)
+ * \#include CS_HEADER_GLOBAL(GLPATH,gl.h)
  * </pre>
  */
 #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
@@ -217,7 +217,7 @@ static inline void csAlignedFree (void* ptr)
  * UTILPATH is defined with some platform-specific value, to actually include a
  * header, such as util.h, the following code would be used:
  * <pre>
- * #include CS_HEADER_LOCAL(UTILPATH,util.h)
+ * \#include CS_HEADER_LOCAL(UTILPATH,util.h)
  * </pre>
  */
 #define CS_HEADER_LOCAL(X,Y) CS_HEADER_LOCAL_COMPOSE1(X,Y)
@@ -680,7 +680,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * Compilers which are capable of flagging deprecation will exhibit a warning
  * when it encounters client code invoking methods so tagged.
  */
-#ifndef CS_DEPRECATED_METHOD
+#if !defined(CS_DEPRECATED_METHOD) || defined(DOXYGEN_RUN)
 #  if defined(CS_COMPILER_MSVC)
 #    define CS_DEPRECATED_METHOD		/*__declspec(deprecated)*/
       /* Disabled: Unfortunately, MSVC is overzealous with warnings; 
@@ -700,7 +700,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * Compilers which are capable of flagging deprecation will exhibit a warning
  * when it encounters client code using types so tagged.
  */
-#ifndef CS_DEPRECATED_TYPE
+#if !defined(CS_DEPRECATED_TYPE) || defined(DOXYGEN_RUN)
 #  if defined(CS_COMPILER_MSVC)
 #    define CS_DEPRECATED_TYPE
 #  else
@@ -719,7 +719,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  *
  * \todo Is there an MSVC equivalent for gcc's __attribute__((const))?
  */
-#ifndef CS_CONST_METHOD
+#if !defined(CS_CONST_METHOD) || defined(DOXYGEN_RUN)
 #define CS_CONST_METHOD
 #endif
 
@@ -735,7 +735,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  *
  * \todo Is there an MSVC equivalent for gcc's __attribute__((pure)) ?
  */
-#ifndef CS_PURE_METHOD
+#if !defined(CS_PURE_METHOD) || defined(DOXYGEN_RUN)
 #define CS_PURE_METHOD
 #endif
 

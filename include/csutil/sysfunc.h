@@ -167,14 +167,21 @@ CS_CRYSTALSPACE_EXPORT csPtr<iConfigFile> csGetPlatformConfig (const char* key);
  * The path is in a platform-specific place - e.g. in "Documents and
  * Settings\\Application Data" on Windows, or $HOME on Unix.
  * \param key Used to distinguish different stored configurations. Should be
- *  the application ID, e.g. "MyGames.ClickFrenzy2".
+ *   the application ID, e.g. "MyGames.ClickFrenzy2".
+ * \param local Some platforms also support "local" per-user configuration 
+ *   data, that is, when the per-user data is roamed over the network, such
+ *   local data is still stored on the local machine(s). While unsuitable for
+ *   for actual configuration data, it is useful e.g. in case the application 
+ *   does caching of some data on disk, and storing such data locally would
+ *   reduce the network load in case the per-user data is roamed.
  * \return A native path  suitable to store per-user configuration data, in
  *   the form of e.g. "...\MyGames\ClickFrenzy2". The path could then be used
  *   as a directory name or a base for a file name.
  * \remarks The returned path may not exist. The caller has to ensure its
  *   existance before using it.
  */
-CS_CRYSTALSPACE_EXPORT csString csGetPlatformConfigPath (const char* key);
+CS_CRYSTALSPACE_EXPORT csString csGetPlatformConfigPath (const char* key,
+  bool local = false);
 
 /** @} */
 

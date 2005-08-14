@@ -24,7 +24,7 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 
-csString csGetPlatformConfigPath (const char* key)
+csString csGetPlatformConfigPath (const char* key, bool /*local*/)
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   NSArray* paths = NSSearchPathForDirectoriesInDomains(

@@ -58,7 +58,7 @@ public:
   csList() : head(0), tail(0) {}
 
   /// Copy constructor
-  csList(const csList &other);
+  csList(const csList<T> &other);
 
   /// Destructor
   ~csList()
@@ -198,7 +198,7 @@ public:
   };
 
   /// Assignment, shallow copy.
-  csList& operator=(const csList& other);
+  csList& operator=(const csList<T>& other);
 
   /// Add an item first in list. Copy T into the listdata.
   Iterator PushFront (const T& item);

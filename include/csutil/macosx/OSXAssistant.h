@@ -43,7 +43,7 @@ SCF_VERSION (iOSXAssistant, 0, 0, 2);
  *  specific to the MacOS/X platform. To ensure that code using this 
  *  functionality compiles properly on all other platforms, the use of the
  *  interface and inclusion of the header file should be surrounded by
- *  appropriate `#if defined(CS_PLATFORM_MACOSX) ... #endif' statements.
+ *  appropriate '\#if defined(CS_PLATFORM_MACOSX) ... \#endif' statements.
  */
 struct iOSXAssistant : public iBase
 {

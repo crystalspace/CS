@@ -235,15 +235,15 @@ public:
   /// Call to release all mouse buttons.
   virtual void Reset ();
 
-  /// Query last mouse X position for mouse #n (1, 2, ...)
+  /// Query last mouse X position for mouse \#n (1, 2, ...)
   CS_PURE_METHOD virtual int GetLastX (uint n) const { return Last[n - 1][0]; }
-  /// Query last mouse Y position for mouse #n (1, 2, ...)
+  /// Query last mouse Y position for mouse \#n (1, 2, ...)
   CS_PURE_METHOD virtual int GetLastY (uint n) const { return Last[n - 1][1]; }
   /// Query last mouse position on axis ax (1, 2, ...) for mouse n (1, 2, ...)
   CS_PURE_METHOD virtual int GetLast (uint n, uint axis) const { return Last[n - 1][axis - 1]; }
   /// Query last mouse axis array for mouse n (1, 2, ...)
   CS_PURE_METHOD virtual const int32 *GetLast (uint n) const { return Last [n - 1]; }
-  /// Query the last known mouse button state for mouse #1
+  /// Query the last known mouse button state for mouse \#1
   CS_PURE_METHOD virtual bool GetLastButton (uint button) const { return GetLastButton(1, button); }
   /// Query the last known mouse button state
   CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const

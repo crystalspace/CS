@@ -32,7 +32,7 @@
  * the iObject.
  * <p>
  * One way to attach key value pairs to CS objects is to add the following
- * xml to your object: <key name="somename" value="somevalue" />
+ * xml to your object: \<key name="somename" value="somevalue" /\>
  */
 class CS_CRYSTALSPACE_EXPORT csKeyValuePair : public csObject, public iKeyValuePair
 {

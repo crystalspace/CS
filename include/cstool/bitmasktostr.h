@@ -85,7 +85,7 @@ public:
   static const csBitmaskToString::MaskNames tableName[] = {
 /**
  * Helper macro to add an entry to a bitmask-to-name table that is a
- * #define.
+ * \#define.
  */
 #define CS_BITMASKTOSTR_MASK_TABLE_DEFINE(def)		      \
     {def, #def},
