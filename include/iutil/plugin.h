@@ -42,7 +42,7 @@ struct iComponent;
  * requested interface. Example use:
  *
  * \code
- * csRef\<iDynamics\> dynamic_system;
+ * csRef<iDynamics> dynamic_system;
  * CS_QUERY_REGISTRY_PLUGIN(dynamic_system, object_reg, 
  *   "crystalspace.dynamics.ode", iDynamics);
  * \endcode
@@ -216,7 +216,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 }
 
 /**
- * Compatbility macro.
+ * \deprecated Compatibility macro.
  * \sa csLoadPlugin<Interface> (mgr, ClassID);
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
@@ -234,7 +234,7 @@ inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
 }
 
 /**
- * Compatbility macro.
+ * \deprecated Compatibility macro.
  * \sa csLoadPluginAlways (mgr, ClassID);
  */
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)				\

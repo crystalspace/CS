@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Aug-2005
+	- res added a hopefully helpful message that is written to the console 
+	  when csInitializer cannot load the VFS plugin.
+	- res dropped "WARNING: " from a couple of messages reported by the
+	  plugin manager, as csReport() can add that, too.
+	- res made some misc doxygen fixes.
+	- res enabled sorting for doxygen brief docs.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.

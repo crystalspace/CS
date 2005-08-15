@@ -157,6 +157,9 @@ struct iObjectRegistryIterator : public iBase
 
 /** @} */
 
+/**
+ * Query an interface from the registry. The tag is the name of the interface.
+ */
 template<class Interface>
 inline csPtr<Interface> csQueryRegistry (iObjectRegistry *Reg)
 { 
@@ -174,11 +177,17 @@ inline csPtr<Interface> csQueryRegistry (iObjectRegistry *Reg)
   return csPtr<Interface> (x);
 }  
   
+/**
+ * Query an object from the registry, with a tag specified by the user.
+ */
 inline csPtr<iBase> csQueryRegistryTag (iObjectRegistry *Reg, const char* Tag)
 {  
   return csPtr<iBase> (Reg->Get (Tag));
 }  
    
+/**
+ * Query an interface from the registry, with a tag specified by the user.
+ */
 template<class Interface>
 inline csPtr<Interface> csQueryRegistryTagInterface (
   iObjectRegistry *Reg, const char* Tag)
@@ -197,9 +206,20 @@ inline csPtr<Interface> csQueryRegistryTagInterface (
   return csPtr<Interface> (x);
 }  
 
-/// FOR COMPATABILITY!
+/**
+ * \deprecated Compatibility macro
+ * \sa csQueryRegistryTag
+ */
 #define CS_QUERY_REGISTRY_TAG(Reg, Tag) (csQueryRegistryTag(Reg, Tag))
+/**
+ * \deprecated Compatibility macro
+ * \sa csQueryRegistry
+ */
 #define CS_QUERY_REGISTRY(Reg,Interface) (csQueryRegistry<Interface>(Reg))
+/**
+ * \deprecated Compatibility macro
+ * \sa csQueryRegistryTagInterface
+ */
 #define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface) \
   (csQueryRegistryTagInterface<Interface>(Reg, Tag))
 

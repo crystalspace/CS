@@ -196,6 +196,12 @@ INLINE_INFO            = YES
 
 SORT_MEMBER_DOCS       = YES
 
+# If the SORT_BRIEF_DOCS tag is set to YES then doxygen will sort the brief 
+# descriptions of file, namespace and class members alphabetically by member 
+# name. If set to NO (the default) the members will appear in declaration order.
+
+SORT_BRIEF_DOCS	       = YES
+
 # If member grouping is used in the documentation and the DISTRIBUTE_GROUP_DOC 
 # tag is set to YES, then doxygen will reuse the documentation of the first 
 # member in the group (if any) for the other members of the group. By default 

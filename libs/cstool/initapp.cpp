@@ -17,49 +17,21 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csshlib.h"
-#include "csutil/sysfunc.h"
-#include "cstool/initapp.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "csutil/cmdline.h"
 #include "csutil/cseventq.h"
 #include "csutil/csinput.h"
+#include "csutil/csshlib.h"
 #include "csutil/objreg.h"
-#include "csutil/physfile.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
-#include "csutil/prfxcfg.h"
 #include "csutil/scfstrset.h"
 #include "csutil/verbosity.h"
 #include "csutil/virtclk.h"
-#include "csutil/xmltiny.h"
-#include "iengine/engine.h"
-#include "igraphic/imageio.h"
-#include "imap/loader.h"
-#include "imesh/crossbld.h"
-#include "imesh/mdlconv.h"
-#include "isound/loader.h"
-#include "isound/renderer.h"
-#include "iutil/cfgmgr.h"
-#include "iutil/cmdline.h"
-#include "iutil/comp.h"
-#include "iutil/evdefs.h"
-#include "iutil/eventh.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
-#include "iutil/strset.h"
-#include "iutil/vfs.h"
-#include "iutil/virtclk.h"
-#include "ivaria/conin.h"
-#include "ivaria/conout.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
+#include "cstool/initapp.h"
+
 
 #ifdef CS_DEBUG
 #define CS_LOAD_LIB_VERBOSE true
@@ -248,8 +220,9 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
-    VFS = csPtr<iVFS> ((iVFS*)(plugin_mgr->QueryPlugin (
-      "iVFS", scfInterfaceTraits<iVFS>::GetVersion())));
+    csRef<iBase> b = csPtr<iBase> (plugin_mgr->QueryPlugin (
+      "iVFS", scfInterfaceTraits<iVFS>::GetVersion()));
+    VFS = scfQueryInterfaceSafe<iVFS> (b);
   }
   if (!VFS)
   {
@@ -257,7 +230,23 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
     VFS = CS_LOAD_PLUGIN (plugin_mgr, pluginID, iVFS);
     if (!VFS)
     {
-      csFPrintf (stderr, "Couldn't load VFS plugin \"%s\"!\n", pluginID);
+      /* NB: loading the plugin should have already resulted in a message 
+       * having been printed. */
+      static const char highlight[] = 
+	" " CS_ANSI_FI "%s" CS_ANSI_RST " ";
+      csFPrintf (stderr, highlight, 
+	"* This likely means that the plugins could not be found.");
+      csFPrintf (stderr, "\n");
+      csFPrintf (stderr, highlight, "If you're a user:");
+      csFPrintf (stderr, "Check the working directory the application starts "
+	"from -\n");
+      csFPrintf (stderr, "  usually, it is the same as the directory with the "
+	"executable.\n");
+      csFPrintf (stderr, "  If in doubt, contact the vendor.\n");
+      csFPrintf (stderr, highlight, "If you're a developer:");
+      csFPrintf (stderr, "Check if the CRYSTAL environment var points to the\n");
+      csFPrintf (stderr, "  correct location - usually the directory CS was "
+	"built in.\n");
       return 0;
     }
     r->Register (VFS, "iVFS");

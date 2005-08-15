@@ -195,7 +195,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.loadplugin",
-    	"WARNING: could not load plugin '%s'", classID);
+    	"could not load plugin '%s'", classID);
   }
   else
   {
@@ -250,7 +250,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
     }
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.loadplugin",
-    	"WARNING: failed to initialize plugin '%s'", classID);
+    	"failed to initialize plugin '%s'", classID);
     // If we added this plugin in this call then we remove it here as well.
     if (added_here)
       Plugins.DeleteIndex (index);
@@ -273,7 +273,7 @@ bool csPluginManager::RegisterPlugin (const char *classID,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.registerplugin",
-    	"WARNING: failed to initialize plugin '%s'", classID);
+    	"failed to initialize plugin '%s'", classID);
     Plugins.DeleteIndex (index);
     return false;
   }
