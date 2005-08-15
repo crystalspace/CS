@@ -529,6 +529,7 @@ CS_AXIS_NONE = _cspace.CS_AXIS_NONE
 CS_AXIS_X = _cspace.CS_AXIS_X
 CS_AXIS_Y = _cspace.CS_AXIS_Y
 CS_AXIS_Z = _cspace.CS_AXIS_Z
+CS_AXIS_W = _cspace.CS_AXIS_W
 class csVector3(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3, name, value)
@@ -2374,8 +2375,6 @@ csGetTicks = _cspace.csGetTicks
 csSleep = _cspace.csSleep
 
 csGetUsername = _cspace.csGetUsername
-
-csGetPlatformConfigPath = _cspace.csGetPlatformConfigPath
 class csPluginRequest(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPluginRequest, name, value)
@@ -2405,6 +2404,8 @@ class csPluginRequestPtr(csPluginRequest):
         if not hasattr(self,"thisown"): _swig_setattr(self, csPluginRequest, 'thisown', 0)
         _swig_setattr(self, csPluginRequest,self.__class__,csPluginRequest)
 _cspace.csPluginRequest_swigregister(csPluginRequestPtr)
+
+csGetPlatformConfigPath = _cspace.csGetPlatformConfigPath
 
 class csInitializer(_object):
     __swig_setmethods__ = {}
