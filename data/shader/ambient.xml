@@ -2,7 +2,7 @@
 <shader compiler="xmlshader" name="ambient">
     <!-- This should be defined by renderloop somehow and track sector ambient -->
     <shadervars>
-	<shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.2, 0.2, 0.4</shadervar>
+	<shadervar name="light ambient" type="vector3">0.2, 0.2, 0.4</shadervar>
     </shadervars>
     <technique priority="50">
 	<pass>

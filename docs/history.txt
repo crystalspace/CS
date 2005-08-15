@@ -15,6 +15,8 @@ chronological order.
 	- res enabled sorting for doxygen brief docs.
 	- res fixed some GCC complaints in the lighter apps and the document
 	  helpers.
+	- res made some VC6 compile fixes.
+	- res fixed the glshader_fixed plugin for the STANDARD_LIGHT changes.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.

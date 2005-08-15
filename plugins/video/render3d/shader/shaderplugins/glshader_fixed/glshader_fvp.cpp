@@ -605,7 +605,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
             else
             {
               csString buf;
-              buf.Format ("STANDARD_LIGHT_%d_POSITION_WORLD", 
+              buf.Format ("light %d position world", 
 		lights[i].lightnum);
               lights[i].positionvar = strings->Request (buf);
             }
@@ -615,7 +615,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
             else
             {
               csString buf;
-              buf.Format ("STANDARD_LIGHT_%d_DIFFUSE", lights[i].lightnum);
+              buf.Format ("light %d diffuse", lights[i].lightnum);
               lights[i].diffusevar = strings->Request (buf);
             }
 
@@ -624,7 +624,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
             else
             {
               csString buf;
-              buf.Format ("STANDARD_LIGHT_%d_SPECULAR", lights[i].lightnum);
+              buf.Format ("light %d specular", lights[i].lightnum);
               lights[i].specularvar = strings->Request (buf);
             }
 
@@ -633,7 +633,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
             else
             {
               csString buf;
-              buf.Format ("STANDARD_LIGHT_%d_ATTENUATION",
+              buf.Format ("light %d attenuation",
 	      	lights[i].lightnum);
               lights[i].attenuationvar = strings->Request (buf);
             }
@@ -668,7 +668,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
             if ((str = child->GetAttributeValue("color")))
               ambientvar = strings->Request (str);
             else
-              ambientvar = strings->Request ("STANDARD_LIGHT_AMBIENT");
+              ambientvar = strings->Request ("light ambient");
           
             do_lighting = true;
           }

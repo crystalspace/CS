@@ -79,6 +79,7 @@ namespace CrystalSpace
 	}
 	const csString& GetRootPath() { return rootPath; }
       };
+      friend class VfsRootMounter;
 
       /**
        * Change the VFS current working directory to the current native 

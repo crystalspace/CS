@@ -170,9 +170,9 @@ template<class Interface>
 inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
                                             const char* ClassID)
 {
-  iBase* base (mgr->QueryPlugin (ClassID,
+  iBase* base = mgr->QueryPlugin (ClassID,
     scfInterfaceTraits<Interface>::GetName(),
-    scfInterfaceTraits<Interface>::GetVersion()));
+    scfInterfaceTraits<Interface>::GetVersion());
 
   if (base == 0) return csPtr<Interface> (0);
 
@@ -202,7 +202,7 @@ template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
                                       const char* ClassID)
 {
-  iBase* base (mgr->LoadPlugin (ClassID));
+  iBase* base = mgr->LoadPlugin (ClassID);
 
   if (base == 0) return csPtr<Interface> (0);
 
@@ -229,7 +229,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
                                         const char* ClassID)
 {
-  iBase* base (mgr->LoadPlugin (ClassID));
+  iBase* base = mgr->LoadPlugin (ClassID);
   return csPtr<iBase> (base);
 }
 

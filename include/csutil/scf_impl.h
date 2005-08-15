@@ -124,34 +124,34 @@ public:
   {
     void *x;
 #if SCF_IMPL_N >= 1
-    if((x = GetInterface<I1>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I1>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 2
-    if((x = GetInterface<I2>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I2>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 3
-    if((x = GetInterface<I3>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I3>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 4
-    if((x = GetInterface<I4>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I4>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 5
-    if((x = GetInterface<I5>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I5>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 6
-    if((x = GetInterface<I6>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I6>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 7
-    if((x = GetInterface<I7>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I7>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 8
-    if((x = GetInterface<I8>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I8>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 9
-    if((x = GetInterface<I9>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I9>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 10
-    if((x = GetInterface<I10>(id, version)) != NULL) return x;
+    if((x = VC6Workaround<I10>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 
     return SCF_IMPL_SUPER::QueryInterface(id, version);
@@ -195,19 +195,23 @@ protected:
 
 private:
   template<class I>
-  CS_FORCEINLINE void* GetInterface(scfInterfaceID id, scfInterfaceVersion version)
+  struct VC6Workaround
   {
-    if (id == scfInterfaceTraits<I>::GetID() &&
-        scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
+    static CS_FORCEINLINE void* GetInterface(Class* scfObject, scfInterfaceID id, 
+					     scfInterfaceVersion version)
     {
-      this->scfObject->IncRef();
-      return CS_STATIC_CAST(I*, this->scfObject);
+      if (id == scfInterfaceTraits<I>::GetID() &&
+	  scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
+      {
+	scfObject->IncRef();
+	return CS_STATIC_CAST(I*, scfObject);
+      }
+      else
+      {
+	return 0;
+      }
     }
-    else
-    {
-      return NULL;
-    }
-  }
+  };
 };
 
 #undef SCF_IMPL_NAME
