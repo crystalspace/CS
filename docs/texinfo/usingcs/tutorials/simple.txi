@@ -512,7 +512,7 @@ bool Simple::Application ()
 @}
 @end example
 
-So, first we create a view for our world and a paritulcar 3D renderer.
+So, first we create a view for our world and a particular 3D renderer.
 The view has a current sector which is passed to the camera and is set by
 @code{SetSector()}.  The camera also has a position in that sector which you
 can set by first getting the camera with @code{GetCamera()} and then setting
