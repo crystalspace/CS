@@ -13333,6 +13333,7 @@ sub CS_AXIS_NONE () { $cspacec::CS_AXIS_NONE }
 sub CS_AXIS_X () { $cspacec::CS_AXIS_X }
 sub CS_AXIS_Y () { $cspacec::CS_AXIS_Y }
 sub CS_AXIS_Z () { $cspacec::CS_AXIS_Z }
+sub CS_AXIS_W () { $cspacec::CS_AXIS_W }
 sub CS_POLY_IN () { $cspacec::CS_POLY_IN }
 sub CS_POLY_ON () { $cspacec::CS_POLY_ON }
 sub CS_POLY_OUT () { $cspacec::CS_POLY_OUT }
