@@ -360,6 +360,8 @@ void csGLGraphics3D::SetMixMode (uint mode)
       break;
   }
 
+  statecache->Disable_GL_ALPHA_TEST ();
+
   if (enable_blending)
     statecache->Enable_GL_BLEND ();
   else

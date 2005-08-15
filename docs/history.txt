@@ -17,6 +17,7 @@ chronological order.
 	  helpers.
 	- res made some VC6 compile fixes.
 	- res fixed the glshader_fixed plugin for the STANDARD_LIGHT changes.
+	- res made csGLGraphics3D::SetMixMode() disable alpha testing.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.
