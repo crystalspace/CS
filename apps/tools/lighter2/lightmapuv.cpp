@@ -60,7 +60,8 @@ namespace lighter
         csRect lmArea; 
         int lmID;
         bool res;
-        res = AllocLightmap (lightmaps, uvSize.x, uvSize.y, lmArea, lmID);
+        res = AllocLightmap (lightmaps, (int)ceilf (uvSize.x), 
+	  (int)ceilf (uvSize.y), lmArea, lmID);
         if (!res) continue; 
 
         lightmaps[lmID]->SetMaxUsedUV (lmArea.xmax, lmArea.ymax);

@@ -100,7 +100,8 @@ void litKDBuildTree::BuildTree (const csArray<litLightingMesh*>& meshes)
   // Collect all toplevel patches
   csArray<litMeshPatch*> patches;
     
-  ForEach (meshes.GetIterator (), PatchCollector (patches));
+  PatchCollector pc (patches);
+  ForEach (meshes.GetIterator (), pc);
 
   //Compute boundaries
   BBComputer bbc;

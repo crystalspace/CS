@@ -13,6 +13,8 @@ chronological order.
 	  plugin manager, as csReport() can add that, too.
 	- res made some misc doxygen fixes.
 	- res enabled sorting for doxygen brief docs.
+	- res fixed some GCC complaints in the lighter apps and the document
+	  helpers.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.

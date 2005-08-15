@@ -186,7 +186,8 @@ namespace lighter
 
     // Find all possible split-locations
     splitPositionFinder->Reset ();
-    ForEach (radPrimitives.GetIterator (), CollectSplitPositions (splitDimension));
+    CollectSplitPositions csp (splitDimension);
+    ForEach (radPrimitives.GetIterator (), csp);
 
     // Compute split-cost at each location using SAH
     float SA_inv = 0.5f / (bbsize.x*bbsize.y + bbsize.x*bbsize.z + bbsize.y*bbsize.z);
@@ -245,9 +246,9 @@ namespace lighter
     rightChild->boundingBox.SetMin (splitDimension, splitLocation);
 
     // Distribute nodes between children
-    ForEach (radPrimitives.GetIterator (),
-      DistributeLeftRight (splitDimension, splitLocation, 
-      leftChild, rightChild));
+    DistributeLeftRight dlr (splitDimension, splitLocation, 
+      leftChild, rightChild);
+    ForEach (radPrimitives.GetIterator (), dlr);
 
     //@TODO: Add a maxdepth check
     leftChild->Subdivide ();

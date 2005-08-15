@@ -60,7 +60,7 @@ namespace lighter
       paths.Push ("/lev/");
       if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
         return globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory);
+          sceneFiles[i].directory.GetData());
 
       // Load it
       csRef<iFile> buf = globalLighter->vfs->Open ("world", VFS_FILE_READ);
@@ -100,7 +100,7 @@ namespace lighter
       paths.Push ("/lev/");
       if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
         return globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory);
+          sceneFiles[i].directory.GetData());
 
       // Save it
       csRef<iFile> buf = globalLighter->vfs->Open ("world", VFS_FILE_WRITE);

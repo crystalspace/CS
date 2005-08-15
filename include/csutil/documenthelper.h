@@ -27,9 +27,67 @@
 
 namespace CrystalSpace
 {
-  // Namespace to group helpers operating on iDocument*
+  /// Namespace to group helpers operating on iDocument*
   namespace DocumentHelper
   {
+    namespace Implementation
+    {
+      /**
+      * Filtering iDocumentNodeIterator.
+      * Filters another iterator with a functor.
+      */
+      template<class T>
+      class FilterDocumentNodeIterator : public 
+        scfImplementation1 <FilterDocumentNodeIterator<T>, 
+	  iDocumentNodeIterator>
+      {
+      public:
+        FilterDocumentNodeIterator (csRef<iDocumentNodeIterator> parent,
+          T filter) : scfImplementation1<FilterDocumentNodeIterator<T>, 
+	    iDocumentNodeIterator> (this), parent (parent), filter (filter)
+        {
+          ForwardIterator ();
+        }
+
+        // -- iDocumentNodeIterator
+        /// Are there more elements?
+        virtual bool HasNext ()
+        {
+          return nextElement.IsValid ();
+        }
+
+        /// Get next element.
+        virtual csRef<iDocumentNode> Next ()
+        {
+          csRef<iDocumentNode> current = nextElement;
+          ForwardIterator ();
+          return current;
+        }
+
+      private:
+        void ForwardIterator ()
+        {
+          if (!parent) nextElement = 0;
+
+          while (parent->HasNext ())
+          {
+            csRef<iDocumentNode> parentNext = parent->Next ();
+            if (filter (parentNext))
+            {
+              nextElement = parentNext;
+              return;
+            }
+          }
+          nextElement = 0;
+          parent = 0;
+        }
+
+        csRef<iDocumentNodeIterator> parent;
+        T filter;
+        csRef<iDocumentNode> nextElement;
+      };
+    }
+    
     /**
      * Remove duplicate child-nodes.
      * The functor T is used to determine what should be seen
@@ -98,7 +156,8 @@ namespace CrystalSpace
       }
     }
 
-    // Functors 
+    /**\name Functors 
+     * @{ */
 
     /**
      * Node comparator. Compares the names of the nodes (case-insensitive).
@@ -112,7 +171,7 @@ namespace CrystalSpace
 
         const char* name1 = node1->GetValue ();
         const char* name2 = node2->GetValue ();
-        if (!strcasecmp (name1, name2)) return true;
+        if (!csStrCaseCmp (name1, name2)) return true;
         return false;
       }
     };
@@ -139,7 +198,7 @@ namespace CrystalSpace
           node2->GetAttribute (attributeName.GetData ());
         if (!attribute1 || !attribute2) return false;
 
-        if (!strcasecmp (attribute1->GetValue (), attribute2->GetValue ())) 
+        if (!csStrCaseCmp (attribute1->GetValue (), attribute2->GetValue ())) 
           return true;
 
         return false;
@@ -149,7 +208,7 @@ namespace CrystalSpace
     };
 
     /**
-     * Compare (case-insensitive) node value to given.
+     * Compare (case-sensitive) node value to given.
      */
     struct NodeValueTest
     {
@@ -170,7 +229,7 @@ namespace CrystalSpace
     };
 
     /**
-     * Compare (case-insensitive) node attirbute to given.
+     * Compare (case-sensitive) node attribute to given.
      */
     struct NodeAttributeValueTest
     {
@@ -193,7 +252,8 @@ namespace CrystalSpace
     };
 
     /**
-     * Compare (case-insensitive) node attirbute to given.
+     * Check if a regular expression matches(case-insensitive) with the value 
+     * of the given attribute.
      */
     struct NodeAttributeRegexpTest
     {
@@ -215,6 +275,7 @@ namespace CrystalSpace
       csString attribute;
       csRegExpMatcher valueMatcher;
     };
+    /** @} */
 
     /// Get a filtering iDocumentNodeIterator
     template<class T>
@@ -224,67 +285,6 @@ namespace CrystalSpace
       return new Implementation::FilterDocumentNodeIterator<T>
         (parent, filter);
     }
-
-
-    namespace Implementation
-    {
-    
-      /**
-      * Filtering iDocumentNodeIterator.
-      * Filters another iterator with a functor.
-      */
-      template<class T>
-      class FilterDocumentNodeIterator : public 
-        scfImplementation1 <FilterDocumentNodeIterator, iDocumentNodeIterator>
-      {
-      public:
-        FilterDocumentNodeIterator (csRef<iDocumentNodeIterator> parent,
-          T filter)
-          : scfImplementationType (this), parent (parent), filter (filter)
-        {
-          ForwardIterator ();
-        }
-
-        // -- iDocumentNodeIterator
-        /// Are there more elements?
-        virtual bool HasNext ()
-        {
-          return nextElement.IsValid ();
-        }
-
-        /// Get next element.
-        virtual csRef<iDocumentNode> Next ()
-        {
-          csRef<iDocumentNode> current = nextElement;
-          ForwardIterator ();
-          return current;
-        }
-
-      private:
-        void ForwardIterator ()
-        {
-          if (!parent) nextElement = 0;
-          bool haveNewElement = false;
-
-          while (parent->HasNext ())
-          {
-            csRef<iDocumentNode> parentNext = parent->Next ();
-            if (filter (parentNext))
-            {
-              nextElement = parentNext;
-              return;
-            }
-          }
-          nextElement = 0;
-          parent = 0;
-        }
-
-        csRef<iDocumentNodeIterator> parent;
-        T filter;
-        csRef<iDocumentNode> nextElement;
-      };
-    }
-
   }
 }
 

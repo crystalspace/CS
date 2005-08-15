@@ -256,106 +256,127 @@ namespace lighter
     }
   }
 
-  // Ok, this is a very strange method.. it is fetched from FSrad
-  // and basically computes the world->uv-transform. Check following explanation from
-  // FSrad and see if you understand it better than I do ;)
+  /* Ok, this is a very strange method.. it is fetched from FSrad
+   * and basically computes the world->uv-transform. Check following 
+   * explanation from FSrad and see if you understand it better than I do ;) 
+   */
 
-  // ---------------------------------------------------------------------------------------------------------------------------------
-  // Warning: The following code is bizarre, to say the least. I'll try to explain it here:
-  //
-  // A polygon with multiple 'n' coordinates per vertex will exist in 'n' spaces simultaneously. In other words, a polygon that has
-  // a (1) 3D coordinate per vertex, (2) a 2D texture coordinate per vertex and (3) a 2D lightmap coordinate per vertex, will exist
-  // in each of these three space simultaneously.
-  //
-  // Because these three spaces are seemingly arbitrary (chosen by an artist, for example) there is no immediate way to map from one
-  // to the next. For the following explanation, we are only concerned with two of all possible spaces: 3-space (the description of
-  // the polygon as it exists in 3D) and 2-space (the description of the polygon as it exists in 2D lightmap space.)
-  //
-  // For the sake of simplicity, I will refer to these two spaces as "3-space" and "2-space".
-  //
-  // Because this code was created for the purpose of lightmapping (at least, originally) our main focus is the ability to transform
-  // from 3-space into 2-space. In the end, we want this to be as quick as possible, so our final product will be two 3D vectors.
-  //
-  // These two vectors represent the direction that you must travel (in 3-space) in order to follow along each of the two axes in
-  // 2-space. These two vectors can (and should) be given a length that will represent the distance in 3-space needed to travel
-  // one unit in 2-space, along the associated vector.
-  //
-  // I hope I've made the academics happy, but for those of you that want it in plain ol' fashioned English, here's a clearer
-  // description: Given a point in 3-space that maps to the point [15.84, 12.43] in 2-space, if we add the U-vector (the first of
-  // our two 2 vectors) to that 3-space point, we will end up with a 3-space point that maps to the 2-space coordinate [16.84, 12.43]
-  // (one unit along the U-axis in the positive direction in textures-space.)
-  //
-  // Confused? If not, you soon will be, because the method by which we need to calculate this is rather bizarre. I'll try to be
-  // clear about it...
-  //
-  // Going back to an earlier portion of the text, remember that the polygon exists in multiple spaces simultaneously. Also note that
-  // these spaces are chosen arbitrarily. Because of this, we actually need to search for the solution, rather than simply calculate
-  // it.
-  //
-  // It's best to think of the solution (or the search for the solution) in terms of axes. There are three axes in 3-space and two
-  // axes in 2-space. Our result will be the two (3-space) vectors that point along the direction of the 2 (2-space) axes. Here's what
-  // it looks like:
-  //
-  //             /\
-  //            / |\
-  //           /  | \
-  //          /   |  \
-  //         /    |   \
-  //        /     |    \
-  //       /____________\_____ V-Vector
-  //      /----___|      \
-  //              |----___\
-  //              |
-  //              |
-  //              U-Vector
-  // 
-  // What you're looking at is a 3D polygon as seen from a perpendicular view to the camera, with the two Vectors (U and V) shown as
-  // vertical and horizontal lines. This is the simplest case, these lines will probably often be at odd orientations, which is why
-  // we must search for them. Here's how we'll perform that search:
-  //
-  // 	point3	u1_3, u2_3, v1_3, v2_3;
-  // 	point2	u1_2, u2_2, v1_2, v2_2;
-  // 	double	maxUDist, maxVDist;
-  //
-  // 	for (each vertex)
-  // 	{
-  // 		for (each edge not sharing that vertex)
-  // 		{
-  // 			// Intercept in U?
-  //
-  // 			if (edge UVs form a line that intercepts the U value from the current vertex)
-  // 			{
-  // 				if (interceptDist > maxUDist)
-  // 				{
-  // 					maxUDist = interceptDist
-  // 					u1_3 = current vertex
-  // 					u2_3 = interceptPoint
-  // 					u1_2 = current vertex (UV)
-  // 					u2_2 = interceptPoint (UV)
-  // 				}
-  // 			}
-  //
-  // 			// Intercept in V (this code is the same as above, but for the V component)?
-  //
-  // 			if (edge UVs form a line that intercepts the V value from the current vertex)
-  // 			{
-  // 				if (interceptDist > maxVDist)
-  // 				{
-  // 					maxVDist = interceptDist
-  // 					v1_3 = current vertex
-  // 					v2_3 = interceptPoint
-  // 					v1_2 = current vertex (UV)
-  // 					v2_2 = interceptPoint (UV)
-  // 				}
-  // 			}
-  // 		}
-  // 	}
-  //
-  // At this point, we have 8 points: four of which are points in 2-space (one point for each endpoint of a line in 3-space that
-  // follows the axis of the associated 2-space) and the four corresponding 2-space coordinates. From this, we are able to easily
-  // calculate the resulting vectors (see code below.)
-  //
-  // ---------------------------------------------------------------------------------------------------------------------------------
+  /* ------------------------------------------------------------------------
+   * Warning: The following code is bizarre, to say the least. I'll try to 
+   * explain it here:
+   *
+   * A polygon with multiple 'n' coordinates per vertex will exist in 'n' 
+   * spaces simultaneously. In other words, a polygon that has a 
+   * (1) 3D coordinate per vertex, 
+   * (2) a 2D texture coordinate per vertex and 
+   * (3) a 2D lightmap coordinate per vertex, will exist
+   * in each of these three space simultaneously.
+   *
+   * Because these three spaces are seemingly arbitrary (chosen by an artist, 
+   * for example) there is no immediate way to map from one to the next. For 
+   * the following explanation, we are only concerned with two of all possible 
+   * spaces: 3-space (the description of the polygon as it exists in 3D) and 
+   * 2-space (the description of the polygon as it exists in 2D lightmap space.)
+   *
+   * For the sake of simplicity, I will refer to these two spaces as "3-space" 
+   * and "2-space".
+   *
+   * Because this code was created for the purpose of lightmapping (at least, 
+   * originally) our main focus is the ability to transform from 3-space into 
+   * 2-space. In the end, we want this to be as quick as possible, so our 
+   * final product will be two 3D vectors.
+   *
+   * These two vectors represent the direction that you must travel (in 
+   * 3-space) in order to follow along each of the two axes in 2-space. These 
+   * two vectors can (and should) be given a length that will represent the 
+   * distance in 3-space needed to travel one unit in 2-space, along the 
+   * associated vector.
+   *
+   * I hope I've made the academics happy, but for those of you that want it 
+   * in plain ol' fashioned English, here's a clearer description: Given a 
+   * point in 3-space that maps to the point [15.84, 12.43] in 2-space, if we 
+   * add the U-vector (the first of our two 2 vectors) to that 3-space point, 
+   * we will end up with a 3-space point that maps to the 2-space coordinate 
+   * [16.84, 12.43] (one unit along the U-axis in the positive direction in 
+   * textures-space.)
+   *
+   * Confused? If not, you soon will be, because the method by which we need 
+   * to calculate this is rather bizarre. I'll try to be clear about it...
+   *
+   * Going back to an earlier portion of the text, remember that the polygon 
+   * exists in multiple spaces simultaneously. Also note that these spaces are 
+   * chosen arbitrarily. Because of this, we actually need to search for the 
+   * solution, rather than simply calculate it.
+   *
+   * It's best to think of the solution (or the search for the solution) in 
+   * terms of axes. There are three axes in 3-space and two axes in 2-space. 
+   * Our result will be the two (3-space) vectors that point along the 
+   * direction of the 2 (2-space) axes. Here's what it looks like:
+   *
+   *             /\
+   *            / |\
+   *           /  | \
+   *          /   |  \
+   *         /    |   \
+   *        /     |    \
+   *       /____________\_____ V-Vector
+   *      /----___|      \
+   *              |----___\
+   *              |
+   *              |
+   *              U-Vector
+   * 
+   * What you're looking at is a 3D polygon as seen from a perpendicular view 
+   * to the camera, with the two Vectors (U and V) shown as vertical and 
+   * horizontal lines. This is the simplest case, these lines will probably 
+   * often be at odd orientations, which is why we must search for them. 
+   * Here's how we'll perform that search:
+   *
+   * 	point3	u1_3, u2_3, v1_3, v2_3;
+   * 	point2	u1_2, u2_2, v1_2, v2_2;
+   * 	double	maxUDist, maxVDist;
+   *
+   * 	for (each vertex)
+   * 	{
+   * 	  for (each edge not sharing that vertex)
+   * 	  {
+   * 	    // Intercept in U?
+   *
+   * 	    if (edge UVs form a line that intercepts the U value from the current vertex)
+   * 	    {
+   * 	      if (interceptDist > maxUDist)
+   * 	      {
+   * 	        maxUDist = interceptDist
+   * 	        u1_3 = current vertex
+   * 	        u2_3 = interceptPoint
+   * 	        u1_2 = current vertex (UV)
+   * 	        u2_2 = interceptPoint (UV)
+   * 	      }
+   * 	    }
+   *
+   * 	    // Intercept in V (this code is the same as above, but for the V component)?
+   *
+   * 	    if (edge UVs form a line that intercepts the V value from the current vertex)
+   * 	    {
+   * 	      if (interceptDist > maxVDist)
+   * 	      {
+   * 	        maxVDist = interceptDist
+   * 	        v1_3 = current vertex
+   * 	        v2_3 = interceptPoint
+   * 	        v1_2 = current vertex (UV)
+   * 	        v2_2 = interceptPoint (UV)
+   * 	      }
+   * 	    }
+   * 	  }
+   * 	}
+   *
+   * At this point, we have 8 points: four of which are points in 2-space (one 
+   * point for each endpoint of a line in 3-space that follows the axis of the 
+   * associated 2-space) and the four corresponding 2-space coordinates. From 
+   * this, we are able to easily calculate the resulting vectors (see code below.)
+   *
+   * ---------------------------------------------------------------------------------------------------------------------------------
+   */
 
   void RadPrimitive::ComputeUVTransform ()
   {
