@@ -1,0 +1,6 @@
+SubDir TOP apps tools lighter2 ;
+
+Description lighter2 : "New Renderer Lightmap Calculator, take 2" ;
+ApplicationIcon win32 : lighter2 : lighter.ico ;
+Application lighter2 : [ Wildcard *.cpp *.h ] ;
+LinkWith lighter2 : crystalspace ;

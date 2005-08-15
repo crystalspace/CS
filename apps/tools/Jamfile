@@ -6,6 +6,7 @@ SubInclude TOP apps tools docconv ;
 SubInclude TOP apps tools heightmapgen ;
 SubInclude TOP apps tools levtool ;
 SubInclude TOP apps tools lighter ;
+SubInclude TOP apps tools lighter2 ;
 SubInclude TOP apps tools partedit ;
 SubInclude TOP apps tools picview ;
 SubInclude TOP apps tools pvscalc ;
