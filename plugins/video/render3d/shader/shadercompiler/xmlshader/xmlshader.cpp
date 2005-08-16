@@ -1411,6 +1411,10 @@ public:
   { wrappedSVC.PushVariables (stacks); }
   virtual bool IsEmpty() const
   { return wrappedSVC.IsEmpty(); }
+  void ReplaceVariable (csShaderVariable *variable)
+  { wrappedSVC.ReplaceVariable (variable); }
+  void Clear ()
+  { wrappedSVC.Clear(); }
 };
 
 SCF_IMPLEMENT_IBASE(SVCWrapper)

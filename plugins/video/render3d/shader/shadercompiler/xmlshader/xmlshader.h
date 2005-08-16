@@ -456,6 +456,19 @@ public:
     return GetUsedSVContext().IsEmpty();
   }
 
+  void ReplaceVariable (csShaderVariable *variable)
+  { 
+    if (useFallbackContext)
+      fallbackShader->ReplaceVariable (variable);
+    GetUsedSVContext().ReplaceVariable (variable);
+  }
+  void Clear ()
+  { 
+    if (useFallbackContext)
+      fallbackShader->Clear();
+    GetUsedSVContext().Clear();
+  }
+
   /// Set object description
   void SetDescription (const char *desc)
   {

@@ -19,19 +19,24 @@
 
 #include "cssysdef.h"
 #include "csqsqrt.h"
+#include "csqint.h"
 
+#include "csgeom/math.h"
 #include "csgeom/math3d.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
+#include "csgfx/memimage.h"
 #include "csutil/bitarray.h"
+#include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csutil/sysfunc.h"
 #include "cstool/rendermeshlist.h"
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"
+#include "iengine/lightmgr.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
 #include "iengine/portal.h"
@@ -41,6 +46,7 @@
 #include "iutil/document.h"
 #include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
+#include "ivideo/txtmgr.h"
 
 #include "fatloop.h"
 
@@ -151,6 +157,20 @@ bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
       case XMLTOKEN_DEFAULTSHADER:
         pass.defShader = synldr->ParseShaderRef (child);
 	break;
+      case XMLTOKEN_MAXLIGHTS:
+	pass.maxLights = child->GetContentsValueAsInt ();
+	break;
+      case XMLTOKEN_MAXPASSES:
+	pass.maxPasses = child->GetContentsValueAsInt ();
+	break;
+      case XMLTOKEN_BASEPASS:
+	if (!synldr->ParseBool (child, pass.basepass, true))
+	  return false;
+	break;
+      case XMLTOKEN_ZOFFSET:
+	if (!synldr->ParseBool (child, pass.zoffset, true))
+	  return false;
+	break;
       default:
 	{
 	  synldr->ReportBadToken (child);
@@ -207,8 +227,9 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   nullShader = shaderManager->GetShader ("*null");
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  lightmgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
@@ -229,12 +250,13 @@ public:
   PriorityHelper (iEngine* engine): engine(engine) {}
   bool IsPrioSpecial (long priority)
   {
-    if ((knownPrios.Length() <= (size_t)priority) || (!knownPrios.IsBitSet (priority)))
+    if ((knownPrios.GetSize() <= (size_t)priority) || 
+      (!knownPrios.IsBitSet (priority)))
     {
-      if (knownPrios.Length() <= (size_t)priority) 
+      if (knownPrios.GetSize() <= (size_t)priority) 
       {
-        knownPrios.SetLength (priority + 1);
-        prioSorted.SetLength (priority + 1);
+        knownPrios.SetSize (priority + 1);
+        prioSorted.SetSize (priority + 1);
       }
       prioSorted.Set (priority, 
         engine->GetRenderPrioritySorting (priority) != CS_RENDPRI_SORT_NONE);
@@ -247,16 +269,11 @@ public:
 void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
                              csShaderVarStack &stacks)
 {
+  shadervars.Clear();
   RenderNode* node = renderNodeAlloc.Alloc();
   BuildNodeGraph (node, rview, sector);
   ProcessNode (rview, node);
   renderNodeAlloc.Empty();
-}
-
-uint32 csFatLoopStep::Classify (csRenderMesh* /*mesh*/)
-{
-  // @@@ Not very distinguishing atm ... we'll see if it's really needed.
-  return (1 << passes.Length())-1;
 }
 
 void csFatLoopStep::SetupFog (RenderNode* node)
@@ -273,9 +290,9 @@ void csFatLoopStep::SetupFog (RenderNode* node)
 void csFatLoopStep::CleanEmptyMeshNodes (RenderNode* node, 
   const csArray<csMeshRenderNode*>& meshNodes)
 {
-  size_t nodeContainedIdx = node->containedNodes.Length() - meshNodes.Length();
+  size_t nodeContainedIdx = node->containedNodes.GetSize() - meshNodes.GetSize();
   size_t meshNodeIdx = 0;
-  while (nodeContainedIdx < node->containedNodes.Length())
+  while (nodeContainedIdx < node->containedNodes.GetSize())
   {
     if (meshNodes[meshNodeIdx]->HasMeshes())
       nodeContainedIdx++;
@@ -327,11 +344,12 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
   }
   SetupFog (node);
 
+  // Here go the render nodes we'll actually process
   csArray<csMeshRenderNode*> meshNodes;
-  for (size_t p = 0; p < passes.Length(); p++)
+  for (size_t p = 0; p < passes.GetSize(); p++)
   {
     meshNodes.Push (meshNodeFact.CreateMeshNode (passes[p].shadertype, 
-      passes[p].defShader, shadervars));
+      passes[p].defShader, shadervars, passes[p].zoffset));
     RenderNode* newNode = renderNodeAlloc.Alloc();
     newNode->renderNode = meshNodes[p];
     newNode->fog = node->fog;
@@ -347,10 +365,14 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
   size_t num = meshlist->SortMeshLists (rview);
-  visible_meshes.SetLength (num);
-  imeshes_scratch.SetLength (num);
+  visible_meshes.SetSize (num);
+  imeshes_scratch.SetSize (num);
   csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ();
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
+
+  uint framenr = rview->GetCurrentFrameNumber();
+
+  csReversibleTransform camTransR = rview->GetCamera()->GetTransform();
 
   PriorityHelper ph (engine);
   for (size_t n = 0; n < num; n++)
@@ -362,10 +384,10 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
       BuildPortalNodes (node, imeshes_scratch[n], mesh->portal, rview);
       SetupFog (node);
 
-      for (size_t p = 0; p < passes.Length(); p++)
+      for (size_t p = 0; p < passes.GetSize(); p++)
       {
         meshNodes[p] = meshNodeFact.CreateMeshNode (passes[p].shadertype, 
-          passes[p].defShader, shadervars);
+	  passes[p].defShader, shadervars, passes[p].zoffset);
         RenderNode* newNode = renderNodeAlloc.Alloc();
         newNode->renderNode = meshNodes[p];
 	newNode->fog = node->fog;
@@ -377,20 +399,188 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     iMeshWrapper* mw = imeshes_scratch[n];
     long prio = mw->GetRenderPriority();
 
-    uint32 classes = Classify (mesh);
-    int c = 0;
-    while (classes != 0)
+    // @@@ FIXME: only fetch when needed
+    const csArray<iLight*>& relevantLights = 
+      lightmgr->GetRelevantLights (mw, -1, true);
+    size_t lightOfs = 0;
+
+    size_t c = 0;
+    while (c < passes.GetSize())
     {
-      if (classes & 1)
+      csMeshRenderNode* meshNode = meshNodes[c];
+      const RenderPass& pass = passes[c++];
+      size_t i;
+      int lightCount = 0;
+      int passCount = 0;
+
+      iShader* shader;
+
+      // Grab the shader from the material...
+      iMaterial* hdl = mesh->material->GetMaterial ();
+      shader = hdl->GetShader (pass.shadertype);
+      if (shader == 0) shader = pass.defShader;
+      if ((shader == 0) || (shader == nullShader))
+	continue;
+
+      // Render passes untik the limit is hit
+      while (passCount < pass.maxPasses)
       {
-        meshNodes[c]->AddMesh (mesh, mw, prio, ph.IsPrioSpecial (prio));
+	passCount++;
+	if (!pass.basepass 
+	  && lightOfs >= relevantLights.GetSize())
+	  break;
+	// Set up SV with light count
+	csRef<csShaderVariable> sv;
+	sv = GetFrameUniqueSV (framenr, shadervars, 
+	  lsvCache.GetDefaultSVId (csLightShaderVarCache::varLightCount));
+	shadervars.ReplaceVariable (sv);
+	sv->SetValue ((int)(relevantLights.GetSize() - lightOfs));
+
+	// ...and fill light SVs.
+	for (i = lightOfs; i < relevantLights.GetSize(); i++)
+	{
+	  if (lightCount >= pass.maxLights) break;
+	  lightCount++;
+	  SetLightSVs (shadervars, relevantLights[i], i-lightOfs, 
+	    camTransR, framenr);
+	}
+
+	// feed light SVs to shader
+	csShaderVarStack stacks;
+	FillStacks (stacks, mesh, mw, hdl, shader);
+
+	csRenderMeshModes modes (*mesh);
+	size_t ticket = shader->GetTicket (modes, stacks);
+
+	// query max light number the shader groks
+	const csShaderMetadata& shaderMeta = shader->GetMetadata (ticket);
+	int n = csMin ((int)shaderMeta.numberOfLights, 
+	  pass.maxLights - lightCount);
+
+	// Set actual count
+	sv->SetValue (n);
+
+	for (i = 0; i < (size_t)n; i++)
+	{
+	  // light SVs will still be in shadervars
+	  FillStacks (stacks, mesh, mw, hdl, shader);
+
+	  // add mesh
+	  meshNode->AddMesh (mesh, shader, stacks, prio, 
+	    ph.IsPrioSpecial (prio), ticket);
+	}
+	lightOfs += n;
+
+	// Prevent infinite loops
+	if (pass.basepass
+	  || (pass.maxLights == 0)) break;
       }
-      c++;
-      classes >>= 1;
     }
   }
   CleanEmptyMeshNodes (node, meshNodes);
   sector->DecRecLevel();
+}
+
+csPtr<iTextureHandle> csFatLoopStep::GetAttenuationTexture (
+  int attnType)
+{
+  if (!attTex.IsValid())
+  {
+  #define CS_ATTTABLE_SIZE	  128
+  #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
+
+    csRGBpixel *attenuationdata = 
+      new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE];
+    csRGBpixel* data = attenuationdata;
+    for (int y=0; y < CS_ATTTABLE_SIZE; y++)
+    {
+      for (int x=0; x < CS_ATTTABLE_SIZE; x++)
+      {
+	float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+	float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+	float i = exp (-0.7 * (xv*xv + yv*yv));
+	unsigned char v = i>1.0f ? 255 : csQint (i*255.99f);
+	(data++)->Set (v, v, v, v);
+      }
+    }
+
+    csRef<iImage> img = csPtr<iImage> (new csImageMemory (
+      CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    attTex = g3d->GetTextureManager()->RegisterTexture (
+	img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+    attTex->SetTextureClass ("lookup");
+  }
+  return csPtr<iTextureHandle> (attTex);
+}
+
+void csFatLoopStep::FillStacks (csShaderVarStack& stacks, 
+                                csRenderMesh* rm, iMeshWrapper* mw, 
+                                iMaterial* hdl, iShader* shader)
+{
+  iShaderVariableContext* svc = mw->GetSVContext();
+  if (svc->IsEmpty())
+    svc = 0;
+
+  stacks.Empty();
+  shaderManager->PushVariables (stacks);
+  shadervars.PushVariables (stacks);
+  if (rm->variablecontext)
+    rm->variablecontext->PushVariables (stacks);
+  if (svc)
+    svc->PushVariables (stacks);
+  shader->PushVariables (stacks);
+  hdl->PushVariables (stacks);
+}
+
+void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars, 
+				 iLight* light, size_t lightId, 
+				 const csReversibleTransform& camTransR,
+				 uint framenr)
+{
+  csRef<csShaderVariable> sv;
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightDiffuse));
+  const csColor& color = light->GetColor ();
+  sv->SetValue (csVector3 (color.red, color.green, color.blue));
+
+  const csVector3 lightPos = light->GetCenter ();
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightPosition));
+  sv->SetValue (lightPos * camTransR);
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightAttenuation));
+  csLightAttenuationMode attnMode = light->GetAttenuationMode ();
+  if (attnMode == CS_ATTN_LINEAR)
+  {
+    float r = light->GetAttenuationConstants ().x;
+    sv->SetValue (csVector3(r, 1/r, 0));
+  }
+  else
+  {
+    sv->SetValue (light->GetAttenuationConstants ());
+  }
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightAttenuationTex));
+  //sv->SetAccessor (GetLightAccessor (light));
+  if (!attTex.IsValid())
+    attTex = GetAttenuationTexture (attnMode);
+  sv->SetValue (attTex);
+}
+
+csRef<csShaderVariable> csFatLoopStep::GetFrameUniqueSV (uint framenr,
+  csShaderVariableContext& shadervars, csStringID name)
+{
+  csRef<csShaderVariable> sv = svHolder.GetFrameUniqueSV (framenr, name);
+  shadervars.ReplaceVariable (sv);
+  return sv;
 }
 
 void csFatLoopStep::BuildPortalNodes (RenderNode* node, 
@@ -445,7 +635,7 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
       portalNode->PostMeshCollect (rview);
     }
 
-    if (newNode->containedNodes.Length() == 0)
+    if (newNode->containedNodes.GetSize() == 0)
       renderNodeAlloc.Free (newNode);
     else
       node->containedNodes.Push (newNode);
@@ -457,7 +647,7 @@ void csFatLoopStep::ProcessNode (iRenderView* rview, RenderNode* node)
   SetupFog (node);
   if ((!node->renderNode) || node->renderNode->Preprocess (rview))
   {
-    for (size_t i = 0; i < node->containedNodes.Length(); i++)
+    for (size_t i = 0; i < node->containedNodes.GetSize(); i++)
     {
       ProcessNode (rview, node->containedNodes[i]);
       SetupFog (node);

@@ -193,7 +193,7 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
     csShaderVariableContext varContext;
     csRefArray<csShaderVariable> globVars = 
       factory->shaderManager->GetShaderVariables ();
-    for (uint i = 0; i < globVars.Length (); i++)
+    for (uint i = 0; i < globVars.GetSize (); i++)
     {
       varContext.AddVariable (globVars[i]);
     }
@@ -301,7 +301,7 @@ csPortalRenderNode* csPortalRenderNodeFactory::CreatePortalNode (iPortal* portal
   const int* vertexIndices = portal->GetVertexIndices();
   int num_vertices = portal->GetVertexIndicesCount();
 
-  camera_vertices.SetLength (num_vertices);
+  camera_vertices.SetSize (num_vertices);
   const csVector3* world_vertices = portal->GetWorldVertices();
   int i;
   for (i = 0 ; i < num_vertices; i++)

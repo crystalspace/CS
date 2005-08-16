@@ -65,7 +65,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
   return 0;
 }
 
-SCF_VERSION (iShaderVariableContext, 0, 0, 1);
+SCF_VERSION (iShaderVariableContext, 0, 0, 2);
 
 /**
  * This is a baseclass for all interfaces which provides shadervariables
@@ -73,7 +73,11 @@ SCF_VERSION (iShaderVariableContext, 0, 0, 1);
  */
 struct iShaderVariableContext : public iBase
 {
-  /// Add a variable to this context
+  /**
+   * Add a variable to this context
+   * \remarks If a variable of the same name exists in the current context,
+   *   its contents are replaced with those of \a variable.
+   */
   virtual void AddVariable (csShaderVariable *variable) = 0;
   
   /// Get a named variable from this context
@@ -105,6 +109,17 @@ struct iShaderVariableContext : public iBase
 
   /// Determine whether this SV context contains any variables at all.
   virtual bool IsEmpty () const = 0;
+
+  /**
+   * Replace the current variable object of the same name as \a variable with
+   * the latter, add \a variable otherwise.
+   * \remarks This differs from AddVariable() as this method replaces the
+   *   variable *object*, not just the contents.
+   */
+  virtual void ReplaceVariable (csShaderVariable* variable) = 0;
+  
+  /// Remove all variables from this context.
+  virtual void Clear() = 0;
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);

@@ -76,11 +76,22 @@ csShaderVariable* csShaderVariableContext::GetVariable
 void csShaderVariableContext::PushVariables 
   (csShaderVarStack &stacks) const
 {
-  for (size_t i=0; i<variables.Length (); ++i)
+  for (size_t i=0; i<variables.GetSize (); ++i)
   {
     csStringID name = variables[i]->GetName ();
-    if (stacks.Length () <= (size_t)name)
-      stacks.SetLength (name+1, 0);
+    if (stacks.GetSize () <= (size_t)name)
+      stacks.SetSize (name+1, 0);
     stacks[name] = variables[i];
   }
+}
+
+void csShaderVariableContext::ReplaceVariable 
+  (csShaderVariable *variable) 
+{
+  size_t index = variables.FindSortedKey (SvVarArrayCmp (
+    variable->GetName()));
+  if (index != csArrayItemNotFound)
+    variables.Put (index, variable);
+  else
+    variables.InsertSorted (variable, SvCompare);
 }

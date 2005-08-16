@@ -22,8 +22,10 @@
 
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/redblacktree.h"
+#include "csutil/refarr.h"
 #include "csutil/weakref.h"
 
+#include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
 #include "rendernode.h"
@@ -32,7 +34,7 @@ struct ShaderTicketKey
 {
   long prio;
   iShader* shader;
-  size_t ticket;
+  size_t realTicket, sortTicket;
 };
 
 CS_SPECIALIZE_TEMPLATE
@@ -43,12 +45,13 @@ public:
   {
     int d = r1.prio - r2.prio;
     if (d != 0) return 0;
-    iShader* sh1 = (r1.ticket != (size_t)~0) ? r1.shader : 0;
-    iShader* sh2 = (r2.ticket != (size_t)~0) ? r2.shader : 0;
+    iShader* sh1 = (r1.sortTicket != (size_t)~0) ? r1.shader : 0;
+    iShader* sh2 = (r2.sortTicket != (size_t)~0) ? r2.shader : 0;
     d = (sh1 < sh2) ? -1 : ((sh1 > sh2) ? 1 : 0);
     if (d == 0)
     {
-      d = (r1.ticket < r2.ticket) ? -1 : ((r1.ticket > r2.ticket) ? 1 : 0);
+      d = (r1.sortTicket < r2.sortTicket) ? -1 
+	: ((r1.sortTicket > r2.sortTicket) ? 1 : 0);
     }
     return d;
   }
@@ -62,15 +65,13 @@ class csMeshRenderNode : public csRenderNode
 
   struct MeshBucket
   {
-    //uint timestamp;
     csDirtyAccessArray<csRenderMesh*> rendermeshes;
     csDirtyAccessArray<csShaderVarStack> stacks;
-
-    //MeshBucket() : timestamp(~0) {}
   };
   typedef csRedBlackTreeMap<ShaderTicketKey, MeshBucket> SortedBuckets;
   SortedBuckets buckets;
   csShaderVariableContext& shadervars;
+  bool zoffset;
   class TraverseShaderBuckets
   {
     csMeshRenderNode& node;
@@ -82,21 +83,20 @@ class csMeshRenderNode : public csRenderNode
   };
   friend class TraverseShaderBuckets;
 
-  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
-    size_t ticket, csRenderMesh** meshes, size_t num,
-    const csShaderVarStack* Stacks);
-  void FillStacks (csShaderVarStack& stacks, csRenderMesh* rm, 
-    iMeshWrapper* mw, iMaterial* hdl, iShader* shader);
-  size_t GetTicket (const csShaderVarStack& stacks, csRenderMesh* rm, 
-    iShader* shader);
-
   csMeshRenderNodeFactory* factory;
   csStringID shaderType;
   csRef<iShader> defShader;
+
+  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
+    size_t ticket, csRenderMesh** meshes, size_t num,
+    const csShaderVarStack* Stacks);
+
   csMeshRenderNode (csMeshRenderNodeFactory* factory, csStringID shaderType,
-    iShader* defShader, csShaderVariableContext& shadervars);
+    iShader* defShader, csShaderVariableContext& shadervars, bool zoffset);
 public:
-  void AddMesh (csRenderMesh* rm, iMeshWrapper* mw, long prio, bool keepOrder);
+  void AddMesh (csRenderMesh* rm, iShader* shader, 
+    const csShaderVarStack& stacks, long prio, bool keepOrder,
+    size_t ticket);
   bool HasMeshes () const { return !buckets.IsEmpty(); }
 
   virtual bool Preprocess (iRenderView* rview);
@@ -116,7 +116,7 @@ public:
   csMeshRenderNodeFactory (iObjectRegistry* object_reg);
 
   csMeshRenderNode* CreateMeshNode (csStringID shaderType, iShader* defShader, 
-    csShaderVariableContext& shadervars);
+    csShaderVariableContext& shadervars, bool zoffset);
 };
 
 #endif // __CS_MESHNODE_H__

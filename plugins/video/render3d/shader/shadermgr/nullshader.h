@@ -65,6 +65,8 @@ public:
   void PopVariables (csShaderVarStack &) const { }
 
   bool IsEmpty() const { return true; }
+  void ReplaceVariable (csShaderVariable*) {}
+  void Clear () { }
 };
 
 #endif // __CS_NULLSHADER_H__

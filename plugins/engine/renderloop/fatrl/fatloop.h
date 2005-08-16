@@ -23,6 +23,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/redblacktree.h"
 #include "csutil/weakref.h"
+#include "csgfx/shadervarframeholder.h"
 #include "csgfx/shadervarcontext.h"
 
 #include "iengine/mesh.h"
@@ -30,10 +31,13 @@
 
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
+#include "csplugincommon/shader/lightsvcache.h"
 
 #include "rendernode.h"
 #include "meshnode.h"
 #include "portalnode.h"
+
+#include <limits.h>
 
 class csFatLoopType : public csBaseRenderStepType
 {
@@ -47,8 +51,18 @@ struct RenderPass
 {
   csStringID shadertype;
   csRef<iShader> defShader;
+  int maxLights;
+  int maxPasses;
+  /**
+   * Means this pass is also used for stuff like ambient, lightmapping etc. 
+   * and is also rendered if no lights are present, but also only rendered
+   * at most once. */
+  bool basepass;
+  bool zoffset;
 
-  RenderPass() : shadertype (csInvalidStringID) {}
+  RenderPass() : shadertype (csInvalidStringID),
+    maxLights (INT_MAX), maxPasses (INT_MAX), basepass (false), 
+    zoffset(false) {}
 };
 
 class csFatLoopLoader : public csBaseRenderStepLoader
@@ -87,12 +101,21 @@ class csFatLoopStep : public iRenderStep
   csWeakRef<iShaderManager> shaderManager;
   csRef<iEngine> engine;
   csWeakRef<iShader> nullShader;
+  csRef<iLightManager> lightmgr;
+  csRef<iStringSet> strings;
 
+  /**
+   * Render tree node.
+   * Determines the order in what is drawn and also some setup for drawing.
+   * Tree nodes are e.g. portals (setup portal transform), meshes(basically 
+   * just rendered) ...
+   */
   struct RenderNode
   {
     csRenderNode* renderNode;
     iRenderView* rview;
 
+    // @@@ FIXME: Fog here?
     struct FogInfo
     {
       float density;
@@ -109,7 +132,6 @@ class csFatLoopStep : public iRenderStep
   csBlockAllocator<RenderNode> renderNodeAlloc;
 
   csArray<RenderPass> passes;
-  uint32 Classify (csRenderMesh* mesh);
 
   csShaderVariableContext shadervars;
   csMeshRenderNodeFactory meshNodeFact;
@@ -118,6 +140,8 @@ class csFatLoopStep : public iRenderStep
 
   void SetupFog (RenderNode* node);
 
+  /**\name Render tree building and stuff
+   * @{ */
   void CleanEmptyMeshNodes (RenderNode* node, 
     const csArray<csMeshRenderNode*>& meshNodes);
   void BuildNodeGraph (RenderNode* node, iRenderView* rview, 
@@ -125,6 +149,29 @@ class csFatLoopStep : public iRenderStep
   void BuildPortalNodes (RenderNode* node, iMeshWrapper* meshwrapper, 
     iPortalContainer* portals, iRenderView* rview);
   void ProcessNode (iRenderView* rview, RenderNode* node);
+  /** @} */
+
+  /**\name SV-related stuff
+   * @{ */
+  csShaderVariableFrameHolder svHolder;
+  csRef<csShaderVariable> GetFrameUniqueSV (uint framenr,
+    csShaderVariableContext& shadervars, csStringID name);
+  void FillStacks (csShaderVarStack& stacks, csRenderMesh* rm, 
+    iMeshWrapper* mw, iMaterial* hdl, iShader* shader);
+  /** @} */
+
+  /**\name Lighting
+   * @{ */
+  csLightShaderVarCache lsvCache;
+  csRef<iTextureHandle> attTex;
+
+  csPtr<iTextureHandle> GetAttenuationTexture (int attnType);
+  csPtr<iTextureHandle> GetAttenuationTexture (const csVector3& attnVec);
+
+  void SetLightSVs (csShaderVariableContext& shadervars, iLight* light,
+    size_t lightId, const csReversibleTransform& camTransR,
+    uint framenr);
+  /** @} */
 public:
   SCF_DECLARE_IBASE;
 
@@ -132,7 +179,7 @@ public:
   virtual ~csFatLoopStep ();
 
   bool AddPass (const RenderPass& pass)
-  { if (passes.Length() >= 32) return false; passes.Push (pass); return true; }
+  { passes.Push (pass); return true; }
 
   virtual void Perform (iRenderView* rview, iSector* sector,
     csShaderVarStack &stacks);

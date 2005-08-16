@@ -20,13 +20,22 @@
 #ifndef __CS_NORMALIZATIONCUBE_H__
 #define __CS_NORMALIZATIONCUBE_H__
 
+/**\file
+ * Shader variable accessor for a normalization cubemap.
+ */
+
 #include "csextern.h"
 #include "csutil/weakref.h"
 #include "csgfx/shadervar.h"
 #include "ivideo/txtmgr.h"
 
-class CS_CRYSTALSPACE_EXPORT csNormalizationCubeAccessor : public iShaderVariableAccessor
+/**
+ * Shader variable accessor for a normalization cubemap.
+ */
+class CS_CRYSTALSPACE_EXPORT csNormalizationCubeAccessor : 
+  public iShaderVariableAccessor
 {
+  /// Generate a cube side.
   void FillNormalizationMapSide (unsigned char *normdata, int size,
     int xx, int xy, int xo,
     int yx, int yy, int yo,
@@ -38,6 +47,11 @@ class CS_CRYSTALSPACE_EXPORT csNormalizationCubeAccessor : public iShaderVariabl
 public:
   SCF_DECLARE_IBASE;
 
+  /**
+   * Create new accessor.
+   * \param txtmgr The texture manager to register the texture with.
+   * \param sideSize Size of a cube map edge.
+   */
   csNormalizationCubeAccessor (iTextureManager* txtmgr, int sideSize);
   virtual ~csNormalizationCubeAccessor ();
 

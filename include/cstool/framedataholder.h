@@ -63,12 +63,12 @@ public:
       data.DeleteAll();
     lastFrame = frameNumber;
     created = false;
-    if ((data.Length() == 0) || (data[lastData].lastFrame == frameNumber))
+    if ((data.GetSize() == 0) || (data[lastData].lastFrame == frameNumber))
     {
       lastData = (size_t)-1;
       //check the list
       size_t i;
-      for(i = 0; i < data.Length (); i++)
+      for(i = 0; i < data.GetSize (); i++)
       {
 	if (data[i].lastFrame != frameNumber)
 	{
@@ -78,7 +78,7 @@ public:
       }
       if (lastData == (size_t)-1)
       {
-	data.SetLength ((lastData = data.Length ()) + 1);
+	data.SetSize ((lastData = data.GetSize ()) + 1);
 	created = true;
 	nextShrink = frameNumber + 1;
       }
@@ -99,14 +99,18 @@ public:
    * Remove all allocated instances.
    * \remarks Warning! Don't use if pointers etc. to contained data still in 
    *  use!
-   * \remarks Does not clear the allocated data instantly but rather upon the
-   *  next frame (ie when the \a frameNumbe parameter passed to 
-   *  GetUnusedData() differs from the last).
+   * \remarks By default. does not clear the allocated data instantly but 
+   *  rather upon the next frame (ie when the \a frameNumber parameter passed 
+   *  to GetUnusedData() differs from the last). To change this behaviour,
+   *  set \a instaClear to true.
    */
-  void Clear ()
+  void Clear (bool instaClear = false)
   {
-    // Don't clear just yet, rather, clear when we enter the next frame.
-    clearReq = lastFrame;
+    if (instaClear)
+      data.DeleteAll();
+    else
+      // Don't clear just yet, rather, clear when we enter the next frame.
+      clearReq = lastFrame;
   }
 };
 

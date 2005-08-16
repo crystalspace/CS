@@ -165,6 +165,10 @@ public:
   bool IsEmpty () const 
   { return svcontext.IsEmpty(); }
 
+  void ReplaceVariable (csShaderVariable *variable)
+  { svcontext.ReplaceVariable(variable); }
+  void Clear () { svcontext.Clear(); }
+
   //==================== iComponent ====================//
   bool Initialize (iObjectRegistry* objreg);
 

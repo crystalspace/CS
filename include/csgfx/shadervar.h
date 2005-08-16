@@ -115,7 +115,12 @@ private:
   csStringID Name;
 public:
 
-  /// Constructor
+  /**
+   * Construct without a name. SetName() must be called before the variable
+   * can be used.
+   */
+  csShaderVariable ();
+  /// Construct with name.
   csShaderVariable (csStringID name);
   csShaderVariable (const csShaderVariable& other) : csRefCount(),
     MatrixValuePtr(0), TransformPtr (0), array(0) { *this = other; }
@@ -136,6 +141,13 @@ public:
   /// Set an accessor to use when getting the value
   void SetAccessor (iShaderVariableAccessor* a) { accessor = a;}
 
+  /**
+   * Set the name of the variable
+   * \warning Changing the name of a variable while it's in use can cause 
+   *    inexpected behaviour.
+   */
+  void SetName (csStringID newName) { Name = newName; }
+  
   /// Get the name of the variable
   csStringID GetName () const { return Name; }
 

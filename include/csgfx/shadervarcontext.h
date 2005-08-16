@@ -43,27 +43,16 @@ public:
   SCF_DECLARE_IBASE;
 
   csShaderVariableContext ();
-
   virtual ~csShaderVariableContext ();
 
-  /// Get Array of all ShaderVariables
   const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return variables; }
-
-  /// Add a variable to this context
   virtual void AddVariable (csShaderVariable *variable);
-
-  /// Get a named variable from this context
   virtual csShaderVariable* GetVariable (csStringID name) const;
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  virtual void PushVariables 
-    (csShaderVarStack &stacks) const;
-
-  virtual bool IsEmpty() const { return variables.Length() == 0; }
+  virtual void PushVariables (csShaderVarStack &stacks) const;
+  virtual bool IsEmpty() const { return variables.Length() == 0; }  
+  virtual void ReplaceVariable (csShaderVariable *variable);
+  virtual void Clear () { variables.Empty(); }
 };
 
 #endif // __CS_CSGFX_SHADERVARCONTEXT_H__

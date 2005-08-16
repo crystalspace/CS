@@ -82,7 +82,7 @@ public:
 
 /**
  * An array of smart pointers.
- * \remarks Warning! Get(), GetExtend() and operator[] are unsafe for element
+ * \warning Get(), GetExtend() and operator[] are unsafe for element
  *   manipulations, as they will return references to pointers and not
  *   proper csRef<> objects - assigning a pointer will circumvent reference
  *   counting and cause unexpected problems. Use Put() to manipulate elements

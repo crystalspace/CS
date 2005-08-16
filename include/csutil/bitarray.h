@@ -98,56 +98,6 @@ private:
       GetStore()[mLength - 1] &= ~((~(store_type)0) << extra_bits);
   }
 
-  /**
-   * Resize the array to \a newSize bits. If this operations enlarges the
-   * array, the newly added bits are cleared.
-   */
-  void SetSize (size_t newSize)
-  {
-    size_t newLength;
-    if (newSize == 0)
-      newLength = 0;
-    else
-      newLength = 1 + GetIndex (newSize - 1);
-
-    if (newLength != mLength)
-    {
-      // Avoid allocation if length is 1 (common case)
-      store_type* newStore;
-      if (newLength <= 1)
-	newStore = &mSingleWord;
-      else
-	newStore = new store_type[newLength];
-
-      if (newLength > 0)
-      {
-	if (mLength > 0)
-	{
-	  store_type const* oldStore = GetStore();
-	  if (newStore != oldStore)
-	  {
-	    memcpy (newStore, oldStore, 
-	      (MIN (mLength, newLength)) * sizeof (store_type));
-	    if (newLength > mLength)
-	      memset(newStore + mLength, 0,
-		     (newLength - mLength) * sizeof (store_type));
-	  }
-	}
-	else
-	  memset (newStore, 0, newLength * sizeof (store_type));
-      }
-
-      if (mpStore != 0)
-	delete[] mpStore;
-
-      mpStore = newLength > 1 ? newStore : 0;
-      mLength = newLength;
-    }
-
-    mNumBits = newSize;
-    Trim();
-  }
-
 public:
   /**
    * \internal Bit proxy (for csBitArray::operator[])
@@ -228,9 +178,27 @@ public:
   }
 
   /// Return the number of stored bits.
-  size_t Length() const
+  size_t GetSize() const
   {
     return mNumBits;
+  }
+
+  /**
+   * Return the number of stored bits.
+   * \deprecated Use GetSize() instead.
+   */
+  size_t Length () const
+  {
+    return GetSize();
+  }
+
+  /**
+   * Set the number of stored bits.
+   * \deprecated Use SetSize() instead.
+   */
+  void SetLength (size_t newSize)
+  {
+    SetSize (newSize);
   }
 
   /**
@@ -238,9 +206,50 @@ public:
    * \remarks If the new size is larger than the old size, the newly added
    *    bits are cleared.
    */
-  void SetLength (size_t newSize)
+  void SetSize (size_t newSize)
   {
-    SetSize (newSize);
+    size_t newLength;
+    if (newSize == 0)
+      newLength = 0;
+    else
+      newLength = 1 + GetIndex (newSize - 1);
+
+    if (newLength != mLength)
+    {
+      // Avoid allocation if length is 1 (common case)
+      store_type* newStore;
+      if (newLength <= 1)
+	newStore = &mSingleWord;
+      else
+	newStore = new store_type[newLength];
+
+      if (newLength > 0)
+      {
+	if (mLength > 0)
+	{
+	  store_type const* oldStore = GetStore();
+	  if (newStore != oldStore)
+	  {
+	    memcpy (newStore, oldStore, 
+	      (MIN (mLength, newLength)) * sizeof (store_type));
+	    if (newLength > mLength)
+	      memset(newStore + mLength, 0,
+		     (newLength - mLength) * sizeof (store_type));
+	  }
+	}
+	else
+	  memset (newStore, 0, newLength * sizeof (store_type));
+      }
+
+      if (mpStore != 0)
+	delete[] mpStore;
+
+      mpStore = newLength > 1 ? newStore : 0;
+      mLength = newLength;
+    }
+
+    mNumBits = newSize;
+    Trim();
   }
 
   //

@@ -12,6 +12,15 @@ chronological order.
 	- res added doxygen documentation for the master headers.
 	- Vincent Knecht applied mdmkolbe's fix to perlpre.i. This resolves
 	  swig errors about _wrap_* functions.
+	- res augmented the fat renderloop with the ability to basically render 
+	  different lights with different shaders. The lights relevant to a
+	  mesh are determined and rendered in the quantities and  limits given 
+	  by user and user-specified shaders.
+	- res added csShaderVariable::SetName().
+	- res added csShaderVariableContext::Clear() and ReplaceVariable().
+	- res made csBitArray::SetSize() public.
+	- res added csBitArray::GetSize().
+	- res changed some more doxygen comments.
 15-Aug-2005
 	- res added a hopefully helpful message that is written to the console 
 	  when csInitializer cannot load the VFS plugin.

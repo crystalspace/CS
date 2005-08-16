@@ -30,7 +30,8 @@
 #include "iengine/movable.h"
 
 
-// Attenuation functors
+/**\file Attenuation functors
+ */
 
 /**
  * No attenuation. 

@@ -630,6 +630,10 @@ public:
       && (!factorySVC.IsValid() || factorySVC->IsEmpty());
   }
 
+  void ReplaceVariable (csShaderVariable *variable)
+  { svcontext.ReplaceVariable (variable); }
+  void Clear () { svcontext.Clear(); }
+
   //--------------------- iMeshWrapper implementation --------------------//
 
   virtual iObject *QueryObject ()
@@ -784,6 +788,10 @@ public:
 
   bool IsEmpty () const 
   { return svcontext.IsEmpty(); }
+
+  void ReplaceVariable (csShaderVariable *variable)
+  { svcontext.ReplaceVariable (variable); }
+  void Clear () { svcontext.Clear(); }
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
   struct MeshFactoryWrapper : public iMeshFactoryWrapper

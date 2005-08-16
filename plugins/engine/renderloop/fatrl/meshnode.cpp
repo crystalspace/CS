@@ -34,9 +34,10 @@
 csMeshRenderNode::csMeshRenderNode (csMeshRenderNodeFactory* factory, 
                                     csStringID shaderType,
                                     iShader* defShader, 
-				    csShaderVariableContext& shadervars) : 
+				    csShaderVariableContext& shadervars, 
+				    bool zoffset) : 
   shadervars(shadervars), factory(factory), shaderType(shaderType), 
-  defShader(defShader)
+  defShader(defShader), zoffset(zoffset)
 {
   shadervars.GetVariableAdd (factory->string_object2world);
 }
@@ -47,7 +48,6 @@ void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
                                      const csShaderVarStack* Stacks)
 {
   if (num == 0) return;
-  //ToggleStepSettings (g3d, true);
   csRef<csShaderVariable> svO2W = 
     shadervars.GetVariable (factory->string_object2world);
 
@@ -72,62 +72,21 @@ void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
   }
 }
 
-void csMeshRenderNode::FillStacks (csShaderVarStack& stacks, 
-                                   csRenderMesh* rm, iMeshWrapper* mw, 
-                                   iMaterial* hdl, iShader* shader)
+void csMeshRenderNode::AddMesh (csRenderMesh* rm, iShader* shader, 
+				const csShaderVarStack& stacks, 
+                                long prio, bool keepOrder,
+				size_t ticket)
 {
-  iShaderVariableContext* svc = mw->GetSVContext();
-  if (svc->IsEmpty())
-    svc = 0;
-
-  stacks.Empty();
-  factory->shaderManager->PushVariables (stacks);
-  shadervars.PushVariables (stacks);
-  if (rm->variablecontext)
-    rm->variablecontext->PushVariables (stacks);
-  if (svc)
-    svc->PushVariables (stacks);
-  shader->PushVariables (stacks);
-  hdl->PushVariables (stacks);
-}
-
-size_t csMeshRenderNode::GetTicket (const csShaderVarStack& stacks, csRenderMesh* rm,
-                                    iShader* shader)
-{
-  csRenderMeshModes modes (*rm);
-  return shader->GetTicket (modes, stacks);
-}
-
-void csMeshRenderNode::AddMesh (csRenderMesh* rm, iMeshWrapper* mw, 
-                                long prio, bool keepOrder)
-{
-  csShaderVarStack stacks;
-
-  iShader* shader;
-  size_t ticket;
-
-  iMaterial* hdl = rm->material->GetMaterial ();
-  shader = hdl->GetShader (shaderType);
-  if (shader == 0) shader = defShader;
-  if ((shader == 0) || (shader == factory->nullShader))
-  {
-    return; // @@@ Perhaps an Assert? Or some Error?
-  }
-  FillStacks (stacks, rm, mw, hdl, shader);
+  ShaderTicketKey key;
 
   if (keepOrder)
-  {
-    ticket = (size_t)~0;
-  }
+    key.sortTicket = (size_t)~0;
   else
-  {
-    ticket = GetTicket (stacks, rm, shader);
-  }
+    key.sortTicket = ticket;
 
-  ShaderTicketKey key;
   key.prio = prio;
   key.shader = shader;
-  key.ticket = ticket;
+  key.realTicket = ticket;
 
   MeshBucket* bucket = buckets.GetElementPointer (key);
   if (bucket == 0)
@@ -144,8 +103,10 @@ bool csMeshRenderNode::Preprocess (iRenderView* rview)
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
   g3d->SetWorldToCamera (camt.GetInverse ());
   g3d->SetZMode (CS_ZBUF_MESH);
+  if (zoffset) g3d->EnableZOffset (); // @@@ FIXME: here?
   TraverseShaderBuckets traverser (*this, g3d);
   buckets.TraverseInOrder (traverser);
+  if (zoffset) g3d->DisableZOffset ();
 
   return true;
 }
@@ -159,32 +120,27 @@ void csMeshRenderNode::TraverseShaderBuckets::Process (
   iShader* lastShader = 0;
   size_t lastTicket = (size_t)~0;
   iShader* meshShader = key.shader;
-  for (size_t i = 0; i < bucket.rendermeshes.Length(); i++)
+  for (size_t i = 0; i < bucket.rendermeshes.GetSize(); i++)
   {
-    size_t newTicket = (key.ticket != (size_t)~0) ? key.ticket :
-      node.GetTicket (*(bucket.stacks.GetArray() + i), 
-        bucket.rendermeshes[i], meshShader);
-    if ((meshShader != lastShader) || (newTicket != lastTicket))
+    if ((meshShader != lastShader) || (key.realTicket != lastTicket))
     {
       // @@@ Need error reporter
       if ((lastShader != 0) && (lastShader != node.factory->nullShader))
       {
-        //g3d->SetWorldToCamera (camt);
         node.RenderMeshes (g3d, lastShader, lastTicket, 
           bucket.rendermeshes.GetArray() + startMesh, i - startMesh,
           bucket.stacks.GetArray() + startMesh);
       }
       startMesh = i;
       lastShader = meshShader;
-      lastTicket = newTicket;
+      lastTicket = key.realTicket;
     }
   }
   if ((lastShader != 0) && (lastShader != node.factory->nullShader))
   {
-    //g3d->SetWorldToCamera (camt);
     node.RenderMeshes (g3d, lastShader, lastTicket, 
       bucket.rendermeshes.GetArray() + startMesh, 
-      bucket.rendermeshes.Length() - startMesh,
+      bucket.rendermeshes.GetSize() - startMesh,
       bucket.stacks.GetArray() + startMesh);
   }
 }
@@ -205,7 +161,8 @@ csMeshRenderNodeFactory::csMeshRenderNodeFactory (iObjectRegistry* object_reg)
 
 csMeshRenderNode* csMeshRenderNodeFactory::CreateMeshNode (
   csStringID shaderType, iShader* defShader, 
-  csShaderVariableContext& shadervars)
+  csShaderVariableContext& shadervars, bool zoffset)
 {
-  return new csMeshRenderNode (this, shaderType, defShader, shadervars);
+  return new csMeshRenderNode (this, shaderType, defShader, shadervars, 
+    zoffset);
 }

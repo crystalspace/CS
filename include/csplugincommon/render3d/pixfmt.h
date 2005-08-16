@@ -3,13 +3,16 @@
    
     Created by Matt Reda on Thu Jan 17 2002.
 
-    This file defines what pixel format to use in 24 bit mode if 
-    the compiler does not pass one in    
 */
 
 
 #ifndef __CS_PIXFMT_H__
 #define __CS_PIXFMT_H__
+
+/**\file
+ * This file defines what pixel format to use in 24 bit mode if 
+ * the compiler does not pass one in    
+ */
 
 // Whether the renderer uses ARGB or ABGR should not be tied directly to
 // the endianness of the platform.  But in order not to break code that

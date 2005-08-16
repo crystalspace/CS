@@ -19,6 +19,10 @@
 #ifndef __CS_TXTMGR_H__
 #define __CS_TXTMGR_H__
 
+/**\file
+ * Texture manager base implementation
+*/
+
 #include "csextern.h"
 #include "csutil/parray.h"
 #include "ivideo/txtmgr.h"
@@ -27,7 +31,6 @@
 #include "ivideo/texture.h"
 #include "ivideo/shader/shader.h"
 #include "iengine/texture.h"
-//#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/weakrefarr.h"
