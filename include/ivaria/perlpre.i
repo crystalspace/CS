@@ -386,8 +386,13 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
  ****************************************************************************/
 %typemap(in) (const char * iface, int iface_ver)
 {
-  $1 = (char*)$input; // SWIG declares $1 non-const for some reason
-  $2 = scfGetVersion($input);
+  // SvPV_nolen is a macro that can't be used in general expression so we
+  // declare a temp variable.  The temp variable is non-const because SWIG
+  // declares $1 to be non-const for some reason.
+  char *inputString;
+  inputString = SvPV_nolen($input);
+  $1 = inputString;
+  $2 = scfGetVersion(inputString);
 }
 
 /****************************************************************************

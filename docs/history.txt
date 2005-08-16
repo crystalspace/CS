@@ -10,6 +10,8 @@ chronological order.
 	- res made some more doxygen fixes and also expanded the doxygen info
 	  in the coding guidelines a bit.
 	- res added doxygen documentation for the master headers.
+	- Vincent Knecht applied mdmkolbe's fix to perlpre.i. This resolves
+	  swig errors about _wrap_* functions.
 15-Aug-2005
 	- res added a hopefully helpful message that is written to the console 
 	  when csInitializer cannot load the VFS plugin.
