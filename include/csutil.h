@@ -17,6 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file 
+ * Directory master header. This header file includes all headers in a
+ * subdirectory of the top CrystalSpace include directory.
+ */
 #include "cssysdef.h"
 #include "csutil/algorithms.h"
 #include "csutil/ansicolor.h"
@@ -114,6 +118,7 @@
 #include "csutil/syspath.h"
 #include "csutil/thread.h"
 #include "csutil/threadjobqueue.h"
+#include "csutil/timemeasure.h"
 #include "csutil/timer.h"
 #include "csutil/util.h"
 #include "csutil/verbosity.h"

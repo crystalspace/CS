@@ -71,6 +71,24 @@ with @samp{/** @dots{} */} rather than @samp{/* @dots{} */}.  Here is an
 example:
 
 @example
+/// Namespace for potentially bouncy classes.
+namespace Bouncy
+{
+
+/**\file
+ * This is an include file.
+ * Put a \\file block in headers so macros and global symbols get documented.
+ */
+
+/// Ball states
+enum
+{
+  /// Ball is limpy
+  Limpy,
+  /// Ball is floppy
+  Floppy
+};
+
 /**
  * This class represents a blue ball.
  * Blue balls bounce higher than red balls.
@@ -78,8 +96,11 @@ example:
 class csBlueBall
 @{
 private:
-  // A private function, so no Doxygen comment here,
-  // but still commented for readers of the header file.
+  /**
+   * A private function - does not show up in the public documentation, but
+   * but still commented for readers of the header file or the developer
+   * documentation.
+   */
   void PrivateFunction();
 
 public:
@@ -89,9 +110,16 @@ public:
   /**
    * This is a multi-line comment.
    * And this is the second line of the multi-line comment.
+   * \param speed How fast the ball is to be deflated.
+   *   <i>Document parameters that way.</i>
+   * \return State of the ball - #Limpy or #Floppy.
+   *   <i>Document return parameters that way. Also shows how to refer to enum
+   *   entries.</i>
    */
-  void Deflate();
+  int Deflate(int speed);
 @};
+
+} // namespace Bouncy
 @end example
 
 @item

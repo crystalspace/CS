@@ -21,6 +21,14 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * Thing mesh interfaces
+ */
+
+/**
+ * \addtogroup meshplugins
+ * @{ */
+
 struct iMaterialWrapper;
 struct iMeshObject;
 struct iMeshObjectFactory;
@@ -811,5 +819,7 @@ struct iThingEnvironment : public iBase
   /// Return default lightmap cell size
   virtual int GetDefaultLightmapCellSize () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_THING_H__

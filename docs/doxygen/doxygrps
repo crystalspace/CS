@@ -96,7 +96,13 @@
  
 	/**
 	 * \defgroup engine3d_meshes Mesh support
-	 */
+	 * @{ */
+	 
+		/**
+		 * \defgroup meshplugins Mesh plugins
+		 */
+		 
+	/** @} */
  
 	/**
 	 * \defgroup engine3d_rloop Renderloops & Rendersteps

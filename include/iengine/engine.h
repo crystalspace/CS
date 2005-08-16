@@ -121,8 +121,6 @@ enum csRenderPrioritySorting
 /** @} */
 
 
-//SCF_VERSION (iEngineSectorCallback, 0, 0, 1);
-
 /**
  * A callback that will be fired whenever a sector is created or
  * removed from the engine.
@@ -142,33 +140,30 @@ struct iEngineSectorCallback : public virtual iBase
 };
 
 
-//SCF_VERSION (iEngine, 0, 23, 1);
-
 /**
  * This interface is the main interface to the 3D engine.
  * The engine is responsible for creating new engine-specific objects
  * such as sectors, mesh objects, mesh object factories, lights, and so on.
  * <p>
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>3D Engine plugin (crystalspace.engine.3d)
- *   </ul>
+ *   - 3D Engine plugin (crystalspace.engine.3d)
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ *   - CS_QUERY_REGISTRY()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>Application.
- *   </ul>
+ *   - Application.
  */
 struct iEngine : public virtual iBase
 {
   SCF_INTERFACE(iEngine,2,0,0);
+  
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
 
-  //-- Preparation and relighting methods
+  /**\name Preparation and relighting methods
+   * @{ */
+  
   /**
    * Prepare the engine. This function must be called after
    * you loaded/created the world. It will prepare all lightmaps
@@ -307,8 +302,11 @@ struct iEngine : public virtual iBase
 
   /// Get the maximum aspect ratio for lightmaps.
   virtual int GetMaxLightmapAspectRatio () const = 0;
+  
+  /** @} */
 
-  //-- Render priority functions
+  /**\name Render priority functions
+   * @{ */
 
   /**
    * Register a new render priority.  Render priorities are assigned to objects
@@ -363,7 +361,10 @@ struct iEngine : public virtual iBase
   /// Get the name of the render priority or 0 if none existant.
   virtual const char* GetRenderPriorityName (long priority) const = 0;
 
-  //-- Material handling
+  /** @} */
+  
+  /**\name Material handling
+   * @{ */
 
   /**
    * Create a base material that can be used to give to the texture
@@ -402,7 +403,10 @@ struct iEngine : public virtual iBase
   virtual iMaterialWrapper* FindMaterial (const char* name,
   	iRegion* region = 0) = 0;
 
-  //-- Texture handling
+  /** @} */
+  
+  /**\name Texture handling
+   * @{ */
 
   /**
    * Create a texture from a file.
@@ -462,7 +466,10 @@ struct iEngine : public virtual iBase
   virtual iTextureWrapper* FindTexture (const char* name,
   	iRegion* region = 0) = 0;
 
-  //-- Light handling
+  /** @} */
+  
+  /**\name Light handling
+   * @{ */
 
   /**
    * Create a static/pseudo-dynamic light.
@@ -560,7 +567,10 @@ struct iEngine : public virtual iBase
   virtual int GetNearbyLights (iSector* sector, const csBox3& box,
   	iLight** lights, int max_num_lights) = 0;
 
-  //-- Sector handling
+  /** @} */
+  
+  /**\name Sector handling
+   * @{ */
 
   /**
    * Create a empty sector with given name.
@@ -605,8 +615,10 @@ struct iEngine : public virtual iBase
    */
   virtual void RemoveEngineSectorCallback (iEngineSectorCallback* cb) = 0;
 
+  /** @} */
 
-  //-- Mesh handling
+  /**\name Mesh handling
+   * @{ */
 
   /**
    * Convenience function to create a mesh object for a given factory.
@@ -764,7 +776,10 @@ struct iEngine : public virtual iBase
    */
   virtual void WantToDie (iMeshWrapper* mesh) = 0;
 
-  //-- Mesh factory handling
+  /** @} */
+  
+  /**\name Mesh factory handling
+   * @{ */
 
   /**
    * Convenience function to create a mesh factory from a given type.
@@ -828,7 +843,10 @@ struct iEngine : public virtual iBase
   /// Get the list of mesh factories
   virtual iMeshFactoryList* GetMeshFactories () = 0;
 
-  //-- Region handling
+  /** @} */
+  
+  /**\name Region handling
+   * @{ */
   
   /**
    * Create a new region and add it to the region list.
@@ -840,7 +858,10 @@ struct iEngine : public virtual iBase
   /// Get the list of all regions
   virtual iRegionList* GetRegions () = 0;
 
-  //-- Camera handling
+  /** @} */
+  
+  /**\name Camera handling
+   * @{ */
 
   /**
    * Create a new camera.
@@ -866,7 +887,10 @@ struct iEngine : public virtual iBase
   /// Get the list of camera positions.
   virtual iCameraPositionList* GetCameraPositions () = 0;
 
-  //-- Portal handling
+  /** @} */
+  
+  /**\name Portal handling
+   * @{ */
   
   /**
    * Convenience function to create a portal from one sector to another
@@ -935,7 +959,10 @@ struct iEngine : public virtual iBase
   virtual csPtr<iMeshWrapper> CreatePortalContainer (const char* name,
   	iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0)) = 0;
 
-  //-- Drawing related
+  /** @} */
+  
+  /**\name Drawing related
+   * @{ */
 
   /**
    * Require that the Z-buffer is cleared every frame. The engine
@@ -1054,7 +1081,10 @@ struct iEngine : public virtual iBase
    */
   virtual uint GetCurrentFrameNumber () const = 0;
 
-  //-- Saving/loading
+  /** @} */
+  
+  /**\name Saving/loading
+   * @{ */
 
   /**
    * Set whether saving should be possible (default OFF).
@@ -1083,7 +1113,10 @@ struct iEngine : public virtual iBase
   virtual csPtr<iLoaderContext> CreateLoaderContext (
   	iRegion* region = 0, bool curRegOnly = true) = 0;
 
-  //-- Other
+  /** @} */
+  
+  /**\name Other
+   * @{ */
 
   /**
    * This routine returns an iterator to iterate over
@@ -1207,6 +1240,8 @@ struct iEngine : public virtual iBase
    *   - maximum lightmap size
    */
   virtual void ResetWorldSpecificSettings() = 0;  
+  
+  /** @} */
 };
 
 /** @} */

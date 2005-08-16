@@ -17,6 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file 
+ * CrystalSpace master header. This header file essentially causes most of the 
+ * CrystalSpace header files to be included, providing a  convenient way to 
+ * use any feature of CrystalSpace without having to worry about including the 
+ * right header file(s).
+ */
 #include "cssysdef.h"
 #include "csgeom.h"
 #include "csgfx.h"

@@ -48,8 +48,11 @@ struct iSequenceWrapper;
  */
 enum
 {
+  /// \todo Document me
   CS_SEQUENCE_LIGHTCHANGE_NONE = 0,
+  /// \todo Document me
   CS_SEQUENCE_LIGHTCHANGE_LESS = 1,
+  /// \todo Document me
   CS_SEQUENCE_LIGHTCHANGE_GREATER = 2
 };
 //@}
@@ -570,8 +573,8 @@ struct iSequenceTrigger : public iBase
    * a certain value or lighter than a certain value, or
    * whenever a light changes.
    * \param whichlight represents the light on which we will test.
-   * \param oper is one of CS_SEQUENCE_LIGHTCHANGE_NONE,
-   * CS_SEQUENCE_LIGHTCHANGE_LESS, or CS_SEQUENCE_LIGHTCHANGE_GREATER
+   * \param oper is one of #CS_SEQUENCE_LIGHTCHANGE_NONE,
+   * #CS_SEQUENCE_LIGHTCHANGE_LESS, or #CS_SEQUENCE_LIGHTCHANGE_GREATER
    * depending on the test you want to use.
    * \param color is the color to compare with.
    */

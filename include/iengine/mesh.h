@@ -474,8 +474,6 @@ struct iMeshWrapper : public iBase
   /**
    * Get flags for this meshwrapper. The following flags are supported:
    * <ul>
-   * <li>#CS_ENTITY_CONVEX: entity is convex. This can help the engine with
-   *     optimizing rendering. Currently not used.
    * <li>#CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
    *     for the engine to render this object differently. Currently not used.
    * <li>#CS_ENTITY_CAMERA: entity will always be centered around the camera.

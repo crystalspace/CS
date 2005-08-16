@@ -691,8 +691,8 @@ public:
 
   /**
    * Get axis aligned plane information from a side of this box.
-   * Side is one of #CS_BOX_SIDE_x. Axis will be one of CS_AXIS_X, CS_AXIS_Y
-   * or CS_AXIS_Z.
+   * Side is one of #CS_BOX_SIDE_x. Axis will be one of #CS_AXIS_X, #CS_AXIS_Y
+   * or #CS_AXIS_Z.
    */
   void GetAxisPlane (int side, int& axis, float& where) const;
 

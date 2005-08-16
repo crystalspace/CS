@@ -24,6 +24,10 @@
 
 class csFlags;
 
+/**\file
+ * Polygon mesh interfaces
+ */
+
 /**
  * \addtogroup geom_utils
  * @{ */
@@ -164,16 +168,16 @@ struct iPolygonMesh : public virtual iBase
    * Get flags for this polygon mesh. This is zero or a combination of the
    * following flags:
    * <ul>
-   * <li>CS_POLYMESH_CLOSED: mesh is closed.
-   * <li>CS_POLYMESH_NOTCLOSED: mesh is not closed.
-   * <li>CS_POLYMESH_CONVEX: mesh is convex.
-   * <li>CS_POLYMESH_NOTCONVEX: mesh is not convex.
-   * <li>CS_POLYMESH_DEFORMABLE: mesh is deformable.
-   * <li>CS_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
+   * <li>#CS_POLYMESH_CLOSED: mesh is closed.
+   * <li>#CS_POLYMESH_NOTCLOSED: mesh is not closed.
+   * <li>#CS_POLYMESH_CONVEX: mesh is convex.
+   * <li>#CS_POLYMESH_NOTCONVEX: mesh is not convex.
+   * <li>#CS_POLYMESH_DEFORMABLE: mesh is deformable.
+   * <li>C#S_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
    * </ul>
-   * Note that if neither CS_POLYMESH_CLOSED nor CS_POLYMESH_NOTCLOSED
+   * Note that if neither #CS_POLYMESH_CLOSED nor #CS_POLYMESH_NOTCLOSED
    * are set then the closed state is not known. Setting both is illegal.
-   * Note that if neither CS_POLYMESH_CONVEX nor CS_POLYMESH_NOTCONVEX
+   * Note that if neither #CS_POLYMESH_CONVEX nor #CS_POLYMESH_NOTCONVEX
    * are set then the convex state is not known. Setting both is illegal.
    */
   virtual csFlags& GetFlags () = 0;

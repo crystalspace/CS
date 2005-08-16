@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Aug-2005
+	- res made some more doxygen fixes and also expanded the doxygen info
+	  in the coding guidelines a bit.
+	- res added doxygen documentation for the master headers.
 15-Aug-2005
 	- res added a hopefully helpful message that is written to the console 
 	  when csInitializer cannot load the VFS plugin.

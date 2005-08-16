@@ -17,6 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file 
+ * Directory master header. This header file includes all headers in a
+ * subdirectory of the top CrystalSpace include directory.
+ */
 #include "cssysdef.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/csimgvec.h"
@@ -37,6 +41,7 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shaderexpaccessor.h"
 #include "csgfx/shadervar.h"
+#include "csgfx/shadervarblockalloc.h"
 #include "csgfx/shadervarcontext.h"
 #include "csgfx/vertexlight.h"
 #include "csgfx/vertexlistwalker.h"

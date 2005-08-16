@@ -110,8 +110,16 @@ CS_MASTER_HEADER_BOILERPLATE =
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+" ;
 
-#include \"cssysdef.h\"" ;
+CS_MASTER_HEADER_DOC_DIRECTORY =
+"/**\\file 
+ * Directory master header. This header file includes all headers in a
+ * subdirectory of the top CrystalSpace include directory.
+ */" ;
+
+CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H = 
+"#include \"cssysdef.h\"" ;
 
 rule MasterHeaderCsUtil
 {
@@ -145,7 +153,9 @@ rule MasterHeaderCsUtil
   }
   return [ MasterHeader csutil :
     [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] :
-    $(CS_MASTER_HEADER_BOILERPLATE) :
+    $(CS_MASTER_HEADER_BOILERPLATE)
+    $(CS_MASTER_HEADER_DOC_DIRECTORY) 
+    $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 
     $(lines) ] ;
 }
 
@@ -168,11 +178,25 @@ CS_MASTER_HEADERS =
       iutil
       ivaria
       ivideo :
-      $(CS_MASTER_HEADER_BOILERPLATE) : : : $(CS_MASTER_HEADER_REJECTS) ] ;
+      $(CS_MASTER_HEADER_BOILERPLATE) 
+      $(CS_MASTER_HEADER_DOC_DIRECTORY) 
+      $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 
+      : : 
+      $(CS_MASTER_HEADER_REJECTS) ] ;
+
+CS_MASTER_HEADER_DOC_MASTER_MASTER =
+"/**\\file 
+ * CrystalSpace master header. This header file essentially causes most of the 
+ * CrystalSpace header files to be included, providing a  convenient way to 
+ * use any feature of CrystalSpace without having to worry about including the 
+ * right header file(s).
+ */" ;
 
 MasterHeader $(PACKAGE_NAME) :
   csqint.h
   csqsqrt.h
   csver.h
   $(CS_MASTER_HEADERS:G=) :
-  $(CS_MASTER_HEADER_BOILERPLATE) ;
+  $(CS_MASTER_HEADER_BOILERPLATE)
+  $(CS_MASTER_HEADER_DOC_MASTER_MASTER)
+  $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) ;

@@ -17,6 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file 
+ * Directory master header. This header file includes all headers in a
+ * subdirectory of the top CrystalSpace include directory.
+ */
 #include "cssysdef.h"
 #include "iutil/binder.h"
 #include "iutil/cache.h"

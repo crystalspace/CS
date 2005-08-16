@@ -21,6 +21,13 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * Mesh object and mesh object factory interfaces
+ */
+
+/**
+ * \addtogroup meshplugins
+ * @{ */
 
 struct iLight;
 struct iMaterialWrapper;
@@ -377,5 +384,7 @@ struct iMeshObjectType : public iBase
   /// Create an instance of iMeshObjectFactory.
   virtual csPtr<iMeshObjectFactory> NewFactory () = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_OBJECT_H__
