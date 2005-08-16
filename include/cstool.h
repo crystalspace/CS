@@ -49,7 +49,6 @@
 #include "cstool/rbuflock.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/rendermeshlist.h"
-#include "cstool/sharedstringset.h"
 #include "cstool/sndwrap.h"
 #include "cstool/sprbuild.h"
 #include "cstool/userrndbuf.h"

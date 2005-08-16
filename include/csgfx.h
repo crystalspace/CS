@@ -41,7 +41,6 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shaderexpaccessor.h"
 #include "csgfx/shadervar.h"
-#include "csgfx/shadervarblockalloc.h"
 #include "csgfx/shadervarcontext.h"
 #include "csgfx/vertexlight.h"
 #include "csgfx/vertexlistwalker.h"
