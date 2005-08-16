@@ -18,6 +18,7 @@ chronological order.
 	- res made some VC6 compile fixes.
 	- res fixed the glshader_fixed plugin for the STANDARD_LIGHT changes.
 	- res made csGLGraphics3D::SetMixMode() disable alpha testing.
+	- Marten added a fugly hack to SCF to allow querying of base-interfaces.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.

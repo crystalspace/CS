@@ -39,9 +39,12 @@
 /**
  * \addtogroup scf
  * @{ */
+
 /**
-*  
-*/
+ * Baseclass for the SCF implementation templates.
+ * Provides common methods such as reference counting and handling of
+ * weak references.
+ */
 template<class Class>
 class scfImplementation : public virtual iBase
 {
@@ -134,8 +137,8 @@ protected:
   }
 
   /**
-  * Query this implementation for a specific interface 
-  */
+   * Query this implementation for a specific interface 
+   */
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)
   {
@@ -155,9 +158,9 @@ protected:
   }
 
   /**
-  * Helper function to get a given interface. Used in the implementation
-  * of child-classes
-  */
+   * Helper function to get a given interface. Used in the implementation
+   * of child-classes
+   */
   template<class I>
   CS_FORCEINLINE void* GetInterface(scfInterfaceID iInterfaceID, 
                                     scfInterfaceVersion iVersion)
@@ -175,6 +178,39 @@ protected:
   }
 };
 
+/**
+ * Fugly helper to resolve some bad situations ;)
+ * Basicly it adds a new entry to QueryInterface without adding another 
+ * class to inheritance.
+ *
+ * Consider the following case:
+ * struct iA : public virtual iBase {};
+ * struct iB : public iA {};
+ *
+ * class myB : public scfImplementation1<myB, iB> {..}.
+ * Querying iA from myB will then fail even though myB inhire from iA (throgh 
+ * iB). By changing the declaration to
+ * class myB : public scfImplementation2<myB, iB, scfFakeInterface<iA> > {..}
+ * you make sure you can query iA from myB.
+ * NOTE! This is potentially dangerous as you can add whatever interface
+ * to another. USE WITH CARE!
+ */
+template<class If>
+class scfFakeInterface
+{
+public:
+  struct InterfaceTraits 
+  {
+    static CS_FORCEINLINE scfInterfaceVersion GetVersion()
+    { 
+      return If::InterfaceTraits::GetVersion ();
+    }
+    static CS_FORCEINLINE char const * GetName() 
+    { 
+      return If::InterfaceTraits::GetName ();
+    }
+  };
+};
 
 #define SCF_IN_IMPLEMENTATION_H 1
 // Instead of duplicating the code for every scfImplementationN and
