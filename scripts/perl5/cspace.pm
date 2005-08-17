@@ -10719,6 +10719,8 @@ package cspace::iShaderVariableContext;
 *GetShaderVariables = *cspacec::iShaderVariableContext_GetShaderVariables;
 *PushVariables = *cspacec::iShaderVariableContext_PushVariables;
 *IsEmpty = *cspacec::iShaderVariableContext_IsEmpty;
+*ReplaceVariable = *cspacec::iShaderVariableContext_ReplaceVariable;
+*Clear = *cspacec::iShaderVariableContext_Clear;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
