@@ -97,7 +97,7 @@ void scfTest::testScfInterface()
 void scfTest::testVersion()
 {
 #define V(A,B,C) SCF_CONSTRUCT_VERSION(A,B,C)
-  int const v = scfInterface<iBaseTest>::GetVersion();
+  int const v = scfInterfaceTraits<iBaseTest>::GetVersion();
   CPPUNIT_ASSERT_EQUAL(V(1,2,3), v);
   CPPUNIT_ASSERT( scfCompatibleVersion(V(1,2,3), v));
   CPPUNIT_ASSERT( scfCompatibleVersion(V(1,2,0), v));

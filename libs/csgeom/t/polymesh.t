@@ -58,8 +58,7 @@ static bool contains_edge(csPolygonMeshEdge* edges, int num_edges,
 /**
  * A cube mesh for unit testing.
  */
-class csUnitCubeMesh :
-  public scfImplementation<csUnitCubeMesh,iPolygonMesh>
+class csUnitCubeMesh : public scfImplementation1<csUnitCubeMesh,iPolygonMesh>
 {
 private:
   csVector3 verts[8];
