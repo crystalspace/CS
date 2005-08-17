@@ -9752,6 +9752,8 @@ class iShaderVariableContext(iBase):
     def GetShaderVariables(*args): return _cspace.iShaderVariableContext_GetShaderVariables(*args)
     def PushVariables(*args): return _cspace.iShaderVariableContext_PushVariables(*args)
     def IsEmpty(*args): return _cspace.iShaderVariableContext_IsEmpty(*args)
+    def ReplaceVariable(*args): return _cspace.iShaderVariableContext_ReplaceVariable(*args)
+    def Clear(*args): return _cspace.iShaderVariableContext_Clear(*args)
     def __del__(self, destroy=_cspace.delete_iShaderVariableContext):
         try:
             if self.thisown: destroy(self)
