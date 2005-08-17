@@ -43,6 +43,7 @@
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/parserenderstep.h"
+#include "csplugincommon/shader/lightsvcache.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
 #include "csplugincommon/soundloader/sndload.h"
