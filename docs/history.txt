@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Aug-2005
+	- Eric Sunshine fixed csutil and csgeom unit tests so that they compile
+	  successfully again following recent SCF re-engineering.
 16-Aug-2005
 	- res made some more doxygen fixes and also expanded the doxygen info
 	  in the coding guidelines a bit.
