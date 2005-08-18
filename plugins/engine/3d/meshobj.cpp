@@ -182,6 +182,10 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
 
+  do_minmax_range = false;
+  min_render_dist = -1000000000.0f;
+  max_render_dist = 1000000000.0f;
+
   relevant_lights_valid = false;
   relevant_lights_max = 8;
   relevant_lights_flags.SetAll (CS_LIGHTINGUPDATE_SORTRELEVANCE);
@@ -578,6 +582,79 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
+}
+
+//----- Min/Max Distance Range ----------------------------------------------
+
+void csMeshWrapper::ClearMinVariable ()
+{
+  if (var_min_render_dist)
+  {
+    var_min_render_dist->RemoveListener (var_min_render_dist_listener);
+    var_min_render_dist_listener = 0;
+    var_min_render_dist = 0;
+  }
+}
+
+void csMeshWrapper::ClearMaxVariable ()
+{
+  if (var_max_render_dist)
+  {
+    var_max_render_dist->RemoveListener (var_max_render_dist_listener);
+    var_max_render_dist_listener = 0;
+    var_max_render_dist = 0;
+  }
+}
+
+void csMeshWrapper::ResetMinMaxRenderDistance ()
+{
+  do_minmax_range = false;
+  min_render_dist = -1000000000.0f;
+  max_render_dist = -1000000000.0f;
+  ClearMinVariable ();
+  ClearMaxVariable ();
+}
+
+void csMeshWrapper::SetMinimumRenderDistance (float min)
+{
+  do_minmax_range = true;
+  min_render_dist = min;
+  ClearMinVariable ();
+}
+
+void csMeshWrapper::SetMaximumRenderDistance (float max)
+{
+  do_minmax_range = true;
+  max_render_dist = max;
+  ClearMaxVariable ();
+}
+
+void csMeshWrapper::SetMinimumRenderDistanceVar (iSharedVariable* min)
+{
+  do_minmax_range = true;
+  ClearMinVariable ();
+  var_min_render_dist = min;
+  if (var_min_render_dist)
+  {
+    var_min_render_dist_listener = csPtr<csLODListener> (
+    	new csLODListener (&min_render_dist));
+    var_min_render_dist->AddListener (var_min_render_dist_listener);
+    min_render_dist = var_min_render_dist->Get ();
+  }
+}
+
+void csMeshWrapper::SetMaximumRenderDistanceVar (iSharedVariable* max)
+{
+  do_minmax_range = true;
+  ClearMaxVariable ();
+  var_max_render_dist = max;
+  if (var_max_render_dist)
+  {
+    var_max_render_dist_listener = csPtr<csLODListener> (
+    	new csLODListener (&max_render_dist));
+    var_max_render_dist->AddListener (var_max_render_dist_listener);
+    max_render_dist = var_max_render_dist->Get ();
+  }
 }
 
 //----- Static LOD ----------------------------------------------------------

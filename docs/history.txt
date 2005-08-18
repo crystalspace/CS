@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Aug-2005
+	- Jorrit added a minimum/maximum range for a mesh object. Outside that
+	  range the object will not be rendered. The maximum distance can be
+	  used to hide small detail objects that are too far away to matter.
+	  The minimum distance can be used to bring in an imposter mesh that
+	  replaces a number of smaller objects (which are then removed with
+	  the maximum distance). You can set mininum/maximum distance with a
+	  constant distance value or else with variables. Using variables gives
+	  greater flexibility as you can then control the distance in a setup
+	  program (even at runtime). The syntax in a map file is as follows:
+	    <meshobj name=...>
+	      <params> ... </params>
+	      <minrenderdist value="5" />
+	      <maxrenderdist var="Test Max Dist" />
+	    </meshobj>
 17-Aug-2005
 	- Eric Sunshine fixed csutil and csgeom unit tests so that they compile
 	  successfully again following recent SCF re-engineering.

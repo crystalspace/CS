@@ -2367,6 +2367,68 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       if (!SyntaxService->ParseBool (child, staticshape, true))
 	return false;
       break;
+    case XMLTOKEN_MINRENDERDIST:
+      {
+	TEST_MISSING_MESH
+	csRef<iDocumentAttribute> attr;
+	if (attr = child->GetAttribute ("value"))
+	{
+	  float dist = attr->GetValueAsFloat ();
+	  mesh->SetMinimumRenderDistance (dist);
+	}
+	else if (attr = child->GetAttribute ("var"))
+	{
+	  csString varname = attr->GetValue ();
+	  iSharedVariable *var = Engine->GetVariableList()->FindByName (varname);
+	  if (!var)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.meshobject",
+		child, "Variable '%s' doesn't exist!", varname.GetData ());
+	    return false;
+	  }
+	  mesh->SetMinimumRenderDistanceVar (var);
+	}
+	else
+	{
+	  SyntaxService->ReportError (
+		"crystalspace.maploader.parse.meshobject",
+		child, "'value' or 'var' should be specified!");
+	  return false;
+	}
+      }
+      break;
+    case XMLTOKEN_MAXRENDERDIST:
+      {
+	TEST_MISSING_MESH
+	csRef<iDocumentAttribute> attr;
+	if (attr = child->GetAttribute ("value"))
+	{
+	  float dist = attr->GetValueAsFloat ();
+	  mesh->SetMaximumRenderDistance (dist);
+	}
+	else if (attr = child->GetAttribute ("var"))
+	{
+	  csString varname = attr->GetValue ();
+	  iSharedVariable *var = Engine->GetVariableList()->FindByName (varname);
+	  if (!var)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.meshobject",
+		child, "Variable '%s' doesn't exist!", varname.GetData ());
+	    return false;
+	  }
+	  mesh->SetMaximumRenderDistanceVar (var);
+	}
+	else
+	{
+	  SyntaxService->ReportError (
+		"crystalspace.maploader.parse.meshobject",
+		child, "'value' or 'var' should be specified!");
+	  return false;
+	}
+      }
+      break;
     case XMLTOKEN_STATICLOD:
       {
 	TEST_MISSING_MESH

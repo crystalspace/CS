@@ -48,6 +48,7 @@ struct iRenderView;
 struct iShaderVariableContext;
 struct iShadowCaster;
 struct iShadowReceiver;
+struct iSharedVariable;
 
 struct csRenderMesh;
 
@@ -624,6 +625,59 @@ struct iMeshWrapper : public iBase
   	csVector3& cent) const = 0;
   /// Get the radius of this mesh and all its children.
   virtual csEllipsoid GetRadius () const = 0;
+
+  /**
+   * Reset minimum/maximum render range to defaults (i.e. unlimited).
+   */
+  virtual void ResetMinMaxRenderDistance () = 0;
+
+  /**
+   * Set the minimum distance at which this mesh will be rendered.
+   * By default this is 0.
+   */
+  virtual void SetMinimumRenderDistance (float min) = 0;
+
+  /**
+   * Get the minimum distance at which this mesh will be rendered.
+   */
+  virtual float GetMinimumRenderDistance () const = 0;
+
+  /**
+   * Set the maximum distance at which this mesh will be rendered.
+   * By default this is 0.
+   */
+  virtual void SetMaximumRenderDistance (float min) = 0;
+
+  /**
+   * Get the maximum distance at which this mesh will be rendered.
+   */
+  virtual float GetMaximumRenderDistance () const = 0;
+
+  /**
+   * Set the minimum distance at which this mesh will be rendered.
+   * This version uses a variable.
+   * By default this is -1000000000.0.
+   */
+  virtual void SetMinimumRenderDistanceVar (iSharedVariable* min) = 0;
+
+  /**
+   * Get the minimum distance at which this mesh will be rendered.
+   * If lod was not set using variables then it will return 0.
+   */
+  virtual iSharedVariable* GetMinimumRenderDistanceVar () const = 0;
+
+  /**
+   * Set the maximum distance at which this mesh will be rendered.
+   * This version uses a variable.
+   * By default this is 1000000000.0.
+   */
+  virtual void SetMaximumRenderDistanceVar (iSharedVariable* min) = 0;
+
+  /**
+   * Get the maximum distance at which this mesh will be rendered.
+   * If lod was not set using variables then it will return 0.
+   */
+  virtual iSharedVariable* GetMaximumRenderDistanceVar () const = 0;
 
   /**
    * Create a LOD control for this mesh wrapper. This is relevant

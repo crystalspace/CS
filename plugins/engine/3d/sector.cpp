@@ -309,9 +309,21 @@ public:
   void ObjectVisible (csMeshWrapper* cmesh, uint32 frustum_mask)
   {
     csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+    bool mm = cmesh->DoMinMaxRange ();
+    float distance = 0;
+    if (static_lod || mm)
+      distance = csQsqrt (cmesh->GetSquaredDistance (rview));
+
+    if (mm)
+    {
+      if (distance < cmesh->csMeshWrapper::GetMinimumRenderDistance ())
+        return;
+      if (distance > cmesh->csMeshWrapper::GetMaximumRenderDistance ())
+        return;
+    }
+
     if (static_lod)
     {
-      float distance = csQsqrt (cmesh->GetSquaredDistance (rview));
       float lod = static_lod->GetLODValue (distance);
       csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
       size_t i;

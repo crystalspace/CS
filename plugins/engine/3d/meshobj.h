@@ -206,6 +206,15 @@ protected:
    */
   csRef<csStaticLODMesh> static_lod;
 
+  /**
+   * Minimum/maximum range for rendering this object.
+   */
+  bool do_minmax_range;
+  float min_render_dist, max_render_dist;
+  csRef<iSharedVariable> var_min_render_dist, var_max_render_dist;
+  csRef<csLODListener> var_min_render_dist_listener;
+  csRef<csLODListener> var_max_render_dist_listener;
+
   csShaderVariableContext svcontext;
   csRef<iShaderVariableContext> factorySVC;
 
@@ -656,6 +665,25 @@ public:
   virtual iShaderVariableContext* GetSVContext()
   {
     return (iShaderVariableContext*)this;
+  }
+
+  void ClearMinVariable ();
+  void ClearMaxVariable ();
+  bool DoMinMaxRange () const { return do_minmax_range; }
+  virtual void ResetMinMaxRenderDistance ();
+  virtual void SetMinimumRenderDistance (float min);
+  virtual float GetMinimumRenderDistance () const { return min_render_dist; }
+  virtual void SetMaximumRenderDistance (float max);
+  virtual float GetMaximumRenderDistance () const { return max_render_dist; }
+  virtual void SetMinimumRenderDistanceVar (iSharedVariable* min);
+  virtual iSharedVariable* GetMinimumRenderDistanceVar () const
+  {
+    return var_min_render_dist;
+  }
+  virtual void SetMaximumRenderDistanceVar (iSharedVariable* max);
+  virtual iSharedVariable* GetMaximumRenderDistanceVar () const
+  {
+    return var_max_render_dist;
   }
 };
 
