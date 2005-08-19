@@ -57,7 +57,7 @@ public:
   void SetCollisionDetection (bool cd);
   bool GetCollisionDetection () const;
 
-  SCF_DECLARE_IBASE_EXT (csMeshObject);
+  SCF_DECLARE_IBASE_EXT (csNewParticleSystem);
 
   //------------------------- iRainState implementation ----------------
   class RainState : public iRainState
