@@ -46,49 +46,7 @@ bool csShaderGLCGVP::Compile ()
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, false, false))
-    return false;
-
-  csString compiledProgram = cgGetProgramString (program, 
-    CG_COMPILED_PROGRAM);
-
-  cgDestroyProgram (program);
-
-  if (shaderPlug->doVerbose)
-  {
-    shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Rewriting program...");
-  }
-
-  size_t insertionPoint = compiledProgram.Find ("PARAM");
-  size_t constPoint = compiledProgram.Find ("#const");
-  while (constPoint != (size_t)-1)
-  {
-    int constNum;
-    float values[4] = {0, 0, 0, 0};
-    csScanStr (compiledProgram.GetData() + constPoint,
-      "#const c[%d] = %f %f %f %f", &constNum, 
-      &values[0], &values[1], &values[2], &values[3]);
-    csString paramString;
-    compiledProgram.Insert (insertionPoint, 
-      paramString.Format ("PARAM c_%d = {%f, %f, %f, %f};\n", 
-        constNum, values[0], values[1], values[2], values[3]));
-    csString find, replace;
-
-    // Change all usages of c[N].
-    find.Format ("c[%d]", constNum);
-    replace.Format ("c_%d", constNum);
-    compiledProgram.FindReplace (find, replace);
-
-    // Change the #const comment back, to avoid CG errors.
-    find.Format ("#const c_%d", constNum);
-    replace.Format ("#const c[%d]", constNum);
-    compiledProgram.FindReplace (find, replace);
-
-    constPoint = compiledProgram.Find ("#const", constPoint+1);
-  }
-
-  if (!DefaultLoadProgram (compiledProgram, CG_GL_VERTEX, true))
+  if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, false, true))
     return false;
 
   return true;
