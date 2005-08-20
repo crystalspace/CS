@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Aug-2005
+	- res fixed potential buffer overflows in TinyXML and xmlread, spotted
+	  by forum member 'dominic'.
 19-Aug-2005
 	- Jorrit fixed the rain plugin so that it is possible to query the
 	  iParticleState from it. Thanks to 'SR' on the forums to find this.

@@ -124,13 +124,6 @@ public:
    * Reads an XML name into the string provided. Returns
    * a pointer just past the last character of the name,
    * or 0 if the function has an error.
-   */
-  static char* ReadName( char* p, char* name );
-
-  /**
-   * Reads an XML name into the string provided. Returns
-   * a pointer just past the last character of the name,
-   * or 0 if the function has an error.
    * This version reads the name in place.
    */
   static char* ReadName( char* p );

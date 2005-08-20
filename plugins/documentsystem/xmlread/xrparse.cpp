@@ -74,27 +74,6 @@ char* TrXmlBase::ReadName( char* p)
   return 0;
 }
 
-char* TrXmlBase::ReadName( char* p, char* name)
-{
-  // Names start with letters or underscores.
-  // After that, they can be letters, underscores, numbers,
-  // hyphens, or colons. (Colons are valid ony for namespaces,
-  // but tinyxml can't tell namespaces from names.)
-  if (p && *p && (isalpha ((unsigned char) *p) || *p == '_'))
-  {
-    char* pname = name;
-    while ((isalnum ((unsigned char) *p) 
-	|| *p == '_' || *p == '-' || *p == ':'))
-    {
-      *pname++ = *p++;
-    }
-    *pname = 0;
-    return p;
-  }
-  *name = 0;
-  return 0;
-}
-
 char* TrXmlBase::GetEntity( char* p, char* value )
 {
   // Presume an entity, and pull it out.
@@ -301,15 +280,15 @@ char* TrXmlElement::Parse( TrDocument* document, char* p )
   }
 
   int endTaglen = endp-value;
-  char endTag[1000];
-  strcpy (endTag, "</");
+  csString endTag;
+  endTag = "</";
 
   char endchar = *endp;
   *endp = 0;
-  strcpy (endTag+2, value);
+  endTag << value;
   *endp = endchar;
 
-  strcpy (endTag+2+endTaglen, ">");
+  endTag << ">";
   endTaglen += 2+1;
 
   // Check for and read attributes. Also look for an empty

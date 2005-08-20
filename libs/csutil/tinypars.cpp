@@ -49,7 +49,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p )
   return p;
 }
 
-const char* TiXmlBase::ReadName( const char* p, char* name)
+const char* TiXmlBase::ReadName( const char* p, csString& name)
 {
   // Names start with letters or underscores.
   // After that, they can be letters, underscores, numbers,
@@ -57,16 +57,13 @@ const char* TiXmlBase::ReadName( const char* p, char* name)
   // but tinyxml can't tell namespaces from names.)
   if (p && *p && (isalpha ((unsigned char) *p) || *p == '_'))
   {
-    char* pname = name;
     while ((isalnum ((unsigned char) *p) 
-  || *p == '_' || *p == '-' || *p == ':'))
+      || *p == '_' || *p == '-' || *p == ':'))
     {
-      *pname++ = *p++;
+      name << *p++;
     }
-    *pname = 0;
     return p;
   }
-  *name = 0;
   return 0;
 }
 
@@ -316,9 +313,9 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
   p = SkipWhiteSpace( p+1 );
 
   // Read the name.
-  char inname[1000];
+  csString inname;
   p = ReadName( p, inname );
-  if ( !p || !*p )
+  if ( inname.IsEmpty() )
   {
     document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
     return 0;
@@ -539,10 +536,10 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   if ( !p || !*p ) return 0;
 
   // Read the name, the '=' and the value.
-  char inname[1000];
+  csString inname;
   p = TiXmlBase::ReadName( p, inname );
 
-  if ( !p || !*p )
+  if ( inname.IsEmpty() )
   {
     document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
     return 0;

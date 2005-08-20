@@ -135,7 +135,7 @@ public:
    * a pointer just past the last character of the name,
    * or 0 if the function has an error.
    */
-  static const char* ReadName( const char* p, char* name );
+  static const char* ReadName( const char* p, csString& name );
 
   /**
    * Reads text. Returns a pointer past the given end tag.
