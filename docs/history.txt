@@ -13,6 +13,7 @@ chronological order.
 	- res changed vproc_std to pull the light information from shader vars.
 	- res added some more options to vproc_std.
 	- res added some more fat rl tests.
+	- res worked around some warnings on VC8.
 20-Aug-2005
 	- res fixed potential buffer overflows in TinyXML and xmlread, spotted
 	  by forum member 'dominic'.
