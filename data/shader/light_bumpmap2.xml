@@ -1,0 +1,60 @@
+<shader compiler="xmlshader" name="light_bumpmap">
+  <technique priority="350" lights="1">
+    <pass>
+      <mixmode>
+        <srcalphaadd />
+      </mixmode>
+      <zmode><ztest /></zmode>
+      <buffer source="normal" destination="normal" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />
+      <vp plugin="glarb" file="/shader/bump_ppl_diffuse_attn2.avp" />
+      <texture destination="unit 0" name="light 0 attenuationtex" />
+      <texture destination="unit 1" name="light 0 attenuationtex" />
+      <texture destination="unit 2" name="standardtex normalization map" />
+      <texture destination="unit 3" name="tex normal" />
+      <texture destination="unit 4" name="tex diffuse" />
+      <texture destination="unit 5" name="tex diffuse" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+          <layer>
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphasource num="1" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="modulate" scale="2" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="texture" modifier="color" />
+            <coloroperation operation="replace" />
+            <alphasource num="0" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="dot3" />
+            <alphasource num="0" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+            <alphasource num="0" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="primary color" modifier="color" />
+            <coloroperation operation="modulate" />
+            <alphasource num="0" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

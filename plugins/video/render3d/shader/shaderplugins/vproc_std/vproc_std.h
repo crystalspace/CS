@@ -36,7 +36,8 @@ public:
   csVProc_Std (iBase *parent);
   virtual ~csVProc_Std ();
 
-  iVertexLightCalculator* GetLightCalculator (iLight* light, bool useAttenuation = true);
+  iVertexLightCalculator* GetLightCalculator (
+    const csLightProperties& light, bool useAttenuation = true);
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgramPlugin
@@ -63,6 +64,7 @@ public:
   iObjectRegistry *objreg;
   csRef<iShaderManager> shaderManager;
   csStringID string_object2world;
+  csLightShaderVarCache lsvCache;
 private:
   bool isOpen;
 

@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Aug-2005
+	- res moved csLightShaderVarCache to csgfx.
+	- res changed the vertex light calculator to not use iLight* but a
+	  struct with the relevant light properties.
+	- res changed vproc_std to pull the light information from shader vars.
+	- res added some more options to vproc_std.
+	- res added some more fat rl tests.
 20-Aug-2005
 	- res fixed potential buffer overflows in TinyXML and xmlread, spotted
 	  by forum member 'dominic'.

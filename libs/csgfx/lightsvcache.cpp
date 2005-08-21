@@ -19,11 +19,11 @@
 
 #include "cssysdef.h"
 
-#include "csplugincommon/shader/lightsvcache.h"
+#include "csgfx/lightsvcache.h"
 
 void csLightShaderVarCache::ClearDefVars ()
 {
-  for (size_t n = 0; n < varCount; n++) defaultVars[n] = csInvalidStringID;
+  for (size_t n = 0; n < _varCount; n++) defaultVars[n] = csInvalidStringID;
 }
 
 void csLightShaderVarCache::SetStrings (iStringSet* strings)
@@ -35,13 +35,18 @@ void csLightShaderVarCache::SetStrings (iStringSet* strings)
   
 csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
 {
-  static const char* svSuffixes[lightCount] = {
+  static const char* svSuffixes[_lightCount] = {
     "diffuse",
     "specular",
     "position",
     "position world",
     "attenuation",
-    "attenuationtex"
+    "attenuationtex",
+    "direction",
+    "inner falloff",
+    "outer falloff",
+    "type",
+    "attenuation mode"
   };
 
   if (!strings.IsValid()) return csInvalidStringID;
@@ -51,8 +56,12 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
     csString str;
     for (size_t n = lightSVIdCache.GetSize(); n <= num; n++)
     {
-      for (int p = 0; p < lightCount; p++)
+      for (int p = 0; p < _lightCount; p++)
       {
+	CS_ASSERT_MSG (
+	  "You added stuff to csLightShaderVarCache::LightProperty "
+	  "but didn't update " __FILE__,
+	  svSuffixes[p] != 0);
 	str.Format ("light %zu %s", n, svSuffixes[p]);
 	lightSVIdCache.GetExtend (num).ids[p] = strings->Request (str);
       }
@@ -63,7 +72,7 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
 
 csStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
 {
-  static const char* svNames[varCount] = {
+  static const char* svNames[_varCount] = {
     "light ambient",
     "light count"
   };
@@ -71,6 +80,12 @@ csStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
   if (!strings.IsValid()) return csInvalidStringID;
 
   if (defaultVars[var] == csInvalidStringID)
+  {
+    CS_ASSERT_MSG (
+      "You added stuff to csLightShaderVarCache::DefaultSV "
+      "but didn't update " __FILE__,
+      defaultVars[var] != 0);
     defaultVars[var] = strings->Request (svNames[var]);
+  }
   return defaultVars[var];
 }

@@ -27,6 +27,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/cscolor.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/refcount.h"
@@ -220,6 +221,14 @@ public:
     return true; 
   }
 
+  /// Retrieve a csColor
+  bool GetValue (csColor& value)
+  { 
+    if (accessor) accessor->PreGetValue (this);
+    value.Set (VectorValue.x, VectorValue.y, VectorValue.z);
+    return true; 
+  }
+
   /// Retrieve a csVector4
   bool GetValue (csVector4& value)
   { 
@@ -330,6 +339,15 @@ public:
     Type = VECTOR3; 
     VectorValue.Set (value.x, value.y, value.z, 1.0f);
     Int = (int)value.x;
+    return true; 
+  }
+
+  /// Store a csColor
+  bool SetValue (const csColor& value)
+  { 
+    Type = VECTOR3; 
+    VectorValue.Set (value.red, value.green, value.blue, 1.0f);
+    Int = (int)value.red;
     return true; 
   }
 

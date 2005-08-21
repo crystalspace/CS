@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSPLUGINCOMMON_SHADER_LIGHTSVCACHE_H__
-#define __CS_CSPLUGINCOMMON_SHADER_LIGHTSVCACHE_H__
+#ifndef __CS_CSGFX_SHADER_LIGHTSVCACHE_H__
+#define __CS_CSGFX_SHADER_LIGHTSVCACHE_H__
 
 #include "csextern.h"
 
@@ -49,9 +49,19 @@ public:
     lightAttenuation,
     /// Attenuation texture
     lightAttenuationTex,
+    /// Direction (object space)
+    lightDirection,
+    /// Spot inner falloff
+    lightInnerFalloff,
+    /// Spot outer falloff
+    lightOuterFalloff,
+    /// Light type (csLightType casted to int)
+    lightType,
+    /// Attenuation mode (csLightAttenuationMode casted to int)
+    lightAttenuationMode,
 
     /// Number of properties
-    lightCount
+    _lightCount
   };
 
   /// Other generally useful shader variables that can be obtained
@@ -63,16 +73,16 @@ public:
     varLightCount,
     
     /// Number of other variables
-    varCount
+    _varCount
   };
 private:
   struct LightSvIdCacheEntry
   {
-    csStringID ids[lightCount];
+    csStringID ids[_lightCount];
   };
   csArray<LightSvIdCacheEntry> lightSVIdCache;
   csRef<iStringSet> strings;
-  csStringID defaultVars[varCount];
+  csStringID defaultVars[_varCount];
   
   void ClearDefVars ();
 public:
@@ -112,4 +122,4 @@ public:
   csStringID GetDefaultSVId (DefaultSV var);
 };
 
-#endif // __CS_CSPLUGINCOMMON_SHADER_LIGHTSVCACHE_H__
+#endif // __CS_CSGFX_SHADER_LIGHTSVCACHE_H__

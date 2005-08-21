@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<shader compiler="xmlshader" name="ambient">
+    <!-- This should be defined by renderloop somehow and track sector ambient -->
+    <shadervars>
+	<shadervar name="light ambient" type="vector3">0.2, 0.2, 0.4</shadervar>
+    </shadervars>
+    <technique priority="50">
+	<pass>
+	    <mixmode><copy/></mixmode>
+	    <vp plugin="glfixed" file="/shader/ambient.fvp"/>
+	    <texture name="tex diffuse" destination="unit 0" />
+	    <fp plugin="glfixed">
+		<fixedfp>
+		    <layer>
+			<colorsource num="0" source="primary color" modifier="color"/>
+			<colorsource num="1" source="texture" modifier="color"/>
+			<coloroperation operation="modulate"/>
+		    </layer>
+		</fixedfp>
+	    </fp>
+	</pass>
+    </technique>
+</shader>

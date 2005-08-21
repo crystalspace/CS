@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<shader compiler="xmlshader" name="vproc_lighting">
+
+    <technique priority="200" lights="2147483647">
+      <pass>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?if !vars."tex diffuse".texture ?>
+	      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
+	    <?endif?>
+	  </fixedvp>
+	</vp>
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <lightmixmode>add</lightmixmode>
+	    <!--
+	    <?if buffers."color lit"?>
+	      <colormixmode>add</colormixmode>
+	      <colorbuffer>color lit</colorbuffer>
+	    <?else?>
+	      <colormixmode>mul</colormixmode>
+	      <colorbuffer>color unlit</colorbuffer>
+	    <?endif?>
+	    -->
+	    <colormixmode>none</colormixmode>
+	    <finalfactor type="float">0.5</finalfactor>
+	    <lights>2147483647</lights>
+	  </vproc_std>
+	</vproc>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <layer name="diffuse">
+	      <?if vars."tex diffuse".texture ?>
+		<colorsource num="0" source="texture" modifier="color"/>
+		<alphasource num="0" source="texture" modifier="alpha"/>
+	      <?else?>
+		<colorsource num="0" source="constant color" modifier="color"/>
+		<alphasource num="0" source="constant color" modifier="alpha"/>
+	      <?endif?>
+	      <colorsource num="1" source="primary color" modifier="color"/>
+	      <coloroperation operation="modulate" scale="2" />
+	      <alphasource num="1" source="primary color" modifier="alpha"/>
+	      <alphaoperation operation="replace" />
+	    </layer>
+	  </fixedfp>
+	</fp>
+      </pass>
+    </technique>
+</shader>

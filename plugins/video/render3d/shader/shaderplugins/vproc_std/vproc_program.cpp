@@ -35,8 +35,13 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 
 csVProcStandardProgram::csVProcStandardProgram (csVProc_Std *plug)
-  : csShaderProgram (plug->objreg), shaderPlugin (plug), lightMixMode (LIGHTMIXMODE_NONE), 
-  finalLightFactor (1.0f), numLights (0), useAttenuation (true)
+  : csShaderProgram (plug->objreg), shaderPlugin (plug), 
+  lightMixMode (LIGHTMIXMODE_NONE), 
+  colorMixMode (LIGHTMIXMODE_NONE), 
+  numLights (0), useAttenuation (true),
+  positionBuffer (CS_BUFFER_POSITION),
+  normalBuffer (CS_BUFFER_NORMAL),
+  colorBuffer (CS_BUFFER_COLOR_UNLIT)
 {
   InitTokenTable (tokens);
 }
@@ -59,55 +64,59 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 {
   if (numLights > 0)
   {
-    const csArray<iLight*> lights = shaderPlugin->shaderManager->GetActiveLights ();
-    if (lights.Length () == 0) return;
+    int lightsActive = 0;
+    csStringID id;
+    id = shaderPlugin->lsvCache.GetDefaultSVId (
+      csLightShaderVarCache::varLightCount);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (lightsActive);
+    if (lightsActive == 0) return;
 
-    iRenderBuffer *vbuf = modes.buffers->GetRenderBuffer (CS_BUFFER_POSITION);
-    iRenderBuffer *cbuf = modes.buffers->GetRenderBuffer (CS_BUFFER_COLOR_UNLIT);
-    iRenderBuffer *nbuf = modes.buffers->GetRenderBuffer (CS_BUFFER_NORMAL);
+    iRenderBuffer *vbuf = GetBuffer (positionBuffer, modes, stacks);
+    iRenderBuffer *nbuf = GetBuffer (normalBuffer, modes, stacks);
+    iRenderBuffer *cbuf = GetBuffer (colorBuffer, modes, stacks);
 
     if (vbuf == 0 || nbuf == 0) return;
 
     //copy output
-    csRef<iRenderBuffer> clbuf = csRenderBuffer::CreateRenderBuffer (vbuf->GetElementCount (), CS_BUF_STREAM,
+    csRef<iRenderBuffer> clbuf = 
+      csRenderBuffer::CreateRenderBuffer (vbuf->GetElementCount (), CS_BUF_STREAM,
       CS_BUFCOMP_FLOAT, 3, true);
 
     // tempdata
     csColor *tmpColor = (csColor*) clbuf->Lock (CS_BUF_LOCK_NORMAL);
 
-
-    if (lightMixMode == LIGHTMIXMODE_ADD || lightMixMode == LIGHTMIXMODE_MUL)
-    {
-      if (cbuf) //copy over colors
-        memcpy (tmpColor, cbuf->Lock (CS_BUF_LOCK_READ), vbuf->GetElementCount ()*sizeof(csColor));
-      else
-        memset (tmpColor, 0, sizeof(csColor)*vbuf->GetElementCount ());
-    }
+    size_t elementCount = vbuf->GetElementCount ();
+    memset (tmpColor, 0, sizeof(csColor) * elementCount);
 
     csReversibleTransform object2world;
-    csGetShaderVariableFromStack (stacks, shaderPlugin->string_object2world)->GetValue (object2world);
-
-    iLight* light = 0;
-    size_t elementCount = vbuf->GetElementCount ();
+    csGetShaderVariableFromStack (stacks, 
+      shaderPlugin->string_object2world)->GetValue (object2world);
 
     if (lightMixMode == LIGHTMIXMODE_NONE)
     {
       //only calculate last, other have no effect
-      light = lights.Get (csMin(lights.Length (), numLights)-1);
-      iVertexLightCalculator *calc = shaderPlugin->GetLightCalculator (light, useAttenuation);
+      csLightProperties light (csMin((size_t)lightsActive, numLights)-1,
+	shaderPlugin->lsvCache, stacks);
+      iVertexLightCalculator *calc = 
+	shaderPlugin->GetLightCalculator (light, useAttenuation);
       calc->CalculateLighting (light, object2world, elementCount,
-        csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),elementCount,vbuf->GetStride ()),
-        csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),elementCount,nbuf->GetStride ()), 
+        csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
+	  elementCount, vbuf->GetStride ()),
+        csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+	  elementCount, nbuf->GetStride ()), 
         tmpColor);
     }
     else
     {
-      for (size_t i = 0; i < (csMin(lights.Length (), numLights)); i++)
+      LightMixmode useMixMode = LIGHTMIXMODE_ADD;
+      for (size_t i = 0; i < (csMin((size_t)lightsActive, numLights)); i++)
       {
-        light = lights.Get (i);
-        iVertexLightCalculator *calc = shaderPlugin->GetLightCalculator (light, useAttenuation);
+	csLightProperties light (i, shaderPlugin->lsvCache, stacks);
+        iVertexLightCalculator *calc = 
+	  shaderPlugin->GetLightCalculator (light, useAttenuation);
 
-        switch (lightMixMode)
+        switch (useMixMode)
         {
         case LIGHTMIXMODE_ADD:
           {
@@ -132,12 +141,37 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
         case LIGHTMIXMODE_NONE:
 	  break;
         }
+	useMixMode = lightMixMode;
       }
     }
+
+    if (cbuf && (colorMixMode != LIGHTMIXMODE_NONE))
+    {
+      csVertexListWalker<csColor> cbufWalker (cbuf->Lock (CS_BUF_LOCK_READ),
+	elementCount, vbuf->GetStride ());
+      
+      if (colorMixMode == LIGHTMIXMODE_ADD)
+      {
+	for (size_t i = 0; i < elementCount; i++)
+	  tmpColor[i] += cbufWalker[i];
+      }
+      else
+      {
+	for (size_t i = 0; i < elementCount; i++)
+	  tmpColor[i] *= cbufWalker[i];
+      }
+
+      cbuf->Release ();
+    }
+
+    float finalLightFactorReal = GetParamFloatVal (stacks, finalLightFactor,
+      1.0f);
+    for (size_t i = 0; i < elementCount; i++)
+      tmpColor[i] *= finalLightFactorReal;
+
     vbuf->Release ();
     nbuf->Release ();
     clbuf->Release ();
-    if (cbuf) cbuf->Release ();
     modes.buffers->SetRenderBuffer (CS_BUFFER_COLOR, clbuf);
   }
 }
@@ -151,10 +185,52 @@ bool csVProcStandardProgram::Compile ()
   return true;
 }
 
-bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, const char* program, 
+bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, 
+				   const char* program, 
                                    csArray<csShaderVarMapping>& mappings)
 {
   return false;
+}
+				    
+bool csVProcStandardProgram::ParseLightMixMode (iDocumentNode* child, 
+						LightMixmode& mixmode)
+{
+  const char *str = child->GetContentsValue ();
+  if (str)
+  {
+    if (strcasecmp (str, "none"))
+      mixmode = LIGHTMIXMODE_NONE;
+    else if (strcasecmp (str, "add"))
+      mixmode = LIGHTMIXMODE_ADD;
+    else if (strcasecmp (str, "multiply"))
+      mixmode = LIGHTMIXMODE_MUL;
+    else
+    {
+      synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	child, "Invalid light mix mode '%s'", str);
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+bool csVProcStandardProgram::ParseBufferName (iDocumentNode* child, 
+					      BufferName& name)
+{
+  const char* str = child->GetContentsValue();
+  if (!str) 
+  {
+    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+      child, "Expected buffer name");
+    return false;
+  }
+  name.defaultName = csRenderBuffer::GetBufferNameFromDescr (str);
+
+  if (name.defaultName == CS_BUFFER_NONE)
+    name.userName = strings->Request (str);
+
+  return true;
 }
 
 bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, iDocumentNode* program)
@@ -174,26 +250,38 @@ bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, iDocumentNode* 
       csStringID id = tokens.Request (value);
       switch(id)
       {
-      case XMLTOKEN_LIGHTING:
-        {
-          numLights = child->GetAttributeValueAsInt ("lights");
-          finalLightFactor = child->GetAttributeValueAsFloat ("finalfactor");
-          if (child->GetAttributeValue ("attenuation"))
-            useAttenuation = child->GetAttributeValueAsBool ("attenuation");
-
-          if (finalLightFactor == 0 && numLights > 0) finalLightFactor = 1.0f;
-          const char *str = child->GetAttributeValue ("mixmode");
-          if (str)
-          {
-            if (strcasecmp (str, "none"))
-              lightMixMode = LIGHTMIXMODE_NONE;
-            else if (strcasecmp (str, "add"))
-              lightMixMode = LIGHTMIXMODE_ADD;
-            else if (strcasecmp (str, "multiply"))
-              lightMixMode = LIGHTMIXMODE_MUL;
-          }
-          break;
-        }
+      case XMLTOKEN_LIGHTS:
+	numLights = child->GetContentsValueAsInt ();
+	break;
+      case XMLTOKEN_FINALFACTOR:
+	if (!ParseProgramParam (child, finalLightFactor,
+	  ParamFloat | ParamShaderExp))
+	  return false;
+	break;
+      case XMLTOKEN_ATTENUATION:
+	if (!synsrv->ParseBool (child, useAttenuation, true))
+	  return false;
+	break;
+      case XMLTOKEN_LIGHTMIXMODE:
+	if (!ParseLightMixMode (child, lightMixMode))
+	  return false;
+	break;
+      case XMLTOKEN_COLORMIXMODE:
+	if (!ParseLightMixMode (child, colorMixMode))
+	  return false;
+	break;
+      case XMLTOKEN_POSITIONBUFFER:
+	if (!ParseBufferName (child, positionBuffer))
+	  return false;
+	break;
+      case XMLTOKEN_NORMALBUFFER:
+	if (!ParseBufferName (child, normalBuffer))
+	  return false;
+	break;
+      case XMLTOKEN_COLORBUFFER:
+	if (!ParseBufferName (child, colorBuffer))
+	  return false;
+	break;
       default:
         {
           switch (commonTokens.Request (value))
@@ -219,4 +307,19 @@ bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, iDocumentNode* 
   }
 
   return true;
+}
+
+iRenderBuffer* csVProcStandardProgram::GetBuffer (const BufferName& name,
+  csRenderMeshModes& modes, const csShaderVarStack &stacks)
+{
+  if (name.defaultName != CS_BUFFER_NONE)
+    return modes.buffers->GetRenderBuffer (name.defaultName);
+
+  if ((stacks.Length() > name.userName) && (stacks[name.userName]))
+  {
+    iRenderBuffer* buf;
+    stacks[name.userName]->GetValue (buf);
+    return buf;
+  }
+  return 0;
 }

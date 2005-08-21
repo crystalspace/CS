@@ -23,22 +23,103 @@
 #include "csgeom/math.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
+#include "csgfx/lightsvcache.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csutil/cscolor.h"
 
 #include "iengine/light.h"
 #include "iengine/movable.h"
+#include "ivideo/shader/shader.h"
 
-
-/**\file Attenuation functors
+/**\file 
+ * Attenuation functors
  */
+
+/**
+ * Light properties, as needed by the attenuation and lighting functors.
+ */
+struct CS_CRYSTALSPACE_EXPORT csLightProperties
+{
+  /// Attenuation coefficients (for CLQ attenuation)
+  csVector3 attenuationConsts;
+  /// Light position (object space)
+  csVector3 posObject;
+  /// Light direction (object space)
+  csVector3 dirObject;
+  /// Light diffuse color
+  csColor color;
+  /// Spotlight inner falloff
+  float spotFalloffInner;
+  /// Spotlight outer falloff
+  float spotFalloffOuter;
+  /// Light type
+  csLightType type;
+  /// Light attenuation mode
+  csLightAttenuationMode attenuationMode;
+
+  csLightProperties () : spotFalloffInner(0.0f), spotFalloffOuter(0.0f),
+    type(CS_LIGHT_POINTLIGHT) {}
+  /**
+   * Convenience constructor to fill the structure from a set of shader
+   * variables.
+   */
+  csLightProperties (size_t lightNum, csLightShaderVarCache& svcache,
+    const csShaderVarStack &stacks)
+  {
+    csStringID id;
+
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightAttenuation);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (attenuationConsts);
+
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightPosition);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (posObject);
+
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightDirection);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (dirObject);
+
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightDiffuse);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (color);
+
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightInnerFalloff);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (spotFalloffInner);
+
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightOuterFalloff);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (spotFalloffOuter);
+
+    int t = CS_LIGHT_POINTLIGHT;
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightType);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (t);
+    type = (csLightType)t;
+
+    t = CS_ATTN_NONE;
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightAttenuationMode);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (t);
+    attenuationMode = (csLightAttenuationMode)t;
+  }
+};
 
 /**
  * No attenuation. 
  */
 struct CS_CRYSTALSPACE_EXPORT csNoAttenuation
 {
-  csNoAttenuation (iLight * /*light*/)
+  csNoAttenuation (const csLightProperties& /*light*/)
   {}
 
   CS_FORCEINLINE void operator() (float /*distance*/, float & /*dp*/) const
@@ -51,9 +132,9 @@ struct CS_CRYSTALSPACE_EXPORT csNoAttenuation
  */
 struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
 {
-  csLinearAttenuation (iLight *light)
+  csLinearAttenuation (const csLightProperties& light)
   {
-    invrad = 1/light->GetAttenuationConstants ().x;
+    invrad = 1/light.attenuationConsts.x;
   }
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -70,7 +151,7 @@ struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
  */
 struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
 {
-  csInverseAttenuation (iLight * /*light*/)
+  csInverseAttenuation (const csLightProperties& /*light*/)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -86,7 +167,7 @@ struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
  */
 struct CS_CRYSTALSPACE_EXPORT csRealisticAttenuation
 {
-  csRealisticAttenuation (iLight * /*light*/)
+  csRealisticAttenuation (const csLightProperties& /*light*/)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -101,8 +182,8 @@ struct CS_CRYSTALSPACE_EXPORT csRealisticAttenuation
  */
 struct CS_CRYSTALSPACE_EXPORT csCLQAttenuation
 {
-  csCLQAttenuation (iLight *light)
-    : attnVec (light->GetAttenuationConstants ())
+  csCLQAttenuation (const csLightProperties& light)
+    : attnVec (light.attenuationConsts)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -113,6 +194,7 @@ struct CS_CRYSTALSPACE_EXPORT csCLQAttenuation
   csVector3 attnVec;
 };
 
+
 /**
  * Preform pointlight lighting calculation without shadowing.
  * Template parameters:
@@ -122,12 +204,12 @@ template<class AttenuationProc>
 class csPointLightProc
 {
 public:
-  csPointLightProc (iLight *light, const csReversibleTransform &objT,
+  csPointLightProc (const csLightProperties& light, const csReversibleTransform &objT,
     float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {    
-    lightPos = objT.Other2This (light->GetMovable ()->GetFullPosition ());
-    lightCol = light->GetColor ();
+    lightPos = light.posObject;
+    lightCol = light.color;
   }
 
   CS_FORCEINLINE
@@ -162,16 +244,17 @@ template<class AttenuationProc>
 class csDirectionalLightProc
 {
 public:
-  csDirectionalLightProc (iLight *light, const csReversibleTransform &objT,
+  csDirectionalLightProc (const csLightProperties& light, const csReversibleTransform &objT,
     float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
-    csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
-    lightPos = objT.Other2This (lightT.GetOrigin ());
-    lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
+    //csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
+    lightPos = light.posObject;//objT.Other2This (lightT.GetOrigin ());
+    /*lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
       light->GetDirection ()));
-    lightDir = lightDir.Unit ();
-    lightCol = light->GetColor ();
+    lightDir = lightDir.Unit ();*/
+    lightDir = light.dirObject;
+    lightCol = light.color;
   }
 
   CS_FORCEINLINE
@@ -207,18 +290,18 @@ template<class AttenuationProc>
 class csSpotLightProc
 {
 public:
-  csSpotLightProc (iLight *light, const csReversibleTransform &objT,
+  csSpotLightProc (const csLightProperties& light, const csReversibleTransform &objT,
     float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
-    csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
-    lightPos = objT.Other2This (lightT.GetOrigin ());
-    lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
-      light->GetDirection ()));
-    lightDir = lightDir.Unit ();
+    //csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
+    lightPos = light.posObject;
+    lightDir = light.dirObject;
 
-    lightCol = light->GetColor ();
-    light->GetSpotLightFalloff (falloffInner, falloffOuter);
+    lightCol = light.color;
+    falloffInner = light.spotFalloffInner;
+    falloffOuter = light.spotFalloffOuter;
+    //light->GetSpotLightFalloff (falloffInner, falloffOuter);
   }
 
   CS_FORCEINLINE
@@ -255,14 +338,20 @@ private:
 struct iVertexLightCalculator
 {
 public:
-  virtual void CalculateLighting (iLight *light, const csReversibleTransform &objtransform,
-    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+  virtual void CalculateLighting (const csLightProperties& light, 
+    const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, 
+    csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
 
-  virtual void CalculateLightingAdd (iLight *light, const csReversibleTransform &objtransform,
-    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+  virtual void CalculateLightingAdd (const csLightProperties& light, 
+    const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, 
+    csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
 
-  virtual void CalculateLightingMul (iLight *light, const csReversibleTransform &objtransform,
-    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+  virtual void CalculateLightingMul (const csLightProperties& light, 
+    const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, 
+    csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
 };
 
 template<class LightProc>
@@ -273,8 +362,10 @@ public:
   {
   }
 
-  virtual void CalculateLighting (iLight *light, const csReversibleTransform &objtransform,
-    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const
+  virtual void CalculateLighting (const csLightProperties& light, 
+    const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, 
+    csVertexListWalker<csVector3> nb, csColor *litColor) const
   {
     // setup the light calculator
     LightProc lighter (light, objtransform);
@@ -285,8 +376,10 @@ public:
     }
   }
 
-  virtual void CalculateLightingAdd (iLight *light, const csReversibleTransform &objtransform,
-    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const
+  virtual void CalculateLightingAdd (const csLightProperties& light, 
+    const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, 
+    csVertexListWalker<csVector3> nb, csColor *litColor) const
   {
     // setup the light calculator
     LightProc lighter (light, objtransform);
@@ -297,8 +390,10 @@ public:
     }
   }
 
-  virtual void CalculateLightingMul (iLight *light, const csReversibleTransform &objtransform,
-    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const
+  virtual void CalculateLightingMul (const csLightProperties& light, 
+    const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, 
+    csVertexListWalker<csVector3> nb, csColor *litColor) const
   {
     // setup the light calculator
     LightProc lighter (light, objtransform);

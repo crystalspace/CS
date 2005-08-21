@@ -104,6 +104,8 @@ bool csVProc_Std::Initialize (iObjectRegistry *reg)
   lightCalculatorMatrix[GetMatrixIndex (CS_LIGHT_SPOTLIGHT, CS_ATTN_CLQ)] =
     new csVertexLightCalculator<csSpotLightProc<csCLQAttenuation> > ();
 
+  lsvCache.SetStrings (strings);
+
   return true;
 }
 
@@ -127,9 +129,9 @@ csPtr<iShaderProgram> csVProc_Std::CreateProgram (const char *type)
   return 0;
 }
 
-iVertexLightCalculator* csVProc_Std::GetLightCalculator (iLight *light,
-                                                                   bool useAttenuation)
+iVertexLightCalculator* csVProc_Std::GetLightCalculator (
+  const csLightProperties& light, bool useAttenuation)
 {
   return lightCalculatorMatrix[GetMatrixIndex 
-    (light->GetType (), (useAttenuation ? light->GetAttenuationMode () : CS_ATTN_NONE))];
+    (light.type, (useAttenuation ? light.attenuationMode : CS_ATTN_NONE))];
 }

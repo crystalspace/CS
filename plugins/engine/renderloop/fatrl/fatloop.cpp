@@ -229,11 +229,13 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   lightmgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
+
+  lsvCache.SetStrings (strings);
 }
 
 csFatLoopStep::~csFatLoopStep ()
@@ -439,7 +441,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 	// ...and fill light SVs.
 	for (i = lightOfs; i < relevantLights.GetSize(); i++)
 	{
-	  if (lightCount >= pass.maxLights) break;
+	  if (((int)lightOfs + lightCount) >= pass.maxLights) break;
 	  lightCount++;
 	  SetLightSVs (shadervars, relevantLights[i], i-lightOfs, 
 	    camTransR, framenr);
@@ -455,20 +457,18 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 	// query max light number the shader groks
 	const csShaderMetadata& shaderMeta = shader->GetMetadata (ticket);
 	int n = csMin ((int)shaderMeta.numberOfLights, 
-	  pass.maxLights - lightCount);
+	  lightCount);
 
 	// Set actual count
 	sv->SetValue (n);
 
-	for (i = 0; i < (size_t)n; i++)
-	{
-	  // light SVs will still be in shadervars
-	  FillStacks (stacks, mesh, mw, hdl, shader);
+	// light SVs will still be in shadervars
+	FillStacks (stacks, mesh, mw, hdl, shader);
 
-	  // add mesh
-	  meshNode->AddMesh (mesh, shader, stacks, prio, 
-	    ph.IsPrioSpecial (prio), ticket);
-	}
+	// add mesh
+	meshNode->AddMesh (mesh, shader, stacks, prio, 
+	  ph.IsPrioSpecial (prio), ticket);
+
 	lightOfs += n;
 
 	// Prevent infinite loops
@@ -565,6 +565,16 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
   {
     sv->SetValue (light->GetAttenuationConstants ());
   }
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightAttenuationMode));
+  sv->SetValue ((int)attnMode);
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightType));
+  sv->SetValue ((int)light->GetType());
 
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<params>
+  <name>std_rloop_fattest</name>
+  <steps>
+    <step plugin="crystalspace.renderloop.step.fatloop">
+      <pass>
+	<shadertype>standard</shadertype>
+	<basepass />
+	<defaultshader name="vproc_lighting" file="/shader/vproc_lighting.xml" />
+      </pass>
+    </step>
+  </steps>
+</params>

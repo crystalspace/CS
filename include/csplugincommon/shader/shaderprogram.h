@@ -146,6 +146,47 @@ protected:
   void DumpProgramInfo (csString& output);
   /// Dump variable mapping
   void DumpVariableMappings (csString& output);
+
+  //@{
+  /**
+   * Query the value of a ProgramParam variable by reading the constant or
+   * resolving the shader variable.
+   */
+  inline csVector4 GetParamVectorVal (const csShaderVarStack &stacks, 
+    const ProgramParam &param, const csVector4& defVal)
+  {
+    csRef<csShaderVariable> var;
+  
+    var = csGetShaderVariableFromStack (stacks, param.name);
+    if (!var.IsValid ())
+      var = param.var;
+  
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      return defVal;
+  
+    csVector4 v;
+    var->GetValue (v);
+    return v;
+  }
+  inline float GetParamFloatVal (const csShaderVarStack &stacks, 
+    const ProgramParam &param, float defVal)
+  {
+    csRef<csShaderVariable> var;
+  
+    var = csGetShaderVariableFromStack (stacks, param.name);
+    if (!var.IsValid ())
+      var = param.var;
+  
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      return defVal;
+  
+    float f;
+    var->GetValue (f);
+    return f;
+  }
+  //@}
 public:
   SCF_DECLARE_IBASE;
 

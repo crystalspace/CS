@@ -82,11 +82,30 @@ private:
     LIGHTMIXMODE_NONE = 0,
     LIGHTMIXMODE_ADD = 1,
     LIGHTMIXMODE_MUL = 2
-  } lightMixMode;
+  };
+  LightMixmode lightMixMode;
+  LightMixmode colorMixMode;
 
-  float finalLightFactor;
+  ProgramParam finalLightFactor;
   size_t numLights;
   bool useAttenuation;
+
+  struct BufferName
+  {
+    csRenderBufferName defaultName;
+    csStringID userName;
+
+    BufferName (csRenderBufferName name = CS_BUFFER_NONE) : 
+    defaultName (name), userName (csInvalidStringID) {}
+  };
+  BufferName positionBuffer;
+  BufferName normalBuffer;
+  BufferName colorBuffer;
+
+  bool ParseLightMixMode (iDocumentNode* child, LightMixmode& mixmode);
+  bool ParseBufferName (iDocumentNode* child, BufferName& name);
+  iRenderBuffer* GetBuffer (const BufferName& name,
+    csRenderMeshModes& modes, const csShaderVarStack &stacks);
 };
 
 #endif //__CS_VPROC_VPROC_PROGRAM_H__

@@ -23,6 +23,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/redblacktree.h"
 #include "csutil/weakref.h"
+#include "csgfx/lightsvcache.h"
 #include "csgfx/shadervarframeholder.h"
 #include "csgfx/shadervarcontext.h"
 
@@ -31,7 +32,6 @@
 
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/basesteploader.h"
-#include "csplugincommon/shader/lightsvcache.h"
 
 #include "rendernode.h"
 #include "meshnode.h"
@@ -102,7 +102,6 @@ class csFatLoopStep : public iRenderStep
   csRef<iEngine> engine;
   csWeakRef<iShader> nullShader;
   csRef<iLightManager> lightmgr;
-  csRef<iStringSet> strings;
 
   /**
    * Render tree node.
