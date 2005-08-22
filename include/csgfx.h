@@ -32,6 +32,7 @@
 #include "csgfx/imagetools.h"
 #include "csgfx/imagevolumemaker.h"
 #include "csgfx/inv_cmap.h"
+#include "csgfx/lightsvcache.h"
 #include "csgfx/memimage.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/packrgb.h"
