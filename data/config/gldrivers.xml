@@ -359,7 +359,16 @@
 	<usecfg>disableRECTTextures</usecfg>
       </applicable>
     </rule>
-    
+
+    <rule description="SiS: Text drawing only seems to work using the worst method">
+      <conditions>
+	<regexp string="vendor" pattern="^SiS" />
+      </conditions>
+      <applicable>
+	<usecfg>disableMTtext</usecfg>
+      </applicable>
+    </rule>
+
     <!--
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>
