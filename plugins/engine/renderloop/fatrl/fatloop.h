@@ -169,7 +169,7 @@ class csFatLoopStep : public iRenderStep
 
   void SetLightSVs (csShaderVariableContext& shadervars, iLight* light,
     size_t lightId, const csReversibleTransform& camTransR,
-    uint framenr);
+    const csReversibleTransform &objT, uint framenr);
   /** @} */
 public:
   SCF_DECLARE_IBASE;

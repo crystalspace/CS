@@ -43,6 +43,8 @@ public:
     lightSpecular,
     /// Position (object space)
     lightPosition,
+    /// Position (camera space)
+    lightPositionCamera,
     /// Position (world space)
     lightPositionWorld,
     /// Attenuation vector

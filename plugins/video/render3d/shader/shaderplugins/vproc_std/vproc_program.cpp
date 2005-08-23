@@ -70,7 +70,6 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
       csLightShaderVarCache::varLightCount);
     if ((stacks.Length() > id) && (stacks[id] != 0))
       stacks[id]->GetValue (lightsActive);
-    if (lightsActive == 0) return;
 
     iRenderBuffer *vbuf = GetBuffer (positionBuffer, modes, stacks);
     iRenderBuffer *nbuf = GetBuffer (normalBuffer, modes, stacks);
@@ -89,60 +88,64 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     size_t elementCount = vbuf->GetElementCount ();
     memset (tmpColor, 0, sizeof(csColor) * elementCount);
 
-    csReversibleTransform object2world;
-    csGetShaderVariableFromStack (stacks, 
-      shaderPlugin->string_object2world)->GetValue (object2world);
+    if (lightsActive > 0)
+    {
+      csReversibleTransform object2world;
+      csGetShaderVariableFromStack (stacks, 
+	shaderPlugin->string_object2world)->GetValue (object2world);
 
-    if (lightMixMode == LIGHTMIXMODE_NONE)
-    {
-      //only calculate last, other have no effect
-      csLightProperties light (csMin((size_t)lightsActive, numLights)-1,
-	shaderPlugin->lsvCache, stacks);
-      iVertexLightCalculator *calc = 
-	shaderPlugin->GetLightCalculator (light, useAttenuation);
-      calc->CalculateLighting (light, object2world, elementCount,
-        csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-	  elementCount, vbuf->GetStride ()),
-        csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-	  elementCount, nbuf->GetStride ()), 
-        tmpColor);
-    }
-    else
-    {
-      LightMixmode useMixMode = LIGHTMIXMODE_ADD;
-      for (size_t i = 0; i < (csMin((size_t)lightsActive, numLights)); i++)
+      if (lightMixMode == LIGHTMIXMODE_NONE)
       {
-	csLightProperties light (i, shaderPlugin->lsvCache, stacks);
-        iVertexLightCalculator *calc = 
+	//only calculate last, other have no effect
+	csLightProperties light (csMin((size_t)lightsActive, numLights)-1,
+	  shaderPlugin->lsvCache, stacks);
+	iVertexLightCalculator *calc = 
 	  shaderPlugin->GetLightCalculator (light, useAttenuation);
-
-        switch (useMixMode)
-        {
-        case LIGHTMIXMODE_ADD:
-          {
-            calc->CalculateLightingAdd (light, object2world, elementCount,
-              csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ), 
-		elementCount, vbuf->GetStride ()),
-              csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-		elementCount, nbuf->GetStride ()), 
-              tmpColor);
-            break;
-          }
-        case LIGHTMIXMODE_MUL:
-          {
-            calc->CalculateLightingMul (light, object2world, elementCount,
-              csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-		elementCount, vbuf->GetStride ()),
-              csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-	        elementCount, nbuf->GetStride ()), 
-              tmpColor);
-            break;
-          }
-        case LIGHTMIXMODE_NONE:
-	  break;
-        }
-	useMixMode = lightMixMode;
+	calc->CalculateLighting (light, object2world, elementCount,
+	  csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
+	    elementCount, vbuf->GetStride ()),
+	  csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+	    elementCount, nbuf->GetStride ()), 
+	  tmpColor);
       }
+      else
+      {
+	LightMixmode useMixMode = LIGHTMIXMODE_ADD;
+	for (size_t i = 0; i < (csMin((size_t)lightsActive, numLights)); i++)
+	{
+	  csLightProperties light (i, shaderPlugin->lsvCache, stacks);
+	  iVertexLightCalculator *calc = 
+	    shaderPlugin->GetLightCalculator (light, useAttenuation);
+
+	  switch (useMixMode)
+	  {
+	  case LIGHTMIXMODE_ADD:
+	    {
+	      calc->CalculateLightingAdd (light, object2world, elementCount,
+		csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ), 
+		  elementCount, vbuf->GetStride ()),
+		csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+		  elementCount, nbuf->GetStride ()), 
+		tmpColor);
+	      break;
+	    }
+	  case LIGHTMIXMODE_MUL:
+	    {
+	      calc->CalculateLightingMul (light, object2world, elementCount,
+		csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
+		  elementCount, vbuf->GetStride ()),
+		csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+		  elementCount, nbuf->GetStride ()), 
+		tmpColor);
+	      break;
+	    }
+	  case LIGHTMIXMODE_NONE:
+	    break;
+	  }
+	  useMixMode = lightMixMode;
+	}
+      }
+
     }
 
     if (cbuf && (colorMixMode != LIGHTMIXMODE_NONE))
@@ -198,11 +201,11 @@ bool csVProcStandardProgram::ParseLightMixMode (iDocumentNode* child,
   const char *str = child->GetContentsValue ();
   if (str)
   {
-    if (strcasecmp (str, "none"))
+    if (strcasecmp (str, "none") == 0)
       mixmode = LIGHTMIXMODE_NONE;
-    else if (strcasecmp (str, "add"))
+    else if (strcasecmp (str, "add") == 0)
       mixmode = LIGHTMIXMODE_ADD;
-    else if (strcasecmp (str, "multiply"))
+    else if (strcasecmp (str, "multiply") == 0)
       mixmode = LIGHTMIXMODE_MUL;
     else
     {

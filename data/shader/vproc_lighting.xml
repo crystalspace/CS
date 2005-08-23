@@ -46,7 +46,7 @@
 	      <colorsource num="1" source="primary color" modifier="color"/>
 	      <coloroperation operation="modulate" scale="2" />
 	      <alphasource num="1" source="primary color" modifier="alpha"/>
-	      <alphaoperation operation="replace" />
+	      <alphaoperation operation="modulate" />
 	    </layer>
 	  </fixedfp>
 	</fp>

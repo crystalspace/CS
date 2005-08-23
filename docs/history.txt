@@ -6,14 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-21-Aug-2005
-	- res moved csLightShaderVarCache to csgfx.
-	- res changed the vertex light calculator to not use iLight* but a
-	  struct with the relevant light properties.
-	- res changed vproc_std to pull the light information from shader vars.
-	- res added some more options to vproc_std.
-	- res added some more fat rl tests.
-	- res worked around some warnings on VC8.
+23-Aug-2005
 	- Erroroman added "start", "end" and "mode" params to csFog struct.
 	- Erroroman added support in csloader for the new fog params.
 	- Erroroman added shader variables for new fog params in generic 
@@ -25,6 +18,15 @@ chronological order.
 	  variable and it can't use mode from csFog. There is still work to get
 	  working OpenGL fog as standard CS fog.
 	- res removed the dependency of ivaria/ode.h on <ode/ode.h>.
+	- res tweaked the fat loop and vproc_std a bit; runs flarge okay now.
+21-Aug-2005
+	- res moved csLightShaderVarCache to csgfx.
+	- res changed the vertex light calculator to not use iLight* but a
+	  struct with the relevant light properties.
+	- res changed vproc_std to pull the light information from shader vars.
+	- res added some more options to vproc_std.
+	- res added some more fat rl tests.
+	- res worked around some warnings on VC8.
 20-Aug-2005
 	- res fixed potential buffer overflows in TinyXML and xmlread, spotted
 	  by forum member 'dominic'.

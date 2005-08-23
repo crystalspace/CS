@@ -444,7 +444,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 	  if (((int)lightOfs + lightCount) >= pass.maxLights) break;
 	  lightCount++;
 	  SetLightSVs (shadervars, relevantLights[i], i-lightOfs, 
-	    camTransR, framenr);
+	    camTransR, mesh->object2world, framenr);
 	}
 
 	// feed light SVs to shader
@@ -537,6 +537,7 @@ void csFatLoopStep::FillStacks (csShaderVarStack& stacks,
 void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars, 
 				 iLight* light, size_t lightId, 
 				 const csReversibleTransform& camTransR,
+				 const csReversibleTransform &objT, 
 				 uint framenr)
 {
   csRef<csShaderVariable> sv;
@@ -549,8 +550,13 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
   const csVector3 lightPos = light->GetCenter ();
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 
-      csLightShaderVarCache::lightPosition));
+      csLightShaderVarCache::lightPositionCamera));
   sv->SetValue (lightPos * camTransR);
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightPosition));
+  sv->SetValue (objT.This2Other (lightPos));
 
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 

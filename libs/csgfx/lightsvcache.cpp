@@ -38,6 +38,7 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
   static const char* svSuffixes[_lightCount] = {
     "diffuse",
     "specular",
+    "position object",
     "position",
     "position world",
     "attenuation",

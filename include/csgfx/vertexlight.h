@@ -139,7 +139,7 @@ struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
   {
-    dp = dp * (1 - distance * invrad);
+    dp = csMax (dp * (1 - distance * invrad), 0.0f);
   }
 
   float invrad;
