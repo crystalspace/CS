@@ -14,6 +14,16 @@ chronological order.
 	- res added some more options to vproc_std.
 	- res added some more fat rl tests.
 	- res worked around some warnings on VC8.
+	- Erroroman added "start", "end" and "mode" params to csFog struct.
+	- Erroroman added support in csloader for the new fog params.
+	- Erroroman added shader variables for new fog params in generic 
+	  renderloop.
+	- Erroroman fixed error in glshader_fixed where wrong parameter was 
+	  used when loading fog color.
+	- Erroroman adopted OpenGL fog in glshader_fixed to use data from 
+	  csFog. At the moment "mode" is not usable because it is not a shader
+	  variable and it can't use mode from csFog. There is still work to get
+	  working OpenGL fog as standard CS fog.
 20-Aug-2005
 	- res fixed potential buffer overflows in TinyXML and xmlread, spotted
 	  by forum member 'dominic'.

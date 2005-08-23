@@ -47,24 +47,16 @@ private:
 
   bool validProgram;
 
-  enum FogMode
-  {
-    FogOff,
-    FogLinear,
-    FogExp,
-    FogExp2
-  };
-
   struct FogInfo
   {
-    FogMode mode;
+    int mode;
 
     ProgramParam density;
     ProgramParam start;
     ProgramParam end;
     ProgramParam color;
 
-    FogInfo () : mode (FogOff) {}
+    FogInfo () : mode (CS_FOG_MODE_NONE) {}
   };
   friend struct FogInfo; // MSVC6: For access to csGLStateCache::FogOff.
 

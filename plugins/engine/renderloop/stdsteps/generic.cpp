@@ -152,6 +152,9 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 csStringID csGenericRenderStep::fogplane_name;
 csStringID csGenericRenderStep::fogdensity_name;
 csStringID csGenericRenderStep::fogcolor_name;
+csStringID csGenericRenderStep::fogstart_name;
+csStringID csGenericRenderStep::fogend_name;
+csStringID csGenericRenderStep::fogmode_name;
 csStringID csGenericRenderStep::string_object2world;
 
 SCF_IMPLEMENT_IBASE(csGenericRenderStep)
@@ -179,6 +182,9 @@ csGenericRenderStep::csGenericRenderStep (
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
+  fogstart_name = strings->Request ("fog start");
+  fogend_name = strings->Request ("fog end");
+  fogmode_name = strings->Request ("fog mode");
   string_object2world = strings->Request ("object2world transform");
 
   visible_meshes_index = 0;
@@ -426,6 +432,12 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     sv->SetValue (csVector3 (sector->GetFog()->red,
     	sector->GetFog()->green,
 	sector->GetFog()->blue));
+    sv = shadervars.Top ().GetVariableAdd (fogstart_name);
+    sv->SetValue (sector->GetFog()->start);
+    sv = shadervars.Top ().GetVariableAdd (fogend_name);
+    sv->SetValue (sector->GetFog()->end);
+    sv = shadervars.Top ().GetVariableAdd (fogmode_name);
+    sv->SetValue (sector->GetFog()->mode);
 
     //construct a cameraplane
     csVector4 fogPlane;

@@ -286,23 +286,15 @@ bool csGLShaderFFP::ParseFog (iDocumentNode* node, FogInfo& fog)
 	  }
 	  if (strcmp (type, "linear") == 0)
 	  {
-	    fog.mode = FogLinear;
+	    fog.mode = CS_FOG_MODE_LINEAR;
 	  }
 	  else if (strcmp (type, "exp") == 0)
 	  {
-	    fog.mode = FogExp;
+	    fog.mode = CS_FOG_MODE_EXP;
 	  }
 	  else if (strcmp (type, "exp2") == 0)
 	  {
-	    fog.mode = FogExp2;
-	  }
-	  else
-	  {
-	    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	      CS_REPORTER_SEVERITY_WARNING,
-	      child,
-	      "Invalid fog mode %s", type);
-	    return false;
+	    fog.mode = CS_FOG_MODE_EXP2;
 	  }
 	}
 	break;
@@ -326,7 +318,7 @@ bool csGLShaderFFP::ParseFog (iDocumentNode* node, FogInfo& fog)
 	break;
       case XMLTOKEN_FOGCOLOR:
 	{
-	  if (!ParseProgramParam (child, fog.start, ParamFloat | ParamVector3 |
+	  if (!ParseProgramParam (child, fog.color, ParamFloat | ParamVector3 |
 	    ParamVector4))
 	    return false;
 	}
@@ -590,7 +582,7 @@ void csGLShaderFFP::Activate ()
 	GL_COMBINE_ALPHA_ARB, GL_ALPHA_SCALE);
     }
   }
-  if (fog.mode != FogOff)
+  if (fog.mode != CS_FOG_MODE_NONE)
   {
     statecache->Enable_GL_FOG ();
   }
@@ -617,7 +609,7 @@ void csGLShaderFFP::Deactivate()
     glTexEnvi  (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1);
   }
 
-  if (fog.mode != FogOff)
+  if (fog.mode != CS_FOG_MODE_NONE)
   {
     statecache->Disable_GL_FOG ();
   }
@@ -629,14 +621,14 @@ void csGLShaderFFP::SetupState (const csRenderMesh *mesh,
                                 csRenderMeshModes& modes,
                                 const csShaderVarStack &stacks)
 {
-  if (fog.mode != FogOff)
+  if (fog.mode != CS_FOG_MODE_NONE)
   {
     csVector4 fc = GetParamVectorVal (stacks, fog.color, defVector);
     glFogfv (GL_FOG_COLOR, (float*)&fc.x);
 
     switch (fog.mode)
     {
-      case FogLinear:
+      case CS_FOG_MODE_LINEAR:
 	{
 	  glFogi (GL_FOG_MODE, GL_LINEAR);
 	  glFogf (GL_FOG_START, 
@@ -645,14 +637,14 @@ void csGLShaderFFP::SetupState (const csRenderMesh *mesh,
 	    GetParamFloatVal (stacks, fog.end, 0.0f));
 	}
 	break;
-      case FogExp:
+      case CS_FOG_MODE_EXP:
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP);
 	  glFogf (GL_FOG_DENSITY, 
 	    GetParamFloatVal (stacks, fog.density, 0.0f));
 	}
 	break;
-      case FogExp2:
+      case CS_FOG_MODE_EXP2:
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP2);
 	  glFogf (GL_FOG_DENSITY, 

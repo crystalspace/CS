@@ -114,6 +114,9 @@ private:
   static csStringID fogplane_name;
   static csStringID fogdensity_name;
   static csStringID fogcolor_name;
+  static csStringID fogstart_name;
+  static csStringID fogend_name;
+  static csStringID fogmode_name;
   static csStringID string_object2world;
 public:
   SCF_DECLARE_IBASE;

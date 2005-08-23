@@ -107,6 +107,14 @@ struct csRenderBufferHolder;
 #define CS_CLIP_NEEDED 1
 /** @} */
 
+enum csFogMode
+{
+	CS_FOG_MODE_NONE = 0,
+	CS_FOG_MODE_LINEAR,
+	CS_FOG_MODE_EXP,
+	CS_FOG_MODE_EXP2
+};
+
 /**
  * Fog structure.
  */
@@ -122,6 +130,12 @@ struct csFog
   float green;
   /// Color (blue).
   float blue;
+  /// Fog start.
+  float start;
+  /// Fog end.
+  float end;
+  /// Fog mode.
+  csFogMode mode;
 };
 
 /// Z-buffer modes
