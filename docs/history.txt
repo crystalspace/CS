@@ -24,6 +24,7 @@ chronological order.
 	  csFog. At the moment "mode" is not usable because it is not a shader
 	  variable and it can't use mode from csFog. There is still work to get
 	  working OpenGL fog as standard CS fog.
+	- res removed the dependency of ivaria/ode.h on <ode/ode.h>.
 20-Aug-2005
 	- res fixed potential buffer overflows in TinyXML and xmlread, spotted
 	  by forum member 'dominic'.

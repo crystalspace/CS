@@ -22,23 +22,12 @@
 
 #include "csutil/scf.h"
 
-#define int8 ode_int8
-#define uint8 ode_uint8
-#define int32 ode_int32
-#define uint32 ode_uint32
-#include <ode/ode.h>
-#undef uint32
-#undef int32
-#undef uint8
-#undef int8
-
 SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
 
 /**
  * This class can be passed in as a callback during the physics update
  * it is only called if FrameRate is enabled.
  */
-
 struct iODEFrameUpdateCallback : public iBase
 {
   /// Executes the per update callback
@@ -304,14 +293,15 @@ struct iODEDynamicSystemState : public iBase
  */
 enum ODEJointType
 {
-  CS_ODE_JOINT_TYPE_BALL = dJointTypeBall,
-  CS_ODE_JOINT_TYPE_HINGE = dJointTypeHinge,
-  CS_ODE_JOINT_TYPE_SLIDER = dJointTypeSlider,
-  CS_ODE_JOINT_TYPE_CONTACT = dJointTypeContact,
-  CS_ODE_JOINT_TYPE_UNIVERSAL = dJointTypeUniversal,
-  CS_ODE_JOINT_TYPE_HINGE2 = dJointTypeHinge2,
-  CS_ODE_JOINT_TYPE_FIXED = dJointTypeFixed,
-  CS_ODE_JOINT_TYPE_AMOTOR = dJointTypeAMotor
+  CS_ODE_JOINT_TYPE_UNKNOWN = -1,
+  CS_ODE_JOINT_TYPE_BALL,
+  CS_ODE_JOINT_TYPE_HINGE,
+  CS_ODE_JOINT_TYPE_SLIDER,
+  CS_ODE_JOINT_TYPE_CONTACT,
+  CS_ODE_JOINT_TYPE_UNIVERSAL,
+  CS_ODE_JOINT_TYPE_HINGE2,
+  CS_ODE_JOINT_TYPE_FIXED,
+  CS_ODE_JOINT_TYPE_AMOTOR
 };
 
 SCF_VERSION (iODEJointState, 0, 0, 2);
@@ -591,8 +581,12 @@ struct iODEUniversalJoint : public iODEGeneralJointState
 
 enum ODEAMotorMode
 {
-  CS_ODE_AMOTOR_MODE_USER = dAMotorUser,
-  CS_ODE_AMOTOR_MODE_EULER = dAMotorEuler
+  CS_ODE_AMOTOR_MODE_UNKNOWN = -1,
+
+  CS_ODE_AMOTOR_MODE_USER = 0,
+  CS_ODE_AMOTOR_MODE_EULER,
+
+  CS_ODE_AMOTOR_MODE_LAST
 };
 
 SCF_VERSION (iODEAMotorJoint, 0, 0, 1);

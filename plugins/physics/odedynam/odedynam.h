@@ -33,6 +33,8 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
 
+#include <ode/ode.h>
+
 struct iMeshWrapper;
 struct iODEFrameUpdateCallback;
 struct iObjectRegistry;
@@ -1082,8 +1084,8 @@ struct ODEAMotorJoint : public csStrictODEJoint, iODEAMotorJoint
   virtual float GetSuspensionCFM (int axis)
   {return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_AMOTOR, dParamSuspensionCFM, axis);};
 
-  void SetAMotorMode (ODEAMotorMode mode) {dJointSetAMotorMode (jointID, mode);};
-  ODEAMotorMode GetAMotorMode () { return (ODEAMotorMode)dJointGetAMotorMode (jointID);};
+  void SetAMotorMode (ODEAMotorMode mode);
+  ODEAMotorMode GetAMotorMode ();
   void SetAMotorNumAxes (int axis_num) {dJointSetAMotorNumAxes (jointID, axis_num);};
   int GetAMotorNumAxes () {return dJointGetAMotorNumAxes (jointID);};
   void SetAMotorAxis (int axis_num, int rel_orient, float x, float y, float z)
@@ -1237,11 +1239,7 @@ public:
   struct ODEJointState : public iODEJointState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csODEJoint);
-    inline ODEJointType GetType()
-    {
-      return CS_STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
-    }
-
+    ODEJointType GetType();
     void SetLoStop (float value) { SetParam (dParamLoStop, value); }
     void SetHiStop (float value) { SetParam (dParamHiStop, value); }
     void SetVel (float value) { SetParam (dParamVel, value); }

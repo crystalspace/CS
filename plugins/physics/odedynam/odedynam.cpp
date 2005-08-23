@@ -2005,6 +2005,27 @@ ODEAMotorJoint::~ODEAMotorJoint ()
   dJointDestroy (jointID);
 }
 
+void ODEAMotorJoint::SetAMotorMode (ODEAMotorMode mode) 
+{
+  if ((mode <= CS_ODE_AMOTOR_MODE_UNKNOWN)
+    || (mode >= CS_ODE_AMOTOR_MODE_LAST))
+    return;
+
+  static const int ODEAMotorModeTodAMotor[CS_ODE_AMOTOR_MODE_LAST] =
+  {dAMotorUser, dAMotorEuler};
+
+  dJointSetAMotorMode (jointID, ODEAMotorModeTodAMotor[mode]);
+}
+
+ODEAMotorMode ODEAMotorJoint::GetAMotorMode () 
+{ 
+  switch (dJointGetAMotorMode (jointID))
+  {
+    case dAMotorUser: return CS_ODE_AMOTOR_MODE_USER;
+    case dAMotorEuler: return CS_ODE_AMOTOR_MODE_EULER;
+  }
+  return CS_ODE_AMOTOR_MODE_UNKNOWN;
+}
 
 csVector3 ODEAMotorJoint::GetAMotorAxis (int axis_num)
 {
@@ -2466,6 +2487,22 @@ void csODEJoint::BuildJoint ()
   } else {
     /* too unconstrained, don't create joint */
   }
+}
+
+ODEJointType csODEJoint::ODEJointState::GetType()
+{
+  switch (dJointGetType (scfParent->jointID))
+  {
+    case dJointTypeBall: return CS_ODE_JOINT_TYPE_BALL;
+    case dJointTypeHinge: return CS_ODE_JOINT_TYPE_HINGE;
+    case dJointTypeSlider: return CS_ODE_JOINT_TYPE_SLIDER;
+    case dJointTypeContact: return CS_ODE_JOINT_TYPE_CONTACT;
+    case dJointTypeUniversal: return CS_ODE_JOINT_TYPE_UNIVERSAL;
+    case dJointTypeHinge2: return CS_ODE_JOINT_TYPE_HINGE2;
+    case dJointTypeFixed: return CS_ODE_JOINT_TYPE_FIXED;
+    case dJointTypeAMotor: return CS_ODE_JOINT_TYPE_AMOTOR;
+  }
+  return CS_ODE_JOINT_TYPE_UNKNOWN;
 }
 
 void csODEJoint::ODEJointState::SetParam (int parameter, float value)

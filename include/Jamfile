@@ -29,7 +29,6 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs iaws     aws2.h      ]
   [ ConcatDirs imap     parser.h    ]
   [ ConcatDirs inetwork vosapi.h    ]
-  [ ConcatDirs ivaria   ode.h       ]
   [ ConcatDirs ivideo   wxwin.h     ]
   ;
 
