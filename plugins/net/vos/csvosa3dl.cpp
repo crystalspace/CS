@@ -106,15 +106,34 @@ csVosA3DL::~csVosA3DL()
 
 csRef<iVosSector> csVosA3DL::GetSector(const char* s)
 {
-  vRef<Vobject> v = Vobject::findObjectFromRoot(s);
-  vRef<csMetaSector> sec = meta_cast<csMetaSector>(v);
-  if(! sec) return csRef<iVosSector>();
+  try {
+    vRef<Vobject> v = Vobject::findObjectFromRoot(s);
+    vRef<csMetaSector> sec = meta_cast<csMetaSector>(v);
+    if(! sec) return csRef<iVosSector>();
 
-  csRef<iVosSector> r = sec->GetCsVosSector();
-  if(! r.IsValid()) r.AttachNew(new csVosSector(objreg, this, sec));
+    csRef<iVosSector> r = sec->GetCsVosSector();
+    if(! r.IsValid()) r.AttachNew(new csVosSector(objreg, this, sec));
 
-  return r;
+    return r;
+  } catch(std::runtime_error) {
+    return csRef<iVosSector>();
+  }
 }
+
+
+csRef<iVosObject3D> csVosA3DL::FindVosObject3D(const char* s)
+{
+  try {
+    vRef<Vobject> v = Vobject::findObjectFromRoot(s);
+    vRef<csMetaObject3D> obj = meta_cast<csMetaObject3D>(v);
+    if(! obj) return csRef<iVosObject3D>();
+
+    return obj->GetCSinterface();
+  } catch(std::runtime_error) {
+    return csRef<iVosObject3D>();
+  }
+}
+
 
 #define REPLACE_FACTORY(type, cls, oldfac, newfac)     \
   Site::removeRemoteMetaObjectFactory(type, &oldfac); \

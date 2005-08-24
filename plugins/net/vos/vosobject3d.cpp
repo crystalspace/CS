@@ -538,7 +538,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
         vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3((float)x,
                                                                        (float)y,
                                                                        (float)z),
-                                                        event.getInitiator()->isRemote()));
+                                                        isLocal() || event.getInitiator()->isRemote()));
       }
       else if (pcr->getContextualName() == "a3dl:orientation")
       {
@@ -553,7 +553,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
         csQuaternion q;
         q.SetWithAxisAngle (csVector3((float)x, (float)y, (float)z), angle * M_PI/180.0);
         vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q),
-                                                         event.getInitiator()->isRemote()));
+                                                         isLocal() || event.getInitiator()->isRemote()));
       }
     }
   }

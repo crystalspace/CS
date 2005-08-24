@@ -290,6 +290,11 @@ void LoadSectorTask::doTask()
 
   LOG("csVosSector", 2, "Starting sector load");
 
+  SimpleProgress* sp = 0;
+  if (meter != 0) sp = new SimpleProgress(meter, vosa3dl);
+
+  if (meter) sp->notifyTaskStart("Sending world download request...", 1);
+
   vRef<RemoteSearch> rs = meta_cast<RemoteSearch>(sector->GetVobject()->getSite());
   if(rs.isValid()) {
 
@@ -326,8 +331,6 @@ void LoadSectorTask::doTask()
 
   LOG("csVosSector", 2, "Starting search");
 
-  SimpleProgress* sp = 0;
-  if (meter != 0) sp = new SimpleProgress(meter, vosa3dl);
 
   rs->search(sector->GetVobject(), "sector", 0,
                        "rule sector\n"

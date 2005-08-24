@@ -81,6 +81,7 @@ public:
   virtual ~csVosA3DL();
 
   virtual csRef<iVosSector> GetSector(const char* s);
+  virtual csRef<iVosObject3D> FindVosObject3D(const char* s);
   virtual bool Initialize (iObjectRegistry *objreg);
   virtual bool HandleEvent (iEvent &ev);
 
