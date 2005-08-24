@@ -19,6 +19,8 @@ chronological order.
 	  working OpenGL fog as standard CS fog.
 	- res removed the dependency of ivaria/ode.h on <ode/ode.h>.
 	- res tweaked the fat loop and vproc_std a bit; runs flarge okay now.
+	- Peter Amstutz added a new method iVosA3dl to allow fetching the
+	  iVosObject3D wrapper for a Vobject given the VOS URL path.
 21-Aug-2005
 	- res moved csLightShaderVarCache to csgfx.
 	- res changed the vertex light calculator to not use iLight* but a
