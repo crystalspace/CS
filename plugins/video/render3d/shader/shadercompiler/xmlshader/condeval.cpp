@@ -22,10 +22,48 @@
 #include "condeval.h"
 #include "tokenhelper.h"
 
-csConditionEvaluator::csConditionEvaluator (iStringSet* strings) : 
-  nextConditionID(0)
+bool csConditionConstants::AddConstant (const char* name, float value)
 {
-  csConditionEvaluator::strings = strings;
+  if (constants.Contains (name)) return false;
+
+  CondOperand op;
+  op.type = operandFloat;
+  op.floatVal = value;
+
+  constants.Put (name, op);
+  return true;
+}
+
+bool csConditionConstants::AddConstant (const char* name, int value)
+{
+  if (constants.Contains (name)) return false;
+
+  CondOperand op;
+  op.type = operandInt;
+  op.floatVal = value;
+
+  constants.Put (name, op);
+  return true;
+}
+
+bool csConditionConstants::AddConstant (const char* name, bool value)
+{
+  if (constants.Contains (name)) return false;
+
+  CondOperand op;
+  op.type = operandBoolean;
+  op.floatVal = value;
+
+  constants.Put (name, op);
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+csConditionEvaluator::csConditionEvaluator (iStringSet* strings, 
+    const csConditionConstants& constants) : nextConditionID(0),
+    strings(strings), constants(constants)
+{
 }
 
 const char* csConditionEvaluator::SetLastError (const char* msg, ...)
@@ -312,6 +350,14 @@ const char* csConditionEvaluator::ResolveOperand (csExpression* expression,
 	return err;
       return 0;
     }
+    else if (TokenEquals (left.tokenStart, left.tokenLen, "consts"))
+    {
+      err = ResolveConst (expression->expressionValue.right,
+	operand);
+      if (err)
+	return err;
+      return 0;
+    }
     else
     {
       return SetLastError ("Unknown identifier '%s'",
@@ -391,6 +437,25 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
   }
   CS_ASSERT (false);
   return 0;
+}
+
+const char* csConditionEvaluator::ResolveConst (csExpression* expression, 
+						CondOperand& operand)
+{
+  if (expression->type == csExpression::Value)
+  {
+    csExpressionToken::Extractor symbol (expression->valueValue);
+    const CondOperand* constOp = 
+      constants.constants.GetElementPointer (symbol.Get());
+    if (!constOp)
+    {
+      return SetLastError ("Unknown symbol '%s'", symbol);
+    }
+    operand = *constOp;
+    return 0;
+  }
+  else
+    return "Expression is not a value";
 }
 
 const char* csConditionEvaluator::ProcessExpression (

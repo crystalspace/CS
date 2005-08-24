@@ -142,10 +142,25 @@ public:
   }
 };
 
+/// Container for shader expression constants
+class csConditionEvaluator;
+
+class csConditionConstants
+{
+  friend class csConditionEvaluator;
+  csHash<CondOperand, csString> constants;
+public:
+  //@{
+  /// Add a constant to the list of constants.
+  bool AddConstant (const char* name, float value);
+  bool AddConstant (const char* name, int value);
+  bool AddConstant (const char* name, bool value);
+  //@}
+};
 
 /**
  * Processes an expression tree and converts it into an internal 
- * representation and allows later evaluation of those expression.
+ * representation and allows later evaluation of this expression.
  */
 class csConditionEvaluator
 {
@@ -176,6 +191,9 @@ class csConditionEvaluator
   csBitArray condChecked;
   csBitArray condResult;
 
+  // Constants
+  const csConditionConstants& constants;
+
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -196,6 +214,8 @@ class csConditionEvaluator
     CondOperand& operand);
   const char* ResolveSVIdentifier (csExpression* expression, 
     CondOperand& operand);
+  const char* ResolveConst (csExpression* expression, 
+    CondOperand& operand);
 
   bool EvaluateOperandB (const CondOperand& operand, 
     const csRenderMeshModes& modes, const csShaderVarStack& stacks);
@@ -209,7 +229,8 @@ class csConditionEvaluator
   bool EvaluateOperandIConst (const CondOperand& operand, int& result);
   bool EvaluateOperandFConst (const CondOperand& operand, float& result);
 public:
-  csConditionEvaluator (iStringSet* strings);
+  csConditionEvaluator (iStringSet* strings, 
+    const csConditionConstants& constants);
 
   /// Convert expression into internal representation.
   const char* ProcessExpression (csExpression* expression, 

@@ -541,6 +541,8 @@ public:
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
   csWrappedDocumentNodeFactory* wrapperFact;
+  /// Condition constants
+  csConditionConstants condConstants;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"

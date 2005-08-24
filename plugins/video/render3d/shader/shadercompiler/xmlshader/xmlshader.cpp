@@ -27,6 +27,8 @@
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
+// For builtin shader consts:
+#include "iengine/light.h"
 
 #include "csutil/cfgacc.h"
 #include "csutil/util.h"
@@ -805,7 +807,8 @@ void csXMLShaderTech::SetFailReason (const char* reason, ...)
 //---------------------------------------------------------------------------
 
 csShaderConditionResolver::csShaderConditionResolver (
-  csXMLShaderCompiler* compiler) : evaluator (compiler->strings)
+  csXMLShaderCompiler* compiler) : 
+  evaluator (compiler->strings, compiler->condConstants)
 {
   rootNode = 0;
   nextVariant = 0;
@@ -1077,6 +1080,12 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
   SCF_CONSTRUCT_IBASE(parent);
   wrapperFact = 0;
   InitTokenTable (xmltokens);
+
+  // Set up builtin constants
+#define BUILTIN_CONSTANT(Type, Value)					    \
+  condConstants.AddConstant (#Value, (Type)Value);
+#include "condconstbuiltin.inc"
+#undef BUILTIN_CONSTANT
 }
 
 csXMLShaderCompiler::~csXMLShaderCompiler()
