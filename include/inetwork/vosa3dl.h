@@ -107,7 +107,7 @@ struct iVosSector : public virtual iBase
 
 
 
-SCF_VERSION (iVosA3DL, 0, 1, 1);
+SCF_VERSION (iVosA3DL, 0, 1, 2);
 
 /** This is the initial component you retrieve from the registry to
     access the VOS A3DL plugin.  Here's how to get it:
@@ -127,12 +127,23 @@ SCF_VERSION (iVosA3DL, 0, 1, 1);
 struct iVosA3DL : public virtual iBase
 {
   /** Get a VOS sector given a VOS URL (such as
-      "vop://interreality.org/world") for a sector object.  Doesn't
+      "vip://interreality.org/world") for a sector object.  Doesn't
       load it (call iVosSector::Load() to do that).
-
-      @bug no way (yet) to tell you if the sector doesn't exist
+      @param url the VOS url to the sector object 
+      @return the iVosSector wrapper
+      @bug no way (yet) to specify specific failure in accessing sector
+      (just returns an empty csRef)
    */
-  virtual csRef<iVosSector> GetSector(const char*) = 0;
+  virtual csRef<iVosSector> GetSector(const char* url) = 0;
+
+  /** Takes a URL path for an A3DL::Object3D Vobject and returns
+      the iVosObject3D interface (suitable for fetching the mesh wrapper).
+      As of this writing, it does not load the object into the engine,
+      it must be loaded by loading the sector it is in.
+      @param url the url path to the object to fetch
+      @return the iVosObject3D wrapper
+   */
+  virtual csRef<iVosObject3D> FindVosObject3D(const char* url) = 0;
 };
 
 #endif
