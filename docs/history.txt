@@ -10,6 +10,7 @@ chronological order.
 	- res further worked on lighting support for the fat rl and vproc_std.
 	- res added the "simplelights.zip" level to test vertex lighting in 
 	  the fat rl.
+	- Philip Wyett eliminated gcc compiler warning in meshmode.cpp.
 23-Aug-2005
 	- Erroroman added "start", "end" and "mode" params to csFog struct.
 	- Erroroman added support in csloader for the new fog params.

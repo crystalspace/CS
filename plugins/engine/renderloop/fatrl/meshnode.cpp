@@ -36,8 +36,8 @@ csMeshRenderNode::csMeshRenderNode (csMeshRenderNodeFactory* factory,
                                     iShader* defShader, 
 				    csShaderVariableContext& shadervars, 
 				    bool zoffset) : 
-  shadervars(shadervars), factory(factory), shaderType(shaderType), 
-  defShader(defShader), zoffset(zoffset)
+  shadervars(shadervars), zoffset(zoffset), factory(factory),
+  shaderType(shaderType), defShader(defShader)
 {
   shadervars.GetVariableAdd (factory->string_object2world);
 }
