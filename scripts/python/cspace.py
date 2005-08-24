@@ -9133,6 +9133,10 @@ CS_CLIPPER_TOPLEVEL = _cspace.CS_CLIPPER_TOPLEVEL
 CS_CLIPPER_REQUIRED = _cspace.CS_CLIPPER_REQUIRED
 CS_CLIP_NOT = _cspace.CS_CLIP_NOT
 CS_CLIP_NEEDED = _cspace.CS_CLIP_NEEDED
+CS_FOG_MODE_NONE = _cspace.CS_FOG_MODE_NONE
+CS_FOG_MODE_LINEAR = _cspace.CS_FOG_MODE_LINEAR
+CS_FOG_MODE_EXP = _cspace.CS_FOG_MODE_EXP
+CS_FOG_MODE_EXP2 = _cspace.CS_FOG_MODE_EXP2
 class csFog(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csFog, name, value)
@@ -9155,6 +9159,15 @@ class csFog(_object):
     __swig_setmethods__["blue"] = _cspace.csFog_blue_set
     __swig_getmethods__["blue"] = _cspace.csFog_blue_get
     if _newclass:blue = property(_cspace.csFog_blue_get, _cspace.csFog_blue_set)
+    __swig_setmethods__["start"] = _cspace.csFog_start_set
+    __swig_getmethods__["start"] = _cspace.csFog_start_get
+    if _newclass:start = property(_cspace.csFog_start_get, _cspace.csFog_start_set)
+    __swig_setmethods__["end"] = _cspace.csFog_end_set
+    __swig_getmethods__["end"] = _cspace.csFog_end_get
+    if _newclass:end = property(_cspace.csFog_end_get, _cspace.csFog_end_set)
+    __swig_setmethods__["mode"] = _cspace.csFog_mode_set
+    __swig_getmethods__["mode"] = _cspace.csFog_mode_get
+    if _newclass:mode = property(_cspace.csFog_mode_get, _cspace.csFog_mode_set)
     def __init__(self, *args):
         _swig_setattr(self, csFog, 'this', _cspace.new_csFog(*args))
         _swig_setattr(self, csFog, 'thisown', 1)
