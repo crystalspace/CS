@@ -10157,6 +10157,12 @@ package cspace::csFog;
 *swig_green_set = *cspacec::csFog_green_set;
 *swig_blue_get = *cspacec::csFog_blue_get;
 *swig_blue_set = *cspacec::csFog_blue_set;
+*swig_start_get = *cspacec::csFog_start_get;
+*swig_start_set = *cspacec::csFog_start_set;
+*swig_end_get = *cspacec::csFog_end_get;
+*swig_end_set = *cspacec::csFog_end_set;
+*swig_mode_get = *cspacec::csFog_mode_get;
+*swig_mode_set = *cspacec::csFog_mode_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csFog(@_);
@@ -13672,6 +13678,10 @@ sub CS_CLIPPER_TOPLEVEL () { $cspacec::CS_CLIPPER_TOPLEVEL }
 sub CS_CLIPPER_REQUIRED () { $cspacec::CS_CLIPPER_REQUIRED }
 sub CS_CLIP_NOT () { $cspacec::CS_CLIP_NOT }
 sub CS_CLIP_NEEDED () { $cspacec::CS_CLIP_NEEDED }
+sub CS_FOG_MODE_NONE () { $cspacec::CS_FOG_MODE_NONE }
+sub CS_FOG_MODE_LINEAR () { $cspacec::CS_FOG_MODE_LINEAR }
+sub CS_FOG_MODE_EXP () { $cspacec::CS_FOG_MODE_EXP }
+sub CS_FOG_MODE_EXP2 () { $cspacec::CS_FOG_MODE_EXP2 }
 sub CS_ZBUF_NONE () { $cspacec::CS_ZBUF_NONE }
 sub CS_ZBUF_FILL () { $cspacec::CS_ZBUF_FILL }
 sub CS_ZBUF_TEST () { $cspacec::CS_ZBUF_TEST }
