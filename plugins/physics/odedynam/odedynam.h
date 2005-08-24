@@ -33,7 +33,16 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
 
+// Avoid conflicts as ODE defines the same types.
+#define int8 ode_int8
+#define uint8 ode_uint8
+#define int32 ode_int32
+#define uint32 ode_uint32
 #include <ode/ode.h>
+#undef uint32
+#undef int32
+#undef uint8
+#undef int8
 
 struct iMeshWrapper;
 struct iODEFrameUpdateCallback;

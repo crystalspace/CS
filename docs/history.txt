@@ -18,6 +18,9 @@ chronological order.
 	- res augmented the XML shader conditionals with support for symbolic
 	  constants to facilitate passing enums etc. from code to shaders
 	  (e.g. "<?if vars.someVariable.int == consts.CS_ATTN_NONE?>").
+	- res added an int8 etc redefinition (equivalent to the redefinition
+	  formerly done in ivaria/ode.h) to odedynam since this is needed on
+	  some platforms.
 23-Aug-2005
 	- Erroroman added "start", "end" and "mode" params to csFog struct.
 	- Erroroman added support in csloader for the new fog params.
