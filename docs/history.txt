@@ -11,6 +11,10 @@ chronological order.
 	- res added the "simplelights.zip" level to test vertex lighting in 
 	  the fat rl.
 	- Philip Wyett eliminated gcc compiler warning in meshmode.cpp.
+	- Eric Sunshine fixed the Linux joystick driver so that it only polls
+	  the joystick device on cscmdPreProcess, rather than on
+	  cscmdPreProcess, cscmdProcess, cscmdPostProcess, and
+	  cscmdFinalProcess, since that was unnecessarily expensive.
 23-Aug-2005
 	- Erroroman added "start", "end" and "mode" params to csFog struct.
 	- Erroroman added support in csloader for the new fog params.

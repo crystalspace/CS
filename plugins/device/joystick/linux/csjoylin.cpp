@@ -23,6 +23,7 @@
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
+#include "csutil/event.h"
 #include "csutil/array.h"
 #include "iutil/csinput.h" /* for JS max/mins */
 
@@ -82,8 +83,12 @@ bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)
 }
 
 #define CS_MAX_LINUX_JOYSTICK_AXES CS_MAX_JOYSTICK_AXES
-bool csLinuxJoystick::HandleEvent (iEvent &)
+bool csLinuxJoystick::HandleEvent (iEvent& ev)
 {
+  if (ev.Type != csevBroadcast ||
+      csCommandEventHelper::GetCode(&ev) != cscmdPreProcess)
+    return false;
+
   struct js_event js;
 
   for (int i = 0; i < nJoy; i++)
@@ -213,7 +218,7 @@ bool csLinuxJoystick::Init ()
     csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (eq != 0)
     {
-      eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+      eq->RegisterListener (&scfiEventHandler, CSMASK_FrameProcess);
       EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
       bHooked = true;
     }
