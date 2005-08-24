@@ -56,16 +56,18 @@ T csClamp (const T& a, T max, T min)
 }
 
 /**
- * Preforms a smooth interpolation of a on range min to max
+ * Preforms a smooth interpolation of a on range min to max.
+ * \return Smooth interporlated value if \a min \< \a a \< \a max, 
+ *  and 0 resp. 1 if \a a is smaller than \a min resp. larger than \a max.
  */
 template<class T>
 T csSmoothStep (const T& a, T max, T min)
 {
   T tmp, tmp2;
   if (a <= min)
-    tmp = min;
+    tmp = 0.0f;
   else if (a >= max)
-    tmp = max;
+    tmp = 1.0f;
   else
   {
     tmp2 = (a - min) / (max-min);

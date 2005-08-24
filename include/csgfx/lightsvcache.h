@@ -53,6 +53,10 @@ public:
     lightAttenuationTex,
     /// Direction (object space)
     lightDirection,
+    /// Direction (camera space)
+    lightDirectionCamera,
+    /// Direction (world space)
+    lightDirectionWorld,
     /// Spot inner falloff
     lightInnerFalloff,
     /// Spot outer falloff

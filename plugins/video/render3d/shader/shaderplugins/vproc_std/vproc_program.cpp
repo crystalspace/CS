@@ -90,10 +90,6 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 
     if (lightsActive > 0)
     {
-      csReversibleTransform object2world;
-      csGetShaderVariableFromStack (stacks, 
-	shaderPlugin->string_object2world)->GetValue (object2world);
-
       if (lightMixMode == LIGHTMIXMODE_NONE)
       {
 	//only calculate last, other have no effect
@@ -101,11 +97,11 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  shaderPlugin->lsvCache, stacks);
 	iVertexLightCalculator *calc = 
 	  shaderPlugin->GetLightCalculator (light, useAttenuation);
-	calc->CalculateLighting (light, object2world, elementCount,
+	calc->CalculateLighting (light, elementCount,
 	  csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-	    elementCount, vbuf->GetStride ()),
+	    elementCount, vbuf->GetElementDistance ()),
 	  csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-	    elementCount, nbuf->GetStride ()), 
+	    elementCount, nbuf->GetElementDistance ()), 
 	  tmpColor);
       }
       else
@@ -121,21 +117,21 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  {
 	  case LIGHTMIXMODE_ADD:
 	    {
-	      calc->CalculateLightingAdd (light, object2world, elementCount,
+	      calc->CalculateLightingAdd (light, elementCount,
 		csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ), 
-		  elementCount, vbuf->GetStride ()),
+		  elementCount, vbuf->GetElementDistance ()),
 		csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-		  elementCount, nbuf->GetStride ()), 
+		  elementCount, nbuf->GetElementDistance ()), 
 		tmpColor);
 	      break;
 	    }
 	  case LIGHTMIXMODE_MUL:
 	    {
-	      calc->CalculateLightingMul (light, object2world, elementCount,
+	      calc->CalculateLightingMul (light, elementCount,
 		csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-		  elementCount, vbuf->GetStride ()),
+		  elementCount, vbuf->GetElementDistance ()),
 		csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-		  elementCount, nbuf->GetStride ()), 
+		  elementCount, nbuf->GetElementDistance ()), 
 		tmpColor);
 	      break;
 	    }
@@ -175,6 +171,8 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     vbuf->Release ();
     nbuf->Release ();
     clbuf->Release ();
+    modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+      modes.buffers->GetAccessorMask() & ~CS_BUFFER_COLOR_MASK);
     modes.buffers->SetRenderBuffer (CS_BUFFER_COLOR, clbuf);
   }
 }

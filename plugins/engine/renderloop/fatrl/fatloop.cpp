@@ -540,6 +540,10 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
 				 const csReversibleTransform &objT, 
 				 uint framenr)
 {
+  // Light TF, this == object, other == world
+  const csReversibleTransform& lightT = 
+    light->GetMovable ()->GetFullTransform ();
+
   csRef<csShaderVariable> sv;
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 
@@ -547,16 +551,58 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
   const csColor& color = light->GetColor ();
   sv->SetValue (csVector3 (color.red, color.green, color.blue));
 
-  const csVector3 lightPos = light->GetCenter ();
+
+  const csVector3& lightPosW = lightT.GetOrigin();
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 
       csLightShaderVarCache::lightPositionCamera));
-  sv->SetValue (lightPos * camTransR);
+  sv->SetValue (lightPosW * camTransR);
 
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 
       csLightShaderVarCache::lightPosition));
-  sv->SetValue (objT.This2Other (lightPos));
+  sv->SetValue (objT.Other2This (lightPosW));
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightPositionWorld));
+  sv->SetValue (lightPosW);
+
+
+  const csVector3 lightDirW = 
+    lightT.This2OtherRelative (light->GetDirection ());
+  if (!lightDirW.IsZero())
+  {
+    sv = GetFrameUniqueSV (framenr, shadervars, 
+      lsvCache.GetLightSVId (lightId, 
+	csLightShaderVarCache::lightDirectionWorld));
+    sv->SetValue (lightDirW.Unit());
+
+    sv = GetFrameUniqueSV (framenr, shadervars, 
+      lsvCache.GetLightSVId (lightId, 
+	csLightShaderVarCache::lightDirection));
+    sv->SetValue (objT.Other2ThisRelative (lightDirW).Unit());
+
+    sv = GetFrameUniqueSV (framenr, shadervars, 
+      lsvCache.GetLightSVId (lightId, 
+	csLightShaderVarCache::lightDirectionCamera));
+    sv->SetValue (camTransR.Other2ThisRelative (lightDirW).Unit());
+  }
+
+
+  float falloffInner, falloffOuter;
+  light->GetSpotLightFalloff (falloffInner, falloffOuter);
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightInnerFalloff));
+  sv->SetValue (falloffInner);
+
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightOuterFalloff));
+  sv->SetValue (falloffOuter);
+
 
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 

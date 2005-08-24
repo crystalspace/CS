@@ -262,16 +262,17 @@ enum csRenderBufferNameMask
 };
 
 
-SCF_VERSION (iRenderBufferAccessor,0,0,1);
 /**
  * Interface for renderbuffer accessor.
  * The renderbuffer accesor is similar to the shadervariable accessor system,
  * and is used to delay calculation of the content of renderbuffers.
  */
-struct iRenderBufferAccessor : public iBase
+struct iRenderBufferAccessor : public virtual iBase
 {
+  SCF_INTERFACE (iRenderBufferAccessor,0,0,1);
   /// Called before associated renderbuffer is fetched from the holder.
-  virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer) = 0;
+  virtual void PreGetBuffer (csRenderBufferHolder* holder, 
+    csRenderBufferName buffer) = 0;
 };
 
 /**

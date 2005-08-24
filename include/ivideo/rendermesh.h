@@ -135,7 +135,10 @@ struct csCoreRenderMesh
   /// Material used for this mesh
   iMaterialWrapper* material;
 
-  /// Transform object space -> world space
+  /** 
+   * Transform object space -> world space.
+   * \remarks 'this' space is object space, 'other' space is world space
+   */
   csReversibleTransform object2world;
 };
 
@@ -154,9 +157,9 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
   ~csRenderMesh () {}
 
   /**
-   * Some unique ID for the geometry used to render this mesh
+   * Some unique ID for the geometry used to render this mesh.
    * Used for sorting purposes, and is allowed to be 0, although
-   * that means non-optimal mesh sorting at rendering
+   * that means non-optimal mesh sorting at rendering.
    */
   void *geometryInstance;
 

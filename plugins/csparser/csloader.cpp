@@ -4288,11 +4288,11 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
           const char* t = child->GetContentsValue ();
           if (t)
           {
-            if (!strcasecmp (t, "point"))
+            if (!strcasecmp (t, "point") || !strcasecmp (t, "pointlight"))
               type = CS_LIGHT_POINTLIGHT;
             else if (!strcasecmp (t, "directional"))
               type = CS_LIGHT_DIRECTIONAL;
-            else if (!strcasecmp (t, "spotlight"))
+            else if (!strcasecmp (t, "spot") || !strcasecmp (t, "spotlight"))
               type = CS_LIGHT_SPOTLIGHT;
             else
             {

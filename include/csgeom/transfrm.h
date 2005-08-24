@@ -107,14 +107,15 @@ public:
   inline const csMatrix3& GetO2T () const { return m_o2t; }
 
   /**
-   * Get 'world' to 'this' translation. This is the vector V
+   * Get 'other' to 'this' translation. This is the vector V
    * from the transform equation T=M*(O-V). This is equivalent
    * to calling GetOrigin().
    */
   inline const csVector3& GetO2TTranslation () const { return v_o2t; }
 
   /**
-   * Get origin of transformed coordinate system. This is equivalent
+   * Get origin of transformed coordinate system. In other words, the vector
+   * that gets 0,0,0 after transforming with Other2This(). This is equivalent
    * to calling GetO2TTranslation().
    */
   inline const csVector3& GetOrigin () const { return v_o2t; }
@@ -305,6 +306,10 @@ public:
  * This version is similar to csTransform (in fact, it is a sub-class)
  * but it is more efficient if you plan to do inverse transformations
  * often.
+ * \remarks Despite that the superclass csTransform transforms from 'other'
+ *   to 'this' space, commonly csReversibleTransform instances are named like
+ *   'this2other' - e.g. 'object2world' where 'this' space is object space and
+ *   'other' space is world space.
  */
 class CS_CRYSTALSPACE_EXPORT csReversibleTransform : public csTransform
 {

@@ -27,24 +27,33 @@ template<class T>
 class csVertexListWalker
 {
 public:
-  csVertexListWalker (void *listPointer, size_t elements, size_t stride = sizeof(T))
-    : list ((uint8*)listPointer), elements (elements), stride (stride), currElement (0)
+  /**
+   * Construct new walker.
+   * \param listPointer Pointer to buffer data.
+   * \param elements Number of elements in the buffer.
+   * \param dist Distance, in bytes, between two elements in the buffer.
+   */
+  csVertexListWalker (void *listPointer, size_t elements, size_t dist = sizeof(T))
+    : list ((uint8*)listPointer), elements (elements), dist (dist), currElement (0)
   {
-    if (stride == 0)
-      this->stride = sizeof(T);
+    if (dist == 0)
+      this->dist = sizeof(T);
   }
 
+  /// Get current element.
   T& operator*()
   {
-    return *((T*)(list+currElement*stride));
+    return *((T*)(list+currElement*dist));
   }
 
+  /// Get a specific element.
   T& operator[] (size_t n)
   {
     CS_ASSERT (n<elements);
-    return *((T*)(list+n*stride));
+    return *((T*)(list+n*dist));
   }
 
+  /// Set current element to the next.
   void operator++ ()
   {
     currElement++;
@@ -52,8 +61,13 @@ public:
   }
 
 private:
+  /// Buffer data
   uint8 *list;
-  size_t elements, stride;
+  /// Number of elements
+  size_t elements;
+  /// Distance between two elements
+  size_t dist;
+  /// Index of current element
   size_t currElement;
 };
 
