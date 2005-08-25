@@ -30,6 +30,7 @@
  * use the csMemoryMappedIO class.
  */
 
+#if 1
 #ifdef CS_HAVE_MEMORY_MAPPED_IO
 /**
  * Map a file to a memory area. 
@@ -56,6 +57,35 @@ extern CS_CRYSTALSPACE_EXPORT bool csMemoryMapWindow(csMemMapInfo*, char const* 
  * from the already mapped file.
  */
 extern CS_CRYSTALSPACE_EXPORT bool csMemoryMapWindow(csMemMapInfo*, csMemMapInfo * original, unsigned int offset, unsigned int len, bool writable);
+#endif
+
+#else
+
+/**
+ * A memory mapping for a file.
+ */
+class csPlatformMemoryMapping : csMemMapInfo
+{
+public:
+  /// Create a new mapping.
+  csPlatformMemoryMapping (const char* filename);
+  /// Destroy file mapping.
+  ~csPlatformMemoryMapping ();
+  
+  /// Return page granularity for this platform.
+  size_t GetPageGranularity();
+  /**
+   * Map a part of the file into memory and return a pointer to mapped data.
+   * \a offset and \a len are the offset and length of the part of the file to
+   * map. Both should be multiples of the granularity returned by 
+   * GetPageGranularity(); otherwise, the function may fail. Returns 0 in case
+   * of failure.
+   */
+  void* MapWindow (size_t offset = 0, size_t len = (size_t)~0);
+  /// Unmap a mapping of the file.
+  void UnmapWindow (void* data);
+};
+
 #endif
 
 #endif // __CS_CSSYS_CSMMAP_H__

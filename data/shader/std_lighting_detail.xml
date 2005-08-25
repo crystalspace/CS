@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader compiler="xmlshader" name="std_lighting_detail">
   <technique priority="200">
-    <tag>detail texture</tag>
+    <tag>detail_texture</tag>
     <pass>
       <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
       <buffer source="texture coordinate 0" destination="texture coordinate 2" />
@@ -45,7 +45,7 @@
     <?include snippets/fog-pass.inc ?>
   </technique>
   <technique priority="150">
-    <tag>detail texture</tag>
+    <tag>detail_texture</tag>
     <tag>multipass detail texture</tag>
     <pass>
       <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
@@ -98,7 +98,7 @@
     <?include snippets/fog-pass.inc ?>
   </technique>
   <technique priority="100">
-    <tag>detail texture</tag>
+    <tag>detail_texture</tag>
     <tag>multipass detail texture</tag>
     <pass>
       <texture name="tex diffuse" destination="unit 0" />

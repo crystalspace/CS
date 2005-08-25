@@ -24,6 +24,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "csutil/unix/mmap_posix.h"
+
 static bool map_window(csMemMapInfo* info, int fd, unsigned int offset,
   unsigned int len, bool writable) 
 {
@@ -86,3 +88,38 @@ void csUnMemoryMapFile(csMemMapInfo* info)
   info->hMappedFile = -1;
   info->close = false;
 }
+
+csPlatformMemoryMapping::csPlatformMemoryMapping ()
+{
+  hMappedFile = -1;
+  granularity = getpagesize();
+}
+
+csPlatformMemoryMapping::~csPlatformMemoryMapping ()
+{
+  if (hMappedFile != -1)
+    close (hMappedFile);
+}
+
+bool csPlatformMemoryMapping::OpenNative (const char* filename)
+{
+  hMappedFile = open(filename, O_RDONLY);
+  return Ok();
+}
+
+void csPlatformMemoryMapping::MapWindow (PlatformMemoryMapping& mapping, 
+                                         size_t offset, size_t len)
+{
+  if (hMappedFile == -1) return;
+  
+  mapping.realPtr = mmap(0, len, PROT_READ, MAP_PRIVATE, hMappedFile, offset);
+  if (mapping.realPtr == (void*)-1) mapping.realPtr = 0;
+  mapping.realSize = len;
+}
+
+void csPlatformMemoryMapping::UnmapWindow (PlatformMemoryMapping& mapping)
+{
+  if (mapping.realPtr != 0)
+    munmap (mapping.realPtr, mapping.realSize);
+}
+

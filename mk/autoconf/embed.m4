@@ -47,19 +47,22 @@ AC_PREREQ([2.56])
 #	EMBED_META-related variables. For building plugin modules, utilize
 #	EMBED_META.CFLAGS when compiling, and EMBED_META.LFLAGS when linking.
 #
-#	On Unix, embedding is accomplished via libbfd, which carries a GPL
-#	license. Projects which carry licenses not compatible with GPL should
-#	consider carefully before enabling embedding on Unix. If your project
-#	is GPL-compatible, then set GPL-OKAY to "yes". This will enable
-#	embedding on Unix by default. If not, then set it to "no" in order to
-#	disable embedding on Unix by default. (The user can still override the
-#	setting via the --enable-meta-info-embedding option.)
+#	On Unix, when CS' own ELF metadata reader can't be used (because the
+#       necessary header file elf.h was not found) embedding is accomplished 
+#       via libbfd, which carries a GPL license. Projects which carry licenses 
+#       not compatible with GPL should consider carefully before enabling 
+#       embedding on Unix. If your project is GPL-compatible, then set 
+#       GPL-OKAY to "yes". This will enable embedding on Unix by default. If 
+#       not, then set it to "no" in order to disable embedding on Unix by 
+#       default. (The user can still override the setting via the 
+#       --enable-meta-info-embedding option.)
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_META_INFO_EMBED],
     [_CS_META_INFO_EMBED_ENABLE([$1], [$2])
     AS_IF([test $enable_meta_info_embedding = yes],
         [_CS_META_INFO_EMBED_TOOLS([$1])
-        _CS_META_INFO_EMBED_BFD([$1])],
+        AS_IF([test $ac_cv_header_elf_h = no],
+            [_CS_META_INFO_EMBED_BFD([$1])])],
 	[cs_embed_meta_info=no])])
 
 
@@ -72,15 +75,22 @@ AC_DEFUN([CS_META_INFO_EMBED],
 #
 # IMPLEMENTATION NOTES
 #
-#	On Unix, embedding is disabled by default unless overridden via
-#	GPL-OKAY because libbfd carries a GPL license which may be incompatible
-#	with a project's own license (such as LGPL).
+#	On Unix, embedding is enabled by default if elf.h is found and disabled 
+#       by default unless overridden via GPL-OKAY because libbfd carries a GPL 
+#       license which may be incompatible with a project's own license (such 
+#       as LGPL).
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_META_INFO_EMBED_ENABLE],
     [AC_REQUIRE([CS_CHECK_HOST])
+    AC_CHECK_HEADERS([elf.h], 
+        [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])
+        CS_EMIT_BUILD_RESULT([ac_cv_header_elf_h], [ELF_H], 
+            CS_EMITTER_OPTIONAL([$1]))])
     AC_MSG_CHECKING([whether to embed plugin meta-information])
     case $cs_host_target in
-	unix) cs_embed_meta_info_default=m4_default([$2],[no]) ;;
+	unix) AS_IF([test $ac_cv_header_elf_h = yes],
+              [cs_embed_meta_info_default=yes],
+              [cs_embed_meta_info_default=$2]) ;;
 	*) cs_embed_meta_info_default=yes ;;
     esac
     AC_ARG_ENABLE([meta-info-embedding],
@@ -88,11 +98,11 @@ AC_DEFUN([_CS_META_INFO_EMBED_ENABLE],
 	    [store plugin meta-information directly inside plugin modules if
 	    supported by platform; if disabled, meta-information is stored in
 	    stand-alone .csplugin files; this is enabled by default for
-	    non-Unix platforms, and disabled by default for non-GPL projects
-	    on Unix platforms since the Unix implementation requires the
-	    GPL-licensed libbfd library; enable this option on Unix only if
-	    you are certain you want a GPL-licensed library infecting your
-	    project])],
+	    non-Unix platforms and Unix platforms that have LGPL, and disabled 
+            by default for non-GPL projects on other Unix platforms since the 
+            non-ELF Unix implementation requires the GPL-licensed libbfd 
+            library; enable this option on Unix only if you are certain you 
+            want a GPL-licensed library infecting your  project])],
 	[], [enable_meta_info_embedding=$cs_embed_meta_info_default])
     AC_MSG_RESULT([$enable_meta_info_embedding])
     CS_EMIT_BUILD_PROPERTY([EMBED_META], [$enable_meta_info_embedding],
@@ -194,4 +204,7 @@ AC_DEFUN([_CS_META_INFO_EMBED_BFD],
 		CS_EMITTER_OPTIONAL([$1]))
 	    CS_EMIT_BUILD_PROPERTY([EMBED_META.LFLAGS],
 		[$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs],[+], [],
-		CS_EMITTER_OPTIONAL([$1]))])])
+		CS_EMITTER_OPTIONAL([$1]))
+            CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
+
+

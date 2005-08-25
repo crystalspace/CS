@@ -25,13 +25,15 @@
 
 #include "csextern.h"
 #include "bitarray.h"
+#include "ref.h"
+#include "refcount.h"
 
 struct iVFS;
 
 /** \internal
  * Default cache block size
  */
-const unsigned csmmioDefaultCacheBlockSize = 256;
+const unsigned csmmioDefaultCacheBlockSize = 4096;
 
 /** \internal
  * Default cache size (in cache blocks)
@@ -43,142 +45,54 @@ const unsigned csmmioDefaultCacheSize = 256;//2048;
  */
 const unsigned csmmioDefaultHashSize = 211;//1559;
 
+#if defined(CS_PLATFORM_WIN32)
+  #include "win32/mmap.h"
+#elif defined(CS_HAVE_POSIX_MMAP)
+  #include "unix/mmap_posix.h"
+#else
+  /* @@@ FIXME: dummy mmap */
+#endif
+
+class csMemoryMapping : public csRefCount
+{
+public:
+  virtual size_t GetLength() = 0;
+  virtual void* GetData() = 0;
+};
 
 /**
-  Defines a simple memory-mapped IO class that is portable.  Requires that
-  data is organized in fixed block sizes.
-  <p>
-  Design notes:
-  <p>
-   1. Although the offset and page in the cache block can both be 
-   calculated from either value, I chose to precalculate and store
-   BOTH items.  The reason for this is that it avoids one 
-   multiplication on each access, and one division when paging data
-   in to cache.  For the default values data storage per cache is
-   8192 bytes with 20 bytes additional overhead.  This means that
-   0.2% of the data is overhead.  That's worth it to avoid a heavy
-   op like multiplication
-  <p>
-   2. Usage of the singly-linked list for storage was chosen over a
-   static array of cache blocks because there's no simple way to
-   provide a direct index into the cache list from the index or page.
-   Since we can probably guarantee that all blocks are NOT going to
-   be in memory at once, we cannot index into the array based on a
-   page index, etc.  A sorted list would probably provide the fastest
-   lookup times, but would it be worth the overhead?  A hash table
-   provides a number of short lists, which in this case are unsorted.
-   Using QuickSort, lookup on a sorted table of 2048 entries would take
-   about log2(2048) operations. With the default hash table size, each 
-   list is about 1.5 entries long if spread uniformly.  This means that
-   most lookups on a cache of this size should take between two and 
-   four operations per (counting the modulus.)  While the hash table 
-   does consume about 4k more memory, I think the slight memory usage 
-   is worth it, considering the massive speedup.
+  Defines a simple memory-mapped IO class that is portable.
  */  
-class CS_CRYSTALSPACE_EXPORT csMemoryMappedIO
+class CS_CRYSTALSPACE_EXPORT csMemoryMappedIO : public csPlatformMemoryMapping,
+                                                public csRefCount
 {
 private:
-  /// Minimum size of a single block 
-  unsigned int block_size;
-  
   /// Set to true if this object is valid
   bool valid_mmio_object;
 
-  /// Size of a cache block in block_size blocks (software emulation)
-  unsigned cache_block_size;
-
-  /**
-   * Size of in-memory cache in cache_block_size blocks, region is
-   * noncontiguous (software emulation)
-   */
-  unsigned int cache_max_size;
-
-  /// Number of cache blocks in cache
-  unsigned int cache_block_count;
-  
-  /**
-   * Array of bits where one bit = cache_block_size * block_size bytes.
-   * A set bit indicates we have the page in memory.
-   */
-  csBitArray *page_map;
-
-#ifdef CS_DEBUG
-
-public:
-  /// Cache hits
-  unsigned int hits;
-
-  /// Cache misses
-  unsigned int misses;
-
-private:
-#endif
-
-  /// Holds a contiguous array of cache blocks
-  struct CacheBlock
-  {    
-    /// The age, used to decide when to release a cache block
-    unsigned age;
-
-    /// The starting offset for this page
-    unsigned offset;
-
-    /// The page number of this block
-    unsigned page;
-    
-    /// The next item in our block list.
-    CacheBlock *next;
-
-    /// The data
-    unsigned char *data;
-  };
-
-  /// Hash table for active blocks
-  CacheBlock *cache[csmmioDefaultHashSize];
-
-  // Software specific csMemMapInfo struct, should only be defined for
-  // platforms w/o hardware mmio.
-  struct emulatedMmioInfo 
-  {          
-    /// Handle to the mapped file 
-    FILE *hMappedFile;
-
-    /// Base pointer to the data
-    unsigned char *data;
-
-    /// File size
-    unsigned int file_size;
-  } emulatedPlatform;
-  
-#ifdef CS_HAVE_MEMORY_MAPPED_IO
-  /// Holds information specific to the platform for hardware paging.
-  csMemMapInfo platform;
+  /// Handle to the mapped file 
+  FILE *hMappedFile;
   
   /// true if \c platform contains valid data.
   bool valid_platform;
-#endif
 public:
   /** 
    * Block size is the size of blocks that you want to get from the file,
-   * filename is the name of the file to map. Indexes will be resolved to
-   * absolute_index=index*block_size. If you supply a VFS,
+   * filename is the name of the file to map. If you supply a VFS,
    * \c filename is tried to be resolved to a native path. Otherwise,
    * \c filename is used as is, hence it must already be a native path.
    */
-  csMemoryMappedIO(unsigned _block_size, char const *filename, iVFS* vfs = 0);
+  csMemoryMappedIO(char const *filename, iVFS* vfs = 0);
 
   /** 
    * Destroys the mmapio object, closes open files, and releases memory.
    */
-  ~csMemoryMappedIO();
+  virtual ~csMemoryMappedIO();
 
-  /** 
-   * This pointer will only be valid for a little while.  Read, at least until
-   * the next call to GetPointer.
-   * NEVER EVER EVER SAVE THIS POINTER.  You must recall this pointer when
-   * you want access to the data again.
+  /**
+   * Obtain a piece of the mapped file.
    */
-  void *GetPointer(unsigned int index);
+  csRef<csMemoryMapping> GetData (size_t offset, size_t length);
   
   /**
    * Returns true the memory was mapped successfully.
@@ -186,14 +100,22 @@ public:
   bool IsValid();
 
 private:
-  /// Reads a cache-page in from the disk.
-  void CachePage(unsigned int page);
 
-  /// Maps file into memory
-  bool SoftMemoryMapFile(emulatedMmioInfo *platform, char const *filename);
-
-  /// Unmaps file from memory
-  void SoftUnMemoryMapFile(emulatedMmioInfo *platform);
+  struct PlatformMapping : public PlatformMemoryMapping,
+                           public csMemoryMapping
+  {
+    csRef<csMemoryMappedIO> parent;
+    size_t length;
+    uint8* data;
+    
+    PlatformMapping (csMemoryMappedIO* parent) : parent(parent) {}
+    virtual ~PlatformMapping() { parent->FreeMapping (this); }
+    virtual size_t GetLength() { return length; }
+    virtual void* GetData() { return data; }
+  };
+  friend class PlatformMapping;
+  
+  void FreeMapping (PlatformMapping* mapping);
 };
 
 #endif // __CS_MEMORY_MAPPED_IO__
