@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csmmap.h"
 #include "csutil/mmapio.h"
 #include "csutil/ref.h"
 
@@ -69,7 +68,7 @@ csRef<csMemoryMapping> csMemoryMappedIO::GetData (size_t offset, size_t length)
     if (!valid_platform)
     {
       p = new uint8[length];
-      fseek (hMappedFile, offset, SEEK_SET);
+      fseek (hMappedFile, (long)offset, SEEK_SET);
       fread (p, 1, length, hMappedFile);
     }
     else

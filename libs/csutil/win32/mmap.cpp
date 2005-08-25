@@ -17,120 +17,56 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csmmap.h"
 
-static bool map_window (csMemMapInfo* info, unsigned int offset, 
-  unsigned int len, bool writable) 
+#include "csutil/win32/mmap.h"
+
+csPlatformMemoryMapping::csPlatformMemoryMapping () :
+  hMappedFile (INVALID_HANDLE_VALUE), hFileMapping (0)
 {
-  unsigned char* p =
-    (unsigned char*)MapViewOfFile (info->hFileMapping, 
-    writable ? FILE_MAP_ALL_ACCESS : FILE_MAP_READ, 0, offset, len);
+  SYSTEM_INFO si;
+  GetSystemInfo (&si);
+  granularity = si.dwPageSize;
+}
 
-  if (p != 0) 
-  {
-    info->data = p;
-    info->file_size = len;
+csPlatformMemoryMapping::~csPlatformMemoryMapping ()
+{
+  if (hFileMapping != 0)
+    CloseHandle (hFileMapping);
 
-    return true;
-  }
+  if (hMappedFile != INVALID_HANDLE_VALUE)
+    CloseHandle (hMappedFile);
+}
   
-  return false;
-}
-
-bool csMemoryMapWindow(csMemMapInfo* info, csMemMapInfo* original, unsigned int offset, 
-  unsigned int len, bool writable) 
+bool csPlatformMemoryMapping::OpenNative (const char* filename)
 {
-  memcpy (info, original, sizeof (csMemMapInfo));
-  if (map_window (info, offset, len, writable)) 
-  {
-    info->close = false;
-
-    return true;
-  }
-
-  return false;
-}
-
-bool csMemoryMapWindow(csMemMapInfo* info, char const * filename, 
-  unsigned int offset, unsigned int len, bool writable) 
-{
-  bool ok = false;
-  memset (info, 0, sizeof (csMemMapInfo));
-  HANDLE file, mapping = INVALID_HANDLE_VALUE;
-  file = CreateFile (
-    filename, GENERIC_READ | (writable ? GENERIC_WRITE : 0), 
-    FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-  if (file != INVALID_HANDLE_VALUE)
-  {
-    unsigned int const sz = GetFileSize (file, 0);
-    if (sz != 0xFFFFFFFF)
-    {
-      mapping = CreateFileMapping (file, 0, 
-        writable ? PAGE_READWRITE : PAGE_READONLY, 0, 0, 0);
-      if (mapping != 0)
-      {
-	info->hMappedFile = file;
-	info->hFileMapping = mapping;
-	info->close = true;
-        ok = map_window (info, 0, sz, writable);
-      }
-    }
-  }
-  if (!ok)
-  {
-    if (mapping != 0)
-      CloseHandle (mapping);
-    if (file != INVALID_HANDLE_VALUE)
-      CloseHandle (file);
-  }
-  return ok;
-}
-
-// Fills in the csMemMapInfo struct by mapping in filename.
-// Returns true on success, false otherwise.
-bool csMemoryMapFile (csMemMapInfo* info, char const* filename)
-{  
-  bool ok = false;
-  memset (info, 0, sizeof (csMemMapInfo));
-  HANDLE file, mapping = INVALID_HANDLE_VALUE;
-  file = CreateFile (
+  hMappedFile = CreateFile (
     filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-  if (file != INVALID_HANDLE_VALUE)
+  if (hMappedFile != INVALID_HANDLE_VALUE)
   {
-    unsigned int const sz = GetFileSize(file, 0);
-    if (sz != 0xFFFFFFFF)
-    {
-      mapping = CreateFileMapping (file, 0, PAGE_READONLY, 0, 0, 0);
-      if (mapping != 0)
-      {
-	info->hMappedFile = file;
-	info->hFileMapping = mapping;
-	info->close = true;
-        ok = map_window (info, 0, sz, false);
-      }
-    }
+    hFileMapping = CreateFileMapping (hMappedFile, 0, 
+      PAGE_READONLY, 0, 0, 0);
+    if (hFileMapping == 0) CloseHandle (hMappedFile);
   }
-  if (!ok)
-  {
-    if (mapping != 0)
-      CloseHandle (mapping);
-    if (file != INVALID_HANDLE_VALUE)
-      CloseHandle (file);
-  }
-  return ok;
+  return Ok();
 }
 
-void csUnMemoryMapFile(csMemMapInfo* info)
-{
-  if (info->data != 0)
-    UnmapViewOfFile(info->data);
-
-  if (info->close)
-  {
-    if (info->hFileMapping != INVALID_HANDLE_VALUE)
-      CloseHandle (info->hFileMapping);
+bool csPlatformMemoryMapping::Ok() 
+{ 
+  return hFileMapping != 0; 
+}
   
-    if (info->hMappedFile != INVALID_HANDLE_VALUE)
-      CloseHandle (info->hMappedFile);
-  }
+void csPlatformMemoryMapping::MapWindow (PlatformMemoryMapping& mapping, 
+					 size_t offset, size_t len)
+{
+  LARGE_INTEGER offs;
+  offs.QuadPart = offset;
+  void* p = MapViewOfFile (hFileMapping, FILE_MAP_READ, offs.HighPart, 
+    offs.LowPart, len);
+  mapping.realPtr = p;
+}
+
+void csPlatformMemoryMapping::UnmapWindow (PlatformMemoryMapping& mapping)
+{
+  if (mapping.realPtr != 0)
+    UnmapViewOfFile (mapping.realPtr);
 }

@@ -287,28 +287,6 @@
   #define CS_INITIALIZE_PLATFORM_APPLICATION CS_WIN32_MSVC_DEBUG_GOOP
 #endif
 
-// Defines that this platform supports hardware memory-mapped i/o
-#define CS_HAVE_MEMORY_MAPPED_IO
-
-/// Windows specific memory-mapped I/O stuff.
-struct csMemMapInfo
-{
-    /// Handle to the mapped file 
-    HANDLE hMappedFile;
-
-    /// Handle to the mapping
-    HANDLE hFileMapping;
-    
-    /// Whether to close the handles
-    bool close;
-  
-    /// Base pointer to the data
-    unsigned char *data;
-
-    /// File size
-    unsigned int file_size;
-};
-
 // The 2D graphics driver used by software renderer on this platform
 #define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"

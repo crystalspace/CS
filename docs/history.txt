@@ -43,6 +43,7 @@ chronological order.
           systems that have ELF binaries does not need libbfd any more).
         - res adjusted the metadata embedding checks to account for the 
           built-in ELF support.
+	- res updated the Win32 memory mapping to the new csMemoryMappedIO.
 24-Aug-2005
 	- res further worked on lighting support for the fat rl and vproc_std.
 	- res added the "simplelights.zip" level to test vertex lighting in 

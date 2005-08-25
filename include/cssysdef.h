@@ -150,26 +150,6 @@ static inline bool isdir (const char *path, struct dirent *de)
  * build process on such platforms must also arrange to have
  * CS/libs/csutil/generic/mmap.cpp incorporated into the csutil library.
  */
-#ifdef CS_HAVE_POSIX_MMAP
-
-#ifndef CS_HAVE_MEMORY_MAPPED_IO
-#define CS_HAVE_MEMORY_MAPPED_IO
-#endif
-
-/// POSIX-specific memory mapped I/O platform dependent structure.
-struct csMemMapInfo
-{          
-  /// Handle to the mapped file.
-  int hMappedFile;
-  /// Base pointer to the data.
-  unsigned char *data;
-  /// File size.
-  unsigned int file_size;
-  /// Close file descriptor (handle) when unmapping.
-  bool close;
-};
-
-#endif // CS_HAVE_POSIX_MMAP
 
 // Handle platforms with no native aligned malloc
 #ifndef CS_HAVE_CSALIGNED_MALLOC

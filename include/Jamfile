@@ -25,6 +25,8 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs csutil   csosdefs.h  ]
   [ ConcatDirs csutil   getopt.h    ]
   [ ConcatDirs csutil   scf_impl.h  ]
+  [ ConcatDirs csutil   unix        mmap_posix.h ]
+  [ ConcatDirs csutil   win32       mmap.h ]
   [ ConcatDirs csutil   zip.h       ]
   [ ConcatDirs iaws     aws2.h      ]
   [ ConcatDirs imap     parser.h    ]

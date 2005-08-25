@@ -20,7 +20,6 @@
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
-#include "csutil/csmmap.h"
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif

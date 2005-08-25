@@ -30,21 +30,6 @@
 
 struct iVFS;
 
-/** \internal
- * Default cache block size
- */
-const unsigned csmmioDefaultCacheBlockSize = 4096;
-
-/** \internal
- * Default cache size (in cache blocks)
- */
-const unsigned csmmioDefaultCacheSize = 256;//2048;
-
-/** \internal
- * Default size for hash table (best to use primes here)
- */
-const unsigned csmmioDefaultHashSize = 211;//1559;
-
 #if defined(CS_PLATFORM_WIN32)
   #include "win32/mmap.h"
 #elif defined(CS_HAVE_POSIX_MMAP)
@@ -53,18 +38,23 @@ const unsigned csmmioDefaultHashSize = 211;//1559;
   /* @@@ FIXME: dummy mmap */
 #endif
 
+/**
+ * Memory mapping, as returned by csMemoryMappedIO::GetData().
+ */
 class csMemoryMapping : public csRefCount
 {
 public:
+  /// Get size of mapped data
   virtual size_t GetLength() = 0;
+  /// Get pointer to mapped data
   virtual void* GetData() = 0;
 };
 
 /**
-  Defines a simple memory-mapped IO class that is portable.
+ * Defines a simple memory-mapped IO class that is portable.
  */  
 class CS_CRYSTALSPACE_EXPORT csMemoryMappedIO : public csPlatformMemoryMapping,
-                                                public csRefCount
+                                                 public csRefCount
 {
 private:
   /// Set to true if this object is valid
