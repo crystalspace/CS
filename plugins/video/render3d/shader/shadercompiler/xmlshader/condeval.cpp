@@ -449,7 +449,7 @@ const char* csConditionEvaluator::ResolveConst (csExpression* expression,
       constants.constants.GetElementPointer (symbol.Get());
     if (!constOp)
     {
-      return "???"; //@@@ FIX ME! SetLastError ("Unknown symbol '%s'", symbol);
+      SetLastError ("Unknown symbol '%s'", symbol.Get());
     }
     operand = *constOp;
     return 0;
