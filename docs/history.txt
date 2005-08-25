@@ -8,6 +8,8 @@ chronological order.
 
 25-Aug-2005
 	- res added some tweaks for software GL to the driver database.
+	- Adam Bradley fixed a bug in the Linux joystick driver diagnosed by
+	  Marc Price <marcymarcymarc@gmail.com>.
 24-Aug-2005
 	- res further worked on lighting support for the fat rl and vproc_std.
 	- res added the "simplelights.zip" level to test vertex lighting in 

@@ -97,6 +97,8 @@ bool csLinuxJoystick::HandleEvent (iEvent& ev)
     while (read (jd.fd, &js, sizeof(js)) == sizeof(js)) 
     {
       int32 axisread[CS_MAX_LINUX_JOYSTICK_AXES];
+      if ((js.type & ~JS_EVENT_INIT) == JS_EVENT_AXIS)
+	jd.axis[js.number] = js.value;
       for (int iter=0 ; 
 	   iter<MIN(jd.nAxes,CS_MAX_LINUX_JOYSTICK_AXES) ; 
 	   iter++)
@@ -109,7 +111,6 @@ bool csLinuxJoystick::HandleEvent (iEvent& ev)
 			       axisread, jd.nAxes);
         break;
       case JS_EVENT_AXIS:
-        jd.axis[js.number] = js.value;
         EventOutlet->Joystick (jd.number, 0, 0, 
 			       axisread, jd.nAxes);
         break;
