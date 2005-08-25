@@ -40,6 +40,9 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  virtual void SetReadOnly (bool) { }
+  virtual bool IsReadOnly () const { return true; }
+
   /**
    * Does nothing.
    */

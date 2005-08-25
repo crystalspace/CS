@@ -39,6 +39,7 @@ csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
   vfs = 0;
   current_type = 0;
   current_scope = 0;
+  readonly = false;
 }
 
 csVfsCacheManager::~csVfsCacheManager ()
@@ -91,6 +92,7 @@ void csVfsCacheManager::SetCurrentScope (const char* scope)
 bool csVfsCacheManager::CacheData (const void* data, size_t size,
   	const char* type, const char* scope, uint32 id)
 {
+  if (readonly) return true;
   csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
@@ -152,6 +154,7 @@ bool csVfsCacheManager::ClearCache (const char* type, const char* scope,
 
 void csVfsCacheManager::Flush ()
 {
-  GetVFS ()->Sync ();
+  if (!readonly)
+    GetVFS ()->Sync ();
 }
 

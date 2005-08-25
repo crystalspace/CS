@@ -61,8 +61,8 @@ bool csConditionConstants::AddConstant (const char* name, bool value)
 //---------------------------------------------------------------------------
 
 csConditionEvaluator::csConditionEvaluator (iStringSet* strings, 
-    const csConditionConstants& constants) : nextConditionID(0),
-    strings(strings), constants(constants)
+    const csConditionConstants& constants) :
+    strings(strings), nextConditionID(0), constants(constants)
 {
 }
 
@@ -449,7 +449,7 @@ const char* csConditionEvaluator::ResolveConst (csExpression* expression,
       constants.constants.GetElementPointer (symbol.Get());
     if (!constOp)
     {
-      return SetLastError ("Unknown symbol '%s'", symbol);
+      return "???"; //@@@ FIX ME! SetLastError ("Unknown symbol '%s'", symbol);
     }
     operand = *constOp;
     return 0;

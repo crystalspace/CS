@@ -40,6 +40,7 @@ private:
   char* current_type;
   char* current_scope;
   csRef<iVFS> vfs;
+  bool readonly;
 
   iVFS* GetVFS ();
 
@@ -56,6 +57,9 @@ public:
   virtual ~csVfsCacheManager ();
 
   SCF_DECLARE_IBASE;
+
+  virtual void SetReadOnly (bool ro) { readonly = ro; }
+  virtual bool IsReadOnly () const { return readonly; }
 
   /**
    * Set current type. 

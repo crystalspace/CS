@@ -10,6 +10,27 @@ chronological order.
 	- res added some tweaks for software GL to the driver database.
 	- Adam Bradley fixed a bug in the Linux joystick driver diagnosed by
 	  Marc Price <marcymarcymarc@gmail.com>.
+	- Jorrit did several cache manager related changes:
+	    - Added new iEngine->SetVFSCacheManager() which is a better way
+	      to change the cache manager that the engine is using then
+	      the current clumsy construct:
+	        vfs->ChDir (...);
+		engine->SetCacheManager (0);
+		engine->GetCacheManager ();
+	    - Added iCacheManager->SetReadOnly() and IsReadOnly(). With
+	      SetReadOnly(true) you can force the cache to be read only
+	      which means nothing can be written to it.
+	    - Removed caching of LOD and normal data in spr3d since calculating
+	      this is now fast enough (it was optimized several months ago).
+	      The cache is no longer needed.
+	- Jorrit removed a few warnings:
+	    - A few unused camera_origin warnings in spr3d and bezier.
+	    - A reordering of initialization in xmlshader plugin.
+	    - Unused var in GL renderer.
+	    - In xmlshader a non-POD was passed through ... I temporarily
+	      disabled that code as I don't know what the correct code is
+	      there.
+	- Jorrit did a documentation fix: the pixmap howto was not 100% correct.
 24-Aug-2005
 	- res further worked on lighting support for the fat rl and vproc_std.
 	- res added the "simplelights.zip" level to test vertex lighting in 

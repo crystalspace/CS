@@ -53,6 +53,18 @@ SCF_VERSION (iCacheManager, 0, 0, 1);
 struct iCacheManager : public iBase
 {
   /**
+   * Force the cache manager to be read-only. This will prevent
+   * updates of the cache but CacheData() will still return true
+   * to indicate success.
+   */
+  virtual void SetReadOnly (bool ro) = 0;
+
+  /**
+   * Is the cache manager read-only?
+   */
+  virtual bool IsReadOnly () const = 0;
+
+  /**
    * Set current type. This will be used in CacheData() and
    * ReadCache() when the given 'type' there is 0.
    */

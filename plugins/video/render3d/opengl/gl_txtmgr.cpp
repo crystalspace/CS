@@ -1047,7 +1047,6 @@ void csGLTextureHandle::PrepareKeycolor (csRef<iImage>& image,
   int h = image->GetHeight ();
   int d = image->GetDepth ();
   csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
-  csRGBpixel mean_color;
   CheckAlpha (w, h, d, _src, &transp_color, alphaType);
   if (alphaType == csAlphaMode::alphaNone) return; // Nothing to fix up
   image = csBakeKeyColor::Image (image, transp_color);

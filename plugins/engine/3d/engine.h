@@ -259,6 +259,7 @@ public:
   { return lightmapCacheMode; }
 
   virtual void SetCacheManager (iCacheManager* cache_mgr);
+  virtual void SetVFSCacheManager (const char* vfspath = 0);
 
   virtual iCacheManager* GetCacheManager ();
 

@@ -294,9 +294,6 @@ private:
   iBase* logparent;
   iMeshObjectType* spr3d_type;
 
-  /// Cache name for caching sprite specific data.
-  char* cachename;
-
   /**
    * The order in which to introduce levels in order to get to a higher LOD.
    * The index of this array is the vertex number which is introduced.
@@ -371,9 +368,6 @@ private:
 
   /// If true then this factory has been initialized.
   bool initialized;
-
-  void GenerateCacheName ();
-  const char* GetCacheName ();
 
 public:
   CS_LEAKGUARD_DECLARE(csSprite3DMeshObjectFactory);

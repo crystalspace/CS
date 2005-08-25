@@ -221,12 +221,8 @@ bool Lighter::LoadMaps ()
       if (!SetMapDir (val))
         return Report ("Error setting map dir '%s'!", val);
 
-      // First we force a clear of the cache manager in the engine
-      // so that a new one will be made soon.
-      engine->SetCacheManager (0);
-      // And then we get the cache manager which will force it
-      // to be created based on current VFS dir.
-      engine->GetCacheManager ();
+      // Set the cache manager based on current VFS dir.
+      engine->SetVFSCacheManager ();
       break;
     }
   }

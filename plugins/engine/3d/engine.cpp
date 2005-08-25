@@ -1270,6 +1270,23 @@ void csEngine::RemoveLight (iLight* light)
   light->GetSector ()->GetLights ()->Remove (light);
 }
 
+void csEngine::SetVFSCacheManager (const char* vfspath)
+{
+  if (vfspath)
+  {
+    VFS->PushDir();
+    VFS->ChDir (vfspath);
+  }
+
+  SetCacheManager (0);
+  GetCacheManager ();
+
+  if (vfspath)
+  {
+    VFS->PopDir();
+  }
+}
+
 void csEngine::SetCacheManager (iCacheManager* cacheManager)
 {
   csEngine::cacheManager = cacheManager;

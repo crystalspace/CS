@@ -871,7 +871,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);
-  csVector3 camera_origin = obj_cam.GetT2OTranslation ();
 
   const uint currentFrame = rview->GetCurrentFrameNumber();
   bool listCreated;

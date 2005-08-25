@@ -43,9 +43,10 @@ This is accomplished by loading the image as raw data and then asking the image
 loader to re-interpret the raw data as an actual @samp{iImage} resource.
 
 @example
+iGraphics3D* g3d = @dots{}
+iTextureManager* txtmgr = g3d->GetTextureManager ();
 csRef<iDataBuffer> buf = VFS->ReadFile ("/lib/mydata/test.jpg");
-csRef<iImage> ifile = imgldr->Load (buf->GetUint8 (),
-  buf->GetSize (), txtmgr->GetTextureFormat ());
+csRef<iImage> ifile = imgldr->Load (buf, txtmgr->GetTextureFormat ());
 csRef<iTextureHandle> txt =
   txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
 @end example

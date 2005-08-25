@@ -1252,15 +1252,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       
     if ((!do_regions) && cache_map != 0)
     {
-      // First we force a clear of the cache manager in the engine
-      // so that a new one will be made soon.
-      Engine->SetCacheManager (0);
       // Then we set the current directory right.
       if (!SetMapDir (cache_map->map_dir))
 	return false;
-      // And finally we get the cache manager which will force it
-      // to be created based on current VFS dir.
-      Engine->GetCacheManager ();
+      // Set the cache manager based on current VFS dir.
+      Engine->SetVFSCacheManager ();
     }
 
     // Check the map and mount it if required.
@@ -1294,12 +1290,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       }
       if (do_regions)
       {
-        // First we force a clear of the cache manager in the engine
-        // so that a new one will be made soon.
-        Engine->SetCacheManager (0);
-        // And finally we get the cache manager which will force it
-        // to be created based on current VFS dir.
-        Engine->GetCacheManager ();
+        // Set the cache manager based on current VFS dir.
+        Engine->SetVFSCacheManager ();
         region->Prepare ();
       }
     }

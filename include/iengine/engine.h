@@ -265,15 +265,21 @@ struct iEngine : public virtual iBase
    * This will do an incref on the given cache manager and a decref
    * on the old one. The engine will release the cache manager at
    * destruction time. To set the cache manager to the default VFS
-   * based cache manager for the current VFS directory you can use the
+   * based cache manager for a given VFS directory you can use the
    * following code:
    * \code
-   * vfs->ChDir (...);
-   * engine->SetCacheManager (0);	// Clear it.
-   * engine->GetCacheManager ();	// Force a regeneration.
+   * engine->SetVFSCacheManager ("/bla/bla");
    * \endcode
    */
   virtual void SetCacheManager (iCacheManager* cache_mgr) = 0;
+
+  /**
+   * Set the cache manager to the default VFS based cache manager.
+   * Note that this function will not change the VFS current directory.
+   * \param vfspath is the path that will be used for the cache manager.
+   * If 0 then the current VFS directory will be used instead.
+   */
+  virtual void SetVFSCacheManager (const char* vfspath = 0) = 0;
 
   /**
    * Get the cache manager that the engine is currently using.
