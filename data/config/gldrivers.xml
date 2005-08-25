@@ -71,7 +71,7 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="softgl">
+    <config name="nofilter">
       <Video>
 	<OpenGL>
 	  <TextureFilter>none</TextureFilter>
@@ -206,6 +206,17 @@
 	<OpenGL>
 	  <EnableNonPowerOfTwo2DTextures>yes</EnableNonPowerOfTwo2DTextures>
 	</OpenGL>
+      </Video>
+    </config>
+    <config name="nodetail">
+      <Video>
+        <ShaderManager>
+          <Tags>
+            <detail_texture>
+              <Presence>forbidden</Presence>
+            </detail_texture>
+          </Tags>
+        </ShaderManager>
       </Video>
     </config>
   </configs>
@@ -384,17 +395,18 @@
     </rule>
     -->
     
-    <!--
     <rule description="Software GL tweaks">
       <conditions fulfill="one">
-	<regexp string="renderer" pattern="^Mesa" />
-	<regexp string="renderer" pattern="^GDI" />
+	<regexp string="renderer" pattern="Mesa GLX Indirect" />
+	<regexp string="renderer" pattern="GDI Generic" />
       </conditions>
       <applicable>
-	<usecfg>softgl</usecfg>
+        <usecfg>nofilter</usecfg>
+        <usecfg>nostencil</usecfg>
+        <usecfg>nodetail</usecfg>
       </applicable>
     </rule>
-    -->
+    
     <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">

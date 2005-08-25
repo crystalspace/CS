@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Aug-2005
+	- res added some tweaks for software GL to the driver database.
 24-Aug-2005
 	- res further worked on lighting support for the fat rl and vproc_std.
 	- res added the "simplelights.zip" level to test vertex lighting in 
