@@ -41,6 +41,9 @@ SCF_VERSION (iCursor, 0, 1, 0);
  * handles processing for displaying pixmaps as cursors. Any number
  * of cursors can be set, indexed by key strings, along with
  * hotspots, and transparency. Supports any static iImage.
+ * <p>
+ * A default implementation of the iCursor interface is provided by
+ * the 'crystalspace.graphic.cursor' plugin.
  */
 struct iCursor : public iBase
 {
