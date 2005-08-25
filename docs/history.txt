@@ -12,7 +12,7 @@ chronological order.
 	  Marc Price <marcymarcymarc@gmail.com>.
 	- Jorrit did several cache manager related changes:
 	    - Added new iEngine->SetVFSCacheManager() which is a better way
-	      to change the cache manager that the engine is using then
+	      to change the cache manager that the engine is using than
 	      the current clumsy construct:
 	        vfs->ChDir (...);
 		engine->SetCacheManager (0);
