@@ -24,7 +24,8 @@
 #include "iutil/plugin.h"
 #include "itexture/itexloaderctx.h"
 #include "imap/services.h"
-#include "csgfx/gradient.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/texture.h"
 
 #include "prsky.h"
 #include "stdproctex.h"
@@ -119,6 +120,12 @@ csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* node,
     }
   }
   csRef<iTextureWrapper> tex = skyFact->Generate();
+
+  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!G3D) return 0;
+  csRef<iTextureManager> tm = G3D->GetTextureManager();
+  if (!tm) return 0;
+  tex->Register (tm);
 
   return csPtr<iBase> (tex);
 }

@@ -31,6 +31,9 @@ chronological order.
 	      disabled that code as I don't know what the correct code is
 	      there.
 	- Jorrit did a documentation fix: the pixmap howto was not 100% correct.
+	- res changed csLoader::ParseTexture() to enforce texture registration
+	  by the loader plugin.
+	- res fixed the proctex loaders to register the returned texture.
 24-Aug-2005
 	- res further worked on lighting support for the fat rl and vproc_std.
 	- res added the "simplelights.zip" level to test vertex lighting in 

@@ -454,6 +454,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 
   if (tex)
   {
+    CS_ASSERT_MSG("Texture loader did not register texture", 
+      tex->GetTextureHandle());
     tex->QueryObject ()->SetName (txtname);
     tex->SetKeepImage (keep_image);
     if (do_transp)
@@ -483,9 +485,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       } else
 	return 0;
     }
-
-    iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
-    if (tm) tex->Register (tm);
   }
 
   return tex;

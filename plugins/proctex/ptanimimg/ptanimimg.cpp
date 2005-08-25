@@ -21,6 +21,7 @@
 
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/texture.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
@@ -120,6 +121,16 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcAnimated (img));
   if (pt->Initialize (object_reg))
   {
+    csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    if (!G3D) return 0;
+    csRef<iTextureManager> tm = G3D->GetTextureManager();
+    if (!tm) return 0;
+    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (ctx->GetImage(), 
+      ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D));
+    if (!TexHandle) return 0;
+
+    pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
+
     csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
     return csPtr<iBase> (tw);
   }

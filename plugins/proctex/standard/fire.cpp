@@ -24,6 +24,9 @@
 #include "iutil/plugin.h"
 #include "itexture/itexloaderctx.h"
 #include "imap/services.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/texture.h"
+
 #include "csgfx/gradient.h"
 
 #include "prfire.h"
@@ -172,6 +175,12 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
       };
     }
   }
+
+  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!G3D) return 0;
+  csRef<iTextureManager> tm = G3D->GetTextureManager();
+  if (!tm) return 0;
+  tex->Register (tm);
 
   return csPtr<iBase> (tex);
 }
