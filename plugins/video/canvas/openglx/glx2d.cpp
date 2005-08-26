@@ -35,25 +35,15 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLX)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iOpenGLInterface)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2DGLX::eiOpenGLInterface)
-  SCF_IMPLEMENTS_INTERFACE (iOpenGLInterface)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
-
 
 #define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
 #define XWIN_SCF_ID "crystalspace.window.x"
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  csGraphics2DGLCommon (iParent), cmap (0), hardwareaccelerated(false)
+  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 void csGraphics2DGLX::Report (int severity, const char* msg, ...)
@@ -131,7 +121,6 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   XFree ((void*)xvis);
   Close ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 bool csGraphics2DGLX::Open()

@@ -27,6 +27,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 
 #include "iutil/comp.h"
@@ -54,7 +55,14 @@ class csFontCache;
  * Functions not marked with an asterisk are optional, but possibly
  * slow since they are too general.
  */
-class CS_CRYSTALSPACE_EXPORT csGraphics2D : public iGraphics2D
+class CS_CRYSTALSPACE_EXPORT csGraphics2D : 
+  public scfImplementation6<csGraphics2D, 
+			    iGraphics2D,
+			    iComponent,
+			    iNativeWindow,
+			    iNativeWindowManager,
+			    iPluginConfig,
+			    iDebugHelper>
 {
 public:
   /// The configuration file.
@@ -138,8 +146,6 @@ private:
 	int depth, void* memory, iOffscreenCanvasCallback* ofscb);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Create csGraphics2D object
   csGraphics2D (iBase*);
   /// Destroy csGraphics2D object
@@ -369,27 +375,13 @@ public:
                                csRGBcolor fg = csRGBcolor(255,255,255),
                                csRGBcolor bg = csRGBcolor(0,0,0));
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-  struct EventHandler : public iEventHandler
+  struct EventHandler : public scfImplementation1<EventHandler, iEventHandler>
   {
   private:
     csGraphics2D* parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csGraphics2D* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
+    EventHandler (csGraphics2D* parent) : scfImplementationType (this), 
+      parent(parent) {}
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
   } * scfiEventHandler;
 
@@ -415,68 +407,40 @@ protected:
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
 
+  /**\name iNativeWindowManager implementation
+   * @{ */
   // Virtual Alert function so it can be overridden by subclasses
   // of csGraphics2D.
   virtual void AlertV (int type, const char* title, const char* okMsg,
     const char* msg, va_list args);
+  virtual void Alert (int type, const char* title, const char* okMsg,
+      const char* msg, ...);
+  /** @} */
+
+  /**\name iNativeWindow implementation
+   * @{ */
   // Virtual SetTitle function so it can be overridden by subclasses
   // of csGraphics2D.
   virtual void SetTitle (const char* title);
+  /** @} */
 
-  struct CanvasConfig : public iPluginConfig
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
-    virtual bool GetOptionDescription (int idx, csOptionDescription*);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiPluginConfig;
-  friend struct CanvasConfig;
+  /**\name iPluginConfig implementation
+   * @{ */
+  virtual bool GetOptionDescription (int idx, csOptionDescription*);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
+  /** @} */
 
-  struct NativeWindowManager : public iNativeWindowManager
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
-    virtual void Alert (int type, const char* title, const char* okMsg,
-        const char* msg, ...);
-    virtual void AlertV (int type, const char* title, const char* okMsg,
-        const char* msg, va_list arg)
-    {
-      scfParent->AlertV (type, title, okMsg, msg, arg);
-    }
-  } scfiNativeWindowManager;
-  friend struct NativeWindowManager;
-
-  struct NativeWindow : public iNativeWindow
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
-    virtual void SetTitle (const char* title)
-    {
-      scfParent->SetTitle (title);
-    }
-  } scfiNativeWindow;
-  friend struct NativeWindow;
-
-  /// Execute a debug command.
+  /**\name iDebugHelper implementation
+   * @{ */
   virtual bool DebugCommand (const char* cmd);
-
-  struct eiDebugHelper : public iDebugHelper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
-    virtual int GetSupportedTests () const
-    { return 0; }
-    virtual csPtr<iString> UnitTest ()
-    { return 0; }
-    virtual csPtr<iString> StateTest ()
-    { return 0; }
-    virtual csTicks Benchmark (int /*num_iterations*/)
-    { return 0; }
-    virtual csPtr<iString> Dump ()
-    { return 0; }
-    virtual void Dump (iGraphics3D* /*g3d*/)
-    { }
-    virtual bool DebugCommand (const char* cmd)
-    { return scfParent->DebugCommand (cmd); }
-  } scfiDebugHelper;
-  friend struct eiDebugHelper;
+  virtual int GetSupportedTests () const { return 0; }
+  virtual csPtr<iString> UnitTest () { return 0; }
+  virtual csPtr<iString> StateTest ()  { return 0; }
+  virtual csTicks Benchmark (int /*num_iterations*/) { return 0; }
+  virtual csPtr<iString> Dump ()  { return 0; }
+  virtual void Dump (iGraphics3D* /*g3d*/)  { }
+  /** @} */
 };
 
 /** @} */

@@ -30,7 +30,9 @@
 #include <X11/Xatom.h>
 
 /// XLIB version.
-class csGraphics2DXLib : public csGraphics2D, public iEventPlug
+class csGraphics2DXLib : public scfImplementationExt1<csGraphics2DXLib, 
+							csGraphics2D, 
+							iEventPlug>
 {
   csRef<iXWindow> xwin;
   /// Shared memory extension (manages the shared memory backbuffer)
@@ -60,7 +62,6 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   bool TryAllocateMemory ();
 
 public:
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
   csGraphics2DXLib (iBase*);
   virtual ~csGraphics2DXLib ();
 

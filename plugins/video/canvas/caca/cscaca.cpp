@@ -41,11 +41,8 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DCaca)
 
-SCF_IMPLEMENT_IBASE_EXT (csGraphics2DCaca)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-csGraphics2DCaca::csGraphics2DCaca (iBase *iParent) : csGraphics2D (iParent)
+csGraphics2DCaca::csGraphics2DCaca (iBase *iParent) : 
+  scfImplementationType (this, iParent)
 {
   EventOutlet = 0;
   Memory = 0;

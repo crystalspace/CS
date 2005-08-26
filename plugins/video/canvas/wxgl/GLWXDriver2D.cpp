@@ -59,22 +59,12 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csGraphics2DWX)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iOpenGLInterface)
-  SCF_IMPLEMENTS_INTERFACE (iWxWindow)
-  SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2DWX::eiOpenGLInterface)
-  SCF_IMPLEMENTS_INTERFACE (iOpenGLInterface)
-  SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGraphics2DWX)
 
 // csGraphics2DWX function
-  csGraphics2DWX::csGraphics2DWX (iBase *iParent) :
-    csGraphics2DGLCommon (iParent), myParent(0)
+csGraphics2DWX::csGraphics2DWX (iBase *iParent) :
+    scfImplementationType (this, iParent), myParent(0)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 void csGraphics2DWX::Report (int severity, const char* msg, ...)

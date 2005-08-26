@@ -58,11 +58,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DSDL)
 
-
-SCF_IMPLEMENT_IBASE_EXT (csGraphics2DSDL)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 #if SHADE_BUF
 #include "util/img.inc"
 static SDL_Surface
@@ -179,7 +174,8 @@ static int drawing_thread(void *_owner)
 #endif
 
 // csGraphics2DSDL functions
-csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D (iParent)
+csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : 
+  scfImplementationType (this, iParent)
 {
   EventOutlet = 0;
 }

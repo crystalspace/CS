@@ -36,15 +36,6 @@ extern "C" {
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphicsMemory)
 
-SCF_IMPLEMENT_IBASE_EXT (csGraphicsMemory)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGraphicsMemory)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphicsMemory::eiGraphicsMemory)
-  SCF_IMPLEMENTS_INTERFACE (iGraphicsMemory)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 #if THREAD_SUPPORT
 void *csGraphicsMemory::updateThread(void *obj)
 {
@@ -62,9 +53,8 @@ void *csGraphicsMemory::updateThread(void *obj)
 #endif
 
 csGraphicsMemory::csGraphicsMemory (iBase* p) :
-  superclass(p), buff_a(0), res(0)
+  scfImplementationType (this, p), buff_a(0), res(0)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiGraphicsMemory);
 #if THREAD_SUPPORT
 	buff_b = 0;
 #endif
@@ -78,7 +68,6 @@ csGraphicsMemory::~csGraphicsMemory()
 #endif
   delete (res);
   Memory = 0;
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiGraphicsMemory);
 }
 
 bool csGraphicsMemory::BeginDraw()
@@ -108,7 +97,7 @@ void csGraphicsMemory::FinishDraw()
 
 bool csGraphicsMemory::Initialize(iObjectRegistry* obj_reg)
 {
-  bool ok = superclass::Initialize(obj_reg);
+  bool ok = csGraphics2D::Initialize(obj_reg);
   obj_reg->Register(this, "crystalspace.canvas.memory");
   if (ok)
   {
@@ -146,13 +135,13 @@ void csGraphicsMemory::Print (csRect const*)
 
 bool csGraphicsMemory::Open ()
 {
-  bool ok = superclass::Open();
+  bool ok = csGraphics2D::Open();
   return ok;
 }
 
 void csGraphicsMemory::Close ()
 {
-  superclass::Close();
+  csGraphics2D::Close();
 }
 
 unsigned char *csGraphicsMemory::GetImage()

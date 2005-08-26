@@ -27,8 +27,10 @@
 #include <SDL.h>
 #include <SDL_mutex.h>
 
-/// SDL version.
-class csGraphics2DSDL : public csGraphics2D, public iEventPlug
+/// SDL canvas.
+class csGraphics2DSDL : public scfImplementationExt1<csGraphics2DSDL,
+						       csGraphics2D, 
+						       iEventPlug>
 {
 public:
   SDL_Surface *screen;
@@ -44,8 +46,6 @@ private:
   void fixlibrary();
 
 public:
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
-
   csGraphics2DSDL (iBase *iParent);
   virtual ~csGraphics2DSDL ();
 

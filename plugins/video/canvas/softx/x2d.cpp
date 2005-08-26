@@ -35,20 +35,12 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DXLib)
 
-
-SCF_IMPLEMENT_IBASE_EXT (csGraphics2DXLib)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-
-
 #define CS_XWIN_SCF_ID "crystalspace.window.x"
 #define CS_XEXT_SHM_SCF_ID "crystalspace.window.x.extshm"
 #define CS_XEXT_SHM "MIT-SHM"
 
-
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (iParent), xim (0),
+  scfImplementationType (this, iParent), xim (0),
   dpy (0), cmap (0), real_Memory (0),
   sim_lt8 (0), sim_lt16 (0)
 {

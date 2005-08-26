@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csplugincommon/opengl/glcommon2d.h"
-#include "csplugincommon/opengl/iogl.h"
+#include "csplugincommon/iopengl/openglinterface.h"
 #include "plugins/video/canvas/xwindowcommon/xwindow.h"
 
 #define GLX_GLXEXT_PROTOTYPES
@@ -35,7 +35,9 @@
 #include <X11/Xatom.h>
 
 /// XLIB version.
-class csGraphics2DGLX : public csGraphics2DGLCommon
+class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX , 
+						       csGraphics2DGLCommon, 
+						       iOpenGLInterface>
 {
   csRef<iXWindow> xwin;
   // The display context
@@ -57,9 +59,6 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   bool CreateVisuals ();
 
 public:
-
-  SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
-
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
 
@@ -107,19 +106,15 @@ public:
     fg, bg);
   }
 
-  struct eiOpenGLInterface : public iOpenGLInterface
+  virtual void *GetProcAddress (const char *funcname)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DGLX);
-    virtual void *GetProcAddress (const char *funcname)
-    {
 # ifndef CSGL_EXT_STATIC_ASSERTION
-      return (void*)glXGetProcAddressARB ((const GLubyte *)funcname);
+    return (void*)glXGetProcAddressARB ((const GLubyte *)funcname);
 # else
-      (void)funcname;
-      return (void*)0;
+    (void)funcname;
+    return (void*)0;
 # endif
-    }
-  } scfiOpenGLInterface;
+  }
 };
 
 #endif // __CS_GLX2D_H__

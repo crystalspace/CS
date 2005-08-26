@@ -39,47 +39,8 @@
 #include "csplugincommon/canvas/softfontcache.h"
 #include "csplugincommon/canvas/softfontcacheimpl.h"
 
-SCF_IMPLEMENT_IBASE(csGraphics2D)
-  SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPluginConfig)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindowManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindow)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::CanvasConfig)
-  SCF_IMPLEMENTS_INTERFACE (iPluginConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindow)
-  SCF_IMPLEMENTS_INTERFACE (iNativeWindow)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiDebugHelper)
-  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindowManager)
-  SCF_IMPLEMENTS_INTERFACE (iNativeWindowManager)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGraphics2D::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-csGraphics2D::csGraphics2D (iBase* parent)
+csGraphics2D::csGraphics2D (iBase* parent) : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   scfiEventHandler = 0;
   Memory = 0;
   LineAddress = 0;
@@ -96,6 +57,20 @@ csGraphics2D::csGraphics2D (iBase* parent)
   refreshRate = 0;
   vsync = false;
   fontCache = 0;
+}
+
+csGraphics2D::~csGraphics2D ()
+{
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    if (q != 0)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef ();
+  }
+  Close ();
+  delete [] Palette;
+  delete [] win_title;
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
@@ -258,27 +233,6 @@ void csGraphics2D::CreateDefaultFontCache ()
 	csPixMixerRGBA<uint32> > (this);
     }
   }
-}
-
-csGraphics2D::~csGraphics2D ()
-{
-  if (scfiEventHandler)
-  {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-    if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
-  }
-  Close ();
-  delete [] Palette;
-  delete [] win_title;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGraphics2D::HandleEvent (iEvent& Event)
@@ -968,18 +922,18 @@ void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,
   fflush (stdout);
 }
 
-void csGraphics2D::NativeWindowManager::Alert (int type,
-    const char* title, const char* okMsg, const char* msg, ...)
+void csGraphics2D::Alert (int type, const char* title, const char* okMsg, 
+			  const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  scfParent->AlertV (type, title, okMsg, msg, arg);
+  AlertV (type, title, okMsg, msg, arg);
   va_end (arg);
 }
 
 iNativeWindow* csGraphics2D::GetNativeWindow ()
 {
-  return &scfiNativeWindow;
+  return CS_STATIC_CAST(iNativeWindow*, this);
 }
 
 void csGraphics2D::SetTitle (const char* title)
@@ -1133,20 +1087,20 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 2, "mode", "Window size or resolution", CSVAR_STRING },
 };
 
-bool csGraphics2D::CanvasConfig::SetOption (int id, csVariant* value)
+bool csGraphics2D::SetOption (int id, csVariant* value)
 {
   if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: scfParent->ChangeDepth (value->GetLong ()); break;
-    case 1: scfParent->SetFullScreen (value->GetBool ()); break;
+    case 0: ChangeDepth (value->GetLong ()); break;
+    case 1: SetFullScreen (value->GetBool ()); break;
     case 2:
     {
       const char* buf = value->GetString ();
       int wres, hres;
       if (sscanf (buf, "%dx%d", &wres, &hres) == 2)
-        scfParent->Resize (wres, hres);
+        Resize (wres, hres);
       break;
     }
     default: return false;
@@ -1154,17 +1108,16 @@ bool csGraphics2D::CanvasConfig::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics2D::CanvasConfig::GetOption (int id, csVariant* value)
+bool csGraphics2D::GetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0: value->SetLong (scfParent->Depth); break;
-    case 1: value->SetBool (scfParent->FullScreen); break;
+    case 0: value->SetLong (Depth); break;
+    case 1: value->SetBool (FullScreen); break;
     case 2:
     {
-      char buf[100];
-      cs_snprintf (buf, sizeof (buf), "%dx%d", scfParent->GetWidth (), 
-	scfParent->GetHeight ());
+      csString buf;
+      buf.Format ("%dx%d", GetWidth (), GetHeight ());
       value->SetString (buf);
       break;
     }
@@ -1173,8 +1126,7 @@ bool csGraphics2D::CanvasConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics2D::CanvasConfig::GetOptionDescription
-  (int idx, csOptionDescription* option)
+bool csGraphics2D::GetOptionDescription (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)
     return false;

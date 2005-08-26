@@ -24,23 +24,13 @@
 // Plugin stuff - create factory functions, etc
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (GLOSXDriver2D)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iOpenGLInterface)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (GLOSXDriver2D::eiOpenGLInterface)
-SCF_IMPLEMENTS_INTERFACE (iOpenGLInterface)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
-
 
 // Constructor
 GLOSXDriver2D::GLOSXDriver2D(iBase *p)
-    : csGraphics2DGLCommon(p), OSXDriver2D(this)
+    : scfImplementationType (this, p), OSXDriver2D(this)
 {
   context = 0;
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 
@@ -48,7 +38,6 @@ GLOSXDriver2D::GLOSXDriver2D(iBase *p)
 GLOSXDriver2D::~GLOSXDriver2D()
 {
   Close();			// In case it hasn't already been called
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 

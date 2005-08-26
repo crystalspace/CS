@@ -155,14 +155,6 @@ static void SystemFatalError (wchar_t* str, HRESULT hRes = ~0)
 
 /////The 2D Graphics Driver//////////////
 
-SCF_IMPLEMENT_IBASE_EXT (csGraphics2DOpenGL)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iOpenGLInterface)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2DOpenGL::eiOpenGLInterface)
-  SCF_IMPLEMENTS_INTERFACE (iOpenGLInterface)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
 #define CS_WIN_PALETTE_SIZE 256
@@ -238,20 +230,18 @@ static void CreateIdentityPalette (csRGBpixel *p)
 }
 
 csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
-  csGraphics2DGLCommon (iParent),
+  scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
   m_hWnd (0),
   m_bPalettized (false),
   m_bPaletteChanged (false),
   modeSwitched (true)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL (void)
 {
   m_nGraphicsReady = 0;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)

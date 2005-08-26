@@ -21,17 +21,21 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iGraphicsMemory, 0, 0, 1);
+/**\file
+ * Memory canvas interfaces
+ */
 
 /**
  * This is the interface used to access the csGraphicsMemory plugin.
  */
-struct iGraphicsMemory : public iBase
+struct iGraphicsMemory : public virtual iBase
 {
+  SCF_INTERFACE (iGraphicsMemory, 0, 0, 1);
+
   /**
    * Get a pointer to the memory containing the canvas image.
    */
   virtual unsigned char* GetImage () = 0;
 };
 
-#endif
+#endif // __CS_IVIDEO_GFXMEM_H__

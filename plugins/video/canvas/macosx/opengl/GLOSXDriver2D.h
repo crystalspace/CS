@@ -18,7 +18,7 @@
 #include "csutil/macosx/OSXAssistant.h"
 #include "csutil/scf.h"
 #include "csplugincommon/opengl/glcommon2d.h"
-#include "csplugincommon/opengl/iogl.h"
+#include "csplugincommon/iopengl/openglinterface.h"
 
 #include "OSXDelegate2D_OpenGL.h"
 
@@ -29,9 +29,12 @@
 #import <string.h>
 
 
-class GLOSXDriver2D : public csGraphics2DGLCommon, public OSXDriver2D {
+class GLOSXDriver2D : public scfImplementationExt1<GLOSXDriver2D, 
+						     csGraphics2DGLCommon, 
+						     iOpenGLInterface>, 
+		       public OSXDriver2D 
+{
 public:
-    SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
     // Constructor
     GLOSXDriver2D(iBase *p);
 
@@ -68,25 +71,21 @@ public:
     // Toggle between fullscreen/windowed mode
     virtual bool ToggleFullscreen();
 
-    struct eiOpenGLInterface : public iOpenGLInterface
+    virtual void *GetProcAddress (const char *name) 
     {
-	SCF_DECLARE_EMBEDDED_IBASE (GLOSXDriver2D);
-	virtual void *GetProcAddress (const char *name) {
-	    // Get the address of a procedure (for OGL use.)
-	    NSSymbol symbol;
-	    char *symbolName;
-	    // Prepend a '_' for the Unix C symbol mangling convention
-	    symbolName = (char *)malloc (strlen (name) + 2);
-	    strcpy(symbolName + 1, name);
-	    symbolName[0] = '_';
-	    symbol = 0;
-	    if (NSIsSymbolNameDefined (symbolName))
-		symbol = NSLookupAndBindSymbol (symbolName);
-	    free (symbolName);
-	    return symbol ? NSAddressOfSymbol (symbol) : 0;
-	}
-    } scfiOpenGLInterface;
-    
+      // Get the address of a procedure (for OGL use.)
+      NSSymbol symbol;
+      csString symbolName;
+      // Prepend a '_' for the Unix C symbol mangling convention
+      symbolName << '_' << name;
+      if (NSIsSymbolNameDefined (symbolName))
+      {
+	symbol = NSLookupAndBindSymbol (symbolName);
+	return NSAddressOfSymbol (symbol);
+      }
+      else
+	return 0;
+    }
 protected:
 
     // Set up the function pointers for drawing based on the current Depth

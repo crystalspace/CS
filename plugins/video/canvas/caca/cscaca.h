@@ -31,7 +31,9 @@
  * implements drawing using characters and (depending on platform)
  * different intensities.
  */
-class csGraphics2DCaca : public csGraphics2D, public iEventPlug
+class csGraphics2DCaca : public scfImplementationExt1<csGraphics2DCaca,
+						      csGraphics2D, 
+						      iEventPlug>
 {
   /// Use native mouse cursor, if possible?
   bool HardwareCursor;
@@ -44,8 +46,6 @@ class csGraphics2DCaca : public csGraphics2D, public iEventPlug
   int MapKey(int raw);
 
 public:
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
-
   csGraphics2DCaca (iBase *iParent);
   virtual ~csGraphics2DCaca ();
 

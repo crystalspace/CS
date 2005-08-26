@@ -149,8 +149,6 @@ struct iOffscreenCanvasCallback : public iBase
   virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
 };
 
-SCF_VERSION (iGraphics2D, 2, 6, 0);
-
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
  * for all 2D operations such as creating the window, switching pages,
@@ -180,6 +178,8 @@ SCF_VERSION (iGraphics2D, 2, 6, 0);
  */
 struct iGraphics2D : public virtual iBase
 {
+  SCF_INTERFACE (iGraphics2D, 2, 6, 0);
+  
   /// Open the device.
   virtual bool Open () = 0;
 

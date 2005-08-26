@@ -37,9 +37,10 @@ extern "C" {
  * The memory driver. This is a cross-platform graphics driver which
  * implements drawing via memory replication.
  */
-class csGraphicsMemory : public csGraphics2D
+class csGraphicsMemory : public scfImplementationExt1<csGraphicsMemory,
+							csGraphics2D,
+							iGraphicsMemory>
 {
-  typedef csGraphics2D superclass;
 protected:
   unsigned char *buff_a, *res;
 #if THREAD_SUPPORT
@@ -51,7 +52,6 @@ protected:
 #endif
   int size;
 public:
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
   csGraphicsMemory(iBase* iParent);
   virtual ~csGraphicsMemory();
 
@@ -67,12 +67,6 @@ public:
   virtual void Print(csRect const* area = 0);
 
   unsigned char *GetImage();
-  struct eiGraphicsMemory : public iGraphicsMemory
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGraphicsMemory);
-    virtual unsigned char *GetImage() { return scfParent->GetImage(); }
-  } scfiGraphicsMemory;
-
 #if THREAD_SUPPORT
 protected:
   static void *updateThread(void *obj);

@@ -16,25 +16,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_OPENGLINTERFACE_H__
-#define __CS_OPENGLINTERFACE_H__
+#ifndef __CS_CSPLUGINCOMMON_IOPENGL_OPENGLINTERFACE_H__
+#define __CS_CSPLUGINCOMMON_IOPENGL_OPENGLINTERFACE_H__
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iOpenGLInterface, 0, 0, 1);
+/**\file
+ * OpenGL-specific interfaces
+ */
 
 /**
- * A common interface to be implemented by the platform specific opengl canvases.
- * Currently covers only aspects that are different for opengl on different platforms
- * like the "GetProcAddress"
+ * A common interface to be implemented by the platform specific opengl 
+ * canvases.
+ * Currently covers only aspects that are different for opengl on different 
+ * platforms like the "GetProcAddress" function.
  */
-struct iOpenGLInterface : public iBase
+struct iOpenGLInterface : public virtual iBase
 {
+  SCF_INTERFACE (iOpenGLInterface, 0, 0, 1);
+  
   /**
-   * Retrieve the address of the function &lt;funcname&gt;.
+   * Retrieve the address of the function \a funcname.
    * Return 0 if not available.
    */
   virtual void *GetProcAddress (const char *funcname) = 0;
 };
 
-#endif // __CS_OPENGLINTERFACE_H__
+#endif // __CS_CSPLUGINCOMMON_IOPENGL_OPENGLINTERFACE_H__

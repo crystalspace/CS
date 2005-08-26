@@ -21,20 +21,21 @@
 
 #include "csutil/scf.h"
 #include "csplugincommon/opengl/glcommon2d.h"
-#include "csplugincommon/opengl/iogl.h"
+#include "csplugincommon/iopengl/openglinterface.h"
 #include "ivideo/wxwin.h"
 #include "wx/glcanvas.h"
 
 class csGLCanvas;
 
-class csGraphics2DWX : public csGraphics2DGLCommon, public iWxWindow
+class csGraphics2DWX : public scfImplementationExt2<csGraphics2DWX, 
+						      csGraphics2DGLCommon, 
+						      iWxWindow,
+						      iOpenGLInterface>
 {
   wxWindow* myParent;
   csGLCanvas* theCanvas;
 
 public:
-  SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
-
   csGraphics2DWX (iBase *iParent);
   virtual ~csGraphics2DWX ();
 
@@ -79,13 +80,6 @@ public:
   virtual wxWindow* GetWindow();
 
   void *GetProcAddress (const char *funcname);
-
-  struct eiOpenGLInterface : public iOpenGLInterface
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DWX);
-    virtual void *GetProcAddress (const char *funcname)
-    { return scfParent->GetProcAddress (funcname); }
-  } scfiOpenGLInterface;
 };
 
 class csGLCanvas: public wxGLCanvas

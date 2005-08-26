@@ -8,6 +8,10 @@ chronological order.
 
 26-Aug-2005
 	- res added a dummy csPlatformMemoryMapping implementation.
+	- res converted the canvases to the new SCF.
+	- res did a slight reorganization: created a new directory 
+	  csplugincommon/iopengl for OpenGL interfaces, renamed iogl.h to
+	  openglinterface.h and moved it there.
 25-Aug-2005
 	- res added some tweaks for software GL to the driver database.
 	- Adam Bradley fixed a bug in the Linux joystick driver diagnosed by

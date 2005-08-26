@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "csplugincommon/canvas/graph2d.h"
 #include "csplugincommon/opengl/glcommon2d.h"
-#include "csplugincommon/opengl/iogl.h"
+#include "csplugincommon/iopengl/openglinterface.h"
 #include "csplugincommon/win32/customcursor.h"
 
 #include "detectdriver.h"
@@ -31,7 +31,9 @@
 struct iWin32Assistant;
 
 /// Windows version.
-class csGraphics2DOpenGL : public csGraphics2DGLCommon
+class csGraphics2DOpenGL : public scfImplementationExt1<csGraphics2DOpenGL, 
+							csGraphics2DGLCommon, 
+							iOpenGLInterface>
 {
 private:
   struct DummyWndInfo
@@ -51,8 +53,6 @@ private:
 public:
   virtual const char* GetRendererString (const char* str);
   virtual const char* GetVersionString (const char* ver);
-
-  SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
   csGraphics2DOpenGL(iBase *iParent);
   virtual ~csGraphics2DOpenGL(void);
@@ -98,13 +98,8 @@ public:
    */
   static unsigned char* GetPixelAtGL (int x, int y);
 
-  struct eiOpenGLInterface : public iOpenGLInterface
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DOpenGL);
-    virtual void *GetProcAddress (const char *funcname)
-    { return (void*)(wglGetProcAddress ((const char *)funcname)); }
-  } scfiOpenGLInterface;
-
+  virtual void *GetProcAddress (const char *funcname)
+  { return (void*)(wglGetProcAddress ((const char *)funcname)); }
 protected:
 
   HDC hDC;

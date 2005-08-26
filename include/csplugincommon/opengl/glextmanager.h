@@ -138,9 +138,9 @@ typedef unsigned int GLhandleARB;
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
-#include "iogl.h"
 #include "ivideo/graph2d.h"
 #include "csutil/cfgacc.h"
+#include "csplugincommon/iopengl/openglinterface.h"
 
 /**\name GL_version_1_2 constants
  * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'

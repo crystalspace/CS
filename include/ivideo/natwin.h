@@ -39,15 +39,15 @@
 #define CS_ALERT_NOTE 3
 /** @} */
 
-SCF_VERSION (iNativeWindowManager, 0, 0, 1);
-
 /**
  * This interface represents the native window manager system.
  * At this moment this interface is nearly empty. In the future it
  * will be extended with more functionality to manage windows and so on.
  */
-struct iNativeWindowManager : public iBase
+struct iNativeWindowManager : public virtual iBase
 {
+  SCF_INTERFACE (iNativeWindowManager, 0, 0, 1);
+  
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
@@ -68,13 +68,13 @@ struct iNativeWindowManager : public iBase
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
 };
 
-SCF_VERSION (iNativeWindow, 0, 0, 1);
-
 /**
  * This interface represents a native window.
  */
-struct iNativeWindow : public iBase
+struct iNativeWindow : public virtual iBase
 {
+  SCF_INTERFACE (iNativeWindow, 0, 0, 1);
+  
   /**
    * Set the title for this window.
    * \remarks \p title is expected to be UTF-8 encoded.

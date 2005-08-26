@@ -49,8 +49,10 @@ class GLFontCache;
  * so that a fix or improvement will be inherited by all platforms
  * instead of percolating via people copying code over. -GJH
  */
-class CS_CSPLUGINCOMMON_GL_EXPORT csGraphics2DGLCommon : public csGraphics2D, 
-							   public iEventPlug
+class CS_CSPLUGINCOMMON_GL_EXPORT csGraphics2DGLCommon : 
+  public scfImplementationExt1<csGraphics2DGLCommon, 
+	  csGraphics2D, 
+	  iEventPlug>
 {
 public:
   enum GLPixelFormatValue
@@ -137,8 +139,6 @@ protected:
 public:
   virtual const char* GetRendererString (const char* str);
   virtual const char* GetVersionString (const char* ver);
-
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   /// The event plug object
   csRef<iEventOutlet> EventOutlet;
