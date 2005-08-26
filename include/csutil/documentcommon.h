@@ -132,9 +132,9 @@ public:
   /**
    * Returns value. Uses GetValue() and converts the string to the return type.
    */
-  virtual int GetValueAsInt () = 0;
-  virtual float GetValueAsFloat () = 0;
-  virtual bool GetValueAsBool () = 0;
+  virtual int GetValueAsInt ();
+  virtual float GetValueAsFloat ();
+  virtual bool GetValueAsBool ();
   //@}
 
   //@{

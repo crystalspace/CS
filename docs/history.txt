@@ -17,6 +17,10 @@ chronological order.
 	  metadata should be embedded.
 	- res added iGLDriverDatabase to allow clients to provide custom
 	  driver databases in addition to CS' default one.
+	- res fixed some mistakenly abstract methods in 
+	  csDocumentAttributeCommon.
+	- res bumped the versions of the canvas-related interfaces that now
+	  virtually inherit from iBase.
 25-Aug-2005
 	- res added some tweaks for software GL to the driver database.
 	- Adam Bradley fixed a bug in the Linux joystick driver diagnosed by

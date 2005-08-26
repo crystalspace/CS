@@ -30,7 +30,7 @@
  */
 struct iGraphicsMemory : public virtual iBase
 {
-  SCF_INTERFACE (iGraphicsMemory, 0, 0, 1);
+  SCF_INTERFACE (iGraphicsMemory, 2, 0, 0);
 
   /**
    * Get a pointer to the memory containing the canvas image.

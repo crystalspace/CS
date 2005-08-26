@@ -33,7 +33,7 @@
  */
 struct iOpenGLInterface : public virtual iBase
 {
-  SCF_INTERFACE (iOpenGLInterface, 0, 0, 1);
+  SCF_INTERFACE (iOpenGLInterface, 2, 0, 0);
   
   /**
    * Retrieve the address of the function \a funcname.

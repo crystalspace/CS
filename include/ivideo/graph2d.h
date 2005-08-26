@@ -178,7 +178,7 @@ struct iOffscreenCanvasCallback : public iBase
  */
 struct iGraphics2D : public virtual iBase
 {
-  SCF_INTERFACE (iGraphics2D, 2, 6, 0);
+  SCF_INTERFACE (iGraphics2D, 3, 0, 0);
   
   /// Open the device.
   virtual bool Open () = 0;

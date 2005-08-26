@@ -46,7 +46,7 @@
  */
 struct iNativeWindowManager : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindowManager, 0, 0, 1);
+  SCF_INTERFACE (iNativeWindowManager, 2, 0, 0);
   
   /**
    * Show an alert.
@@ -73,7 +73,7 @@ struct iNativeWindowManager : public virtual iBase
  */
 struct iNativeWindow : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindow, 0, 0, 1);
+  SCF_INTERFACE (iNativeWindow, 2, 0, 0);
   
   /**
    * Set the title for this window.
