@@ -238,7 +238,7 @@ protected: // 'protected' allows access by test-suite.
     {
 #ifdef CS_DEBUG
       csPrintfErr("NOTIFY: csBlockAllocator(%p) destroying potentially leaked "
-                  "object at %p.\n", this, p);
+                  "object at %p.\n", (void*)this, (void*)p);
 #endif
     }
 #ifdef CS_BLOCKALLOC_DEBUG
