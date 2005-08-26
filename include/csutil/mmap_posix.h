@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSUTIL_UNIX_MMAP_POSIX_H__
-#define __CS_CSUTIL_UNIX_MMAP_POSIX_H__
+#ifndef __CS_CSUTIL_MMAP_POSIX_H__
+#define __CS_CSUTIL_MMAP_POSIX_H__
 
 #include "csextern.h"
 
@@ -65,4 +65,4 @@ protected:
 };
 
 
-#endif // __CS_CSUTIL_UNIX_MMAP_POSIX_H__
+#endif // __CS_CSUTIL_MMAP_POSIX_H__

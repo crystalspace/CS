@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Aug-2005
+	- res added a dummy csPlatformMemoryMapping implementation.
 25-Aug-2005
 	- res added some tweaks for software GL to the driver database.
 	- Adam Bradley fixed a bug in the Linux joystick driver diagnosed by

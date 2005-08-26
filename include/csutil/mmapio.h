@@ -39,10 +39,11 @@ struct iVFS;
   #include "win32/mmap.h"
   #define csPlatformMemoryMapping csPlatformMemoryMappingWin32
 #elif defined(CS_HAVE_POSIX_MMAP)
-  #include "unix/mmap_posix.h"
+  #include "mmap_posix.h"
   #define csPlatformMemoryMapping csPlatformMemoryMappingPosix
 #else
-  /* @@@ FIXME: dummy mmap */
+  #include "mmap_dummy.h"
+  #define csPlatformMemoryMapping csPlatformMemoryMappingDummy
 #endif
 
 /**
@@ -114,6 +115,8 @@ private:
   
   void FreeMapping (PlatformMapping* mapping);
 };
+
+#undef csPlatformMemoryMapping 
 
 #endif // __CS_MEMORY_MAPPED_IO__
 
