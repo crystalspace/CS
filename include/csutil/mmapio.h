@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2002-2005 by Jorrit Tyberghein
+	      (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,10 +31,16 @@
 
 struct iVFS;
 
+/* Note: the "#define csPlatformMemoryMapping ..." is done to appease doxygen,
+ * which produces funny results when all the memory mapping base classes
+ * would be in unison named "csPlatformMemoryMapping".
+ */
 #if defined(CS_PLATFORM_WIN32)
   #include "win32/mmap.h"
+  #define csPlatformMemoryMapping csPlatformMemoryMappingWin32
 #elif defined(CS_HAVE_POSIX_MMAP)
   #include "unix/mmap_posix.h"
+  #define csPlatformMemoryMapping csPlatformMemoryMappingPosix
 #else
   /* @@@ FIXME: dummy mmap */
 #endif

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
-              (C) 2005 Frank Richter
+              (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,7 +32,7 @@
  *  csMemoryMappedIO, use that for memory mapping support in your
  *  application.
  */
-class CS_CRYSTALSPACE_EXPORT csPlatformMemoryMapping
+class CS_CRYSTALSPACE_EXPORT csPlatformMemoryMappingPosix
 {
 protected:
   struct PlatformMemoryMapping
@@ -45,9 +45,9 @@ protected:
   size_t granularity;
 
   /// Create a new mapping.
-  csPlatformMemoryMapping ();
+  csPlatformMemoryMappingPosix ();
   /// Destroy file mapping.
-  ~csPlatformMemoryMapping ();
+  ~csPlatformMemoryMappingPosix ();
   
   bool OpenNative (const char* filename);
   bool Ok() { return hMappedFile != -1; }

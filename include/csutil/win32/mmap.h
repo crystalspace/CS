@@ -27,12 +27,12 @@
  */
 
 /**
- * Memory mapping for platforms with POSIX mmap() support.
+ * Memory mapping for Win32.
  * \remark This class serves as the platform-dependent part of 
  *  csMemoryMappedIO, use that for memory mapping support in your
  *  application.
  */
-class CS_CRYSTALSPACE_EXPORT csPlatformMemoryMapping
+class CS_CRYSTALSPACE_EXPORT csPlatformMemoryMappingWin32
 {
 protected:
   struct PlatformMemoryMapping
@@ -48,9 +48,9 @@ protected:
   size_t granularity;
 
   /// Create a new mapping.
-  csPlatformMemoryMapping ();
+  csPlatformMemoryMappingWin32 ();
   /// Destroy file mapping.
-  ~csPlatformMemoryMapping ();
+  ~csPlatformMemoryMappingWin32 ();
   
   bool OpenNative (const char* filename);
   bool Ok();

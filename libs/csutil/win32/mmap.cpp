@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2002 by Christopher Nelson
+    Copyright (C) 2002-2005 by Christopher Nelson
+		  2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,7 +21,7 @@
 
 #include "csutil/win32/mmap.h"
 
-csPlatformMemoryMapping::csPlatformMemoryMapping () :
+csPlatformMemoryMappingWin32::csPlatformMemoryMappingWin32 () :
   hMappedFile (INVALID_HANDLE_VALUE), hFileMapping (0)
 {
   SYSTEM_INFO si;
@@ -28,7 +29,7 @@ csPlatformMemoryMapping::csPlatformMemoryMapping () :
   granularity = si.dwPageSize;
 }
 
-csPlatformMemoryMapping::~csPlatformMemoryMapping ()
+csPlatformMemoryMappingWin32::~csPlatformMemoryMappingWin32 ()
 {
   if (hFileMapping != 0)
     CloseHandle (hFileMapping);
@@ -37,7 +38,7 @@ csPlatformMemoryMapping::~csPlatformMemoryMapping ()
     CloseHandle (hMappedFile);
 }
   
-bool csPlatformMemoryMapping::OpenNative (const char* filename)
+bool csPlatformMemoryMappingWin32::OpenNative (const char* filename)
 {
   hMappedFile = CreateFile (
     filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
@@ -50,13 +51,13 @@ bool csPlatformMemoryMapping::OpenNative (const char* filename)
   return Ok();
 }
 
-bool csPlatformMemoryMapping::Ok() 
+bool csPlatformMemoryMappingWin32::Ok() 
 { 
   return hFileMapping != 0; 
 }
   
-void csPlatformMemoryMapping::MapWindow (PlatformMemoryMapping& mapping, 
-					 size_t offset, size_t len)
+void csPlatformMemoryMappingWin32::MapWindow (PlatformMemoryMapping& mapping, 
+					       size_t offset, size_t len)
 {
   LARGE_INTEGER offs;
   offs.QuadPart = offset;
@@ -65,7 +66,7 @@ void csPlatformMemoryMapping::MapWindow (PlatformMemoryMapping& mapping,
   mapping.realPtr = p;
 }
 
-void csPlatformMemoryMapping::UnmapWindow (PlatformMemoryMapping& mapping)
+void csPlatformMemoryMappingWin32::UnmapWindow (PlatformMemoryMapping& mapping)
 {
   if (mapping.realPtr != 0)
     UnmapViewOfFile (mapping.realPtr);
