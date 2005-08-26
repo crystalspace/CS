@@ -28,6 +28,7 @@
 #include "csextern_gl.h"
 #include "csutil/scf.h"
 #include "csplugincommon/canvas/graph2d.h"
+#include "csplugincommon/iopengl/driverdb.h"
 #include "glfontcache.h"
 #include "iutil/event.h"
 #include "glstates.h"
@@ -50,9 +51,10 @@ class GLFontCache;
  * instead of percolating via people copying code over. -GJH
  */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGraphics2DGLCommon : 
-  public scfImplementationExt1<csGraphics2DGLCommon, 
+  public scfImplementationExt2<csGraphics2DGLCommon, 
 	  csGraphics2D, 
-	  iEventPlug>
+	  iEventPlug,
+	  iGLDriverDatabase>
 {
 public:
   enum GLPixelFormatValue
@@ -136,6 +138,11 @@ protected:
   bool vpSet;
 
   void GetPixelFormatString (const GLPixelFormat& format, csString& str);
+
+  /// Open default driver database.
+  void OpenDriverDB (const char* phase = 0);
+
+  void Report (int severity, const char* msg, ...);
 public:
   virtual const char* GetRendererString (const char* str);
   virtual const char* GetVersionString (const char* ver);
@@ -269,12 +276,23 @@ public:
   /// Execute a debug command.
   virtual bool DebugCommand (const char* cmd);
 
-  //------------------------ iEventPlug interface ---------------------------//
-
+  /**\name iEventPlug implementation
+   * @{ */
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 150; }
+  /** @} */
+
+  /**\name iGLDriverDatabase implementation
+   * @{ */
+  void ReadDatabase (iDocumentNode* dbRoot, 
+    int configPriority = iConfigManager::ConfigPriorityPlugin + 20,
+    const char* phase = 0)
+  {
+    driverdb.Open (this, dbRoot, 0, configPriority);
+  }
+  /** @} */
 };
 
 #endif // __CS_GLCOMMON2D_H__

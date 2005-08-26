@@ -26,7 +26,6 @@
 #include "csutil/cfgdoc.h"
 #include "csutil/hash.h"
 #include "csutil/regexp.h"
-#include "csutil/xmltiny.h"
 
 #include "csplugincommon/opengl/driverdb.h"
 #include "csplugincommon/opengl/glcommon2d.h"
@@ -478,7 +477,9 @@ csGLDriverDatabase::~csGLDriverDatabase ()
 {
 }
 
-void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d, const char* phase)
+void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d, 
+			       iDocumentNode* dbRoot, const char* phase, 
+			       int configPriority)
 {
   csGLDriverDatabase::ogl2d = ogl2d;
   rulePhase = phase ? phase : "";
@@ -486,47 +487,11 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d, const char* phase)
   csRef<iConfigManager> cfgmgr = CS_QUERY_REGISTRY (ogl2d->object_reg,
     iConfigManager);
 
-  const char* driverDB = cfgmgr->GetStr ("Video.OpenGL.DriverDB.Path",
-    "/config/gldrivers.xml");
-  int driverDBprio = cfgmgr->GetInt ("Video.OpenGL.DriverDB.Priority",
-    iConfigManager::ConfigPriorityPlugin + 10);
-
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (ogl2d->object_reg, iVFS);
-  csRef<iFile> dbfile = vfs->Open (driverDB, VFS_FILE_READ);
-  if (!dbfile)
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Could not open driver database file '%s'", driverDB);
-    return;
-  }
-
-  csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (ogl2d->object_reg,
-    iDocumentSystem);
-  if (!docsys.IsValid())
-    docsys.AttachNew (new csTinyDocumentSystem ());
-  csRef<iDocument> doc (docsys->CreateDocument ());
-
-  const char* err = doc->Parse (dbfile, true);
-  if (err != 0)
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Error parsing driver database: %s", err);
-    return;
-  }
-
-  csRef<iDocumentNode> dbRoot (doc->GetRoot()->GetNode ("gldriverdb"));
-  if (!dbRoot.IsValid())
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Driver database lacks <gldriverdb> node");
-    return;
-  }
-
   csRef<iSyntaxService> synsrv;
   CS_QUERY_REGISTRY_PLUGIN (synsrv, ogl2d->object_reg,
     "crystalspace.syntax.loader.service.text", iSyntaxService);
 
-  csDriverDBReader reader (this, cfgmgr, synsrv, driverDBprio);
+  csDriverDBReader reader (this, cfgmgr, synsrv, configPriority);
 
   csRef<iDocumentNodeIterator> it (dbRoot->GetNodes ());
   while (it->HasNext())

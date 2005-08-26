@@ -421,7 +421,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       ext.Open();
 
       dwi->this_->detector.DoDetection (hWnd, hDC);
-      dwi->this_->driverdb.Open (dwi->this_, "preinit");
+      dwi->this_->OpenDriverDB ("preinit");
 
       ext.InitWGL_ARB_pixel_format (hDC);
       if (ext.CS_WGL_ARB_pixel_format)

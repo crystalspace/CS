@@ -17,17 +17,21 @@
 */
 
 #include "cssysdef.h"
-#include "csplugincommon/opengl/glcommon2d.h"
-#include "csutil/csendian.h"
-#include "csplugincommon/canvas/scrshot.h"
-#include "csgeom/csrect.h"
+#include "csqint.h"
+
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
+#include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
-#include "csqint.h"
-#include "igraphic/image.h"
-#include "igraphic/imageio.h"
+
+#include "csgeom/csrect.h"
+#include "csplugincommon/canvas/scrshot.h"
+#include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glstates.h"
+#include "csutil/csendian.h"
+#include "csutil/xmltiny.h"
 
 // This header should be moved
 #include "csplugincommon/render3d/pixfmt.h"
@@ -107,7 +111,7 @@ bool csGraphics2DGLCommon::Open ()
   statecontext->InitCache();
 
   ext.Open ();
-  driverdb.Open (this);
+  OpenDriverDB ();
 
   // initialize font cache object
   csGLFontCache* GLFontCache = new csGLFontCache (this);
@@ -124,16 +128,13 @@ bool csGraphics2DGLCommon::Open ()
   const char *renderer = (const char *)glGetString (GL_RENDERER);
   const char *vendor = (const char *)glGetString (GL_VENDOR);
   const char *version = (const char *)glGetString (GL_VERSION);
-  csRef<iReporter> reporter (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (renderer || version || vendor)
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.canvas.openglcommon",
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "OpenGL renderer: %s (vendor: %s) version %s",
       renderer ? renderer : "unknown", vendor ? vendor: "unknown", 
       version ? version : "unknown");
 
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    "crystalspace.canvas.openglcommon",
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
     "Using %s mode at resolution %dx%d.",
     FullScreen ? "full screen" : "windowed", Width, Height);
 
@@ -141,14 +142,12 @@ bool csGraphics2DGLCommon::Open ()
     csString pfStr;
     GetPixelFormatString (currentFormat, pfStr);
 
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.canvas.openglcommon",
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Pixel format: %s", pfStr.GetData());
   }
   if (currentFormat[glpfvColorBits] < 24)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-      "crystalspace.canvas.openglcommon",
+    Report (CS_REPORTER_SEVERITY_WARNING,
       "WARNING! Crystal Space performs better in 24 or 32 bit display mode!");
   }
 
@@ -162,8 +161,7 @@ bool csGraphics2DGLCommon::Open ()
       // Sanity check
       if ((vMajor < 1) || ((vMajor == 1) && (vMinor < 1)))
       {
-	reporter->Report (CS_REPORTER_SEVERITY_ERROR,
-	  "crystalspace.canvas.openglcommon",
+	Report (CS_REPORTER_SEVERITY_ERROR,
 	  "OpenGL >= 1.1 is required, but only %d.%d is present.",
 	  vMajor, vMinor);
       }
@@ -204,9 +202,8 @@ bool csGraphics2DGLCommon::Open ()
 
     if (glmultisamp)
     {
-      if (reporter && (glmultisamp != currentFormat[glpfvMultiSamples]))
-	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "crystalspace.canvas.openglcommon",
+      if (glmultisamp != currentFormat[glpfvMultiSamples])
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "Multisample: actually %d samples",
 	  (int)glmultisamp);
 
@@ -218,20 +215,16 @@ bool csGraphics2DGLCommon::Open ()
 	
 	GLint msHint;
 	glGetIntegerv (GL_MULTISAMPLE_FILTER_HINT_NV, &msHint);
-	if (reporter)
-	  reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "crystalspace.canvas.openglcommon",
-	    "Multisample settings: %s",
-	    ((msHint == GL_NICEST) ? "quality" :
-	    ((msHint == GL_FASTEST) ? "performance" : "unknown")));
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Multisample settings: %s",
+	  ((msHint == GL_NICEST) ? "quality" :
+	  ((msHint == GL_FASTEST) ? "performance" : "unknown")));
       }
     }
     else
     {
-      if (reporter)
-	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "crystalspace.canvas.openglcommon",
-	  "Multisample: disabled");
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Multisample: disabled");
     }
   }
 
@@ -393,6 +386,57 @@ void csGraphics2DGLCommon::GetPixelFormatString (const GLPixelFormat& format,
   {
     str.AppendFmt ("%s: %d ", valueNames[v], format[v]);
   }
+}
+
+void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
+{
+  const char* driverDB = config->GetStr ("Video.OpenGL.DriverDB.Path",
+    "/config/gldrivers.xml");
+  int driverDBprio = config->GetInt ("Video.OpenGL.DriverDB.Priority",
+    iConfigManager::ConfigPriorityPlugin + 10);
+
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iFile> dbfile = vfs->Open (driverDB, VFS_FILE_READ);
+  if (!dbfile)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Could not open driver database file '%s'", driverDB);
+    return;
+  }
+
+  csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (object_reg,
+    iDocumentSystem);
+  if (!docsys.IsValid())
+    docsys.AttachNew (new csTinyDocumentSystem ());
+  csRef<iDocument> doc (docsys->CreateDocument ());
+
+  const char* err = doc->Parse (dbfile, true);
+  if (err != 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Error parsing driver database: %s", err);
+    return;
+  }
+
+  csRef<iDocumentNode> dbRoot (doc->GetRoot()->GetNode ("gldriverdb"));
+  if (!dbRoot.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Driver database lacks <gldriverdb> node");
+    return;
+  }
+
+  driverdb.Open (this, dbRoot, phase, driverDBprio);
+}
+
+void csGraphics2DGLCommon::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (object_reg, severity, 
+    "crystalspace.canvas.openglcommon",
+    msg, args);
+  va_end (args);
 }
 
 const char* csGraphics2DGLCommon::GetRendererString (const char* str)
@@ -800,8 +844,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
     csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
     if (!imgsaver)
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.canvas.openglcommon",
+      Report (CS_REPORTER_SEVERITY_WARNING,
         "Could not get image saver.");
       return false;
     }
@@ -809,8 +852,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
     csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
     if (!vfs)
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.canvas.openglcommon",
+      Report (CS_REPORTER_SEVERITY_WARNING,
 	"Could not get VFS.");
       return false;
     }
@@ -826,8 +868,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
       csRef<iDataBuffer> buf = imgsaver->Save (images[i], "image/png");
       if (!buf)
       {
-	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	  "crystalspace.canvas.openglcommon",
+	Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Could not save font cache page.");
       }
       else
@@ -835,14 +876,12 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
 	outfn.Format ("%s%zu.png", dir, i);
 	if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
 	{
-	  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	    "crystalspace.canvas.openglcommon",
+	  Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not write to %s.", outfn.GetData ());
 	}
 	else
 	{
-	  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	    "crystalspace.canvas.openglcommon",
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "Dumped font cache page to %s", outfn.GetData ());
 	}
       }

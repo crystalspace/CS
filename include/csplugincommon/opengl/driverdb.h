@@ -26,6 +26,7 @@
 #include "csutil/strhash.h"
 
 struct iConfigDocument;
+struct iDocumentNode;
 class csGraphics2DGLCommon;
 
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLDriverDatabase
@@ -46,7 +47,8 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  void Open (csGraphics2DGLCommon* ogl2d, const char* phase = 0);
+  void Open (csGraphics2DGLCommon* ogl2d, iDocumentNode* dbRoot, 
+    const char* phase, int configPriority);
   void Close ();
 };
 
