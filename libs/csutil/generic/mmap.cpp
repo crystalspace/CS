@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "csutil/unix/mmap_posix.h"
+#include "csutil/mmap_posix.h"
 
 csPlatformMemoryMappingPosix::csPlatformMemoryMappingPosix ()
 {
