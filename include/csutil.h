@@ -47,7 +47,6 @@
 #include "csutil/cseventq.h"
 #include "csutil/csinput.h"
 #include "csutil/csmd5.h"
-#include "csutil/csmmap.h"
 #include "csutil/csobject.h"
 #include "csutil/cspmeter.h"
 #include "csutil/csppulse.h"
