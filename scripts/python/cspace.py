@@ -4208,6 +4208,7 @@ class iEngine(iBase):
     def SetLightingCacheMode(*args): return _cspace.iEngine_SetLightingCacheMode(*args)
     def GetLightingCacheMode(*args): return _cspace.iEngine_GetLightingCacheMode(*args)
     def SetCacheManager(*args): return _cspace.iEngine_SetCacheManager(*args)
+    def SetVFSCacheManager(*args): return _cspace.iEngine_SetVFSCacheManager(*args)
     def GetCacheManager(*args): return _cspace.iEngine_GetCacheManager(*args)
     def SetMaxLightmapSize(*args): return _cspace.iEngine_SetMaxLightmapSize(*args)
     def GetMaxLightmapSize(*args): return _cspace.iEngine_GetMaxLightmapSize(*args)
@@ -7145,6 +7146,8 @@ class iCacheManager(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iCacheManager instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetReadOnly(*args): return _cspace.iCacheManager_SetReadOnly(*args)
+    def IsReadOnly(*args): return _cspace.iCacheManager_IsReadOnly(*args)
     def SetCurrentType(*args): return _cspace.iCacheManager_SetCurrentType(*args)
     def GetCurrentType(*args): return _cspace.iCacheManager_GetCurrentType(*args)
     def SetCurrentScope(*args): return _cspace.iCacheManager_SetCurrentScope(*args)
