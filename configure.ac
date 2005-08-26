@@ -1808,16 +1808,6 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 
 
 #------------------------------------------------------------------------------
-# Check for Ascii Art library (aalib).
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([aa],
-    [AC_LANG_PROGRAM([[#include <aalib.h>]], [aa_autoinit(0); aa_close(0);])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libaa], [AALIB])], [], [], [], [],
-    [aalib])
-
-
-
-#------------------------------------------------------------------------------
 # Check for Colour Ascii Art library (libcaca).
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([caca],

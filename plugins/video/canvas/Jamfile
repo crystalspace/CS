@@ -1,6 +1,5 @@
 SubDir TOP plugins video canvas ;
 
-SubInclude TOP plugins video canvas asciiart ;
 SubInclude TOP plugins video canvas caca ;
 SubInclude TOP plugins video canvas ddraw ;
 SubInclude TOP plugins video canvas macosx ;
