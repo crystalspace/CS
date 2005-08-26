@@ -13,6 +13,8 @@ chronological order.
 	  csplugincommon/iopengl for OpenGL interfaces, renamed iogl.h to
 	  openglinterface.h and moved it there.
 	- res removed the AsciiArt canvas.
+	- res updated unix.jam to only use EMBED_META to decide whether
+	  metadata should be embedded.
 25-Aug-2005
 	- res added some tweaks for software GL to the driver database.
 	- Adam Bradley fixed a bug in the Linux joystick driver diagnosed by
