@@ -35,6 +35,8 @@
 #include "csplugincommon/canvas/softfontcacheimpl.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
 #include "csplugincommon/imageloader/optionsparser.h"
+#include "csplugincommon/iopengl/driverdb.h"
+#include "csplugincommon/iopengl/openglinterface.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "csplugincommon/particlesys/particle.h"
 #include "csplugincommon/render3d/normalizationcube.h"
