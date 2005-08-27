@@ -19,8 +19,10 @@
 
 #include "cssysdef.h"
 
-#include "csutil/util.h"
+#include "csgeom/math.h"
+#include "csutil/set.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
@@ -214,7 +216,7 @@ void csWrappedDocumentNode::ProcessInclude (const csString& filename,
 void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode, 
 					     NodeProcessingState* state)
 {
-  Template& templNodes = *(state->templ);
+  csRefArray<iDocumentNode>& templNodes = state->templ->nodes;
   csRef<iDocumentNode> node = templNode;
   if (node->GetType() == CS_NODE_UNKNOWN)
   {
@@ -275,16 +277,26 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
 
 bool csWrappedDocumentNode::InvokeTemplate (const char* name, 
 					    iDocumentNode* node,
-					    NodeProcessingState* state)
-
+					    NodeProcessingState* state, 
+					    const csArray<csString>& params)
 {
-  csRefArray<iDocumentNode>* templNodes = 
+  Template* templNodes = 
     globalState->templates.GetElementPointer (name);
   if (!templNodes) return false;
 
-  for (size_t i = 0; i < templNodes->Length(); i++)
+  size_t i;
+  Substitutions paramSubst;
+  for (i = 0; i < csMin (params.Length(), templNodes->paramMap.Length()); i++)
   {
-    ProcessSingleWrappedNode (state, templNodes->Get (i));
+    paramSubst.Put (templNodes->paramMap[i], params[i]);
+  }
+
+  for (i = 0; i < templNodes->nodes.Length(); i++)
+  {
+    csRef<iDocumentNode> newNode = 
+      shared->replacerFactory.CreateWrapper (templNodes->nodes.Get (i), 0,
+      paramSubst);
+    ProcessSingleWrappedNode (state, newNode);
   }
   ValidateTemplateEnd (node, state);
   return true;
@@ -298,6 +310,65 @@ void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node,
     Report (syntaxErrorSeverity, node,
       "'template' without 'endtemplate'");
   }
+}
+
+const char* csWrappedDocumentNode::ParseTemplateArguments (const char* str, 
+							   csArray<csString>& strings)
+{
+  if (!str) return 0;
+
+  csString currentStr;
+
+  while (*str != 0)
+  {
+    currentStr.Empty();
+    while ((*str != 0) && isspace (*str)) str++;
+    if (*str == '"')
+    {
+      while (*str != 0)
+      {
+	if (*str == '\\')
+	{
+	  str++;
+	  currentStr << *str;
+	  str++;
+	}
+	else if (*str == '"')
+	{
+	  str++;
+	  break;
+	}
+	else
+	{
+	  currentStr << *str;
+	  str++;
+	}
+      }
+    }
+    else
+    {
+      while ((*str != 0) && !isspace (*str)) 
+      {
+	currentStr << *str;
+	str++;
+      }
+    }
+    if (!currentStr.IsEmpty()) strings.Push (currentStr);
+  }
+
+  /*const char* paramStart = str;   
+  do
+  {
+    const char* paramEnd = strchr (paramStart, ' ');
+    csString paramName (paramStart, 
+      (paramEnd != 0) ? paramEnd - paramStart : strlen (paramStart));
+    paramName.LTrim();
+    if (!paramName.IsEmpty()) strings.Push (paramName);
+    paramStart = paramEnd;
+  }
+  while (paramStart != 0);*/
+
+  return 0;
 }
 
 void csWrappedDocumentNode::ProcessSingleWrappedNode (
@@ -493,14 +564,38 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    {
 	      bool okay = true;
 	      csString templateName;
+	      Template newTempl;
 	      templateName.Replace (space + 1, valLen - cmdLen - 1);
 	      templateName.RTrim();
 	      size_t templateEnd = templateName.FindFirst (' ');
 	      if (okay && (templateEnd != (size_t)-1))
 	      {
-		Report (syntaxErrorSeverity, node,
-		  "Extra 'template' parameters");
-		okay = false;
+		// Parse template parameter names
+		csArray<csString> paramNames;
+		const char* err = ParseTemplateArguments (
+		  templateName.GetData() + templateEnd + 1, paramNames);
+		if (err != 0)
+		{
+		  Report (syntaxErrorSeverity, node,
+		    "Error parsing template parameters: %s", err);
+		  okay = false;
+		}
+
+		csSet<csString> dupeCheck;
+		for (size_t i = 0; i < paramNames.Length(); i++)
+		{
+		  if (dupeCheck.Contains (paramNames[i]))
+		  {
+		    Report (syntaxErrorSeverity, node,
+		      "Duplicate template parameter '%s'", 
+		      paramNames[i].GetData());
+		    okay = false;
+		  }
+		  newTempl.paramMap.Push (paramNames[i]);
+		  dupeCheck.Add (paramNames[i]);
+		}
+
+		templateName.Truncate (templateEnd);
 	      }
 	      if (okay && templateName.IsEmpty())
 	      {
@@ -517,8 +612,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-		/*ProcessTemplate (templateName, node, state);*/
-		globalState->templates.PutUnique (templateName, Template ());
+		globalState->templates.PutUnique (templateName, newTempl);
 		state->templ = globalState->templates.GetElementPointer (templateName);
 		state->templNestCount = 1;
 	      }
@@ -531,11 +625,24 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    }
 	    break;
 	  default:
-	    if (!InvokeTemplate (tokenStr, node, state))
 	    {
-	      // @@@ Check for template of name
-	      Report (syntaxErrorSeverity, node,
-		"Unknown command '%s'", tokenStr.GetData());
+	      csArray<csString> params;
+	      const char* err = 0;
+	      if (space != 0)
+	      {
+		csString pStr (space + 1, valLen - cmdLen - 1);
+		err = ParseTemplateArguments (pStr, params);
+	      }
+	      if (err != 0)
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "Error parsing template parameters: %s", err);
+	      }
+	      else if (!InvokeTemplate (tokenStr, node, state, params))
+	      {
+		Report (syntaxErrorSeverity, node,
+		  "Unknown command '%s'", tokenStr.GetData());
+	      }
 	    }
 	}
 

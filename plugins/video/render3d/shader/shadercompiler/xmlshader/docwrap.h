@@ -34,6 +34,8 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
+#include "docwrap_replacer.h"
+
 class csWrappedDocumentNodeIterator;
 struct WrapperStackEntry;
 
@@ -150,9 +152,11 @@ class csWrappedDocumentNode : public csDocumentNodeReadOnly
   void ProcessTemplate (iDocumentNode* templNode, 
     NodeProcessingState* state);
   bool InvokeTemplate (const char* name, iDocumentNode* node, 
-    NodeProcessingState* state);
+    NodeProcessingState* state, const csArray<csString>& params);
   void ValidateTemplateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
+  const char* ParseTemplateArguments (const char* str, 
+    csArray<csString>& strings);
 
   void ProcessSingleWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
   void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
@@ -161,7 +165,11 @@ class csWrappedDocumentNode : public csDocumentNodeReadOnly
   
   static void AppendNodeText (WrapperWalker& walker, csString& text);
 
-  typedef csRefArray<iDocumentNode> Template;
+  struct Template
+  {
+    csRefArray<iDocumentNode> nodes;
+    csArray<csString> paramMap;
+  };
   struct GlobalProcessingState : public csRefCount
   {
     csHash<Template, csString> templates;
@@ -258,6 +266,7 @@ class csWrappedDocumentNodeFactory
   iObjectRegistry* objreg;
   csTextNodeWrapper::Pool textNodePool;
   csWrappedDocumentNodeIterator::Pool iterPool;
+  csReplacerDocumentNodeFactory replacerFactory;
 
   csStringHash pitokens;
 #define CS_TOKEN_ITEM_FILE \

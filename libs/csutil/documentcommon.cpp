@@ -19,6 +19,9 @@
 
 #include "cssysdef.h"
 #include "csutil/documentcommon.h"
+#include "csutil/documenthelper.h"
+
+using namespace CrystalSpace;
 
 SCF_IMPLEMENT_IBASE(csEmptyDocumentNodeIterator)
   SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
@@ -64,6 +67,14 @@ void csDocumentNodeCommon::SetValueAsFloat (float value)
   csString s;
   s.Format ("%g", value);
   SetValue (s);
+}
+
+csRef<iDocumentNodeIterator> csDocumentNodeCommon::GetNodes (const char* value)
+{
+  csRef<iDocumentNodeIterator> it = GetNodes();
+  if (!it.IsValid()) return 0;
+  return DocumentHelper::FilterDocumentNodeIterator (it, 
+    DocumentHelper::NodeValueTest (value));
 }
 
 const char* csDocumentNodeCommon::GetContentsValue ()

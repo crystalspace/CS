@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Aug-2005
+	- res added a tad more functionality to the common document stuff.
+	- res augmented the shader conditional template support with the 
+	  ability to substitute strings in the template. The parameter names
+	  are a simple space-delimited list after the name, and strings of the 
+	  form $Foo$ will later be replaced with the string that is passed
+	  at the position of the Foo parameter when invoking the template.
+	  Silly example:
+	    <?template Foo X Y?>
+	      <!-- test $X$ -->
+	      <?template $Y$ Z?>
+		<!-- another test $$Z$$ -->
+	      <?endtemplate?>
+	    <?endtemplate?>
+	  Invokation with
+	    <?Foo baz Bar ?>
+	    <?Bar moo?>
+	  will lead to:
+	    <!-- test baz -->
+	    <!-- another test moo -->
 26-Aug-2005
 	- res added a dummy csPlatformMemoryMapping implementation.
 	- res converted the canvases to the new SCF.

@@ -75,13 +75,14 @@ public:
   virtual void SetValueAsFloat (float value);
   //@}
 
-  //@{
   /// Return empty iterator.
   virtual csRef<iDocumentNodeIterator> GetNodes ()
   { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
-  virtual csRef<iDocumentNodeIterator> GetNodes (const char* /*value*/)
-  { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
-  //@}
+  /**
+   * Return iterator wrapping around the one returned by GetNodes() and
+   * filtering for nodes with a value of \a value.
+   */
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
   /// Dummy implementation
   virtual csRef<iDocumentNode> GetNode (const char* /*value*/)
   { return 0; }
