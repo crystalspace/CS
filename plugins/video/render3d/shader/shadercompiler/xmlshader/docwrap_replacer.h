@@ -69,7 +69,7 @@ public:
   { return value; }
 
   virtual csRef<iDocumentNode> GetParent ()
-  { return parent ? ((iDocumentNode*)parent) : wrappedNode->GetParent(); }
+  { return parent ? csRef<iDocumentNode> (parent) : wrappedNode->GetParent(); }
   virtual csRef<iDocumentNodeIterator> GetNodes ();
   virtual csRef<iDocumentNode> GetNode (const char* value);
 

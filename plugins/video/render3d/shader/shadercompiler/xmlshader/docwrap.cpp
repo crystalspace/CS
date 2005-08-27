@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include <ctype.h>
 
 #include "csgeom/math.h"
 #include "csutil/set.h"
