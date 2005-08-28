@@ -107,7 +107,7 @@
   #endif
 
   // VC8 quirks
-  #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1400)
+  #if (_MSC_VER >= 1400)
     // Also note quirk in csconfig.h
 
     // Nothing else atm.

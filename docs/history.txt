@@ -8,7 +8,8 @@ chronological order.
 
 28-Aug-2005
 	- Philip Wyett moved some declerations to after a goto jump because the 
-	   code executed after the jump does not require them.
+	  code executed after the jump does not require them.
+	- res made a few compile fixes for Win64.
 27-Aug-2005
 	- res added a tad more functionality to the common document stuff.
 	- res augmented the shader conditional template support with the 

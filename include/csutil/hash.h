@@ -94,6 +94,11 @@ CS_SPECIALIZE_TEMPLATE
 class csHashComputer<unsigned long> : 
   public csHashComputerIntegral<unsigned long> {}; 
 CS_SPECIALIZE_TEMPLATE
+class csHashComputer<longlong> : 
+  public csHashComputerIntegral<longlong> {}; 
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<ulonglong> : 
+  public csHashComputerIntegral<ulonglong> {}; 
 class csHashComputer<float>
 {
 public:

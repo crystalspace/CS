@@ -718,7 +718,7 @@ public:
     return UTF16to32 (dest, destSize, (utf16_char*)source, srcSize);
   };
 
-#if !defined(CS_COMPILER_MSVC)
+#if !defined(CS_COMPILER_MSVC) || defined(CS_MSVC_WCHAR_T_BUILTIN)
   /* @@@ For VC6, utf16_char == wchar_t, complains below. (Can be avoided on 
    * VC7 with "Builtin wchar_t" - but disabled for CS.) */
   /**
