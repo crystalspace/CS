@@ -34,6 +34,8 @@ public:
                              const uint32* id = 0);
 
     virtual void Flush();
+    virtual void SetReadOnly(bool) { }
+    virtual bool IsReadOnly() const { return false; }
 };
 
 #endif
