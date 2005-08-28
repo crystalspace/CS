@@ -300,14 +300,12 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 
   putTextLevel++;
 
-  size_t len;
-  char *dst;
-  const char *src;
-  char c;
-
   if (iText2 == 0 || *iText2 == 0)
     goto Done;
 
+  size_t len;
+  char *dst;
+  const char *src;
   {
     csString& iText = *GetTextBuf();
     iText.FormatV (iText2, args);
@@ -316,6 +314,8 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
     dst = Line [LineNumber] + len;
     src = iText;
   }
+  
+  char c;
   for (c = *src; c != '\0'; c = *++src)
   {
     if (ClearInput)

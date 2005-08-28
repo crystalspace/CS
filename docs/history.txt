@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Aug-2005
+	- Philip Wyett moved some declerations to after a goto jump because the 
+	   code executed after the jump does not require them.
 27-Aug-2005
 	- res added a tad more functionality to the common document stuff.
 	- res augmented the shader conditional template support with the 
