@@ -83,22 +83,27 @@ public:
  */
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<void*> : public csHashComputerIntegral<void*> {};
+  
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<unsigned int> : 
   public csHashComputerIntegral<unsigned int> {}; 
+    
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<long> : public csHashComputerIntegral<long> {}; 
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<unsigned long> : 
   public csHashComputerIntegral<unsigned long> {}; 
+    
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<longlong> : 
   public csHashComputerIntegral<longlong> {}; 
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<ulonglong> : 
   public csHashComputerIntegral<ulonglong> {}; 
+    
+CS_SPECIALIZE_TEMPLATE
 class csHashComputer<float>
 {
 public:
