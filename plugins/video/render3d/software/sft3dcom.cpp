@@ -4364,7 +4364,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   {
     csRenderBufferLock<uint> indexLock (scrapIndices);
     for (uint i = 0; i < mesh.vertexCount; i++)
-      indexLock[i] = i;
+      indexLock[(size_t)i] = i;
   }
   sv->SetValue (scrapIndices);
   scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
