@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 28-Aug-2005
-	- Philip Wyett moved some declerations to after a goto jump because the 
+	- Philip Wyett moved some declerations to after a goto jump because the
 	  code executed after the jump does not require them.
 	- res made a few compile fixes for Win64.
 27-Aug-2005
@@ -69,7 +69,8 @@ chronological order.
 	    - In xmlshader a non-POD was passed through ... I temporarily
 	      disabled that code as I don't know what the correct code is
 	      there.
-	- Jorrit did a documentation fix: the pixmap howto was not 100% correct.
+	- Jorrit did a documentation fix: the pixmap howto was not 100%
+	  correct.
 	- res changed csLoader::ParseTexture() to enforce texture registration
 	  by the loader plugin.
 	- res fixed the proctex loaders to register the returned texture.
@@ -151,9 +152,9 @@ chronological order.
 	- res added doxygen documentation for the master headers.
 	- Vincent Knecht applied mdmkolbe's fix to perlpre.i. This resolves
 	  swig errors about _wrap_* functions.
-	- res augmented the fat renderloop with the ability to basically render 
+	- res augmented the fat renderloop with the ability to basically render
 	  different lights with different shaders. The lights relevant to a
-	  mesh are determined and rendered in the quantities and  limits given 
+	  mesh are determined and rendered in the quantities and limits given
 	  by user and user-specified shaders.
 	- res added csShaderVariable::SetName().
 	- res added csShaderVariableContext::Clear() and ReplaceVariable().
@@ -172,7 +173,8 @@ chronological order.
 	- res made some VC6 compile fixes.
 	- res fixed the glshader_fixed plugin for the STANDARD_LIGHT changes.
 	- res made csGLGraphics3D::SetMixMode() disable alpha testing.
-	- Marten added a fugly hack to SCF to allow querying of base-interfaces.
+	- Marten added a fugly hack to SCF to allow querying of
+	  base-interfaces.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.
