@@ -35,81 +35,13 @@
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 
+#include "csutil/win32/psdk-compat.h"
 
 #ifndef GL_VERSION_1_1
 #error OpenGL version 1.1 required! Stopping compilation.
 #endif
 
 CS_IMPLEMENT_PLUGIN
-
-#ifndef CDS_UPDATEREGISTRY
-#define CDS_UPDATEREGISTRY  0x00000001
-#endif
-#ifndef CDS_TEST
-#define CDS_TEST            0x00000002
-#endif
-#ifndef CDS_FULLSCREEN
-#define CDS_FULLSCREEN      0x00000004
-#endif
-#ifndef CDS_GLOBAL
-#define CDS_GLOBAL          0x00000008
-#endif
-#ifndef CDS_SET_PRIMARY
-#define CDS_SET_PRIMARY     0x00000010
-#endif
-#ifndef CDS_RESET
-#define CDS_RESET           0x40000000
-#endif
-#ifndef CDS_SETRECT
-#define CDS_SETRECT         0x20000000
-#endif
-#ifndef CDS_NORESET
-#define CDS_NORESET         0x10000000
-#endif
-
-/* Return values for ChangeDisplaySettings */
-#ifndef DISP_CHANGE_SUCCESSFUL
-#define DISP_CHANGE_SUCCESSFUL       0
-#endif
-#ifndef DISP_CHANGE_RESTART
-#define DISP_CHANGE_RESTART          1
-#endif
-#ifndef DISP_CHANGE_FAILED
-#define DISP_CHANGE_FAILED          -1
-#endif
-#ifndef DISP_CHANGE_BADMODE
-#define DISP_CHANGE_BADMODE         -2
-#endif
-#ifndef DISP_CHANGE_NOTUPDATED
-#define DISP_CHANGE_NOTUPDATED      -3
-#endif
-#ifndef DISP_CHANGE_BADFLAGS
-#define DISP_CHANGE_BADFLAGS        -4
-#endif
-#ifndef DISP_CHANGE_BADPARAM
-#define DISP_CHANGE_BADPARAM        -5
-#endif
-
-#ifndef ENUM_CURRENT_SETTINGS
-#define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
-#endif
-
-// These don't exist on some older SDKs
-#ifndef _WIN64
-  #ifndef SetWindowLongPtrA
-    #define SetWindowLongPtrA SetWindowLongA
-  #endif
-  #ifndef SetWindowLongPtrW
-    #define SetWindowLongPtrW SetWindowLongW
-  #endif
-  
-  #ifndef GetWindowLongPtrA
-    #define GetWindowLongPtrA GetWindowLongA
-  #endif
-  #ifndef GetWindowLongPtrW
-    #define GetWindowLongPtrW GetWindowLongW
-  #endif
-#endif
 
 /*
     In fs mode, the window is topmost, means above every other
@@ -571,13 +503,13 @@ bool csGraphics2DOpenGL::Open ()
   // Subclass the window
   if (IsWindowUnicode (m_hWnd))
   {
-    m_OldWndProc = (WNDPROC)SetWindowLongPtrW (m_hWnd, GWL_WNDPROC, (LONG_PTR) WindowProc);
-    SetWindowLongPtrW (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+    m_OldWndProc = (WNDPROC)SetWindowLongPtrW (m_hWnd, GWLP_WNDPROC, (LONG_PTR) WindowProc);
+    SetWindowLongPtrW (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
   }
   else
   {
-    m_OldWndProc = (WNDPROC)SetWindowLongPtrA (m_hWnd, GWL_WNDPROC, (LONG_PTR) WindowProc);
-    SetWindowLongPtrA (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+    m_OldWndProc = (WNDPROC)SetWindowLongPtrA (m_hWnd, GWLP_WNDPROC, (LONG_PTR) WindowProc);
+    SetWindowLongPtrA (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
   }
 
   hDC = GetDC (m_hWnd);
@@ -1020,7 +952,7 @@ void csGraphics2DOpenGL::SetFullScreen (bool b)
 LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
-  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLongPtrA (hWnd, GWL_USERDATA);
+  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLongPtrA (hWnd, GWLP_USERDATA);
   switch (message)
   {
     case WM_ACTIVATE:

@@ -36,6 +36,7 @@
 #include "csplugincommon/canvas/softfontcache.h"
 
 #include "g2d.h"
+#include "csutil/win32/psdk-compat.h"
 
 #ifndef DD_FALSE
   // This is normally being done in the ddraw.h file
@@ -44,23 +45,6 @@
 
 #define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 #define FULLSCREEN_STYLE (WS_POPUP | WS_SYSMENU)
-
-// These don't exist on some older SDKs
-#ifndef _WIN64
-  #ifndef SetWindowLongPtrA
-    #define SetWindowLongPtrA SetWindowLongA
-  #endif
-  #ifndef SetWindowLongPtrW
-    #define SetWindowLongPtrW SetWindowLongW
-  #endif
-  
-  #ifndef GetWindowLongPtrA
-    #define GetWindowLongPtrA GetWindowLongA
-  #endif
-  #ifndef GetWindowLongPtrW
-    #define GetWindowLongPtrW GetWindowLongW
-  #endif
-#endif
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- csGraphics2DDDraw3 --//--//
 
@@ -172,15 +156,15 @@ bool csGraphics2DDDraw3::Open ()
   // Subclass the window
   if (cswinIsWinNT ())
   {
-    m_OldWndProc = (WNDPROC)GetWindowLongPtrW (m_hWnd, GWL_WNDPROC);
-    SetWindowLongPtrW (m_hWnd, GWL_WNDPROC, (LONG_PTR)WindowProc);
-    SetWindowLongPtrW (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+    m_OldWndProc = (WNDPROC)GetWindowLongPtrW (m_hWnd, GWLP_WNDPROC);
+    SetWindowLongPtrW (m_hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProc);
+    SetWindowLongPtrW (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
   }
   else
   {
-    m_OldWndProc = (WNDPROC)GetWindowLongA (m_hWnd, GWL_WNDPROC);
-    SetWindowLongPtrA (m_hWnd, GWL_WNDPROC, (LONG_PTR)WindowProc);
-    SetWindowLongPtrA (m_hWnd, GWL_USERDATA, (LONG_PTR)this);
+    m_OldWndProc = (WNDPROC)GetWindowLongA (m_hWnd, GWLP_WNDPROC);
+    SetWindowLongPtrA (m_hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProc);
+    SetWindowLongPtrA (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
   }
 
   // Get ahold of the main DirectDraw object...
@@ -923,7 +907,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
 LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
-  csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLongPtrA (hWnd, GWL_USERDATA);
+  csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLongPtrA (hWnd, GWLP_USERDATA);
   switch (message)
   {
     case WM_PAINT:

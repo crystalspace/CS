@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Aug-2005
+	- res made some more compile fixes for Win64, reported by Mike Gist.
+	- res added csutil/win32/psdk-compat.h to concentrate Windows Platform
+	  SDK smoothing in a single place (previously, certain same workarounds
+	  for PSDK version differences have been duplicated in several source
+	  files).
 28-Aug-2005
 	- Philip Wyett moved some declerations to after a goto jump because the
 	  code executed after the jump does not require them.
