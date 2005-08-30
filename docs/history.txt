@@ -13,6 +13,8 @@ chronological order.
 	- res added per-calmesh shader variables to sprcal3d.
 	- res made sprcal3d share indices and texture coordinates between
 	  mesh objects.
+	- Eric Sunshine excluded the special-purpose csutil/win32/psdk-compat.h
+	  from the csutil.h master header.
 29-Aug-2005
 	- res made some more compile fixes for Win64, reported by Mike Gist.
 	- res added csutil/win32/psdk-compat.h to concentrate Windows Platform
