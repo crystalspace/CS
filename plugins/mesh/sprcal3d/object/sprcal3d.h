@@ -203,8 +203,7 @@ private:
   /// Material handle as returned by iTextureManager.
   iBase* logparent;
   
-  iMeshObjectType* sprcal3d_type;
-  csSpriteCal3DMeshObjectType* sprcal3d_type2;
+  csSpriteCal3DMeshObjectType* sprcal3d_type;
 
   /// If true then this factory has been initialized.
   bool initialized;
@@ -212,13 +211,19 @@ private:
   /// This is the factory equivalent class in cal3d.
   CalCoreModel calCoreModel;
   csPDelArray<csCal3DAnimation> anims;
-  csPDelArray<csCal3DMesh> submeshes;
+  csPDelArray<csCal3DMesh> meshes;
   csArray<csString> morph_animation_names;
 
   csString basePath;
   csPDelArray<csSpriteCal3DSocket> sockets;
   csFlags flags;
 
+  struct MeshBuffers
+  {
+    csRef<iRenderBuffer> indexBuffer;
+    csRef<iRenderBuffer> texcoordBuffer;
+  };
+  csHash<MeshBuffers, int> meshBuffers;
 public:
   CS_LEAKGUARD_DECLARE (csSpriteCal3DMeshObjectFactory);
 
@@ -234,9 +239,6 @@ public:
    */
   csWeakRef<iEngine> engine;
   
-  static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name;
-
   /// Create the sprite template.
   csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent,
   	csSpriteCal3DMeshObjectType* type, iObjectRegistry* object_reg);
@@ -271,7 +273,7 @@ public:
     float min_interval);
   bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback);
 
-  int GetMeshCount() { return (int)submeshes.Length(); }
+  int GetMeshCount() { return (int)meshes.Length(); }
   int GetMorphAnimationCount() { return (int)morph_animation_names.Length(); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
@@ -280,6 +282,8 @@ public:
   const char *GetMorphAnimationName(int idx);
   int  FindMorphAnimationName(const char *meshName);
   bool IsMeshDefault(int idx);
+
+  void DefaultGetBuffer (int mesh, csRenderBufferHolder*, csRenderBufferName);
 
   /// Create and add a new socket to the sprite.
   csSpriteCal3DSocket* AddSocket ();
@@ -307,7 +311,8 @@ public:
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iMeshObjectType* GetMeshObjectType () const { return sprcal3d_type; }
+  virtual iMeshObjectType* GetMeshObjectType () const 
+  { return (iMeshObjectType*)sprcal3d_type; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
 
@@ -611,78 +616,43 @@ private:
    */
   csPDelArray<csSpriteCal3DSocket> sockets;
 
-  struct MaterialToIdMapper
-  {
-#if (CS_PROCESSOR_SIZE == 32)
-#if (_MSC_VER >= 1300)
-    int GetIdForMaterial (iMaterialWrapper* mat)
-    { return (int __w64)mat; }
-#else
-    int GetIdForMaterial (iMaterialWrapper* mat)
-    { return (int)mat; }
-#endif
-    iMaterialWrapper* GetMaterialForId (int id)
-    { return (iMaterialWrapper*)id; }
-#else
-    int nextId;
-    csHashReversible<int, csPtrKey<iMaterialWrapper> > matHash;
-    MaterialToIdMapper() : nextId(0), matHash (7, 3) {}
-
-    int GetIdForMaterial (iMaterialWrapper* mat)
-    {
-      int id = matHash.Get (mat, -1);
-      if (id == -1) 
-      {
-	id = nextId++;
-	matHash.Put (mat, id);
-      }
-      return id;
-    }
-    iMaterialWrapper* GetMaterialForId (int id)
-    {
-      return matHash.GetKey (id, 0);
-    }
-#endif
-  };
-  MaterialToIdMapper materialMapper;
-
-  class BaseAccessor : public iRenderBufferAccessor
+  class MeshAccessor : public iRenderBufferAccessor
   {
   protected:
     csSpriteCal3DMeshObject* meshobj;
-    int mesh, submesh;
-    uint meshVersion;
+    int mesh;
+    uint colorVersion, normalVersion;
+    int vertexCount;
 
-    csRef<iRenderBuffer> vertex_buffer;
-    int vertex_size;
     csRef<iRenderBuffer> texel_buffer;
-    int texel_size;
     csRef<iRenderBuffer> normal_buffer;
-    int normal_size;
     csRef<iRenderBuffer> color_buffer;
-    int color_size;
     csRef<iRenderBuffer> index_buffer;
-    int index_size;
+
+    void UpdateNormals (CalRenderer* render,
+      CalMesh* calMesh, size_t vertexCount);
   public:
+    iMovable* movable;
+
     SCF_DECLARE_IBASE;
 
-    BaseAccessor (csSpriteCal3DMeshObject* meshobj, int mesh, 
-      int submesh)
+    MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh)
     {
       SCF_CONSTRUCT_IBASE (0);
-      BaseAccessor::meshobj = meshobj;
-      BaseAccessor::mesh = mesh;
-      BaseAccessor::submesh = submesh;    
-      meshVersion = (uint)-1;
+      MeshAccessor::meshobj = meshobj;
+      MeshAccessor::mesh = mesh;
+      colorVersion = normalVersion = (uint)-1;
+      vertexCount = meshobj->ComputeVertexCount (mesh);
     }
-    virtual ~BaseAccessor() 
+    virtual ~MeshAccessor() 
     {
       SCF_DESTRUCT_IBASE ();
     }
     virtual void PreGetBuffer (csRenderBufferHolder*, csRenderBufferName);
     
   };
-  friend class BaseAccessor;
+  friend class MeshAccessor;
+
 
   /**
    * Default animation time update handler (simply invokes CalModel::update()).
@@ -695,31 +665,48 @@ private:
     void UpdatePosition (float delta, CalModel*);
   };
 
-  bool rmeshesSetup;
   csRef<iStringSet> strings;
-  csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
-  csArray<csArray<csRenderMesh> > renderMeshes;
-  csRenderMeshHolder rmHolder;
-  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > rmArrayHolder;
   csWeakRef<iGraphics3D> G3D;
-  iMovable* currentMovable;
 
+  /* The deal with meshes, submeshes and attached meshes:
+   * - A cal3d model consists of multiple meshes.
+   * - A cal3d mesh consists of multiple submeshes.
+   * - A cal3d submesh has one material(* Although in some places CS allows
+   *   only a material per mesh)
+   * - Of the meshes, several can be 'attached' at a time - that is,
+   *   actually used and rendered. Every mesh cam at most be only attached 
+   *   once.
+   * For CS rendering, since we limit the material to one per mesh, we also
+   * use one rendermesh per cal mesh. 
+   * The total number of RMs may vary with instances and their attached meshes.
+   */
   uint meshVersion;
-  bool arrays_initialized;
   csBox3 object_bbox;
   uint bboxVersion;
-  csArray<csColor*> *meshes_colors;
-  csArray<int> attached_ids;
-  csArray<bool> *is_initialized;
   bool lighting_dirty;
   csColor dynamic_ambient;
-  csArray< csArray<csVector3*> > vertices;
-  bool vertices_allocated;
-  bool vertices_dirty;
 
-  void SetupVertices();
-  void SetupObject ();
-  void SetupObjectSubmesh(int index);
+  struct Mesh
+  {
+    /// Cal3d ID of the mesh
+    int calCoreMeshID;
+    /// Shader variable context for this mesh
+    csRef<csShaderVariableContext> svc;
+
+    csRef<iRenderBuffer> vertex_buffer;
+    uint vertexVersion;
+
+    Mesh() : vertexVersion(~0) {}
+  };
+  csArray<Mesh> meshes;
+  csArray<csRenderMesh> renderMeshTemplates;
+  static int CompareMeshIndexKey (const Mesh& m, int const& id);
+  static int CompareMeshMesh (const Mesh& m1, const Mesh& m2);
+  void SetupRenderMeshTemplate (CalMesh* calMesh, size_t index);
+  // Vertices are handled differently since they're also needed by HitBeam*().
+  iRenderBuffer* GetVertexBuffer (size_t index, CalRenderer *pCalRenderer);
+  int ComputeVertexCount (int mesh);
+
   void SetIdleOverrides(csRandomGen *rng,int which);
   void RecalcBoundingBox(csBox3& bbox);
 
@@ -727,12 +714,11 @@ private:
   int FindAnimCycleNamePos(char const*) const;
   void ClearAnimCyclePos(int pos, float delay);
 
-  void SetupRenderMeshes ();
-
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
-    iMovable* movable);
+    iMovable* movable, csColor* colors);
   void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable*, 
-    CalRenderer*, int mesh, int submesh, float* have_normals=0);
+    CalRenderer*, int mesh, int submesh, float* have_normals, 
+    csColor* colors);
 
 public:
   float updateanim_sqdistance1;
@@ -938,9 +924,9 @@ public:
   bool AddAnimCycle(int idx, float weight, float delay);
   bool ClearAnimCycle (int idx, float delay);
   bool ClearAnimCycle (const char *name, float delay);
-  int  GetActiveAnimCount();
-  int  GetActiveAnims(char *buffer,int max_length);
-  void SetActiveAnims(const char *buffer,int anim_count);
+  size_t GetActiveAnimCount();
+  bool GetActiveAnims(csSpriteCal3DActiveAnim* buffer, size_t max_length);
+  void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, size_t anim_count);
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
   bool SetAnimAction(int idx, float delayIn, float delayOut);
   bool SetVelocity(float vel,csRandomGen *rng=0);
@@ -950,7 +936,7 @@ public:
   float GetTimeFactor();
 
   bool AttachCoreMesh(const char *meshname);
-  bool AttachCoreMesh(int mesh_id,int iMatWrapID);
+  bool AttachCoreMesh(int mesh_id,iMaterialWrapper* iMatWrapID);
   bool DetachCoreMesh(const char *meshname);
   bool DetachCoreMesh(int mesh_id);
 
@@ -988,6 +974,8 @@ public:
   }
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
+
+  virtual iShaderVariableContext* GetSubmeshSVC (const char* meshName);
 
   struct SpriteCal3DState : public iSpriteCal3DState
   {
@@ -1037,15 +1025,16 @@ public:
     {
       return scfParent->ClearAnimCycle(name,delay);
     }
-    virtual int  GetActiveAnimCount()
+    virtual size_t GetActiveAnimCount()
     {
       return scfParent->GetActiveAnimCount();
     }
-    virtual int  GetActiveAnims(char *buffer,int max_length)
+    virtual bool GetActiveAnims(csSpriteCal3DActiveAnim* buffer, 
+      size_t max_length)
     {
       return scfParent->GetActiveAnims(buffer,max_length);
     }
-    virtual void SetActiveAnims(const char *buffer,int anim_count)
+    virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, size_t anim_count)
     {
       scfParent->SetActiveAnims(buffer,anim_count);
     }
@@ -1074,7 +1063,7 @@ public:
     virtual bool AttachCoreMesh(const char *meshname)
     { return scfParent->AttachCoreMesh(meshname); }
 
-    virtual bool AttachCoreMesh(int mesh_id,int iMatWrapID)
+    virtual bool AttachCoreMesh(int mesh_id,iMaterialWrapper* iMatWrapID)
     { return scfParent->AttachCoreMesh(mesh_id,iMatWrapID); }
 
     virtual bool DetachCoreMesh(const char *meshname)
@@ -1155,7 +1144,8 @@ public:
     {
       scfParent->SetAnimTimeUpdateHandler(p);
     }
-
+    virtual iShaderVariableContext* GetSubmeshSVC (const char* meshName)
+    { return scfParent->GetSubmeshSVC (meshName); }
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;
 
@@ -1227,6 +1217,9 @@ public:
   int updateanim_skip2;
   float updateanim_sqdistance3;
   int updateanim_skip3;
+
+  csRenderMeshHolder rmHolder;
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > rmArrayHolder;
 
 public:
   /// Constructor.

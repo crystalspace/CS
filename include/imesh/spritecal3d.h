@@ -26,6 +26,7 @@ struct iMeshObject;
 struct iMeshWrapper;
 struct iMeshObjectFactory;
 struct iRenderView;
+struct iShaderVariableContext;
 struct iVFS;
 
 class csColor;
@@ -352,7 +353,13 @@ struct iAnimTimeUpdateHandler : public iBase
   virtual void UpdatePosition (float delta, CalModel*) = 0;
 };
 
-SCF_VERSION (iSpriteCal3DState, 0, 0, 2);
+struct csSpriteCal3DActiveAnim
+{
+  int index;
+  float weight;
+};
+
+SCF_VERSION (iSpriteCal3DState, 1, 0, 0);
 
 /**
  * This interface describes the API for changing the Cal3D sprite 
@@ -360,6 +367,9 @@ SCF_VERSION (iSpriteCal3DState, 0, 0, 2);
  */
 struct iSpriteCal3DState : public iBase
 {
+  /**\name Animation management
+   * @{ */
+
   /// List of current animation types, used for introspection mostly.
   enum
   {
@@ -431,24 +441,27 @@ struct iSpriteCal3DState : public iBase
 
   /**
    * Returns the count of currently playing animation cycles.  This should
-   * be used to allocate the buffer required by GetActiveAnims below.  2 bytes
-   * per active anim are required.
+   * be used to allocate the buffer required by GetActiveAnims below.  
    */
-  virtual int  GetActiveAnimCount() = 0;
+  virtual size_t GetActiveAnimCount() = 0;
 
   /**
    * Fills the supplied buffer with the information to reconstruct the exact
    * animation mix currently playing in the model.  It does NOT include
    * any non-repeating actions.  Those must be handled separately, due to
    * the timing issues.
+   * \param buffer Buffer receiving information about active animations. 
+   * \param max_length Maximum number of entries that fit into \a buffer.
+   * \return Whether the buffer was successfully filled.
    */
-  virtual int  GetActiveAnims(char *buffer,int max_length) = 0;
+  virtual bool GetActiveAnims(csSpriteCal3DActiveAnim* buffer, 
+    size_t max_length) = 0;
 
   /**
    * Uses the supplied buffer (created by GetActiveAnims) to recreate an
    * exact mix of animation cycles and weights.
    */
-  virtual void SetActiveAnims(const char *buffer,int anim_count) = 0;
+  virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, size_t anim_count) = 0;
 
   /**
    * This adds a non-looping animation to the blend set for the cal3d Mixer.
@@ -482,27 +495,24 @@ struct iSpriteCal3DState : public iBase
    * This function sets the name to use when SetVelocity(0) is called.
    */
   virtual void SetDefaultIdleAnim(const char *name) = 0;
+  /** @} */
 
+  /**\name LOD
+   * @{ */
   /**
    * This function sets the Level of Detail used by the sprite.  This is used
    * to reduce the polygon count and simplify the scene for the renderer.
    */
   virtual void SetLOD(float lod) = 0;
+  /** @} */
 
+  /**\name Mesh attaching
+   * @{ */
   /**
    * This attaches a mesh with the specified name (from xml) to the instance of
    * the model.  
    */
   virtual bool AttachCoreMesh(const char *meshname) = 0;
-
-  /**
-   * This attaches a mesh with the specified calCoreModel id to the instance of
-   * the model.  It is expected this function is only called by the mesh object
-   * itself under normal circumstances.  Callers should normally refer to
-   * meshes by name to prevent behavior changes when xml order is updated.
-   * iMatWrap is the iMaterialWrapper to be used in rendering.
-   */
-  virtual bool AttachCoreMesh(int mesh_id,int iMatWrap) = 0;
 
   /**
    * This detaches a mesh with the specified name (from xml) to the instance of
@@ -511,13 +521,25 @@ struct iSpriteCal3DState : public iBase
   virtual bool DetachCoreMesh(const char *meshname) = 0;
 
   /**
+   * This attaches a mesh with the specified calCoreModel id (as returned by
+   * iSpriteCal3DFactoryState::FindMeshName() to the instance of the model.  
+   * It is expected this function is only called by the mesh object
+   * itself under normal circumstances.  Callers should normally refer to
+   * meshes by name to prevent behavior changes when xml order is updated.
+   * iMatWrap is the iMaterialWrapper to be used in rendering.
+   */
+  virtual bool AttachCoreMesh(int mesh_id, iMaterialWrapper* iMatWrap = 0) = 0;
+  /**
    * This detaches a mesh with the specified calCoreModel id to the instance of
    * the model.  It is expected this function is only called by the mesh object
    * itself under normal circumstances.  Callers should normally refer to
    * meshes by name to prevent behavior changes when xml order is updated.
    */
   virtual bool DetachCoreMesh(int mesh_id) = 0;
+  /** @} */
 
+  /**\name Morph targets
+   * @{ */
   /**
    * Blends the morph target.
    *
@@ -539,16 +561,22 @@ struct iSpriteCal3DState : public iBase
    * @return False if something went wrong.
    */
   virtual bool ClearMorphTarget(int morph_animation_id, float delay) = 0;
+  /** @} */
 
+  /**\name Sockets
+   * @{ */
   /// find a socked based on the sprite attached to it.
   virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const = 0;
 
   /// find a named socket into the sprite.
   virtual iSpriteCal3DSocket* FindSocket (const char* name) const = 0;
+  /** @} */
 
   /// Change the material on a named submesh.  Returns true if successful.
   virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
 
+  /**\name Time
+   * @{ */
   /// Set the animation time adjustment factor.  1=normal speed.
   virtual void SetTimeFactor(float timeFactor) = 0;
 
@@ -565,16 +593,6 @@ struct iSpriteCal3DState : public iBase
   virtual void SetAnimationTime(float animationTime) = 0;
 
   /**
-   * This gives you access to the internal Cal3d Model class which sprcal3d
-   * wraps.  If you use it directly, you run the risk of making sprcal3d and
-   * CalModel get out of sync.  Use carefully!
-   */
-  virtual CalModel *GetCal3DModel() = 0;
-
-  /// Set user data in the model, for access from the callback later, mostly.
-  virtual void SetUserData(void *data) = 0;
-  
-  /**
    * This gives you ability to update the internal Cal3d model directly rather
    * than relying upon the default behavior which merely invokes
    * CalModel::update().  You may need to do this, for example, when you want
@@ -582,6 +600,23 @@ struct iSpriteCal3DState : public iBase
    * for instance).
    */
   virtual void SetAnimTimeUpdateHandler(iAnimTimeUpdateHandler*) = 0;
+  /** @} */
+
+  /// Set user data in the model, for access from the callback later, mostly.
+  virtual void SetUserData(void *data) = 0;
+  
+  virtual iShaderVariableContext* GetSubmeshSVC (const char* meshName) = 0;
+
+  /**\name Direct Cal3d model manipulation
+   * You can get access to the internal Cal3d Model class which sprcal3d
+   * wraps.  
+   * \warning If you use it directly, you run the risk of making sprcal3d and
+   * CalModel get out of sync.  Use carefully!
+   * @{ */
+
+  /// Gives access to the internal Cal3d Model instance
+  virtual CalModel *GetCal3DModel() = 0;
+  /** @} */
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__

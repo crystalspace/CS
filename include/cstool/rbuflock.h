@@ -105,6 +105,12 @@ public:
   {
     return *((T*)((uint8*)Lock() + n * bufStride));
   }
+  
+  /// Retrieve number of items in buffer.
+  size_t GetSize() const
+  {
+    return buffer->GetElementCount();
+  }
 };
 
 #endif // __CS_CSTOOL_RBUFLOCK_H__

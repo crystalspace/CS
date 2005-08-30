@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Aug-2005
+	- res overhauled cal3d's render mesh code - the original code was from
+	  a time when both OR/NR still existed; now, a number of ORisms were
+	  thrown out and some NR features are better utilized.
+	- res added per-calmesh shader variables to sprcal3d.
+	- res made sprcal3d share indices and texture coordinates between
+	  mesh objects.
 29-Aug-2005
 	- res made some more compile fixes for Win64, reported by Mike Gist.
 	- res added csutil/win32/psdk-compat.h to concentrate Windows Platform
