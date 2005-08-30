@@ -492,7 +492,7 @@ void csSpriteCal3DMeshObjectFactory::DefaultGetBuffer (int meshIdx,
       mb = meshBuffers.GetElementPointer (meshIdx);
     }
 
-    if (!mb->indexBuffer.IsValid() || !mb->texcoordBuffer.IsValid())
+    if (!mb->indexBuffer.IsValid() && !mb->texcoordBuffer.IsValid())
     {
       int indexCount = 0;
       int vertexCount = 0;
@@ -526,11 +526,21 @@ void csSpriteCal3DMeshObjectFactory::DefaultGetBuffer (int meshIdx,
 	  indices[indexOffs++] = faces[f].vertexId[1];
 	  indices[indexOffs++] = faces[f].vertexId[2];
 	}
-	std::vector<CalCoreSubmesh::TextureCoordinate>& tc =
-	  submesh->getVectorVectorTextureCoordinate()[0];
-	for (size_t v = 0; v < tc.size(); v++)
+	std::vector<std::vector<CalCoreSubmesh::TextureCoordinate> >& tcV =
+	  submesh->getVectorVectorTextureCoordinate();
+	if (tcV.size() > 0)
 	{
-	  texcoords[tcOffs++].Set (tc[v].u, tc[v].v);
+	  std::vector<CalCoreSubmesh::TextureCoordinate>& tc = tcV[0];
+	  for (size_t v = 0; v < tc.size(); v++)
+	  {
+	    texcoords[tcOffs++].Set (tc[v].u, tc[v].v);
+	  }
+	}
+	else
+	{
+	  size_t vc = submesh->getVertexCount();
+	  memset (texcoords.Lock() + tcOffs, 0, vc * sizeof (csVector2));
+	  tcOffs += vc;
 	}
       }
     }

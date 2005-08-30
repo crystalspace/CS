@@ -15,6 +15,8 @@ chronological order.
 	  mesh objects.
 	- Eric Sunshine excluded the special-purpose csutil/win32/psdk-compat.h
 	  from the csutil.h master header.
+	- res fixed a crash in sprcal3d when a submesh didn't have texture
+	  coordinates.
 29-Aug-2005
 	- res made some more compile fixes for Win64, reported by Mike Gist.
 	- res added csutil/win32/psdk-compat.h to concentrate Windows Platform
