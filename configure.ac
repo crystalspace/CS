@@ -1102,6 +1102,9 @@ AS_IF([test "$no_x" != yes],
 # At least one user (Jorrit) has a strange installation in which inclusion of
 # <windows.h> fails if an int32 is not present, thus we must take this into
 # account.
+#
+# GLU is not required or used by CrystalSpace itself, but certain 3rd party
+# libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
 m4_define([cs_define_int32],
     [[#if !HAVE_TYPE_INT32
@@ -1164,16 +1167,19 @@ AC_ARG_WITH([mesa], [AC_HELP_STRING([--with-mesa],
 
 AS_IF([test $with_mesa != no],
     [cs_mesa_gl=CS_CREATE_TUPLE([],[],[-lMesaGL])
+    cs_mesa_glu=CS_CREATE_TUPLE([],[],[-lMesaGLU])
     cs_mesa_glx=CS_CREATE_TUPLE([],[],[-lMesaGLX])])
 
 # MacOS/X or Darwin?
 AS_IF([test "x$cs_host_macosx" = "xyes"],
     [cs_osx_gl=CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],
-	[-framework OpenGL])])
+	[-framework OpenGL])
+    cs_osx_glu=CS_CREATE_TUPLE([-DCS_GLU_PATH=OpenGL],[],[-framework OpenGL])])
 
 # Windows?
 AS_IF([test $cs_host_family = windows],
-    [cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])])
+    [cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])
+    cs_win32_glu=CS_CREATE_TUPLE([],[],[-lglu32])])
 
 # Check for OpenGL.
 CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
@@ -1185,6 +1191,19 @@ CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     $cs_mesa_gl], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
+
+# Check for GLU.
+CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
+    [AC_LANG_PROGRAM(
+        [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
+    [$cs_osx_glu \
+    CS_CREATE_TUPLE() \
+    $cs_win32_glu \
+    CS_CREATE_TUPLE([],[],[-lGLU]) \
+    CS_CREATE_TUPLE([],[],[-lglu]) \
+    $cs_mesa_glu], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
+    [$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
 AS_IF([test $cs_cv_libgl = yes],
     [# Check for GLhandleARB.
@@ -1734,9 +1753,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
 		[CGprogram p; cgGLBindProgram(p)])],
 	    [], [],
 	    [CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
-	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags],
-	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags],
-	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs  ],
+	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
+	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
+	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
 	    [cggl, cgGL, CGGL, Cg, cg, CG])])])
 
 CS_CHECK_LIBCG

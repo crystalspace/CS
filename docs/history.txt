@@ -17,6 +17,8 @@ chronological order.
 	  from the csutil.h master header.
 	- res fixed a crash in sprcal3d when a submesh didn't have texture
 	  coordinates.
+        - res reinstantiated the GLU check in configure since CgGL depends on
+          it on some platforms.
 29-Aug-2005
 	- res made some more compile fixes for Win64, reported by Mike Gist.
 	- res added csutil/win32/psdk-compat.h to concentrate Windows Platform
