@@ -930,8 +930,8 @@ void Win32Assistant::DisableConsole ()
     strcat (apppath, ".txt");
   }
 
-  freopen(apppath, "a", stderr);
-  freopen(apppath, "a", stdout);
+  freopen(apppath, "w", stderr);
+  freopen(apppath, "w", stdout);
   FreeConsole();
 
   struct tm *now;

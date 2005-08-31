@@ -19,6 +19,12 @@ chronological order.
 	  API documentation stating that it is the responsibility of the DLL's
 	  author to ensure that the global iSCF::SCF gets initialized within
 	  the DLL's context.
+	- res changed the Win32 console -> file redirection from appending to
+	  overwriting the log file - otherwise, the log will grow uncontrolled,
+	  and for troubleshooting purpose a log of the last run is probably
+	  sufficient.
+	- res fixed a bug in sprcal3d where HitBeam* would crash if the mesh
+	  has not been rendered yet.
 30-Aug-2005
 	- res overhauled cal3d's render mesh code - the original code was from
 	  a time when both OR/NR still existed; now, a number of ORisms were

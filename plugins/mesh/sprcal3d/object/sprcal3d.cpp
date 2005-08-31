@@ -1185,6 +1185,8 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
     size_t m;
     for (m = 0; m < meshes.Length(); m++)
     {
+      if (!meshes[m].vertex_buffer)
+	GetVertexBuffer (m, 0);
       csRenderBufferLock<csVector3> vertices (meshes[m].vertex_buffer);
       csBitArray vUpToDate (vertices.GetSize());
 
@@ -1310,6 +1312,8 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     size_t m;
     for (m = 0; m < meshes.Length(); m++)
     {
+      if (!meshes[m].vertex_buffer)
+	GetVertexBuffer (m, 0);
       csRenderBufferLock<csVector3> vertices (meshes[m].vertex_buffer);
       csBitArray vUpToDate (vertices.GetSize());
 
