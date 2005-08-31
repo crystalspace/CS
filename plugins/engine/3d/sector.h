@@ -22,6 +22,7 @@
 
 #include "csgeom/math3d.h"
 #include "cstool/rendermeshlist.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/array.h"
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
@@ -430,8 +431,34 @@ private:
   csRefArrayObject<iSector> list;
   csHash<iSector*,csStrKey> sectors_hash;
 
+  class NameChangeListener : public scfImplementation1<NameChangeListener,
+  	iObjectNameChangeListener>
+  {
+  private:
+    csWeakRef<csSectorList> list;
+
+  public:
+    NameChangeListener (csSectorList* list) : scfImplementationType (this),
+  	  list (list)
+    {
+    }
+    virtual ~NameChangeListener () { }
+
+    virtual void NameChanged (iObject* obj, const char* oldname,
+  	  const char* newname)
+    {
+      if (list)
+        list->NameChanged (obj, oldname, newname);
+    }
+  };
+  csRef<NameChangeListener> listener;
+
+
 public:
   SCF_DECLARE_IBASE;
+
+  void NameChanged (iObject* object, const char* oldname,
+  	const char* newname);
 
   /// constructor
   csSectorList ();

@@ -910,12 +910,22 @@ SCF_IMPLEMENT_IBASE_END
 csSectorList::csSectorList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  listener.AttachNew (new NameChangeListener (this));
 }
 
 csSectorList::~csSectorList ()
 {
   RemoveAll ();
   SCF_DESTRUCT_IBASE();
+}
+
+void csSectorList::NameChanged (iObject* object, const char* oldname,
+  	const char* newname)
+{
+  csRef<iSector> sector = SCF_QUERY_INTERFACE (object, iSector);
+  CS_ASSERT (sector != 0);
+  if (oldname) sectors_hash.Delete (oldname, sector);
+  if (newname) sectors_hash.Put (newname, sector);
 }
 
 void csSectorList::FreeSector (iSector* item)
@@ -930,6 +940,7 @@ int csSectorList::Add (iSector *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     sectors_hash.Put (name, obj);
+  obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
@@ -940,6 +951,7 @@ bool csSectorList::Remove (iSector *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     sectors_hash.Delete (name, obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return list.Delete (obj);
 }
 
@@ -950,6 +962,7 @@ bool csSectorList::Remove (int n)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     sectors_hash.Delete (name, obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return list.DeleteIndex (n);
 }
 
@@ -958,6 +971,7 @@ void csSectorList::RemoveAll ()
   size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
+    list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeSector (list[i]);
   }
   list.DeleteAll ();

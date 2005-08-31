@@ -27,6 +27,7 @@
 #include "csutil/ref.h"
 
 struct iObjectIterator;
+struct iObject;
 
 /**
  * You can use this macro to get a child object from a csObject. The returned
@@ -58,8 +59,20 @@ struct iObjectIterator;
     scfInterfaceTraits<Interface>::GetVersion(),                     \
     name, true))
 
+/**
+ * A callback that you can implement to get notified of name changes
+ * in an iObject.
+ */
+struct iObjectNameChangeListener : public virtual iBase
+{
+  SCF_INTERFACE (iObjectNameChangeListener, 0, 0, 1);
 
-//SCF_VERSION (iObject, 0, 3, 0);
+  /// Object name has changed.
+  virtual void NameChanged (iObject* obj, const char* oldname,
+  	const char* newname) = 0;
+};
+
+
 /**
  * This interface is an SCF interface for encapsulating csObject.
  * <p>
@@ -80,7 +93,7 @@ struct iObjectIterator;
  */
 struct iObject : public virtual iBase
 {
-  SCF_INTERFACE(iObject,2,0,0);
+  SCF_INTERFACE(iObject,2,0,1);
   /// Set object name
   virtual void SetName (const char *iName) = 0;
 
@@ -134,6 +147,18 @@ struct iObject : public virtual iBase
 
   // @@@ temporary fix
   virtual void ObjReleaseOld (iObject *obj) = 0;
+
+  /**
+   * Add a name change listener.
+   */
+  virtual void AddNameChangeListener (
+  	iObjectNameChangeListener* listener) = 0;
+
+  /**
+   * Remove a name change listener.
+   */
+  virtual void RemoveNameChangeListener (
+  	iObjectNameChangeListener* listener) = 0;
 };
 
 

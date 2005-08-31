@@ -150,10 +150,12 @@ csObject::~csObject ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csObject::SetName (const char *iName)
+void csObject::SetName (const char* newname)
 {
-  delete [] Name;
-  Name = csStrNew (iName);
+  const char* oldname = Name;
+  Name = csStrNew (newname);
+  FireNameChangeListeners (oldname, newname);
+  delete [] oldname;
   DG_DESCRIBE1 (this, "%s", Name);
 }
 
@@ -303,5 +305,25 @@ iObject* csObject::GetChild (const char *Name) const
 csPtr<iObjectIterator> csObject::GetIterator ()
 {
   return csPtr<iObjectIterator> (new csObjectIterator (this));
+}
+
+void csObject::FireNameChangeListeners (const char* oldname,
+	const char* newname)
+{
+  size_t i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->NameChanged (this, oldname, newname);
+}
+
+void csObject::AddNameChangeListener (
+  	iObjectNameChangeListener* listener)
+{
+  listeners.Push (listener);
+}
+
+void csObject::RemoveNameChangeListener (
+  	iObjectNameChangeListener* listener)
+{
+  listeners.Delete (listener);
 }
 

@@ -20,8 +20,10 @@
 #define __CS_LIGHT_H__
 
 #include "csgeom/transfrm.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/cscolor.h"
+#include "csutil/weakref.h"
 #include "csutil/flags.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hash.h"
@@ -523,8 +525,33 @@ private:
   csRefArrayObject<iLight> list;
   csHash<iLight*,csStrKey> lights_hash;
 
+  class NameChangeListener : public scfImplementation1<NameChangeListener,
+  	iObjectNameChangeListener>
+  {
+  private:
+    csWeakRef<csLightList> list;
+
+  public:
+    NameChangeListener (csLightList* list) : scfImplementationType (this),
+  	  list (list)
+    {
+    }
+    virtual ~NameChangeListener () { }
+
+    virtual void NameChanged (iObject* obj, const char* oldname,
+  	  const char* newname)
+    {
+      if (list)
+        list->NameChanged (obj, oldname, newname);
+    }
+  };
+  csRef<NameChangeListener> listener;
+
 public:
   SCF_DECLARE_IBASE;
+
+  void NameChanged (iObject* object, const char* oldname,
+  	const char* newname);
 
   /// constructor
   csLightList ();

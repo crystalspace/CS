@@ -799,7 +799,6 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);
-  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   rm->worldspace_origin = movable->GetFullPosition ();
   rm->clip_portal = clip_portal;

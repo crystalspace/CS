@@ -21,6 +21,7 @@
 #define __CS_MATERIAL_H__
 
 #include "csgfx/rgbpixel.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hash.h"
@@ -274,12 +275,37 @@ private:
   csRefArrayObject<iMaterialWrapper> list;
   csHash<iMaterialWrapper*,csStrKey> mat_hash;
 
+  class NameChangeListener : public scfImplementation1<NameChangeListener,
+  	iObjectNameChangeListener>
+  {
+  private:
+    csWeakRef<csMaterialList> list;
+
+  public:
+    NameChangeListener (csMaterialList* list) : scfImplementationType (this),
+  	  list (list)
+    {
+    }
+    virtual ~NameChangeListener () { }
+
+    virtual void NameChanged (iObject* obj, const char* oldname,
+  	  const char* newname)
+    {
+      if (list)
+        list->NameChanged (obj, oldname, newname);
+    }
+  };
+  csRef<NameChangeListener> listener;
+
 public:
   /// Initialize the array
   csMaterialList ();
   virtual ~csMaterialList ();
 
   SCF_DECLARE_IBASE;
+
+  void NameChanged (iObject* object, const char* oldname,
+  	const char* newname);
 
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name);

@@ -345,11 +345,21 @@ SCF_IMPLEMENT_IBASE_END
 csMaterialList::csMaterialList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  listener.AttachNew (new NameChangeListener (this));
 }
 
 csMaterialList::~csMaterialList()
 {
   SCF_DESTRUCT_IBASE ();
+}
+
+void csMaterialList::NameChanged (iObject* object, const char* oldname,
+  	const char* newname)
+{
+  csRef<iMaterialWrapper> mat = SCF_QUERY_INTERFACE (object, iMaterialWrapper);
+  CS_ASSERT (mat != 0);
+  if (oldname) mat_hash.Delete (oldname, mat);
+  if (newname) mat_hash.Put (newname, mat);
 }
 
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
@@ -361,6 +371,7 @@ iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
   if (name)
     mat_hash.Put (name, tm);
   list.Push (tm);
+  tm->QueryObject ()->AddNameChangeListener (listener);
   tm->DecRef ();
   return tm;
 }
@@ -370,6 +381,7 @@ int csMaterialList::Add (iMaterialWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     mat_hash.Put (name, obj);
+  obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
@@ -378,6 +390,7 @@ bool csMaterialList::Remove (iMaterialWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     mat_hash.Delete (name, obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return list.Delete (obj);
 }
 
@@ -387,11 +400,15 @@ bool csMaterialList::Remove (int n)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     mat_hash.Delete (name, obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return list.DeleteIndex (n);
 }
 
 void csMaterialList::RemoveAll ()
 {
+  size_t i;
+  for (i = 0 ; i < list.Length () ; i++)
+    list[i]->QueryObject ()->RemoveNameChangeListener (listener);
   list.DeleteAll ();
   mat_hash.DeleteAll ();
 }

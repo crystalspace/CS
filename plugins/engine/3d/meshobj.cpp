@@ -1306,12 +1306,22 @@ SCF_IMPLEMENT_IBASE_END
 csMeshList::csMeshList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  listener.AttachNew (new NameChangeListener (this));
 }
 
 csMeshList::~csMeshList ()
 {
   RemoveAll ();
   SCF_DESTRUCT_IBASE ();
+}
+
+void csMeshList::NameChanged (iObject* object, const char* oldname,
+  	const char* newname)
+{
+  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (object, iMeshWrapper);
+  CS_ASSERT (mesh != 0);
+  if (oldname) meshes_hash.Delete (oldname, mesh);
+  if (newname) meshes_hash.Put (newname, mesh);
 }
 
 iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
@@ -1334,6 +1344,7 @@ int csMeshList::Add (iMeshWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     meshes_hash.Put (name, obj);
+  obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
@@ -1344,6 +1355,7 @@ bool csMeshList::Remove (iMeshWrapper *obj)
   if (name)
     meshes_hash.Delete (name, obj);
   list.Delete (obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return true;
 }
 
@@ -1355,6 +1367,7 @@ bool csMeshList::Remove (int n)
   if (name)
     meshes_hash.Delete (name, obj);
   list.DeleteIndex (n);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return true;
 }
 
@@ -1363,6 +1376,7 @@ void csMeshList::RemoveAll ()
   size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
+    list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeMesh (list[i]);
   }
   meshes_hash.DeleteAll ();
@@ -1456,6 +1470,7 @@ SCF_IMPLEMENT_IBASE_END
 csMeshFactoryList::csMeshFactoryList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  listener.AttachNew (new NameChangeListener (this));
 }
 
 csMeshFactoryList::~csMeshFactoryList ()
@@ -1464,12 +1479,23 @@ csMeshFactoryList::~csMeshFactoryList ()
   SCF_DESTRUCT_IBASE ();
 }
 
+void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
+  	const char* newname)
+{
+  csRef<iMeshFactoryWrapper> mesh = SCF_QUERY_INTERFACE (object,
+    iMeshFactoryWrapper);
+  CS_ASSERT (mesh != 0);
+  if (oldname) factories_hash.Delete (oldname, mesh);
+  if (newname) factories_hash.Put (newname, mesh);
+}
+
 int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 {
   PrepareFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     factories_hash.Put (name, obj);
+  obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
@@ -1480,6 +1506,7 @@ bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
   if (name)
     factories_hash.Delete (name, obj);
   list.Delete (obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return true;
 }
 
@@ -1493,6 +1520,7 @@ void csMeshFactoryList::RemoveAll ()
   size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
+    list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeFactory (list[i]);
   }
   factories_hash.DeleteAll ();

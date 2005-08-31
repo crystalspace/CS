@@ -20,6 +20,7 @@
 #define __CS_MESHOBJ_H__
 
 #include "csgeom/transfrm.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
@@ -58,8 +59,33 @@ private:
   csRefArrayObject<iMeshWrapper> list;
   csHash<iMeshWrapper*,csStrKey> meshes_hash;
 
+  class NameChangeListener : public scfImplementation1<NameChangeListener,
+  	iObjectNameChangeListener>
+  {
+  private:
+    csWeakRef<csMeshList> list;
+
+  public:
+    NameChangeListener (csMeshList* list) : scfImplementationType (this),
+  	  list (list)
+    {
+    }
+    virtual ~NameChangeListener () { }
+
+    virtual void NameChanged (iObject* obj, const char* oldname,
+  	  const char* newname)
+    {
+      if (list)
+        list->NameChanged (obj, oldname, newname);
+    }
+  };
+  csRef<NameChangeListener> listener;
+
 public:
   SCF_DECLARE_IBASE;
+
+  void NameChanged (iObject* object, const char* oldname,
+  	const char* newname);
 
   /// constructor
   csMeshList ();
@@ -109,8 +135,34 @@ private:
   csHash<iMeshFactoryWrapper*,csStrKey>
   	factories_hash;
 
+  class NameChangeListener : public scfImplementation1<NameChangeListener,
+  	iObjectNameChangeListener>
+  {
+  private:
+    csWeakRef<csMeshFactoryList> list;
+
+  public:
+    NameChangeListener (csMeshFactoryList* list) : scfImplementationType (this),
+  	  list (list)
+    {
+    }
+    virtual ~NameChangeListener () { }
+
+    virtual void NameChanged (iObject* obj, const char* oldname,
+  	  const char* newname)
+    {
+      if (list)
+        list->NameChanged (obj, oldname, newname);
+    }
+  };
+  csRef<NameChangeListener> listener;
+
+
 public:
   SCF_DECLARE_IBASE;
+
+  void NameChanged (iObject* object, const char* oldname,
+  	const char* newname);
 
   /// constructor
   csMeshFactoryList ();

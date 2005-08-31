@@ -222,7 +222,6 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane, 
     clip_z_plane);
-  csVector3 camera_origin = temp.GetT2OTranslation ();
 
   csReversibleTransform tr_o2c;
   tr_o2c.SetO2TTranslation (-temp.Other2This (offset));

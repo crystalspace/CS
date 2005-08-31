@@ -51,8 +51,14 @@ protected:
   /// Parent object
   iObject *ParentObject;
 
-  /// private initialization function
+  /// Name change listeners.
+  csRefArray<iObjectNameChangeListener> listeners;
+
+  /// Private initialization function
   void InitializeObject ();
+
+  /// Fire name change listeners.
+  void FireNameChangeListeners (const char* oldname, const char* newname);
 
 public:
   CS_LEAKGUARD_DECLARE (csObject);
@@ -118,9 +124,13 @@ public:
    */
   virtual csPtr<iObjectIterator> GetIterator ();
 
+  virtual void AddNameChangeListener (
+  	iObjectNameChangeListener* listener);
+  virtual void RemoveNameChangeListener (
+  	iObjectNameChangeListener* listener);
+
   SCF_DECLARE_IBASE;
 
-  // @@@ temporary fix
   virtual void ObjReleaseOld (iObject *obj);
 };
 

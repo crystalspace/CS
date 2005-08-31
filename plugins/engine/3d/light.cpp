@@ -411,12 +411,22 @@ SCF_IMPLEMENT_IBASE_END
 csLightList::csLightList ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  listener.AttachNew (new NameChangeListener (this));
 }
 
 csLightList::~csLightList ()
 {
   RemoveAll ();
   SCF_DESTRUCT_IBASE ();
+}
+
+void csLightList::NameChanged (iObject* object, const char* oldname,
+  	const char* newname)
+{
+  csRef<iLight> light = SCF_QUERY_INTERFACE (object, iLight);
+  CS_ASSERT (light != 0);
+  if (oldname) lights_hash.Delete (oldname, light);
+  if (newname) lights_hash.Put (newname, light);
 }
 
 iLight *csLightList::FindByID (const char* id) const
@@ -437,6 +447,7 @@ int csLightList::Add (iLight *obj)
   const char* lightname = obj->QueryObject ()->GetName ();
   if (lightname)
     lights_hash.Put (lightname, obj);
+  obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
@@ -446,6 +457,7 @@ bool csLightList::Remove (iLight *obj)
   const char* lightname = obj->QueryObject ()->GetName ();
   if (lightname)
     lights_hash.Delete (lightname, obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return list.Delete (obj);
 }
 
@@ -456,6 +468,7 @@ bool csLightList::Remove (int n)
   const char* lightname = obj->QueryObject ()->GetName ();
   if (lightname)
     lights_hash.Delete (lightname, obj);
+  obj->QueryObject ()->RemoveNameChangeListener (listener);
   return list.DeleteIndex (n);
 }
 
@@ -464,6 +477,7 @@ void csLightList::RemoveAll ()
   size_t i;
   for (i = 0 ; i < list.Length () ; i++)
   {
+    list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeLight (list[i]);
   }
   lights_hash.DeleteAll ();
