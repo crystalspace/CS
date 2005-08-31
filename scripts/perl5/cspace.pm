@@ -6938,6 +6938,46 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csSpriteCal3DActiveAnim ##############
+
+package cspace::csSpriteCal3DActiveAnim;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_index_get = *cspacec::csSpriteCal3DActiveAnim_index_get;
+*swig_index_set = *cspacec::csSpriteCal3DActiveAnim_index_set;
+*swig_weight_get = *cspacec::csSpriteCal3DActiveAnim_weight_get;
+*swig_weight_set = *cspacec::csSpriteCal3DActiveAnim_weight_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSpriteCal3DActiveAnim(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSpriteCal3DActiveAnim($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSpriteCal3DState ##############
 
 package cspace::iSpriteCal3DState;
@@ -6976,9 +7016,10 @@ package cspace::iSpriteCal3DState;
 *GetAnimationTime = *cspacec::iSpriteCal3DState_GetAnimationTime;
 *GetAnimationDuration = *cspacec::iSpriteCal3DState_GetAnimationDuration;
 *SetAnimationTime = *cspacec::iSpriteCal3DState_SetAnimationTime;
-*GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
-*SetUserData = *cspacec::iSpriteCal3DState_SetUserData;
 *SetAnimTimeUpdateHandler = *cspacec::iSpriteCal3DState_SetAnimTimeUpdateHandler;
+*SetUserData = *cspacec::iSpriteCal3DState_SetUserData;
+*GetSubmeshSVC = *cspacec::iSpriteCal3DState_GetSubmeshSVC;
+*GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
