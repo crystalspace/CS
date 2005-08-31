@@ -331,7 +331,15 @@ void Name (void (*p)())                                                \
  * for Python, Perl, and Java. For Crystal Space plugins, instead use
  * CS_IMPLEMENT_PLUGIN.  Platforms may override the definition of this macro in
  * order to augment the implementation of the foreign module with any special
- * implementation details required by the platform.
+ * implementation details required by the platform. If the foreign module will
+ * be interacting with Crystal Space, then it also needs to initialize the
+ * global iSCF::SCF variable manually. This variable should be set to point at
+ * the single shared instance of iSCF which is created by the application's
+ * invocation of scfInitialize(), csInitializer::InitializeSCF(), or
+ * csInitializer::CreateEnvironment(). In real Crystal Space plugins (those
+ * using CS_IMPLEMENT_PLUGIN), iSCF::SCF is initialized automatically; but in
+ * foreign DLL's, it is the responsibility of the DLL's author to ensure that
+ * iSCF::SCF gets initialized.
  */
 #ifndef CS_IMPLEMENT_FOREIGN_DLL
 #  if defined(CS_BUILD_SHARED_LIBS)

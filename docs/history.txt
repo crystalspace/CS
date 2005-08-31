@@ -15,6 +15,10 @@ chronological order.
 	  the name of such an object will no longer cause FindByName() to fail
 	  (because the internal hash of that list was not updated after the
 	  name change).
+	- Eric Sunshine added an important note to the CS_IMPLEMENT_FOREIGN_DLL
+	  API documentation stating that it is the responsibility of the DLL's
+	  author to ensure that the global iSCF::SCF gets initialized within
+	  the DLL's context.
 30-Aug-2005
 	- res overhauled cal3d's render mesh code - the original code was from
 	  a time when both OR/NR still existed; now, a number of ORisms were
