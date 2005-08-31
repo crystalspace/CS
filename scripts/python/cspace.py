@@ -6101,6 +6101,35 @@ class iAnimTimeUpdateHandlerPtr(iAnimTimeUpdateHandler):
         _swig_setattr(self, iAnimTimeUpdateHandler,self.__class__,iAnimTimeUpdateHandler)
 _cspace.iAnimTimeUpdateHandler_swigregister(iAnimTimeUpdateHandlerPtr)
 
+class csSpriteCal3DActiveAnim(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSpriteCal3DActiveAnim, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csSpriteCal3DActiveAnim, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csSpriteCal3DActiveAnim instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["index"] = _cspace.csSpriteCal3DActiveAnim_index_set
+    __swig_getmethods__["index"] = _cspace.csSpriteCal3DActiveAnim_index_get
+    if _newclass:index = property(_cspace.csSpriteCal3DActiveAnim_index_get, _cspace.csSpriteCal3DActiveAnim_index_set)
+    __swig_setmethods__["weight"] = _cspace.csSpriteCal3DActiveAnim_weight_set
+    __swig_getmethods__["weight"] = _cspace.csSpriteCal3DActiveAnim_weight_get
+    if _newclass:weight = property(_cspace.csSpriteCal3DActiveAnim_weight_get, _cspace.csSpriteCal3DActiveAnim_weight_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csSpriteCal3DActiveAnim, 'this', _cspace.new_csSpriteCal3DActiveAnim(*args))
+        _swig_setattr(self, csSpriteCal3DActiveAnim, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csSpriteCal3DActiveAnim):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSpriteCal3DActiveAnimPtr(csSpriteCal3DActiveAnim):
+    def __init__(self, this):
+        _swig_setattr(self, csSpriteCal3DActiveAnim, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSpriteCal3DActiveAnim, 'thisown', 0)
+        _swig_setattr(self, csSpriteCal3DActiveAnim,self.__class__,csSpriteCal3DActiveAnim)
+_cspace.csSpriteCal3DActiveAnim_swigregister(csSpriteCal3DActiveAnimPtr)
+
 class iSpriteCal3DState(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6143,9 +6172,10 @@ class iSpriteCal3DState(iBase):
     def GetAnimationTime(*args): return _cspace.iSpriteCal3DState_GetAnimationTime(*args)
     def GetAnimationDuration(*args): return _cspace.iSpriteCal3DState_GetAnimationDuration(*args)
     def SetAnimationTime(*args): return _cspace.iSpriteCal3DState_SetAnimationTime(*args)
-    def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
-    def SetUserData(*args): return _cspace.iSpriteCal3DState_SetUserData(*args)
     def SetAnimTimeUpdateHandler(*args): return _cspace.iSpriteCal3DState_SetAnimTimeUpdateHandler(*args)
+    def SetUserData(*args): return _cspace.iSpriteCal3DState_SetUserData(*args)
+    def GetSubmeshSVC(*args): return _cspace.iSpriteCal3DState_GetSubmeshSVC(*args)
+    def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DState):
         try:
             if self.thisown: destroy(self)
