@@ -2001,6 +2001,8 @@ iRenderBuffer* csSpriteCal3DMeshObject::GetVertexBuffer (size_t index,
 
     if (!pCalRenderer)
       render->endRendering();
+
+    mesh.vertexVersion = meshVersion;
   }
 
   return mesh.vertex_buffer;

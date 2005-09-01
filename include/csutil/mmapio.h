@@ -99,8 +99,9 @@ public:
 
 private:
 
-  struct PlatformMapping : public PlatformMemoryMapping,
-                           public csMemoryMapping
+  struct PlatformMapping : 
+    public csPlatformMemoryMapping::PlatformMemoryMapping, 
+    public csMemoryMapping
   {
     csRef<csMemoryMappedIO> parent;
     size_t length;

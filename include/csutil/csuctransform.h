@@ -718,14 +718,25 @@ public:
     return UTF16to32 (dest, destSize, (utf16_char*)source, srcSize);
   };
 
-#if !defined(CS_COMPILER_MSVC) || defined(CS_MSVC_WCHAR_T_BUILTIN)
-  /* @@@ For VC6, utf16_char == wchar_t, complains below. (Can be avoided on 
-   * VC7 with "Builtin wchar_t" - but disabled for CS.) */
+  /* Decode()/Encode() overloads for wchar_t.
+   * - On VC7+, wchar_t may be an unsigned short or the special type __wchar_t.
+   * - On VC6 wchar_t is always an unsigned short. __wchar_t does not exist.
+   * Now there may be conflicts with the utf16_char overloads if wchar_t is
+   * an unsigned short. On the other hand, we would like to support VC7+'s
+   * built-in wchar_t as well.
+   * So: on VC7+, provide overloads for __wchar_t, on VC6, don't compile this
+   * code at all, on other compilers, provide overloads for wchar_t instead
+   * (by re#definining __wchar_t). 
+   */
+#if !defined(CS_COMPILER_MSVC) || (_MSC_VER > 1300)
+#if !defined(CS_COMPILER_MSVC)
+  #define __wchar_t wchar_t
+#endif  
   /**
    * Decode an Unicode code point from wchar_t.
    * \copydoc UTF8Decode(const utf8_char*,size_t,utf32_char&,bool*,bool)
    */
-  inline static int Decode (const wchar_t* str, size_t strlen, 
+  inline static int Decode (const __wchar_t* str, size_t strlen, 
     utf32_char& ch, bool* isValid = 0, bool returnNonChar = false)
   {
     return UTF16Decode ((utf16_char*)str, strlen, ch, isValid, returnNonChar);
@@ -734,11 +745,14 @@ public:
    * Encode an Unicode code point to wchar_t.
    * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
    */
-  inline static int Encode (const utf32_char ch, wchar_t* buf, 
+  inline static int Encode (const utf32_char ch, __wchar_t* buf, 
     size_t bufsize, bool allowNonchars = false)
   {
     return EncodeUTF16 (ch, (utf16_char*)buf, bufsize, allowNonchars);
   }
+#ifdef __wchar_t
+  #undef __wchar_t
+#endif
 #endif
   /** @} */
 #elif (CS_WCHAR_T_SIZE == 4)

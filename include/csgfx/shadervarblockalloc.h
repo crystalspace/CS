@@ -42,6 +42,7 @@ class csShaderVarBlockAlloc
     csShaderVarBlockAlloc* allocator;
     virtual void Delete() { allocator->blockAlloc.Free (this); }
   };
+  friend class BlockAllocatedSV;
   csBlockAllocator<BlockAllocatedSV> blockAlloc;
 public:
   /**

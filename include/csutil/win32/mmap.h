@@ -34,12 +34,12 @@
  */
 class CS_CRYSTALSPACE_EXPORT csPlatformMemoryMappingWin32
 {
-protected:
+public:
   struct PlatformMemoryMapping
   {
     void* realPtr;
   };
-
+protected:
   /// Handle to the mapped file 
   HANDLE hMappedFile;
   /// Handle to the mapping

@@ -7,9 +7,17 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 1-Sep-2005
-  - Andrew Dai fixed an infinite loop when moving using csColliderActor,
-    this was caused by the collision system and FindIntersection tests
-    disagreeing with each other.
+	- Andrew Dai fixed an infinite loop when moving using csColliderActor,
+	  this was caused by the collision system and FindIntersection tests
+	  disagreeing with each other.
+	- res made an optimization/fix to sprcal3d: forgot to update a variable
+	  that is checked to avoid unnecessary computations.
+	- res made some VC6 compile fixes.
+	- res ditched the fragile "built-in wchar_t" detection and allowed
+	  support for VC's built-in wchar_t by csUnicodeTransform::Encode()
+	  and Decode() by utilizing the special __wchar_t type always present 
+	  on VC7+.
+	- res fixed some VC8 warnings in expparser.cpp.
 31-Aug-2005
 	- Jorrit added a new system to iObject/csObject so that you can get
 	  notified when an object changes name. To do this you have to

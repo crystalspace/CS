@@ -152,7 +152,7 @@ csObject::~csObject ()
 
 void csObject::SetName (const char* newname)
 {
-  const char* oldname = Name;
+  char* oldname = Name;
   Name = csStrNew (newname);
   FireNameChangeListeners (oldname, newname);
   delete [] oldname;

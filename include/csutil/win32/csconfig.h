@@ -107,12 +107,4 @@
 #  define _CRT_NONSTDC_NO_DEPRECATE /* Similar.	*/
 #endif
 
-#if defined(CS_COMPILER_MSVC) && defined(_WCHAR_T_DEFINED)
-  /* Attempt to detect built-in wchar_t - needed for some templates that
-   * are templated for both utf16_char(short) and wchar_t(short as well if 
-   * not built-in). 
-   * NB: only works if cssysdef.h is included first in sources */
-  #define CS_MSVC_WCHAR_T_BUILTIN
-#endif
-  
 #endif // __CS_WIN32_CSCONFIG_H__
