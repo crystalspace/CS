@@ -34,10 +34,9 @@ struct iDataBuffer;
 struct csRGBpixel;
 
 /*
- * We can request to load image in one of several formats.
- * We can request from csImageLoader to load a image in several formats.
+ * We can request csImageLoader to load an image in several formats.
  * The format we should use depends on what we want to do with the image;
- * usually if we're going to use the image as a texture we the format we
+ * usually if we're going to use the image as a texture, the format we
  * should use is determined by querying the 3D rasterizer for the preferred
  * image format.
  */
