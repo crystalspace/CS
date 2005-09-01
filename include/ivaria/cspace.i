@@ -740,6 +740,8 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore csSphere::operator+ (const csSphere &, const csSphere &);
 %ignore csSphere::GetCenter (); // Non-const.
+%ignore csEllipsoid::GetCenter (); // Non-const.
+%ignore csEllipsoid:: GetRadius (); // Non-const.
 %include "csgeom/sphere.h"
 
 %ignore csPlane2::A ();

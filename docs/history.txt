@@ -23,6 +23,9 @@ chronological order.
 	  GetCoreMeshShaderVarContext() (to be a bit more consistent with the
 	  remaining methods and to have a bit more vebose name. Also made it
 	  actually work.
+	- Eric Sunshine added a couple %ignore directives to cspace.i for the
+	  non-const overloads of csEllipsoid::GetCenter() and GetRadius() in
+	  order to avoid 'method redefinition' warnings from Java.
 31-Aug-2005
 	- Jorrit added a new system to iObject/csObject so that you can get
 	  notified when an object changes name. To do this you have to
